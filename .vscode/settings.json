@@ -6,6 +6,7 @@
         "sizebuf.h": "c",
         "q_tools.h": "c",
         "qboolean.h": "c",
-        "byte_t.h": "c"
+        "byte_t.h": "c",
+        "endian_tools.h": "c"
     }
 }

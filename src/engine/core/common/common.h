@@ -20,36 +20,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // comndef.h  -- general definitions
 
-
-
 #include "byte_t.h"
 #include "qboolean.h"
 
-
+#include "endian_tools.h"
+#include "msg.h"
+#include "q_tools.h"
 #include "sizebuf.h"
-
-//============================================================================
-
-typedef struct link_s
-{
-	struct link_s	*prev, *next;
-} link_t;
-
-
-void ClearLink (link_t *l);
-void RemoveLink (link_t *l);
-void InsertLinkBefore (link_t *l, link_t *before);
-void InsertLinkAfter (link_t *l, link_t *after);
-
-// (type *)STRUCT_FROM_LINK(link_t *link, type, member)
-// ent = STRUCT_FROM_LINK(link,entity_t,order)
-// FIXME: remove this mess!
-#define	STRUCT_FROM_LINK(l,t,m) ((t *)((uint8_t *)l - (int)&(((t *)0)->m)))
+#include "link.h"
 
 //============================================================================
 
 #ifndef NULL
-#define NULL ((void *)0)
+	#define NULL ((void *)0)
 #endif
 
 #define Q_MAXCHAR ((char)0x7f)
@@ -66,26 +49,10 @@ void InsertLinkAfter (link_t *l, link_t *after);
 
 //============================================================================
 
-extern	qboolean		bigendien;
-
-extern	short	(*BigShort) (short l);
-extern	short	(*LittleShort) (short l);
-extern	int	(*BigLong) (int l);
-extern	int	(*LittleLong) (int l);
-extern	float	(*BigFloat) (float l);
-extern	float	(*LittleFloat) (float l);
-
-#include "msg.h"
-
-#include "q_tools.h"
-
-//============================================================================
-
 extern	char		com_token[1024];
 extern	qboolean	com_eof;
 
 char *COM_Parse (char *data);
-
 
 extern	int		com_argc;
 extern	char	**com_argv;

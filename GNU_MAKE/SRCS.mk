@@ -13,8 +13,11 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
         $(eval COMM_DIR = $(CORE_DIR)/common) $(eval INCLUDES += $(COMM_DIR))
             SRC_LIST += $(COMM_DIR)/common.c
-#             SRC_LIST += $(COMM_DIR)/msg.c
+            SRC_LIST += $(COMM_DIR)/msg.c
             SRC_LIST += $(COMM_DIR)/sizebuf.c
+            SRC_LIST += $(COMM_DIR)/q_tools.c
+            SRC_LIST += $(COMM_DIR)/endian_tools.c
+            SRC_LIST += $(COMM_DIR)/link.c
 
         SRC_LIST += $(CORE_DIR)/host.c
         SRC_LIST += $(CORE_DIR)/host_cmd.c
