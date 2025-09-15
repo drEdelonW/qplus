@@ -25,12 +25,12 @@ LDFLAGS := $(BITS) -lm
 
 TARGETS ?= $(BUILD_DEBUG_DIR)/quake.x11
 
-ifneq ($(NO_PARALLEL),1)
-  J ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || \
-                nproc 2>/dev/null || \
-                sysctl -n hw.ncpu 2>/dev/null || echo 1)
-  MAKEFLAGS += -j$(J) --output-sync=target
-endif
+# ifneq ($(NO_PARALLEL),1)
+#   J ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || \
+#                 nproc 2>/dev/null || \
+#                 sysctl -n hw.ncpu 2>/dev/null || echo 1)
+#   MAKEFLAGS += -j$(J) --output-sync=target
+# endif
 
 build_debug:
 	@mkdir -p $(BUILD_DEBUG_DIR) \
