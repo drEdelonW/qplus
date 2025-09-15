@@ -2,6 +2,8 @@
     sudo apt install xserver-xephyr
 
 # run EXTERNAL WINDOW
+    open -a XQuartz  # run X11 server on MacOS
+
     Xephyr :1 -screen 320x200x16 -ac -retro
 
 # run in extern window
