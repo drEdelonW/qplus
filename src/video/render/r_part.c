@@ -534,7 +534,7 @@ void R_TeleportSplash (vec3_t org)
 			}
 }
 
-void R_RocketTrail (vec3_t start, vec3_t end, int type)
+void R_RocketTrail (vec3_t start, vec3_t end, rocket_trail_type type)
 {
 	vec3_t		vec;
 	float		len;

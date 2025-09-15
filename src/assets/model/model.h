@@ -288,14 +288,30 @@ typedef struct {
 
 typedef enum {mod_brush, mod_sprite, mod_alias} modtype_t;
 
-#define	EF_ROCKET	1			// leave a trail
-#define	EF_GRENADE	2			// leave a trail
-#define	EF_GIB		4			// leave a trail
-#define	EF_ROTATE	8			// rotate (bonus items)
-#define	EF_TRACER	16			// green split trail
-#define	EF_ZOMGIB	32			// small blood trail
-#define	EF_TRACER2	64			// orange split trail + rotate
-#define	EF_TRACER3	128			// purple trail
+#if 0
+typedef enum {
+    RT_ROCKET   = 0,
+    RT_GRENADE  = 1,
+    RT_GIB      = 2,
+    RT_TRACER   = 3,
+    RT_ZOMGIB   = 4,
+    RT_TRACER2  = 5,
+    RT_TRACER3  = 6
+} rocket_trail_type;
+/* Bit flags for entity effects */
+typedef enum entity_effects {
+    EF_ROCKET  = 1 << RT_ROCKET,   /* leave a trail */
+    EF_GRENADE = 1 << RT_GRENADE,   /* leave a trail */
+    EF_GIB     = 1 << RT_GIB,   /* leave a trail */
+    EF_ROTATE  = 1 << RT_TRACER,   /* rotate (bonus items) */
+    EF_TRACER  = 1 << RT_ZOMGIB,   /* green split trail */
+    EF_ZOMGIB  = 1 << RT_TRACER2,   /* small blood trail */
+    EF_TRACER2 = 1 << RT_TRACER3,   /* orange split trail + rotate */
+    EF_TRACER3 = 1 << 7    /* purple trail */
+} entity_effects;
+#else
+    #include "m_effect.h"
+#endif
 
 typedef struct model_s
 {
@@ -308,15 +324,15 @@ typedef struct model_s
 
 	int			flags;
 
-//
-// volume occupied by the model
-//
+  //
+  // volume occupied by the model
+  //
 	vec3_t		mins, maxs;
 	float		radius;
 
-//
-// brush model
-//
+  //
+  // brush model
+  //
 	int			firstmodelsurface, nummodelsurfaces;
 
 	int			numsubmodels;
@@ -361,9 +377,9 @@ typedef struct model_s
 	byte		*lightdata;
 	char		*entities;
 
-//
-// additional model data
-//
+  //
+  // additional model data
+  //
 	cache_user_t	cache;		// only access through Mod_Extradata
 
 } model_t;

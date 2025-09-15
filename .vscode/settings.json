@@ -9,6 +9,11 @@
         "byte_t.h": "c",
         "endian_tools.h": "c",
         "qparams.h": "c",
-        "chase.h": "c"
+        "chase.h": "c",
+        "r_local.h": "c",
+        "quakedef.h": "c",
+        "d_local.h": "c",
+        "*.q1": "c",
+        "*.q2": "c"
     }
 }

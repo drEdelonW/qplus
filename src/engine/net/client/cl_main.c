@@ -587,25 +587,25 @@ void CL_RelinkEntities (void)
 #endif
 
 		if (ent->model->flags & EF_GIB)
-			R_RocketTrail (oldorg, ent->origin, 2);
+			R_RocketTrail (oldorg, ent->origin, RT_GIB);
 		else if (ent->model->flags & EF_ZOMGIB)
-			R_RocketTrail (oldorg, ent->origin, 4);
+			R_RocketTrail (oldorg, ent->origin, RT_ZOMGIB);
 		else if (ent->model->flags & EF_TRACER)
-			R_RocketTrail (oldorg, ent->origin, 3);
+			R_RocketTrail (oldorg, ent->origin, RT_TRACER);
 		else if (ent->model->flags & EF_TRACER2)
-			R_RocketTrail (oldorg, ent->origin, 5);
+			R_RocketTrail (oldorg, ent->origin, RT_TRACER2);
 		else if (ent->model->flags & EF_ROCKET)
 		{
-			R_RocketTrail (oldorg, ent->origin, 0);
+			R_RocketTrail (oldorg, ent->origin, RT_ROCKET);
 			dl = CL_AllocDlight (i);
 			VectorCopy (ent->origin, dl->origin);
 			dl->radius = 200;
 			dl->die = cl.time + 0.01;
 		}
 		else if (ent->model->flags & EF_GRENADE)
-			R_RocketTrail (oldorg, ent->origin, 1);
+			R_RocketTrail (oldorg, ent->origin, RT_GRENADE);
 		else if (ent->model->flags & EF_TRACER3)
-			R_RocketTrail (oldorg, ent->origin, 6);
+			R_RocketTrail (oldorg, ent->origin, RT_TRACER3);
 
 		ent->forcelink = false;
 
