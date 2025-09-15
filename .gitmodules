@@ -1,0 +1,5 @@
+[submodule "ID_src"]
+	path = ID_src
+	# url = git@github.com:drEdelonW/Quake.git
+	# url = git@github.com:id-Software/Quake.git
+	url = ssh://git@gitlab.ark/id_software/Quake.git
