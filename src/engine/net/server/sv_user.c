@@ -41,7 +41,7 @@ qboolean	onground;
 
 usercmd_t	cmd;
 
-cvar_t	sv_idealpitchscale = {"sv_idealpitchscale","0.8"};
+cvar_t	sv_idealpitchscale = {"sv_idealpitchscale", "0.8"};
 
 
 /*

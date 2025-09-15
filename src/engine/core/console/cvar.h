@@ -29,8 +29,8 @@ it is sufficient to initialize a cvar_t with just the first two fields, or
 you can add a ,true flag for variables that you want saved to the configuration
 file when the game is quit:
 
-cvar_t	r_draworder = {"r_draworder","1"};
-cvar_t	scr_screensize = {"screensize","1",true};
+cvar_t	r_draworder = {"r_draworder", "1"};
+cvar_t	scr_screensize = {"screensize", "1",true};
 
 Cvars must be registered before use, or they will have a 0 value instead of the float interpretation of the string.  Generally, all cvar_t declarations should be registered in the apropriate init function before any console commands are executed:
 Cvar_RegisterVariable (&host_framerate);

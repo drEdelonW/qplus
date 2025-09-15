@@ -74,17 +74,17 @@ int		UseKeyboard = 1;
 
 int		mouserate = MOUSE_DEFAULTSAMPLERATE;
 
-cvar_t		vid_mode = {"vid_mode","5",false};
-cvar_t		vid_redrawfull = {"vid_redrawfull","0",false};
-cvar_t		vid_waitforrefresh = {"vid_waitforrefresh","0",true};
+cvar_t		vid_mode = {"vid_mode", "5",false};
+cvar_t		vid_redrawfull = {"vid_redrawfull", "0",false};
+cvar_t		vid_waitforrefresh = {"vid_waitforrefresh", "0",true};
 
 char	*framebuffer_ptr;
 
 cvar_t  mouse_button_commands[3] =
 {
-    {"mouse1","+attack"},
-    {"mouse2","+strafe"},
-    {"mouse3","+forward"},
+    {"mouse1", "+attack"},
+    {"mouse2", "+strafe"},
+    {"mouse3", "+forward"},
 };
 
 int     mouse_buttons;
@@ -94,7 +94,7 @@ float   mouse_x, mouse_y;
 float	old_mouse_x, old_mouse_y;
 int		mx, my;
 
-cvar_t	m_filter = {"m_filter","0"};
+cvar_t	m_filter = {"m_filter", "0"};
 
 static byte     backingbuf[48*24];
 

@@ -447,7 +447,7 @@ void Host_SavegameComment (char *text)
 	for (i=0 ; i<SAVEGAME_COMMENT_LENGTH ; i++)
 		text[i] = ' ';
 	memcpy (text, cl.levelname, strlen(cl.levelname));
-	sprintf (kills,"kills:%3i/%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
+	sprintf (kills, "kills:%3i/%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
 	memcpy (text+22, kills, strlen(kills));
 // convert space to _ to make stdio happy
 	for (i=0 ; i<SAVEGAME_COMMENT_LENGTH ; i++)
@@ -538,7 +538,7 @@ void Host_Savegame_f (void)
 		if (sv.lightstyles[i])
 			fprintf (f, "%s\n", sv.lightstyles[i]);
 		else
-			fprintf (f,"m\n");
+			fprintf (f, "m\n");
 	}
 
 
@@ -668,7 +668,7 @@ void Host_Loadgame_f (void)
 		start = COM_Parse(str);
 		if (!com_token[0])
 			break;		// end of file
-		if (strcmp(com_token,"{"))
+		if (strcmp(com_token, "{"))
 			Sys_Error ("First token isn't a brace");
 
 		if (entnum == -1)
@@ -741,7 +741,7 @@ void SaveGamestate()
 		if (sv.lightstyles[i])
 			fprintf (f, "%s\n", sv.lightstyles[i]);
 		else
-			fprintf (f,"m\n");
+			fprintf (f, "m\n");
 	}
 
 
@@ -836,7 +836,7 @@ int LoadGamestate(char *level, char *startspot)
 		start = COM_Parse(str);
 		if (!com_token[0])
 			break;		// end of file
-		if (strcmp(com_token,"{"))
+		if (strcmp(com_token, "{"))
 			Sys_Error ("First token isn't a brace");
 
 		// parse an edict

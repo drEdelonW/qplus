@@ -63,7 +63,7 @@ int messagesReceived = 0;
 int unreliableMessagesSent = 0;
 int unreliableMessagesReceived = 0;
 
-cvar_t	net_messagetimeout = {"net_messagetimeout","300"};
+cvar_t	net_messagetimeout = {"net_messagetimeout", "300"};
 cvar_t	hostname = {"hostname", "UNNAMED"};
 
 qboolean	configRestored = false;
@@ -127,7 +127,7 @@ qsocket_t *NET_NewQSocket (void)
 
 	sock->disconnected = false;
 	sock->connecttime = net_time;
-	Q_strcpy (sock->address,"UNSET ADDRESS");
+	Q_strcpy (sock->address, "UNSET ADDRESS");
 	sock->driver = net_driverlevel;
 	sock->socket = 0;
 	sock->driverdata = NULL;

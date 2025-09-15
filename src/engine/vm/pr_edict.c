@@ -389,17 +389,17 @@ char *PR_GlobalString (int ofs)
 	val = (void *)&pr_globals[ofs];
 	def = ED_GlobalAtOfs(ofs);
 	if (!def)
-		sprintf (line,"%i(???)", ofs);
+		sprintf (line, "%i(???)", ofs);
 	else
 	{
 		s = PR_ValueString (def->type, val);
-		sprintf (line,"%i(%s)%s", ofs, pr_strings + def->s_name, s);
+		sprintf (line, "%i(%s)%s", ofs, pr_strings + def->s_name, s);
 	}
 
 	i = strlen(line);
 	for ( ; i<20 ; i++)
-		strcat (line," ");
-	strcat (line," ");
+		strcat (line, " ");
+	strcat (line, " ");
 
 	return line;
 }
@@ -412,14 +412,14 @@ char *PR_GlobalStringNoContents (int ofs)
 
 	def = ED_GlobalAtOfs(ofs);
 	if (!def)
-		sprintf (line,"%i(???)", ofs);
+		sprintf (line, "%i(???)", ofs);
 	else
-		sprintf (line,"%i(%s)", ofs, pr_strings + def->s_name);
+		sprintf (line, "%i(%s)", ofs, pr_strings + def->s_name);
 
 	i = strlen(line);
 	for ( ; i<20 ; i++)
-		strcat (line," ");
-	strcat (line," ");
+		strcat (line, " ");
+	strcat (line, " ");
 
 	return line;
 }
@@ -515,8 +515,8 @@ void ED_Write (FILE *f, edict_t *ed)
 		if (j == type_size[type])
 			continue;
 
-		fprintf (f,"\"%s\" ",name);
-		fprintf (f,"\"%s\"\n", PR_UglyValueString(d->type, (eval_t *)v));
+		fprintf (f, "\"%s\" ",name);
+		fprintf (f, "\"%s\"\n", PR_UglyValueString(d->type, (eval_t *)v));
 	}
 
 	fprintf (f, "}\n");
@@ -620,7 +620,7 @@ void ED_WriteGlobals (FILE *f)
 	char		*name;
 	int			type;
 
-	fprintf (f,"{\n");
+	fprintf (f, "{\n");
 	for (i=0 ; i<progs->numglobaldefs ; i++)
 	{
 		def = &pr_globaldefs[i];
@@ -635,10 +635,10 @@ void ED_WriteGlobals (FILE *f)
 			continue;
 
 		name = pr_strings + def->s_name;
-		fprintf (f,"\"%s\" ", name);
-		fprintf (f,"\"%s\"\n", PR_UglyValueString(type, (eval_t *)&pr_globals[def->ofs]));
+		fprintf (f, "\"%s\" ", name);
+		fprintf (f, "\"%s\"\n", PR_UglyValueString(type, (eval_t *)&pr_globals[def->ofs]));
 	}
-	fprintf (f,"}\n");
+	fprintf (f, "}\n");
 }
 
 /*

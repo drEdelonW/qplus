@@ -29,8 +29,8 @@ static char     *argvdummy = " ";
 static char     *safeargvs[NUM_SAFE_ARGVS] =
 	{"-stdvid", "-nolan", "-nosound", "-nocdaudio", "-nojoy", "-nomouse", "-dibonly"};
 
-cvar_t  registered = {"registered","0"};
-cvar_t  cmdline = {"cmdline","0", false, true};
+cvar_t  registered = {"registered", "0"};
+cvar_t  cmdline = {"cmdline", "0", false, true};
 
 qboolean        com_modified;   // set true if using non-id files
 
@@ -172,7 +172,7 @@ void COM_FileBase (char *in, char *out)
 	;
 
 	if (s-s2 < 2)
-		strcpy (out,"?model?");
+		strcpy (out, "?model?");
 	else
 	{
 		s--;
@@ -718,11 +718,11 @@ int COM_FindFile (char *filename, int *handle, FILE **file)
 			{
 #if defined(_WIN32)
 				if ((strlen(netpath) < 2) || (netpath[1] != ':'))
-					sprintf (cachepath,"%s%s", com_cachedir, netpath);
+					sprintf (cachepath, "%s%s", com_cachedir, netpath);
 				else
-					sprintf (cachepath,"%s%s", com_cachedir, netpath+2);
+					sprintf (cachepath, "%s%s", com_cachedir, netpath+2);
 #else
-				sprintf (cachepath,"%s%s", com_cachedir, netpath);
+				sprintf (cachepath, "%s%s", com_cachedir, netpath);
 #endif
 
 				cachetime = Sys_FileTime (cachepath);

@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "d_local.h"
 
-cvar_t		m_filter = {"m_filter","0", true};
+cvar_t		m_filter = {"m_filter", "0", true};
 
 qboolean        mouse_avail;
 int             mouse_buttons=3;
@@ -433,7 +433,7 @@ void ResetSharedFrameBuffers(void)
 
 //	if (d_pzbuffer)
 //		Z_Free(d_pzbuffer);
-	d_pzbuffer = Hunk_HighAllocName(vid.width*vid.height*sizeof(*d_pzbuffer),"zbuff");
+	d_pzbuffer = Hunk_HighAllocName(vid.width*vid.height*sizeof(*d_pzbuffer), "zbuff");
 
 	for (frm=0 ; frm<2 ; frm++)
 	{

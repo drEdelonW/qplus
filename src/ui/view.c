@@ -32,19 +32,19 @@ when crossing a water boudnary.
 
 */
 
-cvar_t		lcd_x = {"lcd_x","0"};
-cvar_t		lcd_yaw = {"lcd_yaw","0"};
+cvar_t		lcd_x = {"lcd_x", "0"};
+cvar_t		lcd_yaw = {"lcd_yaw", "0"};
 
-cvar_t	scr_ofsx = {"scr_ofsx","0", false};
-cvar_t	scr_ofsy = {"scr_ofsy","0", false};
-cvar_t	scr_ofsz = {"scr_ofsz","0", false};
+cvar_t	scr_ofsx = {"scr_ofsx", "0", false};
+cvar_t	scr_ofsy = {"scr_ofsy", "0", false};
+cvar_t	scr_ofsz = {"scr_ofsz", "0", false};
 
 cvar_t	cl_rollspeed = {"cl_rollspeed", "200"};
 cvar_t	cl_rollangle = {"cl_rollangle", "2.0"};
 
-cvar_t	cl_bob = {"cl_bob","0.02", false};
-cvar_t	cl_bobcycle = {"cl_bobcycle","0.6", false};
-cvar_t	cl_bobup = {"cl_bobup","0.5", false};
+cvar_t	cl_bob = {"cl_bob", "0.02", false};
+cvar_t	cl_bobcycle = {"cl_bobcycle", "0.6", false};
+cvar_t	cl_bobup = {"cl_bobup", "0.5", false};
 
 cvar_t	v_kicktime = {"v_kicktime", "0.5", false};
 cvar_t	v_kickroll = {"v_kickroll", "0.6", false};
@@ -141,7 +141,7 @@ float V_CalcBob (void)
 
 
 cvar_t	v_centermove = {"v_centermove", "0.15", false};
-cvar_t	v_centerspeed = {"v_centerspeed","500"};
+cvar_t	v_centerspeed = {"v_centerspeed", "500"};
 
 
 void V_StartPitchDrift (void)

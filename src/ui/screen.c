@@ -30,14 +30,14 @@ float		scr_con_current;
 float		scr_conlines;		// lines of console to display
 
 float		oldscreensize, oldfov;
-cvar_t		scr_viewsize = {"viewsize","100", true};
-cvar_t		scr_fov = {"fov","90"};	// 10 - 170
-cvar_t		scr_conspeed = {"scr_conspeed","300"};
-cvar_t		scr_centertime = {"scr_centertime","2"};
-cvar_t		scr_showram = {"showram","1"};
-cvar_t		scr_showturtle = {"showturtle","0"};
-cvar_t		scr_showpause = {"showpause","1"};
-cvar_t		scr_printspeed = {"scr_printspeed","8"};
+cvar_t		scr_viewsize = {"viewsize", "100", true};
+cvar_t		scr_fov = {"fov", "90"};	// 10 - 170
+cvar_t		scr_conspeed = {"scr_conspeed", "300"};
+cvar_t		scr_centertime = {"scr_centertime", "2"};
+cvar_t		scr_showram = {"showram", "1"};
+cvar_t		scr_showturtle = {"showturtle", "0"};
+cvar_t		scr_showpause = {"showpause", "1"};
+cvar_t		scr_printspeed = {"scr_printspeed", "8"};
 
 qboolean	scr_initialized;		// ready to draw
 
@@ -232,15 +232,15 @@ static void SCR_CalcRefdef (void)
 
 // bound viewsize
 	if (scr_viewsize.value < 30)
-		Cvar_Set ("viewsize","30");
+		Cvar_Set ("viewsize", "30");
 	if (scr_viewsize.value > 120)
-		Cvar_Set ("viewsize","120");
+		Cvar_Set ("viewsize", "120");
 
 // bound field of view
 	if (scr_fov.value < 10)
-		Cvar_Set ("fov","10");
+		Cvar_Set ("fov", "10");
 	if (scr_fov.value > 170)
-		Cvar_Set ("fov","170");
+		Cvar_Set ("fov", "170");
 
 	r_refdef.fov_x = scr_fov.value;
 	r_refdef.fov_y = CalcFov (r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
@@ -619,7 +619,7 @@ void SCR_ScreenShot_f (void)
 //
 // find a file name to save it to
 //
-	strcpy(pcxname,"quake00.pcx");
+	strcpy(pcxname, "quake00.pcx");
 
 	for (i=0 ; i<=99 ; i++)
 	{

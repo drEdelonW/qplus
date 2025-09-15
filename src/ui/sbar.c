@@ -460,10 +460,10 @@ void Sbar_SoloScoreboard (void)
 	int		minutes, seconds, tens, units;
 	int		l;
 
-	sprintf (str,"Monsters:%3i /%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
+	sprintf (str, "Monsters:%3i /%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
 	Sbar_DrawString (8, 4, str);
 
-	sprintf (str,"Secrets :%3i /%3i", cl.stats[STAT_SECRETS], cl.stats[STAT_TOTALSECRETS]);
+	sprintf (str, "Secrets :%3i /%3i", cl.stats[STAT_SECRETS], cl.stats[STAT_TOTALSECRETS]);
 	Sbar_DrawString (8, 12, str);
 
 // time
@@ -471,7 +471,7 @@ void Sbar_SoloScoreboard (void)
 	seconds = cl.time - 60*minutes;
 	tens = seconds / 10;
 	units = seconds - 10*tens;
-	sprintf (str,"Time :%3i:%i%i", minutes, tens, units);
+	sprintf (str, "Time :%3i:%i%i", minutes, tens, units);
 	Sbar_DrawString (184, 4, str);
 
 // draw level name

@@ -46,8 +46,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MIN_WIDTH 320
 #define MIN_HEIGHT 200
 
-cvar_t		_windowed_mouse = {"_windowed_mouse","0", true};
-cvar_t		m_filter = {"m_filter","0", true};
+cvar_t		_windowed_mouse = {"_windowed_mouse", "0", true};
+cvar_t		m_filter = {"m_filter", "0", true};
 float old_windowed_mouse;
 
 // The following X property format is defined in Motif 1.1's
@@ -674,7 +674,7 @@ VID_ResetFramebuffer()
 	free(d_pzbuffer);
 
 	d_pzbuffer = malloc(PM(vid.width)*PM(vid.height)*sizeof(*d_pzbuffer));
-        //Hunk_HighAllocName(PM(vid.width)*PM(vid.height)*sizeof(*d_pzbuffer),"zbuff");
+        //Hunk_HighAllocName(PM(vid.width)*PM(vid.height)*sizeof(*d_pzbuffer), "zbuff");
 }
 
 VID_ResetFramebuffer_MT()
