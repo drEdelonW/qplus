@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -123,7 +123,7 @@ void    VID_Init (unsigned char *palette)
 	VID_SetMode (vid_modenum, palette);
 
 	vid_realmode = vid_modenum;
-	
+
 	vid_menudrawfn = VID_MenuDraw;
 	vid_menukeyfn = VID_MenuKey;
 }
@@ -192,7 +192,7 @@ char *VID_ModeInfo (int modenum, char **ppheader)
 
 /*
 ================
-VID_SetMode 
+VID_SetMode
 ================
 */
 int VID_SetMode (int modenum, unsigned char *palette)
@@ -397,7 +397,7 @@ VID_DescribeMode_f
 void VID_DescribeMode_f (void)
 {
 	int		modenum;
-	
+
 	modenum = Q_atoi (Cmd_Argv(1));
 
 	Con_Printf ("%s\n", VID_ModeInfo (modenum, NULL));
@@ -577,7 +577,7 @@ void VID_MenuDraw (void)
 
 	vid_wmodes = 0;
 	nummodes = VID_NumModes ();
-	
+
 	p = Draw_CachePic ("gfx/vidmodes.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
 
