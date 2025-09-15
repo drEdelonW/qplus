@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // host.c -- coordinates spawning and killing of local servers
 
+#include "host.h"
 #include "quakedef.h"
 #include "chase.h"
 #include "r_local.h"
