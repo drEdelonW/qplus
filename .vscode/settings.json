@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.cpp": "cpp",
+        "stdarg.h": "c",
+        "mathlib.h": "c",
+        "sizebuf.h": "c"
+    }
+}

@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (C) 1996-1997 Id Software, Inc.
 
@@ -87,6 +88,7 @@ void	VID_UnlockBuffer (void);
 
 #define MAX_NUM_ARGVS	50
 
+#if 0
 // up / down
 #define	PITCH	0
 
@@ -95,7 +97,9 @@ void	VID_UnlockBuffer (void);
 
 // fall over
 #define	ROLL	2
-
+#else
+	#include "angles_indices.h"
+#endif
 
 #define	MAX_QPATH		64			// max length of a quake game pathname
 #define	MAX_OSPATH		128			// max length of a filesystem pathname
@@ -329,11 +333,4 @@ extern qboolean		isDedicated;
 
 extern int			minimum_memory;
 
-//
-// chase
-//
-extern	cvar_t	chase_active;
 
-void Chase_Init (void);
-void Chase_Reset (void);
-void Chase_Update (void);

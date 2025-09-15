@@ -6,12 +6,16 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
         $(eval CLI_DIR = $(CORE_DIR)/console) $(eval INCLUDES += $(CLI_DIR))
             SRC_LIST += $(CLI_DIR)/console.c
             SRC_LIST += $(CLI_DIR)/cvar.c
+            SRC_LIST += $(CLI_DIR)/cmd.c
 
         $(eval CUTILS_DIR = $(CORE_DIR)/utils) $(eval INCLUDES += $(CUTILS_DIR))
             SRC_LIST += $(CUTILS_DIR)/crc.c
 
-        SRC_LIST += $(CORE_DIR)/common.c
-        SRC_LIST += $(CORE_DIR)/cmd.c
+        $(eval COMM_DIR = $(CORE_DIR)/common) $(eval INCLUDES += $(COMM_DIR))
+            SRC_LIST += $(COMM_DIR)/common.c
+#             SRC_LIST += $(COMM_DIR)/msg.c
+            SRC_LIST += $(COMM_DIR)/sizebuf.c
+
         SRC_LIST += $(CORE_DIR)/host.c
         SRC_LIST += $(CORE_DIR)/host_cmd.c
         SRC_LIST += $(CORE_DIR)/keys.c
@@ -83,7 +87,6 @@ $(eval SND_DIR = $(SRC_DIR)/sound) $(eval INCLUDES += $(SND_DIR))
     SRC_LIST += $(SND_DIR)/snd_dma.c
     SRC_LIST += $(SND_DIR)/snd_mem.c
     SRC_LIST += $(SND_DIR)/snd_mix.c
-    SRC_LIST += $(SND_DIR)/snd_linux.c
 
 $(eval MATH_DIR = $(SRC_DIR)/math) $(eval INCLUDES += $(MATH_DIR))
   SRC_LIST += $(MATH_DIR)/mathlib.c
@@ -107,6 +110,8 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR))
         SRC_LIST += $(POSIX_DIR)/sys_linux.c
         SRC_LIST += $(POSIX_DIR)/vid_x.c
         SRC_LIST += $(POSIX_DIR)/cd_linux.c
+        SRC_LIST += $(POSIX_DIR)/snd_linux.c
+
 
 $(eval OTHER_DIR = $(SRC_DIR)/etc) $(eval INCLUDES += $(OTHER_DIR))
 

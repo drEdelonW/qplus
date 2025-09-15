@@ -697,7 +697,11 @@ void R_ScanEdges (void)
 	edge_aftertail.prev = &edge_tail;
 
 // FIXME: do we need this now that we clamp x in r_draw.c?
-	edge_sentinel.u = 2000 << 24;		// make sure nothing sorts past this
+#if 0
+ 	edge_sentinel.u = 2000 << 24;		// make sure nothing sorts past this
+#else
+	edge_sentinel.u = 0x7fffffff;           // sentinel: max 31-bit positive
+#endif
 	edge_sentinel.prev = &edge_aftertail;
 
 //

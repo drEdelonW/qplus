@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (C) 1996-1997 Id Software, Inc.
 
@@ -19,23 +20,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // comndef.h  -- general definitions
 
+#include <stdint.h>
+
 #if !defined BYTE_DEFINED
-typedef unsigned char 		byte;
-#define BYTE_DEFINED 1
+	// typedef unsigned char 		byte; // uint8_t
+	typedef uint8_t 		byte;
+	#define BYTE_DEFINED 1
 #endif
 
+#if 0
 #undef true
 #undef false
 
 typedef enum {false, true}	qboolean;
-
+#else
+	#include "qboolean.h"
+#endif
 //============================================================================
 
+#if 0
 typedef struct sizebuf_s
 {
 	qboolean	allowoverflow;	// if false, do a Sys_Error
 	qboolean	overflowed;		// set to true if the buffer size failed
-	byte	*data;
+	uint8_t	*data;
 	int		maxsize;
 	int		cursize;
 } sizebuf_t;
@@ -46,6 +54,9 @@ void SZ_Clear (sizebuf_t *buf);
 void *SZ_GetSpace (sizebuf_t *buf, int length);
 void SZ_Write (sizebuf_t *buf, void *data, int length);
 void SZ_Print (sizebuf_t *buf, char *data);	// strcats onto the sizebuf
+ #else
+  #include "sizebuf.h"
+ #endif
 
 //============================================================================
 
@@ -63,7 +74,7 @@ void InsertLinkAfter (link_t *l, link_t *after);
 // (type *)STRUCT_FROM_LINK(link_t *link, type, member)
 // ent = STRUCT_FROM_LINK(link,entity_t,order)
 // FIXME: remove this mess!
-#define	STRUCT_FROM_LINK(l,t,m) ((t *)((byte *)l - (int)&(((t *)0)->m)))
+#define	STRUCT_FROM_LINK(l,t,m) ((t *)((uint8_t *)l - (int)&(((t *)0)->m)))
 
 //============================================================================
 
@@ -94,30 +105,8 @@ extern	int	(*LittleLong) (int l);
 extern	float	(*BigFloat) (float l);
 extern	float	(*LittleFloat) (float l);
 
-//============================================================================
+#include "msg.h"
 
-void MSG_WriteChar (sizebuf_t *sb, int c);
-void MSG_WriteByte (sizebuf_t *sb, int c);
-void MSG_WriteShort (sizebuf_t *sb, int c);
-void MSG_WriteLong (sizebuf_t *sb, int c);
-void MSG_WriteFloat (sizebuf_t *sb, float f);
-void MSG_WriteString (sizebuf_t *sb, char *s);
-void MSG_WriteCoord (sizebuf_t *sb, float f);
-void MSG_WriteAngle (sizebuf_t *sb, float f);
-
-extern	int			msg_readcount;
-extern	qboolean	msg_badread;		// set if a read goes beyond end of message
-
-void MSG_BeginReading (void);
-int MSG_ReadChar (void);
-int MSG_ReadByte (void);
-int MSG_ReadShort (void);
-int MSG_ReadLong (void);
-float MSG_ReadFloat (void);
-char *MSG_ReadString (void);
-
-float MSG_ReadCoord (void);
-float MSG_ReadAngle (void);
 
 //============================================================================
 
@@ -172,9 +161,9 @@ int COM_OpenFile (char *filename, int *hndl);
 int COM_FOpenFile (char *filename, FILE **file);
 void COM_CloseFile (int h);
 
-byte *COM_LoadStackFile (char *path, void *buffer, int bufsize);
-byte *COM_LoadTempFile (char *path);
-byte *COM_LoadHunkFile (char *path);
+uint8_t *COM_LoadStackFile (char *path, void *buffer, int bufsize);
+uint8_t *COM_LoadTempFile (char *path);
+uint8_t *COM_LoadHunkFile (char *path);
 void COM_LoadCacheFile (char *path, struct cache_user_s *cu);
 
 

@@ -20,6 +20,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // chase.c -- chase camera code
 
 #include "quakedef.h"
+#include "chase.h"
+#include "mathlib.h"
+#include <math.h>
+#include "common.h"		// qbulean
+#include "cvar.h"
+#include "angles_indices.h"
+#include <stdio.h>
+#include <string.h>
+
+// #include "model.h"
+
+qboolean SV_RecursiveHullCheck (hull_t *hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_t *trace); // engine/world/world.c
+
 
 cvar_t	chase_back 		= {"chase_back", 	"100" };
 cvar_t	chase_up 		= {"chase_up", 		"16"  };

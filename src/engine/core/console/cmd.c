@@ -430,10 +430,10 @@ void Cmd_Init (void)
 //
 // register our commands
 //
-	Cmd_AddCommand ("stuffcmds",Cmd_StuffCmds_f);
-	Cmd_AddCommand ("exec",Cmd_Exec_f);
-	Cmd_AddCommand ("echo",Cmd_Echo_f);
-	Cmd_AddCommand ("alias",Cmd_Alias_f);
+	Cmd_AddCommand ("stuffcmds", Cmd_StuffCmds_f);
+	Cmd_AddCommand ("exec", Cmd_Exec_f);
+	Cmd_AddCommand ("echo", Cmd_Echo_f);
+	Cmd_AddCommand ("alias", Cmd_Alias_f);
 	Cmd_AddCommand ("cmd", Cmd_ForwardToServer);
 	Cmd_AddCommand ("wait", Cmd_Wait_f);
 }
@@ -565,13 +565,13 @@ void	Cmd_AddCommand (char *cmd_name, xcommand_t function)
 Cmd_Exists
 ============
 */
-qboolean	Cmd_Exists (char *cmd_name)
+qboolean Cmd_Exists (char *cmd_name)
 {
 	cmd_function_t	*cmd;
 
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
+	for (cmd = cmd_functions ; cmd ; cmd = cmd->next)
 	{
-		if (!Q_strcmp (cmd_name,cmd->name))
+		if (!Q_strcmp (cmd_name, cmd->name))
 			return true;
 	}
 

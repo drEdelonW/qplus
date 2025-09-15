@@ -329,6 +329,7 @@ int UDP_StringToAddr (char *string, struct qsockaddr *addr)
 }
 
 //=============================================================================
+extern unsigned long inet_addr(const char *cp);
 
 int UDP_GetSocketAddr (int socket, struct qsockaddr *addr)
 {

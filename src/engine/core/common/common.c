@@ -148,7 +148,7 @@ void Q_memset (void *dest, int fill, int count)
 	}
 	else
 		for (i=0 ; i<count ; i++)
-			((byte *)dest)[i] = fill;
+			((uint8_t *)dest)[i] = fill;
 }
 
 void Q_memcpy (void *dest, void *src, int count)
@@ -163,7 +163,7 @@ void Q_memcpy (void *dest, void *src, int count)
 	}
 	else
 		for (i=0 ; i<count ; i++)
-			((byte *)dest)[i] = ((byte *)src)[i];
+			((uint8_t *)dest)[i] = ((uint8_t *)src)[i];
 }
 
 int Q_memcmp (void *m1, void *m2, int count)
@@ -171,7 +171,7 @@ int Q_memcmp (void *m1, void *m2, int count)
 	while(count)
 	{
 		count--;
-		if (((byte *)m1)[count] != ((byte *)m2)[count])
+		if (((uint8_t *)m1)[count] != ((uint8_t *)m2)[count])
 			return -1;
 	}
 	return 0;
@@ -442,7 +442,7 @@ float   (*LittleFloat) (float l);
 
 short   ShortSwap (short l)
 {
-	byte    b1,b2;
+	uint8_t    b1,b2;
 
 	b1 = l&255;
 	b2 = (l>>8)&255;
@@ -457,7 +457,7 @@ short   ShortNoSwap (short l)
 
 int    LongSwap (int l)
 {
-	byte    b1,b2,b3,b4;
+	uint8_t    b1,b2,b3,b4;
 
 	b1 = l&255;
 	b2 = (l>>8)&255;
@@ -477,7 +477,7 @@ float FloatSwap (float f)
 	union
 	{
 		float   f;
-		byte    b[4];
+		uint8_t    b[4];
 	} dat1, dat2;
 
 
@@ -494,12 +494,13 @@ float FloatNoSwap (float f)
 	return f;
 }
 
+#if 1
 /*
 ==============================================================================
 
 			MESSAGE IO FUNCTIONS
 
-Handles byte ordering and avoids alignment errors
+Handles uint8_t ordering and avoids alignment errors
 ==============================================================================
 */
 
@@ -509,7 +510,7 @@ Handles byte ordering and avoids alignment errors
 
 void MSG_WriteChar (sizebuf_t *sb, int c)
 {
-	byte    *buf;
+	uint8_t    *buf;
 
 #ifdef PARANOID
 	if (c < -128 || c > 127)
@@ -522,7 +523,7 @@ void MSG_WriteChar (sizebuf_t *sb, int c)
 
 void MSG_WriteByte (sizebuf_t *sb, int c)
 {
-	byte    *buf;
+	uint8_t    *buf;
 
 #ifdef PARANOID
 	if (c < 0 || c > 255)
@@ -535,7 +536,7 @@ void MSG_WriteByte (sizebuf_t *sb, int c)
 
 void MSG_WriteShort (sizebuf_t *sb, int c)
 {
-	byte    *buf;
+	uint8_t    *buf;
 
 #ifdef PARANOID
 	if (c < ((short)0x8000) || c > (short)0x7fff)
@@ -549,7 +550,7 @@ void MSG_WriteShort (sizebuf_t *sb, int c)
 
 void MSG_WriteLong (sizebuf_t *sb, int c)
 {
-	byte    *buf;
+	uint8_t    *buf;
 
 	buf = SZ_GetSpace (sb, 4);
 	buf[0] = c&0xff;
@@ -678,7 +679,7 @@ float MSG_ReadFloat (void)
 {
 	union
 	{
-		byte    b[4];
+		uint8_t    b[4];
 		float   f;
 		int     l;
 	} dat;
@@ -724,8 +725,9 @@ float MSG_ReadAngle (void)
 	return MSG_ReadChar() * (360.0/256);
 }
 
+#endif
 
-
+#if 0
 //===========================================================================
 
 void SZ_Alloc (sizebuf_t *buf, int startsize)
@@ -785,13 +787,13 @@ void SZ_Print (sizebuf_t *buf, char *data)
 
 	len = Q_strlen(data)+1;
 
-// byte * cast to keep VC++ happy
+// uint8_t * cast to keep VC++ happy
 	if (buf->data[buf->cursize-1])
-		Q_memcpy ((byte *)SZ_GetSpace(buf, len),data,len); // no trailing 0
+		Q_memcpy ((uint8_t *)SZ_GetSpace(buf, len),data,len); // no trailing 0
 	else
-		Q_memcpy ((byte *)SZ_GetSpace(buf, len-1)-1,data,len); // write over trailing 0
+		Q_memcpy ((uint8_t *)SZ_GetSpace(buf, len-1)-1,data,len); // write over trailing 0
 }
-
+#endif
 
 //============================================================================
 
@@ -1124,9 +1126,9 @@ COM_Init
 */
 void COM_Init (char *basedir)
 {
-	byte    swaptest[2] = {1,0};
+	uint8_t    swaptest[2] = {1,0};
 
-// set the byte swapping variables in a portable manner
+// set the uint8_t swapping variables in a portable manner
 	if ( *(short *)swaptest == 1)
 	{
 		bigendien = false;
@@ -1180,7 +1182,7 @@ char    *va(char *format, ...)
 
 
 /// just for debugging
-int     memsearch (byte *start, int count, int search)
+int     memsearch (uint8_t *start, int count, int search)
 {
 	int             i;
 
@@ -1524,16 +1526,16 @@ void COM_CloseFile (int h)
 COM_LoadFile
 
 Filename are reletive to the quake directory.
-Allways appends a 0 byte.
+Allways appends a 0 uint8_t.
 ============
 */
 cache_user_t *loadcache;
-byte    *loadbuf;
+uint8_t    *loadbuf;
 int             loadsize;
-byte *COM_LoadFile (char *path, int usehunk)
+uint8_t *COM_LoadFile (char *path, int usehunk)
 {
 	int             h;
-	byte    *buf;
+	uint8_t    *buf;
 	char    base[32];
 	int             len;
 
@@ -1568,7 +1570,7 @@ byte *COM_LoadFile (char *path, int usehunk)
 	if (!buf)
 		Sys_Error ("COM_LoadFile: not enough space for %s", path);
 
-	((byte *)buf)[len] = 0;
+	((uint8_t *)buf)[len] = 0;
 
 	Draw_BeginDisc ();
 	Sys_FileRead (h, buf, len);
@@ -1578,12 +1580,12 @@ byte *COM_LoadFile (char *path, int usehunk)
 	return buf;
 }
 
-byte *COM_LoadHunkFile (char *path)
+uint8_t *COM_LoadHunkFile (char *path)
 {
 	return COM_LoadFile (path, 1);
 }
 
-byte *COM_LoadTempFile (char *path)
+uint8_t *COM_LoadTempFile (char *path)
 {
 	return COM_LoadFile (path, 2);
 }
@@ -1595,11 +1597,11 @@ void COM_LoadCacheFile (char *path, struct cache_user_s *cu)
 }
 
 // uses temp hunk if larger than bufsize
-byte *COM_LoadStackFile (char *path, void *buffer, int bufsize)
+uint8_t *COM_LoadStackFile (char *path, void *buffer, int bufsize)
 {
-	byte    *buf;
+	uint8_t    *buf;
 
-	loadbuf = (byte *)buffer;
+	loadbuf = (uint8_t *)buffer;
 	loadsize = bufsize;
 	buf = COM_LoadFile (path, 4);
 
@@ -1655,7 +1657,7 @@ pack_t *COM_LoadPackFile (char *packfile)
 // crc the directory to check for modifications
 	CRC_Init (&crc);
 	for (i=0 ; i<header.dirlen ; i++)
-		CRC_ProcessByte (&crc, ((byte *)info)[i]);
+		CRC_ProcessByte (&crc, ((uint8_t *)info)[i]);
 	if (crc != PAK0_CRC)
 		com_modified = true;
 
