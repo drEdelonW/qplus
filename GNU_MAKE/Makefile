@@ -1,5 +1,5 @@
 
-BITS := -m32
+# BITS := -m32
 
 BUILD_DEBUG_DIR 	:= OUTPUT
 # BUILD_RELEASE_DIR 	:= ../release_
@@ -11,14 +11,16 @@ BASE_CFLAGS = $(BITS) -Dstricmp=strcasecmp -DNO_ASM
 	-fomit-frame-pointer -fexpensive-optimizations
 DEBUG_CFLAGS := $(BASE_CFLAGS) -O0 -g
 # XLDFLAGS = $(BITS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86dga
-XLDFLAGS := $(BITS) -L/usr/lib/i386-linux-gnu -lX11 -lXext -lXxf86dga
+XLDFLAGS := $(BITS) -L/usr/lib/i386-linux-gnu -lX11 #-lXext -lXxf86dga
 XCFLAGS = -DX11
 
+CFLAGS += -I/opt/homebrew/opt/libx11/include
 DO_X11_CC 		= $(CC) $(CFLAGS) $(XCFLAGS) -o $@ -c $<
 DO_X11_DEBUG_CC = $(CC) $(DEBUG_CFLAGS) $(XCFLAGS) -o $@ -c $<
 
 LDFLAGS := $(BITS) -lm
 
+LDFLAGS += -L/opt/homebrew/opt/libx11/lib -lX11
 #############################################################################
 # SETUP AND BUILD
 #############################################################################

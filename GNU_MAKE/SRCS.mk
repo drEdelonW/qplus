@@ -1,5 +1,7 @@
 
 INCLUDES += $(SRC_DIR)
+INCLUDES += /opt/homebrew/opt/libx11/include
+INCLUDES += /opt/homebrew/include
 
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
     $(eval CORE_DIR = $(ENG_DIR)/core) $(eval INCLUDES += $(CORE_DIR))
@@ -112,8 +114,11 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR))
     $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))
         SRC_LIST += $(POSIX_DIR)/sys_linux.c
         SRC_LIST += $(POSIX_DIR)/vid_x.c
-        SRC_LIST += $(POSIX_DIR)/cd_linux.c
-        SRC_LIST += $(POSIX_DIR)/snd_linux.c
+#         SRC_LIST += $(POSIX_DIR)/cd_linux.c
+        SRC_LIST += $(PLATFORM_DIR)/null/cd_null.c
+#         SRC_LIST += $(POSIX_DIR)/snd_linux.c
+        SRC_LIST += $(PLATFORM_DIR)/null/snd_null.c
+        SRC_LIST += $(PLATFORM_DIR)/null/xshm_stubs.c
 
 
 $(eval OTHER_DIR = $(SRC_DIR)/etc) $(eval INCLUDES += $(OTHER_DIR))
