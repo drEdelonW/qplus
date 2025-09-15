@@ -1,6 +1,10 @@
 #include "sizebuf.h"
 
 #include "zone.h"
+#include "q_tools.h"
+#include "console.h"
+#include "sys.h"
+
   //===========================================================================
 
 void SZ_Alloc (sizebuf_t *buf, int startsize)

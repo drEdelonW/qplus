@@ -20,43 +20,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // comndef.h  -- general definitions
 
-#include <stdint.h>
 
-#if !defined BYTE_DEFINED
-	// typedef unsigned char 		byte; // uint8_t
-	typedef uint8_t 		byte;
-	#define BYTE_DEFINED 1
-#endif
 
-#if 0
-#undef true
-#undef false
+#include "byte_t.h"
+#include "qboolean.h"
 
-typedef enum {false, true}	qboolean;
-#else
-	#include "qboolean.h"
-#endif
-//============================================================================
 
-#if 0
-typedef struct sizebuf_s
-{
-	qboolean	allowoverflow;	// if false, do a Sys_Error
-	qboolean	overflowed;		// set to true if the buffer size failed
-	uint8_t	*data;
-	int		maxsize;
-	int		cursize;
-} sizebuf_t;
-
-void SZ_Alloc (sizebuf_t *buf, int startsize);
-void SZ_Free (sizebuf_t *buf);
-void SZ_Clear (sizebuf_t *buf);
-void *SZ_GetSpace (sizebuf_t *buf, int length);
-void SZ_Write (sizebuf_t *buf, void *data, int length);
-void SZ_Print (sizebuf_t *buf, char *data);	// strcats onto the sizebuf
- #else
-  #include "sizebuf.h"
- #endif
+#include "sizebuf.h"
 
 //============================================================================
 
@@ -107,23 +77,7 @@ extern	float	(*LittleFloat) (float l);
 
 #include "msg.h"
 
-
-//============================================================================
-
-void Q_memset (void *dest, int fill, int count);
-void Q_memcpy (void *dest, void *src, int count);
-int Q_memcmp (void *m1, void *m2, int count);
-void Q_strcpy (char *dest, char *src);
-void Q_strncpy (char *dest, char *src, int count);
-int Q_strlen (char *str);
-char *Q_strrchr (char *s, char c);
-void Q_strcat (char *dest, char *src);
-int Q_strcmp (char *s1, char *s2);
-int Q_strncmp (char *s1, char *s2, int count);
-int Q_strcasecmp (char *s1, char *s2);
-int Q_strncasecmp (char *s1, char *s2, int n);
-int	Q_atoi (char *str);
-float Q_atof (char *str);
+#include "q_tools.h"
 
 //============================================================================
 

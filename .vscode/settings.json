@@ -3,6 +3,9 @@
         "*.cpp": "cpp",
         "stdarg.h": "c",
         "mathlib.h": "c",
-        "sizebuf.h": "c"
+        "sizebuf.h": "c",
+        "q_tools.h": "c",
+        "qboolean.h": "c",
+        "byte_t.h": "c"
     }
 }
