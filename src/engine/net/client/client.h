@@ -238,35 +238,35 @@ typedef struct
 //
 // cvars
 //
-extern	cvar_t	cl_name;
-extern	cvar_t	cl_color;
+CVAR_EXTERN(cl_name);
+CVAR_EXTERN(cl_color);
 
-extern	cvar_t	cl_upspeed;
-extern	cvar_t	cl_forwardspeed;
-extern	cvar_t	cl_backspeed;
-extern	cvar_t	cl_sidespeed;
+CVAR_EXTERN(cl_upspeed);
+CVAR_EXTERN(cl_forwardspeed);
+CVAR_EXTERN(cl_backspeed);
+CVAR_EXTERN(cl_sidespeed);
 
-extern	cvar_t	cl_movespeedkey;
+CVAR_EXTERN(cl_movespeedkey);
 
-extern	cvar_t	cl_yawspeed;
-extern	cvar_t	cl_pitchspeed;
+CVAR_EXTERN(cl_yawspeed);
+CVAR_EXTERN(cl_pitchspeed);
 
-extern	cvar_t	cl_anglespeedkey;
+CVAR_EXTERN(cl_anglespeedkey);
 
-extern	cvar_t	cl_autofire;
+CVAR_EXTERN(cl_autofire);
 
-extern	cvar_t	cl_shownet;
-extern	cvar_t	cl_nolerp;
+CVAR_EXTERN(cl_shownet);
+CVAR_EXTERN(cl_nolerp);
 
-extern	cvar_t	cl_pitchdriftspeed;
-extern	cvar_t	lookspring;
-extern	cvar_t	lookstrafe;
-extern	cvar_t	sensitivity;
+CVAR_EXTERN(cl_pitchdriftspeed);
+CVAR_EXTERN(lookspring);
+CVAR_EXTERN(lookstrafe);
+CVAR_EXTERN(sensitivity);
 
-extern	cvar_t	m_pitch;
-extern	cvar_t	m_yaw;
-extern	cvar_t	m_forward;
-extern	cvar_t	m_side;
+CVAR_EXTERN(m_pitch);
+CVAR_EXTERN(m_yaw);
+CVAR_EXTERN(m_forward);
+CVAR_EXTERN(m_side);
 
 
 #define	MAX_TEMP_ENTITIES	64			// lightning bolts, etc

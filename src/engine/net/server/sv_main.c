@@ -36,16 +36,16 @@ SV_Init
 void SV_Init (void)
 {
 	int		i;
-	extern	cvar_t	sv_maxvelocity;
-	extern	cvar_t	sv_gravity;
-	extern	cvar_t	sv_nostep;
-	extern	cvar_t	sv_friction;
-	extern	cvar_t	sv_edgefriction;
-	extern	cvar_t	sv_stopspeed;
-	extern	cvar_t	sv_maxspeed;
-	extern	cvar_t	sv_accelerate;
-	extern	cvar_t	sv_idealpitchscale;
-	extern	cvar_t	sv_aim;
+	CVAR_EXTERN(sv_maxvelocity);
+	CVAR_EXTERN(sv_gravity);
+	CVAR_EXTERN(sv_nostep);
+	CVAR_EXTERN(sv_friction);
+	CVAR_EXTERN(sv_edgefriction);
+	CVAR_EXTERN(sv_stopspeed);
+	CVAR_EXTERN(sv_maxspeed);
+	CVAR_EXTERN(sv_accelerate);
+	CVAR_EXTERN(sv_idealpitchscale);
+	CVAR_EXTERN(sv_aim);
 
 	Cvar_RegisterVariable (&sv_maxvelocity);
 	Cvar_RegisterVariable (&sv_gravity);

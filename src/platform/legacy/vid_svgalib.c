@@ -74,9 +74,9 @@ int		UseKeyboard = 1;
 
 int		mouserate = MOUSE_DEFAULTSAMPLERATE;
 
-cvar_t		vid_mode = {"vid_mode", "5",false};
-cvar_t		vid_redrawfull = {"vid_redrawfull", "0",false};
-cvar_t		vid_waitforrefresh = {"vid_waitforrefresh", "0",true};
+CVAR(vid_mode, "5");
+CVAR(vid_redrawfull, "0");
+CVAR_ARC(vid_waitforrefresh, "0");
 
 char	*framebuffer_ptr;
 
@@ -94,7 +94,7 @@ float   mouse_x, mouse_y;
 float	old_mouse_x, old_mouse_y;
 int		mx, my;
 
-cvar_t	m_filter = {"m_filter", "0"};
+CVAR(m_filter, "0");
 
 static byte     backingbuf[48*24];
 

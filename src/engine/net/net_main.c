@@ -63,21 +63,21 @@ int messagesReceived = 0;
 int unreliableMessagesSent = 0;
 int unreliableMessagesReceived = 0;
 
-cvar_t	net_messagetimeout = {"net_messagetimeout", "300"};
-cvar_t	hostname = {"hostname", "UNNAMED"};
+CVAR(net_messagetimeout, "300");
+CVAR(hostname, "UNNAMED");
 
 qboolean	configRestored = false;
-cvar_t	config_com_port = {"_config_com_port", "0x3f8", true};
-cvar_t	config_com_irq = {"_config_com_irq", "4", true};
-cvar_t	config_com_baud = {"_config_com_baud", "57600", true};
-cvar_t	config_com_modem = {"_config_com_modem", "1", true};
-cvar_t	config_modem_dialtype = {"_config_modem_dialtype", "T", true};
-cvar_t	config_modem_clear = {"_config_modem_clear", "ATZ", true};
-cvar_t	config_modem_init = {"_config_modem_init", "", true};
-cvar_t	config_modem_hangup = {"_config_modem_hangup", "AT H", true};
+CVAR_CFG(config_com_port, "0x3f8");
+CVAR_CFG(config_com_irq, "4");
+CVAR_CFG(config_com_baud, "57600");
+CVAR_CFG(config_com_modem, "1");
+CVAR_CFG(config_modem_dialtype, "T");
+CVAR_CFG(config_modem_clear, "ATZ");
+CVAR_CFG(config_modem_init, "");
+CVAR_CFG(config_modem_hangup, "AT H");
 
 #ifdef IDGODS
-cvar_t	idgods = {"idgods", "0"};
+CVAR(idgods, "0");
 #endif
 
 int	vcrFile = -1;

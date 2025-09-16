@@ -9,9 +9,9 @@ extern	quakeparms_t host_parms;
 
 #include "cvar.h"
 
-extern	cvar_t		sys_ticrate;
-extern	cvar_t		sys_nostdout;
-extern	cvar_t		developer;
+CVAR_EXTERN(sys_ticrate);
+CVAR_EXTERN(sys_nostdout);
+CVAR_EXTERN(developer);
 
 #include "qboolean.h"
 extern	qboolean	host_initialized;		// true if into command execution

@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "d_local.h"
 
-cvar_t		m_filter = {"m_filter", "0", true};
+CVAR_ARC(m_filter, "0");
 
 qboolean        mouse_avail;
 int             mouse_buttons=3;

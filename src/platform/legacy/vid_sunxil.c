@@ -46,8 +46,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MIN_WIDTH 320
 #define MIN_HEIGHT 200
 
-cvar_t		_windowed_mouse = {"_windowed_mouse", "0", true};
-cvar_t		m_filter = {"m_filter", "0", true};
+CVAR_ARC(_windowed_mouse, "0");
+CVAR_ARC(m_filter, "0");
 float old_windowed_mouse;
 
 // The following X property format is defined in Motif 1.1's
@@ -149,7 +149,7 @@ static int verbose=1;
 
 static byte current_palette[768];
 
-cvar_t pixel_multiply = {"pixel_multiply", "2", true};
+CVAR_ARC(pixel_multiply, "2");
 int current_pixel_multiply = 2;
 
 #define PM(a) (int)((current_pixel_multiply)?((a)*current_pixel_multiply):(a))

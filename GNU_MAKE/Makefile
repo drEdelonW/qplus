@@ -5,30 +5,6 @@ IDSRC_DIR    := ../ID_src/WinQuake
 OBJ_DIR      ?= ./objs
 OUT_DIR      ?= OUTPUT
 
-# Populated by SRCS.mk: must define SRC_LIST and optionally INCLUDES
-INCLUDES     :=
-SRC_LIST     :=
-include SRCS.mk
-
-# Map sources -> objects
-MY_SRCS      := $(filter $(SRC_DIR)/%,$(SRC_LIST))
-MY_OBJS      := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MY_SRCS))
-
-ID_SRCS      := $(filter $(IDSRC_DIR)/%,$(SRC_LIST))
-ID_OBJS      := $(addprefix $(OBJ_DIR)/,$(notdir $(ID_SRCS:.c=.o)))
-
-OBJS         := $(MY_OBJS) $(ID_OBJS)
-
-# ---------- Toolchain ----------
-CC           ?= gcc
-CXX          ?= g++
-# force LD to be CC even if env has LD=ld
-LD           := $(CC)
-AR           ?= ar
-
-UNAME_S      := $(shell uname -s)
-UNAME_M      := $(shell uname -m)
-
 # ---------- Build options ----------
 # DEBUG=1 for -O0 -g; DEBUG=0 for -O2 -DNDEBUG
 DEBUG        ?= 1
@@ -38,6 +14,33 @@ FORCE_32     ?= 1
 NO_ASM       ?= 1
 # X11 target on *nix
 USE_X11      ?= 1
+
+# Populated by SRCS.mk: must define SRC_LIST and optionally INCLUDES
+INCLUDES     :=
+SRC_LIST     :=
+include SRCS.mk
+
+# ---------- Map sources -> objects ----------
+MY_SRCS      := $(filter $(SRC_DIR)/%,$(SRC_LIST))
+MY_C_OBJS    := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(MY_SRCS)))
+MY_CPP_OBJS  := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(MY_SRCS)))
+
+ID_SRCS      := $(filter $(IDSRC_DIR)/%,$(SRC_LIST))
+ID_C_OBJS    := $(addprefix $(OBJ_DIR)/,$(notdir $(filter %.c,$(ID_SRCS:.c=.o))))
+ID_CPP_OBJS  := $(addprefix $(OBJ_DIR)/,$(notdir $(filter %.cpp,$(ID_SRCS:.cpp=.o))))
+
+OBJS         := $(MY_C_OBJS) $(MY_CPP_OBJS) $(ID_C_OBJS) $(ID_CPP_OBJS)
+
+# ---------- Toolchain ----------
+CC           ?= gcc
+CXX          ?= g++
+# force LD to be CC even if env has LD=ld
+# LD           := $(CC)
+LD           := $(CXX)
+AR           ?= ar
+
+UNAME_S      := $(shell uname -s)
+UNAME_M      := $(shell uname -m)
 
 # ---------- Base flags ----------
 # Put macros and include paths into CPPFLAGS
@@ -60,10 +63,18 @@ CFLAGS       += -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
                 -Wno-missing-field-initializers -Wno-implicit-fallthrough \
                 -Wno-trigraphs -Wno-format-truncation
 
+CXXFLAGS     ?=
+CXXFLAGS     += -fcommon -fno-strict-aliasing -pipe
+CXXFLAGS     += -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
+                -Wno-missing-field-initializers -Wno-implicit-fallthrough \
+                -Wno-trigraphs -Wno-format-truncation
+
 ifeq ($(DEBUG),1)
 CFLAGS       += -O0 -g -fno-omit-frame-pointer
+CXXFLAGS     += -O0 -g -fno-omit-frame-pointer
 else
 CFLAGS       += -O2 -DNDEBUG
+CXXFLAGS     += -O2 -DNDEBUG
 endif
 
 # Linker flags and libraries split correctly
@@ -116,6 +127,14 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 $(OBJ_DIR)/%.o: $(IDSRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(IDSRC_DIR)/%.cpp
+	@mkdir -p $(OBJ_DIR)
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 # ---------- Housekeeping ----------
 clean:

@@ -54,24 +54,24 @@ typedef struct {
 
 //===========================================================================
 
-extern cvar_t	r_draworder;
-extern cvar_t	r_speeds;
-extern cvar_t	r_timegraph;
-extern cvar_t	r_graphheight;
-extern cvar_t	r_clearcolor;
-extern cvar_t	r_waterwarp;
-extern cvar_t	r_fullbright;
-extern cvar_t	r_drawentities;
-extern cvar_t	r_aliasstats;
-extern cvar_t	r_dspeeds;
-extern cvar_t	r_drawflat;
-extern cvar_t	r_ambient;
-extern cvar_t	r_reportsurfout;
-extern cvar_t	r_maxsurfs;
-extern cvar_t	r_numsurfs;
-extern cvar_t	r_reportedgeout;
-extern cvar_t	r_maxedges;
-extern cvar_t	r_numedges;
+CVAR_EXTERN(r_draworder);
+CVAR_EXTERN(r_speeds);
+CVAR_EXTERN(r_timegraph);
+CVAR_EXTERN(r_graphheight);
+CVAR_EXTERN(r_clearcolor);
+CVAR_EXTERN(r_waterwarp);
+CVAR_EXTERN(r_fullbright);
+CVAR_EXTERN(r_drawentities);
+CVAR_EXTERN(r_aliasstats);
+CVAR_EXTERN(r_dspeeds);
+CVAR_EXTERN(r_drawflat);
+CVAR_EXTERN(r_ambient);
+CVAR_EXTERN(r_reportsurfout);
+CVAR_EXTERN(r_maxsurfs);
+CVAR_EXTERN(r_numsurfs);
+CVAR_EXTERN(r_reportedgeout);
+CVAR_EXTERN(r_maxedges);
+CVAR_EXTERN(r_numedges);
 
 #define XCENTERING	(1.0 / 2.0)
 #define YCENTERING	(1.0 / 2.0)

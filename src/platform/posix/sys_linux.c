@@ -26,7 +26,7 @@ int nostdout = 0;
 char *basedir = ".";
 char *cachedir = "/tmp";
 
-cvar_t  sys_linerefresh = {"sys_linerefresh", "0"};// set for entity display
+CVAR(sys_linerefresh, "0");// set for entity display
 
 // =======================================================================
 // General routines

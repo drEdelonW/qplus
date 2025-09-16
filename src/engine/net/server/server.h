@@ -195,12 +195,12 @@ typedef struct client_s
 
 //============================================================================
 
-extern	cvar_t	teamplay;
-extern	cvar_t	skill;
-extern	cvar_t	deathmatch;
-extern	cvar_t	coop;
-extern	cvar_t	fraglimit;
-extern	cvar_t	timelimit;
+CVAR_EXTERN(teamplay);
+CVAR_EXTERN(skill);
+CVAR_EXTERN(deathmatch);
+CVAR_EXTERN(coop);
+CVAR_EXTERN(fraglimit);
+CVAR_EXTERN(timelimit);
 
 extern	server_static_t	svs;				// persistant server info
 extern	server_t		sv;					// local server

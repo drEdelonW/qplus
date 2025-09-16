@@ -41,8 +41,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "d_local.h"
 
-cvar_t		_windowed_mouse = {"_windowed_mouse", "0", true};
-cvar_t		m_filter = {"m_filter", "0", true};
+CVAR_ARC(_windowed_mouse, "0");
+CVAR_ARC(m_filter, "0");
 float old_windowed_mouse;
 
 qboolean        mouse_avail;

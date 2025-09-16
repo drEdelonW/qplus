@@ -938,7 +938,8 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 		// search for the next server cvar
 		while (var)
 		{
-			if (var->server)
+			// if (var->server)
+			if (var->flags & cvf_server)
 				break;
 			var = var->next;
 		}

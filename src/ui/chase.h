@@ -4,7 +4,7 @@
 // chase
 //
 
-extern	cvar_t	chase_active;
+CVAR_EXTERN(chase_active);
 
 void Chase_Init (void);
 void Chase_Reset (void);

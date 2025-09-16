@@ -120,8 +120,11 @@ void Cvar_Set (char *var_name, char *value)
 	var->string = Z_Malloc (Q_strlen(value)+1);
 	Q_strcpy (var->string, value);
 	var->value = Q_atof (var->string);
-	if (var->server && changed)
-	{
+
+    // if (var->server && changed)
+	if (changed &&
+        (var->flags & cvf_server)
+    ){
 		if (sv.active)
 			SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", var->name, var->string);
 	}
@@ -218,7 +221,8 @@ void Cvar_WriteVariables (FILE *f)
 	cvar_t	*var;
 
 	for (var = cvar_vars ; var ; var = var->next)
-		if (var->archive)
+		// if (var->archive)
+        if (var->flags & cvf_archive)
 			fprintf (f, "%s \"%s\"\n", var->name, var->string);
 }
 

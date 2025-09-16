@@ -56,32 +56,32 @@ jmp_buf 	host_abortserver;
 byte		*host_basepal;
 byte		*host_colormap;
 
-cvar_t	host_framerate = {"host_framerate", "0"};	// set for slow motion
-cvar_t	host_speeds = {"host_speeds", "0"};			// set for running times
+CVAR(host_framerate, "0");  // set for slow motion
+CVAR(host_speeds, "0");     // set for running times
 
-cvar_t	sys_ticrate = {"sys_ticrate", "0.05"};
-cvar_t	serverprofile = {"serverprofile", "0"};
+CVAR(sys_ticrate, "0.05");
+CVAR(serverprofile, "0");
 
-cvar_t	fraglimit = {"fraglimit", "0",false,true};
-cvar_t	timelimit = {"timelimit", "0",false,true};
-cvar_t	teamplay = {"teamplay", "0",false,true};
+CVAR_SV(fraglimit, "0");
+CVAR_SV(timelimit, "0");
+CVAR_SV(teamplay, "0");
 
-cvar_t	samelevel = {"samelevel", "0"};
-cvar_t	noexit = {"noexit", "0",false,true};
+CVAR(samelevel, "0");
+CVAR_SV(noexit, "0");
 
 #ifdef QUAKE2
-cvar_t	developer = {"developer", "1"};	// should be 0 for release!
+CVAR(developer, "1");   // should be 0 for release!
 #else
-cvar_t	developer = {"developer", "0"};
+CVAR(developer, "0");
 #endif
 
-cvar_t	skill = {"skill", "1"};						// 0 - 3
-cvar_t	deathmatch = {"deathmatch", "0"};			// 0, 1, or 2
-cvar_t	coop = {"coop", "0"};			// 0 or 1
+CVAR(skill, "1");       // 0 - 3
+CVAR(deathmatch, "0");  // 0, 1, or 2
+CVAR(coop, "0");        // 0 or 1
 
-cvar_t	pausable = {"pausable", "1"};
+CVAR(pausable, "1");
 
-cvar_t	temp1 = {"temp1", "0"};
+CVAR(temp1, "0");
 
 
 /*

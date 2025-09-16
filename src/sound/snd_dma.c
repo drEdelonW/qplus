@@ -68,18 +68,18 @@ int 		desired_bits = 16;
 
 int sound_started=0;
 
-cvar_t bgmvolume = {"bgmvolume", "1", true};
-cvar_t volume = {"volume", "0.7", true};
+CVAR_ARC(bgmvolume, "1");
+CVAR_ARC(volume, "0.7");
 
-cvar_t nosound = {"nosound", "0"};
-cvar_t precache = {"precache", "1"};
-cvar_t loadas8bit = {"loadas8bit", "0"};
-cvar_t bgmbuffer = {"bgmbuffer", "4096"};
-cvar_t ambient_level = {"ambient_level", "0.3"};
-cvar_t ambient_fade = {"ambient_fade", "100"};
-cvar_t snd_noextraupdate = {"snd_noextraupdate", "0"};
-cvar_t snd_show = {"snd_show", "0"};
-cvar_t _snd_mixahead = {"_snd_mixahead", "0.1", true};
+CVAR(nosound, "0");
+CVAR(precache, "1");
+CVAR(loadas8bit, "0");
+CVAR(bgmbuffer, "4096");
+CVAR(ambient_level, "0.3");
+CVAR(ambient_fade, "100");
+CVAR(snd_noextraupdate, "0");
+CVAR(snd_show, "0");
+CVAR_ARC(_snd_mixahead, "0.1");
 
 
 // ====================================================================
