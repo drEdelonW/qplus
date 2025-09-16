@@ -1,5 +1,5 @@
 
-# BITS := -m32
+BITS := -m32  # comment this for ARM M1
 
 BUILD_DEBUG_DIR 	:= OUTPUT
 # BUILD_RELEASE_DIR 	:= ../release_

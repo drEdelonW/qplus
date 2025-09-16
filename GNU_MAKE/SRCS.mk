@@ -118,7 +118,7 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR))
         SRC_LIST += $(PLATFORM_DIR)/null/cd_null.c
 #         SRC_LIST += $(POSIX_DIR)/snd_linux.c
         SRC_LIST += $(PLATFORM_DIR)/null/snd_null.c
-        SRC_LIST += $(PLATFORM_DIR)/null/]xshm_stubs.c
+        SRC_LIST += $(PLATFORM_DIR)/null/xshm_stubs.c
 
 
 $(eval OTHER_DIR = $(SRC_DIR)/etc) $(eval INCLUDES += $(OTHER_DIR))
