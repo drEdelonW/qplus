@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 edict_t	*sv_player;
 
 CVAR_EXTERN(sv_friction);
-cvar_t	sv_edgefriction = {"edgefriction", "2"};
+CVAR_NAMED(sv_edgefriction, "edgefriction", "2");
 CVAR_EXTERN(sv_stopspeed);
 
 static	vec3_t		forward, right, up;

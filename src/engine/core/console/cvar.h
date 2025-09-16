@@ -68,11 +68,9 @@ interface from being ambiguous.
 //  reg_srch: ^\s*cvar_t\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*"\1"\s*,\s*"([^"]*)"\s*\}\s*;
 //  reg_rpc:  CVAR($1, "$2");
 
-
 /* same, but with flags */
 #define CVAR_F(sym, defstr, fl) \
     cvar_t sym = { #sym, (char*)(defstr), (uint8_t)(fl), 0.0f, NULL }
-
 
 /* explicit cvar name (if it differs from the C symbol) */
 #define CVAR_NAMED(sym, namestr, defstr) \
@@ -88,7 +86,7 @@ interface from being ambiguous.
     cvar_t sym = { "_" #sym, (char*)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
 
 
-typedef enum {
+typedef enum{
     cvf_none           = 0,
     cvf_archive        = 1 << 0,   // be saved to vars.rc
     cvf_server         = 1 << 1,   // notifies players when changed

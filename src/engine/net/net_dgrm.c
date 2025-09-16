@@ -471,12 +471,10 @@ void PrintStats(qsocket_t *s)
 	Con_Printf("\n");
 }
 
-void NET_Stats_f (void)
-{
+void NET_Stats_f(void){
 	qsocket_t	*s;
 
-	if (Cmd_Argc () == 1)
-	{
+	if (Cmd_Argc () == 1){
 		Con_Printf("unreliable messages sent   = %i\n", unreliableMessagesSent);
 		Con_Printf("unreliable messages recv   = %i\n", unreliableMessagesReceived);
 		Con_Printf("reliable messages sent     = %i\n", messagesSent);
@@ -488,15 +486,12 @@ void NET_Stats_f (void)
 		Con_Printf("shortPacketCount           = %i\n", shortPacketCount);
 		Con_Printf("droppedDatagrams           = %i\n", droppedDatagrams);
 	}
-	else if (Q_strcmp(Cmd_Argv(1), "*") == 0)
-	{
+	else if (Q_strcmp(Cmd_Argv(1), "*") == 0){
 		for (s = net_activeSockets; s; s = s->next)
 			PrintStats(s);
 		for (s = net_freeSockets; s; s = s->next)
 			PrintStats(s);
-	}
-	else
-	{
+	}else{
 		for (s = net_activeSockets; s; s = s->next)
 			if (Q_strcasecmp(Cmd_Argv(1), s->address) == 0)
 				break;
@@ -823,32 +818,25 @@ void Datagram_Listen (qboolean state)
 }
 
 
-static qsocket_t *_Datagram_CheckNewConnections (void)
-{
+static qsocket_t *_Datagram_CheckNewConnections(void){
 	struct qsockaddr clientaddr;
 	struct qsockaddr newaddr;
-	int			newsock;
-	int			acceptsock;
 	qsocket_t	*sock;
 	qsocket_t	*s;
-	int			len;
-	int			command;
-	int			control;
-	int			ret;
 
-	acceptsock = dfunc.CheckNewConnections();
+	int acceptsock = dfunc.CheckNewConnections();
 	if (acceptsock == -1)
 		return NULL;
 
 	SZ_Clear(&net_message);
 
-	len = dfunc.Read (acceptsock, net_message.data, net_message.maxsize, &clientaddr);
+	int len = dfunc.Read (acceptsock, net_message.data, net_message.maxsize, &clientaddr);
 	if (len < sizeof(int))
 		return NULL;
 	net_message.cursize = len;
 
 	MSG_BeginReading ();
-	control = BigLong(*((int *)net_message.data));
+	int control = BigLong(*((int *)net_message.data));
 	MSG_ReadLong();
 	if (control == -1)
 		return NULL;
@@ -857,7 +845,7 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 	if ((control & NETFLAG_LENGTH_MASK) != len)
 		return NULL;
 
-	command = MSG_ReadByte();
+	int command = MSG_ReadByte();
 	if (command == CCREQ_SERVER_INFO)
 	{
 		if (Q_strcmp(MSG_ReadString(), "QUAKE") != 0)
@@ -1007,7 +995,7 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 	{
 		if (s->driver != net_driverlevel)
 			continue;
-		ret = dfunc.AddrCompare(&clientaddr, &s->addr);
+		int ret = dfunc.AddrCompare(&clientaddr, &s->addr);
 		if (ret >= 0)
 		{
 			// is this a duplicate connection reqeust?
@@ -1049,7 +1037,7 @@ static qsocket_t *_Datagram_CheckNewConnections (void)
 	}
 
 	// allocate a network socket
-	newsock = dfunc.OpenSocket(0);
+	int newsock = dfunc.OpenSocket(0);
 	if (newsock == -1)
 	{
 		NET_FreeQSocket(sock);
