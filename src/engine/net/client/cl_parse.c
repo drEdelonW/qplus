@@ -329,23 +329,20 @@ int	bitcounts[16];
 
 void CL_ParseUpdate (int bits)
 {
-	int			i;
 	model_t		*model;
 	int			modnum;
 	qboolean	forcelink;
 	entity_t	*ent;
 	int			num;
-	int			skin;
+	// int			skin;
 
-	if (cls.signon == SIGNONS - 1)
-	{	// first update is the final signon stage
+	if (cls.signon == SIGNONS - 1){	// first update is the final signon stage
 		cls.signon = SIGNONS;
 		CL_SignonReply ();
 	}
 
-	if (bits & U_MOREBITS)
-	{
-		i = MSG_ReadByte ();
+	if (bits & U_MOREBITS){
+		int i = MSG_ReadByte ();
 		bits |= (i<<8);
 	}
 
@@ -356,9 +353,11 @@ void CL_ParseUpdate (int bits)
 
 	ent = CL_EntityNum (num);
 
-for (i=0 ; i<16 ; i++)
-if (bits&(1<<i))
-	bitcounts[i]++;
+    for (int i = 0; i < 16; i++){
+        if (bits & (1 << i)){
+            bitcounts[i]++;
+        }
+    }
 
 	if (ent->msgtime != cl.mtime[1])
 		forcelink = true;	// no previous frame to lerp from
@@ -367,8 +366,7 @@ if (bits&(1<<i))
 
 	ent->msgtime = cl.mtime[0];
 
-	if (bits & U_MODEL)
-	{
+	if (bits & U_MODEL){
 		modnum = MSG_ReadByte ();
 		if (modnum >= MAX_MODELS)
 			Host_Error ("CL_ParseModel: bad modnum");
@@ -377,20 +375,18 @@ if (bits&(1<<i))
 		modnum = ent->baseline.modelindex;
 
 	model = cl.model_precache[modnum];
-	if (model != ent->model)
-	{
+	if (model != ent->model){
 		ent->model = model;
 	// automatic animation (torches, etc) can be either all together
 	// or randomized
-		if (model)
-		{
+		if (model){
 			if (model->synctype == ST_RAND)
 				ent->syncbase = (float)(rand()&0x7fff) / 0x7fff;
 			else
 				ent->syncbase = 0.0;
-		}
-		else
+		} else {
 			forcelink = true;	// hack to make null model players work
+        }
 #ifdef GLQUAKE
 		if (num > 0 && num <= cl.maxclients)
 			R_TranslatePlayerSkin (num - 1);
@@ -402,17 +398,23 @@ if (bits&(1<<i))
 	else
 		ent->frame = ent->baseline.frame;
 
-	if (bits & U_COLORMAP)
+#if 0
+    int	i;
+    if (bits & U_COLORMAP)
 		i = MSG_ReadByte();
-	else
+    else
 		i = ent->baseline.colormap;
-	if (!i)
+#else
+    int	i = (bits & U_COLORMAP)?
+        MSG_ReadByte() :
+        ent->baseline.colormap;
+#endif
+	if (!i){
 		ent->colormap = vid.colormap;
-	else
-	{
+    }else{
 		if (i > cl.maxclients)
 			Sys_Error ("i >= cl.maxclients");
-		ent->colormap = cl.scores[i-1].translations;
+		ent->colormap = cl.scores[i - 1].translations;
 	}
 
 #ifdef GLQUAKE
@@ -427,7 +429,6 @@ if (bits&(1<<i))
 	}
 
 #else
-
 	if (bits & U_SKIN)
 		ent->skinnum = MSG_ReadByte();
 	else
@@ -447,6 +448,7 @@ if (bits&(1<<i))
 		ent->msg_origins[0][0] = MSG_ReadCoord ();
 	else
 		ent->msg_origins[0][0] = ent->baseline.origin[0];
+
 	if (bits & U_ANGLE1)
 		ent->msg_angles[0][0] = MSG_ReadAngle();
 	else
@@ -456,7 +458,8 @@ if (bits&(1<<i))
 		ent->msg_origins[0][1] = MSG_ReadCoord ();
 	else
 		ent->msg_origins[0][1] = ent->baseline.origin[1];
-	if (bits & U_ANGLE2)
+
+    if (bits & U_ANGLE2)
 		ent->msg_angles[0][1] = MSG_ReadAngle();
 	else
 		ent->msg_angles[0][1] = ent->baseline.angles[1];
@@ -465,7 +468,8 @@ if (bits&(1<<i))
 		ent->msg_origins[0][2] = MSG_ReadCoord ();
 	else
 		ent->msg_origins[0][2] = ent->baseline.origin[2];
-	if (bits & U_ANGLE3)
+
+    if (bits & U_ANGLE3)
 		ent->msg_angles[0][2] = MSG_ReadAngle();
 	else
 		ent->msg_angles[0][2] = ent->baseline.angles[2];

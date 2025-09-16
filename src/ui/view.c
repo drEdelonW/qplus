@@ -862,10 +862,8 @@ V_CalcRefdef
 
 ==================
 */
-void V_CalcRefdef (void)
-{
+void V_CalcRefdef (void) {
 	entity_t	*ent, *view;
-	int			i;
 	vec3_t		forward, right, up;
 	vec3_t		angles;
 	float		bob;
@@ -912,10 +910,12 @@ void V_CalcRefdef (void)
 
 	AngleVectors (angles, forward, right, up);
 
-	for (i=0 ; i<3 ; i++)
-		r_refdef.vieworg[i] += scr_ofsx.value*forward[i]
-			+ scr_ofsy.value*right[i]
-			+ scr_ofsz.value*up[i];
+	for (int i = 0 ; i < 3 ; i++){
+		r_refdef.vieworg[i] +=
+			scr_ofsx.value*forward[i] +
+			scr_ofsy.value*right[i] +
+			scr_ofsz.value*up[i];
+	}
 
 
 	V_BoundOffsets ();
@@ -928,8 +928,7 @@ void V_CalcRefdef (void)
 	VectorCopy (ent->origin, view->origin);
 	view->origin[2] += cl.viewheight;
 
-	for (i=0 ; i<3 ; i++)
-	{
+	for (int i = 0 ; i < 3 ; i++)	{
 		view->origin[i] += forward[i]*bob*0.4;
 //		view->origin[i] += right[i]*bob*0.4;
 //		view->origin[i] += up[i]*bob*0.8;
@@ -942,14 +941,15 @@ void V_CalcRefdef (void)
 #if 0
 	if (cl.model_precache[cl.stats[STAT_WEAPON]] && strcmp (cl.model_precache[cl.stats[STAT_WEAPON]]->name,  "progs/v_shot2.mdl"))
 #endif
-	if (scr_viewsize.value == 110)
+	if (scr_viewsize.value == 110){
 		view->origin[2] += 1;
-	else if (scr_viewsize.value == 100)
+	} else if (scr_viewsize.value == 100){
 		view->origin[2] += 2;
-	else if (scr_viewsize.value == 90)
+	} else if (scr_viewsize.value == 90){
 		view->origin[2] += 1;
-	else if (scr_viewsize.value == 80)
+	} else if (scr_viewsize.value == 80){
 		view->origin[2] += 0.5;
+	}
 
 	view->model = cl.model_precache[cl.stats[STAT_WEAPON]];
 	view->frame = cl.stats[STAT_WEAPONFRAME];
@@ -959,28 +959,31 @@ void V_CalcRefdef (void)
 	VectorAdd (r_refdef.viewangles, cl.punchangle, r_refdef.viewangles);
 
 // smooth out stair step ups
-if (cl.onground && ent->origin[2] - oldz > 0)
-{
-	float steptime;
+	if ((cl.onground) &&
+		((ent->origin[2] - oldz) > 0)) {
 
-	steptime = cl.time - cl.oldtime;
-	if (steptime < 0)
-//FIXME		I_Error ("steptime < 0");
-		steptime = 0;
+		float steptime = cl.time - cl.oldtime;
+		if (steptime < 0){
+			//FIXME		I_Error ("steptime < 0");
+			steptime = 0;
+		}
 
-	oldz += steptime * 80;
-	if (oldz > ent->origin[2])
+		oldz += steptime * 80;
+		if (oldz > ent->origin[2]){
+			oldz = ent->origin[2];
+		}
+		if ((ent->origin[2] - oldz) > 12){
+			oldz = ent->origin[2] - 12;
+		}
+		r_refdef.vieworg[2] += oldz - ent->origin[2];
+		view->origin[2] += oldz - ent->origin[2];
+	} else {
 		oldz = ent->origin[2];
-	if (ent->origin[2] - oldz > 12)
-		oldz = ent->origin[2] - 12;
-	r_refdef.vieworg[2] += oldz - ent->origin[2];
-	view->origin[2] += oldz - ent->origin[2];
-}
-else
-	oldz = ent->origin[2];
+	}
 
-	if (chase_active.value)
+	if (chase_active.value){
 		Chase_Update ();
+	}
 }
 
 /*

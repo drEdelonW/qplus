@@ -120,17 +120,14 @@ void D_DrawSolidSurface (surf_t *surf, int color)
 D_CalcGradients
 ==============
 */
-void D_CalcGradients (msurface_t *pface)
-{
-	mplane_t	*pplane;
-	float		mipscale;
+void D_CalcGradients (msurface_t *pface){
 	vec3_t		p_temp1;
 	vec3_t		p_saxis, p_taxis;
 	float		t;
 
-	pplane = pface->plane;
+	// mplane_t*  pplane = pface->plane;
 
-	mipscale = 1.0 / (float)(1 << miplevel);
+	float mipscale = 1.0 / (float)(1 << miplevel);
 
 	TransformVector (pface->texinfo->vecs[0], p_saxis);
 	TransformVector (pface->texinfo->vecs[1], p_taxis);
@@ -143,14 +140,18 @@ void D_CalcGradients (msurface_t *pface)
 	d_sdivzstepv = -p_saxis[1] * t;
 	d_tdivzstepv = -p_taxis[1] * t;
 
-	d_sdivzorigin = p_saxis[2] * mipscale - xcenter * d_sdivzstepu -
-			ycenter * d_sdivzstepv;
-	d_tdivzorigin = p_taxis[2] * mipscale - xcenter * d_tdivzstepu -
-			ycenter * d_tdivzstepv;
+	d_sdivzorigin =
+		p_saxis[2] * mipscale -
+		xcenter * d_sdivzstepu -
+		ycenter * d_sdivzstepv;
+	d_tdivzorigin =
+		p_taxis[2] * mipscale -
+		xcenter * d_tdivzstepu -
+		ycenter * d_tdivzstepv;
 
 	VectorScale (transformed_modelorg, mipscale, p_temp1);
 
-	t = 0x10000*mipscale;
+	t = 0x10000 * mipscale;
 	sadjust = ((fixed16_t)(DotProduct (p_temp1, p_saxis) * 0x10000 + 0.5)) -
 			((pface->texturemins[0] << 16) >> miplevel)
 			+ pface->texinfo->vecs[0][3]*t;

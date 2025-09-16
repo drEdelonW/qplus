@@ -466,58 +466,51 @@ void Host_Savegame_f (void)
 {
 	char	name[256];
 	FILE	*f;
-	int		i;
 	char	comment[SAVEGAME_COMMENT_LENGTH+1];
 
 	if (cmd_source != src_command)
 		return;
 
-	if (!sv.active)
-	{
+	if (!sv.active){
 		Con_Printf ("Not playing a local game.\n");
 		return;
 	}
 
-	if (cl.intermission)
-	{
+	if (cl.intermission){
 		Con_Printf ("Can't save in intermission.\n");
 		return;
 	}
 
-	if (svs.maxclients != 1)
-	{
+	if (svs.maxclients != 1){
 		Con_Printf ("Can't save multiplayer games.\n");
 		return;
 	}
 
-	if (Cmd_Argc() != 2)
-	{
+	if (Cmd_Argc() != 2){
 		Con_Printf ("save <savename> : save a game\n");
 		return;
 	}
 
-	if (strstr(Cmd_Argv(1), ".."))
-	{
+	if (strstr(Cmd_Argv(1), "..")){
 		Con_Printf ("Relative pathnames are not allowed.\n");
 		return;
 	}
 
-	for (i=0 ; i<svs.maxclients ; i++)
-	{
-		if (svs.clients[i].active && (svs.clients[i].edict->v.health <= 0) )
-		{
+	for (int i = 0; i < svs.maxclients; i++){
+		if (svs.clients[i].active &&
+            (svs.clients[i].edict->v.health <= 0)
+        ){
 			Con_Printf ("Can't savegame with a dead player\n");
 			return;
 		}
 	}
 
-	sprintf (name, "%s/%s", com_gamedir, Cmd_Argv(1));
+	snprintf (name, sizeof(name), "%s/%s", com_gamedir, Cmd_Argv(1));
 	COM_DefaultExtension (name, ".sav");
 
 	Con_Printf ("Saving game to %s...\n", name);
 	f = fopen (name, "w");
-	if (!f)
-	{
+	if (!f){
 		Con_Printf ("ERROR: couldn't open.\n");
 		return;
 	}
@@ -525,16 +518,16 @@ void Host_Savegame_f (void)
 	fprintf (f, "%i\n", SAVEGAME_VERSION);
 	Host_SavegameComment (comment);
 	fprintf (f, "%s\n", comment);
-	for (i=0 ; i<NUM_SPAWN_PARMS ; i++)
+	for (int i = 0; i < NUM_SPAWN_PARMS; i++){
 		fprintf (f, "%f\n", svs.clients->spawn_parms[i]);
+    }
 	fprintf (f, "%d\n", current_skill);
 	fprintf (f, "%s\n", sv.name);
 	fprintf (f, "%f\n",sv.time);
 
 // write the light styles
 
-	for (i=0 ; i<MAX_LIGHTSTYLES ; i++)
-	{
+	for (int i = 0; i < MAX_LIGHTSTYLES; i++){
 		if (sv.lightstyles[i])
 			fprintf (f, "%s\n", sv.lightstyles[i]);
 		else
@@ -543,8 +536,7 @@ void Host_Savegame_f (void)
 
 
 	ED_WriteGlobals (f);
-	for (i=0 ; i<sv.num_edicts ; i++)
-	{
+	for (int i = 0; i < sv.num_edicts; i++){
 		ED_Write (f, EDICT_NUM(i));
 		fflush (f);
 	}
@@ -582,7 +574,7 @@ void Host_Loadgame_f (void)
 
 	cls.demonum = -1;		// stop demo loop in case this fails
 
-	sprintf (name, "%s/%s", com_gamedir, Cmd_Argv(1));
+	snprintf (name, sizeof(name), "%s/%s", com_gamedir, Cmd_Argv(1));
 	COM_DefaultExtension (name, ".sav");
 
 // we can't call SCR_BeginLoadingPlaque, because too much stack space has
@@ -1011,7 +1003,7 @@ void Host_Say(qboolean teamonly)
 	client_t *save;
 	int		j;
 	char	*p;
-	unsigned char	text[64];
+	char	text[64];
 	qboolean	fromServer = false;
 
 	if (cmd_source == src_command)
@@ -1043,9 +1035,9 @@ void Host_Say(qboolean teamonly)
 
 // turn on color set 1
 	if (!fromServer)
-		sprintf (text, "%c%s: ", 1, save->name);
+		snprintf(text, sizeof(text), "%c%s: ", 1, save->name);
 	else
-		sprintf (text, "%c<%s> ", 1, hostname.string);
+		snprintf(text, sizeof(text), "%c<%s> ", 1, hostname.string);
 
 	j = sizeof(text) - 2 - Q_strlen(text);  // -2 for /n and null terminator
 	if (Q_strlen(p) > j)
@@ -1513,20 +1505,21 @@ DEBUGGING TOOLS
 Host_Give_f
 ==================
 */
-void Host_Give_f (void)
-{
+void Host_Give_f (void){
 	char	*t;
-	int		v, w;
+	int		v;
 	eval_t	*val;
 
-	if (cmd_source == src_command)
-	{
+	if (cmd_source == src_command){
 		Cmd_ForwardToServer ();
 		return;
 	}
 
-	if (pr_global_struct->deathmatch && !host_client->privileged)
-		return;
+	if (pr_global_struct->deathmatch &&
+        !host_client->privileged
+    ){
+        return;
+    }
 
 	t = Cmd_Argv(1);
 	v = atoi (Cmd_Argv(2));
@@ -1544,10 +1537,8 @@ void Host_Give_f (void)
    case '8':
    case '9':
       // MED 01/04/97 added hipnotic give stuff
-      if (hipnotic)
-      {
-         if (t[0] == '6')
-         {
+      if (hipnotic) {
+         if (t[0] == '6') {
             if (t[1] == 'a')
                sv_player->v.items = (int)sv_player->v.items | HIT_PROXIMITY_GUN;
             else
@@ -1559,17 +1550,14 @@ void Host_Give_f (void)
             sv_player->v.items = (int)sv_player->v.items | HIT_MJOLNIR;
          else if (t[0] >= '2')
             sv_player->v.items = (int)sv_player->v.items | (IT_SHOTGUN << (t[0] - '2'));
-      }
-      else
-      {
+      } else {
          if (t[0] >= '2')
             sv_player->v.items = (int)sv_player->v.items | (IT_SHOTGUN << (t[0] - '2'));
       }
 		break;
 
     case 's':
-		if (rogue)
-		{
+		if (rogue){
 	        val = GetEdictFieldValue(sv_player, "ammo_shells1");
 		    if (val)
 			    val->_float = v;
@@ -1578,39 +1566,31 @@ void Host_Give_f (void)
         sv_player->v.ammo_shells = v;
         break;
     case 'n':
-		if (rogue)
-		{
+		if (rogue){
 			val = GetEdictFieldValue(sv_player, "ammo_nails1");
-			if (val)
-			{
+			if (val){
 				val->_float = v;
 				if (sv_player->v.weapon <= IT_LIGHTNING)
 					sv_player->v.ammo_nails = v;
 			}
-		}
-		else
-		{
+		}else{
 			sv_player->v.ammo_nails = v;
 		}
         break;
     case 'l':
-		if (rogue)
-		{
+		if (rogue){
 			val = GetEdictFieldValue(sv_player, "ammo_lava_nails");
-			if (val)
-			{
+			if (val){
 				val->_float = v;
 				if (sv_player->v.weapon > IT_LIGHTNING)
 					sv_player->v.ammo_nails = v;
 			}
-		}
+        }
         break;
     case 'r':
-		if (rogue)
-		{
+		if (rogue){
 			val = GetEdictFieldValue(sv_player, "ammo_rockets1");
-			if (val)
-			{
+			if (val){
 				val->_float = v;
 				if (sv_player->v.weapon <= IT_LIGHTNING)
 					sv_player->v.ammo_rockets = v;

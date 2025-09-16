@@ -30,7 +30,7 @@ byte *S_Alloc (int size);
 ResampleSfx
 ================
 */
-void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
+void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, char *data)
 {
 	int		outcount;
 	int		srcsample;
@@ -94,15 +94,14 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 S_LoadSound
 ==============
 */
-sfxcache_t *S_LoadSound (sfx_t *s)
-{
+sfxcache_t *S_LoadSound (sfx_t *s){
     char	namebuffer[256];
-	byte	*data;
+	char*   data;
 	wavinfo_t	info;
-	int		len;
-	float	stepscale;
-	sfxcache_t	*sc;
-	byte	stackbuf[1*1024];		// avoid dirtying the cache heap
+	int     len;
+	float   stepscale;
+	sfxcache_t* sc;
+	char	stackbuf[1 * 1024];		// avoid dirtying the cache heap
 
 // see if still in memory
 	sc = Cache_Check (&s->cache);
@@ -114,19 +113,17 @@ sfxcache_t *S_LoadSound (sfx_t *s)
     Q_strcpy(namebuffer, "sound/");
     Q_strcat(namebuffer, s->name);
 
-//	Con_Printf ("loading %s\n",namebuffer);
+//	Con_Printf ("loading %s\n", namebuffer);
 
-	data = COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
+	data = (char*)COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
 
-	if (!data)
-	{
+	if (!data){
 		Con_Printf ("Couldn't load %s\n", namebuffer);
 		return NULL;
 	}
 
 	info = GetWavinfo (s->name, data, com_filesize);
-	if (info.channels != 1)
-	{
+	if (info.channels != 1)	{
 		Con_Printf ("%s is a stereo sample\n",s->name);
 		return NULL;
 	}
@@ -137,8 +134,9 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	len = len * info.width * info.channels;
 
 	sc = Cache_Alloc ( &s->cache, len + sizeof(sfxcache_t), s->name);
-	if (!sc)
+	if (!sc){
 		return NULL;
+    }
 
 	sc->length = info.samples;
 	sc->loopstart = info.loopstart;
@@ -162,10 +160,10 @@ WAV loading
 */
 
 
-byte	*data_p;
-byte 	*iff_end;
-byte 	*last_chunk;
-byte 	*iff_data;
+char*	data_p;
+char*   iff_end;
+char*   last_chunk;
+char*   iff_data;
 int 	iff_chunk_len;
 
 
@@ -191,9 +189,8 @@ int GetLittleLong(void)
 
 void FindNextChunk(char *name)
 {
-	while (1)
-	{
-		data_p=last_chunk;
+	while (1) {
+		data_p = last_chunk;
 
 		if (data_p >= iff_end)
 		{	// didn't find the chunk
@@ -203,8 +200,7 @@ void FindNextChunk(char *name)
 
 		data_p += 4;
 		iff_chunk_len = GetLittleLong();
-		if (iff_chunk_len < 0)
-		{
+		if (iff_chunk_len < 0) {
 			data_p = NULL;
 			return;
 		}
@@ -212,8 +208,9 @@ void FindNextChunk(char *name)
 //			Sys_Error ("FindNextChunk: %i length is past the 1 meg sanity limit", iff_chunk_len);
 		data_p -= 8;
 		last_chunk = data_p + 8 + ( (iff_chunk_len + 1) & ~1 );
-		if (!Q_strncmp(data_p, name, 4))
+		if (!Q_strncmp(data_p, name, 4)){
 			return;
+        }
 	}
 }
 
@@ -245,7 +242,7 @@ void DumpChunks(void)
 GetWavinfo
 ============
 */
-wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
+wavinfo_t GetWavinfo (char *name, char *wav, int wavlength)
 {
 	wavinfo_t	info;
 	int     i;
@@ -262,8 +259,11 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 
 // find "RIFF" chunk
 	FindChunk("RIFF");
-	if (!(data_p && !Q_strncmp(data_p+8, "WAVE", 4)))
-	{
+	if (!(
+            data_p &&
+		    (!Q_strncmp(data_p + 8, "WAVE", 4))
+		)
+	){
 		Con_Printf("Missing RIFF/WAVE chunks\n");
 		return info;
 	}
@@ -303,7 +303,7 @@ wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength)
 		FindNextChunk ("LIST");
 		if (data_p)
 		{
-			if (!strncmp (data_p + 28, "mark", 4))
+			if (!strncmp ((char*)data_p + 28, "mark", 4))
 			{	// this is not a proper parse, but it works with cooledit...
 				data_p += 24;
 				i = GetLittleLong ();	// samples in loop

@@ -454,7 +454,7 @@ void M_ScanSaves (void)
 	{
 		strcpy (m_filenames[i], "--- UNUSED SLOT ---");
 		loadable[i] = false;
-		sprintf (name, "%s/s%i.sav", com_gamedir, i);
+		snprintf (name, sizeof(name), "%s/s%i.sav", com_gamedir, i);
 		f = fopen (name, "r");
 		if (!f)
 			continue;
@@ -1394,52 +1394,50 @@ void M_UnbindCommand (char *command)
 
 void M_Keys_Draw (void)
 {
-	int		i, l;
+	// int		i, l;
 	int		keys[2];
 	char	*name;
 	int		x, y;
 	qpic_t	*p;
 
 	p = Draw_CachePic ("gfx/ttl_cstm.lmp");
-	M_DrawPic ( (320-p->width)/2, 4, p);
+	M_DrawPic ( (320 - (p->width) / 2), 4, p);
 
-	if (bind_grab)
+	if (bind_grab) {
 		M_Print (12, 32, "Press a key or button for this action");
-	else
+    } else{
 		M_Print (18, 32, "Enter to change, backspace to clear");
+    }
 
 // search for known bindings
-	for (i=0 ; i<NUMCOMMANDS ; i++)
-	{
-		y = 48 + 8*i;
+	for (int i = 0; i < NUMCOMMANDS; i++)	{
+		y = 48 + (8 * i);
 
 		M_Print (16, y, bindnames[i][1]);
 
-		l = strlen (bindnames[i][0]);
+		// int l = strlen (bindnames[i][0]);
 
 		M_FindKeysForCommand (bindnames[i][0], keys);
 
-		if (keys[0] == -1)
-		{
+		if (keys[0] == -1) {
 			M_Print (140, y, "???");
-		}
-		else
-		{
+		} else {
 			name = Key_KeynumToString (keys[0]);
 			M_Print (140, y, name);
 			x = strlen(name) * 8;
-			if (keys[1] != -1)
-			{
+			if (keys[1] != -1) {
 				M_Print (140 + x + 8, y, "or");
 				M_Print (140 + x + 32, y, Key_KeynumToString (keys[1]));
 			}
 		}
 	}
 
-	if (bind_grab)
-		M_DrawCharacter (130, 48 + keys_cursor*8, '=');
-	else
-		M_DrawCharacter (130, 48 + keys_cursor*8, 12+((int)(realtime*4)&1));
+    M_DrawCharacter (
+        130, 48 + (keys_cursor * 8),
+        (bind_grab)?
+            '=' :
+            12 + ((int)(realtime * 4) & 1)
+    );
 }
 
 
@@ -1939,8 +1937,7 @@ forward:
 			break;
 		}
 
-		if (serialConfig_cursor == 4)
-		{
+		if (serialConfig_cursor == 4) {
 			serialConfig_cursor = 5;
 			break;
 		}
@@ -1978,28 +1975,30 @@ forward:
 	default:
 		if (key < 32 || key > 127)
 			break;
-		if (serialConfig_cursor == 4)
-		{
+		if (serialConfig_cursor == 4){
 			l = strlen(serialConfig_phone);
-			if (l < 15)
-			{
+			if (l < 15)	{
 				serialConfig_phone[l+1] = 0;
 				serialConfig_phone[l] = key;
 			}
 		}
 	}
 
-	if (DirectConfig && (serialConfig_cursor == 3 || serialConfig_cursor == 4))
-		if (key == K_UPARROW)
-			serialConfig_cursor = 2;
-		else
-			serialConfig_cursor = 5;
+	if ((DirectConfig) &&
+        ((serialConfig_cursor == 3) ||
+         (serialConfig_cursor == 4))
+    ) {
+		serialConfig_cursor =
+        (key == K_UPARROW)? 2 : 5;
+    }
 
-	if (SerialConfig && StartingGame && serialConfig_cursor == 4)
-		if (key == K_UPARROW)
-			serialConfig_cursor = 3;
-		else
-			serialConfig_cursor = 5;
+	if (SerialConfig &&
+        StartingGame &&
+        (serialConfig_cursor == 4)
+    ){
+        serialConfig_cursor =
+            (key == K_UPARROW)? 3 : 5;
+    }
 }
 
 //=============================================================================
@@ -2362,11 +2361,15 @@ void M_LanConfig_Key (int key)
 		}
 	}
 
-	if (StartingGame && lanConfig_cursor == 2)
-		if (key == K_UPARROW)
+	if ((StartingGame) &&
+        (lanConfig_cursor == 2)
+    ){
+		if (key == K_UPARROW){
 			lanConfig_cursor = 1;
-		else
-			lanConfig_cursor = 0;
+		} else {
+            lanConfig_cursor = 0;
+        }
+    }
 
 	l =  Q_atoi(lanConfig_portname);
 	if (l > 65535)

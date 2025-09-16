@@ -1,83 +1,125 @@
-SRC_DIR		:= ../src
-IDSRC_DIR 	:= ../ID_src/WinQuake
+# ---------- Paths ----------
+SRC_DIR      := ../src
+IDSRC_DIR    := ../ID_src/WinQuake
 
-OBJ_DIR 	?= ./objs
-OUT_DIR 	?= OUTPUT
+OBJ_DIR      ?= ./objs
+OUT_DIR      ?= OUTPUT
 
-#############################################################################
-INCLUDES :=
-SRC_LIST :=
+# Populated by SRCS.mk: must define SRC_LIST and optionally INCLUDES
+INCLUDES     :=
+SRC_LIST     :=
 include SRCS.mk
-# $(info SRC_LIST = $(SRC_LIST))
 
-MY_SRCS := $(filter $(SRC_DIR)/%,$(SRC_LIST))
-MY_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MY_SRCS))
+# Map sources -> objects
+MY_SRCS      := $(filter $(SRC_DIR)/%,$(SRC_LIST))
+MY_OBJS      := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MY_SRCS))
 
-ID_SRCS := $(filter $(IDSRC_DIR)/%,$(SRC_LIST))
-ID_OBJS := $(addprefix $(OBJ_DIR)/,$(notdir $(ID_SRCS:.c=.o)))
+ID_SRCS      := $(filter $(IDSRC_DIR)/%,$(SRC_LIST))
+ID_OBJS      := $(addprefix $(OBJ_DIR)/,$(notdir $(ID_SRCS:.c=.o)))
 
-OBJS := $(MY_OBJS) $(ID_OBJS)
+OBJS         := $(MY_OBJS) $(ID_OBJS)
 
-#############################################################################
-BITS := -m32  # comment this for ARM M1
+# ---------- Toolchain ----------
+CC           ?= gcc
+CXX          ?= g++
+# force LD to be CC even if env has LD=ld
+LD           := $(CC)
+AR           ?= ar
 
-#############################################################################
-CC  = gcc
-CXX = g++
-LD  = gcc
+UNAME_S      := $(shell uname -s)
+UNAME_M      := $(shell uname -m)
 
-CFLAGS := \
-	-O0 \
-	-DX11 -DVID_X11 \
-	-Dstricmp=strcasecmp \
-	-DNO_ASM
-# CFLAGS += -I/opt/homebrew/opt/libx11/include
+# ---------- Build options ----------
+# DEBUG=1 for -O0 -g; DEBUG=0 for -O2 -DNDEBUG
+DEBUG        ?= 1
+# Set to 1 if you want 32-bit build on Linux x86_64 (requires multilibs)
+FORCE_32     ?= 1
+# Disable legacy ASM paths
+NO_ASM       ?= 1
+# X11 target on *nix
+USE_X11      ?= 1
 
-BASE_CFLAGS = $(BITS) -Dstricmp=strcasecmp -DNO_ASM
+# ---------- Base flags ----------
+# Put macros and include paths into CPPFLAGS
+CPPFLAGS     := $(addprefix -I,$(INCLUDES))
+CPPFLAGS     += -MMD -MP            # auto-deps
+CPPFLAGS     += -Dstricmp=strcasecmp
 
-DEBUG_CFLAGS := $(BASE_CFLAGS) -O0 -g
-# XLDFLAGS = $(BITS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86dga
-XLDFLAGS := $(BITS) -L/usr/lib/i386-linux-gnu -lX11 -lXext
-XLDFLAGS += -L/opt/homebrew/opt/libx11/lib
+ifeq ($(NO_ASM),1)
+CPPFLAGS     += -DNO_ASM
+endif
 
-LDFLAGS := $(BITS) -lm
+ifeq ($(USE_X11),1)
+CPPFLAGS     += -DX11 -DVID_X11
+endif
 
-#############################################################################
-# ifneq ($(NO_PARALLEL),1)
-#   J ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || \
-#                 nproc 2>/dev/null || \
-#                 sysctl -n hw.ncpu 2>/dev/null || echo 1)
-#   MAKEFLAGS += -j$(J) --output-sync=target
-# endif
+# GCC10+ compatibility for old C codebases
+CFLAGS       ?=
+CFLAGS       += -fcommon -fno-strict-aliasing -pipe
+CFLAGS       += -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
+                -Wno-missing-field-initializers -Wno-implicit-fallthrough \
+                -Wno-trigraphs -Wno-format-truncation
 
-#############################################################################
-TARGETS ?= $(OUT_DIR)/quake.x11
+ifeq ($(DEBUG),1)
+CFLAGS       += -O0 -g -fno-omit-frame-pointer
+else
+CFLAGS       += -O2 -DNDEBUG
+endif
 
-build:
-	@mkdir -p $(OBJ_DIR) $(OUT_DIR)
-	@$(MAKE) targets OBJ_DIR=./objs CFLAGS="$(DEBUG_CFLAGS)"
+# Linker flags and libraries split correctly
+LDFLAGS      ?=
+LDLIBS       ?= -lm
 
-all: build
+# ---------- Platform specifics ----------
+ifeq ($(USE_X11),1)
+  # hard fallback to avoid surprises with pkg-config
+  LDLIBS += -lX11 -lXext
+endif
 
+# Optional 32-bit build on Linux x86_64
+ifeq ($(UNAME_S),Linux)
+  ifeq ($(UNAME_M),x86_64)
+    ifeq ($(FORCE_32),1)
+      CFLAGS   += -m32
+      LDFLAGS  += -m32
+      # Hint pkg-config to 32-bit libs if needed (Debian/Ubuntu multilib):
+      # export PKG_CONFIG_LIBDIR=/usr/lib/i386-linux-gnu/pkgconfig
+    endif
+  endif
+endif
+
+# On macOS arm64 there is no 32-bit; do nothing.
+
+# ---------- Targets ----------
+TARGETS      ?= $(OUT_DIR)/quake.x11
+
+.PHONY: all build targets clean fresh run rund
+
+all: $(TARGETS)
+build: $(TARGETS)
 targets: $(TARGETS)
 
-#############################################################################
+# Main link (use LDFLAGS/LDLIBS properly)
+$(TARGETS): $(OBJS) | $(OUT_DIR)
+	@$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	@cd run_env && ln -sf ../$(TARGETS) quake
+
+$(OUT_DIR):
+	@mkdir -p $(OUT_DIR)
+
+# ---------- Compile rules ----------
+# Note: use CPPFLAGS for -D/-I, CFLAGS for codegen; generate .d files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $(XCFLAGS) -c $< -o $@ $(addprefix -I,$(INCLUDES))
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(IDSRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
-	@$(CC) $(CFLAGS) $(XCFLAGS) -c $< -o $@ $(addprefix -I,$(INCLUDES))
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-#MAIN TARGET X11
-$(TARGETS): $(OBJS)
-	@$(LD) $(CFLAGS) -o $@ $^ $(XLDFLAGS) $(LDFLAGS)
-	@cd run_env && ln -sf ../$(TARGETS) quake
-
+# ---------- Housekeeping ----------
 clean:
-	@cd $(OBJ_DIR) && 	rm -rf * && \
-	 cd .. && 			rm -f $(TARGETS)
+	@rm -rf $(OBJ_DIR) $(TARGETS)
 
 fresh: clean build
 
@@ -85,4 +127,16 @@ run: $(TARGETS)
 	@cd run_env && DISPLAY=:1 ./quake
 
 rund: $(TARGETS)
-	cd run_env && DISPLAY=:1 gdbserver :1234 ./quake
+	@cd run_env && DISPLAY=:1 gdbserver :1234 ./quake
+
+# Include auto-generated deps
+-include $(OBJS:.o=.d)
+
+# Debug helpers
+.PHONY: vars
+vars:
+	@echo "CPPFLAGS=$(CPPFLAGS)"
+	@echo "CFLAGS=$(CFLAGS)"
+	@echo "LDFLAGS=$(LDFLAGS)"
+	@echo "LDLIBS=$(LDLIBS)"
+	@echo "X11_LIBS=$(X11_LIBS)"

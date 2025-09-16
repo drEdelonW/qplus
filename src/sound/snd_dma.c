@@ -395,38 +395,34 @@ channel_t *SND_PickChannel(int entnum, int entchannel)
 SND_Spatialize
 =================
 */
-void SND_Spatialize(channel_t *ch)
-{
+void SND_Spatialize(channel_t *ch){
     vec_t dot;
-    vec_t ldist, rdist, dist;
+    // vec_t ldist, rdist; // for VR?
+    vec_t dist;
     vec_t lscale, rscale, scale;
     vec3_t source_vec;
-	sfx_t *snd;
+	// sfx_t *snd;
 
 // anything coming from the view entity will allways be full volume
-	if (ch->entnum == cl.viewentity)
-	{
-		ch->leftvol = ch->master_vol;
+	if (ch->entnum == cl.viewentity) {
+		ch->leftvol  = ch->master_vol;
 		ch->rightvol = ch->master_vol;
 		return;
 	}
 
 // calculate stereo seperation and distance attenuation
 
-	snd = ch->sfx;
+	// snd = ch->sfx;
 	VectorSubtract(ch->origin, listener_origin, source_vec);
 
 	dist = VectorNormalize(source_vec) * ch->dist_mult;
 
 	dot = DotProduct(listener_right, source_vec);
 
-	if (shm->channels == 1)
-	{
+	if (shm->channels == 1)	{
 		rscale = 1.0;
 		lscale = 1.0;
-	}
-	else
-	{
+	} else {
 		rscale = 1.0 + dot;
 		lscale = 1.0 - dot;
 	}
@@ -434,13 +430,15 @@ void SND_Spatialize(channel_t *ch)
 // add in distance effect
 	scale = (1.0 - dist) * rscale;
 	ch->rightvol = (int) (ch->master_vol * scale);
-	if (ch->rightvol < 0)
+	if (ch->rightvol < 0){
 		ch->rightvol = 0;
+    }
 
 	scale = (1.0 - dist) * lscale;
 	ch->leftvol = (int) (ch->master_vol * scale);
-	if (ch->leftvol < 0)
+	if (ch->leftvol < 0){
 		ch->leftvol = 0;
+    }
 }
 
 

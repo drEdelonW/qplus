@@ -167,7 +167,7 @@ extern int		snd_blocked;
 void S_LocalSound (char *s);
 sfxcache_t *S_LoadSound (sfx_t *s);
 
-wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength);
+wavinfo_t GetWavinfo (char *name, char *wav, int wavlength);
 
 void SND_InitScaletable (void);
 void SNDDMA_Submit(void);

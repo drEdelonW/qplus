@@ -81,26 +81,29 @@ void *Mod_Extradata (model_t *mod)
 Mod_PointInLeaf
 ===============
 */
-mleaf_t *Mod_PointInLeaf (vec3_t p, model_t *model)
-{
+mleaf_t *Mod_PointInLeaf (vec3_t p, model_t *model) {
 	mnode_t		*node;
 	float		d;
 	mplane_t	*plane;
 
-	if (!model || !model->nodes)
+	if ((!model) ||
+        (!model->nodes)
+    ){
 		Sys_Error ("Mod_PointInLeaf: bad model");
+    }
 
 	node = model->nodes;
-	while (1)
-	{
-		if (node->contents < 0)
+	while (1) {
+		if (node->contents < 0){
 			return (mleaf_t *)node;
+        }
 		plane = node->plane;
-		d = DotProduct (p,plane->normal) - plane->dist;
-		if (d > 0)
+		d = DotProduct (p, plane->normal) - plane->dist;
+		if (d > 0){
 			node = node->children[0];
-		else
+        }else{
 			node = node->children[1];
+        }
 	}
 
 	return NULL;	// never reached
@@ -1140,9 +1143,7 @@ float RadiusFromBounds (vec3_t mins, vec3_t maxs)
 Mod_LoadBrushModel
 =================
 */
-void Mod_LoadBrushModel (model_t *mod, void *buffer)
-{
-	int			i, j;
+void Mod_LoadBrushModel (model_t *mod, void *buffer){
 	dheader_t	*header;
 	dmodel_t 	*bm;
 
@@ -1150,15 +1151,20 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 
 	header = (dheader_t *)buffer;
 
-	i = LittleLong (header->version);
-	if (i != BSPVERSION)
-		Sys_Error ("Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, i, BSPVERSION);
+	int ver = LittleLong (header->version);
+	if (ver != BSPVERSION){
+		Sys_Error(
+            "Mod_LoadBrushModel: %s has wrong version number (%i should be %i)",
+            mod->name, ver, BSPVERSION
+        );
+    }
 
 // swap all the lumps
 	mod_base = (byte *)header;
 
-	for (i=0 ; i<sizeof(dheader_t)/4 ; i++)
+	for (int i = 0; i < (sizeof(dheader_t) / 4); i++){
 		((int *)header)[i] = LittleLong ( ((int *)header)[i]);
+    }
 
 // load into heap
 
@@ -1186,15 +1192,13 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 //
 // set up the submodels (FIXME: this is confusing)
 //
-	for (i=0 ; i<mod->numsubmodels ; i++)
-	{
+	for (int i = 0; i < mod->numsubmodels; i++){
 		bm = &mod->submodels[i];
 
 		mod->hulls[0].firstclipnode = bm->headnode[0];
-		for (j=1 ; j<MAX_MAP_HULLS ; j++)
-		{
+		for (int j = 1; j < MAX_MAP_HULLS; j++){
 			mod->hulls[j].firstclipnode = bm->headnode[j];
-			mod->hulls[j].lastclipnode = mod->numclipnodes-1;
+			mod->hulls[j].lastclipnode = mod->numclipnodes - 1;
 		}
 
 		mod->firstmodelsurface = bm->firstface;
@@ -1206,11 +1210,10 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 
 		mod->numleafs = bm->visleafs;
 
-		if (i < mod->numsubmodels-1)
-		{	// duplicate the basic information
+		if (i < (mod->numsubmodels - 1)){	// duplicate the basic information
 			char	name[10];
 
-			sprintf (name, "*%i", i+1);
+			snprintf (name, sizeof(name), "*%i", i+1);
 			loadmodel = Mod_FindName (name);
 			*loadmodel = *mod;
 			strcpy (loadmodel->name, name);

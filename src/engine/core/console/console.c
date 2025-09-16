@@ -20,10 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // console.c
 
 #ifdef NeXT
-#include <libc.h>
+	#include <libc.h>
 #endif
 #ifndef _MSC_VER
-#include <unistd.h>
+	#include <unistd.h>
 #endif
 #include <fcntl.h>
 #include "quakedef.h"
@@ -32,7 +32,7 @@ int 		con_linewidth;
 
 float		con_cursorspeed = 4;
 
-#define		CON_TEXTSIZE	16384
+#define		CON_TEXTSIZE	0x4000 /*16Kb 16384*/
 
 qboolean 	con_forcedup;		// because no entities to refresh
 
@@ -479,31 +479,35 @@ The input line scrolls horizontally if typing goes beyond the right edge
 */
 void Con_DrawInput (void)
 {
-	int		y;
-	int		i;
 	char	*text;
+	int		y;
 
-	if (key_dest != key_console && !con_forcedup)
+	if ((key_dest != key_console) &&
+		(!con_forcedup)) {
 		return;		// don't draw anything
+	}
 
 	text = key_lines[edit_line];
 
 // add the cursor frame
-	text[key_linepos] = 10+((int)(realtime*con_cursorspeed)&1);
+	text[key_linepos] = 10 + ((int)(realtime * con_cursorspeed) & 1);
 
 // fill out remainder with spaces
-	for (i=key_linepos+1 ; i< con_linewidth ; i++)
+	for (int i = (key_linepos + 1); i < con_linewidth; i++) {
 		text[i] = ' ';
+	}
 
 //	prestep if horizontally scrolling
-	if (key_linepos >= con_linewidth)
+	if (key_linepos >= con_linewidth){
 		text += 1 + key_linepos - con_linewidth;
+	}
 
 // draw it
-	y = con_vislines-16;
+	y = con_vislines - 16;
 
-	for (i=0 ; i<con_linewidth ; i++)
-		Draw_Character ( (i+1)<<3, con_vislines - 16, text[i]);
+	for (int i = 0; i < con_linewidth; i++){
+		Draw_Character ( (i + 1) << 3, y, text[i]);
+	}
 
 // remove cursor
 	key_lines[edit_line][key_linepos] = 0;

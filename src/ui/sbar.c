@@ -1164,18 +1164,16 @@ Sbar_DeathmatchOverlay
 
 ==================
 */
-void Sbar_MiniDeathmatchOverlay (void)
-{
-	qpic_t			*pic;
-	int				i, k, l;
-	int				top, bottom;
-	int				x, y, f;
+void Sbar_MiniDeathmatchOverlay(void){
+	// qpic_t			*pic;
 	char			num[12];
 	scoreboard_t	*s;
-	int				numlines;
 
-	if (vid.width < 512 || !sb_lines)
+	if ((vid.width < 512) ||
+		(!sb_lines)
+	){
 		return;
+	}
 
 	scr_copyeverything = 1;
 	scr_fullupdate = 0;
@@ -1184,56 +1182,65 @@ void Sbar_MiniDeathmatchOverlay (void)
 	Sbar_SortFrags ();
 
 // draw the text
-	l = scoreboardlines;
-	y = vid.height - sb_lines;
-	numlines = sb_lines/8;
-	if (numlines < 3)
+	int sbl = scoreboardlines;
+	int y = vid.height - sb_lines;
+	int numlines = sb_lines / 8;
+	if (numlines < 3){
 		return;
+	}
 
 	//find us
-	for (i = 0; i < scoreboardlines; i++)
-		if (fragsort[i] == cl.viewentity - 1)
+	int i;
+	for (i = 0; i < sbl; i++){
+		if (fragsort[i] == cl.viewentity - 1){
 			break;
-
-    if (i == scoreboardlines) // we're not there
-            i = 0;
-    else // figure out start
-            i = i - numlines/2;
-
-    if (i > scoreboardlines - numlines)
-            i = scoreboardlines - numlines;
-    if (i < 0)
-            i = 0;
-
-	x = 324;
-	for (/* */; i < scoreboardlines && y < vid.height - 8 ; i++)
-	{
-		k = fragsort[i];
-		s = &cl.scores[k];
-		if (!s->name[0])
-			continue;
-
-	// draw background
-		top = s->colors & 0xf0;
-		bottom = (s->colors & 15)<<4;
-		top = Sbar_ColorForMap (top);
-		bottom = Sbar_ColorForMap (bottom);
-
-		Draw_Fill ( x, y+1, 40, 3, top);
-		Draw_Fill ( x, y+4, 40, 4, bottom);
-
-	// draw number
-		f = s->frags;
-		sprintf (num, "%3i",f);
-
-		Draw_Character ( x+8 , y, num[0]);
-		Draw_Character ( x+16 , y, num[1]);
-		Draw_Character ( x+24 , y, num[2]);
-
-		if (k == cl.viewentity - 1) {
-			Draw_Character ( x, y, 16);
-			Draw_Character ( x + 32, y, 17);
 		}
+	}
+
+  #if 0
+    if (i == sbl){ // we're not there
+        i = 0;
+	}else{ // figure out start
+        i = i - (numlines / 2);
+	}
+  #else
+    i = (i == sbl)?
+        0 :                 // we're not there
+        i - (numlines / 2); // figure out start
+  #endif
+
+    if (i > sbl - numlines){
+		i = sbl - numlines;
+	}
+    if (i < 0){
+		i = 0;
+	}
+
+	int x = 324;
+	for (/* */; (i < sbl) && (y < (vid.height - 8)); i++){
+		int k = fragsort[i];
+		s = &cl.scores[k];
+		if (s->name[0]){
+        // draw background
+            int top     = s->colors & 0xf0;
+            int bottom  = (s->colors & 15) << 4;
+            top     = Sbar_ColorForMap (top);
+            bottom  = Sbar_ColorForMap (bottom);
+
+            Draw_Fill ( x, y + 1, 40, 3, top);
+            Draw_Fill ( x, y + 4, 40, 4, bottom);
+
+        // draw number
+            sprintf (num, "%3i", s->frags);
+
+            Draw_Character ( x + 8, y, num[0]);
+            Draw_Character ( x + 16, y, num[1]);
+            Draw_Character ( x + 24, y, num[2]);
+
+            if (k == cl.viewentity - 1) {
+                Draw_Character ( x, y, 16);
+                Draw_Character ( x + 32, y, 17);
+            }
 
 #if 0
 {
@@ -1253,10 +1260,11 @@ void Sbar_MiniDeathmatchOverlay (void)
 }
 #endif
 
-	// draw name
-		Draw_String (x+48, y, s->name);
+        // draw name
+            Draw_String (x + 48, y, s->name);
 
-		y += 8;
+            y += 8;
+        }
 	}
 }
 

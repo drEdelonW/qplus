@@ -121,44 +121,39 @@ vec3_t	avelocity = {23, 7, 3};
 float	partstep = 0.01;
 float	timescale = 0.01;
 
-void R_EntityParticles (entity_t *ent)
-{
-	int			count;
-	int			i;
+void R_EntityParticles (entity_t *ent){
 	particle_t	*p;
 	float		angle;
-	float		sr, sp, sy, cr, cp, cy;
 	vec3_t		forward;
-	float		dist;
 
-	dist = 64;
-	count = 50;
+	float dist = 64;
+	// int count  = 50;
 
-if (!avelocities[0][0])
-{
-for (i=0 ; i<NUMVERTEXNORMALS*3 ; i++)
-avelocities[0][i] = (rand()&255) * 0.01;
-}
+    if (!avelocities[0][0]) {
+        for (int i = 0; i < (NUMVERTEXNORMALS * 3); i++){
+            avelocities[0][i] = (rand() & 255) * 0.01;
+        }
+    }
 
 
-	for (i=0 ; i<NUMVERTEXNORMALS ; i++)
-	{
+	for (int i = 0; i < NUMVERTEXNORMALS; i++){
 		angle = cl.time * avelocities[i][0];
-		sy = sin(angle);
-		cy = cos(angle);
+		float sy = sin(angle);
+		float cy = cos(angle);
 		angle = cl.time * avelocities[i][1];
-		sp = sin(angle);
-		cp = cos(angle);
-		angle = cl.time * avelocities[i][2];
-		sr = sin(angle);
-		cr = cos(angle);
+		float sp = sin(angle);
+		float cp = cos(angle);
+		// angle = cl.time * avelocities[i][2];
+		// float sr = sin(angle);
+		// float cr = cos(angle);
 
 		forward[0] = cp*cy;
 		forward[1] = cp*sy;
 		forward[2] = -sp;
 
-		if (!free_particles)
+		if (!free_particles){
 			return;
+        }
 		p = free_particles;
 		free_particles = p->next;
 		p->next = active_particles;
@@ -248,23 +243,20 @@ R_ParseParticleEffect
 Parse an effect out of the server message
 ===============
 */
-void R_ParseParticleEffect (void)
-{
+void R_ParseParticleEffect (void){
 	vec3_t		org, dir;
-	int			i, count, msgcount, color;
+	int			msgcount, color;
 
-	for (i=0 ; i<3 ; i++)
+	for (int i = 0; i < 3; i++){
 		org[i] = MSG_ReadCoord ();
-	for (i=0 ; i<3 ; i++)
+    }
+	for (int i = 0; i < 3; i++){
 		dir[i] = MSG_ReadChar () * (1.0/16);
+    }
 	msgcount = MSG_ReadByte ();
 	color = MSG_ReadByte ();
 
-if (msgcount == 255)
-	count = 1024;
-else
-	count = msgcount;
-
+    int count = (msgcount == 255)? 1024 : msgcount;
 	R_RunParticleEffect (org, dir, color, count);
 }
 

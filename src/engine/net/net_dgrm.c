@@ -519,58 +519,54 @@ static int		testSocket;
 static void Test_Poll(void);
 PollProcedure	testPollProcedure = {NULL, 0.0, Test_Poll};
 
-static void Test_Poll(void)
-{
+static void Test_Poll(void){
 	struct qsockaddr clientaddr;
-	int		control;
-	int		len;
 	char	name[32];
 	char	address[64];
-	int		colors;
-	int		frags;
-	int		connectTime;
-	byte	playerNumber;
 
 	net_landriverlevel = testDriver;
 
-	while (1)
-	{
-		len = dfunc.Read (testSocket, net_message.data, net_message.maxsize, &clientaddr);
+	while (1)	{
+		int len = dfunc.Read (testSocket, net_message.data, net_message.maxsize, &clientaddr);
 		if (len < sizeof(int))
 			break;
 
 		net_message.cursize = len;
 
 		MSG_BeginReading ();
-		control = BigLong(*((int *)net_message.data));
+		int control = BigLong(*((int *)net_message.data));
 		MSG_ReadLong();
-		if (control == -1)
+		if ((control == -1) ||
+			((control & (~NETFLAG_LENGTH_MASK)) !=  NETFLAG_CTL) ||
+			((control & NETFLAG_LENGTH_MASK) != len)
+		){
 			break;
-		if ((control & (~NETFLAG_LENGTH_MASK)) !=  NETFLAG_CTL)
-			break;
-		if ((control & NETFLAG_LENGTH_MASK) != len)
-			break;
+		}
 
 		if (MSG_ReadByte() != CCREP_PLAYER_INFO)
 			Sys_Error("Unexpected repsonse to Player Info request\n");
 
-		playerNumber = MSG_ReadByte();
+		int playerNumber = MSG_ReadByte();
 		Q_strcpy(name, MSG_ReadString());
-		colors = MSG_ReadLong();
-		frags = MSG_ReadLong();
-		connectTime = MSG_ReadLong();
+		int colors = MSG_ReadLong();
+		int frags = MSG_ReadLong();
+		int connectTime = MSG_ReadLong();
 		Q_strcpy(address, MSG_ReadString());
 
-		Con_Printf("%s\n  frags:%3i  colors:%u %u  time:%u\n  %s\n", name, frags, colors >> 4, colors & 0x0f, connectTime / 60, address);
+		Con_Printf(
+			"%d:%s\n  frags:%3i  colors:%u %u  time:%u\n  %s\n",
+			playerNumber,
+			name, frags,
+			colors >> 4, colors & 0x0f,
+			connectTime / 60,
+			address
+		);
 	}
 
 	testPollCount--;
-	if (testPollCount)
-	{
+	if (testPollCount)	{
 		SchedulePollProcedure(&testPollProcedure, 0.1);
-	}
-	else
-	{
+	}else{
 		dfunc.CloseSocket(testSocket);
 		testInProgress = false;
 	}
