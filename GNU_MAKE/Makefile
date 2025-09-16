@@ -1,32 +1,48 @@
+SRC_DIR		:= ../src
+IDSRC_DIR 	:= ../ID_src/WinQuake
 
+OBJ_DIR 	?= ./objs
+OUT_DIR 	?= OUTPUT
+
+#############################################################################
+INCLUDES :=
+SRC_LIST :=
+include SRCS.mk
+# $(info SRC_LIST = $(SRC_LIST))
+
+MY_SRCS := $(filter $(SRC_DIR)/%,$(SRC_LIST))
+MY_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MY_SRCS))
+
+ID_SRCS := $(filter $(IDSRC_DIR)/%,$(SRC_LIST))
+ID_OBJS := $(addprefix $(OBJ_DIR)/,$(notdir $(ID_SRCS:.c=.o)))
+
+OBJS := $(MY_OBJS) $(ID_OBJS)
+
+#############################################################################
 BITS := -m32  # comment this for ARM M1
 
-BUILD_DEBUG_DIR 	:= OUTPUT
-# BUILD_RELEASE_DIR 	:= ../release_
-CFLAGS := -O0 -DX11 -DVID_X11 -Dstricmp=strcasecmp -DNO_ASM
+#############################################################################
+CC  = gcc
+CXX = g++
+LD  = gcc
 
-CC = gcc
+CFLAGS := \
+	-O0 \
+	-DX11 -DVID_X11 \
+	-Dstricmp=strcasecmp \
+	-DNO_ASM
+# CFLAGS += -I/opt/homebrew/opt/libx11/include
+
 BASE_CFLAGS = $(BITS) -Dstricmp=strcasecmp -DNO_ASM
-# RELEASE_CFLAGS = $(BASE_CFLAGS) -g -mpentiumpro -O6 -ffast-math -funroll-loops \
-	-fomit-frame-pointer -fexpensive-optimizations
+
 DEBUG_CFLAGS := $(BASE_CFLAGS) -O0 -g
 # XLDFLAGS = $(BITS) -L/usr/X11R6/lib -lX11 -lXext -lXxf86dga
-XLDFLAGS := $(BITS) -L/usr/lib/i386-linux-gnu -lX11 #-lXext -lXxf86dga
-XCFLAGS = -DX11
-
-CFLAGS += -I/opt/homebrew/opt/libx11/include
-DO_X11_CC 		= $(CC) $(CFLAGS) $(XCFLAGS) -o $@ -c $<
-DO_X11_DEBUG_CC = $(CC) $(DEBUG_CFLAGS) $(XCFLAGS) -o $@ -c $<
+XLDFLAGS := $(BITS) -L/usr/lib/i386-linux-gnu -lX11 -lXext
+XLDFLAGS += -L/opt/homebrew/opt/libx11/lib
 
 LDFLAGS := $(BITS) -lm
 
-LDFLAGS += -L/opt/homebrew/opt/libx11/lib -lX11
 #############################################################################
-# SETUP AND BUILD
-#############################################################################
-
-TARGETS ?= $(BUILD_DEBUG_DIR)/quake.x11
-
 # ifneq ($(NO_PARALLEL),1)
 #   J ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || \
 #                 nproc 2>/dev/null || \
@@ -34,75 +50,39 @@ TARGETS ?= $(BUILD_DEBUG_DIR)/quake.x11
 #   MAKEFLAGS += -j$(J) --output-sync=target
 # endif
 
-build_debug:
-	@mkdir -p $(BUILD_DEBUG_DIR) \
-		$(BUILD_DEBUG_DIR) \
-		./objs
+#############################################################################
+TARGETS ?= $(OUT_DIR)/quake.x11
+
+build:
+	@mkdir -p $(OBJ_DIR) $(OUT_DIR)
 	@$(MAKE) targets OBJ_DIR=./objs CFLAGS="$(DEBUG_CFLAGS)"
 
-# build_release:
-# 	@mkdir -p $(BUILD_RELEASE_DIR) \
-# 		$(BUILD_RELEASE_DIR)/bin \
-# 		$(BUILD_RELEASE_DIR)/x11
-# 	@$(MAKE) targets OBJ_DIR=$(BUILD_RELEASE_DIR)/x11 CFLAGS="$(RELEASE_CFLAGS)"
-
-all: build_debug
-#  build_release
+all: build
 
 targets: $(TARGETS)
 
 #############################################################################
-# X11 Quake
-#############################################################################
-OBJ_DIR 	:= ./objs
-SRC_DIR		:= ../src
-IDSRC_DIR 	:= ../ID_src/WinQuake
-
-INCLUDES :=
-SRC_LIST :=
-include SRCS.mk
-# $(info SRC_LIST = $(SRC_LIST))
-
-
-MY_SRCS  := $(filter $(SRC_DIR)/%,$(SRC_LIST))
-ID_SRCS  := $(filter $(IDSRC_DIR)/%,$(SRC_LIST))
-
-# OBJS := $(patsubst %.c,$(OBJ_DIR)/%.o,$(filter %.c,$(SRC_LIST))) \
-# 		$(patsubst %.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(SRC_LIST))) #\
-#         $(OBJ_DIR)/common.o
-
-MY_OBJS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(MY_SRCS))
-ID_OBJS := $(addprefix $(OBJ_DIR)/,$(notdir $(ID_SRCS:.c=.o)))
-
-# OBJS := $(addprefix $(OBJ_DIR)/,$(notdir $(SRC_LIST:.c=.o)))
-OBJS := $(MY_OBJS) $(ID_OBJS)
-
-DO_X11_CC ?= $(CC) $(CFLAGS) -DX11 -o $@ -c $<
-
-$(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(XCFLAGS) -c $< -o $@ $(addprefix -I,$(INCLUDES))
 
-$(OBJ_DIR)/%.o : $(IDSRC_DIR)/%.c
+$(OBJ_DIR)/%.o: $(IDSRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	@$(CC) $(CFLAGS) $(XCFLAGS) -c $< -o $@ $(addprefix -I,$(INCLUDES))
 
-# EXEPTION FOR common.o
-$(OBJ_DIR)/common.o : DO_X11_CC = $(DO_X11_DEBUG_CC)
-
-
 #MAIN TARGET X11
-$(BUILD_DEBUG_DIR)/quake.x11: $(OBJS)
-	@$(CC) $(CFLAGS) -o $@ $^ $(XLDFLAGS) $(LDFLAGS)
-	@cd run_env && ln -sf ../OUTPUT/quake.x11 quake
+$(TARGETS): $(OBJS)
+	@$(LD) $(CFLAGS) -o $@ $^ $(XLDFLAGS) $(LDFLAGS)
+	@cd run_env && ln -sf ../$(TARGETS) quake
 
 clean:
-	@cd $(OBJ_DIR) && rm -rf * && cd .. && rm -f  $(BUILD_DEBUG_DIR)/quake.x11
+	@cd $(OBJ_DIR) && 	rm -rf * && \
+	 cd .. && 			rm -f $(TARGETS)
 
-fresh: clean build_debug
+fresh: clean build
 
-run: $(BUILD_DEBUG_DIR)/quake.x11
+run: $(TARGETS)
 	@cd run_env && DISPLAY=:1 ./quake
 
-rund: $(BUILD_DEBUG_DIR)/quake.x11
+rund: $(TARGETS)
 	cd run_env && DISPLAY=:1 gdbserver :1234 ./quake
