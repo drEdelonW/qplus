@@ -432,9 +432,9 @@ void COM_Init (char *basedir)
 {
 	COM_Endian_Init();
 
-	Cvar_RegisterVariable (&registered);
-	Cvar_RegisterVariable (&cmdline);
-	Cmd_AddCommand ("path", COM_Path_f);
+	Cvar_RegisterVariable(&registered);
+	Cvar_RegisterVariable(&cmdline);
+	Cmd_AddCommand("path", COM_Path_f);
 
 	COM_InitFilesystem ();
 	COM_CheckRegistered ();

@@ -212,25 +212,25 @@ void Host_InitLocal (void)
 {
 	Host_InitCommands ();
 
-	Cvar_RegisterVariable (&host_framerate);
-	Cvar_RegisterVariable (&host_speeds);
+	Cvar_RegisterVariable(&host_framerate);
+	Cvar_RegisterVariable(&host_speeds);
 
-	Cvar_RegisterVariable (&sys_ticrate);
-	Cvar_RegisterVariable (&serverprofile);
+	Cvar_RegisterVariable(&sys_ticrate);
+	Cvar_RegisterVariable(&serverprofile);
 
-	Cvar_RegisterVariable (&fraglimit);
-	Cvar_RegisterVariable (&timelimit);
-	Cvar_RegisterVariable (&teamplay);
-	Cvar_RegisterVariable (&samelevel);
-	Cvar_RegisterVariable (&noexit);
-	Cvar_RegisterVariable (&skill);
-	Cvar_RegisterVariable (&developer);
-	Cvar_RegisterVariable (&deathmatch);
-	Cvar_RegisterVariable (&coop);
+	Cvar_RegisterVariable(&fraglimit);
+	Cvar_RegisterVariable(&timelimit);
+	Cvar_RegisterVariable(&teamplay);
+	Cvar_RegisterVariable(&samelevel);
+	Cvar_RegisterVariable(&noexit);
+	Cvar_RegisterVariable(&skill);
+	Cvar_RegisterVariable(&developer);
+	Cvar_RegisterVariable(&deathmatch);
+	Cvar_RegisterVariable(&coop);
 
-	Cvar_RegisterVariable (&pausable);
+	Cvar_RegisterVariable(&pausable);
 
-	Cvar_RegisterVariable (&temp1);
+	Cvar_RegisterVariable(&temp1);
 
 	Host_FindMaxClients ();
 

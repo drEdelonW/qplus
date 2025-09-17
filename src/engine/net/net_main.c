@@ -850,24 +850,24 @@ void NET_Init (void)
 	// allocate space for network message buffer
 	SZ_Alloc (&net_message, NET_MAXMESSAGE);
 
-	Cvar_RegisterVariable (&net_messagetimeout);
-	Cvar_RegisterVariable (&hostname);
-	Cvar_RegisterVariable (&config_com_port);
-	Cvar_RegisterVariable (&config_com_irq);
-	Cvar_RegisterVariable (&config_com_baud);
-	Cvar_RegisterVariable (&config_com_modem);
-	Cvar_RegisterVariable (&config_modem_dialtype);
-	Cvar_RegisterVariable (&config_modem_clear);
-	Cvar_RegisterVariable (&config_modem_init);
-	Cvar_RegisterVariable (&config_modem_hangup);
+	Cvar_RegisterVariable(&net_messagetimeout);
+	Cvar_RegisterVariable(&hostname);
+	Cvar_RegisterVariable(&config_com_port);
+	Cvar_RegisterVariable(&config_com_irq);
+	Cvar_RegisterVariable(&config_com_baud);
+	Cvar_RegisterVariable(&config_com_modem);
+	Cvar_RegisterVariable(&config_modem_dialtype);
+	Cvar_RegisterVariable(&config_modem_clear);
+	Cvar_RegisterVariable(&config_modem_init);
+	Cvar_RegisterVariable(&config_modem_hangup);
 #ifdef IDGODS
-	Cvar_RegisterVariable (&idgods);
+	Cvar_RegisterVariable(&idgods);
 #endif
 
-	Cmd_AddCommand ("slist", NET_Slist_f);
-	Cmd_AddCommand ("listen", NET_Listen_f);
-	Cmd_AddCommand ("maxplayers", MaxPlayers_f);
-	Cmd_AddCommand ("port", NET_Port_f);
+	Cmd_AddCommand("slist", NET_Slist_f);
+	Cmd_AddCommand("listen", NET_Listen_f);
+	Cmd_AddCommand("maxplayers", MaxPlayers_f);
+	Cmd_AddCommand("port", NET_Port_f);
 
 	// initialize all the drivers
 	for (net_driverlevel=0 ; net_driverlevel<net_numdrivers ; net_driverlevel++)

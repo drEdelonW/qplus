@@ -430,12 +430,12 @@ void Cmd_Init (void)
 //
 // register our commands
 //
-	Cmd_AddCommand ("stuffcmds", Cmd_StuffCmds_f);
-	Cmd_AddCommand ("exec", Cmd_Exec_f);
-	Cmd_AddCommand ("echo", Cmd_Echo_f);
-	Cmd_AddCommand ("alias", Cmd_Alias_f);
-	Cmd_AddCommand ("cmd", Cmd_ForwardToServer);
-	Cmd_AddCommand ("wait", Cmd_Wait_f);
+	Cmd_AddCommand("stuffcmds", Cmd_StuffCmds_f);
+	Cmd_AddCommand("exec", Cmd_Exec_f);
+	Cmd_AddCommand("echo", Cmd_Echo_f);
+	Cmd_AddCommand("alias", Cmd_Alias_f);
+	Cmd_AddCommand("cmd", Cmd_ForwardToServer);
+	Cmd_AddCommand("wait", Cmd_Wait_f);
 }
 
 /*
@@ -529,7 +529,7 @@ void Cmd_TokenizeString (char *text)
 Cmd_AddCommand
 ============
 */
-void	Cmd_AddCommand (char *cmd_name, xcommand_t function)
+void	Cmd_AddCommand(char *cmd_name, xcommand_t function)
 {
 	cmd_function_t	*cmd;
 

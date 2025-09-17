@@ -561,7 +561,7 @@ void VID_Init(unsigned char *palette)
 	if (svgalib_inited)
 		return;
 
-//	Cmd_AddCommand ("gamma", VID_Gamma_f);
+//	Cmd_AddCommand("gamma", VID_Gamma_f);
 
 	if (UseDisplay)
 	{
@@ -569,9 +569,9 @@ void VID_Init(unsigned char *palette)
 
 		VID_InitModes();
 
-		Cvar_RegisterVariable (&vid_mode);
-		Cvar_RegisterVariable (&vid_redrawfull);
-		Cvar_RegisterVariable (&vid_waitforrefresh);
+		Cvar_RegisterVariable(&vid_mode);
+		Cvar_RegisterVariable(&vid_redrawfull);
+		Cvar_RegisterVariable(&vid_waitforrefresh);
 
 		Cmd_AddCommand("vid_nummodes", VID_NumModes_f);
 		Cmd_AddCommand("vid_describemode", VID_DescribeMode_f);
@@ -837,11 +837,11 @@ void IN_Init(void)
 	if (UseMouse)
 	{
 
-		Cvar_RegisterVariable (&mouse_button_commands[0]);
-		Cvar_RegisterVariable (&mouse_button_commands[1]);
-		Cvar_RegisterVariable (&mouse_button_commands[2]);
-		Cvar_RegisterVariable (&m_filter);
-		Cmd_AddCommand ("force_centerview", Force_CenterView_f);
+		Cvar_RegisterVariable(&mouse_button_commands[0]);
+		Cvar_RegisterVariable(&mouse_button_commands[1]);
+		Cvar_RegisterVariable(&mouse_button_commands[2]);
+		Cvar_RegisterVariable(&m_filter);
+		Cmd_AddCommand("force_centerview", Force_CenterView_f);
 
 		mouse_buttons = 3;
 

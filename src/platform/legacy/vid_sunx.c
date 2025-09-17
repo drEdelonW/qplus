@@ -574,7 +574,7 @@ void	VID_Init (unsigned char *palette)
 	int num_visuals;
 	int template_mask;
 
-	Cmd_AddCommand ("gamma", VID_Gamma_f);
+	Cmd_AddCommand("gamma", VID_Gamma_f);
 	for (i=0 ; i<256 ; i++)
 		vid_gamma[i] = i;
 
@@ -1190,7 +1190,7 @@ char *Sys_ConsoleInput (void)
 
 void IN_Init (void)
 {
-	Cvar_RegisterVariable (&m_filter);
+	Cvar_RegisterVariable(&m_filter);
 	if ( COM_CheckParm ("-nomouse") )
 		return;
 	mouse_x = mouse_y = 0.0;

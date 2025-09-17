@@ -1067,21 +1067,21 @@ PR_Init
 */
 void PR_Init (void)
 {
-	Cmd_AddCommand ("edict", ED_PrintEdict_f);
-	Cmd_AddCommand ("edicts", ED_PrintEdicts);
-	Cmd_AddCommand ("edictcount", ED_Count);
-	Cmd_AddCommand ("profile", PR_Profile_f);
-	Cvar_RegisterVariable (&nomonsters);
-	Cvar_RegisterVariable (&gamecfg);
-	Cvar_RegisterVariable (&scratch1);
-	Cvar_RegisterVariable (&scratch2);
-	Cvar_RegisterVariable (&scratch3);
-	Cvar_RegisterVariable (&scratch4);
-	Cvar_RegisterVariable (&savedgamecfg);
-	Cvar_RegisterVariable (&saved1);
-	Cvar_RegisterVariable (&saved2);
-	Cvar_RegisterVariable (&saved3);
-	Cvar_RegisterVariable (&saved4);
+	Cmd_AddCommand("edict", ED_PrintEdict_f);
+	Cmd_AddCommand("edicts", ED_PrintEdicts);
+	Cmd_AddCommand("edictcount", ED_Count);
+	Cmd_AddCommand("profile", PR_Profile_f);
+	Cvar_RegisterVariable(&nomonsters);
+	Cvar_RegisterVariable(&gamecfg);
+	Cvar_RegisterVariable(&scratch1);
+	Cvar_RegisterVariable(&scratch2);
+	Cvar_RegisterVariable(&scratch3);
+	Cvar_RegisterVariable(&scratch4);
+	Cvar_RegisterVariable(&savedgamecfg);
+	Cvar_RegisterVariable(&saved1);
+	Cvar_RegisterVariable(&saved2);
+	Cvar_RegisterVariable(&saved3);
+	Cvar_RegisterVariable(&saved4);
 }
 
 

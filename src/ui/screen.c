@@ -313,21 +313,21 @@ SCR_Init
 */
 void SCR_Init (void)
 {
-	Cvar_RegisterVariable (&scr_fov);
-	Cvar_RegisterVariable (&scr_viewsize);
-	Cvar_RegisterVariable (&scr_conspeed);
-	Cvar_RegisterVariable (&scr_showram);
-	Cvar_RegisterVariable (&scr_showturtle);
-	Cvar_RegisterVariable (&scr_showpause);
-	Cvar_RegisterVariable (&scr_centertime);
-	Cvar_RegisterVariable (&scr_printspeed);
+	Cvar_RegisterVariable(&scr_fov);
+	Cvar_RegisterVariable(&scr_viewsize);
+	Cvar_RegisterVariable(&scr_conspeed);
+	Cvar_RegisterVariable(&scr_showram);
+	Cvar_RegisterVariable(&scr_showturtle);
+	Cvar_RegisterVariable(&scr_showpause);
+	Cvar_RegisterVariable(&scr_centertime);
+	Cvar_RegisterVariable(&scr_printspeed);
 
 //
 // register our commands
 //
-	Cmd_AddCommand ("screenshot",SCR_ScreenShot_f);
-	Cmd_AddCommand ("sizeup",SCR_SizeUp_f);
-	Cmd_AddCommand ("sizedown",SCR_SizeDown_f);
+	Cmd_AddCommand("screenshot",SCR_ScreenShot_f);
+	Cmd_AddCommand("sizeup",SCR_SizeUp_f);
+	Cmd_AddCommand("sizedown",SCR_SizeDown_f);
 
 	scr_ram = Draw_PicFromWad ("ram");
 	scr_net = Draw_PicFromWad ("net");

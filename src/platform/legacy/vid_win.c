@@ -2061,31 +2061,31 @@ void	VID_Init (unsigned char *palette)
 	int		basenummodes;
 	byte	*ptmp;
 
-	Cvar_RegisterVariable (&vid_mode);
-	Cvar_RegisterVariable (&vid_wait);
-	Cvar_RegisterVariable (&vid_nopageflip);
-	Cvar_RegisterVariable (&_vid_wait_override);
-	Cvar_RegisterVariable (&_vid_default_mode);
-	Cvar_RegisterVariable (&_vid_default_mode_win);
-	Cvar_RegisterVariable (&vid_config_x);
-	Cvar_RegisterVariable (&vid_config_y);
-	Cvar_RegisterVariable (&vid_stretch_by_2);
-	Cvar_RegisterVariable (&_windowed_mouse);
-	Cvar_RegisterVariable (&vid_fullscreen_mode);
-	Cvar_RegisterVariable (&vid_windowed_mode);
-	Cvar_RegisterVariable (&block_switch);
-	Cvar_RegisterVariable (&vid_window_x);
-	Cvar_RegisterVariable (&vid_window_y);
+	Cvar_RegisterVariable(&vid_mode);
+	Cvar_RegisterVariable(&vid_wait);
+	Cvar_RegisterVariable(&vid_nopageflip);
+	Cvar_RegisterVariable(&_vid_wait_override);
+	Cvar_RegisterVariable(&_vid_default_mode);
+	Cvar_RegisterVariable(&_vid_default_mode_win);
+	Cvar_RegisterVariable(&vid_config_x);
+	Cvar_RegisterVariable(&vid_config_y);
+	Cvar_RegisterVariable(&vid_stretch_by_2);
+	Cvar_RegisterVariable(&_windowed_mouse);
+	Cvar_RegisterVariable(&vid_fullscreen_mode);
+	Cvar_RegisterVariable(&vid_windowed_mode);
+	Cvar_RegisterVariable(&block_switch);
+	Cvar_RegisterVariable(&vid_window_x);
+	Cvar_RegisterVariable(&vid_window_y);
 
-	Cmd_AddCommand ("vid_testmode", VID_TestMode_f);
-	Cmd_AddCommand ("vid_nummodes", VID_NumModes_f);
-	Cmd_AddCommand ("vid_describecurrentmode", VID_DescribeCurrentMode_f);
-	Cmd_AddCommand ("vid_describemode", VID_DescribeMode_f);
-	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
-	Cmd_AddCommand ("vid_forcemode", VID_ForceMode_f);
-	Cmd_AddCommand ("vid_windowed", VID_Windowed_f);
-	Cmd_AddCommand ("vid_fullscreen", VID_Fullscreen_f);
-	Cmd_AddCommand ("vid_minimize", VID_Minimize_f);
+	Cmd_AddCommand("vid_testmode", VID_TestMode_f);
+	Cmd_AddCommand("vid_nummodes", VID_NumModes_f);
+	Cmd_AddCommand("vid_describecurrentmode", VID_DescribeCurrentMode_f);
+	Cmd_AddCommand("vid_describemode", VID_DescribeMode_f);
+	Cmd_AddCommand("vid_describemodes", VID_DescribeModes_f);
+	Cmd_AddCommand("vid_forcemode", VID_ForceMode_f);
+	Cmd_AddCommand("vid_windowed", VID_Windowed_f);
+	Cmd_AddCommand("vid_fullscreen", VID_Fullscreen_f);
+	Cmd_AddCommand("vid_minimize", VID_Minimize_f);
 
 	if (COM_CheckParm ("-dibonly"))
 		dibonly = true;

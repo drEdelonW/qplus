@@ -760,7 +760,7 @@ int Datagram_Init (void)
 	int csock;
 
 	myDriverLevel = net_driverlevel;
-	Cmd_AddCommand ("net_stats", NET_Stats_f);
+	Cmd_AddCommand("net_stats", NET_Stats_f);
 
 	if (COM_CheckParm("-nolan"))
 		return -1;
@@ -775,10 +775,10 @@ int Datagram_Init (void)
 		}
 
 #ifdef BAN_TEST
-	Cmd_AddCommand ("ban", NET_Ban_f);
+	Cmd_AddCommand("ban", NET_Ban_f);
 #endif
-	Cmd_AddCommand ("test", Test_f);
-	Cmd_AddCommand ("test2", Test2_f);
+	Cmd_AddCommand("test", Test_f);
+	Cmd_AddCommand("test2", Test2_f);
 
 	return 0;
 }

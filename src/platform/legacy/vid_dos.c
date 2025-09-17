@@ -89,25 +89,25 @@ VID_Init
 */
 void    VID_Init (unsigned char *palette)
 {
-	Cvar_RegisterVariable (&vid_mode);
-	Cvar_RegisterVariable (&vid_wait);
-	Cvar_RegisterVariable (&vid_nopageflip);
-	Cvar_RegisterVariable (&_vid_wait_override);
-	Cvar_RegisterVariable (&_vid_default_mode);
-	Cvar_RegisterVariable (&_vid_default_mode_win);
-	Cvar_RegisterVariable (&vid_config_x);
-	Cvar_RegisterVariable (&vid_config_y);
-	Cvar_RegisterVariable (&vid_stretch_by_2);
-	Cvar_RegisterVariable (&_windowed_mouse);
-	Cvar_RegisterVariable (&vid_fullscreen_mode);
-	Cvar_RegisterVariable (&vid_windowed_mode);
-	Cvar_RegisterVariable (&block_switch);
+	Cvar_RegisterVariable(&vid_mode);
+	Cvar_RegisterVariable(&vid_wait);
+	Cvar_RegisterVariable(&vid_nopageflip);
+	Cvar_RegisterVariable(&_vid_wait_override);
+	Cvar_RegisterVariable(&_vid_default_mode);
+	Cvar_RegisterVariable(&_vid_default_mode_win);
+	Cvar_RegisterVariable(&vid_config_x);
+	Cvar_RegisterVariable(&vid_config_y);
+	Cvar_RegisterVariable(&vid_stretch_by_2);
+	Cvar_RegisterVariable(&_windowed_mouse);
+	Cvar_RegisterVariable(&vid_fullscreen_mode);
+	Cvar_RegisterVariable(&vid_windowed_mode);
+	Cvar_RegisterVariable(&block_switch);
 
-	Cmd_AddCommand ("vid_testmode", VID_TestMode_f);
-	Cmd_AddCommand ("vid_nummodes", VID_NumModes_f);
-	Cmd_AddCommand ("vid_describecurrentmode", VID_DescribeCurrentMode_f);
-	Cmd_AddCommand ("vid_describemode", VID_DescribeMode_f);
-	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
+	Cmd_AddCommand("vid_testmode", VID_TestMode_f);
+	Cmd_AddCommand("vid_nummodes", VID_NumModes_f);
+	Cmd_AddCommand("vid_describecurrentmode", VID_DescribeCurrentMode_f);
+	Cmd_AddCommand("vid_describemode", VID_DescribeMode_f);
+	Cmd_AddCommand("vid_describemodes", VID_DescribeModes_f);
 
 // set up the mode list; note that later inits link in their modes ahead of
 // earlier ones, so the standard VGA modes are always first in the list. This

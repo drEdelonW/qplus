@@ -188,8 +188,8 @@ void Sbar_Init (void)
 	sb_face_invis_invuln = Draw_PicFromWad ("face_inv2");
 	sb_face_quad = Draw_PicFromWad ("face_quad");
 
-	Cmd_AddCommand ("+showscores", Sbar_ShowScores);
-	Cmd_AddCommand ("-showscores", Sbar_DontShowScores);
+	Cmd_AddCommand("+showscores", Sbar_ShowScores);
+	Cmd_AddCommand("-showscores", Sbar_DontShowScores);
 
 	sb_sbar = Draw_PicFromWad ("sbar");
 	sb_ibar = Draw_PicFromWad ("ibar");

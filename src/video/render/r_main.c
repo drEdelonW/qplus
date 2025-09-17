@@ -189,30 +189,30 @@ void R_Init (void)
 
 	R_InitTurb ();
 
-	Cmd_AddCommand ("timerefresh", R_TimeRefresh_f);
-	Cmd_AddCommand ("pointfile", R_ReadPointFile_f);
+	Cmd_AddCommand("timerefresh", R_TimeRefresh_f);
+	Cmd_AddCommand("pointfile", R_ReadPointFile_f);
 
-	Cvar_RegisterVariable (&r_draworder);
-	Cvar_RegisterVariable (&r_speeds);
-	Cvar_RegisterVariable (&r_timegraph);
-	Cvar_RegisterVariable (&r_graphheight);
-	Cvar_RegisterVariable (&r_drawflat);
-	Cvar_RegisterVariable (&r_ambient);
-	Cvar_RegisterVariable (&r_clearcolor);
-	Cvar_RegisterVariable (&r_waterwarp);
-	Cvar_RegisterVariable (&r_fullbright);
-	Cvar_RegisterVariable (&r_drawentities);
-	Cvar_RegisterVariable (&r_drawviewmodel);
-	Cvar_RegisterVariable (&r_aliasstats);
-	Cvar_RegisterVariable (&r_dspeeds);
-	Cvar_RegisterVariable (&r_reportsurfout);
-	Cvar_RegisterVariable (&r_maxsurfs);
-	Cvar_RegisterVariable (&r_numsurfs);
-	Cvar_RegisterVariable (&r_reportedgeout);
-	Cvar_RegisterVariable (&r_maxedges);
-	Cvar_RegisterVariable (&r_numedges);
-	Cvar_RegisterVariable (&r_aliastransbase);
-	Cvar_RegisterVariable (&r_aliastransadj);
+	Cvar_RegisterVariable(&r_draworder);
+	Cvar_RegisterVariable(&r_speeds);
+	Cvar_RegisterVariable(&r_timegraph);
+	Cvar_RegisterVariable(&r_graphheight);
+	Cvar_RegisterVariable(&r_drawflat);
+	Cvar_RegisterVariable(&r_ambient);
+	Cvar_RegisterVariable(&r_clearcolor);
+	Cvar_RegisterVariable(&r_waterwarp);
+	Cvar_RegisterVariable(&r_fullbright);
+	Cvar_RegisterVariable(&r_drawentities);
+	Cvar_RegisterVariable(&r_drawviewmodel);
+	Cvar_RegisterVariable(&r_aliasstats);
+	Cvar_RegisterVariable(&r_dspeeds);
+	Cvar_RegisterVariable(&r_reportsurfout);
+	Cvar_RegisterVariable(&r_maxsurfs);
+	Cvar_RegisterVariable(&r_numsurfs);
+	Cvar_RegisterVariable(&r_reportedgeout);
+	Cvar_RegisterVariable(&r_maxedges);
+	Cvar_RegisterVariable(&r_numedges);
+	Cvar_RegisterVariable(&r_aliastransbase);
+	Cvar_RegisterVariable(&r_aliastransadj);
 
 	Cvar_SetValue ("r_maxedges", (float)NUMSTACKEDGES);
 	Cvar_SetValue ("r_maxsurfs", (float)NUMSTACKSURFACES);

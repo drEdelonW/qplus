@@ -391,9 +391,9 @@ void	VID_Init (unsigned char *palette)
 
 	int desired_width=320, desired_height=200;
 
-	Cmd_AddCommand ("gamma", VID_Gamma_f);
+	Cmd_AddCommand("gamma", VID_Gamma_f);
 
-	Cvar_RegisterVariable (&pixel_multiply);
+	Cvar_RegisterVariable(&pixel_multiply);
 
 	if (pipe(render_pipeline) < 0)
 		Sys_Error("VID_Init: pipe");
@@ -1216,8 +1216,8 @@ void Sys_SendKeyEvents(void)
 
 void IN_Init (void)
 {
-	Cvar_RegisterVariable (&_windowed_mouse);
-	Cvar_RegisterVariable (&m_filter);
+	Cvar_RegisterVariable(&_windowed_mouse);
+	Cvar_RegisterVariable(&m_filter);
    if ( COM_CheckParm ("-nomouse") )
      return;
    mouse_x = mouse_y = 0.0;

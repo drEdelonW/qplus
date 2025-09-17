@@ -43,10 +43,10 @@ vec3_t    chase_dest_angles;
 
 
 void Chase_Init (void){
-    Cvar_RegisterVariable (&chase_back);
-    Cvar_RegisterVariable (&chase_up);
-    Cvar_RegisterVariable (&chase_right);
-    Cvar_RegisterVariable (&chase_active);
+    Cvar_RegisterVariable(&chase_back);
+    Cvar_RegisterVariable(&chase_up);
+    Cvar_RegisterVariable(&chase_right);
+    Cvar_RegisterVariable(&chase_active);
 }
 
 void Chase_Reset (void){
