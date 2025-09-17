@@ -148,8 +148,8 @@ keyname_t keynames[] = {
 
 bool is_printable(char symb){
     return
-        (symb > 32) &&
-        (symb < 127);
+        (symb >= K_SPACE) &&
+        (symb < K_BACKSPACE);
 }
 
 /*
@@ -228,7 +228,7 @@ void Key_Console(int key){
 	}
 
 	if ((key == K_PGUP) ||
-        (key==K_MWHEELUP)
+        (key == K_MWHEELUP)
     ){
 		con_backscroll += 2;
 		if (con_backscroll > (con_totallines - (vid.height >> 3) - 1))
@@ -237,7 +237,7 @@ void Key_Console(int key){
 	}
 
 	if ((key == K_PGDN) ||
-        (key==K_MWHEELDOWN)
+        (key == K_MWHEELDOWN)
     ){
 		con_backscroll -= 2;
 		if (con_backscroll < 0)

@@ -20,6 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // comndef.h  -- general definitions
 
+#include <stdio.h>
+
+#include "platformdefs.h"
 #include "byte_t.h"
 #include "qboolean.h"
 

@@ -1,7 +1,9 @@
 {
     "files.associations": {
         "*.cpp": "cpp",
-        "stdarg.h": "c",
+        "*.hpp": "cpp",
+        "*.h": "c",
+        "*.c": "c",
         "mathlib.h": "c",
         "sizebuf.h": "c",
         "q_tools.h": "c",
@@ -14,6 +16,9 @@
         "quakedef.h": "c",
         "d_local.h": "c",
         "*.q1": "c",
-        "*.q2": "c"
+        "*.q2": "c",
+        "common.h": "c",
+        "bspfile.h": "c",
+        "random": "c"
     }
 }

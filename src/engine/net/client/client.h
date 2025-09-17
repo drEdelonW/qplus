@@ -18,6 +18,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // client.h
+#include "mathlib.h"
+#include "enginedefs.h"
+#include "vid.h"
+#include "bspfile.h"
+// #include "render.h"
 
 typedef struct
 {
@@ -275,7 +280,7 @@ CVAR_EXTERN(m_side);
 extern	client_state_t	cl;
 
 // FIXME, allocate dynamically
-extern	efrag_t			cl_efrags[MAX_EFRAGS];
+// extern	efrag_t			cl_efrags[MAX_EFRAGS];
 extern	entity_t		cl_entities[MAX_EDICTS];
 extern	entity_t		cl_static_entities[MAX_STATIC_ENTITIES];
 extern	lightstyle_t	cl_lightstyle[MAX_LIGHTSTYLES];
