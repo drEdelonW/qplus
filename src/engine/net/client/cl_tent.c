@@ -42,8 +42,7 @@ sfx_t			*cl_sfx_rail;
 CL_ParseTEnt
 =================
 */
-void CL_InitTEnts (void)
-{
+void CL_InitTEnts (){
 	cl_sfx_wizhit = S_PrecacheSound ("wizard/hit.wav");
 	cl_sfx_knighthit = S_PrecacheSound ("hknight/hit.wav");
 	cl_sfx_tink1 = S_PrecacheSound ("weapons/tink1.wav");
@@ -62,8 +61,7 @@ void CL_InitTEnts (void)
 CL_ParseBeam
 =================
 */
-void CL_ParseBeam (model_t *m)
-{
+void CL_ParseBeam (model_t *m){
 	int		ent;
 	vec3_t	start, end;
 	beam_t	*b;
@@ -112,8 +110,7 @@ void CL_ParseBeam (model_t *m)
 CL_ParseTEnt
 =================
 */
-void CL_ParseTEnt (void)
-{
+void CL_ParseTEnt (){
 	int		type;
 	vec3_t	pos;
 #ifdef QUAKE2
@@ -298,8 +295,7 @@ void CL_ParseTEnt (void)
 CL_NewTempEntity
 =================
 */
-entity_t *CL_NewTempEntity (void)
-{
+entity_t *CL_NewTempEntity (){
 	entity_t	*ent;
 
 	if (cl_numvisedicts == MAX_VISEDICTS)
@@ -322,8 +318,7 @@ entity_t *CL_NewTempEntity (void)
 CL_UpdateTEnts
 =================
 */
-void CL_UpdateTEnts (void)
-{
+void CL_UpdateTEnts (){
 	int			i;
 	beam_t		*b;
 	vec3_t		dist, org;

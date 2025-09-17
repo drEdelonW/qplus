@@ -481,45 +481,38 @@ void	Cmd_AddCommand(char *cmd_name, xcommand_t function)
 }
 
 /*
-============
-Cmd_Exists
-============
+	============
+	Cmd_Exists
+	============
 */
-qboolean Cmd_Exists (char *cmd_name)
-{
-	cmd_function_t	*cmd;
-
-	for (cmd = cmd_functions ; cmd ; cmd = cmd->next)
-	{
-		if (!Q_strcmp (cmd_name, cmd->name))
+qboolean Cmd_Exists(char *cmd_name){
+	for (cmd_function_t* cmd = cmd_functions; cmd; cmd = cmd->next)	{
+		if (!Q_strcmp (cmd_name, cmd->name)){
 			return true;
+		}
 	}
-
 	return false;
 }
 
 
 
 /*
-============
-Cmd_CompleteCommand
-============
+	============
+	Cmd_CompleteCommand
+	============
 */
-char *Cmd_CompleteCommand (char *partial)
-{
-	cmd_function_t	*cmd;
-	int				len;
-
-	len = Q_strlen(partial);
+char *Cmd_CompleteCommand(char *partial){
+	int len = Q_strlen(partial);
 
 	if (!len)
 		return NULL;
 
-// check functions
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
-		if (!Q_strncmp (partial,cmd->name, len))
+	// check functions
+	for (cmd_function_t* cmd = cmd_functions; cmd; cmd = cmd->next){
+		if (!Q_strncmp (partial, cmd->name, len)){
 			return cmd->name;
-
+		}
+	}
 	return NULL;
 }
 
@@ -532,20 +525,17 @@ char *Cmd_CompleteCommand (char *partial)
 	============
 */
 void Cmd_ExecuteString(char* text, cmd_source_t src){
-	cmd_function_t	*cmd;
+    cmd_source = src;
+    Cmd_TokenizeString (text);
 
-	cmd_source = src;
-	Cmd_TokenizeString (text);
+    // execute the command line
+    if (!Cmd_Argc()){
+        return;		// no tokens
+    }
 
-// execute the command line
-	if (!Cmd_Argc())
-		return;		// no tokens
-
-// check functions
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next)
-	{
-		if (!Q_strcasecmp(cmd_argv[0],cmd->name))
-		{
+    // check functions
+	for (cmd_function_t* cmd = cmd_functions; cmd; cmd = cmd->next){
+		if (!Q_strcasecmp(cmd_argv[0], cmd->name)){
 			cmd->function ();
 			return;
 		}
@@ -554,71 +544,72 @@ void Cmd_ExecuteString(char* text, cmd_source_t src){
 	if (checkAlias()){
 		return;
 	}
-// // check alias
-// 	for (cmdalias_t* aliasIt = cmd_alias; aliasIt; aliasIt = aliasIt->next){
-// 		if (!Q_strcasecmp(cmd_argv[0], aliasIt->name)){
-// 			Cbuf_InsertText(aliasIt->value);
-// 			return;
-// 		}
-// 	}
 
-// check cvars
-	if (!Cvar_Command ())
+    #if 0
+    // check alias
+    for (cmdalias_t* aliasIt = cmd_alias; aliasIt; aliasIt = aliasIt->next){
+        if (!Q_strcasecmp(cmd_argv[0], aliasIt->name)){
+            Cbuf_InsertText(aliasIt->value);
+            return;
+        }
+    }
+    #endif
+
+    // check cvars
+	if (!Cvar_Command ()){
 		Con_Printf("Unknown command \"%s\"\n", Cmd_Argv(0));
+    }
 
 }
 
 
 /*
-===================
-Cmd_ForwardToServer
+    ===================
+    Cmd_ForwardToServer
 
-Sends the entire command line over to the server
-===================
+    Sends the entire command line over to the server
+    ===================
 */
-void Cmd_ForwardToServer (void)
-{
-	if (cls.state != ca_connected)
-	{
+void Cmd_ForwardToServer(void){
+	if (cls.state != ca_connected)	{
 		Con_Printf ("Can't \"%s\", not connected\n", Cmd_Argv(0));
 		return;
 	}
 
-	if (cls.demoplayback)
+	if (cls.demoplayback){
 		return;		// not really connected
+    }
 
-	MSG_WriteByte (&cls.message, clc_stringcmd);
-	if (Q_strcasecmp(Cmd_Argv(0), "cmd") != 0)
-	{
+	MSG_WriteByte(&cls.message, clc_stringcmd);
+	if (Q_strcasecmp(Cmd_Argv(0), "cmd") != 0){
 		SZ_Print (&cls.message, Cmd_Argv(0));
 		SZ_Print (&cls.message, " ");
 	}
-	if (Cmd_Argc() > 1)
-		SZ_Print (&cls.message, Cmd_Args());
-	else
-		SZ_Print (&cls.message, "\n");
+    SZ_Print (&cls.message,
+        (Cmd_Argc() > 1)?
+            Cmd_Args() : "\n"
+    );
 }
 
 
 /*
-================
-Cmd_CheckParm
+    ================
+    Cmd_CheckParm
 
-Returns the position (1 to argc-1) in the command's argument list
-where the given parameter apears, or 0 if not present
-================
+    Returns the position (1 to argc-1) in the command's argument list
+    where the given parameter appears, or 0 if not present
+    ================
 */
-
-int Cmd_CheckParm (char *parm)
-{
-	int i;
-
-	if (!parm)
+int Cmd_CheckParm(char *parm){
+	if (!parm){
 		Sys_Error ("Cmd_CheckParm: NULL");
+    }
 
-	for (i = 1; i < Cmd_Argc (); i++)
-		if (! Q_strcasecmp (parm, Cmd_Argv (i)))
+	for (int i = 1; i < Cmd_Argc(); i++){
+		if (! Q_strcasecmp(parm, Cmd_Argv (i))){
 			return i;
+        }
+    }
 
 	return 0;
 }

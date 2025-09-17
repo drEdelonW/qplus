@@ -76,8 +76,7 @@ CL_EntityNum
 This error checks and tracks the total number of entities
 ===============
 */
-entity_t	*CL_EntityNum (int num)
-{
+entity_t	*CL_EntityNum (int num){
 	if (num >= cl.num_entities)
 	{
 		if (num >= MAX_EDICTS)
@@ -98,8 +97,7 @@ entity_t	*CL_EntityNum (int num)
 CL_ParseStartSoundPacket
 ==================
 */
-void CL_ParseStartSoundPacket(void)
-{
+void CL_ParseStartSoundPacket(){
     vec3_t  pos;
     int 	channel, ent;
     int 	sound_num;
@@ -143,8 +141,7 @@ When the client is taking a long time to load stuff, send keepalive messages
 so the server doesn't disconnect.
 ==================
 */
-void CL_KeepaliveMessage (void)
-{
+void CL_KeepaliveMessage (){
 	float	time;
 	static float lastmsg;
 	int		ret;
@@ -201,8 +198,7 @@ void CL_KeepaliveMessage (void)
 CL_ParseServerInfo
 ==================
 */
-void CL_ParseServerInfo (void)
-{
+void CL_ParseServerInfo (){
 	char	*str;
 	int		i;
 	int		nummodels, numsounds;
@@ -327,8 +323,7 @@ relinked.  Other attributes can change without relinking.
 */
 int	bitcounts[16];
 
-void CL_ParseUpdate (int bits)
-{
+void CL_ParseUpdate (int bits){
 	model_t		*model;
 	int			modnum;
 	qboolean	forcelink;
@@ -492,8 +487,7 @@ void CL_ParseUpdate (int bits)
 CL_ParseBaseline
 ==================
 */
-void CL_ParseBaseline (entity_t *ent)
-{
+void CL_ParseBaseline (entity_t *ent){
 	int			i;
 
 	ent->baseline.modelindex = MSG_ReadByte ();
@@ -515,8 +509,7 @@ CL_ParseClientdata
 Server information pertaining to this client only
 ==================
 */
-void CL_ParseClientdata (int bits)
-{
+void CL_ParseClientdata (int bits){
 	int		i, j;
 
 	if (bits & SU_VIEWHEIGHT)
@@ -631,8 +624,7 @@ void CL_ParseClientdata (int bits)
 CL_NewTranslation
 =====================
 */
-void CL_NewTranslation (int slot)
-{
+void CL_NewTranslation (int slot){
 	int		i, j;
 	int		top, bottom;
 	byte	*dest, *source;
@@ -669,8 +661,7 @@ void CL_NewTranslation (int slot)
 CL_ParseStatic
 =====================
 */
-void CL_ParseStatic (void)
-{
+void CL_ParseStatic (){
 	entity_t *ent;
 	int		i;
 
@@ -698,8 +689,7 @@ void CL_ParseStatic (void)
 CL_ParseStaticSound
 ===================
 */
-void CL_ParseStaticSound (void)
-{
+void CL_ParseStaticSound (){
 	vec3_t		org;
 	int			sound_num, vol, atten;
 	int			i;
@@ -721,8 +711,7 @@ void CL_ParseStaticSound (void)
 CL_ParseServerMessage
 =====================
 */
-void CL_ParseServerMessage (void)
-{
+void CL_ParseServerMessage (){
 	int			cmd;
 	int			i;
 

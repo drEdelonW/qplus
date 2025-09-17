@@ -61,31 +61,29 @@ CL_ClearState
 
 =====================
 */
-void CL_ClearState (void)
-{
-	int			i;
-
+void CL_ClearState (){
 	if (!sv.active)
 		Host_ClearMemory ();
 
-// wipe the entire cl structure
-	memset (&cl, 0, sizeof(cl));
+	// wipe the entire cl structure
+	memset(&cl, 0, sizeof(cl));
 
 	SZ_Clear (&cls.message);
 
-// clear other arrays
-	memset (cl_efrags, 0, sizeof(cl_efrags));
-	memset (cl_entities, 0, sizeof(cl_entities));
-	memset (cl_dlights, 0, sizeof(cl_dlights));
-	memset (cl_lightstyle, 0, sizeof(cl_lightstyle));
-	memset (cl_temp_entities, 0, sizeof(cl_temp_entities));
-	memset (cl_beams, 0, sizeof(cl_beams));
+	// clear other arrays
+	memset(cl_efrags, 0, sizeof(cl_efrags));
+	memset(cl_entities, 0, sizeof(cl_entities));
+	memset(cl_dlights, 0, sizeof(cl_dlights));
+	memset(cl_lightstyle, 0, sizeof(cl_lightstyle));
+	memset(cl_temp_entities, 0, sizeof(cl_temp_entities));
+	memset(cl_beams, 0, sizeof(cl_beams));
 
-//
-// allocate the efrags and chain together into a free list
-//
+	//
+	// allocate the efrags and chain together into a free list
+	//
 	cl.free_efrags = cl_efrags;
-	for (i=0 ; i<MAX_EFRAGS-1 ; i++)
+	int i;
+	for (i = 0; i < MAX_EFRAGS - 1; i++)
 		cl.free_efrags[i].entnext = &cl.free_efrags[i+1];
 	cl.free_efrags[i].entnext = NULL;
 }
@@ -98,8 +96,7 @@ Sends a disconnect message to the server
 This is also called on Host_Error, so it shouldn't cause any errors
 =====================
 */
-void CL_Disconnect (void)
-{
+void CL_Disconnect (){
 // stop sounds (especially looping!)
 	S_StopAllSounds (true);
 
@@ -130,8 +127,7 @@ void CL_Disconnect (void)
 	cls.signon = 0;
 }
 
-void CL_Disconnect_f (void)
-{
+void CL_Disconnect_f (){
 	CL_Disconnect ();
 	if (sv.active)
 		Host_ShutdownServer (false);
@@ -147,8 +143,7 @@ CL_EstablishConnection
 Host should be either "local" or a net address to be passed on
 =====================
 */
-void CL_EstablishConnection (char *host)
-{
+void CL_EstablishConnection (char *host){
 	if (cls.state == ca_dedicated)
 		return;
 
@@ -174,8 +169,7 @@ CL_SignonReply
 An svc_signonnum has been received, perform a client side setup
 =====================
 */
-void CL_SignonReply (void)
-{
+void CL_SignonReply (){
 	char 	str[8192];
 
 Con_DPrintf ("CL_SignonReply: %i\n", cls.signon);
@@ -218,8 +212,7 @@ CL_NextDemo
 Called to play the next demo in the demo loop
 =====================
 */
-void CL_NextDemo (void)
-{
+void CL_NextDemo (){
 	char	str[1024];
 
 	if (cls.demonum == -1)
@@ -248,8 +241,7 @@ void CL_NextDemo (void)
 CL_PrintEntities_f
 ==============
 */
-void CL_PrintEntities_f (void)
-{
+void CL_PrintEntities_f (){
 	entity_t	*ent;
 	int			i;
 
@@ -274,8 +266,7 @@ SetPal
 Debugging tool, just flashes the screen
 ===============
 */
-void SetPal (int i)
-{
+void SetPal (int i){
 #if 0
 	static int old;
 	byte	pal[768];
@@ -316,8 +307,7 @@ CL_AllocDlight
 
 ===============
 */
-dlight_t *CL_AllocDlight (int key)
-{
+dlight_t *CL_AllocDlight (int key){
 	int		i;
 	dlight_t	*dl;
 
@@ -329,7 +319,7 @@ dlight_t *CL_AllocDlight (int key)
 		{
 			if (dl->key == key)
 			{
-				memset (dl, 0, sizeof(*dl));
+				memset(dl, 0, sizeof(*dl));
 				dl->key = key;
 				return dl;
 			}
@@ -342,14 +332,14 @@ dlight_t *CL_AllocDlight (int key)
 	{
 		if (dl->die < cl.time)
 		{
-			memset (dl, 0, sizeof(*dl));
+			memset(dl, 0, sizeof(*dl));
 			dl->key = key;
 			return dl;
 		}
 	}
 
 	dl = &cl_dlights[0];
-	memset (dl, 0, sizeof(*dl));
+	memset(dl, 0, sizeof(*dl));
 	dl->key = key;
 	return dl;
 }
@@ -361,8 +351,7 @@ CL_DecayLights
 
 ===============
 */
-void CL_DecayLights (void)
-{
+void CL_DecayLights (){
 	int			i;
 	dlight_t	*dl;
 	float		time;
@@ -390,8 +379,7 @@ Determines the fraction between the last two messages that the objects
 should be put at.
 ===============
 */
-float	CL_LerpPoint (void)
-{
+float	CL_LerpPoint (){
 	float	f, frac;
 
 	f = cl.mtime[0] - cl.mtime[1];
@@ -441,8 +429,7 @@ SetPal(2);
 CL_RelinkEntities
 ===============
 */
-void CL_RelinkEntities (void)
-{
+void CL_RelinkEntities (){
 	entity_t	*ent;
 	int			i, j;
 	float		frac, f, d;
@@ -633,8 +620,7 @@ CL_ReadFromServer
 Read all incoming data from the server
 ===============
 */
-int CL_ReadFromServer (void)
-{
+int CL_ReadFromServer (){
 	int		ret;
 
 	cl.oldtime = cl.time;
@@ -669,8 +655,7 @@ int CL_ReadFromServer (void)
 CL_SendCmd
 =================
 */
-void CL_SendCmd (void)
-{
+void CL_SendCmd (){
 	usercmd_t		cmd;
 
 	if (cls.state != ca_connected)
@@ -716,8 +701,7 @@ void CL_SendCmd (void)
 CL_Init
 =================
 */
-void CL_Init (void)
-{
+void CL_Init (){
 	SZ_Alloc (&cls.message, 1024);
 
 	CL_InitInput ();
