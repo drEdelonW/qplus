@@ -26,21 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // we need to declare some mouse variables here, because the menu system
 // references them even when on a unix system.
 
-// these two are not intended to be set directly
-CVAR_CFG(cl_name, "player");
-CVAR_CFG(cl_color, "0");
-
-CVAR(cl_shownet, "0");	// can be 0, 1, or 2
-CVAR(cl_nolerp, "0");
-
-CVAR_ARC(lookspring, "0");
-CVAR_ARC(lookstrafe, "0");
-CVAR_ARC(sensitivity, "3");
-
-CVAR_ARC(m_pitch, "0.022");
-CVAR_ARC(m_yaw, "0.022");
-CVAR_ARC(m_forward, "1");
-CVAR_ARC(m_side, "0.8");
+#include "cvar_q1.h"
 
 
 client_static_t	cls;

@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sv_phys.c
 
 #include "quakedef.h"
+#include "cvar_q1.h"
 
 /*
 
@@ -38,12 +39,6 @@ flying/floating monsters are SOLID_SLIDEBOX and MOVETYPE_FLY
 solid_edge items only clip against bsp models.
 
 */
-
-CVAR_SV(sv_friction, "4");
-CVAR(sv_stopspeed, "100");
-CVAR_SV(sv_gravity, "800");
-CVAR(sv_maxvelocity, "2000");
-CVAR(sv_nostep, "0");
 
 #ifdef QUAKE2
 static	vec3_t	vec_origin = {0.0, 0.0, 0.0};

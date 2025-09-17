@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // snd_dma.c -- main control for any streaming sound output device
 
 #include "quakedef.h"
+#include "cvar_q1.h"
 
 #ifdef _WIN32
 #include "winquake.h"
@@ -68,18 +69,6 @@ int 		desired_bits = 16;
 
 int sound_started=0;
 
-CVAR_ARC(bgmvolume, "1");
-CVAR_ARC(volume, "0.7");
-
-CVAR(nosound, "0");
-CVAR(precache, "1");
-CVAR(loadas8bit, "0");
-CVAR(bgmbuffer, "4096");
-CVAR(ambient_level, "0.3");
-CVAR(ambient_fade, "100");
-CVAR(snd_noextraupdate, "0");
-CVAR(snd_show, "0");
-CVAR_ARC(_snd_mixahead, "0.1");
 
 
 // ====================================================================
@@ -164,12 +153,11 @@ void S_Startup (void)
 S_Init
 ================
 */
-void S_Init (void)
-{
+void S_Init(){
 
 	Con_Printf("\nSound Initialization\n");
 
-	// if (COM_CheckParm("-nosound"))
+	// if (COM_CheckParm("-nosound"))	// TODO: force disabled
 		return;
 
 	if (COM_CheckParm("-simsound"))

@@ -30,14 +30,6 @@ float		scr_con_current;
 float		scr_conlines;		// lines of console to display
 
 float		oldscreensize, oldfov;
-CVAR_NAMED_AR(scr_viewsize, "viewsize", "100");
-CVAR_NAMED(scr_fov, "fov", "90");	// 10 - 170
-CVAR(scr_conspeed, "300");
-CVAR(scr_centertime, "2");
-CVAR_NAMED(scr_showram, "showram", "1");
-CVAR_NAMED(scr_showturtle, "showturtle", "0");
-CVAR_NAMED(scr_showpause, "showpause", "1");
-CVAR(scr_printspeed, "8");
 
 qboolean	scr_initialized;		// ready to draw
 

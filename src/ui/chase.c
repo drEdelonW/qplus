@@ -30,10 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 
 
-CVAR(chase_back, "100");
-CVAR(chase_up, "16");
-CVAR(chase_right, "0");
-CVAR(chase_active, "0");
 
 vec3_t    chase_pos;
 vec3_t    chase_angles;

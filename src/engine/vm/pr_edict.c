@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sv_edict.c -- entity dictionary
 
 #include "quakedef.h"
+#include "cvar_q1.h"
 
 dprograms_t		*progs;
 dfunction_t		*pr_functions;
@@ -38,17 +39,6 @@ int		type_size[8] = {1,sizeof(string_t)/4,1,3,1,1,sizeof(func_t)/4,sizeof(void *
 ddef_t *ED_FieldAtOfs (int ofs);
 qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s);
 
-CVAR(nomonsters, "0");
-CVAR(gamecfg, "0");
-CVAR(scratch1, "0");
-CVAR(scratch2, "0");
-CVAR(scratch3, "0");
-CVAR(scratch4, "0");
-CVAR_ARC(savedgamecfg, "0");
-CVAR_ARC(saved1, "0");
-CVAR_ARC(saved2, "0");
-CVAR_ARC(saved3, "0");
-CVAR_ARC(saved4, "0");
 
 #define	MAX_FIELD_LEN	64
 #define GEFV_CACHESIZE	2
@@ -1065,8 +1055,7 @@ void PR_LoadProgs (void)
 PR_Init
 ===============
 */
-void PR_Init (void)
-{
+void PR_Init(){
 	Cmd_AddCommand("edict", ED_PrintEdict_f);
 	Cmd_AddCommand("edicts", ED_PrintEdicts);
 	Cmd_AddCommand("edictcount", ED_Count);

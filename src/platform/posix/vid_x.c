@@ -41,14 +41,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "d_local.h"
 
-CVAR_ARC(_windowed_mouse, "0");
-CVAR_ARC(m_filter, "0");
+#include "cvar_q1.h"
+
 float old_windowed_mouse;
 
-qboolean        mouse_avail;
-int             mouse_buttons=3;
-int             mouse_oldbuttonstate;
-int             mouse_buttonstate;
+qboolean    mouse_avail;
+int     mouse_buttons=3;
+int     mouse_oldbuttonstate;
+int     mouse_buttonstate;
 float   mouse_x, mouse_y;
 float   old_mouse_x, old_mouse_y;
 int p_mouse_x;
@@ -56,10 +56,9 @@ int p_mouse_y;
 int ignorenext;
 int bits_per_pixel;
 
-typedef struct
-{
-	int input;
-	int output;
+typedef struct{
+    int input;
+    int output;
 } keymap_t;
 
 extern viddef_t vid; // global video state
@@ -89,7 +88,7 @@ int XShmQueryExtension(Display *);
 int XShmGetEventBase(Display *);
 
 int current_framebuffer;
-static XImage			*x_framebuffer[2] = { 0, 0 };
+static XImage*          x_framebuffer[2] = { 0, 0 };
 static XShmSegmentInfo	x_shminfo[2];
 
 static int verbose=0;

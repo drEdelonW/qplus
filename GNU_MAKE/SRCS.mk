@@ -6,11 +6,15 @@ INCLUDES += $(SRC_DIR)
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
     $(eval CORE_DIR = $(ENG_DIR)/core) $(eval INCLUDES += $(CORE_DIR))
         $(eval CLI_DIR = $(CORE_DIR)/console) $(eval INCLUDES += $(CLI_DIR))
-            SRC_LIST += $(CLI_DIR)/console.c
-            SRC_LIST += $(CLI_DIR)/cvar.c
+            $(eval CVAR_DIR = $(CLI_DIR)/cvar) $(eval INCLUDES += $(CVAR_DIR))
+                SRC_LIST += $(CVAR_DIR)/cvar.c
+                SRC_LIST += $(CVAR_DIR)/cvar_q1.c
+
             $(eval CMD_DIR = $(CLI_DIR)/cmd) $(eval INCLUDES += $(CMD_DIR))
                 SRC_LIST += $(CMD_DIR)/cmd.c
                 SRC_LIST += $(CMD_DIR)/cmd_alias.c
+
+            SRC_LIST += $(CLI_DIR)/console.c
 
         $(eval CUTILS_DIR = $(CORE_DIR)/utils) $(eval INCLUDES += $(CUTILS_DIR))
             SRC_LIST += $(CUTILS_DIR)/crc.c

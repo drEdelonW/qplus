@@ -1,10 +1,8 @@
 #pragma once
-#include "cvar.h"
+#include "cvar_q1.h"
 //
 // chase
 //
-
-CVAR_EXTERN(chase_active);
 
 void Chase_Init (void);
 void Chase_Reset (void);

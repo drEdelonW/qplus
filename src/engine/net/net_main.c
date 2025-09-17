@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "net_vcr.h"
+#include "cvar_q1.h"
+
 
 qsocket_t	*net_activeSockets = NULL;
 qsocket_t	*net_freeSockets = NULL;
@@ -63,22 +65,7 @@ int messagesReceived = 0;
 int unreliableMessagesSent = 0;
 int unreliableMessagesReceived = 0;
 
-CVAR(net_messagetimeout, "300");
-CVAR(hostname, "UNNAMED");
-
-qboolean	configRestored = false;
-CVAR_CFG(config_com_port, "0x3f8");
-CVAR_CFG(config_com_irq, "4");
-CVAR_CFG(config_com_baud, "57600");
-CVAR_CFG(config_com_modem, "1");
-CVAR_CFG(config_modem_dialtype, "T");
-CVAR_CFG(config_modem_clear, "ATZ");
-CVAR_CFG(config_modem_init, "");
-CVAR_CFG(config_modem_hangup, "AT H");
-
-#ifdef IDGODS
-CVAR(idgods, "0");
-#endif
+qboolean configRestored = false;
 
 int	vcrFile = -1;
 qboolean recording = false;

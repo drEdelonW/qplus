@@ -32,38 +32,6 @@ when crossing a water boudnary.
 
 */
 
-CVAR(lcd_x, "0");
-CVAR(lcd_yaw, "0");
-
-CVAR(scr_ofsx, "0");
-CVAR(scr_ofsy, "0");
-CVAR(scr_ofsz, "0");
-
-CVAR(cl_rollspeed, "200");
-CVAR(cl_rollangle, "2.0");
-
-CVAR(cl_bob, "0.02");
-CVAR(cl_bobcycle, "0.6");
-CVAR(cl_bobup, "0.5");
-
-CVAR(v_kicktime, "0.5");
-CVAR(v_kickroll, "0.6");
-CVAR(v_kickpitch, "0.6");
-
-CVAR(v_iyaw_cycle, "2");
-CVAR(v_iroll_cycle, "0.5");
-CVAR(v_ipitch_cycle, "1");
-CVAR(v_iyaw_level, "0.3");
-CVAR(v_iroll_level, "0.1");
-CVAR(v_ipitch_level, "0.3");
-
-CVAR(v_idlescale, "0");
-
-CVAR_ARC(crosshair, "0");
-CVAR(cl_crossx, "0");
-CVAR(cl_crossy, "0");
-
-CVAR(gl_cshiftpercent, "100");
 
 float	v_dmg_time, v_dmg_roll, v_dmg_pitch;
 
@@ -138,11 +106,6 @@ float V_CalcBob (void)
 
 
 //=============================================================================
-
-
-CVAR(v_centermove, "0.15");
-CVAR(v_centerspeed, "500");
-
 
 void V_StartPitchDrift (void)
 {
@@ -257,7 +220,6 @@ cshift_t	cshift_water = { {130,80,50}, 128 };
 cshift_t	cshift_slime = { {0,25,5}, 150 };
 cshift_t	cshift_lava = { {255,80,0}, 150 };
 
-CVAR_NAMED_AR(v_gamma, "gamma", "1");
 
 byte		gammatable[256];	// palette is sent through this
 

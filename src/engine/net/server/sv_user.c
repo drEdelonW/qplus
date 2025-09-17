@@ -20,12 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sv_user.c -- server code for moving users
 
 #include "quakedef.h"
+#include "cvar_q1.h"
 
 edict_t	*sv_player;
 
-CVAR_EXTERN(sv_friction);
-CVAR_NAMED(sv_edgefriction, "edgefriction", "2");
-CVAR_EXTERN(sv_stopspeed);
+
 
 static	vec3_t		forward, right, up;
 
@@ -40,8 +39,6 @@ float	*velocity;
 qboolean	onground;
 
 usercmd_t	cmd;
-
-CVAR(sv_idealpitchscale, "0.8");
 
 
 /*
@@ -164,8 +161,7 @@ void SV_UserFriction (void)
 SV_Accelerate
 ==============
 */
-CVAR_SV(sv_maxspeed, "320");
-CVAR(sv_accelerate, "10");
+
 #if 0
 void SV_Accelerate (vec3_t wishvel)
 {

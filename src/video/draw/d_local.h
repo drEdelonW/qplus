@@ -55,8 +55,6 @@ typedef struct sspan_s
 	int				u, v, count;
 } sspan_t;
 
-CVAR_EXTERN(d_subdiv16);
-
 extern float	scale_for_mip;
 
 extern qboolean		d_roverwrapped;

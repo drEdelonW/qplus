@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // server.h
 
+#include "cvar_q1.h"
+
+
 typedef struct
 {
 	int			maxclients;
@@ -194,13 +197,6 @@ typedef struct client_s
 #endif
 
 //============================================================================
-
-CVAR_EXTERN(teamplay);
-CVAR_EXTERN(skill);
-CVAR_EXTERN(deathmatch);
-CVAR_EXTERN(coop);
-CVAR_EXTERN(fraglimit);
-CVAR_EXTERN(timelimit);
 
 extern	server_static_t	svs;				// persistant server info
 extern	server_t		sv;					// local server

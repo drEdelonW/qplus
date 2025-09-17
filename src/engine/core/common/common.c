@@ -29,8 +29,7 @@ static char     *argvdummy = " ";
 static char     *safeargvs[NUM_SAFE_ARGVS] =
 	{"-stdvid", "-nolan", "-nosound", "-nocdaudio", "-nojoy", "-nomouse", "-dibonly"};
 
-CVAR(registered, "0");
-CVAR_SV(cmdline, "0");
+#include "cvar_q1.h"
 
 qboolean        com_modified;   // set true if using non-id files
 

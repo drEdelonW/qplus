@@ -115,29 +115,6 @@ float	se_time1, se_time2, de_time1, de_time2, dv_time1, dv_time2;
 
 void R_MarkLeaves (void);
 
-CVAR(r_draworder, "0");
-CVAR(r_speeds, "0");
-CVAR(r_timegraph, "0");
-CVAR(r_graphheight, "10");
-CVAR(r_clearcolor, "2");
-CVAR(r_waterwarp, "1");
-CVAR(r_fullbright, "0");
-CVAR(r_drawentities, "1");
-CVAR(r_drawviewmodel, "1");
-CVAR_NAMED(r_aliasstats, "r_polymodelstats", "0");
-CVAR(r_dspeeds, "0");
-CVAR(r_drawflat, "0");
-CVAR(r_ambient, "0");
-CVAR(r_reportsurfout, "0");
-CVAR(r_maxsurfs, "0");
-CVAR(r_numsurfs, "0");
-CVAR(r_reportedgeout, "0");
-CVAR(r_maxedges, "0");
-CVAR(r_numedges, "0");
-CVAR(r_aliastransbase, "200");
-CVAR(r_aliastransadj, "100");
-
-CVAR_EXTERN(scr_fov);
 
 void CreatePassages (void);
 void SetVisibilityByPassages (void);

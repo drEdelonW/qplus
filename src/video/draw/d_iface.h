@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define WARP_HEIGHT		200
 
 #define MAX_LBM_HEIGHT	480
+#include "cvar_q1.h"
 
 typedef struct
 {
@@ -107,7 +108,6 @@ typedef struct
 	int		color;
 } zpointdesc_t;
 
-CVAR_EXTERN(r_drawflat);
 extern int		d_spanpixcount;
 extern int		r_framecount;		// sequence # of current frame since Quake
 									//  started

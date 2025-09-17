@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "chase.h"
 #include "r_local.h"
+#include "cvar_q1.h"
 
 /*
 
@@ -56,32 +57,6 @@ jmp_buf 	host_abortserver;
 byte		*host_basepal;
 byte		*host_colormap;
 
-CVAR(host_framerate, "0");  // set for slow motion
-CVAR(host_speeds, "0");     // set for running times
-
-CVAR(sys_ticrate, "0.05");
-CVAR(serverprofile, "0");
-
-CVAR_SV(fraglimit, "0");
-CVAR_SV(timelimit, "0");
-CVAR_SV(teamplay, "0");
-
-CVAR(samelevel, "0");
-CVAR_SV(noexit, "0");
-
-#ifdef QUAKE2
-CVAR(developer, "1");   // should be 0 for release!
-#else
-CVAR(developer, "0");
-#endif
-
-CVAR(skill, "1");       // 0 - 3
-CVAR(deathmatch, "0");  // 0, 1, or 2
-CVAR(coop, "0");        // 0 or 1
-
-CVAR(pausable, "1");
-
-CVAR(temp1, "0");
 
 
 /*

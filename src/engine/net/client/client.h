@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "enginedefs.h"
 #include "vid.h"
 #include "bspfile.h"
-// #include "render.h"
+#include "cvar_q1.h"
 
 typedef struct{
 	vec3_t	viewangles;
@@ -232,38 +232,6 @@ typedef struct{
 } client_state_t;
 
 
-//
-// cvars
-//
-CVAR_EXTERN(cl_name);
-CVAR_EXTERN(cl_color);
-
-CVAR_EXTERN(cl_upspeed);
-CVAR_EXTERN(cl_forwardspeed);
-CVAR_EXTERN(cl_backspeed);
-CVAR_EXTERN(cl_sidespeed);
-
-CVAR_EXTERN(cl_movespeedkey);
-
-CVAR_EXTERN(cl_yawspeed);
-CVAR_EXTERN(cl_pitchspeed);
-
-CVAR_EXTERN(cl_anglespeedkey);
-
-CVAR_EXTERN(cl_autofire);
-
-CVAR_EXTERN(cl_shownet);
-CVAR_EXTERN(cl_nolerp);
-
-CVAR_EXTERN(cl_pitchdriftspeed);
-CVAR_EXTERN(lookspring);
-CVAR_EXTERN(lookstrafe);
-CVAR_EXTERN(sensitivity);
-
-CVAR_EXTERN(m_pitch);
-CVAR_EXTERN(m_yaw);
-CVAR_EXTERN(m_forward);
-CVAR_EXTERN(m_side);
 
 
 #define	MAX_TEMP_ENTITIES	64			// lightning bolts, etc

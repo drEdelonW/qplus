@@ -3,5 +3,13 @@
 		{
 			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"files.associations": {
+			"*.cpp": "cpp",
+			"errno.h": "c",
+			"cvar_q1.h": "c",
+			"r_shared.h": "c"
+		}
+	}
 }

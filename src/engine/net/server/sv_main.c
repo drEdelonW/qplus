@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sv_main.c -- server main program
 
 #include "quakedef.h"
+#include "cvar_q1.h"
 
 server_t		sv;
 server_static_t	svs;
@@ -33,20 +34,7 @@ char	localmodels[MAX_MODELS][5];			// inline model names for precache
 SV_Init
 ===============
 */
-void SV_Init (void)
-{
-	int		i;
-	CVAR_EXTERN(sv_maxvelocity);
-	CVAR_EXTERN(sv_gravity);
-	CVAR_EXTERN(sv_nostep);
-	CVAR_EXTERN(sv_friction);
-	CVAR_EXTERN(sv_edgefriction);
-	CVAR_EXTERN(sv_stopspeed);
-	CVAR_EXTERN(sv_maxspeed);
-	CVAR_EXTERN(sv_accelerate);
-	CVAR_EXTERN(sv_idealpitchscale);
-	CVAR_EXTERN(sv_aim);
-
+void SV_Init(){
 	Cvar_RegisterVariable(&sv_maxvelocity);
 	Cvar_RegisterVariable(&sv_gravity);
 	Cvar_RegisterVariable(&sv_friction);
@@ -58,8 +46,9 @@ void SV_Init (void)
 	Cvar_RegisterVariable(&sv_aim);
 	Cvar_RegisterVariable(&sv_nostep);
 
-	for (i=0 ; i<MAX_MODELS ; i++)
+	for (int i = 0; i < MAX_MODELS; i++){
 		sprintf (localmodels[i], "*%i", i);
+    }
 }
 
 /*

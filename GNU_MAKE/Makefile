@@ -89,22 +89,38 @@ endif
 
 # Optional 32-bit build on Linux x86_64
 ifeq ($(UNAME_S),Linux)
-  ifeq ($(UNAME_M),x86_64)
-    ifeq ($(FORCE_32),1)
+  $(info UNAME_M arch: $(UNAME_M))
+  ifeq ($(FORCE_32),1)
+    $(info !!!USING 32bit build!!!)
+
+    ifeq ($(UNAME_M),x86_64)
       CFLAGS   += -m32
       LDFLAGS  += -m32
       # Hint pkg-config to 32-bit libs if needed (Debian/Ubuntu multilib):
       # export PKG_CONFIG_LIBDIR=/usr/lib/i386-linux-gnu/pkgconfig
     endif
+    ifeq ($(UNAME_M),aarch64)
+      CC = arm-linux-gnueabihf-gcc
+      LD = arm-linux-gnueabihf-gcc
+    endif
+  else
   endif
 endif
 
 # On macOS arm64 there is no 32-bit; do nothing.
 
+ifneq ($(NO_PARALLEL),1)
+  J ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || \
+                nproc 2>/dev/null || \
+                sysctl -n hw.ncpu 2>/dev/null || echo 1)
+  MAKEFLAGS += -j$(J) --output-sync=target
+endif
+
 # ---------- Targets ----------
 TARGETS      ?= $(OUT_DIR)/quake.x11
 
 .PHONY: all build targets clean fresh run rund
+.NOTPARALLEL: fresh clean build
 
 all: $(TARGETS)
 build: $(TARGETS)

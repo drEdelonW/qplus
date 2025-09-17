@@ -205,17 +205,6 @@ float CL_KeyState (kbutton_t *key){
 
 //==========================================================================
 
-CVAR(cl_upspeed, "200");
-CVAR_ARC(cl_forwardspeed, "200");
-CVAR_ARC(cl_backspeed, "200");
-CVAR(cl_sidespeed, "350");
-
-CVAR(cl_movespeedkey, "2.0");
-
-CVAR(cl_yawspeed, "140");
-CVAR(cl_pitchspeed, "150");
-
-CVAR(cl_anglespeedkey, "1.5");
 
 
 /*

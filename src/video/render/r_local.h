@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef GLQUAKE
 #include "r_shared.h"
+#include "cvar_q1.h"
+
 
 #define ALIAS_BASE_SIZE_RATIO		(1.0 / 11.0)
 					// normalizing factor so player model works out to about
@@ -42,36 +44,17 @@ typedef struct {
 //===========================================================================
 // clipped bmodel edges
 
-typedef struct bedge_s
-{
+typedef struct bedge_s{
 	mvertex_t		*v[2];
 	struct bedge_s	*pnext;
 } bedge_t;
 
-typedef struct {
+typedef struct{
 	float	fv[3];		// viewspace x, y
 } auxvert_t;
 
 //===========================================================================
 
-CVAR_EXTERN(r_draworder);
-CVAR_EXTERN(r_speeds);
-CVAR_EXTERN(r_timegraph);
-CVAR_EXTERN(r_graphheight);
-CVAR_EXTERN(r_clearcolor);
-CVAR_EXTERN(r_waterwarp);
-CVAR_EXTERN(r_fullbright);
-CVAR_EXTERN(r_drawentities);
-CVAR_EXTERN(r_aliasstats);
-CVAR_EXTERN(r_dspeeds);
-CVAR_EXTERN(r_drawflat);
-CVAR_EXTERN(r_ambient);
-CVAR_EXTERN(r_reportsurfout);
-CVAR_EXTERN(r_maxsurfs);
-CVAR_EXTERN(r_numsurfs);
-CVAR_EXTERN(r_reportedgeout);
-CVAR_EXTERN(r_maxedges);
-CVAR_EXTERN(r_numedges);
 
 #define XCENTERING	(1.0 / 2.0)
 #define YCENTERING	(1.0 / 2.0)
@@ -85,8 +68,7 @@ CVAR_EXTERN(r_numedges);
 #define	DIST_NOT_SET	98765
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct clipplane_s
-{
+typedef struct clipplane_s{
 	vec3_t		normal;
 	float		dist;
 	struct		clipplane_s	*next;

@@ -18,6 +18,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+#include "cvar_q1.h"
+
 #ifndef GLQUAKE
 // r_shared.h: general refresh-related stuff shared between the refresh and the
 // driver
@@ -52,8 +54,6 @@ extern int		screenwidth;
 extern	float	pixelAspect;
 
 extern int		r_drawnpolycount;
-
-CVAR_EXTERN(r_clearcolor);
 
 extern int	sintable[SIN_BUFFER_SIZE];
 extern int	intsintable[SIN_BUFFER_SIZE];

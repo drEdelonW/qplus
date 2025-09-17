@@ -1,6 +1,14 @@
 # Install
     sudo apt install xserver-xephyr
 
+# ARM32 Install
+    sudo apt install gcc-arm-linux-gnueabihf
+    sudo dpkg --add-architecture armhf
+    sudo apt update
+    sudo apt install libx11-dev:armhf libxext-dev:armhf
+
+
+
 # run EXTERNAL WINDOW
     open -a XQuartz  # run X11 server on MacOS
 

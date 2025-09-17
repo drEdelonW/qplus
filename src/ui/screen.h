@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // screen.h
+#include "cvar_q1.h"
 
 void SCR_Init (void);
 
@@ -44,8 +45,6 @@ extern	int			sb_lines;
 extern	int			clearnotify;	// set to 0 whenever notify text is drawn
 extern	qboolean	scr_disabled_for_loading;
 extern	qboolean	scr_skipupdate;
-
-CVAR_EXTERN(scr_viewsize);
 
 // only the refresh window will be updated unless these variables are flagged
 extern	int			scr_copytop;
