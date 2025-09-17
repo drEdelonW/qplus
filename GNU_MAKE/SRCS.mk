@@ -21,9 +21,11 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
             SRC_LIST += $(COMM_DIR)/endian_tools.c
             SRC_LIST += $(COMM_DIR)/link.c
 
+        $(eval INPUT_DIR = $(CORE_DIR)/input) $(eval INCLUDES += $(INPUT_DIR))
+            SRC_LIST += $(INPUT_DIR)/keys.c
+
         SRC_LIST += $(CORE_DIR)/host.c
         SRC_LIST += $(CORE_DIR)/host_cmd.c
-        SRC_LIST += $(CORE_DIR)/keys.c
         SRC_LIST += $(CORE_DIR)/zone.c
 
     $(eval WORLD_DIR = $(ENG_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))
