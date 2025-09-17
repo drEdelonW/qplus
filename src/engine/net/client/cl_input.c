@@ -240,13 +240,16 @@ void CL_AdjustAngles(){
 	cl.viewangles[PITCH] -= speed*cl_pitchspeed.value * up;
 	cl.viewangles[PITCH] += speed*cl_pitchspeed.value * down;
 
-    if (up || down)
-        V_StopPitchDrift ();
+    if (up || down){
+        V_StopPitchDrift();
+	}
 
-    if (cl.viewangles[PITCH] > 80)
-        cl.viewangles[PITCH] = 80;
-    else if (cl.viewangles[PITCH] < -70)
-        cl.viewangles[PITCH] = -70;
+	CLAMP_MAX(cl.viewangles[PITCH], 80);    // down look
+    // if (cl.viewangles[PITCH] > 80)
+    //     cl.viewangles[PITCH] = 80;
+	CLAMP_MIN(cl.viewangles[PITCH], -70);  // up look
+    // else if (cl.viewangles[PITCH] < -70)
+    //     cl.viewangles[PITCH] = -70;
 
     if (cl.viewangles[ROLL] > 50)
         cl.viewangles[ROLL] = 50;

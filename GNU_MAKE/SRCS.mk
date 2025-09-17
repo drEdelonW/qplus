@@ -13,6 +13,8 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
             $(eval CMD_DIR = $(CLI_DIR)/cmd) $(eval INCLUDES += $(CMD_DIR))
                 SRC_LIST += $(CMD_DIR)/cmd.c
                 SRC_LIST += $(CMD_DIR)/cmd_alias.c
+                SRC_LIST += $(CMD_DIR)/host_cmd.c
+
 
             SRC_LIST += $(CLI_DIR)/console.c
 
@@ -31,7 +33,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
             SRC_LIST += $(INPUT_DIR)/keys.c
 
         SRC_LIST += $(CORE_DIR)/host.c
-        SRC_LIST += $(CORE_DIR)/host_cmd.c
         SRC_LIST += $(CORE_DIR)/zone.c
 
     $(eval WORLD_DIR = $(ENG_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))

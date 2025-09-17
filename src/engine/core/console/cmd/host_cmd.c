@@ -1244,16 +1244,13 @@ void Host_Pause_f (void)
 Host_PreSpawn_f
 ==================
 */
-void Host_PreSpawn_f (void)
-{
-	if (cmd_source == src_command)
-	{
+void Host_PreSpawn_f(){
+	if (cmd_source == src_command){
 		Con_Printf ("prespawn is not valid from the console\n");
 		return;
 	}
 
-	if (host_client->spawned)
-	{
+	if (host_client->spawned){
 		Con_Printf ("prespawn not valid -- allready spawned\n");
 		return;
 	}
