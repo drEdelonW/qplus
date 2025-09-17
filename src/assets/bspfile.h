@@ -22,43 +22,42 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // upper design bounds
 
-#define	MAX_MAP_HULLS		4
+#define	MAX_MAP_HULLS		(4)
 
-#define	MAX_MAP_MODELS		256
-#define	MAX_MAP_BRUSHES		4096
-#define	MAX_MAP_ENTITIES	1024
-#define	MAX_MAP_ENTSTRING	65536
+#define	MAX_MAP_MODELS		(256)
+#define	MAX_MAP_BRUSHES		(4096)
+#define	MAX_MAP_ENTITIES	(1024)
+#define	MAX_MAP_ENTSTRING	(65536)
 
-#define	MAX_MAP_PLANES		32767
-#define	MAX_MAP_NODES		32767		// because negative shorts are contents
-#define	MAX_MAP_CLIPNODES	32767		//
-#define	MAX_MAP_LEAFS		8192
-#define	MAX_MAP_VERTS		65535
-#define	MAX_MAP_FACES		65535
-#define	MAX_MAP_MARKSURFACES 65535
-#define	MAX_MAP_TEXINFO		4096
-#define	MAX_MAP_EDGES		256000
-#define	MAX_MAP_SURFEDGES	512000
-#define	MAX_MAP_TEXTURES	512
-#define	MAX_MAP_MIPTEX		0x200000
-#define	MAX_MAP_LIGHTING	0x100000
-#define	MAX_MAP_VISIBILITY	0x100000
+#define	MAX_MAP_PLANES		(32767)
+#define	MAX_MAP_NODES		(32767)		// because negative shorts are contents
+#define	MAX_MAP_CLIPNODES	(32767)		//
+#define	MAX_MAP_LEAFS		(8192)
+#define	MAX_MAP_VERTS		(65535)
+#define	MAX_MAP_FACES		(65535)
+#define	MAX_MAP_MARKSURFACES	(65535)
+#define	MAX_MAP_TEXINFO		(4096)
+#define	MAX_MAP_EDGES		(256000)
+#define	MAX_MAP_SURFEDGES	(512000)
+#define	MAX_MAP_TEXTURES	(512)
+#define	MAX_MAP_MIPTEX		(0x200000)
+#define	MAX_MAP_LIGHTING	(0x100000)
+#define	MAX_MAP_VISIBILITY	(0x100000)
 
-#define	MAX_MAP_PORTALS		65536
+#define	MAX_MAP_PORTALS		(65536)
 
 // key / value pair sizes
 
-#define	MAX_KEY		32
-#define	MAX_VALUE	1024
+#define	MAX_KEY		(32)
+#define	MAX_VALUE	(1024)
 
 //=============================================================================
 
 
-#define BSPVERSION	29
-#define	TOOLVERSION	2
+#define BSPVERSION	(29)
+#define	TOOLVERSION	(2)
 
-typedef struct
-{
+typedef struct{
 	int		fileofs, filelen;
 } lump_t;
 
@@ -80,8 +79,7 @@ typedef struct
 
 #define	HEADER_LUMPS	15
 
-typedef struct
-{
+typedef struct{
 	float		mins[3], maxs[3];
 	float		origin[3];
 	int			headnode[MAX_MAP_HULLS];
@@ -89,33 +87,29 @@ typedef struct
 	int			firstface, numfaces;
 } dmodel_t;
 
-typedef struct
-{
+typedef struct{
 	int			version;
 	lump_t		lumps[HEADER_LUMPS];
 } dheader_t;
 
-typedef struct
-{
+typedef struct{
 	int			nummiptex;
 	int			dataofs[4];		// [nummiptex]
 } dmiptexlump_t;
 
 #define	MIPLEVELS	4
-typedef struct miptex_s
-{
+typedef struct miptex_s{
 	char		name[16];
 	unsigned	width, height;
 	unsigned	offsets[MIPLEVELS];		// four mip maps stored
 } miptex_t;
 
 
-typedef struct
-{
+typedef struct{
 	float	point[3];
 } dvertex_t;
 
-
+#if 0
 // 0-2 are axial planes
 #define	PLANE_X			0
 #define	PLANE_Y			1
@@ -125,12 +119,24 @@ typedef struct
 #define	PLANE_ANYX		3
 #define	PLANE_ANYY		4
 #define	PLANE_ANYZ		5
+#else
+typedef enum {
+    // 0–2 are axial planes
+    PLANE_X   = 0,
+    PLANE_Y   = 1,
+    PLANE_Z   = 2,
 
-typedef struct
-{
-	float	normal[3];
-	float	dist;
-	int		type;		// PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
+    // 3–5 are non-axial planes snapped to the nearest
+    PLANE_ANYX = 3,
+    PLANE_ANYY = 4,
+    PLANE_ANYZ = 5
+} plane_type_t;
+#endif
+
+typedef struct{
+	float			normal[3];
+	float			dist;
+	plane_type_t	type;		// PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
 } dplane_t;
 
 
@@ -153,8 +159,7 @@ typedef struct
 
 
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct
-{
+typedef struct{
 	int			planenum;
 	short		children[2];	// negative numbers are -(leafs+1), not nodes
 	short		mins[3];		// for sphere culling

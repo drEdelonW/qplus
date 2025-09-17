@@ -9,7 +9,10 @@
 			"*.cpp": "cpp",
 			"errno.h": "c",
 			"cvar_q1.h": "c",
-			"r_shared.h": "c"
+			"r_shared.h": "c",
+			"quakedef.h": "c",
+			"random": "c",
+			"limits": "c"
 		}
 	}
 }

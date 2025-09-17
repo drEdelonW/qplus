@@ -1,5 +1,14 @@
 #pragma once
 
+// if (var < min_val)   var = min_val;
+#define CLAMP_MIN(var, min_val) \
+    do { if ((var) < (min_val)) (var) = (min_val); } while (0)
+
+
+// if (var > min_val)   var = min_val;
+#define CLAMP_MAX(var, min_val) \
+    do { if ((var) > (min_val)) (var) = (min_val); } while (0)
+
 void    Q_memset(void *dest, int  fill, int count);
 void    Q_memcpy(void *dest, void *src, int count);
 int     Q_memcmp(void *m1,   void *m2,  int count);

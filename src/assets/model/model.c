@@ -551,122 +551,111 @@ void Mod_LoadEntities (lump_t *l)
 
 
 /*
-=================
-Mod_LoadVertexes
-=================
+    =================
+    Mod_LoadVertexes
+    =================
 */
-void Mod_LoadVertexes (lump_t *l)
-{
+void Mod_LoadVertexes(lump_t* l){
 	dvertex_t	*in;
 	mvertex_t	*out;
-	int			i, count;
 
-	in = (void *)(mod_base + l->fileofs);
+	in = (void*)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		Sys_Error ("MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(*in);
-	out = Hunk_AllocName ( count*sizeof(*out), loadname);
+	int count = l->filelen / sizeof(*in);
+	out = Hunk_AllocName( count*sizeof(*out), loadname);
 
 	loadmodel->vertexes = out;
 	loadmodel->numvertexes = count;
 
-	for ( i=0 ; i<count ; i++, in++, out++)
-	{
-		out->position[0] = LittleFloat (in->point[0]);
-		out->position[1] = LittleFloat (in->point[1]);
-		out->position[2] = LittleFloat (in->point[2]);
+	for (int  i = 0; i < count; i++, in++, out++)	{
+		out->position[0] = LittleFloat(in->point[0]);
+		out->position[1] = LittleFloat(in->point[1]);
+		out->position[2] = LittleFloat(in->point[2]);
 	}
 }
 
 /*
-=================
-Mod_LoadSubmodels
-=================
+    =================
+    Mod_LoadSubmodels
+    =================
 */
-void Mod_LoadSubmodels (lump_t *l)
-{
-	dmodel_t	*in;
-	dmodel_t	*out;
-	int			i, j, count;
+void Mod_LoadSubmodels(lump_t* l){
+	dmodel_t*   in;
+	dmodel_t*   out;
 
 	in = (void *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		Sys_Error ("MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(*in);
+	int count = l->filelen / sizeof(*in);
 	out = Hunk_AllocName ( count*sizeof(*out), loadname);
 
 	loadmodel->submodels = out;
 	loadmodel->numsubmodels = count;
 
-	for ( i=0 ; i<count ; i++, in++, out++)
-	{
-		for (j=0 ; j<3 ; j++)
-		{	// spread the mins / maxs by a pixel
-			out->mins[j] = LittleFloat (in->mins[j]) - 1;
-			out->maxs[j] = LittleFloat (in->maxs[j]) + 1;
-			out->origin[j] = LittleFloat (in->origin[j]);
+	for (int i = 0; i < count; i++, in++, out++){
+		for (int j = 0; j < 3; j++){    // spread the mins / maxs by a pixel
+			out->mins[j] = LittleFloat(in->mins[j]) - 1;
+			out->maxs[j] = LittleFloat(in->maxs[j]) + 1;
+			out->origin[j] = LittleFloat(in->origin[j]);
 		}
-		for (j=0 ; j<MAX_MAP_HULLS ; j++)
-			out->headnode[j] = LittleLong (in->headnode[j]);
-		out->visleafs = LittleLong (in->visleafs);
-		out->firstface = LittleLong (in->firstface);
-		out->numfaces = LittleLong (in->numfaces);
+		for (int j = 0; j < MAX_MAP_HULLS; j++)
+			out->headnode[j] = LittleLong(in->headnode[j]);
+
+		out->visleafs = LittleLong(in->visleafs);
+		out->firstface = LittleLong(in->firstface);
+		out->numfaces = LittleLong(in->numfaces);
 	}
 }
 
 /*
-=================
-Mod_LoadEdges
-=================
+    =================
+    Mod_LoadEdges
+    =================
 */
-void Mod_LoadEdges (lump_t *l)
-{
-	dedge_t *in;
-	medge_t *out;
-	int 	i, count;
+void Mod_LoadEdges(lump_t* l){
+	dedge_t*    in;
+	medge_t*    out;
 
-	in = (void *)(mod_base + l->fileofs);
+	in = (void*)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		Sys_Error ("MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(*in);
+	int count = l->filelen / sizeof(*in);
 	out = Hunk_AllocName ( (count + 1) * sizeof(*out), loadname);
 
 	loadmodel->edges = out;
 	loadmodel->numedges = count;
 
-	for ( i=0 ; i<count ; i++, in++, out++)
-	{
+	for (int i = 0; i < count; i++, in++, out++)	{
 		out->v[0] = (unsigned short)LittleShort(in->v[0]);
 		out->v[1] = (unsigned short)LittleShort(in->v[1]);
 	}
 }
 
 /*
-=================
-Mod_LoadTexinfo
-=================
+    =================
+    Mod_LoadTexinfo
+    =================
 */
-void Mod_LoadTexinfo (lump_t *l)
-{
-	texinfo_t *in;
-	mtexinfo_t *out;
-	int 	i, j, count;
+void Mod_LoadTexinfo(lump_t* l){
+	texinfo_t*  in;
+	mtexinfo_t* out;
+
 	int		miptex;
 	float	len1, len2;
 
 	in = (void *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		Sys_Error ("MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(*in);
-	out = Hunk_AllocName ( count*sizeof(*out), loadname);
+	int count = l->filelen / sizeof(*in);
+	out = Hunk_AllocName( count*sizeof(*out), loadname);
 
 	loadmodel->texinfo = out;
 	loadmodel->numtexinfo = count;
 
-	for ( i=0 ; i<count ; i++, in++, out++)
-	{
-		for (j=0 ; j<8 ; j++)
-			out->vecs[0][j] = LittleFloat (in->vecs[0][j]);
+	for (int i = 0; i < count; i++, in++, out++){
+		for (int j = 0; j < 8; j++)
+			out->vecs[0][j] = LittleFloat(in->vecs[0][j]);
 		len1 = Length (out->vecs[0]);
 		len2 = Length (out->vecs[1]);
 		len1 = (len1 + len2)/2;
@@ -678,28 +667,24 @@ void Mod_LoadTexinfo (lump_t *l)
 			out->mipadjust = 2;
 		else
 			out->mipadjust = 1;
-#if 0
+    #if 0
 		if (len1 + len2 < 0.001)
 			out->mipadjust = 1;		// don't crash
 		else
 			out->mipadjust = 1 / floor( (len1+len2)/2 + 0.1 );
-#endif
+    #endif
 
-		miptex = LittleLong (in->miptex);
-		out->flags = LittleLong (in->flags);
+		miptex = LittleLong(in->miptex);
+		out->flags = LittleLong(in->flags);
 
-		if (!loadmodel->textures)
-		{
+		if (!loadmodel->textures){
 			out->texture = r_notexture_mip;	// checkerboard texture
 			out->flags = 0;
-		}
-		else
-		{
+		}else{
 			if (miptex >= loadmodel->numtextures)
 				Sys_Error ("miptex >= loadmodel->numtextures");
 			out->texture = loadmodel->textures[miptex];
-			if (!out->texture)
-			{
+			if (!out->texture){
 				out->texture = r_notexture_mip; // texture not found
 				out->flags = 0;
 			}
@@ -714,12 +699,10 @@ CalcSurfaceExtents
 Fills in s->texturemins[] and s->extents[]
 ================
 */
-void CalcSurfaceExtents (msurface_t *s)
-{
+void CalcSurfaceExtents(msurface_t* s){
 	float	mins[2], maxs[2], val;
-	int		i,j, e;
-	mvertex_t	*v;
-	mtexinfo_t	*tex;
+	mvertex_t*  v;
+	mtexinfo_t* tex;
 	int		bmins[2], bmaxs[2];
 
 	mins[0] = mins[1] = 999999;
@@ -727,15 +710,14 @@ void CalcSurfaceExtents (msurface_t *s)
 
 	tex = s->texinfo;
 
-	for (i=0 ; i<s->numedges ; i++)
-	{
-		e = loadmodel->surfedges[s->firstedge+i];
+	for (int i = 0; i < s->numedges; i++){
+		int e = loadmodel->surfedges[s->firstedge+i];
 		if (e >= 0)
 			v = &loadmodel->vertexes[loadmodel->edges[e].v[0]];
 		else
 			v = &loadmodel->vertexes[loadmodel->edges[-e].v[1]];
 
-		for (j=0 ; j<2 ; j++)
+		for (int j = 0; j < 2; j++)
 		{
 			val = v->position[0] * tex->vecs[j][0] +
 				v->position[1] * tex->vecs[j][1] +
@@ -748,42 +730,42 @@ void CalcSurfaceExtents (msurface_t *s)
 		}
 	}
 
-	for (i=0 ; i<2 ; i++)
-	{
+	for (int i = 0; i < 2; i++){
 		bmins[i] = floor(mins[i]/16);
 		bmaxs[i] = ceil(maxs[i]/16);
 
 		s->texturemins[i] = bmins[i] * 16;
 		s->extents[i] = (bmaxs[i] - bmins[i]) * 16;
-		if ( !(tex->flags & TEX_SPECIAL) && s->extents[i] > 256)
+		if ((!(tex->flags & TEX_SPECIAL)) &&
+            (s->extents[i] > 256)
+        ){
 			Sys_Error ("Bad surface extents");
+        }
 	}
 }
 
 
 /*
-=================
-Mod_LoadFaces
-=================
+    =================
+    Mod_LoadFaces
+    =================
 */
-void Mod_LoadFaces (lump_t *l)
-{
-	dface_t		*in;
-	msurface_t 	*out;
-	int			i, count, surfnum;
+void Mod_LoadFaces (lump_t* l){
+	dface_t*    in;
+	msurface_t* out;
+	int			i;
 	int			planenum, side;
 
 	in = (void *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		Sys_Error ("MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
-	count = l->filelen / sizeof(*in);
+	int count = l->filelen / sizeof(*in);
 	out = Hunk_AllocName ( count*sizeof(*out), loadname);
 
 	loadmodel->surfaces = out;
 	loadmodel->numsurfaces = count;
 
-	for ( surfnum=0 ; surfnum<count ; surfnum++, in++, out++)
-	{
+	for (int  surfnum = 0; surfnum < count; surfnum++, in++, out++){
 		out->firstedge = LittleLong(in->firstedge);
 		out->numedges = LittleShort(in->numedges);
 		out->flags = 0;
@@ -795,33 +777,32 @@ void Mod_LoadFaces (lump_t *l)
 
 		out->plane = loadmodel->planes + planenum;
 
-		out->texinfo = loadmodel->texinfo + LittleShort (in->texinfo);
+		out->texinfo = loadmodel->texinfo + LittleShort(in->texinfo);
 
-		CalcSurfaceExtents (out);
+		CalcSurfaceExtents(out);
 
 	// lighting info
 
-		for (i=0 ; i<MAXLIGHTMAPS ; i++)
+		for (int i=0 ; i<MAXLIGHTMAPS ; i++){
 			out->styles[i] = in->styles[i];
+        }
 		i = LittleLong(in->lightofs);
-		if (i == -1)
+		if (i == -1){
 			out->samples = NULL;
-		else
+        }else{
 			out->samples = loadmodel->lightdata + i;
+        }
 
-	// set the drawing flags flag
+    // set the drawing flags flag
 
-		if (!Q_strncmp(out->texinfo->texture->name, "sky",3))	// sky
-		{
+		if (!Q_strncmp(out->texinfo->texture->name, "sky",3)){	// sky
 			out->flags |= (SURF_DRAWSKY | SURF_DRAWTILED);
 			continue;
 		}
 
-		if (!Q_strncmp(out->texinfo->texture->name, "*",1))		// turbulent
-		{
+		if (!Q_strncmp(out->texinfo->texture->name, "*",1)){	// turbulent
 			out->flags |= (SURF_DRAWTURB | SURF_DRAWTILED);
-			for (i=0 ; i<2 ; i++)
-			{
+			for (int i = 0; i < 2; i++){
 				out->extents[i] = 16384;
 				out->texturemins[i] = -8192;
 			}
@@ -832,12 +813,11 @@ void Mod_LoadFaces (lump_t *l)
 
 
 /*
-=================
-Mod_SetParent
-=================
+    =================
+    Mod_SetParent
+    =================
 */
-void Mod_SetParent (mnode_t *node, mnode_t *parent)
-{
+void Mod_SetParent (mnode_t* node, mnode_t* parent){
 	node->parent = parent;
 	if (node->contents < 0)
 		return;
@@ -846,12 +826,11 @@ void Mod_SetParent (mnode_t *node, mnode_t *parent)
 }
 
 /*
-=================
-Mod_LoadNodes
-=================
+    =================
+    Mod_LoadNodes
+    =================
 */
-void Mod_LoadNodes (lump_t *l)
-{
+void Mod_LoadNodes (lump_t* l){
 	int			i, j, count, p;
 	dnode_t		*in;
 	mnode_t 	*out;

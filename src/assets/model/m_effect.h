@@ -9,6 +9,7 @@ typedef enum {
     RT_TRACER2  = 5,
     RT_TRACER3  = 6
 } rocket_trail_type;
+
 /* Bit flags for entity effects */
 typedef enum entity_effects {
     EF_ROCKET  = 1 << RT_ROCKET,   /* leave a trail */

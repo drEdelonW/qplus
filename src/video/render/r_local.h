@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 
-#define ALIAS_BASE_SIZE_RATIO		(1.0 / 11.0)
+#define ALIAS_BASE_SIZE_RATIO   (1.0 / 11.0)
 					// normalizing factor so player model works out to about
 					//  1 pixel per triangle
 
@@ -36,21 +36,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // viewmodel lighting
 
 typedef struct {
-	int			ambientlight;
-	int			shadelight;
-	float		*plightvec;
+    int     ambientlight;
+    int     shadelight;
+    float*  plightvec;
 } alight_t;
 
 //===========================================================================
 // clipped bmodel edges
 
 typedef struct bedge_s{
-	mvertex_t		*v[2];
-	struct bedge_s	*pnext;
+    mvertex_t*      v[2];
+    struct bedge_s* pnext;
 } bedge_t;
 
 typedef struct{
-	float	fv[3];		// viewspace x, y
+    float   fv[3];		// viewspace x, y
 } auxvert_t;
 
 //===========================================================================

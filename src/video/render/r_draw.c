@@ -696,19 +696,11 @@ void R_RenderBmodelFace (bedge_t *pedges, msurface_t *psurf)
 R_RenderPoly
 ================
 */
-void R_RenderPoly (msurface_t *fa, int clipflags)
-{
-	int			i, lindex, lnumverts, s_axis, t_axis;
-	float		dist, lastdist, lzi, scale, u, v, frac;
-	unsigned	mask;
-	vec3_t		local, transformed;
-	clipplane_t	*pclip;
-	medge_t		*pedges;
-	mplane_t	*pplane;
-	mvertex_t	verts[2][100];	//FIXME: do real number
-	polyvert_t	pverts[100];	//FIXME: do real number, safely
-	int			vertpage, newverts, newpage, lastvert;
-	qboolean	visible;
+void R_RenderPoly(msurface_t* fa, int clipflags){
+	int         s_axis, t_axis;
+	vec3_t      local, transformed;
+	mvertex_t   verts[2][100];	//FIXME: do real number
+	polyvert_t  pverts[100];	//FIXME: do real number, safely
 
 // FIXME: clean this up and make it faster
 // FIXME: guard against running out of vertices
@@ -716,12 +708,10 @@ void R_RenderPoly (msurface_t *fa, int clipflags)
 	s_axis = t_axis = 0;	// keep compiler happy
 
 // set up clip planes
-	pclip = NULL;
-
-	for (i=3, mask = 0x08 ; i>=0 ; i--, mask >>= 1)
-	{
-		if (clipflags & mask)
-		{
+	clipplane_t* pclip = NULL;
+    unsigned mask = 0x08;
+	for (int i = 3; i >= 0; i--, mask >>= 1){
+		if (clipflags & mask){
 			view_clipplanes[i].next = pclip;
 			pclip = &view_clipplanes[i];
 		}
@@ -729,45 +719,38 @@ void R_RenderPoly (msurface_t *fa, int clipflags)
 
 // reconstruct the polygon
 // FIXME: these should be precalculated and loaded off disk
-	pedges = currententity->model->edges;
-	lnumverts = fa->numedges;
-	vertpage = 0;
+	medge_t* pedges = currententity->model->edges;
+	int lnumverts = fa->numedges;
+	int vertpage = 0;
 
-	for (i=0 ; i<lnumverts ; i++)
-	{
-		lindex = currententity->model->surfedges[fa->firstedge + i];
+	for (int i = 0; i < lnumverts; i++)	{
+		int lindex = currententity->model->surfedges[fa->firstedge + i];
 
-		if (lindex > 0)
-		{
+		if (lindex > 0){
 			r_pedge = &pedges[lindex];
 			verts[0][i] = r_pcurrentvertbase[r_pedge->v[0]];
-		}
-		else
-		{
+		}else{
 			r_pedge = &pedges[-lindex];
 			verts[0][i] = r_pcurrentvertbase[r_pedge->v[1]];
 		}
 	}
 
 // clip the polygon, done if not visible
-	while (pclip)
-	{
-		lastvert = lnumverts - 1;
-		lastdist = DotProduct (verts[vertpage][lastvert].position,
+	while (pclip){
+		int lastvert = lnumverts - 1;
+		float lastdist = DotProduct(verts[vertpage][lastvert].position,
 							   pclip->normal) - pclip->dist;
 
-		visible = false;
-		newverts = 0;
-		newpage = vertpage ^ 1;
+		qboolean visible = false;
+		int newverts = 0;
+		int newpage = vertpage ^ 1;
 
-		for (i=0 ; i<lnumverts ; i++)
-		{
-			dist = DotProduct (verts[vertpage][i].position, pclip->normal) -
+		for (int i=0 ; i<lnumverts ; i++){
+			float dist = DotProduct(verts[vertpage][i].position, pclip->normal) -
 					pclip->dist;
 
-			if ((lastdist > 0) != (dist > 0))
-			{
-				frac = dist / (dist - lastdist);
+			if ((lastdist > 0) != (dist > 0)){
+				float frac = dist / (dist - lastdist);
 				verts[newpage][newverts].position[0] =
 						verts[vertpage][i].position[0] +
 						((verts[vertpage][lastvert].position[0] -
@@ -783,8 +766,7 @@ void R_RenderPoly (msurface_t *fa, int clipflags)
 				newverts++;
 			}
 
-			if (dist >= 0)
-			{
+			if (dist >= 0){
 				verts[newpage][newverts] = verts[vertpage][i];
 				newverts++;
 				visible = true;
@@ -804,9 +786,8 @@ void R_RenderPoly (msurface_t *fa, int clipflags)
 
 // transform and project, remembering the z values at the vertices and
 // r_nearzi, and extract the s and t coordinates at the vertices
-	pplane = fa->plane;
-	switch (pplane->type)
-	{
+	mplane_t* pplane = fa->plane;
+	switch (pplane->type){
 	case PLANE_X:
 	case PLANE_ANYX:
 		s_axis = 1;
@@ -826,30 +807,30 @@ void R_RenderPoly (msurface_t *fa, int clipflags)
 
 	r_nearzi = 0;
 
-	for (i=0 ; i<lnumverts ; i++)
-	{
+	for (int i = 0; i < lnumverts; i++){
 	// transform and project
-		VectorSubtract (verts[vertpage][i].position, modelorg, local);
-		TransformVector (local, transformed);
+		VectorSubtract(verts[vertpage][i].position, modelorg, local);
+		TransformVector(local, transformed);
 
 		if (transformed[2] < NEAR_CLIP)
 			transformed[2] = NEAR_CLIP;
 
-		lzi = 1.0 / transformed[2];
+		float lzi = 1.0 / transformed[2];
 
 		if (lzi > r_nearzi)	// for mipmap finding
 			r_nearzi = lzi;
 
 	// FIXME: build x/yscale into transform?
+	    float scale;
 		scale = xscale * lzi;
-		u = (xcenter + scale*transformed[0]);
+		float u = (xcenter + scale*transformed[0]);
 		if (u < r_refdef.fvrectx_adj)
 			u = r_refdef.fvrectx_adj;
 		if (u > r_refdef.fvrectright_adj)
 			u = r_refdef.fvrectright_adj;
 
 		scale = yscale * lzi;
-		v = (ycenter - scale*transformed[1]);
+		float v = (ycenter - scale*transformed[1]);
 		if (v < r_refdef.fvrecty_adj)
 			v = r_refdef.fvrecty_adj;
 		if (v > r_refdef.fvrectbottom_adj)
