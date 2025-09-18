@@ -94,12 +94,11 @@ void Sbar_DontShowScores (void)
 }
 
 /*
-===============
-Sbar_Changed
-===============
+	===============
+	Sbar_Changed
+	===============
 */
-void Sbar_Changed (void)
-{
+void Sbar_Changed(){
 	sb_updates = 0;	// update next frame
 }
 

@@ -20,6 +20,7 @@
         "common.h": "c",
         "bspfile.h": "c",
         "random": "c",
-        "limits": "c"
+        "limits": "c",
+        "ratio": "c"
     }
 }

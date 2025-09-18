@@ -21,6 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // protocol.h -- communications protocols
 
 #define	PROTOCOL_VERSION	15
+enum{
+	FAST_MASK = 0x7F,
+	FAST_FLAG = 0x80
+};
 
 // if the high bit of the servercmd is set, the low bits are fast update flags:
 #if 0

@@ -153,7 +153,7 @@ typedef struct{
 // information for local display
 	int			stats[MAX_CL_STATS];	// health, etc
 	int			items;			// inventory bit flags
-	float	item_gettime[32];	// cl.time of aquiring item, for blinking
+	float		item_gettime[32];	// cl.time of aquiring item, for blinking
 	float		faceanimtime;	// use anim frame if cl.time < this
 
 	cshift_t	cshifts[NUM_CSHIFTS];	// color shifts for damage, powerups

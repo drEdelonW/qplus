@@ -33,7 +33,7 @@ int 		con_linewidth;
 
 float		con_cursorspeed = 4;
 
-#define		CON_TEXTSIZE	0x4000 /*16Kb 16384*/
+#define		CON_TEXTSIZE	0x4000 /*16Kb - 16384b*/
 
 qboolean 	con_forcedup;		// because no entities to refresh
 
@@ -93,7 +93,7 @@ void Con_ToggleConsole_f(){
 */
 void Con_Clear_f(){
 	if (con_text){
-		Q_memset (con_text, ' ', CON_TEXTSIZE);
+		Q_memset(con_text, ' ', CON_TEXTSIZE);
     }
 }
 
