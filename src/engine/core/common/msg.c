@@ -175,7 +175,7 @@ char* MSG_ReadString(){
 	int l = 0;
 	do{
 		int c = MSG_ReadChar();
-		if ((c == MSG_ERROR) || (c == '\n'))
+		if ((c == MSG_ERROR) || (c == '\0'))
 			break;
 		string[l] = c;
 		l++;

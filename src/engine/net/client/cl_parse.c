@@ -98,15 +98,13 @@ entity_t* CL_EntityNum(int num){
 void CL_ParseStartSoundPacket(){
     int field_mask = MSG_ReadByte();
 
-    int volume =
-        (field_mask & SND_VOLUME)?
-            MSG_ReadByte():
-            DEFAULT_SOUND_PACKET_VOLUME;
+    int volume = (field_mask & SND_VOLUME)?
+		MSG_ReadByte():
+		DEFAULT_SOUND_PACKET_VOLUME;
 
-    float attenuation =
-        (field_mask & SND_ATTENUATION)?
-            (MSG_ReadByte() / 64.0) :
-            DEFAULT_SOUND_PACKET_ATTENUATION;
+    float attenuation = (field_mask & SND_ATTENUATION)?
+		(MSG_ReadByte() / 64.0) :
+		DEFAULT_SOUND_PACKET_ATTENUATION;
 
     int channel = MSG_ReadShort();
     int sound_num = MSG_ReadByte();
@@ -132,7 +130,7 @@ void CL_ParseStartSoundPacket(){
     S_StartSound(
         ent, channel,
         cl.sound_precache[sound_num], pos,
-        volume/255.0, attenuation
+        (volume / 255.0f), attenuation
     );
 }
 
@@ -144,47 +142,43 @@ void CL_ParseStartSoundPacket(){
     so the server doesn't disconnect.
     ==================
 */
-void CL_KeepaliveMessage (){
-	float	time;
+void CL_KeepaliveMessage(){
 	static float lastmsg;
-	int		ret;
-	sizebuf_t	old;
 	byte		olddata[8192];
 
-	if (sv.active)
-		return;		// no need if server is local
-	if (cls.demoplayback)
+	if ((sv.active) || // no need if server is local
+        (cls.demoplayback)){
 		return;
+    }
 
 // read messages from server, should just be nops
-	old = net_message;
+	sizebuf_t old = net_message;
 	memcpy (olddata, net_message.data, net_message.cursize);
 
-	do
-	{
-		ret = CL_GetMessage ();
-		switch (ret)
-		{
+    int ret;
+	do {
+		ret = CL_GetMessage();
+		switch (ret) {
 		default:
-			Host_Error ("CL_KeepaliveMessage: CL_GetMessage failed");
+			Host_Error("CL_KeepaliveMessage: CL_GetMessage failed");
 		case 0:
 			break;	// nothing waiting
 		case 1:
-			Host_Error ("CL_KeepaliveMessage: received a message");
+			Host_Error("CL_KeepaliveMessage: received a message");
 			break;
 		case 2:
 			if (MSG_ReadByte() != svc_nop)
-				Host_Error ("CL_KeepaliveMessage: datagram wasn't a nop");
+				Host_Error("CL_KeepaliveMessage: datagram wasn't a nop");
 			break;
 		}
 	} while (ret);
 
 	net_message = old;
-	memcpy (net_message.data, olddata, net_message.cursize);
+	memcpy(net_message.data, olddata, net_message.cursize);
 
 // check time
-	time = Sys_FloatTime ();
-	if (time - lastmsg < 5)
+	float time = Sys_FloatTime();
+	if ((time - lastmsg) < 5.0f)
 		return;
 	lastmsg = time;
 
@@ -717,7 +711,6 @@ CL_ParseServerMessage
 void CL_ParseServerMessage (){
 	int			cmd;
 	int			msg;
-
 //
 // if recording demos, copy the message out
 //
@@ -828,7 +821,7 @@ void CL_ParseServerMessage (){
 
 		case svc_stopsound:
 			msg = MSG_ReadShort();
-			S_StopSound(msg>>3, msg&7);
+			S_StopSound((msg >> 3), (msg & 7));
 			break;
 
 		case svc_updatename:
@@ -865,28 +858,26 @@ void CL_ParseServerMessage (){
 			// must use CL_EntityNum() to force cl.num_entities up
 			CL_ParseBaseline(CL_EntityNum(msg));
 			break;
+
 		case svc_spawnstatic:
 			CL_ParseStatic();
 			break;
-		case svc_temp_entity:
+
+        case svc_temp_entity:
 			CL_ParseTEnt();
 			break;
 
-		case svc_setpause:
-			{
+		case svc_setpause: {
 				cl.paused = MSG_ReadByte();
 
 				if (cl.paused){
 					CDAudio_Pause();
-#ifdef _WIN32
-					VID_HandlePause(true);
-#endif
 				}else{
 					CDAudio_Resume();
-#ifdef _WIN32
-					VID_HandlePause(false);
-#endif
 				}
+#ifdef _WIN32
+                VID_HandlePause(cl.paused);
+#endif
 			}
 			break;
 
