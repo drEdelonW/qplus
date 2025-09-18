@@ -66,117 +66,123 @@ SV_StartParticle
 Make sure the event gets sent to all clients
 ==================
 */
-void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count)
-{
-	int		i, v;
-
-	if (sv.datagram.cursize > MAX_DATAGRAM-16)
-		return;
-	MSG_WriteByte (&sv.datagram, svc_particle);
-	MSG_WriteCoord (&sv.datagram, org[0]);
-	MSG_WriteCoord (&sv.datagram, org[1]);
-	MSG_WriteCoord (&sv.datagram, org[2]);
-	for (i=0 ; i<3 ; i++)
-	{
-		v = dir[i]*16;
-		if (v > 127)
-			v = 127;
-		else if (v < -128)
-			v = -128;
-		MSG_WriteChar (&sv.datagram, v);
+void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count){
+	if (sv.datagram.cursize > (MAX_DATAGRAM - 16)){
+        return;
+    }
+	MSG_WriteByte(&sv.datagram, svc_particle);
+	MSG_WriteCoord(&sv.datagram, org[0]);
+	MSG_WriteCoord(&sv.datagram, org[1]);
+	MSG_WriteCoord(&sv.datagram, org[2]);
+	for (int i = 0; i < 3; i++){
+        int v = dir[i] * 16;
+#if 0
+        if (v > 127)
+            v = 127;
+        else if (v < -128)
+            v = -128;
+#else
+		CLAMP(-128, v, 127);
+#endif
+		MSG_WriteChar(&sv.datagram, v);
 	}
-	MSG_WriteByte (&sv.datagram, count);
-	MSG_WriteByte (&sv.datagram, color);
+	MSG_WriteByte(&sv.datagram, count);
+	MSG_WriteByte(&sv.datagram, color);
 }
 
 /*
-==================
-SV_StartSound
+    ==================
+    SV_StartSound
 
-Each entity can have eight independant sound sources, like voice,
-weapon, feet, etc.
+    Each entity can have eight independant sound sources, like voice,
+    weapon, feet, etc.
 
-Channel 0 is an auto-allocate channel, the others override anything
-allready running on that entity/channel pair.
+    Channel 0 is an auto-allocate channel, the others override anything
+    allready running on that entity/channel pair.
 
-An attenuation of 0 will play full volume everywhere in the level.
-Larger attenuations will drop off.  (max 4 attenuation)
+    An attenuation of 0 will play full volume everywhere in the level.
+    Larger attenuations will drop off.  (max 4 attenuation)
 
-==================
+    ==================
 */
-void SV_StartSound (edict_t *entity, int channel, char *sample, int volume,
-    float attenuation)
-{
-    int         sound_num;
-    int field_mask;
-    int			i;
-	int			ent;
+void SV_StartSound(
+    edict_t* entity,
+    int     channel,
+    char*   sample,
+    int     volume,
+    float   attenuation
+){
+	if ((volume < 0) || (volume > 255))
+		Sys_Error("SV_StartSound: volume = %i", volume);
 
-	if (volume < 0 || volume > 255)
-		Sys_Error ("SV_StartSound: volume = %i", volume);
+	if ((attenuation < 0) || (attenuation > 4))
+		Sys_Error("SV_StartSound: attenuation = %f", attenuation);
 
-	if (attenuation < 0 || attenuation > 4)
-		Sys_Error ("SV_StartSound: attenuation = %f", attenuation);
+	if ((channel < 0) || (channel > 7))
+		Sys_Error("SV_StartSound: channel = %i", channel);
 
-	if (channel < 0 || channel > 7)
-		Sys_Error ("SV_StartSound: channel = %i", channel);
-
-	if (sv.datagram.cursize > MAX_DATAGRAM-16)
+	if (sv.datagram.cursize > (MAX_DATAGRAM - 16))
 		return;
 
 // find precache number for sound
-    for (sound_num=1 ; sound_num<MAX_SOUNDS
-        && sv.sound_precache[sound_num] ; sound_num++)
+    int sound_num;
+    for (   sound_num = 1;
+            (sound_num < MAX_SOUNDS) &&
+             sv.sound_precache[sound_num];
+            sound_num++){
         if (!strcmp(sample, sv.sound_precache[sound_num]))
             break;
-
-    if ( sound_num == MAX_SOUNDS || !sv.sound_precache[sound_num] )
-    {
+    }
+    if ( (sound_num == MAX_SOUNDS) || (!sv.sound_precache[sound_num]) )    {
         Con_Printf ("SV_StartSound: %s not precacheed\n", sample);
         return;
     }
 
-	ent = NUM_FOR_EDICT(entity);
+	int ent = NUM_FOR_EDICT(entity);
 
-	channel = (ent<<3) | channel;
+	channel = (ent << 3) | channel;
 
-	field_mask = 0;
+	int field_mask = 0;
 	if (volume != DEFAULT_SOUND_PACKET_VOLUME)
 		field_mask |= SND_VOLUME;
 	if (attenuation != DEFAULT_SOUND_PACKET_ATTENUATION)
 		field_mask |= SND_ATTENUATION;
 
 // directed messages go only to the entity the are targeted on
-	MSG_WriteByte (&sv.datagram, svc_sound);
-	MSG_WriteByte (&sv.datagram, field_mask);
+	MSG_WriteByte(&sv.datagram, svc_sound);
+	MSG_WriteByte(&sv.datagram, field_mask);
 	if (field_mask & SND_VOLUME)
-		MSG_WriteByte (&sv.datagram, volume);
+		MSG_WriteByte(&sv.datagram, volume);
 	if (field_mask & SND_ATTENUATION)
-		MSG_WriteByte (&sv.datagram, attenuation*64);
-	MSG_WriteShort (&sv.datagram, channel);
-	MSG_WriteByte (&sv.datagram, sound_num);
-	for (i=0 ; i<3 ; i++)
-		MSG_WriteCoord (&sv.datagram, entity->v.origin[i]+0.5*(entity->v.mins[i]+entity->v.maxs[i]));
+		MSG_WriteByte(&sv.datagram, (attenuation * 64));
+	MSG_WriteShort(&sv.datagram, channel);
+	MSG_WriteByte(&sv.datagram, sound_num);
+	for (int i = 0; i < 3; i++){
+		MSG_WriteCoord(
+            &sv.datagram,
+            entity->v.origin[i] +
+            0.5 * (entity->v.mins[i] + entity->v.maxs[i])
+        );
+    }
 }
 
 /*
-==============================================================================
+    ==============================================================================
 
-CLIENT SPAWNING
+    CLIENT SPAWNING
 
-==============================================================================
+    ==============================================================================
 */
 
 /*
-================
-SV_SendServerinfo
+    ================
+    SV_SendServerinfo
 
-Sends the first message from the server to a connected client.
-This will be sent on the initial connection and upon each server load.
-================
+    Sends the first message from the server to a connected client.
+    This will be sent on the initial connection and upon each server load.
+    ================
 */
-void SV_SendServerinfo (client_t *client)
-{
+void SV_SendServerinfo(client_t* client){
 	char			**s;
 	char			message[2048];
 

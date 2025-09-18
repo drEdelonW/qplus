@@ -19,6 +19,7 @@
         "*.q2": "c",
         "common.h": "c",
         "bspfile.h": "c",
-        "random": "c"
+        "random": "c",
+        "limits": "c"
     }
 }

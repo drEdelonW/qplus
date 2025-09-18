@@ -120,15 +120,17 @@ $(eval UI_DIR = $(SRC_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
     SRC_LIST += $(UI_DIR)/chase.c
 
 $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR))
+ifeq ($(UNAME_S),Linux)
     $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))
         SRC_LIST += $(POSIX_DIR)/sys_linux.c
         SRC_LIST += $(POSIX_DIR)/vid_x.c
         SRC_LIST += $(POSIX_DIR)/cd_linux.c
         SRC_LIST += $(POSIX_DIR)/snd_linux.c
-#         SRC_LIST += $(PLATFORM_DIR)/null/cd_null.c
-#         SRC_LIST += $(PLATFORM_DIR)/null/snd_null.c
-#         SRC_LIST += $(PLATFORM_DIR)/null/xshm_stubs.c
-
+else
+    SRC_LIST += $(PLATFORM_DIR)/null/cd_null.c
+    SRC_LIST += $(PLATFORM_DIR)/null/snd_null.c
+    SRC_LIST += $(PLATFORM_DIR)/null/xshm_stubs.c
+endif
 
 $(eval OTHER_DIR = $(SRC_DIR)/etc) $(eval INCLUDES += $(OTHER_DIR))
 

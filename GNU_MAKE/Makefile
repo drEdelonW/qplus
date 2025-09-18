@@ -15,6 +15,8 @@ NO_ASM       ?= 1
 # X11 target on *nix
 USE_X11      ?= 1
 
+UNAME_S      := $(shell uname -s)
+UNAME_M      := $(shell uname -m)
 # Populated by SRCS.mk: must define SRC_LIST and optionally INCLUDES
 INCLUDES     :=
 SRC_LIST     :=
@@ -39,8 +41,7 @@ CXX          ?= g++
 LD           := $(CXX)
 AR           ?= ar
 
-UNAME_S      := $(shell uname -s)
-UNAME_M      := $(shell uname -m)
+
 
 # ---------- Base flags ----------
 # Put macros and include paths into CPPFLAGS
@@ -130,6 +131,7 @@ targets: $(TARGETS)
 $(TARGETS): $(OBJS) | $(OUT_DIR)
 	@$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 	@cd run_env && ln -sf ../$(TARGETS) quake
+	@$(info DONE.)
 
 $(OUT_DIR):
 	@mkdir -p $(OUT_DIR)
