@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (C) 1996-1997 Id Software, Inc.
 
@@ -36,10 +37,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	TYP_SOUND		67
 #define	TYP_MIPTEX		68
 
-typedef struct
-{
-	int			width, height;
-	byte		data[4];			// variably sized
+typedef struct{
+    int     width;
+    int     height;
+    byte    data[4];			// variably sized
 } qpic_t;
 
 

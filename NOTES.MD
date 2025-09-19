@@ -7,7 +7,8 @@
     sudo apt update
     sudo apt install libx11-dev:armhf libxext-dev:armhf
 
-
+# MacOS specific
+    clang -dM -E - < /dev/null | grep __APPLE__
 
 # run EXTERNAL WINDOW
     open -a XQuartz  # run X11 server on MacOS
@@ -31,3 +32,6 @@ sudo apt install \
 
 
     ln -s ../OUTPUT/quake.x11 quake
+
+
+    Нужно заменять на intptr_t, uintptr_t, size_t.

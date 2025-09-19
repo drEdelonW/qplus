@@ -106,6 +106,11 @@ ifeq ($(UNAME_S),Linux)
     endif
   else
   endif
+else ifeq ($(UNAME_S),Darwin)
+    CPPFLAGS += -I/opt/X11/include
+    LDFLAGS  += -L/opt/X11/lib
+else
+  $(info UNAME_S $(UNAME_S))
 endif
 
 # On macOS arm64 there is no 32-bit; do nothing.
@@ -114,7 +119,7 @@ ifneq ($(NO_PARALLEL),1)
   J ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || \
                 nproc 2>/dev/null || \
                 sysctl -n hw.ncpu 2>/dev/null || echo 1)
-  MAKEFLAGS += -j$(J) --output-sync=target
+#   MAKEFLAGS += -j$(J) --output-sync=target
 endif
 
 # ---------- Targets ----------
