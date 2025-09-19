@@ -80,7 +80,7 @@ D_DrawSolidSurface
 
 // FIXME: clean this up
 
-void D_DrawSolidSurface (surf_t *surf, int color)
+void D_DrawSolidSurface (surf_p surf, int color)
 {
 	espan_t	*span;
 	byte	*pdest;
@@ -174,7 +174,7 @@ D_DrawSurfaces
 */
 void D_DrawSurfaces (void)
 {
-	surf_t			*s;
+	surf_p	s;
 	msurface_t		*pface;
 	surfcache_t		*pcurrentcache;
 	vec3_t			world_transformed_modelorg;

@@ -98,6 +98,7 @@ typedef struct surf_s
 
 	int			pad[2];				// to 64 bytes
 } surf_t;
+typedef surf_t* surf_p;
 
 extern	surf_t	*surfaces, *surface_p, *surf_max;
 
