@@ -119,14 +119,12 @@ enum {
 };
 
 
-typedef struct statement_s
-{
+typedef struct statement_s{
 	unsigned short	op;
 	short	a,b,c;
 } dstatement_t;
 
-typedef struct
-{
+typedef struct{
 	unsigned short	type;		// if DEF_SAVEGLOBGAL bit is set
 								// the variable needs to be saved in savegames
 	unsigned short	ofs;
@@ -136,8 +134,7 @@ typedef struct
 
 #define	MAX_PARMS	8
 
-typedef struct
-{
+typedef struct{
 	int		first_statement;	// negative numbers are builtins
 	int		parm_start;
 	int		locals;				// total ints of parms + locals
@@ -153,8 +150,7 @@ typedef struct
 
 
 #define	PROG_VERSION	6
-typedef struct
-{
+typedef struct{
 	int		version;
 	int		crc;			// check of header file
 

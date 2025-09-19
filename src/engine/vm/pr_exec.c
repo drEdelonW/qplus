@@ -47,7 +47,7 @@ int			pr_xstatement;
 
 int		pr_argc;
 
-char *pr_opnames[] =
+char* pr_opnames[] =
 {
 "DONE",
 
@@ -136,8 +136,8 @@ char *pr_opnames[] =
 "BITOR"
 };
 
-char *PR_GlobalString (int ofs);
-char *PR_GlobalStringNoContents (int ofs);
+char* PR_GlobalString (int ofs);
+char* PR_GlobalStringNoContents (int ofs);
 
 
 //=============================================================================
@@ -147,7 +147,7 @@ char *PR_GlobalStringNoContents (int ofs);
 PR_PrintStatement
 =================
 */
-void PR_PrintStatement (dstatement_t *s)
+void PR_PrintStatement (dstatement_t* s)
 {
 	int		i;
 
@@ -221,7 +221,8 @@ PR_Profile_f
 */
 void PR_Profile_f (void)
 {
-	dfunction_t	*f, *best;
+	dfunction_t* f;
+    dfunction_t* best;
 	int			max;
 	int			num;
 	int			i;
@@ -258,7 +259,7 @@ PR_RunError
 Aborts the currently executing function
 ============
 */
-void PR_RunError (char *error, ...)
+void PR_RunError (char* error, ...)
 {
 	va_list		argptr;
 	char		string[1024];
@@ -291,7 +292,7 @@ PR_EnterFunction
 Returns the new program statement counter
 ====================
 */
-int PR_EnterFunction (dfunction_t *f)
+int PR_EnterFunction (dfunction_t* f)
 {
 	int		i, j, c, o;
 
@@ -307,7 +308,7 @@ int PR_EnterFunction (dfunction_t *f)
 		PR_RunError ("PR_ExecuteProgram: locals stack overflow\n");
 
 	for (i=0 ; i < c ; i++)
-		localstack[localstack_used+i] = ((int *)pr_globals)[f->parm_start + i];
+		localstack[localstack_used+i] = ((int* )pr_globals)[f->parm_start + i];
 	localstack_used += c;
 
 // copy parameters
@@ -316,7 +317,7 @@ int PR_EnterFunction (dfunction_t *f)
 	{
 		for (j=0 ; j<f->parm_size[i] ; j++)
 		{
-			((int *)pr_globals)[o] = ((int *)pr_globals)[OFS_PARM0+i*3+j];
+			((int* )pr_globals)[o] = ((int* )pr_globals)[OFS_PARM0+i*3+j];
 			o++;
 		}
 	}
@@ -344,7 +345,7 @@ int PR_LeaveFunction (void)
 		PR_RunError ("PR_ExecuteProgram: locals stack underflow\n");
 
 	for (i=0 ; i < c ; i++)
-		((int *)pr_globals)[pr_xfunction->parm_start + i] = localstack[localstack_used+i];
+		((int* )pr_globals)[pr_xfunction->parm_start + i] = localstack[localstack_used+i];
 
 // up stack
 	pr_depth--;
@@ -360,10 +361,13 @@ PR_ExecuteProgram
 */
 void PR_ExecuteProgram (func_t fnum)
 {
-	eval_t	*a, *b, *c;
+	eval_t* a;
+    eval_t* b;
+    eval_t* c;
 	int			s;
-	dstatement_t	*st;
-	dfunction_t	*f, *newf;
+	dstatement_t* st;
+	dfunction_t* f;
+    dfunction_t* newf;
 	int		runaway;
 	int		i;
 	edict_t	*ed;
@@ -392,9 +396,9 @@ while (1)
 	s++;	// next statement
 
 	st = &pr_statements[s];
-	a = (eval_t *)&pr_globals[st->a];
-	b = (eval_t *)&pr_globals[st->b];
-	c = (eval_t *)&pr_globals[st->c];
+	a = (eval_t* )&pr_globals[st->a];
+	b = (eval_t* )&pr_globals[st->b];
+	c = (eval_t* )&pr_globals[st->c];
 
 	if (!--runaway)
 		PR_RunError ("runaway loop error");
@@ -548,11 +552,11 @@ while (1)
 	case OP_STOREP_FLD:		// integers
 	case OP_STOREP_S:
 	case OP_STOREP_FNC:		// pointers
-		ptr = (eval_t *)((byte *)sv.edicts + b->_int);
+		ptr = (eval_t* )((byte* )sv.edicts + b->_int);
 		ptr->_int = a->_int;
 		break;
 	case OP_STOREP_V:
-		ptr = (eval_t *)((byte *)sv.edicts + b->_int);
+		ptr = (eval_t* )((byte* )sv.edicts + b->_int);
 		ptr->vector[0] = a->vector[0];
 		ptr->vector[1] = a->vector[1];
 		ptr->vector[2] = a->vector[2];
@@ -563,9 +567,9 @@ while (1)
 #ifdef PARANOID
 		NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
-		if (ed == (edict_t *)sv.edicts && sv.state == ss_active)
+		if (ed == (edict_t* )sv.edicts && sv.state == ss_active)
 			PR_RunError ("assignment to world entity");
-		c->_int = (byte *)((int *)&ed->v + b->_int) - (byte *)sv.edicts;
+		c->_int = (byte* )((int* )&ed->v + b->_int) - (byte* )sv.edicts;
 		break;
 
 	case OP_LOAD_F:
@@ -577,7 +581,7 @@ while (1)
 #ifdef PARANOID
 		NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
-		a = (eval_t *)((int *)&ed->v + b->_int);
+		a = (eval_t* )((int* )&ed->v + b->_int);
 		c->_int = a->_int;
 		break;
 
@@ -586,7 +590,7 @@ while (1)
 #ifdef PARANOID
 		NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
-		a = (eval_t *)((int *)&ed->v + b->_int);
+		a = (eval_t* )((int* )&ed->v + b->_int);
 		c->vector[0] = a->vector[0];
 		c->vector[1] = a->vector[1];
 		c->vector[2] = a->vector[2];

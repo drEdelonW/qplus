@@ -28,12 +28,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     R_CheckVariables
     ===============
 */
-void R_CheckVariables (void){
-	static float	oldbright;
+void R_CheckVariables(void){
+    static float oldbright;
 
 	if (r_fullbright.value != oldbright){
 		oldbright = r_fullbright.value;
-		D_FlushCaches ();	// so all lighting changes
+		D_FlushCaches();	// so all lighting changes
 	}
 }
 
@@ -47,14 +47,14 @@ void R_CheckVariables (void){
 */
 void Show(void){
 	vrect_t	vr = {
-        .x = 0,
-        .y = 0,
-        .width = vid.width,
+        // .x      = 0,
+        // .y      = 0,
+        .width  = vid.width,
         .height = vid.height,
-        .pnext = NULL
+        // .pnext  = NULL
     };
 
-	VID_Update (&vr);
+	VID_Update(&vr);
 }
 
 
@@ -65,18 +65,18 @@ void Show(void){
     For program optimization
     ====================
 */
-#define VIEWANGLE_STEPS 1280
+#define VIEWANGLE_STEPS 128
 
 void R_TimeRefresh_f(){
 	int startangle = r_refdef.viewangles[1];
 
 	float start = Sys_FloatTime();
 	for (int i = 0; i < VIEWANGLE_STEPS; i++){
-		r_refdef.viewangles[1] = ( (float)i / (float)VIEWANGLE_STEPS ) * 360.0;
+		r_refdef.viewangles[1] = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
-		VID_LockBuffer ();
-		R_RenderView ();
-		VID_UnlockBuffer ();
+		VID_LockBuffer();
+		R_RenderView();
+		VID_UnlockBuffer();
 
         vrect_t vr = {
             .x = r_refdef.vrect.x,
@@ -85,12 +85,12 @@ void R_TimeRefresh_f(){
             .height = r_refdef.vrect.height,
             .pnext = NULL,
         };
-		VID_Update (&vr);
+		VID_Update(&vr);
 	}
 
     float stop = Sys_FloatTime();
 	float time = stop - start;
-	Con_Printf ("%f seconds (%f fps)\n", time, VIEWANGLE_STEPS / time);
+	Con_Printf("%f seconds (%f fps)\n", time, VIEWANGLE_STEPS / time);
 
 	r_refdef.viewangles[1] = startangle;
 }
@@ -103,27 +103,25 @@ void R_TimeRefresh_f(){
     Only called by R_DisplayTime
     ================
 */
+#define GRAPH_FG 0xFF  // bright bar color
+#define GRAPH_BG 0x30  // background color
 void R_LineGraph(int x, int y, int h){
-	int i;
     // FIXME: should be disabled on no-buffer adapters, or should be in the driver
 
 	x += r_refdef.vrect.x;
 	y += r_refdef.vrect.y;
 
-	byte* dest = vid.buffer + vid.rowbytes*y + x;
+	byte* dest = vid.buffer + (vid.rowbytes * y) + x;
 
 	int s = r_graphheight.value;
 
-	if (h>s)
-		h = s;
+    CLAMP(0, h, s);
 
-	for (i = 0; i < h; i++, dest -= vid.rowbytes*2){
-		dest[0] = 0xff;
-		*(dest-vid.rowbytes) = 0x30;
-	}
-	for ( ; i < s; i++, dest -= vid.rowbytes*2){
-		dest[0] = 0x30;
-		*(dest-vid.rowbytes) = 0x30;
+    for (int i = 0; i < s; ++i) {
+        dest[0] = (i < h) ? GRAPH_FG : GRAPH_BG;
+
+        dest[-vid.rowbytes] = GRAPH_BG;
+        dest -= (vid.rowbytes * 2);
 	}
 }
 

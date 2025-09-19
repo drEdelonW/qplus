@@ -588,9 +588,9 @@ void CL_ParseServerMessage(){
 		}
 
 	// if the high bit of the command byte is set, it is a fast update
-		if (cmd & 128){
+		if (cmd & 0x80){
 			SHOWNET("fast update");
-			CL_ParseUpdate(cmd & 127);
+			CL_ParseUpdate(cmd & 0x7F);
 			continue;
 		}
 

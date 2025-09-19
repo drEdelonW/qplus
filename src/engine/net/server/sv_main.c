@@ -872,11 +872,11 @@ void SV_SpawnServer (char *server, char *startspot)
 void SV_SpawnServer (char *server)
 #endif
 {
-	edict_t*    ent;
+	edict_t* ent;
 
 	// let's not have any servers with no name
 	if (hostname.string[0] == 0)
-		Cvar_Set ("hostname", "UNNAMED");
+		Cvar_Set("hostname", "UNNAMED");
 	scr_centertime_off = 0;
 
 	Con_DPrintf("SpawnServer: %s\n",server);
@@ -885,8 +885,7 @@ void SV_SpawnServer (char *server)
 //
 // tell all connected clients that we are going to a new level
 //
-	if (sv.active)
-	{
+	if (sv.active){
 		SV_SendReconnect ();
 	}
 
@@ -903,7 +902,7 @@ void SV_SpawnServer (char *server)
 //
 // set up the new server
 //
-	Host_ClearMemory ();
+	Host_ClearMemory();
 
 	memset(&sv, 0, sizeof(sv));
 
@@ -914,12 +913,12 @@ void SV_SpawnServer (char *server)
 #endif
 
 // load progs to get entity field count
-	PR_LoadProgs ();
+	PR_LoadProgs();
 
 // allocate server memory
 	sv.max_edicts = MAX_EDICTS;
 
-	sv.edicts = Hunk_AllocName (sv.max_edicts*pr_edict_size, "edicts");
+	sv.edicts = Hunk_AllocName(sv.max_edicts*pr_edict_size, "edicts");
 
 	sv.datagram.maxsize = sizeof(sv.datagram_buf);
 	sv.datagram.cursize = 0;
@@ -947,10 +946,9 @@ void SV_SpawnServer (char *server)
 
 	strcpy(sv.name, server);
 	sprintf(sv.modelname, "maps/%s.bsp", server);
-	sv.worldmodel = Mod_ForName (sv.modelname, false);
-	if (!sv.worldmodel)
-	{
-		Con_Printf ("Couldn't spawn server %s\n", sv.modelname);
+	sv.worldmodel = Mod_ForName(sv.modelname, false);
+	if (!sv.worldmodel)	{
+		Con_Printf("Couldn't spawn server %s\n", sv.modelname);
 		sv.active = false;
 		return;
 	}
@@ -959,7 +957,7 @@ void SV_SpawnServer (char *server)
 //
 // clear world interaction links
 //
-	SV_ClearWorld ();
+	SV_ClearWorld();
 
 	sv.sound_precache[0] = pr_strings;
 
@@ -967,7 +965,7 @@ void SV_SpawnServer (char *server)
 	sv.model_precache[1] = sv.modelname;
 	for (int i = 1; i < sv.worldmodel->numsubmodels; i++){
 		sv.model_precache[1+i] = localmodels[i];
-		sv.models[i+1] = Mod_ForName (localmodels[i], false);
+		sv.models[i+1] = Mod_ForName(localmodels[i], false);
 	}
 
 //
@@ -994,7 +992,7 @@ void SV_SpawnServer (char *server)
 // serverflags are for cross level information (sigils)
 	pr_global_struct->serverflags = svs.serverflags;
 
-	ED_LoadFromFile (sv.worldmodel->entities);
+	ED_LoadFromFile(sv.worldmodel->entities);
 
 	sv.active = true;
 
@@ -1007,7 +1005,7 @@ void SV_SpawnServer (char *server)
 	SV_Physics ();
 
 // create a baseline for more efficient communications
-	SV_CreateBaseline ();
+	SV_CreateBaseline();
 
 // send serverinfo to all connected clients
     host_client = svs.clients;
