@@ -64,11 +64,11 @@ static int	firstupdate = 1;
 
 extern regs_t regs;
 
-void VID_TestMode_f (void);
-void VID_NumModes_f (void);
-void VID_DescribeCurrentMode_f (void);
-void VID_DescribeMode_f (void);
-void VID_DescribeModes_f (void);
+void VID_TestMode_f();
+void VID_NumModes_f();
+void VID_DescribeCurrentMode_f();
+void VID_DescribeMode_f();
+void VID_DescribeModes_f();
 
 byte	vid_current_palette[768];	// save for mode changes
 
@@ -78,7 +78,7 @@ static qboolean	nomodecheck = false;
 unsigned short	d_8to16table[256];	// not used in 8 bpp mode
 unsigned		d_8to24table[256];	// not used in 8 bpp mode
 
-void VID_MenuDraw (void);
+void VID_MenuDraw();
 void VID_MenuKey (int key);
 
 
@@ -307,7 +307,7 @@ void    VID_ShiftPalette (unsigned char *palette)
 VID_Shutdown
 ================
 */
-void VID_Shutdown (void)
+void VID_Shutdown()
 {
 
 	regs.h.ah = 0;
@@ -323,7 +323,7 @@ void VID_Shutdown (void)
 VID_Update
 ================
 */
-void    VID_Update (vrect_t *rects)
+void    VID_Update (vrect_p rects)
 {
 	if (firstupdate && _vid_default_mode.value)
 	{
@@ -366,7 +366,7 @@ void    VID_Update (vrect_t *rects)
 VID_NumModes_f
 =================
 */
-void VID_NumModes_f (void)
+void VID_NumModes_f()
 {
 	int		nummodes;
 
@@ -383,7 +383,7 @@ void VID_NumModes_f (void)
 VID_DescribeCurrentMode_f
 =================
 */
-void VID_DescribeCurrentMode_f (void)
+void VID_DescribeCurrentMode_f()
 {
 	Con_Printf ("%s\n", VID_ModeInfo (vid_modenum, NULL));
 }
@@ -394,7 +394,7 @@ void VID_DescribeCurrentMode_f (void)
 VID_DescribeMode_f
 =================
 */
-void VID_DescribeMode_f (void)
+void VID_DescribeMode_f()
 {
 	int		modenum;
 
@@ -409,7 +409,7 @@ void VID_DescribeMode_f (void)
 VID_DescribeModes_f
 =================
 */
-void VID_DescribeModes_f (void)
+void VID_DescribeModes_f()
 {
 	int			i, nummodes;
 	char		*pinfo, *pheader;
@@ -475,7 +475,7 @@ char *VID_GetModeDescription (int mode)
 VID_TestMode_f
 =================
 */
-void VID_TestMode_f (void)
+void VID_TestMode_f()
 {
 	int		modenum;
 	double	testduration;
@@ -541,7 +541,7 @@ void D_EndDirectRect (int x, int y, int width, int height)
 
 //===========================================================================
 
-extern void M_Menu_Options_f (void);
+extern void M_Menu_Options_f();
 extern void M_Print (int cx, int cy, char *str);
 extern void M_PrintWhite (int cx, int cy, char *str);
 extern void M_DrawCharacter (int cx, int line, int num);
@@ -568,7 +568,7 @@ static modedesc_t	modedescs[MAX_MODEDESCS];
 VID_MenuDraw
 ================
 */
-void VID_MenuDraw (void)
+void VID_MenuDraw()
 {
 	qpic_t		*p;
 	char		*ptr;

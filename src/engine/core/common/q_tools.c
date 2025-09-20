@@ -9,7 +9,7 @@
 ============================================================================
 */
 
-void Q_memset(void* dest, int fill, int count){
+void Q_memset(typeless_ptr dest, int fill, int count){
 	if ( (((long)dest | count) & 3) == 0){
 		count >>= 2;
 		fill = fill | (fill<<8) | (fill<<16) | (fill<<24);
@@ -24,7 +24,7 @@ void Q_memset(void* dest, int fill, int count){
     }
 }
 
-void Q_memcpy(void* dest, void* src, int count){
+void Q_memcpy(typeless_ptr dest, typeless_ptr src, int count){
 	if (( ( (long)dest | (long)src | count) & 3) == 0 ){
 		count>>=2;
 		for (int i=0 ; i<count ; i++){
@@ -37,7 +37,7 @@ void Q_memcpy(void* dest, void* src, int count){
     }
 }
 
-int Q_memcmp(void* m1, void* m2, int count){
+int Q_memcmp(typeless_ptr m1, typeless_ptr m2, int count){
 	while(count){
 		count--;
 		if (((uint8_t* )m1)[count] != ((uint8_t* )m2)[count]){

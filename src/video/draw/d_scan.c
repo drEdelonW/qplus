@@ -30,7 +30,7 @@ fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
 int				*r_turb_turb;
 int				r_turb_spancount;
 
-void D_DrawTurbulent8Span (void);
+void D_DrawTurbulent8Span();
 
 
 /*
@@ -41,7 +41,7 @@ D_WarpScreen
 // the sine warp, to keep the edges from wrapping
 =============
 */
-void D_WarpScreen (void)
+void D_WarpScreen()
 {
 	int		w, h;
 	int		u,v;
@@ -97,7 +97,7 @@ void D_WarpScreen (void)
 D_DrawTurbulent8Span
 =============
 */
-void D_DrawTurbulent8Span (void)
+void D_DrawTurbulent8Span()
 {
 	int		sturb, tturb;
 

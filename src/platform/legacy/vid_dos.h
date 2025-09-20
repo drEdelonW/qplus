@@ -31,15 +31,15 @@ typedef struct vmode_s {
 	int			planar;
 	int			numpages;
 	void		*pextradata;
-	int			(*setmode)(viddef_t *vid, struct vmode_s *pcurrentmode);
-	void		(*swapbuffers)(viddef_t *vid, struct vmode_s *pcurrentmode,
-							   vrect_t *rects);
-	void		(*setpalette)(viddef_t *vid, struct vmode_s *pcurrentmode,
+	int			(*setmode)(viddef_p vid, struct vmode_s *pcurrentmode);
+	void		(*swapbuffers)(viddef_p vid, struct vmode_s *pcurrentmode,
+							   vrect_p rects);
+	void		(*setpalette)(viddef_p vid, struct vmode_s *pcurrentmode,
 							  unsigned char *palette);
-	void		(*begindirectrect)(viddef_t *vid, struct vmode_s *pcurrentmode,
+	void		(*begindirectrect)(viddef_p vid, struct vmode_s *pcurrentmode,
 								   int x, int y, byte *pbitmap, int width,
 								   int height);
-	void		(*enddirectrect)(viddef_t *vid, struct vmode_s *pcurrentmode,
+	void		(*enddirectrect)(viddef_p vid, struct vmode_s *pcurrentmode,
 								 int x, int y, int width, int height);
 } vmode_t;
 
@@ -64,21 +64,21 @@ extern unsigned char colormap256[32][256];
 extern void	*vid_surfcache;
 extern int	vid_surfcachesize;
 
-void VGA_Init (void);
-void VID_InitVESA (void);
-void VID_InitExtra (void);
-void VGA_WaitVsync (void);
+void VGA_Init();
+void VID_InitVESA();
+void VID_InitExtra();
+void VGA_WaitVsync();
 void VGA_ClearVideoMem (int planar);
-void VGA_SetPalette(viddef_t *vid, vmode_t *pcurrentmode, unsigned char *pal);
-void VGA_SwapBuffersCopy (viddef_t *vid, vmode_t *pcurrentmode,
-	vrect_t *rects);
-qboolean VGA_FreeAndAllocVidbuffer (viddef_t *vid, int allocnewbuffer);
+void VGA_SetPalette(viddef_p vid, vmode_t *pcurrentmode, unsigned char *pal);
+void VGA_SwapBuffersCopy (viddef_p vid, vmode_t *pcurrentmode,
+	vrect_p rects);
+qboolean VGA_FreeAndAllocVidbuffer (viddef_p vid, int allocnewbuffer);
 qboolean VGA_CheckAdequateMem (int width, int height, int rowbytes,
 	int allocnewbuffer);
-void VGA_BeginDirectRect (viddef_t *vid, struct vmode_s *pcurrentmode, int x,
+void VGA_BeginDirectRect (viddef_p vid, struct vmode_s *pcurrentmode, int x,
 	int y, byte *pbitmap, int width, int height);
-void VGA_EndDirectRect (viddef_t *vid, struct vmode_s *pcurrentmode, int x,
+void VGA_EndDirectRect (viddef_p vid, struct vmode_s *pcurrentmode, int x,
 	int y, int width, int height);
-void VGA_UpdateLinearScreen (void *srcptr, void *destptr, int width,
+void VGA_UpdateLinearScreen (typeless_ptr srcptr, typeless_ptr destptr, int width,
 	int height, int srcrowbytes, int destrowbytes);
 

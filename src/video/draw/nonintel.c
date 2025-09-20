@@ -54,7 +54,7 @@ void R_Surf16Patch ()
 R_SurfacePatch
 ================
 */
-void R_SurfacePatch (void)
+void R_SurfacePatch()
 {
 	// we only patch code on Intel
 }

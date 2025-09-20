@@ -94,7 +94,7 @@ Called by drivers when a new communications endpoint is required
 The sequence and buffer fields will be filled in properly
 ===================
 */
-qsocket_t *NET_NewQSocket (void)
+qsocket_t *NET_NewQSocket()
 {
 	qsocket_t	*sock;
 
@@ -159,7 +159,7 @@ void NET_FreeQSocket(qsocket_t *sock)
 }
 
 
-static void NET_Listen_f (void)
+static void NET_Listen_f()
 {
 	if (Cmd_Argc () != 2)
 	{
@@ -178,7 +178,7 @@ static void NET_Listen_f (void)
 }
 
 
-static void MaxPlayers_f (void)
+static void MaxPlayers_f()
 {
 	int 	n;
 
@@ -217,7 +217,7 @@ static void MaxPlayers_f (void)
 }
 
 
-static void NET_Port_f (void)
+static void NET_Port_f()
 {
 	int 	n;
 
@@ -278,7 +278,7 @@ static void PrintSlistTrailer(void)
 }
 
 
-void NET_Slist_f (void)
+void NET_Slist_f()
 {
 	if (slistInProgress)
 		return;
@@ -441,7 +441,7 @@ struct
 	long	session;
 } vcrConnect;
 
-qsocket_t *NET_CheckNewConnections (void)
+qsocket_t *NET_CheckNewConnections()
 {
 	qsocket_t	*ret;
 
@@ -788,7 +788,7 @@ NET_Init
 ====================
 */
 
-void NET_Init (void)
+void NET_Init()
 {
 	int			i;
 	int			controlSocket;
@@ -880,7 +880,7 @@ NET_Shutdown
 ====================
 */
 
-void		NET_Shutdown (void)
+void		NET_Shutdown()
 {
 	qsocket_t	*sock;
 

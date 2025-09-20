@@ -26,7 +26,7 @@ qboolean	localconnectpending = false;
 qsocket_t	*loop_client = NULL;
 qsocket_t	*loop_server = NULL;
 
-int Loop_Init (void)
+int Loop_Init()
 {
 	if (cls.state == ca_dedicated)
 		return -1;
@@ -34,7 +34,7 @@ int Loop_Init (void)
 }
 
 
-void Loop_Shutdown (void)
+void Loop_Shutdown()
 {
 }
 
@@ -95,14 +95,14 @@ qsocket_t *Loop_Connect (char *host)
 	loop_server->sendMessageLength = 0;
 	loop_server->canSend = true;
 
-	loop_client->driverdata = (void *)loop_server;
-	loop_server->driverdata = (void *)loop_client;
+	loop_client->driverdata = (typeless_ptr )loop_server;
+	loop_server->driverdata = (typeless_ptr )loop_client;
 
 	return loop_client;
 }
 
 
-qsocket_t *Loop_CheckNewConnections (void)
+qsocket_t *Loop_CheckNewConnections()
 {
 	if (!localconnectpending)
 		return NULL;

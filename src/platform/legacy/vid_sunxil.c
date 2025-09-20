@@ -76,7 +76,7 @@ typedef struct
     char	desc[256];
 } modedesc_t;
 
-extern void M_Menu_Options_f (void);
+extern void M_Menu_Options_f();
 extern void M_Print (int cx, int cy, char *str);
 extern void M_PrintWhite (int cx, int cy, char *str);
 extern void M_DrawCharacter (int cx, int line, int num);
@@ -194,7 +194,7 @@ Keybinding command
 
 byte vid_gamma[256];
 
-void VID_Gamma_f (void)
+void VID_Gamma_f()
 {
 
 	float	g, f, inf;
@@ -220,7 +220,7 @@ void VID_Gamma_f (void)
 
 }
 
-qboolean CheckPixelMultiply (void)
+qboolean CheckPixelMultiply()
 {
 	int m;
 	int w, h;
@@ -683,7 +683,7 @@ VID_ResetFramebuffer_MT()
 	XilImage drain_renderpipeline();
 	XilImage old_display_image;
 
-	void * update_thread();
+	typeless_ptr  update_thread();
 
 	printf("VID_ResetFramebuffer: vid.width %d, vid.height %d\n", vid.width, vid.height);
 
@@ -733,7 +733,7 @@ void VID_SetPalette(unsigned char *palette)
 
 // Called at shutdown
 
-void	VID_Shutdown (void)
+void	VID_Shutdown()
 {
 	X11_active = false;
 	Con_Printf("VID_Shutdown\n");
@@ -925,9 +925,9 @@ void GetEvent(void)
 // flushes the given rectangles from the view buffer to the screen
 
 void
-VID_Update (vrect_t *rects)
+VID_Update (vrect_p rects)
 {
-	void VID_Update_MT(vrect_t *);
+	void VID_Update_MT(vrect_p );
 
 
 	if (count_frames) {
@@ -1019,7 +1019,7 @@ VID_Update (vrect_t *rects)
 }
 
 void
-VID_Update_MT (vrect_t *rects)
+VID_Update_MT (vrect_p rects)
 {
 	XilImage sched_update();
 
@@ -1136,7 +1136,7 @@ sched_update(XilImage image)
 	return (new);
 }
 
-void *update_thread()
+typeless_ptr update_thread()
 {
 	XilImage image;
 
@@ -1214,7 +1214,7 @@ void Sys_SendKeyEvents(void)
 			   }
 }
 
-void IN_Init (void)
+void IN_Init()
 {
 	Cvar_RegisterVariable(&_windowed_mouse);
 	Cvar_RegisterVariable(&m_filter);
@@ -1224,12 +1224,12 @@ void IN_Init (void)
    mouse_avail = 1;
 }
 
-void IN_Shutdown (void)
+void IN_Shutdown()
 {
    mouse_avail = 0;
 }
 
-void IN_Commands (void)
+void IN_Commands()
 {
 	int i;
 

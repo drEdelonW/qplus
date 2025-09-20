@@ -65,23 +65,26 @@ typedef struct{
 
 //===========================================================================
 
-#define	DIST_NOT_SET	98765
+#define	DIST_NOT_SET	(98765) 
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct clipplane_s{
-	vec3_t		normal;
-	float		dist;
-	struct		clipplane_s	*next;
-	byte		leftedge;
-	byte		rightedge;
-	byte		reserved[2];
-} clipplane_t;
+struct clipplane_s;
+typedef struct clipplane_s clipplane_t;
+typedef clipplane_t* clipplane_p;
+struct clipplane_s{
+	vec3_t      normal;
+	float       dist;
+	clipplane_p next;
+	byte        leftedge;
+	byte        rightedge;
+	byte        reserved[2];
+};
 
 extern	clipplane_t	view_clipplanes[4];
 
 //=============================================================================
 
-void R_RenderWorld (void);
+void R_RenderWorld();
 
 //=============================================================================
 
@@ -102,8 +105,8 @@ extern	int		r_visframecount;
 extern int	vstartscan;
 
 
-void R_ClearPolyList (void);
-void R_DrawPolyList (void);
+void R_ClearPolyList();
+void R_DrawPolyList();
 
 //
 // current entity info
@@ -112,51 +115,51 @@ extern	qboolean		insubmodel;
 extern	vec3_t			r_worldmodelorg;
 
 
-void R_DrawSprite (void);
-void R_RenderFace (msurface_t *fa, int clipflags);
-void R_RenderPoly (msurface_t *fa, int clipflags);
-void R_RenderBmodelFace (bedge_t *pedges, msurface_t *psurf);
-void R_TransformPlane (mplane_t *p, float *normal, float *dist);
-void R_TransformFrustum (void);
-void R_SetSkyFrame (void);
-void R_DrawSurfaceBlock16 (void);
-void R_DrawSurfaceBlock8 (void);
-texture_t *R_TextureAnimation (texture_t *base);
+void R_DrawSprite();
+void R_RenderFace (msurface_t* fa, int clipflags);
+void R_RenderPoly (msurface_t* fa, int clipflags);
+void R_RenderBmodelFace (bedge_t* pedges, msurface_t* psurf);
+void R_TransformPlane (mplane_t* p, float* normal, float* dist);
+void R_TransformFrustum();
+void R_SetSkyFrame();
+void R_DrawSurfaceBlock16();
+void R_DrawSurfaceBlock8();
+texture_t* R_TextureAnimation (texture_t* base);
 
 #if	id386
 
-void R_DrawSurfaceBlock8_mip0 (void);
-void R_DrawSurfaceBlock8_mip1 (void);
-void R_DrawSurfaceBlock8_mip2 (void);
-void R_DrawSurfaceBlock8_mip3 (void);
+void R_DrawSurfaceBlock8_mip0();
+void R_DrawSurfaceBlock8_mip1();
+void R_DrawSurfaceBlock8_mip2();
+void R_DrawSurfaceBlock8_mip3();
 
 #endif
 
-void R_GenSkyTile (void *pdest);
-void R_GenSkyTile16 (void *pdest);
-void R_Surf8Patch (void);
-void R_Surf16Patch (void);
-void R_DrawSubmodelPolygons (model_t *pmodel, int clipflags);
-void R_DrawSolidClippedSubmodelPolygons (model_t *pmodel);
+void R_GenSkyTile (typeless_ptr pdest);
+void R_GenSkyTile16 (typeless_ptr pdest);
+void R_Surf8Patch();
+void R_Surf16Patch();
+void R_DrawSubmodelPolygons (model_t* pmodel, int clipflags);
+void R_DrawSolidClippedSubmodelPolygons (model_t* pmodel);
 
-void R_AddPolygonEdges (emitpoint_t *pverts, int numverts, int miplevel);
-surf_t *R_GetSurf (void);
-void R_AliasDrawModel (alight_t *plighting);
-void R_BeginEdgeFrame (void);
-void R_ScanEdges (void);
-void D_DrawSurfaces (void);
-void R_InsertNewEdges (edge_t *edgestoadd, edge_t *edgelist);
-void R_StepActiveU (edge_t *pedge);
-void R_RemoveEdges (edge_t *pedge);
+void R_AddPolygonEdges (emitpoint_t* pverts, int numverts, int miplevel);
+surf_t* R_GetSurf();
+void R_AliasDrawModel (alight_t* plighting);
+void R_BeginEdgeFrame();
+void R_ScanEdges();
+void D_DrawSurfaces();
+void R_InsertNewEdges (edge_ptr edgestoadd, edge_ptr edgelist);
+void R_StepActiveU (edge_ptr pedge);
+void R_RemoveEdges (edge_ptr pedge);
 
-extern void R_Surf8Start (void);
-extern void R_Surf8End (void);
-extern void R_Surf16Start (void);
-extern void R_Surf16End (void);
-extern void R_EdgeCodeStart (void);
-extern void R_EdgeCodeEnd (void);
+extern void R_Surf8Start();
+extern void R_Surf8End();
+extern void R_Surf16Start();
+extern void R_Surf16End();
+extern void R_EdgeCodeStart();
+extern void R_EdgeCodeEnd();
 
-extern void R_RotateBmodel (void);
+extern void R_RotateBmodel();
 
 extern int	c_faceclip;
 extern int	r_polycount;
@@ -177,7 +180,7 @@ extern fixed16_t	bbextents, bbextentt;
 
 #define MAXBVERTINDEXES	1000	// new clipped vertices when clipping bmodels
 								//  to the world BSP
-extern mvertex_t	*r_ptverts, *r_ptvertsmax;
+extern mvertex_t	*r_ptverts,* r_ptvertsmax;
 
 extern vec3_t			sbaseaxis[3], tbaseaxis[3];
 extern float			entity_rotation[3][3];
@@ -197,8 +200,8 @@ typedef struct btofpoly_s {
 extern int			numbtofpolys;
 extern btofpoly_t	*pbtofpolys;
 
-void	R_InitTurb (void);
-void	R_ZDrawSubmodelPolys (model_t *clmodel);
+void	R_InitTurb();
+void	R_ZDrawSubmodelPolys (model_t* clmodel);
 
 //=========================================================
 // Alias models
@@ -215,10 +218,10 @@ extern aliashdr_t		*paliashdr;
 extern mdl_t			*pmdl;
 extern float			leftclip, topclip, rightclip, bottomclip;
 extern int				r_acliptype;
-extern finalvert_t		*pfinalverts;
+extern finalvert_p      pfinalverts;
 extern auxvert_t		*pauxverts;
 
-qboolean R_AliasCheckBBox (void);
+qboolean R_AliasCheckBBox();
 
 //=========================================================
 // turbulence stuff
@@ -230,19 +233,19 @@ qboolean R_AliasCheckBBox (void);
 //=========================================================
 // particle stuff
 
-void R_DrawParticles (void);
-void R_InitParticles (void);
-void R_ClearParticles (void);
-void R_ReadPointFile_f (void);
-void R_SurfacePatch (void);
+void R_DrawParticles();
+void R_InitParticles();
+void R_ClearParticles();
+void R_ReadPointFile_f();
+void R_SurfacePatch();
 
 extern int		r_amodels_drawn;
-extern edge_t	*auxedges;
+extern edge_ptr auxedges;
 extern int		r_numallocatededges;
-extern edge_t	*r_edges, *edge_p, *edge_max;
+extern edge_ptr r_edges, edge_p, edge_max;
 
-extern	edge_t	*newedges[MAXHEIGHT];
-extern	edge_t	*removeedges[MAXHEIGHT];
+extern	edge_ptr newedges[MAXHEIGHT];
+extern	edge_ptr removeedges[MAXHEIGHT];
 
 extern	int	screenwidth;
 
@@ -251,7 +254,7 @@ extern	edge_t	edge_head;
 extern	edge_t	edge_tail;
 extern	edge_t	edge_aftertail;
 extern int		r_bmodelactive;
-extern vrect_t	*pconupdate;
+extern vrect_p pconupdate;
 
 extern float		aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
 extern float		r_aliastransition, r_resfudge;
@@ -262,7 +265,7 @@ extern int		r_outofedges;
 extern mvertex_t	*r_pcurrentvertbase;
 extern int			r_maxvalidedgeoffset;
 
-void R_AliasClipTriangle (mtriangle_t *ptri);
+void R_AliasClipTriangle (mtriangle_t* ptri);
 
 extern float	r_time1;
 extern float	dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2;
@@ -273,7 +276,7 @@ extern qboolean	r_surfsonstack;
 extern cshift_t	cshift_water;
 extern qboolean	r_dowarpold, r_viewchanged;
 
-extern mleaf_t	*r_viewleaf, *r_oldviewleaf;
+extern mleaf_t	*r_viewleaf,* r_oldviewleaf;
 
 extern vec3_t	r_emins, r_emaxs;
 extern mnode_t	*r_pefragtopnode;
@@ -281,19 +284,19 @@ extern int		r_clipflags;
 extern int		r_dlightframecount;
 extern qboolean	r_fov_greater_than_90;
 
-void R_StoreEfrags (efrag_t **ppefrag);
-void R_TimeRefresh_f (void);
-void R_TimeGraph (void);
-void R_PrintAliasStats (void);
-void R_PrintTimes (void);
-void R_PrintDSpeeds (void);
-void R_AnimateLight (void);
+void R_StoreEfrags (efrag_t* *ppefrag);
+void R_TimeRefresh_f();
+void R_TimeGraph();
+void R_PrintAliasStats();
+void R_PrintTimes();
+void R_PrintDSpeeds();
+void R_AnimateLight();
 int R_LightPoint (vec3_t p);
-void R_SetupFrame (void);
-void R_cshift_f (void);
-void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1);
-void R_ClipEdge (mvertex_t *pv0, mvertex_t *pv1, clipplane_t *clip);
-void R_SplitEntityOnNode2 (mnode_t *node);
-void R_MarkLights (dlight_t *light, int bit, mnode_t *node);
+void R_SetupFrame();
+void R_cshift_f();
+void R_EmitEdge (mvertex_t* pv0, mvertex_t* pv1);
+void R_ClipEdge (mvertex_t* pv0, mvertex_t* pv1, clipplane_t* clip);
+void R_SplitEntityOnNode2 (mnode_t* node);
+void R_MarkLights (dlight_t* light, int bit, mnode_t* node);
 
 #endif

@@ -45,10 +45,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //===================================================================
 
-extern void	R_DrawLine(polyvert_t *polyvert0, polyvert_t *polyvert1);
+extern void	R_DrawLine(polyvert_p polyvert0, polyvert_p polyvert1);
 
 extern int		cachewidth;
-extern pixel_t	*cacheblock;
+extern pixel_p cacheblock;
 extern int		screenwidth;
 
 extern	float	pixelAspect;
@@ -61,7 +61,7 @@ extern int	intsintable[SIN_BUFFER_SIZE];
 extern	vec3_t	vup, base_vup;
 extern	vec3_t	vpn, base_vpn;
 extern	vec3_t	vright, base_vright;
-extern	entity_t		*currententity;
+extern	entity_t*   currententity;
 
 #define NUMSTACKEDGES		2400
 #define	MINEDGES			NUMSTACKEDGES
@@ -82,11 +82,10 @@ struct espan_s {
 
 // FIXME: compress, make a union if that will help
 // insubmodel is only 1, flags is fewer than 32, spanstate could be a byte
-typedef struct surf_s
-{
-	struct surf_s	*next;			// active surface stack in r_edge.c
-	struct surf_s	*prev;			// used in r_edge.c for active surf stack
-	struct espan_s	*spans;			// pointer to linked list of spans to draw
+typedef struct surf_s{
+	struct surf_s*  next;			// active surface stack in r_edge.c
+	struct surf_s*  prev;			// used in r_edge.c for active surf stack
+	struct espan_s* spans;			// pointer to linked list of spans to draw
 	int			key;				// sorting key (BSP order)
 	int			last_u;				// set during tracing
 	int			spanstate;			// 0 = not in span
@@ -94,8 +93,8 @@ typedef struct surf_s
 									// -1 = in inverted span (end before
 									//  start)
 	int			flags;				// currentface flags
-	void		*data;				// associated data like msurface_t
-	entity_t	*entity;
+	typeless_ptr       data;				// associated data like msurface_t
+	entity_t*   entity;
 	float		nearzi;				// nearest 1/z on surface, for mipmapping
 	qboolean	insubmodel;
 	float		d_ziorigin, d_zistepu, d_zistepv;
@@ -104,7 +103,7 @@ typedef struct surf_s
 } surf_t;
 typedef surf_t* surf_p;
 
-extern	surf_t	*surfaces, *surface_p, *surf_max;
+extern	surf_p	surfaces, surface_p, surf_max;
 
 // surfaces are generated in back to front order by the bsp, so if a surf
 // pointer is greater than another one, it should be drawn in front

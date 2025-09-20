@@ -102,7 +102,7 @@ char *StrAddr (struct qsockaddr *addr)
 unsigned long banAddr = 0x00000000;
 unsigned long banMask = 0xffffffff;
 
-void NET_Ban_f (void)
+void NET_Ban_f()
 {
 	char	addrStr [32];
 	char	maskStr [32];
@@ -567,7 +567,7 @@ static void Test_Poll(void){
 	}
 }
 
-static void Test_f (void)
+static void Test_f()
 {
 	char	*host;
 	int		n;
@@ -696,7 +696,7 @@ Done:
 	return;
 }
 
-static void Test2_f (void)
+static void Test2_f()
 {
 	char	*host;
 	int		n;
@@ -754,7 +754,7 @@ JustDoIt:
 }
 
 
-int Datagram_Init (void)
+int Datagram_Init()
 {
 	int i;
 	int csock;
@@ -784,7 +784,7 @@ int Datagram_Init (void)
 }
 
 
-void Datagram_Shutdown (void)
+void Datagram_Shutdown()
 {
 	int i;
 
@@ -1073,7 +1073,7 @@ static qsocket_t *_Datagram_CheckNewConnections(void){
 	return sock;
 }
 
-qsocket_t *Datagram_CheckNewConnections (void)
+qsocket_t *Datagram_CheckNewConnections()
 {
 	qsocket_t *ret = NULL;
 

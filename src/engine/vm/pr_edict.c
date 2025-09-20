@@ -34,10 +34,10 @@ int				pr_edict_size;	// in bytes
 
 unsigned short		pr_crc;
 
-int		type_size[8] = {1,sizeof(string_t)/4,1,3,1,1,sizeof(func_t)/4,sizeof(void *)/4};
+int		type_size[8] = {1,sizeof(string_t)/4,1,3,1,1,sizeof(func_t)/4,sizeof(typeless_ptr )/4};
 
 ddef_t *ED_FieldAtOfs (int ofs);
-qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s);
+qboolean	ED_ParseEpair (typeless_ptr base, ddef_t *key, char *s);
 
 
 #define	MAX_FIELD_LEN	64
@@ -74,7 +74,7 @@ instead of being removed and recreated, which can cause interpolated
 angles and bad trails.
 =================
 */
-edict_t *ED_Alloc (void)
+edict_t *ED_Alloc()
 {
 	int			i;
 	edict_t		*e;
@@ -376,7 +376,7 @@ char *PR_GlobalString (int ofs)
 	void	*val;
 	static char	line[128];
 
-	val = (void *)&pr_globals[ofs];
+	val = (typeless_ptr )&pr_globals[ofs];
 	def = ED_GlobalAtOfs(ofs);
 	if (!def)
 		sprintf (line, "%i(???)", ofs);
@@ -524,7 +524,7 @@ ED_PrintEdicts
 For debugging, prints all the entities in the current server
 =============
 */
-void ED_PrintEdicts (void)
+void ED_PrintEdicts()
 {
 	int		i;
 
@@ -540,7 +540,7 @@ ED_PrintEdict_f
 For debugging, prints a single edicy
 =============
 */
-void ED_PrintEdict_f (void)
+void ED_PrintEdict_f()
 {
 	int		i;
 
@@ -560,7 +560,7 @@ ED_Count
 For debugging
 =============
 */
-void ED_Count (void)
+void ED_Count()
 {
 	int		i;
 	edict_t	*ent;
@@ -667,7 +667,7 @@ void ED_ParseGlobals (char *data)
 			continue;
 		}
 
-		if (!ED_ParseEpair ((void *)pr_globals, key, com_token))
+		if (!ED_ParseEpair ((typeless_ptr )pr_globals, key, com_token))
 			Host_Error ("ED_ParseGlobals: parse error");
 	}
 }
@@ -715,7 +715,7 @@ Can parse either fields or globals
 returns false if error
 =============
 */
-qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s)
+qboolean	ED_ParseEpair (typeless_ptr base, ddef_t *key, char *s)
 {
 	int		i;
 	char	string[128];
@@ -724,7 +724,7 @@ qboolean	ED_ParseEpair (void *base, ddef_t *key, char *s)
 	void	*d;
 	dfunction_t	*func;
 
-	d = (void *)((int *)base + key->ofs);
+	d = (typeless_ptr )((int *)base + key->ofs);
 
 	switch (key->type & ~DEF_SAVEGLOBAL)
 	{
@@ -866,7 +866,7 @@ strcpy (temp, com_token);
 sprintf (com_token, "0 %s 0", temp);
 }
 
-		if (!ED_ParseEpair ((void *)&ent->v, key, com_token))
+		if (!ED_ParseEpair ((typeless_ptr )&ent->v, key, com_token))
 			Host_Error ("ED_ParseEdict: parse error");
 	}
 
@@ -972,7 +972,7 @@ void ED_LoadFromFile (char *data)
 PR_LoadProgs
 ===============
 */
-void PR_LoadProgs (void)
+void PR_LoadProgs()
 {
 	int		i;
 

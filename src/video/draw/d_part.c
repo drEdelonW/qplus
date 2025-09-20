@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 D_EndParticles
 ==============
 */
-void D_EndParticles (void)
+void D_EndParticles()
 {
 // not used by software driver
 }
@@ -39,7 +39,7 @@ void D_EndParticles (void)
 D_StartParticles
 ==============
 */
-void D_StartParticles (void)
+void D_StartParticles()
 {
 // not used by software driver
 }
@@ -52,7 +52,7 @@ void D_StartParticles (void)
 D_DrawParticle
 ==============
 */
-void D_DrawParticle (particle_t *pparticle)
+void D_DrawParticle (particle_p pparticle)
 {
 	vec3_t	local, transformed;
 	float	zi;

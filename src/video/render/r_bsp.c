@@ -76,7 +76,7 @@ void R_EntityRotate (vec3_t vec)
 R_RotateBmodel
 ================
 */
-void R_RotateBmodel (void)
+void R_RotateBmodel()
 {
 	float	angle, s, c, temp1[3][3], temp2[3][3], temp3[3][3];
 
@@ -645,7 +645,7 @@ void R_RecursiveWorldNode (mnode_t *node, int clipflags)
 R_RenderWorld
 ================
 */
-void R_RenderWorld (void)
+void R_RenderWorld()
 {
 	int			i;
 	model_t		*clmodel;

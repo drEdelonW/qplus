@@ -57,11 +57,11 @@ void	VID_Init (unsigned char *palette)
 	D_InitCaches (surfcache, sizeof(surfcache));
 }
 
-void	VID_Shutdown (void)
+void	VID_Shutdown()
 {
 }
 
-void	VID_Update (vrect_t *rects)
+void	VID_Update (vrect_p rects)
 {
 }
 

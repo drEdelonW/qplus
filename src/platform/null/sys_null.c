@@ -33,7 +33,7 @@ FILE IO
 #define MAX_HANDLES             10
 FILE    *sys_handles[MAX_HANDLES];
 
-int             findhandle (void)
+int             findhandle()
 {
 	int             i;
 
@@ -107,12 +107,12 @@ void Sys_FileSeek (int handle, int position)
 	fseek (sys_handles[handle], position, SEEK_SET);
 }
 
-int Sys_FileRead (int handle, void *dest, int count)
+int Sys_FileRead (int handle, typeless_ptr dest, int count)
 {
 	return fread (dest, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileWrite (int handle, void *data, int count)
+int Sys_FileWrite (int handle, typeless_ptr data, int count)
 {
 	return fwrite (data, 1, count, sys_handles[handle]);
 }
@@ -171,12 +171,12 @@ void Sys_Printf (char *fmt, ...)
 	va_end (argptr);
 }
 
-void Sys_Quit (void)
+void Sys_Quit()
 {
 	exit (0);
 }
 
-double Sys_FloatTime (void)
+double Sys_FloatTime()
 {
 	static double t;
 
@@ -185,24 +185,24 @@ double Sys_FloatTime (void)
 	return t;
 }
 
-char *Sys_ConsoleInput (void)
+char *Sys_ConsoleInput()
 {
 	return NULL;
 }
 
-void Sys_Sleep (void)
+void Sys_Sleep()
 {
 }
 
-void Sys_SendKeyEvents (void)
+void Sys_SendKeyEvents()
 {
 }
 
-void Sys_HighFPPrecision (void)
+void Sys_HighFPPrecision()
 {
 }
 
-void Sys_LowFPPrecision (void)
+void Sys_LowFPPrecision()
 {
 }
 

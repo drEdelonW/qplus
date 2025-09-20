@@ -34,8 +34,8 @@ have a sentinal at both ends?
 #endif
 
 
-edge_t	*auxedges;
-edge_t	*r_edges, *edge_p, *edge_max;
+edge_ptr auxedges;
+edge_ptr r_edges, edge_p, edge_max;
 
 surf_p	surfaces, surface_p, surf_max;
 
@@ -43,8 +43,8 @@ surf_p	surfaces, surface_p, surf_max;
 // pointer is greater than another one, it should be drawn in front
 // surfaces[1] is the background, and is used as the active surface stack
 
-edge_t	*newedges[MAXHEIGHT];
-edge_t	*removeedges[MAXHEIGHT];
+edge_ptr newedges[MAXHEIGHT];
+edge_ptr removeedges[MAXHEIGHT];
 
 espan_p span_p;
 espan_p max_span_p;
@@ -69,9 +69,9 @@ float	fv;
 void R_GenerateSpans();
 void R_GenerateSpansBackward();
 
-void R_LeadingEdge (edge_t* edge);
-void R_LeadingEdgeBackwards (edge_t* edge);
-void R_TrailingEdge (surf_p surf, edge_t* edge);
+void R_LeadingEdge (edge_ptr  edge);
+void R_LeadingEdgeBackwards (edge_ptr  edge);
+void R_TrailingEdge (surf_p surf, edge_ptr  edge);
 
 
 //=============================================================================
@@ -171,9 +171,9 @@ sentinel at the end (actually, this is the active edge table starting at
 edge_head.next).
 ==============
 */
-void R_InsertNewEdges (edge_t* edgestoadd, edge_t* edgelist)
+void R_InsertNewEdges (edge_ptr  edgestoadd, edge_ptr  edgelist)
 {
-	edge_t	*next_edge;
+	edge_ptr next_edge;
 
 	do
 	{
@@ -212,7 +212,7 @@ addedge:
 R_RemoveEdges
 ==============
 */
-void R_RemoveEdges (edge_t* pedge)
+void R_RemoveEdges (edge_ptr  pedge)
 {
 
 	do
@@ -232,9 +232,9 @@ void R_RemoveEdges (edge_t* pedge)
 R_StepActiveU
 ==============
 */
-void R_StepActiveU (edge_t* pedge)
+void R_StepActiveU (edge_ptr  pedge)
 {
-	edge_t		*pnext_edge, *pwedge;
+	edge_ptr  pnext_edge, pwedge;
 
 	while (1)
 	{
@@ -334,7 +334,7 @@ void R_CleanupSpan ()
 R_LeadingEdgeBackwards
 ==============
 */
-void R_LeadingEdgeBackwards (edge_t* edge)
+void R_LeadingEdgeBackwards (edge_ptr  edge)
 {
 	espan_p  span;
 	surf_p			surf, surf2;
@@ -414,7 +414,7 @@ gotposition:
 R_TrailingEdge
 ==============
 */
-void R_TrailingEdge (surf_p surf, edge_t* edge)
+void R_TrailingEdge (surf_p surf, edge_ptr  edge)
 {
 	espan_p  span;
 	int				iu;
@@ -458,8 +458,7 @@ void R_TrailingEdge (surf_p surf, edge_t* edge)
 R_LeadingEdge
 ==============
 */
-void R_LeadingEdge (edge_t* edge)
-{
+void R_LeadingEdge(edge_ptr  edge){
 	espan_p span;
 	surf_p  surf, surf2;
 	int				iu;
@@ -588,7 +587,7 @@ R_GenerateSpans
 */
 void R_GenerateSpans()
 {
-	edge_t			*edge;
+	edge_ptr edge;
 	surf_p  surf;
 
 	r_bmodelactive = 0;
@@ -627,7 +626,7 @@ R_GenerateSpansBackward
 */
 void R_GenerateSpansBackward()
 {
-	edge_t			*edge;
+	edge_ptr edge;
 
 	r_bmodelactive = 0;
 

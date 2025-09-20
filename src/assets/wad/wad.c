@@ -122,16 +122,16 @@ lumpinfo_t	*W_GetLumpinfo (char *name)
 	return NULL;
 }
 
-void *W_GetLumpName (char *name)
+typeless_ptr W_GetLumpName (char *name)
 {
 	lumpinfo_t	*lump;
 
 	lump = W_GetLumpinfo (name);
 
-	return (void *)(wad_base + lump->filepos);
+	return (typeless_ptr )(wad_base + lump->filepos);
 }
 
-void *W_GetLumpNum (int num)
+typeless_ptr W_GetLumpNum (int num)
 {
 	lumpinfo_t	*lump;
 
@@ -140,7 +140,7 @@ void *W_GetLumpNum (int num)
 
 	lump = wad_lumps + num;
 
-	return (void *)(wad_base + lump->filepos);
+	return (typeless_ptr )(wad_base + lump->filepos);
 }
 
 /*

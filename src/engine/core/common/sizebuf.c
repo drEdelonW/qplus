@@ -30,7 +30,7 @@ void SZ_Clear (sizebuf_t *buf)
 	buf->cursize = 0;
 }
 
-void *SZ_GetSpace (sizebuf_t *buf, int length)
+typeless_ptr SZ_GetSpace (sizebuf_t *buf, int length)
 {
 	void    *data;
 
@@ -53,7 +53,7 @@ void *SZ_GetSpace (sizebuf_t *buf, int length)
 	return data;
 }
 
-void SZ_Write (sizebuf_t *buf, void *data, int length)
+void SZ_Write (sizebuf_t *buf, typeless_ptr data, int length)
 {
 	Q_memcpy (SZ_GetSpace(buf,length),data,length);
 }

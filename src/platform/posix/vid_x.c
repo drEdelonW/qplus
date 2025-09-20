@@ -99,7 +99,7 @@ static long X11_highhunkmark;
 static long X11_buffersize;
 
 int vid_surfcachesize;
-void *vid_surfcache;
+typeless_ptr vid_surfcache;
 
 extern void (*vid_menudrawfn)(void);
 extern void (*vid_menukeyfn)(int key);
@@ -414,7 +414,7 @@ void ResetSharedFrameBuffers(void)
 
 		// attach to the shared memory segment
 		x_shminfo[frm].shmaddr =
-			(void *) shmat(x_shminfo[frm].shmid, 0, 0);
+			(typeless_ptr ) shmat(x_shminfo[frm].shmid, 0, 0);
 
 		printf("VID: shared memory id=%d, addr=0x%lx\n", x_shminfo[frm].shmid,
 			(long) x_shminfo[frm].shmaddr);
@@ -656,9 +656,9 @@ void	VID_Init (unsigned char *palette)
 
 	current_framebuffer = 0;
 	vid.rowbytes = x_framebuffer[0]->bytes_per_line;
-	vid.buffer = (pixel_t*)x_framebuffer[0]->data;
+	vid.buffer = (pixel_p)x_framebuffer[0]->data;
 	vid.direct = 0;
-	vid.conbuffer = (pixel_t*)x_framebuffer[0]->data;
+	vid.conbuffer = (pixel_p)x_framebuffer[0]->data;
 	vid.conrowbytes = vid.rowbytes;
 	vid.conwidth = vid.width;
 	vid.conheight = vid.height;
@@ -705,7 +705,7 @@ void VID_SetPalette(unsigned char *palette)
 
 // Called at shutdown
 
-void	VID_Shutdown (void)
+void	VID_Shutdown()
 {
 	Con_Printf("VID_Shutdown\n");
 	XAutoRepeatOn(x_disp);
@@ -951,7 +951,7 @@ void GetEvent(void)
 
 // flushes the given rectangles from the view buffer to the screen
 
-void	VID_Update (vrect_t *rects)
+void	VID_Update (vrect_p rects)
 {
 	// vrect_t full;
 
@@ -1086,7 +1086,7 @@ void Sys_SendKeyEvents(void)
 }
 
 #if 0
-char *Sys_ConsoleInput (void)
+char *Sys_ConsoleInput()
 {
 
 	static char	text[256];
@@ -1126,7 +1126,7 @@ void D_EndDirectRect (int x, int y, int width, int height)
 // direct drawing of the "accessing disk" icon isn't supported under Linux
 }
 
-void IN_Init (void)
+void IN_Init()
 {
 	Cvar_RegisterVariable(&_windowed_mouse);
 	Cvar_RegisterVariable(&m_filter);
@@ -1136,12 +1136,12 @@ void IN_Init (void)
    mouse_avail = 1;
 }
 
-void IN_Shutdown (void)
+void IN_Shutdown()
 {
    mouse_avail = 0;
 }
 
-void IN_Commands (void)
+void IN_Commands()
 {
 	int i;
 

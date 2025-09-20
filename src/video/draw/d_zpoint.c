@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 D_DrawZPoint
 =====================
 */
-void D_DrawZPoint (void)
+void D_DrawZPoint()
 {
 	byte	*pdest;
 	short	*pz;

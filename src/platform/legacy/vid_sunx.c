@@ -80,7 +80,7 @@ typedef struct
     char	desc[256];
 } modedesc_t;
 
-extern void M_Menu_Options_f (void);
+extern void M_Menu_Options_f();
 extern void M_Print (int cx, int cy, char *str);
 extern void M_PrintWhite (int cx, int cy, char *str);
 extern void M_DrawCharacter (int cx, int line, int num);
@@ -321,7 +321,7 @@ Keybinding command
 
 byte vid_gamma[256];
 
-void VID_Gamma_f (void)
+void VID_Gamma_f()
 {
 
 	float	g, f, inf;
@@ -472,7 +472,7 @@ void ResetSharedFrameBuffers(void)
 
 		// attach to the shared memory segment
 		x_shminfo[frm].shmaddr =
-			(void *) shmat(x_shminfo[frm].shmid, 0, 0);
+			(typeless_ptr ) shmat(x_shminfo[frm].shmid, 0, 0);
 
 		printf("VID: shared memory id=%d, addr=0x%x\n", x_shminfo[frm].shmid,
 			(int) x_shminfo[frm].shmaddr);
@@ -840,7 +840,7 @@ void VID_SetPalette(unsigned char *palette)
 
 // Called at shutdown
 
-void	VID_Shutdown (void)
+void	VID_Shutdown()
 {
 	Con_Printf("VID_Shutdown\n");
 	//XAutoRepeatOn(x_disp);
@@ -1009,7 +1009,7 @@ void GetEvent(void)
 
 // flushes the given rectangles from the view buffer to the screen
 
-void	VID_Update (vrect_t *rects)
+void	VID_Update (vrect_p rects)
 {
 #if 0
 	static int count;
@@ -1158,7 +1158,7 @@ void Sys_SendKeyEvents(void)
 }
 
 #if 0
-char *Sys_ConsoleInput (void)
+char *Sys_ConsoleInput()
 {
 
 	static char	text[256];
@@ -1188,7 +1188,7 @@ char *Sys_ConsoleInput (void)
 }
 #endif
 
-void IN_Init (void)
+void IN_Init()
 {
 	Cvar_RegisterVariable(&m_filter);
 	if ( COM_CheckParm ("-nomouse") )
@@ -1197,12 +1197,12 @@ void IN_Init (void)
 	mouse_avail = 1;
 }
 
-void IN_Shutdown (void)
+void IN_Shutdown()
 {
 	mouse_avail = 0;
 }
 
-void IN_Commands (void)
+void IN_Commands()
 {
 	int i;
 

@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "protocol.h"
 
 
-void Cmd_ForwardToServer (void);
+void Cmd_ForwardToServer();
 
 #define	CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/
 

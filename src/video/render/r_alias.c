@@ -30,20 +30,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 mtriangle_t		*ptriangles;
 affinetridesc_t	r_affinetridesc;
 
-void *			acolormap;	// FIXME: should go away
+typeless_ptr 			acolormap;	// FIXME: should go away
 
 trivertx_t		*r_apverts;
 
 // TODO: these probably will go away with optimized rasterization
-mdl_t				*pmdl;
+mdl_t*				pmdl;
 vec3_t				r_plightvec;
 int					r_ambientlight;
 float				r_shadelight;
-aliashdr_t			*paliashdr;
-finalvert_t			*pfinalverts;
-auxvert_t			*pauxverts;
+aliashdr_t*			paliashdr;
+finalvert_p			pfinalverts;
+auxvert_t*			pauxverts;
 static float		ziscale;
-static model_t		*pmodel;
+static model_t*		pmodel;
 
 static vec3_t		alias_forward, alias_right, alias_up;
 
@@ -72,13 +72,13 @@ float	r_avertexnormals[NUMVERTEXNORMALS][3] = {
 #include "anorms.h"
 };
 
-void R_AliasTransformAndProjectFinalVerts (finalvert_t *fv,
+void R_AliasTransformAndProjectFinalVerts (finalvert_p fv,
 	stvert_t *pstverts);
 void R_AliasSetUpTransform (int trivial_accept);
 void R_AliasTransformVector (vec3_t in, vec3_t out);
-void R_AliasTransformFinalVert (finalvert_t *fv, auxvert_t *av,
+void R_AliasTransformFinalVert (finalvert_p fv, auxvert_t *av,
 	trivertx_t *pverts, stvert_t *pstverts);
-void R_AliasProjectFinalVert (finalvert_t *fv, auxvert_t *av);
+void R_AliasProjectFinalVert (finalvert_p fv, auxvert_t *av);
 
 
 /*
@@ -86,12 +86,13 @@ void R_AliasProjectFinalVert (finalvert_t *fv, auxvert_t *av);
 R_AliasCheckBBox
 ================
 */
-qboolean R_AliasCheckBBox (void)
+qboolean R_AliasCheckBBox()
 {
 	int					i, flags, frame, numv;
 	aliashdr_t			*pahdr;
 	float				zi, basepts[8][3], v0, v1, frac;
-	finalvert_t			*pv0, *pv1, viewpts[16];
+	finalvert_p			pv0, pv1;
+	finalvert_t			viewpts[16];
 	auxvert_t			*pa0, *pa1, viewaux[16];
 	maliasframedesc_t	*pframedesc;
 	qboolean			zclipped, zfullyclipped;
@@ -265,14 +266,14 @@ R_AliasPreparePoints
 General clipped case
 ================
 */
-void R_AliasPreparePoints (void)
+void R_AliasPreparePoints()
 {
 	int			i;
 	stvert_t	*pstverts;
-	finalvert_t	*fv;
+	finalvert_p fv;
 	auxvert_t	*av;
 	mtriangle_t	*ptri;
-	finalvert_t	*pfv[3];
+	finalvert_p pfv[3];
 
 	pstverts = (stvert_t *)((byte *)paliashdr + paliashdr->stverts);
 	r_anumverts = pmdl->numverts;
@@ -412,7 +413,7 @@ void R_AliasSetUpTransform (int trivial_accept)
 R_AliasTransformFinalVert
 ================
 */
-void R_AliasTransformFinalVert (finalvert_t *fv, auxvert_t *av,
+void R_AliasTransformFinalVert (finalvert_p fv, auxvert_t *av,
 	trivertx_t *pverts, stvert_t *pstverts)
 {
 	int		temp;
@@ -456,7 +457,7 @@ void R_AliasTransformFinalVert (finalvert_t *fv, auxvert_t *av,
 R_AliasTransformAndProjectFinalVerts
 ================
 */
-void R_AliasTransformAndProjectFinalVerts (finalvert_t *fv, stvert_t *pstverts)
+void R_AliasTransformAndProjectFinalVerts (finalvert_p fv, stvert_t *pstverts)
 {
 	int			i, temp;
 	float		lightcos, *plightnormal, zi;
@@ -511,7 +512,7 @@ void R_AliasTransformAndProjectFinalVerts (finalvert_t *fv, stvert_t *pstverts)
 R_AliasProjectFinalVert
 ================
 */
-void R_AliasProjectFinalVert (finalvert_t *fv, auxvert_t *av)
+void R_AliasProjectFinalVert (finalvert_p fv, auxvert_t *av)
 {
 	float	zi;
 
@@ -530,10 +531,10 @@ void R_AliasProjectFinalVert (finalvert_t *fv, auxvert_t *av)
 R_AliasPrepareUnclippedPoints
 ================
 */
-void R_AliasPrepareUnclippedPoints (void)
+void R_AliasPrepareUnclippedPoints()
 {
 	stvert_t	*pstverts;
-	finalvert_t	*fv;
+	finalvert_p fv;
 
 	pstverts = (stvert_t *)((byte *)paliashdr + paliashdr->stverts);
 	r_anumverts = pmdl->numverts;
@@ -558,7 +559,7 @@ void R_AliasPrepareUnclippedPoints (void)
 R_AliasSetupSkin
 ===============
 */
-void R_AliasSetupSkin (void)
+void R_AliasSetupSkin()
 {
 	int					skinnum;
 	int					i, numskins;
@@ -603,7 +604,7 @@ void R_AliasSetupSkin (void)
 	}
 
 	r_affinetridesc.pskindesc = pskindesc;
-	r_affinetridesc.pskin = (void *)((byte *)paliashdr + pskindesc->skin);
+	r_affinetridesc.pskin = (typeless_ptr )((byte *)paliashdr + pskindesc->skin);
 	r_affinetridesc.skinwidth = a_skinwidth;
 	r_affinetridesc.seamfixupX16 =  (a_skinwidth >> 1) << 16;
 	r_affinetridesc.skinheight = pmdl->skinheight;
@@ -649,7 +650,7 @@ R_AliasSetupFrame
 set r_apverts
 =================
 */
-void R_AliasSetupFrame (void)
+void R_AliasSetupFrame()
 {
 	int				frame;
 	int				i, numframes;
@@ -709,7 +710,7 @@ void R_AliasDrawModel (alight_t *plighting)
 	r_amodels_drawn++;
 
 // cache align
-	pfinalverts = (finalvert_t *)
+	pfinalverts = (finalvert_p )
 			(((long)&finalverts[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
 	pauxverts = &auxverts[0];
 

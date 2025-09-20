@@ -187,7 +187,7 @@ Cvar_Command
 Handles variable inspection and changing from the console
 ============
 */
-qboolean	Cvar_Command (void)
+qboolean	Cvar_Command()
 {
 	cvar_t			*v;
 

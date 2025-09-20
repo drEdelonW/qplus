@@ -48,6 +48,7 @@ BRUSH MODELS
 typedef struct{
 	vec3_t		position;
 } mvertex_t;
+typedef mvertex_t* mvertex_p;
 
 #define	SIDE_FRONT	0
 #define	SIDE_BACK	1
@@ -182,7 +183,7 @@ SPRITE MODELS
 typedef struct mspriteframe_s{
 	int		width;
 	int		height;
-	void*   pcachespot;			// remove?
+	typeless_ptr   pcachespot;			// remove?
 	float	up, down, left, right;
 	byte	pixels[4];
 } mspriteframe_t;
@@ -204,7 +205,7 @@ typedef struct{
 	int					maxheight;
 	int					numframes;
 	float				beamlength;		// remove?
-	void*               cachespot;		// remove?
+	typeless_ptr               cachespot;		// remove?
 	mspriteframedesc_t	frames[1];
 } msprite_t;
 
@@ -323,7 +324,7 @@ typedef struct model_s{
 	int			firstmodelsurface, nummodelsurfaces;
 
 	int			numsubmodels;
-	dmodel_t*   submodels;
+	dmodel_p    submodels;
 
 	int			numplanes;
 	mplane_t*   planes;

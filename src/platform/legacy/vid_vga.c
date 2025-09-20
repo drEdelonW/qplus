@@ -50,7 +50,7 @@ int		VGA_highhunkmark;
 
 #define NUMVIDMODES		(sizeof(vgavidmodes) / sizeof(vgavidmodes[0]))
 
-void VGA_UpdatePlanarScreen (void *srcbuffer);
+void VGA_UpdatePlanarScreen (typeless_ptr srcbuffer);
 
 static byte	backingbuf[48*24];
 
@@ -59,7 +59,7 @@ static byte	backingbuf[48*24];
 VGA_BeginDirectRect
 ================
 */
-void VGA_BeginDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode, int x,
+void VGA_BeginDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode, int x,
 	int y, byte *pbitmap, int width, int height)
 {
 	int		i, j, k, plane, reps, repshift;
@@ -130,7 +130,7 @@ void VGA_BeginDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode, int x,
 VGA_EndDirectRect
 ================
 */
-void VGA_EndDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode, int x,
+void VGA_EndDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode, int x,
 	int y, int width, int height)
 {
 	int		i, j, k, plane, reps, repshift;
@@ -191,7 +191,7 @@ void VGA_EndDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode, int x,
 VGA_Init
 ================
 */
-void VGA_Init (void)
+void VGA_Init()
 {
 	int		i;
 
@@ -214,7 +214,7 @@ void VGA_Init (void)
 VGA_WaitVsync
 ================
 */
-void VGA_WaitVsync (void)
+void VGA_WaitVsync()
 {
 	while ((inportb (0x3DA) & 0x08) == 0)
 		;
@@ -244,7 +244,7 @@ void VGA_ClearVideoMem (int planar)
 VGA_FreeAndAllocVidbuffer
 ================
 */
-qboolean VGA_FreeAndAllocVidbuffer (viddef_t *lvid, int allocnewbuffer)
+qboolean VGA_FreeAndAllocVidbuffer (viddef_p lvid, int allocnewbuffer)
 {
 	int		tsize, tbuffersize;
 
@@ -294,7 +294,7 @@ qboolean VGA_FreeAndAllocVidbuffer (viddef_t *lvid, int allocnewbuffer)
 
 	if (allocnewbuffer)
 	{
-		lvid->buffer = (void *)( (byte *)vid_surfcache + vid_surfcachesize);
+		lvid->buffer = (typeless_ptr )( (byte *)vid_surfcache + vid_surfcachesize);
 		lvid->conbuffer = lvid->buffer;
 	}
 
@@ -339,7 +339,7 @@ qboolean VGA_CheckAdequateMem (int width, int height, int rowbytes,
 VGA_InitMode
 ================
 */
-int VGA_InitMode (viddef_t *lvid, vmode_t *pcurrentmode)
+int VGA_InitMode (viddef_p lvid, vmode_t *pcurrentmode)
 {
 	vextra_t		*pextra;
 
@@ -356,8 +356,8 @@ int VGA_InitMode (viddef_t *lvid, vmode_t *pcurrentmode)
 	regs.h.al = 0x13;
 	dos_int86(0x10);
 
-	VGA_pagebase = (void *)real2ptr(0xa0000);
-	lvid->direct = (pixel_t *)VGA_pagebase;
+	VGA_pagebase = (typeless_ptr )real2ptr(0xa0000);
+	lvid->direct = (pixel_p)VGA_pagebase;
 
 // set additional registers as needed
 	VideoRegisterSet (pextra->pregset);
@@ -408,7 +408,7 @@ int VGA_InitMode (viddef_t *lvid, vmode_t *pcurrentmode)
 VGA_SetPalette
 ================
 */
-void VGA_SetPalette(viddef_t *lvid, vmode_t *pcurrentmode, unsigned char *pal)
+void VGA_SetPalette(viddef_p lvid, vmode_t *pcurrentmode, unsigned char *pal)
 {
 	int shiftcomponents=2;
 	int i;
@@ -427,8 +427,8 @@ void VGA_SetPalette(viddef_t *lvid, vmode_t *pcurrentmode, unsigned char *pal)
 VGA_SwapBuffersCopy
 ================
 */
-void VGA_SwapBuffersCopy (viddef_t *lvid, vmode_t *pcurrentmode,
-	vrect_t *rects)
+void VGA_SwapBuffersCopy (viddef_p lvid, vmode_t *pcurrentmode,
+	vrect_p rects)
 {
 
 	UNUSED(pcurrentmode);
@@ -466,7 +466,7 @@ void VGA_SwapBuffersCopy (viddef_t *lvid, vmode_t *pcurrentmode,
 VGA_SwapBuffers
 ================
 */
-void VGA_SwapBuffers (viddef_t *lvid, vmode_t *pcurrentmode, vrect_t *rects)
+void VGA_SwapBuffers (viddef_p lvid, vmode_t *pcurrentmode, vrect_p rects)
 {
 	UNUSED(lvid);
 

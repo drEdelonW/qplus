@@ -37,10 +37,10 @@ int				r_lightwidth;
 int				r_numhblocks, r_numvblocks;
 unsigned char	*r_source, *r_sourcemax;
 
-void R_DrawSurfaceBlock8_mip0 (void);
-void R_DrawSurfaceBlock8_mip1 (void);
-void R_DrawSurfaceBlock8_mip2 (void);
-void R_DrawSurfaceBlock8_mip3 (void);
+void R_DrawSurfaceBlock8_mip0();
+void R_DrawSurfaceBlock8_mip1();
+void R_DrawSurfaceBlock8_mip2();
+void R_DrawSurfaceBlock8_mip3();
 
 static void	(*surfmiptable[4])(void) = {
 	R_DrawSurfaceBlock8_mip0,
@@ -58,7 +58,7 @@ unsigned		blocklights[18*18];
 R_AddDynamicLights
 ===============
 */
-void R_AddDynamicLights (void)
+void R_AddDynamicLights()
 {
 	msurface_t *surf;
 	int			lnum;
@@ -146,7 +146,7 @@ R_BuildLightMap
 Combine and scale multiple lightmaps into the 8.8 format in blocklights
 ===============
 */
-void R_BuildLightMap (void)
+void R_BuildLightMap()
 {
 	int			smax, tmax;
 	int			t;
@@ -245,7 +245,7 @@ texture_t *R_TextureAnimation (texture_t *base)
 R_DrawSurface
 ===============
 */
-void R_DrawSurface (void)
+void R_DrawSurface()
 {
 	unsigned char	*basetptr;
 	int				smax, tmax, twidth;
@@ -340,7 +340,7 @@ void R_DrawSurface (void)
 R_DrawSurfaceBlock8_mip0
 ================
 */
-void R_DrawSurfaceBlock8_mip0 (void)
+void R_DrawSurfaceBlock8_mip0()
 {
 	int				v, i, b, lightstep, lighttemp, light;
 	unsigned char	pix, *psource, *prowdest;
@@ -390,7 +390,7 @@ void R_DrawSurfaceBlock8_mip0 (void)
 R_DrawSurfaceBlock8_mip1
 ================
 */
-void R_DrawSurfaceBlock8_mip1 (void)
+void R_DrawSurfaceBlock8_mip1()
 {
 	int				v, i, b, lightstep, lighttemp, light;
 	unsigned char	pix, *psource, *prowdest;
@@ -440,7 +440,7 @@ void R_DrawSurfaceBlock8_mip1 (void)
 R_DrawSurfaceBlock8_mip2
 ================
 */
-void R_DrawSurfaceBlock8_mip2 (void)
+void R_DrawSurfaceBlock8_mip2()
 {
 	int				v, i, b, lightstep, lighttemp, light;
 	unsigned char	pix, *psource, *prowdest;
@@ -490,7 +490,7 @@ void R_DrawSurfaceBlock8_mip2 (void)
 R_DrawSurfaceBlock8_mip3
 ================
 */
-void R_DrawSurfaceBlock8_mip3 (void)
+void R_DrawSurfaceBlock8_mip3()
 {
 	int				v, i, b, lightstep, lighttemp, light;
 	unsigned char	pix, *psource, *prowdest;
@@ -542,7 +542,7 @@ R_DrawSurfaceBlock16
 FIXME: make this work
 ================
 */
-void R_DrawSurfaceBlock16 (void)
+void R_DrawSurfaceBlock16()
 {
 	int				k;
 	unsigned char	*psource;
@@ -592,7 +592,7 @@ void R_DrawSurfaceBlock16 (void)
 R_GenTurbTile
 ================
 */
-void R_GenTurbTile (pixel_t *pbasetex, void *pdest)
+void R_GenTurbTile (pixel_p pbasetex, typeless_ptr pdest)
 {
 	int		*turb;
 	int		i, j, s, t;
@@ -618,7 +618,7 @@ void R_GenTurbTile (pixel_t *pbasetex, void *pdest)
 R_GenTurbTile16
 ================
 */
-void R_GenTurbTile16 (pixel_t *pbasetex, void *pdest)
+void R_GenTurbTile16 (pixel_p pbasetex, typeless_ptr pdest)
 {
 	int				*turb;
 	int				i, j, s, t;
@@ -644,18 +644,18 @@ void R_GenTurbTile16 (pixel_t *pbasetex, void *pdest)
 R_GenTile
 ================
 */
-void R_GenTile (msurface_t *psurf, void *pdest)
+void R_GenTile (msurface_t *psurf, typeless_ptr pdest)
 {
 	if (psurf->flags & SURF_DRAWTURB)
 	{
 		if (r_pixbytes == 1)
 		{
-			R_GenTurbTile ((pixel_t *)
+			R_GenTurbTile ((pixel_p )
 				((byte *)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]), pdest);
 		}
 		else
 		{
-			R_GenTurbTile16 ((pixel_t *)
+			R_GenTurbTile16 ((pixel_p )
 				((byte *)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]), pdest);
 		}
 	}

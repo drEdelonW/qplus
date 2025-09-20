@@ -34,7 +34,7 @@ short	*zspantable[MAXHEIGHT];
 D_Patch
 ================
 */
-void D_Patch (void)
+void D_Patch()
 {
 #if id386
 
@@ -56,7 +56,7 @@ void D_Patch (void)
 D_ViewChanged
 ================
 */
-void D_ViewChanged (void)
+void D_ViewChanged()
 {
 	int rowbytes;
 

@@ -86,13 +86,13 @@ qboolean fakedma = false;
 int fakedma_updates = 15;
 
 
-void S_AmbientOff (void)
+void S_AmbientOff()
 {
 	snd_ambient = false;
 }
 
 
-void S_AmbientOn (void)
+void S_AmbientOn()
 {
 	snd_ambient = true;
 }
@@ -123,7 +123,7 @@ S_Startup
 ================
 */
 
-void S_Startup (void)
+void S_Startup()
 {
 	int		rc;
 
@@ -202,7 +202,7 @@ void S_Init(){
 
 	if (fakedma)
 	{
-		shm = (void *) Hunk_AllocName(sizeof(*shm), "shm");
+		shm = (typeless_ptr ) Hunk_AllocName(sizeof(*shm), "shm");
 		shm->splitbuffer = 0;
 		shm->samplebits = 16;
 		shm->speed = 22050;
@@ -537,12 +537,12 @@ void S_StopAllSounds(qboolean clear)
 		S_ClearBuffer ();
 }
 
-void S_StopAllSoundsC (void)
+void S_StopAllSoundsC()
 {
 	S_StopAllSounds (true);
 }
 
-void S_ClearBuffer (void)
+void S_ClearBuffer()
 {
 	int		clear;
 
@@ -647,7 +647,7 @@ void S_StaticSound (sfx_t *sfx, vec3_t origin, float vol, float attenuation)
 S_UpdateAmbientSounds
 ===================
 */
-void S_UpdateAmbientSounds (void)
+void S_UpdateAmbientSounds()
 {
 	mleaf_t		*l;
 	float		vol;
@@ -827,7 +827,7 @@ void GetSoundtime(void)
 #endif
 }
 
-void S_ExtraUpdate (void)
+void S_ExtraUpdate()
 {
 
 #ifdef _WIN32
@@ -987,17 +987,17 @@ void S_LocalSound (char *sound)
 }
 
 
-void S_ClearPrecache (void)
+void S_ClearPrecache()
 {
 }
 
 
-void S_BeginPrecaching (void)
+void S_BeginPrecaching()
 {
 }
 
 
-void S_EndPrecaching (void)
+void S_EndPrecaching()
 {
 }
 

@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //============================================================================
 
 #ifndef NULL
-	#define NULL ((void *)0)
+	#define NULL ((typeless_ptr )0)
 #endif
 
 #define Q_MAXCHAR ((char)0x7f)
@@ -80,12 +80,12 @@ struct cache_user_s;
 
 extern	char	com_gamedir[MAX_OSPATH];
 
-void COM_WriteFile (char *filename, void *data, int len);
+void COM_WriteFile (char *filename, typeless_ptr data, int len);
 int COM_OpenFile (char *filename, int *hndl);
 int COM_FOpenFile (char *filename, FILE **file);
 void COM_CloseFile (int h);
 
-uint8_t *COM_LoadStackFile (char *path, void *buffer, int bufsize);
+uint8_t *COM_LoadStackFile (char *path, typeless_ptr buffer, int bufsize);
 uint8_t *COM_LoadTempFile (char *path);
 uint8_t *COM_LoadHunkFile (char *path);
 void COM_LoadCacheFile (char *path, struct cache_user_s *cu);

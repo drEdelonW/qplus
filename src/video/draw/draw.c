@@ -106,7 +106,7 @@ qpic_t	*Draw_CachePic (char *path)
 Draw_Init
 ===============
 */
-void Draw_Init (void){
+void Draw_Init(){
 	draw_chars      = W_GetLumpName ("conchars");
 	draw_disc       = W_GetLumpName ("disc");
 	draw_backtile   = W_GetLumpName ("backtile");
@@ -623,7 +623,7 @@ void Draw_ConsoleBackground (int lines)
 R_DrawRect8
 ==============
 */
-void R_DrawRect8 (vrect_t *prect, int rowbytes, byte *psrc,
+void R_DrawRect8 (vrect_p prect, int rowbytes, byte *psrc,
 	int transparent)
 {
 	byte	t;
@@ -672,7 +672,7 @@ void R_DrawRect8 (vrect_t *prect, int rowbytes, byte *psrc,
 R_DrawRect16
 ==============
 */
-void R_DrawRect16 (vrect_t *prect, int rowbytes, byte *psrc,
+void R_DrawRect16 (vrect_p prect, int rowbytes, byte *psrc,
 	int transparent)
 {
 	byte			t;
@@ -837,7 +837,7 @@ Draw_FadeScreen
 
 ================
 */
-void Draw_FadeScreen (void)
+void Draw_FadeScreen()
 {
 	int			x,y;
 	byte		*pbuf;
@@ -875,7 +875,7 @@ Draws the little blue disc in the corner of the screen.
 Call before beginning any disc IO.
 ================
 */
-void Draw_BeginDisc (void)
+void Draw_BeginDisc()
 {
 
 	D_BeginDirectRect (vid.width - 24, 0, draw_disc->data, 24, 24);
@@ -890,7 +890,7 @@ Erases the disc icon.
 Call after completing any disc IO
 ================
 */
-void Draw_EndDisc (void)
+void Draw_EndDisc()
 {
 
 	D_EndDirectRect (vid.width - 24, 0, 24, 24);

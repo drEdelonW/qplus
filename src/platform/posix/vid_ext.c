@@ -115,9 +115,9 @@ static byte	*ppal;
 qboolean	vsync_exists, de_exists;
 
 qboolean VID_ExtraGetModeInfo(int modenum);
-int VID_ExtraInitMode (viddef_t *vid, vmode_t *pcurrentmode);
-void VID_ExtraSwapBuffers (viddef_t *vid, vmode_t *pcurrentmode,
-	vrect_t *rects);
+int VID_ExtraInitMode (viddef_p vid, vmode_t *pcurrentmode);
+void VID_ExtraSwapBuffers (viddef_p vid, vmode_t *pcurrentmode,
+	vrect_p rects);
 
 
 /*
@@ -125,7 +125,7 @@ void VID_ExtraSwapBuffers (viddef_t *vid, vmode_t *pcurrentmode,
 VGA_BankedBeginDirectRect
 ================
 */
-void VGA_BankedBeginDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
+void VGA_BankedBeginDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode,
 	int x, int y, byte *pbitmap, int width, int height)
 {
 
@@ -151,7 +151,7 @@ void VGA_BankedBeginDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
 VGA_BankedEndDirectRect
 ================
 */
-void VGA_BankedEndDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
+void VGA_BankedEndDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode,
 	int x, int y, int width, int height)
 {
 
@@ -177,7 +177,7 @@ void VGA_BankedEndDirectRect (viddef_t *lvid, struct vmode_s *pcurrentmode,
 VID_SetVESAPalette
 ================
 */
-void VID_SetVESAPalette (viddef_t *lvid, vmode_t *pcurrentmode,
+void VID_SetVESAPalette (viddef_p lvid, vmode_t *pcurrentmode,
 	unsigned char *pal)
 {
 	int		i;
@@ -217,7 +217,7 @@ void VID_SetVESAPalette (viddef_t *lvid, vmode_t *pcurrentmode,
 VID_ExtraFarToLinear
 ================
 */
-void *VID_ExtraFarToLinear (void *ptr)
+typeless_ptr VID_ExtraFarToLinear (typeless_ptr ptr)
 {
 	int		temp;
 
@@ -295,7 +295,7 @@ qboolean VID_ExtraStateFound (unsigned state)
 VID_InitExtra
 ================
 */
-void VID_InitExtra (void)
+void VID_InitExtra()
 {
 	int				nummodes;
 	short			*pmodenums;
@@ -584,7 +584,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 VID_ExtraInitMode
 ================
 */
-int VID_ExtraInitMode (viddef_t *lvid, vmode_t *pcurrentmode)
+int VID_ExtraInitMode (viddef_p lvid, vmode_t *pcurrentmode)
 {
 	vesa_extra_t	*pextra;
 	int				pageoffset;
@@ -713,8 +713,8 @@ int VID_ExtraInitMode (viddef_t *lvid, vmode_t *pcurrentmode)
 VID_ExtraSwapBuffers
 ================
 */
-void VID_ExtraSwapBuffers (viddef_t *lvid, vmode_t *pcurrentmode,
-	vrect_t *rects)
+void VID_ExtraSwapBuffers (viddef_p lvid, vmode_t *pcurrentmode,
+	vrect_p rects)
 {
 	int	pageoffset;
 

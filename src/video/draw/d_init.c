@@ -24,10 +24,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define NUM_MIPS	4
 
-surfcache_t		*d_initial_rover;
-qboolean		d_roverwrapped;
-int				d_minmip;
-float			d_scalemip[NUM_MIPS-1];
+surfcache_t*    d_initial_rover;
+qboolean        d_roverwrapped;
+int             d_minmip;
+float           d_scalemip[NUM_MIPS-1];
 
 static float	basemip[NUM_MIPS-1] = {1.0, 0.5*0.8, 0.25*0.8};
 
@@ -61,8 +61,7 @@ void D_Init(){
 D_CopyRects
 ===============
 */
-void D_CopyRects (vrect_t *prects, int transparent)
-{
+void D_CopyRects(vrect_p prects, int transparent) {
 
 // this function is only required if the CPU doesn't have direct access to the
 // back buffer, and there's some driver interface function that the driver
@@ -80,8 +79,7 @@ void D_CopyRects (vrect_t *prects, int transparent)
 D_EnableBackBufferAccess
 ===============
 */
-void D_EnableBackBufferAccess (void)
-{
+void D_EnableBackBufferAccess() {
 	VID_LockBuffer ();
 }
 
@@ -91,8 +89,7 @@ void D_EnableBackBufferAccess (void)
 D_TurnZOn
 ===============
 */
-void D_TurnZOn (void)
-{
+void D_TurnZOn() {
 // not needed for software version
 }
 
@@ -102,8 +99,7 @@ void D_TurnZOn (void)
 D_DisableBackBufferAccess
 ===============
 */
-void D_DisableBackBufferAccess (void)
-{
+void D_DisableBackBufferAccess() {
 	VID_UnlockBuffer ();
 }
 
@@ -113,14 +109,14 @@ void D_DisableBackBufferAccess (void)
 D_SetupFrame
 ===============
 */
-void D_SetupFrame (void)
+void D_SetupFrame()
 {
 	int		i;
 
 	if (r_dowarp)
 		d_viewbuffer = r_warpbuffer;
 	else
-		d_viewbuffer = (void *)(byte *)vid.buffer;
+		d_viewbuffer = (typeless_ptr )(byte *)vid.buffer;
 
 	if (r_dowarp)
 		screenwidth = WARP_WIDTH;
@@ -157,7 +153,7 @@ void D_SetupFrame (void)
 D_UpdateRects
 ===============
 */
-void D_UpdateRects (vrect_t *prect)
+void D_UpdateRects (vrect_p prect)
 {
 
 // the software driver draws these directly to the vid buffer

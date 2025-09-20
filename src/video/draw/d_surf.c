@@ -52,7 +52,7 @@ int     D_SurfaceCacheForRes (int width, int height)
 	return size;
 }
 
-void D_CheckCacheGuard (void)
+void D_CheckCacheGuard()
 {
 	byte    *s;
 	int             i;
@@ -63,7 +63,7 @@ void D_CheckCacheGuard (void)
 			Sys_Error ("D_CheckCacheGuard: failed");
 }
 
-void D_ClearCacheGuard (void)
+void D_ClearCacheGuard()
 {
 	byte    *s;
 	int             i;
@@ -80,7 +80,7 @@ D_InitCaches
 
 ================
 */
-void D_InitCaches (void *buffer, int size)
+void D_InitCaches (typeless_ptr buffer, int size)
 {
 
 	if (!msg_suppress_1)
@@ -103,7 +103,7 @@ void D_InitCaches (void *buffer, int size)
 D_FlushCaches
 ==================
 */
-void D_FlushCaches (void)
+void D_FlushCaches()
 {
 	surfcache_t     *c;
 
@@ -214,7 +214,7 @@ D_CheckCacheGuard ();   // DEBUG
 D_SCDump
 =================
 */
-void D_SCDump (void)
+void D_SCDump()
 {
 	surfcache_t             *test;
 
@@ -313,7 +313,7 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 	else
 		cache->dlight = 0;
 
-	r_drawsurf.surfdat = (pixel_t *)cache->data;
+	r_drawsurf.surfdat = (pixel_p)cache->data;
 
 	cache->texture = r_drawsurf.texture;
 	cache->lightadj[0] = r_drawsurf.lightadj[0];

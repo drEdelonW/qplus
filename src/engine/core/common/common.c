@@ -39,7 +39,7 @@ int             static_registered = 1;  // only for startup check, then set
 
 qboolean		msg_suppress_1 = 0;
 
-void COM_InitFilesystem (void);
+void COM_InitFilesystem();
 
 // if a packfile directory differs from this, it is assumed to be hacked
 #define PAK0_COUNT              339
@@ -317,7 +317,7 @@ Immediately exits out if an alternate game was attempted to be started without
 being registered.
 ================
 */
-void COM_CheckRegistered (void)
+void COM_CheckRegistered()
 {
 	int             h;
 	unsigned short  check[128];
@@ -351,7 +351,7 @@ void COM_CheckRegistered (void)
 }
 
 
-void COM_Path_f (void);
+void COM_Path_f();
 
 
 /*
@@ -538,7 +538,7 @@ COM_Path_f
 
 ============
 */
-void COM_Path_f (void)
+void COM_Path_f()
 {
 	searchpath_t    *s;
 
@@ -561,7 +561,7 @@ COM_WriteFile
 The filename will be prefixed by the current game directory
 ============
 */
-void COM_WriteFile (char *filename, void *data, int len)
+void COM_WriteFile (char *filename, typeless_ptr data, int len)
 {
 	int             handle;
 	char    name[MAX_OSPATH];
@@ -878,7 +878,7 @@ void COM_LoadCacheFile (char *path, struct cache_user_s *cu)
 }
 
 // uses temp hunk if larger than bufsize
-uint8_t *COM_LoadStackFile (char *path, void *buffer, int bufsize)
+uint8_t *COM_LoadStackFile (char *path, typeless_ptr buffer, int bufsize)
 {
 	uint8_t    *buf;
 
@@ -915,7 +915,7 @@ pack_t *COM_LoadPackFile (char *packfile)
 //              Con_Printf ("Couldn't open %s\n", packfile);
 		return NULL;
 	}
-	Sys_FileRead (packhandle, (void *)&header, sizeof(header));
+	Sys_FileRead (packhandle, (typeless_ptr )&header, sizeof(header));
 	if (header.id[0] != 'P' || header.id[1] != 'A'
 	|| header.id[2] != 'C' || header.id[3] != 'K')
 		Sys_Error ("%s is not a packfile", packfile);
@@ -933,7 +933,7 @@ pack_t *COM_LoadPackFile (char *packfile)
 	newfiles = Hunk_AllocName (numpackfiles * sizeof(packfile_t), "packfile");
 
 	Sys_FileSeek (packhandle, header.dirofs);
-	Sys_FileRead (packhandle, (void *)info, header.dirlen);
+	Sys_FileRead (packhandle, (typeless_ptr )info, header.dirlen);
 
 // crc the directory to check for modifications
 	CRC_Init (&crc);
@@ -1012,7 +1012,7 @@ void COM_AddGameDirectory (char *dir)
 COM_InitFilesystem
 ================
 */
-void COM_InitFilesystem (void)
+void COM_InitFilesystem()
 {
 	int             i, j;
 	char    basedir[MAX_OSPATH];

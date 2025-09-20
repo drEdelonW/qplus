@@ -196,10 +196,10 @@ NextSpan:
 D_SpriteScanLeftEdge
 =====================
 */
-void D_SpriteScanLeftEdge (void)
+void D_SpriteScanLeftEdge()
 {
 	int			i, v, itop, ibottom, lmaxindex;
-	emitpoint_t	*pvert, *pnext;
+	emitpoint_p	pvert, pnext;
 	sspan_t		*pspan;
 	float		du, dv, vtop, vbottom, slope;
 	fixed16_t	u, u_step;
@@ -258,10 +258,10 @@ void D_SpriteScanLeftEdge (void)
 D_SpriteScanRightEdge
 =====================
 */
-void D_SpriteScanRightEdge (void)
+void D_SpriteScanRightEdge()
 {
 	int			i, v, itop, ibottom;
-	emitpoint_t	*pvert, *pnext;
+	emitpoint_p	pvert, pnext;
 	sspan_t		*pspan;
 	float		du, dv, vtop, vbottom, slope, uvert, unext, vvert, vnext;
 	fixed16_t	u, u_step;
@@ -340,7 +340,7 @@ void D_SpriteScanRightEdge (void)
 D_SpriteCalculateGradients
 =====================
 */
-void D_SpriteCalculateGradients (void)
+void D_SpriteCalculateGradients()
 {
 	vec3_t		p_normal, p_saxis, p_taxis, p_temp1;
 	float		distinv;
@@ -386,11 +386,11 @@ void D_SpriteCalculateGradients (void)
 D_DrawSprite
 =====================
 */
-void D_DrawSprite (void)
+void D_DrawSprite()
 {
 	int			i, nump;
 	float		ymin, ymax;
-	emitpoint_t	*pverts;
+	emitpoint_p pverts;
 	sspan_t		spans[MAXHEIGHT+1];
 
 	sprite_spans = spans;

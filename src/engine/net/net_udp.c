@@ -52,7 +52,7 @@ static unsigned long myAddr;
 
 //=============================================================================
 
-int UDP_Init (void)
+int UDP_Init()
 {
 	struct hostent *local;
 	char	buff[MAXHOSTNAMELEN];
@@ -95,7 +95,7 @@ int UDP_Init (void)
 
 //=============================================================================
 
-void UDP_Shutdown (void)
+void UDP_Shutdown()
 {
 	UDP_Listen (false);
 	UDP_CloseSocket (net_controlsocket);
@@ -139,7 +139,7 @@ int UDP_OpenSocket (int port)
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(port);
-	if( bind (newsocket, (void *)&address, sizeof(address)) == -1)
+	if( bind (newsocket, (typeless_ptr )&address, sizeof(address)) == -1)
 		goto ErrorReturn;
 
 	return newsocket;
@@ -225,7 +225,7 @@ int UDP_Connect (int socket, struct qsockaddr *addr)
 
 //=============================================================================
 
-int UDP_CheckNewConnections (void)
+int UDP_CheckNewConnections()
 {
 	unsigned long	available;
 

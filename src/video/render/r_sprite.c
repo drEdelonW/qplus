@@ -137,9 +137,10 @@ void R_SetupAndDrawSprite ()
 {
 	int			i, nump;
 	float		dot, scale, *pv;
-	vec5_t		*pverts;
+	vec5_t*		pverts;
 	vec3_t		left, up, right, down, transformed, local;
-	emitpoint_t	outverts[MAXWORKINGVERTS+1], *pout;
+	emitpoint_t	outverts[MAXWORKINGVERTS + 1];
+	emitpoint_p pout;
 
 	dot = DotProduct (r_spritedesc.vpn, modelorg);
 
@@ -283,7 +284,7 @@ mspriteframe_t *R_GetSpriteframe (msprite_t *psprite)
 R_DrawSprite
 ================
 */
-void R_DrawSprite (void)
+void R_DrawSprite()
 {
 	int				i;
 	msprite_t		*psprite;

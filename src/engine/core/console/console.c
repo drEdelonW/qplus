@@ -62,7 +62,7 @@ qboolean	con_initialized;
 
 int			con_notifylines;		// scan lines to clear for notify lines
 
-extern void M_Menu_Main_f (void);
+extern void M_Menu_Main_f();
 
 /*
     ================

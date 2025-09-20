@@ -211,7 +211,7 @@ int Sys_FileOpenWrite(char* path){
 	return handle;
 }
 
-int Sys_FileWrite(int handle, void* src, int count){
+int Sys_FileWrite(int handle, typeless_ptr src, int count){
 	return write(handle, src, count);
 }
 
@@ -223,7 +223,7 @@ void Sys_FileSeek(int handle, int position){
 	lseek (handle, position, SEEK_SET);
 }
 
-int Sys_FileRead(int handle, void* dest, int count){
+int Sys_FileRead(int handle, typeless_ptr dest, int count){
     return read(handle, dest, count);
 }
 

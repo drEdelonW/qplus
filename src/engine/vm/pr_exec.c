@@ -187,7 +187,7 @@ void PR_PrintStatement (dstatement_t* s)
 PR_StackTrace
 ============
 */
-void PR_StackTrace (void)
+void PR_StackTrace()
 {
 	dfunction_t	*f;
 	int			i;
@@ -219,7 +219,7 @@ PR_Profile_f
 
 ============
 */
-void PR_Profile_f (void)
+void PR_Profile_f()
 {
 	dfunction_t* f;
     dfunction_t* best;
@@ -331,7 +331,7 @@ int PR_EnterFunction (dfunction_t* f)
 PR_LeaveFunction
 ====================
 */
-int PR_LeaveFunction (void)
+int PR_LeaveFunction()
 {
 	int		i, c;
 

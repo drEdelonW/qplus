@@ -1,5 +1,5 @@
 #pragma once
-
+#include "zone.h"
 // if (var < min_val)   var = min_val;
 #define CLAMP_MIN(var, min_val)         do{ if ((var) < (min_val)) {(var) = (min_val);} }while(0)
 // keep (var >= min_val)
@@ -15,9 +15,9 @@
 #define CLAMP(min_val, var, max_val)    do{ if ((var) < (min_val)) {(var) = (min_val); }else CLAMP_MAX(var, max_val); }while(0)
 
 
-void    Q_memset(void* dest, int   fill, int count);
-void    Q_memcpy(void* dest, void* src,  int count);
-int     Q_memcmp(void* m1,   void* m2,   int count);
+void    Q_memset(typeless_ptr dest, int   fill, int count);
+void    Q_memcpy(typeless_ptr dest, typeless_ptr src,  int count);
+int     Q_memcmp(typeless_ptr m1,   typeless_ptr m2,   int count);
 
 int     Q_strlen(char*  str);
 void    Q_strcpy(char*  dest, char* src);

@@ -44,7 +44,7 @@ Hunk_Check
 Run consistancy and sentinal trahing checks
 ==============
 */
-void Hunk_Check (void) {
+void Hunk_Check() {
 	for (hunk_p h = (hunk_p)hunk_base; (byte*)h != (hunk_base + hunk_low_used) ; ) {
 		if ((h->sentinal) != HUNK_SENTINAL)
 			Sys_Error("Hunk_Check: trahsed sentinal");

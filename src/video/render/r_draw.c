@@ -40,11 +40,11 @@ polydesc_t		r_polydesc;
 
 
 
-clipplane_t	*entity_clipplanes;
+clipplane_t* entity_clipplanes;
 clipplane_t	view_clipplanes[4];
 clipplane_t	world_clipplanes[16];
 
-medge_t			*r_pedge;
+medge_t*   r_pedge;
 
 qboolean		r_leftclipped, r_rightclipped;
 static qboolean	makeleftedge, makerightedge;
@@ -77,26 +77,22 @@ qboolean	r_lastvertvalid;
 R_EmitEdge
 ================
 */
-void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1)
-{
-	edge_t	*edge, *pcheck;
+void R_EmitEdge(mvertex_p pv0, mvertex_p pv1) {
+	edge_ptr    edge, pcheck;
 	int		u_check;
 	float	u, u_step;
 	vec3_t	local, transformed;
-	float	*world;
+	float*  world;
 	int		v, v2, ceilv0;
 	float	scale, lzi0, u0, v0;
 	int		side;
 
-	if (r_lastvertvalid)
-	{
+	if (r_lastvertvalid){
 		u0 = r_u1;
 		v0 = r_v1;
 		lzi0 = r_lzi1;
 		ceilv0 = r_ceilv1;
-	}
-	else
-	{
+	} else {
 		world = &pv0->position[0];
 
 	// transform and project
@@ -256,7 +252,7 @@ void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1)
 R_ClipEdge
 ================
 */
-void R_ClipEdge (mvertex_t *pv0, mvertex_t *pv1, clipplane_t *clip)
+void R_ClipEdge (mvertex_p pv0, mvertex_p pv1, clipplane_t* clip)
 {
 	float		d0, d1, f;
 	mvertex_t	clipvert;
@@ -342,14 +338,14 @@ void R_ClipEdge (mvertex_t *pv0, mvertex_t *pv1, clipplane_t *clip)
 					r_rightenter = clipvert;
 				}
 
-				R_ClipEdge (&clipvert, pv1, clip->next);
+				R_ClipEdge(&clipvert, pv1, clip->next);
 				return;
 			}
 		} while ((clip = clip->next) != NULL);
 	}
 
 // add the edge
-	R_EmitEdge (pv0, pv1);
+	R_EmitEdge(pv0, pv1);
 }
 
 #endif	// !id386
@@ -360,11 +356,8 @@ void R_ClipEdge (mvertex_t *pv0, mvertex_t *pv1, clipplane_t *clip)
 R_EmitCachedEdge
 ================
 */
-void R_EmitCachedEdge (void)
-{
-	edge_t		*pedge_t;
-
-	pedge_t = (edge_t *)((unsigned long)r_edges + r_pedge->cachededgeoffset);
+void R_EmitCachedEdge(void){
+	edge_ptr pedge_t = (edge_ptr)((unsigned long)r_edges + r_pedge->cachededgeoffset);
 
 	if (!pedge_t->surfs[0])
 		pedge_t->surfs[0] = surface_p - surfaces;
@@ -383,15 +376,15 @@ void R_EmitCachedEdge (void)
 R_RenderFace
 ================
 */
-void R_RenderFace (msurface_t *fa, int clipflags)
+void R_RenderFace(msurface_t* fa, int clipflags)
 {
 	int			i, lindex;
 	unsigned	mask;
-	mplane_t	*pplane;
+	mplane_t* pplane;
 	float		distinv;
 	vec3_t		p_normal;
-	medge_t		*pedges, tedge;
-	clipplane_t	*pclip;
+	medge_t*  pedges, tedge;
+	clipplane_t* pclip;
 
 // skip out if no more surfs
 	if ((surface_p) >= surf_max)
@@ -453,7 +446,7 @@ void R_RenderFace (msurface_t *fa, int clipflags)
 				{
 					if ((((unsigned long)edge_p - (unsigned long)r_edges) >
 						 r_pedge->cachededgeoffset) &&
-						(((edge_t *)((unsigned long)r_edges +
+						(((edge_ptr)((unsigned long)r_edges +
 						 r_pedge->cachededgeoffset))->owner == r_pedge))
 					{
 						R_EmitCachedEdge ();
@@ -464,7 +457,7 @@ void R_RenderFace (msurface_t *fa, int clipflags)
 			}
 
 		// assume it's cacheable
-			cacheoffset = (byte *)edge_p - (byte *)r_edges;
+			cacheoffset = (byte*)edge_p - (byte*)r_edges;
 			r_leftclipped = r_rightclipped = false;
 			R_ClipEdge (&r_pcurrentvertbase[r_pedge->v[0]],
 						&r_pcurrentvertbase[r_pedge->v[1]],
@@ -499,7 +492,7 @@ void R_RenderFace (msurface_t *fa, int clipflags)
 				// by this medge_t
 					if ((((unsigned long)edge_p - (unsigned long)r_edges) >
 						 r_pedge->cachededgeoffset) &&
-						(((edge_t *)((unsigned long)r_edges +
+						(((edge_ptr)((unsigned long)r_edges +
 						 r_pedge->cachededgeoffset))->owner == r_pedge))
 					{
 						R_EmitCachedEdge ();
@@ -510,7 +503,7 @@ void R_RenderFace (msurface_t *fa, int clipflags)
 			}
 
 		// assume it's cacheable
-			cacheoffset = (byte *)edge_p - (byte *)r_edges;
+			cacheoffset = (byte*)edge_p - (byte*)r_edges;
 			r_leftclipped = r_rightclipped = false;
 			R_ClipEdge (&r_pcurrentvertbase[r_pedge->v[1]],
 						&r_pcurrentvertbase[r_pedge->v[0]],
@@ -550,7 +543,7 @@ void R_RenderFace (msurface_t *fa, int clipflags)
 
 	r_polycount++;
 
-	surface_p->data = (void *)fa;
+	surface_p->data = (typeless_ptr)fa;
 	surface_p->nearzi = r_nearzi;
 	surface_p->flags = fa->flags;
 	surface_p->insubmodel = insubmodel;
@@ -581,15 +574,15 @@ void R_RenderFace (msurface_t *fa, int clipflags)
 R_RenderBmodelFace
 ================
 */
-void R_RenderBmodelFace (bedge_t *pedges, msurface_t *psurf)
+void R_RenderBmodelFace (bedge_t* pedges, msurface_t* psurf)
 {
 	int			i;
 	unsigned	mask;
-	mplane_t	*pplane;
+	mplane_t* pplane;
 	float		distinv;
 	vec3_t		p_normal;
 	static medge_t  tedge;
-	clipplane_t	*pclip;
+	clipplane_t* pclip;
 
 // skip out if no more surfs
 	if (surface_p >= surf_max)
@@ -665,7 +658,7 @@ void R_RenderBmodelFace (bedge_t *pedges, msurface_t *psurf)
 
 	r_polycount++;
 
-	surface_p->data = (void *)psurf;
+	surface_p->data = (typeless_ptr)psurf;
 	surface_p->nearzi = r_nearzi;
 	surface_p->flags = psurf->flags;
 	surface_p->insubmodel = true;
@@ -860,12 +853,12 @@ void R_RenderPoly(msurface_t* fa, int clipflags){
 R_ZDrawSubmodelPolys
 ================
 */
-void R_ZDrawSubmodelPolys (model_t *pmodel)
+void R_ZDrawSubmodelPolys (model_t* pmodel)
 {
 	int			i, numsurfaces;
-	msurface_t	*psurf;
+	msurface_t* psurf;
 	float		dot;
-	mplane_t	*pplane;
+	mplane_t* pplane;
 
 	psurf = &pmodel->surfaces[pmodel->firstmodelsurface];
 	numsurfaces = pmodel->nummodelsurfaces;

@@ -101,7 +101,7 @@ static byte     backingbuf[48*24];
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
 byte	*VGA_pagebase;
 
-void VGA_UpdatePlanarScreen (void *srcbuffer);
+void VGA_UpdatePlanarScreen (typeless_ptr srcbuffer);
 
 void D_BeginDirectRect (int x, int y, byte *pbitmap, int width, int height)
 {
@@ -233,7 +233,7 @@ VID_Gamma_f
 Keybinding command
 =================
 */
-void VID_Gamma_f (void)
+void VID_Gamma_f()
 {
 	float	gamma, f, inf;
 	unsigned char	palette[768];
@@ -260,7 +260,7 @@ void VID_Gamma_f (void)
 	}
 }
 
-void VID_DescribeMode_f (void)
+void VID_DescribeMode_f()
 {
 	int modenum;
 
@@ -274,7 +274,7 @@ void VID_DescribeMode_f (void)
 		Con_Printf("%d bpp\n", modes[modenum].bytesperpixel<<3);
 }
 
-void VID_DescribeModes_f (void)
+void VID_DescribeModes_f()
 {
 	int i;
 
@@ -302,12 +302,12 @@ int VID_NumModes ()
 	return (i1);
 }
 
-void VID_NumModes_f (void)
+void VID_NumModes_f()
 {
 	Con_Printf("%d modes\n",VID_NumModes());
 }
 
-void VID_Debug_f (void)
+void VID_Debug_f()
 {
 	Con_Printf("mode: %d\n",current_mode);
 	Con_Printf("height x width: %d x %d\n",vid.height,vid.width);
@@ -500,7 +500,7 @@ int VID_SetMode (int modenum, unsigned char *palette)
 	}
 
 	vid.aspect = ((float)vid.height / (float)vid.width) * (320.0 / 240.0);
-	vid.colormap = (pixel_t *) host_colormap;
+	vid.colormap = (pixel_p) host_colormap;
 	vid.fullbright = 256 - LittleLong (*((int *)vid.colormap + 2048));
 	vid.conrowbytes = vid.rowbytes;
 	vid.conwidth = vid.width;
@@ -528,7 +528,7 @@ int VID_SetMode (int modenum, unsigned char *palette)
 
 	vid_surfcache = ((byte *)d_pzbuffer) + zsize;
 
-	vid.conbuffer = vid.buffer = (pixel_t *)(((byte *)d_pzbuffer) + zsize + tsize);
+	vid.conbuffer = vid.buffer = (pixel_p)(((byte *)d_pzbuffer) + zsize + tsize);
 
 	D_InitCaches (vid_surfcache, tsize);
 
@@ -719,7 +719,7 @@ void VID_Init(unsigned char *palette)
 
 }
 
-void VID_Update(vrect_t *rects)
+void VID_Update(vrect_p rects)
 {
 	if (!svgalib_inited)
 		return;
@@ -814,7 +814,7 @@ void Sys_SendKeyEvents(void)
 		while (keyboard_update());
 }
 
-void Force_CenterView_f (void)
+void Force_CenterView_f()
 {
 	cl.viewangles[PITCH] = 0;
 }
@@ -882,7 +882,7 @@ void IN_Shutdown(void)
 IN_Commands
 ===========
 */
-void IN_Commands (void)
+void IN_Commands()
 {
 	if (UseMouse && cls.state != ca_dedicated)
 	{

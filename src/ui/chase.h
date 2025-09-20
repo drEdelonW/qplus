@@ -4,6 +4,6 @@
 // chase
 //
 
-void Chase_Init (void);
-void Chase_Reset (void);
-void Chase_Update (void);
+void Chase_Init();
+void Chase_Reset();
+void Chase_Update();

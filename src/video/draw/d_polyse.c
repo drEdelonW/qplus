@@ -108,11 +108,11 @@ byte	*skinstart;
 
 void D_PolysetDrawSpans8 (spanpackage_t *pspanpackage);
 void D_PolysetCalcGradients (int skinwidth);
-void D_DrawSubdiv (void);
-void D_DrawNonSubdiv (void);
+void D_DrawSubdiv();
+void D_DrawNonSubdiv();
 void D_PolysetRecursiveTriangle (int *p1, int *p2, int *p3);
-void D_PolysetSetEdgeTable (void);
-void D_RasterizeAliasPolySmooth (void);
+void D_PolysetSetEdgeTable();
+void D_RasterizeAliasPolySmooth();
 void D_PolysetScanLeftEdge (int height);
 
 #if	!id386
@@ -122,7 +122,7 @@ void D_PolysetScanLeftEdge (int height);
 D_PolysetDraw
 ================
 */
-void D_PolysetDraw (void)
+void D_PolysetDraw()
 {
 	spanpackage_t	spans[DPS_MAXSPANS + 1 +
 			((CACHE_SIZE - 1) / sizeof(spanpackage_t)) + 1];
@@ -147,10 +147,9 @@ void D_PolysetDraw (void)
 D_PolysetDrawFinalVerts
 ================
 */
-void D_PolysetDrawFinalVerts (finalvert_t *fv, int numverts)
-{
+void D_PolysetDrawFinalVerts(finalvert_p fv, int numverts){
 	int		i, z;
-	short	*zbuf;
+	short*	zbuf;
 
 	for (i=0 ; i<numverts ; i++, fv++)
 	{
@@ -180,10 +179,10 @@ void D_PolysetDrawFinalVerts (finalvert_t *fv, int numverts)
 D_DrawSubdiv
 ================
 */
-void D_DrawSubdiv (void)
+void D_DrawSubdiv()
 {
 	mtriangle_t		*ptri;
-	finalvert_t		*pfv, *index0, *index1, *index2;
+	finalvert_p		pfv, index0, index1, index2;
 	int				i;
 	int				lnumtriangles;
 
@@ -241,10 +240,10 @@ void D_DrawSubdiv (void)
 D_DrawNonSubdiv
 ================
 */
-void D_DrawNonSubdiv (void)
+void D_DrawNonSubdiv()
 {
 	mtriangle_t		*ptri;
-	finalvert_t		*pfv, *index0, *index1, *index2;
+	finalvert_p		pfv, index0, index1, index2;
 	int				i;
 	int				lnumtriangles;
 
@@ -394,7 +393,7 @@ nodraw:
 D_PolysetUpdateTables
 ================
 */
-void D_PolysetUpdateTables (void)
+void D_PolysetUpdateTables()
 {
 	int		i;
 	byte	*s;
@@ -719,7 +718,7 @@ void D_PolysetFillSpans8 (spanpackage_t *pspanpackage)
 D_RasterizeAliasPolySmooth
 ================
 */
-void D_RasterizeAliasPolySmooth (void)
+void D_RasterizeAliasPolySmooth()
 {
 	int				initialleftheight, initialrightheight;
 	int				*plefttop, *prighttop, *pleftbottom, *prightbottom;
@@ -978,7 +977,7 @@ void D_RasterizeAliasPolySmooth (void)
 D_PolysetSetEdgeTable
 ================
 */
-void D_PolysetSetEdgeTable (void)
+void D_PolysetSetEdgeTable()
 {
 	int			edgetableindex;
 
