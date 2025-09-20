@@ -41,7 +41,7 @@ int			con_totallines;		// total lines in console scrollback
 int			con_backscroll;		// lines up from bottom to display
 int			con_current;		// where next message will be printed
 int			con_x;				// offset in current line for next print
-char*       con_text = 0;
+cstring       con_text = 0;
 
 
 #define	NUM_CON_TIMES 4
@@ -195,7 +195,7 @@ void Con_CheckResize(){
 #define MAXGAMEDIRLEN	1000
 void Con_Init(){
 	char    temp[MAXGAMEDIRLEN + 1];
-	char*   t2 = "/qconsole.log";
+	cstring   t2 = "/qconsole.log";
 
 	con_debuglog = COM_CheckParm("-condebug");
 
@@ -250,7 +250,7 @@ void Con_Linefeed(){
     If no console is visible, the notify window will pop up.
     ================
 */
-void Con_Print(char* txt){
+void Con_Print(cstring txt){
 	int		c;
 	static int	cr;
 	int		mask;
@@ -327,7 +327,7 @@ void Con_Print(char* txt){
     Con_DebugLog
     ================
 */
-void Con_DebugLog(char* file, char* fmt, ...){
+void Con_DebugLog(cstring file, cstring fmt, ...){
     va_list argptr;
     static char data[1024];
     int fd;
@@ -350,7 +350,7 @@ void Con_DebugLog(char* file, char* fmt, ...){
 */
 #define	MAXPRINTMSG	4096
 // FIXME: make a buffer size safe vsprintf?
-void Con_Printf (char* fmt, ...){
+void Con_Printf (cstring fmt, ...){
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 	static qboolean	inupdate;
@@ -397,7 +397,7 @@ void Con_Printf (char* fmt, ...){
     A Con_Printf that only shows up if the "developer" cvar is set
     ================
 */
-void Con_DPrintf (char* fmt, ...){
+void Con_DPrintf (cstring fmt, ...){
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 
@@ -420,7 +420,7 @@ void Con_DPrintf (char* fmt, ...){
     Okay to call even when the screen can't be updated
     ==================
 */
-void Con_SafePrintf (char* fmt, ...){
+void Con_SafePrintf (cstring fmt, ...){
 	va_list		argptr;
 	char		msg[1024];
 
@@ -457,7 +457,7 @@ void Con_DrawInput(){
 		return;		// don't draw anything
 	}
 
-	char* text = key_lines[edit_line];
+	cstring text = key_lines[edit_line];
 
     // add the cursor frame
 	text[key_linepos] = 10 + ((int)(realtime * con_cursorspeed) & 1);
@@ -504,7 +504,7 @@ void Con_DrawNotify(){
 		time = realtime - time;
 		if (time > con_notifytime.value)
 			continue;
-		char* text = con_text + (i % con_totallines) * con_linewidth;
+		cstring text = con_text + (i % con_totallines) * con_linewidth;
 
 		clearnotify = 0;
 		scr_copytop = 1;
@@ -565,7 +565,7 @@ void Con_DrawConsole(int lines, qboolean drawinput){
         // if (j < 0){
 		// 	j = 0;
         // }
-		char* text = con_text + (j % con_totallines) * con_linewidth;
+		cstring text = con_text + (j % con_totallines) * con_linewidth;
 
 		for (int x = 0; x < con_linewidth; x++){
 			Draw_Character((x + 1) << 3, y, text[x]);
@@ -584,7 +584,7 @@ void Con_DrawConsole(int lines, qboolean drawinput){
     Con_NotifyBox
     ==================
 */
-void Con_NotifyBox(char* text){
+void Con_NotifyBox(cstring text){
     // during startup for sound / cd warnings
 	Con_Printf("\n\n" CON_HORIZONLINE);
 

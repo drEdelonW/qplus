@@ -408,7 +408,7 @@ int VGA_InitMode (viddef_p lvid, vmode_t *pcurrentmode)
 VGA_SetPalette
 ================
 */
-void VGA_SetPalette(viddef_p lvid, vmode_t *pcurrentmode, unsigned char *pal)
+void VGA_SetPalette(viddef_p lvid, vmode_t *pcurrentmode, uint8_t *pal)
 {
 	int shiftcomponents=2;
 	int i;

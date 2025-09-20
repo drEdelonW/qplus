@@ -221,7 +221,7 @@ typedef enum {
 } keydest_t;
 
 extern keydest_t	key_dest;
-extern char*    keybindings[MAX_KEYS];
+extern cstring    keybindings[MAX_KEYS];
 extern	int		key_repeats[MAX_KEYS];
 extern	int		key_count;			// incremented every key event
 extern	int		key_lastpress;

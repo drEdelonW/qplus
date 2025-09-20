@@ -97,7 +97,7 @@ typedef struct
 } keymap_t;
 
 viddef_t vid; // global video state
-unsigned short       d_8to16table[256];
+uint16_t       d_8to16table[256];
 
 int		num_shades=32;
 
@@ -143,7 +143,7 @@ static int verbose=1;
 
 static byte current_palette[768];
 
-typedef unsigned short PIXEL16;
+typedef uint16_t PIXEL16;
 typedef unsigned long PIXEL24;
 static PIXEL16 st2d_8to16table[256];
 static PIXEL24 st2d_8to24table[256];
@@ -220,7 +220,7 @@ PIXEL24 xlib_rgb24(int r,int g,int b)
 void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
 {
 	int xi,yi;
-	unsigned char *src;
+	uint8_t *src;
 	PIXEL16 *dest;
 	register int count, n;
 
@@ -256,7 +256,7 @@ void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
 void st3_fixup( XImage *framebuf, int x, int y, int width, int height)
 {
 	int xi,yi;
-	unsigned char *src;
+	uint8_t *src;
 	PIXEL24 *dest;
 	register int count, n;
 
@@ -403,9 +403,9 @@ void ResetFrameBuffer(void)
 	if (pwidth == 3) pwidth = 4;
 	mem = ((vid.width*pwidth+3)&~3) * vid.height;
 
-//	d_pzbuffer = (unsigned short *) Z_Malloc(vid.width*vid.height*
+//	d_pzbuffer = (uint16_t *) Z_Malloc(vid.width*vid.height*
 //		sizeof(*d_pzbuffer));
-	d_pzbuffer = (short *) Hunk_HighAllocName(vid.width*vid.height*
+	d_pzbuffer = (int16_t *) Hunk_HighAllocName(vid.width*vid.height*
 		sizeof(*d_pzbuffer), "zbuff");
 
 	x_framebuffer[0] = XCreateImage(	x_disp,
@@ -521,7 +521,7 @@ void VID_SetWindowTitle( Window win, char *pszName )
     XWMHints		*wmHints;
 
     // Setup ICCCM properties
-    textprop.value = (unsigned char *)pszName;
+    textprop.value = (uint8_t *)pszName;
     textprop.encoding = XA_STRING;
     textprop.format = 8;
     textprop.nitems = strlen(pszName);
@@ -555,7 +555,7 @@ qboolean VID_FullScreen( Window win )
 
     hints.flags = MWM_HINTS_DECORATIONS;
     hints.decorations = 0; // Absolutely no decorations.
-    XChangeProperty( x_disp, win, aHints, aHints, 32, PropModeReplace, (unsigned char *)&hints, 4 );
+    XChangeProperty( x_disp, win, aHints, aHints, 32, PropModeReplace, (uint8_t *)&hints, 4 );
 
     changes.x = 0;
     changes.y = 0;
@@ -566,7 +566,7 @@ qboolean VID_FullScreen( Window win )
     return( true );
 }
 
-void	VID_Init (unsigned char *palette)
+void	VID_Init (uint8_t *palette)
 {
 
 	int pnum, i;
@@ -805,12 +805,12 @@ void	VID_Init (unsigned char *palette)
 
 }
 
-void VID_ShiftPalette(unsigned char *p)
+void VID_ShiftPalette(uint8_t *p)
 {
 	VID_SetPalette(p);
 }
 
-void VID_SetPalette(unsigned char *palette)
+void VID_SetPalette(uint8_t *palette)
 {
 
 	int i;

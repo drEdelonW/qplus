@@ -75,7 +75,7 @@ byte	vid_current_palette[768];	// save for mode changes
 
 static qboolean	nomodecheck = false;
 
-unsigned short	d_8to16table[256];	// not used in 8 bpp mode
+uint16_t	d_8to16table[256];	// not used in 8 bpp mode
 unsigned		d_8to24table[256];	// not used in 8 bpp mode
 
 void VID_MenuDraw();
@@ -87,7 +87,7 @@ void VID_MenuKey (int key);
 VID_Init
 ================
 */
-void    VID_Init (unsigned char *palette)
+void    VID_Init (uint8_t *palette)
 {
 	Cvar_RegisterVariable(&vid_mode);
 	Cvar_RegisterVariable(&vid_wait);
@@ -195,7 +195,7 @@ char *VID_ModeInfo (int modenum, char **ppheader)
 VID_SetMode
 ================
 */
-int VID_SetMode (int modenum, unsigned char *palette)
+int VID_SetMode (int modenum, uint8_t *palette)
 {
 	int		stat;
 	vmode_t	*pnewmode, *poldmode;
@@ -282,7 +282,7 @@ int VID_SetMode (int modenum, unsigned char *palette)
 VID_SetPalette
 ================
 */
-void    VID_SetPalette (unsigned char *palette)
+void    VID_SetPalette (uint8_t *palette)
 {
 	if (palette != vid_current_palette)
 		Q_memcpy(vid_current_palette, palette, 768);
@@ -295,7 +295,7 @@ void    VID_SetPalette (unsigned char *palette)
 VID_ShiftPalette
 ================
 */
-void    VID_ShiftPalette (unsigned char *palette)
+void    VID_ShiftPalette (uint8_t *palette)
 {
 
 	VID_SetPalette (palette);

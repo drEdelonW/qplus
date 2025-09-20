@@ -35,7 +35,7 @@ typedef struct vmode_s {
 	void		(*swapbuffers)(viddef_p vid, struct vmode_s *pcurrentmode,
 							   vrect_p rects);
 	void		(*setpalette)(viddef_p vid, struct vmode_s *pcurrentmode,
-							  unsigned char *palette);
+							  uint8_t *palette);
 	void		(*begindirectrect)(viddef_p vid, struct vmode_s *pcurrentmode,
 								   int x, int y, byte *pbitmap, int width,
 								   int height);
@@ -59,7 +59,7 @@ CVAR_EXTERN(vid_wait);
 CVAR_EXTERN(vid_nopageflip);
 CVAR_EXTERN(_vid_wait_override);
 
-extern unsigned char colormap256[32][256];
+extern uint8_t colormap256[32][256];
 
 extern void	*vid_surfcache;
 extern int	vid_surfcachesize;
@@ -69,7 +69,7 @@ void VID_InitVESA();
 void VID_InitExtra();
 void VGA_WaitVsync();
 void VGA_ClearVideoMem (int planar);
-void VGA_SetPalette(viddef_p vid, vmode_t *pcurrentmode, unsigned char *pal);
+void VGA_SetPalette(viddef_p vid, vmode_t *pcurrentmode, uint8_t *pal);
 void VGA_SwapBuffersCopy (viddef_p vid, vmode_t *pcurrentmode,
 	vrect_p rects);
 qboolean VGA_FreeAndAllocVidbuffer (viddef_p vid, int allocnewbuffer);

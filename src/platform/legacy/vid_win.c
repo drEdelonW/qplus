@@ -104,9 +104,9 @@ static byte		*vid_surfcache;
 static int		vid_surfcachesize;
 static int		VID_highhunkmark;
 
-unsigned char	vid_curpal[256*3];
+uint8_t	vid_curpal[256*3];
 
-unsigned short	d_8to16table[256];
+uint16_t	d_8to16table[256];
 unsigned	d_8to24table[256];
 
 int     driver = grDETECT,mode;
@@ -1561,7 +1561,7 @@ void VID_SetDefaultMode()
 }
 
 
-int VID_SetMode (int modenum, unsigned char *palette)
+int VID_SetMode (int modenum, uint8_t *palette)
 {
 	int				original_mode, temp, dummy;
 	qboolean		stat;
@@ -1812,7 +1812,7 @@ void VID_ForceLockState (int lk)
 }
 
 
-void	VID_SetPalette (unsigned char *palette)
+void	VID_SetPalette (uint8_t *palette)
 {
 	INT			i;
 	palette_t	pal[256];
@@ -1882,7 +1882,7 @@ void	VID_SetPalette (unsigned char *palette)
 }
 
 
-void	VID_ShiftPalette (unsigned char *palette)
+void	VID_ShiftPalette (uint8_t *palette)
 {
 	VID_SetPalette (palette);
 }
@@ -2055,7 +2055,7 @@ void VID_ForceMode_f()
 }
 
 
-void	VID_Init (unsigned char *palette)
+void	VID_Init (uint8_t *palette)
 {
 	int		i, bestmatch, bestmatchmetric, t, dr, dg, db;
 	int		basenummodes;
@@ -2967,7 +2967,7 @@ LONG WINAPI MainWndProc (
 		// Its delta is either positive or neg, and we generate the proper
 		// Event.
 		case WM_MOUSEWHEEL:
-			if ((short) HIWORD(wParam) > 0) {
+			if ((int16_t) HIWORD(wParam) > 0) {
 				Key_Event(K_MWHEELUP, true);
 				Key_Event(K_MWHEELUP, false);
 			} else {

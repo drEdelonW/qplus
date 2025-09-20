@@ -101,7 +101,7 @@ void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count){
 void SV_StartSound(
     edict_t* entity,
     int     channel,
-    char*   sample,
+    cstring   sample,
     int     volume,
     float   attenuation
 ){
@@ -186,15 +186,15 @@ void SV_SendServerinfo(client_t* client){
 
     MSG_WriteByte(&client->message, (!coop.value && deathmatch.value)? GAME_DEATHMATCH : GAME_COOP);
 
-	sprintf(message, pr_strings + sv.edicts->v.message);
+	snprintf(message, sizeof(message), "%s", pr_strings + sv.edicts->v.message);
 
 	MSG_WriteString(&client->message, message);
 
-	for (char** s = (sv.model_precache + 1); *s; s++)
+	for (cstring* s = (sv.model_precache + 1); *s; s++)
 		MSG_WriteString(&client->message, *s);
 	MSG_WriteByte(&client->message, 0);
 
-	for (char** s = (sv.sound_precache + 1); *s; s++)
+	for (cstring* s = (sv.sound_precache + 1); *s; s++)
 		MSG_WriteString(&client->message, *s);
 	MSG_WriteByte(&client->message, 0);
 
@@ -743,7 +743,7 @@ SERVER SPAWNING
 
     ================
 */
-int SV_ModelIndex(char* name){
+int SV_ModelIndex(cstring name){
 	int		i;
 
 	if (!name || !name[0])

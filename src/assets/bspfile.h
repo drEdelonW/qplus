@@ -164,17 +164,17 @@ typedef struct{
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
 typedef struct{
 	int			planenum;
-	short		children[2];	// negative numbers are -(leafs+1), not nodes
-	short		mins[3];		// for sphere culling
-	short		maxs[3];
-	unsigned short	firstface;
-	unsigned short	numfaces;	// counting both sides
+	int16_t		children[2];	// negative numbers are -(leafs+1), not nodes
+	int16_t		mins[3];		// for sphere culling
+	int16_t		maxs[3];
+	uint16_t	firstface;
+	uint16_t	numfaces;	// counting both sides
 } dnode_t;
 
 typedef struct
 {
 	int			planenum;
-	short		children[2];	// negative numbers are contents
+	int16_t		children[2];	// negative numbers are contents
 } dclipnode_t;
 
 
@@ -190,18 +190,18 @@ typedef struct texinfo_s
 // counterclockwise use of the edge in a face
 typedef struct
 {
-	unsigned short	v[2];		// vertex numbers
+	uint16_t	v[2];		// vertex numbers
 } dedge_t;
 
 #define	MAXLIGHTMAPS	4
 typedef struct
 {
-	short		planenum;
-	short		side;
+	int16_t		planenum;
+	int16_t		side;
 
 	int			firstedge;		// we must support > 64k edges
-	short		numedges;
-	short		texinfo;
+	int16_t		numedges;
+	int16_t		texinfo;
 
 // lighting info
 	byte		styles[MAXLIGHTMAPS];
@@ -224,11 +224,11 @@ typedef struct
 	int			contents;
 	int			visofs;				// -1 = no visibility info
 
-	short		mins[3];			// for frustum culling
-	short		maxs[3];
+	int16_t		mins[3];			// for frustum culling
+	int16_t		maxs[3];
 
-	unsigned short		firstmarksurface;
-	unsigned short		nummarksurfaces;
+	uint16_t		firstmarksurface;
+	uint16_t		nummarksurfaces;
 
 	byte		ambient_level[NUM_AMBIENTS];
 } dleaf_t;
@@ -284,7 +284,7 @@ extern	int			numedges;
 extern	dedge_t		dedges[MAX_MAP_EDGES];
 
 extern	int			nummarksurfaces;
-extern	unsigned short	dmarksurfaces[MAX_MAP_MARKSURFACES];
+extern	uint16_t	dmarksurfaces[MAX_MAP_MARKSURFACES];
 
 extern	int			numsurfedges;
 extern	int			dsurfedges[MAX_MAP_SURFEDGES];

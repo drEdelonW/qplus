@@ -472,7 +472,7 @@ void Host_ClearMemory()
 ===================
 Host_FilterTime
 
-Returns false if the time is too short to run a frame
+Returns false if the time is too int16_t to run a frame
 ===================
 */
 qboolean Host_FilterTime (float time)
@@ -488,7 +488,7 @@ qboolean Host_FilterTime (float time)
 	if (host_framerate.value > 0)
 		host_frametime = host_framerate.value;
 	else
-	{	// don't allow really long or short frames
+	{	// don't allow really long or int16_t frames
 		if (host_frametime > 0.1)
 			host_frametime = 0.1;
 		if (host_frametime < 0.001)

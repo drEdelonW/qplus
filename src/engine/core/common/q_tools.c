@@ -47,14 +47,14 @@ int Q_memcmp(typeless_ptr m1, typeless_ptr m2, int count){
 	return 0;
 }
 
-void Q_strcpy(char* dest, char* src){
+void Q_strcpy(cstring dest, cstring src){
 	while (*src){
 		*dest++ = *src++;
 	}
 	*dest++ = 0;
 }
 
-void Q_strncpy(char* dest, char* src, int count){
+void Q_strncpy(cstring dest, cstring src, int count){
 	while (*src && count--){
 		*dest++ = *src++;
 	}
@@ -63,7 +63,7 @@ void Q_strncpy(char* dest, char* src, int count){
     }
 }
 
-int Q_strlen(char* str){
+int Q_strlen(cstring str){
 	int count = 0;
 	while (str[count])
 		count++;
@@ -71,7 +71,7 @@ int Q_strlen(char* str){
 	return count;
 }
 
-char* Q_strrchr(char* s, char c){
+cstring Q_strrchr(cstring s, char c){
     int len = Q_strlen(s);
     s += len;
     while (len--){
@@ -82,12 +82,12 @@ char* Q_strrchr(char* s, char c){
     return 0;
 }
 
-void Q_strcat(char* dest, char* src){
+void Q_strcat(cstring dest, cstring src){
 	dest += Q_strlen(dest);
 	Q_strcpy(dest, src);
 }
 
-int Q_strcmp(char* s1, char* s2){
+int Q_strcmp(cstring s1, cstring s2){
 	while (1){
 		if (*s1 != *s2)
 			return -1;              // strings not equal
@@ -100,7 +100,7 @@ int Q_strcmp(char* s1, char* s2){
 	return -1;
 }
 
-int Q_strncmp(char* s1, char* s2, int count){
+int Q_strncmp(cstring s1, cstring s2, int count){
 	while (1){
 		if (!count--)
 			return 0;
@@ -115,7 +115,7 @@ int Q_strncmp(char* s1, char* s2, int count){
 	return -1;
 }
 
-int Q_strncasecmp(char* s1, char* s2, int n){
+int Q_strncasecmp(cstring s1, cstring s2, int n){
 	while (1) {
 		int c1 = *s1++;
 		int c2 = *s2++;
@@ -141,11 +141,11 @@ int Q_strncasecmp(char* s1, char* s2, int n){
 	return -1;
 }
 
-int Q_strcasecmp(char* s1, char* s2){
+int Q_strcasecmp(cstring s1, cstring s2){
 	return Q_strncasecmp (s1, s2, 99999);
 }
 
-int Q_atoi(char* str){
+int Q_atoi(cstring str){
 	int sign;
 
 	if (*str == '-'){
@@ -200,7 +200,7 @@ int Q_atoi(char* str){
 }
 
 
-float Q_atof(char* str){
+float Q_atof(cstring str){
     int     sign;
 
     if (*str == '-')	{

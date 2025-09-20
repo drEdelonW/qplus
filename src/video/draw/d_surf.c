@@ -127,7 +127,7 @@ void D_FlushCaches()
 D_SCAlloc
 =================
 */
-surfcache_t     *D_SCAlloc (int width, int size)
+surfcache_t* D_SCAlloc (int width, int size)
 {
 	surfcache_t             *new;
 	qboolean                wrapped_this_time;

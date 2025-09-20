@@ -84,7 +84,7 @@ void Sys_Printf (char *fmt, ...)
 void Sys_Printf(char *fmt, ...){
 	va_list argptr;
 	char    text[1024];
-	unsigned char*  p;
+	uint8_t*  p;
 
 	va_start(argptr, fmt);
 	vsprintf(text, fmt, argptr);
@@ -98,7 +98,7 @@ void Sys_Printf(char *fmt, ...){
         return;
 	}
 
-	for (p = (unsigned char*)text; *p; p++) {
+	for (p = (uint8_t*)text; *p; p++) {
 		*p &= 0x7f;
 		if (((*p > 128) ||  // ASCII [DEL] last printable
              (*p < 32)) &&  // ASCII [SP] first printable

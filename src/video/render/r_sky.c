@@ -223,13 +223,13 @@ void R_GenSkyTile16 (typeless_ptr pdest)
 	int				ofs, baseofs;
 	int				xshift, yshift;
 	byte			*pnewsky;
-	unsigned short	*pd;
+	uint16_t	*pd;
 
 	xshift = skytime * skyspeed;
 	yshift = skytime * skyspeed;
 
 	pnewsky = (byte *)&newsky[0];
-	pd = (unsigned short *)pdest;
+	pd = (uint16_t *)pdest;
 
 	for (y=0 ; y<SKYSIZE ; y++)
 	{

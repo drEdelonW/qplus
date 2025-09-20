@@ -62,7 +62,7 @@ typedef struct{
 } keymap_t;
 
 extern viddef_t vid; // global video state
-unsigned short d_8to16table[256];
+uint16_t d_8to16table[256];
 
 int		num_shades=32;
 
@@ -105,7 +105,7 @@ extern void (*vid_menudrawfn)(void);
 extern void (*vid_menukeyfn)(int key);
 void VID_MenuKey (int key);
 
-typedef unsigned short PIXEL16;
+typedef uint16_t PIXEL16;
 typedef unsigned long PIXEL24;
 static PIXEL16 st2d_8to16table[256];
 static PIXEL24 st2d_8to24table[256];
@@ -181,7 +181,7 @@ PIXEL24 xlib_rgb24(int r,int g,int b)
 
 void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
 {
-	unsigned char *src;
+	uint8_t *src;
 	PIXEL16 *dest;
 	register int count, n;
 
@@ -216,7 +216,7 @@ void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
 
 void st3_fixup( XImage *framebuf, int x, int y, int width, int height)
 {
-	unsigned char *src;
+	uint8_t *src;
 	PIXEL24 *dest;
 	register int count, n;
 
@@ -436,7 +436,7 @@ void ResetSharedFrameBuffers(void)
 // the palette data will go away after the call, so it must be copied off if
 // the video driver will need it again
 
-void	VID_Init (unsigned char *palette)
+void	VID_Init (uint8_t *palette)
 {
 
    int pnum, i;
@@ -668,14 +668,14 @@ void	VID_Init (unsigned char *palette)
 
 }
 
-void VID_ShiftPalette(unsigned char *p)
+void VID_ShiftPalette(uint8_t *p)
 {
 	VID_SetPalette(p);
 }
 
 
 
-void VID_SetPalette(unsigned char *palette)
+void VID_SetPalette(uint8_t *palette)
 {
 
 	int i;
@@ -833,7 +833,7 @@ int XLateKey(XKeyEvent *ev)
 #endif
 
 		default:
-			key = *(unsigned char*)buf;
+			key = *(uint8_t*)buf;
 			if (key >= 'A' && key <= 'Z')
 				key = key - 'A' + 'a';
 //			fprintf(stdout, "case 0x0%x: key = ___;break;/* [%c] */\n", keysym);

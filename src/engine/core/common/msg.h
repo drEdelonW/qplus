@@ -24,7 +24,7 @@ int   MSG_ReadByte();
 int   MSG_ReadShort();
 int   MSG_ReadLong();
 float MSG_ReadFloat();
-char* MSG_ReadString();
+cstring MSG_ReadString();
 
 float MSG_ReadCoord();
 float MSG_ReadAngle();

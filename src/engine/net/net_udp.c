@@ -211,7 +211,7 @@ static int PartialIPAddress (char *in, struct qsockaddr *hostaddr)
 		port = net_hostport;
 
 	hostaddr->sa_family = AF_INET;
-	((struct sockaddr_in *)hostaddr)->sin_port = htons((short)port);
+	((struct sockaddr_in *)hostaddr)->sin_port = htons((int16_t)port);
 	((struct sockaddr_in *)hostaddr)->sin_addr.s_addr = (myAddr & htonl(mask)) | htonl(addr);
 
 	return 0;

@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define stringify(m) { #m, m }
 
-unsigned short       d_8to16table[256];
+uint16_t       d_8to16table[256];
 static byte		*vid_surfcache;
 static int		VID_highhunkmark;
 
@@ -60,7 +60,7 @@ struct
 	stringify(MOUSE_PS2),
 };
 
-static unsigned char scantokey[128];
+static uint8_t scantokey[128];
 static byte vid_current_palette[768];
 
 int num_mice = sizeof (mice) / sizeof(mice[0]);
@@ -236,7 +236,7 @@ Keybinding command
 void VID_Gamma_f()
 {
 	float	gamma, f, inf;
-	unsigned char	palette[768];
+	uint8_t	palette[768];
 	int		i;
 
 	if (Cmd_Argc () == 2)
@@ -439,7 +439,7 @@ void VID_Shutdown(void)
 
 }
 
-void VID_ShiftPalette(unsigned char *p)
+void VID_ShiftPalette(uint8_t *p)
 {
 	VID_SetPalette(p);
 }
@@ -469,7 +469,7 @@ void VID_SetPalette(byte *palette)
 	}
 }
 
-int VID_SetMode (int modenum, unsigned char *palette)
+int VID_SetMode (int modenum, uint8_t *palette)
 {
 	int bsize, zsize, tsize;
 
@@ -552,7 +552,7 @@ int VID_SetMode (int modenum, unsigned char *palette)
 	return 0;
 }
 
-void VID_Init(unsigned char *palette)
+void VID_Init(uint8_t *palette)
 {
 
 	int i;

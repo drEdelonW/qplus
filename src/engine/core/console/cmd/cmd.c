@@ -104,7 +104,7 @@ void Cbuf_AddText(char *text){
     ============
 */
 void Cbuf_InsertText(char *text){
-    char*   temp;
+    cstring   temp;
 
     // copy off any commands still remaining in the exec buffer
 	int templen = cmd_text.cursize;
@@ -216,7 +216,7 @@ void Cmd_StuffCmds_f(void){
 	if (!s)
 		return;
 
-	char* text = Z_Malloc(s + 1);
+	cstring text = Z_Malloc(s + 1);
 	text[0] = 0;
 	for (int i = 1; i < com_argc; i++){
 		if (!com_argv[i]){
@@ -229,7 +229,7 @@ void Cmd_StuffCmds_f(void){
 	}
 
     // pull out the commands
-	char* build = Z_Malloc(s + 1);
+	cstring build = Z_Malloc(s + 1);
 	build[0] = 0;
 
 	for (int i = 0; i < (s - 1); i++){
@@ -277,7 +277,7 @@ void Cmd_Exec_f(void){
 	}
 
 	int mark = Hunk_LowMark ();
-	char* f = (char*)COM_LoadHunkFile(Cmd_Argv(1));
+	cstring f = (cstring)COM_LoadHunkFile(Cmd_Argv(1));
 	if (!f){
 		Con_Printf("couldn't exec %s\n", Cmd_Argv(1));
 		return;
@@ -310,8 +310,8 @@ void Cmd_Echo_f(void){
     Creates a new command that executes a command string (possibly ; seperated)
     ===============
 */
-char* CopyString(char *in){
-	char* out = Z_Malloc(strlen(in) + 1);
+cstring CopyString(char *in){
+	cstring out = Z_Malloc(strlen(in) + 1);
 	strcpy (out, in);
 	return out;
 }
@@ -326,7 +326,7 @@ char* CopyString(char *in){
 
 typedef struct cmd_function_s{
     struct cmd_function_s*  next;
-    char*                   name;
+    cstring                   name;
     xcommand_t              function;
 } cmd_function_t;
 
@@ -334,9 +334,9 @@ typedef struct cmd_function_s{
 #define	MAX_ARGS		80
 
 static	int	    cmd_argc;
-char*   cmd_argv[MAX_ARGS];
-static	char*   cmd_null_string = "";
-static	char*   cmd_args = NULL;
+cstring   cmd_argv[MAX_ARGS];
+static	cstring   cmd_null_string = "";
+static	cstring   cmd_args = NULL;
 
 cmd_source_t	cmd_source;
 
@@ -374,7 +374,7 @@ int Cmd_Argc(void){
     Cmd_Argv
     ============
 */
-char* Cmd_Argv(int arg){
+cstring Cmd_Argv(int arg){
     return
         ((unsigned)arg >= cmd_argc)?
             cmd_null_string:
@@ -386,7 +386,7 @@ char* Cmd_Argv(int arg){
     Cmd_Args
     ============
 */
-char* Cmd_Args(void){
+cstring Cmd_Args(void){
 	return cmd_args;
 }
 
@@ -398,7 +398,7 @@ char* Cmd_Args(void){
     Parses the given string into command line tokens.
     ============
 */
-void Cmd_TokenizeString(char* text){
+void Cmd_TokenizeString(cstring text){
     // clear the args from the last string
 	for (int i = 0; i < cmd_argc; i++){
 		Z_Free(cmd_argv[i]);
@@ -524,7 +524,7 @@ char *Cmd_CompleteCommand(char *partial){
 	FIXME: lookupnoadd the token to speed search?
 	============
 */
-void Cmd_ExecuteString(char* text, cmd_source_t src){
+void Cmd_ExecuteString(cstring text, cmd_source_t src){
     cmd_source = src;
     Cmd_TokenizeString (text);
 

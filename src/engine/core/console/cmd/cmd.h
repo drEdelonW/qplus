@@ -22,6 +22,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "qboolean.h"
+#include "zone.h"
 // cmd.h -- Command buffer and command execution
 
 //===========================================================================
@@ -120,4 +121,4 @@ void	Cmd_Print(char *text);
 
 void Cmd_Alias_f(void);
 bool checkAlias();
-char* CopyString(char *in);
+cstring CopyString(cstring in);

@@ -101,7 +101,7 @@ typedef struct
 } keymap_t;
 
 viddef_t vid; // global video state
-unsigned short       d_8to16table[256];
+uint16_t       d_8to16table[256];
 
 int		num_shades=32;
 
@@ -336,7 +336,7 @@ void VID_SetWindowTitle( Window win, char *pszName )
 	XWMHints		*wmHints;
 
     // Setup ICCCM properties
-    textprop.value = (unsigned char *)pszName;
+    textprop.value = (uint8_t *)pszName;
     textprop.encoding = XA_STRING;
     textprop.format = 8;
     textprop.nitems = strlen(pszName);
@@ -369,7 +369,7 @@ qboolean VID_FullScreen( Window win )
 
 	hints.flags = MWM_HINTS_DECORATIONS;
 	hints.decorations = 0; // Absolutely no decorations.
-	XChangeProperty( x_disp, win, aHints, aHints, 32, PropModeReplace, (unsigned char *)&hints, 4 );
+	XChangeProperty( x_disp, win, aHints, aHints, 32, PropModeReplace, (uint8_t *)&hints, 4 );
 
 	changes.x = 0;
 	changes.y = 0;
@@ -380,7 +380,7 @@ qboolean VID_FullScreen( Window win )
 	return( true );
 }
 
-void	VID_Init (unsigned char *palette)
+void	VID_Init (uint8_t *palette)
 {
 
 	int pnum, i;
@@ -704,12 +704,12 @@ VID_ResetFramebuffer_MT()
 	d_pzbuffer = malloc(PM(vid.width)*PM(vid.height)*sizeof(*d_pzbuffer));
 }
 
-void VID_ShiftPalette(unsigned char *p)
+void VID_ShiftPalette(uint8_t *p)
 {
 	VID_SetPalette(p);
 }
 
-void VID_SetPalette(unsigned char *palette)
+void VID_SetPalette(uint8_t *palette)
 {
 
 	int i;
@@ -804,7 +804,7 @@ int XLateKey(XKeyEvent *ev)
 		case XK_F26: key = '*'; break;
 
 		default:
-			key = (unsigned char)*buf;
+			key = (uint8_t)*buf;
 			break;
 		}
 

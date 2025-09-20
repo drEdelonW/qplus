@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 portable_samplepair_t paintbuffer[PAINTBUFFER_SIZE];
 int		snd_scaletable[32][256];
 int 	*snd_p, snd_linear_count, snd_vol;
-short	*snd_out;
+int16_t	*snd_out;
 
 void Snd_WriteLinearBlastStereo16();
 
@@ -46,16 +46,16 @@ void Snd_WriteLinearBlastStereo16()
 		val = (snd_p[i]*snd_vol)>>8;
 		if (val > 0x7fff)
 			snd_out[i] = 0x7fff;
-		else if (val < (short)0x8000)
-			snd_out[i] = (short)0x8000;
+		else if (val < (int16_t)0x8000)
+			snd_out[i] = (int16_t)0x8000;
 		else
 			snd_out[i] = val;
 
 		val = (snd_p[i+1]*snd_vol)>>8;
 		if (val > 0x7fff)
 			snd_out[i+1] = 0x7fff;
-		else if (val < (short)0x8000)
-			snd_out[i+1] = (short)0x8000;
+		else if (val < (int16_t)0x8000)
+			snd_out[i+1] = (int16_t)0x8000;
 		else
 			snd_out[i+1] = val;
 	}
@@ -115,7 +115,7 @@ void S_TransferStereo16 (int endtime)
 	// handle recirculating buffer issues
 		lpos = lpaintedtime & ((shm->samples>>1)-1);
 
-		snd_out = (short *) pbuf + (lpos<<1);
+		snd_out = (int16_t *) pbuf + (lpos<<1);
 
 		snd_linear_count = (shm->samples>>1) - lpos;
 		if (lpaintedtime + snd_linear_count > endtime)
@@ -199,30 +199,30 @@ void S_TransferPaintBuffer(int endtime)
 
 	if (shm->samplebits == 16)
 	{
-		short *out = (short *) pbuf;
+		int16_t *out = (int16_t *) pbuf;
 		while (count--)
 		{
 			val = (*p * snd_vol) >> 8;
 			p+= step;
 			if (val > 0x7fff)
 				val = 0x7fff;
-			else if (val < (short)0x8000)
-				val = (short)0x8000;
+			else if (val < (int16_t)0x8000)
+				val = (int16_t)0x8000;
 			out[out_idx] = val;
 			out_idx = (out_idx + 1) & out_mask;
 		}
 	}
 	else if (shm->samplebits == 8)
 	{
-		unsigned char *out = (unsigned char *) pbuf;
+		uint8_t *out = (uint8_t *) pbuf;
 		while (count--)
 		{
 			val = (*p * snd_vol) >> 8;
 			p+= step;
 			if (val > 0x7fff)
 				val = 0x7fff;
-			else if (val < (short)0x8000)
-				val = (short)0x8000;
+			else if (val < (int16_t)0x8000)
+				val = (int16_t)0x8000;
 			out[out_idx] = (val>>8) + 128;
 			out_idx = (out_idx + 1) & out_mask;
 		}
@@ -347,7 +347,7 @@ void SND_PaintChannelFrom8 (channel_t *ch, sfxcache_t *sc, int count)
 {
 	int 	data;
 	int		*lscale, *rscale;
-	unsigned char *sfx;
+	uint8_t *sfx;
 	int		i;
 
 	if (ch->leftvol > 255)
@@ -357,7 +357,7 @@ void SND_PaintChannelFrom8 (channel_t *ch, sfxcache_t *sc, int count)
 
 	lscale = snd_scaletable[ch->leftvol >> 3];
 	rscale = snd_scaletable[ch->rightvol >> 3];
-	sfx = (unsigned char *)sc->data + ch->pos;
+	sfx = (uint8_t *)sc->data + ch->pos;
 
 	for (i=0 ; i<count ; i++)
 	{
@@ -377,12 +377,12 @@ void SND_PaintChannelFrom16 (channel_t *ch, sfxcache_t *sc, int count)
 	int data;
 	int left, right;
 	int leftvol, rightvol;
-	signed short *sfx;
+	int16_t *sfx;
 	int	i;
 
 	leftvol = ch->leftvol;
 	rightvol = ch->rightvol;
-	sfx = (signed short *)sc->data + ch->pos;
+	sfx = (int16_t *)sc->data + ch->pos;
 
 	for (i=0 ; i<count ; i++)
 	{

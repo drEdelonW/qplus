@@ -28,21 +28,21 @@ viddef_t	vid;				// global video state
 #define	BASEHEIGHT	200
 
 byte	vid_buffer[BASEWIDTH*BASEHEIGHT];
-short	zbuffer[BASEWIDTH*BASEHEIGHT];
+int16_t	zbuffer[BASEWIDTH*BASEHEIGHT];
 byte	surfcache[256*1024];
 
-unsigned short	d_8to16table[256];
+uint16_t	d_8to16table[256];
 unsigned	d_8to24table[256];
 
-void	VID_SetPalette (unsigned char *palette)
+void	VID_SetPalette (uint8_t *palette)
 {
 }
 
-void	VID_ShiftPalette (unsigned char *palette)
+void	VID_ShiftPalette (uint8_t *palette)
 {
 }
 
-void	VID_Init (unsigned char *palette)
+void	VID_Init (uint8_t *palette)
 {
 	vid.maxwarpwidth = vid.width = vid.conwidth = BASEWIDTH;
 	vid.maxwarpheight = vid.height = vid.conheight = BASEHEIGHT;

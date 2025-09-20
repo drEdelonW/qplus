@@ -55,7 +55,7 @@ kbutton_t	in_up, in_down;
 int			in_impulse;
 
 void KeyDown (kbutton_t *btn){
-	char* c = Cmd_Argv(1);
+	cstring c = Cmd_Argv(1);
     int k = (c[0])? atoi(c) : -1;		// typed manually at the console for continuous down
 
 	if ((k == btn->down[0]) ||
@@ -79,7 +79,7 @@ void KeyDown (kbutton_t *btn){
 void KeyUp (kbutton_t *btn){
 	int k;
 
-	char* c = Cmd_Argv(1);
+	cstring c = Cmd_Argv(1);
 	if (c[0]){
 		k = atoi(c);
     }else{ // typed manually at the console, assume for unsticking, so clear all

@@ -39,7 +39,7 @@ keydest_t	key_dest;
 
 int		key_count;			// incremented every key event
 
-char*		keybindings[MAX_KEYS];
+cstring		keybindings[MAX_KEYS];
 qboolean	consolekeys[MAX_KEYS];	// if true, can't be rebound while in console
 qboolean	menubound[MAX_KEYS];	// if true, can't be rebound while in menu
 int			keyshift[MAX_KEYS];		// key to map to if shift held down in console
@@ -47,7 +47,7 @@ int			key_repeats[MAX_KEYS];	// if > 1, it is autorepeating
 qboolean	keydown[MAX_KEYS];
 
 typedef struct{
-	char*   name;
+	cstring   name;
 	int		keynum;
 } keyname_t;
 
@@ -160,7 +160,7 @@ Interactive line editing and console scrollback
 ====================
 */
 void Key_Console(int key){
-	char*   cmd;
+	cstring   cmd;
 
 	if (key == K_ENTER){
 		Cbuf_AddText(key_lines[edit_line] + 1);    // skip the >
@@ -394,7 +394,7 @@ void Key_SetBinding(int keynum, char *binding){
 
 // allocate memory for new binding
 	int l = Q_strlen(binding);
-	char* new = Z_Malloc(l + 1);
+	cstring new = Z_Malloc(l + 1);
 	Q_strcpy(new, binding);
 	new[l] = 0;
 	keybindings[keynum] = new;

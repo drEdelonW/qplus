@@ -87,7 +87,7 @@ extern int D_MipLevelForScale(float scale);
     extern void D_PolysetAff8End(void);
 #endif
 
-extern short*   d_pzbuffer;
+extern int16_t*   d_pzbuffer;
 extern unsigned int d_zrowbytes, d_zwidth;
 
 extern int* d_pscantable;
@@ -99,7 +99,7 @@ extern int	d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
 
 extern pixel_p d_viewbuffer;
 
-extern short*   zspantable[MAXHEIGHT];
+extern int16_t*   zspantable[MAXHEIGHT];
 
 extern int		d_minmip;
 extern float	d_scalemip[3];

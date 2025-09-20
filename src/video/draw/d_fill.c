@@ -30,7 +30,7 @@ D_FillRect
 void D_FillRect (vrect_p rect, int color)
 {
 	int				rx, ry, rwidth, rheight;
-	unsigned char	*dest;
+	uint8_t	*dest;
 	unsigned		*ldest;
 
 	rx = rect->x;

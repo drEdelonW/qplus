@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-char* svc_strings[] = {
+cstring svc_strings[] = {
     "svc_bad",
     "svc_nop",
     "svc_disconnect",
@@ -220,7 +220,7 @@ void CL_ParseServerInfo(){
 	cl.gametype = MSG_ReadByte();
 
 // parse signon message
-	char* str = MSG_ReadString();
+	cstring str = MSG_ReadString();
 	strncpy(cl.levelname, str, (sizeof(cl.levelname) - 1));
 
 // seperate the printfs so the server message can have a color

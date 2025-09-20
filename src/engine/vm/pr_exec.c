@@ -47,7 +47,7 @@ int			pr_xstatement;
 
 int		pr_argc;
 
-char* pr_opnames[] =
+cstring pr_opnames[] =
 {
 "DONE",
 
@@ -136,8 +136,8 @@ char* pr_opnames[] =
 "BITOR"
 };
 
-char* PR_GlobalString (int ofs);
-char* PR_GlobalStringNoContents (int ofs);
+cstring PR_GlobalString (int ofs);
+cstring PR_GlobalStringNoContents (int ofs);
 
 
 //=============================================================================
@@ -259,7 +259,7 @@ PR_RunError
 Aborts the currently executing function
 ============
 */
-void PR_RunError (char* error, ...)
+void PR_RunError (cstring error, ...)
 {
 	va_list		argptr;
 	char		string[1024];

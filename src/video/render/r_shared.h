@@ -154,7 +154,7 @@ struct edge_s{
 	fixed16_t   u_step;
 	edge_ptr    prev;
     edge_ptr    next;
-	unsigned short	surfs[2];
+	uint16_t	surfs[2];
 	edge_ptr    nextremove;
 	float       nearzi;
 	medge_t*    owner;

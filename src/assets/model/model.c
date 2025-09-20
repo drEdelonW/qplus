@@ -627,8 +627,8 @@ void Mod_LoadEdges(lump_p l){
 	loadmodel->numedges = count;
 
 	for (int i = 0; i < count; i++, in++, out++)	{
-		out->v[0] = (unsigned short)LittleShort(in->v[0]);
-		out->v[1] = (unsigned short)LittleShort(in->v[1]);
+		out->v[0] = (uint16_t)LittleShort(in->v[0]);
+		out->v[1] = (uint16_t)LittleShort(in->v[1]);
 	}
 }
 
@@ -1017,7 +1017,7 @@ Mod_LoadMarksurfaces
 void Mod_LoadMarksurfaces (lump_p l)
 {
 	int		i, j, count;
-	short		*in;
+	int16_t* in;
 	msurface_t **out;
 
 	in = (typeless_ptr )(mod_base + l->fileofs);
@@ -1332,7 +1332,7 @@ typeless_ptr  Mod_LoadAliasSkin (typeless_ptr  pin, int *pskinindex, int skinsiz
 {
 	int		i;
 	byte	*pskin, *pinskin;
-	unsigned short	*pusskin;
+	uint16_t	*pusskin;
 
 	pskin = Hunk_AllocName (skinsize * r_pixbytes, loadname);
 	pinskin = (byte *)pin;
@@ -1344,7 +1344,7 @@ typeless_ptr  Mod_LoadAliasSkin (typeless_ptr  pin, int *pskinindex, int skinsiz
 	}
 	else if (r_pixbytes == 2)
 	{
-		pusskin = (unsigned short *)pskin;
+		pusskin = (uint16_t *)pskin;
 
 		for (i=0 ; i<skinsize ; i++)
 			pusskin[i] = d_8to16table[pinskin[i]];
@@ -1653,7 +1653,7 @@ typeless_ptr  Mod_LoadSpriteFrame (typeless_ptr  pin, mspriteframe_t **ppframe)
 	dspriteframe_t		*pinframe;
 	mspriteframe_t		*pspriteframe;
 	int					i, width, height, size, origin[2];
-	unsigned short		*ppixout;
+	uint16_t		*ppixout;
 	byte				*ppixin;
 
 	pinframe = (dspriteframe_t *)pin;
@@ -1685,7 +1685,7 @@ typeless_ptr  Mod_LoadSpriteFrame (typeless_ptr  pin, mspriteframe_t **ppframe)
 	else if (r_pixbytes == 2)
 	{
 		ppixin = (byte *)(pinframe + 1);
-		ppixout = (unsigned short *)&pspriteframe->pixels[0];
+		ppixout = (uint16_t *)&pspriteframe->pixels[0];
 
 		for (i=0 ; i<size ; i++)
 			ppixout[i] = d_8to16table[ppixin[i]];

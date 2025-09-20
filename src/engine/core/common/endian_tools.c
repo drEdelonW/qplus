@@ -10,14 +10,14 @@
 
 qboolean        bigendien;
 
-short   (*BigShort) (short l);
-short   (*LittleShort) (short l);
+int16_t   (*BigShort) (int16_t l);
+int16_t   (*LittleShort) (int16_t l);
 int     (*BigLong) (int l);
 int     (*LittleLong) (int l);
 float   (*BigFloat) (float l);
 float   (*LittleFloat) (float l);
 
-short   ShortSwap (short l)
+int16_t   ShortSwap (int16_t l)
 {
 	uint8_t    b1,b2;
 
@@ -27,7 +27,7 @@ short   ShortSwap (short l)
 	return (b1<<8) + b2;
 }
 
-short   ShortNoSwap (short l)
+int16_t   ShortNoSwap (int16_t l)
 {
 	return l;
 }
@@ -75,7 +75,7 @@ void COM_Endian_Init() {
     uint8_t    swaptest[2] = {1,0};
 
 // set the uint8_t swapping variables in a portable manner
-	if ( *(short *)swaptest == 1)
+	if ( *(int16_t *)swaptest == 1)
 	{
 		bigendien = false;
 		BigShort = ShortSwap;

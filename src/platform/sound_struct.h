@@ -35,7 +35,7 @@ typedef struct{
 	int				samplepos;				// in mono samples
 	int				samplebits;
 	int				speed;
-	unsigned char*  buffer;
+	uint8_t*  buffer;
 } dma_t;
 typedef dma_t* dma_p;
 

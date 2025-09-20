@@ -64,16 +64,20 @@ typedef struct mplane_s{
 	byte	signbits;		// signx + signy<<1 + signz<<1
 	byte	pad[2];
 } mplane_t;
+typedef mplane_t* mplane_p;
 
-typedef struct texture_s{
+struct texture_s;
+typedef struct texture_s texture_t;
+typedef texture_t* texture_p;
+struct texture_s{
 	char		name[16];
 	unsigned	width, height;
 	int			anim_total;				// total tenths in sequence ( 0 = no)
 	int			anim_min, anim_max;		// time for this frame min <=time< max
-	struct texture_s* anim_next;		// in the animation sequence
-	struct texture_s* alternate_anims;	// bmodels in frmae 1 use these
+	texture_p 	anim_next;		// in the animation sequence
+	texture_p 	alternate_anims;	// bmodels in frmae 1 use these
 	unsigned	offsets[MIPLEVELS];		// four mip maps stored
-} texture_t;
+};
 
 
 #define	SURF_PLANEBACK		2
@@ -85,14 +89,14 @@ typedef struct texture_s{
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct{
-	unsigned short	v[2];
+	uint16_t	v[2];
 	unsigned int	cachededgeoffset;
 } medge_t;
 
 typedef struct{
 	float		vecs[2][4];
 	float		mipadjust;
-	texture_t*	texture;
+	texture_p	texture;
 	int			flags;
 } mtexinfo_t;
 
@@ -102,7 +106,7 @@ typedef struct msurface_s{
 	int			dlightframe;
 	int			dlightbits;
 
-	mplane_t*	plane;
+	mplane_p	plane;
 	int			flags;
 
 	int			firstedge;	// look up in model->surfedges[], negative numbers
@@ -111,8 +115,8 @@ typedef struct msurface_s{
 // surface generation data
 	struct surfcache_s*	cachespots[MIPLEVELS];
 
-	short		texturemins[2];
-	short		extents[2];
+	int16_t		texturemins[2];
+	int16_t		extents[2];
 
 	mtexinfo_t*	texinfo;
 
@@ -127,16 +131,16 @@ typedef struct mnode_s{
 	int			contents;		// 0, to differentiate from leafs
 	int			visframe;		// node needs to be traversed if current
 
-	short		minmaxs[6];		// for bounding box culling
+	int16_t		minmaxs[6];		// for bounding box culling
 
 	struct mnode_s*	parent;
 
 // node specific
-	mplane_t*	plane;
+	mplane_p	plane;
 	struct mnode_s*	children[2];
 
-	unsigned short		firstsurface;
-	unsigned short		numsurfaces;
+	uint16_t		firstsurface;
+	uint16_t		numsurfaces;
 } mnode_t;
 
 
@@ -146,7 +150,7 @@ typedef struct mleaf_s{
 	int			contents;		// wil be a negative contents number
 	int			visframe;		// node needs to be traversed if current
 
-	short		minmaxs[6];		// for bounding box culling
+	int16_t		minmaxs[6];		// for bounding box culling
 
 	struct mnode_s*	parent;
 
@@ -163,7 +167,7 @@ typedef struct mleaf_s{
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
 typedef struct{
 	dclipnode_t* clipnodes;
-	mplane_t*   planes;
+	mplane_p   planes;
 	int			firstclipnode;
 	int			lastclipnode;
 	vec3_t		clip_mins;
@@ -327,10 +331,10 @@ typedef struct model_s{
 	dmodel_p    submodels;
 
 	int			numplanes;
-	mplane_t*   planes;
+	mplane_p   planes;
 
 	int			numleafs;		// number of visible leafs, not counting 0
-	mleaf_t	*   leafs;
+	mleaf_t*   leafs;
 
 	int			numvertexes;
 	mvertex_t*  vertexes;
@@ -359,11 +363,11 @@ typedef struct model_s{
 	hull_t		hulls[MAX_MAP_HULLS];
 
 	int			numtextures;
-	texture_t** textures;
+	texture_p* textures;
 
 	byte*       visdata;
 	byte*       lightdata;
-	char*       entities;
+	cstring       entities;
 
   //
   // additional model data

@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 struct qsockaddr {
-	short sa_family;
-	unsigned char sa_data[14];
+	int16_t sa_family;
+	uint8_t sa_data[14];
 };
 
 
@@ -97,7 +97,7 @@ struct qsockaddr {
 //		string	value
 
 //	note:
-//		There are two address forms used above.  The short form is just a
+//		There are two address forms used above.  The int16_t form is just a
 //		port number.  The address that goes along with the port is defined as
 //		"whatever address you receive this reponse from".  This lets us use
 //		the host OS to solve the problem of multiple host addresses (possibly
@@ -153,7 +153,7 @@ extern qsocket_t*   net_freeSockets;
 extern int			net_numsockets;
 
 typedef struct {
-	char*		name;
+	cstring		name;
 	qboolean	initialized;
 	int			controlSock;
 	int			(*Init)();
@@ -166,11 +166,11 @@ typedef struct {
 	int 		(*Read)  (int socket, byte* buf, int len, struct qsockaddr* addr);
 	int 		(*Write) (int socket, byte* buf, int len, struct qsockaddr* addr);
 	int 		(*Broadcast) (int socket, byte* buf, int len);
-	char*		(*AddrToString) (struct qsockaddr* addr);
-	int 		(*StringToAddr) (char* string, struct qsockaddr* addr);
+	cstring		(*AddrToString) (struct qsockaddr* addr);
+	int 		(*StringToAddr) (cstring string, struct qsockaddr* addr);
 	int 		(*GetSocketAddr) (int socket, struct qsockaddr* addr);
-	int 		(*GetNameFromAddr) (struct qsockaddr* addr, char* name);
-	int 		(*GetAddrFromName) (char* name, struct qsockaddr* addr);
+	int 		(*GetNameFromAddr) (struct qsockaddr* addr, cstring name);
+	int 		(*GetAddrFromName) (cstring name, struct qsockaddr* addr);
 	int			(*AddrCompare) (struct qsockaddr* addr1, struct qsockaddr* addr2);
 	int			(*GetSocketPort) (struct qsockaddr* addr);
 	int			(*SetSocketPort) (struct qsockaddr* addr, int port);
@@ -181,12 +181,12 @@ extern int 				net_numlandrivers;
 extern net_landriver_t	net_landrivers[MAX_NET_DRIVERS];
 
 typedef struct {
-	char*       name;
+	cstring       name;
 	qboolean	initialized;
 	int			(*Init)();
 	void		(*Listen) (qboolean state);
 	void		(*SearchForHosts) (qboolean xmit);
-	qsocket_t*  (*Connect) (char* host);
+	qsocket_t*  (*Connect) (cstring host);
 	qsocket_t*  (*CheckNewConnections)();
 	int			(*QGetMessage) (qsocket_t* sock);
 	int			(*QSendMessage) (qsocket_t* sock, sizebuf_t* data);
@@ -240,13 +240,13 @@ extern hostcache_t hostcache[HOSTCACHESIZE];
 extern unsigned long htonl (unsigned long hostlong);
 #endif
 #ifndef htons
-extern unsigned short htons (unsigned short hostshort);
+extern uint16_t htons (uint16_t hostshort);
 #endif
 #ifndef ntohl
 extern unsigned long ntohl (unsigned long netlong);
 #endif
 #ifndef ntohs
-extern unsigned short ntohs (unsigned short netshort);
+extern uint16_t ntohs (uint16_t netshort);
 #endif
 #endif
 
@@ -270,7 +270,7 @@ void		NET_Shutdown();
 struct qsocket_s* NET_CheckNewConnections();
 // returns a new connection number if there is one pending, else -1
 
-struct qsocket_s* NET_Connect (char* host);
+struct qsocket_s* NET_Connect (cstring host);
 // called by client to connect to a host.  Returns -1 if not able to
 
 qboolean NET_CanSendMessage (qsocket_t* sock);
@@ -323,8 +323,8 @@ extern	char		my_ipx_address[NET_NAMELEN];
 extern	char		my_tcpip_address[NET_NAMELEN];
 extern void (*GetComPortConfig) (int portNumber, int* port, int* irq, int* baud, qboolean* useModem);
 extern void (*SetComPortConfig) (int portNumber, int  port, int  irq, int  baud, qboolean  useModem);
-extern void (*GetModemConfig) (int portNumber, char* dialType, char* clear, char* init, char* hangup);
-extern void (*SetModemConfig) (int portNumber, char* dialType, char* clear, char* init, char* hangup);
+extern void (*GetModemConfig) (int portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
+extern void (*SetModemConfig) (int portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
 
 extern	qboolean	slistInProgress;
 extern	qboolean	slistSilent;

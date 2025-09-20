@@ -178,7 +178,7 @@ VID_SetVESAPalette
 ================
 */
 void VID_SetVESAPalette (viddef_p lvid, vmode_t *pcurrentmode,
-	unsigned char *pal)
+	uint8_t *pal)
 {
 	int		i;
 	byte	*pp;
@@ -298,7 +298,7 @@ VID_InitExtra
 void VID_InitExtra()
 {
 	int				nummodes;
-	short			*pmodenums;
+	int16_t			*pmodenums;
 	vbeinfoblock_t	*pinfoblock;
 	__dpmi_meminfo	phys_mem_info;
 
@@ -321,9 +321,9 @@ void VID_InitExtra()
 	Con_Printf ("VESA 2.0 compliant adapter:\n%s\n",
 				VID_ExtraFarToLinear (*(byte **)&pinfoblock->OemStringPtr[0]));
 
-	totalvidmem = *(unsigned short *)&pinfoblock->TotalMemory[0] << 16;
+	totalvidmem = *(uint16_t *)&pinfoblock->TotalMemory[0] << 16;
 
-	pmodenums = (short *)
+	pmodenums = (int16_t *)
 			VID_ExtraFarToLinear (*(byte **)&pinfoblock->VideoModePtr[0]);
 
 // find 8 bit modes until we either run out of space or run out of modes
@@ -463,8 +463,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 		modeinfo.modenum = modenum;
 		modeinfo.bits_per_pixel = *(char*)(infobuf+25);
 		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel+1)/8;
-		modeinfo.width = *(short*)(infobuf+18);
-		modeinfo.height = *(short*)(infobuf+20);
+		modeinfo.width = *(int16_t*)(infobuf+18);
+		modeinfo.height = *(int16_t*)(infobuf+20);
 
 	// we do only 8-bpp in software
 		if ((modeinfo.bits_per_pixel != 8) ||
@@ -475,7 +475,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 			return false;
 		}
 
-		modeinfo.mode_attributes = *(short*)infobuf;
+		modeinfo.mode_attributes = *(int16_t*)infobuf;
 
 	// we only want color graphics modes that are supported by the hardware
 		if ((modeinfo.mode_attributes &
@@ -493,7 +493,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 				return false;
 		}
 
-		modeinfo.bytes_per_scanline = *(short*)(infobuf+16);
+		modeinfo.bytes_per_scanline = *(int16_t*)(infobuf+16);
 
 		modeinfo.pagesize = modeinfo.bytes_per_scanline * modeinfo.height;
 
@@ -503,7 +503,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 	// force to one page if the adapter reports it doesn't support more pages
 	// than that, no matter how much memory it has--it may not have hardware
 	// support for page flipping
-		numimagepages = *(unsigned char *)(infobuf+29);
+		numimagepages = *(uint8_t *)(infobuf+29);
 
 		if (numimagepages <= 0)
 		{
@@ -521,19 +521,19 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 
 		if (*(char*)(infobuf+2) & 5)
 		{
-			modeinfo.winasegment = *(unsigned short*)(infobuf+8);
+			modeinfo.winasegment = *(uint16_t*)(infobuf+8);
 			modeinfo.win = 0;
 		}
 		else if (*(char*)(infobuf+3) & 5)
 		{
-			modeinfo.winbsegment = *(unsigned short*)(infobuf+8);
+			modeinfo.winbsegment = *(uint16_t*)(infobuf+8);
 			modeinfo.win = 1;
 		}
-		modeinfo.granularity = *(short*)(infobuf+4) * 1024;
-		modeinfo.win_size = *(short*)(infobuf+6) * 1024;
+		modeinfo.granularity = *(int16_t*)(infobuf+4) * 1024;
+		modeinfo.win_size = *(int16_t*)(infobuf+6) * 1024;
 		modeinfo.bits_per_pixel = *(char*)(infobuf+25);
 		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel+1)/8;
-		modeinfo.memory_model = *(unsigned char*)(infobuf+27);
+		modeinfo.memory_model = *(uint8_t*)(infobuf+27);
 		modeinfo.num_pages = *(char*)(infobuf+29) + 1;
 
 		modeinfo.red_width = *(char*)(infobuf+31);
@@ -548,8 +548,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 #if 0
 		printf("VID: (VESA) info for mode 0x%x\n", modeinfo.modenum);
 		printf("  mode attrib = 0x%0x\n", modeinfo.mode_attributes);
-		printf("  win a attrib = 0x%0x\n", *(unsigned char*)(infobuf+2));
-		printf("  win b attrib = 0x%0x\n", *(unsigned char*)(infobuf+3));
+		printf("  win a attrib = 0x%0x\n", *(uint8_t*)(infobuf+2));
+		printf("  win b attrib = 0x%0x\n", *(uint8_t*)(infobuf+3));
 		printf("  win a seg 0x%0x\n", (int) modeinfo.winasegment);
 		printf("  win b seg 0x%0x\n", (int) modeinfo.winbsegment);
 		printf("  bytes per scanline = %d\n",

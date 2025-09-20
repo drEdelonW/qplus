@@ -120,14 +120,14 @@ enum {
 
 
 typedef struct statement_s{
-	unsigned short	op;
-	short	a,b,c;
+	uint16_t	op;
+	int16_t	a,b,c;
 } dstatement_t;
 
 typedef struct{
-	unsigned short	type;		// if DEF_SAVEGLOBGAL bit is set
+	uint16_t	type;		// if DEF_SAVEGLOBGAL bit is set
 								// the variable needs to be saved in savegames
-	unsigned short	ofs;
+	uint16_t	ofs;
 	int			s_name;
 } ddef_t;
 #define	DEF_SAVEGLOBAL	(1<<15)

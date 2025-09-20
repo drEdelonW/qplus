@@ -38,7 +38,7 @@ void MSG_WriteByte (sizebuf_t* sb, int c){
 
 void MSG_WriteShort (sizebuf_t* sb, int c){
 #ifdef PARANOID
-	if (c < ((short)0x8000) || c > (short)0x7fff)
+	if (c < ((int16_t)0x8000) || c > (int16_t)0x7fff)
 		Sys_Error ("MSG_WriteShort: range error");
 #endif
 
@@ -67,7 +67,7 @@ void MSG_WriteFloat(sizebuf_t* sb, float f){
 	SZ_Write(sb, &dat.l, 4);
 }
 
-void MSG_WriteString(sizebuf_t* sb, char* s){
+void MSG_WriteString(sizebuf_t* sb, cstring s){
 	if (!s)
 		SZ_Write(sb, "", 1);
 	else
@@ -112,7 +112,7 @@ int MSG_ReadByte(){
 		return MSG_ERROR;
 	}
 
-	int c = (unsigned char)net_message.data[msg_readcount];
+	int c = (uint8_t)net_message.data[msg_readcount];
 	msg_readcount++;
 
 	return c;
@@ -124,7 +124,7 @@ int MSG_ReadShort(){
 		return MSG_ERROR;
 	}
 
-	int c = (short)(
+	int c = (int16_t)(
          net_message.data[msg_readcount] +
         (net_message.data[msg_readcount + 1] << 8)
     );
@@ -169,7 +169,7 @@ float MSG_ReadFloat(){
 	return dat.f;
 }
 
-char* MSG_ReadString(){
+cstring MSG_ReadString(){
 	static char string[2048];
 
 	int l = 0;

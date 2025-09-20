@@ -4,13 +4,13 @@
 #include "zone.h"
 #include "q_tools.h"
 
-extern char* cmd_argv[];
+extern cstring cmd_argv[];
 
 #define	MAX_ALIAS_NAME	(32)
 typedef struct cmdalias_s{
     struct cmdalias_s*  next;
     char                name[MAX_ALIAS_NAME];
-    char*               value;
+    cstring               value;
 } cmdalias_t;
 
 static cmdalias_t* cmd_alias = NULL; // alias linked list entry point
@@ -28,7 +28,7 @@ void Cmd_Alias_f(void){
         return;
     }
 
-    char* _argSt = Cmd_Argv(1);
+    cstring _argSt = Cmd_Argv(1);
     if (strlen(_argSt) >= MAX_ALIAS_NAME){
         Con_Printf ("Alias name is too long\n");
         return;

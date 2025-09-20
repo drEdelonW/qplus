@@ -1,0 +1,2888 @@
+diff --git a/quake.code-workspace b/quake.code-workspace
+index a389b8f..ee95dc5 100644
+--- a/quake.code-workspace
++++ b/quake.code-workspace
+@@ -27,7 +27,8 @@
+ 			"string": "c",
+ 			"string_view": "c",
+ 			"unordered_map": "c",
+-			"vector": "c"
++			"vector": "c",
++			"cvar.h": "c"
+ 		}
+ 	}
+ }
+\ No newline at end of file
+diff --git a/src/assets/bspfile.h b/src/assets/bspfile.h
+index 224b528..d6db42f 100755
+--- a/src/assets/bspfile.h
++++ b/src/assets/bspfile.h
+@@ -164,17 +164,17 @@ typedef struct{
+ // !!! if this is changed, it must be changed in asm_i386.h too !!!
+ typedef struct{
+ 	int			planenum;
+-	short		children[2];	// negative numbers are -(leafs+1), not nodes
+-	short		mins[3];		// for sphere culling
+-	short		maxs[3];
+-	unsigned short	firstface;
+-	unsigned short	numfaces;	// counting both sides
++	int16_t		children[2];	// negative numbers are -(leafs+1), not nodes
++	int16_t		mins[3];		// for sphere culling
++	int16_t		maxs[3];
++	uint16_t	firstface;
++	uint16_t	numfaces;	// counting both sides
+ } dnode_t;
+ 
+ typedef struct
+ {
+ 	int			planenum;
+-	short		children[2];	// negative numbers are contents
++	int16_t		children[2];	// negative numbers are contents
+ } dclipnode_t;
+ 
+ 
+@@ -190,18 +190,18 @@ typedef struct texinfo_s
+ // counterclockwise use of the edge in a face
+ typedef struct
+ {
+-	unsigned short	v[2];		// vertex numbers
++	uint16_t	v[2];		// vertex numbers
+ } dedge_t;
+ 
+ #define	MAXLIGHTMAPS	4
+ typedef struct
+ {
+-	short		planenum;
+-	short		side;
++	int16_t		planenum;
++	int16_t		side;
+ 
+ 	int			firstedge;		// we must support > 64k edges
+-	short		numedges;
+-	short		texinfo;
++	int16_t		numedges;
++	int16_t		texinfo;
+ 
+ // lighting info
+ 	byte		styles[MAXLIGHTMAPS];
+@@ -224,11 +224,11 @@ typedef struct
+ 	int			contents;
+ 	int			visofs;				// -1 = no visibility info
+ 
+-	short		mins[3];			// for frustum culling
+-	short		maxs[3];
++	int16_t		mins[3];			// for frustum culling
++	int16_t		maxs[3];
+ 
+-	unsigned short		firstmarksurface;
+-	unsigned short		nummarksurfaces;
++	uint16_t		firstmarksurface;
++	uint16_t		nummarksurfaces;
+ 
+ 	byte		ambient_level[NUM_AMBIENTS];
+ } dleaf_t;
+@@ -284,7 +284,7 @@ extern	int			numedges;
+ extern	dedge_t		dedges[MAX_MAP_EDGES];
+ 
+ extern	int			nummarksurfaces;
+-extern	unsigned short	dmarksurfaces[MAX_MAP_MARKSURFACES];
++extern	uint16_t	dmarksurfaces[MAX_MAP_MARKSURFACES];
+ 
+ extern	int			numsurfedges;
+ extern	int			dsurfedges[MAX_MAP_SURFEDGES];
+diff --git a/src/assets/model/model.c b/src/assets/model/model.c
+index 1723f93..a9c343d 100755
+--- a/src/assets/model/model.c
++++ b/src/assets/model/model.c
+@@ -627,8 +627,8 @@ void Mod_LoadEdges(lump_p l){
+ 	loadmodel->numedges = count;
+ 
+ 	for (int i = 0; i < count; i++, in++, out++)	{
+-		out->v[0] = (unsigned short)LittleShort(in->v[0]);
+-		out->v[1] = (unsigned short)LittleShort(in->v[1]);
++		out->v[0] = (uint16_t)LittleShort(in->v[0]);
++		out->v[1] = (uint16_t)LittleShort(in->v[1]);
+ 	}
+ }
+ 
+@@ -1017,7 +1017,7 @@ Mod_LoadMarksurfaces
+ void Mod_LoadMarksurfaces (lump_p l)
+ {
+ 	int		i, j, count;
+-	short		*in;
++	int16_t* in;
+ 	msurface_t **out;
+ 
+ 	in = (typeless_ptr )(mod_base + l->fileofs);
+@@ -1332,7 +1332,7 @@ typeless_ptr  Mod_LoadAliasSkin (typeless_ptr  pin, int *pskinindex, int skinsiz
+ {
+ 	int		i;
+ 	byte	*pskin, *pinskin;
+-	unsigned short	*pusskin;
++	uint16_t	*pusskin;
+ 
+ 	pskin = Hunk_AllocName (skinsize * r_pixbytes, loadname);
+ 	pinskin = (byte *)pin;
+@@ -1344,7 +1344,7 @@ typeless_ptr  Mod_LoadAliasSkin (typeless_ptr  pin, int *pskinindex, int skinsiz
+ 	}
+ 	else if (r_pixbytes == 2)
+ 	{
+-		pusskin = (unsigned short *)pskin;
++		pusskin = (uint16_t *)pskin;
+ 
+ 		for (i=0 ; i<skinsize ; i++)
+ 			pusskin[i] = d_8to16table[pinskin[i]];
+@@ -1653,7 +1653,7 @@ typeless_ptr  Mod_LoadSpriteFrame (typeless_ptr  pin, mspriteframe_t **ppframe)
+ 	dspriteframe_t		*pinframe;
+ 	mspriteframe_t		*pspriteframe;
+ 	int					i, width, height, size, origin[2];
+-	unsigned short		*ppixout;
++	uint16_t		*ppixout;
+ 	byte				*ppixin;
+ 
+ 	pinframe = (dspriteframe_t *)pin;
+@@ -1685,7 +1685,7 @@ typeless_ptr  Mod_LoadSpriteFrame (typeless_ptr  pin, mspriteframe_t **ppframe)
+ 	else if (r_pixbytes == 2)
+ 	{
+ 		ppixin = (byte *)(pinframe + 1);
+-		ppixout = (unsigned short *)&pspriteframe->pixels[0];
++		ppixout = (uint16_t *)&pspriteframe->pixels[0];
+ 
+ 		for (i=0 ; i<size ; i++)
+ 			ppixout[i] = d_8to16table[ppixin[i]];
+diff --git a/src/assets/model/model.h b/src/assets/model/model.h
+index 52f3cb2..2c864d9 100755
+--- a/src/assets/model/model.h
++++ b/src/assets/model/model.h
+@@ -64,16 +64,20 @@ typedef struct mplane_s{
+ 	byte	signbits;		// signx + signy<<1 + signz<<1
+ 	byte	pad[2];
+ } mplane_t;
++typedef mplane_t* mplane_p;
+ 
+-typedef struct texture_s{
++struct texture_s;
++typedef struct texture_s texture_t;
++typedef texture_t* texture_p;
++struct texture_s{
+ 	char		name[16];
+ 	unsigned	width, height;
+ 	int			anim_total;				// total tenths in sequence ( 0 = no)
+ 	int			anim_min, anim_max;		// time for this frame min <=time< max
+-	struct texture_s* anim_next;		// in the animation sequence
+-	struct texture_s* alternate_anims;	// bmodels in frmae 1 use these
++	texture_p 	anim_next;		// in the animation sequence
++	texture_p 	alternate_anims;	// bmodels in frmae 1 use these
+ 	unsigned	offsets[MIPLEVELS];		// four mip maps stored
+-} texture_t;
++};
+ 
+ 
+ #define	SURF_PLANEBACK		2
+@@ -85,14 +89,14 @@ typedef struct texture_s{
+ 
+ // !!! if this is changed, it must be changed in asm_draw.h too !!!
+ typedef struct{
+-	unsigned short	v[2];
++	uint16_t	v[2];
+ 	unsigned int	cachededgeoffset;
+ } medge_t;
+ 
+ typedef struct{
+ 	float		vecs[2][4];
+ 	float		mipadjust;
+-	texture_t*	texture;
++	texture_p	texture;
+ 	int			flags;
+ } mtexinfo_t;
+ 
+@@ -102,7 +106,7 @@ typedef struct msurface_s{
+ 	int			dlightframe;
+ 	int			dlightbits;
+ 
+-	mplane_t*	plane;
++	mplane_p	plane;
+ 	int			flags;
+ 
+ 	int			firstedge;	// look up in model->surfedges[], negative numbers
+@@ -111,8 +115,8 @@ typedef struct msurface_s{
+ // surface generation data
+ 	struct surfcache_s*	cachespots[MIPLEVELS];
+ 
+-	short		texturemins[2];
+-	short		extents[2];
++	int16_t		texturemins[2];
++	int16_t		extents[2];
+ 
+ 	mtexinfo_t*	texinfo;
+ 
+@@ -127,16 +131,16 @@ typedef struct mnode_s{
+ 	int			contents;		// 0, to differentiate from leafs
+ 	int			visframe;		// node needs to be traversed if current
+ 
+-	short		minmaxs[6];		// for bounding box culling
++	int16_t		minmaxs[6];		// for bounding box culling
+ 
+ 	struct mnode_s*	parent;
+ 
+ // node specific
+-	mplane_t*	plane;
++	texture_p	plane;
+ 	struct mnode_s*	children[2];
+ 
+-	unsigned short		firstsurface;
+-	unsigned short		numsurfaces;
++	uint16_t		firstsurface;
++	uint16_t		numsurfaces;
+ } mnode_t;
+ 
+ 
+@@ -146,7 +150,7 @@ typedef struct mleaf_s{
+ 	int			contents;		// wil be a negative contents number
+ 	int			visframe;		// node needs to be traversed if current
+ 
+-	short		minmaxs[6];		// for bounding box culling
++	int16_t		minmaxs[6];		// for bounding box culling
+ 
+ 	struct mnode_s*	parent;
+ 
+@@ -163,7 +167,7 @@ typedef struct mleaf_s{
+ // !!! if this is changed, it must be changed in asm_i386.h too !!!
+ typedef struct{
+ 	dclipnode_t* clipnodes;
+-	mplane_t*   planes;
++	texture_p   planes;
+ 	int			firstclipnode;
+ 	int			lastclipnode;
+ 	vec3_t		clip_mins;
+@@ -327,10 +331,10 @@ typedef struct model_s{
+ 	dmodel_p    submodels;
+ 
+ 	int			numplanes;
+-	mplane_t*   planes;
++	texture_p   planes;
+ 
+ 	int			numleafs;		// number of visible leafs, not counting 0
+-	mleaf_t	*   leafs;
++	mleaf_t*   leafs;
+ 
+ 	int			numvertexes;
+ 	mvertex_t*  vertexes;
+@@ -359,11 +363,11 @@ typedef struct model_s{
+ 	hull_t		hulls[MAX_MAP_HULLS];
+ 
+ 	int			numtextures;
+-	texture_t** textures;
++	texture_p* textures;
+ 
+ 	byte*       visdata;
+ 	byte*       lightdata;
+-	char*       entities;
++	cstring       entities;
+ 
+   //
+   // additional model data
+diff --git a/src/engine/core/common/common.c b/src/engine/core/common/common.c
+index ef09c3e..af6e18f 100755
+--- a/src/engine/core/common/common.c
++++ b/src/engine/core/common/common.c
+@@ -55,7 +55,7 @@ char	com_cmdline[CMDLINE_LENGTH];
+ qboolean		standard_quake = true, rogue, hipnotic;
+ 
+ // this graphic needs to be in the pak file to use registered features
+-unsigned short pop[] =
++uint16_t pop[] =
+ {
+  0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000
+ ,0x0000,0x0000,0x6600,0x0000,0x0000,0x0000,0x6600,0x0000
+@@ -320,7 +320,7 @@ being registered.
+ void COM_CheckRegistered()
+ {
+ 	int             h;
+-	unsigned short  check[128];
++	uint16_t  check[128];
+ 	int                     i;
+ 
+ 	COM_OpenFile("gfx/pop.lmp", &h);
+@@ -341,7 +341,7 @@ void COM_CheckRegistered()
+ 	COM_CloseFile (h);
+ 
+ 	for (i=0 ; i<128 ; i++)
+-		if (pop[i] != (unsigned short)BigShort (check[i]))
++		if (pop[i] != (uint16_t)BigShort (check[i]))
+ 			Sys_Error ("Corrupted data file.");
+ 
+ 	Cvar_Set ("cmdline", com_cmdline);
+@@ -908,7 +908,7 @@ pack_t *COM_LoadPackFile (char *packfile)
+ 	pack_t                  *pack;
+ 	int                             packhandle;
+ 	dpackfile_t             info[MAX_FILES_IN_PACK];
+-	unsigned short          crc;
++	uint16_t          crc;
+ 
+ 	if (Sys_FileOpenRead (packfile, &packhandle) == -1)
+ 	{
+diff --git a/src/engine/core/common/common.h b/src/engine/core/common/common.h
+index 823ff11..847004d 100755
+--- a/src/engine/core/common/common.h
++++ b/src/engine/core/common/common.h
+@@ -39,13 +39,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ #endif
+ 
+ #define Q_MAXCHAR ((char)0x7f)
+-#define Q_MAXSHORT ((short)0x7fff)
++#define Q_MAXSHORT ((int16_t)0x7fff)
+ #define Q_MAXINT	((int)0x7fffffff)
+ #define Q_MAXLONG ((int)0x7fffffff)
+ #define Q_MAXFLOAT ((int)0x7fffffff)
+ 
+ #define Q_MINCHAR ((char)0x80)
+-#define Q_MINSHORT ((short)0x8000)
++#define Q_MINSHORT ((int16_t)0x8000)
+ #define Q_MININT 	((int)0x80000000)
+ #define Q_MINLONG ((int)0x80000000)
+ #define Q_MINFLOAT ((int)0x7fffffff)
+diff --git a/src/engine/core/common/endian_tools.c b/src/engine/core/common/endian_tools.c
+index ec0699e..1a60642 100644
+--- a/src/engine/core/common/endian_tools.c
++++ b/src/engine/core/common/endian_tools.c
+@@ -10,14 +10,14 @@
+ 
+ qboolean        bigendien;
+ 
+-short   (*BigShort) (short l);
+-short   (*LittleShort) (short l);
++int16_t   (*BigShort) (int16_t l);
++int16_t   (*LittleShort) (int16_t l);
+ int     (*BigLong) (int l);
+ int     (*LittleLong) (int l);
+ float   (*BigFloat) (float l);
+ float   (*LittleFloat) (float l);
+ 
+-short   ShortSwap (short l)
++int16_t   ShortSwap (int16_t l)
+ {
+ 	uint8_t    b1,b2;
+ 
+@@ -27,7 +27,7 @@ short   ShortSwap (short l)
+ 	return (b1<<8) + b2;
+ }
+ 
+-short   ShortNoSwap (short l)
++int16_t   ShortNoSwap (int16_t l)
+ {
+ 	return l;
+ }
+@@ -75,7 +75,7 @@ void COM_Endian_Init() {
+     uint8_t    swaptest[2] = {1,0};
+ 
+ // set the uint8_t swapping variables in a portable manner
+-	if ( *(short *)swaptest == 1)
++	if ( *(int16_t *)swaptest == 1)
+ 	{
+ 		bigendien = false;
+ 		BigShort = ShortSwap;
+diff --git a/src/engine/core/common/endian_tools.h b/src/engine/core/common/endian_tools.h
+index 2cfc385..a7149c6 100644
+--- a/src/engine/core/common/endian_tools.h
++++ b/src/engine/core/common/endian_tools.h
+@@ -1,12 +1,13 @@
+ #pragma once
+ #include "qboolean.h"
++#include <stdint.h>
+ 
+ //============================================================================
+ 
+ extern	qboolean		bigendien;
+ 
+-extern	short	(*BigShort) (short l);
+-extern	short	(*LittleShort) (short l);
++extern	int16_t	(*BigShort) (int16_t l);
++extern	int16_t	(*LittleShort) (int16_t l);
+ extern	int	(*BigLong) (int l);
+ extern	int	(*LittleLong) (int l);
+ extern	float	(*BigFloat) (float l);
+diff --git a/src/engine/core/common/msg.c b/src/engine/core/common/msg.c
+index 564db91..eb54abc 100644
+--- a/src/engine/core/common/msg.c
++++ b/src/engine/core/common/msg.c
+@@ -38,7 +38,7 @@ void MSG_WriteByte (sizebuf_t* sb, int c){
+ 
+ void MSG_WriteShort (sizebuf_t* sb, int c){
+ #ifdef PARANOID
+-	if (c < ((short)0x8000) || c > (short)0x7fff)
++	if (c < ((int16_t)0x8000) || c > (int16_t)0x7fff)
+ 		Sys_Error ("MSG_WriteShort: range error");
+ #endif
+ 
+@@ -67,7 +67,7 @@ void MSG_WriteFloat(sizebuf_t* sb, float f){
+ 	SZ_Write(sb, &dat.l, 4);
+ }
+ 
+-void MSG_WriteString(sizebuf_t* sb, char* s){
++void MSG_WriteString(sizebuf_t* sb, cstring s){
+ 	if (!s)
+ 		SZ_Write(sb, "", 1);
+ 	else
+@@ -112,7 +112,7 @@ int MSG_ReadByte(){
+ 		return MSG_ERROR;
+ 	}
+ 
+-	int c = (unsigned char)net_message.data[msg_readcount];
++	int c = (uint8_t)net_message.data[msg_readcount];
+ 	msg_readcount++;
+ 
+ 	return c;
+@@ -124,7 +124,7 @@ int MSG_ReadShort(){
+ 		return MSG_ERROR;
+ 	}
+ 
+-	int c = (short)(
++	int c = (int16_t)(
+          net_message.data[msg_readcount] +
+         (net_message.data[msg_readcount + 1] << 8)
+     );
+@@ -169,7 +169,7 @@ float MSG_ReadFloat(){
+ 	return dat.f;
+ }
+ 
+-char* MSG_ReadString(){
++cstring MSG_ReadString(){
+ 	static char string[2048];
+ 
+ 	int l = 0;
+diff --git a/src/engine/core/common/msg.h b/src/engine/core/common/msg.h
+index e67ccc9..7d7b094 100644
+--- a/src/engine/core/common/msg.h
++++ b/src/engine/core/common/msg.h
+@@ -24,7 +24,7 @@ int   MSG_ReadByte();
+ int   MSG_ReadShort();
+ int   MSG_ReadLong();
+ float MSG_ReadFloat();
+-char* MSG_ReadString();
++cstring MSG_ReadString();
+ 
+ float MSG_ReadCoord();
+ float MSG_ReadAngle();
+diff --git a/src/engine/core/common/q_tools.c b/src/engine/core/common/q_tools.c
+index eba0be5..8f5c45f 100644
+--- a/src/engine/core/common/q_tools.c
++++ b/src/engine/core/common/q_tools.c
+@@ -47,14 +47,14 @@ int Q_memcmp(typeless_ptr m1, typeless_ptr m2, int count){
+ 	return 0;
+ }
+ 
+-void Q_strcpy(char* dest, char* src){
++void Q_strcpy(cstring dest, cstring src){
+ 	while (*src){
+ 		*dest++ = *src++;
+ 	}
+ 	*dest++ = 0;
+ }
+ 
+-void Q_strncpy(char* dest, char* src, int count){
++void Q_strncpy(cstring dest, cstring src, int count){
+ 	while (*src && count--){
+ 		*dest++ = *src++;
+ 	}
+@@ -63,7 +63,7 @@ void Q_strncpy(char* dest, char* src, int count){
+     }
+ }
+ 
+-int Q_strlen(char* str){
++int Q_strlen(cstring str){
+ 	int count = 0;
+ 	while (str[count])
+ 		count++;
+@@ -71,7 +71,7 @@ int Q_strlen(char* str){
+ 	return count;
+ }
+ 
+-char* Q_strrchr(char* s, char c){
++cstring Q_strrchr(cstring s, char c){
+     int len = Q_strlen(s);
+     s += len;
+     while (len--){
+@@ -82,12 +82,12 @@ char* Q_strrchr(char* s, char c){
+     return 0;
+ }
+ 
+-void Q_strcat(char* dest, char* src){
++void Q_strcat(cstring dest, cstring src){
+ 	dest += Q_strlen(dest);
+ 	Q_strcpy(dest, src);
+ }
+ 
+-int Q_strcmp(char* s1, char* s2){
++int Q_strcmp(cstring s1, cstring s2){
+ 	while (1){
+ 		if (*s1 != *s2)
+ 			return -1;              // strings not equal
+@@ -100,7 +100,7 @@ int Q_strcmp(char* s1, char* s2){
+ 	return -1;
+ }
+ 
+-int Q_strncmp(char* s1, char* s2, int count){
++int Q_strncmp(cstring s1, cstring s2, int count){
+ 	while (1){
+ 		if (!count--)
+ 			return 0;
+@@ -115,7 +115,7 @@ int Q_strncmp(char* s1, char* s2, int count){
+ 	return -1;
+ }
+ 
+-int Q_strncasecmp(char* s1, char* s2, int n){
++int Q_strncasecmp(cstring s1, cstring s2, int n){
+ 	while (1) {
+ 		int c1 = *s1++;
+ 		int c2 = *s2++;
+@@ -141,11 +141,11 @@ int Q_strncasecmp(char* s1, char* s2, int n){
+ 	return -1;
+ }
+ 
+-int Q_strcasecmp(char* s1, char* s2){
++int Q_strcasecmp(cstring s1, cstring s2){
+ 	return Q_strncasecmp (s1, s2, 99999);
+ }
+ 
+-int Q_atoi(char* str){
++int Q_atoi(cstring str){
+ 	int sign;
+ 
+ 	if (*str == '-'){
+@@ -200,7 +200,7 @@ int Q_atoi(char* str){
+ }
+ 
+ 
+-float Q_atof(char* str){
++float Q_atof(cstring str){
+     int     sign;
+ 
+     if (*str == '-')	{
+diff --git a/src/engine/core/common/q_tools.h b/src/engine/core/common/q_tools.h
+index 028a22f..c7e2239 100644
+--- a/src/engine/core/common/q_tools.h
++++ b/src/engine/core/common/q_tools.h
+@@ -19,15 +19,15 @@ void    Q_memset(typeless_ptr dest, int   fill, int count);
+ void    Q_memcpy(typeless_ptr dest, typeless_ptr src,  int count);
+ int     Q_memcmp(typeless_ptr m1,   typeless_ptr m2,   int count);
+ 
+-int     Q_strlen(char*  str);
+-void    Q_strcpy(char*  dest, char* src);
+-void    Q_strncpy(char* dest, char* src, int count);
+-void    Q_strcat(char*  dest, char* src);
+-char*   Q_strrchr(char* s,  char  c);
+-int     Q_strcmp(char*      s1, char* s2);
+-int     Q_strncmp(char*     s1, char* s2, int count);
+-int     Q_strcasecmp(char*  s1, char* s2);
+-int     Q_strncasecmp(char* s1, char* s2, int n);
++int     Q_strlen(cstring  str);
++void    Q_strcpy(cstring  dest, cstring src);
++void    Q_strncpy(cstring dest, cstring src, int count);
++void    Q_strcat(cstring  dest, cstring src);
++cstring   Q_strrchr(cstring s,  char  c);
++int     Q_strcmp(cstring      s1, cstring s2);
++int     Q_strncmp(cstring     s1, cstring s2, int count);
++int     Q_strcasecmp(cstring  s1, cstring s2);
++int     Q_strncasecmp(cstring s1, cstring s2, int n);
+ 
+-int	    Q_atoi(char* str);
+-float   Q_atof(char* str);
++int	    Q_atoi(cstring str);
++float   Q_atof(cstring str);
+diff --git a/src/engine/core/console/cmd/cmd.c b/src/engine/core/console/cmd/cmd.c
+index a3bcd64..39ae66b 100755
+--- a/src/engine/core/console/cmd/cmd.c
++++ b/src/engine/core/console/cmd/cmd.c
+@@ -104,7 +104,7 @@ void Cbuf_AddText(char *text){
+     ============
+ */
+ void Cbuf_InsertText(char *text){
+-    char*   temp;
++    cstring   temp;
+ 
+     // copy off any commands still remaining in the exec buffer
+ 	int templen = cmd_text.cursize;
+@@ -216,7 +216,7 @@ void Cmd_StuffCmds_f(void){
+ 	if (!s)
+ 		return;
+ 
+-	char* text = Z_Malloc(s + 1);
++	cstring text = Z_Malloc(s + 1);
+ 	text[0] = 0;
+ 	for (int i = 1; i < com_argc; i++){
+ 		if (!com_argv[i]){
+@@ -229,7 +229,7 @@ void Cmd_StuffCmds_f(void){
+ 	}
+ 
+     // pull out the commands
+-	char* build = Z_Malloc(s + 1);
++	cstring build = Z_Malloc(s + 1);
+ 	build[0] = 0;
+ 
+ 	for (int i = 0; i < (s - 1); i++){
+@@ -277,7 +277,7 @@ void Cmd_Exec_f(void){
+ 	}
+ 
+ 	int mark = Hunk_LowMark ();
+-	char* f = (char*)COM_LoadHunkFile(Cmd_Argv(1));
++	cstring f = (cstring)COM_LoadHunkFile(Cmd_Argv(1));
+ 	if (!f){
+ 		Con_Printf("couldn't exec %s\n", Cmd_Argv(1));
+ 		return;
+@@ -310,8 +310,8 @@ void Cmd_Echo_f(void){
+     Creates a new command that executes a command string (possibly ; seperated)
+     ===============
+ */
+-char* CopyString(char *in){
+-	char* out = Z_Malloc(strlen(in) + 1);
++cstring CopyString(char *in){
++	cstring out = Z_Malloc(strlen(in) + 1);
+ 	strcpy (out, in);
+ 	return out;
+ }
+@@ -326,7 +326,7 @@ char* CopyString(char *in){
+ 
+ typedef struct cmd_function_s{
+     struct cmd_function_s*  next;
+-    char*                   name;
++    cstring                   name;
+     xcommand_t              function;
+ } cmd_function_t;
+ 
+@@ -334,9 +334,9 @@ typedef struct cmd_function_s{
+ #define	MAX_ARGS		80
+ 
+ static	int	    cmd_argc;
+-char*   cmd_argv[MAX_ARGS];
+-static	char*   cmd_null_string = "";
+-static	char*   cmd_args = NULL;
++cstring   cmd_argv[MAX_ARGS];
++static	cstring   cmd_null_string = "";
++static	cstring   cmd_args = NULL;
+ 
+ cmd_source_t	cmd_source;
+ 
+@@ -374,7 +374,7 @@ int Cmd_Argc(void){
+     Cmd_Argv
+     ============
+ */
+-char* Cmd_Argv(int arg){
++cstring Cmd_Argv(int arg){
+     return
+         ((unsigned)arg >= cmd_argc)?
+             cmd_null_string:
+@@ -386,7 +386,7 @@ char* Cmd_Argv(int arg){
+     Cmd_Args
+     ============
+ */
+-char* Cmd_Args(void){
++cstring Cmd_Args(void){
+ 	return cmd_args;
+ }
+ 
+@@ -398,7 +398,7 @@ char* Cmd_Args(void){
+     Parses the given string into command line tokens.
+     ============
+ */
+-void Cmd_TokenizeString(char* text){
++void Cmd_TokenizeString(cstring text){
+     // clear the args from the last string
+ 	for (int i = 0; i < cmd_argc; i++){
+ 		Z_Free(cmd_argv[i]);
+@@ -524,7 +524,7 @@ char *Cmd_CompleteCommand(char *partial){
+ 	FIXME: lookupnoadd the token to speed search?
+ 	============
+ */
+-void Cmd_ExecuteString(char* text, cmd_source_t src){
++void Cmd_ExecuteString(cstring text, cmd_source_t src){
+     cmd_source = src;
+     Cmd_TokenizeString (text);
+ 
+diff --git a/src/engine/core/console/cmd/cmd.h b/src/engine/core/console/cmd/cmd.h
+index eb5ffac..ebbab32 100755
+--- a/src/engine/core/console/cmd/cmd.h
++++ b/src/engine/core/console/cmd/cmd.h
+@@ -22,6 +22,7 @@
+ #include <stddef.h>
+ #include <stdbool.h>
+ #include "qboolean.h"
++#include "zone.h"
+ // cmd.h -- Command buffer and command execution
+ 
+ //===========================================================================
+@@ -120,4 +121,4 @@ void	Cmd_Print(char *text);
+ 
+ void Cmd_Alias_f(void);
+ bool checkAlias();
+-char* CopyString(char *in);
+\ No newline at end of file
++cstring CopyString(cstring in);
+\ No newline at end of file
+diff --git a/src/engine/core/console/cmd/cmd_alias.c b/src/engine/core/console/cmd/cmd_alias.c
+index 5f295d9..7e71b77 100755
+--- a/src/engine/core/console/cmd/cmd_alias.c
++++ b/src/engine/core/console/cmd/cmd_alias.c
+@@ -4,13 +4,13 @@
+ #include "zone.h"
+ #include "q_tools.h"
+ 
+-extern char* cmd_argv[];
++extern cstring cmd_argv[];
+ 
+ #define	MAX_ALIAS_NAME	(32)
+ typedef struct cmdalias_s{
+     struct cmdalias_s*  next;
+     char                name[MAX_ALIAS_NAME];
+-    char*               value;
++    cstring               value;
+ } cmdalias_t;
+ 
+ static cmdalias_t* cmd_alias = NULL; // alias linked list entry point
+@@ -28,7 +28,7 @@ void Cmd_Alias_f(void){
+         return;
+     }
+ 
+-    char* _argSt = Cmd_Argv(1);
++    cstring _argSt = Cmd_Argv(1);
+     if (strlen(_argSt) >= MAX_ALIAS_NAME){
+         Con_Printf ("Alias name is too long\n");
+         return;
+diff --git a/src/engine/core/console/console.c b/src/engine/core/console/console.c
+index 1e413a7..baf77d2 100755
+--- a/src/engine/core/console/console.c
++++ b/src/engine/core/console/console.c
+@@ -41,7 +41,7 @@ int			con_totallines;		// total lines in console scrollback
+ int			con_backscroll;		// lines up from bottom to display
+ int			con_current;		// where next message will be printed
+ int			con_x;				// offset in current line for next print
+-char*       con_text = 0;
++cstring       con_text = 0;
+ 
+ 
+ #define	NUM_CON_TIMES 4
+@@ -195,7 +195,7 @@ void Con_CheckResize(){
+ #define MAXGAMEDIRLEN	1000
+ void Con_Init(){
+ 	char    temp[MAXGAMEDIRLEN + 1];
+-	char*   t2 = "/qconsole.log";
++	cstring   t2 = "/qconsole.log";
+ 
+ 	con_debuglog = COM_CheckParm("-condebug");
+ 
+@@ -250,7 +250,7 @@ void Con_Linefeed(){
+     If no console is visible, the notify window will pop up.
+     ================
+ */
+-void Con_Print(char* txt){
++void Con_Print(cstring txt){
+ 	int		c;
+ 	static int	cr;
+ 	int		mask;
+@@ -327,7 +327,7 @@ void Con_Print(char* txt){
+     Con_DebugLog
+     ================
+ */
+-void Con_DebugLog(char* file, char* fmt, ...){
++void Con_DebugLog(cstring file, cstring fmt, ...){
+     va_list argptr;
+     static char data[1024];
+     int fd;
+@@ -350,7 +350,7 @@ void Con_DebugLog(char* file, char* fmt, ...){
+ */
+ #define	MAXPRINTMSG	4096
+ // FIXME: make a buffer size safe vsprintf?
+-void Con_Printf (char* fmt, ...){
++void Con_Printf (cstring fmt, ...){
+ 	va_list		argptr;
+ 	char		msg[MAXPRINTMSG];
+ 	static qboolean	inupdate;
+@@ -397,7 +397,7 @@ void Con_Printf (char* fmt, ...){
+     A Con_Printf that only shows up if the "developer" cvar is set
+     ================
+ */
+-void Con_DPrintf (char* fmt, ...){
++void Con_DPrintf (cstring fmt, ...){
+ 	va_list		argptr;
+ 	char		msg[MAXPRINTMSG];
+ 
+@@ -420,7 +420,7 @@ void Con_DPrintf (char* fmt, ...){
+     Okay to call even when the screen can't be updated
+     ==================
+ */
+-void Con_SafePrintf (char* fmt, ...){
++void Con_SafePrintf (cstring fmt, ...){
+ 	va_list		argptr;
+ 	char		msg[1024];
+ 
+@@ -457,7 +457,7 @@ void Con_DrawInput(){
+ 		return;		// don't draw anything
+ 	}
+ 
+-	char* text = key_lines[edit_line];
++	cstring text = key_lines[edit_line];
+ 
+     // add the cursor frame
+ 	text[key_linepos] = 10 + ((int)(realtime * con_cursorspeed) & 1);
+@@ -504,7 +504,7 @@ void Con_DrawNotify(){
+ 		time = realtime - time;
+ 		if (time > con_notifytime.value)
+ 			continue;
+-		char* text = con_text + (i % con_totallines) * con_linewidth;
++		cstring text = con_text + (i % con_totallines) * con_linewidth;
+ 
+ 		clearnotify = 0;
+ 		scr_copytop = 1;
+@@ -565,7 +565,7 @@ void Con_DrawConsole(int lines, qboolean drawinput){
+         // if (j < 0){
+ 		// 	j = 0;
+         // }
+-		char* text = con_text + (j % con_totallines) * con_linewidth;
++		cstring text = con_text + (j % con_totallines) * con_linewidth;
+ 
+ 		for (int x = 0; x < con_linewidth; x++){
+ 			Draw_Character((x + 1) << 3, y, text[x]);
+@@ -584,7 +584,7 @@ void Con_DrawConsole(int lines, qboolean drawinput){
+     Con_NotifyBox
+     ==================
+ */
+-void Con_NotifyBox(char* text){
++void Con_NotifyBox(cstring text){
+     // during startup for sound / cd warnings
+ 	Con_Printf("\n\n" CON_HORIZONLINE);
+ 
+diff --git a/src/engine/core/console/cvar/cvar.h b/src/engine/core/console/cvar/cvar.h
+index cbe06ee..ebfd4aa 100755
+--- a/src/engine/core/console/cvar/cvar.h
++++ b/src/engine/core/console/cvar/cvar.h
+@@ -56,7 +56,7 @@ interface from being ambiguous.
+ #include "qboolean.h"
+ #include <stdio.h>
+ #include <stdint.h>
+-
++#include "zone.h"
+ 
+ /* header-friendly extern */
+ #define CVAR_EXTERN(sym) extern cvar_t sym
+@@ -64,26 +64,26 @@ interface from being ambiguous.
+ /* 2-field definition: symbol + default string.
+    name is taken from symbol via stringification. value is 0 until Cvar_RegisterVariable() */
+ #define CVAR(sym, defstr) \
+-    cvar_t sym = { #sym, (char*)(defstr), (uint8_t)cvf_none, 0.0f, NULL }
++    cvar_t sym = { #sym, (cstring)(defstr), (uint8_t)cvf_none, 0.0f, NULL }
+ //  reg_srch: ^\s*cvar_t\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*"\1"\s*,\s*"([^"]*)"\s*\}\s*;
+ //  reg_rpc:  CVAR($1, "$2");
+ 
+ /* same, but with flags */
+ #define CVAR_F(sym, defstr, fl) \
+-    cvar_t sym = { #sym, (char*)(defstr), (uint8_t)(fl), 0.0f, NULL }
++    cvar_t sym = { #sym, (cstring)(defstr), (uint8_t)(fl), 0.0f, NULL }
+ 
+ /* explicit cvar name (if it differs from the C symbol) */
+ #define CVAR_NAMED(sym, namestr, defstr) \
+-   cvar_t sym = { (char*)(namestr), (char*)(defstr), (uint8_t)cvf_none, 0.0f, NULL }
++   cvar_t sym = { (cstring)(namestr), (cstring)(defstr), (uint8_t)cvf_none, 0.0f, NULL }
+ //  reg_srch: ^\s*cvar_t\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*"([^"]+)"\s*,\s*"([^"]*)"\s*\}\s*;
+ //  reg_rpc:  CVAR_NAMED($1, "$2", "$3", cvf_none);
+ 
+ #define CVAR_NAMED_AR(sym, namestr, defstr) \
+-   cvar_t sym = { (char*)(namestr), (char*)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
++   cvar_t sym = { (cstring)(namestr), (cstring)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
+ 
+ /* config-style helper: name == "_" "symbol", archived */
+ #define CVAR_CFG(sym, defstr) \
+-    cvar_t sym = { "_" #sym, (char*)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
++    cvar_t sym = { "_" #sym, (cstring)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
+ 
+ 
+ typedef enum{
+diff --git a/src/engine/core/host.c b/src/engine/core/host.c
+index a32f087..5e8bff9 100755
+--- a/src/engine/core/host.c
++++ b/src/engine/core/host.c
+@@ -472,7 +472,7 @@ void Host_ClearMemory()
+ ===================
+ Host_FilterTime
+ 
+-Returns false if the time is too short to run a frame
++Returns false if the time is too int16_t to run a frame
+ ===================
+ */
+ qboolean Host_FilterTime (float time)
+@@ -488,7 +488,7 @@ qboolean Host_FilterTime (float time)
+ 	if (host_framerate.value > 0)
+ 		host_frametime = host_framerate.value;
+ 	else
+-	{	// don't allow really long or short frames
++	{	// don't allow really long or int16_t frames
+ 		if (host_frametime > 0.1)
+ 			host_frametime = 0.1;
+ 		if (host_frametime < 0.001)
+diff --git a/src/engine/core/input/keys.c b/src/engine/core/input/keys.c
+index 3d4ece1..3f4c820 100755
+--- a/src/engine/core/input/keys.c
++++ b/src/engine/core/input/keys.c
+@@ -39,7 +39,7 @@ keydest_t	key_dest;
+ 
+ int		key_count;			// incremented every key event
+ 
+-char*		keybindings[MAX_KEYS];
++cstring		keybindings[MAX_KEYS];
+ qboolean	consolekeys[MAX_KEYS];	// if true, can't be rebound while in console
+ qboolean	menubound[MAX_KEYS];	// if true, can't be rebound while in menu
+ int			keyshift[MAX_KEYS];		// key to map to if shift held down in console
+@@ -47,7 +47,7 @@ int			key_repeats[MAX_KEYS];	// if > 1, it is autorepeating
+ qboolean	keydown[MAX_KEYS];
+ 
+ typedef struct{
+-	char*   name;
++	cstring   name;
+ 	int		keynum;
+ } keyname_t;
+ 
+@@ -160,7 +160,7 @@ Interactive line editing and console scrollback
+ ====================
+ */
+ void Key_Console(int key){
+-	char*   cmd;
++	cstring   cmd;
+ 
+ 	if (key == K_ENTER){
+ 		Cbuf_AddText(key_lines[edit_line] + 1);    // skip the >
+@@ -394,7 +394,7 @@ void Key_SetBinding(int keynum, char *binding){
+ 
+ // allocate memory for new binding
+ 	int l = Q_strlen(binding);
+-	char* new = Z_Malloc(l + 1);
++	cstring new = Z_Malloc(l + 1);
+ 	Q_strcpy(new, binding);
+ 	new[l] = 0;
+ 	keybindings[keynum] = new;
+diff --git a/src/engine/core/input/keys.h b/src/engine/core/input/keys.h
+index ec5cd80..33d7dff 100755
+--- a/src/engine/core/input/keys.h
++++ b/src/engine/core/input/keys.h
+@@ -221,7 +221,7 @@ typedef enum {
+ } keydest_t;
+ 
+ extern keydest_t	key_dest;
+-extern char*    keybindings[MAX_KEYS];
++extern cstring    keybindings[MAX_KEYS];
+ extern	int		key_repeats[MAX_KEYS];
+ extern	int		key_count;			// incremented every key event
+ extern	int		key_lastpress;
+diff --git a/src/engine/core/utils/crc.c b/src/engine/core/utils/crc.c
+index 901e6ab..2ebc0fc 100755
+--- a/src/engine/core/utils/crc.c
++++ b/src/engine/core/utils/crc.c
+@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ #define CRC_INIT_VALUE	0xffff
+ #define CRC_XOR_VALUE	0x0000
+ 
+-static unsigned short crctable[256] =
++static uint16_t crctable[256] =
+ {
+ 	0x0000,	0x1021,	0x2042,	0x3063,	0x4084,	0x50a5,	0x60c6,	0x70e7,
+ 	0x8108,	0x9129,	0xa14a,	0xb16b,	0xc18c,	0xd1ad,	0xe1ce,	0xf1ef,
+@@ -65,17 +65,17 @@ static unsigned short crctable[256] =
+ 	0x6e17,	0x7e36,	0x4e55,	0x5e74,	0x2e93,	0x3eb2,	0x0ed1,	0x1ef0
+ };
+ 
+-void CRC_Init(unsigned short *crcvalue)
++void CRC_Init(uint16_t *crcvalue)
+ {
+ 	*crcvalue = CRC_INIT_VALUE;
+ }
+ 
+-void CRC_ProcessByte(unsigned short *crcvalue, byte data)
++void CRC_ProcessByte(uint16_t *crcvalue, byte data)
+ {
+ 	*crcvalue = (*crcvalue << 8) ^ crctable[(*crcvalue >> 8) ^ data];
+ }
+ 
+-unsigned short CRC_Value(unsigned short crcvalue)
++uint16_t CRC_Value(uint16_t crcvalue)
+ {
+ 	return crcvalue ^ CRC_XOR_VALUE;
+ }
+\ No newline at end of file
+diff --git a/src/engine/core/utils/crc.h b/src/engine/core/utils/crc.h
+index e277160..ee67940 100755
+--- a/src/engine/core/utils/crc.h
++++ b/src/engine/core/utils/crc.h
+@@ -20,6 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+ /* crc.h */
+ 
+-void CRC_Init(unsigned short *crcvalue);
+-void CRC_ProcessByte(unsigned short *crcvalue, byte data);
+-unsigned short CRC_Value(unsigned short crcvalue);
++void CRC_Init(uint16_t *crcvalue);
++void CRC_ProcessByte(uint16_t *crcvalue, byte data);
++uint16_t CRC_Value(uint16_t crcvalue);
+diff --git a/src/engine/net/client/cl_input.c b/src/engine/net/client/cl_input.c
+index 316ffaf..6ad24a6 100644
+--- a/src/engine/net/client/cl_input.c
++++ b/src/engine/net/client/cl_input.c
+@@ -55,7 +55,7 @@ kbutton_t	in_up, in_down;
+ int			in_impulse;
+ 
+ void KeyDown (kbutton_t *btn){
+-	char* c = Cmd_Argv(1);
++	cstring c = Cmd_Argv(1);
+     int k = (c[0])? atoi(c) : -1;		// typed manually at the console for continuous down
+ 
+ 	if ((k == btn->down[0]) ||
+@@ -79,7 +79,7 @@ void KeyDown (kbutton_t *btn){
+ void KeyUp (kbutton_t *btn){
+ 	int k;
+ 
+-	char* c = Cmd_Argv(1);
++	cstring c = Cmd_Argv(1);
+ 	if (c[0]){
+ 		k = atoi(c);
+     }else{ // typed manually at the console, assume for unsticking, so clear all
+diff --git a/src/engine/net/client/cl_parse.c b/src/engine/net/client/cl_parse.c
+index 6e3234b..466eebc 100644
+--- a/src/engine/net/client/cl_parse.c
++++ b/src/engine/net/client/cl_parse.c
+@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ 
+ #include "quakedef.h"
+ 
+-char* svc_strings[] = {
++cstring svc_strings[] = {
+     "svc_bad",
+     "svc_nop",
+     "svc_disconnect",
+@@ -220,7 +220,7 @@ void CL_ParseServerInfo(){
+ 	cl.gametype = MSG_ReadByte();
+ 
+ // parse signon message
+-	char* str = MSG_ReadString();
++	cstring str = MSG_ReadString();
+ 	strncpy(cl.levelname, str, (sizeof(cl.levelname) - 1));
+ 
+ // seperate the printfs so the server message can have a color
+diff --git a/src/engine/net/net.h b/src/engine/net/net.h
+index b297dca..81ba27f 100755
+--- a/src/engine/net/net.h
++++ b/src/engine/net/net.h
+@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ #include "cvar_q1.h"
+ 
+ struct qsockaddr {
+-	short sa_family;
+-	unsigned char sa_data[14];
++	int16_t sa_family;
++	uint8_t sa_data[14];
+ };
+ 
+ 
+@@ -97,7 +97,7 @@ struct qsockaddr {
+ //		string	value
+ 
+ //	note:
+-//		There are two address forms used above.  The short form is just a
++//		There are two address forms used above.  The int16_t form is just a
+ //		port number.  The address that goes along with the port is defined as
+ //		"whatever address you receive this reponse from".  This lets us use
+ //		the host OS to solve the problem of multiple host addresses (possibly
+@@ -153,7 +153,7 @@ extern qsocket_t*   net_freeSockets;
+ extern int			net_numsockets;
+ 
+ typedef struct {
+-	char*		name;
++	cstring		name;
+ 	qboolean	initialized;
+ 	int			controlSock;
+ 	int			(*Init)();
+@@ -166,11 +166,11 @@ typedef struct {
+ 	int 		(*Read)  (int socket, byte* buf, int len, struct qsockaddr* addr);
+ 	int 		(*Write) (int socket, byte* buf, int len, struct qsockaddr* addr);
+ 	int 		(*Broadcast) (int socket, byte* buf, int len);
+-	char*		(*AddrToString) (struct qsockaddr* addr);
+-	int 		(*StringToAddr) (char* string, struct qsockaddr* addr);
++	cstring		(*AddrToString) (struct qsockaddr* addr);
++	int 		(*StringToAddr) (cstring string, struct qsockaddr* addr);
+ 	int 		(*GetSocketAddr) (int socket, struct qsockaddr* addr);
+-	int 		(*GetNameFromAddr) (struct qsockaddr* addr, char* name);
+-	int 		(*GetAddrFromName) (char* name, struct qsockaddr* addr);
++	int 		(*GetNameFromAddr) (struct qsockaddr* addr, cstring name);
++	int 		(*GetAddrFromName) (cstring name, struct qsockaddr* addr);
+ 	int			(*AddrCompare) (struct qsockaddr* addr1, struct qsockaddr* addr2);
+ 	int			(*GetSocketPort) (struct qsockaddr* addr);
+ 	int			(*SetSocketPort) (struct qsockaddr* addr, int port);
+@@ -181,12 +181,12 @@ extern int 				net_numlandrivers;
+ extern net_landriver_t	net_landrivers[MAX_NET_DRIVERS];
+ 
+ typedef struct {
+-	char*       name;
++	cstring       name;
+ 	qboolean	initialized;
+ 	int			(*Init)();
+ 	void		(*Listen) (qboolean state);
+ 	void		(*SearchForHosts) (qboolean xmit);
+-	qsocket_t*  (*Connect) (char* host);
++	qsocket_t*  (*Connect) (cstring host);
+ 	qsocket_t*  (*CheckNewConnections)();
+ 	int			(*QGetMessage) (qsocket_t* sock);
+ 	int			(*QSendMessage) (qsocket_t* sock, sizebuf_t* data);
+@@ -240,13 +240,13 @@ extern hostcache_t hostcache[HOSTCACHESIZE];
+ extern unsigned long htonl (unsigned long hostlong);
+ #endif
+ #ifndef htons
+-extern unsigned short htons (unsigned short hostshort);
++extern uint16_t htons (uint16_t hostshort);
+ #endif
+ #ifndef ntohl
+ extern unsigned long ntohl (unsigned long netlong);
+ #endif
+ #ifndef ntohs
+-extern unsigned short ntohs (unsigned short netshort);
++extern uint16_t ntohs (uint16_t netshort);
+ #endif
+ #endif
+ 
+@@ -270,7 +270,7 @@ void		NET_Shutdown();
+ struct qsocket_s* NET_CheckNewConnections();
+ // returns a new connection number if there is one pending, else -1
+ 
+-struct qsocket_s* NET_Connect (char* host);
++struct qsocket_s* NET_Connect (cstring host);
+ // called by client to connect to a host.  Returns -1 if not able to
+ 
+ qboolean NET_CanSendMessage (qsocket_t* sock);
+@@ -323,8 +323,8 @@ extern	char		my_ipx_address[NET_NAMELEN];
+ extern	char		my_tcpip_address[NET_NAMELEN];
+ extern void (*GetComPortConfig) (int portNumber, int* port, int* irq, int* baud, qboolean* useModem);
+ extern void (*SetComPortConfig) (int portNumber, int  port, int  irq, int  baud, qboolean  useModem);
+-extern void (*GetModemConfig) (int portNumber, char* dialType, char* clear, char* init, char* hangup);
+-extern void (*SetModemConfig) (int portNumber, char* dialType, char* clear, char* init, char* hangup);
++extern void (*GetModemConfig) (int portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
++extern void (*SetModemConfig) (int portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
+ 
+ extern	qboolean	slistInProgress;
+ extern	qboolean	slistSilent;
+diff --git a/src/engine/net/net_dgrm.c b/src/engine/net/net_dgrm.c
+index 79a4a72..757c5b0 100644
+--- a/src/engine/net/net_dgrm.c
++++ b/src/engine/net/net_dgrm.c
+@@ -1,3 +1,4 @@
++#pragma once
+ /*
+ Copyright (C) 1996-1997 Id Software, Inc.
+ 
+@@ -20,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ // net_dgrm.c
+ 
+ // This is enables a simple IP banning mechanism
++#include <stdint.h>
++
+ #define BAN_TEST
+ 
+ #ifdef BAN_TEST
+@@ -34,16 +37,16 @@ struct in_addr
+ {
+ 	union
+ 	{
+-		struct { unsigned char s_b1,s_b2,s_b3,s_b4; } S_un_b;
+-		struct { unsigned short s_w1,s_w2; } S_un_w;
++		struct { uint8_t s_b1,s_b2,s_b3,s_b4; } S_un_b;
++		struct { uint16_t s_w1,s_w2; } S_un_w;
+ 		unsigned long S_addr;
+ 	} S_un;
+ };
+ #define	s_addr	S_un.S_addr	/* can be used for most tcp & ip code */
+ struct sockaddr_in
+ {
+-    short			sin_family;
+-    unsigned short	sin_port;
++    int16_t			sin_family;
++    uint16_t	sin_port;
+ 	struct in_addr	sin_addr;
+     char			sin_zero[8];
+ };
+diff --git a/src/engine/net/net_loop.c b/src/engine/net/net_loop.c
+index e7948bb..e122a58 100644
+--- a/src/engine/net/net_loop.c
++++ b/src/engine/net/net_loop.c
+@@ -195,7 +195,7 @@ int Loop_SendUnreliableMessage (qsocket_t *sock, sizebuf_t *data)
+ 
+ 	bufferLength = &((qsocket_t *)sock->driverdata)->receiveMessageLength;
+ 
+-	if ((*bufferLength + data->cursize + sizeof(byte) + sizeof(short)) > NET_MAXMESSAGE)
++	if ((*bufferLength + data->cursize + sizeof(byte) + sizeof(int16_t)) > NET_MAXMESSAGE)
+ 		return 0;
+ 
+ 	buffer = ((qsocket_t *)sock->driverdata)->receiveMessage + *bufferLength;
+diff --git a/src/engine/net/net_udp.c b/src/engine/net/net_udp.c
+index 6601bb4..78056ee 100644
+--- a/src/engine/net/net_udp.c
++++ b/src/engine/net/net_udp.c
+@@ -211,7 +211,7 @@ static int PartialIPAddress (char *in, struct qsockaddr *hostaddr)
+ 		port = net_hostport;
+ 
+ 	hostaddr->sa_family = AF_INET;
+-	((struct sockaddr_in *)hostaddr)->sin_port = htons((short)port);
++	((struct sockaddr_in *)hostaddr)->sin_port = htons((int16_t)port);
+ 	((struct sockaddr_in *)hostaddr)->sin_addr.s_addr = (myAddr & htonl(mask)) | htonl(addr);
+ 
+ 	return 0;
+diff --git a/src/engine/net/server/sv_main.c b/src/engine/net/server/sv_main.c
+index 909bbe9..1f0248a 100644
+--- a/src/engine/net/server/sv_main.c
++++ b/src/engine/net/server/sv_main.c
+@@ -101,7 +101,7 @@ void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count){
+ void SV_StartSound(
+     edict_t* entity,
+     int     channel,
+-    char*   sample,
++    cstring   sample,
+     int     volume,
+     float   attenuation
+ ){
+@@ -190,11 +190,11 @@ void SV_SendServerinfo(client_t* client){
+ 
+ 	MSG_WriteString(&client->message, message);
+ 
+-	for (char** s = (sv.model_precache + 1); *s; s++)
++	for (cstring* s = (sv.model_precache + 1); *s; s++)
+ 		MSG_WriteString(&client->message, *s);
+ 	MSG_WriteByte(&client->message, 0);
+ 
+-	for (char** s = (sv.sound_precache + 1); *s; s++)
++	for (cstring* s = (sv.sound_precache + 1); *s; s++)
+ 		MSG_WriteString(&client->message, *s);
+ 	MSG_WriteByte(&client->message, 0);
+ 
+@@ -743,7 +743,7 @@ SERVER SPAWNING
+ 
+     ================
+ */
+-int SV_ModelIndex(char* name){
++int SV_ModelIndex(cstring name){
+ 	int		i;
+ 
+ 	if (!name || !name[0])
+diff --git a/src/engine/vm/pr_comp.h b/src/engine/vm/pr_comp.h
+index f5023eb..a1c7525 100644
+--- a/src/engine/vm/pr_comp.h
++++ b/src/engine/vm/pr_comp.h
+@@ -120,14 +120,14 @@ enum {
+ 
+ 
+ typedef struct statement_s{
+-	unsigned short	op;
+-	short	a,b,c;
++	uint16_t	op;
++	int16_t	a,b,c;
+ } dstatement_t;
+ 
+ typedef struct{
+-	unsigned short	type;		// if DEF_SAVEGLOBGAL bit is set
++	uint16_t	type;		// if DEF_SAVEGLOBGAL bit is set
+ 								// the variable needs to be saved in savegames
+-	unsigned short	ofs;
++	uint16_t	ofs;
+ 	int			s_name;
+ } ddef_t;
+ #define	DEF_SAVEGLOBAL	(1<<15)
+diff --git a/src/engine/vm/pr_edict.c b/src/engine/vm/pr_edict.c
+index e1b271e..781d268 100644
+--- a/src/engine/vm/pr_edict.c
++++ b/src/engine/vm/pr_edict.c
+@@ -32,7 +32,7 @@ globalvars_t	*pr_global_struct;
+ float			*pr_globals;			// same as pr_global_struct
+ int				pr_edict_size;	// in bytes
+ 
+-unsigned short		pr_crc;
++uint16_t		pr_crc;
+ 
+ int		type_size[8] = {1,sizeof(string_t)/4,1,3,1,1,sizeof(func_t)/4,sizeof(typeless_ptr )/4};
+ 
+diff --git a/src/engine/vm/pr_exec.c b/src/engine/vm/pr_exec.c
+index c54c1fb..943894d 100644
+--- a/src/engine/vm/pr_exec.c
++++ b/src/engine/vm/pr_exec.c
+@@ -47,7 +47,7 @@ int			pr_xstatement;
+ 
+ int		pr_argc;
+ 
+-char* pr_opnames[] =
++cstring pr_opnames[] =
+ {
+ "DONE",
+ 
+@@ -136,8 +136,8 @@ char* pr_opnames[] =
+ "BITOR"
+ };
+ 
+-char* PR_GlobalString (int ofs);
+-char* PR_GlobalStringNoContents (int ofs);
++cstring PR_GlobalString (int ofs);
++cstring PR_GlobalStringNoContents (int ofs);
+ 
+ 
+ //=============================================================================
+@@ -259,7 +259,7 @@ PR_RunError
+ Aborts the currently executing function
+ ============
+ */
+-void PR_RunError (char* error, ...)
++void PR_RunError (cstring error, ...)
+ {
+ 	va_list		argptr;
+ 	char		string[1024];
+diff --git a/src/engine/vm/progs.h b/src/engine/vm/progs.h
+index f4c3a64..ea95526 100755
+--- a/src/engine/vm/progs.h
++++ b/src/engine/vm/progs.h
+@@ -39,7 +39,7 @@ typedef struct edict_s
+ 	link_t		area;				// linked to a division node or leaf
+ 
+ 	int			num_leafs;
+-	short		leafnums[MAX_ENT_LEAFS];
++	int16_t		leafnums[MAX_ENT_LEAFS];
+ 
+ 	entity_state_t	baseline;
+ 
+@@ -124,7 +124,7 @@ extern	qboolean	pr_trace;
+ extern	dfunction_t	*pr_xfunction;
+ extern	int			pr_xstatement;
+ 
+-extern	unsigned short		pr_crc;
++extern	uint16_t		pr_crc;
+ 
+ void PR_RunError (char *error, ...);
+ 
+diff --git a/src/engine/world/world.h b/src/engine/world/world.h
+index 785e03e..0acdb3c 100755
+--- a/src/engine/world/world.h
++++ b/src/engine/world/world.h
+@@ -20,8 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+ // world.h
+ 
+-typedef struct
+-{
++typedef struct{
+ 	vec3_t	normal;
+ 	float	dist;
+ } plane_t;
+diff --git a/src/platform/legacy/vgamodes.h b/src/platform/legacy/vgamodes.h
+index 089082e..5ee54df 100644
+--- a/src/platform/legacy/vgamodes.h
++++ b/src/platform/legacy/vgamodes.h
+@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ int		VGA_InitMode (viddef_p vid, vmode_t *pcurrentmode);
+ void	VGA_SwapBuffers (viddef_p vid, vmode_t *pcurrentmode, vrect_p rects);
+ void	VGA_SetPalette (viddef_p vid, vmode_t *pcurrentmode,
+-						unsigned char *pal);
++						uint8_t *pal);
+ 
+ ///////////////////////////////////////////////////////////////////////////
+ // the following base mode descriptors plus extra data together provide all
+diff --git a/src/platform/legacy/vid_dos.c b/src/platform/legacy/vid_dos.c
+index 0871c3c..2755901 100644
+--- a/src/platform/legacy/vid_dos.c
++++ b/src/platform/legacy/vid_dos.c
+@@ -75,7 +75,7 @@ byte	vid_current_palette[768];	// save for mode changes
+ 
+ static qboolean	nomodecheck = false;
+ 
+-unsigned short	d_8to16table[256];	// not used in 8 bpp mode
++uint16_t	d_8to16table[256];	// not used in 8 bpp mode
+ unsigned		d_8to24table[256];	// not used in 8 bpp mode
+ 
+ void VID_MenuDraw();
+@@ -87,7 +87,7 @@ void VID_MenuKey (int key);
+ VID_Init
+ ================
+ */
+-void    VID_Init (unsigned char *palette)
++void    VID_Init (uint8_t *palette)
+ {
+ 	Cvar_RegisterVariable(&vid_mode);
+ 	Cvar_RegisterVariable(&vid_wait);
+@@ -195,7 +195,7 @@ char *VID_ModeInfo (int modenum, char **ppheader)
+ VID_SetMode
+ ================
+ */
+-int VID_SetMode (int modenum, unsigned char *palette)
++int VID_SetMode (int modenum, uint8_t *palette)
+ {
+ 	int		stat;
+ 	vmode_t	*pnewmode, *poldmode;
+@@ -282,7 +282,7 @@ int VID_SetMode (int modenum, unsigned char *palette)
+ VID_SetPalette
+ ================
+ */
+-void    VID_SetPalette (unsigned char *palette)
++void    VID_SetPalette (uint8_t *palette)
+ {
+ 	if (palette != vid_current_palette)
+ 		Q_memcpy(vid_current_palette, palette, 768);
+@@ -295,7 +295,7 @@ void    VID_SetPalette (unsigned char *palette)
+ VID_ShiftPalette
+ ================
+ */
+-void    VID_ShiftPalette (unsigned char *palette)
++void    VID_ShiftPalette (uint8_t *palette)
+ {
+ 
+ 	VID_SetPalette (palette);
+diff --git a/src/platform/legacy/vid_dos.h b/src/platform/legacy/vid_dos.h
+index 84a817a..140bfcc 100644
+--- a/src/platform/legacy/vid_dos.h
++++ b/src/platform/legacy/vid_dos.h
+@@ -35,7 +35,7 @@ typedef struct vmode_s {
+ 	void		(*swapbuffers)(viddef_p vid, struct vmode_s *pcurrentmode,
+ 							   vrect_p rects);
+ 	void		(*setpalette)(viddef_p vid, struct vmode_s *pcurrentmode,
+-							  unsigned char *palette);
++							  uint8_t *palette);
+ 	void		(*begindirectrect)(viddef_p vid, struct vmode_s *pcurrentmode,
+ 								   int x, int y, byte *pbitmap, int width,
+ 								   int height);
+@@ -59,7 +59,7 @@ CVAR_EXTERN(vid_wait);
+ CVAR_EXTERN(vid_nopageflip);
+ CVAR_EXTERN(_vid_wait_override);
+ 
+-extern unsigned char colormap256[32][256];
++extern uint8_t colormap256[32][256];
+ 
+ extern void	*vid_surfcache;
+ extern int	vid_surfcachesize;
+@@ -69,7 +69,7 @@ void VID_InitVESA();
+ void VID_InitExtra();
+ void VGA_WaitVsync();
+ void VGA_ClearVideoMem (int planar);
+-void VGA_SetPalette(viddef_p vid, vmode_t *pcurrentmode, unsigned char *pal);
++void VGA_SetPalette(viddef_p vid, vmode_t *pcurrentmode, uint8_t *pal);
+ void VGA_SwapBuffersCopy (viddef_p vid, vmode_t *pcurrentmode,
+ 	vrect_p rects);
+ qboolean VGA_FreeAndAllocVidbuffer (viddef_p vid, int allocnewbuffer);
+diff --git a/src/platform/legacy/vid_sunx.c b/src/platform/legacy/vid_sunx.c
+index e70212c..f70d8d6 100644
+--- a/src/platform/legacy/vid_sunx.c
++++ b/src/platform/legacy/vid_sunx.c
+@@ -97,7 +97,7 @@ typedef struct
+ } keymap_t;
+ 
+ viddef_t vid; // global video state
+-unsigned short       d_8to16table[256];
++uint16_t       d_8to16table[256];
+ 
+ int		num_shades=32;
+ 
+@@ -143,7 +143,7 @@ static int verbose=1;
+ 
+ static byte current_palette[768];
+ 
+-typedef unsigned short PIXEL16;
++typedef uint16_t PIXEL16;
+ typedef unsigned long PIXEL24;
+ static PIXEL16 st2d_8to16table[256];
+ static PIXEL24 st2d_8to24table[256];
+@@ -220,7 +220,7 @@ PIXEL24 xlib_rgb24(int r,int g,int b)
+ void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
+ {
+ 	int xi,yi;
+-	unsigned char *src;
++	uint8_t *src;
+ 	PIXEL16 *dest;
+ 	register int count, n;
+ 
+@@ -256,7 +256,7 @@ void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
+ void st3_fixup( XImage *framebuf, int x, int y, int width, int height)
+ {
+ 	int xi,yi;
+-	unsigned char *src;
++	uint8_t *src;
+ 	PIXEL24 *dest;
+ 	register int count, n;
+ 
+@@ -403,9 +403,9 @@ void ResetFrameBuffer(void)
+ 	if (pwidth == 3) pwidth = 4;
+ 	mem = ((vid.width*pwidth+3)&~3) * vid.height;
+ 
+-//	d_pzbuffer = (unsigned short *) Z_Malloc(vid.width*vid.height*
++//	d_pzbuffer = (uint16_t *) Z_Malloc(vid.width*vid.height*
+ //		sizeof(*d_pzbuffer));
+-	d_pzbuffer = (short *) Hunk_HighAllocName(vid.width*vid.height*
++	d_pzbuffer = (int16_t *) Hunk_HighAllocName(vid.width*vid.height*
+ 		sizeof(*d_pzbuffer), "zbuff");
+ 
+ 	x_framebuffer[0] = XCreateImage(	x_disp,
+@@ -521,7 +521,7 @@ void VID_SetWindowTitle( Window win, char *pszName )
+     XWMHints		*wmHints;
+ 
+     // Setup ICCCM properties
+-    textprop.value = (unsigned char *)pszName;
++    textprop.value = (uint8_t *)pszName;
+     textprop.encoding = XA_STRING;
+     textprop.format = 8;
+     textprop.nitems = strlen(pszName);
+@@ -555,7 +555,7 @@ qboolean VID_FullScreen( Window win )
+ 
+     hints.flags = MWM_HINTS_DECORATIONS;
+     hints.decorations = 0; // Absolutely no decorations.
+-    XChangeProperty( x_disp, win, aHints, aHints, 32, PropModeReplace, (unsigned char *)&hints, 4 );
++    XChangeProperty( x_disp, win, aHints, aHints, 32, PropModeReplace, (uint8_t *)&hints, 4 );
+ 
+     changes.x = 0;
+     changes.y = 0;
+@@ -566,7 +566,7 @@ qboolean VID_FullScreen( Window win )
+     return( true );
+ }
+ 
+-void	VID_Init (unsigned char *palette)
++void	VID_Init (uint8_t *palette)
+ {
+ 
+ 	int pnum, i;
+@@ -805,12 +805,12 @@ void	VID_Init (unsigned char *palette)
+ 
+ }
+ 
+-void VID_ShiftPalette(unsigned char *p)
++void VID_ShiftPalette(uint8_t *p)
+ {
+ 	VID_SetPalette(p);
+ }
+ 
+-void VID_SetPalette(unsigned char *palette)
++void VID_SetPalette(uint8_t *palette)
+ {
+ 
+ 	int i;
+diff --git a/src/platform/legacy/vid_sunxil.c b/src/platform/legacy/vid_sunxil.c
+index eab309d..9064ee7 100644
+--- a/src/platform/legacy/vid_sunxil.c
++++ b/src/platform/legacy/vid_sunxil.c
+@@ -101,7 +101,7 @@ typedef struct
+ } keymap_t;
+ 
+ viddef_t vid; // global video state
+-unsigned short       d_8to16table[256];
++uint16_t       d_8to16table[256];
+ 
+ int		num_shades=32;
+ 
+@@ -336,7 +336,7 @@ void VID_SetWindowTitle( Window win, char *pszName )
+ 	XWMHints		*wmHints;
+ 
+     // Setup ICCCM properties
+-    textprop.value = (unsigned char *)pszName;
++    textprop.value = (uint8_t *)pszName;
+     textprop.encoding = XA_STRING;
+     textprop.format = 8;
+     textprop.nitems = strlen(pszName);
+@@ -369,7 +369,7 @@ qboolean VID_FullScreen( Window win )
+ 
+ 	hints.flags = MWM_HINTS_DECORATIONS;
+ 	hints.decorations = 0; // Absolutely no decorations.
+-	XChangeProperty( x_disp, win, aHints, aHints, 32, PropModeReplace, (unsigned char *)&hints, 4 );
++	XChangeProperty( x_disp, win, aHints, aHints, 32, PropModeReplace, (uint8_t *)&hints, 4 );
+ 
+ 	changes.x = 0;
+ 	changes.y = 0;
+@@ -380,7 +380,7 @@ qboolean VID_FullScreen( Window win )
+ 	return( true );
+ }
+ 
+-void	VID_Init (unsigned char *palette)
++void	VID_Init (uint8_t *palette)
+ {
+ 
+ 	int pnum, i;
+@@ -704,12 +704,12 @@ VID_ResetFramebuffer_MT()
+ 	d_pzbuffer = malloc(PM(vid.width)*PM(vid.height)*sizeof(*d_pzbuffer));
+ }
+ 
+-void VID_ShiftPalette(unsigned char *p)
++void VID_ShiftPalette(uint8_t *p)
+ {
+ 	VID_SetPalette(p);
+ }
+ 
+-void VID_SetPalette(unsigned char *palette)
++void VID_SetPalette(uint8_t *palette)
+ {
+ 
+ 	int i;
+@@ -804,7 +804,7 @@ int XLateKey(XKeyEvent *ev)
+ 		case XK_F26: key = '*'; break;
+ 
+ 		default:
+-			key = (unsigned char)*buf;
++			key = (uint8_t)*buf;
+ 			break;
+ 		}
+ 
+diff --git a/src/platform/legacy/vid_svgalib.c b/src/platform/legacy/vid_svgalib.c
+index e8255f5..4d60612 100644
+--- a/src/platform/legacy/vid_svgalib.c
++++ b/src/platform/legacy/vid_svgalib.c
+@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ 
+ #define stringify(m) { #m, m }
+ 
+-unsigned short       d_8to16table[256];
++uint16_t       d_8to16table[256];
+ static byte		*vid_surfcache;
+ static int		VID_highhunkmark;
+ 
+@@ -60,7 +60,7 @@ struct
+ 	stringify(MOUSE_PS2),
+ };
+ 
+-static unsigned char scantokey[128];
++static uint8_t scantokey[128];
+ static byte vid_current_palette[768];
+ 
+ int num_mice = sizeof (mice) / sizeof(mice[0]);
+@@ -236,7 +236,7 @@ Keybinding command
+ void VID_Gamma_f()
+ {
+ 	float	gamma, f, inf;
+-	unsigned char	palette[768];
++	uint8_t	palette[768];
+ 	int		i;
+ 
+ 	if (Cmd_Argc () == 2)
+@@ -439,7 +439,7 @@ void VID_Shutdown(void)
+ 
+ }
+ 
+-void VID_ShiftPalette(unsigned char *p)
++void VID_ShiftPalette(uint8_t *p)
+ {
+ 	VID_SetPalette(p);
+ }
+@@ -469,7 +469,7 @@ void VID_SetPalette(byte *palette)
+ 	}
+ }
+ 
+-int VID_SetMode (int modenum, unsigned char *palette)
++int VID_SetMode (int modenum, uint8_t *palette)
+ {
+ 	int bsize, zsize, tsize;
+ 
+@@ -552,7 +552,7 @@ int VID_SetMode (int modenum, unsigned char *palette)
+ 	return 0;
+ }
+ 
+-void VID_Init(unsigned char *palette)
++void VID_Init(uint8_t *palette)
+ {
+ 
+ 	int i;
+diff --git a/src/platform/legacy/vid_vga.c b/src/platform/legacy/vid_vga.c
+index 401b21c..50664fb 100644
+--- a/src/platform/legacy/vid_vga.c
++++ b/src/platform/legacy/vid_vga.c
+@@ -408,7 +408,7 @@ int VGA_InitMode (viddef_p lvid, vmode_t *pcurrentmode)
+ VGA_SetPalette
+ ================
+ */
+-void VGA_SetPalette(viddef_p lvid, vmode_t *pcurrentmode, unsigned char *pal)
++void VGA_SetPalette(viddef_p lvid, vmode_t *pcurrentmode, uint8_t *pal)
+ {
+ 	int shiftcomponents=2;
+ 	int i;
+diff --git a/src/platform/legacy/vid_win.c b/src/platform/legacy/vid_win.c
+index fae283f..401f4a5 100644
+--- a/src/platform/legacy/vid_win.c
++++ b/src/platform/legacy/vid_win.c
+@@ -104,9 +104,9 @@ static byte		*vid_surfcache;
+ static int		vid_surfcachesize;
+ static int		VID_highhunkmark;
+ 
+-unsigned char	vid_curpal[256*3];
++uint8_t	vid_curpal[256*3];
+ 
+-unsigned short	d_8to16table[256];
++uint16_t	d_8to16table[256];
+ unsigned	d_8to24table[256];
+ 
+ int     driver = grDETECT,mode;
+@@ -1561,7 +1561,7 @@ void VID_SetDefaultMode()
+ }
+ 
+ 
+-int VID_SetMode (int modenum, unsigned char *palette)
++int VID_SetMode (int modenum, uint8_t *palette)
+ {
+ 	int				original_mode, temp, dummy;
+ 	qboolean		stat;
+@@ -1812,7 +1812,7 @@ void VID_ForceLockState (int lk)
+ }
+ 
+ 
+-void	VID_SetPalette (unsigned char *palette)
++void	VID_SetPalette (uint8_t *palette)
+ {
+ 	INT			i;
+ 	palette_t	pal[256];
+@@ -1882,7 +1882,7 @@ void	VID_SetPalette (unsigned char *palette)
+ }
+ 
+ 
+-void	VID_ShiftPalette (unsigned char *palette)
++void	VID_ShiftPalette (uint8_t *palette)
+ {
+ 	VID_SetPalette (palette);
+ }
+@@ -2055,7 +2055,7 @@ void VID_ForceMode_f()
+ }
+ 
+ 
+-void	VID_Init (unsigned char *palette)
++void	VID_Init (uint8_t *palette)
+ {
+ 	int		i, bestmatch, bestmatchmetric, t, dr, dg, db;
+ 	int		basenummodes;
+@@ -2967,7 +2967,7 @@ LONG WINAPI MainWndProc (
+ 		// Its delta is either positive or neg, and we generate the proper
+ 		// Event.
+ 		case WM_MOUSEWHEEL:
+-			if ((short) HIWORD(wParam) > 0) {
++			if ((int16_t) HIWORD(wParam) > 0) {
+ 				Key_Event(K_MWHEELUP, true);
+ 				Key_Event(K_MWHEELUP, false);
+ 			} else {
+diff --git a/src/platform/null/vid_null.c b/src/platform/null/vid_null.c
+index c3388d5..8cb3888 100644
+--- a/src/platform/null/vid_null.c
++++ b/src/platform/null/vid_null.c
+@@ -28,21 +28,21 @@ viddef_t	vid;				// global video state
+ #define	BASEHEIGHT	200
+ 
+ byte	vid_buffer[BASEWIDTH*BASEHEIGHT];
+-short	zbuffer[BASEWIDTH*BASEHEIGHT];
++int16_t	zbuffer[BASEWIDTH*BASEHEIGHT];
+ byte	surfcache[256*1024];
+ 
+-unsigned short	d_8to16table[256];
++uint16_t	d_8to16table[256];
+ unsigned	d_8to24table[256];
+ 
+-void	VID_SetPalette (unsigned char *palette)
++void	VID_SetPalette (uint8_t *palette)
+ {
+ }
+ 
+-void	VID_ShiftPalette (unsigned char *palette)
++void	VID_ShiftPalette (uint8_t *palette)
+ {
+ }
+ 
+-void	VID_Init (unsigned char *palette)
++void	VID_Init (uint8_t *palette)
+ {
+ 	vid.maxwarpwidth = vid.width = vid.conwidth = BASEWIDTH;
+ 	vid.maxwarpheight = vid.height = vid.conheight = BASEHEIGHT;
+diff --git a/src/platform/posix/snd_linux.c b/src/platform/posix/snd_linux.c
+index 41bca83..aaa1a2e 100644
+--- a/src/platform/posix/snd_linux.c
++++ b/src/platform/posix/snd_linux.c
+@@ -129,9 +129,9 @@ qboolean SNDDMA_Init(void)
+ 
+ // memory map the dma buffer
+ 
+-	shm->buffer = (unsigned char *) mmap(NULL, info.fragstotal
++	shm->buffer = (uint8_t *) mmap(NULL, info.fragstotal
+ 		* info.fragsize, PROT_WRITE, MAP_FILE|MAP_SHARED, audio_fd, 0);
+-	if (!shm->buffer || shm->buffer == (unsigned char *)-1)
++	if (!shm->buffer || shm->buffer == (uint8_t *)-1)
+ 	{
+ 		perror("/dev/dsp");
+ 		Con_Printf("Could not mmap /dev/dsp\n");
+diff --git a/src/platform/posix/sys_linux.c b/src/platform/posix/sys_linux.c
+index 87b97c8..c2d39f6 100755
+--- a/src/platform/posix/sys_linux.c
++++ b/src/platform/posix/sys_linux.c
+@@ -84,7 +84,7 @@ void Sys_Printf (char *fmt, ...)
+ void Sys_Printf(char *fmt, ...){
+ 	va_list argptr;
+ 	char    text[1024];
+-	unsigned char*  p;
++	uint8_t*  p;
+ 
+ 	va_start(argptr, fmt);
+ 	vsprintf(text, fmt, argptr);
+@@ -98,7 +98,7 @@ void Sys_Printf(char *fmt, ...){
+         return;
+ 	}
+ 
+-	for (p = (unsigned char*)text; *p; p++) {
++	for (p = (uint8_t*)text; *p; p++) {
+ 		*p &= 0x7f;
+ 		if (((*p > 128) ||  // ASCII [DEL] last printable
+              (*p < 32)) &&  // ASCII [SP] first printable
+diff --git a/src/platform/posix/vid_ext.c b/src/platform/posix/vid_ext.c
+index f5e8779..e2a1338 100644
+--- a/src/platform/posix/vid_ext.c
++++ b/src/platform/posix/vid_ext.c
+@@ -178,7 +178,7 @@ VID_SetVESAPalette
+ ================
+ */
+ void VID_SetVESAPalette (viddef_p lvid, vmode_t *pcurrentmode,
+-	unsigned char *pal)
++	uint8_t *pal)
+ {
+ 	int		i;
+ 	byte	*pp;
+@@ -298,7 +298,7 @@ VID_InitExtra
+ void VID_InitExtra()
+ {
+ 	int				nummodes;
+-	short			*pmodenums;
++	int16_t			*pmodenums;
+ 	vbeinfoblock_t	*pinfoblock;
+ 	__dpmi_meminfo	phys_mem_info;
+ 
+@@ -321,9 +321,9 @@ void VID_InitExtra()
+ 	Con_Printf ("VESA 2.0 compliant adapter:\n%s\n",
+ 				VID_ExtraFarToLinear (*(byte **)&pinfoblock->OemStringPtr[0]));
+ 
+-	totalvidmem = *(unsigned short *)&pinfoblock->TotalMemory[0] << 16;
++	totalvidmem = *(uint16_t *)&pinfoblock->TotalMemory[0] << 16;
+ 
+-	pmodenums = (short *)
++	pmodenums = (int16_t *)
+ 			VID_ExtraFarToLinear (*(byte **)&pinfoblock->VideoModePtr[0]);
+ 
+ // find 8 bit modes until we either run out of space or run out of modes
+@@ -463,8 +463,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
+ 		modeinfo.modenum = modenum;
+ 		modeinfo.bits_per_pixel = *(char*)(infobuf+25);
+ 		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel+1)/8;
+-		modeinfo.width = *(short*)(infobuf+18);
+-		modeinfo.height = *(short*)(infobuf+20);
++		modeinfo.width = *(int16_t*)(infobuf+18);
++		modeinfo.height = *(int16_t*)(infobuf+20);
+ 
+ 	// we do only 8-bpp in software
+ 		if ((modeinfo.bits_per_pixel != 8) ||
+@@ -475,7 +475,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
+ 			return false;
+ 		}
+ 
+-		modeinfo.mode_attributes = *(short*)infobuf;
++		modeinfo.mode_attributes = *(int16_t*)infobuf;
+ 
+ 	// we only want color graphics modes that are supported by the hardware
+ 		if ((modeinfo.mode_attributes &
+@@ -493,7 +493,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
+ 				return false;
+ 		}
+ 
+-		modeinfo.bytes_per_scanline = *(short*)(infobuf+16);
++		modeinfo.bytes_per_scanline = *(int16_t*)(infobuf+16);
+ 
+ 		modeinfo.pagesize = modeinfo.bytes_per_scanline * modeinfo.height;
+ 
+@@ -503,7 +503,7 @@ qboolean VID_ExtraGetModeInfo(int modenum)
+ 	// force to one page if the adapter reports it doesn't support more pages
+ 	// than that, no matter how much memory it has--it may not have hardware
+ 	// support for page flipping
+-		numimagepages = *(unsigned char *)(infobuf+29);
++		numimagepages = *(uint8_t *)(infobuf+29);
+ 
+ 		if (numimagepages <= 0)
+ 		{
+@@ -521,19 +521,19 @@ qboolean VID_ExtraGetModeInfo(int modenum)
+ 
+ 		if (*(char*)(infobuf+2) & 5)
+ 		{
+-			modeinfo.winasegment = *(unsigned short*)(infobuf+8);
++			modeinfo.winasegment = *(uint16_t*)(infobuf+8);
+ 			modeinfo.win = 0;
+ 		}
+ 		else if (*(char*)(infobuf+3) & 5)
+ 		{
+-			modeinfo.winbsegment = *(unsigned short*)(infobuf+8);
++			modeinfo.winbsegment = *(uint16_t*)(infobuf+8);
+ 			modeinfo.win = 1;
+ 		}
+-		modeinfo.granularity = *(short*)(infobuf+4) * 1024;
+-		modeinfo.win_size = *(short*)(infobuf+6) * 1024;
++		modeinfo.granularity = *(int16_t*)(infobuf+4) * 1024;
++		modeinfo.win_size = *(int16_t*)(infobuf+6) * 1024;
+ 		modeinfo.bits_per_pixel = *(char*)(infobuf+25);
+ 		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel+1)/8;
+-		modeinfo.memory_model = *(unsigned char*)(infobuf+27);
++		modeinfo.memory_model = *(uint8_t*)(infobuf+27);
+ 		modeinfo.num_pages = *(char*)(infobuf+29) + 1;
+ 
+ 		modeinfo.red_width = *(char*)(infobuf+31);
+@@ -548,8 +548,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
+ #if 0
+ 		printf("VID: (VESA) info for mode 0x%x\n", modeinfo.modenum);
+ 		printf("  mode attrib = 0x%0x\n", modeinfo.mode_attributes);
+-		printf("  win a attrib = 0x%0x\n", *(unsigned char*)(infobuf+2));
+-		printf("  win b attrib = 0x%0x\n", *(unsigned char*)(infobuf+3));
++		printf("  win a attrib = 0x%0x\n", *(uint8_t*)(infobuf+2));
++		printf("  win b attrib = 0x%0x\n", *(uint8_t*)(infobuf+3));
+ 		printf("  win a seg 0x%0x\n", (int) modeinfo.winasegment);
+ 		printf("  win b seg 0x%0x\n", (int) modeinfo.winbsegment);
+ 		printf("  bytes per scanline = %d\n",
+diff --git a/src/platform/posix/vid_x.c b/src/platform/posix/vid_x.c
+index 8c228ab..e2efa54 100644
+--- a/src/platform/posix/vid_x.c
++++ b/src/platform/posix/vid_x.c
+@@ -62,7 +62,7 @@ typedef struct{
+ } keymap_t;
+ 
+ extern viddef_t vid; // global video state
+-unsigned short d_8to16table[256];
++uint16_t d_8to16table[256];
+ 
+ int		num_shades=32;
+ 
+@@ -105,7 +105,7 @@ extern void (*vid_menudrawfn)(void);
+ extern void (*vid_menukeyfn)(int key);
+ void VID_MenuKey (int key);
+ 
+-typedef unsigned short PIXEL16;
++typedef uint16_t PIXEL16;
+ typedef unsigned long PIXEL24;
+ static PIXEL16 st2d_8to16table[256];
+ static PIXEL24 st2d_8to24table[256];
+@@ -181,7 +181,7 @@ PIXEL24 xlib_rgb24(int r,int g,int b)
+ 
+ void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
+ {
+-	unsigned char *src;
++	uint8_t *src;
+ 	PIXEL16 *dest;
+ 	register int count, n;
+ 
+@@ -216,7 +216,7 @@ void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
+ 
+ void st3_fixup( XImage *framebuf, int x, int y, int width, int height)
+ {
+-	unsigned char *src;
++	uint8_t *src;
+ 	PIXEL24 *dest;
+ 	register int count, n;
+ 
+@@ -436,7 +436,7 @@ void ResetSharedFrameBuffers(void)
+ // the palette data will go away after the call, so it must be copied off if
+ // the video driver will need it again
+ 
+-void	VID_Init (unsigned char *palette)
++void	VID_Init (uint8_t *palette)
+ {
+ 
+    int pnum, i;
+@@ -668,14 +668,14 @@ void	VID_Init (unsigned char *palette)
+ 
+ }
+ 
+-void VID_ShiftPalette(unsigned char *p)
++void VID_ShiftPalette(uint8_t *p)
+ {
+ 	VID_SetPalette(p);
+ }
+ 
+ 
+ 
+-void VID_SetPalette(unsigned char *palette)
++void VID_SetPalette(uint8_t *palette)
+ {
+ 
+ 	int i;
+@@ -833,7 +833,7 @@ int XLateKey(XKeyEvent *ev)
+ #endif
+ 
+ 		default:
+-			key = *(unsigned char*)buf;
++			key = *(uint8_t*)buf;
+ 			if (key >= 'A' && key <= 'Z')
+ 				key = key - 'A' + 'a';
+ //			fprintf(stdout, "case 0x0%x: key = ___;break;/* [%c] */\n", keysym);
+diff --git a/src/platform/sound.h b/src/platform/sound.h
+index a9333de..68f60cc 100644
+--- a/src/platform/sound.h
++++ b/src/platform/sound.h
+@@ -38,8 +38,8 @@ void S_ClearBuffer();
+ void S_Update(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up);
+ void S_ExtraUpdate();
+ 
+-sfx_p S_PrecacheSound(char* sample);
+-void S_TouchSound(char* sample);
++sfx_p S_PrecacheSound(cstring sample);
++void S_TouchSound(cstring sample);
+ void S_ClearPrecache();
+ void S_BeginPrecaching();
+ void S_EndPrecaching();
+@@ -97,10 +97,10 @@ extern qboolean snd_initialized;
+ 
+ extern int      snd_blocked;
+ 
+-void S_LocalSound(char* s);
++void S_LocalSound(cstring s);
+ sfxcache_p S_LoadSound(sfx_p s);
+ 
+-wavinfo_t GetWavinfo(char* name, char* wav, int wavlength);
++wavinfo_t GetWavinfo(cstring name, cstring wav, int wavlength);
+ 
+ void SND_InitScaletable();
+ void SNDDMA_Submit();
+diff --git a/src/platform/sound_struct.h b/src/platform/sound_struct.h
+index 81ccd43..2cea97e 100644
+--- a/src/platform/sound_struct.h
++++ b/src/platform/sound_struct.h
+@@ -35,7 +35,7 @@ typedef struct{
+ 	int				samplepos;				// in mono samples
+ 	int				samplebits;
+ 	int				speed;
+-	unsigned char*  buffer;
++	uint8_t*  buffer;
+ } dma_t;
+ typedef dma_t* dma_p;
+ 
+diff --git a/src/platform/vid.h b/src/platform/vid.h
+index 002ac7f..e34dd14 100644
+--- a/src/platform/vid.h
++++ b/src/platform/vid.h
+@@ -39,7 +39,7 @@ struct vrect_s{
+ typedef struct{
+     pixel_p     buffer;		// invisible buffer
+     pixel_p     colormap;		// 256 * VID_GRADES size
+-    unsigned short* colormap16;	// 256 * VID_GRADES size
++    uint16_t* colormap16;	// 256 * VID_GRADES size
+     int         fullbright;		// index of first fullbright color
+     unsigned    rowbytes;	// may be > width if displayed in a window
+     unsigned    width;
+@@ -59,18 +59,18 @@ typedef struct{
+ typedef viddef_t* viddef_p;
+ 
+ extern	viddef_t	vid;				// global video state
+-extern	unsigned short	d_8to16table[256];
++extern	uint16_t	d_8to16table[256];
+ extern	unsigned	d_8to24table[256];
+ extern void (*vid_menudrawfn)(void);
+ extern void (*vid_menukeyfn)(int key);
+ 
+-void	VID_SetPalette (unsigned char* palette);
++void	VID_SetPalette (uint8_t* palette);
+ // called at startup and after any gamma correction
+ 
+-void	VID_ShiftPalette (unsigned char* palette);
++void	VID_ShiftPalette (uint8_t* palette);
+ // called for bonus and pain flashes, and for underwater color changes
+ 
+-void	VID_Init (unsigned char* palette);
++void	VID_Init (uint8_t* palette);
+ // Called at startup to set up translation tables, takes 256 8 bit RGB values
+ // the palette data will go away after the call, so it must be copied off if
+ // the video driver will need it again
+@@ -81,7 +81,7 @@ void	VID_Shutdown();
+ void	VID_Update (vrect_p rects);
+ // flushes the given rectangles from the view buffer to the screen
+ 
+-int VID_SetMode (int modenum, unsigned char* palette);
++int VID_SetMode (int modenum, uint8_t* palette);
+ // sets the mode; only used by the Quake engine for resetting to mode 0 (the
+ // base mode) on memory allocation failures
+ 
+diff --git a/src/sound/snd_mem.c b/src/sound/snd_mem.c
+index 6541de4..8bb4d24 100644
+--- a/src/sound/snd_mem.c
++++ b/src/sound/snd_mem.c
+@@ -64,7 +64,7 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, char *data)
+ // fast special case
+ 		for (i=0 ; i<outcount ; i++)
+ 			((signed char *)sc->data)[i]
+-			= (int)( (unsigned char)(data[i]) - 128);
++			= (int)( (uint8_t)(data[i]) - 128);
+ 	}
+ 	else
+ 	{
+@@ -76,11 +76,11 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, char *data)
+ 			srcsample = samplefrac >> 8;
+ 			samplefrac += fracstep;
+ 			if (inwidth == 2)
+-				sample = LittleShort ( ((short *)data)[srcsample] );
++				sample = LittleShort ( ((int16_t *)data)[srcsample] );
+ 			else
+-				sample = (int)( (unsigned char)(data[srcsample]) - 128) << 8;
++				sample = (int)( (uint8_t)(data[srcsample]) - 128) << 8;
+ 			if (sc->width == 2)
+-				((short *)sc->data)[i] = sample;
++				((int16_t *)sc->data)[i] = sample;
+ 			else
+ 				((signed char *)sc->data)[i] = sample >> 8;
+ 		}
+@@ -167,9 +167,9 @@ char*   iff_data;
+ int 	iff_chunk_len;
+ 
+ 
+-short GetLittleShort(void)
++int16_t GetLittleShort(void)
+ {
+-	short val = 0;
++	int16_t val = 0;
+ 	val = *data_p;
+ 	val = val + (*(data_p+1)<<8);
+ 	data_p += 2;
+diff --git a/src/sound/snd_mix.c b/src/sound/snd_mix.c
+index cb187fb..7c81daf 100644
+--- a/src/sound/snd_mix.c
++++ b/src/sound/snd_mix.c
+@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ portable_samplepair_t paintbuffer[PAINTBUFFER_SIZE];
+ int		snd_scaletable[32][256];
+ int 	*snd_p, snd_linear_count, snd_vol;
+-short	*snd_out;
++int16_t	*snd_out;
+ 
+ void Snd_WriteLinearBlastStereo16();
+ 
+@@ -46,16 +46,16 @@ void Snd_WriteLinearBlastStereo16()
+ 		val = (snd_p[i]*snd_vol)>>8;
+ 		if (val > 0x7fff)
+ 			snd_out[i] = 0x7fff;
+-		else if (val < (short)0x8000)
+-			snd_out[i] = (short)0x8000;
++		else if (val < (int16_t)0x8000)
++			snd_out[i] = (int16_t)0x8000;
+ 		else
+ 			snd_out[i] = val;
+ 
+ 		val = (snd_p[i+1]*snd_vol)>>8;
+ 		if (val > 0x7fff)
+ 			snd_out[i+1] = 0x7fff;
+-		else if (val < (short)0x8000)
+-			snd_out[i+1] = (short)0x8000;
++		else if (val < (int16_t)0x8000)
++			snd_out[i+1] = (int16_t)0x8000;
+ 		else
+ 			snd_out[i+1] = val;
+ 	}
+@@ -115,7 +115,7 @@ void S_TransferStereo16 (int endtime)
+ 	// handle recirculating buffer issues
+ 		lpos = lpaintedtime & ((shm->samples>>1)-1);
+ 
+-		snd_out = (short *) pbuf + (lpos<<1);
++		snd_out = (int16_t *) pbuf + (lpos<<1);
+ 
+ 		snd_linear_count = (shm->samples>>1) - lpos;
+ 		if (lpaintedtime + snd_linear_count > endtime)
+@@ -199,30 +199,30 @@ void S_TransferPaintBuffer(int endtime)
+ 
+ 	if (shm->samplebits == 16)
+ 	{
+-		short *out = (short *) pbuf;
++		int16_t *out = (int16_t *) pbuf;
+ 		while (count--)
+ 		{
+ 			val = (*p * snd_vol) >> 8;
+ 			p+= step;
+ 			if (val > 0x7fff)
+ 				val = 0x7fff;
+-			else if (val < (short)0x8000)
+-				val = (short)0x8000;
++			else if (val < (int16_t)0x8000)
++				val = (int16_t)0x8000;
+ 			out[out_idx] = val;
+ 			out_idx = (out_idx + 1) & out_mask;
+ 		}
+ 	}
+ 	else if (shm->samplebits == 8)
+ 	{
+-		unsigned char *out = (unsigned char *) pbuf;
++		uint8_t *out = (uint8_t *) pbuf;
+ 		while (count--)
+ 		{
+ 			val = (*p * snd_vol) >> 8;
+ 			p+= step;
+ 			if (val > 0x7fff)
+ 				val = 0x7fff;
+-			else if (val < (short)0x8000)
+-				val = (short)0x8000;
++			else if (val < (int16_t)0x8000)
++				val = (int16_t)0x8000;
+ 			out[out_idx] = (val>>8) + 128;
+ 			out_idx = (out_idx + 1) & out_mask;
+ 		}
+@@ -347,7 +347,7 @@ void SND_PaintChannelFrom8 (channel_t *ch, sfxcache_t *sc, int count)
+ {
+ 	int 	data;
+ 	int		*lscale, *rscale;
+-	unsigned char *sfx;
++	uint8_t *sfx;
+ 	int		i;
+ 
+ 	if (ch->leftvol > 255)
+@@ -357,7 +357,7 @@ void SND_PaintChannelFrom8 (channel_t *ch, sfxcache_t *sc, int count)
+ 
+ 	lscale = snd_scaletable[ch->leftvol >> 3];
+ 	rscale = snd_scaletable[ch->rightvol >> 3];
+-	sfx = (unsigned char *)sc->data + ch->pos;
++	sfx = (uint8_t *)sc->data + ch->pos;
+ 
+ 	for (i=0 ; i<count ; i++)
+ 	{
+@@ -377,12 +377,12 @@ void SND_PaintChannelFrom16 (channel_t *ch, sfxcache_t *sc, int count)
+ 	int data;
+ 	int left, right;
+ 	int leftvol, rightvol;
+-	signed short *sfx;
++	int16_t *sfx;
+ 	int	i;
+ 
+ 	leftvol = ch->leftvol;
+ 	rightvol = ch->rightvol;
+-	sfx = (signed short *)sc->data + ch->pos;
++	sfx = (int16_t *)sc->data + ch->pos;
+ 
+ 	for (i=0 ; i<count ; i++)
+ 	{
+diff --git a/src/ui/screen.c b/src/ui/screen.c
+index 375b84f..9f5b1e8 100755
+--- a/src/ui/screen.c
++++ b/src/ui/screen.c
+@@ -520,15 +520,15 @@ typedef struct
+     char	version;
+     char	encoding;
+     char	bits_per_pixel;
+-    unsigned short	xmin,ymin,xmax,ymax;
+-    unsigned short	hres,vres;
+-    unsigned char	palette[48];
++    uint16_t	xmin,ymin,xmax,ymax;
++    uint16_t	hres,vres;
++    uint8_t	palette[48];
+     char	reserved;
+     char	color_planes;
+-    unsigned short	bytes_per_line;
+-    unsigned short	palette_type;
++    uint16_t	bytes_per_line;
++    uint16_t	palette_type;
+     char	filler[58];
+-    unsigned char	data;			// unbounded
++    uint8_t	data;			// unbounded
+ } pcx_t;
+ 
+ /*
+@@ -556,13 +556,13 @@ void WritePCXfile (char *filename, byte *data, int width, int height,
+ 	pcx->bits_per_pixel = 8;		// 256 color
+ 	pcx->xmin = 0;
+ 	pcx->ymin = 0;
+-	pcx->xmax = LittleShort((short)(width-1));
+-	pcx->ymax = LittleShort((short)(height-1));
+-	pcx->hres = LittleShort((short)width);
+-	pcx->vres = LittleShort((short)height);
++	pcx->xmax = LittleShort((int16_t)(width-1));
++	pcx->ymax = LittleShort((int16_t)(height-1));
++	pcx->hres = LittleShort((int16_t)width);
++	pcx->vres = LittleShort((int16_t)height);
+ 	Q_memset (pcx->palette,0,sizeof(pcx->palette));
+ 	pcx->color_planes = 1;		// chunky image
+-	pcx->bytes_per_line = LittleShort((short)width);
++	pcx->bytes_per_line = LittleShort((int16_t)width);
+ 	pcx->palette_type = LittleShort(2);		// not a grey scale
+ 	Q_memset (pcx->filler,0,sizeof(pcx->filler));
+ 
+diff --git a/src/video/draw/d_fill.c b/src/video/draw/d_fill.c
+index 0c552ff..29332fb 100644
+--- a/src/video/draw/d_fill.c
++++ b/src/video/draw/d_fill.c
+@@ -30,7 +30,7 @@ D_FillRect
+ void D_FillRect (vrect_p rect, int color)
+ {
+ 	int				rx, ry, rwidth, rheight;
+-	unsigned char	*dest;
++	uint8_t	*dest;
+ 	unsigned		*ldest;
+ 
+ 	rx = rect->x;
+diff --git a/src/video/draw/d_local.h b/src/video/draw/d_local.h
+index 4c3fbc0..f9b8646 100644
+--- a/src/video/draw/d_local.h
++++ b/src/video/draw/d_local.h
+@@ -87,7 +87,7 @@ extern int D_MipLevelForScale(float scale);
+     extern void D_PolysetAff8End(void);
+ #endif
+ 
+-extern short*   d_pzbuffer;
++extern int16_t*   d_pzbuffer;
+ extern unsigned int d_zrowbytes, d_zwidth;
+ 
+ extern int* d_pscantable;
+@@ -99,7 +99,7 @@ extern int	d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
+ 
+ extern pixel_p d_viewbuffer;
+ 
+-extern short*   zspantable[MAXHEIGHT];
++extern int16_t*   zspantable[MAXHEIGHT];
+ 
+ extern int		d_minmip;
+ extern float	d_scalemip[3];
+diff --git a/src/video/draw/d_modech.c b/src/video/draw/d_modech.c
+index 0e9a16a..4d2df22 100644
+--- a/src/video/draw/d_modech.c
++++ b/src/video/draw/d_modech.c
+@@ -27,7 +27,7 @@ int	d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
+ int	d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
+ 
+ int		d_scantable[MAXHEIGHT];
+-short	*zspantable[MAXHEIGHT];
++int16_t	*zspantable[MAXHEIGHT];
+ 
+ /*
+ ================
+diff --git a/src/video/draw/d_part.c b/src/video/draw/d_part.c
+index 1a5d42e..734bb9f 100644
+--- a/src/video/draw/d_part.c
++++ b/src/video/draw/d_part.c
+@@ -57,7 +57,7 @@ void D_DrawParticle (particle_p pparticle)
+ 	vec3_t	local, transformed;
+ 	float	zi;
+ 	byte	*pdest;
+-	short	*pz;
++	int16_t	*pz;
+ 	int		i, izi, pix, count, u, v;
+ 
+ // transform point
+diff --git a/src/video/draw/d_polyse.c b/src/video/draw/d_polyse.c
+index b766523..a40af28 100644
+--- a/src/video/draw/d_polyse.c
++++ b/src/video/draw/d_polyse.c
+@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ // !!! if this is changed, it must be changed in asm_draw.h too !!!
+ typedef struct {
+ 	void			*pdest;
+-	short			*pz;
++	int16_t			*pz;
+ 	int				count;
+ 	byte			*ptex;
+ 	int				sfrac, tfrac, light, zi;
+@@ -84,7 +84,7 @@ spanpackage_t			*a_spans;
+ spanpackage_t			*d_pedgespanpackage;
+ static int				ystart;
+ byte					*d_pdest, *d_ptex;
+-short					*d_pz;
++int16_t					*d_pz;
+ int						d_sfrac, d_tfrac, d_light, d_zi;
+ int						d_ptexextrastep, d_sfracextrastep;
+ int						d_tfracextrastep, d_lightextrastep, d_pdestextrastep;
+@@ -149,7 +149,7 @@ D_PolysetDrawFinalVerts
+ */
+ void D_PolysetDrawFinalVerts(finalvert_p fv, int numverts){
+ 	int		i, z;
+-	short*	zbuf;
++	int16_t*	zbuf;
+ 
+ 	for (i=0 ; i<numverts ; i++, fv++)
+ 	{
+@@ -314,7 +314,7 @@ void D_PolysetRecursiveTriangle (int *lp1, int *lp2, int *lp3)
+ 	int		d;
+ 	int		new[6];
+ 	int		z;
+-	short	*zbuf;
++	int16_t	*zbuf;
+ 
+ 	d = lp2[0] - lp1[0];
+ 	if (d < -1 || d > 1)
+@@ -618,7 +618,7 @@ void D_PolysetDrawSpans8 (spanpackage_t *pspanpackage)
+ 	int		lsfrac, ltfrac;
+ 	int		llight;
+ 	int		lzi;
+-	short	*lpz;
++	int16_t	*lpz;
+ 
+ 	do
+ 	{
+diff --git a/src/video/draw/d_scan.c b/src/video/draw/d_scan.c
+index d1b911a..986a3d1 100644
+--- a/src/video/draw/d_scan.c
++++ b/src/video/draw/d_scan.c
+@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ #include "r_local.h"
+ #include "d_local.h"
+ 
+-unsigned char	*r_turb_pbase, *r_turb_pdest;
++uint8_t	*r_turb_pbase, *r_turb_pdest;
+ fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
+ int				*r_turb_turb;
+ int				r_turb_spancount;
+@@ -131,7 +131,7 @@ void Turbulent8 (espan_t *pspan)
+ 	r_turb_sstep = 0;	// keep compiler happy
+ 	r_turb_tstep = 0;	// ditto
+ 
+-	r_turb_pbase = (unsigned char *)cacheblock;
++	r_turb_pbase = (uint8_t *)cacheblock;
+ 
+ 	sdivz16stepu = d_sdivzstepu * 16;
+ 	tdivz16stepu = d_tdivzstepu * 16;
+@@ -139,7 +139,7 @@ void Turbulent8 (espan_t *pspan)
+ 
+ 	do
+ 	{
+-		r_turb_pdest = (unsigned char *)((byte *)d_viewbuffer +
++		r_turb_pdest = (uint8_t *)((byte *)d_viewbuffer +
+ 				(screenwidth * pspan->v) + pspan->u);
+ 
+ 		count = pspan->count;
+@@ -257,7 +257,7 @@ D_DrawSpans8
+ void D_DrawSpans8 (espan_t *pspan)
+ {
+ 	int				count, spancount;
+-	unsigned char	*pbase, *pdest;
++	uint8_t	*pbase, *pdest;
+ 	fixed16_t		s, t, snext, tnext, sstep, tstep;
+ 	float			sdivz, tdivz, zi, z, du, dv, spancountminus1;
+ 	float			sdivz8stepu, tdivz8stepu, zi8stepu;
+@@ -265,7 +265,7 @@ void D_DrawSpans8 (espan_t *pspan)
+ 	sstep = 0;	// keep compiler happy
+ 	tstep = 0;	// ditto
+ 
+-	pbase = (unsigned char *)cacheblock;
++	pbase = (uint8_t *)cacheblock;
+ 
+ 	sdivz8stepu = d_sdivzstepu * 8;
+ 	tdivz8stepu = d_tdivzstepu * 8;
+@@ -273,7 +273,7 @@ void D_DrawSpans8 (espan_t *pspan)
+ 
+ 	do
+ 	{
+-		pdest = (unsigned char *)((byte *)d_viewbuffer +
++		pdest = (uint8_t *)((byte *)d_viewbuffer +
+ 				(screenwidth * pspan->v) + pspan->u);
+ 
+ 		count = pspan->count;
+@@ -396,7 +396,7 @@ void D_DrawZSpans (espan_t *pspan)
+ {
+ 	int				count, doublecount, izistep;
+ 	int				izi;
+-	short			*pdest;
++	int16_t			*pdest;
+ 	unsigned		ltemp;
+ 	double			zi;
+ 	float			du, dv;
+@@ -421,7 +421,7 @@ void D_DrawZSpans (espan_t *pspan)
+ 
+ 		if ((long)pdest & 0x02)
+ 		{
+-			*pdest++ = (short)(izi >> 16);
++			*pdest++ = (int16_t)(izi >> 16);
+ 			izi += izistep;
+ 			count--;
+ 		}
+@@ -440,7 +440,7 @@ void D_DrawZSpans (espan_t *pspan)
+ 		}
+ 
+ 		if (count & 1)
+-			*pdest = (short)(izi >> 16);
++			*pdest = (int16_t)(izi >> 16);
+ 
+ 	} while ((pspan = pspan->pnext) != NULL);
+ }
+diff --git a/src/video/draw/d_sky.c b/src/video/draw/d_sky.c
+index f8faf1f..31a0486 100644
+--- a/src/video/draw/d_sky.c
++++ b/src/video/draw/d_sky.c
+@@ -65,7 +65,7 @@ D_DrawSkyScans8
+ void D_DrawSkyScans8 (espan_t *pspan)
+ {
+ 	int				count, spancount, u, v;
+-	unsigned char	*pdest;
++	uint8_t	*pdest;
+ 	fixed16_t		s, t, snext, tnext, sstep, tstep;
+ 	int				spancountminus1;
+ 
+@@ -74,7 +74,7 @@ void D_DrawSkyScans8 (espan_t *pspan)
+ 
+ 	do
+ 	{
+-		pdest = (unsigned char *)((byte *)d_viewbuffer +
++		pdest = (uint8_t *)((byte *)d_viewbuffer +
+ 				(screenwidth * pspan->v) + pspan->u);
+ 
+ 		count = pspan->count;
+diff --git a/src/video/draw/d_sprite.c b/src/video/draw/d_sprite.c
+index f2cb7b1..ae572c9 100644
+--- a/src/video/draw/d_sprite.c
++++ b/src/video/draw/d_sprite.c
+@@ -43,7 +43,7 @@ void D_SpriteDrawSpans (sspan_t *pspan)
+ 	float		sdivz, tdivz, zi, z, du, dv, spancountminus1;
+ 	float		sdivz8stepu, tdivz8stepu, zi8stepu;
+ 	byte		btemp;
+-	short		*pz;
++	int16_t		*pz;
+ 
+ 	sstep = 0;	// keep compiler happy
+ 	tstep = 0;	// ditto
+diff --git a/src/video/draw/d_vars.c b/src/video/draw/d_vars.c
+index 152efcb..5db8eea 100644
+--- a/src/video/draw/d_vars.c
++++ b/src/video/draw/d_vars.c
+@@ -42,7 +42,7 @@ fixed16_t	sadjust, tadjust, bbextents, bbextentt;
+ pixel_p cacheblock;
+ int				cachewidth;
+ pixel_p d_viewbuffer;
+-short			*d_pzbuffer;
++int16_t			*d_pzbuffer;
+ unsigned int	d_zrowbytes;
+ unsigned int	d_zwidth;
+ 
+diff --git a/src/video/draw/d_zpoint.c b/src/video/draw/d_zpoint.c
+index e8ad5ca..3a40f61 100644
+--- a/src/video/draw/d_zpoint.c
++++ b/src/video/draw/d_zpoint.c
+@@ -31,7 +31,7 @@ D_DrawZPoint
+ void D_DrawZPoint()
+ {
+ 	byte	*pdest;
+-	short	*pz;
++	int16_t	*pz;
+ 	int		izi;
+ 
+ 	pz = d_pzbuffer + (d_zwidth * r_zpointdesc.v) + r_zpointdesc.u;
+diff --git a/src/video/draw/draw.c b/src/video/draw/draw.c
+index 46a1887..beb24bc 100644
+--- a/src/video/draw/draw.c
++++ b/src/video/draw/draw.c
+@@ -132,7 +132,7 @@ void Draw_Character (int x, int y, int num)
+ {
+ 	byte			*dest;
+ 	byte			*source;
+-	unsigned short	*pusdest;
++	uint16_t	*pusdest;
+ 	int				drawline;
+ 	int				row, col;
+ 
+@@ -191,7 +191,7 @@ void Draw_Character (int x, int y, int num)
+ 	else
+ 	{
+ 	// FIXME: pre-expand to native format?
+-		pusdest = (unsigned short *)
++		pusdest = (uint16_t *)
+ 				((byte *)vid.conbuffer + y*vid.conrowbytes + (x<<1));
+ 
+ 		while (drawline--)
+@@ -285,7 +285,7 @@ Draw_Pic
+ void Draw_Pic (int x, int y, qpic_t *pic)
+ {
+ 	byte			*dest, *source;
+-	unsigned short	*pusdest;
++	uint16_t	*pusdest;
+ 	int				v, u;
+ 
+ 	if ((x < 0) ||
+@@ -312,7 +312,7 @@ void Draw_Pic (int x, int y, qpic_t *pic)
+ 	else
+ 	{
+ 	// FIXME: pretranslate at load time?
+-		pusdest = (unsigned short *)vid.buffer + y * (vid.rowbytes >> 1) + x;
++		pusdest = (uint16_t *)vid.buffer + y * (vid.rowbytes >> 1) + x;
+ 
+ 		for (v=0 ; v<pic->height ; v++)
+ 		{
+@@ -336,7 +336,7 @@ Draw_TransPic
+ void Draw_TransPic (int x, int y, qpic_t *pic)
+ {
+ 	byte	*dest, *source, tbyte;
+-	unsigned short	*pusdest;
++	uint16_t	*pusdest;
+ 	int				v, u;
+ 
+ 	if (x < 0 || (unsigned)(x + pic->width) > vid.width || y < 0 ||
+@@ -394,7 +394,7 @@ void Draw_TransPic (int x, int y, qpic_t *pic)
+ 	else
+ 	{
+ 	// FIXME: pretranslate at load time?
+-		pusdest = (unsigned short *)vid.buffer + y * (vid.rowbytes >> 1) + x;
++		pusdest = (uint16_t *)vid.buffer + y * (vid.rowbytes >> 1) + x;
+ 
+ 		for (v=0 ; v<pic->height ; v++)
+ 		{
+@@ -423,7 +423,7 @@ Draw_TransPicTranslate
+ void Draw_TransPicTranslate (int x, int y, qpic_t *pic, byte *translation)
+ {
+ 	byte	*dest, *source, tbyte;
+-	unsigned short	*pusdest;
++	uint16_t	*pusdest;
+ 	int				v, u;
+ 
+ 	if (x < 0 || (unsigned)(x + pic->width) > vid.width || y < 0 ||
+@@ -481,7 +481,7 @@ void Draw_TransPicTranslate (int x, int y, qpic_t *pic, byte *translation)
+ 	else
+ 	{
+ 	// FIXME: pretranslate at load time?
+-		pusdest = (unsigned short *)vid.buffer + y * (vid.rowbytes >> 1) + x;
++		pusdest = (uint16_t *)vid.buffer + y * (vid.rowbytes >> 1) + x;
+ 
+ 		for (v=0 ; v<pic->height ; v++)
+ 		{
+@@ -536,7 +536,7 @@ void Draw_ConsoleBackground (int lines)
+ {
+ 	int				x, y, v;
+ 	byte			*src, *dest;
+-	unsigned short	*pusdest;
++	uint16_t	*pusdest;
+ 	int				f, fstep;
+ 	qpic_t			*conback;
+ 	char			ver[100];
+@@ -592,7 +592,7 @@ void Draw_ConsoleBackground (int lines)
+ 	}
+ 	else
+ 	{
+-		pusdest = (unsigned short *)vid.conbuffer;
++		pusdest = (uint16_t *)vid.conbuffer;
+ 
+ 		for (y=0 ; y<lines ; y++, pusdest += (vid.conrowbytes >> 1))
+ 		{
+@@ -677,11 +677,11 @@ void R_DrawRect16 (vrect_p prect, int rowbytes, byte *psrc,
+ {
+ 	byte			t;
+ 	int				i, j, srcdelta, destdelta;
+-	unsigned short	*pdest;
++	uint16_t	*pdest;
+ 
+ // FIXME: would it be better to pre-expand native-format versions?
+ 
+-	pdest = (unsigned short *)vid.buffer +
++	pdest = (uint16_t *)vid.buffer +
+ 			(prect->y * (vid.rowbytes >> 1)) + prect->x;
+ 
+ 	srcdelta = rowbytes - prect->width;
+@@ -808,7 +808,7 @@ Fills a box of pixels with a single color
+ void Draw_Fill (int x, int y, int w, int h, int c)
+ {
+ 	byte			*dest;
+-	unsigned short	*pusdest;
++	uint16_t	*pusdest;
+ 	unsigned		uc;
+ 	int				u, v;
+ 
+@@ -823,7 +823,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
+ 	{
+ 		uc = d_8to16table[c];
+ 
+-		pusdest = (unsigned short *)vid.buffer + y * (vid.rowbytes >> 1) + x;
++		pusdest = (uint16_t *)vid.buffer + y * (vid.rowbytes >> 1) + x;
+ 		for (v=0 ; v<h ; v++, pusdest += (vid.rowbytes >> 1))
+ 			for (u=0 ; u<w ; u++)
+ 				pusdest[u] = uc;
+diff --git a/src/video/render.h b/src/video/render.h
+index c92bafa..7f84141 100644
+--- a/src/video/render.h
++++ b/src/video/render.h
+@@ -30,12 +30,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ 
+ //=============================================================================
+ 
+-typedef struct efrag_s{
++struct efrag_s;
++typedef struct efrag_s efrag_t;
++typedef efrag_t* efrag_p;
++struct efrag_s{
+ 	struct mleaf_s*		leaf;
+ 	struct efrag_s*		leafnext;
+ 	struct entity_s*	entity;
+ 	struct efrag_s*		entnext;
+-} efrag_t;
++} ;
+ 
+ 
+ typedef struct entity_s{
+diff --git a/src/video/render/r_shared.h b/src/video/render/r_shared.h
+index 24542bf..6894747 100755
+--- a/src/video/render/r_shared.h
++++ b/src/video/render/r_shared.h
+@@ -154,7 +154,7 @@ struct edge_s{
+ 	fixed16_t   u_step;
+ 	edge_ptr    prev;
+     edge_ptr    next;
+-	unsigned short	surfs[2];
++	uint16_t	surfs[2];
+ 	edge_ptr    nextremove;
+ 	float       nearzi;
+ 	medge_t*    owner;
+diff --git a/src/video/render/r_sky.c b/src/video/render/r_sky.c
+index 5f6cc0f..2ab7fc2 100644
+--- a/src/video/render/r_sky.c
++++ b/src/video/render/r_sky.c
+@@ -223,13 +223,13 @@ void R_GenSkyTile16 (typeless_ptr pdest)
+ 	int				ofs, baseofs;
+ 	int				xshift, yshift;
+ 	byte			*pnewsky;
+-	unsigned short	*pd;
++	uint16_t	*pd;
+ 
+ 	xshift = skytime * skyspeed;
+ 	yshift = skytime * skyspeed;
+ 
+ 	pnewsky = (byte *)&newsky[0];
+-	pd = (unsigned short *)pdest;
++	pd = (uint16_t *)pdest;
+ 
+ 	for (y=0 ; y<SKYSIZE ; y++)
+ 	{
+diff --git a/src/video/render/r_surf.c b/src/video/render/r_surf.c
+index c0eb601..6a539d5 100644
+--- a/src/video/render/r_surf.c
++++ b/src/video/render/r_surf.c
+@@ -29,13 +29,13 @@ int				lightdelta, lightdeltastep;
+ int				lightright, lightleftstep, lightrightstep, blockdivshift;
+ unsigned		blockdivmask;
+ void			*prowdestbase;
+-unsigned char	*pbasesource;
++uint8_t	*pbasesource;
+ int				surfrowbytes;	// used by ASM files
+ unsigned		*r_lightptr;
+ int				r_stepback;
+ int				r_lightwidth;
+ int				r_numhblocks, r_numvblocks;
+-unsigned char	*r_source, *r_sourcemax;
++uint8_t	*r_source, *r_sourcemax;
+ 
+ void R_DrawSurfaceBlock8_mip0();
+ void R_DrawSurfaceBlock8_mip1();
+@@ -81,7 +81,7 @@ void R_AddDynamicLights()
+ 			continue;		// not lit by this light
+ 
+ 		rad = cl_dlights[lnum].radius;
+-		dist = DotProduct (cl_dlights[lnum].origin, surf->plane->normal) -
++		dist = DotProduct(cl_dlights[lnum].origin, surf->plane->normal) -
+ 				surf->plane->dist;
+ 		rad -= fabs(dist);
+ 		minlight = cl_dlights[lnum].minlight;
+@@ -247,12 +247,12 @@ R_DrawSurface
+ */
+ void R_DrawSurface()
+ {
+-	unsigned char	*basetptr;
++	uint8_t	*basetptr;
+ 	int				smax, tmax, twidth;
+ 	int				u;
+ 	int				soffset, basetoffset, texwidth;
+ 	int				horzblockstep;
+-	unsigned char	*pcolumndest;
++	uint8_t	*pcolumndest;
+ 	void			(*pblockdrawer)(void);
+ 	texture_t		*mt;
+ 
+@@ -343,7 +343,7 @@ R_DrawSurfaceBlock8_mip0
+ void R_DrawSurfaceBlock8_mip0()
+ {
+ 	int				v, i, b, lightstep, lighttemp, light;
+-	unsigned char	pix, *psource, *prowdest;
++	uint8_t	pix, *psource, *prowdest;
+ 
+ 	psource = pbasesource;
+ 	prowdest = prowdestbase;
+@@ -368,7 +368,7 @@ void R_DrawSurfaceBlock8_mip0()
+ 			for (b=15; b>=0; b--)
+ 			{
+ 				pix = psource[b];
+-				prowdest[b] = ((unsigned char *)vid.colormap)
++				prowdest[b] = ((uint8_t *)vid.colormap)
+ 						[(light & 0xFF00) + pix];
+ 				light += lightstep;
+ 			}
+@@ -393,7 +393,7 @@ R_DrawSurfaceBlock8_mip1
+ void R_DrawSurfaceBlock8_mip1()
+ {
+ 	int				v, i, b, lightstep, lighttemp, light;
+-	unsigned char	pix, *psource, *prowdest;
++	uint8_t	pix, *psource, *prowdest;
+ 
+ 	psource = pbasesource;
+ 	prowdest = prowdestbase;
+@@ -418,7 +418,7 @@ void R_DrawSurfaceBlock8_mip1()
+ 			for (b=7; b>=0; b--)
+ 			{
+ 				pix = psource[b];
+-				prowdest[b] = ((unsigned char *)vid.colormap)
++				prowdest[b] = ((uint8_t *)vid.colormap)
+ 						[(light & 0xFF00) + pix];
+ 				light += lightstep;
+ 			}
+@@ -443,7 +443,7 @@ R_DrawSurfaceBlock8_mip2
+ void R_DrawSurfaceBlock8_mip2()
+ {
+ 	int				v, i, b, lightstep, lighttemp, light;
+-	unsigned char	pix, *psource, *prowdest;
++	uint8_t	pix, *psource, *prowdest;
+ 
+ 	psource = pbasesource;
+ 	prowdest = prowdestbase;
+@@ -468,7 +468,7 @@ void R_DrawSurfaceBlock8_mip2()
+ 			for (b=3; b>=0; b--)
+ 			{
+ 				pix = psource[b];
+-				prowdest[b] = ((unsigned char *)vid.colormap)
++				prowdest[b] = ((uint8_t *)vid.colormap)
+ 						[(light & 0xFF00) + pix];
+ 				light += lightstep;
+ 			}
+@@ -493,7 +493,7 @@ R_DrawSurfaceBlock8_mip3
+ void R_DrawSurfaceBlock8_mip3()
+ {
+ 	int				v, i, b, lightstep, lighttemp, light;
+-	unsigned char	pix, *psource, *prowdest;
++	uint8_t	pix, *psource, *prowdest;
+ 
+ 	psource = pbasesource;
+ 	prowdest = prowdestbase;
+@@ -518,7 +518,7 @@ void R_DrawSurfaceBlock8_mip3()
+ 			for (b=1; b>=0; b--)
+ 			{
+ 				pix = psource[b];
+-				prowdest[b] = ((unsigned char *)vid.colormap)
++				prowdest[b] = ((uint8_t *)vid.colormap)
+ 						[(light & 0xFF00) + pix];
+ 				light += lightstep;
+ 			}
+@@ -545,16 +545,16 @@ FIXME: make this work
+ void R_DrawSurfaceBlock16()
+ {
+ 	int				k;
+-	unsigned char	*psource;
++	uint8_t	*psource;
+ 	int				lighttemp, lightstep, light;
+-	unsigned short	*prowdest;
++	uint16_t	*prowdest;
+ 
+-	prowdest = (unsigned short *)prowdestbase;
++	prowdest = (uint16_t *)prowdestbase;
+ 
+ 	for (k=0 ; k<blocksize ; k++)
+ 	{
+-		unsigned short	*pdest;
+-		unsigned char	pix;
++		uint16_t	*pdest;
++		uint8_t	pix;
+ 		int				b;
+ 
+ 		psource = pbasesource;
+@@ -576,7 +576,7 @@ void R_DrawSurfaceBlock16()
+ 		pbasesource += sourcetstep;
+ 		lightright += lightrightstep;
+ 		lightleft += lightleftstep;
+-		prowdest = (unsigned short *)((long)prowdest + surfrowbytes);
++		prowdest = (uint16_t *)((long)prowdest + surfrowbytes);
+ 	}
+ 
+ 	prowdestbase = prowdest;
+@@ -622,10 +622,10 @@ void R_GenTurbTile16 (pixel_p pbasetex, typeless_ptr pdest)
+ {
+ 	int				*turb;
+ 	int				i, j, s, t;
+-	unsigned short	*pd;
++	uint16_t	*pd;
+ 
+ 	turb = sintable + ((int)(cl.time*SPEED)&(CYCLE-1));
+-	pd = (unsigned short *)pdest;
++	pd = (uint16_t *)pdest;
+ 
+ 	for (i=0 ; i<TILE_SIZE ; i++)
+ 	{

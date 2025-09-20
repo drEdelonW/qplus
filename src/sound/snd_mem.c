@@ -64,7 +64,7 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, char *data)
 // fast special case
 		for (i=0 ; i<outcount ; i++)
 			((signed char *)sc->data)[i]
-			= (int)( (unsigned char)(data[i]) - 128);
+			= (int)( (uint8_t)(data[i]) - 128);
 	}
 	else
 	{
@@ -76,11 +76,11 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, char *data)
 			srcsample = samplefrac >> 8;
 			samplefrac += fracstep;
 			if (inwidth == 2)
-				sample = LittleShort ( ((short *)data)[srcsample] );
+				sample = LittleShort ( ((int16_t *)data)[srcsample] );
 			else
-				sample = (int)( (unsigned char)(data[srcsample]) - 128) << 8;
+				sample = (int)( (uint8_t)(data[srcsample]) - 128) << 8;
 			if (sc->width == 2)
-				((short *)sc->data)[i] = sample;
+				((int16_t *)sc->data)[i] = sample;
 			else
 				((signed char *)sc->data)[i] = sample >> 8;
 		}
@@ -167,9 +167,9 @@ char*   iff_data;
 int 	iff_chunk_len;
 
 
-short GetLittleShort(void)
+int16_t GetLittleShort(void)
 {
-	short val = 0;
+	int16_t val = 0;
 	val = *data_p;
 	val = val + (*(data_p+1)<<8);
 	data_p += 2;
