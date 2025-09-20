@@ -40,8 +40,7 @@ qpic_t		*draw_backtile;
 //=============================================================================
 /* Support Routines */
 
-typedef struct cachepic_s
-{
+typedef struct cachepic_s{
 	char		name[MAX_QPATH];
 	cache_user_t	cache;
 } cachepic_t;

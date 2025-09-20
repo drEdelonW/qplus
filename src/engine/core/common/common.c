@@ -810,7 +810,7 @@ Filename are reletive to the quake directory.
 Allways appends a 0 uint8_t.
 ============
 */
-cache_user_t *loadcache;
+cache_user_p loadcache;
 uint8_t    *loadbuf;
 int             loadsize;
 uint8_t *COM_LoadFile (char *path, int usehunk)

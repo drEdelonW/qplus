@@ -14,7 +14,20 @@
 			"quakedef.h": "c",
 			"random": "c",
 			"limits": "c",
-			"cstddef": "c"
+			"cstddef": "c",
+			"zone.h": "c",
+			"bitset": "c",
+			"__hash_table": "c",
+			"__split_buffer": "c",
+			"array": "c",
+			"deque": "c",
+			"initializer_list": "c",
+			"queue": "c",
+			"stack": "c",
+			"string": "c",
+			"string_view": "c",
+			"unordered_map": "c",
+			"vector": "c"
 		}
 	}
 }

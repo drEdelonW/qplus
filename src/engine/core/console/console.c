@@ -310,7 +310,7 @@ void Con_Print(char* txt){
 
 		default:	// display character and advance
 			int y = con_current % con_totallines;
-			con_text[y*con_linewidth+con_x] = c | mask;
+			con_text[(y * con_linewidth) + con_x] = c | mask;
 			con_x++;
 			if (con_x >= con_linewidth){
 				con_x = 0;

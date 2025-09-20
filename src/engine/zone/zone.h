@@ -85,48 +85,57 @@ Zone block
 */
 #include <stddef.h>
 
-void Memory_Init(void* buf, size_t size);
+typedef char* cstring;
+typedef const char* cstring_ro;  // read-only
+typedef void* typeless_ptr;
 
-void Z_Free(void* ptr);
-void* Z_Malloc(size_t size);   // returns 0 filled memory
-void* Z_TagMalloc(size_t size, int tag);
+void Memory_Init(typeless_ptr buf, size_t size);
 
-void Z_DumpHeap(void);
-void Z_CheckHeap(void);
-int Z_FreeMemory(void);
+//========================[z_hulk.c]========================//
+void 		 Z_Free(typeless_ptr ptr);
+typeless_ptr Z_Malloc(size_t size);   // returns 0 filled memory
+typeless_ptr Z_TagMalloc(size_t size, int tag);
 
-void* Hunk_Alloc(size_t size); // returns 0 filled memory
-void* Hunk_AllocName(size_t size, char* name);
+void Z_DumpHeap();
+void Z_CheckHeap();
+int  Z_FreeMemory();
 
-void* Hunk_HighAllocName(size_t size, char* name);
 
-int	Hunk_LowMark(void);
-void Hunk_FreeToLowMark(int mark);
+//========================[z_hulk.c]========================//
+typeless_ptr Hunk_Alloc(size_t size); // returns 0 filled memory
+typeless_ptr Hunk_AllocName(size_t size, cstring name);
 
-int	Hunk_HighMark(void);
-void Hunk_FreeToHighMark(int mark);
+typeless_ptr Hunk_HighAllocName(size_t size, cstring name);
 
-void* Hunk_TempAlloc(size_t size);
+size_t  Hunk_LowMark();
+void    Hunk_FreeToLowMark(size_t mark);
 
-void Hunk_Check(void);
+size_t  Hunk_HighMark();
+void    Hunk_FreeToHighMark(size_t mark);
 
+typeless_ptr Hunk_TempAlloc(size_t size);
+
+void Hunk_Check();
+
+
+//========================[z_cache.c]========================//
 typedef struct cache_user_s{
-	void*   data;
+	typeless_ptr   data;
 } cache_user_t;
 typedef cache_user_t* cache_user_p;
 
 
-void Cache_Flush(void);
+void Cache_Flush();
 
 // returns the cached data, and moves to the head of the LRU list if present, otherwise returns NULL
-void* Cache_Check(cache_user_t* c);
+typeless_ptr Cache_Check(cache_user_p c);
 
-void Cache_Free(cache_user_t* c);
+void Cache_Free(cache_user_p c);
 
 // Returns NULL if all purgable data was tossed and there still wasn't enough room.
-void* Cache_Alloc(cache_user_t* c, size_t size, char* name);
+typeless_ptr Cache_Alloc(cache_user_p c, size_t size, cstring name);
 
-void Cache_Report(void);
+void Cache_Report();
 
 
 

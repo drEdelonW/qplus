@@ -33,7 +33,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
             SRC_LIST += $(INPUT_DIR)/keys.c
 
         SRC_LIST += $(CORE_DIR)/host.c
-        SRC_LIST += $(CORE_DIR)/zone.c
 
     $(eval WORLD_DIR = $(ENG_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))
         SRC_LIST += $(WORLD_DIR)/world.c
@@ -63,6 +62,13 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
         SRC_LIST += $(PROG_DIR)/pr_cmds.c
         SRC_LIST += $(PROG_DIR)/pr_edict.c
         SRC_LIST += $(PROG_DIR)/pr_exec.c
+
+    $(eval ZONE_DIR = $(ENG_DIR)/zone) $(eval INCLUDES += $(ZONE_DIR))
+        SRC_LIST += $(ZONE_DIR)/zone.c
+        SRC_LIST += $(ZONE_DIR)/z_hulk.c
+        SRC_LIST += $(ZONE_DIR)/z_cache.c
+        SRC_LIST += $(ZONE_DIR)/z_zone.c
+
 
 $(eval VID_DIR = $(SRC_DIR)/video) $(eval INCLUDES += $(VID_DIR))
     $(eval DRAW_DIR = $(VID_DIR)/draw) $(eval INCLUDES += $(DRAW_DIR))
