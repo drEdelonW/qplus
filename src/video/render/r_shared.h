@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //===================================================================
 
-extern void	R_DrawLine (polyvert_t *polyvert0, polyvert_t *polyvert1);
+extern void	R_DrawLine(polyvert_t *polyvert0, polyvert_t *polyvert1);
 
 extern int		cachewidth;
 extern pixel_t	*cacheblock;
@@ -70,11 +70,15 @@ extern	entity_t		*currententity;
 #define	MAXSPANS			3000
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct espan_s
-{
-	int				u, v, count;
-	struct espan_s	*pnext;
-} espan_t;
+struct espan_s;
+typedef struct espan_s espan_t;
+typedef espan_t* espan_p;
+struct espan_s {
+    int     u;
+    int     v;
+    int     count;
+    espan_p	pnext;
+};
 
 // FIXME: compress, make a union if that will help
 // insubmodel is only 1, flags is fewer than 32, spanstate could be a byte
@@ -122,12 +126,12 @@ extern	float	xscaleshrink, yscaleshrink;
 
 extern	int d_lightstylevalue[256]; // 8.8 frac of base light value
 
-extern void TransformVector (vec3_t in, vec3_t out);
+extern void TransformVector(vec3_t in, vec3_t out);
 extern void SetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 	fixed8_t endvertu, fixed8_t endvertv);
 
 extern int	r_skymade;
-extern void R_MakeSky (void);
+extern void R_MakeSky(void);
 
 extern int	ubasestep, errorterm, erroradjustup, erroradjustdown;
 
@@ -143,16 +147,19 @@ extern int	ubasestep, errorterm, erroradjustup, erroradjustdown;
 #define ALIAS_XY_CLIP_MASK			0x000F
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct edge_s
-{
-	fixed16_t		u;
-	fixed16_t		u_step;
-	struct edge_s	*prev, *next;
+struct edge_s;
+typedef struct edge_s edge_t;
+typedef edge_t* edge_ptr;
+struct edge_s{
+	fixed16_t   u;
+	fixed16_t   u_step;
+	edge_ptr    prev;
+    edge_ptr    next;
 	unsigned short	surfs[2];
-	struct edge_s	*nextremove;
-	float			nearzi;
-	medge_t			*owner;
-} edge_t;
+	edge_ptr    nextremove;
+	float       nearzi;
+	medge_t*    owner;
+};
 
 #endif	// _R_SHARED_H_
 

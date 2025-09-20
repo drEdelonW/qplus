@@ -67,14 +67,14 @@ extern fixed16_t	sadjust, tadjust;
 extern fixed16_t	bbextents, bbextentt;
 
 
-void D_DrawSpans8(espan_t*  pspans);
-void D_DrawSpans16(espan_t* pspans);
-void D_DrawZSpans(espan_t*  pspans);
-void Turbulent8(espan_t*    pspan);
+void D_DrawSpans8(espan_p  pspans);
+void D_DrawSpans16(espan_p pspans);
+void D_DrawZSpans(espan_p  pspans);
+void Turbulent8(espan_p    pspan);
 void D_SpriteDrawSpans(sspan_t* pspan);
 
-void D_DrawSkyScans8(espan_t*   pspan);
-void D_DrawSkyScans16(espan_t*  pspan);
+void D_DrawSkyScans8(espan_p   pspan);
+void D_DrawSkyScans16(espan_p  pspan);
 
 void R_ShowSubDiv(void);
 extern void(*prealspandrawer)(void);
@@ -104,5 +104,5 @@ extern short*   zspantable[MAXHEIGHT];
 extern int		d_minmip;
 extern float	d_scalemip[3];
 
-extern void(*d_drawspans)(espan_t* pspan);
+extern void(*d_drawspans)(espan_p pspan);
 

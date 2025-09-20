@@ -617,12 +617,14 @@ void CL_ParseServerMessage(){
 			break;
 
 		case svc_version:
-			int ver = MSG_ReadLong();
-			if (ver != PROTOCOL_VERSION)
-				Host_Error(
-                    "CL_ParseServerMessage: Server is protocol %i instead of %i\n",
-                    ver, PROTOCOL_VERSION
-                );
+            {
+                int ver = MSG_ReadLong();
+                if (ver != PROTOCOL_VERSION)
+                    Host_Error(
+                        "CL_ParseServerMessage: Server is protocol %i instead of %i\n",
+                        ver, PROTOCOL_VERSION
+                    );
+			}
 			break;
 
 		case svc_disconnect:

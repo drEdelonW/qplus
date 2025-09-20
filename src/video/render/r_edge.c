@@ -37,7 +37,7 @@ have a sentinal at both ends?
 edge_t	*auxedges;
 edge_t	*r_edges, *edge_p, *edge_max;
 
-surf_t	*surfaces, *surface_p, *surf_max;
+surf_p	surfaces, surface_p, surf_max;
 
 // surfaces are generated in back to front order by the bsp, so if a surf
 // pointer is greater than another one, it should be drawn in front
@@ -46,7 +46,8 @@ surf_t	*surfaces, *surface_p, *surf_max;
 edge_t	*newedges[MAXHEIGHT];
 edge_t	*removeedges[MAXHEIGHT];
 
-espan_t	*span_p, *max_span_p;
+espan_p span_p;
+espan_p max_span_p;
 
 int		r_currentkey;
 
@@ -56,7 +57,7 @@ int	current_iv;
 
 int	edge_head_u_shift20, edge_tail_u_shift20;
 
-static void (*pdrawfunc)(void);
+static void (*pdrawfunc)();
 
 edge_t	edge_head;
 edge_t	edge_tail;
@@ -65,12 +66,12 @@ edge_t	edge_sentinel;
 
 float	fv;
 
-void R_GenerateSpans (void);
-void R_GenerateSpansBackward (void);
+void R_GenerateSpans();
+void R_GenerateSpansBackward();
 
-void R_LeadingEdge (edge_t *edge);
-void R_LeadingEdgeBackwards (edge_t *edge);
-void R_TrailingEdge (surf_t *surf, edge_t *edge);
+void R_LeadingEdge (edge_t* edge);
+void R_LeadingEdgeBackwards (edge_t* edge);
+void R_TrailingEdge (surf_p surf, edge_t* edge);
 
 
 //=============================================================================
@@ -81,9 +82,9 @@ void R_TrailingEdge (surf_t *surf, edge_t *edge);
 R_DrawCulledPolys
 ==============
 */
-void R_DrawCulledPolys (void)
+void R_DrawCulledPolys()
 {
-	surf_t			*s;
+	surf_p      s;
 	msurface_t		*pface;
 
 	currententity = &cl_entities[0];
@@ -124,7 +125,7 @@ void R_DrawCulledPolys (void)
 R_BeginEdgeFrame
 ==============
 */
-void R_BeginEdgeFrame (void)
+void R_BeginEdgeFrame()
 {
 	int		v;
 
@@ -170,7 +171,7 @@ sentinel at the end (actually, this is the active edge table starting at
 edge_head.next).
 ==============
 */
-void R_InsertNewEdges (edge_t *edgestoadd, edge_t *edgelist)
+void R_InsertNewEdges (edge_t* edgestoadd, edge_t* edgelist)
 {
 	edge_t	*next_edge;
 
@@ -211,7 +212,7 @@ addedge:
 R_RemoveEdges
 ==============
 */
-void R_RemoveEdges (edge_t *pedge)
+void R_RemoveEdges (edge_t* pedge)
 {
 
 	do
@@ -231,7 +232,7 @@ void R_RemoveEdges (edge_t *pedge)
 R_StepActiveU
 ==============
 */
-void R_StepActiveU (edge_t *pedge)
+void R_StepActiveU (edge_t* pedge)
 {
 	edge_t		*pnext_edge, *pwedge;
 
@@ -301,9 +302,9 @@ R_CleanupSpan
 */
 void R_CleanupSpan ()
 {
-	surf_t	*surf;
+	surf_p  surf;
 	int		iu;
-	espan_t	*span;
+	espan_p span;
 
 // now that we've reached the right edge of the screen, we're done with any
 // unfinished surfaces, so emit a span for whatever's on top
@@ -333,10 +334,10 @@ void R_CleanupSpan ()
 R_LeadingEdgeBackwards
 ==============
 */
-void R_LeadingEdgeBackwards (edge_t *edge)
+void R_LeadingEdgeBackwards (edge_t* edge)
 {
-	espan_t			*span;
-	surf_t			*surf, *surf2;
+	espan_p  span;
+	surf_p			surf, surf2;
 	int				iu;
 
 // it's adding a new surface in, so find the correct place
@@ -413,9 +414,9 @@ gotposition:
 R_TrailingEdge
 ==============
 */
-void R_TrailingEdge (surf_t *surf, edge_t *edge)
+void R_TrailingEdge (surf_p surf, edge_t* edge)
 {
-	espan_t			*span;
+	espan_p  span;
 	int				iu;
 
 // don't generate a span if this is an inverted span, with the end
@@ -457,10 +458,10 @@ void R_TrailingEdge (surf_t *surf, edge_t *edge)
 R_LeadingEdge
 ==============
 */
-void R_LeadingEdge (edge_t *edge)
+void R_LeadingEdge (edge_t* edge)
 {
-	espan_t			*span;
-	surf_t			*surf, *surf2;
+	espan_p span;
+	surf_p  surf, surf2;
 	int				iu;
 	double			fu, newzi, testzi, newzitop, newzibottom;
 
@@ -585,10 +586,10 @@ gotposition:
 R_GenerateSpans
 ==============
 */
-void R_GenerateSpans (void)
+void R_GenerateSpans()
 {
 	edge_t			*edge;
-	surf_t			*surf;
+	surf_p  surf;
 
 	r_bmodelactive = 0;
 
@@ -624,7 +625,7 @@ void R_GenerateSpans (void)
 R_GenerateSpansBackward
 ==============
 */
-void R_GenerateSpansBackward (void)
+void R_GenerateSpansBackward()
 {
 	edge_t			*edge;
 
@@ -660,14 +661,14 @@ Output:
 Each surface has a linked list of its visible spans
 ==============
 */
-void R_ScanEdges (void)
+void R_ScanEdges()
 {
 	int		iv, bottom;
-	byte	basespans[MAXSPANS*sizeof(espan_t)+CACHE_SIZE];
-	espan_t	*basespan_p;
-	surf_t	*s;
+	byte	basespans[MAXSPANS * sizeof(espan_t) + CACHE_SIZE];
+	espan_p basespan_p;
+	surf_p  s;
 
-	basespan_p = (espan_t *)
+	basespan_p = (espan_p)
 			((long)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
 	max_span_p = &basespan_p[MAXSPANS - r_refdef.vrect.width];
 

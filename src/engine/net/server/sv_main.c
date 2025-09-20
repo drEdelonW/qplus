@@ -186,7 +186,7 @@ void SV_SendServerinfo(client_t* client){
 
     MSG_WriteByte(&client->message, (!coop.value && deathmatch.value)? GAME_DEATHMATCH : GAME_COOP);
 
-	sprintf(message, pr_strings+sv.edicts->v.message);
+	sprintf(message, pr_strings + sv.edicts->v.message);
 
 	MSG_WriteString(&client->message, message);
 

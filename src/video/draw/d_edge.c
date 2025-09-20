@@ -30,8 +30,8 @@ int			ubasestep, errorterm, erroradjustup, erroradjustdown;
 int			vstartscan;
 
 // FIXME: should go away
-extern void			R_RotateBmodel (void);
-extern void			R_TransformFrustum (void);
+extern void			R_RotateBmodel();
+extern void			R_TransformFrustum();
 
 vec3_t		transformed_modelorg;
 
@@ -41,8 +41,7 @@ D_DrawPoly
 
 ==============
 */
-void D_DrawPoly (void)
-{
+void D_DrawPoly(){
 // this driver takes spans, not polygons
 }
 
@@ -52,9 +51,8 @@ void D_DrawPoly (void)
 D_MipLevelForScale
 =============
 */
-int D_MipLevelForScale (float scale)
-{
-	int		lmiplevel;
+int D_MipLevelForScale(float scale){
+	int lmiplevel;
 
 	if (scale >= d_scalemip[0] )
 		lmiplevel = 0;
@@ -65,8 +63,7 @@ int D_MipLevelForScale (float scale)
 	else
 		lmiplevel = 3;
 
-	if (lmiplevel < d_minmip)
-		lmiplevel = d_minmip;
+	CLAMP_MIN(lmiplevel, d_minmip);
 
 	return lmiplevel;
 }
@@ -80,36 +77,35 @@ D_DrawSolidSurface
 
 // FIXME: clean this up
 
-void D_DrawSolidSurface (surf_p surf, int color)
-{
-	espan_t	*span;
-	byte	*pdest;
+void D_DrawSolidSurface(surf_p surf, int color){
+	espan_p span;
+	byte* pdest;
 	int		u, u2, pix;
 
 	pix = (color<<24) | (color<<16) | (color<<8) | color;
 	for (span=surf->spans ; span ; span=span->pnext)
 	{
-		pdest = (byte *)d_viewbuffer + screenwidth*span->v;
+		pdest = (byte*)d_viewbuffer + screenwidth*span->v;
 		u = span->u;
 		u2 = span->u + span->count - 1;
-		((byte *)pdest)[u] = pix;
+		((byte*)pdest)[u] = pix;
 
 		if (u2 - u < 8)
 		{
 			for (u++ ; u <= u2 ; u++)
-				((byte *)pdest)[u] = pix;
+				((byte*)pdest)[u] = pix;
 		}
 		else
 		{
 			for (u++ ; u & 3 ; u++)
-				((byte *)pdest)[u] = pix;
+				((byte*)pdest)[u] = pix;
 
 			u2 -= 4;
 			for ( ; u <= u2 ; u+=4)
-				*(int *)((byte *)pdest + u) = pix;
+				*(int*)((byte*)pdest + u) = pix;
 			u2 += 4;
 			for ( ; u <= u2 ; u++)
-				((byte *)pdest)[u] = pix;
+				((byte*)pdest)[u] = pix;
 		}
 	}
 }
@@ -120,7 +116,7 @@ void D_DrawSolidSurface (surf_p surf, int color)
 D_CalcGradients
 ==============
 */
-void D_CalcGradients (msurface_t *pface){
+void D_CalcGradients (msurface_p pface){
 	vec3_t		p_temp1;
 	vec3_t		p_saxis, p_taxis;
 	float		t;
@@ -172,11 +168,9 @@ void D_CalcGradients (msurface_t *pface){
 D_DrawSurfaces
 ==============
 */
-void D_DrawSurfaces (void)
-{
-	surf_p	s;
-	msurface_t		*pface;
-	surfcache_t		*pcurrentcache;
+void D_DrawSurfaces(){
+	msurface_p      pface;
+	surfcache_t*  pcurrentcache;
 	vec3_t			world_transformed_modelorg;
 	vec3_t			local_modelorg;
 
@@ -185,9 +179,8 @@ void D_DrawSurfaces (void)
 	VectorCopy (transformed_modelorg, world_transformed_modelorg);
 
 // TODO: could preset a lot of this at mode set time
-	if (r_drawflat.value)
-	{
-		for (s = &surfaces[1] ; s<surface_p ; s++)
+	if (r_drawflat.value){
+		for (surf_p s = &surfaces[1] ; s < surface_p ; s++)
 		{
 			if (!s->spans)
 				continue;
@@ -202,7 +195,7 @@ void D_DrawSurfaces (void)
 	}
 	else
 	{
-		for (s = &surfaces[1] ; s<surface_p ; s++)
+		for (surf_p s = &surfaces[1] ; s<surface_p ; s++)
 		{
 			if (!s->spans)
 				continue;
@@ -238,8 +231,8 @@ void D_DrawSurfaces (void)
 			{
 				pface = s->data;
 				miplevel = 0;
-				cacheblock = (pixel_t *)
-						((byte *)pface->texinfo->texture +
+				cacheblock = (pixel_t*)
+						((byte*)pface->texinfo->texture +
 						pface->texinfo->texture->offsets[0]);
 				cachewidth = 64;
 
@@ -294,13 +287,15 @@ void D_DrawSurfaces (void)
 				}
 
 				pface = s->data;
-				miplevel = D_MipLevelForScale (s->nearzi * scale_for_mip
-				* pface->texinfo->mipadjust);
+				miplevel = D_MipLevelForScale(
+                    s->nearzi * scale_for_mip *
+                    pface->texinfo->mipadjust
+                );
 
 			// FIXME: make this passed in to D_CacheSurface
 				pcurrentcache = D_CacheSurface (pface, miplevel);
 
-				cacheblock = (pixel_t *)pcurrentcache->data;
+				cacheblock = (pixel_t*)pcurrentcache->data;
 				cachewidth = pcurrentcache->width;
 
 				D_CalcGradients (pface);

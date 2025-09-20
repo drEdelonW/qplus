@@ -251,7 +251,7 @@ void Con_Linefeed(){
     ================
 */
 void Con_Print(char* txt){
-	int		c, l;
+	int		c;
 	static int	cr;
 	int		mask;
 
@@ -272,6 +272,7 @@ void Con_Print(char* txt){
 
 	while ( (c = *txt) ){
 	// count word length
+		int l;
 		for (l=0 ; l< con_linewidth ; l++){
 			if ( txt[l] <= ' '){
 				break;
@@ -309,8 +310,7 @@ void Con_Print(char* txt){
 			break;
 
 		default:	// display character and advance
-			int y = con_current % con_totallines;
-			con_text[(y * con_linewidth) + con_x] = c | mask;
+			con_text[((con_current % con_totallines) * con_linewidth) + con_x] = c | mask;
 			con_x++;
 			if (con_x >= con_linewidth){
 				con_x = 0;

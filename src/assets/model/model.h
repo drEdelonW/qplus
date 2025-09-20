@@ -119,6 +119,7 @@ typedef struct msurface_s{
 	byte		styles[MAXLIGHTMAPS];
 	byte*		samples;		// [numstyles*surfsize]
 } msurface_t;
+typedef msurface_t* msurface_p;
 
 typedef struct mnode_s{
 // common with leaf
@@ -152,7 +153,7 @@ typedef struct mleaf_s{
 	byte*		compressed_vis;
 	efrag_t*	efrags;
 
-	msurface_t**	firstmarksurface;
+	msurface_p*	firstmarksurface;
 	int			nummarksurfaces;
 	int			key;			// BSP sequence number for leaf's contents
 	byte		ambient_sound_level[NUM_AMBIENTS];
@@ -343,7 +344,7 @@ typedef struct model_s{
 	mtexinfo_t* texinfo;
 
 	int			numsurfaces;
-	msurface_t* surfaces;
+	msurface_p  surfaces;
 
 	int			numsurfedges;
 	int*        surfedges;
@@ -352,7 +353,7 @@ typedef struct model_s{
 	dclipnode_t*    clipnodes;
 
 	int			    nummarksurfaces;
-	msurface_t**    marksurfaces;
+	msurface_p *    marksurfaces;
 
 	hull_t		hulls[MAX_MAP_HULLS];
 
