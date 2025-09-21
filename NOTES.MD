@@ -1,6 +1,14 @@
 # Install
     sudo apt install xserver-xephyr
 
+    sudo apt install \
+        make \
+        gcc-aarch64-linux-gnu \
+        gcc-arm-linux-gnueabihf \
+        gcc build-essential \
+        libx11-dev libxext-dev
+
+
 # ARM32 Install
     sudo apt install gcc-arm-linux-gnueabihf
     sudo dpkg --add-architecture armhf
