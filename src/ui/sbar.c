@@ -255,7 +255,8 @@ void Sbar_Init() {
 */
 void Sbar_DrawPic(int x, int y, qpic_p pic) {
     Draw_Pic(
-        x + ((cl.gametype == GAME_DEATHMATCH)?
+        x +
+        ((cl.gametype == GAME_DEATHMATCH)?
             0 : ((vid.width - 320) >> 1)),
         y + (vid.height - SBAR_HEIGHT),
         pic
@@ -273,7 +274,8 @@ void Sbar_DrawPic(int x, int y, qpic_p pic) {
 */
 void Sbar_DrawTransPic(int x, int y, qpic_p pic) {
     Draw_TransPic(
-        x + ((cl.gametype == GAME_DEATHMATCH)?
+        x +
+        ((cl.gametype == GAME_DEATHMATCH)?
             0 : ((vid.width - 320) >> 1)),
         y + (vid.height - SBAR_HEIGHT),
         pic
@@ -293,7 +295,8 @@ void Sbar_DrawTransPic(int x, int y, qpic_p pic) {
 */
 void Sbar_DrawCharacter(int x, int y, int num) {
     Draw_Character(
-        x + 4 + ((cl.gametype == GAME_DEATHMATCH)?
+        x + 4 +
+        ((cl.gametype == GAME_DEATHMATCH)?
             0 : ((vid.width - 320) >> 1)),
         y + (vid.height - SBAR_HEIGHT),
         num
@@ -311,7 +314,8 @@ void Sbar_DrawCharacter(int x, int y, int num) {
 */
 void Sbar_DrawString(int x, int y, cstring str) {
     Draw_String(
-        x + ((cl.gametype == GAME_DEATHMATCH)?
+        x +
+        ((cl.gametype == GAME_DEATHMATCH)?
             0 : ((vid.width - 320) >> 1)),
         y + (vid.height - SBAR_HEIGHT),
         str
