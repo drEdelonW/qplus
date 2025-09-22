@@ -36,9 +36,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //define	PARANOID			// speed sapping error checking
 
 #ifdef QUAKE2
-#define	GAMENAME	"id1"		// directory to look in by default
+    #define	GAMENAME	"id1"		/* directory to look in by default */
 #else
-#define	GAMENAME	"id1"
+    #define	GAMENAME	"id1"
 #endif
 
 #include <math.h>
@@ -82,14 +82,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MAX_NUM_ARGVS	50
 
 #if 0
-// up / down
-#define	PITCH	0
+    // up / down
+    #define	PITCH	0
 
-// left / right
-#define	YAW		1
+    // left / right
+    #define	YAW		1
 
-// fall over
-#define	ROLL	2
+    // fall over
+    #define	ROLL	2
 #else
 	#include "angles_indices.h"
 #endif
@@ -99,9 +99,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define	MAX_MSGLEN		8000		// max length of a reliable message
 #define	MAX_DATAGRAM	1024		// max length of unreliable message
-
-
-
 
 #define	SAVEGAME_COMMENT_LENGTH	39
 
@@ -140,10 +137,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "server.h"
 
 #ifdef GLQUAKE
-#include "gl_model.h"
+    #include "gl_model.h"
 #else
-#include "model.h"
-#include "d_iface.h"
+    #include "model.h"
+    #include "d_iface.h"
 #endif
 
 #include "input.h"
@@ -156,7 +153,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cdaudio.h"
 
 #ifdef GLQUAKE
-#include "glquake.h"
+    #include "glquake.h"
 #endif
 
 

@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 // refresh.h -- public interface to refresh functions
-#include "m_effect.h"
+#include "model_effect.h"
 #include "enginedefs.h"
 
 #define	MAXCLIPPLANES	11

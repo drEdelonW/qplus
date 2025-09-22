@@ -1,9 +1,11 @@
 #pragma once
 
-#include <stdint.h>
-
-#if !defined BYTE_DEFINED
-	// typedef unsigned char 		byte; // uint8_t
-	typedef uint8_t 		byte;
-	#define BYTE_DEFINED 1
-#endif
+// #if !defined BYTE_DEFINED	// needed by [vid_sunxil.c]
+	#if 0
+		// typedef unsigned char 		byte; // uint8_t
+	#else
+		#include <stdint.h>
+		typedef uint8_t 		byte;
+	#endif
+	// #define BYTE_DEFINED 1
+// #endif

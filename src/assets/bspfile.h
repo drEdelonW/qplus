@@ -176,6 +176,7 @@ typedef struct
 	int			planenum;
 	int16_t		children[2];	// negative numbers are contents
 } dclipnode_t;
+typedef dclipnode_t* dclipnode_p;
 
 
 typedef struct texinfo_s

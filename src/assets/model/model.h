@@ -19,9 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef __MODEL__
-#define __MODEL__
-
 #include "modelgen.h"
 #include "spritegn.h"
 
@@ -45,7 +42,7 @@ BRUSH MODELS
 // in memory representation
 //
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct{
+typedef struct {
 	vec3_t		position;
 } mvertex_t;
 typedef mvertex_t* mvertex_p;
@@ -88,12 +85,12 @@ struct texture_s{
 #define SURF_DRAWBACKGROUND	0x40
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct{
+typedef struct {
 	uint16_t	v[2];
 	unsigned int	cachededgeoffset;
 } medge_t;
 
-typedef struct{
+typedef struct {
 	float		vecs[2][4];
 	float		mipadjust;
 	texture_p	texture;
@@ -126,22 +123,25 @@ typedef struct msurface_s{
 } msurface_t;
 typedef msurface_t* msurface_p;
 
-typedef struct mnode_s{
+struct mnode_s;
+typedef struct mnode_s mnode_t;
+typedef mnode_t* mnode_p;
+struct mnode_s{
 // common with leaf
 	int			contents;		// 0, to differentiate from leafs
 	int			visframe;		// node needs to be traversed if current
 
 	int16_t		minmaxs[6];		// for bounding box culling
 
-	struct mnode_s*	parent;
+	mnode_p	    parent;
 
 // node specific
 	mplane_p	plane;
-	struct mnode_s*	children[2];
+	mnode_p     children[2];
 
 	uint16_t		firstsurface;
 	uint16_t		numsurfaces;
-} mnode_t;
+};
 
 
 
@@ -152,7 +152,7 @@ typedef struct mleaf_s{
 
 	int16_t		minmaxs[6];		// for bounding box culling
 
-	struct mnode_s*	parent;
+	mnode_p     parent;
 
 // leaf specific
 	byte*		compressed_vis;
@@ -163,10 +163,11 @@ typedef struct mleaf_s{
 	int			key;			// BSP sequence number for leaf's contents
 	byte		ambient_sound_level[NUM_AMBIENTS];
 } mleaf_t;
+typedef mleaf_t* mleaf_p;
 
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct{
-	dclipnode_t* clipnodes;
+typedef struct {
+	dclipnode_p  clipnodes;
 	mplane_p   planes;
 	int			firstclipnode;
 	int			lastclipnode;
@@ -191,25 +192,26 @@ typedef struct mspriteframe_s{
 	float	up, down, left, right;
 	byte	pixels[4];
 } mspriteframe_t;
+typedef mspriteframe_t* mspriteframe_p;
 
-typedef struct{
+typedef struct {
 	int				numframes;
 	float*          intervals;
-	mspriteframe_t* frames[1];
+	mspriteframe_p  frames[1];
 } mspritegroup_t;
 
-typedef struct{
+typedef struct {
 	spriteframetype_t	type;
-	mspriteframe_t*     frameptr;
+	mspriteframe_p      frameptr;
 } mspriteframedesc_t;
 
-typedef struct{
+typedef struct {
 	int					type;
 	int					maxwidth;
 	int					maxheight;
 	int					numframes;
 	float				beamlength;		// remove?
-	typeless_ptr               cachespot;		// remove?
+	typeless_ptr        cachespot;		// remove?
 	mspriteframedesc_t	frames[1];
 } msprite_t;
 
@@ -223,7 +225,7 @@ Alias models are position independent, so the cache manager can move them.
 ==============================================================================
 */
 
-typedef struct{
+typedef struct {
 	aliasframetype_t	type;
 	trivertx_t			bboxmin;
 	trivertx_t			bboxmax;
@@ -231,25 +233,25 @@ typedef struct{
 	char				name[16];
 } maliasframedesc_t;
 
-typedef struct{
-	aliasskintype_t		type;
-	void				*pcachespot;
-	int					skin;
+typedef struct {
+	aliasskintype_t type;
+	typeless_ptr    pcachespot;
+	int             skin;
 } maliasskindesc_t;
 
-typedef struct{
+typedef struct {
 	trivertx_t			bboxmin;
 	trivertx_t			bboxmax;
 	int					frame;
 } maliasgroupframedesc_t;
 
-typedef struct{
+typedef struct {
 	int						numframes;
 	int						intervals;
 	maliasgroupframedesc_t	frames[1];
 } maliasgroup_t;
 
-typedef struct{
+typedef struct {
 	int					numskins;
 	int					intervals;
 	maliasskindesc_t	skindescs[1];
@@ -257,11 +259,11 @@ typedef struct{
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct mtriangle_s{
-	int     facesfront;
-	int	    vertindex[3];
+	int facesfront;
+	int	vertindex[3];
 } mtriangle_t;
 
-typedef struct{
+typedef struct {
 	int					model;
 	int					stverts;
 	int					skindesc;
@@ -281,30 +283,8 @@ typedef enum{
     mod_alias
 } modtype_t;
 
-#if 0
-typedef enum {
-    RT_ROCKET   = 0,
-    RT_GRENADE  = 1,
-    RT_GIB      = 2,
-    RT_TRACER   = 3,
-    RT_ZOMGIB   = 4,
-    RT_TRACER2  = 5,
-    RT_TRACER3  = 6
-} rocket_trail_type;
-/* Bit flags for entity effects */
-typedef enum entity_effects {
-    EF_ROCKET  = 1 << RT_ROCKET,   /* leave a trail */
-    EF_GRENADE = 1 << RT_GRENADE,   /* leave a trail */
-    EF_GIB     = 1 << RT_GIB,   /* leave a trail */
-    EF_ROTATE  = 1 << RT_TRACER,   /* rotate (bonus items) */
-    EF_TRACER  = 1 << RT_ZOMGIB,   /* green split trail */
-    EF_ZOMGIB  = 1 << RT_TRACER2,   /* small blood trail */
-    EF_TRACER2 = 1 << RT_TRACER3,   /* orange split trail + rotate */
-    EF_TRACER3 = 1 << 7    /* purple trail */
-} entity_effects;
-#else
-    #include "m_effect.h"
-#endif
+#include "model_effect.h"
+
 
 typedef struct model_s{
 	char		name[MAX_QPATH];
@@ -334,7 +314,7 @@ typedef struct model_s{
 	mplane_p   planes;
 
 	int			numleafs;		// number of visible leafs, not counting 0
-	mleaf_t*   leafs;
+	mleaf_p   leafs;
 
 	int			numvertexes;
 	mvertex_t*  vertexes;
@@ -355,7 +335,7 @@ typedef struct model_s{
 	int*        surfedges;
 
 	int			    numclipnodes;
-	dclipnode_t*    clipnodes;
+	dclipnode_p     clipnodes;
 
 	int			    nummarksurfaces;
 	msurface_p *    marksurfaces;
@@ -375,16 +355,16 @@ typedef struct model_s{
 	cache_user_t	cache;		// only access through Mod_Extradata
 
 } model_t;
+typedef model_t* model_p;
 
 //============================================================================
 
-void	Mod_Init(void);
-void	Mod_ClearAll(void);
-model_t *Mod_ForName(char *name, qboolean crash);
-void	*Mod_Extradata(model_t *mod);	// handles caching
-void	Mod_TouchModel(char *name);
+void	Mod_Init();
+void	Mod_ClearAll();
+model_p Mod_ForName(cstring name, qboolean crash);
+void	*Mod_Extradata(model_p mod);	// handles caching
+void	Mod_TouchModel(cstring name);
 
-mleaf_t *Mod_PointInLeaf(vec3_t p, model_t *model);
-byte	*Mod_LeafPVS(mleaf_t *leaf, model_t *model);
+mleaf_p Mod_PointInLeaf(vec3_t p, model_p model);
+byte*	Mod_LeafPVS(mleaf_p leaf, model_p model);
 
-#endif	// __MODEL__

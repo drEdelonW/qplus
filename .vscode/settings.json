@@ -21,6 +21,7 @@
         "bspfile.h": "c",
         "random": "c",
         "limits": "c",
-        "ratio": "c"
+        "ratio": "c",
+        "cstddef": "c"
     }
 }
