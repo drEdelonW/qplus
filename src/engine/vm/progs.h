@@ -52,7 +52,7 @@ typedef edict_t* edict_p;
 //============================================================================
 
 extern	dprograms_t*    progs;
-extern	dfunction_t*    pr_functions;
+extern	dfunction_p    pr_functions;
 extern	cstring         pr_strings;
 extern	ddef_t*         pr_globaldefs;
 extern	ddef_t*         pr_fielddefs;
@@ -121,7 +121,7 @@ extern int pr_numbuiltins;
 extern int		pr_argc;
 
 extern	qboolean	pr_trace;
-extern	dfunction_t* pr_xfunction;
+extern	dfunction_p pr_xfunction;
 extern	int			pr_xstatement;
 
 extern	uint16_t		pr_crc;

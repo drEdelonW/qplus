@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 dprograms_t		*progs;
-dfunction_t		*pr_functions;
+dfunction_p pr_functions;
 cstring pr_strings;
 ddef_t			*pr_fielddefs;
 ddef_t			*pr_globaldefs;
@@ -213,9 +213,9 @@ ddef_t *ED_FindGlobal (cstring name)
 ED_FindFunction
 ============
 */
-dfunction_t *ED_FindFunction (cstring name)
+dfunction_p ED_FindFunction (cstring name)
 {
-	dfunction_t		*func;
+	dfunction_p func;
 	int				i;
 
 	for (i=0 ; i<progs->numfunctions ; i++)
@@ -271,7 +271,7 @@ cstring PR_ValueString (etype_t type, eval_p val)
 {
 	static char	line[256];
 	ddef_t		*def;
-	dfunction_t	*f;
+	dfunction_p f;
 
 	type &= ~DEF_SAVEGLOBAL;
 
@@ -323,7 +323,7 @@ cstring PR_UglyValueString (etype_t type, eval_p val)
 {
 	static char	line[256];
 	ddef_t		*def;
-	dfunction_t	*f;
+	dfunction_p f;
 
 	type &= ~DEF_SAVEGLOBAL;
 
@@ -722,7 +722,7 @@ qboolean	ED_ParseEpair (typeless_ptr base, ddef_t *key, cstring s)
 	ddef_t	*def;
 	cstring v, w;
 	void	*d;
-	dfunction_t	*func;
+	dfunction_p func;
 
 	d = (typeless_ptr )((int *)base + key->ofs);
 
@@ -896,7 +896,7 @@ void ED_LoadFromFile (cstring data)
 {
 	edict_p ent;
 	int			inhibit;
-	dfunction_t	*func;
+	dfunction_p func;
 
 	ent = NULL;
 	inhibit = 0;
@@ -999,7 +999,7 @@ void PR_LoadProgs()
 	if (progs->crc != PROGHEADER_CRC)
 		Sys_Error ("progs.dat system vars have been modified, progdefs.h is out of date");
 
-	pr_functions = (dfunction_t *)((byte *)progs + progs->ofs_functions);
+	pr_functions = (dfunction_p )((byte *)progs + progs->ofs_functions);
 	pr_strings = (cstring )progs + progs->ofs_strings;
 	pr_globaldefs = (ddef_t *)((byte *)progs + progs->ofs_globaldefs);
 	pr_fielddefs = (ddef_t *)((byte *)progs + progs->ofs_fielddefs);

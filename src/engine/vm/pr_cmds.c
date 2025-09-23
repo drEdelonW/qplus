@@ -1150,7 +1150,7 @@ void PF_walkmove()
 	edict_p ent;
 	float	yaw, dist;
 	vec3_t	move;
-	dfunction_t	*oldf;
+	dfunction_p oldf;
 	int 	oldself;
 
 	ent = PROG_TO_EDICT(pr_global_struct->self);

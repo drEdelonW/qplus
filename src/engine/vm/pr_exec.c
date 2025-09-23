@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct
 {
 	int				s;
-	dfunction_t		*f;
+	dfunction_p f;
 } prstack_t;
 
 #define	MAX_STACK_DEPTH		32
@@ -41,7 +41,7 @@ int			localstack_used;
 
 
 qboolean	pr_trace;
-dfunction_t	*pr_xfunction;
+dfunction_p pr_xfunction;
 int			pr_xstatement;
 
 
@@ -187,9 +187,8 @@ void PR_PrintStatement (dstatement_t* s)
 PR_StackTrace
 ============
 */
-void PR_StackTrace()
-{
-	dfunction_t	*f;
+void PR_StackTrace(){
+	dfunction_p f;
 	int			i;
 
 	if (pr_depth == 0)
@@ -221,8 +220,8 @@ PR_Profile_f
 */
 void PR_Profile_f()
 {
-	dfunction_t* f;
-    dfunction_t* best;
+	dfunction_p f;
+    dfunction_p best;
 	int			max;
 	int			num;
 	int			i;
@@ -292,7 +291,7 @@ PR_EnterFunction
 Returns the new program statement counter
 ====================
 */
-int PR_EnterFunction (dfunction_t* f)
+int PR_EnterFunction (dfunction_p f)
 {
 	int		i, j, c, o;
 
@@ -366,8 +365,8 @@ void PR_ExecuteProgram (func_t fnum)
     eval_p  c;
 	int			s;
 	dstatement_t* st;
-	dfunction_t* f;
-    dfunction_t* newf;
+	dfunction_p f;
+    dfunction_p newf;
 	int		runaway;
 	int		i;
 	edict_p ed;
