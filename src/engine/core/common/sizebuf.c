@@ -1,13 +1,13 @@
 #include "sizebuf.h"
 
-#include "zone.h"
+#include "types.h"
 #include "q_tools.h"
 #include "console.h"
 #include "sys.h"
 
   //===========================================================================
 
-void SZ_Alloc (sizebuf_t *buf, int startsize)
+void SZ_Alloc (sizebuf_p buf, int startsize)
 {
 	if (startsize < 256)
 		startsize = 256;
@@ -17,7 +17,7 @@ void SZ_Alloc (sizebuf_t *buf, int startsize)
 }
 
 
-void SZ_Free (sizebuf_t *buf)
+void SZ_Free (sizebuf_p buf)
 {
 //      Z_Free (buf->data);
 //      buf->data = NULL;
@@ -25,12 +25,12 @@ void SZ_Free (sizebuf_t *buf)
 	buf->cursize = 0;
 }
 
-void SZ_Clear (sizebuf_t *buf)
+void SZ_Clear (sizebuf_p buf)
 {
 	buf->cursize = 0;
 }
 
-typeless_ptr SZ_GetSpace (sizebuf_t *buf, int length)
+typeless_ptr SZ_GetSpace (sizebuf_p buf, int length)
 {
 	void    *data;
 
@@ -53,12 +53,12 @@ typeless_ptr SZ_GetSpace (sizebuf_t *buf, int length)
 	return data;
 }
 
-void SZ_Write (sizebuf_t *buf, typeless_ptr data, int length)
+void SZ_Write (sizebuf_p buf, typeless_ptr data, int length)
 {
 	Q_memcpy (SZ_GetSpace(buf,length),data,length);
 }
 
-void SZ_Print (sizebuf_t *buf, cstring data)
+void SZ_Print (sizebuf_p buf, cstring data)
 {
 	int             len;
 

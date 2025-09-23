@@ -16,7 +16,7 @@ Handles uint8_t ordering and avoids alignment errors
 // writing functions
 //
 
-void MSG_WriteChar (sizebuf_t* sb, int c){
+void MSG_WriteChar (sizebuf_p sb, int c){
 #ifdef PARANOID
 	if (c < -128 || c > 127)
 		Sys_Error ("MSG_WriteChar: range error");
@@ -26,7 +26,7 @@ void MSG_WriteChar (sizebuf_t* sb, int c){
 	buf[0] = c;
 }
 
-void MSG_WriteByte (sizebuf_t* sb, int c){
+void MSG_WriteByte (sizebuf_p sb, int c){
 #ifdef PARANOID
 	if (c < 0 || c > 255)
 		Sys_Error ("MSG_WriteByte: range error");
@@ -36,7 +36,7 @@ void MSG_WriteByte (sizebuf_t* sb, int c){
 	buf[0] = c;
 }
 
-void MSG_WriteShort (sizebuf_t* sb, int c){
+void MSG_WriteShort (sizebuf_p sb, int c){
 #ifdef PARANOID
 	if (c < ((int16_t)0x8000) || c > (int16_t)0x7fff)
 		Sys_Error ("MSG_WriteShort: range error");
@@ -47,7 +47,7 @@ void MSG_WriteShort (sizebuf_t* sb, int c){
 	buf[1] = c >> 8;
 }
 
-void MSG_WriteLong (sizebuf_t* sb, int c){
+void MSG_WriteLong (sizebuf_p sb, int c){
 	uint8_t* buf = SZ_GetSpace(sb, 4);
 	buf[0] =  c & 0xff;
 	buf[1] = (c >> 8) & 0xff;
@@ -55,7 +55,7 @@ void MSG_WriteLong (sizebuf_t* sb, int c){
 	buf[3] =  c >> 24;
 }
 
-void MSG_WriteFloat(sizebuf_t* sb, float f){
+void MSG_WriteFloat(sizebuf_p sb, float f){
     union{
         float   f;
         int     l;
@@ -67,18 +67,18 @@ void MSG_WriteFloat(sizebuf_t* sb, float f){
 	SZ_Write(sb, &dat.l, 4);
 }
 
-void MSG_WriteString(sizebuf_t* sb, cstring s){
+void MSG_WriteString(sizebuf_p sb, cstring s){
 	if (!s)
 		SZ_Write(sb, "", 1);
 	else
 		SZ_Write(sb, s, (Q_strlen(s) + 1));
 }
 
-void MSG_WriteCoord(sizebuf_t* sb, float f){
+void MSG_WriteCoord(sizebuf_p sb, float f){
 	MSG_WriteShort(sb, (int)(f*8));
 }
 
-void MSG_WriteAngle(sizebuf_t* sb, float f){
+void MSG_WriteAngle(sizebuf_p sb, float f){
 	MSG_WriteByte(sb, ((int)f*256/360) & 255);
 }
 

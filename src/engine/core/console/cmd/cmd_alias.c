@@ -1,7 +1,7 @@
 #include <string.h>
 #include "cmd.h"
 #include "console.h"
-#include "zone.h"
+#include "types.h"
 #include "q_tools.h"
 
 extern cstring cmd_argv[];

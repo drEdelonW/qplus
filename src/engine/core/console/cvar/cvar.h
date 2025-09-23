@@ -56,7 +56,7 @@ interface from being ambiguous.
 #include "qboolean.h"
 #include <stdio.h>
 #include <stdint.h>
-#include "zone.h"
+#include "types.h"
 
 /* header-friendly extern */
 #define CVAR_EXTERN(sym) extern cvar_t sym

@@ -189,8 +189,8 @@ typedef struct {
 	qsocket_t*  (*Connect) (cstring host);
 	qsocket_t*  (*CheckNewConnections)();
 	int			(*QGetMessage) (qsocket_t* sock);
-	int			(*QSendMessage) (qsocket_t* sock, sizebuf_t* data);
-	int			(*SendUnreliableMessage) (qsocket_t* sock, sizebuf_t* data);
+	int			(*QSendMessage) (qsocket_t* sock, sizebuf_p data);
+	int			(*SendUnreliableMessage) (qsocket_t* sock, sizebuf_p data);
 	qboolean	(*CanSendMessage) (qsocket_t* sock);
 	qboolean	(*CanSendUnreliableMessage) (qsocket_t* sock);
 	void		(*Close) (qsocket_t* sock);
@@ -284,14 +284,14 @@ int			NET_GetMessage (struct qsocket_s* sock);
 // returns 2 if an unreliable message was received
 // returns -1 if the connection died
 
-int			NET_SendMessage (struct qsocket_s* sock, sizebuf_t* data);
-int			NET_SendUnreliableMessage (struct qsocket_s* sock, sizebuf_t* data);
+int			NET_SendMessage (struct qsocket_s* sock, sizebuf_p data);
+int			NET_SendUnreliableMessage (struct qsocket_s* sock, sizebuf_p data);
 // returns 0 if the message connot be delivered reliably, but the connection
 //		is still considered valid
 // returns 1 if the message was sent properly
 // returns -1 if the connection died
 
-int			NET_SendToAll(sizebuf_t* data, int blocktime);
+int			NET_SendToAll(sizebuf_p data, int blocktime);
 // This is a reliable *blocking* send to all attached clients.
 
 

@@ -22,7 +22,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "qboolean.h"
-#include "zone.h"
+#include "types.h"
 // cmd.h -- Command buffer and command execution
 
 //===========================================================================

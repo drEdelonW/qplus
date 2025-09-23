@@ -609,7 +609,7 @@ struct
 	int		r;
 } vcrSendMessage;
 
-int NET_SendMessage (qsocket_t *sock, sizebuf_t *data)
+int NET_SendMessage (qsocket_t *sock, sizebuf_p data)
 {
 	int		r;
 
@@ -640,7 +640,7 @@ int NET_SendMessage (qsocket_t *sock, sizebuf_t *data)
 }
 
 
-int NET_SendUnreliableMessage (qsocket_t *sock, sizebuf_t *data)
+int NET_SendUnreliableMessage (qsocket_t *sock, sizebuf_p data)
 {
 	int		r;
 
@@ -706,7 +706,7 @@ qboolean NET_CanSendMessage (qsocket_t *sock)
 }
 
 
-int NET_SendToAll(sizebuf_t *data, int blocktime)
+int NET_SendToAll(sizebuf_p data, int blocktime)
 {
 	double		start;
 	int			i;
