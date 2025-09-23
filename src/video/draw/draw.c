@@ -34,8 +34,8 @@ typedef struct {
 static rectdesc_t	r_rectdesc;
 
 byte		*draw_chars;				// 8*8 graphic characters
-qpic_t		*draw_disc;
-qpic_t		*draw_backtile;
+qpic_p draw_disc;
+qpic_p draw_backtile;
 
 //=============================================================================
 /* Support Routines */
@@ -50,7 +50,7 @@ cachepic_t	menu_cachepics[MAX_CACHED_PICS];
 int			menu_numcachepics;
 
 
-qpic_t	*Draw_PicFromWad (char *name)
+qpic_p Draw_PicFromWad (char *name)
 {
 	return W_GetLumpName (name);
 }
@@ -60,11 +60,11 @@ qpic_t	*Draw_PicFromWad (char *name)
 Draw_CachePic
 ================
 */
-qpic_t	*Draw_CachePic (char *path)
+qpic_p Draw_CachePic (char *path)
 {
 	cachepic_t	*pic;
 	int			i;
-	qpic_t		*dat;
+	qpic_p dat;
 
 	for (pic=menu_cachepics, i=0 ; i<menu_numcachepics ; pic++, i++)
 		if (!strcmp (path, pic->name))
@@ -88,7 +88,7 @@ qpic_t	*Draw_CachePic (char *path)
 //
 	COM_LoadCacheFile (path, &pic->cache);
 
-	dat = (qpic_t *)pic->cache.data;
+	dat = (qpic_p )pic->cache.data;
 	if (!dat)
 	{
 		Sys_Error ("Draw_CachePic: failed to load %s", path);
@@ -282,7 +282,7 @@ void Draw_DebugChar (char num)
 Draw_Pic
 =============
 */
-void Draw_Pic (int x, int y, qpic_t *pic)
+void Draw_Pic (int x, int y, qpic_p pic)
 {
 	byte			*dest, *source;
 	uint16_t	*pusdest;
@@ -333,7 +333,7 @@ void Draw_Pic (int x, int y, qpic_t *pic)
 Draw_TransPic
 =============
 */
-void Draw_TransPic (int x, int y, qpic_t *pic)
+void Draw_TransPic (int x, int y, qpic_p pic)
 {
 	byte	*dest, *source, tbyte;
 	uint16_t	*pusdest;
@@ -420,7 +420,7 @@ void Draw_TransPic (int x, int y, qpic_t *pic)
 Draw_TransPicTranslate
 =============
 */
-void Draw_TransPicTranslate (int x, int y, qpic_t *pic, byte *translation)
+void Draw_TransPicTranslate (int x, int y, qpic_p pic, byte *translation)
 {
 	byte	*dest, *source, tbyte;
 	uint16_t	*pusdest;
@@ -538,7 +538,7 @@ void Draw_ConsoleBackground (int lines)
 	byte			*src, *dest;
 	uint16_t	*pusdest;
 	int				f, fstep;
-	qpic_t			*conback;
+	qpic_p conback;
 	char			ver[100];
 
 	conback = Draw_CachePic ("gfx/conback.lmp");

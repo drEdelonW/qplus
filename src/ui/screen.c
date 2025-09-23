@@ -33,9 +33,9 @@ float		oldscreensize, oldfov;
 
 qboolean	scr_initialized;		// ready to draw
 
-qpic_t		*scr_ram;
-qpic_t		*scr_net;
-qpic_t		*scr_turtle;
+qpic_p scr_ram;
+qpic_p scr_net;
+qpic_p scr_turtle;
 
 int			scr_fullupdate;
 
@@ -393,7 +393,7 @@ DrawPause
 */
 void SCR_DrawPause()
 {
-	qpic_t	*pic;
+	qpic_p pic;
 
 	if (!scr_showpause.value)		// turn off for screenshots
 		return;
@@ -415,7 +415,7 @@ SCR_DrawLoading
 */
 void SCR_DrawLoading()
 {
-	qpic_t	*pic;
+	qpic_p pic;
 
 	if (!scr_drawloading)
 		return;
