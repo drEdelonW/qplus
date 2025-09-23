@@ -41,7 +41,7 @@ qboolean SNDDMA_Init(void)
     int fmt;
 	int tmp;
     int i;
-    char *s;
+    cstring s;
 	struct audio_buf_info info;
 	int caps;
 

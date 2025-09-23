@@ -26,18 +26,37 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //   TYPES
 //===============
 
-#define	CMP_NONE		0
-#define	CMP_LZSS		1
+#if 0
+    #define	CMP_NONE		0
+    #define	CMP_LZSS		1
 
-#define	TYP_NONE		0
-#define	TYP_LABEL		1
+    #define	TYP_NONE		0
+    #define	TYP_LABEL		1
 
-#define	TYP_LUMPY		64				// 64 + grab command number
-#define	TYP_PALETTE		64
-#define	TYP_QTEX		65
-#define	TYP_QPIC		66
-#define	TYP_SOUND		67
-#define	TYP_MIPTEX		68
+    #define	TYP_LUMPY		64				// 64 + grab command number
+    #define	TYP_PALETTE		64
+    #define	TYP_QTEX		65
+    #define	TYP_QPIC		66
+    #define	TYP_SOUND		67
+    #define	TYP_MIPTEX		68
+#else
+typedef enum {
+    CMP_NONE    = 0,
+    CMP_LZSS    = 1
+} cmp_type_t;
+
+typedef enum {
+    TYP_NONE    = 0,
+    TYP_LABEL   = 1,
+
+    TYP_LUMPY   = 64,   // base offset for grab command number
+    TYP_PALETTE = 64,
+    TYP_QTEX    = 65,
+    TYP_QPIC    = 66,
+    TYP_SOUND   = 67,
+    TYP_MIPTEX  = 68
+} typ_type_t;
+#endif
 
 typedef struct {
     int     width;

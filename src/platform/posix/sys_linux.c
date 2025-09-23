@@ -23,8 +23,8 @@ qboolean isDedicated;
 
 int nostdout = 0;
 
-char *basedir = ".";
-char *cachedir = "/tmp";
+cstring basedir = ".";
+cstring cachedir = "/tmp";
 
 CVAR(sys_linerefresh, "0");// set for entity display
 
@@ -35,7 +35,7 @@ CVAR(sys_linerefresh, "0");// set for entity display
 void Sys_DebugNumber(int y, int val){}
 
 /*
-void Sys_Printf (char *fmt, ...)
+void Sys_Printf (cstring fmt, ...)
 {
 	va_list		argptr;
 	char		text[1024];
@@ -48,7 +48,7 @@ void Sys_Printf (char *fmt, ...)
 	Con_Print (text);
 }
 
-void Sys_Printf (char *fmt, ...)
+void Sys_Printf (cstring fmt, ...)
 {
 
     va_list     argptr;
@@ -81,7 +81,7 @@ void Sys_Printf (char *fmt, ...)
 }
 */
 
-void Sys_Printf(char *fmt, ...){
+void Sys_Printf(cstring fmt, ...){
 	va_list argptr;
 	char    text[1024];
 	uint8_t*  p;
@@ -139,7 +139,7 @@ void Sys_Init(){
 #endif
 }
 
-void Sys_Error(char *error, ...){
+void Sys_Error(cstring error, ...){
     va_list     argptr;
     char        string[1024];
 

@@ -50,7 +50,7 @@ cachepic_t	menu_cachepics[MAX_CACHED_PICS];
 int			menu_numcachepics;
 
 
-qpic_p Draw_PicFromWad (char *name)
+qpic_p Draw_PicFromWad (cstring name)
 {
 	return W_GetLumpName (name);
 }
@@ -60,7 +60,7 @@ qpic_p Draw_PicFromWad (char *name)
 Draw_CachePic
 ================
 */
-qpic_p Draw_CachePic (char *path)
+qpic_p Draw_CachePic (cstring path)
 {
 	cachepic_t	*pic;
 	int			i;
@@ -224,7 +224,7 @@ void Draw_Character (int x, int y, int num)
 Draw_String
 ================
 */
-void Draw_String (int x, int y, char *str)
+void Draw_String (int x, int y, cstring str)
 {
 	while (*str)
 	{

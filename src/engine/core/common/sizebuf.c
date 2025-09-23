@@ -58,7 +58,7 @@ void SZ_Write (sizebuf_t *buf, typeless_ptr data, int length)
 	Q_memcpy (SZ_GetSpace(buf,length),data,length);
 }
 
-void SZ_Print (sizebuf_t *buf, char *data)
+void SZ_Print (sizebuf_t *buf, cstring data)
 {
 	int             len;
 

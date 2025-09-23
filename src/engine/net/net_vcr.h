@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 int			VCR_Init();
 void		VCR_Listen (qboolean state);
 void		VCR_SearchForHosts (qboolean xmit);
-qsocket_t 	*VCR_Connect (char *host);
+qsocket_t 	*VCR_Connect (cstring host);
 qsocket_t 	*VCR_CheckNewConnections();
 int			VCR_GetMessage (qsocket_t *sock);
 int			VCR_SendMessage (qsocket_t *sock, sizebuf_t *data);

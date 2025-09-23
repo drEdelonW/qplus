@@ -48,7 +48,7 @@ int num_shades=32;
 
 struct
 {
-	char *name;
+	cstring name;
 	int num;
 } mice[] =
 {
@@ -344,7 +344,7 @@ void VID_InitModes(void)
 
 }
 
-int get_mode(char *name, int width, int height, int depth)
+int get_mode(cstring name, int width, int height, int depth)
 {
 
 	int i;
@@ -384,7 +384,7 @@ int get_mode(char *name, int width, int height, int depth)
 
 }
 
-int matchmouse(int mouse, char *name)
+int matchmouse(int mouse, cstring name)
 {
 	int i;
 	for (i=0 ; i<num_mice ; i++)
@@ -537,9 +537,9 @@ int VID_SetMode (int modenum, uint8_t *palette)
 	vga_setmode(current_mode);
 	VID_SetPalette(palette);
 
-	VGA_pagebase = vid.direct = framebuffer_ptr = (char *) vga_getgraphmem();
+	VGA_pagebase = vid.direct = framebuffer_ptr = (cstring ) vga_getgraphmem();
 //		if (vga_setlinearaddressing()>0)
-//			framebuffer_ptr = (char *) vga_getgraphmem();
+//			framebuffer_ptr = (cstring ) vga_getgraphmem();
 	if (!framebuffer_ptr)
 		Sys_Error("This mode isn't hapnin'\n");
 
@@ -831,7 +831,7 @@ void IN_Init(void)
 {
 
 	int mtype;
-	char *mousedev;
+	cstring mousedev;
 	int mouserate;
 
 	if (UseMouse)
@@ -984,7 +984,7 @@ void IN_Move (usercmd_t *cmd)
 VID_ModeInfo
 ================
 */
-char *VID_ModeInfo (int modenum)
+cstring VID_ModeInfo (int modenum)
 {
 	static char	*badmodestr = "Bad mode number";
 	static char modestr[40];

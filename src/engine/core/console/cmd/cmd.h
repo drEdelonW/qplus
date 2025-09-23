@@ -43,12 +43,12 @@ void Cbuf_Init(void);
 
 // as new commands are generated from the console or keybindings,
 // the text is added to the end of the command buffer.
-void Cbuf_AddText(char *text);
+void Cbuf_AddText(cstring text);
 
 // when a command wants to issue other commands immediately, the text is
 // inserted at the beginning of the buffer, before any remaining unexecuted
 // commands.
-void Cbuf_InsertText(char *text);
+void Cbuf_InsertText(cstring text);
 
 // Pulls off \n terminated lines of text from the command buffer and sends
 // them through Cmd_ExecuteString.  Stops when the buffer is empty.
@@ -82,14 +82,14 @@ void	Cmd_Init(void);
 // called by the init functions of other parts of the program to
 // register commands and functions to call for them.
 // The cmd_name is referenced later, so it should not be in temp memory
-void	Cmd_AddCommand(char *cmd_name, xcommand_t function);
+void	Cmd_AddCommand(cstring cmd_name, xcommand_t function);
 
 // used by the cvar code to check for cvar / command name overlap
-qboolean Cmd_Exists(char *cmd_name);
+qboolean Cmd_Exists(cstring cmd_name);
 
 // attempts to match a partial command for automatic command line completion
 // returns NULL if nothing fits
-char 	*Cmd_CompleteCommand(char *partial);
+char 	*Cmd_CompleteCommand(cstring partial);
 
 // The functions that execute commands get their parameters with these
 // functions. Cmd_Argv() will return an empty string, not a NULL
@@ -100,15 +100,15 @@ char	*Cmd_Args(void);
 
 // Returns the position (1 to argc-1) in the command's argument list
 // where the given parameter apears, or 0 if not present
-int Cmd_CheckParm(char *parm);
+int Cmd_CheckParm(cstring parm);
 
 // Takes a null terminated string.  Does not need to be /n terminated.
 // breaks the string up into arg tokens.
-void Cmd_TokenizeString(char *text);
+void Cmd_TokenizeString(cstring text);
 
 // Parses a single line of text into arguments and tries to execute it.
 // The text can come from the command buffer, a remote client, or stdin.
-void	Cmd_ExecuteString(char *text, cmd_source_t src);
+void	Cmd_ExecuteString(cstring text, cmd_source_t src);
 
 // adds the current command line as a clc_stringcmd to the client message.
 // things like godmode, noclip, etc, are commands directed to the server,
@@ -117,7 +117,7 @@ void	Cmd_ForwardToServer(void);
 
 // used by command functions to send output to either the graphics console or
 // passed as a print message to the client
-void	Cmd_Print(char *text);
+void	Cmd_Print(cstring text);
 
 void Cmd_Alias_f(void);
 bool checkAlias();

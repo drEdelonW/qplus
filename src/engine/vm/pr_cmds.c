@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ===============================================================================
 */
 
-char *PF_VarString (int	first)
+cstring PF_VarString (int	first)
 {
 	int		i;
 	static char out[256];
@@ -1054,7 +1054,7 @@ void PF_Find()
 }
 #endif
 
-void PR_CheckEmptyString (char *s)
+void PR_CheckEmptyString (cstring s)
 {
 	if (s[0] <= ' ')
 		PR_RunError ("Bad string");
@@ -1588,7 +1588,7 @@ void PF_WriteEntity()
 
 //=============================================================================
 
-int SV_ModelIndex (char *name);
+int SV_ModelIndex (cstring name);
 
 void PF_makestatic()
 {

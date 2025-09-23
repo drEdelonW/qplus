@@ -123,20 +123,20 @@ typedef struct cvar_s{
 void     Cvar_RegisterVariable(cvar_t *variable);
 
 // equivelant to "<name> <variable>" typed at the console
-void     Cvar_Set (char *var_name, char *value);
+void     Cvar_Set (cstring var_name, cstring value);
 
 // expands value to a string and calls Cvar_Set
-void    Cvar_SetValue (char *var_name, float value);
+void    Cvar_SetValue (cstring var_name, float value);
 
 // returns 0 if not defined or non numeric
-float    Cvar_VariableValue (char *var_name);
+float    Cvar_VariableValue (cstring var_name);
 
 // returns an empty string if not defined
-char    *Cvar_VariableString (char *var_name);
+char    *Cvar_VariableString (cstring var_name);
 
 // attempts to match a partial variable name for command line completion
 // returns NULL if nothing fits
-char     *Cvar_CompleteVariable (char *partial);
+char     *Cvar_CompleteVariable (cstring partial);
 
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
 // command.  Returns true if the command was a variable reference that
@@ -147,6 +147,6 @@ qboolean Cvar_Command();
 // with the archive flag set to true.
 void     Cvar_WriteVariables (FILE *f);
 
-cvar_t *Cvar_FindVar (char *var_name);
+cvar_t *Cvar_FindVar (cstring var_name);
 
 extern cvar_t    *cvar_vars;

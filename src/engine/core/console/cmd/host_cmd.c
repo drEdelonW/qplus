@@ -61,7 +61,7 @@ void Host_Status_f()
 	int			minutes;
 	int			hours = 0;
 	int			j;
-	void		(*print) (char *fmt, ...);
+	void		(*print) (cstring fmt, ...);
 
 	if (cmd_source == src_command)
 	{
@@ -440,7 +440,7 @@ Host_SavegameComment
 Writes a SAVEGAME_COMMENT_LENGTH character comment describing the current
 ===============
 */
-void Host_SavegameComment (char *text)
+void Host_SavegameComment (cstring text)
 {
 	int		i;
 	char	kills[20];
@@ -751,7 +751,7 @@ void SaveGamestate()
 	Con_Printf ("done.\n");
 }
 
-int LoadGamestate(char *level, char *startspot)
+int LoadGamestate(cstring level, cstring startspot)
 {
 	char	name[MAX_OSPATH];
 	FILE	*f;

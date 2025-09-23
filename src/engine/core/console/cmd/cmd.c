@@ -84,7 +84,7 @@ void Cbuf_Init(void){
     Adds command text at the end of the buffer
     ============
 */
-void Cbuf_AddText(char *text){
+void Cbuf_AddText(cstring text){
     if ((cmd_text.cursize + Q_strlen (text)) >= cmd_text.maxsize){
         Con_Printf ("Cbuf_AddText: overflow\n");
         return;
@@ -103,7 +103,7 @@ void Cbuf_AddText(char *text){
     FIXME: actually change the command buffer to do less copying
     ============
 */
-void Cbuf_InsertText(char *text){
+void Cbuf_InsertText(cstring text){
     cstring   temp;
 
     // copy off any commands still remaining in the exec buffer
@@ -139,7 +139,7 @@ void Cbuf_Execute(void){
 
 	while (cmd_text.cursize){
     // find a \n or ; line break
-		text = (char *)cmd_text.data;
+		text = (cstring )cmd_text.data;
 
 		quotes = 0;
 		for(i = 0; i < cmd_text.cursize; i++){
@@ -310,7 +310,7 @@ void Cmd_Echo_f(void){
     Creates a new command that executes a command string (possibly ; seperated)
     ===============
 */
-cstring CopyString(char *in){
+cstring CopyString(cstring in){
 	cstring out = Z_Malloc(strlen(in) + 1);
 	strcpy (out, in);
 	return out;
@@ -449,7 +449,7 @@ void Cmd_TokenizeString(cstring text){
     Cmd_AddCommand
     ============
 */
-void	Cmd_AddCommand(char *cmd_name, xcommand_t function)
+void	Cmd_AddCommand(cstring cmd_name, xcommand_t function)
 {
 	cmd_function_t	*cmd;
 
@@ -485,7 +485,7 @@ void	Cmd_AddCommand(char *cmd_name, xcommand_t function)
 	Cmd_Exists
 	============
 */
-qboolean Cmd_Exists(char *cmd_name){
+qboolean Cmd_Exists(cstring cmd_name){
 	for (cmd_function_t* cmd = cmd_functions; cmd; cmd = cmd->next)	{
 		if (!Q_strcmp (cmd_name, cmd->name)){
 			return true;
@@ -501,7 +501,7 @@ qboolean Cmd_Exists(char *cmd_name){
 	Cmd_CompleteCommand
 	============
 */
-char *Cmd_CompleteCommand(char *partial){
+cstring Cmd_CompleteCommand(cstring partial){
 	int len = Q_strlen(partial);
 
 	if (!len)
@@ -600,7 +600,7 @@ void Cmd_ForwardToServer(void){
     where the given parameter appears, or 0 if not present
     ================
 */
-int Cmd_CheckParm(char *parm){
+int Cmd_CheckParm(cstring parm){
 	if (!parm){
 		Sys_Error ("Cmd_CheckParm: NULL");
     }

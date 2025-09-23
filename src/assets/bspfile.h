@@ -294,8 +294,8 @@ extern	int			dsurfedges[MAX_MAP_SURFEDGES];
 void DecompressVis (byte *in, byte *decompressed);
 int CompressVis (byte *vis, byte *dest);
 
-void	LoadBSPFile (char *filename);
-void	WriteBSPFile (char *filename);
+void	LoadBSPFile (cstring filename);
+void	WriteBSPFile (cstring filename);
 void	PrintBSPFileSizes();
 
 //===============
@@ -322,12 +322,12 @@ extern	entity_t	entities[MAX_MAP_ENTITIES];
 void	ParseEntities();
 void	UnparseEntities();
 
-void 	SetKeyValue (entity_t *ent, char *key, char *value);
-char 	*ValueForKey (entity_t *ent, char *key);
+void 	SetKeyValue (entity_t *ent, cstring key, cstring value);
+char 	*ValueForKey (entity_t *ent, cstring key);
 // will return "" if not present
 
-vec_t	FloatForKey (entity_t *ent, char *key);
-void 	GetVectorForKey (entity_t *ent, char *key, vec3_t vec);
+vec_t	FloatForKey (entity_t *ent, cstring key);
+void 	GetVectorForKey (entity_t *ent, cstring key, vec3_t vec);
 
 epair_t *ParseEpair();
 

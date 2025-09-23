@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
+
 int			cache_full_cycle;
 
 byte *S_Alloc (int size);
@@ -30,7 +31,7 @@ byte *S_Alloc (int size);
 ResampleSfx
 ================
 */
-void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, char *data)
+void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, cstring data)
 {
 	int		outcount;
 	int		srcsample;
@@ -63,7 +64,7 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, char *data)
 	{
 // fast special case
 		for (i=0 ; i<outcount ; i++)
-			((signed char *)sc->data)[i]
+			((signed char* )sc->data)[i]
 			= (int)( (uint8_t)(data[i]) - 128);
 	}
 	else
@@ -82,7 +83,7 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, char *data)
 			if (sc->width == 2)
 				((int16_t *)sc->data)[i] = sample;
 			else
-				((signed char *)sc->data)[i] = sample >> 8;
+				((signed char* )sc->data)[i] = sample >> 8;
 		}
 	}
 }
@@ -96,7 +97,7 @@ S_LoadSound
 */
 sfxcache_t *S_LoadSound (sfx_t *s){
     char	namebuffer[256];
-	char*   data;
+	cstring    data;
 	wavinfo_t	info;
 	int     len;
 	float   stepscale;
@@ -115,7 +116,7 @@ sfxcache_t *S_LoadSound (sfx_t *s){
 
 //	Con_Printf ("loading %s\n", namebuffer);
 
-	data = (char*)COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
+	data = (cstring )COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
 
 	if (!data){
 		Con_Printf ("Couldn't load %s\n", namebuffer);
@@ -160,10 +161,10 @@ WAV loading
 */
 
 
-char*	data_p;
-char*   iff_end;
-char*   last_chunk;
-char*   iff_data;
+cstring 	data_p;
+cstring    iff_end;
+cstring    last_chunk;
+cstring    iff_data;
 int 	iff_chunk_len;
 
 
@@ -187,7 +188,7 @@ int GetLittleLong(void)
 	return val;
 }
 
-void FindNextChunk(char *name)
+void FindNextChunk(cstring name)
 {
 	while (1) {
 		data_p = last_chunk;
@@ -214,7 +215,7 @@ void FindNextChunk(char *name)
 	}
 }
 
-void FindChunk(char *name)
+void FindChunk(cstring name)
 {
 	last_chunk = iff_data;
 	FindNextChunk (name);
@@ -242,7 +243,7 @@ void DumpChunks(void)
 GetWavinfo
 ============
 */
-wavinfo_t GetWavinfo (char *name, char *wav, int wavlength)
+wavinfo_t GetWavinfo (cstring name, cstring wav, int wavlength)
 {
 	wavinfo_t	info;
 	int     i;
@@ -303,7 +304,7 @@ wavinfo_t GetWavinfo (char *name, char *wav, int wavlength)
 		FindNextChunk ("LIST");
 		if (data_p)
 		{
-			if (!strncmp ((char*)data_p + 28, "mark", 4))
+			if (!strncmp ((cstring )data_p + 28, "mark", 4))
 			{	// this is not a proper parse, but it works with cooledit...
 				data_p += 24;
 				i = GetLittleLong ();	// samples in loop

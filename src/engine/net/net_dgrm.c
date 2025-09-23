@@ -26,31 +26,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef BAN_TEST
 #if defined(_WIN32)
-#include <windows.h>
+	#include <windows.h>
 #elif defined (NeXT)
-#include <sys/socket.h>
-#include <arpa/inet.h>
+	#include <sys/socket.h>
+	#include <arpa/inet.h>
 #else
-#define AF_INET 		2	/* internet */
-struct in_addr
-{
-	union
-	{
-		struct { uint8_t s_b1,s_b2,s_b3,s_b4; } S_un_b;
-		struct { uint16_t s_w1,s_w2; } S_un_w;
-		unsigned long S_addr;
-	} S_un;
-};
-#define	s_addr	S_un.S_addr	/* can be used for most tcp & ip code */
-struct sockaddr_in
-{
-    int16_t			sin_family;
-    uint16_t	sin_port;
-	struct in_addr	sin_addr;
-    char			sin_zero[8];
-};
-char *inet_ntoa(struct in_addr in);
-unsigned long inet_addr(const char *cp);
+	#include "types.h"
+
+	#define AF_INET 		2	/* internet */
+	struct in_addr {
+		union {
+			struct {uint8_t s_b1, s_b2, s_b3, s_b4; } S_un_b;
+			struct {uint16_t s_w1, s_w2; } S_un_w;
+			uint32_t S_addr;
+		} S_un;
+	};
+	#define	s_addr	S_un.S_addr	/* can be used for most tcp & ip code */
+	struct sockaddr_in {
+		int16_t			sin_family;
+		uint16_t	sin_port;
+		struct in_addr	sin_addr;
+		char			sin_zero[8];
+	};
+cstring inet_ntoa(struct in_addr in);
+unsigned long inet_addr(const cstring cp);
 #endif
 #endif	// BAN_TEST
 
@@ -87,7 +86,7 @@ extern char m_return_reason[32];
 
 
 #ifdef DEBUG
-char *StrAddr (struct qsockaddr *addr)
+cstring StrAddr (struct qsockaddr *addr)
 {
 	static char buf[34];
 	byte *p = (byte *)addr;
@@ -108,7 +107,7 @@ void NET_Ban_f()
 {
 	char	addrStr [32];
 	char	maskStr [32];
-	void	(*print) (char *fmt, ...);
+	void	(*print) (cstring fmt, ...);
 
 	if (cmd_source == src_command)
 	{
@@ -1198,7 +1197,7 @@ void Datagram_SearchForHosts (qboolean xmit)
 }
 
 
-static qsocket_t *_Datagram_Connect (char *host)
+static qsocket_t *_Datagram_Connect (cstring host)
 {
 	struct qsockaddr sendaddr;
 	struct qsockaddr readaddr;
@@ -1365,7 +1364,7 @@ ErrorReturn2:
 	return NULL;
 }
 
-qsocket_t *Datagram_Connect (char *host)
+qsocket_t *Datagram_Connect (cstring host)
 {
 	qsocket_t *ret = NULL;
 

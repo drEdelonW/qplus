@@ -29,7 +29,7 @@ char	*cvar_null_string = "";
 Cvar_FindVar
 ============
 */
-cvar_t *Cvar_FindVar (char *var_name)
+cvar_t *Cvar_FindVar (cstring var_name)
 {
 	cvar_t	*var;
 
@@ -45,7 +45,7 @@ cvar_t *Cvar_FindVar (char *var_name)
 Cvar_VariableValue
 ============
 */
-float	Cvar_VariableValue (char *var_name)
+float	Cvar_VariableValue (cstring var_name)
 {
 	cvar_t	*var;
 
@@ -61,7 +61,7 @@ float	Cvar_VariableValue (char *var_name)
 Cvar_VariableString
 ============
 */
-char *Cvar_VariableString (char *var_name)
+cstring Cvar_VariableString (cstring var_name)
 {
 	cvar_t *var;
 
@@ -77,7 +77,7 @@ char *Cvar_VariableString (char *var_name)
 Cvar_CompleteVariable
 ============
 */
-char *Cvar_CompleteVariable (char *partial)
+cstring Cvar_CompleteVariable (cstring partial)
 {
 	cvar_t		*cvar;
 	int			len;
@@ -101,7 +101,7 @@ char *Cvar_CompleteVariable (char *partial)
 Cvar_Set
 ============
 */
-void Cvar_Set (char *var_name, char *value)
+void Cvar_Set (cstring var_name, cstring value)
 {
 	cvar_t	*var;
 	qboolean changed;
@@ -135,7 +135,7 @@ void Cvar_Set (char *var_name, char *value)
 Cvar_SetValue
 ============
 */
-void Cvar_SetValue (char *var_name, float value)
+void Cvar_SetValue (cstring var_name, float value)
 {
 	char	val[32];
 

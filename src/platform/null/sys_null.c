@@ -62,7 +62,7 @@ int filelength (FILE *f)
 	return end;
 }
 
-int Sys_FileOpenRead (char *path, int *hndl)
+int Sys_FileOpenRead (cstring path, int *hndl)
 {
 	FILE    *f;
 	int             i;
@@ -81,7 +81,7 @@ int Sys_FileOpenRead (char *path, int *hndl)
 	return filelength(f);
 }
 
-int Sys_FileOpenWrite (char *path)
+int Sys_FileOpenWrite (cstring path)
 {
 	FILE    *f;
 	int             i;
@@ -117,7 +117,7 @@ int Sys_FileWrite (int handle, typeless_ptr data, int count)
 	return fwrite (data, 1, count, sys_handles[handle]);
 }
 
-int     Sys_FileTime (char *path)
+int     Sys_FileTime (cstring path)
 {
 	FILE    *f;
 
@@ -131,7 +131,7 @@ int     Sys_FileTime (char *path)
 	return -1;
 }
 
-void Sys_mkdir (char *path)
+void Sys_mkdir (cstring path)
 {
 }
 
@@ -149,7 +149,7 @@ void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 }
 
 
-void Sys_Error (char *error, ...)
+void Sys_Error (cstring error, ...)
 {
 	va_list         argptr;
 
@@ -162,7 +162,7 @@ void Sys_Error (char *error, ...)
 	exit (1);
 }
 
-void Sys_Printf (char *fmt, ...)
+void Sys_Printf (cstring fmt, ...)
 {
 	va_list         argptr;
 
@@ -185,7 +185,7 @@ double Sys_FloatTime()
 	return t;
 }
 
-char *Sys_ConsoleInput()
+cstring Sys_ConsoleInput()
 {
 	return NULL;
 }
@@ -208,7 +208,7 @@ void Sys_LowFPPrecision()
 
 //=============================================================================
 
-void main (int argc, char **argv)
+void main (int argc, cstring *argv)
 {
 	static quakeparms_t    parms;
 

@@ -81,8 +81,8 @@ typedef struct
 } modedesc_t;
 
 extern void M_Menu_Options_f();
-extern void M_Print (int cx, int cy, char *str);
-extern void M_PrintWhite (int cx, int cy, char *str);
+extern void M_Print (int cx, int cy, cstring str);
+extern void M_PrintWhite (int cx, int cy, cstring str);
 extern void M_DrawCharacter (int cx, int line, int num);
 extern void M_DrawTransPic (int x, int y, qpic_p pic);
 extern void M_DrawPic (int x, int y, qpic_p pic);
@@ -515,7 +515,7 @@ byte	surfcache[1024*1024];
 // VID_SetWindowTitle - set the window and icon titles
 //
 
-void VID_SetWindowTitle( Window win, char *pszName )
+void VID_SetWindowTitle( Window win, cstring pszName )
 {
     XTextProperty	textprop;
     XWMHints		*wmHints;
@@ -764,12 +764,12 @@ void	VID_Init (uint8_t *palette)
 // even if MITSHM is available, make sure it's a local connection
 	if (XShmQueryExtension(x_disp))
 	{
-		char *displayname;
+		cstring displayname;
 		doShm = true;
-		displayname = (char *) getenv("DISPLAY");
+		displayname = (cstring ) getenv("DISPLAY");
 		if (displayname)
 		{
-			char *d = displayname;
+			cstring d = displayname;
 			while (*d && (*d != ':')) d++;
 			if (*d) *d = 0;
 			if (!(!strcasecmp(displayname, "unix") || !*displayname))
@@ -1158,7 +1158,7 @@ void Sys_SendKeyEvents(void)
 }
 
 #if 0
-char *Sys_ConsoleInput()
+cstring Sys_ConsoleInput()
 {
 
 	static char	text[256];

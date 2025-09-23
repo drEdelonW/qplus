@@ -1053,7 +1053,7 @@ void VID_CheckModedescFixup (int mode)
 VID_GetModeDescriptionMemCheck
 =================
 */
-char *VID_GetModeDescriptionMemCheck (int mode)
+cstring VID_GetModeDescriptionMemCheck (int mode)
 {
 	char		*pinfo;
 	vmode_t		*pv;
@@ -1082,7 +1082,7 @@ char *VID_GetModeDescriptionMemCheck (int mode)
 VID_GetModeDescription
 =================
 */
-char *VID_GetModeDescription (int mode)
+cstring VID_GetModeDescription (int mode)
 {
 	char		*pinfo;
 	vmode_t		*pv;
@@ -1105,7 +1105,7 @@ VID_GetModeDescription2
 Tacks on "windowed" or "fullscreen"
 =================
 */
-char *VID_GetModeDescription2 (int mode)
+cstring VID_GetModeDescription2 (int mode)
 {
 	static char	pinfo[40];
 	vmode_t		*pv;
@@ -1136,7 +1136,7 @@ char *VID_GetModeDescription2 (int mode)
 
 // KJB: Added this to return the mode driver name in description for console
 
-char *VID_GetExtModeDescription (int mode)
+cstring VID_GetExtModeDescription (int mode)
 {
 	static char	pinfo[40];
 	vmode_t		*pv;
@@ -3041,8 +3041,8 @@ LONG WINAPI MainWndProc (
 
 
 extern void M_Menu_Options_f();
-extern void M_Print (int cx, int cy, char *str);
-extern void M_PrintWhite (int cx, int cy, char *str);
+extern void M_Print (int cx, int cy, cstring str);
+extern void M_PrintWhite (int cx, int cy, cstring str);
 extern void M_DrawCharacter (int cx, int line, int num);
 extern void M_DrawTransPic (int x, int y, qpic_p pic);
 extern void M_DrawPic (int x, int y, qpic_p pic);

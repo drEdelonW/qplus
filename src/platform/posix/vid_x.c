@@ -633,12 +633,12 @@ void	VID_Init (uint8_t *palette)
 // even if MITSHM is available, make sure it's a local connection
 	if (XShmQueryExtension(x_disp))
 	{
-		char *displayname;
+		cstring displayname;
 		doShm = true;
-		displayname = (char *) getenv("DISPLAY");
+		displayname = (cstring ) getenv("DISPLAY");
 		if (displayname)
 		{
-			char *d = displayname;
+			cstring d = displayname;
 			while (*d && (*d != ':')) d++;
 			if (*d) *d = 0;
 			if (!(!strcasecmp(displayname, "unix") || !*displayname))
@@ -1086,7 +1086,7 @@ void Sys_SendKeyEvents(void)
 }
 
 #if 0
-char *Sys_ConsoleInput()
+cstring Sys_ConsoleInput()
 {
 
 	static char	text[256];

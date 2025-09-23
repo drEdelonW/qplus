@@ -324,7 +324,7 @@ the given string.  Single ascii characters return themselves, while
 the K_* names are matched up.
 ===================
 */
-int Key_StringToKeynum(char *str){
+int Key_StringToKeynum(cstring str){
 	keyname_t	*kn;
 
 	if ((!str) ||
@@ -353,7 +353,7 @@ given keynum.
 FIXME: handle quote special (general escape sequence?)
 ===================
 */
-char *Key_KeynumToString(int keynum){
+cstring Key_KeynumToString(int keynum){
 	keyname_t*  kn;
 	static char tinystr[2];
 
@@ -382,7 +382,7 @@ char *Key_KeynumToString(int keynum){
 Key_SetBinding
 ===================
 */
-void Key_SetBinding(int keynum, char *binding){
+void Key_SetBinding(int keynum, cstring binding){
 	if (keynum == -1)
 		return;
 

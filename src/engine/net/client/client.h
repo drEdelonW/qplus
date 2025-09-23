@@ -258,7 +258,7 @@ void	CL_DecayLights();
 
 void CL_Init();
 
-void CL_EstablishConnection(char *host);
+void CL_EstablishConnection(cstring host);
 void CL_Signon1();
 void CL_Signon2();
 void CL_Signon3();
@@ -300,7 +300,7 @@ void CL_BaseMove(usercmd_t *cmd);
 
 
 float CL_KeyState(kbutton_t *key);
-char *Key_KeynumToString(int keynum);
+cstring Key_KeynumToString(int keynum);
 
 //
 // cl_demo.c

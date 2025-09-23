@@ -262,7 +262,7 @@ S_FindName
 
 ==================
 */
-sfx_t *S_FindName (char *name)
+sfx_t *S_FindName (cstring name)
 {
 	int		i;
 	sfx_t	*sfx;
@@ -298,7 +298,7 @@ S_TouchSound
 
 ==================
 */
-void S_TouchSound (char *name)
+void S_TouchSound (cstring name)
 {
 	sfx_t	*sfx;
 
@@ -315,7 +315,7 @@ S_PrecacheSound
 
 ==================
 */
-sfx_t *S_PrecacheSound (char *name)
+sfx_t *S_PrecacheSound (cstring name)
 {
 	sfx_t	*sfx;
 
@@ -968,7 +968,7 @@ void S_SoundList(void)
 }
 
 
-void S_LocalSound (char *sound)
+void S_LocalSound (cstring sound)
 {
 	sfx_t	*sfx;
 

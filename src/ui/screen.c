@@ -79,7 +79,7 @@ Called for important messages that should stay in the center of the screen
 for a few moments
 ==============
 */
-void SCR_CenterPrint (char *str)
+void SCR_CenterPrint (cstring str)
 {
 	strncpy (scr_centerstring, str, sizeof(scr_centerstring)-1);
 	scr_centertime_off = scr_centertime.value;
@@ -536,7 +536,7 @@ typedef struct
 WritePCXfile
 ==============
 */
-void WritePCXfile (char *filename, byte *data, int width, int height,
+void WritePCXfile (cstring filename, byte *data, int width, int height,
 	int rowbytes, byte *palette)
 {
 	int		i, j, length;
@@ -726,7 +726,7 @@ Displays a text string in the center of the screen and waits for a Y or N
 keypress.
 ==================
 */
-int SCR_ModalMessage (char *text)
+int SCR_ModalMessage (cstring text)
 {
 	if (cls.state == ca_dedicated)
 		return true;

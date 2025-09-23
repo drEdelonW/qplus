@@ -40,8 +40,8 @@ char		my_tcpip_address[NET_NAMELEN];
 
 void (*GetComPortConfig) (int portNumber, int *port, int *irq, int *baud, qboolean *useModem);
 void (*SetComPortConfig) (int portNumber, int port, int irq, int baud, qboolean useModem);
-void (*GetModemConfig) (int portNumber, char *dialType, char *clear, char *init, char *hangup);
-void (*SetModemConfig) (int portNumber, char *dialType, char *clear, char *init, char *hangup);
+void (*GetModemConfig) (int portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
+void (*SetModemConfig) (int portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
 
 static qboolean	listening = false;
 
@@ -352,7 +352,7 @@ NET_Connect
 int hostCacheCount = 0;
 hostcache_t hostcache[HOSTCACHESIZE];
 
-qsocket_t *NET_Connect (char *host)
+qsocket_t *NET_Connect (cstring host)
 {
 	qsocket_t		*ret;
 	int				n;

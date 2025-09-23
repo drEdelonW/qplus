@@ -168,7 +168,7 @@ int VID_NumModes ()
 VID_ModeInfo
 ================
 */
-char *VID_ModeInfo (int modenum, char **ppheader)
+cstring VID_ModeInfo (int modenum, char** ppheader)
 {
 	static char	*badmodestr = "Bad mode number";
 	vmode_t		*pv;
@@ -450,7 +450,7 @@ void VID_DescribeModes_f()
 VID_GetModeDescription
 =================
 */
-char *VID_GetModeDescription (int mode)
+cstring VID_GetModeDescription (int mode)
 {
 	char		*pinfo, *pheader;
 	vmode_t		*pv;
@@ -542,8 +542,8 @@ void D_EndDirectRect (int x, int y, int width, int height)
 //===========================================================================
 
 extern void M_Menu_Options_f();
-extern void M_Print (int cx, int cy, char *str);
-extern void M_PrintWhite (int cx, int cy, char *str);
+extern void M_Print (int cx, int cy, cstring str);
+extern void M_PrintWhite (int cx, int cy, cstring str);
 extern void M_DrawCharacter (int cx, int line, int num);
 extern void M_DrawTransPic (int x, int y, qpic_p pic);
 extern void M_DrawPic (int x, int y, qpic_p pic);

@@ -114,7 +114,7 @@ void M_DrawCharacter (int cx, int line, int num)
 	Draw_Character ( cx + ((vid.width - 320)>>1), line, num);
 }
 
-void M_Print (int cx, int cy, char *str)
+void M_Print (int cx, int cy, cstring str)
 {
 	while (*str)
 	{
@@ -124,7 +124,7 @@ void M_Print (int cx, int cy, char *str)
 	}
 }
 
-void M_PrintWhite (int cx, int cy, char *str)
+void M_PrintWhite (int cx, int cy, cstring str)
 {
 	while (*str)
 	{
@@ -858,7 +858,7 @@ int	m_net_cursor;
 int m_net_items;
 int m_net_saveHeight;
 
-char *net_helpMessage [] =
+cstring net_helpMessage [] =
 {
 /* .........1.........2.... */
   "                        ",
@@ -1312,7 +1312,7 @@ void M_Options_Key (int k)
 //=============================================================================
 /* KEYS MENU */
 
-char *bindnames[][2] =
+cstring bindnames[][2] =
 {
 {"+attack", 		"attack"},
 {"impulse 10", 		"change weapon"},
@@ -1347,7 +1347,7 @@ void M_Menu_Keys_f()
 }
 
 
-void M_FindKeysForCommand (char *command, int *twokeys)
+void M_FindKeysForCommand (cstring command, int *twokeys)
 {
 	int		count;
 	int		j;
@@ -1373,7 +1373,7 @@ void M_FindKeysForCommand (char *command, int *twokeys)
 	}
 }
 
-void M_UnbindCommand (char *command)
+void M_UnbindCommand (cstring command)
 {
 	int		j;
 	int		l;
@@ -1579,7 +1579,7 @@ int		m_quit_prevstate;
 qboolean	wasInMenus;
 
 #ifndef	_WIN32
-char *quitMessage [] =
+cstring quitMessage [] =
 {
 /* .........1.........2.... */
   "  Are you gonna quit    ",
@@ -2572,7 +2572,7 @@ void M_GameOptions_Draw()
 	M_Print (0, 72, "        Teamplay");
 	if (rogue)
 	{
-		char *msg;
+		cstring msg;
 
 		switch((int)teamplay.value)
 		{
@@ -2588,7 +2588,7 @@ void M_GameOptions_Draw()
 	}
 	else
 	{
-		char *msg;
+		cstring msg;
 
 		switch((int)teamplay.value)
 		{

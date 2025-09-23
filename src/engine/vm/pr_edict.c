@@ -37,7 +37,7 @@ uint16_t		pr_crc;
 int		type_size[8] = {1,sizeof(string_t)/4,1,3,1,1,sizeof(func_t)/4,sizeof(typeless_ptr )/4};
 
 ddef_t *ED_FieldAtOfs (int ofs);
-qboolean	ED_ParseEpair (typeless_ptr base, ddef_t *key, char *s);
+qboolean	ED_ParseEpair (typeless_ptr base, ddef_t *key, cstring s);
 
 
 #define	MAX_FIELD_LEN	64
@@ -173,7 +173,7 @@ ddef_t *ED_FieldAtOfs (int ofs)
 ED_FindField
 ============
 */
-ddef_t *ED_FindField (char *name)
+ddef_t *ED_FindField (cstring name)
 {
 	ddef_t		*def;
 	int			i;
@@ -193,7 +193,7 @@ ddef_t *ED_FindField (char *name)
 ED_FindGlobal
 ============
 */
-ddef_t *ED_FindGlobal (char *name)
+ddef_t *ED_FindGlobal (cstring name)
 {
 	ddef_t		*def;
 	int			i;
@@ -213,7 +213,7 @@ ddef_t *ED_FindGlobal (char *name)
 ED_FindFunction
 ============
 */
-dfunction_t *ED_FindFunction (char *name)
+dfunction_t *ED_FindFunction (cstring name)
 {
 	dfunction_t		*func;
 	int				i;
@@ -228,7 +228,7 @@ dfunction_t *ED_FindFunction (char *name)
 }
 
 
-eval_t *GetEdictFieldValue(edict_t *ed, char *field)
+eval_t *GetEdictFieldValue(edict_t *ed, cstring field)
 {
 	ddef_t			*def = NULL;
 	int				i;
@@ -256,7 +256,7 @@ Done:
 	if (!def)
 		return NULL;
 
-	return (eval_t *)((char *)&ed->v + def->ofs*4);
+	return (eval_t *)((cstring )&ed->v + def->ofs*4);
 }
 
 
@@ -267,7 +267,7 @@ PR_ValueString
 Returns a string describing *data in a type specific manner
 =============
 */
-char *PR_ValueString (etype_t type, eval_t *val)
+cstring PR_ValueString (etype_t type, eval_t *val)
 {
 	static char	line[256];
 	ddef_t		*def;
@@ -319,7 +319,7 @@ Returns a string describing *data in a type specific manner
 Easier to parse than PR_ValueString
 =============
 */
-char *PR_UglyValueString (etype_t type, eval_t *val)
+cstring PR_UglyValueString (etype_t type, eval_t *val)
 {
 	static char	line[256];
 	ddef_t		*def;
@@ -368,7 +368,7 @@ Returns a string with a description and the contents of a global,
 padded to 20 field width
 ============
 */
-char *PR_GlobalString (int ofs)
+cstring PR_GlobalString (int ofs)
 {
 	char	*s;
 	int		i;
@@ -394,7 +394,7 @@ char *PR_GlobalString (int ofs)
 	return line;
 }
 
-char *PR_GlobalStringNoContents (int ofs)
+cstring PR_GlobalStringNoContents (int ofs)
 {
 	int		i;
 	ddef_t	*def;
@@ -445,7 +445,7 @@ void ED_Print (edict_t *ed)
 		if (name[strlen(name)-2] == '_')
 			continue;	// skip _x, _y, _z vars
 
-		v = (int *)((char *)&ed->v + d->ofs*4);
+		v = (int *)((cstring )&ed->v + d->ofs*4);
 
 	// if the value is still all 0, skip the field
 		type = d->type & ~DEF_SAVEGLOBAL;
@@ -495,7 +495,7 @@ void ED_Write (FILE *f, edict_t *ed)
 		if (name[strlen(name)-2] == '_')
 			continue;	// skip _x, _y, _z vars
 
-		v = (int *)((char *)&ed->v + d->ofs*4);
+		v = (int *)((cstring )&ed->v + d->ofs*4);
 
 	// if the value is still all 0, skip the field
 		type = d->type & ~DEF_SAVEGLOBAL;
@@ -636,7 +636,7 @@ void ED_WriteGlobals (FILE *f)
 ED_ParseGlobals
 =============
 */
-void ED_ParseGlobals (char *data)
+void ED_ParseGlobals (cstring data)
 {
 	char	keyname[64];
 	ddef_t	*key;
@@ -680,7 +680,7 @@ void ED_ParseGlobals (char *data)
 ED_NewString
 =============
 */
-char *ED_NewString (char *string)
+cstring ED_NewString (cstring string)
 {
 	char	*new, *new_p;
 	int		i,l;
@@ -715,7 +715,7 @@ Can parse either fields or globals
 returns false if error
 =============
 */
-qboolean	ED_ParseEpair (typeless_ptr base, ddef_t *key, char *s)
+qboolean	ED_ParseEpair (typeless_ptr base, ddef_t *key, cstring s)
 {
 	int		i;
 	char	string[128];
@@ -789,7 +789,7 @@ ed should be a properly initialized empty edict.
 Used for initial level load and for savegames.
 ====================
 */
-char *ED_ParseEdict (char *data, edict_t *ent)
+cstring ED_ParseEdict (cstring data, edict_t *ent)
 {
 	ddef_t		*key;
 	qboolean	anglehack;
@@ -892,7 +892,7 @@ Used for both fresh maps and savegame loads.  A fresh map would also need
 to call ED_CallSpawnFunctions () to let the objects initialize themselves.
 ================
 */
-void ED_LoadFromFile (char *data)
+void ED_LoadFromFile (cstring data)
 {
 	edict_t		*ent;
 	int			inhibit;
@@ -1000,7 +1000,7 @@ void PR_LoadProgs()
 		Sys_Error ("progs.dat system vars have been modified, progdefs.h is out of date");
 
 	pr_functions = (dfunction_t *)((byte *)progs + progs->ofs_functions);
-	pr_strings = (char *)progs + progs->ofs_strings;
+	pr_strings = (cstring )progs + progs->ofs_strings;
 	pr_globaldefs = (ddef_t *)((byte *)progs + progs->ofs_globaldefs);
 	pr_fielddefs = (ddef_t *)((byte *)progs + progs->ofs_fielddefs);
 	pr_statements = (dstatement_t *)((byte *)progs + progs->ofs_statements);

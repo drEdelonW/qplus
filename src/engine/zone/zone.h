@@ -83,11 +83,7 @@ Zone block
 
 
 */
-#include <stddef.h>
-
-typedef char* cstring;
-typedef const char* cstring_ro;  // read-only
-typedef void* typeless_ptr;
+#include "types.h"
 
 void Memory_Init(typeless_ptr buf, size_t size);
 

@@ -74,17 +74,17 @@ void PR_Profile_f();
 edict_t *ED_Alloc();
 void ED_Free (edict_t *ed);
 
-char	*ED_NewString (char *string);
+char	*ED_NewString (cstring string);
 // returns a copy of the string allocated from the server's string heap
 
 void ED_Print (edict_t *ed);
 void ED_Write (FILE *f, edict_t *ed);
-char *ED_ParseEdict (char *data, edict_t *ent);
+cstring ED_ParseEdict (cstring data, edict_t *ent);
 
 void ED_WriteGlobals (FILE *f);
-void ED_ParseGlobals (char *data);
+void ED_ParseGlobals (cstring data);
 
-void ED_LoadFromFile (char *data);
+void ED_LoadFromFile (cstring data);
 
 //define EDICT_NUM(n) ((edict_t *)(sv.edicts+ (n)*pr_edict_size))
 //define NUM_FOR_EDICT(e) (((byte *)(e) - sv.edicts)/pr_edict_size)
@@ -126,10 +126,10 @@ extern	int			pr_xstatement;
 
 extern	uint16_t		pr_crc;
 
-void PR_RunError (char *error, ...);
+void PR_RunError (cstring error, ...);
 
 void ED_PrintEdicts();
 void ED_PrintNum (int ent);
 
-eval_t *GetEdictFieldValue(edict_t *ed, char *field);
+eval_t *GetEdictFieldValue(edict_t *ed, cstring field);
 

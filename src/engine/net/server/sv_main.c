@@ -867,9 +867,9 @@ void SV_SaveSpawnparms(){
 extern float		scr_centertime_off;
 
 #ifdef QUAKE2
-void SV_SpawnServer (char *server, char *startspot)
+void SV_SpawnServer (cstring server, cstring startspot)
 #else
-void SV_SpawnServer (char *server)
+void SV_SpawnServer (cstring server)
 #endif
 {
 	edict_t* ent;

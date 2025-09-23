@@ -186,7 +186,7 @@ Mod_FindName
 
 ==================
 */
-model_t *Mod_FindName (char *name)
+model_t *Mod_FindName (cstring name)
 {
 	int		i;
 	model_t	*mod;
@@ -236,7 +236,7 @@ Mod_TouchModel
 
 ==================
 */
-void Mod_TouchModel (char *name)
+void Mod_TouchModel (cstring name)
 {
 	model_t	*mod;
 
@@ -329,7 +329,7 @@ Mod_ForName
 Loads in a model for the given name
 ==================
 */
-model_t *Mod_ForName (char *name, qboolean crash)
+model_t *Mod_ForName (cstring name, qboolean crash)
 {
 	model_t	*mod;
 
@@ -1215,7 +1215,7 @@ Mod_LoadAliasFrame
 =================
 */
 typeless_ptr  Mod_LoadAliasFrame (typeless_ptr  pin, int *pframeindex, int numv,
-	trivertx_t *pbboxmin, trivertx_t *pbboxmax, aliashdr_t *pheader, char *name)
+	trivertx_t *pbboxmin, trivertx_t *pbboxmax, aliashdr_t *pheader, cstring name)
 {
 	trivertx_t		*pframe, *pinframe;
 	int				i, j;
@@ -1263,7 +1263,7 @@ Mod_LoadAliasGroup
 =================
 */
 typeless_ptr  Mod_LoadAliasGroup (typeless_ptr  pin, int *pframeindex, int numv,
-	trivertx_t *pbboxmin, trivertx_t *pbboxmax, aliashdr_t *pheader, char *name)
+	trivertx_t *pbboxmin, trivertx_t *pbboxmax, aliashdr_t *pheader, cstring name)
 {
 	daliasgroup_t		*pingroup;
 	maliasgroup_t		*paliasgroup;

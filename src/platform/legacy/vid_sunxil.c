@@ -77,8 +77,8 @@ typedef struct
 } modedesc_t;
 
 extern void M_Menu_Options_f();
-extern void M_Print (int cx, int cy, char *str);
-extern void M_PrintWhite (int cx, int cy, char *str);
+extern void M_Print (int cx, int cy, cstring str);
+extern void M_PrintWhite (int cx, int cy, cstring str);
 extern void M_DrawCharacter (int cx, int line, int num);
 extern void M_DrawTransPic (int x, int y, qpic_t *pic);
 extern void M_DrawPic (int x, int y, qpic_t *pic);
@@ -330,7 +330,7 @@ byte	surfcache[1024*1024];
 // VID_SetWindowTitle - set the window and icon titles
 //
 
-void VID_SetWindowTitle( Window win, char *pszName )
+void VID_SetWindowTitle( Window win, cstring pszName )
 {
 	XTextProperty	textprop;
 	XWMHints		*wmHints;
