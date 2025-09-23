@@ -51,12 +51,12 @@ typedef edict_t* edict_p;
 
 //============================================================================
 
-extern	dprograms_t*    progs;
+extern	dprograms_p    progs;
 extern	dfunction_p    pr_functions;
 extern	cstring         pr_strings;
-extern	ddef_t*         pr_globaldefs;
-extern	ddef_t*         pr_fielddefs;
-extern	dstatement_t*   pr_statements;
+extern	ddef_p         pr_globaldefs;
+extern	ddef_p         pr_fielddefs;
+extern	dstatement_p    pr_statements;
 extern	globalvars_t*   pr_global_struct;
 extern	float*          pr_globals;			// same as pr_global_struct
 

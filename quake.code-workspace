@@ -30,7 +30,9 @@
 			"vector": "c",
 			"cvar.h": "c",
 			"stddef.h": "c",
-			"types.h": "c"
+			"types.h": "c",
+			"ratio": "c",
+			"numbers": "c"
 		}
 	}
 }

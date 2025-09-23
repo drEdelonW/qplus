@@ -25,9 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-typedef struct
-{
-	int				s;
+typedef struct {
+	int			s;
 	dfunction_p f;
 } prstack_t;
 
@@ -47,203 +46,177 @@ int			pr_xstatement;
 
 int		pr_argc;
 
-cstring pr_opnames[] =
-{
-"DONE",
+cstring pr_opnames[] = {
+	"DONE",
 
-"MUL_F",
-"MUL_V",
-"MUL_FV",
-"MUL_VF",
+	"MUL_F",
+	"MUL_V",
+	"MUL_FV",
+	"MUL_VF",
 
-"DIV",
+	"DIV",
 
-"ADD_F",
-"ADD_V",
+	"ADD_F",
+	"ADD_V",
 
-"SUB_F",
-"SUB_V",
+	"SUB_F",
+	"SUB_V",
 
-"EQ_F",
-"EQ_V",
-"EQ_S",
-"EQ_E",
-"EQ_FNC",
+	"EQ_F",
+	"EQ_V",
+	"EQ_S",
+	"EQ_E",
+	"EQ_FNC",
 
-"NE_F",
-"NE_V",
-"NE_S",
-"NE_E",
-"NE_FNC",
+	"NE_F",
+	"NE_V",
+	"NE_S",
+	"NE_E",
+	"NE_FNC",
 
-"LE",
-"GE",
-"LT",
-"GT",
+	"LE",
+	"GE",
+	"LT",
+	"GT",
 
-"INDIRECT",
-"INDIRECT",
-"INDIRECT",
-"INDIRECT",
-"INDIRECT",
-"INDIRECT",
+	"INDIRECT",
+	"INDIRECT",
+	"INDIRECT",
+	"INDIRECT",
+	"INDIRECT",
+	"INDIRECT",
 
-"ADDRESS",
+	"ADDRESS",
 
-"STORE_F",
-"STORE_V",
-"STORE_S",
-"STORE_ENT",
-"STORE_FLD",
-"STORE_FNC",
+	"STORE_F",
+	"STORE_V",
+	"STORE_S",
+	"STORE_ENT",
+	"STORE_FLD",
+	"STORE_FNC",
 
-"STOREP_F",
-"STOREP_V",
-"STOREP_S",
-"STOREP_ENT",
-"STOREP_FLD",
-"STOREP_FNC",
+	"STOREP_F",
+	"STOREP_V",
+	"STOREP_S",
+	"STOREP_ENT",
+	"STOREP_FLD",
+	"STOREP_FNC",
 
-"RETURN",
+	"RETURN",
 
-"NOT_F",
-"NOT_V",
-"NOT_S",
-"NOT_ENT",
-"NOT_FNC",
+	"NOT_F",
+	"NOT_V",
+	"NOT_S",
+	"NOT_ENT",
+	"NOT_FNC",
 
-"IF",
-"IFNOT",
+	"IF",
+	"IFNOT",
 
-"CALL0",
-"CALL1",
-"CALL2",
-"CALL3",
-"CALL4",
-"CALL5",
-"CALL6",
-"CALL7",
-"CALL8",
+	"CALL0",
+	"CALL1",
+	"CALL2",
+	"CALL3",
+	"CALL4",
+	"CALL5",
+	"CALL6",
+	"CALL7",
+	"CALL8",
 
-"STATE",
+	"STATE",
 
-"GOTO",
+	"GOTO",
 
-"AND",
-"OR",
+	"AND",
+	"OR",
 
-"BITAND",
-"BITOR"
+	"BITAND",
+	"BITOR"
 };
 
-cstring PR_GlobalString (int ofs);
-cstring PR_GlobalStringNoContents (int ofs);
+cstring PR_GlobalString(int ofs);
+cstring PR_GlobalStringNoContents(int ofs);
 
 
 //=============================================================================
 
 /*
-=================
-PR_PrintStatement
-=================
+	=================
+	PR_PrintStatement
+	=================
 */
-void PR_PrintStatement (dstatement_t* s)
-{
-	int		i;
-
-	if ( (unsigned)s->op < sizeof(pr_opnames)/sizeof(pr_opnames[0]))
-	{
-		Con_Printf ("%s ",  pr_opnames[s->op]);
-		i = strlen(pr_opnames[s->op]);
-		for ( ; i<10 ; i++)
-			Con_Printf (" ");
+void PR_PrintStatement(dstatement_p s) {
+	if ((unsigned)s->op < (sizeof(pr_opnames) / sizeof(pr_opnames[0]))) {
+		Con_Printf("%s ",  pr_opnames[s->op]);
+		int i = strlen(pr_opnames[s->op]);
+		for (; i < 10; i++)
+			Con_Printf(" ");
 	}
 
-	if (s->op == OP_IF || s->op == OP_IFNOT)
-		Con_Printf ("%sbranch %i",PR_GlobalString(s->a),s->b);
-	else if (s->op == OP_GOTO)
-	{
-		Con_Printf ("branch %i",s->a);
-	}
-	else if ( (unsigned)(s->op - OP_STORE_F) < 6)
-	{
-		Con_Printf ("%s",PR_GlobalString(s->a));
-		Con_Printf ("%s", PR_GlobalStringNoContents(s->b));
-	}
-	else
-	{
+	if ((s->op == OP_IF) || (s->op == OP_IFNOT))
+		Con_Printf("%sbranch %i", PR_GlobalString(s->a),s->b);
+	else if (s->op == OP_GOTO) {
+		Con_Printf("branch %i",s->a);
+	} else if ((unsigned)(s->op - OP_STORE_F) < 6) {
+		Con_Printf("%s", PR_GlobalString(s->a));
+		Con_Printf("%s", PR_GlobalStringNoContents(s->b));
+	} else {
 		if (s->a)
-			Con_Printf ("%s",PR_GlobalString(s->a));
+			Con_Printf("%s", PR_GlobalString(s->a));
 		if (s->b)
-			Con_Printf ("%s",PR_GlobalString(s->b));
+			Con_Printf("%s", PR_GlobalString(s->b));
 		if (s->c)
-			Con_Printf ("%s", PR_GlobalStringNoContents(s->c));
+			Con_Printf("%s", PR_GlobalStringNoContents(s->c));
 	}
-	Con_Printf ("\n");
+	Con_Printf("\n");
 }
 
 /*
-============
-PR_StackTrace
-============
+	============
+	PR_StackTrace
+	============
 */
-void PR_StackTrace(){
-	dfunction_p f;
-	int			i;
-
-	if (pr_depth == 0)
-	{
-		Con_Printf ("<NO STACK>\n");
+void PR_StackTrace() {
+	if (pr_depth == 0) {
+		Con_Printf("<NO STACK>\n");
 		return;
 	}
 
 	pr_stack[pr_depth].f = pr_xfunction;
-	for (i=pr_depth ; i>=0 ; i--)
-	{
-		f = pr_stack[i].f;
+	for (int i = pr_depth; i >= 0; i--) {
+		dfunction_p f = pr_stack[i].f;
 
-		if (!f)
-		{
-			Con_Printf ("<NO FUNCTION>\n");
-		}
-		else
-			Con_Printf ("%12s : %s\n", pr_strings + f->s_file, pr_strings + f->s_name);
+		if (!f) {
+			Con_Printf("<NO FUNCTION>\n");
+		} else
+			Con_Printf("%12s : %s\n", pr_strings + f->s_file, pr_strings + f->s_name);
 	}
 }
 
 
 /*
-============
-PR_Profile_f
+	============
+	PR_Profile_f
 
-============
+	============
 */
-void PR_Profile_f()
-{
-	dfunction_p f;
+void PR_Profile_f() {
     dfunction_p best;
-	int			max;
-	int			num;
-	int			i;
 
-	num = 0;
-	do
-	{
-		max = 0;
+	int num = 0;
+	do {
+		int max = 0;
 		best = NULL;
-		for (i=0 ; i<progs->numfunctions ; i++)
-		{
-			f = &pr_functions[i];
-			if (f->profile > max)
-			{
+		for (int i = 0; i < progs->numfunctions; i++) {
+			dfunction_p f = &pr_functions[i];
+			if (f->profile > max) {
 				max = f->profile;
 				best = f;
 			}
 		}
-		if (best)
-		{
+		if (best) {
 			if (num < 10)
-				Con_Printf ("%7i %s\n", best->profile, pr_strings+best->s_name);
+				Con_Printf("%7i %s\n", best->profile, pr_strings+best->s_name);
 			num++;
 			best->profile = 0;
 		}
@@ -269,7 +242,7 @@ void PR_RunError (cstring error, ...)
 
 	PR_PrintStatement (pr_statements + pr_xstatement);
 	PR_StackTrace ();
-	Con_Printf ("%s\n", string);
+	Con_Printf("%s\n", string);
 
 	pr_depth = 0;		// dump the stack so host_error can shutdown functions
 
@@ -307,7 +280,7 @@ int PR_EnterFunction (dfunction_p f)
 		PR_RunError ("PR_ExecuteProgram: locals stack overflow\n");
 
 	for (i=0 ; i < c ; i++)
-		localstack[localstack_used+i] = ((int* )pr_globals)[f->parm_start + i];
+		localstack[localstack_used+i] = ((int*)pr_globals)[f->parm_start + i];
 	localstack_used += c;
 
 // copy parameters
@@ -316,7 +289,7 @@ int PR_EnterFunction (dfunction_p f)
 	{
 		for (j=0 ; j<f->parm_size[i] ; j++)
 		{
-			((int* )pr_globals)[o] = ((int* )pr_globals)[OFS_PARM0+i*3+j];
+			((int*)pr_globals)[o] = ((int*)pr_globals)[OFS_PARM0+i*3+j];
 			o++;
 		}
 	}
@@ -344,7 +317,7 @@ int PR_LeaveFunction()
 		PR_RunError ("PR_ExecuteProgram: locals stack underflow\n");
 
 	for (i=0 ; i < c ; i++)
-		((int* )pr_globals)[pr_xfunction->parm_start + i] = localstack[localstack_used+i];
+		((int*)pr_globals)[pr_xfunction->parm_start + i] = localstack[localstack_used+i];
 
 // up stack
 	pr_depth--;
@@ -364,7 +337,7 @@ void PR_ExecuteProgram (func_t fnum)
     eval_p  b;
     eval_p  c;
 	int			s;
-	dstatement_t* st;
+	dstatement_p  st;
 	dfunction_p f;
     dfunction_p newf;
 	int		runaway;
@@ -395,9 +368,9 @@ while (1)
 	s++;	// next statement
 
 	st = &pr_statements[s];
-	a = (eval_p  )&pr_globals[st->a];
-	b = (eval_p  )&pr_globals[st->b];
-	c = (eval_p  )&pr_globals[st->c];
+	a = (eval_p)&pr_globals[st->a];
+	b = (eval_p)&pr_globals[st->b];
+	c = (eval_p)&pr_globals[st->c];
 
 	if (!--runaway)
 		PR_RunError ("runaway loop error");
@@ -551,11 +524,11 @@ while (1)
 	case OP_STOREP_FLD:		// integers
 	case OP_STOREP_S:
 	case OP_STOREP_FNC:		// pointers
-		ptr = (eval_p  )((byte* )sv.edicts + b->_int);
+		ptr = (eval_p)((byte*)sv.edicts + b->_int);
 		ptr->_int = a->_int;
 		break;
 	case OP_STOREP_V:
-		ptr = (eval_p  )((byte* )sv.edicts + b->_int);
+		ptr = (eval_p)((byte*)sv.edicts + b->_int);
 		ptr->vector[0] = a->vector[0];
 		ptr->vector[1] = a->vector[1];
 		ptr->vector[2] = a->vector[2];
@@ -568,7 +541,7 @@ while (1)
 #endif
 		if (ed == (edict_p)sv.edicts && sv.state == ss_active)
 			PR_RunError ("assignment to world entity");
-		c->_int = (byte* )((int* )&ed->v + b->_int) - (byte* )sv.edicts;
+		c->_int = (byte*)((int*)&ed->v + b->_int) - (byte*)sv.edicts;
 		break;
 
 	case OP_LOAD_F:
@@ -580,7 +553,7 @@ while (1)
 #ifdef PARANOID
 		NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
-		a = (eval_p  )((int* )&ed->v + b->_int);
+		a = (eval_p)((int*)&ed->v + b->_int);
 		c->_int = a->_int;
 		break;
 
@@ -589,7 +562,7 @@ while (1)
 #ifdef PARANOID
 		NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
-		a = (eval_p  )((int* )&ed->v + b->_int);
+		a = (eval_p)((int*)&ed->v + b->_int);
 		c->vector[0] = a->vector[0];
 		c->vector[1] = a->vector[1];
 		c->vector[2] = a->vector[2];

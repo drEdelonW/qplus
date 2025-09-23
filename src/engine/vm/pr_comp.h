@@ -132,6 +132,7 @@ typedef struct statement_s{
 	uint16_t	op;
 	int16_t	a,b,c;
 } dstatement_t;
+typedef dstatement_t* dstatement_p;
 
 typedef struct{
 	uint16_t	type;		// if DEF_SAVEGLOBGAL bit is set
@@ -139,6 +140,7 @@ typedef struct{
 	uint16_t	ofs;
 	int			s_name;
 } ddef_t;
+typedef ddef_t* ddef_p;
 #define	DEF_SAVEGLOBAL	(1<<15)
 
 #define	MAX_PARMS	8
@@ -184,4 +186,5 @@ typedef struct{
 
 	int		entityfields;
 } dprograms_t;
+typedef dprograms_t* dprograms_p;
 
