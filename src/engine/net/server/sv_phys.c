@@ -373,7 +373,7 @@ void SV_AddGravity (edict_p ent)
 	else
 		ent_gravity = 1.0;
 #else
-	eval_t	*val;
+	eval_p val;
 
 	val = GetEdictFieldValue(ent, "gravity");
 	if (val && val->_float)

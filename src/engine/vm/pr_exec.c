@@ -361,9 +361,9 @@ PR_ExecuteProgram
 */
 void PR_ExecuteProgram (func_t fnum)
 {
-	eval_t* a;
-    eval_t* b;
-    eval_t* c;
+	eval_p  a;
+    eval_p  b;
+    eval_p  c;
 	int			s;
 	dstatement_t* st;
 	dfunction_t* f;
@@ -372,7 +372,7 @@ void PR_ExecuteProgram (func_t fnum)
 	int		i;
 	edict_p ed;
 	int		exitdepth;
-	eval_t	*ptr;
+	eval_p ptr;
 
 	if (!fnum || fnum >= progs->numfunctions)
 	{
@@ -396,9 +396,9 @@ while (1)
 	s++;	// next statement
 
 	st = &pr_statements[s];
-	a = (eval_t* )&pr_globals[st->a];
-	b = (eval_t* )&pr_globals[st->b];
-	c = (eval_t* )&pr_globals[st->c];
+	a = (eval_p  )&pr_globals[st->a];
+	b = (eval_p  )&pr_globals[st->b];
+	c = (eval_p  )&pr_globals[st->c];
 
 	if (!--runaway)
 		PR_RunError ("runaway loop error");
@@ -552,11 +552,11 @@ while (1)
 	case OP_STOREP_FLD:		// integers
 	case OP_STOREP_S:
 	case OP_STOREP_FNC:		// pointers
-		ptr = (eval_t* )((byte* )sv.edicts + b->_int);
+		ptr = (eval_p  )((byte* )sv.edicts + b->_int);
 		ptr->_int = a->_int;
 		break;
 	case OP_STOREP_V:
-		ptr = (eval_t* )((byte* )sv.edicts + b->_int);
+		ptr = (eval_p  )((byte* )sv.edicts + b->_int);
 		ptr->vector[0] = a->vector[0];
 		ptr->vector[1] = a->vector[1];
 		ptr->vector[2] = a->vector[2];
@@ -581,7 +581,7 @@ while (1)
 #ifdef PARANOID
 		NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
-		a = (eval_t* )((int* )&ed->v + b->_int);
+		a = (eval_p  )((int* )&ed->v + b->_int);
 		c->_int = a->_int;
 		break;
 
@@ -590,7 +590,7 @@ while (1)
 #ifdef PARANOID
 		NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
-		a = (eval_t* )((int* )&ed->v + b->_int);
+		a = (eval_p  )((int* )&ed->v + b->_int);
 		c->vector[0] = a->vector[0];
 		c->vector[1] = a->vector[1];
 		c->vector[2] = a->vector[2];

@@ -1507,7 +1507,7 @@ Host_Give_f
 void Host_Give_f(){
 	cstring t;
 	int		v;
-	eval_t	*val;
+	eval_p val;
 
 	if (cmd_source == src_command){
 		Cmd_ForwardToServer ();

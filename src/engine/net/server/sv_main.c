@@ -520,7 +520,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_t* msg){
 #ifdef QUAKE2
 	int items = (int)ent->v.items | ((int)ent->v.items2 << 23);
 #else
-	eval_t* val = GetEdictFieldValue(ent, "items2");
+	eval_p val = GetEdictFieldValue(ent, "items2");
     int items = (int)ent->v.items | (
         (val)?
             ((int)val->_float << 23) :

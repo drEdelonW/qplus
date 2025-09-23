@@ -30,6 +30,7 @@ typedef union eval_s {
 	int         _int;
 	int         edict;
 } eval_t;
+typedef eval_t* eval_p;
 
 #define	MAX_ENT_LEAFS	16
 typedef struct edict_s {

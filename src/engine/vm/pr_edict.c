@@ -228,7 +228,7 @@ dfunction_t *ED_FindFunction (cstring name)
 }
 
 
-eval_t *GetEdictFieldValue(edict_p ed, cstring field)
+eval_p GetEdictFieldValue(edict_p ed, cstring field)
 {
 	ddef_t			*def = NULL;
 	int				i;
@@ -256,7 +256,7 @@ Done:
 	if (!def)
 		return NULL;
 
-	return (eval_t *)((cstring )&ed->v + def->ofs*4);
+	return (eval_p )((cstring )&ed->v + def->ofs*4);
 }
 
 
@@ -267,7 +267,7 @@ PR_ValueString
 Returns a string describing *data in a type specific manner
 =============
 */
-cstring PR_ValueString (etype_t type, eval_t *val)
+cstring PR_ValueString (etype_t type, eval_p val)
 {
 	static char	line[256];
 	ddef_t		*def;
@@ -319,7 +319,7 @@ Returns a string describing *data in a type specific manner
 Easier to parse than PR_ValueString
 =============
 */
-cstring PR_UglyValueString (etype_t type, eval_t *val)
+cstring PR_UglyValueString (etype_t type, eval_p val)
 {
 	static char	line[256];
 	ddef_t		*def;
@@ -461,7 +461,7 @@ void ED_Print (edict_p ed)
 		while (l++ < 15)
 			Con_Printf (" ");
 
-		Con_Printf ("%s\n", PR_ValueString(d->type, (eval_t *)v));
+		Con_Printf ("%s\n", PR_ValueString(d->type, (eval_p )v));
 	}
 }
 
@@ -506,7 +506,7 @@ void ED_Write (FILE *f, edict_p ed)
 			continue;
 
 		fprintf (f, "\"%s\" ",name);
-		fprintf (f, "\"%s\"\n", PR_UglyValueString(d->type, (eval_t *)v));
+		fprintf (f, "\"%s\"\n", PR_UglyValueString(d->type, (eval_p )v));
 	}
 
 	fprintf (f, "}\n");
@@ -626,7 +626,7 @@ void ED_WriteGlobals (FILE *f)
 
 		name = pr_strings + def->s_name;
 		fprintf (f, "\"%s\" ", name);
-		fprintf (f, "\"%s\"\n", PR_UglyValueString(type, (eval_t *)&pr_globals[def->ofs]));
+		fprintf (f, "\"%s\"\n", PR_UglyValueString(type, (eval_p )&pr_globals[def->ofs]));
 	}
 	fprintf (f, "}\n");
 }
