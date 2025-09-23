@@ -133,7 +133,7 @@ void Cbuf_InsertText(cstring text){
 */
 void Cbuf_Execute(void){
 	int		i;
-	char	*text;
+	cstring text;
 	char	line[1024];
 	int		quotes;
 

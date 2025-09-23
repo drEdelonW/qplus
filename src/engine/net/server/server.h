@@ -53,13 +53,13 @@ typedef struct
 #endif
 	char		modelname[64];		// maps/<name>.bsp, for model_precache[0]
 	struct model_s 	*worldmodel;
-	char		*model_precache[MAX_MODELS];	// NULL terminated
+	cstring model_precache[MAX_MODELS];	// NULL terminated
 	struct model_s	*models[MAX_MODELS];
-	char		*sound_precache[MAX_SOUNDS];	// NULL terminated
-	char		*lightstyles[MAX_LIGHTSTYLES];
+	cstring sound_precache[MAX_SOUNDS];	// NULL terminated
+	cstring lightstyles[MAX_LIGHTSTYLES];
 	int			num_edicts;
 	int			max_edicts;
-	edict_t		*edicts;			// can NOT be array indexed, because
+	edict_p edicts;			// can NOT be array indexed, because
 									// edict_t is variable sized, but can
 									// be used to reference the world ent
 	server_state_t	state;			// some actions are only valid during load
@@ -97,7 +97,7 @@ typedef struct client_s
 	sizebuf_t		message;			// can be added to at any time,
 										// copied and clear once per frame
 	byte			msgbuf[MAX_MSGLEN];
-	edict_t*        edict;				// EDICT_NUM(clientnum+1)
+	edict_p        edict;				// EDICT_NUM(clientnum+1)
 	char			name[32];			// for printing to other people
 	int				colors;
 
@@ -207,14 +207,14 @@ extern	jmp_buf 	host_abortserver;
 
 extern	double		host_time;
 
-extern	edict_t		*sv_player;
+extern	edict_p sv_player;
 
 //===========================================================
 
 void SV_Init();
 
 void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count);
-void SV_StartSound (edict_t *entity, int channel, cstring sample, int volume,
+void SV_StartSound (edict_p entity, int channel, cstring sample, int volume,
     float attenuation);
 
 void SV_DropClient (qboolean crash);
@@ -236,10 +236,10 @@ void SV_BroadcastPrintf (cstring fmt, ...);
 
 void SV_Physics();
 
-qboolean SV_CheckBottom (edict_t *ent);
-qboolean SV_movestep (edict_t *ent, vec3_t move, qboolean relink);
+qboolean SV_CheckBottom (edict_p ent);
+qboolean SV_movestep (edict_p ent, vec3_t move, qboolean relink);
 
-void SV_WriteClientdataToMessage (edict_t *ent, sizebuf_p msg);
+void SV_WriteClientdataToMessage (edict_p ent, sizebuf_p msg);
 
 void SV_MoveToGoal();
 

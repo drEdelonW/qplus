@@ -314,7 +314,7 @@ void Host_Changelevel_f()
 #ifdef QUAKE2
 	char	level[MAX_QPATH];
 	char	_startspot[MAX_QPATH];
-	char	*startspot;
+	cstring startspot;
 
 	if (Cmd_Argc() < 2)
 	{
@@ -551,15 +551,15 @@ void Host_Savegame_f()
 Host_Loadgame_f
 ===============
 */
-void Host_Loadgame_f()
-{
+void Host_Loadgame_f() {
 	char	name[MAX_OSPATH];
-	FILE	*f;
+	FILE*	f;
 	char	mapname[MAX_QPATH];
 	float	time, tfloat;
-	char	str[32768], *start;
+	char	str[32768];
+	cstring	start;
 	int		i, r;
-	edict_t	*ent;
+	edict_p ent;
 	int		entnum;
 	int		version;
 	float			spawn_parms[NUM_SPAWN_PARMS];
@@ -706,7 +706,7 @@ void SaveGamestate()
 	FILE	*f;
 	int		i;
 	char	comment[SAVEGAME_COMMENT_LENGTH+1];
-	edict_t	*ent;
+	edict_p ent;
 
 	sprintf (name, "%s/%s.gip", com_gamedir, sv.name);
 
@@ -754,12 +754,13 @@ void SaveGamestate()
 int LoadGamestate(cstring level, cstring startspot)
 {
 	char	name[MAX_OSPATH];
-	FILE	*f;
+	FILE*	f;
 	char	mapname[MAX_QPATH];
 	float	time, sk;
-	char	str[32768], *start;
+	char	str[32768];
+	cstring start;
 	int		i, r;
-	edict_t	*ent;
+	edict_p	ent;
 	int		entnum;
 	int		version;
 //	float	spawn_parms[NUM_SPAWN_PARMS];
@@ -859,7 +860,7 @@ void Host_Changelevel2_f()
 {
 	char	level[MAX_QPATH];
 	char	_startspot[MAX_QPATH];
-	char	*startspot;
+	cstring startspot;
 
 	if (Cmd_Argc() < 2)
 	{
@@ -902,7 +903,7 @@ Host_Name_f
 */
 void Host_Name_f()
 {
-	char	*newName;
+	cstring newName;
 
 	if (Cmd_Argc () == 1)
 	{
@@ -1003,7 +1004,7 @@ void Host_Say(qboolean teamonly)
 	client_t *client;
 	client_t *save;
 	int		j;
-	char	*p;
+	cstring p;
 	char	text[64];
 	qboolean	fromServer = false;
 
@@ -1079,7 +1080,7 @@ void Host_Tell_f(void)
 	client_t *client;
 	client_t *save;
 	int		j;
-	char	*p;
+	cstring p;
 	char	text[64];
 
 	if (cmd_source == src_command)
@@ -1270,7 +1271,7 @@ void Host_Spawn_f()
 {
 	int		i;
 	client_t	*client;
-	edict_t	*ent;
+	edict_p ent;
 
 	if (cmd_source == src_command)
 	{
@@ -1413,9 +1414,9 @@ Kicks a user off of the server
 */
 void Host_Kick_f()
 {
-	char		*who;
-	char		*message = NULL;
-	client_t	*save;
+	cstring who;
+	cstring message = NULL;
+	client_t*	save;
 	int			i;
 	qboolean	byNumber = false;
 
@@ -1504,7 +1505,7 @@ Host_Give_f
 ==================
 */
 void Host_Give_f(){
-	char	*t;
+	cstring t;
 	int		v;
 	eval_t	*val;
 
@@ -1645,10 +1646,10 @@ void Host_Give_f(){
     }
 }
 
-edict_t	*FindViewthing()
+edict_p FindViewthing()
 {
 	int		i;
-	edict_t	*e;
+	edict_p e;
 
 	for (i=0 ; i<sv.num_edicts ; i++)
 	{
@@ -1667,7 +1668,7 @@ Host_Viewmodel_f
 */
 void Host_Viewmodel_f()
 {
-	edict_t	*e;
+	edict_p e;
 	model_t	*m;
 
 	e = FindViewthing ();
@@ -1692,7 +1693,7 @@ Host_Viewframe_f
 */
 void Host_Viewframe_f()
 {
-	edict_t	*e;
+	edict_p e;
 	int		f;
 	model_t	*m;
 
@@ -1729,7 +1730,7 @@ Host_Viewnext_f
 */
 void Host_Viewnext_f()
 {
-	edict_t	*e;
+	edict_p e;
 	model_t	*m;
 
 	e = FindViewthing ();
@@ -1751,7 +1752,7 @@ Host_Viewprev_f
 */
 void Host_Viewprev_f()
 {
-	edict_t	*e;
+	edict_p e;
 	model_t	*m;
 
 	e = FindViewthing ();

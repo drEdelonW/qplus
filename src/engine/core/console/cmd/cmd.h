@@ -89,14 +89,14 @@ qboolean Cmd_Exists(cstring cmd_name);
 
 // attempts to match a partial command for automatic command line completion
 // returns NULL if nothing fits
-char 	*Cmd_CompleteCommand(cstring partial);
+cstring Cmd_CompleteCommand(cstring partial);
 
 // The functions that execute commands get their parameters with these
 // functions. Cmd_Argv() will return an empty string, not a NULL
 // if arg > argc, so string operations are allways safe.
 int		Cmd_Argc(void);
-char	*Cmd_Argv(int arg);
-char	*Cmd_Args(void);
+cstring Cmd_Argv(int arg);
+cstring Cmd_Args(void);
 
 // Returns the position (1 to argc-1) in the command's argument list
 // where the given parameter apears, or 0 if not present

@@ -493,7 +493,7 @@ void ResetSharedFrameBuffers(void)
 void VID_MenuDraw( void )
 {
     qpic_p p;
-    char		*ptr;
+    cstring ptr;
     int			i, j, column, row, dup;
     char		temp[100];
 

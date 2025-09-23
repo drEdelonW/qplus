@@ -3,6 +3,7 @@
 #include "console.h"
 #include "types.h"
 #include "q_tools.h"
+#include "zone.h"
 
 extern cstring cmd_argv[];
 

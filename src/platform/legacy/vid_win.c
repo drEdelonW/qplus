@@ -1055,7 +1055,7 @@ VID_GetModeDescriptionMemCheck
 */
 cstring VID_GetModeDescriptionMemCheck (int mode)
 {
-	char		*pinfo;
+	cstring pinfo;
 	vmode_t		*pv;
 
 	if ((mode < 0) || (mode >= nummodes))
@@ -1084,7 +1084,7 @@ VID_GetModeDescription
 */
 cstring VID_GetModeDescription (int mode)
 {
-	char		*pinfo;
+	cstring pinfo;
 	vmode_t		*pv;
 
 	if ((mode < 0) || (mode >= nummodes))
@@ -1937,7 +1937,7 @@ VID_DescribeModes_f
 void VID_DescribeModes_f()
 {
 	int			i, lnummodes;
-	char		*pinfo;
+	cstring pinfo;
 	qboolean	na;
 	vmode_t		*pv;
 
@@ -3052,7 +3052,7 @@ static int	vid_line, vid_wmodes;
 typedef struct
 {
 	int		modenum;
-	char	*desc;
+	cstring desc;
 	int		iscur;
 	int		ismode13;
 	int		width;
@@ -3072,7 +3072,7 @@ VID_MenuDraw
 void VID_MenuDraw()
 {
 	qpic_p p;
-	char		*ptr;
+	cstring ptr;
 	int			lnummodes, i, j, k, column, row, dup, dupmode;
 	char		temp[100];
 	vmode_t		*pv;

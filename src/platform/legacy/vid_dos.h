@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct vmode_s {
 	struct vmode_s	*pnext;
-	char		*name;
-	char		*header;
+	cstring name;
+	cstring header;
 	unsigned	width;
 	unsigned	height;
 	float		aspect;

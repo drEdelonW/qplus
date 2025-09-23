@@ -1,18 +1,17 @@
 #pragma once
 
-
+#include "types.h"
 //=============================================================================
 
 // the host system specifies the base of the directory tree, the
 // command line parms passed to the program, and the amount of memory
 // available for the program to use
 
-typedef struct
-{
-	char	*basedir;
-	char	*cachedir;		// for development over ISDN lines
+typedef struct {
+	cstring basedir;
+	cstring cachedir;		// for development over ISDN lines
 	int		argc;
 	char	**argv;
-	void	*membase;
+	typeless_ptr membase;
 	int		memsize;
 } quakeparms_t;

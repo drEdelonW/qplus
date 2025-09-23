@@ -78,7 +78,7 @@ int		mouserate = MOUSE_DEFAULTSAMPLERATE;
 // CVAR(vid_redrawfull, "0");
 // CVAR_ARC(vid_waitforrefresh, "0");
 
-char	*framebuffer_ptr;
+cstring framebuffer_ptr;
 
 // cvar_t  mouse_button_commands[3] =
 // {
@@ -986,7 +986,7 @@ VID_ModeInfo
 */
 cstring VID_ModeInfo (int modenum)
 {
-	static char	*badmodestr = "Bad mode number";
+	static cstring badmodestr = "Bad mode number";
 	static char modestr[40];
 
 	if (modenum == 0)

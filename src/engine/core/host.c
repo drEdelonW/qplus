@@ -508,7 +508,7 @@ Add them exactly as if they had been typed at the console
 */
 void Host_GetConsoleCommands()
 {
-	char	*cmd;
+	cstring cmd;
 
 	while (1)
 	{
@@ -749,7 +749,7 @@ extern int vcrFile;
 void Host_InitVCR (quakeparms_t *parms)
 {
 	int		i, len, n;
-	char	*p;
+	cstring p;
 
 	if (COM_CheckParm("-playback"))
 	{

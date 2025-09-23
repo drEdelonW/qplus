@@ -12,9 +12,9 @@ typedef struct sizebuf_s {
 } sizebuf_t;
 typedef sizebuf_t* sizebuf_p;
 
-void SZ_Alloc (sizebuf_p buf, int startsize);
-void SZ_Free (sizebuf_p buf);
-void SZ_Clear (sizebuf_p buf);
-typeless_ptr SZ_GetSpace (sizebuf_p buf, int length);
-void SZ_Write (sizebuf_p buf, typeless_ptr data, int length);
-void SZ_Print (sizebuf_p buf, cstring data);	// strcats onto the sizebuf
+void SZ_Alloc(sizebuf_p buf, int startsize);
+void SZ_Free(sizebuf_p buf);
+void SZ_Clear(sizebuf_p buf);
+typeless_ptr SZ_GetSpace(sizebuf_p buf, int length);
+void SZ_Write(sizebuf_p buf, typeless_ptr data, int length);
+void SZ_Print(sizebuf_p buf, cstring data);	// strcats onto the sizebuf

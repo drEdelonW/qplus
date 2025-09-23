@@ -155,7 +155,7 @@ void Sys_Error(cstring error, ...){
 	exit (1);
 }
 
-void Sys_Warn(char* warning, ...){
+void Sys_Warn(cstring warning, ...){
     va_list argptr;
     char    string[1024];
 
@@ -172,7 +172,7 @@ void Sys_Warn(char* warning, ...){
     returns -1 if not present
 ============
 */
-int	Sys_FileTime(char* path){
+int	Sys_FileTime(cstring path){
 	struct stat buf;
 
 	if (stat(path, &buf) == -1)
@@ -182,11 +182,11 @@ int	Sys_FileTime(char* path){
 }
 
 
-void Sys_mkdir(char* path){
+void Sys_mkdir(cstring path){
     mkdir(path, 0777);
 }
 
-int Sys_FileOpenRead(char* path, int* handle){
+int Sys_FileOpenRead(cstring path, int* handle){
 	struct stat	fileinfo;
 
     int h = open(path, O_RDONLY, 0666);
@@ -200,7 +200,7 @@ int Sys_FileOpenRead(char* path, int* handle){
 	return fileinfo.st_size;
 }
 
-int Sys_FileOpenWrite(char* path){
+int Sys_FileOpenWrite(cstring path){
 	umask (0);
 
 	int handle = open(path, (O_RDWR | O_CREAT | O_TRUNC), 0666);
@@ -227,7 +227,7 @@ int Sys_FileRead(int handle, typeless_ptr dest, int count){
     return read(handle, dest, count);
 }
 
-void Sys_DebugLog(char* file, char* fmt, ...){
+void Sys_DebugLog(cstring file, cstring fmt, ...){
     va_list argptr;
     static char data[1024];
 
@@ -240,11 +240,11 @@ void Sys_DebugLog(char* file, char* fmt, ...){
     close(fd);
 }
 
-void Sys_EditFile(char* filename){
+void Sys_EditFile(cstring filename){
 	char cmd[256];
-	char* editor;
+	cstring editor;
 
-	char* term = getenv("TERM");
+	cstring term = getenv("TERM");
 	if ((term) && (!strcmp(term, "xterm"))){
 		editor = getenv("VISUAL");
 		if (!editor)
@@ -291,7 +291,7 @@ void floating_point_exception_handler(int whatever){
 	signal(SIGFPE, floating_point_exception_handler);
 }
 
-char* Sys_ConsoleInput(){
+cstring Sys_ConsoleInput(){
     static char text[256];
 
     if (cls.state == ca_dedicated) {
@@ -412,7 +412,7 @@ void Sys_MakeCodeWriteable(unsigned long startaddr, unsigned long length){
 //	fprintf(stderr, "writable code %lx(%lx)-%lx, length=%lx\n", startaddr,
 //			addr, startaddr+length, length);
 
-	int r = mprotect((char*)addr, (length + startaddr - addr + psize), 7);
+	int r = mprotect((cstring)addr, (length + startaddr - addr + psize), 7);
 
 	if (r < 0){
         Sys_Error("Protection change failed\n");

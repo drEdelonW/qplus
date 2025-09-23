@@ -80,8 +80,8 @@ extern void M_Menu_Options_f();
 extern void M_Print (int cx, int cy, cstring str);
 extern void M_PrintWhite (int cx, int cy, cstring str);
 extern void M_DrawCharacter (int cx, int line, int num);
-extern void M_DrawTransPic (int x, int y, qpic_t *pic);
-extern void M_DrawPic (int x, int y, qpic_t *pic);
+extern void M_DrawTransPic (int x, int y, qpic_p pic);
+extern void M_DrawPic (int x, int y, qpic_p pic);
 
 extern int sb_updates;
 
@@ -307,8 +307,8 @@ static Cursor CreateNullCursor(Display *display, Window root)
 
 void VID_MenuDraw( void )
 {
-	qpic_t		*p;
-    char		*ptr;
+	qpic_p p;
+    cstring ptr;
     int			i, j, column, row, dup;
     char		temp[100];
 

@@ -99,7 +99,7 @@ void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count){
     ==================
 */
 void SV_StartSound(
-    edict_t* entity,
+    edict_p entity,
     int     channel,
     cstring   sample,
     int     volume,
@@ -380,14 +380,14 @@ byte* SV_FatPVS(vec3_t org){
 
 	=============
 */
-void SV_WriteEntitiesToClient(edict_t* clent, sizebuf_t* msg){
+void SV_WriteEntitiesToClient(edict_p clent, sizebuf_t* msg){
     // find the client's PVS
 	vec3_t  org;
 	VectorAdd(clent->v.origin, clent->v.view_ofs, org);
 	byte* pvs = SV_FatPVS(org);
 
     // send over all entities (excpet the client) that touch the pvs
-	edict_t* ent = NEXT_EDICT(sv.edicts);
+	edict_p ent = NEXT_EDICT(sv.edicts);
 	for (int e = 1; e < sv.num_edicts; e++, ent = NEXT_EDICT(ent))	{
 #ifdef QUAKE2
 		// don't send if flagged for NODRAW and there are no lighting effects
@@ -465,7 +465,7 @@ void SV_WriteEntitiesToClient(edict_t* clent, sizebuf_t* msg){
     =============
 */
 void SV_CleanupEnts(){
-	edict_t* ent = NEXT_EDICT(sv.edicts);
+	edict_p ent = NEXT_EDICT(sv.edicts);
 	for (int e = 1; e < sv.num_edicts; e++, ent = NEXT_EDICT(ent)){
 		ent->v.effects = (int)ent->v.effects & ~EF_MUZZLEFLASH;
 	}
@@ -477,12 +477,12 @@ void SV_CleanupEnts(){
 
     ==================
 */
-void SV_WriteClientdataToMessage(edict_t* ent, sizebuf_t* msg){
+void SV_WriteClientdataToMessage(edict_p ent, sizebuf_t* msg){
 //
 // send a damage message
 //
 	if (ent->v.dmg_take || ent->v.dmg_save){
-		edict_t* other = PROG_TO_EDICT(ent->v.dmg_inflictor);
+		edict_p other = PROG_TO_EDICT(ent->v.dmg_inflictor);
 		MSG_WriteByte(msg, svc_damage);
 		MSG_WriteByte(msg, ent->v.dmg_save);
 		MSG_WriteByte(msg, ent->v.dmg_take);
@@ -767,7 +767,7 @@ void SV_CreateBaseline(){
 
 	for (int entnum = 0; entnum < sv.num_edicts ; entnum++){
 	// get the current server version
-		edict_t* svent = EDICT_NUM(entnum);
+		edict_p svent = EDICT_NUM(entnum);
 		if ((svent->free) ||
 		    (entnum > svs.maxclients && !svent->v.modelindex))
 			continue;
@@ -872,7 +872,7 @@ void SV_SpawnServer (cstring server, cstring startspot)
 void SV_SpawnServer (cstring server)
 #endif
 {
-	edict_t* ent;
+	edict_p ent;
 
 	// let's not have any servers with no name
 	if (hostname.string[0] == 0)

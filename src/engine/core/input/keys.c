@@ -594,7 +594,7 @@ Should NOT be called during an interrupt!
 ===================
 */
 void Key_Event(int key, qboolean down){
-	char	*kb;
+	cstring kb;
 	char	cmd[MAXCMD];
 
 	keydown[key] = down;

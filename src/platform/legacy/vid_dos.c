@@ -170,7 +170,7 @@ VID_ModeInfo
 */
 cstring VID_ModeInfo (int modenum, char** ppheader)
 {
-	static char	*badmodestr = "Bad mode number";
+	static cstring badmodestr = "Bad mode number";
 	vmode_t		*pv;
 
 	pv = VID_GetModePtr (modenum);
@@ -412,7 +412,7 @@ VID_DescribeModes_f
 void VID_DescribeModes_f()
 {
 	int			i, nummodes;
-	char		*pinfo, *pheader;
+	cstring pinfo, pheader;
 	vmode_t		*pv;
 	qboolean	na;
 
@@ -452,7 +452,7 @@ VID_GetModeDescription
 */
 cstring VID_GetModeDescription (int mode)
 {
-	char		*pinfo, *pheader;
+	cstring pinfo, pheader;
 	vmode_t		*pv;
 
 	pv = VID_GetModePtr (mode);
@@ -553,7 +553,7 @@ static int	vid_line, vid_wmodes, vid_column_size;
 typedef struct
 {
 	int		modenum;
-	char	*desc;
+	cstring desc;
 	int		iscur;
 } modedesc_t;
 
@@ -571,7 +571,7 @@ VID_MenuDraw
 void VID_MenuDraw()
 {
 	qpic_p p;
-	char		*ptr;
+	cstring ptr;
 	int			nummodes, i, j, column, row, dup;
 	char		temp[100];
 

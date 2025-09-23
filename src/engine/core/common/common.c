@@ -23,10 +23,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define NUM_SAFE_ARGVS  7
 
-static char     *largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
-static char     *argvdummy = " ";
+static cstring largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
+static cstring argvdummy = " ";
 
-static char     *safeargvs[NUM_SAFE_ARGVS] =
+static cstring safeargvs[NUM_SAFE_ARGVS] =
 	{"-stdvid", "-nolan", "-nosound", "-nocdaudio", "-nojoy", "-nomouse", "-dibonly"};
 
 #include "cvar_q1.h"
@@ -108,7 +108,7 @@ COM_SkipPath
 */
 cstring COM_SkipPath (cstring pathname)
 {
-	char    *last;
+	cstring last;
 
 	last = pathname;
 	while (*pathname)
@@ -188,7 +188,7 @@ COM_DefaultExtension
 */
 void COM_DefaultExtension (cstring path, cstring extension)
 {
-	char    *src;
+	cstring src;
 //
 // if path doesn't have a .EXT, append extension
 // (extension should include the .)
@@ -449,7 +449,7 @@ varargs versions of all text functions.
 FIXME: make this buffer size safe someday
 ============
 */
-char    *va(cstring format, ...)
+cstring va(cstring format, ...)
 {
 	va_list         argptr;
 	static char             string[1024];
@@ -590,7 +590,7 @@ Only used for CopyFile
 */
 void    COM_CreatePath (cstring path)
 {
-	char    *ofs;
+	cstring ofs;
 
 	for (ofs = path+1 ; *ofs ; ofs++)
 	{

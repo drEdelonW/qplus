@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 
 cvar_t	*cvar_vars;
-char	*cvar_null_string = "";
+cstring cvar_null_string = "";
 
 /*
 ============
@@ -153,7 +153,7 @@ Adds a freestanding variable to the variable list.
 */
 void Cvar_RegisterVariable(cvar_t *variable)
 {
-	char	*oldstr;
+	cstring oldstr;
 
 // first check to see if it has allready been defined
 	if (Cvar_FindVar (variable->name))

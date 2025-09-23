@@ -1,5 +1,6 @@
 #pragma once
-#include "zone.h"
+#include "types.h"
+
 // if (var < min_val)   var = min_val;
 #define CLAMP_MIN(var, min_val)         do{ if ((var) < (min_val)) {(var) = (min_val);} }while(0)
 // keep (var >= min_val)

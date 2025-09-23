@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 dprograms_t		*progs;
 dfunction_t		*pr_functions;
-char			*pr_strings;
+cstring pr_strings;
 ddef_t			*pr_fielddefs;
 ddef_t			*pr_globaldefs;
 dstatement_t	*pr_statements;
@@ -57,7 +57,7 @@ ED_ClearEdict
 Sets everything to NULL
 =================
 */
-void ED_ClearEdict (edict_t *e)
+void ED_ClearEdict (edict_p e)
 {
 	memset (&e->v, 0, progs->entityfields * 4);
 	e->free = false;
@@ -74,10 +74,10 @@ instead of being removed and recreated, which can cause interpolated
 angles and bad trails.
 =================
 */
-edict_t *ED_Alloc()
+edict_p ED_Alloc()
 {
 	int			i;
-	edict_t		*e;
+	edict_p e;
 
 	for ( i=svs.maxclients+1 ; i<sv.num_edicts ; i++)
 	{
@@ -109,7 +109,7 @@ Marks the edict as free
 FIXME: walk all entities and NULL out references to this entity
 =================
 */
-void ED_Free (edict_t *ed)
+void ED_Free (edict_p ed)
 {
 	SV_UnlinkEdict (ed);		// unlink from world bsp
 
@@ -228,7 +228,7 @@ dfunction_t *ED_FindFunction (cstring name)
 }
 
 
-eval_t *GetEdictFieldValue(edict_t *ed, cstring field)
+eval_t *GetEdictFieldValue(edict_p ed, cstring field)
 {
 	ddef_t			*def = NULL;
 	int				i;
@@ -370,7 +370,7 @@ padded to 20 field width
 */
 cstring PR_GlobalString (int ofs)
 {
-	char	*s;
+	cstring s;
 	int		i;
 	ddef_t	*def;
 	void	*val;
@@ -422,13 +422,13 @@ ED_Print
 For debugging
 =============
 */
-void ED_Print (edict_t *ed)
+void ED_Print (edict_p ed)
 {
 	int		l;
 	ddef_t	*d;
 	int		*v;
 	int		i, j;
-	char	*name;
+	cstring name;
 	int		type;
 
 	if (ed->free)
@@ -472,12 +472,12 @@ ED_Write
 For savegames
 =============
 */
-void ED_Write (FILE *f, edict_t *ed)
+void ED_Write (FILE *f, edict_p ed)
 {
 	ddef_t	*d;
 	int		*v;
 	int		i, j;
-	char	*name;
+	cstring name;
 	int		type;
 
 	fprintf (f, "{\n");
@@ -563,7 +563,7 @@ For debugging
 void ED_Count()
 {
 	int		i;
-	edict_t	*ent;
+	edict_p ent;
 	int		active, models, solid, step;
 
 	active = models = solid = step = 0;
@@ -607,7 +607,7 @@ void ED_WriteGlobals (FILE *f)
 {
 	ddef_t		*def;
 	int			i;
-	char		*name;
+	cstring name;
 	int			type;
 
 	fprintf (f, "{\n");
@@ -682,7 +682,7 @@ ED_NewString
 */
 cstring ED_NewString (cstring string)
 {
-	char	*new, *new_p;
+	cstring new, new_p;
 	int		i,l;
 
 	l = strlen(string) + 1;
@@ -720,7 +720,7 @@ qboolean	ED_ParseEpair (typeless_ptr base, ddef_t *key, cstring s)
 	int		i;
 	char	string[128];
 	ddef_t	*def;
-	char	*v, *w;
+	cstring v, w;
 	void	*d;
 	dfunction_t	*func;
 
@@ -789,7 +789,7 @@ ed should be a properly initialized empty edict.
 Used for initial level load and for savegames.
 ====================
 */
-cstring ED_ParseEdict (cstring data, edict_t *ent)
+cstring ED_ParseEdict (cstring data, edict_p ent)
 {
 	ddef_t		*key;
 	qboolean	anglehack;
@@ -894,7 +894,7 @@ to call ED_CallSpawnFunctions () to let the objects initialize themselves.
 */
 void ED_LoadFromFile (cstring data)
 {
-	edict_t		*ent;
+	edict_p ent;
 	int			inhibit;
 	dfunction_t	*func;
 
@@ -1075,14 +1075,14 @@ void PR_Init(){
 
 
 
-edict_t *EDICT_NUM(int n)
+edict_p EDICT_NUM(int n)
 {
 	if (n < 0 || n >= sv.max_edicts)
 		Sys_Error ("EDICT_NUM: bad number %i", n);
-	return (edict_t *)((byte *)sv.edicts+ (n)*pr_edict_size);
+	return (edict_p)((byte *)sv.edicts+ (n)*pr_edict_size);
 }
 
-int NUM_FOR_EDICT(edict_t *e)
+int NUM_FOR_EDICT(edict_p e)
 {
 	int		b;
 

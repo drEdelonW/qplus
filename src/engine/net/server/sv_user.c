@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "cvar_q1.h"
 
-edict_t	*sv_player;
+edict_p sv_player;
 
 
 
@@ -479,7 +479,7 @@ qboolean SV_ReadClientMessage()
 {
 	int		ret;
 	int		cmd;
-	char		*s;
+	cstring s;
 
 	do
 	{

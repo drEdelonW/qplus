@@ -209,7 +209,7 @@ void CDAudio_Resume(void)
 
 static void CD_f()
 {
-	char	*command;
+	cstring command;
 	int		ret;
 	int		n;
 

@@ -29,7 +29,8 @@
 			"unordered_map": "c",
 			"vector": "c",
 			"cvar.h": "c",
-			"stddef.h": "c"
+			"stddef.h": "c",
+			"types.h": "c"
 		}
 	}
 }

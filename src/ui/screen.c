@@ -116,7 +116,7 @@ void SCR_EraseCenterString()
 
 void SCR_DrawCenterString()
 {
-	char	*start;
+	cstring start;
 	int		l;
 	int		j;
 	int		x, y;
@@ -683,12 +683,12 @@ void SCR_EndLoadingPlaque()
 
 //=============================================================================
 
-char	*scr_notifystring;
+cstring scr_notifystring;
 qboolean	scr_drawdialog;
 
 void SCR_DrawNotifyString()
 {
-	char	*start;
+	cstring start;
 	int		l;
 	int		j;
 	int		x, y;

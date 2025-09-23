@@ -304,8 +304,8 @@ void	PrintBSPFileSizes();
 typedef struct epair_s
 {
 	struct epair_s	*next;
-	char	*key;
-	char	*value;
+	cstring key;
+	cstring value;
 } epair_t;
 
 typedef struct
@@ -323,7 +323,7 @@ void	ParseEntities();
 void	UnparseEntities();
 
 void 	SetKeyValue (entity_t *ent, cstring key, cstring value);
-char 	*ValueForKey (entity_t *ent, cstring key);
+cstring ValueForKey (entity_t *ent, cstring key);
 // will return "" if not present
 
 vec_t	FloatForKey (entity_t *ent, cstring key);

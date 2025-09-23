@@ -1352,7 +1352,7 @@ void M_FindKeysForCommand (cstring command, int *twokeys)
 	int		count;
 	int		j;
 	int		l;
-	char	*b;
+	cstring b;
 
 	twokeys[0] = twokeys[1] = -1;
 	l = strlen(command);
@@ -1377,7 +1377,7 @@ void M_UnbindCommand (cstring command)
 {
 	int		j;
 	int		l;
-	char	*b;
+	cstring b;
 
 	l = strlen(command);
 
@@ -1396,7 +1396,7 @@ void M_Keys_Draw()
 {
 	// int		i, l;
 	int		keys[2];
-	char	*name;
+	cstring name;
 	int		x, y;
 	qpic_p p;
 
@@ -1773,8 +1773,8 @@ void M_SerialConfig_Draw()
 {
 	qpic_p p;
 	int		basex;
-	char	*startJoin;
-	char	*directModem;
+	cstring startJoin;
+	cstring directModem;
 
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/p_multi.lmp");
@@ -2210,8 +2210,8 @@ void M_LanConfig_Draw()
 {
 	qpic_p p;
 	int		basex;
-	char	*startJoin;
-	char	*protocol;
+	cstring startJoin;
+	cstring protocol;
 
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/p_multi.lmp");
@@ -2384,8 +2384,8 @@ void M_LanConfig_Key (int key)
 
 typedef struct
 {
-	char	*name;
-	char	*description;
+	cstring name;
+	cstring description;
 } level_t;
 
 level_t		levels[] =
@@ -2489,7 +2489,7 @@ level_t		roguelevels[] =
 
 typedef struct
 {
-	char	*description;
+	cstring description;
 	int		firstLevel;
 	int		levels;
 } episode_t;

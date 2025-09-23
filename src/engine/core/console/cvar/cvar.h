@@ -109,8 +109,8 @@ typedef enum{
 //  reg_rpc:  CVAR_AS($1, "$2");$3
 
 typedef struct cvar_s{
-    char    *name;
-    char    *string;
+    cstring name;
+    cstring string;
     // qboolean archive;        // set to true to cause it to be saved to vars.rc
     // qboolean server;        // notifies players when changed
     uint8_t  flags;
@@ -132,11 +132,11 @@ void    Cvar_SetValue (cstring var_name, float value);
 float    Cvar_VariableValue (cstring var_name);
 
 // returns an empty string if not defined
-char    *Cvar_VariableString (cstring var_name);
+cstring Cvar_VariableString (cstring var_name);
 
 // attempts to match a partial variable name for command line completion
 // returns NULL if nothing fits
-char     *Cvar_CompleteVariable (cstring partial);
+cstring Cvar_CompleteVariable (cstring partial);
 
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
 // command.  Returns true if the command was a variable reference that

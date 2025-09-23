@@ -444,7 +444,7 @@ VID_ExtraGetModeInfo
 */
 qboolean VID_ExtraGetModeInfo(int modenum)
 {
-	char	*infobuf;
+	cstring infobuf;
 	int		numimagepages;
 
 	infobuf = dos_getmemory(256);

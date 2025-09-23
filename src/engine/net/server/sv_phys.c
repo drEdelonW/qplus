@@ -46,7 +46,7 @@ static	vec3_t	vec_origin = {0.0, 0.0, 0.0};
 
 #define	MOVE_EPSILON	0.01
 
-void SV_Physics_Toss (edict_t *ent);
+void SV_Physics_Toss (edict_p ent);
 
 /*
 ================
@@ -56,7 +56,7 @@ SV_CheckAllEnts
 void SV_CheckAllEnts()
 {
 	int			e;
-	edict_t		*check;
+	edict_p check;
 
 // see if any solid entities are inside the final position
 	check = NEXT_EDICT(sv.edicts);
@@ -82,7 +82,7 @@ void SV_CheckAllEnts()
 SV_CheckVelocity
 ================
 */
-void SV_CheckVelocity (edict_t *ent)
+void SV_CheckVelocity (edict_p ent)
 {
 	int		i;
 
@@ -118,7 +118,7 @@ in a frame.  Not used for pushmove objects, because they must be exact.
 Returns false if the entity removed itself.
 =============
 */
-qboolean SV_RunThink (edict_t *ent)
+qboolean SV_RunThink (edict_p ent)
 {
 	float	thinktime;
 
@@ -145,7 +145,7 @@ SV_Impact
 Two entities have touched, so run their touch functions
 ==================
 */
-void SV_Impact (edict_t *e1, edict_t *e2)
+void SV_Impact (edict_p e1, edict_p e2)
 {
 	int		old_self, old_other;
 
@@ -221,7 +221,7 @@ If steptrace is not NULL, the trace of any vertical wall hit will be stored
 ============
 */
 #define	MAX_CLIP_PLANES	5
-int SV_FlyMove (edict_t *ent, float time, trace_t *steptrace)
+int SV_FlyMove (edict_p ent, float time, trace_t *steptrace)
 {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
@@ -363,7 +363,7 @@ SV_AddGravity
 
 ============
 */
-void SV_AddGravity (edict_t *ent)
+void SV_AddGravity (edict_p ent)
 {
 	float	ent_gravity;
 
@@ -400,7 +400,7 @@ SV_PushEntity
 Does not change the entities velocity at all
 ============
 */
-trace_t SV_PushEntity (edict_t *ent, vec3_t push)
+trace_t SV_PushEntity (edict_p ent, vec3_t push)
 {
 	trace_t	trace;
 	vec3_t	end;
@@ -431,14 +431,14 @@ SV_PushMove
 
 ============
 */
-void SV_PushMove (edict_t *pusher, float movetime)
+void SV_PushMove (edict_p pusher, float movetime)
 {
 	int			i, e;
-	edict_t		*check, *block;
+	edict_p check, block;
 	vec3_t		mins, maxs, move;
 	vec3_t		entorig, pushorig;
 	int			num_moved;
-	edict_t		*moved_edict[MAX_EDICTS];
+	edict_p moved_edict[MAX_EDICTS];
 	vec3_t		moved_from[MAX_EDICTS];
 
 	if (!pusher->v.velocity[0] && !pusher->v.velocity[1] && !pusher->v.velocity[2])
@@ -558,14 +558,14 @@ SV_PushRotate
 
 ============
 */
-void SV_PushRotate (edict_t *pusher, float movetime)
+void SV_PushRotate (edict_p pusher, float movetime)
 {
 	int			i, e;
-	edict_t		*check, *block;
+	edict_p check, block;
 	vec3_t		move, a, amove;
 	vec3_t		entorig, pushorig;
 	int			num_moved;
-	edict_t		*moved_edict[MAX_EDICTS];
+	edict_p moved_edict[MAX_EDICTS];
 	vec3_t		moved_from[MAX_EDICTS];
 	vec3_t		org, org2;
 	vec3_t		forward, right, up;
@@ -696,7 +696,7 @@ SV_Physics_Pusher
 
 ================
 */
-void SV_Physics_Pusher (edict_t *ent)
+void SV_Physics_Pusher (edict_p ent)
 {
 	float	thinktime;
 	float	oldltime;
@@ -754,7 +754,7 @@ This is a big hack to try and fix the rare case of getting stuck in the world
 clipping hull.
 =============
 */
-void SV_CheckStuck (edict_t *ent)
+void SV_CheckStuck (edict_p ent)
 {
 	int		i, j;
 	int		z;
@@ -800,7 +800,7 @@ void SV_CheckStuck (edict_t *ent)
 SV_CheckWater
 =============
 */
-qboolean SV_CheckWater (edict_t *ent)
+qboolean SV_CheckWater (edict_p ent)
 {
 	vec3_t	point;
 	int		cont;
@@ -859,7 +859,7 @@ SV_WallFriction
 
 ============
 */
-void SV_WallFriction (edict_t *ent, trace_t *trace)
+void SV_WallFriction (edict_p ent, trace_t *trace)
 {
 	vec3_t		forward, right, up;
 	float		d, i;
@@ -893,7 +893,7 @@ Try fixing by pushing one pixel in each direction.
 This is a hack, but in the interest of good gameplay...
 ======================
 */
-int SV_TryUnstick (edict_t *ent, vec3_t oldvel)
+int SV_TryUnstick (edict_p ent, vec3_t oldvel)
 {
 	int		i;
 	vec3_t	oldorg;
@@ -950,7 +950,7 @@ Only used by players
 ======================
 */
 #define	STEPSIZE	18
-void SV_WalkMove (edict_t *ent)
+void SV_WalkMove (edict_p ent)
 {
 	vec3_t		upmove, downmove;
 	vec3_t		oldorg, oldvel;
@@ -1051,7 +1051,7 @@ SV_Physics_Client
 Player character actions
 ================
 */
-void SV_Physics_Client (edict_t	*ent, int num)
+void SV_Physics_Client (edict_p ent, int num)
 {
 	if ( ! svs.clients[num-1].active )
 		return;		// unconnected slot
@@ -1134,7 +1134,7 @@ SV_Physics_None
 Non moving objects can only think
 =============
 */
-void SV_Physics_None (edict_t *ent)
+void SV_Physics_None (edict_p ent)
 {
 // regular thinking
 	SV_RunThink (ent);
@@ -1148,7 +1148,7 @@ SV_Physics_Follow
 Entities that are "stuck" to another entity
 =============
 */
-void SV_Physics_Follow (edict_t *ent)
+void SV_Physics_Follow (edict_p ent)
 {
 // regular thinking
 	SV_RunThink (ent);
@@ -1164,7 +1164,7 @@ SV_Physics_Noclip
 A moving object that doesn't obey physics
 =============
 */
-void SV_Physics_Noclip (edict_t *ent)
+void SV_Physics_Noclip (edict_p ent)
 {
 // regular thinking
 	if (!SV_RunThink (ent))
@@ -1190,7 +1190,7 @@ SV_CheckWaterTransition
 
 =============
 */
-void SV_CheckWaterTransition (edict_t *ent)
+void SV_CheckWaterTransition (edict_p ent)
 {
 	int		cont;
 #ifdef QUAKE2
@@ -1237,13 +1237,13 @@ SV_Physics_Toss
 Toss, bounce, and fly movement.  When onground, do nothing.
 =============
 */
-void SV_Physics_Toss (edict_t *ent)
+void SV_Physics_Toss (edict_p ent)
 {
 	trace_t	trace;
 	vec3_t	move;
 	float	backoff;
 #ifdef QUAKE2
-	edict_t	*groundentity;
+	edict_p groundentity;
 
 	groundentity = PROG_TO_EDICT(ent->v.groundentity);
 	if ((int)groundentity->v.flags & FL_CONVEYOR)
@@ -1355,7 +1355,7 @@ will fall if the floor is pulled out from under them.
 =============
 */
 #ifdef QUAKE2
-void SV_Physics_Step (edict_t *ent)
+void SV_Physics_Step (edict_p ent)
 {
 	qboolean	wasonground;
 	qboolean	inwater;
@@ -1363,7 +1363,7 @@ void SV_Physics_Step (edict_t *ent)
 	float		*vel;
 	float		speed, newspeed, control;
 	float		friction;
-	edict_t		*groundentity;
+	edict_p groundentity;
 
 	groundentity = PROG_TO_EDICT(ent->v.groundentity);
 	if ((int)groundentity->v.flags & FL_CONVEYOR)
@@ -1460,7 +1460,7 @@ void SV_Physics_Step (edict_t *ent)
 	SV_CheckWaterTransition (ent);
 }
 #else
-void SV_Physics_Step (edict_t *ent)
+void SV_Physics_Step (edict_p ent)
 {
 	qboolean	hitsound;
 
@@ -1502,7 +1502,7 @@ SV_Physics
 void SV_Physics()
 {
 	int		i;
-	edict_t	*ent;
+	edict_p ent;
 
 // let the progs know that a new frame has started
 	pr_global_struct->self = EDICT_TO_PROG(sv.edicts);
@@ -1560,9 +1560,10 @@ void SV_Physics()
 
 
 #ifdef QUAKE2
-trace_t SV_Trace_Toss (edict_t *ent, edict_t *ignore)
+trace_t SV_Trace_Toss (edict_p ent, edict_p ignore)
 {
-	edict_t	tempent, *tent;
+	edict_t	tempent;
+	edict_p tent;
 	trace_t	trace;
 	vec3_t	move;
 	vec3_t	end;

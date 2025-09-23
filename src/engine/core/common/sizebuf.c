@@ -4,69 +4,58 @@
 #include "q_tools.h"
 #include "console.h"
 #include "sys.h"
+#include "zone.h"
 
   //===========================================================================
 
-void SZ_Alloc (sizebuf_p buf, int startsize)
-{
-	if (startsize < 256)
-		startsize = 256;
-	buf->data = Hunk_AllocName (startsize, "sizebuf");
+void SZ_Alloc(sizebuf_p buf, int startsize) {
+	CLAMP_LESS(startsize, 256);
+	buf->data = Hunk_AllocName(startsize, "sizebuf");
 	buf->maxsize = startsize;
 	buf->cursize = 0;
 }
 
 
-void SZ_Free (sizebuf_p buf)
-{
-//      Z_Free (buf->data);
+void SZ_Free(sizebuf_p buf) {
+//      Z_Free(buf->data);
 //      buf->data = NULL;
 //      buf->maxsize = 0;
 	buf->cursize = 0;
 }
 
-void SZ_Clear (sizebuf_p buf)
-{
+void SZ_Clear(sizebuf_p buf) {
 	buf->cursize = 0;
 }
 
-typeless_ptr SZ_GetSpace (sizebuf_p buf, int length)
-{
-	void    *data;
-
-	if (buf->cursize + length > buf->maxsize)
-	{
+typeless_ptr SZ_GetSpace(sizebuf_p buf, int length) {
+	if ((buf->cursize + length) > buf->maxsize) {
 		if (!buf->allowoverflow)
-			Sys_Error ("SZ_GetSpace: overflow without allowoverflow set");
+			Sys_Error("SZ_GetSpace: overflow without allowoverflow set");
 
 		if (length > buf->maxsize)
-			Sys_Error ("SZ_GetSpace: %i is > full buffer size", length);
+			Sys_Error("SZ_GetSpace: %i is > full buffer size", length);
 
 		buf->overflowed = true;
-		Con_Printf ("SZ_GetSpace: overflow");
-		SZ_Clear (buf);
+		Con_Printf("SZ_GetSpace: overflow");
+		SZ_Clear(buf);
 	}
 
-	data = buf->data + buf->cursize;
+	typeless_ptr data = buf->data + buf->cursize;
 	buf->cursize += length;
 
 	return data;
 }
 
-void SZ_Write (sizebuf_p buf, typeless_ptr data, int length)
-{
-	Q_memcpy (SZ_GetSpace(buf,length),data,length);
+void SZ_Write(sizebuf_p buf, typeless_ptr data, int length) {
+	Q_memcpy(SZ_GetSpace(buf,length),data,length);
 }
 
-void SZ_Print (sizebuf_p buf, cstring data)
-{
-	int             len;
-
-	len = Q_strlen(data)+1;
+void SZ_Print(sizebuf_p buf, cstring data) {
+	int len = Q_strlen(data) + 1;
 
 // uint8_t * cast to keep VC++ happy
 	if (buf->data[buf->cursize-1])
-		Q_memcpy ((uint8_t *)SZ_GetSpace(buf, len),data,len); // no trailing 0
+		Q_memcpy((uint8_t *)SZ_GetSpace(buf, len), data, len); // no trailing 0
 	else
-		Q_memcpy ((uint8_t *)SZ_GetSpace(buf, len-1)-1,data,len); // write over trailing 0
+		Q_memcpy((uint8_t *)SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
 }

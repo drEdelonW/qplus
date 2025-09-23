@@ -1064,7 +1064,7 @@ Sbar_IntermissionNumber
 void Sbar_IntermissionNumber (int x, int y, int num, int digits, int color)
 {
 	char			str[12];
-	char			*ptr;
+	cstring ptr;
 	int				l, frame;
 
 	l = Sbar_itoa (num, str);

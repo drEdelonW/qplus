@@ -570,7 +570,7 @@ static void Test_Poll(void){
 
 static void Test_f()
 {
-	char	*host;
+	cstring host;
 	int		n;
 	int		max = MAX_SCOREBOARD;
 	struct qsockaddr sendaddr;
@@ -699,7 +699,7 @@ Done:
 
 static void Test2_f()
 {
-	char	*host;
+	cstring host;
 	int		n;
 	struct qsockaddr sendaddr;
 
@@ -909,7 +909,7 @@ static qsocket_t *_Datagram_CheckNewConnections(void){
 
 	if (command == CCREQ_RULE_INFO)
 	{
-		char	*prevCvarName;
+		cstring prevCvarName;
 		cvar_t	*var;
 
 		// find the search start location
@@ -1207,7 +1207,7 @@ static qsocket_t *_Datagram_Connect (cstring host)
 	int			reps;
 	double		start_time;
 	int			control;
-	char		*reason;
+	cstring reason;
 
 	// see if we can resolve the host name
 	if (dfunc.GetAddrFromName(host, &sendaddr) == -1)
