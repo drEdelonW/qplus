@@ -33,7 +33,9 @@
 			"types.h": "c",
 			"ratio": "c",
 			"numbers": "c",
-			"algorithm": "c"
+			"algorithm": "c",
+			"*.q1": "c",
+			"*.q2": "c"
 		}
 	}
 }

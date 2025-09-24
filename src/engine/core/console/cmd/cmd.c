@@ -453,9 +453,7 @@ void Cmd_TokenizeString(cstring text) {
     Cmd_AddCommand
     ============
 */
-void	Cmd_AddCommand(cstring cmd_name, xcommand_t function) {
-    cmd_function_p cmd;
-
+void Cmd_AddCommand(cstring cmd_name, xcommand_t function) {
     if (host_initialized)	// because hunk allocation would get stomped
         Sys_Error("Cmd_AddCommand after host_initialized");
 
@@ -466,6 +464,7 @@ void	Cmd_AddCommand(cstring cmd_name, xcommand_t function) {
     }
 
     // fail if the command already exists
+    cmd_function_p cmd;
     for (cmd = cmd_functions; cmd; cmd = cmd->next) {
         if (!Q_strcmp(cmd_name, cmd->name)) {
             Con_Printf("Cmd_AddCommand: %s already defined\n", cmd_name);

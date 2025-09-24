@@ -110,6 +110,7 @@ typedef struct client_s {
 // client known data for deltas
 	int				old_frags;
 } client_t;
+typedef client_t* client_p;
 
 
 //=============================================================================

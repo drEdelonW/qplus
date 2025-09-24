@@ -232,12 +232,14 @@ typedef struct {
 	int					frame;
 	char				name[16];
 } maliasframedesc_t;
+typedef maliasframedesc_t* maliasframedesc_p;
 
 typedef struct {
 	aliasskintype_t type;
 	typeless_ptr    pcachespot;
 	int             skin;
 } maliasskindesc_t;
+typedef maliasskindesc_t* maliasskindesc_p;
 
 typedef struct {
 	trivertx_t			bboxmin;
@@ -250,18 +252,21 @@ typedef struct {
 	int						intervals;
 	maliasgroupframedesc_t	frames[1];
 } maliasgroup_t;
+typedef maliasgroup_t* maliasgroup_p;
 
 typedef struct {
 	int					numskins;
 	int					intervals;
 	maliasskindesc_t	skindescs[1];
 } maliasskingroup_t;
+typedef maliasskingroup_t* maliasskingroup_p;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct mtriangle_s{
 	int facesfront;
 	int	vertindex[3];
 } mtriangle_t;
+typedef mtriangle_t* mtriangle_p;
 
 typedef struct {
 	int					model;
@@ -270,6 +275,7 @@ typedef struct {
 	int					triangles;
 	maliasframedesc_t	frames[1];
 } aliashdr_t;
+typedef aliashdr_t* aliashdr_p;
 
 //===================================================================
 

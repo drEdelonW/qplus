@@ -74,6 +74,7 @@ typedef struct {
 	int			flags;
 	float		size;
 } mdl_t;
+typedef mdl_t* mdl_p;
 
 // TODO: could be shorts
 
@@ -82,6 +83,7 @@ typedef struct {
 	int		s;
 	int		t;
 } stvert_t;
+typedef stvert_t* stvert_p;
 
 typedef struct dtriangle_s {
 	int					facesfront;
@@ -97,6 +99,7 @@ typedef struct {
 	byte	v[3];
 	byte	lightnormalindex;
 } trivertx_t;
+typedef trivertx_t* trivertx_p;
 
 typedef struct {
 	trivertx_t	bboxmin;	// lightnormal isn't used
