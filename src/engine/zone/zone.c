@@ -28,9 +28,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	DYNAMIC_SIZE    (0xC000)    /* 48Kb */
 
 /*
-    ========================
-    Memory_Init
-    ========================
+	========================
+	Memory_Init
+	========================
 */
 void Memory_Init(typeless_ptr buf, size_t size) {
 	int zonesize = DYNAMIC_SIZE;
@@ -39,7 +39,7 @@ void Memory_Init(typeless_ptr buf, size_t size) {
 
 	Cache_Init();
 	int p = COM_CheckParm("-zone");
-	if (p){
+	if (p) {
 		if (p < (com_argc - 1))
 			zonesize = Q_atoi(com_argv[p + 1]) * 1024;
 		else

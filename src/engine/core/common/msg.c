@@ -16,30 +16,30 @@ Handles uint8_t ordering and avoids alignment errors
 // writing functions
 //
 
-void MSG_WriteChar (sizebuf_p sb, int c){
+void MSG_WriteChar(sizebuf_p sb, int c) {
 #ifdef PARANOID
-	if (c < -128 || c > 127)
-		Sys_Error ("MSG_WriteChar: range error");
+	if ((c < -128) || (c > 127))
+		Sys_Error("MSG_WriteChar: range error");
 #endif
 
 	uint8_t* buf = SZ_GetSpace(sb, 1);
 	buf[0] = c;
 }
 
-void MSG_WriteByte (sizebuf_p sb, int c){
+void MSG_WriteByte(sizebuf_p sb, int c) {
 #ifdef PARANOID
-	if (c < 0 || c > 255)
-		Sys_Error ("MSG_WriteByte: range error");
+	if ((c < 0) || (c > 255))
+		Sys_Error("MSG_WriteByte: range error");
 #endif
 
 	uint8_t* buf = SZ_GetSpace(sb, 1);
 	buf[0] = c;
 }
 
-void MSG_WriteShort (sizebuf_p sb, int c){
+void MSG_WriteShort(sizebuf_p sb, int c) {
 #ifdef PARANOID
-	if (c < ((int16_t)0x8000) || c > (int16_t)0x7fff)
-		Sys_Error ("MSG_WriteShort: range error");
+	if ((c < ((int16_t)0x8000)) || (c >(int16_t)0x7fff))
+		Sys_Error("MSG_WriteShort: range error");
 #endif
 
 	uint8_t* buf = SZ_GetSpace(sb, 2);
@@ -47,19 +47,19 @@ void MSG_WriteShort (sizebuf_p sb, int c){
 	buf[1] = c >> 8;
 }
 
-void MSG_WriteLong (sizebuf_p sb, int c){
+void MSG_WriteLong(sizebuf_p sb, int c) {
 	uint8_t* buf = SZ_GetSpace(sb, 4);
-	buf[0] =  c & 0xff;
+	buf[0] = c & 0xff;
 	buf[1] = (c >> 8) & 0xff;
 	buf[2] = (c >> 16) & 0xff;
-	buf[3] =  c >> 24;
+	buf[3] = c >> 24;
 }
 
-void MSG_WriteFloat(sizebuf_p sb, float f){
-    union{
-        float   f;
-        int     l;
-    } dat;
+void MSG_WriteFloat(sizebuf_p sb, float f) {
+	union {
+		float   f;
+		int     l;
+	} dat;
 
 	dat.f = f;
 	dat.l = LittleLong(dat.l);
@@ -67,19 +67,19 @@ void MSG_WriteFloat(sizebuf_p sb, float f){
 	SZ_Write(sb, &dat.l, 4);
 }
 
-void MSG_WriteString(sizebuf_p sb, cstring s){
+void MSG_WriteString(sizebuf_p sb, cstring s) {
 	if (!s)
 		SZ_Write(sb, "", 1);
 	else
 		SZ_Write(sb, s, (Q_strlen(s) + 1));
 }
 
-void MSG_WriteCoord(sizebuf_p sb, float f){
-	MSG_WriteShort(sb, (int)(f*8));
+void MSG_WriteCoord(sizebuf_p sb, float f) {
+	MSG_WriteShort(sb, (int)(f * 8));
 }
 
-void MSG_WriteAngle(sizebuf_p sb, float f){
-	MSG_WriteByte(sb, ((int)f*256/360) & 255);
+void MSG_WriteAngle(sizebuf_p sb, float f) {
+	MSG_WriteByte(sb, ((int)f * 256 / 360) & 255);
 }
 
 //
@@ -88,14 +88,14 @@ void MSG_WriteAngle(sizebuf_p sb, float f){
 int         msg_readcount;
 qboolean    msg_badread;
 
-void MSG_BeginReading(){
+void MSG_BeginReading() {
 	msg_readcount = 0;
 	msg_badread = false;
 }
 
 // returns MSG_ERROR and sets msg_badread if no more characters are available
-int MSG_ReadChar(){
-	if ((msg_readcount + 1) > net_message.cursize)	{
+int MSG_ReadChar() {
+	if ((msg_readcount + 1) > net_message.cursize) {
 		msg_badread = true;
 		return MSG_ERROR;
 	}
@@ -106,8 +106,8 @@ int MSG_ReadChar(){
 	return c;
 }
 
-int MSG_ReadByte(){
-	if ((msg_readcount + 1) > net_message.cursize){
+int MSG_ReadByte() {
+	if ((msg_readcount + 1) > net_message.cursize) {
 		msg_badread = true;
 		return MSG_ERROR;
 	}
@@ -118,41 +118,41 @@ int MSG_ReadByte(){
 	return c;
 }
 
-int MSG_ReadShort(){
-	if ((msg_readcount + 2) > net_message.cursize)	{
+int MSG_ReadShort() {
+	if ((msg_readcount + 2) > net_message.cursize) {
 		msg_badread = true;
 		return MSG_ERROR;
 	}
 
 	int c = (int16_t)(
-         net_message.data[msg_readcount] +
-        (net_message.data[msg_readcount + 1] << 8)
-    );
+		net_message.data[msg_readcount] +
+		(net_message.data[msg_readcount + 1] << 8)
+		);
 
 	msg_readcount += 2;
 
 	return c;
 }
 
-int MSG_ReadLong(){
-	if ((msg_readcount + 4) > net_message.cursize)	{
+int MSG_ReadLong() {
+	if ((msg_readcount + 4) > net_message.cursize) {
 		msg_badread = true;
 		return MSG_ERROR;
 	}
 
 	int c =
-         net_message.data[msg_readcount] +
-        (net_message.data[msg_readcount + 1] << 8) +
-        (net_message.data[msg_readcount + 2] << 16)	+
-        (net_message.data[msg_readcount + 3] << 24);
+		net_message.data[msg_readcount] +
+		(net_message.data[msg_readcount + 1] << 8) +
+		(net_message.data[msg_readcount + 2] << 16) +
+		(net_message.data[msg_readcount + 3] << 24);
 
 	msg_readcount += 4;
 
 	return c;
 }
 
-float MSG_ReadFloat(){
-	union{
+float MSG_ReadFloat() {
+	union {
 		uint8_t b[4];
 		float   f;
 		int     l;
@@ -164,16 +164,16 @@ float MSG_ReadFloat(){
 	dat.b[3] = net_message.data[msg_readcount + 3];
 	msg_readcount += 4;
 
-	dat.l = LittleLong (dat.l);
+	dat.l = LittleLong(dat.l);
 
 	return dat.f;
 }
 
-cstring MSG_ReadString(){
+cstring MSG_ReadString() {
 	static char string[2048];
 
 	int l = 0;
-	do{
+	do {
 		int c = MSG_ReadChar();
 		if ((c == MSG_ERROR) || (c == '\0'))
 			break;
@@ -186,12 +186,12 @@ cstring MSG_ReadString(){
 	return string;
 }
 
-float MSG_ReadCoord(){
-	return MSG_ReadShort() * (1.0/8);
+float MSG_ReadCoord() {
+	return MSG_ReadShort() * (1.0 / 8);
 }
 
-float MSG_ReadAngle(){
-	return MSG_ReadChar() * (360.0/256);
+float MSG_ReadAngle() {
+	return MSG_ReadChar() * (360.0 / 256);
 }
 
 

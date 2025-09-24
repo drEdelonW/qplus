@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-cvar_t	*cvar_vars;
+cvar_p cvar_vars;
 cstring cvar_null_string = "";
 
 /*
@@ -29,12 +29,9 @@ cstring cvar_null_string = "";
 Cvar_FindVar
 ============
 */
-cvar_t *Cvar_FindVar (cstring var_name)
-{
-	cvar_t	*var;
-
-	for (var=cvar_vars ; var ; var=var->next)
-		if (!Q_strcmp (var_name, var->name))
+cvar_p Cvar_FindVar(cstring var_name) {
+	for (cvar_p var = cvar_vars; var; var = var->next)
+		if (!Q_strcmp(var_name, var->name))
 			return var;
 
 	return NULL;
@@ -45,14 +42,11 @@ cvar_t *Cvar_FindVar (cstring var_name)
 Cvar_VariableValue
 ============
 */
-float	Cvar_VariableValue (cstring var_name)
-{
-	cvar_t	*var;
-
-	var = Cvar_FindVar (var_name);
+float	Cvar_VariableValue(cstring var_name) {
+	cvar_p var = Cvar_FindVar(var_name);
 	if (!var)
 		return 0;
-	return Q_atof (var->string);
+	return Q_atof(var->string);
 }
 
 
@@ -61,11 +55,8 @@ float	Cvar_VariableValue (cstring var_name)
 Cvar_VariableString
 ============
 */
-cstring Cvar_VariableString (cstring var_name)
-{
-	cvar_t *var;
-
-	var = Cvar_FindVar (var_name);
+cstring Cvar_VariableString(cstring var_name) {
+	cvar_p var = Cvar_FindVar(var_name);
 	if (!var)
 		return cvar_null_string;
 	return var->string;
@@ -77,19 +68,15 @@ cstring Cvar_VariableString (cstring var_name)
 Cvar_CompleteVariable
 ============
 */
-cstring Cvar_CompleteVariable (cstring partial)
-{
-	cvar_t		*cvar;
-	int			len;
-
-	len = Q_strlen(partial);
+cstring Cvar_CompleteVariable(cstring partial) {
+	int len = Q_strlen(partial);
 
 	if (!len)
 		return NULL;
 
-// check functions
-	for (cvar=cvar_vars ; cvar ; cvar=cvar->next)
-		if (!Q_strncmp (partial,cvar->name, len))
+	// check functions
+	for (cvar_p cvar = cvar_vars; cvar; cvar = cvar->next)
+		if (!Q_strncmp(partial, cvar->name, len))
 			return cvar->name;
 
 	return NULL;
@@ -101,32 +88,27 @@ cstring Cvar_CompleteVariable (cstring partial)
 Cvar_Set
 ============
 */
-void Cvar_Set (cstring var_name, cstring value)
-{
-	cvar_t	*var;
-	qboolean changed;
-
-	var = Cvar_FindVar (var_name);
-	if (!var)
-	{	// there is an error in C code if this happens
-		Con_Printf ("Cvar_Set: variable %s not found\n", var_name);
+void Cvar_Set(cstring var_name, cstring value) {
+	cvar_p var = Cvar_FindVar(var_name);
+	if (!var) {	// there is an error in C code if this happens
+		Con_Printf("Cvar_Set: variable %s not found\n", var_name);
 		return;
 	}
 
-	changed = Q_strcmp(var->string, value);
+	qboolean changed = Q_strcmp(var->string, value);
 
-	Z_Free (var->string);	// free the old value string
+	Z_Free(var->string);	// free the old value string
 
-	var->string = Z_Malloc (Q_strlen(value)+1);
-	Q_strcpy (var->string, value);
-	var->value = Q_atof (var->string);
+	var->string = Z_Malloc(Q_strlen(value) + 1);
+	Q_strcpy(var->string, value);
+	var->value = Q_atof(var->string);
 
-    // if (var->server && changed)
+	// if (var->server && changed)
 	if (changed &&
-        (var->flags & cvf_server)
-    ){
+		(var->flags & cvf_server)
+		) {
 		if (sv.active)
-			SV_BroadcastPrintf ("\"%s\" changed to \"%s\"\n", var->name, var->string);
+			SV_BroadcastPrintf("\"%s\" changed to \"%s\"\n", var->name, var->string);
 	}
 }
 
@@ -135,12 +117,10 @@ void Cvar_Set (cstring var_name, cstring value)
 Cvar_SetValue
 ============
 */
-void Cvar_SetValue (cstring var_name, float value)
-{
+void Cvar_SetValue(cstring var_name, float value) {
 	char	val[32];
-
-	sprintf (val, "%f",value);
-	Cvar_Set (var_name, val);
+	sprintf(val, "%f", value);
+	Cvar_Set(var_name, val);
 }
 
 
@@ -151,31 +131,26 @@ Cvar_RegisterVariable
 Adds a freestanding variable to the variable list.
 ============
 */
-void Cvar_RegisterVariable(cvar_t *variable)
-{
-	cstring oldstr;
-
-// first check to see if it has allready been defined
-	if (Cvar_FindVar (variable->name))
-	{
-		Con_Printf ("Can't register variable %s, allready defined\n", variable->name);
+void Cvar_RegisterVariable(cvar_p variable) {
+	// first check to see if it has allready been defined
+	if (Cvar_FindVar(variable->name)) {
+		Con_Printf("Can't register variable %s, allready defined\n", variable->name);
 		return;
 	}
 
-// check for overlap with a command
-	if (Cmd_Exists (variable->name))
-	{
-		Con_Printf ("Cvar_RegisterVariable: %s is a command\n", variable->name);
+	// check for overlap with a command
+	if (Cmd_Exists(variable->name)) {
+		Con_Printf("Cvar_RegisterVariable: %s is a command\n", variable->name);
 		return;
 	}
 
-// copy the value off, because future sets will Z_Free it
-	oldstr = variable->string;
-	variable->string = Z_Malloc (Q_strlen(variable->string)+1);
-	Q_strcpy (variable->string, oldstr);
-	variable->value = Q_atof (variable->string);
+	// copy the value off, because future sets will Z_Free it
+	cstring oldstr = variable->string;
+	variable->string = Z_Malloc(Q_strlen(variable->string) + 1);
+	Q_strcpy(variable->string, oldstr);
+	variable->value = Q_atof(variable->string);
 
-// link the variable in
+	// link the variable in
 	variable->next = cvar_vars;
 	cvar_vars = variable;
 }
@@ -187,23 +162,19 @@ Cvar_Command
 Handles variable inspection and changing from the console
 ============
 */
-qboolean	Cvar_Command()
-{
-	cvar_t			*v;
-
-// check variables
-	v = Cvar_FindVar (Cmd_Argv(0));
+qboolean	Cvar_Command() {
+	// check variables
+	cvar_p v = Cvar_FindVar(Cmd_Argv(0));
 	if (!v)
 		return false;
 
-// perform a variable print or set
-	if (Cmd_Argc() == 1)
-	{
-		Con_Printf ("\"%s\" is \"%s\"\n", v->name, v->string);
+	// perform a variable print or set
+	if (Cmd_Argc() == 1) {
+		Con_Printf("\"%s\" is \"%s\"\n", v->name, v->string);
 		return true;
 	}
 
-	Cvar_Set (v->name, Cmd_Argv(1));
+	Cvar_Set(v->name, Cmd_Argv(1));
 	return true;
 }
 
@@ -216,13 +187,10 @@ Writes lines containing "set variable value" for all variables
 with the archive flag set to true.
 ============
 */
-void Cvar_WriteVariables (FILE *f)
-{
-	cvar_t	*var;
-
-	for (var = cvar_vars ; var ; var = var->next)
+void Cvar_WriteVariables(FILE* f) {
+	for (cvar_p var = cvar_vars; var; var = var->next)
 		// if (var->archive)
-        if (var->flags & cvf_archive)
-			fprintf (f, "%s \"%s\"\n", var->name, var->string);
+		if (var->flags & cvf_archive)
+			fprintf(f, "%s \"%s\"\n", var->name, var->string);
 }
 

@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // vid_dos.h: header file for DOS-specific video stuff
 
 typedef struct vmode_s {
-	struct vmode_s	*pnext;
+	struct vmode_s* pnext;
 	cstring name;
 	cstring header;
 	unsigned	width;
@@ -30,17 +30,17 @@ typedef struct vmode_s {
 	unsigned	rowbytes;
 	int			planar;
 	int			numpages;
-	void		*pextradata;
-	int			(*setmode)(viddef_p vid, struct vmode_s *pcurrentmode);
-	void		(*swapbuffers)(viddef_p vid, struct vmode_s *pcurrentmode,
-							   vrect_p rects);
-	void		(*setpalette)(viddef_p vid, struct vmode_s *pcurrentmode,
-							  uint8_t *palette);
-	void		(*begindirectrect)(viddef_p vid, struct vmode_s *pcurrentmode,
-								   int x, int y, byte *pbitmap, int width,
-								   int height);
-	void		(*enddirectrect)(viddef_p vid, struct vmode_s *pcurrentmode,
-								 int x, int y, int width, int height);
+	typeless_ptr pextradata;
+	int			(*setmode)(viddef_p vid, struct vmode_s* pcurrentmode);
+	void		(*swapbuffers)(viddef_p vid, struct vmode_s* pcurrentmode,
+		vrect_p rects);
+	void		(*setpalette)(viddef_p vid, struct vmode_s* pcurrentmode,
+		uint8_t* palette);
+	void		(*begindirectrect)(viddef_p vid, struct vmode_s* pcurrentmode,
+		int x, int y, byte* pbitmap, int width,
+		int height);
+	void		(*enddirectrect)(viddef_p vid, struct vmode_s* pcurrentmode,
+		int x, int y, int width, int height);
 } vmode_t;
 
 // vid_wait settings
@@ -49,11 +49,11 @@ typedef struct vmode_s {
 #define VID_WAIT_DISPLAY_ENABLE	2
 
 extern int		numvidmodes;
-extern vmode_t	*pvidmodes;
+extern vmode_t* pvidmodes;
 
 extern int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
-extern byte		*VGA_pagebase;
-extern vmode_t	*VGA_pcurmode;
+extern byte* VGA_pagebase;
+extern vmode_t* VGA_pcurmode;
 
 CVAR_EXTERN(vid_wait);
 CVAR_EXTERN(vid_nopageflip);
@@ -61,24 +61,24 @@ CVAR_EXTERN(_vid_wait_override);
 
 extern uint8_t colormap256[32][256];
 
-extern void	*vid_surfcache;
+extern typeless_ptr vid_surfcache;
 extern int	vid_surfcachesize;
 
 void VGA_Init();
 void VID_InitVESA();
 void VID_InitExtra();
 void VGA_WaitVsync();
-void VGA_ClearVideoMem (int planar);
-void VGA_SetPalette(viddef_p vid, vmode_t *pcurrentmode, uint8_t *pal);
-void VGA_SwapBuffersCopy (viddef_p vid, vmode_t *pcurrentmode,
+void VGA_ClearVideoMem(int planar);
+void VGA_SetPalette(viddef_p vid, vmode_t* pcurrentmode, uint8_t* pal);
+void VGA_SwapBuffersCopy(viddef_p vid, vmode_t* pcurrentmode,
 	vrect_p rects);
-qboolean VGA_FreeAndAllocVidbuffer (viddef_p vid, int allocnewbuffer);
-qboolean VGA_CheckAdequateMem (int width, int height, int rowbytes,
+qboolean VGA_FreeAndAllocVidbuffer(viddef_p vid, int allocnewbuffer);
+qboolean VGA_CheckAdequateMem(int width, int height, int rowbytes,
 	int allocnewbuffer);
-void VGA_BeginDirectRect (viddef_p vid, struct vmode_s *pcurrentmode, int x,
-	int y, byte *pbitmap, int width, int height);
-void VGA_EndDirectRect (viddef_p vid, struct vmode_s *pcurrentmode, int x,
+void VGA_BeginDirectRect(viddef_p vid, struct vmode_s* pcurrentmode, int x,
+	int y, byte* pbitmap, int width, int height);
+void VGA_EndDirectRect(viddef_p vid, struct vmode_s* pcurrentmode, int x,
 	int y, int width, int height);
-void VGA_UpdateLinearScreen (typeless_ptr srcptr, typeless_ptr destptr, int width,
+void VGA_UpdateLinearScreen(typeless_ptr srcptr, typeless_ptr destptr, int width,
 	int height, int srcrowbytes, int destrowbytes);
 

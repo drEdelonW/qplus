@@ -12,14 +12,14 @@
 #define	HUNK_SENTINAL	(0x1Df001ED)
 
 
-typedef struct{
+typedef struct {
 	int     sentinal;
 	size_t	size;       // including sizeof(hunk_t), -1 = not allocated
 	char 	name[8];
 } hunk_t;
 typedef hunk_t* hunk_p;
 
-byte*   hunk_base;
+byte* hunk_base;
 size_t  hunk_size;
 
 size_t  hunk_low_used;
@@ -30,10 +30,10 @@ static size_t   _hunk_tempmark;
 
 
 void Hulk_Init(typeless_ptr buf, size_t size) {
-	hunk_base       = buf;
-	hunk_size       = size;
-	hunk_low_used   = 0;
-	hunk_high_used  = 0;
+	hunk_base = buf;
+	hunk_size = size;
+	hunk_low_used = 0;
+	hunk_high_used = 0;
 }
 
 
@@ -45,7 +45,7 @@ Run consistancy and sentinal trahing checks
 ==============
 */
 void Hunk_Check() {
-	for (hunk_p h = (hunk_p)hunk_base; (byte*)h != (hunk_base + hunk_low_used) ; ) {
+	for (hunk_p h = (hunk_p)hunk_base; (byte*)h != (hunk_base + hunk_low_used); ) {
 		if ((h->sentinal) != HUNK_SENTINAL)
 			Sys_Error("Hunk_Check: trahsed sentinal");
 		if ((h->size < 16) || ((h->size + (byte*)h - hunk_base) > hunk_size))
@@ -55,58 +55,58 @@ void Hunk_Check() {
 }
 
 /*
-    ==============
-    Hunk_Print
+	==============
+	Hunk_Print
 
-    If "all" is specified, every single allocation is printed.
-    Otherwise, allocations with the same name will be totaled up before printing.
-    ==============
+	If "all" is specified, every single allocation is printed.
+	Otherwise, allocations with the same name will be totaled up before printing.
+	==============
 */
 void Hunk_Print(qboolean all) {
-	char    name[9] = {0};
+	char    name[9] = { 0 };
 
-	hunk_p h         = (hunk_p)hunk_base;
-	hunk_p endlow    = (hunk_p)(hunk_base + hunk_low_used);
+	hunk_p h = (hunk_p)hunk_base;
+	hunk_p endlow = (hunk_p)(hunk_base + hunk_low_used);
 	hunk_p starthigh = (hunk_p)(hunk_base + hunk_size - hunk_high_used);
-	hunk_p endhigh   = (hunk_p)(hunk_base + hunk_size);
+	hunk_p endhigh = (hunk_p)(hunk_base + hunk_size);
 
 	Con_Printf(
-        "          :%8i total hunk size\n"
-        "-------------------------\n",
-        hunk_size
-    );
+		"          :%8i total hunk size\n"
+		"-------------------------\n",
+		hunk_size
+	);
 
 	size_t count = 0;
 	size_t sum = 0;
 	int totalblocks = 0;
-    while (1){
-	//
-	// skip to the high hunk if done with low hunk
-	//
-		if (h == endlow){
+	while (1) {
+		//
+		// skip to the high hunk if done with low hunk
+		//
+		if (h == endlow) {
 			Con_Printf(
-                "-------------------------\n"
-			    "          :%8i REMAINING\n"
-			    "-------------------------\n",
-                hunk_size - hunk_low_used - hunk_high_used
-            );
+				"-------------------------\n"
+				"          :%8i REMAINING\n"
+				"-------------------------\n",
+				hunk_size - hunk_low_used - hunk_high_used
+			);
 			h = starthigh;
 		}
 
-	//
-	// if totally done, break
-	//
+		//
+		// if totally done, break
+		//
 		if (h == endhigh)
 			break;
 
-	//
-	// run consistancy checks
-	//
+		//
+		// run consistancy checks
+		//
 		if (h->sentinal != HUNK_SENTINAL)
 			Sys_Error("Hunk_Check: trahsed sentinal");
 		if ((h->size < 16) ||
 			((h->size + (byte*)h - hunk_base) > hunk_size)
-		)
+			)
 			Sys_Error("Hunk_Check: bad size");
 
 		hunk_p next = (hunk_p)((byte*)h + h->size);
@@ -114,23 +114,23 @@ void Hunk_Print(qboolean all) {
 		totalblocks++;
 		sum += h->size;
 
-	//
-	// print the single block
-	//
+		//
+		// print the single block
+		//
 		memcpy(name, h->name, 8);
 		if (all)
 			Con_Printf("%8p :%8i %8s\n", h, h->size, name);
 
-	//
-	// print the total
-	//
+		//
+		// print the total
+		//
 		if (
-			(next == endlow ) ||
+			(next == endlow) ||
 			(next == endhigh) ||
 			(strncmp(h->name, next->name, 8))
-		) {
+			) {
 			if (!all)
-				Con_Printf("          :%8i %8s (TOTAL)\n",sum, name);
+				Con_Printf("          :%8i %8s (TOTAL)\n", sum, name);
 			count = 0;
 			sum = 0;
 		}
@@ -139,10 +139,10 @@ void Hunk_Print(qboolean all) {
 	}
 
 	Con_Printf(
-        "-------------------------\n"
-        "%8i total blocks\n",
-        totalblocks
-    );
+		"-------------------------\n"
+		"%8i total blocks\n",
+		totalblocks
+	);
 
 }
 
@@ -159,7 +159,7 @@ typeless_ptr Hunk_AllocName(size_t size, cstring name) {
 	size = sizeof(hunk_t) + ALIGN_UP(size, 16);
 
 	if ((hunk_size - hunk_low_used - hunk_high_used) < size)
-		Sys_Error("Hunk_Alloc: failed on %i bytes",size);
+		Sys_Error("Hunk_Alloc: failed on %i bytes", size);
 
 	hunk_p h = (hunk_p)(hunk_base + hunk_low_used);
 	hunk_low_used += size;
@@ -216,9 +216,9 @@ void Hunk_FreeToHighMark(size_t mark) {
 
 
 /*
-    ===================
-    Hunk_HighAllocName
-    ===================
+	===================
+	Hunk_HighAllocName
+	===================
 */
 typeless_ptr Hunk_HighAllocName(size_t size, cstring name) {
 	if (_hunk_tempactive) {
@@ -232,8 +232,8 @@ typeless_ptr Hunk_HighAllocName(size_t size, cstring name) {
 
 	size = sizeof(hunk_t) + ALIGN_UP(size, 16);
 
-	if ((hunk_size - hunk_low_used - hunk_high_used) < size)	{
-		Con_Printf("Hunk_HighAlloc: failed on %i bytes\n",size);
+	if ((hunk_size - hunk_low_used - hunk_high_used) < size) {
+		Con_Printf("Hunk_HighAlloc: failed on %i bytes\n", size);
 		return NULL;
 	}
 
@@ -252,25 +252,25 @@ typeless_ptr Hunk_HighAllocName(size_t size, cstring name) {
 
 
 /*
-        =================
-        Hunk_TempAlloc
+		=================
+		Hunk_TempAlloc
 
-        Return space from the top of the hunk
-        =================
+		Return space from the top of the hunk
+		=================
 */
 typeless_ptr Hunk_TempAlloc(size_t size) {
-    size = ALIGN_UP(size, 16);
+	size = ALIGN_UP(size, 16);
 
-    if (_hunk_tempactive) {
-        Hunk_FreeToHighMark(_hunk_tempmark);
-        _hunk_tempactive = false;
-    }
+	if (_hunk_tempactive) {
+		Hunk_FreeToHighMark(_hunk_tempmark);
+		_hunk_tempactive = false;
+	}
 
-    _hunk_tempmark = Hunk_HighMark();
+	_hunk_tempmark = Hunk_HighMark();
 
-    typeless_ptr buf = Hunk_HighAllocName(size, "temp");
+	typeless_ptr buf = Hunk_HighAllocName(size, "temp");
 
-    _hunk_tempactive = true;
+	_hunk_tempactive = true;
 
-    return buf;
+	return buf;
 }

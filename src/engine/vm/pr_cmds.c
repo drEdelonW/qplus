@@ -215,7 +215,7 @@ void PF_setmodel() {
 	edict_p e;
 	cstring m;
 	char** check;
-	model_t* mod;
+	model_p mod;
 	int i;
 
 	e = G_EDICT(OFS_PARM0);

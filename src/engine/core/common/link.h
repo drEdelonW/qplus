@@ -2,15 +2,18 @@
 #include <stddef.h>
 //============================================================================
 
-typedef struct link_s{
-	struct link_s	*prev, *next;
-} link_t;
+struct link_s;
+typedef struct link_s link_t;
+typedef link_t* link_p;
+struct link_s {
+	link_p prev, next;
+};
 
 
-void ClearLink(link_t *l);
-void RemoveLink(link_t *l);
-void InsertLinkBefore(link_t *l, link_t *before);
-void InsertLinkAfter( link_t *l, link_t *after);
+void ClearLink(link_p l);
+void RemoveLink(link_p l);
+void InsertLinkBefore(link_p l, link_p before);
+void InsertLinkAfter(link_p l, link_p after);
 
 // (type *)STRUCT_FROM_LINK(link_t *link, type, member)
 // ent = STRUCT_FROM_LINK(link,entity_t,order)

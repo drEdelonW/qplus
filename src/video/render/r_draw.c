@@ -380,7 +380,7 @@ void R_RenderFace(msurface_t* fa, int clipflags)
 {
 	int			i, lindex;
 	unsigned	mask;
-	mplane_t* pplane;
+	mplane_p pplane;
 	float		distinv;
 	vec3_t		p_normal;
 	medge_t*  pedges, tedge;
@@ -578,7 +578,7 @@ void R_RenderBmodelFace (bedge_t* pedges, msurface_t* psurf)
 {
 	int			i;
 	unsigned	mask;
-	mplane_t* pplane;
+	mplane_p pplane;
 	float		distinv;
 	vec3_t		p_normal;
 	static medge_t  tedge;
@@ -779,7 +779,7 @@ void R_RenderPoly(msurface_t* fa, int clipflags){
 
 // transform and project, remembering the z values at the vertices and
 // r_nearzi, and extract the s and t coordinates at the vertices
-	mplane_t* pplane = fa->plane;
+	mplane_p pplane = fa->plane;
 	switch (pplane->type){
 	case PLANE_X:
 	case PLANE_ANYX:
@@ -853,12 +853,12 @@ void R_RenderPoly(msurface_t* fa, int clipflags){
 R_ZDrawSubmodelPolys
 ================
 */
-void R_ZDrawSubmodelPolys (model_t* pmodel)
+void R_ZDrawSubmodelPolys (model_p pmodel)
 {
 	int			i, numsurfaces;
 	msurface_t* psurf;
 	float		dot;
-	mplane_t* pplane;
+	mplane_p pplane;
 
 	psurf = &pmodel->surfaces[pmodel->firstmodelsurface];
 	numsurfaces = pmodel->nummodelsurfaces;

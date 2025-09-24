@@ -20,14 +20,14 @@ CACHE MEMORY
 struct cache_system_s;
 typedef struct cache_system_s cache_system_t;
 typedef cache_system_t* cache_system_p;
-struct cache_system_s{
-	size_t          size;   // including this header
-	cache_user_p    user;
-	char            name[16];
-	cache_system_p  prev;
-	cache_system_p  next;
-	cache_system_p  lru_prev;
-	cache_system_p  lru_next;	// for LRU flushing
+struct cache_system_s {
+    size_t          size;   // including this header
+    cache_user_p    user;
+    char            name[16];
+    cache_system_p  prev;
+    cache_system_p  next;
+    cache_system_p  lru_prev;
+    cache_system_p  lru_next;	// for LRU flushing
 };
 
 
@@ -41,26 +41,22 @@ Cache_Move
 ===========
 */
 void Cache_Move(cache_system_p c) {
-	cache_system_p new;
+    // we are clearing up space at the bottom, so only allocate it late
+    cache_system_p new = Cache_TryAlloc(c->size, true);
+    if (new) {
+        //		Con_Printf("cache_move ok\n");
 
-// we are clearing up space at the bottom, so only allocate it late
-	new = Cache_TryAlloc(c->size, true);
-	if (new)
-	{
-//		Con_Printf("cache_move ok\n");
+        Q_memcpy(new + 1, c + 1, c->size - sizeof(cache_system_t));
+        new->user = c->user;
+        Q_memcpy(new->name, c->name, sizeof(new->name));
+        Cache_Free(c->user);
+        new->user->data = (typeless_ptr)(new + 1);
+    }
+    else {
+        //		Con_Printf("cache_move failed\n");
 
-		Q_memcpy(new+1, c+1, c->size - sizeof(cache_system_t));
-		new->user = c->user;
-		Q_memcpy(new->name, c->name, sizeof(new->name));
-		Cache_Free(c->user);
-		new->user->data = (typeless_ptr)(new+1);
-	}
-	else
-	{
-//		Con_Printf("cache_move failed\n");
-
-		Cache_Free(c->user);		// tough luck...
-	}
+        Cache_Free(c->user);		// tough luck...
+    }
 }
 
 /*
@@ -71,17 +67,14 @@ Throw things out until the hunk can be expanded to the given point
 ============
 */
 void Cache_FreeLow(int new_low_hunk) {
-	cache_system_p c;
-
-	while (1)
-	{
-		c = cache_head.next;
-		if (c == &cache_head)
-			return;		// nothing in cache at all
-		if ((byte*)c >= hunk_base + new_low_hunk)
-			return;		// there is space to grow the hunk
-		Cache_Move(c);	// reclaim the space
-	}
+    while (1) {
+        cache_system_p c = cache_head.next;
+        if (c == &cache_head)
+            return;		// nothing in cache at all
+        if ((byte*)c >= hunk_base + new_low_hunk)
+            return;		// there is space to grow the hunk
+        Cache_Move(c);	// reclaim the space
+    }
 }
 
 /*
@@ -93,39 +86,39 @@ Throw things out until the hunk can be expanded to the given point
 */
 void Cache_FreeHigh(int new_high_hunk) {
     cache_system_p prev = NULL;
-	while (1) {
-		cache_system_p c = cache_head.prev;
-		if (c == &cache_head)
-			return;		// nothing in cache at all
-		if (((byte*)c + c->size) <= (hunk_base + hunk_size - new_high_hunk))
-			return;		// there is space to grow the hunk
-		if (c == prev)
-			Cache_Free(c->user);	// didn't move out of the way
-		else {
-			Cache_Move(c);	// try to move it
-			prev = c;
-		}
-	}
+    while (1) {
+        cache_system_p c = cache_head.prev;
+        if (c == &cache_head)
+            return;		// nothing in cache at all
+        if (((byte*)c + c->size) <= (hunk_base + hunk_size - new_high_hunk))
+            return;		// there is space to grow the hunk
+        if (c == prev)
+            Cache_Free(c->user);	// didn't move out of the way
+        else {
+            Cache_Move(c);	// try to move it
+            prev = c;
+        }
+    }
 }
 
 void Cache_UnlinkLRU(cache_system_p cs) {
-	if (!cs->lru_next || !cs->lru_prev)
-		Sys_Error("Cache_UnlinkLRU: NULL link");
+    if (!cs->lru_next || !cs->lru_prev)
+        Sys_Error("Cache_UnlinkLRU: NULL link");
 
-	cs->lru_next->lru_prev = cs->lru_prev;
-	cs->lru_prev->lru_next = cs->lru_next;
+    cs->lru_next->lru_prev = cs->lru_prev;
+    cs->lru_prev->lru_next = cs->lru_next;
 
-	cs->lru_prev = cs->lru_next = NULL;
+    cs->lru_prev = cs->lru_next = NULL;
 }
 
 void Cache_MakeLRU(cache_system_p cs) {
-	if (cs->lru_next || cs->lru_prev)
-		Sys_Error("Cache_MakeLRU: active link");
+    if (cs->lru_next || cs->lru_prev)
+        Sys_Error("Cache_MakeLRU: active link");
 
-	cache_head.lru_next->lru_prev = cs;
-	cs->lru_next = cache_head.lru_next;
-	cs->lru_prev = &cache_head;
-	cache_head.lru_next = cs;
+    cache_head.lru_next->lru_prev = cs;
+    cs->lru_next = cache_head.lru_next;
+    cs->lru_prev = &cache_head;
+    cache_head.lru_next = cs;
 }
 
 /*
@@ -161,8 +154,8 @@ cache_system_p Cache_TryAlloc(size_t size, qboolean nobottom) {
     do {
         if ((!nobottom || (cs != cache_head.next)) &&
             (((byte*)cs - (byte*)new) >= size)
-        ) {	// found space
-            memset (new, 0, sizeof(*new));
+            ) {	// found space
+            memset(new, 0, sizeof(*new));
             new->size = size;
 
             new->next = cs;
@@ -175,7 +168,7 @@ cache_system_p Cache_TryAlloc(size_t size, qboolean nobottom) {
             return new;
         }
 
-    // continue looking
+        // continue looking
         new = (cache_system_p)((byte*)cs + cs->size);
         cs = cs->next;
 
@@ -207,8 +200,8 @@ cache_system_p Cache_TryAlloc(size_t size, qboolean nobottom) {
     ============
 */
 void Cache_Flush() {
-	while (cache_head.next != &cache_head)
-		Cache_Free(cache_head.next->user);	// reclaim the space
+    while (cache_head.next != &cache_head)
+        Cache_Free(cache_head.next->user);	// reclaim the space
 }
 
 
@@ -219,9 +212,9 @@ void Cache_Flush() {
     ============
 */
 void Cache_Print() {
-	for (cache_system_p cd = cache_head.next; cd != &cache_head; cd = cd->next) {
-		Con_Printf("%8i : %s\n", cd->size, cd->name);
-	}
+    for (cache_system_p cd = cache_head.next; cd != &cache_head; cd = cd->next) {
+        Con_Printf("%8i : %s\n", cd->size, cd->name);
+    }
 }
 
 /*
@@ -230,10 +223,10 @@ void Cache_Print() {
 
     ============
 */
-void Cache_Report(){
-	Con_DPrintf(
+void Cache_Report() {
+    Con_DPrintf(
         "%4.1f megabyte data cache\n",
-        (hunk_size - hunk_high_used - hunk_low_used) / (float)(1024*1024)
+        (hunk_size - hunk_high_used - hunk_low_used) / (float)(1024 * 1024)
     );
 }
 
@@ -243,7 +236,7 @@ void Cache_Report(){
 
     ============
 */
-void Cache_Compact(){}
+void Cache_Compact() {}
 
 /*
     ============
@@ -251,11 +244,11 @@ void Cache_Compact(){}
 
     ============
 */
-void Cache_Init(){
-	cache_head.next = cache_head.prev = &cache_head;
-	cache_head.lru_next = cache_head.lru_prev = &cache_head;
+void Cache_Init() {
+    cache_head.next = cache_head.prev = &cache_head;
+    cache_head.lru_next = cache_head.lru_prev = &cache_head;
 
-	Cmd_AddCommand("flush", Cache_Flush);
+    Cmd_AddCommand("flush", Cache_Flush);
 }
 
 /*
@@ -265,21 +258,19 @@ void Cache_Init(){
     Frees the memory and removes it from the LRU list
     ==============
 */
-void Cache_Free(cache_user_p c){
-	cache_system_p cs;
+void Cache_Free(cache_user_p c) {
+    if (!c->data)
+        Sys_Error("Cache_Free: not allocated");
 
-	if (!c->data)
-		Sys_Error("Cache_Free: not allocated");
+    cache_system_p cs = ((cache_system_p)c->data) - 1;
 
-	cs = ((cache_system_p)c->data) - 1;
+    cs->prev->next = cs->next;
+    cs->next->prev = cs->prev;
+    cs->next = cs->prev = NULL;
 
-	cs->prev->next = cs->next;
-	cs->next->prev = cs->prev;
-	cs->next = cs->prev = NULL;
+    c->data = NULL;
 
-	c->data = NULL;
-
-	Cache_UnlinkLRU(cs);
+    Cache_UnlinkLRU(cs);
 }
 
 
@@ -289,7 +280,7 @@ void Cache_Free(cache_user_p c){
     Cache_Check
     ==============
 */
-typeless_ptr Cache_Check(cache_user_p c){
+typeless_ptr Cache_Check(cache_user_p c) {
     if (!c->data)
         return NULL;
 
@@ -317,20 +308,20 @@ typeless_ptr Cache_Alloc(cache_user_p c, size_t size, cstring name) {
 
     size = ALIGN_UP((size + sizeof(cache_system_t)), 16);
 
-// find memory for it
+    // find memory for it
     while (1) {
         cache_system_p cs = Cache_TryAlloc(size, false);
         if (cs) {
-            strncpy(cs->name, name, sizeof(cs->name)-1);
-            c->data = (typeless_ptr)(cs+1);
+            strncpy(cs->name, name, sizeof(cs->name) - 1);
+            c->data = (typeless_ptr)(cs + 1);
             cs->user = c;
             break;
         }
 
-    // free the least recently used cahedat
+        // free the least recently used cahedat
         if (cache_head.lru_prev == &cache_head)
             Sys_Error("Cache_Alloc: out of memory");
-                                                    // not enough memory at all
+        // not enough memory at all
         Cache_Free(cache_head.lru_prev->user);
     }
 

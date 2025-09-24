@@ -115,7 +115,7 @@ void Hunk_Check();
 
 
 //========================[z_cache.c]========================//
-typedef struct cache_user_s{
+typedef struct cache_user_s {
 	typeless_ptr   data;
 } cache_user_t;
 typedef cache_user_t* cache_user_p;

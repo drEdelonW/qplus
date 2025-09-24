@@ -36,27 +36,27 @@ vec3_t    chase_dest;
 vec3_t    chase_dest_angles;
 
 
-void Chase_Init(){
+void Chase_Init() {
     Cvar_RegisterVariable(&chase_back);
     Cvar_RegisterVariable(&chase_up);
     Cvar_RegisterVariable(&chase_right);
     Cvar_RegisterVariable(&chase_active);
 }
 
-void Chase_Reset(){
+void Chase_Reset() {
     // for respawning and teleporting
 //    start position 12 units behind head
 }
 
 qboolean SV_RecursiveHullCheck(
-    hull_t* hull,
+    hull_p hull,
     int num,
     float p1f, float p2f,
     vec3_t p1, vec3_t p2,
-    trace_t *trace
+    trace_t* trace
 ); // engine/world/world.c
 
-void TraceLine(vec3_t start, vec3_t end, vec3_t impact){
+void TraceLine(vec3_t start, vec3_t end, vec3_t impact) {
     trace_t  trace;
 
     memset(&trace, 0, sizeof(trace));
@@ -65,7 +65,7 @@ void TraceLine(vec3_t start, vec3_t end, vec3_t impact){
     VectorCopy(trace.endpos, impact);
 }
 
-void Chase_Update(){
+void Chase_Update() {
     vec3_t  forward, up, right;
     vec3_t  dest, stop;
 
@@ -73,7 +73,7 @@ void Chase_Update(){
     AngleVectors(cl.viewangles, forward, right, up);
 
     // calc exact destination
-    for(int i = 0; i < VECT_DIM; i++){
+    for (int i = 0; i < VECT_DIM; i++) {
         chase_dest[i] =
             r_refdef.vieworg[i] -
             forward[i] * chase_back.value -
@@ -88,15 +88,15 @@ void Chase_Update(){
     // calculate pitch to look at the same spot from camera
     VectorSubtract(stop, r_refdef.vieworg, stop);
     float dist = DotProduct(stop, forward);
-    if (dist < 1){
+    if (dist < 1) {
         dist = 1;
     }
 
     r_refdef.viewangles[PITCH] =
         -atan(stop[2] / dist) /
-            M_PI * 180;
+        M_PI * 180;
 
     // move towards destination
-    VectorCopy (chase_dest, r_refdef.vieworg);
+    VectorCopy(chase_dest, r_refdef.vieworg);
 }
 

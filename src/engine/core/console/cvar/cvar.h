@@ -65,10 +65,10 @@ interface from being ambiguous.
    name is taken from symbol via stringification. value is 0 until Cvar_RegisterVariable() */
 #define CVAR(sym, defstr) \
     cvar_t sym = { #sym, (cstring)(defstr), (uint8_t)cvf_none, 0.0f, NULL }
-//  reg_srch: ^\s*cvar_t\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*"\1"\s*,\s*"([^"]*)"\s*\}\s*;
-//  reg_rpc:  CVAR($1, "$2");
+   //  reg_srch: ^\s*cvar_t\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*"\1"\s*,\s*"([^"]*)"\s*\}\s*;
+   //  reg_rpc:  CVAR($1, "$2");
 
-/* same, but with flags */
+   /* same, but with flags */
 #define CVAR_F(sym, defstr, fl) \
     cvar_t sym = { #sym, (cstring)(defstr), (uint8_t)(fl), 0.0f, NULL }
 
@@ -86,13 +86,13 @@ interface from being ambiguous.
     cvar_t sym = { "_" #sym, (cstring)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
 
 
-typedef enum{
-    cvf_none           = 0,
-    cvf_archive        = 1 << 0,   // be saved to vars.rc
-    cvf_server         = 1 << 1,   // notifies players when changed
+typedef enum {
+    cvf_none = 0,
+    cvf_archive = 1 << 0,   // be saved to vars.rc
+    cvf_server = 1 << 1,   // notifies players when changed
     cvf_archive_server = cvf_archive | cvf_server,   // both: be saved to vars.rc and notifies players when changed
 
-    cvf_all            = 0xFF,
+    cvf_all = 0xFF,
 } cvar_flags_t;
 
 /* convenience shorthands */
@@ -108,35 +108,38 @@ typedef enum{
 //  reg_srch: ^\s*cvar_t\s+([A-Za-z_]\w*)\s*=\s*\{\s*"\1"\s*,\s*"([^"]*)"\s*,\s*true\s*,\s*true\s*\}\s*;(\s*//.*)?$
 //  reg_rpc:  CVAR_AS($1, "$2");$3
 
-typedef struct cvar_s{
+struct cvar_s;
+typedef struct cvar_s cvar_t;
+typedef cvar_t* cvar_p;
+struct cvar_s {
     cstring name;
     cstring string;
     // qboolean archive;        // set to true to cause it to be saved to vars.rc
     // qboolean server;        // notifies players when changed
-    uint8_t  flags;
-    float    value;             // cached numeric value
-    struct cvar_s *next;
-} cvar_t;
+    uint8_t flags;
+    float   value;             // cached numeric value
+    cvar_p  next;
+};
 
 // registers a cvar that allready has the name, string, and optionally the
 // archive elements set.
-void     Cvar_RegisterVariable(cvar_t *variable);
+void     Cvar_RegisterVariable(cvar_p variable);
 
 // equivelant to "<name> <variable>" typed at the console
-void     Cvar_Set (cstring var_name, cstring value);
+void     Cvar_Set(cstring var_name, cstring value);
 
 // expands value to a string and calls Cvar_Set
-void    Cvar_SetValue (cstring var_name, float value);
+void    Cvar_SetValue(cstring var_name, float value);
 
 // returns 0 if not defined or non numeric
-float    Cvar_VariableValue (cstring var_name);
+float    Cvar_VariableValue(cstring var_name);
 
 // returns an empty string if not defined
-cstring Cvar_VariableString (cstring var_name);
+cstring Cvar_VariableString(cstring var_name);
 
 // attempts to match a partial variable name for command line completion
 // returns NULL if nothing fits
-cstring Cvar_CompleteVariable (cstring partial);
+cstring Cvar_CompleteVariable(cstring partial);
 
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
 // command.  Returns true if the command was a variable reference that
@@ -145,8 +148,8 @@ qboolean Cvar_Command();
 
 // Writes lines containing "set variable value" for all variables
 // with the archive flag set to true.
-void     Cvar_WriteVariables (FILE *f);
+void     Cvar_WriteVariables(FILE* f);
 
-cvar_t *Cvar_FindVar (cstring var_name);
+cvar_p Cvar_FindVar(cstring var_name);
 
-extern cvar_t    *cvar_vars;
+extern cvar_p cvar_vars;

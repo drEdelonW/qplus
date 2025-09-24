@@ -330,7 +330,7 @@ void SV_ClearDatagram() {
 int     fatbytes;
 byte    fatpvs[MAX_MAP_LEAFS / 8];
 
-void SV_AddToFatPVS(vec3_t org, mnode_t* node) {
+void SV_AddToFatPVS(vec3_t org, mnode_p node) {
     while (1) {
         // if this is a leaf, accumulate the pvs bits
         if (node->contents < 0) {
@@ -343,7 +343,7 @@ void SV_AddToFatPVS(vec3_t org, mnode_t* node) {
             return;
         }
 
-        mplane_t* plane = node->plane;
+        mplane_p plane = node->plane;
         float d = DotProduct(org, plane->normal) - plane->dist;
         if (d > 8)
             node = node->children[0];

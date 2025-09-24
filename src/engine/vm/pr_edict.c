@@ -349,7 +349,7 @@ cstring PR_GlobalString(int ofs) {
 	cstring s;
 	int		i;
 	ddef_p def;
-	void* val;
+	typeless_ptr val;
 	static char	line[128];
 
 	val = (typeless_ptr)&pr_globals[ofs];
@@ -674,7 +674,7 @@ qboolean	ED_ParseEpair(typeless_ptr base, ddef_p key, cstring s) {
 	char	string[128];
 	ddef_p def;
 	cstring v, w;
-	void* d;
+	typeless_ptr d;
 	dfunction_p func;
 
 	d = (typeless_ptr)((int*)base + key->ofs);

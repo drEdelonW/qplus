@@ -34,14 +34,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern regs_t regs;
 
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
-byte	*VGA_pagebase;
-vmode_t	*VGA_pcurmode;
+byte* VGA_pagebase;
+vmode_t* VGA_pcurmode;
 
 static int		VGA_planar;
 static int		VGA_numpages;
 static int		VGA_buffersize;
 
-void	*vid_surfcache;
+typeless_ptr vid_surfcache;
 int		vid_surfcachesize;
 
 int		VGA_highhunkmark;
@@ -50,75 +50,64 @@ int		VGA_highhunkmark;
 
 #define NUMVIDMODES		(sizeof(vgavidmodes) / sizeof(vgavidmodes[0]))
 
-void VGA_UpdatePlanarScreen (typeless_ptr srcbuffer);
+void VGA_UpdatePlanarScreen(typeless_ptr srcbuffer);
 
-static byte	backingbuf[48*24];
+static byte	backingbuf[48 * 24];
 
 /*
 ================
 VGA_BeginDirectRect
 ================
 */
-void VGA_BeginDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode, int x,
-	int y, byte *pbitmap, int width, int height)
-{
+void VGA_BeginDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode, int x,
+	int y, byte* pbitmap, int width, int height) {
 	int		i, j, k, plane, reps, repshift;
 
 	if (!lvid->direct)
 		return;
 
-	if (lvid->aspect > 1.5)
-	{
+	if (lvid->aspect > 1.5) {
 		reps = 2;
 		repshift = 1;
 	}
-	else
-	{
+	else {
 		reps = 1;
 		repshift = 0;
 	}
 
-	if (pcurrentmode->planar)
-	{
-		for (plane=0 ; plane<4 ; plane++)
-		{
-		// select the correct plane for reading and writing
-			outportb (SC_INDEX, MAP_MASK);
-			outportb (SC_DATA, 1 << plane);
-			outportb (GC_INDEX, READ_MAP);
-			outportb (GC_DATA, plane);
+	if (pcurrentmode->planar) {
+		for (plane = 0; plane < 4; plane++) {
+			// select the correct plane for reading and writing
+			outportb(SC_INDEX, MAP_MASK);
+			outportb(SC_DATA, 1 << plane);
+			outportb(GC_INDEX, READ_MAP);
+			outportb(GC_DATA, plane);
 
-			for (i=0 ; i<(height << repshift) ; i += reps)
-			{
-				for (k=0 ; k<reps ; k++)
-				{
-					for (j=0 ; j<(width >> 2) ; j++)
-					{
+			for (i = 0; i < (height << repshift); i += reps) {
+				for (k = 0; k < reps; k++) {
+					for (j = 0; j < (width >> 2); j++) {
 						backingbuf[(i + k) * 24 + (j << 2) + plane] =
-								lvid->direct[(y + i + k) * VGA_rowbytes +
-								(x >> 2) + j];
-						lvid->direct[(y + i + k) * VGA_rowbytes + (x>>2) + j] =
-								pbitmap[(i >> repshift) * 24 +
-								(j << 2) + plane];
+							lvid->direct[(y + i + k) * VGA_rowbytes +
+							(x >> 2) + j];
+						lvid->direct[(y + i + k) * VGA_rowbytes + (x >> 2) + j] =
+							pbitmap[(i >> repshift) * 24 +
+							(j << 2) + plane];
 					}
 				}
 			}
 		}
 	}
-	else
-	{
-		for (i=0 ; i<(height << repshift) ; i += reps)
-		{
-			for (j=0 ; j<reps ; j++)
-			{
-				memcpy (&backingbuf[(i + j) * 24],
-						lvid->direct + x + ((y << repshift) + i + j) *
-						 VGA_rowbytes,
-						width);
-				memcpy (lvid->direct + x + ((y << repshift) + i + j) *
-						 VGA_rowbytes,
-						&pbitmap[(i >> repshift) * width],
-						width);
+	else {
+		for (i = 0; i < (height << repshift); i += reps) {
+			for (j = 0; j < reps; j++) {
+				memcpy(&backingbuf[(i + j) * 24],
+					lvid->direct + x + ((y << repshift) + i + j) *
+					VGA_rowbytes,
+					width);
+				memcpy(lvid->direct + x + ((y << repshift) + i + j) *
+					VGA_rowbytes,
+					&pbitmap[(i >> repshift) * width],
+					width);
 			}
 		}
 	}
@@ -130,56 +119,45 @@ void VGA_BeginDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode, int x,
 VGA_EndDirectRect
 ================
 */
-void VGA_EndDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode, int x,
-	int y, int width, int height)
-{
+void VGA_EndDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode, int x,
+	int y, int width, int height) {
 	int		i, j, k, plane, reps, repshift;
 
 	if (!lvid->direct)
 		return;
 
-	if (lvid->aspect > 1.5)
-	{
+	if (lvid->aspect > 1.5) {
 		reps = 2;
 		repshift = 1;
 	}
-	else
-	{
+	else {
 		reps = 1;
 		repshift = 0;
 	}
 
-	if (pcurrentmode->planar)
-	{
-		for (plane=0 ; plane<4 ; plane++)
-		{
-		// select the correct plane for writing
-			outportb (SC_INDEX, MAP_MASK);
-			outportb (SC_DATA, 1 << plane);
+	if (pcurrentmode->planar) {
+		for (plane = 0; plane < 4; plane++) {
+			// select the correct plane for writing
+			outportb(SC_INDEX, MAP_MASK);
+			outportb(SC_DATA, 1 << plane);
 
-			for (i=0 ; i<(height << repshift) ; i += reps)
-			{
-				for (k=0 ; k<reps ; k++)
-				{
-					for (j=0 ; j<(width >> 2) ; j++)
-					{
-						lvid->direct[(y + i + k) * VGA_rowbytes + (x>>2) + j] =
-								backingbuf[(i + k) * 24 + (j << 2) + plane];
+			for (i = 0; i < (height << repshift); i += reps) {
+				for (k = 0; k < reps; k++) {
+					for (j = 0; j < (width >> 2); j++) {
+						lvid->direct[(y + i + k) * VGA_rowbytes + (x >> 2) + j] =
+							backingbuf[(i + k) * 24 + (j << 2) + plane];
 					}
 				}
 			}
 		}
 	}
-	else
-	{
-		for (i=0 ; i<(height << repshift) ; i += reps)
-		{
-			for (j=0 ; j<reps ; j++)
-			{
-				memcpy (lvid->direct + x + ((y << repshift) + i + j) *
-						 VGA_rowbytes,
-						&backingbuf[(i + j) * 24],
-						width);
+	else {
+		for (i = 0; i < (height << repshift); i += reps) {
+			for (j = 0; j < reps; j++) {
+				memcpy(lvid->direct + x + ((y << repshift) + i + j) *
+					VGA_rowbytes,
+					&backingbuf[(i + j) * 24],
+					width);
 			}
 		}
 	}
@@ -191,18 +169,16 @@ void VGA_EndDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode, int x,
 VGA_Init
 ================
 */
-void VGA_Init()
-{
+void VGA_Init() {
 	int		i;
 
-// link together all the VGA modes
-	for (i=0 ; i<(NUMVIDMODES - 1) ; i++)
-	{
-		vgavidmodes[i].pnext = &vgavidmodes[i+1];
+	// link together all the VGA modes
+	for (i = 0; i < (NUMVIDMODES - 1); i++) {
+		vgavidmodes[i].pnext = &vgavidmodes[i + 1];
 	}
 
-// add the VGA modes at the start of the mode list
-	vgavidmodes[NUMVIDMODES-1].pnext = pvidmodes;
+	// add the VGA modes at the start of the mode list
+	vgavidmodes[NUMVIDMODES - 1].pnext = pvidmodes;
 	pvidmodes = &vgavidmodes[0];
 
 	numvidmodes += NUMVIDMODES;
@@ -214,9 +190,8 @@ void VGA_Init()
 VGA_WaitVsync
 ================
 */
-void VGA_WaitVsync()
-{
-	while ((inportb (0x3DA) & 0x08) == 0)
+void VGA_WaitVsync() {
+	while ((inportb(0x3DA) & 0x08) == 0)
 		;
 }
 
@@ -226,17 +201,15 @@ void VGA_WaitVsync()
 VGA_ClearVideoMem
 ================
 */
-void VGA_ClearVideoMem (int planar)
-{
+void VGA_ClearVideoMem(int planar) {
 
-	if (planar)
-	{
-	// enable all planes for writing
-		outportb (SC_INDEX, MAP_MASK);
-		outportb (SC_DATA, 0x0F);
+	if (planar) {
+		// enable all planes for writing
+		outportb(SC_INDEX, MAP_MASK);
+		outportb(SC_DATA, 0x0F);
 	}
 
-	Q_memset (VGA_pagebase, 0, VGA_rowbytes * VGA_height);
+	Q_memset(VGA_pagebase, 0, VGA_rowbytes * VGA_height);
 }
 
 /*
@@ -244,57 +217,51 @@ void VGA_ClearVideoMem (int planar)
 VGA_FreeAndAllocVidbuffer
 ================
 */
-qboolean VGA_FreeAndAllocVidbuffer (viddef_p lvid, int allocnewbuffer)
-{
+qboolean VGA_FreeAndAllocVidbuffer(viddef_p lvid, int allocnewbuffer) {
 	int		tsize, tbuffersize;
 
-	if (allocnewbuffer)
-	{
-	// alloc an extra line in case we want to wrap, and allocate the z-buffer
+	if (allocnewbuffer) {
+		// alloc an extra line in case we want to wrap, and allocate the z-buffer
 		tbuffersize = (lvid->rowbytes * (lvid->height + 1)) +
-				(lvid->width * lvid->height * sizeof (*d_pzbuffer));
+			(lvid->width * lvid->height * sizeof(*d_pzbuffer));
 	}
-	else
-	{
-	// just allocate the z-buffer
-		tbuffersize = lvid->width * lvid->height * sizeof (*d_pzbuffer);
+	else {
+		// just allocate the z-buffer
+		tbuffersize = lvid->width * lvid->height * sizeof(*d_pzbuffer);
 	}
 
-	tsize = D_SurfaceCacheForRes (lvid->width, lvid->height);
+	tsize = D_SurfaceCacheForRes(lvid->width, lvid->height);
 
 	tbuffersize += tsize;
 
-// see if there's enough memory, allowing for the normal mode 0x13 pixel,
-// z, and surface buffers
+	// see if there's enough memory, allowing for the normal mode 0x13 pixel,
+	// z, and surface buffers
 	if ((host_parms.memsize - tbuffersize + SURFCACHE_SIZE_AT_320X200 +
-		 0x10000 * 3) < minimum_memory)
-	{
-		Con_Printf ("Not enough memory for video mode\n");
+		0x10000 * 3) < minimum_memory) {
+		Con_Printf("Not enough memory for video mode\n");
 		VGA_pcurmode = NULL;	// so no further accesses to the buffer are
-								//  attempted, particularly when clearing
+		//  attempted, particularly when clearing
 		return false;		// not enough memory for mode
 	}
 
 	VGA_buffersize = tbuffersize;
 	vid_surfcachesize = tsize;
 
-	if (d_pzbuffer)
-	{
-		D_FlushCaches ();
-		Hunk_FreeToHighMark (VGA_highhunkmark);
+	if (d_pzbuffer) {
+		D_FlushCaches();
+		Hunk_FreeToHighMark(VGA_highhunkmark);
 		d_pzbuffer = NULL;
 	}
 
-	VGA_highhunkmark = Hunk_HighMark ();
+	VGA_highhunkmark = Hunk_HighMark();
 
-	d_pzbuffer = Hunk_HighAllocName (VGA_buffersize, "video");
+	d_pzbuffer = Hunk_HighAllocName(VGA_buffersize, "video");
 
-	vid_surfcache = (byte *)d_pzbuffer
-		+ lvid->width * lvid->height * sizeof (*d_pzbuffer);
+	vid_surfcache = (byte*)d_pzbuffer
+		+ lvid->width * lvid->height * sizeof(*d_pzbuffer);
 
-	if (allocnewbuffer)
-	{
-		lvid->buffer = (typeless_ptr )( (byte *)vid_surfcache + vid_surfcachesize);
+	if (allocnewbuffer) {
+		lvid->buffer = (typeless_ptr)((byte*)vid_surfcache + vid_surfcachesize);
 		lvid->conbuffer = lvid->buffer;
 	}
 
@@ -307,26 +274,23 @@ qboolean VGA_FreeAndAllocVidbuffer (viddef_p lvid, int allocnewbuffer)
 VGA_CheckAdequateMem
 ================
 */
-qboolean VGA_CheckAdequateMem (int width, int height, int rowbytes,
-	int allocnewbuffer)
-{
+qboolean VGA_CheckAdequateMem(int width, int height, int rowbytes,
+	int allocnewbuffer) {
 	int		tbuffersize;
 
-	tbuffersize = width * height * sizeof (*d_pzbuffer);
+	tbuffersize = width * height * sizeof(*d_pzbuffer);
 
-	if (allocnewbuffer)
-	{
-	// alloc an extra line in case we want to wrap, and allocate the z-buffer
+	if (allocnewbuffer) {
+		// alloc an extra line in case we want to wrap, and allocate the z-buffer
 		tbuffersize += (rowbytes * (height + 1));
 	}
 
-	tbuffersize += D_SurfaceCacheForRes (width, height);
+	tbuffersize += D_SurfaceCacheForRes(width, height);
 
-// see if there's enough memory, allowing for the normal mode 0x13 pixel,
-// z, and surface buffers
+	// see if there's enough memory, allowing for the normal mode 0x13 pixel,
+	// z, and surface buffers
 	if ((host_parms.memsize - tbuffersize + SURFCACHE_SIZE_AT_320X200 +
-		 0x10000 * 3) < minimum_memory)
-	{
+		0x10000 * 3) < minimum_memory) {
 		return false;		// not enough memory for mode
 	}
 
@@ -339,28 +303,27 @@ qboolean VGA_CheckAdequateMem (int width, int height, int rowbytes,
 VGA_InitMode
 ================
 */
-int VGA_InitMode (viddef_p lvid, vmode_t *pcurrentmode)
-{
-	vextra_t		*pextra;
+int VGA_InitMode(viddef_p lvid, vmode_t* pcurrentmode) {
+	vextra_t* pextra;
 
 	pextra = pcurrentmode->pextradata;
 
-	if (!VGA_FreeAndAllocVidbuffer (lvid, pextra->vidbuffer))
+	if (!VGA_FreeAndAllocVidbuffer(lvid, pextra->vidbuffer))
 		return -1;	// memory alloc failed
 
 	if (VGA_pcurmode)
-		VGA_ClearVideoMem (VGA_pcurmode->planar);
+		VGA_ClearVideoMem(VGA_pcurmode->planar);
 
-// mode 0x13 is the base for all the Mode X-class mode sets
+	// mode 0x13 is the base for all the Mode X-class mode sets
 	regs.h.ah = 0;
 	regs.h.al = 0x13;
 	dos_int86(0x10);
 
-	VGA_pagebase = (typeless_ptr )real2ptr(0xa0000);
+	VGA_pagebase = (typeless_ptr)real2ptr(0xa0000);
 	lvid->direct = (pixel_p)VGA_pagebase;
 
-// set additional registers as needed
-	VideoRegisterSet (pextra->pregset);
+	// set additional registers as needed
+	VideoRegisterSet(pextra->pregset);
 
 	VGA_numpages = 1;
 	lvid->numpages = VGA_numpages;
@@ -374,7 +337,7 @@ int VGA_InitMode (viddef_p lvid, vmode_t *pcurrentmode)
 		VGA_rowbytes = lvid->rowbytes;
 	VGA_bufferrowbytes = lvid->rowbytes;
 	lvid->colormap = host_colormap;
-	lvid->fullbright = 256 - LittleLong (*((int *)lvid->colormap + 2048));
+	lvid->fullbright = 256 - LittleLong(*((int*)lvid->colormap + 2048));
 
 	lvid->maxwarpwidth = WARP_WIDTH;
 	lvid->maxwarpheight = WARP_HEIGHT;
@@ -386,18 +349,16 @@ int VGA_InitMode (viddef_p lvid, vmode_t *pcurrentmode)
 
 	VGA_pcurmode = pcurrentmode;
 
-	VGA_ClearVideoMem (pcurrentmode->planar);
+	VGA_ClearVideoMem(pcurrentmode->planar);
 
-	if (_vid_wait_override.value)
-	{
-		Cvar_SetValue ("vid_wait", (float)VID_WAIT_VSYNC);
+	if (_vid_wait_override.value) {
+		Cvar_SetValue("vid_wait", (float)VID_WAIT_VSYNC);
 	}
-	else
-	{
-		Cvar_SetValue ("vid_wait", (float)VID_WAIT_NONE);
+	else {
+		Cvar_SetValue("vid_wait", (float)VID_WAIT_NONE);
 	}
 
-	D_InitCaches (vid_surfcache, vid_surfcachesize);
+	D_InitCaches(vid_surfcache, vid_surfcachesize);
 
 	return 1;
 }
@@ -408,17 +369,16 @@ int VGA_InitMode (viddef_p lvid, vmode_t *pcurrentmode)
 VGA_SetPalette
 ================
 */
-void VGA_SetPalette(viddef_p lvid, vmode_t *pcurrentmode, uint8_t *pal)
-{
-	int shiftcomponents=2;
+void VGA_SetPalette(viddef_p lvid, vmode_t* pcurrentmode, uint8_t* pal) {
+	int shiftcomponents = 2;
 	int i;
 
 	UNUSED(lvid);
 	UNUSED(pcurrentmode);
 
 	dos_outportb(0x3c8, 0);
-	for (i=0 ; i<768 ; i++)
-		outportb(0x3c9, pal[i]>>shiftcomponents);
+	for (i = 0; i < 768; i++)
+		outportb(0x3c9, pal[i] >> shiftcomponents);
 }
 
 
@@ -427,33 +387,29 @@ void VGA_SetPalette(viddef_p lvid, vmode_t *pcurrentmode, uint8_t *pal)
 VGA_SwapBuffersCopy
 ================
 */
-void VGA_SwapBuffersCopy (viddef_p lvid, vmode_t *pcurrentmode,
-	vrect_p rects)
-{
+void VGA_SwapBuffersCopy(viddef_p lvid, vmode_t* pcurrentmode,
+	vrect_p rects) {
 
 	UNUSED(pcurrentmode);
 
-// TODO: can write a dword at a time
-// TODO: put in ASM
-// TODO: copy only specified rectangles
-	if (VGA_planar)
-	{
-
+	// TODO: can write a dword at a time
+	// TODO: put in ASM
 	// TODO: copy only specified rectangles
+	if (VGA_planar) {
 
-		VGA_UpdatePlanarScreen (lvid->buffer);
+		// TODO: copy only specified rectangles
+
+		VGA_UpdatePlanarScreen(lvid->buffer);
 	}
-	else
-	{
-		while (rects)
-		{
-			VGA_UpdateLinearScreen (
-					lvid->buffer + rects->x + (rects->y * lvid->rowbytes),
-		 			VGA_pagebase + rects->x + (rects->y * VGA_rowbytes),
-					rects->width,
-					rects->height,
-					lvid->rowbytes,
-					VGA_rowbytes);
+	else {
+		while (rects) {
+			VGA_UpdateLinearScreen(
+				lvid->buffer + rects->x + (rects->y * lvid->rowbytes),
+				VGA_pagebase + rects->x + (rects->y * VGA_rowbytes),
+				rects->width,
+				rects->height,
+				lvid->rowbytes,
+				VGA_rowbytes);
 
 			rects = rects->pnext;
 		}
@@ -466,13 +422,12 @@ void VGA_SwapBuffersCopy (viddef_p lvid, vmode_t *pcurrentmode,
 VGA_SwapBuffers
 ================
 */
-void VGA_SwapBuffers (viddef_p lvid, vmode_t *pcurrentmode, vrect_p rects)
-{
+void VGA_SwapBuffers(viddef_p lvid, vmode_t* pcurrentmode, vrect_p rects) {
 	UNUSED(lvid);
 
 	if (vid_wait.value == VID_WAIT_VSYNC)
-		VGA_WaitVsync ();
+		VGA_WaitVsync();
 
-	VGA_SwapBuffersCopy (lvid, pcurrentmode, rects);
+	VGA_SwapBuffersCopy(lvid, pcurrentmode, rects);
 }
 

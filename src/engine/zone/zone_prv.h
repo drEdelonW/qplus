@@ -7,7 +7,7 @@
 #define ALIGN_UP(x, a)   (((x) + ((a) - 1)) & ~((a) - 1))
 
 //========================[z_hulk.c]========================//
-extern byte*       hunk_base;
+extern byte* hunk_base;
 extern size_t      hunk_size;
 
 extern size_t      hunk_low_used;
@@ -20,12 +20,12 @@ void Hulk_Init(typeless_ptr buf, size_t size);
 struct memblock_s;
 typedef struct memblock_s memblock_t;
 typedef memblock_t* memblock_p;
-struct memblock_s{
+struct memblock_s {
 	size_t      size;   // including the header and possibly tiny fragments
 	int         tag;    // a tag of 0 is a free block
 	int         id;     // should be ZONEID
 	memblock_p  next;
-    memblock_p  prev;
+	memblock_p  prev;
 	int		    pad;    // pad to 64 bit boundary
 };
 
@@ -36,7 +36,7 @@ void Cache_FreeLow(int new_low_hunk);
 void Cache_Init();
 
 //========================[z_cache.c]========================//
-typedef struct{
+typedef struct {
 	size_t 		size;       // total bytes malloced, including header
 	memblock_t  blocklist;  // start / end cap for linked list
 	memblock_p  rover;

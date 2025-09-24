@@ -49,12 +49,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct {
 	int			pages[3];			// either 2 or 3 is valid
 	int			vesamode;			// LINEAR_MODE set if linear mode
-	void		*plinearmem;		// linear address of start of frame buffer
+	typeless_ptr plinearmem;		// linear address of start of frame buffer
 	qboolean	vga_incompatible;
 } vesa_extra_t;
 
 static vmode_t		vesa_modes[MAX_VESA_MODES] =
-	{{NULL, NULL, "    ********* VESA modes *********    "}};
+{ {NULL, NULL, "    ********* VESA modes *********    "} };
 static vesa_extra_t	vesa_extra[MAX_VESA_MODES];
 static char			names[MAX_VESA_MODES][10];
 
@@ -62,8 +62,8 @@ extern regs_t regs;
 
 static int		VID_currentpage;
 static int		VID_displayedpage;
-static int		*VID_pagelist;
-static byte		*VID_membase;
+static int* VID_pagelist;
+static byte* VID_membase;
 static int		VID_banked;
 
 typedef struct
@@ -96,27 +96,27 @@ static modeinfo_t modeinfo;
 
 // all bytes to avoid problems with compiler field packing
 typedef struct vbeinfoblock_s {
-     byte			VbeSignature[4];
-     byte			VbeVersion[2];
-     byte			OemStringPtr[4];
-     byte			Capabilities[4];
-     byte			VideoModePtr[4];
-     byte			TotalMemory[2];
-     byte			OemSoftwareRev[2];
-     byte			OemVendorNamePtr[4];
-     byte			OemProductNamePtr[4];
-     byte			OemProductRevPtr[4];
-     byte			Reserved[222];
-     byte			OemData[256];
+	byte			VbeSignature[4];
+	byte			VbeVersion[2];
+	byte			OemStringPtr[4];
+	byte			Capabilities[4];
+	byte			VideoModePtr[4];
+	byte			TotalMemory[2];
+	byte			OemSoftwareRev[2];
+	byte			OemVendorNamePtr[4];
+	byte			OemProductNamePtr[4];
+	byte			OemProductRevPtr[4];
+	byte			Reserved[222];
+	byte			OemData[256];
 } vbeinfoblock_t;
 
 static int	totalvidmem;
-static byte	*ppal;
+static byte* ppal;
 qboolean	vsync_exists, de_exists;
 
 qboolean VID_ExtraGetModeInfo(int modenum);
-int VID_ExtraInitMode (viddef_p vid, vmode_t *pcurrentmode);
-void VID_ExtraSwapBuffers (viddef_p vid, vmode_t *pcurrentmode,
+int VID_ExtraInitMode(viddef_p vid, vmode_t* pcurrentmode);
+void VID_ExtraSwapBuffers(viddef_p vid, vmode_t* pcurrentmode,
 	vrect_p rects);
 
 
@@ -125,9 +125,8 @@ void VID_ExtraSwapBuffers (viddef_p vid, vmode_t *pcurrentmode,
 VGA_BankedBeginDirectRect
 ================
 */
-void VGA_BankedBeginDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode,
-	int x, int y, byte *pbitmap, int width, int height)
-{
+void VGA_BankedBeginDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode,
+	int x, int y, byte* pbitmap, int width, int height) {
 
 	if (!lvid->direct)
 		return;
@@ -137,7 +136,7 @@ void VGA_BankedBeginDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode,
 	regs.x.dx = VID_displayedpage;
 	dos_int86(0x10);
 
-	VGA_BeginDirectRect (lvid, pcurrentmode, x, y, pbitmap, width, height);
+	VGA_BeginDirectRect(lvid, pcurrentmode, x, y, pbitmap, width, height);
 
 	regs.x.ax = 0x4f05;
 	regs.x.bx = 0;
@@ -151,9 +150,8 @@ void VGA_BankedBeginDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode,
 VGA_BankedEndDirectRect
 ================
 */
-void VGA_BankedEndDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode,
-	int x, int y, int width, int height)
-{
+void VGA_BankedEndDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode,
+	int x, int y, int width, int height) {
 
 	if (!lvid->direct)
 		return;
@@ -163,7 +161,7 @@ void VGA_BankedEndDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode,
 	regs.x.dx = VID_displayedpage;
 	dos_int86(0x10);
 
-	VGA_EndDirectRect (lvid, pcurrentmode, x, y, width, height);
+	VGA_EndDirectRect(lvid, pcurrentmode, x, y, width, height);
 
 	regs.x.ax = 0x4f05;
 	regs.x.bx = 0;
@@ -177,19 +175,17 @@ void VGA_BankedEndDirectRect (viddef_p lvid, struct vmode_s *pcurrentmode,
 VID_SetVESAPalette
 ================
 */
-void VID_SetVESAPalette (viddef_p lvid, vmode_t *pcurrentmode,
-	uint8_t *pal)
-{
+void VID_SetVESAPalette(viddef_p lvid, vmode_t* pcurrentmode,
+	uint8_t* pal) {
 	int		i;
-	byte	*pp;
+	byte* pp;
 
 	UNUSED(lvid);
 	UNUSED(pcurrentmode);
 
 	pp = ppal;
 
-	for (i=0 ; i<256 ; i++)
-	{
+	for (i = 0; i < 256; i++) {
 		pp[2] = pal[0] >> 2;
 		pp[1] = pal[1] >> 2;
 		pp[0] = pal[2] >> 2;
@@ -206,7 +202,7 @@ void VID_SetVESAPalette (viddef_p lvid, vmode_t *pcurrentmode,
 	dos_int86(0x10);
 
 	if (regs.x.ax != 0x4f)
-		Sys_Error ("Unable to load VESA palette\n");
+		Sys_Error("Unable to load VESA palette\n");
 }
 
 
@@ -217,8 +213,7 @@ void VID_SetVESAPalette (viddef_p lvid, vmode_t *pcurrentmode,
 VID_ExtraFarToLinear
 ================
 */
-typeless_ptr VID_ExtraFarToLinear (typeless_ptr ptr)
-{
+typeless_ptr VID_ExtraFarToLinear(typeless_ptr ptr) {
 	int		temp;
 
 	temp = (int)ptr;
@@ -231,9 +226,8 @@ typeless_ptr VID_ExtraFarToLinear (typeless_ptr ptr)
 VID_ExtraWaitDisplayEnable
 ================
 */
-void VID_ExtraWaitDisplayEnable ()
-{
-	while ((inportb (0x3DA) & 0x01) == 1)
+void VID_ExtraWaitDisplayEnable() {
+	while ((inportb(0x3DA) & 0x01) == 1)
 		;
 }
 
@@ -243,22 +237,19 @@ void VID_ExtraWaitDisplayEnable ()
 VID_ExtraVidLookForState
 ================
 */
-qboolean VID_ExtraVidLookForState (unsigned state, unsigned mask)
-{
+qboolean VID_ExtraVidLookForState(unsigned state, unsigned mask) {
 	int		i;
 	double	starttime, time;
 
-	starttime = Sys_FloatTime ();
+	starttime = Sys_FloatTime();
 
-	do
-	{
-		for (i=0 ; i<100000 ; i++)
-		{
-			if ((inportb (0x3DA) & mask) == state)
+	do {
+		for (i = 0; i < 100000; i++) {
+			if ((inportb(0x3DA) & mask) == state)
 				return true;
 		}
 
-		time = Sys_FloatTime ();
+		time = Sys_FloatTime();
 	} while ((time - starttime) < 0.1);
 
 	return false;
@@ -270,16 +261,13 @@ qboolean VID_ExtraVidLookForState (unsigned state, unsigned mask)
 VID_ExtraStateFound
 ================
 */
-qboolean VID_ExtraStateFound (unsigned state)
-{
+qboolean VID_ExtraStateFound(unsigned state) {
 	int		i, workingstate;
 
 	workingstate = 0;
 
-	for (i=0 ; i<10 ; i++)
-	{
-		if (!VID_ExtraVidLookForState(workingstate, state))
-		{
+	for (i = 0; i < 10; i++) {
+		if (!VID_ExtraVidLookForState(workingstate, state)) {
 			return false;
 		}
 
@@ -295,18 +283,17 @@ qboolean VID_ExtraStateFound (unsigned state)
 VID_InitExtra
 ================
 */
-void VID_InitExtra()
-{
+void VID_InitExtra() {
 	int				nummodes;
-	int16_t			*pmodenums;
-	vbeinfoblock_t	*pinfoblock;
+	int16_t* pmodenums;
+	vbeinfoblock_t* pinfoblock;
 	__dpmi_meminfo	phys_mem_info;
 
 	pinfoblock = dos_getmemory(sizeof(vbeinfoblock_t));
 
-	*(long *)pinfoblock->VbeSignature = 'V' + ('B'<<8) + ('E'<<16) + ('2'<<24);
+	*(long*)pinfoblock->VbeSignature = 'V' + ('B' << 8) + ('E' << 16) + ('2' << 24);
 
-// see if VESA support is available
+	// see if VESA support is available
 	regs.x.ax = 0x4f00;
 	regs.x.es = ptr2real(pinfoblock) >> 4;
 	regs.x.di = ptr2real(pinfoblock) & 0xf;
@@ -318,49 +305,41 @@ void VID_InitExtra()
 	if (pinfoblock->VbeVersion[1] < 0x02)
 		return;		// not VESA 2.0 or greater
 
-	Con_Printf ("VESA 2.0 compliant adapter:\n%s\n",
-				VID_ExtraFarToLinear (*(byte **)&pinfoblock->OemStringPtr[0]));
+	Con_Printf("VESA 2.0 compliant adapter:\n%s\n",
+		VID_ExtraFarToLinear(*(byte**)&pinfoblock->OemStringPtr[0]));
 
-	totalvidmem = *(uint16_t *)&pinfoblock->TotalMemory[0] << 16;
+	totalvidmem = *(uint16_t*)&pinfoblock->TotalMemory[0] << 16;
 
-	pmodenums = (int16_t *)
-			VID_ExtraFarToLinear (*(byte **)&pinfoblock->VideoModePtr[0]);
+	pmodenums = (int16_t*)
+		VID_ExtraFarToLinear(*(byte**)&pinfoblock->VideoModePtr[0]);
 
-// find 8 bit modes until we either run out of space or run out of modes
+	// find 8 bit modes until we either run out of space or run out of modes
 	nummodes = 0;
 
-	while ((*pmodenums != -1) && (nummodes < MAX_VESA_MODES))
-	{
-		if (VID_ExtraGetModeInfo (*pmodenums))
-		{
-			vesa_modes[nummodes].pnext = &vesa_modes[nummodes+1];
-			if (modeinfo.width > 999)
-			{
-				if (modeinfo.height > 999)
-				{
-					sprintf (&names[nummodes][0], "%4dx%4d", modeinfo.width,
-							 modeinfo.height);
+	while ((*pmodenums != -1) && (nummodes < MAX_VESA_MODES)) {
+		if (VID_ExtraGetModeInfo(*pmodenums)) {
+			vesa_modes[nummodes].pnext = &vesa_modes[nummodes + 1];
+			if (modeinfo.width > 999) {
+				if (modeinfo.height > 999) {
+					sprintf(&names[nummodes][0], "%4dx%4d", modeinfo.width,
+						modeinfo.height);
 					names[nummodes][9] = 0;
 				}
-				else
-				{
-					sprintf (&names[nummodes][0], "%4dx%3d", modeinfo.width,
-							 modeinfo.height);
+				else {
+					sprintf(&names[nummodes][0], "%4dx%3d", modeinfo.width,
+						modeinfo.height);
 					names[nummodes][8] = 0;
 				}
 			}
-			else
-			{
-				if (modeinfo.height > 999)
-				{
-					sprintf (&names[nummodes][0], "%3dx%4d", modeinfo.width,
-							 modeinfo.height);
+			else {
+				if (modeinfo.height > 999) {
+					sprintf(&names[nummodes][0], "%3dx%4d", modeinfo.width,
+						modeinfo.height);
 					names[nummodes][8] = 0;
 				}
-				else
-				{
-					sprintf (&names[nummodes][0], "%3dx%3d", modeinfo.width,
-							 modeinfo.height);
+				else {
+					sprintf(&names[nummodes][0], "%3dx%3d", modeinfo.width,
+						modeinfo.height);
 					names[nummodes][7] = 0;
 				}
 			}
@@ -369,8 +348,8 @@ void VID_InitExtra()
 			vesa_modes[nummodes].width = modeinfo.width;
 			vesa_modes[nummodes].height = modeinfo.height;
 			vesa_modes[nummodes].aspect =
-					((float)modeinfo.height / (float)modeinfo.width) *
-					(320.0 / 240.0);
+				((float)modeinfo.height / (float)modeinfo.width) *
+				(320.0 / 240.0);
 			vesa_modes[nummodes].rowbytes = modeinfo.bytes_per_scanline;
 			vesa_modes[nummodes].planar = 0;
 			vesa_modes[nummodes].pextradata = &vesa_extra[nummodes];
@@ -378,9 +357,8 @@ void VID_InitExtra()
 			vesa_modes[nummodes].swapbuffers = VID_ExtraSwapBuffers;
 			vesa_modes[nummodes].setpalette = VID_SetVESAPalette;
 
-			if (modeinfo.mode_attributes & LINEAR_FRAME_BUFFER)
-			{
-			// add linear bit to mode for linear modes
+			if (modeinfo.mode_attributes & LINEAR_FRAME_BUFFER) {
+				// add linear bit to mode for linear modes
 				vesa_extra[nummodes].vesamode = modeinfo.modenum | LINEAR_MODE;
 				vesa_extra[nummodes].pages[0] = 0;
 				vesa_extra[nummodes].pages[1] = modeinfo.pagesize;
@@ -397,18 +375,17 @@ void VID_InitExtra()
 					goto NextMode;
 
 				vesa_extra[nummodes].plinearmem =
-						 real2ptr (phys_mem_info.address);
+					real2ptr(phys_mem_info.address);
 			}
-			else
-			{
-			// banked at 0xA0000
+			else {
+				// banked at 0xA0000
 				vesa_extra[nummodes].vesamode = modeinfo.modenum;
 				vesa_extra[nummodes].pages[0] = 0;
 				vesa_extra[nummodes].plinearmem =
-						real2ptr(modeinfo.winasegment<<4);
+					real2ptr(modeinfo.winasegment << 4);
 
 				vesa_modes[nummodes].begindirectrect =
-						VGA_BankedBeginDirectRect;
+					VGA_BankedBeginDirectRect;
 				vesa_modes[nummodes].enddirectrect = VGA_BankedEndDirectRect;
 				vesa_extra[nummodes].pages[1] = modeinfo.pagesize;
 				vesa_extra[nummodes].pages[2] = modeinfo.pagesize * 2;
@@ -416,21 +393,20 @@ void VID_InitExtra()
 			}
 
 			vesa_extra[nummodes].vga_incompatible =
-					modeinfo.mode_attributes & VGA_INCOMPATIBLE;
+				modeinfo.mode_attributes & VGA_INCOMPATIBLE;
 
 			nummodes++;
 		}
-NextMode:
+	NextMode:
 		pmodenums++;
 	}
 
-// add the VESA modes at the start of the mode list (if there are any)
-	if (nummodes)
-	{
-		vesa_modes[nummodes-1].pnext = pvidmodes;
+	// add the VESA modes at the start of the mode list (if there are any)
+	if (nummodes) {
+		vesa_modes[nummodes - 1].pnext = pvidmodes;
 		pvidmodes = &vesa_modes[0];
 		numvidmodes += nummodes;
-		ppal = dos_getmemory(256*4);
+		ppal = dos_getmemory(256 * 4);
 	}
 
 	dos_freememory(pinfoblock);
@@ -442,8 +418,7 @@ NextMode:
 VID_ExtraGetModeInfo
 ================
 */
-qboolean VID_ExtraGetModeInfo(int modenum)
-{
+qboolean VID_ExtraGetModeInfo(int modenum) {
 	cstring infobuf;
 	int		numimagepages;
 
@@ -454,108 +429,98 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 	regs.x.es = ptr2real(infobuf) >> 4;
 	regs.x.di = ptr2real(infobuf) & 0xf;
 	dos_int86(0x10);
-	if (regs.x.ax != 0x4f)
-	{
+	if (regs.x.ax != 0x4f) {
 		return false;
 	}
-	else
-	{
+	else {
 		modeinfo.modenum = modenum;
-		modeinfo.bits_per_pixel = *(char*)(infobuf+25);
-		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel+1)/8;
-		modeinfo.width = *(int16_t*)(infobuf+18);
-		modeinfo.height = *(int16_t*)(infobuf+20);
+		modeinfo.bits_per_pixel = *(char*)(infobuf + 25);
+		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel + 1) / 8;
+		modeinfo.width = *(int16_t*)(infobuf + 18);
+		modeinfo.height = *(int16_t*)(infobuf + 20);
 
-	// we do only 8-bpp in software
+		// we do only 8-bpp in software
 		if ((modeinfo.bits_per_pixel != 8) ||
 			(modeinfo.bytes_per_pixel != 1) ||
 			(modeinfo.width > MAXWIDTH) ||
-			(modeinfo.height > MAXHEIGHT))
-		{
+			(modeinfo.height > MAXHEIGHT)) {
 			return false;
 		}
 
 		modeinfo.mode_attributes = *(int16_t*)infobuf;
 
-	// we only want color graphics modes that are supported by the hardware
+		// we only want color graphics modes that are supported by the hardware
 		if ((modeinfo.mode_attributes &
-			 (MODE_SUPPORTED_IN_HW | COLOR_MODE | GRAPHICS_MODE)) !=
-			(MODE_SUPPORTED_IN_HW | COLOR_MODE | GRAPHICS_MODE))
-		{
+			(MODE_SUPPORTED_IN_HW | COLOR_MODE | GRAPHICS_MODE)) !=
+			(MODE_SUPPORTED_IN_HW | COLOR_MODE | GRAPHICS_MODE)) {
 			return false;
 		}
 
-	// we only work with linear frame buffers, except for 320x200, which can
-	// effectively be linear when banked at 0xA000
-		if (!(modeinfo.mode_attributes & LINEAR_FRAME_BUFFER))
-		{
+		// we only work with linear frame buffers, except for 320x200, which can
+		// effectively be linear when banked at 0xA000
+		if (!(modeinfo.mode_attributes & LINEAR_FRAME_BUFFER)) {
 			if ((modeinfo.width != 320) || (modeinfo.height != 200))
 				return false;
 		}
 
-		modeinfo.bytes_per_scanline = *(int16_t*)(infobuf+16);
+		modeinfo.bytes_per_scanline = *(int16_t*)(infobuf + 16);
 
 		modeinfo.pagesize = modeinfo.bytes_per_scanline * modeinfo.height;
 
 		if (modeinfo.pagesize > totalvidmem)
 			return false;
 
-	// force to one page if the adapter reports it doesn't support more pages
-	// than that, no matter how much memory it has--it may not have hardware
-	// support for page flipping
-		numimagepages = *(uint8_t *)(infobuf+29);
+		// force to one page if the adapter reports it doesn't support more pages
+		// than that, no matter how much memory it has--it may not have hardware
+		// support for page flipping
+		numimagepages = *(uint8_t*)(infobuf + 29);
 
-		if (numimagepages <= 0)
-		{
-		// wrong, but there seems to be an ATI VESA driver that reports 0
+		if (numimagepages <= 0) {
+			// wrong, but there seems to be an ATI VESA driver that reports 0
 			modeinfo.numpages = 1;
 		}
-		else if (numimagepages < 3)
-		{
+		else if (numimagepages < 3) {
 			modeinfo.numpages = numimagepages;
 		}
-		else
-		{
+		else {
 			modeinfo.numpages = 3;
 		}
 
-		if (*(char*)(infobuf+2) & 5)
-		{
-			modeinfo.winasegment = *(uint16_t*)(infobuf+8);
+		if (*(char*)(infobuf + 2) & 5) {
+			modeinfo.winasegment = *(uint16_t*)(infobuf + 8);
 			modeinfo.win = 0;
 		}
-		else if (*(char*)(infobuf+3) & 5)
-		{
-			modeinfo.winbsegment = *(uint16_t*)(infobuf+8);
+		else if (*(char*)(infobuf + 3) & 5) {
+			modeinfo.winbsegment = *(uint16_t*)(infobuf + 8);
 			modeinfo.win = 1;
 		}
-		modeinfo.granularity = *(int16_t*)(infobuf+4) * 1024;
-		modeinfo.win_size = *(int16_t*)(infobuf+6) * 1024;
-		modeinfo.bits_per_pixel = *(char*)(infobuf+25);
-		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel+1)/8;
-		modeinfo.memory_model = *(uint8_t*)(infobuf+27);
-		modeinfo.num_pages = *(char*)(infobuf+29) + 1;
+		modeinfo.granularity = *(int16_t*)(infobuf + 4) * 1024;
+		modeinfo.win_size = *(int16_t*)(infobuf + 6) * 1024;
+		modeinfo.bits_per_pixel = *(char*)(infobuf + 25);
+		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel + 1) / 8;
+		modeinfo.memory_model = *(uint8_t*)(infobuf + 27);
+		modeinfo.num_pages = *(char*)(infobuf + 29) + 1;
 
-		modeinfo.red_width = *(char*)(infobuf+31);
-		modeinfo.red_pos = *(char*)(infobuf+32);
-		modeinfo.green_width = *(char*)(infobuf+33);
-		modeinfo.green_pos = *(char*)(infobuf+34);
-		modeinfo.blue_width = *(char*)(infobuf+35);
-		modeinfo.blue_pos = *(char*)(infobuf+36);
+		modeinfo.red_width = *(char*)(infobuf + 31);
+		modeinfo.red_pos = *(char*)(infobuf + 32);
+		modeinfo.green_width = *(char*)(infobuf + 33);
+		modeinfo.green_pos = *(char*)(infobuf + 34);
+		modeinfo.blue_width = *(char*)(infobuf + 35);
+		modeinfo.blue_pos = *(char*)(infobuf + 36);
 
-		modeinfo.pptr = *(long *)(infobuf+40);
+		modeinfo.pptr = *(long*)(infobuf + 40);
 
 #if 0
 		printf("VID: (VESA) info for mode 0x%x\n", modeinfo.modenum);
 		printf("  mode attrib = 0x%0x\n", modeinfo.mode_attributes);
-		printf("  win a attrib = 0x%0x\n", *(uint8_t*)(infobuf+2));
-		printf("  win b attrib = 0x%0x\n", *(uint8_t*)(infobuf+3));
-		printf("  win a seg 0x%0x\n", (int) modeinfo.winasegment);
-		printf("  win b seg 0x%0x\n", (int) modeinfo.winbsegment);
+		printf("  win a attrib = 0x%0x\n", *(uint8_t*)(infobuf + 2));
+		printf("  win b attrib = 0x%0x\n", *(uint8_t*)(infobuf + 3));
+		printf("  win a seg 0x%0x\n", (int)modeinfo.winasegment);
+		printf("  win b seg 0x%0x\n", (int)modeinfo.winbsegment);
 		printf("  bytes per scanline = %d\n",
-				modeinfo.bytes_per_scanline);
+			modeinfo.bytes_per_scanline);
 		printf("  width = %d, height = %d\n", modeinfo.width,
-				modeinfo.height);
+			modeinfo.height);
 		printf("  win = %c\n", 'A' + modeinfo.win);
 		printf("  win granularity = %d\n", modeinfo.granularity);
 		printf("  win size = %d\n", modeinfo.win_size);
@@ -584,9 +549,8 @@ qboolean VID_ExtraGetModeInfo(int modenum)
 VID_ExtraInitMode
 ================
 */
-int VID_ExtraInitMode (viddef_p lvid, vmode_t *pcurrentmode)
-{
-	vesa_extra_t	*pextra;
+int VID_ExtraInitMode(viddef_p lvid, vmode_t* pcurrentmode) {
+	vesa_extra_t* pextra;
 	int				pageoffset;
 
 	pextra = pcurrentmode->pextradata;
@@ -596,17 +560,17 @@ int VID_ExtraInitMode (viddef_p lvid, vmode_t *pcurrentmode)
 	else
 		lvid->numpages = pcurrentmode->numpages;
 
-// clean up any old vid buffer lying around, alloc new if needed
-	if (!VGA_FreeAndAllocVidbuffer (lvid, lvid->numpages == 1))
+	// clean up any old vid buffer lying around, alloc new if needed
+	if (!VGA_FreeAndAllocVidbuffer(lvid, lvid->numpages == 1))
 		return -1;	// memory alloc failed
 
-// clear the screen and wait for the next frame. VGA_pcurmode, which
-// VGA_ClearVideoMem relies on, is guaranteed to be set because mode 0 is
-// always the first mode set in a session
+	// clear the screen and wait for the next frame. VGA_pcurmode, which
+	// VGA_ClearVideoMem relies on, is guaranteed to be set because mode 0 is
+	// always the first mode set in a session
 	if (VGA_pcurmode)
-		VGA_ClearVideoMem (VGA_pcurmode->planar);
+		VGA_ClearVideoMem(VGA_pcurmode->planar);
 
-// set the mode
+	// set the mode
 	regs.x.ax = 0x4f02;
 	regs.x.bx = pextra->vesamode;
 	dos_int86(0x10);
@@ -624,31 +588,27 @@ int VID_ExtraInitMode (viddef_p lvid, vmode_t *pcurrentmode)
 
 	VID_pagelist = &pextra->pages[0];
 
-// wait for display enable by default only when triple-buffering on a VGA-
-// compatible machine that actually has a functioning display enable status
-	vsync_exists = VID_ExtraStateFound (0x08);
-	de_exists = VID_ExtraStateFound (0x01);
+	// wait for display enable by default only when triple-buffering on a VGA-
+	// compatible machine that actually has a functioning display enable status
+	vsync_exists = VID_ExtraStateFound(0x08);
+	de_exists = VID_ExtraStateFound(0x01);
 
-	if (!pextra->vga_incompatible  &&
-		(lvid->numpages == 3)      &&
-		de_exists                  &&
-		(_vid_wait_override.value == 0.0))
-	{
-		Cvar_SetValue ("vid_wait", (float)VID_WAIT_DISPLAY_ENABLE);
+	if (!pextra->vga_incompatible &&
+		(lvid->numpages == 3) &&
+		de_exists &&
+		(_vid_wait_override.value == 0.0)) {
+		Cvar_SetValue("vid_wait", (float)VID_WAIT_DISPLAY_ENABLE);
 
 		VID_displayedpage = 0;
 		VID_currentpage = 1;
 	}
-	else
-	{
-		if ((lvid->numpages == 1) && (_vid_wait_override.value == 0.0))
-		{
-			Cvar_SetValue ("vid_wait", (float)VID_WAIT_NONE);
+	else {
+		if ((lvid->numpages == 1) && (_vid_wait_override.value == 0.0)) {
+			Cvar_SetValue("vid_wait", (float)VID_WAIT_NONE);
 			VID_displayedpage = VID_currentpage = 0;
 		}
-		else
-		{
-			Cvar_SetValue ("vid_wait", (float)VID_WAIT_VSYNC);
+		else {
+			Cvar_SetValue("vid_wait", (float)VID_WAIT_VSYNC);
 
 			VID_displayedpage = 0;
 
@@ -659,7 +619,7 @@ int VID_ExtraInitMode (viddef_p lvid, vmode_t *pcurrentmode)
 		}
 	}
 
-// TODO: really should be a call to a function
+	// TODO: really should be a call to a function
 	pageoffset = VID_pagelist[VID_displayedpage];
 
 	regs.x.ax = 0x4f07;
@@ -668,8 +628,7 @@ int VID_ExtraInitMode (viddef_p lvid, vmode_t *pcurrentmode)
 	regs.x.dx = pageoffset / VGA_rowbytes;
 	dos_int86(0x10);
 
-	if (VID_banked)
-	{
+	if (VID_banked) {
 		regs.x.ax = 0x4f05;
 		regs.x.bx = 0;
 		regs.x.dx = VID_currentpage;
@@ -677,18 +636,15 @@ int VID_ExtraInitMode (viddef_p lvid, vmode_t *pcurrentmode)
 
 		VGA_pagebase = VID_membase;
 	}
-	else
-	{
+	else {
 		VGA_pagebase = VID_membase + VID_pagelist[VID_currentpage];
 	}
 
-	if (lvid->numpages > 1)
-	{
+	if (lvid->numpages > 1) {
 		lvid->buffer = VGA_pagebase;
 		lvid->conbuffer = lvid->buffer;
 	}
-	else
-	{
+	else {
 		lvid->rowbytes = lvid->width;
 	}
 
@@ -702,7 +658,7 @@ int VID_ExtraInitMode (viddef_p lvid, vmode_t *pcurrentmode)
 
 	VGA_pcurmode = pcurrentmode;
 
-	D_InitCaches (vid_surfcache, vid_surfcachesize);
+	D_InitCaches(vid_surfcache, vid_surfcachesize);
 
 	return 1;
 }
@@ -713,9 +669,8 @@ int VID_ExtraInitMode (viddef_p lvid, vmode_t *pcurrentmode)
 VID_ExtraSwapBuffers
 ================
 */
-void VID_ExtraSwapBuffers (viddef_p lvid, vmode_t *pcurrentmode,
-	vrect_p rects)
-{
+void VID_ExtraSwapBuffers(viddef_p lvid, vmode_t* pcurrentmode,
+	vrect_p rects) {
 	int	pageoffset;
 
 	UNUSED(rects);
@@ -723,21 +678,18 @@ void VID_ExtraSwapBuffers (viddef_p lvid, vmode_t *pcurrentmode,
 
 	pageoffset = VID_pagelist[VID_currentpage];
 
-// display the newly finished page
-	if (lvid->numpages > 1)
-	{
-	// page flipped
+	// display the newly finished page
+	if (lvid->numpages > 1) {
+		// page flipped
 		regs.x.ax = 0x4f07;
 
-		if (vid_wait.value != VID_WAIT_VSYNC)
-		{
+		if (vid_wait.value != VID_WAIT_VSYNC) {
 			if ((vid_wait.value == VID_WAIT_DISPLAY_ENABLE) && de_exists)
-				VID_ExtraWaitDisplayEnable ();
+				VID_ExtraWaitDisplayEnable();
 
 			regs.x.bx = VESA_DONT_WAIT_VSYNC;
 		}
-		else
-		{
+		else {
 			regs.x.bx = VESA_WAIT_VSYNC;	// double buffered has to wait
 		}
 
@@ -749,44 +701,39 @@ void VID_ExtraSwapBuffers (viddef_p lvid, vmode_t *pcurrentmode,
 		if (++VID_currentpage >= lvid->numpages)
 			VID_currentpage = 0;
 
-	//
-	// set the new write window if this is a banked mode; otherwise, set the
-	// new address to which to write
-	//
-		if (VID_banked)
-		{
+		//
+		// set the new write window if this is a banked mode; otherwise, set the
+		// new address to which to write
+		//
+		if (VID_banked) {
 			regs.x.ax = 0x4f05;
 			regs.x.bx = 0;
 			regs.x.dx = VID_currentpage;
 			dos_int86(0x10);
 		}
-		else
-		{
+		else {
 			lvid->direct = lvid->buffer;	// direct drawing goes to the
-											//  currently displayed page
+			//  currently displayed page
 			lvid->buffer = VID_membase + VID_pagelist[VID_currentpage];
 			lvid->conbuffer = lvid->buffer;
 		}
 
 		VGA_pagebase = lvid->buffer;
 	}
-	else
-	{
-	// non-page-flipped
-		if (vsync_exists && (vid_wait.value == VID_WAIT_VSYNC))
-		{
-			VGA_WaitVsync ();
+	else {
+		// non-page-flipped
+		if (vsync_exists && (vid_wait.value == VID_WAIT_VSYNC)) {
+			VGA_WaitVsync();
 		}
 
-		while (rects)
-		{
-			VGA_UpdateLinearScreen (
-					lvid->buffer + rects->x + (rects->y * lvid->rowbytes),
-		 			VGA_pagebase + rects->x + (rects->y * VGA_rowbytes),
-					rects->width,
-					rects->height,
-					lvid->rowbytes,
-					VGA_rowbytes);
+		while (rects) {
+			VGA_UpdateLinearScreen(
+				lvid->buffer + rects->x + (rects->y * lvid->rowbytes),
+				VGA_pagebase + rects->x + (rects->y * VGA_rowbytes),
+				rects->width,
+				rects->height,
+				lvid->rowbytes,
+				VGA_rowbytes);
 
 			rects = rects->pnext;
 		}

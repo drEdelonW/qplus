@@ -6,7 +6,7 @@
 #include "sys.h"
 #include "zone.h"
 
-  //===========================================================================
+//===========================================================================
 
 void SZ_Alloc(sizebuf_p buf, int startsize) {
 	CLAMP_LESS(startsize, 256);
@@ -17,9 +17,9 @@ void SZ_Alloc(sizebuf_p buf, int startsize) {
 
 
 void SZ_Free(sizebuf_p buf) {
-//      Z_Free(buf->data);
-//      buf->data = NULL;
-//      buf->maxsize = 0;
+	//      Z_Free(buf->data);
+	//      buf->data = NULL;
+	//      buf->maxsize = 0;
 	buf->cursize = 0;
 }
 
@@ -47,15 +47,15 @@ typeless_ptr SZ_GetSpace(sizebuf_p buf, int length) {
 }
 
 void SZ_Write(sizebuf_p buf, typeless_ptr data, int length) {
-	Q_memcpy(SZ_GetSpace(buf,length),data,length);
+	Q_memcpy(SZ_GetSpace(buf, length), data, length);
 }
 
 void SZ_Print(sizebuf_p buf, cstring data) {
 	int len = Q_strlen(data) + 1;
 
-// uint8_t * cast to keep VC++ happy
-	if (buf->data[buf->cursize-1])
-		Q_memcpy((uint8_t *)SZ_GetSpace(buf, len), data, len); // no trailing 0
+	// uint8_t * cast to keep VC++ happy
+	if (buf->data[buf->cursize - 1])
+		Q_memcpy((uint8_t*)SZ_GetSpace(buf, len), data, len); // no trailing 0
 	else
-		Q_memcpy((uint8_t *)SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
+		Q_memcpy((uint8_t*)SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
 }

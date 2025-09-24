@@ -54,7 +54,7 @@ typedef mvertex_t* mvertex_p;
 
 // plane_t structure
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct mplane_s{
+typedef struct mplane_s {
 	vec3_t	normal;
 	float	dist;
 	byte	type;			// for texture axis selection and fast side tests
@@ -66,7 +66,7 @@ typedef mplane_t* mplane_p;
 struct texture_s;
 typedef struct texture_s texture_t;
 typedef texture_t* texture_p;
-struct texture_s{
+struct texture_s {
 	char		name[16];
 	unsigned	width, height;
 	int			anim_total;				// total tenths in sequence ( 0 = no)
@@ -96,8 +96,9 @@ typedef struct {
 	texture_p	texture;
 	int			flags;
 } mtexinfo_t;
+typedef mtexinfo_t* mtexinfo_p;
 
-typedef struct msurface_s{
+typedef struct msurface_s {
 	int			visframe;		// should be drawn when node is crossed
 
 	int			dlightframe;
@@ -109,25 +110,25 @@ typedef struct msurface_s{
 	int			firstedge;	// look up in model->surfedges[], negative numbers
 	int			numedges;	// are backwards edges
 
-// surface generation data
-	struct surfcache_s*	cachespots[MIPLEVELS];
+	// surface generation data
+	struct surfcache_s* cachespots[MIPLEVELS];
 
 	int16_t		texturemins[2];
 	int16_t		extents[2];
 
-	mtexinfo_t*	texinfo;
+	mtexinfo_p texinfo;
 
-// lighting info
+	// lighting info
 	byte		styles[MAXLIGHTMAPS];
-	byte*		samples;		// [numstyles*surfsize]
+	byte* samples;		// [numstyles*surfsize]
 } msurface_t;
 typedef msurface_t* msurface_p;
 
 struct mnode_s;
 typedef struct mnode_s mnode_t;
 typedef mnode_t* mnode_p;
-struct mnode_s{
-// common with leaf
+struct mnode_s {
+	// common with leaf
 	int			contents;		// 0, to differentiate from leafs
 	int			visframe;		// node needs to be traversed if current
 
@@ -135,7 +136,7 @@ struct mnode_s{
 
 	mnode_p	    parent;
 
-// node specific
+	// node specific
 	mplane_p	plane;
 	mnode_p     children[2];
 
@@ -145,8 +146,8 @@ struct mnode_s{
 
 
 
-typedef struct mleaf_s{
-// common with node
+typedef struct mleaf_s {
+	// common with node
 	int			contents;		// wil be a negative contents number
 	int			visframe;		// node needs to be traversed if current
 
@@ -154,11 +155,11 @@ typedef struct mleaf_s{
 
 	mnode_p     parent;
 
-// leaf specific
-	byte*		compressed_vis;
-	efrag_t*	efrags;
+	// leaf specific
+	byte* compressed_vis;
+	efrag_t* efrags;
 
-	msurface_p*	firstmarksurface;
+	msurface_p* firstmarksurface;
 	int			nummarksurfaces;
 	int			key;			// BSP sequence number for leaf's contents
 	byte		ambient_sound_level[NUM_AMBIENTS];
@@ -174,6 +175,7 @@ typedef struct {
 	vec3_t		clip_mins;
 	vec3_t		clip_maxs;
 } hull_t;
+typedef hull_t* hull_p;
 
 /*
 ==============================================================================
@@ -185,7 +187,7 @@ SPRITE MODELS
 
 
 // FIXME: shorten these?
-typedef struct mspriteframe_s{
+typedef struct mspriteframe_s {
 	int		width;
 	int		height;
 	typeless_ptr   pcachespot;			// remove?
@@ -196,7 +198,7 @@ typedef mspriteframe_t* mspriteframe_p;
 
 typedef struct {
 	int				numframes;
-	float*          intervals;
+	float* intervals;
 	mspriteframe_p  frames[1];
 } mspritegroup_t;
 
@@ -262,7 +264,7 @@ typedef struct {
 typedef maliasskingroup_t* maliasskingroup_p;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct mtriangle_s{
+typedef struct mtriangle_s {
 	int facesfront;
 	int	vertindex[3];
 } mtriangle_t;
@@ -283,16 +285,16 @@ typedef aliashdr_t* aliashdr_p;
 // Whole model
 //
 
-typedef enum{
-    mod_brush,
-    mod_sprite,
-    mod_alias
+typedef enum {
+	mod_brush,
+	mod_sprite,
+	mod_alias
 } modtype_t;
 
 #include "model_effect.h"
 
 
-typedef struct model_s{
+typedef struct model_s {
 	char		name[MAX_QPATH];
 	qboolean	needload;		// bmodels and sprites don't cache normally
 
@@ -302,15 +304,15 @@ typedef struct model_s{
 
 	int			flags;
 
-  //
-  // volume occupied by the model
-  //
+	//
+	// volume occupied by the model
+	//
 	vec3_t		mins, maxs;
 	float		radius;
 
-  //
-  // brush model
-  //
+	//
+	// brush model
+	//
 	int			firstmodelsurface, nummodelsurfaces;
 
 	int			numsubmodels;
@@ -323,41 +325,41 @@ typedef struct model_s{
 	mleaf_p   leafs;
 
 	int			numvertexes;
-	mvertex_t*  vertexes;
+	mvertex_p  vertexes;
 
 	int			numedges;
-	medge_t*    edges;
+	medge_t* edges;
 
 	int			numnodes;
-	mnode_t*    nodes;
+	mnode_p    nodes;
 
 	int			numtexinfo;
-	mtexinfo_t* texinfo;
+	mtexinfo_p texinfo;
 
 	int			numsurfaces;
 	msurface_p  surfaces;
 
 	int			numsurfedges;
-	int*        surfedges;
+	int* surfedges;
 
 	int			    numclipnodes;
 	dclipnode_p     clipnodes;
 
 	int			    nummarksurfaces;
-	msurface_p *    marksurfaces;
+	msurface_p* marksurfaces;
 
 	hull_t		hulls[MAX_MAP_HULLS];
 
 	int			numtextures;
 	texture_p* textures;
 
-	byte*       visdata;
-	byte*       lightdata;
+	byte* visdata;
+	byte* lightdata;
 	cstring       entities;
 
-  //
-  // additional model data
-  //
+	//
+	// additional model data
+	//
 	cache_user_t	cache;		// only access through Mod_Extradata
 
 } model_t;
@@ -368,9 +370,9 @@ typedef model_t* model_p;
 void	Mod_Init();
 void	Mod_ClearAll();
 model_p Mod_ForName(cstring name, qboolean crash);
-void	*Mod_Extradata(model_p mod);	// handles caching
+typeless_ptr Mod_Extradata(model_p mod);	// handles caching
 void	Mod_TouchModel(cstring name);
 
 mleaf_p Mod_PointInLeaf(vec3_t p, model_p model);
-byte*	Mod_LeafPVS(mleaf_p leaf, model_p model);
+byte* Mod_LeafPVS(mleaf_p leaf, model_p model);
 
