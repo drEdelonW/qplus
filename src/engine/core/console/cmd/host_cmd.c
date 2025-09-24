@@ -36,7 +36,8 @@ Host_Quit_f
 extern void M_Menu_Quit_f();
 
 void Host_Quit_f() {
-	if (key_dest != key_console && cls.state != ca_dedicated) {
+	if ((key_dest != key_console) &&
+		(cls.state != ca_dedicated)) {
 		M_Menu_Quit_f();
 		return;
 	}
@@ -53,7 +54,7 @@ Host_Status_f
 ==================
 */
 void Host_Status_f() {
-	client_t* client;
+	client_t* 	client;
 	int			seconds;
 	int			minutes;
 	int			hours = 0;

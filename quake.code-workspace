@@ -32,7 +32,8 @@
 			"stddef.h": "c",
 			"types.h": "c",
 			"ratio": "c",
-			"numbers": "c"
+			"numbers": "c",
+			"algorithm": "c"
 		}
 	}
 }

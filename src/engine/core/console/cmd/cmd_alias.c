@@ -8,17 +8,21 @@
 extern cstring cmd_argv[];
 
 #define	MAX_ALIAS_NAME	(32)
-typedef struct cmdalias_s {
-    struct cmdalias_s* next;
-    char                name[MAX_ALIAS_NAME];
-    cstring               value;
-} cmdalias_t;
 
-static cmdalias_t* cmd_alias = NULL; // alias linked list entry point
+struct cmdalias_s;
+typedef struct cmdalias_s cmdalias_t;
+typedef cmdalias_t* cmdalias_p;
+struct cmdalias_s {
+    cmdalias_p next;
+    char       name[MAX_ALIAS_NAME];
+    cstring    value;
+};
+
+static cmdalias_p cmd_alias = NULL; // alias linked list entry point
 
 
 void Cmd_Alias_f(void) {
-    cmdalias_t* aliasIt;
+    cmdalias_p aliasIt;
     char        cmd[1024];
 
     if (Cmd_Argc() == 1) {
@@ -65,7 +69,7 @@ void Cmd_Alias_f(void) {
 }
 
 bool checkAlias() {
-    for (cmdalias_t* aliasIt = cmd_alias; aliasIt; aliasIt = aliasIt->next) {
+    for (cmdalias_p aliasIt = cmd_alias; aliasIt; aliasIt = aliasIt->next) {
         if (!Q_strcasecmp(cmd_argv[0], aliasIt->name)) {
             Cbuf_InsertText(aliasIt->value);
             return true;
