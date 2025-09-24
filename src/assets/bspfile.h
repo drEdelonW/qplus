@@ -57,7 +57,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define BSPVERSION	(29)
 #define	TOOLVERSION	(2)
 
-typedef struct{
+typedef struct {
 	int		fileofs, filelen;
 } lump_t;
 typedef lump_t* lump_p;
@@ -80,7 +80,7 @@ typedef lump_t* lump_p;
 
 #define	HEADER_LUMPS	15
 
-typedef struct{
+typedef struct {
 	float		mins[3], maxs[3];
 	float		origin[3];
 	int			headnode[MAX_MAP_HULLS];
@@ -89,26 +89,26 @@ typedef struct{
 } dmodel_t;
 typedef dmodel_t* dmodel_p;
 
-typedef struct{
+typedef struct {
 	int			version;
 	lump_t		lumps[HEADER_LUMPS];
 } dheader_t;
 typedef dheader_t* dheader_p;
 
-typedef struct{
+typedef struct {
 	int			nummiptex;
 	int			dataofs[4];		// [nummiptex]
 } dmiptexlump_t;
 
 #define	MIPLEVELS	4
-typedef struct miptex_s{
+typedef struct miptex_s {
 	char		name[16];
 	unsigned	width, height;
 	unsigned	offsets[MIPLEVELS];		// four mip maps stored
 } miptex_t;
 
 
-typedef struct{
+typedef struct {
 	float	point[3];
 } dvertex_t;
 
@@ -124,19 +124,19 @@ typedef struct{
 #define	PLANE_ANYZ		5
 #else
 typedef enum {
-    // 0–2 are axial planes
-    PLANE_X   = 0,
-    PLANE_Y   = 1,
-    PLANE_Z   = 2,
+	// 0–2 are axial planes
+	PLANE_X = 0,
+	PLANE_Y = 1,
+	PLANE_Z = 2,
 
-    // 3–5 are non-axial planes snapped to the nearest
-    PLANE_ANYX = 3,
-    PLANE_ANYY = 4,
-    PLANE_ANYZ = 5
+	// 3–5 are non-axial planes snapped to the nearest
+	PLANE_ANYX = 3,
+	PLANE_ANYY = 4,
+	PLANE_ANYZ = 5
 } plane_type_t;
 #endif
 
-typedef struct{
+typedef struct {
 	float			normal[3];
 	float			dist;
 	plane_type_t	type;		// PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
@@ -162,7 +162,7 @@ typedef struct{
 
 
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct{
+typedef struct {
 	int			planenum;
 	int16_t		children[2];	// negative numbers are -(leafs+1), not nodes
 	int16_t		mins[3];		// for sphere culling
@@ -171,16 +171,14 @@ typedef struct{
 	uint16_t	numfaces;	// counting both sides
 } dnode_t;
 
-typedef struct
-{
+typedef struct {
 	int			planenum;
 	int16_t		children[2];	// negative numbers are contents
 } dclipnode_t;
 typedef dclipnode_t* dclipnode_p;
 
 
-typedef struct texinfo_s
-{
+typedef struct texinfo_s {
 	float		vecs[2][4];		// [s/t][xyz offset]
 	int			miptex;
 	int			flags;
@@ -189,14 +187,12 @@ typedef struct texinfo_s
 
 // note that edge 0 is never used, because negative edge nums are used for
 // counterclockwise use of the edge in a face
-typedef struct
-{
+typedef struct {
 	uint16_t	v[2];		// vertex numbers
 } dedge_t;
 
 #define	MAXLIGHTMAPS	4
-typedef struct
-{
+typedef struct {
 	int16_t		planenum;
 	int16_t		side;
 
@@ -204,24 +200,24 @@ typedef struct
 	int16_t		numedges;
 	int16_t		texinfo;
 
-// lighting info
+	// lighting info
 	byte		styles[MAXLIGHTMAPS];
 	int			lightofs;		// start of [numstyles*surfsize] samples
 } dface_t;
 
 
+typedef enum {
+    AMBIENT_WATER = 0,
+    AMBIENT_SKY   = 1,
+    AMBIENT_SLIME = 2,
+    AMBIENT_LAVA  = 3,
 
-#define	AMBIENT_WATER	0
-#define	AMBIENT_SKY		1
-#define	AMBIENT_SLIME	2
-#define	AMBIENT_LAVA	3
-
-#define	NUM_AMBIENTS			4		// automatic ambient sounds
+    NUM_AMBIENTS  = 4   // automatic ambient sounds
+} ambient_type_t;
 
 // leaf 0 is the generic CONTENTS_SOLID leaf, used for all solid areas
 // all other leafs need visibility info
-typedef struct
-{
+typedef struct {
 	int			contents;
 	int			visofs;				// -1 = no visibility info
 
@@ -291,29 +287,27 @@ extern	int			numsurfedges;
 extern	int			dsurfedges[MAX_MAP_SURFEDGES];
 
 
-void DecompressVis (byte *in, byte *decompressed);
-int CompressVis (byte *vis, byte *dest);
+void DecompressVis(byte* in, byte* decompressed);
+int CompressVis(byte* vis, byte* dest);
 
-void	LoadBSPFile (cstring filename);
-void	WriteBSPFile (cstring filename);
+void	LoadBSPFile(cstring filename);
+void	WriteBSPFile(cstring filename);
 void	PrintBSPFileSizes();
 
 //===============
 
 
-typedef struct epair_s
-{
-	struct epair_s	*next;
+typedef struct epair_s {
+	struct epair_s* next;
 	cstring key;
 	cstring value;
 } epair_t;
 
-typedef struct
-{
+typedef struct {
 	vec3_t		origin;
 	int			firstbrush;
 	int			numbrushes;
-	epair_t		*epairs;
+	epair_t* epairs;
 } entity_t;
 
 extern	int			num_entities;
@@ -322,13 +316,13 @@ extern	entity_t	entities[MAX_MAP_ENTITIES];
 void	ParseEntities();
 void	UnparseEntities();
 
-void 	SetKeyValue (entity_t *ent, cstring key, cstring value);
-cstring ValueForKey (entity_t *ent, cstring key);
+void 	SetKeyValue(entity_t* ent, cstring key, cstring value);
+cstring ValueForKey(entity_t* ent, cstring key);
 // will return "" if not present
 
-vec_t	FloatForKey (entity_t *ent, cstring key);
-void 	GetVectorForKey (entity_t *ent, cstring key, vec3_t vec);
+vec_t	FloatForKey(entity_t* ent, cstring key);
+void 	GetVectorForKey(entity_t* ent, cstring key, vec3_t vec);
 
-epair_t *ParseEpair();
+epair_t* ParseEpair();
 
 #endif

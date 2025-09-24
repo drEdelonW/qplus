@@ -44,7 +44,7 @@ typedef struct edict_s {
 
 	float		freetime;			// sv.time when the object was freed
 	entvars_t	v;					// C exported fields from progs
-// other fields from progs come immediately after
+	// other fields from progs come immediately after
 } edict_t;
 typedef edict_t* edict_p;
 #define	EDICT_FROM_AREA(l) STRUCT_FROM_LINK(l,edict_t,area)
@@ -57,8 +57,8 @@ extern	cstring         pr_strings;
 extern	ddef_p         pr_globaldefs;
 extern	ddef_p         pr_fielddefs;
 extern	dstatement_p    pr_statements;
-extern	globalvars_t*   pr_global_struct;
-extern	float*          pr_globals;			// same as pr_global_struct
+extern	globalvars_t* pr_global_struct;
+extern	float* pr_globals;			// same as pr_global_struct
 
 extern	int				pr_edict_size;	// in bytes
 
@@ -66,25 +66,25 @@ extern	int				pr_edict_size;	// in bytes
 
 void PR_Init();
 
-void PR_ExecuteProgram (func_t fnum);
+void PR_ExecuteProgram(func_t fnum);
 void PR_LoadProgs();
 
 void PR_Profile_f();
 
 edict_p  ED_Alloc();
-void ED_Free (edict_p ed);
+void ED_Free(edict_p ed);
 
-cstring ED_NewString (cstring string);
+cstring ED_NewString(cstring string);
 // returns a copy of the string allocated from the server's string heap
 
-void ED_Print (edict_p ed);
-void ED_Write (FILE *f, edict_p ed);
-cstring ED_ParseEdict (cstring data, edict_p ent);
+void ED_Print(edict_p ed);
+void ED_Write(FILE* f, edict_p ed);
+cstring ED_ParseEdict(cstring data, edict_p ent);
 
-void ED_WriteGlobals (FILE *f);
-void ED_ParseGlobals (cstring data);
+void ED_WriteGlobals(FILE* f);
+void ED_ParseGlobals(cstring data);
 
-void ED_LoadFromFile (cstring data);
+void ED_LoadFromFile(cstring data);
 
 //define EDICT_NUM(n) ((edict_p )(sv.edicts+ (n)*pr_edict_size))
 //define NUM_FOR_EDICT(e) (((byte *)(e) - sv.edicts)/pr_edict_size)
@@ -115,7 +115,7 @@ int NUM_FOR_EDICT(edict_p e);
 extern	int		type_size[8];
 
 typedef void (*builtin_t)();
-extern	builtin_t *pr_builtins;
+extern	builtin_t* pr_builtins;
 extern int pr_numbuiltins;
 
 extern int		pr_argc;
@@ -126,10 +126,10 @@ extern	int			pr_xstatement;
 
 extern	uint16_t		pr_crc;
 
-void PR_RunError (cstring error, ...);
+void PR_RunError(cstring error, ...);
 
 void ED_PrintEdicts();
-void ED_PrintNum (int ent);
+void ED_PrintNum(int ent);
 
-eval_t *GetEdictFieldValue(edict_p ed, cstring field);
+eval_t* GetEdictFieldValue(edict_p ed, cstring field);
 

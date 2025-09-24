@@ -128,15 +128,15 @@ enum {
 };
 
 
-typedef struct statement_s{
+typedef struct statement_s {
 	uint16_t	op;
-	int16_t	a,b,c;
+	int16_t	a, b, c;
 } dstatement_t;
 typedef dstatement_t* dstatement_p;
 
-typedef struct{
+typedef struct {
 	uint16_t	type;		// if DEF_SAVEGLOBGAL bit is set
-								// the variable needs to be saved in savegames
+	// the variable needs to be saved in savegames
 	uint16_t	ofs;
 	int			s_name;
 } ddef_t;
@@ -145,7 +145,7 @@ typedef ddef_t* ddef_p;
 
 #define	MAX_PARMS	8
 
-typedef struct{
+typedef struct {
 	int		first_statement;	// negative numbers are builtins
 	int		parm_start;
 	int		locals;				// total ints of parms + locals
@@ -162,7 +162,7 @@ typedef dfunction_t* dfunction_p;
 
 
 #define	PROG_VERSION	6
-typedef struct{
+typedef struct {
 	int		version;
 	int		crc;			// check of header file
 

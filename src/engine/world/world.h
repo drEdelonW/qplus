@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // world.h
 
-typedef struct{
+typedef struct {
 	vec3_t	normal;
 	float	dist;
 } plane_t;
@@ -45,26 +45,26 @@ typedef struct
 void SV_ClearWorld();
 // called after the world model has been loaded, before linking any entities
 
-void SV_UnlinkEdict (edict_p ent);
+void SV_UnlinkEdict(edict_p ent);
 // call before removing an entity, and before trying to move one,
 // so it doesn't clip against itself
 // flags ent->v.modified
 
-void SV_LinkEdict (edict_p ent, qboolean touch_triggers);
+void SV_LinkEdict(edict_p ent, qboolean touch_triggers);
 // Needs to be called any time an entity changes origin, mins, maxs, or solid
 // flags ent->v.modified
 // sets ent->v.absmin and ent->v.absmax
 // if touchtriggers, calls prog functions for the intersected triggers
 
-int SV_PointContents (vec3_t p);
-int SV_TruePointContents (vec3_t p);
+int SV_PointContents(vec3_t p);
+int SV_TruePointContents(vec3_t p);
 // returns the CONTENTS_* value from the world at the given point.
 // does not check any entities at all
 // the non-true version remaps the water current contents to content_water
 
-edict_p SV_TestEntityPosition (edict_p ent);
+edict_p SV_TestEntityPosition(edict_p ent);
 
-trace_t SV_Move (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int type, edict_p passedict);
+trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int type, edict_p passedict);
 // mins and maxs are reletive
 
 // if the entire move stays in a solid volume, trace.allsolid will be set

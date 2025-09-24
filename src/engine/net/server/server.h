@@ -22,8 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 
-typedef struct
-{
+typedef struct {
 	int			maxclients;
 	int			maxclientslimit;
 	struct client_s	*clients;		// [maxclients]
@@ -33,10 +32,12 @@ typedef struct
 
 //=============================================================================
 
-typedef enum {ss_loading, ss_active} server_state_t;
+typedef enum {
+	ss_loading,
+	ss_active
+} server_state_t;
 
-typedef struct
-{
+typedef struct {
 	qboolean	active;				// false if only a net client
 
 	qboolean	paused;
@@ -115,21 +116,23 @@ typedef struct client_s
 //=============================================================================
 
 // edict->movetype values
-#define	MOVETYPE_NONE			0		// never moves
-#define	MOVETYPE_ANGLENOCLIP	1
-#define	MOVETYPE_ANGLECLIP		2
-#define	MOVETYPE_WALK			3		// gravity
-#define	MOVETYPE_STEP			4		// gravity, special edge handling
-#define	MOVETYPE_FLY			5
-#define	MOVETYPE_TOSS			6		// gravity
-#define	MOVETYPE_PUSH			7		// no clip to world, push and crush
-#define	MOVETYPE_NOCLIP			8
-#define	MOVETYPE_FLYMISSILE		9		// extra size to monsters
-#define	MOVETYPE_BOUNCE			10
+typedef enum {
+    MOVETYPE_NONE        = 0,  // never moves
+    MOVETYPE_ANGLENOCLIP = 1,
+    MOVETYPE_ANGLECLIP   = 2,
+    MOVETYPE_WALK        = 3,  // gravity
+    MOVETYPE_STEP        = 4,  // gravity, special edge handling
+    MOVETYPE_FLY         = 5,
+    MOVETYPE_TOSS        = 6,  // gravity
+    MOVETYPE_PUSH        = 7,  // no clip to world, push and crush
+    MOVETYPE_NOCLIP      = 8,
+    MOVETYPE_FLYMISSILE  = 9,  // extra size to monsters
+    MOVETYPE_BOUNCE      = 10,
 #ifdef QUAKE2
-#define MOVETYPE_BOUNCEMISSILE	11		// bounce w/o gravity
-#define MOVETYPE_FOLLOW			12		// track movement of aiment
+    MOVETYPE_BOUNCEMISSILE = 11, // bounce w/o gravity
+    MOVETYPE_FOLLOW        = 12, // track movement of aiment
 #endif
+} movetype_t;
 
 // edict->solid values
 #define	SOLID_NOT				0		// no interaction with other objects
@@ -163,8 +166,8 @@ typedef struct client_s
 #define	FL_WATERJUMP			2048	// player jumping out of water
 #define	FL_JUMPRELEASED			4096	// for jump debouncing
 #ifdef QUAKE2
-#define FL_FLASHLIGHT			8192
-#define FL_ARCHIVE_OVERRIDE		1048576
+    #define FL_FLASHLIGHT			8192
+    #define FL_ARCHIVE_OVERRIDE		1048576
 #endif
 
 // entity effects
@@ -174,10 +177,10 @@ typedef struct client_s
 #define	EF_BRIGHTLIGHT 			4
 #define	EF_DIMLIGHT 			8
 #ifdef QUAKE2
-#define EF_DARKLIGHT			16
-#define EF_DARKFIELD			32
-#define EF_LIGHT				64
-#define EF_NODRAW				128
+    #define EF_DARKLIGHT			16
+    #define EF_DARKFIELD			32
+    #define EF_LIGHT				64
+    #define EF_NODRAW				128
 #endif
 
 #define	SPAWNFLAG_NOT_EASY			256
@@ -187,13 +190,13 @@ typedef struct client_s
 
 #ifdef QUAKE2
 // server flags
-#define	SFL_EPISODE_1		1
-#define	SFL_EPISODE_2		2
-#define	SFL_EPISODE_3		4
-#define	SFL_EPISODE_4		8
-#define	SFL_NEW_UNIT		16
-#define	SFL_NEW_EPISODE		32
-#define	SFL_CROSS_TRIGGERS	65280
+    #define	SFL_EPISODE_1		1
+    #define	SFL_EPISODE_2		2
+    #define	SFL_EPISODE_3		4
+    #define	SFL_EPISODE_4		8
+    #define	SFL_NEW_UNIT		16
+    #define	SFL_NEW_EPISODE		32
+    #define	SFL_CROSS_TRIGGERS	65280
 #endif
 
 //============================================================================

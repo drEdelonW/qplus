@@ -17,14 +17,14 @@
 
 
 void    Q_memset(typeless_ptr dest, int   fill, int count);
-void    Q_memcpy(typeless_ptr dest, typeless_ptr src,  int count);
-int     Q_memcmp(typeless_ptr m1,   typeless_ptr m2,   int count);
+void    Q_memcpy(typeless_ptr dest, typeless_ptr src, int count);
+int     Q_memcmp(typeless_ptr m1, typeless_ptr m2, int count);
 
 int     Q_strlen(cstring  str);
 void    Q_strcpy(cstring  dest, cstring src);
 void    Q_strncpy(cstring dest, cstring src, int count);
 void    Q_strcat(cstring  dest, cstring src);
-cstring   Q_strrchr(cstring s,  char  c);
+cstring   Q_strrchr(cstring s, char  c);
 int     Q_strcmp(cstring      s1, cstring s2);
 int     Q_strncmp(cstring     s1, cstring s2, int count);
 int     Q_strcasecmp(cstring  s1, cstring s2);
