@@ -81,12 +81,15 @@ typedef struct {
 	float		beamlength;
 	synctype_t	synctype;
 } dsprite_t;
+typedef dsprite_t* dsprite_p;
 
-#define SPR_VP_PARALLEL_UPRIGHT		0
-#define SPR_FACING_UPRIGHT			1
-#define SPR_VP_PARALLEL				2
-#define SPR_ORIENTED				3
-#define SPR_VP_PARALLEL_ORIENTED	4
+typedef enum {
+    SPR_VP_PARALLEL_UPRIGHT   = 0, // viewplane parallel, upright
+    SPR_FACING_UPRIGHT        = 1, // always faces viewer, upright
+    SPR_VP_PARALLEL           = 2, // viewplane parallel, rotates with view
+    SPR_ORIENTED              = 3, // fully oriented in 3D
+    SPR_VP_PARALLEL_ORIENTED  = 4  // viewplane parallel, but oriented
+} sprite_type_t;
 
 typedef struct {
 	int32_t			origin[2];
@@ -98,16 +101,22 @@ typedef dspriteframe_t* dspriteframe_p;
 typedef struct {
 	int32_t			numframes;
 } dspritegroup_t;
+typedef dspritegroup_t* dspritegroup_p;
 
 typedef struct {
 	float	interval;
 } dspriteinterval_t;
+typedef dspriteinterval_t* dspriteinterval_p;
 
-typedef enum { SPR_SINGLE = 0, SPR_GROUP } spriteframetype_t;
+typedef enum {
+	SPR_SINGLE = 0,
+	SPR_GROUP
+} spriteframetype_t;
 
 typedef struct {
 	spriteframetype_t	type;
 } dspriteframetype_t;
+typedef dspriteframetype_t* dspriteframetype_p;
 
 #define IDSPRITEHEADER	(('P'<<24)+('S'<<16)+('D'<<8)+'I')
 // little-endian "IDSP"

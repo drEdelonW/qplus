@@ -1493,31 +1493,22 @@ Mod_LoadSpriteGroup
 =================
 */
 typeless_ptr  Mod_LoadSpriteGroup(typeless_ptr  pin, mspriteframe_t** ppframe) {
-    dspritegroup_t* pingroup;
-    mspritegroup_t* pspritegroup;
-    int					i, numframes;
-    dspriteinterval_t* pin_intervals;
-    float_p poutintervals;
-    typeless_ptr ptemp;
+    dspritegroup_p pingroup = (dspritegroup_p)pin;
+    int numframes = LittleLong(pingroup->numframes);
 
-    pingroup = (dspritegroup_t*)pin;
-
-    numframes = LittleLong(pingroup->numframes);
-
-    pspritegroup = Hunk_AllocName(sizeof(mspritegroup_t) +
-        (numframes - 1) * sizeof(pspritegroup->frames[0]), loadname);
+    mspritegroup_p pspritegroup = Hunk_AllocName(
+        sizeof(mspritegroup_t) + (numframes - 1) * sizeof(pspritegroup->frames[0]),
+        loadname);
 
     pspritegroup->numframes = numframes;
-
     *ppframe = (mspriteframe_t*)pspritegroup;
 
-    pin_intervals = (dspriteinterval_t*)(pingroup + 1);
+    dspriteinterval_p pin_intervals = (dspriteinterval_p)(pingroup + 1);
 
-    poutintervals = Hunk_AllocName(numframes * sizeof(float), loadname);
-
+    float_p poutintervals = Hunk_AllocName(numframes * sizeof(float), loadname);
     pspritegroup->intervals = poutintervals;
 
-    for (i = 0; i < numframes; i++) {
+    for (int i = 0; i < numframes; i++) {
         *poutintervals = LittleFloat(pin_intervals->interval);
         if (*poutintervals <= 0.0)
             Sys_Error("Mod_LoadSpriteGroup: interval<=0");
@@ -1526,9 +1517,9 @@ typeless_ptr  Mod_LoadSpriteGroup(typeless_ptr  pin, mspriteframe_t** ppframe) {
         pin_intervals++;
     }
 
-    ptemp = (typeless_ptr)pin_intervals;
+    typeless_ptr ptemp = (typeless_ptr)pin_intervals;
 
-    for (i = 0; i < numframes; i++) {
+    for (int i = 0; i < numframes; i++) {
         ptemp = Mod_LoadSpriteFrame(ptemp, &pspritegroup->frames[i]);
     }
 
@@ -1542,26 +1533,19 @@ Mod_LoadSpriteModel
 =================
 */
 void Mod_LoadSpriteModel(model_p mod, typeless_ptr buffer) {
-    int					i;
-    int					version;
-    dsprite_t* pin;
-    msprite_t* psprite;
-    int					numframes;
-    int					size;
-    dspriteframetype_t* pframetype;
+    dsprite_p pin = (dsprite_p)buffer;
 
-    pin = (dsprite_t*)buffer;
-
-    version = LittleLong(pin->version);
+    int version = LittleLong(pin->version);
     if (version != SPRITE_VERSION)
         Sys_Error("%s has wrong version number "
             "(%i should be %i)", mod->name, version, SPRITE_VERSION);
 
-    numframes = LittleLong(pin->numframes);
+    int numframes = LittleLong(pin->numframes);
 
-    size = sizeof(msprite_t) + (numframes - 1) * sizeof(psprite->frames);
-
-    psprite = Hunk_AllocName(size, loadname);
+    msprite_p psprite = Hunk_AllocName(
+        sizeof(msprite_t) + (numframes - 1) * sizeof(psprite->frames),
+        loadname
+    );
 
     mod->cache.data = psprite;
 
@@ -1586,23 +1570,19 @@ void Mod_LoadSpriteModel(model_p mod, typeless_ptr buffer) {
     mod->numframes = numframes;
     mod->flags = 0;
 
-    pframetype = (dspriteframetype_t*)(pin + 1);
+    dspriteframetype_p pframetype = (dspriteframetype_p)(pin + 1);
 
-    for (i = 0; i < numframes; i++) {
+    for (int i = 0; i < numframes; i++) {
         spriteframetype_t	frametype;
 
         frametype = LittleLong(pframetype->type);
         psprite->frames[i].type = frametype;
 
         if (frametype == SPR_SINGLE) {
-            pframetype = (dspriteframetype_t*)
-                Mod_LoadSpriteFrame(pframetype + 1,
-                    &psprite->frames[i].frameptr);
+            pframetype = (dspriteframetype_p)Mod_LoadSpriteFrame(pframetype + 1, &psprite->frames[i].frameptr);
         }
         else {
-            pframetype = (dspriteframetype_t*)
-                Mod_LoadSpriteGroup(pframetype + 1,
-                    &psprite->frames[i].frameptr);
+            pframetype = (dspriteframetype_p)Mod_LoadSpriteGroup(pframetype + 1, &psprite->frames[i].frameptr);
         }
     }
 
@@ -1617,11 +1597,9 @@ Mod_Print
 ================
 */
 void Mod_Print() {
-    int		i;
-    model_p mod;
-
     Con_Printf("Cached models:\n");
-    for (i = 0, mod = mod_known; i < mod_numknown; i++, mod++) {
+    model_p mod = mod_known;
+    for (int i = 0; i < mod_numknown; i++, mod++) {
         Con_Printf("%8p : %s", mod->cache.data, mod->name);
         if (mod->needload & NL_UNREFERENCED)
             Con_Printf(" (!R)");

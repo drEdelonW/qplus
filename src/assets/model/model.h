@@ -202,14 +202,17 @@ typedef struct {
     float_p intervals;
     mspriteframe_p  frames[1];
 } mspritegroup_t;
+typedef mspritegroup_t* mspritegroup_p;
+
 
 typedef struct {
     spriteframetype_t   type;
     mspriteframe_p      frameptr;
 } mspriteframedesc_t;
+// typedef mspriteframe_t* mspriteframe_p;
 
 typedef struct {
-    int32_t type;
+    sprite_type_t type;
     int32_t maxwidth;
     int32_t maxheight;
     int32_t numframes;
@@ -217,6 +220,8 @@ typedef struct {
     typeless_ptr    cachespot;		// remove?
     mspriteframedesc_t  frames[1];
 } msprite_t;
+typedef msprite_t* msprite_p;
+
 
 
 /*
