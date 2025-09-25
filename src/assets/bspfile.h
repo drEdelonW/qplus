@@ -101,6 +101,8 @@ typedef struct {
 	int32_t			nummiptex;
 	int32_t			dataofs[4];		// [nummiptex]
 } dmiptexlump_t;
+typedef dmiptexlump_t* dmiptexlump_p;
+
 
 #define	MIPLEVELS	4
 typedef struct miptex_s {
@@ -108,11 +110,13 @@ typedef struct miptex_s {
 	uint32_t	width, height;
 	uint32_t	offsets[MIPLEVELS];		// four mip maps stored
 } miptex_t;
+typedef miptex_t* miptex_p;
 
 
 typedef struct {
 	float	point[3];
 } dvertex_t;
+typedef dvertex_t* dvertex_p;
 
 
 typedef enum {
@@ -132,6 +136,7 @@ typedef struct {
 	float			dist;
 	plane_type_t	type;		// PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
 } dplane_t;
+typedef dplane_t* dplane_p;
 
 
 
@@ -163,6 +168,8 @@ typedef struct {
 	uint16_t	firstface;
 	uint16_t	numfaces;	// counting both sides
 } dnode_t;
+typedef dnode_t* dnode_p;
+
 
 typedef struct {
 	int32_t			planenum;
@@ -176,6 +183,7 @@ typedef struct texinfo_s {
 	int32_t			miptex;
 	int32_t			flags;
 } texinfo_t;
+typedef texinfo_t* texinfo_p;
 #define	TEX_SPECIAL		1		// sky or slime, no lightmap or 256 subdivision
 
 // note that edge 0 is never used, because negative edge nums are used for
@@ -183,6 +191,7 @@ typedef struct texinfo_s {
 typedef struct {
 	uint16_t	v[2];		// vertex numbers
 } dedge_t;
+typedef dedge_t* dedge_p;
 
 #define	MAXLIGHTMAPS	4
 typedef struct {
@@ -197,6 +206,7 @@ typedef struct {
 	uint8_t		styles[MAXLIGHTMAPS];
 	int32_t			lightofs;		// start of [numstyles*surfsize] samples
 } dface_t;
+typedef dface_t* dface_p;
 
 
 typedef enum {
@@ -222,6 +232,7 @@ typedef struct {
 
 	uint8_t		ambient_level[NUM_AMBIENTS];
 } dleaf_t;
+typedef dleaf_t* dleaf_p;
 
 
 //============================================================================

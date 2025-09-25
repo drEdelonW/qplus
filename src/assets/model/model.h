@@ -93,6 +93,7 @@ typedef struct {
     uint16_t	v[2];
     uint32_t	cachededgeoffset;
 } medge_t;
+typedef medge_t* medge_p;
 
 typedef struct {
     float		vecs[2][4];

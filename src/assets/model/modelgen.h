@@ -101,6 +101,7 @@ typedef struct dtriangle_s {
     int32_t	facesfront;
     int32_t	vertindex[3];
 } dtriangle_t;
+typedef dtriangle_t* dtriangle_p;
 
 #define DT_FACES_FRONT				0x0010
 
@@ -118,6 +119,7 @@ typedef struct {
     trivertx_t	bboxmax;	// lightnormal isn't used
     char		name[16];	// frame name from grabbing
 } daliasframe_t;
+typedef daliasframe_t* daliasframe_p;
 
 typedef struct {
     int32_t			numframes;
@@ -140,10 +142,12 @@ typedef struct {
 typedef struct {
     aliasframetype_t	type;
 } daliasframetype_t;
+typedef daliasframetype_t* daliasframetype_p;
 
 typedef struct {
     aliasskintype_t	type;
 } daliasskintype_t;
+typedef daliasskintype_t* daliasskintype_p;
 
 #define IDPOLYHEADER	(('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
 // little-endian "IDPO"
