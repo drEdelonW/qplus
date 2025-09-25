@@ -62,7 +62,7 @@ void VCR_ReadNext() {
 }
 
 
-void VCR_Listen(qboolean state) {
+void VCR_Listen(bool state) {
 }
 
 
@@ -70,7 +70,7 @@ void VCR_Shutdown() {
 }
 
 
-int VCR_GetMessage(qsocket_t* sock) {
+int VCR_GetMessage(qsocket_p sock) {
 	int	ret;
 
 	if (host_time != next.time || next.op != VCR_OP_GETMESSAGE || next.session != *(int32_t*)(&sock->driverdata))
@@ -91,7 +91,7 @@ int VCR_GetMessage(qsocket_t* sock) {
 }
 
 
-int VCR_SendMessage(qsocket_t* sock, sizebuf_p data) {
+int VCR_SendMessage(qsocket_p sock, sizebuf_p data) {
 	int	ret;
 
 	if (host_time != next.time || next.op != VCR_OP_SENDMESSAGE || next.session != *(int32_t*)(&sock->driverdata))
@@ -105,8 +105,8 @@ int VCR_SendMessage(qsocket_t* sock, sizebuf_p data) {
 }
 
 
-qboolean VCR_CanSendMessage(qsocket_t* sock) {
-	qboolean	ret;
+bool VCR_CanSendMessage(qsocket_p sock) {
+	bool	ret;
 
 	if (host_time != next.time || next.op != VCR_OP_CANSENDMESSAGE || next.session != *(int32_t*)(&sock->driverdata))
 		Sys_Error("VCR missmatch");
@@ -119,21 +119,21 @@ qboolean VCR_CanSendMessage(qsocket_t* sock) {
 }
 
 
-void VCR_Close(qsocket_t* sock) {
+void VCR_Close(qsocket_p sock) {
 }
 
 
-void VCR_SearchForHosts(qboolean xmit) {
+void VCR_SearchForHosts(bool xmit) {
 }
 
 
-qsocket_t* VCR_Connect(cstring host) {
+qsocket_p VCR_Connect(cstring host) {
 	return NULL;
 }
 
 
-qsocket_t* VCR_CheckNewConnections() {
-	qsocket_t* sock;
+qsocket_p VCR_CheckNewConnections() {
+	qsocket_p sock;
 
 	if (host_time != next.time || next.op != VCR_OP_CONNECT)
 		Sys_Error("VCR missmatch");

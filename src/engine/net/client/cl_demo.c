@@ -263,7 +263,7 @@ play [demoname]
 void CL_PlayDemo_f (){
 	char	name[256];
 	int c;
-	qboolean neg = false;
+	bool neg = false;
 
 	if (cmd_source != src_command)
 		return;

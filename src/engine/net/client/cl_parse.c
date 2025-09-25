@@ -330,7 +330,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 		}
 	}
 
-	qboolean forcelink = (ent->msgtime != cl.mtime[1]); // no previous frame to lerp from
+	bool forcelink = (ent->msgtime != cl.mtime[1]); // no previous frame to lerp from
 
 	ent->msgtime = cl.mtime[0];
 
@@ -428,7 +428,7 @@ void CL_ParseBaseline(entity_t* ent) {
 	==================
 */
 void CL_ParseClientdata(server_update_bits_t bits) {
-	qboolean upd = false;
+	bool upd = false;
 
 	cl.viewheight = (bits & SU_VIEWHEIGHT) ? MSG_ReadChar() : DEFAULT_VIEWHEIGHT;
 	cl.idealpitch = (bits & SU_IDEALPITCH) ? MSG_ReadChar() : 0;

@@ -154,4 +154,4 @@ typedef struct{
 	float	speed;
 } entvars_t;
 
-#define PROGHEADER_CRC 31586
+#define PROGHEADER_CRC 0x7B62 /* 31586 */

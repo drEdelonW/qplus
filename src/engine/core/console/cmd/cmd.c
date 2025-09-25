@@ -65,7 +65,7 @@ void Cmd_Wait_f(void) {
     =============================================================================
 */
 
-static sizebuf_t    cmd_text;
+static sizebuf_t cmd_text;
 
 /*
     ============

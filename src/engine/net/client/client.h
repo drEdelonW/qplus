@@ -82,7 +82,7 @@ typedef struct {
 	float	minlight;			// don't add when contributing less
 	int32_t		key;
 #ifdef QUAKE2
-	qboolean	dark;			// subtracts light instead of adding
+	bool	dark;			// subtracts light instead of adding
 #endif
 } dlight_t;
 
@@ -124,9 +124,9 @@ typedef struct {
 
 	// demo recording info must be here, because record is started before
 	// entering a map (and clearing client_state_t)
-	qboolean	demorecording;
-	qboolean	demoplayback;
-	qboolean	timedemo;
+	bool	demorecording;
+	bool	demoplayback;
+	bool	timedemo;
 	int32_t			forcetrack;			// -1 = use normal cd track
 	FILE* demofile;
 	int32_t			td_lastframe;		// to meter out one message a frame
@@ -180,16 +180,16 @@ typedef struct {
 	// pitch drifting vars
 	float		idealpitch;
 	float		pitchvel;
-	qboolean	nodrift;
+	bool	nodrift;
 	float		driftmove;
 	double		laststop;
 
 	float		viewheight;
 	float		crouch;			// local amount for smoothing stepups
 
-	qboolean	paused;			// send over by server
-	qboolean	onground;
-	qboolean	inwater;
+	bool	paused;			// send over by server
+	bool	onground;
+	bool	inwater;
 
 	int32_t			intermission;	// don't change view angle, full screen, etc
 	int32_t			completed_time;	// latched at intermission start

@@ -20,19 +20,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // net_vcr.h
 
-#define VCR_OP_CONNECT					1
-#define VCR_OP_GETMESSAGE				2
-#define VCR_OP_SENDMESSAGE				3
-#define VCR_OP_CANSENDMESSAGE			4
-#define VCR_MAX_MESSAGE					4
+typedef enum {
+    VCR_OP_CONNECT       = 1,
+    VCR_OP_GETMESSAGE    = 2,
+    VCR_OP_SENDMESSAGE   = 3,
+    VCR_OP_CANSENDMESSAGE= 4,
 
-int			VCR_Init();
-void		VCR_Listen (qboolean state);
-void		VCR_SearchForHosts (qboolean xmit);
-qsocket_t 	*VCR_Connect (cstring host);
-qsocket_t 	*VCR_CheckNewConnections();
-int			VCR_GetMessage (qsocket_t *sock);
-int			VCR_SendMessage (qsocket_t *sock, sizebuf_p data);
-qboolean	VCR_CanSendMessage (qsocket_t *sock);
-void		VCR_Close (qsocket_t *sock);
-void		VCR_Shutdown();
+    VCR_MAX_MESSAGE      = 4  // highest valid opcode
+} vcr_opcode_t;
+
+int VCR_Init();
+void VCR_Listen(bool state);
+void VCR_SearchForHosts(bool xmit);
+qsocket_p VCR_Connect(cstring host);
+qsocket_p VCR_CheckNewConnections();
+int VCR_GetMessage(qsocket_p sock);
+int VCR_SendMessage(qsocket_p sock, sizebuf_p data);
+bool VCR_CanSendMessage(qsocket_p sock);
+void VCR_Close(qsocket_p sock);
+void VCR_Shutdown();

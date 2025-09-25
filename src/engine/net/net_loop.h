@@ -20,15 +20,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // net_loop.h
 
-int			Loop_Init();
-void		Loop_Listen (qboolean state);
-void		Loop_SearchForHosts (qboolean xmit);
-qsocket_t 	*Loop_Connect (cstring host);
-qsocket_t 	*Loop_CheckNewConnections();
-int			Loop_GetMessage (qsocket_t *sock);
-int			Loop_SendMessage (qsocket_t *sock, sizebuf_p data);
-int			Loop_SendUnreliableMessage (qsocket_t *sock, sizebuf_p data);
-qboolean	Loop_CanSendMessage (qsocket_t *sock);
-qboolean	Loop_CanSendUnreliableMessage (qsocket_t *sock);
-void		Loop_Close (qsocket_t *sock);
-void		Loop_Shutdown();
+int Loop_Init();
+void Loop_Listen(bool state);
+void Loop_SearchForHosts(bool xmit);
+qsocket_p Loop_Connect(cstring host);
+qsocket_p Loop_CheckNewConnections();
+int Loop_GetMessage(qsocket_p sock);
+int Loop_SendMessage(qsocket_p sock, sizebuf_p data);
+int Loop_SendUnreliableMessage(qsocket_p sock, sizebuf_p data);
+bool Loop_CanSendMessage(qsocket_p sock);
+bool Loop_CanSendUnreliableMessage(qsocket_p sock);
+void Loop_Close(qsocket_p sock);
+void Loop_Shutdown();

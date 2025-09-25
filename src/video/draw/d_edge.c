@@ -78,15 +78,11 @@ D_DrawSolidSurface
 // FIXME: clean this up
 
 void D_DrawSolidSurface(surf_p surf, int color) {
-	espan_p span;
-	uint8_p pdest;
-	int		u, u2, pix;
-
-	pix = (color << 24) | (color << 16) | (color << 8) | color;
-	for (span = surf->spans; span; span = span->pnext) {
-		pdest = (uint8_p)d_viewbuffer + screenwidth * span->v;
-		u = span->u;
-		u2 = span->u + span->count - 1;
+	int pix = (color << 24) | (color << 16) | (color << 8) | color;
+	for (espan_p span = surf->spans; span; span = span->pnext) {
+		uint8_p pdest = (uint8_p)d_viewbuffer + screenwidth * span->v;
+		int u = span->u;
+		int u2 = span->u + span->count - 1;
 		((uint8_p)pdest)[u] = pix;
 
 		if (u2 - u < 8) {
@@ -167,7 +163,7 @@ D_DrawSurfaces
 */
 void D_DrawSurfaces() {
 	msurface_p      pface;
-	surfcache_t* pcurrentcache;
+	surfcache_p pcurrentcache;
 	vec3_t			world_transformed_modelorg;
 	vec3_t			local_modelorg;
 

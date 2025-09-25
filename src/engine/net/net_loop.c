@@ -22,9 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "net_loop.h"
 
-qboolean	localconnectpending = false;
-qsocket_t* loop_client = NULL;
-qsocket_t* loop_server = NULL;
+bool	localconnectpending = false;
+qsocket_p loop_client = NULL;
+qsocket_p loop_server = NULL;
 
 int Loop_Init() {
 	if (cls.state == ca_dedicated)
@@ -37,11 +37,11 @@ void Loop_Shutdown() {
 }
 
 
-void Loop_Listen(qboolean state) {
+void Loop_Listen(bool state) {
 }
 
 
-void Loop_SearchForHosts(qboolean xmit) {
+void Loop_SearchForHosts(bool xmit) {
 	if (!sv.active)
 		return;
 
@@ -58,7 +58,7 @@ void Loop_SearchForHosts(qboolean xmit) {
 }
 
 
-qsocket_t* Loop_Connect(cstring host) {
+qsocket_p Loop_Connect(cstring host) {
 	if (Q_strcmp(host, "local") != 0)
 		return NULL;
 
@@ -93,7 +93,7 @@ qsocket_t* Loop_Connect(cstring host) {
 }
 
 
-qsocket_t* Loop_CheckNewConnections() {
+qsocket_p Loop_CheckNewConnections() {
 	if (!localconnectpending)
 		return NULL;
 
@@ -113,7 +113,7 @@ static int IntAlign(int value) {
 }
 
 
-int Loop_GetMessage(qsocket_t* sock) {
+int Loop_GetMessage(qsocket_p sock) {
 	int		ret;
 	int		length;
 
@@ -133,25 +133,25 @@ int Loop_GetMessage(qsocket_t* sock) {
 		Q_memcpy(sock->receiveMessage, &sock->receiveMessage[length], sock->receiveMessageLength);
 
 	if (sock->driverdata && ret == 1)
-		((qsocket_t*)sock->driverdata)->canSend = true;
+		((qsocket_p)sock->driverdata)->canSend = true;
 
 	return ret;
 }
 
 
-int Loop_SendMessage(qsocket_t* sock, sizebuf_p data) {
+int Loop_SendMessage(qsocket_p sock, sizebuf_p data) {
 	uint8_p buffer;
 	int* bufferLength;
 
 	if (!sock->driverdata)
 		return -1;
 
-	bufferLength = &((qsocket_t*)sock->driverdata)->receiveMessageLength;
+	bufferLength = &((qsocket_p)sock->driverdata)->receiveMessageLength;
 
 	if ((*bufferLength + data->cursize + 4) > NET_MAXMESSAGE)
 		Sys_Error("Loop_SendMessage: overflow\n");
 
-	buffer = ((qsocket_t*)sock->driverdata)->receiveMessage + *bufferLength;
+	buffer = ((qsocket_p)sock->driverdata)->receiveMessage + *bufferLength;
 
 	// message type
 	*buffer++ = 1;
@@ -172,19 +172,19 @@ int Loop_SendMessage(qsocket_t* sock, sizebuf_p data) {
 }
 
 
-int Loop_SendUnreliableMessage(qsocket_t* sock, sizebuf_p data) {
+int Loop_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
 	uint8_p buffer;
 	int* bufferLength;
 
 	if (!sock->driverdata)
 		return -1;
 
-	bufferLength = &((qsocket_t*)sock->driverdata)->receiveMessageLength;
+	bufferLength = &((qsocket_p)sock->driverdata)->receiveMessageLength;
 
 	if ((*bufferLength + data->cursize + sizeof(uint8_t) + sizeof(int16_t)) > NET_MAXMESSAGE)
 		return 0;
 
-	buffer = ((qsocket_t*)sock->driverdata)->receiveMessage + *bufferLength;
+	buffer = ((qsocket_p)sock->driverdata)->receiveMessage + *bufferLength;
 
 	// message type
 	*buffer++ = 2;
@@ -203,21 +203,21 @@ int Loop_SendUnreliableMessage(qsocket_t* sock, sizebuf_p data) {
 }
 
 
-qboolean Loop_CanSendMessage(qsocket_t* sock) {
+bool Loop_CanSendMessage(qsocket_p sock) {
 	if (!sock->driverdata)
 		return false;
 	return sock->canSend;
 }
 
 
-qboolean Loop_CanSendUnreliableMessage(qsocket_t* sock) {
+bool Loop_CanSendUnreliableMessage(qsocket_p sock) {
 	return true;
 }
 
 
-void Loop_Close(qsocket_t* sock) {
+void Loop_Close(qsocket_p sock) {
 	if (sock->driverdata)
-		((qsocket_t*)sock->driverdata)->driverdata = NULL;
+		((qsocket_p)sock->driverdata)->driverdata = NULL;
 	sock->receiveMessageLength = 0;
 	sock->sendMessageLength = 0;
 	sock->canSend = true;

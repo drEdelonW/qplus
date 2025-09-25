@@ -29,11 +29,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <string.h>
 
-vec3_t    chase_pos;
-vec3_t    chase_angles;
+vec3_t chase_pos;
+vec3_t chase_angles;
 
-vec3_t    chase_dest;
-vec3_t    chase_dest_angles;
+vec3_t chase_dest;
+vec3_t chase_dest_angles;
 
 
 void Chase_Init() {
@@ -58,7 +58,6 @@ qboolean SV_RecursiveHullCheck(
 
 void TraceLine(vec3_t start, vec3_t end, vec3_t impact) {
     trace_t  trace;
-
     memset(&trace, 0, sizeof(trace));
     SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
 
@@ -88,9 +87,7 @@ void Chase_Update() {
     // calculate pitch to look at the same spot from camera
     VectorSubtract(stop, r_refdef.vieworg, stop);
     float dist = DotProduct(stop, forward);
-    if (dist < 1) {
-        dist = 1;
-    }
+    CLAMP_LESS(dist, 1);
 
     r_refdef.viewangles[PITCH] =
         -atan(stop[2] / dist) /

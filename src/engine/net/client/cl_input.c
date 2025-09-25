@@ -163,7 +163,7 @@ void IN_Impulse() {in_impulse=Q_atoi(Cmd_Argv(1));}
     ===============
 */
 float CL_KeyState (kbutton_t *key){
-	qboolean	impulsedown, impulseup, down;
+	bool	impulsedown, impulseup, down;
 
 	impulsedown = key->state & 2;
 	impulseup = key->state & 4;

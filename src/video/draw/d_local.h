@@ -35,18 +35,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define SURFCACHE_SIZE_AT_320X200  (600 * 1024)
 
-typedef struct surfcache_s {
-	struct surfcache_s* next;
-	struct surfcache_s** owner;		// NULL is an empty chunk of memory
-	int					    lightadj[MAXLIGHTMAPS]; // checked for strobe flush
-	int					    dlight;
-	int					    size;		// including header
-	uint32_t			    width;
-	uint32_t			    height;		// DEBUG only needed for debug
-	float				    mipscale;
-	texture_t* texture;	// checked for animating textures
-	uint8_t				    data[4];	// width * height elements
-} surfcache_t;
+struct surfcache_s;
+typedef struct surfcache_s surfcache_t;
+typedef surfcache_t* surfcache_p;
+struct surfcache_s {
+	surfcache_p 	next;
+	surfcache_p* 	owner;		// NULL is an empty chunk of memory
+	int 			lightadj[MAXLIGHTMAPS]; // checked for strobe flush
+	int 			dlight;
+	int 			size;		// including header
+	uint32_t 		width;
+	uint32_t 		height;		// DEBUG only needed for debug
+	float 			mipscale;
+	texture_p 		texture;	// checked for animating textures
+	uint8_t 		data[4];	// width * height elements
+} ;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct sspan_s {
@@ -56,8 +59,8 @@ typedef struct sspan_s {
 extern float	scale_for_mip;
 
 extern qboolean		d_roverwrapped;
-extern surfcache_t* sc_rover;
-extern surfcache_t* d_initial_rover;
+extern surfcache_p sc_rover;
+extern surfcache_p d_initial_rover;
 
 extern float	d_sdivzstepu, d_tdivzstepu, d_zistepu;
 extern float	d_sdivzstepv, d_tdivzstepv, d_zistepv;
@@ -78,7 +81,7 @@ void D_DrawSkyScans16(espan_p  pspan);
 
 void R_ShowSubDiv(void);
 extern void(*prealspandrawer)(void);
-surfcache_t* D_CacheSurface(msurface_t* surface, int miplevel);
+surfcache_p D_CacheSurface(msurface_t* surface, int miplevel);
 
 extern int D_MipLevelForScale(float scale);
 

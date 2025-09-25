@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int  UDP_Init();
 void UDP_Shutdown();
-void UDP_Listen (qboolean state);
+void UDP_Listen (bool state);
 int  UDP_OpenSocket (int port);
 int  UDP_CloseSocket (int socket);
 int  UDP_Connect (int socket, struct qsockaddr *addr);

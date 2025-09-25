@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define NUM_MIPS	4
 
-surfcache_t* d_initial_rover;
+surfcache_p d_initial_rover;
 qboolean        d_roverwrapped;
 int             d_minmip;
 float           d_scalemip[NUM_MIPS - 1];

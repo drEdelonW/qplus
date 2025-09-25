@@ -139,4 +139,4 @@ typedef struct{
     string_t	noise3;
 } entvars_t;
 
-#define PROGHEADER_CRC 5927
+#define PROGHEADER_CRC  (0x1727) /* 5927 */

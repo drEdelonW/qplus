@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include "sizebuf.h"
 #include "link.h"
+#include "zone.h"
 
 //============================================================================
 
@@ -73,7 +74,7 @@ void COM_CloseFile(int h);
 uint8_p COM_LoadStackFile(cstring path, typeless_ptr buffer, int32_t bufsize);
 uint8_p COM_LoadTempFile(cstring path);
 uint8_p COM_LoadHunkFile(cstring path);
-void COM_LoadCacheFile(cstring path, struct cache_user_s* cu);
+void COM_LoadCacheFile(cstring path, cache_user_p cu);
 
 
 extern	struct cvar_s	registered;

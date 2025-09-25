@@ -455,7 +455,7 @@ QUAKE FILESYSTEM
 =============================================================================
 */
 
-int32_t     com_filesize;
+int32_t com_filesize;
 
 
 //
@@ -803,7 +803,7 @@ uint8_p COM_LoadTempFile(cstring path) {
     return COM_LoadFile(path, 2);
 }
 
-void COM_LoadCacheFile(cstring path, struct cache_user_s* cu) {
+void COM_LoadCacheFile(cstring path, cache_user_p cu) {
     loadcache = cu;
     COM_LoadFile(path, 3);
 }

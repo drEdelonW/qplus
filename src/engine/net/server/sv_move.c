@@ -34,7 +34,7 @@ is not a staircase.
 */
 int c_yes, c_no;
 
-qboolean SV_CheckBottom(edict_p ent) {
+bool SV_CheckBottom(edict_p ent) {
 	vec3_t	mins, maxs, start, stop;
 	trace_t	trace;
 	int		x, y;
@@ -104,7 +104,7 @@ possible, no move is done, false is returned, and
 pr_global_struct->trace_normal is set to the normal of the blocking wall
 =============
 */
-qboolean SV_movestep(edict_p ent, vec3_t move, qboolean relink) {
+bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
 	float		dz;
 	vec3_t		oldorg, neworg, end;
 	trace_t		trace;
@@ -216,7 +216,7 @@ facing it.
 ======================
 */
 void PF_changeyaw();
-qboolean SV_StepDirection(edict_p ent, float yaw, float dist) {
+bool SV_StepDirection(edict_p ent, float yaw, float dist) {
 	vec3_t		move, oldorigin;
 	float		delta;
 
@@ -374,7 +374,7 @@ SV_CloseEnough
 
 ======================
 */
-qboolean SV_CloseEnough(edict_p ent, edict_p goal, float dist) {
+bool SV_CloseEnough(edict_p ent, edict_p goal, float dist) {
 	for (int i = 0; i < 3; i++) {
 		if (goal->v.absmin[i] > ent->v.absmax[i] + dist)
 			return false;

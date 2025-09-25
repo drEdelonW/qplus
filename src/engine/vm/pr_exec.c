@@ -267,8 +267,6 @@ Returns the new program statement counter
 ====================
 */
 int PR_EnterFunction(dfunction_p f) {
-	int		i, j, c, o;
-
 	pr_stack[pr_depth].s = pr_xstatement;
 	pr_stack[pr_depth].f = pr_xfunction;
 	pr_depth++;
@@ -276,18 +274,18 @@ int PR_EnterFunction(dfunction_p f) {
 		PR_RunError("stack overflow");
 
 	// save off any locals that the new function steps on
-	c = f->locals;
+	int c = f->locals;
 	if (localstack_used + c > LOCALSTACK_SIZE)
 		PR_RunError("PR_ExecuteProgram: locals stack overflow\n");
 
-	for (i = 0; i < c; i++)
+	for (int i = 0; i < c; i++)
 		localstack[localstack_used + i] = ((int*)pr_globals)[f->parm_start + i];
 	localstack_used += c;
 
 	// copy parameters
-	o = f->parm_start;
-	for (i = 0; i < f->numparms; i++) {
-		for (j = 0; j < f->parm_size[i]; j++) {
+	int o = f->parm_start;
+	for (int i = 0; i < f->numparms; i++) {
+		for (int j = 0; j < f->parm_size[i]; j++) {
 			((int*)pr_globals)[o] = ((int*)pr_globals)[OFS_PARM0 + i * 3 + j];
 			o++;
 		}
@@ -303,18 +301,16 @@ PR_LeaveFunction
 ====================
 */
 int PR_LeaveFunction() {
-	int		i, c;
-
 	if (pr_depth <= 0)
 		Sys_Error("prog stack underflow");
 
 	// restore locals from the stack
-	c = pr_xfunction->locals;
+	int c = pr_xfunction->locals;
 	localstack_used -= c;
 	if (localstack_used < 0)
 		PR_RunError("PR_ExecuteProgram: locals stack underflow\n");
 
-	for (i = 0; i < c; i++)
+	for (int i = 0; i < c; i++)
 		((int*)pr_globals)[pr_xfunction->parm_start + i] = localstack[localstack_used + i];
 
 	// up stack
@@ -330,42 +326,29 @@ PR_ExecuteProgram
 ====================
 */
 void PR_ExecuteProgram(func_t fnum) {
-	eval_p  a;
-	eval_p  b;
-	eval_p  c;
-	int			s;
-	dstatement_p  st;
-	dfunction_p f;
-	dfunction_p newf;
-	int		runaway;
-	int		i;
-	edict_p ed;
-	int		exitdepth;
-	eval_p ptr;
-
-	if (!fnum || fnum >= progs->numfunctions) {
+	if (!fnum || (fnum >= progs->numfunctions)) {
 		if (pr_global_struct->self)
 			ED_Print(PROG_TO_EDICT(pr_global_struct->self));
 		Host_Error("PR_ExecuteProgram: NULL function");
 	}
 
-	f = &pr_functions[fnum];
+	dfunction_p f = &pr_functions[fnum];
 
-	runaway = 100000;
+	int runaway = 100000;
 	pr_trace = false;
 
 	// make a stack frame
-	exitdepth = pr_depth;
+	int exitdepth = pr_depth;
 
-	s = PR_EnterFunction(f);
+	int s = PR_EnterFunction(f);
 
 	while (1) {
 		s++;	// next statement
 
-		st = &pr_statements[s];
-		a = (eval_p)&pr_globals[st->a];
-		b = (eval_p)&pr_globals[st->b];
-		c = (eval_p)&pr_globals[st->c];
+		dstatement_p st = &pr_statements[s];
+		eval_p a = (eval_p)&pr_globals[st->a];
+		eval_p b = (eval_p)&pr_globals[st->b];
+		eval_p c = (eval_p)&pr_globals[st->c];
 
 		if (!--runaway)
 			PR_RunError("runaway loop error");
@@ -518,24 +501,30 @@ void PR_ExecuteProgram(func_t fnum) {
 		case OP_STOREP_FLD:		// integers
 		case OP_STOREP_S:
 		case OP_STOREP_FNC:		// pointers
-			ptr = (eval_p)((uint8_p)sv.edicts + b->_int);
+		{
+			eval_p ptr = (eval_p)((uint8_p)sv.edicts + b->_int);
 			ptr->_int = a->_int;
-			break;
+		}
+		break;
 		case OP_STOREP_V:
-			ptr = (eval_p)((uint8_p)sv.edicts + b->_int);
+		{
+			eval_p ptr = (eval_p)((uint8_p)sv.edicts + b->_int);
 			ptr->vector[0] = a->vector[0];
 			ptr->vector[1] = a->vector[1];
 			ptr->vector[2] = a->vector[2];
+		}
 			break;
 
 		case OP_ADDRESS:
-			ed = PROG_TO_EDICT(a->edict);
+		{
+			edict_p ed = PROG_TO_EDICT(a->edict);
 #ifdef PARANOID
 			NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
 			if (ed == (edict_p)sv.edicts && sv.state == ss_active)
 				PR_RunError("assignment to world entity");
 			c->_int = (uint8_p)((int*)&ed->v + b->_int) - (uint8_p)sv.edicts;
+		}
 			break;
 
 		case OP_LOAD_F:
@@ -543,16 +532,19 @@ void PR_ExecuteProgram(func_t fnum) {
 		case OP_LOAD_ENT:
 		case OP_LOAD_S:
 		case OP_LOAD_FNC:
-			ed = PROG_TO_EDICT(a->edict);
+		{
+			edict_p ed = PROG_TO_EDICT(a->edict);
 #ifdef PARANOID
 			NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
 			a = (eval_p)((int*)&ed->v + b->_int);
 			c->_int = a->_int;
+		}
 			break;
 
 		case OP_LOAD_V:
-			ed = PROG_TO_EDICT(a->edict);
+		{
+			edict_p ed = PROG_TO_EDICT(a->edict);
 #ifdef PARANOID
 			NUM_FOR_EDICT(ed);		// make sure it's in range
 #endif
@@ -560,6 +552,7 @@ void PR_ExecuteProgram(func_t fnum) {
 			c->vector[0] = a->vector[0];
 			c->vector[1] = a->vector[1];
 			c->vector[2] = a->vector[2];
+		}
 			break;
 
 			//==================
@@ -591,10 +584,10 @@ void PR_ExecuteProgram(func_t fnum) {
 			if (!a->function)
 				PR_RunError("NULL function");
 
-			newf = &pr_functions[a->function];
+			dfunction_p newf = &pr_functions[a->function];
 
 			if (newf->first_statement < 0) {	// negative statements are built in functions
-				i = -newf->first_statement;
+				int i = -newf->first_statement;
 				if (i >= pr_numbuiltins)
 					PR_RunError("Bad builtin call number");
 				pr_builtins[i]();
@@ -616,7 +609,8 @@ void PR_ExecuteProgram(func_t fnum) {
 			break;
 
 		case OP_STATE:
-			ed = PROG_TO_EDICT(pr_global_struct->self);
+		{
+			edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
 #ifdef FPS_20
 			ed->v.nextthink = pr_global_struct->time + 0.05;
 #else
@@ -626,6 +620,7 @@ void PR_ExecuteProgram(func_t fnum) {
 				ed->v.frame = a->_float;
 			}
 			ed->v.think = b->function;
+		}
 			break;
 
 		default:

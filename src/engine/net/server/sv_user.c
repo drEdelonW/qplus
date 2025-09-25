@@ -36,7 +36,7 @@ float_p angles;
 float_p origin;
 float_p velocity;
 
-qboolean	onground;
+bool	onground;
 
 usercmd_t	cmd;
 
@@ -451,7 +451,7 @@ SV_ReadClientMessage
 Returns false if the client should be killed
 ===================
 */
-qboolean SV_ReadClientMessage() {
+bool SV_ReadClientMessage() {
 	int		ret;
 	int		cmd;
 	cstring s;

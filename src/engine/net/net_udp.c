@@ -31,11 +31,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 #ifdef __sun__
-#include <sys/filio.h>
+#	include <sys/filio.h>
 #endif
 
 #ifdef NeXT
-#include <libc.h>
+#	include <libc.h>
 #endif
 
 extern int gethostname(cstring, int);
@@ -100,7 +100,7 @@ void UDP_Shutdown() {
 
 //=============================================================================
 
-void UDP_Listen(qboolean state) {
+void UDP_Listen(bool state) {
 	// enable listening
 	if (state) {
 		if (net_acceptsocket != -1)
@@ -122,7 +122,7 @@ void UDP_Listen(qboolean state) {
 int UDP_OpenSocket(int port) {
 	int newsocket;
 	struct sockaddr_in address;
-	qboolean _true = true;
+	bool _true = true;
 
 	if ((newsocket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
 		return -1;
