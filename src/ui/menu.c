@@ -283,7 +283,7 @@ void M_Main_Key(int key) {
 		key_dest = key_game;
 		m_state = m_none;
 		cls.demonum = m_save_demonum;
-		if (cls.demonum != -1 && !cls.demoplayback && cls.state != ca_connected)
+		if ((cls.demonum != -1) && (!cls.demoplayback) && (cls.state != ca_connected))
 			CL_NextDemo();
 		break;
 
@@ -569,7 +569,9 @@ void M_MultiPlayer_Draw() {
 
 	M_DrawTransPic(54, 32 + m_multiplayer_cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", f + 1)));
 
-	if (serialAvailable || ipxAvailable || tcpipAvailable)
+	if (serialAvailable ||
+		ipxAvailable ||
+		tcpipAvailable)
 		return;
 	M_PrintWhite((320 / 2) - ((27 * 8) / 2), 148, "No Communications Available");
 }
@@ -597,12 +599,16 @@ void M_MultiPlayer_Key(int key) {
 		m_entersound = true;
 		switch (m_multiplayer_cursor) {
 		case 0:
-			if (serialAvailable || ipxAvailable || tcpipAvailable)
+			if (serialAvailable ||
+				ipxAvailable ||
+				tcpipAvailable)
 				M_Menu_Net_f();
 			break;
 
 		case 1:
-			if (serialAvailable || ipxAvailable || tcpipAvailable)
+			if (serialAvailable ||
+				ipxAvailable ||
+				tcpipAvailable)
 				M_Menu_Net_f();
 			break;
 
@@ -719,10 +725,10 @@ void M_Setup_Key(int k) {
 		break;
 
 	case K_ENTER:
-		if (setup_cursor == 0 || setup_cursor == 1)
+		if ((setup_cursor == 0) || (setup_cursor == 1))
 			return;
 
-		if (setup_cursor == 2 || setup_cursor == 3)
+		if ((setup_cursor == 2) || (setup_cursor == 3))
 			goto forward;
 
 		// setup_cursor == 4 (OK)
@@ -730,7 +736,7 @@ void M_Setup_Key(int k) {
 			Cbuf_AddText(va("name \"%s\"\n", setup_myname));
 		if (Q_strcmp(hostname.string, setup_hostname) != 0)
 			Cvar_Set("hostname", setup_hostname);
-		if (setup_top != setup_oldtop || setup_bottom != setup_oldbottom)
+		if ((setup_top != setup_oldtop) || (setup_bottom != setup_oldbottom))
 			Cbuf_AddText(va("color %i %i\n", setup_top, setup_bottom));
 		m_entersound = true;
 		M_Menu_MultiPlayer_f();
@@ -749,7 +755,7 @@ void M_Setup_Key(int k) {
 		break;
 
 	default:
-		if (k < 32 || k > 127)
+		if ((k < 32) || (k > 127))
 			break;
 		if (setup_cursor == 0) {
 			l = strlen(setup_hostname);
@@ -936,13 +942,13 @@ again:
 		}
 	}
 
-	if (m_net_cursor == 0 && !serialAvailable)
+	if ((m_net_cursor == 0) && (!serialAvailable))
 		goto again;
-	if (m_net_cursor == 1 && !serialAvailable)
+	if ((m_net_cursor == 1) && (!serialAvailable))
 		goto again;
-	if (m_net_cursor == 2 && !ipxAvailable)
+	if ((m_net_cursor == 2) && (!ipxAvailable))
 		goto again;
-	if (m_net_cursor == 3 && !tcpipAvailable)
+	if ((m_net_cursor == 3) && (!tcpipAvailable))
 		goto again;
 }
 
@@ -1189,7 +1195,8 @@ void M_Options_Key(int k) {
 		break;
 	}
 
-	if (options_cursor == 12 && vid_menudrawfn == NULL) {
+	if ((options_cursor == 12) &&
+		(vid_menudrawfn == NULL)) {
 		if (k == K_UPARROW)
 			options_cursor = 11;
 		else
@@ -1197,7 +1204,8 @@ void M_Options_Key(int k) {
 	}
 
 #ifdef _WIN32
-	if ((options_cursor == 13) && (modestate != MS_WINDOWED)) {
+	if ((options_cursor == 13) &&
+		(modestate != MS_WINDOWED)) {
 		if (k == K_UPARROW)
 			options_cursor = 12;
 		else
@@ -1809,7 +1817,7 @@ void M_SerialConfig_Key(int key) {
 		break;
 
 	default:
-		if (key < 32 || key > 127)
+		if ((key < 32) || (key > 127))
 			break;
 		if (serialConfig_cursor == 4) {
 			int l = strlen(serialConfig_phone);
@@ -2009,7 +2017,7 @@ void M_Menu_LanConfig_f() {
 		else
 			lanConfig_cursor = 1;
 	}
-	if (StartingGame && lanConfig_cursor == 2)
+	if (StartingGame && (lanConfig_cursor == 2))
 		lanConfig_cursor = 1;
 	lanConfig_port = DEFAULTnet_hostport;
 	sprintf(lanConfig_portname, "%u", lanConfig_port);
@@ -2134,7 +2142,7 @@ void M_LanConfig_Key(int key) {
 		break;
 
 	default:
-		if (key < 32 || key > 127)
+		if ((key < 32) || (key > 127))
 			break;
 
 		if (lanConfig_cursor == 2) {
@@ -2145,7 +2153,7 @@ void M_LanConfig_Key(int key) {
 			}
 		}
 
-		if (key < '0' || key > '9')
+		if ((key < '0') || (key > '9'))
 			break;
 		if (lanConfig_cursor == 0) {
 			int l = strlen(lanConfig_portname);
@@ -2168,7 +2176,7 @@ void M_LanConfig_Key(int key) {
 	}
 
 	int l = Q_atoi(lanConfig_portname);
-	if (l > 65535)
+	if (l > 0xFFFF)
 		l = lanConfig_port;
 	else
 		lanConfig_port = l;
@@ -2768,7 +2776,7 @@ void M_Init() {
 
 
 void M_Draw() {
-	if (m_state == m_none || key_dest != key_menu)
+	if ((m_state == m_none) || (key_dest != key_menu))
 		return;
 
 	if (!m_recursiveDraw) {

@@ -11,6 +11,19 @@ typedef char* cstring;
 typedef const char* cstring_ro;  // read-only
 typedef void* typeless_ptr;
 
+// Pointers to standard integer types
+typedef int8_t*    int8_p;
+typedef uint8_t*   uint8_p;
+typedef int16_t*   int16_p;
+typedef uint16_t*  uint16_p;
+typedef int32_t*   int32_p;
+typedef uint32_t*  uint32_p;
+typedef int64_t*   int64_p;
+typedef uint64_t*  uint64_p;
+
+// Pointers to other common types
+typedef float*     float_p;
+typedef double*    double_p;
 
 #ifndef NULL
 #   define NULL    ((typeless_ptr)0)
