@@ -146,7 +146,7 @@ cstring PR_GlobalStringNoContents(int ofs);
 	=================
 */
 void PR_PrintStatement(dstatement_p s) {
-	if ((unsigned)s->op < (sizeof(pr_opnames) / sizeof(pr_opnames[0]))) {
+	if ((uint32_t)s->op < (sizeof(pr_opnames) / sizeof(pr_opnames[0]))) {
 		Con_Printf("%s ", pr_opnames[s->op]);
 		int i = strlen(pr_opnames[s->op]);
 		for (; i < 10; i++)
@@ -158,7 +158,7 @@ void PR_PrintStatement(dstatement_p s) {
 	else if (s->op == OP_GOTO) {
 		Con_Printf("branch %i", s->a);
 	}
-	else if ((unsigned)(s->op - OP_STORE_F) < 6) {
+	else if ((uint32_t)(s->op - OP_STORE_F) < 6) {
 		Con_Printf("%s", PR_GlobalString(s->a));
 		Con_Printf("%s", PR_GlobalStringNoContents(s->b));
 	}
@@ -518,11 +518,11 @@ void PR_ExecuteProgram(func_t fnum) {
 		case OP_STOREP_FLD:		// integers
 		case OP_STOREP_S:
 		case OP_STOREP_FNC:		// pointers
-			ptr = (eval_p)((byte*)sv.edicts + b->_int);
+			ptr = (eval_p)((uint8_p)sv.edicts + b->_int);
 			ptr->_int = a->_int;
 			break;
 		case OP_STOREP_V:
-			ptr = (eval_p)((byte*)sv.edicts + b->_int);
+			ptr = (eval_p)((uint8_p)sv.edicts + b->_int);
 			ptr->vector[0] = a->vector[0];
 			ptr->vector[1] = a->vector[1];
 			ptr->vector[2] = a->vector[2];
@@ -535,7 +535,7 @@ void PR_ExecuteProgram(func_t fnum) {
 #endif
 			if (ed == (edict_p)sv.edicts && sv.state == ss_active)
 				PR_RunError("assignment to world entity");
-			c->_int = (byte*)((int*)&ed->v + b->_int) - (byte*)sv.edicts;
+			c->_int = (uint8_p)((int*)&ed->v + b->_int) - (uint8_p)sv.edicts;
 			break;
 
 		case OP_LOAD_F:

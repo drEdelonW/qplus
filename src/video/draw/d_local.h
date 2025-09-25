@@ -35,22 +35,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define SURFCACHE_SIZE_AT_320X200  (600 * 1024)
 
-typedef struct surfcache_s{
-	struct surfcache_s*	    next;
-	struct surfcache_s**    owner;		// NULL is an empty chunk of memory
+typedef struct surfcache_s {
+	struct surfcache_s* next;
+	struct surfcache_s** owner;		// NULL is an empty chunk of memory
 	int					    lightadj[MAXLIGHTMAPS]; // checked for strobe flush
 	int					    dlight;
 	int					    size;		// including header
-	unsigned			    width;
-	unsigned			    height;		// DEBUG only needed for debug
+	uint32_t			    width;
+	uint32_t			    height;		// DEBUG only needed for debug
 	float				    mipscale;
-	texture_t*			    texture;	// checked for animating textures
-	byte				    data[4];	// width * height elements
+	texture_t* texture;	// checked for animating textures
+	uint8_t				    data[4];	// width * height elements
 } surfcache_t;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct sspan_s{
-    int u, v, count;
+typedef struct sspan_s {
+	int u, v, count;
 } sspan_t;
 
 extern float	scale_for_mip;
@@ -83,12 +83,12 @@ surfcache_t* D_CacheSurface(msurface_t* surface, int miplevel);
 extern int D_MipLevelForScale(float scale);
 
 #if id386
-    extern void D_PolysetAff8Start(void);
-    extern void D_PolysetAff8End(void);
+extern void D_PolysetAff8Start(void);
+extern void D_PolysetAff8End(void);
 #endif
 
-extern int16_t*   d_pzbuffer;
-extern unsigned int d_zrowbytes, d_zwidth;
+extern int16_p d_pzbuffer;
+extern uint32_t d_zrowbytes, d_zwidth;
 
 extern int* d_pscantable;
 extern int	d_scantable[MAXHEIGHT];
@@ -99,7 +99,7 @@ extern int	d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
 
 extern pixel_p d_viewbuffer;
 
-extern int16_t*   zspantable[MAXHEIGHT];
+extern int16_p zspantable[MAXHEIGHT];
 
 extern int		d_minmip;
 extern float	d_scalemip[3];

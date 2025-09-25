@@ -35,9 +35,9 @@ typedef struct vmode_s {
 	void		(*swapbuffers)(viddef_p vid, struct vmode_s* pcurrentmode,
 		vrect_p rects);
 	void		(*setpalette)(viddef_p vid, struct vmode_s* pcurrentmode,
-		uint8_t* palette);
+		uint8_p palette);
 	void		(*begindirectrect)(viddef_p vid, struct vmode_s* pcurrentmode,
-		int x, int y, byte* pbitmap, int width,
+		int x, int y, uint8_p pbitmap, int width,
 		int height);
 	void		(*enddirectrect)(viddef_p vid, struct vmode_s* pcurrentmode,
 		int x, int y, int width, int height);
@@ -52,7 +52,7 @@ extern int		numvidmodes;
 extern vmode_t* pvidmodes;
 
 extern int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
-extern byte* VGA_pagebase;
+extern uint8_p VGA_pagebase;
 extern vmode_t* VGA_pcurmode;
 
 CVAR_EXTERN(vid_wait);
@@ -69,14 +69,14 @@ void VID_InitVESA();
 void VID_InitExtra();
 void VGA_WaitVsync();
 void VGA_ClearVideoMem(int planar);
-void VGA_SetPalette(viddef_p vid, vmode_t* pcurrentmode, uint8_t* pal);
+void VGA_SetPalette(viddef_p vid, vmode_t* pcurrentmode, uint8_p pal);
 void VGA_SwapBuffersCopy(viddef_p vid, vmode_t* pcurrentmode,
 	vrect_p rects);
 qboolean VGA_FreeAndAllocVidbuffer(viddef_p vid, int allocnewbuffer);
 qboolean VGA_CheckAdequateMem(int width, int height, int rowbytes,
 	int allocnewbuffer);
 void VGA_BeginDirectRect(viddef_p vid, struct vmode_s* pcurrentmode, int x,
-	int y, byte* pbitmap, int width, int height);
+	int y, uint8_p pbitmap, int width, int height);
 void VGA_EndDirectRect(viddef_p vid, struct vmode_s* pcurrentmode, int x,
 	int y, int width, int height);
 void VGA_UpdateLinearScreen(typeless_ptr srcptr, typeless_ptr destptr, int width,

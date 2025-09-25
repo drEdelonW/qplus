@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern regs_t regs;
 
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
-byte* VGA_pagebase;
+uint8_p VGA_pagebase;
 vmode_t* VGA_pcurmode;
 
 static int		VGA_planar;
@@ -52,7 +52,7 @@ int		VGA_highhunkmark;
 
 void VGA_UpdatePlanarScreen(typeless_ptr srcbuffer);
 
-static byte	backingbuf[48 * 24];
+static uint8_t	backingbuf[48 * 24];
 
 /*
 ================
@@ -60,7 +60,7 @@ VGA_BeginDirectRect
 ================
 */
 void VGA_BeginDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode, int x,
-	int y, byte* pbitmap, int width, int height) {
+	int y, uint8_p pbitmap, int width, int height) {
 	int		i, j, k, plane, reps, repshift;
 
 	if (!lvid->direct)
@@ -257,11 +257,11 @@ qboolean VGA_FreeAndAllocVidbuffer(viddef_p lvid, int allocnewbuffer) {
 
 	d_pzbuffer = Hunk_HighAllocName(VGA_buffersize, "video");
 
-	vid_surfcache = (byte*)d_pzbuffer
+	vid_surfcache = (uint8_p)d_pzbuffer
 		+ lvid->width * lvid->height * sizeof(*d_pzbuffer);
 
 	if (allocnewbuffer) {
-		lvid->buffer = (typeless_ptr)((byte*)vid_surfcache + vid_surfcachesize);
+		lvid->buffer = (typeless_ptr)((uint8_p)vid_surfcache + vid_surfcachesize);
 		lvid->conbuffer = lvid->buffer;
 	}
 
@@ -369,7 +369,7 @@ int VGA_InitMode(viddef_p lvid, vmode_t* pcurrentmode) {
 VGA_SetPalette
 ================
 */
-void VGA_SetPalette(viddef_p lvid, vmode_t* pcurrentmode, uint8_t* pal) {
+void VGA_SetPalette(viddef_p lvid, vmode_t* pcurrentmode, uint8_p pal) {
 	int shiftcomponents = 2;
 	int i;
 

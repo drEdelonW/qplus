@@ -23,10 +23,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 typedef struct {
-	int			maxclients;
-	int			maxclientslimit;
-	struct client_s	*clients;		// [maxclients]
-	int			serverflags;		// episode completion information
+	int32_t			maxclients;
+	int32_t			maxclientslimit;
+	struct client_s* clients;		// [maxclients]
+	int32_t			serverflags;		// episode completion information
 	qboolean	changelevel_issued;	// cleared when at SV_SpawnServer
 } server_static_t;
 
@@ -45,7 +45,7 @@ typedef struct {
 
 	double		time;
 
-	int			lastcheck;			// used by PF_checkclient
+	int32_t			lastcheck;			// used by PF_checkclient
 	double		lastchecktime;
 
 	char		name[64];			// map name
@@ -53,26 +53,26 @@ typedef struct {
 	char		startspot[64];
 #endif
 	char		modelname[64];		// maps/<name>.bsp, for model_precache[0]
-	struct model_s 	*worldmodel;
+	struct model_s* worldmodel;
 	cstring model_precache[MAX_MODELS];	// NULL terminated
-	struct model_s	*models[MAX_MODELS];
+	struct model_s* models[MAX_MODELS];
 	cstring sound_precache[MAX_SOUNDS];	// NULL terminated
 	cstring lightstyles[MAX_LIGHTSTYLES];
-	int			num_edicts;
-	int			max_edicts;
+	int32_t			num_edicts;
+	int32_t			max_edicts;
 	edict_p edicts;			// can NOT be array indexed, because
-									// edict_t is variable sized, but can
-									// be used to reference the world ent
+	// edict_t is variable sized, but can
+	// be used to reference the world ent
 	server_state_t	state;			// some actions are only valid during load
 
 	sizebuf_t	datagram;
-	byte		datagram_buf[MAX_DATAGRAM];
+	uint8_t		datagram_buf[MAX_DATAGRAM];
 
 	sizebuf_t	reliable_datagram;	// copied to all clients at end of frame
-	byte		reliable_datagram_buf[MAX_DATAGRAM];
+	uint8_t		reliable_datagram_buf[MAX_DATAGRAM];
 
 	sizebuf_t	signon;
-	byte		signon_buf[8192];
+	uint8_t		signon_buf[8192];
 } server_t;
 
 
@@ -87,7 +87,7 @@ typedef struct client_s {
 	qboolean		sendsignon;			// only valid before spawned
 
 	double			last_message;		// reliable messages must be sent
-										// periodically
+	// periodically
 
 	struct qsocket_s* netconnection;	// communications handle
 
@@ -95,20 +95,20 @@ typedef struct client_s {
 	vec3_t			wishdir;			// intended motion calced from cmd
 
 	sizebuf_t		message;			// can be added to at any time,
-										// copied and clear once per frame
-	byte			msgbuf[MAX_MSGLEN];
+	// copied and clear once per frame
+	uint8_t			msgbuf[MAX_MSGLEN];
 	edict_p        edict;				// EDICT_NUM(clientnum+1)
 	char			name[32];			// for printing to other people
-	int				colors;
+	int32_t				colors;
 
 	float			ping_times[NUM_PING_TIMES];
-	int				num_pings;			// ping_times[num_pings%NUM_PING_TIMES]
+	int32_t				num_pings;			// ping_times[num_pings%NUM_PING_TIMES]
 
-// spawn parms are carried from level to level
+	// spawn parms are carried from level to level
 	float			spawn_parms[NUM_SPAWN_PARMS];
 
-// client known data for deltas
-	int				old_frags;
+	// client known data for deltas
+	int32_t				old_frags;
 } client_t;
 typedef client_t* client_p;
 
@@ -117,20 +117,20 @@ typedef client_t* client_p;
 
 // edict->movetype values
 typedef enum {
-    MOVETYPE_NONE        = 0,  // never moves
-    MOVETYPE_ANGLENOCLIP = 1,
-    MOVETYPE_ANGLECLIP   = 2,
-    MOVETYPE_WALK        = 3,  // gravity
-    MOVETYPE_STEP        = 4,  // gravity, special edge handling
-    MOVETYPE_FLY         = 5,
-    MOVETYPE_TOSS        = 6,  // gravity
-    MOVETYPE_PUSH        = 7,  // no clip to world, push and crush
-    MOVETYPE_NOCLIP      = 8,
-    MOVETYPE_FLYMISSILE  = 9,  // extra size to monsters
-    MOVETYPE_BOUNCE      = 10,
+	MOVETYPE_NONE = 0,  // never moves
+	MOVETYPE_ANGLENOCLIP = 1,
+	MOVETYPE_ANGLECLIP = 2,
+	MOVETYPE_WALK = 3,  // gravity
+	MOVETYPE_STEP = 4,  // gravity, special edge handling
+	MOVETYPE_FLY = 5,
+	MOVETYPE_TOSS = 6,  // gravity
+	MOVETYPE_PUSH = 7,  // no clip to world, push and crush
+	MOVETYPE_NOCLIP = 8,
+	MOVETYPE_FLYMISSILE = 9,  // extra size to monsters
+	MOVETYPE_BOUNCE = 10,
 #ifdef QUAKE2
-    MOVETYPE_BOUNCEMISSILE = 11, // bounce w/o gravity
-    MOVETYPE_FOLLOW        = 12, // track movement of aiment
+	MOVETYPE_BOUNCEMISSILE = 11, // bounce w/o gravity
+	MOVETYPE_FOLLOW = 12, // track movement of aiment
 #endif
 } movetype_t;
 
@@ -166,8 +166,8 @@ typedef enum {
 #define	FL_WATERJUMP			2048	// player jumping out of water
 #define	FL_JUMPRELEASED			4096	// for jump debouncing
 #ifdef QUAKE2
-    #define FL_FLASHLIGHT			8192
-    #define FL_ARCHIVE_OVERRIDE		1048576
+#define FL_FLASHLIGHT			8192
+#define FL_ARCHIVE_OVERRIDE		1048576
 #endif
 
 // entity effects
@@ -177,10 +177,10 @@ typedef enum {
 #define	EF_BRIGHTLIGHT 			4
 #define	EF_DIMLIGHT 			8
 #ifdef QUAKE2
-    #define EF_DARKLIGHT			16
-    #define EF_DARKFIELD			32
-    #define EF_LIGHT				64
-    #define EF_NODRAW				128
+#define EF_DARKLIGHT			16
+#define EF_DARKFIELD			32
+#define EF_LIGHT				64
+#define EF_NODRAW				128
 #endif
 
 #define	SPAWNFLAG_NOT_EASY			256
@@ -190,13 +190,13 @@ typedef enum {
 
 #ifdef QUAKE2
 // server flags
-    #define	SFL_EPISODE_1		1
-    #define	SFL_EPISODE_2		2
-    #define	SFL_EPISODE_3		4
-    #define	SFL_EPISODE_4		8
-    #define	SFL_NEW_UNIT		16
-    #define	SFL_NEW_EPISODE		32
-    #define	SFL_CROSS_TRIGGERS	65280
+#define	SFL_EPISODE_1		1
+#define	SFL_EPISODE_2		2
+#define	SFL_EPISODE_3		4
+#define	SFL_EPISODE_4		8
+#define	SFL_NEW_UNIT		16
+#define	SFL_NEW_EPISODE		32
+#define	SFL_CROSS_TRIGGERS	65280
 #endif
 
 //============================================================================
@@ -204,7 +204,7 @@ typedef enum {
 extern	server_static_t	svs;				// persistant server info
 extern	server_t		sv;					// local server
 
-extern	client_t	*host_client;
+extern	client_t* host_client;
 
 extern	jmp_buf 	host_abortserver;
 
@@ -216,41 +216,40 @@ extern	edict_p sv_player;
 
 void SV_Init();
 
-void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count);
-void SV_StartSound (edict_p entity, int channel, cstring sample, int volume,
-    float attenuation);
+void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count);
+void SV_StartSound(edict_p entity, int channel, cstring sample, int volume,	float attenuation);
 
-void SV_DropClient (qboolean crash);
+void SV_DropClient(bool crash);
 
 void SV_SendClientMessages();
 void SV_ClearDatagram();
 
-int SV_ModelIndex (cstring name);
+int32_t SV_ModelIndex(cstring name);
 
 void SV_SetIdealPitch();
 
 void SV_AddUpdates();
 
 void SV_ClientThink();
-void SV_AddClientToServer (struct qsocket_s	*ret);
+void SV_AddClientToServer(struct qsocket_s* ret);
 
-void SV_ClientPrintf (cstring fmt, ...);
-void SV_BroadcastPrintf (cstring fmt, ...);
+void SV_ClientPrintf(cstring fmt, ...);
+void SV_BroadcastPrintf(cstring fmt, ...);
 
 void SV_Physics();
 
-qboolean SV_CheckBottom (edict_p ent);
-qboolean SV_movestep (edict_p ent, vec3_t move, qboolean relink);
+qboolean SV_CheckBottom(edict_p ent);
+qboolean SV_movestep(edict_p ent, vec3_t move, qboolean relink);
 
-void SV_WriteClientdataToMessage (edict_p ent, sizebuf_p msg);
+void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg);
 
 void SV_MoveToGoal();
 
 void SV_CheckForNewClients();
 void SV_RunClients();
-void SV_SaveSpawnparms ();
+void SV_SaveSpawnparms();
 #ifdef QUAKE2
-void SV_SpawnServer (cstring server, cstring startspot);
+void SV_SpawnServer(cstring server, cstring startspot);
 #else
-void SV_SpawnServer (cstring server);
+void SV_SpawnServer(cstring server);
 #endif

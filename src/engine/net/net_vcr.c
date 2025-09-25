@@ -33,11 +33,10 @@ static struct
 {
 	double	time;
 	int		op;
-	long	session;
+	int32_t	session;
 }	next;
 
-int VCR_Init()
-{
+int VCR_Init() {
 	net_drivers[0].Init = VCR_Init;
 
 	net_drivers[0].SearchForHosts = VCR_SearchForHosts;
@@ -53,115 +52,102 @@ int VCR_Init()
 	return 0;
 }
 
-void VCR_ReadNext()
-{
-	if (Sys_FileRead(vcrFile, &next, sizeof(next)) == 0)
-	{
+void VCR_ReadNext() {
+	if (Sys_FileRead(vcrFile, &next, sizeof(next)) == 0) {
 		next.op = 255;
-		Sys_Error ("=== END OF PLAYBACK===\n");
+		Sys_Error("=== END OF PLAYBACK===\n");
 	}
 	if (next.op < 1 || next.op > VCR_MAX_MESSAGE)
-		Sys_Error ("VCR_ReadNext: bad op");
+		Sys_Error("VCR_ReadNext: bad op");
 }
 
 
-void VCR_Listen (qboolean state)
-{
+void VCR_Listen(qboolean state) {
 }
 
 
-void VCR_Shutdown()
-{
+void VCR_Shutdown() {
 }
 
 
-int VCR_GetMessage (qsocket_t *sock)
-{
+int VCR_GetMessage(qsocket_t* sock) {
 	int	ret;
 
-	if (host_time != next.time || next.op != VCR_OP_GETMESSAGE || next.session != *(long *)(&sock->driverdata))
-		Sys_Error ("VCR missmatch");
+	if (host_time != next.time || next.op != VCR_OP_GETMESSAGE || next.session != *(int32_t*)(&sock->driverdata))
+		Sys_Error("VCR missmatch");
 
 	Sys_FileRead(vcrFile, &ret, sizeof(int));
-	if (ret != 1)
-	{
-		VCR_ReadNext ();
+	if (ret != 1) {
+		VCR_ReadNext();
 		return ret;
 	}
 
 	Sys_FileRead(vcrFile, &net_message.cursize, sizeof(int));
 	Sys_FileRead(vcrFile, net_message.data, net_message.cursize);
 
-	VCR_ReadNext ();
+	VCR_ReadNext();
 
 	return 1;
 }
 
 
-int VCR_SendMessage (qsocket_t *sock, sizebuf_p data)
-{
+int VCR_SendMessage(qsocket_t* sock, sizebuf_p data) {
 	int	ret;
 
-	if (host_time != next.time || next.op != VCR_OP_SENDMESSAGE || next.session != *(long *)(&sock->driverdata))
-		Sys_Error ("VCR missmatch");
+	if (host_time != next.time || next.op != VCR_OP_SENDMESSAGE || next.session != *(int32_t*)(&sock->driverdata))
+		Sys_Error("VCR missmatch");
 
 	Sys_FileRead(vcrFile, &ret, sizeof(int));
 
-	VCR_ReadNext ();
+	VCR_ReadNext();
 
 	return ret;
 }
 
 
-qboolean VCR_CanSendMessage (qsocket_t *sock)
-{
+qboolean VCR_CanSendMessage(qsocket_t* sock) {
 	qboolean	ret;
 
-	if (host_time != next.time || next.op != VCR_OP_CANSENDMESSAGE || next.session != *(long *)(&sock->driverdata))
-		Sys_Error ("VCR missmatch");
+	if (host_time != next.time || next.op != VCR_OP_CANSENDMESSAGE || next.session != *(int32_t*)(&sock->driverdata))
+		Sys_Error("VCR missmatch");
 
 	Sys_FileRead(vcrFile, &ret, sizeof(int));
 
-	VCR_ReadNext ();
+	VCR_ReadNext();
 
 	return ret;
 }
 
 
-void VCR_Close (qsocket_t *sock)
-{
+void VCR_Close(qsocket_t* sock) {
 }
 
 
-void VCR_SearchForHosts (qboolean xmit)
-{
+void VCR_SearchForHosts(qboolean xmit) {
 }
 
 
-qsocket_t *VCR_Connect (cstring host)
-{
+qsocket_t* VCR_Connect(cstring host) {
 	return NULL;
 }
 
 
-qsocket_t *VCR_CheckNewConnections()
-{
-	qsocket_t	*sock;
+qsocket_t* VCR_CheckNewConnections() {
+	qsocket_t* sock;
 
 	if (host_time != next.time || next.op != VCR_OP_CONNECT)
-		Sys_Error ("VCR missmatch");
+		Sys_Error("VCR missmatch");
 
-	if (!next.session)
-	{
-		VCR_ReadNext ();
+	if (!next.session) {
+		VCR_ReadNext();
 		return NULL;
 	}
 
-	sock = NET_NewQSocket ();
-	*(long *)(&sock->driverdata) = next.session;
+	sock = NET_NewQSocket();
+	*(int32_t*)(&sock->driverdata) = next.session;
 
-	Sys_FileRead (vcrFile, sock->address, NET_NAMELEN);
-	VCR_ReadNext ();
+	Sys_FileRead(vcrFile, sock->address, NET_NAMELEN);
+	VCR_ReadNext();
 
 	return sock;
 }

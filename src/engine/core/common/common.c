@@ -42,7 +42,7 @@ qboolean        com_modified;   // set true if using non-id files
 
 qboolean		proghack;
 
-int             static_registered = 1;  // only for startup check, then set
+int32_t             static_registered = 1;  // only for startup check, then set
 
 qboolean		msg_suppress_1 = 0;
 
@@ -53,7 +53,7 @@ void COM_InitFilesystem();
 #define PAK0_CRC                32981
 
 char	com_token[1024];
-int		com_argc;
+int32_t		com_argc;
 char** com_argv;
 
 #define CMDLINE_LENGTH	256
@@ -140,15 +140,15 @@ COM_FileExtension
 */
 cstring COM_FileExtension(cstring in) {
     static char exten[8];
-    int             i;
-
     while ((*in) && (*in != '.'))
         in++;
 
     if (!*in)
         return "";
     in++;
-    for (i = 0; (i < 7) && (*in); i++, in++)
+
+    int i = 0;
+    for (; (i < 7) && (*in); i++, in++)
         exten[i] = *in;
     exten[i] = 0;
     return exten;
@@ -290,7 +290,7 @@ Returns the position (1 to argc-1) in the program's argument list
 where the given parameter apears, or 0 if not present
 ================
 */
-int COM_CheckParm(cstring parm) {
+int32_t COM_CheckParm(cstring parm) {
     for (int i = 1; i < com_argc; i++) {
         if (!com_argv[i])
             continue;               // NEXTSTEP sometimes clears appkit vars.
@@ -440,8 +440,8 @@ cstring va(cstring format, ...) {
 
 
 /// just for debugging
-int memsearch(uint8_t* start, int count, int search) {
-    for (int i = 0; i < count; i++)
+int32_t memsearch(uint8_p start, int32_t count, int32_t search) {
+    for (int32_t i = 0; i < count; i++)
         if (start[i] == search)
             return i;
     return -1;
@@ -455,7 +455,7 @@ QUAKE FILESYSTEM
 =============================================================================
 */
 
-int     com_filesize;
+int32_t     com_filesize;
 
 
 //
@@ -464,14 +464,14 @@ int     com_filesize;
 
 typedef struct {
     char    name[MAX_QPATH];
-    int             filepos, filelen;
+    int32_t             filepos, filelen;
 } packfile_t;
 typedef packfile_t* packfile_p;
 
 typedef struct pack_s {
     char    filename[MAX_OSPATH];
-    int     handle;
-    int     numfiles;
+    int32_t     handle;
+    int32_t     numfiles;
     packfile_p files;
 } pack_t;
 typedef pack_t* pack_p;
@@ -481,13 +481,13 @@ typedef pack_t* pack_p;
 //
 typedef struct {
     char    name[56];
-    int     filepos, filelen;
+    int32_t     filepos, filelen;
 } dpackfile_t;
 
 typedef struct {
     char    id[4];
-    int     dirofs;
-    int     dirlen;
+    int32_t     dirofs;
+    int32_t     dirlen;
 } dpackheader_t;
 
 #define MAX_FILES_IN_PACK       2048
@@ -530,7 +530,7 @@ COM_WriteFile
 The filename will be prefixed by the current game directory
 ============
 */
-void COM_WriteFile(cstring filename, typeless_ptr data, int len) {
+void COM_WriteFile(cstring filename, typeless_ptr data, int32_t len) {
     char    name[MAX_OSPATH];
 
     snprintf(name, sizeof(name), "%s/%s", com_gamedir, filename);
@@ -749,11 +749,11 @@ Allways appends a 0 uint8_t.
 ============
 */
 cache_user_p    loadcache;
-uint8_t* loadbuf;
+uint8_p loadbuf;
 int             loadsize;
-uint8_t* COM_LoadFile(cstring path, int usehunk) {
+uint8_p COM_LoadFile(cstring path, int usehunk) {
 
-    uint8_t* buf = NULL;     // quiet compiler warning
+    uint8_p buf = NULL;     // quiet compiler warning
 
     // look for it in the filesystem or pack files
     int h;
@@ -785,7 +785,7 @@ uint8_t* COM_LoadFile(cstring path, int usehunk) {
     if (!buf)
         Sys_Error("COM_LoadFile: not enough space for %s", path);
 
-    ((uint8_t*)buf)[len] = 0;
+    ((uint8_p)buf)[len] = 0;
 
     Draw_BeginDisc();
     Sys_FileRead(h, buf, len);
@@ -795,11 +795,11 @@ uint8_t* COM_LoadFile(cstring path, int usehunk) {
     return buf;
 }
 
-uint8_t* COM_LoadHunkFile(cstring path) {
+uint8_p COM_LoadHunkFile(cstring path) {
     return COM_LoadFile(path, 1);
 }
 
-uint8_t* COM_LoadTempFile(cstring path) {
+uint8_p COM_LoadTempFile(cstring path) {
     return COM_LoadFile(path, 2);
 }
 
@@ -809,10 +809,10 @@ void COM_LoadCacheFile(cstring path, struct cache_user_s* cu) {
 }
 
 // uses temp hunk if larger than bufsize
-uint8_t* COM_LoadStackFile(cstring path, typeless_ptr buffer, int bufsize) {
-    loadbuf = (uint8_t*)buffer;
+uint8_p COM_LoadStackFile(cstring path, typeless_ptr buffer, int bufsize) {
+    loadbuf = (uint8_p)buffer;
     loadsize = bufsize;
-    uint8_t* buf = COM_LoadFile(path, 4);
+    uint8_p buf = COM_LoadFile(path, 4);
 
     return buf;
 }
@@ -862,7 +862,7 @@ pack_p COM_LoadPackFile(cstring packfile) {
     uint16_t crc;
     CRC_Init(&crc);
     for (int i = 0; i < header.dirlen; i++)
-        CRC_ProcessByte(&crc, ((uint8_t*)info)[i]);
+        CRC_ProcessByte(&crc, ((uint8_p)info)[i]);
 
     if (crc != PAK0_CRC)
         com_modified = true;

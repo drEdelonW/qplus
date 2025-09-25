@@ -1,5 +1,5 @@
 #include "endian_tools.h"
-#include <stdint.h>
+#include "types.h"
 /*
 ============================================================================
 
@@ -12,8 +12,8 @@ qboolean        bigendien;
 
 int16_t(*BigShort) (int16_t l);
 int16_t(*LittleShort) (int16_t l);
-int     (*BigLong) (int l);
-int     (*LittleLong) (int l);
+int32_t     (*BigLong) (int32_t l);
+int32_t     (*LittleLong) (int32_t l);
 float   (*BigFloat) (float l);
 float   (*LittleFloat) (float l);
 
@@ -30,7 +30,7 @@ int16_t   ShortNoSwap(int16_t l) {
 	return l;
 }
 
-int    LongSwap(int l) {
+int32_t    LongSwap(int32_t l) {
 	uint8_t    b1, b2, b3, b4;
 
 	b1 = l & 255;
@@ -38,10 +38,10 @@ int    LongSwap(int l) {
 	b3 = (l >> 16) & 255;
 	b4 = (l >> 24) & 255;
 
-	return ((int)b1 << 24) + ((int)b2 << 16) + ((int)b3 << 8) + b4;
+	return ((int32_t)b1 << 24) + ((int32_t)b2 << 16) + ((int32_t)b3 << 8) + b4;
 }
 
-int     LongNoSwap(int l) {
+int32_t     LongNoSwap(int32_t l) {
 	return l;
 }
 
@@ -69,7 +69,7 @@ void COM_Endian_Init() {
 	uint8_t    swaptest[2] = { 1,0 };
 
 	// set the uint8_t swapping variables in a portable manner
-	if (*(int16_t*)swaptest == 1) {
+	if (*(int16_p)swaptest == 1) {
 		bigendien = false;
 		BigShort = ShortSwap;
 		LittleShort = ShortNoSwap;

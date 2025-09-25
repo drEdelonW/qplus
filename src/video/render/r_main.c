@@ -49,9 +49,9 @@ int			r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
 qboolean	r_surfsonstack;
 int			r_clipflags;
 
-byte* r_warpbuffer;
+uint8_p r_warpbuffer;
 
-byte* r_stack_start;
+uint8_p r_stack_start;
 
 qboolean	r_fov_greater_than_90;
 
@@ -126,7 +126,7 @@ R_InitTextures
 */
 void	R_InitTextures() {
 	int		x, y, m;
-	byte* dest;
+	uint8_p dest;
 
 	// create a simple checkerboard texture for the default
 	r_notexture_mip = Hunk_AllocName(sizeof(texture_t) + 16 * 16 + 8 * 8 + 4 * 4 + 2 * 2, "notexture");
@@ -138,7 +138,7 @@ void	R_InitTextures() {
 	r_notexture_mip->offsets[3] = r_notexture_mip->offsets[2] + 4 * 4;
 
 	for (m = 0; m < 4; m++) {
-		dest = (byte*)r_notexture_mip + r_notexture_mip->offsets[m];
+		dest = (uint8_p)r_notexture_mip + r_notexture_mip->offsets[m];
 		for (y = 0; y < (16 >> m); y++)
 			for (x = 0; x < (16 >> m); x++) {
 				if ((y < (8 >> m)) ^ (x < (8 >> m)))
@@ -158,7 +158,7 @@ void R_Init() {
 	int		dummy;
 
 	// get stack position so we can guess if we are going to overflow
-	r_stack_start = (byte*)&dummy;
+	r_stack_start = (uint8_p)&dummy;
 
 	R_InitTurb();
 
@@ -204,8 +204,8 @@ void R_Init() {
 
 	// TODO: collect 386-specific code in one place
 #if	id386
-	Sys_MakeCodeWriteable((long)R_EdgeCodeStart,
-		(long)R_EdgeCodeEnd - (long)R_EdgeCodeStart);
+	Sys_MakeCodeWriteable((int32_t)R_EdgeCodeStart,
+		(int32_t)R_EdgeCodeEnd - (int32_t)R_EdgeCodeStart);
 #endif	// id386
 
 	D_Init();
@@ -427,14 +427,14 @@ void R_ViewChanged(vrect_p pvrect, int lineadj, float aspect) {
 	// TODO: collect 386-specific code in one place
 #if	id386
 	if (r_pixbytes == 1) {
-		Sys_MakeCodeWriteable((long)R_Surf8Start,
-			(long)R_Surf8End - (long)R_Surf8Start);
+		Sys_MakeCodeWriteable((int32_t)R_Surf8Start,
+			(int32_t)R_Surf8End - (int32_t)R_Surf8Start);
 		colormap = vid.colormap;
 		R_Surf8Patch();
 	}
 	else {
-		Sys_MakeCodeWriteable((long)R_Surf16Start,
-			(long)R_Surf16End - (long)R_Surf16Start);
+		Sys_MakeCodeWriteable((int32_t)R_Surf16Start,
+			(int32_t)R_Surf16End - (int32_t)R_Surf16Start);
 		colormap = vid.colormap16;
 		R_Surf16Patch();
 	}
@@ -450,7 +450,7 @@ R_MarkLeaves
 ===============
 */
 void R_MarkLeaves() {
-	byte* vis;
+	uint8_p vis;
 	mnode_t* node;
 	int		i;
 
@@ -626,7 +626,7 @@ void R_DrawViewModel() {
 R_BmodelCheckBBox
 =============
 */
-int R_BmodelCheckBBox(model_t* clmodel, float* minmaxs) {
+int R_BmodelCheckBBox(model_t* clmodel, float_p minmaxs) {
 	int			i, * pindex, clipflags;
 	vec3_t		acceptpt, rejectpt;
 	double		d;
@@ -814,12 +814,12 @@ void R_EdgeDrawing() {
 	}
 	else {
 		r_edges = (edge_ptr)
-			(((long)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+			(((int32_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
 	}
 
 	if (r_surfsonstack) {
 		surfaces = (surf_t*)
-			(((long)&lsurfs[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+			(((int32_t)&lsurfs[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
 		surf_max = &surfaces[r_cnumsurfs];
 		// surface 0 doesn't really exist; it's just a dummy because index 0
 		// is used to indicate no edge attached to surface
@@ -873,7 +873,7 @@ r_refdef must be set before the first call
 ================
 */
 void R_RenderView_() {
-	byte	warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+	uint8_t	warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 
 	r_warpbuffer = warpbuffer;
 
@@ -966,17 +966,17 @@ void R_RenderView() {
 	int		dummy;
 	int		delta;
 
-	delta = (byte*)&dummy - r_stack_start;
+	delta = (uint8_p)&dummy - r_stack_start;
 	if (delta < -10000 || delta > 10000)
 		Sys_Error("R_RenderView: called without enough stack");
 
 	if (Hunk_LowMark() & 3)
 		Sys_Error("Hunk is missaligned");
 
-	if ((long)(&dummy) & 3)
+	if ((int32_t)(&dummy) & 3)
 		Sys_Error("Stack is missaligned");
 
-	if ((long)(&r_warpbuffer) & 3)
+	if ((int32_t)(&r_warpbuffer) & 3)
 		Sys_Error("Globals are missaligned");
 
 	R_RenderView_();

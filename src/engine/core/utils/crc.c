@@ -64,11 +64,11 @@ static uint16_t crctable[256] = {
 	0x6e17,	0x7e36,	0x4e55,	0x5e74,	0x2e93,	0x3eb2,	0x0ed1,	0x1ef0
 };
 
-void CRC_Init(uint16_t* crcvalue) {
+void CRC_Init(uint16_p crcvalue) {
 	*crcvalue = CRC_INIT_VALUE;
 }
 
-void CRC_ProcessByte(uint16_t* crcvalue, byte data) {
+void CRC_ProcessByte(uint16_p crcvalue, uint8_t data) {
 	*crcvalue = (*crcvalue << 8) ^ crctable[(*crcvalue >> 8) ^ data];
 }
 

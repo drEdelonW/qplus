@@ -18,26 +18,25 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#include "byte_t.h"
-#include "qboolean.h"
+#include "types.h"
 
 #define CON_HORIZONLINE "\35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n"
 
 //
 // console
 //
-extern int con_totallines;
-extern int con_backscroll;
-extern qboolean con_forcedup;	// because no entities to refresh
-extern qboolean con_initialized;
-extern byte* con_chars;
-extern int con_notifylines;		// scan lines to clear for notify lines
+extern int32_t con_totallines;
+extern int32_t con_backscroll;
+extern bool con_forcedup;	// because no entities to refresh
+extern bool con_initialized;
+// extern uint8_p con_chars;
+extern int32_t con_notifylines;		// scan lines to clear for notify lines
 
-void Con_DrawCharacter(int cx, int line, int num);
+void Con_DrawCharacter(int32_t cx, int32_t line, int32_t num);
 
 void Con_CheckResize();
 void Con_Init();
-void Con_DrawConsole (int lines, qboolean drawinput);
+void Con_DrawConsole(int32_t lines, bool drawinput);
 void Con_Print(cstring txt);
 void Con_Printf(cstring fmt, ...);
 void Con_DPrintf(cstring fmt, ...);
@@ -47,5 +46,5 @@ void Con_DrawNotify();
 void Con_ClearNotify();
 void Con_ToggleConsole_f();
 
-void Con_NotifyBox (cstring text);	// during startup for sound / cd warnings
+void Con_NotifyBox(cstring text);	// during startup for sound / cd warnings
 

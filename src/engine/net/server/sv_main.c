@@ -328,14 +328,14 @@ void SV_ClearDatagram() {
 */
 
 int     fatbytes;
-byte    fatpvs[MAX_MAP_LEAFS / 8];
+uint8_t    fatpvs[MAX_MAP_LEAFS / 8];
 
 void SV_AddToFatPVS(vec3_t org, mnode_p node) {
     while (1) {
         // if this is a leaf, accumulate the pvs bits
         if (node->contents < 0) {
             if (node->contents != CONTENTS_SOLID) {
-                byte* pvs = Mod_LeafPVS((mleaf_t*)node, sv.worldmodel);
+                uint8_p pvs = Mod_LeafPVS((mleaf_t*)node, sv.worldmodel);
                 for (int i = 0; i < fatbytes; i++) {
                     fatpvs[i] |= pvs[i];
                 }
@@ -364,7 +364,7 @@ void SV_AddToFatPVS(vec3_t org, mnode_p node) {
     given point.
     =============
 */
-byte* SV_FatPVS(vec3_t org) {
+uint8_p SV_FatPVS(vec3_t org) {
     fatbytes = (sv.worldmodel->numleafs + 31) >> 3;
     Q_memset(fatpvs, 0, fatbytes);
     SV_AddToFatPVS(org, sv.worldmodel->nodes);
@@ -384,7 +384,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_t* msg) {
     // find the client's PVS
     vec3_t  org;
     VectorAdd(clent->v.origin, clent->v.view_ofs, org);
-    byte* pvs = SV_FatPVS(org);
+    uint8_p pvs = SV_FatPVS(org);
 
     // send over all entities (excpet the client) that touch the pvs
     edict_p ent = NEXT_EDICT(sv.edicts);
@@ -584,7 +584,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_t* msg) {
     =======================
 */
 qboolean SV_SendClientDatagram(client_t* client) {
-    byte		buf[MAX_DATAGRAM];
+    uint8_t		buf[MAX_DATAGRAM];
     sizebuf_t	msg;
 
     msg.data = buf;
@@ -655,7 +655,7 @@ void SV_UpdateToReliableMessages() {
 */
 void SV_SendNop(client_t* client) {
     sizebuf_t	msg;
-    byte		buf[4];
+    uint8_t		buf[4];
 
     msg.data = buf;
     msg.maxsize = sizeof(buf);

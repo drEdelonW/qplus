@@ -32,9 +32,9 @@ vec3_t	wishdir;
 float	wishspeed;
 
 // world
-float* angles;
-float* origin;
-float* velocity;
+float_p angles;
+float_p origin;
+float_p velocity;
 
 qboolean	onground;
 
@@ -113,7 +113,7 @@ SV_UserFriction
 ==================
 */
 void SV_UserFriction() {
-	float* vel;
+	float_p vel;
 	float	speed, newspeed, control;
 	vec3_t	start, stop;
 	float	friction;

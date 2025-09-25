@@ -36,7 +36,11 @@
 			"algorithm": "c",
 			"*.q1": "c",
 			"*.q2": "c",
-			"typeinfo": "c"
+			"typeinfo": "c",
+			"qboolean.h": "c",
+			"byte_t.h": "c",
+			"draw.h": "c",
+			"wad.h": "c"
 		}
 	}
 }

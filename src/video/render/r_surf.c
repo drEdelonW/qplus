@@ -27,16 +27,16 @@ drawsurf_t	r_drawsurf;
 int				lightleft, sourcesstep, blocksize, sourcetstep;
 int				lightdelta, lightdeltastep;
 int				lightright, lightleftstep, lightrightstep, blockdivshift;
-unsigned		blockdivmask;
+uint32_t		blockdivmask;
 typeless_ptr prowdestbase;
-uint8_t* pbasesource;
+uint8_p pbasesource;
 int				surfrowbytes;	// used by ASM files
-unsigned* r_lightptr;
+uint32_p r_lightptr;
 int				r_stepback;
 int				r_lightwidth;
 int				r_numhblocks, r_numvblocks;
-uint8_t* r_source;
-uint8_t* r_sourcemax;
+uint8_p r_source;
+uint8_p r_sourcemax;
 
 void R_DrawSurfaceBlock8_mip0();
 void R_DrawSurfaceBlock8_mip1();
@@ -52,7 +52,7 @@ static void	(*surfmiptable[4])(void) = {
 
 
 
-unsigned		blocklights[18 * 18];
+uint32_t		blocklights[18 * 18];
 
 /*
 ===============
@@ -114,7 +114,7 @@ void R_AddDynamicLights() {
 				if (dist < minlight)
 #ifdef QUAKE2
 				{
-					unsigned temp;
+					uint32_t temp;
 					temp = (rad - dist) * 256;
 					i = t * smax + s;
 					if (!cl_dlights[lnum].dark)
@@ -145,8 +145,8 @@ void R_BuildLightMap() {
 	int			smax, tmax;
 	int			t;
 	int			i, size;
-	byte* lightmap;
-	unsigned	scale;
+	uint8_p lightmap;
+	uint32_t	scale;
 	int			maps;
 	msurface_t* surf;
 
@@ -234,12 +234,12 @@ R_DrawSurface
 ===============
 */
 void R_DrawSurface() {
-	uint8_t* basetptr;
+	uint8_p basetptr;
 	int				smax, tmax, twidth;
 	int				u;
 	int				soffset, basetoffset, texwidth;
 	int				horzblockstep;
-	uint8_t* pcolumndest;
+	uint8_p pcolumndest;
 	void			(*pblockdrawer)(void);
 	texture_t* mt;
 
@@ -250,7 +250,7 @@ void R_DrawSurface() {
 
 	mt = r_drawsurf.texture;
 
-	r_source = (byte*)mt + mt->offsets[r_drawsurf.surfmip];
+	r_source = (uint8_p)mt + mt->offsets[r_drawsurf.surfmip];
 
 	// the fractional light values should range from 0 to (VID_GRADES - 1) << 16
 	// from a source range of 0 - 255
@@ -348,7 +348,7 @@ void R_DrawSurfaceBlock8_mip0() {
 
 			for (b = 15; b >= 0; b--) {
 				pix = psource[b];
-				prowdest[b] = ((uint8_t*)vid.colormap)
+				prowdest[b] = ((uint8_p)vid.colormap)
 					[(light & 0xFF00) + pix];
 				light += lightstep;
 			}
@@ -394,7 +394,7 @@ void R_DrawSurfaceBlock8_mip1() {
 
 			for (b = 7; b >= 0; b--) {
 				pix = psource[b];
-				prowdest[b] = ((uint8_t*)vid.colormap)
+				prowdest[b] = ((uint8_p)vid.colormap)
 					[(light & 0xFF00) + pix];
 				light += lightstep;
 			}
@@ -440,7 +440,7 @@ void R_DrawSurfaceBlock8_mip2() {
 
 			for (b = 3; b >= 0; b--) {
 				pix = psource[b];
-				prowdest[b] = ((uint8_t*)vid.colormap)
+				prowdest[b] = ((uint8_p)vid.colormap)
 					[(light & 0xFF00) + pix];
 				light += lightstep;
 			}
@@ -486,7 +486,7 @@ void R_DrawSurfaceBlock8_mip3() {
 
 			for (b = 1; b >= 0; b--) {
 				pix = psource[b];
-				prowdest[b] = ((uint8_t*)vid.colormap)
+				prowdest[b] = ((uint8_p)vid.colormap)
 					[(light & 0xFF00) + pix];
 				light += lightstep;
 			}
@@ -512,14 +512,14 @@ FIXME: make this work
 */
 void R_DrawSurfaceBlock16() {
 	int				k;
-	uint8_t* psource;
+	uint8_p psource;
 	int				lighttemp, lightstep, light;
-	uint16_t* prowdest;
+	uint16_p prowdest;
 
-	prowdest = (uint16_t*)prowdestbase;
+	prowdest = (uint16_p)prowdestbase;
 
 	for (k = 0; k < blocksize; k++) {
-		uint16_t* pdest;
+		uint16_p pdest;
 		uint8_t	pix;
 		int				b;
 
@@ -541,7 +541,7 @@ void R_DrawSurfaceBlock16() {
 		pbasesource += sourcetstep;
 		lightright += lightrightstep;
 		lightleft += lightleftstep;
-		prowdest = (uint16_t*)((long)prowdest + surfrowbytes);
+		prowdest = (uint16_p)((int32_t)prowdest + surfrowbytes);
 	}
 
 	prowdestbase = prowdest;
@@ -560,10 +560,10 @@ R_GenTurbTile
 void R_GenTurbTile(pixel_p pbasetex, typeless_ptr pdest) {
 	int* turb;
 	int		i, j, s, t;
-	byte* pd;
+	uint8_p pd;
 
 	turb = sintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
-	pd = (byte*)pdest;
+	pd = (uint8_p)pdest;
 
 	for (i = 0; i < TILE_SIZE; i++) {
 		for (j = 0; j < TILE_SIZE; j++) {
@@ -583,10 +583,10 @@ R_GenTurbTile16
 void R_GenTurbTile16(pixel_p pbasetex, typeless_ptr pdest) {
 	int* turb;
 	int				i, j, s, t;
-	uint16_t* pd;
+	uint16_p pd;
 
 	turb = sintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
-	pd = (uint16_t*)pdest;
+	pd = (uint16_p)pdest;
 
 	for (i = 0; i < TILE_SIZE; i++) {
 		for (j = 0; j < TILE_SIZE; j++) {
@@ -607,11 +607,11 @@ void R_GenTile(msurface_t* psurf, typeless_ptr pdest) {
 	if (psurf->flags & SURF_DRAWTURB) {
 		if (r_pixbytes == 1) {
 			R_GenTurbTile((pixel_p)
-				((byte*)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]), pdest);
+				((uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]), pdest);
 		}
 		else {
 			R_GenTurbTile16((pixel_p)
-				((byte*)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]), pdest);
+				((uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]), pdest);
 		}
 	}
 	else if (psurf->flags & SURF_DRAWSKY) {

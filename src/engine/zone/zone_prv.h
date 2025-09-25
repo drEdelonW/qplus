@@ -7,7 +7,7 @@
 #define ALIGN_UP(x, a)   (((x) + ((a) - 1)) & ~((a) - 1))
 
 //========================[z_hulk.c]========================//
-extern byte* hunk_base;
+extern uint8_p hunk_base;
 extern size_t      hunk_size;
 
 extern size_t      hunk_low_used;

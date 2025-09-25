@@ -57,12 +57,11 @@ float old_windowed_mouse;
 // smaller Motif 1.1 structure.
 
 #define MWM_HINTS_DECORATIONS   2
-typedef struct
-{
-	long flags;
-	long functions;
-	long decorations;
-	long input_mode;
+typedef struct {
+	int32_t flags;
+	int32_t functions;
+	int32_t decorations;
+	int32_t input_mode;
 } MotifWmHints;
 
 #define MAX_COLUMN_SIZE	11
@@ -226,7 +225,7 @@ qboolean CheckPixelMultiply()
 	int w, h;
 	XWindowAttributes wattr;
 	XWindowChanges chg;
-	unsigned int value_mask;
+	uint32_t value_mask;
 	int old_pixel;
 
 	if ((m = (int)pixel_multiply.value) != current_pixel_multiply) {
@@ -956,7 +955,7 @@ VID_Update (vrect_p rects)
 	if (config_notify) {
 		int w, h;
 		XWindowChanges chg;
-		unsigned int value_mask;
+		uint32_t value_mask;
 
 		w = 320*current_pixel_multiply; // minimum width
 		h = 200*current_pixel_multiply; // minimum height
@@ -1028,7 +1027,7 @@ VID_Update_MT (vrect_p rects)
 	if (config_notify) {
 		int w, h;
 		XWindowChanges chg;
-		unsigned int value_mask;
+		uint32_t value_mask;
 
 		w = 320*current_pixel_multiply; // minimum width
 		h = 200*current_pixel_multiply; // minimum height

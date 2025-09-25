@@ -31,16 +31,15 @@ FILE IO
 */
 
 #define MAX_HANDLES             10
-FILE    *sys_handles[MAX_HANDLES];
+FILE* sys_handles[MAX_HANDLES];
 
-int             findhandle()
-{
+int             findhandle() {
 	int             i;
 
-	for (i=1 ; i<MAX_HANDLES ; i++)
+	for (i = 1; i < MAX_HANDLES; i++)
 		if (!sys_handles[i])
 			return i;
-	Sys_Error ("out of handles");
+	Sys_Error("out of handles");
 	return -1;
 }
 
@@ -49,29 +48,26 @@ int             findhandle()
 filelength
 ================
 */
-int filelength (FILE *f)
-{
+int filelength(FILE* f) {
 	int             pos;
 	int             end;
 
-	pos = ftell (f);
-	fseek (f, 0, SEEK_END);
-	end = ftell (f);
-	fseek (f, pos, SEEK_SET);
+	pos = ftell(f);
+	fseek(f, 0, SEEK_END);
+	end = ftell(f);
+	fseek(f, pos, SEEK_SET);
 
 	return end;
 }
 
-int Sys_FileOpenRead (cstring path, int *hndl)
-{
-	FILE    *f;
+int Sys_FileOpenRead(cstring path, int* hndl) {
+	FILE* f;
 	int             i;
 
-	i = findhandle ();
+	i = findhandle();
 
 	f = fopen(path, "rb");
-	if (!f)
-	{
+	if (!f) {
 		*hndl = -1;
 		return -1;
 	}
@@ -81,49 +77,42 @@ int Sys_FileOpenRead (cstring path, int *hndl)
 	return filelength(f);
 }
 
-int Sys_FileOpenWrite (cstring path)
-{
-	FILE    *f;
+int Sys_FileOpenWrite(cstring path) {
+	FILE* f;
 	int             i;
 
-	i = findhandle ();
+	i = findhandle();
 
 	f = fopen(path, "wb");
 	if (!f)
-		Sys_Error ("Error opening %s: %s", path,strerror(errno));
+		Sys_Error("Error opening %s: %s", path, strerror(errno));
 	sys_handles[i] = f;
 
 	return i;
 }
 
-void Sys_FileClose (int handle)
-{
-	fclose (sys_handles[handle]);
+void Sys_FileClose(int handle) {
+	fclose(sys_handles[handle]);
 	sys_handles[handle] = NULL;
 }
 
-void Sys_FileSeek (int handle, int position)
-{
-	fseek (sys_handles[handle], position, SEEK_SET);
+void Sys_FileSeek(int handle, int position) {
+	fseek(sys_handles[handle], position, SEEK_SET);
 }
 
-int Sys_FileRead (int handle, typeless_ptr dest, int count)
-{
-	return fread (dest, 1, count, sys_handles[handle]);
+int Sys_FileRead(int handle, typeless_ptr dest, int count) {
+	return fread(dest, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileWrite (int handle, typeless_ptr data, int count)
-{
-	return fwrite (data, 1, count, sys_handles[handle]);
+int Sys_FileWrite(int handle, typeless_ptr data, int count) {
+	return fwrite(data, 1, count, sys_handles[handle]);
 }
 
-int     Sys_FileTime (cstring path)
-{
-	FILE    *f;
+int     Sys_FileTime(cstring path) {
+	FILE* f;
 
 	f = fopen(path, "rb");
-	if (f)
-	{
+	if (f) {
 		fclose(f);
 		return 1;
 	}
@@ -131,8 +120,7 @@ int     Sys_FileTime (cstring path)
 	return -1;
 }
 
-void Sys_mkdir (cstring path)
-{
+void Sys_mkdir(cstring path) {
 }
 
 
@@ -144,40 +132,35 @@ SYSTEM IO
 ===============================================================================
 */
 
-void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
-{
+void Sys_MakeCodeWriteable(uint32_t startaddr, uint32_t length) {
 }
 
 
-void Sys_Error (cstring error, ...)
-{
+void Sys_Error(cstring error, ...) {
 	va_list         argptr;
 
-	printf ("Sys_Error: ");
-	va_start (argptr,error);
-	vprintf (error,argptr);
-	va_end (argptr);
-	printf ("\n");
+	printf("Sys_Error: ");
+	va_start(argptr, error);
+	vprintf(error, argptr);
+	va_end(argptr);
+	printf("\n");
 
-	exit (1);
+	exit(1);
 }
 
-void Sys_Printf (cstring fmt, ...)
-{
+void Sys_Printf(cstring fmt, ...) {
 	va_list         argptr;
 
-	va_start (argptr,fmt);
-	vprintf (fmt,argptr);
-	va_end (argptr);
+	va_start(argptr, fmt);
+	vprintf(fmt, argptr);
+	va_end(argptr);
 }
 
-void Sys_Quit()
-{
-	exit (0);
+void Sys_Quit() {
+	exit(0);
 }
 
-double Sys_FloatTime()
-{
+double Sys_FloatTime() {
 	static double t;
 
 	t += 0.1;
@@ -185,47 +168,40 @@ double Sys_FloatTime()
 	return t;
 }
 
-cstring Sys_ConsoleInput()
-{
+cstring Sys_ConsoleInput() {
 	return NULL;
 }
 
-void Sys_Sleep()
-{
+void Sys_Sleep() {
 }
 
-void Sys_SendKeyEvents()
-{
+void Sys_SendKeyEvents() {
 }
 
-void Sys_HighFPPrecision()
-{
+void Sys_HighFPPrecision() {
 }
 
-void Sys_LowFPPrecision()
-{
+void Sys_LowFPPrecision() {
 }
 
 //=============================================================================
 
-void main (int argc, cstring *argv)
-{
+void main(int argc, cstring* argv) {
 	static quakeparms_t    parms;
 
-	parms.memsize = 8*1024*1024;
-	parms.membase = malloc (parms.memsize);
+	parms.memsize = 8 * 1024 * 1024;
+	parms.membase = malloc(parms.memsize);
 	parms.basedir = ".";
 
-	COM_InitArgv (argc, argv);
+	COM_InitArgv(argc, argv);
 
 	parms.argc = com_argc;
 	parms.argv = com_argv;
 
-	printf ("Host_Init\n");
-	Host_Init (&parms);
-	while (1)
-	{
-		Host_Frame (0.1);
+	printf("Host_Init\n");
+	Host_Init(&parms);
+	while (1) {
+		Host_Frame(0.1);
 	}
 }
 

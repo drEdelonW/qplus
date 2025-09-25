@@ -58,7 +58,7 @@ extern	ddef_p         pr_globaldefs;
 extern	ddef_p         pr_fielddefs;
 extern	dstatement_p    pr_statements;
 extern	globalvars_t* pr_global_struct;
-extern	float* pr_globals;			// same as pr_global_struct
+extern	float_p pr_globals;			// same as pr_global_struct
 
 extern	int				pr_edict_size;	// in bytes
 
@@ -87,30 +87,30 @@ void ED_ParseGlobals(cstring data);
 void ED_LoadFromFile(cstring data);
 
 //define EDICT_NUM(n) ((edict_p )(sv.edicts+ (n)*pr_edict_size))
-//define NUM_FOR_EDICT(e) (((byte *)(e) - sv.edicts)/pr_edict_size)
+//define NUM_FOR_EDICT(e) (((uint8_t *)(e) - sv.edicts)/pr_edict_size)
 
 edict_p EDICT_NUM(int n);
 int NUM_FOR_EDICT(edict_p e);
 
-#define	NEXT_EDICT(e) ((edict_p )( (byte *)e + pr_edict_size))
+#define	NEXT_EDICT(e) ((edict_p )( (uint8_t *)e + pr_edict_size))
 
-#define	EDICT_TO_PROG(e) ((byte *)e - (byte *)sv.edicts)
-#define PROG_TO_EDICT(e) ((edict_p )((byte *)sv.edicts + e))
+#define	EDICT_TO_PROG(e) ((uint8_t *)e - (uint8_t *)sv.edicts)
+#define PROG_TO_EDICT(e) ((edict_p )((uint8_t *)sv.edicts + e))
 
 //============================================================================
 
 #define	G_FLOAT(o) (pr_globals[o])
 #define	G_INT(o) (*(int *)&pr_globals[o])
-#define	G_EDICT(o) ((edict_p )((byte *)sv.edicts+ *(int *)&pr_globals[o]))
+#define	G_EDICT(o) ((edict_p )((uint8_t *)sv.edicts+ *(int *)&pr_globals[o]))
 #define G_EDICTNUM(o) NUM_FOR_EDICT(G_EDICT(o))
 #define	G_VECTOR(o) (&pr_globals[o])
 #define	G_STRING(o) (pr_strings + *(string_t *)&pr_globals[o])
 #define	G_FUNCTION(o) (*(func_t *)&pr_globals[o])
 
-#define	E_FLOAT(e,o) (((float*)&e->v)[o])
-#define	E_INT(e,o) (*(int *)&((float*)&e->v)[o])
-#define	E_VECTOR(e,o) (&((float*)&e->v)[o])
-#define	E_STRING(e,o) (pr_strings + *(string_t *)&((float*)&e->v)[o])
+#define	E_FLOAT(e,o) (((float_p)&e->v)[o])
+#define	E_INT(e,o) (*(int *)&((float_p)&e->v)[o])
+#define	E_VECTOR(e,o) (&((float_p)&e->v)[o])
+#define	E_STRING(e,o) (pr_strings + *(string_t *)&((float_p)&e->v)[o])
 
 extern	int		type_size[8];
 

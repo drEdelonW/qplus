@@ -38,7 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct {
 	int     ambientlight;
 	int     shadelight;
-	float* plightvec;
+	float_p plightvec;
 } alight_t;
 typedef alight_t* alight_p;
 
@@ -81,9 +81,9 @@ struct clipplane_s {
 	vec3_t      normal;
 	float       dist;
 	clipplane_p next;
-	byte        leftedge;
-	byte        rightedge;
-	byte        reserved[2];
+	uint8_t        leftedge;
+	uint8_t        rightedge;
+	uint8_t        reserved[2];
 };
 
 extern	clipplane_t	view_clipplanes[4];
@@ -125,7 +125,7 @@ void R_DrawSprite();
 void R_RenderFace(msurface_p fa, int clipflags);
 void R_RenderPoly(msurface_p fa, int clipflags);
 void R_RenderBmodelFace(bedge_p pedges, msurface_p psurf);
-void R_TransformPlane(mplane_p p, float* normal, float* dist);
+void R_TransformPlane(mplane_p p, float_p normal, float_p dist);
 void R_TransformFrustum();
 void R_SetSkyFrame();
 void R_DrawSurfaceBlock16();

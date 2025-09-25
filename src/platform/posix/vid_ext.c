@@ -63,7 +63,7 @@ extern regs_t regs;
 static int		VID_currentpage;
 static int		VID_displayedpage;
 static int* VID_pagelist;
-static byte* VID_membase;
+static uint8_p VID_membase;
 static int		VID_banked;
 
 typedef struct
@@ -96,22 +96,22 @@ static modeinfo_t modeinfo;
 
 // all bytes to avoid problems with compiler field packing
 typedef struct vbeinfoblock_s {
-	byte			VbeSignature[4];
-	byte			VbeVersion[2];
-	byte			OemStringPtr[4];
-	byte			Capabilities[4];
-	byte			VideoModePtr[4];
-	byte			TotalMemory[2];
-	byte			OemSoftwareRev[2];
-	byte			OemVendorNamePtr[4];
-	byte			OemProductNamePtr[4];
-	byte			OemProductRevPtr[4];
-	byte			Reserved[222];
-	byte			OemData[256];
+	uint8_t			VbeSignature[4];
+	uint8_t			VbeVersion[2];
+	uint8_t			OemStringPtr[4];
+	uint8_t			Capabilities[4];
+	uint8_t			VideoModePtr[4];
+	uint8_t			TotalMemory[2];
+	uint8_t			OemSoftwareRev[2];
+	uint8_t			OemVendorNamePtr[4];
+	uint8_t			OemProductNamePtr[4];
+	uint8_t			OemProductRevPtr[4];
+	uint8_t			Reserved[222];
+	uint8_t			OemData[256];
 } vbeinfoblock_t;
 
 static int	totalvidmem;
-static byte* ppal;
+static uint8_p ppal;
 qboolean	vsync_exists, de_exists;
 
 qboolean VID_ExtraGetModeInfo(int modenum);
@@ -126,7 +126,7 @@ VGA_BankedBeginDirectRect
 ================
 */
 void VGA_BankedBeginDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode,
-	int x, int y, byte* pbitmap, int width, int height) {
+	int x, int y, uint8_p pbitmap, int width, int height) {
 
 	if (!lvid->direct)
 		return;
@@ -176,9 +176,9 @@ VID_SetVESAPalette
 ================
 */
 void VID_SetVESAPalette(viddef_p lvid, vmode_t* pcurrentmode,
-	uint8_t* pal) {
+	uint8_p pal) {
 	int		i;
-	byte* pp;
+	uint8_p pp;
 
 	UNUSED(lvid);
 	UNUSED(pcurrentmode);
@@ -237,7 +237,7 @@ void VID_ExtraWaitDisplayEnable() {
 VID_ExtraVidLookForState
 ================
 */
-qboolean VID_ExtraVidLookForState(unsigned state, unsigned mask) {
+qboolean VID_ExtraVidLookForState(uint32_t state, uint32_t mask) {
 	int		i;
 	double	starttime, time;
 
@@ -261,7 +261,7 @@ qboolean VID_ExtraVidLookForState(unsigned state, unsigned mask) {
 VID_ExtraStateFound
 ================
 */
-qboolean VID_ExtraStateFound(unsigned state) {
+qboolean VID_ExtraStateFound(uint32_t state) {
 	int		i, workingstate;
 
 	workingstate = 0;
@@ -285,13 +285,13 @@ VID_InitExtra
 */
 void VID_InitExtra() {
 	int				nummodes;
-	int16_t* pmodenums;
+	int16_p pmodenums;
 	vbeinfoblock_t* pinfoblock;
 	__dpmi_meminfo	phys_mem_info;
 
 	pinfoblock = dos_getmemory(sizeof(vbeinfoblock_t));
 
-	*(long*)pinfoblock->VbeSignature = 'V' + ('B' << 8) + ('E' << 16) + ('2' << 24);
+	*(int32_t*)pinfoblock->VbeSignature = 'V' + ('B' << 8) + ('E' << 16) + ('2' << 24);
 
 	// see if VESA support is available
 	regs.x.ax = 0x4f00;
@@ -306,12 +306,12 @@ void VID_InitExtra() {
 		return;		// not VESA 2.0 or greater
 
 	Con_Printf("VESA 2.0 compliant adapter:\n%s\n",
-		VID_ExtraFarToLinear(*(byte**)&pinfoblock->OemStringPtr[0]));
+		VID_ExtraFarToLinear(*(uint8_p*)&pinfoblock->OemStringPtr[0]));
 
-	totalvidmem = *(uint16_t*)&pinfoblock->TotalMemory[0] << 16;
+	totalvidmem = *(uint16_p)&pinfoblock->TotalMemory[0] << 16;
 
-	pmodenums = (int16_t*)
-		VID_ExtraFarToLinear(*(byte**)&pinfoblock->VideoModePtr[0]);
+	pmodenums = (int16_p)
+		VID_ExtraFarToLinear(*(uint8_p*)&pinfoblock->VideoModePtr[0]);
 
 	// find 8 bit modes until we either run out of space or run out of modes
 	nummodes = 0;
@@ -434,10 +434,10 @@ qboolean VID_ExtraGetModeInfo(int modenum) {
 	}
 	else {
 		modeinfo.modenum = modenum;
-		modeinfo.bits_per_pixel = *(char*)(infobuf + 25);
+		modeinfo.bits_per_pixel = *(cstring)(infobuf + 25);
 		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel + 1) / 8;
-		modeinfo.width = *(int16_t*)(infobuf + 18);
-		modeinfo.height = *(int16_t*)(infobuf + 20);
+		modeinfo.width = *(int16_p)(infobuf + 18);
+		modeinfo.height = *(int16_p)(infobuf + 20);
 
 		// we do only 8-bpp in software
 		if ((modeinfo.bits_per_pixel != 8) ||
@@ -447,7 +447,7 @@ qboolean VID_ExtraGetModeInfo(int modenum) {
 			return false;
 		}
 
-		modeinfo.mode_attributes = *(int16_t*)infobuf;
+		modeinfo.mode_attributes = *(int16_p)infobuf;
 
 		// we only want color graphics modes that are supported by the hardware
 		if ((modeinfo.mode_attributes &
@@ -463,7 +463,7 @@ qboolean VID_ExtraGetModeInfo(int modenum) {
 				return false;
 		}
 
-		modeinfo.bytes_per_scanline = *(int16_t*)(infobuf + 16);
+		modeinfo.bytes_per_scanline = *(int16_p)(infobuf + 16);
 
 		modeinfo.pagesize = modeinfo.bytes_per_scanline * modeinfo.height;
 
@@ -473,7 +473,7 @@ qboolean VID_ExtraGetModeInfo(int modenum) {
 		// force to one page if the adapter reports it doesn't support more pages
 		// than that, no matter how much memory it has--it may not have hardware
 		// support for page flipping
-		numimagepages = *(uint8_t*)(infobuf + 29);
+		numimagepages = *(uint8_p)(infobuf + 29);
 
 		if (numimagepages <= 0) {
 			// wrong, but there seems to be an ATI VESA driver that reports 0
@@ -486,19 +486,19 @@ qboolean VID_ExtraGetModeInfo(int modenum) {
 			modeinfo.numpages = 3;
 		}
 
-		if (*(char*)(infobuf + 2) & 5) {
-			modeinfo.winasegment = *(uint16_t*)(infobuf + 8);
+		if (*(cstring)(infobuf + 2) & 5) {
+			modeinfo.winasegment = *(uint16_p)(infobuf + 8);
 			modeinfo.win = 0;
 		}
 		else if (*(char*)(infobuf + 3) & 5) {
-			modeinfo.winbsegment = *(uint16_t*)(infobuf + 8);
+			modeinfo.winbsegment = *(uint16_p)(infobuf + 8);
 			modeinfo.win = 1;
 		}
-		modeinfo.granularity = *(int16_t*)(infobuf + 4) * 1024;
-		modeinfo.win_size = *(int16_t*)(infobuf + 6) * 1024;
+		modeinfo.granularity = *(int16_p)(infobuf + 4) * 1024;
+		modeinfo.win_size = *(int16_p)(infobuf + 6) * 1024;
 		modeinfo.bits_per_pixel = *(char*)(infobuf + 25);
 		modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel + 1) / 8;
-		modeinfo.memory_model = *(uint8_t*)(infobuf + 27);
+		modeinfo.memory_model = *(uint8_p)(infobuf + 27);
 		modeinfo.num_pages = *(char*)(infobuf + 29) + 1;
 
 		modeinfo.red_width = *(char*)(infobuf + 31);
@@ -508,13 +508,13 @@ qboolean VID_ExtraGetModeInfo(int modenum) {
 		modeinfo.blue_width = *(char*)(infobuf + 35);
 		modeinfo.blue_pos = *(char*)(infobuf + 36);
 
-		modeinfo.pptr = *(long*)(infobuf + 40);
+		modeinfo.pptr = *(int32_t*)(infobuf + 40);
 
 #if 0
 		printf("VID: (VESA) info for mode 0x%x\n", modeinfo.modenum);
 		printf("  mode attrib = 0x%0x\n", modeinfo.mode_attributes);
-		printf("  win a attrib = 0x%0x\n", *(uint8_t*)(infobuf + 2));
-		printf("  win b attrib = 0x%0x\n", *(uint8_t*)(infobuf + 3));
+		printf("  win a attrib = 0x%0x\n", *(uint8_p)(infobuf + 2));
+		printf("  win b attrib = 0x%0x\n", *(uint8_p)(infobuf + 3));
 		printf("  win a seg 0x%0x\n", (int)modeinfo.winasegment);
 		printf("  win b seg 0x%0x\n", (int)modeinfo.winbsegment);
 		printf("  bytes per scanline = %d\n",

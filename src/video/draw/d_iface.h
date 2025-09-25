@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MAX_LBM_HEIGHT	(480)
 #include "cvar_q1.h"
 
-typedef struct{
+typedef struct {
 	float	u, v;
 	float	s, t;
 	float	zi;
@@ -49,10 +49,10 @@ struct particle_s;
 typedef struct particle_s particle_t;
 typedef particle_t* particle_p;
 struct particle_s {
-// driver-usable fields
+	// driver-usable fields
 	vec3_t		org;
 	float		color;
-// drivers never touch the following fields
+	// drivers never touch the following fields
 	particle_p	next;
 	vec3_t		vel;
 	float		ramp;
@@ -87,10 +87,10 @@ typedef finalvert_t* finalvert_p;
 typedef struct
 {
 	typeless_ptr				pskin;
-	maliasskindesc_t*	pskindesc;
+	maliasskindesc_t* pskindesc;
 	int					skinwidth;
 	int					skinheight;
-	mtriangle_t*		ptriangles;
+	mtriangle_t* ptriangles;
 	finalvert_p			pfinalverts;
 	int					numtriangles;
 	int					drawtype;
@@ -102,17 +102,17 @@ typedef struct {
 	float	u, v, zi, color;
 } screenpart_t;
 
-typedef struct{
+typedef struct {
 	int			nump;
 	emitpoint_p	pverts;	// there's room for an extra element at [nump],
-							//  if the driver wants to duplicate element [0] at
-							//  element [nump] to avoid dealing with wrapping
-	mspriteframe_t*	pspriteframe;
+	//  if the driver wants to duplicate element [0] at
+	//  element [nump] to avoid dealing with wrapping
+	mspriteframe_t* pspriteframe;
 	vec3_t			vup, vright, vpn;	// in worldspace
 	float			nearzi;
 } spritedesc_t;
 
-typedef struct{
+typedef struct {
 	int		u, v;
 	float	zi;
 	int		color;
@@ -120,23 +120,23 @@ typedef struct{
 
 extern int		d_spanpixcount;
 extern int		r_framecount;		// sequence # of current frame since Quake
-									//  started
+//  started
 extern qboolean	r_drawpolys;		// 1 if driver wants clipped polygons
-									//  rather than a span list
+//  rather than a span list
 extern qboolean	r_drawculledpolys;	// 1 if driver wants clipped polygons that
-									//  have been culled by the edge list
+//  have been culled by the edge list
 extern qboolean	r_worldpolysbacktofront;	// 1 if driver wants polygons
-											//  delivered back to front rather
-											//  than front to back
+//  delivered back to front rather
+//  than front to back
 extern qboolean	r_recursiveaffinetriangles;	// true if a driver wants to use
-											//  recursive triangular subdivison
-											//  and vertex drawing via
-											//  D_PolysetDrawFinalVerts() past
-											//  a certain distance (normally
-											//  only used by the software
-											//  driver)
+//  recursive triangular subdivison
+//  and vertex drawing via
+//  D_PolysetDrawFinalVerts() past
+//  a certain distance (normally
+//  only used by the software
+//  driver)
 extern float	r_aliasuvscale;		// scale-up factor for screen u and v
-									//  on Alias vertices passed to driver
+//  on Alias vertices passed to driver
 extern int		r_pixbytes;
 extern qboolean	r_dowarp;
 
@@ -146,20 +146,20 @@ extern zpointdesc_t		r_zpointdesc;
 extern polydesc_t		r_polydesc;
 
 extern int		d_con_indirect;	// if 0, Quake will draw console directly
-								//  to vid.buffer; if 1, Quake will
-								//  draw console via D_DrawRect. Must be
-								//  defined by driver
+//  to vid.buffer; if 1, Quake will
+//  draw console via D_DrawRect. Must be
+//  defined by driver
 
 extern vec3_t	r_pright, r_pup, r_ppn;
 
 
-void D_Aff8Patch (typeless_ptr pcolormap);
-void D_BeginDirectRect (int x, int y, byte* pbitmap, int width, int height);
+void D_Aff8Patch(typeless_ptr pcolormap);
+void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height);
 void D_DisableBackBufferAccess();
-void D_EndDirectRect (int x, int y, int width, int height);
+void D_EndDirectRect(int x, int y, int width, int height);
 void D_PolysetDraw();
-void D_PolysetDrawFinalVerts (finalvert_p fv, int numverts);
-void D_DrawParticle (particle_p pparticle);
+void D_PolysetDrawFinalVerts(finalvert_p fv, int numverts);
+void D_DrawParticle(particle_p pparticle);
 void D_DrawPoly();
 void D_DrawSprite();
 void D_DrawSurfaces();
@@ -173,9 +173,9 @@ void D_StartParticles();
 void D_TurnZOn();
 void D_WarpScreen();
 
-void D_FillRect (vrect_p vrect, int color);
+void D_FillRect(vrect_p vrect, int color);
 void D_DrawRect();
-void D_UpdateRects (vrect_p prect);
+void D_UpdateRects(vrect_p prect);
 
 // currently for internal use only, and should be a do-nothing function in
 // hardware drivers
@@ -184,7 +184,7 @@ void D_PolysetUpdateTables();
 
 // these are currently for internal use only, and should not be used by drivers
 extern int				r_skydirect;
-extern byte*    r_skysource;
+extern uint8_p r_skysource;
 
 // transparency types for D_DrawRect ()
 #define DR_SOLID		0
@@ -205,7 +205,7 @@ typedef struct
 	int			rowbytes;	// destination logical width in bytes
 	msurface_p  surf;		// description for surface to generate
 	fixed8_t	lightadj[MAXLIGHTMAPS];
-							// adjust for lightmap levels for dynamic lighting
+	// adjust for lightmap levels for dynamic lighting
 	texture_t* texture;	// corrected for animating textures
 	int			surfmip;	// mipmapped ratio of surface texels / world pixels
 	int			surfwidth;	// in mipmapped texels
@@ -215,7 +215,7 @@ typedef struct
 extern drawsurf_t	r_drawsurf;
 
 void R_DrawSurface();
-void R_GenTile (msurface_p psurf, typeless_ptr pdest);
+void R_GenTile(msurface_p psurf, typeless_ptr pdest);
 
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
@@ -236,5 +236,5 @@ extern float	skytime;
 extern int		c_surf;
 extern vrect_t	scr_vrect;
 
-extern byte*  r_warpbuffer;
+extern uint8_p r_warpbuffer;
 

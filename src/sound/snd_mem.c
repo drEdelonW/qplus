@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int			cache_full_cycle;
 
-byte* S_Alloc(int size);
+uint8_p S_Alloc(int size);
 
 /*
 ================
@@ -62,7 +62,7 @@ void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cstring data) {
 	if (stepscale == 1 && inwidth == 1 && sc->width == 1) {
 		// fast special case
 		for (i = 0; i < outcount; i++)
-			((signed char*)sc->data)[i]
+			((int8_p)sc->data)[i]
 			= (int)((uint8_t)(data[i]) - 128);
 	}
 	else {
@@ -73,13 +73,13 @@ void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cstring data) {
 			srcsample = samplefrac >> 8;
 			samplefrac += fracstep;
 			if (inwidth == 2)
-				sample = LittleShort(((int16_t*)data)[srcsample]);
+				sample = LittleShort(((int16_p)data)[srcsample]);
 			else
 				sample = (int)((uint8_t)(data[srcsample]) - 128) << 8;
 			if (sc->width == 2)
-				((int16_t*)sc->data)[i] = sample;
+				((int16_p)sc->data)[i] = sample;
 			else
-				((signed char*)sc->data)[i] = sample >> 8;
+				((int8_p)sc->data)[i] = sample >> 8;
 		}
 	}
 }

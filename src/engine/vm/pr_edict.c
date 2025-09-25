@@ -29,7 +29,7 @@ ddef_p pr_fielddefs;
 ddef_p pr_globaldefs;
 dstatement_p pr_statements;
 globalvars_t* pr_global_struct;
-float* pr_globals;			// same as pr_global_struct
+float_p pr_globals;			// same as pr_global_struct
 int				pr_edict_size;	// in bytes
 
 uint16_t		pr_crc;
@@ -685,7 +685,7 @@ qboolean	ED_ParseEpair(typeless_ptr base, ddef_p key, cstring s) {
 		break;
 
 	case ev_float:
-		*(float*)d = atof(s);
+		*(float_p)d = atof(s);
 		break;
 
 	case ev_vector:
@@ -696,7 +696,7 @@ qboolean	ED_ParseEpair(typeless_ptr base, ddef_p key, cstring s) {
 			while (*v && *v != ' ')
 				v++;
 			*v = 0;
-			((float*)d)[i] = atof(w);
+			((float_p)d)[i] = atof(w);
 			w = v = v + 1;
 		}
 		break;
@@ -923,7 +923,7 @@ void PR_LoadProgs() {
 	Con_DPrintf("Programs occupy %iK.\n", com_filesize / 1024);
 
 	for (i = 0; i < com_filesize; i++)
-		CRC_ProcessByte(&pr_crc, ((byte*)progs)[i]);
+		CRC_ProcessByte(&pr_crc, ((uint8_p)progs)[i]);
 
 	// byte swap the header
 	for (i = 0; i < sizeof(*progs) / 4; i++)
@@ -934,18 +934,18 @@ void PR_LoadProgs() {
 	if (progs->crc != PROGHEADER_CRC)
 		Sys_Error("progs.dat system vars have been modified, progdefs.h is out of date");
 
-	pr_functions = (dfunction_p)((byte*)progs + progs->ofs_functions);
+	pr_functions = (dfunction_p)((uint8_p)progs + progs->ofs_functions);
 	pr_strings = (cstring)progs + progs->ofs_strings;
-	pr_globaldefs = (ddef_p)((byte*)progs + progs->ofs_globaldefs);
-	pr_fielddefs = (ddef_p)((byte*)progs + progs->ofs_fielddefs);
-	pr_statements = (dstatement_p)((byte*)progs + progs->ofs_statements);
+	pr_globaldefs = (ddef_p)((uint8_p)progs + progs->ofs_globaldefs);
+	pr_fielddefs = (ddef_p)((uint8_p)progs + progs->ofs_fielddefs);
+	pr_statements = (dstatement_p)((uint8_p)progs + progs->ofs_statements);
 
-	pr_global_struct = (globalvars_t*)((byte*)progs + progs->ofs_globals);
-	pr_globals = (float*)pr_global_struct;
+	pr_global_struct = (globalvars_t*)((uint8_p)progs + progs->ofs_globals);
+	pr_globals = (float_p)pr_global_struct;
 
 	pr_edict_size = progs->entityfields * 4 + sizeof(edict_t) - sizeof(entvars_t);
 
-	// byte swap the lumps
+	// uint8_t swap the lumps
 	for (i = 0; i < progs->numstatements; i++) {
 		pr_statements[i].op = LittleShort(pr_statements[i].op);
 		pr_statements[i].a = LittleShort(pr_statements[i].a);
@@ -1009,13 +1009,13 @@ void PR_Init() {
 edict_p EDICT_NUM(int n) {
 	if (n < 0 || n >= sv.max_edicts)
 		Sys_Error("EDICT_NUM: bad number %i", n);
-	return (edict_p)((byte*)sv.edicts + (n)*pr_edict_size);
+	return (edict_p)((uint8_p)sv.edicts + (n)*pr_edict_size);
 }
 
 int NUM_FOR_EDICT(edict_p e) {
 	int		b;
 
-	b = (byte*)e - (byte*)sv.edicts;
+	b = (uint8_p)e - (uint8_p)sv.edicts;
 	b = b / pr_edict_size;
 
 	if (b < 0 || b >= sv.num_edicts)

@@ -39,7 +39,7 @@ lightstyle_t	cl_lightstyle[MAX_LIGHTSTYLES];
 dlight_t		cl_dlights[MAX_DLIGHTS];
 
 int				cl_numvisedicts;
-entity_t		*cl_visedicts[MAX_VISEDICTS];
+entity_t* cl_visedicts[MAX_VISEDICTS];
 
 /*
 =====================
@@ -47,14 +47,14 @@ CL_ClearState
 
 =====================
 */
-void CL_ClearState (){
+void CL_ClearState() {
 	if (!sv.active)
-		Host_ClearMemory ();
+		Host_ClearMemory();
 
 	// wipe the entire cl structure
 	memset(&cl, 0, sizeof(cl));
 
-	SZ_Clear (&cls.message);
+	SZ_Clear(&cls.message);
 
 	// clear other arrays
 	memset(cl_efrags, 0, sizeof(cl_efrags));
@@ -70,7 +70,7 @@ void CL_ClearState (){
 	cl.free_efrags = cl_efrags;
 	int i;
 	for (i = 0; i < MAX_EFRAGS - 1; i++)
-		cl.free_efrags[i].entnext = &cl.free_efrags[i+1];
+		cl.free_efrags[i].entnext = &cl.free_efrags[i + 1];
 	cl.free_efrags[i].entnext = NULL;
 }
 
@@ -82,27 +82,26 @@ Sends a disconnect message to the server
 This is also called on Host_Error, so it shouldn't cause any errors
 =====================
 */
-void CL_Disconnect (){
-// stop sounds (especially looping!)
-	S_StopAllSounds (true);
+void CL_Disconnect() {
+	// stop sounds (especially looping!)
+	S_StopAllSounds(true);
 
-// bring the console down and fade the colors back to normal
-//	SCR_BringDownConsole ();
+	// bring the console down and fade the colors back to normal
+	//	SCR_BringDownConsole ();
 
-// if running a local server, shut it down
+	// if running a local server, shut it down
 	if (cls.demoplayback)
-		CL_StopPlayback ();
-	else if (cls.state == ca_connected)
-	{
+		CL_StopPlayback();
+	else if (cls.state == ca_connected) {
 		if (cls.demorecording)
-			CL_Stop_f ();
+			CL_Stop_f();
 
-		Con_DPrintf ("Sending clc_disconnect\n");
-		SZ_Clear (&cls.message);
-		MSG_WriteByte (&cls.message, clc_disconnect);
-		NET_SendUnreliableMessage (cls.netcon, &cls.message);
-		SZ_Clear (&cls.message);
-		NET_Close (cls.netcon);
+		Con_DPrintf("Sending clc_disconnect\n");
+		SZ_Clear(&cls.message);
+		MSG_WriteByte(&cls.message, clc_disconnect);
+		NET_SendUnreliableMessage(cls.netcon, &cls.message);
+		SZ_Clear(&cls.message);
+		NET_Close(cls.netcon);
 
 		cls.state = ca_disconnected;
 		if (sv.active)
@@ -113,10 +112,10 @@ void CL_Disconnect (){
 	cls.signon = 0;
 }
 
-void CL_Disconnect_f (){
-	CL_Disconnect ();
+void CL_Disconnect_f() {
+	CL_Disconnect();
 	if (sv.active)
-		Host_ShutdownServer (false);
+		Host_ShutdownServer(false);
 }
 
 
@@ -129,19 +128,19 @@ CL_EstablishConnection
 Host should be either "local" or a net address to be passed on
 =====================
 */
-void CL_EstablishConnection (cstring host){
+void CL_EstablishConnection(cstring host) {
 	if (cls.state == ca_dedicated)
 		return;
 
 	if (cls.demoplayback)
 		return;
 
-	CL_Disconnect ();
+	CL_Disconnect();
 
-	cls.netcon = NET_Connect (host);
+	cls.netcon = NET_Connect(host);
 	if (!cls.netcon)
-		Host_Error ("CL_Connect: connect failed\n");
-	Con_DPrintf ("CL_EstablishConnection: connected to %s\n", host);
+		Host_Error("CL_Connect: connect failed\n");
+	Con_DPrintf("CL_EstablishConnection: connected to %s\n", host);
 
 	cls.demonum = -1;			// not in the demo loop now
 	cls.state = ca_connected;
@@ -155,38 +154,37 @@ CL_SignonReply
 An svc_signonnum has been received, perform a client side setup
 =====================
 */
-void CL_SignonReply (){
+void CL_SignonReply() {
 	char 	str[8192];
 
-Con_DPrintf ("CL_SignonReply: %i\n", cls.signon);
+	Con_DPrintf("CL_SignonReply: %i\n", cls.signon);
 
-	switch (cls.signon)
-	{
+	switch (cls.signon) {
 	case 1:
-		MSG_WriteByte (&cls.message, clc_stringcmd);
-		MSG_WriteString (&cls.message, "prespawn");
+		MSG_WriteByte(&cls.message, clc_stringcmd);
+		MSG_WriteString(&cls.message, "prespawn");
 		break;
 
 	case 2:
-		MSG_WriteByte (&cls.message, clc_stringcmd);
-		MSG_WriteString (&cls.message, va("name \"%s\"\n", cl_name.string));
+		MSG_WriteByte(&cls.message, clc_stringcmd);
+		MSG_WriteString(&cls.message, va("name \"%s\"\n", cl_name.string));
 
-		MSG_WriteByte (&cls.message, clc_stringcmd);
-		MSG_WriteString (&cls.message, va("color %i %i\n", ((int)cl_color.value)>>4, ((int)cl_color.value)&15));
+		MSG_WriteByte(&cls.message, clc_stringcmd);
+		MSG_WriteString(&cls.message, va("color %i %i\n", ((int)cl_color.value) >> 4, ((int)cl_color.value) & 15));
 
-		MSG_WriteByte (&cls.message, clc_stringcmd);
-		sprintf (str, "spawn %s", cls.spawnparms);
-		MSG_WriteString (&cls.message, str);
+		MSG_WriteByte(&cls.message, clc_stringcmd);
+		sprintf(str, "spawn %s", cls.spawnparms);
+		MSG_WriteString(&cls.message, str);
 		break;
 
 	case 3:
-		MSG_WriteByte (&cls.message, clc_stringcmd);
-		MSG_WriteString (&cls.message, "begin");
-		Cache_Report ();		// print remaining memory
+		MSG_WriteByte(&cls.message, clc_stringcmd);
+		MSG_WriteString(&cls.message, "begin");
+		Cache_Report();		// print remaining memory
 		break;
 
 	case 4:
-		SCR_EndLoadingPlaque ();		// allow normal screen updates
+		SCR_EndLoadingPlaque();		// allow normal screen updates
 		break;
 	}
 }
@@ -198,27 +196,25 @@ CL_NextDemo
 Called to play the next demo in the demo loop
 =====================
 */
-void CL_NextDemo (){
+void CL_NextDemo() {
 	char	str[1024];
 
 	if (cls.demonum == -1)
 		return;		// don't play demos
 
-	SCR_BeginLoadingPlaque ();
+	SCR_BeginLoadingPlaque();
 
-	if (!cls.demos[cls.demonum][0] || cls.demonum == MAX_DEMOS)
-	{
+	if (!cls.demos[cls.demonum][0] || cls.demonum == MAX_DEMOS) {
 		cls.demonum = 0;
-		if (!cls.demos[cls.demonum][0])
-		{
-			Con_Printf ("No demos listed with startdemos\n");
+		if (!cls.demos[cls.demonum][0]) {
+			Con_Printf("No demos listed with startdemos\n");
 			cls.demonum = -1;
 			return;
 		}
 	}
 
-	sprintf (str, "playdemo %s\n", cls.demos[cls.demonum]);
-	Cbuf_InsertText (str);
+	sprintf(str, "playdemo %s\n", cls.demos[cls.demonum]);
+	Cbuf_InsertText(str);
 	cls.demonum++;
 }
 
@@ -227,20 +223,18 @@ void CL_NextDemo (){
 CL_PrintEntities_f
 ==============
 */
-void CL_PrintEntities_f (){
-	entity_t	*ent;
+void CL_PrintEntities_f() {
+	entity_t* ent;
 	int			i;
 
-	for (i=0,ent=cl_entities ; i<cl.num_entities ; i++,ent++)
-	{
-		Con_Printf ("%3i:",i);
-		if (!ent->model)
-		{
-			Con_Printf ("EMPTY\n");
+	for (i = 0, ent = cl_entities; i < cl.num_entities; i++, ent++) {
+		Con_Printf("%3i:", i);
+		if (!ent->model) {
+			Con_Printf("EMPTY\n");
 			continue;
 		}
-		Con_Printf ("%s:%2i  (%5.1f,%5.1f,%5.1f) [%5.1f %5.1f %5.1f]\n"
-		,ent->model->name,ent->frame, ent->origin[0], ent->origin[1], ent->origin[2], ent->angles[0], ent->angles[1], ent->angles[2]);
+		Con_Printf("%s:%2i  (%5.1f,%5.1f,%5.1f) [%5.1f %5.1f %5.1f]\n"
+			, ent->model->name, ent->frame, ent->origin[0], ent->origin[1], ent->origin[2], ent->angles[0], ent->angles[1], ent->angles[2]);
 	}
 }
 
@@ -252,37 +246,32 @@ SetPal
 Debugging tool, just flashes the screen
 ===============
 */
-void SetPal (int i){
+void SetPal(int i) {
 #if 0
 	static int old;
-	byte	pal[768];
-	int		c;
+	uint8_t	pal[768];
 
 	if (i == old)
 		return;
 	old = i;
 
-	if (i==0)
-		VID_SetPalette (host_basepal);
-	else if (i==1)
-	{
-		for (c=0 ; c<768 ; c+=3)
-		{
+	if (i == 0)
+		VID_SetPalette(host_basepal);
+	else if (i == 1) {
+		for (int c = 0; c < 768; c += 3) {
 			pal[c] = 0;
-			pal[c+1] = 255;
-			pal[c+2] = 0;
+			pal[c + 1] = 255;
+			pal[c + 2] = 0;
 		}
-		VID_SetPalette (pal);
+		VID_SetPalette(pal);
 	}
-	else
-	{
-		for (c=0 ; c<768 ; c+=3)
-		{
+	else {
+		for (int c = 0; c < 768; c += 3) {
 			pal[c] = 0;
-			pal[c+1] = 0;
-			pal[c+2] = 255;
+			pal[c + 1] = 0;
+			pal[c + 2] = 255;
 		}
-		VID_SetPalette (pal);
+		VID_SetPalette(pal);
 	}
 #endif
 }
@@ -293,18 +282,15 @@ CL_AllocDlight
 
 ===============
 */
-dlight_t *CL_AllocDlight (int key){
+dlight_t* CL_AllocDlight(int key) {
 	int		i;
-	dlight_t	*dl;
+	dlight_t* dl;
 
-// first look for an exact key match
-	if (key)
-	{
+	// first look for an exact key match
+	if (key) {
 		dl = cl_dlights;
-		for (i=0 ; i<MAX_DLIGHTS ; i++, dl++)
-		{
-			if (dl->key == key)
-			{
+		for (i = 0; i < MAX_DLIGHTS; i++, dl++) {
+			if (dl->key == key) {
 				memset(dl, 0, sizeof(*dl));
 				dl->key = key;
 				return dl;
@@ -312,12 +298,10 @@ dlight_t *CL_AllocDlight (int key){
 		}
 	}
 
-// then look for anything else
+	// then look for anything else
 	dl = cl_dlights;
-	for (i=0 ; i<MAX_DLIGHTS ; i++, dl++)
-	{
-		if (dl->die < cl.time)
-		{
+	for (i = 0; i < MAX_DLIGHTS; i++, dl++) {
+		if (dl->die < cl.time) {
 			memset(dl, 0, sizeof(*dl));
 			dl->key = key;
 			return dl;
@@ -337,20 +321,19 @@ CL_DecayLights
 
 ===============
 */
-void CL_DecayLights (){
+void CL_DecayLights() {
 	int			i;
-	dlight_t	*dl;
+	dlight_t* dl;
 	float		time;
 
 	time = cl.time - cl.oldtime;
 
 	dl = cl_dlights;
-	for (i=0 ; i<MAX_DLIGHTS ; i++, dl++)
-	{
+	for (i = 0; i < MAX_DLIGHTS; i++, dl++) {
 		if (dl->die < cl.time || !dl->radius)
 			continue;
 
-		dl->radius -= time*dl->decay;
+		dl->radius -= time * dl->decay;
 		if (dl->radius < 0)
 			dl->radius = 0;
 	}
@@ -365,41 +348,35 @@ Determines the fraction between the last two messages that the objects
 should be put at.
 ===============
 */
-float	CL_LerpPoint (){
+float	CL_LerpPoint() {
 	float	f, frac;
 
 	f = cl.mtime[0] - cl.mtime[1];
 
-	if (!f || cl_nolerp.value || cls.timedemo || sv.active)
-	{
+	if (!f || cl_nolerp.value || cls.timedemo || sv.active) {
 		cl.time = cl.mtime[0];
 		return 1;
 	}
 
-	if (f > 0.1)
-	{	// dropped packet, or start of demo
+	if (f > 0.1) {	// dropped packet, or start of demo
 		cl.mtime[1] = cl.mtime[0] - 0.1;
 		f = 0.1;
 	}
 	frac = (cl.time - cl.mtime[1]) / f;
-//Con_Printf ("frac: %f\n",frac);
-	if (frac < 0)
-	{
-		if (frac < -0.01)
-		{
-SetPal(1);
+	//Con_Printf ("frac: %f\n",frac);
+	if (frac < 0) {
+		if (frac < -0.01) {
+			SetPal(1);
 			cl.time = cl.mtime[1];
-//				Con_Printf ("low frac\n");
+			//				Con_Printf ("low frac\n");
 		}
 		frac = 0;
 	}
-	else if (frac > 1)
-	{
-		if (frac > 1.01)
-		{
-SetPal(2);
+	else if (frac > 1) {
+		if (frac > 1.01) {
+			SetPal(2);
 			cl.time = cl.mtime[0];
-//				Con_Printf ("high frac\n");
+			//				Con_Printf ("high frac\n");
 		}
 		frac = 1;
 	}
@@ -415,170 +392,155 @@ SetPal(2);
 CL_RelinkEntities
 ===============
 */
-void CL_RelinkEntities (){
-	entity_t	*ent;
+void CL_RelinkEntities() {
+	entity_t* ent;
 	int			i, j;
 	float		frac, f, d;
 	vec3_t		delta;
 	float		bobjrotate;
 	vec3_t		oldorg;
-	dlight_t	*dl;
+	dlight_t* dl;
 
-// determine partial update time
-	frac = CL_LerpPoint ();
+	// determine partial update time
+	frac = CL_LerpPoint();
 
 	cl_numvisedicts = 0;
 
-//
-// interpolate player info
-//
-	for (i=0 ; i<3 ; i++)
+	//
+	// interpolate player info
+	//
+	for (i = 0; i < 3; i++)
 		cl.velocity[i] = cl.mvelocity[1][i] +
-			frac * (cl.mvelocity[0][i] - cl.mvelocity[1][i]);
+		frac * (cl.mvelocity[0][i] - cl.mvelocity[1][i]);
 
-	if (cls.demoplayback)
-	{
-	// interpolate the angles
-		for (j=0 ; j<3 ; j++)
-		{
+	if (cls.demoplayback) {
+		// interpolate the angles
+		for (j = 0; j < 3; j++) {
 			d = cl.mviewangles[0][j] - cl.mviewangles[1][j];
 			if (d > 180)
 				d -= 360;
 			else if (d < -180)
 				d += 360;
-			cl.viewangles[j] = cl.mviewangles[1][j] + frac*d;
+			cl.viewangles[j] = cl.mviewangles[1][j] + frac * d;
 		}
 	}
 
-	bobjrotate = anglemod(100*cl.time);
+	bobjrotate = anglemod(100 * cl.time);
 
-// start on the entity after the world
-	for (i=1,ent=cl_entities+1 ; i<cl.num_entities ; i++,ent++)
-	{
-		if (!ent->model)
-		{	// empty slot
+	// start on the entity after the world
+	for (i = 1, ent = cl_entities + 1; i < cl.num_entities; i++, ent++) {
+		if (!ent->model) {	// empty slot
 			if (ent->forcelink)
-				R_RemoveEfrags (ent);	// just became empty
+				R_RemoveEfrags(ent);	// just became empty
 			continue;
 		}
 
-// if the object wasn't included in the last packet, remove it
-		if (ent->msgtime != cl.mtime[0])
-		{
+		// if the object wasn't included in the last packet, remove it
+		if (ent->msgtime != cl.mtime[0]) {
 			ent->model = NULL;
 			continue;
 		}
 
-		VectorCopy (ent->origin, oldorg);
+		VectorCopy(ent->origin, oldorg);
 
-		if (ent->forcelink)
-		{	// the entity was not updated in the last message
+		if (ent->forcelink) {	// the entity was not updated in the last message
 			// so move to the final spot
-			VectorCopy (ent->msg_origins[0], ent->origin);
-			VectorCopy (ent->msg_angles[0], ent->angles);
+			VectorCopy(ent->msg_origins[0], ent->origin);
+			VectorCopy(ent->msg_angles[0], ent->angles);
 		}
-		else
-		{	// if the delta is large, assume a teleport and don't lerp
+		else {	// if the delta is large, assume a teleport and don't lerp
 			f = frac;
-			for (j=0 ; j<3 ; j++)
-			{
+			for (j = 0; j < 3; j++) {
 				delta[j] = ent->msg_origins[0][j] - ent->msg_origins[1][j];
 				if (delta[j] > 100 || delta[j] < -100)
 					f = 1;		// assume a teleportation, not a motion
 			}
 
-		// interpolate the origin and angles
-			for (j=0 ; j<3 ; j++)
-			{
-				ent->origin[j] = ent->msg_origins[1][j] + f*delta[j];
+			// interpolate the origin and angles
+			for (j = 0; j < 3; j++) {
+				ent->origin[j] = ent->msg_origins[1][j] + f * delta[j];
 
 				d = ent->msg_angles[0][j] - ent->msg_angles[1][j];
 				if (d > 180)
 					d -= 360;
 				else if (d < -180)
 					d += 360;
-				ent->angles[j] = ent->msg_angles[1][j] + f*d;
+				ent->angles[j] = ent->msg_angles[1][j] + f * d;
 			}
 
 		}
 
-// rotate binary objects locally
+		// rotate binary objects locally
 		if (ent->model->flags & EF_ROTATE)
 			ent->angles[1] = bobjrotate;
 
 		if (ent->effects & EF_BRIGHTFIELD)
-			R_EntityParticles (ent);
+			R_EntityParticles(ent);
 #ifdef QUAKE2
 		if (ent->effects & EF_DARKFIELD)
-			R_DarkFieldParticles (ent);
+			R_DarkFieldParticles(ent);
 #endif
-		if (ent->effects & EF_MUZZLEFLASH)
-		{
+		if (ent->effects & EF_MUZZLEFLASH) {
 			vec3_t		fv, rv, uv;
 
-			dl = CL_AllocDlight (i);
-			VectorCopy (ent->origin,  dl->origin);
+			dl = CL_AllocDlight(i);
+			VectorCopy(ent->origin, dl->origin);
 			dl->origin[2] += 16;
-			AngleVectors (ent->angles, fv, rv, uv);
+			AngleVectors(ent->angles, fv, rv, uv);
 
-			VectorMA (dl->origin, 18, fv, dl->origin);
-			dl->radius = 200 + (rand()&31);
+			VectorMA(dl->origin, 18, fv, dl->origin);
+			dl->radius = 200 + (rand() & 31);
 			dl->minlight = 32;
 			dl->die = cl.time + 0.1;
 		}
-		if (ent->effects & EF_BRIGHTLIGHT)
-		{
-			dl = CL_AllocDlight (i);
-			VectorCopy (ent->origin,  dl->origin);
+		if (ent->effects & EF_BRIGHTLIGHT) {
+			dl = CL_AllocDlight(i);
+			VectorCopy(ent->origin, dl->origin);
 			dl->origin[2] += 16;
-			dl->radius = 400 + (rand()&31);
+			dl->radius = 400 + (rand() & 31);
 			dl->die = cl.time + 0.001;
 		}
-		if (ent->effects & EF_DIMLIGHT)
-		{
-			dl = CL_AllocDlight (i);
-			VectorCopy (ent->origin,  dl->origin);
-			dl->radius = 200 + (rand()&31);
+		if (ent->effects & EF_DIMLIGHT) {
+			dl = CL_AllocDlight(i);
+			VectorCopy(ent->origin, dl->origin);
+			dl->radius = 200 + (rand() & 31);
 			dl->die = cl.time + 0.001;
 		}
 #ifdef QUAKE2
-		if (ent->effects & EF_DARKLIGHT)
-		{
-			dl = CL_AllocDlight (i);
-			VectorCopy (ent->origin,  dl->origin);
-			dl->radius = 200.0 + (rand()&31);
+		if (ent->effects & EF_DARKLIGHT) {
+			dl = CL_AllocDlight(i);
+			VectorCopy(ent->origin, dl->origin);
+			dl->radius = 200.0 + (rand() & 31);
 			dl->die = cl.time + 0.001;
 			dl->dark = true;
 		}
-		if (ent->effects & EF_LIGHT)
-		{
-			dl = CL_AllocDlight (i);
-			VectorCopy (ent->origin,  dl->origin);
+		if (ent->effects & EF_LIGHT) {
+			dl = CL_AllocDlight(i);
+			VectorCopy(ent->origin, dl->origin);
 			dl->radius = 200;
 			dl->die = cl.time + 0.001;
 		}
 #endif
 
 		if (ent->model->flags & EF_GIB)
-			R_RocketTrail (oldorg, ent->origin, RT_GIB);
+			R_RocketTrail(oldorg, ent->origin, RT_GIB);
 		else if (ent->model->flags & EF_ZOMGIB)
-			R_RocketTrail (oldorg, ent->origin, RT_ZOMGIB);
+			R_RocketTrail(oldorg, ent->origin, RT_ZOMGIB);
 		else if (ent->model->flags & EF_TRACER)
-			R_RocketTrail (oldorg, ent->origin, RT_TRACER);
+			R_RocketTrail(oldorg, ent->origin, RT_TRACER);
 		else if (ent->model->flags & EF_TRACER2)
-			R_RocketTrail (oldorg, ent->origin, RT_TRACER2);
-		else if (ent->model->flags & EF_ROCKET)
-		{
-			R_RocketTrail (oldorg, ent->origin, RT_ROCKET);
-			dl = CL_AllocDlight (i);
-			VectorCopy (ent->origin, dl->origin);
+			R_RocketTrail(oldorg, ent->origin, RT_TRACER2);
+		else if (ent->model->flags & EF_ROCKET) {
+			R_RocketTrail(oldorg, ent->origin, RT_ROCKET);
+			dl = CL_AllocDlight(i);
+			VectorCopy(ent->origin, dl->origin);
 			dl->radius = 200;
 			dl->die = cl.time + 0.01;
 		}
 		else if (ent->model->flags & EF_GRENADE)
-			R_RocketTrail (oldorg, ent->origin, RT_GRENADE);
+			R_RocketTrail(oldorg, ent->origin, RT_GRENADE);
 		else if (ent->model->flags & EF_TRACER3)
-			R_RocketTrail (oldorg, ent->origin, RT_TRACER3);
+			R_RocketTrail(oldorg, ent->origin, RT_TRACER3);
 
 		ent->forcelink = false;
 
@@ -586,11 +548,10 @@ void CL_RelinkEntities (){
 			continue;
 
 #ifdef QUAKE2
-		if ( ent->effects & EF_NODRAW )
+		if (ent->effects & EF_NODRAW)
 			continue;
 #endif
-		if (cl_numvisedicts < MAX_VISEDICTS)
-		{
+		if (cl_numvisedicts < MAX_VISEDICTS) {
 			cl_visedicts[cl_numvisedicts] = ent;
 			cl_numvisedicts++;
 		}
@@ -606,33 +567,32 @@ CL_ReadFromServer
 Read all incoming data from the server
 ===============
 */
-int CL_ReadFromServer (){
+int CL_ReadFromServer() {
 	int		ret;
 
 	cl.oldtime = cl.time;
 	cl.time += host_frametime;
 
-	do
-	{
-		ret = CL_GetMessage ();
+	do {
+		ret = CL_GetMessage();
 		if (ret == -1)
-			Host_Error ("CL_ReadFromServer: lost server connection");
+			Host_Error("CL_ReadFromServer: lost server connection");
 		if (!ret)
 			break;
 
 		cl.last_received_message = realtime;
-		CL_ParseServerMessage ();
+		CL_ParseServerMessage();
 	} while (ret && cls.state == ca_connected);
 
 	if (cl_shownet.value)
-		Con_Printf ("\n");
+		Con_Printf("\n");
 
-	CL_RelinkEntities ();
-	CL_UpdateTEnts ();
+	CL_RelinkEntities();
+	CL_UpdateTEnts();
 
-//
-// bring the links up to date
-//
+	//
+	// bring the links up to date
+	//
 	return 0;
 }
 
@@ -641,45 +601,42 @@ int CL_ReadFromServer (){
 CL_SendCmd
 =================
 */
-void CL_SendCmd (){
+void CL_SendCmd() {
 	usercmd_t		cmd;
 
 	if (cls.state != ca_connected)
 		return;
 
-	if (cls.signon == SIGNONS)
-	{
-	// get basic movement from keyboard
-		CL_BaseMove (&cmd);
+	if (cls.signon == SIGNONS) {
+		// get basic movement from keyboard
+		CL_BaseMove(&cmd);
 
-	// allow mice or other external controllers to add to the move
-		IN_Move (&cmd);
+		// allow mice or other external controllers to add to the move
+		IN_Move(&cmd);
 
-	// send the unreliable message
-		CL_SendMove (&cmd);
+		// send the unreliable message
+		CL_SendMove(&cmd);
 
 	}
 
-	if (cls.demoplayback)
-	{
-		SZ_Clear (&cls.message);
+	if (cls.demoplayback) {
+		SZ_Clear(&cls.message);
 		return;
 	}
 
-// send the reliable message
+	// send the reliable message
 	if (!cls.message.cursize)
 		return;		// no message at all
 
-	if (!NET_CanSendMessage (cls.netcon))
-	{
-		Con_DPrintf ("CL_WriteToServer: can't send\n");
+	if (!NET_CanSendMessage(cls.netcon)) {
+		Con_DPrintf("CL_WriteToServer: can't send\n");
 		return;
 	}
 
-	if (NET_SendMessage (cls.netcon, &cls.message) == -1)
-		Host_Error ("CL_WriteToServer: lost server connection");
+	if (NET_SendMessage(cls.netcon, &cls.message) == -1)
+		Host_Error("CL_WriteToServer: lost server connection");
 
-	SZ_Clear (&cls.message);
+	SZ_Clear(&cls.message);
 }
 
 /*
@@ -687,15 +644,15 @@ void CL_SendCmd (){
 CL_Init
 =================
 */
-void CL_Init (){
-	SZ_Alloc (&cls.message, 1024);
+void CL_Init() {
+	SZ_Alloc(&cls.message, 1024);
 
-	CL_InitInput ();
-	CL_InitTEnts ();
+	CL_InitInput();
+	CL_InitTEnts();
 
-//
-// register our commands
-//
+	//
+	// register our commands
+	//
 	Cvar_RegisterVariable(&cl_name);
 	Cvar_RegisterVariable(&cl_color);
 	Cvar_RegisterVariable(&cl_upspeed);
@@ -717,7 +674,7 @@ void CL_Init (){
 	Cvar_RegisterVariable(&m_forward);
 	Cvar_RegisterVariable(&m_side);
 
-//	Cvar_RegisterVariable(&cl_autofire);
+	//	Cvar_RegisterVariable(&cl_autofire);
 
 	Cmd_AddCommand("entities", CL_PrintEntities_f);
 	Cmd_AddCommand("disconnect", CL_Disconnect_f);

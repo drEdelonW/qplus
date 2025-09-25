@@ -113,13 +113,13 @@ setorigin (entity, origin)
 */
 void PF_setorigin() {
 	edict_p e = G_EDICT(OFS_PARM0);
-	float* org = G_VECTOR(OFS_PARM1);
+	float_p org = G_VECTOR(OFS_PARM1);
 	VectorCopy(org, e->v.origin);
 	SV_LinkEdict(e, false);
 }
 
-void SetMinMaxSize(edict_p e, float* min, float* max, qboolean rotate) {
-	float* angles;
+void SetMinMaxSize(edict_p e, float_p min, float_p max, qboolean rotate) {
+	float_p angles;
 	vec3_t rmin, rmax;
 	float bounds[2][3];
 	float xvector[2], yvector[2];
@@ -196,7 +196,7 @@ setsize (entity, minvector, maxvector)
 */
 void PF_setsize() {
 	edict_p e;
-	float* min, * max;
+	float_p min, max;
 
 	e = G_EDICT(OFS_PARM0);
 	min = G_VECTOR(OFS_PARM1);
@@ -320,7 +320,7 @@ vector normalize(vector)
 =================
 */
 void PF_normalize() {
-	float* value1;
+	float_p value1;
 	vec3_t newvalue;
 	float new;
 
@@ -349,7 +349,7 @@ scalar vlen(vector)
 =================
 */
 void PF_vlen() {
-	float* value1;
+	float_p value1;
 	float new;
 
 	value1 = G_VECTOR(OFS_PARM0);
@@ -368,7 +368,7 @@ float vectoyaw(vector)
 =================
 */
 void PF_vectoyaw() {
-	float* value1;
+	float_p value1;
 	float yaw;
 
 	value1 = G_VECTOR(OFS_PARM0);
@@ -392,7 +392,7 @@ vector vectoangles(vector)
 =================
 */
 void PF_vectoangles() {
-	float* value1;
+	float_p value1;
 	float forward;
 	float yaw, pitch;
 
@@ -446,7 +446,7 @@ particle(origin, color, count)
 =================
 */
 void PF_particle() {
-	float* org, * dir;
+	float_p org, dir;
 	float color;
 	float count;
 
@@ -466,7 +466,7 @@ PF_ambientsound
 void PF_ambientsound() {
 	char** check;
 	cstring samp;
-	float* pos;
+	float_p pos;
 	float vol, attenuation;
 	int i, soundnum;
 
@@ -562,7 +562,7 @@ traceline (vector1, vector2, tryents)
 =================
 */
 void PF_traceline() {
-	float* v1, * v2;
+	float_p v1, v2;
 	trace_t trace;
 	int nomonsters;
 	edict_p ent;
@@ -631,11 +631,11 @@ void PF_checkpos() {
 
 //============================================================================
 
-byte checkpvs[MAX_MAP_LEAFS / 8];
+uint8_t checkpvs[MAX_MAP_LEAFS / 8];
 
 int PF_newcheckclient(int check) {
 	int i;
-	byte* pvs;
+	uint8_p pvs;
 	edict_p ent;
 	mleaf_t* leaf;
 	vec3_t org;
@@ -819,7 +819,7 @@ findradius (origin, radius)
 void PF_findradius() {
 	edict_p ent, chain;
 	float rad;
-	float* org;
+	float_p org;
 	vec3_t eorg;
 	int i, j;
 
@@ -1179,7 +1179,7 @@ PF_pointcontents
 =============
 */
 void PF_pointcontents() {
-	float* v;
+	float_p v;
 
 	v = G_VECTOR(OFS_PARM0);
 

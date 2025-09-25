@@ -1276,7 +1276,7 @@ void SV_Physics_Step(edict_p ent) {
 	qboolean	wasonground;
 	qboolean	inwater;
 	qboolean	hitsound = false;
-	float* vel;
+	float_p vel;
 	float		speed, newspeed, control;
 	float		friction;
 	edict_p groundentity;

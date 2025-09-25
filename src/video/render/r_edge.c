@@ -663,12 +663,12 @@ Each surface has a linked list of its visible spans
 void R_ScanEdges()
 {
 	int		iv, bottom;
-	byte	basespans[MAXSPANS * sizeof(espan_t) + CACHE_SIZE];
+	uint8_t	basespans[MAXSPANS * sizeof(espan_t) + CACHE_SIZE];
 	espan_p basespan_p;
 	surf_p  s;
 
 	basespan_p = (espan_p)
-			((long)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+			((int32_t)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
 	max_span_p = &basespan_p[MAXSPANS - r_refdef.vrect.width];
 
 	span_p = basespan_p;

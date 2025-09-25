@@ -37,7 +37,7 @@ void Z_ClearZone(memzone_p zone, size_t size) {
 	// set the entire zone to one free block
 
 	memblock_p block = zone->blocklist.next = zone->blocklist.prev =
-		(memblock_p)((byte*)zone + sizeof(memzone_t));
+		(memblock_p)((uint8_p)zone + sizeof(memzone_t));
 	zone->blocklist.tag = 1;	// in use block
 	zone->blocklist.id = 0;
 	zone->blocklist.size = 0;
@@ -59,7 +59,7 @@ void Z_Free(typeless_ptr ptr) {
 	if (!ptr)
 		Sys_Error("Z_Free: NULL pointer");
 
-	memblock_p block = (memblock_p)((byte*)ptr - sizeof(memblock_t));
+	memblock_p block = (memblock_p)((uint8_p)ptr - sizeof(memblock_t));
 	if (block->id != ZONEID)
 		Sys_Error("Z_Free: freed a pointer without ZONEID");
 	if (block->tag == 0)
@@ -133,7 +133,7 @@ typeless_ptr Z_TagMalloc(size_t size, int tag) {
 	//
 	int extra = base->size - size;
 	if (extra > MINFRAGMENT) {	// there will be a free fragment after the allocated block
-		memblock_p new = (memblock_p)((byte*)base + size);
+		memblock_p new = (memblock_p)((uint8_p)base + size);
 		new->size = extra;
 		new->tag = 0;			// free block
 		new->prev = base;
@@ -151,9 +151,9 @@ typeless_ptr Z_TagMalloc(size_t size, int tag) {
 	base->id = ZONEID;
 
 	// marker for memory trash testing
-	*(uint32_t*)((byte*)base + base->size - sizeof(uint32_t)) = ZONEID;
+	*(uint32_p)((uint8_p)base + base->size - sizeof(uint32_t)) = ZONEID;
 
-	return (typeless_ptr)((byte*)base + sizeof(memblock_t));
+	return (typeless_ptr)((uint8_p)base + sizeof(memblock_t));
 }
 
 
@@ -175,7 +175,7 @@ void Z_Print(memzone_p zone) {
 
 		if (block->next == &zone->blocklist)
 			break;			// all blocks have been hit
-		if (((byte*)block + block->size) != (byte*)block->next)
+		if (((uint8_p)block + block->size) != (uint8_p)block->next)
 			Con_Printf("ERROR: block size does not touch the next block\n");
 		if (block->next->prev != block)
 			Con_Printf("ERROR: next block doesn't have proper back link\n");
@@ -194,7 +194,7 @@ void Z_CheckHeap(void) {
 	for (memblock_p block = mainzone->blocklist.next; ; block = block->next) {
 		if (block->next == &mainzone->blocklist)
 			break;			// all blocks have been hit
-		if (((byte*)block + block->size) != (byte*)block->next)
+		if (((uint8_p)block + block->size) != (uint8_p)block->next)
 			Sys_Error("Z_CheckHeap: block size does not touch the next block\n");
 		if (block->next->prev != block)
 			Sys_Error("Z_CheckHeap: next block doesn't have proper back link\n");

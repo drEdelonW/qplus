@@ -139,7 +139,7 @@ void CL_ParseStartSoundPacket() {
 */
 void CL_KeepaliveMessage() {
 	static float lastmsg;
-	byte		olddata[8192];
+	uint8_t		olddata[8192];
 
 	if ((sv.active) || // no need if server is local
 		(cls.demoplayback)) {
@@ -317,7 +317,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 	if (bits & U_MOREBITS) {
 		int ext = MSG_ReadByte();
 		if (ext == MSG_ERROR) { Host_Error("CL_ParseUpdate: bad MOREBITS"); }
-		bits |= ((unsigned)ext) << 8;
+		bits |= ((uint32_t)ext) << 8;
 	}
 
 	int num = (bits & U_LONGENTITY) ? MSG_ReadShort() : MSG_ReadByte();
@@ -486,8 +486,8 @@ void CL_NewTranslation(int slot) {
 	if ((slot < 0) || (slot > cl.maxclients))
 		Sys_Error("CL_NewTranslation: bad slot %d (max %d)", slot, cl.maxclients);
 
-	byte* dest = cl.scores[slot].translations;
-	byte* source = vid.colormap;
+	uint8_p dest = cl.scores[slot].translations;
+	uint8_p source = vid.colormap;
 
 	memcpy(dest, source, sizeof(cl.scores[slot].translations));
 
@@ -768,9 +768,9 @@ void CL_ParseServerMessage() {
 			cl.cdtrack = MSG_ReadByte();
 			cl.looptrack = MSG_ReadByte();
 			if ((cls.demoplayback || cls.demorecording) && (cls.forcetrack != -1))
-				CDAudio_Play((byte)cls.forcetrack, true);
+				CDAudio_Play((uint8_t)cls.forcetrack, true);
 			else
-				CDAudio_Play((byte)cl.cdtrack, true);
+				CDAudio_Play((uint8_t)cl.cdtrack, true);
 			break;
 
 		case svc_intermission:

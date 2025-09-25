@@ -156,7 +156,7 @@ typedef struct {
 	int		s_file;			// source file defined in
 
 	int		numparms;
-	byte	parm_size[MAX_PARMS];
+	uint8_t	parm_size[MAX_PARMS];
 } dfunction_t;
 typedef dfunction_t* dfunction_p;
 

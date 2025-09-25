@@ -3,11 +3,12 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "byte_t.h"
+// #include "byte_t.h"
 #include "qboolean.h"
 
 
 typedef char* cstring;
+typedef char** cstring_array;
 typedef const char* cstring_ro;  // read-only
 typedef void* typeless_ptr;
 

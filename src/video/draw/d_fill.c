@@ -27,59 +27,52 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 D_FillRect
 ================
 */
-void D_FillRect (vrect_p rect, int color)
-{
+void D_FillRect(vrect_p rect, int color) {
 	int				rx, ry, rwidth, rheight;
-	uint8_t	*dest;
-	unsigned		*ldest;
+	uint8_p dest;
+	uint32_t* ldest;
 
 	rx = rect->x;
 	ry = rect->y;
 	rwidth = rect->width;
 	rheight = rect->height;
 
-	if (rx < 0)
-	{
+	if (rx < 0) {
 		rwidth += rx;
 		rx = 0;
 	}
-	if (ry < 0)
-	{
+	if (ry < 0) {
 		rheight += ry;
 		ry = 0;
 	}
-	if (rx+rwidth > vid.width)
+	if (rx + rwidth > vid.width)
 		rwidth = vid.width - rx;
-	if (ry+rheight > vid.height)
+	if (ry + rheight > vid.height)
 		rheight = vid.height - rx;
 
 	if (rwidth < 1 || rheight < 1)
 		return;
 
-	dest = ((byte *)vid.buffer + ry*vid.rowbytes + rx);
+	dest = ((uint8_p)vid.buffer + ry * vid.rowbytes + rx);
 
-	if (((rwidth & 0x03) == 0) && (((long)dest & 0x03) == 0))
-	{
-	// faster aligned dword clear
-		ldest = (unsigned *)dest;
+	if (((rwidth & 0x03) == 0) && (((int32_t)dest & 0x03) == 0)) {
+		// faster aligned dword clear
+		ldest = (uint32_t*)dest;
 		color += color << 16;
 
 		rwidth >>= 2;
 		color += color << 8;
 
-		for (ry=0 ; ry<rheight ; ry++)
-		{
-			for (rx=0 ; rx<rwidth ; rx++)
+		for (ry = 0; ry < rheight; ry++) {
+			for (rx = 0; rx < rwidth; rx++)
 				ldest[rx] = color;
-			ldest = (unsigned *)((byte*)ldest + vid.rowbytes);
+			ldest = (uint32_t*)((uint8_p)ldest + vid.rowbytes);
 		}
 	}
-	else
-	{
-	// slower byte-by-byte clear for unaligned cases
-		for (ry=0 ; ry<rheight ; ry++)
-		{
-			for (rx=0 ; rx<rwidth ; rx++)
+	else {
+		// slower byte-by-byte clear for unaligned cases
+		for (ry = 0; ry < rheight; ry++) {
+			for (rx = 0; rx < rwidth; rx++)
 				dest[rx] = color;
 			dest += vid.rowbytes;
 		}

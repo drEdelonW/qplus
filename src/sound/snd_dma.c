@@ -785,7 +785,7 @@ void S_ExtraUpdate() {
 }
 
 void S_Update_() {
-	unsigned        endtime;
+	uint32_t        endtime;
 	int				samps;
 
 	if (!sound_started || (snd_blocked > 0))

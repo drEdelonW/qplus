@@ -38,7 +38,7 @@ Memory is cleared / released when a server or client begins, not when they end.
 
 quakeparms_t host_parms;
 
-qboolean	host_initialized;		// true if into command execution
+bool	host_initialized;		// true if into command execution
 
 double		host_frametime;
 double		host_time;
@@ -54,8 +54,8 @@ client_p host_client;			// current client
 
 jmp_buf 	host_abortserver;
 
-byte* host_basepal;
-byte* host_colormap;
+uint8_p host_basepal;
+uint8_p host_colormap;
 
 
 
@@ -97,7 +97,7 @@ This shuts down both the client and server
 void Host_Error(cstring error, ...) {
     va_list		argptr;
     char		string[1024];
-    static	qboolean inerror = false;
+    static	bool inerror = false;
 
     if (inerror)
         Sys_Error("Host_Error: recursively entered");
@@ -300,7 +300,7 @@ Called when the player is getting totally kicked off the host
 if (crash = true), don't bother sending signofs
 =====================
 */
-void SV_DropClient(qboolean crash) {
+void SV_DropClient(bool crash) {
     int		saveSelf;
     int		i;
     client_p client;
@@ -357,7 +357,7 @@ Host_ShutdownServer
 This only happens at the end of a game, not between levels
 ==================
 */
-void Host_ShutdownServer(qboolean crash) {
+void Host_ShutdownServer(bool crash) {
     int		i;
     int		count;
     sizebuf_t	buf;
@@ -444,7 +444,7 @@ Host_FilterTime
 Returns false if the time is too int16_t to run a frame
 ===================
 */
-qboolean Host_FilterTime(float time) {
+bool Host_FilterTime(float time) {
     realtime += time;
 
     if (!cls.timedemo && ((realtime - oldrealtime) < (1.0 / 72.0)))
@@ -792,10 +792,10 @@ void Host_Init(quakeparms_p parms) {
     R_InitTextures();		// needed even for dedicated servers
 
     if (cls.state != ca_dedicated) {
-        host_basepal = (byte*)COM_LoadHunkFile("gfx/palette.lmp");
+        host_basepal = (uint8_p)COM_LoadHunkFile("gfx/palette.lmp");
         if (!host_basepal)
             Sys_Error("Couldn't load gfx/palette.lmp");
-        host_colormap = (byte*)COM_LoadHunkFile("gfx/colormap.lmp");
+        host_colormap = (uint8_p)COM_LoadHunkFile("gfx/colormap.lmp");
         if (!host_colormap)
             Sys_Error("Couldn't load gfx/colormap.lmp");
 
@@ -847,7 +847,7 @@ to run quit through here before the final handoff to the sys code.
 ===============
 */
 void Host_Shutdown() {
-    static qboolean isdown = false;
+    static bool isdown = false;
 
     if (isdown) {
         printf("recursive shutdown\n");

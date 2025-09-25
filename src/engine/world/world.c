@@ -32,11 +32,11 @@ line of sight checks trace->crosscontent, but bullets don't
 
 typedef struct {
 	vec3_t		boxmins, boxmaxs;// enclose the test object along entire move
-	float* mins;
-	float* maxs;	// size of the moving object
+	float_p mins;
+	float_p maxs;	// size of the moving object
 	vec3_t		mins2, maxs2;	// size when clipping against mosnters
-	float* start;
-	float* end;
+	float_p start;
+	float_p end;
 	trace_t		trace;
 	int			type;
 	edict_p passedict;

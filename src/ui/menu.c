@@ -137,12 +137,12 @@ void M_DrawPic(int x, int y, qpic_p pic) {
 	Draw_Pic(x + ((vid.width - 320) >> 1), y, pic);
 }
 
-byte identityTable[256];
-byte translationTable[256];
+uint8_t identityTable[256];
+uint8_t translationTable[256];
 
 void M_BuildTranslationTable(int top, int bottom) {
-	byte* dest;
-	byte* source;
+	uint8_p dest;
+	uint8_p source;
 
 	for (int j = 0; j < 256; j++)
 		identityTable[j] = j;
@@ -1271,7 +1271,7 @@ void M_FindKeysForCommand(cstring command, int* twokeys) {
 void M_UnbindCommand(cstring command) {
 	int l = strlen(command);
 
-	for (int j = 0; j < 256; j++) {
+	for (keycode_t j = 0; j < MAX_KEYS; j++) {
 		cstring b = keybindings[j];
 		if (!b)
 			continue;

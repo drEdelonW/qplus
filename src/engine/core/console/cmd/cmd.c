@@ -37,8 +37,8 @@ void Cmd_ForwardToServer();
 
 #define	CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/
 
-int     trashtest;
-int* trashspot;
+int32_t     trashtest;
+int32_t* trashspot;
 
 qboolean cmd_wait;
 
@@ -107,7 +107,7 @@ void Cbuf_InsertText(cstring text) {
     cstring   temp;
 
     // copy off any commands still remaining in the exec buffer
-    int templen = cmd_text.cursize;
+    int32_t templen = cmd_text.cursize;
     if (templen) {
         temp = Z_Malloc(templen);
         Q_memcpy(temp, cmd_text.data, templen);
@@ -133,10 +133,10 @@ void Cbuf_InsertText(cstring text) {
     ============
 */
 void Cbuf_Execute(void) {
-    int		i;
+    int32_t		i;
     cstring text;
     char	line[1024];
-    int		quotes;
+    int32_t		quotes;
 
     while (cmd_text.cursize) {
         // find a \n or ; line break
@@ -236,15 +236,7 @@ void Cmd_StuffCmds_f(void) {
         if (text[i] == '+') {
             i++;
             int j;
-            for (
-                j = i;
-                ((text[j] != '+') &&
-                    (text[j] != '-') &&
-                    (text[j] != 0));
-                j++
-                ) {
-                ;
-            }
+            for (j = i; ((text[j] != '+') && (text[j] != '-') && (text[j] != 0)); j++);
 
             char c = text[j];
             text[j] = 0;
@@ -276,7 +268,7 @@ void Cmd_Exec_f(void) {
         return;
     }
 
-    int mark = Hunk_LowMark();
+    size_t mark = Hunk_LowMark();
     cstring f = (cstring)COM_LoadHunkFile(Cmd_Argv(1));
     if (!f) {
         Con_Printf("couldn't exec %s\n", Cmd_Argv(1));
@@ -380,7 +372,7 @@ int Cmd_Argc(void) {
 */
 cstring Cmd_Argv(int arg) {
     return
-        ((unsigned)arg >= cmd_argc) ?
+        ((uint32_t)arg >= cmd_argc) ?
         cmd_null_string :
         cmd_argv[arg];
 }

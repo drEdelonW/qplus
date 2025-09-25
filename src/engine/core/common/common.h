@@ -60,19 +60,19 @@ cstring va(cstring format, ...);
 
 //============================================================================
 
-extern int com_filesize;
+extern int32_t com_filesize;
 struct cache_user_s;
 
 extern	char	com_gamedir[MAX_OSPATH];
 
-void COM_WriteFile(cstring filename, typeless_ptr data, int len);
+void COM_WriteFile(cstring filename, typeless_ptr data, int32_t len);
 int COM_OpenFile(cstring filename, int* hndl);
 int COM_FOpenFile(cstring filename, FILE** file);
 void COM_CloseFile(int h);
 
-uint8_t* COM_LoadStackFile(cstring path, typeless_ptr buffer, int bufsize);
-uint8_t* COM_LoadTempFile(cstring path);
-uint8_t* COM_LoadHunkFile(cstring path);
+uint8_p COM_LoadStackFile(cstring path, typeless_ptr buffer, int32_t bufsize);
+uint8_p COM_LoadTempFile(cstring path);
+uint8_p COM_LoadHunkFile(cstring path);
 void COM_LoadCacheFile(cstring path, struct cache_user_s* cu);
 
 

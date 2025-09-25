@@ -121,9 +121,9 @@ qboolean SNDDMA_Init() {
 
 	// memory map the dma buffer
 
-	shm->buffer = (uint8_t*)mmap(NULL, info.fragstotal
+	shm->buffer = (uint8_p)mmap(NULL, info.fragstotal
 		* info.fragsize, PROT_WRITE, MAP_FILE | MAP_SHARED, audio_fd, 0);
-	if (!shm->buffer || shm->buffer == (uint8_t*)-1) {
+	if (!shm->buffer || shm->buffer == (uint8_p)-1) {
 		perror("/dev/dsp");
 		Con_Printf("Could not mmap /dev/dsp\n");
 		close(audio_fd);

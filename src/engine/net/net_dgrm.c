@@ -49,7 +49,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 		char			sin_zero[8];
 	};
     cstring inet_ntoa(struct in_addr in);
-    unsigned long inet_addr(const cstring cp);
+    uint32_t inet_addr(const cstring cp);
 #endif
 #endif	// BAN_TEST
 
@@ -73,9 +73,9 @@ int droppedDatagrams;
 static int myDriverLevel;
 
 struct {
-	unsigned int	length;
-	unsigned int	sequence;
-	byte			data[MAX_DATAGRAM];
+	uint32_t	length;
+	uint32_t	sequence;
+	uint8_t			data[MAX_DATAGRAM];
 } packetBuffer;
 
 extern int m_return_state;
@@ -87,7 +87,7 @@ extern char m_return_reason[32];
 #ifdef DEBUG
 cstring StrAddr(struct qsockaddr* addr) {
 	static char buf[34];
-	byte* p = (byte*)addr;
+	uint8_p p = (uint8_p)addr;
 
 	for (int n = 0; n < 16; n++)
 		sprintf(buf + n * 2, "%02x", *p++);
@@ -97,8 +97,8 @@ cstring StrAddr(struct qsockaddr* addr) {
 
 
 #ifdef BAN_TEST
-unsigned long banAddr = 0x00000000;
-unsigned long banMask = 0xffffffff;
+uint32_t banAddr = 0x00000000;
+uint32_t banMask = 0xffffffff;
 
 void NET_Ban_f() {
 	char	addrStr[32];
@@ -151,9 +151,9 @@ void NET_Ban_f() {
 
 
 int Datagram_SendMessage(qsocket_t* sock, sizebuf_p data) {
-	unsigned int	packetLen;
-	unsigned int	dataLen;
-	unsigned int	eom;
+	uint32_t	packetLen;
+	uint32_t	dataLen;
+	uint32_t	eom;
 
 #ifdef DEBUG
 	if (data->cursize == 0)
@@ -185,7 +185,7 @@ int Datagram_SendMessage(qsocket_t* sock, sizebuf_p data) {
 
 	sock->canSend = false;
 
-	if (sfunc.Write(sock->socket, (byte*)&packetBuffer, packetLen, &sock->addr) == -1)
+	if (sfunc.Write(sock->socket, (uint8_p)&packetBuffer, packetLen, &sock->addr) == -1)
 		return -1;
 
 	sock->lastSendTime = net_time;
@@ -195,9 +195,9 @@ int Datagram_SendMessage(qsocket_t* sock, sizebuf_p data) {
 
 
 int SendMessageNext(qsocket_t* sock) {
-	unsigned int	packetLen;
-	unsigned int	dataLen;
-	unsigned int	eom;
+	uint32_t	packetLen;
+	uint32_t	dataLen;
+	uint32_t	eom;
 
 	if (sock->sendMessageLength <= MAX_DATAGRAM) {
 		dataLen = sock->sendMessageLength;
@@ -215,7 +215,7 @@ int SendMessageNext(qsocket_t* sock) {
 
 	sock->sendNext = false;
 
-	if (sfunc.Write(sock->socket, (byte*)&packetBuffer, packetLen, &sock->addr) == -1)
+	if (sfunc.Write(sock->socket, (uint8_p)&packetBuffer, packetLen, &sock->addr) == -1)
 		return -1;
 
 	sock->lastSendTime = net_time;
@@ -225,9 +225,9 @@ int SendMessageNext(qsocket_t* sock) {
 
 
 int ReSendMessage(qsocket_t* sock) {
-	unsigned int	packetLen;
-	unsigned int	dataLen;
-	unsigned int	eom;
+	uint32_t	packetLen;
+	uint32_t	dataLen;
+	uint32_t	eom;
 
 	if (sock->sendMessageLength <= MAX_DATAGRAM) {
 		dataLen = sock->sendMessageLength;
@@ -245,7 +245,7 @@ int ReSendMessage(qsocket_t* sock) {
 
 	sock->sendNext = false;
 
-	if (sfunc.Write(sock->socket, (byte*)&packetBuffer, packetLen, &sock->addr) == -1)
+	if (sfunc.Write(sock->socket, (uint8_p)&packetBuffer, packetLen, &sock->addr) == -1)
 		return -1;
 
 	sock->lastSendTime = net_time;
@@ -284,7 +284,7 @@ int Datagram_SendUnreliableMessage(qsocket_t* sock, sizebuf_p data) {
 	packetBuffer.sequence = BigLong(sock->unreliableSendSequence++);
 	Q_memcpy(packetBuffer.data, data->data, data->cursize);
 
-	if (sfunc.Write(sock->socket, (byte*)&packetBuffer, packetLen, &sock->addr) == -1)
+	if (sfunc.Write(sock->socket, (uint8_p)&packetBuffer, packetLen, &sock->addr) == -1)
 		return -1;
 
 	packetsSent++;
@@ -293,19 +293,19 @@ int Datagram_SendUnreliableMessage(qsocket_t* sock, sizebuf_p data) {
 
 
 int	Datagram_GetMessage(qsocket_t* sock) {
-	unsigned int	length;
-	unsigned int	flags;
+	uint32_t	length;
+	uint32_t	flags;
 	int				ret = 0;
 	struct qsockaddr readaddr;
-	unsigned int	sequence;
-	unsigned int	count;
+	uint32_t	sequence;
+	uint32_t	count;
 
 	if (!sock->canSend)
 		if ((net_time - sock->lastSendTime) > 1.0)
 			ReSendMessage(sock);
 
 	while (1) {
-		length = sfunc.Read(sock->socket, (byte*)&packetBuffer, NET_DATAGRAMSIZE, &readaddr);
+		length = sfunc.Read(sock->socket, (uint8_p)&packetBuffer, NET_DATAGRAMSIZE, &readaddr);
 
 		//	if ((rand() & 255) > 220)
 		//		continue;
@@ -393,7 +393,7 @@ int	Datagram_GetMessage(qsocket_t* sock) {
 		if (flags & NETFLAG_DATA) {
 			packetBuffer.length = BigLong(NET_HEADERSIZE | NETFLAG_ACK);
 			packetBuffer.sequence = BigLong(sequence);
-			sfunc.Write(sock->socket, (byte*)&packetBuffer, NET_HEADERSIZE, &readaddr);
+			sfunc.Write(sock->socket, (uint8_p)&packetBuffer, NET_HEADERSIZE, &readaddr);
 
 			if (sequence != sock->receiveSequence) {
 				receivedDuplicateCount++;
@@ -906,7 +906,7 @@ static qsocket_t* _Datagram_CheckNewConnections(void) {
 #ifdef BAN_TEST
 	// check for a ban
 	if (clientaddr.sa_family == AF_INET) {
-		unsigned long testAddr;
+		uint32_t testAddr;
 		testAddr = ((struct sockaddr_in*)&clientaddr)->sin_addr.s_addr;
 		if ((testAddr & banMask) == banAddr) {
 			SZ_Clear(&net_message);

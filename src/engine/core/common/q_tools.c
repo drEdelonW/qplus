@@ -9,39 +9,39 @@
 ============================================================================
 */
 
-void Q_memset(typeless_ptr dest, int fill, int count) {
-	if ((((long)dest | count) & 3) == 0) {
+void Q_memset(typeless_ptr dest, int32_t fill, int32_t count) {
+	if ((((int32_t)dest | count) & 3) == 0) {
 		count >>= 2;
 		fill = fill | (fill << 8) | (fill << 16) | (fill << 24);
-		for (int i = 0; i < count; i++) {
-			((int*)dest)[i] = fill;
+		for (int32_t i = 0; i < count; i++) {
+			((int32_t*)dest)[i] = fill;
 		}
 	}
 	else {
-		for (int i = 0; i < count; i++) {
-			((uint8_t*)dest)[i] = fill;
+		for (int32_t i = 0; i < count; i++) {
+			((uint8_p)dest)[i] = fill;
 		}
 	}
 }
 
-void Q_memcpy(typeless_ptr dest, typeless_ptr src, int count) {
-	if ((((long)dest | (long)src | count) & 3) == 0) {
+void Q_memcpy(typeless_ptr dest, typeless_ptr src, int32_t count) {
+	if ((((int32_t)dest | (int32_t)src | count) & 3) == 0) {
 		count >>= 2;
-		for (int i = 0; i < count; i++) {
-			((int*)dest)[i] = ((int*)src)[i];
+		for (int32_t i = 0; i < count; i++) {
+			((int32_t*)dest)[i] = ((int32_t*)src)[i];
 		}
 	}
 	else {
-		for (int i = 0; i < count; i++) {
-			((uint8_t*)dest)[i] = ((uint8_t*)src)[i];
+		for (int32_t i = 0; i < count; i++) {
+			((uint8_p)dest)[i] = ((uint8_p)src)[i];
 		}
 	}
 }
 
-int Q_memcmp(typeless_ptr m1, typeless_ptr m2, int count) {
+int Q_memcmp(typeless_ptr m1, typeless_ptr m2, int32_t count) {
 	while (count) {
 		count--;
-		if (((uint8_t*)m1)[count] != ((uint8_t*)m2)[count]) {
+		if (((uint8_p)m1)[count] != ((uint8_p)m2)[count]) {
 			return -1;
 		}
 	}
@@ -55,7 +55,7 @@ void Q_strcpy(cstring dest, cstring src) {
 	*dest++ = 0;
 }
 
-void Q_strncpy(cstring dest, cstring src, int count) {
+void Q_strncpy(cstring dest, cstring src, int32_t count) {
 	while (*src && count--) {
 		*dest++ = *src++;
 	}
@@ -64,8 +64,8 @@ void Q_strncpy(cstring dest, cstring src, int count) {
 	}
 }
 
-int Q_strlen(cstring str) {
-	int count = 0;
+int32_t Q_strlen(cstring str) {
+	int32_t count = 0;
 	while (str[count])
 		count++;
 
@@ -73,7 +73,7 @@ int Q_strlen(cstring str) {
 }
 
 cstring Q_strrchr(cstring s, char c) {
-	int len = Q_strlen(s);
+	int32_t len = Q_strlen(s);
 	s += len;
 	while (len--) {
 		if (*--s == c) {
@@ -88,7 +88,7 @@ void Q_strcat(cstring dest, cstring src) {
 	Q_strcpy(dest, src);
 }
 
-int Q_strcmp(cstring s1, cstring s2) {
+int32_t Q_strcmp(cstring s1, cstring s2) {
 	while (1) {
 		if (*s1 != *s2)
 			return -1;              // strings not equal
@@ -101,7 +101,7 @@ int Q_strcmp(cstring s1, cstring s2) {
 	return -1;
 }
 
-int Q_strncmp(cstring s1, cstring s2, int count) {
+int Q_strncmp(cstring s1, cstring s2, int32_t count) {
 	while (1) {
 		if (!count--)
 			return 0;
@@ -116,7 +116,7 @@ int Q_strncmp(cstring s1, cstring s2, int count) {
 	return -1;
 }
 
-int Q_strncasecmp(cstring s1, cstring s2, int n) {
+int Q_strncasecmp(cstring s1, cstring s2, int32_t n) {
 	while (1) {
 		int c1 = *s1++;
 		int c2 = *s2++;

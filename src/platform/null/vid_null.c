@@ -27,12 +27,12 @@ viddef_t	vid;				// global video state
 #define	BASEWIDTH	320
 #define	BASEHEIGHT	200
 
-byte	vid_buffer[BASEWIDTH*BASEHEIGHT];
+uint8_t	vid_buffer[BASEWIDTH*BASEHEIGHT];
 int16_t	zbuffer[BASEWIDTH*BASEHEIGHT];
-byte	surfcache[256*1024];
+uint8_t	surfcache[256*1024];
 
 uint16_t	d_8to16table[256];
-unsigned	d_8to24table[256];
+uint32_t	d_8to24table[256];
 
 void	VID_SetPalette (uint8_t *palette)
 {
@@ -70,7 +70,7 @@ void	VID_Update (vrect_p rects)
 D_BeginDirectRect
 ================
 */
-void D_BeginDirectRect (int x, int y, byte *pbitmap, int width, int height)
+void D_BeginDirectRect (int x, int y, uint8_t *pbitmap, int width, int height)
 {
 }
 

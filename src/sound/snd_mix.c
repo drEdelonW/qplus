@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef _WIN32
 	#include "winquake.h"
 #else
-	#define DWORD	unsigned long
+	#define DWORD	uint32_t
 #endif
 
 #define	PAINTBUFFER_SIZE	512
@@ -32,7 +32,7 @@ portable_samplepair_t paintbuffer[PAINTBUFFER_SIZE];
 int snd_scaletable[32][256];
 int*    snd_p;
 int     snd_linear_count, snd_vol;
-int16_t*    snd_out;
+int16_p    snd_out;
 
 void Snd_WriteLinearBlastStereo16();
 
@@ -106,7 +106,7 @@ void S_TransferStereo16(int endtime) {
 		// handle recirculating buffer issues
 		lpos = lpaintedtime & ((shm->samples >> 1) - 1);
 
-		snd_out = (int16_t*)pbuf + (lpos << 1);
+		snd_out = (int16_p)pbuf + (lpos << 1);
 
 		snd_linear_count = (shm->samples >> 1) - lpos;
 		if (lpaintedtime + snd_linear_count > endtime)
@@ -183,7 +183,7 @@ void S_TransferPaintBuffer(int endtime) {
 	}
 
 	if (shm->samplebits == 16) {
-		int16_t* out = (int16_t*)pbuf;
+		int16_p out = (int16_p)pbuf;
 		while (count--) {
 			val = (*p * snd_vol) >> 8;
 			p += step;
@@ -196,7 +196,7 @@ void S_TransferPaintBuffer(int endtime) {
 		}
 	}
 	else if (shm->samplebits == 8) {
-		uint8_t* out = (uint8_t*)pbuf;
+		uint8_p out = (uint8_p)pbuf;
 		while (count--) {
 			val = (*p * snd_vol) >> 8;
 			p += step;
@@ -303,7 +303,7 @@ void S_PaintChannels(int endtime) {
 void SND_InitScaletable() {
 	for (int i = 0; i < 32; i++)
 		for (int j = 0; j < 256; j++)
-			snd_scaletable[i][j] = ((signed char)j) * i * 8;
+			snd_scaletable[i][j] = ((int8_t)j) * i * 8;
 }
 
 
@@ -318,7 +318,7 @@ void SND_PaintChannelFrom8(channel_t* ch, sfxcache_t* sc, int count) {
 
 	int* lscale = snd_scaletable[ch->leftvol >> 3];
 	int* rscale = snd_scaletable[ch->rightvol >> 3];
-	uint8_t* sfx = (uint8_t*)sc->data + ch->pos;
+	uint8_p sfx = (uint8_p)sc->data + ch->pos;
 
 	for (int i = 0; i < count; i++) {
 		int data = sfx[i];
@@ -335,7 +335,7 @@ void SND_PaintChannelFrom8(channel_t* ch, sfxcache_t* sc, int count) {
 void SND_PaintChannelFrom16(channel_t* ch, sfxcache_t* sc, int count) {
 	int leftvol = ch->leftvol;
 	int rightvol = ch->rightvol;
-	int16_t* sfx = (int16_t*)sc->data + ch->pos;
+	int16_p sfx = (int16_p)sc->data + ch->pos;
 
 	for (int i = 0; i < count; i++) {
 		int data = sfx[i];

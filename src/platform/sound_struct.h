@@ -21,7 +21,7 @@ typedef struct{
 	int 	speed;
 	int 	width;
 	int 	stereo;
-	byte	data[1];		// variable sized
+	uint8_t	data[1];		// variable sized
 } sfxcache_t;
 typedef sfxcache_t* sfxcache_p;
 
@@ -35,7 +35,7 @@ typedef struct{
 	int				samplepos;				// in mono samples
 	int				samplebits;
 	int				speed;
-	uint8_t*  buffer;
+	uint8_p  buffer;
 } dma_t;
 typedef dma_t* dma_p;
 

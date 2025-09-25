@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define stringify(m) { #m, m }
 
 uint16_t       d_8to16table[256];
-static byte* vid_surfcache;
+static uint8_p vid_surfcache;
 static int		VID_highhunkmark;
 
 int num_modes;
@@ -59,7 +59,7 @@ struct{
 };
 
 static uint8_t scantokey[128];
-static byte vid_current_palette[768];
+static uint8_t vid_current_palette[768];
 
 int num_mice = sizeof(mice) / sizeof(mice[0]);
 
@@ -94,14 +94,14 @@ int		mx, my;
 
 // CVAR(m_filter, "0");
 
-static byte     backingbuf[48 * 24];
+static uint8_t     backingbuf[48 * 24];
 
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
-byte* VGA_pagebase;
+uint8_p VGA_pagebase;
 
 void VGA_UpdatePlanarScreen(typeless_ptr srcbuffer);
 
-void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
+void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
 	int i, j, k, plane, reps, repshift, offset, vidpage, off;
 
 	if (!svgalib_inited || !vid.direct || !vga_oktowrite()) return;
@@ -402,11 +402,11 @@ void VID_Shutdown(void) {
 
 }
 
-void VID_ShiftPalette(uint8_t* p) {
+void VID_ShiftPalette(uint8_p p) {
 	VID_SetPalette(p);
 }
 
-void VID_SetPalette(byte* palette) {
+void VID_SetPalette(uint8_p palette) {
 
 	static int tmppal[256 * 3];
 	int* tp;
@@ -429,7 +429,7 @@ void VID_SetPalette(byte* palette) {
 	}
 }
 
-int VID_SetMode(int modenum, uint8_t* palette) {
+int VID_SetMode(int modenum, uint8_p palette) {
 	int bsize, zsize, tsize;
 
 	if ((modenum >= num_modes) || (modenum < 0) || !modes[modenum].width) {
@@ -484,9 +484,9 @@ int VID_SetMode(int modenum, uint8_t* palette) {
 
 	d_pzbuffer = Hunk_HighAllocName(bsize + tsize + zsize, "video");
 
-	vid_surfcache = ((byte*)d_pzbuffer) + zsize;
+	vid_surfcache = ((uint8_p)d_pzbuffer) + zsize;
 
-	vid.conbuffer = vid.buffer = (pixel_p)(((byte*)d_pzbuffer) + zsize + tsize);
+	vid.conbuffer = vid.buffer = (pixel_p)(((uint8_p)d_pzbuffer) + zsize + tsize);
 
 	D_InitCaches(vid_surfcache, tsize);
 
@@ -510,7 +510,7 @@ int VID_SetMode(int modenum, uint8_t* palette) {
 	return 0;
 }
 
-void VID_Init(uint8_t* palette) {
+void VID_Init(uint8_p palette) {
 
 	int i;
 	int w, h, d;

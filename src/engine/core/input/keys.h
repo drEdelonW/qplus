@@ -18,9 +18,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#define MAX_KEYS    (256)
 
 typedef enum keycode_e {
+    K_UNKNOWN = -1,
     /* ASCII */
     K_TAB = 9,
     K_ENTER = 13,
@@ -110,7 +110,8 @@ typedef enum keycode_e {
     K_MWHEELDOWN = 240,
 
     /* pause */
-    K_PAUSE = 255
+    K_PAUSE = 255,
+    MAX_KEYS = 256  /* should be LAST */
 } keycode_t;
 
 
@@ -121,15 +122,15 @@ typedef enum {
     key_menu
 } keydest_t;
 
-extern keydest_t	key_dest;
-extern cstring    keybindings[MAX_KEYS];
-extern	int		key_repeats[MAX_KEYS];
-extern	int		key_count;			// incremented every key event
-extern	int		key_lastpress;
+extern  keydest_t   key_dest;
+extern  cstring keybindings[MAX_KEYS];
+extern  int key_repeats[MAX_KEYS];
+extern  int key_count;			// incremented every key event
+extern  int key_lastpress;
 
-void Key_Event(int key, qboolean down);
+void Key_Event(keycode_t key, qboolean down);
 void Key_Init(void);
 void Key_WriteBindings(FILE* f);
-void Key_SetBinding(int keynum, cstring binding);
+void Key_SetBinding(keycode_t keynum, cstring binding);
 void Key_ClearStates(void);
 

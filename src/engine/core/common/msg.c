@@ -22,7 +22,7 @@ void MSG_WriteChar(sizebuf_p sb, int c) {
 		Sys_Error("MSG_WriteChar: range error");
 #endif
 
-	uint8_t* buf = SZ_GetSpace(sb, 1);
+	uint8_p buf = SZ_GetSpace(sb, 1);
 	buf[0] = c;
 }
 
@@ -32,7 +32,7 @@ void MSG_WriteByte(sizebuf_p sb, int c) {
 		Sys_Error("MSG_WriteByte: range error");
 #endif
 
-	uint8_t* buf = SZ_GetSpace(sb, 1);
+	uint8_p buf = SZ_GetSpace(sb, 1);
 	buf[0] = c;
 }
 
@@ -42,13 +42,13 @@ void MSG_WriteShort(sizebuf_p sb, int c) {
 		Sys_Error("MSG_WriteShort: range error");
 #endif
 
-	uint8_t* buf = SZ_GetSpace(sb, 2);
+	uint8_p buf = SZ_GetSpace(sb, 2);
 	buf[0] = c & 0xff;
 	buf[1] = c >> 8;
 }
 
 void MSG_WriteLong(sizebuf_p sb, int c) {
-	uint8_t* buf = SZ_GetSpace(sb, 4);
+	uint8_p buf = SZ_GetSpace(sb, 4);
 	buf[0] = c & 0xff;
 	buf[1] = (c >> 8) & 0xff;
 	buf[2] = (c >> 16) & 0xff;
@@ -100,7 +100,7 @@ int MSG_ReadChar() {
 		return MSG_ERROR;
 	}
 
-	int c = (signed char)net_message.data[msg_readcount];
+	int c = (int8_t)net_message.data[msg_readcount];
 	msg_readcount++;
 
 	return c;

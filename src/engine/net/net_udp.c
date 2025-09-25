@@ -46,7 +46,7 @@ static int net_controlsocket;
 static int net_broadcastsocket = 0;
 static struct qsockaddr broadcastaddr;
 
-static unsigned long myAddr;
+static uint32_t myAddr;
 
 #include "net_udp.h"
 
@@ -215,7 +215,7 @@ int UDP_Connect(int socket, struct qsockaddr* addr) {
 //=============================================================================
 
 int UDP_CheckNewConnections() {
-	unsigned long	available;
+	uint32_t	available;
 
 	if (net_acceptsocket == -1)
 		return -1;
@@ -229,7 +229,7 @@ int UDP_CheckNewConnections() {
 
 //=============================================================================
 
-int UDP_Read(int socket, byte* buf, int len, struct qsockaddr* addr) {
+int UDP_Read(int socket, uint8_p buf, int len, struct qsockaddr* addr) {
 	socklen_t addrlen = sizeof(struct qsockaddr);
 	int ret;
 
@@ -254,7 +254,7 @@ int UDP_MakeSocketBroadcastCapable(int socket) {
 
 //=============================================================================
 
-int UDP_Broadcast(int socket, byte* buf, int len) {
+int UDP_Broadcast(int socket, uint8_p buf, int len) {
 	int ret;
 
 	if (socket != net_broadcastsocket) {
@@ -272,7 +272,7 @@ int UDP_Broadcast(int socket, byte* buf, int len) {
 
 //=============================================================================
 
-int UDP_Write(int socket, byte* buf, int len, struct qsockaddr* addr) {
+int UDP_Write(int socket, uint8_p buf, int len, struct qsockaddr* addr) {
 	int ret;
 
 	ret = sendto(socket, buf, len, 0, (struct sockaddr*)addr, sizeof(struct qsockaddr));
@@ -308,12 +308,12 @@ int UDP_StringToAddr(cstring string, struct qsockaddr* addr) {
 }
 
 //=============================================================================
-extern unsigned long inet_addr(const cstring cp);
+extern uint32_t inet_addr(const cstring cp);
 
 int UDP_GetSocketAddr(int socket, struct qsockaddr* addr) {
 	socklen_t addrlen = sizeof(struct qsockaddr);
 
-	unsigned int a;
+	uint32_t a;
 
 	Q_memset(addr, 0, sizeof(struct qsockaddr));
 	getsockname(socket, (struct sockaddr*)addr, &addrlen);

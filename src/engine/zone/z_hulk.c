@@ -19,7 +19,7 @@ typedef struct {
 } hunk_t;
 typedef hunk_t* hunk_p;
 
-byte* hunk_base;
+uint8_p hunk_base;
 size_t  hunk_size;
 
 size_t  hunk_low_used;
@@ -45,12 +45,12 @@ Run consistancy and sentinal trahing checks
 ==============
 */
 void Hunk_Check() {
-	for (hunk_p h = (hunk_p)hunk_base; (byte*)h != (hunk_base + hunk_low_used); ) {
+	for (hunk_p h = (hunk_p)hunk_base; (uint8_p)h != (hunk_base + hunk_low_used); ) {
 		if ((h->sentinal) != HUNK_SENTINAL)
 			Sys_Error("Hunk_Check: trahsed sentinal");
-		if ((h->size < 16) || ((h->size + (byte*)h - hunk_base) > hunk_size))
+		if ((h->size < 16) || ((h->size + (uint8_p)h - hunk_base) > hunk_size))
 			Sys_Error("Hunk_Check: bad size");
-		h = (hunk_p)((byte*)h + h->size);
+		h = (hunk_p)((uint8_p)h + h->size);
 	}
 }
 
@@ -105,11 +105,11 @@ void Hunk_Print(qboolean all) {
 		if (h->sentinal != HUNK_SENTINAL)
 			Sys_Error("Hunk_Check: trahsed sentinal");
 		if ((h->size < 16) ||
-			((h->size + (byte*)h - hunk_base) > hunk_size)
+			((h->size + (uint8_p)h - hunk_base) > hunk_size)
 			)
 			Sys_Error("Hunk_Check: bad size");
 
-		hunk_p next = (hunk_p)((byte*)h + h->size);
+		hunk_p next = (hunk_p)((uint8_p)h + h->size);
 		count++;
 		totalblocks++;
 		sum += h->size;

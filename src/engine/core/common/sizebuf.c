@@ -8,7 +8,7 @@
 
 //===========================================================================
 
-void SZ_Alloc(sizebuf_p buf, int startsize) {
+void SZ_Alloc(sizebuf_p buf, int32_t startsize) {
 	CLAMP_LESS(startsize, 256);
 	buf->data = Hunk_AllocName(startsize, "sizebuf");
 	buf->maxsize = startsize;
@@ -27,7 +27,7 @@ void SZ_Clear(sizebuf_p buf) {
 	buf->cursize = 0;
 }
 
-typeless_ptr SZ_GetSpace(sizebuf_p buf, int length) {
+typeless_ptr SZ_GetSpace(sizebuf_p buf, int32_t length) {
 	if ((buf->cursize + length) > buf->maxsize) {
 		if (!buf->allowoverflow)
 			Sys_Error("SZ_GetSpace: overflow without allowoverflow set");
@@ -46,16 +46,16 @@ typeless_ptr SZ_GetSpace(sizebuf_p buf, int length) {
 	return data;
 }
 
-void SZ_Write(sizebuf_p buf, typeless_ptr data, int length) {
+void SZ_Write(sizebuf_p buf, typeless_ptr data, int32_t length) {
 	Q_memcpy(SZ_GetSpace(buf, length), data, length);
 }
 
 void SZ_Print(sizebuf_p buf, cstring data) {
 	int len = Q_strlen(data) + 1;
 
-	// uint8_t * cast to keep VC++ happy
+	// uint8_p cast to keep VC++ happy
 	if (buf->data[buf->cursize - 1])
-		Q_memcpy((uint8_t*)SZ_GetSpace(buf, len), data, len); // no trailing 0
+		Q_memcpy((uint8_p)SZ_GetSpace(buf, len), data, len); // no trailing 0
 	else
-		Q_memcpy((uint8_t*)SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
+		Q_memcpy((uint8_p)SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
 }
