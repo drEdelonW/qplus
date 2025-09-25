@@ -35,7 +35,8 @@
 			"numbers": "c",
 			"algorithm": "c",
 			"*.q1": "c",
-			"*.q2": "c"
+			"*.q2": "c",
+			"typeinfo": "c"
 		}
 	}
 }
