@@ -93,6 +93,7 @@ typedef struct {
 	int32_t			width;
 	int32_t			height;
 } dspriteframe_t;
+typedef dspriteframe_t* dspriteframe_p;
 
 typedef struct {
 	int32_t			numframes;
