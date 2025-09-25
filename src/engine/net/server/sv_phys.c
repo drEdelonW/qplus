@@ -54,20 +54,17 @@ SV_CheckAllEnts
 ================
 */
 void SV_CheckAllEnts() {
-	int			e;
-	edict_p check;
-
 	// see if any solid entities are inside the final position
-	check = NEXT_EDICT(sv.edicts);
-	for (e = 1; e < sv.num_edicts; e++, check = NEXT_EDICT(check)) {
+	edict_p check = NEXT_EDICT(sv.edicts);
+	for (int e = 1; e < sv.num_edicts; e++, check = NEXT_EDICT(check)) {
 		if (check->free)
 			continue;
-		if (check->v.movetype == MOVETYPE_PUSH
-			|| check->v.movetype == MOVETYPE_NONE
+		if (check->v.movetype == MOVETYPE_PUSH ||
+			check->v.movetype == MOVETYPE_NONE ||
 #ifdef QUAKE2
-			|| check->v.movetype == MOVETYPE_FOLLOW
+			check->v.movetype == MOVETYPE_FOLLOW
 #endif
-			|| check->v.movetype == MOVETYPE_NOCLIP)
+			check->v.movetype == MOVETYPE_NOCLIP)
 			continue;
 
 		if (SV_TestEntityPosition(check))
@@ -81,12 +78,10 @@ SV_CheckVelocity
 ================
 */
 void SV_CheckVelocity(edict_p ent) {
-	int		i;
-
 	//
 	// bound velocity
 	//
-	for (i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {
 		if (IS_NAN(ent->v.velocity[i])) {
 			Con_Printf("Got a NaN velocity on %s\n", pr_strings + ent->v.classname);
 			ent->v.velocity[i] = 0;
@@ -95,10 +90,7 @@ void SV_CheckVelocity(edict_p ent) {
 			Con_Printf("Got a NaN origin on %s\n", pr_strings + ent->v.classname);
 			ent->v.origin[i] = 0;
 		}
-		if (ent->v.velocity[i] > sv_maxvelocity.value)
-			ent->v.velocity[i] = sv_maxvelocity.value;
-		else if (ent->v.velocity[i] < -sv_maxvelocity.value)
-			ent->v.velocity[i] = -sv_maxvelocity.value;
+		CLAMP(-sv_maxvelocity.value, ent->v.velocity[i], sv_maxvelocity.value);
 	}
 }
 
@@ -113,14 +105,11 @@ Returns false if the entity removed itself.
 =============
 */
 bool SV_RunThink(edict_p ent) {
-	float	thinktime;
-
-	thinktime = ent->v.nextthink;
-	if (thinktime <= 0 || thinktime > sv.time + host_frametime)
+	float thinktime = ent->v.nextthink;
+	if ((thinktime <= 0) || (thinktime > sv.time + host_frametime))
 		return true;
 
-	if (thinktime < sv.time)
-		thinktime = sv.time;	// don't let things stay in the past.
+	CLAMP_LESS(thinktime, sv.time); // don't let things stay in the past.
 	// it is possible to start that way
 	// by a trigger with a local time.
 	ent->v.nextthink = 0;
@@ -139,13 +128,11 @@ Two entities have touched, so run their touch functions
 ==================
 */
 void SV_Impact(edict_p e1, edict_p e2) {
-	int		old_self, old_other;
-
-	old_self = pr_global_struct->self;
-	old_other = pr_global_struct->other;
+	int old_self = pr_global_struct->self;
+	int old_other = pr_global_struct->other;
 
 	pr_global_struct->time = sv.time;
-	if (e1->v.touch && e1->v.solid != SOLID_NOT) {
+	if (e1->v.touch && (e1->v.solid != SOLID_NOT)) {
 		pr_global_struct->self = EDICT_TO_PROG(e1);
 		pr_global_struct->other = EDICT_TO_PROG(e2);
 		PR_ExecuteProgram(e1->v.touch);

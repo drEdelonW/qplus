@@ -37,9 +37,11 @@ typedef struct
 } trace_t;
 
 
-#define	MOVE_NORMAL		0
-#define	MOVE_NOMONSTERS	1
-#define	MOVE_MISSILE	2
+typedef enum {
+    MOVE_NORMAL     = 0, // normal movement, collide with everything
+    MOVE_NOMONSTERS = 1, // ignore monsters
+    MOVE_MISSILE    = 2  // special missile movement rules
+} phymovetype_t;
 
 
 void SV_ClearWorld();
@@ -64,7 +66,7 @@ int SV_TruePointContents(vec3_t p);
 
 edict_p SV_TestEntityPosition(edict_p ent);
 
-trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int type, edict_p passedict);
+trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_t type, edict_p passedict);
 // mins and maxs are reletive
 
 // if the entire move stays in a solid volume, trace.allsolid will be set

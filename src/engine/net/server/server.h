@@ -137,11 +137,13 @@ typedef enum {
 } movetype_t;
 
 // edict->solid values
-#define	SOLID_NOT				0		// no interaction with other objects
-#define	SOLID_TRIGGER			1		// touch on edge, but not blocking
-#define	SOLID_BBOX				2		// touch on edge, block
-#define	SOLID_SLIDEBOX			3		// touch on edge, but not an onground
-#define	SOLID_BSP				4		// bsp clip, touch on edge, block
+typedef enum {
+    SOLID_NOT      = 0, // no interaction with other objects
+    SOLID_TRIGGER  = 1, // touch on edge, but not blocking
+    SOLID_BBOX     = 2, // touch on edge, block
+    SOLID_SLIDEBOX = 3, // touch on edge, but not an onground
+    SOLID_BSP      = 4  // BSP clip, touch on edge, block
+} solid_t;
 
 // edict->deadflag values
 #define	DEAD_NO					0

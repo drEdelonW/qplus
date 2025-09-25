@@ -7,11 +7,11 @@
 #define ALIGN_UP(x, a)   (((x) + ((a) - 1)) & ~((a) - 1))
 
 //========================[z_hulk.c]========================//
-extern uint8_p hunk_base;
-extern size_t      hunk_size;
+extern uint8_p  hunk_base;
+extern size_t   hunk_size;
 
-extern size_t      hunk_low_used;
-extern size_t      hunk_high_used;
+extern size_t   hunk_low_used;
+extern size_t   hunk_high_used;
 
 void Hulk_Init(typeless_ptr buf, size_t size);
 
