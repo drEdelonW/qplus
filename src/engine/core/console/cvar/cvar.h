@@ -53,9 +53,7 @@ r_draworder 0        sets the current value to 0
 Cvars are restricted from having the same names as commands to keep this
 interface from being ambiguous.
 */
-#include "qboolean.h"
 #include <stdio.h>
-#include <stdint.h>
 #include "types.h"
 
 /* header-friendly extern */
@@ -114,8 +112,8 @@ typedef cvar_t* cvar_p;
 struct cvar_s {
     cstring name;
     cstring string;
-    // qboolean archive;        // set to true to cause it to be saved to vars.rc
-    // qboolean server;        // notifies players when changed
+    // bool archive;        // set to true to cause it to be saved to vars.rc
+    // bool server;        // notifies players when changed
     uint8_t flags;
     float   value;             // cached numeric value
     cvar_p  next;
@@ -144,7 +142,7 @@ cstring Cvar_CompleteVariable(cstring partial);
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
 // command.  Returns true if the command was a variable reference that
 // was handled. (print or change)
-qboolean Cvar_Command();
+bool Cvar_Command();
 
 // Writes lines containing "set variable value" for all variables
 // with the archive flag set to true.

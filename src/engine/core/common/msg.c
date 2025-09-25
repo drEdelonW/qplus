@@ -38,7 +38,7 @@ void MSG_WriteByte(sizebuf_p sb, int c) {
 
 void MSG_WriteShort(sizebuf_p sb, int c) {
 #ifdef PARANOID
-	if ((c < ((int16_t)0x8000)) || (c >(int16_t)0x7fff))
+	if ((c < ((int16_t)0x8000)) || (c > (int16_t)0x7fff))
 		Sys_Error("MSG_WriteShort: range error");
 #endif
 
@@ -86,7 +86,7 @@ void MSG_WriteAngle(sizebuf_p sb, float f) {
 // reading functions
 //
 int         msg_readcount;
-qboolean    msg_badread;
+bool    msg_badread;
 
 void MSG_BeginReading() {
 	msg_readcount = 0;

@@ -38,13 +38,13 @@ static cstring safeargvs[NUM_SAFE_ARGVS] = {
 
 #include "cvar_q1.h"
 
-qboolean        com_modified;   // set true if using non-id files
+bool        com_modified;   // set true if using non-id files
 
-qboolean		proghack;
+bool		proghack;
 
 int32_t             static_registered = 1;  // only for startup check, then set
 
-qboolean		msg_suppress_1 = 0;
+bool		msg_suppress_1 = 0;
 
 void COM_InitFilesystem();
 
@@ -59,7 +59,7 @@ char** com_argv;
 #define CMDLINE_LENGTH	256
 char	com_cmdline[CMDLINE_LENGTH];
 
-qboolean		standard_quake = true, rogue, hipnotic;
+bool		standard_quake = true, rogue, hipnotic;
 
 // this graphic needs to be in the pak file to use registered features
 uint16_t pop[] = {
@@ -368,7 +368,7 @@ void COM_InitArgv(int argc, char** argv) {
 
     com_cmdline[n] = 0;
 
-    qboolean safe = false;
+    bool safe = false;
 
     for (com_argc = 0; (com_argc < MAX_NUM_ARGVS) && (com_argc < argc);
         com_argc++) {

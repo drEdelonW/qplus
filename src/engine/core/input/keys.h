@@ -128,7 +128,7 @@ extern  int key_repeats[MAX_KEYS];
 extern  int key_count;			// incremented every key event
 extern  int key_lastpress;
 
-void Key_Event(keycode_t key, qboolean down);
+void Key_Event(keycode_t key, bool down);
 void Key_Init(void);
 void Key_WriteBindings(FILE* f);
 void Key_SetBinding(keycode_t keynum, cstring binding);

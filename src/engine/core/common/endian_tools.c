@@ -8,7 +8,7 @@
 ============================================================================
 */
 
-qboolean        bigendien;
+bool        bigendien;
 
 int16_t(*BigShort) (int16_t l);
 int16_t(*LittleShort) (int16_t l);

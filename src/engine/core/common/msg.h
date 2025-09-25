@@ -15,7 +15,7 @@ void MSG_WriteCoord(sizebuf_p sb, float f);
 void MSG_WriteAngle(sizebuf_p sb, float f);
 
 extern	int			msg_readcount;
-extern	qboolean	msg_badread;		// set if a read goes beyond end of message
+extern	bool	msg_badread;		// set if a read goes beyond end of message
 
 void  MSG_BeginReading();
 int   MSG_ReadChar();

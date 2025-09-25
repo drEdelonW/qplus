@@ -62,23 +62,25 @@ typedef struct {
 } lump_t;
 typedef lump_t* lump_p;
 
-#define	LUMP_ENTITIES	0
-#define	LUMP_PLANES		1
-#define	LUMP_TEXTURES	2
-#define	LUMP_VERTEXES	3
-#define	LUMP_VISIBILITY	4
-#define	LUMP_NODES		5
-#define	LUMP_TEXINFO	6
-#define	LUMP_FACES		7
-#define	LUMP_LIGHTING	8
-#define	LUMP_CLIPNODES	9
-#define	LUMP_LEAFS		10
-#define	LUMP_MARKSURFACES 11
-#define	LUMP_EDGES		12
-#define	LUMP_SURFEDGES	13
-#define	LUMP_MODELS		14
+typedef enum {
+    LUMP_ENTITIES     = 0,
+    LUMP_PLANES       = 1,
+    LUMP_TEXTURES     = 2,
+    LUMP_VERTEXES     = 3,
+    LUMP_VISIBILITY   = 4,
+    LUMP_NODES        = 5,
+    LUMP_TEXINFO      = 6,
+    LUMP_FACES        = 7,
+    LUMP_LIGHTING     = 8,
+    LUMP_CLIPNODES    = 9,
+    LUMP_LEAFS        = 10,
+    LUMP_MARKSURFACES = 11,
+    LUMP_EDGES        = 12,
+    LUMP_SURFEDGES    = 13,
+    LUMP_MODELS       = 14,
 
-#define	HEADER_LUMPS	15
+    HEADER_LUMPS      = 15  // total count of lumps in BSP header
+} lump_type_t;
 
 typedef struct {
 	float		mins[3], maxs[3];
@@ -112,17 +114,7 @@ typedef struct {
 	float	point[3];
 } dvertex_t;
 
-#if 0
-// 0-2 are axial planes
-#define	PLANE_X			0
-#define	PLANE_Y			1
-#define	PLANE_Z			2
 
-// 3-5 are non-axial planes snapped to the nearest
-#define	PLANE_ANYX		3
-#define	PLANE_ANYY		4
-#define	PLANE_ANYZ		5
-#else
 typedef enum {
 	// 0–2 are axial planes
 	PLANE_X = 0,
@@ -134,7 +126,6 @@ typedef enum {
 	PLANE_ANYY = 4,
 	PLANE_ANYZ = 5
 } plane_type_t;
-#endif
 
 typedef struct {
 	float			normal[3];
@@ -144,21 +135,23 @@ typedef struct {
 
 
 
-#define	CONTENTS_EMPTY		-1
-#define	CONTENTS_SOLID		-2
-#define	CONTENTS_WATER		-3
-#define	CONTENTS_SLIME		-4
-#define	CONTENTS_LAVA		-5
-#define	CONTENTS_SKY		-6
-#define	CONTENTS_ORIGIN		-7		// removed at csg time
-#define	CONTENTS_CLIP		-8		// changed to contents_solid
+typedef enum {
+    CONTENTS_EMPTY        = -1,
+    CONTENTS_SOLID        = -2,
+    CONTENTS_WATER        = -3,
+    CONTENTS_SLIME        = -4,
+    CONTENTS_LAVA         = -5,
+    CONTENTS_SKY          = -6,
+    CONTENTS_ORIGIN       = -7,  // removed at CSG time
+    CONTENTS_CLIP         = -8,  // changed to CONTENTS_SOLID
 
-#define	CONTENTS_CURRENT_0		-9
-#define	CONTENTS_CURRENT_90		-10
-#define	CONTENTS_CURRENT_180	-11
-#define	CONTENTS_CURRENT_270	-12
-#define	CONTENTS_CURRENT_UP		-13
-#define	CONTENTS_CURRENT_DOWN	-14
+    CONTENTS_CURRENT_0    = -9,
+    CONTENTS_CURRENT_90   = -10,
+    CONTENTS_CURRENT_180  = -11,
+    CONTENTS_CURRENT_270  = -12,
+    CONTENTS_CURRENT_UP   = -13,
+    CONTENTS_CURRENT_DOWN = -14
+} contents_t;
 
 
 // !!! if this is changed, it must be changed in asm_i386.h too !!!

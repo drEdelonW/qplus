@@ -136,7 +136,7 @@ void Host_Notarget_f() {
         SV_ClientPrintf("notarget ON\n");
 }
 
-qboolean noclip_anglehack;
+bool noclip_anglehack;
 
 void Host_Noclip_f() {
     if (cmd_source == src_command) {
@@ -915,8 +915,8 @@ void Host_Please_f() {
 #endif
 
 
-void Host_Say(qboolean teamonly) {
-    qboolean  fromServer = false;
+void Host_Say(bool teamonly) {
+    bool  fromServer = false;
     if (cmd_source == src_command) {
         if (cls.state == ca_dedicated) {
             fromServer = true;
@@ -1291,7 +1291,7 @@ void Host_Kick_f() {
     cstring who;
     cstring message = NULL;
     client_p save;
-    qboolean	byNumber = false;
+    bool	byNumber = false;
 
     if (cmd_source == src_command) {
         if (!sv.active) {

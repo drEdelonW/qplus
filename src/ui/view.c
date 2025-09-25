@@ -353,7 +353,7 @@ V_SetContentsColor
 Underwater, lava, etc each has a color shift
 =============
 */
-void V_SetContentsColor(int contents) {
+void V_SetContentsColor(contents_t contents) {
 	switch (contents) {
 	case CONTENTS_EMPTY:
 	case CONTENTS_SOLID:

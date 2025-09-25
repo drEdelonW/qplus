@@ -40,7 +40,7 @@ void Cmd_ForwardToServer();
 int32_t     trashtest;
 int32_t* trashspot;
 
-qboolean cmd_wait;
+bool cmd_wait;
 
 //=============================================================================
 
@@ -476,7 +476,7 @@ void Cmd_AddCommand(cstring cmd_name, xcommand_t function) {
     Cmd_Exists
     ============
 */
-qboolean Cmd_Exists(cstring cmd_name) {
+bool Cmd_Exists(cstring cmd_name) {
     for (cmd_function_p cmd = cmd_functions; cmd; cmd = cmd->next) {
         if (!Q_strcmp(cmd_name, cmd->name)) {
             return true;

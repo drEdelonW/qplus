@@ -21,7 +21,6 @@
 
 #include <stddef.h>
 #include <stdbool.h>
-#include "qboolean.h"
 #include "types.h"
 // cmd.h -- Command buffer and command execution
 
@@ -85,7 +84,7 @@ void	Cmd_Init(void);
 void	Cmd_AddCommand(cstring cmd_name, xcommand_t function);
 
 // used by the cvar code to check for cvar / command name overlap
-qboolean Cmd_Exists(cstring cmd_name);
+bool Cmd_Exists(cstring cmd_name);
 
 // attempts to match a partial command for automatic command line completion
 // returns NULL if nothing fits

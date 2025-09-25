@@ -29,22 +29,22 @@ key up events are sent even if in console mode
 
 char	key_lines[MAXCHATLEN][MAXCMDLINE];
 int		key_linepos;
-qboolean    shift_down = false;
+bool    shift_down = false;
 keycode_t   key_lastpress;
 
-int		edit_line = 0;
-int		history_line = 0;
+int edit_line = 0;
+int history_line = 0;
 
 keydest_t	key_dest;
 
 int		key_count;			// incremented every key event
 
 cstring		keybindings[MAX_KEYS];
-qboolean	consolekeys[MAX_KEYS];	// if true, can't be rebound while in console
-qboolean	menubound[MAX_KEYS];	// if true, can't be rebound while in menu
+bool	consolekeys[MAX_KEYS];	// if true, can't be rebound while in console
+bool	menubound[MAX_KEYS];	// if true, can't be rebound while in menu
 keycode_t   keyshift[MAX_KEYS];		// key to map to if shift held down in console
 int			key_repeats[MAX_KEYS];	// if > 1, it is autorepeating
-qboolean	keydown[MAX_KEYS];
+bool	keydown[MAX_KEYS];
 
 typedef struct {
     cstring     name;
@@ -268,7 +268,7 @@ void Key_Console(keycode_t key) {
 
 //============================================================================
 char chat_buffer[MAXCHATLEN];
-qboolean team_message = false;
+bool team_message = false;
 
 void Key_Message(keycode_t key) {
     static int chat_bufferlen = 0;
@@ -595,7 +595,7 @@ Called by the system between frames for both key up and key down events
 Should NOT be called during an interrupt!
 ===================
 */
-void Key_Event(keycode_t key, qboolean down) {
+void Key_Event(keycode_t key, bool down) {
     char	cmd[MAXCMD];
 
     keydown[key] = down;

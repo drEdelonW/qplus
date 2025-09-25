@@ -158,17 +158,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 
-extern qboolean noclip_anglehack;
+extern bool noclip_anglehack;
 
 #include "host.h"
 
-extern qboolean		msg_suppress_1;		// suppresses resolution and cache size console output
+extern bool		msg_suppress_1;		// suppresses resolution and cache size console output
 										//  an fullscreen DIB focus gain/loss
 extern int32_t			current_skill;		// skill level for currently loaded level (in case
 										//  the user changes the cvar while the level is
 										//  running, this reflects the level actually in use)
 
-extern qboolean		isDedicated;
+extern bool		isDedicated;
 
 extern int32_t			minimum_memory;
 

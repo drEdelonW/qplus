@@ -1,10 +1,10 @@
 #pragma once
-#include "qboolean.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 //============================================================================
 
-extern	qboolean		bigendien;
+extern	bool		bigendien;
 
 extern	int16_t(*BigShort) (int16_t l);
 extern	int16_t(*LittleShort) (int16_t l);

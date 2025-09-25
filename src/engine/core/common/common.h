@@ -38,7 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //============================================================================
 
 extern	char		com_token[1024];
-extern	qboolean	com_eof;
+extern	bool	com_eof;
 
 cstring COM_Parse(cstring data);
 
@@ -78,4 +78,4 @@ void COM_LoadCacheFile(cstring path, struct cache_user_s* cu);
 
 extern	struct cvar_s	registered;
 
-extern qboolean		standard_quake, rogue, hipnotic;
+extern bool		standard_quake, rogue, hipnotic;

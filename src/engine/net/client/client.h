@@ -333,7 +333,7 @@ void V_RenderView();
 void V_UpdatePalette();
 void V_Register();
 void V_ParseDamage();
-void V_SetContentsColor(int32_t contents);
+void V_SetContentsColor(contents_t contents);
 
 
 //
