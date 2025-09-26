@@ -46,25 +46,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int32_t con_linewidth;
 float   con_cursorspeed = 4;
-bool    con_forcedup;		// because no entities to refresh
-int32_t con_totallines;		// total lines in console scrollback
-int32_t con_backscroll;		// lines up from bottom to display
-int32_t con_current;		// where next message will be printed
-int32_t con_x;				// offset in current line for next print
+bool    con_forcedup;  // because no entities to refresh
+int32_t con_totallines;  // total lines in console scrollback
+int32_t con_backscroll;  // lines up from bottom to display
+int32_t con_current;  // where next message will be printed
+int32_t con_x;    // offset in current line for next print
 cstring con_text = 0;
 int32_t con_vislines;
 bool    con_initialized;
-int32_t con_notifylines;		// scan lines to clear for notify lines
+int32_t con_notifylines;  // scan lines to clear for notify lines
 bool    con_debuglog;
 
-#define	NUM_CON_TIMES 4
-float   con_times[NUM_CON_TIMES];	// realtime time the line was generated
+#define NUM_CON_TIMES 4
+float   con_times[NUM_CON_TIMES]; // realtime time the line was generated
 // for transparent notify lines
 
 #define MAXCMDLINE  256
-extern	char    key_lines[32][MAXCMDLINE];
-extern	int32_t edit_line;
-extern	int32_t key_linepos;
+extern char    key_lines[32][MAXCMDLINE];
+extern int32_t edit_line;
+extern int32_t key_linepos;
 
 extern void M_Menu_Main_f();
 
@@ -77,7 +77,7 @@ void Con_ToggleConsole_f() {
     if (key_dest == key_console) {
         if (cls.state == ca_connected) {
             key_dest = key_game;
-            key_lines[edit_line][1] = 0;	// clear any typing
+            key_lines[edit_line][1] = 0; // clear any typing
             key_linepos = 1;
         }
         else {
@@ -154,7 +154,7 @@ void Con_CheckResize() {
     if (width == con_linewidth)
         return;
 
-    if (width < 1) {			// video hasn't been initialized yet
+    if (width < 1) {   // video hasn't been initialized yet
         width = 38;
         con_linewidth = width;
         con_totallines = CON_TEXTSIZE / con_linewidth;
@@ -199,7 +199,7 @@ void Con_CheckResize() {
     Con_Init
     ================
 */
-#define MAXGAMEDIRLEN	1000
+#define MAXGAMEDIRLEN 1000
 void Con_Init() {
     char    temp[MAXGAMEDIRLEN + 1];
     cstring   t2 = "/qconsole.log";
@@ -265,13 +265,13 @@ void Con_Print(cstring txt) {
     con_backscroll = 0;
 
     if (txt[0] == 1) {
-        mask = 128;		// go to colored text
+        mask = 128;  // go to colored text
         S_LocalSound("misc/talk.wav");
         // play talk wav
         txt++;
     }
     else if (txt[0] == 2) {
-        mask = 128;		// go to colored text
+        mask = 128;  // go to colored text
         txt++;
     }
     else {
@@ -318,7 +318,7 @@ void Con_Print(cstring txt) {
             cr = 1;
             break;
 
-        default:	// display character and advance
+        default: // display character and advance
             con_text[((con_current % con_totallines) * con_linewidth) + con_x] = c | mask;
             con_x++;
             if (con_x >= con_linewidth) {
@@ -357,19 +357,19 @@ void Con_DebugLog(cstring file, cstring fmt, ...) {
     Handles cursor positioning, line wrapping, etc
     ================
 */
-#define	MAXPRINTMSG	4096
+#define MAXPRINTMSG 4096
 // FIXME: make a buffer size safe vsprintf?
 void Con_Printf(cstring fmt, ...) {
-    va_list		argptr;
-    char		msg[MAXPRINTMSG];
-    static bool	inupdate;
+    va_list  argptr;
+    char  msg[MAXPRINTMSG];
+    static bool inupdate;
 
     va_start(argptr, fmt);
     vsprintf(msg, fmt, argptr);
     va_end(argptr);
 
     // also echo to debugging console
-    Sys_Printf("%s", msg);	// also echo to debugging console
+    Sys_Printf("%s", msg); // also echo to debugging console
 
     // log all messages to file
     if (con_debuglog) {
@@ -379,7 +379,7 @@ void Con_Printf(cstring fmt, ...) {
     if ((!con_initialized) ||
         (cls.state == ca_dedicated)
         ) {
-        return;		// no graphics mode
+        return;  // no graphics mode
     }
 
     // write it to the scrollable buffer
@@ -407,11 +407,11 @@ void Con_Printf(cstring fmt, ...) {
     ================
 */
 void Con_DPrintf(cstring fmt, ...) {
-    va_list		argptr;
-    char		msg[MAXPRINTMSG];
+    va_list  argptr;
+    char  msg[MAXPRINTMSG];
 
     if (!developer.value) {
-        return;			// don't confuse non-developers with techie stuff...
+        return;   // don't confuse non-developers with techie stuff...
     }
 
     va_start(argptr, fmt);
@@ -430,8 +430,8 @@ void Con_DPrintf(cstring fmt, ...) {
     ==================
 */
 void Con_SafePrintf(cstring fmt, ...) {
-    va_list		argptr;
-    char		msg[1024];
+    va_list  argptr;
+    char  msg[1024];
 
     va_start(argptr, fmt);
     vsprintf(msg, fmt, argptr);
@@ -463,7 +463,7 @@ void Con_SafePrintf(cstring fmt, ...) {
 void Con_DrawInput() {
     if ((key_dest != key_console) &&
         (!con_forcedup)) {
-        return;		// don't draw anything
+        return;  // don't draw anything
     }
 
     cstring text = key_lines[edit_line];
@@ -476,7 +476,7 @@ void Con_DrawInput() {
         text[i] = ' ';
     }
 
-    //	prestep if horizontally scrolling
+    // prestep if horizontally scrolling
     if (key_linepos >= con_linewidth) {
         text += 1 + key_linepos - con_linewidth;
     }
@@ -564,15 +564,15 @@ void Con_DrawConsole(int32_t lines, bool drawinput) {
     // draw the text
     con_vislines = lines;
 
-    int32_t rows = (lines - 16) >> 3;		// rows of text to draw
-    int32_t y = lines - 16 - (rows << 3);	// may start slightly negative
+    int32_t rows = (lines - 16) >> 3;  // rows of text to draw
+    int32_t y = lines - 16 - (rows << 3); // may start slightly negative
 
     for (int32_t i = (con_current - rows + 1); i <= con_current; i++, y += 8) {
         int32_t j = i - con_backscroll;
 
         CLAMP_LESS(j, 0);
         // if (j < 0){
-        // 	j = 0;
+        //  j = 0;
         // }
         cstring text = con_text + (j % con_totallines) * con_linewidth;
 

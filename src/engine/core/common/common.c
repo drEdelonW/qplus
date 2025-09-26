@@ -53,10 +53,10 @@ static cstring safeargvs[NUM_SAFE_ARGVS] = {
 
 
 bool        com_modified;   // set true if using non-id files
-bool		proghack;
+bool  proghack;
 int32_t             static_registered = 1;  // only for startup check, then set
 
-bool		msg_suppress_1 = 0;
+bool  msg_suppress_1 = 0;
 
 void COM_InitFilesystem();
 
@@ -64,14 +64,14 @@ void COM_InitFilesystem();
 #define PAK0_COUNT              339
 #define PAK0_CRC                32981
 
-char	com_token[1024];
-int32_t		com_argc;
+char com_token[1024];
+int32_t  com_argc;
 char** com_argv;
 
-#define CMDLINE_LENGTH	256
-char	com_cmdline[CMDLINE_LENGTH];
+#define CMDLINE_LENGTH 256
+char com_cmdline[CMDLINE_LENGTH];
 
-bool		standard_quake = true, rogue, hipnotic;
+bool  standard_quake = true, rogue, hipnotic;
 
 // this graphic needs to be in the pak file to use registered features
 uint16_t pop[] = {
@@ -623,7 +623,7 @@ int COM_FindFile(cstring filename, int* handle, FILE** file) {
     // search through the path, one element at a time
     //
     searchpath_p search = com_searchpaths;
-    if (proghack) {	// gross hack to use quake 1 progs with quake 2 maps
+    if (proghack) { // gross hack to use quake 1 progs with quake 2 maps
         if (!strcmp(filename, "progs.dat"))
             search = search->next;
     }

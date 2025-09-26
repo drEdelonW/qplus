@@ -242,11 +242,10 @@ void Sys_DebugLog(cstring file, cstring fmt, ...) {
 
 void Sys_EditFile(cstring filename) {
     char cmd[256];
-    cstring editor;
 
     cstring term = getenv("TERM");
     if ((term) && (!strcmp(term, "xterm"))) {
-        editor = getenv("VISUAL");
+        cstring editor = getenv("VISUAL");
         if (!editor)
             editor = getenv("EDITOR");
         if (!editor)
@@ -278,10 +277,10 @@ double Sys_FloatTime() {
 // Sleeps for microseconds
 // =======================================================================
 
-static volatile int oktogo;
+static volatile int _oktogo;
 
 void alarm_handler(int x) {
-    oktogo = 1;
+    _oktogo = 1;
 }
 
 void Sys_LineRefresh() {}
@@ -406,6 +405,7 @@ int main(int c, char** v) {
     Sys_MakeCodeWriteable
     ================
 */
+#if 0
 void Sys_MakeCodeWriteable(uint32_t startaddr, uint32_t length) {
     int psize = getpagesize();
 
@@ -421,4 +421,19 @@ void Sys_MakeCodeWriteable(uint32_t startaddr, uint32_t length) {
     }
 
 }
+#else
+void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {
+    long psize = sysconf(_SC_PAGESIZE); // portable page size
+
+    // align start address down to page boundary
+    uintptr_t addr = (startaddr & ~(uintptr_t)(psize - 1));
+
+    // round length up to cover the full range
+    size_t len = (startaddr + length - addr + psize - 1) & ~(psize - 1);
+
+    if (mprotect((void*)addr, len, PROT_READ | PROT_WRITE | PROT_EXEC) < 0) {
+        Sys_Error("Protection change failed\n");
+    }
+}
+#endif
 

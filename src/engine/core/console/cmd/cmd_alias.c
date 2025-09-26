@@ -7,7 +7,7 @@
 
 extern cstring cmd_argv[];
 
-#define	MAX_ALIAS_NAME	(32)
+#define MAX_ALIAS_NAME (32)
 
 struct cmdalias_s;
 typedef struct cmdalias_s cmdalias_t;
@@ -55,7 +55,7 @@ void Cmd_Alias_f(void) {
     strcpy(aliasIt->name, _argSt);
 
     // copy the rest of the command line
-    cmd[0] = 0;		// start out with a null string
+    cmd[0] = 0;  // start out with a null string
     int argCnt = Cmd_Argc();
     for (int i = 2; i < argCnt; i++) {
         strcat(cmd, Cmd_Argv(i));

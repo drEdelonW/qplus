@@ -19,14 +19,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // world.h
+#include "mathlib.h"
+#include "types.h"
+#include "progs.h"
 
 typedef struct {
 	vec3_t	normal;
 	float	dist;
 } plane_t;
 
-typedef struct
-{
+typedef struct {
 	qboolean	allsolid;	// if true, plane is not valid
 	qboolean	startsolid;	// if true, the initial point was in a solid area
 	qboolean	inopen, inwater;
@@ -35,7 +37,7 @@ typedef struct
 	plane_t	plane;			// surface normal at impact
 	edict_p ent;			// entity the surface is on
 } trace_t;
-
+typedef trace_t* trace_p;
 
 typedef enum {
     MOVE_NORMAL     = 0, // normal movement, collide with everything

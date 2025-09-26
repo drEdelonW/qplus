@@ -69,19 +69,19 @@ void Cbuf_Execute(void);
 typedef void(*xcommand_t)(void);
 
 typedef enum {
-    src_client,		// came in over a net connection as a clc_stringcmd
+    src_client,  // came in over a net connection as a clc_stringcmd
     // host_client will be valid during this state.
-    src_command		// from the command buffer
+    src_command  // from the command buffer
 } cmd_source_t;
 
-extern	cmd_source_t	cmd_source;
+extern cmd_source_t cmd_source;
 
-void	Cmd_Init(void);
+void Cmd_Init(void);
 
 // called by the init functions of other parts of the program to
 // register commands and functions to call for them.
 // The cmd_name is referenced later, so it should not be in temp memory
-void	Cmd_AddCommand(cstring cmd_name, xcommand_t function);
+void Cmd_AddCommand(cstring cmd_name, xcommand_t function);
 
 // used by the cvar code to check for cvar / command name overlap
 bool Cmd_Exists(cstring cmd_name);
@@ -93,7 +93,7 @@ cstring Cmd_CompleteCommand(cstring partial);
 // The functions that execute commands get their parameters with these
 // functions. Cmd_Argv() will return an empty string, not a NULL
 // if arg > argc, so string operations are allways safe.
-int		Cmd_Argc(void);
+int  Cmd_Argc(void);
 cstring Cmd_Argv(int arg);
 cstring Cmd_Args(void);
 
@@ -107,16 +107,16 @@ void Cmd_TokenizeString(cstring text);
 
 // Parses a single line of text into arguments and tries to execute it.
 // The text can come from the command buffer, a remote client, or stdin.
-void	Cmd_ExecuteString(cstring text, cmd_source_t src);
+void Cmd_ExecuteString(cstring text, cmd_source_t src);
 
 // adds the current command line as a clc_stringcmd to the client message.
 // things like godmode, noclip, etc, are commands directed to the server,
 // so when they are typed in at the console, they will need to be forwarded.
-void	Cmd_ForwardToServer(void);
+void Cmd_ForwardToServer(void);
 
 // used by command functions to send output to either the graphics console or
 // passed as a print message to the client
-void	Cmd_Print(cstring text);
+void Cmd_Print(cstring text);
 
 void Cmd_Alias_f(void);
 bool checkAlias();

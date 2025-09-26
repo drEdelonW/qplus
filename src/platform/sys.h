@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sys.h -- non-portable functions
 #include "types.h"
-extern bool		isDedicated;
+extern bool  isDedicated;
 
 
 //
@@ -37,13 +37,17 @@ void Sys_FileClose(int handle);
 void Sys_FileSeek(int handle, int position);
 int Sys_FileRead(int handle, typeless_ptr dest, int count);
 int Sys_FileWrite(int handle, typeless_ptr data, int count);
-int	Sys_FileTime(cstring path);
+int Sys_FileTime(cstring path);
 void Sys_mkdir(cstring path);
 
 //
 // memory protection
 //
+#if 0
 void Sys_MakeCodeWriteable(uint32_t startaddr, uint32_t length);
+#else
+void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length);
+#endif
 
 //
 // system IO

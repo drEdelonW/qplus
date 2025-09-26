@@ -61,10 +61,10 @@ typedef in_addr_t* in_addr_p;
 #include "net_dgrm.h"
 
 // these two macros are to make the code more readable
-#define sfunc	net_landrivers[sock->landriver]
-#define dfunc	net_landrivers[net_landriverlevel]
+#define sfunc   net_landrivers[sock->landriver]
+#define dfunc   net_landrivers[_net_landriverlevel]
 
-static int net_landriverlevel;
+static int _net_landriverlevel;
 
 /* statistic counters */
 int	packetsSent = 0;
@@ -74,7 +74,7 @@ int receivedDuplicateCount = 0;
 int shortPacketCount = 0;
 int droppedDatagrams;
 
-static int myDriverLevel;
+static int _myDriverLevel;
 
 struct {
     uint32_t length;
@@ -462,10 +462,10 @@ void NET_Stats_f() {
 }
 
 
-static bool testInProgress = false;
-static int testPollCount;
-static int testDriver;
-static int testSocket;
+static bool _testInProgress = false;
+static int _testPollCount;
+static int _testDriver;
+static int _testSocket;
 
 static void Test_Poll();
 PollProcedure testPollProcedure = {
@@ -479,10 +479,10 @@ static void Test_Poll() {
     char name[32];
     char address[64];
 
-    net_landriverlevel = testDriver;
+    _net_landriverlevel = _testDriver;
 
     while (1) {
-        int len = dfunc.Read(testSocket, net_message.data, net_message.maxsize, &clientaddr);
+        int len = dfunc.Read(_testSocket, net_message.data, net_message.maxsize, &clientaddr);
         if (len < sizeof(int))
             break;
 
@@ -518,13 +518,13 @@ static void Test_Poll() {
         );
     }
 
-    testPollCount--;
-    if (testPollCount) {
+    _testPollCount--;
+    if (_testPollCount) {
         SchedulePollProcedure(&testPollProcedure, 0.1);
     }
     else {
-        dfunc.CloseSocket(testSocket);
-        testInProgress = false;
+        dfunc.CloseSocket(_testSocket);
+        _testInProgress = false;
     }
 }
 
@@ -532,7 +532,7 @@ static void Test_f() {
     int max = MAX_SCOREBOARD;
     qsockaddr_t sendaddr;
 
-    if (testInProgress)
+    if (_testInProgress)
         return;
 
     cstring host = Cmd_Argv(1);
@@ -541,9 +541,9 @@ static void Test_f() {
         int n = 0;
         for (; n < hostCacheCount; n++)
             if (Q_strcasecmp(host, hostcache[n].name) == 0) {
-                if (hostcache[n].driver != myDriverLevel)
+                if (hostcache[n].driver != _myDriverLevel)
                     continue;
-                net_landriverlevel = hostcache[n].ldriver;
+                _net_landriverlevel = hostcache[n].ldriver;
                 max = hostcache[n].maxusers;
                 Q_memcpy(&sendaddr, &hostcache[n].addr, sizeof(qsockaddr_t));
                 break;
@@ -552,25 +552,25 @@ static void Test_f() {
             goto JustDoIt;
     }
 
-    for (net_landriverlevel = 0; net_landriverlevel < net_numlandrivers; net_landriverlevel++) {
-        if (!net_landrivers[net_landriverlevel].initialized)
+    for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++) {
+        if (!net_landrivers[_net_landriverlevel].initialized)
             continue;
 
         // see if we can resolve the host name
         if (dfunc.GetAddrFromName(host, &sendaddr) != -1)
             break;
     }
-    if (net_landriverlevel == net_numlandrivers)
+    if (_net_landriverlevel == net_numlandrivers)
         return;
 
 JustDoIt:
-    testSocket = dfunc.OpenSocket(0);
-    if (testSocket == -1)
+    _testSocket = dfunc.OpenSocket(0);
+    if (_testSocket == -1)
         return;
 
-    testInProgress = true;
-    testPollCount = 20;
-    testDriver = net_landriverlevel;
+    _testInProgress = true;
+    _testPollCount = 20;
+    _testDriver = _net_landriverlevel;
 
     for (int n = 0; n < max; n++) {
         SZ_Clear(&net_message);
@@ -579,16 +579,16 @@ JustDoIt:
         MSG_WriteByte(&net_message, CCREQ_PLAYER_INFO);
         MSG_WriteByte(&net_message, n);
         *((int*)net_message.data) = BigLong(NETFLAG_CTL | (net_message.cursize & NETFLAG_LENGTH_MASK));
-        dfunc.Write(testSocket, net_message.data, net_message.cursize, &sendaddr);
+        dfunc.Write(_testSocket, net_message.data, net_message.cursize, &sendaddr);
     }
     SZ_Clear(&net_message);
     SchedulePollProcedure(&testPollProcedure, 0.1);
 }
 
 
-static bool test2InProgress = false;
-static int test2Driver;
-static int test2Socket;
+static bool _test2InProgress = false;
+static int _test2Driver;
+static int _test2Socket;
 
 static void Test2_Poll();
 PollProcedure test2PollProcedure = {
@@ -602,10 +602,10 @@ static void Test2_Poll() {
     char name[256];
     char value[256];
 
-    net_landriverlevel = test2Driver;
+    _net_landriverlevel = _test2Driver;
     name[0] = 0;
 
-    int len = dfunc.Read(test2Socket, net_message.data, net_message.maxsize, &clientaddr);
+    int len = dfunc.Read(_test2Socket, net_message.data, net_message.maxsize, &clientaddr);
     if (len < sizeof(int))
         goto Reschedule;
 
@@ -633,7 +633,7 @@ static void Test2_Poll() {
     MSG_WriteByte(&net_message, CCREQ_RULE_INFO);
     MSG_WriteString(&net_message, name);
     *((int*)net_message.data) = BigLong(NETFLAG_CTL | (net_message.cursize & NETFLAG_LENGTH_MASK));
-    dfunc.Write(test2Socket, net_message.data, net_message.cursize, &clientaddr);
+    dfunc.Write(_test2Socket, net_message.data, net_message.cursize, &clientaddr);
     SZ_Clear(&net_message);
 
 Reschedule:
@@ -643,15 +643,15 @@ Reschedule:
 Error:
     Con_Printf("Unexpected repsonse to Rule Info request\n");
 Done:
-    dfunc.CloseSocket(test2Socket);
-    test2InProgress = false;
+    dfunc.CloseSocket(_test2Socket);
+    _test2InProgress = false;
     return;
 }
 
 static void Test2_f() {
     qsockaddr_t sendaddr;
 
-    if (test2InProgress)
+    if (_test2InProgress)
         return;
 
     cstring host = Cmd_Argv(1);
@@ -660,9 +660,9 @@ static void Test2_f() {
         int n = 0;
         for (; n < hostCacheCount; n++)
             if (Q_strcasecmp(host, hostcache[n].name) == 0) {
-                if (hostcache[n].driver != myDriverLevel)
+                if (hostcache[n].driver != _myDriverLevel)
                     continue;
-                net_landriverlevel = hostcache[n].ldriver;
+                _net_landriverlevel = hostcache[n].ldriver;
                 Q_memcpy(&sendaddr, &hostcache[n].addr, sizeof(qsockaddr_t));
                 break;
             }
@@ -670,24 +670,24 @@ static void Test2_f() {
             goto JustDoIt;
     }
 
-    for (net_landriverlevel = 0; net_landriverlevel < net_numlandrivers; net_landriverlevel++) {
-        if (!net_landrivers[net_landriverlevel].initialized)
+    for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++) {
+        if (!net_landrivers[_net_landriverlevel].initialized)
             continue;
 
         // see if we can resolve the host name
         if (dfunc.GetAddrFromName(host, &sendaddr) != -1)
             break;
     }
-    if (net_landriverlevel == net_numlandrivers)
+    if (_net_landriverlevel == net_numlandrivers)
         return;
 
 JustDoIt:
-    test2Socket = dfunc.OpenSocket(0);
-    if (test2Socket == -1)
+    _test2Socket = dfunc.OpenSocket(0);
+    if (_test2Socket == -1)
         return;
 
-    test2InProgress = true;
-    test2Driver = net_landriverlevel;
+    _test2InProgress = true;
+    _test2Driver = _net_landriverlevel;
 
     SZ_Clear(&net_message);
     // save space for the header, filled in later
@@ -695,14 +695,14 @@ JustDoIt:
     MSG_WriteByte(&net_message, CCREQ_RULE_INFO);
     MSG_WriteString(&net_message, "");
     *((int*)net_message.data) = BigLong(NETFLAG_CTL | (net_message.cursize & NETFLAG_LENGTH_MASK));
-    dfunc.Write(test2Socket, net_message.data, net_message.cursize, &sendaddr);
+    dfunc.Write(_test2Socket, net_message.data, net_message.cursize, &sendaddr);
     SZ_Clear(&net_message);
     SchedulePollProcedure(&test2PollProcedure, 0.05);
 }
 
 
 int Datagram_Init() {
-    myDriverLevel = net_driverlevel;
+    _myDriverLevel = net_driverlevel;
     Cmd_AddCommand("net_stats", NET_Stats_f);
 
     if (COM_CheckParm("-nolan"))
@@ -873,10 +873,8 @@ static qsocket_p _Datagram_CheckNewConnections() {
         return NULL;
     }
 
-    if (command != CCREQ_CONNECT)
-        return NULL;
-
-    if (Q_strcmp(MSG_ReadString(), "QUAKE") != 0)
+    if ((command != CCREQ_CONNECT) ||
+        (Q_strcmp(MSG_ReadString(), "QUAKE") != 0))
         return NULL;
 
     if (MSG_ReadByte() != NET_PROTOCOL_VERSION) {
@@ -968,7 +966,7 @@ static qsocket_p _Datagram_CheckNewConnections() {
 
     // everything is allocated, just fill in the details
     sock->socket = newsock;
-    sock->landriver = net_landriverlevel;
+    sock->landriver = _net_landriverlevel;
     sock->addr = clientaddr;
     Q_strcpy(sock->address, dfunc.AddrToString(&clientaddr));
 
@@ -990,19 +988,16 @@ static qsocket_p _Datagram_CheckNewConnections() {
 qsocket_p Datagram_CheckNewConnections() {
     qsocket_p ret = NULL;
 
-    for (net_landriverlevel = 0; net_landriverlevel < net_numlandrivers; net_landriverlevel++)
-        if (net_landrivers[net_landriverlevel].initialized)
-            if ((ret = _Datagram_CheckNewConnections()) != NULL)
-                break;
+    for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++)
+        if ((net_landrivers[_net_landriverlevel].initialized) &&
+            ((ret = _Datagram_CheckNewConnections()) != NULL))
+            break;
     return ret;
 }
 
 
 static void _Datagram_SearchForHosts(bool xmit) {
-    int		ret;
-    qsockaddr_t readaddr;
     qsockaddr_t myaddr;
-
     dfunc.GetSocketAddr(dfunc.controlSock, &myaddr);
     if (xmit) {
         SZ_Clear(&net_message);
@@ -1016,36 +1011,30 @@ static void _Datagram_SearchForHosts(bool xmit) {
         SZ_Clear(&net_message);
     }
 
+    int ret;
+    qsockaddr_t readaddr;
     while ((ret = dfunc.Read(dfunc.controlSock, net_message.data, net_message.maxsize, &readaddr)) > 0) {
         if (ret < sizeof(int))
             continue;
         net_message.cursize = ret;
 
-        // don't answer our own query
-        if (dfunc.AddrCompare(&readaddr, &myaddr) >= 0)
-            continue;
-
-        // is the cache full?
-        if (hostCacheCount == HOSTCACHESIZE)
+        if ((dfunc.AddrCompare(&readaddr, &myaddr) >= 0) ||  // don't answer our own query
+            (hostCacheCount == HOSTCACHESIZE))    // is the cache full?
             continue;
 
         MSG_BeginReading();
         int control = BigLong(*((int*)net_message.data));
         MSG_ReadLong();
-        if (control == -1)
-            continue;
-        if ((control & (~NETFLAG_LENGTH_MASK)) != NETFLAG_CTL)
-            continue;
-        if ((control & NETFLAG_LENGTH_MASK) != ret)
-            continue;
-
-        if (MSG_ReadByte() != CCREP_SERVER_INFO)
+        if ((control == -1) ||
+            ((control & (~NETFLAG_LENGTH_MASK)) != NETFLAG_CTL) ||
+            ((control & NETFLAG_LENGTH_MASK) != ret) ||
+            (MSG_ReadByte() != CCREP_SERVER_INFO))
             continue;
 
         dfunc.GetAddrFromName(MSG_ReadString(), &readaddr);
         // search the cache for this server
         int n = 0;
-        for (n = 0; n < hostCacheCount; n++)
+        for (; n < hostCacheCount; n++)
             if (dfunc.AddrCompare(&readaddr, &hostcache[n].addr) == 0)
                 break;
 
@@ -1067,7 +1056,7 @@ static void _Datagram_SearchForHosts(bool xmit) {
         }
         Q_memcpy(&hostcache[n].addr, &readaddr, sizeof(qsockaddr_t));
         hostcache[n].driver = net_driverlevel;
-        hostcache[n].ldriver = net_landriverlevel;
+        hostcache[n].ldriver = _net_landriverlevel;
         Q_strcpy(hostcache[n].cname, dfunc.AddrToString(&readaddr));
 
         // check for a name conflict
@@ -1089,10 +1078,10 @@ static void _Datagram_SearchForHosts(bool xmit) {
 }
 
 void Datagram_SearchForHosts(bool xmit) {
-    for (net_landriverlevel = 0; net_landriverlevel < net_numlandrivers; net_landriverlevel++) {
+    for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++) {
         if (hostCacheCount == HOSTCACHESIZE)
             break;
-        if (net_landrivers[net_landriverlevel].initialized)
+        if (net_landrivers[_net_landriverlevel].initialized)
             _Datagram_SearchForHosts(xmit);
     }
 }
@@ -1116,7 +1105,7 @@ static qsocket_p _Datagram_Connect(cstring host) {
     if (sock == NULL)
         goto ErrorReturn2;
     sock->socket = newsock;
-    sock->landriver = net_landriverlevel;
+    sock->landriver = _net_landriverlevel;
 
     // connect to the host
     if (dfunc.Connect(newsock, &sendaddr) == -1)
@@ -1246,8 +1235,8 @@ ErrorReturn2:
 qsocket_p Datagram_Connect(cstring host) {
     qsocket_p ret = NULL;
 
-    for (net_landriverlevel = 0; net_landriverlevel < net_numlandrivers; net_landriverlevel++)
-        if ((net_landrivers[net_landriverlevel].initialized) &&
+    for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++)
+        if ((net_landrivers[_net_landriverlevel].initialized) &&
             ((ret = _Datagram_Connect(host)) != NULL))
             break;
     return ret;

@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 void Cmd_ForwardToServer();
 
-#define	CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/
+#define CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/
 
 int32_t     trashtest;
 int32_t* trashspot;
@@ -73,7 +73,7 @@ static sizebuf_t cmd_text;
     ============
 */
 void Cbuf_Init(void) {
-    SZ_Alloc(&cmd_text, CMD_BUSS_SIZE);		// space for commands and script files
+    SZ_Alloc(&cmd_text, CMD_BUSS_SIZE);  // space for commands and script files
 }
 
 
@@ -114,7 +114,7 @@ void Cbuf_InsertText(cstring text) {
         SZ_Clear(&cmd_text);
     }
     else {
-        temp = NULL;	// shut up compiler
+        temp = NULL; // shut up compiler
     }
 
     // add the entire text of the file
@@ -133,10 +133,10 @@ void Cbuf_InsertText(cstring text) {
     ============
 */
 void Cbuf_Execute(void) {
-    int32_t		i;
+    int32_t  i;
     cstring text;
-    char	line[1024];
-    int32_t		quotes;
+    char line[1024];
+    int32_t  quotes;
 
     while (cmd_text.cursize) {
         // find a \n or ; line break
@@ -210,7 +210,7 @@ void Cmd_StuffCmds_f(void) {
     int s = 0;
     for (int i = 1; i < com_argc; i++) {
         if (!com_argv[i])
-            continue;		// NEXTSTEP nulls out -NXHost
+            continue;  // NEXTSTEP nulls out -NXHost
         s += Q_strlen(com_argv[i]) + 1;
     }
     if (!s)
@@ -327,17 +327,17 @@ struct cmd_function_s {
 };
 
 
-#define	MAX_ARGS		80
+#define MAX_ARGS  80
 
 static int cmd_argc;
 cstring cmd_argv[MAX_ARGS];
 static cstring cmd_null_string = "";
 static cstring cmd_args = NULL;
 
-cmd_source_t	cmd_source;
+cmd_source_t cmd_source;
 
 
-static cmd_function_p cmd_functions;		// possible commands to execute
+static cmd_function_p cmd_functions;  // possible commands to execute
 
 /*
     ============
@@ -412,7 +412,7 @@ void Cmd_TokenizeString(cstring text) {
             text++;
         }
 
-        if (*text == '\n') {	// a newline seperates commands in the buffer
+        if (*text == '\n') { // a newline seperates commands in the buffer
             text++;
             break;
         }
@@ -446,7 +446,7 @@ void Cmd_TokenizeString(cstring text) {
     ============
 */
 void Cmd_AddCommand(cstring cmd_name, xcommand_t function) {
-    if (host_initialized)	// because hunk allocation would get stomped
+    if (host_initialized) // because hunk allocation would get stomped
         Sys_Error("Cmd_AddCommand after host_initialized");
 
     // fail if the command is a variable name
@@ -521,7 +521,7 @@ void Cmd_ExecuteString(cstring text, cmd_source_t src) {
 
     // execute the command line
     if (!Cmd_Argc()) {
-        return;		// no tokens
+        return;  // no tokens
     }
 
     // check functions
@@ -568,7 +568,7 @@ void Cmd_ForwardToServer(void) {
     }
 
     if (cls.demoplayback) {
-        return;		// not really connected
+        return;  // not really connected
     }
 
     MSG_WriteByte(&cls.message, clc_stringcmd);
