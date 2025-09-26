@@ -35,11 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //define	PARANOID			// speed sapping error checking
 
-#ifdef QUAKE2
-    #define	GAMENAME	"id1"		/* directory to look in by default */
-#else
-    #define	GAMENAME	"id1"
-#endif
+
 
 #include <math.h>
 #include <string.h>
@@ -76,7 +72,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // #define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings
 
-#define MAX_NUM_ARGVS	50
 
 #if 0
     // up / down

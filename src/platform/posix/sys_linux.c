@@ -18,6 +18,9 @@
 #include <errno.h>
 
 #include "quakedef.h"
+#include "sys.h"
+#include "cvar_q1.h"
+
 
 qboolean isDedicated;
 

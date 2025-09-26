@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // view.c -- player eye positioning
 
+
 #include <stdlib.h>  // for atoi()
 #include "view.h"
 #include "client.h"
@@ -31,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "cmd.h"
 #include "chase.h"
+#include "cvar_q1.h"
 
 /*
 

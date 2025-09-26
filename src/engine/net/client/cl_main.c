@@ -19,8 +19,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // cl_main.c  -- client main loop
 
-#include "quakedef.h"
+// #include "quakedef.h"
+#include <string.h>
+#include <stdlib.h>
+#include "client.h"
+#include "server.h"
 #include "chase.h"
+#include "host.h"
+#include "console.h"
+#include "sound.h"
+#include "msg.h"
+#include "common.h"
+#include "protocol.h"
+#include "cmd.h"
+#include "input.h"
 
 
 // we need to declare some mouse variables here, because the menu system

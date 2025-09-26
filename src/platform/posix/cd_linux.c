@@ -34,6 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <linux/cdrom.h>
 
 #include "quakedef.h"
+#include "cvar_q1.h"
+
 
 static qboolean cdValid = false;
 static qboolean	playing = false;

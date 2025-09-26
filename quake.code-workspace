@@ -57,7 +57,16 @@
 			"input.h": "c",
 			"cstdlib": "c",
 			"cdaudio.h": "c",
-			"view.h": "c"
+			"view.h": "c",
+			"link.h": "c",
+			"endian_tools.h": "c",
+			"msg.h": "c",
+			"q_tools.h": "c",
+			"console.h": "c",
+			"protocol.h": "c",
+			"render.h": "c",
+			"enginedefs.h": "c",
+			"system_error": "c"
 		}
 	}
 }

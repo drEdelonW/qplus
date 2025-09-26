@@ -19,6 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // chase.c -- chase camera code
 
+#include <stdio.h>
+#include <string.h>
 #include "quakedef.h"
 #include "chase.h"
 #include "mathlib.h"
@@ -26,8 +28,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"        // qbulean
 #include "cvar.h"
 #include "angles_indices.h"
-#include <stdio.h>
-#include <string.h>
+#include "cvar_q1.h"
+
 
 vec3_t chase_pos;
 vec3_t chase_angles;

@@ -4,6 +4,8 @@ INCLUDES += $(SRC_DIR)
 # INCLUDES += /opt/homebrew/include
 
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
+    $(eval GAMESPEC_DIR = $(ENG_DIR)/game_specific) $(eval INCLUDES += $(GAMESPEC_DIR))
+
     $(eval CORE_DIR = $(ENG_DIR)/core) $(eval INCLUDES += $(CORE_DIR))
         $(eval CLI_DIR = $(CORE_DIR)/console) $(eval INCLUDES += $(CLI_DIR))
             $(eval CVAR_DIR = $(CLI_DIR)/cvar) $(eval INCLUDES += $(CVAR_DIR))

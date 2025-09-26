@@ -19,8 +19,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // common.c -- misc functions used in client and server
 
-#include "quakedef.h"
+// #include "quakedef.h"
+
+#include "common.h"
 #include "cvar_q1.h"
+#include "platformdefs.h"
+#include <string.h>
+#include <stdarg.h>
+#include "sys.h"
+#include "crc.h"
+#include "console.h"
+#include "cmd.h"
+#include "draw.h"
+#include "endian_tools.h"
+#include "host.h"
+#include "gamedefs.h"
 
 
 #define NUM_SAFE_ARGVS  7
@@ -40,9 +53,7 @@ static cstring safeargvs[NUM_SAFE_ARGVS] = {
 
 
 bool        com_modified;   // set true if using non-id files
-
 bool		proghack;
-
 int32_t             static_registered = 1;  // only for startup check, then set
 
 bool		msg_suppress_1 = 0;

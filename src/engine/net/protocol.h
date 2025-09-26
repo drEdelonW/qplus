@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // protocol.h -- communications protocols
 
 #define	PROTOCOL_VERSION	15
-enum{
+enum {
 	FAST_MASK = 0x7F,
 	FAST_FLAG = 0x80
 };

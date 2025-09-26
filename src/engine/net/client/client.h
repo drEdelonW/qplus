@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // client.h
+#include <stdio.h>
 #include "mathlib.h"
 #include "enginedefs.h"
 #include "platformdefs.h"
@@ -27,7 +28,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vid.h"
 #include "bspfile.h"
 #include "render.h"
-#include "cvar_q1.h"
+// #include "cvar_q1.h"
+#include "endian_tools.h"
+
 
 typedef struct {
     vec3_t viewangles;

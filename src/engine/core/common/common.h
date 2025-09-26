@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "platformdefs.h"
 #include "types.h"
 
-#include "endian_tools.h"
 #include "msg.h"
 #include "q_tools.h"
 #include "sizebuf.h"
@@ -38,17 +37,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //============================================================================
 
-extern	char		com_token[1024];
-extern	bool	com_eof;
+extern char com_token[1024];
+extern bool com_eof;
 
 cstring COM_Parse(cstring data);
 
-extern	int		com_argc;
-extern	char	**com_argv;
+extern int com_argc;
+extern char** com_argv;
 
 int COM_CheckParm(cstring parm);
 void COM_Init(cstring path);
-void COM_InitArgv(int argc, cstring *argv);
+void COM_InitArgv(int argc, cstring* argv);
 
 cstring COM_SkipPath(cstring pathname);
 void COM_StripExtension(cstring in, cstring out);
@@ -62,9 +61,8 @@ cstring va(cstring format, ...);
 //============================================================================
 
 extern int32_t com_filesize;
-struct cache_user_s;
 
-extern	char	com_gamedir[MAX_OSPATH];
+extern char com_gamedir[MAX_OSPATH];
 
 void COM_WriteFile(cstring filename, typeless_ptr data, int32_t len);
 int COM_OpenFile(cstring filename, int* hndl);
@@ -77,6 +75,6 @@ uint8_p COM_LoadHunkFile(cstring path);
 void COM_LoadCacheFile(cstring path, cache_user_p cu);
 
 
-extern	struct cvar_s	registered;
+extern struct cvar_s registered;
 
-extern bool		standard_quake, rogue, hipnotic;
+extern bool  standard_quake, rogue, hipnotic;
