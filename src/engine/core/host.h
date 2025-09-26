@@ -13,7 +13,6 @@ extern	quakeparms_t host_parms;
 extern	bool    host_initialized;		// true if into command execution
 extern	double  host_frametime;
 
-#include "byte_t.h"
 extern	uint8_p host_basepal;
 extern	uint8_p host_colormap;
 extern	int32_t host_framecount;	// incremented every frame, never reset
@@ -24,7 +23,7 @@ void Host_ClearMemory();
 void Host_ServerFrame();
 void Host_InitCommands();
 void Host_Init(quakeparms_p parms);
-void Host_Shutdown(void);
+void Host_Shutdown();
 void Host_Error(cstring error, ...);
 void Host_EndGame(cstring message, ...);
 void Host_Frame(float time);

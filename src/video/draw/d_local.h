@@ -79,15 +79,15 @@ void D_SpriteDrawSpans(sspan_t* pspan);
 void D_DrawSkyScans8(espan_p   pspan);
 void D_DrawSkyScans16(espan_p  pspan);
 
-void R_ShowSubDiv(void);
-extern void(*prealspandrawer)(void);
+void R_ShowSubDiv();
+extern void(*prealspandrawer)();
 surfcache_p D_CacheSurface(msurface_t* surface, int miplevel);
 
 extern int D_MipLevelForScale(float scale);
 
 #if id386
-extern void D_PolysetAff8Start(void);
-extern void D_PolysetAff8End(void);
+extern void D_PolysetAff8Start();
+extern void D_PolysetAff8End();
 #endif
 
 extern int16_p d_pzbuffer;

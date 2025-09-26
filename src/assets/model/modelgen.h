@@ -48,7 +48,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define ALIAS_VERSION	6
 
-#define ALIAS_ONSEAM				0x0020
+// enum { ALIAS_ONSEAM = 0x0020 };
 
 // must match definition in spritegn.h
 #ifndef SYNCTYPE_T
@@ -70,21 +70,21 @@ typedef enum {
 } aliasskintype_t;
 
 typedef struct {
-    int32_t	ident;
-    int32_t	version;
-    vec3_t	scale;
-    vec3_t	scale_origin;
-    float	boundingradius;
-    vec3_t		eyeposition;
-    int32_t			numskins;
-    int32_t			skinwidth;
-    int32_t			skinheight;
-    int32_t			numverts;
-    int32_t			numtris;
-    int32_t			numframes;
-    synctype_t	synctype;
-    int32_t			flags;
-    float		size;
+    int32_t ident;
+    int32_t version;
+    vec3_t  scale;
+    vec3_t  scale_origin;
+    float   boundingradius;
+    vec3_t  eyeposition;
+    int32_t numskins;
+    int32_t skinwidth;
+    int32_t skinheight;
+    int32_t numverts;
+    int32_t numtris;
+    int32_t numframes;
+    synctype_t  synctype;
+    int32_t flags;
+    float   size;
 } mdl_t;
 typedef mdl_t* mdl_p;
 
@@ -103,7 +103,7 @@ typedef struct dtriangle_s {
 } dtriangle_t;
 typedef dtriangle_t* dtriangle_p;
 
-#define DT_FACES_FRONT				0x0010
+#define DT_FACES_FRONT  0x0010
 
 // This mirrors trivert_t in trilib.h, is present so Quake knows how to
 // load this data
@@ -115,21 +115,21 @@ typedef struct {
 typedef trivertx_t* trivertx_p;
 
 typedef struct {
-    trivertx_t	bboxmin;	// lightnormal isn't used
-    trivertx_t	bboxmax;	// lightnormal isn't used
-    char		name[16];	// frame name from grabbing
+    trivertx_t  bboxmin;    // lightnormal isn't used
+    trivertx_t  bboxmax;    // lightnormal isn't used
+    char        name[16];   // frame name from grabbing
 } daliasframe_t;
 typedef daliasframe_t* daliasframe_p;
 
 typedef struct {
-    int32_t			numframes;
-    trivertx_t	bboxmin;	// lightnormal isn't used
-    trivertx_t	bboxmax;	// lightnormal isn't used
+    int32_t     numframes;
+    trivertx_t  bboxmin;    // lightnormal isn't used
+    trivertx_t  bboxmax;    // lightnormal isn't used
 } daliasgroup_t;
 typedef daliasgroup_t* daliasgroup_p;
 
 typedef struct {
-    int32_t			numskins;
+    int32_t numskins;
 } daliasskingroup_t;
 typedef daliasskingroup_t* daliasskingroup_p;
 
@@ -139,12 +139,12 @@ typedef struct {
 typedef daliasinterval_t* daliasinterval_p;
 
 typedef struct {
-    float	interval;
+    float interval;
 } daliasskininterval_t;
 typedef daliasskininterval_t* daliasskininterval_p;
 
 typedef struct {
-    aliasframetype_t	type;
+    aliasframetype_t type;
 } daliasframetype_t;
 typedef daliasframetype_t* daliasframetype_p;
 
@@ -153,6 +153,6 @@ typedef struct {
 } daliasskintype_t;
 typedef daliasskintype_t* daliasskintype_p;
 
-#define IDPOLYHEADER	(('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
+#define IDPOLYHEADER    (('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
 // little-endian "IDPO"
 

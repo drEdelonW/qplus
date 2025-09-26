@@ -17,6 +17,8 @@
 #define	MIPLEVELS	4
 #define	MAXLIGHTMAPS	4
 
+#define	SAVEGAME_COMMENT_LENGTH	39
+
 typedef enum {
     AMBIENT_WATER = 0,
     AMBIENT_SKY   = 1,

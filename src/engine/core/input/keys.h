@@ -18,6 +18,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+#include "types.h"
+#include <stdio.h>
 
 typedef enum keycode_e {
     K_UNKNOWN = -1,
@@ -129,8 +131,8 @@ extern  int key_count;			// incremented every key event
 extern  int key_lastpress;
 
 void Key_Event(keycode_t key, bool down);
-void Key_Init(void);
+void Key_Init();
 void Key_WriteBindings(FILE* f);
 void Key_SetBinding(keycode_t keynum, cstring binding);
-void Key_ClearStates(void);
+void Key_ClearStates();
 

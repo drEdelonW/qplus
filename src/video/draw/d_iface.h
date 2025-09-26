@@ -79,7 +79,7 @@ typedef struct polydesc_s {
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct finalvert_s {
 	int     v[6];   // u, v, s, t, l, 1/z
-	int     flags;
+	int     flags;  //alias_clip_flags_t
 	float   reserved;
 } finalvert_t;
 typedef finalvert_t* finalvert_p;

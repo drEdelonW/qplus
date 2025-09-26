@@ -38,7 +38,7 @@
 
 
 // allocates an initial text buffer that will grow as needed
-void Cbuf_Init(void);
+void Cbuf_Init();
 
 // as new commands are generated from the console or keybindings,
 // the text is added to the end of the command buffer.
@@ -53,7 +53,7 @@ void Cbuf_InsertText(cstring text);
 // them through Cmd_ExecuteString.  Stops when the buffer is empty.
 // Normally called once per frame, but may be explicitly invoked.
 // Do not call inside a command function!
-void Cbuf_Execute(void);
+void Cbuf_Execute();
 
 //===========================================================================
 
@@ -66,7 +66,7 @@ void Cbuf_Execute(void);
     not apropriate.
 */
 
-typedef void(*xcommand_t)(void);
+typedef void(*xcommand_t)();
 
 typedef enum {
     src_client,  // came in over a net connection as a clc_stringcmd
@@ -76,7 +76,7 @@ typedef enum {
 
 extern cmd_source_t cmd_source;
 
-void Cmd_Init(void);
+void Cmd_Init();
 
 // called by the init functions of other parts of the program to
 // register commands and functions to call for them.
@@ -93,9 +93,9 @@ cstring Cmd_CompleteCommand(cstring partial);
 // The functions that execute commands get their parameters with these
 // functions. Cmd_Argv() will return an empty string, not a NULL
 // if arg > argc, so string operations are allways safe.
-int  Cmd_Argc(void);
+int  Cmd_Argc();
 cstring Cmd_Argv(int arg);
-cstring Cmd_Args(void);
+cstring Cmd_Args();
 
 // Returns the position (1 to argc-1) in the command's argument list
 // where the given parameter apears, or 0 if not present
@@ -112,12 +112,12 @@ void Cmd_ExecuteString(cstring text, cmd_source_t src);
 // adds the current command line as a clc_stringcmd to the client message.
 // things like godmode, noclip, etc, are commands directed to the server,
 // so when they are typed in at the console, they will need to be forwarded.
-void Cmd_ForwardToServer(void);
+void Cmd_ForwardToServer();
 
 // used by command functions to send output to either the graphics console or
 // passed as a print message to the client
 void Cmd_Print(cstring text);
 
-void Cmd_Alias_f(void);
+void Cmd_Alias_f();
 bool checkAlias();
 cstring CopyString(cstring in);

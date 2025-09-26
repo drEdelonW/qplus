@@ -51,7 +51,7 @@ static uint8_t  _maxTrack;
 static int  _cdfile = -1;
 static char _cd_dev[64] = "/dev/cdrom";
 
-static void CDAudio_Eject(void) {
+static void CDAudio_Eject() {
     if ((_cdfile == -1) || !_enabled)
         return; // no cd init'd
 
@@ -60,7 +60,7 @@ static void CDAudio_Eject(void) {
 }
 
 
-static void CDAudio_CloseDoor(void) {
+static void CDAudio_CloseDoor() {
     if ((_cdfile == -1) || !_enabled)
         return; // no cd init'd
 
@@ -68,7 +68,7 @@ static void CDAudio_CloseDoor(void) {
         Con_DPrintf("ioctl cdromclosetray failed\n");
 }
 
-static int CDAudio_GetAudioDiskInfo(void) {
+static int CDAudio_GetAudioDiskInfo() {
     struct cdrom_tochdr tochdr;
 
     _cdValid = false;
@@ -150,7 +150,7 @@ void CDAudio_Play(uint8_t track, qboolean looping) {
 }
 
 
-void CDAudio_Stop(void) {
+void CDAudio_Stop() {
     if (((_cdfile == -1) || !_enabled) ||
         (!_playing))
         return;
@@ -162,7 +162,7 @@ void CDAudio_Stop(void) {
     _playing = false;
 }
 
-void CDAudio_Pause(void) {
+void CDAudio_Pause() {
     if ((_cdfile == -1) || !_enabled)
         return;
 
@@ -177,7 +177,7 @@ void CDAudio_Pause(void) {
 }
 
 
-void CDAudio_Resume(void) {
+void CDAudio_Resume() {
     if ((_cdfile == -1) || !_enabled)
         return;
 
@@ -294,7 +294,7 @@ static void CD_f() {
     }
 }
 
-void CDAudio_Update(void) {
+void CDAudio_Update() {
     if (!_enabled)
         return;
 
@@ -329,7 +329,7 @@ void CDAudio_Update(void) {
     }
 }
 
-int CDAudio_Init(void) {
+int CDAudio_Init() {
     if ((cls.state == ca_dedicated) ||
         (COM_CheckParm("-nocdaudio")))
         return -1;
@@ -364,7 +364,7 @@ int CDAudio_Init(void) {
 }
 
 
-void CDAudio_Shutdown(void) {
+void CDAudio_Shutdown() {
     if (!_initialized)
         return;
     CDAudio_Stop();

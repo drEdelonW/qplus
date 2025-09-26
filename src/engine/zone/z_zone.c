@@ -190,7 +190,7 @@ void Z_Print(memzone_p zone) {
 	Z_CheckHeap
 	========================
 */
-void Z_CheckHeap(void) {
+void Z_CheckHeap() {
 	for (memblock_p block = mainzone->blocklist.next; ; block = block->next) {
 		if (block->next == &mainzone->blocklist)
 			break;			// all blocks have been hit

@@ -1,5 +1,6 @@
-#include <string.h>
 #include "cmd.h"
+
+#include <string.h>
 #include "console.h"
 #include "types.h"
 #include "q_tools.h"
@@ -21,7 +22,7 @@ struct cmdalias_s {
 static cmdalias_p cmd_alias = NULL; // alias linked list entry point
 
 
-void Cmd_Alias_f(void) {
+void Cmd_Alias_f() {
     cmdalias_p aliasIt;
     char        cmd[1024];
 

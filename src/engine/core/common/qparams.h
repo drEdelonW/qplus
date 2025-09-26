@@ -11,7 +11,7 @@ typedef struct {
     cstring basedir;
     cstring cachedir;  // for development over ISDN lines
     int     argc;
-    char**  argv;
+    cstring* argv;
     typeless_ptr membase;
     int32_t memsize;
 } quakeparms_t;

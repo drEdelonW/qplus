@@ -51,8 +51,8 @@ bool slistLocal = true;
 static double slistStartTime;
 static int slistLastShown;
 
-static void Slist_Send(void);
-static void Slist_Poll(void);
+static void Slist_Send();
+static void Slist_Poll();
 PollProcedure slistSendProcedure = { NULL, 0.0, Slist_Send };
 PollProcedure slistPollProcedure = { NULL, 0.0, Slist_Poll };
 
@@ -79,7 +79,7 @@ int	net_driverlevel;
 
 double net_time;
 
-double SetNetTime(void) {
+double SetNetTime() {
     net_time = Sys_FloatTime();
     return net_time;
 }
@@ -223,14 +223,14 @@ static void NET_Port_f() {
 }
 
 
-static void PrintSlistHeader(void) {
+static void PrintSlistHeader() {
     Con_Printf("Server          Map             Users\n");
     Con_Printf("--------------- --------------- -----\n");
     slistLastShown = 0;
 }
 
 
-static void PrintSlist(void) {
+static void PrintSlist() {
     int n = slistLastShown;
     for (; n < hostCacheCount; n++) {
         if (hostcache[n].maxusers)
@@ -242,7 +242,7 @@ static void PrintSlist(void) {
 }
 
 
-static void PrintSlistTrailer(void) {
+static void PrintSlistTrailer() {
     if (hostCacheCount)
         Con_Printf("== end list ==\n\n");
     else
@@ -269,7 +269,7 @@ void NET_Slist_f() {
 }
 
 
-static void Slist_Send(void) {
+static void Slist_Send() {
     for (net_driverlevel = 0; net_driverlevel < net_numdrivers; net_driverlevel++) {
         if ((!slistLocal && (net_driverlevel == 0)) ||
             (net_drivers[net_driverlevel].initialized == false))
@@ -282,7 +282,7 @@ static void Slist_Send(void) {
 }
 
 
-static void Slist_Poll(void) {
+static void Slist_Poll() {
     for (net_driverlevel = 0; net_driverlevel < net_numdrivers; net_driverlevel++) {
         if ((!slistLocal && (net_driverlevel == 0)) ||
             (net_drivers[net_driverlevel].initialized == false))
@@ -799,7 +799,7 @@ void NET_Shutdown() {
 
 static PollProcedure* pollProcedureList = NULL;
 
-void NET_Poll(void) {
+void NET_Poll() {
     if (!configRestored) {
         if (serialAvailable) {
             bool useModem;

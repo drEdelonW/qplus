@@ -2,7 +2,6 @@
 #include "zone_prv.h"
 
 #include <string.h>
-#include "byte_t.h"
 #include "qboolean.h"
 #include "sys.h"
 #include "console.h"

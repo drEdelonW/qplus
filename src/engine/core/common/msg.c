@@ -1,8 +1,8 @@
 #include "msg.h"
 #include "q_tools.h"
 #include "endian_tools.h"
-// #include "net.h"
-extern sizebuf_t net_message;
+#include "net.h"
+
 /*
 ==============================================================================
 

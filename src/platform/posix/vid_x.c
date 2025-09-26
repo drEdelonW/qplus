@@ -101,7 +101,7 @@ static int32_t X11_buffersize;
 int vid_surfcachesize;
 typeless_ptr vid_surfcache;
 
-extern void (*vid_menudrawfn)(void);
+extern void (*vid_menudrawfn)();
 extern void (*vid_menukeyfn)(int key);
 void VID_MenuKey(int key);
 
@@ -294,7 +294,7 @@ static Cursor CreateNullCursor(Display* display, Window root) {
 	return cursor;
 }
 
-void ResetFrameBuffer(void) {
+void ResetFrameBuffer() {
 	int mem;
 	int pwidth;
 
@@ -348,7 +348,7 @@ void ResetFrameBuffer(void) {
 
 }
 
-void ResetSharedFrameBuffers(void) {
+void ResetSharedFrameBuffers() {
 
 	int size;
 	int key;
@@ -834,7 +834,7 @@ int config_notify = 0;
 int config_notify_width;
 int config_notify_height;
 
-void GetEvent(void) {
+void GetEvent() {
 	XEvent x_event;
 	int b;
 
@@ -1010,21 +1010,21 @@ void	VID_Update(vrect_p rects) {
 
 static int dither;
 
-void VID_DitherOn(void) {
+void VID_DitherOn() {
 	if (dither == 0) {
 		vid.recalc_refdef = 1;
 		dither = 1;
 	}
 }
 
-void VID_DitherOff(void) {
+void VID_DitherOff() {
 	if (dither) {
 		vid.recalc_refdef = 1;
 		dither = 0;
 	}
 }
 
-int Sys_OpenWindow(void) {
+int Sys_OpenWindow() {
 	return 0;
 }
 
@@ -1037,7 +1037,7 @@ void Sys_DrawCircle(int window, int x, int y, int r) {
 void Sys_DisplayWindow(int window) {
 }
 
-void Sys_SendKeyEvents(void) {
+void Sys_SendKeyEvents() {
 	// get events from x server
 	if (x_disp) {
 		while (XPending(x_disp)) GetEvent();

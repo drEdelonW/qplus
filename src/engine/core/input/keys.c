@@ -17,7 +17,20 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#include "quakedef.h"
+#if 0
+#   include "quakedef.h"
+#else
+#   include <string.h>
+#   include "keys.h"
+#   include "cmd.h"
+#   include "console.h"
+#   include "client.h"
+#   include "cvar.h"
+#   include "q_tools.h"
+#   include "zone.h"
+#   include "menu.h"
+#   include "sys.h"
+#endif
 #include <stdbool.h>
 /*
 key up events are sent even if in console mode
@@ -406,7 +419,7 @@ void Key_SetBinding(keycode_t keynum, cstring binding) {
 Key_Unbind_f
 ===================
 */
-void Key_Unbind_f(void) {
+void Key_Unbind_f() {
     if (Cmd_Argc() != 2) {
         Con_Printf("unbind <key> : remove commands from a key\n");
         return;
@@ -424,7 +437,7 @@ void Key_Unbind_f(void) {
     Key_SetBinding(b, "");
 }
 
-void Key_Unbindall_f(void) {
+void Key_Unbindall_f() {
     for (keycode_t i = 0; i < MAX_KEYS; i++)
         if (keybindings[i])
             Key_SetBinding(i, "");
@@ -436,7 +449,7 @@ void Key_Unbindall_f(void) {
 Key_Bind_f
 ===================
 */
-void Key_Bind_f(void) {
+void Key_Bind_f() {
     char    cmd[MAXCMD];
 
     int c = Cmd_Argc();
@@ -513,7 +526,7 @@ void Key_WriteBindings(FILE* f) {
 Key_Init
 ===================
 */
-void Key_Init(void) {
+void Key_Init() {
 
     for (int i = 0; i < 32; i++) {
         key_lines[i][0] = ']';
@@ -760,7 +773,7 @@ void Key_Event(keycode_t key, bool down) {
 Key_ClearStates
 ===================
 */
-void Key_ClearStates(void) {
+void Key_ClearStates() {
     for (keycode_t i = 0; i < MAX_KEYS; i++) {
         keydown[i] = false;
         key_repeats[i] = 0;

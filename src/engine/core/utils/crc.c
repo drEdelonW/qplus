@@ -19,17 +19,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 /* crc.c */
 
-#include "quakedef.h"
 #include "crc.h"
 
 // this is a 16 bit, non-reflected CRC using the polynomial 0x1021
 // and the initial and final xor values shown below...  in other words, the
 // CCITT standard CRC used by XMODEM
 
-#define CRC_INIT_VALUE	0xffff
+#define CRC_INIT_VALUE	0xFFFF
 #define CRC_XOR_VALUE	0x0000
 
-static uint16_t crctable[256] = {
+static uint16_t _crctable[256] = {
 	0x0000,	0x1021,	0x2042,	0x3063,	0x4084,	0x50a5,	0x60c6,	0x70e7,
 	0x8108,	0x9129,	0xa14a,	0xb16b,	0xc18c,	0xd1ad,	0xe1ce,	0xf1ef,
 	0x1231,	0x0210,	0x3273,	0x2252,	0x52b5,	0x4294,	0x72f7,	0x62d6,
@@ -69,7 +68,7 @@ void CRC_Init(uint16_p crcvalue) {
 }
 
 void CRC_ProcessByte(uint16_p crcvalue, uint8_t data) {
-	*crcvalue = (*crcvalue << 8) ^ crctable[(*crcvalue >> 8) ^ data];
+	*crcvalue = (*crcvalue << 8) ^ _crctable[(*crcvalue >> 8) ^ data];
 }
 
 uint16_t CRC_Value(uint16_t crcvalue) {

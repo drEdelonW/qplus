@@ -43,7 +43,7 @@ void R_DrawSurfaceBlock8_mip1();
 void R_DrawSurfaceBlock8_mip2();
 void R_DrawSurfaceBlock8_mip3();
 
-static void	(*surfmiptable[4])(void) = {
+static void	(*surfmiptable[4])() = {
 	R_DrawSurfaceBlock8_mip0,
 	R_DrawSurfaceBlock8_mip1,
 	R_DrawSurfaceBlock8_mip2,
@@ -240,7 +240,7 @@ void R_DrawSurface() {
 	int				soffset, basetoffset, texwidth;
 	int				horzblockstep;
 	uint8_p pcolumndest;
-	void			(*pblockdrawer)(void);
+	void			(*pblockdrawer)();
 	texture_t* mt;
 
 	// calculate the lightings

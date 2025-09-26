@@ -61,7 +61,7 @@ typedef viddef_t* viddef_p;
 extern	viddef_t    vid;				// global video state
 extern	uint16_t    d_8to16table[256];
 extern	uint32_t    d_8to24table[256];
-extern void (*vid_menudrawfn)(void);
+extern void (*vid_menudrawfn)();
 extern void (*vid_menukeyfn)(int key);
 
 // called at startup and after any gamma correction

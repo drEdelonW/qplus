@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	R_CheckVariables
 	===============
 */
-void R_CheckVariables(void) {
+void R_CheckVariables() {
 	static float oldbright;
 
 	if (r_fullbright.value != oldbright) {
@@ -45,7 +45,7 @@ void R_CheckVariables(void) {
 	Debugging use
 	============
 */
-void Show(void) {
+void Show() {
 	vrect_t	vr = {
 		// .x      = 0,
 		// .y      = 0,

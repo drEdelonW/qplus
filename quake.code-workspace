@@ -68,7 +68,8 @@
 			"enginedefs.h": "c",
 			"system_error": "c",
 			"semaphore": "c",
-			"bspfile.h": "c"
+			"bspfile.h": "c",
+			"buffer": "c"
 		}
 	}
 }

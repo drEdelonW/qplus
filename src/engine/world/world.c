@@ -20,16 +20,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // world.c -- world query functions
 
 #if 0
-    #include "quakedef.h"
+#   include "quakedef.h"
 #else
-    #include <string.h>
-    #include "world.h"
-    #include "model.h"
-    #include "bspfile.h"
-    #include "server.h"
-    #include "sys.h"
-    #include "console.h"
-    #include "progs.h"
+#   include <string.h>
+#   include "world.h"
+#   include "model.h"
+#   include "bspfile.h"
+#   include "server.h"
+#   include "sys.h"
+#   include "console.h"
+#   include "progs.h"
 #endif
 
 

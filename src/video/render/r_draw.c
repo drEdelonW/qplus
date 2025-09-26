@@ -340,7 +340,7 @@ void R_ClipEdge(mvertex_p pv0, mvertex_p pv1, clipplane_t* clip) {
 R_EmitCachedEdge
 ================
 */
-void R_EmitCachedEdge(void) {
+void R_EmitCachedEdge() {
 	edge_ptr pedge_t = (edge_ptr)((uint32_t)r_edges + r_pedge->cachededgeoffset);
 
 	if (!pedge_t->surfs[0])

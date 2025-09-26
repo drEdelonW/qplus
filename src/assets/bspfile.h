@@ -19,7 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "enginedefs.h"
+
+#if 0
+#   include "quakedef.h"
+#else
+#   include "enginedefs.h"
+#endif
 
 // upper design bounds
 

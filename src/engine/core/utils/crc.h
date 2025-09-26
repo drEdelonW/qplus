@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 /* crc.h */
-
+#include "types.h"
 void CRC_Init(uint16_p crcvalue);
 void CRC_ProcessByte(uint16_p crcvalue, uint8_t data);
 uint16_t CRC_Value(uint16_t crcvalue);

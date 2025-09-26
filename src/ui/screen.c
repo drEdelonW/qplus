@@ -569,7 +569,7 @@ void WritePCXfile(cstring filename, uint8_p data, int width, int height,
 SCR_ScreenShot_f
 ==================
 */
-void SCR_ScreenShot_f(void) {
+void SCR_ScreenShot_f() {
 	char		pcxname[80];
 	char		checkname[MAX_OSPATH];
 	//

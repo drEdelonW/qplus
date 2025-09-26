@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "net_dgrm.h"
 
 net_driver_t net_drivers[MAX_NET_DRIVERS] = {
-	{
+    {
         "Loopback",
         false,
         Loop_Init,
@@ -38,7 +38,7 @@ net_driver_t net_drivers[MAX_NET_DRIVERS] = {
         Loop_CanSendUnreliableMessage,
         Loop_Close,
         Loop_Shutdown
-	},{
+    },{
         "Datagram",
         false,
         Datagram_Init,
@@ -53,15 +53,15 @@ net_driver_t net_drivers[MAX_NET_DRIVERS] = {
         Datagram_CanSendUnreliableMessage,
         Datagram_Close,
         Datagram_Shutdown
-	}
+    }
 };
 
 int net_numdrivers = 2;
 
 #include "net_udp.h"
 
-net_landriver_t	net_landrivers[MAX_NET_DRIVERS] = {
-	{
+net_landriver_t net_landrivers[MAX_NET_DRIVERS] = {
+    {
         "UDP",
         false,
         0,
@@ -83,7 +83,7 @@ net_landriver_t	net_landrivers[MAX_NET_DRIVERS] = {
         UDP_AddrCompare,
         UDP_GetSocketPort,
         UDP_SetSocketPort
-	}
+    }
 };
 
 int net_numlandrivers = 1;

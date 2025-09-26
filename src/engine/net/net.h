@@ -21,8 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // net.h -- quake's interface to the networking layer
 
 
-#define	MAX_MSGLEN		8000		// max length of a reliable message
-#define	MAX_DATAGRAM	1024		// max length of unreliable message
+#define MAX_MSGLEN  8000  // max length of a reliable message
+#define MAX_DATAGRAM 1024  // max length of unreliable message
 
 typedef struct qsockaddr {
     int16_t sa_family;
@@ -31,11 +31,11 @@ typedef struct qsockaddr {
 typedef qsockaddr_t* qsockaddr_p;
 
 
-#define	NET_NAMELEN			64
+#define NET_NAMELEN   64
 
-#define NET_MAXMESSAGE		8192
-#define NET_HEADERSIZE		(2 * sizeof(uint32_t))
-#define NET_DATAGRAMSIZE	(MAX_DATAGRAM + NET_HEADERSIZE)
+#define NET_MAXMESSAGE  8192
+#define NET_HEADERSIZE  (2 * sizeof(uint32_t))
+#define NET_DATAGRAMSIZE (MAX_DATAGRAM + NET_HEADERSIZE)
 
 // NetHeader flags
 typedef enum {
@@ -49,7 +49,7 @@ typedef enum {
 } netflag_t;
 
 
-#define NET_PROTOCOL_VERSION	3
+#define NET_PROTOCOL_VERSION 3
 
 // This is the network info/connection protocol.  It is used to find Quake
 // servers, get info about them, and connect to them.  Once connected, the
@@ -57,74 +57,74 @@ typedef enum {
 //
 //
 // General notes:
-//	game_name is currently always "QUAKE", but is there so this same protocol
-//		can be used for future games as well; can you say Quake2?
+// game_name is currently always "QUAKE", but is there so this same protocol
+// can be used for future games as well; can you say Quake2?
 //
 // CCREQ_CONNECT
-//		string	game_name				"QUAKE"
-//		byte	net_protocol_version	NET_PROTOCOL_VERSION
+//      string  game_name               "QUAKE"
+//      byte    net_protocol_version    NET_PROTOCOL_VERSION
 //
 // CCREQ_SERVER_INFO
-//		string	game_name				"QUAKE"
-//		byte	net_protocol_version	NET_PROTOCOL_VERSION
+//      string  game_name               "QUAKE"
+//      byte    net_protocol_version    NET_PROTOCOL_VERSION
 //
 // CCREQ_PLAYER_INFO
-//		byte	player_number
+//      byte    player_number
 //
 // CCREQ_RULE_INFO
-//		string	rule
+//      string  rule
 //
 //
 //
 // CCREP_ACCEPT
-//		long	port
+//      long    port
 //
 // CCREP_REJECT
-//		string	reason
+//      string  reason
 //
 // CCREP_SERVER_INFO
-//		string	server_address
-//		string	host_name
-//		string	level_name
-//		byte	current_players
-//		byte	max_players
-//		byte	protocol_version	NET_PROTOCOL_VERSION
+//      string  server_address
+//      string  host_name
+//      string  level_name
+//      byte    current_players
+//      byte    max_players
+//      byte    protocol_version    NET_PROTOCOL_VERSION
 //
 // CCREP_PLAYER_INFO
-//		byte	player_number
-//		string	name
-//		long	colors
-//		long	frags
-//		long	connect_time
-//		string	address
+//      byte    player_number
+//      string  name
+//      long    colors
+//      long    frags
+//      long    connect_time
+//      string  address
 //
 // CCREP_RULE_INFO
-//		string	rule
-//		string	value
+//      string  rule
+//      string  value
 
-//	note:
-//		There are two address forms used above.  The int16_t form is just a
-//		port number.  The address that goes along with the port is defined as
-//		"whatever address you receive this reponse from".  This lets us use
-//		the host OS to solve the problem of multiple host addresses (possibly
-//		with no routing between them); the host will use the right address
-//		when we reply to the inbound connection request.  The long from is
-//		a full address and port in a string.  It is used for returning the
-//		address of a server that is not running locally.
+//  note:
+//      There are two address forms used above.  The int16_t form is just a
+//      port number.  The address that goes along with the port is defined as
+//      "whatever address you receive this reponse from".  This lets us use
+//      the host OS to solve the problem of multiple host addresses (possibly
+//      with no routing between them); the host will use the right address
+//      when we reply to the inbound connection request.  The long from is
+//      a full address and port in a string.  It is used for returning the
+//      address of a server that is not running locally.
 
 typedef enum {
     // requests
-    CCREQ_CONNECT      = 0x01,
-    CCREQ_SERVER_INFO  = 0x02,
-    CCREQ_PLAYER_INFO  = 0x03,
-    CCREQ_RULE_INFO    = 0x04,
+    CCREQ_CONNECT       = 0x01,
+    CCREQ_SERVER_INFO   = 0x02,
+    CCREQ_PLAYER_INFO   = 0x03,
+    CCREQ_RULE_INFO     = 0x04,
 
     // responses
-    CCREP_ACCEPT       = 0x81,
-    CCREP_REJECT       = 0x82,
-    CCREP_SERVER_INFO  = 0x83,
-    CCREP_PLAYER_INFO  = 0x84,
-    CCREP_RULE_INFO    = 0x85
+    CCREP_ACCEPT        = 0x81,
+    CCREP_REJECT        = 0x82,
+    CCREP_SERVER_INFO   = 0x83,
+    CCREP_PLAYER_INFO   = 0x84,
+    CCREP_RULE_INFO     = 0x85
 } ccreq_t;
 
 struct qsocket_s;
@@ -156,59 +156,59 @@ struct qsocket_s {
     int32_t receiveMessageLength;
     uint8_t receiveMessage[NET_MAXMESSAGE];
 
-    qsockaddr_t	addr;
+    qsockaddr_t addr;
     char address[NET_NAMELEN];
 
 };
 
 extern qsocket_p net_activeSockets;
 extern qsocket_p net_freeSockets;
-extern int32_t			net_numsockets;
+extern int32_t   net_numsockets;
 
 typedef struct {
     cstring name;
     bool initialized;
     int32_t controlSock;
-    int32_t (*Init)();
+    int32_t(*Init)();
     void (*Shutdown)();
     void (*Listen)(bool state);
-    int32_t (*OpenSocket)(int32_t port);
-    int32_t (*CloseSocket)(int32_t socket);
-    int32_t (*Connect)(int32_t socket, qsockaddr_p addr);
-    int32_t (*CheckNewConnections)();
-    int32_t (*Read)(int32_t socket, uint8_p buf, int32_t len, qsockaddr_p addr);
-    int32_t (*Write)(int32_t socket, uint8_p buf, int32_t len, qsockaddr_p addr);
-    int32_t (*Broadcast)(int32_t socket, uint8_p buf, int32_t len);
-    cstring (*AddrToString)(qsockaddr_p addr);
-    int32_t (*StringToAddr)(cstring string, qsockaddr_p addr);
-    int32_t (*GetSocketAddr)(int32_t socket, qsockaddr_p addr);
-    int32_t (*GetNameFromAddr)(qsockaddr_p addr, cstring name);
-    int32_t (*GetAddrFromName)(cstring name, qsockaddr_p addr);
-    int32_t (*AddrCompare)(qsockaddr_p addr1, qsockaddr_p addr2);
-    int32_t (*GetSocketPort)(qsockaddr_p addr);
-    int32_t (*SetSocketPort)(qsockaddr_p addr, int32_t port);
+    int32_t(*OpenSocket)(int32_t port);
+    int32_t(*CloseSocket)(int32_t socket);
+    int32_t(*Connect)(int32_t socket, qsockaddr_p addr);
+    int32_t(*CheckNewConnections)();
+    int32_t(*Read)(int32_t socket, uint8_p buf, int32_t len, qsockaddr_p addr);
+    int32_t(*Write)(int32_t socket, uint8_p buf, int32_t len, qsockaddr_p addr);
+    int32_t(*Broadcast)(int32_t socket, uint8_p buf, int32_t len);
+    cstring(*AddrToString)(qsockaddr_p addr);
+    int32_t(*StringToAddr)(cstring string, qsockaddr_p addr);
+    int32_t(*GetSocketAddr)(int32_t socket, qsockaddr_p addr);
+    int32_t(*GetNameFromAddr)(qsockaddr_p addr, cstring name);
+    int32_t(*GetAddrFromName)(cstring name, qsockaddr_p addr);
+    int32_t(*AddrCompare)(qsockaddr_p addr1, qsockaddr_p addr2);
+    int32_t(*GetSocketPort)(qsockaddr_p addr);
+    int32_t(*SetSocketPort)(qsockaddr_p addr, int32_t port);
 } net_landriver_t;
 
-#define	MAX_NET_DRIVERS		8
+#define MAX_NET_DRIVERS  8
 extern int32_t net_numlandrivers;
 extern net_landriver_t net_landrivers[MAX_NET_DRIVERS];
 
 typedef struct {
     cstring name;
     bool initialized;
-    int32_t (*Init)();
+    int32_t(*Init)();
     void (*Listen)(bool state);
     void (*SearchForHosts)(bool xmit);
-    qsocket_p (*Connect)(cstring host);
-    qsocket_p (*CheckNewConnections)();
-    int32_t (*QGetMessage)(qsocket_p sock);
-    int32_t (*QSendMessage)(qsocket_p sock, sizebuf_p data);
-    int32_t (*SendUnreliableMessage)(qsocket_p sock, sizebuf_p data);
+    qsocket_p(*Connect)(cstring host);
+    qsocket_p(*CheckNewConnections)();
+    int32_t(*QGetMessage)(qsocket_p sock);
+    int32_t(*QSendMessage)(qsocket_p sock, sizebuf_p data);
+    int32_t(*SendUnreliableMessage)(qsocket_p sock, sizebuf_p data);
     bool (*CanSendMessage)(qsocket_p sock);
     bool (*CanSendUnreliableMessage)(qsocket_p sock);
     void (*Close)(qsocket_p sock);
     void (*Shutdown)();
-    int32_t			controlSock;
+    int32_t   controlSock;
 } net_driver_t;
 
 extern int32_t net_numdrivers;
@@ -229,10 +229,10 @@ extern int32_t unreliableMessagesReceived;
 
 qsocket_p NET_NewQSocket();
 void NET_FreeQSocket(qsocket_p);
-double SetNetTime(void);
+double SetNetTime();
 
 
-#define HOSTCACHESIZE	8
+#define HOSTCACHESIZE 8
 
 typedef struct {
     char name[16];
@@ -273,34 +273,33 @@ bool IsID(qsockaddr_p addr);
 //
 //============================================================================
 
-extern	double  net_time;
-extern	sizebuf_t   net_message;
-extern	int32_t net_activeconnections;
+extern double       net_time;
+extern sizebuf_t    net_message;
+extern int32_t      net_activeconnections;
 
 void NET_Init();
 void NET_Shutdown();
 
-struct qsocket_s* NET_CheckNewConnections();
+ qsocket_p NET_CheckNewConnections();
 // returns a new connection number if there is one pending, else -1
 
-struct qsocket_s* NET_Connect(cstring host);
+ qsocket_p NET_Connect(cstring host);
 // called by client to connect to a host.  Returns -1 if not able to
 
 bool NET_CanSendMessage(qsocket_p sock);
 // Returns true or false if the given qsocket can currently accept a
 // message to be transmitted.
 
-int32_t NET_GetMessage(struct qsocket_s* sock);
+int32_t NET_GetMessage(qsocket_p sock);
 // returns data in net_message sizebuf
 // returns 0 if no data is waiting
 // returns 1 if a message was received
 // returns 2 if an unreliable message was received
 // returns -1 if the connection died
 
-int32_t NET_SendMessage(struct qsocket_s* sock, sizebuf_p data);
-int32_t NET_SendUnreliableMessage(struct qsocket_s* sock, sizebuf_p data);
-// returns 0 if the message connot be delivered reliably, but the connection
-//		is still considered valid
+int32_t NET_SendMessage(qsocket_p sock, sizebuf_p data);
+int32_t NET_SendUnreliableMessage(qsocket_p sock, sizebuf_p data);
+// returns 0 if the message connot be delivered reliably, but the connection is still considered valid
 // returns 1 if the message was sent properly
 // returns -1 if the connection died
 
@@ -308,7 +307,7 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime);
 // This is a reliable *blocking* send to all attached clients.
 
 
-void NET_Close(struct qsocket_s* sock);
+void NET_Close(qsocket_p sock);
 // if a dead connection is returned by a get or send function, this function
 // should be called when it is convenient
 
@@ -317,7 +316,7 @@ void NET_Close(struct qsocket_s* sock);
 // from a server.
 // A netcon_t number will not be reused until this function is called for it
 
-void NET_Poll(void);
+void NET_Poll();
 
 
 typedef struct _PollProcedure {

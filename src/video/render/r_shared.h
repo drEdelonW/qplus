@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define	MAXVERTS	16					// max points in a surface polygon
 #define MAXWORKINGVERTS	(MAXVERTS+4)	// max points in an intermediate
-										//  polygon (while processing)
+                                        //  polygon (while processing)
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 #define	MAXHEIGHT		1024
 #define	MAXWIDTH		1280
@@ -40,8 +40,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SIN_BUFFER_SIZE	(MAXDIMENSION + CYCLE)
 
 #define INFINITE_DISTANCE	0x10000		// distance that's always guaranteed to
-										//  be farther away than anything in
-										//  the scene
+                                        //  be farther away than anything in
+                                        //  the scene
 
 //===================================================================
 
@@ -74,32 +74,32 @@ struct espan_s;
 typedef struct espan_s espan_t;
 typedef espan_t* espan_p;
 struct espan_s {
-	int     u;
-	int     v;
-	int     count;
-	espan_p	pnext;
+    int     u;
+    int     v;
+    int     count;
+    espan_p	pnext;
 };
 
 // FIXME: compress, make a union if that will help
 // insubmodel is only 1, flags is fewer than 32, spanstate could be a byte
 typedef struct surf_s {
-	struct surf_s* next;			// active surface stack in r_edge.c
-	struct surf_s* prev;			// used in r_edge.c for active surf stack
-	struct espan_s* spans;			// pointer to linked list of spans to draw
-	int			key;				// sorting key (BSP order)
-	int			last_u;				// set during tracing
-	int			spanstate;			// 0 = not in span
-	// 1 = in span
-	// -1 = in inverted span (end before
-	//  start)
-	int			flags;				// currentface flags
-	typeless_ptr       data;				// associated data like msurface_t
-	r_entity_p   entity;
-	float		nearzi;				// nearest 1/z on surface, for mipmapping
-	qboolean	insubmodel;
-	float		d_ziorigin, d_zistepu, d_zistepv;
+    struct surf_s* next;			// active surface stack in r_edge.c
+    struct surf_s* prev;			// used in r_edge.c for active surf stack
+    struct espan_s* spans;			// pointer to linked list of spans to draw
+    int			key;				// sorting key (BSP order)
+    int			last_u;				// set during tracing
+    int			spanstate;			// 0 = not in span
+    // 1 = in span
+    // -1 = in inverted span (end before
+    //  start)
+    int			flags;				// currentface flags
+    typeless_ptr       data;				// associated data like msurface_t
+    r_entity_p   entity;
+    float		nearzi;				// nearest 1/z on surface, for mipmapping
+    qboolean	insubmodel;
+    float		d_ziorigin, d_zistepu, d_zistepv;
 
-	int			pad[2];				// to 64 bytes
+    int			pad[2];				// to 64 bytes
 } surf_t;
 typedef surf_t* surf_p;
 
@@ -127,14 +127,15 @@ extern	int d_lightstylevalue[256]; // 8.8 frac of base light value
 
 extern void TransformVector(vec3_t in, vec3_t out);
 extern void SetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
-	fixed8_t endvertu, fixed8_t endvertv);
+    fixed8_t endvertu, fixed8_t endvertv);
 
 extern int	r_skymade;
-extern void R_MakeSky(void);
+extern void R_MakeSky();
 
 extern int	ubasestep, errorterm, erroradjustup, erroradjustdown;
 
 // flags in finalvert_t.flags
+#if 0
 #define ALIAS_LEFT_CLIP				0x0001
 #define ALIAS_TOP_CLIP				0x0002
 #define ALIAS_RIGHT_CLIP			0x0004
@@ -142,22 +143,36 @@ extern int	ubasestep, errorterm, erroradjustup, erroradjustdown;
 #define ALIAS_Z_CLIP				0x0010
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 #define ALIAS_ONSEAM				0x0020	// also defined in modelgen.h;
-											//  must be kept in sync
+                                            //  must be kept in sync
 #define ALIAS_XY_CLIP_MASK			0x000F
+#else
+typedef enum alias_clip_flags_e {
+    ALIAS_LEFT_CLIP      = 0x0001,
+    ALIAS_TOP_CLIP       = 0x0002,
+    ALIAS_RIGHT_CLIP     = 0x0004,
+    ALIAS_BOTTOM_CLIP    = 0x0008,
+    ALIAS_Z_CLIP         = 0x0010,
+
+    // must stay in sync with d_ifacea.h and modelgen.h
+    ALIAS_ONSEAM         = 0x0020,  // also defined in modelgen.h
+                                    //  must be kept in sync
+    ALIAS_XY_CLIP_MASK   = 0x000F
+} alias_clip_flags_t;
+#endif
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 struct edge_s;
 typedef struct edge_s edge_t;
 typedef edge_t* edge_ptr;
 struct edge_s {
-	fixed16_t   u;
-	fixed16_t   u_step;
-	edge_ptr    prev;
-	edge_ptr    next;
-	uint16_t	surfs[2];
-	edge_ptr    nextremove;
-	float       nearzi;
-	medge_t* owner;
+    fixed16_t   u;
+    fixed16_t   u_step;
+    edge_ptr    prev;
+    edge_ptr    next;
+    uint16_t	surfs[2];
+    edge_ptr    nextremove;
+    float       nearzi;
+    medge_p     owner;
 };
 
 #endif	// _R_SHARED_H_

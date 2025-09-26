@@ -19,21 +19,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // common.c -- misc functions used in client and server
 
-// #include "quakedef.h"
-
-#include "common.h"
-#include "cvar_q1.h"
-#include "platformdefs.h"
-#include <string.h>
-#include <stdarg.h>
-#include "sys.h"
-#include "crc.h"
-#include "console.h"
-#include "cmd.h"
-#include "draw.h"
-#include "endian_tools.h"
-#include "host.h"
-#include "gamedefs.h"
+#if 0
+#   include "quakedef.h"
+#else
+#   include "common.h"
+#   include "cvar_q1.h"
+#   include "platformdefs.h"
+#   include <string.h>
+#   include <stdarg.h>
+#   include "sys.h"
+#   include "crc.h"
+#   include "console.h"
+#   include "cmd.h"
+#   include "draw.h"
+#   include "endian_tools.h"
+#   include "host.h"
+#   include "gamedefs.h"
+#endif
 
 
 #define NUM_SAFE_ARGVS  7
@@ -498,21 +500,21 @@ typedef struct {
 
 typedef struct {
     char    id[4];
-    int32_t     dirofs;
-    int32_t     dirlen;
+    int32_t dirofs;
+    int32_t dirlen;
 } dpackheader_t;
 
 #define MAX_FILES_IN_PACK       2048
 
-char    com_cachedir[MAX_OSPATH];
-char    com_gamedir[MAX_OSPATH];
+char com_cachedir[MAX_OSPATH];
+char com_gamedir[MAX_OSPATH];
 
 struct searchpath_s;
 typedef struct searchpath_s searchpath_t;
 typedef searchpath_t* searchpath_p;
 struct searchpath_s {
     char    filename[MAX_OSPATH];
-    pack_p pack;          // only one of filename / pack will be used
+    pack_p  pack;   // only one of filename / pack will be used
     searchpath_p next;
 };
 

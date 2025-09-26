@@ -1176,7 +1176,7 @@ Sbar_DeathmatchOverlay
 
 ==================
 */
-void Sbar_MiniDeathmatchOverlay(void) {
+void Sbar_MiniDeathmatchOverlay() {
 	// qpic_p pic;
 	char			num[12];
 	scoreboard_t	*s;

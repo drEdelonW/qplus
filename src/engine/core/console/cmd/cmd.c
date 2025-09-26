@@ -19,8 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // cmd.c -- Quake script command processing module
 
-#include <string.h>
 #include "cmd.h"
+
+#include <string.h>
 #include "sizebuf.h"
 #include "q_tools.h"
 #include "console.h"
@@ -53,7 +54,7 @@ bool cmd_wait;
     bind g "impulse 5 ; +attack ; wait ; -attack ; impulse 2"
     ============
 */
-void Cmd_Wait_f(void) {
+void Cmd_Wait_f() {
     cmd_wait = true;
 }
 
@@ -72,7 +73,7 @@ static sizebuf_t cmd_text;
     Cbuf_Init
     ============
 */
-void Cbuf_Init(void) {
+void Cbuf_Init() {
     SZ_Alloc(&cmd_text, CMD_BUSS_SIZE);  // space for commands and script files
 }
 
@@ -132,7 +133,7 @@ void Cbuf_InsertText(cstring text) {
     Cbuf_Execute
     ============
 */
-void Cbuf_Execute(void) {
+void Cbuf_Execute() {
     int32_t  i;
     cstring text;
     char line[1024];
@@ -200,7 +201,7 @@ void Cbuf_Execute(void) {
     quake -nosound +cmd amlev1
     ===============
 */
-void Cmd_StuffCmds_f(void) {
+void Cmd_StuffCmds_f() {
     if (Cmd_Argc() != 1) {
         Con_Printf("stuffcmds : execute command line parameters\n");
         return;
@@ -262,7 +263,7 @@ void Cmd_StuffCmds_f(void) {
     Cmd_Exec_f
     ===============
 */
-void Cmd_Exec_f(void) {
+void Cmd_Exec_f() {
     if (Cmd_Argc() != 2) {
         Con_Printf("exec <filename> : execute a script file\n");
         return;
@@ -288,7 +289,7 @@ void Cmd_Exec_f(void) {
     Just prints the rest of the line to the console
     ===============
 */
-void Cmd_Echo_f(void) {
+void Cmd_Echo_f() {
     for (int i = 1; i < Cmd_Argc(); i++) {
         Con_Printf("%s ", Cmd_Argv(i));
     }
@@ -344,7 +345,7 @@ static cmd_function_p cmd_functions;  // possible commands to execute
     Cmd_Init
     ============
 */
-void Cmd_Init(void) {
+void Cmd_Init() {
     //
     // register our commands
     //
@@ -361,7 +362,7 @@ void Cmd_Init(void) {
     Cmd_Argc
     ============
 */
-int Cmd_Argc(void) {
+int Cmd_Argc() {
     return cmd_argc;
 }
 
@@ -382,7 +383,7 @@ cstring Cmd_Argv(int arg) {
     Cmd_Args
     ============
 */
-cstring Cmd_Args(void) {
+cstring Cmd_Args() {
     return cmd_args;
 }
 
@@ -561,7 +562,7 @@ void Cmd_ExecuteString(cstring text, cmd_source_t src) {
     Sends the entire command line over to the server
     ===================
 */
-void Cmd_ForwardToServer(void) {
+void Cmd_ForwardToServer() {
     if (cls.state != ca_connected) {
         Con_Printf("Can't \"%s\", not connected\n", Cmd_Argv(0));
         return;
