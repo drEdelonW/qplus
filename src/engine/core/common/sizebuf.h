@@ -2,11 +2,11 @@
 #include "types.h"
 
 typedef struct sizebuf_s {
-	bool    allowoverflow;	// if false, do a Sys_Error
-	bool    overflowed;		// set to true if the buffer size failed
-	uint8_p data;
-	int32_t maxsize;
-	int32_t cursize;
+    bool    allowoverflow;	// if false, do a Sys_Error
+    bool    overflowed;		// set to true if the buffer size failed
+    uint8_p data;
+    int32_t maxsize;
+    int32_t cursize;
 } sizebuf_t;
 typedef sizebuf_t* sizebuf_p;
 

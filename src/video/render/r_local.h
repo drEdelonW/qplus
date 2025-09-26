@@ -22,23 +22,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef GLQUAKE
 #include "r_shared.h"
-#include "cvar_q1.h"
+#include "client.h"
 
 
 #define ALIAS_BASE_SIZE_RATIO   (1.0 / 11.0)
-					// normalizing factor so player model works out to about
-					//  1 pixel per triangle
+                    // normalizing factor so player model works out to about
+                    //  1 pixel per triangle
 
-#define BMODEL_FULLY_CLIPPED	0x10 // value returned by R_BmodelCheckBBox ()
-									 //  if bbox is trivially rejected
+#define BMODEL_FULLY_CLIPPED 0x10 // value returned by R_BmodelCheckBBox ()
+                                     //  if bbox is trivially rejected
 
 //===========================================================================
 // viewmodel lighting
 
 typedef struct {
-	int     ambientlight;
-	int     shadelight;
-	float_p plightvec;
+    int     ambientlight;
+    int     shadelight;
+    float_p plightvec;
 } alight_t;
 typedef alight_t* alight_p;
 
@@ -50,43 +50,43 @@ typedef struct bedge_s bedge_t;
 typedef bedge_t* bedge_p;
 
 typedef struct bedge_s {
-	mvertex_p v[2];
-	bedge_p pnext;
+    mvertex_p v[2];
+    bedge_p pnext;
 } bedge_t;
 
 typedef struct {
-	float   fv[3];		// viewspace x, y
+    float   fv[3];  // viewspace x, y
 } auxvert_t;
 typedef auxvert_t* auxvert_p;
 
 //===========================================================================
 
 
-#define XCENTERING	(1.0 / 2.0)
-#define YCENTERING	(1.0 / 2.0)
+#define XCENTERING (1.0 / 2.0)
+#define YCENTERING (1.0 / 2.0)
 
-#define CLIP_EPSILON		0.001
+#define CLIP_EPSILON  0.001
 
-#define BACKFACE_EPSILON	0.01
+#define BACKFACE_EPSILON 0.01
 
 //===========================================================================
 
-#define	DIST_NOT_SET	(98765)
+#define DIST_NOT_SET (98765)
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 struct clipplane_s;
 typedef struct clipplane_s clipplane_t;
 typedef clipplane_t* clipplane_p;
 struct clipplane_s {
-	vec3_t      normal;
-	float       dist;
-	clipplane_p next;
-	uint8_t        leftedge;
-	uint8_t        rightedge;
-	uint8_t        reserved[2];
+    vec3_t      normal;
+    float       dist;
+    clipplane_p next;
+    uint8_t        leftedge;
+    uint8_t        rightedge;
+    uint8_t        reserved[2];
 };
 
-extern	clipplane_t	view_clipplanes[4];
+extern clipplane_t view_clipplanes[4];
 
 //=============================================================================
 
@@ -94,21 +94,17 @@ void R_RenderWorld();
 
 //=============================================================================
 
-extern	mplane_t	screenedge[4];
-
-extern	vec3_t	r_origin;
-
-extern	vec3_t	r_entorigin;
-
-extern	float	screenAspect;
-extern	float	verticalFieldOfView;
-extern	float	xOrigin, yOrigin;
-
-extern	int		r_visframecount;
+extern mplane_t screenedge[4];
+extern vec3_t   r_origin;
+extern vec3_t   r_entorigin;
+extern float    screenAspect;
+extern float    verticalFieldOfView;
+extern float    xOrigin, yOrigin;
+extern int      r_visframecount;
 
 //=============================================================================
 
-extern int	vstartscan;
+extern int vstartscan;
 
 
 void R_ClearPolyList();
@@ -117,8 +113,8 @@ void R_DrawPolyList();
 //
 // current entity info
 //
-extern	qboolean		insubmodel;
-extern	vec3_t			r_worldmodelorg;
+extern qboolean insubmodel;
+extern vec3_t  r_worldmodelorg;
 
 
 void R_DrawSprite();
@@ -130,9 +126,9 @@ void R_TransformFrustum();
 void R_SetSkyFrame();
 void R_DrawSurfaceBlock16();
 void R_DrawSurfaceBlock8();
-texture_t* R_TextureAnimation(texture_t* base);
+texture_p R_TextureAnimation(texture_p base);
 
-#if	id386
+#if id386
 
 void R_DrawSurfaceBlock8_mip0();
 void R_DrawSurfaceBlock8_mip1();
@@ -149,7 +145,7 @@ void R_DrawSubmodelPolygons(model_p pmodel, int clipflags);
 void R_DrawSolidClippedSubmodelPolygons(model_p pmodel);
 
 void R_AddPolygonEdges(emitpoint_p pverts, int numverts, int miplevel);
-surf_t* R_GetSurf();
+surf_p R_GetSurf();
 void R_AliasDrawModel(alight_p plighting);
 void R_BeginEdgeFrame();
 void R_ScanEdges();
@@ -167,75 +163,75 @@ extern void R_EdgeCodeEnd();
 
 extern void R_RotateBmodel();
 
-extern int	c_faceclip;
-extern int	r_polycount;
-extern int	r_wholepolycount;
+extern int c_faceclip;
+extern int r_polycount;
+extern int r_wholepolycount;
 
-extern	model_p cl_worldmodel;
+extern model_p cl_worldmodel;
 
 extern int* pfrustum_indexes[4];
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-#define	NEAR_CLIP	0.01
+#define NEAR_CLIP 0.01
 
-extern int			ubasestep, errorterm, erroradjustup, erroradjustdown;
-extern int			vstartscan;
+extern int  ubasestep, errorterm, erroradjustup, erroradjustdown;
+extern int  vstartscan;
 
-extern fixed16_t	sadjust, tadjust;
-extern fixed16_t	bbextents, bbextentt;
+extern fixed16_t    sadjust, tadjust;
+extern fixed16_t    bbextents, bbextentt;
 
-#define MAXBVERTINDEXES	1000	// new clipped vertices when clipping bmodels
+#define MAXBVERTINDEXES 1000 // new clipped vertices when clipping bmodels
 //  to the world BSP
 extern mvertex_p r_ptverts, r_ptvertsmax;
 
-extern vec3_t			sbaseaxis[3], tbaseaxis[3];
-extern float			entity_rotation[3][3];
+extern vec3_t   sbaseaxis[3], tbaseaxis[3];
+extern float    entity_rotation[3][3];
 
-extern int		reinit_surfcache;
+extern int reinit_surfcache;
 
-extern int		r_currentkey;
-extern int		r_currentbkey;
+extern int r_currentkey;
+extern int r_currentbkey;
 
 typedef struct btofpoly_s {
-	int			clipflags;
-	msurface_p psurf;
+    int         clipflags;
+    msurface_p  psurf;
 } btofpoly_t;
 typedef btofpoly_t* btofpoly_p;
 
-#define MAX_BTOFPOLYS	5000	// FIXME: tune this
+#define MAX_BTOFPOLYS   5000 // FIXME: tune this
 
-extern int			numbtofpolys;
-extern btofpoly_p pbtofpolys;
+extern int          numbtofpolys;
+extern btofpoly_p   pbtofpolys;
 
-void	R_InitTurb();
-void	R_ZDrawSubmodelPolys(model_p clmodel);
+void R_InitTurb();
+void R_ZDrawSubmodelPolys(model_p clmodel);
 
 //=========================================================
 // Alias models
 //=========================================================
 
-#define MAXALIASVERTS		2000	// TODO: tune this
-#define ALIAS_Z_CLIP_PLANE	5
+#define MAXALIASVERTS  2000 // TODO: tune this
+#define ALIAS_Z_CLIP_PLANE 5
 
-extern int				numverts;
-extern int				a_skinwidth;
-extern mtriangle_p ptriangles;
-extern int				numtriangles;
-extern aliashdr_p paliashdr;
-extern mdl_p pmdl;
-extern float			leftclip, topclip, rightclip, bottomclip;
-extern int				r_acliptype;
-extern finalvert_p      pfinalverts;
-extern auxvert_p pauxverts;
+extern int          numverts;
+extern int          a_skinwidth;
+extern mtriangle_p  ptriangles;
+extern int          numtriangles;
+extern aliashdr_p   paliashdr;
+extern mdl_p        pmdl;
+extern float        leftclip, topclip, rightclip, bottomclip;
+extern int          r_acliptype;
+extern finalvert_p  pfinalverts;
+extern auxvert_p    pauxverts;
 
 qboolean R_AliasCheckBBox();
 
 //=========================================================
 // turbulence stuff
 
-#define	AMP		8*0x10000
-#define	AMP2	3
-#define	SPEED	20
+#define AMP  (8 * 0x10000)
+#define AMP2 3
+#define SPEED 20
 
 //=========================================================
 // particle stuff
@@ -246,64 +242,63 @@ void R_ClearParticles();
 void R_ReadPointFile_f();
 void R_SurfacePatch();
 
-extern int		r_amodels_drawn;
+extern int      r_amodels_drawn;
 extern edge_ptr auxedges;
-extern int		r_numallocatededges;
+extern int      r_numallocatededges;
 extern edge_ptr r_edges, edge_p, edge_max;
+extern edge_ptr newedges[MAXHEIGHT];
+extern edge_ptr removeedges[MAXHEIGHT];
 
-extern	edge_ptr newedges[MAXHEIGHT];
-extern	edge_ptr removeedges[MAXHEIGHT];
-
-extern	int	screenwidth;
+extern int screenwidth;
 
 // FIXME: make stack vars when debugging done
-extern	edge_t	edge_head;
-extern	edge_t	edge_tail;
-extern	edge_t	edge_aftertail;
-extern int		r_bmodelactive;
-extern vrect_p pconupdate;
+extern edge_t   edge_head;
+extern edge_t   edge_tail;
+extern edge_t   edge_aftertail;
+extern int      r_bmodelactive;
+extern vrect_p  pconupdate;
 
-extern float		aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
-extern float		r_aliastransition, r_resfudge;
+extern float    aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
+extern float    r_aliastransition, r_resfudge;
 
-extern int		r_outofsurfaces;
-extern int		r_outofedges;
+extern int      r_outofsurfaces;
+extern int      r_outofedges;
 
-extern mvertex_p r_pcurrentvertbase;
-extern int			r_maxvalidedgeoffset;
+extern mvertex_p    r_pcurrentvertbase;
+extern int      r_maxvalidedgeoffset;
 
 void R_AliasClipTriangle(mtriangle_p ptri);
 
-extern float	r_time1;
-extern float	dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2;
-extern float	se_time1, se_time2, de_time1, de_time2, dv_time1, dv_time2;
-extern int		r_frustum_indexes[4 * 6];
-extern int		r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
-extern qboolean	r_surfsonstack;
-extern cshift_t	cshift_water;
-extern qboolean	r_dowarpold, r_viewchanged;
+extern float    r_time1;
+extern float    dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2;
+extern float    se_time1, se_time2, de_time1, de_time2, dv_time1, dv_time2;
+extern int      r_frustum_indexes[4 * 6];
+extern int      r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
+extern qboolean r_surfsonstack;
+extern cshift_t cshift_water;
+extern qboolean r_dowarpold, r_viewchanged;
 
 extern mleaf_p r_viewleaf, r_oldviewleaf;
 
-extern vec3_t	r_emins, r_emaxs;
-extern mnode_p r_pefragtopnode;
-extern int		r_clipflags;
-extern int		r_dlightframecount;
-extern qboolean	r_fov_greater_than_90;
+extern vec3_t   r_emins, r_emaxs;
+extern mnode_p  r_pefragtopnode;
+extern int      r_clipflags;
+extern int      r_dlightframecount;
+extern qboolean r_fov_greater_than_90;
 
-void R_StoreEfrags(efrag_t** ppefrag);
+void R_StoreEfrags(efrag_p* ppefrag);
 void R_TimeRefresh_f();
 void R_TimeGraph();
 void R_PrintAliasStats();
 void R_PrintTimes();
 void R_PrintDSpeeds();
 void R_AnimateLight();
-int R_LightPoint(vec3_t p);
+int  R_LightPoint(vec3_t p);
 void R_SetupFrame();
 void R_cshift_f();
 void R_EmitEdge(mvertex_p pv0, mvertex_p pv1);
 void R_ClipEdge(mvertex_p pv0, mvertex_p pv1, clipplane_p clip);
 void R_SplitEntityOnNode2(mnode_p node);
-void R_MarkLights(dlight_t* light, int bit, mnode_p node);
+void R_MarkLights(dlight_p light, int bit, mnode_p node);
 
 #endif

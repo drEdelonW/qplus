@@ -30,82 +30,83 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 typedef struct {
-	vec3_t	viewangles;
+    vec3_t viewangles;
 
-	// intended velocities
-	float	forwardmove;
-	float	sidemove;
-	float	upmove;
+    // intended velocities
+    float forwardmove;
+    float sidemove;
+    float upmove;
 #ifdef QUAKE2
-	uint8_t	lightlevel;
+    uint8_t lightlevel;
 #endif
 } usercmd_t;
 
 typedef struct {
-	int32_t		length;
-	char	map[MAX_STYLESTRING];
+    int32_t  length;
+    char map[MAX_STYLESTRING];
 } lightstyle_t;
 
 typedef struct {
-	char	name[MAX_SCOREBOARDNAME];
-	float	entertime;
-	int32_t		frags;
-	int32_t		colors;			// two 4 bit fields
-	uint8_t	translations[VID_GRADES * 256];
+    char name[MAX_SCOREBOARDNAME];
+    float entertime;
+    int32_t  frags;
+    int32_t  colors;   // two 4 bit fields
+    uint8_t translations[VID_GRADES * 256];
 } scoreboard_t;
 
 typedef struct {
-	int32_t		destcolor[3];
-	int32_t		percent;		// 0-256
+    int32_t  destcolor[3];
+    int32_t  percent;  // 0-256
 } cshift_t;
 
-#define	CSHIFT_CONTENTS	0
-#define	CSHIFT_DAMAGE	1
-#define	CSHIFT_BONUS	2
-#define	CSHIFT_POWERUP	3
-#define	NUM_CSHIFTS		4
+#define CSHIFT_CONTENTS 0
+#define CSHIFT_DAMAGE 1
+#define CSHIFT_BONUS 2
+#define CSHIFT_POWERUP 3
+#define NUM_CSHIFTS  4
 
-#define	NAME_LENGTH	64
+#define NAME_LENGTH 64
 
 
 //
 // client_state_t should hold all pieces of the client state
 //
 
-#define	SIGNONS		4			// signon messages to receive before connected
+#define SIGNONS  4   // signon messages to receive before connected
 
-#define	MAX_DLIGHTS		32
+#define MAX_DLIGHTS  32
 typedef struct {
-	vec3_t	origin;
-	float	radius;
-	float	die;				// stop lighting after this time
-	float	decay;				// drop this each second
-	float	minlight;			// don't add when contributing less
-	int32_t		key;
+    vec3_t origin;
+    float radius;
+    float die;    // stop lighting after this time
+    float decay;    // drop this each second
+    float minlight;   // don't add when contributing less
+    int32_t  key;
 #ifdef QUAKE2
-	bool	dark;			// subtracts light instead of adding
+    bool dark;   // subtracts light instead of adding
 #endif
 } dlight_t;
+typedef dlight_t* dlight_p;
 
 
-#define	MAX_BEAMS	24
+#define MAX_BEAMS 24
 typedef struct {
-	int32_t		entity;
-	struct model_s* model;
-	float	endtime;
-	vec3_t	start, end;
+    int32_t  entity;
+    struct model_s* model;
+    float endtime;
+    vec3_t start, end;
 } beam_t;
 
-#define	MAX_EFRAGS		640
+#define MAX_EFRAGS  640
 
-#define	MAX_MAPSTRING	2048
-#define	MAX_DEMOS		8
-#define	MAX_DEMONAME	16
+#define MAX_MAPSTRING 2048
+#define MAX_DEMOS  8
+#define MAX_DEMONAME 16
 
 typedef enum {
-	ca_dedicated, 		// a dedicated server with no ability to start a client
-	ca_disconnected, 	// full screen console with no connection
-	ca_connected		// valid netcon, talking to a server
+    ca_dedicated,   // a dedicated server with no ability to start a client
+    ca_disconnected,  // full screen console with no connection
+    ca_connected  // valid netcon, talking to a server
 } cactive_t;
 
 //
@@ -113,145 +114,145 @@ typedef enum {
 // of server connections
 //
 typedef struct {
-	cactive_t	state;
+    cactive_t state;
 
-	// personalization data sent to server
-	char		mapstring[MAX_QPATH];
-	char		spawnparms[MAX_MAPSTRING];	// to restart a level
+    // personalization data sent to server
+    char  mapstring[MAX_QPATH];
+    char  spawnparms[MAX_MAPSTRING]; // to restart a level
 
-	// demo loop control
-	int32_t			demonum;		// -1 = don't play demos
-	char		demos[MAX_DEMOS][MAX_DEMONAME];		// when not playing
+    // demo loop control
+    int32_t   demonum;  // -1 = don't play demos
+    char  demos[MAX_DEMOS][MAX_DEMONAME];  // when not playing
 
-	// demo recording info must be here, because record is started before
-	// entering a map (and clearing client_state_t)
-	bool	demorecording;
-	bool	demoplayback;
-	bool	timedemo;
-	int32_t			forcetrack;			// -1 = use normal cd track
-	FILE* demofile;
-	int32_t			td_lastframe;		// to meter out one message a frame
-	int32_t			td_startframe;		// host_framecount at start
-	float		td_starttime;		// realtime at second frame of timedemo
+    // demo recording info must be here, because record is started before
+    // entering a map (and clearing client_state_t)
+    bool demorecording;
+    bool demoplayback;
+    bool timedemo;
+    int32_t   forcetrack;   // -1 = use normal cd track
+    FILE* demofile;
+    int32_t   td_lastframe;  // to meter out one message a frame
+    int32_t   td_startframe;  // host_framecount at start
+    float  td_starttime;  // realtime at second frame of timedemo
 
 
-	// connection information
-	int32_t			signon;			// 0 to SIGNONS
-	struct qsocket_s* netcon;
-	sizebuf_t	message;		// writing buffer to send to server
+    // connection information
+    int32_t   signon;   // 0 to SIGNONS
+    struct qsocket_s* netcon;
+    sizebuf_t message;  // writing buffer to send to server
 
 } client_static_t;
 
-extern client_static_t	cls;
+extern client_static_t cls;
 
 //
 // the client_state_t structure is wiped completely at every
 // server signon
 //
 typedef struct {
-	int32_t			movemessages;	// since connecting to this server
-	// throw out the first couple, so the player
-	// doesn't accidentally do something the
-	// first frame
-	usercmd_t	cmd;			// last command sent to the server
+    int32_t   movemessages; // since connecting to this server
+    // throw out the first couple, so the player
+    // doesn't accidentally do something the
+    // first frame
+    usercmd_t cmd;   // last command sent to the server
 
-	// information for local display
-	int32_t			stats[MAX_CL_STATS];	// health, etc
-	int32_t			items;			// inventory bit flags
-	float		item_gettime[32];	// cl.time of aquiring item, for blinking
-	float		faceanimtime;	// use anim frame if cl.time < this
+    // information for local display
+    int32_t   stats[MAX_CL_STATS]; // health, etc
+    int32_t   items;   // inventory bit flags
+    float  item_gettime[32]; // cl.time of aquiring item, for blinking
+    float  faceanimtime; // use anim frame if cl.time < this
 
-	cshift_t	cshifts[NUM_CSHIFTS];	// color shifts for damage, powerups
-	cshift_t	prev_cshifts[NUM_CSHIFTS];	// and content types
+    cshift_t cshifts[NUM_CSHIFTS]; // color shifts for damage, powerups
+    cshift_t prev_cshifts[NUM_CSHIFTS]; // and content types
 
-	// the client maintains its own idea of view angles, which are
-	// sent to the server each frame.  The server sets punchangle when
-	// the view is temporarliy offset, and an angle reset commands at the start
-	// of each level and after teleporting.
-	vec3_t		mviewangles[2];	// during demo playback viewangles is lerped
-	// between these
-	vec3_t		viewangles;
+    // the client maintains its own idea of view angles, which are
+    // sent to the server each frame.  The server sets punchangle when
+    // the view is temporarliy offset, and an angle reset commands at the start
+    // of each level and after teleporting.
+    vec3_t  mviewangles[2]; // during demo playback viewangles is lerped
+    // between these
+    vec3_t  viewangles;
 
-	vec3_t		mvelocity[2];	// update by server, used for lean+bob
-	// (0 is newest)
-	vec3_t		velocity;		// lerped between mvelocity[0] and [1]
+    vec3_t  mvelocity[2]; // update by server, used for lean+bob
+    // (0 is newest)
+    vec3_t  velocity;  // lerped between mvelocity[0] and [1]
 
-	vec3_t		punchangle;		// temporary offset
+    vec3_t  punchangle;  // temporary offset
 
-	// pitch drifting vars
-	float		idealpitch;
-	float		pitchvel;
-	bool	nodrift;
-	float		driftmove;
-	double		laststop;
+    // pitch drifting vars
+    float  idealpitch;
+    float  pitchvel;
+    bool nodrift;
+    float  driftmove;
+    double  laststop;
 
-	float		viewheight;
-	float		crouch;			// local amount for smoothing stepups
+    float  viewheight;
+    float  crouch;   // local amount for smoothing stepups
 
-	bool	paused;			// send over by server
-	bool	onground;
-	bool	inwater;
+    bool paused;   // send over by server
+    bool onground;
+    bool inwater;
 
-	int32_t			intermission;	// don't change view angle, full screen, etc
-	int32_t			completed_time;	// latched at intermission start
+    int32_t   intermission; // don't change view angle, full screen, etc
+    int32_t   completed_time; // latched at intermission start
 
-	double		mtime[2];		// the timestamp of last two messages
-	double		time;			// clients view of time, should be between
-	// servertime and oldservertime to generate
-	// a lerp point for other data
-	double		oldtime;		// previous cl.time, time-oldtime is used
-	// to decay light values and smooth step ups
+    double  mtime[2];  // the timestamp of last two messages
+    double  time;   // clients view of time, should be between
+    // servertime and oldservertime to generate
+    // a lerp point for other data
+    double  oldtime;  // previous cl.time, time-oldtime is used
+    // to decay light values and smooth step ups
 
 
-	float		last_received_message;	// (realtime) for net trouble icon
+    float  last_received_message; // (realtime) for net trouble icon
 
-	//
-	// information that is static for the entire time connected to a server
-	//
-	struct model_s* model_precache[MAX_MODELS];
-	struct sfx_s* sound_precache[MAX_SOUNDS];
+    //
+    // information that is static for the entire time connected to a server
+    //
+    struct model_s* model_precache[MAX_MODELS];
+    struct sfx_s* sound_precache[MAX_SOUNDS];
 
-	char		levelname[40];	// for display on solo scoreboard
-	int32_t			viewentity;		// cl_entitites[cl.viewentity] = player
-	int32_t			maxclients;
-	int32_t			gametype;
+    char  levelname[40]; // for display on solo scoreboard
+    int32_t   viewentity;  // cl_entitites[cl.viewentity] = player
+    int32_t   maxclients;
+    int32_t   gametype;
 
-	// refresh related state
-	struct model_s* worldmodel;	// cl_entitites[0].model
-	struct efrag_s* free_efrags;
-	int32_t			num_entities;	// held in cl_entities array
-	int32_t			num_statics;	// held in cl_staticentities array
-	r_entity_t	viewent;			// the gun model
+    // refresh related state
+    struct model_s* worldmodel; // cl_entitites[0].model
+    struct efrag_s* free_efrags;
+    int32_t   num_entities; // held in cl_entities array
+    int32_t   num_statics; // held in cl_staticentities array
+    r_entity_t viewent;   // the gun model
 
-	int32_t			cdtrack, looptrack;	// cd audio
+    int32_t   cdtrack, looptrack; // cd audio
 
-	// frag scoreboard
-	scoreboard_t* scores;		// [cl.maxclients]
+    // frag scoreboard
+    scoreboard_t* scores;  // [cl.maxclients]
 
 #ifdef QUAKE2
-	// light level at player's position including dlights
-	// this is sent back to the server each frame
-	// architectually ugly but it works
-	int32_t			light_level;
+    // light level at player's position including dlights
+    // this is sent back to the server each frame
+    // architectually ugly but it works
+    int32_t   light_level;
 #endif
 } client_state_t;
 
 
 
 
-#define	MAX_TEMP_ENTITIES	64			// lightning bolts, etc
-#define	MAX_STATIC_ENTITIES	128			// torches, etc
+#define MAX_TEMP_ENTITIES 64   // lightning bolts, etc
+#define MAX_STATIC_ENTITIES 128   // torches, etc
 
-extern	client_state_t	cl;
+extern client_state_t cl;
 
 // FIXME, allocate dynamically
-// extern	efrag_t			cl_efrags[MAX_EFRAGS];
-extern	r_entity_t        cl_entities[MAX_EDICTS];
-extern	r_entity_t        cl_static_entities[MAX_STATIC_ENTITIES];
-extern	lightstyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
-extern	dlight_t        cl_dlights[MAX_DLIGHTS];
-extern	r_entity_t        cl_temp_entities[MAX_TEMP_ENTITIES];
-extern	beam_t          cl_beams[MAX_BEAMS];
+// extern efrag_t   cl_efrags[MAX_EFRAGS];
+extern r_entity_t        cl_entities[MAX_EDICTS];
+extern r_entity_t        cl_static_entities[MAX_STATIC_ENTITIES];
+extern lightstyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
+extern dlight_t        cl_dlights[MAX_DLIGHTS];
+extern r_entity_t        cl_temp_entities[MAX_TEMP_ENTITIES];
+extern beam_t          cl_beams[MAX_BEAMS];
 
 //=============================================================================
 
@@ -259,7 +260,7 @@ extern	beam_t          cl_beams[MAX_BEAMS];
 // cl_main
 //
 dlight_t* CL_AllocDlight(int32_t key);
-void	CL_DecayLights();
+void CL_DecayLights();
 
 void CL_Init();
 
@@ -273,16 +274,16 @@ void CL_Disconnect();
 void CL_Disconnect_f();
 void CL_NextDemo();
 
-#define			MAX_VISEDICTS	256
-extern	int32_t				cl_numvisedicts;
-extern	r_entity_p cl_visedicts[MAX_VISEDICTS];
+#define MAX_VISEDICTS 256
+extern int32_t cl_numvisedicts;
+extern r_entity_p cl_visedicts[MAX_VISEDICTS];
 
 //
 // cl_input
 //
 typedef struct {
-	int32_t down[2];    // key nums holding it down
-	int32_t state;      // low bit is down state
+    int32_t down[2];    // key nums holding it down
+    int32_t state;      // low bit is down state
 } kbutton_t;
 
 extern  kbutton_t   in_mlook, in_klook;

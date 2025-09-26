@@ -7,7 +7,7 @@
 //
 extern	quakeparms_t host_parms;
 
-#include "cvar_q1.h"
+
 
 #include "qboolean.h"
 extern	bool    host_initialized;		// true if into command execution

@@ -22,9 +22,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // models are the only shared resource between a client and server running
 // on the same machine.
 
-// #include "model.h"
-// #include <string.h>
-#include "quakedef.h"
+#if 0
+#   include "quakedef.h"
+#else
+#   include <string.h>
+#   include "model.h"
+#   include "sys.h"
+#   include "common.h"
+#   include "q_tools.h"
+#   include "console.h"
+#   include "d_iface.h"
+#endif
 #include "r_local.h"
 
 model_p loadmodel;

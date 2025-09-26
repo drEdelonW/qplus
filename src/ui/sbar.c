@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "sbar.h"
 #include "wad.h"
+#include "cvar_q1.h"
+
 
 
 int			sb_updates;		// if >= vid.numpages, no update needed

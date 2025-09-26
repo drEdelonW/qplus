@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // This is enables a simple IP banning mechanism
 #include <stdint.h>
+#include "cvar_q1.h"
+
 
 #define BAN_TEST
 

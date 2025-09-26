@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // net.h -- quake's interface to the networking layer
-#include "cvar_q1.h"
+
 
 typedef struct qsockaddr {
     int16_t sa_family;

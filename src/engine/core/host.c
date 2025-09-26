@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "chase.h"
 #include "r_local.h"
-#include "cvar_q1.h"
+
 
 /*
 

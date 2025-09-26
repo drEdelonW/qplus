@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // common.c -- misc functions used in client and server
 
 #include "quakedef.h"
+#include "cvar_q1.h"
+
 
 #define NUM_SAFE_ARGVS  7
 
@@ -36,7 +38,6 @@ static cstring safeargvs[NUM_SAFE_ARGVS] = {
     "-dibonly"
 };
 
-#include "cvar_q1.h"
 
 bool        com_modified;   // set true if using non-id files
 
