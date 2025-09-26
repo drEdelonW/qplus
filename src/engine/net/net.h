@@ -21,6 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // net.h -- quake's interface to the networking layer
 
 
+#define	MAX_MSGLEN		8000		// max length of a reliable message
+#define	MAX_DATAGRAM	1024		// max length of unreliable message
+
 typedef struct qsockaddr {
     int16_t sa_family;
     uint8_t sa_data[14];

@@ -20,7 +20,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // host.c -- coordinates spawning and killing of local servers
 
 #include "host.h"
-#include "quakedef.h"
+#if 0
+#   include "quakedef.h"
+#else
+#   include <stdio.h>
+#   include <string.h>
+#   include <stdarg.h>
+#   include <stdlib.h>
+#   include "d_iface.h"
+#   include "server.h"
+#   include "common.h"
+#   include "sys.h"
+#   include "protocol.h"
+#   include "keys.h"
+#   include "console.h"
+#   include "vid.h"
+#   include "cmd.h"
+#   include "input.h"
+#   include "sound.h"
+#   include "cdaudio.h"
+#   include "wad.h"
+#   include "view.h"
+#   include "draw.h"
+#   include "menu.h"
+#   include "sbar.h"
+#endif
 #include "chase.h"
 #include "r_local.h"
 

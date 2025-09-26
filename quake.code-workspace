@@ -51,7 +51,13 @@
 			"netfwd": "c",
 			"progs.h": "c",
 			"mathlib.h": "c",
-			"sound.h": "c"
+			"sound.h": "c",
+			"string.h": "c",
+			"common.h": "c",
+			"input.h": "c",
+			"cstdlib": "c",
+			"cdaudio.h": "c",
+			"view.h": "c"
 		}
 	}
 }

@@ -42,6 +42,7 @@ typedef struct vmode_s {
 	void		(*enddirectrect)(viddef_p vid, struct vmode_s* pcurrentmode,
 		int x, int y, int width, int height);
 } vmode_t;
+typrdef vmode_t* vmode_p;
 
 // vid_wait settings
 #define VID_WAIT_NONE			0

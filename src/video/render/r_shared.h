@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	MAXWIDTH		1280
 #define MAXDIMENSION	((MAXHEIGHT > MAXWIDTH) ? MAXHEIGHT : MAXWIDTH)
 
-#define SIN_BUFFER_SIZE	(MAXDIMENSION+CYCLE)
+#define SIN_BUFFER_SIZE	(MAXDIMENSION + CYCLE)
 
 #define INFINITE_DISTANCE	0x10000		// distance that's always guaranteed to
 										//  be farther away than anything in
@@ -74,24 +74,24 @@ struct espan_s;
 typedef struct espan_s espan_t;
 typedef espan_t* espan_p;
 struct espan_s {
-    int     u;
-    int     v;
-    int     count;
-    espan_p	pnext;
+	int     u;
+	int     v;
+	int     count;
+	espan_p	pnext;
 };
 
 // FIXME: compress, make a union if that will help
 // insubmodel is only 1, flags is fewer than 32, spanstate could be a byte
-typedef struct surf_s{
-	struct surf_s*  next;			// active surface stack in r_edge.c
-	struct surf_s*  prev;			// used in r_edge.c for active surf stack
+typedef struct surf_s {
+	struct surf_s* next;			// active surface stack in r_edge.c
+	struct surf_s* prev;			// used in r_edge.c for active surf stack
 	struct espan_s* spans;			// pointer to linked list of spans to draw
 	int			key;				// sorting key (BSP order)
 	int			last_u;				// set during tracing
 	int			spanstate;			// 0 = not in span
-									// 1 = in span
-									// -1 = in inverted span (end before
-									//  start)
+	// 1 = in span
+	// -1 = in inverted span (end before
+	//  start)
 	int			flags;				// currentface flags
 	typeless_ptr       data;				// associated data like msurface_t
 	r_entity_p   entity;
@@ -149,15 +149,15 @@ extern int	ubasestep, errorterm, erroradjustup, erroradjustdown;
 struct edge_s;
 typedef struct edge_s edge_t;
 typedef edge_t* edge_ptr;
-struct edge_s{
+struct edge_s {
 	fixed16_t   u;
 	fixed16_t   u_step;
 	edge_ptr    prev;
-    edge_ptr    next;
+	edge_ptr    next;
 	uint16_t	surfs[2];
 	edge_ptr    nextremove;
 	float       nearzi;
-	medge_t*    owner;
+	medge_t* owner;
 };
 
 #endif	// _R_SHARED_H_

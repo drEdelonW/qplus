@@ -69,8 +69,8 @@ void D_CopyRects(vrect_p prects, int transparent) {
 	// console); Quake will then draw into wherever the driver points vid.buffer
 	// and will call this function before swapping buffers
 
-	UNUSED(prects);
-	UNUSED(transparent);
+	// UNUSED(prects);
+	// UNUSED(transparent);
 }
 
 
@@ -156,6 +156,6 @@ void D_UpdateRects(vrect_p prect) {
 
 	// the software driver draws these directly to the vid buffer
 
-	UNUSED(prect);
+	// UNUSED(prect);
 }
 

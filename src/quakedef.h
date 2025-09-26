@@ -74,10 +74,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 #define CACHE_SIZE	32		// used to align key data structures
 
-#define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings
-
-#define	MINIMUM_MEMORY			0x550000
-#define	MINIMUM_MEMORY_LEVELPAK	(MINIMUM_MEMORY + 0x100000)
+// #define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings
 
 #define MAX_NUM_ARGVS	50
 
@@ -96,9 +93,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 #define	ON_EPSILON		0.1			// point on plane side epsilon
-
-#define	MAX_MSGLEN		8000		// max length of a reliable message
-#define	MAX_DATAGRAM	1024		// max length of unreliable message
 
 #define	SAVEGAME_COMMENT_LENGTH	39
 
@@ -167,7 +161,6 @@ extern int32_t			current_skill;		// skill level for currently loaded level (in c
 										//  the user changes the cvar while the level is
 										//  running, this reflects the level actually in use)
 
-extern bool		isDedicated;
 
 extern int32_t			minimum_memory;
 
