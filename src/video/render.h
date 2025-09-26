@@ -72,7 +72,8 @@ typedef struct entity_s {
 	struct mnode_s* topnode;		// for bmodels, first world node
 	//  that splits bmodel, or NULL if
 	//  not split
-} entity_t;
+} r_entity_t;
+typedef r_entity_t* r_entity_p;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct {
@@ -125,8 +126,8 @@ void R_ViewChanged(vrect_p pvrect, int lineadj, float aspect);
 // called whenever r_refdef or vid change
 void R_InitSky(struct texture_s* mt);	// called at level load
 
-void R_AddEfrags(entity_t* ent);
-void R_RemoveEfrags(entity_t* ent);
+void R_AddEfrags(r_entity_p ent);
+void R_RemoveEfrags(r_entity_p ent);
 
 void R_NewMap(void);
 
@@ -136,9 +137,9 @@ void R_RunParticleEffect(vec3_t org, vec3_t dir, int color, int count);
 void R_RocketTrail(vec3_t start, vec3_t end, rocket_trail_type type);
 
 #ifdef QUAKE2
-void R_DarkFieldParticles(entity_t* ent);
+void R_DarkFieldParticles(r_entity_p ent);
 #endif
-void R_EntityParticles(entity_t* ent);
+void R_EntityParticles(r_entity_p ent);
 void R_BlobExplosion(vec3_t org);
 void R_ParticleExplosion(vec3_t org);
 void R_ParticleExplosion2(vec3_t org, int colorStart, int colorLength);

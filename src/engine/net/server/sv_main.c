@@ -19,11 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sv_main.c -- server main program
 
+// #include "server.h"
 #include "quakedef.h"
 #include "cvar_q1.h"
 
-server_t        sv;
-server_static_t svs;
+server_t    sv;
+sv_static_t svs;
 
 char localmodels[MAX_MODELS][5];    // inline model names for precache
 
@@ -585,11 +586,15 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_t* msg) {
 */
 bool SV_SendClientDatagram(client_t* client) {
     uint8_t		buf[MAX_DATAGRAM];
-    sizebuf_t	msg;
+    sizebuf_t msg = {
+        .data = buf,
+        .maxsize = sizeof(buf),
+        .cursize = 0
+    };
 
-    msg.data = buf;
-    msg.maxsize = sizeof(buf);
-    msg.cursize = 0;
+    // msg.data = buf;
+    // msg.maxsize = sizeof(buf);
+    // msg.cursize = 0;
 
     MSG_WriteByte(&msg, svc_time);
     MSG_WriteFloat(&msg, sv.time);

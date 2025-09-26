@@ -18,10 +18,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-
+#include "enginedefs.h"
 #include "modelgen.h"
 #include "spritegn.h"
-// #include "bspfile.h"
+#include "bspfile.h"
 // #include "render.h"
 // #include "platformdefs.h"
 
@@ -153,17 +153,17 @@ struct mnode_s {
 
 typedef struct mleaf_s {
     // common with node
-    int32_t contents;		// wil be a negative contents number
-    int32_t visframe;		// node needs to be traversed if current
-    int16_t minmaxs[6];		// for bounding box culling
-    mnode_p parent;
+    int32_t     contents;       // wil be a negative contents number
+    int32_t     visframe;       // node needs to be traversed if current
+    int16_t     minmaxs[6];     // for bounding box culling
+    mnode_p     parent;
     // leaf specific
-    uint8_p compressed_vis;
-    efrag_t* efrags;
+    uint8_p     compressed_vis;
+    efrag_p     efrags;
     msurface_p* firstmarksurface;
-    int32_t			nummarksurfaces;
-    int32_t			key;			// BSP sequence number for leaf's contents
-    uint8_t		ambient_sound_level[NUM_AMBIENTS];
+    int32_t     nummarksurfaces;
+    int32_t     key;            // BSP sequence number for leaf's contents
+    uint8_t     ambient_sound_level[NUM_AMBIENTS];
 } mleaf_t;
 typedef mleaf_t* mleaf_p;
 

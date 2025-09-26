@@ -14,6 +14,17 @@
 #define	MAX_SCOREBOARD		16
 #define	MAX_SCOREBOARDNAME	32
 
+#define	MIPLEVELS	4
+#define	MAXLIGHTMAPS	4
+
+typedef enum {
+    AMBIENT_WATER = 0,
+    AMBIENT_SKY   = 1,
+    AMBIENT_SLIME = 2,
+    AMBIENT_LAVA  = 3,
+
+    NUM_AMBIENTS  = 4   // automatic ambient sounds
+} ambient_type_t;
 
 //
 // stats are integers communicated to the client by the server
@@ -135,3 +146,6 @@ typedef struct {
 	int32_t skin;
 	int32_t effects;
 } entity_state_t;
+
+
+extern bool noclip_anglehack;

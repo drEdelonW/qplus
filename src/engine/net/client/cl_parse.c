@@ -75,7 +75,7 @@ cstring svc_strings[] = {
 	This error checks and tracks the total number of entities
 	===============
 */
-entity_t* CL_EntityNum(int num) {
+r_entity_p CL_EntityNum(int num) {
 	if (num >= cl.num_entities) {
 		if (num >= MAX_EDICTS) {
 			Host_Error("CL_EntityNum: %i is an invalid number", num);
@@ -322,7 +322,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 
 	int num = (bits & U_LONGENTITY) ? MSG_ReadShort() : MSG_ReadByte();
 
-	entity_t* ent = CL_EntityNum(num);
+	r_entity_p ent = CL_EntityNum(num);
 
 	for (int i = 0; i < 16; i++) {
 		if (bits & (1u << i)) {
@@ -408,7 +408,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 	CL_ParseBaseline
 	==================
 */
-void CL_ParseBaseline(entity_t* ent) {
+void CL_ParseBaseline(r_entity_p ent) {
 	ent->baseline.modelindex = MSG_ReadByte();
 	ent->baseline.frame = MSG_ReadByte();
 	ent->baseline.colormap = MSG_ReadByte();
@@ -521,7 +521,7 @@ void CL_ParseStatic() {
 	int statics = cl.num_statics;
 	if (statics >= MAX_STATIC_ENTITIES)
 		Host_Error("Too many static entities");
-	entity_t* ent = &cl_static_entities[statics];
+	r_entity_p ent = &cl_static_entities[statics];
 	cl.num_statics++;
 	CL_ParseBaseline(ent);
 

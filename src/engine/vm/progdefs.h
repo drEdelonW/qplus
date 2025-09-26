@@ -23,3 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #else
     #include "progdefs.q1"
 #endif
+
+typedef globalvars_t* globalvars_p;
+typedef entvars_t* entvars_p;

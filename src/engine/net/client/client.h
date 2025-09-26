@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "screen.h"
 #include "vid.h"
 #include "bspfile.h"
+#include "render.h"
 #include "cvar_q1.h"
 
 typedef struct {
@@ -220,7 +221,7 @@ typedef struct {
 	struct efrag_s* free_efrags;
 	int32_t			num_entities;	// held in cl_entities array
 	int32_t			num_statics;	// held in cl_staticentities array
-	entity_t	viewent;			// the gun model
+	r_entity_t	viewent;			// the gun model
 
 	int32_t			cdtrack, looptrack;	// cd audio
 
@@ -245,11 +246,11 @@ extern	client_state_t	cl;
 
 // FIXME, allocate dynamically
 // extern	efrag_t			cl_efrags[MAX_EFRAGS];
-extern	entity_t        cl_entities[MAX_EDICTS];
-extern	entity_t        cl_static_entities[MAX_STATIC_ENTITIES];
+extern	r_entity_t        cl_entities[MAX_EDICTS];
+extern	r_entity_t        cl_static_entities[MAX_STATIC_ENTITIES];
 extern	lightstyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
 extern	dlight_t        cl_dlights[MAX_DLIGHTS];
-extern	entity_t        cl_temp_entities[MAX_TEMP_ENTITIES];
+extern	r_entity_t        cl_temp_entities[MAX_TEMP_ENTITIES];
 extern	beam_t          cl_beams[MAX_BEAMS];
 
 //=============================================================================
@@ -274,7 +275,7 @@ void CL_NextDemo();
 
 #define			MAX_VISEDICTS	256
 extern	int32_t				cl_numvisedicts;
-extern	entity_t* cl_visedicts[MAX_VISEDICTS];
+extern	r_entity_p cl_visedicts[MAX_VISEDICTS];
 
 //
 // cl_input

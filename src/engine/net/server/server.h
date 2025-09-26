@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (C) 1996-1997 Id Software, Inc.
 
@@ -19,63 +20,55 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // server.h
 
-#include "cvar_q1.h"
+// #include "cvar_q1.h"
+#include "model.h"
 
 struct client_s;
 typedef struct client_s client_t;
 typedef client_t* client_p;
 
 typedef struct {
-	int32_t			maxclients;
-	int32_t			maxclientslimit;
-	client_p clients;		// [maxclients]
-	int32_t			serverflags;		// episode completion information
-	bool	changelevel_issued;	// cleared when at SV_SpawnServer
-} server_static_t;
+	int32_t     maxclients;
+	int32_t     maxclientslimit;
+	client_p    clients;            // [maxclients]
+	int32_t     serverflags;        // episode completion information
+	bool        changelevel_issued; // cleared when at SV_SpawnServer
+} sv_static_t;
 
 //=============================================================================
 
 typedef enum {
 	ss_loading,
 	ss_active
-} server_state_t;
+} sv_state_t;
 
 typedef struct {
-	bool	active;				// false if only a net client
-
-	bool	paused;
-	bool	loadgame;			// handle connections specially
-
-	double		time;
-
-	int32_t			lastcheck;			// used by PF_checkclient
-	double		lastchecktime;
-
-	char		name[64];			// map name
+	bool    active;         // false if only a net client
+	bool    paused;
+	bool    loadgame;       // handle connections specially
+	double  time;
+	int32_t lastcheck;      // used by PF_checkclient
+	double  lastchecktime;
+	char    name[64];       // map name
 #ifdef QUAKE2
-	char		startspot[64];
+	char    startspot[64];
 #endif
-	char		modelname[64];		// maps/<name>.bsp, for model_precache[0]
-	struct model_s* worldmodel;
-	cstring model_precache[MAX_MODELS];	// NULL terminated
-	struct model_s* models[MAX_MODELS];
-	cstring sound_precache[MAX_SOUNDS];	// NULL terminated
-	cstring lightstyles[MAX_LIGHTSTYLES];
-	int32_t			num_edicts;
-	int32_t			max_edicts;
-	edict_p edicts;			// can NOT be array indexed, because
-	// edict_t is variable sized, but can
-	// be used to reference the world ent
-	server_state_t	state;			// some actions are only valid during load
-
-	sizebuf_t	datagram;
-	uint8_t		datagram_buf[MAX_DATAGRAM];
-
-	sizebuf_t	reliable_datagram;	// copied to all clients at end of frame
-	uint8_t		reliable_datagram_buf[MAX_DATAGRAM];
-
-	sizebuf_t	signon;
-	uint8_t		signon_buf[8192];
+	char        modelname[64];  // maps/<name>.bsp, for model_precache[0]
+	model_p     worldmodel;
+	cstring     model_precache[MAX_MODELS];	    // NULL terminated
+	model_p     models[MAX_MODELS];
+	cstring     sound_precache[MAX_SOUNDS];	    // NULL terminated
+	cstring     lightstyles[MAX_LIGHTSTYLES];
+	int32_t     num_edicts;
+	int32_t     max_edicts;
+	edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
+	sv_state_t state; // some actions are only valid during load
+	sizebuf_t   datagram;
+	uint8_t     datagram_buf[MAX_DATAGRAM];
+	sizebuf_t   reliable_datagram;	// copied to all clients at end of frame
+	uint8_t     reliable_datagram_buf[MAX_DATAGRAM];
+	sizebuf_t   signon;
+	uint8_t     signon_buf[8192];
 } server_t;
 
 
@@ -83,35 +76,24 @@ typedef struct {
 #define	NUM_SPAWN_PARMS		16
 
 typedef struct client_s {
-	bool		active;				// false = client is free
-	bool		spawned;			// false = don't send datagrams
-	bool		dropasap;			// has been told to go to another level
-	bool		privileged;			// can execute any host command
-	bool		sendsignon;			// only valid before spawned
-
-	double			last_message;		// reliable messages must be sent
-	// periodically
-
-	struct qsocket_s* netconnection;	// communications handle
-
-	usercmd_t		cmd;				// movement
-	vec3_t			wishdir;			// intended motion calced from cmd
-
-	sizebuf_t		message;			// can be added to at any time,
-	// copied and clear once per frame
-	uint8_t			msgbuf[MAX_MSGLEN];
-	edict_p        edict;				// EDICT_NUM(clientnum+1)
-	char			name[32];			// for printing to other people
-	int32_t				colors;
-
-	float			ping_times[NUM_PING_TIMES];
-	int32_t				num_pings;			// ping_times[num_pings%NUM_PING_TIMES]
-
-	// spawn parms are carried from level to level
-	float			spawn_parms[NUM_SPAWN_PARMS];
-
-	// client known data for deltas
-	int32_t				old_frags;
+    bool        active;     // false = client is free
+    bool        spawned;    // false = don't send datagrams
+    bool        dropasap;   // has been told to go to another level
+    bool        privileged; // can execute any host command
+    bool        sendsignon; // only valid before spawned
+    double      last_message;   // reliable messages must be sent periodically
+    qsocket_p   netconnection;  // communications handle
+    usercmd_t   cmd;        // movement
+    vec3_t      wishdir;    // intended motion calced from cmd
+    sizebuf_t   message;    // can be added to at any time, copied and clear once per frame
+    uint8_t     msgbuf[MAX_MSGLEN];
+    edict_p     edict;      // EDICT_NUM(clientnum+1)
+    char        name[32];   // for printing to other people
+    int32_t     colors;
+    float       ping_times[NUM_PING_TIMES];
+    int32_t     num_pings;  // ping_times[num_pings%NUM_PING_TIMES]
+    float       spawn_parms[NUM_SPAWN_PARMS]; // spawn parms are carried from level to level
+    int32_t     old_frags;  // client known data for deltas
 } client_t;
 
 
@@ -119,17 +101,17 @@ typedef struct client_s {
 
 // edict->movetype values
 typedef enum {
-	MOVETYPE_NONE = 0,  // never moves
-	MOVETYPE_ANGLENOCLIP = 1,
-	MOVETYPE_ANGLECLIP = 2,
-	MOVETYPE_WALK = 3,  // gravity
-	MOVETYPE_STEP = 4,  // gravity, special edge handling
-	MOVETYPE_FLY = 5,
-	MOVETYPE_TOSS = 6,  // gravity
-	MOVETYPE_PUSH = 7,  // no clip to world, push and crush
-	MOVETYPE_NOCLIP = 8,
-	MOVETYPE_FLYMISSILE = 9,  // extra size to monsters
-	MOVETYPE_BOUNCE = 10,
+	MOVETYPE_NONE           = 0,  // never moves
+	MOVETYPE_ANGLENOCLIP    = 1,
+	MOVETYPE_ANGLECLIP      = 2,
+	MOVETYPE_WALK           = 3,  // gravity
+	MOVETYPE_STEP           = 4,  // gravity, special edge handling
+	MOVETYPE_FLY            = 5,
+	MOVETYPE_TOSS           = 6,  // gravity
+	MOVETYPE_PUSH           = 7,  // no clip to world, push and crush
+	MOVETYPE_NOCLIP         = 8,
+	MOVETYPE_FLYMISSILE     = 9,  // extra size to monsters
+	MOVETYPE_BOUNCE         = 10,
 #ifdef QUAKE2
 	MOVETYPE_BOUNCEMISSILE = 11, // bounce w/o gravity
 	MOVETYPE_FOLLOW = 12, // track movement of aiment
@@ -146,75 +128,82 @@ typedef enum {
 } solid_t;
 
 // edict->deadflag values
-#define	DEAD_NO					0
-#define	DEAD_DYING				1
-#define	DEAD_DEAD				2
+typedef enum {
+    DEAD_NO    = 0, // alive
+    DEAD_DYING = 1, // in the process of dying
+    DEAD_DEAD  = 2  // fully dead
+} deadflag_t;
 
-#define	DAMAGE_NO				0
-#define	DAMAGE_YES				1
-#define	DAMAGE_AIM				2
+typedef enum {
+    DAMAGE_NO  = 0, // does not take damage
+    DAMAGE_YES = 1, // always takes damage
+    DAMAGE_AIM = 2  // takes damage only with aim
+} damage_t;
 
 // edict->flags
-#define	FL_FLY					1
-#define	FL_SWIM					2
-//#define	FL_GLIMPSE				4
-#define	FL_CONVEYOR				4
-#define	FL_CLIENT				8
-#define	FL_INWATER				16
-#define	FL_MONSTER				32
-#define	FL_GODMODE				64
-#define	FL_NOTARGET				128
-#define	FL_ITEM					256
-#define	FL_ONGROUND				512
-#define	FL_PARTIALGROUND		1024	// not all corners are valid
-#define	FL_WATERJUMP			2048	// player jumping out of water
-#define	FL_JUMPRELEASED			4096	// for jump debouncing
+typedef enum {
+    FL_FLY            = 1 << 0,   // 0000...0001
+    FL_SWIM           = 1 << 1,   // 0000...0010
+    // FL_GLIMPSE        = 1 << 1,
+    FL_CONVEYOR       = 1 << 2,   // 0000...0100
+    FL_CLIENT         = 1 << 3,   // 0000...1000
+    FL_INWATER        = 1 << 4,   // 0001...0000
+    FL_MONSTER        = 1 << 5,   // 0010...0000
+    FL_GODMODE        = 1 << 6,
+    FL_NOTARGET       = 1 << 7,
+    FL_ITEM           = 1 << 8,
+    FL_ONGROUND       = 1 << 9,
+    FL_PARTIALGROUND  = 1 << 10,  // not all corners are valid
+    FL_WATERJUMP      = 1 << 11,  // player jumping out of water
+    FL_JUMPRELEASED   = 1 << 12,  // for jump debouncing
 #ifdef QUAKE2
-#define FL_FLASHLIGHT			8192
-#define FL_ARCHIVE_OVERRIDE		1048576
+    FL_FLASHLIGHT     = 1 << 13,
+    FL_ARCHIVE_OVERRIDE = 1 << 20
 #endif
+} entity_flags_t;
 
 // entity effects
-
-#define	EF_BRIGHTFIELD			1
-#define	EF_MUZZLEFLASH 			2
-#define	EF_BRIGHTLIGHT 			4
-#define	EF_DIMLIGHT 			8
+typedef enum {
+    EF_BRIGHTFIELD  = 1 << 0, // 0x0001
+    EF_MUZZLEFLASH  = 1 << 1, // 0x0002
+    EF_BRIGHTLIGHT  = 1 << 2, // 0x0004
+    EF_DIMLIGHT     = 1 << 3, // 0x0008
 #ifdef QUAKE2
-#define EF_DARKLIGHT			16
-#define EF_DARKFIELD			32
-#define EF_LIGHT				64
-#define EF_NODRAW				128
+    EF_DARKLIGHT    = 1 << 4, // 0x0010
+    EF_DARKFIELD    = 1 << 5, // 0x0020
+    EF_LIGHT        = 1 << 6, // 0x0040
+    EF_NODRAW       = 1 << 7  // 0x0080
 #endif
+} entity_effects_t;
 
-#define	SPAWNFLAG_NOT_EASY			256
-#define	SPAWNFLAG_NOT_MEDIUM		512
-#define	SPAWNFLAG_NOT_HARD			1024
-#define	SPAWNFLAG_NOT_DEATHMATCH	2048
+typedef enum {
+    SPAWNFLAG_NOT_EASY       = 1 << 8,  // 0x0100
+    SPAWNFLAG_NOT_MEDIUM     = 1 << 9,  // 0x0200
+    SPAWNFLAG_NOT_HARD       = 1 << 10, // 0x0400
+    SPAWNFLAG_NOT_DEATHMATCH = 1 << 11  // 0x0800
+} spawnflags_t;
 
 #ifdef QUAKE2
 // server flags
-#define	SFL_EPISODE_1		1
-#define	SFL_EPISODE_2		2
-#define	SFL_EPISODE_3		4
-#define	SFL_EPISODE_4		8
-#define	SFL_NEW_UNIT		16
-#define	SFL_NEW_EPISODE		32
-#define	SFL_CROSS_TRIGGERS	65280
+typedef enum {
+    SFL_EPISODE_1      = 1 << 0,   // 0x0001
+    SFL_EPISODE_2      = 1 << 1,   // 0x0002
+    SFL_EPISODE_3      = 1 << 2,   // 0x0004
+    SFL_EPISODE_4      = 1 << 3,   // 0x0008
+    SFL_NEW_UNIT       = 1 << 4,   // 0x0010
+    SFL_NEW_EPISODE    = 1 << 5,   // 0x0020
+    SFL_CROSS_TRIGGERS = 0xFF00    // 65280, covers multiple bits
+} spawnlevel_flags_t;
 #endif
 
 //============================================================================
 
-extern	server_static_t	svs;				// persistant server info
-extern	server_t		sv;					// local server
-
-extern	client_t* host_client;
-
-extern	jmp_buf 	host_abortserver;
-
-extern	double		host_time;
-
-extern	edict_p sv_player;
+extern sv_static_t  svs; // persistant server info
+extern server_t     sv;         // local server
+extern client_p     host_client;
+extern jmp_buf      host_abortserver;
+extern double       host_time;
+extern edict_p      sv_player;
 
 //===========================================================
 
@@ -235,7 +224,7 @@ void SV_SetIdealPitch();
 void SV_AddUpdates();
 
 void SV_ClientThink();
-void SV_AddClientToServer(struct qsocket_s* ret);
+void SV_AddClientToServer(qsocket_p ret);
 
 void SV_ClientPrintf(cstring fmt, ...);
 void SV_BroadcastPrintf(cstring fmt, ...);

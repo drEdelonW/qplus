@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#include "enginedefs.h"
 
 // upper design bounds
 
@@ -58,7 +59,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	TOOLVERSION	(2)
 
 typedef struct {
-	int32_t		fileofs, filelen;
+    int32_t fileofs, filelen;
 } lump_t;
 typedef lump_t* lump_p;
 
@@ -83,58 +84,57 @@ typedef enum {
 } lump_type_t;
 
 typedef struct {
-	float		mins[3], maxs[3];
-	float		origin[3];
-	int32_t			headnode[MAX_MAP_HULLS];
-	int32_t			visleafs;		// not including the solid leaf 0
-	int32_t			firstface, numfaces;
+    float   mins[3], maxs[3];
+    float   origin[3];
+    int32_t headnode[MAX_MAP_HULLS];
+    int32_t visleafs;		// not including the solid leaf 0
+    int32_t firstface, numfaces;
 } dmodel_t;
 typedef dmodel_t* dmodel_p;
 
 typedef struct {
-	int32_t			version;
-	lump_t		lumps[HEADER_LUMPS];
+    int32_t version;
+    lump_t  lumps[HEADER_LUMPS];
 } dheader_t;
 typedef dheader_t* dheader_p;
 
 typedef struct {
-	int32_t			nummiptex;
-	int32_t			dataofs[4];		// [nummiptex]
+    int32_t nummiptex;
+    int32_t dataofs[4]; // [nummiptex]
 } dmiptexlump_t;
 typedef dmiptexlump_t* dmiptexlump_p;
 
 
-#define	MIPLEVELS	4
 typedef struct miptex_s {
-	char		name[16];
-	uint32_t	width, height;
-	uint32_t	offsets[MIPLEVELS];		// four mip maps stored
+	char        name[16];
+	uint32_t    width, height;
+	uint32_t    offsets[MIPLEVELS];		// four mip maps stored
 } miptex_t;
 typedef miptex_t* miptex_p;
 
 
 typedef struct {
-	float	point[3];
+    float	point[3];
 } dvertex_t;
 typedef dvertex_t* dvertex_p;
 
 
 typedef enum {
-	// 0–2 are axial planes
-	PLANE_X = 0,
-	PLANE_Y = 1,
-	PLANE_Z = 2,
+    // 0–2 are axial planes
+    PLANE_X = 0,
+    PLANE_Y = 1,
+    PLANE_Z = 2,
 
-	// 3–5 are non-axial planes snapped to the nearest
-	PLANE_ANYX = 3,
-	PLANE_ANYY = 4,
-	PLANE_ANYZ = 5
+    // 3–5 are non-axial planes snapped to the nearest
+    PLANE_ANYX = 3,
+    PLANE_ANYY = 4,
+    PLANE_ANYZ = 5
 } plane_type_t;
 
 typedef struct {
-	float			normal[3];
-	float			dist;
-	plane_type_t	type;		// PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
+    float           normal[3];
+    float           dist;
+    plane_type_t    type;		// PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
 } dplane_t;
 typedef dplane_t* dplane_p;
 
@@ -161,27 +161,27 @@ typedef enum {
 
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
 typedef struct {
-	int32_t			planenum;
-	int16_t		children[2];	// negative numbers are -(leafs+1), not nodes
-	int16_t		mins[3];		// for sphere culling
-	int16_t		maxs[3];
-	uint16_t	firstface;
-	uint16_t	numfaces;	// counting both sides
+    int32_t     planenum;
+    int16_t     children[2];	// negative numbers are -(leafs+1), not nodes
+    int16_t     mins[3];		// for sphere culling
+    int16_t     maxs[3];
+    uint16_t    firstface;
+    uint16_t    numfaces;	// counting both sides
 } dnode_t;
 typedef dnode_t* dnode_p;
 
 
 typedef struct {
-	int32_t			planenum;
-	int16_t		children[2];	// negative numbers are contents
+    int32_t planenum;
+    int16_t children[2];	// negative numbers are contents
 } dclipnode_t;
 typedef dclipnode_t* dclipnode_p;
 
 
 typedef struct texinfo_s {
-	float		vecs[2][4];		// [s/t][xyz offset]
-	int32_t			miptex;
-	int32_t			flags;
+    float   vecs[2][4];		// [s/t][xyz offset]
+    int32_t miptex;
+    int32_t flags;
 } texinfo_t;
 typedef texinfo_t* texinfo_p;
 #define	TEX_SPECIAL		1		// sky or slime, no lightmap or 256 subdivision
@@ -189,48 +189,40 @@ typedef texinfo_t* texinfo_p;
 // note that edge 0 is never used, because negative edge nums are used for
 // counterclockwise use of the edge in a face
 typedef struct {
-	uint16_t	v[2];		// vertex numbers
+    uint16_t    v[2];		// vertex numbers
 } dedge_t;
 typedef dedge_t* dedge_p;
 
-#define	MAXLIGHTMAPS	4
 typedef struct {
-	int16_t		planenum;
-	int16_t		side;
+    int16_t planenum;
+    int16_t side;
 
-	int32_t			firstedge;		// we must support > 64k edges
-	int16_t		numedges;
-	int16_t		texinfo;
+    int32_t firstedge;  // we must support > 64k edges
+    int16_t numedges;
+    int16_t texinfo;
 
-	// lighting info
-	uint8_t		styles[MAXLIGHTMAPS];
-	int32_t			lightofs;		// start of [numstyles*surfsize] samples
+    // lighting info
+    uint8_t styles[MAXLIGHTMAPS];
+    int32_t lightofs;   // start of [numstyles*surfsize] samples
 } dface_t;
 typedef dface_t* dface_p;
 
 
-typedef enum {
-    AMBIENT_WATER = 0,
-    AMBIENT_SKY   = 1,
-    AMBIENT_SLIME = 2,
-    AMBIENT_LAVA  = 3,
 
-    NUM_AMBIENTS  = 4   // automatic ambient sounds
-} ambient_type_t;
 
 // leaf 0 is the generic CONTENTS_SOLID leaf, used for all solid areas
 // all other leafs need visibility info
 typedef struct {
-	int32_t			contents;
-	int32_t			visofs;				// -1 = no visibility info
+	int32_t contents;
+	int32_t visofs;				// -1 = no visibility info
 
-	int16_t		mins[3];			// for frustum culling
-	int16_t		maxs[3];
+	int16_t mins[3];			// for frustum culling
+	int16_t maxs[3];
 
-	uint16_t		firstmarksurface;
-	uint16_t		nummarksurfaces;
+	uint16_t    firstmarksurface;
+	uint16_t    nummarksurfaces;
 
-	uint8_t		ambient_level[NUM_AMBIENTS];
+	uint8_t ambient_level[NUM_AMBIENTS];
 } dleaf_t;
 typedef dleaf_t* dleaf_p;
 
@@ -238,7 +230,7 @@ typedef dleaf_t* dleaf_p;
 //============================================================================
 
 #ifndef QUAKE_GAME
-
+// #warning QUAKE_GAME NOT DEFINED!!!
 #define	ANGLE_UP	-1
 #define	ANGLE_DOWN	-2
 
@@ -308,9 +300,9 @@ typedef struct epair_s {
 } epair_t;
 
 typedef struct {
-	vec3_t		origin;
-	int32_t			firstbrush;
-	int32_t			numbrushes;
+	vec3_t  origin;
+	int32_t firstbrush;
+	int32_t numbrushes;
 	epair_t* epairs;
 } entity_t;
 

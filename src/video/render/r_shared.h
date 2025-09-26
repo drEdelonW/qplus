@@ -61,7 +61,7 @@ extern int	intsintable[SIN_BUFFER_SIZE];
 extern	vec3_t	vup, base_vup;
 extern	vec3_t	vpn, base_vpn;
 extern	vec3_t	vright, base_vright;
-extern	entity_t*   currententity;
+extern	r_entity_p   currententity;
 
 #define NUMSTACKEDGES		2400
 #define	MINEDGES			NUMSTACKEDGES
@@ -94,7 +94,7 @@ typedef struct surf_s{
 									//  start)
 	int			flags;				// currentface flags
 	typeless_ptr       data;				// associated data like msurface_t
-	entity_t*   entity;
+	r_entity_p   entity;
 	float		nearzi;				// nearest 1/z on surface, for mipmapping
 	qboolean	insubmodel;
 	float		d_ziorigin, d_zistepu, d_zistepv;

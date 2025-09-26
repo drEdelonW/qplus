@@ -9,7 +9,6 @@
 //========================[z_hulk.c]========================//
 extern uint8_p  hunk_base;
 extern size_t   hunk_size;
-
 extern size_t   hunk_low_used;
 extern size_t   hunk_high_used;
 
@@ -37,7 +36,7 @@ void Cache_Init();
 
 //========================[z_cache.c]========================//
 typedef struct {
-	size_t 		size;       // total bytes malloced, including header
+	size_t      size;       // total bytes malloced, including header
 	memblock_t  blocklist;  // start / end cap for linked list
 	memblock_p  rover;
 } memzone_t;

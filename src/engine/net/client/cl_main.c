@@ -33,13 +33,13 @@ client_static_t	cls;
 client_state_t	cl;
 // FIXME: put these on hunk?
 efrag_t			cl_efrags[MAX_EFRAGS];
-entity_t		cl_entities[MAX_EDICTS];
-entity_t		cl_static_entities[MAX_STATIC_ENTITIES];
+r_entity_t		cl_entities[MAX_EDICTS];
+r_entity_t		cl_static_entities[MAX_STATIC_ENTITIES];
 lightstyle_t	cl_lightstyle[MAX_LIGHTSTYLES];
 dlight_t		cl_dlights[MAX_DLIGHTS];
 
 int				cl_numvisedicts;
-entity_t* cl_visedicts[MAX_VISEDICTS];
+r_entity_p cl_visedicts[MAX_VISEDICTS];
 
 /*
 =====================
@@ -224,7 +224,7 @@ CL_PrintEntities_f
 ==============
 */
 void CL_PrintEntities_f() {
-	entity_t* ent;
+	r_entity_p ent;
 	int			i;
 
 	for (i = 0, ent = cl_entities; i < cl.num_entities; i++, ent++) {
@@ -393,7 +393,7 @@ CL_RelinkEntities
 ===============
 */
 void CL_RelinkEntities() {
-	entity_t* ent;
+	r_entity_p ent;
 	int			i, j;
 	float		frac, f, d;
 	vec3_t		delta;

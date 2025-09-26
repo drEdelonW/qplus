@@ -48,7 +48,9 @@
 			"tuple": "c",
 			"type_traits": "c",
 			"utility": "c",
-			"netfwd": "c"
+			"netfwd": "c",
+			"progs.h": "c",
+			"mathlib.h": "c"
 		}
 	}
 }

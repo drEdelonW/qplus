@@ -23,15 +23,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "cvar_q1.h"
 
-dprograms_p progs;
-dfunction_p pr_functions;
-cstring pr_strings;
-ddef_p pr_fielddefs;
-ddef_p pr_globaldefs;
-dstatement_p pr_statements;
-globalvars_t* pr_global_struct;
-float_p pr_globals;			// same as pr_global_struct
-int pr_edict_size;	// in bytes
+dprograms_p     progs;
+dfunction_p     pr_functions;
+cstring         pr_strings;
+ddef_p          pr_fielddefs;
+ddef_p          pr_globaldefs;
+dstatement_p    pr_statements;
+globalvars_p    pr_global_struct;
+float_p         pr_globals;     // same as pr_global_struct
+int             pr_edict_size;  // in bytes
 
 uint16_t pr_crc;
 
@@ -39,15 +39,15 @@ int type_size[8] = { 1,sizeof(string_t) / 4,1,3,1,1,sizeof(func_t) / 4,sizeof(ty
 
 
 
-#define	MAX_FIELD_LEN	64
-#define GEFV_CACHESIZE	2
+#define MAX_FIELD_LEN (64)
+#define GEFV_CACHESIZE (2)
 
 typedef struct {
-    ddef_p pcache;
-    char	field[MAX_FIELD_LEN];
+    ddef_p  pcache;
+    char    field[MAX_FIELD_LEN];
 } gefv_cache;
 
-static gefv_cache	gefvCache[GEFV_CACHESIZE] = { {NULL, ""}, {NULL, ""} };
+static gefv_cache   gefvCache[GEFV_CACHESIZE] = { {NULL, ""}, {NULL, ""} };
 
 /*
 =================
@@ -104,7 +104,7 @@ FIXME: walk all entities and NULL out references to this entity
 =================
 */
 void ED_Free(edict_p ed) {
-    SV_UnlinkEdict(ed);		// unlink from world bsp
+    SV_UnlinkEdict(ed); // unlink from world bsp
 
     ed->free = true;
     ed->v.model = 0;
@@ -231,7 +231,7 @@ Returns a string describing *data in a type specific manner
 =============
 */
 cstring PR_ValueString(etype_t type, eval_p val) {
-    static char	line[256];
+    static char line[256];
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
@@ -278,7 +278,7 @@ Easier to parse than PR_ValueString
 =============
 */
 cstring PR_UglyValueString(etype_t type, eval_p val) {
-    static char	line[256];
+    static char line[256];
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
@@ -322,7 +322,7 @@ padded to 20 field width
 ============
 */
 cstring PR_GlobalString(int ofs) {
-    static char	line[128];
+    static char line[128];
 
     typeless_ptr val = (typeless_ptr)&pr_globals[ofs];
     ddef_p def = ED_GlobalAtOfs(ofs);
@@ -342,7 +342,7 @@ cstring PR_GlobalString(int ofs) {
 }
 
 cstring PR_GlobalStringNoContents(int ofs) {
-    static char	line[128];
+    static char line[128];
 
     ddef_p def = ED_GlobalAtOfs(ofs);
     if (!def)
@@ -377,7 +377,7 @@ void ED_Print(edict_p ed) {
         ddef_p d = &pr_fielddefs[i];
         cstring name = pr_strings + d->s_name;
         if (name[strlen(name) - 2] == '_')
-            continue;	// skip _x, _y, _z vars
+            continue; // skip _x, _y, _z vars
 
         int* v = (int*)((cstring)&ed->v + d->ofs * 4);
 
@@ -419,7 +419,7 @@ void ED_Write(FILE* f, edict_p ed) {
         ddef_p d = &pr_fielddefs[i];
         cstring name = pr_strings + d->s_name;
         if (name[strlen(name) - 2] == '_')
-            continue;	// skip _x, _y, _z vars
+            continue; // skip _x, _y, _z vars
 
         int* v = (int*)((cstring)&ed->v + d->ofs * 4);
 
@@ -480,7 +480,7 @@ For debugging
 =============
 */
 void ED_Count() {
-    int		active, models, solid, step;
+    int  active, models, solid, step;
     active = models = solid = step = 0;
     for (int i = 0; i < sv.num_edicts; i++) {
         edict_p ent = EDICT_NUM(i);
@@ -678,7 +678,7 @@ cstring ED_ParseEdict(cstring data, edict_p ent) {
     bool init = false;
 
     // clear it
-    if (ent != sv.edicts)	// hack
+    if (ent != sv.edicts) // hack
         memset(&ent->v, 0, progs->entityfields * 4);
 
     // go through all the dictionary pairs
@@ -702,7 +702,7 @@ cstring ED_ParseEdict(cstring data, edict_p ent) {
 
         // FIXME: change light to _light to get rid of this hack
         if (!strcmp(com_token, "light"))
-            strcpy(com_token, "light_lev");	// hack for single light def
+            strcpy(com_token, "light_lev"); // hack for single light def
 
         char keyname[256];
         strcpy(keyname, com_token);
@@ -736,7 +736,7 @@ cstring ED_ParseEdict(cstring data, edict_p ent) {
         }
 
         if (anglehack) {
-            char	temp[32];
+            char temp[32];
             strcpy(temp, com_token);
             sprintf(com_token, "0 %s 0", temp);
         }
@@ -867,7 +867,7 @@ void PR_LoadProgs() {
     pr_fielddefs = (ddef_p)((uint8_p)progs + progs->ofs_fielddefs);
     pr_statements = (dstatement_p)((uint8_p)progs + progs->ofs_statements);
 
-    pr_global_struct = (globalvars_t*)((uint8_p)progs + progs->ofs_globals);
+    pr_global_struct = (globalvars_p)((uint8_p)progs + progs->ofs_globals);
     pr_globals = (float_p)pr_global_struct;
 
     pr_edict_size = progs->entityfields * 4 + sizeof(edict_t) - sizeof(entvars_t);
