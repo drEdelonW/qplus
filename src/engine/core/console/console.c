@@ -61,8 +61,10 @@ bool    con_debuglog;
 float   con_times[NUM_CON_TIMES]; // realtime time the line was generated
 // for transparent notify lines
 
-#define MAXCMDLINE  256
-extern char    key_lines[32][MAXCMDLINE];
+#define MAXCMDLINE  (256)
+#define MAXCHATLEN  (32)
+
+extern char    key_lines[MAXCHATLEN][MAXCMDLINE];
 extern int32_t edit_line;
 extern int32_t key_linepos;
 

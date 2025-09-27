@@ -29,12 +29,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 m_state_t m_state;
 m_state_t m_return_state;
+bool m_entersound;  // play after drawing a frame, so caching
+// won't disrupt the sound
 
 void (*vid_menudrawfn)();
 void (*vid_menukeyfn)(keycode_t key);
 
-bool m_entersound;  // play after drawing a frame, so caching
-// won't disrupt the sound
+
 bool m_recursiveDraw;
 
 bool m_return_onerror;
@@ -46,27 +47,6 @@ char m_return_reason[32];
 #define DirectConfig    (m_net_cursor == 1)
 #define IPXConfig       (m_net_cursor == 2)
 #define TCPIPConfig     (m_net_cursor == 3)
-
-
-
-
-void M_Print(int cx, int cy, cstring str) {
-    while (*str) {
-        M_DrawCharacter(cx, cy, (*str) + 128);
-        str++;
-        cx += 8;
-    }
-}
-
-void M_PrintWhite(int cx, int cy, cstring str) {
-    while (*str) {
-        M_DrawCharacter(cx, cy, *str);
-        str++;
-        cx += 8;
-    }
-}
-
-
 
 uint8_t identityTable[256];
 uint8_t translationTable[256];
@@ -108,22 +88,19 @@ void M_DrawTextBox(int x, int y, int width, int lines) {
     // draw left side
     int cx = x;
     int cy = y;
-    p = Draw_CachePic("gfx/box_tl.lmp");
-    M_DrawTransPic(cx, cy, p);
+    M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tl.lmp"));
     p = Draw_CachePic("gfx/box_ml.lmp");
     for (int n = 0; n < lines; n++) {
         cy += 8;
         M_DrawTransPic(cx, cy, p);
     }
-    p = Draw_CachePic("gfx/box_bl.lmp");
-    M_DrawTransPic(cx, cy + 8, p);
+    M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_bl.lmp"));
 
     // draw middle
     cx += 8;
     while (width > 0) {
         cy = y;
-        p = Draw_CachePic("gfx/box_tm.lmp");
-        M_DrawTransPic(cx, cy, p);
+        M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tm.lmp"));
         p = Draw_CachePic("gfx/box_mm.lmp");
         for (int n = 0; n < lines; n++) {
             cy += 8;
@@ -131,23 +108,20 @@ void M_DrawTextBox(int x, int y, int width, int lines) {
                 p = Draw_CachePic("gfx/box_mm2.lmp");
             M_DrawTransPic(cx, cy, p);
         }
-        p = Draw_CachePic("gfx/box_bm.lmp");
-        M_DrawTransPic(cx, cy + 8, p);
+        M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_bm.lmp"));
         width -= 2;
         cx += 16;
     }
 
     // draw right side
     cy = y;
-    p = Draw_CachePic("gfx/box_tr.lmp");
-    M_DrawTransPic(cx, cy, p);
+    M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tr.lmp"));
     p = Draw_CachePic("gfx/box_mr.lmp");
     for (int n = 0; n < lines; n++) {
         cy += 8;
         M_DrawTransPic(cx, cy, p);
     }
-    p = Draw_CachePic("gfx/box_br.lmp");
-    M_DrawTransPic(cx, cy + 8, p);
+    M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_br.lmp"));
 }
 
 //=============================================================================
@@ -583,10 +557,8 @@ void M_Menu_Setup_f() {
 
 
 void M_Setup_Draw() {
-    qpic_p p;
-
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    p = Draw_CachePic("gfx/p_multi.lmp");
+    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 
     M_Print(64, 40, "Hostname");
@@ -603,11 +575,9 @@ void M_Setup_Draw() {
     M_DrawTextBox(64, 140 - 8, 14, 1);
     M_Print(72, 140, "Accept Changes");
 
-    p = Draw_CachePic("gfx/bigbox.lmp");
-    M_DrawTransPic(160, 64, p);
-    p = Draw_CachePic("gfx/menuplyr.lmp");
+    M_DrawTransPic(160, 64, Draw_CachePic("gfx/bigbox.lmp"));
     M_BuildTranslationTable(setup_top * 16, setup_bottom * 16);
-    M_DrawTransPicTranslate(172, 72, p);
+    M_DrawTransPicTranslate(172, 72, Draw_CachePic("gfx/menuplyr.lmp"));
 
     M_DrawCharacter(56, setup_cursor_table[setup_cursor], 12 + ((int)(realtime * 4) & 1));
 
@@ -620,8 +590,6 @@ void M_Setup_Draw() {
 
 
 void M_Setup_Key(keycode_t k) {
-    int   l;
-
     switch (k) {
     case K_ESCAPE:
         M_Menu_MultiPlayer_f();
@@ -695,14 +663,14 @@ void M_Setup_Key(keycode_t k) {
         if ((k < 32) || (k > 127))
             break;
         if (setup_cursor == 0) {
-            l = strlen(setup_hostname);
+            int l = strlen(setup_hostname);
             if (l < 15) {
                 setup_hostname[l + 1] = 0;
                 setup_hostname[l] = k;
             }
         }
         if (setup_cursor == 1) {
-            l = strlen(setup_myname);
+            int l = strlen(setup_myname);
             if (l < 15) {
                 setup_myname[l + 1] = 0;
                 setup_myname[l] = k;
@@ -814,8 +782,7 @@ void M_Net_Draw() {
         p = Draw_CachePic("gfx/dim_tcp.lmp");
     M_DrawTransPic(72, f, p);
 
-    if (m_net_items == 5) // JDC, could just be removed
-    {
+    if (m_net_items == 5) { // JDC, could just be removed
         f += 19;
         p = Draw_CachePic("gfx/netmen5.lmp");
         M_DrawTransPic(72, f, p);
@@ -880,447 +847,13 @@ again:
     default: break;
     }
 
-    if ((m_net_cursor == 0) && (!serialAvailable))
-        goto again;
-    if ((m_net_cursor == 1) && (!serialAvailable))
-        goto again;
-    if ((m_net_cursor == 2) && (!ipxAvailable))
-        goto again;
-    if ((m_net_cursor == 3) && (!tcpipAvailable))
+    if (((m_net_cursor == 0) && (!serialAvailable)) ||
+        ((m_net_cursor == 1) && (!serialAvailable)) ||
+        ((m_net_cursor == 2) && (!ipxAvailable)) ||
+        ((m_net_cursor == 3) && (!tcpipAvailable)))
         goto again;
 }
 
-//=============================================================================
-/* OPTIONS MENU */
-
-#ifdef _WIN32
-#define OPTIONS_ITEMS 14
-#else
-#define OPTIONS_ITEMS 13
-#endif
-
-#define SLIDER_RANGE 10
-
-int  options_cursor;
-
-void M_Menu_Options_f() {
-    key_dest = key_menu;
-    m_state = m_options;
-    m_entersound = true;
-
-#ifdef _WIN32
-    if ((options_cursor == 13) && (modestate != MS_WINDOWED)) {
-        options_cursor = 0;
-    }
-#endif
-}
-
-
-void M_AdjustSliders(int dir) {
-    S_LocalSound("misc/menu3.wav");
-
-    switch (options_cursor) {
-    case 3: // screen size
-        scr_viewsize.value += dir * 10;
-        if (scr_viewsize.value < 30)
-            scr_viewsize.value = 30;
-        if (scr_viewsize.value > 120)
-            scr_viewsize.value = 120;
-        Cvar_SetValue("viewsize", scr_viewsize.value);
-        break;
-    case 4: // gamma
-        v_gamma.value -= dir * 0.05;
-        if (v_gamma.value < 0.5)
-            v_gamma.value = 0.5;
-        if (v_gamma.value > 1)
-            v_gamma.value = 1;
-        Cvar_SetValue("gamma", v_gamma.value);
-        break;
-    case 5: // mouse speed
-        sensitivity.value += dir * 0.5;
-        if (sensitivity.value < 1)
-            sensitivity.value = 1;
-        if (sensitivity.value > 11)
-            sensitivity.value = 11;
-        Cvar_SetValue("sensitivity", sensitivity.value);
-        break;
-    case 6: // music volume
-#ifdef _WIN32
-        bgmvolume.value += dir * 1.0;
-#else
-        bgmvolume.value += dir * 0.1;
-#endif
-        if (bgmvolume.value < 0)
-            bgmvolume.value = 0;
-        if (bgmvolume.value > 1)
-            bgmvolume.value = 1;
-        Cvar_SetValue("bgmvolume", bgmvolume.value);
-        break;
-    case 7: // sfx volume
-        volume.value += dir * 0.1;
-        if (volume.value < 0)
-            volume.value = 0;
-        if (volume.value > 1)
-            volume.value = 1;
-        Cvar_SetValue("volume", volume.value);
-        break;
-
-    case 8: // allways run
-        if (cl_forwardspeed.value > 200) {
-            Cvar_SetValue("cl_forwardspeed", 200);
-            Cvar_SetValue("cl_backspeed", 200);
-        }
-        else {
-            Cvar_SetValue("cl_forwardspeed", 400);
-            Cvar_SetValue("cl_backspeed", 400);
-        }
-        break;
-
-    case 9: // invert mouse
-        Cvar_SetValue("m_pitch", -m_pitch.value);
-        break;
-
-    case 10: // lookspring
-        Cvar_SetValue("lookspring", !lookspring.value);
-        break;
-
-    case 11: // lookstrafe
-        Cvar_SetValue("lookstrafe", !lookstrafe.value);
-        break;
-
-#ifdef _WIN32
-    case 13: // _windowed_mouse
-        Cvar_SetValue("_windowed_mouse", !_windowed_mouse.value);
-        break;
-#endif
-    }
-}
-
-
-void M_DrawSlider(int x, int y, float range) {
-    int i;
-
-    if (range < 0)
-        range = 0;
-    if (range > 1)
-        range = 1;
-    M_DrawCharacter(x - 8, y, 128);
-    for (i = 0; i < SLIDER_RANGE; i++)
-        M_DrawCharacter(x + i * 8, y, 129);
-    M_DrawCharacter(x + i * 8, y, 130);
-    M_DrawCharacter(x + (SLIDER_RANGE - 1) * 8 * range, y, 131);
-}
-
-void M_DrawCheckbox(int x, int y, int on) {
-#if 0
-    if (on)
-        M_DrawCharacter(x, y, 131);
-    else
-        M_DrawCharacter(x, y, 129);
-#endif
-    if (on)
-        M_Print(x, y, "on");
-    else
-        M_Print(x, y, "off");
-}
-
-void M_Options_Draw() {
-    float r;
-
-    M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/p_option.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
-
-    M_Print(16, 32, "    Customize controls");
-    M_Print(16, 40, "         Go to console");
-    M_Print(16, 48, "     Reset to defaults");
-
-    M_Print(16, 56, "           Screen size");
-    r = (scr_viewsize.value - 30) / (120 - 30);
-    M_DrawSlider(220, 56, r);
-
-    M_Print(16, 64, "            Brightness");
-    r = (1.0 - v_gamma.value) / 0.5;
-    M_DrawSlider(220, 64, r);
-
-    M_Print(16, 72, "           Mouse Speed");
-    r = (sensitivity.value - 1) / 10;
-    M_DrawSlider(220, 72, r);
-
-    M_Print(16, 80, "       CD Music Volume");
-    r = bgmvolume.value;
-    M_DrawSlider(220, 80, r);
-
-    M_Print(16, 88, "          Sound Volume");
-    r = volume.value;
-    M_DrawSlider(220, 88, r);
-
-    M_Print(16, 96, "            Always Run");
-    M_DrawCheckbox(220, 96, cl_forwardspeed.value > 200);
-
-    M_Print(16, 104, "          Invert Mouse");
-    M_DrawCheckbox(220, 104, m_pitch.value < 0);
-
-    M_Print(16, 112, "            Lookspring");
-    M_DrawCheckbox(220, 112, lookspring.value);
-
-    M_Print(16, 120, "            Lookstrafe");
-    M_DrawCheckbox(220, 120, lookstrafe.value);
-
-    if (vid_menudrawfn)
-        M_Print(16, 128, "         Video Options");
-
-#ifdef _WIN32
-    if (modestate == MS_WINDOWED) {
-        M_Print(16, 136, "             Use Mouse");
-        M_DrawCheckbox(220, 136, _windowed_mouse.value);
-    }
-#endif
-
-    // cursor
-    M_DrawCharacter(200, 32 + options_cursor * 8, 12 + ((int)(realtime * 4) & 1));
-}
-
-
-void M_Options_Key(keycode_t k) {
-    switch (k) {
-    case K_ESCAPE:
-        M_Menu_Main_f();
-        break;
-
-    case K_ENTER:
-        m_entersound = true;
-        switch (options_cursor) {
-        case 0:
-            M_Menu_Keys_f();
-            break;
-        case 1:
-            m_state = m_none;
-            Con_ToggleConsole_f();
-            break;
-        case 2:
-            Cbuf_AddText("exec default.cfg\n");
-            break;
-        case 12:
-            M_Menu_Video_f();
-            break;
-        default:
-            M_AdjustSliders(1);
-            break;
-        }
-        return;
-
-    case K_UPARROW:
-        S_LocalSound("misc/menu1.wav");
-        options_cursor--;
-        if (options_cursor < 0)
-            options_cursor = OPTIONS_ITEMS - 1;
-        break;
-
-    case K_DOWNARROW:
-        S_LocalSound("misc/menu1.wav");
-        options_cursor++;
-        if (options_cursor >= OPTIONS_ITEMS)
-            options_cursor = 0;
-        break;
-
-    case K_LEFTARROW:
-        M_AdjustSliders(-1);
-        break;
-
-    case K_RIGHTARROW:
-        M_AdjustSliders(1);
-        break;
-    default: break;
-    }
-
-    if ((options_cursor == 12) &&
-        (vid_menudrawfn == NULL)) {
-        if (k == K_UPARROW)
-            options_cursor = 11;
-        else
-            options_cursor = 0;
-    }
-
-#ifdef _WIN32
-    if ((options_cursor == 13) &&
-        (modestate != MS_WINDOWED)) {
-        if (k == K_UPARROW)
-            options_cursor = 12;
-        else
-            options_cursor = 0;
-    }
-#endif
-}
-
-//=============================================================================
-/* KEYS MENU */
-
-cstring bindnames[][2] = {
-{"+attack",   "attack"},
-{"impulse 10",   "change weapon"},
-{"+jump",    "jump / swim up"},
-{"+forward",   "walk forward"},
-{"+back",    "backpedal"},
-{"+left",    "turn left"},
-{"+right",    "turn right"},
-{"+speed",    "run"},
-{"+moveleft",   "step left"},
-{"+moveright",   "step right"},
-{"+strafe",   "sidestep"},
-{"+lookup",   "look up"},
-{"+lookdown",   "look down"},
-{"centerview",   "center view"},
-{"+mlook",    "mouse look"},
-{"+klook",    "keyboard look"},
-{"+moveup",   "swim up"},
-{"+movedown",  "swim down"}
-};
-
-#define NUMCOMMANDS (sizeof(bindnames)/sizeof(bindnames[0]))
-
-int  keys_cursor;
-int  bind_grab;
-
-void M_Menu_Keys_f() {
-    key_dest = key_menu;
-    m_state = m_keys;
-    m_entersound = true;
-}
-
-
-void M_FindKeysForCommand(cstring command, int* twokeys) {
-    twokeys[0] = twokeys[1] = -1;
-    int l = strlen(command);
-    int count = 0;
-
-    for (int j = 0; j < 256; j++) {
-        cstring b = keybindings[j];
-        if (!b)
-            continue;
-        if (!strncmp(b, command, l)) {
-            twokeys[count] = j;
-            count++;
-            if (count == 2)
-                break;
-        }
-    }
-}
-
-void M_UnbindCommand(cstring command) {
-    int l = strlen(command);
-
-    for (keycode_t j = 0; j < MAX_KEYS; j++) {
-        cstring b = keybindings[j];
-        if (!b)
-            continue;
-        if (!strncmp(b, command, l))
-            Key_SetBinding(j, "");
-    }
-}
-
-
-void M_Keys_Draw() {
-    int  keys[2];
-
-    qpic_p p = Draw_CachePic("gfx/ttl_cstm.lmp");
-    M_DrawPic((320 - (p->width) / 2), 4, p);
-
-    if (bind_grab) {
-        M_Print(12, 32, "Press a key or button for this action");
-    }
-    else {
-        M_Print(18, 32, "Enter to change, backspace to clear");
-    }
-
-    // search for known bindings
-    for (int i = 0; i < NUMCOMMANDS; i++) {
-        int y = 48 + (8 * i);
-
-        M_Print(16, y, bindnames[i][1]);
-
-        // int l = strlen (bindnames[i][0]);
-
-        M_FindKeysForCommand(bindnames[i][0], keys);
-
-        if (keys[0] == -1) {
-            M_Print(140, y, "???");
-        }
-        else {
-            cstring name = Key_KeynumToString(keys[0]);
-            M_Print(140, y, name);
-            int x = strlen(name) * 8;
-            if (keys[1] != -1) {
-                M_Print(140 + x + 8, y, "or");
-                M_Print(140 + x + 32, y, Key_KeynumToString(keys[1]));
-            }
-        }
-    }
-
-    M_DrawCharacter(
-        130, 48 + (keys_cursor * 8),
-        (bind_grab) ?
-        '=' :
-        12 + ((int)(realtime * 4) & 1)
-    );
-}
-
-
-void M_Keys_Key(keycode_t k) {
-    char cmd[80];
-    int  keys[2];
-
-    if (bind_grab) { // defining a key
-        S_LocalSound("misc/menu1.wav");
-        if (k == K_ESCAPE) {
-            bind_grab = false;
-        }
-        else if (k != '`') {
-            sprintf(cmd, "bind \"%s\" \"%s\"\n", Key_KeynumToString(k), bindnames[keys_cursor][0]);
-            Cbuf_InsertText(cmd);
-        }
-
-        bind_grab = false;
-        return;
-    }
-
-    switch (k) {
-    case K_ESCAPE:
-        M_Menu_Options_f();
-        break;
-
-    case K_LEFTARROW:
-    case K_UPARROW:
-        S_LocalSound("misc/menu1.wav");
-        keys_cursor--;
-        if (keys_cursor < 0)
-            keys_cursor = NUMCOMMANDS - 1;
-        break;
-
-    case K_DOWNARROW:
-    case K_RIGHTARROW:
-        S_LocalSound("misc/menu1.wav");
-        keys_cursor++;
-        if (keys_cursor >= NUMCOMMANDS)
-            keys_cursor = 0;
-        break;
-
-    case K_ENTER:  // go into bind mode
-        M_FindKeysForCommand(bindnames[keys_cursor][0], keys);
-        S_LocalSound("misc/menu2.wav");
-        if (keys[1] != -1)
-            M_UnbindCommand(bindnames[keys_cursor][0]);
-        bind_grab = true;
-        break;
-
-    case K_BACKSPACE:  // delete bindings
-    case K_DEL:    // delete bindings
-        S_LocalSound("misc/menu2.wav");
-        M_UnbindCommand(bindnames[keys_cursor][0]);
-        break;
-    default: break;
-    }
-}
 
 //=============================================================================
 /* VIDEO MENU */

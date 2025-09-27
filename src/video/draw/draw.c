@@ -274,10 +274,10 @@ void Draw_Pic(int x, int y, qpic_p pic) {
 	int				v, u;
 
 	if ((x < 0) ||
-		(x + pic->width > vid.width) ||
+		((x + pic->width) > vid.width) ||
 		(y < 0) ||
-		(y + pic->height > vid.height)) {
-		Sys_Error("Draw_Pic: bad coordinates");
+		((y + pic->height) > vid.height)) {
+		Sys_Error("Draw_Pic: bad coordinates %i/%i-%i/%i", x, y, pic->width, pic->height);
 	}
 
 	source = pic->data;

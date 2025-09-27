@@ -19,3 +19,46 @@ void M_DrawTransPic(int x, int y, qpic_p pic) {
 void M_DrawPic(int x, int y, qpic_p pic) {
     Draw_Pic(x + ((vid.width - 320) >> 1), y, pic);
 }
+
+void M_Print(int cx, int cy, cstring str) {
+    while (*str) {
+        M_DrawCharacter(cx, cy, (*str) + 128);
+        str++;
+        cx += 8;
+    }
+}
+
+void M_PrintWhite(int cx, int cy, cstring str) {
+    while (*str) {
+        M_DrawCharacter(cx, cy, *str);
+        str++;
+        cx += 8;
+    }
+}
+
+#define SLIDER_RANGE 10
+
+void M_DrawSlider(int x, int y, float range) {
+    CLAMP(0.0f, range, 1.0f);
+
+    M_DrawCharacter(x - 8, y, 128);
+    int i = 0;
+    for (; i < SLIDER_RANGE; i++)
+        M_DrawCharacter(x + i * 8, y, 129);
+    M_DrawCharacter(x + i * 8, y, 130);
+    M_DrawCharacter(x + (SLIDER_RANGE - 1) * 8 * range, y, 131);
+}
+
+
+void M_DrawCheckbox(int x, int y, int on) {
+#if 0
+    if (on)
+        M_DrawCharacter(x, y, 131);
+    else
+        M_DrawCharacter(x, y, 129);
+#endif
+    if (on)
+        M_Print(x, y, "on");
+    else
+        M_Print(x, y, "off");
+}

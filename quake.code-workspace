@@ -69,7 +69,8 @@
 			"system_error": "c",
 			"semaphore": "c",
 			"bspfile.h": "c",
-			"buffer": "c"
+			"buffer": "c",
+			"keys.h": "c"
 		}
 	}
 }

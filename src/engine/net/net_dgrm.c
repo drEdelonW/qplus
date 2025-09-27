@@ -1088,8 +1088,6 @@ void Datagram_SearchForHosts(bool xmit) {
 static qsocket_p _Datagram_Connect(cstring host) {
     qsockaddr_t sendaddr;
     qsockaddr_t readaddr;
-    qsocket_p sock;
-    int ret;
 
     // see if we can resolve the host name
     if (dfunc.GetAddrFromName(host, &sendaddr) == -1)
@@ -1099,7 +1097,7 @@ static qsocket_p _Datagram_Connect(cstring host) {
     if (newsock == -1)
         return NULL;
 
-    sock = NET_NewQSocket();
+    qsocket_p sock = NET_NewQSocket();
     if (sock == NULL)
         goto ErrorReturn2;
     sock->socket = newsock;
@@ -1113,6 +1111,7 @@ static qsocket_p _Datagram_Connect(cstring host) {
     Con_Printf("trying...\n"); SCR_UpdateScreen();
     double start_time = net_time;
 
+    int ret;
     for (int reps = 0; reps < 3; reps++) {
         SZ_Clear(&net_message);
         // save space for the header, filled in later

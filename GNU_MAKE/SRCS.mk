@@ -127,6 +127,8 @@ $(eval UI_DIR = $(SRC_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
     $(eval MENU_DIR = $(UI_DIR)/menu) $(eval INCLUDES += $(MENU_DIR))
         SRC_LIST += $(MENU_DIR)/menu.c
         SRC_LIST += $(MENU_DIR)/menu_common.c
+        SRC_LIST += $(MENU_DIR)/menu_options.c
+        SRC_LIST += $(MENU_DIR)/menu_defkey.c
 
     SRC_LIST += $(UI_DIR)/screen.c
     SRC_LIST += $(UI_DIR)/sbar.c
