@@ -23,6 +23,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define VID_CBITS	6
 #define VID_GRADES	(1 << VID_CBITS)
 
+
+#if defined(_WIN32) && !defined(WINDED)
+    #if defined(_M_IX86)
+        #define __i386__	1
+    #endif
+    void	VID_LockBuffer();
+    void	VID_UnlockBuffer();
+#else
+    #define	VID_LockBuffer()
+    #define	VID_UnlockBuffer()
+#endif
 // a pixel can be one, two, or four bytes
 typedef uint8_t pixel_t;
 typedef pixel_t* pixel_p;

@@ -17,74 +17,23 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#include "quakedef.h"
+#include "menu.h"
+#include "menu_prv.h"
+// #include "quakedef.h"
 #include "cvar_q1.h"
+#include "common.h"
+
 
 #ifdef _WIN32
 #include "winquake.h"
 #endif
 
+
+
 void (*vid_menudrawfn)();
-void (*vid_menukeyfn)(int key);
+void (*vid_menukeyfn)(keycode_t key);
 
-enum { m_none, m_main, m_singleplayer, m_load, m_save, m_multiplayer, m_setup, m_net, m_options, m_video, m_keys, m_help, m_quit, m_serialconfig, m_modemconfig, m_lanconfig, m_gameoptions, m_search, m_slist } m_state;
 
-void M_Menu_Main_f();
-void M_Menu_SinglePlayer_f();
-void M_Menu_Load_f();
-void M_Menu_Save_f();
-void M_Menu_MultiPlayer_f();
-void M_Menu_Setup_f();
-void M_Menu_Net_f();
-void M_Menu_Options_f();
-void M_Menu_Keys_f();
-void M_Menu_Video_f();
-void M_Menu_Help_f();
-void M_Menu_Quit_f();
-void M_Menu_SerialConfig_f();
-void M_Menu_ModemConfig_f();
-void M_Menu_LanConfig_f();
-void M_Menu_GameOptions_f();
-void M_Menu_Search_f();
-void M_Menu_ServerList_f();
-
-void M_Main_Draw();
-void M_SinglePlayer_Draw();
-void M_Load_Draw();
-void M_Save_Draw();
-void M_MultiPlayer_Draw();
-void M_Setup_Draw();
-void M_Net_Draw();
-void M_Options_Draw();
-void M_Keys_Draw();
-void M_Video_Draw();
-void M_Help_Draw();
-void M_Quit_Draw();
-void M_SerialConfig_Draw();
-void M_ModemConfig_Draw();
-void M_LanConfig_Draw();
-void M_GameOptions_Draw();
-void M_Search_Draw();
-void M_ServerList_Draw();
-
-void M_Main_Key(int key);
-void M_SinglePlayer_Key(int key);
-void M_Load_Key(int key);
-void M_Save_Key(int key);
-void M_MultiPlayer_Key(int key);
-void M_Setup_Key(int key);
-void M_Net_Key(int key);
-void M_Options_Key(int key);
-void M_Keys_Key(int key);
-void M_Video_Key(int key);
-void M_Help_Key(int key);
-void M_Quit_Key(int key);
-void M_SerialConfig_Key(int key);
-void M_ModemConfig_Key(int key);
-void M_LanConfig_Key(int key);
-void M_GameOptions_Key(int key);
-void M_Search_Key(int key);
-void M_ServerList_Key(int key);
 
 qboolean	m_entersound;		// play after drawing a frame, so caching
 // won't disrupt the sound
@@ -110,6 +59,8 @@ M_DrawCharacter
 Draws one solid graphics character
 ================
 */
+#include "draw.h"
+#include "vid.h"
 void M_DrawCharacter(int cx, int line, int num) {
 	Draw_Character(cx + ((vid.width - 320) >> 1), line, num);
 }
@@ -141,6 +92,8 @@ void M_DrawPic(int x, int y, qpic_p pic) {
 uint8_t identityTable[256];
 uint8_t translationTable[256];
 
+#include <string.h>
+#include "render.h"
 void M_BuildTranslationTable(int top, int bottom) {
 	uint8_p dest;
 	uint8_p source;
@@ -227,6 +180,7 @@ int m_save_demonum;
 M_ToggleMenu_f
 ================
 */
+#include "console.h"
 void M_ToggleMenu_f() {
 	m_entersound = true;
 
@@ -254,7 +208,7 @@ void M_ToggleMenu_f() {
 int	m_main_cursor;
 #define	MAIN_ITEMS	5
 
-
+#include "client.h"
 void M_Menu_Main_f() {
 	if (key_dest != key_menu) {
 		m_save_demonum = cls.demonum;
@@ -265,6 +219,9 @@ void M_Menu_Main_f() {
 	m_entersound = true;
 }
 
+#include "server.h"
+// #include <stdarg.h>
+// #include <stdlib.h>
 
 void M_Main_Draw() {
 	M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
@@ -277,8 +234,8 @@ void M_Main_Draw() {
 	M_DrawTransPic(54, 32 + m_main_cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", f + 1)));
 }
 
-
-void M_Main_Key(int key) {
+#include "sound.h"
+void M_Main_Key(keycode_t key) {
 	switch (key) {
 	case K_ESCAPE:
 		key_dest = key_game;
@@ -324,6 +281,7 @@ void M_Main_Key(int key) {
 			M_Menu_Quit_f();
 			break;
 		}
+	default: break;
 	}
 }
 
@@ -352,8 +310,8 @@ void M_SinglePlayer_Draw() {
 	M_DrawTransPic(54, 32 + m_singleplayer_cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", f + 1)));
 }
 
-
-void M_SinglePlayer_Key(int key) {
+#include "cmd.h"
+void M_SinglePlayer_Key(keycode_t key) {
 	switch (key) {
 	case K_ESCAPE:
 		M_Menu_Main_f();
@@ -394,6 +352,7 @@ void M_SinglePlayer_Key(int key) {
 			M_Menu_Save_f();
 			break;
 		}
+		default: break;
 	}
 }
 
@@ -451,7 +410,7 @@ void M_Menu_Save_f() {
 	M_ScanSaves();
 }
 
-
+#include "host.h"
 void M_Load_Draw() {
 	qpic_p p = Draw_CachePic("gfx/p_load.lmp");
 	M_DrawPic((320 - p->width) / 2, 4, p);
@@ -476,7 +435,7 @@ void M_Save_Draw() {
 }
 
 
-void M_Load_Key(int k) {
+void M_Load_Key(keycode_t k) {
 	switch (k) {
 	case K_ESCAPE:
 		M_Menu_SinglePlayer_f();
@@ -512,11 +471,12 @@ void M_Load_Key(int k) {
 		if (load_cursor >= MAX_SAVEGAMES)
 			load_cursor = 0;
 		break;
+	default: break;
 	}
 }
 
 
-void M_Save_Key(int k) {
+void M_Save_Key(keycode_t k) {
 	switch (k) {
 	case K_ESCAPE:
 		M_Menu_SinglePlayer_f();
@@ -543,6 +503,7 @@ void M_Save_Key(int k) {
 		if (load_cursor >= MAX_SAVEGAMES)
 			load_cursor = 0;
 		break;
+	default: break;
 	}
 }
 
@@ -578,7 +539,7 @@ void M_MultiPlayer_Draw() {
 }
 
 
-void M_MultiPlayer_Key(int key) {
+void M_MultiPlayer_Key(keycode_t key) {
 	switch (key) {
 	case K_ESCAPE:
 		M_Menu_Main_f();
@@ -617,6 +578,7 @@ void M_MultiPlayer_Key(int key) {
 			M_Menu_Setup_f();
 			break;
 		}
+	default: break;
 	}
 }
 
@@ -683,7 +645,7 @@ void M_Setup_Draw() {
 }
 
 
-void M_Setup_Key(int k) {
+void M_Setup_Key(keycode_t k) {
 	int			l;
 
 	switch (k) {
@@ -898,7 +860,7 @@ void M_Net_Draw() {
 }
 
 
-void M_Net_Key(int k) {
+void M_Net_Key(keycode_t k) {
 again:
 	switch (k) {
 	case K_ESCAPE:
@@ -941,6 +903,7 @@ again:
 			// multiprotocol
 			break;
 		}
+	default: break;
 	}
 
 	if ((m_net_cursor == 0) && (!serialAvailable))
@@ -1145,7 +1108,7 @@ void M_Options_Draw() {
 }
 
 
-void M_Options_Key(int k) {
+void M_Options_Key(keycode_t k) {
 	switch (k) {
 	case K_ESCAPE:
 		M_Menu_Main_f();
@@ -1194,6 +1157,7 @@ void M_Options_Key(int k) {
 	case K_RIGHTARROW:
 		M_AdjustSliders(1);
 		break;
+	default: break;
 	}
 
 	if ((options_cursor == 12) &&
@@ -1328,7 +1292,7 @@ void M_Keys_Draw() {
 }
 
 
-void M_Keys_Key(int k) {
+void M_Keys_Key(keycode_t k) {
 	char	cmd[80];
 	int		keys[2];
 
@@ -1380,6 +1344,7 @@ void M_Keys_Key(int k) {
 		S_LocalSound("misc/menu2.wav");
 		M_UnbindCommand(bindnames[keys_cursor][0]);
 		break;
+	default: break;
 	}
 }
 
@@ -1398,7 +1363,7 @@ void M_Video_Draw() {
 }
 
 
-void M_Video_Key(int key) {
+void M_Video_Key(keycode_t key) {
 	(*vid_menukeyfn) (key);
 }
 
@@ -1423,7 +1388,7 @@ void M_Help_Draw() {
 }
 
 
-void M_Help_Key(int key) {
+void M_Help_Key(keycode_t key) {
 	switch (key) {
 	case K_ESCAPE:
 		M_Menu_Main_f();
@@ -1442,6 +1407,7 @@ void M_Help_Key(int key) {
 		if (--help_page < 0)
 			help_page = NUM_HELP_PAGES - 1;
 		break;
+	default: break;
 	}
 
 }
@@ -1498,6 +1464,7 @@ cstring quitMessage[] = {
 };
 #endif
 
+#include <stdlib.h>
 void M_Menu_Quit_f() {
 	if (m_state == m_quit)
 		return;
@@ -1510,8 +1477,8 @@ void M_Menu_Quit_f() {
 }
 
 
-void M_Quit_Key(int key) {
-	switch (key) {
+void M_Quit_Key(keycode_t key) {
+	switch ((char)key) {
 	case K_ESCAPE:
 	case 'n':
 	case 'N':
@@ -1694,7 +1661,7 @@ void M_SerialConfig_Draw() {
 }
 
 
-void M_SerialConfig_Key(int key) {
+void M_SerialConfig_Key(keycode_t key) {
 	switch (key) {
 	case K_ESCAPE:
 		M_Menu_Net_f();
@@ -1903,7 +1870,7 @@ void M_ModemConfig_Draw() {
 }
 
 
-void M_ModemConfig_Key(int key) {
+void M_ModemConfig_Key(keycode_t key) {
 	switch (key) {
 	case K_ESCAPE:
 		M_Menu_SerialConfig_f();
@@ -2082,7 +2049,7 @@ void M_LanConfig_Draw() {
 }
 
 
-void M_LanConfig_Key(int key) {
+void M_LanConfig_Key(keycode_t key) {
 	switch (key) {
 	case K_ESCAPE:
 		M_Menu_Net_f();
@@ -2554,7 +2521,7 @@ void M_NetStart_Change(int dir) {
 	}
 }
 
-void M_GameOptions_Key(int key) {
+void M_GameOptions_Key(keycode_t key) {
 	switch (key) {
 	case K_ESCAPE:
 		M_Menu_Net_f();
@@ -2609,6 +2576,7 @@ void M_GameOptions_Key(int key) {
 
 		M_NetStart_Change(1);
 		break;
+	default: break;
 	}
 }
 
@@ -2660,7 +2628,7 @@ void M_Search_Draw() {
 }
 
 
-void M_Search_Key(int key) {
+void M_Search_Key(keycode_t key) {
 }
 
 //=============================================================================
@@ -2713,7 +2681,7 @@ void M_ServerList_Draw() {
 }
 
 
-void M_ServerList_Key(int k) {
+void M_ServerList_Key(keycode_t k) {
 	switch (k) {
 	case K_ESCAPE:
 		M_Menu_LanConfig_f();
@@ -2886,7 +2854,7 @@ void M_Draw() {
 }
 
 
-void M_Keydown(int key) {
+void M_Keydown(keycode_t key) {
 	switch (m_state) {
 	case m_none:
 		return;

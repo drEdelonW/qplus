@@ -1,42 +1,45 @@
 #pragma once
-#define VEC3_ENABLE_MUL_AS_CROSS 1
+#define VEC3_ENABLE_MUL_AS_CROSS 0
+
+typedef float vect_t;
 
 class Vector3D {
 public:
-    float x, y, z;
+    vect_t x, y, z;
 
-    Vector3D(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) : x(_x), y(_y), z(_z) {};
-// Vector3D::Vector3D(float _x, float _y, float _z)
+    Vector3D(vect_t _x = 0.0f, vect_t _y = 0.0f, vect_t _z = 0.0f)  noexcept : x(_x), y(_y), z(_z) {};
 
+#if 0
+#   define LOG_PRINT
+    void print() const noexcept;
+    void printXML() const noexcept;
+#endif
 
-    void print() const;
-    void printXML() const;
+    Vector3D  operator+(const  Vector3D& other) const noexcept;
+    Vector3D& operator+=(const Vector3D& other) noexcept;
+    Vector3D  operator-(const  Vector3D& other) const noexcept;
+    Vector3D& operator-=(const Vector3D& other) noexcept;
 
-    Vector3D  operator+(const  Vector3D& other) const;
-    Vector3D& operator+=(const Vector3D& other);
-    Vector3D  operator-(const  Vector3D& other) const;
-    Vector3D& operator-=(const Vector3D& other);
-
-#if VEC3_ENABLE_MUL_AS_CROSS
-    // operator* used as cross product
+#if VEC3_ENABLE_MUL_AS_CROSS    // operator* used as cross product
     inline Vector3D operator*(const Vector3D& o) const noexcept { return cross(o); }
 #endif
-    Vector3D  operator*(float  scalar) const;
-    Vector3D& operator*=(float scalar);
-    Vector3D  operator/(float  scalar) const;
-    Vector3D& operator/=(float scalar);
 
-    float     dot(const   Vector3D& other) const;
-    Vector3D  cross(const Vector3D& other) const;
+    Vector3D  operator*(vect_t  scalar) const noexcept;
+    Vector3D& operator*=(vect_t scalar) noexcept;
+    Vector3D  operator/(vect_t  scalar) const noexcept;
+    Vector3D& operator/=(vect_t scalar) noexcept;
 
-    float length() const;
-    Vector3D normalize() const;
-    bool isZero() const;
+    vect_t     dot(const   Vector3D& other) const noexcept;
+    Vector3D  cross(const Vector3D& other) const noexcept;
 
-    Vector3D operator-() const {
+    vect_t length() const noexcept;
+    Vector3D normalize() const noexcept;
+    bool isZero() const noexcept;
+
+    Vector3D operator-() const noexcept {
         return Vector3D(-x, -y, -z);
     }
 
-    Vector3D toRad() const;
-    Vector3D toDeg() const;
+    Vector3D toRad() const noexcept;
+    Vector3D toDeg() const noexcept;
 };

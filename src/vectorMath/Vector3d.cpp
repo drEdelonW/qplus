@@ -4,36 +4,33 @@
 // #include <limits>
 #include <math.h>   // sqrtf, fabsf
 
-// #include "terminal_tools.h"
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846f
+#ifdef LOG_PRINT
+#   include "terminal_tools.h"
+void Vector3D::print() const noexcept {
+    LOG("Vector3D(x: %+.3f, y: %+.3f, z: %+.3f)", x, y, z);
+}
+void Vector3D::printXML() const noexcept {
+    LOG("<Vector3D x=\"%f\" y=\"%f\" z=\"%f\" />\n", x, y, z);
+}
 #endif
 
-
-void Vector3D::print() const {
-    // LOG("Vector3D(x: %+.3f, y: %+.3f, z: %+.3f)", x, y, z);
-}
-void Vector3D::printXML() const {
-    // LOG("<Vector3D x=\"%f\" y=\"%f\" z=\"%f\" />\n", x, y, z);
-}
-
-Vector3D Vector3D::operator+(const Vector3D& other) const {
+Vector3D Vector3D::operator+(const Vector3D& other) const noexcept {
     return Vector3D((x + other.x), (y + other.y), (z + other.z));
 }
 
-Vector3D& Vector3D::operator+=(const Vector3D& other) {
+Vector3D& Vector3D::operator+=(const Vector3D& other) noexcept {
     x += other.x;
     y += other.y;
     z += other.z;
     return *this;
 }
 
-Vector3D Vector3D::operator-(const Vector3D& other) const {
+Vector3D Vector3D::operator-(const Vector3D& other) const noexcept {
     return Vector3D((x - other.x), (y - other.y), (z - other.z));
 }
 
-Vector3D& Vector3D::operator-=(const Vector3D& other) {
+Vector3D& Vector3D::operator-=(const Vector3D& other) noexcept {
     x -= other.x;
     y -= other.y;
     z -= other.z;
@@ -41,26 +38,27 @@ Vector3D& Vector3D::operator-=(const Vector3D& other) {
 }
 
 
-Vector3D Vector3D::operator*(float scalar) const {
+Vector3D Vector3D::operator*(vect_t scalar) const noexcept {
     return Vector3D((x * scalar), (y * scalar), (z * scalar));
 }
 
-Vector3D& Vector3D::operator*=(float scalar) {
+Vector3D& Vector3D::operator*=(vect_t scalar) noexcept {
     x *= scalar;
     y *= scalar;
     z *= scalar;
     return *this;
 }
 
-Vector3D Vector3D::operator/(float scalar) const {
-    if (scalar != 0.0f) {
+Vector3D Vector3D::operator/(vect_t scalar) const noexcept {
 #if 1
-        float i_scalar = 1.0f / scalar;
+    if (scalar != 0.0f) {
+        vect_t i_scalar = 1.0f / scalar;
         return Vector3D((x * i_scalar), (y * i_scalar), (z * i_scalar));
     }
     else
         return Vector3D(0.0f, 0.0f, 0.0f);
 #else
+    if (scalar != 0.0f) {
         return Vector3D((x / scalar), (y / scalar), (z / scalar));
     }
     else {
@@ -73,13 +71,13 @@ Vector3D Vector3D::operator/(float scalar) const {
 #endif
 }
 
-Vector3D& Vector3D::operator/=(float scalar) {
+Vector3D& Vector3D::operator/=(vect_t scalar) noexcept {
 #if 1
     if (scalar == 0.0f) {
         x = y = z = 0.0f;
         return *this;
     }
-    float i_scalar = 1.0f / scalar;
+    vect_t i_scalar = 1.0f / scalar;
     x *= i_scalar;
     y *= i_scalar;
     z *= i_scalar;
@@ -99,11 +97,11 @@ Vector3D& Vector3D::operator/=(float scalar) {
 }
 
 // Скалярное умножение
-float Vector3D::dot(const Vector3D& other) const {
+vect_t Vector3D::dot(const Vector3D& other) const noexcept {
     return (x * other.x) + (y * other.y) + (z * other.z);
 }
 
-Vector3D Vector3D::cross(const Vector3D& other) const {
+Vector3D Vector3D::cross(const Vector3D& other) const noexcept {
 #if 1
     // treat as cross product (no NaN branches)
     return
@@ -113,9 +111,9 @@ Vector3D Vector3D::cross(const Vector3D& other) const {
             (x * other.y) - (y * other.x)
         );
 #else
-    float nx = (y * other.z) - (z * other.y);
-    float ny = (z * other.x) - (x * other.z);
-    float nz = (x * other.y) - (y * other.x);
+    vect_t nx = (y * other.z) - (z * other.y);
+    vect_t ny = (z * other.x) - (x * other.z);
+    vect_t nz = (x * other.y) - (y * other.x);
 
     // Проверка на коллинеарность
     if ((nx == 0.0f) && (ny == 0.0f) && (nz == 0.0f)) {
@@ -129,7 +127,7 @@ Vector3D Vector3D::cross(const Vector3D& other) const {
 #endif
 }
 
-float Vector3D::length() const {
+vect_t Vector3D::length() const noexcept {
     return
 #if 1
     sqrtf
@@ -139,16 +137,16 @@ float Vector3D::length() const {
     ((x * x) + (y * y) + (z * z));
 }
 
-Vector3D Vector3D::normalize() const {
+Vector3D Vector3D::normalize() const noexcept {
 #if 1
-    float l2 = (x * x) + (y * y) + (z * z);
+    vect_t l2 = (x * x) + (y * y) + (z * z);
     if (l2 > 0.0f) {
-        float inv = 1.0f / sqrtf(l2);
+        vect_t inv = 1.0f / sqrtf(l2);
         return Vector3D(x * inv, y * inv, z * inv);
     }
     return Vector3D(0.f, 0.f, 0.f);
 #else
-    float len = length();
+    vect_t len = length();
     if (len != 0) {
         return *this / len;
     }
@@ -162,14 +160,23 @@ Vector3D Vector3D::normalize() const {
 #endif
 }
 
-bool Vector3D::isZero() const {
+bool Vector3D::isZero() const noexcept {
     return (x == 0.0f) && (y == 0.0f) && (z == 0.0f);
 }
+#if __cplusplus >= 201703L
+    // C++17+: inline constexpr avoids .cpp definition
+    inline static constexpr float DEG2RAD = 0.01745329251994329577f;
+    inline static constexpr float RAD2DEG = 57.2957795130823208768f;
+#else
+    // Pre-C++17: define in .cpp (see below)
+    static const float DEG2RAD;
+    static const float RAD2DEG;
+#endif
 
-Vector3D Vector3D::toRad() const {
-    return Vector3D(x, y, z) * (M_PI / 180.0f);
+Vector3D Vector3D::toRad() const noexcept {
+    return Vector3D(x, y, z) * DEG2RAD;
 }
 
-Vector3D Vector3D::toDeg() const {
-    return Vector3D(x, y, z) * (180.0f / M_PI);
+Vector3D Vector3D::toDeg() const noexcept {
+    return Vector3D(x, y, z) * RAD2DEG;
 }
