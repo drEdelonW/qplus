@@ -23,15 +23,31 @@ SRC_LIST     :=
 include SRCS.mk
 
 # ---------- Map sources -> objects ----------
-MY_SRCS      := $(filter $(SRC_DIR)/%,$(SRC_LIST))
-MY_C_OBJS    := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(MY_SRCS)))
-MY_CPP_OBJS  := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(MY_SRCS)))
+# MY_SRCS      := $(filter $(SRC_DIR)/%,$(SRC_LIST))
+# MY_C_OBJS    := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(filter %.c,$(MY_SRCS)))
+# MY_CPP_OBJS  := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(filter %.cpp,$(MY_SRCS)))
 
-ID_SRCS      := $(filter $(IDSRC_DIR)/%,$(SRC_LIST))
-ID_C_OBJS    := $(addprefix $(OBJ_DIR)/,$(notdir $(filter %.c,$(ID_SRCS:.c=.o))))
-ID_CPP_OBJS  := $(addprefix $(OBJ_DIR)/,$(notdir $(filter %.cpp,$(ID_SRCS:.cpp=.o))))
+# ID_SRCS      := $(filter $(IDSRC_DIR)/%,$(SRC_LIST))
+# ID_C_OBJS    := $(addprefix $(OBJ_DIR)/,$(notdir $(filter %.c,$(ID_SRCS:.c=.o))))
+# ID_CPP_OBJS  := $(addprefix $(OBJ_DIR)/,$(notdir $(filter %.cpp,$(ID_SRCS:.cpp=.o))))
 
-OBJS         := $(MY_CPP_OBJS) $(MY_C_OBJS) $(ID_CPP_OBJS) $(ID_C_OBJS)
+# OBJS         := $(MY_CPP_OBJS) $(MY_C_OBJS) $(ID_CPP_OBJS) $(ID_C_OBJS)
+
+# --- order-preserving map SRC -> OBJ ---
+# helper: change .c/.cpp -> .o
+to_o   = $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$1))
+
+# helper: map full source path to proper object path
+# - для $(SRC_DIR): сохраняем поддиректории в $(OBJ_DIR)
+# - для $(IDSRC_DIR): кладём в корень $(OBJ_DIR) (как у тебя было через notdir)
+map_obj = $(if $(filter $(SRC_DIR)/%,$1), \
+             $(OBJ_DIR)/$(patsubst $(SRC_DIR)/%,%,$(call to_o,$1)), \
+             $(if $(filter $(IDSRC_DIR)/%,$1), \
+                 $(OBJ_DIR)/$(notdir $(call to_o,$1)), \
+                 $(OBJ_DIR)/$(notdir $(call to_o,$1)) ) )
+
+# ВАЖНО: порядок = порядок в SRC_LIST
+OBJS := $(foreach f,$(SRC_LIST),$(call map_obj,$(f)))
 
 # ---------- Toolchain ----------
 CC           ?= gcc
@@ -106,7 +122,7 @@ ifeq ($(UNAME_S),Linux)
     ifeq ($(UNAME_M),aarch64)
       CC = arm-linux-gnueabihf-gcc
       CXX = arm-linux-gnueabihf-gcc
-      LD = arm-linux-gnueabihf-gcc
+      LD = $(CXX)
     endif
   else
   endif
