@@ -1,6 +1,14 @@
 #pragma once
 
-enum { m_none, m_main, m_singleplayer, m_load, m_save, m_multiplayer, m_setup, m_net, m_options, m_video, m_keys, m_help, m_quit, m_serialconfig, m_modemconfig, m_lanconfig, m_gameoptions, m_search, m_slist } m_state;
+#include "keys.h"
+#include "draw.h"
+
+
+void M_DrawCharacter(int cx, int line, int num);
+void M_DrawTransPic(int x, int y, qpic_p pic);
+void M_DrawPic(int x, int y, qpic_p pic);
+
+void M_ConfigureNetSubsystem();
 
 void M_Menu_Main_f();
 void M_Menu_SinglePlayer_f();
