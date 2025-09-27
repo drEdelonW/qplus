@@ -162,43 +162,36 @@ $(TARGETS): $(OBJS) | $(OUT_DIR)
 $(OUT_DIR):
 	@mkdir -p $(OUT_DIR)
 
+
+include cli_tool.mk
+
 # ---------- Compile rules ----------
 # Note: use CPPFLAGS for -D/-I, CFLAGS for codegen; generate .d files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@printf "(C)[%-45s] " "$<"
+
+# Canonical reusable recipe
+define compile_template
+	@printf "$(BLD)$(1)$(RST)[%-45s] " "$<"
 	@mkdir -p $(dir $@)
 	@{ out=$$($(TIME) \
-				$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ 2>&1); \
-		rc=$$?; \
-		if [ $$rc -eq 0 ]; then st=OK; else st=FAIL; fi; \
+				$(2) $(CPPFLAGS) $(3) -c $< -o $@ 2>&1); \
+		rc=$$?; if [ $$rc -eq 0 ]; then st=$(GRN)OK$(RST); else st=$(RED)FAIL$(RST); fi; \
 		echo "$$st  $$out"; }
+endef
 
-$(OBJ_DIR)/%.o: $(IDSRC_DIR)/%.c
-	@printf "(C)[%-45s] " "$<"
-	@mkdir -p $(OBJ_DIR)
-	@{ out=$$($(TIME) \
-				$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ 2>&1); \
-		rc=$$?; \
-		if [ $$rc -eq 0 ]; then st=OK; else st=FAIL; fi; \
-		echo "$$st  $$out"; }
+COMPILE_C   = $(call compile_template,{C}  ,$(CC) ,$(CFLAGS))
+COMPILE_CXX = $(call compile_template,{C++},$(CXX),$(CXXFLAGS))
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@printf "(C++)<%-43s> " "$<"
-	@mkdir -p $(dir $@)
-	@{ out=$$($(TIME) \
-				$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ 2>&1); \
-	  rc=$$?; \
-		if [ $$rc -eq 0 ]; then st=OK; else st=FAIL; fi; \
-		echo "$$st  $$out"; }
+# Search sources in ../src and ../ID_src/WinQuake
+vpath %.c   $(SRC_DIR) $(IDSRC_DIR)
+vpath %.cpp $(SRC_DIR) $(IDSRC_DIR)
 
-$(OBJ_DIR)/%.o: $(IDSRC_DIR)/%.cpp
-	@printf "(C++)<%-43s> " "$<"
-	@mkdir -p $(OBJ_DIR)
-	@{ out=$$($(TIME) \
-				$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ 2>&1); \
-	  rc=$$?; \
-		if [ $$rc -eq 0 ]; then st=OK; else st=FAIL; fi; \
-		echo "$$st  $$out"; }
+# Two rules instead of four — make will find % via vpath
+$(OBJ_DIR)/%.o: %.c
+	$(COMPILE_C)
+
+$(OBJ_DIR)/%.o: %.cpp
+	$(COMPILE_CXX)
+
 
 # ---------- Housekeeping ----------
 clean:
