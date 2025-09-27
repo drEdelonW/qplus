@@ -3,6 +3,9 @@ INCLUDES += $(SRC_DIR)
 # INCLUDES += /opt/homebrew/opt/libx11/include
 # INCLUDES += /opt/homebrew/include
 
+$(eval VECMAT_DIR := $(SRC_DIR)/vectorMath) $(eval INCLUDES += $(VECMAT_DIR))
+    SRC_LIST += $(VECMAT_DIR)/Vector3d.cpp
+
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
     $(eval GAMESPEC_DIR = $(ENG_DIR)/game_specific) $(eval INCLUDES += $(GAMESPEC_DIR))
 

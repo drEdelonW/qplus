@@ -31,7 +31,7 @@ ID_SRCS      := $(filter $(IDSRC_DIR)/%,$(SRC_LIST))
 ID_C_OBJS    := $(addprefix $(OBJ_DIR)/,$(notdir $(filter %.c,$(ID_SRCS:.c=.o))))
 ID_CPP_OBJS  := $(addprefix $(OBJ_DIR)/,$(notdir $(filter %.cpp,$(ID_SRCS:.cpp=.o))))
 
-OBJS         := $(MY_C_OBJS) $(MY_CPP_OBJS) $(ID_C_OBJS) $(ID_CPP_OBJS)
+OBJS         := $(MY_CPP_OBJS) $(MY_C_OBJS) $(ID_CPP_OBJS) $(ID_C_OBJS)
 
 # ---------- Toolchain ----------
 CC           ?= gcc
@@ -40,6 +40,8 @@ CXX          ?= g++
 # LD           := $(CC)
 LD           := $(CXX)
 AR           ?= ar
+TIME         := /usr/bin/time -f "%E"
+# \tmem=%MKB"
 
 
 
@@ -96,12 +98,14 @@ ifeq ($(UNAME_S),Linux)
 
     ifeq ($(UNAME_M),x86_64)
       CFLAGS   += -m32
+      CXXFLAGS   += -m32
       LDFLAGS  += -m32
       # Hint pkg-config to 32-bit libs if needed (Debian/Ubuntu multilib):
       # export PKG_CONFIG_LIBDIR=/usr/lib/i386-linux-gnu/pkgconfig
     endif
     ifeq ($(UNAME_M),aarch64)
       CC = arm-linux-gnueabihf-gcc
+      CXX = arm-linux-gnueabihf-gcc
       LD = arm-linux-gnueabihf-gcc
     endif
   else
@@ -119,7 +123,8 @@ ifneq ($(NO_PARALLEL),1)
   J ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || \
                 nproc 2>/dev/null || \
                 sysctl -n hw.ncpu 2>/dev/null || echo 1)
-#   MAKEFLAGS += -j$(J) --output-sync=target
+#   MAKEFLAGS += -j4
+# 	$(J) --output-sync=target
 endif
 
 # ---------- Targets ----------
@@ -144,20 +149,40 @@ $(OUT_DIR):
 # ---------- Compile rules ----------
 # Note: use CPPFLAGS for -D/-I, CFLAGS for codegen; generate .d files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@printf "(C)[%-45s] " "$<"
 	@mkdir -p $(dir $@)
-	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	@{ out=$$($(TIME) \
+				$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ 2>&1); \
+		rc=$$?; \
+		if [ $$rc -eq 0 ]; then st=OK; else st=FAIL; fi; \
+		echo "$$st  $$out"; }
 
 $(OBJ_DIR)/%.o: $(IDSRC_DIR)/%.c
+	@printf "(C)[%-45s] " "$<"
 	@mkdir -p $(OBJ_DIR)
-	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	@{ out=$$($(TIME) \
+				$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ 2>&1); \
+		rc=$$?; \
+		if [ $$rc -eq 0 ]; then st=OK; else st=FAIL; fi; \
+		echo "$$st  $$out"; }
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@printf "(C++)<%-43s> " "$<"
 	@mkdir -p $(dir $@)
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	@{ out=$$($(TIME) \
+				$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ 2>&1); \
+	  rc=$$?; \
+		if [ $$rc -eq 0 ]; then st=OK; else st=FAIL; fi; \
+		echo "$$st  $$out"; }
 
 $(OBJ_DIR)/%.o: $(IDSRC_DIR)/%.cpp
+	@printf "(C++)<%-43s> " "$<"
 	@mkdir -p $(OBJ_DIR)
-	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	@{ out=$$($(TIME) \
+				$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ 2>&1); \
+	  rc=$$?; \
+		if [ $$rc -eq 0 ]; then st=OK; else st=FAIL; fi; \
+		echo "$$st  $$out"; }
 
 # ---------- Housekeeping ----------
 clean:
