@@ -70,7 +70,10 @@
 			"semaphore": "c",
 			"bspfile.h": "c",
 			"buffer": "c",
-			"keys.h": "c"
+			"keys.h": "c",
+			"versions.h": "c",
+			"sstream": "c",
+			"host.h": "c"
 		}
 	}
 }

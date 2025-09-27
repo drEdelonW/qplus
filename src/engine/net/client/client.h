@@ -56,6 +56,7 @@ typedef struct {
     int32_t  colors;   // two 4 bit fields
     uint8_t translations[VID_GRADES * 256];
 } scoreboard_t;
+typedef scoreboard_t* scoreboard_p;
 
 typedef struct {
     int32_t  destcolor[3];
