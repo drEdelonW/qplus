@@ -37,17 +37,16 @@ D_SpriteDrawSpans
 void D_SpriteDrawSpans(sspan_t* pspan) {
 	int			count, spancount, izistep;
 	int			izi;
-	uint8_p pbase, pdest;
-	fixed16_t	s, t, snext, tnext, sstep, tstep;
+	fixed16_t	s, t, snext, tnext;
 	float		sdivz, tdivz, zi, z, du, dv, spancountminus1;
 	float		sdivz8stepu, tdivz8stepu, zi8stepu;
 	uint8_t		btemp;
 	int16_p pz;
 
-	sstep = 0;	// keep compiler happy
-	tstep = 0;	// ditto
+	fixed16_t sstep = 0;	// keep compiler happy
+	fixed16_t tstep = 0;	// ditto
 
-	pbase = cacheblock;
+	uint8_p pbase = cacheblock;
 
 	sdivz8stepu = d_sdivzstepu * 8;
 	tdivz8stepu = d_tdivzstepu * 8;
@@ -57,7 +56,7 @@ void D_SpriteDrawSpans(sspan_t* pspan) {
 	izistep = (int)(d_zistepu * 0x8000 * 0x10000);
 
 	do {
-		pdest = (uint8_p)d_viewbuffer + (screenwidth * pspan->v) + pspan->u;
+		uint8_p pdest = (uint8_p)d_viewbuffer + (screenwidth * pspan->v) + pspan->u;
 		pz = d_pzbuffer + (d_zwidth * pspan->v) + pspan->u;
 
 		count = pspan->count;
@@ -77,16 +76,10 @@ void D_SpriteDrawSpans(sspan_t* pspan) {
 		izi = (int)(zi * 0x8000 * 0x10000);
 
 		s = (int)(sdivz * z) + sadjust;
-		if (s > bbextents)
-			s = bbextents;
-		else if (s < 0)
-			s = 0;
+		CLAMP(0, s, bbextents);
 
 		t = (int)(tdivz * z) + tadjust;
-		if (t > bbextentt)
-			t = bbextentt;
-		else if (t < 0)
-			t = 0;
+		CLAMP(0, t, bbextentt);
 
 		do {
 			// calculate s and t at the far end of the span
@@ -154,11 +147,10 @@ void D_SpriteDrawSpans(sspan_t* pspan) {
 
 			do {
 				btemp = *(pbase + (s >> 16) + (t >> 16) * cachewidth);
-				if (btemp != 255) {
-					if (*pz <= (izi >> 16)) {
-						*pz = izi >> 16;
-						*pdest = btemp;
-					}
+				if ((btemp != 255) &&
+					(*pz <= (izi >> 16))) {
+					*pz = izi >> 16;
+					*pdest = btemp;
 				}
 
 				izi += izistep;
@@ -324,15 +316,14 @@ D_SpriteCalculateGradients
 =====================
 */
 void D_SpriteCalculateGradients() {
-	vec3_t		p_normal, p_saxis, p_taxis, p_temp1;
-	float		distinv;
+	vec3_t p_normal, p_saxis, p_taxis, p_temp1;
 
 	TransformVector(r_spritedesc.vpn, p_normal);
 	TransformVector(r_spritedesc.vright, p_saxis);
 	TransformVector(r_spritedesc.vup, p_taxis);
 	VectorInverse(p_taxis);
 
-	distinv = 1.0 / (-DotProduct(modelorg, r_spritedesc.vpn));
+	float distinv = 1.0 / (-DotProduct(modelorg, r_spritedesc.vpn));
 
 	d_sdivzstepu = p_saxis[0] * xscaleinv;
 	d_tdivzstepu = p_taxis[0] * xscaleinv;
@@ -369,20 +360,16 @@ D_DrawSprite
 =====================
 */
 void D_DrawSprite() {
-	int			i, nump;
-	float		ymin, ymax;
-	emitpoint_p pverts;
-	sspan_t		spans[MAXHEIGHT + 1];
-
+	sspan_t spans[MAXHEIGHT + 1];
 	sprite_spans = spans;
 
 	// find the top and bottom vertices, and make sure there's at least one scan to
 	// draw
-	ymin = 999999.9;
-	ymax = -999999.9;
-	pverts = r_spritedesc.pverts;
+	float ymin = 999999.9;
+	float ymax = -999999.9;
+	emitpoint_p pverts = r_spritedesc.pverts;
 
-	for (i = 0; i < r_spritedesc.nump; i++) {
+	for (int i = 0; i < r_spritedesc.nump; i++) {
 		if (pverts->v < ymin) {
 			ymin = pverts->v;
 			minindex = i;
@@ -408,7 +395,7 @@ void D_DrawSprite() {
 
 	// copy the first vertex to the last vertex, so we don't have to deal with
 	// wrapping
-	nump = r_spritedesc.nump;
+	int nump = r_spritedesc.nump;
 	pverts = r_spritedesc.pverts;
 	pverts[nump] = pverts[0];
 

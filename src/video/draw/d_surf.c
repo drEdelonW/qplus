@@ -23,49 +23,37 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_local.h"
 #include "r_local.h"
 
-float           surfscale;
-qboolean        r_cache_thrash;         // set if surface cache is thrashing
+float surfscale;
+qboolean r_cache_thrash;         // set if surface cache is thrashing
 
-int                                     sc_size;
+int sc_size;
 surfcache_t* sc_rover, * sc_base;
 
-#define GUARDSIZE       4
+#define GUARDSIZE 4
 
 
-int     D_SurfaceCacheForRes(int width, int height) {
-	int             size, pix;
-
+int D_SurfaceCacheForRes(int width, int height) {
 	if (COM_CheckParm("-surfcachesize")) {
-		size = Q_atoi(com_argv[COM_CheckParm("-surfcachesize") + 1]) * 1024;
-		return size;
+		return Q_atoi(com_argv[COM_CheckParm("-surfcachesize") + 1]) * 1024;
 	}
 
-	size = SURFCACHE_SIZE_AT_320X200;
-
-	pix = width * height;
+	int size = SURFCACHE_SIZE_AT_320X200;
+	int pix = width * height;
 	if (pix > 64000)
 		size += (pix - 64000) * 3;
-
-
 	return size;
 }
 
 void D_CheckCacheGuard() {
-	uint8_p s;
-	int             i;
-
-	s = (uint8_p)sc_base + sc_size;
-	for (i = 0; i < GUARDSIZE; i++)
+	uint8_p s = (uint8_p)sc_base + sc_size;
+	for (int i = 0; i < GUARDSIZE; i++)
 		if (s[i] != (uint8_t)i)
 			Sys_Error("D_CheckCacheGuard: failed");
 }
 
 void D_ClearCacheGuard() {
-	uint8_p s;
-	int             i;
-
-	s = (uint8_p)sc_base + sc_size;
-	for (i = 0; i < GUARDSIZE; i++)
+	uint8_p s = (uint8_p)sc_base + sc_size;
+	for (int i = 0; i < GUARDSIZE; i++)
 		s[i] = (uint8_t)i;
 }
 
@@ -122,7 +110,7 @@ D_SCAlloc
 */
 surfcache_t* D_SCAlloc(int width, int size) {
 	surfcache_t* new;
-	qboolean                wrapped_this_time;
+	qboolean wrapped_this_time;
 
 	if ((width < 0) || (width > 256))
 		Sys_Error("D_SCAlloc: bad cache width %d\n", width);
@@ -214,7 +202,7 @@ void D_SCDump() {
 
 // if the num is not a power of 2, assume it will not repeat
 
-int     MaskForNum(int num) {
+int MaskForNum(int num) {
 	if (num == 128)
 		return 127;
 	if (num == 64)
@@ -227,7 +215,7 @@ int     MaskForNum(int num) {
 }
 
 int D_log2(int num) {
-	int     c;
+	int c;
 
 	c = 0;
 
