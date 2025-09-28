@@ -73,7 +73,9 @@
 			"keys.h": "c",
 			"versions.h": "c",
 			"sstream": "c",
-			"host.h": "c"
+			"host.h": "c",
+			"internet": "c",
+			"socket": "c"
 		}
 	}
 }

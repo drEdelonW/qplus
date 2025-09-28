@@ -22,7 +22,6 @@
 // Quake is a trademark of Id Software, Inc., (c) 1996 Id Software, Inc. All
 // rights reserved.
 
-// #include "quakedef.h"
 #include "cvar_q1.h"
 #include "client.h"
 #include <string.h>
