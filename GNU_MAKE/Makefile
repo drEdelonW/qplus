@@ -131,6 +131,12 @@ else ifeq ($(UNAME_S),Darwin)
     LDFLAGS  += -L/opt/X11/lib
 else
   TIME :=
+  ifeq ($(FORCE_32),1)
+    CFLAGS   += -m32
+    CXXFLAGS   += -m32
+    LDFLAGS  += -m32
+  else
+  endif
   $(info UNAME_S $(UNAME_S))
 endif
 
@@ -175,8 +181,8 @@ define compile_template
 	@mkdir -p $(dir $@)
 	@{ out=$$($(TIME) \
 				$(2) $(CPPFLAGS) $(3) -c $< -o $@ 2>&1); \
-		rc=$$?; if [ $$rc -eq 0 ]; then st=$(GRN)OK$(RST); else st=$(RED)FAIL$(RST); fi; \
-		echo "$$st  $$out"; }
+		rc=$$?; if [ $$rc -eq 0 ]; then st=$(GRN)OK$(RST); else st="$(RED)FAIL$(RST)\n"; fi; \
+		echo -e "$$st  $$out"; }
 endef
 
 COMPILE_C   = $(call compile_template,{C}  ,$(CC) ,$(CFLAGS))
