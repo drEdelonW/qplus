@@ -3,6 +3,9 @@
 		{
 			"name": "RnD Quake",
 			"path": "."
+		},{
+			"name": "STM32F769.cube",
+			"path": "./MCU_src"
 		}
 	],
 	"settings": {
