@@ -169,8 +169,8 @@ bool Vector3D::isZero() const noexcept {
     inline static constexpr float RAD2DEG = 57.2957795130823208768f;
 #else
     // Pre-C++17: define in .cpp (see below)
-    static const float DEG2RAD;
-    static const float RAD2DEG;
+    static const float DEG2RAD = 0.01745329251994329577f;
+    static const float RAD2DEG = 57.2957795130823208768f;
 #endif
 
 Vector3D Vector3D::toRad() const noexcept {

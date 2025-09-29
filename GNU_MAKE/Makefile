@@ -1,3 +1,5 @@
+TARGET ?= quakeX11
+
 # ---------- Paths ----------
 SRC_DIR      := ../src
 IDSRC_DIR    := ../ID_src/WinQuake
@@ -20,7 +22,17 @@ UNAME_M      := $(shell uname -m)
 # Populated by SRCS.mk: must define SRC_LIST and optionally INCLUDES
 INCLUDES     :=
 SRC_LIST     :=
-include SRCS.mk
+
+
+TRG_MK_FILE := make_targets/trg_$(TARGET).mk
+ifeq ($(wildcard $(TRG_MK_FILE)),)
+  $(info File $(TRG_MK_FILE) not found, skipping include)
+  include make_targets/SRCS.mk
+else
+  $(info File $(TRG_MK_FILE) found, including)
+  include $(TRG_MK_FILE)
+endif
+
 
 # ---------- Map sources -> objects ----------
 # MY_SRCS      := $(filter $(SRC_DIR)/%,$(SRC_LIST))
@@ -56,7 +68,6 @@ CXX          ?= g++
 # LD           := $(CC)
 LD           := $(CXX)
 AR           ?= ar
-TIME         := /usr/bin/time -f "%E"
 # \tmem=%MKB"
 
 
@@ -89,11 +100,11 @@ CXXFLAGS     += -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
                 -Wno-trigraphs -Wno-format-truncation
 
 ifeq ($(DEBUG),1)
-CFLAGS       += -O0 -g -fno-omit-frame-pointer
-CXXFLAGS     += -O0 -g -fno-omit-frame-pointer
+  CFLAGS       += -O0 -g -fno-omit-frame-pointer
+  CXXFLAGS     += -O0 -g -fno-omit-frame-pointer
 else
-CFLAGS       += -O2 -DNDEBUG
-CXXFLAGS     += -O2 -DNDEBUG
+  CFLAGS       += -O2 -DNDEBUG
+  CXXFLAGS     += -O2 -DNDEBUG
 endif
 
 # Linker flags and libraries split correctly
@@ -108,13 +119,16 @@ endif
 
 # Optional 32-bit build on Linux x86_64
 ifeq ($(UNAME_S),Linux)
+  ECHO = echo -e
+  TIME := /usr/bin/time -f "%E"
+
   $(info UNAME_M arch: $(UNAME_M))
   ifeq ($(FORCE_32),1)
     $(info !!!USING 32bit build!!!)
 
     ifeq ($(UNAME_M),x86_64)
       CFLAGS   += -m32
-      CXXFLAGS   += -m32
+      CXXFLAGS += -m32
       LDFLAGS  += -m32
       # Hint pkg-config to 32-bit libs if needed (Debian/Ubuntu multilib):
       # export PKG_CONFIG_LIBDIR=/usr/lib/i386-linux-gnu/pkgconfig
@@ -127,13 +141,15 @@ ifeq ($(UNAME_S),Linux)
   else
   endif
 else ifeq ($(UNAME_S),Darwin)
+  	ECHO = echo
+
     CPPFLAGS += -I/opt/X11/include
     LDFLAGS  += -L/opt/X11/lib
 else
   TIME :=
   ifeq ($(FORCE_32),1)
     CFLAGS   += -m32
-    CXXFLAGS   += -m32
+    CXXFLAGS += -m32
     LDFLAGS  += -m32
   else
   endif
@@ -182,7 +198,7 @@ define compile_template
 	@{ out=$$($(TIME) \
 				$(2) $(CPPFLAGS) $(3) -c $< -o $@ 2>&1); \
 		rc=$$?; if [ $$rc -eq 0 ]; then st=$(GRN)OK$(RST); else st="$(RED)FAIL$(RST)\n"; fi; \
-		echo -e "$$st  $$out"; }
+		$(ECHO) "$$st  $$out"; }
 endef
 
 COMPILE_C   = $(call compile_template,{C}  ,$(CC) ,$(CFLAGS))

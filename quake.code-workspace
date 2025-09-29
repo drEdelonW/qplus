@@ -78,7 +78,11 @@
 			"sstream": "c",
 			"host.h": "c",
 			"internet": "c",
-			"socket": "c"
-		}
+			"socket": "c",
+			"sound_struct.h": "c",
+			"__bit_reference": "c",
+			"ios": "c"
+		},
+		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}
 }

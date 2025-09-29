@@ -2,10 +2,17 @@
 # Automatically-generated file. Do not edit!
 # Toolchain: GNU Tools for STM32 (13.3.rel1)
 ################################################################################
+# --- STM32CubeIDE toolchain discovery (macOS) ---
+ARM_GCC_BIN ?= $(shell dirname "$$(find /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins -type f -name arm-none-eabi-gcc 2>/dev/null | head -n1)")
+ifeq ($(ARM_GCC_BIN),)
+  $(error Could not locate arm-none-eabi-gcc in STM32CubeIDE.app. Set ARM_GCC_BIN=/path/to/bin)
+endif
+# Make this PATH visible to all recipe lines and sub-makes
+export PATH := $(ARM_GCC_BIN):$(PATH)
 
 -include ../makefile.init
 
-RM := rm -rf
+RM := @rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -88,13 +95,13 @@ all: main-build
 main-build: stm32f7q1.elf secondary-outputs
 
 # Tool invocations
-stm32f7q1.elf stm32f7q1.map: $(OBJS) $(USER_OBJS) D:\SelfLab\RnD\quake\MCU_src\STM32F769NIHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "stm32f7q1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"D:\SelfLab\RnD\quake\MCU_src\STM32F769NIHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f7q1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+stm32f7q1.elf stm32f7q1.map: $(OBJS) $(USER_OBJS) ../STM32F769NIHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	@arm-none-eabi-g++ -o "stm32f7q1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"../STM32F769NIHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f7q1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-size  $(EXECUTABLES)
+	@$(ARM_GCC_BIN)/arm-none-eabi-size  $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
