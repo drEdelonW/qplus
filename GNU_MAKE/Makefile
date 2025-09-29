@@ -130,6 +130,7 @@ else ifeq ($(UNAME_S),Darwin)
     CPPFLAGS += -I/opt/X11/include
     LDFLAGS  += -L/opt/X11/lib
 else
+  TIME :=
   $(info UNAME_S $(UNAME_S))
 endif
 

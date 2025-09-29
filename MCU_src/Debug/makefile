@@ -88,8 +88,8 @@ all: main-build
 main-build: stm32f7q1.elf secondary-outputs
 
 # Tool invocations
-stm32f7q1.elf stm32f7q1.map: $(OBJS) $(USER_OBJS) /Users/edelon/STM32CubeIDE/workspace_1.19.0/stm32f7q1/STM32F769NIHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "stm32f7q1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/Users/edelon/STM32CubeIDE/workspace_1.19.0/stm32f7q1/STM32F769NIHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f7q1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+stm32f7q1.elf stm32f7q1.map: $(OBJS) $(USER_OBJS) D:\SelfLab\RnD\quake\MCU_src\STM32F769NIHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "stm32f7q1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"D:\SelfLab\RnD\quake\MCU_src\STM32F769NIHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f7q1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
