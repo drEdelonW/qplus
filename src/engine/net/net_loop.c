@@ -134,7 +134,7 @@ int Loop_SendMessage(qsocket_p sock, sizebuf_p data) {
     if (!sock->driverdata)
         return -1;
 
-    int* bufferLength = &((qsocket_p)sock->driverdata)->receiveMessageLength;
+    int32_p bufferLength = &((qsocket_p)sock->driverdata)->receiveMessageLength;
 
     if ((*bufferLength + data->cursize + 4) > NET_MAXMESSAGE)
         Sys_Error("Loop_SendMessage: overflow\n");
@@ -164,7 +164,7 @@ int Loop_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
     if (!sock->driverdata)
         return -1;
 
-    int* bufferLength = &((qsocket_p)sock->driverdata)->receiveMessageLength;
+    int32_p bufferLength = &((qsocket_p)sock->driverdata)->receiveMessageLength;
 
     if ((*bufferLength + data->cursize + sizeof(uint8_t) + sizeof(int16_t)) > NET_MAXMESSAGE)
         return 0;

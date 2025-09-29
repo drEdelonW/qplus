@@ -499,7 +499,7 @@ void CL_ParseClientdata(server_update_bits_t bits) {
 	CL_NewTranslation
 	=====================
 */
-void CL_NewTranslation(int slot) {
+void CL_NewTranslation(int32_t slot) {
 	if ((slot < 0) || (slot > cl.maxclients))
 		Sys_Error("CL_NewTranslation: bad slot %d (max %d)", slot, cl.maxclients);
 

@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vid.h"
 #include "bspfile.h"
 #include "render.h"
+#include "keys.h"
 // #include "cvar_q1.h"
 #include "endian_tools.h"
 
@@ -263,7 +264,7 @@ extern beam_t          cl_beams[MAX_BEAMS];
 //
 // cl_main
 //
-dlight_t* CL_AllocDlight(int32_t key);
+dlight_p CL_AllocDlight(int32_t key);
 void CL_DecayLights();
 
 void CL_Init();
@@ -304,19 +305,19 @@ void CL_UpdateTEnts();
 void CL_ClearState();
 
 
-int32_t  CL_ReadFromServer();
+void CL_ReadFromServer();
 void CL_WriteToServer(usercmd_t* cmd);
 void CL_BaseMove(usercmd_t* cmd);
 
 
 float CL_KeyState(kbutton_t* key);
-cstring Key_KeynumToString(int32_t keynum);
+cstring Key_KeynumToString(keycode_t keynum);
 
 //
 // cl_demo.c
 //
 void CL_StopPlayback();
-int32_t CL_GetMessage();
+int CL_GetMessage();
 
 void CL_Stop_f();
 void CL_Record_f();

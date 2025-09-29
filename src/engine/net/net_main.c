@@ -26,22 +26,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 qsocket_p net_activeSockets = NULL;
 qsocket_p net_freeSockets = NULL;
-int net_numsockets = 0;
+int32_t net_numsockets = 0;
 
 bool serialAvailable = false;
 bool ipxAvailable = false;
 bool tcpipAvailable = false;
 
-int net_hostport;
-int DEFAULTnet_hostport = 26000;
+int32_t net_hostport;
+int32_t DEFAULTnet_hostport = 26000;
 
 char my_ipx_address[NET_NAMELEN];
 char my_tcpip_address[NET_NAMELEN];
 
-void (*GetComPortConfig) (int portNumber, int* port, int* irq, int* baud, bool* useModem);
-void (*SetComPortConfig) (int portNumber, int port, int irq, int baud, bool useModem);
-void (*GetModemConfig) (int portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
-void (*SetModemConfig) (int portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
+void (*GetComPortConfig) (int32_t portNumber, int32_p port, int32_p irq, int32_p baud, bool* useModem);
+void (*SetComPortConfig) (int32_t portNumber, int32_t port, int32_t irq, int32_t baud, bool useModem);
+void (*GetModemConfig) (int32_t portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
+void (*SetModemConfig) (int32_t portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
 
 static bool	listening = false;
 
@@ -58,12 +58,12 @@ PollProcedure slistPollProcedure = { NULL, 0.0, Slist_Poll };
 
 
 sizebuf_t net_message;
-int net_activeconnections = 0;
+int32_t net_activeconnections = 0;
 
-int messagesSent = 0;
-int messagesReceived = 0;
-int unreliableMessagesSent = 0;
-int unreliableMessagesReceived = 0;
+int32_t messagesSent = 0;
+int32_t messagesReceived = 0;
+int32_t unreliableMessagesSent = 0;
+int32_t unreliableMessagesReceived = 0;
 
 bool configRestored = false;
 
@@ -74,7 +74,7 @@ bool recording = false;
 #define sfunc net_drivers[sock->driver]
 #define dfunc net_drivers[net_driverlevel]
 
-int	net_driverlevel;
+int32_t	net_driverlevel;
 
 
 double net_time;
@@ -312,7 +312,7 @@ NET_Connect
 ===================
 */
 
-int hostCacheCount = 0;
+int32_t hostCacheCount = 0;
 hostcache_t hostcache[HOSTCACHESIZE];
 
 qsocket_p NET_Connect(cstring host) {
@@ -455,16 +455,16 @@ returns -1 if connection is invalid
 */
 
 struct {
-    double	time;
+    double time;
     vcr_opcode_t op;
-    int32_t	session;
-    int		ret;
-    int		len;
+    int32_t session;
+    int32_t ret;
+    int32_t len;
 } vcrGetMessage;
 
 extern void PrintStats(qsocket_p s);
 
-int	NET_GetMessage(qsocket_p sock) {
+int32_t	NET_GetMessage(qsocket_p sock) {
     if (!sock)
         return -1;
 
@@ -475,7 +475,7 @@ int	NET_GetMessage(qsocket_p sock) {
 
     SetNetTime();
 
-    int ret = sfunc.QGetMessage(sock);
+    int32_t ret = sfunc.QGetMessage(sock);
 
     // see if this connection has timed out
     if ((ret == 0) && (sock->driver)) {
@@ -539,7 +539,7 @@ struct
     int r;
 } vcrSendMessage;
 
-int NET_SendMessage(qsocket_p sock, sizebuf_p data) {
+int32_t NET_SendMessage(qsocket_p sock, sizebuf_p data) {
     if (!sock)
         return -1;
 
@@ -549,7 +549,7 @@ int NET_SendMessage(qsocket_p sock, sizebuf_p data) {
     }
 
     SetNetTime();
-    int r = sfunc.QSendMessage(sock, data);
+    int32_t r = sfunc.QSendMessage(sock, data);
     if ((r == 1) && sock->driver)
         messagesSent++;
 
@@ -565,7 +565,7 @@ int NET_SendMessage(qsocket_p sock, sizebuf_p data) {
 }
 
 
-int NET_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
+int32_t NET_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
     if (!sock)
         return -1;
 
@@ -575,7 +575,7 @@ int NET_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
     }
 
     SetNetTime();
-    int r = sfunc.SendUnreliableMessage(sock, data);
+    int32_t r = sfunc.SendUnreliableMessage(sock, data);
     if ((r == 1) && sock->driver)
         unreliableMessagesSent++;
 
@@ -600,15 +600,13 @@ message to be transmitted.
 ==================
 */
 bool NET_CanSendMessage(qsocket_p sock) {
-    if (!sock)
-        return false;
-
-    if (sock->disconnected)
+    if ((!sock) ||
+        (sock->disconnected))
         return false;
 
     SetNetTime();
 
-    int r = sfunc.CanSendMessage(sock);
+    int32_t r = sfunc.CanSendMessage(sock);
 
     if (recording) {
         vcrSendMessage.time = host_time;
@@ -622,13 +620,13 @@ bool NET_CanSendMessage(qsocket_p sock) {
 }
 
 
-int NET_SendToAll(sizebuf_p data, int blocktime) {
-    int count = 0;
+int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
+    int32_t count = 0;
     bool state1[MAX_SCOREBOARD];
     bool state2[MAX_SCOREBOARD];
 
     host_client = svs.clients;
-    for (int i = 0; i < svs.maxclients; i++, host_client++) {
+    for (int32_t i = 0; i < svs.maxclients; i++, host_client++) {
         if (!host_client->netconnection)
             continue;
         if (host_client->active) {
@@ -652,7 +650,7 @@ int NET_SendToAll(sizebuf_p data, int blocktime) {
     while (count) {
         count = 0;
         host_client = svs.clients;
-        for (int i = 0; i < svs.maxclients; i++, host_client++) {
+        for (int32_t i = 0; i < svs.maxclients; i++, host_client++) {
             if (!state1[i]) {
                 if (NET_CanSendMessage(host_client->netconnection)) {
                     state1[i] = true;

@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // vid.h -- video driver defs
+#include "keys.h"
 
 #define VID_CBITS	6
 #define VID_GRADES	(1 << VID_CBITS)
@@ -73,7 +74,7 @@ extern	viddef_t    vid;				// global video state
 extern	uint16_t    d_8to16table[256];
 extern	uint32_t    d_8to24table[256];
 extern void (*vid_menudrawfn)();
-extern void (*vid_menukeyfn)(int key);
+extern void (*vid_menukeyfn)(keycode_t key);
 
 // called at startup and after any gamma correction
 void    VID_SetPalette(uint8_p palette);

@@ -1,3 +1,4 @@
+DST_PLATFORM := PC
 
 INCLUDES += $(SRC_DIR)
 # INCLUDES += /opt/homebrew/opt/libx11/include
@@ -18,6 +19,8 @@ ifeq ($(UNAME_S),Linux)
                 SRC_LIST += $(POSIX_DIR)/vid_x.c
                 SRC_LIST += $(POSIX_DIR)/cd_linux.c
                 SRC_LIST += $(POSIX_DIR)/snd_linux.c
+                SRC_LIST += $(POSIX_DIR)/net_udp.c
+                SRC_LIST += $(POSIX_DIR)/net_bsd.c
 
 else ifeq ($(UNAME_S),Darwin)
         $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))

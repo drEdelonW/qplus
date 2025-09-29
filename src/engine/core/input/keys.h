@@ -124,11 +124,11 @@ typedef enum {
     key_menu
 } keydest_t;
 
-extern  keydest_t   key_dest;
-extern  cstring keybindings[MAX_KEYS];
-extern  int key_repeats[MAX_KEYS];
-extern  int key_count;			// incremented every key event
-extern  int key_lastpress;
+extern keycode_t key_lastpress;
+extern keydest_t key_dest;
+extern cstring keybindings[MAX_KEYS];
+extern int key_count;			// incremented every key event
+extern int key_repeats[MAX_KEYS];
 
 void Key_Event(keycode_t key, bool down);
 void Key_Init();

@@ -67,7 +67,7 @@ EVENT MESSAGES
     Make sure the event gets sent to all clients
     ==================
 */
-void SV_StartParticle(vec3_t org, vec3_t dir, int color, int count) {
+void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count) {
     if (sv.datagram.cursize > (MAX_DATAGRAM - 16)) {
         return;
     }
@@ -751,15 +751,13 @@ SERVER SPAWNING
     ================
 */
 int SV_ModelIndex(cstring name) {
-    int		i;
-
     if (!name || !name[0])
         return 0;
-
-    for (i = 0; i < MAX_MODELS && sv.model_precache[i]; i++)
+    int i = 0;
+    for (; i < MAX_MODELS && sv.model_precache[i]; i++)
         if (!strcmp(sv.model_precache[i], name))
             return i;
-    if (i == MAX_MODELS || !sv.model_precache[i])
+    if ((i == MAX_MODELS) || !sv.model_precache[i])
         Sys_Error("SV_ModelIndex: model %s not precached", name);
     return i;
 }

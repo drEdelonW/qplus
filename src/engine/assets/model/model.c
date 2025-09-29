@@ -944,13 +944,11 @@ Mod_LoadSurfedges
 =================
 */
 void Mod_LoadSurfedges(lump_p l) {
-    int* in, * out;
-
-    in = (typeless_ptr)(mod_base + l->fileofs);
+    int32_p in = (typeless_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
-    out = Hunk_AllocName(count * sizeof(*out), loadname);
+    int32_p out = Hunk_AllocName(count * sizeof(*out), loadname);
 
     loadmodel->surfedges = out;
     loadmodel->numsurfedges = count;
@@ -1096,7 +1094,7 @@ ALIAS MODELS
 Mod_LoadAliasFrame
 =================
 */
-typeless_ptr Mod_LoadAliasFrame(typeless_ptr  pin, int* pframeindex, int numv, trivertx_p pbboxmin,
+typeless_ptr Mod_LoadAliasFrame(typeless_ptr  pin, int32_p pframeindex, int32_t numv, trivertx_p pbboxmin,
     trivertx_p pbboxmax, aliashdr_p pheader, cstring name) {
     daliasframe_p pdaliasframe = (daliasframe_p)pin;
 
@@ -1134,7 +1132,7 @@ typeless_ptr Mod_LoadAliasFrame(typeless_ptr  pin, int* pframeindex, int numv, t
 Mod_LoadAliasGroup
 =================
 */
-typeless_ptr  Mod_LoadAliasGroup(typeless_ptr  pin, int* pframeindex, int numv,
+typeless_ptr  Mod_LoadAliasGroup(typeless_ptr  pin, int32_p pframeindex, int numv,
     trivertx_p pbboxmin, trivertx_p pbboxmax, aliashdr_p pheader, cstring name) {
 
     daliasgroup_p pingroup = (daliasgroup_p)pin;
@@ -1185,7 +1183,7 @@ typeless_ptr  Mod_LoadAliasGroup(typeless_ptr  pin, int* pframeindex, int numv,
 Mod_LoadAliasSkin
 =================
 */
-typeless_ptr Mod_LoadAliasSkin(typeless_ptr pin, int* pskinindex, int skinsize, aliashdr_p pheader) {
+typeless_ptr Mod_LoadAliasSkin(typeless_ptr pin, int32_p pskinindex, int skinsize, aliashdr_p pheader) {
     uint8_p pskin = Hunk_AllocName(skinsize * r_pixbytes, loadname);
     uint8_p pinskin = (uint8_p)pin;
     *pskinindex = (uint8_p)pskin - (uint8_p)pheader;
@@ -1213,7 +1211,7 @@ typeless_ptr Mod_LoadAliasSkin(typeless_ptr pin, int* pskinindex, int skinsize, 
 Mod_LoadAliasSkinGroup
 =================
 */
-typeless_ptr Mod_LoadAliasSkinGroup(typeless_ptr pin, int* pskinindex, int skinsize, aliashdr_p pheader) {
+typeless_ptr Mod_LoadAliasSkinGroup(typeless_ptr pin, int32_p pskinindex, int32_t skinsize, aliashdr_p pheader) {
     daliasskingroup_p pinskingroup = (daliasskingroup_p)pin;
     int32_t numskins = LittleLong(pinskingroup->numskins);
     maliasskingroup_p paliasskingroup = Hunk_AllocName(

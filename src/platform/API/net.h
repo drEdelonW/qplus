@@ -142,7 +142,7 @@ struct qsocket_s {
 
     int32_t driver;
     int32_t landriver;
-    int32_t socket;
+    int socket;
     typeless_ptr driverdata;
 
     uint32_t ackSequence;
@@ -169,19 +169,19 @@ typedef struct {
     cstring name;
     bool initialized;
     int32_t controlSock;
-    int32_t(*Init)();
+    int (*Init)();
     void (*Shutdown)();
     void (*Listen)(bool state);
-    int32_t(*OpenSocket)(int32_t port);
-    int32_t(*CloseSocket)(int32_t socket);
-    int32_t(*Connect)(int32_t socket, qsockaddr_p addr);
+    int (*OpenSocket)(int32_t port);
+    int (*CloseSocket)(int  socket);
+    int32_t(*Connect)(int socket, qsockaddr_p addr);
     int32_t(*CheckNewConnections)();
-    int32_t(*Read)(int32_t socket, uint8_p buf, int32_t len, qsockaddr_p addr);
-    int32_t(*Write)(int32_t socket, uint8_p buf, int32_t len, qsockaddr_p addr);
-    int32_t(*Broadcast)(int32_t socket, uint8_p buf, int32_t len);
+    int32_t(*Read)(int socket, uint8_p buf, int32_t len, qsockaddr_p addr);
+    int32_t(*Write)(int socket, uint8_p buf, int32_t len, qsockaddr_p addr);
+    int32_t(*Broadcast)(int socket, uint8_p buf, int32_t len);
     cstring(*AddrToString)(qsockaddr_p addr);
     int32_t(*StringToAddr)(cstring string, qsockaddr_p addr);
-    int32_t(*GetSocketAddr)(int32_t socket, qsockaddr_p addr);
+    int32_t(*GetSocketAddr)(int socket, qsockaddr_p addr);
     int32_t(*GetNameFromAddr)(qsockaddr_p addr, cstring name);
     int32_t(*GetAddrFromName)(cstring name, qsockaddr_p addr);
     int32_t(*AddrCompare)(qsockaddr_p addr1, qsockaddr_p addr2);
@@ -196,19 +196,19 @@ extern net_landriver_t net_landrivers[MAX_NET_DRIVERS];
 typedef struct {
     cstring name;
     bool initialized;
-    int32_t(*Init)();
+    int (*Init)();
     void (*Listen)(bool state);
     void (*SearchForHosts)(bool xmit);
     qsocket_p(*Connect)(cstring host);
     qsocket_p(*CheckNewConnections)();
-    int32_t(*QGetMessage)(qsocket_p sock);
-    int32_t(*QSendMessage)(qsocket_p sock, sizebuf_p data);
-    int32_t(*SendUnreliableMessage)(qsocket_p sock, sizebuf_p data);
+    int(*QGetMessage)(qsocket_p sock);
+    int(*QSendMessage)(qsocket_p sock, sizebuf_p data);
+    int(*SendUnreliableMessage)(qsocket_p sock, sizebuf_p data);
     bool (*CanSendMessage)(qsocket_p sock);
     bool (*CanSendUnreliableMessage)(qsocket_p sock);
     void (*Close)(qsocket_p sock);
     void (*Shutdown)();
-    int32_t   controlSock;
+    int32_t controlSock;
 } net_driver_t;
 
 extern int32_t net_numdrivers;

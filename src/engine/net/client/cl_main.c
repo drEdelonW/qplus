@@ -49,7 +49,7 @@ r_entity_t		cl_static_entities[MAX_STATIC_ENTITIES];
 lightstyle_t	cl_lightstyle[MAX_LIGHTSTYLES];
 dlight_t		cl_dlights[MAX_DLIGHTS];
 
-int				cl_numvisedicts;
+int32_t cl_numvisedicts;
 r_entity_p cl_visedicts[MAX_VISEDICTS];
 
 /*
@@ -293,14 +293,13 @@ CL_AllocDlight
 
 ===============
 */
-dlight_t* CL_AllocDlight(int key) {
-	int		i;
-	dlight_t* dl;
+dlight_p CL_AllocDlight(int32_t key) {
+	dlight_p dl;
 
 	// first look for an exact key match
 	if (key) {
 		dl = cl_dlights;
-		for (i = 0; i < MAX_DLIGHTS; i++, dl++) {
+		for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
 			if (dl->key == key) {
 				memset(dl, 0, sizeof(*dl));
 				dl->key = key;
@@ -311,7 +310,7 @@ dlight_t* CL_AllocDlight(int key) {
 
 	// then look for anything else
 	dl = cl_dlights;
-	for (i = 0; i < MAX_DLIGHTS; i++, dl++) {
+	for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
 		if (dl->die < cl.time) {
 			memset(dl, 0, sizeof(*dl));
 			dl->key = key;
@@ -578,12 +577,11 @@ CL_ReadFromServer
 Read all incoming data from the server
 ===============
 */
-int CL_ReadFromServer() {
-	int		ret;
-
+void CL_ReadFromServer() {
 	cl.oldtime = cl.time;
 	cl.time += host_frametime;
 
+	int ret;
 	do {
 		ret = CL_GetMessage();
 		if (ret == -1)
@@ -593,7 +591,7 @@ int CL_ReadFromServer() {
 
 		cl.last_received_message = realtime;
 		CL_ParseServerMessage();
-	} while (ret && cls.state == ca_connected);
+	} while (ret && (cls.state == ca_connected));
 
 	if (cl_shownet.value)
 		Con_Printf("\n");
@@ -604,7 +602,7 @@ int CL_ReadFromServer() {
 	//
 	// bring the links up to date
 	//
-	return 0;
+	// return 0;
 }
 
 /*

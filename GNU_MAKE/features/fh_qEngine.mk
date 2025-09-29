@@ -52,8 +52,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 SRC_LIST += $(NET_DIR)/net_dgrm.c
                 SRC_LIST += $(NET_DIR)/net_loop.c
                 SRC_LIST += $(NET_DIR)/net_vcr.c
-                SRC_LIST += $(NET_DIR)/net_udp.c
-                SRC_LIST += $(NET_DIR)/net_bsd.c
 
         $(eval AST_DIR = $(ENG_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
                 $(eval MDL_DIR = $(AST_DIR)/model) $(eval INCLUDES += $(MDL_DIR))

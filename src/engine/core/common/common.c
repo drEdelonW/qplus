@@ -67,7 +67,7 @@ void COM_InitFilesystem();
 #define PAK0_CRC                32981
 
 char com_token[1024];
-int32_t  com_argc;
+int  com_argc;
 char** com_argv;
 
 #define CMDLINE_LENGTH 256
@@ -304,7 +304,7 @@ Returns the position (1 to argc-1) in the program's argument list
 where the given parameter apears, or 0 if not present
 ================
 */
-int32_t COM_CheckParm(cstring parm) {
+int COM_CheckParm(cstring parm) {
     for (int i = 1; i < com_argc; i++) {
         if (!com_argv[i])
             continue;               // NEXTSTEP sometimes clears appkit vars.
@@ -823,7 +823,7 @@ void COM_LoadCacheFile(cstring path, cache_user_p cu) {
 }
 
 // uses temp hunk if larger than bufsize
-uint8_p COM_LoadStackFile(cstring path, typeless_ptr buffer, int bufsize) {
+uint8_p COM_LoadStackFile(cstring path, typeless_ptr buffer, int32_t bufsize) {
     loadbuf = (uint8_p)buffer;
     loadsize = bufsize;
     uint8_p buf = COM_LoadFile(path, 4);

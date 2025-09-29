@@ -1065,15 +1065,12 @@ static int ISA_IRQs[] = { 4,3,4,3 };
 int serialConfig_baudrate[] = { 9600,14400,19200,28800,38400,57600 };
 
 int  serialConfig_comport;
-int  serialConfig_irq;
+int32_t  serialConfig_irq;
 int  serialConfig_baud;
 char serialConfig_phone[16];
 
 void M_Menu_SerialConfig_f() {
-    int  n;
-    int  port;
-    int  baudrate;
-    bool useModem;
+    int n;
 
     key_dest = key_menu;
     m_state = m_serialconfig;
@@ -1083,6 +1080,9 @@ void M_Menu_SerialConfig_f() {
     else
         serialConfig_cursor = 5;
 
+    int32_t port;
+    int32_t baudrate;
+    bool useModem;
     (*GetComPortConfig) (0, &port, &serialConfig_irq, &baudrate, &useModem);
 
     // map uart's port to COMx

@@ -221,7 +221,7 @@ void SV_DropClient(bool crash);
 void SV_SendClientMessages();
 void SV_ClearDatagram();
 
-int32_t SV_ModelIndex(cstring name);
+int SV_ModelIndex(cstring name);
 
 void SV_SetIdealPitch();
 

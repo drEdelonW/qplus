@@ -5,12 +5,13 @@
 #include "host.h"
 #include "console.h"
 #include "cmd.h"
+#include "vid.h"
 
 //=============================================================================
 /* OPTIONS MENU */
 
 static int _options_cursor;
-void (*vid_menudrawfn)();
+// void (*vid_menudrawfn)();
 
 void M_Menu_Options_f() {
     key_dest = key_menu;

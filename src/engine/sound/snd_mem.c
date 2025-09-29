@@ -234,10 +234,10 @@ GetWavinfo
 ============
 */
 wavinfo_t GetWavinfo(cstring name, cstring wav, int wavlength) {
-    wavinfo_t	info;
-    int     i;
-    int     format;
-    int		samples;
+    wavinfo_t info;
+    int i;
+    int format;
+    int samples;
 
     memset(&info, 0, sizeof(info));
 

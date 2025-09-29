@@ -22,8 +22,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // #include "quakedef.h"
 #include "vid.h"
 #include "d_local.h"
+#include "host.h"
+#include "endian_tools.h"
 
-viddef_t vid;    // global video state
+// menu.c
+// void (*vid_menudrawfn)(void) = NULL;
+// viddef_t vid;    // global video state [src/engine/ui/screen.c]
 
 #define BASEWIDTH 320
 #define BASEHEIGHT 200
