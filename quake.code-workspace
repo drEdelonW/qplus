@@ -82,7 +82,8 @@
 			"sound_struct.h": "c",
 			"__bit_reference": "c",
 			"ios": "c",
-			"socket.h": "c"
+			"socket.h": "c",
+			"main.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}
