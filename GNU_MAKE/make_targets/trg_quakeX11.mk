@@ -6,12 +6,7 @@ INCLUDES += $(SRC_DIR)
 
 include features/fh_qEngine.mk
 
-# $(eval VECMAT_DIR := $(SRC_DIR)/vectorMath) $(eval INCLUDES += $(VECMAT_DIR))
-#         SRC_LIST += $(VECMAT_DIR)/Vector3d.cpp
-
 $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/API)
-
-# ifeq ($(UNAME_S),Linux)
 
 ifeq ($(UNAME_S),Linux)
         $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))

@@ -1,6 +1,6 @@
 # TARGET ?= quakeX11
-# TARGET ?= quakeSTM32
-TARGET ?= testSTM32
+TARGET ?= quakeSTM32
+# TARGET ?= testSTM32
 
 
 # ---------- Paths ----------

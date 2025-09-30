@@ -70,11 +70,37 @@ void fill_rect(uint16_t* fb, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uin
             row[i] = c;
     }
 }
-#if 0
+#if 1
+#include "sys.h"
+#include "errno.h"
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include "common.h"
+#include "sys.h"
+#include "host.h"
 void StartDefaultTask(void const* argument) {
     /* Infinite loop */
-    for (;;) {
-        osDelay(1);
+    // for (;;) {
+    //     osDelay(1);
+    // }
+        static quakeparms_t parms;
+    int argc;
+    cstring* argv;
+    parms.memsize = 8 * 1024 * 1024;
+    parms.membase = malloc(parms.memsize);
+    parms.basedir = ".";
+
+    COM_InitArgv(argc, argv);
+
+    parms.argc = com_argc;
+    parms.argv = com_argv;
+
+    printf("Host_Init\n");
+    Host_Init(&parms);
+    while (1) {
+        Host_Frame(0.1);
     }
 }
 #else
