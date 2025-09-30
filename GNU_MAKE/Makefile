@@ -153,3 +153,9 @@ vars:
 	@echo "X11_LIBS=$(X11_LIBS)"
 	@echo "SRC_LIST=$(SRC_LIST)"
 	@echo "OBJS=$(OBJS)"
+
+
+# include make_tools.mk
+# include prog_Jet-Link.mk
+include prog_ST-Link.mk
+# include extra_goals.mk

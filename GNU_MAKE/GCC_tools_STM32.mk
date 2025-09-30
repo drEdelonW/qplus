@@ -90,3 +90,15 @@ LDFLAGS  ?=
 
 LDFLAGS += -specs=nosys.specs -Wl,--gc-sections
 LDLIBS  += -lc -lm -lnosys
+
+
+# ---------- Post-build: generate HEX and BIN ----------
+%.hex: %.elf
+	@echo "Generating $@ from $<"
+	@$(OBJCOPY) -O ihex   $< $@
+
+%.bin: %.elf
+	@echo "Generating $@ from $<"
+	@$(OBJCOPY) -O binary $< $@
+
+TARGET_FILE := $(OUT_DIR)/$(TARGET)
