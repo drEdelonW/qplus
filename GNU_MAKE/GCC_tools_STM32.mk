@@ -45,9 +45,10 @@ $(info MacOS zsh build)
         ARCH  := darwin-x86_64
     endif
     PKG_SUFIX := .pkg
-    # PKG_SUFIX := .tar.xz
 
-    GCC_BASE_PATH    := /Applications/ArmGNUToolchain/$(GCC_VER)/$(TRG_PREFIX)/
+
+    GCC_BASE_PATH    := /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.macos64_1.0.0.202411102158/tools/
+#     GCC_BASE_PATH    := /Applications/ArmGNUToolchain/$(GCC_VER)/$(TRG_PREFIX)/
     GCC_PATH         ?= $(GCC_BASE_PATH)bin/
 else ifeq ($(UNAME_S), Linux)
 $(info Linux build)
@@ -83,9 +84,9 @@ CFLAGS   ?=
 CXXFLAGS ?=
 LDFLAGS  ?=
 
-CFLAGS   += 
-CXXFLAGS += 
-LDFLAGS  += 
+# CFLAGS   += 
+# CXXFLAGS += 
+# LDFLAGS  += 
 
 LDFLAGS += -specs=nosys.specs -Wl,--gc-sections
 LDLIBS  += -lc -lm -lnosys

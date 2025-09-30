@@ -1,6 +1,6 @@
-TARGET ?= quakeX11
+# TARGET ?= quakeX11
 # TARGET ?= quakeSTM32
-# TARGET ?= testSTM32
+TARGET ?= testSTM32
 
 
 # ---------- Paths ----------
@@ -41,14 +41,20 @@ ECHO = echo
 
 # --- order-preserving map SRC -> OBJ ---
 # helper: change .c/.cpp -> .o
-to_o   = $(patsubst %.cpp,%.o,$(patsubst %.c,%.o,$1))
+to_o   = $(patsubst %.cpp,%.o, \
+			$(patsubst %.c,%.o, \
+				$(patsubst %.s,%.o, \
+					$(patsubst %.S,%.o, \
+					$1 ))))
 
 # helper: map full source path to proper object path
 map_obj = $(if $(filter $(SRC_DIR)/%,$1), \
              $(OBJ_DIR)/$(patsubst $(SRC_DIR)/%,%,$(call to_o,$1)), \
              $(if $(filter $(IDSRC_DIR)/%,$1), \
-                 $(OBJ_DIR)/$(notdir $(call to_o,$1)), \
-                 $(OBJ_DIR)/$(notdir $(call to_o,$1)) ) )
+                 $(OBJ_DIR)/$(patsubst $(IDSRC_DIR)/%,%,$(call to_o,$1)), \
+                 $(if $(filter $(STMSRC_DIR)/%,$1), \
+                     $(OBJ_DIR)/$(patsubst $(STMSRC_DIR)/%,%,$(call to_o,$1)), \
+                     $(OBJ_DIR)/$(notdir $(call to_o,$1)) )) )
 
 OBJS := $(foreach f,$(SRC_LIST),$(call map_obj,$(f)))
 
@@ -103,10 +109,13 @@ endef
 
 COMPILE_C   = $(call compile_template,{C}  ,$(CC) ,$(CFLAGS))
 COMPILE_CXX = $(call compile_template,{C++},$(CXX),$(CXXFLAGS))
+COMPILE_ASM = $(call compile_template,{ASM},$(CC) -c -x assembler-with-cpp,$(ASMFLAGS))
 
 # Search sources in ../src and ../ID_src/WinQuake
-vpath %.c   $(SRC_DIR) $(IDSRC_DIR)
-vpath %.cpp $(SRC_DIR) $(IDSRC_DIR)
+vpath %.c   $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
+vpath %.cpp $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
+vpath %.s $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
+vpath %.S $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
 
 # Two rules instead of four — make will find % via vpath
 $(OBJ_DIR)/%.o: %.c
@@ -114,6 +123,9 @@ $(OBJ_DIR)/%.o: %.c
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(COMPILE_CXX)
+
+$(OBJ_DIR)/%.o: %.s
+	$(COMPILE_ASM)
 
 
 # ---------- Housekeeping ----------
@@ -139,3 +151,5 @@ vars:
 	@echo "LDFLAGS=$(LDFLAGS)"
 	@echo "LDLIBS=$(LDLIBS)"
 	@echo "X11_LIBS=$(X11_LIBS)"
+	@echo "SRC_LIST=$(SRC_LIST)"
+	@echo "OBJS=$(OBJS)"
