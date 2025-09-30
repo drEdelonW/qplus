@@ -26,10 +26,12 @@ else ifeq ($(UNAME_S),Darwin)
         $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))
                 SRC_LIST += $(POSIX_DIR)/sys_linux.c
                 SRC_LIST += $(POSIX_DIR)/vid_x.c
+                SRC_LIST += $(PLATFORM_DIR)/null/cd_null.c
+                SRC_LIST += $(PLATFORM_DIR)/null/snd_null.c
+                SRC_LIST += $(POSIX_DIR)/net_udp.c
+                SRC_LIST += $(POSIX_DIR)/net_bsd.c
 
     # macOS build: disable X11/SHM, use NULL stubs
-        SRC_LIST += $(PLATFORM_DIR)/null/cd_null.c
-        SRC_LIST += $(PLATFORM_DIR)/null/snd_null.c
     # NOTE: skip xshm_stubs.c to avoid missing X11 headers
         CFLAGS  += -DNO_X11_SHM
 

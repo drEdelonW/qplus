@@ -79,5 +79,13 @@ OBJCOPY ?= $(GCC_PATH)$(TRG_PREFIX)-objcopy
 SIZE    ?= $(GCC_PATH)$(TRG_PREFIX)-size
 PYTHON  ?= python3
 
+CFLAGS   ?=
+CXXFLAGS ?=
+LDFLAGS  ?=
+
+CFLAGS   += 
+CXXFLAGS += 
+LDFLAGS  += 
+
 LDFLAGS += -specs=nosys.specs -Wl,--gc-sections
 LDLIBS  += -lc -lm -lnosys

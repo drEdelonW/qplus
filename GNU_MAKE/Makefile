@@ -8,8 +8,8 @@ SRC_DIR      := ../src
 IDSRC_DIR    := ../ID_src/WinQuake
 STMSRC_DIR   := ../MCU_src
 
-OBJ_DIR      ?= ./objs
-OUT_DIR      ?= OUTPUT
+OBJ_DIR      ?= ./objs/$(TARGET)
+OUT_DIR      ?= OUTPUT/$(TARGET)
 
 # ---------- Build options ----------
 # DEBUG=1 for -O0 -g; DEBUG=0 for -O2 -DNDEBUG
@@ -30,10 +30,10 @@ SRC_LIST     :=
 
 TRG_MK_FILE := make_targets/trg_$(TARGET).mk
 ifeq ($(wildcard $(TRG_MK_FILE)),)
-  $(info File $(TRG_MK_FILE) not found, skipping include)
+  $(info File [$(TRG_MK_FILE)] not found, skipping include)
   include make_targets/SRCS.mk
 else
-  $(info File $(TRG_MK_FILE) found, including)
+  $(info File [$(TRG_MK_FILE)] found, including)
   include $(TRG_MK_FILE)
 endif
 
@@ -78,8 +78,8 @@ targets: $(TARGETS)
 
 # Main link (use LDFLAGS/LDLIBS properly)
 $(TARGETS): $(OBJS) | $(OUT_DIR)
-	@$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-	@cd run_env && ln -sf ../$(TARGETS) quake
+	@$(LD) $(LDFLAGS) -o $@.elf $^ $(LDLIBS)
+	@cd run_env && ln -sf ../$(TARGETS).elf quake
 	@$(info DONE.)
 
 $(OUT_DIR):

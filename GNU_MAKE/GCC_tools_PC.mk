@@ -37,8 +37,16 @@ ifeq ($(UNAME_S),Linux)
   else
   endif
 else ifeq ($(UNAME_S),Darwin)
-  	ECHO = echo
+    ECHO = echo
+#     CFLAGS   += -m32
+#     CXXFLAGS += -m32
+#     LDFLAGS  += -m32
 
+    CC = gcc
+    CXX = gcc
+    LD = $(CC)
+
+    CFLAGS  += -D__APPLE__ -DBSD
     CPPFLAGS += -I/opt/X11/include
     LDFLAGS  += -L/opt/X11/lib
 else
