@@ -912,42 +912,6 @@ void MX_WWDG_Init() {
 #endif
 
 
-
-SDRAM_HandleTypeDef hsdram1 = {
-    .Instance   = FMC_SDRAM_DEVICE,
-    .Init   = {
-        .SDBank             = FMC_SDRAM_BANK1,
-        .ColumnBitsNumber   = FMC_SDRAM_COLUMN_BITS_NUM_8,
-        .RowBitsNumber      = FMC_SDRAM_ROW_BITS_NUM_12,
-        .MemoryDataWidth    = FMC_SDRAM_MEM_BUS_WIDTH_32,
-        .InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_4,
-        .CASLatency         = FMC_SDRAM_CAS_LATENCY_3,
-        .WriteProtection    = FMC_SDRAM_WRITE_PROTECTION_DISABLE,
-        .SDClockPeriod      = FMC_SDRAM_CLOCK_PERIOD_2,
-        .ReadBurst          = FMC_SDRAM_RBURST_ENABLE,
-        .ReadPipeDelay      = FMC_SDRAM_RPIPE_DELAY_0,
-    }
-};
-void MX_FMC_Init() {
-    /** Perform the SDRAM1 memory initialization sequence    */
-
-    /* SdramTiming */
-    FMC_SDRAM_TimingTypeDef SdramTiming = {
-        .LoadToActiveDelay      = 2,
-        .ExitSelfRefreshDelay   = 7,
-        .SelfRefreshTime        = 4,
-        .RowCycleDelay          = 7,
-        .WriteRecoveryTime      = 3,
-        .RPDelay                = 2,
-        .RCDDelay               = 2,
-    };
-
-    if (HAL_SDRAM_Init(&hsdram1, &SdramTiming) != HAL_OK) {
-        Error_Handler();
-    }
-}
-
-
 void SystemClock_Config() {
     HAL_PWR_EnableBkUpAccess(); /** Configure LSE Drive Capability  */
 

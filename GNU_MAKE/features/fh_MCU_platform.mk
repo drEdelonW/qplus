@@ -2,9 +2,12 @@ DST_PLATFORM := STM32
 
 $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/API)
     $(eval MCU_DIR = $(PLATFORM_DIR)/MCU) $(eval INCLUDES += $(MCU_DIR))
-        SRC_LIST += $(MCU_DIR)/main.c
-        $(eval INCLUDES += $(MCU_DIR)/STM32F7)
-        SRC_LIST += $(MCU_DIR)/STM32F7/perepherial.c
+        $(eval STM32_DIR = $(MCU_DIR)/STM32F7) $(eval INCLUDES += $(STM32_DIR))
+            SRC_LIST += $(STM32_DIR)/main.c
+            SRC_LIST += $(STM32_DIR)/perepherial.c
+            SRC_LIST += $(STM32_DIR)/per_FMC_SDRAM.c
+
+
 $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/API)
     $(eval MCU_DIR = $(PLATFORM_DIR)/MCU) $(eval INCLUDES += $(MCU_DIR))
         SRC_LIST += $(MCU_DIR)/cd_null.c

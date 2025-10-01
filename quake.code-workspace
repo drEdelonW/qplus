@@ -83,7 +83,8 @@
 			"__bit_reference": "c",
 			"ios": "c",
 			"socket.h": "c",
-			"main.h": "c"
+			"main.h": "c",
+			"perepherial.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}
