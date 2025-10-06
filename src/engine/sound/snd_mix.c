@@ -64,11 +64,13 @@ void Snd_WriteLinearBlastStereo16() {
 void S_TransferStereo16(int endtime) {
 	int		lpos;
 	int		lpaintedtime;
-	DWORD* pbuf;
+	// DWORD* pbuf;
+	LPVOID pbuf;
 #ifdef _WIN32
 	int		reps;
 	DWORD	dwSize, dwSize2;
-	DWORD* pbuf2;
+	// DWORD* pbuf2;
+	LPVOID pbuf2;
 	HRESULT	hresult;
 #endif
 
@@ -137,11 +139,13 @@ void S_TransferPaintBuffer(int endtime) {
 	int 	step;
 	int		val;
 	int		snd_vol;
-	DWORD* pbuf;
+	// DWORD* pbuf;
+	LPVOID pbuf;
 #ifdef _WIN32
 	int		reps;
 	DWORD	dwSize, dwSize2;
-	DWORD* pbuf2;
+	// DWORD* pbuf2;
+	LPVOID pbuf2;
 	HRESULT	hresult;
 #endif
 

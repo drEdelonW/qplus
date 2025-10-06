@@ -48,7 +48,9 @@ static int	snd_sent, snd_completed;
  */
 
 HANDLE		hData;
-HPSTR		lpData, lpData2;
+// HPSTR		lpData, lpData2;
+void* lpData;
+void* lpData2;
 
 HGLOBAL		hWaveHdr;
 LPWAVEHDR	lpWaveHdr;

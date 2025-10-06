@@ -223,9 +223,17 @@ int	Sys_FileTime(char* path) {
     return retval;
 }
 
+#if 0
 void Sys_mkdir(char* path) {
     _mkdir(path);
 }
+#else
+void Sys_mkdir(char *path) {
+    /* WinAPI создаёт папку, если её нет; если есть — вернёт FALSE и
+       GetLastError()==ERROR_ALREADY_EXISTS, что нам ок. */
+    CreateDirectoryA(path, NULL);
+}
+#endif
 
 
 /*
@@ -505,9 +513,10 @@ char* Sys_ConsoleInput(void) {
     static char	text[256];
     static int		len;
     INPUT_RECORD	recs[1024];
-    int		count;
-    int		i, dummy;
-    int		ch, numread, numevents;
+    // int		count;
+    // int		/* i, */;
+    int		ch;
+    DWORD   numevents, numread, dummy;
 
     if (!isDedicated)
         return NULL;
@@ -630,7 +639,7 @@ HWND		hwnd_dialog;
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    MSG				msg;
+    // MSG				msg;
     quakeparms_t	parms;
     double			time, oldtime, newtime;
     MEMORYSTATUS	lpBuffer;

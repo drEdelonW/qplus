@@ -3,7 +3,7 @@ ifeq ($(NO_COLOR),1)
   $(info COLORS DISABLED)
   COLOR := 0
 else ifneq (,$(findstring MINGW,$(UNAME_S)))
-  COLOR := 1
+  COLOR := 0
 else ifeq ($(shell test -t 1 && echo 1),1)
   COLOR := 1
 else

@@ -1,5 +1,5 @@
-TARGET ?= quakeX11
-# TARGET ?= quakeWin
+# TARGET ?= quakeX11
+TARGET ?= quakeWin
 # TARGET ?= quakeSTM32
 # TARGET ?= testSTM32
 
@@ -86,7 +86,7 @@ targets: $(TARGETS)
 # Main link (use LDFLAGS/LDLIBS properly)
 $(TARGETS): $(OBJS) | $(OUT_DIR)
 	@mkdir -p $(dir $@)
-	@$(LD) $(LDFLAGS) -o $@.elf $^ $(LDLIBS)
+	$(LD) $(LDFLAGS) -o $@.elf $^ $(LDLIBS)
 	@cd run_env && ln -sf ../$(TARGETS).elf quake
 	@$(info DONE.)
 
@@ -137,7 +137,8 @@ clean:
 fresh: clean build
 
 run: $(TARGETS)
-	@cd run_env && DISPLAY=:1 ./quake
+	@cd run_env && ./quake
+# 	@cd run_env && DISPLAY=:1 ./quake
 
 rund: $(TARGETS)
 	@cd run_env && DISPLAY=:1 gdbserver :1234 ./quake

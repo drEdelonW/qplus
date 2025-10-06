@@ -817,7 +817,9 @@ void NET_Poll() {
         if (pp->nextTime > net_time)
             break;
         pollProcedureList = pp->next;
-        pp->procedure(pp->arg);
+        pp->procedure(
+            // pp->arg
+        );
     }
 }
 

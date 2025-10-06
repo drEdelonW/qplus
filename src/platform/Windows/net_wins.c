@@ -62,7 +62,12 @@ WSADATA		winsockdata;
 //=============================================================================
 
 static double	blocktime;
-
+#if 1
+INT_PTR CALLBACK BlockingHook(void) {
+    WSACancelBlockingCall();
+    return 0;
+}
+#else
 BOOL PASCAL FAR BlockingHook(void) {
 	MSG		msg;
 	BOOL	ret;
@@ -84,7 +89,7 @@ BOOL PASCAL FAR BlockingHook(void) {
 	/* TRUE if we got a message */
 	return ret;
 }
-
+#endif
 
 void WINS_GetLocalAddress() {
 	struct hostent* local = NULL;

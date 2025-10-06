@@ -14,29 +14,31 @@ LD           := $(CC)
  ifeq ($(OS),Windows_NT)
     $(info Windows_NT build)
   # ==== 32-bit toggle on Windows (MSYS2/MinGW) ====
-#     ifeq ($(FORCE_32),1)
-#         $(info !!! USING 32-bit MinGW toolchain !!!)
-#         # Требуются пакеты: mingw-w64-i686-gcc, (и SDK libs обычно уже есть)
-# #         MINGW_PREFIX := i686-w64-mingw32
-# #         CC  := $(MINGW_PREFIX)-gcc
-# #         CXX := $(MINGW_PREFIX)-g++
-# #         LD  := $(CC)
+    ifeq ($(FORCE_32),1)
+        $(info !!! USING 32-bit MinGW toolchain !!!)
+        # Требуются пакеты: mingw-w64-i686-gcc, (и SDK libs обычно уже есть)
+        GCC_PATH := /c/msys64/mingw32/bin
+        MINGW_PREFIX := $(GCC_PATH)/i686-w64-mingw32
+        CC  := $(MINGW_PREFIX)-gcc
+        CXX := $(MINGW_PREFIX)-g++
+        LD  := $(CC)
 
-#         # НЕ обязательно, но не вредит; оставим для явности
-#         CFLAGS   += -m32
-#         CXXFLAGS += -m32
-#         LDFLAGS  += -m32
+        # НЕ обязательно, но не вредит; оставим для явности
+        CFLAGS   += -m32
+        CXXFLAGS += -m32
+        LDFLAGS  += -m32
 
-#         # Отдельная метка сборки/каталоги (по желанию)
-#         BUILD_TAG ?= quakeWin32
-#     else
-#         MINGW_PREFIX := x86_64-w64-mingw32
-#         CC  := $(MINGW_PREFIX)-gcc
-#         CXX := $(MINGW_PREFIX)-g++
-#         LD  := $(CC)
-#         # оставляем ваши CC/CXX/LD по умолчанию (gcc из MINGW64)
-#         BUILD_TAG ?= quakeWin
-#     endif
+        # Отдельная метка сборки/каталоги (по желанию)
+        BUILD_TAG ?= quakeWin32
+    else
+        GCC_PATH := /c/msys64/mingw64/bin
+        MINGW_PREFIX := $(GCC_PATH)/x86_64-w64-mingw32
+        CC  := $(MINGW_PREFIX)-gcc
+        CXX := $(MINGW_PREFIX)-g++
+        LD  := $(CC)
+        # оставляем ваши CC/CXX/LD по умолчанию (gcc из MINGW64)
+        BUILD_TAG ?= quakeWin
+    endif
 
 else ifeq ($(UNAME_S),Linux)
   $(info Linux build)

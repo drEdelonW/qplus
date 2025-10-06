@@ -9,7 +9,8 @@
       "args": [],                                     // арг-ты НЕ нужны: их дал gdbserver
       "cwd": "${workspaceFolder}",
       "MIMode": "gdb",
-      "miDebuggerPath": "/usr/bin/gdb",
+      "miDebuggerPath": "gdb",
+      // "miDebuggerPath": "/usr/bin/gdb",
       "miDebuggerServerAddress": "localhost:1234",
       "stopAtEntry": false,
       "environment": [ { "name": "DISPLAY", "value": ":1" } ],
