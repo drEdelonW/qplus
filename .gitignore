@@ -8,5 +8,6 @@ MCU_src/Debug/Middlewares
 *.o
 *.d
 *.elf
+*.exe
 *.list
 *.map

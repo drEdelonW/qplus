@@ -86,7 +86,7 @@ targets: $(TARGETS)
 # Main link (use LDFLAGS/LDLIBS properly)
 $(TARGETS): $(OBJS) | $(OUT_DIR)
 	@mkdir -p $(dir $@)
-	$(LD) $(LDFLAGS) -o $@.elf $^ $(LDLIBS)
+	@$(LD) $(LDFLAGS) -o $@.elf $^ $(LDLIBS)
 	@cd run_env && ln -sf ../$(TARGETS).elf quake
 	@$(info DONE.)
 
