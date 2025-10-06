@@ -13,14 +13,14 @@ void  MGL_modeResolution(int, int*, int*) {}
 int  MGL_init(void) { return 0; }
 void MGL_setSuspendAppCallback(void (*)(int)) {}
 
-int  MGL_changeDisplayMode(int,int,int,int) { return 0; }
+int  MGL_changeDisplayMode(int, int, int, int) { return 0; }
 int  MGL_availablePages(void*) { return 1; }
-void* MGL_createDisplayDC(int,int,int,int) { return 0; }
+void* MGL_createDisplayDC(int, int, int, int) { return 0; }
 int  MGL_surfaceAccessType(void*) { return 0; }
 int  MGL_makeCurrentDC(void*) { return 1; }
 int  MGL_sizey(void*) { return 0; }
 int  MGL_sizex(void*) { return 0; }
-void* MGL_createMemoryDC(int,int,int,int) { return 0; }
+void* MGL_createMemoryDC(int, int, int, int) { return 0; }
 void MGL_setActivePage(void*, int) {}
 void MGL_setVisualPage(void*, int, int) {}
 int  MGL_initWindowed(void) { return 1; }
@@ -31,11 +31,11 @@ void MGL_registerFullScreenWindow(void*) {}
 int  MGL_beginDirectAccess(void*) { return 1; }
 void MGL_endDirectAccess(void*) {}
 
-void MGL_setPalette(void*, int,int,void*) {}
+void MGL_setPalette(void*, int, int, void*) {}
 void MGL_realizePalette(void*) {}
 
-void MGL_stretchBltCoord(void*,int,int,int,int,void*,int,int,int,int,int) {}
-void MGL_bitBltCoord(void*,int,int,int,int,void*,int,int,int) {}
+void MGL_stretchBltCoord(void*, int, int, int, int, void*, int, int, int, int, int) {}
+void MGL_bitBltCoord(void*, int, int, int, int, void*, int, int, int) {}
 void MGL_setWinDC(void*, void*) {}
 void MGL_appActivate(int) {}
 
@@ -62,9 +62,11 @@ void MGL_setAppInstance(
 #else
     void* hInst
 #endif
-) { (void)hInst; }
+) {
+    (void)hInst;
+}
 
-MGLDC MGL_createWindowedDC(int a,int b,int c,int d, void* e, void* f, int g) {
+MGLDC MGL_createWindowedDC(int a, int b, int c, int d, void* e, void* f, int g) {
     (void)a;(void)b;(void)c;(void)d;(void)e;(void)f;(void)g;
     return NULL; // код выше проверяет на NULL → работоспособно как “no-MGL”
 }

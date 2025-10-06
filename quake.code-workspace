@@ -84,7 +84,8 @@
 			"ios": "c",
 			"socket.h": "c",
 			"main.h": "c",
-			"perepherial.h": "c"
+			"perepherial.h": "c",
+			"net_wipx.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

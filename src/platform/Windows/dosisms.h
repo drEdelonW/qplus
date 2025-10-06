@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -25,8 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _DOSISMS_H_
 #define _DOSISMS_H_
 
-int dos_lockmem(void *addr, int size);
-int dos_unlockmem(void *addr, int size);
+int dos_lockmem(void* addr, int size);
+int dos_unlockmem(void* addr, int size);
 
 typedef union {
 	struct {
@@ -70,10 +70,10 @@ typedef union {
 	} h;
 } regs_t;
 
-unsigned int ptr2real(void *ptr);
-void *real2ptr(unsigned int real);
-void *far2ptr(unsigned int farptr);
-unsigned int ptr2far(void *ptr);
+unsigned int ptr2real(void* ptr);
+void* real2ptr(unsigned int real);
+void* far2ptr(unsigned int farptr);
+unsigned int ptr2far(void* ptr);
 
 int	dos_inportb(int port);
 int	dos_inportw(int port);
@@ -87,8 +87,8 @@ void dos_restoreintr(int intr);
 
 int	dos_int86(int vec);
 
-void *dos_getmemory(int size);
-void dos_freememory(void *ptr);
+void* dos_getmemory(int size);
+void dos_freememory(void* ptr);
 
 void	dos_usleep(int usecs);
 

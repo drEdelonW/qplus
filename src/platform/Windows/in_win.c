@@ -724,7 +724,7 @@ IN_StartupJoystick
 */
 void IN_StartupJoystick(void) {
 	// int i;
-    int numdevs;
+	int numdevs;
 	JOYCAPS		jc;
 	MMRESULT	mmr;
 

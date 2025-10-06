@@ -17,8 +17,9 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/AP
 #         SRC_LIST += $(WIN_DIR)/sys_wind.c
         SRC_LIST += $(WIN_DIR)/vid_win.c
         SRC_LIST += $(WIN_DIR)/cd_win.c
-#         SRC_LIST += $(WIN_DIR)/mgl_stubs.c
         SRC_LIST += $(WIN_DIR)/fpu_stubs.c
 
-    LDLIBS += $(WIN_DIR)/MGLLT.LIB -luser32 -lgdi32 -lwinmm -lws2_32 -lwsock32 -ldxguid
+#     SRC_LIST += $(WIN_DIR)/mgl_stubs.c
+    LDLIBS += $(WIN_DIR)/MGLLT.LIB
+    LDLIBS += -luser32 -lgdi32 -lwinmm -lws2_32 -lwsock32 -ldxguid
     DEFINES += _WIN32

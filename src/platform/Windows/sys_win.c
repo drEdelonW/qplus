@@ -228,7 +228,7 @@ void Sys_mkdir(char* path) {
     _mkdir(path);
 }
 #else
-void Sys_mkdir(char *path) {
+void Sys_mkdir(char* path) {
     /* WinAPI создаёт папку, если её нет; если есть — вернёт FALSE и
        GetLastError()==ERROR_ALREADY_EXISTS, что нам ок. */
     CreateDirectoryA(path, NULL);
