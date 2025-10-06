@@ -13,6 +13,6 @@ typedef struct {
     int     argc;
     cstring* argv;
     typeless_ptr membase;
-    int32_t memsize;
+    size_t memsize;
 } quakeparms_t;
 typedef quakeparms_t* quakeparms_p;

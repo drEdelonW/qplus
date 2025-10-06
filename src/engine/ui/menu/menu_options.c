@@ -6,6 +6,9 @@
 #include "console.h"
 #include "cmd.h"
 #include "vid.h"
+#ifdef _WIN32
+#   include "winquake.h"
+#endif
 
 //=============================================================================
 /* OPTIONS MENU */

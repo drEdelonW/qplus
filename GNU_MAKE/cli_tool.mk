@@ -10,6 +10,9 @@ else
   $(info COLORS NOT SUPPORTED)
   COLOR := 0
 endif
+# ifeq ($(OS),Windows_NT)
+#   COLOR := 0
+# endif
 
 ifeq ($(COLOR),1)
   RED := \033[31m

@@ -1,4 +1,5 @@
 TARGET ?= quakeX11
+# TARGET ?= quakeWin
 # TARGET ?= quakeSTM32
 # TARGET ?= testSTM32
 
@@ -25,6 +26,7 @@ UNAME_S      := $(shell uname -s)
 UNAME_M      := $(shell uname -m)
 # Populated by SRCS.mk: must define SRC_LIST and optionally INCLUDES
 INCLUDES     :=
+DEFINES      :=
 SRC_LIST     :=
 
 
@@ -105,7 +107,7 @@ define compile_template
 	@{ out=$$($(TIME) \
 				$(2) $(CPPFLAGS) $(3) -c $< -o $@ 2>&1); \
 		rc=$$?; if [ $$rc -eq 0 ]; then st=$(GRN)OK$(RST); else st="$(RED)FAIL$(RST)\n"; fi; \
-		$(ECHO) "$$st  $$out"; }
+		$(ECHO) "$$st  $$out"; exit $$rc;}
 endef
 
 COMPILE_C   = $(call compile_template,{C}  ,$(CC) ,$(CFLAGS))

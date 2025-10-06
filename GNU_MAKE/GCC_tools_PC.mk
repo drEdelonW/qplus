@@ -11,11 +11,38 @@ LD           := $(CC)
 # ---------- Platform specifics ----------
 # ifeq ($(USE_X11),1)
   # hard fallback to avoid surprises with pkg-config
-  LDLIBS += -lX11 -lXext
 # endif
 
 # Optional 32-bit build on Linux x86_64
-ifeq ($(UNAME_S),Linux)
+ ifeq ($(OS),Windows_NT)
+    $(info Windows_NT build)
+  # ==== 32-bit toggle on Windows (MSYS2/MinGW) ====
+#     ifeq ($(FORCE_32),1)
+#         $(info !!! USING 32-bit MinGW toolchain !!!)
+#         # Требуются пакеты: mingw-w64-i686-gcc, (и SDK libs обычно уже есть)
+# #         MINGW_PREFIX := i686-w64-mingw32
+# #         CC  := $(MINGW_PREFIX)-gcc
+# #         CXX := $(MINGW_PREFIX)-g++
+# #         LD  := $(CC)
+
+#         # НЕ обязательно, но не вредит; оставим для явности
+#         CFLAGS   += -m32
+#         CXXFLAGS += -m32
+#         LDFLAGS  += -m32
+
+#         # Отдельная метка сборки/каталоги (по желанию)
+#         BUILD_TAG ?= quakeWin32
+#     else
+#         MINGW_PREFIX := x86_64-w64-mingw32
+#         CC  := $(MINGW_PREFIX)-gcc
+#         CXX := $(MINGW_PREFIX)-g++
+#         LD  := $(CC)
+#         # оставляем ваши CC/CXX/LD по умолчанию (gcc из MINGW64)
+#         BUILD_TAG ?= quakeWin
+#     endif
+
+else ifeq ($(UNAME_S),Linux)
+  $(info Linux build)
   TIME := /usr/bin/time -f "%E"
 
   $(info UNAME_M arch: $(UNAME_M))
@@ -37,6 +64,7 @@ ifeq ($(UNAME_S),Linux)
   else
   endif
 else ifeq ($(UNAME_S),Darwin)
+  $(info Darwin build)
     ECHO = echo
 #     CFLAGS   += -m32
 #     CXXFLAGS += -m32
