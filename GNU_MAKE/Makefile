@@ -19,8 +19,7 @@ DEBUG        ?= 1
 FORCE_32     ?= 1
 # Disable legacy ASM paths
 NO_ASM       ?= 1
-# X11 target on *nix
-USE_X11      ?= 1
+
 
 UNAME_S      := $(shell uname -s)
 UNAME_M      := $(shell uname -m)

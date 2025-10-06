@@ -9,9 +9,6 @@ LD           := $(CC)
 
 #==============OS DEPENDENT VARS================
 # ---------- Platform specifics ----------
-# ifeq ($(USE_X11),1)
-  # hard fallback to avoid surprises with pkg-config
-# endif
 
 # Optional 32-bit build on Linux x86_64
  ifeq ($(OS),Windows_NT)
@@ -106,10 +103,6 @@ CPPFLAGS     += -Dstricmp=strcasecmp
 
 ifeq ($(NO_ASM),1)
   CPPFLAGS     += -DNO_ASM
-endif
-
-ifeq ($(USE_X11),1)
-  CPPFLAGS     += -DX11 -DVID_X11
 endif
 
 # GCC10+ compatibility for old C codebases
