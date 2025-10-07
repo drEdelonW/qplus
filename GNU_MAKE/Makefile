@@ -136,10 +136,10 @@ clean:
 fresh: clean build
 
 run: $(TARGETS)
-	@cd run_env && ln -sf ../$(TARGETS).elf $(TARGETS) && $(RUN_PREFIX) ./$(TARGETS)
+	@cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX) ./$(TARGET)
 
 rund: $(TARGETS)
-	@cd run_env && $(RUN_PREFIX) gdbserver :1234 ./$(TARGETS)
+	@cd run_env && $(RUN_PREFIX) gdbserver :1234 ./$(TARGET)
 
 # Include auto-generated deps
 -include $(OBJS:.o=.d)

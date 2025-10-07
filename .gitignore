@@ -1,6 +1,6 @@
 GNU_MAKE/objs
 GNU_MAKE/OUTPUT
-GNU_MAKE/run_env/quake
+GNU_MAKE/run_env/quake*
 GNU_MAKE/run_env/id1/config.cfg
 MCU_src/Debug/Drivers
 MCU_src/Debug/Core
