@@ -85,7 +85,13 @@
 			"socket.h": "c",
 			"main.h": "c",
 			"perepherial.h": "c",
-			"net_wipx.h": "c"
+			"net_wipx.h": "c",
+			"winquake.h": "c",
+			"mgraph.h": "c",
+			"stdio.h": "c",
+			"mglwin.h": "c",
+			"glquake.h": "c",
+			"gl.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

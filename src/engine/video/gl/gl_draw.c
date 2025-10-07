@@ -38,8 +38,7 @@ qpic_t* draw_backtile;
 int			translate_texture;
 int			char_texture;
 
-typedef struct
-{
+typedef struct {
 	int		texnum;
 	float	sl, tl, sh, th;
 } glpic_t;
@@ -57,8 +56,7 @@ int		gl_filter_max = GL_LINEAR;
 
 int		texels;
 
-typedef struct
-{
+typedef struct {
 	int		texnum;
 	char	identifier[64];
 	int		width, height;
