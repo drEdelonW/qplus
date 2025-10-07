@@ -1,3 +1,5 @@
+# Set to 1 if you want 32-bit build on Linux x86_64 (requires multilibs)
+FORCE_32     ?= 1
 
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
         $(eval GAMESPEC_DIR = $(ENG_DIR)/game_specific) $(eval INCLUDES += $(GAMESPEC_DIR))

@@ -18,6 +18,8 @@ ifeq ($(UNAME_S),Linux)
         CPPFLAGS   += -DX11 -DVID_X11
         LDLIBS     += -lX11 -lXext
 
+        RUN_PREFIX := DISPLAY=:1
+
 else ifeq ($(UNAME_S),Darwin)
     $(info Darwin X11)
 #     INCLUDES += /opt/homebrew/opt/libx11/include
@@ -47,4 +49,3 @@ else
         SRC_LIST += $(PL_NULL_DIR)/xshm_stubs.c
 endif
 
-RUN_PREFIX := DISPLAY=:1
