@@ -1,5 +1,5 @@
-# TARGET ?= quakeX11
-TARGET ?= quakeWin
+TARGET ?= quakeX11
+# TARGET ?= quakeWin
 # TARGET ?= quakeSTM32
 # TARGET ?= testSTM32
 
@@ -42,11 +42,11 @@ ECHO = echo
 
 # --- order-preserving map SRC -> OBJ ---
 # helper: change .c/.cpp -> .o
-to_o   = $(patsubst %.cpp,%.o, \
-			$(patsubst %.c,%.o, \
-				$(patsubst %.s,%.o, \
-					$(patsubst %.S,%.o, \
-					$1 ))))
+to_o = $(patsubst %.cpp,%.o, \
+		$(patsubst %.c,%.o, \
+			$(patsubst %.s,%.o, \
+				$(patsubst %.S,%.o, \
+					$1))))
 
 # helper: map full source path to proper object path
 map_obj = $(if $(filter $(SRC_DIR)/%,$1), \
@@ -87,7 +87,6 @@ targets: $(TARGETS)
 $(TARGETS): $(OBJS) | $(OUT_DIR)
 	@mkdir -p $(dir $@)
 	@$(LD) $(LDFLAGS) -o $@.elf $^ $(LDLIBS)
-	@cd run_env && ln -sf ../$(TARGETS).elf quake
 	@$(info DONE.)
 
 $(OUT_DIR):
@@ -116,8 +115,8 @@ COMPILE_ASM = $(call compile_template,{ASM},$(CC) -c -x assembler-with-cpp,$(ASM
 # Search sources in ../src and ../ID_src/WinQuake
 vpath %.c   $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
 vpath %.cpp $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
-vpath %.s $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
-vpath %.S $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
+vpath %.s.  $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
+vpath %.S   $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
 
 # Two rules instead of four — make will find % via vpath
 $(OBJ_DIR)/%.o: %.c
@@ -137,11 +136,10 @@ clean:
 fresh: clean build
 
 run: $(TARGETS)
-	@cd run_env && ./quake
-# 	@cd run_env && DISPLAY=:1 ./quake
+	@cd run_env && ln -sf ../$(TARGETS).elf $(TARGETS) && $(RUN_PREFIX) ./$(TARGETS)
 
 rund: $(TARGETS)
-	@cd run_env && DISPLAY=:1 gdbserver :1234 ./quake
+	@cd run_env && $(RUN_PREFIX) gdbserver :1234 ./$(TARGETS)
 
 # Include auto-generated deps
 -include $(OBJS:.o=.d)

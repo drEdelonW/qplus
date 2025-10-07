@@ -1,9 +1,6 @@
 DST_PLATFORM := PC
 
 INCLUDES += $(SRC_DIR)
-# INCLUDES += /opt/homebrew/opt/libx11/include
-# INCLUDES += /opt/homebrew/include
-
 include features/fh_qEngine.mk
 
 $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/API)
@@ -22,6 +19,9 @@ ifeq ($(UNAME_S),Linux)
         LDLIBS     += -lX11 -lXext
 
 else ifeq ($(UNAME_S),Darwin)
+    $(info Darwin X11)
+#     INCLUDES += /opt/homebrew/opt/libx11/include
+    INCLUDES += /opt/homebrew/include
     $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))
         SRC_LIST += $(POSIX_DIR)/sys_linux.c
         SRC_LIST += $(POSIX_DIR)/vid_x.c
@@ -32,7 +32,13 @@ else ifeq ($(UNAME_S),Darwin)
 
     # macOS build: disable X11/SHM, use NULL stubs
     # NOTE: skip xshm_stubs.c to avoid missing X11 headers
-        CFLAGS  += -DNO_X11_SHM
+    CFLAGS  += -DNO_X11_SHM
+    # X11 target on *nix
+    CPPFLAGS   += -DX11 -DVID_X11
+    CPPFLAGS += -I/opt/X11/include
+
+    LDFLAGS  += -L/opt/X11/lib
+    LDLIBS     += -lX11 -lXext
 
 else
     $(eval PL_NULL_DIR = $(PLATFORM_DIR)/null) $(eval INCLUDES += $(PL_NULL_DIR))
@@ -41,3 +47,4 @@ else
         SRC_LIST += $(PL_NULL_DIR)/xshm_stubs.c
 endif
 
+RUN_PREFIX := DISPLAY=:1
