@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+#   define M_PI 3.14159265358979323846
 #endif
 
 typedef struct {
@@ -80,9 +80,9 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
-    SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
+    SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    // SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
+    // SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
     if (!ren) {
         // fallback to software renderer
         ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) running = 0;
-            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) running = 0;
+            if ((e.type == SDL_KEYDOWN) && (e.key.keysym.sym == SDLK_ESCAPE)) running = 0;
         }
 
         // dt

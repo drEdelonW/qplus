@@ -13,3 +13,4 @@ MCU_src/Debug/Middlewares
 *.exe
 *.list
 *.map
+GNU_MAKE/run_env/testSDL2
