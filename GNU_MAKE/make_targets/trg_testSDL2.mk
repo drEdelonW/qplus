@@ -12,19 +12,24 @@ $(eval SDL_DIR = $(SRC_DIR)/srcSDL2) $(eval INCLUDES += $(SDL_DIR))
 #     LDFLAGS  += -L/opt/X11/lib
 #     LDLIBS     += -lX11 -lXext
 
-
     SDL2_CFLAGS := $(shell pkg-config --cflags sdl2)
     SDL2_LIBS   := $(shell pkg-config --libs sdl2)
-    CFLAGS  += $(SDL2_CFLAGS)
-    LDLIBS  += $(SDL2_LIBS)
+ifeq ($(UNAME_S),Linux)
+
+
 #----------LINUX------------
 
-# RUN_PREFIX := DISPLAY=:1
+    RUN_PREFIX := DISPLAY=:1
 
 #----------MacOS------------
+else ifeq ($(UNAME_S),Darwin)
+
     HOMEBREW_PREFIX := $(shell brew --prefix 2>/dev/null)
     CFLAGS  += -arch arm64
     CPPFLAGS += -I$(HOMEBREW_PREFIX)/include -I$(HOMEBREW_PREFIX)/include/SDL2
     LDFLAGS += -L$(HOMEBREW_PREFIX)/lib -Wl,-rpath,$(HOMEBREW_PREFIX)/lib
-    LDLIBS  += -lm
 
+endif
+    CFLAGS  += $(SDL2_CFLAGS)
+    LDLIBS  += $(SDL2_LIBS)
+    LDLIBS  += -lm
