@@ -9,6 +9,7 @@
 ============================================================================
 */
 
+#if 0
 void Q_memset(typeless_ptr dest, int32_t fill, int32_t count) {
     if ((((int32_t)dest | count) & 3) == 0) {
         count >>= 2;
@@ -23,7 +24,27 @@ void Q_memset(typeless_ptr dest, int32_t fill, int32_t count) {
         }
     }
 }
+#else
+void Q_memset(typeless_ptr dest, int32_t fill, int32_t count) {
+    if (count <= 0) return;
+    /* 64-bit safe alignment check */
+    if ((((uintptr_t)dest | (uintptr_t)count) & 3u) == 0u) {
+        int32_t n = count >> 2;
+        uint32_t f = (uint8_t)fill;
+        f |= (f << 8);
+        f |= (f << 16);
+        uint32_t* d32 = (uint32_t*)dest;
+        for (int32_t i = 0; i < n; ++i) d32[i] = f;
+    }
+    else {
+        uint8_p d8 = (uint8_p)dest;
+        uint8_t f8 = (uint8_t)fill;
+        for (int32_t i = 0; i < count; ++i) d8[i] = f8;
+    }
+}
+#endif
 
+#if 0
 void Q_memcpy(typeless_ptr dest, typeless_ptr src, int32_t count) {
     if ((((int32_t)dest | (int32_t)src | count) & 3) == 0) {
         count >>= 2;
@@ -37,6 +58,22 @@ void Q_memcpy(typeless_ptr dest, typeless_ptr src, int32_t count) {
         }
     }
 }
+#else
+void Q_memcpy(typeless_ptr dest, typeless_ptr src, int32_t count) {
+    if (count <= 0) return;
+    if ((((uintptr_t)dest | (uintptr_t)src | (uintptr_t)count) & 3u) == 0u) {
+        int32_t n = count >> 2;
+        uint32_t* d32 = (uint32_t*)dest;
+        const uint32_t* s32 = (const uint32_t*)src;
+        for (int32_t i = 0; i < n; ++i) d32[i] = s32[i];
+    }
+    else {
+        uint8_p d8 = (uint8_p)dest;
+        const uint8_p s8 = (const uint8_p)src;
+        for (int32_t i = 0; i < count; ++i) d8[i] = s8[i];
+    }
+}
+#endif
 
 int Q_memcmp(typeless_ptr m1, typeless_ptr m2, int32_t count) {
     while (count) {
@@ -55,6 +92,7 @@ void Q_strcpy(cstring dest, cstring src) {
     *dest++ = 0;
 }
 
+#if 0
 void Q_strncpy(cstring dest, cstring src, int32_t count) {
     while (*src && count--) {
         *dest++ = *src++;
@@ -63,6 +101,16 @@ void Q_strncpy(cstring dest, cstring src, int32_t count) {
         *dest++ = 0;
     }
 }
+#else
+void Q_strncpy(cstring dest, cstring src, int32_t count) {
+    // if (count <= 0) return;
+    int32_t n = count;
+    while (--n > 0 && *src) {
+        *dest++ = *src++;
+    }
+    *dest = 0; /* always NUL-terminate */
+}
+#endif
 
 int Q_strlen(cstring str) {
     int32_t count = 0;
@@ -116,6 +164,7 @@ int Q_strncmp(cstring s1, cstring s2, int32_t count) {
     return -1;
 }
 
+#if 0
 int Q_strncasecmp(cstring s1, cstring s2, int32_t n) {
     while (1) {
         int c1 = *s1++;
@@ -140,6 +189,20 @@ int Q_strncasecmp(cstring s1, cstring s2, int32_t n) {
 
     return -1;
 }
+#else
+int Q_strncasecmp(cstring s1, cstring s2, int32_t n) {
+    // if (n <= 0) return 0;
+    do {
+        int c1 = *s1++;
+        int c2 = *s2++;
+        if ((c1 >= 'a') && (c1 <= 'z')) c1 -= ('a' - 'A');
+        if ((c2 >= 'a') && (c2 <= 'z')) c2 -= ('a' - 'A');
+        if (c1 != c2) return -1;     /* not equal */
+        if (c1 == 0)  return 0;      /* equal (both '\0') */
+    } while (--n);
+    return 0;
+}
+#endif
 
 int Q_strcasecmp(cstring s1, cstring s2) {
     return Q_strncasecmp(s1, s2, 99999);
