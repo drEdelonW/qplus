@@ -217,11 +217,9 @@ R_NewMap
 ===============
 */
 void R_NewMap() {
-	int		i;
-
 	// clear out efrags in case the level hasn't been reloaded
 	// FIXME: is this one short?
-	for (i = 0; i < cl.worldmodel->numleafs; i++)
+	for (int i = 0; i < cl.worldmodel->numleafs; i++)
 		cl.worldmodel->leafs[i].efrags = NULL;
 
 	r_viewleaf = NULL;
@@ -804,19 +802,27 @@ R_EdgeDrawing
 ================
 */
 void R_EdgeDrawing() {
-	edge_t	ledges[NUMSTACKEDGES +
-		((CACHE_SIZE - 1) / sizeof(edge_t)) + 1];
-	surf_t	lsurfs[NUMSTACKSURFACES +
-		((CACHE_SIZE - 1) / sizeof(surf_t)) + 1];
+#if 0
+	edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(edge_t)) + 1];
+	surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(surf_t)) + 1];
+#else
+    /* запас +2: выравнивание + место для surfaces-1 */
+    edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(edge_t)) + 2];
+    surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(surf_t)) + 2];
 
+#endif
+#  define ALIGN_PTR(p, a) ((void*)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
 	if (auxedges) {
 		r_edges = auxedges;
 	}
 	else {
 		r_edges = (edge_ptr)
-			(((int32_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+			// (((int32_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+            ALIGN_PTR(&ledges[0], CACHE_SIZE);
+
 	}
 
+#if 0
 	if (r_surfsonstack) {
 		surfaces = (surf_t*)
 			(((int32_t)&lsurfs[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
@@ -826,6 +832,16 @@ void R_EdgeDrawing() {
 		surfaces--;
 		R_SurfacePatch();
 	}
+#else
+    if (r_surfsonstack) {
+        /* выравниваем от (lsurfs + 1), чтобы потом surfaces = base - 1 было легально */
+        surf_t* base = (surf_t*)ALIGN_PTR(&lsurfs[1], CACHE_SIZE);
+        surfaces = base - 1; /* surfaces[1] указывает ровно на base */
+        surf_max = &surfaces[r_cnumsurfs];
+        /* surface 0 — фиктивный элемент */
+        R_SurfacePatch();
+    }
+#endif
 
 	R_BeginEdgeFrame();
 
