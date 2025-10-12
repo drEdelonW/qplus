@@ -128,7 +128,7 @@ void D_PolysetDraw() {
 	// one extra because of cache line pretouching
 
 	a_spans = (spanpackage_t*)
-		(((int32_t)&spans[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+		(((uintptr_t)&spans[0] + CACHE_SIZE - 1) & ~(uintptr_t)(CACHE_SIZE - 1));
 
 	if (r_affinetridesc.drawtype) {
 		D_DrawSubdiv();

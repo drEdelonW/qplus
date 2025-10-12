@@ -607,7 +607,7 @@ void R_ScanEdges() {
     surf_p  s;
 
     basespan_p = (espan_p)
-        ((int32_t)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+        ((uintptr_t)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
     max_span_p = &basespan_p[MAXSPANS - r_refdef.vrect.width];
 
     span_p = basespan_p;

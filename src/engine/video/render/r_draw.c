@@ -330,7 +330,7 @@ R_EmitCachedEdge
 ================
 */
 void R_EmitCachedEdge() {
-    edge_ptr pedge_t = (edge_ptr)((uint32_t)r_edges + r_pedge->cachededgeoffset);
+    edge_ptr pedge_t = (edge_ptr)((uintptr_t)r_edges + (uintptr_t)r_pedge->cachededgeoffset);
 
     if (!pedge_t->surfs[0])
         pedge_t->surfs[0] = surface_p - surfaces;
@@ -401,9 +401,9 @@ void R_RenderFace(msurface_p fa, int clipflags) {
                     }
                 }
                 else {
-                    if ((((uint32_t)edge_p - (uint32_t)r_edges) >
+                    if ((((uintptr_t)edge_p - (uintptr_t)r_edges) >
                         r_pedge->cachededgeoffset) &&
-                        (((edge_ptr)((uint32_t)r_edges +
+                        (((edge_ptr)((uintptr_t)r_edges +
                             r_pedge->cachededgeoffset))->owner == r_pedge)) {
                         R_EmitCachedEdge();
                         r_lastvertvalid = false;
@@ -441,9 +441,9 @@ void R_RenderFace(msurface_p fa, int clipflags) {
                 else {
                     // it's cached if the cached edge is valid and is owned
                     // by this medge_t
-                    if ((((uint32_t)edge_p - (uint32_t)r_edges) >
+                    if ((((uintptr_t)edge_p - (uintptr_t)r_edges) >
                         r_pedge->cachededgeoffset) &&
-                        (((edge_ptr)((uint32_t)r_edges +
+                        (((edge_ptr)((uintptr_t)r_edges +
                             r_pedge->cachededgeoffset))->owner == r_pedge)) {
                         R_EmitCachedEdge();
                         r_lastvertvalid = false;

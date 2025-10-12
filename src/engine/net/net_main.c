@@ -405,7 +405,7 @@ qsocket_p NET_CheckNewConnections() {
             if (recording) {
                 vcrConnect.time = host_time;
                 vcrConnect.op = VCR_OP_CONNECT;
-                vcrConnect.session = (int32_t)ret;
+                vcrConnect.session = (intptr_t)ret;
                 Sys_FileWrite(vcrFile, &vcrConnect, sizeof(vcrConnect));
                 Sys_FileWrite(vcrFile, ret->address, NET_NAMELEN);
             }
@@ -499,7 +499,7 @@ int32_t	NET_GetMessage(qsocket_p sock) {
         if (recording) {
             vcrGetMessage.time = host_time;
             vcrGetMessage.op = VCR_OP_GETMESSAGE;
-            vcrGetMessage.session = (int32_t)sock;
+            vcrGetMessage.session = (intptr_t)sock;
             vcrGetMessage.ret = ret;
             vcrGetMessage.len = net_message.cursize;
             Sys_FileWrite(vcrFile, &vcrGetMessage, 24);
@@ -510,7 +510,7 @@ int32_t	NET_GetMessage(qsocket_p sock) {
         if (recording) {
             vcrGetMessage.time = host_time;
             vcrGetMessage.op = VCR_OP_GETMESSAGE;
-            vcrGetMessage.session = (int32_t)sock;
+            vcrGetMessage.session = (intptr_t)sock;
             vcrGetMessage.ret = ret;
             Sys_FileWrite(vcrFile, &vcrGetMessage, 20);
         }
@@ -556,7 +556,7 @@ int32_t NET_SendMessage(qsocket_p sock, sizebuf_p data) {
     if (recording) {
         vcrSendMessage.time = host_time;
         vcrSendMessage.op = VCR_OP_SENDMESSAGE;
-        vcrSendMessage.session = (int32_t)sock;
+        vcrSendMessage.session = (intptr_t)sock;
         vcrSendMessage.r = r;
         Sys_FileWrite(vcrFile, &vcrSendMessage, 20);
     }
@@ -582,7 +582,7 @@ int32_t NET_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
     if (recording) {
         vcrSendMessage.time = host_time;
         vcrSendMessage.op = VCR_OP_SENDMESSAGE;
-        vcrSendMessage.session = (int32_t)sock;
+        vcrSendMessage.session = (intptr_t)sock;
         vcrSendMessage.r = r;
         Sys_FileWrite(vcrFile, &vcrSendMessage, 20);
     }
@@ -611,7 +611,7 @@ bool NET_CanSendMessage(qsocket_p sock) {
     if (recording) {
         vcrSendMessage.time = host_time;
         vcrSendMessage.op = VCR_OP_CANSENDMESSAGE;
-        vcrSendMessage.session = (int32_t)sock;
+        vcrSendMessage.session = (intptr_t)sock;
         vcrSendMessage.r = r;
         Sys_FileWrite(vcrFile, &vcrSendMessage, 20);
     }

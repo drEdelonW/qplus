@@ -397,7 +397,7 @@ void D_DrawZSpans(espan_t* pspan) {
 		// we count on FP exceptions being turned off to avoid range problems
 		izi = (int)(zi * 0x8000 * 0x10000);
 
-		if ((int32_t)pdest & 0x02) {
+		if (((uintptr_t)pdest) & 0x02u) {
 			*pdest++ = (int16_t)(izi >> 16);
 			izi += izistep;
 			count--;

@@ -55,7 +55,7 @@ void D_FillRect(vrect_p rect, int color) {
 
 	dest = ((uint8_p)vid.buffer + ry * vid.rowbytes + rx);
 
-	if (((rwidth & 0x03) == 0) && (((int32_t)dest & 0x03) == 0)) {
+	if (((rwidth & 0x03) == 0) && (((uintptr_t)dest & 0x03) == 0)) {
 		// faster aligned dword clear
 		ldest = (uint32_t*)dest;
 		color += color << 16;
