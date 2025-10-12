@@ -43,3 +43,14 @@ sudo apt install \
 
 
     Нужно заменять на intptr_t, uintptr_t, size_t.
+
+
+
+sudo apt update
+sudo apt install -y libsdl2-2.0-0 libsdl2-dev \
+                    mesa-utils libgl1-mesa-dri libegl1-mesa libgles2-mesa
+
+
+export SDL_VIDEO_X11_FORCE_EGL=1
+export SDL_RENDER_DRIVER=opengles2     # рендерер SDL через GLES2
+OUTPUT/testSDL2/testSDL2.elf

@@ -57,10 +57,13 @@ static void project_point(
 int main(int argc, char** argv) {
     (void)argc; (void)argv;
 
+#if 0
     const int win_w = 960;
     const int win_h = 720;
-    // const int win_w = 320;
-    // const int win_h = 240;
+#else
+    const int win_w = 320;
+    const int win_h = 240;
+#endif
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         fprintf(stderr, "SDL_Init error: %s\n", SDL_GetError());

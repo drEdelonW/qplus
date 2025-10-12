@@ -30,7 +30,7 @@ ifeq ($(OS),Windows_NT)
 
 else ifeq ($(UNAME_S),Linux)
   $(info Linux build)
-  TIME := /usr/bin/time -f "%E"
+#   TIME := /usr/bin/time -f "%E"
 
   $(info UNAME_M arch: $(UNAME_M))
   ifeq ($(FORCE_32),1)
