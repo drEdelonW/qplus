@@ -44,6 +44,7 @@ typedef struct {
     uint8_t lightlevel;
 #endif
 } usercmd_t;
+typedef usercmd_t* usercmd_p;
 
 typedef struct {
     int32_t  length;
@@ -81,12 +82,12 @@ typedef struct {
 
 #define MAX_DLIGHTS  32
 typedef struct {
-    vec3_t origin;
-    float radius;
-    float die;    // stop lighting after this time
-    float decay;    // drop this each second
-    float minlight;   // don't add when contributing less
-    int32_t  key;
+    vec3_t  origin;
+    float   radius;
+    float   die;    // stop lighting after this time
+    float   decay;    // drop this each second
+    float   minlight;   // don't add when contributing less
+    int32_t key;
 #ifdef QUAKE2
     bool dark;   // subtracts light instead of adding
 #endif
@@ -232,7 +233,7 @@ typedef struct {
     int32_t   cdtrack, looptrack; // cd audio
 
     // frag scoreboard
-    scoreboard_t* scores;  // [cl.maxclients]
+    scoreboard_p scores;  // [cl.maxclients]
 
 #ifdef QUAKE2
     // light level at player's position including dlights
@@ -242,9 +243,6 @@ typedef struct {
 #endif
 } client_state_t;
 
-
-
-
 #define MAX_TEMP_ENTITIES 64   // lightning bolts, etc
 #define MAX_STATIC_ENTITIES 128   // torches, etc
 
@@ -252,12 +250,12 @@ extern client_state_t cl;
 
 // FIXME, allocate dynamically
 // extern efrag_t   cl_efrags[MAX_EFRAGS];
-extern r_entity_t        cl_entities[MAX_EDICTS];
-extern r_entity_t        cl_static_entities[MAX_STATIC_ENTITIES];
-extern lightstyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
-extern dlight_t        cl_dlights[MAX_DLIGHTS];
-extern r_entity_t        cl_temp_entities[MAX_TEMP_ENTITIES];
-extern beam_t          cl_beams[MAX_BEAMS];
+extern r_entity_t   cl_entities[MAX_EDICTS];
+extern r_entity_t   cl_static_entities[MAX_STATIC_ENTITIES];
+extern lightstyle_t cl_lightstyle[MAX_LIGHTSTYLES];
+extern dlight_t     cl_dlights[MAX_DLIGHTS];
+extern r_entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
+extern beam_t       cl_beams[MAX_BEAMS];
 
 //=============================================================================
 
@@ -280,8 +278,8 @@ void CL_Disconnect_f();
 void CL_NextDemo();
 
 #define MAX_VISEDICTS 256
-extern int32_t cl_numvisedicts;
-extern r_entity_p cl_visedicts[MAX_VISEDICTS];
+extern int32_t      cl_numvisedicts;
+extern r_entity_p   cl_visedicts[MAX_VISEDICTS];
 
 //
 // cl_input
@@ -297,7 +295,7 @@ extern  kbutton_t   in_speed;
 
 void CL_InitInput();
 void CL_SendCmd();
-void CL_SendMove(usercmd_t* cmd);
+void CL_SendMove(usercmd_p cmd);
 
 void CL_ParseTEnt();
 void CL_UpdateTEnts();
@@ -306,8 +304,8 @@ void CL_ClearState();
 
 
 void CL_ReadFromServer();
-void CL_WriteToServer(usercmd_t* cmd);
-void CL_BaseMove(usercmd_t* cmd);
+void CL_WriteToServer(usercmd_p cmd);
+void CL_BaseMove(usercmd_p cmd);
 
 
 float CL_KeyState(kbutton_t* key);

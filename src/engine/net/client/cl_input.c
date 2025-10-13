@@ -59,21 +59,21 @@
 */
 
 
-kbutton_t	in_mlook, in_klook;
-kbutton_t	in_left, in_right, in_forward, in_back;
-kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
-kbutton_t	in_strafe, in_speed, in_use, in_jump, in_attack;
-kbutton_t	in_up, in_down;
+kbutton_t in_mlook, in_klook;
+kbutton_t in_left, in_right, in_forward, in_back;
+kbutton_t in_lookup, in_lookdown, in_moveleft, in_moveright;
+kbutton_t in_strafe, in_speed, in_use, in_jump, in_attack;
+kbutton_t in_up, in_down;
 
-int			in_impulse;
+int   in_impulse;
 
 void KeyDown(kbutton_t* btn) {
     cstring c = Cmd_Argv(1);
-    int k = (c[0]) ? atoi(c) : -1;		// typed manually at the console for continuous down
+    int k = (c[0]) ? atoi(c) : -1;  // typed manually at the console for continuous down
 
     if ((k == btn->down[0]) ||
         (k == btn->down[1]))
-        return;		// repeating key
+        return;  // repeating key
 
     if (!btn->down[0])
         btn->down[0] = k;
@@ -85,8 +85,8 @@ void KeyDown(kbutton_t* btn) {
     }
 
     if (btn->state & 1)
-        return;		// still down
-    btn->state |= 1 + 2;	// down + impulse down
+        return;  // still down
+    btn->state |= 1 + 2; // down + impulse down
 }
 
 void KeyUp(kbutton_t* btn) {
@@ -98,7 +98,7 @@ void KeyUp(kbutton_t* btn) {
     }
     else { // typed manually at the console, assume for unsticking, so clear all
         btn->down[0] = btn->down[1] = 0;
-        btn->state = 4;	// impulse up
+        btn->state = 4; // impulse up
         return;
     }
 
@@ -115,8 +115,8 @@ void KeyUp(kbutton_t* btn) {
         ) {
         return;
     }
-    btn->state &= ~1;		// now up
-    btn->state |= 4; 		// impulse up
+    btn->state &= ~1;  // now up
+    btn->state |= 4;   // impulse up
 }
 
 void IN_KLookDown() { KeyDown(&in_klook); }
@@ -177,7 +177,7 @@ void IN_Impulse() { in_impulse = Q_atoi(Cmd_Argv(1)); }
     ===============
 */
 float CL_KeyState(kbutton_t* key) {
-    bool	impulsedown, impulseup, down;
+    bool impulsedown, impulseup, down;
 
     impulsedown = key->state & 2;
     impulseup = key->state & 4;
@@ -186,30 +186,30 @@ float CL_KeyState(kbutton_t* key) {
 
     if (impulsedown && !impulseup) {
         if (down)
-            val = 0.5;	// pressed and held this frame
+            val = 0.5; // pressed and held this frame
         else
-            val = 0;	//	I_Error ();
+            val = 0; // I_Error ();
     }
     if (impulseup && !impulsedown) {
         if (down)
-            val = 0;	//	I_Error ();
+            val = 0; // I_Error ();
         else
-            val = 0;	// released this frame
+            val = 0; // released this frame
     }
     if (!impulsedown && !impulseup) {
         if (down)
-            val = 1.0;	// held the entire frame
+            val = 1.0; // held the entire frame
         else
-            val = 0;	// up the entire frame
+            val = 0; // up the entire frame
     }
     if (impulsedown && impulseup) {
         if (down)
-            val = 0.75;	// released and re-pressed this frame
+            val = 0.75; // released and re-pressed this frame
         else
-            val = 0.25;	// pressed and released this frame
+            val = 0.25; // pressed and released this frame
     }
 
-    key->state &= 1;		// clear impulses
+    key->state &= 1;  // clear impulses
 
     return val;
 }
@@ -229,8 +229,8 @@ float CL_KeyState(kbutton_t* key) {
     ================
 */
 void CL_AdjustAngles() {
-    float	speed;
-    float	up, down;
+    float speed;
+    float up, down;
 
     if (in_speed.state & 1)
         speed = host_frametime * cl_anglespeedkey.value;
@@ -279,7 +279,7 @@ CL_BaseMove
 Send the intended movement message to the server
 ================
 */
-void CL_BaseMove(usercmd_t* cmd) {
+void CL_BaseMove(usercmd_p cmd) {
     if (cls.signon != SIGNONS)
         return;
 
@@ -324,11 +324,9 @@ void CL_BaseMove(usercmd_t* cmd) {
 CL_SendMove
 ==============
 */
-void CL_SendMove(usercmd_t* cmd) {
-    int		i;
-    int		bits;
-    sizebuf_t	buf;
-    uint8_t	data[128];
+void CL_SendMove(usercmd_p cmd) {
+    sizebuf_t buf;
+    uint8_t data[128];
 
     buf.maxsize = 128;
     buf.cursize = 0;
@@ -341,9 +339,9 @@ void CL_SendMove(usercmd_t* cmd) {
     //
     MSG_WriteByte(&buf, clc_move);
 
-    MSG_WriteFloat(&buf, cl.mtime[0]);	// so server can get ping times
+    MSG_WriteFloat(&buf, cl.mtime[0]); // so server can get ping times
 
-    for (i = 0; i < VECT_DIM; i++)
+    for (int i = 0; i < VECT_DIM; i++)
         MSG_WriteAngle(&buf, cl.viewangles[i]);
 
     MSG_WriteShort(&buf, cmd->forwardmove);
@@ -353,8 +351,7 @@ void CL_SendMove(usercmd_t* cmd) {
     //
     // send button bits
     //
-    bits = 0;
-
+    int bits = 0;
     if (in_attack.state & 3)
         bits |= 1;
     in_attack.state &= ~2;

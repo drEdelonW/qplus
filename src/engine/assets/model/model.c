@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 
 model_p loadmodel;
-char	loadname[32];	// for hunk tags
+char loadname[32]; // for hunk tags
 
 void Mod_LoadSpriteModel(model_p mod, typeless_ptr buffer);
 void Mod_LoadBrushModel(model_p mod, typeless_ptr buffer);
@@ -45,7 +45,7 @@ model_p Mod_LoadModel(model_p mod, bool crash);
 
 uint8_t mod_novis[MAX_MAP_LEAFS / 8];
 
-#define	MAX_MOD_KNOWN	256
+#define MAX_MOD_KNOWN 256
 model_t mod_known[MAX_MOD_KNOWN];
 int32_t mod_numknown;
 
@@ -106,7 +106,7 @@ mleaf_p Mod_PointInLeaf(vec3_t p, model_p model) {
         }
     }
 
-    return NULL;	// never reached
+    return NULL; // never reached
 }
 
 
@@ -121,7 +121,7 @@ uint8_p Mod_DecompressVis(uint8_p in, model_p model) {
     int row = (model->numleafs + 7) >> 3;
     uint8_p out = decompressed;
 
-    if (!in) {	// no vis info, so make all visible
+    if (!in) { // no vis info, so make all visible
         while (row) {
             *out++ = 0xff;
             row--;
@@ -251,7 +251,7 @@ model_p Mod_LoadModel(model_p mod, bool crash) {
     //
     // load the file
     //
-    uint8_t	stackbuf[1024];		// avoid dirtying the cache heap
+    uint8_t stackbuf[1024];  // avoid dirtying the cache heap
     uint32_p buf = (uint32_t*)COM_LoadStackFile(mod->name, stackbuf, sizeof(stackbuf));
     if (!buf) {
         if (crash)
@@ -373,7 +373,7 @@ void Mod_LoadTextures(lump_p l) {
         if (!tx ||
             (tx->name[0] != '+') ||
             (tx->anim_next))
-            continue;	// allready sequenced
+            continue; // allready sequenced
 
         // find the number of frames in the animation
         texture_p anims[10];    memset(anims, 0, sizeof(anims));
@@ -432,7 +432,7 @@ void Mod_LoadTextures(lump_p l) {
                     Sys_Error("Bad animating texture %s", tx->name);
         }
 
-#define	ANIM_CYCLE	2
+#define ANIM_CYCLE 2
         // link them all together
         for (int j = 0; j < max; j++) {
             texture_p tx2 = anims[j];
@@ -608,7 +608,7 @@ void Mod_LoadTexinfo(lump_p l) {
             out->mipadjust = 1;
 #if 0
         if (len1 + len2 < 0.001)
-            out->mipadjust = 1;		// don't crash
+            out->mipadjust = 1;  // don't crash
         else
             out->mipadjust = 1 / floor((len1 + len2) / 2 + 0.1);
 #endif
@@ -617,7 +617,7 @@ void Mod_LoadTexinfo(lump_p l) {
         out->flags = LittleLong(in->flags);
 
         if (!loadmodel->textures) {
-            out->texture = r_notexture_mip;	// checkerboard texture
+            out->texture = r_notexture_mip; // checkerboard texture
             out->flags = 0;
         }
         else {
@@ -640,8 +640,8 @@ Fills in s->texturemins[] and s->extents[]
 ================
 */
 void CalcSurfaceExtents(msurface_p s) {
-    float	mins[2], maxs[2];
-    int		bmins[2], bmaxs[2];
+    float mins[2], maxs[2];
+    int  bmins[2], bmaxs[2];
 
     mins[0] = mins[1] = 999999;
     maxs[0] = maxs[1] = -99999;
@@ -732,12 +732,12 @@ void Mod_LoadFaces(lump_p l) {
 
         // set the drawing flags flag
 
-        if (!Q_strncmp(out->texinfo->texture->name, "sky", 3)) {	// sky
+        if (!Q_strncmp(out->texinfo->texture->name, "sky", 3)) { // sky
             out->flags |= (SURF_DRAWSKY | SURF_DRAWTILED);
             continue;
         }
 
-        if (!Q_strncmp(out->texinfo->texture->name, "*", 1)) {	// turbulent
+        if (!Q_strncmp(out->texinfo->texture->name, "*", 1)) { // turbulent
             out->flags |= (SURF_DRAWTURB | SURF_DRAWTILED);
             for (int i = 0; i < 2; i++) {
                 out->extents[i] = 16384;
@@ -797,7 +797,7 @@ void Mod_LoadNodes(lump_p l) {
         }
     }
 
-    Mod_SetParent(loadmodel->nodes, NULL);	// sets nodes and leafs
+    Mod_SetParent(loadmodel->nodes, NULL); // sets nodes and leafs
 }
 
 /*
@@ -994,12 +994,11 @@ RadiusFromBounds
 =================
 */
 float RadiusFromBounds(vec3_t mins, vec3_t maxs) {
-    vec3_t	corner;
+    vec3_t corner;
     for (int i = 0; i < VECT_DIM; i++) {
         corner[i] = (fabs(mins[i]) > fabs(maxs[i])) ?
             fabs(mins[i]) : fabs(maxs[i]);
     }
-
     return Length(corner);
 }
 
@@ -1047,7 +1046,7 @@ void Mod_LoadBrushModel(model_p mod, typeless_ptr buffer) {
 
     Mod_MakeHull0();
 
-    mod->numframes = 2;		// regular and alternate animation
+    mod->numframes = 2;  // regular and alternate animation
     mod->flags = 0;
 
     //
@@ -1071,8 +1070,8 @@ void Mod_LoadBrushModel(model_p mod, typeless_ptr buffer) {
 
         mod->numleafs = bm->visleafs;
 
-        if (i < (mod->numsubmodels - 1)) {	// duplicate the basic information
-            char	name[10];
+        if (i < (mod->numsubmodels - 1)) { // duplicate the basic information
+            char name[10];
 
             snprintf(name, sizeof(name), "*%i", i + 1);
             loadmodel = Mod_FindName(name);
@@ -1278,7 +1277,7 @@ void Mod_LoadAliasModel(model_p mod, typeless_ptr buffer) {
         (LittleLong(pinmodel->numframes) - 1) *
         sizeof(pheader->frames[0]));
 
-    //	mod->cache.data = pheader;
+    // mod->cache.data = pheader;
     mod->flags = LittleLong(pinmodel->flags);
 
     //
@@ -1342,7 +1341,7 @@ void Mod_LoadAliasModel(model_p mod, typeless_ptr buffer) {
     pheader->skindesc = (uint8_p)pskindesc - (uint8_p)pheader;
 
     for (int i = 0; i < numskins; i++) {
-        aliasskintype_t	skintype;
+        aliasskintype_t skintype;
 
         skintype = LittleLong(pskintype->type);
         pskindesc[i].type = skintype;
@@ -1581,7 +1580,7 @@ void Mod_LoadSpriteModel(model_p mod, typeless_ptr buffer) {
     dspriteframetype_p pframetype = (dspriteframetype_p)(pin + 1);
 
     for (int i = 0; i < numframes; i++) {
-        spriteframetype_t	frametype;
+        spriteframetype_t frametype;
 
         frametype = LittleLong(pframetype->type);
         psprite->frames[i].type = frametype;

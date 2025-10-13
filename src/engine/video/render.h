@@ -36,9 +36,9 @@ typedef struct efrag_s efrag_t;
 typedef efrag_t* efrag_p;
 struct efrag_s {
 	struct mleaf_s* leaf;
-	struct efrag_s* leafnext;
+	efrag_p leafnext;
 	struct entity_s* entity;
-	struct efrag_s* entnext;
+	efrag_p entnext;
 };
 
 
@@ -55,7 +55,7 @@ typedef struct entity_s {
 	vec3_t					msg_angles[2];	// last two updates(0 is newest)
 	vec3_t					angles;
 	struct model_s* model;			// NULL = no model
-	struct efrag_s* efrag;			// linked list of efrags
+	efrag_p efrag;			// linked list of efrags
 	int						frame;
 	float					syncbase;		// for client-side animations
 	uint8_p colormap;
