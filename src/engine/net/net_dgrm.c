@@ -1149,15 +1149,9 @@ static qsocket_p _Datagram_Connect(cstring host) {
 
                 int control = BigLong(*((int*)net_message.data));
                 MSG_ReadLong();
-                if (control == -1) {
-                    ret = 0;
-                    continue;
-                }
-                if ((control & (~NETFLAG_LENGTH_MASK)) != NETFLAG_CTL) {
-                    ret = 0;
-                    continue;
-                }
-                if ((control & NETFLAG_LENGTH_MASK) != ret) {
+                if ((control == -1) ||
+                    ((control & (~NETFLAG_LENGTH_MASK)) != NETFLAG_CTL) ||
+                    ((control & NETFLAG_LENGTH_MASK) != ret)) {
                     ret = 0;
                     continue;
                 }

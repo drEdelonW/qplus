@@ -279,7 +279,7 @@ void V_ParseDamage() {
 
     armor = MSG_ReadByte();
     blood = MSG_ReadByte();
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < VECT_DIM; i++)
         from[i] = MSG_ReadCoord();
 
     count = blood * 0.5 + armor * 0.5;
@@ -825,7 +825,7 @@ void V_CalcRefdef() {
 
     AngleVectors(angles, forward, right, up);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         r_refdef.vieworg[i] +=
             scr_ofsx.value * forward[i] +
             scr_ofsy.value * right[i] +
@@ -843,7 +843,7 @@ void V_CalcRefdef() {
     VectorCopy(ent->origin, view->origin);
     view->origin[2] += cl.viewheight;
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         view->origin[i] += forward[i] * bob * 0.4;
         //		view->origin[i] += right[i]*bob*0.4;
         //		view->origin[i] += up[i]*bob*0.8;
@@ -946,7 +946,7 @@ void V_RenderView() {
         vid.aspect *= 0.5;
 
         r_refdef.viewangles[YAW] -= lcd_yaw.value;
-        for (i = 0; i < 3; i++)
+        for (i = 0; i < VECT_DIM; i++)
             r_refdef.vieworg[i] -= right[i] * lcd_x.value;
         R_RenderView();
 
@@ -955,7 +955,7 @@ void V_RenderView() {
         R_PushDlights();
 
         r_refdef.viewangles[YAW] += lcd_yaw.value * 2;
-        for (i = 0; i < 3; i++)
+        for (i = 0; i < VECT_DIM; i++)
             r_refdef.vieworg[i] += 2 * right[i] * lcd_x.value;
         R_RenderView();
 

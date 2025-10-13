@@ -650,17 +650,19 @@ void CalcSurfaceExtents(msurface_p s) {
 
     for (int i = 0; i < s->numedges; i++) {
         int e = loadmodel->surfedges[s->firstedge + i];
-        mvertex_p v;
-        if (e >= 0)
-            v = &loadmodel->vertexes[loadmodel->edges[e].v[0]];
-        else
-            v = &loadmodel->vertexes[loadmodel->edges[-e].v[1]];
+        mvertex_p v =
+            &loadmodel->vertexes[
+                (e >= 0) ?
+                    loadmodel->edges[e].v[0] :
+                    loadmodel->edges[-e].v[1]
+            ];
 
         for (int j = 0; j < 2; j++) {
-            float val = v->position[0] * tex->vecs[j][0] +
+            float val =
+                v->position[0] * tex->vecs[j][0] +
                 v->position[1] * tex->vecs[j][1] +
                 v->position[2] * tex->vecs[j][2] +
-                tex->vecs[j][3];
+                /*            */ tex->vecs[j][3];
             if (val < mins[j])
                 mins[j] = val;
             if (val > maxs[j])
@@ -974,7 +976,7 @@ void Mod_LoadPlanes(lump_p l) {
 
     for (int i = 0; i < count; i++, in++, out++) {
         int bits = 0;
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < VECT_DIM; j++) {
             out->normal[j] = LittleFloat(in->normal[j]);
             if (out->normal[j] < 0)
                 bits |= 1 << j;

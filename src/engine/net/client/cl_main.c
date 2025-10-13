@@ -419,13 +419,13 @@ void CL_RelinkEntities() {
 	//
 	// interpolate player info
 	//
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < VECT_DIM; i++)
 		cl.velocity[i] = cl.mvelocity[1][i] +
 		frac * (cl.mvelocity[0][i] - cl.mvelocity[1][i]);
 
 	if (cls.demoplayback) {
 		// interpolate the angles
-		for (j = 0; j < 3; j++) {
+		for (j = 0; j < VECT_DIM; j++) {
 			d = cl.mviewangles[0][j] - cl.mviewangles[1][j];
 			if (d > 180)
 				d -= 360;
@@ -460,14 +460,14 @@ void CL_RelinkEntities() {
 		}
 		else {	// if the delta is large, assume a teleport and don't lerp
 			f = frac;
-			for (j = 0; j < 3; j++) {
+			for (j = 0; j < VECT_DIM; j++) {
 				delta[j] = ent->msg_origins[0][j] - ent->msg_origins[1][j];
 				if (delta[j] > 100 || delta[j] < -100)
 					f = 1;		// assume a teleportation, not a motion
 			}
 
 			// interpolate the origin and angles
-			for (j = 0; j < 3; j++) {
+			for (j = 0; j < VECT_DIM; j++) {
 				ent->origin[j] = ent->msg_origins[1][j] + f * delta[j];
 
 				d = ent->msg_angles[0][j] - ent->msg_angles[1][j];

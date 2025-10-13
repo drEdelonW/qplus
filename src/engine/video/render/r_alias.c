@@ -328,7 +328,7 @@ void R_AliasSetUpTransform(int trivial_accept) {
 
     // TODO: can do this with simple matrix rearrangement
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         t2matrix[i][0] = alias_forward[i];
         t2matrix[i][1] = -alias_right[i];
         t2matrix[i][2] = alias_up[i];

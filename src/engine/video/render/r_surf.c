@@ -78,8 +78,8 @@ void R_AddDynamicLights() {
             continue;
         minlight = rad - minlight;
 
-        vec3_t  impact;
-        for (int i = 0; i < 3; i++) {
+        vec3_t impact;
+        for (int i = 0; i < VECT_DIM; i++) {
             impact[i] = cl_dlights[lnum].origin[i] -
                 surf->plane->normal[i] * dist;
         }

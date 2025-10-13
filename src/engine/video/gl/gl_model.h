@@ -87,13 +87,15 @@ typedef struct texture_s
 } texture_t;
 
 
-#define	SURF_PLANEBACK		2
-#define	SURF_DRAWSKY		4
-#define SURF_DRAWSPRITE		8
-#define SURF_DRAWTURB		0x10
-#define SURF_DRAWTILED		0x20
-#define SURF_DRAWBACKGROUND	0x40
-#define SURF_UNDERWATER		0x80
+typedef enum surf_flags_e {
+    SURF_NONE           = 0,
+    SURF_PLANEBACK      = 1u << 1, // 0x02
+    SURF_DRAWSKY        = 1u << 2, // 0x04
+    SURF_DRAWSPRITE     = 1u << 3, // 0x08
+    SURF_DRAWTURB       = 1u << 4, // 0x10
+    SURF_DRAWTILED      = 1u << 5, // 0x20
+    SURF_DRAWBACKGROUND = 1u << 6  // 0x40
+} surf_flags_e;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct

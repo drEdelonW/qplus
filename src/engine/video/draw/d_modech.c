@@ -27,23 +27,21 @@ int	d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
 int	d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
 
 int		d_scantable[MAXHEIGHT];
-int16_t	*zspantable[MAXHEIGHT];
+int16_t* zspantable[MAXHEIGHT];
 
 /*
 ================
 D_Patch
 ================
 */
-void D_Patch()
-{
+void D_Patch() {
 #if id386
 
 	static qboolean protectset8 = false;
 
-	if (!protectset8)
-	{
-		Sys_MakeCodeWriteable ((int)D_PolysetAff8Start,
-						     (int)D_PolysetAff8End - (int)D_PolysetAff8Start);
+	if (!protectset8) {
+		Sys_MakeCodeWriteable((int)D_PolysetAff8Start,
+			(int)D_PolysetAff8End - (int)D_PolysetAff8Start);
 		protectset8 = true;
 	}
 
@@ -56,8 +54,7 @@ void D_Patch()
 D_ViewChanged
 ================
 */
-void D_ViewChanged()
-{
+void D_ViewChanged() {
 	int rowbytes;
 
 	if (r_dowarp)
@@ -90,18 +87,17 @@ void D_ViewChanged()
 	d_vrecty = r_refdef.vrect.y;
 	d_vrectright_particle = r_refdef.vrectright - d_pix_max;
 	d_vrectbottom_particle =
-			r_refdef.vrectbottom - (d_pix_max << d_y_aspect_shift);
+		r_refdef.vrectbottom - (d_pix_max << d_y_aspect_shift);
 
 	{
 		int		i;
 
-		for (i=0 ; i<vid.height; i++)
-		{
-			d_scantable[i] = i*rowbytes;
-			zspantable[i] = d_pzbuffer + i*d_zwidth;
+		for (i = 0; i < vid.height; i++) {
+			d_scantable[i] = i * rowbytes;
+			zspantable[i] = d_pzbuffer + i * d_zwidth;
 		}
 	}
 
-	D_Patch ();
+	D_Patch();
 }
 

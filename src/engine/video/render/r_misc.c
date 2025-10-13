@@ -305,7 +305,7 @@ void R_SetUpFrustumIndexes() {
 	int* pindex = r_frustum_indexes;
 
 	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 3; j++) {
+		for (int j = 0; j < VECT_DIM; j++) {
 			if (view_clipplanes[i].normal[j] < 0) {
 				pindex[j] = j;
 				pindex[j + 3] = j + 3;

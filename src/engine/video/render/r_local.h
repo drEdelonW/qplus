@@ -55,7 +55,8 @@ typedef struct bedge_s {
 } bedge_t;
 
 typedef struct {
-    float   fv[3];  // viewspace x, y
+    // float   fv[3];  // viewspace x, y
+    vec3_t fv;  // viewspace x, y
 } auxvert_t;
 typedef auxvert_t* auxvert_p;
 

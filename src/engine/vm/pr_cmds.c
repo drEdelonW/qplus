@@ -18,8 +18,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "quakedef.h"
+// #include "quakedef.h"
 #include "cvar_q1.h"
+#include "types.h"
+#include "server.h"
+#include "protocol.h"
+#include "world.h"
+#include "q_tools.h"
+#include "console.h"
+#include "msg.h"
+#include "host.h"
+#include "sys.h"
+#include "common.h"
+#include "cmd.h"
+#include <stdlib.h>
+#include <string.h>
 
 #define RETURN_EDICT(edict) (((int *)pr_globals)[OFS_RETURN] = EDICT_TO_PROG(edict))
 
@@ -123,7 +136,7 @@ void SetMinMaxSize(edict_p edict, float_p min, float_p max, bool rotate) {
     vec3_t rmin, rmax;
     vec3_t base, transformed;
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < VECT_DIM; i++)
         if (min[i] > max[i])
             PR_RunError("backwards mins/maxs");
 
@@ -167,7 +180,7 @@ void SetMinMaxSize(edict_p edict, float_p min, float_p max, bool rotate) {
                     transformed[1] = xvector[1] * base[0] + yvector[1] * base[1];
                     transformed[2] = base[2];
 
-                    for (int l = 0; l < 3; l++) {
+                    for (int l = 0; l < VECT_DIM; l++) {
                         if (transformed[l] < rmin[l])
                             rmin[l] = transformed[l];
                         if (transformed[l] > rmax[l])
@@ -759,7 +772,7 @@ void PF_findradius() {
             continue;
         if (ent->v.solid == SOLID_NOT)
             continue;
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < VECT_DIM; j++)
             eorg[j] = org[j] - (ent->v.origin[j] + (ent->v.mins[j] + ent->v.maxs[j]) * 0.5);
         if (Length(eorg) > rad)
             continue;
@@ -1146,7 +1159,7 @@ void PF_aim() {
             continue; // don't aim at teammate
         }
 
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < VECT_DIM; j++) {
             end[j] =
                 check->v.origin[j] +
                 0.5 * (check->v.mins[j] +
@@ -1332,7 +1345,7 @@ void PF_makestatic() {
     MSG_WriteByte(&sv.signon, ent->v.frame);
     MSG_WriteByte(&sv.signon, ent->v.colormap);
     MSG_WriteByte(&sv.signon, ent->v.skin);
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         MSG_WriteCoord(&sv.signon, ent->v.origin[i]);
         MSG_WriteAngle(&sv.signon, ent->v.angles[i]);
     }

@@ -79,7 +79,7 @@ void CL_WriteDemoMessage() {
 
     len = LittleLong(net_message.cursize);
     fwrite(&len, 4, 1, cls.demofile);
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < VECT_DIM; i++) {
         f = LittleFloat(cl.viewangles[i]);
         fwrite(&f, 4, 1, cls.demofile);
     }
@@ -116,7 +116,7 @@ int CL_GetMessage() {
         // get the next message
         fread(&net_message.cursize, 4, 1, cls.demofile);
         VectorCopy(cl.mviewangles[0], cl.mviewangles[1]);
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < VECT_DIM; i++) {
             float f;
             r = fread(&f, 4, 1, cls.demofile);
             cl.mviewangles[0][i] = LittleFloat(f);

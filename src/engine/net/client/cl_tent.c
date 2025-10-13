@@ -367,7 +367,7 @@ void CL_UpdateTEnts() {
 			ent->angles[1] = yaw;
 			ent->angles[2] = rand() % 360;
 
-			for (i = 0; i < 3; i++)
+			for (i = 0; i < VECT_DIM; i++)
 				org[i] += dist[i] * 30;
 			d -= 30;
 		}

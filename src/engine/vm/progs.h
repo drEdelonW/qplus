@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef union eval_s {
     string_t    string;
     float       _float;
-    float       vector[3];
+    vec3_t       vector;
     func_t      function;
     int32_t     _int;    // VM-slot as 32-bit
     int32_t     edict;   // 32-bit byte offset from sv.edicts

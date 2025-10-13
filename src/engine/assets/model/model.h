@@ -82,12 +82,15 @@ struct texture_s {
 };
 
 
-#define	SURF_PLANEBACK		2
-#define	SURF_DRAWSKY		4
-#define SURF_DRAWSPRITE		8
-#define SURF_DRAWTURB		0x10
-#define SURF_DRAWTILED		0x20
-#define SURF_DRAWBACKGROUND	0x40
+typedef enum surf_flags_e {
+    SURF_NONE           = 0,
+    SURF_PLANEBACK      = 1u << 1, // 0x02
+    SURF_DRAWSKY        = 1u << 2, // 0x04
+    SURF_DRAWSPRITE     = 1u << 3, // 0x08
+    SURF_DRAWTURB       = 1u << 4, // 0x10
+    SURF_DRAWTILED      = 1u << 5, // 0x20
+    SURF_DRAWBACKGROUND = 1u << 6  // 0x40
+} surf_flags_e;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct {
@@ -111,7 +114,8 @@ typedef struct msurface_s {
     int32_t			dlightbits;
 
     mplane_p	plane;
-    int32_t			flags;
+    // int32_t			flags;
+    surf_flags_e    flags;
 
     int32_t			firstedge;	// look up in model->surfedges[], negative numbers
     int32_t			numedges;	// are backwards edges
@@ -321,11 +325,11 @@ typedef struct model_s {
     int32_t numplanes;          mplane_p    planes;
     int32_t numleafs;           mleaf_p     leafs;  // number of visible leafs, not counting 0
     int32_t numvertexes;        mvertex_p   vertexes;
-    int32_t numedges;           medge_t* edges;
+    int32_t numedges;           medge_p     edges;
     int32_t numnodes;           mnode_p     nodes;
     int32_t numtexinfo;         mtexinfo_p  texinfo;
     int32_t numsurfaces;        msurface_p  surfaces;
-    int32_t numsurfedges;       int32_t* surfedges;
+    int32_t numsurfedges;       int32_p     surfedges;
     int32_t numclipnodes;       dclipnode_p clipnodes;
     int32_t nummarksurfaces;    msurface_p* marksurfaces;
     hull_t  hulls[MAX_MAP_HULLS];

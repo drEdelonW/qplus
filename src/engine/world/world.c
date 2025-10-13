@@ -50,7 +50,7 @@ typedef struct {
     float_p start;
     float_p end;
     trace_t trace;
-    int     type;
+    phymovetype_t     type;
     edict_p passedict;
 } moveclip_t;
 typedef moveclip_t* moveclip_p;
@@ -142,7 +142,8 @@ hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_t offset) {
 
         model_p model = sv.models[(int)ent->v.modelindex];
 
-        if (!model || (model->type != mod_brush))
+        if (!model ||
+            (model->type != mod_brush))
             Sys_Error("MOVETYPE_PUSH with a non bsp model");
 
         vec3_t  size;
@@ -280,7 +281,8 @@ void SV_TouchLinks(edict_p ent, areanode_p node) {
         edict_p touch = EDICT_FROM_AREA(l);
         if (touch == ent)
             continue;
-        if (!touch->v.touch || touch->v.solid != SOLID_TRIGGER)
+        if (!touch->v.touch ||
+            (touch->v.solid != SOLID_TRIGGER))
             continue;
         if ((ent->v.absmin[0] > touch->v.absmax[0]) ||
             (ent->v.absmin[1] > touch->v.absmax[1]) ||
@@ -337,7 +339,11 @@ void SV_FindTouchedLeafs(edict_p ent, mnode_p node) {
 
     // NODE_MIXED
     mplane_p splitplane = node->plane;
-    int sides = BOX_ON_PLANE_SIDE(ent->v.absmin, ent->v.absmax, splitplane);
+    int sides = BOX_ON_PLANE_SIDE(
+        ent->v.absmin,
+        ent->v.absmax,
+        splitplane
+    );
 
     // recurse down the contacted sides
     if (sides & 1)
@@ -371,7 +377,7 @@ void SV_LinkEdict(edict_p ent, qboolean touch_triggers) {
             ent->v.angles[2]
             )) { // expand for rotation
         float max = 0;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < VECT_DIM; i++) {
             float v = fabs(ent->v.mins[i]);
             if (v > max)
                 max = v;
@@ -379,7 +385,7 @@ void SV_LinkEdict(edict_p ent, qboolean touch_triggers) {
             if (v > max)
                 max = v;
         }
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < VECT_DIM; i++) {
             ent->v.absmin[i] = ent->v.origin[i] - max;
             ent->v.absmax[i] = ent->v.origin[i] + max;
         }
@@ -611,7 +617,7 @@ qboolean SV_RecursiveHullCheck(
 
     float midf = p1f + (p2f - p1f) * frac;
     vec3_t  mid;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         mid[i] = p1[i] + frac * (p2[i] - p1[i]);
     }
 
@@ -626,7 +632,7 @@ qboolean SV_RecursiveHullCheck(
         == CONTENTS_SOLID) {
         Con_Printf("mid PointInHullSolid\n");
         return false;
-    }
+}
 #endif
 
     if (SV_HullPointContents(hull, node->children[side ^ 1], mid)
@@ -659,7 +665,7 @@ qboolean SV_RecursiveHullCheck(
             return false;
         }
         midf = p1f + (p2f - p1f) * frac;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < VECT_DIM; i++) {
             mid[i] = p1[i] + frac * (p2[i] - p1[i]);
         }
     }
@@ -714,7 +720,7 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
         end_l[0] = DotProduct(temp, forward);
         end_l[1] = -DotProduct(temp, right);
         end_l[2] = DotProduct(temp, up);
-    }
+}
 #endif
 
     // trace a line through the apropriate clipping hull
@@ -844,7 +850,7 @@ void SV_MoveBounds(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, vec3_t bo
     boxmins[0] = boxmins[1] = boxmins[2] = -9999;
     boxmaxs[0] = boxmaxs[1] = boxmaxs[2] = 9999;
 #else
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         if (end[i] > start[i]) {
             boxmins[i] = start[i] + mins[i] - 1;
             boxmaxs[i] = end[i] + maxs[i] + 1;
@@ -878,7 +884,7 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
     clip.passedict = passedict;
 
     if (type == MOVE_MISSILE) {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < VECT_DIM; i++) {
             clip.mins2[i] = -15;
             clip.maxs2[i] = 15;
         }

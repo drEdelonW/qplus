@@ -81,7 +81,7 @@ void SV_CheckVelocity(edict_p ent) {
 	//
 	// bound velocity
 	//
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < VECT_DIM; i++) {
 		if (IS_NAN(ent->v.velocity[i])) {
 			Con_Printf("Got a NaN velocity on %s\n", pr_strings + ent->v.classname);
 			ent->v.velocity[i] = 0;
@@ -172,7 +172,7 @@ int ClipVelocity(vec3_t in, vec3_t normal, vec3_t out, float overbounce) {
 
 	backoff = DotProduct(in, normal) * overbounce;
 
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < VECT_DIM; i++) {
 		change = normal[i] * backoff;
 		out[i] = in[i] - change;
 		if (out[i] > -STOP_EPSILON && out[i] < STOP_EPSILON)
@@ -222,7 +222,7 @@ int SV_FlyMove(edict_p ent, float time, trace_t* steptrace) {
 		if (!ent->v.velocity[0] && !ent->v.velocity[1] && !ent->v.velocity[2])
 			break;
 
-		for (i = 0; i < 3; i++)
+		for (i = 0; i < VECT_DIM; i++)
 			end[i] = ent->v.origin[i] + time_left * ent->v.velocity[i];
 
 		trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, false, ent);
@@ -404,7 +404,7 @@ void SV_PushMove(edict_p pusher, float movetime) {
 		return;
 	}
 
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < VECT_DIM; i++) {
 		move[i] = pusher->v.velocity[i] * movetime;
 		mins[i] = pusher->v.absmin[i] + move[i];
 		maxs[i] = pusher->v.absmax[i] + move[i];
@@ -524,7 +524,7 @@ void SV_PushRotate(edict_p pusher, float movetime) {
 		return;
 	}
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < VECT_DIM; i++)
 		amove[i] = pusher->v.avelocity[i] * movetime;
 
 	VectorSubtract(vec3_origin, amove, a);
