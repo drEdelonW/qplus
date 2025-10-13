@@ -32,8 +32,8 @@ typedef union eval_s {
     float       _float;
     float       vector[3];
     func_t      function;
-    int         _int;
-    int         edict;
+    int32_t     _int;    // VM-slot as 32-bit
+    int32_t     edict;   // 32-bit byte offset from sv.edicts
 } eval_t;
 typedef eval_t* eval_p;
 
@@ -41,7 +41,7 @@ typedef eval_t* eval_p;
 typedef struct edict_s {
     qboolean        free;
     link_t          area;       // linked to a division node or leaf
-    int             num_leafs;
+    int32_t         num_leafs;
     int16_t         leafnums[MAX_ENT_LEAFS];
     entity_state_t  baseline;
     float           freetime;   // sv.time when the object was freed
@@ -61,7 +61,7 @@ extern ddef_p           pr_fielddefs;
 extern dstatement_p     pr_statements;
 extern globalvars_p     pr_global_struct;
 extern float_p          pr_globals;     // same as pr_global_struct
-extern int              pr_edict_size;  // in bytes
+extern int32_t              pr_edict_size;  // in bytes
 
 //============================================================================
 
@@ -88,19 +88,30 @@ void ED_ParseGlobals(cstring data);
 void ED_LoadFromFile(cstring data);
 bool ED_ParseEpair(typeless_ptr base, ddef_p key, cstring s);
 
-//define EDICT_NUM(n) ((edict_p )(sv.edicts+ (n)*pr_edict_size))
-//define NUM_FOR_EDICT(e) (((uint8_p)(e) - sv.edicts)/pr_edict_size)
+#if 0
+// define EDICT_NUM(n) ((edict_p )(sv.edicts+ (n)*pr_edict_size))
+// define NUM_FOR_EDICT(e) (((uint8_p)(e) - sv.edicts)/pr_edict_size)
+#else
+edict_p EDICT_NUM(int32_t n);
+int32_t NUM_FOR_EDICT(edict_p e);
+#   define NEXT_EDICT(e)        ((edict_p)((uint8_p)(e) + pr_edict_size))
+#   define PROG_EDICT_BASE      ((uint8_p)sv.edicts)
+#   define PROG_TO_EDICT(ofs)   ((edict_p)(PROG_EDICT_BASE + (uint32_t)(ofs)))
+#   define EDICT_TO_PROG(e)     ((uint32_t)((uint8_p)(e) - PROG_EDICT_BASE))
+#endif
+// #define NEXT_EDICT(e)       ((edict_p )( (uint8_p)(e) + pr_edict_size))
 
-edict_p EDICT_NUM(int n);
-int NUM_FOR_EDICT(edict_p e);
-
-#define NEXT_EDICT(e)       ((edict_p )( (uint8_p)e + pr_edict_size))
-
+#if 0
 #define EDICT_TO_PROG(e)    ((uint8_p)e - (uint8_p)sv.edicts)
 #define PROG_TO_EDICT(e)    ((edict_p )((uint8_p)sv.edicts + e))
+#else
+// #   define EDICT_TO_PROG(e)    PR_OfsFromEdict((e))          /* -> uint32 offset */
+// #   define PROG_TO_EDICT(o)    PR_EdictFromOfs((uint32_t)(o))
+#endif
 
 //============================================================================
 
+#if 0
 #define G_FLOAT(o)      (pr_globals[o])
 #define G_INT(o)        (*(int*)&pr_globals[o])
 #define G_EDICT(o)      ((edict_p )((uint8_p)sv.edicts+ *(int*)&pr_globals[o]))
@@ -108,30 +119,60 @@ int NUM_FOR_EDICT(edict_p e);
 #define G_VECTOR(o)     (&pr_globals[o])
 #define G_STRING(o)     (pr_strings + *(string_t*)&pr_globals[o])
 #define G_FUNCTION(o)   (*(func_t*)&pr_globals[o])
+#else
+#   define G_FLOAT(o)      (pr_globals[(o)])
+#   define G_INT(o)        (*(int32_t*)&pr_globals[(o)])
+#   define G_VECTOR(o)     (&pr_globals[(o)])
+#   define G_FUNCTION(o)   (*(func_t*)&pr_globals[(o)])
 
+// безопасное взятие строки: проверяем, что индекс в пределах string-table
+static inline cstring PR_GetStringSafe(uint32_t str_ofs) {
+    if (
+        // (str_ofs < 0) ||
+        ((uint32_t)str_ofs >= (uint32_t)progs->numstrings)
+        ) {
+        printf("ACHTUNG!!! %u/%u\n", (unsigned)str_ofs, (unsigned)progs->numstrings);
+        // return ""; // или вернуть специальную заглушку, чтобы не падать
+    }
+    return pr_strings + str_ofs;
+}
+#   define G_STRING(o)     PR_GetStringSafe(*(string_t*)&pr_globals[(o)])
+
+// edict хранится как 32-битный байтовый офсет от sv.edicts
+#   define G_EDICT(o)      PROG_TO_EDICT((uint32_t)G_INT((o)))
+#   define G_EDICTNUM(o)   NUM_FOR_EDICT(G_EDICT((o)))
+#endif
+
+#if 0
 #define E_FLOAT(e,o)    (((float_p)&e->v)[o])
 #define E_INT(e,o)      (*(int*)&((float_p)&e->v)[o])
 #define E_VECTOR(e,o)   (&((float_p)&e->v)[o])
 #define E_STRING(e,o)   (pr_strings + *(string_t*)&((float_p)&e->v)[o])
+#else
+#   define E_FLOAT(e,o)    (((float_p)&(e)->v)[(o)])
+#   define E_INT(e,o)      (*(int32_t*)&((float_p)&(e)->v)[(o)])
+#   define E_VECTOR(e,o)   (&((float_p)&(e)->v)[(o)])
+#   define E_STRING(e,o)   PR_GetStringSafe(*(string_t*)&((float_p)&(e)->v)[(o)])
+#endif
 
-extern int  type_size[8];
+extern int32_t  type_size[8];
 
 typedef void (*builtin_t)();
 extern builtin_t* pr_builtins;
-extern int pr_numbuiltins;
+extern int32_t pr_numbuiltins;
 
-extern int pr_argc;
+extern int32_t pr_argc;
 
 extern qboolean pr_trace;
 extern dfunction_p pr_xfunction;
-extern int pr_xstatement;
+extern int32_t pr_xstatement;
 
 extern uint16_t pr_crc;
 
 void PR_RunError(cstring error, ...);
 
 void ED_PrintEdicts();
-void ED_PrintNum(int ent);
+void ED_PrintNum(int32_t ent);
 
 eval_t* GetEdictFieldValue(edict_p ed, cstring field);
 
