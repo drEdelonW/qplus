@@ -18,10 +18,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#ifdef QUAKE2
-    #include "progdefs.q2"
+#ifndef QUAKE2
+#   include "progdefs.q1"
 #else
-    #include "progdefs.q1"
+#   include "progdefs.q2"
 #endif
 
 typedef globalvars_t* globalvars_p;

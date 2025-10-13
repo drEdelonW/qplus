@@ -91,7 +91,8 @@
 			"stdio.h": "c",
 			"mglwin.h": "c",
 			"glquake.h": "c",
-			"gl.h": "c"
+			"gl.h": "c",
+			"MGRAPH.H": "cpp"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

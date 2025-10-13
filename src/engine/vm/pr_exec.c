@@ -18,35 +18,36 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "quakedef.h"
+// #include "quakedef.h"
+#include "types.h"
+#include "pr_comp.h"
+#include "progs.h"
+#include "console.h"
+#include "server.h"
+#include "sys.h"
+#include "host.h"
+#include <string.h>
+#include <stdarg.h>
 
-
-/*
-
-*/
 
 typedef struct {
-    int			s;
-    dfunction_p f;
+    int32_t     stack;
+    dfunction_p func;
 } prstack_t;
 
 #define	MAX_STACK_DEPTH		32
-prstack_t	pr_stack[MAX_STACK_DEPTH];
-int			pr_depth;
+static prstack_t _pr_stack[MAX_STACK_DEPTH];
+static int32_t _pr_depth;
 
 #define	LOCALSTACK_SIZE		2048
-int			localstack[LOCALSTACK_SIZE];
-int			localstack_used;
+static int32_t _localstack[LOCALSTACK_SIZE];
+static int32_t _localstack_used;
 
-
-qboolean	pr_trace;
-dfunction_p pr_xfunction;
-int			pr_xstatement;
-
-
-int		pr_argc;
-
-cstring pr_opnames[] = {
+/* extern */ qboolean	 pr_trace;
+/* extern */ dfunction_p pr_xfunction;
+/* extern */ int32_t     pr_xstatement;
+/* extern */ int32_t     pr_argc;
+/* extern */ cstring     pr_opnames[OP_LAST] = {
     "DONE",
 
     "MUL_F",
@@ -145,30 +146,29 @@ cstring PR_GlobalStringNoContents(int ofs);
     PR_PrintStatement
     =================
 */
-void PR_PrintStatement(dstatement_p s) {
-    if ((uint32_t)s->op < (sizeof(pr_opnames) / sizeof(pr_opnames[0]))) {
-        Con_Printf("%s ", pr_opnames[s->op]);
-        int i = strlen(pr_opnames[s->op]);
+void PR_PrintStatement(dstatement_p state) {
+    // if ((uint32_t)state->op < (sizeof(pr_opnames) / sizeof(pr_opnames[0]))) {
+    if (state->op < OP_LAST) {
+        Con_Printf("%s ", pr_opnames[state->op]);
+        int i = strlen(pr_opnames[state->op]);
         for (; i < 10; i++)
             Con_Printf(" ");
     }
 
-    if ((s->op == OP_IF) || (s->op == OP_IFNOT))
-        Con_Printf("%sbranch %i", PR_GlobalString(s->a), s->b);
-    else if (s->op == OP_GOTO) {
-        Con_Printf("branch %i", s->a);
+    if ((state->op == OP_IF) ||
+        (state->op == OP_IFNOT))
+        Con_Printf("%sbranch %i", PR_GlobalString(state->a), state->b);
+    else if (state->op == OP_GOTO) {
+        Con_Printf("branch %i", state->a);
     }
-    else if ((uint32_t)(s->op - OP_STORE_F) < 6) {
-        Con_Printf("%s", PR_GlobalString(s->a));
-        Con_Printf("%s", PR_GlobalStringNoContents(s->b));
+    else if ((uint32_t)(state->op - OP_STORE_F) < 6) {
+        Con_Printf("%s", PR_GlobalString(state->a));
+        Con_Printf("%s", PR_GlobalStringNoContents(state->b));
     }
     else {
-        if (s->a)
-            Con_Printf("%s", PR_GlobalString(s->a));
-        if (s->b)
-            Con_Printf("%s", PR_GlobalString(s->b));
-        if (s->c)
-            Con_Printf("%s", PR_GlobalStringNoContents(s->c));
+        if (state->a)   Con_Printf("%s", PR_GlobalString(state->a));
+        if (state->b)   Con_Printf("%s", PR_GlobalString(state->b));
+        if (state->c)   Con_Printf("%s", PR_GlobalStringNoContents(state->c));
     }
     Con_Printf("\n");
 }
@@ -179,20 +179,24 @@ void PR_PrintStatement(dstatement_p s) {
     ============
 */
 void PR_StackTrace() {
-    if (pr_depth == 0) {
+    if (_pr_depth == 0) {
         Con_Printf("<NO STACK>\n");
         return;
     }
 
-    pr_stack[pr_depth].f = pr_xfunction;
-    for (int i = pr_depth; i >= 0; i--) {
-        dfunction_p f = pr_stack[i].f;
+    _pr_stack[_pr_depth].func = pr_xfunction;
+    for (int i = _pr_depth; i >= 0; i--) {
+        dfunction_p func = _pr_stack[i].func;
 
-        if (!f) {
+        if (!func) {
             Con_Printf("<NO FUNCTION>\n");
         }
         else
-            Con_Printf("%12s : %s\n", pr_strings + f->s_file, pr_strings + f->s_name);
+            Con_Printf(
+                "%12s : %s\n",
+                pr_strings + func->s_file,
+                pr_strings + func->s_name
+            );
     }
 }
 
@@ -205,21 +209,24 @@ void PR_StackTrace() {
 */
 void PR_Profile_f() {
     dfunction_p best;
-
     int num = 0;
     do {
         int max = 0;
         best = NULL;
-        for (int i = 0; i < progs->numfunctions; i++) {
-            dfunction_p f = &pr_functions[i];
-            if (f->profile > max) {
-                max = f->profile;
-                best = f;
+        for (int i = 0; i < progs->functions.num; i++) {
+            dfunction_p func = &pr_functions[i];
+            if (func->profile > max) {
+                max = func->profile;
+                best = func;
             }
         }
         if (best) {
             if (num < 10)
-                Con_Printf("%7i %s\n", best->profile, pr_strings + best->s_name);
+                Con_Printf(
+                    "%7i %s\n",
+                    best->profile,
+                    pr_strings + best->s_name
+                );
             num++;
             best->profile = 0;
         }
@@ -246,7 +253,7 @@ void PR_RunError(cstring error, ...) {
     PR_StackTrace();
     Con_Printf("%s\n", string);
 
-    pr_depth = 0;		// dump the stack so host_error can shutdown functions
+    _pr_depth = 0;		// dump the stack so host_error can shutdown functions
 
     Host_Error("Program error");
 }
@@ -266,33 +273,35 @@ PR_EnterFunction
 Returns the new program statement counter
 ====================
 */
-int PR_EnterFunction(dfunction_p f) {
-    pr_stack[pr_depth].s = pr_xstatement;
-    pr_stack[pr_depth].f = pr_xfunction;
-    pr_depth++;
-    if (pr_depth >= MAX_STACK_DEPTH)
+int PR_EnterFunction(dfunction_p func) {
+    _pr_stack[_pr_depth] = (prstack_t){
+        .stack = pr_xstatement,
+        .func = pr_xfunction
+    };
+    _pr_depth++;
+    if (_pr_depth >= MAX_STACK_DEPTH)
         PR_RunError("stack overflow");
 
     // save off any locals that the new function steps on
-    int c = f->locals;
-    if (localstack_used + c > LOCALSTACK_SIZE)
+    int param_used = func->locals;
+    if (_localstack_used + param_used > LOCALSTACK_SIZE)
         PR_RunError("PR_ExecuteProgram: locals stack overflow\n");
 
-    for (int i = 0; i < c; i++)
-        localstack[localstack_used + i] = ((int*)pr_globals)[f->parm_start + i];
-    localstack_used += c;
+    for (int i = 0; i < param_used; i++)
+        _localstack[_localstack_used + i] = ((int*)pr_globals)[func->parm_start + i];
+    _localstack_used += param_used;
 
     // copy parameters
-    int o = f->parm_start;
-    for (int i = 0; i < f->numparms; i++) {
-        for (int j = 0; j < f->parm_size[i]; j++) {
-            ((int*)pr_globals)[o] = ((int*)pr_globals)[OFS_PARM0 + i * 3 + j];
-            o++;
+    int param_ofs = func->parm_start;
+    for (int i = 0; i < func->numparms; i++) {
+        for (int j = 0; j < func->parm_size[i]; j++) {
+            ((int32_t*)pr_globals)[param_ofs] = ((int32_t*)pr_globals)[OFS_PARM0 + i * 3 + j];
+            param_ofs++;
         }
     }
 
-    pr_xfunction = f;
-    return f->first_statement - 1;	// offset the s++
+    pr_xfunction = func;
+    return func->first_statement - 1;	// offset the state++
 }
 
 /*
@@ -301,22 +310,22 @@ PR_LeaveFunction
 ====================
 */
 int PR_LeaveFunction() {
-    if (pr_depth <= 0)
+    if (_pr_depth <= 0)
         Sys_Error("prog stack underflow");
 
     // restore locals from the stack
-    int c = pr_xfunction->locals;
-    localstack_used -= c;
-    if (localstack_used < 0)
+    int param_used = pr_xfunction->locals;
+    _localstack_used -= param_used;
+    if (_localstack_used < 0)
         PR_RunError("PR_ExecuteProgram: locals stack underflow\n");
 
-    for (int i = 0; i < c; i++)
-        ((int*)pr_globals)[pr_xfunction->parm_start + i] = localstack[localstack_used + i];
+    for (int i = 0; i < param_used; i++)
+        ((int*)pr_globals)[pr_xfunction->parm_start + i] = _localstack[_localstack_used + i];
 
     // up stack
-    pr_depth--;
-    pr_xfunction = pr_stack[pr_depth].f;
-    return pr_stack[pr_depth].s;
+    _pr_depth--;
+    pr_xfunction = _pr_stack[_pr_depth].func;
+    return _pr_stack[_pr_depth].stack;
 }
 
 
@@ -326,26 +335,27 @@ PR_ExecuteProgram
 ====================
 */
 void PR_ExecuteProgram(func_t fnum) {
-    if (!fnum || (fnum >= progs->numfunctions)) {
+    if (!fnum ||
+        (fnum >= progs->functions.num)) {
         if (pr_global_struct->self)
             ED_Print(PROG_TO_EDICT(pr_global_struct->self));
         Host_Error("PR_ExecuteProgram: NULL function");
     }
 
-    dfunction_p f = &pr_functions[fnum];
+    dfunction_p func = &pr_functions[fnum];
 
     int runaway = 100000;
     pr_trace = false;
 
     // make a stack frame
-    int exitdepth = pr_depth;
+    int exitdepth = _pr_depth;
 
-    int s = PR_EnterFunction(f);
+    int32_t stack = PR_EnterFunction(func);
 
     while (1) {
-        s++;	// next statement
+        stack++;	// next statement
 
-        dstatement_p st = &pr_statements[s];
+        dstatement_p st = &pr_statements[stack];
         eval_p a = (eval_p)&pr_globals[st->a];
         eval_p b = (eval_p)&pr_globals[st->b];
         eval_p c = (eval_p)&pr_globals[st->c];
@@ -354,7 +364,7 @@ void PR_ExecuteProgram(func_t fnum) {
             PR_RunError("runaway loop error");
 
         pr_xfunction->profile++;
-        pr_xstatement = s;
+        pr_xstatement = stack;
 
         if (pr_trace)
             PR_PrintStatement(st);
@@ -471,7 +481,8 @@ void PR_ExecuteProgram(func_t fnum) {
             c->_float = a->_float != b->_float;
             break;
         case OP_NE_V:
-            c->_float = (a->vector[0] != b->vector[0]) ||
+            c->_float =
+                (a->vector[0] != b->vector[0]) ||
                 (a->vector[1] != b->vector[1]) ||
                 (a->vector[2] != b->vector[2]);
             break;
@@ -567,16 +578,16 @@ void PR_ExecuteProgram(func_t fnum) {
 
         case OP_IFNOT:
             if (!a->_int)
-                s += st->b - 1;	// offset the s++
+                stack += st->b - 1;	// offset the stack++
             break;
 
         case OP_IF:
             if (a->_int)
-                s += st->b - 1;	// offset the s++
+                stack += st->b - 1;	// offset the stack++
             break;
 
         case OP_GOTO:
-            s += st->a - 1;	// offset the s++
+            stack += st->a - 1;	// offset the stack++
             break;
 
         case OP_CALL0:
@@ -602,7 +613,7 @@ void PR_ExecuteProgram(func_t fnum) {
                 break;
             }
 
-            s = PR_EnterFunction(newf);
+            stack = PR_EnterFunction(newf);
             break;
 
         case OP_DONE:
@@ -611,18 +622,19 @@ void PR_ExecuteProgram(func_t fnum) {
             pr_globals[OFS_RETURN + 1] = pr_globals[st->a + 1];
             pr_globals[OFS_RETURN + 2] = pr_globals[st->a + 2];
 
-            s = PR_LeaveFunction();
-            if (pr_depth == exitdepth)
+            stack = PR_LeaveFunction();
+            if (_pr_depth == exitdepth)
                 return;		// all done
             break;
 
         case OP_STATE:
         {
             edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
+            ed->v.nextthink = pr_global_struct->time +
 #ifdef FPS_20
-            ed->v.nextthink = pr_global_struct->time + 0.05;
+                0.05;
 #else
-            ed->v.nextthink = pr_global_struct->time + 0.1;
+                0.1;
 #endif
             if (a->_float != ed->v.frame) {
                 ed->v.frame = a->_float;

@@ -23,31 +23,42 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "cvar_q1.h"
 
-dprograms_p     progs;
-dfunction_p     pr_functions;
-cstring         pr_strings;
-ddef_p          pr_fielddefs;
-ddef_p          pr_globaldefs;
-dstatement_p    pr_statements;
-globalvars_p    pr_global_struct;
-float_p         pr_globals;     // same as pr_global_struct
-int             pr_edict_size;  // in bytes
+/* extern */ dprograms_p    progs;
+/* extern */ dfunction_p    pr_functions;
+/* extern */ cstring        pr_strings;         // much more
+/* extern */ ddef_p         pr_fielddefs;
+/* extern */ ddef_p         pr_globaldefs;
+/* extern */ dstatement_p   pr_statements;
+/* extern */ globalvars_p   pr_global_struct;   // much more
+/* extern */ float_p        pr_globals;         // same as pr_global_struct
+/* extern */ int32_t        pr_edict_size;      // in bytes
 
 uint16_t pr_crc;
 
-int type_size[8] = { 1,sizeof(string_t) / 4,1,3,1,1,sizeof(func_t) / 4,sizeof(typeless_ptr) / 4 };
+int type_size[8] = {
+    1,                          // ev_void,
+    sizeof(string_t) / 4,       // ev_string,
+    1,                          // ev_float,
+    3,                          // ev_vector,
+    1,                          // ev_entity,
+    1,                          // ev_field,
+    sizeof(func_t) / 4,         // ev_function,
+    sizeof(typeless_ptr) / 4    // ev_pointer
+};
 
 
 
 #define MAX_FIELD_LEN (64)
 #define GEFV_CACHESIZE (2)
-
 typedef struct {
     ddef_p  pcache;
     char    field[MAX_FIELD_LEN];
 } gefv_cache;
 
-static gefv_cache   gefvCache[GEFV_CACHESIZE] = { {NULL, ""}, {NULL, ""} };
+static gefv_cache _gefvCache[GEFV_CACHESIZE] = {
+    {NULL, ""},
+    {NULL, ""}
+};
 
 /*
 =================
@@ -56,9 +67,9 @@ ED_ClearEdict
 Sets everything to NULL
 =================
 */
-void ED_ClearEdict(edict_p e) {
-    memset(&e->v, 0, progs->entityfields * 4);
-    e->free = false;
+void ED_ClearEdict(edict_p edict) {
+    memset(&edict->v, 0, progs->entityfields * 4);
+    edict->free = false;
 }
 
 /*
@@ -73,15 +84,20 @@ angles and bad trails.
 =================
 */
 edict_p ED_Alloc() {
-    edict_p e;
+    edict_p edict;
     int i = svs.maxclients + 1;
     for (; i < sv.num_edicts; i++) {
-        e = EDICT_NUM(i);
+        edict = EDICT_NUM(i);
         // the first couple seconds of server time can involve a lot of
         // freeing and allocating, so relax the replacement policy
-        if (e->free && (e->freetime < 2 || sv.time - e->freetime > 0.5)) {
-            ED_ClearEdict(e);
-            return e;
+        if ((edict->free) &&
+            (
+                (edict->freetime < 2) ||
+                (sv.time - edict->freetime > 0.5)
+                )
+            ) {
+            ED_ClearEdict(edict);
+            return edict;
         }
     }
 
@@ -89,10 +105,10 @@ edict_p ED_Alloc() {
         Sys_Error("ED_Alloc: no free edicts");
 
     sv.num_edicts++;
-    e = EDICT_NUM(i);
-    ED_ClearEdict(e);
+    edict = EDICT_NUM(i);
+    ED_ClearEdict(edict);
 
-    return e;
+    return edict;
 }
 
 /*
@@ -129,7 +145,7 @@ ED_GlobalAtOfs
 ============
 */
 ddef_p ED_GlobalAtOfs(int ofs) {
-    for (int i = 0; i < progs->numglobaldefs; i++) {
+    for (int i = 0; i < progs->globaldefs.num; i++) {
         ddef_p def = &pr_globaldefs[i];
         if (def->ofs == ofs)
             return def;
@@ -143,7 +159,7 @@ ED_FieldAtOfs
 ============
 */
 ddef_p ED_FieldAtOfs(int ofs) {
-    for (int i = 0; i < progs->numfielddefs; i++) {
+    for (int i = 0; i < progs->fielddefs.num; i++) {
         ddef_p def = &pr_fielddefs[i];
         if (def->ofs == ofs)
             return def;
@@ -157,7 +173,7 @@ ED_FindField
 ============
 */
 ddef_p ED_FindField(cstring name) {
-    for (int i = 0; i < progs->numfielddefs; i++) {
+    for (int i = 0; i < progs->fielddefs.num; i++) {
         ddef_p def = &pr_fielddefs[i];
         if (!strcmp(pr_strings + def->s_name, name))
             return def;
@@ -172,7 +188,7 @@ ED_FindGlobal
 ============
 */
 ddef_p ED_FindGlobal(cstring name) {
-    for (int i = 0; i < progs->numglobaldefs; i++) {
+    for (int i = 0; i < progs->globaldefs.num; i++) {
         ddef_p def = &pr_globaldefs[i];
         if (!strcmp(pr_strings + def->s_name, name))
             return def;
@@ -187,7 +203,7 @@ ED_FindFunction
 ============
 */
 dfunction_p ED_FindFunction(cstring name) {
-    for (int i = 0; i < progs->numfunctions; i++) {
+    for (int i = 0; i < progs->functions.num; i++) {
         dfunction_p func = &pr_functions[i];
         if (!strcmp(pr_strings + func->s_name, name))
             return func;
@@ -201,8 +217,8 @@ eval_p GetEdictFieldValue(edict_p ed, cstring field) {
     static int  rep = 0;
 
     for (int i = 0; i < GEFV_CACHESIZE; i++) {
-        if (!strcmp(field, gefvCache[i].field)) {
-            def = gefvCache[i].pcache;
+        if (!strcmp(field, _gefvCache[i].field)) {
+            def = _gefvCache[i].pcache;
             goto Done;
         }
     }
@@ -210,8 +226,8 @@ eval_p GetEdictFieldValue(edict_p ed, cstring field) {
     def = ED_FindField(field);
 
     if (strlen(field) < MAX_FIELD_LEN) {
-        gefvCache[rep].pcache = def;
-        strcpy(gefvCache[rep].field, field);
+        _gefvCache[rep].pcache = def;
+        strcpy(_gefvCache[rep].field, field);
         rep ^= 1;
     }
 
@@ -373,7 +389,7 @@ void ED_Print(edict_p ed) {
     }
 
     Con_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
-    for (int i = 1; i < progs->numfielddefs; i++) {
+    for (int i = 1; i < progs->fielddefs.num; i++) {
         ddef_p d = &pr_fielddefs[i];
         cstring name = pr_strings + d->s_name;
         if (name[strlen(name) - 2] == '_')
@@ -415,7 +431,7 @@ void ED_Write(FILE* f, edict_p ed) {
         return;
     }
 
-    for (int i = 1; i < progs->numfielddefs; i++) {
+    for (int i = 1; i < progs->fielddefs.num; i++) {
         ddef_p d = &pr_fielddefs[i];
         cstring name = pr_strings + d->s_name;
         if (name[strlen(name) - 2] == '_')
@@ -519,7 +535,7 @@ ED_WriteGlobals
 */
 void ED_WriteGlobals(FILE* f) {
     fprintf(f, "{\n");
-    for (int i = 0; i < progs->numglobaldefs; i++) {
+    for (int i = 0; i < progs->globaldefs.num; i++) {
         ddef_p def = &pr_globaldefs[i];
         int type = def->type;
         if (!(def->type & DEF_SAVEGLOBAL))
@@ -840,7 +856,7 @@ PR_LoadProgs
 void PR_LoadProgs() {
     // flush the non-C variable lookup cache
     for (int i = 0; i < GEFV_CACHESIZE; i++)
-        gefvCache[i].field[0] = 0;
+        _gefvCache[i].field[0] = 0;
 
     CRC_Init(&pr_crc);
 
@@ -861,26 +877,26 @@ void PR_LoadProgs() {
     if (progs->crc != PROGHEADER_CRC)
         Sys_Error("progs.dat system vars have been modified, progdefs.h is out of date");
 
-    pr_functions = (dfunction_p)((uint8_p)progs + progs->ofs_functions);
-    pr_strings = (cstring)progs + progs->ofs_strings;
-    pr_globaldefs = (ddef_p)((uint8_p)progs + progs->ofs_globaldefs);
-    pr_fielddefs = (ddef_p)((uint8_p)progs + progs->ofs_fielddefs);
-    pr_statements = (dstatement_p)((uint8_p)progs + progs->ofs_statements);
+    pr_functions = (dfunction_p)((uint8_p)progs + progs->functions.ofs);
+    pr_strings = (cstring)progs + progs->strings.ofs;
+    pr_globaldefs = (ddef_p)((uint8_p)progs + progs->globaldefs.ofs);
+    pr_fielddefs = (ddef_p)((uint8_p)progs + progs->fielddefs.ofs);
+    pr_statements = (dstatement_p)((uint8_p)progs + progs->statements.ofs);
 
-    pr_global_struct = (globalvars_p)((uint8_p)progs + progs->ofs_globals);
+    pr_global_struct = (globalvars_p)((uint8_p)progs + progs->globals.ofs);
     pr_globals = (float_p)pr_global_struct;
 
     pr_edict_size = progs->entityfields * 4 + sizeof(edict_t) - sizeof(entvars_t);
 
     // uint8_t swap the lumps
-    for (int i = 0; i < progs->numstatements; i++) {
+    for (int i = 0; i < progs->statements.num; i++) {
         pr_statements[i].op = LittleShort(pr_statements[i].op);
         pr_statements[i].a = LittleShort(pr_statements[i].a);
         pr_statements[i].b = LittleShort(pr_statements[i].b);
         pr_statements[i].c = LittleShort(pr_statements[i].c);
     }
 
-    for (int i = 0; i < progs->numfunctions; i++) {
+    for (int i = 0; i < progs->functions.num; i++) {
         pr_functions[i].first_statement = LittleLong(pr_functions[i].first_statement);
         pr_functions[i].parm_start = LittleLong(pr_functions[i].parm_start);
         pr_functions[i].s_name = LittleLong(pr_functions[i].s_name);
@@ -889,13 +905,13 @@ void PR_LoadProgs() {
         pr_functions[i].locals = LittleLong(pr_functions[i].locals);
     }
 
-    for (int i = 0; i < progs->numglobaldefs; i++) {
+    for (int i = 0; i < progs->globaldefs.num; i++) {
         pr_globaldefs[i].type = LittleShort(pr_globaldefs[i].type);
         pr_globaldefs[i].ofs = LittleShort(pr_globaldefs[i].ofs);
         pr_globaldefs[i].s_name = LittleLong(pr_globaldefs[i].s_name);
     }
 
-    for (int i = 0; i < progs->numfielddefs; i++) {
+    for (int i = 0; i < progs->fielddefs.num; i++) {
         pr_fielddefs[i].type = LittleShort(pr_fielddefs[i].type);
         if (pr_fielddefs[i].type & DEF_SAVEGLOBAL)
             Sys_Error("PR_LoadProgs: pr_fielddefs[i].type & DEF_SAVEGLOBAL");
@@ -903,8 +919,8 @@ void PR_LoadProgs() {
         pr_fielddefs[i].s_name = LittleLong(pr_fielddefs[i].s_name);
     }
 
-    for (int i = 0; i < progs->numglobals; i++)
-        ((int*)pr_globals)[i] = LittleLong(((int*)pr_globals)[i]);
+    for (int i = 0; i < progs->globals.num; i++)
+        ((int32_t*)pr_globals)[i] = LittleLong(((int32_t*)pr_globals)[i]);
 }
 
 
@@ -931,19 +947,18 @@ void PR_Init() {
     Cvar_RegisterVariable(&saved4);
 }
 
-
-
 edict_p EDICT_NUM(int n) {
-    if ((n < 0) || (n >= sv.max_edicts))
+    if ((n < 0) ||
+        (n >= sv.max_edicts))
         Sys_Error("EDICT_NUM: bad number %i", n);
-    return (edict_p)((uint8_p)sv.edicts + (n)*pr_edict_size);
+    return (edict_p)((uint8_p)sv.edicts + ((n)*pr_edict_size));
 }
 
-int NUM_FOR_EDICT(edict_p e) {
-    int b = (uint8_p)e - (uint8_p)sv.edicts;
-    b = b / pr_edict_size;
+int NUM_FOR_EDICT(edict_p edict) {
+    int b = ((uint8_p)edict - (uint8_p)sv.edicts) / pr_edict_size;
 
-    if (b < 0 || b >= sv.num_edicts)
+    if ((b < 0) ||
+        (b >= sv.num_edicts))
         Sys_Error("NUM_FOR_EDICT: bad pointer");
     return b;
 }
