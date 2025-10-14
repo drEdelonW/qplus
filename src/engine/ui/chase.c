@@ -51,7 +51,7 @@ void Chase_Reset() {
 }
 
 qboolean SV_RecursiveHullCheck(
-    hull_p hull,
+    Hull_p hull,
     int num,
     float p1f, float p2f,
     vec3_t p1, vec3_t p2,

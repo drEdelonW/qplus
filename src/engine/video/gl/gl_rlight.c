@@ -146,10 +146,10 @@ DYNAMIC LIGHTS
 R_MarkLights
 =============
 */
-void R_MarkLights(dlight_t* light, int bit, mnode_t* node) {
-	mplane_t* splitplane;
+void R_MarkLights(dlight_t* light, int bit, mNode_t* node) {
+	mPlane_t* splitplane;
 	float		dist;
-	msurface_t* surf;
+	mSurface_t* surf;
 	int			i;
 
 	if (node->contents < 0)
@@ -214,19 +214,19 @@ LIGHT SAMPLING
 =============================================================================
 */
 
-mplane_t* lightplane;
+mPlane_t* lightplane;
 vec3_t			lightspot;
 
-int RecursiveLightPoint(mnode_t* node, vec3_t start, vec3_t end) {
+int RecursiveLightPoint(mNode_t* node, vec3_t start, vec3_t end) {
 	int			r;
 	float		front, back, frac;
 	int			side;
-	mplane_t* plane;
+	mPlane_t* plane;
 	vec3_t		mid;
-	msurface_t* surf;
+	mSurface_t* surf;
 	int			s, t, ds, dt;
 	int			i;
-	mtexinfo_t* tex;
+	mTexInfo_t* tex;
 	byte* lightmap;
 	unsigned	scale;
 	int			maps;

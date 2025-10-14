@@ -29,8 +29,8 @@ ALIAS MODEL DISPLAY LIST GENERATION
 =================================================================
 */
 
-model_t* aliasmodel;
-aliashdr_t* paliashdr;
+Model_t* aliasmodel;
+AliasHdr_t* paliashdr;
 
 qboolean	used[8192];
 
@@ -58,7 +58,7 @@ StripLength
 int	StripLength(int starttri, int startv) {
     int			m1, m2;
     int			j;
-    mtriangle_t* last, * check;
+    mTriangle_t* last, * check;
     int			k;
 
     used[starttri] = 2;
@@ -124,7 +124,7 @@ FanLength
 int	FanLength(int starttri, int startv) {
     int		m1, m2;
     int		j;
-    mtriangle_t* last, * check;
+    mTriangle_t* last, * check;
     int		k;
 
     used[starttri] = 2;
@@ -191,11 +191,11 @@ for the model, which holds for all frames
 void BuildTris(void) {
     int		i, j, k;
     int		startv;
-    mtriangle_t* last, * check;
+    mTriangle_t* last, * check;
     int		m1, m2;
     int		striplength;
-    trivertx_t* v;
-    mtriangle_t* tv;
+    TriVertx_t* v;
+    mTriangle_t* tv;
     float	s, t;
     int		index;
     int		len, bestlen, besttype;
@@ -256,8 +256,8 @@ void BuildTris(void) {
             s = (s + 0.5) / pheader->skinwidth;
             t = (t + 0.5) / pheader->skinheight;
 
-            *(float*)&commands[numcommands++] = s;
-            *(float*)&commands[numcommands++] = t;
+            *(float_p)&commands[numcommands++] = s;
+            *(float_p)&commands[numcommands++] = t;
         }
     }
 
@@ -275,18 +275,18 @@ void BuildTris(void) {
 GL_MakeAliasModelDisplayLists
 ================
 */
-void GL_MakeAliasModelDisplayLists(model_t* m, aliashdr_t* hdr) {
+void GL_MakeAliasModelDisplayLists(Model_t* m, AliasHdr_t* hdr) {
     int		i, j;
-    maliasgroup_t* paliasgroup;
+    mAliasGroup_t* paliasgroup;
     int* cmds;
-    trivertx_t* verts;
+    TriVertx_t* verts;
     char	cache[MAX_QPATH], fullpath[MAX_OSPATH], * c;
     FILE* f;
     int		len;
     byte* data;
 
     aliasmodel = m;
-    paliashdr = hdr;	// (aliashdr_t *)Mod_Extradata (m);
+    paliashdr = hdr;	// (AliasHdr_t *)Mod_Extradata (m);
 
     //
     // look for a cached version
@@ -335,7 +335,7 @@ void GL_MakeAliasModelDisplayLists(model_t* m, aliashdr_t* hdr) {
     memcpy(cmds, commands, numcommands * 4);
 
     verts = Hunk_Alloc(paliashdr->numposes * paliashdr->poseverts
-        * sizeof(trivertx_t));
+        * sizeof(TriVertx_t));
     paliashdr->posedata = (byte*)verts - (byte*)paliashdr;
     for (i = 0; i < paliashdr->numposes; i++)
         for (j = 0; j < numorder; j++)

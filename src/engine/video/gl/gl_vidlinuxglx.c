@@ -98,7 +98,7 @@ const char* gl_renderer;
 const char* gl_version;
 const char* gl_extensions;
 
-void (*qglColorTableEXT) (int, int, int, int, int, const void*);
+void (*qglColorTableEXT) (int, int, int, int, int, const typeless_ptr);
 void (*qgl3DfxSetPaletteEXT) (GLuint*);
 
 static float vid_gamma = 1.0;
@@ -525,7 +525,7 @@ void	VID_SetPalette(unsigned char* palette) {
 }
 
 void CheckMultiTextureExtensions(void) {
-	void* prjobj;
+	typeless_ptr prjobj;
 
 	if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
 		Con_Printf("Found GL_SGIS_multitexture...\n");
@@ -535,8 +535,8 @@ void CheckMultiTextureExtensions(void) {
 			return;
 		}
 
-		qglMTexCoord2fSGIS = (void*)dlsym(prjobj, "glMTexCoord2fSGIS");
-		qglSelectTextureSGIS = (void*)dlsym(prjobj, "glSelectTextureSGIS");
+		qglMTexCoord2fSGIS = (typeless_ptr)dlsym(prjobj, "glMTexCoord2fSGIS");
+		qglSelectTextureSGIS = (typeless_ptr)dlsym(prjobj, "glSelectTextureSGIS");
 
 		if (qglMTexCoord2fSGIS && qglSelectTextureSGIS) {
 			Con_Printf("Multitexture extensions found.\n");
@@ -622,7 +622,7 @@ qboolean VID_Is8bit(void) {
 void VID_Init8bitPalette(void) {
 	// Check for 8bit Extensions and initialize them.
 	int i;
-	void* prjobj;
+	typeless_ptr prjobj;
 
 	if ((prjobj = dlopen(NULL, RTLD_LAZY)) == NULL) {
 		Con_Printf("Unable to open symbol list for main program.\n");
@@ -663,7 +663,7 @@ void VID_Init8bitPalette(void) {
 			*newPalette++ = *oldPalette++;
 			oldPalette++;
 		}
-		qglColorTableEXT(GL_SHARED_TEXTURE_PALETTE_EXT, GL_RGB, 256, GL_RGB, GL_UNSIGNED_BYTE, (void*)thePalette);
+		qglColorTableEXT(GL_SHARED_TEXTURE_PALETTE_EXT, GL_RGB, 256, GL_RGB, GL_UNSIGNED_BYTE, (typeless_ptr)thePalette);
 		is8bit = true;
 	}
 

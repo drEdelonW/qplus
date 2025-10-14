@@ -27,42 +27,37 @@ viddef_t	vid;				// global video state
 #define	BASEWIDTH	320
 #define	BASEHEIGHT	200
 
-uint8_t	vid_buffer[BASEWIDTH*BASEHEIGHT];
-int16_t	zbuffer[BASEWIDTH*BASEHEIGHT];
-uint8_t	surfcache[256*1024];
+uint8_t	vid_buffer[BASEWIDTH * BASEHEIGHT];
+int16_t	zbuffer[BASEWIDTH * BASEHEIGHT];
+uint8_t	surfcache[256 * 1024];
 
 uint16_t	d_8to16table[256];
 uint32_t	d_8to24table[256];
 
-void	VID_SetPalette (uint8_t *palette)
-{
+void	VID_SetPalette(uint8_t* palette) {
 }
 
-void	VID_ShiftPalette (uint8_t *palette)
-{
+void	VID_ShiftPalette(uint8_t* palette) {
 }
 
-void	VID_Init (uint8_t *palette)
-{
+void	VID_Init(uint8_t* palette) {
 	vid.maxwarpwidth = vid.width = vid.conwidth = BASEWIDTH;
 	vid.maxwarpheight = vid.height = vid.conheight = BASEHEIGHT;
 	vid.aspect = 1.0;
 	vid.numpages = 1;
 	vid.colormap = host_colormap;
-	vid.fullbright = 256 - LittleLong (*((int *)vid.colormap + 2048));
+	vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
 	vid.buffer = vid.conbuffer = vid_buffer;
 	vid.rowbytes = vid.conrowbytes = BASEWIDTH;
 
 	d_pzbuffer = zbuffer;
-	D_InitCaches (surfcache, sizeof(surfcache));
+	D_InitCaches(surfcache, sizeof(surfcache));
 }
 
-void	VID_Shutdown()
-{
+void	VID_Shutdown() {
 }
 
-void	VID_Update (vrect_p rects)
-{
+void	VID_Update(vRect_p rects) {
 }
 
 /*
@@ -70,8 +65,7 @@ void	VID_Update (vrect_p rects)
 D_BeginDirectRect
 ================
 */
-void D_BeginDirectRect (int x, int y, uint8_t *pbitmap, int width, int height)
-{
+void D_BeginDirectRect(int x, int y, uint8_t* pbitmap, int width, int height) {
 }
 
 
@@ -80,8 +74,7 @@ void D_BeginDirectRect (int x, int y, uint8_t *pbitmap, int width, int height)
 D_EndDirectRect
 ================
 */
-void D_EndDirectRect (int x, int y, int width, int height)
-{
+void D_EndDirectRect(int x, int y, int width, int height) {
 }
 
 

@@ -8,7 +8,7 @@ typedef enum {
     RT_ZOMGIB   = 4,
     RT_TRACER2  = 5,
     RT_TRACER3  = 6
-} rocket_trail_type;
+} RocketTrailType;
 
 /* Bit flags for entity effects */
 typedef enum entity_effects {

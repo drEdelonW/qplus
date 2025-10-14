@@ -46,7 +46,7 @@ void R_CheckVariables() {
 	============
 */
 void Show() {
-	vrect_t	vr = {
+	vRect_t	vr = {
 		// .x      = 0,
 		// .y      = 0,
 		.width = vid.width,
@@ -78,7 +78,7 @@ void R_TimeRefresh_f() {
 		R_RenderView();
 		VID_UnlockBuffer();
 
-		vrect_t vr = {
+		vRect_t vr = {
 			.x = r_refdef.vrect.x,
 			.y = r_refdef.vrect.y,
 			.width = r_refdef.vrect.width,
@@ -288,7 +288,7 @@ void TransformVector(vec3_t in, vec3_t out) {
 	R_TransformPlane
 	================
 */
-void R_TransformPlane(mplane_t* p, float_p normal, float_p dist) {
+void R_TransformPlane(mPlane_t* p, float_p normal, float_p dist) {
 	float d = DotProduct(r_origin, p->normal);
 	*dist = p->dist - d;
 	// TODO: when we have rotating entities, this will need to use the view matrix
@@ -402,7 +402,7 @@ void R_SetupFrame() {
 			if ((vid.width <= vid.maxwarpwidth) &&
 				(vid.height <= vid.maxwarpheight)
 				) {
-				vrect_t vrect = {
+				vRect_t vrect = {
 					.width = vid.width,
 					.height = vid.height
 				};
@@ -423,7 +423,7 @@ void R_SetupFrame() {
 					w *= (float)vid.maxwarpheight / h;
 				}
 
-				vrect_t vrect = {
+				vRect_t vrect = {
 					.width = (int)w,
 					.height = (int)h
 				};
@@ -435,7 +435,7 @@ void R_SetupFrame() {
 			}
 		}
 		else {
-			vrect_t vrect = {
+			vRect_t vrect = {
 				.width = vid.width,
 				.height = vid.height
 			};

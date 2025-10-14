@@ -978,7 +978,7 @@ void GetEvent(void) {
 
 // flushes the given rectangles from the view buffer to the screen
 
-void	VID_Update(vrect_p rects) {
+void	VID_Update(vRect_p rects) {
 #if 0
 	static int count;
 	static long long s;

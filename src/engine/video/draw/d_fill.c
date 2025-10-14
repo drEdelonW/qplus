@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 D_FillRect
 ================
 */
-void D_FillRect(vrect_p rect, int color) {
+void D_FillRect(vRect_p rect, int color) {
 	int rx = rect->x;
 	int ry = rect->y;
 	int rwidth = rect->width;

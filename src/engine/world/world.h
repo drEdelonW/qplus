@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct {
 	vec3_t	normal;
 	float	dist;
-} plane_t;
+} Plane_t;
 
 typedef struct {
 	qboolean	allsolid;	// if true, plane is not valid
@@ -34,7 +34,7 @@ typedef struct {
 	qboolean	inopen, inwater;
 	float	fraction;		// time completed, 1.0 = didn't hit anything
 	vec3_t	endpos;			// final position
-	plane_t	plane;			// surface normal at impact
+	Plane_t	plane;			// surface normal at impact
 	edict_p ent;			// entity the surface is on
 } trace_t;
 typedef trace_t* trace_p;

@@ -239,7 +239,7 @@ void PF_setmodel() {
     edict->v.model = m - pr_strings;
     edict->v.modelindex = i; // SV_ModelIndex (m);
 
-    model_p mod = sv.models[(int)edict->v.modelindex]; // Mod_ForName (m, true);
+    Model_p mod = sv.models[(int)edict->v.modelindex]; // Mod_ForName (m, true);
 
     if (mod)
         SetMinMaxSize(edict, mod->mins, mod->maxs, true);
@@ -631,7 +631,7 @@ int PF_newcheckclient(int check) {
     // get the PVS for the entity
     vec3_t org;
     VectorAdd(ent->v.origin, ent->v.view_ofs, org);
-    mleaf_p leaf = Mod_PointInLeaf(org, sv.worldmodel);
+    mLeaf_p leaf = Mod_PointInLeaf(org, sv.worldmodel);
     uint8_p pvs = Mod_LeafPVS(leaf, sv.worldmodel);
     memcpy(checkpvs, pvs, (sv.worldmodel->numleafs + 7) >> 3);
 
@@ -674,7 +674,7 @@ void PF_checkclient() {
     edict_p self = PROG_TO_EDICT(pr_global_struct->self);
     vec3_t view;
     VectorAdd(self->v.origin, self->v.view_ofs, view);
-    mleaf_p leaf = Mod_PointInLeaf(view, sv.worldmodel);
+    mLeaf_p leaf = Mod_PointInLeaf(view, sv.worldmodel);
     int l = (leaf - sv.worldmodel->leafs) - 1;
     if ((l < 0) ||
         !(checkpvs[l >> 3] & (1 << (l & 7)))) {

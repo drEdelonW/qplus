@@ -44,13 +44,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /* extern */ client_state_t cl;
 // FIXME: put these on hunk?
 efrag_t         cl_efrags[MAX_EFRAGS];
-/* extern */ r_entity_t      cl_entities[MAX_EDICTS];
-/* extern */ r_entity_t      cl_static_entities[MAX_STATIC_ENTITIES];
+/* extern */ r_Entity_t      cl_entities[MAX_EDICTS];
+/* extern */ r_Entity_t      cl_static_entities[MAX_STATIC_ENTITIES];
 /* extern */ lightstyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
 /* extern */ dlight_t        cl_dlights[MAX_DLIGHTS];
 
 /* extern */ int32_t    cl_numvisedicts;
-/* extern */ r_entity_p cl_visedicts[MAX_VISEDICTS];
+/* extern */ r_Entity_p cl_visedicts[MAX_VISEDICTS];
 
 /*
 =====================
@@ -236,7 +236,7 @@ CL_PrintEntities_f
 ==============
 */
 void CL_PrintEntities_f() {
-    r_entity_p ent = cl_entities;
+    r_Entity_p ent = cl_entities;
     for (int i = 0; i < cl.num_entities; i++, ent++) {
         Con_Printf("%3i:", i);
         if (!ent->model) {
@@ -436,7 +436,7 @@ void CL_RelinkEntities() {
     float bobjrotate = anglemod(100 * cl.time);
 
     // start on the entity after the world
-    r_entity_p ent = cl_entities + 1;
+    r_Entity_p ent = cl_entities + 1;
     for (int i = 1; i < cl.num_entities; i++, ent++) {
         if (!ent->model) { // empty slot
             if (ent->forcelink)

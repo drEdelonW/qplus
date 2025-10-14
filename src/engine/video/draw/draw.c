@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 qpic_p draw_disc;
 
 typedef struct {
-    vrect_t rect;
+    vRect_t rect;
     int  width;
     int  height;
     uint8_p ptexbytes;
@@ -546,7 +546,7 @@ void Draw_ConsoleBackground(int lines) {
 R_DrawRect8
 ==============
 */
-void R_DrawRect8(vrect_p prect, int rowbytes, uint8_p psrc, int transparent) {
+void R_DrawRect8(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
     uint8_p pdest = vid.buffer + (prect->y * vid.rowbytes) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
@@ -583,7 +583,7 @@ void R_DrawRect8(vrect_p prect, int rowbytes, uint8_p psrc, int transparent) {
 R_DrawRect16
 ==============
 */
-void R_DrawRect16(vrect_p prect, int rowbytes, uint8_p psrc, int transparent) {
+void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
     // FIXME: would it be better to pre-expand native-format versions?
 
     uint16_p pdest = (uint16_p)vid.buffer +
@@ -633,7 +633,7 @@ refresh window.
 =============
 */
 void Draw_TileClear(int x, int y, int w, int h) {
-    vrect_t   vr;
+    vRect_t   vr;
 
     r_rectdesc.rect.x = x;
     r_rectdesc.rect.y = y;

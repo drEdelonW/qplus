@@ -273,7 +273,7 @@ void V_ParseDamage() {
     vec3_t	from;
     int		i;
     vec3_t	forward, right, up;
-    r_entity_p ent;
+    r_Entity_p ent;
     float	side;
     float	count;
 
@@ -683,7 +683,7 @@ V_BoundOffsets
 ==============
 */
 void V_BoundOffsets() {
-    r_entity_p ent;
+    r_Entity_p ent;
 
     ent = &cl_entities[cl.viewentity];
 
@@ -752,7 +752,7 @@ V_CalcIntermissionRefdef
 ==================
 */
 void V_CalcIntermissionRefdef() {
-    r_entity_p ent, view;
+    r_Entity_p ent, view;
     float		old;
 
     // ent is the player model (visible when out of body)
@@ -778,7 +778,7 @@ V_CalcRefdef
 ==================
 */
 void V_CalcRefdef() {
-    r_entity_p ent, view;
+    r_Entity_p ent, view;
     vec3_t		forward, right, up;
     vec3_t		angles;
     float		bob;
@@ -913,7 +913,7 @@ The player's clipping box goes from (-16 -16 -24) to (16 16 32) from
 the entity origin, so any view position inside that will be valid
 ==================
 */
-extern vrect_t	scr_vrect;
+extern vRect_t	scr_vrect;
 
 void V_RenderView() {
     if (con_forcedup)

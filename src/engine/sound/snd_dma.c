@@ -615,7 +615,7 @@ S_UpdateAmbientSounds
 ===================
 */
 void S_UpdateAmbientSounds() {
-    mleaf_t* l;
+    mLeaf_t* l;
     float		vol;
     int			ambient_channel;
     channel_t* chan;

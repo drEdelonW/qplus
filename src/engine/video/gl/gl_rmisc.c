@@ -219,13 +219,12 @@ R_TranslatePlayerSkin
 Translates a skin texture by the per-player color lookup
 ===============
 */
-void R_TranslatePlayerSkin(int playernum) {
 	int		top, bottom;
 	byte	translate[256];
 	unsigned	translate32[256];
 	int		i, j, s;
-	model_t* model;
-	aliashdr_t* paliashdr;
+	Model_t* model;
+	AliasHdr_t* paliashdr;
 	byte* original;
 	unsigned	pixels[512*256], * out;
 	unsigned	scaled_width, scaled_height;
@@ -264,7 +263,7 @@ void R_TranslatePlayerSkin(int playernum) {
 	if (model->type != mod_alias)
 		return; // only translate skins on alias models
 
-	paliashdr = (aliashdr_t*)Mod_Extradata(model);
+	paliashdr = (AliasHdr_t*)Mod_Extradata(model);
 	s = paliashdr->skinwidth * paliashdr->skinheight;
 	if (currententity->skinnum < 0 || currententity->skinnum >= paliashdr->numskins) {
 		Con_Printf("(%d): Invalid player skin #%d\n", playernum, currententity->skinnum);
@@ -410,7 +409,7 @@ void R_TimeRefresh_f(void) {
 	int			i;
 	float		start, stop, time;
 	int			startangle;
-	vrect_t		vr;
+	vRect_t		vr;
 
 	glDrawBuffer(GL_FRONT);
 	glFinish();

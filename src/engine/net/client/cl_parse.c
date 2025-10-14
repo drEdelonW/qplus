@@ -92,7 +92,7 @@ cstring svc_strings[] = {
 	This error checks and tracks the total number of entities
 	===============
 */
-r_entity_p CL_EntityNum(int num) {
+r_Entity_p CL_EntityNum(int num) {
 	if (num >= cl.num_entities) {
 		if (num >= MAX_EDICTS) {
 			Host_Error("CL_EntityNum: %i is an invalid number", num);
@@ -339,7 +339,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 
 	int num = (bits & U_LONGENTITY) ? MSG_ReadShort() : MSG_ReadByte();
 
-	r_entity_p ent = CL_EntityNum(num);
+	r_Entity_p ent = CL_EntityNum(num);
 
 	for (int i = 0; i < 16; i++) {
 		if (bits & (1u << i)) {
@@ -354,7 +354,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 	int	modnum = (bits & U_MODEL) ? MSG_ReadByte() : ent->baseline.modelindex;
 	if (modnum >= MAX_MODELS) { Host_Error("CL_ParseModel: bad modnum"); }
 
-	model_p model = cl.model_precache[modnum];
+	Model_p model = cl.model_precache[modnum];
 	if (model != ent->model) {
 		ent->model = model;
 		// automatic animation (torches, etc) can be either all together
@@ -425,7 +425,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 	CL_ParseBaseline
 	==================
 */
-void CL_ParseBaseline(r_entity_p ent) {
+void CL_ParseBaseline(r_Entity_p ent) {
 	ent->baseline.modelindex = MSG_ReadByte();
 	ent->baseline.frame = MSG_ReadByte();
 	ent->baseline.colormap = MSG_ReadByte();
@@ -538,7 +538,7 @@ void CL_ParseStatic() {
 	int statics = cl.num_statics;
 	if (statics >= MAX_STATIC_ENTITIES)
 		Host_Error("Too many static entities");
-	r_entity_p ent = &cl_static_entities[statics];
+	r_Entity_p ent = &cl_static_entities[statics];
 	cl.num_statics++;
 	CL_ParseBaseline(ent);
 

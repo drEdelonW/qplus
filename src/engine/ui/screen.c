@@ -56,8 +56,8 @@ int   clearnotify;
 
 viddef_t vid;    // global video state
 
-vrect_p pconupdate;
-vrect_t  scr_vrect;
+vRect_p pconupdate;
+vRect_t  scr_vrect;
 
 qboolean scr_disabled_for_loading;
 qboolean scr_drawloading;
@@ -235,7 +235,7 @@ static void SCR_CalcRefdef() {
 
     // these calculations mirror those in R_Init() for r_refdef, but take no
     // account of water warping
-    vrect_t vrect = {
+    vRect_t vrect = {
         .width = vid.width,
         .height = vid.height
     };
@@ -722,7 +722,7 @@ needs almost the entire 256k of stack space!
 void SCR_UpdateScreen() {
     static float oldscr_viewsize;
     static float oldlcd_x;
-    vrect_t  vrect;
+    vRect_t  vrect;
 
     if (scr_skipupdate || block_drawing)
         return;

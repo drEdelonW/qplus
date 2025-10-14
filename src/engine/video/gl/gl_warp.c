@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-extern	model_t* loadmodel;
+extern	Model_t* loadmodel;
 
 int		skytexturenum;
 
@@ -29,13 +29,13 @@ int		solidskytexture;
 int		alphaskytexture;
 float	speedscale;		// for top sky and bottom sky
 
-msurface_t* warpface;
+mSurface_t* warpface;
 
 extern cvar_t gl_subdivide_size;
 
-void BoundPoly(int numverts, float* verts, vec3_t mins, vec3_t maxs) {
+void BoundPoly(int numverts, float_p verts, vec3_t mins, vec3_t maxs) {
 	int		i, j;
-	float* v;
+	float_p v;
 
 	mins[0] = mins[1] = mins[2] = 9999;
 	maxs[0] = maxs[1] = maxs[2] = -9999;
@@ -49,11 +49,11 @@ void BoundPoly(int numverts, float* verts, vec3_t mins, vec3_t maxs) {
 		}
 }
 
-void SubdividePolygon(int numverts, float* verts) {
+void SubdividePolygon(int numverts, float_p verts) {
 	int		i, j, k;
 	vec3_t	mins, maxs;
 	float	m;
-	float* v;
+	float_p v;
 	vec3_t	front[64], back[64];
 	int		f, b;
 	float	dist[64];
@@ -134,13 +134,13 @@ boundaries so that turbulent and sky warps
 can be done reasonably.
 ================
 */
-void GL_SubdivideSurface(msurface_t* fa) {
+void GL_SubdivideSurface(mSurface_t* fa) {
 	vec3_t		verts[64];
 	int			numverts;
 	int			i;
 	int			lindex;
-	float* vec;
-	texture_t* t;
+	float_p vec;
+	Texture_t* t;
 
 	warpface = fa;
 
@@ -180,9 +180,9 @@ EmitWaterPolys
 Does a water warp on the pre-fragmented glpoly_t chain
 =============
 */
-void EmitWaterPolys(msurface_t* fa) {
+void EmitWaterPolys(mSurface_t* fa) {
 	glpoly_t* p;
-	float* v;
+	float_p v;
 	int			i;
 	float		s, t, os, ot;
 
@@ -214,9 +214,9 @@ void EmitWaterPolys(msurface_t* fa) {
 EmitSkyPolys
 =============
 */
-void EmitSkyPolys(msurface_t* fa) {
+void EmitSkyPolys(mSurface_t* fa) {
 	glpoly_t* p;
-	float* v;
+	float_p v;
 	int			i;
 	float	s, t;
 	vec3_t	dir;
@@ -254,10 +254,10 @@ This will be called for brushmodels, the world
 will have them chained together.
 ===============
 */
-void EmitBothSkyLayers(msurface_t* fa) {
+void EmitBothSkyLayers(mSurface_t* fa) {
 	int			i;
 	int			lindex;
-	float* vec;
+	float_p vec;
 
 	GL_DisableMultitexture();
 
@@ -283,8 +283,8 @@ void EmitBothSkyLayers(msurface_t* fa) {
 R_DrawSkyChain
 =================
 */
-void R_DrawSkyChain(msurface_t* s) {
-	msurface_t* fa;
+void R_DrawSkyChain(mSurface_t* s) {
+	mSurface_t* fa;
 
 	GL_DisableMultitexture();
 
@@ -688,7 +688,7 @@ void DrawSkyPolygon(int nump, vec3_t vecs) {
 	vec3_t	v, av;
 	float	s, t, dv;
 	int		axis;
-	float* vp;
+	float_p vp;
 
 	c_sky++;
 #if 0
@@ -759,8 +759,8 @@ void DrawSkyPolygon(int nump, vec3_t vecs) {
 
 #define	MAX_CLIP_VERTS	64
 void ClipSkyPolygon(int nump, vec3_t vecs, int stage) {
-	float* norm;
-	float* v;
+	float_p norm;
+	float_p v;
 	qboolean	front, back;
 	float	d, e;
 	float	dists[MAX_CLIP_VERTS];
@@ -845,8 +845,8 @@ void ClipSkyPolygon(int nump, vec3_t vecs, int stage) {
 R_DrawSkyChain
 =================
 */
-void R_DrawSkyChain(msurface_t* s) {
-	msurface_t* fa;
+void R_DrawSkyChain(mSurface_t* s) {
+	mSurface_t* fa;
 
 	int		i;
 	vec3_t	verts[MAX_CLIP_VERTS];
@@ -974,7 +974,7 @@ R_InitSky
 A sky texture is 256*128, with the right side being a masked overlay
 ==============
 */
-void R_InitSky(texture_t* mt) {
+void R_InitSky(Texture_t* mt) {
 	int			i, j, p;
 	byte* src;
 	unsigned	trans[128*128];

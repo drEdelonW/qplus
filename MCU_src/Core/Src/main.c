@@ -1840,8 +1840,8 @@ __attribute__((section(".RAM_D1"), aligned(32)))
 #endif
 static uint16_t s_fb[SCREEN_W * SCREEN_H];
 
-static inline uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b){
-  return (uint16_t)(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3));
+static inline uint16_t rgb565(uint8_t red, uint8_t green, uint8_t blue){
+  return (uint16_t)(((red & 0xF8) << 8) | ((green & 0xFC) << 3) | (blue >> 3));
 }
 
 static inline void dcache_clean_range(void* addr, size_t size){

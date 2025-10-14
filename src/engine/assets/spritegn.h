@@ -32,13 +32,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // This program generates .spr sprite package files.
 // The format of the files is as follows:
 //
-// dsprite_t file header structure
-// <repeat dsprite_t.numframes times>
-//   <if spritegroup, repeat dspritegroup_t.numframes times>
-//     dspriteframe_t frame header structure
+// dSprite_t file header structure
+// <repeat dSprite_t.numframes times>
+//   <if spritegroup, repeat dSpriteGroup_t.numframes times>
+//     dSpriteFrame_t frame header structure
 //     sprite bitmap
 //   <else (single sprite frame)>
-//     dspriteframe_t frame header structure
+//     dSpriteFrame_t frame header structure
 //     sprite bitmap
 // <endrepeat>
 //-------------------------------------------------------
@@ -65,24 +65,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef SYNCTYPE_T
 #define SYNCTYPE_T
 typedef enum {
-	ST_SYNC = 0,
-	ST_RAND
-} synctype_t;
+    ST_SYNC = 0,
+    ST_RAND
+} SyncType_t;
 #endif
 
 // TODO: shorten these?
 typedef struct {
-	int32_t			ident;
-	int32_t			version;
-	int32_t			type;
-	float		boundingradius;
-	int32_t			width;
-	int32_t			height;
-	int32_t			numframes;
-	float		beamlength;
-	synctype_t	synctype;
-} dsprite_t;
-typedef dsprite_t* dsprite_p;
+    int32_t     ident;
+    int32_t     version;
+    int32_t     type;
+    float       boundingradius;
+    int32_t     width;
+    int32_t     height;
+    int32_t     numframes;
+    float       beamlength;
+    SyncType_t  synctype;
+} dSprite_t;
+typedef dSprite_t* dSprite_p;
 
 typedef enum {
     SPR_VP_PARALLEL_UPRIGHT   = 0, // viewplane parallel, upright
@@ -90,34 +90,34 @@ typedef enum {
     SPR_VP_PARALLEL           = 2, // viewplane parallel, rotates with view
     SPR_ORIENTED              = 3, // fully oriented in 3D
     SPR_VP_PARALLEL_ORIENTED  = 4  // viewplane parallel, but oriented
-} sprite_type_t;
+} SpriteType_t;
 
 typedef struct {
-	int32_t			origin[2];
-	int32_t			width;
-	int32_t			height;
-} dspriteframe_t;
-typedef dspriteframe_t* dspriteframe_p;
+    int32_t origin[2];
+    int32_t width;
+    int32_t height;
+} dSpriteFrame_t;
+typedef dSpriteFrame_t* dSpriteFrame_p;
 
 typedef struct {
-	int32_t			numframes;
-} dspritegroup_t;
-typedef dspritegroup_t* dspritegroup_p;
+    int32_t numframes;
+} dSpriteGroup_t;
+typedef dSpriteGroup_t* dSpriteGroup_p;
 
 typedef struct {
-	float	interval;
+    float   interval;
 } dspriteinterval_t;
 typedef dspriteinterval_t* dspriteinterval_p;
 
 typedef enum {
-	SPR_SINGLE = 0,
-	SPR_GROUP
-} spriteframetype_t;
+    SPR_SINGLE = 0,
+    SPR_GROUP
+} SpriteFrameType_t;
 
 typedef struct {
-	spriteframetype_t	type;
-} dspriteframetype_t;
-typedef dspriteframetype_t* dspriteframetype_p;
+    SpriteFrameType_t	type;
+} dSpriteFrameType_t;
+typedef dSpriteFrameType_t* dSpriteFrameType_p;
 
 #define IDSPRITEHEADER	(('P'<<24)+('S'<<16)+('D'<<8)+'I')
 // little-endian "IDSP"

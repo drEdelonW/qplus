@@ -56,7 +56,7 @@ typedef struct {
 typedef moveclip_t* moveclip_p;
 
 
-int SV_HullPointContents(hull_p hull, int num, vec3_t p);
+int SV_HullPointContents(Hull_p hull, int num, vec3_t p);
 
 /*
 ===============================================================================
@@ -67,16 +67,16 @@ HULL BOXES
 */
 
 
-static hull_t  _box_hull;
-static dclipnode_t _box_clipnodes[6];
-static mplane_t _box_planes[6];
+static Hull_t  _box_hull;
+static dClipNode_t _box_clipnodes[6];
+static mPlane_t _box_planes[6];
 
 /*
 ===================
 SV_InitBoxHull
 
 Set up the planes and clipnodes so that the six floats of a bounding box
-can just be stored out and get a proper hull_t structure.
+can just be stored out and get a proper Hull_t structure.
 ===================
 */
 void SV_InitBoxHull() {
@@ -111,7 +111,7 @@ To keep everything totally uniform, bounding boxes are turned into small
 BSP trees instead of being compared directly.
 ===================
 */
-hull_p SV_HullForBox(vec3_t mins, vec3_t maxs) {
+Hull_p SV_HullForBox(vec3_t mins, vec3_t maxs) {
     _box_planes[0].dist = maxs[0];
     _box_planes[1].dist = mins[0];
     _box_planes[2].dist = maxs[1];
@@ -133,14 +133,14 @@ Offset is filled in to contain the adjustment that must be added to the
 testing object's origin to get a point to use with the returned hull.
 ================
 */
-hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_t offset) {
-    hull_p  hull;
+Hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_t offset) {
+    Hull_p  hull;
     // decide which clipping hull to use, based on the size
     if (ent->v.solid == SOLID_BSP) { // explicit hulls in the BSP model
         if (ent->v.movetype != MOVETYPE_PUSH)
             Sys_Error("SOLID_BSP without MOVETYPE_PUSH");
 
-        model_p model = sv.models[(int)ent->v.modelindex];
+        Model_p model = sv.models[(int)ent->v.modelindex];
 
         if (!model ||
             (model->type != mod_brush))
@@ -180,21 +180,21 @@ ENTITY AREA CHECKING
 ===============================================================================
 */
 
-struct areanode_s;
-typedef struct areanode_s areanode_t;
-typedef areanode_t* areanode_p;
-typedef struct areanode_s {
+struct areaNode_s;
+typedef struct areaNode_s areaNode_t;
+typedef areaNode_t* areaNode_p;
+typedef struct areaNode_s {
     int  axis;  // -1 = leaf node
     float dist;
-    areanode_p children[2];
+    areaNode_p children[2];
     link_t trigger_edicts;
     link_t solid_edicts;
-} areanode_t;
+} areaNode_t;
 
 #define AREA_DEPTH 4
 #define AREA_NODES 32
 
-static areanode_t sv_areanodes[AREA_NODES];
+static areaNode_t sv_areanodes[AREA_NODES];
 static int   sv_numareanodes;
 
 /*
@@ -203,8 +203,8 @@ SV_CreateAreaNode
 
 ===============
 */
-areanode_p SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
-    areanode_p anode = &sv_areanodes[sv_numareanodes];
+areaNode_p SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
+    areaNode_p anode = &sv_areanodes[sv_numareanodes];
     sv_numareanodes++;
 
     ClearLink(&anode->trigger_edicts);
@@ -272,7 +272,7 @@ void SV_UnlinkEdict(edict_p ent) {
 SV_TouchLinks
 ====================
 */
-void SV_TouchLinks(edict_p ent, areanode_p node) {
+void SV_TouchLinks(edict_p ent, areaNode_p node) {
     link_p next;
 
     // touch linked edicts
@@ -320,7 +320,7 @@ SV_FindTouchedLeafs
 
 ===============
 */
-void SV_FindTouchedLeafs(edict_p ent, mnode_p node) {
+void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
     if (node->contents == CONTENTS_SOLID)
         return;
 
@@ -329,7 +329,7 @@ void SV_FindTouchedLeafs(edict_p ent, mnode_p node) {
         if (ent->num_leafs == MAX_ENT_LEAFS)
             return;
 
-        mleaf_p leaf = (mleaf_p)node;
+        mLeaf_p leaf = (mLeaf_p)node;
         int leafnum = leaf - sv.worldmodel->leafs - 1;
 
         ent->leafnums[ent->num_leafs] = leafnum;
@@ -338,7 +338,7 @@ void SV_FindTouchedLeafs(edict_p ent, mnode_p node) {
     }
 
     // NODE_MIXED
-    mplane_p splitplane = node->plane;
+    mPlane_p splitplane = node->plane;
     int sides = BOX_ON_PLANE_SIDE(
         ent->v.absmin,
         ent->v.absmax,
@@ -426,7 +426,7 @@ void SV_LinkEdict(edict_p ent, qboolean touch_triggers) {
         return;
 
     // find the first node that the ent's box crosses
-    areanode_p node = sv_areanodes;
+    areaNode_p node = sv_areanodes;
     while (1) {
         if (node->axis == -1)
             break;
@@ -468,13 +468,13 @@ SV_HullPointContents
 
 ==================
 */
-int SV_HullPointContents(hull_p hull, int num, vec3_t p) {
+int SV_HullPointContents(Hull_p hull, int num, vec3_t p) {
     while (num >= 0) {
         if ((num < hull->firstclipnode) || (num > hull->lastclipnode))
             Sys_Error("SV_HullPointContents: bad node number");
 
-        dclipnode_p node = hull->clipnodes + num;
-        mplane_p plane = hull->planes + node->planenum;
+        dClipNode_p node = hull->clipnodes + num;
+        mPlane_p plane = hull->planes + node->planenum;
 
         float  d;
         if (plane->type < 3)
@@ -550,7 +550,7 @@ SV_RecursiveHullCheck
 ==================
 */
 qboolean SV_RecursiveHullCheck(
-    hull_p  hull,
+    Hull_p  hull,
     int     num,
     float   p1f,
     float   p2f,
@@ -579,8 +579,8 @@ qboolean SV_RecursiveHullCheck(
     //
     // find the point distances
     //
-    dclipnode_p node = hull->clipnodes + num;
-    mplane_p plane = hull->planes + node->planenum;
+    dClipNode_p node = hull->clipnodes + num;
+    mPlane_p plane = hull->planes + node->planenum;
 
     float t1, t2;
     if (plane->type < 3) {
@@ -695,7 +695,7 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
 
     // get the clipping hull
     vec3_t offset;
-    hull_p hull = SV_HullForEntity(ent, mins, maxs, offset);
+    Hull_p hull = SV_HullForEntity(ent, mins, maxs, offset);
 
     vec3_t  start_l, end_l;
     VectorSubtract(start, offset, start_l);
@@ -769,7 +769,7 @@ SV_ClipToLinks
 Mins and maxs enclose the entire area swept by the move
 ====================
 */
-void SV_ClipToLinks(areanode_p node, moveclip_p clip) {
+void SV_ClipToLinks(areaNode_p node, moveclip_p clip) {
     // touch linked edicts
     link_p next;
     for (link_p l = node->solid_edicts.next; l != &node->solid_edicts; l = next) {

@@ -35,32 +35,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define SURFCACHE_SIZE_AT_320X200  (600 * 1024)
 
-struct surfcache_s;
-typedef struct surfcache_s surfcache_t;
-typedef surfcache_t* surfcache_p;
-struct surfcache_s {
-	surfcache_p 	next;
-	surfcache_p* 	owner;		// NULL is an empty chunk of memory
+struct SurfCache_s;
+typedef struct SurfCache_s SurfCache_t;
+typedef SurfCache_t* SurfCache_p;
+struct SurfCache_s {
+	SurfCache_p 	next;
+	SurfCache_p* 	owner;		// NULL is an empty chunk of memory
 	int 			lightadj[MAXLIGHTMAPS]; // checked for strobe flush
 	int 			dlight;
 	int 			size;		// including header
 	uint32_t 		width;
 	uint32_t 		height;		// DEBUG only needed for debug
 	float 			mipscale;
-	texture_p 		texture;	// checked for animating textures
+	Texture_p 		texture;	// checked for animating textures
 	uint8_t 		data[4];	// width * height elements
 } ;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct sspan_s {
+typedef struct sSpan_s {
 	int u, v, count;
-} sspan_t;
+} sSpan_t;
 
 extern float	scale_for_mip;
 
 extern qboolean		d_roverwrapped;
-extern surfcache_p sc_rover;
-extern surfcache_p d_initial_rover;
+extern SurfCache_p sc_rover;
+extern SurfCache_p d_initial_rover;
 
 extern float	d_sdivzstepu, d_tdivzstepu, d_zistepu;
 extern float	d_sdivzstepv, d_tdivzstepv, d_zistepv;
@@ -70,18 +70,18 @@ extern fixed16_t	sadjust, tadjust;
 extern fixed16_t	bbextents, bbextentt;
 
 
-void D_DrawSpans8(espan_p  pspans);
-void D_DrawSpans16(espan_p pspans);
-void D_DrawZSpans(espan_p  pspans);
-void Turbulent8(espan_p    pspan);
-void D_SpriteDrawSpans(sspan_t* pspan);
+void D_DrawSpans8(eSpan_p  pspans);
+void D_DrawSpans16(eSpan_p pspans);
+void D_DrawZSpans(eSpan_p  pspans);
+void Turbulent8(eSpan_p    pspan);
+void D_SpriteDrawSpans(sSpan_t* pspan);
 
-void D_DrawSkyScans8(espan_p   pspan);
-void D_DrawSkyScans16(espan_p  pspan);
+void D_DrawSkyScans8(eSpan_p   pspan);
+void D_DrawSkyScans16(eSpan_p  pspan);
 
 void R_ShowSubDiv();
 extern void(*prealspandrawer)();
-surfcache_p D_CacheSurface(msurface_t* surface, int miplevel);
+SurfCache_p D_CacheSurface(mSurface_t* surface, int miplevel);
 
 extern int D_MipLevelForScale(float scale);
 
@@ -107,5 +107,5 @@ extern int16_p zspantable[MAXHEIGHT];
 extern int		d_minmip;
 extern float	d_scalemip[3];
 
-extern void(*d_drawspans)(espan_p pspan);
+extern void(*d_drawspans)(eSpan_p pspan);
 

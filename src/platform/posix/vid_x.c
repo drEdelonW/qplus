@@ -931,8 +931,8 @@ void GetEvent() {
 
 // flushes the given rectangles from the view buffer to the screen
 
-void	VID_Update(vrect_p rects) {
-	// vrect_t full;
+void	VID_Update(vRect_p rects) {
+	// vRect_t full;
 
 // if the window changes dimension, skip this frame
 

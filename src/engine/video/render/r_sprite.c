@@ -26,7 +26,7 @@ static int      _clip_current;
 static vec5_t   _clip_verts[2][MAXWORKINGVERTS];
 static int      _sprite_width, _sprite_height;
 
-spritedesc_t    r_spritedesc;
+SpriteDesc_t    r_spritedesc;
 
 
 /*
@@ -53,13 +53,13 @@ Clips the winding at _clip_verts[_clip_current] and changes _clip_current
 Throws out the back side
 ==============
 */
-int R_ClipSpriteFace(int nump, clipplane_t* pclipplane) {
+int R_ClipSpriteFace(int nump, ClipPlane_t* pclipplane) {
     float clipdist = pclipplane->dist;
-    float* pclipnormal = pclipplane->normal;
+    float_p pclipnormal = pclipplane->normal;
 
     // calc dists
-    float* in;
-    float* outstep;
+    float_p in;
+    float_p outstep;
     if (_clip_current) {
         in = _clip_verts[1][0];
         outstep = _clip_verts[0][0];
@@ -71,7 +71,7 @@ int R_ClipSpriteFace(int nump, clipplane_t* pclipplane) {
         _clip_current = 1;
     }
 
-    float* instep = in;
+    float_p instep = in;
     float dists[MAXWORKINGVERTS + 1];
     for (int i = 0; i < nump; i++, instep += sizeof(vec5_t) / sizeof(float)) {
         dists[i] = DotProduct(instep, pclipnormal) - clipdist;
@@ -102,7 +102,7 @@ int R_ClipSpriteFace(int nump, clipplane_t* pclipplane) {
         // split it into a new vertex
         float frac = dists[i] / (dists[i] - dists[i + 1]);
 
-        float* vert2 = instep + sizeof(vec5_t) / sizeof(float);
+        float_p vert2 = instep + sizeof(vec5_t) / sizeof(float);
 
         outstep[0] = instep[0] + frac * (vert2[0] - instep[0]);
         outstep[1] = instep[1] + frac * (vert2[1] - instep[1]);
@@ -174,10 +174,10 @@ void R_SetupAndDrawSprite() {
     }
 
     // transform vertices into viewspace and project
-    float* pv = &_clip_verts[_clip_current][0][0];
+    float_p pv = &_clip_verts[_clip_current][0][0];
     r_spritedesc.nearzi = -999999;
 
-    emitpoint_t outverts[MAXWORKINGVERTS + 1];
+    EmitPoint_t outverts[MAXWORKINGVERTS + 1];
     for (int i = 0; i < nump; i++) {
         vec3_t local;
         VectorSubtract(pv, r_origin, local);
@@ -187,7 +187,7 @@ void R_SetupAndDrawSprite() {
         if (transformed[2] < NEAR_CLIP)
             transformed[2] = NEAR_CLIP;
 
-        emitpoint_p pout = &outverts[i];
+        EmitPoint_p pout = &outverts[i];
         pout->zi = 1.0 / transformed[2];
         if (pout->zi > r_spritedesc.nearzi)
             r_spritedesc.nearzi = pout->zi;
@@ -217,20 +217,20 @@ void R_SetupAndDrawSprite() {
 R_GetSpriteframe
 ================
 */
-mspriteframe_t* R_GetSpriteframe(msprite_t* psprite) {
+mSpriteFrame_t* R_GetSpriteframe(mSprite_t* psprite) {
     int frame = currententity->frame;
     if ((frame >= psprite->numframes) || (frame < 0)) {
         Con_Printf("R_DrawSprite: no such frame %d\n", frame);
         frame = 0;
     }
 
-    mspriteframe_t* pspriteframe;
+    mSpriteFrame_t* pspriteframe;
     if (psprite->frames[frame].type == SPR_SINGLE) {
         pspriteframe = psprite->frames[frame].frameptr;
     }
     else {
-        mspritegroup_t* pspritegroup = (mspritegroup_t*)psprite->frames[frame].frameptr;
-        float* pintervals = pspritegroup->intervals;
+        mSpriteGroup_t* pspritegroup = (mSpriteGroup_t*)psprite->frames[frame].frameptr;
+        float_p pintervals = pspritegroup->intervals;
         int numframes = pspritegroup->numframes;
         float fullinterval = pintervals[numframes - 1];
 
@@ -259,7 +259,7 @@ R_DrawSprite
 ================
 */
 void R_DrawSprite() {
-    msprite_p psprite = currententity->model->cache.data;
+    mSprite_p psprite = currententity->model->cache.data;
     r_spritedesc.pspriteframe = R_GetSpriteframe(psprite);
 
     _sprite_width = r_spritedesc.pspriteframe->width;

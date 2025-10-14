@@ -107,7 +107,7 @@ int			sb_lines;
 
 viddef_t	vid;				// global video state
 
-vrect_t		scr_vrect;
+vRect_t		scr_vrect;
 
 qboolean	scr_disabled_for_loading;
 qboolean	scr_drawloading;
@@ -246,7 +246,7 @@ Internal use only
 =================
 */
 static void SCR_CalcRefdef(void) {
-	vrect_t		vrect;
+	vRect_t		vrect;
 	float		size;
 	int		h;
 	qboolean		full = false;
@@ -781,7 +781,7 @@ needs almost the entire 256k of stack space!
 */
 void SCR_UpdateScreen(void) {
 	static float	oldscr_viewsize;
-	vrect_t		vrect;
+	vRect_t		vrect;
 
 	if (block_drawing)
 		return;

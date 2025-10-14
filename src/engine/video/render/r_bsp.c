@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // current entity info
 //
 qboolean		insubmodel;
-r_entity_p currententity;
+r_Entity_p currententity;
 vec3_t			modelorg, base_modelorg;
 // modelorg is the viewpoint reletive to
 // the currently rendering entity
@@ -44,11 +44,11 @@ typedef enum { touchessolid, drawnode, nodrawnode } solidstate_t;
 #define MAX_BMODEL_VERTS	500			// 6K
 #define MAX_BMODEL_EDGES	1000		// 12K
 
-static mvertex_t* pbverts;
-static bedge_t* pbedges;
+static mVertex_t* pbverts;
+static bEdge_t* pbedges;
 static int			numbverts, numbedges;
 
-static mvertex_t* pfrontenter, * pfrontexit;
+static mVertex_t* pfrontenter, * pfrontexit;
 
 static qboolean		makeclippededge;
 
@@ -153,13 +153,13 @@ void R_RotateBmodel() {
 R_RecursiveClipBPoly
 ================
 */
-void R_RecursiveClipBPoly(bedge_t* pedges, mnode_t* pnode, msurface_t* psurf) {
-	bedge_t* psideedges[2], * pnextedge, * ptedge;
+void R_RecursiveClipBPoly(bEdge_t* pedges, mNode_t* pnode, mSurface_t* psurf) {
+	bEdge_t* psideedges[2], * pnextedge, * ptedge;
 	int			i, side, lastside;
 	float		dist, frac, lastdist;
-	mplane_t* splitplane, tplane;
-	mvertex_t* pvert, * plastvert, * ptvert;
-	mnode_t* pn;
+	mPlane_t* splitplane, tplane;
+	mVertex_t* pvert, * plastvert, * ptvert;
+	mNode_t* pn;
 
 	psideedges[0] = psideedges[1] = NULL;
 
@@ -289,7 +289,7 @@ void R_RecursiveClipBPoly(bedge_t* pedges, mnode_t* pnode, msurface_t* psurf) {
 			if (pn->visframe == r_visframecount) {
 				if (pn->contents < 0) {
 					if (pn->contents != CONTENTS_SOLID) {
-						r_currentbkey = ((mleaf_t*)pn)->key;
+						r_currentbkey = ((mLeaf_t*)pn)->key;
 						R_RenderBmodelFace(psideedges[i], psurf);
 					}
 				}
@@ -308,15 +308,15 @@ void R_RecursiveClipBPoly(bedge_t* pedges, mnode_t* pnode, msurface_t* psurf) {
 R_DrawSolidClippedSubmodelPolygons
 ================
 */
-void R_DrawSolidClippedSubmodelPolygons(model_t* pmodel) {
+void R_DrawSolidClippedSubmodelPolygons(Model_t* pmodel) {
 	int			i, j, lindex;
 	vec_t		dot;
-	msurface_t* psurf;
+	mSurface_t* psurf;
 	int			numsurfaces;
-	mplane_t* pplane;
-	mvertex_t	bverts[MAX_BMODEL_VERTS];
-	bedge_t		bedges[MAX_BMODEL_EDGES], * pbedge;
-	medge_t* pedge, * pedges;
+	mPlane_t* pplane;
+	mVertex_t	bverts[MAX_BMODEL_VERTS];
+	bEdge_t		bedges[MAX_BMODEL_EDGES], * pbedge;
+	mEdge_t* pedge, * pedges;
 
 	// FIXME: use bounding-box-based frustum clipping info?
 
@@ -382,12 +382,12 @@ void R_DrawSolidClippedSubmodelPolygons(model_t* pmodel) {
 R_DrawSubmodelPolygons
 ================
 */
-void R_DrawSubmodelPolygons(model_t* pmodel, int clipflags) {
+void R_DrawSubmodelPolygons(Model_t* pmodel, int clipflags) {
 	int			i;
 	vec_t		dot;
-	msurface_t* psurf;
+	mSurface_t* psurf;
 	int			numsurfaces;
-	mplane_t* pplane;
+	mPlane_t* pplane;
 
 	// FIXME: use bounding-box-based frustum clipping info?
 
@@ -403,7 +403,7 @@ void R_DrawSubmodelPolygons(model_t* pmodel, int clipflags) {
 		// draw the polygon
 		if (((psurf->flags & SURF_PLANEBACK) && (dot < -BACKFACE_EPSILON)) ||
 			(!(psurf->flags & SURF_PLANEBACK) && (dot > BACKFACE_EPSILON))) {
-			r_currentkey = ((mleaf_t*)currententity->topnode)->key;
+			r_currentkey = ((mLeaf_t*)currententity->topnode)->key;
 
 			// FIXME: use bounding-box-based frustum clipping info?
 			R_RenderFace(psurf, clipflags);
@@ -417,12 +417,12 @@ void R_DrawSubmodelPolygons(model_t* pmodel, int clipflags) {
 R_RecursiveWorldNode
 ================
 */
-void R_RecursiveWorldNode(mnode_t* node, int clipflags) {
+void R_RecursiveWorldNode(mNode_t* node, int clipflags) {
 	int			i, c, side, * pindex;
 	vec3_t		acceptpt, rejectpt;
-	mplane_t* plane;
-	msurface_t* surf, ** mark;
-	mleaf_t* pleaf;
+	mPlane_t* plane;
+	mSurface_t* surf, ** mark;
+	mLeaf_t* pleaf;
 	double		d, dot;
 
 	if (node->contents == CONTENTS_SOLID)
@@ -469,7 +469,7 @@ void R_RecursiveWorldNode(mnode_t* node, int clipflags) {
 
 	// if a leaf node, draw stuff
 	if (node->contents < 0) {
-		pleaf = (mleaf_t*)node;
+		pleaf = (mLeaf_t*)node;
 
 		mark = pleaf->firstmarksurface;
 		c = pleaf->nummarksurfaces;
@@ -593,7 +593,7 @@ R_RenderWorld
 */
 void R_RenderWorld() {
 	int			i;
-	model_t* clmodel;
+	Model_t* clmodel;
 	btofpoly_t	btofpolys[MAX_BTOFPOLYS];
 
 	pbtofpolys = btofpolys;

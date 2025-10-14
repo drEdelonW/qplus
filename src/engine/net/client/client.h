@@ -98,7 +98,7 @@ typedef dlight_t* dlight_p;
 #define MAX_BEAMS 24
 typedef struct {
     int32_t  entity;
-    struct model_s* model;
+    struct Model_s* model;
     float endtime;
     vec3_t start, end;
 } beam_t;
@@ -215,7 +215,7 @@ typedef struct {
     //
     // information that is static for the entire time connected to a server
     //
-    struct model_s* model_precache[MAX_MODELS];
+    struct Model_s* model_precache[MAX_MODELS];
     struct sfx_s* sound_precache[MAX_SOUNDS];
 
     char  levelname[40]; // for display on solo scoreboard
@@ -224,11 +224,11 @@ typedef struct {
     int32_t   gametype;
 
     // refresh related state
-    struct model_s* worldmodel; // cl_entitites[0].model
+    struct Model_s* worldmodel; // cl_entitites[0].model
     struct efrag_s* free_efrags;
     int32_t   num_entities; // held in cl_entities array
     int32_t   num_statics; // held in cl_staticentities array
-    r_entity_t viewent;   // the gun model
+    r_Entity_t viewent;   // the gun model
 
     int32_t   cdtrack, looptrack; // cd audio
 
@@ -250,11 +250,11 @@ extern client_state_t cl;
 
 // FIXME, allocate dynamically
 // extern efrag_t   cl_efrags[MAX_EFRAGS];
-extern r_entity_t   cl_entities[MAX_EDICTS];
-extern r_entity_t   cl_static_entities[MAX_STATIC_ENTITIES];
+extern r_Entity_t   cl_entities[MAX_EDICTS];
+extern r_Entity_t   cl_static_entities[MAX_STATIC_ENTITIES];
 extern lightstyle_t cl_lightstyle[MAX_LIGHTSTYLES];
 extern dlight_t     cl_dlights[MAX_DLIGHTS];
-extern r_entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
+extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
 extern beam_t       cl_beams[MAX_BEAMS];
 
 //=============================================================================
@@ -279,7 +279,7 @@ void CL_NextDemo();
 
 #define MAX_VISEDICTS 256
 extern int32_t      cl_numvisedicts;
-extern r_entity_p   cl_visedicts[MAX_VISEDICTS];
+extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
 
 //
 // cl_input

@@ -40,12 +40,12 @@ typedef uint8_t pixel_t;
 typedef pixel_t* pixel_p;
 
 
-struct vrect_s;
-typedef struct vrect_s vrect_t;
-typedef vrect_t* vrect_p;
-struct vrect_s{
+struct vRect_s;
+typedef struct vRect_s vRect_t;
+typedef vRect_t* vRect_p;
+struct vRect_s{
 	int	    x, y, width, height;
-	vrect_p pnext;
+	vRect_p pnext;
 };
 
 typedef struct{
@@ -91,7 +91,7 @@ void    VID_Init (uint8_p palette);
 void    VID_Shutdown();
 
 // flushes the given rectangles from the view buffer to the screen
-void    VID_Update(vrect_p rects);
+void    VID_Update(vRect_p rects);
 
 // sets the mode; only used by the Quake engine for resetting to mode 0 (the
 // base mode) on memory allocation failures

@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typeless_ptr colormap;
 vec3_t		viewlightvec;
-alight_t	r_viewlighting = { 128, 192, viewlightvec };
+aLight_t	r_viewlighting = { 128, 192, viewlightvec };
 float		r_time1;
 int			r_numallocatededges;
 qboolean	r_drawpolys;
@@ -42,7 +42,7 @@ qboolean	r_dowarp, r_dowarpold, r_viewchanged;
 
 int			numbtofpolys;
 btofpoly_t* pbtofpolys;
-mvertex_t* r_pcurrentvertbase;
+mVertex_p r_pcurrentvertbase;
 
 int			c_surf;
 int			r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
@@ -80,7 +80,7 @@ float	screenAspect;
 float	verticalFieldOfView;
 float	xOrigin, yOrigin;
 
-mplane_t	screenedge[4];
+mPlane_t	screenedge[4];
 
 //
 // refresh flags
@@ -102,9 +102,9 @@ int			r_frustum_indexes[4 * 6];
 int		reinit_surfcache = 1;	// if 1, surface cache is currently empty and
 // must be reinitialized for current cache size
 
-mleaf_t* r_viewleaf, * r_oldviewleaf;
+mLeaf_t* r_viewleaf, * r_oldviewleaf;
 
-texture_p r_notexture_mip;
+Texture_p r_notexture_mip;
 
 float		r_aliastransition, r_resfudge;
 
@@ -129,10 +129,10 @@ void	R_InitTextures() {
     uint8_p dest;
 
     // create a simple checkerboard texture for the default
-    r_notexture_mip = Hunk_AllocName(sizeof(texture_t) + 16 * 16 + 8 * 8 + 4 * 4 + 2 * 2, "notexture");
+    r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + 16 * 16 + 8 * 8 + 4 * 4 + 2 * 2, "notexture");
 
     r_notexture_mip->width = r_notexture_mip->height = 16;
-    r_notexture_mip->offsets[0] = sizeof(texture_t);
+    r_notexture_mip->offsets[0] = sizeof(Texture_t);
     r_notexture_mip->offsets[1] = r_notexture_mip->offsets[0] + 16 * 16;
     r_notexture_mip->offsets[2] = r_notexture_mip->offsets[1] + 8 * 8;
     r_notexture_mip->offsets[3] = r_notexture_mip->offsets[2] + 4 * 4;
@@ -231,7 +231,7 @@ void R_NewMap() {
         r_cnumsurfs = MINSURFACES;
 
     if (r_cnumsurfs > NUMSTACKSURFACES) {
-        surfaces = Hunk_AllocName(r_cnumsurfs * sizeof(surf_t), "surfaces");
+        surfaces = Hunk_AllocName(r_cnumsurfs * sizeof(Surf_t), "surfaces");
         surface_p = surfaces;
         surf_max = &surfaces[r_cnumsurfs];
         r_surfsonstack = false;
@@ -256,7 +256,7 @@ void R_NewMap() {
         auxedges = NULL;
     }
     else {
-        auxedges = Hunk_AllocName(r_numallocatededges * sizeof(edge_t),
+        auxedges = Hunk_AllocName(r_numallocatededges * sizeof(Edge_t),
             "edges");
     }
 
@@ -273,7 +273,7 @@ void R_NewMap() {
 R_SetVrect
 ===============
 */
-void R_SetVrect(vrect_p pvrectin, vrect_p pvrect, int lineadj) {
+void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) {
     int		h;
     float	size;
 
@@ -317,7 +317,7 @@ Called every time the vid structure or r_refdef changes.
 Guaranteed to be called before the first refresh
 ===============
 */
-void R_ViewChanged(vrect_p pvrect, int lineadj, float aspect) {
+void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     int		i;
     float	res_scale;
 
@@ -449,7 +449,7 @@ R_MarkLeaves
 */
 void R_MarkLeaves() {
     uint8_p vis;
-    mnode_t* node;
+    mNode_t* node;
     int		i;
 
     if (r_oldviewleaf == r_viewleaf)
@@ -462,7 +462,7 @@ void R_MarkLeaves() {
 
     for (i = 0; i < cl.worldmodel->numleafs; i++) {
         if (vis[i >> 3] & (1 << (i & 7))) {
-            node = (mnode_t*)&cl.worldmodel->leafs[i + 1];
+            node = (mNode_t*)&cl.worldmodel->leafs[i + 1];
             do {
                 if (node->visframe == r_visframecount)
                     break;
@@ -482,7 +482,7 @@ R_DrawEntitiesOnList
 void R_DrawEntitiesOnList() {
     int			i, j;
     int			lnum;
-    alight_t	lighting;
+    aLight_t	lighting;
     // FIXME: remove and do real lighting
     vec3_t		lightvec = { -1, 0, 0 };
     vec3_t		dist;
@@ -628,7 +628,7 @@ void R_DrawViewModel() {
 R_BmodelCheckBBox
 =============
 */
-int R_BmodelCheckBBox(model_t* clmodel, float_p minmaxs) {
+int R_BmodelCheckBBox(Model_t* clmodel, float_p minmaxs) {
     int			i, * pindex, clipflags;
     vec3_t		acceptpt, rejectpt;
     double		d;
@@ -690,7 +690,7 @@ R_DrawBEntitiesOnList
 void R_DrawBEntitiesOnList() {
     int			i, j, k, clipflags;
     vec3_t		oldorigin;
-    model_t* clmodel;
+    Model_t* clmodel;
     float		minmaxs[6];
 
     if (!r_drawentities.value)
@@ -807,20 +807,20 @@ R_EdgeDrawing
 */
 void R_EdgeDrawing() {
 #if 0
-    edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(edge_t)) + 1];
-    surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(surf_t)) + 1];
+    Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 1];
+    Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 1];
 #else
     /* запас +2: выравнивание + место для surfaces-1 */
-    edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(edge_t)) + 2];
-    surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(surf_t)) + 2];
+    Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 2];
+    Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2];
 
 #endif
-#  define ALIGN_PTR(p, a) ((void*)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
+#  define ALIGN_PTR(p, a) ((typeless_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
     if (auxedges) {
         r_edges = auxedges;
     }
     else {
-        r_edges = (edge_ptr)
+        r_edges = (Edge_p)
             // (((uintptr_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
             ALIGN_PTR(&ledges[0], CACHE_SIZE);
 
@@ -828,7 +828,7 @@ void R_EdgeDrawing() {
 
 #if 0
     if (r_surfsonstack) {
-        surfaces = (surf_t*)
+        surfaces = (Surf_t*)
             (((uintptr_t)&lsurfs[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
         surf_max = &surfaces[r_cnumsurfs];
         // surface 0 doesn't really exist; it's just a dummy because index 0
@@ -839,7 +839,7 @@ void R_EdgeDrawing() {
 #else
     if (r_surfsonstack) {
         /* выравниваем от (lsurfs + 1), чтобы потом surfaces = base - 1 было легально */
-        surf_t* base = (surf_t*)ALIGN_PTR(&lsurfs[1], CACHE_SIZE);
+        Surf_t* base = (Surf_t*)ALIGN_PTR(&lsurfs[1], CACHE_SIZE);
         surfaces = base - 1; /* surfaces[1] указывает ровно на base */
         surf_max = &surfaces[r_cnumsurfs];
         /* surface 0 — фиктивный элемент */

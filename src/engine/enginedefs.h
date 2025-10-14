@@ -147,7 +147,7 @@ typedef struct {
     int32_t colormap;
     int32_t skin;
     int32_t effects;
-} entity_state_t;
+} EntityState_t;
 
 
 extern bool noclip_anglehack;

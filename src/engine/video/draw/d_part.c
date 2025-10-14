@@ -50,7 +50,7 @@ void D_StartParticles() {
 D_DrawParticle
 ==============
 */
-void D_DrawParticle(particle_p pparticle) {
+void D_DrawParticle(Particle_p pparticle) {
 	vec3_t	local, transformed;
 	float	zi;
 	uint8_p pdest;

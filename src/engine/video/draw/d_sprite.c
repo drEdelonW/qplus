@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 static int		sprite_height;
 static int		minindex, maxindex;
-static sspan_t* sprite_spans;
+static sSpan_t* sprite_spans;
 
 #if	!id386
 
@@ -34,7 +34,7 @@ static sspan_t* sprite_spans;
 D_SpriteDrawSpans
 =====================
 */
-void D_SpriteDrawSpans(sspan_t* pspan) {
+void D_SpriteDrawSpans(sSpan_t* pspan) {
 	int			count, spancount, izistep;
 	int			izi;
 	fixed16_t	s, t, snext, tnext;
@@ -181,8 +181,8 @@ D_SpriteScanLeftEdge
 */
 void D_SpriteScanLeftEdge() {
 	int			i, v, itop, ibottom, lmaxindex;
-	emitpoint_p	pvert, pnext;
-	sspan_t* pspan;
+	EmitPoint_p	pvert, pnext;
+	sSpan_t* pspan;
 	float		du, dv, vtop, vbottom, slope;
 	fixed16_t	u, u_step;
 
@@ -239,8 +239,8 @@ D_SpriteScanRightEdge
 */
 void D_SpriteScanRightEdge() {
 	int			i, v, itop, ibottom;
-	emitpoint_p	pvert, pnext;
-	sspan_t* pspan;
+	EmitPoint_p	pvert, pnext;
+	sSpan_t* pspan;
 	float		du, dv, vtop, vbottom, slope, uvert, unext, vvert, vnext;
 	fixed16_t	u, u_step;
 
@@ -360,14 +360,14 @@ D_DrawSprite
 =====================
 */
 void D_DrawSprite() {
-	sspan_t spans[MAXHEIGHT + 1];
+	sSpan_t spans[MAXHEIGHT + 1];
 	sprite_spans = spans;
 
 	// find the top and bottom vertices, and make sure there's at least one scan to
 	// draw
 	float ymin = 999999.9;
 	float ymax = -999999.9;
-	emitpoint_p pverts = r_spritedesc.pverts;
+	EmitPoint_p pverts = r_spritedesc.pverts;
 
 	for (int i = 0; i < r_spritedesc.nump; i++) {
 		if (pverts->v < ymin) {

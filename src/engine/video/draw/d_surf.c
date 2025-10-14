@@ -27,7 +27,7 @@ float surfscale;
 qboolean r_cache_thrash;         // set if surface cache is thrashing
 
 int sc_size;
-surfcache_t* sc_rover, * sc_base;
+SurfCache_t* sc_rover, * sc_base;
 
 #define GUARDSIZE 4
 
@@ -70,7 +70,7 @@ void D_InitCaches(typeless_ptr buffer, int size) {
 		Con_Printf("%ik surface cache\n", size / 1024);
 
 	sc_size = size - GUARDSIZE;
-	sc_base = (surfcache_t*)buffer;
+	sc_base = (SurfCache_t*)buffer;
 	sc_rover = sc_base;
 
 	sc_base->next = NULL;
@@ -87,7 +87,7 @@ D_FlushCaches
 ==================
 */
 void D_FlushCaches() {
-	surfcache_t* c;
+	SurfCache_t* c;
 
 	if (!sc_base)
 		return;
@@ -108,8 +108,8 @@ void D_FlushCaches() {
 D_SCAlloc
 =================
 */
-surfcache_t* D_SCAlloc(int width, int size) {
-	surfcache_t* new;
+SurfCache_t* D_SCAlloc(int width, int size) {
+	SurfCache_t* new;
 	qboolean wrapped_this_time;
 
 	if ((width < 0) || (width > 256))
@@ -118,7 +118,7 @@ surfcache_t* D_SCAlloc(int width, int size) {
 	if ((size <= 0) || (size > 0x10000))
 		Sys_Error("D_SCAlloc: bad cache size %d\n", size);
 
-	size = (int)(offsetof(surfcache_t, data) + size);
+	size = (int)(offsetof(SurfCache_t, data) + size);
 	size = (size + 3) & ~3;
 	if (size > sc_size)
 		Sys_Error("D_SCAlloc: %i > cache size", size);
@@ -133,7 +133,7 @@ surfcache_t* D_SCAlloc(int width, int size) {
 		sc_rover = sc_base;
 	}
 
-	// colect and free surfcache_t blocks until the rover block is large enough
+	// colect and free SurfCache_t blocks until the rover block is large enough
 	new = sc_rover;
 	if (sc_rover->owner)
 		*sc_rover->owner = NULL;
@@ -152,7 +152,7 @@ surfcache_t* D_SCAlloc(int width, int size) {
 
 	// create a fragment out of any leftovers
 	if (new->size - size > 256) {
-		sc_rover = (surfcache_t*)((uint8_p)new + size);
+		sc_rover = (SurfCache_t*)((uint8_p)new + size);
 		sc_rover->size = new->size - size;
 		sc_rover->next = new->next;
 		sc_rover->width = 0;
@@ -189,7 +189,7 @@ D_SCDump
 =================
 */
 void D_SCDump() {
-	surfcache_t* test;
+	SurfCache_t* test;
 
 	for (test = sc_base; test; test = test->next) {
 		if (test == sc_rover)
@@ -231,8 +231,8 @@ int D_log2(int num) {
 D_CacheSurface
 ================
 */
-surfcache_t* D_CacheSurface(msurface_t* surface, int miplevel) {
-	surfcache_t* cache;
+SurfCache_t* D_CacheSurface(mSurface_t* surface, int miplevel) {
+	SurfCache_t* cache;
 
 	//
 	// if the surface is animating or flashing, flush the cache

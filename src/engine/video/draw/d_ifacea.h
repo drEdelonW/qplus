@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // !!! if this is changed, it must be changed in quakedef.h too !!!
 #define CACHE_SIZE	32		// used to align key data structures
 
-// particle_t structure
+// Particle_t structure
 // !!! if this is changed, it must be changed in d_iface.h too !!!
 // driver-usable fields
 #define pt_org				0
@@ -59,7 +59,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define PARTICLE_Z_CLIP	8.0
 
-// finalvert_t structure
+// FinalVert_t structure
 // !!! if this is changed, it must be changed in d_iface.h too !!!
 #define fv_v				0	// !!! if this is moved, cases where the !!!
 								// !!! address of this field is pushed in !!!
@@ -78,13 +78,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define stv_size	12
 
 
-// trivertx_t structure
+// TriVertx_t structure
 // !!! if this is changed, it must be changed in modelgen.h too !!!
 #define tv_v				0
 #define tv_lightnormalindex	3
 #define tv_size				4
 
-// affinetridesc_t structure
+// AffineTriDesc_t structure
 // !!! if this is changed, it must be changed in d_iface.h too !!!
 #define atd_pskin			0
 #define atd_pskindesc		4

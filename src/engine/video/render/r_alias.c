@@ -27,27 +27,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LIGHT_MIN	5		// lowest light value we'll allow, to avoid the
                             //  need for inner-loop light clamping
 
-mtriangle_p ptriangles;
-affinetridesc_t	r_affinetridesc;
+mTriangle_p ptriangles;
+AffineTriDesc_t	r_affinetridesc;
 
 typeless_ptr 			acolormap;	// FIXME: should go away
 
-trivertx_p r_apverts;
+TriVertx_p r_apverts;
 
 // TODO: these probably will go away with optimized rasterization
-mdl_p   pmdl;
+Mdl_p   pmdl;
 vec3_t  r_plightvec;
 int     r_ambientlight;
 float   r_shadelight;
-aliashdr_p  paliashdr;
-finalvert_p pfinalverts;
-auxvert_p   pauxverts;
+AliasHdr_p  paliashdr;
+FinalVert_p pfinalverts;
+AuxVert_p   pauxverts;
 static float    ziscale;
-static model_p  pmodel;
+static Model_p  pmodel;
 
 static vec3_t   alias_forward, alias_right, alias_up;
 
-static maliasskindesc_p pskindesc;
+static mAliasSkinDesc_p pskindesc;
 
 int r_amodels_drawn;
 int a_skinwidth;
@@ -58,9 +58,9 @@ float aliastransform[3][4];
 typedef struct {
     int	index0;
     int	index1;
-} aedge_t;
+} aEdge_t;
 
-static aedge_t	aedges[12] = {
+static aEdge_t	aedges[12] = {
 {0, 1}, {1, 2}, {2, 3}, {3, 0},
 {4, 5}, {5, 6}, {6, 7}, {7, 4},
 {0, 5}, {1, 4}, {2, 7}, {3, 6}
@@ -72,11 +72,11 @@ float	r_avertexnormals[NUMVERTEXNORMALS][3] = {
 #include "anorms.h"
 };
 
-void R_AliasTransformAndProjectFinalVerts(finalvert_p fv, stvert_p pstverts);
+void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stvert_p pstverts);
 void R_AliasSetUpTransform(int trivial_accept);
 void R_AliasTransformVector(vec3_t in, vec3_t out);
-void R_AliasTransformFinalVert(finalvert_p fv, auxvert_p av, trivertx_p pverts, stvert_p pstverts);
-void R_AliasProjectFinalVert(finalvert_p fv, auxvert_p av);
+void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stvert_p pstverts);
+void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av);
 
 
 /*
@@ -86,16 +86,16 @@ R_AliasCheckBBox
 */
 qboolean R_AliasCheckBBox() {
     float       basepts[8][3];
-    finalvert_t viewpts[16];
-    auxvert_t   viewaux[16];
+    FinalVert_t viewpts[16];
+    AuxVert_t   viewaux[16];
 
 
     // expand, rotate, and translate points into worldspace
 
     currententity->trivial_accept = 0;
     pmodel = currententity->model;
-    aliashdr_p pahdr = Mod_Extradata(pmodel);
-    pmdl = (mdl_p)((uint8_p)pahdr + pahdr->model);
+    AliasHdr_p pahdr = Mod_Extradata(pmodel);
+    pmdl = (Mdl_p)((uint8_p)pahdr + pahdr->model);
 
     R_AliasSetUpTransform(0);
 
@@ -108,7 +108,7 @@ qboolean R_AliasCheckBBox() {
         frame = 0;
     }
 
-    maliasframedesc_p pframedesc = &pahdr->frames[frame];
+    mAliasFrameDesc_p pframedesc = &pahdr->frames[frame];
 
     // x worldspace coordinates
     basepts[0][0] = basepts[1][0] = basepts[2][0] = basepts[3][0] =
@@ -160,10 +160,10 @@ qboolean R_AliasCheckBBox() {
         // reject)
         for (int i = 0; i < 12; i++) {
             // edge endpoints
-            finalvert_p pv0 = &viewpts[aedges[i].index0];
-            finalvert_p pv1 = &viewpts[aedges[i].index1];
-            auxvert_p pa0 = &viewaux[aedges[i].index0];
-            auxvert_p pa1 = &viewaux[aedges[i].index1];
+            FinalVert_p pv0 = &viewpts[aedges[i].index0];
+            FinalVert_p pv1 = &viewpts[aedges[i].index1];
+            AuxVert_p pa0 = &viewaux[aedges[i].index0];
+            AuxVert_p pa1 = &viewaux[aedges[i].index1];
 
             // if one end is clipped and the other isn't, make a new point
             if (pv0->flags ^ pv1->flags) {
@@ -248,8 +248,8 @@ General clipped case
 void R_AliasPreparePoints() {
     stvert_p pstverts = (stvert_p)((uint8_p)paliashdr + paliashdr->stverts);
     r_anumverts = pmdl->numverts;
-    finalvert_p fv = pfinalverts;
-    auxvert_p av = pauxverts;
+    FinalVert_p fv = pfinalverts;
+    AuxVert_p av = pauxverts;
 
     for (int i = 0; i < r_anumverts; i++, fv++, av++, r_apverts++, pstverts++) {
         R_AliasTransformFinalVert(fv, av, r_apverts, pstverts);
@@ -274,9 +274,9 @@ void R_AliasPreparePoints() {
     //
     r_affinetridesc.numtriangles = 1;
 
-    mtriangle_p ptri = (mtriangle_p)((uint8_p)paliashdr + paliashdr->triangles);
+    mTriangle_p ptri = (mTriangle_p)((uint8_p)paliashdr + paliashdr->triangles);
     for (int i = 0; i < pmdl->numtris; i++, ptri++) {
-        finalvert_p pfv[3] = {
+        FinalVert_p pfv[3] = {
             &pfinalverts[ptri->vertindex[0]],
             &pfinalverts[ptri->vertindex[1]],
             &pfinalverts[ptri->vertindex[2]]
@@ -375,7 +375,7 @@ void R_AliasSetUpTransform(int trivial_accept) {
 R_AliasTransformFinalVert
 ================
 */
-void R_AliasTransformFinalVert(finalvert_p fv, auxvert_p av, trivertx_p pverts, stvert_p pstverts) {
+void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stvert_p pstverts) {
     av->fv[0] = DotProduct(pverts->v, aliastransform[0]) +
         aliastransform[0][3];
     av->fv[1] = DotProduct(pverts->v, aliastransform[1]) +
@@ -413,8 +413,8 @@ void R_AliasTransformFinalVert(finalvert_p fv, auxvert_p av, trivertx_p pverts, 
 R_AliasTransformAndProjectFinalVerts
 ================
 */
-void R_AliasTransformAndProjectFinalVerts(finalvert_p fv, stvert_p pstverts) {
-    trivertx_p pverts = r_apverts;
+void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stvert_p pstverts) {
+    TriVertx_p pverts = r_apverts;
 
     for (int i = 0; i < r_anumverts; i++, fv++, pverts++, pstverts++) {
         // transform and project
@@ -461,7 +461,7 @@ void R_AliasTransformAndProjectFinalVerts(finalvert_p fv, stvert_p pstverts) {
 R_AliasProjectFinalVert
 ================
 */
-void R_AliasProjectFinalVert(finalvert_p fv, auxvert_p av) {
+void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av) {
     // project points
     float zi = 1.0 / av->fv[2];
 
@@ -481,7 +481,7 @@ void R_AliasPrepareUnclippedPoints() {
     stvert_p pstverts = (stvert_p)((uint8_p)paliashdr + paliashdr->stverts);
     r_anumverts = pmdl->numverts;
     // FIXME: just use pfinalverts directly?
-    finalvert_p fv = pfinalverts;
+    FinalVert_p fv = pfinalverts;
 
     R_AliasTransformAndProjectFinalVerts(fv, pstverts);
 
@@ -489,7 +489,7 @@ void R_AliasPrepareUnclippedPoints() {
         D_PolysetDrawFinalVerts(fv, r_anumverts);
 
     r_affinetridesc.pfinalverts = pfinalverts;
-    r_affinetridesc.ptriangles = (mtriangle_p)
+    r_affinetridesc.ptriangles = (mTriangle_p)
         ((uint8_p)paliashdr + paliashdr->triangles);
     r_affinetridesc.numtriangles = pmdl->numtris;
 
@@ -509,12 +509,12 @@ void R_AliasSetupSkin() {
     }
 
     pskindesc =
-        ((maliasskindesc_p)((uint8_p)paliashdr + paliashdr->skindesc)) + skinnum;
+        ((mAliasSkinDesc_p)((uint8_p)paliashdr + paliashdr->skindesc)) + skinnum;
     a_skinwidth = pmdl->skinwidth;
 
     if (pskindesc->type == ALIAS_SKIN_GROUP) {
-        maliasskingroup_p paliasskingroup =
-            (maliasskingroup_p)((uint8_p)paliashdr + pskindesc->skin);
+        mAliasSkinGroup_p paliasskingroup =
+            (mAliasSkinGroup_p)((uint8_p)paliashdr + pskindesc->skin);
         float_p pskinintervals =
             (float_p)((uint8_p)paliashdr + paliasskingroup->intervals);
         int numskins = paliasskingroup->numskins;
@@ -547,7 +547,7 @@ void R_AliasSetupSkin() {
 R_AliasSetupLighting
 ================
 */
-void R_AliasSetupLighting(alight_p plighting) {
+void R_AliasSetupLighting(aLight_p plighting) {
 
     // guarantee that no vertex will ever be lit below LIGHT_MIN, so we don't have
     // to clamp off the bottom
@@ -590,12 +590,12 @@ void R_AliasSetupFrame() {
 
     if (paliashdr->frames[frame].type == ALIAS_SINGLE) {
         r_apverts =
-            (trivertx_p)((uint8_p)paliashdr + paliashdr->frames[frame].frame);
+            (TriVertx_p)((uint8_p)paliashdr + paliashdr->frames[frame].frame);
         return;
     }
 
-    maliasgroup_p paliasgroup =
-        (maliasgroup_p)((uint8_p)paliashdr + paliashdr->frames[frame].frame);
+    mAliasGroup_p paliasgroup =
+        (mAliasGroup_p)((uint8_p)paliashdr + paliashdr->frames[frame].frame);
     float_p pintervals =
         (float_p)((uint8_p)paliashdr + paliasgroup->intervals);
     int numframes = paliasgroup->numframes;
@@ -616,7 +616,7 @@ void R_AliasSetupFrame() {
     }
 
     r_apverts =
-        (trivertx_p)((uint8_p)paliashdr + paliasgroup->frames[i].frame);
+        (TriVertx_p)((uint8_p)paliashdr + paliasgroup->frames[i].frame);
 }
 
 
@@ -625,20 +625,20 @@ void R_AliasSetupFrame() {
 R_AliasDrawModel
 ================
 */
-void R_AliasDrawModel(alight_p plighting) {
-    finalvert_t		finalverts[MAXALIASVERTS +
-        ((CACHE_SIZE - 1) / sizeof(finalvert_t)) + 1];
-    auxvert_t		auxverts[MAXALIASVERTS];
+void R_AliasDrawModel(aLight_p plighting) {
+    FinalVert_t		finalverts[MAXALIASVERTS +
+        ((CACHE_SIZE - 1) / sizeof(FinalVert_t)) + 1];
+    AuxVert_t		auxverts[MAXALIASVERTS];
 
     r_amodels_drawn++;
 
     // cache align
-    pfinalverts = (finalvert_p)
+    pfinalverts = (FinalVert_p)
         (((uintptr_t)&finalverts[0] + CACHE_SIZE - 1) & ~(uintptr_t)(CACHE_SIZE - 1));
     pauxverts = &auxverts[0];
 
-    paliashdr = (aliashdr_p)Mod_Extradata(currententity->model);
-    pmdl = (mdl_p)((uint8_p)paliashdr + paliashdr->model);
+    paliashdr = (AliasHdr_p)Mod_Extradata(currententity->model);
+    pmdl = (Mdl_p)((uint8_p)paliashdr + paliashdr->model);
 
     R_AliasSetupSkin();
     R_AliasSetUpTransform(currententity->trivial_accept);

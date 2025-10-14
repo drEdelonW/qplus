@@ -33,7 +33,7 @@ typedef struct vmode_s {
 	typeless_ptr pextradata;
 	int			(*setmode)(viddef_p vid, struct vmode_s* pcurrentmode);
 	void		(*swapbuffers)(viddef_p vid, struct vmode_s* pcurrentmode,
-		vrect_p rects);
+		vRect_p rects);
 	void		(*setpalette)(viddef_p vid, struct vmode_s* pcurrentmode,
 		uint8_p palette);
 	void		(*begindirectrect)(viddef_p vid, struct vmode_s* pcurrentmode,
@@ -72,7 +72,7 @@ void VGA_WaitVsync();
 void VGA_ClearVideoMem(int planar);
 void VGA_SetPalette(viddef_p vid, vmode_t* pcurrentmode, uint8_p pal);
 void VGA_SwapBuffersCopy(viddef_p vid, vmode_t* pcurrentmode,
-	vrect_p rects);
+	vRect_p rects);
 qboolean VGA_FreeAndAllocVidbuffer(viddef_p vid, int allocnewbuffer);
 qboolean VGA_CheckAdequateMem(int width, int height, int rowbytes,
 	int allocnewbuffer);

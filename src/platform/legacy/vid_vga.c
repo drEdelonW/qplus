@@ -388,7 +388,7 @@ VGA_SwapBuffersCopy
 ================
 */
 void VGA_SwapBuffersCopy(viddef_p lvid, vmode_t* pcurrentmode,
-	vrect_p rects) {
+	vRect_p rects) {
 
 	UNUSED(pcurrentmode);
 
@@ -422,7 +422,7 @@ void VGA_SwapBuffersCopy(viddef_p lvid, vmode_t* pcurrentmode,
 VGA_SwapBuffers
 ================
 */
-void VGA_SwapBuffers(viddef_p lvid, vmode_t* pcurrentmode, vrect_p rects) {
+void VGA_SwapBuffers(viddef_p lvid, vmode_t* pcurrentmode, vRect_p rects) {
 	UNUSED(lvid);
 
 	if (vid_wait.value == VID_WAIT_VSYNC)

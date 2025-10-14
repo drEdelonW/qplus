@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define NUM_MIPS	4
 
-surfcache_p d_initial_rover;
+SurfCache_p d_initial_rover;
 qboolean        d_roverwrapped;
 int             d_minmip;
 float           d_scalemip[NUM_MIPS - 1];
@@ -33,7 +33,7 @@ static float	basemip[NUM_MIPS - 1] = { 1.0, 0.5 * 0.8, 0.25 * 0.8 };
 
 extern int			d_aflatcolor;
 
-void (*d_drawspans) (espan_p pspan);
+void (*d_drawspans) (eSpan_p pspan);
 
 
 /*
@@ -61,7 +61,7 @@ void D_Init() {
 D_CopyRects
 ===============
 */
-void D_CopyRects(vrect_p prects, int transparent) {
+void D_CopyRects(vRect_p prects, int transparent) {
 
 	// this function is only required if the CPU doesn't have direct access to the
 	// back buffer, and there's some driver interface function that the driver
@@ -152,7 +152,7 @@ void D_SetupFrame() {
 D_UpdateRects
 ===============
 */
-void D_UpdateRects(vrect_p prect) {
+void D_UpdateRects(vRect_p prect) {
 
 	// the software driver draws these directly to the vid buffer
 

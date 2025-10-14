@@ -645,14 +645,14 @@ typedef	struct {
 
 #ifdef	BUILD_MGL
 struct _span_t;
-typedef	struct _span_t	span_t;
+typedef	struct _span_t	Span_t;
 #else
-typedef void		span_t;
+typedef void		Span_t;
 #endif
 
 typedef struct {
 	rect_t      rect;			/* Bounding rectangle for region		*/
-	span_t* spans;			/* Start of span list for region		*/
+	Span_t* spans;			/* Start of span list for region		*/
 } region_t;
 
 /* Palette entry structure	*/

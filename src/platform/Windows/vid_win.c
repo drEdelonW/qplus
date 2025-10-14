@@ -2042,7 +2042,7 @@ void	VID_Shutdown(void) {
 FlipScreen
 ================
 */
-void FlipScreen(vrect_t* rects) {
+void FlipScreen(vRect_t* rects) {
     // HRESULT		ddrval;
 
     // Flip the surfaces
@@ -2116,8 +2116,8 @@ void FlipScreen(vrect_t* rects) {
 }
 
 
-void	VID_Update(vrect_t* rects) {
-    vrect_t	rect;
+void	VID_Update(vRect_t* rects) {
+    vRect_t	rect;
     RECT	trect;
 
     if (!vid_palettized && palette_changed) {
@@ -2210,7 +2210,7 @@ D_BeginDirectRect
 */
 void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
     int		i, j, reps, repshift;
-    vrect_t	rect;
+    vRect_t	rect;
 
     if (!vid_initialized)
         return;
@@ -2296,7 +2296,7 @@ D_EndDirectRect
 */
 void D_EndDirectRect(int x, int y, int width, int height) {
     int		i, j, reps, repshift;
-    vrect_t	rect;
+    vRect_t	rect;
 
     if (!vid_initialized)
         return;

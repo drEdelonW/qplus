@@ -1536,7 +1536,7 @@ void Host_Viewmodel_f() {
     if (!e)
         return;
 
-    model_p m = Mod_ForName(Cmd_Argv(1), false);
+    Model_p m = Mod_ForName(Cmd_Argv(1), false);
     if (!m) {
         Con_Printf("Can't load %s\n", Cmd_Argv(1));
         return;
@@ -1555,7 +1555,7 @@ void Host_Viewframe_f() {
     edict_p e = FindViewthing();
     if (!e)
         return;
-    model_p m = cl.model_precache[(int)e->v.modelindex];
+    Model_p m = cl.model_precache[(int)e->v.modelindex];
 
     int f = atoi(Cmd_Argv(1));
     if (f >= m->numframes)
@@ -1565,11 +1565,11 @@ void Host_Viewframe_f() {
 }
 
 
-void PrintFrameName(model_p m, int frame) {
-    aliashdr_p hdr = (aliashdr_p)Mod_Extradata(m);
+void PrintFrameName(Model_p m, int frame) {
+    AliasHdr_p hdr = (AliasHdr_p)Mod_Extradata(m);
     if (!hdr)
         return;
-    maliasframedesc_p pframedesc = &hdr->frames[frame];
+    mAliasFrameDesc_p pframedesc = &hdr->frames[frame];
 
     Con_Printf("frame %i: %s\n", frame, pframedesc->name);
 }
@@ -1583,7 +1583,7 @@ void Host_Viewnext_f() {
     edict_p e = FindViewthing();
     if (!e)
         return;
-    model_p m = cl.model_precache[(int)e->v.modelindex];
+    Model_p m = cl.model_precache[(int)e->v.modelindex];
 
     e->v.frame = e->v.frame + 1;
     if (e->v.frame >= m->numframes)
@@ -1602,7 +1602,7 @@ void Host_Viewprev_f() {
     if (!e)
         return;
 
-    model_p m = cl.model_precache[(int)e->v.modelindex];
+    Model_p m = cl.model_precache[(int)e->v.modelindex];
 
     e->v.frame = e->v.frame - 1;
     if (e->v.frame < 0)

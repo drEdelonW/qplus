@@ -77,9 +77,9 @@ D_DrawSolidSurface
 
 // FIXME: clean this up
 
-void D_DrawSolidSurface(surf_p surf, int color) {
+void D_DrawSolidSurface(Surf_p surf, int color) {
     int pix = (color << 24) | (color << 16) | (color << 8) | color;
-    for (espan_p span = surf->spans; span; span = span->pnext) {
+    for (eSpan_p span = surf->spans; span; span = span->pnext) {
         uint8_p pdest = (uint8_p)d_viewbuffer + screenwidth * span->v;
         int u = span->u;
         int u2 = span->u + span->count - 1;
@@ -109,8 +109,8 @@ void D_DrawSolidSurface(surf_p surf, int color) {
 D_CalcGradients
 ==============
 */
-void D_CalcGradients(msurface_p pface) {
-    // mplane_p  pplane = pface->plane;
+void D_CalcGradients(mSurface_p pface) {
+    // mPlane_p  pplane = pface->plane;
 
     float mipscale = 1.0 / (float)(1 << _miplevel);
 
@@ -170,7 +170,7 @@ void D_DrawSurfaces() {
 
     // TODO: could preset a lot of this at mode set time
     if (r_drawflat.value) {
-        for (surf_p s = &surfaces[1]; s < surface_p; s++) {
+        for (Surf_p s = &surfaces[1]; s < surface_p; s++) {
             if (!s->spans)
                 continue;
 
@@ -184,7 +184,7 @@ void D_DrawSurfaces() {
         }
     }
     else {
-        for (surf_p s = &surfaces[1]; s < surface_p; s++) {
+        for (Surf_p s = &surfaces[1]; s < surface_p; s++) {
             if (!s->spans)
                 continue;
 
@@ -213,7 +213,7 @@ void D_DrawSurfaces() {
                 D_DrawZSpans(s->spans);
             }
             else if (s->flags & SURF_DRAWTURB) {
-                msurface_p pface = s->data;
+                mSurface_p pface = s->data;
                 _miplevel = 0;
                 cacheblock = (pixel_p)
                     ((uint8_p)pface->texinfo->texture +
@@ -268,14 +268,14 @@ void D_DrawSurfaces() {
                     // make entity passed in
                 }
 
-                msurface_p pface = s->data;
+                mSurface_p pface = s->data;
                 _miplevel = D_MipLevelForScale(
                     s->nearzi * scale_for_mip *
                     pface->texinfo->mipadjust
                 );
 
                 // FIXME: make this passed in to D_CacheSurface
-                surfcache_p pcurrentcache = D_CacheSurface(pface, _miplevel);
+                SurfCache_p pcurrentcache = D_CacheSurface(pface, _miplevel);
 
                 cacheblock = (pixel_p)pcurrentcache->data;
                 cachewidth = pcurrentcache->width;

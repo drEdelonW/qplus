@@ -331,12 +331,12 @@ void SV_ClearDatagram() {
 int     fatbytes;
 uint8_t    fatpvs[MAX_MAP_LEAFS / 8];
 
-void SV_AddToFatPVS(vec3_t org, mnode_p node) {
+void SV_AddToFatPVS(vec3_t org, mNode_p node) {
     while (1) {
         // if this is a leaf, accumulate the pvs bits
         if (node->contents < 0) {
             if (node->contents != CONTENTS_SOLID) {
-                uint8_p pvs = Mod_LeafPVS((mleaf_t*)node, sv.worldmodel);
+                uint8_p pvs = Mod_LeafPVS((mLeaf_t*)node, sv.worldmodel);
                 for (int i = 0; i < fatbytes; i++) {
                     fatpvs[i] |= pvs[i];
                 }
@@ -344,7 +344,7 @@ void SV_AddToFatPVS(vec3_t org, mnode_p node) {
             return;
         }
 
-        mplane_p plane = node->plane;
+        mPlane_p plane = node->plane;
         float d = DotProduct(org, plane->normal) - plane->dist;
         if (d > 8)
             node = node->children[0];

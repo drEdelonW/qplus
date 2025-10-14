@@ -924,9 +924,9 @@ void GetEvent(void)
 // flushes the given rectangles from the view buffer to the screen
 
 void
-VID_Update (vrect_p rects)
+VID_Update (vRect_p rects)
 {
-	void VID_Update_MT(vrect_p );
+	void VID_Update_MT(vRect_p );
 
 
 	if (count_frames) {
@@ -1018,7 +1018,7 @@ VID_Update (vrect_p rects)
 }
 
 void
-VID_Update_MT (vrect_p rects)
+VID_Update_MT (vRect_p rects)
 {
 	XilImage sched_update();
 

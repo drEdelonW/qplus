@@ -305,7 +305,7 @@ void VID_Shutdown() {
 VID_Update
 ================
 */
-void    VID_Update(vrect_p rects) {
+void    VID_Update(vRect_p rects) {
 	if (firstupdate && _vid_default_mode.value) {
 		if (_vid_default_mode.value >= numvidmodes)
 			Cvar_SetValue("_vid_default_mode", 0);

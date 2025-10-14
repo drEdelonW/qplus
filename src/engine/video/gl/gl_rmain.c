@@ -21,17 +21,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-entity_t	r_worldentity;
+Entity_t	r_worldentity;
 
 qboolean	r_cache_thrash;		// compatability
 
 vec3_t		modelorg, r_entorigin;
-entity_t* currententity;
+Entity_t* currententity;
 
 int			r_visframecount;	// bumped when going to a new PVS
 int			r_framecount;		// used for dlight push checking
 
-mplane_t	frustum[4];
+mPlane_t	frustum[4];
 
 int			c_brush_polys, c_alias_polys;
 
@@ -46,7 +46,7 @@ int			playertextures;		// up to 16 color translated skins
 
 int			mirrortexturenum;	// quake texturenum, not gltexturenum
 qboolean	mirror;
-mplane_t* mirror_plane;
+mPlane_t* mirror_plane;
 
 //
 // view origin
@@ -64,9 +64,9 @@ float	r_base_world_matrix[16];
 //
 refdef_t	r_refdef;
 
-mleaf_t* r_viewleaf, * r_oldviewleaf;
+mLeaf_t* r_viewleaf, * r_oldviewleaf;
 
-texture_t* r_notexture_mip;
+Texture_t* r_notexture_mip;
 
 int		d_lightstylevalue[256];	// 8.8 fraction of base light value
 
@@ -118,7 +118,7 @@ qboolean R_CullBox(vec3_t mins, vec3_t maxs) {
 }
 
 
-void R_RotateForEntity(entity_t* e) {
+void R_RotateForEntity(Entity_t* e) {
 	glTranslatef(e->origin[0], e->origin[1], e->origin[2]);
 
 	glRotatef(e->angles[1], 0, 0, 1);
@@ -139,12 +139,12 @@ void R_RotateForEntity(entity_t* e) {
 R_GetSpriteFrame
 ================
 */
-mspriteframe_t* R_GetSpriteFrame(entity_t* currententity) {
-	msprite_t* psprite;
-	mspritegroup_t* pspritegroup;
-	mspriteframe_t* pspriteframe;
+mSpriteFrame_t* R_GetSpriteFrame(Entity_t* currententity) {
+	mSprite_t* psprite;
+	mSpriteGroup_t* pspritegroup;
+	mSpriteFrame_t* pspriteframe;
 	int				i, numframes, frame;
-	float* pintervals, fullinterval, targettime, time;
+	float_p pintervals, fullinterval, targettime, time;
 
 	psprite = currententity->model->cache.data;
 	frame = currententity->frame;
@@ -158,7 +158,7 @@ mspriteframe_t* R_GetSpriteFrame(entity_t* currententity) {
 		pspriteframe = psprite->frames[frame].frameptr;
 	}
 	else {
-		pspritegroup = (mspritegroup_t*)psprite->frames[frame].frameptr;
+		pspritegroup = (mSpriteGroup_t*)psprite->frames[frame].frameptr;
 		pintervals = pspritegroup->intervals;
 		numframes = pspritegroup->numframes;
 		fullinterval = pintervals[numframes-1];
@@ -187,12 +187,12 @@ R_DrawSpriteModel
 
 =================
 */
-void R_DrawSpriteModel(entity_t* e) {
+void R_DrawSpriteModel(Entity_t* e) {
 	vec3_t	point;
-	mspriteframe_t* frame;
-	float* up, * right;
+	mSpriteFrame_t* frame;
+	float_p up, right;
 	vec3_t		v_forward, v_right, v_up;
-	msprite_t* psprite;
+	mSprite_t* psprite;
 
 	// don't even bother culling, because it's just a single
 	// polygon without a surface cache
@@ -267,7 +267,7 @@ float	r_avertexnormal_dots[SHADEDOT_QUANT][256] =
 #include "anorm_dots.h"
 ;
 
-float* shadedots = r_avertexnormal_dots[0];
+float_p shadedots = r_avertexnormal_dots[0];
 
 int	lastposenum;
 
@@ -276,21 +276,21 @@ int	lastposenum;
 GL_DrawAliasFrame
 =============
 */
-void GL_DrawAliasFrame(aliashdr_t* paliashdr, int posenum) {
+void GL_DrawAliasFrame(AliasHdr_t* paliashdr, int posenum) {
 	float	s, t;
 	float 	l;
 	int		i, j;
 	int		index;
-	trivertx_t* v, * verts;
+	TriVertx_t* v, * verts;
 	int		list;
 	int* order;
 	vec3_t	point;
-	float* normal;
+	float_p normal;
 	int		count;
 
 	lastposenum = posenum;
 
-	verts = (trivertx_t*)((byte*)paliashdr + paliashdr->posedata);
+	verts = (TriVertx_t*)((byte*)paliashdr + paliashdr->posedata);
 	verts += posenum * paliashdr->poseverts;
 	order = (int*)((byte*)paliashdr + paliashdr->commands);
 
@@ -308,7 +308,7 @@ void GL_DrawAliasFrame(aliashdr_t* paliashdr, int posenum) {
 
 		do {
 			// texture coordinates come from the draw list
-			glTexCoord2f(((float*)order)[0], ((float*)order)[1]);
+			glTexCoord2f(((float_p)order)[0], ((float_p)order)[1]);
 			order += 2;
 
 			// normals and vertexes come from the frame list
@@ -330,22 +330,22 @@ GL_DrawAliasShadow
 */
 extern	vec3_t			lightspot;
 
-void GL_DrawAliasShadow(aliashdr_t* paliashdr, int posenum) {
+void GL_DrawAliasShadow(AliasHdr_t* paliashdr, int posenum) {
 	float	s, t, l;
 	int		i, j;
 	int		index;
-	trivertx_t* v, * verts;
+	TriVertx_t* v, * verts;
 	int		list;
 	int* order;
 	vec3_t	point;
-	float* normal;
+	float_p normal;
 	float	height, lheight;
 	int		count;
 
 	lheight = currententity->origin[2] - lightspot[2];
 
 	height = 0;
-	verts = (trivertx_t*)((byte*)paliashdr + paliashdr->posedata);
+	verts = (TriVertx_t*)((byte*)paliashdr + paliashdr->posedata);
 	verts += posenum * paliashdr->poseverts;
 	order = (int*)((byte*)paliashdr + paliashdr->commands);
 
@@ -394,7 +394,7 @@ R_SetupAliasFrame
 
 =================
 */
-void R_SetupAliasFrame(int frame, aliashdr_t* paliashdr) {
+void R_SetupAliasFrame(int frame, AliasHdr_t* paliashdr) {
 	int				pose, numposes;
 	float			interval;
 
@@ -422,15 +422,15 @@ R_DrawAliasModel
 
 =================
 */
-void R_DrawAliasModel(entity_t* e) {
+void R_DrawAliasModel(Entity_t* e) {
 	int			i, j;
 	int			lnum;
 	vec3_t		dist;
 	float		add;
-	model_t* clmodel;
+	Model_t* clmodel;
 	vec3_t		mins, maxs;
-	aliashdr_t* paliashdr;
-	trivertx_t* verts, * v;
+	AliasHdr_t* paliashdr;
+	TriVertx_t* verts, * v;
 	int			index;
 	float		s, t, an;
 	int			anim;
@@ -501,7 +501,7 @@ void R_DrawAliasModel(entity_t* e) {
 	//
 	// locate the proper data
 	//
-	paliashdr = (aliashdr_t*)Mod_Extradata(currententity->model);
+	paliashdr = (AliasHdr_t*)Mod_Extradata(currententity->model);
 
 	c_alias_polys += paliashdr->numtris;
 
@@ -717,7 +717,7 @@ void R_PolyBlend(void) {
 }
 
 
-int SignbitsForPlane(mplane_t* out) {
+int SignbitsForPlane(mPlane_t* out) {
 	int	bits, j;
 
 	// for fast box on planeside test
@@ -770,7 +770,7 @@ R_SetupFrame
 */
 void R_SetupFrame(void) {
 	int				edgecount;
-	vrect_t			vrect;
+	vRect_t			vrect;
 	float			w, h;
 
 	// don't allow cheats in multiplayer
@@ -983,8 +983,8 @@ R_Mirror
 */
 void R_Mirror(void) {
 	float		d;
-	msurface_t* s;
-	entity_t* ent;
+	mSurface_t* s;
+	Entity_t* ent;
 
 	if (!mirror)
 		return;

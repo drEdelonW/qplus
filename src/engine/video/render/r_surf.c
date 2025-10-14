@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "r_local.h"
 
-drawsurf_t r_drawsurf;
+DrawSurf_t r_drawsurf;
 
 int    lightleft, sourcesstep, blocksize, sourcetstep;
 int    lightdelta, lightdeltastep;
@@ -60,10 +60,10 @@ R_AddDynamicLights
 ===============
 */
 void R_AddDynamicLights() {
-    msurface_p surf = r_drawsurf.surf;
+    mSurface_p surf = r_drawsurf.surf;
     int smax = (surf->extents[0] >> 4) + 1;
     int tmax = (surf->extents[1] >> 4) + 1;
-    mtexinfo_p tex = surf->texinfo;
+    mTexInfo_p tex = surf->texinfo;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
         if (!(surf->dlightbits & (1 << lnum)))
@@ -135,7 +135,7 @@ Combine and scale multiple lightmaps into the 8.8 format in blocklights
 */
 void R_BuildLightMap() {
     // return;
-    msurface_p surf = r_drawsurf.surf;
+    mSurface_p surf = r_drawsurf.surf;
     int smax = (surf->extents[0] >> 4) + 1;
     int tmax = (surf->extents[1] >> 4) + 1;
     int size = smax * tmax;
@@ -184,7 +184,7 @@ R_TextureAnimation
 Returns the proper texture for a given time and base texture
 ===============
 */
-texture_p R_TextureAnimation(texture_p base) {
+Texture_p R_TextureAnimation(Texture_p base) {
     if ((currententity->frame) &&
         (base->alternate_anims))
         base = base->alternate_anims;
@@ -219,7 +219,7 @@ void R_DrawSurface() {
     R_BuildLightMap();
 
     surfrowbytes = r_drawsurf.rowbytes;
-    texture_p mt = r_drawsurf.texture;
+    Texture_p mt = r_drawsurf.texture;
     r_source = (uint8_p)mt + mt->offsets[r_drawsurf.surfmip];
 
     // the fractional light values should range from 0 to (VID_GRADES - 1) << 16
@@ -536,7 +536,7 @@ void R_GenTurbTile16(pixel_p pbasetex, typeless_ptr pdest) {
 R_GenTile
 ================
 */
-void R_GenTile(msurface_t* psurf, typeless_ptr pdest) {
+void R_GenTile(mSurface_t* psurf, typeless_ptr pdest) {
     if (psurf->flags & SURF_DRAWTURB) {
         if (r_pixbytes == 1) {
             R_GenTurbTile((pixel_p)

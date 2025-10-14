@@ -25,8 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _DOSISMS_H_
 #define _DOSISMS_H_
 
-int dos_lockmem(void* addr, int size);
-int dos_unlockmem(void* addr, int size);
+int dos_lockmem(typeless_ptr addr, int size);
+int dos_unlockmem(typeless_ptr addr, int size);
 
 typedef union {
 	struct {
@@ -70,10 +70,10 @@ typedef union {
 	} h;
 } regs_t;
 
-unsigned int ptr2real(void* ptr);
-void* real2ptr(unsigned int real);
-void* far2ptr(unsigned int farptr);
-unsigned int ptr2far(void* ptr);
+unsigned int ptr2real(typeless_ptr ptr);
+typeless_ptr real2ptr(unsigned int real);
+typeless_ptr far2ptr(unsigned int farptr);
+unsigned int ptr2far(typeless_ptr ptr);
 
 int	dos_inportb(int port);
 int	dos_inportw(int port);
@@ -87,8 +87,8 @@ void dos_restoreintr(int intr);
 
 int	dos_int86(int vec);
 
-void* dos_getmemory(int size);
-void dos_freememory(void* ptr);
+typeless_ptr dos_getmemory(int size);
+void dos_freememory(typeless_ptr ptr);
 
 void	dos_usleep(int usecs);
 

@@ -328,7 +328,7 @@ qboolean IN_InitDInput(void) {
 	}
 
 	if (!pDirectInputCreate) {
-		pDirectInputCreate = (void*)GetProcAddress(hInstDI, "DirectInputCreateA");
+		pDirectInputCreate = (typeless_ptr)GetProcAddress(hInstDI, "DirectInputCreateA");
 
 		if (!pDirectInputCreate) {
 			Con_SafePrintf("Couldn't get DI proc addr\n");

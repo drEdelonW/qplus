@@ -61,10 +61,10 @@ typedef struct {
 	char	identifier[64];
 	int		width, height;
 	qboolean	mipmap;
-} gltexture_t;
+} glTexture_t;
 
 #define	MAX_GLTEXTURES	1024
-gltexture_t	gltextures[MAX_GLTEXTURES];
+glTexture_t	gltextures[MAX_GLTEXTURES];
 int			numgltextures;
 
 
@@ -304,7 +304,7 @@ Draw_TextureMode_f
 */
 void Draw_TextureMode_f(void) {
 	int		i;
-	gltexture_t* glt;
+	glTexture_t* glt;
 
 	if (Cmd_Argc() == 1) {
 		for (i=0; i< 6; i++)
@@ -818,7 +818,7 @@ GL_FindTexture
 */
 int GL_FindTexture(char* identifier) {
 	int		i;
-	gltexture_t* glt;
+	glTexture_t* glt;
 
 	for (i=0, glt=gltextures; i<numgltextures; i++, glt++) {
 		if (!strcmp(identifier, glt->identifier))
@@ -1154,7 +1154,7 @@ GL_LoadTexture
 int GL_LoadTexture(char* identifier, int width, int height, byte* data, qboolean mipmap, qboolean alpha) {
 	qboolean	noalpha;
 	int			i, p, s;
-	gltexture_t* glt;
+	glTexture_t* glt;
 
 	// see if the texture is allready present
 	if (identifier[0]) {

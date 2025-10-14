@@ -32,14 +32,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 uint32_t        cacheoffset;
 int             c_faceclip;					// number of faces clipped
-zpointdesc_t    r_zpointdesc;
-polydesc_t      r_polydesc;
+zPointDesc_t    r_zpointdesc;
+PolyDesc_t      r_polydesc;
 
-clipplane_p entity_clipplanes;
-clipplane_t	view_clipplanes[4];
-clipplane_t	world_clipplanes[16];
+ClipPlane_p entity_clipplanes;
+ClipPlane_t	view_clipplanes[4];
+ClipPlane_t	world_clipplanes[16];
 
-medge_p r_pedge;
+mEdge_p r_pedge;
 
 qboolean        r_leftclipped, r_rightclipped;
 static qboolean	makeleftedge, makerightedge;
@@ -48,8 +48,8 @@ qboolean        r_nearzionly;
 int sintable[SIN_BUFFER_SIZE];
 int intsintable[SIN_BUFFER_SIZE];
 
-mvertex_t	r_leftenter, r_leftexit;
-mvertex_t	r_rightenter, r_rightexit;
+mVertex_t	r_leftenter, r_leftexit;
+mVertex_t	r_rightenter, r_rightexit;
 
 typedef struct {
     float	u, v;
@@ -70,7 +70,7 @@ qboolean	r_lastvertvalid;
 R_EmitEdge
 ================
 */
-void R_EmitEdge(mvertex_p pv0, mvertex_p pv1) {
+void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     int		v, v2, ceilv0;
     float	scale, lzi0, u0, v0;
 
@@ -165,7 +165,7 @@ void R_EmitEdge(mvertex_p pv0, mvertex_p pv1) {
 
     int side = ceilv0 > r_ceilv1;
 
-    edge_ptr edge = edge_p++;
+    Edge_p edge = edge_p++;
 
     edge->owner = r_pedge;
 
@@ -220,7 +220,7 @@ void R_EmitEdge(mvertex_p pv0, mvertex_p pv1) {
         newedges[v] = edge;
     }
     else {
-        edge_ptr pcheck = newedges[v];
+        Edge_p pcheck = newedges[v];
         while (pcheck->next && pcheck->next->u < u_check)
             pcheck = pcheck->next;
         edge->next = pcheck->next;
@@ -237,7 +237,7 @@ void R_EmitEdge(mvertex_p pv0, mvertex_p pv1) {
 R_ClipEdge
 ================
 */
-void R_ClipEdge(mvertex_p pv0, mvertex_p pv1, clipplane_p clip) {
+void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip) {
     if (clip) {
         do {
             float d0 = DotProduct(pv0->position, clip->normal) - clip->dist;
@@ -256,7 +256,7 @@ void R_ClipEdge(mvertex_p pv0, mvertex_p pv1, clipplane_p clip) {
                 cacheoffset = 0x7FFFFFFF;
 
                 float f = d0 / (d0 - d1);
-                mvertex_t clipvert;
+                mVertex_t clipvert;
                 clipvert.position[0] = pv0->position[0] +
                     f * (pv1->position[0] - pv0->position[0]);
                 clipvert.position[1] = pv0->position[1] +
@@ -294,7 +294,7 @@ void R_ClipEdge(mvertex_p pv0, mvertex_p pv1, clipplane_p clip) {
                 cacheoffset = 0x7FFFFFFF;
 
                 float f = d0 / (d0 - d1);
-                mvertex_t clipvert;
+                mVertex_t clipvert;
                 clipvert.position[0] = pv0->position[0] +
                     f * (pv1->position[0] - pv0->position[0]);
                 clipvert.position[1] = pv0->position[1] +
@@ -330,7 +330,7 @@ R_EmitCachedEdge
 ================
 */
 void R_EmitCachedEdge() {
-    edge_ptr pedge_t = (edge_ptr)((uintptr_t)r_edges + (uintptr_t)r_pedge->cachededgeoffset);
+    Edge_p pedge_t = (Edge_p)((uintptr_t)r_edges + (uintptr_t)r_pedge->cachededgeoffset);
 
     if (!pedge_t->surfs[0])
         pedge_t->surfs[0] = surface_p - surfaces;
@@ -349,8 +349,8 @@ void R_EmitCachedEdge() {
 R_RenderFace
 ================
 */
-void R_RenderFace(msurface_p fa, int clipflags) {
-    medge_t tedge;
+void R_RenderFace(mSurface_p fa, int clipflags) {
+    mEdge_t tedge;
 
     // skip out if no more surfs
     if ((surface_p) >= surf_max) {
@@ -367,7 +367,7 @@ void R_RenderFace(msurface_p fa, int clipflags) {
     c_faceclip++;
 
     // set up clip planes
-    clipplane_p pclip = NULL;
+    ClipPlane_p pclip = NULL;
 
     uint32_t mask = 0x08;
     for (int i = 3; i >= 0; i--, mask >>= 1) {
@@ -382,7 +382,7 @@ void R_RenderFace(msurface_p fa, int clipflags) {
     r_nearzi = 0;
     r_nearzionly = false;
     makeleftedge = makerightedge = false;
-    medge_p pedges = currententity->model->edges;
+    mEdge_p pedges = currententity->model->edges;
     r_lastvertvalid = false;
 
     for (int i = 0; i < fa->numedges; i++) {
@@ -403,7 +403,7 @@ void R_RenderFace(msurface_p fa, int clipflags) {
                 else {
                     if ((((uintptr_t)edge_p - (uintptr_t)r_edges) >
                         r_pedge->cachededgeoffset) &&
-                        (((edge_ptr)((uintptr_t)r_edges +
+                        (((Edge_p)((uintptr_t)r_edges +
                             r_pedge->cachededgeoffset))->owner == r_pedge)) {
                         R_EmitCachedEdge();
                         r_lastvertvalid = false;
@@ -440,10 +440,10 @@ void R_RenderFace(msurface_p fa, int clipflags) {
                 }
                 else {
                     // it's cached if the cached edge is valid and is owned
-                    // by this medge_t
+                    // by this mEdge_t
                     if ((((uintptr_t)edge_p - (uintptr_t)r_edges) >
                         r_pedge->cachededgeoffset) &&
-                        (((edge_ptr)((uintptr_t)r_edges +
+                        (((Edge_p)((uintptr_t)r_edges +
                             r_pedge->cachededgeoffset))->owner == r_pedge)) {
                         R_EmitCachedEdge();
                         r_lastvertvalid = false;
@@ -500,7 +500,7 @@ void R_RenderFace(msurface_p fa, int clipflags) {
     surface_p->key = r_currentkey++;
     surface_p->spans = NULL;
 
-    mplane_p pplane = fa->plane;
+    mPlane_p pplane = fa->plane;
     // FIXME: cache this?
     vec3_t      p_normal;
     TransformVector(pplane->normal, p_normal);
@@ -523,8 +523,8 @@ void R_RenderFace(msurface_p fa, int clipflags) {
 R_RenderBmodelFace
 ================
 */
-void R_RenderBmodelFace(bedge_p pedges, msurface_p psurf) {
-    static medge_t  tedge;
+void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
+    static mEdge_t  tedge;
 
     // skip out if no more surfs
     if (surface_p >= surf_max) {
@@ -544,7 +544,7 @@ void R_RenderBmodelFace(bedge_p pedges, msurface_p psurf) {
     r_pedge = &tedge;
 
     // set up clip planes
-    clipplane_p pclip = NULL;
+    ClipPlane_p pclip = NULL;
 
     uint32_t mask = 0x08;
     for (int i = 3; i >= 0; i--, mask >>= 1) {
@@ -603,7 +603,7 @@ void R_RenderBmodelFace(bedge_p pedges, msurface_p psurf) {
     surface_p->key = r_currentbkey;
     surface_p->spans = NULL;
 
-    mplane_p pplane = psurf->plane;
+    mPlane_p pplane = psurf->plane;
     // FIXME: cache this?
     vec3_t		p_normal;
     TransformVector(pplane->normal, p_normal);
@@ -626,10 +626,10 @@ void R_RenderBmodelFace(bedge_p pedges, msurface_p psurf) {
 R_RenderPoly
 ================
 */
-void R_RenderPoly(msurface_p fa, int clipflags) {
+void R_RenderPoly(mSurface_p fa, int clipflags) {
     int         s_axis, t_axis;
-    mvertex_t   verts[2][100];	//FIXME: do real number
-    polyvert_t  pverts[100];	//FIXME: do real number, safely
+    mVertex_t   verts[2][100];	//FIXME: do real number
+    PolyVert_t  pverts[100];	//FIXME: do real number, safely
 
     // FIXME: clean this up and make it faster
     // FIXME: guard against running out of vertices
@@ -637,7 +637,7 @@ void R_RenderPoly(msurface_p fa, int clipflags) {
     s_axis = t_axis = 0;	// keep compiler happy
 
     // set up clip planes
-    clipplane_p pclip = NULL;
+    ClipPlane_p pclip = NULL;
     uint32_t mask = 0x08;
     for (int i = 3; i >= 0; i--, mask >>= 1) {
         if (clipflags & mask) {
@@ -648,7 +648,7 @@ void R_RenderPoly(msurface_p fa, int clipflags) {
 
     // reconstruct the polygon
     // FIXME: these should be precalculated and loaded off disk
-    medge_p pedges = currententity->model->edges;
+    mEdge_p pedges = currententity->model->edges;
     int lnumverts = fa->numedges;
     int vertpage = 0;
 
@@ -716,7 +716,7 @@ void R_RenderPoly(msurface_p fa, int clipflags) {
 
     // transform and project, remembering the z values at the vertices and
     // r_nearzi, and extract the s and t coordinates at the vertices
-    mplane_p pplane = fa->plane;
+    mPlane_p pplane = fa->plane;
     switch (pplane->type) {
     case PLANE_X:
     case PLANE_ANYX:
@@ -791,13 +791,13 @@ void R_RenderPoly(msurface_p fa, int clipflags) {
 R_ZDrawSubmodelPolys
 ================
 */
-void R_ZDrawSubmodelPolys(model_p pmodel) {
-    msurface_p psurf = &pmodel->surfaces[pmodel->firstmodelsurface];
+void R_ZDrawSubmodelPolys(Model_p pmodel) {
+    mSurface_p psurf = &pmodel->surfaces[pmodel->firstmodelsurface];
     int numsurfaces = pmodel->nummodelsurfaces;
 
     for (int i = 0; i < numsurfaces; i++, psurf++) {
         // find which side of the node we are on
-        mplane_p pplane = psurf->plane;
+        mPlane_p pplane = psurf->plane;
 
         float dot = DotProduct(modelorg, pplane->normal) - pplane->dist;
 

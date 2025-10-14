@@ -53,7 +53,7 @@ R_InitSky
 A sky texture is 256*128, with the right side being a masked overlay
 ==============
 */
-void R_InitSky(texture_p mt) {
+void R_InitSky(Texture_p mt) {
 	int			i, j;
 	uint8_p src;
 

@@ -1459,8 +1459,8 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
 	vec3_t	move;
 	vec3_t	end;
 	double	save_frametime;
-	//	extern particle_t	*active_particles, *free_particles;
-	//	particle_t	*p;
+	//	extern Particle_t	*active_particles, *free_particles;
+	//	Particle_t	*p;
 
 
 	save_frametime = host_frametime;

@@ -46,7 +46,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //===================================================================
 
-extern void	R_DrawLine(polyvert_p polyvert0, polyvert_p polyvert1);
+extern void	R_DrawLine(PolyVert_p polyvert0, PolyVert_p polyvert1);
 
 extern int		cachewidth;
 extern pixel_p cacheblock;
@@ -62,7 +62,7 @@ extern int	intsintable[SIN_BUFFER_SIZE];
 extern	vec3_t	vup, base_vup;
 extern	vec3_t	vpn, base_vpn;
 extern	vec3_t	vright, base_vright;
-extern	r_entity_p   currententity;
+extern	r_Entity_p   currententity;
 
 #define NUMSTACKEDGES		2400
 #define	MINEDGES			NUMSTACKEDGES
@@ -71,22 +71,21 @@ extern	r_entity_p   currententity;
 #define	MAXSPANS			3000
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-struct espan_s;
-typedef struct espan_s espan_t;
-typedef espan_t* espan_p;
-struct espan_s {
+typedef struct eSpan_s eSpan_t;
+typedef eSpan_t* eSpan_p;
+struct eSpan_s {
     int     u;
     int     v;
     int     count;
-    espan_p	pnext;
+    eSpan_p	pnext;
 };
 
 // FIXME: compress, make a union if that will help
 // insubmodel is only 1, flags is fewer than 32, spanstate could be a byte
-typedef struct surf_s {
-    struct surf_s* next;			// active surface stack in r_edge.c
-    struct surf_s* prev;			// used in r_edge.c for active surf stack
-    struct espan_s* spans;			// pointer to linked list of spans to draw
+typedef struct Surf_s {
+    struct Surf_s* next;			// active surface stack in r_edge.c
+    struct Surf_s* prev;			// used in r_edge.c for active surf stack
+    struct eSpan_s* spans;			// pointer to linked list of spans to draw
     int			key;				// sorting key (BSP order)
     int			last_u;				// set during tracing
     int			spanstate;			// 0 = not in span
@@ -94,23 +93,23 @@ typedef struct surf_s {
     // -1 = in inverted span (end before
     //  start)
     int			flags;				// currentface flags
-    typeless_ptr       data;				// associated data like msurface_t
-    r_entity_p   entity;
+    typeless_ptr       data;				// associated data like mSurface_t
+    r_Entity_p   entity;
     float		nearzi;				// nearest 1/z on surface, for mipmapping
     qboolean	insubmodel;
     float		d_ziorigin, d_zistepu, d_zistepv;
 
     int			pad[2];				// to 64 bytes
-} surf_t;
-typedef surf_t* surf_p;
+} Surf_t;
+typedef Surf_t* Surf_p;
 
-extern	surf_p	surfaces, surface_p, surf_max;
+extern	Surf_p	surfaces, surface_p, surf_max;
 
 // surfaces are generated in back to front order by the bsp, so if a surf
 // pointer is greater than another one, it should be drawn in front
 // surfaces[1] is the background, and is used as the active surface stack.
 // surfaces[0] is a dummy, because index 0 is used to indicate no surface
-//  attached to an edge_t
+//  attached to an Edge_t
 
 //===================================================================
 
@@ -135,7 +134,7 @@ extern void R_MakeSky();
 
 extern int	ubasestep, errorterm, erroradjustup, erroradjustdown;
 
-// flags in finalvert_t.flags
+// flags in FinalVert_t.flags
 #if 0
 #define ALIAS_LEFT_CLIP				0x0001
 #define ALIAS_TOP_CLIP				0x0002
@@ -162,18 +161,18 @@ typedef enum alias_clip_flags_e {
 #endif
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-struct edge_s;
-typedef struct edge_s edge_t;
-typedef edge_t* edge_ptr;
-struct edge_s {
+struct Edge_s;
+typedef struct Edge_s Edge_t;
+typedef Edge_t* Edge_p;
+struct Edge_s {
     fixed16_t   u;
     fixed16_t   u_step;
-    edge_ptr    prev;
-    edge_ptr    next;
+    Edge_p    prev;
+    Edge_p    next;
     uint16_t	surfs[2];
-    edge_ptr    nextremove;
+    Edge_p    nextremove;
     float       nearzi;
-    medge_p     owner;
+    mEdge_p     owner;
 };
 
 #endif	// _R_SHARED_H_

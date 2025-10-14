@@ -31,8 +31,8 @@ typedef struct {
     float u, v;
     float s, t;
     float zi;
-} emitpoint_t;
-typedef emitpoint_t* emitpoint_p;
+} EmitPoint_t;
+typedef EmitPoint_t* EmitPoint_p;
 
 typedef enum {
     pt_static,
@@ -43,112 +43,99 @@ typedef enum {
     pt_explode2,
     pt_blob,
     pt_blob2
-} ptype_t;
+} ParticleType_t;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
-struct particle_s;
-typedef struct particle_s particle_t;
-typedef particle_t* particle_p;
-struct particle_s {
+typedef struct Particle_s Particle_t;
+typedef Particle_t* Particle_p;
+struct Particle_s {
     // driver-usable fields
-    vec3_t org;
-    float color;
+    vec3_t          org;
+    float           color;
     // drivers never touch the following fields
-    particle_p next;
-    vec3_t vel;
-    float ramp;
-    float die;
-    ptype_t type;
+    Particle_p      next;
+    vec3_t          vel;
+    float           ramp;
+    float           die;
+    ParticleType_t  type;
 };
 
 #define PARTICLE_Z_CLIP	8.0
 
-typedef struct polyvert_s {
+typedef struct PolyVert_s {
     float	u, v, zi, s, t;
-} polyvert_t;
-typedef polyvert_t* polyvert_p;
+} PolyVert_t;
+typedef PolyVert_t* PolyVert_p;
 
 
-typedef struct polydesc_s {
+typedef struct PolyDesc_s {
 	int         numverts;
 	float       nearzi;
-	msurface_p  pcurrentface;
-	polyvert_p  pverts;
-} polydesc_t;
+	mSurface_p  pcurrentface;
+	PolyVert_p  pverts;
+} PolyDesc_t;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
-typedef struct finalvert_s {
+typedef struct FinalVert_s {
 	int     v[6];   // u, v, s, t, l, 1/z
 	int     flags;  //alias_clip_flags_t
 	float   reserved;
-} finalvert_t;
-typedef finalvert_t* finalvert_p;
+} FinalVert_t;
+typedef FinalVert_t* FinalVert_p;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct {
     typeless_ptr pskin;
-    maliasskindesc_p pskindesc;
+    mAliasSkinDesc_p pskindesc;
     int skinwidth;
     int skinheight;
-    mtriangle_p ptriangles;
-    finalvert_p pfinalverts;
+    mTriangle_p ptriangles;
+    FinalVert_p pfinalverts;
     int numtriangles;
     int drawtype;
     int seamfixupX16;
-} affinetridesc_t;
+} AffineTriDesc_t;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct {
 	float u, v, zi, color;
-} screenpart_t;
+} ScreenPart_t; // ???
 
 typedef struct {
     int	        nump;
-    emitpoint_p	pverts;	// there's room for an extra element at [nump],
+    EmitPoint_p	pverts;	// there's room for an extra element at [nump],
     //  if the driver wants to duplicate element [0] at
     //  element [nump] to avoid dealing with wrapping
-    mspriteframe_p  pspriteframe;
+    mSpriteFrame_p  pspriteframe;
     vec3_t          vup, vright, vpn;	// in worldspace
     float           nearzi;
-} spritedesc_t;
+} SpriteDesc_t;
 
 typedef struct {
     int     u, v;
     float   zi;
     int     color;
-} zpointdesc_t;
+} zPointDesc_t;
 
 extern int d_spanpixcount;
-extern int r_framecount;		// sequence # of current frame since Quake
-//  started
-extern qboolean	r_drawpolys;		// 1 if driver wants clipped polygons
-//  rather than a span list
-extern qboolean	r_drawculledpolys;	// 1 if driver wants clipped polygons that
-//  have been culled by the edge list
-extern qboolean	r_worldpolysbacktofront;	// 1 if driver wants polygons
-//  delivered back to front rather
-//  than front to back
+extern int r_framecount;            // sequence # of current frame since Quake started
+extern qboolean	r_drawpolys;        // 1 if driver wants clipped polygons rather than a span list
+extern qboolean	r_drawculledpolys;  // 1 if driver wants clipped polygons that have been culled by the edge list
+extern qboolean	r_worldpolysbacktofront;    // 1 if driver wants polygons delivered back to front rather than front to back
 extern qboolean	r_recursiveaffinetriangles;	// true if a driver wants to use
-//  recursive triangular subdivison
-//  and vertex drawing via
-//  D_PolysetDrawFinalVerts() past
-//  a certain distance (normally
-//  only used by the software
-//  driver)
-extern float r_aliasuvscale;		// scale-up factor for screen u and v
-//  on Alias vertices passed to driver
+//  recursive triangular subdivison and vertex drawing via D_PolysetDrawFinalVerts() past
+//  a certain distance (normally only used by the software driver)
+extern float r_aliasuvscale;    // scale-up factor for screen u and v on Alias vertices passed to driver
 extern int r_pixbytes;
 extern qboolean	r_dowarp;
 
-extern affinetridesc_t r_affinetridesc;
-extern spritedesc_t r_spritedesc;
-extern zpointdesc_t r_zpointdesc;
-extern polydesc_t r_polydesc;
+extern AffineTriDesc_t r_affinetridesc;
+extern SpriteDesc_t r_spritedesc;
+extern zPointDesc_t r_zpointdesc;
+extern PolyDesc_t r_polydesc;
 
-extern int d_con_indirect;	// if 0, Quake will draw console directly
-//  to vid.buffer; if 1, Quake will
-//  draw console via D_DrawRect. Must be
-//  defined by driver
+extern int d_con_indirect;	// if 0, Quake will draw console directly to vid.buffer; if 1, Quake will
+//  draw console via D_DrawRect. Must be defined by driver
 
 extern vec3_t r_pright, r_pup, r_ppn;
 
@@ -158,8 +145,8 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height);
 void D_DisableBackBufferAccess();
 void D_EndDirectRect(int x, int y, int width, int height);
 void D_PolysetDraw();
-void D_PolysetDrawFinalVerts(finalvert_p fv, int numverts);
-void D_DrawParticle(particle_p pparticle);
+void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts);
+void D_DrawParticle(Particle_p pparticle);
 void D_DrawPoly();
 void D_DrawSprite();
 void D_DrawSurfaces();
@@ -173,12 +160,11 @@ void D_StartParticles();
 void D_TurnZOn();
 void D_WarpScreen();
 
-void D_FillRect(vrect_p vrect, int color);
+void D_FillRect(vRect_p vrect, int color);
 void D_DrawRect();
-void D_UpdateRects(vrect_p prect);
+void D_UpdateRects(vRect_p prect);
 
-// currently for internal use only, and should be a do-nothing function in
-// hardware drivers
+// currently for internal use only, and should be a do-nothing function in hardware drivers
 // FIXME: this should go away
 void D_PolysetUpdateTables();
 
@@ -204,36 +190,36 @@ extern typeless_ptr acolormap;	// FIXME: should go away
 typedef struct {
 	pixel_p surfdat;	// destination for generated surface
 	int rowbytes;	// destination logical width in bytes
-	msurface_p surf;		// description for surface to generate
+	mSurface_p surf;		// description for surface to generate
 	fixed8_t lightadj[MAXLIGHTMAPS];
 	// adjust for lightmap levels for dynamic lighting
-	texture_p texture;	// corrected for animating textures
+	Texture_p texture;	// corrected for animating textures
 	int surfmip;	// mipmapped ratio of surface texels / world pixels
 	int surfwidth;	// in mipmapped texels
 	int surfheight;	// in mipmapped texels
-} drawsurf_t;
-extern drawsurf_t r_drawsurf;
+} DrawSurf_t;
+extern DrawSurf_t r_drawsurf;
 
 void R_DrawSurface();
-void R_GenTile(msurface_p psurf, typeless_ptr pdest);
+void R_GenTile(mSurface_p psurf, typeless_ptr pdest);
 
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 #define TURB_TEX_SIZE	64		// base turbulent texture size
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
-#define	CYCLE			128		// turbulent cycle size
+#define	CYCLE       128		// turbulent cycle size
 
-#define TILE_SIZE		128		// size of textures generated by R_GenTiledSurf
+#define TILE_SIZE   128		// size of textures generated by R_GenTiledSurf
 
-#define SKYSHIFT		7
-#define	SKYSIZE			(1 << SKYSHIFT)
-#define SKYMASK			(SKYSIZE - 1)
+#define SKYSHIFT    7
+#define	SKYSIZE     (1 << SKYSHIFT)
+#define SKYMASK     (SKYSIZE - 1)
 
 extern float skyspeed, skyspeed2;
 extern float skytime;
 
 extern int c_surf;
-extern vrect_t scr_vrect;
+extern vRect_t scr_vrect;
 extern uint8_p r_warpbuffer;
 

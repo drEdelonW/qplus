@@ -58,9 +58,9 @@ typedef struct {
 	char    startspot[64];
 #endif
 	char        modelname[64];  // maps/<name>.bsp, for model_precache[0]
-	model_p     worldmodel;
+	Model_p     worldmodel;
 	cstring     model_precache[MAX_MODELS];	    // NULL terminated
-	model_p     models[MAX_MODELS];
+	Model_p     models[MAX_MODELS];
 	cstring     sound_precache[MAX_SOUNDS];	    // NULL terminated
 	cstring     lightstyles[MAX_LIGHTSTYLES];
 	int32_t     num_edicts;
@@ -164,28 +164,16 @@ typedef enum {
     FL_FLASHLIGHT     = 1 << 13,
     FL_ARCHIVE_OVERRIDE = 1 << 20
 #endif
-} entity_flags_t;
+} EntityFlags_t;
 
-// entity effects
-typedef enum {
-    EF_BRIGHTFIELD  = 1 << 0, // 0x0001
-    EF_MUZZLEFLASH  = 1 << 1, // 0x0002
-    EF_BRIGHTLIGHT  = 1 << 2, // 0x0004
-    EF_DIMLIGHT     = 1 << 3, // 0x0008
-#ifdef QUAKE2
-    EF_DARKLIGHT    = 1 << 4, // 0x0010
-    EF_DARKFIELD    = 1 << 5, // 0x0020
-    EF_LIGHT        = 1 << 6, // 0x0040
-    EF_NODRAW       = 1 << 7  // 0x0080
-#endif
-} entity_effects_t;
+
 
 typedef enum {
     SPAWNFLAG_NOT_EASY       = 1 << 8,  // 0x0100
     SPAWNFLAG_NOT_MEDIUM     = 1 << 9,  // 0x0200
     SPAWNFLAG_NOT_HARD       = 1 << 10, // 0x0400
     SPAWNFLAG_NOT_DEATHMATCH = 1 << 11  // 0x0800
-} spawnflags_t;
+} SpawnFlags_t;
 
 #ifdef QUAKE2
 // server flags

@@ -144,7 +144,7 @@ void D_PolysetDraw() {
 D_PolysetDrawFinalVerts
 ================
 */
-void D_PolysetDrawFinalVerts(finalvert_p fv, int numverts) {
+void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts) {
 	int		i, z;
 	int16_p zbuf;
 
@@ -174,8 +174,8 @@ D_DrawSubdiv
 ================
 */
 void D_DrawSubdiv() {
-	mtriangle_t* ptri;
-	finalvert_p		pfv, index0, index1, index2;
+	mTriangle_t* ptri;
+	FinalVert_p		pfv, index0, index1, index2;
 	int				i;
 	int				lnumtriangles;
 
@@ -230,8 +230,8 @@ D_DrawNonSubdiv
 ================
 */
 void D_DrawNonSubdiv() {
-	mtriangle_t* ptri;
-	finalvert_p		pfv, index0, index1, index2;
+	mTriangle_t* ptri;
+	FinalVert_p		pfv, index0, index1, index2;
 	int				i;
 	int				lnumtriangles;
 

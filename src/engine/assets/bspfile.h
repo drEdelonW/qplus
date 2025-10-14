@@ -96,8 +96,8 @@ typedef struct {
     int32_t headnode[MAX_MAP_HULLS];
     int32_t visleafs;  // not including the solid leaf 0
     int32_t firstface, numfaces;
-} dmodel_t;
-typedef dmodel_t* dmodel_p;
+} dModel_t;
+typedef dModel_t* dModel_p;
 
 typedef struct {
     int32_t version;
@@ -122,8 +122,8 @@ typedef miptex_t* miptex_p;
 
 typedef struct {
     vec3_t point;
-} dvertex_t;
-typedef dvertex_t* dvertex_p;
+} dVertex_t;
+typedef dVertex_t* dVertex_p;
 
 
 typedef enum {
@@ -136,14 +136,14 @@ typedef enum {
     PLANE_ANYX = 3,
     PLANE_ANYY = 4,
     PLANE_ANYZ = 5
-} plane_type_t;
+} PlaneType_t;
 
 typedef struct {
     vec3_t  normal;
     float   dist;
-    plane_type_t    type;  // PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
-} dplane_t;
-typedef dplane_t* dplane_p;
+    PlaneType_t    type;  // PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
+} dPlane_t;
+typedef dPlane_t* dPlane_p;
 
 
 
@@ -174,31 +174,31 @@ typedef struct {
     int16_t     maxs[3];
     uint16_t    firstface;
     uint16_t    numfaces; // counting both sides
-} dnode_t;
-typedef dnode_t* dnode_p;
+} dNode_t;
+typedef dNode_t* dNode_p;
 
 
 typedef struct {
     int32_t planenum;
     int16_t children[2]; // negative numbers are contents
-} dclipnode_t;
-typedef dclipnode_t* dclipnode_p;
+} dClipNode_t;
+typedef dClipNode_t* dClipNode_p;
 
 
-typedef struct texinfo_s {
+typedef struct TexInfo_s {
     float   vecs[2][4];  // [s/t][xyz offset]
     int32_t miptex;
     int32_t flags;
-} texinfo_t;
-typedef texinfo_t* texinfo_p;
+} TexInfo_t;
+typedef TexInfo_t* TexInfo_p;
 #define TEX_SPECIAL  1  // sky or slime, no lightmap or 256 subdivision
 
 // note that edge 0 is never used, because negative edge nums are used for
 // counterclockwise use of the edge in a face
 typedef struct {
-    uint16_t    v[2];  // vertex numbers
-} dedge_t;
-typedef dedge_t* dedge_p;
+    uint16_t    v[2];  // Vertex numbers
+} dEdge_t;
+typedef dEdge_t* dEdge_p;
 
 typedef struct {
     int16_t planenum;
@@ -230,8 +230,8 @@ typedef struct {
  uint16_t    nummarksurfaces;
 
  uint8_t ambient_level[NUM_AMBIENTS];
-} dleaf_t;
-typedef dleaf_t* dleaf_p;
+} dLeaf_t;
+typedef dLeaf_t* dLeaf_p;
 
 
 //============================================================================
@@ -245,7 +245,7 @@ typedef dleaf_t* dleaf_p;
 // the utilities get to be lazy and just use large static arrays
 
 extern int32_t   nummodels;
-extern dmodel_t dmodels[MAX_MAP_MODELS];
+extern dModel_t dmodels[MAX_MAP_MODELS];
 
 extern int32_t   visdatasize;
 extern uint8_t  dvisdata[MAX_MAP_VISIBILITY];
@@ -260,28 +260,28 @@ extern int32_t   entdatasize;
 extern char  dentdata[MAX_MAP_ENTSTRING];
 
 extern int32_t   numleafs;
-extern dleaf_t  dleafs[MAX_MAP_LEAFS];
+extern dLeaf_t  dleafs[MAX_MAP_LEAFS];
 
 extern int32_t   numplanes;
-extern dplane_t dplanes[MAX_MAP_PLANES];
+extern dPlane_t dplanes[MAX_MAP_PLANES];
 
 extern int32_t   numvertexes;
-extern dvertex_t dvertexes[MAX_MAP_VERTS];
+extern dVertex_t dvertexes[MAX_MAP_VERTS];
 
 extern int32_t   numnodes;
-extern dnode_t  dnodes[MAX_MAP_NODES];
+extern dNode_t  dnodes[MAX_MAP_NODES];
 
 extern int32_t   numtexinfo;
-extern texinfo_t texinfo[MAX_MAP_TEXINFO];
+extern TexInfo_t texinfo[MAX_MAP_TEXINFO];
 
 extern int32_t   numfaces;
 extern dface_t  dfaces[MAX_MAP_FACES];
 
 extern int32_t   numclipnodes;
-extern dclipnode_t dclipnodes[MAX_MAP_CLIPNODES];
+extern dClipNode_t dclipnodes[MAX_MAP_CLIPNODES];
 
 extern int32_t   numedges;
-extern dedge_t  dedges[MAX_MAP_EDGES];
+extern dEdge_t  dedges[MAX_MAP_EDGES];
 
 extern int32_t   nummarksurfaces;
 extern uint16_t dmarksurfaces[MAX_MAP_MARKSURFACES];
@@ -311,20 +311,20 @@ typedef struct {
  int32_t firstbrush;
  int32_t numbrushes;
  epair_t* epairs;
-} entity_t;
+} Entity_t;
 
 extern int32_t   num_entities;
-extern entity_t entities[MAX_MAP_ENTITIES];
+extern Entity_t entities[MAX_MAP_ENTITIES];
 
 void ParseEntities();
 void UnparseEntities();
 
-void  SetKeyValue(entity_t* ent, cstring key, cstring value);
-cstring ValueForKey(entity_t* ent, cstring key);
+void  SetKeyValue(Entity_t* ent, cstring key, cstring value);
+cstring ValueForKey(Entity_t* ent, cstring key);
 // will return "" if not present
 
-vec_t FloatForKey(entity_t* ent, cstring key);
-void  GetVectorForKey(entity_t* ent, cstring key, vec3_t vec);
+vec_t FloatForKey(Entity_t* ent, cstring key);
+void  GetVectorForKey(Entity_t* ent, cstring key, vec3_t vec);
 
 epair_t* ParseEpair();
 

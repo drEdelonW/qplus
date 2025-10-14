@@ -82,7 +82,7 @@ static inline uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
             (b >> 3));
 }
 
-static inline void dcache_clean_range(void* addr, size_t size) {
+static inline void dcache_clean_range(typeless_ptr addr, size_t size) {
     uintptr_t a = ((uintptr_t)addr) & ~31u;               // 32B line align
     size += ((uintptr_t)addr - a);
     size = (size + 31u) & ~31u;

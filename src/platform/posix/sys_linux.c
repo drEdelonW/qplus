@@ -431,7 +431,7 @@ void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {
     // round length up to cover the full range
     size_t len = (startaddr + length - addr + psize - 1) & ~(psize - 1);
 
-    if (mprotect((void*)addr, len, PROT_READ | PROT_WRITE | PROT_EXEC) < 0) {
+    if (mprotect((typeless_ptr)addr, len, PROT_READ | PROT_WRITE | PROT_EXEC) < 0) {
         Sys_Error("Protection change failed\n");
     }
 }

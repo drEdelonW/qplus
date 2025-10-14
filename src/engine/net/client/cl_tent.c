@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 
 int			num_temp_entities;
-r_entity_t	cl_temp_entities[MAX_TEMP_ENTITIES];
+r_Entity_t	cl_temp_entities[MAX_TEMP_ENTITIES];
 beam_t		cl_beams[MAX_BEAMS];
 
 sfx_p cl_sfx_wizhit;
@@ -61,7 +61,7 @@ void CL_InitTEnts() {
 CL_ParseBeam
 =================
 */
-void CL_ParseBeam(model_t* m) {
+void CL_ParseBeam(Model_t* m) {
 	int		ent;
 	vec3_t	start, end;
 	beam_t* b;
@@ -289,8 +289,8 @@ void CL_ParseTEnt() {
 CL_NewTempEntity
 =================
 */
-r_entity_p CL_NewTempEntity() {
-	r_entity_p ent;
+r_Entity_p CL_NewTempEntity() {
+	r_Entity_p ent;
 
 	if (cl_numvisedicts == MAX_VISEDICTS)
 		return NULL;
@@ -317,7 +317,7 @@ void CL_UpdateTEnts() {
 	beam_t* b;
 	vec3_t		dist, org;
 	float		d;
-	r_entity_p ent;
+	r_Entity_p ent;
 	float		yaw, pitch;
 	float		forward;
 

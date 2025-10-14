@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-mnode_t* r_pefragtopnode;
+mNode_t* r_pefragtopnode;
 
 
 //===========================================================================
@@ -38,7 +38,7 @@ efrag_t** lastlink;
 
 vec3_t		r_emins, r_emaxs;
 
-entity_t* r_addent;
+Entity_t* r_addent;
 
 
 /*
@@ -48,7 +48,7 @@ R_RemoveEfrags
 Call when removing an object from the world or moving it to another position
 ================
 */
-void R_RemoveEfrags(entity_t* ent) {
+void R_RemoveEfrags(Entity_t* ent) {
 	efrag_t* ef, * old, * walk, ** prev;
 
 	ef = ent->efrag;
@@ -83,10 +83,10 @@ void R_RemoveEfrags(entity_t* ent) {
 R_SplitEntityOnNode
 ===================
 */
-void R_SplitEntityOnNode(mnode_t* node) {
+void R_SplitEntityOnNode(mNode_t* node) {
 	efrag_t* ef;
-	mplane_t* splitplane;
-	mleaf_t* leaf;
+	mPlane_t* splitplane;
+	mLeaf_t* leaf;
 	int			sides;
 
 	if (node->contents == CONTENTS_SOLID) {
@@ -99,7 +99,7 @@ void R_SplitEntityOnNode(mnode_t* node) {
 		if (!r_pefragtopnode)
 			r_pefragtopnode = node;
 
-		leaf = (mleaf_t*)node;
+		leaf = (mLeaf_t*)node;
 
 		// grab an efrag off the free list
 		ef = cl.free_efrags;
@@ -151,8 +151,8 @@ void R_SplitEntityOnNode(mnode_t* node) {
 R_AddEfrags
 ===========
 */
-void R_AddEfrags(entity_t* ent) {
-	model_t* entmodel;
+void R_AddEfrags(Entity_t* ent) {
+	Model_t* entmodel;
 	int			i;
 
 	if (!ent->model)
@@ -184,8 +184,8 @@ R_StoreEfrags
 ================
 */
 void R_StoreEfrags(efrag_t** ppefrag) {
-	entity_t* pent;
-	model_t* clmodel;
+	Entity_t* pent;
+	Model_t* clmodel;
 	efrag_t* pefrag;
 
 

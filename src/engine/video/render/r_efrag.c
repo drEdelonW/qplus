@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "r_local.h"
 
-mnode_t* r_pefragtopnode;
+mNode_t* r_pefragtopnode;
 
 
 //===========================================================================
@@ -39,7 +39,7 @@ efrag_t** lastlink;
 
 vec3_t		r_emins, r_emaxs;
 
-r_entity_p r_addent;
+r_Entity_p r_addent;
 
 
 /*
@@ -49,7 +49,7 @@ R_RemoveEfrags
 Call when removing an object from the world or moving it to another position
 ================
 */
-void R_RemoveEfrags(r_entity_p ent) {
+void R_RemoveEfrags(r_Entity_p ent) {
 	efrag_t* ef, * old, * walk, ** prev;
 
 	ef = ent->efrag;
@@ -84,10 +84,10 @@ void R_RemoveEfrags(r_entity_p ent) {
 R_SplitEntityOnNode
 ===================
 */
-void R_SplitEntityOnNode(mnode_t* node) {
+void R_SplitEntityOnNode(mNode_t* node) {
 	efrag_t* ef;
-	mplane_t* splitplane;
-	mleaf_t* leaf;
+	mPlane_t* splitplane;
+	mLeaf_t* leaf;
 	int			sides;
 
 	if (node->contents == CONTENTS_SOLID) {
@@ -100,7 +100,7 @@ void R_SplitEntityOnNode(mnode_t* node) {
 		if (!r_pefragtopnode)
 			r_pefragtopnode = node;
 
-		leaf = (mleaf_t*)node;
+		leaf = (mLeaf_t*)node;
 
 		// grab an efrag off the free list
 		ef = cl.free_efrags;
@@ -151,8 +151,8 @@ void R_SplitEntityOnNode(mnode_t* node) {
 R_SplitEntityOnNode2
 ===================
 */
-void R_SplitEntityOnNode2(mnode_t* node) {
-	mplane_t* splitplane;
+void R_SplitEntityOnNode2(mNode_t* node) {
+	mPlane_t* splitplane;
 	int			sides;
 
 	if (node->visframe != r_visframecount)
@@ -187,8 +187,8 @@ void R_SplitEntityOnNode2(mnode_t* node) {
 R_AddEfrags
 ===========
 */
-void R_AddEfrags(r_entity_p ent) {
-	model_t* entmodel;
+void R_AddEfrags(r_Entity_p ent) {
+	Model_t* entmodel;
 	int			i;
 
 	if (!ent->model)
@@ -223,8 +223,8 @@ R_StoreEfrags
 ================
 */
 void R_StoreEfrags(efrag_t** ppefrag) {
-	r_entity_p pent;
-	model_t* clmodel;
+	r_Entity_p pent;
+	Model_t* clmodel;
 	efrag_t* pefrag;
 
 

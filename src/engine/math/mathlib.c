@@ -173,7 +173,7 @@ BoxOnPlaneSide
 Returns 1, 2, or 1 + 2
 ==================
 */
-int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mplane_p p) {
+int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
     float dist1, dist2;
 
 #if 0 // this is done by the BOX_ON_PLANE_SIDE macro before calling this

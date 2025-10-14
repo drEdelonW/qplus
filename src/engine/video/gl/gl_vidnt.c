@@ -132,7 +132,7 @@ PROC glColorPointerEXT;
 PROC glTexCoordPointerEXT;
 PROC glVertexPointerEXT;
 
-typedef void (APIENTRY* lp3DFXFUNC) (int, int, int, int, int, const void*);
+typedef void (APIENTRY* lp3DFXFUNC) (int, int, int, int, int, const typeless_ptr);
 lp3DFXFUNC glColorTableEXT;
 qboolean is8bit = false;
 qboolean isPermedia = false;
@@ -498,7 +498,7 @@ void CheckTextureExtensions(void) {
 		if (hInstGL == NULL)
 			Sys_Error("Couldn't load opengl32.dll\n");
 
-		bindTexFunc = (void*)GetProcAddress(hInstGL, "glBindTexture");
+		bindTexFunc = (typeless_ptr)GetProcAddress(hInstGL, "glBindTexture");
 
 		if (!bindTexFunc)
 			Sys_Error("No texture objects!");
@@ -549,8 +549,8 @@ int		texture_extension_number = 1;
 void CheckMultiTextureExtensions(void) {
 	if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
 		Con_Printf("Multitexture extensions found.\n");
-		qglMTexCoord2fSGIS = (void*)wglGetProcAddress("glMTexCoord2fSGIS");
-		qglSelectTextureSGIS = (void*)wglGetProcAddress("glSelectTextureSGIS");
+		qglMTexCoord2fSGIS = (typeless_ptr)wglGetProcAddress("glMTexCoord2fSGIS");
+		qglSelectTextureSGIS = (typeless_ptr)wglGetProcAddress("glSelectTextureSGIS");
 		gl_mtexable = true;
 	}
 }
@@ -1428,7 +1428,7 @@ void VID_Init8bitPalette() {
 	char thePalette[256*3];
 	char* oldPalette, * newPalette;
 
-	glColorTableEXT = (void*)wglGetProcAddress("glColorTableEXT");
+	glColorTableEXT = (typeless_ptr)wglGetProcAddress("glColorTableEXT");
 	if (!glColorTableEXT || strstr(gl_extensions, "GL_EXT_shared_texture_palette") ||
 		COM_CheckParm("-no8bit"))
 		return;
@@ -1444,7 +1444,7 @@ void VID_Init8bitPalette() {
 		oldPalette++;
 	}
 	glColorTableEXT(GL_SHARED_TEXTURE_PALETTE_EXT, GL_RGB, 256, GL_RGB, GL_UNSIGNED_BYTE,
-		(void*)thePalette);
+		(typeless_ptr)thePalette);
 	is8bit = TRUE;
 }
 
