@@ -87,7 +87,7 @@ typedef enum {
     LUMP_MODELS       = 14,
 
     HEADER_LUMPS      = 15  // total count of lumps in BSP header
-} Lump_type_t;
+} LumpType;
 
 typedef struct {
     vec3_t  mins;
@@ -103,22 +103,22 @@ typedef dModel_t* dModel_p;
 typedef struct {
     int32_t version;
     Lump_t  lumps[HEADER_LUMPS];
-} dheader_t;
-typedef dheader_t* dheader_p;
+} dHeader_t;
+typedef dHeader_t* dHeader_p;
 
 typedef struct {
     int32_t nummiptex;
     int32_t dataofs[4]; // [nummiptex]
-} dmiptexLump_t;
-typedef dmiptexLump_t* dmiptexlump_p;
+} dMipTexLump_t;
+typedef dMipTexLump_t* dmiptexlump_p;
 
 
-typedef struct miptex_s {
+typedef struct MipTex_s {
 char        name[16];
 uint32_t    width, height;
 uint32_t    offsets[MIPLEVELS];  // four mip maps stored
-} miptex_t;
-typedef miptex_t* miptex_p;
+} MipTex_t;
+typedef MipTex_t* MipTex_p;
 
 
 typedef struct {
@@ -212,8 +212,8 @@ typedef struct {
     // lighting info
     uint8_t styles[MAXLIGHTMAPS];
     int32_t lightofs;   // start of [numstyles*surfsize] samples
-} dface_t;
-typedef dface_t* dface_p;
+} dFace_t;
+typedef dFace_t* dFace_p;
 
 
 
@@ -255,7 +255,7 @@ extern int32_t   lightdatasize;
 extern uint8_t  dlightdata[MAX_MAP_LIGHTING];
 
 extern int32_t   texdatasize;
-extern uint8_t  dtexdata[MAX_MAP_MIPTEX]; // (dmiptexLump_t)
+extern uint8_t  dtexdata[MAX_MAP_MIPTEX]; // (dMipTexLump_t)
 
 extern int32_t   entdatasize;
 extern char  dentdata[MAX_MAP_ENTSTRING];
@@ -276,7 +276,7 @@ extern int32_t   numtexinfo;
 extern TexInfo_t texinfo[MAX_MAP_TEXINFO];
 
 extern int32_t   numfaces;
-extern dface_t  dfaces[MAX_MAP_FACES];
+extern dFace_t  dfaces[MAX_MAP_FACES];
 
 extern int32_t   numclipnodes;
 extern dClipNode_t dclipnodes[MAX_MAP_CLIPNODES];

@@ -502,7 +502,7 @@ typedef struct {
     char    id[4];
     int32_t dirofs;
     int32_t dirlen;
-} dpackheader_t;
+} dpackHeader_t;
 
 #define MAX_FILES_IN_PACK       2048
 
@@ -842,7 +842,7 @@ of the list so they override previous pack files.
 =================
 */
 pack_p COM_LoadPackFile(cString packfile) {
-    dpackheader_t   header;
+    dpackHeader_t   header;
     dpackfile_t info[MAX_FILES_IN_PACK];
 
     int packhandle;

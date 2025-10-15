@@ -48,7 +48,7 @@ uint8_p     wad_base;
 */
 void W_CleanupName(cString in, cString out) {
     int i = 0;
-    for (; i < 16; i++) {
+    for (; i < LUMP_NAME_LEN; i++) {
         char c = in[i];
         if (!c)
             break;
@@ -59,7 +59,7 @@ void W_CleanupName(cString in, cString out) {
         out[i] = c;
     }
 
-    for (; i < 16; i++)
+    for (; i < LUMP_NAME_LEN; i++)
         out[i] = 0;
 }
 
@@ -106,13 +106,12 @@ void W_LoadWadFile(cString filename) {
     =============
 */
 LumpInfo_p W_GetLumpinfo(cString name) {
-    char clean[16];
+    char clean[LUMP_NAME_LEN];
     W_CleanupName(name, clean);
 
     LumpInfo_p lump_p = wad_lumps;
     for (int32_t i = 0; i < wad_numlumps; i++, lump_p++) {
-        // if (!strcmp(clean, lump_p->name))
-        if (!strncmp(clean, lump_p->name, 16))
+        if (!strncmp(clean, lump_p->name, LUMP_NAME_LEN))
             return lump_p;
     }
 

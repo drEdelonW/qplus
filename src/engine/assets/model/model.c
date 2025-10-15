@@ -338,7 +338,7 @@ void Mod_LoadTextures(Lump_p l) {
         if (m->dataofs[i] == -1)
             continue;
 
-        miptex_p mt = (miptex_p)((uint8_p)m + m->dataofs[i]);
+        MipTex_p mt = (MipTex_p)((uint8_p)m + m->dataofs[i]);
         mt->width = LittleLong(mt->width);
         mt->height = LittleLong(mt->height);
         for (int j = 0; j < MIPLEVELS; j++)
@@ -357,7 +357,7 @@ void Mod_LoadTextures(Lump_p l) {
         tx->width = mt->width;
         tx->height = mt->height;
         for (int j = 0; j < MIPLEVELS; j++)
-            tx->offsets[j] = mt->offsets[j] + sizeof(Texture_t) - sizeof(miptex_t);
+            tx->offsets[j] = mt->offsets[j] + sizeof(Texture_t) - sizeof(MipTex_t);
         // the pixels immediately follow the structures
         memcpy(tx + 1, mt + 1, pixels);
 
@@ -691,7 +691,7 @@ void CalcSurfaceExtents(mSurface_p s) {
     =================
 */
 void Mod_LoadFaces(Lump_p l) {
-    dface_p in = (TypeLess_ptr)(mod_base + l->fileofs);
+    dFace_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -1009,7 +1009,7 @@ Mod_LoadBrushModel
 */
 void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
     loadmodel->type = mod_brush;
-    dheader_p header = (dheader_p)buffer;
+    dHeader_p header = (dHeader_p)buffer;
 
     int ver = LittleLong(header->version);
     if (ver != BSPVERSION) {
@@ -1022,7 +1022,7 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
     // swap all the lumps
     mod_base = (uint8_p)header;
 
-    for (int i = 0; i < (sizeof(dheader_t) / 4); i++) {
+    for (int i = 0; i < (sizeof(dHeader_t) / 4); i++) {
         ((int*)header)[i] = LittleLong(((int*)header)[i]);
     }
 

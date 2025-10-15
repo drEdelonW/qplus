@@ -315,17 +315,17 @@ Mod_LoadTextures
 */
 void Mod_LoadTextures(Lump_t* l) {
 	int		i, j, pixels, num, max, altmax;
-	miptex_t* mt;
+	MipTex_t* mt;
 	Texture_t* tx, * tx2;
 	Texture_t* anims[10];
 	Texture_t* altanims[10];
-	dmiptexLump_t* m;
+	dMipTexLump_t* m;
 
 	if (!l->filelen) {
 		loadmodel->textures = NULL;
 		return;
 	}
-	m = (dmiptexLump_t*)(mod_base + l->fileofs);
+	m = (dMipTexLump_t*)(mod_base + l->fileofs);
 
 	m->nummiptex = LittleLong(m->nummiptex);
 
@@ -336,7 +336,7 @@ void Mod_LoadTextures(Lump_t* l) {
 		m->dataofs[i] = LittleLong(m->dataofs[i]);
 		if (m->dataofs[i] == -1)
 			continue;
-		mt = (miptex_t*)((byte*)m + m->dataofs[i]);
+		mt = (MipTex_t*)((byte*)m + m->dataofs[i]);
 		mt->width = LittleLong(mt->width);
 		mt->height = LittleLong(mt->height);
 		for (j=0; j<MIPLEVELS; j++)
@@ -352,7 +352,7 @@ void Mod_LoadTextures(Lump_t* l) {
 		tx->width = mt->width;
 		tx->height = mt->height;
 		for (j=0; j<MIPLEVELS; j++)
-			tx->offsets[j] = mt->offsets[j] + sizeof(Texture_t) - sizeof(miptex_t);
+			tx->offsets[j] = mt->offsets[j] + sizeof(Texture_t) - sizeof(MipTex_t);
 		// the pixels immediately follow the structures
 		memcpy(tx+1, mt+1, pixels);
 
@@ -698,7 +698,7 @@ Mod_LoadFaces
 =================
 */
 void Mod_LoadFaces(Lump_t* l) {
-	dface_t* in;
+	dFace_t* in;
 	mSurface_t* out;
 	int			i, count, surfnum;
 	int			planenum, side;
@@ -1064,12 +1064,12 @@ Mod_LoadBrushModel
 */
 void Mod_LoadBrushModel(Model_t* mod, TypeLess_ptr buffer) {
 	int			i, j;
-	dheader_t* header;
+	dHeader_t* header;
 	dModel_t* bm;
 
 	loadmodel->type = mod_brush;
 
-	header = (dheader_t*)buffer;
+	header = (dHeader_t*)buffer;
 
 	i = LittleLong(header->version);
 	if (i != BSPVERSION)
@@ -1078,7 +1078,7 @@ void Mod_LoadBrushModel(Model_t* mod, TypeLess_ptr buffer) {
 	// swap all the lumps
 	mod_base = (byte*)header;
 
-	for (i=0; i<sizeof(dheader_t)/4; i++)
+	for (i=0; i<sizeof(dHeader_t)/4; i++)
 		((int*)header)[i] = LittleLong(((int*)header)[i]);
 
 	// load into heap

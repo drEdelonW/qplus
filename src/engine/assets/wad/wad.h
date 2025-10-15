@@ -24,8 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //===============
 //   TYPES
 //===============
-
-
 typedef enum {
     CMP_NONE    = 0,
     CMP_LZSS    = 1
@@ -59,6 +57,7 @@ typedef struct {
 } WadInfo_t;
 typedef WadInfo_t* WadInfo_p;
 
+#define LUMP_NAME_LEN   (16)
 typedef struct {
     int32_t filepos;
     int32_t disksize;
@@ -66,7 +65,7 @@ typedef struct {
     char    type;           // TypType ?
     char    compression;    // CmpType ?
     char    pad1, pad2;
-    char    name[16];       // must be null terminated
+    char    name[LUMP_NAME_LEN]; // must be null terminated
 } LumpInfo_t;
 typedef LumpInfo_t* LumpInfo_p;
 
