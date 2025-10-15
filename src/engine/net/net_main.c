@@ -40,8 +40,8 @@ char my_tcpip_address[NET_NAMELEN];
 
 void (*GetComPortConfig) (int32_t portNumber, int32_p port, int32_p irq, int32_p baud, bool* useModem);
 void (*SetComPortConfig) (int32_t portNumber, int32_t port, int32_t irq, int32_t baud, bool useModem);
-void (*GetModemConfig) (int32_t portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
-void (*SetModemConfig) (int32_t portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
+void (*GetModemConfig) (int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
+void (*SetModemConfig) (int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
 
 static bool	listening = false;
 
@@ -315,7 +315,7 @@ NET_Connect
 int32_t hostCacheCount = 0;
 hostcache_t hostcache[HOSTCACHESIZE];
 
-qsocket_p NET_Connect(cstring host) {
+qsocket_p NET_Connect(cString host) {
     int numdrivers = net_numdrivers;
 
     SetNetTime();

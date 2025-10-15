@@ -132,7 +132,7 @@ PROC glColorPointerEXT;
 PROC glTexCoordPointerEXT;
 PROC glVertexPointerEXT;
 
-typedef void (APIENTRY* lp3DFXFUNC) (int, int, int, int, int, const typeless_ptr);
+typedef void (APIENTRY* lp3DFXFUNC) (int, int, int, int, int, const TypeLess_ptr);
 lp3DFXFUNC glColorTableEXT;
 qboolean is8bit = false;
 qboolean isPermedia = false;
@@ -498,7 +498,7 @@ void CheckTextureExtensions(void) {
 		if (hInstGL == NULL)
 			Sys_Error("Couldn't load opengl32.dll\n");
 
-		bindTexFunc = (typeless_ptr)GetProcAddress(hInstGL, "glBindTexture");
+		bindTexFunc = (TypeLess_ptr)GetProcAddress(hInstGL, "glBindTexture");
 
 		if (!bindTexFunc)
 			Sys_Error("No texture objects!");
@@ -549,8 +549,8 @@ int		texture_extension_number = 1;
 void CheckMultiTextureExtensions(void) {
 	if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
 		Con_Printf("Multitexture extensions found.\n");
-		qglMTexCoord2fSGIS = (typeless_ptr)wglGetProcAddress("glMTexCoord2fSGIS");
-		qglSelectTextureSGIS = (typeless_ptr)wglGetProcAddress("glSelectTextureSGIS");
+		qglMTexCoord2fSGIS = (TypeLess_ptr)wglGetProcAddress("glMTexCoord2fSGIS");
+		qglSelectTextureSGIS = (TypeLess_ptr)wglGetProcAddress("glSelectTextureSGIS");
 		gl_mtexable = true;
 	}
 }
@@ -1428,7 +1428,7 @@ void VID_Init8bitPalette() {
 	char thePalette[256*3];
 	char* oldPalette, * newPalette;
 
-	glColorTableEXT = (typeless_ptr)wglGetProcAddress("glColorTableEXT");
+	glColorTableEXT = (TypeLess_ptr)wglGetProcAddress("glColorTableEXT");
 	if (!glColorTableEXT || strstr(gl_extensions, "GL_EXT_shared_texture_palette") ||
 		COM_CheckParm("-no8bit"))
 		return;
@@ -1444,7 +1444,7 @@ void VID_Init8bitPalette() {
 		oldPalette++;
 	}
 	glColorTableEXT(GL_SHARED_TEXTURE_PALETTE_EXT, GL_RGB, 256, GL_RGB, GL_UNSIGNED_BYTE,
-		(typeless_ptr)thePalette);
+		(TypeLess_ptr)thePalette);
 	is8bit = TRUE;
 }
 
@@ -1722,8 +1722,8 @@ extern void M_Menu_Options_f(void);
 extern void M_Print(int cx, int cy, char* str);
 extern void M_PrintWhite(int cx, int cy, char* str);
 extern void M_DrawCharacter(int cx, int line, int num);
-extern void M_DrawTransPic(int x, int y, qpic_t* pic);
-extern void M_DrawPic(int x, int y, qpic_t* pic);
+extern void M_DrawTransPic(int x, int y, qPic_t* pic);
+extern void M_DrawPic(int x, int y, qPic_t* pic);
 
 static int	vid_line, vid_wmodes;
 
@@ -1746,7 +1746,7 @@ VID_MenuDraw
 ================
 */
 void VID_MenuDraw(void) {
-	qpic_t* p;
+	qPic_t* p;
 	char* ptr;
 	int			lnummodes, i, j, k, column, row, dup, dupmode;
 	char		temp[100];

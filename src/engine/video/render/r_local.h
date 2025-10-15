@@ -45,7 +45,6 @@ typedef aLight_t* aLight_p;
 //===========================================================================
 // clipped bmodel edges
 
-struct bEdge_s;
 typedef struct bEdge_s bEdge_t;
 typedef bEdge_t* bEdge_p;
 typedef struct bEdge_s {
@@ -81,9 +80,9 @@ struct ClipPlane_s {
     vec3_t      normal;
     float       dist;
     ClipPlane_p next;
-    uint8_t        leftedge;
-    uint8_t        rightedge;
-    uint8_t        reserved[2];
+    uint8_t     leftedge;
+    uint8_t     rightedge;
+    uint8_t     reserved[2];
 };
 
 extern ClipPlane_t view_clipplanes[4];
@@ -137,8 +136,8 @@ void R_DrawSurfaceBlock8_mip3();
 
 #endif
 
-void R_GenSkyTile(typeless_ptr pdest);
-void R_GenSkyTile16(typeless_ptr pdest);
+void R_GenSkyTile(TypeLess_ptr pdest);
+void R_GenSkyTile16(TypeLess_ptr pdest);
 void R_Surf8Patch();
 void R_Surf16Patch();
 void R_DrawSubmodelPolygons(Model_p pmodel, int clipflags);
@@ -243,11 +242,11 @@ void R_ReadPointFile_f();
 void R_SurfacePatch();
 
 extern int      r_amodels_drawn;
-extern Edge_p auxedges;
+extern Edge_p   auxedges;
 extern int      r_numallocatededges;
-extern Edge_p r_edges, edge_p, edge_max;
-extern Edge_p newedges[MAXHEIGHT];
-extern Edge_p removeedges[MAXHEIGHT];
+extern Edge_p   r_edges, edge_p, edge_max;
+extern Edge_p   newedges[MAXHEIGHT];
+extern Edge_p   removeedges[MAXHEIGHT];
 
 extern int screenwidth;
 

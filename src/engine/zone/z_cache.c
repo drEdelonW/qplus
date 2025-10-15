@@ -49,7 +49,7 @@ void Cache_Move(cache_system_p c) {
         new->user = c->user;
         Q_memcpy(new->name, c->name, sizeof(new->name));
         Cache_Free(c->user);
-        new->user->data = (typeless_ptr)(new + 1);
+        new->user->data = (TypeLess_ptr)(new + 1);
     }
     else {
         //		Con_Printf("cache_move failed\n");
@@ -279,7 +279,7 @@ void Cache_Free(cache_user_p c) {
     Cache_Check
     ==============
 */
-typeless_ptr Cache_Check(cache_user_p c) {
+TypeLess_ptr Cache_Check(cache_user_p c) {
     if (!c->data)
         return NULL;
 
@@ -298,7 +298,7 @@ typeless_ptr Cache_Check(cache_user_p c) {
     Cache_Alloc
     ==============
 */
-typeless_ptr Cache_Alloc(cache_user_p c, size_t size, cstring name) {
+TypeLess_ptr Cache_Alloc(cache_user_p c, size_t size, cString name) {
     if (c->data)
         Sys_Error("Cache_Alloc: allready allocated");
 
@@ -312,7 +312,7 @@ typeless_ptr Cache_Alloc(cache_user_p c, size_t size, cstring name) {
         cache_system_p cs = Cache_TryAlloc(size, false);
         if (cs) {
             strncpy(cs->name, name, sizeof(cs->name) - 1);
-            c->data = (typeless_ptr)(cs + 1);
+            c->data = (TypeLess_ptr)(cs + 1);
             cs->user = c;
             break;
         }

@@ -36,9 +36,9 @@ void StartDefaultTask(void const* argument) {
     // for (;;) {
     //     osDelay(1);
     // }
-    static quakeparms_t parms;
+    static QuakeParms_t parms;
     int argc;
-    cstring* argv;
+    cStringArray argv;
     parms.memsize = 8 * 1024 * 1024;
     parms.membase = malloc(parms.memsize);
     parms.basedir = ".";
@@ -82,7 +82,7 @@ static inline uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
             (b >> 3));
 }
 
-static inline void dcache_clean_range(typeless_ptr addr, size_t size) {
+static inline void dcache_clean_range(TypeLess_ptr addr, size_t size) {
     uintptr_t a = ((uintptr_t)addr) & ~31u;               // 32B line align
     size += ((uintptr_t)addr - a);
     size = (size + 31u) & ~31u;

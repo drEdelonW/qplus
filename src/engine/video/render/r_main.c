@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //define	PASSAGES
 
-typeless_ptr colormap;
+TypeLess_ptr colormap;
 vec3_t		viewlightvec;
 aLight_t	r_viewlighting = { 128, 192, viewlightvec };
 float		r_time1;
@@ -815,7 +815,7 @@ void R_EdgeDrawing() {
     Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2];
 
 #endif
-#  define ALIGN_PTR(p, a) ((typeless_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
+#  define ALIGN_PTR(p, a) ((TypeLess_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
     if (auxedges) {
         r_edges = auxedges;
     }

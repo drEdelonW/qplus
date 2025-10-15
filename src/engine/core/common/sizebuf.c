@@ -27,7 +27,7 @@ void SZ_Clear(sizebuf_p buf) {
     buf->cursize = 0;
 }
 
-typeless_ptr SZ_GetSpace(sizebuf_p buf, int32_t length) {
+TypeLess_ptr SZ_GetSpace(sizebuf_p buf, int32_t length) {
     if ((buf->cursize + length) > buf->maxsize) {
         if (!buf->allowoverflow)
             Sys_Error("SZ_GetSpace: overflow without allowoverflow set");
@@ -40,17 +40,17 @@ typeless_ptr SZ_GetSpace(sizebuf_p buf, int32_t length) {
         SZ_Clear(buf);
     }
 
-    typeless_ptr data = buf->data + buf->cursize;
+    TypeLess_ptr data = buf->data + buf->cursize;
     buf->cursize += length;
 
     return data;
 }
 
-void SZ_Write(sizebuf_p buf, typeless_ptr data, int32_t length) {
+void SZ_Write(sizebuf_p buf, TypeLess_ptr data, int32_t length) {
     Q_memcpy(SZ_GetSpace(buf, length), data, length);
 }
 
-void SZ_Print(sizebuf_p buf, cstring data) {
+void SZ_Print(sizebuf_p buf, cString data) {
     int len = Q_strlen(data) + 1;
 
     // uint8_p cast to keep VC++ happy

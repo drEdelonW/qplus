@@ -38,9 +38,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 Model_p loadmodel;
 char loadname[32]; // for hunk tags
 
-void Mod_LoadSpriteModel(Model_p mod, typeless_ptr buffer);
-void Mod_LoadBrushModel(Model_p mod, typeless_ptr buffer);
-void Mod_LoadAliasModel(Model_p mod, typeless_ptr buffer);
+void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer);
+void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer);
+void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer);
 Model_p Mod_LoadModel(Model_p mod, bool crash);
 
 uint8_t mod_novis[MAX_MAP_LEAFS / 8];
@@ -67,8 +67,8 @@ Mod_Extradata
 Caches the data if needed
 ===============
 */
-typeless_ptr Mod_Extradata(Model_p mod) {
-    typeless_ptr r = Cache_Check(&mod->cache);
+TypeLess_ptr Mod_Extradata(Model_p mod) {
+    TypeLess_ptr r = Cache_Check(&mod->cache);
     if (r)
         return r;
 
@@ -173,7 +173,7 @@ Mod_FindName
 
 ==================
 */
-Model_p Mod_FindName(cstring name) {
+Model_p Mod_FindName(cString name) {
     Model_p avail = NULL;
 
     if (!name[0])
@@ -218,7 +218,7 @@ Mod_TouchModel
 
 ==================
 */
-void Mod_TouchModel(cstring name) {
+void Mod_TouchModel(cString name) {
     Model_p mod = Mod_FindName(name);
 
     if ((mod->needload == NL_PRESENT) &&
@@ -297,7 +297,7 @@ Mod_ForName
 Loads in a model for the given name
 ==================
 */
-Model_p Mod_ForName(cstring name, bool crash) {
+Model_p Mod_ForName(cString name, bool crash) {
     Model_p mod = Mod_FindName(name);
     return Mod_LoadModel(mod, crash);
 }
@@ -319,7 +319,7 @@ uint8_p mod_base;
 Mod_LoadTextures
 =================
 */
-void Mod_LoadTextures(lump_p l) {
+void Mod_LoadTextures(Lump_p l) {
     if (!l->filelen) {
         loadmodel->textures = NULL;
         return;
@@ -464,7 +464,7 @@ void Mod_LoadTextures(lump_p l) {
 Mod_LoadLighting
 =================
 */
-void Mod_LoadLighting(lump_p l) {
+void Mod_LoadLighting(Lump_p l) {
     if (!l->filelen) {
         loadmodel->lightdata = NULL;
         return;
@@ -479,7 +479,7 @@ void Mod_LoadLighting(lump_p l) {
 Mod_LoadVisibility
 =================
 */
-void Mod_LoadVisibility(lump_p l) {
+void Mod_LoadVisibility(Lump_p l) {
     if (!l->filelen) {
         loadmodel->visdata = NULL;
         return;
@@ -494,7 +494,7 @@ void Mod_LoadVisibility(lump_p l) {
 Mod_LoadEntities
 =================
 */
-void Mod_LoadEntities(lump_p l) {
+void Mod_LoadEntities(Lump_p l) {
     if (!l->filelen) {
         loadmodel->entities = NULL;
         return;
@@ -509,8 +509,8 @@ void Mod_LoadEntities(lump_p l) {
     Mod_LoadVertexes
     =================
 */
-void Mod_LoadVertexes(lump_p l) {
-    dVertex_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadVertexes(Lump_p l) {
+    dVertex_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -531,8 +531,8 @@ void Mod_LoadVertexes(lump_p l) {
     Mod_LoadSubmodels
     =================
 */
-void Mod_LoadSubmodels(lump_p l) {
-    dModel_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadSubmodels(Lump_p l) {
+    dModel_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -561,8 +561,8 @@ void Mod_LoadSubmodels(lump_p l) {
     Mod_LoadEdges
     =================
 */
-void Mod_LoadEdges(lump_p l) {
-    dEdge_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadEdges(Lump_p l) {
+    dEdge_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -582,8 +582,8 @@ void Mod_LoadEdges(lump_p l) {
     Mod_LoadTexinfo
     =================
 */
-void Mod_LoadTexinfo(lump_p l) {
-    TexInfo_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadTexinfo(Lump_p l) {
+    TexInfo_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -690,8 +690,8 @@ void CalcSurfaceExtents(mSurface_p s) {
     Mod_LoadFaces
     =================
 */
-void Mod_LoadFaces(lump_p l) {
-    dface_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadFaces(Lump_p l) {
+    dface_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -767,8 +767,8 @@ void Mod_SetParent(mNode_p node, mNode_p parent) {
     Mod_LoadNodes
     =================
 */
-void Mod_LoadNodes(lump_p l) {
-    dNode_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadNodes(Lump_p l) {
+    dNode_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -805,8 +805,8 @@ void Mod_LoadNodes(lump_p l) {
 Mod_LoadLeafs
 =================
 */
-void Mod_LoadLeafs(lump_p l) {
-    dLeaf_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadLeafs(Lump_p l) {
+    dLeaf_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -844,8 +844,8 @@ void Mod_LoadLeafs(lump_p l) {
 Mod_LoadClipnodes
 =================
 */
-void Mod_LoadClipnodes(lump_p l) {
-    dClipNode_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadClipnodes(Lump_p l) {
+    dClipNode_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -922,8 +922,8 @@ void Mod_MakeHull0() {
 Mod_LoadMarksurfaces
 =================
 */
-void Mod_LoadMarksurfaces(lump_p l) {
-    int16_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadMarksurfaces(Lump_p l) {
+    int16_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -945,8 +945,8 @@ void Mod_LoadMarksurfaces(lump_p l) {
 Mod_LoadSurfedges
 =================
 */
-void Mod_LoadSurfedges(lump_p l) {
-    int32_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadSurfedges(Lump_p l) {
+    int32_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -964,8 +964,8 @@ void Mod_LoadSurfedges(lump_p l) {
 Mod_LoadPlanes
 =================
 */
-void Mod_LoadPlanes(lump_p l) {
-    dPlane_p in = (typeless_ptr)(mod_base + l->fileofs);
+void Mod_LoadPlanes(Lump_p l) {
+    dPlane_p in = (TypeLess_ptr)(mod_base + l->fileofs);
     if (l->filelen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     int count = l->filelen / sizeof(*in);
@@ -1007,7 +1007,7 @@ float RadiusFromBounds(vec3_t mins, vec3_t maxs) {
 Mod_LoadBrushModel
 =================
 */
-void Mod_LoadBrushModel(Model_p mod, typeless_ptr buffer) {
+void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
     loadmodel->type = mod_brush;
     dheader_p header = (dheader_p)buffer;
 
@@ -1095,8 +1095,8 @@ ALIAS MODELS
 Mod_LoadAliasFrame
 =================
 */
-typeless_ptr Mod_LoadAliasFrame(typeless_ptr  pin, int32_p pframeindex, int32_t numv, TriVertx_p pbboxmin,
-    TriVertx_p pbboxmax, AliasHdr_p pheader, cstring name) {
+TypeLess_ptr Mod_LoadAliasFrame(TypeLess_ptr  pin, int32_p pframeindex, int32_t numv, TriVertx_p pbboxmin,
+    TriVertx_p pbboxmax, AliasHdr_p pheader, cString name) {
     daliasframe_p pdaliasframe = (daliasframe_p)pin;
 
     strcpy(name, pdaliasframe->name);
@@ -1124,7 +1124,7 @@ typeless_ptr Mod_LoadAliasFrame(typeless_ptr  pin, int32_p pframeindex, int32_t 
 
     pinframe += numv;
 
-    return (typeless_ptr)pinframe;
+    return (TypeLess_ptr)pinframe;
 }
 
 
@@ -1133,8 +1133,8 @@ typeless_ptr Mod_LoadAliasFrame(typeless_ptr  pin, int32_p pframeindex, int32_t 
 Mod_LoadAliasGroup
 =================
 */
-typeless_ptr  Mod_LoadAliasGroup(typeless_ptr  pin, int32_p pframeindex, int numv,
-    TriVertx_p pbboxmin, TriVertx_p pbboxmax, AliasHdr_p pheader, cstring name) {
+TypeLess_ptr  Mod_LoadAliasGroup(TypeLess_ptr  pin, int32_p pframeindex, int numv,
+    TriVertx_p pbboxmin, TriVertx_p pbboxmax, AliasHdr_p pheader, cString name) {
 
     dAliasGroup_p pingroup = (dAliasGroup_p)pin;
     int32_t numframes = LittleLong(pingroup->numframes);
@@ -1162,7 +1162,7 @@ typeless_ptr  Mod_LoadAliasGroup(typeless_ptr  pin, int32_p pframeindex, int num
         pin_intervals++;
     }
 
-    typeless_ptr ptemp = (typeless_ptr)pin_intervals;
+    TypeLess_ptr ptemp = (TypeLess_ptr)pin_intervals;
 
     for (int32_t i = 0; i < numframes; i++) {
         ptemp = Mod_LoadAliasFrame(
@@ -1184,7 +1184,7 @@ typeless_ptr  Mod_LoadAliasGroup(typeless_ptr  pin, int32_p pframeindex, int num
 Mod_LoadAliasSkin
 =================
 */
-typeless_ptr Mod_LoadAliasSkin(typeless_ptr pin, int32_p pskinindex, int skinsize, AliasHdr_p pheader) {
+TypeLess_ptr Mod_LoadAliasSkin(TypeLess_ptr pin, int32_p pskinindex, int skinsize, AliasHdr_p pheader) {
     uint8_p pskin = Hunk_AllocName(skinsize * r_pixbytes, loadname);
     uint8_p pinskin = (uint8_p)pin;
     *pskinindex = (uint8_p)pskin - (uint8_p)pheader;
@@ -1203,7 +1203,7 @@ typeless_ptr Mod_LoadAliasSkin(typeless_ptr pin, int32_p pskinindex, int skinsiz
     }
 
     pinskin += skinsize;
-    return ((typeless_ptr)pinskin);
+    return ((TypeLess_ptr)pinskin);
 }
 
 
@@ -1212,7 +1212,7 @@ typeless_ptr Mod_LoadAliasSkin(typeless_ptr pin, int32_p pskinindex, int skinsiz
 Mod_LoadAliasSkinGroup
 =================
 */
-typeless_ptr Mod_LoadAliasSkinGroup(typeless_ptr pin, int32_p pskinindex, int32_t skinsize, AliasHdr_p pheader) {
+TypeLess_ptr Mod_LoadAliasSkinGroup(TypeLess_ptr pin, int32_p pskinindex, int32_t skinsize, AliasHdr_p pheader) {
     dAliasSkinGroup_p pinskingroup = (dAliasSkinGroup_p)pin;
     int32_t numskins = LittleLong(pinskingroup->numskins);
     mAliasSkinGroup_p paliasskingroup = Hunk_AllocName(
@@ -1235,7 +1235,7 @@ typeless_ptr Mod_LoadAliasSkinGroup(typeless_ptr pin, int32_p pskinindex, int32_
         pinskinintervals++;
     }
 
-    typeless_ptr ptemp = (typeless_ptr)pinskinintervals;
+    TypeLess_ptr ptemp = (TypeLess_ptr)pinskinintervals;
     for (int32_t i = 0; i < numskins; i++) {
         ptemp = Mod_LoadAliasSkin(ptemp,
             &paliasskingroup->skindescs[i].skin, skinsize, pheader);
@@ -1250,7 +1250,7 @@ typeless_ptr Mod_LoadAliasSkinGroup(typeless_ptr pin, int32_p pskinindex, int32_
 Mod_LoadAliasModel
 =================
 */
-void Mod_LoadAliasModel(Model_p mod, typeless_ptr buffer) {
+void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     size_t start = Hunk_LowMark();
 
     Mdl_p pinmodel = (Mdl_p)buffer;
@@ -1450,7 +1450,7 @@ void Mod_LoadAliasModel(Model_p mod, typeless_ptr buffer) {
 Mod_LoadSpriteFrame
 =================
 */
-typeless_ptr  Mod_LoadSpriteFrame(typeless_ptr  pin, mSpriteFrame_t** ppframe) {
+TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_t** ppframe) {
     dSpriteFrame_p pinframe = (dSpriteFrame_p)pin;
 
     int width = LittleLong(pinframe->width);
@@ -1490,7 +1490,7 @@ typeless_ptr  Mod_LoadSpriteFrame(typeless_ptr  pin, mSpriteFrame_t** ppframe) {
             r_pixbytes);
     }
 
-    return (typeless_ptr)((uint8_p)pinframe + sizeof(dSpriteFrame_t) + size);
+    return (TypeLess_ptr)((uint8_p)pinframe + sizeof(dSpriteFrame_t) + size);
 }
 
 
@@ -1499,7 +1499,7 @@ typeless_ptr  Mod_LoadSpriteFrame(typeless_ptr  pin, mSpriteFrame_t** ppframe) {
 Mod_LoadSpriteGroup
 =================
 */
-typeless_ptr  Mod_LoadSpriteGroup(typeless_ptr  pin, mSpriteFrame_t** ppframe) {
+TypeLess_ptr  Mod_LoadSpriteGroup(TypeLess_ptr  pin, mSpriteFrame_t** ppframe) {
     dSpriteGroup_p pingroup = (dSpriteGroup_p)pin;
     int numframes = LittleLong(pingroup->numframes);
 
@@ -1524,7 +1524,7 @@ typeless_ptr  Mod_LoadSpriteGroup(typeless_ptr  pin, mSpriteFrame_t** ppframe) {
         pin_intervals++;
     }
 
-    typeless_ptr ptemp = (typeless_ptr)pin_intervals;
+    TypeLess_ptr ptemp = (TypeLess_ptr)pin_intervals;
 
     for (int i = 0; i < numframes; i++) {
         ptemp = Mod_LoadSpriteFrame(ptemp, &pspritegroup->frames[i]);
@@ -1539,7 +1539,7 @@ typeless_ptr  Mod_LoadSpriteGroup(typeless_ptr  pin, mSpriteFrame_t** ppframe) {
 Mod_LoadSpriteModel
 =================
 */
-void Mod_LoadSpriteModel(Model_p mod, typeless_ptr buffer) {
+void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
     dSprite_p pin = (dSprite_p)buffer;
 
     int version = LittleLong(pin->version);

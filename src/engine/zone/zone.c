@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	Memory_Init
 	========================
 */
-void Memory_Init(typeless_ptr buf, size_t size) {
+void Memory_Init(TypeLess_ptr buf, size_t size) {
 	int zonesize = DYNAMIC_SIZE;
 
 	Hulk_Init(buf, size);

@@ -139,7 +139,7 @@ CL_EstablishConnection
 Host should be either "local" or a net address to be passed on
 =====================
 */
-void CL_EstablishConnection(cstring host) {
+void CL_EstablishConnection(cString host) {
     if ((cls.state == ca_dedicated) ||
         (cls.demoplayback))
         return;

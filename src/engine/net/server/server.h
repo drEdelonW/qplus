@@ -59,10 +59,10 @@ typedef struct {
 #endif
 	char        modelname[64];  // maps/<name>.bsp, for model_precache[0]
 	Model_p     worldmodel;
-	cstring     model_precache[MAX_MODELS];	    // NULL terminated
+	cString     model_precache[MAX_MODELS];	    // NULL terminated
 	Model_p     models[MAX_MODELS];
-	cstring     sound_precache[MAX_SOUNDS];	    // NULL terminated
-	cstring     lightstyles[MAX_LIGHTSTYLES];
+	cString     sound_precache[MAX_SOUNDS];	    // NULL terminated
+	cString     lightstyles[MAX_LIGHTSTYLES];
 	int32_t     num_edicts;
 	int32_t     max_edicts;
 	edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
@@ -202,14 +202,14 @@ extern edict_p      sv_player;
 void SV_Init();
 
 void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count);
-void SV_StartSound(edict_p entity, int channel, cstring sample, int volume,	float attenuation);
+void SV_StartSound(edict_p entity, int channel, cString sample, int volume,	float attenuation);
 
 void SV_DropClient(bool crash);
 
 void SV_SendClientMessages();
 void SV_ClearDatagram();
 
-int SV_ModelIndex(cstring name);
+int SV_ModelIndex(cString name);
 
 void SV_SetIdealPitch();
 
@@ -218,8 +218,8 @@ void SV_AddUpdates();
 void SV_ClientThink();
 void SV_AddClientToServer(qsocket_p ret);
 
-void SV_ClientPrintf(cstring fmt, ...);
-void SV_BroadcastPrintf(cstring fmt, ...);
+void SV_ClientPrintf(cString fmt, ...);
+void SV_BroadcastPrintf(cString fmt, ...);
 
 void SV_Physics();
 
@@ -234,7 +234,7 @@ void SV_CheckForNewClients();
 void SV_RunClients();
 void SV_SaveSpawnparms();
 #ifdef QUAKE2
-void SV_SpawnServer(cstring server, cstring startspot);
+void SV_SpawnServer(cString server, cString startspot);
 #else
-void SV_SpawnServer(cstring server);
+void SV_SpawnServer(cString server);
 #endif

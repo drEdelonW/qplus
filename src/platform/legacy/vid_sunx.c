@@ -80,11 +80,11 @@ typedef struct
 } modedesc_t;
 
 extern void M_Menu_Options_f();
-extern void M_Print(int cx, int cy, cstring str);
-extern void M_PrintWhite(int cx, int cy, cstring str);
+extern void M_Print(int cx, int cy, cString str);
+extern void M_PrintWhite(int cx, int cy, cString str);
 extern void M_DrawCharacter(int cx, int line, int num);
-extern void M_DrawTransPic(int x, int y, qpic_p pic);
-extern void M_DrawPic(int x, int y, qpic_p pic);
+extern void M_DrawTransPic(int x, int y, qPic_p pic);
+extern void M_DrawPic(int x, int y, qPic_p pic);
 
 extern int sb_updates;
 extern int x_root, y_root; // root window relative mouse coords
@@ -468,7 +468,7 @@ void ResetSharedFrameBuffers(void) {
 
 		// attach to the shared memory segment
 		x_shminfo[frm].shmaddr =
-			(typeless_ptr)shmat(x_shminfo[frm].shmid, 0, 0);
+			(TypeLess_ptr)shmat(x_shminfo[frm].shmid, 0, 0);
 
 		printf("VID: shared memory id=%d, addr=0x%x\n", x_shminfo[frm].shmid,
 			(int)x_shminfo[frm].shmaddr);
@@ -487,8 +487,8 @@ void ResetSharedFrameBuffers(void) {
 }
 
 void VID_MenuDraw(void) {
-	qpic_p p;
-	cstring ptr;
+	qPic_p p;
+	cString ptr;
 	int			i, j, column, row, dup;
 	char		temp[100];
 
@@ -510,7 +510,7 @@ byte	surfcache[1024 * 1024];
 // VID_SetWindowTitle - set the window and icon titles
 //
 
-void VID_SetWindowTitle(Window win, cstring pszName) {
+void VID_SetWindowTitle(Window win, cString pszName) {
 	XTextProperty	textprop;
 	XWMHints* wmHints;
 
@@ -743,11 +743,11 @@ void	VID_Init(uint8_t* palette) {
 
 	// even if MITSHM is available, make sure it's a local connection
 	if (XShmQueryExtension(x_disp)) {
-		cstring displayname;
+		cString displayname;
 		doShm = true;
-		displayname = (cstring)getenv("DISPLAY");
+		displayname = (cString)getenv("DISPLAY");
 		if (displayname) {
-			cstring d = displayname;
+			cString d = displayname;
 			while (*d && (*d != ':')) d++;
 			if (*d) *d = 0;
 			if (!(!strcasecmp(displayname, "unix") || !*displayname))
@@ -1109,7 +1109,7 @@ void Sys_SendKeyEvents(void) {
 }
 
 #if 0
-cstring Sys_ConsoleInput() {
+cString Sys_ConsoleInput() {
 
 	static char	text[256];
 	int		len;

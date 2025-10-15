@@ -28,7 +28,7 @@ int    lightleft, sourcesstep, blocksize, sourcetstep;
 int    lightdelta, lightdeltastep;
 int    lightright, lightleftstep, lightrightstep, blockdivshift;
 uint32_t  blockdivmask;
-typeless_ptr prowdestbase;
+TypeLess_ptr prowdestbase;
 uint8_p pbasesource;
 int    surfrowbytes; // used by ASM files
 uint32_p r_lightptr;
@@ -498,7 +498,7 @@ void R_DrawSurfaceBlock16() {
 R_GenTurbTile
 ================
 */
-void R_GenTurbTile(pixel_p pbasetex, typeless_ptr pdest) {
+void R_GenTurbTile(pixel_p pbasetex, TypeLess_ptr pdest) {
     int* turb = sintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
     uint8_p pd = (uint8_p)pdest;
 
@@ -517,7 +517,7 @@ void R_GenTurbTile(pixel_p pbasetex, typeless_ptr pdest) {
 R_GenTurbTile16
 ================
 */
-void R_GenTurbTile16(pixel_p pbasetex, typeless_ptr pdest) {
+void R_GenTurbTile16(pixel_p pbasetex, TypeLess_ptr pdest) {
     int* turb = sintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
     uint16_p pd = (uint16_p)pdest;
 
@@ -536,7 +536,7 @@ void R_GenTurbTile16(pixel_p pbasetex, typeless_ptr pdest) {
 R_GenTile
 ================
 */
-void R_GenTile(mSurface_t* psurf, typeless_ptr pdest) {
+void R_GenTile(mSurface_t* psurf, TypeLess_ptr pdest) {
     if (psurf->flags & SURF_DRAWTURB) {
         if (r_pixbytes == 1) {
             R_GenTurbTile((pixel_p)

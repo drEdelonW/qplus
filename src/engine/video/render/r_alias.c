@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 mTriangle_p ptriangles;
 AffineTriDesc_t	r_affinetridesc;
 
-typeless_ptr 			acolormap;	// FIXME: should go away
+TypeLess_ptr    acolormap;	// FIXME: should go away
 
 TriVertx_p r_apverts;
 
@@ -536,7 +536,7 @@ void R_AliasSetupSkin() {
     }
 
     r_affinetridesc.pskindesc = pskindesc;
-    r_affinetridesc.pskin = (typeless_ptr)((uint8_p)paliashdr + pskindesc->skin);
+    r_affinetridesc.pskin = (TypeLess_ptr)((uint8_p)paliashdr + pskindesc->skin);
     r_affinetridesc.skinwidth = a_skinwidth;
     r_affinetridesc.seamfixupX16 = (a_skinwidth >> 1) << 16;
     r_affinetridesc.skinheight = pmdl->skinheight;

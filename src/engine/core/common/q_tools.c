@@ -10,7 +10,7 @@
 */
 
 #if 0
-void Q_memset(typeless_ptr dest, int32_t fill, int32_t count) {
+void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count) {
     if ((((int32_t)dest | count) & 3) == 0) {
         count >>= 2;
         fill = fill | (fill << 8) | (fill << 16) | (fill << 24);
@@ -25,7 +25,7 @@ void Q_memset(typeless_ptr dest, int32_t fill, int32_t count) {
     }
 }
 #else
-void Q_memset(typeless_ptr dest, int32_t fill, int32_t count) {
+void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count) {
     if (count <= 0) return;
     /* 64-bit safe alignment check */
     if ((((uintptr_t)dest | (uintptr_t)count) & 3u) == 0u) {
@@ -45,7 +45,7 @@ void Q_memset(typeless_ptr dest, int32_t fill, int32_t count) {
 #endif
 
 #if 0
-void Q_memcpy(typeless_ptr dest, typeless_ptr src, int32_t count) {
+void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count) {
     if ((((int32_t)dest | (int32_t)src | count) & 3) == 0) {
         count >>= 2;
         for (int32_t i = 0; i < count; i++) {
@@ -59,7 +59,7 @@ void Q_memcpy(typeless_ptr dest, typeless_ptr src, int32_t count) {
     }
 }
 #else
-void Q_memcpy(typeless_ptr dest, typeless_ptr src, int32_t count) {
+void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count) {
     if (count <= 0) return;
     if ((((uintptr_t)dest | (uintptr_t)src | (uintptr_t)count) & 3u) == 0u) {
         int32_t n = count >> 2;
@@ -75,7 +75,7 @@ void Q_memcpy(typeless_ptr dest, typeless_ptr src, int32_t count) {
 }
 #endif
 
-int Q_memcmp(typeless_ptr m1, typeless_ptr m2, int32_t count) {
+int Q_memcmp(TypeLess_ptr m1, TypeLess_ptr m2, int32_t count) {
     while (count) {
         count--;
         if (((uint8_p)m1)[count] != ((uint8_p)m2)[count]) {
@@ -85,7 +85,7 @@ int Q_memcmp(typeless_ptr m1, typeless_ptr m2, int32_t count) {
     return 0;
 }
 
-void Q_strcpy(cstring dest, cstring src) {
+void Q_strcpy(cString dest, cString src) {
     while (*src) {
         *dest++ = *src++;
     }
@@ -93,7 +93,7 @@ void Q_strcpy(cstring dest, cstring src) {
 }
 
 #if 0
-void Q_strncpy(cstring dest, cstring src, int32_t count) {
+void Q_strncpy(cString dest, cString src, int32_t count) {
     while (*src && count--) {
         *dest++ = *src++;
     }
@@ -102,7 +102,7 @@ void Q_strncpy(cstring dest, cstring src, int32_t count) {
     }
 }
 #else
-void Q_strncpy(cstring dest, cstring src, int32_t count) {
+void Q_strncpy(cString dest, cString src, int32_t count) {
     // if (count <= 0) return;
     int32_t n = count;
     while (--n > 0 && *src) {
@@ -112,7 +112,7 @@ void Q_strncpy(cstring dest, cstring src, int32_t count) {
 }
 #endif
 
-int Q_strlen(cstring str) {
+int Q_strlen(cString str) {
     int32_t count = 0;
     while (str[count])
         count++;
@@ -120,7 +120,7 @@ int Q_strlen(cstring str) {
     return count;
 }
 
-cstring Q_strrchr(cstring s, char c) {
+cString Q_strrchr(cString s, char c) {
     int32_t len = Q_strlen(s);
     s += len;
     while (len--) {
@@ -131,12 +131,12 @@ cstring Q_strrchr(cstring s, char c) {
     return 0;
 }
 
-void Q_strcat(cstring dest, cstring src) {
+void Q_strcat(cString dest, cString src) {
     dest += Q_strlen(dest);
     Q_strcpy(dest, src);
 }
 
-int Q_strcmp(cstring s1, cstring s2) {
+int Q_strcmp(cString s1, cString s2) {
     while (1) {
         if (*s1 != *s2)
             return -1;              // strings not equal
@@ -149,7 +149,7 @@ int Q_strcmp(cstring s1, cstring s2) {
     return -1;
 }
 
-int Q_strncmp(cstring s1, cstring s2, int32_t count) {
+int Q_strncmp(cString s1, cString s2, int32_t count) {
     while (1) {
         if (!count--)
             return 0;
@@ -165,7 +165,7 @@ int Q_strncmp(cstring s1, cstring s2, int32_t count) {
 }
 
 #if 0
-int Q_strncasecmp(cstring s1, cstring s2, int32_t n) {
+int Q_strncasecmp(cString s1, cString s2, int32_t n) {
     while (1) {
         int c1 = *s1++;
         int c2 = *s2++;
@@ -190,7 +190,7 @@ int Q_strncasecmp(cstring s1, cstring s2, int32_t n) {
     return -1;
 }
 #else
-int Q_strncasecmp(cstring s1, cstring s2, int32_t n) {
+int Q_strncasecmp(cString s1, cString s2, int32_t n) {
     // if (n <= 0) return 0;
     do {
         int c1 = *s1++;
@@ -204,11 +204,11 @@ int Q_strncasecmp(cstring s1, cstring s2, int32_t n) {
 }
 #endif
 
-int Q_strcasecmp(cstring s1, cstring s2) {
+int Q_strcasecmp(cString s1, cString s2) {
     return Q_strncasecmp(s1, s2, 99999);
 }
 
-int Q_atoi(cstring str) {
+int Q_atoi(cString str) {
     int sign;
 
     if (*str == '-') {
@@ -264,7 +264,7 @@ int Q_atoi(cstring str) {
 }
 
 
-float Q_atof(cstring str) {
+float Q_atof(cString str) {
     int     sign;
 
     if (*str == '-') {

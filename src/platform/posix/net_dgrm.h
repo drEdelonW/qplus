@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 int Datagram_Init();
 void Datagram_Listen(bool state);
 void Datagram_SearchForHosts(bool xmit);
-qsocket_p Datagram_Connect(cstring host);
+qsocket_p Datagram_Connect(cString host);
 qsocket_p Datagram_CheckNewConnections();
 int Datagram_GetMessage(qsocket_p sock);
 int Datagram_SendMessage(qsocket_p sock, sizebuf_p data);

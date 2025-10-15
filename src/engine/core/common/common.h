@@ -40,21 +40,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern char com_token[1024];
 extern bool com_eof;
 
-cstring COM_Parse(cstring data);
+cString COM_Parse(cString data);
 
 extern int com_argc;
 extern char** com_argv;
 
-int COM_CheckParm(cstring parm);
-void COM_Init(cstring path);
-void COM_InitArgv(int argc, cstring* argv);
+int COM_CheckParm(cString parm);
+void COM_Init(cString path);
+void COM_InitArgv(int argc, cStringArray argv);
 
-cstring COM_SkipPath(cstring pathname);
-void COM_StripExtension(cstring in, cstring out);
-void COM_FileBase(cstring in, cstring out);
-void COM_DefaultExtension(cstring path, cstring extension);
+cString COM_SkipPath(cString pathname);
+void COM_StripExtension(cString in, cString out);
+void COM_FileBase(cString in, cString out);
+void COM_DefaultExtension(cString path, cString extension);
 
-cstring va(cstring format, ...);
+cString va(cString format, ...);
 // does a varargs printf into a temp buffer
 
 
@@ -64,15 +64,15 @@ extern int32_t com_filesize;
 
 extern char com_gamedir[MAX_OSPATH];
 
-void COM_WriteFile(cstring filename, typeless_ptr data, int32_t len);
-int COM_OpenFile(cstring filename, int* hndl);
-int COM_FOpenFile(cstring filename, FILE** file);
+void COM_WriteFile(cString filename, TypeLess_ptr data, int32_t len);
+int COM_OpenFile(cString filename, int* hndl);
+int COM_FOpenFile(cString filename, FILE** file);
 void COM_CloseFile(int h);
 
-uint8_p COM_LoadStackFile(cstring path, typeless_ptr buffer, int32_t bufsize);
-uint8_p COM_LoadTempFile(cstring path);
-uint8_p COM_LoadHunkFile(cstring path);
-void COM_LoadCacheFile(cstring path, cache_user_p cu);
+uint8_p COM_LoadStackFile(cString path, TypeLess_ptr buffer, int32_t bufsize);
+uint8_p COM_LoadTempFile(cString path);
+uint8_p COM_LoadHunkFile(cString path);
+void COM_LoadCacheFile(cString path, cache_user_p cu);
 
 
 extern struct cvar_s registered;

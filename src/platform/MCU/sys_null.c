@@ -65,7 +65,7 @@ int filelength(FILE* f) {
     return end;
 }
 
-int Sys_FileOpenRead(cstring path, int* hndl) {
+int Sys_FileOpenRead(cString path, int* hndl) {
     int i = findhandle();
     FILE* f = fopen(path, "rb");
     if (!f) {
@@ -78,7 +78,7 @@ int Sys_FileOpenRead(cstring path, int* hndl) {
     return filelength(f);
 }
 
-int Sys_FileOpenWrite(cstring path) {
+int Sys_FileOpenWrite(cString path) {
     int i = findhandle();
     FILE* f = fopen(path, "wb");
     if (!f)
@@ -97,15 +97,15 @@ void Sys_FileSeek(int handle, int position) {
     fseek(sys_handles[handle], position, SEEK_SET);
 }
 
-int Sys_FileRead(int handle, typeless_ptr dest, int count) {
+int Sys_FileRead(int handle, TypeLess_ptr dest, int count) {
     return fread(dest, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileWrite(int handle, typeless_ptr data, int count) {
+int Sys_FileWrite(int handle, TypeLess_ptr data, int count) {
     return fwrite(data, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileTime(cstring path) {
+int Sys_FileTime(cString path) {
     FILE* f = fopen(path, "rb");
     if (f) {
         fclose(f);
@@ -114,7 +114,7 @@ int Sys_FileTime(cstring path) {
     return -1;
 }
 
-void Sys_mkdir(cstring path) {}
+void Sys_mkdir(cString path) {}
 
 
 /*
@@ -127,7 +127,7 @@ SYSTEM IO
 
 void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
 
-void Sys_Error(cstring error, ...) {
+void Sys_Error(cString error, ...) {
     printf("Sys_Error: ");
     va_list argptr;
     va_start(argptr, error);
@@ -138,7 +138,7 @@ void Sys_Error(cstring error, ...) {
     exit(1);
 }
 
-void Sys_Printf(cstring fmt, ...) {
+void Sys_Printf(cString fmt, ...) {
     va_list argptr;
     va_start(argptr, fmt);
     vprintf(fmt, argptr);
@@ -155,7 +155,7 @@ double Sys_FloatTime() {
     return t;
 }
 
-cstring Sys_ConsoleInput() {
+cString Sys_ConsoleInput() {
     return NULL;
 }
 
@@ -190,11 +190,11 @@ int _write(int, const char* buf, int len) { (void)buf; return len; }
 #endif
 //=============================================================================
 
-// void main(int argc, cstring* argv) {
+// void main(int argc, cStringArray argv) {
 // int main() {
-//     static quakeparms_t parms;
+//     static QuakeParms_t parms;
 //     int argc;
-//     cstring* argv;
+//     cStringArray argv;
 //     parms.memsize = 8 * 1024 * 1024;
 //     parms.membase = malloc(parms.memsize);
 //     parms.basedir = ".";

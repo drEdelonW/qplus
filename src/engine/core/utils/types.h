@@ -6,10 +6,10 @@
 #include "qboolean.h"
 
 
-typedef char* cstring;
-typedef char** cstring_array;
-typedef const char* cstring_ro;  // read-only
-typedef void* typeless_ptr;
+typedef char* cString;
+typedef char** cStringArray;
+typedef const char* cStringRO;  // read-only
+typedef void* TypeLess_ptr;
 
 // Pointers to standard integer types
 typedef int8_t*    int8_p;
@@ -26,7 +26,7 @@ typedef float*     float_p;
 typedef double*    double_p;
 
 #ifndef NULL
-#   define NULL    ((typeless_ptr)0)
+#   define NULL    ((TypeLess_ptr)0)
 #endif
 
 #if 0

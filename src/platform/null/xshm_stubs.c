@@ -22,7 +22,7 @@ Bool XShmDetach(Display* dpy, XShmSegmentInfo* shminfo) {
 }
 
 XImage* XShmCreateImage(Display* dpy, Visual* visual, uint32_t depth,
-    int format, cstring data, XShmSegmentInfo* shminfo,
+    int format, cString data, XShmSegmentInfo* shminfo,
     uint32_t width, uint32_t height) {
     return NULL;
 }

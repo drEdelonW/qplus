@@ -28,7 +28,7 @@ static qboolean _hunk_tempactive;
 static size_t   _hunk_tempmark;
 
 
-void Hulk_Init(typeless_ptr buf, size_t size) {
+void Hulk_Init(TypeLess_ptr buf, size_t size) {
 	hunk_base = buf;
 	hunk_size = size;
 	hunk_low_used = 0;
@@ -150,7 +150,7 @@ void Hunk_Print(qboolean all) {
 Hunk_AllocName
 ===================
 */
-typeless_ptr Hunk_AllocName(size_t size, cstring name) {
+TypeLess_ptr Hunk_AllocName(size_t size, cString name) {
 #ifdef PARANOID
 	Hunk_Check();
 #endif
@@ -170,7 +170,7 @@ typeless_ptr Hunk_AllocName(size_t size, cstring name) {
 	h->sentinal = HUNK_SENTINAL;
 	Q_strncpy(h->name, name, 8);
 
-	return (typeless_ptr)(h + 1);
+	return (TypeLess_ptr)(h + 1);
 }
 
 /*
@@ -178,7 +178,7 @@ typeless_ptr Hunk_AllocName(size_t size, cstring name) {
 Hunk_Alloc
 ===================
 */
-typeless_ptr Hunk_Alloc(size_t size) {
+TypeLess_ptr Hunk_Alloc(size_t size) {
 	return Hunk_AllocName(size, "unknown");
 }
 
@@ -219,7 +219,7 @@ void Hunk_FreeToHighMark(size_t mark) {
 	Hunk_HighAllocName
 	===================
 */
-typeless_ptr Hunk_HighAllocName(size_t size, cstring name) {
+TypeLess_ptr Hunk_HighAllocName(size_t size, cString name) {
 	if (_hunk_tempactive) {
 		Hunk_FreeToHighMark(_hunk_tempmark);
 		_hunk_tempactive = false;
@@ -246,7 +246,7 @@ typeless_ptr Hunk_HighAllocName(size_t size, cstring name) {
 	h->sentinal = HUNK_SENTINAL;
 	Q_strncpy(h->name, name, 8);
 
-	return (typeless_ptr)(h + 1);
+	return (TypeLess_ptr)(h + 1);
 }
 
 
@@ -257,7 +257,7 @@ typeless_ptr Hunk_HighAllocName(size_t size, cstring name) {
 		Return space from the top of the hunk
 		=================
 */
-typeless_ptr Hunk_TempAlloc(size_t size) {
+TypeLess_ptr Hunk_TempAlloc(size_t size) {
 	size = ALIGN_UP(size, 16);
 
 	if (_hunk_tempactive) {
@@ -267,7 +267,7 @@ typeless_ptr Hunk_TempAlloc(size_t size) {
 
 	_hunk_tempmark = Hunk_HighMark();
 
-	typeless_ptr buf = Hunk_HighAllocName(size, "temp");
+	TypeLess_ptr buf = Hunk_HighAllocName(size, "temp");
 
 	_hunk_tempactive = true;
 

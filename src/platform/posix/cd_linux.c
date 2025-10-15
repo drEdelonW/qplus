@@ -193,7 +193,7 @@ void CDAudio_Resume() {
 }
 
 static void CD_f() {
-    cstring command;
+    cString command;
     int		ret;
     int		n;
 

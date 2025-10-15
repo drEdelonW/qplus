@@ -85,7 +85,7 @@ void Cbuf_Init() {
     Adds command text at the end of the buffer
     ============
 */
-void Cbuf_AddText(cstring text) {
+void Cbuf_AddText(cString text) {
     if ((cmd_text.cursize + Q_strlen(text)) >= cmd_text.maxsize) {
         Con_Printf("Cbuf_AddText: overflow\n");
         return;
@@ -104,8 +104,8 @@ void Cbuf_AddText(cstring text) {
     FIXME: actually change the command buffer to do less copying
     ============
 */
-void Cbuf_InsertText(cstring text) {
-    cstring   temp;
+void Cbuf_InsertText(cString text) {
+    cString   temp;
 
     // copy off any commands still remaining in the exec buffer
     int32_t templen = cmd_text.cursize;
@@ -135,13 +135,13 @@ void Cbuf_InsertText(cstring text) {
 */
 void Cbuf_Execute() {
     int32_t  i;
-    cstring text;
+    cString text;
     char line[1024];
     int32_t  quotes;
 
     while (cmd_text.cursize) {
         // find a \n or ; line break
-        text = (cstring)cmd_text.data;
+        text = (cString)cmd_text.data;
 
         quotes = 0;
         for (i = 0; i < cmd_text.cursize; i++) {
@@ -217,7 +217,7 @@ void Cmd_StuffCmds_f() {
     if (!s)
         return;
 
-    cstring text = Z_Malloc(s + 1);
+    cString text = Z_Malloc(s + 1);
     text[0] = 0;
     for (int i = 1; i < com_argc; i++) {
         if (!com_argv[i]) {
@@ -230,7 +230,7 @@ void Cmd_StuffCmds_f() {
     }
 
     // pull out the commands
-    cstring build = Z_Malloc(s + 1);
+    cString build = Z_Malloc(s + 1);
     build[0] = 0;
 
     for (int i = 0; i < (s - 1); i++) {
@@ -270,7 +270,7 @@ void Cmd_Exec_f() {
     }
 
     size_t mark = Hunk_LowMark();
-    cstring f = (cstring)COM_LoadHunkFile(Cmd_Argv(1));
+    cString f = (cString)COM_LoadHunkFile(Cmd_Argv(1));
     if (!f) {
         Con_Printf("couldn't exec %s\n", Cmd_Argv(1));
         return;
@@ -303,8 +303,8 @@ void Cmd_Echo_f() {
     Creates a new command that executes a command string (possibly ; seperated)
     ===============
 */
-cstring CopyString(cstring in) {
-    cstring out = Z_Malloc(strlen(in) + 1);
+cString CopyString(cString in) {
+    cString out = Z_Malloc(strlen(in) + 1);
     strcpy(out, in);
     return out;
 }
@@ -323,7 +323,7 @@ typedef struct cmd_function_s cmd_function_t;
 typedef cmd_function_t* cmd_function_p;
 struct cmd_function_s {
     cmd_function_p  next;
-    cstring         name;
+    cString         name;
     xcommand_t      function;
 };
 
@@ -331,9 +331,9 @@ struct cmd_function_s {
 #define MAX_ARGS  80
 
 static int cmd_argc;
-cstring cmd_argv[MAX_ARGS];
-static cstring cmd_null_string = "";
-static cstring cmd_args = NULL;
+cString cmd_argv[MAX_ARGS];
+static cString cmd_null_string = "";
+static cString cmd_args = NULL;
 
 cmd_source_t cmd_source;
 
@@ -371,7 +371,7 @@ int Cmd_Argc() {
     Cmd_Argv
     ============
 */
-cstring Cmd_Argv(int arg) {
+cString Cmd_Argv(int arg) {
     return
         ((uint32_t)arg >= cmd_argc) ?
         cmd_null_string :
@@ -383,7 +383,7 @@ cstring Cmd_Argv(int arg) {
     Cmd_Args
     ============
 */
-cstring Cmd_Args() {
+cString Cmd_Args() {
     return cmd_args;
 }
 
@@ -395,7 +395,7 @@ cstring Cmd_Args() {
     Parses the given string into command line tokens.
     ============
 */
-void Cmd_TokenizeString(cstring text) {
+void Cmd_TokenizeString(cString text) {
     // clear the args from the last string
     for (int i = 0; i < cmd_argc; i++) {
         Z_Free(cmd_argv[i]);
@@ -446,7 +446,7 @@ void Cmd_TokenizeString(cstring text) {
     Cmd_AddCommand
     ============
 */
-void Cmd_AddCommand(cstring cmd_name, xcommand_t function) {
+void Cmd_AddCommand(cString cmd_name, xcommand_t function) {
     if (host_initialized) // because hunk allocation would get stomped
         Sys_Error("Cmd_AddCommand after host_initialized");
 
@@ -477,7 +477,7 @@ void Cmd_AddCommand(cstring cmd_name, xcommand_t function) {
     Cmd_Exists
     ============
 */
-bool Cmd_Exists(cstring cmd_name) {
+bool Cmd_Exists(cString cmd_name) {
     for (cmd_function_p cmd = cmd_functions; cmd; cmd = cmd->next) {
         if (!Q_strcmp(cmd_name, cmd->name)) {
             return true;
@@ -493,7 +493,7 @@ bool Cmd_Exists(cstring cmd_name) {
     Cmd_CompleteCommand
     ============
 */
-cstring Cmd_CompleteCommand(cstring partial) {
+cString Cmd_CompleteCommand(cString partial) {
     int len = Q_strlen(partial);
 
     if (!len)
@@ -516,7 +516,7 @@ cstring Cmd_CompleteCommand(cstring partial) {
     FIXME: lookupnoadd the token to speed search?
     ============
 */
-void Cmd_ExecuteString(cstring text, cmd_source_t src) {
+void Cmd_ExecuteString(cString text, cmd_source_t src) {
     cmd_source = src;
     Cmd_TokenizeString(text);
 
@@ -592,7 +592,7 @@ void Cmd_ForwardToServer() {
     where the given parameter appears, or 0 if not present
     ================
 */
-int Cmd_CheckParm(cstring parm) {
+int Cmd_CheckParm(cString parm) {
     if (!parm) {
         Sys_Error("Cmd_CheckParm: NULL");
     }

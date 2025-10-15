@@ -64,7 +64,7 @@ D_InitCaches
 
 ================
 */
-void D_InitCaches(typeless_ptr buffer, int size) {
+void D_InitCaches(TypeLess_ptr buffer, int size) {
 
 	if (!msg_suppress_1)
 		Con_Printf("%ik surface cache\n", size / 1024);

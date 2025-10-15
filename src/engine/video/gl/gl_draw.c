@@ -32,8 +32,8 @@ cvar_t		gl_max_size = { "gl_max_size", "1024" };
 cvar_t		gl_picmip = { "gl_picmip", "0" };
 
 byte* draw_chars;				// 8*8 graphic characters
-qpic_t* draw_disc;
-qpic_t* draw_backtile;
+qPic_t* draw_disc;
+qPic_t* draw_backtile;
 
 int			translate_texture;
 int			char_texture;
@@ -43,8 +43,8 @@ typedef struct {
 	float	sl, tl, sh, th;
 } glpic_t;
 
-byte		conback_buffer[sizeof(qpic_t) + sizeof(glpic_t)];
-qpic_t* conback = (qpic_t*)&conback_buffer;
+byte		conback_buffer[sizeof(qPic_t) + sizeof(glpic_t)];
+qPic_t* conback = (qPic_t*)&conback_buffer;
 
 int		gl_lightmap_format = 4;
 int		gl_solid_format = 3;
@@ -159,7 +159,7 @@ void Scrap_Upload(void) {
 typedef struct cachepic_s
 {
 	char		name[MAX_QPATH];
-	qpic_t		pic;
+	qPic_t		pic;
 	byte		padding[32];	// for appended glpic
 } cachepic_t;
 
@@ -172,8 +172,8 @@ byte		menuplyr_pixels[4096];
 int		pic_texels;
 int		pic_count;
 
-qpic_t* Draw_PicFromWad(char* name) {
-	qpic_t* p;
+qPic_t* Draw_PicFromWad(char* name) {
+	qPic_t* p;
 	glpic_t* gl;
 
 	p = W_GetLumpName(name);
@@ -217,10 +217,10 @@ qpic_t* Draw_PicFromWad(char* name) {
 Draw_CachePic
 ================
 */
-qpic_t* Draw_CachePic(char* path) {
+qPic_t* Draw_CachePic(char* path) {
 	cachepic_t* pic;
 	int			i;
-	qpic_t* dat;
+	qPic_t* dat;
 	glpic_t* gl;
 
 	for (pic=menu_cachepics, i=0; i<menu_numcachepics; pic++, i++)
@@ -235,7 +235,7 @@ qpic_t* Draw_CachePic(char* path) {
 	//
 	// load the pic from disk
 	//
-	dat = (qpic_t*)COM_LoadTempFile(path);
+	dat = (qPic_t*)COM_LoadTempFile(path);
 	if (!dat)
 		Sys_Error("Draw_CachePic: failed to load %s", path);
 	SwapPic(dat);
@@ -345,7 +345,7 @@ Draw_Init
 */
 void Draw_Init(void) {
 	int		i;
-	qpic_t* cb;
+	qPic_t* cb;
 	byte* dest, * src;
 	int		x, y;
 	char	ver[40];
@@ -380,7 +380,7 @@ void Draw_Init(void) {
 
 	start = Hunk_LowMark();
 
-	cb = (qpic_t*)COM_LoadTempFile("gfx/conback.lmp");
+	cb = (qPic_t*)COM_LoadTempFile("gfx/conback.lmp");
 	if (!cb)
 		Sys_Error("Couldn't load gfx/conback.lmp");
 	SwapPic(cb);
@@ -535,7 +535,7 @@ void Draw_DebugChar(char num) {
 Draw_AlphaPic
 =============
 */
-void Draw_AlphaPic(int x, int y, qpic_t* pic, float alpha) {
+void Draw_AlphaPic(int x, int y, qPic_t* pic, float alpha) {
 	byte* dest, * source;
 	unsigned short* pusdest;
 	int				v, u;
@@ -571,7 +571,7 @@ void Draw_AlphaPic(int x, int y, qpic_t* pic, float alpha) {
 Draw_Pic
 =============
 */
-void Draw_Pic(int x, int y, qpic_t* pic) {
+void Draw_Pic(int x, int y, qPic_t* pic) {
 	byte* dest, * source;
 	unsigned short* pusdest;
 	int				v, u;
@@ -600,7 +600,7 @@ void Draw_Pic(int x, int y, qpic_t* pic) {
 Draw_TransPic
 =============
 */
-void Draw_TransPic(int x, int y, qpic_t* pic) {
+void Draw_TransPic(int x, int y, qPic_t* pic) {
 	byte* dest, * source, tbyte;
 	unsigned short* pusdest;
 	int				v, u;
@@ -621,7 +621,7 @@ Draw_TransPicTranslate
 Only used for the player color selection menu
 =============
 */
-void Draw_TransPicTranslate(int x, int y, qpic_t* pic, byte* translation) {
+void Draw_TransPicTranslate(int x, int y, qPic_t* pic, byte* translation) {
 	int				v, u, c;
 	unsigned		trans[64*64], * dest;
 	byte* src;
@@ -1191,7 +1191,7 @@ int GL_LoadTexture(char* identifier, int width, int height, byte* data, qboolean
 GL_LoadPicTexture
 ================
 */
-int GL_LoadPicTexture(qpic_t* pic) {
+int GL_LoadPicTexture(qPic_t* pic) {
 	return GL_LoadTexture("", pic->width, pic->height, pic->data, false, true);
 }
 

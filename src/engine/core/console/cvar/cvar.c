@@ -32,14 +32,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 cvar_p cvar_vars;
-cstring cvar_null_string = "";
+cString cvar_null_string = "";
 
 /*
 ============
 Cvar_FindVar
 ============
 */
-cvar_p Cvar_FindVar(cstring var_name) {
+cvar_p Cvar_FindVar(cString var_name) {
     for (cvar_p var = cvar_vars; var; var = var->next)
         if (!Q_strcmp(var_name, var->name))
             return var;
@@ -52,7 +52,7 @@ cvar_p Cvar_FindVar(cstring var_name) {
 Cvar_VariableValue
 ============
 */
-float	Cvar_VariableValue(cstring var_name) {
+float	Cvar_VariableValue(cString var_name) {
     cvar_p var = Cvar_FindVar(var_name);
     if (!var)
         return 0;
@@ -65,7 +65,7 @@ float	Cvar_VariableValue(cstring var_name) {
 Cvar_VariableString
 ============
 */
-cstring Cvar_VariableString(cstring var_name) {
+cString Cvar_VariableString(cString var_name) {
     cvar_p var = Cvar_FindVar(var_name);
     if (!var)
         return cvar_null_string;
@@ -78,7 +78,7 @@ cstring Cvar_VariableString(cstring var_name) {
 Cvar_CompleteVariable
 ============
 */
-cstring Cvar_CompleteVariable(cstring partial) {
+cString Cvar_CompleteVariable(cString partial) {
     int len = Q_strlen(partial);
 
     if (!len)
@@ -98,7 +98,7 @@ cstring Cvar_CompleteVariable(cstring partial) {
 Cvar_Set
 ============
 */
-void Cvar_Set(cstring var_name, cstring value) {
+void Cvar_Set(cString var_name, cString value) {
     cvar_p var = Cvar_FindVar(var_name);
     if (!var) {	// there is an error in C code if this happens
         Con_Printf("Cvar_Set: variable %s not found\n", var_name);
@@ -127,7 +127,7 @@ void Cvar_Set(cstring var_name, cstring value) {
 Cvar_SetValue
 ============
 */
-void Cvar_SetValue(cstring var_name, float value) {
+void Cvar_SetValue(cString var_name, float value) {
     char	val[32];
     sprintf(val, "%f", value);
     Cvar_Set(var_name, val);
@@ -155,7 +155,7 @@ void Cvar_RegisterVariable(cvar_p variable) {
     }
 
     // copy the value off, because future sets will Z_Free it
-    cstring oldstr = variable->string;
+    cString oldstr = variable->string;
     variable->string = Z_Malloc(Q_strlen(variable->string) + 1);
     Q_strcpy(variable->string, oldstr);
     variable->value = Q_atof(variable->string);

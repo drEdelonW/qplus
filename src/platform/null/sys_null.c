@@ -60,7 +60,7 @@ int filelength(FILE* f) {
 	return end;
 }
 
-int Sys_FileOpenRead(cstring path, int* hndl) {
+int Sys_FileOpenRead(cString path, int* hndl) {
 	FILE* f;
 	int             i;
 
@@ -77,7 +77,7 @@ int Sys_FileOpenRead(cstring path, int* hndl) {
 	return filelength(f);
 }
 
-int Sys_FileOpenWrite(cstring path) {
+int Sys_FileOpenWrite(cString path) {
 	FILE* f;
 	int             i;
 
@@ -100,15 +100,15 @@ void Sys_FileSeek(int handle, int position) {
 	fseek(sys_handles[handle], position, SEEK_SET);
 }
 
-int Sys_FileRead(int handle, typeless_ptr dest, int count) {
+int Sys_FileRead(int handle, TypeLess_ptr dest, int count) {
 	return fread(dest, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileWrite(int handle, typeless_ptr data, int count) {
+int Sys_FileWrite(int handle, TypeLess_ptr data, int count) {
 	return fwrite(data, 1, count, sys_handles[handle]);
 }
 
-int     Sys_FileTime(cstring path) {
+int     Sys_FileTime(cString path) {
 	FILE* f;
 
 	f = fopen(path, "rb");
@@ -120,7 +120,7 @@ int     Sys_FileTime(cstring path) {
 	return -1;
 }
 
-void Sys_mkdir(cstring path) {
+void Sys_mkdir(cString path) {
 }
 
 
@@ -136,7 +136,7 @@ void Sys_MakeCodeWriteable(uint32_t startaddr, uint32_t length) {
 }
 
 
-void Sys_Error(cstring error, ...) {
+void Sys_Error(cString error, ...) {
 	va_list         argptr;
 
 	printf("Sys_Error: ");
@@ -148,7 +148,7 @@ void Sys_Error(cstring error, ...) {
 	exit(1);
 }
 
-void Sys_Printf(cstring fmt, ...) {
+void Sys_Printf(cString fmt, ...) {
 	va_list         argptr;
 
 	va_start(argptr, fmt);
@@ -168,7 +168,7 @@ double Sys_FloatTime() {
 	return t;
 }
 
-cstring Sys_ConsoleInput() {
+cString Sys_ConsoleInput() {
 	return NULL;
 }
 
@@ -186,8 +186,8 @@ void Sys_LowFPPrecision() {
 
 //=============================================================================
 
-void main(int argc, cstring* argv) {
-	static quakeparms_t    parms;
+void main(int argc, cStringArray argv) {
+	static QuakeParms_t	parms;
 
 	parms.memsize = 8 * 1024 * 1024;
 	parms.membase = malloc(parms.memsize);

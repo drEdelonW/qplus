@@ -47,7 +47,7 @@ int current_mode;
 int num_shades = 32;
 
 struct{
-	cstring name;
+	cString name;
 	int num;
 } mice[] = {
 	stringify(MOUSE_MICROSOFT),
@@ -76,7 +76,7 @@ int		mouserate = MOUSE_DEFAULTSAMPLERATE;
 // CVAR(vid_redrawfull, "0");
 // CVAR_ARC(vid_waitforrefresh, "0");
 
-cstring framebuffer_ptr;
+cString framebuffer_ptr;
 
 // cvar_t  mouse_button_commands[3] =
 // {
@@ -99,7 +99,7 @@ static uint8_t     backingbuf[48 * 24];
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
 uint8_p VGA_pagebase;
 
-void VGA_UpdatePlanarScreen(typeless_ptr srcbuffer);
+void VGA_UpdatePlanarScreen(TypeLess_ptr srcbuffer);
 
 void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
 	int i, j, k, plane, reps, repshift, offset, vidpage, off;
@@ -317,7 +317,7 @@ void VID_InitModes(void) {
 
 }
 
-int get_mode(cstring name, int width, int height, int depth) {
+int get_mode(cString name, int width, int height, int depth) {
 
 	int i;
 	int ok, match;
@@ -351,7 +351,7 @@ int get_mode(cstring name, int width, int height, int depth) {
 
 }
 
-int matchmouse(int mouse, cstring name) {
+int matchmouse(int mouse, cString name) {
 	int i;
 	for (i = 0; i < num_mice; i++)
 		if (!strcmp(mice[i].name, name))
@@ -495,9 +495,9 @@ int VID_SetMode(int modenum, uint8_p palette) {
 	vga_setmode(current_mode);
 	VID_SetPalette(palette);
 
-	VGA_pagebase = vid.direct = framebuffer_ptr = (cstring)vga_getgraphmem();
+	VGA_pagebase = vid.direct = framebuffer_ptr = (cString)vga_getgraphmem();
 	//		if (vga_setlinearaddressing()>0)
-	//			framebuffer_ptr = (cstring ) vga_getgraphmem();
+	//			framebuffer_ptr = (cString ) vga_getgraphmem();
 	if (!framebuffer_ptr)
 		Sys_Error("This mode isn't hapnin'\n");
 
@@ -776,7 +776,7 @@ void mousehandler(int buttonstate, int dx, int dy) {
 void IN_Init(void) {
 
 	int mtype;
-	cstring mousedev;
+	cString mousedev;
 	int mouserate;
 
 	if (UseMouse) {
@@ -918,8 +918,8 @@ void IN_Move(usercmd_t* cmd) {
 VID_ModeInfo
 ================
 */
-cstring VID_ModeInfo(int modenum) {
-	static cstring badmodestr = "Bad mode number";
+cString VID_ModeInfo(int modenum) {
+	static cString badmodestr = "Bad mode number";
 	static char modestr[40];
 
 	if (modenum == 0) {

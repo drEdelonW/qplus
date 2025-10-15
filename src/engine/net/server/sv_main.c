@@ -102,7 +102,7 @@ void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count) {
 void SV_StartSound(
     edict_p entity,
     int     channel,
-    cstring   sample,
+    cString   sample,
     int     volume,
     float   attenuation
 ) {
@@ -191,11 +191,11 @@ void SV_SendServerinfo(client_t* client) {
 
     MSG_WriteString(&client->message, message);
 
-    for (cstring* s = (sv.model_precache + 1); *s; s++)
+    for (cStringArray s = (sv.model_precache + 1); *s; s++)
         MSG_WriteString(&client->message, *s);
     MSG_WriteByte(&client->message, 0);
 
-    for (cstring* s = (sv.sound_precache + 1); *s; s++)
+    for (cStringArray s = (sv.sound_precache + 1); *s; s++)
         MSG_WriteString(&client->message, *s);
     MSG_WriteByte(&client->message, 0);
 
@@ -750,7 +750,7 @@ SERVER SPAWNING
 
     ================
 */
-int SV_ModelIndex(cstring name) {
+int SV_ModelIndex(cString name) {
     if (!name || !name[0])
         return 0;
     int i = 0;
@@ -873,9 +873,9 @@ void SV_SaveSpawnparms() {
 extern float		scr_centertime_off;
 
 #ifdef QUAKE2
-void SV_SpawnServer(cstring server, cstring startspot)
+void SV_SpawnServer(cString server, cString startspot)
 #else
-void SV_SpawnServer(cstring server)
+void SV_SpawnServer(cString server)
 #endif
 {
     edict_p ent;

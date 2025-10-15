@@ -17,7 +17,7 @@ enum bind_st {
 
 static int _keys_cursor;
 static bool _bind_grab;
-static cstring _bindnames[][bs_num] = {
+static cString _bindnames[][bs_num] = {
     {"+attack",     "attack"},
     {"impulse 10",  "change weapon"},
     {"+jump",       "jump / swim up"},
@@ -42,7 +42,7 @@ static cstring _bindnames[][bs_num] = {
 
 
 void M_Keys_Draw() {
-    qpic_p p = Draw_CachePic("gfx/ttl_cstm.lmp");
+    qPic_p p = Draw_CachePic("gfx/ttl_cstm.lmp");
     M_DrawPic((vid.width - p->width) / 2, 4, p);
 
     M_Print(12, 32, (_bind_grab) ?
@@ -63,7 +63,7 @@ void M_Keys_Draw() {
             M_Print(140, y, "???");
         }
         else {
-            cstring name = Key_KeynumToString(keys[0]);
+            cString name = Key_KeynumToString(keys[0]);
             M_Print(140, y, name);
             int x = strlen(name) * 8;
             if (keys[1] != -1) {
@@ -81,7 +81,7 @@ void M_Keys_Draw() {
     );
 }
 
-void M_UnbindCommand(cstring command) {
+void M_UnbindCommand(cString command) {
     int l = strlen(command);
 
     for (keycode_t j = 0; j < MAX_KEYS; j++) {
@@ -158,7 +158,7 @@ void M_Menu_Keys_f() {
     m_entersound = true;
 }
 
-void M_FindKeysForCommand(cstring command, int* twokeys) {
+void M_FindKeysForCommand(cString command, int* twokeys) {
     twokeys[0] = twokeys[1] = -1;
     int l = strlen(command);
     int count = 0;

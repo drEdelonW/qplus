@@ -12,15 +12,15 @@ void M_DrawCharacter(int cx, int line, int num) {
     Draw_Character(cx + ((vid.width - 320) >> 1), line, num);
 }
 
-void M_DrawTransPic(int x, int y, qpic_p pic) {
+void M_DrawTransPic(int x, int y, qPic_p pic) {
     Draw_TransPic(x + ((vid.width - 320) >> 1), y, pic);
 }
 
-void M_DrawPic(int x, int y, qpic_p pic) {
+void M_DrawPic(int x, int y, qPic_p pic) {
     Draw_Pic(x + ((vid.width - 320) >> 1), y, pic);
 }
 
-void M_Print(int cx, int cy, cstring str) {
+void M_Print(int cx, int cy, cString str) {
     while (*str) {
         M_DrawCharacter(cx, cy, (*str) + 128);
         str++;
@@ -28,7 +28,7 @@ void M_Print(int cx, int cy, cstring str) {
     }
 }
 
-void M_PrintWhite(int cx, int cy, cstring str) {
+void M_PrintWhite(int cx, int cy, cString str) {
     while (*str) {
         M_DrawCharacter(cx, cy, *str);
         str++;

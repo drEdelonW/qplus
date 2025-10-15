@@ -34,37 +34,37 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 int   sb_updates;  // if >= vid.numpages, no update needed
 
 #define STAT_MINUS  10 // num frame for '-' stats digit
-qpic_p sb_nums[2][11];
-qpic_p sb_colon, sb_slash;
-qpic_p sb_ibar;
-qpic_p sb_sbar;
-qpic_p sb_scorebar;
+qPic_p sb_nums[2][11];
+qPic_p sb_colon, sb_slash;
+qPic_p sb_ibar;
+qPic_p sb_sbar;
+qPic_p sb_scorebar;
 
-qpic_p sb_weapons[7][8];   // 0 is active, 1 is owned, 2-5 are flashes
-qpic_p sb_ammo[4];
-qpic_p sb_sigil[4];
-qpic_p sb_armor[3];
-qpic_p sb_items[32];
+qPic_p sb_weapons[7][8];   // 0 is active, 1 is owned, 2-5 are flashes
+qPic_p sb_ammo[4];
+qPic_p sb_sigil[4];
+qPic_p sb_armor[3];
+qPic_p sb_items[32];
 
-qpic_p sb_faces[7][2];  // 0 is gibbed, 1 is dead, 2-6 are alive
+qPic_p sb_faces[7][2];  // 0 is gibbed, 1 is dead, 2-6 are alive
 // 0 is static, 1 is temporary animation
-qpic_p sb_face_invis;
-qpic_p sb_face_quad;
-qpic_p sb_face_invuln;
-qpic_p sb_face_invis_invuln;
+qPic_p sb_face_invis;
+qPic_p sb_face_quad;
+qPic_p sb_face_invuln;
+qPic_p sb_face_invis_invuln;
 
 bool sb_showscores;
 
 int   sb_lines;   // scan lines to draw
 
-qpic_p rsb_invbar[2];
-qpic_p rsb_weapons[5];
-qpic_p rsb_items[2];
-qpic_p rsb_ammo[3];
-qpic_p rsb_teambord;  // PGM 01/19/97 - team color border
+qPic_p rsb_invbar[2];
+qPic_p rsb_weapons[5];
+qPic_p rsb_items[2];
+qPic_p rsb_ammo[3];
+qPic_p rsb_teambord;  // PGM 01/19/97 - team color border
 
 //MED 01/04/97 added two more weapons + 3 alternates for grenade launcher
-qpic_p hsb_weapons[7][5];   // 0 is active, 1 is owned, 2-5 are flashes
+qPic_p hsb_weapons[7][5];   // 0 is active, 1 is owned, 2-5 are flashes
 //MED 01/04/97 added array to simplify weapon parsing
 int hipweapons[4] = {
     HIT_LASER_CANNON_BIT,
@@ -73,11 +73,11 @@ int hipweapons[4] = {
     HIT_PROXIMITY_GUN_BIT
 };
 //MED 01/04/97 added hipnotic items array
-qpic_p hsb_items[2];
+qPic_p hsb_items[2];
 
 void Sbar_MiniDeathmatchOverlay();
 void Sbar_DeathmatchOverlay();
-void M_DrawPic(int x, int y, qpic_p pic);
+void M_DrawPic(int x, int y, qPic_p pic);
 
 /*
     ===============
@@ -260,7 +260,7 @@ void Sbar_Init() {
     Sbar_DrawPic
     =============
 */
-void Sbar_DrawPic(int x, int y, qpic_p pic) {
+void Sbar_DrawPic(int x, int y, qPic_p pic) {
     Draw_Pic(
         x +
         ((cl.gametype == GAME_DEATHMATCH) ?
@@ -279,7 +279,7 @@ void Sbar_DrawPic(int x, int y, qpic_p pic) {
     Sbar_DrawTransPic
     =============
 */
-void Sbar_DrawTransPic(int x, int y, qpic_p pic) {
+void Sbar_DrawTransPic(int x, int y, qPic_p pic) {
     Draw_TransPic(
         x +
         ((cl.gametype == GAME_DEATHMATCH) ?
@@ -319,7 +319,7 @@ void Sbar_DrawCharacter(int x, int y, int num) {
     Sbar_DrawString
     ================
 */
-void Sbar_DrawString(int x, int y, cstring str) {
+void Sbar_DrawString(int x, int y, cString str) {
     Draw_String(
         x +
         ((cl.gametype == GAME_DEATHMATCH) ?
@@ -338,8 +338,8 @@ void Sbar_DrawString(int x, int y, cstring str) {
     Sbar_itoa
     =============
 */
-int Sbar_itoa(int num, cstring buf) {
-    cstring str = buf;
+int Sbar_itoa(int num, cString buf) {
+    cString str = buf;
     if (num < 0) {
         *str++ = '-';
         num = -num;
@@ -371,7 +371,7 @@ void Sbar_DrawNum(int x, int y, int num, int digits, int color) {
     char str[12];
 
     int l = Sbar_itoa(num, str);
-    cstring ptr = str;
+    cString ptr = str;
     if (l > digits)
         ptr += (l - digits);
     if (l < digits)
@@ -974,7 +974,7 @@ Sbar_IntermissionNumber
 void Sbar_IntermissionNumber(int x, int y, int num, int digits, int color) {
     char str[12];
     int l = Sbar_itoa(num, str);
-    cstring ptr = str;
+    cString ptr = str;
     if (l > digits)
         ptr += (l - digits);
     if (l < digits)
@@ -1000,7 +1000,7 @@ void Sbar_DeathmatchOverlay() {
     scr_copyeverything = 1;
     scr_fullupdate = 0;
 
-    qpic_p pic = Draw_CachePic("gfx/ranking.lmp");
+    qPic_p pic = Draw_CachePic("gfx/ranking.lmp");
     M_DrawPic((320 - pic->width) / 2, 8, pic);
 
     // scores
@@ -1217,6 +1217,6 @@ Sbar_FinaleOverlay
 */
 void Sbar_FinaleOverlay() {
     scr_copyeverything = 1;
-    qpic_p pic = Draw_CachePic("gfx/finale.lmp");
+    qPic_p pic = Draw_CachePic("gfx/finale.lmp");
     Draw_TransPic((vid.width - pic->width) / 2, 16, pic);
 }

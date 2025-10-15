@@ -45,9 +45,9 @@ float  oldscreensize, oldfov;
 
 qboolean scr_initialized;  // ready to draw
 
-qpic_p scr_ram;
-qpic_p scr_net;
-qpic_p scr_turtle;
+qPic_p scr_ram;
+qPic_p scr_net;
+qPic_p scr_turtle;
 
 int   scr_fullupdate;
 
@@ -91,7 +91,7 @@ Called for important messages that should stay in the center of the screen
 for a few moments
 ==============
 */
-void SCR_CenterPrint(cstring str) {
+void SCR_CenterPrint(cString str) {
     strncpy(scr_centerstring, str, sizeof(scr_centerstring) - 1);
     scr_centertime_off = scr_centertime.value;
     scr_centertime_start = cl.time;
@@ -124,7 +124,7 @@ void SCR_DrawCenterString() {
         scr_printspeed.value * (cl.time - scr_centertime_start) : 9999;
 
     scr_erase_center = 0;
-    cstring start = scr_centerstring;
+    cString start = scr_centerstring;
 
     int y = (scr_center_lines <= 4) ?
         vid.height * 0.35 : 48;
@@ -369,7 +369,7 @@ void SCR_DrawPause() {
         (!cl.paused))
         return;
 
-    qpic_p pic = Draw_CachePic("gfx/pause.lmp");
+    qPic_p pic = Draw_CachePic("gfx/pause.lmp");
     Draw_Pic((vid.width - pic->width) / 2,
         (vid.height - 48 - pic->height) / 2, pic);
 }
@@ -385,7 +385,7 @@ void SCR_DrawLoading() {
     if (!scr_drawloading)
         return;
 
-    qpic_p pic = Draw_CachePic("gfx/loading.lmp");
+    qPic_p pic = Draw_CachePic("gfx/loading.lmp");
     Draw_Pic((vid.width - pic->width) / 2,
         (vid.height - 48 - pic->height) / 2, pic);
 }
@@ -492,7 +492,7 @@ typedef pcx_t* pcx_p;
 WritePCXfile
 ==============
 */
-void WritePCXfile(cstring filename, uint8_p data, int width, int height, int rowbytes, uint8_p palette) {
+void WritePCXfile(cString filename, uint8_p data, int width, int height, int rowbytes, uint8_p palette) {
     pcx_p pcx = Hunk_TempAlloc(width * height * 2 + 1000);
     if (pcx == NULL) {
         Con_Printf("SCR_ScreenShot_f: not enough memory\n");
@@ -626,11 +626,11 @@ void SCR_EndLoadingPlaque() {
 
 //=============================================================================
 
-static cstring _scr_notifystring;
+static cString _scr_notifystring;
 static bool _scr_drawdialog;
 
 void SCR_DrawNotifyString() {
-    cstring start = _scr_notifystring;
+    cString start = _scr_notifystring;
     int y = vid.height * 0.35;
 
     do {
@@ -662,7 +662,7 @@ Displays a text string in the center of the screen and waits for a Y or N
 keypress.
 ==================
 */
-int SCR_ModalMessage(cstring text) {
+int SCR_ModalMessage(cString text) {
     if (cls.state == ca_dedicated)
         return true;
 

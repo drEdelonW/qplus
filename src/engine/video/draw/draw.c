@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "versions.h"
 #include "sound.h"
 
-qpic_p draw_disc;
+qPic_p draw_disc;
 
 typedef struct {
     vRect_t rect;
@@ -43,7 +43,7 @@ typedef struct {
 } rectdesc_t;
 static rectdesc_t r_rectdesc;
 static uint8_p _draw_chars;    // 8*8 graphic characters
-static qpic_p _draw_backtile;
+static qPic_p _draw_backtile;
 
 //=============================================================================
 /* Support Routines */
@@ -59,7 +59,7 @@ static cachepic_t _menu_cachepics[MAX_CACHED_PICS];
 static int _menu_numcachepics;
 
 
-qpic_p Draw_PicFromWad(cstring name) {
+qPic_p Draw_PicFromWad(cString name) {
     return W_GetLumpName(name);
 }
 
@@ -68,7 +68,7 @@ qpic_p Draw_PicFromWad(cstring name) {
 Draw_CachePic
 ================
 */
-qpic_p Draw_CachePic(cstring path) {
+qPic_p Draw_CachePic(cString path) {
     cachepic_p pic = _menu_cachepics;
     int i = 0;
     for (; i < _menu_numcachepics; pic++, i++)
@@ -82,7 +82,7 @@ qpic_p Draw_CachePic(cstring path) {
         strcpy(pic->name, path);
     }
 
-    qpic_p dat = Cache_Check(&pic->cache);
+    qPic_p dat = Cache_Check(&pic->cache);
     if (dat)
         return dat;
 
@@ -91,7 +91,7 @@ qpic_p Draw_CachePic(cstring path) {
     //
     COM_LoadCacheFile(path, &pic->cache);
 
-    dat = (qpic_p)pic->cache.data;
+    dat = (qPic_p)pic->cache.data;
     if (!dat) {
         Sys_Error("Draw_CachePic: failed to load %s", path);
     }
@@ -215,7 +215,7 @@ void Draw_Character(int x, int y, int num) {
 Draw_String
 ================
 */
-void Draw_String(int x, int y, cstring str) {
+void Draw_String(int x, int y, cString str) {
     while (*str) {
         Draw_Character(x, y, *str);
         str++;
@@ -264,7 +264,7 @@ void Draw_DebugChar(char num) {
 Draw_Pic
 =============
 */
-void Draw_Pic(int x, int y, qpic_p pic) {
+void Draw_Pic(int x, int y, qPic_p pic) {
     if ((x < 0) ||
         ((x + pic->width) > vid.width) ||
         (y < 0) ||
@@ -304,7 +304,7 @@ void Draw_Pic(int x, int y, qpic_p pic) {
 Draw_TransPic
 =============
 */
-void Draw_TransPic(int x, int y, qpic_p pic) {
+void Draw_TransPic(int x, int y, qPic_p pic) {
     uint8_t tbyte;
     if ((x < 0) ||
         ((uint32_t)(x + pic->width) > vid.width) ||
@@ -378,7 +378,7 @@ void Draw_TransPic(int x, int y, qpic_p pic) {
 Draw_TransPicTranslate
 =============
 */
-void Draw_TransPicTranslate(int x, int y, qpic_p pic, uint8_p translation) {
+void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
     uint8_t tbyte;
 
     if (x < 0 || (uint32_t)(x + pic->width) > vid.width || y < 0 ||
@@ -470,7 +470,7 @@ Draw_ConsoleBackground
 ================
 */
 void Draw_ConsoleBackground(int lines) {
-    qpic_p conback = Draw_CachePic("gfx/conback.lmp");
+    qPic_p conback = Draw_CachePic("gfx/conback.lmp");
 
     // hack the version number directly into the pic
     char ver[100];

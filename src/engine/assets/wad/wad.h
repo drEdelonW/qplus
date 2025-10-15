@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef enum {
     CMP_NONE    = 0,
     CMP_LZSS    = 1
-} cmp_type_t;
+} CmpType;
 
 typedef enum {
     TYP_NONE    = 0,
@@ -41,43 +41,43 @@ typedef enum {
     TYP_QPIC    = 66,
     TYP_SOUND   = 67,
     TYP_MIPTEX  = 68
-} typ_type_t;
+} TypType;
 
 typedef struct {
     int32_t     width;
     int32_t     height;
     uint8_t    data[4];			// variably sized
-} qpic_t;
-typedef qpic_t* qpic_p;
+} qPic_t;
+typedef qPic_t* qPic_p;
 
 
 
 typedef struct {
-    char    identification[4];		// should be WAD2 or 2DAW
+    char        identification[4];		// should be WAD2 or 2DAW
     int32_t     numlumps;
     int32_t     infotableofs;
-} wadinfo_t;
-typedef wadinfo_t* wadinfo_p;
+} WadInfo_t;
+typedef WadInfo_t* WadInfo_p;
 
 typedef struct {
     int32_t filepos;
     int32_t disksize;
     int32_t size;           // uncompressed
-    char    type;
-    char    compression;
+    char    type;           // TypType ?
+    char    compression;    // CmpType ?
     char    pad1, pad2;
     char    name[16];       // must be null terminated
-} lumpinfo_t;
-typedef lumpinfo_t* lumpinfo_p;
+} LumpInfo_t;
+typedef LumpInfo_t* LumpInfo_p;
 
 extern	int32_t     wad_numlumps;
-extern	lumpinfo_p  wad_lumps;
+extern	LumpInfo_p  wad_lumps;
 extern	uint8_p     wad_base;
 
-void W_LoadWadFile(cstring filename);
-void W_CleanupName(cstring in, cstring out);
-lumpinfo_p W_GetLumpinfo(cstring name);
-typeless_ptr W_GetLumpName(cstring name);
-typeless_ptr W_GetLumpNum(int32_t num);
+void W_LoadWadFile(cString filename);
+void W_CleanupName(cString in, cString out);
+LumpInfo_p W_GetLumpinfo(cString name);
+TypeLess_ptr W_GetLumpName(cString name);
+TypeLess_ptr W_GetLumpNum(int32_t num);
 
-void SwapPic(qpic_p pic);
+void SwapPic(qPic_p pic);

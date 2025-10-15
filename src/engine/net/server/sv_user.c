@@ -457,7 +457,7 @@ Returns false if the client should be killed
 bool SV_ReadClientMessage() {
     int		ret;
     int		cmd;
-    cstring s;
+    cString s;
 
     do {
     nextmsg:

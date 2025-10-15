@@ -64,9 +64,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define TOOLVERSION (2)
 
 typedef struct {
-    int32_t fileofs, filelen;
-} lump_t;
-typedef lump_t* lump_p;
+    int32_t fileofs;
+    int32_t filelen;
+} Lump_t;
+typedef Lump_t* Lump_p;
 
 typedef enum {
     LUMP_ENTITIES     = 0,
@@ -86,7 +87,7 @@ typedef enum {
     LUMP_MODELS       = 14,
 
     HEADER_LUMPS      = 15  // total count of lumps in BSP header
-} lump_type_t;
+} Lump_type_t;
 
 typedef struct {
     vec3_t  mins;
@@ -101,21 +102,21 @@ typedef dModel_t* dModel_p;
 
 typedef struct {
     int32_t version;
-    lump_t  lumps[HEADER_LUMPS];
+    Lump_t  lumps[HEADER_LUMPS];
 } dheader_t;
 typedef dheader_t* dheader_p;
 
 typedef struct {
     int32_t nummiptex;
     int32_t dataofs[4]; // [nummiptex]
-} dmiptexlump_t;
-typedef dmiptexlump_t* dmiptexlump_p;
+} dmiptexLump_t;
+typedef dmiptexLump_t* dmiptexlump_p;
 
 
 typedef struct miptex_s {
- char        name[16];
- uint32_t    width, height;
- uint32_t    offsets[MIPLEVELS];  // four mip maps stored
+char        name[16];
+uint32_t    width, height;
+uint32_t    offsets[MIPLEVELS];  // four mip maps stored
 } miptex_t;
 typedef miptex_t* miptex_p;
 
@@ -220,16 +221,16 @@ typedef dface_t* dface_p;
 // leaf 0 is the generic CONTENTS_SOLID leaf, used for all solid areas
 // all other leafs need visibility info
 typedef struct {
- int32_t contents;
- int32_t visofs;    // -1 = no visibility info
+int32_t contents;
+int32_t visofs;    // -1 = no visibility info
 
- int16_t mins[3];   // for frustum culling
- int16_t maxs[3];
+int16_t mins[3];   // for frustum culling
+int16_t maxs[3];
 
- uint16_t    firstmarksurface;
- uint16_t    nummarksurfaces;
+uint16_t    firstmarksurface;
+uint16_t    nummarksurfaces;
 
- uint8_t ambient_level[NUM_AMBIENTS];
+uint8_t ambient_level[NUM_AMBIENTS];
 } dLeaf_t;
 typedef dLeaf_t* dLeaf_p;
 
@@ -254,7 +255,7 @@ extern int32_t   lightdatasize;
 extern uint8_t  dlightdata[MAX_MAP_LIGHTING];
 
 extern int32_t   texdatasize;
-extern uint8_t  dtexdata[MAX_MAP_MIPTEX]; // (dmiptexlump_t)
+extern uint8_t  dtexdata[MAX_MAP_MIPTEX]; // (dmiptexLump_t)
 
 extern int32_t   entdatasize;
 extern char  dentdata[MAX_MAP_ENTSTRING];
@@ -293,24 +294,24 @@ extern int32_t   dsurfedges[MAX_MAP_SURFEDGES];
 void DecompressVis(uint8_p in, uint8_p decompressed);
 int32_t CompressVis(uint8_p vis, uint8_p dest);
 
-void LoadBSPFile(cstring filename);
-void WriteBSPFile(cstring filename);
+void LoadBSPFile(cString filename);
+void WriteBSPFile(cString filename);
 void PrintBSPFileSizes();
 
 //===============
 
 
 typedef struct epair_s {
- struct epair_s* next;
- cstring key;
- cstring value;
+struct epair_s* next;
+cString key;
+cString value;
 } epair_t;
 
 typedef struct {
- vec3_t  origin;
- int32_t firstbrush;
- int32_t numbrushes;
- epair_t* epairs;
+vec3_t  origin;
+int32_t firstbrush;
+int32_t numbrushes;
+epair_t* epairs;
 } Entity_t;
 
 extern int32_t   num_entities;
@@ -319,12 +320,12 @@ extern Entity_t entities[MAX_MAP_ENTITIES];
 void ParseEntities();
 void UnparseEntities();
 
-void  SetKeyValue(Entity_t* ent, cstring key, cstring value);
-cstring ValueForKey(Entity_t* ent, cstring key);
+void  SetKeyValue(Entity_t* ent, cString key, cString value);
+cString ValueForKey(Entity_t* ent, cString key);
 // will return "" if not present
 
-vec_t FloatForKey(Entity_t* ent, cstring key);
-void  GetVectorForKey(Entity_t* ent, cstring key, vec3_t vec);
+vec_t FloatForKey(Entity_t* ent, cString key);
+void  GetVectorForKey(Entity_t* ent, cString key, vec3_t vec);
 
 epair_t* ParseEpair();
 

@@ -32,7 +32,7 @@ uint8_p S_Alloc(int size);
 ResampleSfx
 ================
 */
-void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cstring data) {
+void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cString data) {
     int		outcount;
     int		srcsample;
     float	stepscale;
@@ -94,7 +94,7 @@ S_LoadSound
 */
 sfxcache_t* S_LoadSound(sfx_p s) {
     char	namebuffer[256];
-    cstring    data;
+    cString    data;
     wavinfo_t	info;
     int     len;
     float   stepscale;
@@ -113,7 +113,7 @@ sfxcache_t* S_LoadSound(sfx_p s) {
 
     //	Con_Printf ("loading %s\n", namebuffer);
 
-    data = (cstring)COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
+    data = (cString)COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
 
     if (!data) {
         Con_Printf("Couldn't load %s\n", namebuffer);
@@ -158,10 +158,10 @@ WAV loading
 */
 
 
-cstring 	data_p;
-cstring    iff_end;
-cstring    last_chunk;
-cstring    iff_data;
+cString 	data_p;
+cString    iff_end;
+cString    last_chunk;
+cString    iff_data;
 int 	iff_chunk_len;
 
 
@@ -183,7 +183,7 @@ int GetLittleLong() {
     return val;
 }
 
-void FindNextChunk(cstring name) {
+void FindNextChunk(cString name) {
     while (1) {
         data_p = last_chunk;
 
@@ -208,7 +208,7 @@ void FindNextChunk(cstring name) {
     }
 }
 
-void FindChunk(cstring name) {
+void FindChunk(cString name) {
     last_chunk = iff_data;
     FindNextChunk(name);
 }
@@ -233,7 +233,7 @@ void DumpChunks() {
 GetWavinfo
 ============
 */
-wavinfo_t GetWavinfo(cstring name, cstring wav, int wavlength) {
+wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
     wavinfo_t info;
     int i;
     int format;
@@ -289,7 +289,7 @@ wavinfo_t GetWavinfo(cstring name, cstring wav, int wavlength) {
             // if the next chunk is a LIST chunk, look for a cue length marker
         FindNextChunk("LIST");
         if (data_p) {
-            if (!strncmp((cstring)data_p + 28, "mark", 4)) {	// this is not a proper parse, but it works with cooledit...
+            if (!strncmp((cString)data_p + 28, "mark", 4)) {	// this is not a proper parse, but it works with cooledit...
                 data_p += 24;
                 i = GetLittleLong();	// samples in loop
                 info.samples = info.loopstart + i;

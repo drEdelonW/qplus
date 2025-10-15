@@ -41,7 +41,7 @@ static int		VGA_planar;
 static int		VGA_numpages;
 static int		VGA_buffersize;
 
-typeless_ptr vid_surfcache;
+TypeLess_ptr vid_surfcache;
 int		vid_surfcachesize;
 
 int		VGA_highhunkmark;
@@ -50,7 +50,7 @@ int		VGA_highhunkmark;
 
 #define NUMVIDMODES		(sizeof(vgavidmodes) / sizeof(vgavidmodes[0]))
 
-void VGA_UpdatePlanarScreen(typeless_ptr srcbuffer);
+void VGA_UpdatePlanarScreen(TypeLess_ptr srcbuffer);
 
 static uint8_t	backingbuf[48 * 24];
 
@@ -261,7 +261,7 @@ qboolean VGA_FreeAndAllocVidbuffer(viddef_p lvid, int allocnewbuffer) {
 		+ lvid->width * lvid->height * sizeof(*d_pzbuffer);
 
 	if (allocnewbuffer) {
-		lvid->buffer = (typeless_ptr)((uint8_p)vid_surfcache + vid_surfcachesize);
+		lvid->buffer = (TypeLess_ptr)((uint8_p)vid_surfcache + vid_surfcachesize);
 		lvid->conbuffer = lvid->buffer;
 	}
 
@@ -319,7 +319,7 @@ int VGA_InitMode(viddef_p lvid, vmode_t* pcurrentmode) {
 	regs.h.al = 0x13;
 	dos_int86(0x10);
 
-	VGA_pagebase = (typeless_ptr)real2ptr(0xa0000);
+	VGA_pagebase = (TypeLess_ptr)real2ptr(0xa0000);
 	lvid->direct = (pixel_p)VGA_pagebase;
 
 	// set additional registers as needed

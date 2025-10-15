@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 /* extern */ dprograms_p    progs;
 /* extern */ dfunction_p    pr_functions;
-/* extern */ cstring        pr_strings;         // much more
+/* extern */ cString        pr_strings;         // much more
 /* extern */ ddef_p         pr_fielddefs;
 /* extern */ ddef_p         pr_globaldefs;
 /* extern */ dstatement_p   pr_statements;
@@ -43,7 +43,7 @@ int type_size[8] = {
     1,                          // ev_entity,
     1,                          // ev_field,
     sizeof(func_t) / 4,         // ev_function,
-    sizeof(typeless_ptr) / 4    // ev_pointer
+    sizeof(TypeLess_ptr) / 4    // ev_pointer
 };
 
 
@@ -172,7 +172,7 @@ ddef_p ED_FieldAtOfs(int ofs) {
 ED_FindField
 ============
 */
-ddef_p ED_FindField(cstring name) {
+ddef_p ED_FindField(cString name) {
     for (int i = 0; i < progs->fielddefs.num; i++) {
         ddef_p def = &pr_fielddefs[i];
         if (!strcmp(pr_strings + def->s_name, name))
@@ -187,7 +187,7 @@ ddef_p ED_FindField(cstring name) {
 ED_FindGlobal
 ============
 */
-ddef_p ED_FindGlobal(cstring name) {
+ddef_p ED_FindGlobal(cString name) {
     for (int i = 0; i < progs->globaldefs.num; i++) {
         ddef_p def = &pr_globaldefs[i];
         if (!strcmp(pr_strings + def->s_name, name))
@@ -202,7 +202,7 @@ ddef_p ED_FindGlobal(cstring name) {
 ED_FindFunction
 ============
 */
-dfunction_p ED_FindFunction(cstring name) {
+dfunction_p ED_FindFunction(cString name) {
     for (int i = 0; i < progs->functions.num; i++) {
         dfunction_p func = &pr_functions[i];
         if (!strcmp(pr_strings + func->s_name, name))
@@ -212,7 +212,7 @@ dfunction_p ED_FindFunction(cstring name) {
 }
 
 
-eval_p GetEdictFieldValue(edict_p ed, cstring field) {
+eval_p GetEdictFieldValue(edict_p ed, cString field) {
     ddef_p def = NULL;
     static int  rep = 0;
 
@@ -235,7 +235,7 @@ Done:
     if (!def)
         return NULL;
 
-    return (eval_p)((cstring)&ed->v + def->ofs * 4);
+    return (eval_p)((cString)&ed->v + def->ofs * 4);
 }
 
 
@@ -246,7 +246,7 @@ PR_ValueString
 Returns a string describing *data in a type specific manner
 =============
 */
-cstring PR_ValueString(etype_t type, eval_p val) {
+cString PR_ValueString(etype_t type, eval_p val) {
     static char line[256];
     type &= ~DEF_SAVEGLOBAL;
 
@@ -293,7 +293,7 @@ Returns a string describing *data in a type specific manner
 Easier to parse than PR_ValueString
 =============
 */
-cstring PR_UglyValueString(etype_t type, eval_p val) {
+cString PR_UglyValueString(etype_t type, eval_p val) {
     static char line[256];
     type &= ~DEF_SAVEGLOBAL;
 
@@ -337,15 +337,15 @@ Returns a string with a description and the contents of a global,
 padded to 20 field width
 ============
 */
-cstring PR_GlobalString(int ofs) {
+cString PR_GlobalString(int ofs) {
     static char line[128];
 
-    typeless_ptr val = (typeless_ptr)&pr_globals[ofs];
+    TypeLess_ptr val = (TypeLess_ptr)&pr_globals[ofs];
     ddef_p def = ED_GlobalAtOfs(ofs);
     if (!def)
         sprintf(line, "%i(???)", ofs);
     else {
-        cstring s = PR_ValueString(def->type, val);
+        cString s = PR_ValueString(def->type, val);
         sprintf(line, "%i(%s)%s", ofs, pr_strings + def->s_name, s);
     }
 
@@ -357,7 +357,7 @@ cstring PR_GlobalString(int ofs) {
     return line;
 }
 
-cstring PR_GlobalStringNoContents(int ofs) {
+cString PR_GlobalStringNoContents(int ofs) {
     static char line[128];
 
     ddef_p def = ED_GlobalAtOfs(ofs);
@@ -391,11 +391,11 @@ void ED_Print(edict_p ed) {
     Con_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
     for (int i = 1; i < progs->fielddefs.num; i++) {
         ddef_p d = &pr_fielddefs[i];
-        cstring name = pr_strings + d->s_name;
+        cString name = pr_strings + d->s_name;
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
-        int* v = (int*)((cstring)&ed->v + d->ofs * 4);
+        int* v = (int*)((cString)&ed->v + d->ofs * 4);
 
         // if the value is still all 0, skip the field
         int type = d->type & ~DEF_SAVEGLOBAL;
@@ -433,11 +433,11 @@ void ED_Write(FILE* f, edict_p ed) {
 
     for (int i = 1; i < progs->fielddefs.num; i++) {
         ddef_p d = &pr_fielddefs[i];
-        cstring name = pr_strings + d->s_name;
+        cString name = pr_strings + d->s_name;
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
-        int* v = (int*)((cstring)&ed->v + d->ofs * 4);
+        int* v = (int*)((cString)&ed->v + d->ofs * 4);
 
         // if the value is still all 0, skip the field
         int type = d->type & ~DEF_SAVEGLOBAL;
@@ -547,7 +547,7 @@ void ED_WriteGlobals(FILE* f) {
             && type != ev_entity)
             continue;
 
-        cstring name = pr_strings + def->s_name;
+        cString name = pr_strings + def->s_name;
         fprintf(f, "\"%s\" ", name);
         fprintf(f, "\"%s\"\n", PR_UglyValueString(type, (eval_p)&pr_globals[def->ofs]));
     }
@@ -559,7 +559,7 @@ void ED_WriteGlobals(FILE* f) {
 ED_ParseGlobals
 =============
 */
-void ED_ParseGlobals(cstring data) {
+void ED_ParseGlobals(cString data) {
     while (1) {
         // parse key
         data = COM_Parse(data);
@@ -585,7 +585,7 @@ void ED_ParseGlobals(cstring data) {
             continue;
         }
 
-        if (!ED_ParseEpair((typeless_ptr)pr_globals, key, com_token))
+        if (!ED_ParseEpair((TypeLess_ptr)pr_globals, key, com_token))
             Host_Error("ED_ParseGlobals: parse error");
     }
 }
@@ -598,10 +598,10 @@ void ED_ParseGlobals(cstring data) {
 ED_NewString
 =============
 */
-cstring ED_NewString(cstring string) {
+cString ED_NewString(cString string) {
     int l = strlen(string) + 1;
-    cstring new = Hunk_Alloc(l);
-    cstring new_p = new;
+    cString new = Hunk_Alloc(l);
+    cString new_p = new;
 
     for (int i = 0; i < l; i++) {
         if ((string[i] == '\\') && (i < (l - 1))) {
@@ -627,8 +627,8 @@ Can parse either fields or globals
 returns false if error
 =============
 */
-bool ED_ParseEpair(typeless_ptr base, ddef_p key, cstring s) {
-    typeless_ptr d = (typeless_ptr)((int*)base + key->ofs);
+bool ED_ParseEpair(TypeLess_ptr base, ddef_p key, cString s) {
+    TypeLess_ptr d = (TypeLess_ptr)((int*)base + key->ofs);
 
     switch (key->type & ~DEF_SAVEGLOBAL) {
     case ev_string:
@@ -642,8 +642,8 @@ bool ED_ParseEpair(typeless_ptr base, ddef_p key, cstring s) {
     case ev_vector:
         char string[128];
         strcpy(string, s);
-        cstring v = string;
-        cstring w = string;
+        cString v = string;
+        cString w = string;
         for (int i = 0; i < 3; i++) {
             while (*v && *v != ' ')
                 v++;
@@ -690,7 +690,7 @@ ed should be a properly initialized empty edict.
 Used for initial level load and for savegames.
 ====================
 */
-cstring ED_ParseEdict(cstring data, edict_p ent) {
+cString ED_ParseEdict(cString data, edict_p ent) {
     bool init = false;
 
     // clear it
@@ -757,7 +757,7 @@ cstring ED_ParseEdict(cstring data, edict_p ent) {
             sprintf(com_token, "0 %s 0", temp);
         }
 
-        if (!ED_ParseEpair((typeless_ptr)&ent->v, key, com_token))
+        if (!ED_ParseEpair((TypeLess_ptr)&ent->v, key, com_token))
             Host_Error("ED_ParseEdict: parse error");
     }
 
@@ -783,7 +783,7 @@ Used for both fresh maps and savegame loads.  A fresh map would also need
 to call ED_CallSpawnFunctions () to let the objects initialize themselves.
 ================
 */
-void ED_LoadFromFile(cstring data) {
+void ED_LoadFromFile(cString data) {
     edict_p ent = NULL;
     int inhibit = 0;
     pr_global_struct->time = sv.time;
@@ -878,7 +878,7 @@ void PR_LoadProgs() {
         Sys_Error("progs.dat system vars have been modified, progdefs.h is out of date");
 
     pr_functions = (dfunction_p)((uint8_p)progs + progs->functions.ofs);
-    pr_strings = (cstring)progs + progs->strings.ofs;
+    pr_strings = (cString)progs + progs->strings.ofs;
     pr_globaldefs = (ddef_p)((uint8_p)progs + progs->globaldefs.ofs);
     pr_fielddefs = (ddef_p)((uint8_p)progs + progs->fielddefs.ofs);
     pr_statements = (dstatement_p)((uint8_p)progs + progs->statements.ofs);

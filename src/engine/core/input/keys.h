@@ -126,13 +126,13 @@ typedef enum {
 
 extern keycode_t key_lastpress;
 extern keydest_t key_dest;
-extern cstring keybindings[MAX_KEYS];
+extern cString keybindings[MAX_KEYS];
 extern int key_count;			// incremented every key event
 extern int key_repeats[MAX_KEYS];
 
 void Key_Event(keycode_t key, bool down);
 void Key_Init();
 void Key_WriteBindings(FILE* f);
-void Key_SetBinding(keycode_t keynum, cstring binding);
+void Key_SetBinding(keycode_t keynum, cString binding);
 void Key_ClearStates();
 

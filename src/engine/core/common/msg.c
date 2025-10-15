@@ -67,7 +67,7 @@ void MSG_WriteFloat(sizebuf_p sb, float f) {
     SZ_Write(sb, &dat.l, 4);
 }
 
-void MSG_WriteString(sizebuf_p sb, cstring s) {
+void MSG_WriteString(sizebuf_p sb, cString s) {
     if (!s)
         SZ_Write(sb, "", 1);
     else
@@ -169,7 +169,7 @@ float MSG_ReadFloat() {
     return dat.f;
 }
 
-cstring MSG_ReadString() {
+cString MSG_ReadString() {
     static char string[2048];
 
     int l = 0;

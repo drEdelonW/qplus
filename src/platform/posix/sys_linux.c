@@ -26,8 +26,8 @@ qboolean isDedicated;
 
 int nostdout = 0;
 
-cstring basedir = ".";
-cstring cachedir = "/tmp";
+cString basedir = ".";
+cString cachedir = "/tmp";
 
 CVAR(sys_linerefresh, "0");// set for entity display
 
@@ -38,7 +38,7 @@ CVAR(sys_linerefresh, "0");// set for entity display
 void Sys_DebugNumber(int y, int val) {}
 
 /*
-void Sys_Printf(cstring fmt, ...) {
+void Sys_Printf(cString fmt, ...) {
     va_list		argptr;
     char		text[1024];
 
@@ -50,7 +50,7 @@ void Sys_Printf(cstring fmt, ...) {
     Con_Print(text);
 }
 
-void Sys_Printf(cstring fmt, ...) {
+void Sys_Printf(cString fmt, ...) {
 
     va_list     argptr;
     char        text[1024], * t_p;
@@ -80,7 +80,7 @@ void Sys_Printf(cstring fmt, ...) {
 }
 */
 
-void Sys_Printf(cstring fmt, ...) {
+void Sys_Printf(cString fmt, ...) {
     va_list argptr;
     char    text[1024];
     uint8_p  p;
@@ -139,7 +139,7 @@ void Sys_Init() {
 #endif
 }
 
-void Sys_Error(cstring error, ...) {
+void Sys_Error(cString error, ...) {
     va_list     argptr;
     char        string[1024];
 
@@ -155,7 +155,7 @@ void Sys_Error(cstring error, ...) {
     exit(1);
 }
 
-void Sys_Warn(cstring warning, ...) {
+void Sys_Warn(cString warning, ...) {
     va_list argptr;
     char    string[1024];
 
@@ -172,7 +172,7 @@ void Sys_Warn(cstring warning, ...) {
     returns -1 if not present
 ============
 */
-int	Sys_FileTime(cstring path) {
+int	Sys_FileTime(cString path) {
     struct stat buf;
 
     if (stat(path, &buf) == -1)
@@ -182,11 +182,11 @@ int	Sys_FileTime(cstring path) {
 }
 
 
-void Sys_mkdir(cstring path) {
+void Sys_mkdir(cString path) {
     mkdir(path, 0777);
 }
 
-int Sys_FileOpenRead(cstring path, int* handle) {
+int Sys_FileOpenRead(cString path, int* handle) {
     struct stat	fileinfo;
 
     int h = open(path, O_RDONLY, 0666);
@@ -200,7 +200,7 @@ int Sys_FileOpenRead(cstring path, int* handle) {
     return fileinfo.st_size;
 }
 
-int Sys_FileOpenWrite(cstring path) {
+int Sys_FileOpenWrite(cString path) {
     umask(0);
 
     int handle = open(path, (O_RDWR | O_CREAT | O_TRUNC), 0666);
@@ -211,7 +211,7 @@ int Sys_FileOpenWrite(cstring path) {
     return handle;
 }
 
-int Sys_FileWrite(int handle, typeless_ptr src, int count) {
+int Sys_FileWrite(int handle, TypeLess_ptr src, int count) {
     return write(handle, src, count);
 }
 
@@ -223,11 +223,11 @@ void Sys_FileSeek(int handle, int position) {
     lseek(handle, position, SEEK_SET);
 }
 
-int Sys_FileRead(int handle, typeless_ptr dest, int count) {
+int Sys_FileRead(int handle, TypeLess_ptr dest, int count) {
     return read(handle, dest, count);
 }
 
-void Sys_DebugLog(cstring file, cstring fmt, ...) {
+void Sys_DebugLog(cString file, cString fmt, ...) {
     va_list argptr;
     static char data[1024];
 
@@ -240,12 +240,12 @@ void Sys_DebugLog(cstring file, cstring fmt, ...) {
     close(fd);
 }
 
-void Sys_EditFile(cstring filename) {
+void Sys_EditFile(cString filename) {
     char cmd[256];
 
-    cstring term = getenv("TERM");
+    cString term = getenv("TERM");
     if ((term) && (!strcmp(term, "xterm"))) {
-        cstring editor = getenv("VISUAL");
+        cString editor = getenv("VISUAL");
         if (!editor)
             editor = getenv("EDITOR");
         if (!editor)
@@ -290,7 +290,7 @@ void floating_point_exception_handler(int whatever) {
     signal(SIGFPE, floating_point_exception_handler);
 }
 
-cstring Sys_ConsoleInput() {
+cString Sys_ConsoleInput() {
     static char text[256];
 
     if (cls.state == ca_dedicated) {
@@ -324,7 +324,7 @@ void Sys_LowFPPrecision() {}
 #endif
 
 int main(int c, char** v) {
-    quakeparms_t parms;
+    QuakeParms_t parms;
     extern int vcrFile;
     extern int recording;
 
@@ -414,7 +414,7 @@ void Sys_MakeCodeWriteable(uint32_t startaddr, uint32_t length) {
     //	fprintf(stderr, "writable code %lx(%lx)-%lx, length=%lx\n", startaddr,
     //			addr, startaddr+length, length);
 
-    int r = mprotect((cstring)addr, (length + startaddr - addr + psize), 7);
+    int r = mprotect((cString)addr, (length + startaddr - addr + psize), 7);
 
     if (r < 0) {
         Sys_Error("Protection change failed\n");
@@ -431,7 +431,7 @@ void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {
     // round length up to cover the full range
     size_t len = (startaddr + length - addr + psize - 1) & ~(psize - 1);
 
-    if (mprotect((typeless_ptr)addr, len, PROT_READ | PROT_WRITE | PROT_EXEC) < 0) {
+    if (mprotect((TypeLess_ptr)addr, len, PROT_READ | PROT_WRITE | PROT_EXEC) < 0) {
         Sys_Error("Protection change failed\n");
     }
 }

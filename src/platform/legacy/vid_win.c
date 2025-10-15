@@ -969,8 +969,8 @@ void VID_CheckModedescFixup(int mode) {
 VID_GetModeDescriptionMemCheck
 =================
 */
-cstring VID_GetModeDescriptionMemCheck(int mode) {
-	cstring pinfo;
+cString VID_GetModeDescriptionMemCheck(int mode) {
+	cString pinfo;
 	vmode_t* pv;
 
 	if ((mode < 0) || (mode >= nummodes))
@@ -995,8 +995,8 @@ cstring VID_GetModeDescriptionMemCheck(int mode) {
 VID_GetModeDescription
 =================
 */
-cstring VID_GetModeDescription(int mode) {
-	cstring pinfo;
+cString VID_GetModeDescription(int mode) {
+	cString pinfo;
 	vmode_t* pv;
 
 	if ((mode < 0) || (mode >= nummodes))
@@ -1017,7 +1017,7 @@ VID_GetModeDescription2
 Tacks on "windowed" or "fullscreen"
 =================
 */
-cstring VID_GetModeDescription2(int mode) {
+cString VID_GetModeDescription2(int mode) {
 	static char	pinfo[40];
 	vmode_t* pv;
 
@@ -1044,7 +1044,7 @@ cstring VID_GetModeDescription2(int mode) {
 
 // KJB: Added this to return the mode driver name in description for console
 
-cstring VID_GetExtModeDescription(int mode) {
+cString VID_GetExtModeDescription(int mode) {
 	static char	pinfo[40];
 	vmode_t* pv;
 
@@ -1609,7 +1609,7 @@ void VID_LockBuffer() {
 	if (r_dowarp)
 		d_viewbuffer = r_warpbuffer;
 	else
-		d_viewbuffer = (typeless_ptr)(uint8_p)vid.buffer;
+		d_viewbuffer = (TypeLess_ptr)(uint8_p)vid.buffer;
 
 	if (r_dowarp)
 		screenwidth = WARP_WIDTH;
@@ -1783,7 +1783,7 @@ VID_DescribeModes_f
 */
 void VID_DescribeModes_f() {
 	int			i, lnummodes;
-	cstring pinfo;
+	cString pinfo;
 	qboolean	na;
 	vmode_t* pv;
 
@@ -2783,18 +2783,18 @@ LONG WINAPI MainWndProc(
 
 
 extern void M_Menu_Options_f();
-extern void M_Print(int cx, int cy, cstring str);
-extern void M_PrintWhite(int cx, int cy, cstring str);
+extern void M_Print(int cx, int cy, cString str);
+extern void M_PrintWhite(int cx, int cy, cString str);
 extern void M_DrawCharacter(int cx, int line, int num);
-extern void M_DrawTransPic(int x, int y, qpic_p pic);
-extern void M_DrawPic(int x, int y, qpic_p pic);
+extern void M_DrawTransPic(int x, int y, qPic_p pic);
+extern void M_DrawPic(int x, int y, qPic_p pic);
 
 static int	vid_line, vid_wmodes;
 
 typedef struct
 {
 	int		modenum;
-	cstring desc;
+	cString desc;
 	int		iscur;
 	int		ismode13;
 	int		width;
@@ -2812,8 +2812,8 @@ VID_MenuDraw
 ================
 */
 void VID_MenuDraw() {
-	qpic_p p;
-	cstring ptr;
+	qPic_p p;
+	cString ptr;
 	int			lnummodes, i, j, k, column, row, dup, dupmode;
 	char		temp[100];
 	vmode_t* pv;

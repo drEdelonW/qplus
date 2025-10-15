@@ -491,7 +491,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
 
     r_polycount++;
 
-    surface_p->data = (typeless_ptr)fa;
+    surface_p->data = (TypeLess_ptr)fa;
     surface_p->nearzi = r_nearzi;
     surface_p->flags = fa->flags;
     surface_p->insubmodel = insubmodel;
@@ -594,7 +594,7 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
 
     r_polycount++;
 
-    surface_p->data = (typeless_ptr)psurf;
+    surface_p->data = (TypeLess_ptr)psurf;
     surface_p->nearzi = r_nearzi;
     surface_p->flags = psurf->flags;
     surface_p->insubmodel = true;

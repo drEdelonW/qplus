@@ -30,15 +30,15 @@ extern bool  isDedicated;
 // returns the file size
 // return -1 if file is not present
 // the file should be in BINARY mode for stupid OSs that care
-int Sys_FileOpenRead(cstring path, int *hndl);
+int Sys_FileOpenRead(cString path, int *hndl);
 
-int Sys_FileOpenWrite(cstring path);
+int Sys_FileOpenWrite(cString path);
 void Sys_FileClose(int handle);
 void Sys_FileSeek(int handle, int position);
-int Sys_FileRead(int handle, typeless_ptr dest, int count);
-int Sys_FileWrite(int handle, typeless_ptr data, int count);
-int Sys_FileTime(cstring path);
-void Sys_mkdir(cstring path);
+int Sys_FileRead(int handle, TypeLess_ptr dest, int count);
+int Sys_FileWrite(int handle, TypeLess_ptr data, int count);
+int Sys_FileTime(cString path);
+void Sys_mkdir(cString path);
 
 //
 // memory protection
@@ -52,19 +52,19 @@ void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length);
 //
 // system IO
 //
-void Sys_DebugLog(cstring file, cstring fmt, ...);
+void Sys_DebugLog(cString file, cString fmt, ...);
 
 // an error will cause the entire program to exit
-void Sys_Error(cstring error, ...);
+void Sys_Error(cString error, ...);
 
 // send text to the console
-void Sys_Printf(cstring fmt, ...);
+void Sys_Printf(cString fmt, ...);
 
 void Sys_Quit();
 
 double Sys_FloatTime();
 
-cstring Sys_ConsoleInput();
+cString Sys_ConsoleInput();
 
 // called to yield for a little bit so as
 // not to hog cpu when paused or debugging

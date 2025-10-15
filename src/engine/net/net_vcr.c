@@ -127,7 +127,7 @@ void VCR_SearchForHosts(bool xmit) {
 }
 
 
-qsocket_p VCR_Connect(cstring host) {
+qsocket_p VCR_Connect(cString host) {
 	return NULL;
 }
 

@@ -16,19 +16,19 @@
 #define CLAMP(min_val, var, max_val)    do{ if ((var) < (min_val)) {(var) = (min_val); }else CLAMP_MAX(var, max_val); }while(0)
 
 
-void Q_memset(typeless_ptr dest, int32_t fill, int32_t count);
-void Q_memcpy(typeless_ptr dest, typeless_ptr src, int32_t count);
-int Q_memcmp(typeless_ptr m1, typeless_ptr m2, int32_t count);
+void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count);
+void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count);
+int Q_memcmp(TypeLess_ptr m1, TypeLess_ptr m2, int32_t count);
 
-int Q_strlen(cstring  str);
-void Q_strcpy(cstring  dest, cstring src);
-void Q_strncpy(cstring dest, cstring src, int32_t count);
-void Q_strcat(cstring  dest, cstring src);
-cstring Q_strrchr(cstring s, char  c);
-int Q_strcmp(cstring      s1, cstring s2);
-int Q_strncmp(cstring     s1, cstring s2, int32_t count);
-int Q_strcasecmp(cstring  s1, cstring s2);
-int Q_strncasecmp(cstring s1, cstring s2, int32_t n);
+int Q_strlen(cString  str);
+void Q_strcpy(cString  dest, cString src);
+void Q_strncpy(cString dest, cString src, int32_t count);
+void Q_strcat(cString  dest, cString src);
+cString Q_strrchr(cString s, char  c);
+int Q_strcmp(cString      s1, cString s2);
+int Q_strncmp(cString     s1, cString s2, int32_t count);
+int Q_strcasecmp(cString  s1, cString s2);
+int Q_strncasecmp(cString s1, cString s2, int32_t n);
 
-int	Q_atoi(cstring str);
-float Q_atof(cstring str);
+int	Q_atoi(cString str);
+float Q_atof(cString str);

@@ -99,7 +99,7 @@ void M_Options_Draw() {
     float r;
 
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/p_option.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_option.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 
     M_Print(16, 32, "    Customize controls");

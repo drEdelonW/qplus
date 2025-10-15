@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 int Loop_Init();
 void Loop_Listen(bool state);
 void Loop_SearchForHosts(bool xmit);
-qsocket_p Loop_Connect(cstring host);
+qsocket_p Loop_Connect(cString host);
 qsocket_p Loop_CheckNewConnections();
 int Loop_GetMessage(qsocket_p sock);
 int Loop_SendMessage(qsocket_p sock, sizebuf_p data);

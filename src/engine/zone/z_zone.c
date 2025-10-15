@@ -55,7 +55,7 @@ void Z_ClearZone(memzone_p zone, size_t size) {
 	Z_Free
 	========================
 */
-void Z_Free(typeless_ptr ptr) {
+void Z_Free(TypeLess_ptr ptr) {
 	if (!ptr)
 		Sys_Error("Z_Free: NULL pointer");
 
@@ -93,9 +93,9 @@ void Z_Free(typeless_ptr ptr) {
 	Z_Malloc
 	========================
 */
-typeless_ptr Z_Malloc(size_t size) {
+TypeLess_ptr Z_Malloc(size_t size) {
 	Z_CheckHeap();	// DEBUG
-	typeless_ptr buf = Z_TagMalloc(size, 1);
+	TypeLess_ptr buf = Z_TagMalloc(size, 1);
 	if (!buf)
 		Sys_Error("Z_Malloc: failed on allocation of %i bytes", size);
 	Q_memset(buf, 0, size);
@@ -103,7 +103,7 @@ typeless_ptr Z_Malloc(size_t size) {
 	return buf;
 }
 
-typeless_ptr Z_TagMalloc(size_t size, int tag) {
+TypeLess_ptr Z_TagMalloc(size_t size, int tag) {
 	if (!tag)
 		Sys_Error("Z_TagMalloc: tried to use a 0 tag");
 
@@ -153,7 +153,7 @@ typeless_ptr Z_TagMalloc(size_t size, int tag) {
 	// marker for memory trash testing
 	*(uint32_p)((uint8_p)base + base->size - sizeof(uint32_t)) = ZONEID;
 
-	return (typeless_ptr)((uint8_p)base + sizeof(memblock_t));
+	return (TypeLess_ptr)((uint8_p)base + sizeof(memblock_t));
 }
 
 

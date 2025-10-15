@@ -143,7 +143,7 @@ struct qsocket_s {
     int32_t driver;
     int32_t landriver;
     int socket;
-    typeless_ptr driverdata;
+    TypeLess_ptr driverdata;
 
     uint32_t ackSequence;
     uint32_t sendSequence;
@@ -166,7 +166,7 @@ extern qsocket_p net_freeSockets;
 extern int32_t   net_numsockets;
 
 typedef struct {
-    cstring name;
+    cString name;
     bool initialized;
     int32_t controlSock;
     int (*Init)();
@@ -179,11 +179,11 @@ typedef struct {
     int32_t(*Read)(int socket, uint8_p buf, int32_t len, qsockaddr_p addr);
     int32_t(*Write)(int socket, uint8_p buf, int32_t len, qsockaddr_p addr);
     int32_t(*Broadcast)(int socket, uint8_p buf, int32_t len);
-    cstring(*AddrToString)(qsockaddr_p addr);
-    int32_t(*StringToAddr)(cstring string, qsockaddr_p addr);
+    cString(*AddrToString)(qsockaddr_p addr);
+    int32_t(*StringToAddr)(cString string, qsockaddr_p addr);
     int32_t(*GetSocketAddr)(int socket, qsockaddr_p addr);
-    int32_t(*GetNameFromAddr)(qsockaddr_p addr, cstring name);
-    int32_t(*GetAddrFromName)(cstring name, qsockaddr_p addr);
+    int32_t(*GetNameFromAddr)(qsockaddr_p addr, cString name);
+    int32_t(*GetAddrFromName)(cString name, qsockaddr_p addr);
     int32_t(*AddrCompare)(qsockaddr_p addr1, qsockaddr_p addr2);
     int32_t(*GetSocketPort)(qsockaddr_p addr);
     int32_t(*SetSocketPort)(qsockaddr_p addr, int32_t port);
@@ -194,12 +194,12 @@ extern int32_t net_numlandrivers;
 extern net_landriver_t net_landrivers[MAX_NET_DRIVERS];
 
 typedef struct {
-    cstring name;
+    cString name;
     bool initialized;
     int (*Init)();
     void (*Listen)(bool state);
     void (*SearchForHosts)(bool xmit);
-    qsocket_p(*Connect)(cstring host);
+    qsocket_p(*Connect)(cString host);
     qsocket_p(*CheckNewConnections)();
     int(*QGetMessage)(qsocket_p sock);
     int(*QSendMessage)(qsocket_p sock, sizebuf_p data);
@@ -283,7 +283,7 @@ void NET_Shutdown();
  qsocket_p NET_CheckNewConnections();
 // returns a new connection number if there is one pending, else -1
 
- qsocket_p NET_Connect(cstring host);
+ qsocket_p NET_Connect(cString host);
 // called by client to connect to a host.  Returns -1 if not able to
 
 bool NET_CanSendMessage(qsocket_p sock);
@@ -323,7 +323,7 @@ typedef struct _PollProcedure {
     struct _PollProcedure* next;
     double nextTime;
     void (*procedure)();
-    typeless_ptr arg;
+    TypeLess_ptr arg;
 } PollProcedure;
 
 void SchedulePollProcedure(PollProcedure* pp, double timeOffset);
@@ -335,8 +335,8 @@ extern char my_ipx_address[NET_NAMELEN];
 extern char my_tcpip_address[NET_NAMELEN];
 extern void (*GetComPortConfig)(int32_t portNumber, int32_p port, int32_p irq, int32_p baud, bool* useModem);
 extern void (*SetComPortConfig)(int32_t portNumber, int32_t port, int32_t irq, int32_t baud, bool useModem);
-extern void (*GetModemConfig)(int32_t portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
-extern void (*SetModemConfig)(int32_t portNumber, cstring dialType, cstring clear, cstring init, cstring hangup);
+extern void (*GetModemConfig)(int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
+extern void (*SetModemConfig)(int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
 
 extern bool slistInProgress;
 extern bool slistSilent;

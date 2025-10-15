@@ -68,7 +68,7 @@ kbutton_t in_up, in_down;
 int   in_impulse;
 
 void KeyDown(kbutton_t* btn) {
-    cstring c = Cmd_Argv(1);
+    cString c = Cmd_Argv(1);
     int k = (c[0]) ? atoi(c) : -1;  // typed manually at the console for continuous down
 
     if ((k == btn->down[0]) ||
@@ -92,7 +92,7 @@ void KeyDown(kbutton_t* btn) {
 void KeyUp(kbutton_t* btn) {
     int k;
 
-    cstring c = Cmd_Argv(1);
+    cString c = Cmd_Argv(1);
     if (c[0]) {
         k = atoi(c);
     }

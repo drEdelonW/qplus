@@ -10,7 +10,7 @@ void MSG_WriteByte(sizebuf_p sb, int c);
 void MSG_WriteShort(sizebuf_p sb, int c);
 void MSG_WriteLong(sizebuf_p sb, int c);
 void MSG_WriteFloat(sizebuf_p sb, float f);
-void MSG_WriteString(sizebuf_p sb, cstring s);
+void MSG_WriteString(sizebuf_p sb, cString s);
 void MSG_WriteCoord(sizebuf_p sb, float f);
 void MSG_WriteAngle(sizebuf_p sb, float f);
 
@@ -23,7 +23,7 @@ int   MSG_ReadByte();
 int   MSG_ReadShort();
 int   MSG_ReadLong();
 float MSG_ReadFloat();
-cstring MSG_ReadString();
+cString MSG_ReadString();
 
 float MSG_ReadCoord();
 float MSG_ReadAngle();

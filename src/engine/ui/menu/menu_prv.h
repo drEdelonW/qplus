@@ -11,17 +11,17 @@ extern bool m_entersound; // play after drawing a frame, so caching
 // won't disrupt the sound
 
 void M_DrawCharacter(int cx, int line, int num);
-void M_DrawTransPic(int x, int y, qpic_p pic);
-void M_DrawPic(int x, int y, qpic_p pic);
-void M_Print(int cx, int cy, cstring str);
-void M_PrintWhite(int cx, int cy, cstring str);
+void M_DrawTransPic(int x, int y, qPic_p pic);
+void M_DrawPic(int x, int y, qPic_p pic);
+void M_Print(int cx, int cy, cString str);
+void M_PrintWhite(int cx, int cy, cString str);
 void M_DrawSlider(int x, int y, float range);
 void M_DrawCheckbox(int x, int y, int on);
 
 
 void M_ConfigureNetSubsystem();
 
-void M_FindKeysForCommand(cstring command, int* twokeys);
+void M_FindKeysForCommand(cString command, int* twokeys);
 
 
 void M_Menu_Main_f();

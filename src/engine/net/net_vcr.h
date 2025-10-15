@@ -32,7 +32,7 @@ typedef enum {
 int VCR_Init();
 void VCR_Listen(bool state);
 void VCR_SearchForHosts(bool xmit);
-qsocket_p VCR_Connect(cstring host);
+qsocket_p VCR_Connect(cString host);
 qsocket_p VCR_CheckNewConnections();
 int VCR_GetMessage(qsocket_p sock);
 int VCR_SendMessage(qsocket_p sock, sizebuf_p data);

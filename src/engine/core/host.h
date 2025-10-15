@@ -5,7 +5,7 @@
 //
 // host
 //
-extern	quakeparms_t host_parms;
+extern	QuakeParms_t host_parms;
 
 
 
@@ -22,11 +22,11 @@ extern	double  realtime;			// not bounded in any way, changed at
 void Host_ClearMemory();
 void Host_ServerFrame();
 void Host_InitCommands();
-void Host_Init(quakeparms_p parms);
+void Host_Init(QuakeParms_p parms);
 void Host_Shutdown();
-void Host_Error(cstring error, ...);
-void Host_EndGame(cstring message, ...);
+void Host_Error(cString error, ...);
+void Host_EndGame(cString message, ...);
 void Host_Frame(float time);
 void Host_Quit_f();
-void Host_ClientCommands(cstring fmt, ...);
+void Host_ClientCommands(cString fmt, ...);
 void Host_ShutdownServer(bool crash);

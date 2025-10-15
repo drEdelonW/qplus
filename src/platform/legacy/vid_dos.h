@@ -22,15 +22,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct vmode_s {
 	struct vmode_s* pnext;
-	cstring name;
-	cstring header;
+	cString name;
+	cString header;
 	unsigned	width;
 	unsigned	height;
 	float		aspect;
 	unsigned	rowbytes;
 	int			planar;
 	int			numpages;
-	typeless_ptr pextradata;
+	TypeLess_ptr pextradata;
 	int			(*setmode)(viddef_p vid, struct vmode_s* pcurrentmode);
 	void		(*swapbuffers)(viddef_p vid, struct vmode_s* pcurrentmode,
 		vRect_p rects);
@@ -62,7 +62,7 @@ CVAR_EXTERN(_vid_wait_override);
 
 extern uint8_t colormap256[32][256];
 
-extern typeless_ptr vid_surfcache;
+extern TypeLess_ptr vid_surfcache;
 extern int	vid_surfcachesize;
 
 void VGA_Init();
@@ -80,6 +80,6 @@ void VGA_BeginDirectRect(viddef_p vid, struct vmode_s* pcurrentmode, int x,
 	int y, uint8_p pbitmap, int width, int height);
 void VGA_EndDirectRect(viddef_p vid, struct vmode_s* pcurrentmode, int x,
 	int y, int width, int height);
-void VGA_UpdateLinearScreen(typeless_ptr srcptr, typeless_ptr destptr, int width,
+void VGA_UpdateLinearScreen(TypeLess_ptr srcptr, TypeLess_ptr destptr, int width,
 	int height, int srcrowbytes, int destrowbytes);
 

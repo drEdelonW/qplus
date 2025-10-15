@@ -92,7 +92,7 @@ qboolean SNDDMA_Init() {
 
     // set sample bits & speed
 
-    cstring s = getenv("QUAKE_SOUND_SAMPLEBITS");
+    cString s = getenv("QUAKE_SOUND_SAMPLEBITS");
     int param;
     if (s) shm->samplebits = atoi(s);
     else if ((param = COM_CheckParm("-sndbits")) != 0)

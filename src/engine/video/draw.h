@@ -23,20 +23,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // to touch the vid buffer
 #include "wad.h"
 
-extern qpic_p draw_disc;	// also used on sbar
+extern qPic_p draw_disc;	// also used on sbar
 
 void    Draw_Init();
 void    Draw_Character(int x, int y, int num);
 void    Draw_DebugChar(char num);
-void    Draw_Pic(int x, int y, qpic_p pic);
-void    Draw_TransPic(int x, int y, qpic_p pic);
-void    Draw_TransPicTranslate(int x, int y, qpic_p pic, uint8_p translation);
+void    Draw_Pic(int x, int y, qPic_p pic);
+void    Draw_TransPic(int x, int y, qPic_p pic);
+void    Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation);
 void    Draw_ConsoleBackground(int lines);
 void    Draw_BeginDisc();
 void    Draw_EndDisc();
 void    Draw_TileClear(int x, int y, int w, int h);
 void    Draw_Fill(int x, int y, int w, int h, int c);
 void    Draw_FadeScreen();
-void    Draw_String(int x, int y, cstring str);
-qpic_p  Draw_PicFromWad(cstring name);
-qpic_p  Draw_CachePic(cstring path);
+void    Draw_String(int x, int y, cString str);
+qPic_p  Draw_PicFromWad(cString name);
+qPic_p  Draw_CachePic(cString path);

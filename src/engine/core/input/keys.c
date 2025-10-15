@@ -44,7 +44,7 @@ char key_lines[MAXCHATLEN][MAXCMDLINE];
 int32_t key_linepos;
 keycode_t key_lastpress;
 keydest_t key_dest;
-cstring keybindings[MAX_KEYS];
+cString keybindings[MAX_KEYS];
 int key_count;   // incremented every key event
 int key_repeats[MAX_KEYS]; // if > 1, it is autorepeating
 int edit_line = 0;
@@ -57,7 +57,7 @@ static keycode_t _keyshift[MAX_KEYS];  // key to map to if shift held down in co
 static bool _keydown[MAX_KEYS];
 
 typedef struct {
-    cstring     name;
+    cString     name;
     keycode_t   keynum;
 } keyname_t;
 
@@ -185,7 +185,7 @@ void Key_Console(keycode_t key) {
     }
 
     if (key == K_TAB) { // command completion
-        cstring cmd = Cmd_CompleteCommand(key_lines[edit_line] + 1);
+        cString cmd = Cmd_CompleteCommand(key_lines[edit_line] + 1);
         if (!cmd)
             cmd = Cvar_CompleteVariable(key_lines[edit_line] + 1);
 
@@ -333,7 +333,7 @@ the given string.  Single ascii characters return themselves, while
 the K_* names are matched up.
 ===================
 */
-keycode_t Key_StringToKeynum(cstring str) {
+keycode_t Key_StringToKeynum(cString str) {
     keyname_t* kn;
 
     if ((!str) ||
@@ -362,7 +362,7 @@ given keynum.
 FIXME: handle quote special (general escape sequence?)
 ===================
 */
-cstring Key_KeynumToString(keycode_t keynum) {
+cString Key_KeynumToString(keycode_t keynum) {
     keyname_t* kn;
     static char tinystr[2];
 
@@ -391,7 +391,7 @@ cstring Key_KeynumToString(keycode_t keynum) {
 Key_SetBinding
 ===================
 */
-void Key_SetBinding(keycode_t keynum, cstring binding) {
+void Key_SetBinding(keycode_t keynum, cString binding) {
     if (keynum == -1)
         return;
 
@@ -403,7 +403,7 @@ void Key_SetBinding(keycode_t keynum, cstring binding) {
 
     // allocate memory for new binding
     int l = Q_strlen(binding);
-    cstring new = Z_Malloc(l + 1);
+    cString new = Z_Malloc(l + 1);
     Q_strcpy(new, binding);
     new[l] = 0;
     keybindings[keynum] = new;
@@ -659,7 +659,7 @@ void Key_Event(keycode_t key, bool down) {
     // downs can be matched with ups
     //
     if (!down) {
-        cstring kb = keybindings[key];
+        cString kb = keybindings[key];
         if (kb &&
             (kb[0] == '+')
             ) {
@@ -713,7 +713,7 @@ void Key_Event(keycode_t key, bool down) {
             (!con_forcedup ||
                 !_consolekeys[key]))
         ) {
-        cstring kb = keybindings[key];
+        cString kb = keybindings[key];
         if (kb) {
             if (kb[0] == '+') { // button commands add keynum as a parm
                 sprintf(cmd, "%s %i\n", kb, key);

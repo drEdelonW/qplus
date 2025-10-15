@@ -11,7 +11,7 @@ Bool XShmAttach(Display* dpy, XShmSegmentInfo* shminfo) { return False; }
 Bool XShmDetach(Display* dpy, XShmSegmentInfo* shminfo) { return False; }
 
 XImage* XShmCreateImage(Display* dpy, Visual* visual, uint32_t depth,
-    int format, cstring data, XShmSegmentInfo* shminfo,
+    int format, cString data, XShmSegmentInfo* shminfo,
     uint32_t width, uint32_t height) {
     return NULL;
 }

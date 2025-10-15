@@ -82,26 +82,27 @@ struct eSpan_s {
 
 // FIXME: compress, make a union if that will help
 // insubmodel is only 1, flags is fewer than 32, spanstate could be a byte
-typedef struct Surf_s {
-    struct Surf_s* next;			// active surface stack in r_edge.c
-    struct Surf_s* prev;			// used in r_edge.c for active surf stack
-    struct eSpan_s* spans;			// pointer to linked list of spans to draw
-    int			key;				// sorting key (BSP order)
-    int			last_u;				// set during tracing
-    int			spanstate;			// 0 = not in span
-    // 1 = in span
-    // -1 = in inverted span (end before
-    //  start)
-    int			flags;				// currentface flags
-    typeless_ptr       data;				// associated data like mSurface_t
-    r_Entity_p   entity;
-    float		nearzi;				// nearest 1/z on surface, for mipmapping
-    qboolean	insubmodel;
-    float		d_ziorigin, d_zistepu, d_zistepv;
+typedef struct Surf_s Surf_t;
+typedef Surf_t* Surf_p;
+struct Surf_s {
+    Surf_p  next;       // active surface stack in r_edge.c
+    Surf_p  prev;       // used in r_edge.c for active surf stack
+    eSpan_p spans;      // pointer to linked list of spans to draw
+    int     key;        // sorting key (BSP order)
+    int     last_u;     // set during tracing
+    int     spanstate;  // 0 = not in span
+                        // 1 = in span
+                        // -1 = in inverted span (end before
+                        //  start)
+    int     flags;      // currentface flags
+    TypeLess_ptr    data;   // associated data like mSurface_t
+    r_Entity_p  entity;
+    float   nearzi;     // nearest 1/z on surface, for mipmapping
+    qboolean    insubmodel;
+    float   d_ziorigin, d_zistepu, d_zistepv;
 
     int			pad[2];				// to 64 bytes
-} Surf_t;
-typedef Surf_t* Surf_p;
+};
 
 extern	Surf_p	surfaces, surface_p, surf_max;
 
@@ -147,16 +148,16 @@ extern int	ubasestep, errorterm, erroradjustup, erroradjustdown;
 #define ALIAS_XY_CLIP_MASK			0x000F
 #else
 typedef enum alias_clip_flags_e {
-    ALIAS_LEFT_CLIP      = 0x0001,
-    ALIAS_TOP_CLIP       = 0x0002,
-    ALIAS_RIGHT_CLIP     = 0x0004,
-    ALIAS_BOTTOM_CLIP    = 0x0008,
-    ALIAS_Z_CLIP         = 0x0010,
+    ALIAS_LEFT_CLIP = 0x0001,
+    ALIAS_TOP_CLIP = 0x0002,
+    ALIAS_RIGHT_CLIP = 0x0004,
+    ALIAS_BOTTOM_CLIP = 0x0008,
+    ALIAS_Z_CLIP = 0x0010,
 
     // must stay in sync with d_ifacea.h and modelgen.h
-    ALIAS_ONSEAM         = 0x0020,  // also defined in modelgen.h
-                                    //  must be kept in sync
-    ALIAS_XY_CLIP_MASK   = 0x000F
+    ALIAS_ONSEAM = 0x0020,  // also defined in modelgen.h
+    //  must be kept in sync
+    ALIAS_XY_CLIP_MASK = 0x000F
 } alias_clip_flags_t;
 #endif
 

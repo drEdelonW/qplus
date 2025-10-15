@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ===============================================================================
 */
 
-cstring PF_VarString(int first) {
+cString PF_VarString(int first) {
     static char out[256];
 
     out[0] = 0;
@@ -65,7 +65,7 @@ error(value)
 =================
 */
 void PF_error() {
-    cstring str = PF_VarString(0);
+    cString str = PF_VarString(0);
     Con_Printf(
         "======SERVER ERROR in %s:\n%s\n",
         pr_strings + pr_xfunction->s_name,
@@ -87,7 +87,7 @@ objerror(value)
 =================
 */
 void PF_objerror() {
-    cstring str = PF_VarString(0);
+    cString str = PF_VarString(0);
     Con_Printf(
         "======OBJECT ERROR in %s:\n%s\n",
         pr_strings + pr_xfunction->s_name,
@@ -224,7 +224,7 @@ setmodel(entity, model)
 */
 void PF_setmodel() {
     edict_p edict = G_EDICT(OFS_PARM0);
-    cstring m = G_STRING(OFS_PARM1);
+    cString m = G_STRING(OFS_PARM1);
 
     // check to see if model was properly precached
     char** check = sv.model_precache;
@@ -257,7 +257,7 @@ bprint(value)
 =================
 */
 void PF_bprint() {
-    cstring str = PF_VarString(0);
+    cString str = PF_VarString(0);
     SV_BroadcastPrintf("%s", str);
 }
 
@@ -272,7 +272,7 @@ sprint(clientent, value)
 */
 void PF_sprint() {
     int ent_num = G_EDICTNUM(OFS_PARM0);
-    cstring str = PF_VarString(1);
+    cString str = PF_VarString(1);
 
     if ((ent_num < 1) ||
         (ent_num > svs.maxclients)) {
@@ -297,7 +297,7 @@ centerprint(clientent, value)
 */
 void PF_centerprint() {
     int entnum = G_EDICTNUM(OFS_PARM0);
-    cstring str = PF_VarString(1);
+    cString str = PF_VarString(1);
 
     if ((entnum < 1) || (entnum > svs.maxclients)) {
         Con_Printf("tried to sprint to a non-client\n");
@@ -445,7 +445,7 @@ PF_ambientsound
 */
 void PF_ambientsound() {
     float_p pos = G_VECTOR(OFS_PARM0);
-    cstring samp = G_STRING(OFS_PARM1);
+    cString samp = G_STRING(OFS_PARM1);
     float vol = G_FLOAT(OFS_PARM2);
     float attenuation = G_FLOAT(OFS_PARM3);
 
@@ -491,7 +491,7 @@ Larger attenuations will drop off.
 void PF_sound() {
     edict_p entity = G_EDICT(OFS_PARM0);
     int channel = G_FLOAT(OFS_PARM1);
-    cstring sample = G_STRING(OFS_PARM2);
+    cString sample = G_STRING(OFS_PARM2);
     int volume = G_FLOAT(OFS_PARM3) * 255;
     float attenuation = G_FLOAT(OFS_PARM4);
 
@@ -704,7 +704,7 @@ void PF_stuffcmd() {
     if ((entnum < 1) ||
         (entnum > svs.maxclients))
         PR_RunError("Parm 0 not a client");
-    cstring str = G_STRING(OFS_PARM1);
+    cString str = G_STRING(OFS_PARM1);
 
     client_p old = host_client;
     host_client = &svs.clients[entnum - 1];
@@ -722,7 +722,7 @@ localcmd (string)
 =================
 */
 void PF_localcmd() {
-    cstring str = G_STRING(OFS_PARM0);
+    cString str = G_STRING(OFS_PARM0);
     Cbuf_AddText(str);
 }
 
@@ -734,7 +734,7 @@ float cvar (string)
 =================
 */
 void PF_cvar() {
-    cstring str = G_STRING(OFS_PARM0);
+    cString str = G_STRING(OFS_PARM0);
     G_FLOAT(OFS_RETURN) = Cvar_VariableValue(str);
 }
 
@@ -746,8 +746,8 @@ float cvar (string)
 =================
 */
 void PF_cvar_set() {
-    cstring var = G_STRING(OFS_PARM0);
-    cstring val = G_STRING(OFS_PARM1);
+    cString var = G_STRING(OFS_PARM0);
+    cString val = G_STRING(OFS_PARM1);
     Cvar_Set(var, val);
 }
 
@@ -843,7 +843,7 @@ void PF_Find()
     first = second = last = (edict_p)sv.edicts;
     edict = G_EDICTNUM(OFS_PARM0);
     int f = G_INT(OFS_PARM1);
-    cstring str = G_STRING(OFS_PARM2);
+    cString str = G_STRING(OFS_PARM2);
     if (!str)
         PR_RunError("PF_Find: bad search string");
 
@@ -851,7 +851,7 @@ void PF_Find()
         edict_p ed = EDICT_NUM(edict);
         if (ed->free)
             continue;
-        cstring t = E_STRING(ed, f);
+        cString t = E_STRING(ed, f);
         if (!t)
             continue;
         if (!strcmp(t, str)) {
@@ -879,7 +879,7 @@ void PF_Find()
 {
     int edict = G_EDICTNUM(OFS_PARM0);
     int f = G_INT(OFS_PARM1);
-    cstring str = G_STRING(OFS_PARM2);
+    cString str = G_STRING(OFS_PARM2);
     if (!str)
         PR_RunError("PF_Find: bad search string");
 
@@ -887,7 +887,7 @@ void PF_Find()
         edict_p ed = EDICT_NUM(edict);
         if (ed->free)
             continue;
-        cstring t = E_STRING(ed, f);
+        cString t = E_STRING(ed, f);
         if (!t)
             continue;
         if (!strcmp(t, str)) {
@@ -900,7 +900,7 @@ void PF_Find()
 }
 #endif
 
-void PR_CheckEmptyString(cstring str) {
+void PR_CheckEmptyString(cString str) {
     if (str[0] <= ' ')
         PR_RunError("Bad string");
 }
@@ -913,7 +913,7 @@ void PF_precache_sound() {
     if (sv.state != ss_loading)
         PR_RunError("PF_Precache_*: Precache can only be done in spawn functions");
 
-    cstring str = G_STRING(OFS_PARM0);
+    cString str = G_STRING(OFS_PARM0);
     G_INT(OFS_RETURN) = G_INT(OFS_PARM0);
     PR_CheckEmptyString(str);
 
@@ -932,7 +932,7 @@ void PF_precache_model() {
     if (sv.state != ss_loading)
         PR_RunError("PF_Precache_*: Precache can only be done in spawn functions");
 
-    cstring str = G_STRING(OFS_PARM0);
+    cString str = G_STRING(OFS_PARM0);
     G_INT(OFS_RETURN) = G_INT(OFS_PARM0);
     PR_CheckEmptyString(str);
 
@@ -1038,7 +1038,7 @@ void PF_lightstyle() {
     int j;
 
     int style = G_FLOAT(OFS_PARM0);
-    cstring val = G_STRING(OFS_PARM1);
+    cString val = G_STRING(OFS_PARM1);
 
     // change the string in sv
     sv.lightstyles[style] = val;
@@ -1386,8 +1386,8 @@ void PF_changelevel() {
         return;
     svs.changelevel_issued = true;
 
-    cstring s1 = G_STRING(OFS_PARM0);
-    cstring s2 = G_STRING(OFS_PARM1);
+    cString s1 = G_STRING(OFS_PARM0);
+    cString s2 = G_STRING(OFS_PARM1);
 
     if ((int)pr_global_struct->serverflags & (SFL_NEW_UNIT | SFL_NEW_EPISODE))
         Cbuf_AddText(va("changelevel %s %s\n", s1, s2));
@@ -1399,7 +1399,7 @@ void PF_changelevel() {
         return;
     svs.changelevel_issued = true;
 
-    cstring str = G_STRING(OFS_PARM0);
+    cString str = G_STRING(OFS_PARM0);
     Cbuf_AddText(va("changelevel %s\n", str));
 #endif
 }

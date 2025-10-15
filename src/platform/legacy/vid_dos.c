@@ -164,8 +164,8 @@ int VID_NumModes() {
 VID_ModeInfo
 ================
 */
-cstring VID_ModeInfo(int modenum, char** ppheader) {
-	static cstring badmodestr = "Bad mode number";
+cString VID_ModeInfo(int modenum, char** ppheader) {
+	static cString badmodestr = "Bad mode number";
 	vmode_t* pv;
 
 	pv = VID_GetModePtr(modenum);
@@ -383,7 +383,7 @@ VID_DescribeModes_f
 */
 void VID_DescribeModes_f() {
 	int			i, nummodes;
-	cstring pinfo, pheader;
+	cString pinfo, pheader;
 	vmode_t* pv;
 	qboolean	na;
 
@@ -417,8 +417,8 @@ void VID_DescribeModes_f() {
 VID_GetModeDescription
 =================
 */
-cstring VID_GetModeDescription(int mode) {
-	cstring pinfo, pheader;
+cString VID_GetModeDescription(int mode) {
+	cString pinfo, pheader;
 	vmode_t* pv;
 
 	pv = VID_GetModePtr(mode);
@@ -501,18 +501,18 @@ void D_EndDirectRect(int x, int y, int width, int height) {
 //===========================================================================
 
 extern void M_Menu_Options_f();
-extern void M_Print(int cx, int cy, cstring str);
-extern void M_PrintWhite(int cx, int cy, cstring str);
+extern void M_Print(int cx, int cy, cString str);
+extern void M_PrintWhite(int cx, int cy, cString str);
 extern void M_DrawCharacter(int cx, int line, int num);
-extern void M_DrawTransPic(int x, int y, qpic_p pic);
-extern void M_DrawPic(int x, int y, qpic_p pic);
+extern void M_DrawTransPic(int x, int y, qPic_p pic);
+extern void M_DrawPic(int x, int y, qPic_p pic);
 
 static int	vid_line, vid_wmodes, vid_column_size;
 
 typedef struct
 {
 	int		modenum;
-	cstring desc;
+	cString desc;
 	int		iscur;
 } modedesc_t;
 
@@ -528,8 +528,8 @@ VID_MenuDraw
 ================
 */
 void VID_MenuDraw() {
-	qpic_p p;
-	cstring ptr;
+	qPic_p p;
+	cString ptr;
 	int			nummodes, i, j, column, row, dup;
 	char		temp[100];
 

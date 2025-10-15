@@ -85,12 +85,12 @@ Zone block
 */
 #include "types.h"
 
-void Memory_Init(typeless_ptr buf, size_t size);
+void Memory_Init(TypeLess_ptr buf, size_t size);
 
 //========================[z_hulk.c]========================//
-void 		 Z_Free(typeless_ptr ptr);
-typeless_ptr Z_Malloc(size_t size);   // returns 0 filled memory
-typeless_ptr Z_TagMalloc(size_t size, int tag);
+void 		 Z_Free(TypeLess_ptr ptr);
+TypeLess_ptr Z_Malloc(size_t size);   // returns 0 filled memory
+TypeLess_ptr Z_TagMalloc(size_t size, int tag);
 
 void Z_DumpHeap();
 void Z_CheckHeap();
@@ -98,10 +98,10 @@ int  Z_FreeMemory();
 
 
 //========================[z_hulk.c]========================//
-typeless_ptr Hunk_Alloc(size_t size); // returns 0 filled memory
-typeless_ptr Hunk_AllocName(size_t size, cstring name);
+TypeLess_ptr Hunk_Alloc(size_t size); // returns 0 filled memory
+TypeLess_ptr Hunk_AllocName(size_t size, cString name);
 
-typeless_ptr Hunk_HighAllocName(size_t size, cstring name);
+TypeLess_ptr Hunk_HighAllocName(size_t size, cString name);
 
 size_t  Hunk_LowMark();
 void    Hunk_FreeToLowMark(size_t mark);
@@ -109,14 +109,14 @@ void    Hunk_FreeToLowMark(size_t mark);
 size_t  Hunk_HighMark();
 void    Hunk_FreeToHighMark(size_t mark);
 
-typeless_ptr Hunk_TempAlloc(size_t size);
+TypeLess_ptr Hunk_TempAlloc(size_t size);
 
 void Hunk_Check();
 
 
 //========================[z_cache.c]========================//
 typedef struct cache_user_s {
-	typeless_ptr   data;
+	TypeLess_ptr   data;
 } cache_user_t;
 typedef cache_user_t* cache_user_p;
 
@@ -124,12 +124,12 @@ typedef cache_user_t* cache_user_p;
 void Cache_Flush();
 
 // returns the cached data, and moves to the head of the LRU list if present, otherwise returns NULL
-typeless_ptr Cache_Check(cache_user_p c);
+TypeLess_ptr Cache_Check(cache_user_p c);
 
 void Cache_Free(cache_user_p c);
 
 // Returns NULL if all purgable data was tossed and there still wasn't enough room.
-typeless_ptr Cache_Alloc(cache_user_p c, size_t size, cstring name);
+TypeLess_ptr Cache_Alloc(cache_user_p c, size_t size, cString name);
 
 void Cache_Report();
 

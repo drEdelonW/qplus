@@ -62,26 +62,26 @@ interface from being ambiguous.
 /* 2-field definition: symbol + default string.
    name is taken from symbol via stringification. value is 0 until Cvar_RegisterVariable() */
 #define CVAR(sym, defstr) \
-    cvar_t sym = { #sym, (cstring)(defstr), (uint8_t)cvf_none, 0.0f, NULL }
+    cvar_t sym = { #sym, (cString)(defstr), (uint8_t)cvf_none, 0.0f, NULL }
    //  reg_srch: ^\s*cvar_t\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*"\1"\s*,\s*"([^"]*)"\s*\}\s*;
    //  reg_rpc:  CVAR($1, "$2");
 
    /* same, but with flags */
 #define CVAR_F(sym, defstr, fl) \
-    cvar_t sym = { #sym, (cstring)(defstr), (uint8_t)(fl), 0.0f, NULL }
+    cvar_t sym = { #sym, (cString)(defstr), (uint8_t)(fl), 0.0f, NULL }
 
 /* explicit cvar name (if it differs from the C symbol) */
 #define CVAR_NAMED(sym, namestr, defstr) \
-   cvar_t sym = { (cstring)(namestr), (cstring)(defstr), (uint8_t)cvf_none, 0.0f, NULL }
+   cvar_t sym = { (cString)(namestr), (cString)(defstr), (uint8_t)cvf_none, 0.0f, NULL }
 //  reg_srch: ^\s*cvar_t\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*"([^"]+)"\s*,\s*"([^"]*)"\s*\}\s*;
 //  reg_rpc:  CVAR_NAMED($1, "$2", "$3", cvf_none);
 
 #define CVAR_NAMED_AR(sym, namestr, defstr) \
-   cvar_t sym = { (cstring)(namestr), (cstring)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
+   cvar_t sym = { (cString)(namestr), (cString)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
 
 /* config-style helper: name == "_" "symbol", archived */
 #define CVAR_CFG(sym, defstr) \
-    cvar_t sym = { "_" #sym, (cstring)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
+    cvar_t sym = { "_" #sym, (cString)(defstr), (uint8_t)cvf_archive, 0.0f, NULL }
 
 
 typedef enum {
@@ -110,8 +110,8 @@ struct cvar_s;
 typedef struct cvar_s cvar_t;
 typedef cvar_t* cvar_p;
 struct cvar_s {
-    cstring name;
-    cstring string;
+    cString name;
+    cString string;
     // bool archive;        // set to true to cause it to be saved to vars.rc
     // bool server;        // notifies players when changed
     uint8_t flags;
@@ -124,20 +124,20 @@ struct cvar_s {
 void     Cvar_RegisterVariable(cvar_p variable);
 
 // equivelant to "<name> <variable>" typed at the console
-void     Cvar_Set(cstring var_name, cstring value);
+void     Cvar_Set(cString var_name, cString value);
 
 // expands value to a string and calls Cvar_Set
-void    Cvar_SetValue(cstring var_name, float value);
+void    Cvar_SetValue(cString var_name, float value);
 
 // returns 0 if not defined or non numeric
-float    Cvar_VariableValue(cstring var_name);
+float    Cvar_VariableValue(cString var_name);
 
 // returns an empty string if not defined
-cstring Cvar_VariableString(cstring var_name);
+cString Cvar_VariableString(cString var_name);
 
 // attempts to match a partial variable name for command line completion
 // returns NULL if nothing fits
-cstring Cvar_CompleteVariable(cstring partial);
+cString Cvar_CompleteVariable(cString partial);
 
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
 // command.  Returns true if the command was a variable reference that
@@ -148,6 +148,6 @@ bool Cvar_Command();
 // with the archive flag set to true.
 void     Cvar_WriteVariables(FILE* f);
 
-cvar_p Cvar_FindVar(cstring var_name);
+cvar_p Cvar_FindVar(cString var_name);
 
 extern cvar_p cvar_vars;

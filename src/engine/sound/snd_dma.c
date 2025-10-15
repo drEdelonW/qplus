@@ -191,7 +191,7 @@ void S_Init() {
     // create a piece of DMA memory
 
     if (fakedma) {
-        shm = (typeless_ptr)Hunk_AllocName(sizeof(*shm), "shm");
+        shm = (TypeLess_ptr)Hunk_AllocName(sizeof(*shm), "shm");
         shm->splitbuffer = 0;
         shm->samplebits = 16;
         shm->speed = 22050;
@@ -249,7 +249,7 @@ S_FindName
 
 ==================
 */
-sfx_p S_FindName(cstring name) {
+sfx_p S_FindName(cString name) {
     int		i;
     sfx_p sfx;
 
@@ -283,7 +283,7 @@ S_TouchSound
 
 ==================
 */
-void S_TouchSound(cstring name) {
+void S_TouchSound(cString name) {
     sfx_p sfx;
 
     if (!sound_started)
@@ -299,7 +299,7 @@ S_PrecacheSound
 
 ==================
 */
-sfx_p S_PrecacheSound(cstring name) {
+sfx_p S_PrecacheSound(cString name) {
     sfx_p sfx;
 
     if (!sound_started || nosound.value)
@@ -908,7 +908,7 @@ void S_SoundList() {
 }
 
 
-void S_LocalSound(cstring sound) {
+void S_LocalSound(cString sound) {
     sfx_p sfx;
 
     if (nosound.value)

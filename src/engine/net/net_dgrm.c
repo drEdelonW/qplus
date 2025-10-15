@@ -51,8 +51,8 @@ struct sockaddr_in {
     struct in_addr	sin_addr;
     char			sin_zero[8];
 };
-cstring inet_ntoa(struct in_addr in);
-uint32_t inet_addr(const cstring cp);
+cString inet_ntoa(struct in_addr in);
+uint32_t inet_addr(const cString cp);
 #   endif
 #endif	// BAN_TEST
 typedef struct in_addr in_addr_t;
@@ -88,7 +88,7 @@ extern char m_return_reason[32];
 
 
 #ifdef DEBUG
-cstring StrAddr(qsockaddr_p addr) {
+cString StrAddr(qsockaddr_p addr) {
     static char buf[34];
     uint8_p p = (uint8_p)addr;
 
@@ -106,7 +106,7 @@ uint32_t banMask = 0xFFFFFFFF;
 void NET_Ban_f() {
     char addrStr[32];
     char maskStr[32];
-    void (*print) (cstring fmt, ...);
+    void (*print) (cString fmt, ...);
 
     if (cmd_source == src_command) {
         if (!sv.active) {
@@ -534,7 +534,7 @@ static void Test_f() {
     if (_testInProgress)
         return;
 
-    cstring host = Cmd_Argv(1);
+    cString host = Cmd_Argv(1);
 
     if (host && hostCacheCount) {
         int n = 0;
@@ -653,7 +653,7 @@ static void Test2_f() {
     if (_test2InProgress)
         return;
 
-    cstring host = Cmd_Argv(1);
+    cString host = Cmd_Argv(1);
 
     if (host && hostCacheCount) {
         int n = 0;
@@ -833,7 +833,7 @@ static qsocket_p _Datagram_CheckNewConnections() {
     }
 
     if (command == CCREQ_RULE_INFO) {
-        cstring prevCvarName;
+        cString prevCvarName;
         cvar_p var;
 
         // find the search start location
@@ -1086,7 +1086,7 @@ void Datagram_SearchForHosts(bool xmit) {
 }
 
 
-static qsocket_p _Datagram_Connect(cstring host) {
+static qsocket_p _Datagram_Connect(cString host) {
     qsockaddr_t sendaddr;
     qsockaddr_t readaddr;
 
@@ -1164,14 +1164,14 @@ static qsocket_p _Datagram_Connect(cstring host) {
     }
 
     if (ret == 0) {
-        cstring reason = "No Response";
+        cString reason = "No Response";
         Con_Printf("%s\n", reason);
         Q_strcpy(m_return_reason, reason);
         goto ErrorReturn;
     }
 
     if (ret == -1) {
-        cstring reason = "Network Error";
+        cString reason = "Network Error";
         Con_Printf("%s\n", reason);
         Q_strcpy(m_return_reason, reason);
         goto ErrorReturn;
@@ -1179,7 +1179,7 @@ static qsocket_p _Datagram_Connect(cstring host) {
 
     ret = MSG_ReadByte();
     if (ret == CCREP_REJECT) {
-        cstring reason = MSG_ReadString();
+        cString reason = MSG_ReadString();
         Con_Printf(reason);
         Q_strncpy(m_return_reason, reason, 31);
         goto ErrorReturn;
@@ -1190,7 +1190,7 @@ static qsocket_p _Datagram_Connect(cstring host) {
         dfunc.SetSocketPort(&sock->addr, MSG_ReadLong());
     }
     else {
-        cstring reason = "Bad Response";
+        cString reason = "Bad Response";
         Con_Printf("%s\n", reason);
         Q_strcpy(m_return_reason, reason);
         goto ErrorReturn;
@@ -1203,7 +1203,7 @@ static qsocket_p _Datagram_Connect(cstring host) {
 
     // switch the connection to the specified address
     if (dfunc.Connect(newsock, &sock->addr) == -1) {
-        cstring reason = "Connect to Game failed";
+        cString reason = "Connect to Game failed";
         Con_Printf("%s\n", reason);
         Q_strcpy(m_return_reason, reason);
         goto ErrorReturn;
@@ -1224,7 +1224,7 @@ ErrorReturn2:
     return NULL;
 }
 
-qsocket_p Datagram_Connect(cstring host) {
+qsocket_p Datagram_Connect(cString host) {
     qsocket_p ret = NULL;
 
     for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++)

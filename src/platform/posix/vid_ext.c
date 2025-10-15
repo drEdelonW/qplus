@@ -49,7 +49,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct {
     int			pages[3];			// either 2 or 3 is valid
     int			vesamode;			// LINEAR_MODE set if linear mode
-    typeless_ptr plinearmem;		// linear address of start of frame buffer
+    TypeLess_ptr plinearmem;		// linear address of start of frame buffer
     qboolean	vga_incompatible;
 } vesa_extra_t;
 
@@ -216,7 +216,7 @@ void VID_SetVESAPalette(viddef_p lvid, vmode_p pcurrentmode,
 VID_ExtraFarToLinear
 ================
 */
-typeless_ptr VID_ExtraFarToLinear(typeless_ptr ptr) {
+TypeLess_ptr VID_ExtraFarToLinear(TypeLess_ptr ptr) {
     int		temp;
 
     temp = (int)ptr;
@@ -422,7 +422,7 @@ VID_ExtraGetModeInfo
 ================
 */
 qboolean VID_ExtraGetModeInfo(int modenum) {
-    cstring infobuf;
+    cString infobuf;
     int		numimagepages;
 
     infobuf = dos_getmemory(256);
@@ -437,7 +437,7 @@ qboolean VID_ExtraGetModeInfo(int modenum) {
     }
     else {
         modeinfo.modenum = modenum;
-        modeinfo.bits_per_pixel = *(cstring)(infobuf + 25);
+        modeinfo.bits_per_pixel = *(cString)(infobuf + 25);
         modeinfo.bytes_per_pixel = (modeinfo.bits_per_pixel + 1) / 8;
         modeinfo.width = *(int16_p)(infobuf + 18);
         modeinfo.height = *(int16_p)(infobuf + 20);
@@ -489,7 +489,7 @@ qboolean VID_ExtraGetModeInfo(int modenum) {
             modeinfo.numpages = 3;
         }
 
-        if (*(cstring)(infobuf + 2) & 5) {
+        if (*(cString)(infobuf + 2) & 5) {
             modeinfo.winasegment = *(uint16_p)(infobuf + 8);
             modeinfo.win = 0;
         }

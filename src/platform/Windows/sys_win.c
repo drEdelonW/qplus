@@ -640,7 +640,7 @@ HWND		hwnd_dialog;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     // MSG				msg;
-    quakeparms_t	parms;
+    QuakeParms_t	parms;
     double			time, oldtime, newtime;
     MEMORYSTATUS	lpBuffer;
     static	char	cwd[1024];

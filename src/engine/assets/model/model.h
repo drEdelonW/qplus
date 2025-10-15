@@ -191,7 +191,7 @@ SPRITE MODELS
 typedef struct mSpriteFrame_s {
     int32_t         width;
     int32_t         height;
-    typeless_ptr    pcachespot;   // remove?
+    TypeLess_ptr    pcachespot;   // remove?
     float           up, down, left, right;
     uint8_t         pixels[4];
 } mSpriteFrame_t;
@@ -218,7 +218,7 @@ typedef struct {
     int32_t             maxheight;
     int32_t             numframes;
     float               beamlength;  // remove?
-    typeless_ptr        cachespot;  // remove?
+    TypeLess_ptr        cachespot;  // remove?
     mSpriteFrameDesc_t  frames[1];
 } mSprite_t;
 typedef mSprite_t* mSprite_p;
@@ -246,7 +246,7 @@ typedef mAliasFrameDesc_t* mAliasFrameDesc_p;
 
 typedef struct {
     AliasSkinType_t type;
-    typeless_ptr    pcachespot;
+    TypeLess_ptr    pcachespot;
     int32_t         skin;
 } mAliasSkinDesc_t;
 typedef mAliasSkinDesc_t* mAliasSkinDesc_p;
@@ -333,7 +333,7 @@ typedef struct Model_s {
     int32_t numtextures;        Texture_p* textures;
     uint8_p visdata;
     uint8_p lightdata;
-    cstring entities;
+    cString entities;
     // additional model data
     cache_user_t cache;  // only access through Mod_Extradata
 
@@ -344,9 +344,9 @@ typedef Model_t* Model_p;
 
 void Mod_Init();
 void Mod_ClearAll();
-Model_p Mod_ForName(cstring name, bool crash);
-typeless_ptr Mod_Extradata(Model_p mod); // handles caching
-void Mod_TouchModel(cstring name);
+Model_p Mod_ForName(cString name, bool crash);
+TypeLess_ptr Mod_Extradata(Model_p mod); // handles caching
+void Mod_TouchModel(cString name);
 
 mLeaf_p Mod_PointInLeaf(vec3_t p, Model_p model);
 uint8_p Mod_LeafPVS(mLeaf_p leaf, Model_p model);

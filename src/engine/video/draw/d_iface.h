@@ -85,7 +85,7 @@ typedef FinalVert_t* FinalVert_p;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct {
-    typeless_ptr pskin;
+    TypeLess_ptr pskin;
     mAliasSkinDesc_p pskindesc;
     int skinwidth;
     int skinheight;
@@ -140,7 +140,7 @@ extern int d_con_indirect;	// if 0, Quake will draw console directly to vid.buff
 extern vec3_t r_pright, r_pup, r_ppn;
 
 
-void D_Aff8Patch(typeless_ptr pcolormap);
+void D_Aff8Patch(TypeLess_ptr pcolormap);
 void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height);
 void D_DisableBackBufferAccess();
 void D_EndDirectRect(int x, int y, int width, int height);
@@ -181,7 +181,7 @@ typedef enum {
 // !!! must be kept the same as in quakeasm.h !!!
 #define TRANSPARENT_COLOR	(0xFF)
 
-extern typeless_ptr acolormap;	// FIXME: should go away
+extern TypeLess_ptr acolormap;	// FIXME: should go away
 
 //=======================================================================//
 
@@ -201,7 +201,7 @@ typedef struct {
 extern DrawSurf_t r_drawsurf;
 
 void R_DrawSurface();
-void R_GenTile(mSurface_p psurf, typeless_ptr pdest);
+void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest);
 
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!

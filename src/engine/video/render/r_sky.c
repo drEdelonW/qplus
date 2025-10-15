@@ -147,7 +147,7 @@ void R_MakeSky() {
 R_GenSkyTile
 =================
 */
-void R_GenSkyTile(typeless_ptr pdest) {
+void R_GenSkyTile(TypeLess_ptr pdest) {
 	int			x, y;
 	int			ofs, baseofs;
 	int			xshift, yshift;
@@ -202,7 +202,7 @@ void R_GenSkyTile(typeless_ptr pdest) {
 R_GenSkyTile16
 =================
 */
-void R_GenSkyTile16(typeless_ptr pdest) {
+void R_GenSkyTile16(TypeLess_ptr pdest) {
 	int				x, y;
 	int				ofs, baseofs;
 	int				xshift, yshift;

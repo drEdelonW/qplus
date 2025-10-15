@@ -54,7 +54,7 @@ void Loop_SearchForHosts(bool xmit) {
 }
 
 
-qsocket_p Loop_Connect(cstring host) {
+qsocket_p Loop_Connect(cString host) {
     if (Q_strcmp(host, "local") != 0)
         return NULL;
 
@@ -82,8 +82,8 @@ qsocket_p Loop_Connect(cstring host) {
     loop_server->sendMessageLength = 0;
     loop_server->canSend = true;
 
-    loop_client->driverdata = (typeless_ptr)loop_server;
-    loop_server->driverdata = (typeless_ptr)loop_client;
+    loop_client->driverdata = (TypeLess_ptr)loop_server;
+    loop_server->driverdata = (TypeLess_ptr)loop_client;
 
     return loop_client;
 }

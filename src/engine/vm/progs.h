@@ -56,7 +56,7 @@ typedef edict_t* edict_p;
 
 extern dprograms_p  progs;
 extern dfunction_p  pr_functions;
-extern cstring      pr_strings;
+extern cString      pr_strings;
 extern ddef_p       pr_globaldefs;
 extern ddef_p       pr_fielddefs;
 extern dstatement_p pr_statements;
@@ -76,18 +76,18 @@ void PR_Profile_f();
 edict_p  ED_Alloc();
 void ED_Free(edict_p ed);
 
-cstring ED_NewString(cstring string);
+cString ED_NewString(cString string);
 // returns a copy of the string allocated from the server's string heap
 
 void ED_Print(edict_p ed);
 void ED_Write(FILE* f, edict_p ed);
-cstring ED_ParseEdict(cstring data, edict_p ent);
+cString ED_ParseEdict(cString data, edict_p ent);
 
 void ED_WriteGlobals(FILE* f);
-void ED_ParseGlobals(cstring data);
+void ED_ParseGlobals(cString data);
 
-void ED_LoadFromFile(cstring data);
-bool ED_ParseEpair(typeless_ptr base, ddef_p key, cstring s);
+void ED_LoadFromFile(cString data);
+bool ED_ParseEpair(TypeLess_ptr base, ddef_p key, cString s);
 
 #if 0
 // define EDICT_NUM(n) ((edict_p )(sv.edicts+ (n)*pr_edict_size))
@@ -127,7 +127,7 @@ int32_t NUM_FOR_EDICT(edict_p e);
 #   define G_FUNCTION(o)   (*(func_t*)&pr_globals[(o)])
 
 // безопасное взятие строки: проверяем, что индекс в пределах string-table
-static inline cstring PR_GetStringSafe(uint32_t str_ofs) {
+static inline cString PR_GetStringSafe(uint32_t str_ofs) {
     // if (
     //     // (str_ofs < 0) ||
     //     ((uint32_t)str_ofs >= (uint32_t)progs->num_strings)
@@ -170,10 +170,10 @@ extern int32_t pr_xstatement;
 
 extern uint16_t pr_crc;
 
-void PR_RunError(cstring error, ...);
+void PR_RunError(cString error, ...);
 
 void ED_PrintEdicts();
 void ED_PrintNum(int32_t ent);
 
-eval_t* GetEdictFieldValue(edict_p ed, cstring field);
+eval_t* GetEdictFieldValue(edict_p ed, cString field);
 

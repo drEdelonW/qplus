@@ -11,7 +11,7 @@ extern size_t   hunk_size;
 extern size_t   hunk_low_used;
 extern size_t   hunk_high_used;
 
-void Hulk_Init(typeless_ptr buf, size_t size);
+void Hulk_Init(TypeLess_ptr buf, size_t size);
 
 //========================[z_cache.c]========================//
 

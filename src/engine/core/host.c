@@ -60,7 +60,7 @@ Memory is cleared / released when a server or client begins, not when they end.
 
 */
 
-quakeparms_t host_parms;
+QuakeParms_t host_parms;
 
 bool host_initialized;		// true if into command execution
 
@@ -88,7 +88,7 @@ uint8_p host_colormap;
 Host_EndGame
 ================
 */
-void Host_EndGame(cstring message, ...) {
+void Host_EndGame(cString message, ...) {
     va_list		argptr;
     char		string[1024];
 
@@ -118,7 +118,7 @@ Host_Error
 This shuts down both the client and server
 ================
 */
-void Host_Error(cstring error, ...) {
+void Host_Error(cString error, ...) {
     va_list		argptr;
     char		string[1024];
     static	bool inerror = false;
@@ -263,7 +263,7 @@ Sends text across to be displayed
 FIXME: make this just a stuffed echo?
 =================
 */
-void SV_ClientPrintf(cstring fmt, ...) {
+void SV_ClientPrintf(cString fmt, ...) {
     va_list		argptr;
     char		string[1024];
 
@@ -282,7 +282,7 @@ SV_BroadcastPrintf
 Sends text to all active clients
 =================
 */
-void SV_BroadcastPrintf(cstring fmt, ...) {
+void SV_BroadcastPrintf(cString fmt, ...) {
     va_list		argptr;
     char		string[1024];
 
@@ -304,7 +304,7 @@ Host_ClientCommands
 Send text over to the client to be executed
 =================
 */
-void Host_ClientCommands(cstring fmt, ...) {
+void Host_ClientCommands(cString fmt, ...) {
     va_list		argptr;
     char		string[1024];
 
@@ -499,7 +499,7 @@ Add them exactly as if they had been typed at the console
 */
 void Host_GetConsoleCommands() {
     while (1) {
-        cstring cmd = Sys_ConsoleInput();
+        cString cmd = Sys_ConsoleInput();
         if (!cmd)
             break;
         Cbuf_AddText(cmd);
@@ -718,9 +718,9 @@ extern int vcrFile;
 #define	VCR_SIGNATURE	0x56435231
 // "VCR1"
 
-void Host_InitVCR(quakeparms_p parms) {
+void Host_InitVCR(QuakeParms_p parms) {
     int		i, len, n;
-    cstring p;
+    cString p;
 
     if (COM_CheckParm("-playback")) {
         if (com_argc != 2)
@@ -735,7 +735,7 @@ void Host_InitVCR(quakeparms_p parms) {
             Sys_Error("Invalid signature in vcr file\n");
 
         Sys_FileRead(vcrFile, &com_argc, sizeof(int));
-        com_argv = malloc(com_argc * sizeof(cstring));
+        com_argv = malloc(com_argc * sizeof(cString));
         com_argv[0] = parms->argv[0];
         for (i = 0; i < com_argc; i++) {
             Sys_FileRead(vcrFile, &len, sizeof(int));
@@ -775,7 +775,7 @@ void Host_InitVCR(quakeparms_p parms) {
 Host_Init
 ====================
 */
-void Host_Init(quakeparms_p parms) {
+void Host_Init(QuakeParms_p parms) {
 
     if (standard_quake)
         minimum_memory = MINIMUM_MEMORY;

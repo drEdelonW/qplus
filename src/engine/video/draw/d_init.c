@@ -115,7 +115,7 @@ void D_SetupFrame() {
 	if (r_dowarp)
 		d_viewbuffer = r_warpbuffer;
 	else
-		d_viewbuffer = (typeless_ptr)(uint8_p)vid.buffer;
+		d_viewbuffer = (TypeLess_ptr)(uint8_p)vid.buffer;
 
 	if (r_dowarp)
 		screenwidth = WARP_WIDTH;

@@ -77,13 +77,13 @@ void M_BuildTranslationTable(int top, int bottom) {
 }
 
 
-void M_DrawTransPicTranslate(int x, int y, qpic_p pic) {
+void M_DrawTransPicTranslate(int x, int y, qPic_p pic) {
     Draw_TransPicTranslate(x + ((vid.width - 320) >> 1), y, pic, translationTable);
 }
 
 
 void M_DrawTextBox(int x, int y, int width, int lines) {
-    qpic_p p;
+    qPic_p p;
 
     // draw left side
     int cx = x;
@@ -175,7 +175,7 @@ void M_Menu_Main_f() {
 #include "server.h"
 void M_Main_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/ttl_main.lmp");
+    qPic_p p = Draw_CachePic("gfx/ttl_main.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/mainmenu.lmp"));
 
@@ -251,7 +251,7 @@ void M_Menu_SinglePlayer_f() {
 
 void M_SinglePlayer_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/ttl_sgl.lmp");
+    qPic_p p = Draw_CachePic("gfx/ttl_sgl.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/sp_menu.lmp"));
 
@@ -360,7 +360,7 @@ void M_Menu_Save_f() {
 
 #include "host.h"
 void M_Load_Draw() {
-    qpic_p p = Draw_CachePic("gfx/p_load.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_load.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 
     for (int i = 0; i < MAX_SAVEGAMES; i++)
@@ -372,7 +372,7 @@ void M_Load_Draw() {
 
 
 void M_Save_Draw() {
-    qpic_p p = Draw_CachePic("gfx/p_save.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_save.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 
     for (int i = 0; i < MAX_SAVEGAMES; i++)
@@ -471,7 +471,7 @@ void M_Menu_MultiPlayer_f() {
 
 void M_MultiPlayer_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/mp_menu.lmp"));
 
@@ -558,7 +558,7 @@ void M_Menu_Setup_f() {
 
 void M_Setup_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 
     M_Print(64, 40, "Hostname");
@@ -695,7 +695,7 @@ int m_net_cursor;
 int m_net_items;
 int m_net_saveHeight;
 
-cstring net_helpMessage[] = {
+cString net_helpMessage[] = {
     /* .........1.........2.... */
     "                        ",
     " Two computers connected",
@@ -733,7 +733,7 @@ void M_Menu_Net_f() {
 
 void M_Net_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 
     int f = 32;
@@ -927,7 +927,7 @@ int  m_quit_prevstate;
 bool wasInMenus;
 
 #ifndef _WIN32
-cstring quitMessage[] = {
+cString quitMessage[] = {
     /* .........1.........2.... */
     "  Are you gonna quit    ",
     "  this game just like   ",
@@ -1109,11 +1109,11 @@ void M_Menu_SerialConfig_f() {
 
 
 void M_SerialConfig_Draw() {
-    cstring startJoin;
-    cstring directModem;
+    cString startJoin;
+    cString directModem;
 
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     int basex = (320 - p->width) / 2;
     M_DrawPic(basex, 4, p);
 
@@ -1342,7 +1342,7 @@ void M_Menu_ModemConfig_f() {
 
 void M_ModemConfig_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     int basex = (320 - p->width) / 2;
     M_DrawPic(basex, 4, p);
     basex += 8;
@@ -1503,11 +1503,11 @@ void M_Menu_LanConfig_f() {
 
 
 void M_LanConfig_Draw() {
-    cstring startJoin;
-    cstring protocol;
+    cString startJoin;
+    cString protocol;
 
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     int basex = (320 - p->width) / 2;
     M_DrawPic(basex, 4, p);
 
@@ -1662,8 +1662,8 @@ void M_LanConfig_Key(keycode_t key) {
 /* GAME OPTIONS MENU */
 
 typedef struct {
-    cstring name;
-    cstring description;
+    cString name;
+    cString description;
 } level_t;
 
 level_t  levels[] = {
@@ -1763,7 +1763,7 @@ level_t  roguelevels[] = {
 };
 
 typedef struct {
-    cstring description;
+    cString description;
     int  firstLevel;
     int  levels;
 } episode_t;
@@ -1820,7 +1820,7 @@ int  gameoptions_cursor;
 
 void M_GameOptions_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 
     M_DrawTextBox(152, 32, 10, 1);
@@ -1837,7 +1837,7 @@ void M_GameOptions_Draw() {
 
     M_Print(0, 72, "        Teamplay");
     if (rogue) {
-        cstring msg;
+        cString msg;
 
         switch ((int)teamplay.value) {
         case 1: msg = "No Friendly Fire"; break;
@@ -1851,7 +1851,7 @@ void M_GameOptions_Draw() {
         M_Print(160, 72, msg);
     }
     else {
-        cstring msg;
+        cString msg;
 
         switch ((int)teamplay.value) {
         case 1: msg = "No Friendly Fire"; break;
@@ -2106,7 +2106,7 @@ void M_Menu_Search_f() {
 
 
 void M_Search_Draw() {
-    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
     int x = (320 / 2) - ((12 * 8) / 2) + 4;
     M_DrawTextBox(x - 8, 32, 12, 1);
@@ -2172,7 +2172,7 @@ void M_ServerList_Draw() {
         slist_sorted = true;
     }
 
-    qpic_p p = Draw_CachePic("gfx/p_multi.lmp");
+    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
     for (int n = 0; n < hostCacheCount; n++) {
         if (hostcache[n].maxusers)

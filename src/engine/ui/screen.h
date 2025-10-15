@@ -29,12 +29,12 @@ void SCR_UpdateScreen();
 void SCR_SizeUp();
 void SCR_SizeDown();
 void SCR_BringDownConsole();
-void SCR_CenterPrint (cstring str);
+void SCR_CenterPrint (cString str);
 
 void SCR_BeginLoadingPlaque();
 void SCR_EndLoadingPlaque();
 
-int SCR_ModalMessage (cstring text);
+int SCR_ModalMessage (cString text);
 
 extern	float		scr_con_current;
 extern	float		scr_conlines;		// lines of console to display

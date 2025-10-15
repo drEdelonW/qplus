@@ -94,9 +94,9 @@ extern	cvar_t	crosshair;
 
 qboolean	scr_initialized;		// ready to draw
 
-qpic_t* scr_ram;
-qpic_t* scr_net;
-qpic_t* scr_turtle;
+qPic_t* scr_ram;
+qPic_t* scr_net;
+qPic_t* scr_turtle;
 
 int			scr_fullupdate;
 
@@ -442,7 +442,7 @@ DrawPause
 ==============
 */
 void SCR_DrawPause(void) {
-	qpic_t* pic;
+	qPic_t* pic;
 
 	if (!scr_showpause.value)		// turn off for screenshots
 		return;
@@ -463,7 +463,7 @@ SCR_DrawLoading
 ==============
 */
 void SCR_DrawLoading(void) {
-	qpic_t* pic;
+	qPic_t* pic;
 
 	if (!scr_drawloading)
 		return;

@@ -233,7 +233,7 @@ typedef struct {
     int     maxheight;
     int     numframes;
     float    beamlength;  // remove?
-    typeless_ptr cachespot;  // remove?
+    TypeLess_ptr cachespot;  // remove?
     mSpriteFrameDesc_t frames[1];
 } mSprite_t;
 
@@ -409,7 +409,7 @@ typedef struct Model_s {
 void Mod_Init(void);
 void Mod_ClearAll(void);
 Model_t* Mod_ForName(char* name, qboolean crash);
-typeless_ptr Mod_Extradata(Model_t* mod); // handles caching
+TypeLess_ptr Mod_Extradata(Model_t* mod); // handles caching
 void Mod_TouchModel(char* name);
 
 mLeaf_t* Mod_PointInLeaf(float_p p, Model_t* model);

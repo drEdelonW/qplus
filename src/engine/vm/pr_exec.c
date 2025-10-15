@@ -47,7 +47,7 @@ static int32_t _localstack_used;
 /* extern */ dfunction_p pr_xfunction;
 /* extern */ int32_t     pr_xstatement;
 /* extern */ int32_t     pr_argc;
-/* extern */ cstring     pr_opnames[OP_LAST] = {
+/* extern */ cString     pr_opnames[OP_LAST] = {
     "DONE",
 
     "MUL_F",
@@ -135,8 +135,8 @@ static int32_t _localstack_used;
     "BITOR"
 };
 
-cstring PR_GlobalString(int ofs);
-cstring PR_GlobalStringNoContents(int ofs);
+cString PR_GlobalString(int ofs);
+cString PR_GlobalStringNoContents(int ofs);
 
 
 //=============================================================================
@@ -241,7 +241,7 @@ PR_RunError
 Aborts the currently executing function
 ============
 */
-void PR_RunError(cstring error, ...) {
+void PR_RunError(cString error, ...) {
     va_list		argptr;
     char		string[1024];
 

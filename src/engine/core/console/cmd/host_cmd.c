@@ -69,7 +69,7 @@ Host_Status_f
 ==================
 */
 void Host_Status_f() {
-    void (*print) (cstring fmt, ...);
+    void (*print) (cString fmt, ...);
 
     if (cmd_source == src_command) {
         if (!sv.active) {
@@ -298,7 +298,7 @@ void Host_Changelevel_f() {
 #ifdef QUAKE2
     char	level[MAX_QPATH];
     char	_startspot[MAX_QPATH];
-    cstring startspot;
+    cString startspot;
 
     if (Cmd_Argc() < 2) {
         Con_Printf("changelevel <levelname> : continue game on a new level\n");
@@ -414,7 +414,7 @@ Host_SavegameComment
 Writes a SAVEGAME_COMMENT_LENGTH character comment describing the current
 ===============
 */
-void Host_SavegameComment(cstring text) {
+void Host_SavegameComment(cString text) {
     for (int i = 0; i < SAVEGAME_COMMENT_LENGTH; i++)
         text[i] = ' ';
     memcpy(text, cl.levelname, strlen(cl.levelname));
@@ -617,7 +617,7 @@ void Host_Loadgame_f() {
         if (i == sizeof(str) - 1)
             Sys_Error("Loadgame buffer overflow");
         str[i] = 0;
-        cstring	start = str;
+        cString	start = str;
         start = COM_Parse(str);
         if (!com_token[0])
             break;		// end of file
@@ -703,13 +703,13 @@ void SaveGamestate() {
     Con_Printf("done.\n");
 }
 
-int LoadGamestate(cstring level, cstring startspot) {
+int LoadGamestate(cString level, cString startspot) {
     char	name[MAX_OSPATH];
     FILE* f;
     char	mapname[MAX_QPATH];
     float	time, sk;
     char	str[32768];
-    cstring start;
+    cString start;
     int     r;
     edict_p	ent;
     int32_t		entnum;
@@ -804,7 +804,7 @@ int LoadGamestate(cstring level, cstring startspot) {
 void Host_Changelevel2_f() {
     char	level[MAX_QPATH];
     char	_startspot[MAX_QPATH];
-    cstring startspot;
+    cString startspot;
 
     if (Cmd_Argc() < 2) {
         Con_Printf("changelevel2 <levelname> : continue game on a new level in the unit\n");
@@ -843,7 +843,7 @@ Host_Name_f
 ======================
 */
 void Host_Name_f() {
-    cstring newName;
+    cString newName;
 
     if (Cmd_Argc() == 1) {
         Con_Printf("\"name\" is \"%s\"\n", cl_name.string);
@@ -948,7 +948,7 @@ void Host_Say(bool teamonly) {
 
     client_p save = host_client;
 
-    cstring p = Cmd_Args();
+    cString p = Cmd_Args();
     // remove quotes if present
     if (*p == '"') {
         p++;
@@ -1009,7 +1009,7 @@ void Host_Tell_f() {
     Q_strcpy(text, host_client->name);
     Q_strcat(text, ": ");
 
-    cstring p = Cmd_Args();
+    cString p = Cmd_Args();
 
     // remove quotes if present
     if (*p == '"') {
@@ -1303,8 +1303,8 @@ Kicks a user off of the server
 ==================
 */
 void Host_Kick_f() {
-    cstring who;
-    cstring message = NULL;
+    cString who;
+    cString message = NULL;
     client_p save;
     bool	byNumber = false;
 
@@ -1397,7 +1397,7 @@ void Host_Give_f() {
         return;
     }
 
-    cstring t = Cmd_Argv(1);
+    cString t = Cmd_Argv(1);
     int v = atoi(Cmd_Argv(2));
 
     switch (t[0]) {

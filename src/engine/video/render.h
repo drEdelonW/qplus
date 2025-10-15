@@ -168,6 +168,6 @@ extern qboolean r_cache_thrash; // set if thrashing the surface cache
 int  D_SurfaceCacheForRes(int width, int height);
 void D_FlushCaches();
 void D_DeleteSurfaceCache();
-void D_InitCaches(typeless_ptr buffer, int size);
+void D_InitCaches(TypeLess_ptr buffer, int size);
 void R_SetVrect(vRect_p pvrect, vRect_p pvrectin, int lineadj);
 
