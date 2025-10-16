@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "r_local.h"
 
-mNode_t* r_pefragtopnode;
+mNode_p r_pefragtopnode;
 
 
 //===========================================================================
@@ -84,9 +84,9 @@ void R_RemoveEfrags(r_Entity_p ent) {
 R_SplitEntityOnNode
 ===================
 */
-void R_SplitEntityOnNode(mNode_t* node) {
+void R_SplitEntityOnNode(mNode_p node) {
 	efrag_t* ef;
-	mPlane_t* splitplane;
+	mPlane_p splitplane;
 	mLeaf_t* leaf;
 	int			sides;
 
@@ -151,8 +151,8 @@ void R_SplitEntityOnNode(mNode_t* node) {
 R_SplitEntityOnNode2
 ===================
 */
-void R_SplitEntityOnNode2(mNode_t* node) {
-	mPlane_t* splitplane;
+void R_SplitEntityOnNode2(mNode_p node) {
+	mPlane_p splitplane;
 	int			sides;
 
 	if (node->visframe != r_visframecount)

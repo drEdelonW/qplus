@@ -55,17 +55,17 @@ int			allocated[MAX_LIGHTMAPS][BLOCK_WIDTH];
 byte		lightmaps[4*MAX_LIGHTMAPS*BLOCK_WIDTH*BLOCK_HEIGHT];
 
 // For gl_texsort 0
-mSurface_t* skychain = NULL;
-mSurface_t* waterchain = NULL;
+mSurface_p skychain = NULL;
+mSurface_p waterchain = NULL;
 
-void R_RenderDynamicLightmaps(mSurface_t* fa);
+void R_RenderDynamicLightmaps(mSurface_p fa);
 
 /*
 ===============
 R_AddDynamicLights
 ===============
 */
-void R_AddDynamicLights(mSurface_t* surf) {
+void R_AddDynamicLights(mSurface_p surf) {
 	int			lnum;
 	int			sd, td;
 	float		dist, rad, minlight;
@@ -130,7 +130,7 @@ R_BuildLightMap
 Combine and scale multiple lightmaps into the 8.8 format in blocklights
 ===============
 */
-void R_BuildLightMap(mSurface_t* surf, byte* dest, int stride) {
+void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
 	int			smax, tmax;
 	int			t;
 	int			i, j, size;
@@ -292,7 +292,7 @@ Systems that have fast state and texture changes can
 just do everything as it passes with no need to sort
 ================
 */
-void R_DrawSequentialPoly(mSurface_t* s) {
+void R_DrawSequentialPoly(mSurface_p s) {
 	glpoly_t* p;
 	float_p v;
 	int			i;
@@ -383,7 +383,7 @@ Systems that have fast state and texture changes can
 just do everything as it passes with no need to sort
 ================
 */
-void R_DrawSequentialPoly(mSurface_t* s) {
+void R_DrawSequentialPoly(mSurface_p s) {
 	glpoly_t* p;
 	float_p v;
 	int			i;
@@ -704,7 +704,7 @@ void R_BlendLightmaps(void) {
 R_RenderBrushPoly
 ================
 */
-void R_RenderBrushPoly(mSurface_t* fa) {
+void R_RenderBrushPoly(mSurface_p fa) {
 	Texture_t* t;
 	byte* base;
 	int			maps;
@@ -778,7 +778,7 @@ R_RenderDynamicLightmaps
 Multitexture
 ================
 */
-void R_RenderDynamicLightmaps(mSurface_t* fa) {
+void R_RenderDynamicLightmaps(mSurface_p fa) {
 	Texture_t* t;
 	byte* base;
 	int			maps;
@@ -834,7 +834,7 @@ void R_RenderDynamicLightmaps(mSurface_t* fa) {
 R_MirrorChain
 ================
 */
-void R_MirrorChain(mSurface_t* s) {
+void R_MirrorChain(mSurface_p s) {
 	if (mirror)
 		return;
 	mirror = true;
@@ -850,7 +850,7 @@ R_DrawWaterSurfaces
 */
 void R_DrawWaterSurfaces(void) {
 	int			i;
-	mSurface_t* s;
+	mSurface_p s;
 	Texture_t* t;
 
 	if (r_wateralpha.value == 1.0)
@@ -897,7 +897,7 @@ R_DrawWaterSurfaces
 */
 void R_DrawWaterSurfaces(void) {
 	int			i;
-	mSurface_t* s;
+	mSurface_p s;
 	Texture_t* t;
 
 	if (r_wateralpha.value == 1.0 && gl_texsort.value)
@@ -968,7 +968,7 @@ DrawTextureChains
 */
 void DrawTextureChains(void) {
 	int		i;
-	mSurface_t* s;
+	mSurface_p s;
 	Texture_t* t;
 
 	if (!gl_texsort.value) {
@@ -1015,9 +1015,9 @@ void R_DrawBrushModel(Entity_t* e) {
 	int			j, k;
 	vec3_t		mins, maxs;
 	int			i, numsurfaces;
-	mSurface_t* psurf;
+	mSurface_p psurf;
 	float		dot;
-	mPlane_t* pplane;
+	mPlane_p pplane;
 	Model_t* clmodel;
 	qboolean	rotated;
 
@@ -1114,11 +1114,11 @@ void R_DrawBrushModel(Entity_t* e) {
 R_RecursiveWorldNode
 ================
 */
-void R_RecursiveWorldNode(mNode_t* node) {
+void R_RecursiveWorldNode(mNode_p node) {
 	int			i, c, side, * pindex;
 	vec3_t		acceptpt, rejectpt;
-	mPlane_t* plane;
-	mSurface_t* surf, ** mark;
+	mPlane_p plane;
+	mSurface_p surf, * mark;
 	mLeaf_t* pleaf;
 	double		d, dot;
 	vec3_t		mins, maxs;
@@ -1271,7 +1271,7 @@ R_MarkLeaves
 */
 void R_MarkLeaves(void) {
 	byte* vis;
-	mNode_t* node;
+	mNode_p node;
 	int		i;
 	byte	solid[4096];
 
@@ -1293,7 +1293,7 @@ void R_MarkLeaves(void) {
 
 	for (i=0; i<cl.worldmodel->numleafs; i++) {
 		if (vis[i>>3] & (1<<(i&7))) {
-			node = (mNode_t*)&cl.worldmodel->leafs[i+1];
+			node = (mNode_p)&cl.worldmodel->leafs[i+1];
 			do {
 				if (node->visframe == r_visframecount)
 					break;
@@ -1362,13 +1362,13 @@ int	nColinElim;
 BuildSurfaceDisplayList
 ================
 */
-void BuildSurfaceDisplayList(mSurface_t* fa) {
+void BuildSurfaceDisplayList(mSurface_p fa) {
 	int			i, lindex, lnumverts, s_axis, t_axis;
 	float		dist, lastdist, lzi, scale, u, v, frac;
 	unsigned	mask;
 	vec3_t		local, transformed;
 	mEdge_t* pedges, * r_pedge;
-	mPlane_t* pplane;
+	mPlane_p pplane;
 	int			vertpage, newverts, newpage, lastvert;
 	qboolean	visible;
 	float_p vec;
@@ -1474,7 +1474,7 @@ void BuildSurfaceDisplayList(mSurface_t* fa) {
 GL_CreateSurfaceLightmap
 ========================
 */
-void GL_CreateSurfaceLightmap(mSurface_t* surf) {
+void GL_CreateSurfaceLightmap(mSurface_p surf) {
 	int		smax, tmax, s, t, l, i;
 	byte* base;
 

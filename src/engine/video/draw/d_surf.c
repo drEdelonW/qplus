@@ -231,7 +231,7 @@ int D_log2(int num) {
 D_CacheSurface
 ================
 */
-SurfCache_t* D_CacheSurface(mSurface_t* surface, int miplevel) {
+SurfCache_t* D_CacheSurface(mSurface_p surface, int miplevel) {
 	SurfCache_t* cache;
 
 	//

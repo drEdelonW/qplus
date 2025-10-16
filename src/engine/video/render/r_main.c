@@ -449,7 +449,7 @@ R_MarkLeaves
 */
 void R_MarkLeaves() {
     uint8_p vis;
-    mNode_t* node;
+    mNode_p node;
     int		i;
 
     if (r_oldviewleaf == r_viewleaf)
@@ -462,7 +462,7 @@ void R_MarkLeaves() {
 
     for (i = 0; i < cl.worldmodel->numleafs; i++) {
         if (vis[i >> 3] & (1 << (i & 7))) {
-            node = (mNode_t*)&cl.worldmodel->leafs[i + 1];
+            node = (mNode_p)&cl.worldmodel->leafs[i + 1];
             do {
                 if (node->visframe == r_visframecount)
                     break;

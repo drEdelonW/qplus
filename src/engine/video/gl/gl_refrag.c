@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-mNode_t* r_pefragtopnode;
+mNode_p r_pefragtopnode;
 
 
 //===========================================================================
@@ -38,7 +38,7 @@ efrag_t** lastlink;
 
 vec3_t		r_emins, r_emaxs;
 
-Entity_t* r_addent;
+Entity_p r_addent;
 
 
 /*
@@ -48,7 +48,7 @@ R_RemoveEfrags
 Call when removing an object from the world or moving it to another position
 ================
 */
-void R_RemoveEfrags(Entity_t* ent) {
+void R_RemoveEfrags(Entity_p ent) {
 	efrag_t* ef, * old, * walk, ** prev;
 
 	ef = ent->efrag;
@@ -83,9 +83,9 @@ void R_RemoveEfrags(Entity_t* ent) {
 R_SplitEntityOnNode
 ===================
 */
-void R_SplitEntityOnNode(mNode_t* node) {
+void R_SplitEntityOnNode(mNode_p node) {
 	efrag_t* ef;
-	mPlane_t* splitplane;
+	mPlane_p splitplane;
 	mLeaf_t* leaf;
 	int			sides;
 
@@ -151,7 +151,7 @@ void R_SplitEntityOnNode(mNode_t* node) {
 R_AddEfrags
 ===========
 */
-void R_AddEfrags(Entity_t* ent) {
+void R_AddEfrags(Entity_p ent) {
 	Model_t* entmodel;
 	int			i;
 
@@ -184,7 +184,7 @@ R_StoreEfrags
 ================
 */
 void R_StoreEfrags(efrag_t** ppefrag) {
-	Entity_t* pent;
+	Entity_p pent;
 	Model_t* clmodel;
 	efrag_t* pefrag;
 

@@ -77,9 +77,9 @@ Mod_PointInLeaf
 ===============
 */
 mLeaf_t* Mod_PointInLeaf(vec3_t p, Model_t* model) {
-	mNode_t* node;
+	mNode_p node;
 	float		d;
-	mPlane_t* plane;
+	mPlane_p plane;
 
 	if (!model || !model->nodes)
 		Sys_Error("Mod_PointInLeaf: bad model");
@@ -649,7 +649,7 @@ CalcSurfaceExtents
 Fills in s->texturemins[] and s->extents[]
 ================
 */
-void CalcSurfaceExtents(mSurface_t* s) {
+void CalcSurfaceExtents(mSurface_p s) {
 	float	mins[2], maxs[2], val;
 	int		i, j, e;
 	mVertex_t* v;
@@ -699,7 +699,7 @@ Mod_LoadFaces
 */
 void Mod_LoadFaces(Lump_t* l) {
 	dFace_t* in;
-	mSurface_t* out;
+	mSurface_p out;
 	int			i, count, surfnum;
 	int			planenum, side;
 
@@ -769,7 +769,7 @@ void Mod_LoadFaces(Lump_t* l) {
 Mod_SetParent
 =================
 */
-void Mod_SetParent(mNode_t* node, mNode_t* parent) {
+void Mod_SetParent(mNode_p node, mNode_p parent) {
 	node->parent = parent;
 	if (node->contents < 0)
 		return;
@@ -785,7 +785,7 @@ Mod_LoadNodes
 void Mod_LoadNodes(Lump_t* l) {
 	int			i, j, count, p;
 	dNode_t* in;
-	mNode_t* out;
+	mNode_p out;
 
 	in = (TypeLess_ptr)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -813,7 +813,7 @@ void Mod_LoadNodes(Lump_t* l) {
 			if (p >= 0)
 				out->children[j] = loadmodel->nodes + p;
 			else
-				out->children[j] = (mNode_t*)(loadmodel->leafs + (-1 - p));
+				out->children[j] = (mNode_p)(loadmodel->leafs + (-1 - p));
 		}
 	}
 
@@ -928,7 +928,7 @@ Deplicate the drawing hull structure as a clipping hull
 =================
 */
 void Mod_MakeHull0(void) {
-	mNode_t* in, * child;
+	mNode_p in,  child;
 	dClipNode_t* out;
 	int			i, j, count;
 	Hull_t* hull;
@@ -964,7 +964,7 @@ Mod_LoadMarksurfaces
 void Mod_LoadMarksurfaces(Lump_t* l) {
 	int		i, j, count;
 	short* in;
-	mSurface_t** out;
+	mSurface_p* out;
 
 	in = (TypeLess_ptr)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -1013,7 +1013,7 @@ Mod_LoadPlanes
 */
 void Mod_LoadPlanes(Lump_t* l) {
 	int			i, j;
-	mPlane_t* out;
+	mPlane_p out;
 	dPlane_t* in;
 	int			count;
 	int			bits;

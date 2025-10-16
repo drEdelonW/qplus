@@ -114,9 +114,9 @@ typedef dMipTexLump_t* dmiptexlump_p;
 
 
 typedef struct MipTex_s {
-char        name[16];
-uint32_t    width, height;
-uint32_t    offsets[MIPLEVELS];  // four mip maps stored
+    char        name[16];
+    uint32_t    width, height;
+    uint32_t    offsets[MIPLEVELS];  // four mip maps stored
 } MipTex_t;
 typedef MipTex_t* MipTex_p;
 
@@ -140,9 +140,9 @@ typedef enum {
 } PlaneType_t;
 
 typedef struct {
-    vec3_t  normal;
-    float   dist;
-    PlaneType_t    type;  // PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
+    vec3_t      normal;
+    float       dist;
+    PlaneType_t type;  // PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
 } dPlane_t;
 typedef dPlane_t* dPlane_p;
 
@@ -221,16 +221,16 @@ typedef dFace_t* dFace_p;
 // leaf 0 is the generic CONTENTS_SOLID leaf, used for all solid areas
 // all other leafs need visibility info
 typedef struct {
-int32_t contents;
-int32_t visofs;    // -1 = no visibility info
+    int32_t contents;
+    int32_t visofs;    // -1 = no visibility info
 
-int16_t mins[3];   // for frustum culling
-int16_t maxs[3];
+    int16_t mins[3];   // for frustum culling
+    int16_t maxs[3];
 
-uint16_t    firstmarksurface;
-uint16_t    nummarksurfaces;
+    uint16_t    firstmarksurface;
+    uint16_t    nummarksurfaces;
 
-uint8_t ambient_level[NUM_AMBIENTS];
+    uint8_t ambient_level[NUM_AMBIENTS];
 } dLeaf_t;
 typedef dLeaf_t* dLeaf_p;
 
@@ -245,50 +245,50 @@ typedef dLeaf_t* dLeaf_p;
 
 // the utilities get to be lazy and just use large static arrays
 
-extern int32_t   nummodels;
+extern int32_t  nummodels;
 extern dModel_t dmodels[MAX_MAP_MODELS];
 
-extern int32_t   visdatasize;
+extern int32_t  visdatasize;
 extern uint8_t  dvisdata[MAX_MAP_VISIBILITY];
 
-extern int32_t   lightdatasize;
+extern int32_t  lightdatasize;
 extern uint8_t  dlightdata[MAX_MAP_LIGHTING];
 
-extern int32_t   texdatasize;
+extern int32_t  texdatasize;
 extern uint8_t  dtexdata[MAX_MAP_MIPTEX]; // (dMipTexLump_t)
 
-extern int32_t   entdatasize;
-extern char  dentdata[MAX_MAP_ENTSTRING];
+extern int32_t  entdatasize;
+extern char     dentdata[MAX_MAP_ENTSTRING];
 
-extern int32_t   numleafs;
+extern int32_t  numleafs;
 extern dLeaf_t  dleafs[MAX_MAP_LEAFS];
 
-extern int32_t   numplanes;
+extern int32_t  numplanes;
 extern dPlane_t dplanes[MAX_MAP_PLANES];
 
-extern int32_t   numvertexes;
+extern int32_t  numvertexes;
 extern dVertex_t dvertexes[MAX_MAP_VERTS];
 
-extern int32_t   numnodes;
+extern int32_t  numnodes;
 extern dNode_t  dnodes[MAX_MAP_NODES];
 
 extern int32_t   numtexinfo;
 extern TexInfo_t texinfo[MAX_MAP_TEXINFO];
 
-extern int32_t   numfaces;
+extern int32_t  numfaces;
 extern dFace_t  dfaces[MAX_MAP_FACES];
 
-extern int32_t   numclipnodes;
-extern dClipNode_t dclipnodes[MAX_MAP_CLIPNODES];
+extern int32_t      numclipnodes;
+extern dClipNode_t  dclipnodes[MAX_MAP_CLIPNODES];
 
-extern int32_t   numedges;
+extern int32_t  numedges;
 extern dEdge_t  dedges[MAX_MAP_EDGES];
 
-extern int32_t   nummarksurfaces;
+extern int32_t  nummarksurfaces;
 extern uint16_t dmarksurfaces[MAX_MAP_MARKSURFACES];
 
-extern int32_t   numsurfedges;
-extern int32_t   dsurfedges[MAX_MAP_SURFEDGES];
+extern int32_t  numsurfedges;
+extern int32_t  dsurfedges[MAX_MAP_SURFEDGES];
 
 
 void DecompressVis(uint8_p in, uint8_p decompressed);
@@ -300,19 +300,22 @@ void PrintBSPFileSizes();
 
 //===============
 
-
-typedef struct epair_s {
-struct epair_s* next;
-cString key;
-cString value;
-} epair_t;
+typedef struct ePair_s ePair_t;
+typedef ePair_t* ePair_p;
+struct ePair_s {
+    ePair_p next;
+    cString key;
+    cString value;
+};
 
 typedef struct {
-vec3_t  origin;
-int32_t firstbrush;
-int32_t numbrushes;
-epair_t* epairs;
+    vec3_t  origin;
+    int32_t firstbrush;
+    int32_t numbrushes;
+    ePair_p epairs;
 } Entity_t;
+typedef Entity_t* Entity_p;
+
 
 extern int32_t   num_entities;
 extern Entity_t entities[MAX_MAP_ENTITIES];
@@ -320,13 +323,13 @@ extern Entity_t entities[MAX_MAP_ENTITIES];
 void ParseEntities();
 void UnparseEntities();
 
-void  SetKeyValue(Entity_t* ent, cString key, cString value);
-cString ValueForKey(Entity_t* ent, cString key);
+void  SetKeyValue(Entity_p ent, cString key, cString value);
+cString ValueForKey(Entity_p ent, cString key);
 // will return "" if not present
 
-vec_t FloatForKey(Entity_t* ent, cString key);
-void  GetVectorForKey(Entity_t* ent, cString key, vec3_t vec);
+vec_t FloatForKey(Entity_p ent, cString key);
+void  GetVectorForKey(Entity_p ent, cString key, vec3_t vec);
 
-epair_t* ParseEpair();
+ePair_p ParseEpair();
 
 #endif

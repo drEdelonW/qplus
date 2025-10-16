@@ -26,7 +26,7 @@ Entity_t	r_worldentity;
 qboolean	r_cache_thrash;		// compatability
 
 vec3_t		modelorg, r_entorigin;
-Entity_t* currententity;
+Entity_p currententity;
 
 int			r_visframecount;	// bumped when going to a new PVS
 int			r_framecount;		// used for dlight push checking
@@ -46,7 +46,7 @@ int			playertextures;		// up to 16 color translated skins
 
 int			mirrortexturenum;	// quake texturenum, not gltexturenum
 qboolean	mirror;
-mPlane_t* mirror_plane;
+mPlane_p mirror_plane;
 
 //
 // view origin
@@ -118,7 +118,7 @@ qboolean R_CullBox(vec3_t mins, vec3_t maxs) {
 }
 
 
-void R_RotateForEntity(Entity_t* e) {
+void R_RotateForEntity(Entity_p e) {
 	glTranslatef(e->origin[0], e->origin[1], e->origin[2]);
 
 	glRotatef(e->angles[1], 0, 0, 1);
@@ -139,7 +139,7 @@ void R_RotateForEntity(Entity_t* e) {
 R_GetSpriteFrame
 ================
 */
-mSpriteFrame_t* R_GetSpriteFrame(Entity_t* currententity) {
+mSpriteFrame_t* R_GetSpriteFrame(Entity_p currententity) {
 	mSprite_t* psprite;
 	mSpriteGroup_t* pspritegroup;
 	mSpriteFrame_t* pspriteframe;
@@ -187,7 +187,7 @@ R_DrawSpriteModel
 
 =================
 */
-void R_DrawSpriteModel(Entity_t* e) {
+void R_DrawSpriteModel(Entity_p e) {
 	vec3_t	point;
 	mSpriteFrame_t* frame;
 	float_p up, right;
@@ -422,7 +422,7 @@ R_DrawAliasModel
 
 =================
 */
-void R_DrawAliasModel(Entity_t* e) {
+void R_DrawAliasModel(Entity_p e) {
 	int			i, j;
 	int			lnum;
 	vec3_t		dist;
@@ -717,7 +717,7 @@ void R_PolyBlend(void) {
 }
 
 
-int SignbitsForPlane(mPlane_t* out) {
+int SignbitsForPlane(mPlane_p out) {
 	int	bits, j;
 
 	// for fast box on planeside test
@@ -983,8 +983,8 @@ R_Mirror
 */
 void R_Mirror(void) {
 	float		d;
-	mSurface_t* s;
-	Entity_t* ent;
+	mSurface_p s;
+	Entity_p ent;
 
 	if (!mirror)
 		return;

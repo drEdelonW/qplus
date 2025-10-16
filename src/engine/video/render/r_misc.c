@@ -288,7 +288,7 @@ void TransformVector(vec3_t in, vec3_t out) {
 	R_TransformPlane
 	================
 */
-void R_TransformPlane(mPlane_t* p, float_p normal, float_p dist) {
+void R_TransformPlane(mPlane_p p, float_p normal, float_p dist) {
 	float d = DotProduct(r_origin, p->normal);
 	*dist = p->dist - d;
 	// TODO: when we have rotating entities, this will need to use the view matrix

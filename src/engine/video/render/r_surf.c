@@ -536,7 +536,7 @@ void R_GenTurbTile16(pixel_p pbasetex, TypeLess_ptr pdest) {
 R_GenTile
 ================
 */
-void R_GenTile(mSurface_t* psurf, TypeLess_ptr pdest) {
+void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest) {
     if (psurf->flags & SURF_DRAWTURB) {
         if (r_pixbytes == 1) {
             R_GenTurbTile((pixel_p)

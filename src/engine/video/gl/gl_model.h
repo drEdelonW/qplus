@@ -124,7 +124,7 @@ typedef struct glpoly_s {
 typedef struct mSurface_s {
     int   visframe;  // should be drawn when node is crossed
 
-    mPlane_t* plane;
+    mPlane_p plane;
     int   flags;
 
     int   firstedge; // look up in model->surfedges[], negative numbers
@@ -161,7 +161,7 @@ typedef struct mNode_s {
     struct mNode_s* parent;
 
     // node specific
-    mPlane_t* plane;
+    mPlane_p plane;
     struct mNode_s* children[2];
 
     unsigned short  firstsurface;
@@ -183,7 +183,7 @@ typedef struct mLeaf_s {
     byte* compressed_vis;
     efrag_t* efrags;
 
-    mSurface_t** firstmarksurface;
+    mSurface_p* firstmarksurface;
     int   nummarksurfaces;
     int   key;   // BSP sequence number for leaf's contents
     byte  ambient_sound_level[NUM_AMBIENTS];
@@ -192,7 +192,7 @@ typedef struct mLeaf_s {
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
 typedef struct {
     dClipNode_t* clipnodes;
-    mPlane_t* planes;
+    mPlane_p planes;
     int   firstclipnode;
     int   lastclipnode;
     vec3_t  clip_mins;
@@ -359,7 +359,7 @@ typedef struct Model_s {
     dModel_t* submodels;
 
     int   numplanes;
-    mPlane_t* planes;
+    mPlane_p planes;
 
     int   numleafs;  // number of visible leafs, not counting 0
     mLeaf_t* leafs;
@@ -371,13 +371,13 @@ typedef struct Model_s {
     mEdge_t* edges;
 
     int   numnodes;
-    mNode_t* nodes;
+    mNode_p nodes;
 
     int   numtexinfo;
     mTexInfo_t* texinfo;
 
     int   numsurfaces;
-    mSurface_t* surfaces;
+    mSurface_p surfaces;
 
     int   numsurfedges;
     int* surfedges;
@@ -386,7 +386,7 @@ typedef struct Model_s {
     dClipNode_t* clipnodes;
 
     int   nummarksurfaces;
-    mSurface_t** marksurfaces;
+    mSurface_p* marksurfaces;
 
     Hull_t  hulls[MAX_MAP_HULLS];
 

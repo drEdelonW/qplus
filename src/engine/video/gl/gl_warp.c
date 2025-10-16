@@ -29,7 +29,7 @@ int		solidskytexture;
 int		alphaskytexture;
 float	speedscale;		// for top sky and bottom sky
 
-mSurface_t* warpface;
+mSurface_p warpface;
 
 extern cvar_t gl_subdivide_size;
 
@@ -134,7 +134,7 @@ boundaries so that turbulent and sky warps
 can be done reasonably.
 ================
 */
-void GL_SubdivideSurface(mSurface_t* fa) {
+void GL_SubdivideSurface(mSurface_p fa) {
 	vec3_t		verts[64];
 	int			numverts;
 	int			i;
@@ -180,7 +180,7 @@ EmitWaterPolys
 Does a water warp on the pre-fragmented glpoly_t chain
 =============
 */
-void EmitWaterPolys(mSurface_t* fa) {
+void EmitWaterPolys(mSurface_p fa) {
 	glpoly_t* p;
 	float_p v;
 	int			i;
@@ -214,7 +214,7 @@ void EmitWaterPolys(mSurface_t* fa) {
 EmitSkyPolys
 =============
 */
-void EmitSkyPolys(mSurface_t* fa) {
+void EmitSkyPolys(mSurface_p fa) {
 	glpoly_t* p;
 	float_p v;
 	int			i;
@@ -254,7 +254,7 @@ This will be called for brushmodels, the world
 will have them chained together.
 ===============
 */
-void EmitBothSkyLayers(mSurface_t* fa) {
+void EmitBothSkyLayers(mSurface_p fa) {
 	int			i;
 	int			lindex;
 	float_p vec;
@@ -283,8 +283,8 @@ void EmitBothSkyLayers(mSurface_t* fa) {
 R_DrawSkyChain
 =================
 */
-void R_DrawSkyChain(mSurface_t* s) {
-	mSurface_t* fa;
+void R_DrawSkyChain(mSurface_p s) {
+	mSurface_p fa;
 
 	GL_DisableMultitexture();
 
@@ -845,8 +845,8 @@ void ClipSkyPolygon(int nump, vec3_t vecs, int stage) {
 R_DrawSkyChain
 =================
 */
-void R_DrawSkyChain(mSurface_t* s) {
-	mSurface_t* fa;
+void R_DrawSkyChain(mSurface_p s) {
+	mSurface_p fa;
 
 	int		i;
 	vec3_t	verts[MAX_CLIP_VERTS];

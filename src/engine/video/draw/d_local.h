@@ -81,7 +81,7 @@ void D_DrawSkyScans16(eSpan_p  pspan);
 
 void R_ShowSubDiv();
 extern void(*prealspandrawer)();
-SurfCache_p D_CacheSurface(mSurface_t* surface, int miplevel);
+SurfCache_p D_CacheSurface(mSurface_p surface, int miplevel);
 
 extern int D_MipLevelForScale(float scale);
 
