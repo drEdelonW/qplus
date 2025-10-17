@@ -620,7 +620,7 @@ void R_DrawViewModel(void) {
 	int			lnum;
 	vec3_t		dist;
 	float		add;
-	dlight_t* dl;
+	dLight_p dl;
 	int			ambientlight, shadelight;
 
 	if (!r_drawviewmodel.value)

@@ -87,7 +87,7 @@ typedef struct client_s {
     bool        sendsignon; // only valid before spawned
     double      last_message;   // reliable messages must be sent periodically
     qsocket_p   netconnection;  // communications handle
-    usercmd_t   cmd;        // movement
+    UserCmd_t   cmd;        // movement
     vec3_t      wishdir;    // intended motion calced from cmd
     sizebuf_t   message;    // can be added to at any time, copied and clear once per frame
     uint8_t     msgbuf[MAX_MSGLEN];

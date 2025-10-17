@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int			num_temp_entities;
 r_Entity_t	cl_temp_entities[MAX_TEMP_ENTITIES];
-beam_t		cl_beams[MAX_BEAMS];
+Beam_t		cl_beams[MAX_BEAMS];
 
 sfx_p cl_sfx_wizhit;
 sfx_p cl_sfx_knighthit;
@@ -64,7 +64,7 @@ CL_ParseBeam
 void CL_ParseBeam(Model_t* m) {
 	int		ent;
 	vec3_t	start, end;
-	beam_t* b;
+	Beam_p b;
 	int		i;
 
 	ent = MSG_ReadShort();
@@ -113,7 +113,7 @@ void CL_ParseTEnt() {
 #ifdef QUAKE2
 	vec3_t	endpos;
 #endif
-	dlight_t* dl;
+	dLight_p dl;
 	int		rnd;
 	int		colorStart, colorLength;
 
@@ -314,7 +314,7 @@ CL_UpdateTEnts
 */
 void CL_UpdateTEnts() {
 	int			i;
-	beam_t* b;
+	Beam_p b;
 	vec3_t		dist, org;
 	float		d;
 	r_Entity_p ent;

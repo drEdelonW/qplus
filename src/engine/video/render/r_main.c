@@ -22,100 +22,99 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "r_local.h"
 
-//define	PASSAGES
+//define PASSAGES
 
 TypeLess_ptr colormap;
-vec3_t		viewlightvec;
-aLight_t	r_viewlighting = { 128, 192, viewlightvec };
-float		r_time1;
-int			r_numallocatededges;
-qboolean	r_drawpolys;
-qboolean	r_drawculledpolys;
-qboolean	r_worldpolysbacktofront;
-qboolean	r_recursiveaffinetriangles = true;
-int			r_pixbytes = 1;
-float		r_aliasuvscale = 1.0;
-int			r_outofsurfaces;
-int			r_outofedges;
+vec3_t  viewlightvec;
+aLight_t r_viewlighting = { 128, 192, viewlightvec };
+float  r_time1;
+int   r_numallocatededges;
+qboolean r_drawpolys;
+qboolean r_drawculledpolys;
+qboolean r_worldpolysbacktofront;
+qboolean r_recursiveaffinetriangles = true;
+int   r_pixbytes = 1;
+float  r_aliasuvscale = 1.0;
+int   r_outofsurfaces;
+int   r_outofedges;
 
-qboolean	r_dowarp, r_dowarpold, r_viewchanged;
+qboolean r_dowarp, r_dowarpold, r_viewchanged;
 
-int			numbtofpolys;
-btofpoly_t* pbtofpolys;
+int   numbtofpolys;
+btofpoly_p  pbtofpolys;
 mVertex_p r_pcurrentvertbase;
 
-int			c_surf;
-int			r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
-qboolean	r_surfsonstack;
-int			r_clipflags;
+int   c_surf;
+int   r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
+qboolean r_surfsonstack;
+int   r_clipflags;
 
-uint8_p r_warpbuffer;
+uint8_p     r_warpbuffer;
+uint8_p     r_stack_start;
 
-uint8_p r_stack_start;
-
-qboolean	r_fov_greater_than_90;
+qboolean r_fov_greater_than_90;
 
 //
 // view origin
 //
-vec3_t	vup, base_vup;
-vec3_t	vpn, base_vpn;
-vec3_t	vright, base_vright;
-vec3_t	r_origin;
+vec3_t vup, base_vup;
+vec3_t vpn, base_vpn;
+vec3_t vright, base_vright;
+vec3_t r_origin;
 
 //
 // screen size info
 //
-refdef_t	r_refdef;
-float		xcenter, ycenter;
-float		xscale, yscale;
-float		xscaleinv, yscaleinv;
-float		xscaleshrink, yscaleshrink;
-float		aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
+refdef_t r_refdef;
+float  xcenter, ycenter;
+float  xscale, yscale;
+float  xscaleinv, yscaleinv;
+float  xscaleshrink, yscaleshrink;
+float  aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
 
-int		screenwidth;
+int  screenwidth;
 
-float	pixelAspect;
-float	screenAspect;
-float	verticalFieldOfView;
-float	xOrigin, yOrigin;
+float pixelAspect;
+float screenAspect;
+float verticalFieldOfView;
+float xOrigin, yOrigin;
 
-mPlane_t	screenedge[4];
+mPlane_t screenedge[4];
 
 //
 // refresh flags
 //
-int		r_framecount = 1;	// so frame counts initialized to 0 don't match
-int		r_visframecount;
-int		d_spanpixcount;
-int		r_polycount;
-int		r_drawnpolycount;
-int		r_wholepolycount;
+int  r_framecount = 1; // so frame counts initialized to 0 don't match
+int  r_visframecount;
+int  d_spanpixcount;
+int  r_polycount;
+int  r_drawnpolycount;
+int  r_wholepolycount;
 
-#define		VIEWMODNAME_LENGTH	256
-char		viewmodname[VIEWMODNAME_LENGTH + 1];
-int			modcount;
+#define VIEWMODNAME_LENGTH 256
+char    viewmodname[VIEWMODNAME_LENGTH + 1];
+int modcount;
 
 int* pfrustum_indexes[4];
-int			r_frustum_indexes[4 * 6];
+int r_frustum_indexes[4 * 6];
 
-int		reinit_surfcache = 1;	// if 1, surface cache is currently empty and
+int  reinit_surfcache = 1; // if 1, surface cache is currently empty and
 // must be reinitialized for current cache size
 
-mLeaf_t* r_viewleaf, * r_oldviewleaf;
-
+mLeaf_p r_viewleaf, r_oldviewleaf;
 Texture_p r_notexture_mip;
+float   r_aliastransition, r_resfudge;
 
-float		r_aliastransition, r_resfudge;
+int  d_lightstylevalue[256]; // 8.8 fraction of base light value
 
-int		d_lightstylevalue[256];	// 8.8 fraction of base light value
-
-float	dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2;
-float	se_time1, se_time2, de_time1, de_time2, dv_time1, dv_time2;
+float dp_time1, dp_time2;
+float db_time1, db_time2;
+float rw_time1, rw_time2;
+float se_time1, se_time2;
+float de_time1, de_time2;
+float dv_time1, dv_time2;
 
 void R_MarkLeaves();
-
-
 void CreatePassages();
 void SetVisibilityByPassages();
 
@@ -124,10 +123,7 @@ void SetVisibilityByPassages();
 R_InitTextures
 ==================
 */
-void	R_InitTextures() {
-    int		x, y, m;
-    uint8_p dest;
-
+void R_InitTextures() {
     // create a simple checkerboard texture for the default
     r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + 16 * 16 + 8 * 8 + 4 * 4 + 2 * 2, "notexture");
 
@@ -137,10 +133,10 @@ void	R_InitTextures() {
     r_notexture_mip->offsets[2] = r_notexture_mip->offsets[1] + 8 * 8;
     r_notexture_mip->offsets[3] = r_notexture_mip->offsets[2] + 4 * 4;
 
-    for (m = 0; m < 4; m++) {
-        dest = (uint8_p)r_notexture_mip + r_notexture_mip->offsets[m];
-        for (y = 0; y < (16 >> m); y++)
-            for (x = 0; x < (16 >> m); x++) {
+    for (int m = 0; m < 4; m++) {
+        uint8_p dest = (uint8_p)r_notexture_mip + r_notexture_mip->offsets[m];
+        for (int y = 0; y < (16 >> m); y++)
+            for (int x = 0; x < (16 >> m); x++) {
                 if ((y < (8 >> m)) ^ (x < (8 >> m)))
                     *dest++ = 0;
                 else
@@ -155,7 +151,7 @@ R_Init
 ===============
 */
 void R_Init() {
-    int		dummy;
+    int  dummy;
 
     // get stack position so we can guess if we are going to overflow
     r_stack_start = (uint8_p)&dummy;
@@ -192,9 +188,11 @@ void R_Init() {
 
     view_clipplanes[0].leftedge = true;
     view_clipplanes[1].rightedge = true;
-    view_clipplanes[1].leftedge = view_clipplanes[2].leftedge =
+    view_clipplanes[1].leftedge =
+        view_clipplanes[2].leftedge =
         view_clipplanes[3].leftedge = false;
-    view_clipplanes[0].rightedge = view_clipplanes[2].rightedge =
+    view_clipplanes[0].rightedge =
+        view_clipplanes[2].rightedge =
         view_clipplanes[3].rightedge = false;
 
     r_refdef.xOrigin = XCENTERING;
@@ -203,10 +201,11 @@ void R_Init() {
     R_InitParticles();
 
     // TODO: collect 386-specific code in one place
-#if	id386
-    Sys_MakeCodeWriteable((int32_t)R_EdgeCodeStart,
+#if id386
+    Sys_MakeCodeWriteable(
+        (int32_t)R_EdgeCodeStart,
         (int32_t)R_EdgeCodeEnd - (int32_t)R_EdgeCodeStart);
-#endif	// id386
+#endif // id386
 
     D_Init();
 }
@@ -274,21 +273,18 @@ R_SetVrect
 ===============
 */
 void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) {
-    int		h;
-    float	size;
-
-    size = scr_viewsize.value > 100 ? 100 : scr_viewsize.value;
+    float size = scr_viewsize.value > 100 ? 100 : scr_viewsize.value;
     if (cl.intermission) {
         size = 100;
         lineadj = 0;
     }
     size /= 100;
 
-    h = pvrectin->height - lineadj;
+    int h = pvrectin->height - lineadj;
     pvrect->width = pvrectin->width * size;
     if (pvrect->width < 96) {
         size = 96.0 / pvrectin->width;
-        pvrect->width = 96;	// min for icons
+        pvrect->width = 96; // min for icons
     }
     pvrect->width &= ~7;
     pvrect->height = pvrectin->height * size;
@@ -300,11 +296,9 @@ void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) {
     pvrect->x = (pvrectin->width - pvrect->width) / 2;
     pvrect->y = (h - pvrect->height) / 2;
 
-    {
-        if (lcd_x.value) {
-            pvrect->y >>= 1;
-            pvrect->height >>= 1;
-        }
+    if (lcd_x.value) {
+        pvrect->y >>= 1;
+        pvrect->height >>= 1;
     }
 }
 
@@ -318,9 +312,6 @@ Guaranteed to be called before the first refresh
 ===============
 */
 void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
-    int		i;
-    float	res_scale;
-
     r_viewchanged = true;
 
     R_SetVrect(pvrect, &r_refdef.vrect, lineadj);
@@ -344,9 +335,11 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     r_refdef.aliasvrect.y = (int)(r_refdef.vrect.y * r_aliasuvscale);
     r_refdef.aliasvrect.width = (int)(r_refdef.vrect.width * r_aliasuvscale);
     r_refdef.aliasvrect.height = (int)(r_refdef.vrect.height * r_aliasuvscale);
-    r_refdef.aliasvrectright = r_refdef.aliasvrect.x +
+    r_refdef.aliasvrectright =
+        r_refdef.aliasvrect.x +
         r_refdef.aliasvrect.width;
-    r_refdef.aliasvrectbottom = r_refdef.aliasvrect.y +
+    r_refdef.aliasvrectbottom =
+        r_refdef.aliasvrect.y +
         r_refdef.aliasvrect.height;
 
     pixelAspect = aspect;
@@ -408,10 +401,10 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     screenedge[3].normal[2] = 1;
     screenedge[3].type = PLANE_ANYZ;
 
-    for (i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
         VectorNormalize(screenedge[i].normal);
 
-    res_scale = sqrt((double)(r_refdef.vrect.width * r_refdef.vrect.height) /
+    float res_scale = sqrt((double)(r_refdef.vrect.width * r_refdef.vrect.height) /
         (320.0 * 152.0)) *
         (2.0 / r_refdef.horizontalFieldOfView);
     r_aliastransition = r_aliastransbase.value * res_scale;
@@ -423,7 +416,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
         r_fov_greater_than_90 = true;
 
     // TODO: collect 386-specific code in one place
-#if	id386
+#if id386
     if (r_pixbytes == 1) {
         Sys_MakeCodeWriteable((int32_t)R_Surf8Start,
             (int32_t)R_Surf8End - (int32_t)R_Surf8Start);
@@ -436,7 +429,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
         colormap = vid.colormap16;
         R_Surf16Patch();
     }
-#endif	// id386
+#endif // id386
 
     D_ViewChanged();
 }
@@ -448,21 +441,17 @@ R_MarkLeaves
 ===============
 */
 void R_MarkLeaves() {
-    uint8_p vis;
-    mNode_p node;
-    int		i;
-
     if (r_oldviewleaf == r_viewleaf)
         return;
 
     r_visframecount++;
     r_oldviewleaf = r_viewleaf;
 
-    vis = Mod_LeafPVS(r_viewleaf, cl.worldmodel);
+    uint8_p vis = Mod_LeafPVS(r_viewleaf, cl.worldmodel);
 
-    for (i = 0; i < cl.worldmodel->numleafs; i++) {
+    for (int i = 0; i < cl.worldmodel->numleafs; i++) {
         if (vis[i >> 3] & (1 << (i & 7))) {
-            node = (mNode_p)&cl.worldmodel->leafs[i + 1];
+            mNode_p node = (mNode_p)&cl.worldmodel->leafs[i + 1];
             do {
                 if (node->visframe == r_visframecount)
                     break;
@@ -480,22 +469,16 @@ R_DrawEntitiesOnList
 =============
 */
 void R_DrawEntitiesOnList() {
-    int			i, j;
-    int			lnum;
-    aLight_t	lighting;
     // FIXME: remove and do real lighting
-    vec3_t		lightvec = { -1, 0, 0 };
-    vec3_t		dist;
-    float		add;
 
     if (!r_drawentities.value)
         return;
 
-    for (i = 0; i < cl_numvisedicts; i++) {
+    for (int i = 0; i < cl_numvisedicts; i++) {
         currententity = cl_visedicts[i];
 
         if (currententity == &cl_entities[cl.viewentity])
-            continue;	// don't draw the player
+            continue; // don't draw the player
 
         switch (currententity->model->type) {
         case mod_sprite:
@@ -511,19 +494,23 @@ void R_DrawEntitiesOnList() {
             // see if the bounding box lets us trivially reject, also sets
             // trivial accept status
             if (R_AliasCheckBBox()) {
-                j = R_LightPoint(currententity->origin);
+                int j = R_LightPoint(currententity->origin);
 
+                aLight_t lighting;
                 lighting.ambientlight = j;
                 lighting.shadelight = j;
 
+                vec3_t  lightvec = { -1, 0, 0 };
                 lighting.plightvec = lightvec;
 
-                for (lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
+                for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
                     if (cl_dlights[lnum].die >= cl.time) {
-                        VectorSubtract(currententity->origin,
+                        vec3_t  dist;
+                        VectorSubtract(
+                            currententity->origin,
                             cl_dlights[lnum].origin,
                             dist);
-                        add = cl_dlights[lnum].radius - Length(dist);
+                        float add = cl_dlights[lnum].radius - Length(dist);
 
                         if (add > 0)
                             lighting.ambientlight += add;
@@ -554,24 +541,10 @@ R_DrawViewModel
 */
 void R_DrawViewModel() {
     // FIXME: remove and do real lighting
-    vec3_t lightvec = {
-        -1,
-        0,
-        0
-    };
-    int			j;
-    int			lnum;
-    vec3_t		dist;
-    float		add;
-    dlight_t* dl;
 
-    if (!r_drawviewmodel.value || r_fov_greater_than_90)
-        return;
-
-    if (cl.items & IT_INVISIBILITY)
-        return;
-
-    if (cl.stats[STAT_HEALTH] <= 0)
+    if ((!r_drawviewmodel.value || r_fov_greater_than_90) ||
+        (cl.items & IT_INVISIBILITY) ||
+        (cl.stats[STAT_HEALTH] <= 0))
         return;
 
     currententity = &cl.viewent;
@@ -584,25 +557,24 @@ void R_DrawViewModel() {
     VectorCopy(vup, viewlightvec);
     VectorInverse(viewlightvec);
 
-    j = R_LightPoint(currententity->origin);
+    int j = R_LightPoint(currententity->origin);
 
     if (j < 24)
-        j = 24;		// allways give some light on gun
+        j = 24;  // allways give some light on gun
     r_viewlighting.ambientlight = j;
     r_viewlighting.shadelight = j;
 
     // add dynamic lights
-    for (lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
-        dl = &cl_dlights[lnum];
-        if (!dl->radius)
-            continue;
-        if (!dl->radius)
-            continue;
-        if (dl->die < cl.time)
+    for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
+        dLight_p dl = &cl_dlights[lnum];
+        if ((!dl->radius) ||
+            (!dl->radius) ||
+            (dl->die < cl.time))
             continue;
 
+        vec3_t dist;
         VectorSubtract(currententity->origin, dl->origin, dist);
-        add = dl->radius - Length(dist);
+        float add = dl->radius - Length(dist);
         if (add > 0)
             r_viewlighting.ambientlight += add;
     }
@@ -613,6 +585,7 @@ void R_DrawViewModel() {
     if (r_viewlighting.ambientlight + r_viewlighting.shadelight > 192)
         r_viewlighting.shadelight = 192 - r_viewlighting.ambientlight;
 
+    vec3_t lightvec = { -1, 0, 0 };
     r_viewlighting.plightvec = lightvec;
 
 #ifdef QUAKE2
@@ -628,17 +601,14 @@ void R_DrawViewModel() {
 R_BmodelCheckBBox
 =============
 */
-int R_BmodelCheckBBox(Model_t* clmodel, float_p minmaxs) {
-    int			i, * pindex, clipflags;
-    vec3_t		acceptpt, rejectpt;
-    double		d;
+int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
+    int clipflags = 0;
 
-    clipflags = 0;
-
-    if (currententity->angles[0] || currententity->angles[1]
-        || currententity->angles[2]) {
-        for (i = 0; i < 4; i++) {
-            d = DotProduct(currententity->origin, view_clipplanes[i].normal);
+    if (currententity->angles[0] ||
+        currententity->angles[1] ||
+        currententity->angles[2]) {
+        for (int i = 0; i < 4; i++) {
+            double d = DotProduct(currententity->origin, view_clipplanes[i].normal);
             d -= view_clipplanes[i].dist;
 
             if (d <= -clmodel->radius)
@@ -649,32 +619,37 @@ int R_BmodelCheckBBox(Model_t* clmodel, float_p minmaxs) {
         }
     }
     else {
-        for (i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             // generate accept and reject points
             // FIXME: do with fast look-ups or integer tests based on the sign bit
             // of the floating point values
 
-            pindex = pfrustum_indexes[i];
+            int* pindex = pfrustum_indexes[i];
+            {
+                vec3_t rejectpt = {
+                    minmaxs[pindex[0]],
+                    minmaxs[pindex[1]],
+                    minmaxs[pindex[2]]
+                };
+                double d = DotProduct(rejectpt, view_clipplanes[i].normal);
+                d -= view_clipplanes[i].dist;
 
-            rejectpt[0] = minmaxs[pindex[0]];
-            rejectpt[1] = minmaxs[pindex[1]];
-            rejectpt[2] = minmaxs[pindex[2]];
+                if (d <= 0)
+                    return BMODEL_FULLY_CLIPPED;
+            }
+            {
+                vec3_t acceptpt = {
+                    minmaxs[pindex[3 + 0]],
+                    minmaxs[pindex[3 + 1]],
+                    minmaxs[pindex[3 + 2]]
+                };
 
-            d = DotProduct(rejectpt, view_clipplanes[i].normal);
-            d -= view_clipplanes[i].dist;
+                double d = DotProduct(acceptpt, view_clipplanes[i].normal);
+                d -= view_clipplanes[i].dist;
 
-            if (d <= 0)
-                return BMODEL_FULLY_CLIPPED;
-
-            acceptpt[0] = minmaxs[pindex[3 + 0]];
-            acceptpt[1] = minmaxs[pindex[3 + 1]];
-            acceptpt[2] = minmaxs[pindex[3 + 2]];
-
-            d = DotProduct(acceptpt, view_clipplanes[i].normal);
-            d -= view_clipplanes[i].dist;
-
-            if (d <= 0)
-                clipflags |= (1 << i);
+                if (d <= 0)
+                    clipflags |= (1 << i);
+            }
         }
     }
 
@@ -688,10 +663,10 @@ R_DrawBEntitiesOnList
 =============
 */
 void R_DrawBEntitiesOnList() {
-    int			i, j, k, clipflags;
-    vec3_t		oldorigin;
+    int   i, j, k, clipflags;
+    vec3_t  oldorigin;
     Model_t* clmodel;
-    float		minmaxs[6];
+    float  minmaxs[6];
 
     if (!r_drawentities.value)
         return;
@@ -839,7 +814,7 @@ void R_EdgeDrawing() {
 #else
     if (r_surfsonstack) {
         /* выравниваем от (lsurfs + 1), чтобы потом surfaces = base - 1 было легально */
-        Surf_t* base = (Surf_t*)ALIGN_PTR(&lsurfs[1], CACHE_SIZE);
+        Surf_p base = (Surf_p)ALIGN_PTR(&lsurfs[1], CACHE_SIZE);
         surfaces = base - 1; /* surfaces[1] указывает ровно на base */
         surf_max = &surfaces[r_cnumsurfs];
         /* surface 0 — фиктивный элемент */
@@ -876,7 +851,7 @@ void R_EdgeDrawing() {
 
     if (!r_dspeeds.value) {
         VID_UnlockBuffer();
-        S_ExtraUpdate();	// don't let sound get messed up if going slow
+        S_ExtraUpdate(); // don't let sound get messed up if going slow
         VID_LockBuffer();
     }
 
@@ -893,11 +868,13 @@ r_refdef must be set before the first call
 ================
 */
 void R_RenderView_() {
-    uint8_t	warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+    uint8_t warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 
     r_warpbuffer = warpbuffer;
 
-    if (r_timegraph.value || r_speeds.value || r_dspeeds.value)
+    if (r_timegraph.value ||
+        r_speeds.value ||
+        r_dspeeds.value)
         r_time1 = Sys_FloatTime();
 
     R_SetupFrame();
@@ -905,7 +882,7 @@ void R_RenderView_() {
 #ifdef PASSAGES
     SetVisibilityByPassages();
 #else
-    R_MarkLeaves();	// done here so we know if we're in water
+    R_MarkLeaves(); // done here so we know if we're in water
 #endif
 
     // make FDIV fast. This reduces timing precision after we've been running for a
@@ -919,7 +896,7 @@ void R_RenderView_() {
 
     if (!r_dspeeds.value) {
         VID_UnlockBuffer();
-        S_ExtraUpdate();	// don't let sound get messed up if going slow
+        S_ExtraUpdate(); // don't let sound get messed up if going slow
         VID_LockBuffer();
     }
 
@@ -927,7 +904,7 @@ void R_RenderView_() {
 
     if (!r_dspeeds.value) {
         VID_UnlockBuffer();
-        S_ExtraUpdate();	// don't let sound get messed up if going slow
+        S_ExtraUpdate(); // don't let sound get messed up if going slow
         VID_LockBuffer();
     }
 
@@ -983,10 +960,8 @@ void R_RenderView_() {
 }
 
 void R_RenderView() {
-    int		dummy;
-    int		delta;
-
-    delta = (uint8_p)&dummy - r_stack_start;
+    int dummy;
+    int delta = (uint8_p)&dummy - r_stack_start;
     if (delta < -10000 || delta > 10000)
         Sys_Error("R_RenderView: called without enough stack");
 
@@ -1008,11 +983,9 @@ R_InitTurb
 ================
 */
 void R_InitTurb() {
-    int		i;
-
-    for (i = 0; i < (SIN_BUFFER_SIZE); i++) {
+    for (int i = 0; i < (SIN_BUFFER_SIZE); i++) {
         sintable[i] = AMP + sin(i * 3.14159 * 2 / CYCLE) * AMP;
-        intsintable[i] = AMP2 + sin(i * 3.14159 * 2 / CYCLE) * AMP2;	// AMP2, not 20
+        intsintable[i] = AMP2 + sin(i * 3.14159 * 2 / CYCLE) * AMP2; // AMP2, not 20
     }
 }
 

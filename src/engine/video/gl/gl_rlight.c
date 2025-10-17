@@ -68,7 +68,7 @@ void AddLightBlend(float r, float g, float b, float a2) {
 	v_blend[2] = v_blend[2]*(1-a2) + b*a2;
 }
 
-void R_RenderDlight(dlight_t* light) {
+void R_RenderDlight(dLight_t* light) {
 	int		i, j;
 	float	a;
 	vec3_t	v;
@@ -105,7 +105,7 @@ R_RenderDlights
 */
 void R_RenderDlights(void) {
 	int		i;
-	dlight_t* l;
+	dLight_t* l;
 
 	if (!gl_flashblend.value)
 		return;
@@ -146,7 +146,7 @@ DYNAMIC LIGHTS
 R_MarkLights
 =============
 */
-void R_MarkLights(dlight_t* light, int bit, mNode_p node) {
+void R_MarkLights(dLight_t* light, int bit, mNode_p node) {
 	mPlane_p splitplane;
 	float		dist;
 	mSurface_p surf;
@@ -189,7 +189,7 @@ R_PushDlights
 */
 void R_PushDlights(void) {
 	int		i;
-	dlight_t* l;
+	dLight_t* l;
 
 	if (gl_flashblend.value)
 		return;

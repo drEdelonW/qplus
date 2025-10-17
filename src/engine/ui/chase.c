@@ -67,10 +67,8 @@ void TraceLine(vec3_t start, vec3_t end, vec3_t impact) {
 }
 
 void Chase_Update() {
-    vec3_t  forward, up, right;
-    vec3_t  dest, stop;
-
     // if can't see player, reset
+    vec3_t  forward, up, right;
     AngleVectors(cl.viewangles, forward, right, up);
 
     // calc exact destination
@@ -83,6 +81,7 @@ void Chase_Update() {
     chase_dest[2] = r_refdef.vieworg[2] + chase_up.value;
 
     // find the spot the player is looking at
+    vec3_t  dest, stop;
     VectorMA(r_refdef.vieworg, 4096, forward, dest);
     TraceLine(r_refdef.vieworg, dest, stop);
 

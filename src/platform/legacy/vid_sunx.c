@@ -1163,7 +1163,7 @@ void IN_Commands() {
 	mouse_oldbuttonstate = mouse_buttonstate;
 }
 
-void IN_Move(usercmd_t* cmd) {
+void IN_Move(UserCmd_p cmd) {
 	if (!mouse_avail)
 		return;
 

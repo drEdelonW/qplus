@@ -168,10 +168,10 @@ typedef Edge_t* Edge_p;
 struct Edge_s {
     fixed16_t   u;
     fixed16_t   u_step;
-    Edge_p    prev;
-    Edge_p    next;
+    Edge_p      prev;
+    Edge_p      next;
     uint16_t	surfs[2];
-    Edge_p    nextremove;
+    Edge_p      nextremove;
     float       nearzi;
     mEdge_p     owner;
 };

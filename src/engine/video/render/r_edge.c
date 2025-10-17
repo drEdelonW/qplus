@@ -37,7 +37,7 @@ have a sentinal at both ends ?
 Edge_p auxedges;
 Edge_p r_edges, edge_p, edge_max;
 
-Surf_p	surfaces, surface_p, surf_max;
+Surf_p surfaces, surface_p, surf_max;
 
 // surfaces are generated in back to front order by the bsp, so if a surf
 // pointer is greater than another one, it should be drawn in front
@@ -49,28 +49,24 @@ Edge_p removeedges[MAXHEIGHT];
 eSpan_p span_p;
 eSpan_p max_span_p;
 
-int		r_currentkey;
+int  r_currentkey;
+extern int screenwidth;
+int current_iv;
+int edge_head_u_shift20, edge_tail_u_shift20;
 
-extern	int	screenwidth;
+static void (*_pDrawFunc)();
 
-int	current_iv;
-
-int	edge_head_u_shift20, edge_tail_u_shift20;
-
-static void (*pdrawfunc)();
-
-Edge_t	edge_head;
-Edge_t	edge_tail;
-Edge_t	edge_aftertail;
-Edge_t	edge_sentinel;
-
-float	fv;
+Edge_t edge_head;
+Edge_t edge_tail;
+Edge_t edge_aftertail;
+Edge_t edge_sentinel;
+float fv;
 
 void R_GenerateSpans();
 void R_GenerateSpansBackward();
 
-void R_LeadingEdge(Edge_p  edge);
-void R_LeadingEdgeBackwards(Edge_p  edge);
+void R_LeadingEdge(Edge_p edge);
+void R_LeadingEdgeBackwards(Edge_p edge);
 void R_TrailingEdge(Surf_p surf, Edge_p  edge);
 
 
@@ -86,23 +82,23 @@ void R_DrawCulledPolys() {
     currententity = &cl_entities[0];
 
     if (r_worldpolysbacktofront) {
-        for (Surf_p s = surface_p - 1; s > &surfaces[1]; s--) {
-            if (!s->spans)
+        for (Surf_p surf = surface_p - 1; surf > &surfaces[1]; surf--) {
+            if (!surf->spans)
                 continue;
 
-            if (!(s->flags & SURF_DRAWBACKGROUND)) {
-                mSurface_p pface = (mSurface_p)s->data;
+            if (!(surf->flags & SURF_DRAWBACKGROUND)) {
+                mSurface_p pface = (mSurface_p)surf->data;
                 R_RenderPoly(pface, 15);
             }
         }
     }
     else {
-        for (Surf_p s = &surfaces[1]; s < surface_p; s++) {
-            if (!s->spans)
+        for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++) {
+            if (!surf->spans)
                 continue;
 
-            if (!(s->flags & SURF_DRAWBACKGROUND)) {
-                mSurface_p pface = (mSurface_p)s->data;
+            if (!(surf->flags & SURF_DRAWBACKGROUND)) {
+                mSurface_p pface = (mSurface_p)surf->data;
                 R_RenderPoly(pface, 15);
             }
         }
@@ -119,19 +115,19 @@ void R_BeginEdgeFrame() {
     edge_p = r_edges;
     edge_max = &r_edges[r_numallocatededges];
 
-    surface_p = &surfaces[2];	// background is surface 1,
+    surface_p = &surfaces[2]; // background is surface 1,
     //  surface 0 is a dummy
-    surfaces[1].spans = NULL;	// no background spans yet
+    surfaces[1].spans = NULL; // no background spans yet
     surfaces[1].flags = SURF_DRAWBACKGROUND;
 
     // put the background behind everything in the world
     if (r_draworder.value) {
-        pdrawfunc = R_GenerateSpansBackward;
+        _pDrawFunc = R_GenerateSpansBackward;
         surfaces[1].key = 0;
         r_currentkey = 1;
     }
     else {
-        pdrawfunc = R_GenerateSpans;
+        _pDrawFunc = R_GenerateSpans;
         surfaces[1].key = 0x7FFFFFFF;
         r_currentkey = 0;
     }
@@ -143,7 +139,7 @@ void R_BeginEdgeFrame() {
 }
 
 
-#if	!id386
+#if !id386
 
 /*
 ==============
@@ -157,7 +153,6 @@ edge_head.next).
 */
 void R_InsertNewEdges(Edge_p  edgestoadd, Edge_p  edgelist) {
     Edge_p next_edge;
-
     do {
         next_edge = edgestoadd->next;
     edgesearch:
@@ -184,10 +179,10 @@ void R_InsertNewEdges(Edge_p  edgestoadd, Edge_p  edgelist) {
     } while ((edgestoadd = next_edge) != NULL);
 }
 
-#endif	// !id386
+#endif // !id386
 
 
-#if	!id386
+#if !id386
 
 /*
 ==============
@@ -202,74 +197,68 @@ void R_RemoveEdges(Edge_p  pedge) {
     } while ((pedge = pedge->nextremove) != NULL);
 }
 
-#endif	// !id386
+#endif // !id386
 
 
-#if	!id386
+#if !id386
 
 /*
 ==============
 R_StepActiveU
 ==============
 */
-void R_StepActiveU(Edge_p  pedge) {
-    Edge_p  pnext_edge, pwedge;
-
+void R_StepActiveU(Edge_p pEdge) {
     while (1) {
     nextedge:
-        pedge->u += pedge->u_step;
-        if (pedge->u < pedge->prev->u)
-            goto pushback;
-        pedge = pedge->next;
+        pEdge->u += pEdge->u_step;
+        if (pEdge->u < pEdge->prev->u)  goto pushback;
+        pEdge = pEdge->next;
 
-        pedge->u += pedge->u_step;
-        if (pedge->u < pedge->prev->u)
-            goto pushback;
-        pedge = pedge->next;
+        pEdge->u += pEdge->u_step;
+        if (pEdge->u < pEdge->prev->u)  goto pushback;
+        pEdge = pEdge->next;
 
-        pedge->u += pedge->u_step;
-        if (pedge->u < pedge->prev->u)
-            goto pushback;
-        pedge = pedge->next;
+        pEdge->u += pEdge->u_step;
+        if (pEdge->u < pEdge->prev->u)  goto pushback;
+        pEdge = pEdge->next;
 
-        pedge->u += pedge->u_step;
-        if (pedge->u < pedge->prev->u)
-            goto pushback;
-        pedge = pedge->next;
+        pEdge->u += pEdge->u_step;
+        if (pEdge->u < pEdge->prev->u)  goto pushback;
+        pEdge = pEdge->next;
 
         goto nextedge;
 
     pushback:
-        if (pedge == &edge_aftertail)
+        if (pEdge == &edge_aftertail)
             return;
 
         // push it back to keep it sorted
-        pnext_edge = pedge->next;
+        Edge_p pnext_edge = pEdge->next;
 
         // pull the edge out of the edge list
-        pedge->next->prev = pedge->prev;
-        pedge->prev->next = pedge->next;
+        pEdge->next->prev = pEdge->prev;
+        pEdge->prev->next = pEdge->next;
 
         // find out where the edge goes in the edge list
-        pwedge = pedge->prev->prev;
+        Edge_p pwedge = pEdge->prev->prev;
 
-        while (pwedge->u > pedge->u) {
+        while (pwedge->u > pEdge->u) {
             pwedge = pwedge->prev;
         }
 
         // put the edge back into the edge list
-        pedge->next = pwedge->next;
-        pedge->prev = pwedge;
-        pedge->next->prev = pedge;
-        pwedge->next = pedge;
+        pEdge->next = pwedge->next;
+        pEdge->prev = pwedge;
+        pEdge->next->prev = pEdge;
+        pwedge->next = pEdge;
 
-        pedge = pnext_edge;
-        if (pedge == &edge_tail)
+        pEdge = pnext_edge;
+        if (pEdge == &edge_tail)
             return;
     }
 }
 
-#endif	// !id386
+#endif // !id386
 
 
 /*
@@ -304,19 +293,15 @@ void R_CleanupSpan() {
 R_LeadingEdgeBackwards
 ==============
 */
-void R_LeadingEdgeBackwards(Edge_p  edge) {
-    eSpan_p  span;
-    Surf_p			surf, surf2;
-    int				iu;
-
+void R_LeadingEdgeBackwards(Edge_p edge) {
     // it's adding a new surface in, so find the correct place
-    surf = &surfaces[edge->surfs[1]];
+    Surf_p surf = &surfaces[edge->surfs[1]];
 
     // don't start a span if this is an inverted span, with the end
     // edge preceding the start edge (that is, we've already seen the
     // end edge)
     if (++surf->spanstate == 1) {
-        surf2 = surfaces[1].next;
+        Surf_p surf2 = surfaces[1].next;
 
         if (surf->key > surf2->key)
             goto newtop;
@@ -349,10 +334,10 @@ void R_LeadingEdgeBackwards(Edge_p  edge) {
 
     newtop:
         // emit a span (obscures current top)
-        iu = edge->u >> 20;
+        int iu = edge->u >> 20;
 
         if (iu > surf2->last_u) {
-            span = span_p++;
+            eSpan_p span = span_p++;
             span->u = surf2->last_u;
             span->count = iu - span->u;
             span->v = current_iv;
@@ -408,7 +393,7 @@ void R_TrailingEdge(Surf_p surf, Edge_p  edge) {
 }
 
 
-#if	!id386
+#if !id386
 
 /*
 ==============
@@ -416,14 +401,9 @@ R_LeadingEdge
 ==============
 */
 void R_LeadingEdge(Edge_p  edge) {
-    eSpan_p span;
-    Surf_p  surf, surf2;
-    int				iu;
-    double			fu, newzi, testzi, newzitop, newzibottom;
-
     if (edge->surfs[1]) {
         // it's adding a new surface in, so find the correct place
-        surf = &surfaces[edge->surfs[1]];
+        Surf_p surf = &surfaces[edge->surfs[1]];
 
         // don't start a span if this is an inverted span, with the end
         // edge preceding the start edge (that is, we've already seen the
@@ -432,33 +412,34 @@ void R_LeadingEdge(Edge_p  edge) {
             if (surf->insubmodel)
                 r_bmodelactive++;
 
-            surf2 = surfaces[1].next;
+            Surf_p surf2 = surfaces[1].next;
 
-            if (surf->key < surf2->key)
-                goto newtop;
+            if (surf->key < surf2->key)         goto newtop;
 
             // if it's two surfaces on the same plane, the one that's already
             // active is in front, so keep going unless it's a bmodel
-            if (surf->insubmodel && (surf->key == surf2->key)) {
+            if (surf->insubmodel &&
+                (surf->key == surf2->key)
+                ) {
                 // must be two bmodels in the same leaf; sort on 1/z
-                fu = (float)(edge->u - 0xFFFFF) * (1.0 / 0x100000);
-                newzi = surf->d_ziorigin + fv * surf->d_zistepv +
+                double fu = (float)(edge->u - 0xFFFFF) * (1.0 / 0x100000);
+                double newzi =
+                    surf->d_ziorigin +
+                    fv * surf->d_zistepv +
                     fu * surf->d_zistepu;
-                newzibottom = newzi * 0.99;
+                double newzibottom = newzi * 0.99;
 
-                testzi = surf2->d_ziorigin + fv * surf2->d_zistepv +
+                double testzi =
+                    surf2->d_ziorigin +
+                    fv * surf2->d_zistepv +
                     fu * surf2->d_zistepu;
 
-                if (newzibottom >= testzi) {
-                    goto newtop;
-                }
+                if (newzibottom >= testzi)      goto newtop;
 
-                newzitop = newzi * 1.01;
-                if (newzitop >= testzi) {
-                    if (surf->d_zistepu >= surf2->d_zistepu) {
-                        goto newtop;
-                    }
-                }
+                double newzitop = newzi * 1.01;
+                if ((newzitop >= testzi) &&
+                    (surf->d_zistepu >= surf2->d_zistepu))    goto newtop;
+
             }
 
         continue_search:
@@ -470,28 +451,26 @@ void R_LeadingEdge(Edge_p  edge) {
             if (surf->key == surf2->key) {
                 // if it's two surfaces on the same plane, the one that's already
                 // active is in front, so keep going unless it's a bmodel
-                if (!surf->insubmodel)
-                    goto continue_search;
+                if (!surf->insubmodel)          goto continue_search;
 
                 // must be two bmodels in the same leaf; sort on 1/z
-                fu = (float)(edge->u - 0xFFFFF) * (1.0 / 0x100000);
-                newzi = surf->d_ziorigin + fv * surf->d_zistepv +
+                double fu = (float)(edge->u - 0xFFFFF) * (1.0 / 0x100000);
+                double newzi =
+                    surf->d_ziorigin +
+                    fv * surf->d_zistepv +
                     fu * surf->d_zistepu;
-                newzibottom = newzi * 0.99;
+                double newzibottom = newzi * 0.99;
 
-                testzi = surf2->d_ziorigin + fv * surf2->d_zistepv +
+                double testzi =
+                    surf2->d_ziorigin +
+                    fv * surf2->d_zistepv +
                     fu * surf2->d_zistepu;
 
-                if (newzibottom >= testzi) {
-                    goto gotposition;
-                }
+                if (newzibottom >= testzi)                  goto gotposition;
 
-                newzitop = newzi * 1.01;
-                if (newzitop >= testzi) {
-                    if (surf->d_zistepu >= surf2->d_zistepu) {
-                        goto gotposition;
-                    }
-                }
+                double newzitop = newzi * 1.01;
+                if ((newzitop >= testzi) &&
+                    (surf->d_zistepu >= surf2->d_zistepu))   goto gotposition;
 
                 goto continue_search;
             }
@@ -500,10 +479,10 @@ void R_LeadingEdge(Edge_p  edge) {
 
         newtop:
             // emit a span (obscures current top)
-            iu = edge->u >> 20;
+            int iu = edge->u >> 20;
 
             if (iu > surf2->last_u) {
-                span = span_p++;
+                eSpan_p span = span_p++;
                 span->u = surf2->last_u;
                 span->count = iu - span->u;
                 span->v = current_iv;
@@ -531,9 +510,6 @@ R_GenerateSpans
 ==============
 */
 void R_GenerateSpans() {
-    Edge_p edge;
-    Surf_p  surf;
-
     r_bmodelactive = 0;
 
     // clear active surfaces to just the background surface
@@ -541,10 +517,10 @@ void R_GenerateSpans() {
     surfaces[1].last_u = edge_head_u_shift20;
 
     // generate spans
-    for (edge = edge_head.next; edge != &edge_tail; edge = edge->next) {
+    for (Edge_p edge = edge_head.next; edge != &edge_tail; edge = edge->next) {
         if (edge->surfs[0]) {
             // it has a left surface, so a surface is going away for this span
-            surf = &surfaces[edge->surfs[0]];
+            Surf_p surf = &surfaces[edge->surfs[0]];
 
             R_TrailingEdge(surf, edge);
 
@@ -558,7 +534,7 @@ void R_GenerateSpans() {
     R_CleanupSpan();
 }
 
-#endif	// !id386
+#endif // !id386
 
 
 /*
@@ -567,8 +543,6 @@ R_GenerateSpansBackward
 ==============
 */
 void R_GenerateSpansBackward() {
-    Edge_p edge;
-
     r_bmodelactive = 0;
 
     // clear active surfaces to just the background surface
@@ -576,7 +550,7 @@ void R_GenerateSpansBackward() {
     surfaces[1].last_u = edge_head_u_shift20;
 
     // generate spans
-    for (edge = edge_head.next; edge != &edge_tail; edge = edge->next) {
+    for (Edge_p edge = edge_head.next; edge != &edge_tail; edge = edge->next) {
         if (edge->surfs[0])
             R_TrailingEdge(&surfaces[edge->surfs[0]], edge);
 
@@ -601,13 +575,8 @@ Each surface has a linked list of its visible spans
 ==============
 */
 void R_ScanEdges() {
-    int		iv, bottom;
-    uint8_t	basespans[MAXSPANS * sizeof(eSpan_t) + CACHE_SIZE];
-    eSpan_p basespan_p;
-    Surf_p  s;
-
-    basespan_p = (eSpan_p)
-        ((uintptr_t)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+    uint8_t basespans[MAXSPANS * sizeof(eSpan_t) + CACHE_SIZE];
+    eSpan_p basespan_p = (eSpan_p)((uintptr_t)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
     max_span_p = &basespan_p[MAXSPANS - r_refdef.vrect.width];
 
     span_p = basespan_p;
@@ -630,14 +599,14 @@ void R_ScanEdges() {
     edge_tail.surfs[0] = 1;
     edge_tail.surfs[1] = 0;
 
-    edge_aftertail.u = -1;		// force a move
+    edge_aftertail.u = -1;  // force a move
     edge_aftertail.u_step = 0;
     edge_aftertail.next = &edge_sentinel;
     edge_aftertail.prev = &edge_tail;
 
     // FIXME: do we need this now that we clamp x in r_draw.c?
 #if 0
-    edge_sentinel.u = 2000 << 24;		// make sure nothing sorts past this
+    edge_sentinel.u = 2000 << 24;  // make sure nothing sorts past this
 #else
     edge_sentinel.u = 0x7fffffff;           // sentinel: max 31-bit positive
 #endif
@@ -646,47 +615,38 @@ void R_ScanEdges() {
     //
     // process all scan lines
     //
-    bottom = r_refdef.vrectbottom - 1;
-
-    for (iv = r_refdef.vrect.y; iv < bottom; iv++) {
+    int bottom = r_refdef.vrectbottom - 1;
+    int iv = r_refdef.vrect.y;
+    for (; iv < bottom; iv++) {
         current_iv = iv;
         fv = (float)iv;
 
         // mark that the head (background start) span is pre-included
         surfaces[1].spanstate = 1;
 
-        if (newedges[iv]) {
-            R_InsertNewEdges(newedges[iv], edge_head.next);
-        }
-
-        (*pdrawfunc) ();
+        if (newedges[iv])   R_InsertNewEdges(newedges[iv], edge_head.next);
+        (*_pDrawFunc) ();
 
         // flush the span list if we can't be sure we have enough spans left for
         // the next scan
         if (span_p >= max_span_p) {
             VID_UnlockBuffer();
-            S_ExtraUpdate();	// don't let sound get messed up if going slow
+            S_ExtraUpdate(); // don't let sound get messed up if going slow
             VID_LockBuffer();
 
-            if (r_drawculledpolys) {
-                R_DrawCulledPolys();
-            }
-            else {
-                D_DrawSurfaces();
-            }
+            if (r_drawculledpolys)  R_DrawCulledPolys();
+            else                    D_DrawSurfaces();
+
 
             // clear the surface span pointers
-            for (s = &surfaces[1]; s < surface_p; s++)
-                s->spans = NULL;
+            for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++)
+                surf->spans = NULL;
 
             span_p = basespan_p;
         }
 
-        if (removeedges[iv])
-            R_RemoveEdges(removeedges[iv]);
-
-        if (edge_head.next != &edge_tail)
-            R_StepActiveU(edge_head.next);
+        if (removeedges[iv])    R_RemoveEdges(removeedges[iv]);
+        if (edge_head.next != &edge_tail)   R_StepActiveU(edge_head.next);
     }
 
     // do the last scan (no need to step or sort or remove on the last scan)
@@ -697,16 +657,12 @@ void R_ScanEdges() {
     // mark that the head (background start) span is pre-included
     surfaces[1].spanstate = 1;
 
-    if (newedges[iv])
-        R_InsertNewEdges(newedges[iv], edge_head.next);
-
-    (*pdrawfunc) ();
+    if (newedges[iv])   R_InsertNewEdges(newedges[iv], edge_head.next);
+    (*_pDrawFunc) ();
 
     // draw whatever's left in the span list
-    if (r_drawculledpolys)
-        R_DrawCulledPolys();
-    else
-        D_DrawSurfaces();
+    if (r_drawculledpolys)  R_DrawCulledPolys();
+    else                    D_DrawSurfaces();
 }
 
 

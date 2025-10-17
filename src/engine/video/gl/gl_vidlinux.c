@@ -777,7 +777,7 @@ void IN_Commands(void) {
 IN_Move
 ===========
 */
-void IN_MouseMove(usercmd_t* cmd) {
+void IN_MouseMove(UserCmd_p cmd) {
 	if (!UseMouse)
 		return;
 
@@ -824,7 +824,7 @@ void IN_MouseMove(usercmd_t* cmd) {
 	}
 }
 
-void IN_Move(usercmd_t* cmd) {
+void IN_Move(UserCmd_p cmd) {
 	IN_MouseMove(cmd);
 }
 

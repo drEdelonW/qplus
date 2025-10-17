@@ -247,14 +247,14 @@ typedef enum {
 #define	clc_bad			0
 #define	clc_nop 		1
 #define	clc_disconnect	2
-#define	clc_move		3			// [usercmd_t]
+#define	clc_move		3			// [UserCmd_t]
 #define	clc_stringcmd	4		// [string] message
 #else
 typedef enum {
     clc_bad         = 0,
     clc_nop         = 1,
     clc_disconnect  = 2,
-    clc_move        = 3, // [usercmd_t]
+    clc_move        = 3, // [UserCmd_t]
     clc_stringcmd   = 4  // [string] message
 } clc_t;
 #endif

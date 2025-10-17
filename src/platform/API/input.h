@@ -28,7 +28,7 @@ void IN_Shutdown();
 void IN_Commands();
 
 // add additional movement on top of the keyboard move cmd
-void IN_Move(usercmd_t* cmd);
+void IN_Move(UserCmd_p cmd);
 
 // restores all button and position states to defaults
 void IN_ClearStates();

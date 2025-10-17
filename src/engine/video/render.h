@@ -38,7 +38,8 @@ typedef r_Entity_t* r_Entity_p;
 typedef struct efrag_s efrag_t;
 typedef efrag_t* efrag_p;
 struct efrag_s {
-    struct mLeaf_s* leaf;
+    // mLeaf_p leaf;
+    struct mLeaf_s* leaf;  // TODO: fix include collision issue
     efrag_p     leafnext;
     r_Entity_p  entity;
     efrag_p     entnext;

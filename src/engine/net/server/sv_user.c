@@ -38,7 +38,7 @@ float_p velocity;
 
 bool	onground;
 
-usercmd_t	cmd;
+UserCmd_t	cmd;
 
 
 /*
@@ -408,7 +408,7 @@ void SV_ClientThink() {
 SV_ReadClientMove
 ===================
 */
-void SV_ReadClientMove(usercmd_t* move) {
+void SV_ReadClientMove(UserCmd_p move) {
     int		bits;
 
     // read ping time

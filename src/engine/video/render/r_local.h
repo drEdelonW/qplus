@@ -274,7 +274,7 @@ extern float    se_time1, se_time2, de_time1, de_time2, dv_time1, dv_time2;
 extern int      r_frustum_indexes[4 * 6];
 extern int      r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
 extern qboolean r_surfsonstack;
-extern cshift_t cshift_water;
+extern ColorShift_t cshift_water;
 extern qboolean r_dowarpold, r_viewchanged;
 
 extern mLeaf_p  r_viewleaf, r_oldviewleaf;
@@ -298,6 +298,6 @@ void R_cshift_f();
 void R_EmitEdge(mVertex_p pv0, mVertex_p pv1);
 void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip);
 void R_SplitEntityOnNode2(mNode_p node);
-void R_MarkLights(dlight_p light, int bit, mNode_p node);
+void R_MarkLights(dLight_p light, int bit, mNode_p node);
 
 #endif

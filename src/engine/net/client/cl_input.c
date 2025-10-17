@@ -279,7 +279,7 @@ CL_BaseMove
 Send the intended movement message to the server
 ================
 */
-void CL_BaseMove(usercmd_p cmd) {
+void CL_BaseMove(UserCmd_p cmd) {
     if (cls.signon != SIGNONS)
         return;
 
@@ -324,7 +324,7 @@ void CL_BaseMove(usercmd_p cmd) {
 CL_SendMove
 ==============
 */
-void CL_SendMove(usercmd_p cmd) {
+void CL_SendMove(UserCmd_p cmd) {
     sizebuf_t buf;
     uint8_t data[128];
 

@@ -96,58 +96,33 @@ void M_AdjustSliders(int dir) {
 }
 
 void M_Options_Draw() {
-    float r;
+    const int col0 = 16;
+    const int col1 = 220;
 
-    M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+    M_DrawTransPic(col0, 4, Draw_CachePic("gfx/qplaque.lmp"));
     qPic_p p = Draw_CachePic("gfx/p_option.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 
-    M_Print(16, 32, "    Customize controls");
-    M_Print(16, 40, "         Go to console");
-    M_Print(16, 48, "     Reset to defaults");
-
-    M_Print(16, 56, "           Screen size");
-    r = (scr_viewsize.value - 30) / (120 - 30);
-    M_DrawSlider(220, 56, r);
-
-    M_Print(16, 64, "            Brightness");
-    r = (1.0 - v_gamma.value) / 0.5;
-    M_DrawSlider(220, 64, r);
-
-    M_Print(16, 72, "           Mouse Speed");
-    r = (sensitivity.value - 1) / 10;
-    M_DrawSlider(220, 72, r);
-
-    M_Print(16, 80, "       CD Music Volume");
-    r = bgmvolume.value;
-    M_DrawSlider(220, 80, r);
-
-    M_Print(16, 88, "          Sound Volume");
-    r = volume.value;
-    M_DrawSlider(220, 88, r);
-
-    M_Print(16, 96, "            Always Run");
-    M_DrawCheckbox(220, 96, cl_forwardspeed.value > 200);
-
-    M_Print(16, 104, "          Invert Mouse");
-    M_DrawCheckbox(220, 104, m_pitch.value < 0);
-
-    M_Print(16, 112, "            Lookspring");
-    M_DrawCheckbox(220, 112, lookspring.value);
-
-    M_Print(16, 120, "            Lookstrafe");
-    M_DrawCheckbox(220, 120, lookstrafe.value);
-
+    M_Print(col0, 32, "    Customize controls");
+    M_Print(col0, 40, "         Go to console");
+    M_Print(col0, 48, "     Reset to defaults");
+    M_Print(col0, 56, "           Screen size");    M_DrawSlider(col1, 56, (scr_viewsize.value - 30) / (120 - 30));
+    M_Print(col0, 64, "            Brightness");    M_DrawSlider(col1, 64, (1.0 - v_gamma.value) / 0.5);
+    M_Print(col0, 72, "           Mouse Speed");    M_DrawSlider(col1, 72, (sensitivity.value - 1) / 10);
+    M_Print(col0, 80, "       CD Music Volume");    M_DrawSlider(col1, 80, bgmvolume.value);
+    M_Print(col0, 88, "          Sound Volume");    M_DrawSlider(col1, 88, volume.value);
+    M_Print(col0, 96, "            Always Run");    M_DrawCheckbox(col1, 96, cl_forwardspeed.value > 200);
+    M_Print(col0, 104, "          Invert Mouse");   M_DrawCheckbox(col1, 104, m_pitch.value < 0);
+    M_Print(col0, 112, "            Lookspring");   M_DrawCheckbox(col1, 112, lookspring.value);
+    M_Print(col0, 120, "            Lookstrafe");   M_DrawCheckbox(col1, 120, lookstrafe.value);
     if (vid_menudrawfn)
-        M_Print(16, 128, "         Video Options");
+        M_Print(col0, 128, "         Video Options");
 
 #ifdef _WIN32
     if (modestate == MS_WINDOWED) {
-        M_Print(16, 136, "             Use Mouse");
-        M_DrawCheckbox(220, 136, _windowed_mouse.value);
+        M_Print(col0, 136, "             Use Mouse");   M_DrawCheckbox(col1, 136, _windowed_mouse.value);
     }
 #endif
-
     // cursor
     M_DrawCharacter(200, 32 + _options_cursor * 8, 12 + ((int)(realtime * 4) & 1));
 }

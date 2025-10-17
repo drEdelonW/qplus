@@ -40,14 +40,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 
-/* extern */ client_static_t cls;
-/* extern */ client_state_t cl;
+/* extern */ ClientStatic_t cls;
+/* extern */ ClientState_t cl;
 // FIXME: put these on hunk?
 efrag_t         cl_efrags[MAX_EFRAGS];
 /* extern */ r_Entity_t      cl_entities[MAX_EDICTS];
 /* extern */ r_Entity_t      cl_static_entities[MAX_STATIC_ENTITIES];
-/* extern */ lightstyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
-/* extern */ dlight_t        cl_dlights[MAX_DLIGHTS];
+/* extern */ LightStyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
+/* extern */ dLight_t        cl_dlights[MAX_DLIGHTS];
 
 /* extern */ int32_t    cl_numvisedicts;
 /* extern */ r_Entity_p cl_visedicts[MAX_VISEDICTS];
@@ -302,10 +302,10 @@ CL_AllocDlight
 
 ===============
 */
-dlight_p CL_AllocDlight(int32_t key) {
+dLight_p CL_AllocDlight(int32_t key) {
     // first look for an exact key match
     if (key) {
-        dlight_p dl = cl_dlights;
+        dLight_p dl = cl_dlights;
         for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
             if (dl->key == key) {
                 memset(dl, 0, sizeof(*dl));
@@ -317,7 +317,7 @@ dlight_p CL_AllocDlight(int32_t key) {
 
     // then look for anything else
     {
-        dlight_p dl = cl_dlights;
+        dLight_p dl = cl_dlights;
         for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
             if (dl->die < cl.time) {
                 memset(dl, 0, sizeof(*dl));
@@ -327,7 +327,7 @@ dlight_p CL_AllocDlight(int32_t key) {
         }
     }
 
-    dlight_p dl = &cl_dlights[0];
+    dLight_p dl = &cl_dlights[0];
     memset(dl, 0, sizeof(*dl));
     dl->key = key;
     return dl;
@@ -342,7 +342,7 @@ CL_DecayLights
 */
 void CL_DecayLights() {
     float time = cl.time - cl.oldtime;
-    dlight_p dl = cl_dlights;
+    dLight_p dl = cl_dlights;
     for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
         if (dl->die < cl.time || !dl->radius)
             continue;
@@ -494,7 +494,7 @@ void CL_RelinkEntities() {
         if (ent->effects & EF_MUZZLEFLASH) {
             vec3_t  fv, rv, uv;
 
-            dlight_p dl = CL_AllocDlight(i);
+            dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
             dl->origin[2] += 16;
             AngleVectors(ent->angles, fv, rv, uv);
@@ -505,28 +505,28 @@ void CL_RelinkEntities() {
             dl->die = cl.time + 0.1;
         }
         if (ent->effects & EF_BRIGHTLIGHT) {
-            dlight_p dl = CL_AllocDlight(i);
+            dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
             dl->origin[2] += 16;
             dl->radius = 400 + (rand() & 31);
             dl->die = cl.time + 0.001;
         }
         if (ent->effects & EF_DIMLIGHT) {
-            dlight_p dl = CL_AllocDlight(i);
+            dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
             dl->radius = 200 + (rand() & 31);
             dl->die = cl.time + 0.001;
         }
 #ifdef QUAKE2
         if (ent->effects & EF_DARKLIGHT) {
-            dlight_p dl = CL_AllocDlight(i);
+            dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
             dl->radius = 200.0 + (rand() & 31);
             dl->die = cl.time + 0.001;
             dl->dark = true;
         }
         if (ent->effects & EF_LIGHT) {
-            dlight_p dl = CL_AllocDlight(i);
+            dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
             dl->radius = 200;
             dl->die = cl.time + 0.001;
@@ -543,7 +543,7 @@ void CL_RelinkEntities() {
             R_RocketTrail(oldorg, ent->origin, RT_TRACER2);
         else if (ent->model->flags & EF_ROCKET) {
             R_RocketTrail(oldorg, ent->origin, RT_ROCKET);
-            dlight_p dl = CL_AllocDlight(i);
+            dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
             dl->radius = 200;
             dl->die = cl.time + 0.01;
@@ -616,7 +616,7 @@ void CL_SendCmd() {
         return;
 
     if (cls.signon == SIGNONS) {
-        usercmd_t  cmd;
+        UserCmd_t  cmd;
         // get basic movement from keyboard
         CL_BaseMove(&cmd);
 

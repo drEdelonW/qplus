@@ -152,7 +152,7 @@ static DIDATAFORMAT	df = {
 // forward-referenced functions
 void IN_StartupJoystick(void);
 void Joy_AdvancedUpdate_f(void);
-void IN_JoyMove(usercmd_t* cmd);
+void IN_JoyMove(UserCmd_p cmd);
 
 
 /*
@@ -528,7 +528,7 @@ void IN_MouseEvent(int mstate) {
 IN_MouseMove
 ===========
 */
-void IN_MouseMove(usercmd_t* cmd) {
+void IN_MouseMove(UserCmd_p cmd) {
 	int					mx, my;
 	// HDC					hdc;
 	int					i;
@@ -670,7 +670,7 @@ void IN_MouseMove(usercmd_t* cmd) {
 IN_Move
 ===========
 */
-void IN_Move(usercmd_t* cmd) {
+void IN_Move(UserCmd_p cmd) {
 
 	if (ActiveApp && !Minimized) {
 		IN_MouseMove(cmd);
@@ -966,7 +966,7 @@ qboolean IN_ReadJoystick(void) {
 IN_JoyMove
 ===========
 */
-void IN_JoyMove(usercmd_t* cmd) {
+void IN_JoyMove(UserCmd_p cmd) {
 	float	speed, aspeed;
 	float	fAxisValue, fTemp;
 	int		i;

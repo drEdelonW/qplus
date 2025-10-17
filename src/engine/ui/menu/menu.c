@@ -54,13 +54,10 @@ uint8_t translationTable[256];
 #include <string.h>
 #include "render.h"
 void M_BuildTranslationTable(int top, int bottom) {
-    uint8_p dest;
-    uint8_p source;
-
     for (int j = 0; j < 256; j++)
         identityTable[j] = j;
-    dest = translationTable;
-    source = identityTable;
+    uint8_p dest = translationTable;
+    uint8_p source = identityTable;
     memcpy(dest, source, 256);
 
     if (top < 128) // the artists made some backwards ranges.  sigh.
@@ -83,13 +80,11 @@ void M_DrawTransPicTranslate(int x, int y, qPic_p pic) {
 
 
 void M_DrawTextBox(int x, int y, int width, int lines) {
-    qPic_p p;
-
     // draw left side
     int cx = x;
     int cy = y;
     M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tl.lmp"));
-    p = Draw_CachePic("gfx/box_ml.lmp");
+    qPic_p p = Draw_CachePic("gfx/box_ml.lmp");
     for (int n = 0; n < lines; n++) {
         cy += 8;
         M_DrawTransPic(cx, cy, p);
@@ -175,8 +170,10 @@ void M_Menu_Main_f() {
 #include "server.h"
 void M_Main_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+
     qPic_p p = Draw_CachePic("gfx/ttl_main.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
+
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/mainmenu.lmp"));
 
     int f = (int)(host_time * 10) % 6;
@@ -251,8 +248,10 @@ void M_Menu_SinglePlayer_f() {
 
 void M_SinglePlayer_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+
     qPic_p p = Draw_CachePic("gfx/ttl_sgl.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
+
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/sp_menu.lmp"));
 
     int f = (int)(host_time * 10) % 6;
@@ -316,16 +315,18 @@ char m_filenames[MAX_SAVEGAMES][SAVEGAME_COMMENT_LENGTH + 1];
 int  loadable[MAX_SAVEGAMES];
 
 void M_ScanSaves() {
-    char name[MAX_OSPATH];
-    int  version;
 
     for (int i = 0; i < MAX_SAVEGAMES; i++) {
         strcpy(m_filenames[i], "--- UNUSED SLOT ---");
         loadable[i] = false;
+
+        char name[MAX_OSPATH];
         snprintf(name, sizeof(name), "%s/s%i.sav", com_gamedir, i);
         FILE* f = fopen(name, "r");
         if (!f)
             continue;
+
+        int  version;
         fscanf(f, "%i\n", &version);
         fscanf(f, "%79s\n", name);
         strncpy(m_filenames[i], name, sizeof(m_filenames[i]) - 1);
@@ -561,19 +562,11 @@ void M_Setup_Draw() {
     qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 
-    M_Print(64, 40, "Hostname");
-    M_DrawTextBox(160, 32, 16, 1);
-    M_Print(168, 40, setup_hostname);
-
-    M_Print(64, 56, "Your name");
-    M_DrawTextBox(160, 48, 16, 1);
-    M_Print(168, 56, setup_myname);
-
+    M_Print(64, 40, "Hostname");    M_DrawTextBox(160, 32, 16, 1);  M_Print(168, 40, setup_hostname);
+    M_Print(64, 56, "Your name");   M_DrawTextBox(160, 48, 16, 1);  M_Print(168, 56, setup_myname);
     M_Print(64, 80, "Shirt color");
     M_Print(64, 104, "Pants color");
-
-    M_DrawTextBox(64, 140 - 8, 14, 1);
-    M_Print(72, 140, "Accept Changes");
+    M_DrawTextBox(64, 140 - 8, 14, 1);    M_Print(72, 140, "Accept Changes");
 
     M_DrawTransPic(160, 64, Draw_CachePic("gfx/bigbox.lmp"));
     M_BuildTranslationTable(setup_top * 16, setup_bottom * 16);
@@ -630,10 +623,12 @@ void M_Setup_Key(keycode_t k) {
         break;
 
     case K_ENTER:
-        if ((setup_cursor == 0) || (setup_cursor == 1))
+        if ((setup_cursor == 0) ||
+            (setup_cursor == 1))
             return;
 
-        if ((setup_cursor == 2) || (setup_cursor == 3))
+        if ((setup_cursor == 2) ||
+            (setup_cursor == 3))
             goto forward;
 
         // setup_cursor == 4 (OK)
@@ -641,26 +636,26 @@ void M_Setup_Key(keycode_t k) {
             Cbuf_AddText(va("name \"%s\"\n", setup_myname));
         if (Q_strcmp(hostname.string, setup_hostname) != 0)
             Cvar_Set("hostname", setup_hostname);
-        if ((setup_top != setup_oldtop) || (setup_bottom != setup_oldbottom))
+        if ((setup_top != setup_oldtop) ||
+            (setup_bottom != setup_oldbottom))
             Cbuf_AddText(va("color %i %i\n", setup_top, setup_bottom));
         m_entersound = true;
         M_Menu_MultiPlayer_f();
         break;
 
     case K_BACKSPACE:
-        if (setup_cursor == 0) {
-            if (strlen(setup_hostname))
-                setup_hostname[strlen(setup_hostname) - 1] = 0;
-        }
+        if ((setup_cursor == 0) &&
+            (strlen(setup_hostname)))
+            setup_hostname[strlen(setup_hostname) - 1] = 0;
 
-        if (setup_cursor == 1) {
-            if (strlen(setup_myname))
-                setup_myname[strlen(setup_myname) - 1] = 0;
-        }
+        if ((setup_cursor == 1) &&
+            (strlen(setup_myname)))
+            setup_myname[strlen(setup_myname) - 1] = 0;
         break;
 
     default:
-        if ((k < 32) || (k > 127))
+        if ((k < 32) ||
+            (k > 127))
             break;
         if (setup_cursor == 0) {
             int l = strlen(setup_hostname);
@@ -784,8 +779,7 @@ void M_Net_Draw() {
 
     if (m_net_items == 5) { // JDC, could just be removed
         f += 19;
-        p = Draw_CachePic("gfx/netmen5.lmp");
-        M_DrawTransPic(72, f, p);
+        M_DrawTransPic(72, f, Draw_CachePic("gfx/netmen5.lmp"));
     }
 
     f = (320 - 26 * 8) / 2;
@@ -1292,7 +1286,8 @@ void M_SerialConfig_Key(keycode_t key) {
         break;
 
     default:
-        if ((key < 32) || (key > 127))
+        if ((key < 32) ||
+            (key > 127))
             break;
         if (serialConfig_cursor == 4) {
             int l = strlen(serialConfig_phone);
@@ -1442,7 +1437,8 @@ void M_ModemConfig_Key(keycode_t key) {
         break;
 
     default:
-        if (key < 32 || key > 127)
+        if ((key < 32) ||
+            (key > 127))
             break;
 
         if (modemConfig_cursor == 1) {
@@ -1617,7 +1613,8 @@ void M_LanConfig_Key(keycode_t key) {
         break;
 
     default:
-        if ((key < 32) || (key > 127))
+        if ((key < 32) ||
+            (key > 127))
             break;
 
         if (lanConfig_cursor == 2) {
@@ -1628,7 +1625,8 @@ void M_LanConfig_Key(keycode_t key) {
             }
         }
 
-        if ((key < '0') || (key > '9'))
+        if ((key < '0') ||
+            (key > '9'))
             break;
         if (lanConfig_cursor == 0) {
             int l = strlen(lanConfig_portname);
@@ -1714,30 +1712,30 @@ level_t  levels[] = {
 };
 
 //MED 01/06/97 added hipnotic levels
-level_t     hipnoticlevels[] = {
-{"start", "Command HQ"},  // 0
+level_t hipnoticlevels[] = {
+    {"start", "Command HQ"},  // 0
 
-{"hip1m1", "The Pumping Station"},          // 1
-{"hip1m2", "Storage Facility"},
-{"hip1m3", "The Lost Mine"},
-{"hip1m4", "Research Facility"},
-{"hip1m5", "Military Complex"},
+    {"hip1m1", "The Pumping Station"},          // 1
+    {"hip1m2", "Storage Facility"},
+    {"hip1m3", "The Lost Mine"},
+    {"hip1m4", "Research Facility"},
+    {"hip1m5", "Military Complex"},
 
-{"hip2m1", "Ancient Realms"},          // 6
-{"hip2m2", "The Black Cathedral"},
-{"hip2m3", "The Catacombs"},
-{"hip2m4", "The Crypt"},
-{"hip2m5", "Mortum's Keep"},
-{"hip2m6", "The Gremlin's Domain"},
+    {"hip2m1", "Ancient Realms"},          // 6
+    {"hip2m2", "The Black Cathedral"},
+    {"hip2m3", "The Catacombs"},
+    {"hip2m4", "The Crypt"},
+    {"hip2m5", "Mortum's Keep"},
+    {"hip2m6", "The Gremlin's Domain"},
 
-{"hip3m1", "Tur Torment"},       // 12
-{"hip3m2", "Pandemonium"},
-{"hip3m3", "Limbo"},
-{"hip3m4", "The Gauntlet"},
+    {"hip3m1", "Tur Torment"},       // 12
+    {"hip3m2", "Pandemonium"},
+    {"hip3m3", "Limbo"},
+    {"hip3m4", "The Gauntlet"},
 
-{"hipend", "Armagon's Lair"},       // 16
+    {"hipend", "Armagon's Lair"},       // 16
 
-{"hipdm1", "The Edge of Oblivion"}           // 17
+    {"hipdm1", "The Edge of Oblivion"}           // 17
 };
 
 //PGM 01/07/97 added rogue levels
@@ -1862,36 +1860,25 @@ void M_GameOptions_Draw() {
     }
 
     M_Print(0, 80, "            Skill");
-    if (skill.value == 0)
-        M_Print(160, 80, "Easy difficulty");
-    else if (skill.value == 1)
-        M_Print(160, 80, "Normal difficulty");
-    else if (skill.value == 2)
-        M_Print(160, 80, "Hard difficulty");
-    else
-        M_Print(160, 80, "Nightmare difficulty");
+    if (skill.value == 0)       M_Print(160, 80, "Easy difficulty");
+    else if (skill.value == 1)  M_Print(160, 80, "Normal difficulty");
+    else if (skill.value == 2)  M_Print(160, 80, "Hard difficulty");
+    else                        M_Print(160, 80, "Nightmare difficulty");
 
     M_Print(0, 88, "       Frag Limit");
-    if (fraglimit.value == 0)
-        M_Print(160, 88, "none");
-    else
-        M_Print(160, 88, va("%i frags", (int)fraglimit.value));
+    if (fraglimit.value == 0)   M_Print(160, 88, "none");
+    else                        M_Print(160, 88, va("%i frags", (int)fraglimit.value));
 
     M_Print(0, 96, "       Time Limit");
-    if (timelimit.value == 0)
-        M_Print(160, 96, "none");
-    else
-        M_Print(160, 96, va("%i minutes", (int)timelimit.value));
+    if (timelimit.value == 0)   M_Print(160, 96, "none");
+    else                        M_Print(160, 96, va("%i minutes", (int)timelimit.value));
 
     M_Print(0, 112, "         Episode");
     //MED 01/06/97 added hipnotic episodes
-    if (hipnotic)
-        M_Print(160, 112, hipnoticepisodes[startepisode].description);
+    if (hipnotic)           M_Print(160, 112, hipnoticepisodes[startepisode].description);
     //PGM 01/07/97 added rogue episodes
-    else if (rogue)
-        M_Print(160, 112, rogueepisodes[startepisode].description);
-    else
-        M_Print(160, 112, episodes[startepisode].description);
+    else if (rogue)         M_Print(160, 112, rogueepisodes[startepisode].description);
+    else                    M_Print(160, 112, episodes[startepisode].description);
 
     M_Print(0, 120, "           Level");
     //MED 01/06/97 added hipnotic episodes
@@ -2071,12 +2058,9 @@ void M_GameOptions_Key(keycode_t key) {
             Cbuf_AddText(va("maxplayers %u\n", maxplayers));
             SCR_BeginLoadingPlaque();
 
-            if (hipnotic)
-                Cbuf_AddText(va("map %s\n", hipnoticlevels[hipnoticepisodes[startepisode].firstLevel + startlevel].name));
-            else if (rogue)
-                Cbuf_AddText(va("map %s\n", roguelevels[rogueepisodes[startepisode].firstLevel + startlevel].name));
-            else
-                Cbuf_AddText(va("map %s\n", levels[episodes[startepisode].firstLevel + startlevel].name));
+            if (hipnotic)   Cbuf_AddText(va("map %s\n", hipnoticlevels[hipnoticepisodes[startepisode].firstLevel + startlevel].name));
+            else if (rogue) Cbuf_AddText(va("map %s\n", roguelevels[rogueepisodes[startepisode].firstLevel + startlevel].name));
+            else            Cbuf_AddText(va("map %s\n", levels[episodes[startepisode].firstLevel + startlevel].name));
 
             return;
         }
@@ -2135,8 +2119,7 @@ void M_Search_Draw() {
 }
 
 
-void M_Search_Key(keycode_t key) {
-}
+void M_Search_Key(keycode_t key) {}
 
 //=============================================================================
 /* SLIST MENU */
@@ -2156,8 +2139,6 @@ void M_Menu_ServerList_f() {
 
 
 void M_ServerList_Draw() {
-    char string[64];
-
     if (!slist_sorted) {
         if (hostCacheCount > 1) {
             hostcache_t temp;
@@ -2175,6 +2156,7 @@ void M_ServerList_Draw() {
     qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
     for (int n = 0; n < hostCacheCount; n++) {
+        char string[64];
         if (hostcache[n].maxusers)
             sprintf(string, "%-15.15s %-15.15s %2u/%2u\n", hostcache[n].name, hostcache[n].map, hostcache[n].users, hostcache[n].maxusers);
         else
@@ -2252,7 +2234,8 @@ void M_Init() {
 
 
 void M_Draw() {
-    if ((m_state == m_none) || (key_dest != key_menu))
+    if ((m_state == m_none) ||
+        (key_dest != key_menu))
         return;
 
     if (!m_recursiveDraw) {
@@ -2445,10 +2428,12 @@ void M_ConfigureNetSubsystem() {
     // enable/disable net systems to match desired config
 
     Cbuf_AddText("stopdemo\n");
-    if (SerialConfig || DirectConfig) {
+    if (SerialConfig ||
+        DirectConfig) {
         Cbuf_AddText("com1 enable\n");
     }
 
-    if (IPXConfig || TCPIPConfig)
+    if (IPXConfig ||
+        TCPIPConfig)
         net_hostport = lanConfig_port;
 }

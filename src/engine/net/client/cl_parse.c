@@ -211,7 +211,7 @@ void CL_ParseServerInfo() {
 
 	Con_DPrintf("Serverinfo packet received.\n");
 	//
-	// wipe the client_state_t struct
+	// wipe the ClientState_t struct
 	//
 	CL_ClearState();
 
