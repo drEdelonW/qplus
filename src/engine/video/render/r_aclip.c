@@ -198,9 +198,8 @@ R_AliasClipTriangle
 void R_AliasClipTriangle(mTriangle_p ptri) {
     // copy vertexes and fix seam texture coordinates
     if (ptri->facesfront) {
-        _fv[0][0] = pfinalverts[ptri->vertindex[0]];
-        _fv[0][1] = pfinalverts[ptri->vertindex[1]];
-        _fv[0][2] = pfinalverts[ptri->vertindex[2]];
+        for (int i = 0; i < 3; i++)
+            _fv[0][i] = pfinalverts[ptri->vertindex[i]];
     }
     else {
         for (int i = 0; i < 3; i++) {
@@ -289,9 +288,9 @@ void R_AliasClipTriangle(mTriangle_p ptri) {
     }
 
     // draw triangles
-    mTriangle_t mtri;
-    mtri.facesfront =
-        ptri->facesfront;
+    mTriangle_t mtri = {
+        .facesfront = ptri->facesfront
+    };
     r_affinetridesc.ptriangles = &mtri;
     r_affinetridesc.pfinalverts = _fv[pingpong];
 

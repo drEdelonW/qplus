@@ -77,6 +77,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(MENU_DIR)/menu_multiplayer.c
                         SRC_LIST += $(MENU_DIR)/menu_setup.c
                         SRC_LIST += $(MENU_DIR)/menu_net.c
+                        SRC_LIST += $(MENU_DIR)/menu_search.c
                         SRC_LIST += $(MENU_DIR)/menu_server_list.c
                         SRC_LIST += $(MENU_DIR)/menu_config_serial.c
                         SRC_LIST += $(MENU_DIR)/menu_config_modem.c

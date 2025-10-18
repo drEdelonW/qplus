@@ -1,6 +1,11 @@
 #pragma once
 
-extern int lanConfig_port;
+typedef struct {
+    int  port;
+    char portname[6];
+    char joinname[22];
+} LanConfig_t;
+extern LanConfig_t lanConfig;
 
 extern int m_net_cursor;
 #define SerialConfig    (m_net_cursor == 0)

@@ -2819,8 +2819,7 @@ void VID_MenuDraw() {
 	vmode_t* pv;
 	modedesc_t	tmodedesc;
 
-	p = Draw_CachePic("gfx/vidmodes.lmp");
-	M_DrawPic((320 - p->width) / 2, 4, p);
+	M_DrawPic(4, Draw_CachePic("gfx/vidmodes.lmp"));
 
 	for (i = 0; i < 3; i++) {
 		ptr = VID_GetModeDescriptionMemCheck(i);
@@ -2963,7 +2962,7 @@ void VID_MenuDraw() {
 		if (vid_line >= 3)
 			row += 3 * 8;
 
-		M_DrawCharacter(column, row, 12 + ((int)(realtime * 4) & 1));
+		M_DrawCharacter(column, row, curSymb());
 	}
 }
 

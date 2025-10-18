@@ -304,8 +304,8 @@ void VID_MenuDraw(void) {
 	int			i, j, column, row, dup;
 	char		temp[100];
 
-	p = Draw_CachePic("gfx/vidmodes.lmp");
-	M_DrawPic((320 - p->width) / 2, 4, p);
+	M_DrawPic(4, Draw_CachePic("gfx/vidmodes.lmp"));
+
 	M_Print(4 * 8, 36 + MAX_COLUMN_SIZE * 8 + 8, "Video mode switching unavailable");
 	M_Print(9 * 8, 36 + MAX_COLUMN_SIZE * 8 + 8 * 6, "Press any key...");
 }

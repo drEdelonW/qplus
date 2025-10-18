@@ -97,7 +97,8 @@
 			"model.h": "c",
 			"vid.h": "c",
 			"menu_prv.h": "c",
-			"menu_net.h": "c"
+			"menu_net.h": "c",
+			"menu.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

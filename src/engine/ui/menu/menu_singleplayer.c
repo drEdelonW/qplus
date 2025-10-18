@@ -3,9 +3,16 @@
 //=============================================================================
 /* SINGLE PLAYER MENU */
 
-int m_singleplayer_cursor;
-#define SINGLEPLAYER_ITEMS 3
+typedef enum {
+    sp_force_signed = -1,
+    sp_FIRST = 0,
+    sp_NewGame = sp_FIRST,
+    sp_Load,
+    sp_Save,
 
+    sp_NUM     //should be last
+} SinglePlayer_e;
+static SinglePlayer_e _cursor;
 
 void M_Menu_SinglePlayer_f() {
     key_dest = key_menu;
@@ -17,40 +24,36 @@ void M_Menu_SinglePlayer_f() {
 void M_SinglePlayer_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
 
-    qPic_p p = Draw_CachePic("gfx/ttl_sgl.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
+    M_DrawPicHC(4, Draw_CachePic("gfx/ttl_sgl.lmp"));
 
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/sp_menu.lmp"));
 
-    M_DrawTransPic(54, 32 + m_singleplayer_cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", curAmimFrame())));
+    M_DrawTransPic(54, 32 + _cursor * 20,
+        Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame())));
 }
 
 void M_SinglePlayer_Key(keycode_t key) {
     switch (key) {
-    case K_ESCAPE:
-        M_Menu_Main_f();
-        break;
+    case K_ESCAPE:  M_Menu_Main_f();    break;
 
     case K_DOWNARROW:
         S_LocalSound("misc/menu1.wav");
-        if (++m_singleplayer_cursor >= SINGLEPLAYER_ITEMS)
-            m_singleplayer_cursor = 0;
+        if (++_cursor >= sp_NUM)    _cursor = sp_FIRST;
         break;
 
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
-        if (--m_singleplayer_cursor < 0)
-            m_singleplayer_cursor = SINGLEPLAYER_ITEMS - 1;
+        if (--_cursor < sp_FIRST)   _cursor = sp_NUM - 1;
         break;
 
     case K_ENTER:
         m_entersound = true;
 
-        switch (m_singleplayer_cursor) {
-        case 0:
-            if (sv.active)
-                if (!SCR_ModalMessage("Are you sure you want to\nstart a new game?\n"))
-                    break;
+        switch (_cursor) {
+        case sp_NewGame:
+            if ((sv.active) &&
+                (!SCR_ModalMessage("Are you sure you want to\nstart a new game?\n")))
+                break;
             key_dest = key_game;
             if (sv.active)
                 Cbuf_AddText("disconnect\n");
@@ -58,13 +61,9 @@ void M_SinglePlayer_Key(keycode_t key) {
             Cbuf_AddText("map start\n");
             break;
 
-        case 1:
-            M_Menu_Load_f();
-            break;
-
-        case 2:
-            M_Menu_Save_f();
-            break;
+        case sp_Load:   M_Menu_Load_f();    break;
+        case sp_Save:   M_Menu_Save_f();    break;
+        default: break;
         }
     default: break;
     }

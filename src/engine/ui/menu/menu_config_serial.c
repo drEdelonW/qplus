@@ -63,9 +63,8 @@ void M_Menu_SerialConfig_f() {
 
 void M_SerialConfig_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
-    int basex = (320 - p->width) / 2;
-    M_DrawPic(basex, 4, p);
+
+    int basex = M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 
     cString startJoin = (is_CreateGame()) ? "New Game" : "Join Game";
     cString directModem = (SerialConfig) ? "Modem" : "Direct Connect";
@@ -107,10 +106,10 @@ void M_SerialConfig_Draw() {
         }
     }
 
-    M_DrawCharacter(basex - 8, _serialConfigCursorTable[serialConfigCursor], 12 + ((int)(realtime * 4) & 1));
+    M_DrawCharacter(basex - 8, _serialConfigCursorTable[serialConfigCursor], curSymb());
 
     if (serialConfigCursor == 4)
-        M_DrawCharacter(168 + 8 * strlen(serialConfig_phone), _serialConfigCursorTable[serialConfigCursor], 10 + ((int)(realtime * 4) & 1));
+        M_DrawCharacter(168 + 8 * strlen(serialConfig_phone), _serialConfigCursorTable[serialConfigCursor], inpSymb());
 
     if (*m_return_reason)
         M_PrintWhite(basex, 148, m_return_reason);

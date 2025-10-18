@@ -4,152 +4,163 @@
 
 //=============================================================================
 /* SETUP MENU */
+typedef enum {
+    s_force_signed = -1,
+    s_FIRST = 0,
+    s_HostName = s_FIRST,
+    s_PlayerName,
+    s_ShirtCol,
+    s_PantsCol,
+    s_Accept,
 
-int  setup_cursor = 4;
-int  setup_cursor_table[] = { 40, 56, 80, 104, 140 };
-
-char setup_hostname[16];
-char setup_myname[16];
-int  setup_oldtop;
-int  setup_oldbottom;
-int  setup_top;
-int  setup_bottom;
-
+    s_NUM     //should be last
+} Setup_e;
+static Setup_e _cursor = 4;
 #define NUM_SETUP_CMDS 5
+
+static int _y[5] = { 40, 56, 80, 104, 140 };
+
+#define HOSTNAME_LEN    (16)
+#define PLAYERNAME_LEN    (16)
+typedef struct {
+    char hostname[HOSTNAME_LEN];
+    char myname[PLAYERNAME_LEN];
+    int  oldtop;
+    int  oldbottom;
+    int  top;
+    int  bottom;
+} Setup_t;
+Setup_t _s;
 
 void M_Menu_Setup_f() {
     key_dest = key_menu;
     m_state = m_setup;
     m_entersound = true;
-    Q_strcpy(setup_myname, cl_name.string);
-    Q_strcpy(setup_hostname, hostname.string);
-    setup_top = setup_oldtop = ((int)cl_color.value) >> 4;
-    setup_bottom = setup_oldbottom = ((int)cl_color.value) & 15;
+    Q_strcpy(_s.myname, cl_name.string);
+    Q_strcpy(_s.hostname, hostname.string);
+    _s.top = _s.oldtop = ((int)cl_color.value) >> 4;
+    _s.bottom = _s.oldbottom = ((int)cl_color.value) & 15;
 }
 
 
 void M_Setup_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
 
-    M_Print(64, 40, "Hostname");    M_DrawTextBox(160, 32, 16, 1);  M_Print(168, 40, setup_hostname);
-    M_Print(64, 56, "Your name");   M_DrawTextBox(160, 48, 16, 1);  M_Print(168, 56, setup_myname);
-    M_Print(64, 80, "Shirt color");
-    M_Print(64, 104, "Pants color");
-    M_DrawTextBox(64, 140 - 8, 14, 1);    M_Print(72, 140, "Accept Changes");
+    M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
+
+    M_Print(64, _y[s_HostName], "Hostname");
+    M_DrawTextBox(160, _y[s_HostName] - 8, HOSTNAME_LEN, 1); {
+        M_Print(168, _y[s_HostName], _s.hostname);
+    }
+
+    M_Print(64, _y[s_PlayerName], "Your name");
+    M_DrawTextBox(160, _y[s_PlayerName] - 8, PLAYERNAME_LEN, 1); {
+        M_Print(168, _y[s_PlayerName], _s.myname);
+    }
+    M_Print(64, _y[s_ShirtCol], "Shirt color");
+
+    M_Print(64, _y[s_PantsCol], "Pants color");
+
+    M_DrawTextBox(64, _y[s_Accept] - 8, 14, 1); {
+        M_Print(72, _y[s_Accept], "Accept Changes");
+    }
 
     M_DrawTransPic(160, 64, Draw_CachePic("gfx/bigbox.lmp"));
-    M_BuildTranslationTable(setup_top * 16, setup_bottom * 16);
-    M_DrawTransPicTranslate(172, 72, Draw_CachePic("gfx/menuplyr.lmp"));
+    M_BuildTranslationTable(_s.top * 16, _s.bottom * 16); {
+        M_DrawTransPicTranslate(172, 72, Draw_CachePic("gfx/menuplyr.lmp"));
+    }
 
-    M_DrawCharacter(56, setup_cursor_table[setup_cursor], 12 + ((int)(realtime * 4) & 1));
+    M_DrawCharacter(56, _y[_cursor], curSymb());
 
-    if (setup_cursor == 0)
-        M_DrawCharacter(168 + 8 * strlen(setup_hostname), setup_cursor_table[setup_cursor], 10 + ((int)(realtime * 4) & 1));
+    if (_cursor == s_HostName)
+        M_DrawCharacter(168 + 8 * strlen(_s.hostname), _y[_cursor], inpSymb());
 
-    if (setup_cursor == 1)
-        M_DrawCharacter(168 + 8 * strlen(setup_myname), setup_cursor_table[setup_cursor], 10 + ((int)(realtime * 4) & 1));
+    if (_cursor == s_PlayerName)
+        M_DrawCharacter(168 + 8 * strlen(_s.myname), _y[_cursor], inpSymb());
 }
 
 
 void M_Setup_Key(keycode_t k) {
     switch (k) {
-    case K_ESCAPE:
-        M_Menu_MultiPlayer_f();
-        break;
+    case K_ESCAPE:  M_Menu_MultiPlayer_f(); break;
 
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
-        setup_cursor--;
-        if (setup_cursor < 0)
-            setup_cursor = NUM_SETUP_CMDS - 1;
-        break;
+        if (--_cursor < s_FIRST) { _cursor = s_NUM - 1; } break;
 
     case K_DOWNARROW:
         S_LocalSound("misc/menu1.wav");
-        setup_cursor++;
-        if (setup_cursor >= NUM_SETUP_CMDS)
-            setup_cursor = 0;
-        break;
+        if (++_cursor >= s_NUM) { _cursor = s_FIRST; } break;
 
     case K_LEFTARROW:
-        if (setup_cursor < 2)
-            return;
+        if (_cursor < s_ShirtCol)   return;
         S_LocalSound("misc/menu3.wav");
-        if (setup_cursor == 2)
-            setup_top = setup_top - 1;
-        if (setup_cursor == 3)
-            setup_bottom = setup_bottom - 1;
+        if (_cursor == s_ShirtCol)  _s.top--;
+        if (_cursor == s_PantsCol)  _s.bottom--;
         break;
+
     case K_RIGHTARROW:
-        if (setup_cursor < 2)
-            return;
+        if (_cursor < s_ShirtCol)   return;
     forward:
         S_LocalSound("misc/menu3.wav");
-        if (setup_cursor == 2)
-            setup_top = setup_top + 1;
-        if (setup_cursor == 3)
-            setup_bottom = setup_bottom + 1;
+        if (_cursor == s_ShirtCol)  _s.top++;
+        if (_cursor == s_PantsCol)  _s.bottom++;
         break;
 
     case K_ENTER:
-        if ((setup_cursor == 0) ||
-            (setup_cursor == 1))
+        if ((_cursor == s_HostName) ||
+            (_cursor == s_PlayerName))
             return;
 
-        if ((setup_cursor == 2) ||
-            (setup_cursor == 3))
+        if ((_cursor == s_ShirtCol) ||
+            (_cursor == s_PantsCol))
             goto forward;
 
-        // setup_cursor == 4 (OK)
-        if (Q_strcmp(cl_name.string, setup_myname) != 0)
-            Cbuf_AddText(va("name \"%s\"\n", setup_myname));
-        if (Q_strcmp(hostname.string, setup_hostname) != 0)
-            Cvar_Set("hostname", setup_hostname);
-        if ((setup_top != setup_oldtop) ||
-            (setup_bottom != setup_oldbottom))
-            Cbuf_AddText(va("color %i %i\n", setup_top, setup_bottom));
+        // _cursor == 4 (OK)
+        if (Q_strcmp(cl_name.string, _s.myname) != 0) { Cbuf_AddText(va("name \"%s\"\n", _s.myname)); }
+        if (Q_strcmp(hostname.string, _s.hostname) != 0) { Cvar_Set("hostname", _s.hostname); }
+        if ((_s.top != _s.oldtop) ||
+            (_s.bottom != _s.oldbottom))
+            Cbuf_AddText(va("color %i %i\n", _s.top, _s.bottom));
         m_entersound = true;
         M_Menu_MultiPlayer_f();
         break;
 
     case K_BACKSPACE:
-        if ((setup_cursor == 0) &&
-            (strlen(setup_hostname)))
-            setup_hostname[strlen(setup_hostname) - 1] = 0;
+        if ((_cursor == s_HostName) &&
+            (strlen(_s.hostname)))
+            _s.hostname[strlen(_s.hostname) - 1] = 0x00;
 
-        if ((setup_cursor == 1) &&
-            (strlen(setup_myname)))
-            setup_myname[strlen(setup_myname) - 1] = 0;
+        if ((_cursor == s_PlayerName) &&
+            (strlen(_s.myname)))
+            _s.myname[strlen(_s.myname) - 1] = 0x00;
         break;
 
     default:
-        if ((k < 32) ||
-            (k > 127))
-            break;
-        if (setup_cursor == 0) {
-            int l = strlen(setup_hostname);
-            if (l < 15) {
-                setup_hostname[l + 1] = 0;
-                setup_hostname[l] = k;
+        if (!is_printable(k)) break;
+        if (_cursor == s_HostName) {
+            int l = strlen(_s.hostname);
+            if (l < (HOSTNAME_LEN - 1)) {
+                _s.hostname[l] = k;
+                _s.hostname[l + 1] = 0x00;
             }
         }
-        if (setup_cursor == 1) {
-            int l = strlen(setup_myname);
-            if (l < 15) {
-                setup_myname[l + 1] = 0;
-                setup_myname[l] = k;
+        if (_cursor == s_PlayerName) {
+            int l = strlen(_s.myname);
+            if (l < (PLAYERNAME_LEN - 1)) {
+                _s.myname[l] = k;
+                _s.myname[l + 1] = 0x00;
             }
         }
     }
 
-    if (setup_top > 13)
-        setup_top = 0;
-    if (setup_top < 0)
-        setup_top = 13;
-    if (setup_bottom > 13)
-        setup_bottom = 0;
-    if (setup_bottom < 0)
-        setup_bottom = 13;
+    if (_s.top > 13)
+        _s.top = 0;
+    else if (_s.top < 0)
+        _s.top = 13;
+
+    if (_s.bottom > 13)
+        _s.bottom = 0;
+    else if (_s.bottom < 0)
+        _s.bottom = 13;
 }

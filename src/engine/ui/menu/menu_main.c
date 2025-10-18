@@ -31,12 +31,11 @@ void M_Menu_Main_f() {
 void M_Main_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
 
-    qPic_p p = Draw_CachePic("gfx/ttl_main.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
+    M_DrawPicHC(4, Draw_CachePic("gfx/ttl_main.lmp"));
 
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/mainmenu.lmp"));
 
-    M_DrawTransPic(54, 32 + _cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", curAmimFrame())));
+    M_DrawTransPic(54, 32 + _cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame())));
 }
 
 void M_Main_Key(keycode_t key) {
@@ -54,13 +53,11 @@ void M_Main_Key(keycode_t key) {
     case K_DOWNARROW:
         S_LocalSound("misc/menu1.wav");
         if (++_cursor >= m_LAST)    _cursor = m_FIRST;
-        printf("DOWN cursor %d \n",_cursor);
         break;
 
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
         if (--_cursor < (int)m_FIRST)    _cursor = m_LAST - 1;
-        printf("UP cursor %d %d \n",_cursor, m_FIRST);
         break;
 
     case K_ENTER:

@@ -42,9 +42,7 @@ void M_Menu_ModemConfig_f() {
 void M_ModemConfig_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
 
-    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
-    int x = (320 - p->width) / 2;
-    M_DrawPic(x, 4, p);
+    int x = M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 
     x += 8;
     M_Print(x, piontY[mc_DialMode], (_mc.dialing == 'P') ? "Pulse Dialing" : "Touch Tone Dialing");

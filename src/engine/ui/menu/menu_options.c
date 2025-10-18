@@ -28,7 +28,9 @@ typedef enum {
     o_LookSpring,
     o_LookStrafe,
     o_VideoOptions,
+#ifdef _WIN32
     o_UseMouse,
+#endif
 
     o_LAST     //should be last
 } options_e;
@@ -57,7 +59,7 @@ void M_AdjustSliders(menuDirection_e dir) {
     S_LocalSound("misc/menu3.wav");
 
     switch (_cursor) {
-    case o_ScreenSize: // screen size
+    case o_ScreenSize:
         scr_viewsize.value += dir * 10; CLAMP(30.0f, scr_viewsize.value, 120.0f);
         Cvar_SetValue("viewsize", scr_viewsize.value);
         break;
@@ -83,7 +85,7 @@ void M_AdjustSliders(menuDirection_e dir) {
         Cvar_SetValue("volume", volume.value);
         break;
 
-    case o_AlwaysRun: /* allways run */
+    case o_AlwaysRun:
         if (cl_forwardspeed.value > 200) {
             Cvar_SetValue("cl_forwardspeed", 200);
             Cvar_SetValue("cl_backspeed", 200);
@@ -98,11 +100,11 @@ void M_AdjustSliders(menuDirection_e dir) {
     case o_LookSpring:  Cvar_SetValue("lookspring", !lookspring.value); break;
     case o_LookStrafe:  Cvar_SetValue("lookstrafe", !lookstrafe.value); break;
 
-        // #ifdef _WIN32
-    case o_VideoOptions: // _windowed_mouse
+#ifdef _WIN32
+    case o_UseMouse: // _windowed_mouse
         Cvar_SetValue("_windowed_mouse", !_windowed_mouse.value);
         break;
-        // #endif
+#endif
     default: break;
     }
 }
@@ -111,8 +113,8 @@ void M_Options_Draw() {
     const int col0 = 16;
     const int col1 = 220;
     M_DrawTransPic(col0, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qPic_p p = Draw_CachePic("gfx/p_option.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
+
+    M_DrawPicHC(4, Draw_CachePic("gfx/p_option.lmp"));
 
     M_Print(col0, 32, "    Customize controls");
     M_Print(col0, 40, "         Go to console");
@@ -155,14 +157,12 @@ void M_Options_Key(keycode_t k) {
 
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
-        _cursor--;
-        if (_cursor < o_FIRST)  _cursor = o_LAST - 1;
+        if (--_cursor < o_FIRST)  _cursor = o_LAST - 1;
         break;
 
     case K_DOWNARROW:
         S_LocalSound("misc/menu1.wav");
-        _cursor++;
-        if (_cursor >= o_LAST)  _cursor = o_FIRST;
+        if (++_cursor >= o_LAST)  _cursor = o_FIRST;
         break;
 
     case K_LEFTARROW:   M_AdjustSliders(md_left);   break;
@@ -179,7 +179,7 @@ void M_Options_Key(keycode_t k) {
     if ((_cursor == o_UseMouse) &&
         (modestate != MS_WINDOWED)) {
         _cursor = (k == K_UPARROW) ? o_VideoOptions : o_FIRST;
-}
+    }
 #endif
 }
 

@@ -24,7 +24,7 @@ extern bool m_return_onerror;
 extern char m_return_reason[];
 
 int blink(char sym);
-int curAmimFrame();
+int curAnimFrame();
 int curSymb();
 int inpSymb();
 
@@ -38,6 +38,7 @@ void M_BuildTranslationTable(int top, int bottom);
 
 void M_DrawTransPicTranslate(int x, int y, qPic_p pic);
 void M_DrawTransPic(int x, int y, qPic_p pic);
+int M_DrawPicHC(int y, qPic_p pic);
 void M_DrawPic(int x, int y, qPic_p pic);
 
 

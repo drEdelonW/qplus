@@ -52,9 +52,9 @@ void M_Menu_Net_f() {
 void M_Net_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
 
-    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
+    M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 
+    qPic_p p;
     if (serialAvailable) {
         p = Draw_CachePic("gfx/netmen1.lmp");
     }
@@ -96,7 +96,7 @@ void M_Net_Draw() {
 
     M_DrawTransPic(
         54, 32 + m_net_cursor * 20,
-        Draw_CachePic(va("gfx/menudot%i.lmp", curAmimFrame())
+        Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame())
         )
     );
 }
@@ -159,5 +159,5 @@ void M_ConfigureNetSubsystem() {
 
     if (IPXConfig ||
         TCPIPConfig)
-        net_hostport = lanConfig_port;
+        net_hostport = lanConfig.port;
 }

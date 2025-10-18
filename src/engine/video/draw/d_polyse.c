@@ -31,11 +31,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct {
-	TypeLess_ptr pdest;
-	int16_p pz;
-	int				count;
-	uint8_p ptex;
-	int				sfrac, tfrac, light, zi;
+	TypeLess_ptr    pdest;
+	int16_p         pz;
+	int             count;
+	uint8_p         ptex;
+	int             sfrac, tfrac, light, zi;
 } spanpackage_t;
 
 typedef struct {

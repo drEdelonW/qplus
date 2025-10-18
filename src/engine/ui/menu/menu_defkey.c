@@ -76,8 +76,7 @@ void M_Keys_Draw() {
     M_DrawCharacter(
         130, 48 + (_keys_cursor * 8),
         (_bind_grab) ?
-        '=' :
-        12 + ((int)(realtime * 4) & 1)
+        '=' : curSymb()
     );
 }
 
@@ -122,16 +121,14 @@ void M_Keys_Key(keycode_t k) {
     case K_LEFTARROW:
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
-        _keys_cursor--;
-        if (_keys_cursor < 0)
+        if (--_keys_cursor < 0)
             _keys_cursor = NUMCOMMANDS - 1;
         break;
 
     case K_DOWNARROW:
     case K_RIGHTARROW:
         S_LocalSound("misc/menu1.wav");
-        _keys_cursor++;
-        if (_keys_cursor >= NUMCOMMANDS)
+        if (++_keys_cursor >= NUMCOMMANDS)
             _keys_cursor = 0;
         break;
 

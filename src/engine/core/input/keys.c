@@ -156,10 +156,16 @@ keyname_t keynames[] = {
 ==============================================================================
 */
 
-bool is_printable(char symb) {
+bool is_printable(keycode_t symb) {
     return
         (symb >= K_SPACE) &&
         (symb < K_BACKSPACE);
+}
+
+bool is_digits(keycode_t symb) {
+    return
+        (symb >= '0') &&
+        (symb < '9');
 }
 
 /*

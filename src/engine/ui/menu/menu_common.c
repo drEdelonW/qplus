@@ -90,6 +90,14 @@ void M_DrawTransPic(int x, int y, qPic_p pic) {
     Draw_TransPic(x + ((vid.width - 320) >> 1), y, pic);
 }
 
+int M_DrawPicHC( int y, qPic_p pic) {
+    if (pic) {
+        int ret = (320 - pic->width) / 2;
+        M_DrawPic(ret, y, pic);
+        return ret;
+    }
+    return -1;
+}
 void M_DrawPic(int x, int y, qPic_p pic) {
     Draw_Pic(x + ((vid.width - 320) >> 1), y, pic);
 }
@@ -134,10 +142,10 @@ void M_DrawCheckbox(int x, int y, int on) {
     );
 }
 
-int blink(char sym){
+int blink(char sym) {
     return sym + ((int)(realtime * 4) & 1);
 }
-int curAmimFrame(){
+int curAnimFrame() {
     return ((int)(host_time * 10) % 6) + 1;
 }
 

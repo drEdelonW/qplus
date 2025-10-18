@@ -319,7 +319,7 @@ void SCR_DrawRam() {
     if ((!scr_showram.value) ||
         (!r_cache_thrash))
         return;
-
+    printf("drawRAM [%s]  \n", r_cache_thrash ? "true" : "false");
     Draw_Pic(scr_vrect.x + 32, scr_vrect.y, scr_ram);
 }
 

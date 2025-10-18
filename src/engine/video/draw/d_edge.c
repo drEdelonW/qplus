@@ -53,15 +53,10 @@ D_MipLevelForScale
 */
 int D_MipLevelForScale(float scale) {
     int lmiplevel;
-
-    if (scale >= d_scalemip[0])
-        lmiplevel = 0;
-    else if (scale >= d_scalemip[1])
-        lmiplevel = 1;
-    else if (scale >= d_scalemip[2])
-        lmiplevel = 2;
-    else
-        lmiplevel = 3;
+    if (scale >= d_scalemip[0])         lmiplevel = 0;
+    else if (scale >= d_scalemip[1])    lmiplevel = 1;
+    else if (scale >= d_scalemip[2])    lmiplevel = 2;
+    else                                lmiplevel = 3;
 
     CLAMP_MIN(lmiplevel, d_minmip);
 

@@ -163,8 +163,8 @@ int  gameoptions_cursor;
 
 void M_GameOptions_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
+
+    M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 
     M_DrawTextBox(152, 32, 10, 1);
     M_Print(160, 40, "begin game");
@@ -242,7 +242,7 @@ void M_GameOptions_Draw() {
     }
 
     // line cursor
-    M_DrawCharacter(144, gameoptions_cursor_table[gameoptions_cursor], 12 + ((int)(realtime * 4) & 1));
+    M_DrawCharacter(144, gameoptions_cursor_table[gameoptions_cursor], curSymb());
 
     if (m_serverInfoMessage) {
         if ((realtime - m_serverInfoMessageTime) < 5.0) {
@@ -368,15 +368,13 @@ void M_GameOptions_Key(keycode_t key) {
 
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
-        gameoptions_cursor--;
-        if (gameoptions_cursor < 0)
+        if (--gameoptions_cursor < 0)
             gameoptions_cursor = NUM_GAMEOPTIONS - 1;
         break;
 
     case K_DOWNARROW:
         S_LocalSound("misc/menu1.wav");
-        gameoptions_cursor++;
-        if (gameoptions_cursor >= NUM_GAMEOPTIONS)
+        if (++gameoptions_cursor >= NUM_GAMEOPTIONS)
             gameoptions_cursor = 0;
         break;
 
@@ -415,53 +413,3 @@ void M_GameOptions_Key(keycode_t key) {
     default: break;
     }
 }
-
-//=============================================================================
-/* SEARCH MENU */
-
-bool searchComplete = false;
-double  searchCompleteTime;
-
-void M_Menu_Search_f() {
-    key_dest = key_menu;
-    m_state = m_search;
-    m_entersound = false;
-    slistSilent = true;
-    slistLocal = false;
-    searchComplete = false;
-    NET_Slist_f();
-
-}
-
-
-void M_Search_Draw() {
-    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
-    int x = (320 / 2) - ((12 * 8) / 2) + 4;
-    M_DrawTextBox(x - 8, 32, 12, 1);
-    M_Print(x, 40, "Searching...");
-
-    if (slistInProgress) {
-        NET_Poll();
-        return;
-    }
-
-    if (!searchComplete) {
-        searchComplete = true;
-        searchCompleteTime = realtime;
-    }
-
-    if (hostCacheCount) {
-        M_Menu_ServerList_f();
-        return;
-    }
-
-    M_PrintWhite((320 / 2) - ((22 * 8) / 2), 64, "No Quake servers found");
-    if ((realtime - searchCompleteTime) < 3.0)
-        return;
-
-    M_Menu_LanConfig_f();
-}
-
-
-void M_Search_Key(keycode_t key) {}

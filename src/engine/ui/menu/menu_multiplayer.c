@@ -28,12 +28,13 @@ void M_Menu_MultiPlayer_f() {
 
 void M_MultiPlayer_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-    qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
+
+    M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
+
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/mp_menu.lmp"));
 
     M_DrawTransPic(54, 32 + _mp_cursor * 20,
-        Draw_CachePic(va("gfx/menudot%i.lmp", curAmimFrame()))
+        Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame()))
     );
 
     if (!(is_anyComAval()))

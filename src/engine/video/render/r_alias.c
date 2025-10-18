@@ -175,11 +175,14 @@ qboolean R_AliasCheckBBox() {
 
             // if one end is clipped and the other isn't, make a new point
             if (pv0->flags ^ pv1->flags) {
-                float frac = (ALIAS_Z_CLIP_PLANE - pa0->fv[2]) /
+                float frac =
+                    (ALIAS_Z_CLIP_PLANE - pa0->fv[2]) /
                     (pa1->fv[2] - pa0->fv[2]);
-                viewaux[numv].fv[0] = pa0->fv[0] +
+                viewaux[numv].fv[0] =
+                    pa0->fv[0] +
                     (pa1->fv[0] - pa0->fv[0]) * frac;
-                viewaux[numv].fv[1] = pa0->fv[1] +
+                viewaux[numv].fv[1] =
+                    pa0->fv[1] +
                     (pa1->fv[1] - pa0->fv[1]) * frac;
                 viewaux[numv].fv[2] = ALIAS_Z_CLIP_PLANE;
                 viewpts[numv].flags = 0;
@@ -235,9 +238,8 @@ R_AliasTransformVector
 ================
 */
 void R_AliasTransformVector(vec3_t in, vec3_t out) {
-    out[0] = DotProduct(in, aliastransform[0]) + aliastransform[0][3];
-    out[1] = DotProduct(in, aliastransform[1]) + aliastransform[1][3];
-    out[2] = DotProduct(in, aliastransform[2]) + aliastransform[2][3];
+    for (int i = 0; i < 3; i++)
+        out[i] = DotProduct(in, aliastransform[i]) + aliastransform[i][3];
 }
 
 

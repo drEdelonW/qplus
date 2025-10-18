@@ -136,3 +136,7 @@ void Key_WriteBindings(FILE* f);
 void Key_SetBinding(keycode_t keynum, cString binding);
 void Key_ClearStates();
 
+bool is_printable(keycode_t symb);
+bool is_digits(keycode_t symb);
+
+

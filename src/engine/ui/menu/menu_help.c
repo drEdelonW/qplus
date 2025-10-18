@@ -5,7 +5,7 @@
 //=============================================================================
 /* HELP MENU */
 
-int  help_page;
+int help_page;
 #define NUM_HELP_PAGES 6
 
 
@@ -19,7 +19,11 @@ void M_Menu_Help_f() {
 
 
 void M_Help_Draw() {
-    M_DrawPic(0, 0, Draw_CachePic(va("gfx/help%i.lmp", help_page)));
+    M_DrawPic(0, 0,
+        Draw_CachePic(
+            va("gfx/help%i.lmp", help_page)
+        )
+    );
 }
 
 

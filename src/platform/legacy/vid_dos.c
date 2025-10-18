@@ -536,8 +536,7 @@ void VID_MenuDraw() {
 	vid_wmodes = 0;
 	nummodes = VID_NumModes();
 
-	p = Draw_CachePic("gfx/vidmodes.lmp");
-	M_DrawPic((320 - p->width) / 2, 4, p);
+	M_DrawPicHC(4, Draw_CachePic("gfx/vidmodes.lmp"));
 
 	for (i = 0; i < nummodes; i++) {
 		if (vid_wmodes < MAX_MODEDESCS) {
@@ -627,7 +626,7 @@ void VID_MenuDraw() {
 		row = 36 + (vid_line % vid_column_size) * 8;
 		column = 8 + (vid_line / vid_column_size) * 13 * 8;
 
-		M_DrawCharacter(column, row, 12 + ((int)(realtime * 4) & 1));
+		M_DrawCharacter(column, row, curSymb());
 	}
 }
 

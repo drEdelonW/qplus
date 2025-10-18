@@ -33,13 +33,9 @@ bool m_entersound;  // play after drawing a frame, so caching
 void (*vid_menudrawfn)();
 void (*vid_menukeyfn)(keycode_t key);
 
-
 bool m_recursiveDraw;
-
 bool m_return_onerror;
 char m_return_reason[32];
-
-
 
 //=============================================================================
 
