@@ -297,9 +297,8 @@ void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip) {
 
                 float f = d0 / (d0 - d1);
                 mVertex_t clipvert;
-                clipvert.position[0] = pv0->position[0] + f * (pv1->position[0] - pv0->position[0]);
-                clipvert.position[1] = pv0->position[1] + f * (pv1->position[1] - pv0->position[1]);
-                clipvert.position[2] = pv0->position[2] + f * (pv1->position[2] - pv0->position[2]);
+                for (int i = 0; i < VECT_DIM; i++)
+                    clipvert.position[i] = pv0->position[i] + f * (pv1->position[i] - pv0->position[i]);
 
                 if (clip->leftedge) {
                     r_leftclipped = true;
@@ -349,7 +348,7 @@ R_RenderFace
 ================
 */
 void R_RenderFace(mSurface_p fa, int clipflags) {
-    mEdge_t tedge;
+    static mEdge_t tedge;
 
     // skip out if no more surfs
     if ((surface_p) >= surf_max) {
@@ -516,7 +515,7 @@ R_RenderBmodelFace
 ================
 */
 void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
-    static mEdge_t  tedge;
+    static mEdge_t tedge;
 
     // skip out if no more surfs
     if (surface_p >= surf_max) {
@@ -617,14 +616,11 @@ R_RenderPoly
 ================
 */
 void R_RenderPoly(mSurface_p fa, int clipflags) {
-    int         s_axis, t_axis;
     mVertex_t   verts[2][100];	//FIXME: do real number
     PolyVert_t  pverts[100];	//FIXME: do real number, safely
 
     // FIXME: clean this up and make it faster
     // FIXME: guard against running out of vertices
-
-    s_axis = t_axis = 0;	// keep compiler happy
 
     // set up clip planes
     ClipPlane_p pclip = NULL;
@@ -698,6 +694,8 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
     // transform and project, remembering the z values at the vertices and
     // r_nearzi, and extract the s and t coordinates at the vertices
     mPlane_p pplane = fa->plane;
+
+    int s_axis, t_axis;
     switch (pplane->type) {
     case PLANE_X:
     case PLANE_ANYX:

@@ -59,9 +59,8 @@ R_EntityRotate
 void R_EntityRotate(vec3_t vec) {
     vec3_t tvec;
     VectorCopy(vec, tvec);
-    vec[0] = DotProduct(entity_rotation[0], tvec);
-    vec[1] = DotProduct(entity_rotation[1], tvec);
-    vec[2] = DotProduct(entity_rotation[2], tvec);
+    for (int i = 0; i < VECT_DIM; i++)
+        vec[i] = DotProduct(entity_rotation[i], tvec);
 }
 
 
@@ -71,7 +70,6 @@ R_RotateBmodel
 ================
 */
 void R_RotateBmodel() {
-    float   angle, s, c;
 
     // TODO: should use a look-up table
     // TODO: should really be stored with the entity instead of being reconstructed
@@ -79,10 +77,10 @@ void R_RotateBmodel() {
     // TODO: share work with R_SetUpAliasTransform
 
     // yaw
-    angle = currententity->angles[YAW];
+    float angle = currententity->angles[YAW];
     angle = angle * M_PI * 2 / 360;
-    s = sin(angle);
-    c = cos(angle);
+    float s = sin(angle);
+    float c = cos(angle);
 
     float temp1[3][3];
     temp1[0][0] = c;    temp1[0][1] = s;    temp1[0][2] = 0;
@@ -146,9 +144,8 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
             splitplane->dist -
             DotProduct(r_entorigin, splitplane->normal)
     };
-    tplane.normal[0] = DotProduct(entity_rotation[0], splitplane->normal);
-    tplane.normal[1] = DotProduct(entity_rotation[1], splitplane->normal);
-    tplane.normal[2] = DotProduct(entity_rotation[2], splitplane->normal);
+    for (int i = 0; i < VECT_DIM; i++)
+        tplane.normal[i] = DotProduct(entity_rotation[i], splitplane->normal);
 
     // clip edges to BSP plane
     for (; pedges; pedges = pnextedge) {
@@ -395,7 +392,7 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
             int* pindex = pfrustum_indexes[i];
 
             {
-                vec3_t  rejectpt = {
+                vec3_t rejectpt = {
                     (float)node->minmaxs[pindex[0]],
                     (float)node->minmaxs[pindex[1]],
                     (float)node->minmaxs[pindex[2]],
@@ -408,7 +405,7 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
             }
 
             {
-                vec3_t  acceptpt = {
+                vec3_t acceptpt = {
                     (float)node->minmaxs[pindex[3 + 0]],
                     (float)node->minmaxs[pindex[3 + 1]],
                     (float)node->minmaxs[pindex[3 + 2]]
@@ -452,18 +449,10 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
 
         double  dot;
         switch (plane->type) {
-        case PLANE_X:
-            dot = modelorg[0] - plane->dist;
-            break;
-        case PLANE_Y:
-            dot = modelorg[1] - plane->dist;
-            break;
-        case PLANE_Z:
-            dot = modelorg[2] - plane->dist;
-            break;
-        default:
-            dot = DotProduct(modelorg, plane->normal) - plane->dist;
-            break;
+        case PLANE_X: dot = modelorg[0] - plane->dist;  break;
+        case PLANE_Y: dot = modelorg[1] - plane->dist;  break;
+        case PLANE_Z: dot = modelorg[2] - plane->dist;  break;
+        default: dot = DotProduct(modelorg, plane->normal) - plane->dist; break;
         }
 
         int side = (dot >= 0) ? 0 : 1;
@@ -473,7 +462,6 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
 
         // draw stuff
         int c = node->numsurfaces;
-
         if (c) {
             mSurface_p surf = cl.worldmodel->surfaces + node->firstsurface;
 

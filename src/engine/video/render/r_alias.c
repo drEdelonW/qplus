@@ -628,10 +628,11 @@ R_AliasDrawModel
 ================
 */
 void R_AliasDrawModel(aLight_p plighting) {
-    FinalVert_t finalverts[MAXALIASVERTS +
-        ((CACHE_SIZE - 1) /
-            sizeof(FinalVert_t)) +
-        1];
+    FinalVert_t finalverts[
+        MAXALIASVERTS +
+            ((CACHE_SIZE - 1) /
+                sizeof(FinalVert_t)) +
+            1];
 
     r_amodels_drawn++;
 
@@ -658,11 +659,11 @@ void R_AliasDrawModel(aLight_p plighting) {
     if (r_affinetridesc.drawtype) {
         D_PolysetUpdateTables();  // FIXME: precalc...
     }
-    else {
 #if id386
+    else {
         D_Aff8Patch(currententity->colormap);
-#endif
     }
+#endif
 
     acolormap = currententity->colormap;
 
