@@ -50,7 +50,7 @@ static qPic_p       _draw_backtile;
 
 typedef struct CachePic_s {
     char  name[MAX_QPATH];
-    cache_user_t cache;
+    CacheUser_t cache;
 } CachePic_t;
 typedef CachePic_t* CachePic_p;
 

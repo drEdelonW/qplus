@@ -331,6 +331,7 @@ void SchedulePollProcedure(PollProcedure* pp, double timeOffset);
 extern bool serialAvailable;
 extern bool ipxAvailable;
 extern bool tcpipAvailable;
+
 extern char my_ipx_address[NET_NAMELEN];
 extern char my_tcpip_address[NET_NAMELEN];
 extern void (*GetComPortConfig)(int32_t portNumber, int32_p port, int32_p irq, int32_p baud, bool* useModem);

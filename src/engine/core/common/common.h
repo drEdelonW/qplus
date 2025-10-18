@@ -72,7 +72,7 @@ void COM_CloseFile(int h);
 uint8_p COM_LoadStackFile(cString path, TypeLess_ptr buffer, int32_t bufsize);
 uint8_p COM_LoadTempFile(cString path);
 uint8_p COM_LoadHunkFile(cString path);
-void COM_LoadCacheFile(cString path, cache_user_p cu);
+void COM_LoadCacheFile(cString path, CacheUser_p cu);
 
 
 extern struct cvar_s registered;

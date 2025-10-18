@@ -115,21 +115,21 @@ void Hunk_Check();
 
 
 //========================[z_cache.c]========================//
-typedef struct cache_user_s {
+typedef struct CacheUser_s {
 	TypeLess_ptr   data;
-} cache_user_t;
-typedef cache_user_t* cache_user_p;
+} CacheUser_t;
+typedef CacheUser_t* CacheUser_p;
 
 
 void Cache_Flush();
 
 // returns the cached data, and moves to the head of the LRU list if present, otherwise returns NULL
-TypeLess_ptr Cache_Check(cache_user_p c);
+TypeLess_ptr Cache_Check(CacheUser_p c);
 
-void Cache_Free(cache_user_p c);
+void Cache_Free(CacheUser_p c);
 
 // Returns NULL if all purgable data was tossed and there still wasn't enough room.
-TypeLess_ptr Cache_Alloc(cache_user_p c, size_t size, cString name);
+TypeLess_ptr Cache_Alloc(CacheUser_p c, size_t size, cString name);
 
 void Cache_Report();
 

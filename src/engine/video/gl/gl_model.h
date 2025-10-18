@@ -72,6 +72,7 @@ typedef struct mPlane_s {
     byte signbits;  // signx + signy<<1 + signz<<1
     byte pad[2];
 } mPlane_t;
+typedef mPlane_t* mPlane_p;
 
 typedef struct Texture_s Texture_t;
 typedef Texture_t* Texture_p;
@@ -107,19 +108,22 @@ typedef struct {
 typedef struct {
     float  vecs[2][4];
     float  mipadjust;
-    Texture_t* texture;
+    Texture_p texture;
     int   flags;
 } mTexInfo_t;
+typedef mTexInfo_t* mTexInfo_p;
 
 #define VERTEXSIZE 7
 
-typedef struct glpoly_s {
-    struct glpoly_s* next;
-    struct glpoly_s* chain;
+typedef struct glpoly_s glpoly_t;
+typedef glpoly_t* glpoly_p;
+struct glpoly_s {
+    glpoly_p next;
+    glpoly_p chain;
     int  numverts;
     int  flags;   // for SURF_UNDERWATER
     float verts[4][VERTEXSIZE]; // variable sized (xyz s1t1 s2t2)
-} glpoly_t;
+} ;
 
 typedef struct mSurface_s {
     int   visframe;  // should be drawn when node is crossed
@@ -135,10 +139,10 @@ typedef struct mSurface_s {
 
     int   light_s, light_t; // gl lightmap coordinates
 
-    glpoly_t* polys;    // multiple if warped
+    glpoly_p polys;    // multiple if warped
     struct mSurface_s* texturechain;
 
-    mTexInfo_t* texinfo;
+    mTexInfo_p texinfo;
 
     // lighting info
     int   dlightframe;
@@ -150,6 +154,7 @@ typedef struct mSurface_s {
     qboolean cached_dlight;    // true if dynamic light in cache
     byte* samples;  // [numstyles*surfsize]
 } mSurface_t;
+typedef mSurface_t* mSurface_p;
 
 typedef struct mNode_s {
     // common with leaf
@@ -181,7 +186,7 @@ typedef struct mLeaf_s {
 
     // leaf specific
     byte* compressed_vis;
-    efrag_t* efrags;
+    efrag_p efrags;
 
     mSurface_p* firstmarksurface;
     int   nummarksurfaces;
@@ -191,7 +196,7 @@ typedef struct mLeaf_s {
 
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
 typedef struct {
-    dClipNode_t* clipnodes;
+    dClipNode_p clipnodes;
     mPlane_p planes;
     int   firstclipnode;
     int   lastclipnode;
@@ -215,16 +220,17 @@ typedef struct mSpriteFrame_s {
     float up, down, left, right;
     int  gl_texturenum;
 } mSpriteFrame_t;
+typedef mSpriteFrame_t* mSpriteFrame_p;
 
 typedef struct {
     int    numframes;
     float_p intervals;
-    mSpriteFrame_t* frames[1];
+    mSpriteFrame_p frames[1];
 } mSpriteGroup_t;
 
 typedef struct {
     SpriteFrameType_t type;
-    mSpriteFrame_t* frameptr;
+    mSpriteFrame_p frameptr;
 } mSpriteFrameDesc_t;
 
 typedef struct {
@@ -302,14 +308,15 @@ typedef struct {
     int     texels[MAX_SKINS]; // only for player skins
     mAliasFrameDesc_t frames[1]; // variable sized
 } AliasHdr_t;
+typedef AliasHdr_t* AliasHdr_p;
 
 #define MAXALIASVERTS 1024
 #define MAXALIASFRAMES 256
 #define MAXALIASTRIS 2048
-extern AliasHdr_t* pheader;
+extern AliasHdr_p pheader;
 extern stvert_t stverts[MAXALIASVERTS];
 extern mTriangle_t triangles[MAXALIASTRIS];
-extern TriVertx_t* poseverts[MAXALIASFRAMES];
+extern TriVertx_p poseverts[MAXALIASFRAMES];
 
 //===================================================================
 
@@ -356,25 +363,25 @@ typedef struct Model_s {
     int   firstmodelsurface, nummodelsurfaces;
 
     int   numsubmodels;
-    dModel_t* submodels;
+    dModel_p submodels;
 
     int   numplanes;
     mPlane_p planes;
 
     int   numleafs;  // number of visible leafs, not counting 0
-    mLeaf_t* leafs;
+    mLeaf_p leafs;
 
     int   numvertexes;
-    mVertex_t* vertexes;
+    mVertex_p vertexes;
 
     int   numedges;
-    mEdge_t* edges;
+    mEdge_p edges;
 
     int   numnodes;
     mNode_p nodes;
 
     int   numtexinfo;
-    mTexInfo_t* texinfo;
+    mTexInfo_p texinfo;
 
     int   numsurfaces;
     mSurface_p surfaces;
@@ -383,7 +390,7 @@ typedef struct Model_s {
     int* surfedges;
 
     int   numclipnodes;
-    dClipNode_t* clipnodes;
+    dClipNode_p clipnodes;
 
     int   nummarksurfaces;
     mSurface_p* marksurfaces;
@@ -391,7 +398,7 @@ typedef struct Model_s {
     Hull_t  hulls[MAX_MAP_HULLS];
 
     int   numtextures;
-    Texture_t** textures;
+    Texture_p* textures;
 
     byte* visdata;
     byte* lightdata;
@@ -400,7 +407,7 @@ typedef struct Model_s {
     //
     // additional model data
     //
-    cache_user_t cache;  // only access through Mod_Extradata
+    CacheUser_t cache;  // only access through Mod_Extradata
 
 } Model_t;
 
@@ -408,11 +415,11 @@ typedef struct Model_s {
 
 void Mod_Init(void);
 void Mod_ClearAll(void);
-Model_t* Mod_ForName(char* name, qboolean crash);
-TypeLess_ptr Mod_Extradata(Model_t* mod); // handles caching
+Model_p Mod_ForName(char* name, qboolean crash);
+TypeLess_ptr Mod_Extradata(Model_p mod); // handles caching
 void Mod_TouchModel(char* name);
 
-mLeaf_t* Mod_PointInLeaf(float_p p, Model_t* model);
-byte* Mod_LeafPVS(mLeaf_t* leaf, Model_t* model);
+mLeaf_p Mod_PointInLeaf(float_p p, Model_p model);
+byte* Mod_LeafPVS(mLeaf_p leaf, Model_p model);
 
 #endif // __MODEL__

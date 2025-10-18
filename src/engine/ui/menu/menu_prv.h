@@ -4,12 +4,31 @@
 #include "keys.h"
 #include "draw.h"
 #include "q_tools.h"
-
+#include "client.h"
+#include "cvar_q1.h"
+#include "common.h"
+#include <string.h>
+#include "server.h"
+#include "sound.h"
+#include "console.h"
+#include "cmd.h"
+#include "host.h"
 
 extern m_state_t m_state;
 extern m_state_t m_return_state;
 extern bool m_entersound; // play after drawing a frame, so caching
 // won't disrupt the sound
+
+extern bool m_recursiveDraw;
+extern bool m_return_onerror;
+extern char m_return_reason[];
+
+int blink(char sym);
+int curAmimFrame();
+int curSymb();
+int inpSymb();
+
+
 void M_DrawTextBox(int x, int y, int width, int lines);
 void M_DrawCharacter(int cx, int line, int num);
 

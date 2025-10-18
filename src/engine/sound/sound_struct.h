@@ -11,7 +11,7 @@ typedef struct {
 
 typedef struct sfx_s {
     char  name[MAX_QPATH];
-    cache_user_t cache;
+    CacheUser_t cache;
 } sfx_t;
 typedef sfx_t* sfx_p;
 

@@ -12,8 +12,27 @@
 
 //=============================================================================
 /* OPTIONS MENU */
+typedef enum {
+    o_force_signed = -1,
+    o_FIRST = 0,
+    o_CostumizeCtrl = o_FIRST,
+    o_GoConsole,
+    o_ResetDefault,
+    o_ScreenSize,
+    o_Brightness,
+    o_MouseSpeed,
+    o_CDVolume,
+    o_SndVolume,
+    o_AlwaysRun,
+    o_InvertMouse,
+    o_LookSpring,
+    o_LookStrafe,
+    o_VideoOptions,
+    o_UseMouse,
 
-static int _options_cursor;
+    o_LAST     //should be last
+} options_e;
+static options_e _cursor;
 // void (*vid_menudrawfn)();
 
 void M_Menu_Options_f() {
@@ -22,34 +41,35 @@ void M_Menu_Options_f() {
     m_entersound = true;
 
 #ifdef _WIN32
-    if ((_options_cursor == 13) &&
+    if ((_cursor == o_UseMouse) &&
         (modestate != MS_WINDOWED)) {
-        _options_cursor = 0;
+        _cursor = o_FIRST;
     }
 #endif
 }
 
+typedef enum {
+    md_left = -1,
+    md_right = 1
+} menuDirection_e;
 
-void M_AdjustSliders(int dir) {
+void M_AdjustSliders(menuDirection_e dir) {
     S_LocalSound("misc/menu3.wav");
 
-    switch (_options_cursor) {
-    case 3: // screen size
-        scr_viewsize.value += dir * 10;
-        CLAMP(30.0f, scr_viewsize.value, 120.0f);
+    switch (_cursor) {
+    case o_ScreenSize: // screen size
+        scr_viewsize.value += dir * 10; CLAMP(30.0f, scr_viewsize.value, 120.0f);
         Cvar_SetValue("viewsize", scr_viewsize.value);
         break;
-    case 4: // gamma
-        v_gamma.value -= dir * 0.05;
-        CLAMP(0.5f, v_gamma.value, 1.0f);
+    case o_Brightness: // gamma
+        v_gamma.value -= dir * 0.05;    CLAMP(0.5f, v_gamma.value, 1.0f);
         Cvar_SetValue("gamma", v_gamma.value);
         break;
-    case 5: // mouse speed
-        sensitivity.value += dir * 0.5;
-        CLAMP(1.0f, sensitivity.value, 11.0f);
+    case o_MouseSpeed: // mouse speed
+        sensitivity.value += dir * 0.5; CLAMP(1.0f, sensitivity.value, 11.0f);
         Cvar_SetValue("sensitivity", sensitivity.value);
         break;
-    case 6: // music volume
+    case o_CDVolume: // music volume
 #ifdef _WIN32
         bgmvolume.value += dir * 1.0f;
 #else
@@ -58,13 +78,12 @@ void M_AdjustSliders(int dir) {
         CLAMP(0.0f, bgmvolume.value, 1.0f);
         Cvar_SetValue("bgmvolume", bgmvolume.value);
         break;
-    case 7: // sfx volume
-        volume.value += dir * 0.1f;
-        CLAMP(0.0f, volume.value, 1.0f);
+    case o_SndVolume: // sfx volume
+        volume.value += dir * 0.1f; CLAMP(0.0f, volume.value, 1.0f);
         Cvar_SetValue("volume", volume.value);
         break;
 
-    case 8: // allways run
+    case o_AlwaysRun: /* allways run */
         if (cl_forwardspeed.value > 200) {
             Cvar_SetValue("cl_forwardspeed", 200);
             Cvar_SetValue("cl_backspeed", 200);
@@ -75,30 +94,22 @@ void M_AdjustSliders(int dir) {
         }
         break;
 
-    case 9: // invert mouse
-        Cvar_SetValue("m_pitch", -m_pitch.value);
-        break;
+    case o_InvertMouse: Cvar_SetValue("m_pitch", -m_pitch.value);       break;
+    case o_LookSpring:  Cvar_SetValue("lookspring", !lookspring.value); break;
+    case o_LookStrafe:  Cvar_SetValue("lookstrafe", !lookstrafe.value); break;
 
-    case 10: // lookspring
-        Cvar_SetValue("lookspring", !lookspring.value);
-        break;
-
-    case 11: // lookstrafe
-        Cvar_SetValue("lookstrafe", !lookstrafe.value);
-        break;
-
-#ifdef _WIN32
-    case 13: // _windowed_mouse
+        // #ifdef _WIN32
+    case o_VideoOptions: // _windowed_mouse
         Cvar_SetValue("_windowed_mouse", !_windowed_mouse.value);
         break;
-#endif
+        // #endif
+    default: break;
     }
 }
 
 void M_Options_Draw() {
     const int col0 = 16;
     const int col1 = 220;
-
     M_DrawTransPic(col0, 4, Draw_CachePic("gfx/qplaque.lmp"));
     qPic_p p = Draw_CachePic("gfx/p_option.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
@@ -124,83 +135,51 @@ void M_Options_Draw() {
     }
 #endif
     // cursor
-    M_DrawCharacter(200, 32 + _options_cursor * CHAR_HEIGHT, 12 + ((int)(realtime * 4) & 1));
+    M_DrawCharacter(200, 32 + _cursor * CHAR_HEIGHT, curSymb());
 }
-
-#ifdef _WIN32
-#   define OPTIONS_ITEMS 14
-#else
-#   define OPTIONS_ITEMS 13
-#endif
 
 void M_Options_Key(keycode_t k) {
     switch (k) {
-    case K_ESCAPE:
-        M_Menu_Main_f();
-        break;
+    case K_ESCAPE:  M_Menu_Main_f();    break;
 
     case K_ENTER:
         m_entersound = true;
-        switch (_options_cursor) {
-        case 0:
-            M_Menu_Keys_f();
-            break;
-        case 1:
-            m_state = m_none;
-            Con_ToggleConsole_f();
-            break;
-        case 2:
-            Cbuf_AddText("exec default.cfg\n");
-            break;
-        case 12:
-            M_Menu_Video_f();
-            break;
-        default:
-            M_AdjustSliders(1);
-            break;
+        switch (_cursor) {
+        case o_CostumizeCtrl:                   M_Menu_Keys_f();                    break;
+        case o_GoConsole:   m_state = m_none;   Con_ToggleConsole_f();              break;
+        case o_ResetDefault:                    Cbuf_AddText("exec default.cfg\n"); break;
+        case o_VideoOptions:                    M_Menu_Video_f();                   break;
+        default:                                M_AdjustSliders(md_right);          break;
         }
         return;
 
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
-        _options_cursor--;
-        if (_options_cursor < 0)
-            _options_cursor = OPTIONS_ITEMS - 1;
+        _cursor--;
+        if (_cursor < o_FIRST)  _cursor = o_LAST - 1;
         break;
 
     case K_DOWNARROW:
         S_LocalSound("misc/menu1.wav");
-        _options_cursor++;
-        if (_options_cursor >= OPTIONS_ITEMS)
-            _options_cursor = 0;
+        _cursor++;
+        if (_cursor >= o_LAST)  _cursor = o_FIRST;
         break;
 
-    case K_LEFTARROW:
-        M_AdjustSliders(-1);
-        break;
-
-    case K_RIGHTARROW:
-        M_AdjustSliders(1);
-        break;
+    case K_LEFTARROW:   M_AdjustSliders(md_left);   break;
+    case K_RIGHTARROW:  M_AdjustSliders(md_right);  break;
     default: break;
     }
 
-    if ((_options_cursor == 12) &&
+    if ((_cursor == o_VideoOptions) &&
         (vid_menudrawfn == NULL)) {
-        if (k == K_UPARROW)
-            _options_cursor = 11;
-        else
-            _options_cursor = 0;
+        _cursor = (k == K_UPARROW) ? o_LookStrafe : o_FIRST;
     }
 
 #ifdef _WIN32
-    if ((_options_cursor == 13) &&
+    if ((_cursor == o_UseMouse) &&
         (modestate != MS_WINDOWED)) {
-        if (k == K_UPARROW)
-            _options_cursor = 12;
-        else
-            _options_cursor = 0;
-    }
+        _cursor = (k == K_UPARROW) ? o_VideoOptions : o_FIRST;
+}
 #endif
 }
 

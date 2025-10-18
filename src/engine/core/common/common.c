@@ -762,7 +762,7 @@ Filename are reletive to the quake directory.
 Allways appends a 0 uint8_t.
 ============
 */
-cache_user_p    loadcache;
+CacheUser_p    loadcache;
 uint8_p loadbuf;
 int             loadsize;
 uint8_p COM_LoadFile(cString path, int usehunk) {
@@ -817,7 +817,7 @@ uint8_p COM_LoadTempFile(cString path) {
     return COM_LoadFile(path, 2);
 }
 
-void COM_LoadCacheFile(cString path, cache_user_p cu) {
+void COM_LoadCacheFile(cString path, CacheUser_p cu) {
     loadcache = cu;
     COM_LoadFile(path, 3);
 }

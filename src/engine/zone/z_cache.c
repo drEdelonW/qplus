@@ -21,7 +21,7 @@ typedef struct cache_system_s cache_system_t;
 typedef cache_system_t* cache_system_p;
 struct cache_system_s {
     size_t          size;   // including this header
-    cache_user_p    user;
+    CacheUser_p    user;
     char            name[16];
     cache_system_p  prev;
     cache_system_p  next;
@@ -257,7 +257,7 @@ void Cache_Init() {
     Frees the memory and removes it from the LRU list
     ==============
 */
-void Cache_Free(cache_user_p c) {
+void Cache_Free(CacheUser_p c) {
     if (!c->data)
         Sys_Error("Cache_Free: not allocated");
 
@@ -279,7 +279,7 @@ void Cache_Free(cache_user_p c) {
     Cache_Check
     ==============
 */
-TypeLess_ptr Cache_Check(cache_user_p c) {
+TypeLess_ptr Cache_Check(CacheUser_p c) {
     if (!c->data)
         return NULL;
 
@@ -298,7 +298,7 @@ TypeLess_ptr Cache_Check(cache_user_p c) {
     Cache_Alloc
     ==============
 */
-TypeLess_ptr Cache_Alloc(cache_user_p c, size_t size, cString name) {
+TypeLess_ptr Cache_Alloc(CacheUser_p c, size_t size, cString name) {
     if (c->data)
         Sys_Error("Cache_Alloc: allready allocated");
 

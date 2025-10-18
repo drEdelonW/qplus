@@ -24,11 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // instead of having the menu code look through their internal tables
 //
 #include "keys.h"
-typedef enum {
-    MNET_IPX = 1,
-    MNET_TCP = 2
-} mnet_type_t;
-
 
 typedef enum {
     m_none,
@@ -54,8 +49,6 @@ typedef enum {
 
 extern m_state_t m_state;
 extern m_state_t m_return_state;
-
-extern int m_activenet;
 
 //
 // menus

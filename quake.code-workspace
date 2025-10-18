@@ -95,7 +95,9 @@
 			"MGRAPH.H": "cpp",
 			"modelgen.h": "c",
 			"model.h": "c",
-			"vid.h": "c"
+			"vid.h": "c",
+			"menu_prv.h": "c",
+			"menu_net.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

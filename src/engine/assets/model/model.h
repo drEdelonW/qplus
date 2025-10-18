@@ -335,7 +335,7 @@ typedef struct Model_s {
     uint8_p lightdata;
     cString entities;
     // additional model data
-    cache_user_t cache;  // only access through Mod_Extradata
+    CacheUser_t cache;  // only access through Mod_Extradata
 
 } Model_t;
 typedef Model_t* Model_p;
