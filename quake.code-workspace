@@ -94,7 +94,8 @@
 			"gl.h": "c",
 			"MGRAPH.H": "cpp",
 			"modelgen.h": "c",
-			"model.h": "c"
+			"model.h": "c",
+			"vid.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

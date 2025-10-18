@@ -243,7 +243,8 @@ void Con_Linefeed() {
     Q_memset(
         &_con_text[
             (_con_current % con_totallines) * _con_linewidth
-        ], ' ', _con_linewidth
+        ],
+        ' ', _con_linewidth
     );
 }
 
@@ -258,11 +259,10 @@ void Con_Linefeed() {
 */
 void Con_Print(cString txt) {
     static bool cr;
-    char    c;
-    int32_t mask;
 
     con_backscroll = 0;
 
+    int32_t mask;
     if (txt[0] == 1) {
         mask = 128;  // go to colored text
         S_LocalSound("misc/talk.wav");
@@ -277,18 +277,18 @@ void Con_Print(cString txt) {
         mask = 0;
     }
 
-
+    char    c;
     while ((c = *txt)) {
         // count word length
         int32_t l = 0;
         for (; l < _con_linewidth; l++) {
-            if (txt[l] <= ' ') {
+            if (txt[l] <= ' ')
                 break;
-            }
         }
 
         // word wrap
-        if ((l != _con_linewidth) && (_con_x + l > _con_linewidth)) {
+        if ((l != _con_linewidth) &&
+            (_con_x + l > _con_linewidth)) {
             _con_x = 0;
         }
 
@@ -336,14 +336,13 @@ void Con_Print(cString txt) {
     ================
 */
 void Con_DebugLog(cString file, cString fmt, ...) {
-    va_list argptr;
     static char data[1024];
-    int fd;
 
+    va_list argptr;
     va_start(argptr, fmt);
     vsprintf(data, fmt, argptr);
     va_end(argptr);
-    fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
+    int fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
     write(fd, data, strlen(data));
     close(fd);
 }
@@ -406,13 +405,12 @@ void Con_Printf(cString fmt, ...) {
     ================
 */
 void Con_DPrintf(cString fmt, ...) {
-    va_list  argptr;
-    char  msg[MAXPRINTMSG];
-
     if (!developer.value) {
         return;   // don't confuse non-developers with techie stuff...
     }
 
+    va_list  argptr;
+    char  msg[MAXPRINTMSG];
     va_start(argptr, fmt);
     vsprintf(msg, fmt, argptr);
     va_end(argptr);
@@ -521,7 +519,7 @@ void Con_DrawNotify() {
             Draw_Character((x + 1) << 3, v, text[x]);
         }
 
-        v += 8;
+        v += CHAR_HEIGHT;
     }
 
     if (key_dest == key_message) {
@@ -536,7 +534,7 @@ void Con_DrawNotify() {
             x++;
         }
         Draw_Character((x + 5) << 3, v, 10 + ((int)(realtime * _con_cursorspeed) & 1));
-        v += 8;
+        v += CHAR_HEIGHT;
     }
 
     if (v > con_notifylines) {
@@ -566,7 +564,7 @@ void Con_DrawConsole(int32_t lines, bool drawinput) {
     int32_t rows = (lines - 16) >> 3;  // rows of text to draw
     int32_t y = lines - 16 - (rows << 3); // may start slightly negative
 
-    for (int32_t i = (_con_current - rows + 1); i <= _con_current; i++, y += 8) {
+    for (int32_t i = (_con_current - rows + 1); i <= _con_current; i++, y += CHAR_HEIGHT) {
         int32_t j = i - con_backscroll;
 
         CLAMP_LESS(j, 0);

@@ -124,7 +124,7 @@ void M_Options_Draw() {
     }
 #endif
     // cursor
-    M_DrawCharacter(200, 32 + _options_cursor * 8, 12 + ((int)(realtime * 4) & 1));
+    M_DrawCharacter(200, 32 + _options_cursor * CHAR_HEIGHT, 12 + ((int)(realtime * 4) & 1));
 }
 
 #ifdef _WIN32

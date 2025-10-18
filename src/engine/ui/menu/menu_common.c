@@ -7,7 +7,81 @@ M_DrawCharacter
 Draws one solid graphics character
 ================
 */
+
 #include "vid.h"
+#include "render.h"
+#include <string.h>
+
+static uint8_t _identityTable[256];
+static uint8_t _translationTable[256];
+
+void M_BuildTranslationTable(int top, int bottom) {
+    for (int i = 0; i < 256; i++)
+        _identityTable[i] = i;
+
+    uint8_p dest = _translationTable;
+    uint8_p source = _identityTable;
+    memcpy(dest, source, 256);
+
+    if (top < 128) // the artists made some backwards ranges.  sigh.
+        memcpy(dest + TOP_RANGE, source + top, 16);
+    else
+        for (int i = 0; i < 16; i++)
+            dest[TOP_RANGE + i] = source[top + 15 - i];
+
+    if (bottom < 128)
+        memcpy(dest + BOTTOM_RANGE, source + bottom, 16);
+    else
+        for (int i = 0; i < 16; i++)
+            dest[BOTTOM_RANGE + i] = source[bottom + 15 - i];
+}
+
+
+void M_DrawTransPicTranslate(int x, int y, qPic_p pic) {
+    Draw_TransPicTranslate(x + ((vid.width - 320) >> 1), y, pic, _translationTable);
+}
+
+
+void M_DrawTextBox(int x, int y, int width, int lines) {
+    // draw left side
+    int cx = x;
+    int cy = y;
+    M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tl.lmp"));
+    qPic_p p = Draw_CachePic("gfx/box_ml.lmp");
+    for (int n = 0; n < lines; n++) {
+        cy += CHAR_HEIGHT;
+        M_DrawTransPic(cx, cy, p);
+    }
+    M_DrawTransPic(cx, cy + CHAR_HEIGHT, Draw_CachePic("gfx/box_bl.lmp"));
+
+    // draw middle
+    cx += 8;
+    while (width > 0) {
+        cy = y;
+        M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tm.lmp"));
+        p = Draw_CachePic("gfx/box_mm.lmp");
+        for (int n = 0; n < lines; n++) {
+            cy += CHAR_HEIGHT;
+            if (n == 1)
+                p = Draw_CachePic("gfx/box_mm2.lmp");
+            M_DrawTransPic(cx, cy, p);
+        }
+        M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_bm.lmp"));
+        width -= 2;
+        cx += 16;
+    }
+
+    // draw right side
+    cy = y;
+    M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tr.lmp"));
+    p = Draw_CachePic("gfx/box_mr.lmp");
+    for (int n = 0; n < lines; n++) {
+        cy += CHAR_HEIGHT;
+        M_DrawTransPic(cx, cy, p);
+    }
+    M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_br.lmp"));
+}
+
 void M_DrawCharacter(int cx, int line, int num) {
     Draw_Character(cx + ((vid.width - 320) >> 1), line, num);
 }
@@ -24,7 +98,7 @@ void M_Print(int cx, int cy, cString str) {
     while (*str) {
         M_DrawCharacter(cx, cy, (*str) + 128);
         str++;
-        cx += 8;
+        cx += CHAR_WIDTH;
     }
 }
 
@@ -32,7 +106,7 @@ void M_PrintWhite(int cx, int cy, cString str) {
     while (*str) {
         M_DrawCharacter(cx, cy, *str);
         str++;
-        cx += 8;
+        cx += CHAR_WIDTH;
     }
 }
 
@@ -41,18 +115,21 @@ void M_PrintWhite(int cx, int cy, cString str) {
 void M_DrawSlider(int x, int y, float range) {
     CLAMP(0.0f, range, 1.0f);
 
-    M_DrawCharacter(x - 8, y, 128);
+    M_DrawCharacter(x - CHAR_WIDTH, y, 128);
     int i = 0;
     for (; i < SLIDER_RANGE; i++)
-        M_DrawCharacter(x + i * 8, y, 129);
-    M_DrawCharacter(x + i * 8, y, 130);
-    M_DrawCharacter(x + (SLIDER_RANGE - 1) * 8 * range, y, 131);
+        M_DrawCharacter(x + i * CHAR_WIDTH, y, 129);
+    M_DrawCharacter(x + i * CHAR_WIDTH, y, 130);
+    M_DrawCharacter(x + (SLIDER_RANGE - 1) * CHAR_WIDTH * range, y, 131);
 }
 
 
 void M_DrawCheckbox(int x, int y, int on) {
+    M_Print(x, y, (on) ?
 #if 0
-    M_Print(x, y, (on) ? 131 : 129);
+        131 : 129
+#else
+        "on" : "off"
 #endif
-    M_Print(x, y, (on) ? "on" : "off");
+    );
 }

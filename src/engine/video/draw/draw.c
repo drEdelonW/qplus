@@ -36,26 +36,26 @@ qPic_p draw_disc;
 
 typedef struct {
     vRect_t rect;
-    int  width;
-    int  height;
-    uint8_p ptexbytes;
-    int  rowbytes;
-} rectdesc_t;
-static rectdesc_t r_rectdesc;
-static uint8_p _draw_chars;    // 8*8 graphic characters
-static qPic_p _draw_backtile;
+    int     width;
+    int     height;
+    uint8_p pTexBytes;
+    int     rowBytes;
+} RectDesc_t;
+static RectDesc_t   _rRectDesc;
+static uint8_p      _draw_chars;    // 8*8 graphic characters
+static qPic_p       _draw_backtile;
 
 //=============================================================================
 /* Support Routines */
 
-typedef struct cachepic_s {
+typedef struct CachePic_s {
     char  name[MAX_QPATH];
     cache_user_t cache;
-} cachepic_t;
-typedef cachepic_t* cachepic_p;
+} CachePic_t;
+typedef CachePic_t* CachePic_p;
 
 #define MAX_CACHED_PICS  128
-static cachepic_t _menu_cachepics[MAX_CACHED_PICS];
+static CachePic_t _menu_cachepics[MAX_CACHED_PICS];
 static int _menu_numcachepics;
 
 
@@ -69,7 +69,7 @@ Draw_CachePic
 ================
 */
 qPic_p Draw_CachePic(cString path) {
-    cachepic_p pic = _menu_cachepics;
+    CachePic_p pic = _menu_cachepics;
     int i = 0;
     for (; i < _menu_numcachepics; pic++, i++)
         if (!strcmp(path, pic->name))
@@ -113,10 +113,10 @@ void Draw_Init() {
     draw_disc = W_GetLumpName("disc");
     _draw_backtile = W_GetLumpName("backtile");
 
-    r_rectdesc.width = _draw_backtile->width;
-    r_rectdesc.height = _draw_backtile->height;
-    r_rectdesc.ptexbytes = _draw_backtile->data;
-    r_rectdesc.rowbytes = _draw_backtile->width;
+    _rRectDesc.width = _draw_backtile->width;
+    _rRectDesc.height = _draw_backtile->height;
+    _rRectDesc.pTexBytes = _draw_backtile->data;
+    _rRectDesc.rowBytes = _draw_backtile->width;
 }
 
 
@@ -137,9 +137,12 @@ void Draw_Character(int x, int y, int num) {
         return;   // totally off screen
 
 #ifdef PARANOID
-    if (y > vid.height - 8 || x < 0 || x > vid.width - 8)
+    if ((y > vid.height - 80) ||
+        (x < 0) ||
+        (x > vid.width - 8))
         Sys_Error("Con_DrawCharacter: (%i, %i)", x, y);
-    if (num < 0 || num > 255)
+    if ((num < 0) ||
+        (num > 255))
         Sys_Error("Con_DrawCharacter: char %i", num);
 #endif
 
@@ -161,22 +164,9 @@ void Draw_Character(int x, int y, int num) {
         uint8_p dest = vid.conbuffer + y * vid.conrowbytes + x;
 
         while (drawline--) {
-            if (source[0])
-                dest[0] = source[0];
-            if (source[1])
-                dest[1] = source[1];
-            if (source[2])
-                dest[2] = source[2];
-            if (source[3])
-                dest[3] = source[3];
-            if (source[4])
-                dest[4] = source[4];
-            if (source[5])
-                dest[5] = source[5];
-            if (source[6])
-                dest[6] = source[6];
-            if (source[7])
-                dest[7] = source[7];
+            for (int i = 0; i < 8; i++)
+                if (source[i])
+                    dest[i] = source[i];
             source += 128;
             dest += vid.conrowbytes;
         }
@@ -187,22 +177,9 @@ void Draw_Character(int x, int y, int num) {
             ((uint8_p)vid.conbuffer + y * vid.conrowbytes + (x << 1));
 
         while (drawline--) {
-            if (source[0])
-                pusdest[0] = d_8to16table[source[0]];
-            if (source[1])
-                pusdest[1] = d_8to16table[source[1]];
-            if (source[2])
-                pusdest[2] = d_8to16table[source[2]];
-            if (source[3])
-                pusdest[3] = d_8to16table[source[3]];
-            if (source[4])
-                pusdest[4] = d_8to16table[source[4]];
-            if (source[5])
-                pusdest[5] = d_8to16table[source[5]];
-            if (source[6])
-                pusdest[6] = d_8to16table[source[6]];
-            if (source[7])
-                pusdest[7] = d_8to16table[source[7]];
+            for (int i = 0; i < 8; i++)
+                if (source[i])
+                    pusdest[i] = d_8to16table[source[i]];
 
             source += 128;
             pusdest += (vid.conrowbytes >> 1);
@@ -246,14 +223,9 @@ void Draw_DebugChar(char num) {
     uint8_p dest = vid.direct + 312;
 
     while (drawline--) {
-        dest[0] = source[0];
-        dest[1] = source[1];
-        dest[2] = source[2];
-        dest[3] = source[3];
-        dest[4] = source[4];
-        dest[5] = source[5];
-        dest[6] = source[6];
-        dest[7] = source[7];
+        for (int i = 0; i < 8; i++)
+            dest[i] = source[i];
+
         source += 128;
         dest += 320;
     }
@@ -266,9 +238,10 @@ Draw_Pic
 */
 void Draw_Pic(int x, int y, qPic_p pic) {
     if ((x < 0) ||
-        ((x + pic->width) > vid.width) ||
         (y < 0) ||
-        ((y + pic->height) > vid.height)) {
+        ((x + pic->width) > vid.width) ||
+        ((y + pic->height) > vid.height)
+        ) {
         Sys_Error("Draw_Pic: bad coordinates %i/%i-%i/%i", x, y, pic->width, pic->height);
     }
 
@@ -305,19 +278,21 @@ Draw_TransPic
 =============
 */
 void Draw_TransPic(int x, int y, qPic_p pic) {
-    uint8_t tbyte;
+    if (!pic)
+        return;
+
     if ((x < 0) ||
-        ((uint32_t)(x + pic->width) > vid.width) ||
         (y < 0) ||
-        ((uint32_t)(y + pic->height) > vid.height)) {
+        ((uint32_t)(x + pic->width) > vid.width) ||
+        ((uint32_t)(y + pic->height) > vid.height)
+        ) {
         Sys_Error("Draw_TransPic: bad coordinates");
     }
-
     uint8_p source = pic->data;
 
     if (r_pixbytes == 1) {
         uint8_p dest = vid.buffer + y * vid.rowbytes + x;
-
+        uint8_t tbyte;
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u++)
@@ -331,22 +306,10 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
         else { // unwound
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u += 8) {
-                    if ((tbyte = source[u]) != TRANSPARENT_COLOR)
-                        dest[u] = tbyte;
-                    if ((tbyte = source[u + 1]) != TRANSPARENT_COLOR)
-                        dest[u + 1] = tbyte;
-                    if ((tbyte = source[u + 2]) != TRANSPARENT_COLOR)
-                        dest[u + 2] = tbyte;
-                    if ((tbyte = source[u + 3]) != TRANSPARENT_COLOR)
-                        dest[u + 3] = tbyte;
-                    if ((tbyte = source[u + 4]) != TRANSPARENT_COLOR)
-                        dest[u + 4] = tbyte;
-                    if ((tbyte = source[u + 5]) != TRANSPARENT_COLOR)
-                        dest[u + 5] = tbyte;
-                    if ((tbyte = source[u + 6]) != TRANSPARENT_COLOR)
-                        dest[u + 6] = tbyte;
-                    if ((tbyte = source[u + 7]) != TRANSPARENT_COLOR)
-                        dest[u + 7] = tbyte;
+                    for (int i = 0; i < 8; i++)
+                        if ((tbyte = source[u + i]) != TRANSPARENT_COLOR)
+                            dest[u + i] = tbyte;
+
                 }
                 dest += vid.rowbytes;
                 source += pic->width;
@@ -359,8 +322,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
-                tbyte = source[u];
-
+                uint8_t tbyte = source[u];
                 if (tbyte != TRANSPARENT_COLOR) {
                     pusdest[u] = d_8to16table[tbyte];
                 }
@@ -380,22 +342,25 @@ Draw_TransPicTranslate
 */
 void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
     uint8_t tbyte;
+    if (!pic)
+        return;
 
-    if (x < 0 || (uint32_t)(x + pic->width) > vid.width || y < 0 ||
-        (uint32_t)(y + pic->height) > vid.height) {
+    if ((x < 0) ||
+        (y < 0) ||
+        ((uint32_t)(x + pic->width) > vid.width) ||
+        (uint32_t)(y + pic->height) > vid.height
+        ) {
         Sys_Error("Draw_TransPic: bad coordinates");
     }
 
     uint8_p source = pic->data;
-
     if (r_pixbytes == 1) {
         uint8_p dest = vid.buffer + y * vid.rowbytes + x;
 
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u++)
-                    if ((tbyte = source[u]) != TRANSPARENT_COLOR)
-                        dest[u] = translation[tbyte];
+                    if ((tbyte = source[u]) != TRANSPARENT_COLOR)       dest[u] = translation[tbyte];
 
                 dest += vid.rowbytes;
                 source += pic->width;
@@ -403,24 +368,11 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
         }
         else { // unwound
             for (int v = 0; v < pic->height; v++) {
-                for (int u = 0; u < pic->width; u += 8) {
-                    if ((tbyte = source[u]) != TRANSPARENT_COLOR)
-                        dest[u] = translation[tbyte];
-                    if ((tbyte = source[u + 1]) != TRANSPARENT_COLOR)
-                        dest[u + 1] = translation[tbyte];
-                    if ((tbyte = source[u + 2]) != TRANSPARENT_COLOR)
-                        dest[u + 2] = translation[tbyte];
-                    if ((tbyte = source[u + 3]) != TRANSPARENT_COLOR)
-                        dest[u + 3] = translation[tbyte];
-                    if ((tbyte = source[u + 4]) != TRANSPARENT_COLOR)
-                        dest[u + 4] = translation[tbyte];
-                    if ((tbyte = source[u + 5]) != TRANSPARENT_COLOR)
-                        dest[u + 5] = translation[tbyte];
-                    if ((tbyte = source[u + 6]) != TRANSPARENT_COLOR)
-                        dest[u + 6] = translation[tbyte];
-                    if ((tbyte = source[u + 7]) != TRANSPARENT_COLOR)
-                        dest[u + 7] = translation[tbyte];
-                }
+                for (int u = 0; u < pic->width; u += 8)
+                    for (int i = 0; i < 8; i++)
+                        if ((tbyte = source[u + i]) != TRANSPARENT_COLOR)
+                            dest[u + i] = translation[tbyte];
+
                 dest += vid.rowbytes;
                 source += pic->width;
             }
@@ -452,7 +404,6 @@ void Draw_CharToConback(int num, uint8_p dest) {
     uint8_p source = _draw_chars + (row << 10) + (col << 3);
 
     int drawline = 8;
-
     while (drawline--) {
         for (int x = 0; x < 8; x++)
             if (source[x])
@@ -556,9 +507,8 @@ void R_DrawRect8(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
         for (int i = 0; i < prect->height; i++) {
             for (int j = 0; j < prect->width; j++) {
                 uint8_t t = *psrc;
-                if (t != TRANSPARENT_COLOR) {
+                if (t != TRANSPARENT_COLOR)
                     *pdest = t;
-                }
 
                 psrc++;
                 pdest++;
@@ -597,9 +547,9 @@ void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
         for (int i = 0; i < prect->height; i++) {
             for (int j = 0; j < prect->width; j++) {
                 t = *psrc;
-                if (t != TRANSPARENT_COLOR) {
+                if (t != TRANSPARENT_COLOR)
                     *pdest = d_8to16table[t];
-                }
+
 
                 psrc++;
                 pdest++;
@@ -633,49 +583,48 @@ refresh window.
 =============
 */
 void Draw_TileClear(int x, int y, int w, int h) {
-    vRect_t   vr;
 
-    r_rectdesc.rect.x = x;
-    r_rectdesc.rect.y = y;
-    r_rectdesc.rect.width = w;
-    r_rectdesc.rect.height = h;
+    _rRectDesc.rect.x = x;
+    _rRectDesc.rect.y = y;
+    _rRectDesc.rect.width = w;
+    _rRectDesc.rect.height = h;
 
-    vr.y = r_rectdesc.rect.y;
-    int height = r_rectdesc.rect.height;
+    vRect_t vr = { .y = _rRectDesc.rect.y };
+    int height = _rRectDesc.rect.height;
 
-    int tileoffsety = vr.y % r_rectdesc.height;
+    int tileoffsety = vr.y % _rRectDesc.height;
 
     while (height > 0) {
-        vr.x = r_rectdesc.rect.x;
-        int width = r_rectdesc.rect.width;
+        vr.x = _rRectDesc.rect.x;
+        int width = _rRectDesc.rect.width;
 
         if (tileoffsety != 0)
-            vr.height = r_rectdesc.height - tileoffsety;
+            vr.height = _rRectDesc.height - tileoffsety;
         else
-            vr.height = r_rectdesc.height;
+            vr.height = _rRectDesc.height;
 
         if (vr.height > height)
             vr.height = height;
 
-        int tileoffsetx = vr.x % r_rectdesc.width;
+        int tileoffsetx = vr.x % _rRectDesc.width;
 
         while (width > 0) {
             if (tileoffsetx != 0)
-                vr.width = r_rectdesc.width - tileoffsetx;
+                vr.width = _rRectDesc.width - tileoffsetx;
             else
-                vr.width = r_rectdesc.width;
+                vr.width = _rRectDesc.width;
 
             if (vr.width > width)
                 vr.width = width;
 
-            uint8_p psrc = r_rectdesc.ptexbytes +
-                (tileoffsety * r_rectdesc.rowbytes) + tileoffsetx;
+            uint8_p psrc = _rRectDesc.pTexBytes +
+                (tileoffsety * _rRectDesc.rowBytes) + tileoffsetx;
 
             if (r_pixbytes == 1) {
-                R_DrawRect8(&vr, r_rectdesc.rowbytes, psrc, 0);
+                R_DrawRect8(&vr, _rRectDesc.rowBytes, psrc, 0);
             }
             else {
-                R_DrawRect16(&vr, r_rectdesc.rowbytes, psrc, 0);
+                R_DrawRect16(&vr, _rRectDesc.rowBytes, psrc, 0);
             }
 
             vr.x += vr.width;

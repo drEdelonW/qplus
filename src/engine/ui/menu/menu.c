@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "menu_prv.h"
 #include "cvar_q1.h"
 #include "common.h"
-
+#include <string.h>
 
 #ifdef _WIN32
 #   include "winquake.h"
@@ -48,76 +48,6 @@ char m_return_reason[32];
 #define IPXConfig       (m_net_cursor == 2)
 #define TCPIPConfig     (m_net_cursor == 3)
 
-uint8_t identityTable[256];
-uint8_t translationTable[256];
-
-#include <string.h>
-#include "render.h"
-void M_BuildTranslationTable(int top, int bottom) {
-    for (int j = 0; j < 256; j++)
-        identityTable[j] = j;
-    uint8_p dest = translationTable;
-    uint8_p source = identityTable;
-    memcpy(dest, source, 256);
-
-    if (top < 128) // the artists made some backwards ranges.  sigh.
-        memcpy(dest + TOP_RANGE, source + top, 16);
-    else
-        for (int j = 0; j < 16; j++)
-            dest[TOP_RANGE + j] = source[top + 15 - j];
-
-    if (bottom < 128)
-        memcpy(dest + BOTTOM_RANGE, source + bottom, 16);
-    else
-        for (int j = 0; j < 16; j++)
-            dest[BOTTOM_RANGE + j] = source[bottom + 15 - j];
-}
-
-
-void M_DrawTransPicTranslate(int x, int y, qPic_p pic) {
-    Draw_TransPicTranslate(x + ((vid.width - 320) >> 1), y, pic, translationTable);
-}
-
-
-void M_DrawTextBox(int x, int y, int width, int lines) {
-    // draw left side
-    int cx = x;
-    int cy = y;
-    M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tl.lmp"));
-    qPic_p p = Draw_CachePic("gfx/box_ml.lmp");
-    for (int n = 0; n < lines; n++) {
-        cy += 8;
-        M_DrawTransPic(cx, cy, p);
-    }
-    M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_bl.lmp"));
-
-    // draw middle
-    cx += 8;
-    while (width > 0) {
-        cy = y;
-        M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tm.lmp"));
-        p = Draw_CachePic("gfx/box_mm.lmp");
-        for (int n = 0; n < lines; n++) {
-            cy += 8;
-            if (n == 1)
-                p = Draw_CachePic("gfx/box_mm2.lmp");
-            M_DrawTransPic(cx, cy, p);
-        }
-        M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_bm.lmp"));
-        width -= 2;
-        cx += 16;
-    }
-
-    // draw right side
-    cy = y;
-    M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tr.lmp"));
-    p = Draw_CachePic("gfx/box_mr.lmp");
-    for (int n = 0; n < lines; n++) {
-        cy += 8;
-        M_DrawTransPic(cx, cy, p);
-    }
-    M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_br.lmp"));
-}
 
 //=============================================================================
 
@@ -728,10 +658,9 @@ void M_Menu_Net_f() {
 
 void M_Net_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+
     qPic_p p = Draw_CachePic("gfx/p_multi.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
-
-    int f = 32;
 
     if (serialAvailable) {
         p = Draw_CachePic("gfx/netmen1.lmp");
@@ -744,42 +673,30 @@ void M_Net_Draw() {
 #endif
     }
 
+    int f = 32;
     if (p)
         M_DrawTransPic(72, f, p);
 
-    f += 19;
-
-    if (serialAvailable) {
-        p = Draw_CachePic("gfx/netmen2.lmp");
-    }
-    else {
+    M_DrawTransPic(72, f += 19,
+        (serialAvailable) ?
+        Draw_CachePic("gfx/netmen2.lmp") :
 #ifdef _WIN32
-        p = NULL;
+        NULL
 #else
-        p = Draw_CachePic("gfx/dim_drct.lmp");
+        Draw_CachePic("gfx/dim_drct.lmp")
 #endif
-    }
+    );
 
-    if (p)
-        M_DrawTransPic(72, f, p);
+    M_DrawTransPic(72, f += 19, Draw_CachePic((ipxAvailable) ?
+        "gfx/netmen3.lmp" : "gfx/dim_ipx.lmp")
+    );
 
-    f += 19;
-    if (ipxAvailable)
-        p = Draw_CachePic("gfx/netmen3.lmp");
-    else
-        p = Draw_CachePic("gfx/dim_ipx.lmp");
-    M_DrawTransPic(72, f, p);
-
-    f += 19;
-    if (tcpipAvailable)
-        p = Draw_CachePic("gfx/netmen4.lmp");
-    else
-        p = Draw_CachePic("gfx/dim_tcp.lmp");
-    M_DrawTransPic(72, f, p);
+    M_DrawTransPic(72, f += 19, Draw_CachePic((tcpipAvailable) ?
+        "gfx/netmen4.lmp" : "gfx/dim_tcp.lmp")
+    );
 
     if (m_net_items == 5) { // JDC, could just be removed
-        f += 19;
-        M_DrawTransPic(72, f, Draw_CachePic("gfx/netmen5.lmp"));
+        M_DrawTransPic(72, f += 19, Draw_CachePic("gfx/netmen5.lmp"));
     }
 
     f = (320 - 26 * 8) / 2;
@@ -790,8 +707,13 @@ void M_Net_Draw() {
     M_Print(f, 158, net_helpMessage[m_net_cursor * 4 + 2]);
     M_Print(f, 166, net_helpMessage[m_net_cursor * 4 + 3]);
 
-    f = (int)(host_time * 10) % 6;
-    M_DrawTransPic(54, 32 + m_net_cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", f + 1)));
+    M_DrawTransPic(
+        54, 32 + m_net_cursor * 20,
+        Draw_CachePic(
+            va("gfx/menudot%i.lmp",
+                ((int)(host_time * 10) % 6) + 1)
+        )
+    );
 }
 
 
