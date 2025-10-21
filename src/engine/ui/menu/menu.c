@@ -19,6 +19,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "menu.h"
 #include "menu_prv.h"
+#include "console.h"
+#include "cmd.h"
+#include "vid.h"
+#include "screen.h"
 
 
 #ifdef _WIN32

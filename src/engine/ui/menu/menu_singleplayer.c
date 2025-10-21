@@ -1,5 +1,7 @@
 #include "menu.h"
 #include "menu_prv.h"
+#include "server.h"
+
 //=============================================================================
 /* SINGLE PLAYER MENU */
 

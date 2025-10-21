@@ -1,5 +1,11 @@
 #include "menu.h"
 #include "menu_prv.h"
+#include "enginedefs.h"
+#include <string.h>
+#include "common.h"
+#include "server.h"
+#include "cmd.h"
+
 
 //=============================================================================
 /* LOAD/SAVE MENU */

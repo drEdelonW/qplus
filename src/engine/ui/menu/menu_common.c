@@ -1,4 +1,10 @@
 #include "menu_prv.h"
+#include "vid.h"
+#include "render.h"
+#include <string.h>
+#include "q_tools.h"
+#include "host.h"
+#include "server.h"
 
 /*
 ================
@@ -8,9 +14,7 @@ Draws one solid graphics character
 ================
 */
 
-#include "vid.h"
-#include "render.h"
-#include <string.h>
+
 
 static uint8_t _identityTable[256];
 static uint8_t _translationTable[256];

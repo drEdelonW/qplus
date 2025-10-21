@@ -1,6 +1,7 @@
 #include "menu.h"
 #include "menu_prv.h"
-
+#include "net.h"
+#include "host.h"
 
 
 //=============================================================================

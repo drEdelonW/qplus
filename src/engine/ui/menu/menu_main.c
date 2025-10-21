@@ -1,5 +1,6 @@
 #include "menu.h"
 #include "menu_prv.h"
+#include "client.h"
 //=============================================================================
 /* MAIN MENU */
 

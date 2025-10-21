@@ -1,5 +1,8 @@
 #include "menu.h"
 #include "menu_prv.h"
+#include "server.h"
+#include "cvar_q1.h"
+#include "host.h"
 
 //=============================================================================
 /* GAME OPTIONS MENU */
