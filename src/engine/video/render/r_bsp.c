@@ -33,20 +33,24 @@ vec3_t      modelorg, base_modelorg;
 vec3_t      r_entorigin; // the currently rendering entity in world
 // coordinates
 
-float   entity_rotation[3][3];
+vec3_t  entity_rotation[3];
 vec3_t  r_worldmodelorg;
 int     r_currentbkey;
 
-typedef enum { touchessolid, drawnode, nodrawnode } solidstate_t;
+typedef enum {
+    touchessolid,
+    drawnode,
+    nodrawnode
+} solidstate_t;
 
 #define MAX_BMODEL_VERTS 500   // 6K
 #define MAX_BMODEL_EDGES 1000  // 12K
 
-static mVertex_p    pbverts;
-static bEdge_p      pbedges;
-static int          numbverts, numbedges;
-static mVertex_p    pfrontenter, pfrontexit;
-static qboolean     makeclippededge;
+static mVertex_p    _pbVerts;
+static bEdge_p      _pbEdges;
+static int          _numbVerts, _numbEges;
+static mVertex_p    _pFrontEnter, _pFrontExit;
+static qboolean     _makeClippedEdge;
 
 
 //===========================================================================
@@ -134,7 +138,7 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
     bEdge_p psideedges[2], pnextedge;
 
     psideedges[0] = psideedges[1] = NULL;
-    makeclippededge = false;
+    _makeClippedEdge = false;
 
     // transform the BSP plane into model space
     // FIXME: cache these?
@@ -164,12 +168,12 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
 
         if (side != lastside) {
             // clipped
-            if (numbverts >= MAX_BMODEL_VERTS)
+            if (_numbVerts >= MAX_BMODEL_VERTS)
                 return;
 
             // generate the clipped vertex
             float frac = lastdist / (lastdist - dist);
-            mVertex_p ptvert = &pbverts[numbverts++];
+            mVertex_p ptvert = &_pbVerts[_numbVerts++];
             ptvert->position[0] =
                 plastvert->position[0] +
                 frac * (pvert->position[0] -
@@ -186,33 +190,33 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
             // split into two edges, one on each side, and remember entering
             // and exiting points
             // FIXME: share the clip edge by having a winding direction flag?
-            if (numbedges >= (MAX_BMODEL_EDGES - 1)) {
+            if (_numbEges >= (MAX_BMODEL_EDGES - 1)) {
                 Con_Printf("Out of edges for bmodel\n");
                 return;
             }
 
-            bEdge_p ptedge = &pbedges[numbedges];
+            bEdge_p ptedge = &_pbEdges[_numbEges];
             ptedge->pnext = psideedges[lastside];
             psideedges[lastside] = ptedge;
             ptedge->v[0] = plastvert;
             ptedge->v[1] = ptvert;
 
-            ptedge = &pbedges[numbedges + 1];
+            ptedge = &_pbEdges[_numbEges + 1];
             ptedge->pnext = psideedges[side];
             psideedges[side] = ptedge;
             ptedge->v[0] = ptvert;
             ptedge->v[1] = pvert;
 
-            numbedges += 2;
+            _numbEges += 2;
 
             if (side == 0) {
                 // entering for front, exiting for back
-                pfrontenter = ptvert;
-                makeclippededge = true;
+                _pFrontEnter = ptvert;
+                _makeClippedEdge = true;
             }
             else {
-                pfrontexit = ptvert;
-                makeclippededge = true;
+                _pFrontExit = ptvert;
+                _makeClippedEdge = true;
             }
         }
         else {
@@ -224,25 +228,25 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
 
     // if anything was clipped, reconstitute and add the edges along the clip
     // plane to both sides (but in opposite directions)
-    if (makeclippededge) {
-        if (numbedges >= (MAX_BMODEL_EDGES - 2)) {
+    if (_makeClippedEdge) {
+        if (_numbEges >= (MAX_BMODEL_EDGES - 2)) {
             Con_Printf("Out of edges for bmodel\n");
             return;
         }
 
-        bEdge_p ptedge = &pbedges[numbedges];
+        bEdge_p ptedge = &_pbEdges[_numbEges];
         ptedge->pnext = psideedges[0];
         psideedges[0] = ptedge;
-        ptedge->v[0] = pfrontexit;
-        ptedge->v[1] = pfrontenter;
+        ptedge->v[0] = _pFrontExit;
+        ptedge->v[1] = _pFrontEnter;
 
-        ptedge = &pbedges[numbedges + 1];
+        ptedge = &_pbEdges[_numbEges + 1];
         ptedge->pnext = psideedges[1];
         psideedges[1] = ptedge;
-        ptedge->v[0] = pfrontenter;
-        ptedge->v[1] = pfrontexit;
+        ptedge->v[0] = _pFrontEnter;
+        ptedge->v[1] = _pFrontExit;
 
-        numbedges += 2;
+        _numbEges += 2;
     }
 
     // draw or recurse further
@@ -300,14 +304,14 @@ void R_DrawSolidClippedSubmodelPolygons(Model_p pmodel) {
             // FIXME: if edges and vertices get caches, these assignments must move
             // outside the loop, and overflow checking must be done here
             mVertex_t bverts[MAX_BMODEL_VERTS];
-            pbverts = bverts;
+            _pbVerts = bverts;
             bEdge_t bedges[MAX_BMODEL_EDGES];
-            pbedges = bedges;
-            numbverts = numbedges = 0;
+            _pbEdges = bedges;
+            _numbVerts = _numbEges = 0;
 
             if (psurf->numedges > 0) {
-                bEdge_p pbedge = &bedges[numbedges];
-                numbedges += psurf->numedges;
+                bEdge_p pbedge = &bedges[_numbEges];
+                _numbEges += psurf->numedges;
 
                 int j = 0;
                 for (; j < psurf->numedges; j++) {

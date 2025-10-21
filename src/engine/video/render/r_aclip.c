@@ -170,14 +170,10 @@ int R_AliasClip(FinalVert_p in, FinalVert_p out, int flag, int count, alias_clip
         if (oldflags ^ flags) {
             clip_fn(&in[j], &in[i], &out[k]);
             out[k].flags = 0;
-            if (out[k].v[0] < r_refdef.aliasvrect.x)
-                out[k].flags |= ALIAS_LEFT_CLIP;
-            if (out[k].v[1] < r_refdef.aliasvrect.y)
-                out[k].flags |= ALIAS_TOP_CLIP;
-            if (out[k].v[0] > r_refdef.aliasvrectright)
-                out[k].flags |= ALIAS_RIGHT_CLIP;
-            if (out[k].v[1] > r_refdef.aliasvrectbottom)
-                out[k].flags |= ALIAS_BOTTOM_CLIP;
+            if (out[k].v[0] < r_refdef.aliasvrect.x)    out[k].flags |= ALIAS_LEFT_CLIP;
+            if (out[k].v[1] < r_refdef.aliasvrect.y)    out[k].flags |= ALIAS_TOP_CLIP;
+            if (out[k].v[0] > r_refdef.aliasvrectright) out[k].flags |= ALIAS_RIGHT_CLIP;
+            if (out[k].v[1] > r_refdef.aliasvrectbottom) out[k].flags |= ALIAS_BOTTOM_CLIP;
             k++;
         }
         if (!flags) {

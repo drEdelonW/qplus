@@ -74,6 +74,7 @@ D_DrawSolidSurface
 
 void D_DrawSolidSurface(Surf_p surf, int color) {
     int pix = (color << 24) | (color << 16) | (color << 8) | color;
+
     for (eSpan_p span = surf->spans; span; span = span->pnext) {
         uint8_p pdest = (uint8_p)d_viewbuffer + screenwidth * span->v;
         int u = span->u;
@@ -165,60 +166,60 @@ void D_DrawSurfaces() {
 
     // TODO: could preset a lot of this at mode set time
     if (r_drawflat.value) {
-        for (Surf_p s = &surfaces[1]; s < surface_p; s++) {
-            if (!s->spans)
+        for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++) {
+            if (!surf->spans)
                 continue;
 
-            d_zistepu = s->d_zistepu;
-            d_zistepv = s->d_zistepv;
-            d_ziorigin = s->d_ziorigin;
+            d_zistepu = surf->d_zistepu;
+            d_zistepv = surf->d_zistepv;
+            d_ziorigin = surf->d_ziorigin;
 
-            // D_DrawSolidSurface(s, (int)s->data & 0xFF);
-            D_DrawSolidSurface(s, (int)((uintptr_t)s->data & 0xFF));
-            D_DrawZSpans(s->spans);
+            // D_DrawSolidSurface(surf, (int)surf->data & 0xFF);
+            D_DrawSolidSurface(surf, (int)((uintptr_t)surf->data & 0xFF));
+            D_DrawZSpans(surf->spans);
         }
     }
     else {
-        for (Surf_p s = &surfaces[1]; s < surface_p; s++) {
-            if (!s->spans)
+        for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++) {
+            if (!surf->spans)
                 continue;
 
             r_drawnpolycount++;
 
-            d_zistepu = s->d_zistepu;
-            d_zistepv = s->d_zistepv;
-            d_ziorigin = s->d_ziorigin;
+            d_zistepu = surf->d_zistepu;
+            d_zistepv = surf->d_zistepv;
+            d_ziorigin = surf->d_ziorigin;
 
-            if (s->flags & SURF_DRAWSKY) {
+            if (surf->flags & SURF_DRAWSKY) {
                 if (!r_skymade) {
                     R_MakeSky();
                 }
 
-                D_DrawSkyScans8(s->spans);
-                D_DrawZSpans(s->spans);
+                D_DrawSkyScans8(surf->spans);
+                D_DrawZSpans(surf->spans);
             }
-            else if (s->flags & SURF_DRAWBACKGROUND) {
+            else if (surf->flags & SURF_DRAWBACKGROUND) {
                 // set up a gradient for the background surface that places it
                 // effectively at infinity distance from the viewpoint
                 d_zistepu = 0;
                 d_zistepv = 0;
                 d_ziorigin = -0.9;
 
-                D_DrawSolidSurface(s, (int)r_clearcolor.value & 0xFF);
-                D_DrawZSpans(s->spans);
+                D_DrawSolidSurface(surf, (int)r_clearcolor.value & 0xFF);
+                D_DrawZSpans(surf->spans);
             }
-            else if (s->flags & SURF_DRAWTURB) {
-                mSurface_p pface = s->data;
+            else if (surf->flags & SURF_DRAWTURB) {
+                mSurface_p pface = surf->data;
                 _miplevel = 0;
                 cacheblock = (pixel_p)
                     ((uint8_p)pface->texinfo->texture +
                         pface->texinfo->texture->offsets[0]);
                 cachewidth = 64;
 
-                if (s->insubmodel) {
+                if (surf->insubmodel) {
                     // FIXME: we don't want to do all this for every polygon!
                     // TODO: store once at start of frame
-                    currententity = s->entity; //FIXME: make this passed in to
+                    currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel ()
                     vec3_t local_modelorg;
                     VectorSubtract(r_origin, currententity->origin,
@@ -230,10 +231,10 @@ void D_DrawSurfaces() {
                 }
 
                 D_CalcGradients(pface);
-                Turbulent8(s->spans);
-                D_DrawZSpans(s->spans);
+                Turbulent8(surf->spans);
+                D_DrawZSpans(surf->spans);
 
-                if (s->insubmodel) {
+                if (surf->insubmodel) {
                     //
                     // restore the old drawing state
                     // FIXME: we don't want to do this every time!
@@ -250,10 +251,10 @@ void D_DrawSurfaces() {
                 }
             }
             else {
-                if (s->insubmodel) {
+                if (surf->insubmodel) {
                     // FIXME: we don't want to do all this for every polygon!
                     // TODO: store once at start of frame
-                    currententity = s->entity; //FIXME: make this passed in to
+                    currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel ()
                     vec3_t local_modelorg;
                     VectorSubtract(r_origin, currententity->origin, local_modelorg);
@@ -263,9 +264,9 @@ void D_DrawSurfaces() {
                     // make entity passed in
                 }
 
-                mSurface_p pface = s->data;
+                mSurface_p pface = surf->data;
                 _miplevel = D_MipLevelForScale(
-                    s->nearzi * scale_for_mip *
+                    surf->nearzi * scale_for_mip *
                     pface->texinfo->mipadjust
                 );
 
@@ -277,11 +278,11 @@ void D_DrawSurfaces() {
 
                 D_CalcGradients(pface);
 
-                (*d_drawspans) (s->spans);
+                (*d_drawspans) (surf->spans);
 
-                D_DrawZSpans(s->spans);
+                D_DrawZSpans(surf->spans);
 
-                if (s->insubmodel) {
+                if (surf->insubmodel) {
                     //
                     // restore the old drawing state
                     // FIXME: we don't want to do this every time!
