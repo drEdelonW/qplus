@@ -61,23 +61,16 @@ Memory is cleared / released when a server or client begins, not when they end.
 */
 
 QuakeParms_t host_parms;
-
-bool host_initialized;		// true if into command execution
-
+bool host_initialized;  // true if into command execution
 double host_frametime;
 double host_time;
-double realtime;				// without any filtering or bounding
-double oldrealtime;			// last frame run
+double realtime;    // without any filtering or bounding
+double oldrealtime;   // last frame run
 int32_t host_framecount;
-
 int host_hunklevel;
-
 int minimum_memory;
-
-client_p host_client;			// current client
-
-jmp_buf 	host_abortserver;
-
+client_p host_client;   // current client
+jmp_buf  host_abortserver;
 uint8_p host_basepal;
 uint8_p host_colormap;
 
@@ -89,24 +82,20 @@ Host_EndGame
 ================
 */
 void Host_EndGame(cString message, ...) {
-    va_list		argptr;
-    char		string[1024];
+    va_list  argptr;
+    char  string[1024];
 
     va_start(argptr, message);
     vsprintf(string, message, argptr);
     va_end(argptr);
     Con_DPrintf("Host_EndGame: %s\n", string);
 
-    if (sv.active)
-        Host_ShutdownServer(false);
+    if (sv.active)  Host_ShutdownServer(false);
 
-    if (cls.state == ca_dedicated)
-        Sys_Error("Host_EndGame: %s\n", string);	// dedicated servers exit
+    if (cls.state == ca_dedicated)  Sys_Error("Host_EndGame: %s\n", string); // dedicated servers exit
 
-    if (cls.demonum != -1)
-        CL_NextDemo();
-    else
-        CL_Disconnect();
+    if (cls.demonum != -1)  CL_NextDemo();
+    else                    CL_Disconnect();
 
     longjmp(host_abortserver, 1);
 }
@@ -119,26 +108,23 @@ This shuts down both the client and server
 ================
 */
 void Host_Error(cString error, ...) {
-    va_list		argptr;
-    char		string[1024];
-    static	bool inerror = false;
+    static bool inerror = false;
+    va_list  argptr;
+    char  string[1024];
 
-    if (inerror)
-        Sys_Error("Host_Error: recursively entered");
+    if (inerror)    Sys_Error("Host_Error: recursively entered");
     inerror = true;
 
-    SCR_EndLoadingPlaque();		// reenable screen updates
+    SCR_EndLoadingPlaque();  // reenable screen updates
 
     va_start(argptr, error);
     vsprintf(string, error, argptr);
     va_end(argptr);
     Con_Printf("Host_Error: %s\n", string);
 
-    if (sv.active)
-        Host_ShutdownServer(false);
+    if (sv.active)  Host_ShutdownServer(false);
 
-    if (cls.state == ca_dedicated)
-        Sys_Error("Host_Error: %s\n", string);	// dedicated servers exit
+    if (cls.state == ca_dedicated)  Sys_Error("Host_Error: %s\n", string); // dedicated servers exit
 
     CL_Disconnect();
     cls.demonum = -1;
@@ -154,30 +140,22 @@ Host_FindMaxClients
 ================
 */
 void Host_FindMaxClients() {
-    int param;
-
     svs.maxclients = 1;
 
-    param = COM_CheckParm("-dedicated");
+    int param = COM_CheckParm("-dedicated");
     if (param) {
         cls.state = ca_dedicated;
-        if (param != (com_argc - 1)) {
-            svs.maxclients = Q_atoi(com_argv[param + 1]);
-        }
-        else
-            svs.maxclients = 8;
+        if (param != (com_argc - 1))    svs.maxclients = Q_atoi(com_argv[param + 1]);
+        else                            svs.maxclients = 8;
     }
-    else
-        cls.state = ca_disconnected;
+    else        cls.state = ca_disconnected;
 
     param = COM_CheckParm("-listen");
     if (param) {
-        if (cls.state == ca_dedicated)
-            Sys_Error("Only one of -dedicated or -listen can be specified");
-        if (param != (com_argc - 1))
-            svs.maxclients = Q_atoi(com_argv[param + 1]);
-        else
-            svs.maxclients = 8;
+        if (cls.state == ca_dedicated)  Sys_Error("Only one of -dedicated or -listen can be specified");
+
+        if (param != (com_argc - 1))    svs.maxclients = Q_atoi(com_argv[param + 1]);
+        else                            svs.maxclients = 8;
     }
     if (svs.maxclients < 1)
         svs.maxclients = 8;
@@ -189,10 +167,8 @@ void Host_FindMaxClients() {
         svs.maxclientslimit = 4;
     svs.clients = Hunk_AllocName(svs.maxclientslimit * sizeof(client_t), "clients");
 
-    if (svs.maxclients > 1)
-        Cvar_SetValue("deathmatch", 1.0);
-    else
-        Cvar_SetValue("deathmatch", 0.0);
+    if (svs.maxclients > 1) Cvar_SetValue("deathmatch", 1.0);
+    else                    Cvar_SetValue("deathmatch", 0.0);
 }
 
 
@@ -226,7 +202,7 @@ void Host_InitLocal() {
 
     Host_FindMaxClients();
 
-    host_time = 1.0;		// so a think at time 0 won't get called
+    host_time = 1.0;  // so a think at time 0 won't get called
 }
 
 
@@ -264,8 +240,8 @@ FIXME: make this just a stuffed echo?
 =================
 */
 void SV_ClientPrintf(cString fmt, ...) {
-    va_list		argptr;
-    char		string[1024];
+    va_list  argptr;
+    char  string[1024];
 
     va_start(argptr, fmt);
     vsprintf(string, fmt, argptr);
@@ -283,8 +259,8 @@ Sends text to all active clients
 =================
 */
 void SV_BroadcastPrintf(cString fmt, ...) {
-    va_list		argptr;
-    char		string[1024];
+    va_list  argptr;
+    char  string[1024];
 
     va_start(argptr, fmt);
     vsprintf(string, fmt, argptr);
@@ -305,8 +281,8 @@ Send text over to the client to be executed
 =================
 */
 void Host_ClientCommands(cString fmt, ...) {
-    va_list		argptr;
-    char		string[1024];
+    va_list  argptr;
+    char  string[1024];
 
     va_start(argptr, fmt);
     vsprintf(string, fmt, argptr);
@@ -325,10 +301,6 @@ if (crash = true), don't bother sending signofs
 =====================
 */
 void SV_DropClient(bool crash) {
-    int		saveSelf;
-    int		i;
-    client_p client;
-
     if (!crash) {
         // send any final messages (don't check for errors)
         if (NET_CanSendMessage(host_client->netconnection)) {
@@ -339,7 +311,7 @@ void SV_DropClient(bool crash) {
         if (host_client->edict && host_client->spawned) {
             // call the prog function for removing a client
             // this will set the body to a dead frame, among other things
-            saveSelf = pr_global_struct->self;
+            int saveSelf = pr_global_struct->self;
             pr_global_struct->self = EDICT_TO_PROG(host_client->edict);
             PR_ExecuteProgram(pr_global_struct->ClientDisconnect);
             pr_global_struct->self = saveSelf;
@@ -359,9 +331,9 @@ void SV_DropClient(bool crash) {
     net_activeconnections--;
 
     // send notification to all clients
-    for (i = 0, client = svs.clients; i < svs.maxclients; i++, client++) {
-        if (!client->active)
-            continue;
+    client_p client = svs.clients;
+    for (int i = 0; i < svs.maxclients; i++, client++) {
+        if (!client->active)    continue;
         MSG_WriteByte(&client->message, svc_updatename);
         MSG_WriteByte(&client->message, host_client - svs.clients);
         MSG_WriteString(&client->message, "");
@@ -382,25 +354,23 @@ This only happens at the end of a game, not between levels
 ==================
 */
 void Host_ShutdownServer(bool crash) {
-    int		i;
-    int		count;
-    sizebuf_t	buf;
-    uint8_t		message[4];
+    int  count;
+    sizebuf_t buf;
+    uint8_t  message[4];
 
-    if (!sv.active)
-        return;
+    if (!sv.active) return;
 
     sv.active = false;
 
     // stop all client sounds immediately
-    if (cls.state == ca_connected)
-        CL_Disconnect();
+    if (cls.state == ca_connected)  CL_Disconnect();
 
     // flush any pending messages - like the score!!!
     double start = Sys_FloatTime();
     do {
         count = 0;
-        for (i = 0, host_client = svs.clients; i < svs.maxclients; i++, host_client++) {
+        host_client = svs.clients;
+        for (int i = 0; i < svs.maxclients; i++, host_client++) {
             if (host_client->active && host_client->message.cursize) {
                 if (NET_CanSendMessage(host_client->netconnection)) {
                     NET_SendMessage(host_client->netconnection, &host_client->message);
@@ -412,8 +382,7 @@ void Host_ShutdownServer(bool crash) {
                 }
             }
         }
-        if ((Sys_FloatTime() - start) > 3.0)
-            break;
+        if ((Sys_FloatTime() - start) > 3.0)    break;
     } while (count);
 
     // make sure all the clients know we're disconnecting
@@ -425,7 +394,8 @@ void Host_ShutdownServer(bool crash) {
     if (count)
         Con_Printf("Host_ShutdownServer: NET_SendToAll failed for %u clients\n", count);
 
-    for (i = 0, host_client = svs.clients; i < svs.maxclients; i++, host_client++)
+    host_client = svs.clients;
+    for (int i = 0; i < svs.maxclients; i++, host_client++)
         if (host_client->active)
             SV_DropClient(crash);
 
@@ -472,14 +442,14 @@ bool Host_FilterTime(float time) {
     realtime += time;
 
     if (!cls.timedemo && ((realtime - oldrealtime) < (1.0 / 72.0)))
-        return false;		// framerate is too high
+        return false;  // framerate is too high
 
     host_frametime = realtime - oldrealtime;
     oldrealtime = realtime;
 
     if (host_framerate.value > 0)
         host_frametime = host_framerate.value;
-    else {	// don't allow really long or int16_t frames
+    else { // don't allow really long or int16_t frames
         if (host_frametime > 0.1)
             host_frametime = 0.1;
         if (host_frametime < 0.001)
@@ -538,7 +508,7 @@ void Host_ServerFrame() {
     // check for new clients
     SV_CheckForNewClients();
 
-    float	save_host_frametime;
+    float save_host_frametime;
     float temp_host_frametime = save_host_frametime = host_frametime;
     while (temp_host_frametime > (1.0 / 72.0)) {
         if (temp_host_frametime > 0.05)
@@ -557,25 +527,24 @@ void Host_ServerFrame() {
 #else
 
 void Host_ServerFrame() {
-    // run the world state
-    pr_global_struct->frametime = host_frametime;
+    pr_global_struct->frametime = host_frametime;   // run the world state
 
-    // set the time and clear the general datagram
-    SV_ClearDatagram();
+    SV_ClearDatagram();     // set the time and clear the general datagram
 
-    // check for new clients
-    SV_CheckForNewClients();
+    SV_CheckForNewClients();    // check for new clients
 
-    // read client messages
-    SV_RunClients();
+    SV_RunClients();    // read client messages
 
     // move things around and think
     // always pause in single player if in console or menus
-    if (!sv.paused && ((svs.maxclients > 1) || (key_dest == key_game)))
+    if (!sv.paused &&
+        (
+            (svs.maxclients > 1) ||
+            (key_dest == key_game))
+        )
         SV_Physics();
 
-    // send all messages to the clients
-    SV_SendClientMessages();
+    SV_SendClientMessages(); // send all messages to the clients
 }
 
 #endif
@@ -589,35 +558,29 @@ Runs all active servers
 ==================
 */
 void _Host_Frame(float time) {
-    static double		time1 = 0;
-    static double		time2 = 0;
-    static double		time3 = 0;
-    int			pass1, pass2, pass3;
+    static double  time1 = 0;
+    static double  time2 = 0;
+    static double  time3 = 0;
+    int   pass1, pass2, pass3;
 
     if (setjmp(host_abortserver))
-        return;			// something bad happened, or the server disconnected
+        return;   // something bad happened, or the server disconnected
 
-    // keep the random time dependent
-    rand();
+    rand(); // keep the random time dependent
 
     // decide the simulation time
-    if (!Host_FilterTime(time))
-        return;			// don't run too fast, or packets will flood out
+    if (!Host_FilterTime(time)) return; // don't run too fast, or packets will flood out
 
-    // get new key events
-    Sys_SendKeyEvents();
+    Sys_SendKeyEvents();    // get new key events
 
-    // allow mice or other external controllers to add commands
-    IN_Commands();
+    IN_Commands();  // allow mice or other external controllers to add commands
 
-    // process console commands
-    Cbuf_Execute();
+    Cbuf_Execute(); // process console commands
 
     NET_Poll();
 
     // if running the server locally, make intentions now
-    if (sv.active)
-        CL_SendCmd();
+    if (sv.active)  CL_SendCmd();
 
     //-------------------
     //
@@ -628,8 +591,7 @@ void _Host_Frame(float time) {
     // check for commands typed to the host
     Host_GetConsoleCommands();
 
-    if (sv.active)
-        Host_ServerFrame();
+    if (sv.active)  Host_ServerFrame();
 
     //-------------------
     //
@@ -639,24 +601,20 @@ void _Host_Frame(float time) {
 
     // if running the server remotely, send intentions now after
     // the incoming messages have been read
-    if (!sv.active)
-        CL_SendCmd();
+    if (!sv.active) CL_SendCmd();
 
     host_time += host_frametime;
 
     // fetch results from server
-    if (cls.state == ca_connected) {
-        CL_ReadFromServer();
-    }
+    if (cls.state == ca_connected)  CL_ReadFromServer();
+
 
     // update video
-    if (host_speeds.value)
-        time1 = Sys_FloatTime();
+    if (host_speeds.value)  time1 = Sys_FloatTime();
 
     SCR_UpdateScreen();
 
-    if (host_speeds.value)
-        time2 = Sys_FloatTime();
+    if (host_speeds.value)  time2 = Sys_FloatTime();
 
     // update audio
     if (cls.signon == SIGNONS) {
@@ -681,13 +639,10 @@ void _Host_Frame(float time) {
 }
 
 void Host_Frame(float time) {
-    static double	timetotal;
-    static int		timecount;
+    static double timetotal;
+    static int  timecount;
 
-    if (!serverprofile.value) {
-        _Host_Frame(time);
-        return;
-    }
+    if (!serverprofile.value) { _Host_Frame(time); return; }
 
     double time1 = Sys_FloatTime();
     _Host_Frame(time);
@@ -715,12 +670,10 @@ void Host_Frame(float time) {
 
 
 extern int vcrFile;
-#define	VCR_SIGNATURE	0x56435231
+#define VCR_SIGNATURE 0x56435231
 // "VCR1"
 
 void Host_InitVCR(QuakeParms_p parms) {
-    int		i, len, n;
-    cString p;
 
     if (COM_CheckParm("-playback")) {
         if (com_argc != 2)
@@ -730,6 +683,7 @@ void Host_InitVCR(QuakeParms_p parms) {
         if (vcrFile == -1)
             Sys_Error("playback file not found\n");
 
+        int i;
         Sys_FileRead(vcrFile, &i, sizeof(int));
         if (i != VCR_SIGNATURE)
             Sys_Error("Invalid signature in vcr file\n");
@@ -737,9 +691,10 @@ void Host_InitVCR(QuakeParms_p parms) {
         Sys_FileRead(vcrFile, &com_argc, sizeof(int));
         com_argv = malloc(com_argc * sizeof(cString));
         com_argv[0] = parms->argv[0];
-        for (i = 0; i < com_argc; i++) {
+        for (int i = 0; i < com_argc; i++) {
+            int len;
             Sys_FileRead(vcrFile, &len, sizeof(int));
-            p = malloc(len);
+            cString p = malloc(len);
             Sys_FileRead(vcrFile, p, len);
             com_argv[i + 1] = p;
         }
@@ -748,23 +703,30 @@ void Host_InitVCR(QuakeParms_p parms) {
         parms->argv = com_argv;
     }
 
+    int n;
     if ((n = COM_CheckParm("-record")) != 0) {
         vcrFile = Sys_FileOpenWrite("quake.vcr");
 
-        i = VCR_SIGNATURE;
-        Sys_FileWrite(vcrFile, &i, sizeof(int));
-        i = com_argc - 1;
-        Sys_FileWrite(vcrFile, &i, sizeof(int));
-        for (i = 1; i < com_argc; i++) {
-            if (i == n) {
-                len = 10;
+        {
+            int i = VCR_SIGNATURE;
+            Sys_FileWrite(vcrFile, &i, sizeof(int));
+        }
+
+        {
+            int i = com_argc - 1;
+            Sys_FileWrite(vcrFile, &i, sizeof(int));
+            for (int i = 1; i < com_argc; i++) {
+                if (i == n) {
+                    int len;
+                    len = 10;
+                    Sys_FileWrite(vcrFile, &len, sizeof(int));
+                    Sys_FileWrite(vcrFile, "-playback", len);
+                    continue;
+                }
+                int len = Q_strlen(com_argv[i]) + 1;
                 Sys_FileWrite(vcrFile, &len, sizeof(int));
-                Sys_FileWrite(vcrFile, "-playback", len);
-                continue;
+                Sys_FileWrite(vcrFile, com_argv[i], len);
             }
-            len = Q_strlen(com_argv[i]) + 1;
-            Sys_FileWrite(vcrFile, &len, sizeof(int));
-            Sys_FileWrite(vcrFile, com_argv[i], len);
         }
     }
 
@@ -777,10 +739,7 @@ Host_Init
 */
 void Host_Init(QuakeParms_p parms) {
 
-    if (standard_quake)
-        minimum_memory = MINIMUM_MEMORY;
-    else
-        minimum_memory = MINIMUM_MEMORY_LEVELPAK;
+    minimum_memory = (standard_quake) ? MINIMUM_MEMORY : MINIMUM_MEMORY_LEVELPAK;
 
     if (COM_CheckParm("-minmemory"))
         parms->memsize = minimum_memory;
@@ -813,15 +772,13 @@ void Host_Init(QuakeParms_p parms) {
     Con_Printf("Exe: "__TIME__" "__DATE__"\n");
     Con_Printf("%4.1f megabyte heap\n", parms->memsize / (1024 * 1024.0));
 
-    R_InitTextures();		// needed even for dedicated servers
+    R_InitTextures();  // needed even for dedicated servers
 
     if (cls.state != ca_dedicated) {
         host_basepal = (uint8_p)COM_LoadHunkFile("gfx/palette.lmp");
-        if (!host_basepal)
-            Sys_Error("Couldn't load gfx/palette.lmp");
+        if (!host_basepal)  Sys_Error("Couldn't load gfx/palette.lmp");
         host_colormap = (uint8_p)COM_LoadHunkFile("gfx/colormap.lmp");
-        if (!host_colormap)
-            Sys_Error("Couldn't load gfx/colormap.lmp");
+        if (!host_colormap) Sys_Error("Couldn't load gfx/colormap.lmp");
 
 #ifndef _WIN32 // on non win32, mouse comes before video for security reasons
         IN_Init();
@@ -831,18 +788,18 @@ void Host_Init(QuakeParms_p parms) {
         Draw_Init();
         SCR_Init();
         R_Init();
-#ifndef	_WIN32
+#ifndef _WIN32
         // on Win32, sound initialization has to come before video initialization, so we
         // can put up a popup if the sound hardware is in use
         S_Init();
 #else
 
-#ifdef	GLQUAKE
+#ifdef GLQUAKE
         // FIXME: doesn't use the new one-window approach yet
         S_Init();
 #endif
 
-#endif	// _WIN32
+#endif // _WIN32
         CDAudio_Init();
         Sbar_Init();
         CL_Init();
@@ -873,10 +830,7 @@ to run quit through here before the final handoff to the sys code.
 void Host_Shutdown() {
     static bool isdown = false;
 
-    if (isdown) {
-        printf("recursive shutdown\n");
-        return;
-    }
+    if (isdown) { printf("recursive shutdown\n"); return; }
     isdown = true;
 
     // keep Con_Printf from trying to update the screen
@@ -889,8 +843,6 @@ void Host_Shutdown() {
     S_Shutdown();
     IN_Shutdown();
 
-    if (cls.state != ca_dedicated) {
-        VID_Shutdown();
-    }
+    if (cls.state != ca_dedicated) { VID_Shutdown(); }
 }
 

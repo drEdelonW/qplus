@@ -399,24 +399,19 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_t* msg) {
         // ignore if not touching a PV leaf
         if (ent != clent) {	// clent is ALLWAYS sent
             // ignore ents without visible models
-            if (!ent->v.modelindex || !pr_strings[ent->v.model])
-                continue;
+            if (!ent->v.modelindex || !pr_strings[ent->v.model])    continue;
 
             int i;
             for (i = 0; i < ent->num_leafs; i++)
-                if (pvs[ent->leafnums[i] >> 3] & (1 << (ent->leafnums[i] & 7)))
-                    break;
+                if (pvs[ent->leafnums[i] >> 3] & (1 << (ent->leafnums[i] & 7))) break;
 
             if (i == ent->num_leafs) continue;		// not visible
         }
 
-        if (msg->maxsize - msg->cursize < 16) {
-            Con_Printf("packet overflow\n");
-            return;
-        }
+        if (msg->maxsize - msg->cursize < 16) { Con_Printf("packet overflow\n"); return; }
 
         // send an update
-        int bits = 0;
+        uint16_t bits = 0;
 
         for (int i = 0; i < VECT_DIM; i++) {
             float miss = ent->v.origin[i] - ent->baseline.origin[i];
@@ -427,11 +422,11 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_t* msg) {
         if (ent->v.angles[1] != ent->baseline.angles[1])    bits |= U_ANGLE2;
         if (ent->v.angles[2] != ent->baseline.angles[2])    bits |= U_ANGLE3;
         if (ent->v.movetype == MOVETYPE_STEP)               bits |= U_NOLERP;	// don't mess up the step animation
-        if (ent->baseline.colormap != ent->v.colormap)      bits |= U_COLORMAP;
-        if (ent->baseline.skin != ent->v.skin)              bits |= U_SKIN;
-        if (ent->baseline.frame != ent->v.frame)            bits |= U_FRAME;
-        if (ent->baseline.effects != ent->v.effects)        bits |= U_EFFECTS;
-        if (ent->baseline.modelindex != ent->v.modelindex)  bits |= U_MODEL;
+        if (ent->v.colormap != ent->baseline.colormap)      bits |= U_COLORMAP;
+        if (ent->v.skin != ent->baseline.skin)              bits |= U_SKIN;
+        if (ent->v.frame != ent->baseline.frame)            bits |= U_FRAME;
+        if (ent->v.effects != ent->baseline.effects)        bits |= U_EFFECTS;
+        if (ent->v.modelindex != ent->baseline.modelindex)  bits |= U_MODEL;
         if (e >= 256)                                       bits |= U_LONGENTITY;
         if (bits >= 256)                                    bits |= U_MOREBITS;
 
