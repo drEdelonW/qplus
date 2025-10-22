@@ -39,7 +39,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct {
     vec3_t viewangles;
-
     // intended velocities
     float forwardmove;
     float sidemove;
@@ -51,15 +50,15 @@ typedef struct {
 typedef UserCmd_t* UserCmd_p;
 
 typedef struct {
-    int32_t  length;
-    char map[MAX_STYLESTRING];
+    int32_t length;
+    char    map[MAX_STYLESTRING];
 } LightStyle_t;
 
 typedef struct {
-    char name[MAX_SCOREBOARDNAME];
-    float entertime;
-    int32_t  frags;
-    int32_t  colors;   // two 4 bit fields
+    char    name[MAX_SCOREBOARDNAME];
+    float   entertime;
+    int32_t frags;
+    int32_t colors;   // two 4 bit fields
     uint8_t translations[VID_GRADES * 256];
 } ScoreBoard_t;
 typedef ScoreBoard_t* ScoreBoard_p;
@@ -151,7 +150,7 @@ typedef struct {
 
     // connection information
     int32_t     signon;   // 0 to SIGNONS
-    qsocket_p netcon;
+    qsocket_p   netcon;
     sizebuf_t   message;  // writing buffer to send to server
 
 } ClientStatic_t;
@@ -195,8 +194,8 @@ typedef struct {
     float   driftmove;
     double  laststop;
 
-    float  viewheight;
-    float  crouch;   // local amount for smoothing stepups
+    float   viewheight;
+    float   crouch;   // local amount for smoothing stepups
 
     bool    paused;   // send over by server
     bool    onground;
@@ -215,7 +214,7 @@ typedef struct {
     // information that is static for the entire time connected to a server
     //
     Model_p model_precache[MAX_MODELS];
-    sfx_p sound_precache[MAX_SOUNDS];
+    sfx_p   sound_precache[MAX_SOUNDS];
 
     char    levelname[40]; // for display on solo scoreboard
     int32_t viewentity;  // cl_entitites[cl.viewentity] = player
