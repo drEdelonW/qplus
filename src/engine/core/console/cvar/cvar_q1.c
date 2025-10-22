@@ -146,7 +146,7 @@ CVAR(r_drawentities, "1");
 CVAR(r_drawviewmodel, "1");
 CVAR_NAMED(r_aliasstats, "r_polymodelstats", "0");
 CVAR(r_dspeeds, "0");
-CVAR(r_drawflat, "0");
+CVAR_ARC(r_drawflat, "0");
 CVAR(r_ambient, "0");
 CVAR(r_reportsurfout, "0");
 CVAR(r_maxsurfs, "0");

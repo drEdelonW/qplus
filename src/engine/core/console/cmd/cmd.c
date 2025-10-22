@@ -38,8 +38,8 @@ void Cmd_ForwardToServer();
 
 #define CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/
 
-int32_t     trashtest;
-int32_t* trashspot;
+int32_t trashtest;
+int32_p trashspot;
 
 bool cmd_wait;
 
@@ -134,17 +134,14 @@ void Cbuf_InsertText(cString text) {
     ============
 */
 void Cbuf_Execute() {
-    int32_t  i;
-    cString text;
-    char line[1024];
-    int32_t  quotes;
 
     while (cmd_text.cursize) {
         // find a \n or ; line break
-        text = (cString)cmd_text.data;
+        cString text = (cString)cmd_text.data;
 
-        quotes = 0;
-        for (i = 0; i < cmd_text.cursize; i++) {
+        uint8_t quotes = 0;
+        int i = 0;
+        for (; i < cmd_text.cursize; i++) {
             if (text[i] == '"')
                 quotes++;
             if (((!(quotes & 1)) &&
@@ -155,6 +152,7 @@ void Cbuf_Execute() {
         }
 
 
+        char line[1024];
         memcpy(line, text, i);
         line[i] = 0;
 
@@ -496,8 +494,7 @@ bool Cmd_Exists(cString cmd_name) {
 cString Cmd_CompleteCommand(cString partial) {
     int len = Q_strlen(partial);
 
-    if (!len)
-        return NULL;
+    if (!len) return NULL;
 
     // check functions
     for (cmd_function_p cmd = cmd_functions; cmd; cmd = cmd->next) {

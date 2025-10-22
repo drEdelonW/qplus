@@ -247,9 +247,11 @@ void CL_PrintEntities_f() {
             "%s:%2i  (%5.1f,%5.1f,%5.1f) [%5.1f %5.1f %5.1f]\n",
             ent->model->name,
             ent->frame,
+
             ent->origin[0],
             ent->origin[1],
             ent->origin[2],
+
             ent->angles[0],
             ent->angles[1],
             ent->angles[2]
@@ -414,9 +416,7 @@ void CL_RelinkEntities() {
 
     cl_numvisedicts = 0;
 
-    //
     // interpolate player info
-    //
     for (int i = 0; i < VECT_DIM; i++)
         cl.velocity[i] = cl.mvelocity[1][i] +
         frac * (cl.mvelocity[0][i] - cl.mvelocity[1][i]);
@@ -533,14 +533,10 @@ void CL_RelinkEntities() {
         }
 #endif
 
-        if (ent->model->flags & EF_GIB)
-            R_RocketTrail(oldorg, ent->origin, RT_GIB);
-        else if (ent->model->flags & EF_ZOMGIB)
-            R_RocketTrail(oldorg, ent->origin, RT_ZOMGIB);
-        else if (ent->model->flags & EF_TRACER)
-            R_RocketTrail(oldorg, ent->origin, RT_TRACER);
-        else if (ent->model->flags & EF_TRACER2)
-            R_RocketTrail(oldorg, ent->origin, RT_TRACER2);
+        if (ent->model->flags & EF_GIB)             R_RocketTrail(oldorg, ent->origin, RT_GIB);
+        else if (ent->model->flags & EF_ZOMGIB)     R_RocketTrail(oldorg, ent->origin, RT_ZOMGIB);
+        else if (ent->model->flags & EF_TRACER)     R_RocketTrail(oldorg, ent->origin, RT_TRACER);
+        else if (ent->model->flags & EF_TRACER2)    R_RocketTrail(oldorg, ent->origin, RT_TRACER2);
         else if (ent->model->flags & EF_ROCKET) {
             R_RocketTrail(oldorg, ent->origin, RT_ROCKET);
             dLight_p dl = CL_AllocDlight(i);
@@ -548,19 +544,15 @@ void CL_RelinkEntities() {
             dl->radius = 200;
             dl->die = cl.time + 0.01;
         }
-        else if (ent->model->flags & EF_GRENADE)
-            R_RocketTrail(oldorg, ent->origin, RT_GRENADE);
-        else if (ent->model->flags & EF_TRACER3)
-            R_RocketTrail(oldorg, ent->origin, RT_TRACER3);
+        else if (ent->model->flags & EF_GRENADE)    R_RocketTrail(oldorg, ent->origin, RT_GRENADE);
+        else if (ent->model->flags & EF_TRACER3)    R_RocketTrail(oldorg, ent->origin, RT_TRACER3);
 
         ent->forcelink = false;
 
-        if (i == cl.viewentity && !chase_active.value)
-            continue;
+        if ((i == cl.viewentity) && !chase_active.value)  continue;
 
 #ifdef QUAKE2
-        if (ent->effects & EF_NODRAW)
-            continue;
+        if (ent->effects & EF_NODRAW)                   continue;
 #endif
         if (cl_numvisedicts < MAX_VISEDICTS) {
             cl_visedicts[cl_numvisedicts] = ent;
@@ -585,17 +577,14 @@ void CL_ReadFromServer() {
     int ret;
     do {
         ret = CL_GetMessage();
-        if (ret == -1)
-            Host_Error("CL_ReadFromServer: lost server connection");
-        if (!ret)
-            break;
+        if (ret == -1)  Host_Error("CL_ReadFromServer: lost server connection");
+        if (!ret)       break;
 
         cl.last_received_message = realtime;
         CL_ParseServerMessage();
     } while (ret && (cls.state == ca_connected));
 
-    if (cl_shownet.value)
-        Con_Printf("\n");
+    if (cl_shownet.value)   Con_Printf("\n");
 
     CL_RelinkEntities();
     CL_UpdateTEnts();
@@ -612,30 +601,19 @@ CL_SendCmd
 =================
 */
 void CL_SendCmd() {
-    if (cls.state != ca_connected)
-        return;
+    if (cls.state != ca_connected)  return;
 
     if (cls.signon == SIGNONS) {
         UserCmd_t  cmd;
-        // get basic movement from keyboard
-        CL_BaseMove(&cmd);
-
-        // allow mice or other external controllers to add to the move
-        IN_Move(&cmd);
-
-        // send the unreliable message
-        CL_SendMove(&cmd);
-
+        CL_BaseMove(&cmd);  // get basic movement from keyboard
+        IN_Move(&cmd);      // allow mice or other external controllers to add to the move
+        CL_SendMove(&cmd);  // send the unreliable message
     }
 
-    if (cls.demoplayback) {
-        SZ_Clear(&cls.message);
-        return;
-    }
+    if (cls.demoplayback) { SZ_Clear(&cls.message); return; }
 
     // send the reliable message
-    if (!cls.message.cursize)
-        return;  // no message at all
+    if (!cls.message.cursize)   return;  // no message at all
 
     if (!NET_CanSendMessage(cls.netcon)) {
         Con_DPrintf("CL_WriteToServer: can't send\n");

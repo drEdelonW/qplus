@@ -227,8 +227,8 @@ typedef struct {
     int16_t mins[3];   // for frustum culling
     int16_t maxs[3];
 
-    uint16_t    firstmarksurface;
-    uint16_t    nummarksurfaces;
+    uint16_t firstmarksurface;
+    uint16_t nummarksurfaces;
 
     uint8_t ambient_level[NUM_AMBIENTS];
 } dLeaf_t;
@@ -266,7 +266,7 @@ extern dLeaf_t  dleafs[MAX_MAP_LEAFS];
 extern int32_t  numplanes;
 extern dPlane_t dplanes[MAX_MAP_PLANES];
 
-extern int32_t  numvertexes;
+extern int32_t   numvertexes;
 extern dVertex_t dvertexes[MAX_MAP_VERTS];
 
 extern int32_t  numnodes;
@@ -317,7 +317,7 @@ typedef struct {
 typedef Entity_t* Entity_p;
 
 
-extern int32_t   num_entities;
+extern int32_t  num_entities;
 extern Entity_t entities[MAX_MAP_ENTITIES];
 
 void ParseEntities();

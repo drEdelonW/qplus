@@ -224,7 +224,7 @@ Parse a token out of a string
 ==============
 */
 cString COM_Parse(cString data) {
-    int c;
+    char c;
 
     int len = 0;
     com_token[0] = 0;
@@ -306,10 +306,8 @@ where the given parameter apears, or 0 if not present
 */
 int COM_CheckParm(cString parm) {
     for (int i = 1; i < com_argc; i++) {
-        if (!com_argv[i])
-            continue;               // NEXTSTEP sometimes clears appkit vars.
-        if (!Q_strcmp(parm, com_argv[i]))
-            return i;
+        if (!com_argv[i])                   continue;   // NEXTSTEP sometimes clears appkit vars.
+        if (!Q_strcmp(parm, com_argv[i]))   return i;
     }
 
     return 0;
@@ -327,8 +325,6 @@ being registered.
 */
 void COM_CheckRegistered() {
     int h;
-    uint16_t  check[128];
-
     COM_OpenFile("gfx/pop.lmp", &h);
     static_registered = 0;
 
@@ -342,6 +338,7 @@ void COM_CheckRegistered() {
         return;
     }
 
+    uint16_t  check[128];
     Sys_FileRead(h, check, sizeof(check));
     COM_CloseFile(h);
 
@@ -478,15 +475,15 @@ int32_t com_filesize;
 
 typedef struct {
     char    name[MAX_QPATH];
-    int32_t             filepos, filelen;
+    int32_t filepos, filelen;
 } packfile_t;
 typedef packfile_t* packfile_p;
 
 typedef struct pack_s {
-    char    filename[MAX_OSPATH];
+    char        filename[MAX_OSPATH];
     int32_t     handle;
     int32_t     numfiles;
-    packfile_p files;
+    packfile_p  files;
 } pack_t;
 typedef pack_t* pack_p;
 
@@ -495,7 +492,7 @@ typedef pack_t* pack_p;
 //
 typedef struct {
     char    name[56];
-    int32_t     filepos, filelen;
+    int32_t filepos, filelen;
 } dpackfile_t;
 
 typedef struct {
@@ -513,8 +510,8 @@ struct searchpath_s;
 typedef struct searchpath_s searchpath_t;
 typedef searchpath_t* searchpath_p;
 struct searchpath_s {
-    char    filename[MAX_OSPATH];
-    pack_p  pack;   // only one of filename / pack will be used
+    char         filename[MAX_OSPATH];
+    pack_p       pack;   // only one of filename / pack will be used
     searchpath_p next;
 };
 
@@ -546,7 +543,6 @@ The filename will be prefixed by the current game directory
 */
 void COM_WriteFile(cString filename, TypeLess_ptr data, int32_t len) {
     char    name[MAX_OSPATH];
-
     snprintf(name, sizeof(name), "%s/%s", com_gamedir, filename);
 
     int handle = Sys_FileOpenWrite(name);
@@ -588,14 +584,14 @@ needed.  This is for the convenience of developers using ISDN from home.
 ===========
 */
 void COM_CopyFile(cString netpath, cString cachepath) {
-    int     in, out;
-    char    buf[4096];
+    int     in;
 
     int remaining = Sys_FileOpenRead(netpath, &in);
     COM_CreatePath(cachepath);     // create directories up to the cache file
-    out = Sys_FileOpenWrite(cachepath);
+    int out = Sys_FileOpenWrite(cachepath);
 
     while (remaining) {
+        char buf[4096];
         int count = (remaining < sizeof(buf)) ?
             remaining : sizeof(buf);
         Sys_FileRead(in, buf, count);
@@ -616,10 +612,8 @@ Sets com_filesize and one of handle or file
 ===========
 */
 int COM_FindFile(cString filename, int* handle, FILE** file) {
-    if (file && handle)
-        Sys_Error("COM_FindFile: both handle and file set");
-    if (!file && !handle)
-        Sys_Error("COM_FindFile: neither handle or file set");
+    if (file && handle)     Sys_Error("COM_FindFile: both handle and file set");
+    if (!file && !handle)   Sys_Error("COM_FindFile: neither handle or file set");
 
     //
     // search through the path, one element at a time
@@ -762,42 +756,32 @@ Filename are reletive to the quake directory.
 Allways appends a 0 uint8_t.
 ============
 */
-CacheUser_p    loadcache;
-uint8_p loadbuf;
-int             loadsize;
+CacheUser_p loadcache;
+uint8_p     loadbuf;
+int         loadsize;
 uint8_p COM_LoadFile(cString path, int usehunk) {
-
     uint8_p buf = NULL;     // quiet compiler warning
 
     // look for it in the filesystem or pack files
     int h;
     int len = COM_OpenFile(path, &h);
-    if (h == -1)
-        return NULL;
+    if (h == -1)    return NULL;
 
     // extract the filename base name for hunk tag
     char    base[32];
     COM_FileBase(path, base);
 
-    if (usehunk == 1)
-        buf = Hunk_AllocName(len + 1, base);
-    else if (usehunk == 2)
-        buf = Hunk_TempAlloc(len + 1);
-    else if (usehunk == 0)
-        buf = Z_Malloc(len + 1);
-    else if (usehunk == 3)
-        buf = Cache_Alloc(loadcache, len + 1, base);
+    if (usehunk == 1)       buf = Hunk_AllocName(len + 1, base);
+    else if (usehunk == 2)  buf = Hunk_TempAlloc(len + 1);
+    else if (usehunk == 0)  buf = Z_Malloc(len + 1);
+    else if (usehunk == 3)  buf = Cache_Alloc(loadcache, len + 1, base);
     else if (usehunk == 4) {
-        if (len + 1 > loadsize)
-            buf = Hunk_TempAlloc(len + 1);
-        else
-            buf = loadbuf;
+        if (len + 1 > loadsize) buf = Hunk_TempAlloc(len + 1);
+        else                    buf = loadbuf;
     }
-    else
-        Sys_Error("COM_LoadFile: bad usehunk");
+    else        Sys_Error("COM_LoadFile: bad usehunk");
 
-    if (!buf)
-        Sys_Error("COM_LoadFile: not enough space for %s", path);
+    if (!buf)   Sys_Error("COM_LoadFile: not enough space for %s", path);
 
     ((uint8_p)buf)[len] = 0;
 
@@ -809,13 +793,8 @@ uint8_p COM_LoadFile(cString path, int usehunk) {
     return buf;
 }
 
-uint8_p COM_LoadHunkFile(cString path) {
-    return COM_LoadFile(path, 1);
-}
-
-uint8_p COM_LoadTempFile(cString path) {
-    return COM_LoadFile(path, 2);
-}
+uint8_p COM_LoadHunkFile(cString path) { return COM_LoadFile(path, 1); }
+uint8_p COM_LoadTempFile(cString path) { return COM_LoadFile(path, 2); }
 
 void COM_LoadCacheFile(cString path, CacheUser_p cu) {
     loadcache = cu;
@@ -945,17 +924,15 @@ COM_InitFilesystem
 ================
 */
 void COM_InitFilesystem() {
-    char    basedir[MAX_OSPATH];
+    char basedir[MAX_OSPATH];
 
     //
     // -basedir <path>
     // Overrides the system supplied base directory (under GAMENAME)
     //
     int param = COM_CheckParm("-basedir");
-    if (param && (param < com_argc - 1))
-        strcpy(basedir, com_argv[param + 1]);
-    else
-        strcpy(basedir, host_parms.basedir);
+    if (param && (param < com_argc - 1))    strcpy(basedir, com_argv[param + 1]);
+    else                                    strcpy(basedir, host_parms.basedir);
 
     int st_len = strlen(basedir);
 
@@ -987,10 +964,8 @@ void COM_InitFilesystem() {
     //
     COM_AddGameDirectory(va("%s/"GAMENAME, basedir));
 
-    if (COM_CheckParm("-rogue"))
-        COM_AddGameDirectory(va("%s/rogue", basedir));
-    if (COM_CheckParm("-hipnotic"))
-        COM_AddGameDirectory(va("%s/hipnotic", basedir));
+    if (COM_CheckParm("-rogue"))    COM_AddGameDirectory(va("%s/rogue", basedir));
+    if (COM_CheckParm("-hipnotic")) COM_AddGameDirectory(va("%s/hipnotic", basedir));
 
     //
     // -game <gamedir>
@@ -1029,8 +1004,7 @@ void COM_InitFilesystem() {
         }
     }
 
-    if (COM_CheckParm("-proghack"))
-        proghack = true;
+    if (COM_CheckParm("-proghack")) proghack = true;
 }
 
 

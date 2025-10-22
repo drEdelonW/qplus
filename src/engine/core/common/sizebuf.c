@@ -29,11 +29,8 @@ void SZ_Clear(sizebuf_p buf) {
 
 TypeLess_ptr SZ_GetSpace(sizebuf_p buf, int32_t length) {
     if ((buf->cursize + length) > buf->maxsize) {
-        if (!buf->allowoverflow)
-            Sys_Error("SZ_GetSpace: overflow without allowoverflow set");
-
-        if (length > buf->maxsize)
-            Sys_Error("SZ_GetSpace: %i is > full buffer size", length);
+        if (!buf->allowoverflow)    Sys_Error("SZ_GetSpace: overflow without allowoverflow set");
+        if (length > buf->maxsize)  Sys_Error("SZ_GetSpace: %i is > full buffer size", length);
 
         buf->overflowed = true;
         Con_Printf("SZ_GetSpace: overflow");
@@ -54,8 +51,6 @@ void SZ_Print(sizebuf_p buf, cString data) {
     int len = Q_strlen(data) + 1;
 
     // uint8_p cast to keep VC++ happy
-    if (buf->data[buf->cursize - 1])
-        Q_memcpy((uint8_p)SZ_GetSpace(buf, len), data, len); // no trailing 0
-    else
-        Q_memcpy((uint8_p)SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
+    if (buf->data[buf->cursize - 1])    Q_memcpy((uint8_p)SZ_GetSpace(buf, len), data, len); // no trailing 0
+    else                                Q_memcpy((uint8_p)SZ_GetSpace(buf, len - 1) - 1, data, len); // write over trailing 0
 }

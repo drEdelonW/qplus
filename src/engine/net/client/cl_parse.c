@@ -203,15 +203,13 @@ void CL_KeepaliveMessage() {
     ==================
 */
 void CL_ParseServerInfo() {
-
     Con_DPrintf("Serverinfo packet received.\n");
-    //
+
     // wipe the ClientState_t struct
-    //
     CL_ClearState();
 
     // parse protocol version number
-    int ver = MSG_ReadLong();
+    int32_t ver = MSG_ReadLong();
     if (ver != PROTOCOL_VERSION) {
         Con_Printf("Server returned version %i, not %i", ver, PROTOCOL_VERSION);
         return;
@@ -226,11 +224,9 @@ void CL_ParseServerInfo() {
     }
     cl.scores = Hunk_AllocName(cl.maxclients * sizeof(*cl.scores), "scores");
 
-    // parse gametype
-    cl.gametype = MSG_ReadByte();
+    cl.gametype = MSG_ReadByte();   // parse gametype
 
-    // parse signon message
-    cString str = MSG_ReadString();
+    cString str = MSG_ReadString(); // parse signon message
     strncpy(cl.levelname, str, (sizeof(cl.levelname) - 1));
 
     // seperate the printfs so the server message can have a color
@@ -249,8 +245,8 @@ void CL_ParseServerInfo() {
     int nummodels;
     for (nummodels = 1; ; nummodels++) {
         str = MSG_ReadString();
-        if (!str[0])
-            break;
+        if (!str[0])    break;
+
         if (nummodels == MAX_MODELS) {
             Con_Printf("Server sent too many model precaches\n");
             return;
@@ -265,8 +261,8 @@ void CL_ParseServerInfo() {
     int numsounds;
     for (numsounds = 1; ; numsounds++) {
         str = MSG_ReadString();
-        if (!str[0])
-            break;
+        if (!str[0])    break;
+
         if (numsounds == MAX_SOUNDS) {
             Con_Printf("Server sent too many sound precaches\n");
             return;
@@ -606,12 +602,12 @@ void CL_ParseServerMessage() {
 
         case svc_nop:       Con_Printf("%s\n", svc_strings[svc_nop]); break;
 
-        case svc_time:
+        case svc_time: {
             cl.mtime[1] = cl.mtime[0];
             cl.mtime[0] = MSG_ReadFloat();
-            break;
+        } break;
 
-        case svc_clientdata: CL_ParseClientdata(MSG_ReadShort());  break;
+        case svc_clientdata:    CL_ParseClientdata(MSG_ReadShort());    break;
 
         case svc_version: {
             int ver = MSG_ReadLong();
@@ -628,15 +624,15 @@ void CL_ParseServerMessage() {
         case svc_stufftext:     Cbuf_AddText(MSG_ReadString());         break;
         case svc_damage:        V_ParseDamage();                        break;
 
-        case svc_serverinfo:
+        case svc_serverinfo: {
             CL_ParseServerInfo();
             vid.recalc_refdef = true; // leave intermission full screen
-            break;
+        } break;
 
-        case svc_setangle:
+        case svc_setangle: {
             for (int i = 0; i < VECT_DIM; i++)
                 cl.viewangles[i] = MSG_ReadAngle();
-            break;
+        } break;
 
         case svc_setview:       cl.viewentity = MSG_ReadShort();        break;
 
@@ -646,7 +642,7 @@ void CL_ParseServerMessage() {
                 Sys_Error("svc_lightstyle > MAX_LIGHTSTYLES");
             Q_strcpy(cl_lightstyle[msg].map, MSG_ReadString());
             cl_lightstyle[msg].length = Q_strlen(cl_lightstyle[msg].map);
-        }                           break;
+        } break;
 
         case svc_sound:         CL_ParseStartSoundPacket();             break;
 
@@ -687,7 +683,7 @@ void CL_ParseServerMessage() {
 
         case svc_setpause: {
             if ((cl.paused = (bool)MSG_ReadByte())) CDAudio_Pause();
-            else                            CDAudio_Resume();
+            else                                    CDAudio_Resume();
 
 #ifdef _WIN32
             VID_HandlePause(cl.paused);

@@ -119,6 +119,6 @@ typedef struct {
 } dSpriteFrameType_t;
 typedef dSpriteFrameType_t* dSpriteFrameType_p;
 
-#define IDSPRITEHEADER	(('P'<<24)+('S'<<16)+('D'<<8)+'I')
+#define IDSPRITEHEADER	(('P' << 24) + ('S' << 16) + ('D' << 8) + 'I')
 // little-endian "IDSP"
 

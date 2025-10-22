@@ -50,12 +50,9 @@ void W_CleanupName(cString in, cString out) {
     int i = 0;
     for (; i < LUMP_NAME_LEN; i++) {
         char c = in[i];
-        if (!c)
-            break;
+        if (!c) break;
 
-        if ((c >= 'A') &&
-            (c <= 'Z'))
-            c += ('a' - 'A');
+        if ((c >= 'A') && (c <= 'Z')) c += ('a' - 'A');
         out[i] = c;
     }
 

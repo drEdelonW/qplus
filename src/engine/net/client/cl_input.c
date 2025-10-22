@@ -67,7 +67,7 @@ kbutton_t in_up, in_down;
 
 int   in_impulse;
 
-void KeyDown(kbutton_t* btn) {
+void KeyDown(kbutton_p btn) {
     cString c = Cmd_Argv(1);
     int k = (c[0]) ? atoi(c) : -1;  // typed manually at the console for continuous down
 
@@ -75,21 +75,18 @@ void KeyDown(kbutton_t* btn) {
         (k == btn->down[1]))
         return;  // repeating key
 
-    if (!btn->down[0])
-        btn->down[0] = k;
-    else if (!btn->down[1])
-        btn->down[1] = k;
+    if (!btn->down[0])  btn->down[0] = k;
+    else if (!btn->down[1]) btn->down[1] = k;
     else {
         Con_Printf("Three keys down for a button!\n");
         return;
     }
 
-    if (btn->state & 1)
-        return;  // still down
+    if (btn->state & 1) return;  // still down
     btn->state |= 1 + 2; // down + impulse down
 }
 
-void KeyUp(kbutton_t* btn) {
+void KeyUp(kbutton_p btn) {
     int k;
 
     cString c = Cmd_Argv(1);
@@ -176,37 +173,27 @@ void IN_Impulse() { in_impulse = Q_atoi(Cmd_Argv(1)); }
     1.0 if held for the entire time
     ===============
 */
-float CL_KeyState(kbutton_t* key) {
-    bool impulsedown, impulseup, down;
-
-    impulsedown = key->state & 2;
-    impulseup = key->state & 4;
-    down = key->state & 1;
+float CL_KeyState(kbutton_p key) {
+    bool down = key->state & 1;
+    bool impulsedown = key->state & 2;
+    bool impulseup = key->state & 4;
     float val = 0;
 
     if (impulsedown && !impulseup) {
-        if (down)
-            val = 0.5; // pressed and held this frame
-        else
-            val = 0; // I_Error ();
+        if (down)   val = 0.5; // pressed and held this frame
+        else        val = 0; // I_Error ();
     }
     if (impulseup && !impulsedown) {
-        if (down)
-            val = 0; // I_Error ();
-        else
-            val = 0; // released this frame
+        if (down)   val = 0; // I_Error ();
+        else        val = 0; // released this frame
     }
     if (!impulsedown && !impulseup) {
-        if (down)
-            val = 1.0; // held the entire frame
-        else
-            val = 0; // up the entire frame
+        if (down)   val = 1.0; // held the entire frame
+        else        val = 0; // up the entire frame
     }
     if (impulsedown && impulseup) {
-        if (down)
-            val = 0.75; // released and re-pressed this frame
-        else
-            val = 0.25; // pressed and released this frame
+        if (down)   val = 0.75; // released and re-pressed this frame
+        else        val = 0.25; // pressed and released this frame
     }
 
     key->state &= 1;  // clear impulses
@@ -232,10 +219,8 @@ void CL_AdjustAngles() {
     float speed;
     float up, down;
 
-    if (in_speed.state & 1)
-        speed = host_frametime * cl_anglespeedkey.value;
-    else
-        speed = host_frametime;
+    if (in_speed.state & 1) speed = host_frametime * cl_anglespeedkey.value;
+    else                    speed = host_frametime;
 
     if (!(in_strafe.state & 1)) {
         cl.viewangles[YAW] -= speed * cl_yawspeed.value * CL_KeyState(&in_right);
@@ -258,17 +243,8 @@ void CL_AdjustAngles() {
         V_StopPitchDrift();
     }
 
-    CLAMP_MAX(cl.viewangles[PITCH], 80);    // down look
-    // if (cl.viewangles[PITCH] > 80)
-    //     cl.viewangles[PITCH] = 80;
-    CLAMP_MIN(cl.viewangles[PITCH], -70);  // up look
-    // else if (cl.viewangles[PITCH] < -70)
-    //     cl.viewangles[PITCH] = -70;
-
-    if (cl.viewangles[ROLL] > 50)
-        cl.viewangles[ROLL] = 50;
-    else if (cl.viewangles[ROLL] < -50)
-        cl.viewangles[ROLL] = -50;
+    CLAMP(-70, cl.viewangles[PITCH], 80);    // down look
+    CLAMP(-50, cl.viewangles[ROLL], 50);
 
 }
 
@@ -375,15 +351,13 @@ void CL_SendMove(UserCmd_p cmd) {
     //
     // deliver the message
     //
-    if (cls.demoplayback)
-        return;
+    if (cls.demoplayback)   return;
 
     //
     // allways dump the first two message, because it may contain leftover inputs
     // from the last level
     //
-    if (++cl.movemessages <= 2)
-        return;
+    if (++cl.movemessages <= 2) return;
 
     if (NET_SendUnreliableMessage(cls.netcon, &buf) == -1) {
         Con_Printf("CL_SendMove: lost server connection\n");
@@ -432,6 +406,5 @@ void CL_InitInput() {
     Cmd_AddCommand("-klook", IN_KLookUp);
     Cmd_AddCommand("+mlook", IN_MLookDown);
     Cmd_AddCommand("-mlook", IN_MLookUp);
-
 }
 

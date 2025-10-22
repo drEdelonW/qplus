@@ -277,13 +277,12 @@ void CL_NextDemo();
 extern int32_t      cl_numvisedicts;
 extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
 
-//
 // cl_input
-//
 typedef struct {
-    int32_t down[2];    // key nums holding it down
-    int32_t state;      // low bit is down state
+    uint8_t down[2];    // key nums holding it down
+    uint8_t state;      // low bit is down state
 } kbutton_t;
+typedef kbutton_t* kbutton_p;
 
 extern  kbutton_t   in_mlook, in_klook;
 extern  kbutton_t   in_strafe;
@@ -304,12 +303,10 @@ void CL_WriteToServer(UserCmd_p cmd);
 void CL_BaseMove(UserCmd_p cmd);
 
 
-float CL_KeyState(kbutton_t* key);
+float CL_KeyState(kbutton_p key);
 cString Key_KeynumToString(keycode_t keynum);
 
-//
 // cl_demo.c
-//
 void CL_StopPlayback();
 int CL_GetMessage();
 
@@ -318,15 +315,11 @@ void CL_Record_f();
 void CL_PlayDemo_f();
 void CL_TimeDemo_f();
 
-//
 // cl_parse.c
-//
 void CL_ParseServerMessage();
 void CL_NewTranslation(int32_t slot);
 
-//
 // view
-//
 void V_StartPitchDrift();
 void V_StopPitchDrift();
 
@@ -337,8 +330,6 @@ void V_ParseDamage();
 void V_SetContentsColor(contents_t contents);
 
 
-//
 // cl_tent
-//
 void CL_InitTEnts();
 void CL_SignonReply();
