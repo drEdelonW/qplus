@@ -32,47 +32,47 @@ typedef struct client_s client_t;
 typedef client_t* client_p;
 
 typedef struct {
-	int32_t     maxclients;
-	int32_t     maxclientslimit;
-	client_p    clients;            // [maxclients]
-	int32_t     serverflags;        // episode completion information
-	bool        changelevel_issued; // cleared when at SV_SpawnServer
+    int32_t     maxclients;
+    int32_t     maxclientslimit;
+    client_p    clients;            // [maxclients]
+    int32_t     serverflags;        // episode completion information
+    bool        changelevel_issued; // cleared when at SV_SpawnServer
 } sv_static_t;
 
 //=============================================================================
 
 typedef enum {
-	ss_loading,
-	ss_active
+    ss_loading,
+    ss_active
 } sv_state_t;
 
 typedef struct {
-	bool    active;         // false if only a net client
-	bool    paused;
-	bool    loadgame;       // handle connections specially
-	double  time;
-	int32_t lastcheck;      // used by PF_checkclient
-	double  lastchecktime;
-	char    name[64];       // map name
+    bool    active;         // false if only a net client
+    bool    paused;
+    bool    loadgame;       // handle connections specially
+    double  time;
+    int32_t lastcheck;      // used by PF_checkclient
+    double  lastchecktime;
+    char    name[64];       // map name
 #ifdef QUAKE2
-	char    startspot[64];
+    char    startspot[64];
 #endif
-	char        modelname[64];  // maps/<name>.bsp, for model_precache[0]
-	Model_p     worldmodel;
-	cString     model_precache[MAX_MODELS];	    // NULL terminated
-	Model_p     models[MAX_MODELS];
-	cString     sound_precache[MAX_SOUNDS];	    // NULL terminated
-	cString     lightstyles[MAX_LIGHTSTYLES];
-	int32_t     num_edicts;
-	int32_t     max_edicts;
-	edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
-	sv_state_t state; // some actions are only valid during load
-	sizebuf_t   datagram;
-	uint8_t     datagram_buf[MAX_DATAGRAM];
-	sizebuf_t   reliable_datagram;	// copied to all clients at end of frame
-	uint8_t     reliable_datagram_buf[MAX_DATAGRAM];
-	sizebuf_t   signon;
-	uint8_t     signon_buf[8192];
+    char        modelname[64];  // maps/<name>.bsp, for model_precache[0]
+    Model_p     worldmodel;
+    cString     model_precache[MAX_MODELS];	    // NULL terminated
+    Model_p     models[MAX_MODELS];
+    cString     sound_precache[MAX_SOUNDS];	    // NULL terminated
+    cString     lightstyles[MAX_LIGHTSTYLES];
+    int32_t     num_edicts;
+    int32_t     max_edicts;
+    edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
+    sv_state_t  state; // some actions are only valid during load
+    sizebuf_t   datagram;
+    uint8_t     datagram_buf[MAX_DATAGRAM];
+    sizebuf_t   reliable_datagram;	// copied to all clients at end of frame
+    uint8_t     reliable_datagram_buf[MAX_DATAGRAM];
+    sizebuf_t   signon;
+    uint8_t     signon_buf[8192];
 } server_t;
 
 
@@ -202,7 +202,7 @@ extern edict_p      sv_player;
 void SV_Init();
 
 void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count);
-void SV_StartSound(edict_p entity, int channel, cString sample, int volume,	float attenuation);
+void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation);
 
 void SV_DropClient(bool crash);
 

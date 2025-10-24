@@ -61,21 +61,16 @@ void R_InitParticles() {
 
 #ifdef QUAKE2
 void R_DarkFieldParticles(r_Entity_p ent) {
-    int   i, j, k;
-    Particle_p p;
-    float  vel;
-    vec3_t  dir;
-    vec3_t  org;
-
-    org[0] = ent->origin[0];
-    org[1] = ent->origin[1];
-    org[2] = ent->origin[2];
-    for (i = -16; i < 16; i += 8)
-        for (j = -16; j < 16; j += 8)
-            for (k = 0; k < 32; k += 8) {
-                if (!free_particles)
-                    return;
-                p = free_particles;
+    vec3_t org = {
+        ent->origin[0],
+        ent->origin[1],
+        ent->origin[2]
+    };
+    for (int i = -16; i < 16; i += 8)
+        for (int j = -16; j < 16; j += 8)
+            for (int k = 0; k < 32; k += 8) {
+                if (!free_particles)        return;
+                Particle_p p = free_particles;
                 free_particles = p->next;
                 p->next = active_particles;
                 active_particles = p;
@@ -84,16 +79,17 @@ void R_DarkFieldParticles(r_Entity_p ent) {
                 p->color = 150 + rand() % 6;
                 p->type = pt_slowgrav;
 
-                dir[0] = j * 8;
-                dir[1] = i * 8;
-                dir[2] = k * 8;
-
+                vec3_t  dir = {
+                    j * 8,
+                    i * 8,
+                    k * 8
+                };
                 p->org[0] = org[0] + i + (rand() & 3);
                 p->org[1] = org[1] + j + (rand() & 3);
                 p->org[2] = org[2] + k + (rand() & 3);
 
                 VectorNormalize(dir);
-                vel = 50 + (rand() & 63);
+                float vel = 50 + (rand() & 63);
                 VectorScale(dir, vel, p->vel);
             }
 }
@@ -115,22 +111,15 @@ float partstep = 0.01;
 float timescale = 0.01;
 
 void R_EntityParticles(r_Entity_p ent) {
-    Particle_p p;
-    float  angle;
-    vec3_t  forward;
-
-    float dist = 64;
-    // int count  = 50;
-
     if (!avelocities[0][0]) {
         for (int i = 0; i < (NUMVERTEXNORMALS * 3); i++) {
             avelocities[0][i] = (rand() & 255) * 0.01;
         }
     }
 
-
+    float dist = 64;
     for (int i = 0; i < NUMVERTEXNORMALS; i++) {
-        angle = cl.time * avelocities[i][0];
+        float angle = cl.time * avelocities[i][0];
         float sy = sin(angle);
         float cy = cos(angle);
         angle = cl.time * avelocities[i][1];
@@ -140,14 +129,15 @@ void R_EntityParticles(r_Entity_p ent) {
         // float sr = sin(angle);
         // float cr = cos(angle);
 
-        forward[0] = cp * cy;
-        forward[1] = cp * sy;
-        forward[2] = -sp;
+        vec3_t  forward = {
+            cp * cy,
+            cp * sy,
+            -sp
+        };
 
-        if (!free_particles) {
-            return;
-        }
-        p = free_particles;
+        if (!free_particles)    return;
+
+        Particle_p p = free_particles;
         free_particles = p->next;
         p->next = active_particles;
         active_particles = p;
@@ -174,6 +164,7 @@ void R_ClearParticles() {
 
     for (int i = 0;i < r_numparticles; i++)
         particles[i].next = &particles[i + 1];
+
     particles[r_numparticles - 1].next = NULL;
 }
 
@@ -181,25 +172,19 @@ void R_ClearParticles() {
 void R_ReadPointFile_f() {
     char name[MAX_OSPATH];
     sprintf(name, "maps/%s.pts", sv.name);
-    FILE* f;
-    COM_FOpenFile(name, &f);
-    if (!f) {
-        Con_Printf("couldn't open %s\n", name);
-        return;
-    }
+
+    FILE* pntFile;
+    COM_FOpenFile(name, &pntFile);
+    if (!pntFile) { Con_Printf("couldn't open %s\n", name); return; }
 
     Con_Printf("Reading %s...\n", name);
     int c = 0;
     for (;; ) {
         vec3_t org;
-        if (fscanf(f, "%f %f %f\n", &org[0], &org[1], &org[2]) != 3)
-            break;
+        if (fscanf(pntFile, "%f %f %f\n", &org[0], &org[1], &org[2]) != 3) break;
         c++;
 
-        if (!free_particles) {
-            Con_Printf("Not enough free particles\n");
-            break;
-        }
+        if (!free_particles) { Con_Printf("Not enough free particles\n"); break; }
         Particle_p p = free_particles;
         free_particles = p->next;
         p->next = active_particles;
@@ -212,7 +197,7 @@ void R_ReadPointFile_f() {
         VectorCopy(org, p->org);
     }
 
-    fclose(f);
+    fclose(pntFile);
     Con_Printf("%i points read\n", c);
 }
 
@@ -224,13 +209,17 @@ Parse an effect out of the server message
 ===============
 */
 void R_ParseParticleEffect() {
-    vec3_t  org, dir;
-    for (int i = 0; i < VECT_DIM; i++) {
-        org[i] = MSG_ReadCoord();
-    }
-    for (int i = 0; i < VECT_DIM; i++) {
-        dir[i] = MSG_ReadChar() * (1.0 / 16);
-    }
+    vec3_t org = {
+        MSG_ReadCoord(),
+        MSG_ReadCoord(),
+        MSG_ReadCoord()
+    };
+
+    vec3_t dir = {
+        MSG_ReadChar() * (1.0 / 16),
+        MSG_ReadChar() * (1.0 / 16),
+        MSG_ReadChar() * (1.0 / 16)
+    };
     int msgcount = MSG_ReadByte();
     int color = MSG_ReadByte();
 
@@ -246,8 +235,8 @@ R_ParticleExplosion
 */
 void R_ParticleExplosion(vec3_t org) {
     for (int i = 0; i < 1024; i++) {
-        if (!free_particles)
-            return;
+        if (!free_particles)        return;
+
         Particle_p p = free_particles;
         free_particles = p->next;
         p->next = active_particles;
@@ -256,19 +245,10 @@ void R_ParticleExplosion(vec3_t org) {
         p->die = cl.time + 5;
         p->color = ramp1[0];
         p->ramp = rand() & 3;
-        if (i & 1) {
-            p->type = pt_explode;
-            for (int j = 0; j < VECT_DIM; j++) {
-                p->org[j] = org[j] + ((rand() % 32) - 16);
-                p->vel[j] = (rand() % 512) - 256;
-            }
-        }
-        else {
-            p->type = pt_explode2;
-            for (int j = 0; j < VECT_DIM; j++) {
-                p->org[j] = org[j] + ((rand() % 32) - 16);
-                p->vel[j] = (rand() % 512) - 256;
-            }
+        p->type = (i & 1) ? pt_explode : pt_explode2;
+        for (int j = 0; j < VECT_DIM; j++) {
+            p->org[j] = org[j] + ((rand() % 32) - 16);
+            p->vel[j] = (rand() % 512) - 256;
         }
     }
 }
@@ -282,8 +262,8 @@ R_ParticleExplosion2
 void R_ParticleExplosion2(vec3_t org, int colorStart, int colorLength) {
     int colorMod = 0;
     for (int i = 0; i < 512; i++) {
-        if (!free_particles)
-            return;
+        if (!free_particles)        return;
+
         Particle_p p = free_particles;
         free_particles = p->next;
         p->next = active_particles;
@@ -309,30 +289,19 @@ R_BlobExplosion
 */
 void R_BlobExplosion(vec3_t org) {
     for (int i = 0; i < 1024; i++) {
-        if (!free_particles)
-            return;
+        if (!free_particles)        return;
+
         Particle_p p = free_particles;
         free_particles = p->next;
         p->next = active_particles;
         active_particles = p;
 
         p->die = cl.time + 1 + (rand() & 8) * 0.05;
-
-        if (i & 1) {
-            p->type = pt_blob;
-            p->color = 66 + rand() % 6;
-            for (int j = 0; j < VECT_DIM; j++) {
-                p->org[j] = org[j] + ((rand() % 32) - 16);
-                p->vel[j] = (rand() % 512) - 256;
-            }
-        }
-        else {
-            p->type = pt_blob2;
-            p->color = 150 + rand() % 6;
-            for (int j = 0; j < VECT_DIM; j++) {
-                p->org[j] = org[j] + ((rand() % 32) - 16);
-                p->vel[j] = (rand() % 512) - 256;
-            }
+        p->type = (i & 1) ? pt_blob : pt_blob2;
+        p->color = ((i & 1) ? 66 : 150) + rand() % 6;
+        for (int j = 0; j < VECT_DIM; j++) {
+            p->org[j] = org[j] + ((rand() % 32) - 16);
+            p->vel[j] = (rand() % 512) - 256;
         }
     }
 }
@@ -394,8 +363,8 @@ void R_LavaSplash(vec3_t org) {
     for (int i = -16; i < 16; i++)
         for (int j = -16; j < 16; j++)
             for (int k = 0; k < 1; k++) {
-                if (!free_particles)
-                    return;
+                if (!free_particles)    return;
+
                 Particle_p p = free_particles;
                 free_particles = p->next;
                 p->next = active_particles;
@@ -405,10 +374,11 @@ void R_LavaSplash(vec3_t org) {
                 p->color = 224 + (rand() & 7);
                 p->type = pt_slowgrav;
 
-                vec3_t  dir;
-                dir[0] = j * 8 + (rand() & 7);
-                dir[1] = i * 8 + (rand() & 7);
-                dir[2] = 256;
+                vec3_t  dir = {
+                    j * 8 + (rand() & 7),
+                    i * 8 + (rand() & 7),
+                    256
+                };
 
                 p->org[0] = org[0] + dir[0];
                 p->org[1] = org[1] + dir[1];
@@ -430,8 +400,7 @@ void R_TeleportSplash(vec3_t org) {
     for (int i = -16; i < 16; i += 4)
         for (int j = -16; j < 16; j += 4)
             for (int k = -24; k < 32; k += 4) {
-                if (!free_particles)
-                    return;
+                if (!free_particles)    return;
                 Particle_p p = free_particles;
                 free_particles = p->next;
                 p->next = active_particles;
@@ -441,10 +410,11 @@ void R_TeleportSplash(vec3_t org) {
                 p->color = 7 + (rand() & 7);
                 p->type = pt_slowgrav;
 
-                vec3_t dir;
-                dir[0] = j * 8;
-                dir[1] = i * 8;
-                dir[2] = k * 8;
+                vec3_t dir = {
+                    j * 8,
+                    i * 8,
+                    k * 8
+                };
 
                 p->org[0] = org[0] + i + (rand() & 3);
                 p->org[1] = org[1] + j + (rand() & 3);
@@ -457,9 +427,9 @@ void R_TeleportSplash(vec3_t org) {
 }
 
 void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
-    vec3_t  vec;
     static int tracercount;
-    VectorSubtract(end, start, vec);
+
+    vec3_t vec; VectorSubtract(end, start, vec);
     float len = VectorNormalize(vec);
 
     int dec;
@@ -473,8 +443,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
     while (len > 0) {
         len -= dec;
 
-        if (!free_particles)
-            return;
+        if (!free_particles)    return;
         Particle_p p = free_particles;
         free_particles = p->next;
         p->next = active_particles;
@@ -556,25 +525,15 @@ R_DrawParticles
 ===============
 */
 void R_DrawParticles() {
-    Particle_p  p, kill;
-    float   grav;
-    int    i;
-    float   time2, time3;
-    float   time1;
-    float   dvel;
-    float   frametime;
-
 #ifdef GLQUAKE
-    vec3_t   up, right;
-    float   scale;
 
     GL_Bind(particletexture);
     glEnable(GL_BLEND);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glBegin(GL_TRIANGLES);
 
-    VectorScale(vup, 1.5, up);
-    VectorScale(vright, 1.5, right);
+    vec3_t up;  VectorScale(vup, 1.5, up);
+    vec3_t right;   VectorScale(vright, 1.5, right);
 #else
     D_StartParticles();
 
@@ -582,16 +541,17 @@ void R_DrawParticles() {
     VectorScale(vup, yscaleshrink, r_pup);
     VectorCopy(vpn, r_ppn);
 #endif
-    frametime = cl.time - cl.oldtime;
-    time3 = frametime * 15;
-    time2 = frametime * 10; // 15;
-    time1 = frametime * 5;
-    grav = frametime * sv_gravity.value * 0.05;
-    dvel = 4 * frametime;
+    float frametime = cl.time - cl.oldtime;
+    float time3 = frametime * 15;
+    float time2 = frametime * 10; // 15;
+    float time1 = frametime * 5;
+    float grav = frametime * sv_gravity.value * 0.05;
+    float dvel = 4 * frametime;
 
     for (;; ) {
-        kill = active_particles;
-        if (kill && kill->die < cl.time) {
+        Particle_p kill = active_particles;
+        if (kill && (kill->die < cl.time)
+            ) {
             active_particles = kill->next;
             kill->next = free_particles;
             free_particles = kill;
@@ -600,10 +560,12 @@ void R_DrawParticles() {
         break;
     }
 
-    for (p = active_particles; p; p = p->next) {
+    Particle_p p = active_particles;
+    for (; p; p = p->next) {
         for (;; ) {
-            kill = p->next;
-            if (kill && kill->die < cl.time) {
+            Particle_p kill = p->next;
+            if (kill && (kill->die < cl.time)
+                ) {
                 p->next = kill->next;
                 kill->next = free_particles;
                 free_particles = kill;
@@ -614,12 +576,10 @@ void R_DrawParticles() {
 
 #ifdef GLQUAKE
         // hack a scale up to keep particles from disapearing
-        scale = (p->org[0] - r_origin[0]) * vpn[0] + (p->org[1] - r_origin[1]) * vpn[1]
+        float scale = (p->org[0] - r_origin[0]) * vpn[0] + (p->org[1] - r_origin[1]) * vpn[1]
             + (p->org[2] - r_origin[2]) * vpn[2];
-        if (scale < 20)
-            scale = 1;
-        else
-            scale = 1 + scale * 0.004;
+        if (scale < 20) scale = 1;
+        else            scale = 1 + scale * 0.004;
         glColor3ubv((uint8_p)&d_8to24table[(int)p->color]);
         glTexCoord2f(0, 0);
         glVertex3fv(p->org);
@@ -630,52 +590,45 @@ void R_DrawParticles() {
 #else
         D_DrawParticle(p);
 #endif
-        p->org[0] += p->vel[0] * frametime;
+        p->org[0] += p->vel[0] * frametime; // p->org += p->vel * frametime;
         p->org[1] += p->vel[1] * frametime;
         p->org[2] += p->vel[2] * frametime;
 
         switch (p->type) {
-        case pt_static:
-            break;
+        case pt_static:     break;
         case pt_fire:
             p->ramp += time1;
-            if (p->ramp >= 6)
-                p->die = -1;
-            else
-                p->color = ramp3[(int)p->ramp];
+            if (p->ramp >= 6)   p->die = -1;
+            else                p->color = ramp3[(int)p->ramp];
             p->vel[2] += grav;
             break;
 
         case pt_explode:
             p->ramp += time2;
-            if (p->ramp >= 8)
-                p->die = -1;
-            else
-                p->color = ramp1[(int)p->ramp];
-            for (i = 0; i < VECT_DIM; i++)
+            if (p->ramp >= 8)   p->die = -1;
+            else                p->color = ramp1[(int)p->ramp];
+            for (int i = 0; i < VECT_DIM; i++)
                 p->vel[i] += p->vel[i] * dvel;
             p->vel[2] -= grav;
             break;
 
         case pt_explode2:
             p->ramp += time3;
-            if (p->ramp >= 8)
-                p->die = -1;
-            else
-                p->color = ramp2[(int)p->ramp];
-            for (i = 0; i < VECT_DIM; i++)
+            if (p->ramp >= 8)   p->die = -1;
+            else                p->color = ramp2[(int)p->ramp];
+            for (int i = 0; i < VECT_DIM; i++)
                 p->vel[i] -= p->vel[i] * frametime;
             p->vel[2] -= grav;
             break;
 
         case pt_blob:
-            for (i = 0; i < VECT_DIM; i++)
+            for (int i = 0; i < VECT_DIM; i++)
                 p->vel[i] += p->vel[i] * dvel;
             p->vel[2] -= grav;
             break;
 
         case pt_blob2:
-            for (i = 0; i < 2; i++)
+            for (int i = 0; i < 2; i++)
                 p->vel[i] -= p->vel[i] * dvel;
             p->vel[2] -= grav;
             break;

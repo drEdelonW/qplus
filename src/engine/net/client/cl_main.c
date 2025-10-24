@@ -450,8 +450,7 @@ void CL_RelinkEntities() {
             continue;
         }
 
-        vec3_t oldorg;
-        VectorCopy(ent->origin, oldorg);
+        vec3_t oldorg;  VectorCopy(ent->origin, oldorg);
 
         if (ent->forcelink) { // the entity was not updated in the last message
             // so move to the final spot
@@ -463,7 +462,8 @@ void CL_RelinkEntities() {
             vec3_t delta;
             for (int j = 0; j < VECT_DIM; j++) {
                 delta[j] = ent->msg_origins[0][j] - ent->msg_origins[1][j];
-                if (delta[j] > 100 || delta[j] < -100)
+                if ((delta[j] > 100) ||
+                    (delta[j] < -100))
                     f = 1;  // assume a teleportation, not a motion
             }
 
@@ -492,12 +492,11 @@ void CL_RelinkEntities() {
             R_DarkFieldParticles(ent);
 #endif
         if (ent->effects & EF_MUZZLEFLASH) {
-            vec3_t  fv, rv, uv;
 
             dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
             dl->origin[2] += 16;
-            AngleVectors(ent->angles, fv, rv, uv);
+            vec3_t fv, rv, uv;  AngleVectors(ent->angles, fv, rv, uv);
 
             VectorMA(dl->origin, 18, fv, dl->origin);
             dl->radius = 200 + (rand() & 31);

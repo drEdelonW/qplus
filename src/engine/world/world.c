@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   include "sys.h"
 #   include "console.h"
 #   include "progs.h"
+#   include "q_tools.h"
 #endif
 
 
@@ -470,21 +471,20 @@ SV_HullPointContents
 */
 int SV_HullPointContents(Hull_p hull, int num, vec3_t p) {
     while (num >= 0) {
-        if ((num < hull->firstclipnode) || (num > hull->lastclipnode))
+        if ((num < hull->firstclipnode) ||
+            (num > hull->lastclipnode)
+            )
             Sys_Error("SV_HullPointContents: bad node number");
 
         dClipNode_p node = hull->clipnodes + num;
         mPlane_p plane = hull->planes + node->planenum;
 
-        float  d;
-        if (plane->type < 3)
-            d = p[plane->type] - plane->dist;
-        else
-            d = DotProduct(plane->normal, p) - plane->dist;
-        if (d < 0)
-            num = node->children[1];
-        else
-            num = node->children[0];
+        float d =
+            ((plane->type < 3) ?
+                p[plane->type] : DotProduct(plane->normal, p)) -
+            plane->dist;
+
+        num = node->children[(d < 0) ? 1 : 0];
     }
 
     return num;
@@ -525,10 +525,8 @@ edict_p SV_TestEntityPosition(edict_p ent) {
         ent->v.origin, ent->v.mins, ent->v.maxs, ent->v.origin, 0, ent
     );
 
-    if (trace.startsolid)
-        return sv.edicts;
 
-    return NULL;
+    return (trace.startsolid) ? sv.edicts : NULL;
 }
 
 
@@ -562,18 +560,16 @@ qboolean SV_RecursiveHullCheck(
     if (num < 0) {
         if (num != CONTENTS_SOLID) {
             trace->allsolid = false;
-            if (num == CONTENTS_EMPTY)
-                trace->inopen = true;
-            else
-                trace->inwater = true;
+            if (num == CONTENTS_EMPTY)  trace->inopen = true;
+            else                        trace->inwater = true;
         }
-        else {
-            trace->startsolid = true;
-        }
+        else { trace->startsolid = true; }
         return true;  // empty
     }
 
-    if ((num < hull->firstclipnode) || (num > hull->lastclipnode))
+    if ((num < hull->firstclipnode) ||
+        (num > hull->lastclipnode)
+        )
         Sys_Error("SV_RecursiveHullCheck: bad node number");
 
     //
@@ -593,27 +589,18 @@ qboolean SV_RecursiveHullCheck(
     }
 
 #if 1
-    if ((t1 >= 0) && (t2 >= 0))
-        return SV_RecursiveHullCheck(hull, node->children[0], p1f, p2f, p1, p2, trace);
-    if ((t1 < 0) && (t2 < 0))
-        return SV_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
+    if ((t1 >= 0) && (t2 >= 0))     return SV_RecursiveHullCheck(hull, node->children[0], p1f, p2f, p1, p2, trace);
+    if ((t1 < 0) && (t2 < 0))       return SV_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
 #else
-    if ((t1 >= DIST_EPSILON && t2 >= DIST_EPSILON) || (t2 > t1 && t1 >= 0))
-        return SV_RecursiveHullCheck(hull, node->children[0], p1f, p2f, p1, p2, trace);
-    if ((t1 <= -DIST_EPSILON && t2 <= -DIST_EPSILON) || (t2 < t1 && t1 <= 0))
-        return SV_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
+    if ((t1 >= DIST_EPSILON && t2 >= DIST_EPSILON) || (t2 > t1 && t1 >= 0))     return SV_RecursiveHullCheck(hull, node->children[0], p1f, p2f, p1, p2, trace);
+    if ((t1 <= -DIST_EPSILON && t2 <= -DIST_EPSILON) || (t2 < t1 && t1 <= 0))   return SV_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
 #endif
 
     // put the crosspoint DIST_EPSILON pixels on the near side
     float  frac;
-    if (t1 < 0)
-        frac = (t1 + DIST_EPSILON) / (t1 - t2);
-    else
-        frac = (t1 - DIST_EPSILON) / (t1 - t2);
-    if (frac < 0)
-        frac = 0;
-    if (frac > 1)
-        frac = 1;
+    if (t1 < 0) frac = (t1 + DIST_EPSILON) / (t1 - t2);
+    else        frac = (t1 - DIST_EPSILON) / (t1 - t2);
+    CLAMP(0.0, frac, 1.0);
 
     float midf = p1f + (p2f - p1f) * frac;
     vec3_t  mid;
@@ -632,16 +619,14 @@ qboolean SV_RecursiveHullCheck(
         == CONTENTS_SOLID) {
         Con_Printf("mid PointInHullSolid\n");
         return false;
-}
+    }
 #endif
 
-    if (SV_HullPointContents(hull, node->children[side ^ 1], mid)
-        != CONTENTS_SOLID)
+    if (SV_HullPointContents(hull, node->children[side ^ 1], mid) != CONTENTS_SOLID)
         // go past the node
         return SV_RecursiveHullCheck(hull, node->children[side ^ 1], midf, p2f, mid, p2, trace);
 
-    if (trace->allsolid)
-        return false;  // never got out of the solid area
+    if (trace->allsolid)    return false;  // never got out of the solid area
 
     //==================
     // the other side of the node is solid, this is the impact point
@@ -687,8 +672,7 @@ eventually rotation) of the end points
 */
 trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end) {
     // fill in a default trace
-    trace_t trace;
-    memset(&trace, 0, sizeof(trace_t));
+    trace_t trace;  memset(&trace, 0, sizeof(trace_t));
     trace.fraction = 1;
     trace.allsolid = true;
     VectorCopy(end, trace.endpos);
@@ -703,8 +687,12 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
 
 #ifdef QUAKE2
     // rotate start and end into the models frame of reference
-    if (ent->v.solid == SOLID_BSP &&
-        (ent->v.angles[0] || ent->v.angles[1] || ent->v.angles[2])) {
+    if ((solid_t)ent->v.solid == SOLID_BSP &&
+        (
+            ent->v.angles[0] ||
+            ent->v.angles[1] ||
+            ent->v.angles[2])
+        ) {
         // vec3_t a;
         vec3_t forward, right, up;
 
@@ -720,7 +708,7 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
         end_l[0] = DotProduct(temp, forward);
         end_l[1] = -DotProduct(temp, right);
         end_l[2] = DotProduct(temp, up);
-}
+    }
 #endif
 
     // trace a line through the apropriate clipping hull
@@ -728,24 +716,27 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
 
 #ifdef QUAKE2
     // rotate endpos back to world frame of reference
-    if ((ent->v.solid == SOLID_BSP) &&
-        (ent->v.angles[0] || ent->v.angles[1] || ent->v.angles[2]) &&
+    if (((solid_t)ent->v.solid == SOLID_BSP) &&
+        (
+            ent->v.angles[0] ||
+            ent->v.angles[1] ||
+            ent->v.angles[2]) &&
         (trace.fraction != 1)) {
-        vec3_t a;
-        VectorSubtract(vec3_origin, ent->v.angles, a);
-        vec3_t forward, right, up;
-        AngleVectors(a, forward, right, up);
+        vec3_t a; VectorSubtract(vec3_origin, ent->v.angles, a);
+        vec3_t forward, right, up;  AngleVectors(a, forward, right, up);
 
-        vec3_t temp;
-        VectorCopy(trace.endpos, temp);
-        trace.endpos[0] = DotProduct(temp, forward);
-        trace.endpos[1] = -DotProduct(temp, right);
-        trace.endpos[2] = DotProduct(temp, up);
-
-        VectorCopy(trace.plane.normal, temp);
-        trace.plane.normal[0] = DotProduct(temp, forward);
-        trace.plane.normal[1] = -DotProduct(temp, right);
-        trace.plane.normal[2] = DotProduct(temp, up);
+        {
+            vec3_t temp;    VectorCopy(trace.endpos, temp);
+            trace.endpos[0] = DotProduct(temp, forward);
+            trace.endpos[1] = -DotProduct(temp, right);
+            trace.endpos[2] = DotProduct(temp, up);
+        }
+        {
+            vec3_t temp;    VectorCopy(trace.plane.normal, temp);
+            trace.plane.normal[0] = DotProduct(temp, forward);
+            trace.plane.normal[1] = -DotProduct(temp, right);
+            trace.plane.normal[2] = DotProduct(temp, up);
+        }
     }
 #endif
 
@@ -775,23 +766,24 @@ void SV_ClipToLinks(areaNode_p node, moveclip_p clip) {
     for (link_p l = node->solid_edicts.next; l != &node->solid_edicts; l = next) {
         next = l->next;
         edict_p touch = EDICT_FROM_AREA(l);
-        if (touch->v.solid == SOLID_NOT)
+        if ((touch->v.solid == SOLID_NOT) ||
+            (touch == clip->passedict))
             continue;
-        if (touch == clip->passedict)
-            continue;
-        if (touch->v.solid == SOLID_TRIGGER)
-            Sys_Error("Trigger in clipping list");
+        if (touch->v.solid == SOLID_TRIGGER)    Sys_Error("Trigger in clipping list");
 
         if ((clip->type == MOVE_NOMONSTERS) &&
             (touch->v.solid != SOLID_BSP))
             continue;
 
-        if (clip->boxmins[0] > touch->v.absmax[0] ||
-            clip->boxmins[1] > touch->v.absmax[1] ||
-            clip->boxmins[2] > touch->v.absmax[2] ||
-            clip->boxmaxs[0] < touch->v.absmin[0] ||
-            clip->boxmaxs[1] < touch->v.absmin[1] ||
-            clip->boxmaxs[2] < touch->v.absmin[2] ||
+        if (
+            (
+                clip->boxmins[0] > touch->v.absmax[0] ||
+                clip->boxmins[1] > touch->v.absmax[1] ||
+                clip->boxmins[2] > touch->v.absmax[2]) ||
+            (
+                clip->boxmaxs[0] < touch->v.absmin[0] ||
+                clip->boxmaxs[1] < touch->v.absmin[1] ||
+                clip->boxmaxs[2] < touch->v.absmin[2]) ||
             (
                 clip->passedict &&
                 clip->passedict->v.size[0] &&

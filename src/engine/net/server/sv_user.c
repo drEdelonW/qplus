@@ -70,7 +70,7 @@ void SV_SetIdealPitch() {
         };
 
         trace_t tr = SV_Move(top, vec3_origin, vec3_origin, bottom, 1, sv_player);
-        if (tr.allsolid)    return; // looking at a wall, leave ideal the way is was
+        if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
         if (tr.fraction == 1)   return; // near a dropoff
 
         z[i] = top[2] + tr.fraction * (bottom[2] - top[2]);

@@ -38,8 +38,7 @@ void R_RotateSprite(float beamlength) {
     if (beamlength == 0.0)
         return;
 
-    vec3_t vec;
-    VectorScale(r_spritedesc.vpn, -beamlength, vec);
+    vec3_t vec; VectorScale(r_spritedesc.vpn, -beamlength, vec);
     VectorAdd(r_entorigin, vec, r_entorigin);
     VectorSubtract(modelorg, vec, modelorg);
 }
@@ -179,10 +178,8 @@ void R_SetupAndDrawSprite() {
 
     EmitPoint_t outverts[MAXWORKINGVERTS + 1];
     for (int i = 0; i < nump; i++) {
-        vec3_t local;
-        VectorSubtract(pv, r_origin, local);
-        vec3_t transformed;
-        TransformVector(local, transformed);
+        vec3_t local;   VectorSubtract(pv, r_origin, local);
+        vec3_t transformed; TransformVector(local, transformed);
 
         if (transformed[2] < NEAR_CLIP)
             transformed[2] = NEAR_CLIP;

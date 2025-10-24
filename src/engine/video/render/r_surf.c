@@ -66,22 +66,20 @@ void R_AddDynamicLights() {
     mTexInfo_p tex = surf->texinfo;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
-        if (!(surf->dlightbits & (1 << lnum)))
-            continue;  // not lit by this light
+        if (!(surf->dlightbits & (1 << lnum)))  continue;  // not lit by this light
 
         float rad = cl_dlights[lnum].radius;
         float dist = DotProduct(cl_dlights[lnum].origin, surf->plane->normal) -
             surf->plane->dist;
         rad -= fabs(dist);
         float minlight = cl_dlights[lnum].minlight;
-        if (rad < minlight)
-            continue;
+        if (rad < minlight)     continue;
+
         minlight = rad - minlight;
 
         vec3_t impact;
         for (int i = 0; i < VECT_DIM; i++) {
-            impact[i] = cl_dlights[lnum].origin[i] -
-                surf->plane->normal[i] * dist;
+            impact[i] = cl_dlights[lnum].origin[i] - surf->plane->normal[i] * dist;
         }
 
         vec3_t   local;
@@ -106,16 +104,12 @@ void R_AddDynamicLights() {
                 if (dist < minlight)
 #ifdef QUAKE2
                 {
-                    uint32_t temp;
-                    temp = (rad - dist) * 256;
+                    uint32_t temp = (rad - dist) * 256;
                     i = t * smax + s;
-                    if (!cl_dlights[lnum].dark)
-                        blocklights[i] += temp;
+                    if (!cl_dlights[lnum].dark)     blocklights[i] += temp;
                     else {
-                        if (blocklights[i] > temp)
-                            blocklights[i] -= temp;
-                        else
-                            blocklights[i] = 0;
+                        if (blocklights[i] > temp)  blocklights[i] -= temp;
+                        else                        blocklights[i] = 0;
                     }
                 }
 #else

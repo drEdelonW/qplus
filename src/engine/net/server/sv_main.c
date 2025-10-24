@@ -102,7 +102,7 @@ void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count) {
 void SV_StartSound(
     edict_p entity,
     int     channel,
-    cString   sample,
+    cString sample,
     int     volume,
     float   attenuation
 ) {
@@ -174,7 +174,7 @@ void SV_StartSound(
     This will be sent on the initial connection and upon each server load.
     ================
 */
-void SV_SendServerinfo(client_t* client) {
+void SV_SendServerinfo(client_p client) {
     char message[2048];
 
     MSG_WriteByte(&client->message, svc_print);
@@ -381,10 +381,9 @@ uint8_p SV_FatPVS(vec3_t org) {
 
     =============
 */
-void SV_WriteEntitiesToClient(edict_p clent, sizebuf_t* msg) {
+void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     // find the client's PVS
-    vec3_t  org;
-    VectorAdd(clent->v.origin, clent->v.view_ofs, org);
+    vec3_t  org;    VectorAdd(clent->v.origin, clent->v.view_ofs, org);
     uint8_p pvs = SV_FatPVS(org);
 
     // send over all entities (excpet the client) that touch the pvs
@@ -473,7 +472,7 @@ void SV_CleanupEnts() {
 
     ==================
 */
-void SV_WriteClientdataToMessage(edict_p ent, sizebuf_t* msg) {
+void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     //
     // send a damage message
     //
@@ -581,7 +580,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_t* msg) {
 */
 bool SV_SendClientDatagram(client_t* client) {
     uint8_t		buf[MAX_DATAGRAM];
-    sizebuf_t msg = {
+    sizebuf_t   msg = {
         .data = buf,
         .maxsize = sizeof(buf),
         .cursize = 0
@@ -617,7 +616,7 @@ bool SV_SendClientDatagram(client_t* client) {
     =======================
 */
 void SV_UpdateToReliableMessages() {
-    client_t* client;
+    client_p client;
 
     // check for changes to be sent over the reliable streams
     host_client = svs.clients;
@@ -653,7 +652,7 @@ void SV_UpdateToReliableMessages() {
     message buffer
     =======================
 */
-void SV_SendNop(client_t* client) {
+void SV_SendNop(client_p client) {
     sizebuf_t	msg;
     uint8_t		buf[4];
 
@@ -746,8 +745,8 @@ SERVER SPAWNING
     ================
 */
 int SV_ModelIndex(cString name) {
-    if (!name || !name[0])
-        return 0;
+    if (!name || !name[0]) return 0;
+
     int i = 0;
     for (; i < MAX_MODELS && sv.model_precache[i]; i++)
         if (!strcmp(sv.model_precache[i], name))
@@ -815,7 +814,7 @@ void SV_CreateBaseline() {
     ================
 */
 void SV_SendReconnect() {
-    uint8_t	data[128];
+    uint8_t	    data[128];
     sizebuf_t	msg;
 
     msg.data = data;
@@ -867,12 +866,12 @@ void SV_SaveSpawnparms() {
 */
 extern float		scr_centertime_off;
 
+void SV_SpawnServer(
+    cString server
 #ifdef QUAKE2
-void SV_SpawnServer(cString server, cString startspot)
-#else
-void SV_SpawnServer(cString server)
+    , cString startspot
 #endif
-{
+) {
     edict_p ent;
 
     // let's not have any servers with no name
@@ -980,10 +979,8 @@ void SV_SpawnServer(cString server)
     ent->v.solid = SOLID_BSP;
     ent->v.movetype = MOVETYPE_PUSH;
 
-    if (coop.value)
-        pr_global_struct->coop = coop.value;
-    else
-        pr_global_struct->deathmatch = deathmatch.value;
+    if (coop.value) pr_global_struct->coop = coop.value;
+    else            pr_global_struct->deathmatch = deathmatch.value;
 
     pr_global_struct->mapname = sv.name - pr_strings;
 #ifdef QUAKE2

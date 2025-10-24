@@ -158,13 +158,8 @@ stop recording a demo
 ====================
 */
 void CL_Stop_f() {
-    if (cmd_source != src_command)
-        return;
-
-    if (!cls.demorecording) {
-        Con_Printf("Not recording a demo.\n");
-        return;
-    }
+    if (cmd_source != src_command) return;
+    if (!cls.demorecording) { Con_Printf("Not recording a demo.\n"); return; }
 
     // write a disconnect message to the demo file
     SZ_Clear(&net_message);
@@ -186,8 +181,7 @@ record <demoname> <map> [cd track]
 ====================
 */
 void CL_Record_f() {
-    if (cmd_source != src_command)
-        return;
+    if (cmd_source != src_command) return;
 
     int arg = Cmd_Argc();
     if ((arg != 2) &&
@@ -253,13 +247,9 @@ play [demoname]
 ====================
 */
 void CL_PlayDemo_f() {
-    if (cmd_source != src_command)
-        return;
+    if (cmd_source != src_command) return;
 
-    if (Cmd_Argc() != 2) {
-        Con_Printf("play <demoname> : plays a demo\n");
-        return;
-    }
+    if (Cmd_Argc() != 2) { Con_Printf("play <demoname> : plays a demo\n"); return; }
 
     //
     // disconnect from server
@@ -288,10 +278,8 @@ void CL_PlayDemo_f() {
     int c;
     bool neg = false;
     while ((c = getc(cls.demofile)) != '\n')
-        if (c == '-')
-            neg = true;
-        else
-            cls.forcetrack = cls.forcetrack * 10 + (c - '0');
+        if (c == '-')   neg = true;
+        else            cls.forcetrack = cls.forcetrack * 10 + (c - '0');
 
     if (neg)
         cls.forcetrack = -cls.forcetrack;
@@ -324,13 +312,8 @@ timedemo [demoname]
 ====================
 */
 void CL_TimeDemo_f() {
-    if (cmd_source != src_command)
-        return;
-
-    if (Cmd_Argc() != 2) {
-        Con_Printf("timedemo <demoname> : gets demo speeds\n");
-        return;
-    }
+    if (cmd_source != src_command) return;
+    if (Cmd_Argc() != 2) { Con_Printf("timedemo <demoname> : gets demo speeds\n"); return; }
 
     CL_PlayDemo_f();
 
