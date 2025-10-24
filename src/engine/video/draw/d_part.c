@@ -43,7 +43,7 @@ void D_StartParticles() {
 }
 
 
-#if	!id386
+#if !id386
 
 /*
 ==============
@@ -52,8 +52,7 @@ D_DrawParticle
 */
 void D_DrawParticle(Particle_p pparticle) {
     // transform point
-    vec3_t	local;
-    VectorSubtract(pparticle->org, r_origin, local);
+    vec3_t local; VectorSubtract(pparticle->org, r_origin, local);
 
     vec3_t transformed = {
         DotProduct(local, r_pright),
@@ -178,5 +177,5 @@ void D_DrawParticle(Particle_p pparticle) {
     }
 }
 
-#endif	// !id386
+#endif // !id386
 

@@ -39,35 +39,36 @@ struct SurfCache_s;
 typedef struct SurfCache_s SurfCache_t;
 typedef SurfCache_t* SurfCache_p;
 struct SurfCache_s {
-	SurfCache_p 	next;
-	SurfCache_p* 	owner;		// NULL is an empty chunk of memory
-	int 			lightadj[MAXLIGHTMAPS]; // checked for strobe flush
-	int 			dlight;
-	int 			size;		// including header
-	uint32_t 		width;
-	uint32_t 		height;		// DEBUG only needed for debug
-	float 			mipscale;
-	Texture_p 		texture;	// checked for animating textures
-	uint8_t 		data[4];	// width * height elements
+    SurfCache_p  next;
+    SurfCache_p*  owner;  // NULL is an empty chunk of memory
+    int    lightadj[MAXLIGHTMAPS]; // checked for strobe flush
+    int    dlight;
+    int    size;  // including header
+    uint32_t   width;
+    uint32_t   height;  // DEBUG only needed for debug
+    float    mipscale;
+    Texture_p   texture; // checked for animating textures
+    uint8_t   data[4]; // width * height elements
 } ;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct sSpan_s {
-	int u, v, count;
+    int u, v, count;
 } sSpan_t;
+typedef sSpan_t* sSpan_p;
 
-extern float	scale_for_mip;
+extern float scale_for_mip;
 
-extern qboolean		d_roverwrapped;
+extern qboolean  d_roverwrapped;
 extern SurfCache_p sc_rover;
 extern SurfCache_p d_initial_rover;
 
-extern float	d_sdivzstepu, d_tdivzstepu, d_zistepu;
-extern float	d_sdivzstepv, d_tdivzstepv, d_zistepv;
-extern float	d_sdivzorigin, d_tdivzorigin, d_ziorigin;
+extern float d_sdivzstepu, d_tdivzstepu, d_zistepu;
+extern float d_sdivzstepv, d_tdivzstepv, d_zistepv;
+extern float d_sdivzorigin, d_tdivzorigin, d_ziorigin;
 
-extern fixed16_t	sadjust, tadjust;
-extern fixed16_t	bbextents, bbextentt;
+extern fixed16_t sadjust, tadjust;
+extern fixed16_t bbextents, bbextentt;
 
 
 void D_DrawSpans8(eSpan_p  pspans);
@@ -94,18 +95,18 @@ extern int16_p d_pzbuffer;
 extern uint32_t d_zrowbytes, d_zwidth;
 
 extern int* d_pscantable;
-extern int	d_scantable[MAXHEIGHT];
+extern int d_scantable[MAXHEIGHT];
 
-extern int	d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
+extern int d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
 
-extern int	d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
+extern int d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
 
 extern pixel_p d_viewbuffer;
 
 extern int16_p zspantable[MAXHEIGHT];
 
-extern int		d_minmip;
-extern float	d_scalemip[3];
+extern int  d_minmip;
+extern float d_scalemip[3];
 
 extern void(*d_drawspans)(eSpan_p pspan);
 

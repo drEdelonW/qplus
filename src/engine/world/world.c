@@ -147,14 +147,10 @@ Hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_t offset) {
             (model->type != mod_brush))
             Sys_Error("MOVETYPE_PUSH with a non bsp model");
 
-        vec3_t  size;
-        VectorSubtract(maxs, mins, size);
-        if (size[0] < 3)
-            hull = &model->hulls[0];
-        else if (size[0] <= 32)
-            hull = &model->hulls[1];
-        else
-            hull = &model->hulls[2];
+        vec3_t size; VectorSubtract(maxs, mins, size);
+        if (size[0] < 3)        hull = &model->hulls[0];
+        else if (size[0] <= 32) hull = &model->hulls[1];
+        else                    hull = &model->hulls[2];
 
         // calculate an offset value to center the origin
         VectorSubtract(hull->clip_mins, mins, offset);
@@ -162,9 +158,8 @@ Hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_t offset) {
     }
     else { // create a temp hull from bounding box sizes
 
-        vec3_t  hullmins, hullmaxs;
-        VectorSubtract(ent->v.mins, maxs, hullmins);
-        VectorSubtract(ent->v.maxs, mins, hullmaxs);
+        vec3_t hullmins; VectorSubtract(ent->v.mins, maxs, hullmins);
+        vec3_t hullmaxs; VectorSubtract(ent->v.maxs, mins, hullmaxs);
         hull = SV_HullForBox(hullmins, hullmaxs);
 
         VectorCopy(ent->v.origin, offset);
@@ -217,19 +212,15 @@ areaNode_p SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
         return anode;
     }
 
-    vec3_t size;
-    VectorSubtract(maxs, mins, size);
-    if (size[0] > size[1])
-        anode->axis = 0;
-    else
-        anode->axis = 1;
+    vec3_t size; VectorSubtract(maxs, mins, size);
+    if (size[0] > size[1])  anode->axis = 0;
+    else                    anode->axis = 1;
 
     anode->dist = 0.5 * (maxs[anode->axis] + mins[anode->axis]);
-    vec3_t  mins1, maxs1, mins2, maxs2;
-    VectorCopy(mins, mins1);
-    VectorCopy(mins, mins2);
-    VectorCopy(maxs, maxs1);
-    VectorCopy(maxs, maxs2);
+    vec3_t mins1; VectorCopy(mins, mins1);
+    vec3_t mins2; VectorCopy(mins, mins2);
+    vec3_t maxs1; VectorCopy(maxs, maxs1);
+    vec3_t maxs2; VectorCopy(maxs, maxs2);
 
     maxs1[anode->axis] = mins2[anode->axis] = anode->dist;
 
@@ -681,9 +672,8 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
     vec3_t offset;
     Hull_p hull = SV_HullForEntity(ent, mins, maxs, offset);
 
-    vec3_t  start_l, end_l;
-    VectorSubtract(start, offset, start_l);
-    VectorSubtract(end, offset, end_l);
+    vec3_t start_l; VectorSubtract(start, offset, start_l);
+    vec3_t end_l; VectorSubtract(end, offset, end_l);
 
 #ifdef QUAKE2
     // rotate start and end into the models frame of reference
@@ -694,12 +684,9 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
             ent->v.angles[2])
         ) {
         // vec3_t a;
-        vec3_t forward, right, up;
+        vec3_t forward, right, up; AngleVectors(ent->v.angles, forward, right, up);
 
-        AngleVectors(ent->v.angles, forward, right, up);
-
-        vec3_t temp;
-        VectorCopy(start_l, temp);
+        vec3_t temp; VectorCopy(start_l, temp);
         start_l[0] = DotProduct(temp, forward);
         start_l[1] = -DotProduct(temp, right);
         start_l[2] = DotProduct(temp, up);
@@ -726,13 +713,13 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
         vec3_t forward, right, up;  AngleVectors(a, forward, right, up);
 
         {
-            vec3_t temp;    VectorCopy(trace.endpos, temp);
+            vec3_t temp; VectorCopy(trace.endpos, temp);
             trace.endpos[0] = DotProduct(temp, forward);
             trace.endpos[1] = -DotProduct(temp, right);
             trace.endpos[2] = DotProduct(temp, up);
         }
         {
-            vec3_t temp;    VectorCopy(trace.plane.normal, temp);
+            vec3_t temp; VectorCopy(trace.plane.normal, temp);
             trace.plane.normal[0] = DotProduct(temp, forward);
             trace.plane.normal[1] = -DotProduct(temp, right);
             trace.plane.normal[2] = DotProduct(temp, up);

@@ -505,11 +505,7 @@ void R_DrawEntitiesOnList() {
 
                 for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
                     if (cl_dlights[lnum].die >= cl.time) {
-                        vec3_t  dist;
-                        VectorSubtract(
-                            currententity->origin,
-                            cl_dlights[lnum].origin,
-                            dist);
+                        vec3_t dist; VectorSubtract(currententity->origin, cl_dlights[lnum].origin, dist);
                         float add = cl_dlights[lnum].radius - Length(dist);
 
                         if (add > 0)
@@ -572,8 +568,7 @@ void R_DrawViewModel() {
             (dl->die < cl.time))
             continue;
 
-        vec3_t dist;
-        VectorSubtract(currententity->origin, dl->origin, dist);
+        vec3_t dist; VectorSubtract(currententity->origin, dl->origin, dist);
         float add = dl->radius - Length(dist);
         if (add > 0)
             r_viewlighting.ambientlight += add;
@@ -663,36 +658,29 @@ R_DrawBEntitiesOnList
 =============
 */
 void R_DrawBEntitiesOnList() {
-    int   i, j, k, clipflags;
-    vec3_t  oldorigin;
-    Model_t* clmodel;
-    float  minmaxs[6];
+    if (!r_drawentities.value)  return;
 
-    if (!r_drawentities.value)
-        return;
-
-    VectorCopy(modelorg, oldorigin);
+    vec3_t oldorigin; VectorCopy(modelorg, oldorigin);
     insubmodel = true;
     r_dlightframecount = r_framecount;
 
-    for (i = 0; i < cl_numvisedicts; i++) {
+    for (int i = 0; i < cl_numvisedicts; i++) {
         currententity = cl_visedicts[i];
 
         switch (currententity->model->type) {
         case mod_brush:
 
-            clmodel = currententity->model;
+            Model_p clmodel = currententity->model;
 
             // see if the bounding box lets us trivially reject, also sets
             // trivial accept status
-            for (j = 0; j < VECT_DIM; j++) {
-                minmaxs[j] = currententity->origin[j] +
-                    clmodel->mins[j];
-                minmaxs[3 + j] = currententity->origin[j] +
-                    clmodel->maxs[j];
+            float  minmaxs[6];
+            for (int j = 0; j < VECT_DIM; j++) {
+                minmaxs[j] = currententity->origin[j] + clmodel->mins[j];
+                minmaxs[3 + j] = currententity->origin[j] + clmodel->maxs[j];
             }
 
-            clipflags = R_BmodelCheckBBox(clmodel, minmaxs);
+            int clipflags = R_BmodelCheckBBox(clmodel, minmaxs);
 
             if (clipflags != BMODEL_FULLY_CLIPPED) {
                 VectorCopy(currententity->origin, r_entorigin);
@@ -708,7 +696,7 @@ void R_DrawBEntitiesOnList() {
                 // calculate dynamic lighting for bmodel if it's not an
                 // instanced model
                 if (clmodel->firstmodelsurface != 0) {
-                    for (k = 0; k < MAX_DLIGHTS; k++) {
+                    for (int k = 0; k < MAX_DLIGHTS; k++) {
                         if ((cl_dlights[k].die < cl.time) ||
                             (!cl_dlights[k].radius)) {
                             continue;
@@ -728,7 +716,7 @@ void R_DrawBEntitiesOnList() {
                 else {
                     r_pefragtopnode = NULL;
 
-                    for (j = 0; j < VECT_DIM; j++) {
+                    for (int j = 0; j < VECT_DIM; j++) {
                         r_emins[j] = minmaxs[j];
                         r_emaxs[j] = minmaxs[3 + j];
                     }
@@ -766,8 +754,7 @@ void R_DrawBEntitiesOnList() {
 
             break;
 
-        default:
-            break;
+        default:    break;
         }
     }
 
@@ -791,9 +778,7 @@ void R_EdgeDrawing() {
 
 #endif
 #  define ALIGN_PTR(p, a) ((TypeLess_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
-    if (auxedges) {
-        r_edges = auxedges;
-    }
+    if (auxedges) { r_edges = auxedges; }
     else {
         r_edges = (Edge_p)
             // (((uintptr_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
@@ -810,7 +795,7 @@ void R_EdgeDrawing() {
         // is used to indicate no edge attached to surface
         surfaces--;
         R_SurfacePatch();
-}
+    }
 #else
     if (r_surfsonstack) {
         /* выравниваем от (lsurfs + 1), чтобы потом surfaces = base - 1 было легально */
@@ -929,25 +914,15 @@ void R_RenderView_() {
 
     R_DrawParticles();
 
-    if (r_dspeeds.value)
-        dp_time2 = Sys_FloatTime();
-
-    if (r_dowarp)
-        D_WarpScreen();
+    if (r_dspeeds.value)    dp_time2 = Sys_FloatTime();
+    if (r_dowarp)           D_WarpScreen();
 
     V_SetContentsColor(r_viewleaf->contents);
 
-    if (r_timegraph.value)
-        R_TimeGraph();
-
-    if (r_aliasstats.value)
-        R_PrintAliasStats();
-
-    if (r_speeds.value)
-        R_PrintTimes();
-
-    if (r_dspeeds.value)
-        R_PrintDSpeeds();
+    if (r_timegraph.value)  R_TimeGraph();
+    if (r_aliasstats.value) R_PrintAliasStats();
+    if (r_speeds.value)     R_PrintTimes();
+    if (r_dspeeds.value)    R_PrintDSpeeds();
 
     if (r_reportsurfout.value && r_outofsurfaces)
         Con_Printf("Short %d surfaces\n", r_outofsurfaces);
@@ -962,17 +937,10 @@ void R_RenderView_() {
 void R_RenderView() {
     int dummy;
     int delta = (uint8_p)&dummy - r_stack_start;
-    if (delta < -10000 || delta > 10000)
-        Sys_Error("R_RenderView: called without enough stack");
-
-    if (Hunk_LowMark() & 3)
-        Sys_Error("Hunk is missaligned");
-
-    if ((uintptr_t)(&dummy) & 3)
-        Sys_Error("Stack is missaligned");
-
-    if ((uintptr_t)(&r_warpbuffer) & 3)
-        Sys_Error("Globals are missaligned");
+    if (delta < -10000 || delta > 10000)    Sys_Error("R_RenderView: called without enough stack");
+    if (Hunk_LowMark() & 3)                 Sys_Error("Hunk is missaligned");
+    if ((uintptr_t)(&dummy) & 3)            Sys_Error("Stack is missaligned");
+    if ((uintptr_t)(&r_warpbuffer) & 3)     Sys_Error("Globals are missaligned");
 
     R_RenderView_();
 }

@@ -654,8 +654,7 @@ void PF_checkclient() {
 
     // if current entity can't possibly see the check entity, return 0
     edict_p self = PROG_TO_EDICT(pr_global_struct->self);
-    vec3_t view;
-    VectorAdd(self->v.origin, self->v.view_ofs, view);
+    vec3_t view; VectorAdd(self->v.origin, self->v.view_ofs, view);
     mLeaf_p leaf = Mod_PointInLeaf(view, sv.worldmodel);
     int l = (leaf - sv.worldmodel->leafs) - 1;
     if ((l < 0) ||
@@ -744,7 +743,6 @@ findradius (origin, radius)
 =================
 */
 void PF_findradius() {
-    vec3_t eorg;
     edict_p chain = (edict_p)sv.edicts;
     float_p org = G_VECTOR(OFS_PARM0);
     float rad = G_FLOAT(OFS_PARM1);
@@ -755,8 +753,10 @@ void PF_findradius() {
             (ent->v.solid == SOLID_NOT))
             continue;
 
+        vec3_t eorg;
         for (int j = 0; j < VECT_DIM; j++) // eorg -= ent->v.origin + (ent->v.mins + ent->v.maxs) * 0.5;
             eorg[j] = org[j] - (ent->v.origin[j] + (ent->v.mins[j] + ent->v.maxs[j]) * 0.5);
+
         if (Length(eorg) > rad) continue;
 
         ent->v.chain = EDICT_TO_PROG(chain);

@@ -84,9 +84,8 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         float_p world = &pv0->position[0];
 
         // transform and project
-        vec3_t local, transformed;
-        VectorSubtract(world, modelorg, local);
-        TransformVector(local, transformed);
+        vec3_t local;   VectorSubtract(world, modelorg, local);
+        vec3_t transformed; TransformVector(local, transformed);
 
         if (transformed[2] < NEAR_CLIP)
             transformed[2] = NEAR_CLIP;
@@ -117,9 +116,8 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     float_p world = &pv1->position[0];
 
     // transform and project
-    vec3_t local, transformed;
-    VectorSubtract(world, modelorg, local);
-    TransformVector(local, transformed);
+    vec3_t local; VectorSubtract(world, modelorg, local);
+    vec3_t transformed; TransformVector(local, transformed);
 
     if (transformed[2] < NEAR_CLIP)
         transformed[2] = NEAR_CLIP;
@@ -493,8 +491,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
 
     mPlane_p pplane = fa->plane;
     // FIXME: cache this?
-    vec3_t p_normal;
-    TransformVector(pplane->normal, p_normal);
+    vec3_t p_normal; TransformVector(pplane->normal, p_normal);
     // FIXME: cache this?
     float distinv = 1.0 / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
@@ -594,8 +591,7 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
 
     mPlane_p pplane = psurf->plane;
     // FIXME: cache this?
-    vec3_t  p_normal;
-    TransformVector(pplane->normal, p_normal);
+    vec3_t p_normal; TransformVector(pplane->normal, p_normal);
     // FIXME: cache this?
     float distinv = 1.0 / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
@@ -718,9 +714,8 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
 
     for (int i = 0; i < lnumverts; i++) {
         // transform and project
-        vec3_t local, transformed;
-        VectorSubtract(verts[vertpage][i].position, modelorg, local);
-        TransformVector(local, transformed);
+        vec3_t local; VectorSubtract(verts[vertpage][i].position, modelorg, local);
+        vec3_t transformed; TransformVector(local, transformed);
 
         if (transformed[2] < NEAR_CLIP)
             transformed[2] = NEAR_CLIP;

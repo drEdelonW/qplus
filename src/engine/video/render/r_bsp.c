@@ -61,8 +61,7 @@ R_EntityRotate
 ================
 */
 void R_EntityRotate(vec3_t vec) {
-    vec3_t tvec;
-    VectorCopy(vec, tvec);
+    vec3_t tvec; VectorCopy(vec, tvec);
     for (int i = 0; i < VECT_DIM; i++)
         vec[i] = DotProduct(entity_rotation[i], tvec);
 }

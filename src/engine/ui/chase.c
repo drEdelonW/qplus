@@ -31,11 +31,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 
-vec3_t chase_pos;
-vec3_t chase_angles;
+// vec3_t chase_pos;
+// vec3_t chase_angles;
 
 vec3_t chase_dest;
-vec3_t chase_dest_angles;
+// vec3_t chase_dest_angles;
 
 
 void Chase_Init() {
@@ -55,12 +55,11 @@ qboolean SV_RecursiveHullCheck(
     int num,
     float p1f, float p2f,
     vec3_t p1, vec3_t p2,
-    trace_t* trace
+    trace_p trace
 ); // engine/world/world.c
 
 void TraceLine(vec3_t start, vec3_t end, vec3_t impact) {
-    trace_t  trace;
-    memset(&trace, 0, sizeof(trace));
+    trace_t  trace; memset(&trace, 0, sizeof(trace));
     SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
 
     VectorCopy(trace.endpos, impact);
@@ -68,8 +67,7 @@ void TraceLine(vec3_t start, vec3_t end, vec3_t impact) {
 
 void Chase_Update() {
     // if can't see player, reset
-    vec3_t  forward, up, right;
-    AngleVectors(cl.viewangles, forward, right, up);
+    vec3_t  forward, up, right; AngleVectors(cl.viewangles, forward, right, up);
 
     // calc exact destination
     for (int i = 0; i < VECT_DIM; i++) {
@@ -81,9 +79,8 @@ void Chase_Update() {
     chase_dest[2] = r_refdef.vieworg[2] + chase_up.value;
 
     // find the spot the player is looking at
-    vec3_t  dest, stop;
-    VectorMA(r_refdef.vieworg, 4096, forward, dest);
-    TraceLine(r_refdef.vieworg, dest, stop);
+    vec3_t dest;    VectorMA(r_refdef.vieworg, 4096, forward, dest);
+    vec3_t stop;    TraceLine(r_refdef.vieworg, dest, stop);
 
     // calculate pitch to look at the same spot from camera
     VectorSubtract(stop, r_refdef.vieworg, stop);

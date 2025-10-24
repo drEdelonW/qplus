@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cmd.h"
 #include "chase.h"
 #include "cvar_q1.h"
+#include "q_tools.h"
 
 /*
 
@@ -68,10 +69,8 @@ float V_CalcRoll(vec3_t angles, vec3_t velocity) {
     // if (cl.inwater)
     //  value *= 6;
 
-    if (side < cl_rollspeed.value)
-        side = side * value / cl_rollspeed.value;
-    else
-        side = value;
+    if (side < cl_rollspeed.value)  side = side * value / cl_rollspeed.value;
+    else                            side = value;
 
     return side * sign;
 }
@@ -86,10 +85,8 @@ V_CalcBob
 float V_CalcBob() {
     float cycle = cl.time - (int)(cl.time / cl_bobcycle.value) * cl_bobcycle.value;
     cycle /= cl_bobcycle.value;
-    if (cycle < cl_bobup.value)
-        cycle = M_PI * cycle / cl_bobup.value;
-    else
-        cycle = M_PI + M_PI * (cycle - cl_bobup.value) / (1.0 - cl_bobup.value);
+    if (cycle < cl_bobup.value) cycle = M_PI * cycle / cl_bobup.value;
+    else                        cycle = M_PI + M_PI * (cycle - cl_bobup.value) / (1.0 - cl_bobup.value);
 
     // bob is proportional to velocity in the xy plane
     // (don't count Z, or jumping messes it up)
@@ -150,10 +147,8 @@ void V_DriftPitch() {
 
     // don't count small mouse motion
     if (cl.nodrift) {
-        if (fabs(cl.cmd.forwardmove) < cl_forwardspeed.value)
-            cl.driftmove = 0;
-        else
-            cl.driftmove += host_frametime;
+        if (fabs(cl.cmd.forwardmove) < cl_forwardspeed.value)   cl.driftmove = 0;
+        else                                                    cl.driftmove += host_frametime;
 
         if (cl.driftmove > v_centermove.value)  V_StartPitchDrift();
         return;
@@ -258,13 +253,13 @@ V_ParseDamage
 ===============
 */
 void V_ParseDamage() {
-    vec3_t from;
-    vec3_t forward, right, up;
-
     int armor = MSG_ReadByte();
     int blood = MSG_ReadByte();
-    for (int i = 0; i < VECT_DIM; i++)
-        from[i] = MSG_ReadCoord();
+    vec3_t from = {
+        MSG_ReadCoord(),
+        MSG_ReadCoord(),
+        MSG_ReadCoord()
+    };
 
     float count = blood * 0.5 + armor * 0.5;
     if (count < 10)
@@ -302,7 +297,7 @@ void V_ParseDamage() {
     VectorSubtract(from, ent->origin, from);
     VectorNormalize(from);
 
-    AngleVectors(ent->angles, forward, right, up);
+    vec3_t forward, right, up;  AngleVectors(ent->angles, forward, right, up);
 
     v_dmg_roll = count * v_kickroll.value * DotProduct(from, right);
     v_dmg_pitch = count * v_kickpitch.value * DotProduct(from, forward);
@@ -347,17 +342,10 @@ Underwater, lava, etc each has a color shift
 void V_SetContentsColor(contents_t contents) {
     switch (contents) {
     case CONTENTS_EMPTY:
-    case CONTENTS_SOLID:
-        cl.cshifts[CSHIFT_CONTENTS] = cshift_empty;
-        break;
-    case CONTENTS_LAVA:
-        cl.cshifts[CSHIFT_CONTENTS] = cshift_lava;
-        break;
-    case CONTENTS_SLIME:
-        cl.cshifts[CSHIFT_CONTENTS] = cshift_slime;
-        break;
-    default:
-        cl.cshifts[CSHIFT_CONTENTS] = cshift_water;
+    case CONTENTS_SOLID:    cl.cshifts[CSHIFT_CONTENTS] = cshift_empty; break;
+    case CONTENTS_LAVA:     cl.cshifts[CSHIFT_CONTENTS] = cshift_lava;  break;
+    case CONTENTS_SLIME:    cl.cshifts[CSHIFT_CONTENTS] = cshift_slime; break;
+    default:                cl.cshifts[CSHIFT_CONTENTS] = cshift_water;
     }
 }
 
@@ -603,15 +591,9 @@ void CalcGunAngle() {
     float pitch = -r_refdef.viewangles[PITCH];
 
     yaw = angledelta(yaw - r_refdef.viewangles[YAW]) * 0.4;
-    if (yaw > 10)
-        yaw = 10;
-    if (yaw < -10)
-        yaw = -10;
+    CLAMP(-10, yaw, 10);
     pitch = angledelta(-pitch - r_refdef.viewangles[PITCH]) * 0.4;
-    if (pitch > 10)
-        pitch = 10;
-    if (pitch < -10)
-        pitch = -10;
+    CLAMP(-10, pitch, 10);
     float move = host_frametime * 20;
     if (yaw > oldyaw) {
         if (oldyaw + move < yaw)
@@ -741,18 +723,13 @@ void V_CalcRefdef() {
     static float oldz = 0;
 
     V_DriftPitch();
-    // ent is the player model (visible when out of body)
-    r_Entity_p ent = &cl_entities[cl.viewentity];
-    // view is the weapon model (only visible from inside body)
-    r_Entity_p view = &cl.viewent;
+    r_Entity_p ent = &cl_entities[cl.viewentity];   // ent is the player model (visible when out of body)
+    r_Entity_p view = &cl.viewent;  // view is the weapon model (only visible from inside body)
 
 
-    // transform the view offset by the model's matrix to get the offset from
-    // model origin for the view
-    ent->angles[YAW] = cl.viewangles[YAW]; // the model should face
-    // the view dir
-    ent->angles[PITCH] = -cl.viewangles[PITCH]; // the model should face
-    // the view dir
+    // transform the view offset by the model's matrix to get the offset from model origin for the view
+    ent->angles[YAW] = cl.viewangles[YAW]; // the model should face the view dir
+    ent->angles[PITCH] = -cl.viewangles[PITCH]; // the model should face the view dir
 
 
     float bob = V_CalcBob();
@@ -779,8 +756,7 @@ void V_CalcRefdef() {
        ent->angles[ROLL]   /* angles[ROLL] */
     };
 
-    vec3_t forward, right, up;
-    AngleVectors(angles, forward, right, up);
+    vec3_t forward, right, up;  AngleVectors(angles, forward, right, up);
 
     for (int i = 0; i < VECT_DIM; i++) {
         r_refdef.vieworg[i] +=
@@ -792,8 +768,7 @@ void V_CalcRefdef() {
 
     V_BoundOffsets();
 
-    // set up gun position
-    VectorCopy(cl.viewangles, view->angles);
+    VectorCopy(cl.viewangles, view->angles);    // set up gun position
 
     CalcGunAngle();
 
@@ -811,20 +786,12 @@ void V_CalcRefdef() {
     // roughly equal with different FOV
 
 #if 0
-    if (cl.model_precache[cl.stats[STAT_WEAPON]] && strcmp(cl.model_precache[cl.stats[STAT_WEAPON]]->name, "progs/v_shot2.mdl"))
+    if (cl.model_precache[cl.stats[STAT_WEAPON]] && strcmp(cl.model_precache[cl.stats[STAT_WEAPON]]->name, "progs/v_shot2.mdl")) {}
 #endif
-        if (scr_viewsize.value == 110) {
-            view->origin[2] += 1;
-        }
-        else if (scr_viewsize.value == 100) {
-            view->origin[2] += 2;
-        }
-        else if (scr_viewsize.value == 90) {
-            view->origin[2] += 1;
-        }
-        else if (scr_viewsize.value == 80) {
-            view->origin[2] += 0.5;
-        }
+    if (scr_viewsize.value == 110)      view->origin[2] += 1;
+    else if (scr_viewsize.value == 100) view->origin[2] += 2;
+    else if (scr_viewsize.value == 90)  view->origin[2] += 1;
+    else if (scr_viewsize.value == 80)  view->origin[2] += 0.5;
 
     view->model = cl.model_precache[cl.stats[STAT_WEAPON]];
     view->frame = cl.stats[STAT_WEAPONFRAME];
@@ -853,13 +820,9 @@ void V_CalcRefdef() {
         r_refdef.vieworg[2] += oldz - ent->origin[2];
         view->origin[2] += oldz - ent->origin[2];
     }
-    else {
-        oldz = ent->origin[2];
-    }
+    else { oldz = ent->origin[2]; }
 
-    if (chase_active.value) {
-        Chase_Update();
-    }
+    if (chase_active.value) { Chase_Update(); }
 }
 
 /*
@@ -873,8 +836,7 @@ the entity origin, so any view position inside that will be valid
 extern vRect_t scr_vrect;
 
 void V_RenderView() {
-    if (con_forcedup)
-        return;
+    if (con_forcedup)   return;
 
     // don't allow cheats in multiplayer
     if (cl.maxclients > 1) {
@@ -887,7 +849,7 @@ void V_RenderView() {
         V_CalcIntermissionRefdef();
     }
     else {
-        if (!cl.paused /* && (sv.maxclients > 1 || key_dest == key_game) */)
+        if (!cl.paused /* && ((sv.maxclients > 1) || (key_dest == key_game)) */)
             V_CalcRefdef();
     }
 
@@ -922,14 +884,15 @@ void V_RenderView() {
         vid.rowbytes >>= 1;
         vid.aspect *= 2;
     }
-    else {
-        R_RenderView();
-    }
+    else { R_RenderView(); }
 
 #ifndef GLQUAKE
     if (crosshair.value)
-        Draw_Character(scr_vrect.x + scr_vrect.width / 2 + cl_crossx.value,
-            scr_vrect.y + scr_vrect.height / 2 + cl_crossy.value, '+');
+        Draw_Character(
+            scr_vrect.x + scr_vrect.width / 2 + cl_crossx.value,
+            scr_vrect.y + scr_vrect.height / 2 + cl_crossy.value,
+            '+'
+        );
 #endif
 
 }

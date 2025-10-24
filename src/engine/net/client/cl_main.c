@@ -101,8 +101,7 @@ void CL_Disconnect() {
     // SCR_BringDownConsole ();
 
     // if running a local server, shut it down
-    if (cls.demoplayback)
-        CL_StopPlayback();
+    if (cls.demoplayback)   CL_StopPlayback();
     else if (cls.state == ca_connected) {
         if (cls.demorecording)
             CL_Stop_f();
@@ -115,8 +114,7 @@ void CL_Disconnect() {
         NET_Close(cls.netcon);
 
         cls.state = ca_disconnected;
-        if (sv.active)
-            Host_ShutdownServer(false);
+        if (sv.active)      Host_ShutdownServer(false);
     }
 
     cls.demoplayback = cls.timedemo = false;
@@ -125,8 +123,7 @@ void CL_Disconnect() {
 
 void CL_Disconnect_f() {
     CL_Disconnect();
-    if (sv.active)
-        Host_ShutdownServer(false);
+    if (sv.active)  Host_ShutdownServer(false);
 }
 
 
@@ -149,6 +146,7 @@ void CL_EstablishConnection(cString host) {
     cls.netcon = NET_Connect(host);
     if (!cls.netcon)
         Host_Error("CL_Connect: connect failed\n");
+
     Con_DPrintf("CL_EstablishConnection: connected to %s\n", host);
 
     cls.demonum = -1;   // not in the demo loop now
@@ -210,12 +208,13 @@ Called to play the next demo in the demo loop
 =====================
 */
 void CL_NextDemo() {
-    if (cls.demonum == -1)
-        return;  // don't play demos
+    if (cls.demonum == -1)      return;  // don't play demos
 
     SCR_BeginLoadingPlaque();
 
-    if (!cls.demos[cls.demonum][0] || cls.demonum == MAX_DEMOS) {
+    if (!cls.demos[cls.demonum][0] ||
+        cls.demonum == MAX_DEMOS
+        ) {
         cls.demonum = 0;
         if (!cls.demos[cls.demonum][0]) {
             Con_Printf("No demos listed with startdemos\n");
@@ -239,10 +238,7 @@ void CL_PrintEntities_f() {
     r_Entity_p ent = cl_entities;
     for (int i = 0; i < cl.num_entities; i++, ent++) {
         Con_Printf("%3i:", i);
-        if (!ent->model) {
-            Con_Printf("EMPTY\n");
-            continue;
-        }
+        if (!ent->model) { Con_Printf("EMPTY\n"); continue; }
         Con_Printf(
             "%s:%2i  (%5.1f,%5.1f,%5.1f) [%5.1f %5.1f %5.1f]\n",
             ent->model->name,
@@ -271,8 +267,7 @@ void SetPal(int i) {
 #if 0
     static int old;
 
-    if (i == old)
-        return;
+    if (i == old)   return;
     old = i;
 
     if (i == 0)

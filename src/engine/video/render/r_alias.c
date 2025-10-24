@@ -324,10 +324,11 @@ void R_AliasSetUpTransform(int trivial_accept) {
     // TODO: should use a look-up table
     // TODO: could cache lazily, stored in the entity
 
-    vec3_t angles;
-    angles[ROLL] = currententity->angles[ROLL];
-    angles[PITCH] = -currententity->angles[PITCH];
-    angles[YAW] = currententity->angles[YAW];
+    vec3_t angles = {
+        /* angles[PITCH] = */ -currententity->angles[PITCH],
+        /* angles[YAW] = */ currententity->angles[YAW],
+        /* angles[ROLL] = */ currententity->angles[ROLL]
+    };
     AngleVectors(angles, _aliasForward, _aliasRight, _aliasUp);
 
     tmatrix[0][0] = pmdl->scale[0];
@@ -372,14 +373,9 @@ void R_AliasSetUpTransform(int trivial_accept) {
     // FIXME: make this work for clipped case too?
     if (trivial_accept) {
         for (int i = 0; i < 4; i++) {
-            aliastransform[0][i] *=
-                aliasxscale *
-                (1.0 / ((float)0x8000 * 0x10000));
-            aliastransform[1][i] *=
-                aliasyscale *
-                (1.0 / ((float)0x8000 * 0x10000));
-            aliastransform[2][i] *=
-                (1.0 / ((float)0x8000 * 0x10000));
+            aliastransform[0][i] *= aliasxscale * (1.0 / ((float)0x8000 * 0x10000));
+            aliastransform[1][i] *= aliasyscale * (1.0 / ((float)0x8000 * 0x10000));
+            aliastransform[2][i] *= (1.0 / ((float)0x8000 * 0x10000));
         }
     }
 }

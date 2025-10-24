@@ -110,9 +110,8 @@ void D_CalcGradients(mSurface_p pface) {
 
     float mipscale = 1.0 / (float)(1 << _miplevel);
 
-    vec3_t  p_saxis, p_taxis;
-    TransformVector(pface->texinfo->vecs[0], p_saxis);
-    TransformVector(pface->texinfo->vecs[1], p_taxis);
+    vec3_t p_saxis; TransformVector(pface->texinfo->vecs[0], p_saxis);
+    vec3_t p_taxis; TransformVector(pface->texinfo->vecs[1], p_taxis);
     {
         float t = xscaleinv * mipscale;
         d_sdivzstepu = p_saxis[0] * t;
@@ -132,8 +131,7 @@ void D_CalcGradients(mSurface_p pface) {
         xcenter * d_tdivzstepu -
         ycenter * d_tdivzstepv;
 
-    vec3_t p_temp1;
-    VectorScale(transformed_modelorg, mipscale, p_temp1);
+    vec3_t p_temp1; VectorScale(transformed_modelorg, mipscale, p_temp1);
 
     {
         float t = 0x10000 * mipscale;
@@ -158,11 +156,9 @@ D_DrawSurfaces
 ==============
 */
 void D_DrawSurfaces() {
-    vec3_t world_transformed_modelorg;
-
     currententity = &cl_entities[0];
     TransformVector(modelorg, transformed_modelorg);
-    VectorCopy(transformed_modelorg, world_transformed_modelorg);
+    vec3_t world_transformed_modelorg; VectorCopy(transformed_modelorg, world_transformed_modelorg);
 
     // TODO: could preset a lot of this at mode set time
     if (r_drawflat.value) {
@@ -221,9 +217,7 @@ void D_DrawSurfaces() {
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel ()
-                    vec3_t local_modelorg;
-                    VectorSubtract(r_origin, currententity->origin,
-                        local_modelorg);
+                    vec3_t local_modelorg;  VectorSubtract(r_origin, currententity->origin, local_modelorg);
                     TransformVector(local_modelorg, transformed_modelorg);
 
                     R_RotateBmodel(); // FIXME: don't mess with the frustum,
@@ -256,8 +250,7 @@ void D_DrawSurfaces() {
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel ()
-                    vec3_t local_modelorg;
-                    VectorSubtract(r_origin, currententity->origin, local_modelorg);
+                    vec3_t local_modelorg;  VectorSubtract(r_origin, currententity->origin, local_modelorg);
                     TransformVector(local_modelorg, transformed_modelorg);
 
                     R_RotateBmodel(); // FIXME: don't mess with the frustum,
