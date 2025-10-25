@@ -38,9 +38,9 @@ void R_RotateSprite(float beamlength) {
     if (beamlength == 0.0)
         return;
 
-    vec3_t vec; VectorScale(r_spritedesc.vpn, -beamlength, vec);
-    VectorAdd(r_entorigin, vec, r_entorigin);
-    VectorSubtract(modelorg, vec, modelorg);
+    vec3_t vec; VectorScale(r_spritedesc.vpn, -beamlength, vec); // vec = r_spritedesc.vpn * (-beamlength);
+    VectorAdd(r_entorigin, vec, r_entorigin);   // r_entorigin += vec;
+    VectorSubtract(modelorg, vec, modelorg);    // modelorg -= vec;
 }
 
 
@@ -92,11 +92,8 @@ int R_ClipSpriteFace(int nump, ClipPlane_t* pclipplane) {
             outcount++;
         }
 
-        if (dists[i] == 0 || dists[i + 1] == 0)
-            continue;
-
-        if ((dists[i] > 0) == (dists[i + 1] > 0))
-            continue;
+        if ((dists[i] == 0) || (dists[i + 1] == 0))     continue;
+        if ((dists[i] > 0) == (dists[i + 1] > 0))       continue;
 
         // split it into a new vertex
         float frac = dists[i] / (dists[i] - dists[i + 1]);

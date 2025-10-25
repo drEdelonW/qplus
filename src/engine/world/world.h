@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "mathlib.h"
 #include "types.h"
 #include "progs.h"
+#include "bspfile.h"
+
 
 typedef struct {
 	vec3_t	normal;
@@ -60,8 +62,8 @@ void SV_LinkEdict(edict_p ent, qboolean touch_triggers);
 // sets ent->v.absmin and ent->v.absmax
 // if touchtriggers, calls prog functions for the intersected triggers
 
-int SV_PointContents(vec3_t p);
-int SV_TruePointContents(vec3_t p);
+contents_t SV_PointContents(vec3_t p);
+contents_t SV_TruePointContents(vec3_t p);
 // returns the CONTENTS_* value from the world at the given point.
 // does not check any entities at all
 // the non-true version remaps the water current contents to content_water

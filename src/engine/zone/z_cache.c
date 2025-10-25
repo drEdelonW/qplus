@@ -68,10 +68,8 @@ Throw things out until the hunk can be expanded to the given point
 void Cache_FreeLow(int new_low_hunk) {
     while (1) {
         cache_system_p c = cache_head.next;
-        if (c == &cache_head)
-            return;		// nothing in cache at all
-        if ((uint8_p)c >= hunk_base + new_low_hunk)
-            return;		// there is space to grow the hunk
+        if (c == &cache_head)                       return;		// nothing in cache at all
+        if ((uint8_p)c >= hunk_base + new_low_hunk) return;		// there is space to grow the hunk
         Cache_Move(c);	// reclaim the space
     }
 }

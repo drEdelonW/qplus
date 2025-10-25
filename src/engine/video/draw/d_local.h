@@ -75,7 +75,7 @@ void D_DrawSpans8(eSpan_p  pspans);
 void D_DrawSpans16(eSpan_p pspans);
 void D_DrawZSpans(eSpan_p  pspans);
 void Turbulent8(eSpan_p    pspan);
-void D_SpriteDrawSpans(sSpan_t* pspan);
+void D_SpriteDrawSpans(sSpan_p pspan);
 
 void D_DrawSkyScans8(eSpan_p   pspan);
 void D_DrawSkyScans16(eSpan_p  pspan);

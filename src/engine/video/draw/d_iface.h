@@ -103,13 +103,13 @@ typedef FinalVert_t* FinalVert_p;
 typedef struct {
     TypeLess_ptr pskin;
     mAliasSkinDesc_p pskindesc;
-    int skinwidth;
-    int skinheight;
+    int         skinwidth;
+    int         skinheight;
     mTriangle_p ptriangles;
     FinalVert_p pfinalverts;
-    int numtriangles;
-    int drawtype;
-    int seamfixupX16;
+    int         numtriangles;
+    int         drawtype;
+    int         seamfixupX16;
 } AffineTriDesc_t;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
@@ -190,7 +190,7 @@ extern uint8_p r_skysource;
 
 // transparency types for D_DrawRect ()
 typedef enum {
-    DR_SOLID       = 0, // draw solid
+    DR_SOLID = 0, // draw solid
     DR_TRANSPARENT = 1  // draw transparent
 } drawrect_t;
 
@@ -204,15 +204,14 @@ extern TypeLess_ptr acolormap; // FIXME: should go away
 // callbacks to Quake
 
 typedef struct {
-    pixel_p surfdat; // destination for generated surface
-    int rowbytes; // destination logical width in bytes
-    mSurface_p surf;  // description for surface to generate
-    fixed8_t lightadj[MAXLIGHTMAPS];
-    // adjust for lightmap levels for dynamic lighting
-    Texture_p texture; // corrected for animating textures
-    int surfmip; // mipmapped ratio of surface texels / world pixels
-    int surfwidth; // in mipmapped texels
-    int surfheight; // in mipmapped texels
+    pixel_p     surfdat;                // destination for generated surface
+    int         rowbytes;               // destination logical width in bytes
+    mSurface_p  surf;                   // description for surface to generate
+    fixed8_t    lightadj[MAXLIGHTMAPS]; // adjust for lightmap levels for dynamic lighting
+    Texture_p   texture;                // corrected for animating textures
+    int         surfmip;                // mipmapped ratio of surface texels / world pixels
+    int         surfwidth;              // in mipmapped texels
+    int         surfheight;             // in mipmapped texels
 } DrawSurf_t;
 extern DrawSurf_t r_drawsurf;
 

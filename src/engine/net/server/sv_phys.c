@@ -727,10 +727,10 @@ bool SV_CheckWater(edict_p ent) {
 
     ent->v.waterlevel = 0;
     ent->v.watertype = CONTENTS_EMPTY;
-    int cont = SV_PointContents(point);
+    contents_t cont = SV_PointContents(point);
     if (cont <= CONTENTS_WATER) {
 #ifdef QUAKE2
-        int truecont = SV_TruePointContents(point);
+        contents_t truecont = SV_TruePointContents(point);
 #endif
         ent->v.watertype = cont;
         ent->v.waterlevel = 1;
@@ -744,7 +744,8 @@ bool SV_CheckWater(edict_p ent) {
                 ent->v.waterlevel = 3;
         }
 #ifdef QUAKE2
-        if (truecont <= CONTENTS_CURRENT_0 && truecont >= CONTENTS_CURRENT_DOWN) {
+        if ((truecont <= CONTENTS_CURRENT_0) &&
+            (truecont >= CONTENTS_CURRENT_DOWN)) {
             static vec3_t current_table[] =
             {
                 {1, 0, 0},
@@ -756,9 +757,9 @@ bool SV_CheckWater(edict_p ent) {
             };
 
             VectorMA(ent->v.basevelocity, 150.0 * ent->v.waterlevel / 3.0, current_table[CONTENTS_CURRENT_0 - truecont], ent->v.basevelocity);
-        }
-#endif
     }
+#endif
+}
 
     return ent->v.waterlevel > 1;
 }

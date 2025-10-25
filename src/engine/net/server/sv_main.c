@@ -329,7 +329,7 @@ void SV_ClearDatagram() {
 */
 
 int     fatbytes;
-uint8_t    fatpvs[MAX_MAP_LEAFS / 8];
+uint8_t fatpvs[MAX_MAP_LEAFS / 8];
 
 void SV_AddToFatPVS(vec3_t org, mNode_p node) {
     while (1) {
@@ -346,10 +346,8 @@ void SV_AddToFatPVS(vec3_t org, mNode_p node) {
 
         mPlane_p plane = node->plane;
         float d = DotProduct(org, plane->normal) - plane->dist;
-        if (d > 8)
-            node = node->children[0];
-        else if (d < -8)
-            node = node->children[1];
+        if (d > 8)          node = node->children[0];
+        else if (d < -8)    node = node->children[1];
         else {	// go down both
             SV_AddToFatPVS(org, node->children[0]);
             node = node->children[1];
@@ -400,8 +398,8 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
             // ignore ents without visible models
             if (!ent->v.modelindex || !pr_strings[ent->v.model])    continue;
 
-            int i;
-            for (i = 0; i < ent->num_leafs; i++)
+            int i = 0;
+            for (; i < ent->num_leafs; i++)
                 if (pvs[ent->leafnums[i] >> 3] & (1 << (ent->leafnums[i] & 7))) break;
 
             if (i == ent->num_leafs) continue;		// not visible
@@ -435,7 +433,6 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         MSG_WriteByte(msg, bits | U_SIGNAL);
 
         if (bits & U_MOREBITS)	MSG_WriteByte(msg, bits >> 8);
-
         if (bits & U_LONGENTITY)MSG_WriteShort(msg, e);
         else                    MSG_WriteByte(msg, e);
 
@@ -533,7 +530,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     }
     if (ent->v.weaponframe)                 bits |= SU_WEAPONFRAME;
     if (ent->v.armorvalue)                  bits |= SU_ARMOR;
-    /* if (ent->v.weapon) */                bits |= SU_WEAPON;
+    if (ent->v.weapon)                      bits |= SU_WEAPON;
 
     // send the data
 

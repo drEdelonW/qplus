@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // mathlib.h
 #include <math.h>
+#include "types.h"
 typedef float vec_t;
 typedef enum axis_e {
     X_AX = 0,
@@ -27,12 +28,20 @@ typedef enum axis_e {
     Z_AX = 2,
     VECT_DIM = 3,
 } axis_e;
-typedef vec_t vec3_t[VECT_DIM];
-typedef vec_t vec5_t[5];
 
-typedef int fixed4_t;
-typedef int fixed8_t;
-typedef int fixed16_t;
+typedef vec_t vec3_t[VECT_DIM];
+typedef vec3_t* vec3_p;
+
+typedef vec_t vec5_t[5];
+typedef vec5_t* vec5_p;
+
+// typedef int fixed4_t; // not used
+// typedef int fixed8_t; // DO NOT USE int!!!
+typedef uint16_t fixed8_t; // V
+// typedef uint8_t fixed8_t; // Segmentation fault
+// typedef int fixed16_t; // DO NOT USE int!!!
+// typedef int16_t fixed16_t; // X
+typedef int32_t fixed16_t; // V
 
 #ifndef M_PI
 #define M_PI  (3.14159265358979323846) /* matches value in gcc v2 math.h */
@@ -77,7 +86,7 @@ void    _VectorSubtract(vec3_t veca, vec3_t vecb, vec3_t out);
 void    _VectorAdd(vec3_t veca, vec3_t vecb, vec3_t out);
 void    _VectorCopy(vec3_t in, vec3_t out);
 
-int     VectorCompare(vec3_t v1, vec3_t v2);
+bool    VectorCompare(vec3_t v1, vec3_t v2);
 vec_t   Length(vec3_t v);
 void    CrossProduct(vec3_t v1, vec3_t v2, vec3_t cross);
 float   VectorNormalize(vec3_t v);  // returns vector length

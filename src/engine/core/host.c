@@ -530,9 +530,7 @@ void Host_ServerFrame() {
     pr_global_struct->frametime = host_frametime;   // run the world state
 
     SV_ClearDatagram();     // set the time and clear the general datagram
-
     SV_CheckForNewClients();    // check for new clients
-
     SV_RunClients();    // read client messages
 
     // move things around and think
@@ -540,7 +538,8 @@ void Host_ServerFrame() {
     if (!sv.paused &&
         (
             (svs.maxclients > 1) ||
-            (key_dest == key_game))
+            (key_dest == key_game)
+            )
         )
         SV_Physics();
 
@@ -561,7 +560,6 @@ void _Host_Frame(float time) {
     static double  time1 = 0;
     static double  time2 = 0;
     static double  time3 = 0;
-    int   pass1, pass2, pass3;
 
     if (setjmp(host_abortserver))
         return;   // something bad happened, or the server disconnected
@@ -627,10 +625,10 @@ void _Host_Frame(float time) {
     CDAudio_Update();
 
     if (host_speeds.value) {
-        pass1 = (time1 - time3) * 1000;
+        int pass1 = (time1 - time3) * 1000;
         time3 = Sys_FloatTime();
-        pass2 = (time2 - time1) * 1000;
-        pass3 = (time3 - time2) * 1000;
+        int pass2 = (time2 - time1) * 1000;
+        int pass3 = (time3 - time2) * 1000;
         Con_Printf("%3i tot %3i server %3i gfx %3i snd\n",
             pass1 + pass2 + pass3, pass1, pass2, pass3);
     }
@@ -676,17 +674,14 @@ extern int vcrFile;
 void Host_InitVCR(QuakeParms_p parms) {
 
     if (COM_CheckParm("-playback")) {
-        if (com_argc != 2)
-            Sys_Error("No other parameters allowed with -playback\n");
+        if (com_argc != 2)      Sys_Error("No other parameters allowed with -playback\n");
 
         Sys_FileOpenRead("quake.vcr", &vcrFile);
-        if (vcrFile == -1)
-            Sys_Error("playback file not found\n");
+        if (vcrFile == -1)      Sys_Error("playback file not found\n");
 
         int i;
         Sys_FileRead(vcrFile, &i, sizeof(int));
-        if (i != VCR_SIGNATURE)
-            Sys_Error("Invalid signature in vcr file\n");
+        if (i != VCR_SIGNATURE) Sys_Error("Invalid signature in vcr file\n");
 
         Sys_FileRead(vcrFile, &com_argc, sizeof(int));
         com_argv = malloc(com_argc * sizeof(cString));
@@ -831,6 +826,7 @@ void Host_Shutdown() {
     static bool isdown = false;
 
     if (isdown) { printf("recursive shutdown\n"); return; }
+
     isdown = true;
 
     // keep Con_Printf from trying to update the screen

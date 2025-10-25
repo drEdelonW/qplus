@@ -66,7 +66,7 @@ void Cmd_Wait_f() {
     =============================================================================
 */
 
-static sizebuf_t cmd_text;
+static sizebuf_t _cmdText;
 
 /*
     ============
@@ -74,7 +74,7 @@ static sizebuf_t cmd_text;
     ============
 */
 void Cbuf_Init() {
-    SZ_Alloc(&cmd_text, CMD_BUSS_SIZE);  // space for commands and script files
+    SZ_Alloc(&_cmdText, CMD_BUSS_SIZE);  // space for commands and script files
 }
 
 
@@ -86,12 +86,12 @@ void Cbuf_Init() {
     ============
 */
 void Cbuf_AddText(cString text) {
-    if ((cmd_text.cursize + Q_strlen(text)) >= cmd_text.maxsize) {
+    if ((_cmdText.cursize + Q_strlen(text)) >= _cmdText.maxsize) {
         Con_Printf("Cbuf_AddText: overflow\n");
         return;
     }
 
-    SZ_Write(&cmd_text, text, Q_strlen(text));
+    SZ_Write(&_cmdText, text, Q_strlen(text));
 }
 
 
@@ -108,11 +108,11 @@ void Cbuf_InsertText(cString text) {
     cString   temp;
 
     // copy off any commands still remaining in the exec buffer
-    int32_t templen = cmd_text.cursize;
+    int32_t templen = _cmdText.cursize;
     if (templen) {
         temp = Z_Malloc(templen);
-        Q_memcpy(temp, cmd_text.data, templen);
-        SZ_Clear(&cmd_text);
+        Q_memcpy(temp, _cmdText.data, templen);
+        SZ_Clear(&_cmdText);
     }
     else {
         temp = NULL; // shut up compiler
@@ -123,7 +123,7 @@ void Cbuf_InsertText(cString text) {
 
     // add the copied off data
     if (templen) {
-        SZ_Write(&cmd_text, temp, templen);
+        SZ_Write(&_cmdText, temp, templen);
         Z_Free(temp);
     }
 }
@@ -135,13 +135,13 @@ void Cbuf_InsertText(cString text) {
 */
 void Cbuf_Execute() {
 
-    while (cmd_text.cursize) {
+    while (_cmdText.cursize) {
         // find a \n or ; line break
-        cString text = (cString)cmd_text.data;
+        cString text = (cString)_cmdText.data;
 
         uint8_t quotes = 0;
         int i = 0;
-        for (; i < cmd_text.cursize; i++) {
+        for (; i < _cmdText.cursize; i++) {
             if (text[i] == '"')
                 quotes++;
             if (((!(quotes & 1)) &&
@@ -160,13 +160,13 @@ void Cbuf_Execute() {
         // this is necessary because commands (exec, alias) can insert data at the
         // beginning of the text buffer
 
-        if (i == cmd_text.cursize) {
-            cmd_text.cursize = 0;
+        if (i == _cmdText.cursize) {
+            _cmdText.cursize = 0;
         }
         else {
             i++;
-            cmd_text.cursize -= i;
-            Q_memcpy(text, text + i, cmd_text.cursize);
+            _cmdText.cursize -= i;
+            Q_memcpy(text, text + i, _cmdText.cursize);
         }
 
         // execute the command line
@@ -208,19 +208,17 @@ void Cmd_StuffCmds_f() {
     // build the combined string to parse from
     int s = 0;
     for (int i = 1; i < com_argc; i++) {
-        if (!com_argv[i])
-            continue;  // NEXTSTEP nulls out -NXHost
+        if (!com_argv[i])   continue;  // NEXTSTEP nulls out -NXHost
+
         s += Q_strlen(com_argv[i]) + 1;
     }
-    if (!s)
-        return;
+    if (!s)     return;
 
     cString text = Z_Malloc(s + 1);
     text[0] = 0;
     for (int i = 1; i < com_argc; i++) {
-        if (!com_argv[i]) {
-            continue;   // NEXTSTEP nulls out -NXHost
-        }
+        if (!com_argv[i])   continue;   // NEXTSTEP nulls out -NXHost
+
         Q_strcat(text, com_argv[i]);
         if (i != (com_argc - 1)) {
             Q_strcat(text, " ");
@@ -234,8 +232,8 @@ void Cmd_StuffCmds_f() {
     for (int i = 0; i < (s - 1); i++) {
         if (text[i] == '+') {
             i++;
-            int j;
-            for (j = i; ((text[j] != '+') && (text[j] != '-') && (text[j] != 0)); j++);
+            int j = i;
+            for (; ((text[j] != '+') && (text[j] != '-') && (text[j] != 0)); j++);
 
             char c = text[j];
             text[j] = 0;
@@ -247,9 +245,7 @@ void Cmd_StuffCmds_f() {
         }
     }
 
-    if (build[0]) {
-        Cbuf_InsertText(build);
-    }
+    if (build[0]) Cbuf_InsertText(build);
 
     Z_Free(text);
     Z_Free(build);
@@ -328,15 +324,15 @@ struct cmd_function_s {
 
 #define MAX_ARGS  80
 
-static int cmd_argc;
+static int _cmdArgC;
 cString cmd_argv[MAX_ARGS];
-static cString cmd_null_string = "";
-static cString cmd_args = NULL;
+static cString _cmdNullString = "";
+static cString _cmdArgS = NULL;
 
 cmd_source_t cmd_source;
 
 
-static cmd_function_p cmd_functions;  // possible commands to execute
+static cmd_function_p _cmdFunctions;  // possible commands to execute
 
 /*
     ============
@@ -360,9 +356,7 @@ void Cmd_Init() {
     Cmd_Argc
     ============
 */
-int Cmd_Argc() {
-    return cmd_argc;
-}
+int Cmd_Argc() { return _cmdArgC; }
 
 /*
     ============
@@ -371,9 +365,8 @@ int Cmd_Argc() {
 */
 cString Cmd_Argv(int arg) {
     return
-        ((uint32_t)arg >= cmd_argc) ?
-        cmd_null_string :
-        cmd_argv[arg];
+        ((uint32_t)arg >= _cmdArgC) ?
+        _cmdNullString : cmd_argv[arg];
 }
 
 /*
@@ -381,9 +374,7 @@ cString Cmd_Argv(int arg) {
     Cmd_Args
     ============
 */
-cString Cmd_Args() {
-    return cmd_args;
-}
+cString Cmd_Args() { return _cmdArgS; }
 
 
 /*
@@ -395,12 +386,12 @@ cString Cmd_Args() {
 */
 void Cmd_TokenizeString(cString text) {
     // clear the args from the last string
-    for (int i = 0; i < cmd_argc; i++) {
+    for (int i = 0; i < _cmdArgC; i++) {
         Z_Free(cmd_argv[i]);
     }
 
-    cmd_argc = 0;
-    cmd_args = NULL;
+    _cmdArgC = 0;
+    _cmdArgS = NULL;
 
     while (1) {
         // skip whitespace up to a /n
@@ -416,23 +407,19 @@ void Cmd_TokenizeString(cString text) {
             break;
         }
 
-        if (!*text) {
-            return;
-        }
+        if (!*text) { return; }
 
-        if (cmd_argc == 1) {
-            cmd_args = text;
+        if (_cmdArgC == 1) {
+            _cmdArgS = text;
         }
 
         text = COM_Parse(text);
-        if (!text) {
-            return;
-        }
+        if (!text) { return; }
 
-        if (cmd_argc < MAX_ARGS) {
-            cmd_argv[cmd_argc] = Z_Malloc(Q_strlen(com_token) + 1);
-            Q_strcpy(cmd_argv[cmd_argc], com_token);
-            cmd_argc++;
+        if (_cmdArgC < MAX_ARGS) {
+            cmd_argv[_cmdArgC] = Z_Malloc(Q_strlen(com_token) + 1);
+            Q_strcpy(cmd_argv[_cmdArgC], com_token);
+            _cmdArgC++;
         }
     }
 
@@ -456,7 +443,7 @@ void Cmd_AddCommand(cString cmd_name, xcommand_t function) {
 
     // fail if the command already exists
     cmd_function_p cmd;
-    for (cmd = cmd_functions; cmd; cmd = cmd->next) {
+    for (cmd = _cmdFunctions; cmd; cmd = cmd->next) {
         if (!Q_strcmp(cmd_name, cmd->name)) {
             Con_Printf("Cmd_AddCommand: %s already defined\n", cmd_name);
             return;
@@ -466,8 +453,8 @@ void Cmd_AddCommand(cString cmd_name, xcommand_t function) {
     cmd = Hunk_Alloc(sizeof(cmd_function_t));
     cmd->name = cmd_name;
     cmd->function = function;
-    cmd->next = cmd_functions;
-    cmd_functions = cmd;
+    cmd->next = _cmdFunctions;
+    _cmdFunctions = cmd;
 }
 
 /*
@@ -476,10 +463,8 @@ void Cmd_AddCommand(cString cmd_name, xcommand_t function) {
     ============
 */
 bool Cmd_Exists(cString cmd_name) {
-    for (cmd_function_p cmd = cmd_functions; cmd; cmd = cmd->next) {
-        if (!Q_strcmp(cmd_name, cmd->name)) {
-            return true;
-        }
+    for (cmd_function_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
+        if (!Q_strcmp(cmd_name, cmd->name)) { return true; }
     }
     return false;
 }
@@ -497,7 +482,7 @@ cString Cmd_CompleteCommand(cString partial) {
     if (!len) return NULL;
 
     // check functions
-    for (cmd_function_p cmd = cmd_functions; cmd; cmd = cmd->next) {
+    for (cmd_function_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
         if (!Q_strncmp(partial, cmd->name, len)) {
             return cmd->name;
         }
@@ -518,21 +503,17 @@ void Cmd_ExecuteString(cString text, cmd_source_t src) {
     Cmd_TokenizeString(text);
 
     // execute the command line
-    if (!Cmd_Argc()) {
-        return;  // no tokens
-    }
+    if (!Cmd_Argc()) { return; } // no tokens
 
     // check functions
-    for (cmd_function_p cmd = cmd_functions; cmd; cmd = cmd->next) {
+    for (cmd_function_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
         if (!Q_strcasecmp(cmd_argv[0], cmd->name)) {
             cmd->function();
             return;
         }
     }
 
-    if (checkAlias()) {
-        return;
-    }
+    if (checkAlias()) { return; }
 
 #if 0
     // check alias
@@ -565,9 +546,7 @@ void Cmd_ForwardToServer() {
         return;
     }
 
-    if (cls.demoplayback) {
-        return;  // not really connected
-    }
+    if (cls.demoplayback) { return; }  // not really connected
 
     MSG_WriteByte(&cls.message, clc_stringcmd);
     if (Q_strcasecmp(Cmd_Argv(0), "cmd") != 0) {
@@ -590,14 +569,10 @@ void Cmd_ForwardToServer() {
     ================
 */
 int Cmd_CheckParm(cString parm) {
-    if (!parm) {
-        Sys_Error("Cmd_CheckParm: NULL");
-    }
+    if (!parm) { Sys_Error("Cmd_CheckParm: NULL"); }
 
     for (int i = 1; i < Cmd_Argc(); i++) {
-        if (!Q_strcasecmp(parm, Cmd_Argv(i))) {
-            return i;
-        }
+        if (!Q_strcasecmp(parm, Cmd_Argv(i))) { return i; }
     }
 
     return 0;

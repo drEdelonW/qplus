@@ -112,7 +112,7 @@ void D_DrawTurbulent8Span() {
 Turbulent8
 =============
 */
-void Turbulent8(eSpan_t* pspan) {
+void Turbulent8(eSpan_p pspan) {
 	int				count;
 	fixed16_t		snext, tnext;
 	float			sdivz, tdivz, zi, z, du, dv, spancountminus1;
@@ -241,7 +241,7 @@ void Turbulent8(eSpan_t* pspan) {
 D_DrawSpans8
 =============
 */
-void D_DrawSpans8(eSpan_t* pspan) {
+void D_DrawSpans8(eSpan_p pspan) {
 	int				count, spancount;
 	uint8_p pbase, pdest;
 	fixed16_t		s, t, snext, tnext, sstep, tstep;
@@ -372,7 +372,7 @@ void D_DrawSpans8(eSpan_t* pspan) {
 D_DrawZSpans
 =============
 */
-void D_DrawZSpans(eSpan_t* pspan) {
+void D_DrawZSpans(eSpan_p pspan) {
 	int				count, doublecount, izistep;
 	int				izi;
 	int16_p pdest;

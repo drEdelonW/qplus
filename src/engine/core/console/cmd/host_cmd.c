@@ -75,22 +75,19 @@ void Host_Status_f() {
         if (!sv.active) { Cmd_ForwardToServer();    return; }
         print = Con_Printf;
     }
-    else
-        print = SV_ClientPrintf;
+    else    print = SV_ClientPrintf;
 
     print("host:    %s\n", Cvar_VariableString("hostname"));
     print("version: %4.2f\n", VERSION);
-    if (tcpipAvailable)
-        print("tcp/ip:  %s\n", my_tcpip_address);
-    if (ipxAvailable)
-        print("ipx:     %s\n", my_ipx_address);
+    if (tcpipAvailable)     print("tcp/ip:  %s\n", my_tcpip_address);
+    if (ipxAvailable)       print("ipx:     %s\n", my_ipx_address);
     print("map:     %s\n", sv.name);
     print("players: %i active (%i max)\n\n", net_activeconnections, svs.maxclients);
 
     client_p client = svs.clients;
     for (int32_t j = 0; j < svs.maxclients; j++, client++) {
-        if (!client->active)
-            continue;
+        if (!client->active)    continue;
+
         int seconds = (int)(net_time - client->netconnection->connecttime);
         int minutes = seconds / 60;
         int hours = 0;
@@ -101,8 +98,8 @@ void Host_Status_f() {
             if (hours)
                 minutes -= (hours * 60);
         }
-        else
-            hours = 0;
+        else    hours = 0;
+
         print("#%-2u %-16.16s  %3i  %2i:%02i:%02i\n", j + 1, client->name, (int32_t)client->edict->v.frags, hours, minutes, seconds);
         print("   %s\n", client->netconnection->address);
     }
@@ -190,8 +187,7 @@ void Host_Ping_f() {
     SV_ClientPrintf("Client ping times:\n");
     client_p client = svs.clients;
     for (int32_t i = 0; i < svs.maxclients; i++, client++) {
-        if (!client->active)
-            continue;
+        if (!client->active)    continue;
 
         float total = 0;
         for (int j = 0; j < NUM_PING_TIMES; j++)
@@ -719,13 +715,16 @@ Host_Name_f
 */
 void Host_Name_f() {
     if (Cmd_Argc() == 1) { Con_Printf("\"name\" is \"%s\"\n", cl_name.string); return; }
+
     cString newName = (Cmd_Argc() == 2) ? Cmd_Argv(1) : Cmd_Args();
     newName[15] = 0;
 
     if (cmd_source == src_command) {
         if (Q_strcmp(cl_name.string, newName) == 0) return;
+
         Cvar_Set("_cl_name", newName);
-        if (cls.state == ca_connected) { Cmd_ForwardToServer(); }
+        if (cls.state == ca_connected)
+            Cmd_ForwardToServer();
         return;
     }
     if (host_client->name[0] &&
@@ -1390,7 +1389,8 @@ Host_Startdemos_f
 */
 void Host_Startdemos_f() {
     if (cls.state == ca_dedicated) {
-        if (!sv.active)     Cbuf_AddText("map start\n");
+        if (!sv.active)
+            Cbuf_AddText("map start\n");
         return;
     }
 
@@ -1411,8 +1411,7 @@ void Host_Startdemos_f() {
         cls.demonum = 0;
         CL_NextDemo();
     }
-    else
-        cls.demonum = -1;
+    else cls.demonum = -1;
 }
 
 

@@ -163,8 +163,7 @@ void D_DrawSurfaces() {
     // TODO: could preset a lot of this at mode set time
     if (r_drawflat.value) {
         for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++) {
-            if (!surf->spans)
-                continue;
+            if (!surf->spans)       continue;
 
             d_zistepu = surf->d_zistepu;
             d_zistepv = surf->d_zistepv;
@@ -177,8 +176,7 @@ void D_DrawSurfaces() {
     }
     else {
         for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++) {
-            if (!surf->spans)
-                continue;
+            if (!surf->spans)       continue;
 
             r_drawnpolycount++;
 

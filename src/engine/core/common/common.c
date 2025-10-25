@@ -174,18 +174,16 @@ COM_FileBase
 ============
 */
 void COM_FileBase(cString in, cString out) {
-    cString s2;
-
     cString s = in + strlen(in) - 1;
 
+    cString s2;
     while ((s != in) && (*s != '.'))
         s--;
 
     for (s2 = s; (*s2) && (*s2 != '/'); s2--)
         ;
 
-    if ((s - s2) < 2)
-        strcpy(out, "?model?");
+    if ((s - s2) < 2)   strcpy(out, "?model?");
     else {
         s--;
         strncpy(out, s2 + 1, s - s2);
@@ -440,7 +438,7 @@ FIXME: make this buffer size safe someday
 */
 cString va(cString format, ...) {
     va_list         argptr;
-    static char             string[1024];
+    static char     string[1024];
 
     va_start(argptr, format);
     vsprintf(string, format, argptr);
@@ -526,11 +524,8 @@ COM_Path_f
 void COM_Path_f() {
     Con_Printf("Current search path:\n");
     for (searchpath_p s = com_searchpaths; s; s = s->next) {
-        if (s->pack) {
-            Con_Printf("%s (%i files)\n", s->pack->filename, s->pack->numfiles);
-        }
-        else
-            Con_Printf("%s\n", s->filename);
+        if (s->pack)    Con_Printf("%s (%i files)\n", s->pack->filename, s->pack->numfiles);
+        else            Con_Printf("%s\n", s->filename);
     }
 }
 
@@ -584,8 +579,7 @@ needed.  This is for the convenience of developers using ISDN from home.
 ===========
 */
 void COM_CopyFile(cString netpath, cString cachepath) {
-    int     in;
-
+    int in;
     int remaining = Sys_FileOpenRead(netpath, &in);
     COM_CreatePath(cachepath);     // create directories up to the cache file
     int out = Sys_FileOpenWrite(cachepath);
@@ -698,10 +692,9 @@ int COM_FindFile(cString filename, int* handle, FILE** file) {
 
     Sys_Printf("FindFile: can't find %s\n", filename);
 
-    if (handle)
-        *handle = -1;
-    else
-        *file = NULL;
+    if (handle) *handle = -1;
+    else        *file = NULL;
+
     com_filesize = -1;
     return -1;
 }
@@ -821,14 +814,13 @@ of the list so they override previous pack files.
 =================
 */
 pack_p COM_LoadPackFile(cString packfile) {
-    dpackHeader_t   header;
-    dpackfile_t info[MAX_FILES_IN_PACK];
 
     int packhandle;
     if (Sys_FileOpenRead(packfile, &packhandle) == -1) {
         //              Con_Printf ("Couldn't open %s\n", packfile);
         return NULL;
     }
+    dpackHeader_t header;
     Sys_FileRead(packhandle, (TypeLess_ptr)&header, sizeof(header));
     if ((header.id[0] != 'P') ||
         (header.id[1] != 'A') ||
@@ -849,6 +841,7 @@ pack_p COM_LoadPackFile(cString packfile) {
     packfile_p newfiles = Hunk_AllocName(numpackfiles * sizeof(packfile_t), "packfile");
 
     Sys_FileSeek(packhandle, header.dirofs);
+    dpackfile_t info[MAX_FILES_IN_PACK];
     Sys_FileRead(packhandle, (TypeLess_ptr)info, header.dirlen);
 
     // crc the directory to check for modifications
@@ -949,15 +942,11 @@ void COM_InitFilesystem() {
     //
     param = COM_CheckParm("-cachedir");
     if (param && (param < com_argc - 1)) {
-        if (com_argv[param + 1][0] == '-')
-            com_cachedir[0] = 0;
-        else
-            strcpy(com_cachedir, com_argv[param + 1]);
+        if (com_argv[param + 1][0] == '-')  com_cachedir[0] = 0;
+        else                         strcpy(com_cachedir, com_argv[param + 1]);
     }
-    else if (host_parms.cachedir)
-        strcpy(com_cachedir, host_parms.cachedir);
-    else
-        com_cachedir[0] = 0;
+    else if (host_parms.cachedir)    strcpy(com_cachedir, host_parms.cachedir);
+    else                                    com_cachedir[0] = 0;
 
     //
     // start up with GAMENAME by default (id1)
@@ -994,11 +983,9 @@ void COM_InitFilesystem() {
             searchpath_p search = Hunk_Alloc(sizeof(searchpath_t));
             if (!strcmp(COM_FileExtension(com_argv[param]), "pak")) {
                 search->pack = COM_LoadPackFile(com_argv[param]);
-                if (!search->pack)
-                    Sys_Error("Couldn't load packfile: %s", com_argv[param]);
+                if (!search->pack)      Sys_Error("Couldn't load packfile: %s", com_argv[param]);
             }
-            else
-                strcpy(search->filename, com_argv[param]);
+            else    strcpy(search->filename, com_argv[param]);
             search->next = com_searchpaths;
             com_searchpaths = search;
         }

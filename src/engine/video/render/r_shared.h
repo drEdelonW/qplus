@@ -127,8 +127,7 @@ extern float xscaleshrink, yscaleshrink;
 extern int d_lightstylevalue[256]; // 8.8 frac of base light value
 
 extern void TransformVector(vec3_t in, vec3_t out);
-extern void SetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
-    fixed8_t endvertu, fixed8_t endvertv);
+extern void SetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv, fixed8_t endvertu, fixed8_t endvertv);
 
 extern int r_skymade;
 extern void R_MakeSky();

@@ -118,19 +118,16 @@ void D_SetupFrame() {
     d_initial_rover = sc_rover;
 
     d_minmip = d_mipcap.value;
-    if (d_minmip > 3)
-        d_minmip = 3;
-    else if (d_minmip < 0)
-        d_minmip = 0;
+    CLAMP(0, d_minmip, 3);
 
     for (int i = 0; i < (NUM_MIPS - 1); i++)
         d_scalemip[i] = basemip[i] * d_mipscale.value;
 
+    d_drawspans =
 #if	id386
-    d_drawspans = (d_subdiv16.value) ? D_DrawSpans16 : D_DrawSpans8;
-#else
-    d_drawspans = D_DrawSpans8;
+    (d_subdiv16.value) ? D_DrawSpans16 :
 #endif
+        D_DrawSpans8;
 
     d_aflatcolor = 0;
 }

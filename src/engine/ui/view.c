@@ -94,10 +94,8 @@ float V_CalcBob() {
     float bob = sqrt(cl.velocity[0] * cl.velocity[0] + cl.velocity[1] * cl.velocity[1]) * cl_bob.value;
     //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
     bob = bob * 0.3 + bob * 0.7 * sin(cycle);
-    if (bob > 4)
-        bob = 4;
-    else if (bob < -7)
-        bob = -7;
+    if (bob > 4)        bob = 4;
+    else if (bob < -7)  bob = -7;
     return bob;
 }
 
@@ -106,9 +104,7 @@ float V_CalcBob() {
 
 void V_StartPitchDrift() {
 #if 1
-    if (cl.laststop == cl.time) {
-        return;  // something else is keeping it from drifting
-    }
+    if (cl.laststop == cl.time) return;  // something else is keeping it from drifting
 #endif
     if (cl.nodrift || !cl.pitchvel) {
         cl.pitchvel = v_centerspeed.value;
@@ -156,10 +152,7 @@ void V_DriftPitch() {
 
     float delta = cl.idealpitch - cl.viewangles[PITCH];
 
-    if (!delta) {
-        cl.pitchvel = 0;
-        return;
-    }
+    if (!delta) { cl.pitchvel = 0; return; }
 
     float move = host_frametime * cl.pitchvel;
     cl.pitchvel += host_frametime * v_centerspeed.value;
@@ -209,8 +202,6 @@ float  v_blend[4];  // rgba 0.0 - 1.0
 #endif // GLQUAKE
 
 void BuildGammaTable(float g) {
-    int inf;
-
     if (g == 1.0) {
         for (int i = 0; i < 256; i++)
             gammatable[i] = i;
@@ -218,11 +209,8 @@ void BuildGammaTable(float g) {
     }
 
     for (int i = 0; i < 256; i++) {
-        inf = 255 * pow((i + 0.5) / 255.5, g) + 0.5;
-        if (inf < 0)
-            inf = 0;
-        if (inf > 255)
-            inf = 255;
+        int inf = 255 * pow((i + 0.5) / 255.5, g) + 0.5;
+        CLAMP(0, inf, 255);
         gammatable[i] = inf;
     }
 }
@@ -235,8 +223,7 @@ V_CheckGamma
 qboolean V_CheckGamma() {
     static float oldgammavalue;
 
-    if (v_gamma.value == oldgammavalue)
-        return false;
+    if (v_gamma.value == oldgammavalue)     return false;
     oldgammavalue = v_gamma.value;
 
     BuildGammaTable(v_gamma.value);
@@ -635,20 +622,9 @@ void V_BoundOffsets() {
     // absolutely bound refresh reletive to entity clipping hull
     // so the view can never be inside a solid wall
 
-    if (r_refdef.vieworg[0] < ent->origin[0] - 14)
-        r_refdef.vieworg[0] = ent->origin[0] - 14;
-    else if (r_refdef.vieworg[0] > ent->origin[0] + 14)
-        r_refdef.vieworg[0] = ent->origin[0] + 14;
-
-    if (r_refdef.vieworg[1] < ent->origin[1] - 14)
-        r_refdef.vieworg[1] = ent->origin[1] - 14;
-    else if (r_refdef.vieworg[1] > ent->origin[1] + 14)
-        r_refdef.vieworg[1] = ent->origin[1] + 14;
-
-    if (r_refdef.vieworg[2] < ent->origin[2] - 22)
-        r_refdef.vieworg[2] = ent->origin[2] - 22;
-    else if (r_refdef.vieworg[2] > ent->origin[2] + 30)
-        r_refdef.vieworg[2] = ent->origin[2] + 30;
+    CLAMP(ent->origin[0] - 14, r_refdef.vieworg[0], ent->origin[0] + 14);
+    CLAMP(ent->origin[1] - 14, r_refdef.vieworg[1], ent->origin[1] + 14);
+    CLAMP(ent->origin[2] - 22, r_refdef.vieworg[2], ent->origin[2] + 30);
 }
 
 /*
@@ -697,10 +673,8 @@ V_CalcIntermissionRefdef
 ==================
 */
 void V_CalcIntermissionRefdef() {
-    // ent is the player model (visible when out of body)
-    r_Entity_p ent = &cl_entities[cl.viewentity];
-    // view is the weapon model (only visible from inside body)
-    r_Entity_p view = &cl.viewent;
+    r_Entity_p ent = &cl_entities[cl.viewentity];    // ent is the player model (visible when out of body)
+    r_Entity_p view = &cl.viewent;    // view is the weapon model (only visible from inside body)
 
     VectorCopy(ent->origin, r_refdef.vieworg);
     VectorCopy(ent->angles, r_refdef.viewangles);

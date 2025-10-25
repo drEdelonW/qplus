@@ -120,6 +120,7 @@ int CL_GetMessage() {
         net_message.cursize = LittleLong(net_message.cursize);
         if (net_message.cursize > MAX_MSGLEN)
             Sys_Error("Demo message > MAX_MSGLEN");
+
         int r = fread(net_message.data, net_message.cursize, 1, cls.demofile);
         if (r != 1) {
             CL_StopPlayback();
@@ -137,7 +138,7 @@ int CL_GetMessage() {
             return r;
 
         // discard nop keepalive message
-        if (net_message.cursize == 1 && net_message.data[0] == svc_nop)
+        if ((net_message.cursize == 1) && (net_message.data[0] == svc_nop))
             Con_Printf("<-- server to client keepalive\n");
         else
             break;

@@ -75,7 +75,7 @@ void KeyDown(kbutton_p btn) {
         (k == btn->down[1]))
         return;  // repeating key
 
-    if (!btn->down[0])  btn->down[0] = k;
+    if (!btn->down[0])      btn->down[0] = k;
     else if (!btn->down[1]) btn->down[1] = k;
     else {
         Con_Printf("Three keys down for a button!\n");
@@ -99,12 +99,9 @@ void KeyUp(kbutton_p btn) {
         return;
     }
 
-    if (btn->down[0] == k)
-        btn->down[0] = 0;
-    else if (btn->down[1] == k)
-        btn->down[1] = 0;
-    else
-        return;  // key up without coresponding down (menu pass through)
+    if (btn->down[0] == k)          btn->down[0] = 0;
+    else if (btn->down[1] == k)     btn->down[1] = 0;
+    else    return;  // key up without coresponding down (menu pass through)
 
     if ((btn->down[0] ||
         btn->down[1]) ||   // some other key is still holding it down
@@ -123,9 +120,8 @@ void IN_MLookUp() {
     KeyUp(&in_mlook);
     if (!(in_mlook.state & 1) &&
         lookspring.value
-        ) {
-        V_StartPitchDrift();
-    }
+        )   V_StartPitchDrift();
+
 }
 void IN_UpDown() { KeyDown(&in_up); }
 void IN_UpUp() { KeyUp(&in_up); }
@@ -217,7 +213,6 @@ float CL_KeyState(kbutton_p key) {
 */
 void CL_AdjustAngles() {
     float speed;
-    float up, down;
 
     if (in_speed.state & 1) speed = host_frametime * cl_anglespeedkey.value;
     else                    speed = host_frametime;
@@ -233,8 +228,8 @@ void CL_AdjustAngles() {
         cl.viewangles[PITCH] += speed * cl_pitchspeed.value * CL_KeyState(&in_back);
     }
 
-    up = CL_KeyState(&in_lookup);
-    down = CL_KeyState(&in_lookdown);
+    float up = CL_KeyState(&in_lookup);
+    float down = CL_KeyState(&in_lookdown);
 
     cl.viewangles[PITCH] -= speed * cl_pitchspeed.value * up;
     cl.viewangles[PITCH] += speed * cl_pitchspeed.value * down;
@@ -328,12 +323,10 @@ void CL_SendMove(UserCmd_p cmd) {
     // send button bits
     //
     int bits = 0;
-    if (in_attack.state & 3)
-        bits |= 1;
+    if (in_attack.state & 3)    bits |= 1;
     in_attack.state &= ~2;
 
-    if (in_jump.state & 3)
-        bits |= 2;
+    if (in_jump.state & 3)      bits |= 2;
     in_jump.state &= ~2;
 
     MSG_WriteByte(&buf, bits);

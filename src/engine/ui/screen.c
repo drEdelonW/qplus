@@ -133,8 +133,9 @@ void SCR_DrawCenterString() {
         // scan the width of the line
         int l = 0;
         for (; l < 40; l++)
-            if (start[l] == '\n' || !start[l])
+            if ((start[l] == '\n') || !start[l])
                 break;
+
         int x = (vid.width - l * 8) / 2;
         for (int j = 0; j < l; j++, x += 8) {
             Draw_Character(x, y, start[j]);
@@ -205,33 +206,24 @@ static void SCR_CalcRefdef() {
     //========================================
 
     // bound viewsize
-    if (scr_viewsize.value < 30)
-        Cvar_Set("viewsize", "30");
-    if (scr_viewsize.value > 120)
-        Cvar_Set("viewsize", "120");
+    if (scr_viewsize.value < 30)    Cvar_Set("viewsize", "30");
+    if (scr_viewsize.value > 120)   Cvar_Set("viewsize", "120");
 
     // bound field of view
-    if (scr_fov.value < 10)
-        Cvar_Set("fov", "10");
-    if (scr_fov.value > 170)
-        Cvar_Set("fov", "170");
+    if (scr_fov.value < 10)         Cvar_Set("fov", "10");
+    if (scr_fov.value > 170)        Cvar_Set("fov", "170");
 
     r_refdef.fov_x = scr_fov.value;
     r_refdef.fov_y = CalcFov(r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
 
     // intermission is always full screen
     float  size;
-    if (cl.intermission)
-        size = 120;
-    else
-        size = scr_viewsize.value;
+    if (cl.intermission)    size = 120;
+    else                    size = scr_viewsize.value;
 
-    if (size >= 120)
-        sb_lines = 0;  // no status bar at all
-    else if (size >= 110)
-        sb_lines = 24;  // no inventory
-    else
-        sb_lines = 24 + 16 + 8;
+    if (size >= 120)        sb_lines = 0;  // no status bar at all
+    else if (size >= 110)   sb_lines = 24;  // no inventory
+    else                    sb_lines = 24 + 16 + 8;
 
     // these calculations mirror those in R_Init() for r_refdef, but take no
     // account of water warping
@@ -331,17 +323,12 @@ SCR_DrawTurtle
 void SCR_DrawTurtle() {
     static int count;
 
-    if (!scr_showturtle.value)
-        return;
+    if (!scr_showturtle.value)  return;
 
-    if (host_frametime < 0.1) {
-        count = 0;
-        return;
-    }
+    if (host_frametime < 0.1) { count = 0;  return; }
 
     count++;
-    if (count < 3)
-        return;
+    if (count < 3)  return;
 
     Draw_Pic(scr_vrect.x, scr_vrect.y, scr_turtle);
 }
@@ -382,8 +369,7 @@ SCR_DrawLoading
 ==============
 */
 void SCR_DrawLoading() {
-    if (!scr_drawloading)
-        return;
+    if (!scr_drawloading)   return;
 
     qPic_p pic = Draw_CachePic("gfx/loading.lmp");
     Draw_Pic((vid.width - pic->width) / 2,
@@ -403,8 +389,7 @@ SCR_SetUpToDrawConsole
 void SCR_SetUpToDrawConsole() {
     Con_CheckResize();
 
-    if (scr_drawloading)
-        return;  // never a console with loading plaque
+    if (scr_drawloading)    return;  // never a console with loading plaque
 
     // decide on the height of the console
     con_forcedup = !cl.worldmodel || cls.signon != SIGNONS;
@@ -413,10 +398,8 @@ void SCR_SetUpToDrawConsole() {
         scr_conlines = vid.height;  // full screen
         scr_con_current = scr_conlines;
     }
-    else if (key_dest == key_console)
-        scr_conlines = vid.height / 2; // half screen
-    else
-        scr_conlines = 0;    // none visible
+    else if (key_dest == key_console)   scr_conlines = vid.height / 2; // half screen
+    else                                scr_conlines = 0;    // none visible
 
     if (scr_conlines < scr_con_current) {
         scr_con_current -= scr_conspeed.value * host_frametime;
@@ -455,7 +438,7 @@ void SCR_DrawConsole() {
         clearconsole = 0;
     }
     else {
-        if (key_dest == key_game || key_dest == key_message)
+        if ((key_dest == key_game) || (key_dest == key_message))
             Con_DrawNotify(); // only draw notify in game
     }
 }
@@ -637,8 +620,8 @@ void SCR_DrawNotifyString() {
         // scan the width of the line
         int l = 0;
         for (; l < 40; l++)
-            if ((start[l] == '\n') || !start[l])
-                break;
+            if ((start[l] == '\n') || !start[l])    break;
+
         int x = (vid.width - l * 8) / 2;
         for (int j = 0; j < l; j++, x += 8)
             Draw_Character(x, y, start[j]);
@@ -648,8 +631,7 @@ void SCR_DrawNotifyString() {
         while (*start && *start != '\n')
             start++;
 
-        if (!*start)
-            break;
+        if (!*start)    break;
         start++;  // skip the \n
     } while (1);
 }
@@ -663,8 +645,7 @@ keypress.
 ==================
 */
 int SCR_ModalMessage(cString text) {
-    if (cls.state == ca_dedicated)
-        return true;
+    if (cls.state == ca_dedicated)  return true;
 
     _scr_notifystring = text;
 
@@ -679,7 +660,10 @@ int SCR_ModalMessage(cString text) {
     do {
         key_count = -1;  // wait for a key down and up
         Sys_SendKeyEvents();
-    } while (key_lastpress != 'y' && key_lastpress != 'n' && key_lastpress != K_ESCAPE);
+    } while (
+        (key_lastpress != 'y') &&
+        (key_lastpress != 'n') &&
+        (key_lastpress != K_ESCAPE));
 
     scr_fullupdate = 0;
     SCR_UpdateScreen();
@@ -722,7 +706,6 @@ needs almost the entire 256k of stack space!
 void SCR_UpdateScreen() {
     static float oldscr_viewsize;
     static float oldlcd_x;
-    vRect_t  vrect;
 
     if (scr_skipupdate || block_drawing)
         return;
@@ -811,14 +794,14 @@ void SCR_UpdateScreen() {
         SCR_DrawLoading();
         Sbar_Draw();
     }
-    else if (cl.intermission == 1 && key_dest == key_game) {
+    else if ((cl.intermission == 1) && (key_dest == key_game)) {
         Sbar_IntermissionOverlay();
     }
-    else if (cl.intermission == 2 && key_dest == key_game) {
+    else if ((cl.intermission == 2) && (key_dest == key_game)) {
         Sbar_FinaleOverlay();
         SCR_CheckDrawCenterString();
     }
-    else if (cl.intermission == 3 && key_dest == key_game) {
+    else if ((cl.intermission == 3) && (key_dest == key_game)) {
         SCR_CheckDrawCenterString();
     }
     else {
@@ -845,29 +828,35 @@ void SCR_UpdateScreen() {
     //
 
     if (scr_copyeverything) {
-        vrect.x = 0;
-        vrect.y = 0;
-        vrect.width = vid.width;
-        vrect.height = vid.height;
-        vrect.pnext = 0;
+        vRect_t  vrect = {
+            .x = 0,
+            .y = 0,
+            .width = vid.width,
+            .height = vid.height,
+            .pnext = 0
+        };
 
         VID_Update(&vrect);
     }
     else if (scr_copytop) {
-        vrect.x = 0;
-        vrect.y = 0;
-        vrect.width = vid.width;
-        vrect.height = vid.height - sb_lines;
-        vrect.pnext = 0;
+        vRect_t  vrect = {
+            .x = 0,
+            .y = 0,
+            .width = vid.width,
+            .height = vid.height - sb_lines,
+            .pnext = 0
+        };
 
         VID_Update(&vrect);
     }
     else {
-        vrect.x = scr_vrect.x;
-        vrect.y = scr_vrect.y;
-        vrect.width = scr_vrect.width;
-        vrect.height = scr_vrect.height;
-        vrect.pnext = 0;
+        vRect_t  vrect = {
+            .x = scr_vrect.x,
+            .y = scr_vrect.y,
+            .width = vid.width,
+            .height = vid.height,
+            .pnext = 0
+        };
 
         VID_Update(&vrect);
     }

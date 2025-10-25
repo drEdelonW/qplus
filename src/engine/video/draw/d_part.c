@@ -82,10 +82,7 @@ void D_DrawParticle(Particle_p pparticle) {
 
     int pix = izi >> d_pix_shift;
 
-    if (pix < d_pix_min)
-        pix = d_pix_min;
-    else if (pix > d_pix_max)
-        pix = d_pix_max;
+    CLAMP(d_pix_min, pix, d_pix_max);
 
     switch (pix) {
     case 1: {

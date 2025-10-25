@@ -87,8 +87,7 @@ void M_DrawPic(int x, int y, qPic_p pic);
     ===============
 */
 void Sbar_ShowScores() {
-    if (sb_showscores)
-        return;
+    if (sb_showscores)  return;
     sb_showscores = true;
     sb_updates = 0;
 }
@@ -353,20 +352,15 @@ int Sbar_itoa(int num, cString buf) {
 */
 void Sbar_DrawNum(int x, int y, int num, int digits, int color) {
     char str[12];
-
     int l = Sbar_itoa(num, str);
     cString ptr = str;
-    if (l > digits)
-        ptr += (l - digits);
-    if (l < digits)
-        x += (digits - l) * 24;
+    if (l > digits)     ptr += (l - digits);
+    if (l < digits)     x += (digits - l) * 24;
 
     while (*ptr) {
         int frame;
-        if (*ptr == '-')
-            frame = STAT_MINUS;
-        else
-            frame = *ptr - '0';
+        if (*ptr == '-')    frame = STAT_MINUS;
+        else                frame = *ptr - '0';
 
         Sbar_DrawTransPic(x, y, sb_nums[color][frame]);
         x += 24;
@@ -581,18 +575,12 @@ void Sbar_DrawInventory() {
                 }
                 else if (i == 3) {
                     if (cl.items & (IT_SHOTGUN << 4)) {
-                        if (flashon && !grenadeflashing) {
-                            Sbar_DrawPic(96, -16, hsb_weapons[flashon][3]);
-                        }
-                        else if (!grenadeflashing) {
-                            Sbar_DrawPic(96, -16, hsb_weapons[0][3]);
-                        }
+                        if (flashon && !grenadeflashing)    Sbar_DrawPic(96, -16, hsb_weapons[flashon][3]);
+                        else if (!grenadeflashing)          Sbar_DrawPic(96, -16, hsb_weapons[0][3]);
                     }
-                    else
-                        Sbar_DrawPic(96, -16, hsb_weapons[flashon][4]);
+                    else                                    Sbar_DrawPic(96, -16, hsb_weapons[flashon][4]);
                 }
-                else
-                    Sbar_DrawPic(176 + (i * 24), -16, hsb_weapons[flashon][i]);
+                else    Sbar_DrawPic(176 + (i * 24), -16, hsb_weapons[flashon][i]);
                 if (flashon > 1)
                     sb_updates = 0;      // force update to remove flash
             }
@@ -614,12 +602,9 @@ void Sbar_DrawInventory() {
     for (int i = 0; i < 4; i++) {
         char num[6];
         sprintf(num, "%3i", cl.stats[STAT_SHELLS + i]);
-        if (num[0] != ' ')
-            Sbar_DrawCharacter((6 * i + 1) * 8 - 2, -24, 18 + num[0] - '0');
-        if (num[1] != ' ')
-            Sbar_DrawCharacter((6 * i + 2) * 8 - 2, -24, 18 + num[1] - '0');
-        if (num[2] != ' ')
-            Sbar_DrawCharacter((6 * i + 3) * 8 - 2, -24, 18 + num[2] - '0');
+        if (num[0] != ' ')  Sbar_DrawCharacter((6 * i + 1) * 8 - 2, -24, 18 + num[0] - '0');
+        if (num[1] != ' ')  Sbar_DrawCharacter((6 * i + 2) * 8 - 2, -24, 18 + num[1] - '0');
+        if (num[2] != ' ')  Sbar_DrawCharacter((6 * i + 3) * 8 - 2, -24, 18 + num[2] - '0');
     }
 
     flashon = 0;
@@ -627,14 +612,13 @@ void Sbar_DrawInventory() {
     for (int i = 0; i < 6; i++)
         if (cl.items & (1 << (17 + i))) {
             float time = cl.item_gettime[17 + i];
-            if (time && time > cl.time - 2 && flashon) {  // flash frame
+            if (time && (time > (cl.time - 2)) && flashon) {  // flash frame
                 sb_updates = 0;
             }
             else {
                 //MED 01/04/97 changed keys
-                if (!hipnotic || (i > 1)) {
-                    Sbar_DrawPic(192 + i * 16, -16, sb_items[i]);
-                }
+                if (!hipnotic || (i > 1))   Sbar_DrawPic(192 + i * 16, -16, sb_items[i]);
+
             }
             if (time && time > cl.time - 2)
                 sb_updates = 0;
@@ -645,13 +629,12 @@ void Sbar_DrawInventory() {
         for (int i = 0; i < 2; i++)
             if (cl.items & (1 << (24 + i))) {
                 float time = cl.item_gettime[24 + i];
-                if (time && time > cl.time - 2 && flashon) {  // flash frame
+                if (time && (time > (cl.time - 2)) && flashon) {  // flash frame
                     sb_updates = 0;
                 }
-                else {
-                    Sbar_DrawPic(288 + i * 16, -16, hsb_items[i]);
-                }
-                if (time && time > cl.time - 2)
+                else    Sbar_DrawPic(288 + i * 16, -16, hsb_items[i]);
+
+                if (time && (time > (cl.time - 2)))
                     sb_updates = 0;
             }
     }
@@ -665,9 +648,8 @@ void Sbar_DrawInventory() {
                 if (time && time > cl.time - 2 && flashon) { // flash frame
                     sb_updates = 0;
                 }
-                else {
-                    Sbar_DrawPic(288 + i * 16, -16, rsb_items[i]);
-                }
+                else    Sbar_DrawPic(288 + i * 16, -16, rsb_items[i]);
+
 
                 if (time && time > cl.time - 2)
                     sb_updates = 0;
@@ -682,8 +664,7 @@ void Sbar_DrawInventory() {
                 if (time && time > cl.time - 2 && flashon) { // flash frame
                     sb_updates = 0;
                 }
-                else
-                    Sbar_DrawPic(320 - 32 + i * 8, -16, sb_sigil[i]);
+                else    Sbar_DrawPic(320 - 32 + i * 8, -16, sb_sigil[i]);
                 if (time && time > cl.time - 2)
                     sb_updates = 0;
             }
@@ -795,18 +776,9 @@ void Sbar_DrawFace() {
         Sbar_DrawPic(112, 0, sb_face_invis_invuln);
         return;
     }
-    if (cl.items & IT_QUAD) {
-        Sbar_DrawPic(112, 0, sb_face_quad);
-        return;
-    }
-    if (cl.items & IT_INVISIBILITY) {
-        Sbar_DrawPic(112, 0, sb_face_invis);
-        return;
-    }
-    if (cl.items & IT_INVULNERABILITY) {
-        Sbar_DrawPic(112, 0, sb_face_invuln);
-        return;
-    }
+    if (cl.items & IT_QUAD) { ;             Sbar_DrawPic(112, 0, sb_face_quad);     return; }
+    if (cl.items & IT_INVISIBILITY) { ;     Sbar_DrawPic(112, 0, sb_face_invis);    return; }
+    if (cl.items & IT_INVULNERABILITY) { ;  Sbar_DrawPic(112, 0, sb_face_invuln);   return; }
 
     int f = (cl.stats[STAT_HEALTH] >= 100) ?
         4 : cl.stats[STAT_HEALTH] / 20;
@@ -927,10 +899,8 @@ void Sbar_IntermissionNumber(int x, int y, int num, int digits, int color) {
     char str[12];
     int l = Sbar_itoa(num, str);
     cString ptr = str;
-    if (l > digits)
-        ptr += (l - digits);
-    else if (l < digits)
-        x += (digits - l) * 24;
+    if (l > digits)         ptr += (l - digits);
+    else if (l < digits)    x += (digits - l) * 24;
 
     while (*ptr) {
         int frame = (*ptr == '-') ?
@@ -1049,18 +1019,10 @@ void Sbar_MiniDeathmatchOverlay() {
         }
     }
 
-#if 0
-    if (i == sbl) { // we're not there
-        i = 0;
-    }
-    else { // figure out start
-        i = i - (numlines / 2);
-    }
-#else
+
     i = (i == sbl) ?
         0 :                 // we're not there
         i - (numlines / 2); // figure out start
-#endif
 
     if (i > sbl - numlines) {
         i = sbl - numlines;

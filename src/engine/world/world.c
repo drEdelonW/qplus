@@ -68,9 +68,9 @@ HULL BOXES
 */
 
 
-static Hull_t  _box_hull;
-static dClipNode_t _box_clipnodes[6];
-static mPlane_t _box_planes[6];
+static Hull_t       _boxHull;
+static dClipNode_t  _boxClipNodes[6];
+static mPlane_t     _boxPlanes[6];
 
 /*
 ===================
@@ -81,24 +81,22 @@ can just be stored out and get a proper Hull_t structure.
 ===================
 */
 void SV_InitBoxHull() {
-    _box_hull.clipnodes = _box_clipnodes;
-    _box_hull.planes = _box_planes;
-    _box_hull.firstclipnode = 0;
-    _box_hull.lastclipnode = 5;
+    _boxHull.clipnodes = _boxClipNodes;
+    _boxHull.planes = _boxPlanes;
+    _boxHull.firstclipnode = 0;
+    _boxHull.lastclipnode = 5;
 
     for (int i = 0; i < 6; i++) {
-        _box_clipnodes[i].planenum = i;
+        _boxClipNodes[i].planenum = i;
 
         int side = i & 1;
 
-        _box_clipnodes[i].children[side] = CONTENTS_EMPTY;
-        if (i != 5)
-            _box_clipnodes[i].children[side ^ 1] = i + 1;
-        else
-            _box_clipnodes[i].children[side ^ 1] = CONTENTS_SOLID;
+        _boxClipNodes[i].children[side] = CONTENTS_EMPTY;
+        if (i != 5)     _boxClipNodes[i].children[side ^ 1] = i + 1;
+        else            _boxClipNodes[i].children[side ^ 1] = CONTENTS_SOLID;
 
-        _box_planes[i].type = i >> 1;
-        _box_planes[i].normal[i >> 1] = 1;
+        _boxPlanes[i].type = i >> 1;
+        _boxPlanes[i].normal[i >> 1] = 1;
     }
 
 }
@@ -113,13 +111,13 @@ BSP trees instead of being compared directly.
 ===================
 */
 Hull_p SV_HullForBox(vec3_t mins, vec3_t maxs) {
-    _box_planes[0].dist = maxs[0];
-    _box_planes[1].dist = mins[0];
-    _box_planes[2].dist = maxs[1];
-    _box_planes[3].dist = mins[1];
-    _box_planes[4].dist = maxs[2];
-    _box_planes[5].dist = mins[2];
-    return &_box_hull;
+    _boxPlanes[0].dist = maxs[0];
+    _boxPlanes[1].dist = mins[0];
+    _boxPlanes[2].dist = maxs[1];
+    _boxPlanes[3].dist = mins[1];
+    _boxPlanes[4].dist = maxs[2];
+    _boxPlanes[5].dist = mins[2];
+    return &_boxHull;
 }
 
 
@@ -252,8 +250,7 @@ SV_UnlinkEdict
 ===============
 */
 void SV_UnlinkEdict(edict_p ent) {
-    if (!ent->area.prev)
-        return;  // not linked in anywhere
+    if (!ent->area.prev)    return;  // not linked in anywhere
     RemoveLink(&ent->area);
     ent->area.prev = ent->area.next = NULL;
 }
@@ -271,8 +268,8 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
     for (link_p l = node->trigger_edicts.next; l != &node->trigger_edicts; l = next) {
         next = l->next;
         edict_p touch = EDICT_FROM_AREA(l);
-        if (touch == ent)
-            continue;
+        if (touch == ent)   continue;
+
         if (!touch->v.touch ||
             (touch->v.solid != SOLID_TRIGGER))
             continue;
@@ -283,6 +280,7 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
             (ent->v.absmax[1] < touch->v.absmin[1]) ||
             (ent->v.absmax[2] < touch->v.absmin[2]))
             continue;
+
         int old_self = pr_global_struct->self;
         int old_other = pr_global_struct->other;
 
@@ -296,13 +294,10 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
     }
 
     // recurse down both sides
-    if (node->axis == -1)
-        return;
+    if (node->axis == -1)       return;
 
-    if (ent->v.absmax[node->axis] > node->dist)
-        SV_TouchLinks(ent, node->children[0]);
-    if (ent->v.absmin[node->axis] < node->dist)
-        SV_TouchLinks(ent, node->children[1]);
+    if (ent->v.absmax[node->axis] > node->dist)     SV_TouchLinks(ent, node->children[0]);
+    if (ent->v.absmin[node->axis] < node->dist)     SV_TouchLinks(ent, node->children[1]);
 }
 
 
@@ -313,13 +308,11 @@ SV_FindTouchedLeafs
 ===============
 */
 void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
-    if (node->contents == CONTENTS_SOLID)
-        return;
+    if (node->contents == CONTENTS_SOLID)       return;
 
     // add an efrag if the node is a leaf
     if (node->contents < 0) {
-        if (ent->num_leafs == MAX_ENT_LEAFS)
-            return;
+        if (ent->num_leafs == MAX_ENT_LEAFS)    return;
 
         mLeaf_p leaf = (mLeaf_p)node;
         int leafnum = leaf - sv.worldmodel->leafs - 1;
@@ -338,11 +331,9 @@ void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
     );
 
     // recurse down the contacted sides
-    if (sides & 1)
-        SV_FindTouchedLeafs(ent, node->children[0]);
+    if (sides & 1)      SV_FindTouchedLeafs(ent, node->children[0]);
 
-    if (sides & 2)
-        SV_FindTouchedLeafs(ent, node->children[1]);
+    if (sides & 2)      SV_FindTouchedLeafs(ent, node->children[1]);
 }
 
 /*
@@ -420,26 +411,20 @@ void SV_LinkEdict(edict_p ent, qboolean touch_triggers) {
     // find the first node that the ent's box crosses
     areaNode_p node = sv_areanodes;
     while (1) {
-        if (node->axis == -1)
-            break;
-        if (ent->v.absmin[node->axis] > node->dist)
-            node = node->children[0];
-        else if (ent->v.absmax[node->axis] < node->dist)
-            node = node->children[1];
-        else
-            break;  // crosses the node
+        if (node->axis == -1)   break;
+
+        if (ent->v.absmin[node->axis] > node->dist)         node = node->children[0];
+        else if (ent->v.absmax[node->axis] < node->dist)    node = node->children[1];
+        else    break;  // crosses the node
     }
 
     // link it in
 
-    if (ent->v.solid == SOLID_TRIGGER)
-        InsertLinkBefore(&ent->area, &node->trigger_edicts);
-    else
-        InsertLinkBefore(&ent->area, &node->solid_edicts);
+    if (ent->v.solid == SOLID_TRIGGER)  InsertLinkBefore(&ent->area, &node->trigger_edicts);
+    else                                InsertLinkBefore(&ent->area, &node->solid_edicts);
 
     // if touch_triggers, touch all entities at this node and decend for more
-    if (touch_triggers)
-        SV_TouchLinks(ent, sv_areanodes);
+    if (touch_triggers)     SV_TouchLinks(ent, sv_areanodes);
 }
 
 
@@ -490,15 +475,15 @@ SV_PointContents
 
 ==================
 */
-int SV_PointContents(vec3_t p) {
-    int cont = SV_HullPointContents(&sv.worldmodel->hulls[0], 0, p);
+contents_t SV_PointContents(vec3_t p) {
+    contents_t cont = SV_HullPointContents(&sv.worldmodel->hulls[0], 0, p);
     if ((cont <= CONTENTS_CURRENT_0) &&
         (cont >= CONTENTS_CURRENT_DOWN))
         cont = CONTENTS_WATER;
     return cont;
 }
 
-int SV_TruePointContents(vec3_t p) {
+contents_t SV_TruePointContents(vec3_t p) {
     return SV_HullPointContents(&sv.worldmodel->hulls[0], 0, p);
 }
 
@@ -756,6 +741,7 @@ void SV_ClipToLinks(areaNode_p node, moveclip_p clip) {
         if ((touch->v.solid == SOLID_NOT) ||
             (touch == clip->passedict))
             continue;
+
         if (touch->v.solid == SOLID_TRIGGER)    Sys_Error("Trigger in clipping list");
 
         if ((clip->type == MOVE_NOMONSTERS) &&
@@ -780,8 +766,8 @@ void SV_ClipToLinks(areaNode_p node, moveclip_p clip) {
             continue; // points never interact
 
         // might intersect, so do an exact clip
-        if (clip->trace.allsolid)
-            return;
+        if (clip->trace.allsolid)   return;
+
         if (clip->passedict) {
             if ((PROG_TO_EDICT(touch->v.owner) == clip->passedict) || // don't clip against own missiles
                 (PROG_TO_EDICT(clip->passedict->v.owner) == touch)) // don't clip against owner
@@ -811,10 +797,8 @@ void SV_ClipToLinks(areaNode_p node, moveclip_p clip) {
     if (node->axis == -1)
         return;
 
-    if (clip->boxmaxs[node->axis] > node->dist)
-        SV_ClipToLinks(node->children[0], clip);
-    if (clip->boxmins[node->axis] < node->dist)
-        SV_ClipToLinks(node->children[1], clip);
+    if (clip->boxmaxs[node->axis] > node->dist)     SV_ClipToLinks(node->children[0], clip);
+    if (clip->boxmins[node->axis] < node->dist)     SV_ClipToLinks(node->children[1], clip);
 }
 
 
@@ -849,7 +833,6 @@ SV_Move
 */
 trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_t type, edict_p passedict) {
     moveclip_t clip;
-
     memset(&clip, 0, sizeof(moveclip_t));
 
     // clip to world

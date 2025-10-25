@@ -174,21 +174,18 @@ Returns 1, 2, or 1 + 2
 ==================
 */
 int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
-    float dist1, dist2;
-
 #if 0 // this is done by the BOX_ON_PLANE_SIDE macro before calling this
     // function
 // fast axial cases
     if (p->type < 3) {
-        if (p->dist <= emins[p->type])
-            return 1;
-        if (p->dist >= emaxs[p->type])
-            return 2;
+        if (p->dist <= emins[p->type])  return 1;
+        if (p->dist >= emaxs[p->type])  return 2;
         return 3;
 }
 #endif
 
     // general case
+    float dist1, dist2;
     switch (p->signbits) {
     case 0:
         dist1 = p->normal[0] * emaxs[0] + p->normal[1] * emaxs[1] + p->normal[2] * emaxs[2];
@@ -229,10 +226,8 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
     }
 
 #if 0
-    int  i;
     vec3_t corners[2];
-
-    for (i = 0; i < VECT_DIM; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         if (plane->normal[i] < 0) {
             corners[0][i] = emins[i];
             corners[1][i] = emaxs[i];
@@ -245,22 +240,17 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
     dist = DotProduct(plane->normal, corners[0]) - plane->dist;
     dist2 = DotProduct(plane->normal, corners[1]) - plane->dist;
     sides = 0;
-    if (dist1 >= 0)
-        sides = 1;
-    if (dist2 < 0)
-        sides |= 2;
+    if (dist1 >= 0)     sides = 1;
+    if (dist2 < 0)      sides |= 2;
 
 #endif
 
     int sides = 0;
-    if (dist1 >= p->dist)
-        sides = 1;
-    if (dist2 < p->dist)
-        sides |= 2;
+    if (dist1 >= p->dist)   sides |= 1;
+    if (dist2 < p->dist)    sides |= 2;
 
 #ifdef PARANOID
-    if (sides == 0)
-        Sys_Error("BoxOnPlaneSide: sides==0");
+    if (sides == 0) Sys_Error("BoxOnPlaneSide: sides==0");
 #endif
 
     return sides;
@@ -293,11 +283,11 @@ void AngleVectors(vec3_t angles, vec3_t forward, vec3_t right, vec3_t up) {
     up[2] = cr * cp;
 }
 
-int VectorCompare(vec3_t v1, vec3_t v2) {
+bool VectorCompare(vec3_t v1, vec3_t v2) {
     for (int i = 0; i < VECT_DIM; i++)
         if (v1[i] != v2[i])
-            return 0;
-    return 1;
+            return false;
+    return true;
 }
 
 void VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_t vecc) {
