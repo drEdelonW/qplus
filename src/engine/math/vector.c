@@ -68,14 +68,12 @@ void VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_t vecc) {
     vecc[2] = veca[2] + scale * vecb[2];
 }
 
-// #ifndef DotProduct
-vec_t DotProduct_(vec3_t v1, vec3_t v2) {
+vec_t DotProduct(vec3_t v1, vec3_t v2) {
     return
         v1[0] * v2[0] +
         v1[1] * v2[1] +
         v1[2] * v2[2];
 }
-// #endif
 
 void VectorSubtract(vec3_t veca, vec3_t vecb, vec3_t out) {
     out[0] = veca[0] - vecb[0];

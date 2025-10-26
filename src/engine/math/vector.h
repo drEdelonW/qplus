@@ -15,17 +15,7 @@ typedef vec3_t* vec3_p;
 typedef vec_t vec5_t[5];
 typedef vec5_t* vec5_p;
 
-// #if 0
-#define DotProduct(x, y)    \
-    (                       \
-        x[0] * y[0] +       \
-        x[1] * y[1] +       \
-        x[2] * y[2]         \
-    )
-// #else
-vec_t  DotProduct_(vec3_t v1, vec3_t v2);
-// #endif
-
+vec_t   DotProduct(vec3_t v1, vec3_t v2);
 void    VectorSubtract(vec3_t veca, vec3_t vecb, vec3_t out);
 void    VectorAdd(vec3_t veca, vec3_t vecb, vec3_t out);
 void    VectorCopy(vec3_t in, vec3_t out);

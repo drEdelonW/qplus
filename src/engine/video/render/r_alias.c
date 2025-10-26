@@ -386,9 +386,14 @@ R_AliasTransformFinalVert
 ================
 */
 void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stvert_p pstverts) {
-    av->fv[0] = DotProduct(pverts->v, aliastransform[0]) + aliastransform[0][3];
-    av->fv[1] = DotProduct(pverts->v, aliastransform[1]) + aliastransform[1][3];
-    av->fv[2] = DotProduct(pverts->v, aliastransform[2]) + aliastransform[2][3];
+    vec3_t tv = {
+        pverts->v[0],
+        pverts->v[1],
+        pverts->v[2],
+    };
+    av->fv[0] = DotProduct(tv, aliastransform[0]) + aliastransform[0][3];
+    av->fv[1] = DotProduct(tv, aliastransform[1]) + aliastransform[1][3];
+    av->fv[2] = DotProduct(tv, aliastransform[2]) + aliastransform[2][3];
 
     fv->v[2] = pstverts->s;
     fv->v[3] = pstverts->t;
@@ -425,15 +430,20 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stvert_p pstverts) {
 
     for (int i = 0; i < r_anumverts; i++, fv++, pverts++, pstverts++) {
         // transform and project
-        float zi = 1.0 / (DotProduct(pverts->v, aliastransform[2]) + aliastransform[2][3]);
+        vec3_t tv = {
+            pverts->v[0],
+            pverts->v[1],
+            pverts->v[2],
+        };
+        float zi = 1.0 / (DotProduct(tv, aliastransform[2]) + aliastransform[2][3]);
 
         // x, y, and z are scaled down by 1/2**31 in the transform, so 1/z is
         // scaled up by 1/2**31, and the scaling cancels out for x and y in the
         // projection
         fv->v[5] = zi;
 
-        fv->v[0] = ((DotProduct(pverts->v, aliastransform[0]) + aliastransform[0][3]) * zi) + aliasxcenter;
-        fv->v[1] = ((DotProduct(pverts->v, aliastransform[1]) + aliastransform[1][3]) * zi) + aliasycenter;
+        fv->v[0] = ((DotProduct(tv, aliastransform[0]) + aliastransform[0][3]) * zi) + aliasxcenter;
+        fv->v[1] = ((DotProduct(tv, aliastransform[1]) + aliastransform[1][3]) * zi) + aliasycenter;
 
         fv->v[2] = pstverts->s;
         fv->v[3] = pstverts->t;
