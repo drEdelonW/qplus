@@ -32,11 +32,16 @@ void PerpendicularVector(vec3_t dst, const vec3_t src) {
     */
     VectorNormalize(dst);
 }
-
+vec_t _DotProduct(const vec3_t v1, const vec3_t v2) {
+    return
+        v1[0] * v2[0] +
+        v1[1] * v2[1] +
+        v1[2] * v2[2];
+}
 
 void ProjectPointOnPlane(vec3_t dst, const vec3_t p, const vec3_t normal) {
-    float inv_denom = 1.0F / DotProduct(normal, normal);
-    float d = DotProduct(normal, p) * inv_denom;
+    float inv_denom = 1.0F / _DotProduct(normal, normal);
+    float d = _DotProduct(normal, p) * inv_denom;
 
     vec3_t n;
     n[0] = normal[0] * inv_denom;
@@ -63,35 +68,32 @@ void VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_t vecc) {
     vecc[2] = veca[2] + scale * vecb[2];
 }
 
-#ifndef DotProduct
-vec_t DotProduct(vec3_t v1, vec3_t v2) {
-    return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
+// #ifndef DotProduct
+vec_t DotProduct_(vec3_t v1, vec3_t v2) {
+    return
+        v1[0] * v2[0] +
+        v1[1] * v2[1] +
+        v1[2] * v2[2];
 }
-#endif
+// #endif
 
-#ifndef VectorSubtract
 void VectorSubtract(vec3_t veca, vec3_t vecb, vec3_t out) {
     out[0] = veca[0] - vecb[0];
     out[1] = veca[1] - vecb[1];
     out[2] = veca[2] - vecb[2];
 }
-#endif
 
-#ifndef VectorAdd
 void VectorAdd(vec3_t veca, vec3_t vecb, vec3_t out) {
     out[0] = veca[0] + vecb[0];
     out[1] = veca[1] + vecb[1];
     out[2] = veca[2] + vecb[2];
 }
-#endif
 
-#ifndef VectorCopy
 void VectorCopy(vec3_t in, vec3_t out) {
     out[0] = in[0];
     out[1] = in[1];
     out[2] = in[2];
 }
-#endif
 
 void CrossProduct(vec3_t v1, vec3_t v2, vec3_t cross) {
     cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
