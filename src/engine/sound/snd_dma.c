@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include <stdlib.h> //for rand()
 #include "host.h"
+#include "mathlib.h"
 
 #ifdef _WIN32
 #include "winquake.h"

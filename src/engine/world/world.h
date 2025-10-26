@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // world.h
-#include "mathlib.h"
+#include "vector.h"
 #include "types.h"
 #include "progs.h"
 #include "bspfile.h"

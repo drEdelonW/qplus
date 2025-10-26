@@ -105,7 +105,10 @@
 			"sys.h": "c",
 			"gl_model.h": "c",
 			"angles_indices.h": "c",
-			"signal.h": "c"
+			"signal.h": "c",
+			"qparams.h": "c",
+			"server.h": "c",
+			"cmath": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

@@ -2,7 +2,6 @@
 #include "zone_prv.h"
 
 #include <string.h>
-#include "qboolean.h"
 #include "q_tools.h"
 #include "sys.h"
 #include "console.h"

@@ -3,7 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "qboolean.h"
+
+typedef bool qboolean;
 
 
 typedef char* cString;

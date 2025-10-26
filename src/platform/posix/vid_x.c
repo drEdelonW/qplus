@@ -45,6 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_local.h"
 #include "client.h"
 #include "host.h"
+#include "angle.h"
 
 float   old_windowed_mouse;
 

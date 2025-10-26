@@ -1,6 +1,5 @@
 #pragma once
-// #include <stddef.h>
-#include "qboolean.h"
+#include "types.h"
 
 // Align value 'x' up to nearest multiple of 'a' (a must be power of two)
 #define ALIGN_UP(x, a)   (((x) + ((a) - 1)) & ~((a) - 1))

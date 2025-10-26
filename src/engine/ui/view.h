@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // view.h
 
-#include "mathlib.h"
+#include "vector.h"
 #include "types.h"
 
 extern uint8_t gammatable[256];	// palette is sent through this

@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // client.h
 #include <stdio.h>
-#include "mathlib.h"
+// #include "mathlib.h"
 #include "enginedefs.h"
 #include "platformdefs.h"
 #include "sizebuf.h"

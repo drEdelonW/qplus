@@ -139,3 +139,5 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
         $(eval MATH_DIR = $(ENG_DIR)/math) $(eval INCLUDES += $(MATH_DIR))
                 SRC_LIST += $(MATH_DIR)/mathlib.c
+                SRC_LIST += $(MATH_DIR)/vector.c
+                SRC_LIST += $(MATH_DIR)/angle.c

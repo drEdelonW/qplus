@@ -7,9 +7,6 @@
 //
 extern	QuakeParms_t host_parms;
 
-
-
-#include "qboolean.h"
 extern	bool    host_initialized;		// true if into command execution
 extern	double  host_frametime;
 

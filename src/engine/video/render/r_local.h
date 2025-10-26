@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "console.h"
 #include "sys.h"
+#include "mathlib.h"
 
 
 #define ALIAS_BASE_SIZE_RATIO   (1.0 / 11.0)

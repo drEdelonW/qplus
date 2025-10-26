@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "protocol.h"
 #include "console.h"
 #include "client.h"
+#include "mathlib.h"
 #include <stdlib.h>
 
 int			num_temp_entities;
