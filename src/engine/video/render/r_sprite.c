@@ -72,8 +72,9 @@ int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
     }
 
     float_p instep = in;
+    int vsize = sizeof(vec5_t) / sizeof(float);
     float dists[MAXWORKINGVERTS + 1];
-    for (int i = 0; i < nump; i++, instep += sizeof(vec5_t) / sizeof(float)) {
+    for (int i = 0; i < nump; i++, instep += vsize) {
         dists[i] = DotProduct(instep, pclipnormal) - clipdist;
     }
 
@@ -86,10 +87,10 @@ int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
     instep = in;
     int outcount = 0;
 
-    for (int i = 0; i < nump; i++, instep += sizeof(vec5_t) / sizeof(float)) {
+    for (int i = 0; i < nump; i++, instep += vsize) {
         if (dists[i] >= 0) {
             Q_memcpy(outstep, instep, sizeof(vec5_t));
-            outstep += sizeof(vec5_t) / sizeof(float);
+            outstep += vsize;
             outcount++;
         }
 
@@ -99,15 +100,12 @@ int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
         // split it into a new vertex
         float frac = dists[i] / (dists[i] - dists[i + 1]);
 
-        float_p vert2 = instep + sizeof(vec5_t) / sizeof(float);
+        float_p vert2 = instep + vsize;
 
-        outstep[0] = instep[0] + frac * (vert2[0] - instep[0]);
-        outstep[1] = instep[1] + frac * (vert2[1] - instep[1]);
-        outstep[2] = instep[2] + frac * (vert2[2] - instep[2]);
-        outstep[3] = instep[3] + frac * (vert2[3] - instep[3]);
-        outstep[4] = instep[4] + frac * (vert2[4] - instep[4]);
+        for (int v = 0; v < vsize; v++)
+            outstep[v] = instep[v] + frac * (vert2[v] - instep[v]);
 
-        outstep += sizeof(vec5_t) / sizeof(float);
+        outstep += vsize;
         outcount++;
     }
 
@@ -140,8 +138,9 @@ int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
 #endif
 
     float_p instep = in;    // vec5_t
+    int vsize = sizeof(vec5_t) / sizeof(float);
     float dists[MAXWORKINGVERTS + 1];
-    for (int i = 0; i < nump; i++, instep += sizeof(vec5_t) / sizeof(float)) {
+    for (int i = 0; i < nump; i++, instep += vsize) {
         dists[i] = DotProduct(instep, *pclipnormal) - clipdist;
     }
 
@@ -154,10 +153,10 @@ int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
     instep = in;
     int outcount = 0;
 
-    for (int i = 0; i < nump; i++, instep += sizeof(vec5_t) / sizeof(float)) {
+    for (int i = 0; i < nump; i++, instep += vsize) {
         if (dists[i] >= 0) {
             Q_memcpy(outstep, instep, sizeof(vec5_t));
-            outstep += sizeof(vec5_t) / sizeof(float);
+            outstep += vsize;
             outcount++;
         }
 
@@ -167,15 +166,12 @@ int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
         // split it into a new vertex
         float frac = dists[i] / (dists[i] - dists[i + 1]);
 
-        float_p vert2 = instep + sizeof(vec5_t) / sizeof(float);    // vec5_t
+        float_p vert2 = instep + vsize;    // vec5_t
 
-        outstep[0] = instep[0] + frac * (vert2[0] - instep[0]);
-        outstep[1] = instep[1] + frac * (vert2[1] - instep[1]);
-        outstep[2] = instep[2] + frac * (vert2[2] - instep[2]);
-        outstep[3] = instep[3] + frac * (vert2[3] - instep[3]);
-        outstep[4] = instep[4] + frac * (vert2[4] - instep[4]);
+        for (int v = 0; v < vsize; v++)
+            outstep[v] = instep[v] + frac * (vert2[v] - instep[v]);
 
-        outstep += sizeof(vec5_t) / sizeof(float);
+        outstep += vsize;
         outcount++;
     }
 
@@ -343,8 +339,7 @@ void R_DrawSprite() {
         r_spritedesc.vup[2] = 1;
         r_spritedesc.vright[0] = tvec[1];
         // CrossProduct(r_spritedesc.vup, -modelorg,
-        r_spritedesc.vright[1] = -tvec[0];
-        //              r_spritedesc.vright)
+        r_spritedesc.vright[1] = -tvec[0]; // r_spritedesc.vright)
         r_spritedesc.vright[2] = 0;
         VectorNormalize(r_spritedesc.vright);
         r_spritedesc.vpn[0] = -r_spritedesc.vright[1];
