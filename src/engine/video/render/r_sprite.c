@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "r_local.h"
 
-static int      _clip_current;
+static int      _clipCurrent = 0;
 static vec5_t   _clip_verts[2][MAXWORKINGVERTS];
 static int      _sprite_width, _sprite_height;
 
@@ -35,8 +35,7 @@ R_RotateSprite
 ================
 */
 void R_RotateSprite(float beamlength) {
-    if (beamlength == 0.0)
-        return;
+    if (beamlength == 0.0)      return;
 
     vec3_t vec; VectorScale(r_spritedesc.vpn, -beamlength, vec); // vec = r_spritedesc.vpn * (-beamlength);
     VectorAdd(r_entorigin, vec, r_entorigin);   // r_entorigin += vec;
@@ -48,26 +47,28 @@ void R_RotateSprite(float beamlength) {
 =============
 R_ClipSpriteFace
 
-Clips the winding at _clip_verts[_clip_current] and changes _clip_current
+Clips the winding at _clip_verts[_clipCurrent] and changes _clipCurrent
 Throws out the back side
 ==============
 */
-int R_ClipSpriteFace(int nump, ClipPlane_t* pclipplane) {
+#if 1
+int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
+    printf("R_ClipSpriteFace\n");
     float clipdist = pclipplane->dist;
     float_p pclipnormal = pclipplane->normal;
 
     // calc dists
     float_p in;
     float_p outstep;
-    if (_clip_current) {
+    if (_clipCurrent) {
         in = _clip_verts[1][0];
         outstep = _clip_verts[0][0];
-        _clip_current = 0;
+        _clipCurrent = 0;
     }
     else {
         in = _clip_verts[0][0];
         outstep = _clip_verts[1][0];
-        _clip_current = 1;
+        _clipCurrent = 1;
     }
 
     float_p instep = in;
@@ -112,7 +113,75 @@ int R_ClipSpriteFace(int nump, ClipPlane_t* pclipplane) {
 
     return outcount;
 }
+#else
+int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
+    printf("R_ClipSpriteFace\n");
+    float clipdist = pclipplane->dist;
+    vec3_p pclipnormal = &pclipplane->normal;
 
+    // calc dists
+    float_p in;         // vec5_t
+    float_p outstep;    // vec5_t
+#if 1
+    if (_clipCurrent) {
+        in = _clip_verts[1][0];
+        outstep = _clip_verts[0][0];
+        _clipCurrent = 0;
+    }
+    else {
+        in = _clip_verts[0][0];
+        outstep = _clip_verts[1][0];
+        _clipCurrent = 1;
+    }
+#else
+    _clipCurrent = !_clipCurrent;
+    in = _clip_verts[!_clipCurrent][0];
+    outstep = _clip_verts[_clipCurrent][0];
+#endif
+
+    float_p instep = in;    // vec5_t
+    float dists[MAXWORKINGVERTS + 1];
+    for (int i = 0; i < nump; i++, instep += sizeof(vec5_t) / sizeof(float)) {
+        dists[i] = DotProduct(instep, *pclipnormal) - clipdist;
+    }
+
+    // handle wraparound case
+    dists[nump] = dists[0];
+    Q_memcpy(instep, in, sizeof(vec5_t));
+
+
+    // clip the winding
+    instep = in;
+    int outcount = 0;
+
+    for (int i = 0; i < nump; i++, instep += sizeof(vec5_t) / sizeof(float)) {
+        if (dists[i] >= 0) {
+            Q_memcpy(outstep, instep, sizeof(vec5_t));
+            outstep += sizeof(vec5_t) / sizeof(float);
+            outcount++;
+        }
+
+        if ((dists[i] == 0) || (dists[i + 1] == 0))     continue;
+        if ((dists[i] > 0) == (dists[i + 1] > 0))       continue;
+
+        // split it into a new vertex
+        float frac = dists[i] / (dists[i] - dists[i + 1]);
+
+        float_p vert2 = instep + sizeof(vec5_t) / sizeof(float);    // vec5_t
+
+        outstep[0] = instep[0] + frac * (vert2[0] - instep[0]);
+        outstep[1] = instep[1] + frac * (vert2[1] - instep[1]);
+        outstep[2] = instep[2] + frac * (vert2[2] - instep[2]);
+        outstep[3] = instep[3] + frac * (vert2[3] - instep[3]);
+        outstep[4] = instep[4] + frac * (vert2[4] - instep[4]);
+
+        outstep += sizeof(vec5_t) / sizeof(float);
+        outcount++;
+    }
+
+    return outcount;
+}
+#endif
 
 /*
 ================
@@ -122,8 +191,7 @@ R_SetupAndDrawSprite
 void R_SetupAndDrawSprite() {
     float dot = DotProduct(r_spritedesc.vpn, modelorg);
     // backface cull
-    if (dot >= 0)
-        return;
+    if (dot >= 0)       return;
 
     // build the sprite poster in worldspace
     vec3_t right;   VectorScale(r_spritedesc.vright, r_spritedesc.pspriteframe->right, right);
@@ -131,7 +199,7 @@ void R_SetupAndDrawSprite() {
     vec3_t left;    VectorScale(r_spritedesc.vright, r_spritedesc.pspriteframe->left, left);
     vec3_t down;    VectorScale(r_spritedesc.vup, r_spritedesc.pspriteframe->down, down);
 
-    vec5_t* pverts = _clip_verts[0];
+    vec5_p pverts = _clip_verts[0];
 
     pverts[0][0] = r_entorigin[0] + up[0] + left[0];
     pverts[0][1] = r_entorigin[1] + up[1] + left[1];
@@ -159,18 +227,16 @@ void R_SetupAndDrawSprite() {
 
     // clip to the frustum in worldspace
     int nump = 4;
-    _clip_current = 0;
+    _clipCurrent = 0;
 
     for (int i = 0; i < 4; i++) {
         nump = R_ClipSpriteFace(nump, &view_clipplanes[i]);
-        if (nump < 3)
-            return;
-        if (nump >= MAXWORKINGVERTS)
-            Sys_Error("R_SetupAndDrawSprite: too many points");
+        if (nump < 3)                   return;
+        if (nump >= MAXWORKINGVERTS)    Sys_Error("R_SetupAndDrawSprite: too many points");
     }
 
     // transform vertices into viewspace and project
-    float_p pv = &_clip_verts[_clip_current][0][0];
+    float_p pv = &_clip_verts[_clipCurrent][0][0];
     r_spritedesc.nearzi = -999999;
 
     EmitPoint_t outverts[MAXWORKINGVERTS + 1];
@@ -188,14 +254,8 @@ void R_SetupAndDrawSprite() {
 
         pout->s = pv[3];
         pout->t = pv[4];
-        {
-            float scale = xscale * pout->zi;
-            pout->u = (xcenter + scale * transformed[0]);
-        }
-        {
-            float scale = yscale * pout->zi;
-            pout->v = (ycenter - scale * transformed[1]);
-        }
+        pout->u = xcenter + xscale * pout->zi * transformed[0];
+        pout->v = ycenter - yscale * pout->zi * transformed[1];
         pv += sizeof(vec5_t) / sizeof(*pv);
     }
 
@@ -211,19 +271,19 @@ void R_SetupAndDrawSprite() {
 R_GetSpriteframe
 ================
 */
-mSpriteFrame_t* R_GetSpriteframe(mSprite_t* psprite) {
+mSpriteFrame_p R_GetSpriteframe(mSprite_p psprite) {
     int frame = currententity->frame;
     if ((frame >= psprite->numframes) || (frame < 0)) {
         Con_Printf("R_DrawSprite: no such frame %d\n", frame);
         frame = 0;
     }
 
-    mSpriteFrame_t* pspriteframe;
+    mSpriteFrame_p pspriteframe;
     if (psprite->frames[frame].type == SPR_SINGLE) {
         pspriteframe = psprite->frames[frame].frameptr;
     }
     else {
-        mSpriteGroup_t* pspritegroup = (mSpriteGroup_t*)psprite->frames[frame].frameptr;
+        mSpriteGroup_p pspritegroup = (mSpriteGroup_p)psprite->frames[frame].frameptr;
         float_p pintervals = pspritegroup->intervals;
         int numframes = pspritegroup->numframes;
         float fullinterval = pintervals[numframes - 1];

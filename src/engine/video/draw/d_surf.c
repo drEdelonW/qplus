@@ -33,9 +33,8 @@ SurfCache_p sc_rover, sc_base;
 
 
 int D_SurfaceCacheForRes(int width, int height) {
-    if (COM_CheckParm("-surfcachesize")) {
+    if (COM_CheckParm("-surfcachesize"))
         return Q_atoi(com_argv[COM_CheckParm("-surfcachesize") + 1]) * 1024;
-    }
 
     int size = SURFCACHE_SIZE_AT_320X200;
     int pix = width * height;
@@ -86,8 +85,7 @@ D_FlushCaches
 ==================
 */
 void D_FlushCaches() {
-    if (!sc_base)
-        return;
+    if (!sc_base)       return;
 
     for (SurfCache_p c = sc_base; c; c = c->next) {
         if (c->owner)
@@ -106,24 +104,15 @@ D_SCAlloc
 =================
 */
 SurfCache_p D_SCAlloc(int width, int size) {
-    SurfCache_p new;
-    qboolean wrapped_this_time;
-
-    if ((width < 0) ||
-        (width > 256))
-        Sys_Error("D_SCAlloc: bad cache width %d\n", width);
-
-    if ((size <= 0) ||
-        (size > 0x10000))
-        Sys_Error("D_SCAlloc: bad cache size %d\n", size);
+    if ((width < 0) || (width > 256))       Sys_Error("D_SCAlloc: bad cache width %d\n", width);
+    if ((size <= 0) || (size > 0x10000))    Sys_Error("D_SCAlloc: bad cache size %d\n", size);
 
     size = (int)(offsetof(SurfCache_t, data) + size);
     size = (size + 3) & ~3;
-    if (size > sc_size)
-        Sys_Error("D_SCAlloc: %i > cache size", size);
+    if (size > sc_size)     Sys_Error("D_SCAlloc: %i > cache size", size);
 
     // if there is not size bytes after the rover, reset to the start
-    wrapped_this_time = false;
+    qboolean wrapped_this_time = false;
 
     if (!sc_rover ||
         (((uint8_p)sc_rover - (uint8_p)sc_base) > sc_size - size)) {
@@ -134,17 +123,15 @@ SurfCache_p D_SCAlloc(int width, int size) {
     }
 
     // colect and free SurfCache_t blocks until the rover block is large enough
-    new = sc_rover;
+    SurfCache_p new = sc_rover;
     if (sc_rover->owner)
         *sc_rover->owner = NULL;
 
     while (new->size < size) {
         // free another
         sc_rover = sc_rover->next;
-        if (!sc_rover)
-            Sys_Error("D_SCAlloc: hit the end of memory");
-        if (sc_rover->owner)
-            *sc_rover->owner = NULL;
+        if (!sc_rover)          Sys_Error("D_SCAlloc: hit the end of memory");
+        if (sc_rover->owner)    *sc_rover->owner = NULL;
 
         new->size += sc_rover->size;
         new->next = sc_rover->next;
