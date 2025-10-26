@@ -22,11 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "mathlib.h"
 #include <math.h>
 #include <string.h>
+#include "sys.h"    // void Sys_Error(cString error, ...);
 
-void Sys_Error(cString error, ...);
-
-/* extern */ vec3_t vec3_origin = { 0, 0, 0 };
-/* extern */ int nanmask = 255 << 23;
+/* extern */ vec3_t vec3_origin = { 0.0f, 0.0f, 0.0f };
+/* extern */ uint32_t nanmask = 0xFF << 23;
 
 /*-----------------------------------------------------------------*/
 
@@ -271,6 +270,7 @@ int Q_log2(int val) {
 R_ConcatRotations
 ================
 */
+#if 0
 void R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]) {
     out[0][0] =
         in1[0][0] * in2[0][0] +
@@ -284,6 +284,7 @@ void R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]) {
         in1[0][0] * in2[0][2] +
         in1[0][1] * in2[1][2] +
         in1[0][2] * in2[2][2];
+
     out[1][0] =
         in1[1][0] * in2[0][0] +
         in1[1][1] * in2[1][0] +
@@ -296,6 +297,7 @@ void R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]) {
         in1[1][0] * in2[0][2] +
         in1[1][1] * in2[1][2] +
         in1[1][2] * in2[2][2];
+
     out[2][0] =
         in1[2][0] * in2[0][0] +
         in1[2][1] * in2[1][0] +
@@ -308,14 +310,27 @@ void R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]) {
         in1[2][0] * in2[0][2] +
         in1[2][1] * in2[1][2] +
         in1[2][2] * in2[2][2];
-}
 
+}
+#else
+void R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            float sum = 0.0f;
+            for (int k = 0; k < 3; k++)
+                sum += in1[i][k] * in2[k][j];
+            out[i][j] = sum;
+        }
+    }
+}
+#endif
 
 /*
 ================
 R_ConcatTransforms
 ================
 */
+#if 0
 void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]) {
     out[0][0] =
         in1[0][0] * in2[0][0] +
@@ -371,7 +386,22 @@ void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]) {
         in1[2][2] * in2[2][3] +
         in1[2][3];
 }
-
+#else
+void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            float sum = 0.0f;
+            for (int k = 0; k < 3; k++)
+                sum += in1[i][k] * in2[k][j];
+            out[i][j] = sum;
+        }
+        float sum = in1[i][3];
+        for (int k = 0; k < 3; k++)
+            sum += in1[i][k] * in2[k][3];
+        out[i][3] = sum;
+    }
+}
+#endif
 
 /*
 ===================
@@ -387,12 +417,10 @@ void FloorDivMod(double numer, double denom, int* quotient, int* rem) {
     int  q, r;
 
 #ifndef PARANOID
-    if (denom <= 0.0)
-        Sys_Error("FloorDivMod: bad denominator %d\n", denom);
+    if (denom <= 0.0)       Sys_Error("FloorDivMod: bad denominator %d\n", denom);
 
     // if ((floor(numer) != numer) || (floor(denom) != denom))
-    //  Sys_Error ("FloorDivMod: non-integer numer or denom %f %f\n",
-    //    numer, denom);
+    //  Sys_Error ("FloorDivMod: non-integer numer or denom %f %f\n", numer, denom);
 #endif
 
     if (numer >= 0.0) {
@@ -438,24 +466,3 @@ int GreatestCommonDivisor(int i1, int i2) {
 }
 
 
-#if !id386
-
-// TODO: move to nonintel.c
-
-// /*
-// ===================
-// Invert24To16
-
-// Inverts an 8.24 value to a 16.16 value
-// ====================
-// */
-
-// fixed16_t Invert24To16(fixed16_t val) {
-//     if (val < 256)
-//         return (0xFFFFFFFF);
-
-//     return (fixed16_t)
-//         (((double)0x10000 * (double)0x1000000 / (double)val) + 0.5);
-// }
-
-#endif
