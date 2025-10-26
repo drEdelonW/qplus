@@ -29,7 +29,6 @@
 #include "console.h"
 #include "cmd.h"
 #include "host.h"
-#include "angles_indices.h"
 #include "protocol.h"
 #include "q_tools.h"
 #include "msg.h"

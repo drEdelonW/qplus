@@ -19,14 +19,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sv_user.c -- server code for moving users
 
-#include "quakedef.h"
+#include "sys.h"
+#include "msg.h"
+#include "q_tools.h"
 #include "cvar_q1.h"
+#include "protocol.h"
+#include "server.h"
+#include "cmd.h"
+#include "world.h"
+#include <string.h>
+#include "console.h"
+#include "view.h"
+#include "host.h"
 
 edict_p sv_player;
 
-
-
-static vec3_t  forward, right, up;
+static vec3_t  _forward, _right, _up;
 
 vec3_t wishdir;
 float wishspeed;
@@ -212,11 +220,11 @@ SV_WaterMove
 */
 void SV_WaterMove() {
     // user intentions
-    AngleVectors(sv_player->v.v_angle, forward, right, up);
+    AngleVectors(sv_player->v.v_angle, _forward, _right, _up);
 
     vec3_t wishvel;
     for (int i = 0; i < VECT_DIM; i++)
-        wishvel[i] = forward[i] * cmd.forwardmove + right[i] * cmd.sidemove;
+        wishvel[i] = _forward[i] * cmd.forwardmove + _right[i] * cmd.sidemove;
 
     if (!cmd.forwardmove &&
         !cmd.sidemove &&
@@ -245,7 +253,7 @@ void SV_WaterMove() {
         newspeed = 0;
 
     // water acceleration
-    if (!wishspeed) return;
+    if (!wishspeed)     return;
 
     float addspeed = wishspeed - newspeed;
     if (addspeed <= 0)  return;
@@ -260,8 +268,9 @@ void SV_WaterMove() {
 }
 
 void SV_WaterJump() {
-    if (sv.time > sv_player->v.teleport_time
-        || !sv_player->v.waterlevel) {
+    if (sv.time > sv_player->v.teleport_time ||
+        !sv_player->v.waterlevel
+        ) {
         sv_player->v.flags = (int)sv_player->v.flags & ~FL_WATERJUMP;
         sv_player->v.teleport_time = 0;
     }
@@ -277,7 +286,7 @@ SV_AirMove
 ===================
 */
 void SV_AirMove() {
-    AngleVectors(sv_player->v.angles, forward, right, up);
+    AngleVectors(sv_player->v.angles, _forward, _right, _up);
 
     float fmove = cmd.forwardmove;
     float smove = cmd.sidemove;
@@ -288,7 +297,7 @@ void SV_AirMove() {
 
     vec3_t  wishvel;
     for (int i = 0; i < VECT_DIM; i++)
-        wishvel[i] = forward[i] * fmove + right[i] * smove;
+        wishvel[i] = _forward[i] * fmove + _right[i] * smove;
 
     if ((int)sv_player->v.movetype != MOVETYPE_WALK)
         wishvel[2] = cmd.upmove;

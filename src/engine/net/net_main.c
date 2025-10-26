@@ -19,9 +19,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // net_main.c
 
-#include "quakedef.h"
+#include "server.h"
+#include "common.h"
+#include "sys.h"
+#include "cmd.h"
 #include "net_vcr.h"
 #include "cvar_q1.h"
+#include "console.h"
 
 
 qsocket_p net_activeSockets = NULL;
@@ -699,10 +703,8 @@ void NET_Init() {
         recording = true;
 
     int param = COM_CheckParm("-port");
-    if (!param)
-        param = COM_CheckParm("-udpport");
-    if (!param)
-        param = COM_CheckParm("-ipxport");
+    if (!param)     param = COM_CheckParm("-udpport");
+    if (!param)     param = COM_CheckParm("-ipxport");
 
     if (param) {
         if (param < com_argc - 1)

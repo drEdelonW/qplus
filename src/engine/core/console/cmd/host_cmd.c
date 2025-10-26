@@ -18,23 +18,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#if 0
-#   include "quakedef.h"
-#else
-#   include "cmd.h"
-#   include <string.h>
-#   include <stdlib.h>
-#   include "enginedefs.h"
-#   include "server.h"
-#   include "console.h"
-#   include "keys.h"
-#   include "host.h"
-#   include "sys.h"
-#   include "protocol.h"
-#   include "common.h"
-#   include "world.h"
-#   include "versions.h"
-#endif
+#include "cmd.h"
+#include <string.h>
+#include <stdlib.h>
+#include "enginedefs.h"
+#include "server.h"
+#include "console.h"
+#include "keys.h"
+#include "host.h"
+#include "sys.h"
+#include "protocol.h"
+#include "common.h"
+#include "world.h"
+#include "versions.h"
 #include "cvar_q1.h"
 
 

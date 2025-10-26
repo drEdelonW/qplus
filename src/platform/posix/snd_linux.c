@@ -27,13 +27,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <sys/wait.h>
 #include <linux/soundcard.h>
 #include <stdio.h>
-#if 0
-#   include "quakedef.h"
-#else
-#   include "sound.h"
-#   include "common.h"
-#   include "console.h"
-#endif
+#include "sound.h"
+#include "common.h"
+#include "console.h"
 
 static int _audio_fd;
 static bool _snd_inited = false;

@@ -17,20 +17,16 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#if 0
-#   include "quakedef.h"
-#else
-#   include <string.h>
-#   include "keys.h"
-#   include "cmd.h"
-#   include "console.h"
-#   include "client.h"
-#   include "cvar.h"
-#   include "q_tools.h"
-#   include "zone.h"
-#   include "menu.h"
-#   include "sys.h"
-#endif
+#include "keys.h"
+#include <string.h>
+#include "cmd.h"
+#include "console.h"
+#include "client.h"
+#include "cvar.h"
+#include "q_tools.h"
+#include "zone.h"
+#include "menu.h"
+#include "sys.h"
 #include <stdbool.h>
 /*
 key up events are sent even if in console mode

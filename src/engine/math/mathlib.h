@@ -21,6 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // mathlib.h
 #include <math.h>
 #include "types.h"
+#include "angles_indices.h"
+
+#define	ON_EPSILON		0.1			// point on plane side epsilon
+
 typedef float vec_t;
 typedef enum axis_e {
     X_AX = 0,
@@ -98,20 +102,12 @@ void    R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]);
 void    R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]);
 
 void    FloorDivMod(double numer, double denom, int* quotient, int* rem);
-fixed16_t Invert24To16(fixed16_t val);
+// fixed16_t Invert24To16(fixed16_t val);
 int     GreatestCommonDivisor(int i1, int i2);
 
 void    AngleVectors(vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
-int     BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, struct mPlane_s* plane);
+
 float   anglemod(float a);
 
 
 
-#define BOX_ON_PLANE_SIDE(emins, emaxs, p)      \
-    (((p)->type < 3)? (                         \
-        ((p)->dist <= (emins)[(p)->type])?      \
-            1 : (                               \
-            ((p)->dist >= (emaxs)[(p)->type])?  \
-                2 : 3                           \
-        )                                       \
-    ) : BoxOnPlaneSide( (emins), (emaxs), (p)))

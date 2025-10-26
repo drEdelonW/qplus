@@ -82,3 +82,21 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
 // shouldn't be considered solid objects
 
 // passedict is explicitly excluded from clipping checks (normally NULL)
+#ifdef GLQUAKE
+    #include "gl_model.h"
+    #include "glquake.h"
+#else
+    #include "model.h"
+    // #include "d_iface.h"
+#endif
+
+int     BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane);
+
+#define BOX_ON_PLANE_SIDE(emins, emaxs, p)      \
+    (((p)->type < 3)? (                         \
+        ((p)->dist <= (emins)[(p)->type])?      \
+            1 : (                               \
+            ((p)->dist >= (emaxs)[(p)->type])?  \
+                2 : 3                           \
+        )                                       \
+    ) : BoxOnPlaneSide( (emins), (emaxs), (p)))

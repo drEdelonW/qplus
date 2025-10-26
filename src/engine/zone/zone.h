@@ -84,6 +84,7 @@ Zone block
 
 */
 #include "types.h"
+extern int32_t			minimum_memory;
 
 void Memory_Init(TypeLess_ptr buf, size_t size);
 

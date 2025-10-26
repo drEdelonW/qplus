@@ -23,6 +23,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef GLQUAKE
 #include "r_shared.h"
 #include "client.h"
+#include "common.h"
+#include "console.h"
+#include "sys.h"
 
 
 #define ALIAS_BASE_SIZE_RATIO   (1.0 / 11.0)

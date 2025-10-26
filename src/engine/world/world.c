@@ -19,19 +19,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // world.c -- world query functions
 
-#if 0
-#   include "quakedef.h"
-#else
-#   include <string.h>
-#   include "world.h"
-#   include "model.h"
-#   include "bspfile.h"
-#   include "server.h"
-#   include "sys.h"
-#   include "console.h"
-#   include "progs.h"
-#   include "q_tools.h"
-#endif
+#include <string.h>
+#include "world.h"
+#include "model.h"
+#include "bspfile.h"
+#include "server.h"
+#include "sys.h"
+#include "console.h"
+#include "progs.h"
+#include "q_tools.h"
+#include "link.h"
 
 
 /*
@@ -178,18 +175,18 @@ struct areaNode_s;
 typedef struct areaNode_s areaNode_t;
 typedef areaNode_t* areaNode_p;
 typedef struct areaNode_s {
-    int  axis;  // -1 = leaf node
-    float dist;
-    areaNode_p children[2];
-    link_t trigger_edicts;
-    link_t solid_edicts;
+    int         axis;  // -1 = leaf node
+    float       dist;
+    areaNode_p  children[2];
+    link_t      trigger_edicts;
+    link_t      solid_edicts;
 } areaNode_t;
 
 #define AREA_DEPTH 4
 #define AREA_NODES 32
 
-static areaNode_t sv_areanodes[AREA_NODES];
-static int   sv_numareanodes;
+static areaNode_t   _sv_AreaNodes[AREA_NODES];
+static int          _sv_NumAreaNodes;
 
 /*
 ===============
@@ -198,8 +195,8 @@ SV_CreateAreaNode
 ===============
 */
 areaNode_p SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
-    areaNode_p anode = &sv_areanodes[sv_numareanodes];
-    sv_numareanodes++;
+    areaNode_p anode = &_sv_AreaNodes[_sv_NumAreaNodes];
+    _sv_NumAreaNodes++;
 
     ClearLink(&anode->trigger_edicts);
     ClearLink(&anode->solid_edicts);
@@ -237,8 +234,8 @@ SV_ClearWorld
 void SV_ClearWorld() {
     SV_InitBoxHull();
 
-    memset(sv_areanodes, 0, sizeof(sv_areanodes));
-    sv_numareanodes = 0;
+    memset(_sv_AreaNodes, 0, sizeof(_sv_AreaNodes));
+    _sv_NumAreaNodes = 0;
     SV_CreateAreaNode(0, sv.worldmodel->mins, sv.worldmodel->maxs);
 }
 
@@ -262,9 +259,8 @@ SV_TouchLinks
 ====================
 */
 void SV_TouchLinks(edict_p ent, areaNode_p node) {
-    link_p next;
-
     // touch linked edicts
+    link_p next;
     for (link_p l = node->trigger_edicts.next; l != &node->trigger_edicts; l = next) {
         next = l->next;
         edict_p touch = EDICT_FROM_AREA(l);
@@ -273,6 +269,7 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
         if (!touch->v.touch ||
             (touch->v.solid != SOLID_TRIGGER))
             continue;
+
         if ((ent->v.absmin[0] > touch->v.absmax[0]) ||
             (ent->v.absmin[1] > touch->v.absmax[1]) ||
             (ent->v.absmin[2] > touch->v.absmax[2]) ||
@@ -332,7 +329,6 @@ void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
 
     // recurse down the contacted sides
     if (sides & 1)      SV_FindTouchedLeafs(ent, node->children[0]);
-
     if (sides & 2)      SV_FindTouchedLeafs(ent, node->children[1]);
 }
 
@@ -387,6 +383,7 @@ void SV_LinkEdict(edict_p ent, qboolean touch_triggers) {
     if ((int)ent->v.flags & FL_ITEM) {
         ent->v.absmin[0] -= 15;
         ent->v.absmin[1] -= 15;
+
         ent->v.absmax[0] += 15;
         ent->v.absmax[1] += 15;
     }
@@ -395,6 +392,7 @@ void SV_LinkEdict(edict_p ent, qboolean touch_triggers) {
         ent->v.absmin[0] -= 1;
         ent->v.absmin[1] -= 1;
         ent->v.absmin[2] -= 1;
+
         ent->v.absmax[0] += 1;
         ent->v.absmax[1] += 1;
         ent->v.absmax[2] += 1;
@@ -405,13 +403,12 @@ void SV_LinkEdict(edict_p ent, qboolean touch_triggers) {
     if (ent->v.modelindex)
         SV_FindTouchedLeafs(ent, sv.worldmodel->nodes);
 
-    if (ent->v.solid == SOLID_NOT)
-        return;
+    if (ent->v.solid == SOLID_NOT)      return;
 
     // find the first node that the ent's box crosses
-    areaNode_p node = sv_areanodes;
+    areaNode_p node = _sv_AreaNodes;
     while (1) {
-        if (node->axis == -1)   break;
+        if (node->axis == -1)       break;
 
         if (ent->v.absmin[node->axis] > node->dist)         node = node->children[0];
         else if (ent->v.absmax[node->axis] < node->dist)    node = node->children[1];
@@ -424,7 +421,7 @@ void SV_LinkEdict(edict_p ent, qboolean touch_triggers) {
     else                                InsertLinkBefore(&ent->area, &node->solid_edicts);
 
     // if touch_triggers, touch all entities at this node and decend for more
-    if (touch_triggers)     SV_TouchLinks(ent, sv_areanodes);
+    if (touch_triggers)     SV_TouchLinks(ent, _sv_AreaNodes);
 }
 
 
@@ -860,8 +857,164 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
     SV_MoveBounds(start, clip.mins2, clip.maxs2, end, clip.boxmins, clip.boxmaxs);
 
     // clip to entities
-    SV_ClipToLinks(sv_areanodes, &clip);
+    SV_ClipToLinks(_sv_AreaNodes, &clip);
 
     return clip.trace;
 }
 
+/*
+==================
+BOPS_Error
+
+Split out like this for ASM to call.
+==================
+*/
+void BOPS_Error() {
+    Sys_Error("BoxOnPlaneSide:  Bad signbits");
+}
+
+
+#if !id386
+
+
+
+
+/*
+==================
+BoxOnPlaneSide
+
+Returns 1, 2, or 1 + 2
+==================
+*/
+int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
+#if 0 // this is done by the BOX_ON_PLANE_SIDE macro before calling this
+    // function
+// fast axial cases
+    if (p->type < 3) {
+        if (p->dist <= emins[p->type])  return 1;
+        if (p->dist >= emaxs[p->type])  return 2;
+        return 3;
+    }
+#endif
+
+    // general case
+    float dist1, dist2;
+    switch (p->signbits) {
+    case 0:
+        dist1 =
+            p->normal[0] * emaxs[0] +
+            p->normal[1] * emaxs[1] +
+            p->normal[2] * emaxs[2];
+        dist2 =
+            p->normal[0] * emins[0] +
+            p->normal[1] * emins[1] +
+            p->normal[2] * emins[2];
+        break;
+    case 1:
+        dist1 =
+            p->normal[0] * emins[0] +
+            p->normal[1] * emaxs[1] +
+            p->normal[2] * emaxs[2];
+        dist2 =
+            p->normal[0] * emaxs[0] +
+            p->normal[1] * emins[1] +
+            p->normal[2] * emins[2];
+        break;
+    case 2:
+        dist1 =
+            p->normal[0] * emaxs[0] +
+            p->normal[1] * emins[1] +
+            p->normal[2] * emaxs[2];
+        dist2 =
+            p->normal[0] * emins[0] +
+            p->normal[1] * emaxs[1] +
+            p->normal[2] * emins[2];
+        break;
+    case 3:
+        dist1 =
+            p->normal[0] * emins[0] +
+            p->normal[1] * emins[1] +
+            p->normal[2] * emaxs[2];
+        dist2 =
+            p->normal[0] * emaxs[0] +
+            p->normal[1] * emaxs[1] +
+            p->normal[2] * emins[2];
+        break;
+    case 4:
+        dist1 =
+            p->normal[0] * emaxs[0] +
+            p->normal[1] * emaxs[1] +
+            p->normal[2] * emins[2];
+        dist2 =
+            p->normal[0] * emins[0] +
+            p->normal[1] * emins[1] +
+            p->normal[2] * emaxs[2];
+        break;
+    case 5:
+        dist1 =
+            p->normal[0] * emins[0] +
+            p->normal[1] * emaxs[1] +
+            p->normal[2] * emins[2];
+        dist2 =
+            p->normal[0] * emaxs[0] +
+            p->normal[1] * emins[1] +
+            p->normal[2] * emaxs[2];
+        break;
+    case 6:
+        dist1 =
+            p->normal[0] * emaxs[0] +
+            p->normal[1] * emins[1] +
+            p->normal[2] * emins[2];
+        dist2 =
+            p->normal[0] * emins[0] +
+            p->normal[1] * emaxs[1] +
+            p->normal[2] * emaxs[2];
+        break;
+    case 7:
+        dist1 =
+            p->normal[0] * emins[0] +
+            p->normal[1] * emins[1] +
+            p->normal[2] * emins[2];
+        dist2 =
+            p->normal[0] * emaxs[0] +
+            p->normal[1] * emaxs[1] +
+            p->normal[2] * emaxs[2];
+        break;
+    default:
+        dist1 = dist2 = 0;  // shut up compiler
+        BOPS_Error();
+        break;
+    }
+
+#if 0
+    vec3_t corners[2];
+    for (int i = 0; i < VECT_DIM; i++) {
+        if (plane->normal[i] < 0) {
+            corners[0][i] = emins[i];
+            corners[1][i] = emaxs[i];
+        }
+        else {
+            corners[1][i] = emins[i];
+            corners[0][i] = emaxs[i];
+        }
+    }
+    dist = DotProduct(plane->normal, corners[0]) - plane->dist;
+    dist2 = DotProduct(plane->normal, corners[1]) - plane->dist;
+    sides = 0;
+    if (dist1 >= 0)     sides = 1;
+    if (dist2 < 0)      sides |= 2;
+
+#endif
+
+    int sides = 0;
+    if (dist1 >= p->dist)   sides |= 1;
+    if (dist2 < p->dist)    sides |= 2;
+
+#ifdef PARANOID
+    if (sides == 0) Sys_Error("BoxOnPlaneSide: sides==0");
+#endif
+
+    return sides;
+}
+
+#endif

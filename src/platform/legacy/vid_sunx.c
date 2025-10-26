@@ -36,7 +36,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <X11/keysym.h>
 #include <X11/extensions/XShm.h>
 
-#include "quakedef.h"
 #include "d_local.h"
 
 CVAR_ARC(m_filter, "0");

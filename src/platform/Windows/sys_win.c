@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sys_win.c -- Win32 system interface code
 
-#include "quakedef.h"
 #include "winquake.h"
 #include "errno.h"
 #include "resource.h"

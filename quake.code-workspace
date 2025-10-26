@@ -99,7 +99,13 @@
 			"menu_prv.h": "c",
 			"menu_net.h": "c",
 			"menu.h": "c",
-			"net.h": "c"
+			"net.h": "c",
+			"r_local.h": "c",
+			"client.h": "c",
+			"sys.h": "c",
+			"gl_model.h": "c",
+			"angles_indices.h": "c",
+			"signal.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

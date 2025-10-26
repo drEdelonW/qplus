@@ -20,8 +20,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // net_dgrm.c
 
 // This is enables a simple IP banning mechanism
+#include "server.h"
 #include <stdint.h>
+#include "sys.h"
+#include "common.h"
 #include "cvar_q1.h"
+#include "cmd.h"
+#include "console.h"
+#include "menu.h"
 
 
 #define BAN_TEST
@@ -58,7 +64,6 @@ uint32_t inet_addr(const cString cp);
 typedef struct in_addr in_addr_t;
 typedef in_addr_t* in_addr_p;
 
-#include "quakedef.h"
 #include "net_dgrm.h"
 
 // these two macros are to make the code more readable

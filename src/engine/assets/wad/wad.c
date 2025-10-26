@@ -19,15 +19,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // wad.c
 
-#if 0
-#   include "quakedef.h"
-#else
-#   include "wad.h"
-#   include <string.h>
-#   include "common.h"
-#   include "sys.h"
-#   include "endian_tools.h"
-#endif
+#include "wad.h"
+#include <string.h>
+#include "common.h"
+#include "sys.h"
+#include "endian_tools.h"
 
 int32_t     wad_numlumps;
 LumpInfo_p  wad_lumps;

@@ -33,7 +33,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <linux/cdrom.h>
 
-#include "quakedef.h"
+#include "cdaudio.h"
+#include "cmd.h"
+#include "cmd.h"
+#include "console.h"
+#include "common.h"
+#include "client.h"
 #include "cvar_q1.h"
 
 
@@ -163,11 +168,8 @@ void CDAudio_Stop() {
 }
 
 void CDAudio_Pause() {
-    if ((_cdfile == -1) || !_enabled)
-        return;
-
-    if (!_playing)
-        return;
+    if ((_cdfile == -1) || !_enabled)   return;
+    if (!_playing)                      return;
 
     if (ioctl(_cdfile, CDROMPAUSE) == -1)
         Con_DPrintf("ioctl cdrompause failed\n");
@@ -178,14 +180,9 @@ void CDAudio_Pause() {
 
 
 void CDAudio_Resume() {
-    if ((_cdfile == -1) || !_enabled)
-        return;
-
-    if (!_cdValid)
-        return;
-
-    if (!_wasPlaying)
-        return;
+    if ((_cdfile == -1) || !_enabled)   return;
+    if (!_cdValid)                      return;
+    if (!_wasPlaying)                   return;
 
     if (ioctl(_cdfile, CDROMRESUME) == -1)
         Con_DPrintf("ioctl cdromresume failed\n");

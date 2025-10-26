@@ -19,8 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // mathlib.c -- math primitives
 
+#include "mathlib.h"
 #include <math.h>
-#include "quakedef.h"
+#include <string.h>
 
 void Sys_Error(cString error, ...);
 
@@ -86,9 +87,8 @@ void RotatePointAroundVector(vec3_t dst, const vec3_t dir, const vec3_t point, f
         dir[1],
         dir[2]
     };
-    vec3_t vr, vup;
-    PerpendicularVector(vr, dir);
-    CrossProduct(vr, vf, vup);
+    vec3_t vr;  PerpendicularVector(vr, dir);
+    vec3_t vup; CrossProduct(vr, vf, vup);
     float m[3][3];
     m[0][0] = vr[0];
     m[1][0] = vr[1];
@@ -102,8 +102,7 @@ void RotatePointAroundVector(vec3_t dst, const vec3_t dir, const vec3_t point, f
     m[1][2] = vf[1];
     m[2][2] = vf[2];
 
-    float im[3][3];
-    memcpy(im, m, sizeof(im));
+    float im[3][3];    memcpy(im, m, sizeof(im));
 
     im[0][1] = m[1][0];
     im[0][2] = m[2][0];
@@ -143,120 +142,15 @@ void RotatePointAroundVector(vec3_t dst, const vec3_t dir, const vec3_t point, f
 
 float anglemod(float a) {
 #if 0
-    if (a >= 0)
-        a -= 360 * (int)(a / 360);
-    else
-        a += 360 * (1 + (int)(-a / 360));
+    if (a >= 0) a -= 360 * (int)(a / 360);
+    else        a += 360 * (1 + (int)(-a / 360));
 #endif
     a = (360.0 / 65536) * ((int)(a * (65536 / 360.0)) & 65535);
     return a;
 }
 
-/*
-==================
-BOPS_Error
-
-Split out like this for ASM to call.
-==================
-*/
-void BOPS_Error() {
-    Sys_Error("BoxOnPlaneSide:  Bad signbits");
-}
 
 
-#if !id386
-
-/*
-==================
-BoxOnPlaneSide
-
-Returns 1, 2, or 1 + 2
-==================
-*/
-int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
-#if 0 // this is done by the BOX_ON_PLANE_SIDE macro before calling this
-    // function
-// fast axial cases
-    if (p->type < 3) {
-        if (p->dist <= emins[p->type])  return 1;
-        if (p->dist >= emaxs[p->type])  return 2;
-        return 3;
-}
-#endif
-
-    // general case
-    float dist1, dist2;
-    switch (p->signbits) {
-    case 0:
-        dist1 = p->normal[0] * emaxs[0] + p->normal[1] * emaxs[1] + p->normal[2] * emaxs[2];
-        dist2 = p->normal[0] * emins[0] + p->normal[1] * emins[1] + p->normal[2] * emins[2];
-        break;
-    case 1:
-        dist1 = p->normal[0] * emins[0] + p->normal[1] * emaxs[1] + p->normal[2] * emaxs[2];
-        dist2 = p->normal[0] * emaxs[0] + p->normal[1] * emins[1] + p->normal[2] * emins[2];
-        break;
-    case 2:
-        dist1 = p->normal[0] * emaxs[0] + p->normal[1] * emins[1] + p->normal[2] * emaxs[2];
-        dist2 = p->normal[0] * emins[0] + p->normal[1] * emaxs[1] + p->normal[2] * emins[2];
-        break;
-    case 3:
-        dist1 = p->normal[0] * emins[0] + p->normal[1] * emins[1] + p->normal[2] * emaxs[2];
-        dist2 = p->normal[0] * emaxs[0] + p->normal[1] * emaxs[1] + p->normal[2] * emins[2];
-        break;
-    case 4:
-        dist1 = p->normal[0] * emaxs[0] + p->normal[1] * emaxs[1] + p->normal[2] * emins[2];
-        dist2 = p->normal[0] * emins[0] + p->normal[1] * emins[1] + p->normal[2] * emaxs[2];
-        break;
-    case 5:
-        dist1 = p->normal[0] * emins[0] + p->normal[1] * emaxs[1] + p->normal[2] * emins[2];
-        dist2 = p->normal[0] * emaxs[0] + p->normal[1] * emins[1] + p->normal[2] * emaxs[2];
-        break;
-    case 6:
-        dist1 = p->normal[0] * emaxs[0] + p->normal[1] * emins[1] + p->normal[2] * emins[2];
-        dist2 = p->normal[0] * emins[0] + p->normal[1] * emaxs[1] + p->normal[2] * emaxs[2];
-        break;
-    case 7:
-        dist1 = p->normal[0] * emins[0] + p->normal[1] * emins[1] + p->normal[2] * emins[2];
-        dist2 = p->normal[0] * emaxs[0] + p->normal[1] * emaxs[1] + p->normal[2] * emaxs[2];
-        break;
-    default:
-        dist1 = dist2 = 0;  // shut up compiler
-        BOPS_Error();
-        break;
-    }
-
-#if 0
-    vec3_t corners[2];
-    for (int i = 0; i < VECT_DIM; i++) {
-        if (plane->normal[i] < 0) {
-            corners[0][i] = emins[i];
-            corners[1][i] = emaxs[i];
-        }
-        else {
-            corners[1][i] = emins[i];
-            corners[0][i] = emaxs[i];
-        }
-    }
-    dist = DotProduct(plane->normal, corners[0]) - plane->dist;
-    dist2 = DotProduct(plane->normal, corners[1]) - plane->dist;
-    sides = 0;
-    if (dist1 >= 0)     sides = 1;
-    if (dist2 < 0)      sides |= 2;
-
-#endif
-
-    int sides = 0;
-    if (dist1 >= p->dist)   sides |= 1;
-    if (dist2 < p->dist)    sides |= 2;
-
-#ifdef PARANOID
-    if (sides == 0) Sys_Error("BoxOnPlaneSide: sides==0");
-#endif
-
-    return sides;
-}
-
-#endif
 
 
 void AngleVectors(vec3_t angles, vec3_t forward, vec3_t right, vec3_t up) {
@@ -548,20 +442,20 @@ int GreatestCommonDivisor(int i1, int i2) {
 
 // TODO: move to nonintel.c
 
-/*
-===================
-Invert24To16
+// /*
+// ===================
+// Invert24To16
 
-Inverts an 8.24 value to a 16.16 value
-====================
-*/
+// Inverts an 8.24 value to a 16.16 value
+// ====================
+// */
 
-fixed16_t Invert24To16(fixed16_t val) {
-    if (val < 256)
-        return (0xFFFFFFFF);
+// fixed16_t Invert24To16(fixed16_t val) {
+//     if (val < 256)
+//         return (0xFFFFFFFF);
 
-    return (fixed16_t)
-        (((double)0x10000 * (double)0x1000000 / (double)val) + 0.5);
-}
+//     return (fixed16_t)
+//         (((double)0x10000 * (double)0x1000000 / (double)val) + 0.5);
+// }
 
 #endif

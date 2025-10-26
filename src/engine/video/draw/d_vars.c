@@ -21,7 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #if	!id386
 
-#include	"quakedef.h"
+#include "mathlib.h"
+#include "vid.h"
+
 
 // all global and static refresh variables are collected in a contiguous block
 // to avoid cache conflicts.

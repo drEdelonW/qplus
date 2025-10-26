@@ -19,13 +19,13 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
                 $(eval CUTILS_DIR = $(CORE_DIR)/utils) $(eval INCLUDES += $(CUTILS_DIR))
                         SRC_LIST += $(CUTILS_DIR)/crc.c
+                        SRC_LIST += $(CUTILS_DIR)/endian_tools.c
 
                 $(eval COMM_DIR = $(CORE_DIR)/common) $(eval INCLUDES += $(COMM_DIR))
                         SRC_LIST += $(COMM_DIR)/common.c
                         SRC_LIST += $(COMM_DIR)/msg.c
                         SRC_LIST += $(COMM_DIR)/sizebuf.c
                         SRC_LIST += $(COMM_DIR)/q_tools.c
-                        SRC_LIST += $(COMM_DIR)/endian_tools.c
                         SRC_LIST += $(COMM_DIR)/link.c
 
                 $(eval INPUT_DIR = $(CORE_DIR)/input) $(eval INCLUDES += $(INPUT_DIR))

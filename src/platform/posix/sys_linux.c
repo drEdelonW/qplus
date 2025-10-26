@@ -17,9 +17,12 @@
 #include <sys/mman.h>
 #include <errno.h>
 
-#include "quakedef.h"
 #include "sys.h"
+#include "versions.h"
+#include "common.h"
+#include "client.h"
 #include "cvar_q1.h"
+#include "host.h"
 
 
 qboolean isDedicated;

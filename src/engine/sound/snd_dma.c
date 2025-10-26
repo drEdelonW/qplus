@@ -19,8 +19,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // snd_dma.c -- main control for any streaming sound output device
 
-#include "quakedef.h"
+#include "sound.h"
+#include "client.h"
+#include "sys.h"
+#include "cmd.h"
+#include "common.h"
 #include "cvar_q1.h"
+#include <string.h>
+#include <stdlib.h> //for rand()
+#include "host.h"
 
 #ifdef _WIN32
 #include "winquake.h"

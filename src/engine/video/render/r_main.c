@@ -19,24 +19,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_main.c
 
-#include "quakedef.h"
 #include "r_local.h"
+#include "sound.h"
+#include "cmd.h"
 
 //define PASSAGES
 
 TypeLess_ptr colormap;
-vec3_t  viewlightvec;
-aLight_t r_viewlighting = { 128, 192, viewlightvec };
-float  r_time1;
-int   r_numallocatededges;
-qboolean r_drawpolys;
-qboolean r_drawculledpolys;
-qboolean r_worldpolysbacktofront;
-qboolean r_recursiveaffinetriangles = true;
-int   r_pixbytes = 1;
-float  r_aliasuvscale = 1.0;
-int   r_outofsurfaces;
-int   r_outofedges;
+vec3_t      viewlightvec;
+aLight_t    r_viewlighting = { 128, 192, viewlightvec };
+float       r_time1;
+int         r_numallocatededges;
+qboolean    r_drawpolys;
+qboolean    r_drawculledpolys;
+qboolean    r_worldpolysbacktofront;
+qboolean    r_recursiveaffinetriangles = true;
+int         r_pixbytes = 1;
+float       r_aliasuvscale = 1.0;
+int         r_outofsurfaces;
+int         r_outofedges;
 
 qboolean r_dowarp, r_dowarpold, r_viewchanged;
 

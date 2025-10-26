@@ -57,7 +57,6 @@ uint32_t inet_addr(const cString cp);
 typedef struct in_addr in_addr_t;
 typedef in_addr_t* in_addr_p;
 
-#include "quakedef.h"
 #include "net_dgrm.h"
 
 // these two macros are to make the code more readable

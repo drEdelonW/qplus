@@ -27,8 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <dlfcn.h>
 
-#include "quakedef.h"
-
 #include <GL/glx.h>
 
 #include <X11/keysym.h>

@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_sprite.c
 
-#include "quakedef.h"
+#include "q_tools.h"
 #include "r_local.h"
 
 static int      _clipCurrent = 0;
@@ -53,7 +53,7 @@ Throws out the back side
 */
 #if 1
 int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
-    printf("R_ClipSpriteFace\n");
+    // printf("R_ClipSpriteFace\n");
     float clipdist = pclipplane->dist;
     float_p pclipnormal = pclipplane->normal;
 

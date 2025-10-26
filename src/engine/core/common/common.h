@@ -28,11 +28,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "msg.h"
 #include "q_tools.h"
 #include "sizebuf.h"
-#include "link.h"
 #include "zone.h"
 
 //============================================================================
 
+extern bool		msg_suppress_1;		// suppresses resolution and cache size console output
+										//  an fullscreen DIB focus gain/loss
+extern int32_t			current_skill;		// skill level for currently loaded level (in case
+                                        //  the user changes the cvar while the level is
+                                        //  running, this reflects the level actually in use)
+// !!! if this is changed, it must be changed in quakedef.h too !!!
+#define CACHE_SIZE	32		// used to align key data structures
 
 
 //============================================================================

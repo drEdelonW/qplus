@@ -38,8 +38,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <X11/keysym.h>
 #include <X11/extensions/XShm.h>
 
-#include "quakedef.h"
+#include "sys.h"
+#include "console.h"
+#include "common.h"
+#include "endian_tools.h"
 #include "d_local.h"
+#include "client.h"
+#include "host.h"
 
 float   old_windowed_mouse;
 

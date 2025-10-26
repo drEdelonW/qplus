@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // net_udp.c
 
-#include "quakedef.h"
+#include "net.h"
 
 #include <sys/types.h>
 #if defined(__STM32__)
@@ -29,8 +29,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   include <netdb.h>
 #   include <sys/ioctl.h>
 #endif
+#include <string.h>
 #include <sys/param.h>
 #include <errno.h>
+#include "sys.h"
+#include "console.h"
+#include "common.h"
 #include "cvar_q1.h"
 
 #ifdef __sun__

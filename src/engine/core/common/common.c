@@ -19,23 +19,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // common.c -- misc functions used in client and server
 
-#if 0
-#   include "quakedef.h"
-#else
-#   include "common.h"
-#   include "cvar_q1.h"
-#   include "platformdefs.h"
-#   include <string.h>
-#   include <stdarg.h>
-#   include "sys.h"
-#   include "crc.h"
-#   include "console.h"
-#   include "cmd.h"
-#   include "draw.h"
-#   include "endian_tools.h"
-#   include "host.h"
-#   include "gamedefs.h"
-#endif
+#include "common.h"
+#include "cvar_q1.h"
+#include "platformdefs.h"
+#include <string.h>
+#include <stdarg.h>
+#include "sys.h"
+#include "crc.h"
+#include "console.h"
+#include "cmd.h"
+#include "draw.h"
+#include "endian_tools.h"
+#include "host.h"
+#include "gamedefs.h"
 
 
 #define NUM_SAFE_ARGVS  7

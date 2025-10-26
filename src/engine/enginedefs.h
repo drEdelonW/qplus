@@ -1,7 +1,6 @@
 #pragma once
 
-#include "mathlib.h"
-#include "types.h"
+
 
 //
 // per-level limits
@@ -138,7 +137,8 @@ typedef enum {
     HIT_EMPATHY_SHIELDS = (1 << HIT_EMPATHY_SHIELDS_BIT)
 } hipnotic_item_bits_t;
 
-
+#include "mathlib.h"
+// #include "types.h"
 typedef struct {
     vec3_t  origin;
     vec3_t  angles;

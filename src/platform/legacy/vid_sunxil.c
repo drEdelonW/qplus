@@ -40,7 +40,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <X11/keysym.h>
 #include <xil/xil.h>
 
-#include "quakedef.h"
 #include "d_local.h"
 
 #define MIN_WIDTH 320

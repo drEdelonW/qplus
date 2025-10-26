@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "types.h"
 #include "mathlib.h"
 #include "link.h"
@@ -31,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef union eval_s {
     string_t    string;
     float       _float;
-    vec3_t       vector;
+    vec3_t      vector;
     func_t      function;
     int32_t     _int;    // VM-slot as 32-bit
     int32_t     edict;   // 32-bit byte offset from sv.edicts

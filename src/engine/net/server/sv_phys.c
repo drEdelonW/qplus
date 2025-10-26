@@ -19,8 +19,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sv_phys.c
 
-#include "quakedef.h"
+#include "server.h"
 #include "cvar_q1.h"
+#include "sys.h"
+#include "q_tools.h"
+#include <string.h>
+#include "world.h"
+#include "console.h"
+#include "host.h"
 
 /*
 

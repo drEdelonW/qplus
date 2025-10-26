@@ -21,14 +21,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 #include <string.h>
-#include "quakedef.h"
 #include "chase.h"
 #include "mathlib.h"
 #include <math.h>
 #include "common.h"        // qbulean
 #include "cvar.h"
-#include "angles_indices.h"
 #include "cvar_q1.h"
+#include "client.h"
+#include "world.h"
 
 
 // vec3_t chase_pos;

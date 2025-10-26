@@ -32,7 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vgakeyboard.h"
 #include "vgamouse.h"
 
-#include "quakedef.h"
 #include "GL/fxmesa.h"
 
 #define WARP_WIDTH              320

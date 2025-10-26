@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // Include file for asm driver interface.
 //
-
+#if defined __i386__ && !defined NO_ASM
 //
 // !!! note that this file must match the corresponding C structures in
 // d_iface.h at all times !!!
@@ -97,3 +97,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define atd_seamfixupX16	32
 #define atd_size			36
 
+#endif

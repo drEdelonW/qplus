@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sys_null.h -- null system driver to aid porting efforts
 
-// #include "quakedef.h"
 #include "sys.h"
 #include "errno.h"
 #include <stdio.h>
