@@ -45,7 +45,7 @@ else ifeq ($(UNAME_S),Linux)
     endif
     ifeq ($(UNAME_M),aarch64)
       CC = arm-linux-gnueabihf-gcc
-      CXX = arm-linux-gnueabihf-gcc
+      CXX = arm-linux-gnueabihf-g++
       LD = $(CXX)
     endif
   else

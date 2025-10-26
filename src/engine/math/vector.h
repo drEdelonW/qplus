@@ -15,6 +15,10 @@ typedef vec3_t* vec3_p;
 typedef vec_t vec5_t[5];
 typedef vec5_t* vec5_p;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 vec_t   DotProduct(vec3_t v1, vec3_t v2);
 void    VectorSubtract(vec3_t veca, vec3_t vecb, vec3_t out);
 void    VectorAdd(vec3_t veca, vec3_t vecb, vec3_t out);
@@ -32,3 +36,8 @@ void    ProjectPointOnPlane(vec3_t dst, const vec3_t p, const vec3_t normal);
 float   VectorNormalize(vec3_t v);  // returns vector length
 void    VectorInverse(vec3_t v);
 void    VectorScale(vec3_t in, vec_t scale, vec3_t out);
+
+
+#ifdef __cplusplus
+}
+#endif

@@ -1,6 +1,11 @@
 
+// #include "vector.h"
+extern "C" {
 #include "vector.h"
+}
+
 #include <math.h>
+#include "Vector3d.hpp"
 
 
 /*
@@ -63,53 +68,99 @@ bool VectorCompare(vec3_t v1, vec3_t v2) {
 }
 
 void VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_t vecc) {
+#if 1
+    Vector3D aV(veca);
+    Vector3D bV(vecb);
+    (aV + (bV * scale)).toVec3(vecc);
+#else
     vecc[0] = veca[0] + scale * vecb[0];
     vecc[1] = veca[1] + scale * vecb[1];
     vecc[2] = veca[2] + scale * vecb[2];
+#endif
 }
 
 vec_t DotProduct(vec3_t v1, vec3_t v2) {
+#if 1
+    Vector3D aV(v1);
+    Vector3D bV(v2);
+    return aV.dot(v2);
+#else
     return
         v1[0] * v2[0] +
         v1[1] * v2[1] +
         v1[2] * v2[2];
+#endif
 }
 
 void VectorSubtract(vec3_t veca, vec3_t vecb, vec3_t out) {
+#if 1
+    Vector3D aV(veca);
+    Vector3D bV(vecb);
+    (aV - bV).toVec3(out);
+#else
     out[0] = veca[0] - vecb[0];
     out[1] = veca[1] - vecb[1];
     out[2] = veca[2] - vecb[2];
+#endif
 }
 
 void VectorAdd(vec3_t veca, vec3_t vecb, vec3_t out) {
+#if 1
+    Vector3D aV(veca);
+    Vector3D bV(vecb);
+    (aV + bV).toVec3(out);
+#else
     out[0] = veca[0] + vecb[0];
     out[1] = veca[1] + vecb[1];
     out[2] = veca[2] + vecb[2];
+#endif
 }
 
 void VectorCopy(vec3_t in, vec3_t out) {
+#if 1
+    Vector3D V(in);
+    V.toVec3(out);
+#else
     out[0] = in[0];
     out[1] = in[1];
     out[2] = in[2];
+#endif
 }
 
 void CrossProduct(vec3_t v1, vec3_t v2, vec3_t cross) {
+#if 1
+    Vector3D aV(v1);
+    Vector3D bV(v2);
+    aV.cross(v2).toVec3(cross);
+#else
     cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
     cross[1] = v1[2] * v2[0] - v1[0] * v2[2];
     cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
+#endif
 }
 
 
 vec_t Length(vec3_t v) {
+#if 1
+    Vector3D V(v);
+    return V.length();
+#else
     float length = 0;
     for (int i = 0; i < VECT_DIM; i++)
         length += v[i] * v[i];
     length = sqrt(length);  // FIXME
 
     return length;
+#endif
 }
 
 float VectorNormalize(vec3_t v) {
+#if 1
+    Vector3D V(v);
+    float len = V.length();
+    V.normalize().toVec3(v);
+    return len;
+#else
     float length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
     length = sqrt(length);  // FIXME
 
@@ -121,17 +172,27 @@ float VectorNormalize(vec3_t v) {
     }
 
     return length;
-
+#endif
 }
 
 void VectorInverse(vec3_t v) {
+#if 1
+    Vector3D V(v);
+    (-V).toVec3(v);
+#else
     v[0] = -v[0];
     v[1] = -v[1];
     v[2] = -v[2];
+#endif
 }
 
 void VectorScale(vec3_t in, vec_t scale, vec3_t out) {
+#if 1
+    Vector3D V(in);
+    (V * scale).toVec3(out);
+#else
     out[0] = in[0] * scale;
     out[1] = in[1] * scale;
     out[2] = in[2] * scale;
+#endif
 }

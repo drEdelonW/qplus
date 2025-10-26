@@ -1,4 +1,6 @@
 #pragma once
+#include "vector.h"
+
 #define VEC3_ENABLE_MUL_AS_CROSS 0
 
 typedef float vect_t;
@@ -9,6 +11,14 @@ public:
 
     Vector3D(vect_t _x = 0.0f, vect_t _y = 0.0f, vect_t _z = 0.0f)  noexcept : x(_x), y(_y), z(_z) {};
 
+    Vector3D(vec3_t v)  noexcept : x(v[0]), y(v[1]), z(v[2]) {};
+    Vector3D& operator=(const vec3_t v) noexcept { x = v[0]; y = v[1]; z = v[2]; return *this; }
+    void toVec3(vec3_t out) const noexcept { out[0] = x; out[1] = y; out[2] = z; }
+
+    // vec3_t toVec3() const noexcept {
+    //     vec3_t v = { x, y, z };
+    //     return v;
+    // }
 #if 0
 #   define LOG_PRINT
     void print() const noexcept;
