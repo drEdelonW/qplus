@@ -99,7 +99,7 @@ struct Surf_s {
     TypeLess_ptr    data;   // associated data like mSurface_t
     r_Entity_p  entity;
     float   nearzi;     // nearest 1/z on surface, for mipmapping
-    qboolean    insubmodel;
+    bool    insubmodel;
     float   d_ziorigin, d_zistepu, d_zistepv;
 
     int   pad[2];    // to 64 bytes

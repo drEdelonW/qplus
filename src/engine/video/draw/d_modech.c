@@ -36,7 +36,7 @@ D_Patch
 void D_Patch() {
 #if id386
 
-    static qboolean protectset8 = false;
+    static bool protectset8 = false;
 
     if (!protectset8) {
         Sys_MakeCodeWriteable((int)D_PolysetAff8Start,

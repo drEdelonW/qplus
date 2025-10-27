@@ -45,7 +45,7 @@ int WIPX_Init(void) {
     int		i;
     char	buff[MAXHOSTNAMELEN];
     struct qsockaddr addr;
-    char* p;
+    cString p;
     int		r;
     // WORD	wVersionRequested;
 
@@ -126,7 +126,7 @@ void WIPX_Shutdown(void) {
 
 //=============================================================================
 
-void WIPX_Listen(qboolean state) {
+void WIPX_Listen(bool state) {
     // enable listening
     if (state) {
         if (net_acceptsocket != -1)
@@ -271,7 +271,7 @@ int WIPX_Write(int handle, byte* buf, int len, struct qsockaddr* addr) {
 
 //=============================================================================
 
-char* WIPX_AddrToString(struct qsockaddr* addr) {
+cString WIPX_AddrToString(struct qsockaddr* addr) {
     static char buf[28];
 
     sprintf(buf, "%02x%02x%02x%02x:%02x%02x%02x%02x%02x%02x:%u",
@@ -292,7 +292,7 @@ char* WIPX_AddrToString(struct qsockaddr* addr) {
 
 //=============================================================================
 
-int WIPX_StringToAddr(char* string, struct qsockaddr* addr) {
+int WIPX_StringToAddr(cString string, struct qsockaddr* addr) {
     int  val;
     char buf[3];
 
@@ -343,14 +343,14 @@ int WIPX_GetSocketAddr(int handle, struct qsockaddr* addr) {
 
 //=============================================================================
 
-int WIPX_GetNameFromAddr(struct qsockaddr* addr, char* name) {
+int WIPX_GetNameFromAddr(struct qsockaddr* addr, cString name) {
     Q_strcpy(name, WIPX_AddrToString(addr));
     return 0;
 }
 
 //=============================================================================
 
-int WIPX_GetAddrFromName(char* name, struct qsockaddr* addr) {
+int WIPX_GetAddrFromName(cString name, struct qsockaddr* addr) {
     int n;
     char buf[32];
 

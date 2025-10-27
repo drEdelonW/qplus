@@ -31,9 +31,9 @@ typedef struct {
 } Plane_t;
 
 typedef struct {
-	qboolean	allsolid;	// if true, plane is not valid
-	qboolean	startsolid;	// if true, the initial point was in a solid area
-	qboolean	inopen, inwater;
+	bool	allsolid;	// if true, plane is not valid
+	bool	startsolid;	// if true, the initial point was in a solid area
+	bool	inopen, inwater;
 	float	fraction;		// time completed, 1.0 = didn't hit anything
 	vec3_t	endpos;			// final position
 	Plane_t	plane;			// surface normal at impact
@@ -56,7 +56,7 @@ void SV_UnlinkEdict(edict_p ent);
 // so it doesn't clip against itself
 // flags ent->v.modified
 
-void SV_LinkEdict(edict_p ent, qboolean touch_triggers);
+void SV_LinkEdict(edict_p ent, bool touch_triggers);
 // Needs to be called any time an entity changes origin, mins, maxs, or solid
 // flags ent->v.modified
 // sets ent->v.absmin and ent->v.absmax

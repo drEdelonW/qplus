@@ -29,7 +29,7 @@ struct cache_system_s {
 };
 
 
-cache_system_p Cache_TryAlloc(size_t size, qboolean nobottom);
+cache_system_p Cache_TryAlloc(size_t size, bool nobottom);
 
 cache_system_t	cache_head;
 
@@ -125,7 +125,7 @@ void Cache_MakeLRU(cache_system_p cs) {
     Size should already include the header and padding
     ============
 */
-cache_system_p Cache_TryAlloc(size_t size, qboolean nobottom) {
+cache_system_p Cache_TryAlloc(size_t size, bool nobottom) {
     // is the cache completely empty?
     if (!nobottom && (cache_head.prev == &cache_head)) {
         if ((hunk_size - hunk_high_used - hunk_low_used) < size)

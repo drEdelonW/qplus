@@ -59,7 +59,7 @@ typedef sSpan_t* sSpan_p;
 
 extern float scale_for_mip;
 
-extern qboolean  d_roverwrapped;
+extern bool  d_roverwrapped;
 extern SurfCache_p sc_rover;
 extern SurfCache_p d_initial_rover;
 

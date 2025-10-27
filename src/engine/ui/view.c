@@ -220,7 +220,7 @@ void BuildGammaTable(float g) {
 V_CheckGamma
 =================
 */
-qboolean V_CheckGamma() {
+bool V_CheckGamma() {
     static float oldgammavalue;
 
     if (v_gamma.value == oldgammavalue)     return false;
@@ -420,7 +420,7 @@ void V_UpdatePalette() {
 
     V_CalcPowerupCshift();
 
-    qboolean new = false;
+    bool new = false;
 
     for (int i = 0; i < NUM_CSHIFTS; i++) {
         if (cl.cshifts[i].percent != cl.prev_cshifts[i].percent) {
@@ -444,7 +444,7 @@ void V_UpdatePalette() {
     if (cl.cshifts[CSHIFT_BONUS].percent <= 0)
         cl.cshifts[CSHIFT_BONUS].percent = 0;
 
-    qboolean force = V_CheckGamma();
+    bool force = V_CheckGamma();
     if (!new && !force)
         return;
 
@@ -495,7 +495,7 @@ void V_UpdatePalette() {
 
     V_CalcPowerupCshift();
 
-    qboolean new = false;
+    bool new = false;
 
     for (int i = 0; i < NUM_CSHIFTS; i++) {
         if (cl.cshifts[i].percent != cl.prev_cshifts[i].percent) {
@@ -519,7 +519,7 @@ void V_UpdatePalette() {
     if (cl.cshifts[CSHIFT_BONUS].percent <= 0)
         cl.cshifts[CSHIFT_BONUS].percent = 0;
 
-    qboolean force = V_CheckGamma();
+    bool force = V_CheckGamma();
     if (!new && !force)
         return;
 

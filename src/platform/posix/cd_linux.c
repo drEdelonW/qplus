@@ -42,12 +42,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 
-static qboolean _cdValid = false;
-static qboolean	_playing = false;
-static qboolean	_wasPlaying = false;
-static qboolean	_initialized = false;
-static qboolean	_enabled = true;
-static qboolean _playLooping = false;
+static bool _cdValid = false;
+static bool	_playing = false;
+static bool	_wasPlaying = false;
+static bool	_initialized = false;
+static bool	_enabled = true;
+static bool _playLooping = false;
 static float    _cdvolume;
 static uint8_t  _remap[100];
 static uint8_t  _playTrack;
@@ -95,7 +95,7 @@ static int CDAudio_GetAudioDiskInfo() {
 }
 
 
-void CDAudio_Play(uint8_t track, qboolean looping) {
+void CDAudio_Play(uint8_t track, bool looping) {
     struct cdrom_tocentry entry;
     struct cdrom_ti ti;
 

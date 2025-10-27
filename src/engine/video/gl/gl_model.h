@@ -151,7 +151,7 @@ typedef struct mSurface_s {
     int   lightmaptexturenum;
     byte  styles[MAXLIGHTMAPS];
     int   cached_light[MAXLIGHTMAPS]; // values currently used in lightmap
-    qboolean cached_dlight;    // true if dynamic light in cache
+    bool cached_dlight;    // true if dynamic light in cache
     byte* samples;  // [numstyles*surfsize]
 } mSurface_t;
 typedef mSurface_t* mSurface_p;
@@ -337,7 +337,7 @@ typedef enum { mod_brush, mod_sprite, mod_alias } ModType_t;
 
 typedef struct Model_s {
     char  name[MAX_QPATH];
-    qboolean needload;  // bmodels and sprites don't cache normally
+    bool needload;  // bmodels and sprites don't cache normally
 
     ModType_t type;
     int   numframes;
@@ -354,7 +354,7 @@ typedef struct Model_s {
     //
     // solid volume for clipping 
     //
-    qboolean clipbox;
+    bool clipbox;
     vec3_t  clipmins, clipmaxs;
 
     //
@@ -402,7 +402,7 @@ typedef struct Model_s {
 
     byte* visdata;
     byte* lightdata;
-    char* entities;
+    cString entities;
 
     //
     // additional model data
@@ -415,9 +415,9 @@ typedef struct Model_s {
 
 void Mod_Init(void);
 void Mod_ClearAll(void);
-Model_p Mod_ForName(char* name, qboolean crash);
+Model_p Mod_ForName(cString name, bool crash);
 TypeLess_ptr Mod_Extradata(Model_p mod); // handles caching
-void Mod_TouchModel(char* name);
+void Mod_TouchModel(cString name);
 
 mLeaf_p Mod_PointInLeaf(float_p p, Model_p model);
 byte* Mod_LeafPVS(mLeaf_p leaf, Model_p model);

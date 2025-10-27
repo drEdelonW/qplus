@@ -35,7 +35,7 @@ void S_Shutdown();
 void S_StartSound(int entnum, int entchannel, sfx_p sfx, vec3_t origin, float fvol,  float attenuation);
 void S_StaticSound(sfx_p sfx, vec3_t origin, float vol, float attenuation);
 void S_StopSound(int entnum, int entchannel);
-void S_StopAllSounds(qboolean clear);
+void S_StopAllSounds(bool clear);
 void S_ClearBuffer();
 void S_Update(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up);
 void S_ExtraUpdate();
@@ -55,7 +55,7 @@ channel_p SND_PickChannel(int entnum, int entchannel);
 void SND_Spatialize(channel_p ch);
 
 // initializes cycling through a DMA buffer and returns information on it
-qboolean SNDDMA_Init();
+bool SNDDMA_Init();
 
 // gets the current DMA position
 int SNDDMA_GetDMAPos();
@@ -84,7 +84,7 @@ extern	int total_channels;
 // number of times S_Update() is called per second.
 //
 
-extern qboolean fakedma;
+extern bool fakedma;
 extern int      fakedma_updates;
 extern int      paintedtime;
 extern vec3_t   listener_origin;
@@ -95,7 +95,7 @@ extern volatile dma_t* shm;
 extern volatile dma_t sn;
 extern vec_t    sound_nominal_clip_dist;
 
-extern qboolean snd_initialized;
+extern bool snd_initialized;
 
 extern int      snd_blocked;
 

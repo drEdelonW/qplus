@@ -49,7 +49,7 @@ extern bool com_eof;
 cString COM_Parse(cString data);
 
 extern int com_argc;
-extern char** com_argv;
+extern cStringArray com_argv;
 
 int COM_CheckParm(cString parm);
 void COM_Init(cString path);

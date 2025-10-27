@@ -49,7 +49,7 @@ typedef struct {
     int			pages[3];			// either 2 or 3 is valid
     int			vesamode;			// LINEAR_MODE set if linear mode
     TypeLess_ptr plinearmem;		// linear address of start of frame buffer
-    qboolean	vga_incompatible;
+    bool	vga_incompatible;
 } vesa_extra_t;
 
 static vmode_t		vesa_modes[MAX_VESA_MODES] =
@@ -111,9 +111,9 @@ typedef struct vbeinfoblock_s {
 
 static int	totalvidmem;
 static uint8_p ppal;
-qboolean	vsync_exists, de_exists;
+bool	vsync_exists, de_exists;
 
-qboolean VID_ExtraGetModeInfo(int modenum);
+bool VID_ExtraGetModeInfo(int modenum);
 int VID_ExtraInitMode(viddef_p vid, vmode_p pcurrentmode);
 void VID_ExtraSwapBuffers(viddef_p vid, vmode_p pcurrentmode, vRect_p rects);
 
@@ -239,7 +239,7 @@ void VID_ExtraWaitDisplayEnable() {
 VID_ExtraVidLookForState
 ================
 */
-qboolean VID_ExtraVidLookForState(uint32_t state, uint32_t mask) {
+bool VID_ExtraVidLookForState(uint32_t state, uint32_t mask) {
     int		i;
     double	starttime, time;
 
@@ -263,7 +263,7 @@ qboolean VID_ExtraVidLookForState(uint32_t state, uint32_t mask) {
 VID_ExtraStateFound
 ================
 */
-qboolean VID_ExtraStateFound(uint32_t state) {
+bool VID_ExtraStateFound(uint32_t state) {
     int		i, workingstate;
 
     workingstate = 0;
@@ -420,7 +420,7 @@ void VID_InitExtra() {
 VID_ExtraGetModeInfo
 ================
 */
-qboolean VID_ExtraGetModeInfo(int modenum) {
+bool VID_ExtraGetModeInfo(int modenum) {
     cString infobuf;
     int		numimagepages;
 

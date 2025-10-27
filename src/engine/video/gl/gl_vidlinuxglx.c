@@ -55,8 +55,8 @@ unsigned char	d_15to8table[65536];
 
 cvar_t	vid_mode = { "vid_mode","0",false };
 
-static qboolean        mouse_avail;
-static qboolean        mouse_active;
+static bool        mouse_avail;
+static bool        mouse_active;
 static int   mx, my;
 static int	old_mouse_x, old_mouse_y;
 
@@ -64,8 +64,8 @@ static cvar_t in_mouse = { "in_mouse", "1", false };
 static cvar_t in_dgamouse = { "in_dgamouse", "1", false };
 static cvar_t m_filter = { "m_filter", "0" };
 
-qboolean dgamouse = false;
-qboolean vidmode_ext = false;
+bool dgamouse = false;
+bool vidmode_ext = false;
 
 static int win_x, win_y;
 
@@ -74,7 +74,7 @@ static int scr_width, scr_height;
 static XF86VidModeModeInfo** vidmodes;
 static int default_dotclock_vidmode;
 static int num_vidmodes;
-static qboolean vidmode_active = false;
+static bool vidmode_active = false;
 
 /*-----------------------------------------------------------------------*/
 
@@ -91,19 +91,19 @@ float		gldepthmin, gldepthmax;
 
 cvar_t	gl_ztrick = { "gl_ztrick","1" };
 
-const char* gl_vendor;
-const char* gl_renderer;
-const char* gl_version;
-const char* gl_extensions;
+cStringRO gl_vendor;
+cStringRO gl_renderer;
+cStringRO gl_version;
+cStringRO gl_extensions;
 
 void (*qglColorTableEXT) (int, int, int, int, int, const TypeLess_ptr);
 void (*qgl3DfxSetPaletteEXT) (GLuint*);
 
 static float vid_gamma = 1.0;
 
-qboolean is8bit = false;
-qboolean isPermedia = false;
-qboolean gl_mtexable = false;
+bool is8bit = false;
+bool isPermedia = false;
+bool gl_mtexable = false;
 
 /*-----------------------------------------------------------------------*/
 void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
@@ -326,7 +326,7 @@ static void HandleEvents(void) {
 	XEvent event;
 	KeySym ks;
 	int b;
-	qboolean dowarp = false;
+	bool dowarp = false;
 	int mwx = vid.width/2;
 	int mwy = vid.height/2;
 
@@ -613,7 +613,7 @@ void GL_EndRendering(void) {
 	glXSwapBuffers(dpy, win);
 }
 
-qboolean VID_Is8bit(void) {
+bool VID_Is8bit(void) {
 	return is8bit;
 }
 
@@ -713,7 +713,7 @@ void VID_Init(unsigned char* palette) {
 	unsigned long mask;
 	Window root;
 	XVisualInfo* visinfo;
-	qboolean fullscreen = true;
+	bool fullscreen = true;
 	int MajorVersion, MinorVersion;
 	int actualWidth, actualHeight;
 

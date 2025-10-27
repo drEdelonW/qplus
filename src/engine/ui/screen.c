@@ -43,7 +43,7 @@ float  scr_conlines;  // lines of console to display
 
 float  oldscreensize, oldfov;
 
-qboolean scr_initialized;  // ready to draw
+bool scr_initialized;  // ready to draw
 
 qPic_p scr_ram;
 qPic_p scr_net;
@@ -59,12 +59,12 @@ viddef_t vid;    // global video state
 vRect_p pconupdate;
 vRect_t  scr_vrect;
 
-qboolean scr_disabled_for_loading;
-qboolean scr_drawloading;
+bool scr_disabled_for_loading;
+bool scr_drawloading;
 float  scr_disabled_time;
-qboolean scr_skipupdate;
+bool scr_skipupdate;
 
-qboolean block_drawing;
+bool block_drawing;
 
 void SCR_ScreenShot_f();
 

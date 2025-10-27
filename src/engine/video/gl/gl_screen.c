@@ -91,7 +91,7 @@ cvar_t		gl_triplebuffer = { "gl_triplebuffer", "1", true };
 
 extern	cvar_t	crosshair;
 
-qboolean	scr_initialized;		// ready to draw
+bool	scr_initialized;		// ready to draw
 
 qPic_t* scr_ram;
 qPic_t* scr_net;
@@ -108,11 +108,11 @@ viddef_t	vid;				// global video state
 
 vRect_t		scr_vrect;
 
-qboolean	scr_disabled_for_loading;
-qboolean	scr_drawloading;
+bool	scr_disabled_for_loading;
+bool	scr_drawloading;
 float		scr_disabled_time;
 
-qboolean	block_drawing;
+bool	block_drawing;
 
 void SCR_ScreenShot_f(void);
 
@@ -139,7 +139,7 @@ Called for important messages that should stay in the center of the screen
 for a few moments
 ==============
 */
-void SCR_CenterPrint(char* str) {
+void SCR_CenterPrint(cString str) {
 	strncpy(scr_centerstring, str, sizeof(scr_centerstring)-1);
 	scr_centertime_off = scr_centertime.value;
 	scr_centertime_start = cl.time;
@@ -155,7 +155,7 @@ void SCR_CenterPrint(char* str) {
 
 
 void SCR_DrawCenterString(void) {
-	char* start;
+	cString start;
 	int		l;
 	int		j;
 	int		x, y;
@@ -248,7 +248,7 @@ static void SCR_CalcRefdef(void) {
 	vRect_t		vrect;
 	float		size;
 	int		h;
-	qboolean		full = false;
+	bool		full = false;
 
 
 	scr_fullupdate = 0;		// force a background redraw
@@ -656,11 +656,11 @@ void SCR_EndLoadingPlaque(void) {
 
 //=============================================================================
 
-char* scr_notifystring;
-qboolean	scr_drawdialog;
+cString scr_notifystring;
+bool	scr_drawdialog;
 
 void SCR_DrawNotifyString(void) {
-	char* start;
+	cString start;
 	int		l;
 	int		j;
 	int		x, y;
@@ -697,7 +697,7 @@ Displays a text string in the center of the screen and waits for a Y or N
 keypress.
 ==================
 */
-int SCR_ModalMessage(char* text) {
+int SCR_ModalMessage(cString text) {
 	if (cls.state == ca_dedicated)
 		return true;
 

@@ -32,7 +32,7 @@ static struct qsockaddr broadcastaddr;
 
 static unsigned long myAddr;
 
-qboolean	winsock_lib_initialized;
+bool	winsock_lib_initialized;
 
 int (PASCAL FAR* pWSAStartup)(WORD wVersionRequired, LPWSADATA lpWSAData);
 int (PASCAL FAR* pWSACleanup)(void);
@@ -123,7 +123,7 @@ void WINS_GetLocalAddress() {
 int WINS_Init(void) {
 	int		i;
 	char	buff[MAXHOSTNAMELEN];
-	char* p;
+	cString p;
 	int		r;
 	// WORD	wVersionRequested;
 	HINSTANCE hInst;
@@ -248,7 +248,7 @@ void WINS_Shutdown(void) {
 
 //=============================================================================
 
-void WINS_Listen(qboolean state) {
+void WINS_Listen(bool state) {
 	// enable listening
 	if (state) {
 		if (net_acceptsocket != -1)
@@ -309,9 +309,9 @@ this lets you type only as much of the net address as required, using
 the local network components to fill in the rest
 ============
 */
-static int PartialIPAddress(char* in, struct qsockaddr* hostaddr) {
+static int PartialIPAddress(cString in, struct qsockaddr* hostaddr) {
 	char buff[256];
-	char* b;
+	cString b;
 	int addr;
 	int num;
 	int mask;
@@ -397,7 +397,7 @@ int WINS_MakeSocketBroadcastCapable(int socket) {
 	int	i = 1;
 
 	// make this socket broadcast capable
-	if (psetsockopt(socket, SOL_SOCKET, SO_BROADCAST, (char*)&i, sizeof(i)) < 0)
+	if (psetsockopt(socket, SOL_SOCKET, SO_BROADCAST, (cString)&i, sizeof(i)) < 0)
 		return -1;
 	net_broadcastsocket = socket;
 
@@ -438,7 +438,7 @@ int WINS_Write(int socket, byte* buf, int len, struct qsockaddr* addr) {
 
 //=============================================================================
 
-char* WINS_AddrToString(struct qsockaddr* addr) {
+cString WINS_AddrToString(struct qsockaddr* addr) {
 	static char buffer[22];
 	int haddr;
 
@@ -449,7 +449,7 @@ char* WINS_AddrToString(struct qsockaddr* addr) {
 
 //=============================================================================
 
-int WINS_StringToAddr(char* string, struct qsockaddr* addr) {
+int WINS_StringToAddr(cString string, struct qsockaddr* addr) {
 	int ha1, ha2, ha3, ha4, hp;
 	int ipaddr;
 
@@ -479,12 +479,12 @@ int WINS_GetSocketAddr(int socket, struct qsockaddr* addr) {
 
 //=============================================================================
 
-int WINS_GetNameFromAddr(struct qsockaddr* addr, char* name) {
+int WINS_GetNameFromAddr(struct qsockaddr* addr, cString name) {
 	struct hostent* hostentry;
 
 	hostentry = pgethostbyaddr((char*)&((struct sockaddr_in*)addr)->sin_addr, sizeof(struct in_addr), AF_INET);
 	if (hostentry) {
-		Q_strncpy(name, (char*)hostentry->h_name, NET_NAMELEN - 1);
+		Q_strncpy(name, (cString)hostentry->h_name, NET_NAMELEN - 1);
 		return 0;
 	}
 
@@ -494,7 +494,7 @@ int WINS_GetNameFromAddr(struct qsockaddr* addr, char* name) {
 
 //=============================================================================
 
-int WINS_GetAddrFromName(char* name, struct qsockaddr* addr) {
+int WINS_GetAddrFromName(cString name, struct qsockaddr* addr) {
 	struct hostent* hostentry;
 
 	if (name[0] >= '0' && name[0] <= '9')

@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 
 float surfscale;
-qboolean r_cache_thrash;         // set if surface cache is thrashing
+bool r_cache_thrash;         // set if surface cache is thrashing
 
 int sc_size;
 SurfCache_p sc_rover, sc_base;
@@ -113,7 +113,7 @@ SurfCache_p D_SCAlloc(int width, int size) {
     if (size > sc_size)     Sys_Error("D_SCAlloc: %i > cache size", size);
 
     // if there is not size bytes after the rover, reset to the start
-    qboolean wrapped_this_time = false;
+    bool wrapped_this_time = false;
 
     if (!sc_rover ||
         (((uint8_p)sc_rover - (uint8_p)sc_base) > sc_size - size)) {

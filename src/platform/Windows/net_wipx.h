@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int  WIPX_Init(void);
 void WIPX_Shutdown(void);
-void WIPX_Listen(qboolean state);
+void WIPX_Listen(bool state);
 int  WIPX_OpenSocket(int port);
 int  WIPX_CloseSocket(int socket);
 int  WIPX_Connect(int socket, struct qsockaddr* addr);
@@ -29,11 +29,11 @@ int  WIPX_CheckNewConnections(void);
 int  WIPX_Read(int socket, byte* buf, int len, struct qsockaddr* addr);
 int  WIPX_Write(int socket, byte* buf, int len, struct qsockaddr* addr);
 int  WIPX_Broadcast(int socket, byte* buf, int len);
-char* WIPX_AddrToString(struct qsockaddr* addr);
-int  WIPX_StringToAddr(char* string, struct qsockaddr* addr);
+cString WIPX_AddrToString(struct qsockaddr* addr);
+int  WIPX_StringToAddr(cString string, struct qsockaddr* addr);
 int  WIPX_GetSocketAddr(int socket, struct qsockaddr* addr);
-int  WIPX_GetNameFromAddr(struct qsockaddr* addr, char* name);
-int  WIPX_GetAddrFromName(char* name, struct qsockaddr* addr);
+int  WIPX_GetNameFromAddr(struct qsockaddr* addr, cString name);
+int  WIPX_GetAddrFromName(cString name, struct qsockaddr* addr);
 int  WIPX_AddrCompare(struct qsockaddr* addr1, struct qsockaddr* addr2);
 int  WIPX_GetSocketPort(struct qsockaddr* addr);
 int  WIPX_SetSocketPort(struct qsockaddr* addr, int port);

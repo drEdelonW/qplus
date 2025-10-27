@@ -25,7 +25,7 @@
 #include "host.h"
 
 
-qboolean isDedicated;
+bool isDedicated;
 
 int nostdout = 0;
 
@@ -326,7 +326,7 @@ void Sys_HighFPPrecision() {}
 void Sys_LowFPPrecision() {}
 #endif
 
-int main(int c, char** v) {
+int main(int c, cStringArray v) {
     QuakeParms_t parms;
     extern int vcrFile;
     extern int recording;

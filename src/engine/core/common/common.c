@@ -64,7 +64,7 @@ void COM_InitFilesystem();
 
 char com_token[1024];
 int  com_argc;
-char** com_argv;
+cStringArray com_argv;
 
 #define CMDLINE_LENGTH 256
 char com_cmdline[CMDLINE_LENGTH];
@@ -355,7 +355,7 @@ void COM_Path_f();
 COM_InitArgv
 ================
 */
-void COM_InitArgv(int argc, char** argv) {
+void COM_InitArgv(int argc, cStringArray argv) {
     // reconstitute the command line for the cmdline externally visible cvar
     int n = 0;
     for (int j = 0; (j < MAX_NUM_ARGVS) && (j < argc); j++) {

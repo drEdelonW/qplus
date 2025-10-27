@@ -41,7 +41,7 @@ static int _tryrates[] = {
     8000
 };
 
-qboolean SNDDMA_Init() {
+bool SNDDMA_Init() {
     _snd_inited = false;
 
     // open /dev/dsp, confirm capability to mmap, and get size of dma buffer

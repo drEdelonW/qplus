@@ -108,7 +108,8 @@
 			"signal.h": "c",
 			"qparams.h": "c",
 			"server.h": "c",
-			"cmath": "c"
+			"cmath": "c",
+			"MGLWIN.H": "cpp"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

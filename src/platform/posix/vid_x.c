@@ -49,7 +49,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 float   old_windowed_mouse;
 
-qboolean    mouse_avail;
+bool    mouse_avail;
 int     mouse_buttons = 3;
 int     mouse_oldbuttonstate;
 int     mouse_buttonstate;
@@ -72,7 +72,7 @@ int num_shades = 32;
 int d_con_indirect = 0;
 int vid_buffersize;
 
-static qboolean     doShm;
+static bool     doShm;
 static Display*     x_disp;
 static Colormap     x_cmap;
 static Window       x_win;
@@ -83,7 +83,7 @@ static XVisualInfo* x_visinfo;
 static int          x_shmeventtype;
 // static XShmSegmentInfo x_shminfo;
 
-static qboolean   oktodraw = false;
+static bool   oktodraw = false;
 
 int XShmQueryExtension(Display*);
 int XShmGetEventBase(Display*);

@@ -225,7 +225,7 @@ void PF_setmodel() {
     cString m = G_STRING(OFS_PARM1);
 
     // check to see if model was properly precached
-    char** check = sv.model_precache;
+    cStringArray check = sv.model_precache;
     int i = 0;
     for (; *check; i++, check++)
         if (!strcmp(*check, m))     break;
@@ -442,7 +442,7 @@ void PF_ambientsound() {
     float attenuation = G_FLOAT(OFS_PARM3);
 
     // check to see if samp was properly precached
-    char** check = sv.sound_precache;
+    cStringArray check = sv.sound_precache;
     int soundnum = 0;
     for (; *check; check++, soundnum++)
         if (!strcmp(*check, samp))

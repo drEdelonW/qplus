@@ -42,7 +42,7 @@ static int32_t _pr_depth;
 static int32_t _localstack[LOCALSTACK_SIZE];
 static int32_t _localstack_used;
 
-/* extern */ qboolean	 pr_trace;
+/* extern */ bool	 pr_trace;
 /* extern */ dfunction_p pr_xfunction;
 /* extern */ int32_t     pr_xstatement;
 /* extern */ int32_t     pr_argc;

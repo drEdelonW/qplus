@@ -48,7 +48,7 @@ int num_shades=32;
 
 struct
 {
-	char* name;
+	cString name;
 	int num;
 } mice[] =
 {
@@ -111,19 +111,19 @@ float		gldepthmin, gldepthmax;
 
 cvar_t	gl_ztrick = { "gl_ztrick","1" };
 
-const char* gl_vendor;
-const char* gl_renderer;
-const char* gl_version;
-const char* gl_extensions;
+cStringRO gl_vendor;
+cStringRO gl_renderer;
+cStringRO gl_version;
+cStringRO gl_extensions;
 
 void (*qgl3DfxSetPaletteEXT) (GLuint*);
 void (*qglColorTableEXT) (int, int, int, int, int, const TypeLess_ptr);
 
 static float vid_gamma = 1.0;
 
-qboolean is8bit = false;
-qboolean isPermedia = false;
-qboolean gl_mtexable = false;
+bool is8bit = false;
+bool isPermedia = false;
+bool gl_mtexable = false;
 
 /*-----------------------------------------------------------------------*/
 void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
@@ -132,7 +132,7 @@ void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
 void D_EndDirectRect(int x, int y, int width, int height) {
 }
 
-int matchmouse(int mouse, char* name) {
+int matchmouse(int mouse, cString name) {
 	int i;
 	for (i=0; i<num_mice; i++)
 		if (!strcmp(mice[i].name, name))
@@ -212,7 +212,7 @@ void	VID_SetPalette(unsigned char* palette) {
 	FILE* f;
 	char s[255];
 	int dist, bestdist;
-	static qboolean palflag = false;
+	static bool palflag = false;
 
 	//
 	// 8 8 8 encoding
@@ -498,7 +498,7 @@ int findres(int* width, int* height) {
 	return GR_RESOLUTION_640x480;
 }
 
-qboolean VID_Is8bit(void) {
+bool VID_Is8bit(void) {
 	return is8bit;
 }
 

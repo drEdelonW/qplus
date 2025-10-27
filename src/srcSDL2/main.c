@@ -54,7 +54,7 @@ static void project_point(
     *sy = (int)(h * 0.5f - py);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, cStringArray argv) {
     (void)argc; (void)argv;
 
 #if 0

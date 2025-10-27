@@ -83,7 +83,7 @@ extern void M_DrawPic(int x, int y, qPic_p pic);
 
 extern int sb_updates;
 
-qboolean        mouse_avail;
+bool        mouse_avail;
 int             mouse_buttons = 3;
 int             mouse_oldbuttonstate;
 int             mouse_buttonstate;
@@ -122,13 +122,13 @@ int		vid_buffersize;
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
 byte* VGA_pagebase;
 
-qboolean			x_fullscreen = true;
+bool			x_fullscreen = true;
 Display* x_disp = NULL;
 int				x_screen, x_screen_width, x_screen_height;
 int				x_center_width, x_center_height;
 int				x_std_event_mask = STD_EVENT_MASK;
 Window				x_win, x_root_win;
-qboolean			x_focus = true;
+bool			x_focus = true;
 int				global_dx, global_dy;
 
 
@@ -139,8 +139,8 @@ static XVisualInfo* x_visinfo;
 static Atom			aHints = NULL;
 static Atom			aWMDelete = NULL;
 
-static qboolean			oktodraw = false;
-static qboolean			X11_active = false;
+static bool			oktodraw = false;
+static bool			X11_active = false;
 
 
 static int verbose = 1;
@@ -215,7 +215,7 @@ void VID_Gamma_f() {
 
 }
 
-qboolean CheckPixelMultiply() {
+bool CheckPixelMultiply() {
 	int m;
 	int w, h;
 	XWindowAttributes wattr;
@@ -346,7 +346,7 @@ void VID_SetWindowTitle(Window win, cString pszName) {
 // VID_FullScreen - open the window in full screen mode
 //
 
-qboolean VID_FullScreen(Window win) {
+bool VID_FullScreen(Window win) {
 	MotifWmHints    hints;
 	XWindowChanges  changes;
 

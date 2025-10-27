@@ -72,7 +72,7 @@ void VID_DescribeModes_f();
 uint8_t	vid_current_palette[768];	// save for mode changes
 
 
-static qboolean	nomodecheck = false;
+static bool	nomodecheck = false;
 
 uint16_t	d_8to16table[256];	// not used in 8 bpp mode
 unsigned		d_8to24table[256];	// not used in 8 bpp mode
@@ -163,7 +163,7 @@ int VID_NumModes() {
 VID_ModeInfo
 ================
 */
-cString VID_ModeInfo(int modenum, char** ppheader) {
+cString VID_ModeInfo(int modenum, cStringArray ppheader) {
 	static cString badmodestr = "Bad mode number";
 	vmode_t* pv;
 
@@ -384,7 +384,7 @@ void VID_DescribeModes_f() {
 	int			i, nummodes;
 	cString pinfo, pheader;
 	vmode_t* pv;
-	qboolean	na;
+	bool	na;
 
 	na = false;
 

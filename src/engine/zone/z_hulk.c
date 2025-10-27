@@ -23,7 +23,7 @@ size_t  hunk_size;
 size_t  hunk_low_used;
 size_t  hunk_high_used;
 
-static qboolean _hunk_tempactive;
+static bool _hunk_tempactive;
 static size_t   _hunk_tempmark;
 
 
@@ -60,7 +60,7 @@ void Hunk_Check() {
 	Otherwise, allocations with the same name will be totaled up before printing.
 	==============
 */
-void Hunk_Print(qboolean all) {
+void Hunk_Print(bool all) {
 	char    name[9] = { 0 };
 
 	hunk_p h = (hunk_p)hunk_base;

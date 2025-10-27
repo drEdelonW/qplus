@@ -59,7 +59,7 @@ int filelength(FILE* f) {
     return end;
 }
 
-int Sys_FileOpenRead(char* path, int* hndl) {
+int Sys_FileOpenRead(cString path, int* hndl) {
     int i = findhandle();
     FILE* f = fopen(path, "rb");
     if (!f) {
@@ -72,7 +72,7 @@ int Sys_FileOpenRead(char* path, int* hndl) {
     return filelength(f);
 }
 
-int Sys_FileOpenWrite(char* path) {
+int Sys_FileOpenWrite(cString path) {
     int i = findhandle();
     FILE*  f = fopen(path, "wb");
     if (!f)
@@ -99,7 +99,7 @@ int Sys_FileWrite(int handle, void* data, int count) {
     return fwrite(data, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileTime(char* path) {
+int Sys_FileTime(cString path) {
     FILE* f = fopen(path, "rb");
     if (f) {
         fclose(f);
@@ -109,7 +109,7 @@ int Sys_FileTime(char* path) {
     return -1;
 }
 
-void Sys_mkdir(char* path) {
+void Sys_mkdir(cString path) {
 }
 
 
@@ -122,9 +122,9 @@ SYSTEM IO
 */
 
 void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) { }
-void Sys_DebugLog(char* file, char* fmt, ...) { }
+void Sys_DebugLog(cString file, cString fmt, ...) { }
 
-void Sys_Error(char* error, ...) {
+void Sys_Error(cString error, ...) {
     va_list  argptr;
     char  text[1024];
 
@@ -138,7 +138,7 @@ void Sys_Error(char* error, ...) {
     exit(1);
 }
 
-void Sys_Printf(char* fmt, ...) {
+void Sys_Printf(cString fmt, ...) {
     va_list  argptr;
     va_start(argptr, fmt);
     vprintf(fmt, argptr);
@@ -164,7 +164,7 @@ void Sys_SendKeyEvents(void) {}
 void Sys_HighFPPrecision(void) {}
 void Sys_LowFPPrecision(void) {}
 
-char* Sys_ConsoleInput(void) {
+cString Sys_ConsoleInput(void) {
     static char text[256];
     static int  len;
     INPUT_RECORD recs[1024];
@@ -206,7 +206,7 @@ main
 */
 char* newargv[256];
 
-int main(int argc, char** argv) {
+int main(int argc, cStringArray argv) {
     MSG        msg;
     QuakeParms_t parms;
     double   time, oldtime;

@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 CVAR_ARC(m_filter, "0");
 
-qboolean        mouse_avail;
+bool        mouse_avail;
 int             mouse_buttons = 3;
 int             mouse_oldbuttonstate;
 int             mouse_buttonstate;
@@ -48,7 +48,7 @@ float   mouse_x, mouse_y;
 float   old_mouse_x, old_mouse_y;
 int p_mouse_x;
 int p_mouse_y;
-qboolean	mouse_grabbed = false; // we grab it when console is up
+bool	mouse_grabbed = false; // we grab it when console is up
 
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
 uint8_t* VGA_pagebase;
@@ -108,16 +108,16 @@ int		vid_buffersize;
 PointerMotionMask | EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | \
 ExposureMask | StructureNotifyMask )
 
-qboolean				x_fullscreen = true;
+bool				x_fullscreen = true;
 Display* x_disp = NULL;
 int						x_screen, x_screen_width, x_screen_height;
 int				x_center_width, x_center_height;
 int						x_std_event_mask = STD_EVENT_MASK;
 Window					x_win, x_root_win;
-qboolean				mouse_in_window = false;
+bool				mouse_in_window = false;
 int				global_dx, global_dy;
 
-static qboolean			doShm;
+static bool			doShm;
 static Colormap			x_cmap;
 static GC				x_gc;
 static Visual* x_vis;
@@ -128,7 +128,7 @@ static Atom				aWMDelete = 0;
 static int				x_shmeventtype;
 //static XShmSegmentInfo	x_shminfo;
 
-static qboolean			oktodraw = false;
+static bool			oktodraw = false;
 
 int XShmQueryExtension(Display*);
 int XShmGetEventBase(Display*);
@@ -534,7 +534,7 @@ void VID_SetWindowTitle(Window win, cString pszName) {
 // VID_FullScreen - open the window in full screen mode
 //
 
-qboolean VID_FullScreen(Window win) {
+bool VID_FullScreen(Window win) {
 	MotifWmHints    hints;
 	XWindowChanges  changes;
 

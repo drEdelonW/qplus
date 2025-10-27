@@ -73,8 +73,8 @@ void VGA_ClearVideoMem(int planar);
 void VGA_SetPalette(viddef_p vid, vmode_t* pcurrentmode, uint8_p pal);
 void VGA_SwapBuffersCopy(viddef_p vid, vmode_t* pcurrentmode,
 	vRect_p rects);
-qboolean VGA_FreeAndAllocVidbuffer(viddef_p vid, int allocnewbuffer);
-qboolean VGA_CheckAdequateMem(int width, int height, int rowbytes,
+bool VGA_FreeAndAllocVidbuffer(viddef_p vid, int allocnewbuffer);
+bool VGA_CheckAdequateMem(int width, int height, int rowbytes,
 	int allocnewbuffer);
 void VGA_BeginDirectRect(viddef_p vid, struct vmode_s* pcurrentmode, int x,
 	int y, uint8_p pbitmap, int width, int height);

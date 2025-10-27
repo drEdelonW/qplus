@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // current entity info
 //
-qboolean    insubmodel;
+bool    insubmodel;
 r_Entity_p  currententity;
 vec3_t      modelorg, base_modelorg;
 // modelorg is the viewpoint reletive to
@@ -49,7 +49,7 @@ static mVertex_p    _pbVerts;
 static bEdge_p      _pbEdges;
 static int          _numbVerts, _numbEges;
 static mVertex_p    _pFrontEnter, _pFrontExit;
-static qboolean     _makeClippedEdge;
+static bool     _makeClippedEdge;
 
 
 //===========================================================================

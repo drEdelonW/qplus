@@ -41,11 +41,11 @@ extern "C" {			/* Use "C" linkage when in C++ mode	*/
 
     /* Initialise the MGL for fullscreen output */
 
-    bool	MGLAPI MGL_init(m_int* driver, m_int* mode, const char* mglpath);
+    bool	MGLAPI MGL_init(m_int* driver, m_int* mode, cStringRO mglpath);
 
     /* Initialise the MGL just for Windowed output, not full screen */
 
-    bool	MGLAPI MGL_initWindowed(const char* mglpath);
+    bool	MGLAPI MGL_initWindowed(cStringRO mglpath);
 
     /* Function to register a fullscreen window with the MGL. If you wish
      * for the MGL to use your own window for fullscreen modes, you can

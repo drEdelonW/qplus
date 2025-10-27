@@ -216,7 +216,7 @@ void VGA_ClearVideoMem(int planar) {
 VGA_FreeAndAllocVidbuffer
 ================
 */
-qboolean VGA_FreeAndAllocVidbuffer(viddef_p lvid, int allocnewbuffer) {
+bool VGA_FreeAndAllocVidbuffer(viddef_p lvid, int allocnewbuffer) {
 	int		tsize, tbuffersize;
 
 	if (allocnewbuffer) {
@@ -273,7 +273,7 @@ qboolean VGA_FreeAndAllocVidbuffer(viddef_p lvid, int allocnewbuffer) {
 VGA_CheckAdequateMem
 ================
 */
-qboolean VGA_CheckAdequateMem(int width, int height, int rowbytes,
+bool VGA_CheckAdequateMem(int width, int height, int rowbytes,
 	int allocnewbuffer) {
 	int		tbuffersize;
 

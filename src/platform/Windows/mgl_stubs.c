@@ -1,8 +1,8 @@
 /* src/platform/Windows/mgl_stubs.c: грубые заглушки MGL, чтобы собрать без библиотеки */
 void MGL_exit(void) {}
 int  MGL_result(void) { return 0; }
-const char* MGL_errorMsg(int) { return "MGL stub"; }
-void MGL_fatalError(const char*, ...) {}
+cStringRO MGL_errorMsg(int) { return "MGL stub"; }
+void MGL_fatalError(cStringRO, ...) {}
 
 void MGL_registerDriver(void*) {}
 void MGL_unregisterAllDrivers(void) {}
@@ -24,7 +24,7 @@ void* MGL_createMemoryDC(int, int, int, int) { return 0; }
 void MGL_setActivePage(void*, int) {}
 void MGL_setVisualPage(void*, int, int) {}
 int  MGL_initWindowed(void) { return 1; }
-const char* MGL_modeDriverName(int) { return "stub"; }
+cStringRO MGL_modeDriverName(int) { return "stub"; }
 void MGL_destroyDC(void*) {}
 void MGL_registerFullScreenWindow(void*) {}
 

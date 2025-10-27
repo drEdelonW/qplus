@@ -339,7 +339,7 @@ SV_LinkEdict
 
 ===============
 */
-void SV_LinkEdict(edict_p ent, qboolean touch_triggers) {
+void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     if (ent->area.prev)
         SV_UnlinkEdict(ent); // unlink from old position
 
@@ -521,7 +521,7 @@ SV_RecursiveHullCheck
 
 ==================
 */
-qboolean SV_RecursiveHullCheck(
+bool SV_RecursiveHullCheck(
     Hull_p  hull,
     int     num,
     float   p1f,

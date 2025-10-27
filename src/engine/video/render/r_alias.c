@@ -80,7 +80,7 @@ void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av);
 R_AliasCheckBBox
 ================
 */
-qboolean R_AliasCheckBBox() {
+bool R_AliasCheckBBox() {
     // expand, rotate, and translate points into worldspace
 
     currententity->trivial_accept = 0;
@@ -133,8 +133,8 @@ qboolean R_AliasCheckBBox() {
         basepts[6][2] =
         basepts[7][2] = (float)pframedesc->bboxmax.v[2];
 
-    qboolean zclipped = false;
-    qboolean zfullyclipped = true;
+    bool zclipped = false;
+    bool zfullyclipped = true;
 
     int minz = 9999;
     AuxVert_t   viewaux[16];

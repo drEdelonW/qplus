@@ -50,7 +50,7 @@ void Chase_Reset() {
 //    start position 12 units behind head
 }
 
-qboolean SV_RecursiveHullCheck(
+bool SV_RecursiveHullCheck(
     Hull_p hull,
     int num,
     float p1f, float p2f,

@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef bool qboolean;
-
-
 typedef char* cString;
 typedef char** cStringArray;
 typedef const char* cStringRO;  // read-only
