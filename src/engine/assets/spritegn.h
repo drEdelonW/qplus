@@ -106,8 +106,8 @@ typedef dSpriteGroup_t* dSpriteGroup_p;
 
 typedef struct {
     float   interval;
-} dspriteinterval_t;
-typedef dspriteinterval_t* dspriteinterval_p;
+} dSpriteInterval_t;
+typedef dSpriteInterval_t* dSpriteInterval_p;
 
 typedef enum {
     SPR_SINGLE = 0,

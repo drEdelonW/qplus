@@ -26,6 +26,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "platformdefs.h"
 #include "zone.h"
 
+#include "Vertex.h"
+
+
+
+#define TOP_RANGE  (16)   // soldier uniform colors
+#define BOTTOM_RANGE (96)
 /*
 
 d*_t structures are on-disk representations
@@ -42,14 +48,6 @@ BRUSH MODELS
 */
 
 
-//
-// in memory representation
-//
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct {
-    vec3_t  position;
-} mVertex_t;
-typedef mVertex_t* mVertex_p;
 
 typedef enum {
     SIDE_FRONT = 0, // point is in front of plane
@@ -57,40 +55,8 @@ typedef enum {
     SIDE_ON    = 2  // point is on plane
 } Side_t;
 
-// Plane_t structure
-// !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct mPlane_s {
-    vec3_t  normal;
-    float   dist;
-    uint8_t type;   // for texture axis selection and fast side tests
-    uint8_t signbits;  // signx + signy<<1 + signz<<1
-    uint8_t pad[2];
-} mPlane_t;
-typedef mPlane_t* mPlane_p;
-
-struct Texture_s;
-typedef struct Texture_s Texture_t;
-typedef Texture_t* Texture_p;
-struct Texture_s {
-    char        name[16];
-    uint32_t    width, height;
-    int32_t     anim_total;    // total tenths in sequence ( 0 = no)
-    int32_t     anim_min, anim_max;  // time for this frame min <=time< max
-    Texture_p   anim_next;  // in the animation sequence
-    Texture_p   alternate_anims; // bmodels in frmae 1 use these
-    uint32_t    offsets[MIPLEVELS];  // four mip maps stored
-};
 
 
-typedef enum {
-    SURF_NONE           = 0,
-    SURF_PLANEBACK      = 1u << 1, // 0x02
-    SURF_DRAWSKY        = 1u << 2, // 0x04
-    SURF_DRAWSPRITE     = 1u << 3, // 0x08
-    SURF_DRAWTURB       = 1u << 4, // 0x10
-    SURF_DRAWTILED      = 1u << 5, // 0x20
-    SURF_DRAWBACKGROUND = 1u << 6  // 0x40
-} SurfaceFlags_e;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct {
@@ -100,72 +66,6 @@ typedef struct {
 typedef mEdge_t* mEdge_p;
 
 
-typedef struct {
-    float   vecs[2][4];
-    float  mipadjust;
-    Texture_p texture;
-    int32_t   flags;
-} mTexInfo_t;
-typedef mTexInfo_t* mTexInfo_p;
-
-
-typedef struct mSurface_s {
-    int32_t visframe;  // should be drawn when node is crossed
-    int32_t dlightframe;
-    int32_t dlightbits;
-    mPlane_p    plane;
-    // int32_t  flags;
-    SurfaceFlags_e    flags;
-    int32_t firstedge; // look up in model->surfedges[], negative numbers
-    int32_t numedges; // are backwards edges
-
-    // surface generation data
-    struct SurfCache_s* cachespots[MIPLEVELS];
-    int16_t texturemins[2];
-    int16_t extents[2];
-    mTexInfo_p texinfo;
-
-    // lighting info
-    uint8_t styles[MAXLIGHTMAPS];
-    uint8_p samples;  // [numstyles*surfsize]
-} mSurface_t;
-typedef mSurface_t* mSurface_p;
-
-
-struct mNode_s;
-typedef struct mNode_s mNode_t;
-typedef mNode_t* mNode_p;
-struct mNode_s {
-    // common with leaf
-    int32_t     contents;  // 0, to differentiate from leafs
-    int32_t     visframe;  // node needs to be traversed if current
-    int16_t     minmaxs[6];  // for bounding box culling
-    mNode_p     parent;
-    // node specific
-    mPlane_p    plane;
-    mNode_p     children[2];
-    uint16_t    firstsurface;
-    uint16_t    numsurfaces;
-};
-
-
-
-typedef struct mLeaf_s {
-    // common with node
-    int32_t contents;   // wil be a negative contents number
-    int32_t visframe;   // node needs to be traversed if current
-    int16_t minmaxs[6]; // for bounding box culling
-    mNode_p parent;
-
-    // leaf specific
-    uint8_p compressed_vis;
-    efrag_p efrags;
-    mSurface_p* firstmarksurface;
-    int32_t nummarksurfaces;
-    int32_t key;        // BSP sequence number for leaf's contents
-    uint8_t ambient_sound_level[NUM_AMBIENTS];
-} mLeaf_t;
-typedef mLeaf_t* mLeaf_p;
 
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
 typedef struct {
@@ -308,7 +208,9 @@ typedef enum {
 } NeedLoad_t;
 
 
-typedef struct Model_s {
+typedef struct Model_s Model_t;
+typedef Model_t* Model_p;
+struct Model_s {
     char  name[MAX_QPATH];
     NeedLoad_t needload;  // bmodels and sprites don't cache normally
     ModType_t   type;
@@ -336,9 +238,7 @@ typedef struct Model_s {
     cString entities;
     // additional model data
     CacheUser_t cache;  // only access through Mod_Extradata
-
-} Model_t;
-typedef Model_t* Model_p;
+} ;
 
 //============================================================================
 

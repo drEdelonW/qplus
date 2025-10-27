@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "enginedefs.h"
+#include "Leaf.h"
+#include "Vertex.h"
 
 // upper design bounds
 
@@ -116,30 +118,7 @@ typedef struct MipTex_s {
 typedef MipTex_t* MipTex_p;
 
 
-typedef struct {
-    vec3_t point;
-} dVertex_t;
-typedef dVertex_t* dVertex_p;
 
-
-typedef enum {
-    // 0–2 are axial planes
-    PLANE_X = 0,
-    PLANE_Y = 1,
-    PLANE_Z = 2,
-
-    // 3–5 are non-axial planes snapped to the nearest
-    PLANE_ANYX = 3,
-    PLANE_ANYY = 4,
-    PLANE_ANYZ = 5
-} PlaneType_t;
-
-typedef struct {
-    vec3_t      normal;
-    float       dist;
-    PlaneType_t type;  // PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
-} dPlane_t;
-typedef dPlane_t* dPlane_p;
 
 
 
@@ -162,18 +141,6 @@ typedef enum {
 } contents_t;
 
 
-// !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct {
-    int32_t     planenum;
-    int16_t     children[2]; // negative numbers are -(leafs+1), not nodes
-    int16_t     mins[3];  // for sphere culling
-    int16_t     maxs[3];
-    uint16_t    firstface;
-    uint16_t    numfaces; // counting both sides
-} dNode_t;
-typedef dNode_t* dNode_p;
-
-
 typedef struct {
     int32_t planenum;
     int16_t children[2]; // negative numbers are contents
@@ -181,12 +148,7 @@ typedef struct {
 typedef dClipNode_t* dClipNode_p;
 
 
-typedef struct TexInfo_s {
-    float   vecs[2][4];  // [s/t][xyz offset]
-    int32_t miptex;
-    int32_t flags;
-} TexInfo_t;
-typedef TexInfo_t* TexInfo_p;
+
 #define TEX_SPECIAL  1  // sky or slime, no lightmap or 256 subdivision
 
 // note that edge 0 is never used, because negative edge nums are used for
@@ -213,21 +175,7 @@ typedef dFace_t* dFace_p;
 
 
 
-// leaf 0 is the generic CONTENTS_SOLID leaf, used for all solid areas
-// all other leafs need visibility info
-typedef struct {
-    int32_t contents;
-    int32_t visofs;    // -1 = no visibility info
 
-    int16_t mins[3];   // for frustum culling
-    int16_t maxs[3];
-
-    uint16_t firstmarksurface;
-    uint16_t nummarksurfaces;
-
-    uint8_t ambient_level[NUM_AMBIENTS];
-} dLeaf_t;
-typedef dLeaf_t* dLeaf_p;
 
 
 //============================================================================

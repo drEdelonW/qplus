@@ -23,27 +23,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "model_effect.h"
 #include "enginedefs.h"
 #include "vid.h"
-// #include "model.h"
+#include "eFrag.h"
+#include "model.h"
 
-#define MAXCLIPPLANES (11)
-
-#define TOP_RANGE  (16)   // soldier uniform colors
-#define BOTTOM_RANGE (96)
+// #define MAXCLIPPLANES (11). /* not used */
 
 //=============================================================================
-typedef struct r_Entity_s r_Entity_t;
-typedef r_Entity_t* r_Entity_p;
-
-// struct efrag_s;
-typedef struct efrag_s efrag_t;
-typedef efrag_t* efrag_p;
-struct efrag_s {
-    // mLeaf_p leaf;
-    struct mLeaf_s* leaf;  // TODO: fix include collision issue
-    efrag_p     leafnext;
-    r_Entity_p  entity;
-    efrag_p     entnext;
-};
 
 
 // entity effects
@@ -60,6 +45,8 @@ typedef enum {
 #endif
 } EntityEffects_t;
 
+typedef struct Model_s Model_t;
+typedef Model_t* Model_p;
 struct r_Entity_s {
     bool            forcelink;  // model changed
     int             update_type;
@@ -69,7 +56,7 @@ struct r_Entity_s {
     vec3_t          origin;
     vec3_t          msg_angles[2]; // last two updates(0 is newest)
     vec3_t          angles;
-    struct Model_s* model;   // NULL = no model
+    Model_p         model;   // NULL = no model
     efrag_p         efrag;   // linked list of efrags
     int             frame;
     float           syncbase;  // for client-side animations

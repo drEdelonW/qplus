@@ -1410,7 +1410,7 @@ TypeLess_ptr  Mod_LoadSpriteGroup(TypeLess_ptr  pin, mSpriteFrame_t** ppframe) {
     pspritegroup->numframes = numframes;
     *ppframe = (mSpriteFrame_t*)pspritegroup;
 
-    dspriteinterval_p pin_intervals = (dspriteinterval_p)(pingroup + 1);
+    dSpriteInterval_p pin_intervals = (dSpriteInterval_p)(pingroup + 1);
 
     float_p poutintervals = Hunk_AllocName(numframes * sizeof(float), loadname);
     pspritegroup->intervals = poutintervals;

@@ -10,18 +10,18 @@ typedef const char* cStringRO;  // read-only
 typedef void* TypeLess_ptr;
 
 // Pointers to standard integer types
-typedef int8_t*    int8_p;
-typedef uint8_t*   uint8_p;
-typedef int16_t*   int16_p;
-typedef uint16_t*  uint16_p;
-typedef int32_t*   int32_p;
-typedef uint32_t*  uint32_p;
-typedef int64_t*   int64_p;
-typedef uint64_t*  uint64_p;
+typedef int8_t* int8_p;
+typedef uint8_t* uint8_p;
+typedef int16_t* int16_p;
+typedef uint16_t* uint16_p;
+typedef int32_t* int32_p;
+typedef uint32_t* uint32_p;
+typedef int64_t* int64_p;
+typedef uint64_t* uint64_p;
 
 // Pointers to other common types
-typedef float*     float_p;
-typedef double*    double_p;
+typedef float* float_p;
+typedef double* double_p;
 
 #ifndef NULL
 #   define NULL    ((TypeLess_ptr)0)
@@ -56,7 +56,7 @@ typedef double*    double_p;
 
 
 // typedef int fixed4_t; // not used
-// typedef uint8_t fixed4_t; // not used
+// typedef uint8_t fixed4_t; // ?
 
 // typedef int fixed8_t; // DO NOT USE int!!!
 typedef uint16_t fixed8_t; // V
@@ -65,7 +65,6 @@ typedef uint16_t fixed8_t; // V
 // typedef int fixed16_t; // DO NOT USE int!!!
 typedef int32_t fixed16_t; // V
 // typedef int16_t fixed16_t; // X
-
 
 // fixed16_t Invert24To16(fixed16_t val);
 
@@ -78,17 +77,13 @@ typedef int32_t fixed16_t; // V
 // /*
 // ===================
 // Invert24To16
-
 // Inverts an 8.24 value to a 16.16 value
 // ====================
 // */
 
 // fixed16_t Invert24To16(fixed16_t val) {
-//     if (val < 256)
-//         return (0xFFFFFFFF);
-
-//     return (fixed16_t)
-//         (((double)0x10000 * (double)0x1000000 / (double)val) + 0.5);
+//     if (val < 256)      return (0xFFFFFFFF);
+//     return (fixed16_t)(((double)0x10000 * (double)0x1000000 / (double)val) + 0.5);
 // }
 
 #endif
