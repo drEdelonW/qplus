@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // d_local.h:  private rasterization driver defs
 
 #include "r_shared.h"
+#include "SurfCache.h"
 
 //
 // TODO: fine-tune this; it's based on providing some overage even if there
@@ -35,27 +36,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define SURFCACHE_SIZE_AT_320X200  (600 * 1024)
 
-struct SurfCache_s;
-typedef struct SurfCache_s SurfCache_t;
-typedef SurfCache_t* SurfCache_p;
-struct SurfCache_s {
-    SurfCache_p  next;
-    SurfCache_p*  owner;  // NULL is an empty chunk of memory
-    int    lightadj[MAXLIGHTMAPS]; // checked for strobe flush
-    int    dlight;
-    int    size;  // including header
-    uint32_t   width;
-    uint32_t   height;  // DEBUG only needed for debug
-    float    mipscale;
-    Texture_p   texture; // checked for animating textures
-    uint8_t   data[4]; // width * height elements
-} ;
+
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct sSpan_s {
     int u, v, count;
 } sSpan_t;
 typedef sSpan_t* sSpan_p;
+
 
 extern float scale_for_mip;
 
@@ -96,15 +84,10 @@ extern uint32_t d_zrowbytes, d_zwidth;
 
 extern int* d_pscantable;
 extern int d_scantable[MAXHEIGHT];
-
 extern int d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
-
 extern int d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
-
 extern pixel_p d_viewbuffer;
-
 extern int16_p zspantable[MAXHEIGHT];
-
 extern int  d_minmip;
 extern float d_scalemip[3];
 

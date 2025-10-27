@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "world.h"
 #include "versions.h"
 #include "cvar_q1.h"
+#include "Alias.h"
 
 
 int32_t current_skill;
@@ -753,8 +754,10 @@ void Host_Please_f() {
         int j = Q_atof(Cmd_Argv(2)) - 1;
         if ((j < 0) ||
             (j >= svs.maxclients) ||
-            (!svs.clients[j].active))
+            (!svs.clients[j].active)
+            )
             return;
+
         client_p cl = &svs.clients[j];
         if (cl->privileged) {
             cl->privileged = false;
@@ -762,8 +765,7 @@ void Host_Please_f() {
             cl->edict->v.movetype = MOVETYPE_WALK;
             noclip_anglehack = false;
         }
-        else
-            cl->privileged = true;
+        else    cl->privileged = true;
     }
 
     if (Cmd_Argc() != 2)    return;
@@ -779,8 +781,7 @@ void Host_Please_f() {
                     cl->edict->v.movetype = MOVETYPE_WALK;
                     noclip_anglehack = false;
                 }
-                else
-                    cl->privileged = true;
+                else    cl->privileged = true;
                 break;
             }
         }
@@ -811,35 +812,35 @@ void Host_Say(bool teamonly) {
     }
 
     // turn on color set 1
-    char text[64];
     {
+        char text[64];
         if (fromServer) snprintf(text, sizeof(text), "%c<%s> ", 1, hostname.string);
         else            snprintf(text, sizeof(text), "%c%s: ", 1, save->name);
 
         int32_t j = sizeof(text) - 2 - Q_strlen(text);  // -2 for /n and null terminator
         if (Q_strlen(args) > j)
             args[j] = 0;
-    }
-    strcat(text, args);
-    strcat(text, "\n");
+        strcat(text, args);
+        strcat(text, "\n");
 
-    client_p client = svs.clients;
-    for (int32_t j = 0; j < svs.maxclients; j++, client++) {
-        if (!client ||
-            !client->active ||
-            !client->spawned ||
-            (
-                teamplay.value &&
-                teamonly &&
-                (client->edict->v.team != save->edict->v.team))
-            )
-            continue;
-        host_client = client;
-        SV_ClientPrintf("%s", text);
-    }
-    host_client = save;
+        client_p client = svs.clients;
+        for (int32_t j = 0; j < svs.maxclients; j++, client++) {
+            if (!client ||
+                !client->active ||
+                !client->spawned ||
+                (
+                    teamplay.value &&
+                    teamonly &&
+                    (client->edict->v.team != save->edict->v.team))
+                )
+                continue;
+            host_client = client;
+            SV_ClientPrintf("%s", text);
+        }
+        host_client = save;
 
-    Sys_Printf("%s", &text[1]);
+        Sys_Printf("%s", &text[1]);
+    }
 }
 
 
@@ -848,7 +849,7 @@ void Host_Say_Team_f() { Host_Say(true); }
 
 
 void Host_Tell_f() {
-    if (cmd_source == src_command) { Cmd_ForwardToServer();     return; }
+    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
     if (Cmd_Argc() < 3)     return;
 
     char text[64];
@@ -987,7 +988,7 @@ Host_Spawn_f
 */
 void Host_Spawn_f() {
     if (cmd_source == src_command) { ; Con_Printf("spawn is not valid from the console\n");     return; }
-    if (host_client->spawned) { ;       Con_Printf("Spawn not valid -- allready spawned\n");    return; }
+    if (host_client->spawned) { ;      Con_Printf("Spawn not valid -- allready spawned\n");    return; }
 
     // run the entrance script
     if (sv.loadgame) { // loaded games are fully inited allready

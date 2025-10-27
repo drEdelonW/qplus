@@ -36,3 +36,16 @@ typedef struct mSurface_s {
     uint8_p samples;  // [numstyles*surfsize]
 } mSurface_t;
 typedef mSurface_t* mSurface_p;
+
+#include "vid.h"  //    pixel_p
+typedef struct {
+    pixel_p     surfdat;                // destination for generated surface
+    int         rowbytes;               // destination logical width in bytes
+    mSurface_p  surf;                   // description for surface to generate
+    fixed8_t    lightadj[MAXLIGHTMAPS]; // adjust for lightmap levels for dynamic lighting
+    Texture_p   texture;                // corrected for animating textures
+    int         surfmip;                // mipmapped ratio of surface texels / world pixels
+    int         surfwidth;              // in mipmapped texels
+    int         surfheight;             // in mipmapped texels
+} DrawSurf_t;
+extern DrawSurf_t r_drawsurf;

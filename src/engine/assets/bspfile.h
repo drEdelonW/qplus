@@ -20,12 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "enginedefs.h"
-#include "Leaf.h"
-#include "Vertex.h"
+#include "Model.h"
 
 // upper design bounds
 
-#define MAX_MAP_HULLS       (4)
 
 #define MAX_MAP_MODELS      (256)
 #define MAX_MAP_BRUSHES     (4096)
@@ -60,48 +58,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define BSPVERSION  (29)
 #define TOOLVERSION (2)
 
-typedef struct {
-    int32_t fileofs;
-    int32_t filelen;
-} Lump_t;
-typedef Lump_t* Lump_p;
 
-typedef enum {
-    LUMP_ENTITIES     = 0,
-    LUMP_PLANES       = 1,
-    LUMP_TEXTURES     = 2,
-    LUMP_VERTEXES     = 3,
-    LUMP_VISIBILITY   = 4,
-    LUMP_NODES        = 5,
-    LUMP_TEXINFO      = 6,
-    LUMP_FACES        = 7,
-    LUMP_LIGHTING     = 8,
-    LUMP_CLIPNODES    = 9,
-    LUMP_LEAFS        = 10,
-    LUMP_MARKSURFACES = 11,
-    LUMP_EDGES        = 12,
-    LUMP_SURFEDGES    = 13,
-    LUMP_MODELS       = 14,
-
-    HEADER_LUMPS      = 15  // total count of lumps in BSP header
-} LumpType;
-
-typedef struct {
-    vec3_t  mins;
-    vec3_t  maxs;
-    vec3_t  origin;
-
-    int32_t headnode[MAX_MAP_HULLS];
-    int32_t visleafs;  // not including the solid leaf 0
-    int32_t firstface, numfaces;
-} dModel_t;
-typedef dModel_t* dModel_p;
-
-typedef struct {
-    int32_t version;
-    Lump_t  lumps[HEADER_LUMPS];
-} dHeader_t;
-typedef dHeader_t* dHeader_p;
 
 typedef struct {
     int32_t nummiptex;
@@ -116,10 +73,6 @@ typedef struct MipTex_s {
     uint32_t    offsets[MIPLEVELS];  // four mip maps stored
 } MipTex_t;
 typedef MipTex_t* MipTex_p;
-
-
-
-
 
 
 typedef enum {
@@ -141,22 +94,13 @@ typedef enum {
 } contents_t;
 
 
-typedef struct {
-    int32_t planenum;
-    int16_t children[2]; // negative numbers are contents
-} dClipNode_t;
-typedef dClipNode_t* dClipNode_p;
+
 
 
 
 #define TEX_SPECIAL  1  // sky or slime, no lightmap or 256 subdivision
 
-// note that edge 0 is never used, because negative edge nums are used for
-// counterclockwise use of the edge in a face
-typedef struct {
-    uint16_t    v[2];  // Vertex numbers
-} dEdge_t;
-typedef dEdge_t* dEdge_p;
+
 
 typedef struct {
     int16_t planenum;

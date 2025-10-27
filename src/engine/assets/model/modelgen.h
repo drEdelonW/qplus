@@ -87,13 +87,6 @@ typedef struct {
 } stvert_t;
 typedef stvert_t* stvert_p;
 
-
-typedef struct dTriangle_s {
-    int32_t facesfront;
-    int32_t vertindex[3];
-} dTriangle_t;
-typedef dTriangle_t* dTriangle_p;
-
 #define DT_FACES_FRONT  0x0010
 
 // This mirrors trivert_t in trilib.h, is present so Quake knows how to
@@ -110,8 +103,8 @@ typedef struct {
     TriVertx_t  bboxmin;    // lightnormal isn't used
     TriVertx_t  bboxmax;    // lightnormal isn't used
     char        name[16];   // frame name from grabbing
-} daliasframe_t;
-typedef daliasframe_t* daliasframe_p;
+} dAliasFrame_t;
+typedef dAliasFrame_t* dAliasFrame_p;
 
 
 typedef struct {

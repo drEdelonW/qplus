@@ -42,9 +42,7 @@ D_DrawPoly
 
 ==============
 */
-void D_DrawPoly() {
-    // this driver takes spans, not polygons
-}
+void D_DrawPoly() {} // this driver takes spans, not polygons
 
 
 /*

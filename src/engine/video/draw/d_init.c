@@ -29,7 +29,7 @@ bool        d_roverwrapped;
 int         d_minmip;
 float       d_scalemip[NUM_MIPS - 1];
 
-static float	basemip[NUM_MIPS - 1] = { 1.0, 0.5 * 0.8, 0.25 * 0.8 };
+static float	_BaseMip[NUM_MIPS - 1] = { 1.0, 0.5 * 0.8, 0.25 * 0.8 };
 
 extern int			d_aflatcolor;
 
@@ -79,9 +79,7 @@ void D_CopyRects(vRect_p prects, int transparent) {
 D_EnableBackBufferAccess
 ===============
 */
-void D_EnableBackBufferAccess() {
-    VID_LockBuffer();
-}
+void D_EnableBackBufferAccess() { VID_LockBuffer(); }
 
 
 /*
@@ -99,9 +97,7 @@ void D_TurnZOn() {
 D_DisableBackBufferAccess
 ===============
 */
-void D_DisableBackBufferAccess() {
-    VID_UnlockBuffer();
-}
+void D_DisableBackBufferAccess() { VID_UnlockBuffer(); }
 
 
 /*
@@ -121,7 +117,7 @@ void D_SetupFrame() {
     CLAMP(0, d_minmip, 3);
 
     for (int i = 0; i < (NUM_MIPS - 1); i++)
-        d_scalemip[i] = basemip[i] * d_mipscale.value;
+        d_scalemip[i] = _BaseMip[i] * d_mipscale.value;
 
     d_drawspans =
 #if	id386
@@ -139,9 +135,7 @@ D_UpdateRects
 ===============
 */
 void D_UpdateRects(vRect_p prect) {
-
     // the software driver draws these directly to the vid buffer
-
     // UNUSED(prect);
 }
 

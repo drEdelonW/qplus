@@ -61,7 +61,6 @@ struct r_Entity_s {
     int             frame;
     float           syncbase;  // for client-side animations
     uint8_p         colormap;
-    // int             effects;  // light, particals, etc
     EntityEffects_t effects;  // light, particals, etc
     int             skinnum;  // for Alias models
     int             visframe;  // last frame this entity was
@@ -71,7 +70,7 @@ struct r_Entity_s {
 
     // FIXME: could turn these into a union
     int             trivial_accept;
-    struct mNode_s* topnode;  // for bmodels, first world node
+    mNode_p topnode;  // for bmodels, first world node
     //  that splits bmodel, or NULL if not split
 } ;
 typedef r_Entity_t* r_Entity_p;
@@ -113,7 +112,7 @@ extern int  reinit_surfcache;
 extern refdef_t r_refdef;
 extern vec3_t r_origin, vpn, vright, vup;
 
-extern struct Texture_s* r_notexture_mip;
+extern Texture_p r_notexture_mip;
 
 
 void R_Init();
@@ -122,7 +121,7 @@ void R_InitEfrags();
 void R_RenderView();  // must set r_refdef first
 void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect);
 // called whenever r_refdef or vid change
-void R_InitSky(struct Texture_s* mt); // called at level load
+void R_InitSky(Texture_p mt); // called at level load
 
 void R_AddEfrags(r_Entity_p ent);
 void R_RemoveEfrags(r_Entity_p ent);

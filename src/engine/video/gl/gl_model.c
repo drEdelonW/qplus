@@ -1158,9 +1158,9 @@ Mod_LoadAliasFrame
 TypeLess_ptr Mod_LoadAliasFrame(TypeLess_ptr pin, mAliasFrameDesc_t* frame) {
     TriVertx_t* pframe, * pinframe;
     int    i, j;
-    daliasframe_t* pdaliasframe;
+    dAliasFrame_t* pdaliasframe;
 
-    pdaliasframe = (daliasframe_t*)pin;
+    pdaliasframe = (dAliasFrame_t*)pin;
 
     strcpy(frame->name, pdaliasframe->name);
     frame->firstpose = posenum;
@@ -1217,10 +1217,10 @@ TypeLess_ptr Mod_LoadAliasGroup(TypeLess_ptr pin, mAliasFrameDesc_t* frame) {
     ptemp = (TypeLess_ptr)pin_intervals;
 
     for (i = 0; i < numframes; i++) {
-        poseverts[posenum] = (TriVertx_t*)((daliasframe_t*)ptemp + 1);
+        poseverts[posenum] = (TriVertx_t*)((dAliasFrame_t*)ptemp + 1);
         posenum++;
 
-        ptemp = (TriVertx_t*)((daliasframe_t*)ptemp + 1) + pheader->numverts;
+        ptemp = (TriVertx_t*)((dAliasFrame_t*)ptemp + 1) + pheader->numverts;
     }
 
     return ptemp;

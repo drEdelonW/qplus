@@ -1385,19 +1385,21 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
         trace_t trace = SV_Move(tent->v.origin, tent->v.mins, tent->v.maxs, end, MOVE_NORMAL, tent);
         VectorCopy(trace.endpos, tent->v.origin);
 
-        // extern Particle_p active_particles, free_particles;
-        // Particle_p p = free_particles;
-        // if (p) {
-        //     free_particles = p->next;
-        //     p->next = active_particles;
-        //     active_particles = p;
+#if 0
+        extern Particle_p active_particles, free_particles;
+        Particle_p p = free_particles;
+        if (p) {
+            free_particles = p->next;
+            p->next = active_particles;
+            active_particles = p;
 
-        //     p->die = 256;
-        //     p->color = 15;
-        //     p->type = pt_static;
-        //     VectorCopy(vec3_origin, p->vel);
-        //     VectorCopy(tent->v.origin, p->org);
-        // }
+            p->die = 256;
+            p->color = 15;
+            p->type = pt_static;
+            VectorCopy(vec3_origin, p->vel);
+            VectorCopy(tent->v.origin, p->org);
+        }
+#endif
 
         if ((trace.ent) &&
             (trace.ent != ignore))

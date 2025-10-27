@@ -28,53 +28,53 @@ D_FillRect
 ================
 */
 void D_FillRect(vRect_p rect, int color) {
-	int rx = rect->x;
-	int ry = rect->y;
-	int rwidth = rect->width;
-	int rheight = rect->height;
+    int rx = rect->x;
+    int ry = rect->y;
+    int rwidth = rect->width;
+    int rheight = rect->height;
 
-	if (rx < 0) {
-		rwidth += rx;
-		rx = 0;
-	}
-	if (ry < 0) {
-		rheight += ry;
-		ry = 0;
-	}
-	if (rx + rwidth > vid.width)
-		rwidth = vid.width - rx;
-	if (ry + rheight > vid.height)
-		rheight = vid.height - rx;
+    if (rx < 0) {
+        rwidth += rx;
+        rx = 0;
+    }
+    if (ry < 0) {
+        rheight += ry;
+        ry = 0;
+    }
+    if (rx + rwidth > vid.width)
+        rwidth = vid.width - rx;
+    if (ry + rheight > vid.height)
+        rheight = vid.height - rx;
 
-	if ((rwidth < 1) ||
-		(rheight < 1))
-		return;
+    if ((rwidth < 1) ||
+        (rheight < 1))
+        return;
 
-	uint8_p dest = ((uint8_p)vid.buffer + ry * vid.rowbytes + rx);
+    uint8_p dest = ((uint8_p)vid.buffer + ry * vid.rowbytes + rx);
 
-	if (((rwidth & 0x03) == 0) &&
-		(((uintptr_t)dest & 0x03) == 0)
-		) {
-		// faster aligned dword clear
-		uint32_p ldest = (uint32_p)dest;
-		color += color << 16;
+    if (((rwidth & 0x03) == 0) &&
+        (((uintptr_t)dest & 0x03) == 0)
+        ) {
+        // faster aligned dword clear
+        uint32_p ldest = (uint32_p)dest;
+        color += color << 16;
 
-		rwidth >>= 2;
-		color += color << 8;
+        rwidth >>= 2;
+        color += color << 8;
 
-		for (int ry = 0; ry < rheight; ry++) {
-			for (int rx = 0; rx < rwidth; rx++)
-				ldest[rx] = color;
-			ldest = (uint32_p)((uint8_p)ldest + vid.rowbytes);
-		}
-	}
-	else {
-		// slower byte-by-byte clear for unaligned cases
-		for (int ry = 0; ry < rheight; ry++) {
-			for (int rx = 0; rx < rwidth; rx++)
-				dest[rx] = color;
-			dest += vid.rowbytes;
-		}
-	}
+        for (int ry = 0; ry < rheight; ry++) {
+            for (int rx = 0; rx < rwidth; rx++)
+                ldest[rx] = color;
+            ldest = (uint32_p)((uint8_p)ldest + vid.rowbytes);
+        }
+    }
+    else {
+        // slower byte-by-byte clear for unaligned cases
+        for (int ry = 0; ry < rheight; ry++) {
+            for (int rx = 0; rx < rwidth; rx++)
+                dest[rx] = color;
+            dest += vid.rowbytes;
+        }
+    }
 }
 

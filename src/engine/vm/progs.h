@@ -41,7 +41,7 @@ typedef eval_t* eval_p;
 
 #define MAX_ENT_LEAFS (16)
 typedef struct edict_s {
-    bool        free;
+    bool            free;
     link_t          area;       // linked to a division node or leaf
     int32_t         num_leafs;
     int16_t         leafnums[MAX_ENT_LEAFS];

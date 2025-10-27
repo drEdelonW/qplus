@@ -19,54 +19,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // d_iface.h: interface header file for rasterization driver modules
-#include "vector.h"
 #include "model.h"
+#include "Triangle.h"
+#include "Sprite.h"
+#include "Alias.h"
+
 
 #define WARP_WIDTH  (320)
 #define WARP_HEIGHT (200)
 
 #define MAX_LBM_HEIGHT (480)
-
-typedef struct {
-    float u, v;
-    float s, t;
-    float zi;
-} EmitPoint_t;
-typedef EmitPoint_t* EmitPoint_p;
-
-typedef enum {
-    pt_static,
-    pt_grav,
-    pt_slowgrav,
-    pt_fire,
-    pt_explode,
-    pt_explode2,
-    pt_blob,
-    pt_blob2
-} ParticleType_t;
-
-// !!! if this is changed, it must be changed in d_ifacea.h too !!!
-typedef struct Particle_s Particle_t;
-typedef Particle_t* Particle_p;
-struct Particle_s {
-    // driver-usable fields
-    vec3_t          org;
-    float           color;
-    // drivers never touch the following fields
-    Particle_p      next;
-    vec3_t          vel;
-    float           ramp;
-    float           die;
-    ParticleType_t  type;
-};
-
-#define PARTICLE_Z_CLIP 8.0
-
-typedef struct PolyVert_s {
-    float u, v, zi, s, t;
-} PolyVert_t;
-typedef PolyVert_t* PolyVert_p;
-
 
 typedef struct PolyDesc_s {
     int         numverts;
@@ -75,29 +37,6 @@ typedef struct PolyDesc_s {
     PolyVert_p  pverts;
 } PolyDesc_t;
 
-// flags in FinalVert_t.flags
-
-typedef enum alias_clip_flags_e {
-    ALIAS_LEFT_CLIP = 0x0001,
-    ALIAS_TOP_CLIP = 0x0002,
-    ALIAS_RIGHT_CLIP = 0x0004,
-    ALIAS_BOTTOM_CLIP = 0x0008,
-    ALIAS_Z_CLIP = 0x0010,
-
-    // must stay in sync with d_ifacea.h and modelgen.h
-    ALIAS_ONSEAM = 0x0020,  // also defined in modelgen.h
-    //  must be kept in sync
-    ALIAS_XY_CLIP_MASK = 0x000F
-} AliasClipFlags_f;
-
-// !!! if this is changed, it must be changed in d_ifacea.h too !!!
-typedef struct FinalVert_s {
-    int     v[6];   // u, v, s, t, l, 1/z
-    // int     flags;  //alias_clip_flags_t
-    AliasClipFlags_f    flags;  //alias_clip_flags_t
-    float   reserved;
-} FinalVert_t;
-typedef FinalVert_t* FinalVert_p;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct {
@@ -113,19 +52,10 @@ typedef struct {
 } AffineTriDesc_t;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
-typedef struct {
-    float u, v, zi, color;
-} ScreenPart_t; // ???
+// typedef struct {
+//     float u, v, zi, color;
+// } ScreenPart_t; // ???
 
-typedef struct {
-    int         nump;
-    EmitPoint_p pverts; // there's room for an extra element at [nump],
-    //  if the driver wants to duplicate element [0] at
-    //  element [nump] to avoid dealing with wrapping
-    mSpriteFrame_p  pspriteframe;
-    vec3_t          vup, vright, vpn; // in worldspace
-    float           nearzi;
-} SpriteDesc_t;
 
 typedef struct {
     int     u, v;
@@ -133,8 +63,9 @@ typedef struct {
     int     color;
 } zPointDesc_t;
 
-extern int d_spanpixcount;
-extern int r_framecount;            // sequence # of current frame since Quake started
+
+extern int  d_spanpixcount;
+extern int  r_framecount;            // sequence # of current frame since Quake started
 extern bool r_drawpolys;        // 1 if driver wants clipped polygons rather than a span list
 extern bool r_drawculledpolys;  // 1 if driver wants clipped polygons that have been culled by the edge list
 extern bool r_worldpolysbacktofront;    // 1 if driver wants polygons delivered back to front rather than front to back
@@ -162,7 +93,6 @@ void D_DisableBackBufferAccess();
 void D_EndDirectRect(int x, int y, int width, int height);
 void D_PolysetDraw();
 void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts);
-void D_DrawParticle(Particle_p pparticle);
 void D_DrawPoly();
 void D_DrawSprite();
 void D_DrawSurfaces();
@@ -177,7 +107,7 @@ void D_TurnZOn();
 void D_WarpScreen();
 
 void D_FillRect(vRect_p vrect, int color);
-void D_DrawRect();
+// void D_DrawRect();
 void D_UpdateRects(vRect_p prect);
 
 // currently for internal use only, and should be a do-nothing function in hardware drivers
@@ -202,18 +132,6 @@ extern TypeLess_ptr acolormap; // FIXME: should go away
 //=======================================================================//
 
 // callbacks to Quake
-
-typedef struct {
-    pixel_p     surfdat;                // destination for generated surface
-    int         rowbytes;               // destination logical width in bytes
-    mSurface_p  surf;                   // description for surface to generate
-    fixed8_t    lightadj[MAXLIGHTMAPS]; // adjust for lightmap levels for dynamic lighting
-    Texture_p   texture;                // corrected for animating textures
-    int         surfmip;                // mipmapped ratio of surface texels / world pixels
-    int         surfwidth;              // in mipmapped texels
-    int         surfheight;             // in mipmapped texels
-} DrawSurf_t;
-extern DrawSurf_t r_drawsurf;
 
 void R_DrawSurface();
 void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest);

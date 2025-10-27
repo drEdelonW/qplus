@@ -35,20 +35,21 @@ typedef struct {
     int             count;
     uint8_p         ptex;
     int             sfrac, tfrac, light, zi;
-} spanpackage_t;
-typedef spanpackage_t* spanpackage_p;
+} SpanPackage_t;
+typedef SpanPackage_t* SpanPackage_p;
 
 typedef struct {
     int  isflattop;
-    int  numleftedges;
-    int* pleftedgevert0;
-    int* pleftedgevert1;
-    int* pleftedgevert2;
-    int  numrightedges;
-    int* prightedgevert0;
-    int* prightedgevert1;
-    int* prightedgevert2;
-} edgetable;
+    int  numLeftEdges;
+    int* pLeftEdgeVert0;
+    int* pLeftEdgeVert1;
+    int* pLeftEdgeVert2;
+    int  numRightEdges;
+    int* pRightEdgeVert0;
+    int* pRightEdgeVert1;
+    int* pRightEdgeVert2;
+} EdgeTable_t;
+typedef EdgeTable_t* EdgeTable_p;
 
 int r_p0[6], r_p1[6], r_p2[6];
 
@@ -57,9 +58,9 @@ uint8_p d_pcolormap;
 int   d_aflatcolor;
 int   d_xdenom;
 
-edgetable* pedgetable;
+EdgeTable_p pedgetable;
 
-edgetable edgetables[12] = {
+EdgeTable_t edgetables[12] = {
     {0, 1, r_p0, r_p2, NULL, 2, r_p0, r_p1, r_p2},
     {0, 2, r_p1, r_p0, r_p2, 1, r_p1, r_p2, NULL},
     {1, 1, r_p0, r_p2, NULL, 1, r_p1, r_p2, NULL},
@@ -80,8 +81,8 @@ int    r_sstepx, r_tstepx, r_lstepy, r_sstepy, r_tstepy;
 int    r_zistepx, r_zistepy;
 int    d_aspancount, d_countextrastep;
 
-spanpackage_p a_spans;
-spanpackage_p d_pedgespanpackage;
+SpanPackage_p a_spans;
+SpanPackage_p d_pedgespanpackage;
 static int    ystart;
 uint8_p d_pdest, d_ptex;
 int16_p d_pz;
@@ -107,7 +108,7 @@ uint8_p skintable[MAX_LBM_HEIGHT];
 int  skinwidth;
 uint8_p skinstart;
 
-void D_PolysetDrawSpans8(spanpackage_p pspanpackage);
+void D_PolysetDrawSpans8(SpanPackage_p pspanpackage);
 void D_PolysetCalcGradients(int skinwidth);
 void D_DrawSubdiv();
 void D_DrawNonSubdiv();
@@ -124,11 +125,11 @@ D_PolysetDraw
 ================
 */
 void D_PolysetDraw() {
-    spanpackage_t spans[DPS_MAXSPANS + 1 +
-        ((CACHE_SIZE - 1) / sizeof(spanpackage_t)) + 1];
+    SpanPackage_t spans[DPS_MAXSPANS + 1 +
+        ((CACHE_SIZE - 1) / sizeof(SpanPackage_t)) + 1];
     // one extra because of cache line pretouching
 
-    a_spans = (spanpackage_p)
+    a_spans = (SpanPackage_p)
         (((uintptr_t)&spans[0] + CACHE_SIZE - 1) & ~(uintptr_t)(CACHE_SIZE - 1));
 
     if (r_affinetridesc.drawtype)   D_DrawSubdiv();
@@ -522,7 +523,7 @@ void InitGel(uint8_p palette) {
 D_PolysetDrawSpans8
 ================
 */
-void D_PolysetDrawSpans8(spanpackage_p pspanpackage) {
+void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
     do {
         int lcount = d_aspancount - pspanpackage->count;
 
@@ -577,7 +578,7 @@ void D_PolysetDrawSpans8(spanpackage_p pspanpackage) {
 D_PolysetFillSpans8
 ================
 */
-void D_PolysetFillSpans8(spanpackage_p pspanpackage) {
+void D_PolysetFillSpans8(SpanPackage_p pspanpackage) {
     // FIXME: do z buffering
 
     int color = d_aflatcolor++;
@@ -609,11 +610,11 @@ void D_RasterizeAliasPolySmooth() {
     int* plefttop, * prighttop, * pleftbottom, * prightbottom;
     int    working_lstepx, originalcount;
 
-    plefttop = pedgetable->pleftedgevert0;
-    prighttop = pedgetable->prightedgevert0;
+    plefttop = pedgetable->pLeftEdgeVert0;
+    prighttop = pedgetable->pRightEdgeVert0;
 
-    pleftbottom = pedgetable->pleftedgevert1;
-    prightbottom = pedgetable->prightedgevert1;
+    pleftbottom = pedgetable->pLeftEdgeVert1;
+    prightbottom = pedgetable->pRightEdgeVert1;
 
     initialleftheight = pleftbottom[1] - plefttop[1];
     initialrightheight = prightbottom[1] - prighttop[1];
@@ -725,11 +726,11 @@ void D_RasterizeAliasPolySmooth() {
     //
     // scan out the bottom part of the left edge, if it exists
     //
-    if (pedgetable->numleftedges == 2) {
+    if (pedgetable->numLeftEdges == 2) {
         int  height;
 
         plefttop = pleftbottom;
-        pleftbottom = pedgetable->pleftedgevert2;
+        pleftbottom = pedgetable->pLeftEdgeVert2;
 
         height = pleftbottom[1] - plefttop[1];
 
@@ -826,9 +827,9 @@ void D_RasterizeAliasPolySmooth() {
     D_PolysetDrawSpans8(a_spans);
 
     // scan out the bottom part of the right edge, if it exists
-    if (pedgetable->numrightedges == 2) {
+    if (pedgetable->numRightEdges == 2) {
         int    height;
-        spanpackage_p pstart;
+        SpanPackage_p pstart;
 
         pstart = a_spans + initialrightheight;
         pstart->count = originalcount;
@@ -836,7 +837,7 @@ void D_RasterizeAliasPolySmooth() {
         d_aspancount = prightbottom[0] - prighttop[0];
 
         prighttop = prightbottom;
-        prightbottom = pedgetable->prightedgevert2;
+        prightbottom = pedgetable->pRightEdgeVert2;
 
         height = prightbottom[1] - prighttop[1];
 

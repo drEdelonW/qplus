@@ -109,7 +109,8 @@
 			"qparams.h": "c",
 			"server.h": "c",
 			"cmath": "c",
-			"MGLWIN.H": "cpp"
+			"MGLWIN.H": "cpp",
+			"particle.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

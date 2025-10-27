@@ -278,8 +278,7 @@ Draw_TransPic
 =============
 */
 void Draw_TransPic(int x, int y, qPic_p pic) {
-    if (!pic)
-        return;
+    if (!pic)   return;
 
     if ((x < 0) ||
         (y < 0) ||

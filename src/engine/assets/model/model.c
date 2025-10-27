@@ -1032,7 +1032,7 @@ Mod_LoadAliasFrame
 */
 TypeLess_ptr Mod_LoadAliasFrame(TypeLess_ptr  pin, int32_p pframeindex, int32_t numv, TriVertx_p pbboxmin,
     TriVertx_p pbboxmax, AliasHdr_p pheader, cString name) {
-    daliasframe_p pdaliasframe = (daliasframe_p)pin;
+    dAliasFrame_p pdaliasframe = (dAliasFrame_p)pin;
 
     strcpy(name, pdaliasframe->name);
 

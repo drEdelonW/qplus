@@ -125,7 +125,8 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
             trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, neworg, false, ent);
 
             if (trace.fraction == 1) {
-                if (((int)ent->v.flags & FL_SWIM) && SV_PointContents(trace.endpos) == CONTENTS_EMPTY)
+                if (((int)ent->v.flags & FL_SWIM) &&
+                    SV_PointContents(trace.endpos) == CONTENTS_EMPTY)
                     return false; // swim monster left water
 
                 VectorCopy(trace.endpos, ent->v.origin);

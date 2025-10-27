@@ -27,11 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "sys.h"
 #include "mathlib.h"
-
-
-#define ALIAS_BASE_SIZE_RATIO   (1.0 / 11.0)
-                    // normalizing factor so player model works out to about
-                    //  1 pixel per triangle
+#include "Alias.h"
 
 #define BMODEL_FULLY_CLIPPED 0x10 // value returned by R_BmodelCheckBBox ()
                                      //  if bbox is trivially rejected
@@ -46,21 +42,7 @@ typedef struct {
 } aLight_t;
 typedef aLight_t* aLight_p;
 
-//===========================================================================
-// clipped bmodel edges
 
-typedef struct bEdge_s bEdge_t;
-typedef bEdge_t* bEdge_p;
-typedef struct bEdge_s {
-    mVertex_p v[2];
-    bEdge_p pnext;
-} bEdge_t;
-
-typedef struct {
-    // float   fv[3];  // viewspace x, y
-    vec3_t fv;  // viewspace x, y
-} AuxVert_t;
-typedef AuxVert_t* AuxVert_p;
 
 //===========================================================================
 
