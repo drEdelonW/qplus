@@ -20,20 +20,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // client.h
 #include <stdio.h>
-// #include "mathlib.h"
 #include "enginedefs.h"
 #include "platformdefs.h"
-#include "sizebuf.h"
-#include "screen.h"
-#include "vid.h"
 #include "bspfile.h"
 #include "render.h"
-#include "keys.h"
-// #include "cvar_q1.h"
-#include "endian_tools.h"
 #include "sound/sound_struct.h"
 #include "net.h"
-#include "model/model.h"
 
 
 

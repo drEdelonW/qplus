@@ -19,16 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // world.c -- world query functions
 
-#include <string.h>
 #include "world.h"
-#include "model.h"
-#include "bspfile.h"
+#include <string.h>
 #include "server.h"
 #include "sys.h"
 #include "console.h"
-#include "progs.h"
 #include "q_tools.h"
-#include "link.h"
 #include "mathlib.h"
 
 
@@ -830,8 +826,7 @@ SV_Move
 ==================
 */
 trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_t type, edict_p passedict) {
-    moveclip_t clip;
-    memset(&clip, 0, sizeof(moveclip_t));
+    moveclip_t clip;    memset(&clip, 0, sizeof(moveclip_t));
 
     // clip to world
     clip.trace = SV_ClipMoveToEntity(sv.edicts, start, mins, maxs, end);

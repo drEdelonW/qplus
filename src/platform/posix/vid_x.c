@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define _BSD
 
-
 #include <ctype.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -46,6 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include "host.h"
 #include "angle.h"
+#include "q_tools.h"
 
 float   old_windowed_mouse;
 
@@ -65,7 +65,7 @@ typedef struct {
     int output;
 } keymap_t;
 
-extern viddef_t vid; // global video state
+extern VidDef_t vid; // global video state
 uint16_t d_8to16table[256];
 
 int num_shades = 32;

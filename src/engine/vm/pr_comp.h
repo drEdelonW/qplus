@@ -137,16 +137,16 @@ typedef struct statement_s {
     arg_type    a;
     arg_type    b;
     arg_type    c;
-} dstatement_t;
-typedef dstatement_t* dstatement_p;
+} dStatement_t;
+typedef dStatement_t* dStatement_p;
 
 typedef struct {
     uint16_t type;  // if DEF_SAVEGLOBGAL bit is set
     // the variable needs to be saved in savegames
     uint16_t ofs;
     int32_t   s_name;
-} ddef_t;
-typedef ddef_t* ddef_p;
+} dDef_t;
+typedef dDef_t* dDef_p;
 
 #define DEF_SAVEGLOBAL (1 << 15)
 #define MAX_PARMS (8)
@@ -163,8 +163,8 @@ typedef struct {
 
     int32_t  numparms;
     uint8_t parm_size[MAX_PARMS];
-} dfunction_t;
-typedef dfunction_t* dfunction_p;
+} dFunction_t;
+typedef dFunction_t* dFunction_p;
 
 
 #define PROG_VERSION 6

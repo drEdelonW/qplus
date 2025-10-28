@@ -27,14 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern  int sb_lines;			// scan lines to draw
 
 void Sbar_Init();
-
-// call whenever any of the client stats represented on the sbar changes
-void Sbar_Changed();
-
-// called every frame by screen
-void Sbar_Draw();
-
-// called each frame after the level has been completed
-void Sbar_IntermissionOverlay();
-
+void Sbar_Changed();    // call whenever any of the client stats represented on the sbar changes
+void Sbar_Draw();   // called every frame by screen
+void Sbar_IntermissionOverlay();    // called each frame after the level has been completed
 void Sbar_FinaleOverlay();

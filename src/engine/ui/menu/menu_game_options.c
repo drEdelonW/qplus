@@ -3,6 +3,7 @@
 #include "server.h"
 #include "cvar_q1.h"
 #include "host.h"
+#include "screen.h"
 
 //=============================================================================
 /* GAME OPTIONS MENU */

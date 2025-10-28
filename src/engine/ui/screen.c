@@ -19,18 +19,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // screen.c -- master for refresh, status bar, console, chat, notify, etc
 
-#include "r_local.h"
-#include <string.h>
+#include "screen.h"
+#include "endian_tools.h"
 #include "wad.h"
+#include <string.h>
+#include "vid.h"
+#include "cvar_q1.h"
+#include "client.h"
 #include "draw.h"
 #include "host.h"
-#include "keys.h"
 #include "sys.h"
+#include <math.h>
 #include "sbar.h"
 #include "cmd.h"
 #include "console.h"
 #include "q_tools.h"
 #include "common.h"
+#include "d_iface.h"
 #include "sound.h"
 #include "menu.h"
 
@@ -54,14 +59,14 @@ int   scr_fullupdate;
 int   clearconsole;
 int   clearnotify;
 
-viddef_t vid;    // global video state
+VidDef_t vid;    // global video state
 
 vRect_p pconupdate;
 vRect_t  scr_vrect;
 
 bool scr_disabled_for_loading;
 bool scr_drawloading;
-float  scr_disabled_time;
+float scr_disabled_time;
 bool scr_skipupdate;
 
 bool block_drawing;

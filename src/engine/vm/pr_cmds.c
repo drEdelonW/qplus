@@ -18,21 +18,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "cvar_q1.h"
-#include "types.h"
-#include "server.h"
-#include "protocol.h"
-#include "world.h"
-#include "q_tools.h"
+#include "progs.h"
+#include "pr_comp.h"
+#include <string.h>
 #include "console.h"
-#include "msg.h"
+#include "server.h"
+#include "q_tools.h"
 #include "host.h"
+#include "angle.h"
+#include "world.h"
+#include "mathlib.h"
+#include "cvar_q1.h"
+#include "protocol.h"
+#include "msg.h"
 #include "sys.h"
 #include "common.h"
 #include "cmd.h"
-#include "mathlib.h"
 #include <stdlib.h>
-#include <string.h>
 
 #define RETURN_EDICT(edict) (((int *)pr_globals)[OFS_RETURN] = EDICT_TO_PROG(edict))
 
@@ -965,7 +967,7 @@ void PF_walkmove() {
     };
 
     // save program state, because SV_movestep may call other progs
-    dfunction_p oldf = pr_xfunction;
+    dFunction_p oldf = pr_xfunction;
     int oldself = pr_global_struct->self;
 
     G_FLOAT(OFS_RETURN) = SV_movestep(ent, move, true);

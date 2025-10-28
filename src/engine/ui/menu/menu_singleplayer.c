@@ -1,6 +1,7 @@
 #include "menu.h"
 #include "menu_prv.h"
 #include "server.h"
+#include "screen.h"
 
 //=============================================================================
 /* SINGLE PLAYER MENU */

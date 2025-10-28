@@ -26,7 +26,6 @@ void SCR_Init();
 
 void SCR_UpdateScreen();
 
-
 void SCR_SizeUp();
 void SCR_SizeDown();
 void SCR_BringDownConsole();

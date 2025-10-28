@@ -3,16 +3,9 @@
 #include "menu.h"
 #include "keys.h"
 #include "draw.h"
-// #include "q_tools.h"
-// #include "client.h"
-// #include "cvar_q1.h"
 #include "common.h"
-// #include <string.h>
-// #include "server.h"
 #include "sound.h"
-// #include "console.h"
 #include "cmd.h"
-// #include "host.h"
 
 extern m_state_t m_state;
 extern m_state_t m_return_state;

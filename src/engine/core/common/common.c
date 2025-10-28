@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "common.h"
 #include "cvar_q1.h"
-#include "platformdefs.h"
 #include <string.h>
 #include <stdarg.h>
 #include "sys.h"
@@ -32,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "endian_tools.h"
 #include "host.h"
 #include "gamedefs.h"
+#include "q_tools.h"
 
 
 #define NUM_SAFE_ARGVS  7

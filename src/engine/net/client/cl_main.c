@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "console.h"
 #include "sound.h"
+#include "screen.h"
 #include "msg.h"
 #include "common.h"
 #include "protocol.h"

@@ -25,9 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "platformdefs.h"
 #include "types.h"
 
-#include "msg.h"
-#include "q_tools.h"
-#include "sizebuf.h"
 #include "zone.h"
 
 //============================================================================

@@ -53,7 +53,7 @@ static int		vid_stretched, windowed_mouse;
 static bool	palette_changed, syscolchg, vid_mode_set, hide_window, pal_is_nostatic;
 static HICON	hIcon;
 
-viddef_t	vid;				// global video state
+VidDef_t	vid;				// global video state
 
 #define MODE_WINDOWED			0
 #define MODE_SETTABLE_WINDOW	2

@@ -23,6 +23,7 @@
 #include "client.h"
 #include "cvar_q1.h"
 #include "host.h"
+#include "q_tools.h"
 
 
 bool isDedicated;

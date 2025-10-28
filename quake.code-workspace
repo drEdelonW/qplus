@@ -111,7 +111,11 @@
 			"cmath": "c",
 			"MGLWIN.H": "cpp",
 			"particle.h": "c",
-			"cmd.h": "c"
+			"cmd.h": "c",
+			"entitystate.h": "c",
+			"progdefs.h": "c",
+			"d_local.h": "c",
+			"surfcache.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

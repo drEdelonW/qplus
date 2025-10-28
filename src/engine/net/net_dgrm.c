@@ -28,6 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cmd.h"
 #include "console.h"
 #include "menu.h"
+#include "endian_tools.h"
+#include "screen.h"
+#include "q_tools.h"
+#include "msg.h"
 
 
 #define BAN_TEST

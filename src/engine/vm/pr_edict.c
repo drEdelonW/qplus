@@ -30,16 +30,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "crc.h"
 #include "mathlib.h"
+#include "endian_tools.h"
 #include <string.h>
+#include <stdlib.h>
 
 #include "cvar_q1.h"
 
 /* extern */ dprograms_p    progs;
-/* extern */ dfunction_p    pr_functions;
+/* extern */ dFunction_p    pr_functions;
 /* extern */ cString        pr_strings;         // much more
-/* extern */ ddef_p         pr_fielddefs;
-/* extern */ ddef_p         pr_globaldefs;
-/* extern */ dstatement_p   pr_statements;
+/* extern */ dDef_p         pr_fielddefs;
+/* extern */ dDef_p         pr_globaldefs;
+/* extern */ dStatement_p   pr_statements;
 /* extern */ globalvars_p   pr_global_struct;   // much more
 /* extern */ float_p        pr_globals;         // same as pr_global_struct
 /* extern */ int32_t        pr_edict_size;      // in bytes
@@ -62,7 +64,7 @@ int type_size[8] = {
 #define MAX_FIELD_LEN (64)
 #define GEFV_CACHESIZE (2)
 typedef struct {
-    ddef_p  pcache;
+    dDef_p  pcache;
     char    field[MAX_FIELD_LEN];
 } gefv_cache;
 
@@ -154,9 +156,9 @@ void ED_Free(edict_p ed) {
 ED_GlobalAtOfs
 ============
 */
-ddef_p ED_GlobalAtOfs(int ofs) {
+dDef_p ED_GlobalAtOfs(int ofs) {
     for (int i = 0; i < progs->globaldefs.num; i++) {
-        ddef_p def = &pr_globaldefs[i];
+        dDef_p def = &pr_globaldefs[i];
         if (def->ofs == ofs)
             return def;
     }
@@ -168,9 +170,9 @@ ddef_p ED_GlobalAtOfs(int ofs) {
 ED_FieldAtOfs
 ============
 */
-ddef_p ED_FieldAtOfs(int ofs) {
+dDef_p ED_FieldAtOfs(int ofs) {
     for (int i = 0; i < progs->fielddefs.num; i++) {
-        ddef_p def = &pr_fielddefs[i];
+        dDef_p def = &pr_fielddefs[i];
         if (def->ofs == ofs)
             return def;
     }
@@ -182,9 +184,9 @@ ddef_p ED_FieldAtOfs(int ofs) {
 ED_FindField
 ============
 */
-ddef_p ED_FindField(cString name) {
+dDef_p ED_FindField(cString name) {
     for (int i = 0; i < progs->fielddefs.num; i++) {
-        ddef_p def = &pr_fielddefs[i];
+        dDef_p def = &pr_fielddefs[i];
         if (!strcmp(pr_strings + def->s_name, name))
             return def;
     }
@@ -197,9 +199,9 @@ ddef_p ED_FindField(cString name) {
 ED_FindGlobal
 ============
 */
-ddef_p ED_FindGlobal(cString name) {
+dDef_p ED_FindGlobal(cString name) {
     for (int i = 0; i < progs->globaldefs.num; i++) {
-        ddef_p def = &pr_globaldefs[i];
+        dDef_p def = &pr_globaldefs[i];
         if (!strcmp(pr_strings + def->s_name, name))
             return def;
     }
@@ -212,9 +214,9 @@ ddef_p ED_FindGlobal(cString name) {
 ED_FindFunction
 ============
 */
-dfunction_p ED_FindFunction(cString name) {
+dFunction_p ED_FindFunction(cString name) {
     for (int i = 0; i < progs->functions.num; i++) {
-        dfunction_p func = &pr_functions[i];
+        dFunction_p func = &pr_functions[i];
         if (!strcmp(pr_strings + func->s_name, name))
             return func;
     }
@@ -225,7 +227,7 @@ dfunction_p ED_FindFunction(cString name) {
 eval_p GetEdictFieldValue(edict_p ed, cString field) {
     static int  rep = 0;
 
-    ddef_p def = NULL;
+    dDef_p def = NULL;
     for (int i = 0; i < GEFV_CACHESIZE; i++) {
         if (!strcmp(field, _gefvCache[i].field)) {
             def = _gefvCache[i].pcache;
@@ -263,11 +265,11 @@ cString PR_ValueString(etype_t type, eval_p val) {
     case ev_string:     sprintf(line, "%s", pr_strings + val->string);                                          break;
     case ev_entity:     sprintf(line, "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                   break;
     case ev_function:
-        dfunction_p f = pr_functions + val->function;
+        dFunction_p f = pr_functions + val->function;
         sprintf(line, "%s()", pr_strings + f->s_name);
         break;
     case ev_field:
-        ddef_p def = ED_FieldAtOfs(val->_int);
+        dDef_p def = ED_FieldAtOfs(val->_int);
         sprintf(line, ".%s", pr_strings + def->s_name);
         break;
     case ev_void:       sprintf(line, "void");                                                                  break;
@@ -296,11 +298,11 @@ cString PR_UglyValueString(etype_t type, eval_p val) {
     case ev_string:     sprintf(line, "%s", pr_strings + val->string);                              break;
     case ev_entity:     sprintf(line, "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));              break;
     case ev_function:
-        dfunction_p f = pr_functions + val->function;
+        dFunction_p f = pr_functions + val->function;
         sprintf(line, "%s", pr_strings + f->s_name);
         break;
     case ev_field:
-        ddef_p def = ED_FieldAtOfs(val->_int);
+        dDef_p def = ED_FieldAtOfs(val->_int);
         sprintf(line, "%s", pr_strings + def->s_name);
         break;
     case ev_void:       sprintf(line, "void");                                                      break;
@@ -324,7 +326,7 @@ cString PR_GlobalString(int ofs) {
     static char line[128];
 
     TypeLess_ptr val = (TypeLess_ptr)&pr_globals[ofs];
-    ddef_p def = ED_GlobalAtOfs(ofs);
+    dDef_p def = ED_GlobalAtOfs(ofs);
     if (!def)
         sprintf(line, "%i(???)", ofs);
     else {
@@ -343,7 +345,7 @@ cString PR_GlobalString(int ofs) {
 cString PR_GlobalStringNoContents(int ofs) {
     static char line[128];
 
-    ddef_p def = ED_GlobalAtOfs(ofs);
+    dDef_p def = ED_GlobalAtOfs(ofs);
     if (!def)   sprintf(line, "%i(???)", ofs);
     else        sprintf(line, "%i(%s)", ofs, pr_strings + def->s_name);
 
@@ -368,7 +370,7 @@ void ED_Print(edict_p ed) {
 
     Con_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
     for (int i = 1; i < progs->fielddefs.num; i++) {
-        ddef_p d = &pr_fielddefs[i];
+        dDef_p d = &pr_fielddefs[i];
         cString name = pr_strings + d->s_name;
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
@@ -408,7 +410,7 @@ void ED_Write(FILE* f, edict_p ed) {
     if (ed->free) { fprintf(f, "}\n"); return; }
 
     for (int i = 1; i < progs->fielddefs.num; i++) {
-        ddef_p d = &pr_fielddefs[i];
+        dDef_p d = &pr_fielddefs[i];
         cString name = pr_strings + d->s_name;
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
@@ -507,7 +509,7 @@ ED_WriteGlobals
 void ED_WriteGlobals(FILE* f) {
     fprintf(f, "{\n");
     for (int i = 0; i < progs->globaldefs.num; i++) {
-        ddef_p def = &pr_globaldefs[i];
+        dDef_p def = &pr_globaldefs[i];
         int type = def->type;
         if (!(def->type & DEF_SAVEGLOBAL))  continue;
         type &= ~DEF_SAVEGLOBAL;
@@ -545,7 +547,7 @@ void ED_ParseGlobals(cString data) {
         if (!data)                  Sys_Error("ED_ParseEntity: EOF without closing brace");
         if (com_token[0] == '}')    Sys_Error("ED_ParseEntity: closing brace without data");
 
-        ddef_p key = ED_FindGlobal(keyname);
+        dDef_p key = ED_FindGlobal(keyname);
         if (!key) {
             Con_Printf("'%s' is not a global\n", keyname);
             continue;
@@ -592,7 +594,7 @@ Can parse either fields or globals
 returns false if error
 =============
 */
-bool ED_ParseEpair(TypeLess_ptr base, ddef_p key, cString s) {
+bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
     TypeLess_ptr d = (TypeLess_ptr)((int*)base + key->ofs);
 
     switch (key->type & ~DEF_SAVEGLOBAL) {
@@ -617,7 +619,7 @@ bool ED_ParseEpair(TypeLess_ptr base, ddef_p key, cString s) {
     case ev_entity:     *(int*)d = EDICT_TO_PROG(EDICT_NUM(atoi(s)));       break;
 
     case ev_field:
-        ddef_p def = ED_FindField(s);
+        dDef_p def = ED_FindField(s);
         if (!def) {
             Con_Printf("Can't find field %s\n", s);
             return false;
@@ -626,7 +628,7 @@ bool ED_ParseEpair(TypeLess_ptr base, ddef_p key, cString s) {
         break;
 
     case ev_function:
-        dfunction_p func = ED_FindFunction(s);
+        dFunction_p func = ED_FindFunction(s);
         if (!func) {
             Con_Printf("Can't find function %s\n", s);
             return false;
@@ -698,7 +700,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
         if (keyname[0] == '_')
             continue;
 
-        ddef_p key = ED_FindField(keyname);
+        dDef_p key = ED_FindField(keyname);
         if (!key) {
             Con_Printf("'%s' is not a field\n", keyname);
             continue;
@@ -780,7 +782,7 @@ void ED_LoadFromFile(cString data) {
         }
 
         // look for the spawn function
-        dfunction_p func = ED_FindFunction(pr_strings + ent->v.classname);
+        dFunction_p func = ED_FindFunction(pr_strings + ent->v.classname);
 
         if (!func) {
             Con_Printf("No spawn function for:\n");
@@ -824,11 +826,11 @@ void PR_LoadProgs() {
     if (progs->version != PROG_VERSION)     Sys_Error("progs.dat has wrong version number (%i should be %i)", progs->version, PROG_VERSION);
     if (progs->crc != PROGHEADER_CRC)       Sys_Error("progs.dat system vars have been modified, progdefs.h is out of date");
 
-    pr_functions = (dfunction_p)((uint8_p)progs + progs->functions.ofs);
+    pr_functions = (dFunction_p)((uint8_p)progs + progs->functions.ofs);
     pr_strings = (cString)progs + progs->strings.ofs;
-    pr_globaldefs = (ddef_p)((uint8_p)progs + progs->globaldefs.ofs);
-    pr_fielddefs = (ddef_p)((uint8_p)progs + progs->fielddefs.ofs);
-    pr_statements = (dstatement_p)((uint8_p)progs + progs->statements.ofs);
+    pr_globaldefs = (dDef_p)((uint8_p)progs + progs->globaldefs.ofs);
+    pr_fielddefs = (dDef_p)((uint8_p)progs + progs->fielddefs.ofs);
+    pr_statements = (dStatement_p)((uint8_p)progs + progs->statements.ofs);
 
     pr_global_struct = (globalvars_p)((uint8_p)progs + progs->globals.ofs);
     pr_globals = (float_p)pr_global_struct;

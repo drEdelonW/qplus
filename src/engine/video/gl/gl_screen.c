@@ -104,7 +104,7 @@ int			clearnotify;
 
 int			sb_lines;
 
-viddef_t	vid;				// global video state
+VidDef_t	vid;				// global video state
 
 vRect_t		scr_vrect;
 

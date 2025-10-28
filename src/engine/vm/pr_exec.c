@@ -18,8 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "types.h"
-#include "pr_comp.h"
 #include "progs.h"
 #include "console.h"
 #include "server.h"
@@ -31,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct {
     int32_t     stack;
-    dfunction_p func;
+    dFunction_p func;
 } prstack_t;
 
 #define	MAX_STACK_DEPTH		32
@@ -43,7 +41,7 @@ static int32_t _localstack[LOCALSTACK_SIZE];
 static int32_t _localstack_used;
 
 /* extern */ bool	 pr_trace;
-/* extern */ dfunction_p pr_xfunction;
+/* extern */ dFunction_p pr_xfunction;
 /* extern */ int32_t     pr_xstatement;
 /* extern */ int32_t     pr_argc;
 /* extern */ cString     pr_opnames[OP_LAST] = {
@@ -145,7 +143,7 @@ cString PR_GlobalStringNoContents(int ofs);
     PR_PrintStatement
     =================
 */
-void PR_PrintStatement(dstatement_p state) {
+void PR_PrintStatement(dStatement_p state) {
     // if ((uint32_t)state->op < (sizeof(pr_opnames) / sizeof(pr_opnames[0]))) {
     if (state->op < OP_LAST) {
         Con_Printf("%s ", pr_opnames[state->op]);
@@ -178,18 +176,13 @@ void PR_PrintStatement(dstatement_p state) {
     ============
 */
 void PR_StackTrace() {
-    if (_pr_depth == 0) {
-        Con_Printf("<NO STACK>\n");
-        return;
-    }
+    if (_pr_depth == 0) { Con_Printf("<NO STACK>\n"); return; }
 
     _pr_stack[_pr_depth].func = pr_xfunction;
     for (int i = _pr_depth; i >= 0; i--) {
-        dfunction_p func = _pr_stack[i].func;
+        dFunction_p func = _pr_stack[i].func;
 
-        if (!func) {
-            Con_Printf("<NO FUNCTION>\n");
-        }
+        if (!func) { Con_Printf("<NO FUNCTION>\n"); }
         else
             Con_Printf(
                 "%12s : %s\n",
@@ -207,19 +200,19 @@ void PR_StackTrace() {
     ============
 */
 void PR_Profile_f() {
-    dfunction_p best;
-    int num = 0;
+    dFunction_p best;
     do {
         int max = 0;
         best = NULL;
         for (int i = 0; i < progs->functions.num; i++) {
-            dfunction_p func = &pr_functions[i];
+            dFunction_p func = &pr_functions[i];
             if (func->profile > max) {
                 max = func->profile;
                 best = func;
             }
         }
         if (best) {
+            int num = 0;
             if (num < 10)
                 Con_Printf(
                     "%7i %s\n",
@@ -272,14 +265,13 @@ PR_EnterFunction
 Returns the new program statement counter
 ====================
 */
-int PR_EnterFunction(dfunction_p func) {
+int PR_EnterFunction(dFunction_p func) {
     _pr_stack[_pr_depth] = (prstack_t){
         .stack = pr_xstatement,
         .func = pr_xfunction
     };
     _pr_depth++;
-    if (_pr_depth >= MAX_STACK_DEPTH)
-        PR_RunError("stack overflow");
+    if (_pr_depth >= MAX_STACK_DEPTH)        PR_RunError("stack overflow");
 
     // save off any locals that the new function steps on
     int param_used = func->locals;
@@ -309,14 +301,12 @@ PR_LeaveFunction
 ====================
 */
 int PR_LeaveFunction() {
-    if (_pr_depth <= 0)
-        Sys_Error("prog stack underflow");
+    if (_pr_depth <= 0)     Sys_Error("prog stack underflow");
 
     // restore locals from the stack
     int param_used = pr_xfunction->locals;
     _localstack_used -= param_used;
-    if (_localstack_used < 0)
-        PR_RunError("PR_ExecuteProgram: locals stack underflow\n");
+    if (_localstack_used < 0)   PR_RunError("PR_ExecuteProgram: locals stack underflow\n");
 
     for (int i = 0; i < param_used; i++)
         ((int*)pr_globals)[pr_xfunction->parm_start + i] = _localstack[_localstack_used + i];
@@ -341,7 +331,7 @@ void PR_ExecuteProgram(func_t fnum) {
         Host_Error("PR_ExecuteProgram: NULL function");
     }
 
-    dfunction_p func = &pr_functions[fnum];
+    dFunction_p func = &pr_functions[fnum];
 
     int runaway = 100000;
     pr_trace = false;
@@ -354,46 +344,39 @@ void PR_ExecuteProgram(func_t fnum) {
     while (1) {
         stack++;	// next statement
 
-        dstatement_p st = &pr_statements[stack];
+        dStatement_p st = &pr_statements[stack];
         eval_p a = (eval_p)&pr_globals[st->a];
         eval_p b = (eval_p)&pr_globals[st->b];
         eval_p c = (eval_p)&pr_globals[st->c];
 
-        if (!--runaway)
-            PR_RunError("runaway loop error");
+        if (!--runaway)     PR_RunError("runaway loop error");
 
         pr_xfunction->profile++;
         pr_xstatement = stack;
 
-        if (pr_trace)
-            PR_PrintStatement(st);
+        if (pr_trace)       PR_PrintStatement(st);
 
         switch (st->op) {
-        case OP_ADD_F:
-            c->_float = a->_float + b->_float;
-            break;
+        case OP_ADD_F:      c->_float = a->_float + b->_float;      break;
         case OP_ADD_V:
             c->vector[0] = a->vector[0] + b->vector[0];
             c->vector[1] = a->vector[1] + b->vector[1];
             c->vector[2] = a->vector[2] + b->vector[2];
             break;
 
-        case OP_SUB_F:
-            c->_float = a->_float - b->_float;
-            break;
+        case OP_SUB_F:      c->_float = a->_float - b->_float;      break;
         case OP_SUB_V:
             c->vector[0] = a->vector[0] - b->vector[0];
             c->vector[1] = a->vector[1] - b->vector[1];
             c->vector[2] = a->vector[2] - b->vector[2];
             break;
 
-        case OP_MUL_F:
-            c->_float = a->_float * b->_float;
-            break;
+        case OP_MUL_F:      c->_float = a->_float * b->_float;      break;
         case OP_MUL_V:
-            c->_float = a->vector[0] * b->vector[0]
-                + a->vector[1] * b->vector[1]
-                + a->vector[2] * b->vector[2];
+            c->_float =
+                a->vector[0] * b->vector[0] +
+                a->vector[1] * b->vector[1] +
+                a->vector[2] * b->vector[2];
             break;
         case OP_MUL_FV:
             c->vector[0] = a->_float * b->vector[0];
@@ -406,58 +389,25 @@ void PR_ExecuteProgram(func_t fnum) {
             c->vector[2] = b->_float * a->vector[2];
             break;
 
-        case OP_DIV_F:
-            c->_float = a->_float / b->_float;
-            break;
-
-        case OP_BITAND:
-            c->_float = (int)a->_float & (int)b->_float;
-            break;
-
-        case OP_BITOR:
-            c->_float = (int)a->_float | (int)b->_float;
-            break;
+        case OP_DIV_F:      c->_float = a->_float / b->_float;              break;
+        case OP_BITAND:     c->_float = (int)a->_float & (int)b->_float;    break;
+        case OP_BITOR:      c->_float = (int)a->_float | (int)b->_float;    break;
 
 
-        case OP_GE:
-            c->_float = a->_float >= b->_float;
-            break;
-        case OP_LE:
-            c->_float = a->_float <= b->_float;
-            break;
-        case OP_GT:
-            c->_float = a->_float > b->_float;
-            break;
-        case OP_LT:
-            c->_float = a->_float < b->_float;
-            break;
-        case OP_AND:
-            c->_float = a->_float && b->_float;
-            break;
-        case OP_OR:
-            c->_float = a->_float || b->_float;
-            break;
+        case OP_GE:         c->_float = a->_float >= b->_float;     break;
+        case OP_LE:         c->_float = a->_float <= b->_float;     break;
+        case OP_GT:         c->_float = a->_float > b->_float;      break;
+        case OP_LT:         c->_float = a->_float < b->_float;      break;
+        case OP_AND:        c->_float = a->_float && b->_float;     break;
+        case OP_OR:         c->_float = a->_float || b->_float;     break;
 
-        case OP_NOT_F:
-            c->_float = !a->_float;
-            break;
-        case OP_NOT_V:
-            c->_float = !a->vector[0] && !a->vector[1] && !a->vector[2];
-            break;
-        case OP_NOT_S:
-            // c->_float = !a->string || !pr_strings[a->string];
-            c->_float = !a->string || !*PR_GetStringSafe(a->string);
-            break;
-        case OP_NOT_FNC:
-            c->_float = !a->function;
-            break;
-        case OP_NOT_ENT:
-            c->_float = (PROG_TO_EDICT(a->edict) == sv.edicts);
-            break;
+        case OP_NOT_F:      c->_float = !a->_float;     break;
+        case OP_NOT_V:      c->_float = !a->vector[0] && !a->vector[1] && !a->vector[2];    break;
+        case OP_NOT_S:      c->_float = !a->string || !*PR_GetStringSafe(a->string);        break;        // c->_float = !a->string || !pr_strings[a->string];
+        case OP_NOT_FNC:    c->_float = !a->function;   break;
+        case OP_NOT_ENT:    c->_float = (PROG_TO_EDICT(a->edict) == sv.edicts); break;
+        case OP_EQ_F:       c->_float = a->_float == b->_float;                 break;
 
-        case OP_EQ_F:
-            c->_float = a->_float == b->_float;
-            break;
         case OP_EQ_V:
             c->_float = (a->vector[0] == b->vector[0]) &&
                 (a->vector[1] == b->vector[1]) &&
@@ -471,14 +421,8 @@ void PR_ExecuteProgram(func_t fnum) {
             // c->_float = a->_int == b->_int;
             c->_float = (a->_int == b->_int);
             break;
-        case OP_EQ_FNC:
-            c->_float = a->function == b->function;
-            break;
-
-
-        case OP_NE_F:
-            c->_float = a->_float != b->_float;
-            break;
+        case OP_EQ_FNC:     c->_float = a->function == b->function;     break;
+        case OP_NE_F:       c->_float = a->_float != b->_float;     break;
         case OP_NE_V:
             c->_float =
                 (a->vector[0] != b->vector[0]) ||
@@ -489,21 +433,15 @@ void PR_ExecuteProgram(func_t fnum) {
             // c->_float = strcmp(pr_strings + a->string, pr_strings + b->string);
             c->_float = strcmp(PR_GetStringSafe(a->string), PR_GetStringSafe(b->string));
             break;
-        case OP_NE_E:
-            c->_float = a->_int != b->_int;
-            break;
-        case OP_NE_FNC:
-            c->_float = a->function != b->function;
-            break;
+        case OP_NE_E:       c->_float = a->_int != b->_int;     break;
+        case OP_NE_FNC:     c->_float = a->function != b->function;     break;
 
             //==================
         case OP_STORE_F:
         case OP_STORE_ENT:
         case OP_STORE_FLD:		// integers
         case OP_STORE_S:
-        case OP_STORE_FNC:		// pointers
-            b->_int = a->_int;
-            break;
+        case OP_STORE_FNC:  b->_int = a->_int;  break;  // pointers
         case OP_STORE_V:
             b->vector[0] = a->vector[0];
             b->vector[1] = a->vector[1];
@@ -585,9 +523,7 @@ void PR_ExecuteProgram(func_t fnum) {
                 stack += st->b - 1;	// offset the stack++
             break;
 
-        case OP_GOTO:
-            stack += st->a - 1;	// offset the stack++
-            break;
+        case OP_GOTO:   stack += st->a - 1;     break;  // offset the stack++
 
         case OP_CALL0:
         case OP_CALL1:
@@ -602,7 +538,7 @@ void PR_ExecuteProgram(func_t fnum) {
             if (!a->function)
                 PR_RunError("NULL function");
 
-            dfunction_p newf = &pr_functions[a->function];
+            dFunction_p newf = &pr_functions[a->function];
 
             if (newf->first_statement < 0) {	// negative statements are built in functions
                 int i = -newf->first_statement;
@@ -642,8 +578,7 @@ void PR_ExecuteProgram(func_t fnum) {
         }
         break;
 
-        default:
-            PR_RunError("Bad opcode %i", st->op);
+        default:    PR_RunError("Bad opcode %i", st->op);
         }
     }
 

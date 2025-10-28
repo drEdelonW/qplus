@@ -2,6 +2,7 @@
 #include "menu_prv.h"
 #include "menu_net.h"
 #include "net.h"
+#include "q_tools.h"
 #include <string.h>
 
 //=============================================================================

@@ -33,6 +33,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "versions.h"
 #include "cvar_q1.h"
 #include "Alias.h"
+#include "screen.h"
+#include "q_tools.h"
+#include "msg.h"
 
 
 int32_t current_skill;

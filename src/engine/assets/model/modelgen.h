@@ -28,27 +28,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // * pass data from one to the other via model files.      *
 // *********************************************************
 
-#ifdef INCLUDELIBS
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-
-#include "cmdlib.h"
-#include "scriplib.h"
-#include "trilib.h"
-#include "lbmlib.h"
-#include "mathlib.h"
-
-#endif
-
-#include "vector.h"
-#include "types.h"
 
 #define ALIAS_VERSION 6
-
-// #define DT_FACES_FRONT  0x0010
 
 #define IDPOLYHEADER    (('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
 // little-endian "IDPO"

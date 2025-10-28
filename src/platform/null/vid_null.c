@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "d_local.h"
 
-viddef_t	vid;				// global video state
+VidDef_t	vid;				// global video state
 
 #define	BASEWIDTH	320
 #define	BASEHEIGHT	200

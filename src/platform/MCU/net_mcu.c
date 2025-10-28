@@ -57,8 +57,6 @@ net_driver_t net_drivers[MAX_NET_DRIVERS] = {
 
 int32_t net_numdrivers = 1;
 
-// #include "net_udp.h"
-
 net_landriver_t net_landrivers[MAX_NET_DRIVERS] = {
     // {
     //     "UDP",

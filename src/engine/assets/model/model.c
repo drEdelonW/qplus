@@ -24,12 +24,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string.h>
 #include "model.h"
+#include "spritegn.h"
 #include "sys.h"
 #include "common.h"
 #include "q_tools.h"
 #include "console.h"
 #include "d_iface.h"
 #include "r_local.h"
+#include "endian_tools.h"
 
 Model_p loadmodel;
 static char _loadName[32]; // for hunk tags

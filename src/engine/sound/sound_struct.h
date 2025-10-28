@@ -3,7 +3,6 @@
 #include "platformdefs.h"
 #include "zone.h"
 #include "vector.h"
-// #include "mathlib.h"
 // !!! if this is changed, it much be changed in asm_i386.h too !!!
 typedef struct {
     int left;

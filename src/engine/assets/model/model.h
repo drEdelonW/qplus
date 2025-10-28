@@ -18,15 +18,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-#include "enginedefs.h"
-#include "modelgen.h"
-#include "spritegn.h"
-#include "bspfile.h"
-#include "render.h"
-#include "platformdefs.h"
-#include "zone.h"
-
-#include "Vertex.h"
+#include "Model.h"
 
 #define TOP_RANGE  (16)   // soldier uniform colors
 #define BOTTOM_RANGE (96)

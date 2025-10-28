@@ -58,7 +58,7 @@ static uint8_t	backingbuf[48 * 24];
 VGA_BeginDirectRect
 ================
 */
-void VGA_BeginDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode, int x,
+void VGA_BeginDirectRect(VidDef_p lvid, struct vmode_s* pcurrentmode, int x,
 	int y, uint8_p pbitmap, int width, int height) {
 	int		i, j, k, plane, reps, repshift;
 
@@ -118,7 +118,7 @@ void VGA_BeginDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode, int x,
 VGA_EndDirectRect
 ================
 */
-void VGA_EndDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode, int x,
+void VGA_EndDirectRect(VidDef_p lvid, struct vmode_s* pcurrentmode, int x,
 	int y, int width, int height) {
 	int		i, j, k, plane, reps, repshift;
 
@@ -216,7 +216,7 @@ void VGA_ClearVideoMem(int planar) {
 VGA_FreeAndAllocVidbuffer
 ================
 */
-bool VGA_FreeAndAllocVidbuffer(viddef_p lvid, int allocnewbuffer) {
+bool VGA_FreeAndAllocVidbuffer(VidDef_p lvid, int allocnewbuffer) {
 	int		tsize, tbuffersize;
 
 	if (allocnewbuffer) {
@@ -302,7 +302,7 @@ bool VGA_CheckAdequateMem(int width, int height, int rowbytes,
 VGA_InitMode
 ================
 */
-int VGA_InitMode(viddef_p lvid, vmode_t* pcurrentmode) {
+int VGA_InitMode(VidDef_p lvid, vmode_t* pcurrentmode) {
 	vextra_t* pextra;
 
 	pextra = pcurrentmode->pextradata;
@@ -368,7 +368,7 @@ int VGA_InitMode(viddef_p lvid, vmode_t* pcurrentmode) {
 VGA_SetPalette
 ================
 */
-void VGA_SetPalette(viddef_p lvid, vmode_t* pcurrentmode, uint8_p pal) {
+void VGA_SetPalette(VidDef_p lvid, vmode_t* pcurrentmode, uint8_p pal) {
 	int shiftcomponents = 2;
 	int i;
 
@@ -386,7 +386,7 @@ void VGA_SetPalette(viddef_p lvid, vmode_t* pcurrentmode, uint8_p pal) {
 VGA_SwapBuffersCopy
 ================
 */
-void VGA_SwapBuffersCopy(viddef_p lvid, vmode_t* pcurrentmode,
+void VGA_SwapBuffersCopy(VidDef_p lvid, vmode_t* pcurrentmode,
 	vRect_p rects) {
 
 	UNUSED(pcurrentmode);
@@ -421,7 +421,7 @@ void VGA_SwapBuffersCopy(viddef_p lvid, vmode_t* pcurrentmode,
 VGA_SwapBuffers
 ================
 */
-void VGA_SwapBuffers(viddef_p lvid, vmode_t* pcurrentmode, vRect_p rects) {
+void VGA_SwapBuffers(VidDef_p lvid, vmode_t* pcurrentmode, vRect_p rects) {
 	UNUSED(lvid);
 
 	if (vid_wait.value == VID_WAIT_VSYNC)

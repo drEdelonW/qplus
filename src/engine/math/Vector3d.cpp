@@ -1,7 +1,5 @@
 // Vector3D.cpp
 #include "Vector3d.hpp"
-// #include <cmath>
-// #include <limits>
 #include <math.h>   // sqrtf, fabsf
 
 

@@ -42,7 +42,6 @@ typedef struct {
 } Hull_t;
 typedef Hull_t* Hull_p;
 
-#include "model_effect.h"
 typedef enum {
     NL_PRESENT = 0,      // model is already loaded
     NL_NEEDS_LOADED = 1, // model must be loaded

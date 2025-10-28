@@ -67,10 +67,10 @@ typedef struct{
     int         maxwarpheight;
     pixel_p     direct;		// direct drawing to framebuffer, if not
 									//  NULL
-} viddef_t;
-typedef viddef_t* viddef_p;
+} VidDef_t;
+typedef VidDef_t* VidDef_p;
 
-extern	viddef_t    vid;				// global video state
+extern	VidDef_t    vid;				// global video state
 extern	uint16_t    d_8to16table[256];
 extern	uint32_t    d_8to24table[256];
 extern void (*vid_menudrawfn)();

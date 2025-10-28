@@ -114,8 +114,8 @@ static uint8_p ppal;
 bool	vsync_exists, de_exists;
 
 bool VID_ExtraGetModeInfo(int modenum);
-int VID_ExtraInitMode(viddef_p vid, vmode_p pcurrentmode);
-void VID_ExtraSwapBuffers(viddef_p vid, vmode_p pcurrentmode, vRect_p rects);
+int VID_ExtraInitMode(VidDef_p vid, vmode_p pcurrentmode);
+void VID_ExtraSwapBuffers(VidDef_p vid, vmode_p pcurrentmode, vRect_p rects);
 
 
 /*
@@ -124,7 +124,7 @@ VGA_BankedBeginDirectRect
 ================
 */
 void VGA_BankedBeginDirectRect(
-    viddef_p lvid,
+    VidDef_p lvid,
     struct vmode_s* pcurrentmode,
     int x, int y,
     uint8_p pbitmap,
@@ -152,7 +152,7 @@ void VGA_BankedBeginDirectRect(
 VGA_BankedEndDirectRect
 ================
 */
-void VGA_BankedEndDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode,
+void VGA_BankedEndDirectRect(VidDef_p lvid, struct vmode_s* pcurrentmode,
     int x, int y, int width, int height) {
 
     if (!lvid->direct)
@@ -177,7 +177,7 @@ void VGA_BankedEndDirectRect(viddef_p lvid, struct vmode_s* pcurrentmode,
 VID_SetVESAPalette
 ================
 */
-void VID_SetVESAPalette(viddef_p lvid, vmode_p pcurrentmode,
+void VID_SetVESAPalette(VidDef_p lvid, vmode_p pcurrentmode,
     uint8_p pal) {
     int		i;
     uint8_p pp;
@@ -551,7 +551,7 @@ bool VID_ExtraGetModeInfo(int modenum) {
 VID_ExtraInitMode
 ================
 */
-int VID_ExtraInitMode(viddef_p lvid, vmode_p pcurrentmode) {
+int VID_ExtraInitMode(VidDef_p lvid, vmode_p pcurrentmode) {
     vesa_extra_t* pextra;
     int				pageoffset;
 
@@ -671,7 +671,7 @@ int VID_ExtraInitMode(viddef_p lvid, vmode_p pcurrentmode) {
 VID_ExtraSwapBuffers
 ================
 */
-void VID_ExtraSwapBuffers(viddef_p lvid, vmode_p pcurrentmode, vRect_p rects) {
+void VID_ExtraSwapBuffers(VidDef_p lvid, vmode_p pcurrentmode, vRect_p rects) {
     int	pageoffset;
 
     // UNUSED(rects);

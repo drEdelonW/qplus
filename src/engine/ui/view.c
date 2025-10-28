@@ -20,20 +20,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // view.c -- player eye positioning
 
 
-#include <stdlib.h>  // for atoi()
 #include "view.h"
+#include <math.h>
+#include <stdlib.h>  // for atoi()
+#include "angle.h"
+#include "chase.h"
 #include "client.h"
+#include "console.h"
+#include "cmd.h"
+#include "cvar_q1.h"
+#include "draw.h"
 #include "gamedefs.h"
 #include "host.h"
 #include "msg.h"
-#include "render.h"
-#include "draw.h"
-#include "console.h"
-#include "cmd.h"
-#include "chase.h"
-#include "cvar_q1.h"
 #include "q_tools.h"
-#include "mathlib.h"
 
 /*
 

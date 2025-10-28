@@ -19,15 +19,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // chase.c -- chase camera code
 
-#include <stdio.h>
-#include <string.h>
 #include "chase.h"
-#include "mathlib.h"
+#include <string.h>
 #include <math.h>
-#include "common.h"        // qbulean
-#include "cvar.h"
+#include "angle.h"
 #include "cvar_q1.h"
 #include "client.h"
+#include "q_tools.h"
+#include "vector.h"
 #include "world.h"
 
 
@@ -45,18 +44,7 @@ void Chase_Init() {
     Cvar_RegisterVariable(&chase_active);
 }
 
-void Chase_Reset() {
-    // for respawning and teleporting
-//    start position 12 units behind head
-}
-
-bool SV_RecursiveHullCheck(
-    Hull_p hull,
-    int num,
-    float p1f, float p2f,
-    vec3_t p1, vec3_t p2,
-    trace_p trace
-); // engine/world/world.c
+void Chase_Reset() {} // for respawning and teleporting start position 12 units behind head
 
 void TraceLine(vec3_t start, vec3_t end, vec3_t impact) {
     trace_t  trace; memset(&trace, 0, sizeof(trace));

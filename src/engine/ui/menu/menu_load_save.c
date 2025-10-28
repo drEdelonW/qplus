@@ -5,6 +5,7 @@
 #include "common.h"
 #include "server.h"
 #include "cmd.h"
+#include "screen.h"
 
 
 //=============================================================================

@@ -1,5 +1,4 @@
 
-// #include "vector.h"
 extern "C" {
 #include "vector.h"
 }
