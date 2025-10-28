@@ -43,65 +43,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // <endrepeat>
 //-------------------------------------------------------
 
-#ifdef INCLUDELIBS
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-
-#include "cmdlib.h"
-#include "scriplib.h"
-#include "dictlib.h"
-#include "trilib.h"
-#include "lbmlib.h"
-#include "mathlib.h"
-
-#endif
 
 #define SPRITE_VERSION	1
-
-// must match definition in modelgen.h
-#ifndef SYNCTYPE_T
-#define SYNCTYPE_T
-typedef enum {
-    ST_SYNC = 0,
-    ST_RAND
-} SyncType_t;
-#endif
-
-// TODO: shorten these?
-typedef struct {
-    int32_t     ident;
-    int32_t     version;
-    int32_t     type;
-    float       boundingradius;
-    int32_t     width;
-    int32_t     height;
-    int32_t     numframes;
-    float       beamlength;
-    SyncType_t  synctype;
-} dSprite_t;
-typedef dSprite_t* dSprite_p;
-
-typedef struct {
-    int32_t origin[2];
-    int32_t width;
-    int32_t height;
-} dSpriteFrame_t;
-typedef dSpriteFrame_t* dSpriteFrame_p;
-
-typedef struct {
-    int32_t numframes;
-} dSpriteGroup_t;
-typedef dSpriteGroup_t* dSpriteGroup_p;
-
-typedef struct {
-    float   interval;
-} dSpriteInterval_t;
-typedef dSpriteInterval_t* dSpriteInterval_p;
-
-
 
 #define IDSPRITEHEADER	(('P' << 24) + ('S' << 16) + ('D' << 8) + 'I')
 // little-endian "IDSP"

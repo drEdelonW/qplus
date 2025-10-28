@@ -110,7 +110,8 @@
 			"server.h": "c",
 			"cmath": "c",
 			"MGLWIN.H": "cpp",
-			"particle.h": "c"
+			"particle.h": "c",
+			"cmd.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

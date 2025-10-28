@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>  // for atoi()
 #include "view.h"
 #include "client.h"
-#include "enginedefs.h"
+#include "gamedefs.h"
 #include "host.h"
 #include "msg.h"
 #include "render.h"

@@ -55,6 +55,11 @@ typedef enum {
     mod_alias
 } ModType_t;
 
+typedef enum {
+    ST_SYNC = 0,
+    ST_RAND
+} SyncType_t;
+
 typedef struct Model_s Model_t;
 typedef Model_t* Model_p;
 struct Model_s {
@@ -88,6 +93,26 @@ struct Model_s {
 } ;
 
 
+// must match definition in spritegn.h
+typedef struct {
+    int32_t     ident;
+    int32_t     version;
+    vec3_t      scale;
+    vec3_t      scale_origin;
+    float       boundingradius;
+    vec3_t      eyeposition;
+    int32_t     numskins;
+    int32_t     skinwidth;
+    int32_t     skinheight;
+    int32_t     numverts;
+    int32_t     numtris;
+    int32_t     numframes;
+    SyncType_t  synctype;
+    int32_t     flags;
+    float       size;
+} Mdl_t;
+typedef Mdl_t* Mdl_p;
+
 typedef struct {
     int32_t fileofs;
     int32_t filelen;
@@ -119,3 +144,5 @@ typedef struct {
     Lump_t  lumps[HEADER_LUMPS];
 } dHeader_t;
 typedef dHeader_t* dHeader_p;
+
+

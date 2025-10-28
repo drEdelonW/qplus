@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vid.h"
 #include "eFrag.h"
 #include "model/model.h"
+#include "EntityState.h"
 
 // #define MAXCLIPPLANES (11). /* not used */
 

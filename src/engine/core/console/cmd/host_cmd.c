@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cmd.h"
 #include <string.h>
 #include <stdlib.h>
-#include "enginedefs.h"
+#include "gamedefs.h"
 #include "server.h"
 #include "console.h"
 #include "keys.h"

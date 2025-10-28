@@ -14,3 +14,12 @@ typedef struct mTriangle_s {
     int32_t vertindex[3];
 } mTriangle_t;
 typedef mTriangle_t* mTriangle_p;
+
+// This mirrors trivert_t in trilib.h, is present so Quake knows how to
+// load this data
+
+typedef struct {
+    uint8_t v[3];
+    uint8_t lightnormalindex;
+} TriVertx_t;
+typedef TriVertx_t* TriVertx_p;

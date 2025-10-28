@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sbar.h"
 #include "wad.h"
 #include "cvar_q1.h"
-#include "enginedefs.h"
+#include "gamedefs.h"
 #include "draw.h"
 #include "common.h"
 #include "cmd.h"

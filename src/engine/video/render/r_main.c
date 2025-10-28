@@ -22,33 +22,34 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "sound.h"
 #include "cmd.h"
+#include "gamedefs.h"
 
 //define PASSAGES
 
 TypeLess_ptr colormap;
-vec3_t      viewlightvec;
+vec3_t  viewlightvec;
 aLight_t    r_viewlighting = { 128, 192, viewlightvec };
-float       r_time1;
-int         r_numallocatededges;
+float   r_time1;
+int     r_numallocatededges;
 bool    r_drawpolys;
 bool    r_drawculledpolys;
 bool    r_worldpolysbacktofront;
 bool    r_recursiveaffinetriangles = true;
-int         r_pixbytes = 1;
-float       r_aliasuvscale = 1.0;
-int         r_outofsurfaces;
-int         r_outofedges;
+int     r_pixbytes = 1;
+float   r_aliasuvscale = 1.0;
+int     r_outofsurfaces;
+int     r_outofedges;
 
-bool r_dowarp, r_dowarpold, r_viewchanged;
+bool    r_dowarp, r_dowarpold, r_viewchanged;
 
 int   numbtofpolys;
 btofpoly_p  pbtofpolys;
 mVertex_p r_pcurrentvertbase;
 
-int   c_surf;
-int   r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
+int c_surf;
+int r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
 bool r_surfsonstack;
-int   r_clipflags;
+int r_clipflags;
 
 uint8_p     r_warpbuffer;
 uint8_p     r_stack_start;
@@ -938,10 +939,10 @@ void R_RenderView_() {
 void R_RenderView() {
     int dummy;
     int delta = (uint8_p)&dummy - r_stack_start;
-    if (delta < -10000 || delta > 10000)    Sys_Error("R_RenderView: called without enough stack");
-    if (Hunk_LowMark() & 3)                 Sys_Error("Hunk is missaligned");
-    if ((uintptr_t)(&dummy) & 3)            Sys_Error("Stack is missaligned");
-    if ((uintptr_t)(&r_warpbuffer) & 3)     Sys_Error("Globals are missaligned");
+    if ((delta < -10000) || (delta > 10000))    Sys_Error("R_RenderView: called without enough stack");
+    if (Hunk_LowMark() & 3)                     Sys_Error("Hunk is missaligned");
+    if ((uintptr_t)(&dummy) & 3)                Sys_Error("Stack is missaligned");
+    if ((uintptr_t)(&r_warpbuffer) & 3)         Sys_Error("Globals are missaligned");
 
     R_RenderView_();
 }

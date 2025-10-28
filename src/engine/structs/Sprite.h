@@ -83,3 +83,36 @@ typedef struct {
     mSpriteFrameDesc_t  frames[1];
 } mSprite_t;
 typedef mSprite_t* mSprite_p;
+
+
+
+// TODO: shorten these?
+typedef struct {
+    int32_t     ident;
+    int32_t     version;
+    int32_t     type;
+    float       boundingradius;
+    int32_t     width;
+    int32_t     height;
+    int32_t     numframes;
+    float       beamlength;
+    SyncType_t  synctype;
+} dSprite_t;
+typedef dSprite_t* dSprite_p;
+
+typedef struct {
+    int32_t origin[2];
+    int32_t width;
+    int32_t height;
+} dSpriteFrame_t;
+typedef dSpriteFrame_t* dSpriteFrame_p;
+
+typedef struct {
+    int32_t numframes;
+} dSpriteGroup_t;
+typedef dSpriteGroup_t* dSpriteGroup_p;
+
+typedef struct {
+    float   interval;
+} dSpriteInterval_t;
+typedef dSpriteInterval_t* dSpriteInterval_p;

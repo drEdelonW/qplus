@@ -52,3 +52,13 @@ typedef struct PolyVert_s {
     float s, t;
 } PolyVert_t;
 typedef PolyVert_t* PolyVert_p;
+
+// enum { ALIAS_ONSEAM = 0x0020 };
+// TODO: could be shorts
+
+typedef struct {
+    int32_t onseam;
+    int32_t s;
+    int32_t t;
+} stvert_t;
+typedef stvert_t* stvert_p;
