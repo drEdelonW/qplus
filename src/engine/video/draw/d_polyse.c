@@ -306,32 +306,32 @@ split2:
 
 split:
     // split this edge
-    int  new[6];
-    new[0] = (lp1[0] + lp2[0]) >> 1;
-    new[1] = (lp1[1] + lp2[1]) >> 1;
-    new[2] = (lp1[2] + lp2[2]) >> 1;
-    new[3] = (lp1[3] + lp2[3]) >> 1;
-    new[5] = (lp1[5] + lp2[5]) >> 1;
+    int  _new[6];
+    _new[0] = (lp1[0] + lp2[0]) >> 1;
+    _new[1] = (lp1[1] + lp2[1]) >> 1;
+    _new[2] = (lp1[2] + lp2[2]) >> 1;
+    _new[3] = (lp1[3] + lp2[3]) >> 1;
+    _new[5] = (lp1[5] + lp2[5]) >> 1;
 
     // draw the point if splitting a leading edge
     if (lp2[1] > lp1[1])                            goto nodraw;
     if ((lp2[1] == lp1[1]) && (lp2[0] < lp1[0]))    goto nodraw;
 
 
-    int z = new[5] >> 16;
-    int16_p zbuf = zspantable[new[1]] + new[0];
+    int z = _new[5] >> 16;
+    int16_p zbuf = zspantable[_new[1]] + _new[0];
     if (z >= *zbuf) {
         int pix;
 
         *zbuf = z;
-        pix = d_pcolormap[skintable[new[3] >> 16][new[2] >> 16]];
-        d_viewbuffer[d_scantable[new[1]] + new[0]] = pix;
+        pix = d_pcolormap[skintable[_new[3] >> 16][_new[2] >> 16]];
+        d_viewbuffer[d_scantable[_new[1]] + _new[0]] = pix;
     }
 
 nodraw:
     // recursively continue
-    D_PolysetRecursiveTriangle(lp3, lp1, new);
-    D_PolysetRecursiveTriangle(lp3, new, lp2);
+    D_PolysetRecursiveTriangle(lp3, lp1, _new);
+    D_PolysetRecursiveTriangle(lp3, _new, lp2);
 }
 
 #endif // !id386
@@ -908,26 +908,26 @@ void D_PolysetRecursiveDrawLine(int* lp1, int* lp2) {
 
 split:
     // split this edge
-    int  new[6];
-    new[0] = (lp1[0] + lp2[0]) >> 1;
-    new[1] = (lp1[1] + lp2[1]) >> 1;
-    new[5] = (lp1[5] + lp2[5]) >> 1;
-    new[2] = (lp1[2] + lp2[2]) >> 1;
-    new[3] = (lp1[3] + lp2[3]) >> 1;
-    new[4] = (lp1[4] + lp2[4]) >> 1;
+    int  _new[6];
+    _new[0] = (lp1[0] + lp2[0]) >> 1;
+    _new[1] = (lp1[1] + lp2[1]) >> 1;
+    _new[5] = (lp1[5] + lp2[5]) >> 1;
+    _new[2] = (lp1[2] + lp2[2]) >> 1;
+    _new[3] = (lp1[3] + lp2[3]) >> 1;
+    _new[4] = (lp1[4] + lp2[4]) >> 1;
 
     // draw the point
-    int ofs = d_scantable[new[1]] + new[0];
-    if (new[5] > d_pzbuffer[ofs]) {
-        d_pzbuffer[ofs] = new[5];
-        int pix = skintable[new[3] >> 16][new[2] >> 16];
-        //  pix = ((uint8_t *)acolormap)[pix + (new[4] & 0xFF00)];
+    int ofs = d_scantable[_new[1]] + _new[0];
+    if (_new[5] > d_pzbuffer[ofs]) {
+        d_pzbuffer[ofs] = _new[5];
+        int pix = skintable[_new[3] >> 16][_new[2] >> 16];
+        //  pix = ((uint8_t *)acolormap)[pix + (_new[4] & 0xFF00)];
         d_viewbuffer[ofs] = pix;
     }
 
     // recursively continue
-    D_PolysetRecursiveDrawLine(lp1, new);
-    D_PolysetRecursiveDrawLine(new, lp2);
+    D_PolysetRecursiveDrawLine(lp1, _new);
+    D_PolysetRecursiveDrawLine(_new, lp2);
 }
 
 void D_PolysetRecursiveTriangle2(int* lp1, int* lp2, int* lp3) {
@@ -939,19 +939,19 @@ void D_PolysetRecursiveTriangle2(int* lp1, int* lp2, int* lp3) {
 
 split:
     // split this edge
-    int new[6];
-    new[0] = (lp1[0] + lp2[0]) >> 1;
-    new[1] = (lp1[1] + lp2[1]) >> 1;
-    new[5] = (lp1[5] + lp2[5]) >> 1;
-    new[2] = (lp1[2] + lp2[2]) >> 1;
-    new[3] = (lp1[3] + lp2[3]) >> 1;
-    new[4] = (lp1[4] + lp2[4]) >> 1;
+    int _new[6];
+    _new[0] = (lp1[0] + lp2[0]) >> 1;
+    _new[1] = (lp1[1] + lp2[1]) >> 1;
+    _new[5] = (lp1[5] + lp2[5]) >> 1;
+    _new[2] = (lp1[2] + lp2[2]) >> 1;
+    _new[3] = (lp1[3] + lp2[3]) >> 1;
+    _new[4] = (lp1[4] + lp2[4]) >> 1;
 
-    D_PolysetRecursiveDrawLine(new, lp3);
+    D_PolysetRecursiveDrawLine(_new, lp3);
 
     // recursively continue
-    D_PolysetRecursiveTriangle(lp1, new, lp3);
-    D_PolysetRecursiveTriangle(new, lp2, lp3);
+    D_PolysetRecursiveTriangle(lp1, _new, lp3);
+    D_PolysetRecursiveTriangle(_new, lp2, lp3);
 }
 
 #endif

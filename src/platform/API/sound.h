@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // #ifndef __SOUND__
 // #define __SOUND__
-#include "sound_struct.h"
+#include "sound/sound_struct.h"
 #include "vector.h"
 #include "console.h"
 

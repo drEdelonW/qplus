@@ -60,7 +60,7 @@ float   r_nearzi;
 float   r_u1, r_v1, r_lzi1;
 int     r_ceilv1;
 
-bool r_lastvertvalid;
+static bool _rLastVertValid;
 
 #if !id386
 
@@ -73,7 +73,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     int ceilv0;
 
     float lzi0, u0, v0;
-    if (r_lastvertvalid) {
+    if (_rLastVertValid) {
         u0 = r_u1;
         v0 = r_v1;
         lzi0 = r_lzi1;
@@ -287,7 +287,7 @@ void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip) {
                 }
 
                 // only point 0 is clipped
-                r_lastvertvalid = false;
+                _rLastVertValid = false;
 
                 // we don't cache partially clipped edges
                 cacheoffset = 0x7FFFFFFF;
@@ -378,7 +378,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
     r_nearzionly = false;
     _makeLeftEdge = _makeRightEdge = false;
     mEdge_p pedges = currententity->model->edges;
-    r_lastvertvalid = false;
+    _rLastVertValid = false;
 
     for (int i = 0; i < fa->numedges; i++) {
         int lindex = currententity->model->surfedges[fa->firstedge + i];
@@ -391,7 +391,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
                 if ((r_pedge->cachededgeoffset & FULLY_CLIPPED_CACHED) &&
                     ((r_pedge->cachededgeoffset & FRAMECOUNT_MASK) == r_framecount)
                     ) {
-                    r_lastvertvalid = false;
+                    _rLastVertValid = false;
                     continue;
                 }
                 else {
@@ -399,7 +399,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
                         (((Edge_p)((uintptr_t)r_edges + r_pedge->cachededgeoffset))->owner == r_pedge)
                         ) {
                         R_EmitCachedEdge();
-                        r_lastvertvalid = false;
+                        _rLastVertValid = false;
                         continue;
                     }
                 }
@@ -416,7 +416,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
 
             if (r_leftclipped)  _makeLeftEdge = true;
             if (r_rightclipped) _makeRightEdge = true;
-            r_lastvertvalid = true;
+            _rLastVertValid = true;
         }
         else {
             lindex = -lindex;
@@ -425,7 +425,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
             if (!insubmodel) {
                 if ((r_pedge->cachededgeoffset & FULLY_CLIPPED_CACHED) &&
                     ((r_pedge->cachededgeoffset & FRAMECOUNT_MASK) == r_framecount)) {
-                    r_lastvertvalid = false;
+                    _rLastVertValid = false;
                     continue;
                 }
                 else {
@@ -435,7 +435,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
                         (((Edge_p)((uintptr_t)r_edges + r_pedge->cachededgeoffset))->owner == r_pedge)
                         ) {
                         R_EmitCachedEdge();
-                        r_lastvertvalid = false;
+                        _rLastVertValid = false;
                         continue;
                     }
                 }
@@ -452,7 +452,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
 
             if (r_leftclipped)  _makeLeftEdge = true;
             if (r_rightclipped) _makeRightEdge = true;
-            r_lastvertvalid = true;
+            _rLastVertValid = true;
         }
     }
 
@@ -461,14 +461,14 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
     // FIXME: share clipped edges?
     if (_makeLeftEdge) {
         r_pedge = &tedge;
-        r_lastvertvalid = false;
+        _rLastVertValid = false;
         R_ClipEdge(&r_leftexit, &r_leftenter, pclip->next);
     }
 
     // if there was a clip off the right edge, get the right r_nearzi
     if (_makeRightEdge) {
         r_pedge = &tedge;
-        r_lastvertvalid = false;
+        _rLastVertValid = false;
         r_nearzionly = true;
         R_ClipEdge(&r_rightexit, &r_rightenter, view_clipplanes[1].next);
     }
@@ -548,7 +548,7 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
     _makeLeftEdge = _makeRightEdge = false;
     // FIXME: keep clipped bmodel edges in clockwise order so last vertex caching
     // can be used?
-    r_lastvertvalid = false;
+    _rLastVertValid = false;
 
     for (; pedges; pedges = pedges->pnext) {
         r_leftclipped = r_rightclipped = false;

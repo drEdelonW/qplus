@@ -31,9 +31,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "keys.h"
 // #include "cvar_q1.h"
 #include "endian_tools.h"
-#include "sound_struct.h"
+#include "sound/sound_struct.h"
 #include "net.h"
-#include "model.h"
+#include "model/model.h"
 
 
 

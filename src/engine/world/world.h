@@ -86,7 +86,7 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
     #include "gl_model.h"
     #include "glquake.h"
 #else
-    #include "model.h"
+    #include "model/model.h"
     // #include "d_iface.h"
 #endif
 
