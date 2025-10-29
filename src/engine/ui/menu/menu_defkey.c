@@ -114,9 +114,7 @@ void M_Keys_Key(keycode_t k) {
     }
 
     switch (k) {
-    case K_ESCAPE:
-        M_Menu_Options_f();
-        break;
+    case K_ESCAPE:  M_Menu_Options_f(); break;
 
     case K_LEFTARROW:
     case K_UPARROW:

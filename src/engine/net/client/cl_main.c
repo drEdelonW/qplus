@@ -422,10 +422,8 @@ void CL_RelinkEntities() {
         // interpolate the angles
         for (int j = 0; j < VECT_DIM; j++) {
             float d = cl.mviewangles[0][j] - cl.mviewangles[1][j];
-            if (d > 180)
-                d -= 360;
-            else if (d < -180)
-                d += 360;
+            if (d > 180)        d -= 360;
+            else if (d < -180)  d += 360;
             cl.viewangles[j] = cl.mviewangles[1][j] + frac * d;
         }
     }

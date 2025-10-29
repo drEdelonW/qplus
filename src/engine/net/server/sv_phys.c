@@ -49,10 +49,10 @@ solid_edge items only clip against bsp models.
 
 /* --- movement clip flags (bitmask) --- */
 typedef enum {
-    MOVECLIP_NONE = 0,          /* no block */
-    MOVECLIP_FLOOR = 1 << 0,    /* floor (normal[2] > 0) */
-    MOVECLIP_WALL = 1 << 1,     /* wall/step (normal[2] == 0) */
-    MOVECLIP_DEADSTOP = 1 << 2,  /* dead stop (reserved by original comment) */
+    MOVECLIP_NONE = 0,        /* no block */
+    MOVECLIP_FLOOR = 1 << 0,   /* floor (normal[2] > 0) */
+    MOVECLIP_WALL = 1 << 1,   /* wall/step (normal[2] == 0) */
+    MOVECLIP_DEADSTOP = 1 << 2,   /* dead stop (reserved by original comment) */
 
     /* --- special early-return results (non-bitmask) --- */
     /* note: 3 == (MOVECLIP_FLOOR|MOVECLIP_WALL) by value; here it is used as “trapped/allsolid” */
@@ -764,9 +764,9 @@ bool SV_CheckWater(edict_p ent) {
             };
 
             VectorMA(ent->v.basevelocity, 150.0 * ent->v.waterlevel / 3.0, current_table[CONTENTS_CURRENT_0 - truecont], ent->v.basevelocity);
-    }
+        }
 #endif
-}
+    }
 
     return ent->v.waterlevel > 1;
 }
@@ -813,14 +813,14 @@ MoveClipFlags_e SV_TryUnstick(edict_p ent, vec3_t oldvel) {
     for (int i = 0; i < 8; i++) {
         // try pushing a little in an axial direction
         switch (i) {
-        case 0: dir[0] = 2;  dir[1] = 0;  break;
-        case 1: dir[0] = 0;  dir[1] = 2;  break;
-        case 2: dir[0] = -2; dir[1] = 0;  break;
-        case 3: dir[0] = 0;  dir[1] = -2; break;
-        case 4: dir[0] = 2;  dir[1] = 2;  break;
-        case 5: dir[0] = -2; dir[1] = 2;  break;
-        case 6: dir[0] = 2;  dir[1] = -2; break;
-        case 7: dir[0] = -2; dir[1] = -2; break;
+        case 0:     dir[0] = 2;  dir[1] = 0;  break;
+        case 1:     dir[0] = 0;  dir[1] = 2;  break;
+        case 2:     dir[0] = -2; dir[1] = 0;  break;
+        case 3:     dir[0] = 0;  dir[1] = -2; break;
+        case 4:     dir[0] = 2;  dir[1] = 2;  break;
+        case 5:     dir[0] = -2; dir[1] = 2;  break;
+        case 6:     dir[0] = 2;  dir[1] = -2; break;
+        case 7:     dir[0] = -2; dir[1] = -2; break;
         }
 
         SV_PushEntity(ent, dir);
@@ -1004,9 +1004,7 @@ SV_Physics_None
 Non moving objects can only think
 =============
 */
-void SV_Physics_None(edict_p ent) {
-    SV_RunThink(ent);   // regular thinking
-}
+void SV_Physics_None(edict_p ent) { SV_RunThink(ent); } // regular thinking
 
 #ifdef QUAKE2
 /*
@@ -1082,7 +1080,7 @@ void SV_CheckWaterTransition(edict_p ent) {
         ent->v.watertype = CONTENTS_EMPTY;
         ent->v.waterlevel = cont;
     }
-}
+    }
 
 /*
 =============

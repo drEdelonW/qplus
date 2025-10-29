@@ -296,12 +296,12 @@ CL_SendMove
 ==============
 */
 void CL_SendMove(UserCmd_p cmd) {
-    sizebuf_t buf;
     uint8_t data[128];
-
-    buf.maxsize = 128;
-    buf.cursize = 0;
-    buf.data = data;
+    sizebuf_t buf = {
+        .maxsize = 128,
+        .cursize = 0,
+        .data = data,
+    };
 
     cl.cmd = *cmd;
 

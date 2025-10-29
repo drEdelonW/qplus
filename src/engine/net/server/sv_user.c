@@ -19,12 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sv_user.c -- server code for moving users
 
+#include "server.h"
 #include "sys.h"
 #include "msg.h"
 #include "q_tools.h"
 #include "cvar_q1.h"
 #include "protocol.h"
-#include "server.h"
 #include "cmd.h"
 #include "world.h"
 #include <string.h>
@@ -73,9 +73,9 @@ void SV_SetIdealPitch() {
         };
 
         vec3_t bottom = {
-            bottom[0] = top[0],
-            bottom[1] = top[1],
-            bottom[2] = top[2] - 160
+            top[0],
+            top[1],
+            top[2] - 160
         };
 
         trace_t tr = SV_Move(top, vec3_origin, vec3_origin, bottom, 1, sv_player);
@@ -361,8 +361,8 @@ void SV_ClientThink() {
     if ((int)sv_player->v.flags & FL_WATERJUMP) { SV_WaterJump(); return; }
 
     // walk
-    if ((sv_player->v.waterlevel >= 2)
-        && (sv_player->v.movetype != MOVETYPE_NOCLIP)) {
+    if ((sv_player->v.waterlevel >= 2) &&
+        (sv_player->v.movetype != MOVETYPE_NOCLIP)) {
         SV_WaterMove();
         return;
     }

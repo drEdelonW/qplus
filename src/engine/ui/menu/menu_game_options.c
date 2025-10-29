@@ -127,12 +127,12 @@ episode_t episodes[] = {
 
 //MED 01/06/97  added hipnotic episodes
 episode_t   hipnoticepisodes[] = {
-{"Scourge of Armagon", 0, 1},
-{"Fortress of the Dead", 1, 5},
-{"Dominion of Darkness", 6, 6},
-{"The Rift", 12, 4},
-{"Final Level", 16, 1},
-{"Deathmatch Arena", 17, 1}
+    {"Scourge of Armagon", 0, 1},
+    {"Fortress of the Dead", 1, 5},
+    {"Dominion of Darkness", 6, 6},
+    {"The Rift", 12, 4},
+    {"Final Level", 16, 1},
+    {"Deathmatch Arena", 17, 1}
 };
 
 //PGM 01/07/97 added rogue episodes
@@ -161,7 +161,13 @@ void M_Menu_GameOptions_f() {
 }
 
 
-int gameoptions_cursor_table[] = { 40, 56, 64, 72, 80, 88, 96, 112, 120 };
+int gameoptions_cursor_table[] = {
+    40, 56,
+    64, 72,
+    80, 88,
+    96, 112,
+    120
+};
 #define NUM_GAMEOPTIONS 9
 int  gameoptions_cursor;
 
@@ -177,23 +183,21 @@ void M_GameOptions_Draw() {
     M_Print(160, 56, va("%i", maxplayers));
 
     M_Print(0, 64, "        Game Type");
-    if (coop.value)
-        M_Print(160, 64, "Cooperative");
-    else
-        M_Print(160, 64, "Deathmatch");
+    if (coop.value)     M_Print(160, 64, "Cooperative");
+    else                M_Print(160, 64, "Deathmatch");
 
     M_Print(0, 72, "        Teamplay");
     if (rogue) {
         cString msg;
 
         switch ((int)teamplay.value) {
-        case 1: msg = "No Friendly Fire"; break;
-        case 2: msg = "Friendly Fire"; break;
-        case 3: msg = "Tag"; break;
-        case 4: msg = "Capture the Flag"; break;
-        case 5: msg = "One Flag CTF"; break;
-        case 6: msg = "Three Team CTF"; break;
-        default: msg = "Off"; break;
+        case 1:     msg = "No Friendly Fire";   break;
+        case 2:     msg = "Friendly Fire";      break;
+        case 3:     msg = "Tag";                break;
+        case 4:     msg = "Capture the Flag";   break;
+        case 5:     msg = "One Flag CTF";       break;
+        case 6:     msg = "Three Team CTF";     break;
+        default:    msg = "Off";                break;
         }
         M_Print(160, 72, msg);
     }
@@ -201,9 +205,9 @@ void M_GameOptions_Draw() {
         cString msg;
 
         switch ((int)teamplay.value) {
-        case 1: msg = "No Friendly Fire"; break;
-        case 2: msg = "Friendly Fire"; break;
-        default: msg = "Off"; break;
+        case 1:     msg = "No Friendly Fire";   break;
+        case 2:     msg = "Friendly Fire";      break;
+        default:    msg = "Off";                break;
         }
         M_Print(160, 72, msg);
     }
@@ -224,10 +228,10 @@ void M_GameOptions_Draw() {
 
     M_Print(0, 112, "         Episode");
     //MED 01/06/97 added hipnotic episodes
-    if (hipnotic)           M_Print(160, 112, hipnoticepisodes[startepisode].description);
+    if (hipnotic)               M_Print(160, 112, hipnoticepisodes[startepisode].description);
     //PGM 01/07/97 added rogue episodes
-    else if (rogue)         M_Print(160, 112, rogueepisodes[startepisode].description);
-    else                    M_Print(160, 112, episodes[startepisode].description);
+    else if (rogue)             M_Print(160, 112, rogueepisodes[startepisode].description);
+    else                        M_Print(160, 112, episodes[startepisode].description);
 
     M_Print(0, 120, "           Level");
     //MED 01/06/97 added hipnotic episodes
@@ -280,60 +284,44 @@ void M_NetStart_Change(int dir) {
             maxplayers = 2;
         break;
 
-    case 2:
-        Cvar_SetValue("coop", coop.value ? 0 : 1);
-        break;
+    case 2: Cvar_SetValue("coop", coop.value ? 0 : 1);  break;
 
     case 3:
-        if (rogue)
-            count = 6;
-        else
-            count = 2;
+        if (rogue)  count = 6;
+        else        count = 2;
 
         Cvar_SetValue("teamplay", teamplay.value + dir);
-        if (teamplay.value > count)
-            Cvar_SetValue("teamplay", 0);
-        else if (teamplay.value < 0)
-            Cvar_SetValue("teamplay", count);
+        if (teamplay.value > count)     Cvar_SetValue("teamplay", 0);
+        else if (teamplay.value < 0)    Cvar_SetValue("teamplay", count);
         break;
 
     case 4:
         Cvar_SetValue("skill", skill.value + dir);
-        if (skill.value > 3)
-            Cvar_SetValue("skill", 0);
-        if (skill.value < 0)
-            Cvar_SetValue("skill", 3);
+        if (skill.value > 3)    Cvar_SetValue("skill", 0);
+        if (skill.value < 0)    Cvar_SetValue("skill", 3);
         break;
 
     case 5:
         Cvar_SetValue("fraglimit", fraglimit.value + dir * 10);
-        if (fraglimit.value > 100)
-            Cvar_SetValue("fraglimit", 0);
-        if (fraglimit.value < 0)
-            Cvar_SetValue("fraglimit", 100);
+        if (fraglimit.value > 100)  Cvar_SetValue("fraglimit", 0);
+        if (fraglimit.value < 0)    Cvar_SetValue("fraglimit", 100);
         break;
 
     case 6:
         Cvar_SetValue("timelimit", timelimit.value + dir * 5);
-        if (timelimit.value > 60)
-            Cvar_SetValue("timelimit", 0);
-        if (timelimit.value < 0)
-            Cvar_SetValue("timelimit", 60);
+        if (timelimit.value > 60)   Cvar_SetValue("timelimit", 0);
+        if (timelimit.value < 0)    Cvar_SetValue("timelimit", 60);
         break;
 
     case 7:
         startepisode += dir;
         //MED 01/06/97 added hipnotic count
-        if (hipnotic)
-            count = 6;
+        if (hipnotic)               count = 6;
         //PGM 01/07/97 added rogue count
         //PGM 03/02/97 added 1 for dmatch episode
-        else if (rogue)
-            count = 4;
-        else if (registered.value)
-            count = 7;
-        else
-            count = 2;
+        else if (rogue)             count = 4;
+        else if (registered.value)  count = 7;
+        else                        count = 2;
 
         if (startepisode < 0)
             startepisode = count - 1;
@@ -347,13 +335,10 @@ void M_NetStart_Change(int dir) {
     case 8:
         startlevel += dir;
         //MED 01/06/97 added hipnotic episodes
-        if (hipnotic)
-            count = hipnoticepisodes[startepisode].levels;
+        if (hipnotic)   count = hipnoticepisodes[startepisode].levels;
         //PGM 01/06/97 added hipnotic episodes
-        else if (rogue)
-            count = rogueepisodes[startepisode].levels;
-        else
-            count = episodes[startepisode].levels;
+        else if (rogue) count = rogueepisodes[startepisode].levels;
+        else            count = episodes[startepisode].levels;
 
         if (startlevel < 0)
             startlevel = count - 1;
@@ -366,9 +351,7 @@ void M_NetStart_Change(int dir) {
 
 void M_GameOptions_Key(keycode_t key) {
     switch (key) {
-    case K_ESCAPE:
-        M_Menu_Net_f();
-        break;
+    case K_ESCAPE:  M_Menu_Net_f(); break;
 
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
@@ -383,15 +366,14 @@ void M_GameOptions_Key(keycode_t key) {
         break;
 
     case K_LEFTARROW:
-        if (gameoptions_cursor == 0)
-            break;
+        if (gameoptions_cursor == 0)    break;
+
         S_LocalSound("misc/menu3.wav");
         M_NetStart_Change(-1);
         break;
 
     case K_RIGHTARROW:
-        if (gameoptions_cursor == 0)
-            break;
+        if (gameoptions_cursor == 0)    break;
         S_LocalSound("misc/menu3.wav");
         M_NetStart_Change(1);
         break;
@@ -414,6 +396,6 @@ void M_GameOptions_Key(keycode_t key) {
 
         M_NetStart_Change(1);
         break;
-    default: break;
+    default:    break;
     }
 }

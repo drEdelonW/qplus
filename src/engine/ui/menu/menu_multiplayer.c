@@ -51,12 +51,12 @@ void M_MultiPlayer_Key(keycode_t key) {
 
     case K_DOWNARROW:
         S_LocalSound("misc/menu1.wav");
-        if (++_mp_cursor >= mp_NUM) _mp_cursor = mp_FIRST;
+        if (++_mp_cursor >= mp_NUM)     _mp_cursor = mp_FIRST;
         break;
 
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
-        if (--_mp_cursor < mp_FIRST) _mp_cursor = mp_NUM - 1;
+        if (--_mp_cursor < mp_FIRST)    _mp_cursor = mp_NUM - 1;
         break;
 
     case K_ENTER:

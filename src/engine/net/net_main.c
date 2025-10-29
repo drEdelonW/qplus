@@ -48,7 +48,7 @@ void (*SetComPortConfig) (int32_t portNumber, int32_t port, int32_t irq, int32_t
 void (*GetModemConfig) (int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
 void (*SetModemConfig) (int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
 
-static bool	listening = false;
+static bool  listening = false;
 
 bool slistInProgress = false;
 bool slistSilent = false;
@@ -72,14 +72,14 @@ int32_t unreliableMessagesReceived = 0;
 
 bool configRestored = false;
 
-int	vcrFile = -1;
+int  vcrFile = -1;
 bool recording = false;
 
 // these two macros are to make the code more readable
 #define sfunc net_drivers[sock->driver]
 #define dfunc net_drivers[net_driverlevel]
 
-int32_t	net_driverlevel;
+int32_t  net_driverlevel;
 
 
 double net_time;
@@ -191,17 +191,12 @@ static void MaxPlayers_f() {
         Con_Printf("\"maxplayers\" set to \"%u\"\n", n);
     }
 
-    if ((n == 1) && listening)
-        Cbuf_AddText("listen 0\n");
-
-    if ((n > 1) && (!listening))
-        Cbuf_AddText("listen 1\n");
+    if ((n == 1) && listening)      Cbuf_AddText("listen 0\n");
+    if ((n > 1) && (!listening))    Cbuf_AddText("listen 1\n");
 
     svs.maxclients = n;
-    if (n == 1)
-        Cvar_Set("deathmatch", "0");
-    else
-        Cvar_Set("deathmatch", "1");
+    if (n == 1) Cvar_Set("deathmatch", "0");
+    else        Cvar_Set("deathmatch", "1");
 }
 
 
@@ -248,16 +243,13 @@ static void PrintSlist() {
 
 
 static void PrintSlistTrailer() {
-    if (hostCacheCount)
-        Con_Printf("== end list ==\n\n");
-    else
-        Con_Printf("No Quake servers found.\n\n");
+    if (hostCacheCount)     Con_Printf("== end list ==\n\n");
+    else                    Con_Printf("No Quake servers found.\n\n");
 }
 
 
 void NET_Slist_f() {
-    if (slistInProgress)
-        return;
+    if (slistInProgress)    return;
 
     if (!slistSilent) {
         Con_Printf("Looking for Quake servers...\n");
@@ -295,8 +287,7 @@ static void Slist_Poll() {
         dfunc.SearchForHosts(false);
     }
 
-    if (!slistSilent)
-        PrintSlist();
+    if (!slistSilent)   PrintSlist();
 
     if ((Sys_FloatTime() - slistStartTime) < 1.5) {
         SchedulePollProcedure(&slistPollProcedure, 0.1);
@@ -395,7 +386,7 @@ NET_CheckNewConnections
 struct {
     double time;
     vcr_opcode_t op;
-    int32_t	session;
+    int32_t  session;
 } vcrConnect;
 
 qsocket_p NET_CheckNewConnections() {
@@ -469,7 +460,7 @@ struct {
 
 extern void PrintStats(qsocket_p s);
 
-int32_t	NET_GetMessage(qsocket_p sock) {
+int32_t  NET_GetMessage(qsocket_p sock) {
     if (!sock)
         return -1;
 
@@ -494,11 +485,8 @@ int32_t	NET_GetMessage(qsocket_p sock) {
     if (ret > 0) {
         if (sock->driver) {
             sock->lastMessageTime = net_time;
-            if (ret == 1)
-                messagesReceived++;
-            else
-                if (ret == 2)
-                    unreliableMessagesReceived++;
+            if (ret == 1)       messagesReceived++;
+            else if (ret == 2)  unreliableMessagesReceived++;
         }
 
         if (recording) {
@@ -538,9 +526,9 @@ returns -1 if the connection died
 */
 struct
 {
-    double	time;
+    double  time;
     vcr_opcode_t op;
-    int32_t	session;
+    int32_t  session;
     int r;
 } vcrSendMessage;
 
@@ -763,10 +751,8 @@ void NET_Init() {
             net_drivers[net_driverlevel].Listen(true);
     }
 
-    if (*my_ipx_address)
-        Con_DPrintf("IPX address %s\n", my_ipx_address);
-    if (*my_tcpip_address)
-        Con_DPrintf("TCP/IP address %s\n", my_tcpip_address);
+    if (*my_ipx_address)    Con_DPrintf("IPX address %s\n", my_ipx_address);
+    if (*my_tcpip_address)  Con_DPrintf("TCP/IP address %s\n", my_tcpip_address);
 }
 
 /*
@@ -849,7 +835,7 @@ void SchedulePollProcedure(PollProcedure* proc, double timeOffset) {
 
 
 #ifdef IDGODS
-#define IDNET	0xc0f62800
+#define IDNET  0xc0f62800
 
 bool IsID(struct qsockaddr* addr) {
     if ((idgods.value == 0.0) ||

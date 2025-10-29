@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "world.h"
 #include "console.h"
 #include "host.h"
+#include "net.h"
 
 server_t    sv;
 sv_static_t svs;
@@ -79,9 +80,8 @@ EVENT MESSAGES
     ==================
 */
 void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count) {
-    if (sv.datagram.cursize > (MAX_DATAGRAM - 16)) {
-        return;
-    }
+    if (sv.datagram.cursize > (MAX_DATAGRAM - 16))  return;
+
     MSG_WriteByte(&sv.datagram, svc_particle);
     MSG_WriteCoord(&sv.datagram, org[0]);
     MSG_WriteCoord(&sv.datagram, org[1]);
@@ -110,24 +110,12 @@ void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count) {
 
     ==================
 */
-void SV_StartSound(
-    edict_p entity,
-    int     channel,
-    cString sample,
-    int     volume,
-    float   attenuation
-) {
-    if ((volume < 0) || (volume > 255))
-        Sys_Error("SV_StartSound: volume = %i", volume);
+void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation) {
+    if ((volume < 0) || (volume > 255))         Sys_Error("SV_StartSound: volume = %i", volume);
+    if ((attenuation < 0) || (attenuation > 4)) Sys_Error("SV_StartSound: attenuation = %f", attenuation);
+    if ((channel < 0) || (channel > 7))         Sys_Error("SV_StartSound: channel = %i", channel);
 
-    if ((attenuation < 0) || (attenuation > 4))
-        Sys_Error("SV_StartSound: attenuation = %f", attenuation);
-
-    if ((channel < 0) || (channel > 7))
-        Sys_Error("SV_StartSound: channel = %i", channel);
-
-    if (sv.datagram.cursize > (MAX_DATAGRAM - 16))
-        return;
+    if (sv.datagram.cursize > (MAX_DATAGRAM - 16))  return;
 
     // find precache number for sound
     int sound_num;
@@ -146,18 +134,14 @@ void SV_StartSound(
     channel |= (NUM_FOR_EDICT(entity) << 3);
 
     int field_mask = 0;
-    if (volume != DEFAULT_SOUND_PACKET_VOLUME)
-        field_mask |= SND_VOLUME;
-    if (attenuation != DEFAULT_SOUND_PACKET_ATTENUATION)
-        field_mask |= SND_ATTENUATION;
+    if (volume != DEFAULT_SOUND_PACKET_VOLUME)              field_mask |= SND_VOLUME;
+    if (attenuation != DEFAULT_SOUND_PACKET_ATTENUATION)    field_mask |= SND_ATTENUATION;
 
     // directed messages go only to the entity the are targeted on
     MSG_WriteByte(&sv.datagram, svc_sound);
     MSG_WriteByte(&sv.datagram, field_mask);
-    if (field_mask & SND_VOLUME)
-        MSG_WriteByte(&sv.datagram, volume);
-    if (field_mask & SND_ATTENUATION)
-        MSG_WriteByte(&sv.datagram, (attenuation * 64));
+    if (field_mask & SND_VOLUME)        MSG_WriteByte(&sv.datagram, volume);
+    if (field_mask & SND_ATTENUATION)   MSG_WriteByte(&sv.datagram, (attenuation * 64));
     MSG_WriteShort(&sv.datagram, channel);
     MSG_WriteByte(&sv.datagram, sound_num);
     for (int i = 0; i < VECT_DIM; i++) {
@@ -223,7 +207,7 @@ void SV_SendServerinfo(client_p client) {
     MSG_WriteByte(&client->message, 1);
 
     client->sendsignon = true;
-    client->spawned = false;		// need prespawn, spawn, etc
+    client->spawned = false;    // need prespawn, spawn, etc
 }
 
 /*
@@ -237,11 +221,11 @@ void SV_SendServerinfo(client_p client) {
 void SV_ConnectClient(int clientnum) {
     float spawn_parms[NUM_SPAWN_PARMS];
 
-    client_t* client = svs.clients + clientnum;
+    client_p client = svs.clients + clientnum;
     Con_DPrintf("Client %s connected\n", client->netconnection->address);
 
     // set up the client_t
-    struct qsocket_s* netconnection = client->netconnection;
+    qsocket_p netconnection = client->netconnection;
 
     if (sv.loadgame)
         memcpy(spawn_parms, client->spawn_parms, sizeof(spawn_parms));
@@ -254,7 +238,7 @@ void SV_ConnectClient(int clientnum) {
     client->edict = EDICT_NUM(clientnum + 1);
     client->message.data = client->msgbuf;
     client->message.maxsize = sizeof(client->msgbuf);
-    client->message.allowoverflow = true;		// we can catch it
+    client->message.allowoverflow = true;    // we can catch it
 
     client->privileged =
 #ifdef IDGODS
@@ -287,19 +271,18 @@ void SV_CheckForNewClients() {
     // check for new connections
     //
     while (1) {
-        struct qsocket_s* ret = NET_CheckNewConnections();
+        qsocket_p ret = NET_CheckNewConnections();
         if (!ret)
             break;
 
         //
         // init a new client structure
         //
-        int	i;
-        for (i = 0; i < svs.maxclients; i++) {
+        int i = 0;
+        for (; i < svs.maxclients; i++) {
             if (!svs.clients[i].active) break;
         }
-        if (i == svs.maxclients)
-            Sys_Error("Host_CheckForNewClients: no free clients");
+        if (i == svs.maxclients)        Sys_Error("Host_CheckForNewClients: no free clients");
 
         svs.clients[i].netconnection = ret;
         SV_ConnectClient(i);
@@ -324,9 +307,7 @@ FRAME UPDATES
 
     ==================
 */
-void SV_ClearDatagram() {
-    SZ_Clear(&sv.datagram);
-}
+void SV_ClearDatagram() { SZ_Clear(&sv.datagram); }
 
 /*
     =============================================================================
@@ -359,7 +340,7 @@ void SV_AddToFatPVS(vec3_t org, mNode_p node) {
         float d = DotProduct(org, plane->normal) - plane->dist;
         if (d > 8)          node = node->children[0];
         else if (d < -8)    node = node->children[1];
-        else {	// go down both
+        else {  // go down both
             SV_AddToFatPVS(org, node->children[0]);
             node = node->children[1];
         }
@@ -405,7 +386,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
 #endif
 
         // ignore if not touching a PV leaf
-        if (ent != clent) {	// clent is ALLWAYS sent
+        if (ent != clent) {  // clent is ALLWAYS sent
             // ignore ents without visible models
             if (!ent->v.modelindex || !pr_strings[ent->v.model])    continue;
 
@@ -413,7 +394,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
             for (; i < ent->num_leafs; i++)
                 if (pvs[ent->leafnums[i] >> 3] & (1 << (ent->leafnums[i] & 7))) break;
 
-            if (i == ent->num_leafs) continue;		// not visible
+            if (i == ent->num_leafs) continue;    // not visible
         }
 
         if (msg->maxsize - msg->cursize < 16) { Con_Printf("packet overflow\n"); return; }
@@ -429,7 +410,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         if (ent->v.angles[0] != ent->baseline.angles[0])    bits |= U_ANGLE1;
         if (ent->v.angles[1] != ent->baseline.angles[1])    bits |= U_ANGLE2;
         if (ent->v.angles[2] != ent->baseline.angles[2])    bits |= U_ANGLE3;
-        if (ent->v.movetype == MOVETYPE_STEP)               bits |= U_NOLERP;	// don't mess up the step animation
+        if (ent->v.movetype == MOVETYPE_STEP)               bits |= U_NOLERP;  // don't mess up the step animation
         if (ent->v.colormap != ent->baseline.colormap)      bits |= U_COLORMAP;
         if (ent->v.skin != ent->baseline.skin)              bits |= U_SKIN;
         if (ent->v.frame != ent->baseline.frame)            bits |= U_FRAME;
@@ -443,7 +424,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         //
         MSG_WriteByte(msg, bits | U_SIGNAL);
 
-        if (bits & U_MOREBITS)	MSG_WriteByte(msg, bits >> 8);
+        if (bits & U_MOREBITS)  MSG_WriteByte(msg, bits >> 8);
         if (bits & U_LONGENTITY)MSG_WriteShort(msg, e);
         else                    MSG_WriteByte(msg, e);
 
@@ -504,7 +485,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     //
     // send the current viewpos offset from the view entity
     //
-    SV_SetIdealPitch();		// how much to look up / down ideally
+    SV_SetIdealPitch();    // how much to look up / down ideally
 
     // a fixangle might get lost in a dropped packet.  Oh well.
     if (ent->v.fixangle) {
@@ -587,7 +568,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     =======================
 */
 bool SV_SendClientDatagram(client_t* client) {
-    uint8_t		buf[MAX_DATAGRAM];
+    uint8_t    buf[MAX_DATAGRAM];
     sizebuf_t   msg = {
         .data = buf,
         .maxsize = sizeof(buf),
@@ -661,17 +642,17 @@ void SV_UpdateToReliableMessages() {
     =======================
 */
 void SV_SendNop(client_p client) {
-    sizebuf_t	msg;
-    uint8_t		buf[4];
-
-    msg.data = buf;
-    msg.maxsize = sizeof(buf);
-    msg.cursize = 0;
+    uint8_t    buf[4];
+    sizebuf_t  msg = {
+        .data = buf,
+        .maxsize = sizeof(buf),
+        .cursize = 0,
+    };
 
     MSG_WriteChar(&msg, svc_nop);
 
     if (NET_SendUnreliableMessage(client->netconnection, &msg) == -1)
-        SV_DropClient(true);	// if the message couldn't send, kick off
+        SV_DropClient(true);  // if the message couldn't send, kick off
     client->last_message = realtime;
 }
 
@@ -701,7 +682,7 @@ void SV_SendClientMessages() {
             if (!host_client->sendsignon) {
                 if (realtime - host_client->last_message > 5)
                     SV_SendNop(host_client);
-                continue;	// don't send out non-signon messages
+                continue;  // don't send out non-signon messages
             }
         }
 
@@ -716,15 +697,14 @@ void SV_SendClientMessages() {
 
         if (host_client->message.cursize || host_client->dropasap) {
             if (!NET_CanSendMessage(host_client->netconnection)) {
-                //				I_Printf ("can't write\n");
+                //        I_Printf ("can't write\n");
                 continue;
             }
 
-            if (host_client->dropasap)
-                SV_DropClient(false);	// went to another level
+            if (host_client->dropasap)      SV_DropClient(false);  // went to another level
             else {
                 if (NET_SendMessage(host_client->netconnection, &host_client->message) == -1)
-                    SV_DropClient(true);	// if the message couldn't send, kick off
+                    SV_DropClient(true);  // if the message couldn't send, kick off
                 SZ_Clear(&host_client->message);
                 host_client->last_message = realtime;
                 host_client->sendsignon = false;
@@ -822,12 +802,12 @@ void SV_CreateBaseline() {
     ================
 */
 void SV_SendReconnect() {
-    uint8_t	    data[128];
-    sizebuf_t	msg;
-
-    msg.data = data;
-    msg.cursize = 0;
-    msg.maxsize = sizeof(data);
+    uint8_t      data[128];
+    sizebuf_t  msg = {
+        .data = data,
+        .cursize = 0,
+        .maxsize = sizeof(data),
+    };
 
     MSG_WriteChar(&msg, svc_stufftext);
     MSG_WriteString(&msg, "reconnect\n");
@@ -872,7 +852,7 @@ void SV_SaveSpawnparms() {
     This is called at the start of each level
     ================
 */
-extern float		scr_centertime_off;
+extern float    scr_centertime_off;
 
 void SV_SpawnServer(
     cString server
@@ -888,20 +868,17 @@ void SV_SpawnServer(
     scr_centertime_off = 0;
 
     Con_DPrintf("SpawnServer: %s\n", server);
-    svs.changelevel_issued = false;		// now safe to issue another
+    svs.changelevel_issued = false;    // now safe to issue another
 
     //
     // tell all connected clients that we are going to a new level
     //
-    if (sv.active) {
-        SV_SendReconnect();
-    }
+    if (sv.active) { SV_SendReconnect(); }
 
     //
     // make cvars consistant
     //
-    if (coop.value)
-        Cvar_SetValue("deathmatch", 0);
+    if (coop.value) Cvar_SetValue("deathmatch", 0);
     current_skill = (int)(skill.value + 0.5);
     CLAMP(0, current_skill, 3);
 
@@ -983,7 +960,7 @@ void SV_SpawnServer(
     memset(&ent->v, 0, progs->entityfields * 4);
     ent->free = false;
     ent->v.model = sv.worldmodel->name - pr_strings;
-    ent->v.modelindex = 1;		// world model
+    ent->v.modelindex = 1;    // world model
     ent->v.solid = SOLID_BSP;
     ent->v.movetype = MOVETYPE_PUSH;
 

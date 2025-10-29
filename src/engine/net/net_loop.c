@@ -198,9 +198,7 @@ bool Loop_CanSendMessage(qsocket_p sock) {
 }
 
 
-bool Loop_CanSendUnreliableMessage(qsocket_p sock) {
-    return true;
-}
+bool Loop_CanSendUnreliableMessage(qsocket_p sock) { return true; }
 
 
 void Loop_Close(qsocket_p sock) {
@@ -209,8 +207,6 @@ void Loop_Close(qsocket_p sock) {
     sock->receiveMessageLength = 0;
     sock->sendMessageLength = 0;
     sock->canSend = true;
-    if (sock == loop_client)
-        loop_client = NULL;
-    else
-        loop_server = NULL;
+    if (sock == loop_client)    loop_client = NULL;
+    else                        loop_server = NULL;
 }

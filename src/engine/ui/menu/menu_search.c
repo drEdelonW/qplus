@@ -29,20 +29,14 @@ void M_Search_Draw() {
         M_Print(x, 40, "Searching...");
     }
 
-    if (slistInProgress) {
-        NET_Poll();
-        return;
-    }
+    if (slistInProgress) { NET_Poll();      return; }
 
     if (!searchComplete) {
         searchComplete = true;
         searchCompleteTime = realtime;
     }
 
-    if (hostCacheCount) {
-        M_Menu_ServerList_f();
-        return;
-    }
+    if (hostCacheCount) { M_Menu_ServerList_f();    return; }
 
     M_PrintWhite((320 / 2) - ((22 * 8) / 2), 64, "No Quake servers found");
     if ((realtime - searchCompleteTime) < 3.0)

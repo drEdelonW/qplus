@@ -20,37 +20,38 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "enginedefs.h"
-#include "Model.h"
+#include "vector.h"
+#include "types.h"
 
 // upper design bounds
 
 
-#define MAX_MAP_MODELS      (256)
-#define MAX_MAP_BRUSHES     (4096)
+// #define MAX_MAP_MODELS      (256)
+// #define MAX_MAP_BRUSHES     (4096)
 #define MAX_MAP_ENTITIES    (1024)
-#define MAX_MAP_ENTSTRING   (65536)
+// #define MAX_MAP_ENTSTRING   (65536)
 
-#define MAX_MAP_PLANES          (32767)
-#define MAX_MAP_NODES           (32767)  // because negative shorts are contents
-#define MAX_MAP_CLIPNODES       (32767)  //
+// #define MAX_MAP_PLANES          (32767)
+// #define MAX_MAP_NODES           (32767)  // because negative shorts are contents
+// #define MAX_MAP_CLIPNODES       (32767)  //
 #define MAX_MAP_LEAFS           (8192)
-#define MAX_MAP_VERTS           (65535)
-#define MAX_MAP_FACES           (65535)
-#define MAX_MAP_MARKSURFACES    (65535)
-#define MAX_MAP_TEXINFO         (4096)
-#define MAX_MAP_EDGES           (256000)
-#define MAX_MAP_SURFEDGES       (512000)
-#define MAX_MAP_TEXTURES        (512)
-#define MAX_MAP_MIPTEX          (0x200000)
-#define MAX_MAP_LIGHTING        (0x100000)
-#define MAX_MAP_VISIBILITY      (0x100000)
+// #define MAX_MAP_VERTS           (65535)
+// #define MAX_MAP_FACES           (65535)
+// #define MAX_MAP_MARKSURFACES    (65535)
+// #define MAX_MAP_TEXINFO         (4096)
+// #define MAX_MAP_EDGES           (256000)
+// #define MAX_MAP_SURFEDGES       (512000)
+// #define MAX_MAP_TEXTURES        (512)
+// #define MAX_MAP_MIPTEX          (0x200000)
+// #define MAX_MAP_LIGHTING        (0x100000)
+// #define MAX_MAP_VISIBILITY      (0x100000)
 
-#define MAX_MAP_PORTALS  (65536)
+// #define MAX_MAP_PORTALS  (65536)
 
 // key / value pair sizes
 
-#define MAX_KEY     (32)
-#define MAX_VALUE   (1024)
+// #define MAX_KEY     (32)
+// #define MAX_VALUE   (1024)
 
 //=============================================================================
 
@@ -93,15 +94,7 @@ typedef enum {
     CONTENTS_CURRENT_DOWN = -14
 } contents_t;
 
-
-
-
-
-
 #define TEX_SPECIAL  1  // sky or slime, no lightmap or 256 subdivision
-
-
-
 typedef struct {
     int16_t planenum;
     int16_t side;
@@ -118,64 +111,60 @@ typedef dFace_t* dFace_p;
 
 
 
-
-
-
-
 //============================================================================
 
 #ifndef QUAKE_GAME
 // #warning QUAKE_GAME NOT DEFINED!!!
-#define ANGLE_UP -1
-#define ANGLE_DOWN -2
+// #define ANGLE_UP -1
+// #define ANGLE_DOWN -2
 
 
 // the utilities get to be lazy and just use large static arrays
 
-extern int32_t  nummodels;
-extern dModel_t dmodels[MAX_MAP_MODELS];
+// extern int32_t  nummodels;
+// extern dModel_t dmodels[MAX_MAP_MODELS];
 
-extern int32_t  visdatasize;
-extern uint8_t  dvisdata[MAX_MAP_VISIBILITY];
+// extern int32_t  visdatasize;
+// extern uint8_t  dvisdata[MAX_MAP_VISIBILITY];
 
-extern int32_t  lightdatasize;
-extern uint8_t  dlightdata[MAX_MAP_LIGHTING];
+// extern int32_t  lightdatasize;
+// extern uint8_t  dlightdata[MAX_MAP_LIGHTING];
 
-extern int32_t  texdatasize;
-extern uint8_t  dtexdata[MAX_MAP_MIPTEX]; // (dMipTexLump_t)
+// extern int32_t  texdatasize;
+// extern uint8_t  dtexdata[MAX_MAP_MIPTEX]; // (dMipTexLump_t)
 
-extern int32_t  entdatasize;
-extern char     dentdata[MAX_MAP_ENTSTRING];
+// extern int32_t  entdatasize;
+// extern char     dentdata[MAX_MAP_ENTSTRING];
 
-extern int32_t  numleafs;
-extern dLeaf_t  dleafs[MAX_MAP_LEAFS];
+// extern int32_t  numleafs;
+// extern dLeaf_t  dleafs[MAX_MAP_LEAFS];
 
-extern int32_t  numplanes;
-extern dPlane_t dplanes[MAX_MAP_PLANES];
+// extern int32_t  numplanes;
+// extern dPlane_t dplanes[MAX_MAP_PLANES];
 
-extern int32_t   numvertexes;
-extern dVertex_t dvertexes[MAX_MAP_VERTS];
+// extern int32_t   numvertexes;
+// extern dVertex_t dvertexes[MAX_MAP_VERTS];
 
-extern int32_t  numnodes;
-extern dNode_t  dnodes[MAX_MAP_NODES];
+// extern int32_t  numnodes;
+// extern dNode_t  dnodes[MAX_MAP_NODES];
 
-extern int32_t   numtexinfo;
-extern TexInfo_t texinfo[MAX_MAP_TEXINFO];
+// extern int32_t   numtexinfo;
+// extern TexInfo_t texinfo[MAX_MAP_TEXINFO];
 
-extern int32_t  numfaces;
-extern dFace_t  dfaces[MAX_MAP_FACES];
+// extern int32_t  numfaces;
+// extern dFace_t  dfaces[MAX_MAP_FACES];
 
-extern int32_t      numclipnodes;
-extern dClipNode_t  dclipnodes[MAX_MAP_CLIPNODES];
+// extern int32_t      numclipnodes;
+// extern dClipNode_t  dclipnodes[MAX_MAP_CLIPNODES];
 
-extern int32_t  numedges;
-extern dEdge_t  dedges[MAX_MAP_EDGES];
+// extern int32_t  numedges;
+// extern dEdge_t  dedges[MAX_MAP_EDGES];
 
-extern int32_t  nummarksurfaces;
-extern uint16_t dmarksurfaces[MAX_MAP_MARKSURFACES];
+// extern int32_t  nummarksurfaces;
+// extern uint16_t dmarksurfaces[MAX_MAP_MARKSURFACES];
 
-extern int32_t  numsurfedges;
-extern int32_t  dsurfedges[MAX_MAP_SURFEDGES];
+// extern int32_t  numsurfedges;
+// extern int32_t  dsurfedges[MAX_MAP_SURFEDGES];
 
 
 void DecompressVis(uint8_p in, uint8_p decompressed);

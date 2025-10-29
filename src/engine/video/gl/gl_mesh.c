@@ -27,38 +27,38 @@ ALIAS MODEL DISPLAY LIST GENERATION
 
 =================================================================
 */
-
-Model_t* aliasmodel;
+#include "Model.h"
+Model_p aliasmodel;
 AliasHdr_t* paliashdr;
 
-bool	used[8192];
+bool used[8192];
 
 // the command list holds counts and s/t values that are valid for
 // every frame
-int		commands[8192];
-int		numcommands;
+int  commands[8192];
+int  numcommands;
 
 // all frames will have their vertexes rearranged and expanded
 // so they are in the order expected by the command list
-int		vertexorder[8192];
-int		numorder;
+int  vertexorder[8192];
+int  numorder;
 
-int		allverts, alltris;
+int  allverts, alltris;
 
-int		stripverts[128];
-int		striptris[128];
-int		stripcount;
+int  stripverts[128];
+int  striptris[128];
+int  stripcount;
 
 /*
 ================
 StripLength
 ================
 */
-int	StripLength(int starttri, int startv) {
-    int			m1, m2;
-    int			j;
-    mTriangle_t* last, * check;
-    int			k;
+int StripLength(int starttri, int startv) {
+    int   m1, m2;
+    int   j;
+    mTriangle_p last, check;
+    int   k;
 
     used[starttri] = 2;
 
@@ -77,13 +77,10 @@ int	StripLength(int starttri, int startv) {
     // look for a matching triangle
 nexttri:
     for (j = starttri + 1, check = &triangles[starttri + 1]; j < pheader->numtris; j++, check++) {
-        if (check->facesfront != last->facesfront)
-            continue;
+        if (check->facesfront != last->facesfront)  continue;
         for (k = 0; k < 3; k++) {
-            if (check->vertindex[k] != m1)
-                continue;
-            if (check->vertindex[(k + 1) % 3] != m2)
-                continue;
+            if (check->vertindex[k] != m1)              continue;
+            if (check->vertindex[(k + 1) % 3] != m2)    continue;
 
             // this is the next part of the fan
 
@@ -120,11 +117,11 @@ done:
 FanLength
 ===========
 */
-int	FanLength(int starttri, int startv) {
-    int		m1, m2;
-    int		j;
-    mTriangle_t* last, * check;
-    int		k;
+int FanLength(int starttri, int startv) {
+    int  m1, m2;
+    int  j;
+    mTriangle_p last, check;
+    int  k;
 
     used[starttri] = 2;
 
@@ -188,70 +185,55 @@ for the model, which holds for all frames
 ================
 */
 void BuildTris(void) {
-    int		i, j, k;
-    int		startv;
-    mTriangle_t* last, * check;
-    int		m1, m2;
-    int		striplength;
-    TriVertx_t* v;
-    mTriangle_t* tv;
-    float	s, t;
-    int		index;
-    int		len, bestlen, besttype;
-    int		bestverts[1024];
-    int		besttris[1024];
-    int		type;
-
     //
     // build tristrips
     //
     numorder = 0;
     numcommands = 0;
     memset(used, 0, sizeof(used));
-    for (i = 0; i < pheader->numtris; i++) {
+    for (int i = 0; i < pheader->numtris; i++) {
         // pick an unused triangle and start the trifan
         if (used[i])
             continue;
 
-        bestlen = 0;
-        for (type = 0; type < 2; type++)
-            //	type = 1;
+        int bestlen = 0;
+        int len, besttype;
+        int  bestverts[1024];
+        int  besttris[1024];
+        for (int type = 0; type < 2; type++)
+            // type = 1;
         {
-            for (startv = 0; startv < 3; startv++) {
-                if (type == 1)
-                    len = StripLength(i, startv);
-                else
-                    len = FanLength(i, startv);
+            for (int startv = 0; startv < 3; startv++) {
+                if (type == 1)  len = StripLength(i, startv);
+                else            len = FanLength(i, startv);
                 if (len > bestlen) {
                     besttype = type;
                     bestlen = len;
-                    for (j = 0; j < bestlen + 2; j++)
+                    for (int j = 0; j < bestlen + 2; j++)
                         bestverts[j] = stripverts[j];
-                    for (j = 0; j < bestlen; j++)
+                    for (int j = 0; j < bestlen; j++)
                         besttris[j] = striptris[j];
                 }
             }
         }
 
         // mark the tris on the best strip as used
-        for (j = 0; j < bestlen; j++)
+        for (int j = 0; j < bestlen; j++)
             used[besttris[j]] = 1;
 
-        if (besttype == 1)
-            commands[numcommands++] = (bestlen + 2);
-        else
-            commands[numcommands++] = -(bestlen + 2);
+        if (besttype == 1)  commands[numcommands++] = (bestlen + 2);
+        else                commands[numcommands++] = -(bestlen + 2);
 
-        for (j = 0; j < bestlen + 2; j++) {
+        for (int j = 0; j < bestlen + 2; j++) {
             // emit a vertex into the reorder buffer
-            k = bestverts[j];
+            int k = bestverts[j];
             vertexorder[numorder++] = k;
 
             // emit s/t coords into the commands stream
-            s = stverts[k].s;
-            t = stverts[k].t;
+            float s = stverts[k].s;
+            float t = stverts[k].t;
             if (!triangles[besttris[0]].facesfront && stverts[k].onseam)
-                s += pheader->skinwidth / 2;	// on back side
+                s += pheader->skinwidth / 2; // on back side
             s = (s + 0.5) / pheader->skinwidth;
             t = (t + 0.5) / pheader->skinheight;
 
@@ -260,7 +242,7 @@ void BuildTris(void) {
         }
     }
 
-    commands[numcommands++] = 0;		// end of list marker
+    commands[numcommands++] = 0;  // end of list marker
 
     Con_DPrintf("%3i tri %3i vert %3i cmd\n", pheader->numtris, numorder, numcommands);
 
@@ -274,26 +256,19 @@ void BuildTris(void) {
 GL_MakeAliasModelDisplayLists
 ================
 */
-void GL_MakeAliasModelDisplayLists(Model_t* m, AliasHdr_t* hdr) {
-    int		i, j;
-    mAliasGroup_t* paliasgroup;
-    int* cmds;
-    TriVertx_t* verts;
-    char	cache[MAX_QPATH], fullpath[MAX_OSPATH], * c;
-    FILE* f;
-    int		len;
-    byte* data;
+void GL_MakeAliasModelDisplayLists(Model_p m, AliasHdr_p hdr) {
 
     aliasmodel = m;
-    paliashdr = hdr;	// (AliasHdr_t *)Mod_Extradata (m);
+    paliashdr = hdr; // (AliasHdr_t *)Mod_Extradata (m);
 
     //
     // look for a cached version
     //
-    strcpy(cache, "glquake/");
+    char cache[MAX_QPATH]; strcpy(cache, "glquake/");
     COM_StripExtension(m->name + strlen("progs/"), cache + strlen("glquake/"));
     strcat(cache, ".ms2");
 
+    FILE* f;
     COM_FOpenFile(cache, &f);
     if (f) {
         fread(&numcommands, 4, 1, f);
@@ -308,12 +283,12 @@ void GL_MakeAliasModelDisplayLists(Model_t* m, AliasHdr_t* hdr) {
         //
         Con_Printf("meshing %s...\n", m->name);
 
-        BuildTris();		// trifans or lists
+        BuildTris();  // trifans or lists
 
         //
         // save out the cached version
         //
-        sprintf(fullpath, "%s/%s", com_gamedir, cache);
+        char fullpath[MAX_OSPATH];  sprintf(fullpath, "%s/%s", com_gamedir, cache);
         f = fopen(fullpath, "wb");
         if (f) {
             fwrite(&numcommands, 4, 1, f);
@@ -329,15 +304,14 @@ void GL_MakeAliasModelDisplayLists(Model_t* m, AliasHdr_t* hdr) {
 
     paliashdr->poseverts = numorder;
 
-    cmds = Hunk_Alloc(numcommands * 4);
+    int* cmds = Hunk_Alloc(numcommands * 4);
     paliashdr->commands = (byte*)cmds - (byte*)paliashdr;
     memcpy(cmds, commands, numcommands * 4);
 
-    verts = Hunk_Alloc(paliashdr->numposes * paliashdr->poseverts
-        * sizeof(TriVertx_t));
+    TriVertx_p verts = Hunk_Alloc(paliashdr->numposes * paliashdr->poseverts * sizeof(TriVertx_t));
     paliashdr->posedata = (byte*)verts - (byte*)paliashdr;
-    for (i = 0; i < paliashdr->numposes; i++)
-        for (j = 0; j < numorder; j++)
+    for (int i = 0; i < paliashdr->numposes; i++)
+        for (int j = 0; j < numorder; j++)
             *verts++ = poseverts[i][vertexorder[j]];
 }
 

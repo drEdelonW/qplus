@@ -35,11 +35,8 @@ void M_Menu_LanConfig_f() {
     m_state = m_lanconfig;
     m_entersound = true;
     if (_cursor == lc_UNINITED) {
-        if (is_JoinGame() &&
-            TCPIPConfig)
-            _cursor = 2;
-        else
-            _cursor = 1;
+        if (is_JoinGame() && TCPIPConfig)   _cursor = 2;
+        else                                _cursor = 1;
     }
     if (is_CreateGame() &&
         (_cursor == 2))
@@ -171,12 +168,8 @@ void M_LanConfig_Key(keycode_t key) {
     if ((is_CreateGame()) &&
         (_cursor == lc_JoinName)
         ) {
-        if (key == K_UPARROW) {
-            _cursor = 1;
-        }
-        else {
-            _cursor = 0;
-        }
+        if (key == K_UPARROW)   _cursor = 1;
+        else                    _cursor = 0;
     }
 
     int l = Q_atoi(lanConfig.portname);

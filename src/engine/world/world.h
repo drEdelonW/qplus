@@ -23,7 +23,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "types.h"
 #include "progs.h"
 #include "bspfile.h"
-
+#include "Model.h"
+#ifdef GLQUAKE
+#   include "gl_model.h"
+#   include "glquake.h"
+#else
+// #   include "model/model.h"
+#endif
 
 typedef struct {
     vec3_t	normal;
@@ -31,20 +37,20 @@ typedef struct {
 } Plane_t;
 
 typedef struct {
-    bool	allsolid;	// if true, plane is not valid
+    bool	allsolid;   // if true, plane is not valid
     bool	startsolid;	// if true, the initial point was in a solid area
     bool	inopen, inwater;
-    float	fraction;		// time completed, 1.0 = didn't hit anything
-    vec3_t	endpos;			// final position
-    Plane_t	plane;			// surface normal at impact
-    edict_p ent;			// entity the surface is on
+    float	fraction;   // time completed, 1.0 = didn't hit anything
+    vec3_t	endpos;     // final position
+    Plane_t	plane;      // surface normal at impact
+    edict_p ent;        // entity the surface is on
 } trace_t;
 typedef trace_t* trace_p;
 
 typedef enum {
-    MOVE_NORMAL = 0, // normal movement, collide with everything
+    MOVE_NORMAL     = 0, // normal movement, collide with everything
     MOVE_NOMONSTERS = 1, // ignore monsters
-    MOVE_MISSILE = 2  // special missile movement rules
+    MOVE_MISSILE    = 2  // special missile movement rules
 } phymovetype_t;
 
 bool SV_RecursiveHullCheck(Hull_p hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_p trace);
@@ -82,12 +88,7 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
 // shouldn't be considered solid objects
 
 // passedict is explicitly excluded from clipping checks (normally NULL)
-#ifdef GLQUAKE
-#include "gl_model.h"
-#include "glquake.h"
-#else
-#include "model/model.h"
-#endif
+
 
 int     BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane);
 

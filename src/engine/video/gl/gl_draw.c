@@ -17,6 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+#include "draw.h"
 
 // draw.c -- this is the only file outside the refresh that touches the
 // vid buffer
@@ -30,9 +31,9 @@ cvar_t  gl_nobind = { "gl_nobind", "0" };
 cvar_t  gl_max_size = { "gl_max_size", "1024" };
 cvar_t  gl_picmip = { "gl_picmip", "0" };
 
-byte* draw_chars;    // 8*8 graphic characters
-qPic_t* draw_disc;
-qPic_t* draw_backtile;
+uint8_p _drawChars;    // 8*8 graphic characters
+qPic_p draw_disc;
+qPic_p draw_backtile;
 
 int   translate_texture;
 int   char_texture;
@@ -43,7 +44,7 @@ typedef struct {
 } glpic_t;
 
 byte  conback_buffer[sizeof(qPic_t) + sizeof(glpic_t)];
-qPic_t* conback = (qPic_t*)&conback_buffer;
+qPic_p conback = (qPic_p)&conback_buffer;
 
 int  gl_lightmap_format = 4;
 int  gl_solid_format = 3;
@@ -171,8 +172,8 @@ byte  menuplyr_pixels[4096];
 int  pic_texels;
 int  pic_count;
 
-qPic_t* Draw_PicFromWad(cString name) {
-    qPic_t* p;
+qPic_p Draw_PicFromWad(cString name) {
+    qPic_p p;
     glpic_t* gl;
 
     p = W_GetLumpName(name);
@@ -216,10 +217,10 @@ qPic_t* Draw_PicFromWad(cString name) {
 Draw_CachePic
 ================
 */
-qPic_t* Draw_CachePic(cString path) {
+qPic_p Draw_CachePic(cString path) {
     cachepic_t* pic;
     int   i;
-    qPic_t* dat;
+    qPic_p dat;
     glpic_t* gl;
 
     for (pic = menu_cachepics, i = 0; i < menu_numcachepics; pic++, i++)
@@ -234,7 +235,7 @@ qPic_t* Draw_CachePic(cString path) {
     //
     // load the pic from disk
     //
-    dat = (qPic_t*)COM_LoadTempFile(path);
+    dat = (qPic_p)COM_LoadTempFile(path);
     if (!dat)
         Sys_Error("Draw_CachePic: failed to load %s", path);
     SwapPic(dat);
@@ -259,15 +260,15 @@ qPic_t* Draw_CachePic(cString path) {
 }
 
 
-void Draw_CharToConback(int num, byte* dest) {
+void Draw_CharToConback(int num, uint8_p dest) {
     int  row, col;
-    byte* source;
+    uint8_p source;
     int  drawline;
     int  x;
 
     row = num >> 4;
     col = num & 15;
-    source = draw_chars + (row << 10) + (col << 3);
+    source = _drawChars + (row << 10) + (col << 3);
 
     drawline = 8;
 
@@ -344,13 +345,13 @@ Draw_Init
 */
 void Draw_Init(void) {
     int  i;
-    qPic_t* cb;
-    byte* dest, * src;
+    qPic_p cb;
+    uint8_p dest,  src;
     int  x, y;
     char ver[40];
     glpic_t* gl;
     int  start;
-    byte* ncdata;
+    uint8_p ncdata;
     int  f, fstep;
 
 
@@ -369,17 +370,17 @@ void Draw_Init(void) {
     // by hand, because we need to write the version
     // string into the background before turning
     // it into a texture
-    draw_chars = W_GetLumpName("conchars");
+    _drawChars = W_GetLumpName("conchars");
     for (i = 0; i < 256 * 64; i++)
-        if (draw_chars[i] == 0)
-            draw_chars[i] = 255; // proper transparent color
+        if (_drawChars[i] == 0)
+            _drawChars[i] = 255; // proper transparent color
 
     // now turn them into textures
-    char_texture = GL_LoadTexture("charset", 128, 128, draw_chars, false, true);
+    char_texture = GL_LoadTexture("charset", 128, 128, _drawChars, false, true);
 
     start = Hunk_LowMark();
 
-    cb = (qPic_t*)COM_LoadTempFile("gfx/conback.lmp");
+    cb = (qPic_p)COM_LoadTempFile("gfx/conback.lmp");
     if (!cb)
         Sys_Error("Couldn't load gfx/conback.lmp");
     SwapPic(cb);
@@ -468,8 +469,8 @@ smoothly scrolled off.
 ================
 */
 void Draw_Character(int x, int y, int num) {
-    byte* dest;
-    byte* source;
+    uint8_p dest;
+    uint8_p source;
     unsigned short* pusdest;
     int    drawline;
     int    row, col;
@@ -534,8 +535,8 @@ void Draw_DebugChar(char num) {
 Draw_AlphaPic
 =============
 */
-void Draw_AlphaPic(int x, int y, qPic_t* pic, float alpha) {
-    byte* dest, * source;
+void Draw_AlphaPic(int x, int y, qPic_p pic, float alpha) {
+    uint8_p dest, source;
     unsigned short* pusdest;
     int    v, u;
     glpic_t* gl;
@@ -570,8 +571,8 @@ void Draw_AlphaPic(int x, int y, qPic_t* pic, float alpha) {
 Draw_Pic
 =============
 */
-void Draw_Pic(int x, int y, qPic_t* pic) {
-    byte* dest, * source;
+void Draw_Pic(int x, int y, qPic_p pic) {
+    uint8_p dest,  source;
     unsigned short* pusdest;
     int    v, u;
     glpic_t* gl;
@@ -599,8 +600,9 @@ void Draw_Pic(int x, int y, qPic_t* pic) {
 Draw_TransPic
 =============
 */
-void Draw_TransPic(int x, int y, qPic_t* pic) {
-    byte* dest, * source, tbyte;
+void Draw_TransPic(int x, int y, qPic_p pic) {
+    uint8_p dest,  source,
+    byte tbyte;
     unsigned short* pusdest;
     int    v, u;
 
@@ -620,10 +622,10 @@ Draw_TransPicTranslate
 Only used for the player color selection menu
 =============
 */
-void Draw_TransPicTranslate(int x, int y, qPic_t* pic, byte* translation) {
+void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
     int    v, u, c;
     unsigned  trans[64 * 64], * dest;
-    byte* src;
+    uint8_p src;
     int    p;
 
     GL_Bind(translate_texture);
@@ -889,9 +891,9 @@ GL_MipMap
 Operates in place, quartering the size of the texture
 ================
 */
-void GL_MipMap(byte* in, int width, int height) {
+void GL_MipMap(uint8_p in, int width, int height) {
     int  i, j;
-    byte* out;
+    uint8_p out;
 
     width <<= 2;
     height >>= 1;
@@ -913,20 +915,20 @@ GL_MipMap8Bit
 Mipping for 8 bit textures
 ================
 */
-void GL_MipMap8Bit(byte* in, int width, int height) {
+void GL_MipMap8Bit(uint8_p in, int width, int height) {
     int  i, j;
     unsigned short     r, g, b;
-    byte* out, * at1, * at2, * at3, * at4;
+    uint8_p out,  at1,  at2,  at3,  at4;
 
     // width <<=2;
     height >>= 1;
     out = in;
     for (i = 0; i < height; i++, in += width) {
         for (j = 0; j < width; j += 2, out += 1, in += 2) {
-            at1 = (byte*)(d_8to24table + in[0]);
-            at2 = (byte*)(d_8to24table + in[1]);
-            at3 = (byte*)(d_8to24table + in[width + 0]);
-            at4 = (byte*)(d_8to24table + in[width + 1]);
+            at1 = (uint8_p)(d_8to24table + in[0]);
+            at2 = (uint8_p)(d_8to24table + in[1]);
+            at3 = (uint8_p)(d_8to24table + in[width + 0]);
+            at4 = (uint8_p)(d_8to24table + in[width + 1]);
 
             r = (at1[0] + at2[0] + at3[0] + at4[0]); r >>= 5;
             g = (at1[1] + at2[1] + at3[1] + at4[1]); g >>= 5;
@@ -994,7 +996,7 @@ void GL_Upload32(unsigned* data, int width, int height, bool mipmap, bool alpha)
 
         miplevel = 0;
         while (scaled_width > 1 || scaled_height > 1) {
-            GL_MipMap((byte*)scaled, scaled_width, scaled_height);
+            GL_MipMap((uint8_p)scaled, scaled_width, scaled_height);
             scaled_width >>= 1;
             scaled_height >>= 1;
             if (scaled_width < 1)
@@ -1019,7 +1021,7 @@ done:;
     }
 }
 
-void GL_Upload8_EXT(byte* data, int width, int height, bool mipmap, bool alpha) {
+void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha) {
     int   i, s;
     bool noalpha;
     int   p;
@@ -1077,7 +1079,7 @@ void GL_Upload8_EXT(byte* data, int width, int height, bool mipmap, bool alpha) 
 
         miplevel = 0;
         while (scaled_width > 1 || scaled_height > 1) {
-            GL_MipMap8Bit((byte*)scaled, scaled_width, scaled_height);
+            GL_MipMap8Bit((uint8_p)scaled, scaled_width, scaled_height);
             scaled_width >>= 1;
             scaled_height >>= 1;
             if (scaled_width < 1)
@@ -1106,7 +1108,7 @@ done:;
 GL_Upload8
 ===============
 */
-void GL_Upload8(byte* data, int width, int height, bool mipmap, bool alpha) {
+void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
     static unsigned trans[640 * 480];  // FIXME, temporary
     int   i, s;
     bool noalpha;
@@ -1150,7 +1152,7 @@ void GL_Upload8(byte* data, int width, int height, bool mipmap, bool alpha) {
 GL_LoadTexture
 ================
 */
-int GL_LoadTexture(cString identifier, int width, int height, byte* data, bool mipmap, bool alpha) {
+int GL_LoadTexture(cString identifier, int width, int height, uint8_p data, bool mipmap, bool alpha) {
     bool noalpha;
     int   i, p, s;
     glTexture_t* glt;
@@ -1190,7 +1192,7 @@ int GL_LoadTexture(cString identifier, int width, int height, byte* data, bool m
 GL_LoadPicTexture
 ================
 */
-int GL_LoadPicTexture(qPic_t* pic) {
+int GL_LoadPicTexture(qPic_p pic) {
     return GL_LoadTexture("", pic->width, pic->height, pic->data, false, true);
 }
 

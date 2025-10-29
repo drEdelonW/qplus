@@ -26,25 +26,19 @@ bool r_cache_thrash;  // compatability
 
 vec3_t  modelorg, r_entorigin;
 Entity_p currententity;
-
 int   r_visframecount; // bumped when going to a new PVS
 int   r_framecount;  // used for dlight push checking
-
 mPlane_t frustum[4];
 
-int   c_brush_polys, c_alias_polys;
+int     c_brush_polys, c_alias_polys;
+bool    envmap;    // true during envmap command capture
+int     currenttexture = -1;  // to avoid unnecessary texture sets
+int     cnttextures[2] = { -1, -1 };     // cached
+int     particletexture; // little dot for particles
+int     playertextures;  // up to 16 color translated skins
 
-bool envmap;    // true during envmap command capture 
-
-int   currenttexture = -1;  // to avoid unnecessary texture sets
-
-int   cnttextures[2] = { -1, -1 };     // cached
-
-int   particletexture; // little dot for particles
-int   playertextures;  // up to 16 color translated skins
-
-int   mirrortexturenum; // quake texturenum, not gltexturenum
-bool mirror;
+int     mirrortexturenum; // quake texturenum, not gltexturenum
+bool    mirror;
 mPlane_p mirror_plane;
 
 //
@@ -62,9 +56,7 @@ float r_base_world_matrix[16];
 // screen size info
 //
 refdef_t r_refdef;
-
 mLeaf_p r_viewleaf, r_oldviewleaf;
-
 Texture_p r_notexture_mip;
 
 int  d_lightstylevalue[256]; // 8.8 fraction of base light value
@@ -72,30 +64,30 @@ int  d_lightstylevalue[256]; // 8.8 fraction of base light value
 
 void R_MarkLeaves(void);
 
-cvar_t r_norefresh = { "r_norefresh","0" };
-cvar_t r_drawentities = { "r_drawentities","1" };
-cvar_t r_drawviewmodel = { "r_drawviewmodel","1" };
-cvar_t r_speeds = { "r_speeds","0" };
-cvar_t r_fullbright = { "r_fullbright","0" };
-cvar_t r_lightmap = { "r_lightmap","0" };
-cvar_t r_shadows = { "r_shadows","0" };
-cvar_t r_mirroralpha = { "r_mirroralpha","1" };
-cvar_t r_wateralpha = { "r_wateralpha","1" };
-cvar_t r_dynamic = { "r_dynamic","1" };
-cvar_t r_novis = { "r_novis","0" };
+cvar_t r_norefresh = { "r_norefresh", "0" };
+cvar_t r_drawentities = { "r_drawentities", "1" };
+cvar_t r_drawviewmodel = { "r_drawviewmodel", "1" };
+cvar_t r_speeds = { "r_speeds", "0" };
+cvar_t r_fullbright = { "r_fullbright", "0" };
+cvar_t r_lightmap = { "r_lightmap", "0" };
+cvar_t r_shadows = { "r_shadows", "0" };
+cvar_t r_mirroralpha = { "r_mirroralpha", "1" };
+cvar_t r_wateralpha = { "r_wateralpha", "1" };
+cvar_t r_dynamic = { "r_dynamic", "1" };
+cvar_t r_novis = { "r_novis", "0" };
 
-cvar_t gl_finish = { "gl_finish","0" };
-cvar_t gl_clear = { "gl_clear","0" };
-cvar_t gl_cull = { "gl_cull","1" };
-cvar_t gl_texsort = { "gl_texsort","1" };
-cvar_t gl_smoothmodels = { "gl_smoothmodels","1" };
-cvar_t gl_affinemodels = { "gl_affinemodels","0" };
-cvar_t gl_polyblend = { "gl_polyblend","1" };
-cvar_t gl_flashblend = { "gl_flashblend","1" };
-cvar_t gl_playermip = { "gl_playermip","0" };
-cvar_t gl_nocolors = { "gl_nocolors","0" };
-cvar_t gl_keeptjunctions = { "gl_keeptjunctions","0" };
-cvar_t gl_reporttjunctions = { "gl_reporttjunctions","0" };
+cvar_t gl_finish = { "gl_finish", "0" };
+cvar_t gl_clear = { "gl_clear", "0" };
+cvar_t gl_cull = { "gl_cull", "1" };
+cvar_t gl_texsort = { "gl_texsort", "1" };
+cvar_t gl_smoothmodels = { "gl_smoothmodels", "1" };
+cvar_t gl_affinemodels = { "gl_affinemodels", "0" };
+cvar_t gl_polyblend = { "gl_polyblend", "1" };
+cvar_t gl_flashblend = { "gl_flashblend", "1" };
+cvar_t gl_playermip = { "gl_playermip", "0" };
+cvar_t gl_nocolors = { "gl_nocolors", "0" };
+cvar_t gl_keeptjunctions = { "gl_keeptjunctions", "0" };
+cvar_t gl_reporttjunctions = { "gl_reporttjunctions", "0" };
 cvar_t gl_doubleeyes = { "gl_doubleeys", "1" };
 
 extern cvar_t gl_ztrick;
@@ -108,9 +100,7 @@ Returns true if the box is completely outside the frustom
 =================
 */
 bool R_CullBox(vec3_t mins, vec3_t maxs) {
-    int  i;
-
-    for (i=0; i<4; i++)
+    for (int i = 0; i < 4; i++)
         if (BoxOnPlaneSide(mins, maxs, &frustum[i]) == 2)
             return true;
     return false;
@@ -160,7 +150,7 @@ mSpriteFrame_t* R_GetSpriteFrame(Entity_p currententity) {
         pspritegroup = (mSpriteGroup_t*)psprite->frames[frame].frameptr;
         pintervals = pspritegroup->intervals;
         numframes = pspritegroup->numframes;
-        fullinterval = pintervals[numframes-1];
+        fullinterval = pintervals[numframes - 1];
 
         time = cl.time + currententity->syncbase;
 
@@ -168,7 +158,7 @@ mSpriteFrame_t* R_GetSpriteFrame(Entity_p currententity) {
         // are positive, so we don't have to worry about division by 0
         targettime = time - ((int)(time / fullinterval)) * fullinterval;
 
-        for (i=0; i<(numframes-1); i++) {
+        for (i = 0; i < (numframes - 1); i++) {
             if (pintervals[i] > targettime)
                 break;
         }
@@ -372,8 +362,8 @@ void GL_DrawAliasShadow(AliasHdr_t* paliashdr, int posenum) {
             point[1] = verts->v[1] * paliashdr->scale[1] + paliashdr->scale_origin[1];
             point[2] = verts->v[2] * paliashdr->scale[2] + paliashdr->scale_origin[2];
 
-            point[0] -= shadevector[0]*(point[2]+lheight);
-            point[1] -= shadevector[1]*(point[2]+lheight);
+            point[0] -= shadevector[0] * (point[2] + lheight);
+            point[1] -= shadevector[1] * (point[2] + lheight);
             point[2] = height;
             //   height -= 0.001;
             glVertex3fv(point);
@@ -456,7 +446,7 @@ void R_DrawAliasModel(Entity_p e) {
     if (e == &cl.viewent && ambientlight < 24)
         ambientlight = shadelight = 24;
 
-    for (lnum=0; lnum<MAX_DLIGHTS; lnum++) {
+    for (lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
         if (cl_dlights[lnum].die >= cl.time) {
             VectorSubtract(currententity->origin,
                 cl_dlights[lnum].origin,
@@ -479,7 +469,7 @@ void R_DrawAliasModel(Entity_p e) {
 
     // ZOID: never allow players to go totally black
     i = currententity - cl_entities;
-    if (i >= 1 && i<=cl.maxclients /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
+    if (i >= 1 && i <= cl.maxclients /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
         if (ambientlight < 8)
             ambientlight = shadelight = 8;
 
@@ -491,7 +481,7 @@ void R_DrawAliasModel(Entity_p e) {
     shadedots = r_avertexnormal_dots[((int)(e->angles[1] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
     shadelight = shadelight / 200.0;
 
-    an = e->angles[1]/180*M_PI;
+    an = e->angles[1] / 180 * M_PI;
     shadevector[0] = cos(-an);
     shadevector[1] = sin(-an);
     shadevector[2] = 1;
@@ -516,21 +506,21 @@ void R_DrawAliasModel(Entity_p e) {
     if (!strcmp(clmodel->name, "progs/eyes.mdl") && gl_doubleeyes.value) {
         glTranslatef(paliashdr->scale_origin[0], paliashdr->scale_origin[1], paliashdr->scale_origin[2] - (22 + 8));
         // double size of eyes, since they are really hard to see in gl
-        glScalef(paliashdr->scale[0]*2, paliashdr->scale[1]*2, paliashdr->scale[2]*2);
+        glScalef(paliashdr->scale[0] * 2, paliashdr->scale[1] * 2, paliashdr->scale[2] * 2);
     }
     else {
         glTranslatef(paliashdr->scale_origin[0], paliashdr->scale_origin[1], paliashdr->scale_origin[2]);
         glScalef(paliashdr->scale[0], paliashdr->scale[1], paliashdr->scale[2]);
     }
 
-    anim = (int)(cl.time*10) & 3;
+    anim = (int)(cl.time * 10) & 3;
     GL_Bind(paliashdr->gl_texturenum[currententity->skinnum][anim]);
 
     // we can't dynamically colormap textures, so they are cached
     // seperately for the players.  Heads are just uncolored.
     if (currententity->colormap != vid.colormap && !gl_nocolors.value) {
         i = currententity - cl_entities;
-        if (i >= 1 && i<=cl.maxclients /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
+        if (i >= 1 && i <= cl.maxclients /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
             GL_Bind(playertextures - 1 + i);
     }
 
@@ -580,7 +570,7 @@ void R_DrawEntitiesOnList(void) {
         return;
 
     // draw sprites seperately, because of alpha blending
-    for (i=0; i<cl_numvisedicts; i++) {
+    for (i = 0; i < cl_numvisedicts; i++) {
         currententity = cl_visedicts[i];
 
         switch (currententity->model->type) {
@@ -597,7 +587,7 @@ void R_DrawEntitiesOnList(void) {
         }
     }
 
-    for (i=0; i<cl_numvisedicts; i++) {
+    for (i = 0; i < cl_numvisedicts; i++) {
         currententity = cl_visedicts[i];
 
         switch (currententity->model->type) {
@@ -652,7 +642,7 @@ void R_DrawViewModel(void) {
     shadelight = j;
 
     // add dynamic lights  
-    for (lnum=0; lnum<MAX_DLIGHTS; lnum++) {
+    for (lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
         dl = &cl_dlights[lnum];
         if (!dl->radius)
             continue;
@@ -671,7 +661,7 @@ void R_DrawViewModel(void) {
     diffuse[0] = diffuse[1] = diffuse[2] = diffuse[3] = (float)shadelight / 128;
 
     // hack the depth range to prevent view model from poking into walls
-    glDepthRange(gldepthmin, gldepthmin + 0.3*(gldepthmax-gldepthmin));
+    glDepthRange(gldepthmin, gldepthmin + 0.3 * (gldepthmax - gldepthmin));
     R_DrawAliasModel(currententity);
     glDepthRange(gldepthmin, gldepthmax);
 }
@@ -722,9 +712,9 @@ int SignbitsForPlane(mPlane_p out) {
     // for fast box on planeside test
 
     bits = 0;
-    for (j=0; j<3; j++) {
+    for (j = 0; j < 3; j++) {
         if (out->normal[j] < 0)
-            bits |= 1<<j;
+            bits |= 1 << j;
     }
     return bits;
 }
@@ -744,16 +734,16 @@ void R_SetFrustum(void) {
     }
     else {
         // rotate VPN right by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[0].normal, vup, vpn, -(90-r_refdef.fov_x / 2));
+        RotatePointAroundVector(frustum[0].normal, vup, vpn, -(90 - r_refdef.fov_x / 2));
         // rotate VPN left by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[1].normal, vup, vpn, 90-r_refdef.fov_x / 2);
+        RotatePointAroundVector(frustum[1].normal, vup, vpn, 90 - r_refdef.fov_x / 2);
         // rotate VPN up by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[2].normal, vright, vpn, 90-r_refdef.fov_y / 2);
+        RotatePointAroundVector(frustum[2].normal, vright, vpn, 90 - r_refdef.fov_y / 2);
         // rotate VPN down by FOV_X/2 degrees
         RotatePointAroundVector(frustum[3].normal, vright, vpn, -(90 - r_refdef.fov_y / 2));
     }
 
-    for (i=0; i<4; i++) {
+    for (i = 0; i < 4; i++) {
         frustum[i].type = PLANE_ANYZ;
         frustum[i].dist = DotProduct(r_origin, frustum[i].normal);
         frustum[i].signbits = SignbitsForPlane(&frustum[i]);
@@ -831,10 +821,10 @@ void R_SetupGL(void) {
     //
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    x = r_refdef.vrect.x * glwidth/vid.width;
-    x2 = (r_refdef.vrect.x + r_refdef.vrect.width) * glwidth/vid.width;
-    y = (vid.height-r_refdef.vrect.y) * glheight/vid.height;
-    y2 = (vid.height - (r_refdef.vrect.y + r_refdef.vrect.height)) * glheight/vid.height;
+    x = r_refdef.vrect.x * glwidth / vid.width;
+    x2 = (r_refdef.vrect.x + r_refdef.vrect.width) * glwidth / vid.width;
+    y = (vid.height - r_refdef.vrect.y) * glheight / vid.height;
+    y2 = (vid.height - (r_refdef.vrect.y + r_refdef.vrect.height)) * glheight / vid.height;
 
     // fudge around because of frac screen scale
     if (x > 0)
@@ -855,7 +845,7 @@ void R_SetupGL(void) {
     }
 
     glViewport(glx + x, gly + y2, w, h);
-    screenaspect = (float)r_refdef.vrect.width/r_refdef.vrect.height;
+    screenaspect = (float)r_refdef.vrect.width / r_refdef.vrect.height;
     // yfov = 2*atan((float)r_refdef.vrect.height/r_refdef.vrect.width)*180/M_PI;
     MYgluPerspective(r_refdef.fov_y, screenaspect, 4, 4096);
 
@@ -991,13 +981,13 @@ void R_Mirror(void) {
     memcpy(r_base_world_matrix, r_world_matrix, sizeof(r_base_world_matrix));
 
     d = DotProduct(r_refdef.vieworg, mirror_plane->normal) - mirror_plane->dist;
-    VectorMA(r_refdef.vieworg, -2*d, mirror_plane->normal, r_refdef.vieworg);
+    VectorMA(r_refdef.vieworg, -2 * d, mirror_plane->normal, r_refdef.vieworg);
 
     d = DotProduct(vpn, mirror_plane->normal);
-    VectorMA(vpn, -2*d, mirror_plane->normal, vpn);
+    VectorMA(vpn, -2 * d, mirror_plane->normal, vpn);
 
-    r_refdef.viewangles[0] = -asin(vpn[2])/M_PI*180;
-    r_refdef.viewangles[1] = atan2(vpn[1], vpn[0])/M_PI*180;
+    r_refdef.viewangles[0] = -asin(vpn[2]) / M_PI * 180;
+    r_refdef.viewangles[1] = atan2(vpn[1], vpn[0]) / M_PI * 180;
     r_refdef.viewangles[2] = -r_refdef.viewangles[2];
 
     ent = &cl_entities[cl.viewentity];
@@ -1033,7 +1023,7 @@ void R_Mirror(void) {
 
     glColor4f(1, 1, 1, r_mirroralpha.value);
     s = cl.worldmodel->textures[mirrortexturenum]->texturechain;
-    for (; s; s=s->texturechain)
+    for (; s; s = s->texturechain)
         R_RenderBrushPoly(s);
     cl.worldmodel->textures[mirrortexturenum]->texturechain = NULL;
     glDisable(GL_BLEND);
@@ -1097,6 +1087,6 @@ void R_RenderView(void) {
     if (r_speeds.value) {
         //  glFinish ();
         time2 = Sys_FloatTime();
-        Con_Printf("%3i ms  %4i wpoly %4i epoly\n", (int)((time2-time1)*1000), c_brush_polys, c_alias_polys);
+        Con_Printf("%3i ms  %4i wpoly %4i epoly\n", (int)((time2 - time1) * 1000), c_brush_polys, c_alias_polys);
     }
 }

@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 
 
-int			cache_full_cycle;
+int   cache_full_cycle;
 
 uint8_p S_Alloc(int size);
 
@@ -38,54 +38,43 @@ ResampleSfx
 ================
 */
 void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cString data) {
-    int		outcount;
-    int		srcsample;
-    float	stepscale;
-    int		i;
-    int		sample, samplefrac, fracstep;
-    sfxcache_t* sc;
 
-    sc = Cache_Check(&sfx->cache);
-    if (!sc)
-        return;
+    sfxcache_p sc = Cache_Check(&sfx->cache);
+    if (!sc)    return;
 
-    stepscale = (float)inrate / shm->speed;	// this is usually 0.5, 1, or 2
+    float stepscale = (float)inrate / shm->speed; // this is usually 0.5, 1, or 2
 
-    outcount = sc->length / stepscale;
+    int outcount = sc->length / stepscale;
     sc->length = outcount;
     if (sc->loopstart != -1)
         sc->loopstart = sc->loopstart / stepscale;
 
     sc->speed = shm->speed;
-    if (loadas8bit.value)
-        sc->width = 1;
-    else
-        sc->width = inwidth;
+    if (loadas8bit.value)   sc->width = 1;
+    else                    sc->width = inwidth;
     sc->stereo = 0;
 
     // resample / decimate to the current source rate
 
     if (stepscale == 1 && inwidth == 1 && sc->width == 1) {
         // fast special case
-        for (i = 0; i < outcount; i++)
+        for (int i = 0; i < outcount; i++)
             ((int8_p)sc->data)[i]
             = (int)((uint8_t)(data[i]) - 128);
     }
     else {
         // general case
-        samplefrac = 0;
-        fracstep = stepscale * 256;
-        for (i = 0; i < outcount; i++) {
-            srcsample = samplefrac >> 8;
+        int samplefrac = 0;
+        int fracstep = stepscale * 256;
+        for (int i = 0; i < outcount; i++) {
+            int srcsample = samplefrac >> 8;
             samplefrac += fracstep;
-            if (inwidth == 2)
-                sample = LittleShort(((int16_p)data)[srcsample]);
-            else
-                sample = (int)((uint8_t)(data[srcsample]) - 128) << 8;
-            if (sc->width == 2)
-                ((int16_p)sc->data)[i] = sample;
-            else
-                ((int8_p)sc->data)[i] = sample >> 8;
+            int sample;
+            if (inwidth == 2)   sample = LittleShort(((int16_p)data)[srcsample]);
+            else                sample = (int)((uint8_t)(data[srcsample]) - 128) << 8;
+
+            if (sc->width == 2) ((int16_p)sc->data)[i] = sample;
+            else                ((int8_p)sc->data)[i] = sample >> 8;
         }
     }
 }
@@ -97,42 +86,36 @@ void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cString data) {
 S_LoadSound
 ==============
 */
-sfxcache_t* S_LoadSound(sfx_p s) {
-    char	namebuffer[256];
-    cString    data;
-    wavinfo_t	info;
-    int     len;
-    float   stepscale;
-    sfxcache_t* sc;
-    char	stackbuf[1 * 1024];		// avoid dirtying the cache heap
-
+sfxcache_p S_LoadSound(sfx_p s) {
     // see if still in memory
-    sc = Cache_Check(&s->cache);
+    sfxcache_p sc = Cache_Check(&s->cache);
     if (sc)
         return sc;
 
     //Con_Printf ("S_LoadSound: %x\n", (int)stackbuf);
     // load it in
+    char namebuffer[256];
     Q_strcpy(namebuffer, "sound/");
     Q_strcat(namebuffer, s->name);
 
-    //	Con_Printf ("loading %s\n", namebuffer);
+    // Con_Printf ("loading %s\n", namebuffer);
 
-    data = (cString)COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
+    char stackbuf[1 * 1024];  // avoid dirtying the cache heap
+    cString data = (cString)COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
 
     if (!data) {
         Con_Printf("Couldn't load %s\n", namebuffer);
         return NULL;
     }
 
-    info = GetWavinfo(s->name, data, com_filesize);
+    wavinfo_t info = GetWavinfo(s->name, data, com_filesize);
     if (info.channels != 1) {
         Con_Printf("%s is a stereo sample\n", s->name);
         return NULL;
     }
 
-    stepscale = (float)info.rate / shm->speed;
-    len = info.samples / stepscale;
+    float stepscale = (float)info.rate / shm->speed;
+    int len = info.samples / stepscale;
 
     len = len * info.width * info.channels;
 
@@ -163,11 +146,11 @@ WAV loading
 */
 
 
-cString 	data_p;
-cString    iff_end;
-cString    last_chunk;
-cString    iff_data;
-int 	iff_chunk_len;
+cString data_p;
+cString iff_end;
+cString last_chunk;
+cString iff_data;
+int     iff_chunk_len;
 
 
 int16_t GetLittleShort() {
@@ -192,7 +175,7 @@ void FindNextChunk(cString name) {
     while (1) {
         data_p = last_chunk;
 
-        if (data_p >= iff_end) {	// didn't find the chunk
+        if (data_p >= iff_end) { // didn't find the chunk
             data_p = NULL;
             return;
         }
@@ -203,8 +186,8 @@ void FindNextChunk(cString name) {
             data_p = NULL;
             return;
         }
-        //		if (iff_chunk_len > 1024*1024)
-        //			Sys_Error ("FindNextChunk: %i length is past the 1 meg sanity limit", iff_chunk_len);
+        //  if (iff_chunk_len > 1024*1024)
+        //   Sys_Error ("FindNextChunk: %i length is past the 1 meg sanity limit", iff_chunk_len);
         data_p -= 8;
         last_chunk = data_p + 8 + ((iff_chunk_len + 1) & ~1);
         if (!Q_strncmp(data_p, name, 4)) {
@@ -220,7 +203,7 @@ void FindChunk(cString name) {
 
 
 void DumpChunks() {
-    char	str[5];
+    char str[5];
 
     str[4] = 0;
     data_p = iff_data;
@@ -239,15 +222,9 @@ GetWavinfo
 ============
 */
 wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
-    wavinfo_t info;
-    int i;
-    int format;
-    int samples;
+    wavinfo_t info; memset(&info, 0, sizeof(info));
 
-    memset(&info, 0, sizeof(info));
-
-    if (!wav)
-        return info;
+    if (!wav)   return info;
 
     iff_data = wav;
     iff_end = wav + wavlength;
@@ -259,8 +236,7 @@ wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
         (!Q_strncmp(data_p + 8, "WAVE", 4))
         )
         ) {
-        Con_Printf("Missing RIFF/WAVE chunks\n");
-        return info;
+        Con_Printf("Missing RIFF/WAVE chunks\n");   return info;
     }
 
     // get "fmt " chunk
@@ -268,16 +244,10 @@ wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
     // DumpChunks ();
 
     FindChunk("fmt ");
-    if (!data_p) {
-        Con_Printf("Missing fmt chunk\n");
-        return info;
-    }
+    if (!data_p) { Con_Printf("Missing fmt chunk\n");   return info; }
     data_p += 8;
-    format = GetLittleShort();
-    if (format != 1) {
-        Con_Printf("Microsoft PCM format only\n");
-        return info;
-    }
+    int format = GetLittleShort();
+    if (format != 1) { Con_Printf("Microsoft PCM format only\n");   return info; }
 
     info.channels = GetLittleShort();
     info.rate = GetLittleLong();
@@ -289,16 +259,16 @@ wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
     if (data_p) {
         data_p += 32;
         info.loopstart = GetLittleLong();
-        //		Con_Printf("loopstart=%d\n", sfx->loopstart);
+        //  Con_Printf("loopstart=%d\n", sfx->loopstart);
 
             // if the next chunk is a LIST chunk, look for a cue length marker
         FindNextChunk("LIST");
         if (data_p) {
-            if (!strncmp((cString)data_p + 28, "mark", 4)) {	// this is not a proper parse, but it works with cooledit...
+            if (!strncmp((cString)data_p + 28, "mark", 4)) { // this is not a proper parse, but it works with cooledit...
                 data_p += 24;
-                i = GetLittleLong();	// samples in loop
+                int i = GetLittleLong(); // samples in loop
                 info.samples = info.loopstart + i;
-                //				Con_Printf("looped length: %i\n", i);
+                //    Con_Printf("looped length: %i\n", i);
             }
         }
     }
@@ -307,20 +277,16 @@ wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
 
     // find data chunk
     FindChunk("data");
-    if (!data_p) {
-        Con_Printf("Missing data chunk\n");
-        return info;
-    }
+    if (!data_p) { Con_Printf("Missing data chunk\n");        return info; }
 
     data_p += 4;
-    samples = GetLittleLong() / info.width;
+    int samples = GetLittleLong() / info.width;
 
     if (info.samples) {
         if (samples < info.samples)
             Sys_Error("Sound %s has a bad loop length", name);
     }
-    else
-        info.samples = samples;
+    else    info.samples = samples;
 
     info.dataofs = data_p - wav;
 

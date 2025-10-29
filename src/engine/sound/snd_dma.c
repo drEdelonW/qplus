@@ -101,10 +101,7 @@ void S_AmbientOn() { snd_ambient = true; }
 
 
 void S_SoundInfo_f() {
-    if (!sound_started || !shm) {
-        Con_Printf("sound system not started\n");
-        return;
-    }
+    if (!sound_started || !shm) { Con_Printf("sound system not started\n");        return; }
 
     Con_Printf("%5d stereo\n", shm->channels - 1);
     Con_Printf("%5d samples\n", shm->samples);
@@ -154,7 +151,7 @@ void S_Init() {
 #if 0   /* NOSOUND*/
     if (COM_CheckParm("-nosound")) // TODO: force disabled
 #endif
-    return;
+        return;
 
     if (COM_CheckParm("-simsound"))
         fakedma = true;
@@ -405,9 +402,9 @@ void SND_Spatialize(channel_p ch) {
 // =======================================================================
 
 void S_StartSound(int entnum, int entchannel, sfx_p sfx, vec3_t origin, float fvol, float attenuation) {
-    if (!sound_started) return;
-    if (!sfx)   return;
-    if (nosound.value)  return;
+    if ((!sound_started) ||
+        (!sfx) ||
+        (nosound.value))  return;
 
     int vol = fvol * 255;
 
@@ -483,9 +480,7 @@ void S_StopAllSounds(bool clear) {
         S_ClearBuffer();
 }
 
-void S_StopAllSoundsC() {
-    S_StopAllSounds(true);
-}
+void S_StopAllSoundsC() { S_StopAllSounds(true); }
 
 void S_ClearBuffer() {
     if (!sound_started ||
@@ -534,7 +529,7 @@ void S_ClearBuffer() {
     {
         Q_memset(shm->buffer, clear, shm->samples * shm->samplebits / 8);
     }
-}
+    }
 
 
 /*

@@ -7,7 +7,7 @@
 //=============================================================================
 /* MODEM CONFIG MENU */
 
-typedef enum{
+typedef enum {
     mc_force_signed = -1,
     mc_FIRST = 0,
     mc_DialMode = mc_FIRST,
@@ -121,17 +121,9 @@ void M_ModemConfig_Key(keycode_t key) {
         break;
 
     case K_BACKSPACE:
-        if (_mc.cursor == mc_Clear) {
-            if (strlen(_mc.sClear))  _mc.sClear[strlen(_mc.sClear) - 1] = 0x00;
-        }
-
-        if (_mc.cursor == mc_Init) {
-            if (strlen(_mc.sInit))   _mc.sInit[strlen(_mc.sInit) - 1] = 0x00;
-        }
-
-        if (_mc.cursor == mc_Hangup) {
-            if (strlen(_mc.sHangup)) _mc.sHangup[strlen(_mc.sHangup) - 1] = 0x00;
-        }
+        if ((_mc.cursor == mc_Clear) && (strlen(_mc.sClear)))   _mc.sClear[strlen(_mc.sClear) - 1] = 0x00;
+        if ((_mc.cursor == mc_Init) && (strlen(_mc.sInit)))     _mc.sInit[strlen(_mc.sInit) - 1] = 0x00;
+        if ((_mc.cursor == mc_Hangup) && (strlen(_mc.sHangup))) _mc.sHangup[strlen(_mc.sHangup) - 1] = 0x00;
         break;
 
     default:

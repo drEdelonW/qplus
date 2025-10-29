@@ -86,9 +86,7 @@ void M_Save_Draw() {
 
 void M_Load_Key(keycode_t k) {
     switch (k) {
-    case K_ESCAPE:
-        M_Menu_SinglePlayer_f();
-        break;
+    case K_ESCAPE:  M_Menu_SinglePlayer_f();    break;
 
     case K_ENTER:
         S_LocalSound("misc/menu2.wav");
@@ -125,9 +123,7 @@ void M_Load_Key(keycode_t k) {
 
 void M_Save_Key(keycode_t k) {
     switch (k) {
-    case K_ESCAPE:
-        M_Menu_SinglePlayer_f();
-        break;
+    case K_ESCAPE:  M_Menu_SinglePlayer_f();    break;
 
     case K_ENTER:
         m_state = m_none;

@@ -174,7 +174,7 @@ void CL_KeepaliveMessage() {
         ret = CL_GetMessage();
         switch (ret) {
         default:    Host_Error("CL_KeepaliveMessage: CL_GetMessage failed");    break;
-            // case 0:                                                                 break; // nothing waiting
+        case 0:                                                                 break; // nothing waiting
         case 1:     Host_Error("CL_KeepaliveMessage: received a message");      break;
         case 2:
             if (MSG_ReadByte() != svc_nop)

@@ -13,7 +13,7 @@ int m_net_items;
 int m_net_saveHeight;
 
 cString net_helpMessage[][4]/*[25]*/ = {
-    /* .........1.........2.... */{
+    { /* .........1.........2.... */
         "                        ",
         " Two computers connected",
         "   through two modems.  ",
@@ -130,10 +130,10 @@ again:
     default: break;
     }
 
-    if (((m_net_cursor == 0) && (!serialAvailable)) ||
-        ((m_net_cursor == 1) && (!serialAvailable)) ||
-        ((m_net_cursor == 2) && (!ipxAvailable)) ||
-        ((m_net_cursor == 3) && (!tcpipAvailable)))
+    if ((SerialConfig && (!serialAvailable)) ||
+        (DirectConfig && (!serialAvailable)) ||
+        (IPXConfig && (!ipxAvailable)) ||
+        (TCPIPConfig && (!tcpipAvailable)))
         goto again;
 }
 

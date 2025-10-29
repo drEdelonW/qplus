@@ -30,9 +30,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "model.h"
 #include <stdlib.h>
 
-int			num_temp_entities;
-r_Entity_t	cl_temp_entities[MAX_TEMP_ENTITIES];
-Beam_t		cl_beams[MAX_BEAMS];
+int      num_temp_entities;
+r_Entity_t  cl_temp_entities[MAX_TEMP_ENTITIES];
+Beam_t    cl_beams[MAX_BEAMS];
 
 sfx_p cl_sfx_wizhit;
 sfx_p cl_sfx_knighthit;
@@ -70,15 +70,15 @@ void CL_InitTEnts() {
 CL_ParseBeam
 =================
 */
-void CL_ParseBeam(Model_t* m) {
+void CL_ParseBeam(Model_p m) {
     int16_t ent = MSG_ReadShort();
 
-    vec3_t	start = {
+    vec3_t  start = {
         MSG_ReadCoord(),
         MSG_ReadCoord(),
         MSG_ReadCoord()
     };
-    vec3_t	end = {
+    vec3_t  end = {
         MSG_ReadCoord(),
         MSG_ReadCoord(),
         MSG_ReadCoord()
@@ -119,8 +119,8 @@ CL_ParseTEnt
 void CL_ParseTEnt() {
     te_t type = MSG_ReadByte();
     switch (type) {
-    case TE_WIZSPIKE: {			// spike hitting wall
-        vec3_t	pos = {
+    case TE_WIZSPIKE: {      // spike hitting wall
+        vec3_t  pos = {
             MSG_ReadCoord(),
             MSG_ReadCoord(),
             MSG_ReadCoord()
@@ -129,8 +129,8 @@ void CL_ParseTEnt() {
         S_StartSound(-1, 0, cl_sfx_wizhit, pos, 1, 1);
     } break;
 
-    case TE_KNIGHTSPIKE: {			// spike hitting wall
-        vec3_t	pos = {
+    case TE_KNIGHTSPIKE: {      // spike hitting wall
+        vec3_t  pos = {
             MSG_ReadCoord(),
             MSG_ReadCoord(),
             MSG_ReadCoord()
@@ -139,7 +139,7 @@ void CL_ParseTEnt() {
         S_StartSound(-1, 0, cl_sfx_knighthit, pos, 1, 1);
     } break;
 
-    case TE_SPIKE: {		// spike hitting wall
+    case TE_SPIKE: {    // spike hitting wall
         vec3_t pos = {
             MSG_ReadCoord(),
             MSG_ReadCoord(),
@@ -159,7 +159,7 @@ void CL_ParseTEnt() {
             else                S_StartSound(-1, 0, cl_sfx_ric3, pos, 1, 1);
         }
     } break;
-    case TE_SUPERSPIKE: {		// super spike hitting wall
+    case TE_SUPERSPIKE: {    // super spike hitting wall
         vec3_t pos = {
             MSG_ReadCoord(),
             MSG_ReadCoord(),
@@ -167,8 +167,7 @@ void CL_ParseTEnt() {
         };
         R_RunParticleEffect(pos, vec3_origin, 0, 20);
 
-        if (rand() % 5)
-            S_StartSound(-1, 0, cl_sfx_tink1, pos, 1, 1);
+        if (rand() % 5)     S_StartSound(-1, 0, cl_sfx_tink1, pos, 1, 1);
         else {
             int rnd = rand() & 3;
             if (rnd == 1)       S_StartSound(-1, 0, cl_sfx_ric1, pos, 1, 1);
@@ -177,7 +176,7 @@ void CL_ParseTEnt() {
         }
     } break;
 
-    case TE_GUNSHOT: {			// bullet hitting wall
+    case TE_GUNSHOT: {      // bullet hitting wall
         vec3_t pos = {
             MSG_ReadCoord(),
             MSG_ReadCoord(),
@@ -186,7 +185,7 @@ void CL_ParseTEnt() {
         R_RunParticleEffect(pos, vec3_origin, 0, 20);
     } break;
 
-    case TE_EXPLOSION: {			// rocket explosion
+    case TE_EXPLOSION: {      // rocket explosion
         vec3_t pos = {
             MSG_ReadCoord(),
             MSG_ReadCoord(),
@@ -201,7 +200,7 @@ void CL_ParseTEnt() {
         S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
     } break;
 
-    case TE_TAREXPLOSION: {			// tarbaby explosion
+    case TE_TAREXPLOSION: {      // tarbaby explosion
         vec3_t pos = {
             MSG_ReadCoord(),
             MSG_ReadCoord(),
@@ -212,22 +211,11 @@ void CL_ParseTEnt() {
         S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
     } break;
 
-    case TE_LIGHTNING1:				// lightning bolts
-        CL_ParseBeam(Mod_ForName("progs/bolt.mdl", true));
-        break;
-
-    case TE_LIGHTNING2:				// lightning bolts
-        CL_ParseBeam(Mod_ForName("progs/bolt2.mdl", true));
-        break;
-
-    case TE_LIGHTNING3:				// lightning bolts
-        CL_ParseBeam(Mod_ForName("progs/bolt3.mdl", true));
-        break;
-
+    case TE_LIGHTNING1:     CL_ParseBeam(Mod_ForName("progs/bolt.mdl", true));      break;  // lightning bolts
+    case TE_LIGHTNING2:     CL_ParseBeam(Mod_ForName("progs/bolt2.mdl", true));     break;  // lightning bolts
+    case TE_LIGHTNING3:     CL_ParseBeam(Mod_ForName("progs/bolt3.mdl", true));     break;  // lightning bolts
         // PGM 01/21/97
-    case TE_BEAM:				// grappling hook beam
-        CL_ParseBeam(Mod_ForName("progs/beam.mdl", true));
-        break;
+    case TE_BEAM:           CL_ParseBeam(Mod_ForName("progs/beam.mdl", true));      break;  // grappling hook beam
         // PGM 01/21/97
 
     case TE_LAVASPLASH:
@@ -248,7 +236,7 @@ void CL_ParseTEnt() {
         R_TeleportSplash(pos);
     } break;
 
-    case TE_EXPLOSION2: {				// color mapped explosion
+    case TE_EXPLOSION2: {        // color mapped explosion
         vec3_t pos = {
             MSG_ReadCoord(),
             MSG_ReadCoord(),
@@ -298,8 +286,7 @@ void CL_ParseTEnt() {
     } break;
 #endif
 
-    default:
-        Sys_Error("CL_ParseTEnt: bad type");
+    default:    Sys_Error("CL_ParseTEnt: bad type");
     }
 }
 

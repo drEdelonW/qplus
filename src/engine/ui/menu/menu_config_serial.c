@@ -120,9 +120,7 @@ void M_SerialConfig_Draw() {
 
 void M_SerialConfig_Key(keycode_t key) {
     switch (key) {
-    case K_ESCAPE:
-        M_Menu_Net_f();
-        break;
+    case K_ESCAPE:  M_Menu_Net_f(); break;
 
     case K_UPARROW:
         S_LocalSound("misc/menu1.wav");
@@ -228,10 +226,8 @@ void M_SerialConfig_Key(keycode_t key) {
         key_dest = key_game;
         m_state = m_none;
 
-        if (SerialConfig)
-            Cbuf_AddText(va("connect \"%s\"\n", serialConfig_phone));
-        else
-            Cbuf_AddText("connect\n");
+        if (SerialConfig)   Cbuf_AddText(va("connect \"%s\"\n", serialConfig_phone));
+        else                Cbuf_AddText("connect\n");
         break;
 
     case K_BACKSPACE:

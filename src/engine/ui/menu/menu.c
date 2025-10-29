@@ -141,7 +141,7 @@ void M_Draw() {
 
 void M_Keydown(keycode_t key) {
     switch (m_state) {
-    case m_none:        return;
+    case m_none:                                        return;
     case m_main:            M_Main_Key(key);            return;
     case m_singleplayer:    M_SinglePlayer_Key(key);    return;
     case m_load:            M_Load_Key(key);            return;

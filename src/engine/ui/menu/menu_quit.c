@@ -68,6 +68,7 @@ cString quitMessage[][4] = {
 void M_Menu_Quit_f() {
     if (m_state == m_quit)
         return;
+
     _wasInMenus = (key_dest == key_menu);
     key_dest = key_menu;
     _m_quitPrevState = m_state;
@@ -98,8 +99,7 @@ void M_Quit_Key(keycode_t key) {
         Host_Quit_f();
         break;
 
-    default:
-        break;
+    default:    break;
     }
 
 }
