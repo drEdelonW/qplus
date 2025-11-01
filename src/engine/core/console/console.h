@@ -31,20 +31,25 @@ extern bool con_forcedup; // because no entities to refresh
 extern bool con_initialized;
 // extern uint8_p con_chars;
 extern int32_t con_notifylines;  // scan lines to clear for notify lines
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void Con_DrawCharacter(int32_t cx, int32_t line, int32_t num);
 
-void Con_DrawCharacter(int32_t cx, int32_t line, int32_t num);
+    void Con_CheckResize();
+    void Con_Init();
+    void Con_DrawConsole(int32_t lines, bool drawinput);
+    void Con_Print(cString txt);
+    void Con_Printf(cString fmt, ...);
+    void Con_DPrintf(cString fmt, ...);
+    void Con_SafePrintf(cString fmt, ...);
+    void Con_Clear_f();
+    void Con_DrawNotify();
+    void Con_ClearNotify();
+    void Con_ToggleConsole_f();
 
-void Con_CheckResize();
-void Con_Init();
-void Con_DrawConsole(int32_t lines, bool drawinput);
-void Con_Print(cString txt);
-void Con_Printf(cString fmt, ...);
-void Con_DPrintf(cString fmt, ...);
-void Con_SafePrintf(cString fmt, ...);
-void Con_Clear_f();
-void Con_DrawNotify();
-void Con_ClearNotify();
-void Con_ToggleConsole_f();
+    void Con_NotifyBox(cString text); // during startup for sound / cd warnings
 
-void Con_NotifyBox(cString text); // during startup for sound / cd warnings
-
+#ifdef __cplusplus
+}
+#endif

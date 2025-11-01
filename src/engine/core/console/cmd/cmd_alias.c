@@ -21,12 +21,10 @@ struct CmdAlias_s {
 static CmdAlias_p _cmdAlias = NULL; // alias linked list entry point
 
 void Cmd_Alias_f() {
-    CmdAlias_p  aliasIt;
-    char        cmd[1024];
 
     if (Cmd_Argc() == 1) {
         Con_Printf("Current alias commands:\n");
-        for (aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
+        for (CmdAlias_p aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
             Con_Printf("%s : %s\n", aliasIt->name, aliasIt->value);
         }
         return;
@@ -39,7 +37,8 @@ void Cmd_Alias_f() {
     }
 
     // if the alias allready exists, reuse it
-    for (aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
+    CmdAlias_p aliasIt = _cmdAlias;
+    for (; aliasIt; aliasIt = aliasIt->next) {
         if (!strcmp(_argSt, aliasIt->name)) {
             Z_Free(aliasIt->value);
             break;
@@ -54,7 +53,7 @@ void Cmd_Alias_f() {
     strcpy(aliasIt->name, _argSt);
 
     // copy the rest of the command line
-    cmd[0] = 0;  // start out with a null string
+    char cmd[1024] = {0}; // start out with a null string
     int argCnt = Cmd_Argc();
     for (int i = 2; i < argCnt; i++) {
         strcat(cmd, Cmd_Argv(i));

@@ -11,7 +11,10 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR)) $(eval INCLU
                                 SRC_LIST += $(CVAR_DIR)/cvar_q1.c
 
                         $(eval CMD_DIR = $(CLI_DIR)/cmd) $(eval INCLUDES += $(CMD_DIR))
-                                SRC_LIST += $(CMD_DIR)/cbuf.c
+#                                 SRC_LIST += $(CMD_DIR)/cbuf.c
+                                SRC_LIST += $(CMD_DIR)/cbuf_cWrap.cpp
+                                SRC_LIST += $(CMD_DIR)/cbuf_obj.cpp
+
                                 SRC_LIST += $(CMD_DIR)/cmd.c
                                 SRC_LIST += $(CMD_DIR)/cmd_alias.c
                                 SRC_LIST += $(CMD_DIR)/host_cmd.c

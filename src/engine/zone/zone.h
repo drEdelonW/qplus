@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 /*
- memory allocation
+memory allocation
 
 
 H_??? The hunk manages the entire memory block given to quake.  It must be
@@ -84,55 +84,70 @@ Zone block
 
 */
 #include "types.h"
-extern int32_t			minimum_memory;
+extern int32_t   minimum_memory;
 
 void Memory_Init(TypeLess_ptr buf, size_t size);
 
 //========================[z_hulk.c]========================//
-void 		 Z_Free(TypeLess_ptr ptr);
-TypeLess_ptr Z_Malloc(size_t size);   // returns 0 filled memory
-TypeLess_ptr Z_TagMalloc(size_t size, int tag);
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void         Z_Free(TypeLess_ptr ptr);
+    TypeLess_ptr Z_Malloc(size_t size);   // returns 0 filled memory
+    TypeLess_ptr Z_TagMalloc(size_t size, int tag);
 
-void Z_DumpHeap();
-void Z_CheckHeap();
-int  Z_FreeMemory();
-
+    void Z_DumpHeap();
+    void Z_CheckHeap();
+    int  Z_FreeMemory();
+#ifdef __cplusplus
+}
+#endif
 
 //========================[z_hulk.c]========================//
-TypeLess_ptr Hunk_Alloc(size_t size); // returns 0 filled memory
-TypeLess_ptr Hunk_AllocName(size_t size, cString name);
+#ifdef __cplusplus
+extern "C" {
+#endif
+    TypeLess_ptr Hunk_Alloc(size_t size); // returns 0 filled memory
+    TypeLess_ptr Hunk_AllocName(size_t size, cString name);
 
-TypeLess_ptr Hunk_HighAllocName(size_t size, cString name);
+    TypeLess_ptr Hunk_HighAllocName(size_t size, cString name);
 
-size_t  Hunk_LowMark();
-void    Hunk_FreeToLowMark(size_t mark);
+    size_t  Hunk_LowMark();
+    void    Hunk_FreeToLowMark(size_t mark);
 
-size_t  Hunk_HighMark();
-void    Hunk_FreeToHighMark(size_t mark);
+    size_t  Hunk_HighMark();
+    void    Hunk_FreeToHighMark(size_t mark);
 
-TypeLess_ptr Hunk_TempAlloc(size_t size);
+    TypeLess_ptr Hunk_TempAlloc(size_t size);
 
-void Hunk_Check();
-
+    void Hunk_Check();
+#ifdef __cplusplus
+}
+#endif
 
 //========================[z_cache.c]========================//
 typedef struct CacheUser_s {
-	TypeLess_ptr   data;
+    TypeLess_ptr   data;
 } CacheUser_t;
 typedef CacheUser_t* CacheUser_p;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void Cache_Flush();
 
-void Cache_Flush();
+    // returns the cached data, and moves to the head of the LRU list if present, otherwise returns NULL
+    TypeLess_ptr Cache_Check(CacheUser_p c);
 
-// returns the cached data, and moves to the head of the LRU list if present, otherwise returns NULL
-TypeLess_ptr Cache_Check(CacheUser_p c);
+    void Cache_Free(CacheUser_p c);
 
-void Cache_Free(CacheUser_p c);
+    // Returns NULL if all purgable data was tossed and there still wasn't enough room.
+    TypeLess_ptr Cache_Alloc(CacheUser_p c, size_t size, cString name);
 
-// Returns NULL if all purgable data was tossed and there still wasn't enough room.
-TypeLess_ptr Cache_Alloc(CacheUser_p c, size_t size, cString name);
-
-void Cache_Report();
+    void Cache_Report();
 
 
 
+#ifdef __cplusplus
+}
+#endif
