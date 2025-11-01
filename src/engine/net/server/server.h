@@ -233,8 +233,9 @@ void SV_MoveToGoal();
 void SV_CheckForNewClients();
 void SV_RunClients();
 void SV_SaveSpawnparms();
+void SV_SpawnServer(
+    cString server
 #ifdef QUAKE2
-void SV_SpawnServer(cString server, cString startspot);
-#else
-void SV_SpawnServer(cString server);
+    , cString startspot
 #endif
+);

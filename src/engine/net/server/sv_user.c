@@ -37,15 +37,15 @@ edict_p sv_player;
 
 static vec3_t  _forward, _right, _up;
 
-vec3_t wishdir;
-float wishspeed;
+static vec3_t _wishDir;
+static float _wishSpeed;
 
 // world
-float_p angles;
+static float_p _angles;
 float_p origin;
 float_p velocity;
 
-bool onground;
+static bool _onGround;
 
 UserCmd_t cmd;
 
@@ -156,7 +156,7 @@ SV_Accelerate
 
 #if 0
 void SV_Accelerate(vec3_t wishvel) {
-    if (wishspeed == 0) return;
+    if (_wishSpeed == 0) return;
 
     vec3_t  pushvec;
     VectorSubtract(wishvel, velocity, pushvec);
@@ -171,17 +171,17 @@ void SV_Accelerate(vec3_t wishvel) {
 }
 #endif
 void SV_Accelerate() {
-    float currentspeed = DotProduct(velocity, wishdir);
-    float addspeed = wishspeed - currentspeed;
+    float currentspeed = DotProduct(velocity, _wishDir);
+    float addspeed = _wishSpeed - currentspeed;
     if (addspeed <= 0)
         return;
 
-    float accelspeed = sv_accelerate.value * host_frametime * wishspeed;
+    float accelspeed = sv_accelerate.value * host_frametime * _wishSpeed;
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
     for (int i = 0; i < VECT_DIM; i++)
-        velocity[i] += accelspeed * wishdir[i];
+        velocity[i] += accelspeed * _wishDir[i];
 }
 
 void SV_AirAccelerate(vec3_t wishveloc) {
@@ -195,7 +195,7 @@ void SV_AirAccelerate(vec3_t wishveloc) {
         return;
 
     // accelspeed = sv_accelerate.value * host_frametime;
-    float accelspeed = sv_accelerate.value * wishspeed * host_frametime;
+    float accelspeed = sv_accelerate.value * _wishSpeed * host_frametime;
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
@@ -234,12 +234,12 @@ void SV_WaterMove() {
     else
         wishvel[2] += cmd.upmove;
 
-    wishspeed = Length(wishvel);
-    if (wishspeed > sv_maxspeed.value) {
-        VectorScale(wishvel, sv_maxspeed.value / wishspeed, wishvel);
-        wishspeed = sv_maxspeed.value;
+    _wishSpeed = Length(wishvel);
+    if (_wishSpeed > sv_maxspeed.value) {
+        VectorScale(wishvel, sv_maxspeed.value / _wishSpeed, wishvel);
+        _wishSpeed = sv_maxspeed.value;
     }
-    wishspeed *= 0.7;
+    _wishSpeed *= 0.7;
 
     // water friction
     float speed = Length(velocity);
@@ -254,13 +254,13 @@ void SV_WaterMove() {
         newspeed = 0;
 
     // water acceleration
-    if (!wishspeed)     return;
+    if (!_wishSpeed)     return;
 
-    float addspeed = wishspeed - newspeed;
+    float addspeed = _wishSpeed - newspeed;
     if (addspeed <= 0)  return;
 
     VectorNormalize(wishvel);
-    float accelspeed = sv_accelerate.value * wishspeed * host_frametime;
+    float accelspeed = sv_accelerate.value * _wishSpeed * host_frametime;
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
@@ -305,17 +305,17 @@ void SV_AirMove() {
     else
         wishvel[2] = 0;
 
-    VectorCopy(wishvel, wishdir);
-    wishspeed = VectorNormalize(wishdir);
-    if (wishspeed > sv_maxspeed.value) {
-        VectorScale(wishvel, sv_maxspeed.value / wishspeed, wishvel);
-        wishspeed = sv_maxspeed.value;
+    VectorCopy(wishvel, _wishDir);
+    _wishSpeed = VectorNormalize(_wishDir);
+    if (_wishSpeed > sv_maxspeed.value) {
+        VectorScale(wishvel, sv_maxspeed.value / _wishSpeed, wishvel);
+        _wishSpeed = sv_maxspeed.value;
     }
 
     if (sv_player->v.movetype == MOVETYPE_NOCLIP) { // noclip
         VectorCopy(wishvel, velocity);
     }
-    else if (onground) {
+    else if (_onGround) {
         SV_UserFriction();
         SV_Accelerate();
     }
@@ -335,7 +335,7 @@ the angle fields specify an exact angular motion in degrees
 void SV_ClientThink() {
     if (sv_player->v.movetype == MOVETYPE_NONE) return;
 
-    onground = (int)sv_player->v.flags & FL_ONGROUND;
+    _onGround = (int)sv_player->v.flags & FL_ONGROUND;
 
     origin = sv_player->v.origin;
     velocity = sv_player->v.velocity;
@@ -348,14 +348,14 @@ void SV_ClientThink() {
     // angles
     // show 1/3 the pitch angle and all the roll angle
     cmd = host_client->cmd;
-    angles = sv_player->v.angles;
+    _angles = sv_player->v.angles;
 
     vec3_t v_angle;
     VectorAdd(sv_player->v.v_angle, sv_player->v.punchangle, v_angle);
-    angles[ROLL] = V_CalcRoll(sv_player->v.angles, sv_player->v.velocity) * 4;
+    _angles[ROLL] = V_CalcRoll(sv_player->v.angles, sv_player->v.velocity) * 4;
     if (!sv_player->v.fixangle) {
-        angles[PITCH] = -v_angle[PITCH] / 3;
-        angles[YAW] = v_angle[YAW];
+        _angles[PITCH] = -v_angle[PITCH] / 3;
+        _angles[YAW] = v_angle[YAW];
     }
 
     if ((int)sv_player->v.flags & FL_WATERJUMP) { SV_WaterJump(); return; }
@@ -435,10 +435,10 @@ bool SV_ReadClientMessage() {
 
         while (1) {
             if (!host_client->active) return false; // a command caused an error
-            if (msg_badread) { Sys_Printf("SV_ReadClientMessage: badread\n"); return false; }
+            if (getMsgBadRead()) { Sys_Printf("SV_ReadClientMessage: badread\n"); return false; }
 
             clc_t cmd = MSG_ReadChar();
-            if (msg_badread) goto nextmsg;
+            if (getMsgBadRead()) goto nextmsg;
 
             switch (cmd) {
                 // case MSG_ERROR:

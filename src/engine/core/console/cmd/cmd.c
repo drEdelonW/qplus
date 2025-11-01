@@ -55,9 +55,7 @@ bool cmd_wait;
     bind g "impulse 5 ; +attack ; wait ; -attack ; impulse 2"
     ============
 */
-void Cmd_Wait_f() {
-    cmd_wait = true;
-}
+void Cmd_Wait_f() { cmd_wait = true; }
 
 /*
     =============================================================================
@@ -74,9 +72,8 @@ static sizebuf_t _cmdText;
     Cbuf_Init
     ============
 */
-void Cbuf_Init() {
-    SZ_Alloc(&_cmdText, CMD_BUSS_SIZE);  // space for commands and script files
-}
+void Cbuf_Init() { SZ_Alloc(&_cmdText, CMD_BUSS_SIZE); } // space for commands and script files
+
 
 
 /*
@@ -259,17 +256,12 @@ void Cmd_StuffCmds_f() {
     ===============
 */
 void Cmd_Exec_f() {
-    if (Cmd_Argc() != 2) {
-        Con_Printf("exec <filename> : execute a script file\n");
-        return;
-    }
+    if (Cmd_Argc() != 2) { Con_Printf("exec <filename> : execute a script file\n"); return; }
 
     size_t mark = Hunk_LowMark();
     cString f = (cString)COM_LoadHunkFile(Cmd_Argv(1));
-    if (!f) {
-        Con_Printf("couldn't exec %s\n", Cmd_Argv(1));
-        return;
-    }
+    if (!f) { Con_Printf("couldn't exec %s\n", Cmd_Argv(1)); return; }
+
     Con_Printf("execing %s\n", Cmd_Argv(1));
 
     Cbuf_InsertText(f);

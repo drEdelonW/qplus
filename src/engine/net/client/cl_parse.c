@@ -324,7 +324,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 
     if (bits & U_MOREBITS) {
         int ext = MSG_ReadByte();
-        if (msg_badread) { Host_Error("CL_ParseUpdate: bad MOREBITS"); }
+        if (getMsgBadRead()) { Host_Error("CL_ParseUpdate: bad MOREBITS"); }
         bits |= ((uint32_t)ext) << 8;
     }
 
@@ -562,7 +562,7 @@ void CL_ParseStaticSound() {
 }
 
 
-#define SHOWNET(x) if (cl_shownet.value == 2) {Con_Printf("%3i:%s\n", (msg_readcount - 1), x);}
+#define SHOWNET(x) if (cl_shownet.value == 2) {Con_Printf("%3i:%s\n", (getMsgReadCount() - 1), x);}
 
 /*
     =====================
@@ -579,11 +579,11 @@ void CL_ParseServerMessage() {
     MSG_BeginReading();
 
     while (1) {
-        if (msg_badread)    Host_Error("CL_ParseServerMessage: Bad server message");
+        if (getMsgBadRead())    Host_Error("CL_ParseServerMessage: Bad server message");
 
         svc_t cmd = MSG_ReadByte();
 
-        if (msg_badread) {
+        if (getMsgBadRead()) {
             SHOWNET("END OF MESSAGE");
             return;  // end of message
         }

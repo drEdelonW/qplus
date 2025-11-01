@@ -15,6 +15,9 @@
 // keep (min_val < var < max_val)
 #define CLAMP(min_val, var, max_val)    do{ if ((var) < (min_val)) {(var) = (min_val); }else CLAMP_MAX(var, max_val); }while(0)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count);
 void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count);
@@ -32,3 +35,7 @@ int Q_strncasecmp(cString s1, cString s2, int32_t n);
 
 int	Q_atoi(cString str);
 float Q_atof(cString str);
+
+#ifdef __cplusplus
+}
+#endif

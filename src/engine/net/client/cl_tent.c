@@ -150,8 +150,7 @@ void CL_ParseTEnt() {
 #else
         R_RunParticleEffect(pos, vec3_origin, 0, 10);
 #endif
-        if (rand() % 5)
-            S_StartSound(-1, 0, cl_sfx_tink1, pos, 1, 1);
+        if (rand() % 5)         S_StartSound(-1, 0, cl_sfx_tink1, pos, 1, 1);
         else {
             int rnd = rand() & 3;
             if (rnd == 1)       S_StartSound(-1, 0, cl_sfx_ric1, pos, 1, 1);
@@ -323,7 +322,8 @@ void CL_UpdateTEnts() {
     // update lightning
     Beam_p b = cl_beams;
     for (int i = 0; i < MAX_BEAMS; i++, b++) {
-        if (!b->model || (b->endtime < cl.time))
+        if (!b->model ||
+            (b->endtime < cl.time))
             continue;
 
         // if coming from the player, update the start position
@@ -335,7 +335,9 @@ void CL_UpdateTEnts() {
         vec3_t dist;    VectorSubtract(b->end, b->start, dist);
 
         float yaw, pitch;
-        if ((dist[1] == 0) && (dist[0] == 0)) {
+        if ((dist[1] == 0) &&
+            (dist[0] == 0)
+            ) {
             yaw = 0;
             if (dist[2] > 0)    pitch = 90;
             else                pitch = 270;

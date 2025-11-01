@@ -85,68 +85,68 @@ void MSG_WriteAngle(sizebuf_p sb, float f) {
 //
 // reading functions
 //
-int     msg_readcount;
-bool    msg_badread;
+static int     _msgReadCount;
+static bool    _msgBadRead;
 
 void MSG_BeginReading() {
-    msg_readcount = 0;
-    msg_badread = false;
+    _msgReadCount = 0;
+    _msgBadRead = false;
 }
 
-// returns MSG_ERROR and sets msg_badread if no more characters are available
+// returns MSG_ERROR and sets _msgBadRead if no more characters are available
 int8_t MSG_ReadChar() {
-    if ((msg_readcount + 1) > net_message.cursize) {
-        msg_badread = true;
+    if ((_msgReadCount + 1) > net_message.cursize) {
+        _msgBadRead = true;
         return 0;
     }
 
-    int8_t c = (int8_t)net_message.data[msg_readcount];
-    msg_readcount++;
+    int8_t c = (int8_t)net_message.data[_msgReadCount];
+    _msgReadCount++;
 
     return c;
 }
 
 uint8_t MSG_ReadByte() {
-    if ((msg_readcount + 1) > net_message.cursize) {
-        msg_badread = true;
+    if ((_msgReadCount + 1) > net_message.cursize) {
+        _msgBadRead = true;
         return 0;
     }
 
-    uint8_t c = (uint8_t)net_message.data[msg_readcount];
-    msg_readcount++;
+    uint8_t c = (uint8_t)net_message.data[_msgReadCount];
+    _msgReadCount++;
 
     return c;
 }
 
 int16_t MSG_ReadShort() {
-    if ((msg_readcount + 2) > net_message.cursize) {
-        msg_badread = true;
+    if ((_msgReadCount + 2) > net_message.cursize) {
+        _msgBadRead = true;
         return 0;
     }
 
     int c = (int16_t)(
-        net_message.data[msg_readcount] +
-        (net_message.data[msg_readcount + 1] << 8)
+        net_message.data[_msgReadCount] +
+        (net_message.data[_msgReadCount + 1] << 8)
         );
 
-    msg_readcount += 2;
+    _msgReadCount += 2;
 
     return c;
 }
 
 int32_t MSG_ReadLong() {
-    if ((msg_readcount + 4) > net_message.cursize) {
-        msg_badread = true;
+    if ((_msgReadCount + 4) > net_message.cursize) {
+        _msgBadRead = true;
         return 0;
     }
 
     int32_t c =
-        net_message.data[msg_readcount] +
-        (net_message.data[msg_readcount + 1] << 8) +
-        (net_message.data[msg_readcount + 2] << 16) +
-        (net_message.data[msg_readcount + 3] << 24);
+        net_message.data[_msgReadCount] +
+        (net_message.data[_msgReadCount + 1] << 8) +
+        (net_message.data[_msgReadCount + 2] << 16) +
+        (net_message.data[_msgReadCount + 3] << 24);
 
-    msg_readcount += 4;
+    _msgReadCount += 4;
 
     return c;
 }
@@ -158,11 +158,11 @@ float MSG_ReadFloat() {
         int     l;
     } dat;
 
-    dat.b[0] = net_message.data[msg_readcount];
-    dat.b[1] = net_message.data[msg_readcount + 1];
-    dat.b[2] = net_message.data[msg_readcount + 2];
-    dat.b[3] = net_message.data[msg_readcount + 3];
-    msg_readcount += 4;
+    dat.b[0] = net_message.data[_msgReadCount];
+    dat.b[1] = net_message.data[_msgReadCount + 1];
+    dat.b[2] = net_message.data[_msgReadCount + 2];
+    dat.b[3] = net_message.data[_msgReadCount + 3];
+    _msgReadCount += 4;
 
     dat.l = LittleLong(dat.l);
 
@@ -175,7 +175,7 @@ cString MSG_ReadString() {
     int l = 0;
     do {
         int c = MSG_ReadChar();
-        if ((msg_badread) || (c == '\0'))
+        if ((_msgBadRead) || (c == '\0'))
             break;
         string[l] = c;
         l++;

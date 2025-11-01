@@ -45,8 +45,7 @@ bool SV_CheckBottom(edict_p ent) {
     // if all of the points under the corners are solid world, don't bother
     // with the tougher checks
     // the corners must be within 16 of the midpoint
-    vec3_t start, stop;
-    start[2] = mins[2] - 1;
+    vec3_t start = { 0, 0, mins[2] - 1 };
     for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++) {
             start[0] = x ? maxs[0] : mins[0];
@@ -66,6 +65,7 @@ realcheck:
     start[2] = mins[2];
 
     // the midpoint must be within 16 of the bottom
+    vec3_t stop;
     start[0] = stop[0] = (mins[0] + maxs[0]) * 0.5;
     start[1] = stop[1] = (mins[1] + maxs[1]) * 0.5;
     stop[2] = start[2] - 2 * STEPSIZE;
@@ -74,8 +74,8 @@ realcheck:
     if (trace.fraction == 1.0)
         return false;
 
-    float mid, bottom;
-    mid = bottom = trace.endpos[2];
+    float mid = trace.endpos[2];
+    float bottom = trace.endpos[2];
 
     // the corners must be within 16 of the midpoint
     for (int x = 0; x <= 1; x++)
@@ -259,40 +259,38 @@ SV_NewChaseDir
 */
 #define DI_NODIR -1
 void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
-    float   orient[3];   // direction angle Euler
+    // float   orient[3];   // direction angle Euler
+    vec3_t  orient;   // direction angle Euler
 
     float olddir = anglemod((int)(actor->v.ideal_yaw / 45) * 45);
     float turnaround = anglemod(olddir - 180);
 
     float deltax = enemy->v.origin[0] - actor->v.origin[0];
-    float deltay = enemy->v.origin[1] - actor->v.origin[1];
     if (deltax > 10)        orient[1] = 0;
     else if (deltax < -10)  orient[1] = 180;
     else                    orient[1] = DI_NODIR;
 
+    float deltay = enemy->v.origin[1] - actor->v.origin[1];
     if (deltay < -10)       orient[2] = 270;
     else if (deltay > 10)   orient[2] = 90;
     else                    orient[2] = DI_NODIR;
 
     // try direct route
-    if (
-        (orient[1] != DI_NODIR) &&
+    if ((orient[1] != DI_NODIR) &&
         (orient[2] != DI_NODIR)
         ) {
         float tdir;
         if (orient[1] == 0) tdir = orient[2] == 90 ? 45 : 315;
         else                tdir = orient[2] == 90 ? 135 : 215;
 
-        if (
-            (tdir != turnaround) &&
+        if ((tdir != turnaround) &&
             SV_StepDirection(actor, tdir, dist)
             )
             return;
     }
 
     // try other directions
-    if (
-        ((rand() & 3) & 1) ||
+    if (((rand() & 3) & 1) ||
         (fabs(deltay) > fabs(deltax))
         ) {
         float tdir = orient[1];
@@ -316,29 +314,27 @@ void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
 
     /* there is no direct path to the player, so pick another direction */
 
-    if (olddir != DI_NODIR && SV_StepDirection(actor, olddir, dist))
+    if ((olddir != DI_NODIR) &&
+        SV_StepDirection(actor, olddir, dist)
+        )
         return;
 
-    if (rand() & 1)  /*randomly determine direction of search*/
-    {
+    if (rand() & 1) {  /*randomly determine direction of search*/
         for (int tdir = 0; tdir <= 315; tdir += 45)
-            if (
-                (tdir != turnaround) &&
+            if ((tdir != turnaround) &&
                 SV_StepDirection(actor, tdir, dist)
                 )
                 return;
     }
     else {
         for (int tdir = 315; tdir >= 0; tdir -= 45)
-            if (
-                (tdir != turnaround) &&
+            if ((tdir != turnaround) &&
                 SV_StepDirection(actor, tdir, dist)
                 )
                 return;
     }
 
-    if (
-        (turnaround != DI_NODIR) &&
+    if ((turnaround != DI_NODIR) &&
         SV_StepDirection(actor, turnaround, dist)
         )
         return;
@@ -387,9 +383,9 @@ void SV_MoveToGoal() {
     // if the next step hits the enemy, return immediately
 #ifdef QUAKE2
     edict_p enemy = PROG_TO_EDICT(ent->v.enemy);
-    if (enemy != sv.edicts && SV_CloseEnough(ent, enemy, dist))
+    if ((enemy != sv.edicts) && SV_CloseEnough(ent, enemy, dist))
 #else
-    if (PROG_TO_EDICT(ent->v.enemy) != sv.edicts && SV_CloseEnough(ent, goal, dist))
+    if ((PROG_TO_EDICT(ent->v.enemy) != sv.edicts) && SV_CloseEnough(ent, goal, dist))
 #endif
         return;
 

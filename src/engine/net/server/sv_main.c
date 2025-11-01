@@ -118,22 +118,23 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
     if (sv.datagram.cursize > (MAX_DATAGRAM - 16))  return;
 
     // find precache number for sound
-    int sound_num;
-    for (sound_num = 1;
+    int sound_num = 1;
+    for (;
         (sound_num < MAX_SOUNDS) &&
         sv.sound_precache[sound_num];
         sound_num++) {
         if (!strcmp(sample, sv.sound_precache[sound_num]))
             break;
     }
-    if ((sound_num == MAX_SOUNDS) || (!sv.sound_precache[sound_num])) {
+    if ((sound_num == MAX_SOUNDS) ||
+        (!sv.sound_precache[sound_num])) {
         Con_Printf("SV_StartSound: %s not precacheed\n", sample);
         return;
     }
 
     channel |= (NUM_FOR_EDICT(entity) << 3);
 
-    int field_mask = 0;
+    int field_mask = 0x00;
     if (volume != DEFAULT_SOUND_PACKET_VOLUME)              field_mask |= SND_VOLUME;
     if (attenuation != DEFAULT_SOUND_PACKET_ATTENUATION)    field_mask |= SND_ATTENUATION;
 
@@ -320,8 +321,8 @@ void SV_ClearDatagram() { SZ_Clear(&sv.datagram); }
     =============================================================================
 */
 
-int     fatbytes;
-uint8_t fatpvs[MAX_MAP_LEAFS / 8];
+static int  _fatBytes;
+static uint8_t _fatPvs[MAX_MAP_LEAFS / 8];
 
 void SV_AddToFatPVS(vec3_t org, mNode_p node) {
     while (1) {
@@ -329,8 +330,8 @@ void SV_AddToFatPVS(vec3_t org, mNode_p node) {
         if (node->contents < 0) {
             if (node->contents != CONTENTS_SOLID) {
                 uint8_p pvs = Mod_LeafPVS((mLeaf_t*)node, sv.worldmodel);
-                for (int i = 0; i < fatbytes; i++) {
-                    fatpvs[i] |= pvs[i];
+                for (int i = 0; i < _fatBytes; i++) {
+                    _fatPvs[i] |= pvs[i];
                 }
             }
             return;
@@ -356,10 +357,10 @@ void SV_AddToFatPVS(vec3_t org, mNode_p node) {
     =============
 */
 uint8_p SV_FatPVS(vec3_t org) {
-    fatbytes = (sv.worldmodel->numleafs + 31) >> 3;
-    Q_memset(fatpvs, 0, fatbytes);
+    _fatBytes = (sv.worldmodel->numleafs + 31) >> 3;
+    Q_memset(_fatPvs, 0, _fatBytes);
     SV_AddToFatPVS(org, sv.worldmodel->nodes);
-    return fatpvs;
+    return _fatPvs;
 }
 
 //=============================================================================
@@ -739,7 +740,8 @@ int SV_ModelIndex(cString name) {
     for (; i < MAX_MODELS && sv.model_precache[i]; i++)
         if (!strcmp(sv.model_precache[i], name))
             return i;
-    if ((i == MAX_MODELS) || !sv.model_precache[i])
+    if ((i == MAX_MODELS) ||
+        !sv.model_precache[i])
         Sys_Error("SV_ModelIndex: model %s not precached", name);
     return i;
 }
@@ -756,7 +758,9 @@ void SV_CreateBaseline() {
         // get the current server version
         edict_p svent = EDICT_NUM(entnum);
         if ((svent->free) ||
-            (entnum > svs.maxclients && !svent->v.modelindex))
+            ((entnum > svs.maxclients) &&
+                !svent->v.modelindex)
+            )
             continue;
 
         //
