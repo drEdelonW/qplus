@@ -39,10 +39,10 @@ void Cmd_ForwardToServer();
 
 #define CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/
 
-int32_t trashtest;
-int32_p trashspot;
+// int32_t trashtest;
+// int32_p trashspot;
 
-bool cmd_wait;
+static bool _cmdWait;
 
 //=============================================================================
 
@@ -55,7 +55,7 @@ bool cmd_wait;
     bind g "impulse 5 ; +attack ; wait ; -attack ; impulse 2"
     ============
 */
-void Cmd_Wait_f() { cmd_wait = true; }
+void Cmd_Wait_f() { _cmdWait = true; }
 
 /*
     =============================================================================
@@ -112,9 +112,8 @@ void Cbuf_InsertText(cString text) {
         Q_memcpy(temp, _cmdText.data, templen);
         SZ_Clear(&_cmdText);
     }
-    else {
-        temp = NULL; // shut up compiler
-    }
+    else temp = NULL; // shut up compiler
+
 
     // add the entire text of the file
     Cbuf_AddText(text);
@@ -158,9 +157,7 @@ void Cbuf_Execute() {
         // this is necessary because commands (exec, alias) can insert data at the
         // beginning of the text buffer
 
-        if (i == _cmdText.cursize) {
-            _cmdText.cursize = 0;
-        }
+        if (i == _cmdText.cursize) { _cmdText.cursize = 0; }
         else {
             i++;
             _cmdText.cursize -= i;
@@ -172,8 +169,8 @@ void Cbuf_Execute() {
 
         // skip out while text still remains in buffer, leaving it
         // for next frame
-        if (cmd_wait) {
-            cmd_wait = false;
+        if (_cmdWait) {
+            _cmdWait = false;
             break;
         }
     }
@@ -231,7 +228,12 @@ void Cmd_StuffCmds_f() {
         if (text[i] == '+') {
             i++;
             int j = i;
-            for (; ((text[j] != '+') && (text[j] != '-') && (text[j] != 0)); j++);
+            for (;
+                (
+                    (text[j] != '+') &&
+                    (text[j] != '-') &&
+                    (text[j] != 0));
+                j++);
 
             char c = text[j];
             text[j] = 0;
@@ -305,11 +307,10 @@ cString CopyString(cString in) {
 */
 
 
-struct cmd_function_s;
-typedef struct cmd_function_s cmd_function_t;
-typedef cmd_function_t* cmd_function_p;
-struct cmd_function_s {
-    cmd_function_p  next;
+typedef struct CmdFunction_s CmdFunction_t;
+typedef CmdFunction_t* CmdFunction_p;
+struct CmdFunction_s {
+    CmdFunction_p  next;
     cString         name;
     xcommand_t      function;
 };
@@ -325,7 +326,7 @@ static cString _cmdArgS = NULL;
 cmd_source_t cmd_source;
 
 
-static cmd_function_p _cmdFunctions;  // possible commands to execute
+static CmdFunction_p _cmdFunctions;  // possible commands to execute
 
 /*
     ============
@@ -435,7 +436,7 @@ void Cmd_AddCommand(cString cmd_name, xcommand_t function) {
     }
 
     // fail if the command already exists
-    cmd_function_p cmd;
+    CmdFunction_p cmd;
     for (cmd = _cmdFunctions; cmd; cmd = cmd->next) {
         if (!Q_strcmp(cmd_name, cmd->name)) {
             Con_Printf("Cmd_AddCommand: %s already defined\n", cmd_name);
@@ -443,7 +444,7 @@ void Cmd_AddCommand(cString cmd_name, xcommand_t function) {
         }
     }
 
-    cmd = Hunk_Alloc(sizeof(cmd_function_t));
+    cmd = Hunk_Alloc(sizeof(CmdFunction_t));
     cmd->name = cmd_name;
     cmd->function = function;
     cmd->next = _cmdFunctions;
@@ -456,7 +457,7 @@ void Cmd_AddCommand(cString cmd_name, xcommand_t function) {
     ============
 */
 bool Cmd_Exists(cString cmd_name) {
-    for (cmd_function_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
+    for (CmdFunction_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
         if (!Q_strcmp(cmd_name, cmd->name)) { return true; }
     }
     return false;
@@ -475,7 +476,7 @@ cString Cmd_CompleteCommand(cString partial) {
     if (!len) return NULL;
 
     // check functions
-    for (cmd_function_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
+    for (CmdFunction_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
         if (!Q_strncmp(partial, cmd->name, len)) {
             return cmd->name;
         }
@@ -499,7 +500,7 @@ void Cmd_ExecuteString(cString text, cmd_source_t src) {
     if (!Cmd_Argc()) { return; } // no tokens
 
     // check functions
-    for (cmd_function_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
+    for (CmdFunction_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
         if (!Q_strcasecmp(cmd_argv[0], cmd->name)) {
             cmd->function();
             return;
@@ -510,12 +511,12 @@ void Cmd_ExecuteString(cString text, cmd_source_t src) {
 
 #if 0
     // check alias
-    for (cmdalias_p aliasIt = cmd_alias; aliasIt; aliasIt = aliasIt->next) {
+    for (cmdalias_p aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
         if (!Q_strcasecmp(cmd_argv[0], aliasIt->name)) {
             Cbuf_InsertText(aliasIt->value);
             return;
         }
-    }
+}
 #endif
 
     // check cvars

@@ -6,29 +6,26 @@
 #include "q_tools.h"
 #include "zone.h"
 
-extern cString cmd_argv[];
 
 #define MAX_ALIAS_NAME (32)
 
-struct cmdalias_s;
-typedef struct cmdalias_s cmdalias_t;
-typedef cmdalias_t* cmdalias_p;
-struct cmdalias_s {
-    cmdalias_p next;
+typedef struct CmdAlias_s CmdAlias_t;
+typedef CmdAlias_t* CmdAlias_p;
+struct CmdAlias_s {
+    CmdAlias_p next;
     char       name[MAX_ALIAS_NAME];
     cString    value;
 };
 
-static cmdalias_p cmd_alias = NULL; // alias linked list entry point
-
+static CmdAlias_p _cmdAlias = NULL; // alias linked list entry point
 
 void Cmd_Alias_f() {
-    cmdalias_p aliasIt;
+    CmdAlias_p  aliasIt;
     char        cmd[1024];
 
     if (Cmd_Argc() == 1) {
         Con_Printf("Current alias commands:\n");
-        for (aliasIt = cmd_alias; aliasIt; aliasIt = aliasIt->next) {
+        for (aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
             Con_Printf("%s : %s\n", aliasIt->name, aliasIt->value);
         }
         return;
@@ -41,7 +38,7 @@ void Cmd_Alias_f() {
     }
 
     // if the alias allready exists, reuse it
-    for (aliasIt = cmd_alias; aliasIt; aliasIt = aliasIt->next) {
+    for (aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
         if (!strcmp(_argSt, aliasIt->name)) {
             Z_Free(aliasIt->value);
             break;
@@ -49,9 +46,9 @@ void Cmd_Alias_f() {
     }
 
     if (!aliasIt) {
-        aliasIt = Z_Malloc(sizeof(cmdalias_t));
-        aliasIt->next = cmd_alias;
-        cmd_alias = aliasIt;
+        aliasIt = Z_Malloc(sizeof(CmdAlias_t));
+        aliasIt->next = _cmdAlias;
+        _cmdAlias = aliasIt;
     }
     strcpy(aliasIt->name, _argSt);
 
@@ -69,8 +66,9 @@ void Cmd_Alias_f() {
     aliasIt->value = CopyString(cmd);
 }
 
+extern cString cmd_argv[];
 bool checkAlias() {
-    for (cmdalias_p aliasIt = cmd_alias; aliasIt; aliasIt = aliasIt->next) {
+    for (CmdAlias_p aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
         if (!Q_strcasecmp(cmd_argv[0], aliasIt->name)) {
             Cbuf_InsertText(aliasIt->value);
             return true;
