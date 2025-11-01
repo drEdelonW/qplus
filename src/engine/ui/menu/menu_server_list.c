@@ -3,6 +3,7 @@
 #include "net.h"
 #include "q_tools.h"
 #include <string.h>
+#include "cbuf.h"
 
 //=============================================================================
 /* SLIST MENU */

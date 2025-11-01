@@ -2,6 +2,7 @@
 #include "menu_prv.h"
 #include "server.h"
 #include "screen.h"
+#include "cbuf.h"
 
 //=============================================================================
 /* SINGLE PLAYER MENU */

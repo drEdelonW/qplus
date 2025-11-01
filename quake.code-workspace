@@ -115,7 +115,8 @@
 			"entitystate.h": "c",
 			"progdefs.h": "c",
 			"d_local.h": "c",
-			"surfcache.h": "c"
+			"surfcache.h": "c",
+			"world.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

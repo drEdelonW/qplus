@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "sys.h"
 #include "cmd.h"
+#include "cbuf.h"
 #include "net_vcr.h"
 #include "cvar_q1.h"
 #include "console.h"

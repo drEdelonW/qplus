@@ -1,4 +1,5 @@
 #include "cmd.h"
+#include "cbuf.h"
 
 #include <string.h>
 #include "console.h"

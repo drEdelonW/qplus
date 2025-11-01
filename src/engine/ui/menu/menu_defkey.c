@@ -5,6 +5,7 @@
 #include <string.h>
 #include "sound.h"
 #include "cmd.h"
+#include "cbuf.h"
 #include "host.h"
 
 //=============================================================================

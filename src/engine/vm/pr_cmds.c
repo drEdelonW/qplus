@@ -34,6 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sys.h"
 #include "common.h"
 #include "cmd.h"
+#include "cbuf.h"
 #include <stdlib.h>
 
 #define RETURN_EDICT(edict) (((int *)pr_globals)[OFS_RETURN] = EDICT_TO_PROG(edict))

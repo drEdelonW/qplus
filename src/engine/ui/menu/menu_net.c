@@ -3,6 +3,7 @@
 #include "menu_net.h"
 #include "net.h"
 #include "vid.h"
+#include "cbuf.h"
 
 
 //=============================================================================

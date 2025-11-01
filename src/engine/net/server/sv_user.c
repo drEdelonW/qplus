@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 #include "protocol.h"
 #include "cmd.h"
+#include "cbuf.h"
 #include "world.h"
 #include <string.h>
 #include "console.h"

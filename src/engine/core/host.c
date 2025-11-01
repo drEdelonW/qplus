@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "vid.h"
 #include "cmd.h"
+#include "cbuf.h"
 #include "input.h"
 #include "sound.h"
 #include "cdaudio.h"

@@ -5,6 +5,7 @@
 #include "host.h"
 #include "console.h"
 #include "cmd.h"
+#include "cbuf.h"
 #include "vid.h"
 #include "q_tools.h"
 #ifdef _WIN32

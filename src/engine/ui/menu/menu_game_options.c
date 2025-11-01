@@ -4,6 +4,7 @@
 #include "cvar_q1.h"
 #include "host.h"
 #include "screen.h"
+#include "cbuf.h"
 
 //=============================================================================
 /* GAME OPTIONS MENU */

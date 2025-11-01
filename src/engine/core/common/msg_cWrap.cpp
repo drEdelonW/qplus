@@ -11,7 +11,9 @@ Handles uint8_t ordering and avoids alignment errors
 */
 
 #include "net.h"  // net_message
+// NetMsg MSG(&net_message);
 NetMsg MSG;
+// NetMsg MSG(&cls.message);
 
 void MSG_SetSizeBuf(sizebuf_p sb) { MSG.SetSizeBuf(sb); }
 void MSG_BeginReading() { MSG.SetSizeBuf(&net_message); MSG.BeginReading(); }
