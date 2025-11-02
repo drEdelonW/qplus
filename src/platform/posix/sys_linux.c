@@ -340,8 +340,8 @@ int main(int c, cStringArray v) {
     memset(&parms, 0, sizeof(parms));
 
     COM_InitArgv(c, v);
-    parms.argc = com_argc;
-    parms.argv = com_argv;
+    parms.argc = com.argc;
+    parms.argv = com.argv;
 
 #ifdef GLQUAKE
     parms.memsize = 16 * 1024 * 1024;
@@ -351,7 +351,7 @@ int main(int c, cStringArray v) {
 
     int memParam = COM_CheckParm("-mem");
     if (memParam)
-        parms.memsize = (int)(Q_atof(com_argv[memParam + 1]) * 1024 * 1024);
+        parms.memsize = (int)(Q_atof(com.argv[memParam + 1]) * 1024 * 1024);
     parms.membase = malloc(parms.memsize);
 
     parms.basedir = basedir;

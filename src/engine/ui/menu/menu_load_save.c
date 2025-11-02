@@ -25,7 +25,7 @@ void M_ScanSaves() {
         loadable[i] = false;
 
         char name[MAX_OSPATH];
-        snprintf(name, sizeof(name), "%s/s%i.sav", com_gamedir, i);
+        snprintf(name, sizeof(name), "%s/s%i.sav", com.gamedir, i);
         FILE* f = fopen(name, "r");
         if (!f)
             continue;

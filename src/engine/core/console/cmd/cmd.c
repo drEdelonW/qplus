@@ -61,20 +61,20 @@ void Cmd_StuffCmds_f() {
 
     // build the combined string to parse from
     int s = 0;
-    for (int i = 1; i < com_argc; i++) {
-        if (!com_argv[i])   continue;  // NEXTSTEP nulls out -NXHost
+    for (int i = 1; i < com.argc; i++) {
+        if (!com.argv[i])   continue;  // NEXTSTEP nulls out -NXHost
 
-        s += Q_strlen(com_argv[i]) + 1;
+        s += Q_strlen(com.argv[i]) + 1;
     }
     if (!s)     return;
 
     cString text = Z_Malloc(s + 1);
     text[0] = 0;
-    for (int i = 1; i < com_argc; i++) {
-        if (!com_argv[i])   continue;   // NEXTSTEP nulls out -NXHost
+    for (int i = 1; i < com.argc; i++) {
+        if (!com.argv[i])   continue;   // NEXTSTEP nulls out -NXHost
 
-        Q_strcat(text, com_argv[i]);
-        if (i != (com_argc - 1)) {
+        Q_strcat(text, com.argv[i]);
+        if (i != (com.argc - 1)) {
             Q_strcat(text, " ");
         }
     }
@@ -270,8 +270,8 @@ void Cmd_TokenizeString(cString text) {
         if (!text) { return; }
 
         if (_cmdArgC < MAX_ARGS) {
-            cmd_argv[_cmdArgC] = Z_Malloc(Q_strlen(com_token) + 1);
-            Q_strcpy(cmd_argv[_cmdArgC], com_token);
+            cmd_argv[_cmdArgC] = Z_Malloc(Q_strlen(com.token) + 1);
+            Q_strcpy(cmd_argv[_cmdArgC], com.token);
             _cmdArgC++;
         }
     }

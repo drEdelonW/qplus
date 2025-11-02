@@ -73,11 +73,11 @@ int d_con_indirect = 0;
 int vid_buffersize;
 
 static bool     doShm;
-static Display*     x_disp;
+static Display* x_disp;
 static Colormap     x_cmap;
 static Window       x_win;
 static GC           x_gc;
-static Visual*      x_vis;
+static Visual* x_vis;
 static XVisualInfo* x_visinfo;
 // static XImage*      x_image;
 static int          x_shmeventtype;
@@ -89,7 +89,7 @@ int XShmQueryExtension(Display*);
 int XShmGetEventBase(Display*);
 
 int current_framebuffer;
-static XImage* x_framebuffer[2] = {0, 0};
+static XImage* x_framebuffer[2] = { 0, 0 };
 static XShmSegmentInfo x_shminfo[2];
 
 static int verbose = 0;
@@ -486,24 +486,24 @@ void VID_Init(uint8_p palette) {
 
     // check for command-line window size
     if ((pnum = COM_CheckParm("-winsize"))) {
-        if (pnum >= com_argc - 2)
+        if (pnum >= com.argc - 2)
             Sys_Error("VID: -winsize <width> <height>\n");
-        vid.width = Q_atoi(com_argv[pnum + 1]);
-        vid.height = Q_atoi(com_argv[pnum + 2]);
+        vid.width = Q_atoi(com.argv[pnum + 1]);
+        vid.height = Q_atoi(com.argv[pnum + 2]);
         if (!vid.width || !vid.height)
             Sys_Error("VID: Bad window width/height\n");
     }
     if ((pnum = COM_CheckParm("-width"))) {
-        if (pnum >= com_argc - 1)
+        if (pnum >= com.argc - 1)
             Sys_Error("VID: -width <width>\n");
-        vid.width = Q_atoi(com_argv[pnum + 1]);
+        vid.width = Q_atoi(com.argv[pnum + 1]);
         if (!vid.width)
             Sys_Error("VID: Bad window width\n");
     }
     if ((pnum = COM_CheckParm("-height"))) {
-        if (pnum >= com_argc - 1)
+        if (pnum >= com.argc - 1)
             Sys_Error("VID: -height <height>\n");
-        vid.height = Q_atoi(com_argv[pnum + 1]);
+        vid.height = Q_atoi(com.argv[pnum + 1]);
         if (!vid.height)
             Sys_Error("VID: Bad window height\n");
     }
@@ -512,9 +512,9 @@ void VID_Init(uint8_p palette) {
 
     // specify a visual id
     if ((pnum = COM_CheckParm("-visualid"))) {
-        if (pnum >= com_argc - 1)
+        if (pnum >= com.argc - 1)
             Sys_Error("VID: -visualid <id#>\n");
-        template.visualid = Q_atoi(com_argv[pnum + 1]);
+        template.visualid = Q_atoi(com.argv[pnum + 1]);
         template_mask = VisualIDMask;
     }
 

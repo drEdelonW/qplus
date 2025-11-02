@@ -206,9 +206,9 @@ void Con_Init() {
 
     if (_con_debuglog) {
         cString t2 = "/qconsole.log";
-        if (strlen(com_gamedir) < (MAXGAMEDIRLEN - strlen(t2))) {
+        if (strlen(com.gamedir) < (MAXGAMEDIRLEN - strlen(t2))) {
             char temp[MAXGAMEDIRLEN + 1];
-            sprintf(temp, "%s%s", com_gamedir, t2);
+            sprintf(temp, "%s%s", com.gamedir, t2);
             unlink(temp);
         }
     }
@@ -372,7 +372,7 @@ void Con_Printf(cStringRO fmt, ...) {
 
     // log all messages to file
     if (_con_debuglog) {
-        Con_DebugLog(va("%s/qconsole.log", com_gamedir), "%s", msg);
+        Con_DebugLog(va("%s/qconsole.log", com.gamedir), "%s", msg);
     }
 
     if ((!con_initialized) ||

@@ -146,7 +146,7 @@ void Host::FindMaxClients() {
     int param = COM_CheckParm("-dedicated");
     if (param) {
         cls.state = ca_dedicated;
-        if (param != (com_argc - 1))    svs.maxclients = Q_atoi(com_argv[param + 1]);
+        if (param != (com.argc - 1))    svs.maxclients = Q_atoi(com.argv[param + 1]);
         else                            svs.maxclients = 8;
     }
     else        cls.state = ca_disconnected;
@@ -155,7 +155,7 @@ void Host::FindMaxClients() {
     if (param) {
         if (cls.state == ca_dedicated)  Sys_Error("Only one of -dedicated or -listen can be specified");
 
-        if (param != (com_argc - 1))    svs.maxclients = Q_atoi(com_argv[param + 1]);
+        if (param != (com.argc - 1))    svs.maxclients = Q_atoi(com.argv[param + 1]);
         else                            svs.maxclients = 8;
     }
     if (svs.maxclients < 1)
@@ -219,7 +219,7 @@ void Host::WriteConfiguration() {
     // dedicated servers initialize the host but don't parse and set the
     // config.cfg cvars
     if (host_initialized & !isDedicated) {
-        FILE* f = fopen(va("%s/config.cfg", com_gamedir), "w");
+        FILE* f = fopen(va("%s/config.cfg", com.gamedir), "w");
         if (!f) {
             Con_Printf("Couldn't write config.cfg.\n");
             return;
@@ -676,7 +676,7 @@ extern int vcrFile;
 void Host::InitVCR(QuakeParms_p parms) {
 
     if (COM_CheckParm("-playback")) {
-        if (com_argc != 2)      Sys_Error("No other parameters allowed with -playback\n");
+        if (com.argc != 2)      Sys_Error("No other parameters allowed with -playback\n");
 
         Sys_FileOpenRead("quake.vcr", &vcrFile);
         if (vcrFile == -1)      Sys_Error("playback file not found\n");
@@ -685,19 +685,19 @@ void Host::InitVCR(QuakeParms_p parms) {
         Sys_FileRead(vcrFile, &i, sizeof(int));
         if (i != VCR_SIGNATURE) Sys_Error("Invalid signature in vcr file\n");
 
-        Sys_FileRead(vcrFile, &com_argc, sizeof(int));
-        com_argv = (cStringArray)malloc(com_argc * sizeof(cString));
-        com_argv[0] = parms->argv[0];
-        for (int i = 0; i < com_argc; i++) {
+        Sys_FileRead(vcrFile, &com.argc, sizeof(int));
+        com.argv = (cStringArray)malloc(com.argc * sizeof(cString));
+        com.argv[0] = parms->argv[0];
+        for (int i = 0; i < com.argc; i++) {
             int len;
             Sys_FileRead(vcrFile, &len, sizeof(int));
             cString p = (cString)malloc(len);
             Sys_FileRead(vcrFile, p, len);
-            com_argv[i + 1] = p;
+            com.argv[i + 1] = p;
         }
-        com_argc++; /* add one for arg[0] */
-        parms->argc = com_argc;
-        parms->argv = com_argv;
+        com.argc++; /* add one for arg[0] */
+        parms->argc = com.argc;
+        parms->argv = com.argv;
     }
 
     int n;
@@ -710,9 +710,9 @@ void Host::InitVCR(QuakeParms_p parms) {
         }
 
         {
-            int i = com_argc - 1;
+            int i = com.argc - 1;
             Sys_FileWrite(vcrFile, &i, sizeof(int));
-            for (int i = 1; i < com_argc; i++) {
+            for (int i = 1; i < com.argc; i++) {
                 if (i == n) {
                     int len;
                     len = 10;
@@ -720,9 +720,9 @@ void Host::InitVCR(QuakeParms_p parms) {
                     Sys_FileWrite(vcrFile, (TypeLess_ptr)"-playback", len);
                     continue;
                 }
-                int len = Q_strlen(com_argv[i]) + 1;
+                int len = Q_strlen(com.argv[i]) + 1;
                 Sys_FileWrite(vcrFile, &len, sizeof(int));
-                Sys_FileWrite(vcrFile, com_argv[i], len);
+                Sys_FileWrite(vcrFile, com.argv[i], len);
             }
         }
     }
@@ -746,8 +746,8 @@ void Host::Init(QuakeParms_p parms) {
     if (parms->memsize < minimum_memory)
         Sys_Error("Only %4.1f megs of memory available, can't execute game", parms->memsize / (float)0x100000);
 
-    com_argc = parms->argc;
-    com_argv = parms->argv;
+    com.argc = parms->argc;
+    com.argv = parms->argv;
 
     Memory_Init(parms->membase, parms->memsize);
     Cbuf_Init();

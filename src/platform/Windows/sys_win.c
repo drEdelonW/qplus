@@ -450,7 +450,7 @@ void Sys_InitFloatTime() {
     int j = COM_CheckParm("-starttime");
 
     if (j) {
-        _curtime = (double)(Q_atof(com_argv[j + 1]));
+        _curtime = (double)(Q_atof(com.argv[j + 1]));
     }
     else {
         _curtime = 0.0;
@@ -632,8 +632,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     COM_InitArgv(parms.argc, parms.argv);
 
-    parms.argc = com_argc;
-    parms.argv = com_argv;
+    parms.argc = com.argc;
+    parms.argv = com.argv;
 
     isDedicated = (COM_CheckParm("-dedicated") != 0);
 
@@ -676,8 +676,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         int param;
         param = COM_CheckParm("-heapsize") + 1;
 
-        if (param < com_argc)
-            parms.memsize = Q_atoi(com_argv[param]) * 1024;
+        if (param < com.argc)
+            parms.memsize = Q_atoi(com.argv[param]) * 1024;
     }
 
     parms.membase = malloc(parms.memsize);
@@ -703,18 +703,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // give QHOST a chance to hook into the console
         int param;
         if ((param = COM_CheckParm("-HFILE")) > 0) {
-            if (param < com_argc)
-                _hFile = (HANDLE)Q_atoi(com_argv[param + 1]);
+            if (param < com.argc)
+                _hFile = (HANDLE)Q_atoi(com.argv[param + 1]);
         }
 
         if ((param = COM_CheckParm("-HPARENT")) > 0) {
-            if (param < com_argc)
-                _hEventParent = (HANDLE)Q_atoi(com_argv[param + 1]);
+            if (param < com.argc)
+                _hEventParent = (HANDLE)Q_atoi(com.argv[param + 1]);
         }
 
         if ((param = COM_CheckParm("-HCHILD")) > 0) {
-            if (param < com_argc)
-                _hEventChild = (HANDLE)Q_atoi(com_argv[param + 1]);
+            if (param < com.argc)
+                _hEventChild = (HANDLE)Q_atoi(com.argv[param + 1]);
         }
 
         InitConProc(_hFile, _hEventParent, _hEventChild);

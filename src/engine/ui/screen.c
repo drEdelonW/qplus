@@ -547,7 +547,7 @@ void SCR_ScreenShot_f() {
         pcxname[6] = (i % 10) + '0';
 
         char checkname[MAX_OSPATH];
-        snprintf(checkname, sizeof(checkname), "%s/%s", com_gamedir, pcxname);
+        snprintf(checkname, sizeof(checkname), "%s/%s", com.gamedir, pcxname);
         if (Sys_FileTime(checkname) == -1) {     // save the pcx file
             D_EnableBackBufferAccess(); // enable direct drawing of console to back
             //  buffer

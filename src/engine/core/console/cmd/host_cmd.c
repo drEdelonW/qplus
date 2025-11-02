@@ -38,9 +38,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include "msg.h"
 
-
-int32_t current_skill;
-
 void Mod_Print();
 
 /*
@@ -409,7 +406,7 @@ void Host_Savegame_f() {
     }
 
     char name[256];
-    snprintf(name, sizeof(name), "%s/%s", com_gamedir, Cmd_Argv(1));
+    snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
     COM_DefaultExtension(name, ".sav");
 
     Con_Printf("Saving game to %s...\n", name);
@@ -457,7 +454,7 @@ void Host_Loadgame_f() {
     cls.demonum = -1;  // stop demo loop in case this fails
 
     char name[MAX_OSPATH];
-    snprintf(name, sizeof(name), "%s/%s", com_gamedir, Cmd_Argv(1));
+    snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
     COM_DefaultExtension(name, ".sav");
 
     // we can't call SCR_BeginLoadingPlaque, because too much stack space has
@@ -534,8 +531,8 @@ void Host_Loadgame_f() {
         str[i] = 0;
         cString start = str;
         start = COM_Parse(str);
-        if (!com_token[0])  break;  // end of file
-        if (strcmp(com_token, "{")) Sys_Error("First token isn't a brace");
+        if (!com.token[0])  break;  // end of file
+        if (strcmp(com.token, "{")) Sys_Error("First token isn't a brace");
 
         if (entnum == -1) { ED_ParseGlobals(start); }   // parse the global vars
         else { // parse an edict
@@ -569,7 +566,7 @@ void Host_Loadgame_f() {
 #ifdef QUAKE2
 void SaveGamestate() {
     char name[256];
-    sprintf(name, "%s/%s.gip", com_gamedir, sv.name);
+    sprintf(name, "%s/%s.gip", com.gamedir, sv.name);
 
     Con_Printf("Saving game to %s...\n", name);
     FILE* saveGStFile = fopen(name, "w");
@@ -608,7 +605,7 @@ void SaveGamestate() {
 
 int LoadGamestate(cString level, cString startspot) {
     char name[MAX_OSPATH];
-    sprintf(name, "%s/%s.gip", com_gamedir, level);
+    sprintf(name, "%s/%s.gip", com.gamedir, level);
 
     Con_Printf("Loading game from %s...\n", name);
     FILE* loadGStFile = fopen(name, "r");
@@ -656,8 +653,8 @@ int LoadGamestate(cString level, cString startspot) {
         str[i] = 0;
         cString start = str;
         start = COM_Parse(str);
-        if (!com_token[0])  break;  // end of file
-        if (strcmp(com_token, "{")) Sys_Error("First token isn't a brace");
+        if (!com.token[0])  break;  // end of file
+        if (strcmp(com.token, "{")) Sys_Error("First token isn't a brace");
 
         // parse an edict
 

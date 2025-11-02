@@ -92,7 +92,7 @@ bool SNDDMA_Init() {
     int param;
     if (s) shm->samplebits = atoi(s);
     else if ((param = COM_CheckParm("-sndbits")) != 0)
-        shm->samplebits = atoi(com_argv[param + 1]);
+        shm->samplebits = atoi(com.argv[param + 1]);
     if ((shm->samplebits != 16) &&
         (shm->samplebits != 8)) {
         int fmt;
@@ -106,7 +106,7 @@ bool SNDDMA_Init() {
     s = getenv("QUAKE_SOUND_SPEED");
     if (s) shm->speed = atoi(s);
     else if ((param = COM_CheckParm("-sndspeed")) != 0)
-        shm->speed = atoi(com_argv[param + 1]);
+        shm->speed = atoi(com.argv[param + 1]);
     else {
         for (int i = 0; i < sizeof(_tryrates) / 4; i++)
             if (!ioctl(_audio_fd, SNDCTL_DSP_SPEED, &_tryrates[i])) break;

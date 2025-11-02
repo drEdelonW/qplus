@@ -499,7 +499,7 @@ void VID_SetWindowTitle(Window win, cString pszName) {
     wmHints->flags = StateHint;
     XSetWMProperties(x_disp, win, &textprop, &textprop,
         // Only put WM_COMMAND property on first window.
-        com_argv, com_argc, NULL, NULL, NULL);
+        com.argv, com.argc, NULL, NULL, NULL);
     XFree(wmHints);
 
     aWMDelete = XInternAtom(x_disp, "WM_DELETE_WINDOW", False);
@@ -596,10 +596,10 @@ void	VID_Init(uint8_t* palette) {
 
 // check for command-line window size
     if ((pnum = COM_CheckParm("-winsize"))) {
-        if (pnum >= com_argc - 2)
+        if (pnum >= com.argc - 2)
             Sys_Error("VID: -winsize <width> <height>\n");
-        vid.width = Q_atoi(com_argv[pnum + 1]);
-        vid.height = Q_atoi(com_argv[pnum + 2]);
+        vid.width = Q_atoi(com.argv[pnum + 1]);
+        vid.height = Q_atoi(com.argv[pnum + 2]);
         if (!vid.width || !vid.height)
             Sys_Error("VID: Bad window width/height\n");
     }
@@ -608,9 +608,9 @@ void	VID_Init(uint8_t* palette) {
 
     // specify a visual id
     if ((pnum = COM_CheckParm("-visualid"))) {
-        if (pnum >= com_argc - 1)
+        if (pnum >= com.argc - 1)
             Sys_Error("VID: -visualid <id#>\n");
-        template.visualid = Q_atoi(com_argv[pnum + 1]);
+        template.visualid = Q_atoi(com.argv[pnum + 1]);
         template_mask = VisualIDMask;
     }
 

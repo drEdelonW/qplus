@@ -333,8 +333,8 @@ int CDAudio_Init() {
         return -1;
 
     int param = COM_CheckParm("-cddev");
-    if ((param != 0) && (param < com_argc - 1)) {
-        strncpy(_cd_dev, com_argv[param + 1], sizeof(_cd_dev));
+    if ((param != 0) && (param < com.argc - 1)) {
+        strncpy(_cd_dev, com.argv[param + 1], sizeof(_cd_dev));
         _cd_dev[sizeof(_cd_dev) - 1] = 0;
     }
 

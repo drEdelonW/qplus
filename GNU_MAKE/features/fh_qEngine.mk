@@ -26,10 +26,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR)) $(eval INCLU
                         SRC_LIST += $(CUTILS_DIR)/endian_tools.c
 
                 $(eval COMM_DIR = $(CORE_DIR)/common) $(eval INCLUDES += $(COMM_DIR))
-                        $(eval MSG_DIR = $(COMM_DIR)/Msg) $(eval INCLUDES += $(MSG_DIR))
-#                                 SRC_LIST += $(MSG_DIR)/msg.c
-                                SRC_LIST += $(MSG_DIR)/msg_cWrap.cpp
-                                SRC_LIST += $(MSG_DIR)/msg_obj.cpp
 
                         SRC_LIST += $(COMM_DIR)/common.c
                         SRC_LIST += $(COMM_DIR)/sizebuf.c
@@ -39,14 +35,20 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR)) $(eval INCLU
                 $(eval INPUT_DIR = $(CORE_DIR)/input) $(eval INCLUDES += $(INPUT_DIR))
                         SRC_LIST += $(INPUT_DIR)/keys.c
 
-#                 SRC_LIST += $(CORE_DIR)/host.c
-                SRC_LIST += $(CORE_DIR)/host_obj.cpp
-                SRC_LIST += $(CORE_DIR)/host_cWrap.cpp
+                $(eval HOST_DIR = $(CORE_DIR)/Host) $(eval INCLUDES += $(HOST_DIR))
+#                         SRC_LIST += $(HOST_DIR)/host.c
+                        SRC_LIST += $(HOST_DIR)/host_obj.cpp
+                        SRC_LIST += $(HOST_DIR)/host_cWrap.cpp
 
         $(eval WORLD_DIR = $(ENG_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))
                 SRC_LIST += $(WORLD_DIR)/world.c
 
         $(eval NET_DIR = $(ENG_DIR)/net) $(eval INCLUDES += $(NET_DIR))
+                $(eval MSG_DIR = $(NET_DIR)/Msg) $(eval INCLUDES += $(MSG_DIR))
+#                         SRC_LIST += $(MSG_DIR)/msg.c
+                        SRC_LIST += $(MSG_DIR)/msg_cWrap.cpp
+                        SRC_LIST += $(MSG_DIR)/msg_obj.cpp
+
                 $(eval NET_CL_DIR = $(NET_DIR)/client) $(eval INCLUDES += $(NET_CL_DIR))
                         SRC_LIST += $(NET_CL_DIR)/cl_main.c
                         SRC_LIST += $(NET_CL_DIR)/cl_input.c

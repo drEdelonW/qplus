@@ -194,8 +194,8 @@ void main(int argc, cStringArray argv) {
 
 	COM_InitArgv(argc, argv);
 
-	parms.argc = com_argc;
-	parms.argv = com_argv;
+	parms.argc = com.argc;
+	parms.argv = com.argv;
 
 	printf("Host_Init\n");
 	Host_Init(&parms);

@@ -205,11 +205,11 @@ int WINS_Init(void) {
 
 	i = COM_CheckParm("-ip");
 	if (i) {
-		if (i < com_argc-1) {
-			myAddr = inet_addr(com_argv[i+1]);
+		if (i < com.argc-1) {
+			myAddr = inet_addr(com.argv[i+1]);
 			if (myAddr == INADDR_NONE)
-				Sys_Error("%s is not a valid IP address", com_argv[i+1]);
-			strcpy(my_tcpip_address, com_argv[i+1]);
+				Sys_Error("%s is not a valid IP address", com.argv[i+1]);
+			strcpy(my_tcpip_address, com.argv[i+1]);
 		}
 		else {
 			Sys_Error("NET_Init: you must specify an IP address after -ip");

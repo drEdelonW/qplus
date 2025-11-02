@@ -61,6 +61,7 @@ extern globalvars_p pr_global_struct;
 extern float_p      pr_globals;     // same as pr_global_struct
 extern int32_t      pr_edict_size;  // in bytes
 
+
 //============================================================================
 #ifdef __cplusplus
 extern "C" {

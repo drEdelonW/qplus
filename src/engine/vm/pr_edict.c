@@ -536,16 +536,16 @@ void ED_ParseGlobals(cString data) {
     while (1) {
         // parse key
         data = COM_Parse(data);
-        if (com_token[0] == '}')    break;
+        if (com.token[0] == '}')    break;
         if (!data)                  Sys_Error("ED_ParseEntity: EOF without closing brace");
 
         char keyname[64];
-        strcpy(keyname, com_token);
+        strcpy(keyname, com.token);
 
         // parse value
         data = COM_Parse(data);
         if (!data)                  Sys_Error("ED_ParseEntity: EOF without closing brace");
-        if (com_token[0] == '}')    Sys_Error("ED_ParseEntity: closing brace without data");
+        if (com.token[0] == '}')    Sys_Error("ED_ParseEntity: closing brace without data");
 
         dDef_p key = ED_FindGlobal(keyname);
         if (!key) {
@@ -553,7 +553,7 @@ void ED_ParseGlobals(cString data) {
             continue;
         }
 
-        if (!ED_ParseEpair((TypeLess_ptr)pr_globals, key, com_token))
+        if (!ED_ParseEpair((TypeLess_ptr)pr_globals, key, com.token))
             Host_Error("ED_ParseGlobals: parse error");
     }
 }
@@ -661,25 +661,25 @@ cString ED_ParseEdict(cString data, edict_p ent) {
     while (1) {
         // parse key
         data = COM_Parse(data);
-        if (com_token[0] == '}')    break;
+        if (com.token[0] == '}')    break;
         if (!data)                  Sys_Error("ED_ParseEntity: EOF without closing brace");
 
         // anglehack is to allow QuakeEd to write single scalar angles
         // and allow them to be turned into vectors. (FIXME...)
         bool anglehack;
-        if (!strcmp(com_token, "angle")) {
-            strcpy(com_token, "angles");
+        if (!strcmp(com.token, "angle")) {
+            strcpy(com.token, "angles");
             anglehack = true;
         }
         else
             anglehack = false;
 
         // FIXME: change light to _light to get rid of this hack
-        if (!strcmp(com_token, "light"))
-            strcpy(com_token, "light_lev"); // hack for single light def
+        if (!strcmp(com.token, "light"))
+            strcpy(com.token, "light_lev"); // hack for single light def
 
         char keyname[256];
-        strcpy(keyname, com_token);
+        strcpy(keyname, com.token);
 
         // another hack to fix heynames with trailing spaces
         int n = strlen(keyname);
@@ -691,7 +691,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
         // parse value
         data = COM_Parse(data);
         if (!data)                  Sys_Error("ED_ParseEntity: EOF without closing brace");
-        if (com_token[0] == '}')    Sys_Error("ED_ParseEntity: closing brace without data");
+        if (com.token[0] == '}')    Sys_Error("ED_ParseEntity: closing brace without data");
 
         init = true;
 
@@ -708,11 +708,11 @@ cString ED_ParseEdict(cString data, edict_p ent) {
 
         if (anglehack) {
             char temp[32];
-            strcpy(temp, com_token);
-            sprintf(com_token, "0 %s 0", temp);
+            strcpy(temp, com.token);
+            sprintf(com.token, "0 %s 0", temp);
         }
 
-        if (!ED_ParseEpair((TypeLess_ptr)&ent->v, key, com_token))
+        if (!ED_ParseEpair((TypeLess_ptr)&ent->v, key, com.token))
             Host_Error("ED_ParseEdict: parse error");
     }
 
@@ -738,6 +738,8 @@ Used for both fresh maps and savegame loads.  A fresh map would also need
 to call ED_CallSpawnFunctions () to let the objects initialize themselves.
 ================
 */
+
+
 void ED_LoadFromFile(cString data) {
     edict_p ent = NULL;
     int inhibit = 0;
@@ -748,7 +750,7 @@ void ED_LoadFromFile(cString data) {
         // parse the opening brace
         data = COM_Parse(data);
         if (!data)  break;
-        if (com_token[0] != '{')    Sys_Error("ED_LoadFromFile: found %s when expecting {", com_token);
+        if (com.token[0] != '{')    Sys_Error("ED_LoadFromFile: found %s when expecting {", com.token);
 
         if (!ent)       ent = EDICT_NUM(0);
         else            ent = ED_Alloc();
@@ -814,9 +816,9 @@ void PR_LoadProgs() {
     progs = (dprograms_p)COM_LoadHunkFile("progs.dat");
     if (!progs)                             Sys_Error("PR_LoadProgs: couldn't load progs.dat");
 
-    Con_DPrintf("Programs occupy %iK.\n", com_filesize / 1024);
+    Con_DPrintf("Programs occupy %iK.\n", com.filesize / 1024);
 
-    for (int i = 0; i < com_filesize; i++)
+    for (int i = 0; i < com.filesize; i++)
         CRC_ProcessByte(&pr_crc, ((uint8_p)progs)[i]);
 
     // byte swap the header

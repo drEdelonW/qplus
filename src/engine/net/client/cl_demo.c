@@ -214,7 +214,7 @@ void CL_Record_f() {
         track = -1;
 
     char name[MAX_OSPATH];
-    snprintf(name, sizeof(name), "%s/%s", com_gamedir, Cmd_Argv(1));
+    snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
 
     //
     // start the map up

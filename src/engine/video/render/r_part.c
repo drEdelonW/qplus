@@ -49,7 +49,7 @@ void R_InitParticles() {
     int i = COM_CheckParm("-particles");
 
     if (i) {
-        _rNumParticles = (int)(Q_atoi(com_argv[i + 1]));
+        _rNumParticles = (int)(Q_atoi(com.argv[i + 1]));
         if (_rNumParticles < ABSOLUTE_MIN_PARTICLES)
             _rNumParticles = ABSOLUTE_MIN_PARTICLES;
     }

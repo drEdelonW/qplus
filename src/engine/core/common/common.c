@@ -36,10 +36,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define NUM_SAFE_ARGVS  7
 
-static cString largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
-static cString argvdummy = " ";
-
-static cString safeargvs[NUM_SAFE_ARGVS] = {
+static cString   _lArgV[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
+static cStringRO _argVDummy = " ";
+static cStringRO _safeArgvs[NUM_SAFE_ARGVS] = {
     "-stdvid",
     "-nolan",
     "-nosound",
@@ -50,26 +49,22 @@ static cString safeargvs[NUM_SAFE_ARGVS] = {
 };
 
 
-bool        com_modified;   // set true if using non-id files
-bool  proghack;
-int32_t             static_registered = 1;  // only for startup check, then set
+static bool     _contModified;   // set true if using non-id files
+static bool     _progHack;
+static int32_t  _Registered = 1;  // only for startup check, then set
 
-bool  msg_suppress_1 = 0;
-
-void COM_InitFilesystem();
+bool  msg_suppress_1 = false; // supress System messages
 
 // if a packfile directory differs from this, it is assumed to be hacked
 #define PAK0_COUNT              339
 #define PAK0_CRC                32981
 
-char com_token[1024];
-int  com_argc;
-cStringArray com_argv;
 
-#define CMDLINE_LENGTH 256
-char com_cmdline[CMDLINE_LENGTH];
+common_t com;
 
-bool  standard_quake = true, rogue, hipnotic;
+bool standard_quake = true;
+bool rogue;
+bool hipnotic;
 
 // this graphic needs to be in the pak file to use registered features
 uint16_t pop[] = {
@@ -155,6 +150,7 @@ cString COM_FileExtension(cStringRO in) {
 
     if (!*in)
         return "";
+
     in++;
 
     int i = 0;
@@ -221,7 +217,7 @@ cString COM_Parse(cString data) {
     char c;
 
     int len = 0;
-    com_token[0] = 0;
+    com.token[0] = 0;
 
     if (!data)
         return NULL;
@@ -248,10 +244,10 @@ skipwhite:
         while (1) {
             c = *data++;
             if ((c == '\"') || (!c)) {
-                com_token[len] = 0;
+                com.token[len] = 0;
                 return data;
             }
-            com_token[len] = c;
+            com.token[len] = c;
             len++;
         }
     }
@@ -264,15 +260,15 @@ skipwhite:
         (c == '\'') ||
         (c == ':')
         ) {
-        com_token[len] = c;
+        com.token[len] = c;
         len++;
-        com_token[len] = 0;
+        com.token[len] = 0;
         return data + 1;
     }
 
     // parse a regular word
     do {
-        com_token[len] = c;
+        com.token[len] = c;
         data++;
         len++;
         c = *data;
@@ -285,7 +281,7 @@ skipwhite:
             break;
     } while (c > 32);
 
-    com_token[len] = 0;
+    com.token[len] = 0;
     return data;
 }
 
@@ -299,9 +295,9 @@ where the given parameter apears, or 0 if not present
 ================
 */
 int COM_CheckParm(cStringRO parm) {
-    for (int i = 1; i < com_argc; i++) {
-        if (!com_argv[i])                   continue;   // NEXTSTEP sometimes clears appkit vars.
-        if (!Q_strcmp(parm, com_argv[i]))   return i;
+    for (int i = 1; i < com.argc; i++) {
+        if (!com.argv[i])                   continue;   // NEXTSTEP sometimes clears appkit vars.
+        if (!Q_strcmp(parm, com.argv[i]))   return i;
     }
 
     return 0;
@@ -320,14 +316,14 @@ being registered.
 void COM_CheckRegistered() {
     int h;
     COM_OpenFile("gfx/pop.lmp", &h);
-    static_registered = 0;
+    _Registered = 0;
 
     if (h == -1) {
 #if WINDED
         Sys_Error("This dedicated server requires a full registered copy of Quake");
 #endif
         Con_Printf("Playing shareware version.\n");
-        if (com_modified)
+        if (_contModified)
             Sys_Error("You must have the registered version to use modified games");
         return;
     }
@@ -340,14 +336,13 @@ void COM_CheckRegistered() {
         if (pop[i] != (uint16_t)BigShort(check[i]))
             Sys_Error("Corrupted data file.");
 
-    Cvar_Set("cmdline", com_cmdline);
+    Cvar_Set("cmdline", com.cmdline);
     Cvar_Set("registered", "1");
-    static_registered = 1;
+    _Registered = 1;
     Con_Printf("Playing registered version.\n");
 }
 
 
-void COM_Path_f();
 
 
 /*
@@ -362,23 +357,23 @@ void COM_InitArgv(int argc, cStringArray argv) {
         int i = 0;
 
         while ((n < (CMDLINE_LENGTH - 1)) && argv[j][i]) {
-            com_cmdline[n++] = argv[j][i++];
+            com.cmdline[n++] = argv[j][i++];
         }
 
         if (n < (CMDLINE_LENGTH - 1))
-            com_cmdline[n++] = ' ';
+            com.cmdline[n++] = ' ';
         else
             break;
     }
 
-    com_cmdline[n] = 0;
+    com.cmdline[n] = 0;
 
     bool safe = false;
 
-    for (com_argc = 0; (com_argc < MAX_NUM_ARGVS) && (com_argc < argc);
-        com_argc++) {
-        largv[com_argc] = argv[com_argc];
-        if (!Q_strcmp("-safe", argv[com_argc]))
+    for (com.argc = 0; (com.argc < MAX_NUM_ARGVS) && (com.argc < argc);
+        com.argc++) {
+        _lArgV[com.argc] = argv[com.argc];
+        if (!Q_strcmp("-safe", argv[com.argc]))
             safe = true;
     }
 
@@ -386,13 +381,13 @@ void COM_InitArgv(int argc, cStringArray argv) {
         // force all the safe-mode switches. Note that we reserved extra space in
         // case we need to add these, so we don't need an overflow check
         for (int i = 0; i < NUM_SAFE_ARGVS; i++) {
-            largv[com_argc] = safeargvs[i];
-            com_argc++;
+            _lArgV[com.argc] = (cString)_safeArgvs[i];
+            com.argc++;
         }
     }
 
-    largv[com_argc] = argvdummy;
-    com_argv = largv;
+    _lArgV[com.argc] = (cString)_argVDummy;
+    com.argv = _lArgV;
 
     if (COM_CheckParm("-rogue")) {
         rogue = true;
@@ -411,6 +406,9 @@ void COM_InitArgv(int argc, cStringArray argv) {
 COM_Init
 ================
 */
+void COM_Path_f();
+void COM_InitFilesystem();
+
 void COM_Init(cStringRO basedir) {
     COM_Endian_Init();
 
@@ -460,9 +458,6 @@ QUAKE FILESYSTEM
 =============================================================================
 */
 
-int32_t com_filesize;
-
-
 //
 // in memory
 //
@@ -498,7 +493,7 @@ typedef struct {
 #define MAX_FILES_IN_PACK       2048
 
 char com_cachedir[MAX_OSPATH];
-char com_gamedir[MAX_OSPATH];
+
 
 struct searchpath_s;
 typedef struct searchpath_s searchpath_t;
@@ -534,7 +529,7 @@ The filename will be prefixed by the current game directory
 */
 void COM_WriteFile(cStringRO filename, TypeLess_ptr data, int32_t len) {
     char    name[MAX_OSPATH];
-    snprintf(name, sizeof(name), "%s/%s", com_gamedir, filename);
+    snprintf(name, sizeof(name), "%s/%s", com.gamedir, filename);
 
     int handle = Sys_FileOpenWrite(name);
     if (handle == -1) {
@@ -598,7 +593,7 @@ void COM_CopyFile(cString netpath, cString cachepath) {
 COM_FindFile
 
 Finds the file in the search path.
-Sets com_filesize and one of handle or file
+Sets com.filesize and one of handle or file
 ===========
 */
 int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
@@ -609,7 +604,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
     // search through the path, one element at a time
     //
     searchpath_p search = com_searchpaths;
-    if (proghack) { // gross hack to use quake 1 progs with quake 2 maps
+    if (_progHack) { // gross hack to use quake 1 progs with quake 2 maps
         if (!strcmp(filename, "progs.dat"))
             search = search->next;
     }
@@ -631,13 +626,13 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
                         if (*file)
                             fseek(*file, pak->files[idxPak].filepos, SEEK_SET);
                     }
-                    com_filesize = pak->files[idxPak].filelen;
-                    return com_filesize;
+                    com.filesize = pak->files[idxPak].filelen;
+                    return com.filesize;
                 }
         }
         else {
             // check a file in the directory tree
-            if (!static_registered) {       // if not a registered version, don't ever go beyond base
+            if (!_Registered) {       // if not a registered version, don't ever go beyond base
                 if (strchr(filename, '/') ||
                     strchr(filename, '\\'))
                     continue;
@@ -674,14 +669,14 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
             Sys_Printf("FindFile: %s\n", netpath);
             int fHandle;
 
-            com_filesize = Sys_FileOpenRead(netpath, &fHandle);
+            com.filesize = Sys_FileOpenRead(netpath, &fHandle);
             if (handle)
                 *handle = fHandle;
             else {
                 Sys_FileClose(fHandle);
                 *file = fopen(netpath, "rb");
             }
-            return com_filesize;
+            return com.filesize;
         }
 
     }
@@ -691,7 +686,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
     if (handle) *handle = -1;
     else        *file = NULL;
 
-    com_filesize = -1;
+    com.filesize = -1;
     return -1;
 }
 
@@ -832,7 +827,7 @@ pack_p COM_LoadPackFile(cStringRO packfile) {
         Sys_Error("%s has %i files", packfile, numpackfiles);
 
     if (numpackfiles != PAK0_COUNT)
-        com_modified = true;    // not the original file
+        _contModified = true;    // not the original file
 
     packfile_p newfiles = Hunk_AllocName(numpackfiles * sizeof(packfile_t), "packfile");
 
@@ -847,7 +842,7 @@ pack_p COM_LoadPackFile(cStringRO packfile) {
         CRC_ProcessByte(&crc, ((uint8_p)info)[i]);
 
     if (crc != PAK0_CRC)
-        com_modified = true;
+        _contModified = true;
 
     // parse the directory
     for (int i = 0; i < numpackfiles; i++) {
@@ -871,12 +866,12 @@ pack_p COM_LoadPackFile(cStringRO packfile) {
 ================
 COM_AddGameDirectory
 
-Sets com_gamedir, adds the directory to the head of the path,
+Sets com.gamedir, adds the directory to the head of the path,
 then loads and adds pak1.pak pak2.pak ...
 ================
 */
 void COM_AddGameDirectory(cStringRO dir) {
-    strcpy(com_gamedir, dir);
+    strcpy(com.gamedir, dir);
 
     //
     // add the directory to the search path
@@ -920,7 +915,7 @@ void COM_InitFilesystem() {
     // Overrides the system supplied base directory (under GAMENAME)
     //
     int param = COM_CheckParm("-basedir");
-    if (param && (param < com_argc - 1))    strcpy(basedir, com_argv[param + 1]);
+    if (param && (param < com.argc - 1))    strcpy(basedir, com.argv[param + 1]);
     else                                    strcpy(basedir, host_parms.basedir);
 
     int st_len = strlen(basedir);
@@ -937,9 +932,9 @@ void COM_InitFilesystem() {
     // -cachedir - will disable caching.
     //
     param = COM_CheckParm("-cachedir");
-    if (param && (param < com_argc - 1)) {
-        if (com_argv[param + 1][0] == '-')  com_cachedir[0] = 0;
-        else                         strcpy(com_cachedir, com_argv[param + 1]);
+    if (param && (param < com.argc - 1)) {
+        if (com.argv[param + 1][0] == '-')  com_cachedir[0] = 0;
+        else                         strcpy(com_cachedir, com.argv[param + 1]);
     }
     else if (host_parms.cachedir)    strcpy(com_cachedir, host_parms.cachedir);
     else                                    com_cachedir[0] = 0;
@@ -957,9 +952,9 @@ void COM_InitFilesystem() {
     // Adds basedir/gamedir as an override game
     //
     param = COM_CheckParm("-game");
-    if (param && (param < com_argc - 1)) {
-        com_modified = true;
-        COM_AddGameDirectory(va("%s/%s", basedir, com_argv[param + 1]));
+    if (param && (param < com.argc - 1)) {
+        _contModified = true;
+        COM_AddGameDirectory(va("%s/%s", basedir, com.argv[param + 1]));
     }
 
     //
@@ -968,26 +963,26 @@ void COM_InitFilesystem() {
     //
     param = COM_CheckParm("-path");
     if (param) {
-        com_modified = true;
+        _contModified = true;
         com_searchpaths = NULL;
-        while (++param < com_argc) {
-            if (!com_argv[param] ||
-                (com_argv[param][0] == '+') ||
-                (com_argv[param][0] == '-'))
+        while (++param < com.argc) {
+            if (!com.argv[param] ||
+                (com.argv[param][0] == '+') ||
+                (com.argv[param][0] == '-'))
                 break;
 
             searchpath_p search = Hunk_Alloc(sizeof(searchpath_t));
-            if (!strcmp(COM_FileExtension(com_argv[param]), "pak")) {
-                search->pack = COM_LoadPackFile(com_argv[param]);
-                if (!search->pack)      Sys_Error("Couldn't load packfile: %s", com_argv[param]);
+            if (!strcmp(COM_FileExtension(com.argv[param]), "pak")) {
+                search->pack = COM_LoadPackFile(com.argv[param]);
+                if (!search->pack)      Sys_Error("Couldn't load packfile: %s", com.argv[param]);
             }
-            else    strcpy(search->filename, com_argv[param]);
+            else    strcpy(search->filename, com.argv[param]);
             search->next = com_searchpaths;
             com_searchpaths = search;
         }
     }
 
-    if (COM_CheckParm("-proghack")) proghack = true;
+    if (COM_CheckParm("-proghack")) _progHack = true;
 }
 
 

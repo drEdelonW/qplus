@@ -31,24 +31,36 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern bool		msg_suppress_1;		// suppresses resolution and cache size console output
 //  an fullscreen DIB focus gain/loss
-extern int32_t			current_skill;		// skill level for currently loaded level (in case
-//  the user changes the cvar while the level is
-//  running, this reflects the level actually in use)
-// !!! if this is changed, it must be changed in quakedef.h too !!!
+
 #define CACHE_SIZE	32		// used to align key data structures
 
 
 //============================================================================
+#define CMDLINE_LENGTH 256
 
-extern char com_token[1024];
-extern bool com_eof;
+typedef struct {
+    int             argc;
+    cStringArray    argv;
+    int32_t         filesize;
+    char            cmdline[CMDLINE_LENGTH]; // private
+    char            token[1024];
+    char            gamedir[MAX_OSPATH];
+} common_t;
+
+extern common_t com;
+
+extern struct cvar_s registered;
+
+extern bool standard_quake;
+extern bool rogue;
+extern bool hipnotic;
+
+
+// extern bool com_eof; // not used
 #ifdef __cplusplus
 extern "C" {
 #endif
     cString COM_Parse(cString data);
-
-    extern int com_argc;
-    extern cStringArray com_argv;
 
     int COM_CheckParm(cStringRO parm);
     void COM_Init(cStringRO path);
@@ -62,12 +74,7 @@ extern "C" {
     cString va(cStringRO format, ...);
     // does a varargs printf into a temp buffer
 
-
     //============================================================================
-
-    extern int32_t com_filesize;
-
-    extern char com_gamedir[MAX_OSPATH];
 
     void COM_WriteFile(cStringRO filename, TypeLess_ptr data, int32_t len);
     int COM_OpenFile(cStringRO filename, int* hndl);
@@ -82,6 +89,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-extern struct cvar_s registered;
-
-extern bool  standard_quake, rogue, hipnotic;

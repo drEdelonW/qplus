@@ -108,7 +108,7 @@ sfxcache_p S_LoadSound(sfx_p s) {
         return NULL;
     }
 
-    wavinfo_t info = GetWavinfo(s->name, data, com_filesize);
+    wavinfo_t info = GetWavinfo(s->name, data, com.filesize);
     if (info.channels != 1) {
         Con_Printf("%s is a stereo sample\n", s->name);
         return NULL;

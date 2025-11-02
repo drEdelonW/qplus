@@ -36,7 +36,7 @@ SurfCache_p sc_rover, sc_base;
 
 int D_SurfaceCacheForRes(int width, int height) {
     if (COM_CheckParm("-surfcachesize"))
-        return Q_atoi(com_argv[COM_CheckParm("-surfcachesize") + 1]) * 1024;
+        return Q_atoi(com.argv[COM_CheckParm("-surfcachesize") + 1]) * 1024;
 
     int size = SURFCACHE_SIZE_AT_320X200;
     int pix = width * height;

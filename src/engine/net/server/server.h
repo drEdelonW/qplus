@@ -74,6 +74,8 @@ typedef struct {
     sizebuf_t   signon;
     uint8_t     signon_buf[8192];
 } server_t;
+extern int32_t     current_skill; 	// skill level for currently loaded level (in case
+//  the user changes the cvar while the level is running, this reflects the level actually in use)
 
 
 #define	NUM_PING_TIMES		16

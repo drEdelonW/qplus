@@ -52,7 +52,6 @@ private:
 // #endif
 
     /* extern globals */
-    extern int32_t current_skill;
     extern bool    noclip_anglehack;
 
     /* from other TUs but needed here */

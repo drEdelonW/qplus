@@ -697,8 +697,8 @@ void NET_Init() {
     if (!param)     param = COM_CheckParm("-ipxport");
 
     if (param) {
-        if (param < com_argc - 1)
-            DEFAULTnet_hostport = Q_atoi(com_argv[param + 1]);
+        if (param < com.argc - 1)
+            DEFAULTnet_hostport = Q_atoi(com.argv[param + 1]);
         else
             Sys_Error("NET_Init: you must specify a number after -port");
     }

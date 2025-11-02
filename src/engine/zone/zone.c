@@ -41,8 +41,8 @@ void Memory_Init(TypeLess_ptr buf, size_t size) {
 	Cache_Init();
 	int p = COM_CheckParm("-zone");
 	if (p) {
-		if (p < (com_argc - 1))
-			zonesize = Q_atoi(com_argv[p + 1]) * 1024;
+		if (p < (com.argc - 1))
+			zonesize = Q_atoi(com.argv[p + 1]) * 1024;
 		else
 			Sys_Error("Memory_Init: you must specify a size in KB after -zone");
 	}
