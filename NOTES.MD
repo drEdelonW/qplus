@@ -54,3 +54,5 @@ sudo apt install -y libsdl2-2.0-0 libsdl2-dev \
 export SDL_VIDEO_X11_FORCE_EGL=1
 export SDL_RENDER_DRIVER=opengles2     # рендерер SDL через GLES2
 OUTPUT/testSDL2/testSDL2.elf
+
+JackHummer - map editor in Steam

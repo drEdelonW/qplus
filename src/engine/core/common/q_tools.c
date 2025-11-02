@@ -1,5 +1,5 @@
 #include "q_tools.h"
-#include <stdint.h>
+// #include <stdint.h>
 
 /*
 ============================================================================
@@ -15,7 +15,7 @@ void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count) {
         count >>= 2;
         fill = fill | (fill << 8) | (fill << 16) | (fill << 24);
         for (int32_t i = 0; i < count; i++) {
-            ((int32_t*)dest)[i] = fill;
+            ((int32_p)dest)[i] = fill;
         }
     }
     else {
@@ -33,13 +33,15 @@ void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count) {
         uint32_t f = (uint8_t)fill;
         f |= (f << 8);
         f |= (f << 16);
-        uint32_t* d32 = (uint32_t*)dest;
-        for (int32_t i = 0; i < n; ++i) d32[i] = f;
+        uint32_p d32 = (uint32_p)dest;
+        for (int32_t i = 0; i < n; ++i)
+            d32[i] = f;
     }
     else {
         uint8_p d8 = (uint8_p)dest;
         uint8_t f8 = (uint8_t)fill;
-        for (int32_t i = 0; i < count; ++i) d8[i] = f8;
+        for (int32_t i = 0; i < count; ++i)
+            d8[i] = f8;
     }
 }
 #endif
@@ -49,7 +51,7 @@ void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count) {
     if ((((int32_t)dest | (int32_t)src | count) & 3) == 0) {
         count >>= 2;
         for (int32_t i = 0; i < count; i++) {
-            ((int32_t*)dest)[i] = ((int32_t*)src)[i];
+            ((int32_p)dest)[i] = ((int32_p)src)[i];
         }
     }
     else {
@@ -63,8 +65,8 @@ void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count) {
     if (count <= 0) return;
     if ((((uintptr_t)dest | (uintptr_t)src | (uintptr_t)count) & 3u) == 0u) {
         int32_t n = count >> 2;
-        uint32_t* d32 = (uint32_t*)dest;
-        const uint32_t* s32 = (const uint32_t*)src;
+        uint32_p d32 = (uint32_p)dest;
+        const uint32_p s32 = (const uint32_p)src;
         for (int32_t i = 0; i < n; ++i) d32[i] = s32[i];
     }
     else {
@@ -98,17 +100,17 @@ void Q_strncpy(cString dest, cStringRO src, int32_t count) {
         *dest++ = *src++;
     }
     if (count) {
-        *dest++ = 0;
+        *dest++ = 0x00;
     }
 }
 #else
 void Q_strncpy(cString dest, cStringRO src, int32_t count) {
     // if (count <= 0) return;
     int32_t n = count;
-    while (--n > 0 && *src) {
+    while ((--n > 0) && *src) {
         *dest++ = *src++;
     }
-    *dest = 0; /* always NUL-terminate */
+    *dest = 0x00; /* always NUL-terminate */
 }
 #endif
 
@@ -128,7 +130,7 @@ cString Q_strrchr(cString s, char c) {
             return s;
         }
     }
-    return 0;
+    return NULL;
 }
 
 void Q_strcat(cString dest, cStringRO src) {
@@ -138,10 +140,8 @@ void Q_strcat(cString dest, cStringRO src) {
 
 int Q_strcmp(cStringRO s1, cStringRO s2) {
     while (1) {
-        if (*s1 != *s2)
-            return -1;              // strings not equal
-        if (!*s1)
-            return 0;               // strings are equal
+        if (*s1 != *s2)     return -1;              // strings not equal
+        if (!*s1)           return 0;               // strings are equal
         s1++;
         s2++;
     }
@@ -151,12 +151,9 @@ int Q_strcmp(cStringRO s1, cStringRO s2) {
 
 int Q_strncmp(cStringRO s1, cStringRO s2, int32_t count) {
     while (1) {
-        if (!count--)
-            return 0;
-        if (*s1 != *s2)
-            return -1;              // strings not equal
-        if (!*s1)
-            return 0;               // strings are equal
+        if (!count--)       return 0;
+        if (*s1 != *s2)     return -1;              // strings not equal
+        if (!*s1)           return 0;               // strings are equal
         s1++;
         s2++;
     }
@@ -188,10 +185,10 @@ int Q_strncasecmp(cStringRO s1, cStringRO s2, int32_t n) {
     do {
         int c1 = *s1++;
         int c2 = *s2++;
-        if ((c1 >= 'a') && (c1 <= 'z')) c1 -= ('a' - 'A');
-        if ((c2 >= 'a') && (c2 <= 'z')) c2 -= ('a' - 'A');
-        if (c1 != c2) return -1;     /* not equal */
-        if (c1 == 0)  return 0;      /* equal (both '\0') */
+        if ((c1 >= 'a') && (c1 <= 'z'))     c1 -= ('a' - 'A');
+        if ((c2 >= 'a') && (c2 <= 'z'))     c2 -= ('a' - 'A');
+        if (c1 != c2)   return -1;     /* not equal */
+        if (c1 == 0)    return 0;      /* equal (both '\0') */
     } while (--n);
     return 0;
 }
@@ -204,13 +201,9 @@ int Q_strcasecmp(cStringRO s1, cStringRO s2) {
 int Q_atoi(cStringRO str) {
     int sign;
 
-    if (*str == '-') {
-        sign = -1;
-        str++;
-    }
-    else {
-        sign = 1;
-    }
+    if (*str == '-') { sign = -1;   str++; }
+    else                sign = 1;
+
 
     int val = 0;
 
@@ -225,23 +218,19 @@ int Q_atoi(cStringRO str) {
         str += 2;
         while (1) {
             int c = *str++;
-            if ((c >= '0') && (c <= '9'))
-                val = (val << 4) + c - '0';
-            else if ((c >= 'a') && (c <= 'f'))
-                val = (val << 4) + c - 'a' + 10;
-            else if ((c >= 'A') && (c <= 'F'))
-                val = (val << 4) + c - 'A' + 10;
-            else
-                return val * sign;
+            if ((c >= '0') && (c <= '9'))           val = (val << 4) + c - '0';
+            else if ((c >= 'a') && (c <= 'f'))      val = (val << 4) + c - 'a' + 10;
+            else if ((c >= 'A') && (c <= 'F'))      val = (val << 4) + c - 'A' + 10;
+            else                                    return val * sign;
         }
     }
 
     //
     // check for character
     //
-    if (str[0] == '\'') {
+    if (str[0] == '\'')
         return sign * str[1];
-    }
+
 
     //
     // assume decimal
@@ -250,6 +239,7 @@ int Q_atoi(cStringRO str) {
         int c = *str++;
         if ((c < '0') || (c > '9'))
             return val * sign;
+
         val = val * 10 + c - '0';
     }
 
@@ -260,13 +250,8 @@ int Q_atoi(cStringRO str) {
 float Q_atof(cStringRO str) {
     int     sign;
 
-    if (*str == '-') {
-        sign = -1;
-        str++;
-    }
-    else {
-        sign = 1;
-    }
+    if (*str == '-') { sign = -1;   str++; }
+    else                sign = 1;
 
     double val = 0;
 
@@ -281,23 +266,19 @@ float Q_atof(cStringRO str) {
         str += 2;
         while (1) {
             int c = *str++;
-            if ((c >= '0') && (c <= '9'))
-                val = (val * 16) + c - '0';
-            else if ((c >= 'a') && (c <= 'f'))
-                val = (val * 16) + c - 'a' + 10;
-            else if ((c >= 'A') && (c <= 'F'))
-                val = (val * 16) + c - 'A' + 10;
-            else
-                return val * sign;
+            if ((c >= '0') && (c <= '9'))           val = (val * 16) + c - '0';
+            else if ((c >= 'a') && (c <= 'f'))      val = (val * 16) + c - 'a' + 10;
+            else if ((c >= 'A') && (c <= 'F'))      val = (val * 16) + c - 'A' + 10;
+            else                                    return val * sign;
         }
     }
 
     //
     // check for character
     //
-    if (str[0] == '\'') {
+    if (str[0] == '\'')
         return sign * str[1];
-    }
+
 
     //
     // assume decimal
@@ -312,6 +293,7 @@ float Q_atof(cStringRO str) {
         }
         if ((c < '0') || (c > '9'))
             break;
+
         val = val * 10 + c - '0';
         total++;
     }
