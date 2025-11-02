@@ -40,6 +40,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR)) $(eval INCLU
                         SRC_LIST += $(HOST_DIR)/host_cmd.c
                         SRC_LIST += $(HOST_DIR)/host_obj.cpp
                         SRC_LIST += $(HOST_DIR)/host_cWrap.cpp
+                        SRC_LIST += $(HOST_DIR)/host_cUnWrapped.cpp
 
         $(eval WORLD_DIR = $(ENG_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))
                 SRC_LIST += $(WORLD_DIR)/world.c

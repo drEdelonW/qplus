@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "endian_tools.h"
 #include <string.h>
 #include "q_tools.h"
+#include "console.h"
 
 
 int   cache_full_cycle;

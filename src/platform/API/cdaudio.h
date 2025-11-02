@@ -22,13 +22,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef __cplusplus
 extern "C" {
 #endif
-    int CDAudio_Init();
+
+    int  CDAudio_Init();
     void CDAudio_Play(uint8_t track, bool looping);
     void CDAudio_Stop();
     void CDAudio_Pause();
     void CDAudio_Resume();
     void CDAudio_Shutdown();
     void CDAudio_Update();
+
 #ifdef __cplusplus
 }
 #endif

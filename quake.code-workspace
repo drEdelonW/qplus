@@ -116,7 +116,8 @@
 			"progdefs.h": "c",
 			"d_local.h": "c",
 			"surfcache.h": "c",
-			"world.h": "c"
+			"world.h": "c",
+			"*.c_": "cpp"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}
