@@ -250,12 +250,9 @@ void Sys_EditFile(cString filename) {
     cString term = getenv("TERM");
     if ((term) && (!strcmp(term, "xterm"))) {
         cString editor = getenv("VISUAL");
-        if (!editor)
-            editor = getenv("EDITOR");
-        if (!editor)
-            editor = getenv("EDIT");
-        if (!editor)
-            editor = "vi";
+        if (!editor)    editor = getenv("EDITOR");
+        if (!editor)    editor = getenv("EDIT");
+        if (!editor)    editor = "vi";
         sprintf(cmd, "xterm -e %s %s", editor, filename);
         system(cmd);
     }

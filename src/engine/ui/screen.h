@@ -26,19 +26,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern "C" {
 #endif
 
-void SCR_Init();
+    void SCR_Init();
 
-void SCR_UpdateScreen();
+    void SCR_UpdateScreen();
 
-void SCR_SizeUp();
-void SCR_SizeDown();
-void SCR_BringDownConsole();
-void SCR_CenterPrint (cString str);
+    void SCR_SizeUp();
+    void SCR_SizeDown();
+    void SCR_BringDownConsole();
+    void SCR_CenterPrint(cString str);
 
-void SCR_BeginLoadingPlaque();
-void SCR_EndLoadingPlaque();
+    void SCR_BeginLoadingPlaque();
+    void SCR_EndLoadingPlaque();
 
-int SCR_ModalMessage (cString text);
+    int SCR_ModalMessage(cString text);
 #ifdef __cplusplus
 }
 #endif

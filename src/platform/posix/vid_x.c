@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define _BSD
 
+#include "vid.h"
+
 #include <ctype.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -47,30 +49,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "angle.h"
 #include "q_tools.h"
 
-float   old_windowed_mouse;
+static float   old_windowed_mouse;
 
-bool    mouse_avail;
-int     mouse_buttons = 3;
-int     mouse_oldbuttonstate;
-int     mouse_buttonstate;
-float   mouse_x, mouse_y;
-float   old_mouse_x, old_mouse_y;
-int     p_mouse_x;
-int     p_mouse_y;
-int     ignorenext;
-int     bits_per_pixel;
+static bool    mouse_avail;
+static int     mouse_buttons = 3;
+static int     mouse_oldbuttonstate;
+static int     mouse_buttonstate;
+static float   mouse_x, mouse_y;
+static float   old_mouse_x, old_mouse_y;
+static int     p_mouse_x;
+static int     p_mouse_y;
+static int     ignorenext;
+// static int     bits_per_pixel;
 
-typedef struct {
-    int input;
-    int output;
-} keymap_t;
+// typedef struct {
+//     int input;
+//     int output;
+// } keymap_t;
 
-extern VidDef_t vid; // global video state
+// extern VidDef_t vid; // global video state
 uint16_t d_8to16table[256];
 
-int num_shades = 32;
-int d_con_indirect = 0;
-int vid_buffersize;
+// static int num_shades = 32;
+// int d_con_indirect = 0;
+// int vid_buffersize;
 
 static bool     doShm;
 static Display* x_disp;
@@ -85,10 +87,10 @@ static int          x_shmeventtype;
 
 static bool   oktodraw = false;
 
-int XShmQueryExtension(Display*);
-int XShmGetEventBase(Display*);
+// int XShmQueryExtension(Display*);
+// int XShmGetEventBase(Display*);
 
-int current_framebuffer;
+static int current_framebuffer;
 static XImage* x_framebuffer[2] = { 0, 0 };
 static XShmSegmentInfo x_shminfo[2];
 
@@ -100,11 +102,11 @@ static int32_t X11_highhunkmark;
 static int32_t X11_buffersize;
 
 int vid_surfcachesize;
-TypeLess_ptr vid_surfcache;
+static TypeLess_ptr vid_surfcache;
 
-extern void (*vid_menudrawfn)();
-extern void (*vid_menukeyfn)(int key);
-void VID_MenuKey(int key);
+// extern void (*vid_menudrawfn)();
+// extern void (*vid_menukeyfn)(int key);
+// void VID_MenuKey(int key);
 
 typedef uint16_t PIXEL16;
 typedef uint32_t PIXEL24;
@@ -119,90 +121,65 @@ void shiftmask_init() {
     r_mask = x_vis->red_mask;
     g_mask = x_vis->green_mask;
     b_mask = x_vis->blue_mask;
-    for (r_shift = -8, x = 1;x < r_mask;x = x << 1)r_shift++;
-    for (g_shift = -8, x = 1;x < g_mask;x = x << 1)g_shift++;
-    for (b_shift = -8, x = 1;x < b_mask;x = x << 1)b_shift++;
+    for (r_shift = -8, x = 1; x < r_mask; x = x << 1)
+        r_shift++;
+    for (g_shift = -8, x = 1; x < g_mask; x = x << 1)
+        g_shift++;
+    for (b_shift = -8, x = 1; x < b_mask; x = x << 1)
+        b_shift++;
     shiftmask_fl = 1;
 }
 
 PIXEL16 xlib_rgb16(int r, int g, int b) {
-    PIXEL16 p;
     if (shiftmask_fl == 0) shiftmask_init();
-    p = 0;
+    PIXEL16 p = 0;
 
-    if (r_shift > 0) {
-        p = (r << (r_shift)) & r_mask;
-    }
-    else if (r_shift < 0) {
-        p = (r >> (-r_shift)) & r_mask;
-    }
-    else p |= (r & r_mask);
+    if (r_shift > 0)        p = (r << (r_shift)) & r_mask;
+    else if (r_shift < 0)   p = (r >> (-r_shift)) & r_mask;
+    else                    p |= (r & r_mask);
 
-    if (g_shift > 0) {
-        p |= (g << (g_shift)) & g_mask;
-    }
-    else if (g_shift < 0) {
-        p |= (g >> (-g_shift)) & g_mask;
-    }
-    else p |= (g & g_mask);
+    if (g_shift > 0)        p |= (g << (g_shift)) & g_mask;
+    else if (g_shift < 0)   p |= (g >> (-g_shift)) & g_mask;
+    else                    p |= (g & g_mask);
 
-    if (b_shift > 0) {
-        p |= (b << (b_shift)) & b_mask;
-    }
-    else if (b_shift < 0) {
-        p |= (b >> (-b_shift)) & b_mask;
-    }
-    else p |= (b & b_mask);
+    if (b_shift > 0)        p |= (b << (b_shift)) & b_mask;
+    else if (b_shift < 0)   p |= (b >> (-b_shift)) & b_mask;
+    else                    p |= (b & b_mask);
 
     return p;
 }
 
 PIXEL24 xlib_rgb24(int r, int g, int b) {
-    PIXEL24 p;
     if (shiftmask_fl == 0) shiftmask_init();
-    p = 0;
+    PIXEL24 p = 0;
 
-    if (r_shift > 0) {
-        p = (r << (r_shift)) & r_mask;
-    }
-    else if (r_shift < 0) {
-        p = (r >> (-r_shift)) & r_mask;
-    }
-    else p |= (r & r_mask);
+    if (r_shift > 0)        p = (r << (r_shift)) & r_mask;
+    else if (r_shift < 0)   p = (r >> (-r_shift)) & r_mask;
+    else                    p |= (r & r_mask);
 
-    if (g_shift > 0) {
-        p |= (g << (g_shift)) & g_mask;
-    }
-    else if (g_shift < 0) {
-        p |= (g >> (-g_shift)) & g_mask;
-    }
-    else p |= (g & g_mask);
+    if (g_shift > 0)        p |= (g << (g_shift)) & g_mask;
+    else if (g_shift < 0)   p |= (g >> (-g_shift)) & g_mask;
+    else                    p |= (g & g_mask);
 
-    if (b_shift > 0) {
-        p |= (b << (b_shift)) & b_mask;
-    }
-    else if (b_shift < 0) {
-        p |= (b >> (-b_shift)) & b_mask;
-    }
-    else p |= (b & b_mask);
+    if (b_shift > 0)        p |= (b << (b_shift)) & b_mask;
+    else if (b_shift < 0)   p |= (b >> (-b_shift)) & b_mask;
+    else                    p |= (b & b_mask);
 
     return p;
 }
 
 void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
-    uint8_p src;
-    PIXEL16* dest;
     register int count, n;
 
     if ((x < 0) || (y < 0))return;
 
     for (int yi = y; yi < (y + height); yi++) {
-        src = (uint8_p)&framebuf->data[yi * framebuf->bytes_per_line];
+        uint8_p src = (uint8_p)&framebuf->data[yi * framebuf->bytes_per_line];
 
         // Duff's Device
         count = width;
         n = (count + 7) / 8;
-        dest = ((PIXEL16*)src) + x + width - 1;
+        PIXEL16* dest = ((PIXEL16*)src) + x + width - 1;
         src += x + width - 1;
 
         switch (count % 8) {
@@ -225,19 +202,17 @@ void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
 }
 
 void st3_fixup(XImage* framebuf, int x, int y, int width, int height) {
-    uint8_p src;
-    PIXEL24* dest;
     register int count, n;
 
     if ((x < 0) || (y < 0))return;
 
     for (int yi = y; yi < (y + height); yi++) {
-        src = (uint8_p)&framebuf->data[yi * framebuf->bytes_per_line];
+        uint8_p src = (uint8_p)&framebuf->data[yi * framebuf->bytes_per_line];
 
         // Duff's Device
         count = width;
         n = (count + 7) / 8;
-        dest = ((PIXEL24*)src) + x + width - 1;
+        PIXEL24* dest = ((PIXEL24*)src) + x + width - 1;
         src += x + width - 1;
 
         switch (count % 8) {
@@ -275,20 +250,18 @@ void TragicDeath(int signal_num) {
 // ========================================================================
 
 static Cursor CreateNullCursor(Display* display, Window root) {
-    Pixmap cursormask;
-    XGCValues xgc;
-    GC gc;
-    XColor dummycolour;
-    Cursor cursor;
-
-    cursormask = XCreatePixmap(display, root, 1, 1, 1/*depth*/);
-    xgc.function = GXclear;
-    gc = XCreateGC(display, cursormask, GCFunction, &xgc);
+    Pixmap cursormask = XCreatePixmap(display, root, 1, 1, 1/*depth*/);
+    XGCValues xgc = {
+         .function = GXclear
+    };
+    GC gc = XCreateGC(display, cursormask, GCFunction, &xgc);
     XFillRectangle(display, cursormask, gc, 0, 0, 1, 1);
-    dummycolour.pixel = 0;
-    dummycolour.red = 0;
-    dummycolour.flags = 04;
-    cursor = XCreatePixmapCursor(display, cursormask, cursormask,
+    XColor dummycolour = {
+        .pixel = 0,
+        .red = 0,
+        .flags = 04
+    };
+    Cursor cursor = XCreatePixmapCursor(display, cursormask, cursormask,
         &dummycolour, &dummycolour, 0, 0);
     XFreePixmap(display, cursormask);
     XFreeGC(display, gc);
@@ -296,9 +269,6 @@ static Cursor CreateNullCursor(Display* display, Window root) {
 }
 
 void ResetFrameBuffer() {
-    int mem;
-    int pwidth;
-
     if (x_framebuffer[0]) {
         free(x_framebuffer[0]->data);
         free(x_framebuffer[0]);
@@ -327,9 +297,9 @@ void ResetFrameBuffer() {
 
     D_InitCaches(vid_surfcache, vid_surfcachesize);
 
-    pwidth = x_visinfo->depth / 8;
-    if (pwidth == 3) pwidth = 4;
-    mem = ((vid.width * pwidth + 7) & ~7) * vid.height;
+    int pwidth = x_visinfo->depth / 8;
+    if (pwidth == 3)    pwidth = 4;
+    int mem = ((vid.width * pwidth + 7) & ~7) * vid.height;
 
     x_framebuffer[0] = XCreateImage(x_disp,
         x_vis,
@@ -339,7 +309,8 @@ void ResetFrameBuffer() {
         malloc(mem),
         vid.width, vid.height,
         32,
-        0);
+        0
+    );
 
     if (!x_framebuffer[0])
         Sys_Error("VID: XCreateImage failed\n");
@@ -350,11 +321,7 @@ void ResetFrameBuffer() {
 }
 
 void ResetSharedFrameBuffers() {
-
-    int size;
-    int key;
     int minsize = getpagesize();
-    int frm;
 
     if (d_pzbuffer) {
         D_FlushCaches();
@@ -380,7 +347,7 @@ void ResetSharedFrameBuffers() {
 
     D_InitCaches(vid_surfcache, vid_surfcachesize);
 
-    for (frm = 0; frm < 2; frm++) {
+    for (int frm = 0; frm < 2; frm++) {
 
         // free up old frame buffer memory
 
@@ -403,12 +370,12 @@ void ResetSharedFrameBuffers() {
 
         // grab shared memory
 
-        size = x_framebuffer[frm]->bytes_per_line
-            * x_framebuffer[frm]->height;
+        int size = x_framebuffer[frm]->bytes_per_line *
+            x_framebuffer[frm]->height;
         if (size < minsize)
             Sys_Error("VID: Window must use at least %d bytes\n", minsize);
 
-        key = random();
+        int key = random();
         x_shminfo[frm].shmid = shmget((key_t)key, size, IPC_CREAT | 0777);
         if (x_shminfo[frm].shmid == -1)
             Sys_Error("VID: Could not get any shared memory\n");
@@ -417,7 +384,8 @@ void ResetSharedFrameBuffers() {
         x_shminfo[frm].shmaddr =
             (TypeLess_ptr)shmat(x_shminfo[frm].shmid, 0, 0);
 
-        printf("VID: shared memory id=%d, addr=0x%p\n", x_shminfo[frm].shmid,
+        printf("VID: shared memory id=%d, addr=0x%p\n",
+            x_shminfo[frm].shmid,
             (TypeLess_ptr)x_shminfo[frm].shmaddr);
 
         x_framebuffer[frm]->data = x_shminfo[frm].shmaddr;
@@ -426,6 +394,7 @@ void ResetSharedFrameBuffers() {
 
         if (!XShmAttach(x_disp, &x_shminfo[frm]))
             Sys_Error("VID: XShmAttach() failed\n");
+
         XSync(x_disp, 0);
         shmctl(x_shminfo[frm].shmid, IPC_RMID, 0);
 
@@ -439,7 +408,7 @@ void ResetSharedFrameBuffers() {
 
 void VID_Init(uint8_p palette) {
 #
-    int pnum, i;
+    int pnum;
     XVisualInfo template;
     int num_visuals;
     int template_mask;
@@ -486,34 +455,33 @@ void VID_Init(uint8_p palette) {
 
     // check for command-line window size
     if ((pnum = COM_CheckParm("-winsize"))) {
-        if (pnum >= com.argc - 2)
-            Sys_Error("VID: -winsize <width> <height>\n");
+        if (pnum >= com.argc - 2)           Sys_Error("VID: -winsize <width> <height>\n");
+
         vid.width = Q_atoi(com.argv[pnum + 1]);
         vid.height = Q_atoi(com.argv[pnum + 2]);
-        if (!vid.width || !vid.height)
-            Sys_Error("VID: Bad window width/height\n");
+        if (!vid.width || !vid.height)      Sys_Error("VID: Bad window width/height\n");
+
     }
     if ((pnum = COM_CheckParm("-width"))) {
-        if (pnum >= com.argc - 1)
-            Sys_Error("VID: -width <width>\n");
+        if (pnum >= com.argc - 1)       Sys_Error("VID: -width <width>\n");
+
         vid.width = Q_atoi(com.argv[pnum + 1]);
-        if (!vid.width)
-            Sys_Error("VID: Bad window width\n");
+        if (!vid.width)                 Sys_Error("VID: Bad window width\n");
+
     }
     if ((pnum = COM_CheckParm("-height"))) {
-        if (pnum >= com.argc - 1)
-            Sys_Error("VID: -height <height>\n");
+        if (pnum >= com.argc - 1)       Sys_Error("VID: -height <height>\n");
+
         vid.height = Q_atoi(com.argv[pnum + 1]);
-        if (!vid.height)
-            Sys_Error("VID: Bad window height\n");
+        if (!vid.height)                Sys_Error("VID: Bad window height\n");
     }
 
     template_mask = 0;
 
     // specify a visual id
     if ((pnum = COM_CheckParm("-visualid"))) {
-        if (pnum >= com.argc - 1)
-            Sys_Error("VID: -visualid <id#>\n");
+        if (pnum >= com.argc - 1)       Sys_Error("VID: -visualid <id#>\n");
+
         template.visualid = Q_atoi(com.argv[pnum + 1]);
         template_mask = VisualIDMask;
     }
@@ -531,7 +499,7 @@ void VID_Init(uint8_p palette) {
     x_visinfo = XGetVisualInfo(x_disp, template_mask, &template, &num_visuals);
     if (num_visuals > 1) {
         printf("Found more than one visual id at depth %d:\n", template.depth);
-        for (i = 0; i < num_visuals; i++)
+        for (int i = 0; i < num_visuals; i++)
             printf(" -visualid %d\n", (int)(x_visinfo[i].visualid));
     }
     else if (num_visuals == 0) {
@@ -557,9 +525,7 @@ void VID_Init(uint8_p palette) {
     {
         int attribmask = CWEventMask | CWColormap | CWBorderPixel;
         XSetWindowAttributes attribs;
-        Colormap tmpcmap;
-
-        tmpcmap = XCreateColormap(x_disp, XRootWindow(x_disp,
+        Colormap tmpcmap = XCreateColormap(x_disp, XRootWindow(x_disp,
             x_visinfo->screen), x_vis, AllocNone);
 
         attribs.event_mask = StructureNotifyMask | KeyPressMask
@@ -807,11 +773,11 @@ keycode_t XLateKey(XKeyEvent* ev) {
     return key;
 }
 
-struct
-{
-    int key;
-    int down;
+struct {
+    keycode_t   key;
+    bool        down;
 } keyq[64];
+
 int keyq_head = 0;
 int keyq_tail = 0;
 
@@ -820,10 +786,7 @@ int config_notify_width;
 int config_notify_height;
 
 void GetEvent() {
-    XEvent x_event;
-    int b;
-
-    XNextEvent(x_disp, &x_event);
+    XEvent x_event;    XNextEvent(x_disp, &x_event);
     switch (x_event.type) {
     case KeyPress:
         keyq[keyq_head].key = XLateKey(&x_event.xkey);
@@ -863,29 +826,21 @@ void GetEvent() {
         }
         break;
 
-    case ButtonPress:
-        b = -1;
-        if (x_event.xbutton.button == 1)
-            b = 0;
-        else if (x_event.xbutton.button == 2)
-            b = 2;
-        else if (x_event.xbutton.button == 3)
-            b = 1;
-        if (b >= 0)
-            mouse_buttonstate |= 1 << b;
-        break;
+    case ButtonPress: {
+        int b = -1;
+        if (x_event.xbutton.button == 1)        b = 0;
+        else if (x_event.xbutton.button == 2)   b = 2;
+        else if (x_event.xbutton.button == 3)   b = 1;
+        if (b >= 0)         mouse_buttonstate |= 1 << b;
+    }break;
 
-    case ButtonRelease:
-        b = -1;
-        if (x_event.xbutton.button == 1)
-            b = 0;
-        else if (x_event.xbutton.button == 2)
-            b = 2;
-        else if (x_event.xbutton.button == 3)
-            b = 1;
-        if (b >= 0)
-            mouse_buttonstate &= ~(1 << b);
-        break;
+    case ButtonRelease: {
+        int b = -1;
+        if (x_event.xbutton.button == 1)        b = 0;
+        else if (x_event.xbutton.button == 2)   b = 2;
+        else if (x_event.xbutton.button == 3)   b = 1;
+        if (b >= 0)         mouse_buttonstate &= ~(1 << b);
+    } break;
 
     case ConfigureNotify:
         //printf("config notify\n");
@@ -1075,15 +1030,17 @@ void IN_Shutdown() {
 }
 
 void IN_Commands() {
-    int i;
-
     if (!mouse_avail) return;
 
-    for (i = 0; i < mouse_buttons; i++) {
-        if ((mouse_buttonstate & (1 << i)) && !(mouse_oldbuttonstate & (1 << i)))
+    for (int i = 0; i < mouse_buttons; i++) {
+        if ((mouse_buttonstate & (1 << i)) &&
+            !(mouse_oldbuttonstate & (1 << i))
+            )
             Key_Event(K_MOUSE1 + i, true);
 
-        if (!(mouse_buttonstate & (1 << i)) && (mouse_oldbuttonstate & (1 << i)))
+        if (!(mouse_buttonstate & (1 << i)) &&
+            (mouse_oldbuttonstate & (1 << i))
+            )
             Key_Event(K_MOUSE1 + i, false);
     }
     mouse_oldbuttonstate = mouse_buttonstate;

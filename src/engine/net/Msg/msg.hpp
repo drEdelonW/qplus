@@ -52,3 +52,5 @@ private:
     int         _readCount;
     bool        _badRead; // set if a read goes beyond end of message
 };
+
+extern NetMsg MSG;

@@ -1,4 +1,4 @@
-#include "msg_cWrap.h"
+#include "msg.h"
 #include "msg.hpp"
 
 /*
@@ -11,9 +11,7 @@ Handles uint8_t ordering and avoids alignment errors
 */
 
 #include "net.h"  // net_message
-// NetMsg MSG(&net_message);
-NetMsg MSG;
-// NetMsg MSG(&cls.message);
+
 
 void MSG_SetSizeBuf(sizebuf_p sb) { MSG.SetSizeBuf(sb); }
 void MSG_BeginReading() { MSG.SetSizeBuf(&net_message); MSG.BeginReading(); }
@@ -29,6 +27,7 @@ void MSG_WriteString(sizebuf_p sb, cStringRO s) { ; MSG.SetSizeBuf(sb); MSG.Writ
 void MSG_WriteCoord(sizebuf_p sb, float f) { ;      MSG.SetSizeBuf(sb); MSG.WriteCoord(f); }
 void MSG_WriteAngle(sizebuf_p sb, float f) { ;      MSG.SetSizeBuf(sb); MSG.WriteAngle(f); }
 
+#if 0
 void MSG_WriteCharB(int8_t c) { ;   MSG.WriteChar(c); }
 void MSG_WriteByteB(uint8_t c) { ;  MSG.WriteByte(c); }
 void MSG_WriteShortB(int16_t c) { ; MSG.WriteShort(c); }
@@ -37,6 +36,7 @@ void MSG_WriteFloatB(float f) { ;   MSG.WriteFloat(f); }
 void MSG_WriteStringB(cStringRO s) { ;MSG.WriteString(s); }
 void MSG_WriteCoordB(float f) { ;   MSG.WriteCoord(f); }
 void MSG_WriteAngleB(float f) { ;   MSG.WriteAngle(f); }
+#endif
 
 // returns MSG_ERROR and sets msg_badread if no more characters are available
 int8_t MSG_ReadChar() { ;       MSG.SetSizeBuf(&net_message); return MSG.ReadChar(); }

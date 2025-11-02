@@ -46,7 +46,6 @@
 
 
 
-Host host;
 /*
 ================
 Host_EndGame
@@ -314,9 +313,6 @@ Host_Frame
 Runs all active servers
 ==================
 */
-void _Host_Frame(float time) {
-    host._Frame(time);
-}
 
 void Host_Frame(float time) {
     host.Frame(time);

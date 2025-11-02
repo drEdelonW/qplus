@@ -7,7 +7,7 @@
 // host
 //
 class Host {
-public:
+  public:
     // Host();
 
     void  ClearMemory();
@@ -36,12 +36,15 @@ public:
     void FindMaxClients();
     bool FilterTime(float time);
     void GetConsoleCommands();
-    void _Frame(float time);
     void InitVCR(QuakeParms_p parms);
     void WriteConfiguration();
-private:
+
+  private:
+    void _Frame(float time);
 
 };
+
+extern Host host;
 
 // #ifndef HOST_CMDS_H
 // #define HOST_CMDS_H

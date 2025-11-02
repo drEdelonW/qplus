@@ -11,13 +11,13 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR)) $(eval INCLU
                                 SRC_LIST += $(CVAR_DIR)/cvar_q1.c
 
                         $(eval CMD_DIR = $(CLI_DIR)/cmd) $(eval INCLUDES += $(CMD_DIR))
-#                                 SRC_LIST += $(CMD_DIR)/cbuf.c
-                                SRC_LIST += $(CMD_DIR)/cbuf_cWrap.cpp
-                                SRC_LIST += $(CMD_DIR)/cbuf_obj.cpp
+                                $(eval CBUF_DIR = $(CMD_DIR)/Cbuf) $(eval INCLUDES += $(CBUF_DIR))
+#                                         SRC_LIST += $(CBUF_DIR)/cbuf.c
+                                        SRC_LIST += $(CBUF_DIR)/cbuf_cWrap.cpp
+                                        SRC_LIST += $(CBUF_DIR)/cbuf_obj.cpp
 
                                 SRC_LIST += $(CMD_DIR)/cmd.c
                                 SRC_LIST += $(CMD_DIR)/cmd_alias.c
-                                SRC_LIST += $(CMD_DIR)/host_cmd.c
 
                         SRC_LIST += $(CLI_DIR)/console.c
 
@@ -37,6 +37,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR)) $(eval INCLU
 
                 $(eval HOST_DIR = $(CORE_DIR)/Host) $(eval INCLUDES += $(HOST_DIR))
 #                         SRC_LIST += $(HOST_DIR)/host.c
+                        SRC_LIST += $(HOST_DIR)/host_cmd.c
                         SRC_LIST += $(HOST_DIR)/host_obj.cpp
                         SRC_LIST += $(HOST_DIR)/host_cWrap.cpp
 

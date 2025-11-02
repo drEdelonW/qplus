@@ -2,6 +2,10 @@
 #include "q_tools.h"
 #include "endian_tools.h"
 
+
+// NetMsg MSG(&net_message);
+NetMsg MSG;
+// NetMsg MSG(&cls.message);
 /*
 ==============================================================================
 

@@ -670,7 +670,7 @@ void Host::Frame(float time) {
 
 
 extern int vcrFile;
-#define VCR_SIGNATURE 0x56435231
+#define VCR_SIGNATURE (uint32_t)(0x56435231)
 // "VCR1"
 
 void Host::InitVCR(QuakeParms_p parms) {
@@ -681,9 +681,11 @@ void Host::InitVCR(QuakeParms_p parms) {
         Sys_FileOpenRead("quake.vcr", &vcrFile);
         if (vcrFile == -1)      Sys_Error("playback file not found\n");
 
-        int i;
-        Sys_FileRead(vcrFile, &i, sizeof(int));
-        if (i != VCR_SIGNATURE) Sys_Error("Invalid signature in vcr file\n");
+        {
+            uint32_t sig;
+            Sys_FileRead(vcrFile, &sig, sizeof(int));
+            if (sig != VCR_SIGNATURE) Sys_Error("Invalid signature in vcr file\n");
+        }
 
         Sys_FileRead(vcrFile, &com.argc, sizeof(int));
         com.argv = (cStringArray)malloc(com.argc * sizeof(cString));
@@ -700,13 +702,13 @@ void Host::InitVCR(QuakeParms_p parms) {
         parms->argv = com.argv;
     }
 
-    int n;
-    if ((n = COM_CheckParm("-record")) != 0) {
+    int n = COM_CheckParm("-record");
+    if ((n) != 0) {
         vcrFile = Sys_FileOpenWrite("quake.vcr");
 
         {
-            int i = VCR_SIGNATURE;
-            Sys_FileWrite(vcrFile, &i, sizeof(int));
+            uint32_t sig = VCR_SIGNATURE;
+            Sys_FileWrite(vcrFile, &sig, sizeof(int));
         }
 
         {
@@ -717,7 +719,7 @@ void Host::InitVCR(QuakeParms_p parms) {
                     int len;
                     len = 10;
                     Sys_FileWrite(vcrFile, &len, sizeof(int));
-                    Sys_FileWrite(vcrFile, (TypeLess_ptr)"-playback", len);
+                    Sys_FileWrite(vcrFile, (cString)"-playback", len);
                     continue;
                 }
                 int len = Q_strlen(com.argv[i]) + 1;
@@ -844,3 +846,4 @@ void Host::Shutdown() {
     if (cls.state != ca_dedicated) { VID_Shutdown(); }
 }
 
+Host host;

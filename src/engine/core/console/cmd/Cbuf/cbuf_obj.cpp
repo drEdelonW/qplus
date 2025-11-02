@@ -1,3 +1,4 @@
+#include "cbuf.hpp"
 #include "cbuf.h"
 #include "cmd.h"
 
@@ -10,7 +11,6 @@
 #define CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/
 
 
-static bool _cmdWait;
 
 //=============================================================================
 
@@ -23,8 +23,9 @@ static bool _cmdWait;
     bind g "impulse 5 ; +attack ; wait ; -attack ; impulse 2"
     ============
 */
-void Cmd_Wait_f() { _cmdWait = true; }
-
+void Cbuf::setWait() {
+    _cmdWait = true;
+}
 /*
     =============================================================================
 
@@ -33,50 +34,49 @@ void Cmd_Wait_f() { _cmdWait = true; }
     =============================================================================
 */
 
-static sizebuf_t _cmdText;
 
 /*
     ============
-    Cbuf_Init
+    Cbuf::Init
     ============
 */
-void Cbuf_Init() { SZ_Alloc(&_cmdText, CMD_BUSS_SIZE); } // space for commands and script files
+void Cbuf::Init() { SZ_Alloc(&_cmdText, CMD_BUSS_SIZE); } // space for commands and script files
 
 
 
 /*
     ============
-    Cbuf_AddText
+    Cbuf::AddText
 
     Adds command text at the end of the buffer
     ============
 */
-void Cbuf_AddText(cStringRO text) {
+void Cbuf::AddText(cStringRO text) {
     if ((_cmdText.cursize + Q_strlen(text)) >= _cmdText.maxsize) {
-        Con_Printf("Cbuf_AddText: overflow\n");
+        Con_Printf("Cbuf::AddText: overflow\n");
         return;
     }
 
-    SZ_Write(&_cmdText, text, Q_strlen(text));
+    SZ_Write(&_cmdText, (TypeLess_ptr)text, Q_strlen(text));
 }
 
 
 /*
     ============
-    Cbuf_InsertText
+    Cbuf::InsertText
 
     Adds command text immediately after the current command
     Adds a \n to the text
     FIXME: actually change the command buffer to do less copying
     ============
 */
-void Cbuf_InsertText(cStringRO text) {
+void Cbuf::InsertText(cStringRO text) {
     cString   temp;
 
     // copy off any commands still remaining in the exec buffer
     int32_t templen = _cmdText.cursize;
     if (templen) {
-        temp = Z_Malloc(templen);
+        temp = (cString)Z_Malloc(templen);
         Q_memcpy(temp, _cmdText.data, templen);
         SZ_Clear(&_cmdText);
     }
@@ -84,7 +84,7 @@ void Cbuf_InsertText(cStringRO text) {
 
 
     // add the entire text of the file
-    Cbuf_AddText(text);
+    Cbuf::AddText(text);
 
     // add the copied off data
     if (templen) {
@@ -95,10 +95,10 @@ void Cbuf_InsertText(cStringRO text) {
 
 /*
     ============
-    Cbuf_Execute
+    Cbuf::Execute
     ============
 */
-void Cbuf_Execute() {
+void Cbuf::Execute() {
 
     while (_cmdText.cursize) {
         // find a \n or ; line break
@@ -143,3 +143,6 @@ void Cbuf_Execute() {
         }
     }
 }
+
+
+Cbuf cbuf;

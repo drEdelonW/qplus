@@ -1,10 +1,9 @@
-#include "cbuf.hpp"
 #include "cbuf.h"
+#include "cbuf.hpp"
 
 #define CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/
 
 
-Cbuf cbuf;
 //=============================================================================
 
 /*

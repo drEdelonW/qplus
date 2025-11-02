@@ -1,5 +1,5 @@
 #pragma once
-
+#error
 #include "msg.h"
 #ifdef __cplusplus
 extern "C" {
