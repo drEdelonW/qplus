@@ -46,7 +46,7 @@ void Cbuf_Init() {  // space for commands and script files
     Adds command text at the end of the buffer
     ============
 */
-void Cbuf_AddText(cString text) {
+void Cbuf_AddText(cStringRO text) {
     cbuf.AddText(text);
 }
 
@@ -60,7 +60,7 @@ void Cbuf_AddText(cString text) {
     FIXME: actually change the command buffer to do less copying
     ============
 */
-void Cbuf_InsertText(cString text) {
+void Cbuf_InsertText(cStringRO text) {
     cbuf.InsertText(text);
 }
 

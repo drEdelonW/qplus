@@ -85,7 +85,7 @@ int Q_memcmp(TypeLess_ptr m1, TypeLess_ptr m2, int32_t count) {
     return 0;
 }
 
-void Q_strcpy(cString dest, cString src) {
+void Q_strcpy(cString dest, cStringRO src) {
     while (*src) {
         *dest++ = *src++;
     }
@@ -93,7 +93,7 @@ void Q_strcpy(cString dest, cString src) {
 }
 
 #if 0
-void Q_strncpy(cString dest, cString src, int32_t count) {
+void Q_strncpy(cString dest, cStringRO src, int32_t count) {
     while (*src && count--) {
         *dest++ = *src++;
     }
@@ -102,7 +102,7 @@ void Q_strncpy(cString dest, cString src, int32_t count) {
     }
 }
 #else
-void Q_strncpy(cString dest, cString src, int32_t count) {
+void Q_strncpy(cString dest, cStringRO src, int32_t count) {
     // if (count <= 0) return;
     int32_t n = count;
     while (--n > 0 && *src) {
@@ -131,7 +131,7 @@ cString Q_strrchr(cString s, char c) {
     return 0;
 }
 
-void Q_strcat(cString dest, cString src) {
+void Q_strcat(cString dest, cStringRO src) {
     dest += Q_strlen(dest);
     Q_strcpy(dest, src);
 }
@@ -149,7 +149,7 @@ int Q_strcmp(cStringRO s1, cStringRO s2) {
     return -1;
 }
 
-int Q_strncmp(cString s1, cString s2, int32_t count) {
+int Q_strncmp(cStringRO s1, cStringRO s2, int32_t count) {
     while (1) {
         if (!count--)
             return 0;
@@ -165,7 +165,7 @@ int Q_strncmp(cString s1, cString s2, int32_t count) {
 }
 
 #if 0
-int Q_strncasecmp(cString s1, cString s2, int32_t n) {
+int Q_strncasecmp(cStringRO s1, cStringRO s2, int32_t n) {
     while (1) {
         int c1 = *s1++;
         int c2 = *s2++;
@@ -183,7 +183,7 @@ int Q_strncasecmp(cString s1, cString s2, int32_t n) {
     return -1;
 }
 #else
-int Q_strncasecmp(cString s1, cString s2, int32_t n) {
+int Q_strncasecmp(cStringRO s1, cStringRO s2, int32_t n) {
     // if (n <= 0) return 0;
     do {
         int c1 = *s1++;
@@ -197,11 +197,11 @@ int Q_strncasecmp(cString s1, cString s2, int32_t n) {
 }
 #endif
 
-int Q_strcasecmp(cString s1, cString s2) {
+int Q_strcasecmp(cStringRO s1, cStringRO s2) {
     return Q_strncasecmp(s1, s2, 99999);
 }
 
-int Q_atoi(cString str) {
+int Q_atoi(cStringRO str) {
     int sign;
 
     if (*str == '-') {
@@ -257,7 +257,7 @@ int Q_atoi(cString str) {
 }
 
 
-float Q_atof(cString str) {
+float Q_atof(cStringRO str) {
     int     sign;
 
     if (*str == '-') {

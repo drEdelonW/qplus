@@ -235,7 +235,7 @@ Returns false if the time is too int16_t to run a frame
 ===================
 */
 bool Host_FilterTime(float time) {
-    Host_FilterTime(time);
+    return host.FilterTime(time);
 }
 
 

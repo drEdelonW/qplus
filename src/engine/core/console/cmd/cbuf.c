@@ -51,7 +51,7 @@ void Cbuf_Init() { SZ_Alloc(&_cmdText, CMD_BUSS_SIZE); } // space for commands a
     Adds command text at the end of the buffer
     ============
 */
-void Cbuf_AddText(cString text) {
+void Cbuf_AddText(cStringRO text) {
     if ((_cmdText.cursize + Q_strlen(text)) >= _cmdText.maxsize) {
         Con_Printf("Cbuf_AddText: overflow\n");
         return;
@@ -70,7 +70,7 @@ void Cbuf_AddText(cString text) {
     FIXME: actually change the command buffer to do less copying
     ============
 */
-void Cbuf_InsertText(cString text) {
+void Cbuf_InsertText(cStringRO text) {
     cString   temp;
 
     // copy off any commands still remaining in the exec buffer

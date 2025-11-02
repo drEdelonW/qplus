@@ -123,10 +123,10 @@ COM_SkipPath
 ============
 */
 cString COM_SkipPath(cStringRO pathname) {
-    cString last = pathname;
+    cString last = (cString)pathname;
     while (*pathname) {
         if (*pathname == '/')
-            last = pathname + 1;
+            last = (cString)pathname + 1;
         pathname++;
     }
     return last;
@@ -170,7 +170,7 @@ COM_FileBase
 ============
 */
 void COM_FileBase(cStringRO in, cString out) {
-    cString s = in + strlen(in) - 1;
+    cString s = (cString)in + strlen(in) - 1;
 
     cString s2;
     while ((s != in) && (*s != '.'))
@@ -198,7 +198,7 @@ void COM_DefaultExtension(cStringRO path, cString extension) {
     // if path doesn't have a .EXT, append extension
     // (extension should include the .)
     //
-    cString src = path + strlen(path) - 1;
+    cString src = (cString)path + strlen(path) - 1;
 
     while ((*src != '/') && (src != path)) {
         if (*src == '.')
@@ -206,7 +206,7 @@ void COM_DefaultExtension(cStringRO path, cString extension) {
         src--;
     }
 
-    strcat(path, extension);
+    strcat((cString)path, extension);
 }
 
 
@@ -556,7 +556,7 @@ Only used for CopyFile
 ============
 */
 void COM_CreatePath(cStringRO path) {
-    for (cString ofs = path + 1; *ofs; ofs++) {
+    for (cString ofs = (cString)path + 1; *ofs; ofs++) {
         if (*ofs == '/') {       // create the directory
             *ofs = 0;
             Sys_mkdir(path);

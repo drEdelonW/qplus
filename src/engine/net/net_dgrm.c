@@ -115,7 +115,7 @@ uint32_t banMask = 0xFFFFFFFF;
 void NET_Ban_f() {
     char addrStr[32];
     char maskStr[32];
-    void (*print) (cString fmt, ...);
+    void (*print) (cStringRO fmt, ...);
 
     if (cmd_source == src_command) {
         if (!sv.active) {
