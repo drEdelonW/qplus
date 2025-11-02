@@ -25,20 +25,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //   TYPES
 //===============
 typedef enum {
-    CMP_NONE    = 0,
-    CMP_LZSS    = 1
+    CMP_NONE = 0,
+    CMP_LZSS = 1
 } CmpType;
 
 typedef enum {
-    TYP_NONE    = 0,
-    TYP_LABEL   = 1,
+    TYP_NONE = 0,
+    TYP_LABEL = 1,
 
-    TYP_LUMPY   = 64,   // base offset for grab command number
+    TYP_LUMPY = 64,   // base offset for grab command number
     TYP_PALETTE = 64,
-    TYP_QTEX    = 65,
-    TYP_QPIC    = 66,
-    TYP_SOUND   = 67,
-    TYP_MIPTEX  = 68
+    TYP_QTEX = 65,
+    TYP_QPIC = 66,
+    TYP_SOUND = 67,
+    TYP_MIPTEX = 68
 } TypType;
 
 typedef struct {
@@ -73,10 +73,18 @@ extern	int32_t     wad_numlumps;
 extern	LumpInfo_p  wad_lumps;
 extern	uint8_p     wad_base;
 
-void W_LoadWadFile(cString filename);
-void W_CleanupName(cString in, cString out);
-LumpInfo_p W_GetLumpinfo(cString name);
-TypeLess_ptr W_GetLumpName(cString name);
-TypeLess_ptr W_GetLumpNum(int32_t num);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void SwapPic(qPic_p pic);
+    void W_LoadWadFile(cStringRO filename);
+    void W_CleanupName(cString in, cString out);
+    LumpInfo_p W_GetLumpinfo(cString name);
+    TypeLess_ptr W_GetLumpName(cString name);
+    TypeLess_ptr W_GetLumpNum(int32_t num);
+
+    void SwapPic(qPic_p pic);
+
+#ifdef __cplusplus
+}
+#endif

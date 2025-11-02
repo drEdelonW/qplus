@@ -22,6 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "types.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void SCR_Init();
 
 void SCR_UpdateScreen();
@@ -35,7 +39,9 @@ void SCR_BeginLoadingPlaque();
 void SCR_EndLoadingPlaque();
 
 int SCR_ModalMessage (cString text);
-
+#ifdef __cplusplus
+}
+#endif
 extern float    scr_con_current;
 extern float    scr_conlines;  // lines of console to display
 

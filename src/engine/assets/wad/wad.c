@@ -63,7 +63,7 @@ void W_CleanupName(cString in, cString out) {
     W_LoadWadFile
     ====================
 */
-void W_LoadWadFile(cString filename) {
+void W_LoadWadFile(cStringRO filename) {
     wad_base = COM_LoadHunkFile(filename);
     if (!wad_base)
         Sys_Error("W_LoadWadFile: couldn't load %s", filename);

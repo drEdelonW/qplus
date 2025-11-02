@@ -11,7 +11,7 @@ void MSG_WriteByte(sizebuf_p sb, uint8_t c);
 void MSG_WriteShort(sizebuf_p sb, int16_t c);
 void MSG_WriteLong(sizebuf_p sb, int32_t c);
 void MSG_WriteFloat(sizebuf_p sb, float f);
-void MSG_WriteString(sizebuf_p sb, cString s);
+void MSG_WriteString(sizebuf_p sb, cStringRO s);
 void MSG_WriteCoord(sizebuf_p sb, float f);
 void MSG_WriteAngle(sizebuf_p sb, float f);
 

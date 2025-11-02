@@ -70,7 +70,7 @@ Host_Status_f
 ==================
 */
 void Host_Status_f() {
-    void (*print) (cString fmt, ...);
+    void (*print) (cStringRO fmt, ...);
 
     if (cmd_source == src_command) {
         if (!sv.active) { Cmd_ForwardToServer();    return; }

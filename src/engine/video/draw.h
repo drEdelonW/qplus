@@ -26,24 +26,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define CHAR_HEIGHT (8)
 
 extern qPic_p draw_disc;	// also used on sbar
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void    Draw_Init();
 
-void    Draw_Init();
+    void    Draw_Character(int x, int y, int num);
+    void    Draw_DebugChar(char num);
+    void    Draw_String(int x, int y, cString str);
 
-void    Draw_Character(int x, int y, int num);
-void    Draw_DebugChar(char num);
-void    Draw_String(int x, int y, cString str);
+    void    Draw_Pic(int x, int y, qPic_p pic);
+    void    Draw_TransPic(int x, int y, qPic_p pic);
+    void    Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation);
+    void    Draw_ConsoleBackground(int lines);
 
-void    Draw_Pic(int x, int y, qPic_p pic);
-void    Draw_TransPic(int x, int y, qPic_p pic);
-void    Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation);
-void    Draw_ConsoleBackground(int lines);
+    void    Draw_BeginDisc();
+    void    Draw_EndDisc();
 
-void    Draw_BeginDisc();
-void    Draw_EndDisc();
+    void    Draw_TileClear(int x, int y, int w, int h);
+    void    Draw_Fill(int x, int y, int w, int h, int c);
 
-void    Draw_TileClear(int x, int y, int w, int h);
-void    Draw_Fill(int x, int y, int w, int h, int c);
+    void    Draw_FadeScreen();
+    qPic_p  Draw_PicFromWad(cString name);
+    qPic_p  Draw_CachePic(cString path);
 
-void    Draw_FadeScreen();
-qPic_p  Draw_PicFromWad(cString name);
-qPic_p  Draw_CachePic(cString path);
+#ifdef __cplusplus
+}
+#endif

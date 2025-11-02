@@ -258,7 +258,7 @@ void Con_Linefeed() {
     If no console is visible, the notify window will pop up.
     ================
 */
-void Con_Print(cString txt) {
+void Con_Print(cStringRO txt) {
     static bool cr;
 
     con_backscroll = 0;
@@ -358,7 +358,7 @@ void Con_DebugLog(cString file, cString fmt, ...) {
 */
 #define MAXPRINTMSG (4096)
 // FIXME: make a buffer size safe vsprintf?
-void Con_Printf(cString fmt, ...) {
+void Con_Printf(cStringRO fmt, ...) {
     va_list  argptr;
     char  msg[MAXPRINTMSG];
     static bool inupdate;
@@ -405,7 +405,7 @@ void Con_Printf(cString fmt, ...) {
     A Con_Printf that only shows up if the "developer" cvar is set
     ================
 */
-void Con_DPrintf(cString fmt, ...) {
+void Con_DPrintf(cStringRO fmt, ...) {
     if (!developer.value) {
         return;   // don't confuse non-developers with techie stuff...
     }
@@ -427,7 +427,7 @@ void Con_DPrintf(cString fmt, ...) {
     Okay to call even when the screen can't be updated
     ==================
 */
-void Con_SafePrintf(cString fmt, ...) {
+void Con_SafePrintf(cStringRO fmt, ...) {
     va_list  argptr;
     char  msg[1024];
 

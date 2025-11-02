@@ -39,10 +39,10 @@ extern "C" {
     void Con_CheckResize();
     void Con_Init();
     void Con_DrawConsole(int32_t lines, bool drawinput);
-    void Con_Print(cString txt);
-    void Con_Printf(cString fmt, ...);
-    void Con_DPrintf(cString fmt, ...);
-    void Con_SafePrintf(cString fmt, ...);
+    void Con_Print(cStringRO txt);
+    void Con_Printf(cStringRO fmt, ...);
+    void Con_DPrintf(cStringRO fmt, ...);
+    void Con_SafePrintf(cStringRO fmt, ...);
     void Con_Clear_f();
     void Con_DrawNotify();
     void Con_ClearNotify();

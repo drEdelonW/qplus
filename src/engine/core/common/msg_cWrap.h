@@ -12,7 +12,7 @@ extern "C" {
     void MSG_WriteShortB(int16_t c);
     void MSG_WriteLongB(int32_t c);
     void MSG_WriteFloatB(float f);
-    void MSG_WriteStringB(cString s);
+    void MSG_WriteStringB(cStringRO s);
     void MSG_WriteCoordB(float f);
     void MSG_WriteAngleB(float f);
 

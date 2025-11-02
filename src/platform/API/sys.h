@@ -27,53 +27,59 @@ extern bool  isDedicated;
 // file IO
 //
 
-// returns the file size
-// return -1 if file is not present
-// the file should be in BINARY mode for stupid OSs that care
-int Sys_FileOpenRead(cString path, int *hndl);
+#ifdef __cplusplus
+extern "C" {
+#endif
+    // returns the file size
+    // return -1 if file is not present
+    // the file should be in BINARY mode for stupid OSs that care
+    int Sys_FileOpenRead(cStringRO path, int* hndl);
 
-int Sys_FileOpenWrite(cString path);
-void Sys_FileClose(int handle);
-void Sys_FileSeek(int handle, int position);
-int Sys_FileRead(int handle, TypeLess_ptr dest, int count);
-int Sys_FileWrite(int handle, TypeLess_ptr data, int count);
-int Sys_FileTime(cString path);
-void Sys_mkdir(cString path);
+    int Sys_FileOpenWrite(cStringRO path);
+    void Sys_FileClose(int handle);
+    void Sys_FileSeek(int handle, int position);
+    int Sys_FileRead(int handle, TypeLess_ptr dest, int count);
+    int Sys_FileWrite(int handle, TypeLess_ptr data, int count);
+    int Sys_FileTime(cStringRO path);
+    void Sys_mkdir(cStringRO path);
 
-//
-// memory protection
-//
+    //
+    // memory protection
+    //
 #if 0
-void Sys_MakeCodeWriteable(uint32_t startaddr, uint32_t length);
+    void Sys_MakeCodeWriteable(uint32_t startaddr, uint32_t length);
 #else
-void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length);
+    void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length);
 #endif
 
-//
-// system IO
-//
-void Sys_DebugLog(cString file, cString fmt, ...);
+    //
+    // system IO
+    //
+    void Sys_DebugLog(cStringRO file, cStringRO fmt, ...);
 
-// an error will cause the entire program to exit
-void Sys_Error(cString error, ...);
+    // an error will cause the entire program to exit
+    void Sys_Error(cStringRO error, ...);
 
-// send text to the console
-void Sys_Printf(cString fmt, ...);
+    // send text to the console
+    void Sys_Printf(cStringRO fmt, ...);
 
-void Sys_Quit();
+    void Sys_Quit();
 
-double Sys_FloatTime();
+    double Sys_FloatTime();
 
-cString Sys_ConsoleInput();
+    cString Sys_ConsoleInput();
 
-// called to yield for a little bit so as
-// not to hog cpu when paused or debugging
-void Sys_Sleep();
+    // called to yield for a little bit so as
+    // not to hog cpu when paused or debugging
+    void Sys_Sleep();
 
-// Perform Key_Event() callbacks until the input que is empty
-void Sys_SendKeyEvents();
+    // Perform Key_Event() callbacks until the input que is empty
+    void Sys_SendKeyEvents();
 
-void Sys_LowFPPrecision();
-void Sys_HighFPPrecision();
-void Sys_SetFPCW();
+    void Sys_LowFPPrecision();
+    void Sys_HighFPPrecision();
+    void Sys_SetFPCW();
 
+#ifdef __cplusplus
+}
+#endif

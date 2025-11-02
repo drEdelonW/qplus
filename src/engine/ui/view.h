@@ -27,8 +27,15 @@ extern uint8_t gammatable[256];	// palette is sent through this
 extern uint8_t ramps[3][256];
 extern float v_blend[4];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void V_Init();
 void V_RenderView();
 float V_CalcRoll(vec3_t angles, vec3_t velocity);
 void V_UpdatePalette();
 
+#ifdef __cplusplus
+}
+#endif

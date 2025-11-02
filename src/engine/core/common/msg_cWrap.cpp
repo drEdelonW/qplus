@@ -25,7 +25,7 @@ void MSG_WriteByte(sizebuf_p sb, uint8_t c) { ;     MSG.SetSizeBuf(sb); MSG.Writ
 void MSG_WriteShort(sizebuf_p sb, int16_t c) { ;    MSG.SetSizeBuf(sb); MSG.WriteShort(c); }
 void MSG_WriteLong(sizebuf_p sb, int32_t c) { ;     MSG.SetSizeBuf(sb); MSG.WriteLong(c); }
 void MSG_WriteFloat(sizebuf_p sb, float f) { ;      MSG.SetSizeBuf(sb); MSG.WriteFloat(f); }
-void MSG_WriteString(sizebuf_p sb, cString s) { ;   MSG.SetSizeBuf(sb); MSG.WriteString(s); }
+void MSG_WriteString(sizebuf_p sb, cStringRO s) { ; MSG.SetSizeBuf(sb); MSG.WriteString(s); }
 void MSG_WriteCoord(sizebuf_p sb, float f) { ;      MSG.SetSizeBuf(sb); MSG.WriteCoord(f); }
 void MSG_WriteAngle(sizebuf_p sb, float f) { ;      MSG.SetSizeBuf(sb); MSG.WriteAngle(f); }
 
@@ -34,7 +34,7 @@ void MSG_WriteByteB(uint8_t c) { ;  MSG.WriteByte(c); }
 void MSG_WriteShortB(int16_t c) { ; MSG.WriteShort(c); }
 void MSG_WriteLongB(int32_t c) { ;  MSG.WriteLong(c); }
 void MSG_WriteFloatB(float f) { ;   MSG.WriteFloat(f); }
-void MSG_WriteStringB(cString s) { ;MSG.WriteString(s); }
+void MSG_WriteStringB(cStringRO s) { ;MSG.WriteString(s); }
 void MSG_WriteCoordB(float f) { ;   MSG.WriteCoord(f); }
 void MSG_WriteAngleB(float f) { ;   MSG.WriteAngle(f); }
 

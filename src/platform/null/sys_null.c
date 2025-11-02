@@ -135,7 +135,7 @@ void Sys_MakeCodeWriteable(uint32_t startaddr, uint32_t length) {
 }
 
 
-void Sys_Error(cString error, ...) {
+void Sys_Error(cStringRO error, ...) {
 	va_list         argptr;
 
 	printf("Sys_Error: ");

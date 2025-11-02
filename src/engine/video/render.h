@@ -73,7 +73,7 @@ struct r_Entity_s {
     int             trivial_accept;
     mNode_p topnode;  // for bmodels, first world node
     //  that splits bmodel, or NULL if not split
-} ;
+};
 typedef r_Entity_t* r_Entity_p;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
@@ -109,47 +109,54 @@ extern refdef_t r_refdef;
 extern vec3_t   r_origin, vpn, vright, vup;
 extern Texture_p r_notexture_mip;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void R_Init();
-void R_InitTextures();
-void R_InitEfrags();
-void R_RenderView();  // must set r_refdef first
-void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect);
-// called whenever r_refdef or vid change
-void R_InitSky(Texture_p mt); // called at level load
+    void R_Init();
+    void R_InitTextures();
+    void R_InitEfrags();
+    void R_RenderView();  // must set r_refdef first
+    void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect);
+    // called whenever r_refdef or vid change
+    void R_InitSky(Texture_p mt); // called at level load
 
-void R_AddEfrags(r_Entity_p ent);
-void R_RemoveEfrags(r_Entity_p ent);
+    void R_AddEfrags(r_Entity_p ent);
+    void R_RemoveEfrags(r_Entity_p ent);
 
-void R_NewMap();
+    void R_NewMap();
 
 
-void R_ParseParticleEffect();
-void R_RunParticleEffect(vec3_t org, vec3_t dir, int color, int count);
-void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type);
+    void R_ParseParticleEffect();
+    void R_RunParticleEffect(vec3_t org, vec3_t dir, int color, int count);
+    void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type);
 
 #ifdef QUAKE2
-void R_DarkFieldParticles(r_Entity_p ent);
+    void R_DarkFieldParticles(r_Entity_p ent);
 #endif
-void R_EntityParticles(r_Entity_p ent);
-void R_BlobExplosion(vec3_t org);
-void R_ParticleExplosion(vec3_t org);
-void R_ParticleExplosion2(vec3_t org, int colorStart, int colorLength);
-void R_LavaSplash(vec3_t org);
-void R_TeleportSplash(vec3_t org);
+    void R_EntityParticles(r_Entity_p ent);
+    void R_BlobExplosion(vec3_t org);
+    void R_ParticleExplosion(vec3_t org);
+    void R_ParticleExplosion2(vec3_t org, int colorStart, int colorLength);
+    void R_LavaSplash(vec3_t org);
+    void R_TeleportSplash(vec3_t org);
 
-void R_PushDlights();
+    void R_PushDlights();
 
 
-//
-// surface cache related
-//
-extern int  reinit_surfcache; // if 1, surface cache is currently empty and
-extern bool r_cache_thrash; // set if thrashing the surface cache
+    //
+    // surface cache related
+    //
+    // extern int  reinit_surfcache; // if 1, surface cache is currently empty and
+    extern bool r_cache_thrash; // set if thrashing the surface cache
 
-int  D_SurfaceCacheForRes(int width, int height);
-void D_FlushCaches();
-void D_DeleteSurfaceCache();
-void D_InitCaches(TypeLess_ptr buffer, int size);
-void R_SetVrect(vRect_p pvrect, vRect_p pvrectin, int lineadj);
+    int  D_SurfaceCacheForRes(int width, int height);
+    void D_FlushCaches();
+    void D_DeleteSurfaceCache();
+    void D_InitCaches(TypeLess_ptr buffer, int size);
+    void R_SetVrect(vRect_p pvrect, vRect_p pvrectin, int lineadj);
 
+
+#ifdef __cplusplus
+}
+#endif

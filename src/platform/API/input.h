@@ -20,17 +20,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // input.h -- external (non-keyboard) input devices
 #include "client.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void IN_Init();
 
-void IN_Init();
+    void IN_Shutdown();
 
-void IN_Shutdown();
+    // oportunity for devices to stick commands on the script buffer
+    void IN_Commands();
 
-// oportunity for devices to stick commands on the script buffer
-void IN_Commands();
+    // add additional movement on top of the keyboard move cmd
+    void IN_Move(UserCmd_p cmd);
 
-// add additional movement on top of the keyboard move cmd
-void IN_Move(UserCmd_p cmd);
+    // restores all button and position states to defaults
+    void IN_ClearStates();
 
-// restores all button and position states to defaults
-void IN_ClearStates();
-
+#ifdef __cplusplus
+}
+#endif

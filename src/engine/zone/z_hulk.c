@@ -149,7 +149,7 @@ void Hunk_Print(bool all) {
 Hunk_AllocName
 ===================
 */
-TypeLess_ptr Hunk_AllocName(size_t size, cString name) {
+TypeLess_ptr Hunk_AllocName(size_t size, cStringRO name) {
 #ifdef PARANOID
 	Hunk_Check();
 #endif
@@ -218,7 +218,7 @@ void Hunk_FreeToHighMark(size_t mark) {
 	Hunk_HighAllocName
 	===================
 */
-TypeLess_ptr Hunk_HighAllocName(size_t size, cString name) {
+TypeLess_ptr Hunk_HighAllocName(size_t size, cStringRO name) {
 	if (_hunk_tempactive) {
 		Hunk_FreeToHighMark(_hunk_tempmark);
 		_hunk_tempactive = false;

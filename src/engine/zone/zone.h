@@ -85,9 +85,13 @@ Zone block
 */
 #include "types.h"
 extern int32_t   minimum_memory;
-
-void Memory_Init(TypeLess_ptr buf, size_t size);
-
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void Memory_Init(TypeLess_ptr buf, size_t size);
+#ifdef __cplusplus
+}
+#endif
 //========================[z_hulk.c]========================//
 #ifdef __cplusplus
 extern "C" {
@@ -108,9 +112,9 @@ extern "C" {
 extern "C" {
 #endif
     TypeLess_ptr Hunk_Alloc(size_t size); // returns 0 filled memory
-    TypeLess_ptr Hunk_AllocName(size_t size, cString name);
+    TypeLess_ptr Hunk_AllocName(size_t size, cStringRO name);
 
-    TypeLess_ptr Hunk_HighAllocName(size_t size, cString name);
+    TypeLess_ptr Hunk_HighAllocName(size_t size, cStringRO name);
 
     size_t  Hunk_LowMark();
     void    Hunk_FreeToLowMark(size_t mark);

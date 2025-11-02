@@ -187,13 +187,13 @@ cString NetMsg::ReadString() {
     return string;
 }
 
-void NetMsg::WriteString(sizebuf_p sb, cString s) {
+void NetMsg::WriteString(sizebuf_p sb, cStringRO s) {
     if (!sb)    return;
     char empSt[2] = { 0 };    // ""
     if (!s) SZ_Write(sb, empSt, 1);
-    else    SZ_Write(sb, s, (Q_strlen(s) + 1));
+    else    SZ_Write(sb, (TypeLess_ptr)s, (Q_strlen(s) + 1));
 }
-void NetMsg::WriteString(cString s) { WriteString(_sb, s); }
+void NetMsg::WriteString(cStringRO s) { WriteString(_sb, s); }
 
 
 

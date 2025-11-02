@@ -23,12 +23,12 @@ void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count);
 void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count);
 int Q_memcmp(TypeLess_ptr m1, TypeLess_ptr m2, int32_t count);
 
-int Q_strlen(cString  str);
+int Q_strlen(cStringRO str);
 void Q_strcpy(cString  dest, cString src);
 void Q_strncpy(cString dest, cString src, int32_t count);
 void Q_strcat(cString  dest, cString src);
 cString Q_strrchr(cString s, char  c);
-int Q_strcmp(cString      s1, cString s2);
+int Q_strcmp(cStringRO     s1, cStringRO s2);
 int Q_strncmp(cString     s1, cString s2, int32_t count);
 int Q_strcasecmp(cString  s1, cString s2);
 int Q_strncasecmp(cString s1, cString s2, int32_t n);

@@ -280,7 +280,7 @@ void Sys_Init() {
 }
 
 
-void Sys_Error(cString error, ...) {
+void Sys_Error(cStringRO error, ...) {
     va_list  argptr;
     char  text[1024], text2[1024];
     cString text3 = "Press Enter to exit\n";

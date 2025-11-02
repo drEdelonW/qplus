@@ -42,7 +42,7 @@ CVAR(sys_linerefresh, "0");// set for entity display
 void Sys_DebugNumber(int y, int val) {}
 
 /*
-void Sys_Printf(cString fmt, ...) {
+void Sys_Printf(cStringRO fmt, ...) {
     va_list		argptr;
     char		text[1024];
 
@@ -54,7 +54,7 @@ void Sys_Printf(cString fmt, ...) {
     Con_Print(text);
 }
 
-void Sys_Printf(cString fmt, ...) {
+void Sys_Printf(cStringRO fmt, ...) {
 
     va_list     argptr;
     char        text[1024], * t_p;
@@ -84,7 +84,7 @@ void Sys_Printf(cString fmt, ...) {
 }
 */
 
-void Sys_Printf(cString fmt, ...) {
+void Sys_Printf(cStringRO fmt, ...) {
     va_list argptr;
     char    text[1024];
     uint8_p  p;
@@ -143,7 +143,7 @@ void Sys_Init() {
 #endif
 }
 
-void Sys_Error(cString error, ...) {
+void Sys_Error(cStringRO error, ...) {
     va_list     argptr;
     char        string[1024];
 
@@ -159,7 +159,7 @@ void Sys_Error(cString error, ...) {
     exit(1);
 }
 
-void Sys_Warn(cString warning, ...) {
+void Sys_Warn(cStringRO warning, ...) {
     va_list argptr;
     char    string[1024];
 
@@ -176,7 +176,7 @@ void Sys_Warn(cString warning, ...) {
     returns -1 if not present
 ============
 */
-int	Sys_FileTime(cString path) {
+int	Sys_FileTime(cStringRO path) {
     struct stat buf;
 
     if (stat(path, &buf) == -1)
@@ -186,11 +186,11 @@ int	Sys_FileTime(cString path) {
 }
 
 
-void Sys_mkdir(cString path) {
+void Sys_mkdir(cStringRO path) {
     mkdir(path, 0777);
 }
 
-int Sys_FileOpenRead(cString path, int* handle) {
+int Sys_FileOpenRead(cStringRO path, int* handle) {
     struct stat	fileinfo;
 
     int h = open(path, O_RDONLY, 0666);
@@ -204,7 +204,7 @@ int Sys_FileOpenRead(cString path, int* handle) {
     return fileinfo.st_size;
 }
 
-int Sys_FileOpenWrite(cString path) {
+int Sys_FileOpenWrite(cStringRO path) {
     umask(0);
 
     int handle = open(path, (O_RDWR | O_CREAT | O_TRUNC), 0666);
@@ -231,7 +231,7 @@ int Sys_FileRead(int handle, TypeLess_ptr dest, int count) {
     return read(handle, dest, count);
 }
 
-void Sys_DebugLog(cString file, cString fmt, ...) {
+void Sys_DebugLog(cStringRO file, cStringRO fmt, ...) {
     va_list argptr;
     static char data[1024];
 

@@ -119,35 +119,41 @@ struct cvar_s {
     cvar_p  next;
 };
 
-// registers a cvar that allready has the name, string, and optionally the
-// archive elements set.
-void     Cvar_RegisterVariable(cvar_p variable);
+#ifdef __cplusplus
+extern "C" {
+#endif
+    // registers a cvar that allready has the name, string, and optionally the
+    // archive elements set.
+    void     Cvar_RegisterVariable(cvar_p variable);
 
-// equivelant to "<name> <variable>" typed at the console
-void     Cvar_Set(cString var_name, cString value);
+    // equivelant to "<name> <variable>" typed at the console
+    void     Cvar_Set(cStringRO var_name, cString value);
 
-// expands value to a string and calls Cvar_Set
-void    Cvar_SetValue(cString var_name, float value);
+    // expands value to a string and calls Cvar_Set
+    void    Cvar_SetValue(cStringRO var_name, float value);
 
-// returns 0 if not defined or non numeric
-float    Cvar_VariableValue(cString var_name);
+    // returns 0 if not defined or non numeric
+    float    Cvar_VariableValue(cString var_name);
 
-// returns an empty string if not defined
-cString Cvar_VariableString(cString var_name);
+    // returns an empty string if not defined
+    cString Cvar_VariableString(cString var_name);
 
-// attempts to match a partial variable name for command line completion
-// returns NULL if nothing fits
-cString Cvar_CompleteVariable(cString partial);
+    // attempts to match a partial variable name for command line completion
+    // returns NULL if nothing fits
+    cString Cvar_CompleteVariable(cString partial);
 
-// called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
-// command.  Returns true if the command was a variable reference that
-// was handled. (print or change)
-bool Cvar_Command();
+    // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
+    // command.  Returns true if the command was a variable reference that
+    // was handled. (print or change)
+    bool Cvar_Command();
 
-// Writes lines containing "set variable value" for all variables
-// with the archive flag set to true.
-void     Cvar_WriteVariables(FILE* f);
+    // Writes lines containing "set variable value" for all variables
+    // with the archive flag set to true.
+    void     Cvar_WriteVariables(FILE* f);
 
-cvar_p Cvar_FindVar(cString var_name);
+    cvar_p Cvar_FindVar(cStringRO var_name);
 
-extern cvar_p cvar_vars;
+    extern cvar_p cvar_vars;
+#ifdef __cplusplus
+}
+#endif

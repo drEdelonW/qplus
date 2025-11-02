@@ -26,14 +26,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 #if defined(_WIN32) && !defined(WINDED)
-    #if defined(_M_IX86)
-        #define __i386__	1
-    #endif
-    void	VID_LockBuffer();
-    void	VID_UnlockBuffer();
+#if defined(_M_IX86)
+#define __i386__	1
+#endif
+void	VID_LockBuffer();
+void	VID_UnlockBuffer();
 #else
-    #define	VID_LockBuffer()
-    #define	VID_UnlockBuffer()
+#define	VID_LockBuffer()
+#define	VID_UnlockBuffer()
 #endif
 // a pixel can be one, two, or four bytes
 typedef uint8_t pixel_t;
@@ -43,12 +43,12 @@ typedef pixel_t* pixel_p;
 struct vRect_s;
 typedef struct vRect_s vRect_t;
 typedef vRect_t* vRect_p;
-struct vRect_s{
-	int	    x, y, width, height;
-	vRect_p pnext;
+struct vRect_s {
+    int	    x, y, width, height;
+    vRect_p pnext;
 };
 
-typedef struct{
+typedef struct {
     pixel_p     buffer;		// invisible buffer
     pixel_p     colormap;		// 256 * VID_GRADES size
     uint16_p   colormap16;	// 256 * VID_GRADES size
@@ -66,7 +66,7 @@ typedef struct{
     int         maxwarpwidth;
     int         maxwarpheight;
     pixel_p     direct;		// direct drawing to framebuffer, if not
-									//  NULL
+    //  NULL
 } VidDef_t;
 typedef VidDef_t* VidDef_p;
 
@@ -76,27 +76,33 @@ extern	uint32_t    d_8to24table[256];
 extern void (*vid_menudrawfn)();
 extern void (*vid_menukeyfn)(keycode_t key);
 
-// called at startup and after any gamma correction
-void    VID_SetPalette(uint8_p palette);
+#ifdef __cplusplus
+extern "C" {
+#endif
+    // called at startup and after any gamma correction
+    void    VID_SetPalette(uint8_p palette);
 
-// called for bonus and pain flashes, and for underwater color changes
-void    VID_ShiftPalette(uint8_p palette);
+    // called for bonus and pain flashes, and for underwater color changes
+    void    VID_ShiftPalette(uint8_p palette);
 
-// Called at startup to set up translation tables, takes 256 8 bit RGB values
-// the palette data will go away after the call, so it must be copied off if
-// the video driver will need it again
-void    VID_Init (uint8_p palette);
+    // Called at startup to set up translation tables, takes 256 8 bit RGB values
+    // the palette data will go away after the call, so it must be copied off if
+    // the video driver will need it again
+    void    VID_Init(uint8_p palette);
 
-// Called at shutdown
-void    VID_Shutdown();
+    // Called at shutdown
+    void    VID_Shutdown();
 
-// flushes the given rectangles from the view buffer to the screen
-void    VID_Update(vRect_p rects);
+    // flushes the given rectangles from the view buffer to the screen
+    void    VID_Update(vRect_p rects);
 
-// sets the mode; only used by the Quake engine for resetting to mode 0 (the
-// base mode) on memory allocation failures
-int     VID_SetMode(int modenum, uint8_p palette);
+    // sets the mode; only used by the Quake engine for resetting to mode 0 (the
+    // base mode) on memory allocation failures
+    int     VID_SetMode(int modenum, uint8_p palette);
 
-// called only on Win32, when pause happens, so the mouse can be released
-void    VID_HandlePause(bool pause);
+    // called only on Win32, when pause happens, so the mouse can be released
+    void    VID_HandlePause(bool pause);
 
+#ifdef __cplusplus
+}
+#endif

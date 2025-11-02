@@ -130,13 +130,20 @@ extern cString keybindings[MAX_KEYS];
 extern int key_count;			// incremented every key event
 extern int key_repeats[MAX_KEYS];
 
-void Key_Event(keycode_t key, bool down);
-void Key_Init();
-void Key_WriteBindings(FILE* f);
-void Key_SetBinding(keycode_t keynum, cString binding);
-void Key_ClearStates();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-bool is_printable(keycode_t symb);
-bool is_digits(keycode_t symb);
+    void Key_Event(keycode_t key, bool down);
+    void Key_Init();
+    void Key_WriteBindings(FILE* f);
+    void Key_SetBinding(keycode_t keynum, cString binding);
+    void Key_ClearStates();
+
+    bool is_printable(keycode_t symb);
+    bool is_digits(keycode_t symb);
 
 
+#ifdef __cplusplus
+}
+#endif

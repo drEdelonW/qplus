@@ -112,7 +112,7 @@ void Q_strncpy(cString dest, cString src, int32_t count) {
 }
 #endif
 
-int Q_strlen(cString str) {
+int Q_strlen(cStringRO str) {
     int32_t count = 0;
     while (str[count])
         count++;
@@ -136,7 +136,7 @@ void Q_strcat(cString dest, cString src) {
     Q_strcpy(dest, src);
 }
 
-int Q_strcmp(cString s1, cString s2) {
+int Q_strcmp(cStringRO s1, cStringRO s2) {
     while (1) {
         if (*s1 != *s2)
             return -1;              // strings not equal

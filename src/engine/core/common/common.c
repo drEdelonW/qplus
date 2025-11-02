@@ -122,7 +122,7 @@ The file "parms.txt" will be read out of the game directory and appended to the 
 COM_SkipPath
 ============
 */
-cString COM_SkipPath(cString pathname) {
+cString COM_SkipPath(cStringRO pathname) {
     cString last = pathname;
     while (*pathname) {
         if (*pathname == '/')
@@ -137,7 +137,7 @@ cString COM_SkipPath(cString pathname) {
 COM_StripExtension
 ============
 */
-void COM_StripExtension(cString in, cString out) {
+void COM_StripExtension(cStringRO in, cString out) {
     while ((*in) && (*in != '.'))
         *out++ = *in++;
     *out = 0;
@@ -148,7 +148,7 @@ void COM_StripExtension(cString in, cString out) {
 COM_FileExtension
 ============
 */
-cString COM_FileExtension(cString in) {
+cString COM_FileExtension(cStringRO in) {
     static char exten[8];
     while ((*in) && (*in != '.'))
         in++;
@@ -169,7 +169,7 @@ cString COM_FileExtension(cString in) {
 COM_FileBase
 ============
 */
-void COM_FileBase(cString in, cString out) {
+void COM_FileBase(cStringRO in, cString out) {
     cString s = in + strlen(in) - 1;
 
     cString s2;
@@ -193,7 +193,7 @@ void COM_FileBase(cString in, cString out) {
 COM_DefaultExtension
 ==================
 */
-void COM_DefaultExtension(cString path, cString extension) {
+void COM_DefaultExtension(cStringRO path, cString extension) {
     //
     // if path doesn't have a .EXT, append extension
     // (extension should include the .)
@@ -298,7 +298,7 @@ Returns the position (1 to argc-1) in the program's argument list
 where the given parameter apears, or 0 if not present
 ================
 */
-int COM_CheckParm(cString parm) {
+int COM_CheckParm(cStringRO parm) {
     for (int i = 1; i < com_argc; i++) {
         if (!com_argv[i])                   continue;   // NEXTSTEP sometimes clears appkit vars.
         if (!Q_strcmp(parm, com_argv[i]))   return i;
@@ -411,7 +411,7 @@ void COM_InitArgv(int argc, cStringArray argv) {
 COM_Init
 ================
 */
-void COM_Init(cString basedir) {
+void COM_Init(cStringRO basedir) {
     COM_Endian_Init();
 
     Cvar_RegisterVariable(&registered);
@@ -432,7 +432,7 @@ varargs versions of all text functions.
 FIXME: make this buffer size safe someday
 ============
 */
-cString va(cString format, ...) {
+cString va(cStringRO format, ...) {
     va_list         argptr;
     static char     string[1024];
 
@@ -532,7 +532,7 @@ COM_WriteFile
 The filename will be prefixed by the current game directory
 ============
 */
-void COM_WriteFile(cString filename, TypeLess_ptr data, int32_t len) {
+void COM_WriteFile(cStringRO filename, TypeLess_ptr data, int32_t len) {
     char    name[MAX_OSPATH];
     snprintf(name, sizeof(name), "%s/%s", com_gamedir, filename);
 
@@ -555,7 +555,7 @@ COM_CreatePath
 Only used for CopyFile
 ============
 */
-void COM_CreatePath(cString path) {
+void COM_CreatePath(cStringRO path) {
     for (cString ofs = path + 1; *ofs; ofs++) {
         if (*ofs == '/') {       // create the directory
             *ofs = 0;
@@ -601,7 +601,7 @@ Finds the file in the search path.
 Sets com_filesize and one of handle or file
 ===========
 */
-int COM_FindFile(cString filename, int* handle, FILE** file) {
+int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
     if (file && handle)     Sys_Error("COM_FindFile: both handle and file set");
     if (!file && !handle)   Sys_Error("COM_FindFile: neither handle or file set");
 
@@ -705,7 +705,7 @@ returns a handle and a length
 it may actually be inside a pak file
 ===========
 */
-int COM_OpenFile(cString filename, int* handle) {
+int COM_OpenFile(cStringRO filename, int* handle) {
     return COM_FindFile(filename, handle, NULL);
 }
 
@@ -717,7 +717,7 @@ If the requested file is inside a packfile, a new FILE * will be opened
 into the file.
 ===========
 */
-int COM_FOpenFile(cString filename, FILE** file) {
+int COM_FOpenFile(cStringRO filename, FILE** file) {
     return COM_FindFile(filename, NULL, file);
 }
 
@@ -748,7 +748,7 @@ Allways appends a 0 uint8_t.
 CacheUser_p loadcache;
 uint8_p     loadbuf;
 int         loadsize;
-uint8_p COM_LoadFile(cString path, int usehunk) {
+uint8_p COM_LoadFile(cStringRO path, int usehunk) {
     uint8_p buf = NULL;     // quiet compiler warning
 
     // look for it in the filesystem or pack files
@@ -782,16 +782,16 @@ uint8_p COM_LoadFile(cString path, int usehunk) {
     return buf;
 }
 
-uint8_p COM_LoadHunkFile(cString path) { return COM_LoadFile(path, 1); }
-uint8_p COM_LoadTempFile(cString path) { return COM_LoadFile(path, 2); }
+uint8_p COM_LoadHunkFile(cStringRO path) { return COM_LoadFile(path, 1); }
+uint8_p COM_LoadTempFile(cStringRO path) { return COM_LoadFile(path, 2); }
 
-void COM_LoadCacheFile(cString path, CacheUser_p cu) {
+void COM_LoadCacheFile(cStringRO path, CacheUser_p cu) {
     loadcache = cu;
     COM_LoadFile(path, 3);
 }
 
 // uses temp hunk if larger than bufsize
-uint8_p COM_LoadStackFile(cString path, TypeLess_ptr buffer, int32_t bufsize) {
+uint8_p COM_LoadStackFile(cStringRO path, TypeLess_ptr buffer, int32_t bufsize) {
     loadbuf = (uint8_p)buffer;
     loadsize = bufsize;
     uint8_p buf = COM_LoadFile(path, 4);
@@ -809,7 +809,7 @@ Loads the header and directory, adding the files at the beginning
 of the list so they override previous pack files.
 =================
 */
-pack_p COM_LoadPackFile(cString packfile) {
+pack_p COM_LoadPackFile(cStringRO packfile) {
 
     int packhandle;
     if (Sys_FileOpenRead(packfile, &packhandle) == -1) {
@@ -875,7 +875,7 @@ Sets com_gamedir, adds the directory to the head of the path,
 then loads and adds pak1.pak pak2.pak ...
 ================
 */
-void COM_AddGameDirectory(cString dir) {
+void COM_AddGameDirectory(cStringRO dir) {
     strcpy(com_gamedir, dir);
 
     //

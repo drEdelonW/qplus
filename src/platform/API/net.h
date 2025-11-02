@@ -227,121 +227,127 @@ extern int32_t messagesSent;
 extern int32_t messagesReceived;
 extern int32_t unreliableMessagesSent;
 extern int32_t unreliableMessagesReceived;
-
-qsocket_p NET_NewQSocket();
-void NET_FreeQSocket(qsocket_p);
-double SetNetTime();
+#ifdef __cplusplus
+extern "C" {
+#endif
+    qsocket_p NET_NewQSocket();
+    void NET_FreeQSocket(qsocket_p);
+    double SetNetTime();
 
 
 #define HOSTCACHESIZE 8
 
-typedef struct {
-    char name[16];
-    char map[16];
-    char cname[32];
-    int32_t users;
-    int32_t maxusers;
-    int32_t driver;
-    int32_t ldriver;
-    qsockaddr_t addr;
-} hostcache_t;
+    typedef struct {
+        char name[16];
+        char map[16];
+        char cname[32];
+        int32_t users;
+        int32_t maxusers;
+        int32_t driver;
+        int32_t ldriver;
+        qsockaddr_t addr;
+    } hostcache_t;
 
-extern int32_t hostCacheCount;
-extern hostcache_t hostcache[HOSTCACHESIZE];
+    extern int32_t hostCacheCount;
+    extern hostcache_t hostcache[HOSTCACHESIZE];
 
 #if !defined(_WIN32 ) && !defined (__linux__) && !defined (__sun__)
 #ifndef htonl
-extern uint32_t htonl(uint32_t hostlong);
+    extern uint32_t htonl(uint32_t hostlong);
 #endif
 #ifndef htons
-extern uint16_t htons(uint16_t hostshort);
+    extern uint16_t htons(uint16_t hostshort);
 #endif
 #ifndef ntohl
-extern uint32_t ntohl(uint32_t netlong);
+    extern uint32_t ntohl(uint32_t netlong);
 #endif
 #ifndef ntohs
-extern uint16_t ntohs(uint16_t netshort);
+    extern uint16_t ntohs(uint16_t netshort);
 #endif
 #endif
 
 #ifdef IDGODS
-bool IsID(qsockaddr_p addr);
+    bool IsID(qsockaddr_p addr);
 #endif
 
-//============================================================================
-//
-// public network functions
-//
-//============================================================================
+    //============================================================================
+    //
+    // public network functions
+    //
+    //============================================================================
 
-extern double       net_time;
-extern sizebuf_t    net_message;
-extern int32_t      net_activeconnections;
+    extern double       net_time;
+    extern sizebuf_t    net_message;
+    extern int32_t      net_activeconnections;
 
-void NET_Init();
-void NET_Shutdown();
+    void NET_Init();
+    void NET_Shutdown();
 
- qsocket_p NET_CheckNewConnections();
-// returns a new connection number if there is one pending, else -1
+    qsocket_p NET_CheckNewConnections();
+    // returns a new connection number if there is one pending, else -1
 
- qsocket_p NET_Connect(cString host);
-// called by client to connect to a host.  Returns -1 if not able to
+    qsocket_p NET_Connect(cString host);
+    // called by client to connect to a host.  Returns -1 if not able to
 
-bool NET_CanSendMessage(qsocket_p sock);
-// Returns true or false if the given qsocket can currently accept a
-// message to be transmitted.
+    bool NET_CanSendMessage(qsocket_p sock);
+    // Returns true or false if the given qsocket can currently accept a
+    // message to be transmitted.
 
-int32_t NET_GetMessage(qsocket_p sock);
-// returns data in net_message sizebuf
-// returns 0 if no data is waiting
-// returns 1 if a message was received
-// returns 2 if an unreliable message was received
-// returns -1 if the connection died
+    int32_t NET_GetMessage(qsocket_p sock);
+    // returns data in net_message sizebuf
+    // returns 0 if no data is waiting
+    // returns 1 if a message was received
+    // returns 2 if an unreliable message was received
+    // returns -1 if the connection died
 
-int32_t NET_SendMessage(qsocket_p sock, sizebuf_p data);
-int32_t NET_SendUnreliableMessage(qsocket_p sock, sizebuf_p data);
-// returns 0 if the message connot be delivered reliably, but the connection is still considered valid
-// returns 1 if the message was sent properly
-// returns -1 if the connection died
+    int32_t NET_SendMessage(qsocket_p sock, sizebuf_p data);
+    int32_t NET_SendUnreliableMessage(qsocket_p sock, sizebuf_p data);
+    // returns 0 if the message connot be delivered reliably, but the connection is still considered valid
+    // returns 1 if the message was sent properly
+    // returns -1 if the connection died
 
-int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime);
-// This is a reliable *blocking* send to all attached clients.
-
-
-void NET_Close(qsocket_p sock);
-// if a dead connection is returned by a get or send function, this function
-// should be called when it is convenient
-
-// Server calls when a client is kicked off for a game related misbehavior
-// like an illegal protocal conversation.  Client calls when disconnecting
-// from a server.
-// A netcon_t number will not be reused until this function is called for it
-
-void NET_Poll();
+    int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime);
+    // This is a reliable *blocking* send to all attached clients.
 
 
-typedef struct _PollProcedure {
-    struct _PollProcedure* next;
-    double nextTime;
-    void (*procedure)();
-    TypeLess_ptr arg;
-} PollProcedure;
+    void NET_Close(qsocket_p sock);
+    // if a dead connection is returned by a get or send function, this function
+    // should be called when it is convenient
 
-void SchedulePollProcedure(PollProcedure* pp, double timeOffset);
+    // Server calls when a client is kicked off for a game related misbehavior
+    // like an illegal protocal conversation.  Client calls when disconnecting
+    // from a server.
+    // A netcon_t number will not be reused until this function is called for it
 
-extern bool serialAvailable;
-extern bool ipxAvailable;
-extern bool tcpipAvailable;
+    void NET_Poll();
 
-extern char my_ipx_address[NET_NAMELEN];
-extern char my_tcpip_address[NET_NAMELEN];
-extern void (*GetComPortConfig)(int32_t portNumber, int32_p port, int32_p irq, int32_p baud, bool* useModem);
-extern void (*SetComPortConfig)(int32_t portNumber, int32_t port, int32_t irq, int32_t baud, bool useModem);
-extern void (*GetModemConfig)(int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
-extern void (*SetModemConfig)(int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
 
-extern bool slistInProgress;
-extern bool slistSilent;
-extern bool slistLocal;
+    typedef struct _PollProcedure {
+        struct _PollProcedure* next;
+        double nextTime;
+        void (*procedure)();
+        TypeLess_ptr arg;
+    } PollProcedure;
 
-void NET_Slist_f();
+    void SchedulePollProcedure(PollProcedure* pp, double timeOffset);
+
+    extern bool serialAvailable;
+    extern bool ipxAvailable;
+    extern bool tcpipAvailable;
+
+    extern char my_ipx_address[NET_NAMELEN];
+    extern char my_tcpip_address[NET_NAMELEN];
+    extern void (*GetComPortConfig)(int32_t portNumber, int32_p port, int32_p irq, int32_p baud, bool* useModem);
+    extern void (*SetComPortConfig)(int32_t portNumber, int32_t port, int32_t irq, int32_t baud, bool useModem);
+    extern void (*GetModemConfig)(int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
+    extern void (*SetModemConfig)(int32_t portNumber, cString dialType, cString clear, cString init, cString hangup);
+
+    extern bool slistInProgress;
+    extern bool slistSilent;
+    extern bool slistLocal;
+
+    void NET_Slist_f();
+
+#ifdef __cplusplus
+}
+#endif

@@ -35,7 +35,7 @@ cString cvar_null_string = "";
 Cvar_FindVar
 ============
 */
-cvar_p Cvar_FindVar(cString var_name) {
+cvar_p Cvar_FindVar(cStringRO var_name) {
     for (cvar_p var = cvar_vars; var; var = var->next)
         if (!Q_strcmp(var_name, var->name))
             return var;
@@ -94,7 +94,7 @@ cString Cvar_CompleteVariable(cString partial) {
 Cvar_Set
 ============
 */
-void Cvar_Set(cString var_name, cString value) {
+void Cvar_Set(cStringRO var_name, cString value) {
     cvar_p var = Cvar_FindVar(var_name);
     if (!var) {	// there is an error in C code if this happens
         Con_Printf("Cvar_Set: variable %s not found\n", var_name);
@@ -123,7 +123,7 @@ void Cvar_Set(cString var_name, cString value) {
 Cvar_SetValue
 ============
 */
-void Cvar_SetValue(cString var_name, float value) {
+void Cvar_SetValue(cStringRO var_name, float value) {
     char	val[32];
     sprintf(val, "%f", value);
     Cvar_Set(var_name, val);

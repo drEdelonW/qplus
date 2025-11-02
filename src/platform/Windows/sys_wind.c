@@ -124,7 +124,7 @@ SYSTEM IO
 void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) { }
 void Sys_DebugLog(cString file, cString fmt, ...) { }
 
-void Sys_Error(cString error, ...) {
+void Sys_Error(cStringRO error, ...) {
     va_list  argptr;
     char  text[1024];
 

@@ -33,8 +33,8 @@ public:
     void    WriteFloat(float f);
 
     cString ReadString();
-    void    WriteString(sizebuf_p sb, cString s);
-    void    WriteString(cString s);
+    void    WriteString(sizebuf_p sb, cStringRO s);
+    void    WriteString(cStringRO s);
 
     float   ReadCoord();
     void    WriteCoord(sizebuf_p sb, float f);

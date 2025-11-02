@@ -67,7 +67,7 @@ void MSG_WriteFloat(sizebuf_p sb, float f) {
     SZ_Write(sb, &dat.l, 4);
 }
 
-void MSG_WriteString(sizebuf_p sb, cString s) {
+void MSG_WriteString(sizebuf_p sb, cStringRO s) {
     if (!s)
         SZ_Write(sb, "", 1);
     else

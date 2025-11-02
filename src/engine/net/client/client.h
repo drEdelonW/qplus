@@ -271,82 +271,88 @@ extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
 extern Beam_t       cl_beams[MAX_BEAMS];
 
 //=============================================================================
+#ifdef __cplusplus
+extern "C" {
+#endif
+    //
+    // cl_main
+    //
+    dLight_p CL_AllocDlight(int32_t key);
+    void CL_DecayLights();
 
-//
-// cl_main
-//
-dLight_p CL_AllocDlight(int32_t key);
-void CL_DecayLights();
+    void CL_Init();
 
-void CL_Init();
+    void CL_EstablishConnection(cString host);
+    void CL_Signon1();
+    void CL_Signon2();
+    void CL_Signon3();
+    void CL_Signon4();
 
-void CL_EstablishConnection(cString host);
-void CL_Signon1();
-void CL_Signon2();
-void CL_Signon3();
-void CL_Signon4();
-
-void CL_Disconnect();
-void CL_Disconnect_f();
-void CL_NextDemo();
+    void CL_Disconnect();
+    void CL_Disconnect_f();
+    void CL_NextDemo();
 
 #define MAX_VISEDICTS 256
-extern int32_t      cl_numvisedicts;
-extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
+    extern int32_t      cl_numvisedicts;
+    extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
 
-// cl_input
-typedef struct {
-    uint8_t down[2];    // key nums holding it down
-    uint8_t state;      // low bit is down state
-} kbutton_t;
-typedef kbutton_t* kbutton_p;
+    // cl_input
+    typedef struct {
+        uint8_t down[2];    // key nums holding it down
+        uint8_t state;      // low bit is down state
+    } kbutton_t;
+    typedef kbutton_t* kbutton_p;
 
-extern  kbutton_t   in_mlook, in_klook;
-extern  kbutton_t   in_strafe;
-extern  kbutton_t   in_speed;
+    extern  kbutton_t   in_mlook, in_klook;
+    extern  kbutton_t   in_strafe;
+    extern  kbutton_t   in_speed;
 
-void CL_InitInput();
-void CL_SendCmd();
-void CL_SendMove(UserCmd_p cmd);
+    void CL_InitInput();
+    void CL_SendCmd();
+    void CL_SendMove(UserCmd_p cmd);
 
-void CL_ParseTEnt();
-void CL_UpdateTEnts();
+    void CL_ParseTEnt();
+    void CL_UpdateTEnts();
 
-void CL_ClearState();
-
-
-void CL_ReadFromServer();
-void CL_WriteToServer(UserCmd_p cmd);
-void CL_BaseMove(UserCmd_p cmd);
+    void CL_ClearState();
 
 
-float CL_KeyState(kbutton_p key);
-cString Key_KeynumToString(keycode_t keynum);
-
-// cl_demo.c
-void CL_StopPlayback();
-int CL_GetMessage();
-
-void CL_Stop_f();
-void CL_Record_f();
-void CL_PlayDemo_f();
-void CL_TimeDemo_f();
-
-// cl_parse.c
-void CL_ParseServerMessage();
-void CL_NewTranslation(int32_t slot);
-
-// view
-void V_StartPitchDrift();
-void V_StopPitchDrift();
-
-void V_RenderView();
-void V_UpdatePalette();
-void V_Register();
-void V_ParseDamage();
-void V_SetContentsColor(contents_t contents);
+    void CL_ReadFromServer();
+    void CL_WriteToServer(UserCmd_p cmd);
+    void CL_BaseMove(UserCmd_p cmd);
 
 
-// cl_tent
-void CL_InitTEnts();
-void CL_SignonReply();
+    float CL_KeyState(kbutton_p key);
+    cString Key_KeynumToString(keycode_t keynum);
+
+    // cl_demo.c
+    void CL_StopPlayback();
+    int CL_GetMessage();
+
+    void CL_Stop_f();
+    void CL_Record_f();
+    void CL_PlayDemo_f();
+    void CL_TimeDemo_f();
+
+    // cl_parse.c
+    void CL_ParseServerMessage();
+    void CL_NewTranslation(int32_t slot);
+
+    // view
+    void V_StartPitchDrift();
+    void V_StopPitchDrift();
+
+    void V_RenderView();
+    void V_UpdatePalette();
+    void V_Register();
+    void V_ParseDamage();
+    void V_SetContentsColor(contents_t contents);
+
+
+    // cl_tent
+    void CL_InitTEnts();
+    void CL_SignonReply();
+
+#ifdef __cplusplus
+}
+#endif
