@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "versions.h"
 #include "sound.h"
 #include "q_tools.h"
+#include "wad.h"
 
 qPic_p draw_disc;
 
@@ -60,7 +61,7 @@ static CachePic_t _menu_cachepics[MAX_CACHED_PICS];
 static int _menu_numcachepics;
 
 
-qPic_p Draw_PicFromWad(cString name) {
+qPic_p Draw_PicFromWad(cStringRO name) {
     return W_GetLumpName(name);
 }
 
@@ -69,7 +70,7 @@ qPic_p Draw_PicFromWad(cString name) {
 Draw_CachePic
 ================
 */
-qPic_p Draw_CachePic(cString path) {
+qPic_p Draw_CachePic(cStringRO path) {
     CachePic_p pic = _menu_cachepics;
     int i = 0;
     for (; i < _menu_numcachepics; pic++, i++)
@@ -165,9 +166,28 @@ void Draw_Character(int x, int y, int num) {
         uint8_p dest = vid.conbuffer + y * vid.conrowbytes + x;
 
         while (drawline--) {
+#if 0
             for (int i = 0; i < 8; i++)
                 if (source[i])
                     dest[i] = source[i];
+#else
+            if (source[0])
+                dest[0] = source[0];
+            if (source[1])
+                dest[1] = source[1];
+            if (source[2])
+                dest[2] = source[2];
+            if (source[3])
+                dest[3] = source[3];
+            if (source[4])
+                dest[4] = source[4];
+            if (source[5])
+                dest[5] = source[5];
+            if (source[6])
+                dest[6] = source[6];
+            if (source[7])
+                dest[7] = source[7];
+#endif
             source += 128;
             dest += vid.conrowbytes;
         }
@@ -178,10 +198,28 @@ void Draw_Character(int x, int y, int num) {
             ((uint8_p)vid.conbuffer + y * vid.conrowbytes + (x << 1));
 
         while (drawline--) {
+#if 0
             for (int i = 0; i < 8; i++)
                 if (source[i])
                     pusdest[i] = d_8to16table[source[i]];
-
+#else
+            if (source[0])
+                pusdest[0] = d_8to16table[source[0]];
+            if (source[1])
+                pusdest[1] = d_8to16table[source[1]];
+            if (source[2])
+                pusdest[2] = d_8to16table[source[2]];
+            if (source[3])
+                pusdest[3] = d_8to16table[source[3]];
+            if (source[4])
+                pusdest[4] = d_8to16table[source[4]];
+            if (source[5])
+                pusdest[5] = d_8to16table[source[5]];
+            if (source[6])
+                pusdest[6] = d_8to16table[source[6]];
+            if (source[7])
+                pusdest[7] = d_8to16table[source[7]];
+#endif
             source += 128;
             pusdest += (vid.conrowbytes >> 1);
         }
@@ -193,7 +231,7 @@ void Draw_Character(int x, int y, int num) {
 Draw_String
 ================
 */
-void Draw_String(int x, int y, cString str) {
+void Draw_String(int x, int y, cStringRO str) {
     while (*str) {
         Draw_Character(x, y, *str);
         str++;
@@ -211,7 +249,7 @@ of the code.
 ================
 */
 void Draw_DebugChar(char num) {
-    extern uint8_p _draw_chars;
+    // extern uint8_p _draw_chars;
 
     if (!vid.direct)
         return;  // don't have direct FB access, so no debugchars...

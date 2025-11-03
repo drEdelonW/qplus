@@ -270,6 +270,23 @@ extern dLight_t     cl_dlights[MAX_DLIGHTS];
 extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
 extern Beam_t       cl_beams[MAX_BEAMS];
 
+#define MAX_VISEDICTS 256
+    extern int32_t      cl_numvisedicts;
+    extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
+
+    // cl_input
+    typedef struct {
+        uint8_t down[2];    // key nums holding it down
+        uint8_t state;      // low bit is down state
+    } kbutton_t;
+    typedef kbutton_t* kbutton_p;
+
+    extern  kbutton_t   in_mlook, in_klook;
+    extern  kbutton_t   in_strafe;
+    extern  kbutton_t   in_speed;
+
+extern kbutton_t in_forward, in_forward2, in_back;
+
 //=============================================================================
 #ifdef __cplusplus
 extern "C" {
@@ -292,20 +309,6 @@ extern "C" {
     void CL_Disconnect_f();
     void CL_NextDemo();
 
-#define MAX_VISEDICTS 256
-    extern int32_t      cl_numvisedicts;
-    extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
-
-    // cl_input
-    typedef struct {
-        uint8_t down[2];    // key nums holding it down
-        uint8_t state;      // low bit is down state
-    } kbutton_t;
-    typedef kbutton_t* kbutton_p;
-
-    extern  kbutton_t   in_mlook, in_klook;
-    extern  kbutton_t   in_strafe;
-    extern  kbutton_t   in_speed;
 
     void CL_InitInput();
     void CL_SendCmd();

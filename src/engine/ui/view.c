@@ -45,9 +45,8 @@ when crossing a water boudnary.
 */
 
 
-float v_dmg_time, v_dmg_roll, v_dmg_pitch;
+static float v_dmg_time, v_dmg_roll, v_dmg_pitch;
 
-extern int in_forward, in_forward2, in_back;
 
 
 /*
@@ -85,6 +84,7 @@ V_CalcBob
 float V_CalcBob() {
     float cycle = cl.time - (int)(cl.time / cl_bobcycle.value) * cl_bobcycle.value;
     cycle /= cl_bobcycle.value;
+
     if (cycle < cl_bobup.value) cycle = M_PI * cycle / cl_bobup.value;
     else                        cycle = M_PI + M_PI * (cycle - cl_bobup.value) / (1.0 - cl_bobup.value);
 
@@ -575,28 +575,27 @@ void CalcGunAngle() {
     static float oldpitch = 0;
 
     float yaw = r_refdef.viewangles[YAW];
-    float pitch = -r_refdef.viewangles[PITCH];
-
     yaw = angledelta(yaw - r_refdef.viewangles[YAW]) * 0.4;
     CLAMP(-10, yaw, 10);
-    pitch = angledelta(-pitch - r_refdef.viewangles[PITCH]) * 0.4;
-    CLAMP(-10, pitch, 10);
     float move = host_frametime * 20;
     if (yaw > oldyaw) {
-        if (oldyaw + move < yaw)
+        if ((oldyaw + move) < yaw)
             yaw = oldyaw + move;
     }
     else {
-        if (oldyaw - move > yaw)
+        if ((oldyaw - move) > yaw)
             yaw = oldyaw - move;
     }
 
+    float pitch = -r_refdef.viewangles[PITCH];
+    pitch = angledelta(-pitch - r_refdef.viewangles[PITCH]) * 0.4;
+    CLAMP(-10, pitch, 10);
     if (pitch > oldpitch) {
-        if (oldpitch + move < pitch)
+        if ((oldpitch + move) < pitch)
             pitch = oldpitch + move;
     }
     else {
-        if (oldpitch - move > pitch)
+        if ((oldpitch - move) > pitch)
             pitch = oldpitch - move;
     }
 
@@ -796,7 +795,8 @@ void V_CalcRefdef() {
     }
     else { oldz = ent->origin[2]; }
 
-    if (chase_active.value) { Chase_Update(); }
+    if (chase_active.value)
+        Chase_Update();
 }
 
 /*
@@ -865,7 +865,11 @@ void V_RenderView() {
         Draw_Character(
             scr_vrect.x + scr_vrect.width / 2 + cl_crossx.value,
             scr_vrect.y + scr_vrect.height / 2 + cl_crossy.value,
+#if 1
             '+'
+#else
+            'Q'
+#endif
         );
 #endif
 
@@ -905,6 +909,7 @@ void V_Init() {
     Cvar_RegisterVariable(&scr_ofsx);
     Cvar_RegisterVariable(&scr_ofsy);
     Cvar_RegisterVariable(&scr_ofsz);
+
     Cvar_RegisterVariable(&cl_rollspeed);
     Cvar_RegisterVariable(&cl_rollangle);
     Cvar_RegisterVariable(&cl_bob);

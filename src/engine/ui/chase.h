@@ -8,7 +8,7 @@ extern "C" {
 
     void Chase_Init();
     void Chase_Reset();
-    void Chase_Update();
+    void Chase_Update(); // using r_refdef.vieworg and cl.viewangles
 
 #ifdef __cplusplus
 }

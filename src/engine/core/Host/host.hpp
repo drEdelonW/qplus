@@ -22,6 +22,7 @@ class Host {
     void  ClientCommands(cString fmt, ...);
     void  ShutdownServer(bool crash);
 
+#if 0
     QuakeParms_t parms;
 
     bool     initialized;  // true if into command execution
@@ -30,8 +31,9 @@ class Host {
     uint8_p  basepal;
     uint8_p  colormap;
     int32_t  framecount; // incremented every frame, never reset
-    double   realtime;   // not bounded in any way, changed at
-    // start of every frame, never reset
+    double   realtime;   // not bounded in any way, changed at start of every frame, never reset
+#endif
+
     void InitLocal();
     void FindMaxClients();
     bool FilterTime(float time);
@@ -46,6 +48,8 @@ class Host {
 
 extern Host host;
 
+/* extern globals */
+extern bool    noclip_anglehack;
 // #ifndef HOST_CMDS_H
 // #define HOST_CMDS_H
 #include "progs.h"
@@ -54,11 +58,8 @@ extern Host host;
 // extern "C" {
 // #endif
 
-    /* extern globals */
-    extern bool    noclip_anglehack;
 
     /* from other TUs but needed here */
-    void Mod_Print(void);
     void M_Menu_Quit_f(void);
 
     /* console/host commands */

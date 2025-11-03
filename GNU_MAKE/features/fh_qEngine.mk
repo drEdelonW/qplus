@@ -1,7 +1,10 @@
 # Set to 1 if you want 32-bit build on Linux x86_64 (requires multilibs)
 FORCE_32     ?= 1
 
-$(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR)) $(eval INCLUDES += $(ENG_DIR)/structs)
+$(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
+        $(eval STRUCT_DIR := $(ENG_DIR)/structs) $(eval INCLUDES += $(STRUCT_DIR))
+                SRC_LIST += $(STRUCT_DIR)/qPic.c
+
         $(eval GAMESPEC_DIR = $(ENG_DIR)/game_specific) $(eval INCLUDES += $(GAMESPEC_DIR))
 
         $(eval CORE_DIR = $(ENG_DIR)/core) $(eval INCLUDES += $(CORE_DIR))

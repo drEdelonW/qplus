@@ -133,6 +133,7 @@ void M_DrawCheckbox(int x, int y, int on) {
     M_Print(x, y, (on) ?
 #if 0
         131 : 129
+        "[V]" : "[ ]"
 #else
         "on" : "off"
 #endif

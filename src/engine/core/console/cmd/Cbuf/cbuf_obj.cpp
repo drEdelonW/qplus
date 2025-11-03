@@ -1,5 +1,4 @@
 #include "cbuf.hpp"
-#include "cbuf.h"
 #include "cmd.h"
 
 #include "sizebuf.h"
@@ -10,22 +9,16 @@
 
 #define CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/
 
+Cbuf cbuf;
 
 
 //=============================================================================
 
-/*
-    ============
-    Cmd_Wait_f
-
-    Causes execution of the remainder of the command buffer to be delayed until
-    next frame.  This allows commands like:
-    bind g "impulse 5 ; +attack ; wait ; -attack ; impulse 2"
-    ============
-*/
 void Cbuf::setWait() {
     _cmdWait = true;
 }
+
+
 /*
     =============================================================================
 
@@ -40,7 +33,9 @@ void Cbuf::setWait() {
     Cbuf::Init
     ============
 */
-void Cbuf::Init() { SZ_Alloc(&_cmdText, CMD_BUSS_SIZE); } // space for commands and script files
+void Cbuf::Init() {
+    SZ_Alloc(&_cmdText, CMD_BUSS_SIZE);
+} // space for commands and script files
 
 
 
@@ -117,8 +112,7 @@ void Cbuf::Execute() {
         }
 
 
-        char line[1024];
-        memcpy(line, text, i);
+        char line[1024]; memcpy(line, text, i);
         line[i] = 0;
 
         // delete the text from the command buffer and move remaining commands down
@@ -144,5 +138,3 @@ void Cbuf::Execute() {
     }
 }
 
-
-Cbuf cbuf;

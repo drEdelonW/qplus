@@ -74,8 +74,8 @@ typedef enum {
 //hipnotic added defines
 
 typedef enum {
-    HIT_PROXIMITY_GUN_BIT   = 16,
     HIT_MJOLNIR_BIT         = 7,
+    HIT_PROXIMITY_GUN_BIT   = 16,
     HIT_LASER_CANNON_BIT    = 23,
     HIT_WETSUIT_BIT         = 25, // (23 + 2)
     HIT_EMPATHY_SHIELDS_BIT = 26  // (23 + 3)

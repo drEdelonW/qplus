@@ -117,7 +117,8 @@
 			"d_local.h": "c",
 			"surfcache.h": "c",
 			"world.h": "c",
-			"*.c_": "cpp"
+			"*.c_": "cpp",
+			"platformdefs.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

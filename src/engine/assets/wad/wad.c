@@ -24,12 +24,52 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "sys.h"
 #include "endian_tools.h"
+#include "qPic.h"
 
-int32_t     wad_numlumps;
-LumpInfo_p  wad_lumps;
-uint8_p     wad_base;
+#define LUMP_NAME_LEN   (16)
 
-// void SwapPic(qPic_p pic);
+//===============
+//   TYPES
+//===============
+typedef enum {
+    CMP_NONE = 0,
+    CMP_LZSS = 1
+} CmpType;
+
+typedef enum {
+    TYP_NONE    = 0,
+    TYP_LABEL   = 1,
+
+    TYP_LUMPY   = 64,   // base offset for grab command number
+    TYP_PALETTE = 64,
+    TYP_QTEX    = 65,
+    TYP_QPIC    = 66,
+    TYP_SOUND   = 67,
+    TYP_MIPTEX  = 68
+} TypType;
+
+typedef struct {
+    int32_t filepos;
+    int32_t disksize;
+    int32_t size;           // uncompressed
+    char    type;           // TypType ?
+    char    compression;    // CmpType ?
+    char    pad1, pad2;
+    char    name[LUMP_NAME_LEN]; // must be null terminated
+} LumpInfo_t;
+typedef LumpInfo_t* LumpInfo_p;
+
+static LumpInfo_p  _LumpsBase;
+static int32_t     _NumLumps;
+static uint8_p     _wadBase;
+
+typedef struct {
+    char    ID[4];		// should be WAD2 or 2DAW
+    int32_t numLumps;
+    int32_t infoTableOfs;
+} WadInfo_t;
+typedef WadInfo_t* WadInfo_p;
+
 
 /*
     ==================
@@ -42,21 +82,19 @@ uint8_p     wad_base;
     Can safely be performed in place.
     ==================
 */
-void W_CleanupName(cString in, cString out) {
+void W_CleanupName(cStringRO in, cString out) {
     int i = 0;
     for (; i < LUMP_NAME_LEN; i++) {
         char c = in[i];
         if (!c) break;
 
-        if ((c >= 'A') && (c <= 'Z')) c += ('a' - 'A');
+        if ((c >= 'A') && (c <= 'Z'))   c += ('a' - 'A');
         out[i] = c;
     }
 
     for (; i < LUMP_NAME_LEN; i++)
-        out[i] = 0;
+        out[i] = 0x00;
 }
-
-
 
 /*
     ====================
@@ -64,31 +102,31 @@ void W_CleanupName(cString in, cString out) {
     ====================
 */
 void W_LoadWadFile(cStringRO filename) {
-    wad_base = COM_LoadHunkFile(filename);
-    if (!wad_base)
+    _wadBase = COM_LoadHunkFile(filename);
+    if (!_wadBase)
         Sys_Error("W_LoadWadFile: couldn't load %s", filename);
 
-    WadInfo_p header = (WadInfo_p)wad_base;
+    WadInfo_p header = (WadInfo_p)_wadBase;
 
     if (
-        (header->identification[0] != 'W') ||
-        (header->identification[1] != 'A') ||
-        (header->identification[2] != 'D') ||
-        (header->identification[3] != '2')
+        (header->ID[0] != 'W') ||
+        (header->ID[1] != 'A') ||
+        (header->ID[2] != 'D') ||
+        (header->ID[3] != '2')
         )
         Sys_Error("Wad file %s doesn't have WAD2 id\n", filename);
 
-    wad_numlumps = LittleLong(header->numlumps);
-    int infotableofs = LittleLong(header->infotableofs);
-    wad_lumps = (LumpInfo_p)(wad_base + infotableofs);
+    _NumLumps = LittleLong(header->numLumps);
+    int infoTableOfs = LittleLong(header->infoTableOfs);
+    _LumpsBase = (LumpInfo_p)(_wadBase + infoTableOfs);
 
-    LumpInfo_p lump_p = wad_lumps;
-    for (uint32_t i = 0; i < wad_numlumps; i++, lump_p++) {
+    LumpInfo_p lump_p = _LumpsBase;
+    for (uint32_t i = 0; i < _NumLumps; i++, lump_p++) {
         lump_p->filepos = LittleLong(lump_p->filepos);
         lump_p->size = LittleLong(lump_p->size);
         W_CleanupName(lump_p->name, lump_p->name);
         if (lump_p->type == TYP_QPIC)
-            SwapPic((qPic_p)(wad_base + lump_p->filepos));
+            SwapPic((qPic_p)(_wadBase + lump_p->filepos));
     }
 }
 
@@ -98,12 +136,12 @@ void W_LoadWadFile(cStringRO filename) {
     W_GetLumpinfo
     =============
 */
-LumpInfo_p W_GetLumpinfo(cString name) {
+LumpInfo_p W_GetLumpinfo(cStringRO name) {
     char clean[LUMP_NAME_LEN];
     W_CleanupName(name, clean);
 
-    LumpInfo_p lump_p = wad_lumps;
-    for (int32_t i = 0; i < wad_numlumps; i++, lump_p++) {
+    LumpInfo_p lump_p = _LumpsBase;
+    for (int32_t i = 0; i < _NumLumps; i++, lump_p++) {
         if (!strncmp(clean, lump_p->name, LUMP_NAME_LEN))
             return lump_p;
     }
@@ -112,17 +150,17 @@ LumpInfo_p W_GetLumpinfo(cString name) {
     return NULL;
 }
 
-TypeLess_ptr W_GetLumpName(cString name) {
-    return (TypeLess_ptr)(wad_base + W_GetLumpinfo(name)->filepos);
+TypeLess_ptr W_GetLumpName(cStringRO name) {
+    return (TypeLess_ptr)(_wadBase + W_GetLumpinfo(name)->filepos);
 }
 
 TypeLess_ptr W_GetLumpNum(int32_t num) {
     if ((num < 0) ||
-        (num > wad_numlumps)
+        (num > _NumLumps)
         )
         Sys_Error("W_GetLumpNum: bad number: %i", num);
 
-    return (TypeLess_ptr)(wad_base + (wad_lumps + num)->filepos);
+    return (TypeLess_ptr)(_wadBase + (_LumpsBase + num)->filepos);
 }
 
 /*
@@ -133,7 +171,4 @@ TypeLess_ptr W_GetLumpNum(int32_t num) {
     =============================================================================
 */
 
-void SwapPic(qPic_p pic) {
-    pic->width = LittleLong(pic->width);
-    pic->height = LittleLong(pic->height);
-}
+

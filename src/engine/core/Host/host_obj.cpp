@@ -61,19 +61,21 @@ Memory is cleared / released when a server or client begins, not when they end.
 
 */
 
-QuakeParms_t host_parms;
-bool host_initialized;  // true if into command execution
-double host_frametime;
-double host_time;
-double realtime;    // without any filtering or bounding
-double oldrealtime;   // last frame run
-int32_t host_framecount;
-int host_hunklevel;
-int minimum_memory;
-client_p host_client;   // current client
-jmp_buf  host_abortserver;
-uint8_p host_basepal;
-uint8_p host_colormap;
+#if 1
+    QuakeParms_t host_parms;
+    bool host_initialized;  // true if into command execution
+    double host_frametime;
+    double host_time;
+    double realtime;    // without any filtering or bounding
+    double oldrealtime;   // last frame run
+    int32_t host_framecount;
+    int host_hunklevel;
+    int minimum_memory;
+    client_p host_client;   // current client
+    jmp_buf  host_abortserver;
+    uint8_p host_basepal;
+    uint8_p host_colormap;
+#endif
 
 
 

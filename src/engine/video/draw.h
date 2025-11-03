@@ -21,7 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // draw.h -- these are the only functions outside the refresh allowed
 // to touch the vid buffer
-#include "wad.h"
+// #include "wad.h"
+#include "qPic.h"
+
+
 #define CHAR_WIDTH  (8)
 #define CHAR_HEIGHT (8)
 
@@ -29,11 +32,12 @@ extern qPic_p draw_disc;	// also used on sbar
 #ifdef __cplusplus
 extern "C" {
 #endif
+
     void    Draw_Init();
 
     void    Draw_Character(int x, int y, int num);
     void    Draw_DebugChar(char num);
-    void    Draw_String(int x, int y, cString str);
+    void    Draw_String(int x, int y, cStringRO str);
 
     void    Draw_Pic(int x, int y, qPic_p pic);
     void    Draw_TransPic(int x, int y, qPic_p pic);
@@ -47,8 +51,8 @@ extern "C" {
     void    Draw_Fill(int x, int y, int w, int h, int c);
 
     void    Draw_FadeScreen();
-    qPic_p  Draw_PicFromWad(cString name);
-    qPic_p  Draw_CachePic(cString path);
+    qPic_p  Draw_PicFromWad(cStringRO name);
+    qPic_p  Draw_CachePic(cStringRO path);
 
 #ifdef __cplusplus
 }

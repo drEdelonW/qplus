@@ -53,7 +53,7 @@ void Cmd_Alias_f() {
     strcpy(aliasIt->name, _argSt);
 
     // copy the rest of the command line
-    char cmd[1024] = {0}; // start out with a null string
+    char cmd[1024] = { 0 }; // start out with a null string
     int argCnt = Cmd_Argc();
     for (int i = 2; i < argCnt; i++) {
         strcat(cmd, Cmd_Argv(i));
@@ -69,7 +69,8 @@ void Cmd_Alias_f() {
 extern cString cmd_argv[];
 bool checkAlias() {
     for (CmdAlias_p aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
-        if (!Q_strcasecmp(cmd_argv[0], aliasIt->name)) {
+        if (!Q_strcasecmp(cmd_argv[0], aliasIt->name)
+            ) {
             Cbuf_InsertText(aliasIt->value);
             return true;
         }
