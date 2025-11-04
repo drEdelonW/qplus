@@ -60,7 +60,7 @@ void D_Sky_uv_To_st(int u, int v, fixed16_t* s, fixed16_t* t) {
 D_DrawSkyScans8
 =================
 */
-void D_DrawSkyScans8(eSpan_t* pspan) {
+void D_DrawSkyScans8(eSpan_p pspan) {
     fixed16_t  s, t, snext, tnext;
     fixed16_t sstep = 0; // keep compiler happy
     fixed16_t tstep = 0; // ditto

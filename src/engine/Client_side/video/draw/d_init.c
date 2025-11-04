@@ -29,7 +29,7 @@ bool        d_roverwrapped;
 int         d_minmip;
 float       d_scalemip[NUM_MIPS - 1];
 
-static float	_BaseMip[NUM_MIPS - 1] = { 1.0, 0.5 * 0.8, 0.25 * 0.8 };
+static float _BaseMip[NUM_MIPS - 1] = { 1.0, 0.5 * 0.8, 0.25 * 0.8 };
 
 void (*d_drawspans) (eSpan_p pspan);
 

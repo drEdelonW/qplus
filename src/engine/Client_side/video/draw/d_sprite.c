@@ -296,9 +296,9 @@ D_SpriteCalculateGradients
 =====================
 */
 void D_SpriteCalculateGradients() {
-    vec3_t p_normal;    TransformVector(r_spritedesc.vpn, p_normal);
-    vec3_t p_saxis; TransformVector(r_spritedesc.vright, p_saxis);
-    vec3_t p_taxis; TransformVector(r_spritedesc.vup, p_taxis);
+    vec3_t p_normal; TransformVector(r_spritedesc.vpn, p_normal);
+    vec3_t p_saxis;  TransformVector(r_spritedesc.vright, p_saxis);
+    vec3_t p_taxis;  TransformVector(r_spritedesc.vup, p_taxis);
     VectorInverse(p_taxis);
 
     float distinv = 1.0 / (-DotProduct(modelorg, r_spritedesc.vpn));

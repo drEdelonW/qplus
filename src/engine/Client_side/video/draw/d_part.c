@@ -164,14 +164,13 @@ void D_DrawParticle(Particle_p pparticle) {
     default: {
         int count = pix << d_y_aspect_shift;
 
-        for (; count; count--, pz += d_zwidth, pdest += screenwidth) {
-            for (int i = 0; i < pix; i++) {
+        for (; count; count--, pz += d_zwidth, pdest += screenwidth)
+            for (int i = 0; i < pix; i++)
                 if (pz[i] <= izi) {
                     pz[i] = izi;
                     pdest[i] = pparticle->color;
                 }
-            }
-        }
+
     }   break;
     }
 }

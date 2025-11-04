@@ -58,7 +58,7 @@ typedef CachePic_t* CachePic_p;
 
 #define MAX_CACHED_PICS  128
 static CachePic_t _menu_cachepics[MAX_CACHED_PICS];
-static int _menu_numcachepics;
+static int _menu_numcachepics = 0;
 
 
 qPic_p Draw_PicFromWad(cStringRO name) {
@@ -80,6 +80,7 @@ qPic_p Draw_CachePic(cStringRO path) {
     if (i == _menu_numcachepics) {
         if (_menu_numcachepics == MAX_CACHED_PICS)
             Sys_Error("_menu_numcachepics == MAX_CACHED_PICS");
+
         _menu_numcachepics++;
         strcpy(pic->name, path);
     }
@@ -94,9 +95,8 @@ qPic_p Draw_CachePic(cStringRO path) {
     COM_LoadCacheFile(path, &pic->cache);
 
     dat = (qPic_p)pic->cache.data;
-    if (!dat) {
+    if (!dat)
         Sys_Error("Draw_CachePic: failed to load %s", path);
-    }
 
     SwapPic(dat);
 
@@ -166,28 +166,10 @@ void Draw_Character(int x, int y, int num) {
         uint8_p dest = vid.conbuffer + y * vid.conrowbytes + x;
 
         while (drawline--) {
-#if 0
             for (int i = 0; i < 8; i++)
-                if (source[i])
+                if (source[i])  // 0 is transparent
                     dest[i] = source[i];
-#else
-            if (source[0])
-                dest[0] = source[0];
-            if (source[1])
-                dest[1] = source[1];
-            if (source[2])
-                dest[2] = source[2];
-            if (source[3])
-                dest[3] = source[3];
-            if (source[4])
-                dest[4] = source[4];
-            if (source[5])
-                dest[5] = source[5];
-            if (source[6])
-                dest[6] = source[6];
-            if (source[7])
-                dest[7] = source[7];
-#endif
+
             source += 128;
             dest += vid.conrowbytes;
         }
@@ -198,28 +180,10 @@ void Draw_Character(int x, int y, int num) {
             ((uint8_p)vid.conbuffer + y * vid.conrowbytes + (x << 1));
 
         while (drawline--) {
-#if 0
             for (int i = 0; i < 8; i++)
-                if (source[i])
+                if (source[i])   // 0 is transparent
                     pusdest[i] = d_8to16table[source[i]];
-#else
-            if (source[0])
-                pusdest[0] = d_8to16table[source[0]];
-            if (source[1])
-                pusdest[1] = d_8to16table[source[1]];
-            if (source[2])
-                pusdest[2] = d_8to16table[source[2]];
-            if (source[3])
-                pusdest[3] = d_8to16table[source[3]];
-            if (source[4])
-                pusdest[4] = d_8to16table[source[4]];
-            if (source[5])
-                pusdest[5] = d_8to16table[source[5]];
-            if (source[6])
-                pusdest[6] = d_8to16table[source[6]];
-            if (source[7])
-                pusdest[7] = d_8to16table[source[7]];
-#endif
+
             source += 128;
             pusdest += (vid.conrowbytes >> 1);
         }
@@ -299,9 +263,8 @@ void Draw_Pic(int x, int y, qPic_p pic) {
         uint16_p pusdest = (uint16_p)vid.buffer + y * (vid.rowbytes >> 1) + x;
 
         for (int v = 0; v < pic->height; v++) {
-            for (int u = 0; u < pic->width; u++) {
+            for (int u = 0; u < pic->width; u++)
                 pusdest[u] = d_8to16table[source[u]];
-            }
 
             pusdest += vid.rowbytes >> 1;
             source += pic->width;
@@ -342,12 +305,11 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
         }
         else { // unwound
             for (int v = 0; v < pic->height; v++) {
-                for (int u = 0; u < pic->width; u += 8) {
+                for (int u = 0; u < pic->width; u += 8)
                     for (int i = 0; i < 8; i++)
                         if ((tbyte = source[u + i]) != TRANSPARENT_COLOR)
                             dest[u + i] = tbyte;
 
-                }
                 dest += vid.rowbytes;
                 source += pic->width;
             }
@@ -360,9 +322,8 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
                 uint8_t tbyte = source[u];
-                if (tbyte != TRANSPARENT_COLOR) {
+                if (tbyte != TRANSPARENT_COLOR)
                     pusdest[u] = d_8to16table[tbyte];
-                }
             }
 
             pusdest += vid.rowbytes >> 1;
@@ -423,9 +384,8 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
             for (int u = 0; u < pic->width; u++) {
                 tbyte = source[u];
 
-                if (tbyte != TRANSPARENT_COLOR) {
+                if (tbyte != TRANSPARENT_COLOR)
                     pusdest[u] = d_8to16table[tbyte];
-                }
             }
 
             pusdest += vid.rowbytes >> 1;
@@ -492,14 +452,10 @@ void Draw_ConsoleBackground(int lines) {
                 int f = 0;
                 int fstep = 320 * 0x10000 / vid.conwidth;
                 for (int x = 0; x < vid.conwidth; x += 4) {
-                    dest[x] = src[f >> 16];
-                    f += fstep;
-                    dest[x + 1] = src[f >> 16];
-                    f += fstep;
-                    dest[x + 2] = src[f >> 16];
-                    f += fstep;
-                    dest[x + 3] = src[f >> 16];
-                    f += fstep;
+                    dest[x + 0] = src[f >> 16];     f += fstep;
+                    dest[x + 1] = src[f >> 16];     f += fstep;
+                    dest[x + 2] = src[f >> 16];     f += fstep;
+                    dest[x + 3] = src[f >> 16];     f += fstep;
                 }
             }
         }
@@ -515,14 +471,10 @@ void Draw_ConsoleBackground(int lines) {
             int f = 0;
             int fstep = 320 * 0x10000 / vid.conwidth;
             for (int x = 0; x < vid.conwidth; x += 4) {
-                pusdest[x] = d_8to16table[src[f >> 16]];
-                f += fstep;
-                pusdest[x + 1] = d_8to16table[src[f >> 16]];
-                f += fstep;
-                pusdest[x + 2] = d_8to16table[src[f >> 16]];
-                f += fstep;
-                pusdest[x + 3] = d_8to16table[src[f >> 16]];
-                f += fstep;
+                pusdest[x + 0] = d_8to16table[src[f >> 16]];    f += fstep;
+                pusdest[x + 1] = d_8to16table[src[f >> 16]];    f += fstep;
+                pusdest[x + 2] = d_8to16table[src[f >> 16]];    f += fstep;
+                pusdest[x + 3] = d_8to16table[src[f >> 16]];    f += fstep;
             }
         }
     }
@@ -587,7 +539,6 @@ void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
                 if (t != TRANSPARENT_COLOR)
                     *pdest = d_8to16table[t];
 
-
                 psrc++;
                 pdest++;
             }
@@ -620,7 +571,6 @@ refresh window.
 =============
 */
 void Draw_TileClear(int x, int y, int w, int h) {
-
     _rRectDesc.rect.x = x;
     _rRectDesc.rect.y = y;
     _rRectDesc.rect.width = w;
@@ -635,10 +585,8 @@ void Draw_TileClear(int x, int y, int w, int h) {
         vr.x = _rRectDesc.rect.x;
         int width = _rRectDesc.rect.width;
 
-        if (tileoffsety != 0)
-            vr.height = _rRectDesc.height - tileoffsety;
-        else
-            vr.height = _rRectDesc.height;
+        if (tileoffsety != 0)   vr.height = _rRectDesc.height - tileoffsety;
+        else                    vr.height = _rRectDesc.height;
 
         if (vr.height > height)
             vr.height = height;
@@ -646,10 +594,8 @@ void Draw_TileClear(int x, int y, int w, int h) {
         int tileoffsetx = vr.x % _rRectDesc.width;
 
         while (width > 0) {
-            if (tileoffsetx != 0)
-                vr.width = _rRectDesc.width - tileoffsetx;
-            else
-                vr.width = _rRectDesc.width;
+            if (tileoffsetx != 0)   vr.width = _rRectDesc.width - tileoffsetx;
+            else                    vr.width = _rRectDesc.width;
 
             if (vr.width > width)
                 vr.width = width;
@@ -657,12 +603,8 @@ void Draw_TileClear(int x, int y, int w, int h) {
             uint8_p psrc = _rRectDesc.pTexBytes +
                 (tileoffsety * _rRectDesc.rowBytes) + tileoffsetx;
 
-            if (r_pixbytes == 1) {
-                R_DrawRect8(&vr, _rRectDesc.rowBytes, psrc, 0);
-            }
-            else {
-                R_DrawRect16(&vr, _rRectDesc.rowBytes, psrc, 0);
-            }
+            if (r_pixbytes == 1) { R_DrawRect8(&vr, _rRectDesc.rowBytes, psrc, 0); }
+            else { ;              R_DrawRect16(&vr, _rRectDesc.rowBytes, psrc, 0); }
 
             vr.x += vr.width;
             width -= vr.width;
@@ -707,23 +649,18 @@ Draw_FadeScreen
 ================
 */
 void Draw_FadeScreen() {
-    VID_UnlockBuffer();
-    S_ExtraUpdate();
-    VID_LockBuffer();
+    VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
 
     for (int y = 0; y < vid.height; y++) {
         uint8_p pbuf = (uint8_p)(vid.buffer + vid.rowbytes * y);
         int t = (y & 1) << 1;
 
-        for (int x = 0; x < vid.width; x++) {
+        for (int x = 0; x < vid.width; x++)
             if ((x & 3) != t)
                 pbuf[x] = 0;
-        }
     }
 
-    VID_UnlockBuffer();
-    S_ExtraUpdate();
-    VID_LockBuffer();
+    VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
 }
 
 //=============================================================================

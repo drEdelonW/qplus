@@ -19,9 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_vars.c: global refresh variables
 
-#if	!id386
+#if !id386
 
-#include "mathlib.h"
+#include "types.h"
 #include "vid.h"
 
 
@@ -35,18 +35,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // FIXME: make into one big structure, like cl or sv
 // FIXME: do separately for refresh engine and driver
 
-float	d_sdivzstepu, d_tdivzstepu, d_zistepu;
-float	d_sdivzstepv, d_tdivzstepv, d_zistepv;
-float	d_sdivzorigin, d_tdivzorigin, d_ziorigin;
+float d_sdivzstepu, d_tdivzstepu, d_zistepu;
+float d_sdivzstepv, d_tdivzstepv, d_zistepv;
+float d_sdivzorigin, d_tdivzorigin, d_ziorigin;
 
-fixed16_t	sadjust, tadjust, bbextents, bbextentt;
+fixed16_t sadjust, tadjust, bbextents, bbextentt;
 
 pixel_p cacheblock;
-int				cachewidth;
+int     cachewidth;
 pixel_p d_viewbuffer;
-int16_t			*d_pzbuffer;
-uint32_t	d_zrowbytes;
-uint32_t	d_zwidth;
+int16_p d_pzbuffer;
+uint32_t d_zrowbytes;
+uint32_t d_zwidth;
 
-#endif	// !id386
+#endif // !id386
 

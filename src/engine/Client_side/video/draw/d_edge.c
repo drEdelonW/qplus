@@ -180,9 +180,8 @@ void D_DrawSurfaces() {
             d_ziorigin = surf->d_ziorigin;
 
             if (surf->flags & SURF_DRAWSKY) {
-                if (!r_skymade) {
+                if (!r_skymade)
                     R_MakeSky();
-                }
 
                 D_DrawSkyScans8(surf->spans);
                 D_DrawZSpans(surf->spans);

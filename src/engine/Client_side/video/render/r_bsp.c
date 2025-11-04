@@ -49,7 +49,7 @@ static mVertex_p    _pbVerts;
 static bEdge_p      _pbEdges;
 static int          _numbVerts, _numbEges;
 static mVertex_p    _pFrontEnter, _pFrontExit;
-static bool     _makeClippedEdge;
+static bool         _makeClippedEdge;
 
 
 //===========================================================================

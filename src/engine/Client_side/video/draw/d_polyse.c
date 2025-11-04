@@ -34,7 +34,10 @@ typedef struct {
     int16_p         pz;
     int             count;
     uint8_p         ptex;
-    int             sfrac, tfrac, light, zi;
+    int             sfrac;
+    int             tfrac;
+    int             light;
+    int             zi;
 } SpanPackage_t;
 typedef SpanPackage_t* SpanPackage_p;
 
@@ -190,11 +193,9 @@ void D_DrawSubdiv() {
 
         if (ptri[i].facesfront) { D_PolysetRecursiveTriangle(index0->v, index1->v, index2->v); }
         else {
-            int  s0, s1, s2;
-
-            s0 = index0->v[2];
-            s1 = index1->v[2];
-            s2 = index2->v[2];
+            int s0 = index0->v[2];
+            int s1 = index1->v[2];
+            int s2 = index2->v[2];
 
             if (index0->flags & ALIAS_ONSEAM)   index0->v[2] += r_affinetridesc.seamfixupX16;
             if (index1->flags & ALIAS_ONSEAM)   index1->v[2] += r_affinetridesc.seamfixupX16;
@@ -532,9 +533,8 @@ void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
             d_aspancount += d_countextrastep;
             errorterm -= erroradjustdown;
         }
-        else {
-            d_aspancount += ubasestep;
-        }
+        else d_aspancount += ubasestep;
+
 
         if (lcount) {
             uint8_p lpdest = pspanpackage->pdest;
@@ -607,7 +607,10 @@ D_RasterizeAliasPolySmooth
 */
 void D_RasterizeAliasPolySmooth() {
     int    initialleftheight, initialrightheight;
-    int* plefttop, * prighttop, * pleftbottom, * prightbottom;
+    int* plefttop;
+    int* prighttop;
+    int* pleftbottom;
+    int* prightbottom;
     int    working_lstepx, originalcount;
 
     plefttop = pedgetable->pLeftEdgeVert0;
@@ -873,7 +876,7 @@ void D_PolysetSetEdgeTable() {
             return;
         }
         else    edgetableindex = 1;
-        
+
     }
 
     if (r_p0[1] == r_p2[1]) {

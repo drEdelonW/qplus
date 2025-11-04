@@ -217,7 +217,7 @@ CVAR(scr_printspeed, "8");
 
 // FROM: src/ui/screen.c
 CVAR(d_subdiv16, "1");
-CVAR(d_mipcap, "0");
+CVAR_ARC(d_mipcap, "0");
 CVAR(d_mipscale, "1");
 
 // FROM: src/ui/chase.c

@@ -660,25 +660,17 @@ void R_AliasDrawModel(aLight_p plighting) {
         (currententity->trivial_accept == 3) &&
         r_recursiveaffinetriangles;
 
-    if (r_affinetridesc.drawtype) {
-        D_PolysetUpdateTables();  // FIXME: precalc...
-    }
+    if (r_affinetridesc.drawtype)   D_PolysetUpdateTables();  // FIXME: precalc...
 #if id386
-    else {
-        D_Aff8Patch(currententity->colormap);
-    }
+    else                            D_Aff8Patch(currententity->colormap);
 #endif
 
     acolormap = currententity->colormap;
 
-    if (currententity != &cl.viewent)
-        _ziscale = (float)0x8000 * (float)0x10000;
-    else
-        _ziscale = (float)0x8000 * (float)0x10000 * 3.0;
+    if (currententity != &cl.viewent)   _ziscale = (float)0x8000 * (float)0x10000;
+    else                                _ziscale = (float)0x8000 * (float)0x10000 * 3.0;
 
-    if (currententity->trivial_accept)
-        R_AliasPrepareUnclippedPoints();
-    else
-        R_AliasPreparePoints();
+    if (currententity->trivial_accept)  R_AliasPrepareUnclippedPoints();
+    else                                R_AliasPreparePoints();
 }
 
