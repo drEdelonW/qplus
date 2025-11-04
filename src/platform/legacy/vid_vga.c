@@ -30,7 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vid_dos.h"
 #include <dpmi.h>
 
-extern regs_t regs;
 
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
 uint8_p VGA_pagebase;

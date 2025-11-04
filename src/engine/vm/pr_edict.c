@@ -36,15 +36,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "cvar_q1.h"
 
-/* extern */ dprograms_p    progs;
-/* extern */ dFunction_p    pr_functions;
-/* extern */ cString        pr_strings;         // much more
-/* extern */ dDef_p         pr_fielddefs;
-/* extern */ dDef_p         pr_globaldefs;
-/* extern */ dStatement_p   pr_statements;
-/* extern */ globalvars_p   pr_global_struct;   // much more
-/* extern */ float_p        pr_globals;         // same as pr_global_struct
-/* extern */ int32_t        pr_edict_size;      // in bytes
+dprograms_p    progs;
+dFunction_p    pr_functions;
+cString        pr_strings;         // much more
+dDef_p         pr_fielddefs;
+dDef_p         pr_globaldefs;
+dStatement_p   pr_statements;
+globalvars_p   pr_global_struct;   // much more
+float_p        pr_globals;         // same as pr_global_struct
+int32_t        pr_edict_size;      // in bytes
 
 uint16_t pr_crc;
 

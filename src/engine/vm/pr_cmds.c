@@ -550,7 +550,6 @@ void PF_traceline() {
 }
 
 #ifdef QUAKE2
-extern trace_t SV_Trace_Toss(edict_p ent, edict_p ignore);
 
 void PF_TraceToss() {
     edict_p ent = G_EDICT(OFS_PARM0);

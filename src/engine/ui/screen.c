@@ -120,13 +120,13 @@ void SCR_DrawCenterString() {
 
     do {
         // scan the width of the line
-        int l = 0;
-        for (; l < 40; l++)
-            if ((start[l] == '\n') || !start[l])
+        int inLine = 0;
+        for (; inLine < 40; inLine++)
+            if ((start[inLine] == '\n') || !start[inLine])
                 break;
 
-        int x = (vid.width - l * 8) / 2;
-        for (int j = 0; j < l; j++, x += 8) {
+        int x = (vid.width - inLine * 8) / 2;
+        for (int j = 0; j < inLine; j++, x += 8) {
             Draw_Character(x, y, start[j]);
             if (!remaining--)
                 return;
@@ -170,11 +170,11 @@ float CalcFov(float fov_x, float width, float height) {
         Sys_Error("Bad fov: %f", fov_x);
 
     float x = width / tan(fov_x / 360 * M_PI);
-    float a = atan(height / x);
+    float at = atan(height / x);
 
-    a = a * 360 / M_PI;
+    at = at * 360 / M_PI;
 
-    return a;
+    return at;
 }
 
 /*
@@ -357,14 +357,14 @@ SCR_DrawTurtle
 ==============
 */
 void SCR_DrawTurtle() {
-    static int count;
+    static int _cnt;
 
     if (!scr_showturtle.value)  return;
 
-    if (host_frametime < 0.1) { count = 0;  return; }
+    if (host_frametime < 0.1) { _cnt = 0;  return; }
 
-    count++;
-    if (count < 3)  return;
+    _cnt++;
+    if (_cnt < 3)  return;
 
     Draw_Pic(scr.vrect.x, scr.vrect.y, _scr.turtle);
 }
@@ -534,12 +534,12 @@ void SCR_DrawNotifyString() {
 
     do {
         // scan the width of the line
-        int l = 0;
-        for (; l < 40; l++)
-            if ((start[l] == '\n') || !start[l])    break;
+        int inLine = 0;
+        for (; inLine < 40; inLine++)
+            if ((start[inLine] == '\n') || !start[inLine])    break;
 
-        int x = (vid.width - l * 8) / 2;
-        for (int j = 0; j < l; j++, x += 8)
+        int x = (vid.width - inLine * 8) / 2;
+        for (int j = 0; j < inLine; j++, x += 8)
             Draw_Character(x, y, start[j]);
 
         y += 8;

@@ -40,6 +40,7 @@ typedef enum {
 } cmd_source_t;
 
 extern cmd_source_t cmd_source;
+extern cString cmd_argv[];
 
 #ifdef __cplusplus
 extern "C" {

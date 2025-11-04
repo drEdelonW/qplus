@@ -62,7 +62,6 @@ static aEdge_t _aEdges[12] = {
     {0, 5}, {1, 4}, {2, 7}, {3, 6}
 };
 
-#define NUMVERTEXNORMALS 162
 
 float r_avertexnormals[NUMVERTEXNORMALS][3] = {
 #   include "anorms.h"

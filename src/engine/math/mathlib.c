@@ -24,8 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include "sys.h"    // void Sys_Error(cString error, ...);
 
-/* extern */ vec3_t vec3_origin = { 0.0f, 0.0f, 0.0f };
-/* extern */ uint32_t nanmask = 0xFF << 23;
+vec3_t vec3_origin = { 0.0f, 0.0f, 0.0f };
+uint32_t nanmask = 0xFF << 23;
 
 /*-----------------------------------------------------------------*/
 

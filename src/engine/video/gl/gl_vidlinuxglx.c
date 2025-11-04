@@ -595,7 +595,6 @@ GL_BeginRendering
 =================
 */
 void GL_BeginRendering(int* x, int* y, int* width, int* height) {
-    extern cvar_t gl_clear;
 
     *x = *y = 0;
     *width = scr_width;

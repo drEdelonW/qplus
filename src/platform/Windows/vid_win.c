@@ -28,7 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 bool	dibonly;
 
-extern bool		Minimized;
 
 HWND		mainwindow;
 
@@ -2781,13 +2780,6 @@ LONG WINAPI MainWndProc(
     return lRet;
 }
 
-
-extern void M_Menu_Options_f(void);
-extern void M_Print(int cx, int cy, cString str);
-extern void M_PrintWhite(int cx, int cy, cString str);
-extern void M_DrawCharacter(int cx, int line, int num);
-extern void M_DrawTransPic(int x, int y, qPic_t* pic);
-extern void M_DrawPic(int x, int y, qPic_t* pic);
 
 static int	vid_line, vid_wmodes;
 

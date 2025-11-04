@@ -252,9 +252,6 @@ Texture_t* R_TextureAnimation(Texture_t* base) {
 */
 
 
-extern	int		solidskytexture;
-extern	int		alphaskytexture;
-extern	float	speedscale;		// for top sky and bottom sky
 
 void DrawGLWaterPoly(glpoly_t* p);
 void DrawGLWaterPolyLightmap(glpoly_t* p);
@@ -1501,7 +1498,6 @@ with all the surfaces from all brush models
 void GL_BuildLightmaps(void) {
 	int		i, j;
 	Model_t* m;
-	extern bool isPermedia;
 
 	memset(allocated, 0, sizeof(allocated));
 

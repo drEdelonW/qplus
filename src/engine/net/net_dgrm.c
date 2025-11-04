@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "screen.h"
 #include "q_tools.h"
 #include "msg.h"
+#include "menu_prv.h"
 
 
 #define BAN_TEST
@@ -91,9 +92,6 @@ struct {
     uint32_t sequence;
     uint8_t data[MAX_DATAGRAM];
 } packetBuffer;
-
-extern bool m_return_onerror;
-extern char m_return_reason[32];
 
 
 #ifdef DEBUG
@@ -449,6 +447,7 @@ void NET_Stats_f() {
     else if (Q_strcmp(Cmd_Argv(1), "*") == 0) {
         for (qsocket_p s = net_activeSockets; s; s = s->next)
             PrintStats(s);
+
         for (qsocket_p s = net_freeSockets; s; s = s->next)
             PrintStats(s);
     }

@@ -136,7 +136,6 @@ void R_LineGraph(int x, int y, int h) {
     ==============
 */
 #define MAX_TIMINGS (100)
-// extern float mouse_x, mouse_y;
 
 void R_TimeGraph() {
     static int timex;

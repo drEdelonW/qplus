@@ -29,6 +29,9 @@ typedef enum {
     VCR_MAX_MESSAGE      = 4  // highest valid opcode
 } vcr_opcode_t;
 
+extern int  vcrFile;
+#define VCR_SIGNATURE (uint32_t)(0x56435231)
+
 int VCR_Init();
 void VCR_Listen(bool state);
 void VCR_SearchForHosts(bool xmit);

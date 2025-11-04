@@ -668,8 +668,6 @@ void Host_Frame(float time) {
 //============================================================================
 
 
-extern int vcrFile;
-#define VCR_SIGNATURE 0x56435231
 // "VCR1"
 
 void Host_InitVCR(QuakeParms_p parms) {

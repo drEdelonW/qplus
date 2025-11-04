@@ -459,7 +459,6 @@ struct {
     int32_t len;
 } vcrGetMessage;
 
-extern void PrintStats(qsocket_p s);
 
 int32_t  NET_GetMessage(qsocket_p sock) {
     if (!sock)

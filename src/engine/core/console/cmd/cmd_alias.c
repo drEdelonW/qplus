@@ -66,7 +66,6 @@ void Cmd_Alias_f() {
     aliasIt->value = CopyString(cmd);
 }
 
-extern cString cmd_argv[];
 bool checkAlias() {
     for (CmdAlias_p aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
         if (!Q_strcasecmp(cmd_argv[0], aliasIt->name)

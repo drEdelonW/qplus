@@ -105,10 +105,6 @@ static int32_t X11_buffersize;
 int vid_surfcachesize;
 static TypeLess_ptr vid_surfcache;
 
-// extern void (*vid_menudrawfn)();
-// extern void (*vid_menukeyfn)(int key);
-// void VID_MenuKey(int key);
-
 typedef uint16_t PIXEL16;
 typedef uint32_t PIXEL24;
 static PIXEL16 st2d_8to16table[256];

@@ -21,18 +21,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "q_tools.h"
 #include "d_local.h"
+#include "r_local.h"
 #include "client.h"
 
 static int _miplevel;
 
 float  scale_for_mip;
-extern int   screenwidth;
 int   ubasestep, errorterm, erroradjustup, erroradjustdown;
 int   vstartscan;
-
-// FIXME: should go away
-extern void   R_RotateBmodel();
-extern void   R_TransformFrustum();
 
 vec3_t  transformed_modelorg;
 

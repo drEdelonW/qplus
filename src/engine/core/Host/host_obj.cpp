@@ -48,6 +48,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "screen.h"
 #include "q_tools.h"
 #include "msg.h"
+#include "net_vcr.h"
 
 
 /*
@@ -669,8 +670,6 @@ void Host::Frame(float time) {
 //============================================================================
 
 
-extern int vcrFile;
-#define VCR_SIGNATURE (uint32_t)(0x56435231)
 // "VCR1"
 
 void Host::InitVCR(QuakeParms_p parms) {

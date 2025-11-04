@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <wsipx.h>
 #include "net_wipx.h"
 
-extern cvar_t hostname;
 
 #define MAXHOSTNAMELEN		256
 
@@ -31,9 +30,8 @@ static int net_acceptsocket = -1;		// socket for fielding new connections
 static int net_controlsocket;
 static struct qsockaddr broadcastaddr;
 
-// extern qboolean winsock_initialized;
-extern int winsock_initialized;
-extern WSADATA		winsockdata;
+// extern int winsock_initialized;
+// extern WSADATA		winsockdata;
 
 #define IPXSOCKETS 18
 static int ipxsocket[IPXSOCKETS];

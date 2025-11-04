@@ -43,17 +43,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 
-/* extern */ ClientStatic_t cls;
-/* extern */ ClientState_t cl;
+ClientStatic_t cls;
+ClientState_t cl;
 // FIXME: put these on hunk?
-efrag_t         cl_efrags[MAX_EFRAGS];
-/* extern */ r_Entity_t      cl_entities[MAX_EDICTS];
-/* extern */ r_Entity_t      cl_static_entities[MAX_STATIC_ENTITIES];
-/* extern */ LightStyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
-/* extern */ dLight_t        cl_dlights[MAX_DLIGHTS];
+static efrag_t  cl_efrags[MAX_EFRAGS];
+r_Entity_t      cl_entities[MAX_EDICTS];
+r_Entity_t      cl_static_entities[MAX_STATIC_ENTITIES];
+LightStyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
+dLight_t        cl_dlights[MAX_DLIGHTS];
 
-/* extern */ int32_t    cl_numvisedicts;
-/* extern */ r_Entity_p cl_visedicts[MAX_VISEDICTS];
+int32_t    cl_numvisedicts;
+r_Entity_p cl_visedicts[MAX_VISEDICTS];
 
 /*
 =====================

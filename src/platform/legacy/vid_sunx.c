@@ -78,15 +78,6 @@ typedef struct
     char	desc[256];
 } modedesc_t;
 
-extern void M_Menu_Options_f();
-extern void M_Print(int cx, int cy, cString str);
-extern void M_PrintWhite(int cx, int cy, cString str);
-extern void M_DrawCharacter(int cx, int line, int num);
-extern void M_DrawTransPic(int x, int y, qPic_p pic);
-extern void M_DrawPic(int x, int y, qPic_p pic);
-
-extern int sb_updates;
-extern int x_root, y_root; // root window relative mouse coords
 
 typedef struct
 {

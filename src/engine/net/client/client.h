@@ -262,7 +262,6 @@ typedef struct {
 extern ClientState_t cl;
 
 // FIXME, allocate dynamically
-// extern efrag_t   cl_efrags[MAX_EFRAGS];
 extern r_Entity_t   cl_entities[MAX_EDICTS];
 extern r_Entity_t   cl_static_entities[MAX_STATIC_ENTITIES];
 extern LightStyle_t cl_lightstyle[MAX_LIGHTSTYLES];

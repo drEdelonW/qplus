@@ -50,7 +50,6 @@ eSpan_p span_p;
 eSpan_p max_span_p;
 
 int  r_currentkey;
-extern int screenwidth;
 int current_iv;
 int edge_head_u_shift20, edge_tail_u_shift20;
 

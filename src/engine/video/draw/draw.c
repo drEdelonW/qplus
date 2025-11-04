@@ -249,7 +249,6 @@ of the code.
 ================
 */
 void Draw_DebugChar(char num) {
-    // extern uint8_p _draw_chars;
 
     if (!vid.direct)
         return;  // don't have direct FB access, so no debugchars...

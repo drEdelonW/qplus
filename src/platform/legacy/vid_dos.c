@@ -61,7 +61,6 @@ vmode_t* pvidmodes;
 
 static int	firstupdate = 1;
 
-extern regs_t regs;
 
 void VID_TestMode_f();
 void VID_NumModes_f();
@@ -498,13 +497,6 @@ void D_EndDirectRect(int x, int y, int width, int height) {
 
 
 //===========================================================================
-
-extern void M_Menu_Options_f();
-extern void M_Print(int cx, int cy, cString str);
-extern void M_PrintWhite(int cx, int cy, cString str);
-extern void M_DrawCharacter(int cx, int line, int num);
-extern void M_DrawTransPic(int x, int y, qPic_p pic);
-extern void M_DrawPic(int x, int y, qPic_p pic);
 
 static int	vid_line, vid_wmodes, vid_column_size;
 

@@ -24,6 +24,7 @@
 #include "cvar_q1.h"
 #include "host.h"
 #include "q_tools.h"
+#include "net_vcr.h"
 
 
 bool isDedicated;
@@ -326,8 +327,6 @@ void Sys_LowFPPrecision() {}
 
 int main(int c, cStringArray v) {
     QuakeParms_t parms;
-    extern int vcrFile;
-    extern int recording;
 
     //	static char cwd[1024];
 

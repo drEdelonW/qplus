@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <windows.h>
 
-extern HWND mainwindow;
-extern cvar_t bgmvolume;
+// extern HWND mainwindow;
+// extern cvar_t bgmvolume;
 
 static bool cdValid = false;
 static bool playing = false;

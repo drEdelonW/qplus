@@ -1384,7 +1384,7 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
         VectorCopy(trace.endpos, tent->v.origin);
 
 #if 0
-        extern Particle_p active_particles, free_particles;
+        exter_n Particle_p active_particles, free_particles;
         Particle_p p = free_particles;
         if (p) {
             free_particles = p->next;

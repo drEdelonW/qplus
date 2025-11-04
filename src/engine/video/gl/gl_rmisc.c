@@ -160,8 +160,6 @@ R_Init
 ===============
 */
 void R_Init(void) {
-	extern byte* hunk_base;
-	extern cvar_t gl_finish;
 
 	Cmd_AddCommand("timerefresh", R_TimeRefresh_f);
 	Cmd_AddCommand("envmap", R_Envmap_f);
@@ -229,7 +227,6 @@ Translates a skin texture by the per-player color lookup
 	int			inwidth, inheight;
 	byte* inrow;
 	unsigned	frac, fracstep;
-	extern	byte** player_8bit_texels_tbl;
 
 	GL_DisableMultitexture();
 

@@ -40,11 +40,11 @@ static int32_t _pr_depth;
 static int32_t _localstack[LOCALSTACK_SIZE];
 static int32_t _localstack_used;
 
-/* extern */ bool	 pr_trace;
-/* extern */ dFunction_p pr_xfunction;
-/* extern */ int32_t     pr_xstatement;
-/* extern */ int32_t     pr_argc;
-/* extern */ cString     pr_opnames[OP_LAST] = {
+bool	 pr_trace;
+dFunction_p pr_xfunction;
+int32_t     pr_xstatement;
+int32_t     pr_argc;
+cString     pr_opnames[OP_LAST] = {
     "DONE",
 
     "MUL_F",

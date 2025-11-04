@@ -46,6 +46,7 @@ typedef sSpan_t* sSpan_p;
 
 
 extern float scale_for_mip;
+extern int   d_aflatcolor;
 
 extern bool  d_roverwrapped;
 extern SurfCache_p sc_rover;

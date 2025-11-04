@@ -81,8 +81,6 @@ struct {
     uint8_t data[MAX_DATAGRAM];
 } packetBuffer;
 
-extern bool m_return_onerror;
-extern char m_return_reason[32];
 
 
 #ifdef DEBUG

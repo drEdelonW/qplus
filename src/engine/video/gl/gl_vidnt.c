@@ -79,7 +79,6 @@ static bool	windowed, leavecurrentmode;
 static bool vid_canalttab = false;
 static bool vid_wassuspended = false;
 static int		windowed_mouse;
-extern bool	mouseactive;  // from in_win.c
 static HICON	hIcon;
 
 int			DIBWidth, DIBHeight;
@@ -624,7 +623,6 @@ GL_BeginRendering
 =================
 */
 void GL_BeginRendering(int* x, int* y, int* width, int* height) {
-    extern cvar_t gl_clear;
 
     *x = *y = 0;
     *width = WindowRect.right - WindowRect.left;
@@ -727,7 +725,6 @@ void	VID_SetPalette(unsigned char* palette) {
 BOOL	gammaworks;
 
 void	VID_ShiftPalette(unsigned char* palette) {
-    extern	byte ramps[3][256];
 
     //	VID_SetPalette (palette);
 
@@ -966,7 +963,6 @@ LONG WINAPI MainWndProc(
     LPARAM  lParam) {
     LONG    lRet = 1;
     int		fwKeys, xPos, yPos, fActive, fMinimized, temp;
-    extern unsigned int uiWheelMessage;
 
     if (uMsg == uiWheelMessage)
         uMsg = WM_MOUSEWHEEL;
@@ -1717,12 +1713,6 @@ void	VID_Init(unsigned char* palette) {
 // Video menu stuff
 //========================================================
 
-extern void M_Menu_Options_f(void);
-extern void M_Print(int cx, int cy, char* str);
-extern void M_PrintWhite(int cx, int cy, char* str);
-extern void M_DrawCharacter(int cx, int line, int num);
-extern void M_DrawTransPic(int x, int y, qPic_t* pic);
-extern void M_DrawPic(int x, int y, qPic_t* pic);
 
 static int	vid_line, vid_wmodes;
 

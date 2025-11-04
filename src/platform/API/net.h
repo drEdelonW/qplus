@@ -212,6 +212,7 @@ typedef struct {
     int32_t controlSock;
 } net_driver_t;
 
+extern bool recording;
 extern int32_t net_numdrivers;
 extern net_driver_t net_drivers[MAX_NET_DRIVERS];
 

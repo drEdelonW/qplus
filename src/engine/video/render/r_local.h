@@ -234,7 +234,6 @@ extern Edge_p   r_edges, edge_p, edge_max;
 extern Edge_p   newedges[MAXHEIGHT];
 extern Edge_p   removeedges[MAXHEIGHT];
 
-extern int screenwidth;
 
 // FIXME: make stack vars when debugging done
 extern Edge_t   edge_head;

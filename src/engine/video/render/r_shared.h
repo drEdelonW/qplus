@@ -59,6 +59,9 @@ extern vec3_t   vpn, base_vpn;
 extern vec3_t   vright, base_vright;
 extern r_Entity_p   currententity;
 
+#define NUMVERTEXNORMALS 162
+extern float r_avertexnormals[NUMVERTEXNORMALS][3];
+
 #define NUMSTACKEDGES       (2400)
 #define MINEDGES            NUMSTACKEDGES
 #define NUMSTACKSURFACES    (800)

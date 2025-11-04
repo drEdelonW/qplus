@@ -14,7 +14,6 @@ int _read(int, cStringArray, int) { errno = ENOSYS; return 0; }
 // int _getpid(void) { return 1; }
 
 // memory
-// extern char _end;
 // static cStringArray heap_end;
 // void* _sbrk(ptrdiff_t incr) { if (!heap_end) heap_end = &_end; cStringArray p = heap_end; heap_end += incr; return p; }
 

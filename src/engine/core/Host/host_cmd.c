@@ -37,6 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "screen.h"
 #include "q_tools.h"
 #include "msg.h"
+#include "menu_prv.h"
 
 /*
 ==================
@@ -44,7 +45,6 @@ Host_Quit_f
 ==================
 */
 
-extern void M_Menu_Quit_f();
 
 void Host_Quit_f() {
     if ((key.dest != key_console) &&

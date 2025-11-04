@@ -90,7 +90,6 @@ cvar_t gl_keeptjunctions = { "gl_keeptjunctions", "0" };
 cvar_t gl_reporttjunctions = { "gl_reporttjunctions", "0" };
 cvar_t gl_doubleeyes = { "gl_doubleeys", "1" };
 
-extern cvar_t gl_ztrick;
 
 /*
 =================
@@ -317,7 +316,6 @@ void GL_DrawAliasFrame(AliasHdr_t* paliashdr, int posenum) {
 GL_DrawAliasShadow
 =============
 */
-extern vec3_t   lightspot;
 
 void GL_DrawAliasShadow(AliasHdr_t* paliashdr, int posenum) {
     float s, t, l;
@@ -813,7 +811,6 @@ void R_SetupGL(void) {
     float screenaspect;
     float yfov;
     int  i;
-    extern int glwidth, glheight;
     int  x, x2, y2, y, w, h;
 
     //

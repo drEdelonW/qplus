@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // gl_warp.c -- sky and water polygons
 
 
-extern Model_t* loadmodel;
 
 int  skytexturenum;
 
@@ -30,7 +29,6 @@ float speedscale;  // for top sky and bottom sky
 
 mSurface_p warpface;
 
-extern cvar_t gl_subdivide_size;
 
 void BoundPoly(int numverts, float_p verts, vec3_t mins, vec3_t maxs) {
     int  i, j;
@@ -964,7 +962,6 @@ void R_InitSky(Texture_t* mt) {
     unsigned transpix;
     int   r, g, b;
     unsigned* rgba;
-    extern int   skytexturenum;
 
     src = (byte*)mt + mt->offsets[0];
 

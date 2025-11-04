@@ -21,17 +21,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "net.h"
 
+
 #include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 #if defined(__STM32__)
 #else
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   include <netdb.h>
 #   include <sys/ioctl.h>
 #endif
 #include <string.h>
 #include <sys/param.h>
 #include <errno.h>
+
 #include "sys.h"
 #include "console.h"
 #include "common.h"
@@ -45,9 +49,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef NeXT
 #  include <libc.h>
 #endif
-
-extern int gethostname(cString, int);
-extern int close(int);
 
 static int net_acceptsocket = -1;  // socket for fielding new connections
 static int net_controlsocket;
@@ -316,7 +317,6 @@ int UDP_StringToAddr(cString string, struct qsockaddr* addr) {
 }
 
 //=============================================================================
-extern uint32_t inet_addr(const cString cp);
 
 int UDP_GetSocketAddr(int socket, struct qsockaddr* addr) {
   socklen_t addrlen = sizeof(struct qsockaddr);

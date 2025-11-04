@@ -102,7 +102,6 @@ R_EntityParticles
 */
 
 #define NUMVERTEXNORMALS 162
-extern float r_avertexnormals[NUMVERTEXNORMALS][3];
 static vec3_t _aVelocities[NUMVERTEXNORMALS];
 static float _beamLength = 16;
 // vec3_t avelocity = { 23, 7, 3 }; // not used
