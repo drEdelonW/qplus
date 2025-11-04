@@ -47,7 +47,7 @@ void M_ScanSaves() {
 void M_Menu_Load_f() {
     m_entersound = true;
     m_state = m_load;
-    key_dest = key_menu;
+    key.dest = key_menu;
     M_ScanSaves();
 }
 
@@ -59,7 +59,7 @@ void M_Menu_Save_f() {
         return;
     m_entersound = true;
     m_state = m_save;
-    key_dest = key_menu;
+    key.dest = key_menu;
     M_ScanSaves();
 }
 
@@ -94,7 +94,7 @@ void M_Load_Key(keycode_t k) {
         if (!loadable[load_cursor])
             return;
         m_state = m_none;
-        key_dest = key_game;
+        key.dest = key_game;
 
         // Host_Loadgame_f can't bring up the loading plaque because too much
         // stack space has been used, so do it now
@@ -128,7 +128,7 @@ void M_Save_Key(keycode_t k) {
 
     case K_ENTER:
         m_state = m_none;
-        key_dest = key_game;
+        key.dest = key_game;
         Cbuf_AddText(va("save s%i\n", load_cursor));
         return;
 

@@ -19,7 +19,7 @@ typedef enum {
 static SinglePlayer_e _cursor;
 
 void M_Menu_SinglePlayer_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_singleplayer;
     m_entersound = true;
 }
@@ -36,8 +36,8 @@ void M_SinglePlayer_Draw() {
         Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame())));
 }
 
-void M_SinglePlayer_Key(keycode_t key) {
-    switch (key) {
+void M_SinglePlayer_Key(keycode_t Key) {
+    switch (Key) {
     case K_ESCAPE:  M_Menu_Main_f();    break;
 
     case K_DOWNARROW:
@@ -58,7 +58,7 @@ void M_SinglePlayer_Key(keycode_t key) {
             if ((sv.active) &&
                 (!SCR_ModalMessage("Are you sure you want to\nstart a new game?\n")))
                 break;
-            key_dest = key_game;
+            key.dest = key_game;
             if (sv.active)
                 Cbuf_AddText("disconnect\n");
             Cbuf_AddText("maxplayers 1\n");

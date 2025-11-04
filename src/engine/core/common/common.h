@@ -49,8 +49,6 @@ typedef struct {
 
 extern common_t com;
 
-extern struct cvar_s registered;
-
 extern bool standard_quake;
 extern bool rogue;
 extern bool hipnotic;

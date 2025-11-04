@@ -69,8 +69,8 @@ void M_Menu_Quit_f() {
     if (m_state == m_quit)
         return;
 
-    _wasInMenus = (key_dest == key_menu);
-    key_dest = key_menu;
+    _wasInMenus = (key.dest == key_menu);
+    key.dest = key_menu;
     _m_quitPrevState = m_state;
     m_state = m_quit;
     m_entersound = true;
@@ -78,8 +78,8 @@ void M_Menu_Quit_f() {
 }
 
 
-void M_Quit_Key(keycode_t key) {
-    switch ((char)key) {
+void M_Quit_Key(keycode_t Key) {
+    switch ((char)Key) {
     case K_ESCAPE:
     case 'n':
     case 'N':
@@ -88,14 +88,14 @@ void M_Quit_Key(keycode_t key) {
             m_entersound = true;
         }
         else {
-            key_dest = key_game;
+            key.dest = key_game;
             m_state = m_none;
         }
         break;
 
     case 'Y':
     case 'y':
-        key_dest = key_console;
+        key.dest = key_console;
         Host_Quit_f();
         break;
 

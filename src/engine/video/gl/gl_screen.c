@@ -140,7 +140,7 @@ for a few moments
 ==============
 */
 void SCR_CenterPrint(cString str) {
-	strncpy(scr_centerstring, str, sizeof(scr_centerstring)-1);
+	strncpy(scr_centerstring, str, sizeof(scr_centerstring) - 1);
 	scr_centertime_off = scr_centertime.value;
 	scr_centertime_start = cl.time;
 
@@ -171,17 +171,17 @@ void SCR_DrawCenterString(void) {
 	start = scr_centerstring;
 
 	if (scr_center_lines <= 4)
-		y = vid.height*0.35;
+		y = vid.height * 0.35;
 	else
 		y = 48;
 
 	do {
 		// scan the width of the line
-		for (l=0; l<40; l++)
+		for (l = 0; l < 40; l++)
 			if (start[l] == '\n' || !start[l])
 				break;
-		x = (vid.width - l*8)/2;
-		for (j=0; j<l; j++, x+=8) {
+		x = (vid.width - l * 8) / 2;
+		for (j = 0; j < l; j++, x += 8) {
 			Draw_Character(x, y, start[j]);
 			if (!remaining--)
 				return;
@@ -207,7 +207,7 @@ void SCR_CheckDrawCenterString(void) {
 
 	if (scr_centertime_off <= 0 && !cl.intermission)
 		return;
-	if (key_dest != key_game)
+	if (key.dest != key_game)
 		return;
 
 	SCR_DrawCenterString();
@@ -227,11 +227,11 @@ float CalcFov(float fov_x, float width, float height) {
 	if (fov_x < 1 || fov_x > 179)
 		Sys_Error("Bad fov: %f", fov_x);
 
-	x = width/tan(fov_x/360*M_PI);
+	x = width / tan(fov_x / 360 * M_PI);
 
-	a = atan(height/x);
+	a = atan(height / x);
 
-	a = a*360/M_PI;
+	a = a * 360 / M_PI;
 
 	return a;
 }
@@ -282,7 +282,7 @@ static void SCR_CalcRefdef(void) {
 	else if (size >= 110)
 		sb_lines = 24;		// no inventory
 	else
-		sb_lines = 24+16+8;
+		sb_lines = 24 + 16 + 8;
 
 	if (scr_viewsize.value >= 100.0) {
 		full = true;
@@ -310,11 +310,11 @@ static void SCR_CalcRefdef(void) {
 		r_refdef.vrect.height = vid.height - sb_lines;
 	if (r_refdef.vrect.height > vid.height)
 		r_refdef.vrect.height = vid.height;
-	r_refdef.vrect.x = (vid.width - r_refdef.vrect.width)/2;
+	r_refdef.vrect.x = (vid.width - r_refdef.vrect.width) / 2;
 	if (full)
 		r_refdef.vrect.y = 0;
 	else
-		r_refdef.vrect.y = (h - r_refdef.vrect.height)/2;
+		r_refdef.vrect.y = (h - r_refdef.vrect.height) / 2;
 
 	r_refdef.fov_x = scr_fov.value;
 	r_refdef.fov_y = CalcFov(r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
@@ -331,7 +331,7 @@ Keybinding command
 =================
 */
 void SCR_SizeUp_f(void) {
-	Cvar_SetValue("viewsize", scr_viewsize.value+10);
+	Cvar_SetValue("viewsize", scr_viewsize.value + 10);
 	vid.recalc_refdef = 1;
 }
 
@@ -344,7 +344,7 @@ Keybinding command
 =================
 */
 void SCR_SizeDown_f(void) {
-	Cvar_SetValue("viewsize", scr_viewsize.value-10);
+	Cvar_SetValue("viewsize", scr_viewsize.value - 10);
 	vid.recalc_refdef = 1;
 }
 
@@ -395,7 +395,7 @@ void SCR_DrawRam(void) {
 	if (!r_cache_thrash)
 		return;
 
-	Draw_Pic(scr_vrect.x+32, scr_vrect.y, scr_ram);
+	Draw_Pic(scr_vrect.x + 32, scr_vrect.y, scr_ram);
 }
 
 /*
@@ -432,7 +432,7 @@ void SCR_DrawNet(void) {
 	if (cls.demoplayback)
 		return;
 
-	Draw_Pic(scr_vrect.x+64, scr_vrect.y, scr_net);
+	Draw_Pic(scr_vrect.x + 64, scr_vrect.y, scr_net);
 }
 
 /*
@@ -450,8 +450,8 @@ void SCR_DrawPause(void) {
 		return;
 
 	pic = Draw_CachePic("gfx/pause.lmp");
-	Draw_Pic((vid.width - pic->width)/2,
-		(vid.height - 48 - pic->height)/2, pic);
+	Draw_Pic((vid.width - pic->width) / 2,
+		(vid.height - 48 - pic->height) / 2, pic);
 }
 
 
@@ -468,8 +468,8 @@ void SCR_DrawLoading(void) {
 		return;
 
 	pic = Draw_CachePic("gfx/loading.lmp");
-	Draw_Pic((vid.width - pic->width)/2,
-		(vid.height - 48 - pic->height)/2, pic);
+	Draw_Pic((vid.width - pic->width) / 2,
+		(vid.height - 48 - pic->height) / 2, pic);
 }
 
 
@@ -495,19 +495,19 @@ void SCR_SetUpToDrawConsole(void) {
 		scr_conlines = vid.height;		// full screen
 		scr_con_current = scr_conlines;
 	}
-	else if (key_dest == key_console)
-		scr_conlines = vid.height/2;	// half screen
+	else if (key.dest == key_console)
+		scr_conlines = vid.height / 2;	// half screen
 	else
 		scr_conlines = 0;				// none visible
 
 	if (scr_conlines < scr_con_current) {
-		scr_con_current -= scr_conspeed.value*host_frametime;
+		scr_con_current -= scr_conspeed.value * host_frametime;
 		if (scr_conlines > scr_con_current)
 			scr_con_current = scr_conlines;
 
 	}
 	else if (scr_conlines > scr_con_current) {
-		scr_con_current += scr_conspeed.value*host_frametime;
+		scr_con_current += scr_conspeed.value * host_frametime;
 		if (scr_conlines < scr_con_current)
 			scr_con_current = scr_conlines;
 	}
@@ -533,7 +533,7 @@ void SCR_DrawConsole(void) {
 		clearconsole = 0;
 	}
 	else {
-		if (key_dest == key_game || key_dest == key_message)
+		if (key.dest == key_game || key.dest == key_message)
 			Con_DrawNotify();	// only draw notify in game
 	}
 }
@@ -571,38 +571,38 @@ void SCR_ScreenShot_f(void) {
 	// 
 	strcpy(pcxname, "quake00.tga");
 
-	for (i=0; i<=99; i++) {
-		pcxname[5] = i/10 + '0';
-		pcxname[6] = i%10 + '0';
+	for (i = 0; i <= 99; i++) {
+		pcxname[5] = i / 10 + '0';
+		pcxname[6] = i % 10 + '0';
 		sprintf(checkname, "%s/%s", com.gamedir, pcxname);
 		if (Sys_FileTime(checkname) == -1)
 			break;	// file doesn't exist
 	}
-	if (i==100) {
+	if (i == 100) {
 		Con_Printf("SCR_ScreenShot_f: Couldn't create a PCX file\n");
 		return;
 	}
 
 
-	buffer = malloc(glwidth*glheight*3 + 18);
+	buffer = malloc(glwidth * glheight * 3 + 18);
 	memset(buffer, 0, 18);
 	buffer[2] = 2;		// uncompressed type
-	buffer[12] = glwidth&255;
-	buffer[13] = glwidth>>8;
-	buffer[14] = glheight&255;
-	buffer[15] = glheight>>8;
+	buffer[12] = glwidth & 255;
+	buffer[13] = glwidth >> 8;
+	buffer[14] = glheight & 255;
+	buffer[15] = glheight >> 8;
 	buffer[16] = 24;	// pixel size
 
-	glReadPixels(glx, gly, glwidth, glheight, GL_RGB, GL_UNSIGNED_BYTE, buffer+18);
+	glReadPixels(glx, gly, glwidth, glheight, GL_RGB, GL_UNSIGNED_BYTE, buffer + 18);
 
 	// swap rgb to bgr
-	c = 18+glwidth*glheight*3;
-	for (i=18; i<c; i+=3) {
+	c = 18 + glwidth * glheight * 3;
+	for (i = 18; i < c; i += 3) {
 		temp = buffer[i];
-		buffer[i] = buffer[i+2];
-		buffer[i+2] = temp;
+		buffer[i] = buffer[i + 2];
+		buffer[i + 2] = temp;
 	}
-	COM_WriteFile(pcxname, buffer, glwidth*glheight*3 + 18);
+	COM_WriteFile(pcxname, buffer, glwidth * glheight * 3 + 18);
 
 	free(buffer);
 	Con_Printf("Wrote %s\n", pcxname);
@@ -667,15 +667,15 @@ void SCR_DrawNotifyString(void) {
 
 	start = scr_notifystring;
 
-	y = vid.height*0.35;
+	y = vid.height * 0.35;
 
 	do {
 		// scan the width of the line
-		for (l=0; l<40; l++)
+		for (l = 0; l < 40; l++)
 			if (start[l] == '\n' || !start[l])
 				break;
-		x = (vid.width - l*8)/2;
-		for (j=0; j<l; j++, x+=8)
+		x = (vid.width - l * 8) / 2;
+		for (j = 0; j < l; j++, x += 8)
 			Draw_Character(x, y, start[j]);
 
 		y += 8;
@@ -712,14 +712,17 @@ int SCR_ModalMessage(cString text) {
 	S_ClearBuffer();		// so dma doesn't loop current sound
 
 	do {
-		key_count = -1;		// wait for a key down and up
+		key.count = -1;		// wait for a key down and up
 		Sys_SendKeyEvents();
-	} while (key_lastpress != 'y' && key_lastpress != 'n' && key_lastpress != K_ESCAPE);
+	} while (
+		(key.lastpress != 'y') &&
+		(key.lastpress != 'n') &&
+		(key.lastpress != K_ESCAPE));
 
 	scr_fullupdate = 0;
 	SCR_UpdateScreen();
 
-	return key_lastpress == 'y';
+	return key.lastpress == 'y';
 }
 
 
@@ -737,7 +740,7 @@ void SCR_BringDownConsole(void) {
 
 	scr_centertime_off = 0;
 
-	for (i=0; i<20 && scr_conlines != scr_con_current; i++)
+	for (i = 0; i < 20 && scr_conlines != scr_con_current; i++)
 		SCR_UpdateScreen();
 
 	cl.cshifts[0].percent = 0;		// no area contents palette on next frame
@@ -845,16 +848,16 @@ void SCR_UpdateScreen(void) {
 		SCR_DrawLoading();
 		Sbar_Draw();
 	}
-	else if (cl.intermission == 1 && key_dest == key_game) {
+	else if (cl.intermission == 1 && key.dest == key_game) {
 		Sbar_IntermissionOverlay();
 	}
-	else if (cl.intermission == 2 && key_dest == key_game) {
+	else if (cl.intermission == 2 && key.dest == key_game) {
 		Sbar_FinaleOverlay();
 		SCR_CheckDrawCenterString();
 	}
 	else {
 		if (crosshair.value)
-			Draw_Character(scr_vrect.x + scr_vrect.width/2, scr_vrect.y + scr_vrect.height/2, '+');
+			Draw_Character(scr_vrect.x + scr_vrect.width / 2, scr_vrect.y + scr_vrect.height / 2, '+');
 
 		SCR_DrawRam();
 		SCR_DrawNet();

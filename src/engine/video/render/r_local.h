@@ -241,7 +241,7 @@ extern Edge_t   edge_head;
 extern Edge_t   edge_tail;
 extern Edge_t   edge_aftertail;
 extern int      r_bmodelactive;
-extern vRect_p  pconupdate;
+// extern vRect_p  pconupdate;
 
 extern float    aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
 extern float    r_aliastransition, r_resfudge;

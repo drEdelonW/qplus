@@ -800,11 +800,11 @@ Sbar_Draw
 ===============
 */
 void Sbar_Draw() {
-    if ((scr_con_current == vid.height) || // console is full screen
+    if ((scr.con_current == vid.height) || // console is full screen
         (sb_updates >= vid.numpages))
         return;
 
-    scr_copyeverything = 1;
+    scr.copyeverything = 1;
 
     sb_updates++;
 
@@ -922,8 +922,8 @@ Sbar_DeathmatchOverlay
 int M_DrawPicHC(int y, qPic_p pic);
 
 void Sbar_DeathmatchOverlay() {
-    scr_copyeverything = 1;
-    scr_fullupdate = 0;
+    scr.copyeverything = 1;
+    scr.fullupdate = 0;
 
     M_DrawPicHC(8, Draw_CachePic("gfx/ranking.lmp"));
 
@@ -998,8 +998,8 @@ void Sbar_MiniDeathmatchOverlay() {
         return;
     }
 
-    scr_copyeverything = 1;
-    scr_fullupdate = 0;
+    scr.copyeverything = 1;
+    scr.fullupdate = 0;
 
     // scores
     Sbar_SortFrags();
@@ -1089,8 +1089,8 @@ Sbar_IntermissionOverlay
 ==================
 */
 void Sbar_IntermissionOverlay() {
-    scr_copyeverything = 1;
-    scr_fullupdate = 0;
+    scr.copyeverything = 1;
+    scr.fullupdate = 0;
 
     if (cl.gametype == GAME_DEATHMATCH) {
         Sbar_DeathmatchOverlay();
@@ -1126,7 +1126,7 @@ Sbar_FinaleOverlay
 ==================
 */
 void Sbar_FinaleOverlay() {
-    scr_copyeverything = 1;
+    scr.copyeverything = 1;
     qPic_p pic = Draw_CachePic("gfx/finale.lmp");
     Draw_TransPic((vid.width - pic->width) / 2, 16, pic);
 }

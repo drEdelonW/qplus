@@ -521,7 +521,7 @@ void SV_RunClients() {
         // always pause in single player if in console or menus
         if (!sv.paused &&
             ((svs.maxclients > 1) ||
-                (key_dest == key_game)
+                (key.dest == key_game)
                 )
             )
             SV_ClientThink();

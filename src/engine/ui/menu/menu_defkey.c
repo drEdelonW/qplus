@@ -55,7 +55,7 @@ void M_Keys_Draw() {
     for (int i = 0; i < NUMCOMMANDS; i++) {
         int y = 48 + (8 * i);
         M_Print(16, y, _bindnames[i][description]);
-        // int l = strlen (_bindnames[i][command]);
+        // int len = strlen (_bindnames[i][command]);
 
         int keys[2];
         M_FindKeysForCommand(_bindnames[i][command], keys);
@@ -82,12 +82,12 @@ void M_Keys_Draw() {
 }
 
 void M_UnbindCommand(cString command) {
-    int l = strlen(command);
+    int len = strlen(command);
 
     for (keycode_t j = 0; j < MAX_KEYS; j++) {
-        if (!keybindings[j])
+        if (!keyBindings[j])
             continue;
-        if (!strncmp(keybindings[j], command, l))
+        if (!strncmp(keyBindings[j], command, len))
             Key_SetBinding(j, "");
     }
 }
@@ -149,20 +149,20 @@ void M_Keys_Key(keycode_t k) {
 }
 
 void M_Menu_Keys_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_keys;
     m_entersound = true;
 }
 
 void M_FindKeysForCommand(cString command, int* twokeys) {
     twokeys[0] = twokeys[1] = -1;
-    int l = strlen(command);
+    int len = strlen(command);
     int count = 0;
 
     for (int j = 0; j < MAX_KEYS; j++) {
-        if (!keybindings[j])
+        if (!keyBindings[j])
             continue;
-        if (!strncmp(keybindings[j], command, l)) {
+        if (!strncmp(keyBindings[j], command, len)) {
             twokeys[count] = j;
             count++;
             if (count == 2)

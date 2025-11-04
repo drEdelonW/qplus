@@ -25,12 +25,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // console
 //
-extern int32_t con_totallines;
-extern int32_t con_backscroll;
-extern bool con_forcedup; // because no entities to refresh
-extern bool con_initialized;
-// extern uint8_p con_chars;
-extern int32_t con_notifylines;  // scan lines to clear for notify lines
+#define MAXCMDLINE  (256)
+#define MAXCHATLEN  (32)
+typedef struct {
+    int32_t totallines; // total lines in console scrollback
+    int32_t backscroll; // lines up from bottom to display
+    int32_t notifylines;  // scan lines to clear for notify lines
+    bool    forcedup; // because no entities to refresh
+    bool    isInitialized;
+    char    lines[MAXCHATLEN][MAXCMDLINE];
+    int32_t linepos;
+} console_t;
+extern console_t con;
+
+extern int32_t edit_line;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

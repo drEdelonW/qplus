@@ -52,13 +52,13 @@ M_ToggleMenu_f
 void M_ToggleMenu_f() {
     m_entersound = true;
 
-    if (key_dest == key_menu) {
+    if (key.dest == key_menu) {
         if (m_state != m_main) { M_Menu_Main_f(); return; }
-        key_dest = key_game;
+        key.dest = key_game;
         m_state = m_none;
         return;
     }
-    if (key_dest == key_console)    Con_ToggleConsole_f();
+    if (key.dest == key_console)    Con_ToggleConsole_f();
     else                            M_Menu_Main_f();
 
 }
@@ -88,13 +88,13 @@ void M_Init() {
 
 void M_Draw() {
     if ((m_state == m_none) ||
-        (key_dest != key_menu))
+        (key.dest != key_menu))
         return;
 
     if (!m_recursiveDraw) {
-        scr_copyeverything = 1;
+        scr.copyeverything = 1;
 
-        if (scr_con_current) {
+        if (scr.con_current) {
             Draw_ConsoleBackground(vid.height);
             VID_UnlockBuffer();
             S_ExtraUpdate();
@@ -102,7 +102,7 @@ void M_Draw() {
         }
         else    Draw_FadeScreen();
 
-        scr_fullupdate = 0;
+        scr.fullupdate = 0;
     }
     else { m_recursiveDraw = false; }
 

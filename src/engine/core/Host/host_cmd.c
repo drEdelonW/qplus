@@ -47,7 +47,7 @@ Host_Quit_f
 extern void M_Menu_Quit_f();
 
 void Host_Quit_f() {
-    if ((key_dest != key_console) &&
+    if ((key.dest != key_console) &&
         (cls.state != ca_dedicated)) {
         M_Menu_Quit_f();
         return;
@@ -219,7 +219,7 @@ void Host_Map_f() {
     CL_Disconnect();
     Host_ShutdownServer(false);
 
-    key_dest = key_game;   // remove console or menu
+    key.dest = key_game;   // remove console or menu
     SCR_BeginLoadingPlaque();
 
     cls.mapstring[0] = 0;

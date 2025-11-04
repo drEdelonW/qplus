@@ -48,6 +48,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "angle.h"
 #include "q_tools.h"
+#include "screen.h"
 
 static float   old_windowed_mouse;
 
@@ -67,7 +68,7 @@ static int     ignorenext;
 //     int output;
 // } keymap_t;
 
-// extern VidDef_t vid; // global video state
+VidDef_t vid; // global video state
 uint16_t d_8to16table[256];
 
 // static int num_shades = 32;
@@ -899,9 +900,8 @@ void VID_Update(vRect_p rects) {
 
     // force full update if not 8bit
     if (x_visinfo->depth != 8) {
-        extern int scr_fullupdate;
 
-        scr_fullupdate = 0;
+        scr.fullupdate = 0;
     }
 
 

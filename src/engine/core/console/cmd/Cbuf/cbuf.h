@@ -7,7 +7,7 @@
 
 /*
     Any number of commands can be added in a frame, from several different sources.
-    Most commands come from either keybindings or console line input, but remote
+    Most commands come from either keyBindings or console line input, but remote
     servers can also send across commands and entire text files can be execed.
 
     The + command line options are also added to the command buffer.
@@ -41,7 +41,7 @@ extern "C" {
         Adds command text at the end of the buffer
         ============
     */
-    // as new commands are generated from the console or keybindings,
+    // as new commands are generated from the console or keyBindings,
     // the text is added to the end of the command buffer.
     void Cbuf_AddText(cStringRO text);
 

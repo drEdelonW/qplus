@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <math.h>
 #include <stdlib.h>  // for atoi()
 #include "angle.h"
+#include "screen.h"
 #include "chase.h"
 #include "client.h"
 #include "console.h"
@@ -807,10 +808,9 @@ The player's clipping box goes from (-16 -16 -24) to (16 16 32) from
 the entity origin, so any view position inside that will be valid
 ==================
 */
-extern vRect_t scr_vrect;
 
 void V_RenderView() {
-    if (con_forcedup)   return;
+    if (con.forcedup)   return;
 
     // don't allow cheats in multiplayer
     if (cl.maxclients > 1) {
@@ -823,7 +823,7 @@ void V_RenderView() {
         V_CalcIntermissionRefdef();
     }
     else {
-        if (!cl.paused /* && ((sv.maxclients > 1) || (key_dest == key_game)) */)
+        if (!cl.paused /* && ((sv.maxclients > 1) || (key.dest == key_game)) */)
             V_CalcRefdef();
     }
 
@@ -863,8 +863,8 @@ void V_RenderView() {
 #ifndef GLQUAKE
     if (crosshair.value)
         Draw_Character(
-            scr_vrect.x + scr_vrect.width / 2 + cl_crossx.value,
-            scr_vrect.y + scr_vrect.height / 2 + cl_crossy.value,
+            scr.vrect.x + scr.vrect.width / 2 + cl_crossx.value,
+            scr.vrect.y + scr.vrect.height / 2 + cl_crossy.value,
 #if 1
             '+'
 #else

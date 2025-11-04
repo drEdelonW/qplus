@@ -21,7 +21,7 @@ bool is_JoinGame() { return _mp_cursor == mp_Join; }
 bool is_anyComAval() { return serialAvailable || ipxAvailable || tcpipAvailable; }
 
 void M_Menu_MultiPlayer_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_multiplayer;
     m_entersound = true;
 }

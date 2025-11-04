@@ -3,7 +3,6 @@
 #include "types.h"
 #include "enginedefs.h"
 
-struct Texture_s;
 typedef struct Texture_s Texture_t;
 typedef Texture_t* Texture_p;
 struct Texture_s {

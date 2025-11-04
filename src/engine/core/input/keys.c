@@ -35,31 +35,207 @@ key up events are sent even if in console mode
 */
 
 #define MAXCMD      (1024)
-#define MAXCMDLINE  (256)
-#define MAXCHATLEN  (32)
 
-char key_lines[MAXCHATLEN][MAXCMDLINE];
-int32_t key_linepos;
-keycode_t key_lastpress;
-keydest_t key_dest;
-cString keybindings[MAX_KEYS];
-int key_count;   // incremented every key event
-int key_repeats[MAX_KEYS]; // if > 1, it is autorepeating
-int edit_line = 0;
+Key_t key;
+cString keyBindings[MAX_KEYS];
 
-static int _history_line = 0;
+static int  _key_repeats[MAX_KEYS]; // if > 1, it is autorepeating
+static int  _history_line = 0;
 static bool _shift_down = false;
-static bool _consolekeys[MAX_KEYS]; // if true, can't be rebound while in console
-static bool _menubound[MAX_KEYS]; // if true, can't be rebound while in menu
+static bool _isConKeys[MAX_KEYS]; // if true, can't be rebound while in console
+static bool _isMenuBound[MAX_KEYS]; // if true, can't be rebound while in menu
+static bool _isKeyDown[MAX_KEYS];
 static keycode_t _keyshift[MAX_KEYS];  // key to map to if shift held down in console
-static bool _keydown[MAX_KEYS];
+
+/*
+==============================================================================
+
+            LINE TYPING INTO THE CONSOLE
+
+==============================================================================
+*/
+
+bool is_printable(keycode_t symb) {
+    return
+        (symb >= K_SPACE) &&
+        (symb < K_BACKSPACE);
+}
+
+bool is_digits(keycode_t symb) {
+    return
+        (symb >= '0') &&
+        (symb < '9');
+}
+
+/*
+====================
+Key_Console
+
+Interactive line editing and console scrollback
+====================
+*/
+void Key_Console(keycode_t key) {
+    if (key == K_ENTER) {
+        Cbuf_AddText(con.lines[edit_line] + 1);    // skip the >
+        Cbuf_AddText("\n");
+        Con_Printf("%s\n", con.lines[edit_line]);
+        edit_line = (edit_line + 1) & 31;
+        _history_line = edit_line;
+        con.lines[edit_line][0] = ']';
+        con.linepos = 1;
+        if (cls.state == ca_disconnected)
+            SCR_UpdateScreen(); // force an update, because the command
+        // may take some time
+        return;
+    }
+
+    if (key == K_TAB) { // command completion
+        cString cmd = Cmd_CompleteCommand(con.lines[edit_line] + 1);
+        if (!cmd)
+            cmd = Cvar_CompleteVariable(con.lines[edit_line] + 1);
+
+        if (cmd) {
+            Q_strcpy(con.lines[edit_line] + 1, cmd);
+            con.linepos = Q_strlen(cmd) + 1;
+            con.lines[edit_line][con.linepos] = ' ';
+            con.linepos++;
+            con.lines[edit_line][con.linepos] = 0;
+            return;
+        }
+    }
+
+    if ((key == K_BACKSPACE) ||
+        (key == K_LEFTARROW)) {
+        if (con.linepos > 1)
+            con.linepos--;
+        return;
+    }
+
+    if (key == K_UPARROW) {
+        do {
+            _history_line = (_history_line - 1) & 31;
+        } while ((_history_line != edit_line) &&
+            (!con.lines[_history_line][1])
+            );
+        if (_history_line == edit_line)
+            _history_line = (edit_line + 1) & 31;
+        Q_strcpy(con.lines[edit_line], con.lines[_history_line]);
+        con.linepos = Q_strlen(con.lines[edit_line]);
+        return;
+    }
+
+    if (key == K_DOWNARROW) {
+        if (_history_line == edit_line) return;
+        do {
+            _history_line = (_history_line + 1) & 31;
+        } while ((_history_line != edit_line) &&
+            (!con.lines[_history_line][1]));
+
+        if (_history_line == edit_line) {
+            con.lines[edit_line][0] = ']';
+            con.linepos = 1;
+        }
+        else {
+            Q_strcpy(con.lines[edit_line], con.lines[_history_line]);
+            con.linepos = Q_strlen(con.lines[edit_line]);
+        }
+        return;
+    }
+
+    if ((key == K_PGUP) ||
+        (key == K_MWHEELUP)
+        ) {
+        con.backscroll += 2;
+        if (con.backscroll > (con.totallines - (vid.height >> 3) - 1))
+            con.backscroll = con.totallines - (vid.height >> 3) - 1;
+        return;
+    }
+
+    if ((key == K_PGDN) ||
+        (key == K_MWHEELDOWN)
+        ) {
+        con.backscroll -= 2;
+        if (con.backscroll < 0)
+            con.backscroll = 0;
+        return;
+    }
+
+    if (key == K_HOME) {
+        con.backscroll = con.totallines - (vid.height >> 3) - 1;
+        return;
+    }
+
+    if (key == K_END) {
+        con.backscroll = 0;
+        return;
+    }
+
+    if (!is_printable(key))
+        return; // non printable
+
+    if (con.linepos < (MAXCMDLINE - 1)) {
+        con.lines[edit_line][con.linepos] = key;
+        con.linepos++;
+        con.lines[edit_line][con.linepos] = 0;
+    }
+}
+
+//============================================================================
+char chatBuffer[MAXCHATLEN];
+bool team_message = false;
+
+void Key_Message(keycode_t Key) {
+    static int _chatBuffLen = 0;
+
+    if (Key == K_ENTER) {
+        if (team_message)   Cbuf_AddText("say_team \"");
+        else                Cbuf_AddText("say \"");
+
+        Cbuf_AddText(chatBuffer);
+        Cbuf_AddText("\"\n");
+
+        key.dest = key_game;
+        _chatBuffLen = 0;
+        chatBuffer[0] = 0;
+        return;
+    }
+
+    if (Key == K_ESCAPE) {
+        key.dest = key_game;
+        _chatBuffLen = 0;
+        chatBuffer[0] = 0;
+        return;
+    }
+
+    if (!is_printable(Key))
+        return; // non printable
+
+    if (Key == K_BACKSPACE) {
+        if (_chatBuffLen) {
+            _chatBuffLen--;
+            chatBuffer[_chatBuffLen] = 0;
+        }
+        return;
+    }
+
+    if (_chatBuffLen == 31)
+        return; // all full
+
+    chatBuffer[_chatBuffLen++] = Key;
+    chatBuffer[_chatBuffLen] = 0;
+}
+
+//============================================================================
+
+
 
 typedef struct {
     cString     name;
     keycode_t   keynum;
 } keyname_t;
+typedef keyname_t* keyname_p;
 
-keyname_t keynames[] = {
+static keyname_t _keyNames[] = {
     {"TAB",         K_TAB},
     {"ENTER",       K_ENTER},
     {"ESCAPE",      K_ESCAPE},
@@ -147,212 +323,25 @@ keyname_t keynames[] = {
 };
 
 /*
-==============================================================================
-
-            LINE TYPING INTO THE CONSOLE
-
-==============================================================================
-*/
-
-bool is_printable(keycode_t symb) {
-    return
-        (symb >= K_SPACE) &&
-        (symb < K_BACKSPACE);
-}
-
-bool is_digits(keycode_t symb) {
-    return
-        (symb >= '0') &&
-        (symb < '9');
-}
-
-/*
-====================
-Key_Console
-
-Interactive line editing and console scrollback
-====================
-*/
-void Key_Console(keycode_t key) {
-    if (key == K_ENTER) {
-        Cbuf_AddText(key_lines[edit_line] + 1);    // skip the >
-        Cbuf_AddText("\n");
-        Con_Printf("%s\n", key_lines[edit_line]);
-        edit_line = (edit_line + 1) & 31;
-        _history_line = edit_line;
-        key_lines[edit_line][0] = ']';
-        key_linepos = 1;
-        if (cls.state == ca_disconnected)
-            SCR_UpdateScreen(); // force an update, because the command
-        // may take some time
-        return;
-    }
-
-    if (key == K_TAB) { // command completion
-        cString cmd = Cmd_CompleteCommand(key_lines[edit_line] + 1);
-        if (!cmd)
-            cmd = Cvar_CompleteVariable(key_lines[edit_line] + 1);
-
-        if (cmd) {
-            Q_strcpy(key_lines[edit_line] + 1, cmd);
-            key_linepos = Q_strlen(cmd) + 1;
-            key_lines[edit_line][key_linepos] = ' ';
-            key_linepos++;
-            key_lines[edit_line][key_linepos] = 0;
-            return;
-        }
-    }
-
-    if ((key == K_BACKSPACE) ||
-        (key == K_LEFTARROW)) {
-        if (key_linepos > 1)
-            key_linepos--;
-        return;
-    }
-
-    if (key == K_UPARROW) {
-        do {
-            _history_line = (_history_line - 1) & 31;
-        } while ((_history_line != edit_line) &&
-            (!key_lines[_history_line][1])
-            );
-        if (_history_line == edit_line)
-            _history_line = (edit_line + 1) & 31;
-        Q_strcpy(key_lines[edit_line], key_lines[_history_line]);
-        key_linepos = Q_strlen(key_lines[edit_line]);
-        return;
-    }
-
-    if (key == K_DOWNARROW) {
-        if (_history_line == edit_line) return;
-        do {
-            _history_line = (_history_line + 1) & 31;
-        } while ((_history_line != edit_line) &&
-            (!key_lines[_history_line][1]));
-        if (_history_line == edit_line) {
-            key_lines[edit_line][0] = ']';
-            key_linepos = 1;
-        }
-        else {
-            Q_strcpy(key_lines[edit_line], key_lines[_history_line]);
-            key_linepos = Q_strlen(key_lines[edit_line]);
-        }
-        return;
-    }
-
-    if ((key == K_PGUP) ||
-        (key == K_MWHEELUP)
-        ) {
-        con_backscroll += 2;
-        if (con_backscroll > (con_totallines - (vid.height >> 3) - 1))
-            con_backscroll = con_totallines - (vid.height >> 3) - 1;
-        return;
-    }
-
-    if ((key == K_PGDN) ||
-        (key == K_MWHEELDOWN)
-        ) {
-        con_backscroll -= 2;
-        if (con_backscroll < 0)
-            con_backscroll = 0;
-        return;
-    }
-
-    if (key == K_HOME) {
-        con_backscroll = con_totallines - (vid.height >> 3) - 1;
-        return;
-    }
-
-    if (key == K_END) {
-        con_backscroll = 0;
-        return;
-    }
-
-    if (!is_printable(key))
-        return; // non printable
-
-    if (key_linepos < (MAXCMDLINE - 1)) {
-        key_lines[edit_line][key_linepos] = key;
-        key_linepos++;
-        key_lines[edit_line][key_linepos] = 0;
-    }
-}
-
-//============================================================================
-char chat_buffer[MAXCHATLEN];
-bool team_message = false;
-
-void Key_Message(keycode_t key) {
-    static int chat_bufferlen = 0;
-
-    if (key == K_ENTER) {
-        if (team_message)
-            Cbuf_AddText("say_team \"");
-        else
-            Cbuf_AddText("say \"");
-
-        Cbuf_AddText(chat_buffer);
-        Cbuf_AddText("\"\n");
-
-        key_dest = key_game;
-        chat_bufferlen = 0;
-        chat_buffer[0] = 0;
-        return;
-    }
-
-    if (key == K_ESCAPE) {
-        key_dest = key_game;
-        chat_bufferlen = 0;
-        chat_buffer[0] = 0;
-        return;
-    }
-
-    if (!is_printable(key))
-        return; // non printable
-
-    if (key == K_BACKSPACE) {
-        if (chat_bufferlen) {
-            chat_bufferlen--;
-            chat_buffer[chat_bufferlen] = 0;
-        }
-        return;
-    }
-
-    if (chat_bufferlen == 31)
-        return; // all full
-
-    chat_buffer[chat_bufferlen++] = key;
-    chat_buffer[chat_bufferlen] = 0;
-}
-
-//============================================================================
-
-
-/*
 ===================
 Key_StringToKeynum
 
-Returns a key number to be used to index keybindings[] by looking at
+Returns a key number to be used to index keyBindings[] by looking at
 the given string.  Single ascii characters return themselves, while
 the K_* names are matched up.
 ===================
 */
-keycode_t Key_StringToKeynum(cString str) {
-    keyname_t* kn;
 
-    if ((!str) ||
-        (!str[0])
-        ) {
+keycode_t Key_StringToKeynum(cStringRO str) {
+    if ((!str) || (!str[0]))
         return -1;
-    }
-    if (!str[1]) {
-        return str[0];
-    }
 
-    for (kn = keynames; kn->name; kn++) {
-        if (!Q_strcasecmp(str, kn->name)) {
+    if (!str[1])
+        return str[0];
+
+    for (keyname_p kn = _keyNames; kn->name; kn++) {
+        if (!Q_strcasecmp(str, kn->name))
             return kn->keynum;
-        }
     }
     return K_UNKNOWN;
 }
@@ -367,12 +356,10 @@ FIXME: handle quote special (general escape sequence?)
 ===================
 */
 cString Key_KeynumToString(keycode_t keynum) {
-    keyname_t* kn;
     static char tinystr[2];
 
-    if (keynum == -1) {
+    if (keynum == -1)
         return "<KEY NOT FOUND>";
-    }
 
     if (is_printable(keynum)) { // printable ascii
         tinystr[0] = keynum;
@@ -380,10 +367,9 @@ cString Key_KeynumToString(keycode_t keynum) {
         return tinystr;
     }
 
-    for (kn = keynames; kn->name; kn++) {
-        if (keynum == kn->keynum) {
+    for (keyname_p kn = _keyNames; kn->name; kn++) {
+        if (keynum == kn->keynum)
             return kn->name;
-        }
     }
 
     return "<UNKNOWN KEYNUM>";
@@ -400,17 +386,17 @@ void Key_SetBinding(keycode_t keynum, cString binding) {
         return;
 
     // free old bindings
-    if (keybindings[keynum]) {
-        Z_Free(keybindings[keynum]);
-        keybindings[keynum] = NULL;
+    if (keyBindings[keynum]) {
+        Z_Free(keyBindings[keynum]);
+        keyBindings[keynum] = NULL;
     }
 
     // allocate memory for new binding
-    int l = Q_strlen(binding);
-    cString new = Z_Malloc(l + 1);
+    int len = Q_strlen(binding);
+    cString new = Z_Malloc(len + 1);
     Q_strcpy(new, binding);
-    new[l] = 0;
-    keybindings[keynum] = new;
+    new[len] = 0;
+    keyBindings[keynum] = new;
 }
 
 /*
@@ -426,10 +412,7 @@ void Key_Unbind_f() {
 
     keycode_t b = Key_StringToKeynum(Cmd_Argv(1));
     if (b == K_UNKNOWN) {
-        Con_Printf(
-            "\"%s\" isn't a valid key\n",
-            Cmd_Argv(1)
-        );
+        Con_Printf("\"%s\" isn't a valid key\n", Cmd_Argv(1));
         return;
     }
 
@@ -438,7 +421,7 @@ void Key_Unbind_f() {
 
 void Key_Unbindall_f() {
     for (keycode_t i = 0; i < MAX_KEYS; i++)
-        if (keybindings[i])
+        if (keyBindings[i])
             Key_SetBinding(i, "");
 }
 
@@ -449,7 +432,6 @@ Key_Bind_f
 ===================
 */
 void Key_Bind_f() {
-    char    cmd[MAXCMD];
     int argcnt = Cmd_Argc();
     if ((argcnt != 2) &&
         (argcnt != 3)
@@ -465,8 +447,8 @@ void Key_Bind_f() {
     }
 
     if (argcnt == 2) {
-        if (keybindings[btn]) {
-            Con_Printf("\"%s\" = \"%s\"\n", Cmd_Argv(1), keybindings[btn]);
+        if (keyBindings[btn]) {
+            Con_Printf("\"%s\" = \"%s\"\n", Cmd_Argv(1), keyBindings[btn]);
         }
         else {
             Con_Printf("\"%s\" is not bound\n", Cmd_Argv(1));
@@ -475,7 +457,7 @@ void Key_Bind_f() {
     }
 
     // copy the rest of the command line
-    cmd[0] = 0;  // start out with a null string
+    char cmd[MAXCMD] = { 0 }; // start out with a null string
     for (int i = 2; i < argcnt; i++) {
         if (i > 2)
             strcat(cmd, " ");
@@ -494,13 +476,13 @@ Writes lines containing "bind key value"
 */
 void Key_WriteBindings(FILE* f) {
     for (keycode_t i = 0; i < MAX_KEYS; i++) {
-        if ((keybindings[i]) &&
-            (*keybindings[i])
+        if ((keyBindings[i]) &&
+            (*keyBindings[i])
             ) {
             fprintf(f,
                 "bind \"%s\" \"%s\"\n",
                 Key_KeynumToString(i),
-                keybindings[i]
+                keyBindings[i]
             );
         }
     }
@@ -514,32 +496,32 @@ Key_Init
 */
 void Key_Init() {
     for (int i = 0; i < 32; i++) {
-        key_lines[i][0] = ']';
-        key_lines[i][1] = 0;
+        con.lines[i][0] = ']';
+        con.lines[i][1] = 0;
     }
-    key_linepos = 1;
+    con.linepos = 1;
 
     //
     // init ascii characters in console mode
     //
     for (int i = 32; i < 128; i++) {
-        _consolekeys[i] = true;
+        _isConKeys[i] = true;
     }
 
-    _consolekeys[K_ENTER] = true;
-    _consolekeys[K_TAB] = true;
-    _consolekeys[K_LEFTARROW] = true;
-    _consolekeys[K_RIGHTARROW] = true;
-    _consolekeys[K_UPARROW] = true;
-    _consolekeys[K_DOWNARROW] = true;
-    _consolekeys[K_BACKSPACE] = true;
-    _consolekeys[K_PGUP] = true;
-    _consolekeys[K_PGDN] = true;
-    _consolekeys[K_SHIFT] = true;
-    _consolekeys[K_MWHEELUP] = true;
-    _consolekeys[K_MWHEELDOWN] = true;
-    _consolekeys['`'] = false;
-    _consolekeys['~'] = false;
+    _isConKeys[K_ENTER] = true;
+    _isConKeys[K_TAB] = true;
+    _isConKeys[K_LEFTARROW] = true;
+    _isConKeys[K_RIGHTARROW] = true;
+    _isConKeys[K_UPARROW] = true;
+    _isConKeys[K_DOWNARROW] = true;
+    _isConKeys[K_BACKSPACE] = true;
+    _isConKeys[K_PGUP] = true;
+    _isConKeys[K_PGDN] = true;
+    _isConKeys[K_SHIFT] = true;
+    _isConKeys[K_MWHEELUP] = true;
+    _isConKeys[K_MWHEELDOWN] = true;
+    _isConKeys['`'] = false;
+    _isConKeys['~'] = false;
 
     for (keycode_t i = 0; i < MAX_KEYS; i++) {
         _keyshift[i] = i;
@@ -571,9 +553,9 @@ void Key_Init() {
     _keyshift['`'] = '~';
     _keyshift['\\'] = '|';
 
-    _menubound[K_ESCAPE] = true;
+    _isMenuBound[K_ESCAPE] = true;
     for (int i = 0; i < 12; i++) {
-        _menubound[K_F1 + i] = true;
+        _isMenuBound[K_F1 + i] = true;
     }
 
     //
@@ -593,64 +575,53 @@ Called by the system between frames for both key up and key down events
 Should NOT be called during an interrupt!
 ===================
 */
-void Key_Event(keycode_t key, bool down) {
-    char cmd[MAXCMD];
+void Key_Event(keycode_t Key, bool down) {
+    _isKeyDown[Key] = down;
 
-    _keydown[key] = down;
+    if (!down)
+        _key_repeats[Key] = 0;
 
-    if (!down) {
-        key_repeats[key] = 0;
-    }
-
-    key_lastpress = key;
-    key_count++;
-    if (key_count <= 0) {
+    key.lastpress = Key;
+    key.count++;
+    if (key.count <= 0)
         return;  // just catching keys for Con_NotifyBox
-    }
 
     // update auto-repeat status
     if (down) {
-        key_repeats[key]++;
-        if ((key != K_BACKSPACE) &&
-            (key != K_PAUSE) &&
-            (key_repeats[key] > 1)
+        _key_repeats[Key]++;
+        if ((Key != K_BACKSPACE) &&
+            (Key != K_PAUSE) &&
+            (_key_repeats[Key] > 1)
             ) {
             return; // ignore most autorepeats
         }
 
-        if ((key >= 200) &&
-            !keybindings[key]
+        if ((Key >= 200) &&
+            !keyBindings[Key]
             ) {
             Con_Printf(
                 "%s is unbound, hit F4 to set.\n",
-                Key_KeynumToString(key)
+                Key_KeynumToString(Key)
             );
         }
     }
 
-    if (key == K_SHIFT) {
+    if (Key == K_SHIFT)
         _shift_down = down;
-    }
+
 
     //
     // handle escape specialy, so the user can never unbind it
     //
-    if (key == K_ESCAPE) {
-        if (!down)
-            return;
-        switch (key_dest) {
-        case key_message:
-            Key_Message(key);
-            break;
-        case key_menu:
-            M_Keydown(key);
-            break;
+    if (Key == K_ESCAPE) {
+        if (!down)  return;
+
+        switch (key.dest) {
+        case key_message:   Key_Message(Key);   break;
+        case key_menu:      M_Keydown(Key);     break;
         case key_game:
-        case key_console:
-            M_ToggleMenu_f();
-            break;
-        default:
-            Sys_Error("Bad key_dest");
+        case key_console:   M_ToggleMenu_f();   break;
+        default:            Sys_Error("Bad key.dest");
         }
         return;
     }
@@ -663,30 +634,27 @@ void Key_Event(keycode_t key, bool down) {
     // downs can be matched with ups
     //
     if (!down) {
-        cString kb = keybindings[key];
-        if (kb &&
-            (kb[0] == '+')
+        cString kb = keyBindings[Key];
+        if (kb && (kb[0] == '+')
             ) {
-            sprintf(cmd, "-%s %i\n", kb + 1, key);
+            char cmd[MAXCMD];   sprintf(cmd, "-%s %i\n", kb + 1, Key);
             Cbuf_AddText(cmd);
         }
-        if (_keyshift[key] != key) {
-            if ((unsigned)key < MAX_KEYS) {
-                keycode_t sh = _keyshift[key];
-                if ((unsigned)sh < MAX_KEYS) {
-                    kb = keybindings[(unsigned)sh];
-                }
-                else {
-                    kb = NULL;
-                }
-            }
-            else {
-                kb = NULL;
-            }
-            if (kb &&
-                (kb[0] == '+')
+
+        if (_keyshift[Key] != Key) {
+            if ((unsigned)Key < MAX_KEYS
                 ) {
-                sprintf(cmd, "-%s %i\n", kb + 1, key);
+                keycode_t sh = _keyshift[Key];
+                if ((unsigned)sh < MAX_KEYS) {
+                    kb = keyBindings[(unsigned)sh];
+                }
+                else { kb = NULL; }
+            }
+            else { kb = NULL; }
+
+            if (kb && (kb[0] == '+')
+                ) {
+                char cmd[MAXCMD];   sprintf(cmd, "-%s %i\n", kb + 1, Key);
                 Cbuf_AddText(cmd);
             }
         }
@@ -696,10 +664,8 @@ void Key_Event(keycode_t key, bool down) {
     //
     // during demo playback, most keys bring up the main menu
     //
-    if (cls.demoplayback &&
-        down &&
-        _consolekeys[key] &&
-        (key_dest == key_game)
+    if (cls.demoplayback && down &&
+        _isConKeys[Key] && (key.dest == key_game)
         ) {
         M_ToggleMenu_f();
         return;
@@ -709,18 +675,15 @@ void Key_Event(keycode_t key, bool down) {
     // if not a consolekey, send to the interpreter no matter what mode is
     //
     if (
-        ((key_dest == key_menu) &&
-            _menubound[key]) ||
-        ((key_dest == key_console) &&
-            !_consolekeys[key]) ||
-        ((key_dest == key_game) &&
-            (!con_forcedup ||
-                !_consolekeys[key]))
+        ((key.dest == key_menu) && _isMenuBound[Key]) ||
+        ((key.dest == key_console) && !_isConKeys[Key]) ||
+        ((key.dest == key_game) && (!con.forcedup ||
+            !_isConKeys[Key]))
         ) {
-        cString kb = keybindings[key];
+        cString kb = keyBindings[Key];
         if (kb) {
             if (kb[0] == '+') { // button commands add keynum as a parm
-                sprintf(cmd, "%s %i\n", kb, key);
+                char cmd[MAXCMD];   sprintf(cmd, "%s %i\n", kb, Key);
                 Cbuf_AddText(cmd);
             }
             else {
@@ -734,21 +697,16 @@ void Key_Event(keycode_t key, bool down) {
     if (!down)
         return;  // other systems only care about key down events
 
-    if (_shift_down) {
-        key = _keyshift[key];
-    }
+    if (_shift_down)
+        Key = _keyshift[Key];
 
-    switch (key_dest) {
-    case key_message:
-        Key_Message(key);  break;
-    case key_menu:
-        M_Keydown(key);    break;
 
+    switch (key.dest) {
+    case key_message:   Key_Message(Key);  break;
+    case key_menu:      M_Keydown(Key);    break;
     case key_game:
-    case key_console:
-        Key_Console(key);  break;
-    default:
-        Sys_Error("Bad key_dest");
+    case key_console:   Key_Console(Key);  break;
+    default:            Sys_Error("Bad key.dest");
     }
 }
 
@@ -760,8 +718,8 @@ Key_ClearStates
 */
 void Key_ClearStates() {
     for (keycode_t i = 0; i < MAX_KEYS; i++) {
-        _keydown[i] = false;
-        key_repeats[i] = 0;
+        _isKeyDown[i] = false;
+        _key_repeats[i] = 0;
     }
 }
 

@@ -498,7 +498,7 @@ void Host::_ServerFrame() {
 
     // move things around and think
     // always pause in single player if in console or menus
-    if (!sv.paused && (svs.maxclients > 1 || key_dest == key_game))
+    if (!sv.paused && ((svs.maxclients > 1) || (key.dest == key_game)))
         SV_Physics();
 }
 
@@ -515,10 +515,8 @@ void Host::ServerFrame() {
     float save_host_frametime;
     float temp_host_frametime = save_host_frametime = host_frametime;
     while (temp_host_frametime > (1.0 / 72.0)) {
-        if (temp_host_frametime > 0.05)
-            host_frametime = 0.05;
-        else
-            host_frametime = temp_host_frametime;
+        if (temp_host_frametime > 0.05)     host_frametime = 0.05;
+        else                                host_frametime = temp_host_frametime;
         temp_host_frametime -= host_frametime;
         _ServerFrame();
     }
@@ -542,7 +540,7 @@ void Host::ServerFrame() {
     if (!sv.paused &&
         (
             (svs.maxclients > 1) ||
-            (key_dest == key_game)
+            (key.dest == key_game)
             )
         )
         SV_Physics();
@@ -836,7 +834,7 @@ void Host::Shutdown() {
     isdown = true;
 
     // keep Con_Printf from trying to update the screen
-    scr_disabled_for_loading = true;
+    scr.disabled_for_loading = true;
 
     WriteConfiguration();
 

@@ -12,7 +12,7 @@ int  slist_cursor;
 bool slist_sorted;
 
 void M_Menu_ServerList_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_slist;
     m_entersound = true;
     slist_cursor = 0;
@@ -74,7 +74,7 @@ void M_ServerList_Key(keycode_t k) {
         m_return_state = m_state;
         m_return_onerror = true;
         slist_sorted = false;
-        key_dest = key_game;
+        key.dest = key_game;
         m_state = m_none;
         Cbuf_AddText(va("connect \"%s\"\n", hostcache[slist_cursor].cname));
         break;

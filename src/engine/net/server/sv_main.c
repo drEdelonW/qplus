@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include "versions.h"
 #include "common.h"
+#include "screen.h"
 #include "sys.h"
 #include "msg.h"
 #include "q_tools.h"
@@ -856,7 +857,6 @@ void SV_SaveSpawnparms() {
     This is called at the start of each level
     ================
 */
-extern float    scr_centertime_off;
 
 void SV_SpawnServer(
     cString server
@@ -869,7 +869,7 @@ void SV_SpawnServer(
     // let's not have any servers with no name
     if (hostname.string[0] == 0)
         Cvar_Set("hostname", "UNNAMED");
-    scr_centertime_off = 0;
+    scr.centertime_off = 0;
 
     Con_DPrintf("SpawnServer: %s\n", server);
     svs.changelevel_issued = false;    // now safe to issue another

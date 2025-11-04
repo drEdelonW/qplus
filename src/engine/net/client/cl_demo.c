@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "msg.h"
 #include "endian_tools.h"
 
-void CL_FinishTimeDemo();
+
 
 /*
 ==============================================================================
@@ -45,6 +45,23 @@ Whenever cl.time gets past the last received message, another message is
 read from the demo file.
 ==============================================================================
 */
+
+/*
+====================
+CL_FinishTimeDemo
+
+====================
+*/
+void CL_FinishTimeDemo() {
+    cls.timedemo = false;
+
+    // the first frame didn't count
+    int frames = (host_framecount - cls.td_startframe) - 1;
+    float time = realtime - cls.td_starttime;
+    if (!time)
+        time = 1;
+    Con_Printf("%i frames %5.1f seconds %5.1f fps\n", frames, time, frames / time);
+}
 
 /*
 ==============
@@ -287,23 +304,6 @@ void CL_PlayDemo_f() {
         cls.forcetrack = -cls.forcetrack;
     // ZOID, fscanf is evil
     // fscanf (cls.demofile, "%i\n", &cls.forcetrack);
-}
-
-/*
-====================
-CL_FinishTimeDemo
-
-====================
-*/
-void CL_FinishTimeDemo() {
-    cls.timedemo = false;
-
-    // the first frame didn't count
-    int frames = (host_framecount - cls.td_startframe) - 1;
-    float time = realtime - cls.td_starttime;
-    if (!time)
-        time = 1;
-    Con_Printf("%i frames %5.1f seconds %5.1f fps\n", frames, time, frames / time);
 }
 
 /*

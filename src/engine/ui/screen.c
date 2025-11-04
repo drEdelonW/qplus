@@ -20,10 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // screen.c -- master for refresh, status bar, console, chat, notify, etc
 
 #include "screen.h"
-#include "endian_tools.h"
-#include "wad.h"
+#include "qPic.h"
 #include <string.h>
-#include "vid.h"
 #include "cvar_q1.h"
 #include "client.h"
 #include "draw.h"
@@ -33,45 +31,37 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sbar.h"
 #include "cmd.h"
 #include "console.h"
-#include "q_tools.h"
 #include "common.h"
 #include "d_iface.h"
 #include "sound.h"
 #include "menu.h"
 
-// only the refresh window will be updated unless these variables are flagged
-int   scr_copytop;
-int   scr_copyeverything;
+Screen_t scr;
 
-float  scr_con_current;
-float  scr_conlines;  // lines of console to display
+int     clearnotify;
+bool    block_drawing;
 
-float  oldscreensize, oldfov;
 
-bool scr_initialized;  // ready to draw
+typedef struct {
+    bool     initialized;  // ready to draw
+    qPic_p   ram;
+    qPic_p   net;
+    qPic_p   turtle;
+    bool     drawloading;
+    bool     drawdialog;
+    int      erase_lines;
+    int      erase_center;
+    cString  notifystring;
+    float    disabled_time;
+    float    centertime_start; // for slow victory printing
+    int      center_lines;
+    char     centerstring[1024];
+} _Screen_t;
+static _Screen_t _scr;
 
-qPic_p scr_ram;
-qPic_p scr_net;
-qPic_p scr_turtle;
-
-int   scr_fullupdate;
-
-int   clearconsole;
-int   clearnotify;
-
-VidDef_t vid;    // global video state
-
-vRect_p pconupdate;
-vRect_t  scr_vrect;
-
-bool scr_disabled_for_loading;
-bool scr_drawloading;
-float scr_disabled_time;
-bool scr_skipupdate;
-
-bool block_drawing;
-
-void SCR_ScreenShot_f();
+static float    oldscreensize, oldfov;
+static int      clearconsole;
+static vRect_p  pconupdate;
 
 /*
 ===============================================================================
@@ -81,12 +71,6 @@ CENTER PRINTING
 ===============================================================================
 */
 
-char  scr_centerstring[1024];
-float  scr_centertime_start; // for slow victory printing
-float  scr_centertime_off;
-int   scr_center_lines;
-int   scr_erase_lines;
-int   scr_erase_center;
 
 /*
 ==============
@@ -97,41 +81,41 @@ for a few moments
 ==============
 */
 void SCR_CenterPrint(cString str) {
-    strncpy(scr_centerstring, str, sizeof(scr_centerstring) - 1);
-    scr_centertime_off = scr_centertime.value;
-    scr_centertime_start = cl.time;
+    strncpy(_scr.centerstring, str, sizeof(_scr.centerstring) - 1);
+    scr.centertime_off = scr_centertime.value;
+    _scr.centertime_start = cl.time;
 
     // count the number of lines for centering
-    scr_center_lines = 1;
+    _scr.center_lines = 1;
     while (*str) {
         if (*str == '\n')
-            scr_center_lines++;
+            _scr.center_lines++;
         str++;
     }
 }
 
 void SCR_EraseCenterString() {
-    if (scr_erase_center++ > vid.numpages) {
-        scr_erase_lines = 0;
+    if (_scr.erase_center++ > vid.numpages) {
+        _scr.erase_lines = 0;
         return;
     }
 
-    int y = (scr_center_lines <= 4) ?
+    int y = (_scr.center_lines <= 4) ?
         vid.height * 0.35 : 48;
 
-    scr_copytop = 1;
-    Draw_TileClear(0, y, vid.width, 8 * scr_erase_lines);
+    scr.copytop = 1;
+    Draw_TileClear(0, y, vid.width, 8 * _scr.erase_lines);
 }
 
 void SCR_DrawCenterString() {
     // the finale prints the characters one at a time
     int remaining = (cl.intermission) ?
-        scr_printspeed.value * (cl.time - scr_centertime_start) : 9999;
+        scr_printspeed.value * (cl.time - _scr.centertime_start) : 9999;
 
-    scr_erase_center = 0;
-    cString start = scr_centerstring;
+    _scr.erase_center = 0;
+    cString start = _scr.centerstring;
 
-    int y = (scr_center_lines <= 4) ?
+    int y = (_scr.center_lines <= 4) ?
         vid.height * 0.35 : 48;
 
     do {
@@ -160,14 +144,14 @@ void SCR_DrawCenterString() {
 }
 
 void SCR_CheckDrawCenterString() {
-    scr_copytop = 1;
-    if (scr_center_lines > scr_erase_lines)
-        scr_erase_lines = scr_center_lines;
+    scr.copytop = 1;
+    if (_scr.center_lines > _scr.erase_lines)
+        _scr.erase_lines = _scr.center_lines;
 
-    scr_centertime_off -= host_frametime;
+    scr.centertime_off -= host_frametime;
 
-    if (((scr_centertime_off <= 0) && !cl.intermission) ||
-        (key_dest != key_game))
+    if (((scr.centertime_off <= 0) && !cl.intermission) ||
+        (key.dest != key_game))
         return;
 
     SCR_DrawCenterString();
@@ -202,7 +186,7 @@ Internal use only
 =================
 */
 static void SCR_CalcRefdef() {
-    scr_fullupdate = 0;  // force a background redraw
+    scr.fullupdate = 0;  // force a background redraw
     vid.recalc_refdef = 0;
 
     // force the status bar to redraw
@@ -237,12 +221,12 @@ static void SCR_CalcRefdef() {
         .height = vid.height
     };
 
-    R_SetVrect(&vrect, &scr_vrect, sb_lines);
+    R_SetVrect(&vrect, &scr.vrect, sb_lines);
 
     // guard against going from one mode to another that's less than half the
     // vertical resolution
-    if (scr_con_current > vid.height)
-        scr_con_current = vid.height;
+    if (scr.con_current > vid.height)
+        scr.con_current = vid.height;
 
     // notify the refresh of the change
     R_ViewChanged(&vrect, sb_lines, vid.aspect);
@@ -277,179 +261,6 @@ void SCR_SizeDown_f() {
 //============================================================================
 
 /*
-==================
-SCR_Init
-==================
-*/
-void SCR_Init() {
-    Cvar_RegisterVariable(&scr_fov);
-    Cvar_RegisterVariable(&scr_viewsize);
-    Cvar_RegisterVariable(&scr_conspeed);
-    Cvar_RegisterVariable(&scr_showram);
-    Cvar_RegisterVariable(&scr_showturtle);
-    Cvar_RegisterVariable(&scr_showpause);
-    Cvar_RegisterVariable(&scr_centertime);
-    Cvar_RegisterVariable(&scr_printspeed);
-
-    //
-    // register our commands
-    //
-    Cmd_AddCommand("screenshot", SCR_ScreenShot_f);
-    Cmd_AddCommand("sizeup", SCR_SizeUp_f);
-    Cmd_AddCommand("sizedown", SCR_SizeDown_f);
-
-    scr_ram = Draw_PicFromWad("ram");
-    scr_net = Draw_PicFromWad("net");
-    scr_turtle = Draw_PicFromWad("turtle");
-
-    scr_initialized = true;
-}
-
-
-
-/*
-==============
-SCR_DrawRam
-==============
-*/
-void SCR_DrawRam() {
-    if ((!scr_showram.value) ||
-        (!r_cache_thrash))
-        return;
-    printf("drawRAM [%s]  \n", r_cache_thrash ? "true" : "false");
-    Draw_Pic(scr_vrect.x + 32, scr_vrect.y, scr_ram);
-}
-
-/*
-==============
-SCR_DrawTurtle
-==============
-*/
-void SCR_DrawTurtle() {
-    static int count;
-
-    if (!scr_showturtle.value)  return;
-
-    if (host_frametime < 0.1) { count = 0;  return; }
-
-    count++;
-    if (count < 3)  return;
-
-    Draw_Pic(scr_vrect.x, scr_vrect.y, scr_turtle);
-}
-
-/*
-==============
-SCR_DrawNet
-==============
-*/
-void SCR_DrawNet() {
-    if ((realtime - cl.last_received_message < 0.3) ||
-        (cls.demoplayback))
-        return;
-
-    Draw_Pic(scr_vrect.x + 64, scr_vrect.y, scr_net);
-}
-
-/*
-==============
-DrawPause
-==============
-*/
-void SCR_DrawPause() {
-    if ((!scr_showpause.value) ||  // turn off for screenshots
-        (!cl.paused))
-        return;
-
-    qPic_p pic = Draw_CachePic("gfx/pause.lmp");
-    Draw_Pic((vid.width - pic->width) / 2,
-        (vid.height - 48 - pic->height) / 2, pic);
-}
-
-
-
-/*
-==============
-SCR_DrawLoading
-==============
-*/
-void SCR_DrawLoading() {
-    if (!scr_drawloading)   return;
-
-    qPic_p pic = Draw_CachePic("gfx/loading.lmp");
-    Draw_Pic((vid.width - pic->width) / 2,
-        (vid.height - 48 - pic->height) / 2, pic);
-}
-
-
-
-//=============================================================================
-
-
-/*
-==================
-SCR_SetUpToDrawConsole
-==================
-*/
-void SCR_SetUpToDrawConsole() {
-    Con_CheckResize();
-
-    if (scr_drawloading)    return;  // never a console with loading plaque
-
-    // decide on the height of the console
-    con_forcedup = !cl.worldmodel || cls.signon != SIGNONS;
-
-    if (con_forcedup) {
-        scr_conlines = vid.height;  // full screen
-        scr_con_current = scr_conlines;
-    }
-    else if (key_dest == key_console)   scr_conlines = vid.height / 2; // half screen
-    else                                scr_conlines = 0;    // none visible
-
-    if (scr_conlines < scr_con_current) {
-        scr_con_current -= scr_conspeed.value * host_frametime;
-        if (scr_conlines > scr_con_current)
-            scr_con_current = scr_conlines;
-
-    }
-    else if (scr_conlines > scr_con_current) {
-        scr_con_current += scr_conspeed.value * host_frametime;
-        if (scr_conlines < scr_con_current)
-            scr_con_current = scr_conlines;
-    }
-
-    if (clearconsole++ < vid.numpages) {
-        scr_copytop = 1;
-        Draw_TileClear(0, (int)scr_con_current, vid.width, vid.height - (int)scr_con_current);
-        Sbar_Changed();
-    }
-    else if (clearnotify++ < vid.numpages) {
-        scr_copytop = 1;
-        Draw_TileClear(0, 0, vid.width, con_notifylines);
-    }
-    else
-        con_notifylines = 0;
-}
-
-/*
-==================
-SCR_DrawConsole
-==================
-*/
-void SCR_DrawConsole() {
-    if (scr_con_current) {
-        scr_copyeverything = 1;
-        Con_DrawConsole(scr_con_current, true);
-        clearconsole = 0;
-    }
-    else {
-        if ((key_dest == key_game) || (key_dest == key_message))
-            Con_DrawNotify(); // only draw notify in game
-    }
-}
-
-
-/*
 ==============================================================================
 
                         SCREEN SHOTS
@@ -457,78 +268,7 @@ void SCR_DrawConsole() {
 ==============================================================================
 */
 
-
-typedef struct {
-    char manufacturer;
-    char version;
-    char encoding;
-    char bits_per_pixel;
-    uint16_t xmin, ymin, xmax, ymax;
-    uint16_t hres, vres;
-    uint8_t palette[48];
-    char reserved;
-    char color_planes;
-    uint16_t bytes_per_line;
-    uint16_t palette_type;
-    char filler[58];
-    uint8_t data;   // unbounded
-} pcx_t;
-typedef pcx_t* pcx_p;
-
-/*
-==============
-WritePCXfile
-==============
-*/
-void WritePCXfile(cString filename, uint8_p data, int width, int height, int rowbytes, uint8_p palette) {
-    pcx_p pcx = Hunk_TempAlloc(width * height * 2 + 1000);
-    if (pcx == NULL) {
-        Con_Printf("SCR_ScreenShot_f: not enough memory\n");
-        return;
-    }
-
-    pcx->manufacturer = 0x0a; // PCX id
-    pcx->version = 5;   // 256 color
-    pcx->encoding = 1;  // uncompressed
-    pcx->bits_per_pixel = 8;  // 256 color
-    pcx->xmin = 0;
-    pcx->ymin = 0;
-    pcx->xmax = LittleShort((int16_t)(width - 1));
-    pcx->ymax = LittleShort((int16_t)(height - 1));
-    pcx->hres = LittleShort((int16_t)width);
-    pcx->vres = LittleShort((int16_t)height);
-    Q_memset(pcx->palette, 0, sizeof(pcx->palette));
-    pcx->color_planes = 1;  // chunky image
-    pcx->bytes_per_line = LittleShort((int16_t)width);
-    pcx->palette_type = LittleShort(2);  // not a grey scale
-    Q_memset(pcx->filler, 0, sizeof(pcx->filler));
-
-    // pack the image
-    uint8_p pack = &pcx->data;
-
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            if ((*data & 0xc0) != 0xc0)
-                *pack++ = *data++;
-            else {
-                *pack++ = 0xc1;
-                *pack++ = *data++;
-            }
-        }
-
-        data += rowbytes - width;
-    }
-
-    // write the palette
-    *pack++ = 0x0C; // palette ID uint8_t
-    for (int i = 0; i < 768; i++)
-        *pack++ = *palette++;
-
-    // write output file
-    COM_WriteFile(filename, pcx, pack - (uint8_p)pcx);
-}
-
-
+#include "pcx.h"
 
 /*
 ==================
@@ -536,11 +276,10 @@ SCR_ScreenShot_f
 ==================
 */
 void SCR_ScreenShot_f() {
-    char pcxname[80];
     //
     // find a file name to save it to
     //
-    strcpy(pcxname, "quake00.pcx");
+    char pcxname[80]; strcpy(pcxname, "quake00.pcx");
 
     for (int i = 0; i <= 99; i++) {
         pcxname[5] = (i / 10) + '0';
@@ -568,6 +307,179 @@ void SCR_ScreenShot_f() {
 }
 
 
+/*
+==================
+SCR_Init
+==================
+*/
+void SCR_Init() {
+    Cvar_RegisterVariable(&scr_fov);
+    Cvar_RegisterVariable(&scr_viewsize);
+    Cvar_RegisterVariable(&scr_conspeed);
+    Cvar_RegisterVariable(&scr_showram);
+    Cvar_RegisterVariable(&scr_showturtle);
+    Cvar_RegisterVariable(&scr_showpause);
+    Cvar_RegisterVariable(&scr_centertime);
+    Cvar_RegisterVariable(&scr_printspeed);
+
+    //
+    // register our commands
+    //
+    Cmd_AddCommand("screenshot", SCR_ScreenShot_f);
+    Cmd_AddCommand("sizeup", SCR_SizeUp_f);
+    Cmd_AddCommand("sizedown", SCR_SizeDown_f);
+
+    _scr.ram = Draw_PicFromWad("ram");
+    _scr.net = Draw_PicFromWad("net");
+    _scr.turtle = Draw_PicFromWad("turtle");
+
+    _scr.initialized = true;
+}
+
+
+
+/*
+==============
+SCR_DrawRam
+==============
+*/
+void SCR_DrawRam() {
+    if ((!scr_showram.value) ||
+        (!r_cache_thrash))
+        return;
+    printf("drawRAM [%s]  \n", r_cache_thrash ? "true" : "false");
+    Draw_Pic(scr.vrect.x + 32, scr.vrect.y, _scr.ram);
+}
+
+/*
+==============
+SCR_DrawTurtle
+==============
+*/
+void SCR_DrawTurtle() {
+    static int count;
+
+    if (!scr_showturtle.value)  return;
+
+    if (host_frametime < 0.1) { count = 0;  return; }
+
+    count++;
+    if (count < 3)  return;
+
+    Draw_Pic(scr.vrect.x, scr.vrect.y, _scr.turtle);
+}
+
+/*
+==============
+SCR_DrawNet
+==============
+*/
+void SCR_DrawNet() {
+    if ((realtime - cl.last_received_message < 0.3) ||
+        (cls.demoplayback))
+        return;
+
+    Draw_Pic(scr.vrect.x + 64, scr.vrect.y, _scr.net);
+}
+
+/*
+==============
+DrawPause
+==============
+*/
+void SCR_DrawPause() {
+    if ((!scr_showpause.value) ||  // turn off for screenshots
+        (!cl.paused))
+        return;
+
+    qPic_p pic = Draw_CachePic("gfx/pause.lmp");
+    Draw_Pic((vid.width - pic->width) / 2,
+        (vid.height - 48 - pic->height) / 2, pic);
+}
+
+
+
+/*
+==============
+SCR_DrawLoading
+==============
+*/
+void SCR_DrawLoading() {
+    if (!_scr.drawloading)   return;
+
+    qPic_p pic = Draw_CachePic("gfx/loading.lmp");
+    Draw_Pic((vid.width - pic->width) / 2,
+        (vid.height - 48 - pic->height) / 2, pic);
+}
+
+
+
+//=============================================================================
+
+
+/*
+==================
+SCR_SetUpToDrawConsole
+==================
+*/
+void SCR_SetUpToDrawConsole() {
+    Con_CheckResize();
+
+    if (_scr.drawloading)    return;  // never a console with loading plaque
+
+    // decide on the height of the console
+    con.forcedup = !cl.worldmodel || cls.signon != SIGNONS;
+
+    if (con.forcedup) {
+        scr.conlines = vid.height;  // full screen
+        scr.con_current = scr.conlines;
+    }
+    else if (key.dest == key_console)   scr.conlines = vid.height / 2; // half screen
+    else                                scr.conlines = 0;    // none visible
+
+    if (scr.conlines < scr.con_current) {
+        scr.con_current -= scr_conspeed.value * host_frametime;
+        if (scr.conlines > scr.con_current)
+            scr.con_current = scr.conlines;
+
+    }
+    else if (scr.conlines > scr.con_current) {
+        scr.con_current += scr_conspeed.value * host_frametime;
+        if (scr.conlines < scr.con_current)
+            scr.con_current = scr.conlines;
+    }
+
+    if (clearconsole++ < vid.numpages) {
+        scr.copytop = 1;
+        Draw_TileClear(0, (int)scr.con_current, vid.width, vid.height - (int)scr.con_current);
+        Sbar_Changed();
+    }
+    else if (clearnotify++ < vid.numpages) {
+        scr.copytop = 1;
+        Draw_TileClear(0, 0, vid.width, con.notifylines);
+    }
+    else
+        con.notifylines = 0;
+}
+
+/*
+==================
+SCR_DrawConsole
+==================
+*/
+void SCR_DrawConsole() {
+    if (scr.con_current) {
+        scr.copyeverything = 1;
+        Con_DrawConsole(scr.con_current, true);
+        clearconsole = 0;
+    }
+    else {
+        if ((key.dest == key_game) || (key.dest == key_message))
+            Con_DrawNotify(); // only draw notify in game
+    }
+}
+
+
 //=============================================================================
 
 
@@ -586,18 +498,18 @@ void SCR_BeginLoadingPlaque() {
 
     // redraw with no console and the loading plaque
     Con_ClearNotify();
-    scr_centertime_off = 0;
-    scr_con_current = 0;
+    scr.centertime_off = 0;
+    scr.con_current = 0;
 
-    scr_drawloading = true;
-    scr_fullupdate = 0;
+    _scr.drawloading = true;
+    scr.fullupdate = 0;
     Sbar_Changed();
     SCR_UpdateScreen();
-    scr_drawloading = false;
+    _scr.drawloading = false;
 
-    scr_disabled_for_loading = true;
-    scr_disabled_time = realtime;
-    scr_fullupdate = 0;
+    scr.disabled_for_loading = true;
+    _scr.disabled_time = realtime;
+    scr.fullupdate = 0;
 }
 
 /*
@@ -607,18 +519,17 @@ SCR_EndLoadingPlaque
 ================
 */
 void SCR_EndLoadingPlaque() {
-    scr_disabled_for_loading = false;
-    scr_fullupdate = 0;
+    scr.disabled_for_loading = false;
+    scr.fullupdate = 0;
     Con_ClearNotify();
 }
 
 //=============================================================================
 
-static cString _scr_notifystring;
-static bool _scr_drawdialog;
+
 
 void SCR_DrawNotifyString() {
-    cString start = _scr_notifystring;
+    cString start = _scr.notifystring;
     int y = vid.height * 0.35;
 
     do {
@@ -652,28 +563,28 @@ keypress.
 int SCR_ModalMessage(cString text) {
     if (cls.state == ca_dedicated)  return true;
 
-    _scr_notifystring = text;
+    _scr.notifystring = text;
 
     // draw a fresh screen
-    scr_fullupdate = 0;
-    _scr_drawdialog = true;
+    scr.fullupdate = 0;
+    _scr.drawdialog = true;
     SCR_UpdateScreen();
-    _scr_drawdialog = false;
+    _scr.drawdialog = false;
 
     S_ClearBuffer();  // so dma doesn't loop current sound
 
     do {
-        key_count = -1;  // wait for a key down and up
+        key.count = -1;  // wait for a key down and up
         Sys_SendKeyEvents();
     } while (
-        (key_lastpress != 'y') &&
-        (key_lastpress != 'n') &&
-        (key_lastpress != K_ESCAPE));
+        (key.lastpress != 'y') &&
+        (key.lastpress != 'n') &&
+        (key.lastpress != K_ESCAPE));
 
-    scr_fullupdate = 0;
+    scr.fullupdate = 0;
     SCR_UpdateScreen();
 
-    return key_lastpress == 'y';
+    return key.lastpress == 'y';
 }
 
 
@@ -687,9 +598,9 @@ Brings the console down and fades the palettes back to normal
 ================
 */
 void SCR_BringDownConsole() {
-    scr_centertime_off = 0;
+    scr.centertime_off = 0;
 
-    for (int i = 0; (i < 20) && (scr_conlines != scr_con_current); i++)
+    for (int i = 0; (i < 20) && (scr.conlines != scr.con_current); i++)
         SCR_UpdateScreen();
 
     cl.cshifts[0].percent = 0;  // no area contents palette on next frame
@@ -712,25 +623,24 @@ void SCR_UpdateScreen() {
     static float oldscr_viewsize;
     static float oldlcd_x;
 
-    if (scr_skipupdate || block_drawing)
+    if (scr.skipupdate || block_drawing)
         return;
 
-    scr_copytop = 0;
-    scr_copyeverything = 0;
+    scr.copytop = 0;
+    scr.copyeverything = 0;
 
-    if (scr_disabled_for_loading) {
-        if (realtime - scr_disabled_time > 60) {
-            scr_disabled_for_loading = false;
+    if (scr.disabled_for_loading) {
+        if (realtime - _scr.disabled_time > 60) {
+            scr.disabled_for_loading = false;
             Con_Printf("load failed.\n");
         }
-        else
-            return;
+        else    return;
     }
 
     if (cls.state == ca_dedicated)
         return;    // stdout only
 
-    if (!scr_initialized || !con_initialized)
+    if (!_scr.initialized || !con.isInitialized)
         return;    // not initialized yet
 
     if (scr_viewsize.value != oldscr_viewsize) {
@@ -766,8 +676,8 @@ void SCR_UpdateScreen() {
     //
     D_EnableBackBufferAccess(); // of all overlay stuff if drawing directly
 
-    if (scr_fullupdate++ < vid.numpages) { // clear the entire screen
-        scr_copyeverything = 1;
+    if (scr.fullupdate++ < vid.numpages) { // clear the entire screen
+        scr.copyeverything = 1;
         Draw_TileClear(0, 0, vid.width, vid.height);
         Sbar_Changed();
     }
@@ -782,31 +692,29 @@ void SCR_UpdateScreen() {
     //  for linear writes all the time
 
     VID_LockBuffer();
-
     V_RenderView();
-
     VID_UnlockBuffer();
 
     D_EnableBackBufferAccess(); // of all overlay stuff if drawing directly
 
-    if (_scr_drawdialog) {
+    if (_scr.drawdialog) {
         Sbar_Draw();
         Draw_FadeScreen();
         SCR_DrawNotifyString();
-        scr_copyeverything = true;
+        scr.copyeverything = true;
     }
-    else if (scr_drawloading) {
+    else if (_scr.drawloading) {
         SCR_DrawLoading();
         Sbar_Draw();
     }
-    else if ((cl.intermission == 1) && (key_dest == key_game)) {
+    else if ((cl.intermission == 1) && (key.dest == key_game)) {
         Sbar_IntermissionOverlay();
     }
-    else if ((cl.intermission == 2) && (key_dest == key_game)) {
+    else if ((cl.intermission == 2) && (key.dest == key_game)) {
         Sbar_FinaleOverlay();
         SCR_CheckDrawCenterString();
     }
-    else if ((cl.intermission == 3) && (key_dest == key_game)) {
+    else if ((cl.intermission == 3) && (key.dest == key_game)) {
         SCR_CheckDrawCenterString();
     }
     else {
@@ -822,9 +730,9 @@ void SCR_UpdateScreen() {
 
     D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
     //  for linear writes all the time
-    if (pconupdate) {
+    if (pconupdate)
         D_UpdateRects(pconupdate);
-    }
+
 
     V_UpdatePalette();
 
@@ -832,7 +740,7 @@ void SCR_UpdateScreen() {
     // update one of three areas
     //
 
-    if (scr_copyeverything) {
+    if (scr.copyeverything) {
         vRect_t  vrect = {
             .x = 0,
             .y = 0,
@@ -843,7 +751,7 @@ void SCR_UpdateScreen() {
 
         VID_Update(&vrect);
     }
-    else if (scr_copytop) {
+    else if (scr.copytop) {
         vRect_t  vrect = {
             .x = 0,
             .y = 0,
@@ -856,8 +764,8 @@ void SCR_UpdateScreen() {
     }
     else {
         vRect_t  vrect = {
-            .x = scr_vrect.x,
-            .y = scr_vrect.y,
+            .x = scr.vrect.x,
+            .y = scr.vrect.y,
             .width = vid.width,
             .height = vid.height,
             .pnext = 0
@@ -874,6 +782,6 @@ SCR_UpdateWholeScreen
 ==================
 */
 void SCR_UpdateWholeScreen() {
-    scr_fullupdate = 0;
+    scr.fullupdate = 0;
     SCR_UpdateScreen();
 }

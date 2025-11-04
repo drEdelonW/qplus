@@ -27,7 +27,7 @@ char serialConfig_phone[16];
 
 void M_Menu_SerialConfig_f() {
 
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_serialconfig;
     m_entersound = true;
     serialConfigCursor = (is_JoinGame() && SerialConfig) ? 4 : 5;
@@ -119,8 +119,8 @@ void M_SerialConfig_Draw() {
 }
 
 
-void M_SerialConfig_Key(keycode_t key) {
-    switch (key) {
+void M_SerialConfig_Key(keycode_t Key) {
+    switch (Key) {
     case K_ESCAPE:  M_Menu_Net_f(); break;
 
     case K_UPARROW:
@@ -224,7 +224,7 @@ void M_SerialConfig_Key(keycode_t key) {
 
         m_return_state = m_state;
         m_return_onerror = true;
-        key_dest = key_game;
+        key.dest = key_game;
         m_state = m_none;
 
         if (SerialConfig)   Cbuf_AddText(va("connect \"%s\"\n", serialConfig_phone));
@@ -239,14 +239,14 @@ void M_SerialConfig_Key(keycode_t key) {
         break;
 
     default:
-        if ((key < 32) ||
-            (key > 127))
+        if ((Key < 32) ||
+            (Key > 127))
             break;
         if (serialConfigCursor == 4) {
             int l = strlen(serialConfig_phone);
             if (l < 15) {
                 serialConfig_phone[l + 1] = 0;
-                serialConfig_phone[l] = key;
+                serialConfig_phone[l] = Key;
             }
         }
     }
@@ -256,7 +256,7 @@ void M_SerialConfig_Key(keycode_t key) {
             (serialConfigCursor == 4))
         ) {
         serialConfigCursor =
-            (key == K_UPARROW) ? 2 : 5;
+            (Key == K_UPARROW) ? 2 : 5;
     }
 
     if (SerialConfig &&
@@ -264,6 +264,6 @@ void M_SerialConfig_Key(keycode_t key) {
         (serialConfigCursor == 4)
         ) {
         serialConfigCursor =
-            (key == K_UPARROW) ? 3 : 5;
+            (Key == K_UPARROW) ? 3 : 5;
     }
 }

@@ -934,7 +934,7 @@ void GetEvent(void) {
     }
 
     if (mouse_avail) {
-        if (key_dest == key_game && !mouse_grabbed && mouse_in_window) {
+        if (key.dest == key_game && !mouse_grabbed && mouse_in_window) {
             mouse_grabbed = true;
             /* grab the pointer */
             XGrabPointer(x_disp, x_win, True, 0, GrabModeAsync,
@@ -942,7 +942,7 @@ void GetEvent(void) {
             // inviso cursor
             XDefineCursor(x_disp, x_win, CreateNullCursor(x_disp, x_win));
         }
-        else if ((key_dest != key_game || !mouse_in_window) && mouse_grabbed) {
+        else if ((key.dest != key_game || !mouse_in_window) && mouse_grabbed) {
             mouse_grabbed = false;
             /* ungrab the pointer */
             XUngrabPointer(x_disp, CurrentTime);

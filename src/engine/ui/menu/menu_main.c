@@ -20,11 +20,11 @@ static Main_e _cursor;
 int m_save_demonum;
 
 void M_Menu_Main_f() {
-    if (key_dest != key_menu) {
+    if (key.dest != key_menu) {
         m_save_demonum = cls.demonum;
         cls.demonum = -1;
     }
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_main;
     m_entersound = true;
 }
@@ -39,10 +39,10 @@ void M_Main_Draw() {
     M_DrawTransPic(54, 32 + _cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame())));
 }
 
-void M_Main_Key(keycode_t key) {
-    switch (key) {
+void M_Main_Key(keycode_t Key) {
+    switch (Key) {
     case K_ESCAPE:
-        key_dest = key_game;
+        key.dest = key_game;
         m_state = m_none;
         cls.demonum = m_save_demonum;
         if ((cls.demonum != -1) &&

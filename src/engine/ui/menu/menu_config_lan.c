@@ -32,7 +32,7 @@ static int _y[] = { 72, 92, 124 };
 
 
 void M_Menu_LanConfig_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_lanconfig;
     m_entersound = true;
     if (_cursor == lc_UNINITED) {
@@ -94,8 +94,8 @@ void M_LanConfig_Draw() {
 }
 
 
-void M_LanConfig_Key(keycode_t key) {
-    switch (key) {
+void M_LanConfig_Key(keycode_t Key) {
+    switch (Key) {
     case K_ESCAPE:  M_Menu_Net_f(); break;
 
     case K_UPARROW:
@@ -125,7 +125,7 @@ void M_LanConfig_Key(keycode_t key) {
         if (_cursor == lc_JoinName) {
             m_return_state = m_state;
             m_return_onerror = true;
-            key_dest = key_game;
+            key.dest = key_game;
             m_state = m_none;
             Cbuf_AddText(va("connect \"%s\"\n", lanConfig.joinname));
             break;
@@ -146,21 +146,21 @@ void M_LanConfig_Key(keycode_t key) {
         break;
 
     default:
-        if (!is_printable(key)) break;
+        if (!is_printable(Key)) break;
 
         if (_cursor == lc_JoinName) {
             int l = strlen(lanConfig.joinname);
             if (l < 21) {
-                lanConfig.joinname[l] = key;
+                lanConfig.joinname[l] = Key;
                 lanConfig.joinname[l + 1] = 0x00;
             }
         }
 
-        if (!is_digits(key))    break;
+        if (!is_digits(Key))    break;
         if (_cursor == lc_Port) {
             int l = strlen(lanConfig.portname);
             if (l < 5) {
-                lanConfig.portname[l] = key;
+                lanConfig.portname[l] = Key;
                 lanConfig.portname[l + 1] = 0x00;
             }
         }
@@ -169,7 +169,7 @@ void M_LanConfig_Key(keycode_t key) {
     if ((is_CreateGame()) &&
         (_cursor == lc_JoinName)
         ) {
-        if (key == K_UPARROW)   _cursor = 1;
+        if (Key == K_UPARROW)   _cursor = 1;
         else                    _cursor = 0;
     }
 

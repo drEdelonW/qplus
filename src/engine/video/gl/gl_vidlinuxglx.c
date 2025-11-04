@@ -910,7 +910,7 @@ void IN_Commands(void) {
     if (!dpy || !win)
         return;
 
-    if (vidmode_active || key_dest == key_game)
+    if (vidmode_active || key.dest == key_game)
         IN_ActivateMouse();
     else
         IN_DeactivateMouse();

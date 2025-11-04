@@ -40,7 +40,7 @@ static options_e _cursor;
 // void (*vid_menudrawfn)();
 
 void M_Menu_Options_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_options;
     m_entersound = true;
 

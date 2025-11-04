@@ -106,7 +106,6 @@ typedef enum {
 //  reg_srch: ^\s*cvar_t\s+([A-Za-z_]\w*)\s*=\s*\{\s*"\1"\s*,\s*"([^"]*)"\s*,\s*true\s*,\s*true\s*\}\s*;(\s*//.*)?$
 //  reg_rpc:  CVAR_AS($1, "$2");$3
 
-struct cvar_s;
 typedef struct cvar_s cvar_t;
 typedef cvar_t* cvar_p;
 struct cvar_s {

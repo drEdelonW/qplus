@@ -118,7 +118,9 @@
 			"surfcache.h": "c",
 			"world.h": "c",
 			"*.c_": "cpp",
-			"platformdefs.h": "c"
+			"platformdefs.h": "c",
+			"texture.h": "c",
+			"screen.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

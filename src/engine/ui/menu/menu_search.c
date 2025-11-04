@@ -11,7 +11,7 @@ bool searchComplete = false;
 double searchCompleteTime;
 
 void M_Menu_Search_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_search;
     m_entersound = false;
     slistSilent = true;

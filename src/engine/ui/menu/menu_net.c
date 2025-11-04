@@ -41,7 +41,7 @@ cString net_helpMessage[][4]/*[25]*/ = {
 };
 
 void M_Menu_Net_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_net;
     m_entersound = true;
     m_net_items = 4;
@@ -143,7 +143,7 @@ again:
 /* VIDEO MENU */
 
 void M_Menu_Video_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_video;
     m_entersound = true;
 }

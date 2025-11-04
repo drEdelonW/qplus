@@ -124,11 +124,17 @@ typedef enum {
     key_menu
 } keydest_t;
 
-extern keycode_t key_lastpress;
-extern keydest_t key_dest;
-extern cString keybindings[MAX_KEYS];
-extern int key_count;			// incremented every key event
-extern int key_repeats[MAX_KEYS];
+extern cString   keyBindings[MAX_KEYS];
+typedef struct {
+    keycode_t lastpress;
+    keydest_t dest;
+    int       count;			// incremented every key event
+} Key_t;
+
+extern Key_t key;
+extern char chatBuffer[];
+extern bool team_message;
+
 
 #ifdef __cplusplus
 extern "C" {

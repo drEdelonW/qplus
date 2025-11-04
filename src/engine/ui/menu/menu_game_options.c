@@ -152,7 +152,7 @@ bool m_serverInfoMessage = false;
 double m_serverInfoMessageTime;
 
 void M_Menu_GameOptions_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_gameoptions;
     m_entersound = true;
     if (maxplayers == 0)

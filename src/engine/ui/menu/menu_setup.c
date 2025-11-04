@@ -38,7 +38,7 @@ typedef struct {
 Setup_t _s;
 
 void M_Menu_Setup_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_setup;
     m_entersound = true;
     Q_strcpy(_s.myname, cl_name.string);

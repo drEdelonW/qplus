@@ -34,7 +34,7 @@ typedef struct {
 static modemConfig_t _mc;
 
 void M_Menu_ModemConfig_f() {
-    key_dest = key_menu;
+    key.dest = key_menu;
     m_state = m_modemconfig;
     m_entersound = true;
     (*GetModemConfig) (0, &_mc.dialing, _mc.sClear, _mc.sInit, _mc.sHangup);

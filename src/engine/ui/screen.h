@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // screen.h
 #include "types.h"
-
+#include "vid.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,23 +39,25 @@ extern "C" {
     void SCR_EndLoadingPlaque();
 
     int SCR_ModalMessage(cString text);
+
 #ifdef __cplusplus
 }
 #endif
-extern float    scr_con_current;
-extern float    scr_conlines;  // lines of console to display
-
-extern int  scr_fullupdate; // set to 0 to force full redraw
-extern int  sb_lines;
-
-extern int  clearnotify; // set to 0 whenever notify text is drawn
-extern bool scr_disabled_for_loading;
-extern bool scr_skipupdate;
-
 // only the refresh window will be updated unless these variables are flagged
-extern int  scr_copytop;
-extern int  scr_copyeverything;
+typedef struct {
+    int      copytop;
+    int      copyeverything;
+    float    con_current;
+    float    conlines;  // lines of console to display
+    int      fullupdate; // set to 0 to force full redraw
+    vRect_t  vrect;
+    bool     disabled_for_loading;
+    bool     skipupdate;
+    float    centertime_off;
+} Screen_t;
+extern Screen_t scr;
 
-extern bool  block_drawing;
+extern int      clearnotify; // set to 0 whenever notify text is drawn
+extern bool     block_drawing;
 
 void SCR_UpdateWholeScreen();

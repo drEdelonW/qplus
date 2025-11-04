@@ -23,9 +23,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "r_local.h"
 #include "d_local.h"
+#include "screen.h"
 
 uint8_p r_turb_pbase, r_turb_pdest;
-fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
+fixed16_t r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
 int* r_turb_turb;
 int				r_turb_spancount;
 
@@ -54,27 +55,27 @@ void D_WarpScreen() {
 	w = r_refdef.vrect.width;
 	h = r_refdef.vrect.height;
 
-	wratio = w / (float)scr_vrect.width;
-	hratio = h / (float)scr_vrect.height;
+	wratio = w / (float)scr.vrect.width;
+	hratio = h / (float)scr.vrect.height;
 
-	for (v = 0; v < scr_vrect.height + AMP2 * 2; v++) {
+	for (v = 0; v < scr.vrect.height + AMP2 * 2; v++) {
 		rowptr[v] = d_viewbuffer + (r_refdef.vrect.y * screenwidth) +
 			(screenwidth * (int)((float)v * hratio * h / (h + AMP2 * 2)));
 	}
 
-	for (u = 0; u < scr_vrect.width + AMP2 * 2; u++) {
+	for (u = 0; u < scr.vrect.width + AMP2 * 2; u++) {
 		column[u] = r_refdef.vrect.x +
 			(int)((float)u * wratio * w / (w + AMP2 * 2));
 	}
 
 	turb = intsintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
-	dest = vid.buffer + scr_vrect.y * vid.rowbytes + scr_vrect.x;
+	dest = vid.buffer + scr.vrect.y * vid.rowbytes + scr.vrect.x;
 
-	for (v = 0; v < scr_vrect.height; v++, dest += vid.rowbytes) {
+	for (v = 0; v < scr.vrect.height; v++, dest += vid.rowbytes) {
 		col = &column[turb[v]];
 		row = &rowptr[v];
 
-		for (u = 0; u < scr_vrect.width; u += 4) {
+		for (u = 0; u < scr.vrect.width; u += 4) {
 			dest[u + 0] = row[turb[u + 0]][col[u + 0]];
 			dest[u + 1] = row[turb[u + 1]][col[u + 1]];
 			dest[u + 2] = row[turb[u + 2]][col[u + 2]];

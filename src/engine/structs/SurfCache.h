@@ -4,7 +4,6 @@
 #include "enginedefs.h"
 #include "Texture.h"
 
-struct SurfCache_s;
 typedef struct SurfCache_s SurfCache_t;
 typedef SurfCache_t* SurfCache_p;
 struct SurfCache_s {
