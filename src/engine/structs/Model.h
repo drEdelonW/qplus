@@ -9,12 +9,14 @@
 #include "Edge.h"
 #include "ClipNode.h"
 
-#include "modelgen.h"
 #include "platformdefs.h"
 #include "zone.h"
 
 #define MAX_MAP_HULLS       (4)
+#define ALIAS_VERSION 6
 
+#define IDPOLYHEADER    (('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
+// little-endian "IDPO"
 //
 // Whole model
 //

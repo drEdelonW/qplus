@@ -38,9 +38,9 @@ BRUSH MODELS
 */
 
 typedef enum {
-    SIDE_FRONT = 0, // point is in front of plane
-    SIDE_BACK = 1, // point is behind plane
-    SIDE_ON = 2  // point is on plane
+    SIDE_FRONT  = 0, // point is in front of plane
+    SIDE_BACK   = 1, // point is behind plane
+    SIDE_ON     = 2  // point is on plane
 } Side_t;
 
 
@@ -60,7 +60,7 @@ extern "C" {
     mLeaf_p Mod_PointInLeaf(vec3_t p, Model_p model);
     uint8_p Mod_LeafPVS(mLeaf_p leaf, Model_p model);
 
+    void Mod_Print();
 #ifdef __cplusplus
 }
 #endif
-void Mod_Print();

@@ -30,8 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 
-#define ALIAS_VERSION 6
+#error deprecated!
 
-#define IDPOLYHEADER    (('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
-// little-endian "IDPO"
 

@@ -1,39 +1,6 @@
 #include "host.h"
 #include "host.hpp"
 
-/*
-================
-Host_FindMaxClients
-================
-*/
-void Host_FindMaxClients() {
-    host.FindMaxClients();
-}
-
-
-/*
-=======================
-Host_InitLocal
-======================
-*/
-void Host_InitLocal() {
-    host.InitLocal();
-}
-
-
-/*
-===============
-Host_WriteConfiguration
-
-Writes key bindings and archived cvars to config.cfg
-===============
-*/
-void Host_WriteConfiguration() {
-    host.WriteConfiguration();
-}
-
-
-
 
 /*
 ==================
@@ -63,41 +30,6 @@ void Host_ClearMemory() {
 //============================================================================
 
 
-/*
-===================
-Host_FilterTime
-
-Returns false if the time is too int16_t to run a frame
-===================
-*/
-bool Host_FilterTime(float time) {
-    return host.FilterTime(time);
-}
-
-
-/*
-===================
-Host_GetConsoleCommands
-
-Add them exactly as if they had been typed at the console
-===================
-*/
-void Host_GetConsoleCommands() {
-    host.GetConsoleCommands();
-}
-
-
-/*
-==================
-Host_ServerFrame
-
-==================
-*/
-
-void Host_ServerFrame() {
-    host.ServerFrame();
-}
-
 
 /*
 ==================
@@ -113,10 +45,6 @@ void Host_Frame(float time) {
 
 //============================================================================
 
-
-void Host_InitVCR(QuakeParms_p parms) {
-    host.InitVCR(parms);
-}
 
 /*
 ====================
@@ -137,6 +65,9 @@ to run quit through here before the final handoff to the sys code.
 ===============
 */
 void Host_Shutdown() {
-  host.Shutdown();
+    host.Shutdown();
 }
 
+// void Host_InitCommands() {
+//     host.InitCommands();
+// }

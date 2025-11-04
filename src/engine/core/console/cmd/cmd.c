@@ -284,7 +284,7 @@ void Cmd_TokenizeString(cString text) {
     Cmd_AddCommand
     ============
 */
-void Cmd_AddCommand(cString cmd_name, xcommand_t function) {
+void Cmd_AddCommand(cStringRO cmd_name, xcommand_t function) {
     if (host_initialized) // because hunk allocation would get stomped
         Sys_Error("Cmd_AddCommand after host_initialized");
 
@@ -304,7 +304,7 @@ void Cmd_AddCommand(cString cmd_name, xcommand_t function) {
     }
 
     cmd = Hunk_Alloc(sizeof(CmdFunction_t));
-    cmd->name = cmd_name;
+    cmd->name = (cString)cmd_name;
     cmd->function = function;
     cmd->next = _cmdFunctions;
     _cmdFunctions = cmd;

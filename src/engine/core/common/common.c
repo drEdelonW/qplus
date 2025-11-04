@@ -49,7 +49,6 @@ static cStringRO _safeArgvs[NUM_SAFE_ARGVS] = {
 };
 
 
-static bool     _progHack;
 static int32_t  _Registered = 1;  // only for startup check, then set
 
 bool  msg_suppress_1 = false; // supress System messages
@@ -531,6 +530,8 @@ Finds the file in the search path.
 Sets com.filesize and one of handle or file
 ===========
 */
+static bool     _progHack;
+
 int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
     if (file && handle)     Sys_Error("COM_FindFile: both handle and file set");
     if (!file && !handle)   Sys_Error("COM_FindFile: neither handle or file set");

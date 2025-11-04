@@ -28,8 +28,10 @@ ALIAS MODEL DISPLAY LIST GENERATION
 =================================================================
 */
 #include "Model.h"
+#include "Alias.h"
+
 Model_p aliasmodel;
-AliasHdr_t* paliashdr;
+AliasHdr_p paliashdr;
 
 bool used[8192];
 
@@ -55,14 +57,9 @@ StripLength
 ================
 */
 int StripLength(int starttri, int startv) {
-    int   m1, m2;
-    int   j;
-    mTriangle_p last, check;
-    int   k;
-
     used[starttri] = 2;
 
-    last = &triangles[starttri];
+    mTriangle_p last = &triangles[starttri];
 
     stripverts[0] = last->vertindex[(startv) % 3];
     stripverts[1] = last->vertindex[(startv + 1) % 3];
@@ -71,14 +68,15 @@ int StripLength(int starttri, int startv) {
     striptris[0] = starttri;
     stripcount = 1;
 
-    m1 = last->vertindex[(startv + 2) % 3];
-    m2 = last->vertindex[(startv + 1) % 3];
+    int m1 = last->vertindex[(startv + 2) % 3];
+    int m2 = last->vertindex[(startv + 1) % 3];
 
     // look for a matching triangle
 nexttri:
-    for (j = starttri + 1, check = &triangles[starttri + 1]; j < pheader->numtris; j++, check++) {
+    mTriangle_p check = &triangles[starttri + 1];
+    for (int j = starttri + 1; j < pheader->numtris; j++, check++) {
         if (check->facesfront != last->facesfront)  continue;
-        for (k = 0; k < 3; k++) {
+        for (int k = 0; k < 3; k++) {
             if (check->vertindex[k] != m1)              continue;
             if (check->vertindex[(k + 1) % 3] != m2)    continue;
 
@@ -105,7 +103,7 @@ nexttri:
 done:
 
     // clear the temp used flags
-    for (j = starttri + 1; j < pheader->numtris; j++)
+    for (int j = starttri + 1; j < pheader->numtris; j++)
         if (used[j] == 2)
             used[j] = 0;
 

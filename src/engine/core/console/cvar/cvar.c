@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 cvar_p cvar_vars;
-cString cvar_null_string = "";
+static cStringRO _cvar_null_string = "";
 
 /*
 ============
@@ -51,7 +51,7 @@ Cvar_VariableValue
 float	Cvar_VariableValue(cString var_name) {
     cvar_p var = Cvar_FindVar(var_name);
     if (!var)
-        return 0;
+        return 0.0f;
     return Q_atof(var->string);
 }
 
@@ -61,10 +61,10 @@ float	Cvar_VariableValue(cString var_name) {
 Cvar_VariableString
 ============
 */
-cString Cvar_VariableString(cString var_name) {
+cString Cvar_VariableString(cStringRO var_name) {
     cvar_p var = Cvar_FindVar(var_name);
     if (!var)
-        return cvar_null_string;
+        return (cString)_cvar_null_string;
     return var->string;
 }
 

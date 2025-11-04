@@ -50,7 +50,7 @@ extern "C" {
     // called by the init functions of other parts of the program to
     // register commands and functions to call for them.
     // The cmd_name is referenced later, so it should not be in temp memory
-    void Cmd_AddCommand(cString cmd_name, xcommand_t function);
+    void Cmd_AddCommand(cStringRO cmd_name, xcommand_t function);
 
     // used by the cvar code to check for cvar / command name overlap
     bool Cmd_Exists(cString cmd_name);
