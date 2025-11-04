@@ -5,6 +5,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
         $(eval STRUCT_DIR := $(ENG_DIR)/structs) $(eval INCLUDES += $(STRUCT_DIR))
                 SRC_LIST += $(STRUCT_DIR)/qPic.c
                 SRC_LIST += $(STRUCT_DIR)/pcx.c
+                SRC_LIST += $(STRUCT_DIR)/Pak.c
 
         $(eval GAMESPEC_DIR = $(ENG_DIR)/game_specific) $(eval INCLUDES += $(GAMESPEC_DIR))
 

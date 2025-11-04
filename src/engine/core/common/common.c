@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include <stdarg.h>
 #include "sys.h"
-#include "crc.h"
+#include "Pak.h"
 #include "console.h"
 #include "cmd.h"
 #include "draw.h"
@@ -49,15 +49,13 @@ static cStringRO _safeArgvs[NUM_SAFE_ARGVS] = {
 };
 
 
-static bool     _contModified;   // set true if using non-id files
 static bool     _progHack;
 static int32_t  _Registered = 1;  // only for startup check, then set
 
 bool  msg_suppress_1 = false; // supress System messages
 
 // if a packfile directory differs from this, it is assumed to be hacked
-#define PAK0_COUNT              339
-#define PAK0_CRC                32981
+
 
 
 common_t com;
@@ -323,7 +321,7 @@ void COM_CheckRegistered() {
         Sys_Error("This dedicated server requires a full registered copy of Quake");
 #endif
         Con_Printf("Playing shareware version.\n");
-        if (_contModified)
+        if (contModified)
             Sys_Error("You must have the registered version to use modified games");
         return;
     }
@@ -401,24 +399,6 @@ void COM_InitArgv(int argc, cStringArray argv) {
 }
 
 
-/*
-================
-COM_Init
-================
-*/
-void COM_Path_f();
-void COM_InitFilesystem();
-
-void COM_Init(cStringRO basedir) {
-    COM_Endian_Init();
-
-    Cvar_RegisterVariable(&registered);
-    Cvar_RegisterVariable(&cmdline);
-    Cmd_AddCommand("path", COM_Path_f);
-
-    COM_InitFilesystem();
-    COM_CheckRegistered();
-}
 
 
 /*
@@ -447,52 +427,10 @@ int32_t memsearch(uint8_p start, int32_t count, int32_t search) {
     return -1;
 }
 
-/*
-=============================================================================
-
-QUAKE FILESYSTEM
-
-=============================================================================
-*/
-
-//
-// in memory
-//
-
-typedef struct {
-    char    name[MAX_QPATH];
-    int32_t filepos, filelen;
-} packfile_t;
-typedef packfile_t* packfile_p;
-
-typedef struct pack_s {
-    char        filename[MAX_OSPATH];
-    int32_t     handle;
-    int32_t     numfiles;
-    packfile_p  files;
-} pack_t;
-typedef pack_t* pack_p;
-
-//
-// on disk
-//
-typedef struct {
-    char    name[56];
-    int32_t filepos, filelen;
-} dpackfile_t;
-
-typedef struct {
-    char    id[4];
-    int32_t dirofs;
-    int32_t dirlen;
-} dpackHeader_t;
-
-#define MAX_FILES_IN_PACK       2048
 
 char com_cachedir[MAX_OSPATH];
 
 
-struct searchpath_s;
 typedef struct searchpath_s searchpath_t;
 typedef searchpath_t* searchpath_p;
 struct searchpath_s {
@@ -791,73 +729,6 @@ uint8_p COM_LoadStackFile(cStringRO path, TypeLess_ptr buffer, int32_t bufsize) 
     return buf;
 }
 
-/*
-=================
-COM_LoadPackFile
-
-Takes an explicit (not game tree related) path to a pak file.
-
-Loads the header and directory, adding the files at the beginning
-of the list so they override previous pack files.
-=================
-*/
-pack_p COM_LoadPackFile(cStringRO packfile) {
-
-    int packhandle;
-    if (Sys_FileOpenRead(packfile, &packhandle) == -1) {
-        //              Con_Printf ("Couldn't open %s\n", packfile);
-        return NULL;
-    }
-    dpackHeader_t header;
-    Sys_FileRead(packhandle, (TypeLess_ptr)&header, sizeof(header));
-    if ((header.id[0] != 'P') ||
-        (header.id[1] != 'A') ||
-        (header.id[2] != 'C') ||
-        (header.id[3] != 'K'))
-        Sys_Error("%s is not a packfile", packfile);
-    header.dirofs = LittleLong(header.dirofs);
-    header.dirlen = LittleLong(header.dirlen);
-
-    int numpackfiles = header.dirlen / sizeof(dpackfile_t);
-
-    if (numpackfiles > MAX_FILES_IN_PACK)
-        Sys_Error("%s has %i files", packfile, numpackfiles);
-
-    if (numpackfiles != PAK0_COUNT)
-        _contModified = true;    // not the original file
-
-    packfile_p newfiles = Hunk_AllocName(numpackfiles * sizeof(packfile_t), "packfile");
-
-    Sys_FileSeek(packhandle, header.dirofs);
-    dpackfile_t info[MAX_FILES_IN_PACK];
-    Sys_FileRead(packhandle, (TypeLess_ptr)info, header.dirlen);
-
-    // crc the directory to check for modifications
-    uint16_t crc;
-    CRC_Init(&crc);
-    for (int i = 0; i < header.dirlen; i++)
-        CRC_ProcessByte(&crc, ((uint8_p)info)[i]);
-
-    if (crc != PAK0_CRC)
-        _contModified = true;
-
-    // parse the directory
-    for (int i = 0; i < numpackfiles; i++) {
-        strcpy(newfiles[i].name, info[i].name);
-        newfiles[i].filepos = LittleLong(info[i].filepos);
-        newfiles[i].filelen = LittleLong(info[i].filelen);
-    }
-
-    pack_p pack = Hunk_Alloc(sizeof(pack_t));
-    strcpy(pack->filename, packfile);
-    pack->handle = packhandle;
-    pack->numfiles = numpackfiles;
-    pack->files = newfiles;
-
-    Con_Printf("Added packfile %s (%i files)\n", packfile, numpackfiles);
-    return pack;
-}
-
 
 /*
 ================
@@ -950,7 +821,7 @@ void COM_InitFilesystem() {
     //
     param = COM_CheckParm("-game");
     if (param && (param < com.argc - 1)) {
-        _contModified = true;
+        contModified = true;
         COM_AddGameDirectory(va("%s/%s", basedir, com.argv[param + 1]));
     }
 
@@ -960,7 +831,7 @@ void COM_InitFilesystem() {
     //
     param = COM_CheckParm("-path");
     if (param) {
-        _contModified = true;
+        contModified = true;
         com_searchpaths = NULL;
         while (++param < com.argc) {
             if (!com.argv[param] ||
@@ -983,3 +854,19 @@ void COM_InitFilesystem() {
 }
 
 
+/*
+================
+COM_Init
+================
+*/
+
+void COM_Init(cStringRO basedir) {
+    COM_Endian_Init();
+
+    Cvar_RegisterVariable(&registered);
+    Cvar_RegisterVariable(&cmdline);
+    Cmd_AddCommand("path", COM_Path_f);
+
+    COM_InitFilesystem();
+    COM_CheckRegistered();
+}

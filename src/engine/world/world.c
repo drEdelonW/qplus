@@ -46,13 +46,11 @@ typedef struct {
     float_p start;
     float_p end;
     trace_t trace;
-    phymovetype_t     type;
+    phymovetype_t type;
     edict_p passedict;
 } moveclip_t;
 typedef moveclip_t* moveclip_p;
 
-
-int SV_HullPointContents(Hull_p hull, int num, vec3_t p);
 
 /*
 ===============================================================================
@@ -169,7 +167,6 @@ ENTITY AREA CHECKING
 ===============================================================================
 */
 
-struct areaNode_s;
 typedef struct areaNode_s areaNode_t;
 typedef areaNode_t* areaNode_p;
 typedef struct areaNode_s {
@@ -492,10 +489,7 @@ This could be a lot more efficient...
 ============
 */
 edict_p SV_TestEntityPosition(edict_p ent) {
-    trace_t trace = SV_Move(
-        ent->v.origin, ent->v.mins, ent->v.maxs, ent->v.origin, 0, ent
-    );
-
+    trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, ent->v.origin, 0, ent);
 
     return (trace.startsolid) ? sv.edicts : NULL;
 }
@@ -569,15 +563,15 @@ bool SV_RecursiveHullCheck(
 
     // put the crosspoint DIST_EPSILON pixels on the near side
     float  frac;
-    if (t1 < 0) frac = (t1 + DIST_EPSILON) / (t1 - t2);
-    else        frac = (t1 - DIST_EPSILON) / (t1 - t2);
+    if (t1 < 0)     frac = (t1 + DIST_EPSILON) / (t1 - t2);
+    else            frac = (t1 - DIST_EPSILON) / (t1 - t2);
     CLAMP(0.0, frac, 1.0);
 
     float midf = p1f + (p2f - p1f) * frac;
     vec3_t  mid;
-    for (int i = 0; i < VECT_DIM; i++) {
+    for (int i = 0; i < VECT_DIM; i++)
         mid[i] = p1[i] + frac * (p2[i] - p1[i]);
-    }
+
 
     int side = (t1 < 0);
 
@@ -770,19 +764,18 @@ void SV_ClipToLinks(areaNode_p node, moveclip_p clip) {
         }
 
         trace_t trace;
-        if ((int)touch->v.flags & FL_MONSTER)
-            trace = SV_ClipMoveToEntity(touch, clip->start, clip->mins2, clip->maxs2, clip->end);
-        else
-            trace = SV_ClipMoveToEntity(touch, clip->start, clip->mins, clip->maxs, clip->end);
+        if ((int)touch->v.flags & FL_MONSTER)       trace = SV_ClipMoveToEntity(touch, clip->start, clip->mins2, clip->maxs2, clip->end);
+        else                                        trace = SV_ClipMoveToEntity(touch, clip->start, clip->mins, clip->maxs, clip->end);
+
         if (trace.allsolid || trace.startsolid ||
             trace.fraction < clip->trace.fraction) {
             trace.ent = touch;
-            if (clip->trace.startsolid) {
+            if (clip->trace.startsolid
+                ) {
                 clip->trace = trace;
                 clip->trace.startsolid = true;
             }
-            else
-                clip->trace = trace;
+            else clip->trace = trace;
         }
         else if (trace.startsolid)
             clip->trace.startsolid = true;
@@ -891,7 +884,7 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
         if (p->dist <= emins[p->type])  return 1;
         if (p->dist >= emaxs[p->type])  return 2;
         return 3;
-    }
+}
 #endif
 
     // general case

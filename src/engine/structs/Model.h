@@ -113,8 +113,8 @@ typedef struct {
 typedef Mdl_t* Mdl_p;
 
 typedef struct {
-    int32_t fileofs;
-    int32_t filelen;
+    int32_t fileOfs;
+    int32_t fileLen;
 } Lump_t;
 typedef Lump_t* Lump_p;
 
@@ -140,7 +140,7 @@ typedef enum {
 
 typedef struct {
     int32_t version;
-    Lump_t  lumps[HEADER_LUMPS];
+    Lump_t  lumps[HEADER_LUMPS];    // LumpType
 } dHeader_t;
 typedef dHeader_t* dHeader_p;
 

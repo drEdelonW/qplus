@@ -20,7 +20,7 @@ typedef struct cache_system_s cache_system_t;
 typedef cache_system_t* cache_system_p;
 struct cache_system_s {
     size_t          size;   // including this header
-    CacheUser_p    user;
+    CacheUser_p     user;
     char            name[16];
     cache_system_p  prev;
     cache_system_p  next;
@@ -296,11 +296,8 @@ TypeLess_ptr Cache_Check(CacheUser_p c) {
     ==============
 */
 TypeLess_ptr Cache_Alloc(CacheUser_p c, size_t size, cString name) {
-    if (c->data)
-        Sys_Error("Cache_Alloc: allready allocated");
-
-    if (size <= 0)
-        Sys_Error("Cache_Alloc: size %i", size);
+    if (c->data)        Sys_Error("Cache_Alloc: allready allocated");
+    if (size <= 0)      Sys_Error("Cache_Alloc: size %i", size);
 
     size = ALIGN_UP((size + sizeof(cache_system_t)), 16);
 

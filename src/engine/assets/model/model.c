@@ -293,9 +293,9 @@ Mod_LoadTextures
 =================
 */
 void Mod_LoadTextures(Lump_p l) {
-    if (!l->filelen) { loadmodel->textures = NULL; return; }
+    if (!l->fileLen) { loadmodel->textures = NULL; return; }
 
-    dmiptexlump_p m = (dmiptexlump_p)(mod_base + l->fileofs);
+    dmiptexlump_p m = (dmiptexlump_p)(mod_base + l->fileOfs);
 
     m->nummiptex = LittleLong(m->nummiptex);
 
@@ -424,10 +424,10 @@ Mod_LoadLighting
 =================
 */
 void Mod_LoadLighting(Lump_p l) {
-    if (!l->filelen) { loadmodel->lightdata = NULL; return; }
+    if (!l->fileLen) { loadmodel->lightdata = NULL; return; }
 
-    loadmodel->lightdata = Hunk_AllocName(l->filelen, _loadName);
-    memcpy(loadmodel->lightdata, mod_base + l->fileofs, l->filelen);
+    loadmodel->lightdata = Hunk_AllocName(l->fileLen, _loadName);
+    memcpy(loadmodel->lightdata, mod_base + l->fileOfs, l->fileLen);
 }
 
 
@@ -437,10 +437,10 @@ Mod_LoadVisibility
 =================
 */
 void Mod_LoadVisibility(Lump_p l) {
-    if (!l->filelen) { loadmodel->visdata = NULL; return; }
+    if (!l->fileLen) { loadmodel->visdata = NULL; return; }
 
-    loadmodel->visdata = Hunk_AllocName(l->filelen, _loadName);
-    memcpy(loadmodel->visdata, mod_base + l->fileofs, l->filelen);
+    loadmodel->visdata = Hunk_AllocName(l->fileLen, _loadName);
+    memcpy(loadmodel->visdata, mod_base + l->fileOfs, l->fileLen);
 }
 
 
@@ -450,10 +450,10 @@ Mod_LoadEntities
 =================
 */
 void Mod_LoadEntities(Lump_p l) {
-    if (!l->filelen) { loadmodel->entities = NULL; return; }
+    if (!l->fileLen) { loadmodel->entities = NULL; return; }
 
-    loadmodel->entities = Hunk_AllocName(l->filelen, _loadName);
-    memcpy(loadmodel->entities, mod_base + l->fileofs, l->filelen);
+    loadmodel->entities = Hunk_AllocName(l->fileLen, _loadName);
+    memcpy(loadmodel->entities, mod_base + l->fileOfs, l->fileLen);
 }
 
 
@@ -463,10 +463,10 @@ void Mod_LoadEntities(Lump_p l) {
     =================
 */
 void Mod_LoadVertexes(Lump_p l) {
-    dVertex_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    dVertex_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     mVertex_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
     loadmodel->vertexes = out;
@@ -485,10 +485,10 @@ void Mod_LoadVertexes(Lump_p l) {
     =================
 */
 void Mod_LoadSubmodels(Lump_p l) {
-    dModel_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    dModel_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     dModel_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
     loadmodel->submodels = out;
@@ -515,10 +515,10 @@ void Mod_LoadSubmodels(Lump_p l) {
     =================
 */
 void Mod_LoadEdges(Lump_p l) {
-    dEdge_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    dEdge_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     mEdge_p out = Hunk_AllocName((count + 1) * sizeof(*out), _loadName);
 
     loadmodel->edges = out;
@@ -536,10 +536,10 @@ void Mod_LoadEdges(Lump_p l) {
     =================
 */
 void Mod_LoadTexinfo(Lump_p l) {
-    TexInfo_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    TexInfo_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     mTexInfo_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
     loadmodel->texinfo = out;
@@ -636,11 +636,11 @@ void CalcSurfaceExtents(mSurface_p s) {
     =================
 */
 void Mod_LoadFaces(Lump_p l) {
-    dFace_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))
+    dFace_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))
         Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     mSurface_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
     loadmodel->surfaces = out;
@@ -711,10 +711,10 @@ void Mod_SetParent(mNode_p node, mNode_p parent) {
     =================
 */
 void Mod_LoadNodes(Lump_p l) {
-    dNode_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    dNode_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     mNode_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
     loadmodel->nodes = out;
@@ -747,10 +747,10 @@ Mod_LoadLeafs
 =================
 */
 void Mod_LoadLeafs(Lump_p l) {
-    dLeaf_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    dLeaf_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     mLeaf_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
     loadmodel->leafs = out;
@@ -784,10 +784,10 @@ Mod_LoadClipnodes
 =================
 */
 void Mod_LoadClipnodes(Lump_p l) {
-    dClipNode_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    dClipNode_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     dClipNode_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
     loadmodel->clipnodes = out;
@@ -860,10 +860,10 @@ Mod_LoadMarksurfaces
 =================
 */
 void Mod_LoadMarksurfaces(Lump_p l) {
-    int16_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))           Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    int16_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))           Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     mSurface_p* out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
     loadmodel->marksurfaces = out;
@@ -883,10 +883,10 @@ Mod_LoadSurfedges
 =================
 */
 void Mod_LoadSurfedges(Lump_p l) {
-    int32_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    int32_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))       Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     int32_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
     loadmodel->surfedges = out;
@@ -902,10 +902,10 @@ Mod_LoadPlanes
 =================
 */
 void Mod_LoadPlanes(Lump_p l) {
-    dPlane_p in = (TypeLess_ptr)(mod_base + l->fileofs);
-    if (l->filelen % sizeof(*in))        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+    dPlane_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->filelen / sizeof(*in);
+    int count = l->fileLen / sizeof(*in);
     mPlane_p out = Hunk_AllocName(count * 2 * sizeof(*out), _loadName);
 
     loadmodel->planes = out;
