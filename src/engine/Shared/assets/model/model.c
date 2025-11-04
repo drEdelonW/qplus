@@ -1503,7 +1503,7 @@ void Mod_Print() {
     Con_Printf("Cached models:\n");
     Model_p mod = mod_known;
     for (int i = 0; i < mod_numknown; i++, mod++) {
-        Con_Printf("%8p : %s", mod->cache.data, mod->name);
+        Con_Printf("[%d] %8p : %s", i, mod->cache.data, mod->name);
         if (mod->needload & NL_UNREFERENCED)    Con_Printf(" (!R)");
         if (mod->needload & NL_NEEDS_LOADED)    Con_Printf(" (!P)");
         Con_Printf("\n");

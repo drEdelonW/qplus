@@ -65,19 +65,19 @@ Memory is cleared / released when a server or client begins, not when they end.
 */
 
 #if 1
-    QuakeParms_t host_parms;
-    bool host_initialized;  // true if into command execution
-    double host_frametime;
-    double host_time;
-    double realtime;    // without any filtering or bounding
-    double oldrealtime;   // last frame run
-    int32_t host_framecount;
-    int host_hunklevel;
-    int minimum_memory;
-    RmtClient_p remoteClient;   // current client
-    jmp_buf  host_abortserver;
-    uint8_p host_basepal;
-    uint8_p host_colormap;
+QuakeParms_t host_parms;
+bool host_initialized;  // true if into command execution
+double host_frametime;
+double host_time;
+double realtime;    // without any filtering or bounding
+double oldrealtime;   // last frame run
+int32_t host_framecount;
+int host_hunklevel;
+int minimum_memory;
+RmtClient_p remoteClient;   // current client
+jmp_buf  host_abortserver;
+uint8_p host_basepal;
+uint8_p host_colormap;
 #endif
 
 
@@ -245,9 +245,8 @@ FIXME: make this just a stuffed echo?
 //     va_list  argptr;    va_start(argptr, fmt);
 //     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
 //     va_end(argptr);
-
-//     MSG_WriteByte(&remoteClient->message, svc_print);
-//     MSG_WriteString(&remoteClient->message, string);
+//     sizebuf_p pBuf = &remoteClient->message;    SZ_Clear(pBuf);
+//     MSG_WriteByte(pBuf, svc_print);    MSG_WriteString(pBuf, string);
 // }
 
 /*
@@ -261,11 +260,10 @@ Sends text to all active clients
 //    va_list  argptr;    va_start(argptr, fmt);
 //    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
 //    va_end(argptr);
-
 //     for (int i = 0; i < svs.maxClients; i++)
 //         if (svs.clients[i].active && svs.clients[i].spawned) {
-//             MSG_WriteByte(&svs.clients[i].message, svc_print);
-//             MSG_WriteString(&svs.clients[i].message, string);
+    //     sizebuf_p pBuf = &remoteClient->message;
+//             MSG_WriteByte(&svs.clients[i].message, svc_print);   MSG_WriteString(&svs.clients[i].message, string);
 //         }
 // }
 
@@ -281,8 +279,8 @@ void Host::ClientCommands(cString fmt, ...) {
     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
-    MSG_WriteByte(&remoteClient->message, svc_stufftext);
-    MSG_WriteString(&remoteClient->message, string);
+    sizebuf_p pBuf = &remoteClient->message;
+    MSG_WriteByte(pBuf, svc_stufftext); MSG_WriteString(pBuf, string);
 }
 
 /*
@@ -297,8 +295,8 @@ void SV_DropClient(bool crash) {
     if (!crash) {
         // send any final messages (don't check for errors)
         if (NET_CanSendMessage(remoteClient->netconnection)) {
-            MSG_WriteByte(&remoteClient->message, svc_disconnect);
-            NET_SendMessage(remoteClient->netconnection, &remoteClient->message);
+            sizebuf_p pBuf = &remoteClient->message;
+            MSG_WriteByte(pBuf, svc_disconnect);    NET_SendMessage(remoteClient->netconnection, pBuf);
         }
 
         if (remoteClient->edict && remoteClient->spawned) {
@@ -327,15 +325,10 @@ void SV_DropClient(bool crash) {
     RmtClient_p client = svs.clients;
     for (int i = 0; i < svs.maxClients; i++, client++) {
         if (!client->active)    continue;
-        MSG_WriteByte(&client->message, svc_updatename);
-        MSG_WriteByte(&client->message, remoteClient - svs.clients);
-        MSG_WriteString(&client->message, "");
-        MSG_WriteByte(&client->message, svc_updatefrags);
-        MSG_WriteByte(&client->message, remoteClient - svs.clients);
-        MSG_WriteShort(&client->message, 0);
-        MSG_WriteByte(&client->message, svc_updatecolors);
-        MSG_WriteByte(&client->message, remoteClient - svs.clients);
-        MSG_WriteByte(&client->message, 0);
+        sizebuf_p pBuf = &client->message;
+        MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteString(pBuf, "");
+        MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteShort(pBuf, 0);
+        MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteByte(pBuf, 0);
     }
 }
 
@@ -833,6 +826,7 @@ void Host::Shutdown() {
     if (cls.state != ca_dedicated) { VID_Shutdown(); }
 }
 
+
 #include "host_cmd.h"
 /*
 ==================
@@ -840,48 +834,48 @@ Host::InitCommands
 ==================
 */
 void Host::InitCommands() {
-    Cmd_AddCommand("status", Host_Status_f);
-    Cmd_AddCommand("quit", Host_Quit_f);
-    Cmd_AddCommand("god", Host_God_f);
-    Cmd_AddCommand("notarget", Host_Notarget_f);
-    Cmd_AddCommand("fly", Host_Fly_f);
-    Cmd_AddCommand("map", Host_Map_f);
-    Cmd_AddCommand("restart", Host_Restart_f);
-    Cmd_AddCommand("changelevel", Host_Changelevel_f);
+    Cmd_AddCommand("status", Host_Status_f);            // sv
+    Cmd_AddCommand("quit", Host_Quit_f);                // host
+    Cmd_AddCommand("god", Host_God_f);                  // sv
+    Cmd_AddCommand("notarget", Host_Notarget_f);        // sv
+    Cmd_AddCommand("fly", Host_Fly_f);                  // sv
+    Cmd_AddCommand("map", Host_Map_f);                  // sv
+    Cmd_AddCommand("restart", Host_Restart_f);          // sv
+    Cmd_AddCommand("changelevel", Host_Changelevel_f);  // sv
 #ifdef QUAKE2
-    Cmd_AddCommand("changelevel2", Host_Changelevel2_f);
+    Cmd_AddCommand("changelevel2", Host_Changelevel2_f);    // sv
 #endif
-    Cmd_AddCommand("connect", Host_Connect_f);
-    Cmd_AddCommand("reconnect", Host_Reconnect_f);
-    Cmd_AddCommand("name", Host_Name_f);
-    Cmd_AddCommand("noclip", Host_Noclip_f);
-    Cmd_AddCommand("version", Host_Version_f);
+    Cmd_AddCommand("connect", Host_Connect_f);      // cl
+    Cmd_AddCommand("reconnect", Host_Reconnect_f);  // cl
+    Cmd_AddCommand("name", Host_Name_f);            // cl
+    Cmd_AddCommand("noclip", Host_Noclip_f);        // sv
+    Cmd_AddCommand("version", Host_Version_f);      // host
 #ifdef IDGODS
     Cmd_AddCommand("please", Host_Please_f);
 #endif
-    Cmd_AddCommand("say", Host_Say_f);
-    Cmd_AddCommand("say_team", Host_Say_Team_f);
-    Cmd_AddCommand("tell", Host_Tell_f);
-    Cmd_AddCommand("color", Host_Color_f);
-    Cmd_AddCommand("kill", Host_Kill_f);
-    Cmd_AddCommand("pause", Host_Pause_f);
-    Cmd_AddCommand("spawn", Host_Spawn_f);
-    Cmd_AddCommand("begin", Host_Begin_f);
-    Cmd_AddCommand("prespawn", Host_PreSpawn_f);
-    Cmd_AddCommand("kick", Host_Kick_f);
-    Cmd_AddCommand("ping", Host_Ping_f);
-    Cmd_AddCommand("load", Host_Loadgame_f);
-    Cmd_AddCommand("save", Host_Savegame_f);
-    Cmd_AddCommand("give", Host_Give_f);
+    Cmd_AddCommand("say", Host_Say_f);              // cl
+    Cmd_AddCommand("say_team", Host_Say_Team_f);    // cl
+    Cmd_AddCommand("tell", Host_Tell_f);            // cl
+    Cmd_AddCommand("color", Host_Color_f);          // cl
+    Cmd_AddCommand("kill", Host_Kill_f);            // cl
+    Cmd_AddCommand("pause", Host_Pause_f);          // sv
+    Cmd_AddCommand("spawn", Host_Spawn_f);          // sv\cl
+    Cmd_AddCommand("begin", Host_Begin_f);          // sv\cl
+    Cmd_AddCommand("prespawn", Host_PreSpawn_f);    // sv\cl
+    Cmd_AddCommand("kick", Host_Kick_f);            // sv
+    Cmd_AddCommand("ping", Host_Ping_f);            // net
+    Cmd_AddCommand("load", Host_Loadgame_f);        // sv
+    Cmd_AddCommand("save", Host_Savegame_f);        // sv
+    Cmd_AddCommand("give", Host_Give_f);            // cl
 
-    Cmd_AddCommand("startdemos", Host_Startdemos_f);
-    Cmd_AddCommand("demos", Host_Demos_f);
-    Cmd_AddCommand("stopdemo", Host_Stopdemo_f);
+    Cmd_AddCommand("startdemos", Host_Startdemos_f);    // cl
+    Cmd_AddCommand("demos", Host_Demos_f);              // cl
+    Cmd_AddCommand("stopdemo", Host_Stopdemo_f);        // cl
 
-    Cmd_AddCommand("viewmodel", Host_Viewmodel_f);
-    Cmd_AddCommand("viewframe", Host_Viewframe_f);
-    Cmd_AddCommand("viewnext", Host_Viewnext_f);
-    Cmd_AddCommand("viewprev", Host_Viewprev_f);
+    Cmd_AddCommand("viewmodel", Host_Viewmodel_f);      // prog
+    Cmd_AddCommand("viewframe", Host_Viewframe_f);      // prog
+    Cmd_AddCommand("viewnext", Host_Viewnext_f);        // prog
+    Cmd_AddCommand("viewprev", Host_Viewprev_f);        // prog
 
     Cmd_AddCommand("mcache", Mod_Print);
 }

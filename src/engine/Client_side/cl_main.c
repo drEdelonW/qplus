@@ -169,13 +169,11 @@ void CL_SignonReply() {
 
     switch (cls.signon) {
     case 1:
-        MSG_WriteByte(&cls.message, clc_stringcmd);
-        MSG_WriteString(&cls.message, "prespawn");
+        MSG_WriteByte(&cls.message, clc_stringcmd); MSG_WriteString(&cls.message, "prespawn");
         break;
 
     case 2:
-        MSG_WriteByte(&cls.message, clc_stringcmd);
-        MSG_WriteString(&cls.message, va("name \"%s\"\n", cl_name.string));
+        MSG_WriteByte(&cls.message, clc_stringcmd); MSG_WriteString(&cls.message, va("name \"%s\"\n", cl_name.string));
 
         MSG_WriteByte(&cls.message, clc_stringcmd);
         MSG_WriteString(
@@ -192,8 +190,7 @@ void CL_SignonReply() {
         break;
 
     case 3:
-        MSG_WriteByte(&cls.message, clc_stringcmd);
-        MSG_WriteString(&cls.message, "begin");
+        MSG_WriteByte(&cls.message, clc_stringcmd); MSG_WriteString(&cls.message, "begin");
         Cache_Report();  // print remaining memory
         break;
 

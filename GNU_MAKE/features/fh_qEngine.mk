@@ -32,7 +32,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
                 $(eval COMM_DIR = $(HOST_DIR)/common) $(eval INCLUDES += $(COMM_DIR))
                         SRC_LIST += $(COMM_DIR)/common.c
-                        SRC_LIST += $(COMM_DIR)/sizebuf.c
 
 
                 $(eval INPUT_DIR = $(HOST_DIR)/input) $(eval INCLUDES += $(INPUT_DIR))
@@ -41,7 +40,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
         $(eval NET_DIR = $(ENG_DIR)/Net) $(eval INCLUDES += $(NET_DIR))
                 $(eval MSG_DIR = $(NET_DIR)/Msg) $(eval INCLUDES += $(MSG_DIR))
-#                         SRC_LIST += $(MSG_DIR)/msg.c
+                        #SRC_LIST += $(MSG_DIR)/msg.c
                         SRC_LIST += $(MSG_DIR)/msg_cWrap.cpp
                         SRC_LIST += $(MSG_DIR)/msg_obj.cpp
 
@@ -78,64 +77,64 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 SRC_LIST += $(CL_SIDE_DIR)/cl_parse.c
                 SRC_LIST += $(CL_SIDE_DIR)/cl_tent.c
 
-        $(eval VID_DIR = $(CL_SIDE_DIR)/video) $(eval INCLUDES += $(VID_DIR))
-                $(eval DRAW_DIR = $(VID_DIR)/draw) $(eval INCLUDES += $(DRAW_DIR))
-                        SRC_LIST += $(DRAW_DIR)/nonintel.c
-                        SRC_LIST += $(DRAW_DIR)/draw.c
-                        SRC_LIST += $(DRAW_DIR)/d_edge.c
-                        SRC_LIST += $(DRAW_DIR)/d_fill.c
-                        SRC_LIST += $(DRAW_DIR)/d_init.c
-                        SRC_LIST += $(DRAW_DIR)/d_modech.c
-                        SRC_LIST += $(DRAW_DIR)/d_part.c
-                        SRC_LIST += $(DRAW_DIR)/d_polyse.c
-                        SRC_LIST += $(DRAW_DIR)/d_scan.c
-                        SRC_LIST += $(DRAW_DIR)/d_sky.c
-                        SRC_LIST += $(DRAW_DIR)/d_sprite.c
-                        SRC_LIST += $(DRAW_DIR)/d_surf.c
-                        SRC_LIST += $(DRAW_DIR)/d_vars.c
-                        SRC_LIST += $(DRAW_DIR)/d_zpoint.c
+                $(eval VID_DIR = $(CL_SIDE_DIR)/video) $(eval INCLUDES += $(VID_DIR))
+                        $(eval DRAW_DIR = $(VID_DIR)/draw) $(eval INCLUDES += $(DRAW_DIR))
+                                SRC_LIST += $(DRAW_DIR)/nonintel.c
+                                SRC_LIST += $(DRAW_DIR)/draw.c
+                                SRC_LIST += $(DRAW_DIR)/d_edge.c
+                                SRC_LIST += $(DRAW_DIR)/d_fill.c
+                                SRC_LIST += $(DRAW_DIR)/d_init.c
+                                SRC_LIST += $(DRAW_DIR)/d_modech.c
+                                SRC_LIST += $(DRAW_DIR)/d_part.c
+                                SRC_LIST += $(DRAW_DIR)/d_polyse.c
+                                SRC_LIST += $(DRAW_DIR)/d_scan.c
+                                SRC_LIST += $(DRAW_DIR)/d_sky.c
+                                SRC_LIST += $(DRAW_DIR)/d_sprite.c
+                                SRC_LIST += $(DRAW_DIR)/d_surf.c
+                                SRC_LIST += $(DRAW_DIR)/d_vars.c
+                                SRC_LIST += $(DRAW_DIR)/d_zpoint.c
 
-                $(eval RENDER_DIR = $(VID_DIR)/render) $(eval INCLUDES += $(RENDER_DIR))
-                        SRC_LIST += $(RENDER_DIR)/r_aclip.c
-                        SRC_LIST += $(RENDER_DIR)/r_alias.c
-                        SRC_LIST += $(RENDER_DIR)/r_bsp.c
-                        SRC_LIST += $(RENDER_DIR)/r_light.c
-                        SRC_LIST += $(RENDER_DIR)/r_draw.c
-                        SRC_LIST += $(RENDER_DIR)/r_efrag.c
-                        SRC_LIST += $(RENDER_DIR)/r_edge.c
-                        SRC_LIST += $(RENDER_DIR)/r_misc.c
-                        SRC_LIST += $(RENDER_DIR)/r_main.c
-                        SRC_LIST += $(RENDER_DIR)/r_sky.c
-                        SRC_LIST += $(RENDER_DIR)/r_sprite.c
-                        SRC_LIST += $(RENDER_DIR)/r_surf.c
-                        SRC_LIST += $(RENDER_DIR)/r_part.c
-                        SRC_LIST += $(RENDER_DIR)/r_vars.c
+                        $(eval RENDER_DIR = $(VID_DIR)/render) $(eval INCLUDES += $(RENDER_DIR))
+                                SRC_LIST += $(RENDER_DIR)/r_aclip.c
+                                SRC_LIST += $(RENDER_DIR)/r_alias.c
+                                SRC_LIST += $(RENDER_DIR)/r_bsp.c
+                                SRC_LIST += $(RENDER_DIR)/r_light.c
+                                SRC_LIST += $(RENDER_DIR)/r_draw.c
+                                SRC_LIST += $(RENDER_DIR)/r_efrag.c
+                                SRC_LIST += $(RENDER_DIR)/r_edge.c
+                                SRC_LIST += $(RENDER_DIR)/r_misc.c
+                                SRC_LIST += $(RENDER_DIR)/r_main.c
+                                SRC_LIST += $(RENDER_DIR)/r_sky.c
+                                SRC_LIST += $(RENDER_DIR)/r_sprite.c
+                                SRC_LIST += $(RENDER_DIR)/r_surf.c
+                                SRC_LIST += $(RENDER_DIR)/r_part.c
+                                SRC_LIST += $(RENDER_DIR)/r_vars.c
 
-                $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
-                        $(eval MENU_DIR = $(UI_DIR)/menu) $(eval INCLUDES += $(MENU_DIR))
-                                SRC_LIST += $(MENU_DIR)/menu.c
-                                SRC_LIST += $(MENU_DIR)/menu_common.c
-                                SRC_LIST += $(MENU_DIR)/menu_main.c
-                                SRC_LIST += $(MENU_DIR)/menu_singleplayer.c
-                                SRC_LIST += $(MENU_DIR)/menu_load_save.c
-                                SRC_LIST += $(MENU_DIR)/menu_multiplayer.c
-                                SRC_LIST += $(MENU_DIR)/menu_setup.c
-                                SRC_LIST += $(MENU_DIR)/menu_net.c
-                                SRC_LIST += $(MENU_DIR)/menu_search.c
-                                SRC_LIST += $(MENU_DIR)/menu_server_list.c
-                                SRC_LIST += $(MENU_DIR)/menu_config_serial.c
-                                SRC_LIST += $(MENU_DIR)/menu_config_modem.c
-                                SRC_LIST += $(MENU_DIR)/menu_config_lan.c
-                                SRC_LIST += $(MENU_DIR)/menu_options.c
-                                SRC_LIST += $(MENU_DIR)/menu_game_options.c
-                                SRC_LIST += $(MENU_DIR)/menu_defkey.c
-                                SRC_LIST += $(MENU_DIR)/menu_help.c
-                                SRC_LIST += $(MENU_DIR)/menu_quit.c
+                        $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
+                                $(eval MENU_DIR = $(UI_DIR)/menu) $(eval INCLUDES += $(MENU_DIR))
+                                        SRC_LIST += $(MENU_DIR)/menu.c
+                                        SRC_LIST += $(MENU_DIR)/menu_common.c
+                                        SRC_LIST += $(MENU_DIR)/menu_main.c
+                                        SRC_LIST += $(MENU_DIR)/menu_singleplayer.c
+                                        SRC_LIST += $(MENU_DIR)/menu_load_save.c
+                                        SRC_LIST += $(MENU_DIR)/menu_multiplayer.c
+                                        SRC_LIST += $(MENU_DIR)/menu_setup.c
+                                        SRC_LIST += $(MENU_DIR)/menu_net.c
+                                        SRC_LIST += $(MENU_DIR)/menu_search.c
+                                        SRC_LIST += $(MENU_DIR)/menu_server_list.c
+                                        SRC_LIST += $(MENU_DIR)/menu_config_serial.c
+                                        SRC_LIST += $(MENU_DIR)/menu_config_modem.c
+                                        SRC_LIST += $(MENU_DIR)/menu_config_lan.c
+                                        SRC_LIST += $(MENU_DIR)/menu_options.c
+                                        SRC_LIST += $(MENU_DIR)/menu_game_options.c
+                                        SRC_LIST += $(MENU_DIR)/menu_defkey.c
+                                        SRC_LIST += $(MENU_DIR)/menu_help.c
+                                        SRC_LIST += $(MENU_DIR)/menu_quit.c
 
-                        SRC_LIST += $(UI_DIR)/screen.c
-                        SRC_LIST += $(UI_DIR)/sbar.c
-                        SRC_LIST += $(UI_DIR)/view.c
-                        SRC_LIST += $(UI_DIR)/chase.c
+                                SRC_LIST += $(UI_DIR)/screen.c
+                                SRC_LIST += $(UI_DIR)/sbar.c
+                                SRC_LIST += $(UI_DIR)/view.c
+                                SRC_LIST += $(UI_DIR)/chase.c
 
 
 
@@ -170,3 +169,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(ZONE_DIR)/z_hulk.c
                         SRC_LIST += $(ZONE_DIR)/z_cache.c
                         SRC_LIST += $(ZONE_DIR)/z_zone.c
+
+                $(eval SBUF_DIR = $(SHARED_DIR)/sBuf) $(eval INCLUDES += $(SBUF_DIR))
+                        SRC_LIST += $(SBUF_DIR)/sizebuf.c

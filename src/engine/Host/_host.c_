@@ -240,8 +240,7 @@ void SV_ClientPrintf(cStringRO fmt, ...) {
     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
-    MSG_WriteByte(&remoteClient->message, svc_print);
-    MSG_WriteString(&remoteClient->message, string);
+    MSG_WriteByte(&remoteClient->message, svc_print);   MSG_WriteString(&remoteClient->message, string);
 }
 
 /*
@@ -258,8 +257,7 @@ void SV_BroadcastPrintf(cString fmt, ...) {
 
     for (int i = 0; i < svs.maxClients; i++)
         if (svs.clients[i].active && svs.clients[i].spawned) {
-            MSG_WriteByte(&svs.clients[i].message, svc_print);
-            MSG_WriteString(&svs.clients[i].message, string);
+            MSG_WriteByte(&svs.clients[i].message, svc_print);  MSG_WriteString(&svs.clients[i].message, string);
         }
 }
 
@@ -276,8 +274,7 @@ void Host_ClientCommands(cString fmt, ...) {
     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
-    MSG_WriteByte(&remoteClient->message, svc_stufftext);
-    MSG_WriteString(&remoteClient->message, string);
+    MSG_WriteByte(&remoteClient->message, svc_stufftext);   MSG_WriteString(&remoteClient->message, string);
 }
 
 /*
@@ -292,8 +289,7 @@ void SV_DropClient(bool crash) {
     if (!crash) {
         // send any final messages (don't check for errors)
         if (NET_CanSendMessage(remoteClient->netconnection)) {
-            MSG_WriteByte(&remoteClient->message, svc_disconnect);
-            NET_SendMessage(remoteClient->netconnection, &remoteClient->message);
+            MSG_WriteByte(&remoteClient->message, svc_disconnect);  NET_SendMessage(remoteClient->netconnection, &remoteClient->message);
         }
 
         if (remoteClient->edict && remoteClient->spawned) {
@@ -322,15 +318,10 @@ void SV_DropClient(bool crash) {
     RmtClient_p client = svs.clients;
     for (int i = 0; i < svs.maxClients; i++, client++) {
         if (!client->active)    continue;
-        MSG_WriteByte(&client->message, svc_updatename);
-        MSG_WriteByte(&client->message, remoteClient - svs.clients);
-        MSG_WriteString(&client->message, "");
-        MSG_WriteByte(&client->message, svc_updatefrags);
-        MSG_WriteByte(&client->message, remoteClient - svs.clients);
-        MSG_WriteShort(&client->message, 0);
-        MSG_WriteByte(&client->message, svc_updatecolors);
-        MSG_WriteByte(&client->message, remoteClient - svs.clients);
-        MSG_WriteByte(&client->message, 0);
+        sizebuf_p pBuf = &client->message;
+        MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteString(pBuf, "");
+        MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteShort(pBuf, 0);
+        MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteByte(pBuf, 0);
     }
 }
 
@@ -343,8 +334,6 @@ This only happens at the end of a game, not between levels
 */
 void Host_ShutdownServer(bool crash) {
     int  count;
-    sizebuf_t buf;
-    uint8_t  message[4];
 
     if (!sv.active) return;
 
@@ -374,9 +363,12 @@ void Host_ShutdownServer(bool crash) {
     } while (count);
 
     // make sure all the clients know we're disconnecting
-    buf.data = message;
-    buf.maxsize = 4;
-    buf.cursize = 0;
+    uint8_t  message[4];
+    sizebuf_t buf = {
+        .data = message,
+        .maxsize = 4,
+        .cursize = 0
+    };
     MSG_WriteByte(&buf, svc_disconnect);
     count = NET_SendToAll(&buf, 5);
     if (count)

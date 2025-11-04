@@ -164,8 +164,7 @@ Mod_FindName
 ==================
 */
 Model_p Mod_FindName(cString name) {
-    int  i;
-    Model_p mod;
+
 
     if (!name[0])
         Sys_Error("Mod_ForName: NULL name");
@@ -173,7 +172,9 @@ Model_p Mod_FindName(cString name) {
     //
     // search the currently loaded models
     //
-    for (i = 0, mod = mod_known; i < mod_numknown; i++, mod++)
+    int  i = 0;
+    Model_p mod = mod_known;
+    for (; i < mod_numknown; i++, mod++)
         if (!strcmp(mod->name, name))
             break;
 

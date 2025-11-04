@@ -113,7 +113,7 @@ Sets client to godmode
 */
 void Host_God_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))   return;
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
 
     sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_GODMODE;
     SV_ClientPrintf("godmode %s\n",
@@ -124,7 +124,7 @@ void Host_God_f() {
 
 void Host_Notarget_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged)) return;
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
 
     sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_NOTARGET;
     SV_ClientPrintf("notarget %s\n",
@@ -137,7 +137,7 @@ bool noclip_anglehack;
 
 void Host_Noclip_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged)) return;
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
 
     if (sv_player->v.movetype == MOVETYPE_NOCLIP) {
         noclip_anglehack = false;
@@ -160,7 +160,7 @@ Sets client to flymode
 */
 void Host_Fly_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged)) return;
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
 
     if (sv_player->v.movetype == MOVETYPE_FLY) {
         sv_player->v.movetype = MOVETYPE_WALK;
@@ -737,9 +737,7 @@ void Host_Name_f() {
 
     // send notification to all clients
     sizebuf_p pBuf = &sv.reliable_datagram;
-    MSG_WriteByte(pBuf, svc_updatename);
-    MSG_WriteByte(pBuf, remoteClient - svs.clients);
-    MSG_WriteString(pBuf, remoteClient->name);
+    MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteString(pBuf, remoteClient->name);
 }
 
 
@@ -925,9 +923,7 @@ void Host_Color_f() {
 
     // send notification to all clients
     sizebuf_p pBuf = &sv.reliable_datagram;
-    MSG_WriteByte(pBuf, svc_updatecolors);
-    MSG_WriteByte(pBuf, remoteClient - svs.clients);
-    MSG_WriteByte(pBuf, remoteClient->colors);
+    MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteByte(pBuf, remoteClient->colors);
 }
 
 /*
@@ -960,8 +956,7 @@ void Host_Pause_f() {
 
         // send notification to all clients
         sizebuf_p pBuf = &sv.reliable_datagram;
-        MSG_WriteByte(pBuf, svc_setpause);
-        MSG_WriteByte(pBuf, sv.paused);
+        MSG_WriteByte(pBuf, svc_setpause);  MSG_WriteByte(pBuf, sv.paused);
     }
 }
 
@@ -979,8 +974,7 @@ void Host_PreSpawn_f() {
 
     sizebuf_p pBuf = &remoteClient->message;
     SZ_Write(pBuf, sv.signon.data, sv.signon.cursize);
-    MSG_WriteByte(pBuf, svc_signonnum);
-    MSG_WriteByte(pBuf, 2);
+    MSG_WriteByte(pBuf, svc_signonnum);    MSG_WriteByte(pBuf, 2);
     remoteClient->sendsignon = true;
 }
 
@@ -990,7 +984,7 @@ Host_Spawn_f
 ==================
 */
 void Host_Spawn_f() {
-    if (cmd_source == src_command) { ; Con_Printf("spawn is not valid from the console\n");     return; }
+    if (cmd_source == src_command) { ;  Con_Printf("spawn is not valid from the console\n");    return; }
     if (remoteClient->spawned) { ;      Con_Printf("Spawn not valid -- allready spawned\n");    return; }
 
     // run the entrance script
@@ -1026,51 +1020,30 @@ void Host_Spawn_f() {
 
 
     // send all current names, colors, and frag counts
-    sizebuf_p pBuf = &remoteClient->message;
-    SZ_Clear(pBuf);
+    sizebuf_p pBuf = &remoteClient->message;    SZ_Clear(pBuf);
 
     // send time of update
-    MSG_WriteByte(pBuf, svc_time);
-    MSG_WriteFloat(pBuf, sv.time);
+    MSG_WriteByte(pBuf, svc_time);    MSG_WriteFloat(pBuf, sv.time);
     {
         RmtClient_p rClient = svs.clients;
         for (int32_t i = 0; i < svs.maxClients; i++, rClient++) {
-            MSG_WriteByte(pBuf, svc_updatename);
-            MSG_WriteByte(pBuf, i);
-            MSG_WriteString(pBuf, rClient->name);
-            MSG_WriteByte(pBuf, svc_updatefrags);
-            MSG_WriteByte(pBuf, i);
-            MSG_WriteShort(pBuf, rClient->old_frags);
-            MSG_WriteByte(pBuf, svc_updatecolors);
-            MSG_WriteByte(pBuf, i);
-            MSG_WriteByte(pBuf, rClient->colors);
+            MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, i); MSG_WriteString(pBuf, rClient->name);
+            MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, i); MSG_WriteShort(pBuf, rClient->old_frags);
+            MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, i); MSG_WriteByte(pBuf, rClient->colors);
         }
     }
     // send all current light styles
     for (int i = 0; i < MAX_LIGHTSTYLES; i++) {
-        MSG_WriteByte(pBuf, svc_lightstyle);
-        MSG_WriteByte(pBuf, (char)i);
-        MSG_WriteString(pBuf, sv.lightstyles[i]);
+        MSG_WriteByte(pBuf, svc_lightstyle);    MSG_WriteByte(pBuf, (char)i);   MSG_WriteString(pBuf, sv.lightstyles[i]);
     }
 
     //
     // send some stats
     //
-    MSG_WriteByte(pBuf, svc_updatestat);
-    MSG_WriteByte(pBuf, STAT_TOTALSECRETS);
-    MSG_WriteLong(pBuf, pr_global_struct->total_secrets);
-
-    MSG_WriteByte(pBuf, svc_updatestat);
-    MSG_WriteByte(pBuf, STAT_TOTALMONSTERS);
-    MSG_WriteLong(pBuf, pr_global_struct->total_monsters);
-
-    MSG_WriteByte(pBuf, svc_updatestat);
-    MSG_WriteByte(pBuf, STAT_SECRETS);
-    MSG_WriteLong(pBuf, pr_global_struct->found_secrets);
-
-    MSG_WriteByte(pBuf, svc_updatestat);
-    MSG_WriteByte(pBuf, STAT_MONSTERS);
-    MSG_WriteLong(pBuf, pr_global_struct->killed_monsters);
+    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_TOTALSECRETS);     MSG_WriteLong(pBuf, pr_global_struct->total_secrets);
+    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_TOTALMONSTERS);    MSG_WriteLong(pBuf, pr_global_struct->total_monsters);
+    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_SECRETS);          MSG_WriteLong(pBuf, pr_global_struct->found_secrets);
+    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_MONSTERS);         MSG_WriteLong(pBuf, pr_global_struct->killed_monsters);
 
 
     //
@@ -1087,8 +1060,7 @@ void Host_Spawn_f() {
 
     SV_WriteClientdataToMessage(sv_player, pBuf);
 
-    MSG_WriteByte(pBuf, svc_signonnum);
-    MSG_WriteByte(pBuf, 3);
+    MSG_WriteByte(pBuf, svc_signonnum);    MSG_WriteByte(pBuf, 3);
     remoteClient->sendsignon = true;
 }
 
@@ -1114,8 +1086,14 @@ Kicks a user off of the server
 ==================
 */
 void Host_Kick_f() {
-    if (cmd_source == src_command) { if (!sv.active) { Cmd_ForwardToServer(); return; } }
-    else if (pr_global_struct->deathmatch && !remoteClient->privileged)        return;
+    if (cmd_source == src_command) {
+        if (!sv.active) {
+            Cmd_ForwardToServer(); return;
+        }
+    }
+    else
+        if (pr_global_struct->deathmatch && !remoteClient->privileged)
+            return;
 
     RmtClient_p save = remoteClient;
     int32_t i;

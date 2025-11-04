@@ -143,8 +143,7 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
     if (attenuation != DEFAULT_SOUND_PACKET_ATTENUATION)    field_mask |= SND_ATTENUATION;
 
     // directed messages go only to the entity the are targeted on
-    MSG_WriteByte(&sv.datagram, svc_sound);
-    MSG_WriteByte(&sv.datagram, field_mask);
+    MSG_WriteByte(&sv.datagram, svc_sound);    MSG_WriteByte(&sv.datagram, field_mask);
     if (field_mask & SND_VOLUME)        MSG_WriteByte(&sv.datagram, volume);
     if (field_mask & SND_ATTENUATION)   MSG_WriteByte(&sv.datagram, (attenuation * 64));
     MSG_WriteShort(&sv.datagram, channel);
@@ -177,39 +176,38 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
 void SV_SendServerinfo(RmtClient_p client) {
     char message[2048];
 
-    MSG_WriteByte(&client->message, svc_print);
+    sizebuf_p pBuf = &client->message;
+    MSG_WriteByte(pBuf, svc_print);
     sprintf(message, "%c\nVERSION %4.2f SERVER (%i CRC)", 2, VERSION, pr_crc);
-    MSG_WriteString(&client->message, message);
+    MSG_WriteString(pBuf, message);
 
-    MSG_WriteByte(&client->message, svc_serverinfo);
-    MSG_WriteLong(&client->message, PROTOCOL_VERSION);
-    MSG_WriteByte(&client->message, svs.maxClients);
+    MSG_WriteByte(pBuf, svc_serverinfo);    MSG_WriteLong(pBuf, PROTOCOL_VERSION);    MSG_WriteByte(pBuf, svs.maxClients);
 
-    MSG_WriteByte(&client->message, (!coop.value && deathmatch.value) ? GAME_DEATHMATCH : GAME_COOP);
+    MSG_WriteByte(pBuf, (!coop.value && deathmatch.value) ? GAME_DEATHMATCH : GAME_COOP);
 
     snprintf(message, sizeof(message), "%s", pr_strings + sv.edicts->v.message);
 
-    MSG_WriteString(&client->message, message);
+    MSG_WriteString(pBuf, message);
 
     for (cStringArray s = (sv.model_precache + 1); *s; s++)
-        MSG_WriteString(&client->message, *s);
-    MSG_WriteByte(&client->message, 0);
+        MSG_WriteString(pBuf, *s);
+    MSG_WriteByte(pBuf, 0);
 
     for (cStringArray s = (sv.sound_precache + 1); *s; s++)
-        MSG_WriteString(&client->message, *s);
-    MSG_WriteByte(&client->message, 0);
+        MSG_WriteString(pBuf, *s);
+    MSG_WriteByte(pBuf, 0);
 
     // send music
-    MSG_WriteByte(&client->message, svc_cdtrack);
-    MSG_WriteByte(&client->message, sv.edicts->v.sounds);
-    MSG_WriteByte(&client->message, sv.edicts->v.sounds);
+    MSG_WriteByte(pBuf, svc_cdtrack);
+    MSG_WriteByte(pBuf, sv.edicts->v.sounds);
+    MSG_WriteByte(pBuf, sv.edicts->v.sounds);
 
     // set view
-    MSG_WriteByte(&client->message, svc_setview);
-    MSG_WriteShort(&client->message, NUM_FOR_EDICT(client->edict));
+    MSG_WriteByte(pBuf, svc_setview);
+    MSG_WriteShort(pBuf, NUM_FOR_EDICT(client->edict));
 
-    MSG_WriteByte(&client->message, svc_signonnum);
-    MSG_WriteByte(&client->message, 1);
+    MSG_WriteByte(pBuf, svc_signonnum);
+    MSG_WriteByte(pBuf, 1);
 
     client->sendsignon = true;
     client->spawned = false;    // need prespawn, spawn, etc
@@ -619,9 +617,9 @@ void SV_UpdateToReliableMessages() {
             client = svs.clients;
             for (int j = 0; j < svs.maxClients; j++, client++) {
                 if (!client->active)    continue;
-                MSG_WriteByte(&client->message, svc_updatefrags);
-                MSG_WriteByte(&client->message, i);
-                MSG_WriteShort(&client->message, remoteClient->edict->v.frags);
+
+                sizebuf_p pBuf = &client->message;
+                MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, i); MSG_WriteShort(pBuf, remoteClient->edict->v.frags);
             }
 
             remoteClient->old_frags = remoteClient->edict->v.frags;
@@ -787,8 +785,7 @@ void SV_CreateBaseline() {
         //
         // add to the message
         //
-        MSG_WriteByte(&sv.signon, svc_spawnbaseline);
-        MSG_WriteShort(&sv.signon, entnum);
+        MSG_WriteByte(&sv.signon, svc_spawnbaseline);   MSG_WriteShort(&sv.signon, entnum);
 
         MSG_WriteByte(&sv.signon, svent->baseline.modelindex);
         MSG_WriteByte(&sv.signon, svent->baseline.frame);

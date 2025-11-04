@@ -24,9 +24,9 @@ void Cmd_Alias_f() {
 
     if (Cmd_Argc() == 1) {
         Con_Printf("Current alias commands:\n");
-        for (CmdAlias_p aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next) {
+        for (CmdAlias_p aliasIt = _cmdAlias; aliasIt; aliasIt = aliasIt->next)
             Con_Printf("%s : %s\n", aliasIt->name, aliasIt->value);
-        }
+
         return;
     }
 
@@ -57,9 +57,8 @@ void Cmd_Alias_f() {
     int argCnt = Cmd_Argc();
     for (int i = 2; i < argCnt; i++) {
         strcat(cmd, Cmd_Argv(i));
-        if (i != argCnt) {
+        if (i != argCnt)
             strcat(cmd, " ");
-        }
     }
     strcat(cmd, "\n");
 
