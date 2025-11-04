@@ -7,6 +7,8 @@
 #include "cmd.h"
 #include "cbuf.h"
 #include "screen.h"
+#undef SERVER
+#include "client.h"
 
 
 //=============================================================================
@@ -51,7 +53,6 @@ void M_Menu_Load_f() {
     M_ScanSaves();
 }
 
-#include "client.h"
 void M_Menu_Save_f() {
     if ((!sv.active) ||
         (cl.intermission) ||

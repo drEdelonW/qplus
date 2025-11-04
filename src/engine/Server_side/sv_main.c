@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sv_main.c -- server main program
 
 #include "server.h"
+#undef SERVER
+#include "client.h"
 #include <string.h>
 #include "versions.h"
 #include "common.h"
@@ -35,6 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "host.h"
 #include "net.h"
+#include "render.h"
 
 server_t    sv;
 sv_static_t svs;
@@ -450,7 +453,6 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
 
     =============
 */
-#include "render.h"
 void SV_CleanupEnts() {
     edict_p ent = NEXT_EDICT(sv.edicts);
     for (int e = 1; e < sv.num_edicts; e++, ent = NEXT_EDICT(ent)) {
@@ -807,7 +809,6 @@ void SV_CreateBaseline() {
     Tell all the clients that the server is changing levels
     ================
 */
-#include "client.h"
 void SV_SendReconnect() {
     uint8_t      data[128];
     sizebuf_t  msg = {

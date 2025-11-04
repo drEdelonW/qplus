@@ -281,8 +281,7 @@ void Sys_Init() {
 
 
 void Sys_Error(cStringRO error, ...) {
-    va_list  argptr;
-    char  text[1024], text2[1024];
+    char text2[1024];
     cString text3 = "Press Enter to exit\n";
     cString text4 = "***********************************\n";
     cString text5 = "\n";
@@ -298,13 +297,13 @@ void Sys_Error(cStringRO error, ...) {
         VID_ForceUnlockedAndReturnState();
     }
 
-    va_start(argptr, error);
-    vsprintf(text, error, argptr);
+    va_list argptr;     va_start(argptr, error);
+    char text[1024];    vsnprintf(text, sizeof(text), error, argptr);
     va_end(argptr);
 
     if (isDedicated) {
         va_start(argptr, error);
-        vsprintf(text, error, argptr);
+        vsnprintf(text, sizeof(text), error, argptr);
         va_end(argptr);
 
         sprintf(text2, "ERROR: %s\n", text);
@@ -352,13 +351,11 @@ void Sys_Error(cStringRO error, ...) {
 }
 
 void Sys_Printf(cString fmt, ...) {
-    va_list argptr;
-    char    text[1024];
     DWORD   dummy;
-
+    
     if (isDedicated) {
-        va_start(argptr, fmt);
-        vsprintf(text, fmt, argptr);
+        va_list argptr;     va_start(argptr, fmt);
+        char text[1024];    vsnprintf(text, sizeof(text), fmt, argptr);
         va_end(argptr);
 
         WriteFile(houtput, text, strlen(text), &dummy, NULL);

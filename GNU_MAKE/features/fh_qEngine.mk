@@ -17,16 +17,18 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                                 SRC_LIST += $(CVAR_DIR)/cvar.c
                                 SRC_LIST += $(CVAR_DIR)/cvar_q1.c
 
-                                $(eval CMD_DIR = $(CLI_DIR)/cmd) $(eval INCLUDES += $(CMD_DIR))
-                                        $(eval CBUF_DIR = $(CMD_DIR)/Cbuf) $(eval INCLUDES += $(CBUF_DIR))
-                                                #SRC_LIST += $(CBUF_DIR)/cbuf.c
-                                                SRC_LIST += $(CBUF_DIR)/cbuf_cWrap.cpp
-                                                SRC_LIST += $(CBUF_DIR)/cbuf_obj.cpp
+
+                        $(eval CMD_DIR = $(CLI_DIR)/cmd) $(eval INCLUDES += $(CMD_DIR))
+                                $(eval CBUF_DIR = $(CMD_DIR)/Cbuf) $(eval INCLUDES += $(CBUF_DIR))
+                                        #SRC_LIST += $(CBUF_DIR)/cbuf.c
+                                        SRC_LIST += $(CBUF_DIR)/cbuf_cWrap.cpp
+                                        SRC_LIST += $(CBUF_DIR)/cbuf_obj.cpp
 
                                 SRC_LIST += $(CMD_DIR)/cmd.c
                                 SRC_LIST += $(CMD_DIR)/cmd_alias.c
 
                         SRC_LIST += $(CLI_DIR)/console.c
+
 
                 $(eval COMM_DIR = $(HOST_DIR)/common) $(eval INCLUDES += $(COMM_DIR))
                         SRC_LIST += $(COMM_DIR)/common.c
@@ -43,18 +45,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(MSG_DIR)/msg_cWrap.cpp
                         SRC_LIST += $(MSG_DIR)/msg_obj.cpp
 
-                $(eval NET_CL_DIR = $(NET_DIR)/client) $(eval INCLUDES += $(NET_CL_DIR))
-                        SRC_LIST += $(NET_CL_DIR)/cl_main.c
-                        SRC_LIST += $(NET_CL_DIR)/cl_input.c
-                        SRC_LIST += $(NET_CL_DIR)/cl_demo.c
-                        SRC_LIST += $(NET_CL_DIR)/cl_parse.c
-                        SRC_LIST += $(NET_CL_DIR)/cl_tent.c
-
-                $(eval NET_SV_DIR = $(NET_DIR)/server) $(eval INCLUDES += $(NET_SV_DIR))
-                        SRC_LIST += $(NET_SV_DIR)/sv_main.c
-                        SRC_LIST += $(NET_SV_DIR)/sv_user.c
-                        SRC_LIST += $(NET_SV_DIR)/sv_phys.c
-                        SRC_LIST += $(NET_SV_DIR)/sv_move.c
 
                 SRC_LIST += $(NET_DIR)/net_main.c
                 SRC_LIST += $(NET_DIR)/net_dgrm.c
@@ -71,12 +61,22 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(PROG_DIR)/pr_edict.c
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
 
+                SRC_LIST += $(SV_SIDE_DIR)/sv_main.c
+                SRC_LIST += $(SV_SIDE_DIR)/sv_user.c
+                SRC_LIST += $(SV_SIDE_DIR)/sv_phys.c
+                SRC_LIST += $(SV_SIDE_DIR)/sv_move.c
 
         $(eval CL_SIDE_DIR = $(ENG_DIR)/Client_side) $(eval INCLUDES += $(CL_SIDE_DIR))
                 $(eval SND_DIR = $(CL_SIDE_DIR)/sound) $(eval INCLUDES += $(SND_DIR))
                         SRC_LIST += $(SND_DIR)/snd_dma.c
                         SRC_LIST += $(SND_DIR)/snd_mem.c
                         SRC_LIST += $(SND_DIR)/snd_mix.c
+
+                SRC_LIST += $(CL_SIDE_DIR)/cl_main.c
+                SRC_LIST += $(CL_SIDE_DIR)/cl_input.c
+                SRC_LIST += $(CL_SIDE_DIR)/cl_demo.c
+                SRC_LIST += $(CL_SIDE_DIR)/cl_parse.c
+                SRC_LIST += $(CL_SIDE_DIR)/cl_tent.c
 
         $(eval VID_DIR = $(CL_SIDE_DIR)/video) $(eval INCLUDES += $(VID_DIR))
                 $(eval DRAW_DIR = $(VID_DIR)/draw) $(eval INCLUDES += $(DRAW_DIR))

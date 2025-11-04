@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include "d_iface.h"
 #include "server.h"
+#undef SERVER
 #include "common.h"
 #include "sys.h"
 #include "protocol.h"
@@ -87,11 +88,8 @@ Host::EndGame
 ================
 */
 void Host::EndGame(cString message, ...) {
-    va_list  argptr;
-    char  string[1024];
-
-    va_start(argptr, message);
-    vsprintf(string, message, argptr);
+    va_list  argptr;    va_start(argptr, message);
+    char  string[1024]; vsnprintf(string, sizeof(string), message, argptr);
     va_end(argptr);
     Con_DPrintf("Host::EndGame: %s\n", string);
 
@@ -114,16 +112,14 @@ This shuts down both the client and server
 */
 void Host::Error(cString error, ...) {
     static bool inerror = false;
-    va_list  argptr;
-    char  string[1024];
 
     if (inerror)    Sys_Error("Host::Error: recursively entered");
     inerror = true;
 
     SCR_EndLoadingPlaque();  // reenable screen updates
 
-    va_start(argptr, error);
-    vsprintf(string, error, argptr);
+    va_list  argptr;    va_start(argptr, error);
+    char  string[1024]; vsnprintf(string, sizeof(string), error, argptr);
     va_end(argptr);
     Con_Printf("Host::Error: %s\n", string);
 
@@ -246,11 +242,8 @@ FIXME: make this just a stuffed echo?
 =================
 */
 // void SV_ClientPrintf(cString fmt, ...) {
-//     va_list  argptr;
-//     char  string[1024];
-
-//     va_start(argptr, fmt);
-//     vsprintf(string, fmt, argptr);
+//     va_list  argptr;    va_start(argptr, fmt);
+//     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
 //     va_end(argptr);
 
 //     MSG_WriteByte(&host_client->message, svc_print);
@@ -265,12 +258,9 @@ Sends text to all active clients
 =================
 */
 // void SV_BroadcastPrintf(cString fmt, ...) {
-//     va_list  argptr;
-//     char  string[1024];
-
-//     va_start(argptr, fmt);
-//     vsprintf(string, fmt, argptr);
-//     va_end(argptr);
+//    va_list  argptr;    va_start(argptr, fmt);
+//    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
+//    va_end(argptr);
 
 //     for (int i = 0; i < svs.maxclients; i++)
 //         if (svs.clients[i].active && svs.clients[i].spawned) {
@@ -287,11 +277,8 @@ Send text over to the client to be executed
 =================
 */
 void Host::ClientCommands(cString fmt, ...) {
-    va_list  argptr;
-    char  string[1024];
-
-    va_start(argptr, fmt);
-    vsprintf(string, fmt, argptr);
+    va_list  argptr;    va_start(argptr, fmt);
+    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
     MSG_WriteByte(&host_client->message, svc_stufftext);

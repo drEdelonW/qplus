@@ -44,11 +44,8 @@ void Sys_DebugNumber(int y, int val) {}
 
 /*
 void Sys_Printf(cStringRO fmt, ...) {
-    va_list		argptr;
-    char		text[1024];
-
-    va_start(argptr, fmt);
-    vsprintf(text, fmt, argptr);
+    va_list argptr;     va_start(argptr, fmt);
+    char text[1024];    vsnprintf(text, sizeof(text), fmt, argptr);
     va_end(argptr);
     fprintf(stderr, "%s", text);
 
@@ -56,16 +53,14 @@ void Sys_Printf(cStringRO fmt, ...) {
 }
 
 void Sys_Printf(cStringRO fmt, ...) {
-
-    va_list     argptr;
-    char        text[1024], * t_p;
-    int         l, r;
+    chap* t_p;
+    int l, r;
 
     if (nostdout)
         return;
 
-    va_start(argptr, fmt);
-    vsprintf(text, fmt, argptr);
+    va_list argptr; va_start(argptr, fmt);
+    char text[1024];    vsnprintf(text, sizeof(text), fmt, argptr);
     va_end(argptr);
 
     l = strlen(text);
@@ -86,23 +81,17 @@ void Sys_Printf(cStringRO fmt, ...) {
 */
 
 void Sys_Printf(cStringRO fmt, ...) {
-    va_list argptr;
-    char    text[1024];
-    uint8_p  p;
-
-    va_start(argptr, fmt);
-    vsprintf(text, fmt, argptr);
+    va_list argptr;     va_start(argptr, fmt);
+    char text[1024];    vsnprintf(text, sizeof(text), fmt, argptr);
     va_end(argptr);
 
-    if (strlen(text) > sizeof(text)) {
+    if (strlen(text) > sizeof(text))
         Sys_Error("memory overwrite in Sys_Printf");
-    }
 
-    if (nostdout) {
+    if (nostdout)
         return;
-    }
 
-    for (p = (uint8_p)text; *p; p++) {
+    for (uint8_p p = (uint8_p)text; *p; p++) {
         *p &= 0x7f;
         if (((*p > 128) ||  // ASCII [DEL] last printable
             (*p < 32)) &&  // ASCII [SP] first printable
@@ -112,9 +101,8 @@ void Sys_Printf(cStringRO fmt, ...) {
             ) {
             printf("[%02x]", *p);
         }
-        else {
-            putc(*p, stdout);
-        }
+        else putc(*p, stdout);
+
     }
 }
 
@@ -145,14 +133,11 @@ void Sys_Init() {
 }
 
 void Sys_Error(cStringRO error, ...) {
-    va_list     argptr;
-    char        string[1024];
-
     // change stdin to non blocking
     fcntl(0, F_SETFL, (fcntl(0, F_GETFL, 0) & ~FNDELAY));
 
-    va_start(argptr, error);
-    vsprintf(string, error, argptr);
+    va_list argptr;     va_start(argptr, error);
+    char string[1024];  vsnprintf(string, sizeof(string),  error, argptr);
     va_end(argptr);
     fprintf(stderr, "Error: %s\n", string);
 
@@ -161,11 +146,8 @@ void Sys_Error(cStringRO error, ...) {
 }
 
 void Sys_Warn(cStringRO warning, ...) {
-    va_list argptr;
-    char    string[1024];
-
-    va_start(argptr, warning);
-    vsprintf(string, warning, argptr);
+    va_list argptr;     va_start(argptr, warning);
+    char string[1024];  vsnprintf(string, sizeof(string),  warning, argptr);
     va_end(argptr);
     fprintf(stderr, "Warning: %s", string);
 }
@@ -233,11 +215,8 @@ int Sys_FileRead(int handle, TypeLess_ptr dest, int count) {
 }
 
 void Sys_DebugLog(cStringRO file, cStringRO fmt, ...) {
-    va_list argptr;
-    static char data[1024];
-
-    va_start(argptr, fmt);
-    vsprintf(data, fmt, argptr);
+    va_list argptr;         va_start(argptr, fmt);
+    static char data[1024]; vsnprintf(data, sizeof(data), fmt, argptr);
     va_end(argptr);
     //    fd = open(file, O_WRONLY | O_BINARY | O_CREAT | O_APPEND, 0666);
     int fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);

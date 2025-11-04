@@ -21,8 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string.h>
 #include <stdlib.h>
-#include "client.h"
 #include "server.h"
+#undef SERVER
+#include "client.h"
 #include "chase.h"
 #include "host.h"
 #include "console.h"

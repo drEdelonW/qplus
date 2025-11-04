@@ -19,7 +19,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // server.h
-
+#define SERVER
+#ifdef CLIENT
+#error CLIENT defined
+#endif
 #include <setjmp.h>
 #include "model/model.h"
 #include "progs.h"

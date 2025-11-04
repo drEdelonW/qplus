@@ -19,6 +19,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // client.h
+#define CLIENT
+#ifdef SERVER
+#error SERVER defined
+#endif
 #include <stdio.h>
 #include "enginedefs.h"
 #include "platformdefs.h"

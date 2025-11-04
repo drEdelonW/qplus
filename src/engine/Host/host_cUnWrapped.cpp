@@ -3,6 +3,7 @@
 
 #include <stdarg.h>
 #include "server.h"
+#undef SERVER
 #include "client.h"
 #include "sys.h"
 #include "protocol.h"
@@ -17,7 +18,7 @@ Host.EndGame
 */
 void Host_EndGame(cString message, ...) {
     va_list argptr;     va_start(argptr, message);
-    char string[1024];  vsprintf(string, message, argptr);
+    char string[1024];  vsnprintf(string, sizeof(string), message, argptr);
     va_end(argptr);
 
     Con_DPrintf("Host.EndGame: %s\n", string);
@@ -46,7 +47,7 @@ void Host_Error(cString error, ...) {
     SCR_EndLoadingPlaque();  // reenable screen updates
 
     va_list argptr;     va_start(argptr, error);
-    char string[1024];  vsprintf(string, error, argptr);
+    char string[1024];  vsnprintf(string, sizeof(string), error, argptr);
     va_end(argptr);
 
     Con_Printf("Host.Error: %s\n", string);
@@ -72,7 +73,7 @@ FIXME: make this just a stuffed echo?
 */
 void SV_ClientPrintf(cStringRO fmt, ...) {
     va_list argptr;     va_start(argptr, fmt);
-    char string[1024];  vsprintf(string, fmt, argptr);
+    char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
     MSG_WriteByte(&host_client->message, svc_print);
@@ -88,7 +89,7 @@ Sends text to all active clients
 */
 void SV_BroadcastPrintf(cString fmt, ...) {
     va_list argptr;     va_start(argptr, fmt);
-    char string[1024];  vsprintf(string, fmt, argptr);
+    char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
     for (int i = 0; i < svs.maxclients; i++)
@@ -107,7 +108,7 @@ Send text over to the client to be executed
 */
 void Host_ClientCommands(cString fmt, ...) {
     va_list argptr;     va_start(argptr, fmt);
-    char string[1024];  vsprintf(string, fmt, argptr);
+    char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
     MSG_WriteByte(&host_client->message, svc_stufftext);

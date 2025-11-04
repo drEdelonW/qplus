@@ -125,11 +125,8 @@ void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) { }
 void Sys_DebugLog(cString file, cString fmt, ...) { }
 
 void Sys_Error(cStringRO error, ...) {
-    va_list  argptr;
-    char  text[1024];
-
-    va_start(argptr, error);
-    vsprintf(text, error, argptr);
+    va_list argptr;     va_start(argptr, error);
+    char text[1024];    vsnprintf(text, sizeof(text), error, argptr);
     va_end(argptr);
 
     //    MessageBox(NULL, text, "Error", 0 /* MB_OK */ );

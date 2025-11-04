@@ -329,8 +329,8 @@ void Con_Print(cStringRO txt) {
 void Con_DebugLog(cString file, cString fmt, ...) {
     static char data[1024];
 
-    va_list argptr;    va_start(argptr, fmt);
-    vsprintf(data, fmt, argptr);
+    va_list argptr; va_start(argptr, fmt);
+    vsnprintf(data, sizeof(data), fmt, argptr);
     va_end(argptr);
 
     int fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
@@ -347,12 +347,11 @@ void Con_DebugLog(cString file, cString fmt, ...) {
     ================
 */
 #define MAXPRINTMSG (4096)
-// FIXME: make a buffer size safe vsprintf?
 void Con_Printf(cStringRO fmt, ...) {
     static bool inupdate;
 
-    va_list  argptr;        va_start(argptr, fmt);
-    char  msg[MAXPRINTMSG]; vsprintf(msg, fmt, argptr);
+    va_list argptr;         va_start(argptr, fmt);
+    char msg[MAXPRINTMSG];  vsnprintf(msg, sizeof(msg), fmt, argptr);
     va_end(argptr);
 
     // also echo to debugging console
@@ -398,7 +397,7 @@ void Con_DPrintf(cStringRO fmt, ...) {
         return;   // don't confuse non-developers with techie stuff...
 
     va_list argptr;         va_start(argptr, fmt);
-    char msg[MAXPRINTMSG];  vsprintf(msg, fmt, argptr);
+    char msg[MAXPRINTMSG];  vsnprintf(msg, sizeof(msg), fmt, argptr);
     va_end(argptr);
 
     Con_Printf("%s", msg);
@@ -414,7 +413,7 @@ void Con_DPrintf(cStringRO fmt, ...) {
 */
 void Con_SafePrintf(cStringRO fmt, ...) {
     va_list argptr; va_start(argptr, fmt);
-    char msg[1024]; vsprintf(msg, fmt, argptr);
+    char msg[1024]; vsnprintf(msg, sizeof(msg), fmt, argptr);
     va_end(argptr);
 
     int temp = scr.disabled_for_loading;

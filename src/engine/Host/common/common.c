@@ -411,7 +411,7 @@ FIXME: make this buffer size safe someday
 */
 cString va(cStringRO format, ...) {
     va_list argptr;             va_start(argptr, format);
-    static char string[1024];   vsprintf(string, format, argptr);
+    static char string[1024];   vsnprintf(string, sizeof(string), format, argptr);
     va_end(argptr);
 
     return string;
