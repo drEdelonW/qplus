@@ -25,7 +25,7 @@ int inpSymb();
 void M_DrawTextBox(int x, int y, int width, int lines);
 void M_DrawCharacter(int cx, int line, int num);
 
-void M_Print(int cx, int cy, cString str);
+void M_Print(int cx, int cy, cStringRO str);
 void M_PrintWhite(int cx, int cy, cString str);
 void M_BuildTranslationTable(int top, int bottom);
 

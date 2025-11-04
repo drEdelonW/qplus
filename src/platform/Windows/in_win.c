@@ -635,15 +635,15 @@ void IN_MouseMove(UserCmd_p cmd) {
 	mouse_y *= sensitivity.value;
 
 	// add mouse X/Y movement to cmd
-	if ((in_strafe.state & 1) || (lookstrafe.value && (in_mlook.state & 1)))
+	if ((in.strafe.state & 1) || (lookstrafe.value && (in.mlook.state & 1)))
 		cmd->sidemove += m_side.value * mouse_x;
 	else
 		cl.viewangles[YAW] -= m_yaw.value * mouse_x;
 
-	if (in_mlook.state & 1)
+	if (in.mlook.state & 1)
 		V_StopPitchDrift();
 
-	if ((in_mlook.state & 1) && !(in_strafe.state & 1)) {
+	if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
 		cl.viewangles[PITCH] += m_pitch.value * mouse_y;
 		if (cl.viewangles[PITCH] > 80)
 			cl.viewangles[PITCH] = 80;
@@ -651,7 +651,7 @@ void IN_MouseMove(UserCmd_p cmd) {
 			cl.viewangles[PITCH] = -70;
 	}
 	else {
-		if ((in_strafe.state & 1) && noclip_anglehack)
+		if ((in.strafe.state & 1) && noclip_anglehack)
 			cmd->upmove -= m_forward.value * mouse_y;
 		else
 			cmd->forwardmove -= m_forward.value * mouse_y;
@@ -978,7 +978,7 @@ void IN_JoyMove(UserCmd_p cmd) {
 	}
 
 	// verify joystick is available and that the user wants to use it
-	if (!joy_avail || !in_joystick.value) {
+	if (!joy_avail || !in.joystick.value) {
 		return;
 	}
 
@@ -987,7 +987,7 @@ void IN_JoyMove(UserCmd_p cmd) {
 		return;
 	}
 
-	if (in_speed.state & 1)
+	if (in.speed.state & 1)
 		speed = cl_movespeedkey.value;
 	else
 		speed = 1;
@@ -1019,7 +1019,7 @@ void IN_JoyMove(UserCmd_p cmd) {
 
 		switch (dwAxisMap[i]) {
 		case AxisForward:
-			if ((joy_advanced.value == 0.0) && (in_mlook.state & 1)) {
+			if ((joy_advanced.value == 0.0) && (in.mlook.state & 1)) {
 				// user wants forward control to become look control
 				if (fabs(fAxisValue) > joy_pitchthreshold.value) {
 					// if mouse invert is on, invert the joystick pitch value
@@ -1056,7 +1056,7 @@ void IN_JoyMove(UserCmd_p cmd) {
 			break;
 
 		case AxisTurn:
-			if ((in_strafe.state & 1) || (lookstrafe.value && (in_mlook.state & 1))) {
+			if ((in.strafe.state & 1) || (lookstrafe.value && (in.mlook.state & 1))) {
 				// user wants turn control to become side control
 				if (fabs(fAxisValue) > joy_sidethreshold.value) {
 					cmd->sidemove -= (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
@@ -1077,7 +1077,7 @@ void IN_JoyMove(UserCmd_p cmd) {
 			break;
 
 		case AxisLook:
-			if (in_mlook.state & 1) {
+			if (in.mlook.state & 1) {
 				if (fabs(fAxisValue) > joy_pitchthreshold.value) {
 					// pitch movement detected and pitch movement desired by user
 					if (dwControlMap[i] == JOY_ABSOLUTE_AXIS) {

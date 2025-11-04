@@ -19,13 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // cl_parse.c  -- parse a message received from the server
 
+#include "client.h"
+#undef CLIENT
+#include "server.h"
+#include "host.h"
 #include <string.h>
 #include <stdlib.h>
-#include "server.h"
-#undef SERVER
-#include "client.h"
-#include "render.h"
-#include "host.h"
 #include "protocol.h"
 #include "sound.h"
 #include "cdaudio.h"
@@ -98,9 +97,8 @@ cString svc_strings[] = {
 */
 r_Entity_p CL_EntityNum(int num) {
     if (num >= cl.num_entities) {
-        if (num >= MAX_EDICTS) {
-            Host_Error("CL_EntityNum: %i is an invalid number", num);
-        }
+        if (num >= MAX_EDICTS)      Host_Error("CL_EntityNum: %i is an invalid number", num);
+
         while (cl.num_entities <= num) {
             cl_entities[cl.num_entities].colormap = vid.colormap;
             cl.num_entities++;
@@ -117,15 +115,15 @@ r_Entity_p CL_EntityNum(int num) {
     ==================
 */
 void CL_ParseStartSoundPacket() {
-    int field_mask = MSG_ReadByte();
+    uint8_t field_mask = MSG_ReadByte();
 
-    int volume = (field_mask & SND_VOLUME) ? MSG_ReadByte() : DEFAULT_SOUND_PACKET_VOLUME;
+    uint8_t volume = (field_mask & SND_VOLUME) ? MSG_ReadByte() : DEFAULT_SOUND_PACKET_VOLUME;
     float attenuation = (field_mask & SND_ATTENUATION) ? (MSG_ReadByte() / 64.0) : DEFAULT_SOUND_PACKET_ATTENUATION;
 
-    int channel = MSG_ReadShort();
-    int sound_num = MSG_ReadByte();
+    uint16_t channel = MSG_ReadShort();
+    uint8_t sound_num = MSG_ReadByte();
 
-    int ent = channel >> 3;
+    uint16_t ent = channel >> 3;
     channel &= 7;
 
     if (ent > MAX_EDICTS)
@@ -159,8 +157,7 @@ void CL_ParseStartSoundPacket() {
     ==================
 */
 void CL_KeepaliveMessage() {
-    static float lastmsg;
-    uint8_t  olddata[8192];
+    static float _lastMsg;
 
     if ((sv.active) || // no need if server is local
         (cls.demoplayback)) {
@@ -169,7 +166,7 @@ void CL_KeepaliveMessage() {
 
     // read messages from server, should just be nops
     sizebuf_t old = net_message;
-    memcpy(olddata, net_message.data, net_message.cursize);
+    uint8_t olddata[8192];  memcpy(olddata, net_message.data, net_message.cursize);
 
     int ret;
     do {
@@ -190,8 +187,8 @@ void CL_KeepaliveMessage() {
 
     // check time
     float time = Sys_FloatTime();
-    if ((time - lastmsg) < 5.0f)    return;
-    lastmsg = time;
+    if ((time - _lastMsg) < 5.0f)    return;
+    _lastMsg = time;
 
     // write out a nop
     Con_Printf("--> client to server keepalive\n");
@@ -209,8 +206,7 @@ void CL_KeepaliveMessage() {
 void CL_ParseServerInfo() {
     Con_DPrintf("Serverinfo packet received.\n");
 
-    // wipe the ClientState_t struct
-    CL_ClearState();
+    CL_ClearState();    // wipe the ClientState_t struct
 
     // parse protocol version number
     int32_t ver = MSG_ReadLong();
@@ -219,11 +215,11 @@ void CL_ParseServerInfo() {
         return;
     }
 
-    // parse maxclients
+    // parse maxClients
     cl.maxclients = MSG_ReadByte();
     if ((cl.maxclients < 1) ||
         (cl.maxclients > MAX_SCOREBOARD)) {
-        Con_Printf("Bad maxclients (%u) from server\n", cl.maxclients);
+        Con_Printf("Bad maxClients (%u) from server\n", cl.maxclients);
         return;
     }
     cl.scores = Hunk_AllocName(cl.maxclients * sizeof(*cl.scores), "scores");
@@ -246,7 +242,7 @@ void CL_ParseServerInfo() {
     // precache models
     char model_precache[MAX_MODELS][MAX_QPATH];
     memset(cl.model_precache, 0, sizeof(cl.model_precache));
-    int nummodels;
+    uint16_t nummodels;
     for (nummodels = 1; ; nummodels++) {
         str = MSG_ReadString();
         if (!str[0])    break;
@@ -335,29 +331,25 @@ void CL_ParseUpdate(update_bits_t bits) {
     r_Entity_p ent = CL_EntityNum(num);
 
     for (int i = 0; i < 16; i++) {
-        if (bits & (1u << i)) {
+        if (bits & (1u << i))
             bitcounts[i]++;
-        }
     }
 
     bool forcelink = (ent->msgtime != cl.mtime[1]); // no previous frame to lerp from
 
     ent->msgtime = cl.mtime[0];
 
-    int modnum = (bits & U_MODEL) ? MSG_ReadByte() : ent->baseline.modelindex;
-    if (modnum >= MAX_MODELS) { Host_Error("CL_ParseModel: bad modnum"); }
+    uint16_t modnum = (bits & U_MODEL) ? MSG_ReadByte() : ent->baseline.modelindex;
+    if (modnum >= MAX_MODELS)   Host_Error("CL_ParseModel: bad modnum");
 
     Model_p model = cl.model_precache[modnum];
     if (model != ent->model) {
         ent->model = model;
         // automatic animation (torches, etc) can be either all together
         // or randomized
-        if (model) {
-            ent->syncbase = (model->synctype == ST_RAND) ? ((float)(rand() & 0x7fff) / 0x7fff) : 0.0;
-        }
-        else {
-            forcelink = true; // hack to make null model players work
-        }
+        if (model)  ent->syncbase = (model->synctype == ST_RAND) ? ((float)(rand() & 0x7fff) / 0x7fff) : 0.0;
+        else        forcelink = true; // hack to make null model players work
+
 #ifdef GLQUAKE
         if ((num > 0) && (num <= cl.maxclients))
             R_TranslatePlayerSkin(num - 1);
@@ -367,9 +359,10 @@ void CL_ParseUpdate(update_bits_t bits) {
     ent->frame = (bits & U_FRAME) ? MSG_ReadByte() : ent->baseline.frame;
     uint8_t i = (bits & U_COLORMAP) ? MSG_ReadByte() : ent->baseline.colormap;
 
-    if (!i) { ent->colormap = vid.colormap; }
+    if (!i)     ent->colormap = vid.colormap;
     else {
         if (i > cl.maxclients)  Sys_Error("i >= cl.maxclients %d > %d", i, cl.maxclients);
+
         ent->colormap = cl.scores[i - 1].translations;
     }
 
@@ -529,6 +522,7 @@ void CL_ParseStatic() {
     int statics = cl.num_statics;
     if (statics >= MAX_STATIC_ENTITIES)
         Host_Error("Too many static entities");
+
     r_Entity_p ent = &cl_static_entities[statics];
     cl.num_statics++;
     CL_ParseBaseline(ent);
@@ -556,9 +550,9 @@ void CL_ParseStaticSound() {
         MSG_ReadCoord(),
         MSG_ReadCoord()
     };
-    int sound_num = MSG_ReadByte();
-    int vol = MSG_ReadByte();
-    int atten = MSG_ReadByte();
+    uint8_t sound_num = MSG_ReadByte();
+    uint8_t vol = MSG_ReadByte();
+    uint8_t atten = MSG_ReadByte();
 
     S_StaticSound(cl.sound_precache[sound_num], org, vol, atten);
 }

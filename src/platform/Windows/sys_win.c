@@ -352,7 +352,7 @@ void Sys_Error(cStringRO error, ...) {
 
 void Sys_Printf(cString fmt, ...) {
     DWORD   dummy;
-    
+
     if (isDedicated) {
         va_list argptr;     va_start(argptr, fmt);
         char text[1024];    vsnprintf(text, sizeof(text), fmt, argptr);

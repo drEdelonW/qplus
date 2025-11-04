@@ -64,7 +64,7 @@ void M_Keys_Draw() {
             M_Print(140, y, "???");
         }
         else {
-            cString name = Key_KeynumToString(keys[0]);
+            cStringRO name = Key_KeynumToString(keys[0]);
             M_Print(140, y, name);
             int x = strlen(name) * 8;
             if (keys[1] != -1) {

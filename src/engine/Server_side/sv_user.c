@@ -348,7 +348,7 @@ void SV_ClientThink() {
 
     // angles
     // show 1/3 the pitch angle and all the roll angle
-    cmd = host_client->cmd;
+    cmd = remoteClient->cmd;
     _angles = sv_player->v.angles;
 
     vec3_t v_angle;
@@ -379,9 +379,9 @@ SV_ReadClientMove
 */
 void SV_ReadClientMove(UserCmd_p move) {
     // read ping time
-    host_client->ping_times[host_client->num_pings % NUM_PING_TIMES]
+    remoteClient->ping_times[remoteClient->num_pings % NUM_PING_TIMES]
         = sv.time - MSG_ReadFloat();
-    host_client->num_pings++;
+    remoteClient->num_pings++;
 
     // read current angles
     // for (int i = 0; i < VECT_DIM; i++)
@@ -392,7 +392,7 @@ void SV_ReadClientMove(UserCmd_p move) {
         MSG_ReadAngle()
     };
 
-    VectorCopy(angle, host_client->edict->v.v_angle);
+    VectorCopy(angle, remoteClient->edict->v.v_angle);
 
     // read movement
     move->forwardmove = MSG_ReadShort();
@@ -401,16 +401,16 @@ void SV_ReadClientMove(UserCmd_p move) {
 
     // read buttons
     int bits = MSG_ReadByte();
-    host_client->edict->v.button0 = bits & 1;
-    host_client->edict->v.button2 = (bits & 2) >> 1;
+    remoteClient->edict->v.button0 = bits & 1;
+    remoteClient->edict->v.button2 = (bits & 2) >> 1;
 
     int i = MSG_ReadByte();
     if (i)
-        host_client->edict->v.impulse = i;
+        remoteClient->edict->v.impulse = i;
 
 #ifdef QUAKE2
     // read light level
-    host_client->edict->v.light_level = MSG_ReadByte();
+    remoteClient->edict->v.light_level = MSG_ReadByte();
 #endif
 }
 
@@ -425,7 +425,7 @@ bool SV_ReadClientMessage() {
     int  ret;
     do {
     nextmsg:
-        ret = NET_GetMessage(host_client->netconnection);
+        ret = NET_GetMessage(remoteClient->netconnection);
         if (ret == -1) {
             Sys_Printf("SV_ReadClientMessage: NET_GetMessage failed\n");
             return false;
@@ -435,7 +435,7 @@ bool SV_ReadClientMessage() {
         MSG_BeginReading();
 
         while (1) {
-            if (!host_client->active) return false; // a command caused an error
+            if (!remoteClient->active) return false; // a command caused an error
             if (getMsgBadRead()) { Sys_Printf("SV_ReadClientMessage: badread\n"); return false; }
 
             clc_t cmd = MSG_ReadChar();
@@ -453,7 +453,7 @@ bool SV_ReadClientMessage() {
 
             case clc_stringcmd:
                 cString str = MSG_ReadString();
-                if (host_client->privileged)    ret = 2;
+                if (remoteClient->privileged)    ret = 2;
                 else                            ret = 0;
 
                 if ((Q_strncasecmp(str, "status", 6) == 0) ||
@@ -479,14 +479,14 @@ bool SV_ReadClientMessage() {
 
                 if (ret == 2)       Cbuf_InsertText(str);
                 else if (ret == 1)  Cmd_ExecuteString(str, src_client);
-                else                Con_DPrintf("%s tried to %s\n", host_client->name, str);
+                else                Con_DPrintf("%s tried to %s\n", remoteClient->name, str);
                 break;
 
             case clc_disconnect:
                 //    Sys_Printf ("SV_ReadClientMessage: client disconnected\n");
                 return false;
 
-            case clc_move: SV_ReadClientMove(&host_client->cmd); break;
+            case clc_move: SV_ReadClientMove(&remoteClient->cmd); break;
             }
         }
     } while (ret == 1);
@@ -501,26 +501,26 @@ SV_RunClients
 ==================
 */
 void SV_RunClients() {
-    host_client = svs.clients;
-    for (int i = 0; i < svs.maxclients; i++, host_client++) {
-        if (!host_client->active) continue;
+    remoteClient = svs.clients;
+    for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+        if (!remoteClient->active) continue;
 
-        sv_player = host_client->edict;
+        sv_player = remoteClient->edict;
 
         if (!SV_ReadClientMessage()) {
             SV_DropClient(false); // client misbehaved...
             continue;
         }
 
-        if (!host_client->spawned) {
+        if (!remoteClient->spawned) {
             // clear client movement until a new packet is received
-            memset(&host_client->cmd, 0, sizeof(host_client->cmd));
+            memset(&remoteClient->cmd, 0, sizeof(remoteClient->cmd));
             continue;
         }
 
         // always pause in single player if in console or menus
         if (!sv.paused &&
-            ((svs.maxclients > 1) ||
+            ((svs.maxClients > 1) ||
                 (key.dest == key_game)
                 )
             )

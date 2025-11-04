@@ -21,8 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // client.h
 #define CLIENT
 #ifdef SERVER
-#error SERVER defined
+#   error SERVER defined
 #endif
+
 #include <stdio.h>
 #include "enginedefs.h"
 #include "platformdefs.h"
@@ -31,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sound/sound_struct.h"
 #include "net.h"
 #include "UserCmd.h"
+#include "protocol.h"
 
 
 typedef struct {
@@ -54,9 +56,9 @@ typedef struct {
 
 typedef enum cshift_kind_e {
     CSHIFT_CONTENTS = 0,
-    CSHIFT_DAMAGE   = 1,
-    CSHIFT_BONUS    = 2,
-    CSHIFT_POWERUP  = 3,
+    CSHIFT_DAMAGE = 1,
+    CSHIFT_BONUS = 2,
+    CSHIFT_POWERUP = 3,
 
     NUM_CSHIFTS // should be last
 } cshift_kind_t;
@@ -147,23 +149,23 @@ extern ClientStatic_t cls;
 // stats are integers communicated to the client by the server
 //
 typedef enum {
-    STAT_HEALTH        = 0,
-    STAT_FRAGS         = 1,
-    STAT_WEAPON        = 2,
-    STAT_AMMO          = 3,
-    STAT_ARMOR         = 4,
-    STAT_WEAPONFRAME   = 5,
-    STAT_SHELLS        = 6,
-    STAT_NAILS         = 7,
-    STAT_ROCKETS       = 8,
-    STAT_CELLS         = 9,
-    STAT_ACTIVEWEAPON  = 10,
-    STAT_TOTALSECRETS  = 11,
+    STAT_HEALTH = 0,
+    STAT_FRAGS = 1,
+    STAT_WEAPON = 2,
+    STAT_AMMO = 3,
+    STAT_ARMOR = 4,
+    STAT_WEAPONFRAME = 5,
+    STAT_SHELLS = 6,
+    STAT_NAILS = 7,
+    STAT_ROCKETS = 8,
+    STAT_CELLS = 9,
+    STAT_ACTIVEWEAPON = 10,
+    STAT_TOTALSECRETS = 11,
     STAT_TOTALMONSTERS = 12,
-    STAT_SECRETS       = 13, // bumped client-side by svc_foundsecret
-    STAT_MONSTERS      = 14,  // bumped by svc_killedmonster
+    STAT_SECRETS = 13, // bumped client-side by svc_foundsecret
+    STAT_MONSTERS = 14,  // bumped by svc_killedmonster
 
-    MAX_CL_STATS       = 32
+    MAX_CL_STATS = 32
 } stat_t;
 
 //
@@ -227,8 +229,9 @@ typedef struct {
 
     char    levelname[40]; // for display on solo scoreboard
     int32_t viewentity;  // cl_entitites[cl.viewentity] = player
-    int32_t maxclients;
-    int32_t gametype;
+    uint8_t maxclients;
+    // int32_t gametype;   // game_type_t
+    game_type_t gametype;   // game_type_t
 
     // refresh related state
     Model_p worldmodel; // cl_entitites[0].model
@@ -236,7 +239,7 @@ typedef struct {
     int32_t num_entities; // held in cl_entities array
     int32_t num_statics; // held in cl_staticentities array
     r_Entity_t viewent;   // the gun model
-    int32_t cdtrack, looptrack; // cd audio
+    uint8_t cdtrack, looptrack; // cd audio
 
     // frag scoreboard
     ScoreBoard_p scores;  // [cl.maxclients]
@@ -262,21 +265,38 @@ extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
 extern Beam_t       cl_beams[MAX_BEAMS];
 
 #define MAX_VISEDICTS 256
-    extern int32_t      cl_numvisedicts;
-    extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
+extern int32_t      cl_numvisedicts;
+extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
 
-    // cl_input
-    typedef struct {
-        uint8_t down[2];    // key nums holding it down
-        uint8_t state;      // low bit is down state
-    } kbutton_t;
-    typedef kbutton_t* kbutton_p;
+// cl_input
+typedef struct {
+    uint8_t down[2];    // key nums holding it down
+    uint8_t state;      // low bit is down state
+} kbutton_t;
+typedef kbutton_t* kbutton_p;
 
-    extern  kbutton_t   in_mlook, in_klook;
-    extern  kbutton_t   in_strafe;
-    extern  kbutton_t   in_speed;
-
-extern kbutton_t in_forward, in_forward2, in_back;
+typedef struct {
+    kbutton_t mlook;
+    kbutton_t klook;
+    kbutton_t left;
+    kbutton_t right;
+    kbutton_t forward;
+    kbutton_t forward2;
+    kbutton_t up;
+    kbutton_t down;
+    kbutton_t back;
+    kbutton_t lookup;
+    kbutton_t lookdown;
+    kbutton_t moveleft;
+    kbutton_t moveright;
+    kbutton_t strafe;
+    kbutton_t speed;
+    kbutton_t use;
+    kbutton_t jump;
+    kbutton_t attack;
+    int       impulse;
+} ClInput_t;
+extern ClInput_t in;
 
 //=============================================================================
 #ifdef __cplusplus
@@ -285,67 +305,63 @@ extern "C" {
     //
     // cl_main
     //
+
+    // LIFECYCLE
+    void CL_Init();
+    void CL_ClearState();
+
+    // CONNECTION / SIGN-ON / SESSION
+    void CL_EstablishConnection(cString host);
+    // void CL_Signon1();
+    // void CL_Signon2();
+    // void CL_Signon3();
+    // void CL_Signon4();
+    void CL_SignonReply();
+    void CL_Disconnect();
+    void CL_Disconnect_f();
+
+    // INPUT
+    void CL_InitInput();
+    float CL_KeyState(kbutton_p key);
+    cStringRO Key_KeynumToString(keycode_t keynum);
+
+    // NETWORK I/O & USERCMDS
+    void CL_SendCmd();
+    void CL_BaseMove(UserCmd_p cmd);
+    void CL_SendMove(UserCmd_p cmd);
+    // void CL_WriteToServer(UserCmd_p cmd);
+    void CL_ReadFromServer();
+
+    // NET MESSAGE PARSING / TRANSLATION // cl_parse.c
+    void CL_ParseServerMessage();
+    void CL_NewTranslation(int32_t slot);
+
+    // TEMP ENTITIES & DYNAMIC LIGHTS// cl_tent
+    void CL_InitTEnts();
+    void CL_ParseTEnt();
+    void CL_UpdateTEnts();
     dLight_p CL_AllocDlight(int32_t key);
     void CL_DecayLights();
 
-    void CL_Init();
+    // VIEW / SCREEN EFFECTS
+    // void V_Register();
+    void V_RenderView();
+    void V_UpdatePalette();
+    void V_ParseDamage();
+    void V_StartPitchDrift(); // view
+    void V_StopPitchDrift();
+    void V_SetContentsColor(contents_t contents);
 
-    void CL_EstablishConnection(cString host);
-    void CL_Signon1();
-    void CL_Signon2();
-    void CL_Signon3();
-    void CL_Signon4();
-
-    void CL_Disconnect();
-    void CL_Disconnect_f();
-    void CL_NextDemo();
-
-
-    void CL_InitInput();
-    void CL_SendCmd();
-    void CL_SendMove(UserCmd_p cmd);
-
-    void CL_ParseTEnt();
-    void CL_UpdateTEnts();
-
-    void CL_ClearState();
-
-
-    void CL_ReadFromServer();
-    void CL_WriteToServer(UserCmd_p cmd);
-    void CL_BaseMove(UserCmd_p cmd);
-
-
-    float CL_KeyState(kbutton_p key);
-    cString Key_KeynumToString(keycode_t keynum);
-
+    // DEMO SYSTEM
     // cl_demo.c
     void CL_StopPlayback();
     int CL_GetMessage();
-
     void CL_Stop_f();
     void CL_Record_f();
     void CL_PlayDemo_f();
     void CL_TimeDemo_f();
+    void CL_NextDemo();
 
-    // cl_parse.c
-    void CL_ParseServerMessage();
-    void CL_NewTranslation(int32_t slot);
-
-    // view
-    void V_StartPitchDrift();
-    void V_StopPitchDrift();
-
-    void V_RenderView();
-    void V_UpdatePalette();
-    void V_Register();
-    void V_ParseDamage();
-    void V_SetContentsColor(contents_t contents);
-
-
-    // cl_tent
-    void CL_InitTEnts();
-    void CL_SignonReply();
 
 #ifdef __cplusplus
 }

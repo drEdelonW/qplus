@@ -22,19 +22,18 @@
 // Quake is a trademark of Id Software, Inc., (c) 1996 Id Software, Inc. All
 // rights reserved.
 
-#include "cvar_q1.h"
 #include "client.h"
-#include <string.h>
+#include "host.h"
+#include "msg.h"
+#include "cvar_q1.h"
 #include <stdlib.h>
 #include "console.h"
 #include "cmd.h"
-#include "host.h"
 #include "protocol.h"
 #include "q_tools.h"
-#include "msg.h"
-#include "net.h"
 #include "angle.h"
 
+ClInput_t in;
 
 
 /*
@@ -59,14 +58,6 @@
 */
 
 
-kbutton_t in_mlook, in_klook;
-kbutton_t in_left, in_right, in_forward, in_back;
-kbutton_t in_lookup, in_lookdown, in_moveleft, in_moveright;
-kbutton_t in_strafe, in_speed, in_use, in_jump, in_attack;
-kbutton_t in_up, in_down;
-
-int   in_impulse;
-
 void KeyDown(kbutton_p btn) {
     cString c = Cmd_Argv(1);
     int k = (c[0]) ? atoi(c) : -1;  // typed manually at the console for continuous down
@@ -90,9 +81,7 @@ void KeyUp(kbutton_p btn) {
     int k;
 
     cString c = Cmd_Argv(1);
-    if (c[0]) {
-        k = atoi(c);
-    }
+    if (c[0]) { k = atoi(c); }
     else { // typed manually at the console, assume for unsticking, so clear all
         btn->down[0] = btn->down[1] = 0;
         btn->state = 4; // impulse up
@@ -112,52 +101,6 @@ void KeyUp(kbutton_p btn) {
     btn->state &= ~1;  // now up
     btn->state |= 4;   // impulse up
 }
-
-void IN_KLookDown() { KeyDown(&in_klook); }
-void IN_KLookUp() { KeyUp(&in_klook); }
-void IN_MLookDown() { KeyDown(&in_mlook); }
-void IN_MLookUp() {
-    KeyUp(&in_mlook);
-    if (!(in_mlook.state & 1) &&
-        lookspring.value
-        )   V_StartPitchDrift();
-
-}
-void IN_UpDown() { KeyDown(&in_up); }
-void IN_UpUp() { KeyUp(&in_up); }
-void IN_DownDown() { KeyDown(&in_down); }
-void IN_DownUp() { KeyUp(&in_down); }
-void IN_LeftDown() { KeyDown(&in_left); }
-void IN_LeftUp() { KeyUp(&in_left); }
-void IN_RightDown() { KeyDown(&in_right); }
-void IN_RightUp() { KeyUp(&in_right); }
-void IN_ForwardDown() { KeyDown(&in_forward); }
-void IN_ForwardUp() { KeyUp(&in_forward); }
-void IN_BackDown() { KeyDown(&in_back); }
-void IN_BackUp() { KeyUp(&in_back); }
-void IN_LookupDown() { KeyDown(&in_lookup); }
-void IN_LookupUp() { KeyUp(&in_lookup); }
-void IN_LookdownDown() { KeyDown(&in_lookdown); }
-void IN_LookdownUp() { KeyUp(&in_lookdown); }
-void IN_MoveleftDown() { KeyDown(&in_moveleft); }
-void IN_MoveleftUp() { KeyUp(&in_moveleft); }
-void IN_MoverightDown() { KeyDown(&in_moveright); }
-void IN_MoverightUp() { KeyUp(&in_moveright); }
-
-void IN_SpeedDown() { KeyDown(&in_speed); }
-void IN_SpeedUp() { KeyUp(&in_speed); }
-void IN_StrafeDown() { KeyDown(&in_strafe); }
-void IN_StrafeUp() { KeyUp(&in_strafe); }
-
-void IN_AttackDown() { KeyDown(&in_attack); }
-void IN_AttackUp() { KeyUp(&in_attack); }
-
-void IN_UseDown() { KeyDown(&in_use); }
-void IN_UseUp() { KeyUp(&in_use); }
-void IN_JumpDown() { KeyDown(&in_jump); }
-void IN_JumpUp() { KeyUp(&in_jump); }
-
-void IN_Impulse() { in_impulse = Q_atoi(Cmd_Argv(1)); }
 
 /*
     ===============
@@ -198,8 +141,6 @@ float CL_KeyState(kbutton_p key) {
 }
 
 
-
-
 //==========================================================================
 
 
@@ -214,29 +155,28 @@ float CL_KeyState(kbutton_p key) {
 void CL_AdjustAngles() {
     float speed;
 
-    if (in_speed.state & 1) speed = host_frametime * cl_anglespeedkey.value;
+    if (in.speed.state & 1) speed = host_frametime * cl_anglespeedkey.value;
     else                    speed = host_frametime;
 
-    if (!(in_strafe.state & 1)) {
-        cl.viewangles[YAW] -= speed * cl_yawspeed.value * CL_KeyState(&in_right);
-        cl.viewangles[YAW] += speed * cl_yawspeed.value * CL_KeyState(&in_left);
+    if (!(in.strafe.state & 1)) {
+        cl.viewangles[YAW] -= speed * cl_yawspeed.value * CL_KeyState(&in.right);
+        cl.viewangles[YAW] += speed * cl_yawspeed.value * CL_KeyState(&in.left);
         cl.viewangles[YAW] = anglemod(cl.viewangles[YAW]);
     }
-    if (in_klook.state & 1) {
+    if (in.klook.state & 1) {
         V_StopPitchDrift();
-        cl.viewangles[PITCH] -= speed * cl_pitchspeed.value * CL_KeyState(&in_forward);
-        cl.viewangles[PITCH] += speed * cl_pitchspeed.value * CL_KeyState(&in_back);
+        cl.viewangles[PITCH] -= speed * cl_pitchspeed.value * CL_KeyState(&in.forward);
+        cl.viewangles[PITCH] += speed * cl_pitchspeed.value * CL_KeyState(&in.back);
     }
 
-    float up = CL_KeyState(&in_lookup);
-    float down = CL_KeyState(&in_lookdown);
+    float up = CL_KeyState(&in.lookup);
+    float down = CL_KeyState(&in.lookdown);
 
     cl.viewangles[PITCH] -= speed * cl_pitchspeed.value * up;
     cl.viewangles[PITCH] += speed * cl_pitchspeed.value * down;
 
-    if (up || down) {
+    if (up || down)
         V_StopPitchDrift();
-    }
 
     CLAMP(-70, cl.viewangles[PITCH], 80);    // down look
     CLAMP(-50, cl.viewangles[ROLL], 50);
@@ -258,26 +198,26 @@ void CL_BaseMove(UserCmd_p cmd) {
 
     Q_memset(cmd, 0, sizeof(*cmd));
 
-    if (in_strafe.state & 1) {
-        cmd->sidemove += cl_sidespeed.value * CL_KeyState(&in_right);
-        cmd->sidemove -= cl_sidespeed.value * CL_KeyState(&in_left);
+    if (in.strafe.state & 1) {
+        cmd->sidemove += cl_sidespeed.value * CL_KeyState(&in.right);
+        cmd->sidemove -= cl_sidespeed.value * CL_KeyState(&in.left);
     }
 
-    cmd->sidemove += cl_sidespeed.value * CL_KeyState(&in_moveright);
-    cmd->sidemove -= cl_sidespeed.value * CL_KeyState(&in_moveleft);
+    cmd->sidemove += cl_sidespeed.value * CL_KeyState(&in.moveright);
+    cmd->sidemove -= cl_sidespeed.value * CL_KeyState(&in.moveleft);
 
-    cmd->upmove += cl_upspeed.value * CL_KeyState(&in_up);
-    cmd->upmove -= cl_upspeed.value * CL_KeyState(&in_down);
+    cmd->upmove += cl_upspeed.value * CL_KeyState(&in.up);
+    cmd->upmove -= cl_upspeed.value * CL_KeyState(&in.down);
 
-    if (!(in_klook.state & 1)) {
-        cmd->forwardmove += cl_forwardspeed.value * CL_KeyState(&in_forward);
-        cmd->forwardmove -= cl_backspeed.value * CL_KeyState(&in_back);
+    if (!(in.klook.state & 1)) {
+        cmd->forwardmove += cl_forwardspeed.value * CL_KeyState(&in.forward);
+        cmd->forwardmove -= cl_backspeed.value * CL_KeyState(&in.back);
     }
 
     //
     // adjust for speed key
     //
-    if (in_speed.state & 1) {
+    if (in.speed.state & 1) {
         cmd->forwardmove *= cl_movespeedkey.value;
         cmd->sidemove *= cl_movespeedkey.value;
         cmd->upmove *= cl_movespeedkey.value;
@@ -323,16 +263,16 @@ void CL_SendMove(UserCmd_p cmd) {
     // send button bits
     //
     int bits = 0;
-    if (in_attack.state & 3)    bits |= 1;
-    in_attack.state &= ~2;
+    if (in.attack.state & 3)    bits |= 1;
+    in.attack.state &= ~2;
 
-    if (in_jump.state & 3)      bits |= 2;
-    in_jump.state &= ~2;
+    if (in.jump.state & 3)      bits |= 2;
+    in.jump.state &= ~2;
 
     MSG_WriteByte(&buf, bits);
 
-    MSG_WriteByte(&buf, in_impulse);
-    in_impulse = 0;
+    MSG_WriteByte(&buf, in.impulse);
+    in.impulse = 0;
 
 #ifdef QUAKE2
     //
@@ -358,46 +298,49 @@ void CL_SendMove(UserCmd_p cmd) {
     }
 }
 
+
+void IN_KLookDown() { KeyDown(&in.klook); }         void IN_KLookUp() { KeyUp(&in.klook); }
+void IN_MLookDown() { KeyDown(&in.mlook); }         void IN_MLookUp() { KeyUp(&in.mlook); if (!(in.mlook.state & 1) && lookspring.value) V_StartPitchDrift(); }
+void IN_UpDown() { KeyDown(&in.up); }               void IN_UpUp() { KeyUp(&in.up); }
+void IN_DownDown() { KeyDown(&in.down); }           void IN_DownUp() { KeyUp(&in.down); }
+void IN_LeftDown() { KeyDown(&in.left); }           void IN_LeftUp() { KeyUp(&in.left); }
+void IN_RightDown() { KeyDown(&in.right); }         void IN_RightUp() { KeyUp(&in.right); }
+void IN_ForwardDown() { KeyDown(&in.forward); }     void IN_ForwardUp() { KeyUp(&in.forward); }
+void IN_BackDown() { KeyDown(&in.back); }           void IN_BackUp() { KeyUp(&in.back); }
+void IN_LookupDown() { KeyDown(&in.lookup); }       void IN_LookupUp() { KeyUp(&in.lookup); }
+void IN_LookdownDown() { KeyDown(&in.lookdown); }   void IN_LookdownUp() { KeyUp(&in.lookdown); }
+void IN_MoveleftDown() { KeyDown(&in.moveleft); }   void IN_MoveleftUp() { KeyUp(&in.moveleft); }
+void IN_MoverightDown() { KeyDown(&in.moveright); } void IN_MoverightUp() { KeyUp(&in.moveright); }
+void IN_SpeedDown() { KeyDown(&in.speed); }         void IN_SpeedUp() { KeyUp(&in.speed); }
+void IN_StrafeDown() { KeyDown(&in.strafe); }       void IN_StrafeUp() { KeyUp(&in.strafe); }
+void IN_AttackDown() { KeyDown(&in.attack); }       void IN_AttackUp() { KeyUp(&in.attack); }
+void IN_UseDown() { KeyDown(&in.use); }             void IN_UseUp() { KeyUp(&in.use); }
+void IN_JumpDown() { KeyDown(&in.jump); }           void IN_JumpUp() { KeyUp(&in.jump); }
+void IN_Impulse() { in.impulse = Q_atoi(Cmd_Argv(1)); }
+
 /*
 ============
 CL_InitInput
 ============
 */
 void CL_InitInput() {
-    Cmd_AddCommand("+moveup", IN_UpDown);
-    Cmd_AddCommand("-moveup", IN_UpUp);
-    Cmd_AddCommand("+movedown", IN_DownDown);
-    Cmd_AddCommand("-movedown", IN_DownUp);
-    Cmd_AddCommand("+left", IN_LeftDown);
-    Cmd_AddCommand("-left", IN_LeftUp);
-    Cmd_AddCommand("+right", IN_RightDown);
-    Cmd_AddCommand("-right", IN_RightUp);
-    Cmd_AddCommand("+forward", IN_ForwardDown);
-    Cmd_AddCommand("-forward", IN_ForwardUp);
-    Cmd_AddCommand("+back", IN_BackDown);
-    Cmd_AddCommand("-back", IN_BackUp);
-    Cmd_AddCommand("+lookup", IN_LookupDown);
-    Cmd_AddCommand("-lookup", IN_LookupUp);
-    Cmd_AddCommand("+lookdown", IN_LookdownDown);
-    Cmd_AddCommand("-lookdown", IN_LookdownUp);
-    Cmd_AddCommand("+strafe", IN_StrafeDown);
-    Cmd_AddCommand("-strafe", IN_StrafeUp);
-    Cmd_AddCommand("+moveleft", IN_MoveleftDown);
-    Cmd_AddCommand("-moveleft", IN_MoveleftUp);
-    Cmd_AddCommand("+moveright", IN_MoverightDown);
-    Cmd_AddCommand("-moveright", IN_MoverightUp);
-    Cmd_AddCommand("+speed", IN_SpeedDown);
-    Cmd_AddCommand("-speed", IN_SpeedUp);
-    Cmd_AddCommand("+attack", IN_AttackDown);
-    Cmd_AddCommand("-attack", IN_AttackUp);
-    Cmd_AddCommand("+use", IN_UseDown);
-    Cmd_AddCommand("-use", IN_UseUp);
-    Cmd_AddCommand("+jump", IN_JumpDown);
-    Cmd_AddCommand("-jump", IN_JumpUp);
+    Cmd_AddCommand("+moveup", IN_UpDown);               Cmd_AddCommand("-moveup", IN_UpUp);
+    Cmd_AddCommand("+movedown", IN_DownDown);           Cmd_AddCommand("-movedown", IN_DownUp);
+    Cmd_AddCommand("+left", IN_LeftDown);               Cmd_AddCommand("-left", IN_LeftUp);
+    Cmd_AddCommand("+right", IN_RightDown);             Cmd_AddCommand("-right", IN_RightUp);
+    Cmd_AddCommand("+forward", IN_ForwardDown);         Cmd_AddCommand("-forward", IN_ForwardUp);
+    Cmd_AddCommand("+back", IN_BackDown);               Cmd_AddCommand("-back", IN_BackUp);
+    Cmd_AddCommand("+lookup", IN_LookupDown);           Cmd_AddCommand("-lookup", IN_LookupUp);
+    Cmd_AddCommand("+lookdown", IN_LookdownDown);       Cmd_AddCommand("-lookdown", IN_LookdownUp);
+    Cmd_AddCommand("+strafe", IN_StrafeDown);           Cmd_AddCommand("-strafe", IN_StrafeUp);
+    Cmd_AddCommand("+moveleft", IN_MoveleftDown);       Cmd_AddCommand("-moveleft", IN_MoveleftUp);
+    Cmd_AddCommand("+moveright", IN_MoverightDown);     Cmd_AddCommand("-moveright", IN_MoverightUp);
+    Cmd_AddCommand("+speed", IN_SpeedDown);             Cmd_AddCommand("-speed", IN_SpeedUp);
+    Cmd_AddCommand("+attack", IN_AttackDown);           Cmd_AddCommand("-attack", IN_AttackUp);
+    Cmd_AddCommand("+use", IN_UseDown);                 Cmd_AddCommand("-use", IN_UseUp);
+    Cmd_AddCommand("+jump", IN_JumpDown);               Cmd_AddCommand("-jump", IN_JumpUp);
+    Cmd_AddCommand("+klook", IN_KLookDown);             Cmd_AddCommand("-klook", IN_KLookUp);
+    Cmd_AddCommand("+mlook", IN_MLookDown);             Cmd_AddCommand("-mlook", IN_MLookUp);
     Cmd_AddCommand("impulse", IN_Impulse);
-    Cmd_AddCommand("+klook", IN_KLookDown);
-    Cmd_AddCommand("-klook", IN_KLookUp);
-    Cmd_AddCommand("+mlook", IN_MLookDown);
-    Cmd_AddCommand("-mlook", IN_MLookUp);
 }
 

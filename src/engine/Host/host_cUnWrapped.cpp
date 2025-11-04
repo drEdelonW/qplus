@@ -76,8 +76,8 @@ void SV_ClientPrintf(cStringRO fmt, ...) {
     char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
-    MSG_WriteByte(&host_client->message, svc_print);
-    MSG_WriteString(&host_client->message, string);
+    MSG_WriteByte(&remoteClient->message, svc_print);
+    MSG_WriteString(&remoteClient->message, string);
 }
 
 /*
@@ -92,7 +92,7 @@ void SV_BroadcastPrintf(cString fmt, ...) {
     char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
-    for (int i = 0; i < svs.maxclients; i++)
+    for (int i = 0; i < svs.maxClients; i++)
         if (svs.clients[i].active && svs.clients[i].spawned) {
             MSG_WriteByte(&svs.clients[i].message, svc_print);
             MSG_WriteString(&svs.clients[i].message, string);
@@ -111,6 +111,6 @@ void Host_ClientCommands(cString fmt, ...) {
     char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
-    MSG_WriteByte(&host_client->message, svc_stufftext);
-    MSG_WriteString(&host_client->message, string);
+    MSG_WriteByte(&remoteClient->message, svc_stufftext);
+    MSG_WriteString(&remoteClient->message, string);
 }

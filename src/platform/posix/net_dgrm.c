@@ -112,7 +112,7 @@ void NET_Ban_f() {
         print = Con_Printf;
     }
     else {
-        if (pr_global_struct->deathmatch && !host_client->privileged)
+        if (pr_global_struct->deathmatch && !remoteClient->privileged)
             return;
         print = SV_ClientPrintf;
     }
@@ -785,7 +785,7 @@ static qsocket_p _Datagram_CheckNewConnections() {
         MSG_WriteString(&net_message, hostname.string);
         MSG_WriteString(&net_message, sv.name);
         MSG_WriteByte(&net_message, net_activeconnections);
-        MSG_WriteByte(&net_message, svs.maxclients);
+        MSG_WriteByte(&net_message, svs.maxClients);
         MSG_WriteByte(&net_message, NET_PROTOCOL_VERSION);
         *((int*)net_message.data) = BigLong(NETFLAG_CTL | (net_message.cursize & NETFLAG_LENGTH_MASK));
         dfunc.Write(acceptsock, net_message.data, net_message.cursize, &clientaddr);
@@ -797,18 +797,18 @@ static qsocket_p _Datagram_CheckNewConnections() {
         int			playerNumber;
         int			activeNumber;
         int			clientNumber;
-        client_t* client;
+        RmtClient_p    client;
 
         playerNumber = MSG_ReadByte();
         activeNumber = -1;
-        for (clientNumber = 0, client = svs.clients; clientNumber < svs.maxclients; clientNumber++, client++) {
+        for (clientNumber = 0, client = svs.clients; clientNumber < svs.maxClients; clientNumber++, client++) {
             if (client->active) {
                 activeNumber++;
                 if (activeNumber == playerNumber)
                     break;
             }
         }
-        if (clientNumber == svs.maxclients)
+        if (clientNumber == svs.maxClients)
             return NULL;
 
         SZ_Clear(&net_message);

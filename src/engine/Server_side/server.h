@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // server.h
 #define SERVER
 #ifdef CLIENT
-#error CLIENT defined
+#   error CLIENT defined
 #endif
 #include <setjmp.h>
 #include "model/model.h"
@@ -30,24 +30,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "net.h"
 #include "UserCmd.h"
 
-struct client_s;
-typedef struct client_s client_t;
-typedef client_t* client_p;
-
-typedef struct {
-    int32_t     maxclients;
-    int32_t     maxclientslimit;
-    client_p    clients;            // [maxclients]
-    int32_t     serverflags;        // episode completion information
-    bool        changelevel_issued; // cleared when at SV_SpawnServer
-} sv_static_t;
 
 //=============================================================================
 
 typedef enum {
     ss_loading,
     ss_active
-} sv_state_t;
+} sv_state_e;
 
 typedef struct {
     bool    active;         // false if only a net client
@@ -69,7 +58,7 @@ typedef struct {
     int32_t     num_edicts;
     int32_t     max_edicts;
     edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
-    sv_state_t  state; // some actions are only valid during load
+    sv_state_e  state;  // some actions are only valid during load
     sizebuf_t   datagram;
     uint8_t     datagram_buf[MAX_DATAGRAM];
     sizebuf_t   reliable_datagram;	// copied to all clients at end of frame
@@ -77,6 +66,7 @@ typedef struct {
     sizebuf_t   signon;
     uint8_t     signon_buf[8192];
 } server_t;
+
 extern int32_t     current_skill; 	// skill level for currently loaded level (in case
 //  the user changes the cvar while the level is running, this reflects the level actually in use)
 
@@ -84,7 +74,7 @@ extern int32_t     current_skill; 	// skill level for currently loaded level (in
 #define	NUM_PING_TIMES		16
 #define	NUM_SPAWN_PARMS		16
 
-typedef struct client_s {
+struct RmtClient_s {
     bool        active;     // false = client is free
     bool        spawned;    // false = don't send datagrams
     bool        dropasap;   // has been told to go to another level
@@ -103,7 +93,9 @@ typedef struct client_s {
     int32_t     num_pings;  // ping_times[num_pings%NUM_PING_TIMES]
     float       spawn_parms[NUM_SPAWN_PARMS]; // spawn parms are carried from level to level
     int32_t     old_frags;  // client known data for deltas
-} client_t;
+};
+typedef struct RmtClient_s RmtClient_t;
+typedef RmtClient_t* RmtClient_p;
 
 
 //=============================================================================
@@ -193,11 +185,21 @@ typedef enum {
 } spawnlevel_flags_t;
 #endif
 
+
+typedef struct {
+    int8_t      maxClients;
+    int8_t      maxClientsLimit;
+    RmtClient_p clients;            // [maxClients]
+    int32_t     serverflags;        // episode completion information
+    bool        changelevel_issued; // cleared when at SV_SpawnServer
+} sv_static_t;
+
+
 //============================================================================
 
-extern sv_static_t  svs; // persistant server info
-extern server_t     sv;         // local server
-extern client_p     host_client;
+extern sv_static_t  svs;    // persistent server info
+extern server_t     sv;     // local server
+extern RmtClient_p  remoteClient;
 extern jmp_buf      host_abortserver;
 extern double       host_time;
 extern edict_p      sv_player;

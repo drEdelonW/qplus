@@ -42,7 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 server_t    sv;
 sv_static_t svs;
 int32_t     current_skill;
-char localmodels[MAX_MODELS][5];    // inline model names for precache
+static char _localModels[MAX_MODELS][5];    // inline model names for precache
 
 //============================================================================
 
@@ -64,7 +64,7 @@ void SV_Init() {
     Cvar_RegisterVariable(&sv_nostep);
 
     for (int i = 0; i < MAX_MODELS; i++) {
-        sprintf(localmodels[i], "*%i", i);
+        sprintf(_localModels[i], "*%i", i);
     }
 }
 
@@ -174,7 +174,7 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
     This will be sent on the initial connection and upon each server load.
     ================
 */
-void SV_SendServerinfo(client_p client) {
+void SV_SendServerinfo(RmtClient_p client) {
     char message[2048];
 
     MSG_WriteByte(&client->message, svc_print);
@@ -183,7 +183,7 @@ void SV_SendServerinfo(client_p client) {
 
     MSG_WriteByte(&client->message, svc_serverinfo);
     MSG_WriteLong(&client->message, PROTOCOL_VERSION);
-    MSG_WriteByte(&client->message, svs.maxclients);
+    MSG_WriteByte(&client->message, svs.maxClients);
 
     MSG_WriteByte(&client->message, (!coop.value && deathmatch.value) ? GAME_DEATHMATCH : GAME_COOP);
 
@@ -219,17 +219,17 @@ void SV_SendServerinfo(client_p client) {
     ================
     SV_ConnectClient
 
-    Initializes a client_t for a new net connection.  This will only be called
+    Initializes a RmtClient_t for a new net connection.  This will only be called
     once for a player each game, not once for each level change.
     ================
 */
 void SV_ConnectClient(int clientnum) {
     float spawn_parms[NUM_SPAWN_PARMS];
 
-    client_p client = svs.clients + clientnum;
+    RmtClient_p client = svs.clients + clientnum;
     Con_DPrintf("Client %s connected\n", client->netconnection->address);
 
-    // set up the client_t
+    // set up the RmtClient_t
     qsocket_p netconnection = client->netconnection;
 
     if (sv.loadgame)
@@ -284,10 +284,10 @@ void SV_CheckForNewClients() {
         // init a new client structure
         //
         int i = 0;
-        for (; i < svs.maxclients; i++) {
+        for (; i < svs.maxClients; i++) {
             if (!svs.clients[i].active) break;
         }
-        if (i == svs.maxclients)        Sys_Error("Host_CheckForNewClients: no free clients");
+        if (i == svs.maxClients)        Sys_Error("Host_CheckForNewClients: no free clients");
 
         svs.clients[i].netconnection = ret;
         SV_ConnectClient(i);
@@ -572,7 +572,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     SV_SendClientDatagram
     =======================
 */
-bool SV_SendClientDatagram(client_t* client) {
+bool SV_SendClientDatagram(RmtClient_t* client) {
     uint8_t    buf[MAX_DATAGRAM];
     sizebuf_t   msg = {
         .data = buf,
@@ -610,26 +610,26 @@ bool SV_SendClientDatagram(client_t* client) {
     =======================
 */
 void SV_UpdateToReliableMessages() {
-    client_p client;
+    RmtClient_p client;
 
     // check for changes to be sent over the reliable streams
-    host_client = svs.clients;
-    for (int i = 0; i < svs.maxclients; i++, host_client++) {
-        if (host_client->old_frags != host_client->edict->v.frags) {
+    remoteClient = svs.clients;
+    for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+        if (remoteClient->old_frags != remoteClient->edict->v.frags) {
             client = svs.clients;
-            for (int j = 0; j < svs.maxclients; j++, client++) {
+            for (int j = 0; j < svs.maxClients; j++, client++) {
                 if (!client->active)    continue;
                 MSG_WriteByte(&client->message, svc_updatefrags);
                 MSG_WriteByte(&client->message, i);
-                MSG_WriteShort(&client->message, host_client->edict->v.frags);
+                MSG_WriteShort(&client->message, remoteClient->edict->v.frags);
             }
 
-            host_client->old_frags = host_client->edict->v.frags;
+            remoteClient->old_frags = remoteClient->edict->v.frags;
         }
     }
 
     client = svs.clients;
-    for (int j = 0; j < svs.maxclients; j++, client++) {
+    for (int j = 0; j < svs.maxClients; j++, client++) {
         if (!client->active)    continue;
         SZ_Write(&client->message, sv.reliable_datagram.data, sv.reliable_datagram.cursize);
     }
@@ -646,7 +646,7 @@ void SV_UpdateToReliableMessages() {
     message buffer
     =======================
 */
-void SV_SendNop(client_p client) {
+void SV_SendNop(RmtClient_p client) {
     uint8_t    buf[4];
     sizebuf_t  msg = {
         .data = buf,
@@ -671,12 +671,12 @@ void SV_SendClientMessages() {
     SV_UpdateToReliableMessages();
 
     // build individual updates
-    host_client = svs.clients;
-    for (int i = 0; i < svs.maxclients; i++, host_client++) {
-        if (!host_client->active)   continue;
+    remoteClient = svs.clients;
+    for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+        if (!remoteClient->active)   continue;
 
-        if (host_client->spawned) {
-            if (!SV_SendClientDatagram(host_client))   continue;
+        if (remoteClient->spawned) {
+            if (!SV_SendClientDatagram(remoteClient))   continue;
         }
         else {
             // the player isn't totally in the game yet
@@ -684,9 +684,9 @@ void SV_SendClientMessages() {
             // send a full message when the next signon stage has been requested
             // some other message data (name changes, etc) may accumulate
             // between signon stages
-            if (!host_client->sendsignon) {
-                if (realtime - host_client->last_message > 5)
-                    SV_SendNop(host_client);
+            if (!remoteClient->sendsignon) {
+                if (realtime - remoteClient->last_message > 5)
+                    SV_SendNop(remoteClient);
                 continue;  // don't send out non-signon messages
             }
         }
@@ -694,25 +694,25 @@ void SV_SendClientMessages() {
         // check for an overflowed message.  Should only happen
         // on a very fucked up connection that backs up a lot, then
         // changes level
-        if (host_client->message.overflowed) {
+        if (remoteClient->message.overflowed) {
             SV_DropClient(true);
-            host_client->message.overflowed = false;
+            remoteClient->message.overflowed = false;
             continue;
         }
 
-        if (host_client->message.cursize || host_client->dropasap) {
-            if (!NET_CanSendMessage(host_client->netconnection)) {
+        if (remoteClient->message.cursize || remoteClient->dropasap) {
+            if (!NET_CanSendMessage(remoteClient->netconnection)) {
                 //        I_Printf ("can't write\n");
                 continue;
             }
 
-            if (host_client->dropasap)      SV_DropClient(false);  // went to another level
+            if (remoteClient->dropasap)      SV_DropClient(false);  // went to another level
             else {
-                if (NET_SendMessage(host_client->netconnection, &host_client->message) == -1)
+                if (NET_SendMessage(remoteClient->netconnection, &remoteClient->message) == -1)
                     SV_DropClient(true);  // if the message couldn't send, kick off
-                SZ_Clear(&host_client->message);
-                host_client->last_message = realtime;
-                host_client->sendsignon = false;
+                SZ_Clear(&remoteClient->message);
+                remoteClient->last_message = realtime;
+                remoteClient->sendsignon = false;
             }
         }
     }
@@ -762,7 +762,7 @@ void SV_CreateBaseline() {
         // get the current server version
         edict_p svent = EDICT_NUM(entnum);
         if ((svent->free) ||
-            ((entnum > svs.maxclients) &&
+            ((entnum > svs.maxClients) &&
                 !svent->v.modelindex)
             )
             continue;
@@ -774,7 +774,7 @@ void SV_CreateBaseline() {
         VectorCopy(svent->v.angles, svent->baseline.angles);
         svent->baseline.frame = svent->v.frame;
         svent->baseline.skin = svent->v.skin;
-        if ((entnum > 0) && (entnum <= svs.maxclients)) {
+        if ((entnum > 0) && (entnum <= svs.maxClients)) {
             svent->baseline.colormap = entnum;
             svent->baseline.modelindex = SV_ModelIndex("progs/player.mdl");
         }
@@ -810,8 +810,8 @@ void SV_CreateBaseline() {
     ================
 */
 void SV_SendReconnect() {
-    uint8_t      data[128];
-    sizebuf_t  msg = {
+    uint8_t data[128];
+    sizebuf_t msg = {
         .data = data,
         .cursize = 0,
         .maxsize = sizeof(data),
@@ -840,15 +840,15 @@ void SV_SendReconnect() {
 */
 void SV_SaveSpawnparms() {
     svs.serverflags = pr_global_struct->serverflags;
-    host_client = svs.clients;
-    for (int i = 0; i < svs.maxclients; i++, host_client++) {
-        if (!host_client->active)       continue;
+    remoteClient = svs.clients;
+    for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+        if (!remoteClient->active)       continue;
 
         // call the progs to get default spawn parms for the new client
-        pr_global_struct->self = EDICT_TO_PROG(host_client->edict);
+        pr_global_struct->self = EDICT_TO_PROG(remoteClient->edict);
         PR_ExecuteProgram(pr_global_struct->SetChangeParms);
         for (int j = 0; j < NUM_SPAWN_PARMS; j++)
-            host_client->spawn_parms[j] = (&pr_global_struct->parm1)[j];
+            remoteClient->spawn_parms[j] = (&pr_global_struct->parm1)[j];
     }
 }
 
@@ -867,7 +867,6 @@ void SV_SpawnServer(
     , cString startspot
 #endif
 ) {
-    edict_p ent;
 
     // let's not have any servers with no name
     if (hostname.string[0] == 0)
@@ -925,9 +924,9 @@ void SV_SpawnServer(
     sv.signon.data = sv.signon_buf;
 
     // leave slots at start for clients only
-    sv.num_edicts = svs.maxclients + 1;
-    for (int i = 0; i < svs.maxclients; i++) {
-        ent = EDICT_NUM(i + 1);
+    sv.num_edicts = svs.maxClients + 1;
+    for (int i = 0; i < svs.maxClients; i++) {
+        edict_p ent = EDICT_NUM(i + 1);
         svs.clients[i].edict = ent;
     }
 
@@ -956,14 +955,14 @@ void SV_SpawnServer(
     sv.model_precache[0] = pr_strings;
     sv.model_precache[1] = sv.modelname;
     for (int i = 1; i < sv.worldmodel->numsubmodels; i++) {
-        sv.model_precache[1 + i] = localmodels[i];
-        sv.models[i + 1] = Mod_ForName(localmodels[i], false);
+        sv.model_precache[1 + i] = _localModels[i];
+        sv.models[i + 1] = Mod_ForName(_localModels[i], false);
     }
 
     //
     // load the rest of the entities
     //
-    ent = EDICT_NUM(0);
+    edict_p ent = EDICT_NUM(0);
     memset(&ent->v, 0, progs->entityfields * 4);
     ent->free = false;
     ent->v.model = sv.worldmodel->name - pr_strings;
@@ -998,10 +997,10 @@ void SV_SpawnServer(
     SV_CreateBaseline();
 
     // send serverinfo to all connected clients
-    host_client = svs.clients;
-    for (int i = 0; i < svs.maxclients; i++, host_client++)
-        if (host_client->active)
-            SV_SendServerinfo(host_client);
+    remoteClient = svs.clients;
+    for (int i = 0; i < svs.maxClients; i++, remoteClient++)
+        if (remoteClient->active)
+            SV_SendServerinfo(remoteClient);
 
     Con_DPrintf("Server spawned.\n");
 }

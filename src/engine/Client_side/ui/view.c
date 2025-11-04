@@ -823,7 +823,7 @@ void V_RenderView() {
         V_CalcIntermissionRefdef();
     }
     else {
-        if (!cl.paused /* && ((sv.maxclients > 1) || (key.dest == key_game)) */)
+        if (!cl.paused /* && ((sv.maxClients > 1) || (key.dest == key_game)) */)
             V_CalcRefdef();
     }
 

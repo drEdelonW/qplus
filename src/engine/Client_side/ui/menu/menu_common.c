@@ -98,7 +98,7 @@ void M_DrawPic(int x, int y, qPic_p pic) {
     Draw_Pic(x + ((vid.width - 320) >> 1), y, pic);
 }
 
-void M_Print(int cx, int cy, cString str) {
+void M_Print(int cx, int cy, cStringRO str) {
     while (*str) {
         M_DrawCharacter(cx, cy, (*str) + 128);
         str++;

@@ -80,13 +80,13 @@ void Host_Status_f() {
     if (tcpipAvailable)     print("tcp/ip:  %s\n", my_tcpip_address);
     if (ipxAvailable)       print("ipx:     %s\n", my_ipx_address);
     print("map:     %s\n", sv.name);
-    print("players: %i active (%i max)\n\n", net_activeconnections, svs.maxclients);
+    print("players: %i active (%i max)\n\n", net_activeconnections, svs.maxClients);
 
-    client_p client = svs.clients;
-    for (int32_t j = 0; j < svs.maxclients; j++, client++) {
-        if (!client->active)    continue;
+    RmtClient_p rClient = svs.clients;
+    for (int32_t j = 0; j < svs.maxClients; j++, rClient++) {
+        if (!rClient->active)    continue;
 
-        int seconds = (int)(net_time - client->netconnection->connecttime);
+        int seconds = (int)(net_time - rClient->netconnection->connecttime);
         int minutes = seconds / 60;
         int hours = 0;
 
@@ -98,8 +98,8 @@ void Host_Status_f() {
         }
         else    hours = 0;
 
-        print("#%-2u %-16.16s  %3i  %2i:%02i:%02i\n", j + 1, client->name, (int32_t)client->edict->v.frags, hours, minutes, seconds);
-        print("   %s\n", client->netconnection->address);
+        print("#%-2u %-16.16s  %3i  %2i:%02i:%02i\n", j + 1, rClient->name, (int32_t)rClient->edict->v.frags, hours, minutes, seconds);
+        print("   %s\n", rClient->netconnection->address);
     }
 }
 
@@ -113,7 +113,7 @@ Sets client to godmode
 */
 void Host_God_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!host_client->privileged))   return;
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))   return;
 
     sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_GODMODE;
     SV_ClientPrintf("godmode %s\n",
@@ -124,7 +124,7 @@ void Host_God_f() {
 
 void Host_Notarget_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!host_client->privileged)) return;
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged)) return;
 
     sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_NOTARGET;
     SV_ClientPrintf("notarget %s\n",
@@ -137,7 +137,7 @@ bool noclip_anglehack;
 
 void Host_Noclip_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!host_client->privileged)) return;
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged)) return;
 
     if (sv_player->v.movetype == MOVETYPE_NOCLIP) {
         noclip_anglehack = false;
@@ -160,7 +160,7 @@ Sets client to flymode
 */
 void Host_Fly_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!host_client->privileged)) return;
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged)) return;
 
     if (sv_player->v.movetype == MOVETYPE_FLY) {
         sv_player->v.movetype = MOVETYPE_WALK;
@@ -183,15 +183,15 @@ void Host_Ping_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
 
     SV_ClientPrintf("Client ping times:\n");
-    client_p client = svs.clients;
-    for (int32_t i = 0; i < svs.maxclients; i++, client++) {
-        if (!client->active)    continue;
+    RmtClient_p rClient = svs.clients;
+    for (int32_t i = 0; i < svs.maxClients; i++, rClient++) {
+        if (!rClient->active)    continue;
 
         float total = 0;
         for (int j = 0; j < NUM_PING_TIMES; j++)
-            total += client->ping_times[j];
+            total += rClient->ping_times[j];
         total /= NUM_PING_TIMES;
-        SV_ClientPrintf("%4i %s\n", (int)(total * 1000), client->name);
+        SV_ClientPrintf("%4i %s\n", (int)(total * 1000), rClient->name);
     }
 }
 
@@ -343,8 +343,7 @@ void Host_Connect_f() {
         CL_StopPlayback();
         CL_Disconnect();
     }
-    char name[MAX_QPATH];
-    strcpy(name, Cmd_Argv(1));
+    char name[MAX_QPATH];   strcpy(name, Cmd_Argv(1));
     CL_EstablishConnection(name);
     Host_Reconnect_f();
 }
@@ -370,6 +369,7 @@ Writes a SAVEGAME_COMMENT_LENGTH character comment describing the current
 void Host_SavegameComment(cString text) {
     for (int i = 0; i < SAVEGAME_COMMENT_LENGTH; i++)
         text[i] = ' ';
+
     memcpy(text, cl.levelname, strlen(cl.levelname));
 
     char kills[20];
@@ -379,6 +379,7 @@ void Host_SavegameComment(cString text) {
     for (int i = 0; i < SAVEGAME_COMMENT_LENGTH; i++)
         if (text[i] == ' ')
             text[i] = '_';
+
     text[SAVEGAME_COMMENT_LENGTH] = '\0';
 }
 
@@ -392,11 +393,11 @@ void Host_Savegame_f() {
     if (cmd_source != src_command)      return;
     if (!sv.active) { ;                 Con_Printf("Not playing a local game.\n");              return; }
     if (cl.intermission) { ;            Con_Printf("Can't save in intermission.\n");            return; }
-    if (svs.maxclients != 1) { ;        Con_Printf("Can't save multiplayer games.\n");          return; }
+    if (svs.maxClients != 1) { ;        Con_Printf("Can't save multiplayer games.\n");          return; }
     if (Cmd_Argc() != 2) { ;            Con_Printf("save <savename> : save a game\n");          return; }
     if (strstr(Cmd_Argv(1), "..")) { ;  Con_Printf("Relative pathnames are not allowed.\n");    return; }
 
-    for (int32_t i = 0; i < svs.maxclients; i++) {
+    for (int32_t i = 0; i < svs.maxClients; i++) {
         if (svs.clients[i].active &&
             (svs.clients[i].edict->v.health <= 0)
             ) {
@@ -417,9 +418,9 @@ void Host_Savegame_f() {
     char comment[SAVEGAME_COMMENT_LENGTH + 1];
     Host_SavegameComment(comment);
     fprintf(saveFile, "%s\n", comment);
-    for (int i = 0; i < NUM_SPAWN_PARMS; i++) {
+    for (int i = 0; i < NUM_SPAWN_PARMS; i++)
         fprintf(saveFile, "%f\n", svs.clients->spawn_parms[i]);
-    }
+
     fprintf(saveFile, "%d\n", current_skill);
     fprintf(saveFile, "%s\n", sv.name);
     fprintf(saveFile, "%f\n", sv.time);
@@ -591,7 +592,7 @@ void SaveGamestate() {
     }
 
 
-    for (int i = svs.maxclients + 1; i < sv.num_edicts; i++) {
+    for (int i = svs.maxClients + 1; i < sv.num_edicts; i++) {
         edict_p ent = EDICT_NUM(i);
         if ((int32_t)ent->v.flags & FL_ARCHIVE_OVERRIDE)
             continue;
@@ -725,19 +726,20 @@ void Host_Name_f() {
             Cmd_ForwardToServer();
         return;
     }
-    if (host_client->name[0] &&
-        strcmp(host_client->name, "unconnected") &&
-        (Q_strcmp(host_client->name, newName) != 0)
+    if (remoteClient->name[0] &&
+        strcmp(remoteClient->name, "unconnected") &&
+        (Q_strcmp(remoteClient->name, newName) != 0)
         )
-        Con_Printf("%s renamed to %s\n", host_client->name, newName);
-    Q_strcpy(host_client->name, newName);
-    host_client->edict->v.netname = host_client->name - pr_strings;
+        Con_Printf("%s renamed to %s\n", remoteClient->name, newName);
+
+    Q_strcpy(remoteClient->name, newName);
+    remoteClient->edict->v.netname = remoteClient->name - pr_strings;
 
     // send notification to all clients
     sizebuf_p pBuf = &sv.reliable_datagram;
     MSG_WriteByte(pBuf, svc_updatename);
-    MSG_WriteByte(pBuf, host_client - svs.clients);
-    MSG_WriteString(pBuf, host_client->name);
+    MSG_WriteByte(pBuf, remoteClient - svs.clients);
+    MSG_WriteString(pBuf, remoteClient->name);
 }
 
 
@@ -754,12 +756,12 @@ void Host_Please_f() {
         (Q_strcmp(Cmd_Argv(1), "#") == 0)) {
         int j = Q_atof(Cmd_Argv(2)) - 1;
         if ((j < 0) ||
-            (j >= svs.maxclients) ||
+            (j >= svs.maxClients) ||
             (!svs.clients[j].active)
             )
             return;
 
-        client_p cl = &svs.clients[j];
+        RmtClient_p cl = &svs.clients[j];
         if (cl->privileged) {
             cl->privileged = false;
             cl->edict->v.flags = (int32_t)cl->edict->v.flags & ~(FL_GODMODE | FL_NOTARGET);
@@ -772,8 +774,8 @@ void Host_Please_f() {
     if (Cmd_Argc() != 2)    return;
 
     {
-        client_p cl = svs.clients;
-        for (int j = 0; j < svs.maxclients; j++, cl++) {
+        RmtClient_p cl = svs.clients;
+        for (int j = 0; j < svs.maxClients; j++, cl++) {
             if (!cl->active)    continue;
             if (Q_strcasecmp(cl->name, Cmd_Argv(1)) == 0) {
                 if (cl->privileged) {
@@ -803,7 +805,7 @@ void Host_Say(bool teamonly) {
 
     if (Cmd_Argc() < 2)         return;
 
-    client_p save = host_client;
+    RmtClient_p save = remoteClient;
 
     cString args = Cmd_Args();
     // remove quotes if present
@@ -824,21 +826,21 @@ void Host_Say(bool teamonly) {
         strcat(text, args);
         strcat(text, "\n");
 
-        client_p client = svs.clients;
-        for (int32_t j = 0; j < svs.maxclients; j++, client++) {
-            if (!client ||
-                !client->active ||
-                !client->spawned ||
+        RmtClient_p rClient = svs.clients;
+        for (int32_t j = 0; j < svs.maxClients; j++, rClient++) {
+            if (!rClient ||
+                !rClient->active ||
+                !rClient->spawned ||
                 (
                     teamplay.value &&
                     teamonly &&
-                    (client->edict->v.team != save->edict->v.team))
+                    (rClient->edict->v.team != save->edict->v.team))
                 )
                 continue;
-            host_client = client;
+            remoteClient = rClient;
             SV_ClientPrintf("%s", text);
         }
-        host_client = save;
+        remoteClient = save;
 
         Sys_Printf("%s", &text[1]);
     }
@@ -854,7 +856,7 @@ void Host_Tell_f() {
     if (Cmd_Argc() < 3)     return;
 
     char text[64];
-    Q_strcpy(text, host_client->name);
+    Q_strcpy(text, remoteClient->name);
     Q_strcat(text, ": ");
 
     cString args = Cmd_Args();
@@ -872,19 +874,19 @@ void Host_Tell_f() {
     strcat(text, args);
     strcat(text, "\n");
 
-    client_p save = host_client;
+    RmtClient_p save = remoteClient;
     {
-        client_p client = svs.clients;
-        for (int32_t j = 0; j < svs.maxclients; j++, client++) {
-            if (!client->active || !client->spawned)        continue;
-            if (Q_strcasecmp(client->name, Cmd_Argv(1)))    continue;
+        RmtClient_p rClient = svs.clients;
+        for (int32_t j = 0; j < svs.maxClients; j++, rClient++) {
+            if (!rClient->active || !rClient->spawned)        continue;
+            if (Q_strcasecmp(rClient->name, Cmd_Argv(1)))    continue;
 
-            host_client = client;
+            remoteClient = rClient;
             SV_ClientPrintf("%s", text);
             break;
         }
     }
-    host_client = save;
+    remoteClient = save;
 }
 
 
@@ -918,14 +920,14 @@ void Host_Color_f() {
         return;
     }
 
-    host_client->colors = playercolor;
-    host_client->edict->v.team = bottom + 1;
+    remoteClient->colors = playercolor;
+    remoteClient->edict->v.team = bottom + 1;
 
     // send notification to all clients
     sizebuf_p pBuf = &sv.reliable_datagram;
     MSG_WriteByte(pBuf, svc_updatecolors);
-    MSG_WriteByte(pBuf, host_client - svs.clients);
-    MSG_WriteByte(pBuf, host_client->colors);
+    MSG_WriteByte(pBuf, remoteClient - svs.clients);
+    MSG_WriteByte(pBuf, remoteClient->colors);
 }
 
 /*
@@ -973,13 +975,13 @@ Host_PreSpawn_f
 */
 void Host_PreSpawn_f() {
     if (cmd_source == src_command) { ;  Con_Printf("prespawn is not valid from the console\n"); return; }
-    if (host_client->spawned) { ;       Con_Printf("prespawn not valid -- allready spawned\n"); return; }
+    if (remoteClient->spawned) { ;       Con_Printf("prespawn not valid -- allready spawned\n"); return; }
 
-    sizebuf_p pBuf = &host_client->message;
+    sizebuf_p pBuf = &remoteClient->message;
     SZ_Write(pBuf, sv.signon.data, sv.signon.cursize);
     MSG_WriteByte(pBuf, svc_signonnum);
     MSG_WriteByte(pBuf, 2);
-    host_client->sendsignon = true;
+    remoteClient->sendsignon = true;
 }
 
 /*
@@ -989,7 +991,7 @@ Host_Spawn_f
 */
 void Host_Spawn_f() {
     if (cmd_source == src_command) { ; Con_Printf("spawn is not valid from the console\n");     return; }
-    if (host_client->spawned) { ;      Con_Printf("Spawn not valid -- allready spawned\n");    return; }
+    if (remoteClient->spawned) { ;      Con_Printf("Spawn not valid -- allready spawned\n");    return; }
 
     // run the entrance script
     if (sv.loadgame) { // loaded games are fully inited allready
@@ -998,17 +1000,17 @@ void Host_Spawn_f() {
     }
     else {
         // set up the edict
-        edict_p ent = host_client->edict;
+        edict_p ent = remoteClient->edict;
 
         memset(&ent->v, 0, progs->entityfields * 4);
         ent->v.colormap = NUM_FOR_EDICT(ent);
-        ent->v.team = (host_client->colors & 15) + 1;
-        ent->v.netname = host_client->name - pr_strings;
+        ent->v.team = (remoteClient->colors & 15) + 1;
+        ent->v.netname = remoteClient->name - pr_strings;
 
-        // copy spawn parms out of the client_t
+        // copy spawn parms out of the RmtClient_t
 
         for (int i = 0; i < NUM_SPAWN_PARMS; i++)
-            (&pr_global_struct->parm1)[i] = host_client->spawn_parms[i];
+            (&pr_global_struct->parm1)[i] = remoteClient->spawn_parms[i];
 
         // call the spawn function
 
@@ -1016,32 +1018,32 @@ void Host_Spawn_f() {
         pr_global_struct->self = EDICT_TO_PROG(sv_player);
         PR_ExecuteProgram(pr_global_struct->ClientConnect);
 
-        if ((Sys_FloatTime() - host_client->netconnection->connecttime) <= sv.time)
-            Sys_Printf("%s entered the game\n", host_client->name);
+        if ((Sys_FloatTime() - remoteClient->netconnection->connecttime) <= sv.time)
+            Sys_Printf("%s entered the game\n", remoteClient->name);
 
         PR_ExecuteProgram(pr_global_struct->PutClientInServer);
     }
 
 
     // send all current names, colors, and frag counts
-    sizebuf_p pBuf = &host_client->message;
+    sizebuf_p pBuf = &remoteClient->message;
     SZ_Clear(pBuf);
 
     // send time of update
     MSG_WriteByte(pBuf, svc_time);
     MSG_WriteFloat(pBuf, sv.time);
     {
-        client_p client = svs.clients;
-        for (int32_t i = 0; i < svs.maxclients; i++, client++) {
+        RmtClient_p rClient = svs.clients;
+        for (int32_t i = 0; i < svs.maxClients; i++, rClient++) {
             MSG_WriteByte(pBuf, svc_updatename);
             MSG_WriteByte(pBuf, i);
-            MSG_WriteString(pBuf, client->name);
+            MSG_WriteString(pBuf, rClient->name);
             MSG_WriteByte(pBuf, svc_updatefrags);
             MSG_WriteByte(pBuf, i);
-            MSG_WriteShort(pBuf, client->old_frags);
+            MSG_WriteShort(pBuf, rClient->old_frags);
             MSG_WriteByte(pBuf, svc_updatecolors);
             MSG_WriteByte(pBuf, i);
-            MSG_WriteByte(pBuf, client->colors);
+            MSG_WriteByte(pBuf, rClient->colors);
         }
     }
     // send all current light styles
@@ -1077,7 +1079,7 @@ void Host_Spawn_f() {
     // in a state where it is expecting the client to correct the angle
     // and it won't happen if the game was just loaded, so you wind up
     // with a permanent head tilt
-    edict_p ent = EDICT_NUM(1 + (host_client - svs.clients));
+    edict_p ent = EDICT_NUM(1 + (remoteClient - svs.clients));
     MSG_WriteByte(pBuf, svc_setangle);
     for (int i = 0; i < 2; i++)
         MSG_WriteAngle(pBuf, ent->v.angles[i]);
@@ -1087,7 +1089,7 @@ void Host_Spawn_f() {
 
     MSG_WriteByte(pBuf, svc_signonnum);
     MSG_WriteByte(pBuf, 3);
-    host_client->sendsignon = true;
+    remoteClient->sendsignon = true;
 }
 
 /*
@@ -1098,7 +1100,7 @@ Host_Begin_f
 void Host_Begin_f() {
     if (cmd_source == src_command) { Con_Printf("begin is not valid from the console\n"); return; }
 
-    host_client->spawned = true;
+    remoteClient->spawned = true;
 }
 
 //===========================================================================
@@ -1113,9 +1115,9 @@ Kicks a user off of the server
 */
 void Host_Kick_f() {
     if (cmd_source == src_command) { if (!sv.active) { Cmd_ForwardToServer(); return; } }
-    else if (pr_global_struct->deathmatch && !host_client->privileged)        return;
+    else if (pr_global_struct->deathmatch && !remoteClient->privileged)        return;
 
-    client_p save = host_client;
+    RmtClient_p save = remoteClient;
     int32_t i;
     bool byNumber = false;
     if ((Cmd_Argc() > 2) &&
@@ -1123,22 +1125,22 @@ void Host_Kick_f() {
         ) {
         i = Q_atof(Cmd_Argv(2)) - 1;
         if ((i < 0) ||
-            (i >= svs.maxclients) ||
+            (i >= svs.maxClients) ||
             (!svs.clients[i].active)
             )
             return;
-        host_client = &svs.clients[i];
+        remoteClient = &svs.clients[i];
         byNumber = true;
     }
     else {
-        host_client = svs.clients;
-        for (i = 0; i < svs.maxclients; i++, host_client++) {
-            if (!host_client->active)                               continue;
-            if (Q_strcasecmp(host_client->name, Cmd_Argv(1)) == 0)  break;
+        remoteClient = svs.clients;
+        for (i = 0; i < svs.maxClients; i++, remoteClient++) {
+            if (!remoteClient->active)                               continue;
+            if (Q_strcasecmp(remoteClient->name, Cmd_Argv(1)) == 0)  break;
         }
     }
 
-    if (i < svs.maxclients) {
+    if (i < svs.maxClients) {
         cString who;
         if (cmd_source == src_command)
             if (cls.state == ca_dedicated)  who = "Console";
@@ -1146,7 +1148,7 @@ void Host_Kick_f() {
         else                                who = save->name;
 
         // can't kick yourself!
-        if (host_client == save)    return;
+        if (remoteClient == save)    return;
 
         cString message = NULL;
         if (Cmd_Argc() > 2) {
@@ -1165,7 +1167,7 @@ void Host_Kick_f() {
         SV_DropClient(false);
     }
 
-    host_client = save;
+    remoteClient = save;
 }
 
 /*
@@ -1183,7 +1185,7 @@ Host_Give_f
 */
 void Host_Give_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer();        return; }
-    if (pr_global_struct->deathmatch && !host_client->privileged) { return; }
+    if (pr_global_struct->deathmatch && !remoteClient->privileged) { return; }
 
     cString t = Cmd_Argv(1);
     int cVal = atoi(Cmd_Argv(2));

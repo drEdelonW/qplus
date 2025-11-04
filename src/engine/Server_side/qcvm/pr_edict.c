@@ -98,7 +98,7 @@ angles and bad trails.
 */
 edict_p ED_Alloc() {
     edict_p edict;
-    int i = svs.maxclients + 1;
+    int i = svs.maxClients + 1;
     for (; i < sv.num_edicts; i++) {
         edict = EDICT_NUM(i);
         // the first couple seconds of server time can involve a lot of

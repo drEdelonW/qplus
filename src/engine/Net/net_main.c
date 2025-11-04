@@ -104,7 +104,7 @@ qsocket_p NET_NewQSocket() {
     if (net_freeSockets == NULL)
         return NULL;
 
-    if (net_activeconnections >= svs.maxclients)
+    if (net_activeconnections >= svs.maxClients)
         return NULL;
 
     // get one from free list
@@ -176,7 +176,7 @@ static void NET_Listen_f() {
 
 static void MaxPlayers_f() {
     if (Cmd_Argc() != 2) {
-        Con_Printf("\"maxplayers\" is \"%u\"\n", svs.maxclients);
+        Con_Printf("\"maxplayers\" is \"%u\"\n", svs.maxClients);
         return;
     }
 
@@ -188,15 +188,15 @@ static void MaxPlayers_f() {
     int n = Q_atoi(Cmd_Argv(1));
     if (n < 1)
         n = 1;
-    if (n > svs.maxclientslimit) {
-        n = svs.maxclientslimit;
+    if (n > svs.maxClientsLimit) {
+        n = svs.maxClientsLimit;
         Con_Printf("\"maxplayers\" set to \"%u\"\n", n);
     }
 
     if ((n == 1) && listening)      Cbuf_AddText("listen 0\n");
     if ((n > 1) && (!listening))    Cbuf_AddText("listen 1\n");
 
-    svs.maxclients = n;
+    svs.maxClients = n;
     if (n == 1) Cvar_Set("deathmatch", "0");
     else        Cvar_Set("deathmatch", "1");
 }
@@ -619,13 +619,13 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
     bool state1[MAX_SCOREBOARD];
     bool state2[MAX_SCOREBOARD];
 
-    host_client = svs.clients;
-    for (int32_t i = 0; i < svs.maxclients; i++, host_client++) {
-        if (!host_client->netconnection)
+    remoteClient = svs.clients;
+    for (int32_t i = 0; i < svs.maxClients; i++, remoteClient++) {
+        if (!remoteClient->netconnection)
             continue;
-        if (host_client->active) {
-            if (host_client->netconnection->driver == 0) {
-                NET_SendMessage(host_client->netconnection, data);
+        if (remoteClient->active) {
+            if (remoteClient->netconnection->driver == 0) {
+                NET_SendMessage(remoteClient->netconnection, data);
                 state1[i] = true;
                 state2[i] = true;
                 continue;
@@ -643,26 +643,26 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
     double start = Sys_FloatTime();
     while (count) {
         count = 0;
-        host_client = svs.clients;
-        for (int32_t i = 0; i < svs.maxclients; i++, host_client++) {
+        remoteClient = svs.clients;
+        for (int32_t i = 0; i < svs.maxClients; i++, remoteClient++) {
             if (!state1[i]) {
-                if (NET_CanSendMessage(host_client->netconnection)) {
+                if (NET_CanSendMessage(remoteClient->netconnection)) {
                     state1[i] = true;
-                    NET_SendMessage(host_client->netconnection, data);
+                    NET_SendMessage(remoteClient->netconnection, data);
                 }
                 else {
-                    NET_GetMessage(host_client->netconnection);
+                    NET_GetMessage(remoteClient->netconnection);
                 }
                 count++;
                 continue;
             }
 
             if (!state2[i]) {
-                if (NET_CanSendMessage(host_client->netconnection)) {
+                if (NET_CanSendMessage(remoteClient->netconnection)) {
                     state2[i] = true;
                 }
                 else {
-                    NET_GetMessage(host_client->netconnection);
+                    NET_GetMessage(remoteClient->netconnection);
                 }
                 count++;
                 continue;
@@ -706,7 +706,7 @@ void NET_Init() {
 
     if (COM_CheckParm("-listen") || (cls.state == ca_dedicated))
         listening = true;
-    net_numsockets = svs.maxclientslimit;
+    net_numsockets = svs.maxClientsLimit;
     if (cls.state != ca_dedicated)
         net_numsockets++;
 

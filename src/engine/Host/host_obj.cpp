@@ -74,7 +74,7 @@ Memory is cleared / released when a server or client begins, not when they end.
     int32_t host_framecount;
     int host_hunklevel;
     int minimum_memory;
-    client_p host_client;   // current client
+    RmtClient_p remoteClient;   // current client
     jmp_buf  host_abortserver;
     uint8_p host_basepal;
     uint8_p host_colormap;
@@ -141,13 +141,13 @@ Host::FindMaxClients
 ================
 */
 void Host::FindMaxClients() {
-    svs.maxclients = 1;
+    svs.maxClients = 1;
 
     int param = COM_CheckParm("-dedicated");
     if (param) {
         cls.state = ca_dedicated;
-        if (param != (com.argc - 1))    svs.maxclients = Q_atoi(com.argv[param + 1]);
-        else                            svs.maxclients = 8;
+        if (param != (com.argc - 1))    svs.maxClients = Q_atoi(com.argv[param + 1]);
+        else                            svs.maxClients = 8;
     }
     else        cls.state = ca_disconnected;
 
@@ -155,20 +155,20 @@ void Host::FindMaxClients() {
     if (param) {
         if (cls.state == ca_dedicated)  Sys_Error("Only one of -dedicated or -listen can be specified");
 
-        if (param != (com.argc - 1))    svs.maxclients = Q_atoi(com.argv[param + 1]);
-        else                            svs.maxclients = 8;
+        if (param != (com.argc - 1))    svs.maxClients = Q_atoi(com.argv[param + 1]);
+        else                            svs.maxClients = 8;
     }
-    if (svs.maxclients < 1)
-        svs.maxclients = 8;
-    else if (svs.maxclients > MAX_SCOREBOARD)
-        svs.maxclients = MAX_SCOREBOARD;
+    if (svs.maxClients < 1)
+        svs.maxClients = 8;
+    else if (svs.maxClients > MAX_SCOREBOARD)
+        svs.maxClients = MAX_SCOREBOARD;
 
-    svs.maxclientslimit = svs.maxclients;
-    if (svs.maxclientslimit < 4)
-        svs.maxclientslimit = 4;
-    svs.clients = (client_p)Hunk_AllocName(svs.maxclientslimit * sizeof(client_t), "clients");
+    svs.maxClientsLimit = svs.maxClients;
+    if (svs.maxClientsLimit < 4)
+        svs.maxClientsLimit = 4;
+    svs.clients = (RmtClient_p)Hunk_AllocName(svs.maxClientsLimit * sizeof(RmtClient_t), "clients");
 
-    if (svs.maxclients > 1) Cvar_SetValue("deathmatch", 1.0);
+    if (svs.maxClients > 1) Cvar_SetValue("deathmatch", 1.0);
     else                    Cvar_SetValue("deathmatch", 0.0);
 }
 
@@ -246,8 +246,8 @@ FIXME: make this just a stuffed echo?
 //     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
 //     va_end(argptr);
 
-//     MSG_WriteByte(&host_client->message, svc_print);
-//     MSG_WriteString(&host_client->message, string);
+//     MSG_WriteByte(&remoteClient->message, svc_print);
+//     MSG_WriteString(&remoteClient->message, string);
 // }
 
 /*
@@ -262,7 +262,7 @@ Sends text to all active clients
 //    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
 //    va_end(argptr);
 
-//     for (int i = 0; i < svs.maxclients; i++)
+//     for (int i = 0; i < svs.maxClients; i++)
 //         if (svs.clients[i].active && svs.clients[i].spawned) {
 //             MSG_WriteByte(&svs.clients[i].message, svc_print);
 //             MSG_WriteString(&svs.clients[i].message, string);
@@ -281,8 +281,8 @@ void Host::ClientCommands(cString fmt, ...) {
     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
-    MSG_WriteByte(&host_client->message, svc_stufftext);
-    MSG_WriteString(&host_client->message, string);
+    MSG_WriteByte(&remoteClient->message, svc_stufftext);
+    MSG_WriteString(&remoteClient->message, string);
 }
 
 /*
@@ -296,45 +296,45 @@ if (crash = true), don't bother sending signofs
 void SV_DropClient(bool crash) {
     if (!crash) {
         // send any final messages (don't check for errors)
-        if (NET_CanSendMessage(host_client->netconnection)) {
-            MSG_WriteByte(&host_client->message, svc_disconnect);
-            NET_SendMessage(host_client->netconnection, &host_client->message);
+        if (NET_CanSendMessage(remoteClient->netconnection)) {
+            MSG_WriteByte(&remoteClient->message, svc_disconnect);
+            NET_SendMessage(remoteClient->netconnection, &remoteClient->message);
         }
 
-        if (host_client->edict && host_client->spawned) {
+        if (remoteClient->edict && remoteClient->spawned) {
             // call the prog function for removing a client
             // this will set the body to a dead frame, among other things
             int saveSelf = pr_global_struct->self;
-            pr_global_struct->self = EDICT_TO_PROG(host_client->edict);
+            pr_global_struct->self = EDICT_TO_PROG(remoteClient->edict);
             PR_ExecuteProgram(pr_global_struct->ClientDisconnect);
             pr_global_struct->self = saveSelf;
         }
 
-        Sys_Printf("Client %s removed\n", host_client->name);
+        Sys_Printf("Client %s removed\n", remoteClient->name);
     }
 
     // break the net connection
-    NET_Close(host_client->netconnection);
-    host_client->netconnection = NULL;
+    NET_Close(remoteClient->netconnection);
+    remoteClient->netconnection = NULL;
 
     // free the client (the body stays around)
-    host_client->active = false;
-    host_client->name[0] = 0;
-    host_client->old_frags = -999999;
+    remoteClient->active = false;
+    remoteClient->name[0] = 0;
+    remoteClient->old_frags = -999999;
     net_activeconnections--;
 
     // send notification to all clients
-    client_p client = svs.clients;
-    for (int i = 0; i < svs.maxclients; i++, client++) {
+    RmtClient_p client = svs.clients;
+    for (int i = 0; i < svs.maxClients; i++, client++) {
         if (!client->active)    continue;
         MSG_WriteByte(&client->message, svc_updatename);
-        MSG_WriteByte(&client->message, host_client - svs.clients);
+        MSG_WriteByte(&client->message, remoteClient - svs.clients);
         MSG_WriteString(&client->message, "");
         MSG_WriteByte(&client->message, svc_updatefrags);
-        MSG_WriteByte(&client->message, host_client - svs.clients);
+        MSG_WriteByte(&client->message, remoteClient - svs.clients);
         MSG_WriteShort(&client->message, 0);
         MSG_WriteByte(&client->message, svc_updatecolors);
-        MSG_WriteByte(&client->message, host_client - svs.clients);
+        MSG_WriteByte(&client->message, remoteClient - svs.clients);
         MSG_WriteByte(&client->message, 0);
     }
 }
@@ -362,15 +362,15 @@ void Host::ShutdownServer(bool crash) {
     double start = Sys_FloatTime();
     do {
         count = 0;
-        host_client = svs.clients;
-        for (int i = 0; i < svs.maxclients; i++, host_client++) {
-            if (host_client->active && host_client->message.cursize) {
-                if (NET_CanSendMessage(host_client->netconnection)) {
-                    NET_SendMessage(host_client->netconnection, &host_client->message);
-                    SZ_Clear(&host_client->message);
+        remoteClient = svs.clients;
+        for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+            if (remoteClient->active && remoteClient->message.cursize) {
+                if (NET_CanSendMessage(remoteClient->netconnection)) {
+                    NET_SendMessage(remoteClient->netconnection, &remoteClient->message);
+                    SZ_Clear(&remoteClient->message);
                 }
                 else {
-                    NET_GetMessage(host_client->netconnection);
+                    NET_GetMessage(remoteClient->netconnection);
                     count++;
                 }
             }
@@ -387,16 +387,16 @@ void Host::ShutdownServer(bool crash) {
     if (count)
         Con_Printf("Host::ShutdownServer: NET_SendToAll failed for %u clients\n", count);
 
-    host_client = svs.clients;
-    for (int i = 0; i < svs.maxclients; i++, host_client++)
-        if (host_client->active)
+    remoteClient = svs.clients;
+    for (int i = 0; i < svs.maxClients; i++, remoteClient++)
+        if (remoteClient->active)
             SV_DropClient(crash);
 
     //
     // clear structures
     //
     memset(&sv, 0, sizeof(sv));
-    memset(svs.clients, 0, svs.maxclientslimit * sizeof(client_t));
+    memset(svs.clients, 0, svs.maxClientsLimit * sizeof(RmtClient_t));
 }
 
 
@@ -487,7 +487,7 @@ void Host::_ServerFrame() {
 
     // move things around and think
     // always pause in single player if in console or menus
-    if (!sv.paused && ((svs.maxclients > 1) || (key.dest == key_game)))
+    if (!sv.paused && ((svs.maxClients > 1) || (key.dest == key_game)))
         SV_Physics();
 }
 
@@ -528,7 +528,7 @@ void Host::ServerFrame() {
     // always pause in single player if in console or menus
     if (!sv.paused &&
         (
-            (svs.maxclients > 1) ||
+            (svs.maxClients > 1) ||
             (key.dest == key_game)
             )
         )
@@ -647,7 +647,7 @@ void Host::Frame(float time) {
     timecount = 0;
     timetotal = 0;
     int c = 0;
-    for (int i = 0; i < svs.maxclients; i++) {
+    for (int i = 0; i < svs.maxClients; i++) {
         if (svs.clients[i].active)
             c++;
     }

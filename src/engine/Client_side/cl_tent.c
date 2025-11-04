@@ -30,6 +30,35 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "model.h"
 #include <stdlib.h>
 
+//
+// temp entity events
+//
+
+typedef enum {
+    TE_SPIKE        = 0,
+    TE_SUPERSPIKE   = 1,
+    TE_GUNSHOT      = 2,
+    TE_EXPLOSION    = 3,
+    TE_TAREXPLOSION = 4,
+    TE_LIGHTNING1   = 5,
+    TE_LIGHTNING2   = 6,
+    TE_WIZSPIKE     = 7,
+    TE_KNIGHTSPIKE  = 8,
+    TE_LIGHTNING3   = 9,
+    TE_LAVASPLASH   = 10,
+    TE_TELEPORT     = 11,
+    TE_EXPLOSION2   = 12,
+
+    // PGM 01/21/97
+    TE_BEAM         = 13,
+    // PGM 01/21/97
+
+#ifdef QUAKE2
+    TE_IMPLOSION    = 14,
+    TE_RAILTRAIL    = 15,
+#endif
+} te_t;
+
 int      num_temp_entities;
 r_Entity_t  cl_temp_entities[MAX_TEMP_ENTITIES];
 Beam_t    cl_beams[MAX_BEAMS];
@@ -98,8 +127,8 @@ void CL_ParseBeam(Model_p m) {
 
     // find a free beam
     b = cl_beams;
-    for (int i = 0; i < MAX_BEAMS; i++, b++) {
-        if (!b->model || b->endtime < cl.time) {
+    for (int i = 0; i < MAX_BEAMS; i++, b++)
+        if (!b->model || (b->endtime < cl.time)) {
             b->entity = ent;
             b->model = m;
             b->endtime = cl.time + 0.2;
@@ -107,7 +136,7 @@ void CL_ParseBeam(Model_p m) {
             VectorCopy(end, b->end);
             return;
         }
-    }
+
     Con_Printf("beam list overflow!\n");
 }
 

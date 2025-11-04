@@ -355,7 +355,7 @@ given keynum.
 FIXME: handle quote special (general escape sequence?)
 ===================
 */
-cString Key_KeynumToString(keycode_t keynum) {
+cStringRO Key_KeynumToString(keycode_t keynum) {
     static char tinystr[2];
 
     if (keynum == -1)

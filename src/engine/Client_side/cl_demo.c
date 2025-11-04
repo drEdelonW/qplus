@@ -21,15 +21,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include <string.h>
 #include <stdlib.h>
-#include "net.h"
 #include "host.h"
+#include "console.h"
+#include "endian_tools.h"
 #include "sys.h"
 #include "protocol.h"
-#include "console.h"
-#include "common.h"
 #include "cmd.h"
 #include "msg.h"
-#include "endian_tools.h"
+#include "common.h"
 
 
 

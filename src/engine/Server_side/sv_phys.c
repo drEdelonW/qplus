@@ -1338,7 +1338,7 @@ void SV_Physics() {
             SV_LinkEdict(ent, true); // force retouch even for stationary
         }
 
-        if ((i > 0) && (i <= svs.maxclients)) { SV_Physics_Client(ent, i); }
+        if ((i > 0) && (i <= svs.maxClients)) { SV_Physics_Client(ent, i); }
         else {
             switch ((movetype_t)ent->v.movetype) {
 #ifdef QUAKE2

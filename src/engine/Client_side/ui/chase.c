@@ -26,15 +26,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 #include "client.h"
 #include "q_tools.h"
-#include "vector.h"
 #include "world.h"
 
 
-// vec3_t chase_pos;
-// vec3_t chase_angles;
-
 static vec3_t _chaseDest;
-// vec3_t chase_dest_angles;
 
 
 void Chase_Init() {

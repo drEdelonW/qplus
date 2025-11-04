@@ -156,9 +156,9 @@ void M_Menu_GameOptions_f() {
     m_state = m_gameoptions;
     m_entersound = true;
     if (maxplayers == 0)
-        maxplayers = svs.maxclients;
+        maxplayers = svs.maxClients;
     if (maxplayers < 2)
-        maxplayers = svs.maxclientslimit;
+        maxplayers = svs.maxClientsLimit;
 }
 
 
@@ -276,8 +276,8 @@ void M_NetStart_Change(int dir) {
     switch (gameoptions_cursor) {
     case 1:
         maxplayers += dir;
-        if (maxplayers > svs.maxclientslimit) {
-            maxplayers = svs.maxclientslimit;
+        if (maxplayers > svs.maxClientsLimit) {
+            maxplayers = svs.maxClientsLimit;
             m_serverInfoMessage = true;
             m_serverInfoMessageTime = realtime;
         }

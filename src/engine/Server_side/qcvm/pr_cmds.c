@@ -272,12 +272,12 @@ void PF_sprint() {
     cString str = PF_VarString(1);
 
     if ((ent_num < 1) ||
-        (ent_num > svs.maxclients)) {
+        (ent_num > svs.maxClients)) {
         Con_Printf("tried to sprint to a non-client\n");
         return;
     }
 
-    client_p client = &svs.clients[ent_num - 1];
+    RmtClient_p client = &svs.clients[ent_num - 1];
 
     MSG_WriteChar(&client->message, svc_print);
     MSG_WriteString(&client->message, str);
@@ -296,12 +296,12 @@ void PF_centerprint() {
     int entnum = G_EDICTNUM(OFS_PARM0);
     cString str = PF_VarString(1);
 
-    if ((entnum < 1) || (entnum > svs.maxclients)) {
+    if ((entnum < 1) || (entnum > svs.maxClients)) {
         Con_Printf("tried to sprint to a non-client\n");
         return;
     }
 
-    client_p client = &svs.clients[entnum - 1];
+    RmtClient_p client = &svs.clients[entnum - 1];
 
     MSG_WriteChar(&client->message, svc_centerprint);
     MSG_WriteString(&client->message, str);
@@ -589,13 +589,13 @@ uint8_t checkpvs[MAX_MAP_LEAFS / 8];
 
 int PF_newcheckclient(int check) {
     // cycle to the next one
-    CLAMP(1, check, svs.maxclients);
+    CLAMP(1, check, svs.maxClients);
 
-    int i = (check == svs.maxclients) ? 0 : check + 1;
+    int i = (check == svs.maxClients) ? 0 : check + 1;
 
     edict_p ent;
     for (;; i++) {
-        if (i == svs.maxclients + 1)
+        if (i == svs.maxClients + 1)
             i = 1;
 
         ent = EDICT_NUM(i);
@@ -686,14 +686,14 @@ stuffcmd (clientent, value)
 void PF_stuffcmd() {
     int entnum = G_EDICTNUM(OFS_PARM0);
     if ((entnum < 1) ||
-        (entnum > svs.maxclients))
+        (entnum > svs.maxClients))
         PR_RunError("Parm 0 not a client");
     cString str = G_STRING(OFS_PARM1);
 
-    client_p old = host_client;
-    host_client = &svs.clients[entnum - 1];
+    RmtClient_p old = remoteClient;
+    remoteClient = &svs.clients[entnum - 1];
     Host_ClientCommands("%s", str);
-    host_client = old;
+    remoteClient = old;
 }
 
 /*
@@ -1021,8 +1021,8 @@ void PF_lightstyle() {
     // send message to all clients on this server
     if (sv.state != ss_active) return;
 
-    client_p client = svs.clients;
-    for (int j = 0; j < svs.maxclients; j++, client++)
+    RmtClient_p client = svs.clients;
+    for (int j = 0; j < svs.maxClients; j++, client++)
         if (client->active || client->spawned) {
             MSG_WriteChar(&client->message, svc_lightstyle);
             MSG_WriteChar(&client->message, style);
@@ -1238,7 +1238,7 @@ sizebuf_p WriteDest() {
     case MSG_ONE:
         edict_p ent = PROG_TO_EDICT(pr_global_struct->msg_entity);
         int entnum = NUM_FOR_EDICT(ent);
-        if ((entnum < 1) || (entnum > svs.maxclients))
+        if ((entnum < 1) || (entnum > svs.maxClients))
             PR_RunError("WriteDest: not a client");
         return &svs.clients[entnum - 1].message;
 
@@ -1311,11 +1311,11 @@ void PF_setspawnparms() {
     edict_p ent = G_EDICT(OFS_PARM0);
     int i = NUM_FOR_EDICT(ent);
     if ((i < 1) ||
-        (i > svs.maxclients))
+        (i > svs.maxClients))
         PR_RunError("Entity is not a client");
 
-    // copy spawn parms out of the client_t
-    client_p client = svs.clients + (i - 1);
+    // copy spawn parms out of the RmtClient_t
+    RmtClient_p client = svs.clients + (i - 1);
 
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
         (&pr_global_struct->parm1)[i] = client->spawn_parms[i];

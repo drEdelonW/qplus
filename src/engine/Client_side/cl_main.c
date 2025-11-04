@@ -19,33 +19,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // cl_main.c  -- client main loop
 
-#include <string.h>
-#include <stdlib.h>
-#include "server.h"
-#undef SERVER
 #include "client.h"
-#include "chase.h"
+#undef CLIENT
+#include "server.h"
 #include "host.h"
-#include "console.h"
+#include <string.h>
 #include "sound.h"
-#include "screen.h"
+#include "console.h"
 #include "msg.h"
-#include "common.h"
 #include "protocol.h"
+#include <stdlib.h>
+#include "screen.h"
+#include "common.h"
 #include "cmd.h"
 #include "cbuf.h"
 #include "input.h"
 #include "angle.h"
+#include "cvar_q1.h"
 
 
 // we need to declare some mouse variables here, because the menu system
 // references them even when on a unix system.
 
-#include "cvar_q1.h"
 
 
-ClientStatic_t cls;
 ClientState_t cl;
+ClientStatic_t cls;
 // FIXME: put these on hunk?
 static efrag_t  cl_efrags[MAX_EFRAGS];
 r_Entity_t      cl_entities[MAX_EDICTS];
