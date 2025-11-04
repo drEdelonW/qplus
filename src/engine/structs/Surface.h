@@ -36,6 +36,7 @@ typedef struct mSurface_s {
     uint8_p samples;  // [numstyles*surfsize]
 } mSurface_t;
 typedef mSurface_t* mSurface_p;
+typedef mSurface_p* mSurface_ar;
 
 #include "vid.h"  //    pixel_p
 typedef struct {

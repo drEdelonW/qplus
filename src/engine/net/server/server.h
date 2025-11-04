@@ -21,11 +21,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // server.h
 
 #include <setjmp.h>
-#include "client.h"
 #include "model/model.h"
 #include "progs.h"
 #include "sizebuf.h"
 #include "net.h"
+#include "UserCmd.h"
 
 struct client_s;
 typedef struct client_s client_t;

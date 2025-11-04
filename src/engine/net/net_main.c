@@ -681,7 +681,7 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
 NET_Init
 ====================
 */
-
+#include "client.h"
 void NET_Init() {
     if (COM_CheckParm("-playback")) {
         net_numdrivers = 1;

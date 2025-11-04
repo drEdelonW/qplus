@@ -450,6 +450,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
 
     =============
 */
+#include "render.h"
 void SV_CleanupEnts() {
     edict_p ent = NEXT_EDICT(sv.edicts);
     for (int e = 1; e < sv.num_edicts; e++, ent = NEXT_EDICT(ent)) {
@@ -806,6 +807,7 @@ void SV_CreateBaseline() {
     Tell all the clients that the server is changing levels
     ================
 */
+#include "client.h"
 void SV_SendReconnect() {
     uint8_t      data[128];
     sizebuf_t  msg = {

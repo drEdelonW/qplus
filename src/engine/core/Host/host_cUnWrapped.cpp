@@ -3,6 +3,7 @@
 
 #include <stdarg.h>
 #include "server.h"
+#include "client.h"
 #include "sys.h"
 #include "protocol.h"
 #include "console.h"

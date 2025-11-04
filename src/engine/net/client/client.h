@@ -26,20 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "render.h"
 #include "sound/sound_struct.h"
 #include "net.h"
+#include "UserCmd.h"
 
-
-
-typedef struct {
-    vec3_t viewangles;
-    // intended velocities
-    float forwardmove;
-    float sidemove;
-    float upmove;
-#ifdef QUAKE2
-    uint8_t lightlevel;
-#endif
-} UserCmd_t;
-typedef UserCmd_t* UserCmd_p;
 
 typedef struct {
     int32_t length;
@@ -109,9 +97,9 @@ typedef Beam_t* Beam_p;
 #define MAX_DEMONAME 16
 
 typedef enum {
-    ca_dedicated,   // a dedicated server with no ability to start a client
-    ca_disconnected,  // full screen console with no connection
-    ca_connected  // valid netcon, talking to a server
+    ca_dedicated,       // a dedicated server with no ability to start a client
+    ca_disconnected,    // full screen console with no connection
+    ca_connected        // valid netcon, talking to a server
 } ClientStatus;
 
 //

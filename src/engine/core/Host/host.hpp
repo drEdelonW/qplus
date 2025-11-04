@@ -32,6 +32,7 @@ public:
     double   realtime;   // not bounded in any way, changed at start of every frame, never reset
 #endif
 
+  private:
     void InitCommands();
     void InitLocal();
     void FindMaxClients();
@@ -39,9 +40,7 @@ public:
     void GetConsoleCommands();
     void InitVCR(QuakeParms_p parms);
     void WriteConfiguration();
-
-private:
-    void  ServerFrame();
+    void ServerFrame();
     void _Frame(float time);
 
 };

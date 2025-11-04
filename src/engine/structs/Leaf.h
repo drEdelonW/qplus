@@ -17,7 +17,7 @@ typedef struct mLeaf_s {
     // leaf specific
     uint8_p compressed_vis;
     efrag_p efrags;
-    mSurface_p* firstmarksurface;
+    mSurface_ar firstmarksurface;
     int32_t nummarksurfaces;
     int32_t key;        // BSP sequence number for leaf's contents
     uint8_t ambient_sound_level[NUM_AMBIENTS];
