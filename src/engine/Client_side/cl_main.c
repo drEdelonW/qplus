@@ -111,8 +111,7 @@ void CL_Disconnect() {
 
         Con_DPrintf("Sending clc_disconnect\n");
         SZ_Clear(&cls.message);
-        MSG_WriteByte(&cls.message, clc_disconnect);
-        NET_SendUnreliableMessage(cls.netcon, &cls.message);
+        MSG_WriteByte(&cls.message, clc_disconnect);    NET_SendUnreliableMessage(cls.netcon, &cls.message);
         SZ_Clear(&cls.message);
         NET_Close(cls.netcon);
 

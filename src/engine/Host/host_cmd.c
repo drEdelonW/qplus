@@ -401,8 +401,7 @@ void Host_Savegame_f() {
         if (svs.clients[i].active &&
             (svs.clients[i].edict->v.health <= 0)
             ) {
-            Con_Printf("Can't savegame with a dead player\n");
-            return;
+            Con_Printf("Can't savegame with a dead player\n"); return;
         }
     }
 
@@ -1034,16 +1033,16 @@ void Host_Spawn_f() {
     }
     // send all current light styles
     for (int i = 0; i < MAX_LIGHTSTYLES; i++) {
-        MSG_WriteByte(pBuf, svc_lightstyle);    MSG_WriteByte(pBuf, (char)i);   MSG_WriteString(pBuf, sv.lightstyles[i]);
+        MSG_WriteByte(pBuf, svc_lightstyle); MSG_WriteByte(pBuf, (char)i); MSG_WriteString(pBuf, sv.lightstyles[i]);
     }
 
     //
     // send some stats
     //
-    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_TOTALSECRETS);     MSG_WriteLong(pBuf, pr_global_struct->total_secrets);
-    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_TOTALMONSTERS);    MSG_WriteLong(pBuf, pr_global_struct->total_monsters);
-    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_SECRETS);          MSG_WriteLong(pBuf, pr_global_struct->found_secrets);
-    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_MONSTERS);         MSG_WriteLong(pBuf, pr_global_struct->killed_monsters);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALSECRETS);  MSG_WriteLong(pBuf, pr_global_struct->total_secrets);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALMONSTERS); MSG_WriteLong(pBuf, pr_global_struct->total_monsters);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_SECRETS);       MSG_WriteLong(pBuf, pr_global_struct->found_secrets);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_MONSTERS);      MSG_WriteLong(pBuf, pr_global_struct->killed_monsters);
 
 
     //
@@ -1053,10 +1052,7 @@ void Host_Spawn_f() {
     // and it won't happen if the game was just loaded, so you wind up
     // with a permanent head tilt
     edict_p ent = EDICT_NUM(1 + (remoteClient - svs.clients));
-    MSG_WriteByte(pBuf, svc_setangle);
-    for (int i = 0; i < 2; i++)
-        MSG_WriteAngle(pBuf, ent->v.angles[i]);
-    MSG_WriteAngle(pBuf, 0);
+    MSG_WriteByte(pBuf, svc_setangle); MSG_WriteAngle(pBuf, ent->v.angles[0]); MSG_WriteAngle(pBuf, ent->v.angles[1]); MSG_WriteAngle(pBuf, 0);
 
     SV_WriteClientdataToMessage(sv_player, pBuf);
 

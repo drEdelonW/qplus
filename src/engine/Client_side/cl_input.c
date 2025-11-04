@@ -248,9 +248,7 @@ void CL_SendMove(UserCmd_p cmd) {
     //
     // send the movement message
     //
-    MSG_WriteByte(&buf, clc_move);
-
-    MSG_WriteFloat(&buf, cl.mtime[0]); // so server can get ping times
+    MSG_WriteByte(&buf, clc_move); MSG_WriteFloat(&buf, cl.mtime[0]); // so server can get ping times
 
     for (int i = 0; i < VECT_DIM; i++)
         MSG_WriteAngle(&buf, cl.viewangles[i]);

@@ -245,8 +245,8 @@ FIXME: make this just a stuffed echo?
 //     va_list  argptr;    va_start(argptr, fmt);
 //     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
 //     va_end(argptr);
-//     sizebuf_p pBuf = &remoteClient->message;    SZ_Clear(pBuf);
-//     MSG_WriteByte(pBuf, svc_print);    MSG_WriteString(pBuf, string);
+//     sizebuf_p pBuf = &remoteClient->message;
+//     MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
 // }
 
 /*
@@ -262,8 +262,8 @@ Sends text to all active clients
 //    va_end(argptr);
 //     for (int i = 0; i < svs.maxClients; i++)
 //         if (svs.clients[i].active && svs.clients[i].spawned) {
-    //     sizebuf_p pBuf = &remoteClient->message;
-//             MSG_WriteByte(&svs.clients[i].message, svc_print);   MSG_WriteString(&svs.clients[i].message, string);
+    //     sizebuf_p pBuf = &svs.clients[i].message;
+//             MSG_WriteByte(pBuf, svc_print);   MSG_WriteString(pBuf, string);
 //         }
 // }
 
@@ -341,8 +341,6 @@ This only happens at the end of a game, not between levels
 */
 void Host::ShutdownServer(bool crash) {
     int  count;
-    sizebuf_t buf;
-    uint8_t  message[4];
 
     if (!sv.active) return;
 
@@ -372,9 +370,12 @@ void Host::ShutdownServer(bool crash) {
     } while (count);
 
     // make sure all the clients know we're disconnecting
-    buf.data = message;
-    buf.maxsize = 4;
-    buf.cursize = 0;
+    uint8_t  message[4];
+    sizebuf_t buf = {
+        .data = message,
+        .maxsize = 4,
+        .cursize = 0
+    };
     MSG_WriteByte(&buf, svc_disconnect);
     count = NET_SendToAll(&buf, 5);
     if (count)

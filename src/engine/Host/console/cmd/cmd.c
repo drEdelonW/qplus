@@ -74,9 +74,9 @@ void Cmd_StuffCmds_f() {
         if (!com.argv[i])   continue;   // NEXTSTEP nulls out -NXHost
 
         Q_strcat(text, com.argv[i]);
-        if (i != (com.argc - 1)) {
+        if (i != (com.argc - 1))
             Q_strcat(text, " ");
-        }
+
     }
 
     // pull out the commands
@@ -117,11 +117,15 @@ void Cmd_StuffCmds_f() {
     ===============
 */
 void Cmd_Exec_f() {
-    if (Cmd_Argc() != 2) { Con_Printf("exec <filename> : execute a script file\n"); return; }
+    if (Cmd_Argc() != 2) {
+        Con_Printf("exec <filename> : execute a script file\n"); return;
+    }
 
     size_t mark = Hunk_LowMark();
     cString f = (cString)COM_LoadHunkFile(Cmd_Argv(1));
-    if (!f) { Con_Printf("couldn't exec %s\n", Cmd_Argv(1)); return; }
+    if (!f) {
+        Con_Printf("couldn't exec %s\n", Cmd_Argv(1)); return;
+    }
 
     Con_Printf("execing %s\n", Cmd_Argv(1));
 
@@ -138,9 +142,9 @@ void Cmd_Exec_f() {
     ===============
 */
 void Cmd_Echo_f() {
-    for (int i = 1; i < Cmd_Argc(); i++) {
+    for (int i = 1; i < Cmd_Argc(); i++)
         Con_Printf("%s ", Cmd_Argv(i));
-    }
+
     Con_Printf("\n");
 }
 
@@ -209,7 +213,9 @@ void Cmd_Init() {
     Cmd_Argc
     ============
 */
-int Cmd_Argc() { return _cmdArgC; }
+int Cmd_Argc() {
+    return _cmdArgC;
+}
 
 /*
     ============
@@ -227,7 +233,9 @@ cString Cmd_Argv(int arg) {
     Cmd_Args
     ============
 */
-cString Cmd_Args() { return _cmdArgS; }
+cString Cmd_Args() {
+    return _cmdArgS;
+}
 
 
 /*
@@ -260,14 +268,14 @@ void Cmd_TokenizeString(cString text) {
             break;
         }
 
-        if (!*text) { return; }
+        if (!*text)  return;
 
         if (_cmdArgC == 1) {
             _cmdArgS = text;
         }
 
         text = COM_Parse(text);
-        if (!text) { return; }
+        if (!text)  return;
 
         if (_cmdArgC < MAX_ARGS) {
             cmd_argv[_cmdArgC] = Z_Malloc(Q_strlen(com.token) + 1);
@@ -296,12 +304,12 @@ void Cmd_AddCommand(cStringRO cmd_name, xcommand_t function) {
 
     // fail if the command already exists
     CmdFunction_p cmd;
-    for (cmd = _cmdFunctions; cmd; cmd = cmd->next) {
+    for (cmd = _cmdFunctions; cmd; cmd = cmd->next)
         if (!Q_strcmp(cmd_name, cmd->name)) {
             Con_Printf("Cmd_AddCommand: %s already defined\n", cmd_name);
             return;
         }
-    }
+
 
     cmd = Hunk_Alloc(sizeof(CmdFunction_t));
     cmd->name = (cString)cmd_name;
@@ -316,9 +324,10 @@ void Cmd_AddCommand(cStringRO cmd_name, xcommand_t function) {
     ============
 */
 bool Cmd_Exists(cString cmd_name) {
-    for (CmdFunction_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
-        if (!Q_strcmp(cmd_name, cmd->name)) { return true; }
-    }
+    for (CmdFunction_p cmd = _cmdFunctions; cmd; cmd = cmd->next)
+        if (!Q_strcmp(cmd_name, cmd->name))
+            return true;
+
     return false;
 }
 
@@ -335,11 +344,11 @@ cString Cmd_CompleteCommand(cString partial) {
     if (!len) return NULL;
 
     // check functions
-    for (CmdFunction_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
-        if (!Q_strncmp(partial, cmd->name, len)) {
+    for (CmdFunction_p cmd = _cmdFunctions; cmd; cmd = cmd->next)
+        if (!Q_strncmp(partial, cmd->name, len))
             return cmd->name;
-        }
-    }
+
+
     return NULL;
 }
 
@@ -356,7 +365,7 @@ void Cmd_ExecuteString(cString text, cmd_source_t src) {
     Cmd_TokenizeString(text);
 
     // execute the command line
-    if (!Cmd_Argc()) { return; } // no tokens
+    if (!Cmd_Argc())  return;  // no tokens
 
     // check functions
     for (CmdFunction_p cmd = _cmdFunctions; cmd; cmd = cmd->next) {
@@ -366,7 +375,7 @@ void Cmd_ExecuteString(cString text, cmd_source_t src) {
         }
     }
 
-    if (checkAlias()) { return; }
+    if (checkAlias())  return;
 
 #if 0
     // check alias
@@ -375,13 +384,13 @@ void Cmd_ExecuteString(cString text, cmd_source_t src) {
             Cbuf_InsertText(aliasIt->value);
             return;
         }
-}
+    }
 #endif
 
     // check cvars
-    if (!Cvar_Command()) {
+    if (!Cvar_Command())
         Con_Printf("Unknown command \"%s\"\n", Cmd_Argv(0));
-    }
+
 
 }
 
@@ -400,13 +409,13 @@ void Cmd_ForwardToServer() {
     }
 
     if (cls.demoplayback) { return; }  // not really connected
-
-    MSG_WriteByte(&cls.message, clc_stringcmd);
+    sizebuf_p pBuf = &cls.message;
+    MSG_WriteByte(pBuf, clc_stringcmd);
     if (Q_strcasecmp(Cmd_Argv(0), "cmd") != 0) {
-        SZ_Print(&cls.message, Cmd_Argv(0));
-        SZ_Print(&cls.message, " ");
+        SZ_Print(pBuf, Cmd_Argv(0));
+        SZ_Print(pBuf, " ");
     }
-    SZ_Print(&cls.message,
+    SZ_Print(pBuf,
         (Cmd_Argc() > 1) ?
         Cmd_Args() : "\n"
     );
@@ -424,9 +433,9 @@ void Cmd_ForwardToServer() {
 int Cmd_CheckParm(cString parm) {
     if (!parm) { Sys_Error("Cmd_CheckParm: NULL"); }
 
-    for (int i = 1; i < Cmd_Argc(); i++) {
-        if (!Q_strcasecmp(parm, Cmd_Argv(i))) { return i; }
-    }
+    for (int i = 1; i < Cmd_Argc(); i++)
+        if (!Q_strcasecmp(parm, Cmd_Argv(i)))
+            return i;
 
     return 0;
 }
