@@ -84,7 +84,7 @@ Zone block
 
 */
 #include "types.h"
-extern int32_t   minimum_memory;
+extern size_t   minimum_memory;
 #ifdef __cplusplus
 extern "C" {
 #endif

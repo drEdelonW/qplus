@@ -995,7 +995,6 @@ void Host_Spawn_f() {
     else {
         // set up the edict
         edict_p ent = remoteClient->edict;
-
         memset(&ent->v, 0, progs->entityfields * 4);
         ent->v.colormap = NUM_FOR_EDICT(ent);
         ent->v.team = (remoteClient->colors & 15) + 1;

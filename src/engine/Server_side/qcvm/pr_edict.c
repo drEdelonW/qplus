@@ -366,9 +366,9 @@ For debugging
 =============
 */
 void ED_Print(edict_p ed) {
-    if (ed->free) { Con_Printf("FREE\n"); return; }
+    if (ed->free) { Sys_Printf("FREE\n"); return; }
 
-    Con_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
+    Sys_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
     for (int i = 1; i < progs->fielddefs.num; i++) {
         dDef_p d = &pr_fielddefs[i];
         cString name = pr_strings + d->s_name;
@@ -388,12 +388,12 @@ void ED_Print(edict_p ed) {
         if (j == type_size[type])
             continue;
 
-        Con_Printf("%s", name);
+        Sys_Printf("%s", name);
         int l = strlen(name);
         while (l++ < 15)
-            Con_Printf(" ");
+            Sys_Printf(" ");
 
-        Con_Printf("%s\n", PR_ValueString(d->type, (eval_p)v));
+        Sys_Printf("%s\n", PR_ValueString(d->type, (eval_p)v));
     }
 }
 
@@ -446,7 +446,7 @@ For debugging, prints all the entities in the current server
 =============
 */
 void ED_PrintEdicts() {
-    Con_Printf("%i entities\n", sv.num_edicts);
+    Sys_Printf("%i entities\n", sv.num_edicts);
     for (int i = 0; i < sv.num_edicts; i++)
         ED_PrintNum(i);
 }
@@ -460,7 +460,7 @@ For debugging, prints a single edicy
 */
 void ED_PrintEdict_f() {
     int i = Q_atoi(Cmd_Argv(1));
-    if (i >= sv.num_edicts) { Con_Printf("Bad edict number\n"); return; }
+    if (i >= sv.num_edicts) { Sys_Printf("Bad edict number\n"); return; }
     ED_PrintNum(i);
 }
 
@@ -484,11 +484,11 @@ void ED_Count() {
         if (ent->v.movetype == MOVETYPE_STEP)   step++;
     }
 
-    Con_Printf("num_edicts:%3i\n", sv.num_edicts);
-    Con_Printf("active    :%3i\n", active);
-    Con_Printf("view      :%3i\n", models);
-    Con_Printf("touch     :%3i\n", solid);
-    Con_Printf("step      :%3i\n", step);
+    Sys_Printf("num_edicts:%3i\n", sv.num_edicts);
+    Sys_Printf("active    :%3i\n", active);
+    Sys_Printf("view      :%3i\n", models);
+    Sys_Printf("touch     :%3i\n", solid);
+    Sys_Printf("step      :%3i\n", step);
 
 }
 
@@ -549,7 +549,7 @@ void ED_ParseGlobals(cString data) {
 
         dDef_p key = ED_FindGlobal(keyname);
         if (!key) {
-            Con_Printf("'%s' is not a global\n", keyname);
+            Sys_Printf("'%s' is not a global\n", keyname);
             continue;
         }
 
@@ -621,7 +621,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
     case ev_field:
         dDef_p def = ED_FindField(s);
         if (!def) {
-            Con_Printf("Can't find field %s\n", s);
+            Sys_Printf("Can't find field %s\n", s);
             return false;
         }
         *(int*)d = G_INT(def->ofs);
@@ -630,7 +630,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
     case ev_function:
         dFunction_p func = ED_FindFunction(s);
         if (!func) {
-            Con_Printf("Can't find function %s\n", s);
+            Sys_Printf("Can't find function %s\n", s);
             return false;
         }
         *(func_t*)d = func - pr_functions;
@@ -702,7 +702,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
 
         dDef_p key = ED_FindField(keyname);
         if (!key) {
-            Con_Printf("'%s' is not a field\n", keyname);
+            Sys_Printf("'%s' is not a field\n", keyname);
             continue;
         }
 
@@ -777,7 +777,7 @@ void ED_LoadFromFile(cString data) {
         // immediately call spawn function
         //
         if (!ent->v.classname) {
-            Con_Printf("No classname for:\n");
+            Sys_Printf("No classname for:\n");
             ED_Print(ent);
             ED_Free(ent);
             continue;
@@ -787,7 +787,7 @@ void ED_LoadFromFile(cString data) {
         dFunction_p func = ED_FindFunction(pr_strings + ent->v.classname);
 
         if (!func) {
-            Con_Printf("No spawn function for:\n");
+            Sys_Printf("No spawn function for:\n");
             ED_Print(ent);
             ED_Free(ent);
             continue;

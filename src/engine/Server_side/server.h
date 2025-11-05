@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   error CLIENT defined
 #endif
 #include "model/model.h"
-// #include "progs.h"
 #include "sizebuf.h"
 #include "net.h"
 #include "UserCmd.h"

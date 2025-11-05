@@ -76,8 +76,7 @@ double realtime;    // without any filtering or bounding
 double oldrealtime;   // last frame run
 int32_t host_framecount;
 int host_hunklevel;
-int minimum_memory;
-RmtClient_p remoteClient;   // current client
+size_t minimum_memory;
 jmp_buf  host_abortserver;
 uint8_p host_basepal;
 uint8_p host_colormap;

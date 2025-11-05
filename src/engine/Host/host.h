@@ -6,6 +6,7 @@
 // host
 //
 extern bool isDedicated;
+
 extern QuakeParms_t host_parms;
 extern bool    host_initialized;  // true if into command execution
 extern double  host_frametime;
@@ -21,7 +22,6 @@ extern "C" {
 #endif
 
     void Host_ClearMemory();
-    // void Host_ServerFrame();
     void Host_Init(QuakeParms_p parms);
     void Host_Shutdown();
     void Host_Error(cString error, ...);

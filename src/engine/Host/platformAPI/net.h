@@ -128,7 +128,6 @@ typedef enum {
     CCREP_RULE_INFO     = 0x85
 } ccreq_t;
 
-struct qsocket_s;
 typedef struct qsocket_s qsocket_t;
 typedef qsocket_t* qsocket_p;
 struct qsocket_s {
@@ -159,7 +158,6 @@ struct qsocket_s {
 
     qsockaddr_t addr;
     char address[NET_NAMELEN];
-
 };
 
 extern qsocket_p net_activeSockets;
