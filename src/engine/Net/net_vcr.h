@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // net_vcr.h
+#include "net.h"
 
 typedef enum {
     VCR_OP_CONNECT       = 1,

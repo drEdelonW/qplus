@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // This is enables a simple IP banning mechanism
 #include "server.h"
+#include "progs.h"
 #include <stdint.h>
 #include "sys.h"
 #include "common.h"

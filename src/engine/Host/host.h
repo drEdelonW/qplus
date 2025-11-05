@@ -12,7 +12,8 @@ extern double  host_frametime;
 extern uint8_p host_basepal;
 extern uint8_p host_colormap;
 extern int32_t host_framecount; // incremented every frame, never reset
-
+// extern jmp_buf host_abortserver;
+extern double  host_time;
 extern double  realtime;   // not bounded in any way, changed at start of every frame, never reset
 
 #ifdef __cplusplus

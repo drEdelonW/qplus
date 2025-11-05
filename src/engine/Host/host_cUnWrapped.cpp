@@ -11,6 +11,9 @@
 #include "screen.h"
 #include "msg.h"
 
+#include <setjmp.h>
+extern jmp_buf host_abortserver;
+
 /*
 ================
 Host.EndGame

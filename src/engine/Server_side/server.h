@@ -23,12 +23,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef CLIENT
 #   error CLIENT defined
 #endif
-#include <setjmp.h>
 #include "model/model.h"
-#include "progs.h"
+// #include "progs.h"
 #include "sizebuf.h"
 #include "net.h"
 #include "UserCmd.h"
+#include "Edict.h"
 
 
 //=============================================================================
@@ -200,8 +200,6 @@ typedef struct {
 extern sv_static_t  svs;    // persistent server info
 extern server_t     sv;     // local server
 extern RmtClient_p  remoteClient;
-extern jmp_buf      host_abortserver;
-extern double       host_time;
 extern edict_p      sv_player;
 
 //===========================================================

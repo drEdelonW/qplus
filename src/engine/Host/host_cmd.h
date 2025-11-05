@@ -1,6 +1,6 @@
 #pragma once
 
-#include "progs.h"
+#include "Edict.h"
 #include "Model.h"
 
 #ifdef __cplusplus
