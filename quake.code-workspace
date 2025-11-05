@@ -122,7 +122,8 @@
 			"texture.h": "c",
 			"screen.h": "c",
 			"in.h": "c",
-			"netdb.h": "c"
+			"netdb.h": "c",
+			"pak.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

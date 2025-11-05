@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // models are the only shared resource between a client and server running
 // on the same machine.
 #include "gl_model.h"
+#include "types.h"
+
 
 Model_p loadmodel;
 static char _loadName[32]; // for hunk tags
@@ -31,13 +33,13 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer);
 void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer);
 Model_p Mod_LoadModel(Model_p mod, bool crash);
 
-byte mod_novis[MAX_MAP_LEAFS / 8];
+static uint8_t _modNoVis[MAX_MAP_LEAFS / 8];
 
 #define MAX_MOD_KNOWN 512
-Model_t mod_known[MAX_MOD_KNOWN];
-int  mod_numknown;
+static uint16_t  _mod_NumKnown = 0;
+static Model_t _mod_Known[MAX_MOD_KNOWN];
 
-cvar_t gl_subdivide_size = { "gl_subdivide_size", "128", true };
+cvar_t gl_subdivide_size = { "gl_subdivide_size", "128", true };    // GL diff
 
 /*
 ===============
@@ -45,8 +47,8 @@ Mod_Init
 ===============
 */
 void Mod_Init(void) {
-    Cvar_RegisterVariable(&gl_subdivide_size);
-    memset(mod_novis, 0xff, sizeof(mod_novis));
+    Cvar_RegisterVariable(&gl_subdivide_size);      // GL diff
+    memset(_modNoVis, 0xff, sizeof(_modNoVis));
 }
 
 /*
@@ -56,17 +58,14 @@ Mod_Init
 Caches the data if needed
 ===============
 */
-TypeLess_ptr Mod_Extradata(Model_p mod) {
-    TypeLess_ptr r;
-
-    r = Cache_Check(&mod->cache);
-    if (r)
-        return r;
+TypeLess_ptr Mod_Extradata(Model_p mod) { // same
+    TypeLess_ptr r = Cache_Check(&mod->cache);
+    if (r)  return r;
 
     Mod_LoadModel(mod, true);
 
-    if (!mod->cache.data)
-        Sys_Error("Mod_Extradata: caching failed");
+    if (!mod->cache.data)   Sys_Error("Mod_Extradata: caching failed");
+
     return mod->cache.data;
 }
 
@@ -75,10 +74,8 @@ TypeLess_ptr Mod_Extradata(Model_p mod) {
 Mod_PointInLeaf
 ===============
 */
-mLeaf_t* Mod_PointInLeaf(vec3_t p, Model_p model) {
-
-    if (!model || !model->nodes)
-        Sys_Error("Mod_PointInLeaf: bad model");
+mLeaf_t* Mod_PointInLeaf(vec3_t p, Model_p model) { // same
+    if (!model || !model->nodes)    Sys_Error("Mod_PointInLeaf: bad model");
 
     mNode_p node = model->nodes;
     while (1) {
@@ -99,14 +96,11 @@ mLeaf_t* Mod_PointInLeaf(vec3_t p, Model_p model) {
 Mod_DecompressVis
 ===================
 */
-byte* Mod_DecompressVis(byte* in, Model_p model) {
-    static byte decompressed[MAX_MAP_LEAFS / 8];
-    int  c;
-    byte* out;
-    int  row;
+uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
+    static uint8_t decompressed[MAX_MAP_LEAFS / 8];
 
-    row = (model->numleafs + 7) >> 3;
-    out = decompressed;
+    int row = (model->numleafs + 7) >> 3;
+    uint8_p out = decompressed;
 
 #if 0
     memcpy(out, in, row);
@@ -125,7 +119,7 @@ byte* Mod_DecompressVis(byte* in, Model_p model) {
             continue;
         }
 
-        c = in[1];
+        int c = in[1];
         in += 2;
         while (c) {
             *out++ = 0;
@@ -137,9 +131,9 @@ byte* Mod_DecompressVis(byte* in, Model_p model) {
     return decompressed;
 }
 
-byte* Mod_LeafPVS(mLeaf_t* leaf, Model_p model) {
+uint8_p Mod_LeafPVS(mLeaf_t* leaf, Model_p model) {
     if (leaf == model->leafs)
-        return mod_novis;
+        return _modNoVis;
     return Mod_DecompressVis(leaf->compressed_vis, model);
 }
 
@@ -152,7 +146,7 @@ void Mod_ClearAll(void) {
     int  i;
     Model_p mod;
 
-    for (i = 0, mod = mod_known; i < mod_numknown; i++, mod++)
+    for (i = 0, mod = _mod_Known; i < _mod_NumKnown; i++, mod++)
         if (mod->type != mod_alias)
             mod->needload = true;
 }
@@ -173,17 +167,17 @@ Model_p Mod_FindName(cString name) {
     // search the currently loaded models
     //
     int  i = 0;
-    Model_p mod = mod_known;
-    for (; i < mod_numknown; i++, mod++)
+    Model_p mod = _mod_Known;
+    for (; i < _mod_NumKnown; i++, mod++)
         if (!strcmp(mod->name, name))
             break;
 
-    if (i == mod_numknown) {
-        if (mod_numknown == MAX_MOD_KNOWN)
-            Sys_Error("mod_numknown == MAX_MOD_KNOWN");
+    if (i == _mod_NumKnown) {
+        if (_mod_NumKnown == MAX_MOD_KNOWN)
+            Sys_Error("_mod_NumKnown == MAX_MOD_KNOWN");
         strcpy(mod->name, name);
         mod->needload = true;
-        mod_numknown++;
+        _mod_NumKnown++;
     }
 
     return mod;
@@ -216,7 +210,7 @@ Loads a model into the cache
 Model_p Mod_LoadModel(Model_p mod, bool crash) {
     TypeLess_ptr d;
     unsigned* buf;
-    byte stackbuf[1024];  // avoid dirtying the cache heap
+    uint8_t stackbuf[1024];  // avoid dirtying the cache heap
 
     if (!mod->needload) {
         if (mod->type == mod_alias) {
@@ -300,7 +294,7 @@ Model_p Mod_ForName(cString name, bool crash) {
 ===============================================================================
 */
 
-byte* mod_base;
+uint8_p mod_base;
 
 
 /*
@@ -331,7 +325,7 @@ void Mod_LoadTextures(Lump_t* l) {
         m->dataofs[i] = LittleLong(m->dataofs[i]);
         if (m->dataofs[i] == -1)
             continue;
-        mt = (MipTex_t*)((byte*)m + m->dataofs[i]);
+        mt = (MipTex_t*)((uint8_p)m + m->dataofs[i]);
         mt->width = LittleLong(mt->width);
         mt->height = LittleLong(mt->height);
         for (j = 0; j < MIPLEVELS; j++)
@@ -356,7 +350,7 @@ void Mod_LoadTextures(Lump_t* l) {
             R_InitSky(tx);
         else {
             texture_mode = GL_LINEAR_MIPMAP_NEAREST; //_LINEAR;
-            tx->gl_texturenum = GL_LoadTexture(mt->name, tx->width, tx->height, (byte*)(tx + 1), true, false);
+            tx->gl_texturenum = GL_LoadTexture(mt->name, tx->width, tx->height, (uint8_p)(tx + 1), true, false);
             texture_mode = GL_LINEAR;
         }
     }
@@ -873,7 +867,7 @@ Mod_LoadClipnodes
 void Mod_LoadClipnodes(Lump_t* l) {
     dClipNode_t* in, * out;
     int   i, count;
-    Hull_t* hull;
+    Hull_t hull;
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
@@ -926,7 +920,7 @@ void Mod_MakeHull0(void) {
     mNode_p in, child;
     dClipNode_t* out;
     int   i, j, count;
-    Hull_t* hull;
+    Hull_t hull;
 
     hull = &loadmodel->hulls[0];
 
@@ -1069,7 +1063,7 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
         Sys_Error("Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, i, BSPVERSION);
 
     // swap all the lumps
-    mod_base = (byte*)header;
+    mod_base = (uint8_p)header;
 
     for (i = 0; i < sizeof(dHeader_t) / 4; i++)
         ((int*)header)[i] = LittleLong(((int*)header)[i]);
@@ -1148,8 +1142,8 @@ mTriangle_t triangles[MAXALIASTRIS];
 TriVertx_t* poseverts[MAXALIASFRAMES];
 int   posenum;
 
-byte** player_8bit_texels_tbl;
-byte* player_8bit_texels;
+uint8_p* player_8bit_texels_tbl;
+uint8_p player_8bit_texels;
 
 /*
 =================
@@ -1258,7 +1252,7 @@ typedef struct
     else if (pos[off] != 255) fdc = pos[off]; \
 }
 
-void Mod_FloodFillSkin(byte* skin, int skinwidth, int skinheight) {
+void Mod_FloodFillSkin(uint8_p skin, int skinwidth, int skinheight) {
     byte    fillcolor = *skin; // assume this is the pixel to fill
     floodfill_t   fifo[FLOODFILL_FIFO_SIZE];
     int     inpt = 0, outpt = 0;
@@ -1288,7 +1282,7 @@ void Mod_FloodFillSkin(byte* skin, int skinwidth, int skinheight) {
     while (outpt != inpt) {
         int   x = fifo[outpt].x, y = fifo[outpt].y;
         int   fdc = filledcolor;
-        byte* pos = &skin[x + skinwidth * y];
+        uint8_p pos = &skin[x + skinwidth * y];
 
         outpt = (outpt + 1) & FLOODFILL_FIFO_MASK;
 
@@ -1309,14 +1303,14 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_t* pskintype) {
     int  i, j, k;
     char name[32];
     int  s;
-    byte* copy;
-    byte* skin;
-    byte* texels;
+    uint8_p copy;
+    uint8_p skin;
+    uint8_p texels;
     dAliasSkinGroup_t* pinskingroup;
     int  groupskins;
     dAliasSkinInterval_t* pinskinintervals;
 
-    skin = (byte*)(pskintype + 1);
+    skin = (uint8_p)(pskintype + 1);
 
     if (numskins < 1 || numskins > MAX_SKINS)
         Sys_Error("Mod_LoadAliasModel: Invalid # of skins: %d\n", numskins);
@@ -1330,8 +1324,8 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_t* pskintype) {
             // save 8 bit texels for the player model to remap
     //  if (!strcmp(loadmodel->name,"progs/player.mdl")) {
             texels = Hunk_AllocName(s, _loadName);
-            pheader->texels[i] = texels - (byte*)pheader;
-            memcpy(texels, (byte*)(pskintype + 1), s);
+            pheader->texels[i] = texels - (uint8_p)pheader;
+            memcpy(texels, (uint8_p)(pskintype + 1), s);
             //  }
             sprintf(name, "%s_%i", loadmodel->name, i);
             pheader->gl_texturenum[i][0] =
@@ -1339,8 +1333,8 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_t* pskintype) {
                 pheader->gl_texturenum[i][2] =
                 pheader->gl_texturenum[i][3] =
                 GL_LoadTexture(name, pheader->skinwidth,
-                    pheader->skinheight, (byte*)(pskintype + 1), true, false);
-            pskintype = (dAliasSkinType_t*)((byte*)(pskintype + 1) + s);
+                    pheader->skinheight, (uint8_p)(pskintype + 1), true, false);
+            pskintype = (dAliasSkinType_t*)((uint8_p)(pskintype + 1) + s);
         }
         else {
             // animating skin group.  yuck.
@@ -1355,14 +1349,14 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_t* pskintype) {
                 Mod_FloodFillSkin(skin, pheader->skinwidth, pheader->skinheight);
                 if (j == 0) {
                     texels = Hunk_AllocName(s, _loadName);
-                    pheader->texels[i] = texels - (byte*)pheader;
-                    memcpy(texels, (byte*)(pskintype), s);
+                    pheader->texels[i] = texels - (uint8_p)pheader;
+                    memcpy(texels, (uint8_p)(pskintype), s);
                 }
                 sprintf(name, "%s_%i_%i", loadmodel->name, i, j);
                 pheader->gl_texturenum[i][j & 3] =
                     GL_LoadTexture(name, pheader->skinwidth,
-                        pheader->skinheight, (byte*)(pskintype), true, false);
-                pskintype = (dAliasSkinType_t*)((byte*)(pskintype)+s);
+                        pheader->skinheight, (uint8_p)(pskintype), true, false);
+                pskintype = (dAliasSkinType_t*)((uint8_p)(pskintype)+s);
             }
             k = j;
             for (/* */; j < 4; j++)
@@ -1544,7 +1538,7 @@ TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_t** ppframe, int
     mSpriteFrame_t* pspriteframe;
     int     i, width, height, size, origin[2];
     unsigned short* ppixout;
-    byte* ppixin;
+    uint8_p ppixin;
     char    name[64];
 
     pinframe = (dSpriteFrame_t*)pin;
@@ -1570,9 +1564,9 @@ TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_t** ppframe, int
     pspriteframe->right = width + origin[0];
 
     sprintf(name, "%s_%i", loadmodel->name, framenum);
-    pspriteframe->gl_texturenum = GL_LoadTexture(name, width, height, (byte*)(pinframe + 1), true, true);
+    pspriteframe->gl_texturenum = GL_LoadTexture(name, width, height, (uint8_p)(pinframe + 1), true, true);
 
-    return (TypeLess_ptr)((byte*)pinframe + sizeof(dSpriteFrame_t) + size);
+    return (TypeLess_ptr)((uint8_p)pinframe + sizeof(dSpriteFrame_t) + size);
 }
 
 
@@ -1709,7 +1703,7 @@ void Mod_Print(void) {
     Model_p mod;
 
     Con_Printf("Cached models:\n");
-    for (i = 0, mod = mod_known; i < mod_numknown; i++, mod++) {
+    for (i = 0, mod = _mod_Known; i < _mod_NumKnown; i++, mod++) {
         Con_Printf("%8p : %s\n", mod->cache.data, mod->name);
     }
 }

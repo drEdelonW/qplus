@@ -15,7 +15,7 @@
 #define MAX_MAP_HULLS       (4)
 #define ALIAS_VERSION 6
 
-#define IDPOLYHEADER    (('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
+#define IDPOLYHEADER    (uint32_t)(('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
 // little-endian "IDPO"
 //
 // Whole model
@@ -45,7 +45,7 @@ typedef struct {
 typedef Hull_t* Hull_p;
 
 typedef enum {
-    NL_PRESENT = 0,      // model is already loaded
+    NL_PRESENT      = 0, // model is already loaded
     NL_NEEDS_LOADED = 1, // model must be loaded
     NL_UNREFERENCED = 2  // model is not referenced
 } NeedLoad_t;
@@ -64,14 +64,18 @@ typedef enum {
 typedef struct Model_s Model_t;
 typedef Model_t* Model_p;
 struct Model_s {
-    char  name[MAX_QPATH];
-    NeedLoad_t needload;  // bmodels and sprites don't cache normally
+    char        name[MAX_QPATH];
+    NeedLoad_t  needload;  // bmodels and sprites don't cache normally
     ModType_t   type;
     int32_t     numframes;
     SyncType_t  synctype;
     int32_t     flags;
     vec3_t  mins, maxs; // volume occupied by the model
-    float  radius;
+    float   radius;
+#ifdef GLQUAKE
+    bool    clipbox;    // solid volume for clipping
+    vec3_t  clipmins, clipmaxs;
+#endif
     int32_t firstmodelsurface, nummodelsurfaces;    // brush model
     int32_t numsubmodels;       dModel_p    submodels;
     int32_t numplanes;          mPlane_p    planes;

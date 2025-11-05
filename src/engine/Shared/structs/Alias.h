@@ -27,21 +27,53 @@ typedef struct {
 typedef dAliasFrameType_t* dAliasFrameType_p;
 
 typedef struct {
+#ifdef GLQUAKE
+    int     firstpose;
+    int     numposes;
+    float   interval;
+#else
     AliasFrameType_t    type;
-    TriVertx_t          bboxmin;
-    TriVertx_t          bboxmax;
-    int32_t             frame;
-    char                name[16];
+#endif
+    TriVertx_t  bboxmin;
+    TriVertx_t  bboxmax;
+    int32_t     frame;
+    char        name[16];
 } mAliasFrameDesc_t;
 typedef mAliasFrameDesc_t* mAliasFrameDesc_p;
 
 
+#define MAX_SKINS 32
 
 typedef struct {
+#ifdef GLQUAKE
+    int     ident;
+    int     version;
+    vec3_t  scale;
+    vec3_t  scale_origin;
+    float   boundingradius;
+    vec3_t  eyeposition;
+    int     numskins;
+    int     skinwidth;
+    int     skinheight;
+    int     numverts;
+    int     numtris;
+    int     numframes;
+    SyncType_t synctype;
+    int     flags;
+    float   size;
+
+    int     numposes;
+    int     poseverts;
+    int     posedata; // numposes*poseverts trivert_t
+    int     commands; // gl command list with embedded s/t
+    int     gl_texturenum[MAX_SKINS][4];
+    int     texels[MAX_SKINS]; // only for player skins
+#else
     int32_t model;
     int32_t stverts;
     int32_t skindesc;
     int32_t triangles;
+#endif
     mAliasFrameDesc_t frames[1];
 } AliasHdr_t;
 typedef AliasHdr_t* AliasHdr_p;

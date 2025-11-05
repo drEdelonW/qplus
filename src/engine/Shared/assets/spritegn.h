@@ -46,6 +46,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define SPRITE_VERSION	1
 
-#define IDSPRITEHEADER	(('P' << 24) + ('S' << 16) + ('D' << 8) + 'I')
+#define IDSPRITEHEADER	(uint32_t)(('P' << 24) + ('S' << 16) + ('D' << 8) + 'I')
 // little-endian "IDSP"
 

@@ -33,10 +33,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     ===============
 */
 void R_CheckVariables() {
-    static float oldbright;
+    static float _oldBright;
 
-    if (r_fullbright.value != oldbright) {
-        oldbright = r_fullbright.value;
+    if (r_fullbright.value != _oldBright) {
+        _oldBright = r_fullbright.value;
         D_FlushCaches(); // so all lighting changes
     }
 }
@@ -72,11 +72,11 @@ void Show() {
 #define VIEWANGLE_STEPS 128
 
 void R_TimeRefresh_f() {
-    int startangle = r_refdef.viewangles[1];
+    int startangle = r_refdef.viewangles[YAW];
 
     float start = Sys_FloatTime();
     for (int i = 0; i < VIEWANGLE_STEPS; i++) {
-        r_refdef.viewangles[1] = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
+        r_refdef.viewangles[YAW] = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
         VID_LockBuffer();
         R_RenderView();
@@ -96,7 +96,7 @@ void R_TimeRefresh_f() {
     float time = stop - start;
     Con_Printf("%f seconds (%f fps)\n", time, VIEWANGLE_STEPS / time);
 
-    r_refdef.viewangles[1] = startangle;
+    r_refdef.viewangles[YAW] = startangle;
 }
 
 

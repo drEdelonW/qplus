@@ -57,7 +57,7 @@ V_CalcRoll
 Used by view and sv_user
 ===============
 */
-vec3_t forward, right, up;
+static vec3_t forward, right, up;
 
 float V_CalcRoll(vec3_t angles, vec3_t velocity) {
     AngleVectors(angles, forward, right, up);
@@ -97,6 +97,7 @@ float V_CalcBob() {
     bob = bob * 0.3 + bob * 0.7 * sin(cycle);
     if (bob > 4)        bob = 4;
     else if (bob < -7)  bob = -7;
+
     return bob;
 }
 
@@ -147,7 +148,8 @@ void V_DriftPitch() {
         if (fabs(cl.cmd.forwardmove) < cl_forwardspeed.value)   cl.driftmove = 0;
         else                                                    cl.driftmove += host_frametime;
 
-        if (cl.driftmove > v_centermove.value)  V_StartPitchDrift();
+        if (cl.driftmove > v_centermove.value)
+            V_StartPitchDrift();
         return;
     }
 
@@ -448,7 +450,7 @@ void V_UpdatePalette() {
     bool force = V_CheckGamma();
     if (!new && !force)
         return;
-
+//-------------------
     V_CalcBlend();
 
     float a = v_blend[3];
@@ -473,8 +475,8 @@ void V_UpdatePalette() {
         ramps[2][i] = gammatable[ib];
     }
 
-    uint8_p basepal = host_basepal;
     uint8_t pal[255 * 3];
+    uint8_p basepal = host_basepal;
     uint8_p newpal = pal;
 
     for (int i = 0; i < 256; i++) {
@@ -486,6 +488,7 @@ void V_UpdatePalette() {
         newpal[0] = ramps[0][ir];
         newpal[1] = ramps[1][ig];
         newpal[2] = ramps[2][ib];
+//-------------------
         newpal += 3;
     }
 
@@ -523,7 +526,7 @@ void V_UpdatePalette() {
     bool force = V_CheckGamma();
     if (!new && !force)
         return;
-
+//-------------------
     uint8_t pal[255 * 3];
     uint8_p basepal = host_basepal;
     uint8_p newpal = pal;
@@ -543,6 +546,7 @@ void V_UpdatePalette() {
         newpal[0] = gammatable[r];
         newpal[1] = gammatable[g];
         newpal[2] = gammatable[b];
+//-------------------
         newpal += 3;
     }
 

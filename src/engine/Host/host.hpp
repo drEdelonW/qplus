@@ -46,11 +46,4 @@ public:
 };
 
 extern Host host;
-
-/* extern globals */
-extern bool    noclip_anglehack;
-// #ifndef HOST_CMDS_H
-// #define HOST_CMDS_H
-
-
-// #endif /* HOST_CMDS_H */
+extern bool noclip_anglehack;

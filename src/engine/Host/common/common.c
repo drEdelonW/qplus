@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // common.c -- misc functions used in client and server
 
 #include "common.h"
+#include "host.h"
 #include "cvar_q1.h"
 #include <string.h>
 #include <stdarg.h>
@@ -29,7 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cmd.h"
 #include "draw.h"
 #include "endian_tools.h"
-#include "host.h"
 #include "gamedefs.h"
 #include "q_tools.h"
 

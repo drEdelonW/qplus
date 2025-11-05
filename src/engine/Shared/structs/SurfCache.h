@@ -6,15 +6,16 @@
 
 typedef struct SurfCache_s SurfCache_t;
 typedef SurfCache_t* SurfCache_p;
+typedef SurfCache_p* SurfCache_ar;
 struct SurfCache_s {
-    SurfCache_p  next;
-    SurfCache_p*  owner;  // NULL is an empty chunk of memory
-    int    lightadj[MAXLIGHTMAPS]; // checked for strobe flush
-    int    dlight;
-    int    size;  // including header
-    uint32_t   width;
-    uint32_t   height;  // DEBUG only needed for debug
-    float    mipscale;
-    Texture_p   texture; // checked for animating textures
-    uint8_t   data[4]; // width * height elements
+    SurfCache_p next;
+    SurfCache_ar owner;                 // NULL is an empty chunk of memory
+    int         lightadj[MAXLIGHTMAPS]; // checked for strobe flush
+    int         dlight;
+    int         size;                   // including header
+    uint32_t    width;
+    uint32_t    height;                 // DEBUG only needed for debug
+    float       mipscale;
+    Texture_p   texture;                // checked for animating textures
+    uint8_t     data[4];                // width * height elements
 } ;

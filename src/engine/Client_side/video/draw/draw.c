@@ -51,14 +51,14 @@ static qPic_p       _draw_backtile;
 /* Support Routines */
 
 typedef struct CachePic_s {
-    char  name[MAX_QPATH];
+    char        name[MAX_QPATH];
     CacheUser_t cache;
 } CachePic_t;
 typedef CachePic_t* CachePic_p;
 
 #define MAX_CACHED_PICS  128
-static CachePic_t _menu_cachepics[MAX_CACHED_PICS];
-static int _menu_numcachepics = 0;
+static CachePic_t   _menu_cachepics[MAX_CACHED_PICS];
+static int          _menu_numcachepics = 0;
 
 
 qPic_p Draw_PicFromWad(cStringRO name) {
@@ -213,7 +213,6 @@ of the code.
 ================
 */
 void Draw_DebugChar(char num) {
-
     if (!vid.direct)
         return;  // don't have direct FB access, so no debugchars...
 

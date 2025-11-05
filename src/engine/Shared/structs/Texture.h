@@ -8,6 +8,10 @@ typedef Texture_t* Texture_p;
 struct Texture_s {
     char        name[16];
     uint32_t    width, height;
+#ifdef GLQUAKE
+    int         gl_texturenum;
+    mSurface_p  texturechain; // for gl_texsort drawing
+#endif
     int32_t     anim_total;    // total tenths in sequence ( 0 = no)
     int32_t     anim_min, anim_max;  // time for this frame min <=time< max
     Texture_p   anim_next;  // in the animation sequence
