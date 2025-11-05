@@ -8,6 +8,7 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/AP
 ifeq ($(UNAME_S),Linux)
     $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))
         SRC_LIST += $(POSIX_DIR)/sys_linux.c
+        SRC_LIST += $(POSIX_DIR)/sys_linux_file.c
         SRC_LIST += $(POSIX_DIR)/vid_x.c
         SRC_LIST += $(POSIX_DIR)/cd_linux.c
         SRC_LIST += $(POSIX_DIR)/snd_linux.c

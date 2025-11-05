@@ -5,6 +5,7 @@
 //
 // host
 //
+extern bool isDedicated;
 extern QuakeParms_t host_parms;
 extern bool    host_initialized;  // true if into command execution
 extern double  host_frametime;

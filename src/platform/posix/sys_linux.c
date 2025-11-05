@@ -1,38 +1,28 @@
-#include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdarg.h>
-#include <stdio.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/stat.h>
 #include <string.h>
-#include <ctype.h>
-#include <sys/wait.h>
 #include <sys/mman.h>
-#include <errno.h>
+
 
 #include "sys.h"
-#include "versions.h"
+#include "host.h"
 #include "common.h"
+#include "versions.h"
 #include "client.h"
 #include "cvar_q1.h"
-#include "host.h"
 #include "q_tools.h"
 #include "net_vcr.h"
 
 
-bool isDedicated;
 
 int nostdout = 0;
 
-cString basedir = ".";
-cString cachedir = "/tmp";
+static cString _baseDir = ".";
+// cString cachedir = "/tmp";
 
 CVAR(sys_linerefresh, "0");// set for entity display
 
@@ -42,7 +32,7 @@ CVAR(sys_linerefresh, "0");// set for entity display
 
 void Sys_DebugNumber(int y, int val) {}
 
-/*
+#if 0
 void Sys_Printf(cStringRO fmt, ...) {
     va_list argptr;     va_start(argptr, fmt);
     char text[1024];    vsnprintf(text, sizeof(text), fmt, argptr);
@@ -51,9 +41,9 @@ void Sys_Printf(cStringRO fmt, ...) {
 
     Con_Print(text);
 }
-
+#elif 0
 void Sys_Printf(cStringRO fmt, ...) {
-    chap* t_p;
+    char* t_p;
     int l, r;
 
     if (nostdout)
@@ -78,7 +68,7 @@ void Sys_Printf(cStringRO fmt, ...) {
     }
 
 }
-*/
+#else
 
 void Sys_Printf(cStringRO fmt, ...) {
     va_list argptr;     va_start(argptr, fmt);
@@ -105,22 +95,21 @@ void Sys_Printf(cStringRO fmt, ...) {
 
     }
 }
+#endif
 
 #if 0
 static char end1[] =
 "\x1b[?7h\x1b[40m\x1b[2J\x1b[0;1;41m\x1b[1;1H                QUAKE: The Doomed Dimension \x1b[33mby \x1b[44mid\x1b[41m Software                      \x1b[2;1H  ----------------------------------------------------------------------------  \x1b[3;1H           CALL 1-800-IDGAMES TO ORDER OR FOR TECHNICAL SUPPORT                 \x1b[4;1H             PRICE: $45.00 (PRICES MAY VARY OUTSIDE THE US.)                    \x1b[5;1H                                                                                \x1b[6;1H  \x1b[37mYes! You only have one fourth of this incredible epic. That is because most   \x1b[7;1H   of you have paid us nothing or at most, very little. You could steal the     \x1b[8;1H   game from a friend. But we both know you'll be punished by God if you do.    \x1b[9;1H        \x1b[33mWHY RISK ETERNAL DAMNATION? CALL 1-800-IDGAMES AND BUY NOW!             \x1b[10;1H             \x1b[37mRemember, we love you almost as much as He does.                   \x1b[11;1H                                                                                \x1b[12;1H            \x1b[33mProgramming: \x1b[37mJohn Carmack, Michael Abrash, John Cash                \x1b[13;1H       \x1b[33mDesign: \x1b[37mJohn Romero, Sandy Petersen, American McGee, Tim Willits         \x1b[14;1H                     \x1b[33mArt: \x1b[37mAdrian Carmack, Kevin Cloud                           \x1b[15;1H               \x1b[33mBiz: \x1b[37mJay Wilbur, Mike Wilson, Donna Jackson                      \x1b[16;1H            \x1b[33mProjects: \x1b[37mShawn Green   \x1b[33mSupport: \x1b[37mBarrett Alexander                  \x1b[17;1H              \x1b[33mSound Effects: \x1b[37mTrent Reznor and Nine Inch Nails                   \x1b[18;1H  For other information or details on ordering outside the US, check out the    \x1b[19;1H     files accompanying QUAKE or our website at http://www.idsoftware.com.      \x1b[20;1H    \x1b[0;41mQuake is a trademark of Id Software, inc., (c)1996 Id Software, inc.        \x1b[21;1H     All rights reserved. NIN logo is a registered trademark licensed to        \x1b[22;1H                 Nothing Interactive, Inc. All rights reserved.                 \x1b[40m\x1b[23;1H\x1b[0m";
 static char end2[] =
 "\x1b[?7h\x1b[40m\x1b[2J\x1b[0;1;41m\x1b[1;1H        QUAKE \x1b[33mby \x1b[44mid\x1b[41m Software                                                    \x1b[2;1H -----------------------------------------------------------------------------  \x1b[3;1H        \x1b[37mWhy did you quit from the registered version of QUAKE? Did the          \x1b[4;1H        scary monsters frighten you? Or did Mr. Sandman tug at your             \x1b[5;1H        little lids? No matter! What is important is you love our               \x1b[6;1H        game, and gave us your money. Congratulations, you are probably         \x1b[7;1H        not a thief.                                                            \x1b[8;1H                                                           Thank You.           \x1b[9;1H        \x1b[33;44mid\x1b[41m Software is:                                                         \x1b[10;1H        PROGRAMMING: \x1b[37mJohn Carmack, Michael Abrash, John Cash                    \x1b[11;1H        \x1b[33mDESIGN: \x1b[37mJohn Romero, Sandy Petersen, American McGee, Tim Willits        \x1b[12;1H        \x1b[33mART: \x1b[37mAdrian Carmack, Kevin Cloud                                        \x1b[13;1H        \x1b[33mBIZ: \x1b[37mJay Wilbur, Mike Wilson     \x1b[33mPROJECTS MAN: \x1b[37mShawn Green              \x1b[14;1H        \x1b[33mBIZ ASSIST: \x1b[37mDonna Jackson        \x1b[33mSUPPORT: \x1b[37mBarrett Alexander             \x1b[15;1H        \x1b[33mSOUND EFFECTS AND MUSIC: \x1b[37mTrent Reznor and Nine Inch Nails               \x1b[16;1H                                                                                \x1b[17;1H        If you need help running QUAKE refer to the text files in the           \x1b[18;1H        QUAKE directory, or our website at http://www.idsoftware.com.           \x1b[19;1H        If all else fails, call our technical support at 1-800-IDGAMES.         \x1b[20;1H      \x1b[0;41mQuake is a trademark of Id Software, inc., (c)1996 Id Software, inc.      \x1b[21;1H        All rights reserved. NIN logo is a registered trademark licensed        \x1b[22;1H             to Nothing Interactive, Inc. All rights reserved.                  \x1b[23;1H\x1b[40m\x1b[0m";
-
 #endif
+
 void Sys_Quit() {
     Host_Shutdown();
     fcntl(0, F_SETFL, (fcntl(0, F_GETFL, 0) & ~FNDELAY));
 #if 0
-    if (registered.value)
-        printf("%s", end2);
-    else
-        printf("%s", end1);
+    if (registered.value)   printf("%s", end2);
+    else                    printf("%s", end1);
 #endif
     fflush(stdout);
     exit(0);
@@ -152,106 +141,19 @@ void Sys_Warn(cStringRO warning, ...) {
     fprintf(stderr, "Warning: %s", string);
 }
 
-/*
-============
-    Sys_FileTime
-
-    returns -1 if not present
-============
-*/
-int	Sys_FileTime(cStringRO path) {
-    struct stat buf;
-
-    if (stat(path, &buf) == -1)
-        return -1;
-
-    return buf.st_mtime;
-}
-
-
-void Sys_mkdir(cStringRO path) {
-    mkdir(path, 0777);
-}
-
-int Sys_FileOpenRead(cStringRO path, int* handle) {
-    struct stat	fileinfo;
-
-    int h = open(path, O_RDONLY, 0666);
-    *handle = h;
-    if (h == -1)
-        return -1;
-
-    if (fstat(h, &fileinfo) == -1)
-        Sys_Error("Error fstating %s", path);
-
-    return fileinfo.st_size;
-}
-
-int Sys_FileOpenWrite(cStringRO path) {
-    umask(0);
-
-    int handle = open(path, (O_RDWR | O_CREAT | O_TRUNC), 0666);
-
-    if (handle == -1)
-        Sys_Error("Error opening %s: %s", path, strerror(errno));
-
-    return handle;
-}
-
-int Sys_FileWrite(int handle, TypeLess_ptr src, int count) {
-    return write(handle, src, count);
-}
-
-void Sys_FileClose(int handle) {
-    close(handle);
-}
-
-void Sys_FileSeek(int handle, int position) {
-    lseek(handle, position, SEEK_SET);
-}
-
-int Sys_FileRead(int handle, TypeLess_ptr dest, int count) {
-    return read(handle, dest, count);
-}
-
-void Sys_DebugLog(cStringRO file, cStringRO fmt, ...) {
-    va_list argptr;         va_start(argptr, fmt);
-    static char data[1024]; vsnprintf(data, sizeof(data), fmt, argptr);
-    va_end(argptr);
-    //    fd = open(file, O_WRONLY | O_BINARY | O_CREAT | O_APPEND, 0666);
-    int fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
-    write(fd, data, strlen(data));
-    close(fd);
-}
-
-void Sys_EditFile(cString filename) {
-    char cmd[256];
-
-    cString term = getenv("TERM");
-    if ((term) && (!strcmp(term, "xterm"))) {
-        cString editor = getenv("VISUAL");
-        if (!editor)    editor = getenv("EDITOR");
-        if (!editor)    editor = getenv("EDIT");
-        if (!editor)    editor = "vi";
-        sprintf(cmd, "xterm -e %s %s", editor, filename);
-        system(cmd);
-    }
-
-}
-
 double Sys_FloatTime() {
     struct timeval tp;
     struct timezone tzp;
-    static int      secbase;
+    static int _secBase;
 
     gettimeofday(&tp, &tzp);
 
-    if (!secbase) {
-        secbase = tp.tv_sec;
+    if (!_secBase) {
+        _secBase = tp.tv_sec;
         return tp.tv_usec / 1000000.0;
     }
 
-    return (tp.tv_sec - secbase) + tp.tv_usec / 1000000.0;
+    return (tp.tv_sec - _secBase) + tp.tv_usec / 1000000.0;
 }
 
 // =======================================================================
@@ -266,37 +168,12 @@ void alarm_handler(int x) {
 
 void Sys_LineRefresh() {}
 
-void floating_point_exception_handler(int whatever) {
-    //	Sys_Warn("floating point exception\n");
-    signal(SIGFPE, floating_point_exception_handler);
-}
+// void floating_point_exception_handler(int whatever) {
+//     //	Sys_Warn("floating point exception\n");
+//     signal(SIGFPE, floating_point_exception_handler);
+// }
 
-cString Sys_ConsoleInput() {
-    static char text[256];
 
-    if (cls.state == ca_dedicated) {
-        fd_set	fdset;
-        FD_ZERO(&fdset);
-        FD_SET(0, &fdset); // stdin
-
-        struct timeval timeout;
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 0;
-        if ((select(1, &fdset, NULL, NULL, &timeout) == -1) ||
-            (!FD_ISSET(0, &fdset))
-            ) {
-            return NULL;
-        }
-
-        int len = read(0, text, sizeof(text));
-        if (len < 1)
-            return NULL;
-        text[len - 1] = 0;    // rip off the /n and terminate
-
-        return text;
-    }
-    return NULL;
-}
 
 #if !id386
 void Sys_HighFPPrecision() {}
@@ -329,7 +206,7 @@ int main(int c, cStringArray v) {
         parms.memsize = (int)(Q_atof(com.argv[memParam + 1]) * 1024 * 1024);
     parms.membase = malloc(parms.memsize);
 
-    parms.basedir = basedir;
+    parms.basedir = _baseDir;
     // caching is disabled by default, use -cachedir to enable
     //	parms.cachedir = cachedir;
 

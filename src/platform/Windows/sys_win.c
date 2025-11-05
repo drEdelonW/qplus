@@ -19,6 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sys_win.c -- Win32 system interface code
 
+#include "sys.h"
+#include "host.h"
 #include "winquake.h"
 #include "errno.h"
 #include "resource.h"
@@ -40,7 +42,6 @@ static double   _pfreq;
 static double   _curtime = 0.0;
 static double   _lastcurtime = 0.0;
 static int      _lowshift;
-bool        isDedicated;
 static bool _ScReturnOnEnter = false;
 HANDLE          hinput, houtput;
 

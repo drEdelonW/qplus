@@ -1,14 +1,12 @@
 #pragma once
 
 #include "host.h"
-#include "qparams.h"
 
 //
 // host
 //
 class Host {
 public:
-    // Host();
 
     void ClearMemory();
     void Init(QuakeParms_p parms);
