@@ -36,6 +36,7 @@ extern dStatement_p pr_statements;
 extern globalvars_p pr_global_struct;
 extern float_p      pr_globals;     // same as pr_global_struct
 extern int32_t      pr_edict_size;  // in bytes
+extern int32_t      current_skill;  // skill level for currently loaded level (in case the user changes the cvar while the level is running, this reflects the level actually in use)
 
 
 //============================================================================

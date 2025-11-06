@@ -156,3 +156,26 @@ typedef enum {
 } clc_t;
 
 
+
+//
+// stats are integers communicated to the client by the server
+//
+typedef enum {
+    STAT_HEALTH         = 0,
+    STAT_FRAGS          = 1,
+    STAT_WEAPON         = 2,
+    STAT_AMMO           = 3,
+    STAT_ARMOR          = 4,
+    STAT_WEAPONFRAME    = 5,
+    STAT_SHELLS         = 6,
+    STAT_NAILS          = 7,
+    STAT_ROCKETS        = 8,
+    STAT_CELLS          = 9,
+    STAT_ACTIVEWEAPON   = 10,
+    STAT_TOTALSECRETS   = 11,
+    STAT_TOTALMONSTERS  = 12,
+    STAT_SECRETS        = 13, // bumped client-side by svc_foundsecret
+    STAT_MONSTERS       = 14,  // bumped by svc_killedmonster
+
+    MAX_CL_STATS        = 32
+} stat_t;

@@ -33,6 +33,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "view.h"
 #include "host.h"
 #include "mathlib.h"
+#include "progs.h"
+
 
 edict_p sv_player;
 
@@ -525,6 +527,77 @@ void SV_RunClients() {
                 )
             )
             SV_ClientThink();
+    }
+}
+
+
+
+/*
+==================
+Host_God_f
+
+Sets client to godmode
+==================
+*/
+void Host_God_f() {
+    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
+
+    sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_GODMODE;
+    SV_ClientPrintf("godmode %s\n",
+        (((int32_t)sv_player->v.flags) & FL_GODMODE) ?
+        "ON" : "OFF"
+    );
+}
+
+
+void Host_Notarget_f() {
+    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
+
+    sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_NOTARGET;
+    SV_ClientPrintf("notarget %s\n",
+        (((int32_t)sv_player->v.flags) & FL_NOTARGET) ?
+        "ON" : "OFF"
+    );
+}
+
+bool noclip_anglehack;
+
+void Host_Noclip_f() {
+    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
+
+    if (sv_player->v.movetype == MOVETYPE_NOCLIP) {
+        noclip_anglehack = false;
+        sv_player->v.movetype = MOVETYPE_WALK;
+        SV_ClientPrintf("noclip OFF\n");
+    }
+    else {
+        noclip_anglehack = true;
+        sv_player->v.movetype = MOVETYPE_NOCLIP;
+        SV_ClientPrintf("noclip ON\n");
+    }
+}
+
+/*
+==================
+Host_Fly_f
+
+Sets client to flymode
+==================
+*/
+void Host_Fly_f() {
+    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
+
+    if (sv_player->v.movetype == MOVETYPE_FLY) {
+        sv_player->v.movetype = MOVETYPE_WALK;
+        SV_ClientPrintf("flymode OFF\n");
+    }
+    else {
+        sv_player->v.movetype = MOVETYPE_FLY;
+        SV_ClientPrintf("flymode ON\n");
     }
 }
 
