@@ -335,7 +335,7 @@ void Host_Savegame_f() {
         if (svs.clients[i].active &&
             (svs.clients[i].edict->v.health <= 0)
             ) {
-            Con_Printf("Can't savegame with a dead player\n"); return;
+            Con_Printf("Can't savegame with a dead player\n");  return;
         }
     }
 
@@ -731,7 +731,7 @@ void Host_Say(bool teamonly) {
             fromServer = true;
             teamonly = false;
         }
-        else { Cmd_ForwardToServer();       return; }
+        else { Cmd_ForwardToServer();   return; }
     }
 
     if (Cmd_Argc() < 2)         return;
@@ -1092,7 +1092,7 @@ Host_Give_f
 */
 void Host_Give_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer();        return; }
-    if (pr_global_struct->deathmatch && !remoteClient->privileged) { return; }
+    if (pr_global_struct->deathmatch && !remoteClient->privileged)  return;
 
     cString t = Cmd_Argv(1);
     int cVal = atoi(Cmd_Argv(2));

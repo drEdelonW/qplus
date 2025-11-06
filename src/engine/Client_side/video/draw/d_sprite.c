@@ -25,6 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "render.h"
 #include <math.h>
 
+#define DS_SPAN_LIST_END   (-128)
+
 static int  sprite_height;
 static int  minindex, maxindex;
 static sSpan_p sprite_spans;

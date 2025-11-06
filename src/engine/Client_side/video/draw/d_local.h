@@ -27,16 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // TODO: fine-tune this; it's based on providing some overage even if there
 // is a 2k-wide scan, with subdivision every 8, for 256 spans of 12 bytes each
 //
-#define SCANBUFFERPAD   (0x1000)
-
-#define R_SKY_SMASK     (0x007F0000)
-#define R_SKY_TMASK     (0x007F0000)
-
-#define DS_SPAN_LIST_END   (-128)
 
 #define SURFCACHE_SIZE_AT_320X200  (600 * 1024)
-
-
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct sSpan_s {
@@ -49,8 +41,8 @@ typedef sSpan_t* sSpan_p;
 
 extern float scale_for_mip;
 extern int   d_aflatcolor;
-
 extern bool  d_roverwrapped;
+
 extern SurfCache_p sc_rover;
 extern SurfCache_p d_initial_rover;
 
@@ -75,24 +67,23 @@ void R_ShowSubDiv();
 extern void(*prealspandrawer)();
 SurfCache_p D_CacheSurface(mSurface_p surface, int miplevel);
 
-extern int D_MipLevelForScale(float scale);
 
 #if id386
 extern void D_PolysetAff8Start();
 extern void D_PolysetAff8End();
 #endif
 
-extern int16_p d_pzbuffer;
+extern int16_p  d_pzbuffer;
 extern uint32_t d_zrowbytes, d_zwidth;
 
 extern int* d_pscantable;
-extern int d_scantable[MAXHEIGHT];
-extern int d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
-extern int d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
-extern pixel_p d_viewbuffer;
-extern int16_p zspantable[MAXHEIGHT];
-extern int  d_minmip;
-extern float d_scalemip[3];
+extern int      d_scantable[MAXHEIGHT];
+extern int      d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
+extern int      d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
+extern pixel_p  d_viewbuffer;
+extern int16_p  zspantable[MAXHEIGHT];
+extern int      d_minmip;
+extern float    d_scalemip[3];
 
 extern void(*d_drawspans)(eSpan_p pspan);
 

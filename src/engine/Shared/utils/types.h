@@ -61,10 +61,12 @@ typedef double* double_p;
 // typedef int fixed8_t; // DO NOT USE int!!!
 typedef uint16_t fixed8_t; // V
 // typedef uint8_t fixed8_t; // Segmentation fault
+typedef fixed8_t* fixed8_p; // V
 
 // typedef int fixed16_t; // DO NOT USE int!!!
 typedef int32_t fixed16_t; // V
 // typedef int16_t fixed16_t; // X
+typedef fixed16_t* fixed16_p; // V
 
 // fixed16_t Invert24To16(fixed16_t val);
 

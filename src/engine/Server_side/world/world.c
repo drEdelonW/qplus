@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // world.c -- world query functions
 
 #include "world.h"
-#include "cmd.h"
 #include <string.h>
 #include "server.h"
 #include "sys.h"
@@ -45,8 +44,8 @@ typedef struct {
     trace_t trace;
     phymovetype_t type;
     edict_p passedict;
-} moveclip_t;
-typedef moveclip_t* moveclip_p;
+} moveClip_t;
+typedef moveClip_t* moveClip_p;
 
 
 /*
@@ -56,7 +55,6 @@ HULL BOXES
 
 ===============================================================================
 */
-
 
 static Hull_t       _boxHull;
 static dClipNode_t  _boxClipNodes[6];
@@ -718,7 +716,7 @@ SV_ClipToLinks
 Mins and maxs enclose the entire area swept by the move
 ====================
 */
-void SV_ClipToLinks(areaNode_p node, moveclip_p clip) {
+void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
     // touch linked edicts
     link_p next;
     for (link_p l = node->solid_edicts.next; l != &node->solid_edicts; l = next) {
@@ -817,7 +815,7 @@ SV_Move
 ==================
 */
 trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_t type, edict_p passedict) {
-    moveclip_t clip;  memset(&clip, 0, sizeof(moveclip_t));
+    moveClip_t clip;  memset(&clip, 0, sizeof(moveClip_t));
 
     // clip to world
     clip.trace = SV_ClipMoveToEntity(sv.edicts, start, mins, maxs, end);
@@ -855,9 +853,7 @@ BOPS_Error
 Split out like this for ASM to call.
 ==================
 */
-void BOPS_Error() {
-    Sys_Error("BoxOnPlaneSide:  Bad signbits");
-}
+void BOPS_Error() { Sys_Error("BoxOnPlaneSide:  Bad signbits"); }
 
 
 #if !id386

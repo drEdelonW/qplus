@@ -22,16 +22,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "d_local.h"
 
+#define R_SKY_SMASK     (0x007F0000)
+#define R_SKY_TMASK     (0x007F0000)
+
 #define SKY_SPAN_SHIFT 5
 #define SKY_SPAN_MAX (1 << SKY_SPAN_SHIFT)
-
 
 /*
 =================
 D_Sky_uv_To_st
 =================
 */
-void D_Sky_uv_To_st(int u, int v, fixed16_t* s, fixed16_t* t) {
+void D_Sky_uv_To_st(int u, int v, fixed16_p s, fixed16_p t) {
     float temp;
     if (r_refdef.vrect.width >= r_refdef.vrect.height)
         temp = (float)r_refdef.vrect.width;

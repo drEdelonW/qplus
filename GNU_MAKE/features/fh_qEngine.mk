@@ -38,18 +38,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(INPUT_DIR)/keys.c
 
 
-        $(eval NET_DIR = $(ENG_DIR)/Net) $(eval INCLUDES += $(NET_DIR))
-                $(eval MSG_DIR = $(NET_DIR)/Msg) $(eval INCLUDES += $(MSG_DIR))
-                        #SRC_LIST += $(MSG_DIR)/msg.c
-                        SRC_LIST += $(MSG_DIR)/msg_cWrap.cpp
-                        SRC_LIST += $(MSG_DIR)/msg_obj.cpp
-
-
-                SRC_LIST += $(NET_DIR)/net_main.c
-                SRC_LIST += $(NET_DIR)/net_dgrm.c
-                SRC_LIST += $(NET_DIR)/net_loop.c
-                SRC_LIST += $(NET_DIR)/net_vcr.c
-
+ 
 
         $(eval SV_SIDE_DIR = $(ENG_DIR)/Server_side) $(eval INCLUDES += $(SV_SIDE_DIR))
                 $(eval WORLD_DIR = $(SV_SIDE_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))
@@ -139,6 +128,17 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
 
         $(eval SHARED_DIR = $(ENG_DIR)/Shared) $(eval INCLUDES += $(SHARED_DIR))
+                $(eval NET_DIR = $(SHARED_DIR)/Net) $(eval INCLUDES += $(NET_DIR))
+                        $(eval MSG_DIR = $(NET_DIR)/Msg) $(eval INCLUDES += $(MSG_DIR))
+                                #SRC_LIST += $(MSG_DIR)/msg.c
+                                SRC_LIST += $(MSG_DIR)/msg_cWrap.cpp
+                                SRC_LIST += $(MSG_DIR)/msg_obj.cpp
+
+
+                        SRC_LIST += $(NET_DIR)/net_main.c
+                        SRC_LIST += $(NET_DIR)/net_dgrm.c
+                        SRC_LIST += $(NET_DIR)/net_loop.c
+                        SRC_LIST += $(NET_DIR)/net_vcr.c
                 $(eval MATH_DIR = $(SHARED_DIR)/math) $(eval INCLUDES += $(MATH_DIR))
                         SRC_LIST += $(MATH_DIR)/mathlib.c
                         SRC_LIST += $(MATH_DIR)/Vector3d.cpp

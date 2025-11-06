@@ -48,7 +48,7 @@ int32_t        pr_edict_size;      // in bytes
 
 uint16_t pr_crc;
 
-int type_size[8] = {
+int type_size[ev_LAST] = {
     1,                          // ev_void,
     sizeof(string_t) / 4,       // ev_string,
     1,                          // ev_float,
@@ -472,8 +472,10 @@ For debugging
 =============
 */
 void ED_Count() {
-    int  active, models, solid, step;
-    active = models = solid = step = 0;
+    int active = 0;
+    int models = 0;
+    int solid = 0;
+    int step = 0;
     for (int i = 0; i < sv.num_edicts; i++) {
         edict_p ent = EDICT_NUM(i);
         if (ent->free)  continue;
