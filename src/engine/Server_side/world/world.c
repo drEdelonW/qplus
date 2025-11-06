@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // world.c -- world query functions
 
-#include "cmd.h"
 #include "world.h"
+#include "cmd.h"
 #include <string.h>
 #include "server.h"
 #include "sys.h"
@@ -31,13 +31,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 /*
-
-entities never clip against themselves, or their owner
-
-line of sight checks trace->crosscontent, but bullets don't
-
+    entities never clip against themselves, or their owner
+    line of sight checks trace->crosscontent, but bullets don't
 */
-
 
 typedef struct {
     vec3_t  boxmins, boxmaxs;// enclose the test object along entire move
@@ -136,7 +132,8 @@ Hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_t offset) {
         Model_p model = sv.models[(int)ent->v.modelindex];
 
         if (!model ||
-            (model->type != mod_brush))
+            (model->type != mod_brush)
+            )
             Sys_Error("MOVETYPE_PUSH with a non bsp model");
 
         vec3_t size; VectorSubtract(maxs, mins, size);
@@ -244,6 +241,7 @@ SV_UnlinkEdict
 */
 void SV_UnlinkEdict(edict_p ent) {
     if (!ent->area.prev)    return;  // not linked in anywhere
+
     RemoveLink(&ent->area);
     ent->area.prev = ent->area.next = NULL;
 }
@@ -471,7 +469,8 @@ SV_PointContents
 contents_t SV_PointContents(vec3_t p) {
     contents_t cont = SV_HullPointContents(&sv.worldmodel->hulls[0], 0, p);
     if ((cont <= CONTENTS_CURRENT_0) &&
-        (cont >= CONTENTS_CURRENT_DOWN))
+        (cont >= CONTENTS_CURRENT_DOWN)
+        )
         cont = CONTENTS_WATER;
     return cont;
 }
@@ -514,12 +513,9 @@ SV_RecursiveHullCheck
 ==================
 */
 bool SV_RecursiveHullCheck(
-    Hull_p  hull,
-    int     num,
-    float   p1f,
-    float   p2f,
-    vec3_t  p1,
-    vec3_t  p2,
+    Hull_p hull, int    num,
+    float  p1f, float  p2f,
+    vec3_t p1, vec3_t p2,
     trace_p trace
 ) {
     // check for empty
@@ -821,7 +817,7 @@ SV_Move
 ==================
 */
 trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_t type, edict_p passedict) {
-    moveclip_t clip;    memset(&clip, 0, sizeof(moveclip_t));
+    moveclip_t clip;  memset(&clip, 0, sizeof(moveclip_t));
 
     // clip to world
     clip.trace = SV_ClipMoveToEntity(sv.edicts, start, mins, maxs, end);
@@ -833,12 +829,11 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
     clip.type = type;
     clip.passedict = passedict;
 
-    if (type == MOVE_MISSILE) {
+    if (type == MOVE_MISSILE)
         for (int i = 0; i < VECT_DIM; i++) {
             clip.mins2[i] = -15;
             clip.maxs2[i] = 15;
         }
-    }
     else {
         VectorCopy(mins, clip.mins2);
         VectorCopy(maxs, clip.maxs2);
@@ -885,7 +880,7 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
         if (p->dist <= emins[p->type])  return 1;
         if (p->dist >= emaxs[p->type])  return 2;
         return 3;
-}
+    }
 #endif
 
     // general case

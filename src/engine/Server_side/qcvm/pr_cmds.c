@@ -48,13 +48,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 cString PF_VarString(int first) {
-    static char out[256];
+    static char _out[256];
 
-    out[0] = 0;
-    for (int i = first; i < pr_argc; i++) {
-        strcat(out, G_STRING((OFS_PARM0 + i * 3)));
-    }
-    return out;
+    _out[0] = 0;
+    for (int i = first; i < pr_argc; i++)
+        strcat(_out, G_STRING((OFS_PARM0 + i * 3)));
+
+    return _out;
 }
 
 /*
@@ -273,8 +273,7 @@ void PF_sprint() {
 
     if ((ent_num < 1) ||
         (ent_num > svs.maxClients)) {
-        Con_Printf("tried to sprint to a non-client\n");
-        return;
+        Con_Printf("tried to sprint to a non-client\n");    return;
     }
 
     RmtClient_p client = &svs.clients[ent_num - 1];
@@ -297,8 +296,7 @@ void PF_centerprint() {
     cString str = PF_VarString(1);
 
     if ((entnum < 1) || (entnum > svs.maxClients)) {
-        Con_Printf("tried to sprint to a non-client\n");
-        return;
+        Con_Printf("tried to sprint to a non-client\n");    return;
     }
 
     RmtClient_p client = &svs.clients[entnum - 1];
@@ -320,8 +318,7 @@ void PF_normalize() {
     new = sqrt(new);
 
     vec3_t newvalue;
-    if (new == 0)
-        newvalue[0] = newvalue[1] = newvalue[2] = 0;
+    if (new == 0)   newvalue[0] = newvalue[1] = newvalue[2] = 0;
     else {
         new = 1 / new;
         newvalue[0] = value1[0] * new;  // newvalue = value1 * new;
@@ -364,8 +361,7 @@ void PF_vectoyaw() {
         yaw = 0;
     else {
         yaw = (int)(atan2(value1[1], value1[0]) * 180 / M_PI);
-        if (yaw < 0)
-            yaw += 360;
+        if (yaw < 0)    yaw += 360;
     }
 
     G_FLOAT(OFS_RETURN) = yaw;
@@ -390,13 +386,11 @@ void PF_vectoangles() {
     }
     else {
         yaw = (int)(atan2(value1[1], value1[0]) * 180 / M_PI);
-        if (yaw < 0)
-            yaw += 360;
+        if (yaw < 0)    yaw += 360;
 
         float forward = sqrt(value1[0] * value1[0] + value1[1] * value1[1]);
         pitch = (int)(atan2(value1[2], forward) * 180 / M_PI);
-        if (pitch < 0)
-            pitch += 360;
+        if (pitch < 0)  pitch += 360;
     }
 
     G_FLOAT(OFS_RETURN + 0) = pitch;
@@ -413,9 +407,7 @@ Returns a number from 0<= num < 1
 random()
 =================
 */
-void PF_random() {
-    G_FLOAT(OFS_RETURN) = (rand() & 0x7fff) / ((float)0x7fff);
-}
+void PF_random() { G_FLOAT(OFS_RETURN) = (rand() & 0x7fff) / ((float)0x7fff); }
 
 /*
 =================
@@ -580,12 +572,11 @@ FIXME: make work...
 scalar checkpos (entity, vector)
 =================
 */
-void PF_checkpos() {
-}
+void PF_checkpos() {}
 
 //============================================================================
 
-uint8_t checkpvs[MAX_MAP_LEAFS / 8];
+static uint8_t _checkPvs[MAX_MAP_LEAFS / 8];
 
 int PF_newcheckclient(int check) {
     // cycle to the next one
@@ -617,7 +608,7 @@ int PF_newcheckclient(int check) {
     vec3_t org;    VectorAdd(ent->v.origin, ent->v.view_ofs, org);
     mLeaf_p leaf = Mod_PointInLeaf(org, sv.worldmodel);
     uint8_p pvs = Mod_LeafPVS(leaf, sv.worldmodel);
-    memcpy(checkpvs, pvs, (sv.worldmodel->numleafs + 7) >> 3);
+    memcpy(_checkPvs, pvs, (sv.worldmodel->numleafs + 7) >> 3);
 
     return i;
 }
@@ -637,8 +628,8 @@ it is not returned at all.
 name checkclient ()
 =================
 */
-#define MAX_CHECK 16
-int c_invis, c_notvis;
+// #define MAX_CHECK 16
+// int c_invis, c_notvis;
 void PF_checkclient() {
     // find a new check if on a new frame
     if (sv.time - sv.lastchecktime >= 0.1) {
@@ -649,7 +640,8 @@ void PF_checkclient() {
     // return check if it might be visible
     edict_p ent = EDICT_NUM(sv.lastcheck);
     if (ent->free ||
-        (ent->v.health <= 0)) {
+        (ent->v.health <= 0)
+        ) {
         RETURN_EDICT(sv.edicts);
         return;
     }
@@ -660,15 +652,15 @@ void PF_checkclient() {
     mLeaf_p leaf = Mod_PointInLeaf(view, sv.worldmodel);
     int l = (leaf - sv.worldmodel->leafs) - 1;
     if ((l < 0) ||
-        !(checkpvs[l >> 3] & (1 << (l & 7)))
+        !(_checkPvs[l >> 3] & (1 << (l & 7)))
         ) {
-        c_notvis++;
+        // c_notvis++;
         RETURN_EDICT(sv.edicts);
         return;
     }
 
     // might be able to see it
-    c_invis++;
+    // c_invis++;
     RETURN_EDICT(ent);
 }
 
@@ -686,8 +678,10 @@ stuffcmd (clientent, value)
 void PF_stuffcmd() {
     int entnum = G_EDICTNUM(OFS_PARM0);
     if ((entnum < 1) ||
-        (entnum > svs.maxClients))
+        (entnum > svs.maxClients)
+        )
         PR_RunError("Parm 0 not a client");
+
     cString str = G_STRING(OFS_PARM1);
 
     RmtClient_p old = remoteClient;
@@ -773,18 +767,16 @@ void PF_findradius() {
 PF_dprint
 =========
 */
-void PF_dprint() {
-    Con_DPrintf("%s", PF_VarString(0));
-}
+void PF_dprint() { Con_DPrintf("%s", PF_VarString(0)); }
 
-char pr_string_temp[128];
+static char _pr_string_temp[128];
 
 void PF_ftos() {
     float v = G_FLOAT(OFS_PARM0);
 
-    if (v == (int)v)    sprintf(pr_string_temp, "%d", (int)v);
-    else                sprintf(pr_string_temp, "%5.1f", v);
-    G_INT(OFS_RETURN) = pr_string_temp - pr_strings;
+    if (v == (int)v)    sprintf(_pr_string_temp, "%d", (int)v);
+    else                sprintf(_pr_string_temp, "%5.1f", v);
+    G_INT(OFS_RETURN) = _pr_string_temp - pr_strings;
 }
 
 void PF_fabs() {
@@ -793,14 +785,14 @@ void PF_fabs() {
 }
 
 void PF_vtos() {
-    sprintf(pr_string_temp, "'%5.1f %5.1f %5.1f'", G_VECTOR(OFS_PARM0)[0], G_VECTOR(OFS_PARM0)[1], G_VECTOR(OFS_PARM0)[2]);
-    G_INT(OFS_RETURN) = pr_string_temp - pr_strings;
+    sprintf(_pr_string_temp, "'%5.1f %5.1f %5.1f'", G_VECTOR(OFS_PARM0)[0], G_VECTOR(OFS_PARM0)[1], G_VECTOR(OFS_PARM0)[2]);
+    G_INT(OFS_RETURN) = _pr_string_temp - pr_strings;
 }
 
 #ifdef QUAKE2
 void PF_etos() {
-    sprintf(pr_string_temp, "entity %i", G_EDICTNUM(OFS_PARM0));
-    G_INT(OFS_RETURN) = pr_string_temp - pr_strings;
+    sprintf(_pr_string_temp, "entity %i", G_EDICTNUM(OFS_PARM0));
+    G_INT(OFS_RETURN) = _pr_string_temp - pr_strings;
 }
 #endif
 
@@ -818,11 +810,9 @@ void PF_Remove() {
 void PF_Find()
 #ifdef QUAKE2
 {
-    edict_p first;
-    edict_p second;
-    edict_p last;
-
-    first = second = last = (edict_p)sv.edicts;
+    edict_p first = (edict_p)sv.edicts;
+    edict_p second = first;
+    edict_p last = second;
     edict = G_EDICTNUM(OFS_PARM0);
     int f = G_INT(OFS_PARM1);
     cString str = G_STRING(OFS_PARM2);
@@ -836,10 +826,8 @@ void PF_Find()
         cString t = E_STRING(ed, f);
         if (!t)            continue;
         if (!strcmp(t, str)) {
-            if (first == (edict_p)sv.edicts)
-                first = ed;
-            else if (second == (edict_p)sv.edicts)
-                second = ed;
+            if (first == (edict_p)sv.edicts)        first = ed;
+            else if (second == (edict_p)sv.edicts)  second = ed;
             ed->v.chain = EDICT_TO_PROG(last);
             last = ed;
         }
@@ -849,7 +837,9 @@ void PF_Find()
         if (last != second)     first->v.chain = last->v.chain;
         else                    first->v.chain = EDICT_TO_PROG(last);
         last->v.chain = EDICT_TO_PROG((edict_p)sv.edicts);
-        if (second && second != last)
+        if (second &&
+            (second != last)
+            )
             second->v.chain = EDICT_TO_PROG(last);
     }
     RETURN_EDICT(first);
@@ -867,7 +857,8 @@ void PF_Find()
         if (ed->free)   continue;
         cString t = E_STRING(ed, f);
         if (!t)         continue;
-        if (!strcmp(t, str)) {
+        if (!strcmp(t, str)
+            ) {
             RETURN_EDICT(ed);
             return;
         }
@@ -925,21 +916,10 @@ void PF_precache_model() {
     PR_RunError("PF_precache_model: overflow");
 }
 
-void PF_coredump() {
-    ED_PrintEdicts();
-}
-
-void PF_traceon() {
-    pr_trace = true;
-}
-
-void PF_traceoff() {
-    pr_trace = false;
-}
-
-void PF_eprint() {
-    ED_PrintNum(G_EDICTNUM(OFS_PARM0));
-}
+void PF_coredump() { ED_PrintEdicts(); }
+void PF_traceon() { pr_trace = true; }
+void PF_traceoff() { pr_trace = false; }
+void PF_eprint() { ED_PrintNum(G_EDICTNUM(OFS_PARM0)); }
 
 /*
 ===============
@@ -991,10 +971,7 @@ void PF_droptofloor() {
 
     trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, false, ent);
 
-    if ((trace.fraction == 1) ||
-        trace.allsolid
-        )
-        G_FLOAT(OFS_RETURN) = 0;
+    if ((trace.fraction == 1) || trace.allsolid)    G_FLOAT(OFS_RETURN) = 0;
     else {
         VectorCopy(trace.endpos, ent->v.origin);
         SV_LinkEdict(ent, false);
@@ -1035,12 +1012,8 @@ void PF_rint() {
     if (f > 0)  G_FLOAT(OFS_RETURN) = (int)(f + 0.5);
     else        G_FLOAT(OFS_RETURN) = (int)(f - 0.5);
 }
-void PF_floor() {
-    G_FLOAT(OFS_RETURN) = floor(G_FLOAT(OFS_PARM0));
-}
-void PF_ceil() {
-    G_FLOAT(OFS_RETURN) = ceil(G_FLOAT(OFS_PARM0));
-}
+void PF_floor() { G_FLOAT(OFS_RETURN) = floor(G_FLOAT(OFS_PARM0)); }
+void PF_ceil() { G_FLOAT(OFS_RETURN) = ceil(G_FLOAT(OFS_PARM0)); }
 
 /*
 =============
@@ -1119,7 +1092,8 @@ void PF_aim() {
             (check == ent) ||
             (teamplay.value &&
                 (ent->v.team > 0) &&
-                (ent->v.team == check->v.team))) {
+                (ent->v.team == check->v.team))
+            ) {
             continue; // don't aim at teammate
         }
 
@@ -1132,9 +1106,8 @@ void PF_aim() {
         VectorSubtract(end, start, dir);
         VectorNormalize(dir);
         float dist = DotProduct(dir, pr_global_struct->v_forward);
-        if (dist < bestdist) {
-            continue; // to far to turn
-        }
+        if (dist < bestdist)    continue; // to far to turn
+
         tr = SV_Move(start, vec3_origin, vec3_origin, end, false, ent);
         if (tr.ent == check) { // can shoot at this one
             bestdist = dist;
@@ -1150,9 +1123,7 @@ void PF_aim() {
         VectorNormalize(end);
         VectorCopy(end, G_VECTOR(OFS_RETURN));
     }
-    else {
-        VectorCopy(bestdir, G_VECTOR(OFS_RETURN));
-    }
+    else    VectorCopy(bestdir, G_VECTOR(OFS_RETURN));
 }
 
 /*
@@ -1170,15 +1141,11 @@ void PF_changeyaw() {
 
     if (current == ideal)   return;
     float move = ideal - current;
-    if (ideal > current) {
-        if (move >= 180)    move = move - 360;
-    }
-    else {
-        if (move <= -180)   move = move + 360;
-    }
+    if (ideal > current) { if (move >= 180)    move = move - 360; }
+    else { ;               if (move <= -180)   move = move + 360; }
+
     if (move > 0)   CLAMP_MORE(move, speed);
     else            CLAMP_LESS(move, -speed);
-
 
     ent->v.angles[1] = anglemod(current + move);
 }
@@ -1198,18 +1165,11 @@ void PF_changepitch() {
     if (current == ideal)
         return;
     float move = ideal - current;
-    if (ideal > current) {
-        if (move >= 180)    move = move - 360;
-    }
-    else {
-        if (move <= -180)   move = move + 360;
-    }
-    if (move > 0) {
-        if (move > speed)   move = speed;
-    }
-    else {
-        if (move < -speed)  move = -speed;
-    }
+    if (ideal > current) { ;if (move >= 180)    move = move - 360; }
+    else { ;                if (move <= -180)   move = move + 360; }
+
+    if (move > 0) { ;       if (move > speed)   move = speed; }
+    else { ;                if (move < -speed)  move = -speed; }
 
     ent->v.angles[0] = anglemod(current + move);
 }
@@ -1224,10 +1184,10 @@ MESSAGE WRITING
 */
 
 typedef enum msg_dest_e {
-    MSG_BROADCAST = 0,  // unreliable to all
-    MSG_ONE = 1,  // reliable to one (msg_entity)
-    MSG_ALL = 2,  // reliable to all
-    MSG_INIT = 3   // write to the init string
+    MSG_BROADCAST   = 0,  // unreliable to all
+    MSG_ONE         = 1,  // reliable to one (msg_entity)
+    MSG_ALL         = 2,  // reliable to all
+    MSG_INIT        = 3   // write to the init string
 } msg_dest_e;
 
 sizebuf_p WriteDest() {
@@ -1235,13 +1195,13 @@ sizebuf_p WriteDest() {
     switch (dest) {
     case MSG_BROADCAST: return &sv.datagram;
 
-    case MSG_ONE:
+    case MSG_ONE: {
         edict_p ent = PROG_TO_EDICT(pr_global_struct->msg_entity);
         int entnum = NUM_FOR_EDICT(ent);
         if ((entnum < 1) || (entnum > svs.maxClients))
             PR_RunError("WriteDest: not a client");
         return &svs.clients[entnum - 1].message;
-
+    }
     case MSG_ALL:       return &sv.reliable_datagram;
     case MSG_INIT:      return &sv.signon;
     default:            PR_RunError("WriteDest: bad destination");  break;
@@ -1250,37 +1210,14 @@ sizebuf_p WriteDest() {
     return NULL;
 }
 
-void PF_WriteByte() {
-    MSG_WriteByte(WriteDest(), G_FLOAT(OFS_PARM1));
-}
-
-void PF_WriteChar() {
-    MSG_WriteChar(WriteDest(), G_FLOAT(OFS_PARM1));
-}
-
-void PF_WriteShort() {
-    MSG_WriteShort(WriteDest(), G_FLOAT(OFS_PARM1));
-}
-
-void PF_WriteLong() {
-    MSG_WriteLong(WriteDest(), G_FLOAT(OFS_PARM1));
-}
-
-void PF_WriteAngle() {
-    MSG_WriteAngle(WriteDest(), G_FLOAT(OFS_PARM1));
-}
-
-void PF_WriteCoord() {
-    MSG_WriteCoord(WriteDest(), G_FLOAT(OFS_PARM1));
-}
-
-void PF_WriteString() {
-    MSG_WriteString(WriteDest(), G_STRING(OFS_PARM1));
-}
-
-void PF_WriteEntity() {
-    MSG_WriteShort(WriteDest(), G_EDICTNUM(OFS_PARM1));
-}
+void PF_WriteByte() { MSG_WriteByte(WriteDest(), G_FLOAT(OFS_PARM1)); }
+void PF_WriteChar() { MSG_WriteChar(WriteDest(), G_FLOAT(OFS_PARM1)); }
+void PF_WriteShort() { MSG_WriteShort(WriteDest(), G_FLOAT(OFS_PARM1)); }
+void PF_WriteLong() { MSG_WriteLong(WriteDest(), G_FLOAT(OFS_PARM1)); }
+void PF_WriteAngle() { MSG_WriteAngle(WriteDest(), G_FLOAT(OFS_PARM1)); }
+void PF_WriteCoord() { MSG_WriteCoord(WriteDest(), G_FLOAT(OFS_PARM1)); }
+void PF_WriteString() { MSG_WriteString(WriteDest(), G_STRING(OFS_PARM1)); }
+void PF_WriteEntity() { MSG_WriteShort(WriteDest(), G_EDICTNUM(OFS_PARM1)); }
 
 //=============================================================================
 
@@ -1365,14 +1302,8 @@ void PF_changelevel() {
 #define ATTN_NORM 1
 
 void PF_WaterMove() {
-    edict_p self;
-    int flags;
-    int waterlevel;
-    int watertype;
-    float drownlevel;
     float damage = 0.0;
-
-    self = PROG_TO_EDICT(pr_global_struct->self);
+    edict_p self = PROG_TO_EDICT(pr_global_struct->self);
 
     if (self->v.movetype == MOVETYPE_NOCLIP) {
         self->v.air_finished = sv.time + 12;
@@ -1385,17 +1316,18 @@ void PF_WaterMove() {
         return;
     }
 
-    if (self->v.deadflag == DEAD_NO)
-        drownlevel = 3;
-    else
-        drownlevel = 1;
+    float drownlevel = (self->v.deadflag == DEAD_NO) ? 3 : 1;
 
-    flags = (int)self->v.flags;
-    waterlevel = (int)self->v.waterlevel;
-    watertype = (int)self->v.watertype;
+    int flags = (int)self->v.flags;
+    int waterlevel = (int)self->v.waterlevel;
+    int watertype = (int)self->v.watertype;
 
     if (!(flags & (FL_IMMUNE_WATER + FL_GODMODE)))
-        if (((flags & FL_SWIM) && (waterlevel < drownlevel)) || (waterlevel >= drownlevel)) {
+        if (
+            ((flags & FL_SWIM) &&
+                (waterlevel < drownlevel)) ||
+            (waterlevel >= drownlevel)
+            ) {
             if (self->v.air_finished < sv.time)
                 if (self->v.pain_finished < sv.time) {
                     self->v.dmg = self->v.dmg + 2;
@@ -1407,21 +1339,15 @@ void PF_WaterMove() {
                 }
         }
         else {
-            if (self->v.air_finished < sv.time)
-                //				sound (self, CHAN_VOICE, "player/gasp2.wav", 1, ATTN_NORM);
-                SV_StartSound(self, CHAN_VOICE, "player/gasp2.wav", 255, ATTN_NORM);
-            else if (self->v.air_finished < sv.time + 9)
-                //				sound (self, CHAN_VOICE, "player/gasp1.wav", 1, ATTN_NORM);
-                SV_StartSound(self, CHAN_VOICE, "player/gasp1.wav", 255, ATTN_NORM);
+            if (self->v.air_finished < sv.time)             SV_StartSound(self, CHAN_VOICE, "player/gasp2.wav", 255, ATTN_NORM);
+            else if (self->v.air_finished < sv.time + 9)    SV_StartSound(self, CHAN_VOICE, "player/gasp1.wav", 255, ATTN_NORM);
             self->v.air_finished = sv.time + 12.0;
             self->v.dmg = 2;
         }
 
     if (!waterlevel) {
         if (flags & FL_INWATER) {
-            // play leave water sound
-            //			sound (self, CHAN_BODY, "misc/outwater.wav", 1, ATTN_NORM);
-            SV_StartSound(self, CHAN_BODY, "misc/outwater.wav", 255, ATTN_NORM);
+            SV_StartSound(self, CHAN_BODY, "misc/outwater.wav", 255, ATTN_NORM);    // play leave water sound
             self->v.flags = (float)(flags & ~FL_INWATER);
         }
         self->v.air_finished = sv.time + 12.0;
@@ -1432,10 +1358,8 @@ void PF_WaterMove() {
     if (watertype == CONTENT_LAVA) { // do damage
         if (!(flags & (FL_IMMUNE_LAVA + FL_GODMODE)))
             if (self->v.dmgtime < sv.time) {
-                if (self->v.radsuit_finished < sv.time)
-                    self->v.dmgtime = sv.time + 0.2;
-                else
-                    self->v.dmgtime = sv.time + 1.0;
+                if (self->v.radsuit_finished < sv.time)     self->v.dmgtime = sv.time + 0.2;
+                else                                        self->v.dmgtime = sv.time + 1.0;
                 //				T_Damage (self, world, world, 10*self.waterlevel, 0, TRUE);
                 damage = (float)(10 * waterlevel);
             }
@@ -1452,15 +1376,9 @@ void PF_WaterMove() {
     if (!(flags & FL_INWATER)) {
 
         // player enter water sound
-        if (watertype == CONTENT_LAVA)
-            //			sound (self, CHAN_BODY, "player/inlava.wav", 1, ATTN_NORM);
-            SV_StartSound(self, CHAN_BODY, "player/inlava.wav", 255, ATTN_NORM);
-        if (watertype == CONTENT_WATER)
-            //			sound (self, CHAN_BODY, "player/inh2o.wav", 1, ATTN_NORM);
-            SV_StartSound(self, CHAN_BODY, "player/inh2o.wav", 255, ATTN_NORM);
-        if (watertype == CONTENT_SLIME)
-            //			sound (self, CHAN_BODY, "player/slimbrn2.wav", 1, ATTN_NORM);
-            SV_StartSound(self, CHAN_BODY, "player/slimbrn2.wav", 255, ATTN_NORM);
+        if (watertype == CONTENT_LAVA)  SV_StartSound(self, CHAN_BODY, "player/inlava.wav", 255, ATTN_NORM);
+        if (watertype == CONTENT_WATER) SV_StartSound(self, CHAN_BODY, "player/inh2o.wav", 255, ATTN_NORM);
+        if (watertype == CONTENT_SLIME) SV_StartSound(self, CHAN_BODY, "player/slimbrn2.wav", 255, ATTN_NORM);
 
         self->v.flags = (float)(flags | FL_INWATER);
         self->v.dmgtime = 0;

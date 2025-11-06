@@ -139,7 +139,6 @@ typedef enum {
     OP_BITOR,
     OP_LAST     // Should be last
 } prog_operation_e;
-extern cString pr_opnames[OP_LAST];
 
 typedef uint16_t op_type;
 typedef int16_t arg_type;

@@ -866,7 +866,7 @@ void SV_WalkMove(edict_p ent) {
     vec3_t oldorg;  VectorCopy(ent->v.origin, oldorg);
     vec3_t oldvel;  VectorCopy(ent->v.velocity, oldvel);
 
-    trace_t  steptrace;
+    trace_t steptrace;
 
     if (
         !(SV_FlyMove(ent, host_frametime, &steptrace) & MOVECLIP_WALL) ||   // move didn't block on a step

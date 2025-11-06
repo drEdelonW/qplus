@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 //
 // per-level limits
 //
@@ -18,8 +16,3 @@
 
 #define SAVEGAME_COMMENT_LENGTH 39
 
-
-
-
-#include <stdbool.h>
-extern bool noclip_anglehack;

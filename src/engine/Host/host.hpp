@@ -44,4 +44,3 @@ public:
 };
 
 extern Host host;
-extern bool noclip_anglehack;
