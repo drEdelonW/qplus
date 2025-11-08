@@ -860,9 +860,9 @@ void GL_ResampleTexture(unsigned* in, int inwidth, int inheight, unsigned* out, 
 GL_Resample8BitTexture -- JACK
 ================
 */
-void GL_Resample8BitTexture(unsigned char* in, int inwidth, int inheight, unsigned char* out, int outwidth, int outheight) {
+void GL_Resample8BitTexture(uint8_p in, int inwidth, int inheight, uint8_p out, int outwidth, int outheight) {
     int  i, j;
-    unsigned char* inrow;
+    uint8_p inrow;
     unsigned frac, fracstep;
 
     fracstep = inwidth * 0x10000 / outwidth;

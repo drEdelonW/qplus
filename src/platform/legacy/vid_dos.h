@@ -20,10 +20,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // vid_dos.h: header file for DOS-specific video stuff
 
-typedef struct vmode_s {
-    struct vmode_s* pnext;
-    cString name;
-    cString header;
+typedef struct vmode_s vmode_t;
+typedef vmode_t* vmode_s;
+struct vmode_s {
+    vmode_p     pnext;
+    cString     name;
+    cString     header;
     unsigned	width;
     unsigned	height;
     float		aspect;
@@ -31,17 +33,12 @@ typedef struct vmode_s {
     int			planar;
     int			numpages;
     TypeLess_ptr pextradata;
-    int			(*setmode)(VidDef_p vid, struct vmode_s* pcurrentmode);
-    void		(*swapbuffers)(VidDef_p vid, struct vmode_s* pcurrentmode,
-        vRect_p rects);
-    void		(*setpalette)(VidDef_p vid, struct vmode_s* pcurrentmode,
-        uint8_p palette);
-    void		(*begindirectrect)(VidDef_p vid, struct vmode_s* pcurrentmode,
-        int x, int y, uint8_p pbitmap, int width,
-        int height);
-    void		(*enddirectrect)(VidDef_p vid, struct vmode_s* pcurrentmode,
-        int x, int y, int width, int height);
-} vmode_t;
+    int			(*setmode)(VidDef_p vid, vmode_p pcurrentmode);
+    void		(*swapbuffers)(VidDef_p vid, vmode_p pcurrentmode, vRect_p rects);
+    void		(*setpalette)(VidDef_p vid, vmode_p pcurrentmode, uint8_p palette);
+    void		(*begindirectrect)(VidDef_p vid, vmode_p pcurrentmode, int x, int y, uint8_p pbitmap, int width, int height);
+    void		(*enddirectrect)(VidDef_p vid, vmode_p pcurrentmode, int x, int y, int width, int height);
+};
 typrdef vmode_t* vmode_p;
 
 // vid_wait settings
@@ -74,7 +71,7 @@ void VGA_SetPalette(VidDef_p vid, vmode_p pcurrentmode, uint8_p pal);
 void VGA_SwapBuffersCopy(VidDef_p vid, vmode_p pcurrentmode, vRect_p rects);
 bool VGA_FreeAndAllocVidbuffer(VidDef_p vid, int allocnewbuffer);
 bool VGA_CheckAdequateMem(int width, int height, int rowbytes, int allocnewbuffer);
-void VGA_BeginDirectRect(VidDef_p vid, struct vmode_s* pcurrentmode, int x, int y, uint8_p pbitmap, int width, int height);
-void VGA_EndDirectRect(VidDef_p vid, struct vmode_s* pcurrentmode, int x, int y, int width, int height);
+void VGA_BeginDirectRect(VidDef_p vid, vmode_p pcurrentmode, int x, int y, uint8_p pbitmap, int width, int height);
+void VGA_EndDirectRect(VidDef_p vid, vmode_p pcurrentmode, int x, int y, int width, int height);
 void VGA_UpdateLinearScreen(TypeLess_ptr srcptr, TypeLess_ptr destptr, int width, int height, int srcrowbytes, int destrowbytes);
 

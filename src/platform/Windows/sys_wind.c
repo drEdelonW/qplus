@@ -201,7 +201,7 @@ main
 
 ==================
 */
-char* newargv[256];
+cString newargv[256];
 
 int main(int argc, cStringArray argv) {
     MSG        msg;

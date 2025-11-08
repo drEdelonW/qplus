@@ -53,4 +53,4 @@ private:
     bool        _badRead; // set if a read goes beyond end of message
 };
 
-extern NetMsg MSG;
+extern NetMsg nMSG;

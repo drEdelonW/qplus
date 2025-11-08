@@ -197,11 +197,11 @@ void InitSig(void) {
     signal(SIGTERM, signal_handler);
 }
 
-void VID_ShiftPalette(unsigned char* p) {
+void VID_ShiftPalette(uint8_p p) {
     //	VID_SetPalette(p);
 }
 
-void	VID_SetPalette(unsigned char* palette) {
+void	VID_SetPalette(uint8_p palette) {
     byte* pal;
     unsigned r, g, b;
     unsigned v;
@@ -241,7 +241,7 @@ void	VID_SetPalette(unsigned char* palette) {
         r = ((i & 0x1F) << 3) + 4;
         g = ((i & 0x03E0) >> 2) + 4;
         b = ((i & 0x7C00) >> 7) + 4;
-        pal = (unsigned char*)d_8to24table;
+        pal = (uint8_p)d_8to24table;
         for (v = 0, k = 0, bestdist = 10000 * 10000; v < 256; v++, pal += 4) {
             r1 = (int)r - (int)pal[0];
             g1 = (int)g - (int)pal[1];
@@ -556,7 +556,7 @@ void VID_Init8bitPalette(void) {
     dlclose(prjobj);
 }
 
-static void Check_Gamma(unsigned char* pal) {
+static void Check_Gamma(uint8_p pal) {
     float	f, inf;
     unsigned char	palette[768];
     int		i;
@@ -584,7 +584,7 @@ static void Check_Gamma(unsigned char* pal) {
     memcpy(pal, palette, sizeof(palette));
 }
 
-void VID_Init(unsigned char* palette) {
+void VID_Init(uint8_p palette) {
     int i;
     GLint attribs[32];
     char	gldir[MAX_OSPATH];
@@ -693,7 +693,7 @@ void mousehandler(int buttonstate, int dx, int dy) {
 void IN_Init(void) {
 
     int mtype;
-    char* mousedev;
+    cString mousedev;
     int mouserate;
 
     if (UseMouse) {

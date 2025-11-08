@@ -420,7 +420,7 @@ VID_ExtraGetModeInfo
 ================
 */
 bool VID_ExtraGetModeInfo(int modenum) {
-    cString infobuf;
+    char* infobuf;
     int		numimagepages;
 
     infobuf = dos_getmemory(256);

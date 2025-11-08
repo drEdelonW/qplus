@@ -70,7 +70,7 @@ bool		scr_skipupdate;
 
 static vmode_t	modelist[MAX_MODE_LIST];
 static int		nummodes;
-static vmode_t* pcurrentmode;
+static vmode_p pcurrentmode;
 static vmode_t	badmode;
 
 static DEVMODE	gdevmode;
@@ -120,7 +120,7 @@ void VID_MenuKey(int key);
 
 LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void AppActivate(BOOL fActive, BOOL minimize);
-char* VID_GetModeDescription(int mode);
+cString VID_GetModeDescription(int mode);
 void ClearAllStates(void);
 void VID_UpdateWindowStatus(void);
 void GL_Init(void);
@@ -357,7 +357,7 @@ bool VID_SetFullDIBMode(int modenum) {
 }
 
 
-int VID_SetMode(int modenum, unsigned char* palette) {
+int VID_SetMode(int modenum, uint8_p palette) {
     int				original_mode, temp;
     bool		stat;
     MSG				msg;
@@ -477,13 +477,13 @@ BINDTEXFUNCPTR bindTexFunc;
 
 
 void CheckTextureExtensions(void) {
-    char* tmp;
+    cString tmp;
     bool	texture_ext;
     HINSTANCE	hInstGL;
 
     texture_ext = FALSE;
     /* check for texture extension */
-    tmp = (unsigned char*)glGetString(GL_EXTENSIONS);
+    tmp = (uint8_p)glGetString(GL_EXTENSIONS);
     while (*tmp) {
         if (strncmp((cStringRO)tmp, TEXTURE_EXT_STRING, strlen(TEXTURE_EXT_STRING)) == 0)
             texture_ext = TRUE;
@@ -512,10 +512,10 @@ void CheckTextureExtensions(void) {
 }
 
 void CheckArrayExtensions(void) {
-    char* tmp;
+    cString tmp;
 
     /* check for texture extension */
-    tmp = (unsigned char*)glGetString(GL_EXTENSIONS);
+    tmp = (uint8_p)glGetString(GL_EXTENSIONS);
     while (*tmp) {
         if (strncmp((cStringRO)tmp, "GL_EXT_vertex_array", strlen("GL_EXT_vertex_array")) == 0) {
             if (
@@ -664,7 +664,7 @@ void GL_EndRendering(void) {
         Sbar_Changed();
 }
 
-void	VID_SetPalette(unsigned char* palette) {
+void	VID_SetPalette(uint8_p palette) {
     byte* pal;
     unsigned r, g, b;
     unsigned v;
@@ -707,7 +707,7 @@ void	VID_SetPalette(unsigned char* palette) {
         r = ((i & 0x1F) << 3) + 4;
         g = ((i & 0x03E0) >> 2) + 4;
         b = ((i & 0x7C00) >> 7) + 4;
-        pal = (unsigned char*)d_8to24table;
+        pal = (uint8_p)d_8to24table;
         for (v = 0, k = 0, l = 10000 * 10000; v < 256; v++, pal += 4) {
             r1 = r - pal[0];
             g1 = g - pal[1];
@@ -724,7 +724,7 @@ void	VID_SetPalette(unsigned char* palette) {
 
 BOOL	gammaworks;
 
-void	VID_ShiftPalette(unsigned char* palette) {
+void	VID_ShiftPalette(uint8_p palette) {
 
     //	VID_SetPalette (palette);
 
@@ -1094,7 +1094,7 @@ int VID_NumModes(void) {
 VID_GetModePtr
 =================
 */
-vmode_t* VID_GetModePtr(int modenum) {
+vmode_p VID_GetModePtr(int modenum) {
 
     if ((modenum >= 0) && (modenum < nummodes))
         return &modelist[modenum];
@@ -1108,9 +1108,9 @@ vmode_t* VID_GetModePtr(int modenum) {
 VID_GetModeDescription
 =================
 */
-char* VID_GetModeDescription(int mode) {
-    char* pinfo;
-    vmode_t* pv;
+cString VID_GetModeDescription(int mode) {
+    cString pinfo;
+    vmode_p pv;
     static char	temp[100];
 
     if ((mode < 0) || (mode >= nummodes))
@@ -1133,9 +1133,9 @@ char* VID_GetModeDescription(int mode) {
 
 // KJB: Added this to return the mode driver name in description for console
 
-char* VID_GetExtModeDescription(int mode) {
+cString VID_GetExtModeDescription(int mode) {
     static char	pinfo[40];
-    vmode_t* pv;
+    vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
         return NULL;
@@ -1212,8 +1212,8 @@ VID_DescribeModes_f
 */
 void VID_DescribeModes_f(void) {
     int			i, lnummodes, t;
-    char* pinfo;
-    vmode_t* pv;
+    cString pinfo;
+    vmode_p pv;
 
     lnummodes = VID_NumModes();
 
@@ -1421,7 +1421,8 @@ void VID_Init8bitPalette() {
     // Check for 8bit Extensions and initialize them.
     int i;
     char thePalette[256 * 3];
-    char* oldPalette, * newPalette;
+    char* oldPalette;
+    char* newPalette;
 
     glColorTableEXT = (TypeLess_ptr)wglGetProcAddress("glColorTableEXT");
     if (!glColorTableEXT || strstr(gl_extensions, "GL_EXT_shared_texture_palette") ||
@@ -1443,7 +1444,7 @@ void VID_Init8bitPalette() {
     is8bit = TRUE;
 }
 
-static void Check_Gamma(unsigned char* pal) {
+static void Check_Gamma(uint8_p pal) {
     float	f, inf;
     unsigned char	palette[768];
     int		i;
@@ -1476,7 +1477,7 @@ static void Check_Gamma(unsigned char* pal) {
 VID_Init
 ===================
 */
-void	VID_Init(unsigned char* palette) {
+void	VID_Init(uint8_p palette) {
     int		i, existingmode;
     int		basenummodes, width, height, bpp, findbpp, done;
     byte* ptmp;
@@ -1716,10 +1717,9 @@ void	VID_Init(unsigned char* palette) {
 
 static int	vid_line, vid_wmodes;
 
-typedef struct
-{
+typedef struct {
     int		modenum;
-    char* desc;
+    cString desc;
     int		iscur;
 } modedesc_t;
 
@@ -1735,11 +1735,11 @@ VID_MenuDraw
 ================
 */
 void VID_MenuDraw(void) {
-    qPic_t* p;
-    char* ptr;
+    qPic_p p;
+    cString ptr;
     int			lnummodes, i, j, k, column, row, dup, dupmode;
     char		temp[100];
-    vmode_t* pv;
+    vmode_p pv;
 
     p = Draw_CachePic("gfx/vidmodes.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);

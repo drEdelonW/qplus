@@ -967,8 +967,8 @@ void VID_CheckModedescFixup(int mode) {
 VID_GetModeDescriptionMemCheck
 =================
 */
-char* VID_GetModeDescriptionMemCheck(int mode) {
-    char* pinfo;
+cString VID_GetModeDescriptionMemCheck(int mode) {
+    cString pinfo;
     vmode_t* pv;
 
     if ((mode < 0) || (mode >= nummodes))
@@ -993,8 +993,8 @@ char* VID_GetModeDescriptionMemCheck(int mode) {
 VID_GetModeDescription
 =================
 */
-char* VID_GetModeDescription(int mode) {
-    char* pinfo;
+cString VID_GetModeDescription(int mode) {
+    cString pinfo;
     vmode_t* pv;
 
     if ((mode < 0) || (mode >= nummodes))
@@ -1015,7 +1015,7 @@ VID_GetModeDescription2
 Tacks on "windowed" or "fullscreen"
 =================
 */
-char* VID_GetModeDescription2(int mode) {
+cString VID_GetModeDescription2(int mode) {
     static char	pinfo[40];
     vmode_t* pv;
 
@@ -1042,7 +1042,7 @@ char* VID_GetModeDescription2(int mode) {
 
 // KJB: Added this to return the mode driver name in description for console
 
-char* VID_GetExtModeDescription(int mode) {
+cString VID_GetExtModeDescription(int mode) {
     static char	pinfo[40];
     vmode_t* pv;
 
@@ -1443,7 +1443,7 @@ void VID_SetDefaultMode(void) {
 }
 
 
-int VID_SetMode(int modenum, unsigned char* palette) {
+int VID_SetMode(int modenum, uint8_p palette) {
     int				original_mode, temp;//, dummy;
     bool		stat;
     MSG				msg;
@@ -1670,7 +1670,7 @@ void VID_ForceLockState(int lk) {
 }
 
 
-void	VID_SetPalette(unsigned char* palette) {
+void	VID_SetPalette(uint8_p palette) {
     INT			i;
     palette_t	pal[256];
     HDC			hdc;
@@ -1731,7 +1731,7 @@ void	VID_SetPalette(unsigned char* palette) {
 }
 
 
-void	VID_ShiftPalette(unsigned char* palette) {
+void	VID_ShiftPalette(uint8_p palette) {
     VID_SetPalette(palette);
 }
 
@@ -1781,7 +1781,7 @@ VID_DescribeModes_f
 */
 void VID_DescribeModes_f(void) {
     int			i, lnummodes;
-    char* pinfo;
+    cString pinfo;
     bool	na;
     vmode_t* pv;
 
@@ -1887,7 +1887,7 @@ void VID_ForceMode_f(void) {
 }
 
 
-void	VID_Init(unsigned char* palette) {
+void	VID_Init(uint8_p palette) {
     int		i, bestmatch, bestmatchmetric, t, dr, dg, db;
     int		basenummodes;
     byte* ptmp;
@@ -2786,7 +2786,7 @@ static int	vid_line, vid_wmodes;
 typedef struct
 {
     int		modenum;
-    char* desc;
+    cString desc;
     int		iscur;
     int		ismode13;
     int		width;
@@ -2804,8 +2804,8 @@ VID_MenuDraw
 ================
 */
 void VID_MenuDraw(void) {
-    qPic_t* p;
-    char* ptr;
+    qPic_p p;
+    cString ptr;
     int			lnummodes, i, j, k, column, row, dup, dupmode;
     char		temp[100];
     vmode_t* pv;

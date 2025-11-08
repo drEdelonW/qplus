@@ -92,9 +92,9 @@ cvar_t		gl_triplebuffer = { "gl_triplebuffer", "1", true };
 
 bool	scr_initialized;		// ready to draw
 
-qPic_t* scr_ram;
-qPic_t* scr_net;
-qPic_t* scr_turtle;
+qPic_p scr_ram;
+qPic_p scr_net;
+qPic_p scr_turtle;
 
 int			scr_fullupdate;
 
@@ -440,7 +440,7 @@ DrawPause
 ==============
 */
 void SCR_DrawPause(void) {
-	qPic_t* pic;
+	qPic_p pic;
 
 	if (!scr_showpause.value)		// turn off for screenshots
 		return;
@@ -461,7 +461,7 @@ SCR_DrawLoading
 ==============
 */
 void SCR_DrawLoading(void) {
-	qPic_t* pic;
+	qPic_p pic;
 
 	if (!scr_drawloading)
 		return;

@@ -607,7 +607,7 @@ void LoadTGA(FILE* fin) {
 R_LoadSkys
 ==================
 */
-char* suf[6] = { "rt", "bk", "lf", "ft", "up", "dn" };
+cString suf[6] = { "rt", "bk", "lf", "ft", "up", "dn" };
 void R_LoadSkys(void) {
     int  i;
     FILE* f;

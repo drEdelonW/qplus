@@ -43,7 +43,7 @@ void Sys_Printf(cStringRO fmt, ...) {
 }
 #elif 0
 void Sys_Printf(cStringRO fmt, ...) {
-    char* t_p;
+    cString t_p;
     int l, r;
 
     if (nostdout)

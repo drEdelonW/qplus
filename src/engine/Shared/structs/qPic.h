@@ -12,7 +12,9 @@ typedef qPic_t* qPic_p;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
     void SwapPic(qPic_p pic);
+
 #ifdef __cplusplus
 }
 #endif

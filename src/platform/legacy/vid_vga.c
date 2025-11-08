@@ -57,7 +57,7 @@ static uint8_t	backingbuf[48 * 24];
 VGA_BeginDirectRect
 ================
 */
-void VGA_BeginDirectRect(VidDef_p lvid, struct vmode_s* pcurrentmode, int x,
+void VGA_BeginDirectRect(VidDef_p lvid, vmode_p pcurrentmode, int x,
 	int y, uint8_p pbitmap, int width, int height) {
 	int		i, j, k, plane, reps, repshift;
 
@@ -117,7 +117,7 @@ void VGA_BeginDirectRect(VidDef_p lvid, struct vmode_s* pcurrentmode, int x,
 VGA_EndDirectRect
 ================
 */
-void VGA_EndDirectRect(VidDef_p lvid, struct vmode_s* pcurrentmode, int x,
+void VGA_EndDirectRect(VidDef_p lvid, vmode_p pcurrentmode, int x,
 	int y, int width, int height) {
 	int		i, j, k, plane, reps, repshift;
 

@@ -4,9 +4,9 @@
 #include "endian_tools.h"
 
 
-// NetMsg MSG(&net_message);
-NetMsg MSG;
-// NetMsg MSG(&cls.message);
+// NetMsg nMSG(&net_message);
+NetMsg nMSG;
+// NetMsg nMSG(&cls.message);
 /*
 ==============================================================================
 
