@@ -40,9 +40,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static fxMesaContext fc = NULL;
 #define stringify(m) { #m, m }
 
-unsigned short	d_8to16table[256];
-unsigned	d_8to24table[256];
-unsigned char d_15to8table[65536];
+uint16_t	d_8to16table[256];
+uint32_t	d_8to24table[256];
+uint8_t d_15to8table[65536];
 
 int num_shades = 32;
 
@@ -60,7 +60,7 @@ struct
     stringify(MOUSE_PS2),
 };
 
-static unsigned char scantokey[128];
+static uint8_t scantokey[128];
 
 int num_mice = sizeof(mice) / sizeof(mice[0]);
 
@@ -76,13 +76,12 @@ cvar_t		vid_mode = { "vid_mode","5",false };
 cvar_t		vid_redrawfull = { "vid_redrawfull","0",false };
 cvar_t		vid_waitforrefresh = { "vid_waitforrefresh","0",true };
 
-char* framebuffer_ptr;
+int8_p framebuffer_ptr;
 
-cvar_t  mouse_button_commands[3] =
-{
-    {"mouse1","+attack"},
-    {"mouse2","+strafe"},
-    {"mouse3","+forward"},
+cvar_t  mouse_button_commands[3] = {
+    {"mouse1", "+attack"},
+    {"mouse2", "+strafe"},
+    {"mouse3", "+forward"},
 };
 
 int     mouse_buttons;
@@ -203,12 +202,12 @@ void VID_ShiftPalette(uint8_p p) {
 
 void	VID_SetPalette(uint8_p palette) {
     byte* pal;
-    unsigned r, g, b;
-    unsigned v;
+    uint32_t r, g, b;
+    uint32_t v;
     int     r1, g1, b1;
     int		j, k, l, m;
-    unsigned short i;
-    unsigned* table;
+    uint16_t i;
+    uint32_p table;
     FILE* f;
     char s[255];
     int dist, bestdist;
@@ -517,11 +516,11 @@ void VID_Init8bitPalette(void) {
     if (strstr(gl_extensions, "3DFX_set_global_palette") &&
         (qgl3DfxSetPaletteEXT = dlsym(prjobj, "gl3DfxSetPaletteEXT")) != NULL) {
         GLubyte table[256][4];
-        char* oldpal;
+        int8_p oldpal;
 
         Con_SafePrintf("... Using 3DFX_set_global_palette\n");
         glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
-        oldpal = (char*)d_8to24table; //d_8to24table3dfx;
+        oldpal = (int8_p)d_8to24table; //d_8to24table3dfx;
         for (i = 0;i < 256;i++) {
             table[i][2] = *oldpal++;
             table[i][1] = *oldpal++;
@@ -536,11 +535,12 @@ void VID_Init8bitPalette(void) {
     else if (strstr(gl_extensions, "GL_EXT_shared_texture_palette") &&
         (qglColorTableEXT = dlsym(prjobj, "glColorTableEXT")) != NULL) {
         char thePalette[256 * 3];
-        char* oldPalette, * newPalette;
+        int8_p oldPalette;
+        int8_p newPalette;
 
         Con_SafePrintf("... Using GL_EXT_shared_texture_palette\n");
         glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
-        oldPalette = (char*)d_8to24table; //d_8to24table3dfx;
+        oldPalette = (int8_p)d_8to24table; //d_8to24table3dfx;
         newPalette = thePalette;
         for (i = 0;i < 256;i++) {
             *newPalette++ = *oldPalette++;
@@ -558,7 +558,7 @@ void VID_Init8bitPalette(void) {
 
 static void Check_Gamma(uint8_p pal) {
     float	f, inf;
-    unsigned char	palette[768];
+    uint8_t	palette[768];
     int		i;
 
     if ((i = COM_CheckParm("-gamma")) == 0) {

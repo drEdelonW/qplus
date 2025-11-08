@@ -227,7 +227,7 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
 	int			i;
 	mTexInfo_t* tex;
 	byte* lightmap;
-	unsigned	scale;
+	uint32_t	scale;
 	int			maps;
 
 	if (node->contents < 0)

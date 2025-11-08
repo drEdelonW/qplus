@@ -112,10 +112,10 @@ void WINS_GetLocalAddress() {
 	addr = ntohl(myAddr);
 	// sprintf(my_tcpip_address, "%d.%d.%d.%d", (addr >> 24) & 0xff, (addr >> 16) & 0xff, (addr >> 8) & 0xff, addr & 0xff);
 	sprintf(my_tcpip_address, "%u.%u.%u.%u",
-		(unsigned)(addr >> 24) & 0xff,
-		(unsigned)(addr >> 16) & 0xff,
-		(unsigned)(addr >> 8) & 0xff,
-		(unsigned)addr & 0xff);
+		(uint32_t)(addr >> 24) & 0xff,
+		(uint32_t)(addr >> 16) & 0xff,
+		(uint32_t)(addr >> 8) & 0xff,
+		(uint32_t)addr & 0xff);
 }
 
 
@@ -228,7 +228,7 @@ int WINS_Init(void) {
 
 	((struct sockaddr_in*)&broadcastaddr)->sin_family = AF_INET;
 	((struct sockaddr_in*)&broadcastaddr)->sin_addr.s_addr = INADDR_BROADCAST;
-	((struct sockaddr_in*)&broadcastaddr)->sin_port = htons((unsigned short)net_hostport);
+	((struct sockaddr_in*)&broadcastaddr)->sin_port = htons((uint16_t)net_hostport);
 
 	Con_Printf("Winsock TCP/IP Initialized\n");
 	tcpipAvailable = true;
@@ -280,7 +280,7 @@ int WINS_OpenSocket(int port) {
 
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = myAddr;
-	address.sin_port = htons((unsigned short)port);
+	address.sin_port = htons((uint16_t)port);
 	if (bind(newsocket, (void*)&address, sizeof(address)) == 0)
 		return newsocket;
 
@@ -348,7 +348,7 @@ static int PartialIPAddress(cString in, struct qsockaddr* hostaddr) {
 		port = net_hostport;
 
 	hostaddr->sa_family = AF_INET;
-	((struct sockaddr_in*)hostaddr)->sin_port = htons((short)port);
+	((struct sockaddr_in*)hostaddr)->sin_port = htons((int16_t)port);
 	((struct sockaddr_in*)hostaddr)->sin_addr.s_addr = (myAddr & htonl(mask)) | htonl(addr);
 
 	return 0;
@@ -457,7 +457,7 @@ int WINS_StringToAddr(cString string, struct qsockaddr* addr) {
 
 	addr->sa_family = AF_INET;
 	((struct sockaddr_in*)addr)->sin_addr.s_addr = htonl(ipaddr);
-	((struct sockaddr_in*)addr)->sin_port = htons((unsigned short)hp);
+	((struct sockaddr_in*)addr)->sin_port = htons((uint16_t)hp);
 	return 0;
 }
 
@@ -465,7 +465,7 @@ int WINS_StringToAddr(cString string, struct qsockaddr* addr) {
 
 int WINS_GetSocketAddr(int socket, struct qsockaddr* addr) {
 	int addrlen = sizeof(struct qsockaddr);
-	unsigned int a;
+	uint32_t a;
 
 	Q_memset(addr, 0, sizeof(struct qsockaddr));
 	pgetsockname(socket, (struct sockaddr*)addr, &addrlen);
@@ -481,7 +481,7 @@ int WINS_GetSocketAddr(int socket, struct qsockaddr* addr) {
 int WINS_GetNameFromAddr(struct qsockaddr* addr, cString name) {
 	struct hostent* hostentry;
 
-	hostentry = pgethostbyaddr((char*)&((struct sockaddr_in*)addr)->sin_addr, sizeof(struct in_addr), AF_INET);
+	hostentry = pgethostbyaddr((int8_p)&((struct sockaddr_in*)addr)->sin_addr, sizeof(struct in_addr), AF_INET);
 	if (hostentry) {
 		Q_strncpy(name, (cString)hostentry->h_name, NET_NAMELEN - 1);
 		return 0;
@@ -504,7 +504,7 @@ int WINS_GetAddrFromName(cString name, struct qsockaddr* addr) {
 		return -1;
 
 	addr->sa_family = AF_INET;
-	((struct sockaddr_in*)addr)->sin_port = htons((unsigned short)net_hostport);
+	((struct sockaddr_in*)addr)->sin_port = htons((uint16_t)net_hostport);
 	((struct sockaddr_in*)addr)->sin_addr.s_addr = *(int*)hostentry->h_addr_list[0];
 
 	return 0;
@@ -533,7 +533,7 @@ int WINS_GetSocketPort(struct qsockaddr* addr) {
 
 
 int WINS_SetSocketPort(struct qsockaddr* addr, int port) {
-	((struct sockaddr_in*)addr)->sin_port = htons((unsigned short)port);
+	((struct sockaddr_in*)addr)->sin_port = htons((uint16_t)port);
 	return 0;
 }
 

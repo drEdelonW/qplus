@@ -642,11 +642,11 @@ void Key_Event(keycode_t Key, bool down) {
         }
 
         if (_keyshift[Key] != Key) {
-            if ((unsigned)Key < MAX_KEYS
+            if ((uint32_t)Key < MAX_KEYS
                 ) {
                 keycode_t sh = _keyshift[Key];
-                if ((unsigned)sh < MAX_KEYS) {
-                    kb = keyBindings[(unsigned)sh];
+                if ((uint32_t)sh < MAX_KEYS) {
+                    kb = keyBindings[(uint32_t)sh];
                 }
                 else { kb = NULL; }
             }

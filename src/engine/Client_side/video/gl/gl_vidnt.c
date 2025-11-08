@@ -91,7 +91,7 @@ int			vid_modenum = NO_MODE;
 int			vid_realmode;
 int			vid_default = MODE_WINDOWED;
 static int	windowed_default;
-unsigned char	vid_curpal[256 * 3];
+uint8_t	vid_curpal[256 * 3];
 static bool fullsbardraw = false;
 
 static float vid_gamma = 1.0;
@@ -107,9 +107,9 @@ HWND WINAPI InitializeWindow(HINSTANCE hInstance, int nCmdShow);
 
 VidDef_t	vid;				// global video state
 
-unsigned short	d_8to16table[256];
-unsigned	d_8to24table[256];
-unsigned char d_15to8table[65536];
+uint16_t	d_8to16table[256];
+uint32_t	d_8to24table[256];
+uint8_t d_15to8table[65536];
 
 float		gldepthmin, gldepthmax;
 
@@ -666,12 +666,12 @@ void GL_EndRendering(void) {
 
 void	VID_SetPalette(uint8_p palette) {
     byte* pal;
-    unsigned r, g, b;
-    unsigned v;
+    uint32_t r, g, b;
+    uint32_t v;
     int     r1, g1, b1;
     int		j, k, l, m;
-    unsigned short i;
-    unsigned* table;
+    uint16_t i;
+    uint32_p table;
     FILE* f;
     char s[255];
     HWND hDlg, hProgress;
@@ -1024,7 +1024,7 @@ LONG WINAPI MainWndProc(
         // Its delta is either positive or neg, and we generate the proper
         // Event.
     case WM_MOUSEWHEEL:
-        if ((short)HIWORD(wParam) > 0) {
+        if ((int16_t)HIWORD(wParam) > 0) {
             Key_Event(K_MWHEELUP, true);
             Key_Event(K_MWHEELUP, false);
         }
@@ -1421,8 +1421,8 @@ void VID_Init8bitPalette() {
     // Check for 8bit Extensions and initialize them.
     int i;
     char thePalette[256 * 3];
-    char* oldPalette;
-    char* newPalette;
+    int8_p oldPalette;
+    int8_p newPalette;
 
     glColorTableEXT = (TypeLess_ptr)wglGetProcAddress("glColorTableEXT");
     if (!glColorTableEXT || strstr(gl_extensions, "GL_EXT_shared_texture_palette") ||
@@ -1431,7 +1431,7 @@ void VID_Init8bitPalette() {
 
     Con_SafePrintf("8-bit GL extensions enabled.\n");
     glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
-    oldPalette = (char*)d_8to24table; //d_8to24table3dfx;
+    oldPalette = (int8_p)d_8to24table; //d_8to24table3dfx;
     newPalette = thePalette;
     for (i = 0;i < 256;i++) {
         *newPalette++ = *oldPalette++;
@@ -1446,7 +1446,7 @@ void VID_Init8bitPalette() {
 
 static void Check_Gamma(uint8_p pal) {
     float	f, inf;
-    unsigned char	palette[768];
+    uint8_t	palette[768];
     int		i;
 
     if ((i = COM_CheckParm("-gamma")) == 0) {

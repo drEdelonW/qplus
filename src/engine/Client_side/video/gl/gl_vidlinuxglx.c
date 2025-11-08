@@ -49,9 +49,9 @@ static GLXContext ctx = NULL;
 #define X_MASK (KEY_MASK | MOUSE_MASK | VisibilityChangeMask | StructureNotifyMask )
 
 
-unsigned short	d_8to16table[256];
-unsigned		d_8to24table[256];
-unsigned char	d_15to8table[65536];
+uint16_t	d_8to16table[256];
+uint32_t		d_8to24table[256];
+uint8_t	d_15to8table[65536];
 
 cvar_t	vid_mode = { "vid_mode","0",false };
 
@@ -471,12 +471,12 @@ void VID_ShiftPalette(uint8_p p) {
 
 void	VID_SetPalette(uint8_p palette) {
     byte* pal;
-    unsigned r, g, b;
-    unsigned v;
+    uint32_t r, g, b;
+    uint32_t v;
     int     r1, g1, b1;
     int		j, k, l, m;
-    unsigned short i;
-    unsigned* table;
+    uint16_t i;
+    uint32_p table;
     FILE* f;
     char s[255];
     int dist, bestdist;
@@ -629,11 +629,11 @@ void VID_Init8bitPalette(void) {
     if (strstr(gl_extensions, "3DFX_set_global_palette") &&
         (qgl3DfxSetPaletteEXT = dlsym(prjobj, "gl3DfxSetPaletteEXT")) != NULL) {
         GLubyte table[256][4];
-        char* oldpal;
+        int8_p oldpal;
 
         Con_SafePrintf("8-bit GL extensions enabled.\n");
         glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
-        oldpal = (char*)d_8to24table; //d_8to24table3dfx;
+        oldpal = (int8_p)d_8to24table; //d_8to24table3dfx;
         for (i = 0;i < 256;i++) {
             table[i][2] = *oldpal++;
             table[i][1] = *oldpal++;
@@ -648,11 +648,11 @@ void VID_Init8bitPalette(void) {
     else if (strstr(gl_extensions, "GL_EXT_shared_texture_palette") &&
         (qglColorTableEXT = dlsym(prjobj, "glColorTableEXT")) != NULL) {
         char thePalette[256 * 3];
-        char* oldPalette, * newPalette;
+        int8_p oldPalette, * newPalette;
 
         Con_SafePrintf("8-bit GL extensions enabled.\n");
         glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
-        oldPalette = (char*)d_8to24table; //d_8to24table3dfx;
+        oldPalette = (int8_p)d_8to24table; //d_8to24table3dfx;
         newPalette = thePalette;
         for (i = 0;i < 256;i++) {
             *newPalette++ = *oldPalette++;
@@ -669,7 +669,7 @@ void VID_Init8bitPalette(void) {
 
 static void Check_Gamma(uint8_p pal) {
     float	f, inf;
-    unsigned char	palette[768];
+    uint8_t	palette[768];
     int		i;
 
     if ((i = COM_CheckParm("-gamma")) == 0) {

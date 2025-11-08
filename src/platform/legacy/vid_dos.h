@@ -26,10 +26,10 @@ struct vmode_s {
     vmode_p     pnext;
     cString     name;
     cString     header;
-    unsigned	width;
-    unsigned	height;
+    uint32_t	width;
+    uint32_t	height;
     float		aspect;
-    unsigned	rowbytes;
+    uint32_t	rowbytes;
     int			planar;
     int			numpages;
     TypeLess_ptr pextradata;

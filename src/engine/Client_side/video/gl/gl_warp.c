@@ -333,15 +333,15 @@ typedef struct
     char version;
     char encoding;
     char bits_per_pixel;
-    unsigned short xmin, ymin, xmax, ymax;
-    unsigned short hres, vres;
-    unsigned char palette[48];
+    uint16_p xmin, ymin, xmax, ymax;
+    uint16_p hres, vres;
+    uint8_t palette[48];
     char reserved;
     char color_planes;
-    unsigned short bytes_per_line;
-    unsigned short palette_type;
+    uint16_p bytes_per_line;
+    uint16_p palette_type;
     char filler[58];
-    unsigned  data;   // unbounded
+    uint32_t  data;   // unbounded
 } pcx_t;
 
 byte* pcx_rgb;
@@ -418,24 +418,24 @@ TARGA LOADING
 */
 
 typedef struct _TargaHeader {
-    unsigned char  id_length, colormap_type, image_type;
-    unsigned short colormap_index, colormap_length;
-    unsigned char colormap_size;
-    unsigned short x_origin, y_origin, width, height;
-    unsigned char pixel_size, attributes;
+    uint8_t  id_length, colormap_type, image_type;
+    uint16_p colormap_index, colormap_length;
+    uint8_t colormap_size;
+    uint16_p x_origin, y_origin, width, height;
+    uint8_t pixel_size, attributes;
 } TargaHeader;
 
 
 TargaHeader  targa_header;
 byte* targa_rgba;
 
-int fgetLittleShort(FILE* f) {
+int16_t fgetLittleShort(FILE* f) {
     byte b1, b2;
 
     b1 = fgetc(f);
     b2 = fgetc(f);
 
-    return (short)(b1 + b2 * 256);
+    return (int16_t)(b1 + b2 * 256);
 }
 
 int fgetLittleLong(FILE* f) {
@@ -495,7 +495,7 @@ void LoadTGA(FILE* fin) {
         for (row = rows - 1; row >= 0; row--) {
             pixbuf = targa_rgba + row * columns * 4;
             for (column = 0; column < columns; column++) {
-                unsigned char red, green, blue, alphabyte;
+                uint8_t red, green, blue, alphabyte;
                 switch (targa_header.pixel_size) {
                 case 24:
 
@@ -522,7 +522,7 @@ void LoadTGA(FILE* fin) {
         }
     }
     else if (targa_header.image_type == 10) {   // Runlength encoded RGB images
-        unsigned char red, green, blue, alphabyte, packetHeader, packetSize, j;
+        uint8_t red, green, blue, alphabyte, packetHeader, packetSize, j;
         for (row = rows - 1; row >= 0; row--) {
             pixbuf = targa_rgba + row * columns * 4;
             for (column = 0; column < columns; ) {
@@ -958,10 +958,10 @@ A sky texture is 256*128, with the right side being a masked overlay
 void R_InitSky(Texture_t* mt) {
     int   i, j, p;
     byte* src;
-    unsigned trans[128 * 128];
-    unsigned transpix;
+    uint32_t trans[128 * 128];
+    uint32_t transpix;
     int   r, g, b;
-    unsigned* rgba;
+    uint32_p rgba;
 
     src = (byte*)mt + mt->offsets[0];
 

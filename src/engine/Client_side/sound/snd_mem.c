@@ -101,7 +101,7 @@ sfxcache_p S_LoadSound(sfx_p s) {
 
     // Con_Printf ("loading %s\n", namebuffer);
 
-    char stackbuf[1 * 1024];  // avoid dirtying the cache heap
+    int8_t stackbuf[1 * 1024];  // avoid dirtying the cache heap
     cString data = (cString)COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
 
     if (!data) {

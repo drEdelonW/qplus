@@ -99,7 +99,7 @@ int WIPX_Init(void) {
     ((struct sockaddr_ipx*)&broadcastaddr)->sa_family = AF_IPX;
     memset(((struct sockaddr_ipx*)&broadcastaddr)->sa_netnum, 0, 4);
     memset(((struct sockaddr_ipx*)&broadcastaddr)->sa_nodenum, 0xff, 6);
-    ((struct sockaddr_ipx*)&broadcastaddr)->sa_socket = htons((unsigned short)net_hostport);
+    ((struct sockaddr_ipx*)&broadcastaddr)->sa_socket = htons((uint16_t)net_hostport);
 
     WIPX_GetSocketAddr(net_controlsocket, &addr);
     Q_strcpy(my_ipx_address, WIPX_AddrToString(&addr));
@@ -161,13 +161,13 @@ int WIPX_OpenSocket(int port) {
     if (pioctlsocket(newsocket, FIONBIO, &_true) == -1)
         goto ErrorReturn;
 
-    if (psetsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (char*)&_true, sizeof(_true)) < 0)
+    if (psetsockopt(newsocket, SOL_SOCKET, SO_BROADCAST, (int8_p)&_true, sizeof(_true)) < 0)
         goto ErrorReturn;
 
     address.sa_family = AF_IPX;
     memset(address.sa_netnum, 0, 4);
     memset(address.sa_nodenum, 0, 6);;
-    address.sa_socket = htons((unsigned short)port);
+    address.sa_socket = htons((uint16_t)port);
     if (bind(newsocket, (void*)&address, sizeof(address)) == 0) {
         ipxsocket[handle] = newsocket;
         sequence[handle] = 0;
@@ -318,7 +318,7 @@ int WIPX_StringToAddr(cString string, struct qsockaddr* addr) {
 #undef DO
 
     sscanf(&string[22], "%u", &val);
-    ((struct sockaddr_ipx*)addr)->sa_socket = htons((unsigned short)val);
+    ((struct sockaddr_ipx*)addr)->sa_socket = htons((uint16_t)val);
 
     return 0;
 }
@@ -328,7 +328,7 @@ int WIPX_StringToAddr(cString string, struct qsockaddr* addr) {
 int WIPX_GetSocketAddr(int handle, struct qsockaddr* addr) {
     int socket = ipxsocket[handle];
     int addrlen = sizeof(struct qsockaddr);
-    // unsigned int a;
+    // uint32_t a;
 
     Q_memset(addr, 0, sizeof(struct qsockaddr));
     if (pgetsockname(socket, (struct sockaddr*)addr, &addrlen) != 0) {
@@ -394,7 +394,7 @@ int WIPX_GetSocketPort(struct qsockaddr* addr) {
 
 
 int WIPX_SetSocketPort(struct qsockaddr* addr, int port) {
-    ((struct sockaddr_ipx*)addr)->sa_socket = htons((unsigned short)port);
+    ((struct sockaddr_ipx*)addr)->sa_socket = htons((uint16_t)port);
     return 0;
 }
 

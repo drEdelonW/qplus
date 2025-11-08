@@ -470,7 +470,7 @@ smoothly scrolled off.
 void Draw_Character(int x, int y, int num) {
     uint8_p dest;
     uint8_p source;
-    unsigned short* pusdest;
+    uint16_p pusdest;
     int    drawline;
     int    row, col;
     float   frow, fcol, size;
@@ -536,7 +536,7 @@ Draw_AlphaPic
 */
 void Draw_AlphaPic(int x, int y, qPic_p pic, float alpha) {
     uint8_p dest, source;
-    unsigned short* pusdest;
+    uint16_p pusdest;
     int    v, u;
     glpic_t* gl;
 
@@ -572,7 +572,7 @@ Draw_Pic
 */
 void Draw_Pic(int x, int y, qPic_p pic) {
     uint8_p dest,  source;
-    unsigned short* pusdest;
+    uint16_p pusdest;
     int    v, u;
     glpic_t* gl;
 
@@ -602,11 +602,11 @@ Draw_TransPic
 void Draw_TransPic(int x, int y, qPic_p pic) {
     uint8_p dest,  source,
     byte tbyte;
-    unsigned short* pusdest;
+    uint16_p pusdest;
     int    v, u;
 
-    if (x < 0 || (unsigned)(x + pic->width) > vid.width || y < 0 ||
-        (unsigned)(y + pic->height) > vid.height) {
+    if (x < 0 || (uint32_t)(x + pic->width) > vid.width || y < 0 ||
+        (uint32_t)(y + pic->height) > vid.height) {
         Sys_Error("Draw_TransPic: bad coordinates");
     }
 
@@ -623,7 +623,8 @@ Only used for the player color selection menu
 */
 void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
     int    v, u, c;
-    unsigned  trans[64 * 64], * dest;
+    uint32_t  trans[64 * 64];
+    uint32_p dest;
     uint8_p src;
     int    p;
 
@@ -833,10 +834,10 @@ int GL_FindTexture(cString identifier) {
 GL_ResampleTexture
 ================
 */
-void GL_ResampleTexture(unsigned* in, int inwidth, int inheight, unsigned* out, int outwidth, int outheight) {
+void GL_ResampleTexture(uint32_p in, int inwidth, int inheight, uint32_p out, int outwidth, int outheight) {
     int  i, j;
-    unsigned* inrow;
-    unsigned frac, fracstep;
+    uint32_p inrow;
+    uint32_t frac, fracstep;
 
     fracstep = inwidth * 0x10000 / outwidth;
     for (i = 0; i < outheight; i++, out += outwidth) {
@@ -863,7 +864,7 @@ GL_Resample8BitTexture -- JACK
 void GL_Resample8BitTexture(uint8_p in, int inwidth, int inheight, uint8_p out, int outwidth, int outheight) {
     int  i, j;
     uint8_p inrow;
-    unsigned frac, fracstep;
+    uint32_t frac, fracstep;
 
     fracstep = inwidth * 0x10000 / outwidth;
     for (i = 0; i < outheight; i++, out += outwidth) {
@@ -916,7 +917,7 @@ Mipping for 8 bit textures
 */
 void GL_MipMap8Bit(uint8_p in, int width, int height) {
     int  i, j;
-    unsigned short     r, g, b;
+    uint16_t     r, g, b;
     uint8_p out,  at1,  at2,  at3,  at4;
 
     // width <<=2;
@@ -943,9 +944,9 @@ void GL_MipMap8Bit(uint8_p in, int width, int height) {
 GL_Upload32
 ===============
 */
-void GL_Upload32(unsigned* data, int width, int height, bool mipmap, bool alpha) {
+void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) {
     int   samples;
-    static unsigned scaled[1024 * 512]; // [512*256];
+    static uint32_t scaled[1024 * 512]; // [512*256];
     int   scaled_width, scaled_height;
 
     for (scaled_width = 1; scaled_width < width; scaled_width <<= 1)
@@ -1024,9 +1025,9 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
     int   i, s;
     bool noalpha;
     int   p;
-    static unsigned j;
+    static uint32_t j;
     int   samples;
-    static unsigned char scaled[1024 * 512]; // [512*256];
+    static uint8_t scaled[1024 * 512]; // [512*256];
     int   scaled_width, scaled_height;
 
     s = width * height;
@@ -1108,7 +1109,7 @@ GL_Upload8
 ===============
 */
 void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
-    static unsigned trans[640 * 480];  // FIXME, temporary
+    static uint32_t trans[640 * 480];  // FIXME, temporary
     int   i, s;
     bool noalpha;
     int   p;

@@ -31,7 +31,7 @@ int		lightmap_bytes;		// 1, 2, or 4
 
 int		lightmap_textures;
 
-unsigned		blocklights[18*18];
+uint32_t		blocklights[18*18];
 
 #define	BLOCK_WIDTH		128
 #define	BLOCK_HEIGHT	128
@@ -40,7 +40,7 @@ unsigned		blocklights[18*18];
 int			active_lightmaps;
 
 typedef struct glRect_s {
-	unsigned char l, t, w, h;
+	uint8_t l, t, w, h;
 } glRect_t;
 
 glpoly_t* lightmap_polys[MAX_LIGHTMAPS];
@@ -134,10 +134,10 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
 	int			t;
 	int			i, j, size;
 	byte* lightmap;
-	unsigned	scale;
+	uint32_t	scale;
 	int			maps;
 	int			lightadj[4];
-	unsigned* bl;
+	uint32_p bl;
 
 	surf->cached_dlight = (surf->dlightframe == r_framecount);
 
@@ -1361,9 +1361,9 @@ BuildSurfaceDisplayList
 void BuildSurfaceDisplayList(mSurface_p fa) {
 	int			i, lindex, lnumverts, s_axis, t_axis;
 	float		dist, lastdist, lzi, scale, u, v, frac;
-	unsigned	mask;
+	uint32_t	mask;
 	vec3_t		local, transformed;
-	mEdge_t* pedges, * r_pedge;
+	mEdge_p pedges, r_pedge;
 	mPlane_p pplane;
 	int			vertpage, newverts, newpage, lastvert;
 	bool	visible;

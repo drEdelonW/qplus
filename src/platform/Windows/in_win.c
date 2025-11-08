@@ -41,14 +41,14 @@ int			mouse_x, mouse_y, old_mouse_x, old_mouse_y, mx_accum, my_accum;
 static bool	restore_spi;
 static int		originalmouseparms[3], newmouseparms[3] = { 0, 0, 1 };
 
-unsigned int uiWheelMessage;
+uint32_t uiWheelMessage;
 bool	mouseactive;
 bool		mouseinitialized;
 static bool	mouseparmsvalid, mouseactivatetoggle;
 static bool	mouseshowtoggle = 1;
 static bool	dinput_acquired;
 
-static unsigned int		mstate_di;
+static uint32_t		mstate_di;
 
 // joystick defines and variables
 // where should defines be moved?

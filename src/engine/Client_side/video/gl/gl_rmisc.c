@@ -213,16 +213,16 @@ Translates a skin texture by the per-player color lookup
 void R_TranslatePlayerSkin(int playernum) {
     int  top, bottom;
     uint8_t translate[256];
-    unsigned translate32[256];
+    uint32_t translate32[256];
     int  i, j, s;
     Model_t* model;
     AliasHdr_t* paliashdr;
     uint8_p original;
-    unsigned pixels[512 * 256], * out;
-    unsigned scaled_width, scaled_height;
+    uint32_t pixels[512 * 256], * out;
+    uint32_t scaled_width, scaled_height;
     int   inwidth, inheight;
     uint8_p inrow;
-    unsigned frac, fracstep;
+    uint32_t frac, fracstep;
 
     GL_DisableMultitexture();
 
