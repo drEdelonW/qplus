@@ -611,7 +611,7 @@ char* suf[6] = { "rt", "bk", "lf", "ft", "up", "dn" };
 void R_LoadSkys(void) {
     int  i;
     FILE* f;
-    char name[64];
+    char name[NAME_LENGTH];
 
     for (i = 0; i < 6; i++) {
         GL_Bind(SKY_TEX + i);

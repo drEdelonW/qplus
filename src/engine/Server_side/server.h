@@ -44,11 +44,11 @@ typedef struct {
     double  time;
     int32_t lastcheck;      // used by PF_checkclient
     double  lastchecktime;
-    char    name[64];       // map name
+    char    name[NAME_LENGTH];       // map name
 #ifdef QUAKE2
-    char    startspot[64];
+    char    startspot[NAME_LENGTH];
 #endif
-    char        modelname[64];  // maps/<name>.bsp, for model_precache[0]
+    char        modelname[NAME_LENGTH];  // maps/<name>.bsp, for model_precache[0]
     Model_p     worldmodel;
     cString     model_precache[MAX_MODELS];	    // NULL terminated
     Model_p     models[MAX_MODELS];

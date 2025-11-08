@@ -472,7 +472,7 @@ PollProcedure testPollProcedure = {
 static void Test_Poll() {
     qsockaddr_t clientaddr;
     char name[32];
-    char address[64];
+    char address[NAME_LENGTH];
 
     _net_landriverlevel = _testDriver;
 

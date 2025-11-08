@@ -1,5 +1,6 @@
 #include "menu.h"
 #include "menu_prv.h"
+#include "enginedefs.h"
 #include "net.h"
 #include "q_tools.h"
 #include <string.h>
@@ -38,7 +39,7 @@ void M_ServerList_Draw() {
 
     M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
     for (int n = 0; n < hostCacheCount; n++) {
-        char string[64];
+        char string[NAME_LENGTH];
         if (hostcache[n].maxusers)
             sprintf(string, "%-15.15s %-15.15s %2u/%2u\n", hostcache[n].name, hostcache[n].map, hostcache[n].users, hostcache[n].maxusers);
         else

@@ -1539,7 +1539,7 @@ TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_t** ppframe, int
     int     i, width, height, size, origin[2];
     unsigned short* ppixout;
     uint8_p ppixin;
-    char    name[64];
+    char    name[NAME_LENGTH];
 
     pinframe = (dSpriteFrame_t*)pin;
 

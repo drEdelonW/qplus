@@ -1,4 +1,5 @@
 #include "Pak.h"
+#include "enginedefs.h"
 #include "zone.h"
 #include "sys.h"
 #include "endian_tools.h"

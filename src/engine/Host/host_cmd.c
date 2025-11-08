@@ -747,7 +747,7 @@ void Host_Say(bool teamonly) {
 
     // turn on color set 1
     {
-        char text[64];
+        char text[NAME_LENGTH];
         if (fromServer) snprintf(text, sizeof(text), "%c<%s> ", 1, hostname.string);
         else            snprintf(text, sizeof(text), "%c%s: ", 1, save->name);
 
@@ -786,7 +786,7 @@ void Host_Tell_f() {
     if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
     if (Cmd_Argc() < 3)     return;
 
-    char text[64];
+    char text[NAME_LENGTH];
     Q_strcpy(text, remoteClient->name);
     Q_strcat(text, ": ");
 

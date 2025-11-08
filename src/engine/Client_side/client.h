@@ -56,15 +56,12 @@ typedef struct {
 
 typedef enum cshift_kind_e {
     CSHIFT_CONTENTS = 0,
-    CSHIFT_DAMAGE = 1,
-    CSHIFT_BONUS = 2,
-    CSHIFT_POWERUP = 3,
+    CSHIFT_DAMAGE   = 1,
+    CSHIFT_BONUS    = 2,
+    CSHIFT_POWERUP  = 3,
 
     NUM_CSHIFTS // should be last
 } cshift_kind_t;
-
-#define NAME_LENGTH 64
-
 
 //
 // ClientState_t should hold all pieces of the client state
@@ -72,7 +69,6 @@ typedef enum cshift_kind_e {
 
 #define SIGNONS  4   // signon messages to receive before connected
 
-#define MAX_DLIGHTS  32
 typedef struct {
     vec3_t  origin;
     float   radius;
@@ -95,12 +91,6 @@ typedef struct {
     vec3_t  start, end;
 } Beam_t;
 typedef Beam_t* Beam_p;
-
-#define MAX_EFRAGS  640
-
-#define MAX_MAPSTRING 2048
-#define MAX_DEMOS  8
-#define MAX_DEMONAME 16
 
 typedef enum {
     ca_dedicated,       // a dedicated server with no ability to start a client
@@ -142,8 +132,6 @@ typedef struct {
 } ClientStatic_t;
 
 extern ClientStatic_t cls;
-
-
 
 //
 // the ClientState_t structure is wiped completely at every
@@ -228,9 +216,6 @@ typedef struct {
 #endif
 } ClientState_t;
 
-#define MAX_TEMP_ENTITIES 64   // lightning bolts, etc
-#define MAX_STATIC_ENTITIES 128   // torches, etc
-
 extern ClientState_t cl;
 
 // FIXME, allocate dynamically
@@ -241,7 +226,6 @@ extern dLight_t     cl_dlights[MAX_DLIGHTS];
 extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
 extern Beam_t       cl_beams[MAX_BEAMS];
 
-#define MAX_VISEDICTS 256
 extern int32_t      cl_numvisedicts;
 extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
 

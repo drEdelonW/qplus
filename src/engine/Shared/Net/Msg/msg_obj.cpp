@@ -1,4 +1,5 @@
 #include "msg.hpp"
+#include "enginedefs.h"
 #include "q_tools.h"
 #include "endian_tools.h"
 
@@ -175,7 +176,7 @@ void NetMsg::WriteFloat(float f) { WriteFloat(_sb, f); }
 
 
 cString NetMsg::ReadString() {
-    static char string[2048];
+    static char string[MAX_MAPSTRING];
 
     int l = 0;
     do {

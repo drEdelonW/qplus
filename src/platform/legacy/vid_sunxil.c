@@ -722,7 +722,7 @@ void	VID_Shutdown() {
 int XLateKey(XKeyEvent* ev) {
 
     int key;
-    char buf[64];
+    char buf[NAME_LENGTH];
     KeySym keysym;
 
     XLookupString(ev, buf, sizeof buf, &keysym, 0);

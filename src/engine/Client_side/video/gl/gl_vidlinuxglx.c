@@ -115,7 +115,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
 static int XLateKey(XKeyEvent* ev) {
 
     int key;
-    char buf[64];
+    char buf[NAME_LENGTH];
     KeySym keysym;
 
     key = 0;

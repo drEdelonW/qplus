@@ -792,7 +792,7 @@ void	VID_Shutdown() {
 
 keycode_t XLateKey(XKeyEvent* ev) {
     keycode_t key;
-    char buf[64];
+    char buf[NAME_LENGTH];
     KeySym keysym;
 
     XLookupString(ev, buf, sizeof buf, &keysym, 0);

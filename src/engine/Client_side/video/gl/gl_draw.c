@@ -57,7 +57,7 @@ int  texels;
 
 typedef struct {
     int  texnum;
-    char identifier[64];
+    char identifier[NAME_LENGTH];
     int  width, height;
     bool mipmap;
 } glTexture_t;

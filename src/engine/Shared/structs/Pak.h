@@ -44,7 +44,4 @@ typedef struct {
     int32_t dirlen;
 } dpackHeader_t;
 
-#define MAX_FILES_IN_PACK       2048
-
-
 pack_p COM_LoadPackFile(cStringRO packfile);
