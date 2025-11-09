@@ -85,7 +85,7 @@ EVENT MESSAGES
     Make sure the event gets sent to all clients
     ==================
 */
-void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count) {
+void SV_StartParticle(vec3_t org, vec3_t dir, int color, size_t count) {
     if (sv.datagram.cursize > (MAX_DATAGRAM - 16))  return;
 
     MSG_WriteByte(&sv.datagram, svc_particle);
@@ -93,12 +93,12 @@ void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count) {
     MSG_WriteCoord(&sv.datagram, org[1]);
     MSG_WriteCoord(&sv.datagram, org[2]);
     for (int i = 0; i < VECT_DIM; i++) {
-        int v = dir[i] * 16;
+        int v = (int)(dir[i] * 16.0f);
         CLAMP(-128, v, 127);
-        MSG_WriteChar(&sv.datagram, v);
+        MSG_WriteChar(&sv.datagram, (int8_t)v);
     }
-    MSG_WriteByte(&sv.datagram, count);
-    MSG_WriteByte(&sv.datagram, color);
+    MSG_WriteByte(&sv.datagram, (uint8_t)count);
+    MSG_WriteByte(&sv.datagram, (uint8_t)color);
 }
 
 /*
@@ -138,23 +138,23 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
         return;
     }
 
-    channel |= (NUM_FOR_EDICT(entity) << 3);
+    channel |= (int)(NUM_FOR_EDICT(entity) << 3);
 
     int field_mask = 0x00;
     if (volume != DEFAULT_SOUND_PACKET_VOLUME)              field_mask |= SND_VOLUME;
     if (attenuation != DEFAULT_SOUND_PACKET_ATTENUATION)    field_mask |= SND_ATTENUATION;
 
     // directed messages go only to the entity the are targeted on
-    MSG_WriteByte(&sv.datagram, svc_sound);    MSG_WriteByte(&sv.datagram, field_mask);
-    if (field_mask & SND_VOLUME)        MSG_WriteByte(&sv.datagram, volume);
-    if (field_mask & SND_ATTENUATION)   MSG_WriteByte(&sv.datagram, (attenuation * 64));
-    MSG_WriteShort(&sv.datagram, channel);
-    MSG_WriteByte(&sv.datagram, sound_num);
+    MSG_WriteByte(&sv.datagram, svc_sound);    MSG_WriteByte(&sv.datagram, (uint8_t)field_mask);
+    if (field_mask & SND_VOLUME)        MSG_WriteByte(&sv.datagram, (uint8_t)volume);
+    if (field_mask & SND_ATTENUATION)   MSG_WriteByte(&sv.datagram, (uint8_t)(attenuation * 64));
+    MSG_WriteShort(&sv.datagram, (int16_t)channel);
+    MSG_WriteByte(&sv.datagram, (uint8_t)sound_num);
     for (int i = 0; i < VECT_DIM; i++) {
         MSG_WriteCoord(
             &sv.datagram,
             entity->v.origin[i] +
-            0.5 * (entity->v.mins[i] + entity->v.maxs[i])
+            0.5f * (entity->v.mins[i] + entity->v.maxs[i])
         );
     }
 }
@@ -201,12 +201,12 @@ void SV_SendServerinfo(RmtClient_p client) {
 
     // send music
     MSG_WriteByte(pBuf, svc_cdtrack);
-    MSG_WriteByte(pBuf, sv.edicts->v.sounds);
-    MSG_WriteByte(pBuf, sv.edicts->v.sounds);
+    MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds);
+    MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds);
 
     // set view
     MSG_WriteByte(pBuf, svc_setview);
-    MSG_WriteShort(pBuf, NUM_FOR_EDICT(client->edict));
+    MSG_WriteShort(pBuf, (int16_t)NUM_FOR_EDICT(client->edict));
 
     MSG_WriteByte(pBuf, svc_signonnum);
     MSG_WriteByte(pBuf, 1);
@@ -223,7 +223,7 @@ void SV_SendServerinfo(RmtClient_p client) {
     once for a player each game, not once for each level change.
     ================
 */
-void SV_ConnectClient(int clientnum) {
+void SV_ConnectClient(uint32_t clientnum) {
     float spawn_parms[NUM_SPAWN_PARMS];
 
     RmtClient_p client = svs.clients + clientnum;
@@ -283,7 +283,7 @@ void SV_CheckForNewClients() {
         //
         // init a new client structure
         //
-        int i = 0;
+        uint32_t i = 0;
         for (; i < svs.maxClients; i++) {
             if (!svs.clients[i].active) break;
         }
@@ -325,7 +325,7 @@ void SV_ClearDatagram() { SZ_Clear(&sv.datagram); }
     =============================================================================
 */
 
-static int  _fatBytes;
+static uint32_t  _fatBytes;
 static uint8_t _fatPvs[MAX_MAP_LEAFS / 8];
 
 void SV_AddToFatPVS(vec3_t org, mNode_p node) {
@@ -427,17 +427,17 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         //
         // write the message
         //
-        MSG_WriteByte(msg, bits | U_SIGNAL);
+        MSG_WriteByte(msg, (uint8_t)(bits | U_SIGNAL));
 
-        if (bits & U_MOREBITS)  MSG_WriteByte(msg, bits >> 8);
-        if (bits & U_LONGENTITY)MSG_WriteShort(msg, e);
-        else                    MSG_WriteByte(msg, e);
+        if (bits & U_MOREBITS)  MSG_WriteByte(msg, (uint8_t)(bits >> 8));
+        if (bits & U_LONGENTITY)MSG_WriteShort(msg, (int16_t)e);
+        else                    MSG_WriteByte(msg, (uint8_t)e);
 
-        if (bits & U_MODEL)     MSG_WriteByte(msg, ent->v.modelindex);
-        if (bits & U_FRAME)     MSG_WriteByte(msg, ent->v.frame);
-        if (bits & U_COLORMAP)  MSG_WriteByte(msg, ent->v.colormap);
-        if (bits & U_SKIN)      MSG_WriteByte(msg, ent->v.skin);
-        if (bits & U_EFFECTS)   MSG_WriteByte(msg, ent->v.effects);
+        if (bits & U_MODEL)     MSG_WriteByte(msg, (uint8_t)ent->v.modelindex);
+        if (bits & U_FRAME)     MSG_WriteByte(msg, (uint8_t)ent->v.frame);
+        if (bits & U_COLORMAP)  MSG_WriteByte(msg, (uint8_t)ent->v.colormap);
+        if (bits & U_SKIN)      MSG_WriteByte(msg, (uint8_t)ent->v.skin);
+        if (bits & U_EFFECTS)   MSG_WriteByte(msg, (uint8_t)ent->v.effects);
         if (bits & U_ORIGIN1)   MSG_WriteCoord(msg, ent->v.origin[0]);
         if (bits & U_ANGLE1)    MSG_WriteAngle(msg, ent->v.angles[0]);
         if (bits & U_ORIGIN2)   MSG_WriteCoord(msg, ent->v.origin[1]);
@@ -473,12 +473,12 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     if (ent->v.dmg_take || ent->v.dmg_save) {
         edict_p other = PROG_TO_EDICT(ent->v.dmg_inflictor);
         MSG_WriteByte(msg, svc_damage);
-        MSG_WriteByte(msg, ent->v.dmg_save);
-        MSG_WriteByte(msg, ent->v.dmg_take);
+        MSG_WriteByte(msg, (uint8_t)ent->v.dmg_save);
+        MSG_WriteByte(msg, (uint8_t)ent->v.dmg_take);
         for (int i = 0; i < VECT_DIM; i++)
             MSG_WriteCoord(msg,
                 other->v.origin[i] +
-                0.5 *
+                0.5f *
                 (other->v.mins[i] +
                     other->v.maxs[i])
             );
@@ -532,33 +532,33 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     // send the data
 
     MSG_WriteByte(msg, svc_clientdata);
-    MSG_WriteShort(msg, bits);
-    if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, ent->v.view_ofs[2]);
-    if (bits & SU_IDEALPITCH)           MSG_WriteChar(msg, ent->v.idealpitch);
+    MSG_WriteShort(msg, (int16_t)bits);
+    if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, (int8_t)ent->v.view_ofs[2]);
+    if (bits & SU_IDEALPITCH)           MSG_WriteChar(msg, (int8_t)ent->v.idealpitch);
     for (int i = 0; i < VECT_DIM; i++) {
-        if (bits & (SU_PUNCH1 << i))      MSG_WriteChar(msg, ent->v.punchangle[i]);
-        if (bits & (SU_VELOCITY1 << i))   MSG_WriteChar(msg, ent->v.velocity[i] / 16);
+        if (bits & (SU_PUNCH1 << i))      MSG_WriteChar(msg, (int8_t)ent->v.punchangle[i]);
+        if (bits & (SU_VELOCITY1 << i))   MSG_WriteChar(msg, (int8_t)ent->v.velocity[i] / 16);
     }
 
     // [always sent]
     /* if (bits & SU_ITEMS) */          MSG_WriteLong(msg, items);
 
-    if (bits & SU_WEAPONFRAME)          MSG_WriteByte(msg, ent->v.weaponframe);
-    if (bits & SU_ARMOR)                MSG_WriteByte(msg, ent->v.armorvalue);
-    if (bits & SU_WEAPON)               MSG_WriteByte(msg, SV_ModelIndex(pr_strings + ent->v.weaponmodel));
+    if (bits & SU_WEAPONFRAME)          MSG_WriteByte(msg, (uint8_t)ent->v.weaponframe);
+    if (bits & SU_ARMOR)                MSG_WriteByte(msg, (uint8_t)ent->v.armorvalue);
+    if (bits & SU_WEAPON)               MSG_WriteByte(msg, (uint8_t)SV_ModelIndex(pr_strings + ent->v.weaponmodel));
 
-    MSG_WriteShort(msg, ent->v.health);
-    MSG_WriteByte(msg, ent->v.currentammo);
-    MSG_WriteByte(msg, ent->v.ammo_shells);
-    MSG_WriteByte(msg, ent->v.ammo_nails);
-    MSG_WriteByte(msg, ent->v.ammo_rockets);
-    MSG_WriteByte(msg, ent->v.ammo_cells);
+    MSG_WriteShort(msg, (int16_t)ent->v.health);
+    MSG_WriteByte(msg, (uint8_t)ent->v.currentammo);
+    MSG_WriteByte(msg, (uint8_t)ent->v.ammo_shells);
+    MSG_WriteByte(msg, (uint8_t)ent->v.ammo_nails);
+    MSG_WriteByte(msg, (uint8_t)ent->v.ammo_rockets);
+    MSG_WriteByte(msg, (uint8_t)ent->v.ammo_cells);
 
     if (standard_quake) {
-        MSG_WriteByte(msg, ent->v.weapon);
+        MSG_WriteByte(msg, (uint8_t)ent->v.weapon);
     }
     else {
-        for (int i = 0; i < 32; i++) {
+        for (uint8_t i = 0; i < 32; i++) {
             if (((int)ent->v.weapon) & (1 << i)) {
                 MSG_WriteByte(msg, i);
                 break;
@@ -585,7 +585,7 @@ bool SV_SendClientDatagram(RmtClient_t* client) {
     // msg.cursize = 0;
 
     MSG_WriteByte(&msg, svc_time);
-    MSG_WriteFloat(&msg, sv.time);
+    MSG_WriteFloat(&msg, (float)sv.time);
 
     // add the client specific data to the datagram
     SV_WriteClientdataToMessage(client->edict, &msg);
@@ -621,10 +621,10 @@ void SV_UpdateToReliableMessages() {
                 if (!client->active)    continue;
 
                 sizebuf_p pBuf = &client->message;
-                MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, i); MSG_WriteShort(pBuf, remoteClient->edict->v.frags);
+                MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, (uint8_t)i); MSG_WriteShort(pBuf, (int16_t)remoteClient->edict->v.frags);
             }
 
-            remoteClient->old_frags = remoteClient->edict->v.frags;
+            remoteClient->old_frags = (int16_t)remoteClient->edict->v.frags;
         }
     }
 
@@ -758,7 +758,7 @@ int SV_ModelIndex(cString name) {
 */
 void SV_CreateBaseline() {
 
-    for (int entnum = 0; entnum < sv.num_edicts; entnum++) {
+    for (uint32_t entnum = 0; entnum < sv.num_edicts; entnum++) {
         // get the current server version
         edict_p svent = EDICT_NUM(entnum);
         if ((svent->free) ||
@@ -772,10 +772,10 @@ void SV_CreateBaseline() {
         //
         VectorCopy(svent->v.origin, svent->baseline.origin);
         VectorCopy(svent->v.angles, svent->baseline.angles);
-        svent->baseline.frame = svent->v.frame;
-        svent->baseline.skin = svent->v.skin;
+        svent->baseline.frame = (int32_t)svent->v.frame;
+        svent->baseline.skin = (int32_t)svent->v.skin;
         if ((entnum > 0) && (entnum <= svs.maxClients)) {
-            svent->baseline.colormap = entnum;
+            svent->baseline.colormap = (int32_t)entnum;
             svent->baseline.modelindex = SV_ModelIndex("progs/player.mdl");
         }
         else {
@@ -787,12 +787,12 @@ void SV_CreateBaseline() {
         //
         // add to the message
         //
-        MSG_WriteByte(&sv.signon, svc_spawnbaseline);   MSG_WriteShort(&sv.signon, entnum);
+        MSG_WriteByte(&sv.signon, svc_spawnbaseline);   MSG_WriteShort(&sv.signon, (int16_t)entnum);
 
-        MSG_WriteByte(&sv.signon, svent->baseline.modelindex);
-        MSG_WriteByte(&sv.signon, svent->baseline.frame);
-        MSG_WriteByte(&sv.signon, svent->baseline.colormap);
-        MSG_WriteByte(&sv.signon, svent->baseline.skin);
+        MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.modelindex);
+        MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.frame);
+        MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.colormap);
+        MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.skin);
         for (int i = 0; i < VECT_DIM; i++) {
             MSG_WriteCoord(&sv.signon, svent->baseline.origin[i]);
             MSG_WriteAngle(&sv.signon, svent->baseline.angles[i]);
@@ -838,7 +838,7 @@ void SV_SendReconnect() {
     ================
 */
 void SV_SaveSpawnparms() {
-    svs.serverflags = pr_global_struct->serverflags;
+    svs.serverflags = (uint32_t)pr_global_struct->serverflags;
     remoteClient = svs.clients;
     for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
         if (!remoteClient->active)       continue;
@@ -908,7 +908,7 @@ void SV_SpawnServer(
     // allocate server memory
     sv.max_edicts = MAX_EDICTS;
 
-    sv.edicts = Hunk_AllocName(sv.max_edicts * pr_edict_size, "edicts");
+    sv.edicts = Hunk_AllocName((uint32_t)sv.max_edicts * pr_edict_size, "edicts");
 
     sv.datagram.maxsize = sizeof(sv.datagram_buf);
     sv.datagram.cursize = 0;
@@ -924,7 +924,7 @@ void SV_SpawnServer(
 
     // leave slots at start for clients only
     sv.num_edicts = svs.maxClients + 1;
-    for (int i = 0; i < svs.maxClients; i++) {
+    for (uint32_t i = 0; i < svs.maxClients; i++) {
         edict_p ent = EDICT_NUM(i + 1);
         svs.clients[i].edict = ent;
     }
@@ -978,7 +978,7 @@ void SV_SpawnServer(
 #endif
 
     // serverflags are for cross level information (sigils)
-    pr_global_struct->serverflags = svs.serverflags;
+    pr_global_struct->serverflags = (float)svs.serverflags;
 
     ED_LoadFromFile(sv.worldmodel->entities);
 

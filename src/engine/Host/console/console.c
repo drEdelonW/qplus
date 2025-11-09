@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 
-#define CON_TEXTSIZE    0x4000 /*16Kb - 16384b*/
+#define CON_TEXTSIZE    (int32_t)0x4000 /*16Kb - 16384b*/
 #define NUM_CON_TIMES 4
 
 int32_t edit_line;
@@ -56,7 +56,7 @@ typedef struct {
     int32_t  linewidth;
     float    cursorspeed;
     int32_t  current;   // where next message will be printed
-    int32_t  x;         // offset in current line for next print
+    uint32_t  x;         // offset in current line for next print
     cString  text;
     int32_t  vislines;
     bool     debuglog;
@@ -147,13 +147,13 @@ void Con_CheckResize() {
 
     if (width < 1) {   // video hasn't been initialized yet
         width = 38;
-        _con.linewidth = width;
+        _con.linewidth = (int32_t)width;
         con.totallines = CON_TEXTSIZE / _con.linewidth;
         Q_memset(_con.text, ' ', CON_TEXTSIZE);
     }
     else {
-        int32_t oldwidth = _con.linewidth;
-        _con.linewidth = width;
+        uint32_t oldwidth = (uint32_t)_con.linewidth;
+        _con.linewidth = (int32_t)width;
         int32_t oldtotallines = con.totallines;
         con.totallines = CON_TEXTSIZE / _con.linewidth;
         int32_t numlines = oldtotallines;
@@ -161,10 +161,10 @@ void Con_CheckResize() {
         if (con.totallines < numlines)
             numlines = con.totallines;
 
-        int32_t numchars = oldwidth;
+        uint32_t numchars = oldwidth;
 
         if (_con.linewidth < numchars)
-            numchars = _con.linewidth;
+            numchars = (uint32_t)_con.linewidth;
 
         char tbuf[CON_TEXTSIZE];
         Q_memcpy(tbuf, _con.text, CON_TEXTSIZE);
@@ -174,7 +174,7 @@ void Con_CheckResize() {
             for (int32_t j = 0; j < numchars; j++) {
                 _con.text[(con.totallines - 1 - i) * _con.linewidth + j] =
                     tbuf[((_con.current - i + oldtotallines) %
-                        oldtotallines) * oldwidth + j];
+                        oldtotallines) * (int32_t)oldwidth + j];
             }
         }
 
@@ -182,7 +182,7 @@ void Con_CheckResize() {
     }
 
     con.backscroll = 0;
-    _con.current = con.totallines - 1;
+    _con.current = (int32_t)con.totallines - 1;
 }
 
 
@@ -191,7 +191,6 @@ void Con_CheckResize() {
     Con_Init
     ================
 */
-#define MAXGAMEDIRLEN 1000
 void Con_Init() {
     _con.debuglog = COM_CheckParm("-condebug");
 
@@ -234,9 +233,9 @@ void Con_Linefeed() {
     _con.current++;
     Q_memset(
         &_con.text[
-            (_con.current % con.totallines) * _con.linewidth
+            (uint32_t)((_con.current % (int32_t)con.totallines) * _con.linewidth)
         ],
-        ' ', _con.linewidth
+        ' ', (uint32_t)_con.linewidth
     );
 }
 
@@ -254,7 +253,7 @@ void Con_Print(cStringRO txt) {
 
     con.backscroll = 0;
 
-    int32_t mask;
+    uint8_t mask;
     if (txt[0] == 1) {
         mask = 128;  // go to colored text
         S_LocalSound("misc/talk.wav");
@@ -271,7 +270,7 @@ void Con_Print(cStringRO txt) {
     char    c;
     while ((c = *txt)) {
         // count word length
-        int32_t l = 0;
+        uint32_t l = 0;
         for (; l < _con.linewidth; l++) {
             if (txt[l] <= ' ')
                 break;
@@ -279,7 +278,7 @@ void Con_Print(cStringRO txt) {
 
         // word wrap
         if ((l != _con.linewidth) &&
-            (_con.x + l > _con.linewidth)) {
+            ((_con.x + l) > (uint32_t)_con.linewidth)) {
             _con.x = 0;
         }
 
@@ -295,7 +294,7 @@ void Con_Print(cStringRO txt) {
             Con_Linefeed();
             // mark time for transparent overlay
             if (_con.current >= 0)
-                _con.times[_con.current % NUM_CON_TIMES] = realtime;
+                _con.times[_con.current % NUM_CON_TIMES] = (float)realtime;
         }
 
         switch (c) {
@@ -309,7 +308,12 @@ void Con_Print(cStringRO txt) {
             break;
 
         default: // display character and advance
-            _con.text[((_con.current % con.totallines) * _con.linewidth) + _con.x] = c | mask;
+            _con.text[
+                (uint32_t)(
+                    (_con.current % (int32_t)con.totallines) *
+                    _con.linewidth) +
+                    _con.x
+            ] = (uint32_t)c | mask;
             _con.x++;
             if (_con.x >= _con.linewidth) {
                 _con.x = 0;
@@ -451,12 +455,12 @@ void Con_DrawInput() {
     text[con.linepos] = 10 + ((int)(realtime * _con.cursorspeed) & 1);
 
     // fill out remainder with spaces
-    for (int i = (con.linepos + 1); i < _con.linewidth; i++)
+    for (uint32_t i = (con.linepos + 1); i < _con.linewidth; i++)
         text[i] = ' ';
 
     // prestep if horizontally scrolling
     if (con.linepos >= _con.linewidth)
-        text += 1 + con.linepos - _con.linewidth;
+        text += 1 + con.linepos - (uint32_t)_con.linewidth;
 
     // draw it
     int32_t y = _con.vislines - 16;
@@ -485,10 +489,10 @@ void Con_DrawNotify() {
         float time = _con.times[i % NUM_CON_TIMES];
         if (time == 0)  continue;
 
-        time = realtime - time;
+        time = (float)realtime - time;
         if (time > con_notifytime.value)    continue;
 
-        cString text = _con.text + (i % con.totallines) * _con.linewidth;
+        cString text = _con.text + (i % (int32_t)con.totallines) * _con.linewidth;
 
         clearnotify = 0;
         scr.copytop = 1;

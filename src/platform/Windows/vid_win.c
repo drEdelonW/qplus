@@ -524,7 +524,7 @@ MGLDC* createDisplayDC(int forcemem)
 
     if (!COM_CheckParm("-notriplebuf")) {
         if (npages > 2)     npages = 2;
-        
+
     }
 
     if ((dc = MGL_createDisplayDC(npages)) == NULL)
@@ -628,7 +628,9 @@ void VID_InitMGLDIB(HINSTANCE hInstance) {
     // automatically stretch the default mode up if > 640x480 desktop resolution
     hdc = GetDC(NULL);
 
-    if ((GetDeviceCaps(hdc, HORZRES) > 640) && !COM_CheckParm("-noautostretch")) {
+    if ((GetDeviceCaps(hdc, HORZRES) > 640) &&
+        !COM_CheckParm("-noautostretch")
+        ) {
         vid_default = MODE_WINDOWED + 1;
     }
     else {
@@ -853,17 +855,9 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
         }
 
         switch (bpp) {
-        case 8:
-            bpp = 16;
-            break;
-
-        case 16:
-            bpp = 32;
-            break;
-
-        case 32:
-            done = 1;
-            break;
+        case 8:     bpp = 16;   break;
+        case 16:    bpp = 32;   break;
+        case 32:    done = 1;   break;
         }
     }
 
@@ -899,10 +893,8 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
         }
     }
 
-    if (nummodes != originalnummodes)
-        vid_default = MODE_FULLSCREEN_DEFAULT;
-    else
-        Con_SafePrintf("No fullscreen DIB modes found\n");
+    if (nummodes != originalnummodes)   vid_default = MODE_FULLSCREEN_DEFAULT;
+    else                                Con_SafePrintf("No fullscreen DIB modes found\n");
 }
 
 
@@ -923,7 +915,8 @@ VID_GetModePtr
 */
 vmode_t* VID_GetModePtr(int modenum) {
 
-    if ((modenum >= 0) && (modenum < nummodes))
+    if ((modenum >= 0) &&
+        (modenum < nummodes))
         return &modelist[modenum];
     else
         return &badmode;
@@ -936,11 +929,9 @@ VID_CheckModedescFixup
 =================
 */
 void VID_CheckModedescFixup(int mode) {
-    int		x, y, stretch;
-
     if (mode == MODE_SETTABLE_WINDOW) {
         modelist[mode].stretched = (int)vid_stretch_by_2.value;
-        stretch = modelist[mode].stretched;
+        int stretch = modelist[mode].stretched;
 
         if (vid_config_x.value < (320 << stretch))
             vid_config_x.value = 320 << stretch;
@@ -948,8 +939,8 @@ void VID_CheckModedescFixup(int mode) {
         if (vid_config_y.value < (200 << stretch))
             vid_config_y.value = 200 << stretch;
 
-        x = (int)vid_config_x.value;
-        y = (int)vid_config_y.value;
+        int x = (int)vid_config_x.value;
+        int y = (int)vid_config_y.value;
         sprintf(modelist[mode].modedesc, "%dx%d", x, y);
         modelist[mode].width = x;
         modelist[mode].height = y;
@@ -1021,15 +1012,9 @@ cString VID_GetModeDescription2(int mode) {
 
     pv = VID_GetModePtr(mode);
 
-    if (modelist[mode].type == MS_FULLSCREEN) {
-        sprintf(pinfo, "%s fullscreen", pv->modedesc);
-    }
-    else if (modelist[mode].type == MS_FULLDIB) {
-        sprintf(pinfo, "%s fullscreen", pv->modedesc);
-    }
-    else {
-        sprintf(pinfo, "%s windowed", pv->modedesc);
-    }
+    if (modelist[mode].type == MS_FULLSCREEN)       sprintf(pinfo, "%s fullscreen", pv->modedesc);
+    else if (modelist[mode].type == MS_FULLDIB)     sprintf(pinfo, "%s fullscreen", pv->modedesc);
+    else                                            sprintf(pinfo, "%s windowed", pv->modedesc);
 
     return pinfo;
 }
@@ -1066,10 +1051,8 @@ void DestroyDIBWindow(void) {
 
     if (modestate == MS_WINDOWED) {
         // destroy the associated MGL DC's; the window gets reused
-        if (windc)
-            MGL_destroyDC(windc);
-        if (dibdc)
-            MGL_destroyDC(dibdc);
+        if (windc)      MGL_destroyDC(windc);
+        if (dibdc)      MGL_destroyDC(dibdc);
         windc = dibdc = NULL;
     }
 }
@@ -1079,10 +1062,8 @@ void DestroyFullscreenWindow(void) {
 
     if (modestate == MS_FULLSCREEN) {
         // destroy the existing fullscreen mode and DC's
-        if (mgldc)
-            MGL_destroyDC(mgldc);
-        if (memdc)
-            MGL_destroyDC(memdc);
+        if (mgldc)      MGL_destroyDC(mgldc);
+        if (memdc)      MGL_destroyDC(memdc);
         mgldc = memdc = NULL;
     }
 }
@@ -1094,10 +1075,8 @@ void DestroyFullDIBWindow(void) {
         ChangeDisplaySettings(NULL, CDS_FULLSCREEN);
 
         // Destroy the fullscreen DIB window and associated MGL DC's
-        if (windc)
-            MGL_destroyDC(windc);
-        if (dibdc)
-            MGL_destroyDC(dibdc);
+        if (windc)      MGL_destroyDC(windc);
+        if (dibdc)      MGL_destroyDC(dibdc);
         windc = dibdc = NULL;
     }
 }
@@ -1127,10 +1106,8 @@ bool VID_SetWindowedMode(int modenum) {
     DestroyFullscreenWindow();
     DestroyFullDIBWindow();
 
-    if (windc)
-        MGL_destroyDC(windc);
-    if (dibdc)
-        MGL_destroyDC(dibdc);
+    if (windc)      MGL_destroyDC(windc);
+    if (dibdc)      MGL_destroyDC(dibdc);
     windc = dibdc = NULL;
 
     // KJB: Signal to the MGL that we are going back to windowed mode
@@ -1205,10 +1182,8 @@ bool VID_SetWindowedMode(int modenum) {
         (int)vid_window_y.value, 0, 0,
         SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_DRAWFRAME);
 
-    if (force_minimized)
-        ShowWindow(mainwindow, SW_MINIMIZE);
-    else
-        ShowWindow(mainwindow, SW_SHOWDEFAULT);
+    if (force_minimized)    ShowWindow(mainwindow, SW_MINIMIZE);
+    else                    ShowWindow(mainwindow, SW_SHOWDEFAULT);
 
     UpdateWindow(mainwindow);
 
@@ -1261,10 +1236,8 @@ bool VID_SetFullscreenMode(int modenum) {
     mode = modelist[modenum].modenum;
 
     // Destroy old DC's, resetting back to fullscreen mode
-    if (mgldc)
-        MGL_destroyDC(mgldc);
-    if (memdc)
-        MGL_destroyDC(memdc);
+    if (mgldc)      MGL_destroyDC(mgldc);
+    if (memdc)      MGL_destroyDC(memdc);
     mgldc = memdc = NULL;
 
     if ((mgldc = createDisplayDC(modelist[modenum].stretched ||
@@ -1311,10 +1284,8 @@ bool VID_SetFullDIBMode(int modenum) {
     DestroyFullscreenWindow();
     DestroyDIBWindow();
 
-    if (windc)
-        MGL_destroyDC(windc);
-    if (dibdc)
-        MGL_destroyDC(dibdc);
+    if (windc)      MGL_destroyDC(windc);
+    if (dibdc)      MGL_destroyDC(dibdc);
     windc = dibdc = NULL;
 
     // KJB: Signal to the MGL that we are going back to windowed mode
@@ -1446,12 +1417,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     while ((modenum >= nummodes) || (modenum < 0)) {
         if (vid_modenum == NO_MODE) {
-            if (modenum == vid_default) {
-                modenum = windowed_default;
-            }
-            else {
-                modenum = vid_default;
-            }
+            if (modenum == vid_default)     modenum = windowed_default;
+            else                            modenum = vid_default;
 
             Cvar_SetValue("vid_mode", (float)modenum);
         }
@@ -1472,10 +1439,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
     CDAudio_Pause();
     S_ClearBuffer();
 
-    if (vid_modenum == NO_MODE)
-        original_mode = windowed_default;
-    else
-        original_mode = vid_modenum;
+    if (vid_modenum == NO_MODE)     original_mode = windowed_default;
+    else                            original_mode = vid_modenum;
 
     // Set either the fullscreen or windowed mode
     if (modelist[modenum].type == MS_WINDOWED) {
@@ -1527,10 +1492,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     hdc = GetDC(NULL);
 
-    if (GetDeviceCaps(hdc, RASTERCAPS) & RC_PALETTE)
-        vid_palettized = true;
-    else
-        vid_palettized = false;
+    if (GetDeviceCaps(hdc, RASTERCAPS) & RC_PALETTE)    vid_palettized = true;
+    else                                                vid_palettized = false;
 
     VID_SetPalette(palette);
 
@@ -1599,15 +1562,11 @@ void VID_LockBuffer(void) {
         vid.rowbytes = vid.conrowbytes = mgldc->mi.bytesPerLine;
     }
 
-    if (r_dowarp)
-        d_viewbuffer = r_warpbuffer;
-    else
-        d_viewbuffer = (void*)(byte*)vid.buffer;
+    if (r_dowarp)   d_viewbuffer = r_warpbuffer;
+    else            d_viewbuffer = (void*)(byte*)vid.buffer;
 
-    if (r_dowarp)
-        screenwidth = WARP_WIDTH;
-    else
-        screenwidth = vid.rowbytes;
+    if (r_dowarp)   screenwidth = WARP_WIDTH;
+    else            screenwidth = vid.rowbytes;
 
     if (lcd_x.value)
         screenwidth <<= 1;
@@ -1748,10 +1707,8 @@ VID_NumModes_f
 */
 void VID_NumModes_f(void) {
 
-    if (nummodes == 1)
-        Con_Printf("%d video mode is available\n", nummodes);
-    else
-        Con_Printf("%d video modes are available\n", nummodes);
+    if (nummodes == 1)      Con_Printf("%d video mode is available\n", nummodes);
+    else                    Con_Printf("%d video modes are available\n", nummodes);
 }
 
 
@@ -1761,9 +1718,7 @@ VID_DescribeMode_f
 =================
 */
 void VID_DescribeMode_f(void) {
-    int		modenum;
-
-    modenum = Q_atoi(Cmd_Argv(1));
+    int	modenum = Q_atoi(Cmd_Argv(1));
 
     Con_Printf("%s\n", VID_GetExtModeDescription(modenum));
 }
@@ -1775,18 +1730,11 @@ VID_DescribeModes_f
 =================
 */
 void VID_DescribeModes_f(void) {
-    int			i, lnummodes;
-    cString pinfo;
-    bool	na;
-    vmode_t* pv;
-
-    na = false;
-
-    lnummodes = VID_NumModes();
-
-    for (i = 0; i < lnummodes; i++) {
-        pv = VID_GetModePtr(i);
-        pinfo = VID_GetExtModeDescription(i);
+    bool na = false;
+    int lnummodes = VID_NumModes();
+    for (int i = 0; i < lnummodes; i++) {
+        vmode_t* pv = VID_GetModePtr(i);
+        cString pinfo = VID_GetExtModeDescription(i);
 
         if (VID_CheckAdequateMem(pv->width, pv->height)) {
             Con_Printf("%2d: %s\n", i, pinfo);
@@ -1809,15 +1757,12 @@ VID_TestMode_f
 =================
 */
 void VID_TestMode_f(void) {
-    int		modenum;
-    double	testduration;
-
     if (!vid_testingmode) {
-        modenum = Q_atoi(Cmd_Argv(1));
+        int modenum = Q_atoi(Cmd_Argv(1));
 
         if (VID_SetMode(modenum, vid_curpal)) {
             vid_testingmode = 1;
-            testduration = Q_atof(Cmd_Argv(2));
+            double testduration = Q_atof(Cmd_Argv(2));
             if (testduration == 0)
                 testduration = 5.0;
             vid_testendtime = realtime + testduration;
@@ -1832,7 +1777,6 @@ VID_Windowed_f
 =================
 */
 void VID_Windowed_f(void) {
-
     VID_SetMode((int)vid_windowed_mode.value, vid_curpal);
 }
 
@@ -1843,7 +1787,6 @@ VID_Fullscreen_f
 =================
 */
 void VID_Fullscreen_f(void) {
-
     VID_SetMode((int)vid_fullscreen_mode.value, vid_curpal);
 }
 
@@ -1869,11 +1812,8 @@ VID_ForceMode_f
 =================
 */
 void VID_ForceMode_f(void) {
-    int		modenum;
-    // double	testduration;
-
     if (!vid_testingmode) {
-        modenum = Q_atoi(Cmd_Argv(1));
+        int modenum = Q_atoi(Cmd_Argv(1));
 
         force_mode_set = 1;
         VID_SetMode(modenum, vid_curpal);
@@ -1883,8 +1823,7 @@ void VID_ForceMode_f(void) {
 
 
 void	VID_Init(uint8_p palette) {
-    int		i, bestmatch, bestmatchmetric, t, dr, dg, db;
-    int		basenummodes;
+    int bestmatch, bestmatchmetric, t, dr, dg, db;
     byte* ptmp;
 
     Cvar_RegisterVariable(&vid_mode);
@@ -1918,7 +1857,7 @@ void	VID_Init(uint8_p palette) {
 
     VID_InitMGLDIB(global_hInstance);
 
-    basenummodes = nummodes;
+    int basenummodes = nummodes;
 
     if (!dibonly)
         VID_InitMGLFull(global_hInstance);
@@ -1927,9 +1866,8 @@ void	VID_Init(uint8_p palette) {
     // fullscreen DIBs as well
     if (((nummodes == basenummodes) ||
         ((nummodes == (basenummodes + 1)) && is_mode0x13)) &&
-        !COM_CheckParm("-nofulldib"))
-
-    {
+        !COM_CheckParm("-nofulldib")
+        ) {
         VID_InitFullDIB(global_hInstance);
     }
 
@@ -1943,7 +1881,7 @@ void	VID_Init(uint8_p palette) {
     // mappings from that black to another one
     bestmatchmetric = 256 * 256 * 3;
 
-    for (i = 1; i < 256; i++) {
+    for (int i = 1; i < 256; i++) {
         dr = palette[0] - palette[i * 3];
         dg = palette[1] - palette[i * 3 + 1];
         db = palette[2] - palette[i * 3 + 2];
@@ -1959,7 +1897,8 @@ void	VID_Init(uint8_p palette) {
         }
     }
 
-    for (i = 0, ptmp = vid.colormap; i < (1 << (VID_CBITS + 8)); i++, ptmp++) {
+    ptmp = vid.colormap;
+    for (int i = 0; i < (1 << (VID_CBITS + 8)); i++, ptmp++) {
         if (*ptmp == 0)
             *ptmp = bestmatch;
     }
@@ -2001,9 +1940,6 @@ void	VID_Init(uint8_p palette) {
 
 
 void	VID_Shutdown(void) {
-    // HDC				hdc;
-    // int				dummy;
-
     if (vid_initialized) {
         if (modestate == MS_FULLDIB)
             ChangeDisplaySettings(NULL, CDS_FULLSCREEN);
@@ -2016,11 +1952,8 @@ void	VID_Shutdown(void) {
         DestroyFullscreenWindow();
         DestroyFullDIBWindow();
 
-        if (hwnd_dialog)
-            DestroyWindow(hwnd_dialog);
-
-        if (mainwindow)
-            DestroyWindow(mainwindow);
+        if (hwnd_dialog)    DestroyWindow(hwnd_dialog);
+        if (mainwindow)     DestroyWindow(mainwindow);
 
         MGL_exit();
 
@@ -2036,8 +1969,6 @@ FlipScreen
 ================
 */
 void FlipScreen(vRect_t* rects) {
-    // HRESULT		ddrval;
-
     // Flip the surfaces
 
     if (DDActive) {
@@ -2109,22 +2040,22 @@ void FlipScreen(vRect_t* rects) {
 }
 
 
-void	VID_Update(vRect_t* rects) {
-    vRect_t	rect;
-    RECT	trect;
-
+void VID_Update(vRect_p rects) {
     if (!vid_palettized && palette_changed) {
         palette_changed = false;
-        rect.x = 0;
-        rect.y = 0;
-        rect.width = vid.width;
-        rect.height = vid.height;
-        rect.pnext = NULL;
+        vRect_t	rect = {
+            .x = 0,
+            .y = 0,
+            .width = vid.width,
+            .height = vid.height,
+            .pnext = NULL
+        }
         rects = &rect;
     }
 
     if (firstupdate) {
         if (modestate == MS_WINDOWED) {
+            RECT trect;
             GetWindowRect(mainwindow, &trect);
 
             if ((trect.left != (int)vid_window_x.value) ||
@@ -2208,14 +2139,8 @@ void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
     if (!vid_initialized)
         return;
 
-    if (vid.aspect > 1.5) {
-        reps = 2;
-        repshift = 1;
-    }
-    else {
-        reps = 1;
-        repshift = 0;
-    }
+    if (vid.aspect > 1.5) { ;   reps = 2; repshift = 1; }
+    else { ;                    reps = 1; repshift = 0; }
 
     if (vid.numpages == 1) {
         VID_LockBuffer();
@@ -2288,20 +2213,14 @@ D_EndDirectRect
 ================
 */
 void D_EndDirectRect(int x, int y, int width, int height) {
-    int		i, j, reps, repshift;
+    int     reps, repshift;
     vRect_t	rect;
 
     if (!vid_initialized)
         return;
 
-    if (vid.aspect > 1.5) {
-        reps = 2;
-        repshift = 1;
-    }
-    else {
-        reps = 1;
-        repshift = 0;
-    }
+    if (vid.aspect > 1.5) { ;   reps = 2; repshift = 1; }
+    else { ;                    reps = 1; repshift = 0; }
 
     if (vid.numpages == 1) {
         VID_LockBuffer();
@@ -2309,8 +2228,8 @@ void D_EndDirectRect(int x, int y, int width, int height) {
         if (!vid.direct)
             Sys_Error("NULL vid.direct pointer");
 
-        for (i = 0; i < (height << repshift); i += reps) {
-            for (j = 0; j < reps; j++) {
+        for (int i = 0; i < (height << repshift); i += reps) {
+            for (int j = 0; j < reps; j++) {
                 memcpy(vid.direct + x + ((y << repshift) + i + j) * vid.rowbytes,
                     &backingbuf[(i + j) * 24],
                     width);
@@ -2339,8 +2258,8 @@ void D_EndDirectRect(int x, int y, int width, int height) {
         MGL_beginDirectAccess();
 
         // restore to the screen
-        for (i = 0; i < (height << repshift); i += reps) {
-            for (j = 0; j < reps; j++) {
+        for (int i = 0; i < (height << repshift); i += reps) {
+            for (int j = 0; j < reps; j++) {
                 memcpy((byte*)mgldc->surface + x +
                     ((y << repshift) + i + j) * mgldc->mi.bytesPerLine,
                     &backingbuf[(i + j) * 24],
@@ -2363,26 +2282,25 @@ void D_EndDirectRect(int x, int y, int width, int height) {
 
 //==========================================================================
 
-byte        scantokey[128] =
-{
-    //  0           1       2       3       4       5       6       7 
-    //  8           9       A       B       C       D       E       F 
-        0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6',
-        '7',    '8',    '9',    '0',    '-',    '=',    K_BACKSPACE, 9, // 0 
+static uint8_t _scanToKey[128] = {
+    //   0       1       2       3       4       5       6       7
+    //   8       9       A       B       C       D       E       F
+         0 ,     27,    '1',    '2',    '3',    '4',    '5',    '6',
+        '7',    '8',    '9',    '0',    '-',    '=',K_BACKSPACE, 9,     // 0
         'q',    'w',    'e',    'r',    't',    'y',    'u',    'i',
-        'o',    'p',    '[',    ']',    13 ,    K_CTRL,'a',  's',      // 1 
+        'o',    'p',    '[',    ']',    13 ,   K_CTRL,  'a',    's',    // 1
         'd',    'f',    'g',    'h',    'j',    'k',    'l',    ';',
-        '\'' ,    '`',    K_SHIFT,'\\',  'z',    'x',    'c',    'v',      // 2 
-        'b',    'n',    'm',    ',',    '.',    '/',    K_SHIFT,'*',
-        K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
-        K_F6, K_F7, K_F8, K_F9, K_F10,  K_PAUSE,    0  , K_HOME,
-        K_UPARROW,K_PGUP,'-',K_LEFTARROW,'5',K_RIGHTARROW,'+',K_END, //4 
-        K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11,
-        K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5
+        '\'' ,  '`',  K_SHIFT,  '\\',   'z',    'x',    'c',    'v',    // 2
+        'b',    'n',    'm',    ',',    '.',    '/',  K_SHIFT,  '*',
+        K_ALT,  ' ',     0 ,    K_F1,   K_F2,   K_F3,   K_F4,   K_F5,   // 3
+        K_F6,   K_F7,   K_F8,   K_F9,   K_F10,  K_PAUSE, 0 ,    K_HOME,
+    K_UPARROW, K_PGUP,  '-',K_LEFTARROW,'5',K_RIGHTARROW,'+',   K_END,  //4
+  K_DOWNARROW, K_PGDN, K_INS, K_DEL,    0 ,     0  ,    0 ,     K_F11,
+        K_F12,  0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5
         0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,
-        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6
         0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,
-        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
+        0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7
 };
 
 /*
@@ -2393,14 +2311,13 @@ Map from windows to quake keynums
 =======
 */
 int MapKey(int key) {
-    key = (key >> 16) & 255;
+    key = (key >> 16) & 0xFF;
     if (key > 127)
         return 0;
 
-    return scantokey[key];
+    return _scanToKey[key];
 }
 
-void AppActivate(BOOL fActive, BOOL minimize)
 /****************************************************************************
 *
 * Function:     AppActivate
@@ -2411,10 +2328,10 @@ void AppActivate(BOOL fActive, BOOL minimize)
 *               correctly.
 *
 ****************************************************************************/
-{
-    HDC			hdc;
-    int			i, t;
-    static BOOL	sound_active;
+void AppActivate(BOOL fActive, BOOL minimize) {
+    static BOOL	_sound_active;
+    HDC hdc;
+    int i, t;
 
     ActiveApp = fActive;
 
@@ -2463,15 +2380,15 @@ void AppActivate(BOOL fActive, BOOL minimize)
     }
 
     // enable/disable sound on focus gain/loss
-    if (!ActiveApp && sound_active) {
+    if (!ActiveApp && _sound_active) {
         S_BlockSound();
         S_ClearBuffer();
-        sound_active = false;
+        _sound_active = false;
     }
-    else if (ActiveApp && !sound_active) {
+    else if (ActiveApp && !_sound_active) {
         S_UnblockSound();
         S_ClearBuffer();
-        sound_active = true;
+        _sound_active = true;
     }
 
     // minimize/restore fulldib windows/mouse-capture normal windows on demand
@@ -2689,14 +2606,9 @@ LONG WINAPI MainWndProc(
         if (!in_mode_set) {
             temp = 0;
 
-            if (wParam & MK_LBUTTON)
-                temp |= 1;
-
-            if (wParam & MK_RBUTTON)
-                temp |= 2;
-
-            if (wParam & MK_MBUTTON)
-                temp |= 4;
+            if (wParam & MK_LBUTTON)                temp |= 1;
+            if (wParam & MK_RBUTTON)                temp |= 2;
+            if (wParam & MK_MBUTTON)                temp |= 4;
 
             IN_MouseEvent(temp);
         }
@@ -2723,10 +2635,8 @@ LONG WINAPI MainWndProc(
     case WM_QUERYNEWPALETTE:
         hdc = GetDC(NULL);
 
-        if (GetDeviceCaps(hdc, RASTERCAPS) & RC_PALETTE)
-            vid_palettized = true;
-        else
-            vid_palettized = false;
+        if (GetDeviceCaps(hdc, RASTERCAPS) & RC_PALETTE)    vid_palettized = true;
+        else                                                vid_palettized = false;
 
         ReleaseDC(NULL, hdc);
 
@@ -2761,14 +2671,11 @@ LONG WINAPI MainWndProc(
         }
         break;
 
-    case MM_MCINOTIFY:
-        lRet = CDAudio_MessageHandler(hWnd, uMsg, wParam, lParam);
-        break;
+    case MM_MCINOTIFY:  lRet = CDAudio_MessageHandler(hWnd, uMsg, wParam, lParam);  break;
 
     default:
         /* pass all unhandled messages to DefWindowProc */
-        lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
-        break;
+        lRet = DefWindowProc(hWnd, uMsg, wParam, lParam); break;
     }
 
     /* return 0 if handled message, 1 if not */
@@ -2778,8 +2685,7 @@ LONG WINAPI MainWndProc(
 
 static int	vid_line, vid_wmodes;
 
-typedef struct
-{
+typedef struct {
     int		modenum;
     cString desc;
     int		iscur;
@@ -2843,12 +2749,8 @@ void VID_MenuDraw(void) {
 
             if (dup || (vid_wmodes < MAX_MODEDESCS)) {
                 if (!dup || !modedescs[dupmode].ismode13 || COM_CheckParm("-noforcevga")) {
-                    if (dup) {
-                        k = dupmode;
-                    }
-                    else {
-                        k = vid_wmodes;
-                    }
+                    if (dup)    k = dupmode;
+                    else        k = vid_wmodes;
 
                     modedescs[k].modenum = i;
                     modedescs[k].desc = ptr;
@@ -2885,10 +2787,8 @@ void VID_MenuDraw(void) {
     row = 36 + 2 * 8;
 
     for (i = 0; i < 3; i++) {
-        if (modedescs[i].iscur)
-            M_PrintWhite(column, row, modedescs[i].desc);
-        else
-            M_Print(column, row, modedescs[i].desc);
+        if (modedescs[i].iscur)     M_PrintWhite(column, row, modedescs[i].desc);
+        else                        M_Print(column, row, modedescs[i].desc);
 
         column += 13 * 8;
     }
@@ -2900,10 +2800,8 @@ void VID_MenuDraw(void) {
         row = 36 + 6 * 8;
 
         for (i = 3; i < vid_wmodes; i++) {
-            if (modedescs[i].iscur)
-                M_PrintWhite(column, row, modedescs[i].desc);
-            else
-                M_Print(column, row, modedescs[i].desc);
+            if (modedescs[i].iscur)     M_PrintWhite(column, row, modedescs[i].desc);
+            else                        M_Print(column, row, modedescs[i].desc);
 
             column += 13 * 8;
 
@@ -2923,10 +2821,8 @@ void VID_MenuDraw(void) {
             "Please wait 5 seconds...");
     }
     else {
-        M_Print(9 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8,
-            "Press Enter to set mode");
-        M_Print(6 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8 * 3,
-            "T to test mode for 5 seconds");
+        M_Print(9 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8,       "Press Enter to set mode");
+        M_Print(6 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8 * 3,   "T to test mode for 5 seconds");
         ptr = VID_GetModeDescription2(vid_modenum);
 
         if (ptr) {

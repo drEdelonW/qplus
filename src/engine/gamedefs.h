@@ -35,9 +35,9 @@ typedef enum {
     IT_SIGIL1           = (1 << 28),
     IT_SIGIL2           = (1 << 29),
     IT_SIGIL3           = (1 << 30),
-    IT_SIGIL4           = (1 << 31)
+    // IT_SIGIL4           = (1 << 31)
 } item_bits_t;
-
+#define IT_SIGIL4 (1u << 31)
 
 //===========================================
 //rogue changed and added defines
@@ -64,8 +64,9 @@ typedef enum {
     RIT_MULTI_ROCKETS      = (1 << 28),  // 268435456
     RIT_SHIELD             = (1 << 29),  // 536870912
     RIT_ANTIGRAV           = (1 << 30),  // 1073741824
-    RIT_SUPERHEALTH        = (1u << 31)  // 2147483648
+    // RIT_SUPERHEALTH        = (1u << 31)  // 2147483648
 } rogue_item_bits_t;
+#define RIT_SUPERHEALTH (1u << 31)
 
 
 

@@ -29,7 +29,7 @@ static int net_controlsocket;
 static int net_broadcastsocket = 0;
 static struct qsockaddr broadcastaddr;
 
-static unsigned long myAddr;
+static uint32_t myAddr;
 
 bool	winsock_lib_initialized;
 
@@ -92,7 +92,7 @@ BOOL PASCAL FAR BlockingHook(void) {
 void WINS_GetLocalAddress() {
 	struct hostent* local = NULL;
 	char			buff[MAXHOSTNAMELEN];
-	unsigned long	addr;
+	uint32_t	addr;
 
 	if (myAddr != INADDR_ANY)
 		return;

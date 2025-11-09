@@ -337,10 +337,10 @@ CL_DecayLights
 ===============
 */
 void CL_DecayLights() {
-    float time = cl.time - cl.oldtime;
+    float time = (float)(cl.time - cl.oldtime);
     dLight_p dl = cl_dlights;
     for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
-        if (dl->die < cl.time || !dl->radius)
+        if ((dl->die < cl.time) || !dl->radius)
             continue;
 
         dl->radius -= time * dl->decay;
@@ -359,7 +359,7 @@ should be put at.
 ===============
 */
 float CL_LerpPoint() {
-    float f = cl.mtime[0] - cl.mtime[1];
+    float f = (float)(cl.mtime[0] - cl.mtime[1]);
 
     if (!f ||
         cl_nolerp.value ||
@@ -372,9 +372,9 @@ float CL_LerpPoint() {
 
     if (f > 0.1) { // dropped packet, or start of demo
         cl.mtime[1] = cl.mtime[0] - 0.1;
-        f = 0.1;
+        f = 0.1f;
     }
-    float frac = (cl.time - cl.mtime[1]) / f;
+    float frac = (float)(cl.time - cl.mtime[1]) / f;
     //Con_Printf ("frac: %f\n",frac);
     if (frac < 0) {
         if (frac < -0.01) {
@@ -425,7 +425,7 @@ void CL_RelinkEntities() {
         }
     }
 
-    float bobjrotate = anglemod(100 * cl.time);
+    float bobjrotate = anglemod((float)(100 * cl.time));
 
     // start on the entity after the world
     r_Entity_p ent = cl_entities + 1;
@@ -491,22 +491,22 @@ void CL_RelinkEntities() {
             vec3_t fv, rv, uv;  AngleVectors(ent->angles, fv, rv, uv);
 
             VectorMA(dl->origin, 18, fv, dl->origin);
-            dl->radius = 200 + (rand() & 31);
+            dl->radius = (float)(200 + (rand() & 31));
             dl->minlight = 32;
-            dl->die = cl.time + 0.1;
+            dl->die = (float)(cl.time + 0.1);
         }
         if (ent->effects & EF_BRIGHTLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
             dl->origin[2] += 16;
-            dl->radius = 400 + (rand() & 31);
-            dl->die = cl.time + 0.001;
+            dl->radius = (float)(400 + (rand() & 31));
+            dl->die = (float)(cl.time + 0.001);
         }
         if (ent->effects & EF_DIMLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
-            dl->radius = 200 + (rand() & 31);
-            dl->die = cl.time + 0.001;
+            dl->radius = (float)(200 + (rand() & 31));
+            dl->die = (float)(cl.time + 0.001);
         }
 #ifdef QUAKE2
         if (ent->effects & EF_DARKLIGHT) {
@@ -533,7 +533,7 @@ void CL_RelinkEntities() {
             dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, dl->origin);
             dl->radius = 200;
-            dl->die = cl.time + 0.01;
+            dl->die = (float)(cl.time + 0.01);
         }
         else if (ent->model->flags & EF_GRENADE)    R_RocketTrail(oldorg, ent->origin, RT_GRENADE);
         else if (ent->model->flags & EF_TRACER3)    R_RocketTrail(oldorg, ent->origin, RT_TRACER3);
@@ -571,7 +571,7 @@ void CL_ReadFromServer() {
         if (ret == -1)  Host_Error("CL_ReadFromServer: lost server connection");
         if (!ret)       break;
 
-        cl.last_received_message = realtime;
+        cl.last_received_message = (float)realtime;
         CL_ParseServerMessage();
     } while (ret && (cls.state == ca_connected));
 

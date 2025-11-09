@@ -56,10 +56,10 @@ void CL_FinishTimeDemo() {
 
     // the first frame didn't count
     int frames = (host_framecount - cls.td_startframe) - 1;
-    float time = realtime - cls.td_starttime;
+    float time = (float)(realtime - cls.td_starttime);
     if (!time)
         time = 1;
-    Con_Printf("%i frames %5.1f seconds %5.1f fps\n", frames, time, frames / time);
+    Con_Printf("%i frames %5.1f seconds %5.1f fps\n", frames, time, (float)frames / time);
 }
 
 /*
@@ -90,7 +90,7 @@ Dumps the current net message, prefixed by the length and view angles
 ====================
 */
 void CL_WriteDemoMessage() {
-    int len = LittleLong(net_message.cursize);
+    int len = LittleLong((int32_t)net_message.cursize);
     fwrite(&len, 4, 1, cls.demofile);
     for (int i = 0; i < VECT_DIM; i++) {
         float f = LittleFloat(cl.viewangles[i]);
@@ -118,7 +118,7 @@ int CL_GetMessage() {
                 // if this is the second frame, grab the real td_starttime
                 // so the bogus time on the first frame doesn't count
                 if (host_framecount == cls.td_startframe + 1)
-                    cls.td_starttime = realtime;
+                    cls.td_starttime = (float)realtime;
             }
             else if ( /* cl.time > 0 && */ cl.time <= cl.mtime[0]) {
                 return 0;  // don't need another message yet
@@ -134,11 +134,11 @@ int CL_GetMessage() {
             cl.mviewangles[0][i] = LittleFloat(f);
         }
 
-        net_message.cursize = LittleLong(net_message.cursize);
+        net_message.cursize = (size_t)LittleLong((int32_t)net_message.cursize);
         if (net_message.cursize > MAX_MSGLEN)
             Sys_Error("Demo message > MAX_MSGLEN");
 
-        int r = fread(net_message.data, net_message.cursize, 1, cls.demofile);
+        size_t r = fread(net_message.data, net_message.cursize, 1, cls.demofile);
         if (r != 1) {
             CL_StopPlayback();
             return 0;

@@ -155,8 +155,8 @@ float CL_KeyState(kbutton_p key) {
 void CL_AdjustAngles() {
     float speed;
 
-    if (in.speed.state & 1) speed = host_frametime * cl_anglespeedkey.value;
-    else                    speed = host_frametime;
+    if (in.speed.state & 1) speed = (float)host_frametime * cl_anglespeedkey.value;
+    else                    speed = (float)host_frametime;
 
     if (!(in.strafe.state & 1)) {
         cl.viewangles[YAW] -= speed * cl_yawspeed.value * CL_KeyState(&in.right);
@@ -248,14 +248,14 @@ void CL_SendMove(UserCmd_p cmd) {
     //
     // send the movement message
     //
-    MSG_WriteByte(&buf, clc_move); MSG_WriteFloat(&buf, cl.mtime[0]); // so server can get ping times
+    MSG_WriteByte(&buf, clc_move); MSG_WriteFloat(&buf, (float)cl.mtime[0]); // so server can get ping times
 
     for (int i = 0; i < VECT_DIM; i++)
         MSG_WriteAngle(&buf, cl.viewangles[i]);
 
-    MSG_WriteShort(&buf, cmd->forwardmove);
-    MSG_WriteShort(&buf, cmd->sidemove);
-    MSG_WriteShort(&buf, cmd->upmove);
+    MSG_WriteShort(&buf, (int16_t)cmd->forwardmove);
+    MSG_WriteShort(&buf, (int16_t)cmd->sidemove);
+    MSG_WriteShort(&buf, (int16_t)cmd->upmove);
 
     //
     // send button bits
@@ -267,9 +267,9 @@ void CL_SendMove(UserCmd_p cmd) {
     if (in.jump.state & 3)      bits |= 2;
     in.jump.state &= ~2;
 
-    MSG_WriteByte(&buf, bits);
+    MSG_WriteByte(&buf, (uint8_t)bits);
 
-    MSG_WriteByte(&buf, in.impulse);
+    MSG_WriteByte(&buf, (uint8_t)in.impulse);
     in.impulse = 0;
 
 #ifdef QUAKE2

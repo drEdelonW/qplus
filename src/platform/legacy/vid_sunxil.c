@@ -905,14 +905,14 @@ VID_Update(vRect_p rects) {
 
     if (count_frames) {
         static int count;
-        static long long s;
-        long long gethrtime();
+        static int64_t s;
+        int64_t gethrtime();
 
         if (count == 0)
             s = gethrtime();
 
         if (count++ == 200) {
-            long long n = gethrtime();
+            int64_t n = gethrtime();
             count = 1;
             printf("%lf frames/secs\n", 200.0 / ((double)(n - s) / 1e9));
             s = n;

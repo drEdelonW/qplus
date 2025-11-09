@@ -63,15 +63,15 @@ void SV_SetIdealPitch() {
     if (!((int)sv_player->v.flags & FL_ONGROUND))   return;
 
     float z[MAX_FORWARD];
-    float angleval = sv_player->v.angles[YAW] * M_PI * 2 / 360;
-    float sinval = sin(angleval);
-    float cosval = cos(angleval);
+    float angleval = sv_player->v.angles[YAW] * (float)M_PI * 2 / 360;
+    float sinval = (float)sin(angleval);
+    float cosval = (float)cos(angleval);
 
     int i = 0;
     for (; i < MAX_FORWARD; i++) {
         vec3_t top = {
-            sv_player->v.origin[0] + cosval * (i + 3) * 12,
-            sv_player->v.origin[1] + sinval * (i + 3) * 12,
+            sv_player->v.origin[0] + cosval * ((float)i + 3) * 12,
+            sv_player->v.origin[1] + sinval * ((float)i + 3) * 12,
             sv_player->v.origin[2] + sv_player->v.view_ofs[2]
         };
 
@@ -88,10 +88,10 @@ void SV_SetIdealPitch() {
         z[i] = top[2] + tr.fraction * (bottom[2] - top[2]);
     }
 
-    int dir = 0;
-    int steps = 0;
+    float dir = 0;
+    float steps = 0;
     for (int j = 1; j < i; j++) {
-        int step = z[j] - z[j - 1];
+        float step = z[j] - z[j - 1];
         if ((step > -ON_EPSILON) && (step < ON_EPSILON))    continue;
 
         if (dir && (((step - dir) > ON_EPSILON) || ((step - dir) < -ON_EPSILON))) return;  // mixed changes
@@ -122,7 +122,7 @@ void SV_UserFriction() {
 
     float_p vel = velocity;
 
-    float speed = sqrt(vel[0] * vel[0] + vel[1] * vel[1]);
+    float speed = (float)sqrt(vel[0] * vel[0] + vel[1] * vel[1]);
     if (!speed) return;
 
     // if the leading edge is over a dropoff, increase friction
@@ -139,8 +139,8 @@ void SV_UserFriction() {
         friction = sv_friction.value;
 
     // apply friction
-    float control = speed < sv_stopspeed.value ? sv_stopspeed.value : speed;
-    float newspeed = speed - host_frametime * control * friction;
+    float control = (speed < sv_stopspeed.value) ? sv_stopspeed.value : speed;
+    float newspeed = (float)(speed - host_frametime * control * friction);
 
     if (newspeed < 0)
         newspeed = 0;
@@ -179,7 +179,7 @@ void SV_Accelerate() {
     if (addspeed <= 0)
         return;
 
-    float accelspeed = sv_accelerate.value * host_frametime * _wishSpeed;
+    float accelspeed = (float)(sv_accelerate.value * host_frametime * _wishSpeed);
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
@@ -198,7 +198,7 @@ void SV_AirAccelerate(vec3_t wishveloc) {
         return;
 
     // accelspeed = sv_accelerate.value * host_frametime;
-    float accelspeed = sv_accelerate.value * _wishSpeed * host_frametime;
+    float accelspeed = (float)(sv_accelerate.value * _wishSpeed * host_frametime);
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
@@ -210,7 +210,7 @@ void SV_AirAccelerate(vec3_t wishveloc) {
 void DropPunchAngle() {
     float len = VectorNormalize(sv_player->v.punchangle);
 
-    len -= 10 * host_frametime;
+    len -= (float)(10.0 * host_frametime);
     if (len < 0)
         len = 0;
     VectorScale(sv_player->v.punchangle, len, sv_player->v.punchangle);
@@ -242,13 +242,13 @@ void SV_WaterMove() {
         VectorScale(wishvel, sv_maxspeed.value / _wishSpeed, wishvel);
         _wishSpeed = sv_maxspeed.value;
     }
-    _wishSpeed *= 0.7;
+    _wishSpeed *= 0.7f;
 
     // water friction
     float speed = Length(velocity);
     float newspeed;
     if (speed) {
-        newspeed = speed - host_frametime * speed * sv_friction.value;
+        newspeed = (float)(speed - host_frametime * speed * sv_friction.value);
         if (newspeed < 0)
             newspeed = 0;
         VectorScale(velocity, newspeed / speed, velocity);
@@ -263,7 +263,7 @@ void SV_WaterMove() {
     if (addspeed <= 0)  return;
 
     VectorNormalize(wishvel);
-    float accelspeed = sv_accelerate.value * _wishSpeed * host_frametime;
+    float accelspeed = (float)(sv_accelerate.value * _wishSpeed * host_frametime);
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
@@ -381,8 +381,7 @@ SV_ReadClientMove
 */
 void SV_ReadClientMove(UserCmd_p move) {
     // read ping time
-    remoteClient->ping_times[remoteClient->num_pings % NUM_PING_TIMES]
-        = sv.time - MSG_ReadFloat();
+    remoteClient->ping_times[remoteClient->num_pings % NUM_PING_TIMES] = (float)sv.time - MSG_ReadFloat();
     remoteClient->num_pings++;
 
     // read current angles
@@ -403,12 +402,12 @@ void SV_ReadClientMove(UserCmd_p move) {
 
     // read buttons
     int bits = MSG_ReadByte();
-    remoteClient->edict->v.button0 = bits & 1;
-    remoteClient->edict->v.button2 = (bits & 2) >> 1;
+    remoteClient->edict->v.button0 = (float)(bits & 1);
+    remoteClient->edict->v.button2 = (float)((bits & 2) >> 1);
 
-    int i = MSG_ReadByte();
+    uint8_t i = MSG_ReadByte();
     if (i)
-        remoteClient->edict->v.impulse = i;
+        remoteClient->edict->v.impulse = (float)i;
 
 #ifdef QUAKE2
     // read light level

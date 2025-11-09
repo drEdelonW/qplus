@@ -9,6 +9,7 @@
 #define MAX_LIGHTSTYLES     64
 #define MAX_MODELS          256   /* these are sent over the net as bytes */
 #define MAX_SOUNDS          256   /* so they cannot be blindly increased */
+#define MAXGAMEDIRLEN       1000
 
 #define MAX_SCOREBOARD      16
 #define MAX_SCOREBOARDNAME  32

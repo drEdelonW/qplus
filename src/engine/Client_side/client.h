@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 typedef struct {
-    int32_t length;
+    uint32_t length;
     char    map[MAX_STYLESTRING];
 } LightStyle_t;
 
@@ -145,8 +145,8 @@ typedef struct {
     UserCmd_t   cmd;   // last command sent to the server
 
     // information for local display
-    int32_t stats[MAX_CL_STATS]; // health, etc
-    int32_t items;   // inventory bit flags
+    uint32_t stats[MAX_CL_STATS]; // health, etc
+    uint32_t items;   // inventory bit flags
     float   item_gettime[32]; // cl.time of aquiring item, for blinking
     float   faceanimtime; // use anim frame if cl.time < this
 
@@ -231,8 +231,8 @@ extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
 
 // cl_input
 typedef struct {
-    uint8_t down[2];    // key nums holding it down
-    uint8_t state;      // low bit is down state
+    int down[2];    // key nums holding it down
+    int state;      // low bit is down state
 } kbutton_t;
 typedef kbutton_t* kbutton_p;
 

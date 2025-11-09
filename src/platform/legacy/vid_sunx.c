@@ -947,8 +947,8 @@ void GetEvent(void) {
 void	VID_Update(vRect_p rects) {
 #if 0
     static int count;
-    static long long s;
-    long long gethrtime();
+    static int64_t s;
+    int64_t gethrtime();
 
     if (count == 0)
         s = gethrtime();
@@ -985,7 +985,7 @@ void	VID_Update(vRect_p rects) {
     }
 
     if (doShm) {
-        //		long long s, gethrtime();
+        //		int64_t s, gethrtime();
         //		s = gethrtime();
 
         while (rects) {

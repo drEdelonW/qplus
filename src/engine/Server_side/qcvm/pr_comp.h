@@ -49,18 +49,18 @@ typedef enum {
 } etype_t;
 
 // VM global offsets; vectors occupy 3 float slots
-typedef enum  {
-    OFS_NULL      = 0,
-    OFS_RETURN    = 1,
-    OFS_PARM0     = 4,   // parm0..parm7: +3 per parm
-    OFS_PARM1     = 7,
-    OFS_PARM2     = 10,
-    OFS_PARM3     = 13,
-    OFS_PARM4     = 16,
-    OFS_PARM5     = 19,
-    OFS_PARM6     = 22,
-    OFS_PARM7     = 25,
-    RESERVED_OFS  = 28
+typedef enum {
+    OFS_NULL      = 0u,
+    OFS_RETURN    = 1u,
+    OFS_PARM0     = 4u,   // parm0..parm7: +3 per parm
+    OFS_PARM1     = 7u,
+    OFS_PARM2     = 10u,
+    OFS_PARM3     = 13u,
+    OFS_PARM4     = 16u,
+    OFS_PARM5     = 19u,
+    OFS_PARM6     = 22u,
+    OFS_PARM7     = 25u,
+    RESERVED_OFS  = 28u
 } PrOfs_e;
 
 typedef enum {
@@ -160,7 +160,7 @@ typedef struct {
 } dDef_t;
 typedef dDef_t* dDef_p;
 
-#define DEF_SAVEGLOBAL (1 << 15)
+#define DEF_SAVEGLOBAL (1U << 15)
 #define MAX_PARMS (8)
 
 typedef struct {
@@ -196,7 +196,7 @@ typedef struct {
     prog_lump32_t strings;      // first string is a null string
     prog_lump32_t globals;
 
-    int32_t  entityfields;
+    uint32_t  entityfields;
 } dprograms_t;
 typedef dprograms_t* dprograms_p;
 

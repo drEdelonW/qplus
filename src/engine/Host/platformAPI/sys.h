@@ -37,8 +37,8 @@ extern "C" {
     void Sys_FileClose(int handle);
 
     void Sys_FileSeek(int handle, int position);
-    int Sys_FileRead(int handle, TypeLess_ptr dest, int count);
-    int Sys_FileWrite(int handle, TypeLess_ptr data, int count);
+    int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count);
+    int Sys_FileWrite(int handle, TypeLess_ptr data, size_t count);
     int Sys_FileTime(cStringRO path);
     void Sys_mkdir(cStringRO path);
 

@@ -74,7 +74,7 @@ extern "C" {
 
     //============================================================================
 
-    void COM_WriteFile(cStringRO filename, TypeLess_ptr data, int32_t len);
+    void COM_WriteFile(cStringRO filename, TypeLess_ptr data, size_t len);
     int COM_OpenFile(cStringRO filename, int* hndl);
     int COM_FOpenFile(cStringRO filename, FILE** file);
     void COM_CloseFile(int h);

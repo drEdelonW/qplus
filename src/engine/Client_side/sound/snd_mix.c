@@ -45,13 +45,13 @@ void Snd_WriteLinearBlastStereo16();
 void Snd_WriteLinearBlastStereo16() {
     for (int i = 0; i < _snd_linear_count; i += 2) {
         {
-            int val = (_snd_p[i] * _snd_vol) >> 8;
+            int16_t val = (int16_t)((_snd_p[i] * _snd_vol) >> 8);
             if (val > MAX_SND_VAL)      _snd_out[i] = MAX_SND_VAL;
             else if (val < MIN_SND_VAL) _snd_out[i] = MIN_SND_VAL;
             else                        _snd_out[i] = val;
         }
         {
-            int val = (_snd_p[i + 1] * _snd_vol) >> 8;
+            int16_t val = (int16_t)((_snd_p[i + 1] * _snd_vol) >> 8);
             if (val > MAX_SND_VAL)      _snd_out[i + 1] = MAX_SND_VAL;
             else if (val < MIN_SND_VAL) _snd_out[i + 1] = MIN_SND_VAL;
             else                        _snd_out[i + 1] = val;
@@ -62,7 +62,7 @@ void Snd_WriteLinearBlastStereo16() {
 
 void S_TransferStereo16(int endtime) {
     LPVOID pbuf;
-    _snd_vol = volume.value * 256;
+    _snd_vol = (int)(volume.value * 256);
     _snd_p = (int*)_paintbuffer;
     int lpaintedtime = paintedtime;
 #ifdef _WIN32
@@ -131,7 +131,7 @@ void S_TransferPaintBuffer(int endtime) {
     int out_mask = shm->samples - 1;
     int out_idx = paintedtime * shm->channels & out_mask;
     int step = 3 - shm->channels;
-    int snd_vol = volume.value * 256;
+    int snd_vol = (int)(volume.value * 256);
 
     LPVOID pbuf;
 #ifdef _WIN32
@@ -167,7 +167,7 @@ void S_TransferPaintBuffer(int endtime) {
     if (shm->samplebits == 16) {
         int16_p out = (int16_p)pbuf;
         while (count--) {
-            int val = (*p * snd_vol) >> 8;
+            int16_t val = (int16_t)((*p * snd_vol) >> 8);
             p += step;
             if (val > MAX_SND_VAL)          val = MAX_SND_VAL;
             else if (val < MIN_SND_VAL)     val = MIN_SND_VAL;
@@ -178,11 +178,11 @@ void S_TransferPaintBuffer(int endtime) {
     else if (shm->samplebits == 8) {
         uint8_p out = (uint8_p)pbuf;
         while (count--) {
-            int val = (*p * snd_vol) >> 8;
+            int16_t val = (int16_t)((*p * snd_vol) >> 8);
             p += step;
             if (val > MAX_SND_VAL)          val = MAX_SND_VAL;
             else if (val < MIN_SND_VAL)     val = MIN_SND_VAL;
-            out[out_idx] = (val >> 8) + 128;
+            out[out_idx] = (uint8_t)((val >> 8) + 128);
             out_idx = (out_idx + 1) & out_mask;
         }
     }
@@ -225,7 +225,7 @@ void S_PaintChannels(int endtime) {
             end = paintedtime + PAINTBUFFER_SIZE;
 
         // clear the paint buffer
-        Q_memset(_paintbuffer, 0, (end - paintedtime) * sizeof(portable_samplepair_t));
+        Q_memset(_paintbuffer, 0, (size_t)(end - paintedtime) * sizeof(portable_samplepair_t));
 
         // paint in the channels.
         channel_p ch = channels;

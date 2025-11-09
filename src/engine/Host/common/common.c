@@ -175,7 +175,7 @@ void COM_FileBase(cStringRO in, cString out) {
     if ((s - s2) < 2)   strcpy(out, "?model?");
     else {
         s--;
-        strncpy(out, s2 + 1, s - s2);
+        strncpy(out, s2 + 1u, (size_t)(s - s2));
         out[s - s2] = 0;
     }
 }
@@ -325,7 +325,7 @@ void COM_CheckRegistered() {
         return;
     }
 
-    uint16_t  check[128];
+    int16_t  check[128];
     Sys_FileRead(h, check, sizeof(check));
     COM_CloseFile(h);
 
@@ -461,7 +461,7 @@ COM_WriteFile
 The filename will be prefixed by the current game directory
 ============
 */
-void COM_WriteFile(cStringRO filename, TypeLess_ptr data, int32_t len) {
+void COM_WriteFile(cStringRO filename, TypeLess_ptr data, size_t len) {
     char    name[MAX_OSPATH];
     snprintf(name, sizeof(name), "%s/%s", com.gamedir, filename);
 
@@ -505,14 +505,17 @@ needed.  This is for the convenience of developers using ISDN from home.
 */
 void COM_CopyFile(cString netpath, cString cachepath) {
     int in;
-    int remaining = Sys_FileOpenRead(netpath, &in);
+    int ret = Sys_FileOpenRead(netpath, &in);
+    if (ret == -1) return; // ERROR
+
+    size_t remaining = (size_t)ret;
     COM_CreatePath(cachepath);     // create directories up to the cache file
     int out = Sys_FileOpenWrite(cachepath);
 
     while (remaining) {
         char buf[4096];
-        int count = (remaining < sizeof(buf)) ?
-            remaining : sizeof(buf);
+        size_t count = (remaining < sizeof(buf)) ?
+            remaining : (int)sizeof(buf);
         Sys_FileRead(in, buf, count);
         Sys_FileWrite(out, buf, count);
         remaining -= count;
@@ -684,7 +687,7 @@ uint8_p COM_LoadFile(cStringRO path, int usehunk) {
 
     // look for it in the filesystem or pack files
     int h;
-    int len = COM_OpenFile(path, &h);
+    size_t len = (size_t)COM_OpenFile(path, &h);
     if (h == -1)    return NULL;
 
     // extract the filename base name for hunk tag
@@ -787,7 +790,7 @@ void COM_InitFilesystem() {
     if (param && (param < com.argc - 1))    strcpy(basedir, com.argv[param + 1]);
     else                                    strcpy(basedir, host_parms.basedir);
 
-    int st_len = strlen(basedir);
+    size_t st_len = strlen(basedir);
 
     if (st_len > 0) {
         if ((basedir[st_len - 1] == '\\') ||

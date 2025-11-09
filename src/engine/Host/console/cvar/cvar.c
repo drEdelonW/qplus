@@ -75,7 +75,7 @@ Cvar_CompleteVariable
 ============
 */
 cString Cvar_CompleteVariable(cString partial) {
-    int len = Q_strlen(partial);
+    uint32_t len = Q_strlen(partial);
 
     if (!len)
         return NULL;

@@ -34,7 +34,7 @@ typedef struct {
     bool    forcedup; // because no entities to refresh
     bool    isInitialized;
     char    lines[MAXCHATLEN][MAXCMDLINE];
-    int32_t linepos;
+    uint32_t linepos;
 } console_t;
 extern console_t con;
 

@@ -8,7 +8,7 @@
 
 //===========================================================================
 
-void SZ_Alloc(sizebuf_p buf, int32_t startsize) {
+void SZ_Alloc(sizebuf_p buf, size_t startsize) {
     CLAMP_LESS(startsize, 256);
     buf->data = Hunk_AllocName(startsize, "sizebuf");
     buf->maxsize = startsize;
@@ -27,7 +27,7 @@ void SZ_Clear(sizebuf_p buf) {
     buf->cursize = 0;
 }
 
-TypeLess_ptr SZ_GetSpace(sizebuf_p buf, int32_t length) {
+TypeLess_ptr SZ_GetSpace(sizebuf_p buf, size_t length) {
     if ((buf->cursize + length) > buf->maxsize) {
         if (!buf->allowoverflow)    Sys_Error("SZ_GetSpace: overflow without allowoverflow set");
         if (length > buf->maxsize)  Sys_Error("SZ_GetSpace: %i is > full buffer size", length);
@@ -43,7 +43,7 @@ TypeLess_ptr SZ_GetSpace(sizebuf_p buf, int32_t length) {
     return data;
 }
 
-void SZ_Write(sizebuf_p buf, TypeLess_ptr data, int32_t length) {
+void SZ_Write(sizebuf_p buf, TypeLess_ptr data, size_t length) {
     Q_memcpy(SZ_GetSpace(buf, length), data, length);
 }
 

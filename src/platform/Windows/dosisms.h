@@ -30,14 +30,14 @@ int dos_unlockmem(TypeLess_ptr addr, int size);
 
 typedef union {
 	struct {
-		unsigned long edi;
-		unsigned long esi;
-		unsigned long ebp;
-		unsigned long res;
-		unsigned long ebx;
-		unsigned long edx;
-		unsigned long ecx;
-		unsigned long eax;
+		uint32_t edi;
+		uint32_t esi;
+		uint32_t ebp;
+		uint32_t res;
+		uint32_t ebx;
+		uint32_t edx;
+		uint32_t ecx;
+		uint32_t eax;
 	} d;
 	struct {
 		uint16_t di, di_hi;

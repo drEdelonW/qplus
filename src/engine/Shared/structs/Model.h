@@ -76,18 +76,18 @@ struct Model_s {
     bool    clipbox;    // solid volume for clipping
     vec3_t  clipmins, clipmaxs;
 #endif
-    int32_t firstmodelsurface, nummodelsurfaces;    // brush model
-    int32_t numsubmodels;       dModel_p    submodels;
-    int32_t numplanes;          mPlane_p    planes;
-    int32_t numleafs;           mLeaf_p     leafs;  // number of visible leafs, not counting 0
-    int32_t numvertexes;        mVertex_p   vertexes;
-    int32_t numedges;           mEdge_p     edges;
-    int32_t numnodes;           mNode_p     nodes;
-    int32_t numtexinfo;         mTexInfo_p  texinfo;
-    int32_t numsurfaces;        mSurface_p  surfaces;
-    int32_t numsurfedges;       int32_p     surfedges;
-    int32_t numclipnodes;       dClipNode_p clipnodes;
-    int32_t nummarksurfaces;    mSurface_p* marksurfaces;
+    uint32_t firstmodelsurface, nummodelsurfaces;    // brush model
+    uint32_t numsubmodels;       dModel_p    submodels;
+    uint32_t numplanes;          mPlane_p    planes;
+    uint32_t numleafs;           mLeaf_p     leafs;  // number of visible leafs, not counting 0
+    uint32_t numvertexes;        mVertex_p   vertexes;
+    uint32_t numedges;           mEdge_p     edges;
+    uint32_t numnodes;           mNode_p     nodes;
+    uint32_t numtexinfo;         mTexInfo_p  texinfo;
+    uint32_t numsurfaces;        mSurface_p  surfaces;
+    uint32_t numsurfedges;       int32_p     surfedges;
+    uint32_t numclipnodes;       dClipNode_p clipnodes;
+    uint32_t nummarksurfaces;    mSurface_p* marksurfaces;
     Hull_t  hulls[MAX_MAP_HULLS];
     int32_t numtextures;        Texture_p* textures;
     uint8_p visdata;

@@ -24,7 +24,7 @@ void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count) {
     }
 }
 #else
-void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count) {
+void Q_memset(TypeLess_ptr dest, int32_t fill, uint32_t count) {
     if (count <= 0) return;
     /* 64-bit safe alignment check */
     if ((((uintptr_t)dest | (uintptr_t)count) & 3u) == 0u) {
@@ -113,8 +113,8 @@ void Q_strncpy(cString dest, cStringRO src, int32_t count) {
 }
 #endif
 
-int Q_strlen(cStringRO str) {
-    int32_t count = 0;
+uint32_t Q_strlen(cStringRO str) {
+    uint32_t count = 0;
     while (str[count])
         count++;
 
@@ -148,7 +148,7 @@ int Q_strcmp(cStringRO s1, cStringRO s2) {
     return -1;
 }
 
-int Q_strncmp(cStringRO s1, cStringRO s2, int32_t count) {
+int Q_strncmp(cStringRO s1, cStringRO s2, uint32_t count) {
     while (1) {
         if (!count--)       return 0;
         if (*s1 != *s2)     return -1;              // strings not equal

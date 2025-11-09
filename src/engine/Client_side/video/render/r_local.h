@@ -59,7 +59,6 @@ typedef aLight_t* aLight_p;
 #define DIST_NOT_SET (98765)
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
-struct ClipPlane_s;
 typedef struct ClipPlane_s ClipPlane_t;
 typedef ClipPlane_t* ClipPlane_p;
 struct ClipPlane_s {
@@ -70,7 +69,6 @@ struct ClipPlane_s {
     uint8_t     rightedge;
     uint8_t     reserved[2];
 };
-
 extern ClipPlane_t view_clipplanes[4];
 
 //=============================================================================

@@ -60,7 +60,7 @@ void Cmd_StuffCmds_f() {
     }
 
     // build the combined string to parse from
-    int s = 0;
+    uint32_t s = 0;
     for (int i = 1; i < com.argc; i++) {
         if (!com.argv[i])   continue;  // NEXTSTEP nulls out -NXHost
 
@@ -339,7 +339,7 @@ bool Cmd_Exists(cString cmd_name) {
     ============
 */
 cString Cmd_CompleteCommand(cString partial) {
-    int len = Q_strlen(partial);
+    uint32_t len = Q_strlen(partial);
 
     if (!len) return NULL;
 

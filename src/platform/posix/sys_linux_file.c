@@ -83,7 +83,7 @@ int Sys_FileOpenWrite(cStringRO path) {
     return handle;
 }
 
-int Sys_FileWrite(int handle, TypeLess_ptr src, int count) {
+int Sys_FileWrite(int handle, TypeLess_ptr src, size_t count) {
     return write(handle, src, count);
 }
 
@@ -95,7 +95,7 @@ void Sys_FileSeek(int handle, int position) {
     lseek(handle, position, SEEK_SET);
 }
 
-int Sys_FileRead(int handle, TypeLess_ptr dest, int count) {
+int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) {
     return read(handle, dest, count);
 }
 

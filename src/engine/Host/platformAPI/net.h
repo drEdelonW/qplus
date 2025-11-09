@@ -46,9 +46,9 @@ typedef enum {
     NETFLAG_NAK         = 0x00040000, // negative acknowledge
     NETFLAG_EOM         = 0x00080000, // end of message
     NETFLAG_UNRELIABLE  = 0x00100000, // unreliable packet
-    NETFLAG_CTL         = 0x80000000  // control packet
+    // NETFLAG_CTL         = 0x80000000  // control packet
 } netflag_t;
-
+#define NETFLAG_CTL 0x80000000u
 
 #define NET_PROTOCOL_VERSION 3
 

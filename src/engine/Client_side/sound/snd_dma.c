@@ -65,7 +65,7 @@ vec3_t  listener_right;
 vec3_t  listener_up;
 vec_t  sound_nominal_clip_dist = 1000.0;
 
-int   soundtime;  // sample PAIRS
+int     soundtime;  // sample PAIRS
 int     paintedtime;  // sample PAIRS
 
 
@@ -375,23 +375,23 @@ void SND_Spatialize(channel_p ch) {
 
     vec_t lscale, rscale;
     if (shm->channels == 1) {
-        rscale = 1.0;
-        lscale = 1.0;
+        rscale = 1.0f;
+        lscale = 1.0f;
     }
     else {
-        rscale = 1.0 + dot;
-        lscale = 1.0 - dot;
+        rscale = 1.0f + dot;
+        lscale = 1.0f - dot;
     }
 
     // add in distance effect
-    vec_t scale = (1.0 - dist) * rscale;
-    ch->rightvol = (int)(ch->master_vol * scale);
+    vec_t scale = (1.0f - dist) * rscale;
+    ch->rightvol = (int)((float)ch->master_vol * scale);
     if (ch->rightvol < 0) {
         ch->rightvol = 0;
     }
 
-    scale = (1.0 - dist) * lscale;
-    ch->leftvol = (int)(ch->master_vol * scale);
+    scale = (1.0f - dist) * lscale;
+    ch->leftvol = (int)((float)ch->master_vol * scale);
     if (ch->leftvol < 0) {
         ch->leftvol = 0;
     }
@@ -407,7 +407,7 @@ void S_StartSound(int entnum, int entchannel, sfx_p sfx, vec3_t origin, float fv
         (!sfx) ||
         (nosound.value))  return;
 
-    int vol = fvol * 255;
+    float vol = fvol * 255;
 
     // pick a channel to play on
     channel_p target_chan = SND_PickChannel(entnum, entchannel);
@@ -417,7 +417,7 @@ void S_StartSound(int entnum, int entchannel, sfx_p sfx, vec3_t origin, float fv
     memset(target_chan, 0, sizeof(*target_chan));
     VectorCopy(origin, target_chan->origin);
     target_chan->dist_mult = attenuation / sound_nominal_clip_dist;
-    target_chan->master_vol = vol;
+    target_chan->master_vol = (int)vol;
     target_chan->entnum = entnum;
     target_chan->entchannel = entchannel;
     SND_Spatialize(target_chan);
@@ -528,7 +528,7 @@ void S_ClearBuffer() {
     else
 #endif
     {
-        Q_memset(shm->buffer, clear, shm->samples * shm->samplebits / 8);
+        Q_memset(shm->buffer, clear, (size_t)(shm->samples * shm->samplebits / 8));
     }
     }
 
@@ -559,7 +559,7 @@ void S_StaticSound(sfx_p sfx, vec3_t origin, float vol, float attenuation) {
 
     ss->sfx = sfx;
     VectorCopy(origin, ss->origin);
-    ss->master_vol = vol;
+    ss->master_vol = (int)vol;
     ss->dist_mult = (attenuation / 64) / sound_nominal_clip_dist;
     ss->end = paintedtime + sc->length;
 
@@ -597,14 +597,14 @@ void S_UpdateAmbientSounds() {
 
         // don't adjust volume too fast
         if (chan->master_vol < vol) {
-            chan->master_vol += host_frametime * ambient_fade.value;
+            chan->master_vol += (int)((float)host_frametime * ambient_fade.value);
             if (chan->master_vol > vol)
-                chan->master_vol = vol;
+                chan->master_vol = (int)vol;
         }
         else if (chan->master_vol > vol) {
-            chan->master_vol -= host_frametime * ambient_fade.value;
+            chan->master_vol -= (int)((float)host_frametime * ambient_fade.value);
             if (chan->master_vol < vol)
-                chan->master_vol = vol;
+                chan->master_vol = (int)vol;
         }
 
         chan->leftvol = chan->rightvol = chan->master_vol;
@@ -747,9 +747,9 @@ void S_Update_() {
     }
 
     // mix ahead of current position
-    uint32_t endtime = soundtime + _snd_mixahead.value * shm->speed;
+    int endtime = soundtime + (int)_snd_mixahead.value * shm->speed;
     int samps = shm->samples >> (shm->channels - 1);
-    if (endtime - soundtime > samps)
+    if ((endtime - soundtime) > samps)
         endtime = soundtime + samps;
 
 #ifdef _WIN32

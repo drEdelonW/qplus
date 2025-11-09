@@ -119,7 +119,7 @@ void CL_ParseBeam(Model_p m) {
         if (b->entity == ent) {
             b->entity = ent;
             b->model = m;
-            b->endtime = cl.time + 0.2;
+            b->endtime = (float)(cl.time + 0.2);
             VectorCopy(start, b->start);
             VectorCopy(end, b->end);
             return;
@@ -131,7 +131,7 @@ void CL_ParseBeam(Model_p m) {
         if (!b->model || (b->endtime < cl.time)) {
             b->entity = ent;
             b->model = m;
-            b->endtime = cl.time + 0.2;
+            b->endtime = (float)(cl.time + 0.2);
             VectorCopy(start, b->start);
             VectorCopy(end, b->end);
             return;
@@ -223,7 +223,7 @@ void CL_ParseTEnt() {
         dLight_p dl = CL_AllocDlight(0);
         VectorCopy(pos, dl->origin);
         dl->radius = 350;
-        dl->die = cl.time + 0.5;
+        dl->die = (float)(cl.time + 0.5);
         dl->decay = 300;
         S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
     } break;
@@ -276,7 +276,7 @@ void CL_ParseTEnt() {
         dLight_p dl = CL_AllocDlight(0);
         VectorCopy(pos, dl->origin);
         dl->radius = 350;
-        dl->die = cl.time + 0.5;
+        dl->die = (float)(cl.time + 0.5);
         dl->decay = 300;
         S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
     } break;
@@ -372,12 +372,12 @@ void CL_UpdateTEnts() {
             else                pitch = 270;
         }
         else {
-            yaw = (int)(atan2(dist[1], dist[0]) * 180 / M_PI);
+            yaw = (float)(atan2(dist[1], dist[0]) * 180 / M_PI);
             if (yaw < 0)
                 yaw += 360;
 
-            float forward = sqrt(dist[0] * dist[0] + dist[1] * dist[1]);
-            pitch = (int)(atan2(dist[2], forward) * 180 / M_PI);
+            float forward = (float)sqrt(dist[0] * dist[0] + dist[1] * dist[1]);
+            pitch = (float)(atan2(dist[2], forward) * 180 / M_PI);
             if (pitch < 0)
                 pitch += 360;
         }
@@ -393,7 +393,7 @@ void CL_UpdateTEnts() {
             ent->model = b->model;
             ent->angles[0] = pitch;
             ent->angles[1] = yaw;
-            ent->angles[2] = rand() % 360;
+            ent->angles[2] = (float)(rand() % 360);
 
             for (i = 0; i < VECT_DIM; i++)
                 org[i] += dist[i] * 30;

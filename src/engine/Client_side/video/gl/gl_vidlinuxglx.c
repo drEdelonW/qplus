@@ -709,7 +709,7 @@ void VID_Init(uint8_p palette) {
     char	gldir[MAX_OSPATH];
     int width = 640, height = 480;
     XSetWindowAttributes attr;
-    unsigned long mask;
+    uint32_t mask;
     Window root;
     XVisualInfo* visinfo;
     bool fullscreen = true;

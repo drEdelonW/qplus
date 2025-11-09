@@ -118,12 +118,12 @@ void CL_ParseStartSoundPacket() {
     uint8_t field_mask = MSG_ReadByte();
 
     uint8_t volume = (field_mask & SND_VOLUME) ? MSG_ReadByte() : DEFAULT_SOUND_PACKET_VOLUME;
-    float attenuation = (field_mask & SND_ATTENUATION) ? (MSG_ReadByte() / 64.0) : DEFAULT_SOUND_PACKET_ATTENUATION;
+    float attenuation = (field_mask & SND_ATTENUATION) ? ((float)MSG_ReadByte() / 64.0f) : DEFAULT_SOUND_PACKET_ATTENUATION;
 
-    uint16_t channel = MSG_ReadShort();
+    int16_t channel = MSG_ReadShort();
     uint8_t sound_num = MSG_ReadByte();
 
-    uint16_t ent = channel >> 3;
+    int16_t ent = channel >> 3;
     channel &= 7;
 
     if (ent > MAX_EDICTS)
@@ -186,7 +186,7 @@ void CL_KeepaliveMessage() {
     memcpy(net_message.data, olddata, net_message.cursize);
 
     // check time
-    float time = Sys_FloatTime();
+    float time = (float)Sys_FloatTime();
     if ((time - _lastMsg) < 5.0f)    return;
     _lastMsg = time;
 
@@ -338,7 +338,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 
     ent->msgtime = cl.mtime[0];
 
-    uint16_t modnum = (bits & U_MODEL) ? MSG_ReadByte() : ent->baseline.modelindex;
+    uint16_t modnum = (bits & U_MODEL) ? (uint16_t)MSG_ReadByte() : (uint16_t)ent->baseline.modelindex;
     if (modnum >= MAX_MODELS)   Host_Error("CL_ParseModel: bad modnum");
 
     Model_p model = cl.model_precache[modnum];
@@ -346,7 +346,7 @@ void CL_ParseUpdate(update_bits_t bits) {
         ent->model = model;
         // automatic animation (torches, etc) can be either all together
         // or randomized
-        if (model)  ent->syncbase = (model->synctype == ST_RAND) ? ((float)(rand() & 0x7fff) / 0x7fff) : 0.0;
+        if (model)  ent->syncbase = (model->synctype == ST_RAND) ? ((float)(rand() & 0x7fff) / 0x7fff) : 0.0f;
         else        forcelink = true; // hack to make null model players work
 
 #ifdef GLQUAKE
@@ -356,7 +356,7 @@ void CL_ParseUpdate(update_bits_t bits) {
     }
 
     ent->frame = (bits & U_FRAME) ? MSG_ReadByte() : ent->baseline.frame;
-    uint8_t i = (bits & U_COLORMAP) ? MSG_ReadByte() : ent->baseline.colormap;
+    uint8_t i = (bits & U_COLORMAP) ? MSG_ReadByte() : (uint8_t)ent->baseline.colormap;
 
     if (!i)     ent->colormap = vid.colormap;
     else {
@@ -437,17 +437,17 @@ void CL_ParseClientdata(server_update_bits_t bits) {
         cl.punchangle[i] = (bits & (SU_PUNCH1 << i)) ? MSG_ReadChar() : 0;
         cl.mvelocity[0][i] = (bits & (SU_VELOCITY1 << i)) ? (MSG_ReadChar() * 16) : 0;
     }
-    int32_t msg;
+    uint32_t msg;
     // [always sent]    SU_ITEMS
     if (bits & SU_ITEMS) {
-        msg = MSG_ReadLong();
+        msg = (uint32_t)MSG_ReadLong();
         if (cl.items != msg) { // set flash times
             upd = true; /* Sbar_Changed(); */
             for (int i = 0; i < 32; i++) {
                 if ((msg & (1u << i)) &&
                     !(cl.items & (1u << i))
                     ) {
-                    cl.item_gettime[i] = cl.time;
+                    cl.item_gettime[i] = (float)cl.time;
                 }
             }
             cl.items = msg;
@@ -462,15 +462,15 @@ void CL_ParseClientdata(server_update_bits_t bits) {
     msg = (bits & SU_ARMOR) ? MSG_ReadByte() : 0;   if (cl.stats[STAT_ARMOR] != msg) { cl.stats[STAT_ARMOR] = msg; upd = true; /* Sbar_Changed(); */ }
     msg = (bits & SU_WEAPON) ? MSG_ReadByte() : 0;  if (cl.stats[STAT_WEAPON] != msg) { cl.stats[STAT_WEAPON] = msg; upd = true; /* Sbar_Changed(); */ }
 
-    msg = MSG_ReadShort();  if (cl.stats[STAT_HEALTH] != msg) { cl.stats[STAT_HEALTH] = msg; upd = true; /* Sbar_Changed(); */ }
-    msg = MSG_ReadByte();   if (cl.stats[STAT_AMMO] != msg) { cl.stats[STAT_AMMO] = msg; upd = true; /* Sbar_Changed(); */ }
+    msg = (uint32_t)MSG_ReadShort();  if (cl.stats[STAT_HEALTH] != msg) { cl.stats[STAT_HEALTH] = msg; upd = true; /* Sbar_Changed(); */ }
+    msg = (uint32_t)MSG_ReadByte();   if (cl.stats[STAT_AMMO] != msg) { cl.stats[STAT_AMMO] = msg; upd = true; /* Sbar_Changed(); */ }
 
     for (int i = 0; i < 4; i++) {
-        int msg = MSG_ReadByte(); if (cl.stats[STAT_SHELLS + i] != msg) { cl.stats[STAT_SHELLS + i] = msg; upd = true; /* Sbar_Changed(); */ }
+        uint32_t msg = MSG_ReadByte(); if (cl.stats[STAT_SHELLS + i] != msg) { cl.stats[STAT_SHELLS + i] = msg; upd = true; /* Sbar_Changed(); */ }
     }
 
-    msg = MSG_ReadByte();
-    int w = (standard_quake) ? msg : (1U << msg);
+    msg = (uint32_t)MSG_ReadByte();
+    uint32_t w = (standard_quake) ? msg : (1U << msg);
     if (cl.stats[STAT_ACTIVEWEAPON] != w) { cl.stats[STAT_ACTIVEWEAPON] = w; upd = true; /* Sbar_Changed(); */ }
 
     if (upd) { Sbar_Changed(); }
@@ -702,7 +702,7 @@ void CL_ParseServerMessage() {
             uint8_t msg = MSG_ReadByte();
             if (msg >= MAX_CL_STATS)
                 Sys_Error("svc_updatestat: %i is invalid", msg);
-            cl.stats[msg] = MSG_ReadLong();
+            cl.stats[msg] = (uint32_t)MSG_ReadLong();
         } break;
 
         case svc_spawnstaticsound:  CL_ParseStaticSound();  break;
@@ -717,20 +717,20 @@ void CL_ParseServerMessage() {
 
         case svc_intermission:
             cl.intermission = 1;
-            cl.completed_time = cl.time;
+            cl.completed_time = (int32_t)cl.time;
             vid.recalc_refdef = true; // go to full screen
             break;
 
         case svc_finale:
             cl.intermission = 2;
-            cl.completed_time = cl.time;
+            cl.completed_time = (int32_t)cl.time;
             vid.recalc_refdef = true; // go to full screen
             SCR_CenterPrint(MSG_ReadString());
             break;
 
         case svc_cutscene:
             cl.intermission = 3;
-            cl.completed_time = cl.time;
+            cl.completed_time = (int32_t)cl.time;
             vid.recalc_refdef = true; // go to full screen
             SCR_CenterPrint(MSG_ReadString());
             break;

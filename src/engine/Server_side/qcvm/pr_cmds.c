@@ -151,15 +151,15 @@ void SetMinMaxSize(edict_p edict, float_p min, float_p max, bool rotate) {
         // find min / max for rotations
         float_p angles = edict->v.angles;
 
-        float a = angles[1] / 180 * M_PI;
+        float a = angles[1] / 180.0f * (float)M_PI;
 
         float xvector[2] = {
-            cos(a),
-            sin(a)
+            (float)cos(a),
+            (float)sin(a)
         };
         float yvector[2] = {
-            -sin(a),
-            cos(a)
+            (float)-sin(a),
+            (float)cos(a)
         };
 
         float bounds[2][3];
@@ -236,7 +236,7 @@ void PF_setmodel() {
     if (!*check)        PR_RunError("no precache: %s\n", m);
 
     edict->v.model = m - pr_strings;
-    edict->v.modelindex = i; // SV_ModelIndex (m);
+    edict->v.modelindex = (float)i; // SV_ModelIndex (m);
 
     Model_p mod = sv.models[(int)edict->v.modelindex]; // Mod_ForName (m, true);
 
@@ -268,7 +268,7 @@ sprint(clientent, value)
 =================
 */
 void PF_sprint() {
-    int ent_num = G_EDICTNUM(OFS_PARM0);
+    uint32_t ent_num = G_EDICTNUM(OFS_PARM0);
     cString str = PF_VarString(1);
 
     if ((ent_num < 1) ||
@@ -292,7 +292,7 @@ centerprint(clientent, value)
 =================
 */
 void PF_centerprint() {
-    int entnum = G_EDICTNUM(OFS_PARM0);
+    uint32_t entnum = G_EDICTNUM(OFS_PARM0);
     cString str = PF_VarString(1);
 
     if ((entnum < 1) || (entnum > svs.maxClients)) {
@@ -315,7 +315,7 @@ vector normalize(vector)
 void PF_normalize() {
     float_p value1 = G_VECTOR(OFS_PARM0);
     float new = value1[0] * value1[0] + value1[1] * value1[1] + value1[2] * value1[2];
-    new = sqrt(new);
+    new = (float)sqrt(new);
 
     vec3_t newvalue;
     if (new == 0)   newvalue[0] = newvalue[1] = newvalue[2] = 0;
@@ -340,7 +340,7 @@ void PF_vlen() {
     float_p value1 = G_VECTOR(OFS_PARM0);
 
     float new = value1[0] * value1[0] + value1[1] * value1[1] + value1[2] * value1[2];
-    new = sqrt(new);
+    new= (float)sqrt(new);
 
     G_FLOAT(OFS_RETURN) = new;
 }
@@ -360,7 +360,7 @@ void PF_vectoyaw() {
         (value1[0] == 0))
         yaw = 0;
     else {
-        yaw = (int)(atan2(value1[1], value1[0]) * 180 / M_PI);
+        yaw = (float)(atan2(value1[1], value1[0]) * 180 / M_PI);
         if (yaw < 0)    yaw += 360;
     }
 
@@ -385,11 +385,11 @@ void PF_vectoangles() {
         else                pitch = 270;
     }
     else {
-        yaw = (int)(atan2(value1[1], value1[0]) * 180 / M_PI);
+        yaw = (float)(atan2(value1[1], value1[0]) * 180 / M_PI);
         if (yaw < 0)    yaw += 360;
 
-        float forward = sqrt(value1[0] * value1[0] + value1[1] * value1[1]);
-        pitch = (int)(atan2(value1[2], forward) * 180 / M_PI);
+        float forward= (float)sqrt(value1[0] * value1[0] + value1[1] * value1[1]);
+        pitch = (float)(atan2(value1[2], forward) * 180 / M_PI);
         if (pitch < 0)  pitch += 360;
     }
 
@@ -407,7 +407,7 @@ Returns a number from 0<= num < 1
 random()
 =================
 */
-void PF_random() { G_FLOAT(OFS_RETURN) = (rand() & 0x7fff) / ((float)0x7fff); }
+void PF_random() { G_FLOAT(OFS_RETURN) = (float)(rand() & 0x7fff) / ((float)0x7fff); }
 
 /*
 =================
@@ -421,7 +421,7 @@ void PF_particle() {
     float_p dir = G_VECTOR(OFS_PARM1);
     float color = G_FLOAT(OFS_PARM2);
     float count = G_FLOAT(OFS_PARM3);
-    SV_StartParticle(org, dir, color, count);
+    SV_StartParticle(org, dir, (int)color, (size_t)count);
 }
 
 /*
@@ -438,7 +438,7 @@ void PF_ambientsound() {
 
     // check to see if samp was properly precached
     cStringArray check = sv.sound_precache;
-    int soundnum = 0;
+    uint8_t soundnum = 0;
     for (; *check; check++, soundnum++)
         if (!strcmp(*check, samp))
             break;
@@ -456,8 +456,8 @@ void PF_ambientsound() {
 
     MSG_WriteByte(&sv.signon, soundnum);
 
-    MSG_WriteByte(&sv.signon, vol * 255);
-    MSG_WriteByte(&sv.signon, attenuation * 64);
+    MSG_WriteByte(&sv.signon, (uint8_t)(vol * 255));
+    MSG_WriteByte(&sv.signon, (uint8_t)(attenuation * 64));
 }
 
 /*
@@ -477,9 +477,9 @@ Larger attenuations will drop off.
 */
 void PF_sound() {
     edict_p entity = G_EDICT(OFS_PARM0);
-    int channel = G_FLOAT(OFS_PARM1);
+    int channel = (int)G_FLOAT(OFS_PARM1);
     cString sample = G_STRING(OFS_PARM2);
-    int volume = G_FLOAT(OFS_PARM3) * 255;
+    int volume = (int)G_FLOAT(OFS_PARM3) * 255;
     float attenuation = G_FLOAT(OFS_PARM4);
 
     if ((volume < 0) ||
@@ -524,7 +524,7 @@ traceline (vector1, vector2, tryents)
 void PF_traceline() {
     float_p v1 = G_VECTOR(OFS_PARM0);
     float_p v2 = G_VECTOR(OFS_PARM1);
-    int nomonsters = G_FLOAT(OFS_PARM2);
+    int nomonsters = (int)G_FLOAT(OFS_PARM2);
     edict_p ent = G_EDICT(OFS_PARM3);
 
     trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, nomonsters, ent);
@@ -578,11 +578,11 @@ void PF_checkpos() {}
 
 static uint8_t _checkPvs[MAX_MAP_LEAFS / 8];
 
-int PF_newcheckclient(int check) {
+uint8_t PF_newcheckclient(uint8_t check) {
     // cycle to the next one
-    CLAMP(1, check, svs.maxClients);
+    CLAMP(1u, check, svs.maxClients);
 
-    int i = (check == svs.maxClients) ? 0 : check + 1;
+    uint8_t i = (check == svs.maxClients) ? 0 : check + 1;
 
     edict_p ent;
     for (;; i++) {
@@ -676,7 +676,7 @@ stuffcmd (clientent, value)
 =================
 */
 void PF_stuffcmd() {
-    int entnum = G_EDICTNUM(OFS_PARM0);
+    uint32_t entnum = G_EDICTNUM(OFS_PARM0);
     if ((entnum < 1) ||
         (entnum > svs.maxClients)
         )
@@ -751,7 +751,7 @@ void PF_findradius() {
 
         vec3_t eorg;
         for (int j = 0; j < VECT_DIM; j++) // eorg -= ent->v.origin + (ent->v.mins + ent->v.maxs) * 0.5;
-            eorg[j] = org[j] - (ent->v.origin[j] + (ent->v.mins[j] + ent->v.maxs[j]) * 0.5);
+            eorg[j] = org[j] - (ent->v.origin[j] + (ent->v.mins[j] + ent->v.maxs[j]) * 0.5f);
 
         if (Length(eorg) > rad) continue;
 
@@ -781,7 +781,7 @@ void PF_ftos() {
 
 void PF_fabs() {
     float v = G_FLOAT(OFS_PARM0);
-    G_FLOAT(OFS_RETURN) = fabs(v);
+    G_FLOAT(OFS_RETURN) = (float)fabs(v);
 }
 
 void PF_vtos() {
@@ -846,7 +846,7 @@ void PF_Find()
 }
 #else
 {
-    int edict = G_EDICTNUM(OFS_PARM0);
+    uint32_t edict = G_EDICTNUM(OFS_PARM0);
     int f = G_INT(OFS_PARM1);
     cString str = G_STRING(OFS_PARM2);
     if (!str)
@@ -938,11 +938,11 @@ void PF_walkmove() {
         return;
     }
 
-    yaw = yaw * M_PI * 2 / 360;
+    yaw = yaw * (float)M_PI * 2 / 360;
 
     vec3_t move = {
-        cos(yaw) * dist,
-        sin(yaw) * dist,
+        (float)cos(yaw) * dist,
+        (float)sin(yaw) * dist,
         0,
     };
 
@@ -989,7 +989,7 @@ void(float style, string value) lightstyle
 ===============
 */
 void PF_lightstyle() {
-    int style = G_FLOAT(OFS_PARM0);
+    int style = (int)G_FLOAT(OFS_PARM0);
     cString val = G_STRING(OFS_PARM1);
 
     // change the string in sv
@@ -1002,18 +1002,18 @@ void PF_lightstyle() {
     for (int j = 0; j < svs.maxClients; j++, client++)
         if (client->active || client->spawned) {
             MSG_WriteChar(&client->message, svc_lightstyle);
-            MSG_WriteChar(&client->message, style);
+            MSG_WriteChar(&client->message, (int8_t)style);
             MSG_WriteString(&client->message, val);
         }
 }
 
 void PF_rint() {
     float f = G_FLOAT(OFS_PARM0);
-    if (f > 0)  G_FLOAT(OFS_RETURN) = (int)(f + 0.5);
-    else        G_FLOAT(OFS_RETURN) = (int)(f - 0.5);
+    if (f > 0)  G_FLOAT(OFS_RETURN) = (float)((int)(f + 0.5));
+    else        G_FLOAT(OFS_RETURN) = (float)((int)(f - 0.5));
 }
-void PF_floor() { G_FLOAT(OFS_RETURN) = floor(G_FLOAT(OFS_PARM0)); }
-void PF_ceil() { G_FLOAT(OFS_RETURN) = ceil(G_FLOAT(OFS_PARM0)); }
+void PF_floor() { G_FLOAT(OFS_RETURN) = (float)floor(G_FLOAT(OFS_PARM0)); }
+void PF_ceil() { G_FLOAT(OFS_RETURN) = (float)ceil(G_FLOAT(OFS_PARM0)); }
 
 /*
 =============
@@ -1043,7 +1043,7 @@ entity nextent(entity)
 =============
 */
 void PF_nextent() {
-    int i = G_EDICTNUM(OFS_PARM0);
+    uint32_t i = G_EDICTNUM(OFS_PARM0);
     while (1) {
         i++;
         if (i == sv.num_edicts) { RETURN_EDICT(sv.edicts); return; }
@@ -1100,7 +1100,7 @@ void PF_aim() {
         for (int j = 0; j < VECT_DIM; j++) {
             end[j] =
                 check->v.origin[j] +
-                0.5 * (check->v.mins[j] +
+                0.5f * (check->v.mins[j] +
                     check->v.maxs[j]);
         }
         VectorSubtract(end, start, dir);
@@ -1197,7 +1197,7 @@ sizebuf_p WriteDest() {
 
     case MSG_ONE: {
         edict_p ent = PROG_TO_EDICT(pr_global_struct->msg_entity);
-        int entnum = NUM_FOR_EDICT(ent);
+        uint32_t entnum = NUM_FOR_EDICT(ent);
         if ((entnum < 1) || (entnum > svs.maxClients))
             PR_RunError("WriteDest: not a client");
         return &svs.clients[entnum - 1].message;
@@ -1210,24 +1210,24 @@ sizebuf_p WriteDest() {
     return NULL;
 }
 
-void PF_WriteByte() { MSG_WriteByte(WriteDest(), G_FLOAT(OFS_PARM1)); }
-void PF_WriteChar() { MSG_WriteChar(WriteDest(), G_FLOAT(OFS_PARM1)); }
-void PF_WriteShort() { MSG_WriteShort(WriteDest(), G_FLOAT(OFS_PARM1)); }
-void PF_WriteLong() { MSG_WriteLong(WriteDest(), G_FLOAT(OFS_PARM1)); }
+void PF_WriteByte() { MSG_WriteByte(WriteDest(), (uint8_t)G_FLOAT(OFS_PARM1)); }
+void PF_WriteChar() { MSG_WriteChar(WriteDest(), (int8_t)G_FLOAT(OFS_PARM1)); }
+void PF_WriteShort() { MSG_WriteShort(WriteDest(), (int16_t)G_FLOAT(OFS_PARM1)); }
+void PF_WriteLong() { MSG_WriteLong(WriteDest(), (int32_t)G_FLOAT(OFS_PARM1)); }
 void PF_WriteAngle() { MSG_WriteAngle(WriteDest(), G_FLOAT(OFS_PARM1)); }
 void PF_WriteCoord() { MSG_WriteCoord(WriteDest(), G_FLOAT(OFS_PARM1)); }
 void PF_WriteString() { MSG_WriteString(WriteDest(), G_STRING(OFS_PARM1)); }
-void PF_WriteEntity() { MSG_WriteShort(WriteDest(), G_EDICTNUM(OFS_PARM1)); }
+void PF_WriteEntity() { MSG_WriteShort(WriteDest(), (int16_t)G_EDICTNUM(OFS_PARM1)); }
 
 //=============================================================================
 
 void PF_makestatic() {
     edict_p ent = G_EDICT(OFS_PARM0);
     MSG_WriteByte(&sv.signon, svc_spawnstatic);
-    MSG_WriteByte(&sv.signon, SV_ModelIndex(pr_strings + ent->v.model));
-    MSG_WriteByte(&sv.signon, ent->v.frame);
-    MSG_WriteByte(&sv.signon, ent->v.colormap);
-    MSG_WriteByte(&sv.signon, ent->v.skin);
+    MSG_WriteByte(&sv.signon, (uint8_t)SV_ModelIndex(pr_strings + ent->v.model));
+    MSG_WriteByte(&sv.signon, (uint8_t)ent->v.frame);
+    MSG_WriteByte(&sv.signon, (uint8_t)ent->v.colormap);
+    MSG_WriteByte(&sv.signon, (uint8_t)ent->v.skin);
     for (int i = 0; i < VECT_DIM; i++) {
         MSG_WriteCoord(&sv.signon, ent->v.origin[i]);
         MSG_WriteAngle(&sv.signon, ent->v.angles[i]);
@@ -1246,7 +1246,7 @@ PF_setspawnparms
 */
 void PF_setspawnparms() {
     edict_p ent = G_EDICT(OFS_PARM0);
-    int i = NUM_FOR_EDICT(ent);
+    uint32_t i = NUM_FOR_EDICT(ent);
     if ((i < 1) ||
         (i > svs.maxClients))
         PR_RunError("Entity is not a client");
@@ -1393,15 +1393,15 @@ void PF_WaterMove() {
 }
 
 void PF_sin() {
-    G_FLOAT(OFS_RETURN) = sin(G_FLOAT(OFS_PARM0));
+    G_FLOAT(OFS_RETURN)= (float)sin(G_FLOAT(OFS_PARM0));
 }
 
 void PF_cos() {
-    G_FLOAT(OFS_RETURN) = cos(G_FLOAT(OFS_PARM0));
+    G_FLOAT(OFS_RETURN)= (float)cos(G_FLOAT(OFS_PARM0));
 }
 
 void PF_sqrt() {
-    G_FLOAT(OFS_RETURN) = sqrt(G_FLOAT(OFS_PARM0));
+    G_FLOAT(OFS_RETURN)= (float)sqrt(G_FLOAT(OFS_PARM0));
 }
 #endif
 

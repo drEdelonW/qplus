@@ -43,12 +43,12 @@ void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cString data) {
     sfxcache_p sc = Cache_Check(&sfx->cache);
     if (!sc)    return;
 
-    float stepscale = (float)inrate / shm->speed; // this is usually 0.5, 1, or 2
+    float stepscale = (float)inrate / (float)shm->speed; // this is usually 0.5, 1, or 2
 
-    int outcount = sc->length / stepscale;
+    int outcount = (int)((float)sc->length / stepscale);
     sc->length = outcount;
     if (sc->loopstart != -1)
-        sc->loopstart = sc->loopstart / stepscale;
+        sc->loopstart = (int)((float)sc->loopstart / stepscale);
 
     sc->speed = shm->speed;
     if (loadas8bit.value)   sc->width = 1;
@@ -60,13 +60,12 @@ void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cString data) {
     if (stepscale == 1 && inwidth == 1 && sc->width == 1) {
         // fast special case
         for (int i = 0; i < outcount; i++)
-            ((int8_p)sc->data)[i]
-            = (int)((uint8_t)(data[i]) - 128);
+            ((int8_p)sc->data)[i] = ((int8_t)(data[i]) - 128);
     }
     else {
         // general case
         int samplefrac = 0;
-        int fracstep = stepscale * 256;
+        int fracstep = (int)(stepscale * 256);
         for (int i = 0; i < outcount; i++) {
             int srcsample = samplefrac >> 8;
             samplefrac += fracstep;
@@ -74,8 +73,8 @@ void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cString data) {
             if (inwidth == 2)   sample = LittleShort(((int16_p)data)[srcsample]);
             else                sample = (int)((uint8_t)(data[srcsample]) - 128) << 8;
 
-            if (sc->width == 2) ((int16_p)sc->data)[i] = sample;
-            else                ((int8_p)sc->data)[i] = sample >> 8;
+            if (sc->width == 2) ((int16_p)sc->data)[i] = (int16_t)sample;
+            else                ((int8_p)sc->data)[i] = (int8_t)(sample >> 8);
         }
     }
 }
@@ -115,10 +114,10 @@ sfxcache_p S_LoadSound(sfx_p s) {
         return NULL;
     }
 
-    float stepscale = (float)info.rate / shm->speed;
-    int len = info.samples / stepscale;
+    float stepscale = (float)info.rate / (float)shm->speed;
+    size_t len = (size_t)((float)info.samples / stepscale);
 
-    len = len * info.width * info.channels;
+    len = len * (size_t)info.width * (size_t)info.channels;
 
     sc = Cache_Alloc(&s->cache, len + sizeof(sfxcache_t), s->name);
     if (!sc) {
@@ -157,7 +156,7 @@ int     iff_chunk_len;
 int16_t GetLittleShort() {
     int16_t val = 0;
     val = *data_p;
-    val = val + (*(data_p + 1) << 8);
+    val = val + (int16_t)(*(data_p + 1) << 8);
     data_p += 2;
     return val;
 }
@@ -212,7 +211,7 @@ void DumpChunks() {
         memcpy(str, data_p, 4);
         data_p += 4;
         iff_chunk_len = GetLittleLong();
-        Con_Printf("0x%x : %s (%d)\n", (int)(data_p - 4), str, iff_chunk_len);
+        Con_Printf("0x%p : %s (%d)\n", (data_p - 4), str, iff_chunk_len);
         data_p += (iff_chunk_len + 1) & ~1;
     } while (data_p < iff_end);
 }

@@ -392,7 +392,7 @@ void Key_SetBinding(keycode_t keynum, cString binding) {
     }
 
     // allocate memory for new binding
-    int len = Q_strlen(binding);
+    size_t len = Q_strlen(binding);
     cString new = Z_Malloc(len + 1);
     Q_strcpy(new, binding);
     new[len] = 0;

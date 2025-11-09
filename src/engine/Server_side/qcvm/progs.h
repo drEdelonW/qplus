@@ -35,7 +35,7 @@ extern dDef_p       pr_fielddefs;
 extern dStatement_p pr_statements;
 extern globalvars_p pr_global_struct;
 extern float_p      pr_globals;     // same as pr_global_struct
-extern int32_t      pr_edict_size;  // in bytes
+extern uint32_t     pr_edict_size;  // in bytes
 extern int32_t      pr_numbuiltins;
 extern int32_t      pr_argc;
 extern bool         pr_trace;
@@ -73,13 +73,13 @@ extern "C" {
     void ED_LoadFromFile(cString data);
     bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s);
 
-    edict_p EDICT_NUM(int32_t n);
-    int32_t NUM_FOR_EDICT(edict_p e);
+    edict_p EDICT_NUM(uint32_t n);
+    uint32_t NUM_FOR_EDICT(edict_p e);
 
 #   define NEXT_EDICT(e)        ((edict_p)((uint8_p)(e) + pr_edict_size))
 #   define PROG_EDICT_BASE      ((uint8_p)sv.edicts)
 #   define PROG_TO_EDICT(ofs)   ((edict_p)(PROG_EDICT_BASE + (uint32_t)(ofs)))
-#   define EDICT_TO_PROG(e)     ((uint32_t)((uint8_p)(e) - PROG_EDICT_BASE))
+#   define EDICT_TO_PROG(e)     ((int32_t)((uint8_p)(e) - PROG_EDICT_BASE))
 
 #   define G_FLOAT(o)       (pr_globals[(o)])
 #   define G_INT(o)         (*(int32_t*)&pr_globals[(o)])
@@ -94,10 +94,10 @@ extern "C" {
 #   define G_STRING(o)      PR_GetStringSafe(*(string_t*)&pr_globals[(o)])
 #   define E_STRING(e,o)    PR_GetStringSafe(*(string_t*)&((float_p)&(e)->v)[(o)])
 
-    static inline cString PR_GetStringSafe(uint32_t str_ofs) { return pr_strings + str_ofs; }
+    static inline cString PR_GetStringSafe(int32_t str_ofs) { return pr_strings + str_ofs; }
     void PR_RunError(cString error, ...);
     void ED_PrintEdicts();
-    void ED_PrintNum(int32_t ent);
+    void ED_PrintNum(uint32_t ent);
 
     eval_p GetEdictFieldValue(edict_p ed, cString field);
 

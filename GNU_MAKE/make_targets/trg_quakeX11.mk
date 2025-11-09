@@ -17,6 +17,10 @@ ifeq ($(UNAME_S),Linux)
 
         # X11 target on *nix
         CPPFLAGS   += -DX11 -DVID_X11
+       # CFLAGS   += -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion \
+-Wint-to-pointer-cast -Wpointer-to-int-cast -Wformat=2 \
+-Werror=conversion -Werror=sign-conversion -Werror=int-to-pointer-cast -Werror=pointer-to-int-cast
+
         LDLIBS     += -lX11 -lXext
 
         RUN_PREFIX := DISPLAY=:1

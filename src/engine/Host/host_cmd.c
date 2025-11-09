@@ -367,7 +367,7 @@ void Host_Savegame_f() {
 
 
     ED_WriteGlobals(saveFile);
-    for (int32_t i = 0; i < sv.num_edicts; i++) {
+    for (uint32_t i = 0; i < sv.num_edicts; i++) {
         ED_Write(saveFile, EDICT_NUM(i));
         fflush(saveFile);
     }
@@ -448,14 +448,14 @@ void Host_Loadgame_f() {
     }
 
     // load the edicts out of the savegame file
-    int entnum = -1;  // -1 is the globals
+    int32_t entnum = -1;  // -1 is the globals
     while (!feof(loadFile)) {
         int32_t i = 0;
         for (; i < sizeof(str) - 1; i++) {
             int r = fgetc(loadFile);
             if ((r == EOF) || !r) break;
 
-            str[i] = r;
+            str[i] = (char)r;
             if (r == '}') {
                 i++;
                 break;
@@ -470,7 +470,7 @@ void Host_Loadgame_f() {
 
         if (entnum == -1) { ED_ParseGlobals(start); }   // parse the global vars
         else { // parse an edict
-            edict_p ent = EDICT_NUM(entnum);
+            edict_p ent = EDICT_NUM((uint32_t)entnum);
             memset(&ent->v, 0, progs->entityfields * 4);
             ent->free = false;
             ED_ParseEdict(start, ent);
@@ -670,7 +670,7 @@ void Host_Name_f() {
 
     // send notification to all clients
     sizebuf_p pBuf = &sv.reliable_datagram;
-    MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteString(pBuf, remoteClient->name);
+    MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteString(pBuf, remoteClient->name);
 }
 
 
@@ -751,7 +751,7 @@ void Host_Say(bool teamonly) {
         if (fromServer) snprintf(text, sizeof(text), "%c<%s> ", 1, hostname.string);
         else            snprintf(text, sizeof(text), "%c%s: ", 1, save->name);
 
-        int32_t j = sizeof(text) - 2 - Q_strlen(text);  // -2 for /n and null terminator
+        uint32_t j = sizeof(text) - 2 - Q_strlen(text);  // -2 for /n and null terminator
         if (Q_strlen(args) > j)
             args[j] = 0;
         strcat(text, args);
@@ -799,7 +799,7 @@ void Host_Tell_f() {
     }
 
     // check length & truncate if necessary
-    int32_t j = sizeof(text) - 2 - Q_strlen(text);  // -2 for /n and null terminator
+    uint32_t j = sizeof(text) - 2 - Q_strlen(text);  // -2 for /n and null terminator
     if (Q_strlen(args) > j)     args[j] = 0;
 
     strcat(text, args);
@@ -833,8 +833,13 @@ void Host_Color_f() {
         return;
     }
 
-    uint8_t top = atoi(Cmd_Argv(1));
-    uint8_t bottom = atoi(Cmd_Argv((Cmd_Argc() == 2) ? 1 : 2));
+    uint8_t top = (uint8_t)atoi(Cmd_Argv(1));
+    uint8_t bottom = (uint8_t)atoi(
+        Cmd_Argv(
+            (Cmd_Argc() == 2) ?
+            1 : 2
+        )
+    );
 
     top &= 15;
     if (top > 13)
@@ -843,7 +848,7 @@ void Host_Color_f() {
     if (bottom > 13)
         bottom = 13;
 
-    uint8_t playercolor = top * 16 + bottom;
+    uint8_t playercolor = (uint8_t)(((uint16_t)top << 4) + bottom);
 
     if (cmd_source == src_command) {
         Cvar_SetValue("_cl_color", playercolor);
@@ -856,7 +861,7 @@ void Host_Color_f() {
 
     // send notification to all clients
     sizebuf_p pBuf = &sv.reliable_datagram;
-    MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteByte(pBuf, remoteClient->colors);
+    MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteByte(pBuf, remoteClient->colors);
 }
 
 /*
@@ -868,7 +873,7 @@ void Host_Kill_f() {
     if (cmd_source == src_command) { ;  Cmd_ForwardToServer();                                  return; }
     if (sv_player->v.health <= 0) { ;   SV_ClientPrintf("Can't suicide -- allready dead!\n");   return; }
 
-    pr_global_struct->time = sv.time;
+    pr_global_struct->time = (float)sv.time;
     pr_global_struct->self = EDICT_TO_PROG(sv_player);
     PR_ExecuteProgram(pr_global_struct->ClientKill);
 }
@@ -906,7 +911,7 @@ void Host_PreSpawn_f() {
     if (remoteClient->spawned) { ;       Con_Printf("prespawn not valid -- allready spawned\n"); return; }
 
     sizebuf_p pBuf = &remoteClient->message;
-    SZ_Write(pBuf, sv.signon.data, sv.signon.cursize);
+    SZ_Write(pBuf, sv.signon.data, (size_t)sv.signon.cursize);
     MSG_WriteByte(pBuf, svc_signonnum);    MSG_WriteByte(pBuf, 2);
     remoteClient->sendsignon = true;
 }
@@ -929,8 +934,8 @@ void Host_Spawn_f() {
         // set up the edict
         edict_p ent = remoteClient->edict;
         memset(&ent->v, 0, progs->entityfields * 4);
-        ent->v.colormap = NUM_FOR_EDICT(ent);
-        ent->v.team = (remoteClient->colors & 15) + 1;
+        ent->v.colormap = (float)NUM_FOR_EDICT(ent);
+        ent->v.team = (float)(remoteClient->colors & 15) + 1;
         ent->v.netname = remoteClient->name - pr_strings;
 
         // copy spawn parms out of the RmtClient_t
@@ -940,7 +945,7 @@ void Host_Spawn_f() {
 
         // call the spawn function
 
-        pr_global_struct->time = sv.time;
+        pr_global_struct->time = (float)sv.time;
         pr_global_struct->self = EDICT_TO_PROG(sv_player);
         PR_ExecuteProgram(pr_global_struct->ClientConnect);
 
@@ -955,10 +960,10 @@ void Host_Spawn_f() {
     sizebuf_p pBuf = &remoteClient->message;    SZ_Clear(pBuf);
 
     // send time of update
-    MSG_WriteByte(pBuf, svc_time);    MSG_WriteFloat(pBuf, sv.time);
+    MSG_WriteByte(pBuf, svc_time);    MSG_WriteFloat(pBuf, (float)sv.time);
     {
         RmtClient_p rClient = svs.clients;
-        for (int32_t i = 0; i < svs.maxClients; i++, rClient++) {
+        for (uint8_t i = 0; i < svs.maxClients; i++, rClient++) {
             MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, i); MSG_WriteString(pBuf, rClient->name);
             MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, i); MSG_WriteShort(pBuf, rClient->old_frags);
             MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, i); MSG_WriteByte(pBuf, rClient->colors);
@@ -972,10 +977,10 @@ void Host_Spawn_f() {
     //
     // send some stats
     //
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALSECRETS);  MSG_WriteLong(pBuf, pr_global_struct->total_secrets);
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALMONSTERS); MSG_WriteLong(pBuf, pr_global_struct->total_monsters);
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_SECRETS);       MSG_WriteLong(pBuf, pr_global_struct->found_secrets);
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_MONSTERS);      MSG_WriteLong(pBuf, pr_global_struct->killed_monsters);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALSECRETS);  MSG_WriteLong(pBuf, (int32_t)pr_global_struct->total_secrets);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALMONSTERS); MSG_WriteLong(pBuf, (int32_t)pr_global_struct->total_monsters);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_SECRETS);       MSG_WriteLong(pBuf, (int32_t)pr_global_struct->found_secrets);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_MONSTERS);      MSG_WriteLong(pBuf, (int32_t)pr_global_struct->killed_monsters);
 
 
     //
@@ -984,7 +989,7 @@ void Host_Spawn_f() {
     // in a state where it is expecting the client to correct the angle
     // and it won't happen if the game was just loaded, so you wind up
     // with a permanent head tilt
-    edict_p ent = EDICT_NUM(1 + (remoteClient - svs.clients));
+    edict_p ent = EDICT_NUM(1 + (uint32_t)(remoteClient - svs.clients));
     MSG_WriteByte(pBuf, svc_setangle); MSG_WriteAngle(pBuf, ent->v.angles[0]); MSG_WriteAngle(pBuf, ent->v.angles[1]); MSG_WriteAngle(pBuf, 0);
 
     SV_WriteClientdataToMessage(sv_player, pBuf);
@@ -1030,7 +1035,7 @@ void Host_Kick_f() {
     if ((Cmd_Argc() > 2) &&
         (Q_strcmp(Cmd_Argv(1), "#") == 0)
         ) {
-        i = Q_atof(Cmd_Argv(2)) - 1;
+        i = (int32_t)Q_atof(Cmd_Argv(2)) - 1;
         if ((i < 0) ||
             (i >= svs.maxClients) ||
             (!svs.clients[i].active)
@@ -1127,29 +1132,29 @@ void Host_Give_f() {
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_shells1");
             if (val)
-                val->_float = cVal;
+                val->_float = (float)cVal;
         }
 
-        sv_player->v.ammo_shells = cVal;
+        sv_player->v.ammo_shells = (float)cVal;
         break;
     case 'n':
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_nails1");
             if (val) {
-                val->_float = cVal;
-                if (sv_player->v.weapon <= IT_LIGHTNING)    sv_player->v.ammo_nails = cVal;
+                val->_float = (float)cVal;
+                if (sv_player->v.weapon <= IT_LIGHTNING)    sv_player->v.ammo_nails = (float)cVal;
             }
         }
         else {
-            sv_player->v.ammo_nails = cVal;
+            sv_player->v.ammo_nails = (float)cVal;
         }
         break;
     case 'l':
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_lava_nails");
             if (val) {
-                val->_float = cVal;
-                if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_nails = cVal;
+                val->_float = (float)cVal;
+                if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_nails = (float)cVal;
             }
         }
         break;
@@ -1157,38 +1162,38 @@ void Host_Give_f() {
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_rockets1");
             if (val) {
-                val->_float = cVal;
-                if (sv_player->v.weapon <= IT_LIGHTNING)    sv_player->v.ammo_rockets = cVal;
+                val->_float = (float)cVal;
+                if (sv_player->v.weapon <= IT_LIGHTNING)    sv_player->v.ammo_rockets = (float)cVal;
             }
         }
-        else { sv_player->v.ammo_rockets = cVal; }
+        else { sv_player->v.ammo_rockets = (float)cVal; }
         break;
     case 'm':
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_multi_rockets");
             if (val) {
-                val->_float = cVal;
-                if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_rockets = cVal;
+                val->_float = (float)cVal;
+                if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_rockets = (float)cVal;
             }
         }
         break;
-    case 'h':   sv_player->v.health = cVal; break;
+    case 'h':   sv_player->v.health = (float)cVal; break;
     case 'c':
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_cells1");
             if (val) {
-                val->_float = cVal;
-                if (sv_player->v.weapon <= IT_LIGHTNING)    sv_player->v.ammo_cells = cVal;
+                val->_float = (float)cVal;
+                if (sv_player->v.weapon <= IT_LIGHTNING)    sv_player->v.ammo_cells = (float)cVal;
             }
         }
-        else { sv_player->v.ammo_cells = cVal; }
+        else { sv_player->v.ammo_cells = (float)cVal; }
         break;
     case 'p':
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_plasma");
             if (val) {
-                val->_float = cVal;
-                if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_cells = cVal;
+                val->_float = (float)cVal;
+                if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_cells = (float)cVal;
             }
         }
         break;
@@ -1196,7 +1201,7 @@ void Host_Give_f() {
 }
 
 edict_p FindViewthing() {
-    for (int32_t i = 0; i < sv.num_edicts; i++) {
+    for (uint32_t i = 0; i < sv.num_edicts; i++) {
         edict_p eDict = EDICT_NUM(i);
         if (!strcmp(pr_strings + eDict->v.classname, "viewthing"))  return eDict;
     }
@@ -1234,7 +1239,7 @@ void Host_Viewframe_f() {
     if (frame >= mdl->numframes)
         frame = mdl->numframes - 1;
 
-    eDict->v.frame = frame;
+    eDict->v.frame = (float)frame;
 }
 
 
@@ -1258,9 +1263,9 @@ void Host_Viewnext_f() {
     Model_p mdl = cl.model_precache[(int)eDict->v.modelindex];
     eDict->v.frame++;
     if (eDict->v.frame >= mdl->numframes)
-        eDict->v.frame = mdl->numframes - 1;
+        eDict->v.frame = (float)mdl->numframes - 1;
 
-    PrintFrameName(mdl, eDict->v.frame);
+    PrintFrameName(mdl, (int)eDict->v.frame);
 }
 
 /*
@@ -1277,7 +1282,7 @@ void Host_Viewprev_f() {
     if (eDict->v.frame < 0)
         eDict->v.frame = 0;
 
-    PrintFrameName(mdl, eDict->v.frame);
+    PrintFrameName(mdl, (int)eDict->v.frame);
 }
 
 /*

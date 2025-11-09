@@ -54,8 +54,8 @@ typedef struct {
     uint16_p   colormap16;	// 256 * VID_GRADES size
     int         fullbright;		// index of first fullbright color
     uint32_t    rowbytes;	// may be > width if displayed in a window
-    uint32_t    width;
-    uint32_t    height;
+    int32_t    width;
+    int32_t    height;
     float       aspect;		// width / height -- < 0 is taller than wide
     int         numpages;
     int         recalc_refdef;	// if true, recalc vid-based stuff

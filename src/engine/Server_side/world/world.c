@@ -74,7 +74,7 @@ void SV_InitBoxHull() {
     _boxHull.firstclipnode = 0;
     _boxHull.lastclipnode = 5;
 
-    for (int i = 0; i < 6; i++) {
+    for (uint8_t i = 0; i < 6; i++) {
         _boxClipNodes[i].planenum = i;
 
         int side = i & 1;
@@ -202,7 +202,7 @@ areaNode_p SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
     if (size[0] > size[1])  anode->axis = 0;
     else                    anode->axis = 1;
 
-    anode->dist = 0.5 * (maxs[anode->axis] + mins[anode->axis]);
+    anode->dist = 0.5f * (maxs[anode->axis] + mins[anode->axis]);
     vec3_t mins1; VectorCopy(mins, mins1);
     vec3_t mins2; VectorCopy(mins, mins2);
     vec3_t maxs1; VectorCopy(maxs, maxs1);
@@ -275,7 +275,7 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
 
         pr_global_struct->self = EDICT_TO_PROG(touch);
         pr_global_struct->other = EDICT_TO_PROG(ent);
-        pr_global_struct->time = sv.time;
+        pr_global_struct->time = (float)sv.time;
         PR_ExecuteProgram(touch->v.touch);
 
         pr_global_struct->self = old_self;
@@ -304,9 +304,9 @@ void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
         if (ent->num_leafs == MAX_ENT_LEAFS)    return;
 
         mLeaf_p leaf = (mLeaf_p)node;
-        int leafnum = leaf - sv.worldmodel->leafs - 1;
+        int32_t leafnum = leaf - sv.worldmodel->leafs - 1;
 
-        ent->leafnums[ent->num_leafs] = leafnum;
+        ent->leafnums[ent->num_leafs] = (int16_t)leafnum;
         ent->num_leafs++;
         return;
     }
@@ -502,7 +502,7 @@ LINE TESTING IN HULLS
 */
 
 // 1/32 epsilon to keep floating point happy
-#define DIST_EPSILON (0.03125)
+#define DIST_EPSILON (0.03125f)
 
 /*
 ==================
@@ -602,7 +602,7 @@ bool SV_RecursiveHullCheck(
 
     while (
         SV_HullPointContents(hull, hull->firstclipnode, mid) == CONTENTS_SOLID) { // shouldn't really happen, but does occasionally
-        frac -= 0.1;
+        frac -= 0.1f;
         if (frac < 0) {
             trace->fraction = midf;
             VectorCopy(mid, trace->endpos);

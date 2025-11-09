@@ -44,7 +44,7 @@ dDef_p         pr_globaldefs;
 dStatement_p   pr_statements;
 globalvars_p   pr_global_struct;   // much more
 float_p        pr_globals;         // same as pr_global_struct
-int32_t        pr_edict_size;      // in bytes
+uint32_t       pr_edict_size;      // in bytes
 
 uint16_t pr_crc;
 
@@ -98,7 +98,7 @@ angles and bad trails.
 */
 edict_p ED_Alloc() {
     edict_p edict;
-    int i = svs.maxClients + 1;
+    uint32_t i = svs.maxClients + 1;
     for (; i < sv.num_edicts; i++) {
         edict = EDICT_NUM(i);
         // the first couple seconds of server time can involve a lot of
@@ -146,7 +146,7 @@ void ED_Free(edict_p ed) {
     ed->v.nextthink = -1;
     ed->v.solid = 0;
 
-    ed->freetime = sv.time;
+    ed->freetime = (float)sv.time;
 }
 
 //===========================================================================
@@ -334,7 +334,7 @@ cString PR_GlobalString(int ofs) {
         sprintf(line, "%i(%s)%s", ofs, pr_strings + def->s_name, s);
     }
 
-    int i = strlen(line);
+    size_t i = strlen(line);
     for (; i < 20; i++)
         strcat(line, " ");
     strcat(line, " ");
@@ -349,7 +349,7 @@ cString PR_GlobalStringNoContents(int ofs) {
     if (!def)   sprintf(line, "%i(???)", ofs);
     else        sprintf(line, "%i(%s)", ofs, pr_strings + def->s_name);
 
-    int i = strlen(line);
+    size_t i = strlen(line);
     for (; i < 20; i++)
         strcat(line, " ");
     strcat(line, " ");
@@ -378,7 +378,7 @@ void ED_Print(edict_p ed) {
         int* v = (int*)((cString)&ed->v + d->ofs * 4);
 
         // if the value is still all 0, skip the field
-        int type = d->type & ~DEF_SAVEGLOBAL;
+        uint32_t type = d->type & ~DEF_SAVEGLOBAL;
 
         int j = 0;
         for (; j < type_size[type]; j++)
@@ -389,7 +389,7 @@ void ED_Print(edict_p ed) {
             continue;
 
         Sys_Printf("%s", name);
-        int l = strlen(name);
+        size_t l = strlen(name);
         while (l++ < 15)
             Sys_Printf(" ");
 
@@ -418,7 +418,7 @@ void ED_Write(FILE* f, edict_p ed) {
         int* v = (int*)((cString)&ed->v + d->ofs * 4);
 
         // if the value is still all 0, skip the field
-        int type = d->type & ~DEF_SAVEGLOBAL;
+        uint32_t type = d->type & ~DEF_SAVEGLOBAL;
         int j = 0;
         for (; j < type_size[type]; j++)
             if (v[j])
@@ -434,7 +434,7 @@ void ED_Write(FILE* f, edict_p ed) {
     fprintf(f, "}\n");
 }
 
-void ED_PrintNum(int ent) {
+void ED_PrintNum(uint32_t ent) {
     ED_Print(EDICT_NUM(ent));
 }
 
@@ -447,7 +447,7 @@ For debugging, prints all the entities in the current server
 */
 void ED_PrintEdicts() {
     Sys_Printf("%i entities\n", sv.num_edicts);
-    for (int i = 0; i < sv.num_edicts; i++)
+    for (uint32_t i = 0; i < sv.num_edicts; i++)
         ED_PrintNum(i);
 }
 
@@ -459,7 +459,7 @@ For debugging, prints a single edicy
 =============
 */
 void ED_PrintEdict_f() {
-    int i = Q_atoi(Cmd_Argv(1));
+    uint32_t i = (uint32_t)Q_atoi(Cmd_Argv(1));
     if (i >= sv.num_edicts) { Sys_Printf("Bad edict number\n"); return; }
     ED_PrintNum(i);
 }
@@ -476,7 +476,7 @@ void ED_Count() {
     int models = 0;
     int solid = 0;
     int step = 0;
-    for (int i = 0; i < sv.num_edicts; i++) {
+    for (uint32_t i = 0; i < sv.num_edicts; i++) {
         edict_p ent = EDICT_NUM(i);
         if (ent->free)  continue;
 
@@ -512,7 +512,7 @@ void ED_WriteGlobals(FILE* f) {
     fprintf(f, "{\n");
     for (int i = 0; i < progs->globaldefs.num; i++) {
         dDef_p def = &pr_globaldefs[i];
-        int type = def->type;
+        uint32_t type = def->type;
         if (!(def->type & DEF_SAVEGLOBAL))  continue;
         type &= ~DEF_SAVEGLOBAL;
 
@@ -569,7 +569,7 @@ ED_NewString
 =============
 */
 cString ED_NewString(cString string) {
-    int l = strlen(string) + 1;
+    size_t l = strlen(string) + 1;
     cString new = Hunk_Alloc(l);
     cString new_p = new;
 
@@ -602,7 +602,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
     switch (key->type & ~DEF_SAVEGLOBAL) {
     case ev_string:     *(string_t*)d = ED_NewString(s) - pr_strings;       break;
 
-    case ev_float:      *(float_p)d = atof(s);                              break;
+    case ev_float:      *(float_p)d = (float)atof(s);                              break;
 
     case ev_vector:
         char string[128];
@@ -613,12 +613,12 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
             while (*v && *v != ' ')
                 v++;
             *v = 0;
-            ((float_p)d)[i] = atof(w);
+            ((float_p)d)[i] = (float)atof(w);
             w = v = v + 1;
         }
         break;
 
-    case ev_entity:     *(int*)d = EDICT_TO_PROG(EDICT_NUM(atoi(s)));       break;
+    case ev_entity:     *(int*)d = EDICT_TO_PROG(EDICT_NUM((uint32_t)atoi(s)));       break;
 
     case ev_field:
         dDef_p def = ED_FindField(s);
@@ -684,7 +684,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
         strcpy(keyname, com.token);
 
         // another hack to fix heynames with trailing spaces
-        int n = strlen(keyname);
+        size_t n = strlen(keyname);
         while (n && keyname[n - 1] == ' ') {
             keyname[n - 1] = 0;
             n--;
@@ -745,7 +745,7 @@ to call ED_CallSpawnFunctions () to let the objects initialize themselves.
 void ED_LoadFromFile(cString data) {
     edict_p ent = NULL;
     int inhibit = 0;
-    pr_global_struct->time = sv.time;
+    pr_global_struct->time = (float)sv.time;
 
     // parse ents
     while (1) {
@@ -843,7 +843,7 @@ void PR_LoadProgs() {
 
     // uint8_t swap the lumps
     for (int i = 0; i < progs->statements.num; i++) {
-        pr_statements[i].op = LittleShort(pr_statements[i].op);
+        pr_statements[i].op = (op_type)LittleShort((int16_t)pr_statements[i].op);
         pr_statements[i].a = LittleShort(pr_statements[i].a);
         pr_statements[i].b = LittleShort(pr_statements[i].b);
         pr_statements[i].c = LittleShort(pr_statements[i].c);
@@ -859,16 +859,16 @@ void PR_LoadProgs() {
     }
 
     for (int i = 0; i < progs->globaldefs.num; i++) {
-        pr_globaldefs[i].type = LittleShort(pr_globaldefs[i].type);
-        pr_globaldefs[i].ofs = LittleShort(pr_globaldefs[i].ofs);
+        pr_globaldefs[i].type = (op_type)LittleShort((int16_t)pr_globaldefs[i].type);
+        pr_globaldefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_globaldefs[i].ofs);
         pr_globaldefs[i].s_name = LittleLong(pr_globaldefs[i].s_name);
     }
 
     for (int i = 0; i < progs->fielddefs.num; i++) {
-        pr_fielddefs[i].type = LittleShort(pr_fielddefs[i].type);
+        pr_fielddefs[i].type = (op_type)LittleShort((int16_t)pr_fielddefs[i].type);
         if (pr_fielddefs[i].type & DEF_SAVEGLOBAL)      Sys_Error("PR_LoadProgs: pr_fielddefs[i].type & DEF_SAVEGLOBAL");
 
-        pr_fielddefs[i].ofs = LittleShort(pr_fielddefs[i].ofs);
+        pr_fielddefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_fielddefs[i].ofs);
         pr_fielddefs[i].s_name = LittleLong(pr_fielddefs[i].s_name);
     }
 
@@ -900,7 +900,7 @@ void PR_Init() {
     Cvar_RegisterVariable(&saved4);
 }
 
-edict_p EDICT_NUM(int n) {
+edict_p EDICT_NUM(uint32_t n) {
     if ((n < 0) ||
         (n >= sv.max_edicts))
         Sys_Error("EDICT_NUM: bad number %i", n);
@@ -908,8 +908,8 @@ edict_p EDICT_NUM(int n) {
     return (edict_p)((uint8_p)sv.edicts + ((n)*pr_edict_size));
 }
 
-int NUM_FOR_EDICT(edict_p edict) {
-    int b = ((uint8_p)edict - (uint8_p)sv.edicts) / pr_edict_size;
+uint32_t NUM_FOR_EDICT(edict_p edict) {
+    uint32_t b = (uint32_t)((uint8_p)edict - (uint8_p)sv.edicts) / pr_edict_size;
 
     if ((b < 0) ||
         (b >= sv.num_edicts))

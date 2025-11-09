@@ -146,7 +146,7 @@ void PR_PrintStatement(dStatement_p state) {
     // if ((uint32_t)state->op < (sizeof(_pr_opNames) / sizeof(_pr_opNames[0]))) {
     if (state->op < OP_LAST) {
         Con_Printf("%s ", _pr_opNames[state->op]);
-        int i = strlen(_pr_opNames[state->op]);
+        size_t i = strlen(_pr_opNames[state->op]);
         for (; i < 10; i++)
             Con_Printf(" ");
     }
@@ -422,7 +422,7 @@ void PR_ExecuteProgram(func_t fnum) {
         } break;
         case OP_NE_S:
             // c->_float = strcmp(pr_strings + a->string, pr_strings + b->string);
-            c->_float = strcmp(PR_GetStringSafe(a->string), PR_GetStringSafe(b->string));   break;
+            c->_float = (float)strcmp(PR_GetStringSafe(a->string), PR_GetStringSafe(b->string));   break;
         case OP_NE_E:       c->_float = a->_int != b->_int;     break;
         case OP_NE_FNC:     c->_float = a->function != b->function;     break;
 
@@ -464,7 +464,7 @@ void PR_ExecuteProgram(func_t fnum) {
             // c->_int = (uint8_p)((int*)&ed->v + b->_int) - (uint8_p)sv.edicts;
             {
                 eval_p ptr = (eval_p)((int*)&ed->v + b->_int);
-                c->_int = (uint32_t)((uintptr_t)ptr - (uintptr_t)sv.edicts);
+                c->_int = (int32_t)((uintptr_t)ptr - (uintptr_t)sv.edicts);
             }
         } break;
 
@@ -547,9 +547,9 @@ void PR_ExecuteProgram(func_t fnum) {
             edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
             ed->v.nextthink = pr_global_struct->time +
 #ifdef FPS_20
-                0.05;
+                0.05f;
 #else
-                0.1;
+                0.1f;
 #endif
             if (a->_float != ed->v.frame)
                 ed->v.frame = a->_float;

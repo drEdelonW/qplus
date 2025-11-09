@@ -201,7 +201,7 @@ int WIPX_Connect(int handle, struct qsockaddr* addr) {
 //=============================================================================
 
 int WIPX_CheckNewConnections(void) {
-    unsigned long	available;
+    uint32_t	available;
 
     if (net_acceptsocket == -1)
         return -1;

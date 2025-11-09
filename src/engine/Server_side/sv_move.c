@@ -67,8 +67,8 @@ realcheck:
 
     // the midpoint must be within 16 of the bottom
     vec3_t stop;
-    start[0] = stop[0] = (mins[0] + maxs[0]) * 0.5;
-    start[1] = stop[1] = (mins[1] + maxs[1]) * 0.5;
+    start[0] = stop[0] = (mins[0] + maxs[0]) * 0.5f;
+    start[1] = stop[1] = (mins[1] + maxs[1]) * 0.5f;
     stop[2] = start[2] - 2 * STEPSIZE;
     trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, true, ent);
 
@@ -217,10 +217,10 @@ bool SV_StepDirection(edict_p ent, float yaw, float dist) {
     ent->v.ideal_yaw = yaw;
     PF_changeyaw();
 
-    yaw = yaw * M_PI * 2 / 360;
+    yaw = yaw * (float)M_PI * 2 / 360;
     vec3_t  move = {
-        cos(yaw) * dist,
-        sin(yaw) * dist,
+        (float)cos(yaw) * dist,
+        (float)sin(yaw) * dist,
         0
     };
 
@@ -263,7 +263,7 @@ void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
     // float   orient[3];   // direction angle Euler
     vec3_t  orient;   // direction angle Euler
 
-    float olddir = anglemod((int)(actor->v.ideal_yaw / 45) * 45);
+    float olddir = anglemod((float)((int)(actor->v.ideal_yaw / 45) * 45));
     float turnaround = anglemod(olddir - 180);
 
     float deltax = enemy->v.origin[0] - actor->v.origin[0];
@@ -321,14 +321,14 @@ void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
         return;
 
     if (rand() & 1) {  /*randomly determine direction of search*/
-        for (int tdir = 0; tdir <= 315; tdir += 45)
+        for (float tdir = 0; tdir <= 315; tdir += 45)
             if ((tdir != turnaround) &&
                 SV_StepDirection(actor, tdir, dist)
                 )
                 return;
     }
     else {
-        for (int tdir = 315; tdir >= 0; tdir -= 45)
+        for (float tdir = 315; tdir >= 0; tdir -= 45)
             if ((tdir != turnaround) &&
                 SV_StepDirection(actor, tdir, dist)
                 )

@@ -42,7 +42,7 @@ typedef struct {
     bool    paused;
     bool    loadgame;       // handle connections specially
     double  time;
-    int32_t lastcheck;      // used by PF_checkclient
+    uint8_t lastcheck;      // used by PF_checkclient
     double  lastchecktime;
     char    name[NAME_LENGTH];       // map name
 #ifdef QUAKE2
@@ -85,11 +85,11 @@ struct RmtClient_s {
     uint8_t     msgbuf[MAX_MSGLEN];
     edict_p     edict;      // EDICT_NUM(clientnum+1)
     char        name[32];   // for printing to other people
-    int32_t     colors;
+    uint8_t     colors;
     float       ping_times[NUM_PING_TIMES];
     int32_t     num_pings;  // ping_times[num_pings%NUM_PING_TIMES]
     float       spawn_parms[NUM_SPAWN_PARMS]; // spawn parms are carried from level to level
-    int32_t     old_frags;  // client known data for deltas
+    int16_t     old_frags;  // client known data for deltas
 };
 typedef struct RmtClient_s RmtClient_t;
 typedef RmtClient_t* RmtClient_p;
@@ -98,10 +98,10 @@ typedef RmtClient_t* RmtClient_p;
 //=============================================================================
 
 typedef struct {
-    int8_t      maxClients;
-    int8_t      maxClientsLimit;
+    uint8_t      maxClients;
+    uint8_t      maxClientsLimit;
     RmtClient_p clients;            // [maxClients]
-    int32_t     serverflags;        // episode completion information
+    uint32_t     serverflags;        // episode completion information
     bool        changelevel_issued; // cleared when at SV_SpawnServer
 } sv_static_t;
 
@@ -119,7 +119,7 @@ extern "C" {
 #endif
     void SV_Init();
 
-    void SV_StartParticle(vec3_t org, vec3_t dir, int color, int32_t count);
+    void SV_StartParticle(vec3_t org, vec3_t dir, int color, size_t count);
     void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation);
 
     void SV_DropClient(bool crash);

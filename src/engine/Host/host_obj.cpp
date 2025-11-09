@@ -320,7 +320,7 @@ void SV_DropClient(bool crash) {
     // free the client (the body stays around)
     remoteClient->active = false;
     remoteClient->name[0] = 0;
-    remoteClient->old_frags = -999999;
+    remoteClient->old_frags = -16959;//-999999;
     net_activeconnections--;
 
     // send notification to all clients
@@ -328,9 +328,9 @@ void SV_DropClient(bool crash) {
     for (int i = 0; i < svs.maxClients; i++, client++) {
         if (!client->active)    continue;
         sizebuf_p pBuf = &client->message;
-        MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteString(pBuf, "");
-        MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteShort(pBuf, 0);
-        MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, remoteClient - svs.clients);    MSG_WriteByte(pBuf, 0);
+        MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteString(pBuf, "");
+        MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteShort(pBuf, 0);
+        MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteByte(pBuf, 0);
     }
 }
 
