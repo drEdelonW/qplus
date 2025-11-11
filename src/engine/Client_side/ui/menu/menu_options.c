@@ -139,7 +139,7 @@ void M_Options_Draw() {
     }
 #endif
     // cursor
-    M_DrawCharacter(200, 32 + _cursor * CHAR_HEIGHT, curSymb());
+    M_DrawCharacter(200, 32 + _cursor * D_CHAR_HEIGHT, curSymb());
 }
 
 void M_Options_Key(keycode_t k) {

@@ -21,6 +21,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "sys.h"
 #include "host.h"
+#include "console.h"
+#include "common.h"
+#include "client.h"
+#include "screen.h"
+#include "q_tools.h"
 #include "winquake.h"
 #include "errno.h"
 #include "resource.h"
@@ -65,7 +70,7 @@ volatile int     sys_checksum;
 Sys_PageIn
 ================
 */
-void Sys_PageIn(void* ptr, int size) {
+void Sys_PageIn(TypeLess_ptr ptr, int size) {
     // touch all the memory to make sure it's there. The 16-page skip is to
     // keep Win 95 from thinking we're trying to page ourselves in (we are
     // doing that, of course, but there's no reason we shouldn't)
@@ -116,7 +121,7 @@ int filelength(FILE* f) {
     return end;
 }
 
-int Sys_FileOpenRead(cString path, int* hndl) {
+int Sys_FileOpenRead(cStringRO path, int* hndl) {
     int t = VID_ForceUnlockedAndReturnState();
     int i = findhandle();
     FILE* f = fopen(path, "rb");
@@ -136,7 +141,7 @@ int Sys_FileOpenRead(cString path, int* hndl) {
     return retval;
 }
 
-int Sys_FileOpenWrite(cString path) {
+int Sys_FileOpenWrite(cStringRO path) {
     int t = VID_ForceUnlockedAndReturnState();
     int i = findhandle();
     FILE* f = fopen(path, "wb");
@@ -161,21 +166,21 @@ void Sys_FileSeek(int handle, int position) {
     VID_ForceLockState(t);
 }
 
-int Sys_FileRead(int handle, void* dest, int count) {
+int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) {
     int t = VID_ForceUnlockedAndReturnState();
     int x = fread(dest, 1, count, sys_handles[handle]);
     VID_ForceLockState(t);
     return x;
 }
 
-int Sys_FileWrite(int handle, void* data, int count) {
+int Sys_FileWrite(int handle, TypeLess_ptr data, size_t count) {
     int t = VID_ForceUnlockedAndReturnState();
     int x = fwrite(data, 1, count, sys_handles[handle]);
     VID_ForceLockState(t);
     return x;
 }
 
-int Sys_FileTime(cString path) {
+int Sys_FileTime(cStringRO path) {
     int t = VID_ForceUnlockedAndReturnState();
 
     FILE* f = fopen(path, "rb");
@@ -193,11 +198,11 @@ int Sys_FileTime(cString path) {
 }
 
 #if 0
-void Sys_mkdir(cString path) {
+void Sys_mkdir(cStringRO path) {
     _mkdir(path);
 }
 #else
-void Sys_mkdir(cString path) {
+void Sys_mkdir(cStringRO path) {
     /* WinAPI создаёт папку, если её нет; если есть — вернёт FALSE и
        GetLastError()==ERROR_ALREADY_EXISTS, что нам ок. */
     CreateDirectoryA(path, NULL);
@@ -283,9 +288,9 @@ void Sys_Init() {
 
 void Sys_Error(cStringRO error, ...) {
     char text2[1024];
-    cString text3 = "Press Enter to exit\n";
-    cString text4 = "***********************************\n";
-    cString text5 = "\n";
+    cStringRO text3 = "Press Enter to exit\n";
+    cStringRO text4 = "***********************************\n";
+    cStringRO text5 = "\n";
     DWORD  dummy;
     double  starttime;
     static int in_sys_error0 = 0;
@@ -351,7 +356,7 @@ void Sys_Error(cStringRO error, ...) {
     exit(1);
 }
 
-void Sys_Printf(cString fmt, ...) {
+void Sys_Printf(cStringRO fmt, ...) {
     DWORD   dummy;
 
     if (isDedicated) {
@@ -447,12 +452,9 @@ void Sys_InitFloatTime() {
 
     int j = COM_CheckParm("-starttime");
 
-    if (j) {
-        _curtime = (double)(Q_atof(com.argv[j + 1]));
-    }
-    else {
-        _curtime = 0.0;
-    }
+    if (j)  _curtime = (double)(Q_atof(com.argv[j + 1]));
+    else    _curtime = 0.0;
+
 
     _lastcurtime = _curtime;
 }
@@ -536,7 +538,7 @@ void Sys_SendKeyEvents() {
     MSG msg;
     while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
         // we always update if there are any event, even if we're paused
-        scr_skipupdate = FALSE;
+        scr.skipupdate = FALSE;
 
         if (!GetMessage(&msg, NULL, 0, 0))
             Sys_Quit();
@@ -745,7 +747,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             // yield the CPU for a little while when paused, minimized, or not the focus
             if ((cl.paused && (!ActiveApp && !DDActive)) || Minimized || block_drawing) {
                 SleepUntilInput(PAUSE_SLEEP);
-                scr_skipupdate = TRUE;  // no point in bothering to draw
+                scr.skipupdate = TRUE;  // no point in bothering to draw
             }
             else if (!ActiveApp && !DDActive) {
                 SleepUntilInput(NOT_FOCUS_SLEEP);

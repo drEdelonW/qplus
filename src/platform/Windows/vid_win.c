@@ -20,6 +20,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // vid_win.c -- Win32 video driver
 
 #include "winquake.h"
+#include "input.h"
+#include "host.h"
+#include "cdaudio.h"
+#include "menu.h"
+#include "menu_prv.h"
+#include "screen.h"
+#include "draw.h"
+#include "endian_tools.h"
+#include "cmd.h"
+#include "q_tools.h"
+#include "console.h"
+#include "common.h"
+#include "sys.h"
+#include "sound.h"
+#include "qPic.h"
 #include "d_local.h"
 #include "resource.h"
 
@@ -1432,8 +1447,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
         return true;
 
     // so Con_Printfs don't mess us up by forcing vid and snd updates
-    temp = scr_disabled_for_loading;
-    scr_disabled_for_loading = true;
+    temp = scr.disabled_for_loading;
+    scr.disabled_for_loading = true;
     in_mode_set = true;
 
     CDAudio_Pause();
@@ -1471,7 +1486,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     VID_UpdateWindowStatus();
 
     CDAudio_Resume();
-    scr_disabled_for_loading = temp;
+    scr.disabled_for_loading = temp;
 
     if (!stat) {
         VID_RestoreOldMode(original_mode);
@@ -2049,7 +2064,7 @@ void VID_Update(vRect_p rects) {
             .width = vid.width,
             .height = vid.height,
             .pnext = NULL
-        }
+        };
         rects = &rect;
     }
 
@@ -2374,7 +2389,7 @@ void AppActivate(BOOL fActive, BOOL minimize) {
         if (!Minimized)
             VID_SetPalette(vid_curpal);
 
-        scr_fullupdate = 0;
+        scr.fullupdate = 0;
 
         ReleaseDC(NULL, hdc);
     }
@@ -2640,7 +2655,7 @@ LONG WINAPI MainWndProc(
 
         ReleaseDC(NULL, hdc);
 
-        scr_fullupdate = 0;
+        scr.fullupdate = 0;
 
         if (vid_initialized && !in_mode_set && windc && MGL_activatePalette(windc, false) && !Minimized) {
             VID_SetPalette(vid_curpal);

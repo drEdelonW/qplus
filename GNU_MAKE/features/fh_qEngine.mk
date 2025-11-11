@@ -7,7 +7,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 $(eval API_DIR := $(HOST_DIR)/API) $(eval INCLUDES += $(API_DIR))
 
                 $(eval PLAPI_DIR := $(HOST_DIR)/platformAPI) $(eval INCLUDES += $(PLAPI_DIR))
-                        SRC_LIST += $(PLAPI_DIR)/sys_null.c
+                        #SRC_LIST += $(PLAPI_DIR)/sys_null.c
                         SRC_LIST += $(PLAPI_DIR)/vid_null.c
                         SRC_LIST += $(PLAPI_DIR)/in_null.c
                         SRC_LIST += $(PLAPI_DIR)/snd_null.c

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Edict.h"
-#include "Model.h"
+#include "Model_s.h"
 
 #ifdef __cplusplus
 extern "C" {

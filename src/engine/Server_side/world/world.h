@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "types.h"
 #include "Edict.h"
 #include "bspfile.h"
-#include "Model.h"
+#include "Model_s.h"
 #ifdef GLQUAKE
 #   include "gl_model.h"
 #   include "glquake.h"

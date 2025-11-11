@@ -128,7 +128,13 @@
 			"pr_comp.h": "c",
 			"stdlib.h": "c",
 			"usercmd.h": "c",
-			"*.h_": "c"
+			"*.h_": "c",
+			"plane.h": "c",
+			"STDDEF.H": "cpp",
+			"resource.h": "c",
+			"angle.h": "c",
+			"wsipx.h": "c",
+			"WSIPX.H": "cpp"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

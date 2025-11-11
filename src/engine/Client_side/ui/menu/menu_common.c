@@ -50,10 +50,10 @@ void M_DrawTextBox(int x, int y, int width, int lines) {
     int cy = y;
     M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tl.lmp"));
     for (int n = 0; n < lines; n++) {
-        cy += CHAR_HEIGHT;
+        cy += D_CHAR_HEIGHT;
         M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_ml.lmp"));
     }
-    M_DrawTransPic(cx, cy + CHAR_HEIGHT, Draw_CachePic("gfx/box_bl.lmp"));
+    M_DrawTransPic(cx, cy + D_CHAR_HEIGHT, Draw_CachePic("gfx/box_bl.lmp"));
 
     // draw middle
     cx += 8;
@@ -62,7 +62,7 @@ void M_DrawTextBox(int x, int y, int width, int lines) {
         M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tm.lmp"));
         qPic_p p = Draw_CachePic("gfx/box_mm.lmp");
         for (int n = 0; n < lines; n++) {
-            cy += CHAR_HEIGHT;
+            cy += D_CHAR_HEIGHT;
             if (n == 1)
                 p = Draw_CachePic("gfx/box_mm2.lmp");
             M_DrawTransPic(cx, cy, p);
@@ -76,7 +76,7 @@ void M_DrawTextBox(int x, int y, int width, int lines) {
     cy = y;
     M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tr.lmp"));
     for (int n = 0; n < lines; n++) {
-        cy += CHAR_HEIGHT;
+        cy += D_CHAR_HEIGHT;
         M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_mr.lmp"));
     }
     M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_br.lmp"));
@@ -102,7 +102,7 @@ void M_Print(int cx, int cy, cStringRO str) {
     while (*str) {
         M_DrawCharacter(cx, cy, (*str) + 128);
         str++;
-        cx += CHAR_WIDTH;
+        cx += D_CHAR_WIDTH;
     }
 }
 
@@ -110,7 +110,7 @@ void M_PrintWhite(int cx, int cy, cString str) {
     while (*str) {
         M_DrawCharacter(cx, cy, *str);
         str++;
-        cx += CHAR_WIDTH;
+        cx += D_CHAR_WIDTH;
     }
 }
 
@@ -119,13 +119,13 @@ void M_PrintWhite(int cx, int cy, cString str) {
 void M_DrawSlider(int x, int y, float range) {
     CLAMP(0.0f, range, 1.0f);
 
-    M_DrawCharacter(x - CHAR_WIDTH, y, 128);
+    M_DrawCharacter(x - D_CHAR_WIDTH, y, 128);
     int i = 0;
     for (; i < SLIDER_RANGE; i++)
-        M_DrawCharacter(x + i * CHAR_WIDTH, y, 129);
-    M_DrawCharacter(x + i * CHAR_WIDTH, y, 130);
+        M_DrawCharacter(x + i * D_CHAR_WIDTH, y, 129);
+    M_DrawCharacter(x + i * D_CHAR_WIDTH, y, 130);
 
-    M_DrawCharacter(x + (SLIDER_RANGE - 1) * CHAR_WIDTH * range, y, 131);
+    M_DrawCharacter(x + (SLIDER_RANGE - 1) * D_CHAR_WIDTH * range, y, 131);
 }
 
 

@@ -21,6 +21,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // rights reserved.
 
 #include <windows.h>
+#include "winquake.h"
+#include "console.h"
+#include "common.h"
+#include "cdaudio.h"
+#include "cmd.h"
+#include "q_tools.h"
+#include "client.h"
 
 // extern HWND mainwindow;
 // extern cvar_t bgmvolume;
@@ -221,7 +228,7 @@ void CDAudio_Resume(void) {
 
 
 static void CD_f(void) {
-    cStringArray command;
+    cString command;
     int  ret;
     int  n;
     int  startAddress;

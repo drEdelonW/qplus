@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef _WIN32
 #   include "winquake.h"
+#   include "console.h"
 #else
 #   define DWORD uint32_t
 typedef DWORD* LPVOID;
@@ -66,10 +67,11 @@ void S_TransferStereo16(int endtime) {
     _snd_p = (int*)_paintbuffer;
     int lpaintedtime = paintedtime;
 #ifdef _WIN32
+    DWORD dwSize;
     if (pDSBuf) {
         int reps = 0;
 
-        DWORD dwSize, dwSize2;
+        DWORD dwSize2;
         LPVOID pbuf2;
         HRESULT hresult;
         while ((hresult = pDSBuf->lpVtbl->Lock(pDSBuf, 0, gSndBufSize, &pbuf, &dwSize,
@@ -135,10 +137,11 @@ void S_TransferPaintBuffer(int endtime) {
 
     LPVOID pbuf;
 #ifdef _WIN32
+    DWORD dwSize;
     if (pDSBuf) {
         int reps = 0;
 
-        DWORD dwSize, dwSize2;
+        DWORD dwSize2;
         LPVOID pbuf2;
         HRESULT hresult;
         while ((hresult = pDSBuf->lpVtbl->Lock(pDSBuf, 0, gSndBufSize, &pbuf, &dwSize,

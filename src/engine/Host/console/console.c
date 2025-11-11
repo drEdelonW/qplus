@@ -500,7 +500,7 @@ void Con_DrawNotify() {
         for (int32_t x = 0; x < _con.linewidth; x++)
             Draw_Character((x + 1) << 3, v, text[x]);
 
-        v += CHAR_HEIGHT;
+        v += D_CHAR_HEIGHT;
     }
 
     if (key.dest == key_message) {
@@ -515,7 +515,7 @@ void Con_DrawNotify() {
             x++;
         }
         Draw_Character((x + 5) << 3, v, 10 + ((int)(realtime * _con.cursorspeed) & 1));
-        v += CHAR_HEIGHT;
+        v += D_CHAR_HEIGHT;
     }
 
     if (v > con.notifylines) {
@@ -544,7 +544,7 @@ void Con_DrawConsole(int32_t lines, bool drawinput) {
     int32_t rows = (lines - 16) >> 3;  // rows of text to draw
     int32_t y = lines - 16 - (rows << 3); // may start slightly negative
 
-    for (int32_t i = (_con.current - rows + 1); i <= _con.current; i++, y += CHAR_HEIGHT) {
+    for (int32_t i = (_con.current - rows + 1); i <= _con.current; i++, y += D_CHAR_HEIGHT) {
         int32_t j = i - con.backscroll;
 
         CLAMP_LESS(j, 0);
