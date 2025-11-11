@@ -40,7 +40,6 @@ typedef uint8_t pixel_t;
 typedef pixel_t* pixel_p;
 
 
-struct vRect_s;
 typedef struct vRect_s vRect_t;
 typedef vRect_t* vRect_p;
 struct vRect_s {

@@ -64,8 +64,7 @@ static int* VID_pagelist;
 static uint8_p VID_membase;
 static int		VID_banked;
 
-typedef struct
-{
+typedef struct{
     int modenum;
     int mode_attributes;
     int	winasegment;

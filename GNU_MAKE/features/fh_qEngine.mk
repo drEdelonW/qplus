@@ -4,8 +4,15 @@ FORCE_32     ?= 1
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
         $(eval HOST_DIR = $(ENG_DIR)/Host) $(eval INCLUDES += $(HOST_DIR))
-                $(eval INCLUDES += $(HOST_DIR)/platformAPI)
-                $(eval INCLUDES += $(HOST_DIR)/API)
+                $(eval API_DIR := $(HOST_DIR)/API) $(eval INCLUDES += $(API_DIR))
+
+                $(eval PLAPI_DIR := $(HOST_DIR)/platformAPI) $(eval INCLUDES += $(PLAPI_DIR))
+                        SRC_LIST += $(PLAPI_DIR)/sys_null.c
+                        SRC_LIST += $(PLAPI_DIR)/vid_null.c
+                        SRC_LIST += $(PLAPI_DIR)/in_null.c
+                        SRC_LIST += $(PLAPI_DIR)/snd_null.c
+                        SRC_LIST += $(PLAPI_DIR)/cd_null.c
+
                 #SRC_LIST += $(HOST_DIR)/host.c
                 SRC_LIST += $(HOST_DIR)/host_cmd.c
                 SRC_LIST += $(HOST_DIR)/host_obj.cpp
@@ -38,7 +45,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(INPUT_DIR)/keys.c
 
 
- 
+
 
         $(eval SV_SIDE_DIR = $(ENG_DIR)/Server_side) $(eval INCLUDES += $(SV_SIDE_DIR))
                 $(eval WORLD_DIR = $(SV_SIDE_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))

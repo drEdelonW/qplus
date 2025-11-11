@@ -40,15 +40,15 @@ typedef qsockaddr_t* qsockaddr_p;
 
 // NetHeader flags
 typedef enum {
-    NETFLAG_LENGTH_MASK = 0x0000ffff, // lower 16 bits hold length
-    NETFLAG_DATA        = 0x00010000, // packet contains data
-    NETFLAG_ACK         = 0x00020000, // acknowledge
-    NETFLAG_NAK         = 0x00040000, // negative acknowledge
-    NETFLAG_EOM         = 0x00080000, // end of message
-    NETFLAG_UNRELIABLE  = 0x00100000, // unreliable packet
-    // NETFLAG_CTL         = 0x80000000  // control packet
+    NETFLAG_LENGTH_MASK = 0x0000ffffu, // lower 16 bits hold length
+    NETFLAG_DATA        = 0x00010000u, // packet contains data
+    NETFLAG_ACK         = 0x00020000u, // acknowledge
+    NETFLAG_NAK         = 0x00040000u, // negative acknowledge
+    NETFLAG_EOM         = 0x00080000u, // end of message
+    NETFLAG_UNRELIABLE  = 0x00100000u, // unreliable packet
+    NETFLAG_CTL         = 0x80000000u  // control packet
 } netflag_t;
-#define NETFLAG_CTL 0x80000000u
+// #define NETFLAG_CTL 0x80000000u
 
 #define NET_PROTOCOL_VERSION 3
 
@@ -266,6 +266,7 @@ extern bool slistLocal;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
     qsocket_p NET_NewQSocket();
     void NET_FreeQSocket(qsocket_p);
     double SetNetTime();

@@ -127,7 +127,8 @@
 			"sizebuf.h": "c",
 			"pr_comp.h": "c",
 			"stdlib.h": "c",
-			"usercmd.h": "c"
+			"usercmd.h": "c",
+			"*.h_": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

@@ -245,6 +245,5 @@ SNDDMA_Submit
 Send sound to device if buffer isn't really the dma buffer
 ===============
 */
-void SNDDMA_Submit() {
-}
+void SNDDMA_Submit() {}
 

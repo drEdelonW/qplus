@@ -149,9 +149,7 @@ void S_Init() {
 
     Con_Printf("\nSound Initialization\n");
 
-#if 0   /* NOSOUND*/
-    if (COM_CheckParm("-nosound")) // TODO: force disabled
-#endif
+    if (COM_CheckParm("-nosound"))
         return;
 
     if (COM_CheckParm("-simsound"))

@@ -11,7 +11,7 @@ ifeq ($(UNAME_S),Linux)
         SRC_LIST += $(POSIX_DIR)/sys_linux_file.c
         SRC_LIST += $(POSIX_DIR)/vid_x.c
         SRC_LIST += $(POSIX_DIR)/cd_linux.c
-        SRC_LIST += $(POSIX_DIR)/snd_linux.c
+        # SRC_LIST += $(POSIX_DIR)/snd_linux.c  # TODO:
         SRC_LIST += $(POSIX_DIR)/net_udp.c
         SRC_LIST += $(POSIX_DIR)/net_bsd.c
 
@@ -32,8 +32,6 @@ else ifeq ($(UNAME_S),Darwin)
     $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))
         SRC_LIST += $(POSIX_DIR)/sys_linux.c
         SRC_LIST += $(POSIX_DIR)/vid_x.c
-        SRC_LIST += $(PLATFORM_DIR)/null/cd_null.c
-        SRC_LIST += $(PLATFORM_DIR)/null/snd_null.c
         SRC_LIST += $(POSIX_DIR)/net_udp.c
         SRC_LIST += $(POSIX_DIR)/net_bsd.c
 
@@ -49,8 +47,6 @@ else ifeq ($(UNAME_S),Darwin)
 
 else
     $(eval PL_NULL_DIR = $(PLATFORM_DIR)/null) $(eval INCLUDES += $(PL_NULL_DIR))
-        SRC_LIST += $(PL_NULL_DIR)/cd_null.c
-        SRC_LIST += $(PL_NULL_DIR)/snd_null.c
         SRC_LIST += $(PL_NULL_DIR)/xshm_stubs.c
 endif
 
