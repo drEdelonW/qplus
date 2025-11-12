@@ -56,6 +56,7 @@ extern m_state_t m_return_state;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
     void M_Init();
     void M_Keydown(keycode_t key);
     void M_Draw();

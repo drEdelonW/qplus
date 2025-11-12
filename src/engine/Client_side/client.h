@@ -133,6 +133,12 @@ typedef struct {
 
 extern ClientStatic_t cls;
 
+typedef enum {
+    IM_NONE     = 0u,
+    IM_LEVEL    = 1u,   // svc_intermission: scoreboard/end-of-level
+    IM_FINALE   = 2u,   // svc_finale: text finale
+    IM_CUTSCENE = 3u    // svc_cutscene/finale2
+} IntermissionState_e;
 //
 // the ClientState_t structure is wiped completely at every
 // server signon
@@ -177,7 +183,7 @@ typedef struct {
     bool    onground;
     bool    inwater;
 
-    int32_t intermission; // don't change view angle, full screen, etc
+    IntermissionState_e intermission; // don't change view angle, full screen, etc
     int32_t completed_time; // latched at intermission start
 
     double  mtime[2];  // the timestamp of last two messages

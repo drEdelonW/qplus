@@ -823,7 +823,7 @@ void V_RenderView() {
         Cvar_Set("scr_ofsz", "0");
     }
 
-    if (cl.intermission) { // intermission / finale rendering
+    if (cl.intermission != IM_NONE) { // intermission / finale rendering
         V_CalcIntermissionRefdef();
     }
     else {

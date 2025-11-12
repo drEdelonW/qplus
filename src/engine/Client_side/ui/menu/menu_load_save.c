@@ -55,7 +55,7 @@ void M_Menu_Load_f() {
 
 void M_Menu_Save_f() {
     if ((!sv.active) ||
-        (cl.intermission) ||
+        (cl.intermission != IM_NONE) ||
         (svs.maxClients != 1))
         return;
     m_entersound = true;

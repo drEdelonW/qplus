@@ -109,7 +109,7 @@ void SCR_EraseCenterString() {
 
 void SCR_DrawCenterString() {
     // the finale prints the characters one at a time
-    int remaining = (cl.intermission) ?
+    int remaining = (cl.intermission != IM_NONE) ?
         scr_printspeed.value * (cl.time - _scr.centertime_start) : 9999;
 
     _scr.erase_center = 0;
@@ -150,8 +150,10 @@ void SCR_CheckDrawCenterString() {
 
     scr.centertime_off -= host_frametime;
 
-    if (((scr.centertime_off <= 0) && !cl.intermission) ||
-        (key.dest != key_game))
+    if (((scr.centertime_off <= 0) &&
+        (cl.intermission == IM_NONE)) ||
+        (key.dest != key_game)
+        )
         return;
 
     SCR_DrawCenterString();
@@ -207,8 +209,8 @@ static void SCR_CalcRefdef() {
 
     // intermission is always full screen
     float  size;
-    if (cl.intermission)    size = 120;
-    else                    size = scr_viewsize.value;
+    if (cl.intermission != IM_NONE) size = 120;
+    else                            size = scr_viewsize.value;
 
     if (size >= 120)        sb_lines = 0;  // no status bar at all
     else if (size >= 110)   sb_lines = 24;  // no inventory
@@ -707,14 +709,14 @@ void SCR_UpdateScreen() {
         SCR_DrawLoading();
         Sbar_Draw();
     }
-    else if ((cl.intermission == 1) && (key.dest == key_game)) {
+    else if ((cl.intermission == IM_LEVEL) && (key.dest == key_game)) {
         Sbar_IntermissionOverlay();
     }
-    else if ((cl.intermission == 2) && (key.dest == key_game)) {
+    else if ((cl.intermission == IM_FINALE) && (key.dest == key_game)) {
         Sbar_FinaleOverlay();
         SCR_CheckDrawCenterString();
     }
-    else if ((cl.intermission == 3) && (key.dest == key_game)) {
+    else if ((cl.intermission == IM_CUTSCENE) && (key.dest == key_game)) {
         SCR_CheckDrawCenterString();
     }
     else {

@@ -326,7 +326,7 @@ Host_Savegame_f
 void Host_Savegame_f() {
     if (cmd_source != src_command)      return;
     if (!sv.active) { ;                 Con_Printf("Not playing a local game.\n");              return; }
-    if (cl.intermission) { ;            Con_Printf("Can't save in intermission.\n");            return; }
+    if (cl.intermission != IM_NONE) { ; Con_Printf("Can't save in intermission.\n");            return; }
     if (svs.maxClients != 1) { ;        Con_Printf("Can't save multiplayer games.\n");          return; }
     if (Cmd_Argc() != 2) { ;            Con_Printf("save <savename> : save a game\n");          return; }
     if (strstr(Cmd_Argv(1), "..")) { ;  Con_Printf("Relative pathnames are not allowed.\n");    return; }

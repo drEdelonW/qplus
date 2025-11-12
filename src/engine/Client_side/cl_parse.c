@@ -716,20 +716,20 @@ void CL_ParseServerMessage() {
             break;
 
         case svc_intermission:
-            cl.intermission = 1;
+            cl.intermission = IM_LEVEL;
             cl.completed_time = (int32_t)cl.time;
             vid.recalc_refdef = true; // go to full screen
             break;
 
         case svc_finale:
-            cl.intermission = 2;
+            cl.intermission = IM_FINALE;
             cl.completed_time = (int32_t)cl.time;
             vid.recalc_refdef = true; // go to full screen
             SCR_CenterPrint(MSG_ReadString());
             break;
 
         case svc_cutscene:
-            cl.intermission = 3;
+            cl.intermission = IM_CUTSCENE;
             cl.completed_time = (int32_t)cl.time;
             vid.recalc_refdef = true; // go to full screen
             SCR_CenterPrint(MSG_ReadString());
