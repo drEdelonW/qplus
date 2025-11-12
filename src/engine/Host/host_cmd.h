@@ -7,9 +7,6 @@
 extern "C" {
 #endif
 
-    /* from other TUs but needed here */
-    void M_Menu_Quit_f();
-
     /* console/host commands */
     void Host_Quit_f();
     void Host_Status_f();

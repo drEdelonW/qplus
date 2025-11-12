@@ -162,11 +162,16 @@ ENTITY AREA CHECKING
 
 ===============================================================================
 */
+typedef enum AreaAxis_e {
+    AXIS_LEAF   = -1,   // leaf node (no split)
+    AXIS_X      = 0,    // split along X
+    AXIS_Y      = 1     // split along Y
+} AreaAxis;
 
 typedef struct areaNode_s areaNode_t;
 typedef areaNode_t* areaNode_p;
 typedef struct areaNode_s {
-    int         axis;  // -1 = leaf node
+    AreaAxis    axis;  // -1 = leaf node
     float       dist;
     areaNode_p  children[2];
     link_t      trigger_edicts;
@@ -193,14 +198,14 @@ areaNode_p SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
     ClearLink(&anode->solid_edicts);
 
     if (depth == AREA_DEPTH) {
-        anode->axis = -1;
+        anode->axis = AXIS_LEAF;
         anode->children[0] = anode->children[1] = NULL;
         return anode;
     }
 
     vec3_t size; VectorSubtract(maxs, mins, size);
-    if (size[0] > size[1])  anode->axis = 0;
-    else                    anode->axis = 1;
+    if (size[0] > size[1])  anode->axis = AXIS_X;
+    else                    anode->axis = AXIS_Y;
 
     anode->dist = 0.5f * (maxs[anode->axis] + mins[anode->axis]);
     vec3_t mins1; VectorCopy(mins, mins1);
@@ -283,7 +288,7 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
     }
 
     // recurse down both sides
-    if (node->axis == -1)       return;
+    if (node->axis == AXIS_LEAF)       return;
 
     if (ent->v.absmax[node->axis] > node->dist)     SV_TouchLinks(ent, node->children[0]);
     if (ent->v.absmin[node->axis] < node->dist)     SV_TouchLinks(ent, node->children[1]);
@@ -400,7 +405,7 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     // find the first node that the ent's box crosses
     areaNode_p node = _sv_AreaNodes;
     while (1) {
-        if (node->axis == -1)       break;
+        if (node->axis == AXIS_LEAF)       break;
 
         if (ent->v.absmin[node->axis] > node->dist)         node = node->children[0];
         else if (ent->v.absmax[node->axis] < node->dist)    node = node->children[1];
@@ -777,7 +782,7 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
     }
 
     // recurse down both sides
-    if (node->axis == -1)
+    if (node->axis == AXIS_LEAF)
         return;
 
     if (clip->boxmaxs[node->axis] > node->dist)     SV_ClipToLinks(node->children[0], clip);

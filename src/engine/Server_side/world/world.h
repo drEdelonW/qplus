@@ -32,17 +32,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 typedef struct {
-    vec3_t	normal;
-    float	dist;
+    vec3_t  normal;
+    float   dist;
 } Plane_t;
 
 typedef struct {
-    bool	allsolid;   // if true, plane is not valid
-    bool	startsolid;	// if true, the initial point was in a solid area
-    bool	inopen, inwater;
-    float	fraction;   // time completed, 1.0 = didn't hit anything
-    vec3_t	endpos;     // final position
-    Plane_t	plane;      // surface normal at impact
+    bool    allsolid;   // if true, plane is not valid
+    bool    startsolid; // if true, the initial point was in a solid area
+    bool    inopen, inwater;
+    float   fraction;   // time completed, 1.0 = didn't hit anything
+    vec3_t  endpos;     // final position
+    Plane_t plane;      // surface normal at impact
     edict_p ent;        // entity the surface is on
 } trace_t;
 typedef trace_t* trace_p;
@@ -58,13 +58,11 @@ void SV_ClearWorld();
 // called after the world model has been loaded, before linking any entities
 
 void SV_UnlinkEdict(edict_p ent);
-// call before removing an entity, and before trying to move one,
-// so it doesn't clip against itself
+// call before removing an entity, and before trying to move one, so it doesn't clip against itself
 // flags ent->v.modified
 
 void SV_LinkEdict(edict_p ent, bool touch_triggers);
-// Needs to be called any time an entity changes origin, mins, maxs, or solid
-// flags ent->v.modified
+// Needs to be called any time an entity changes origin, mins, maxs, or solid flags ent->v.modified
 // sets ent->v.absmin and ent->v.absmax
 // if touchtriggers, calls prog functions for the intersected triggers
 
@@ -90,7 +88,7 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
 // passedict is explicitly excluded from clipping checks (normally NULL)
 
 
-int     BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane);
+int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane);
 
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)      \
     (((p)->type < 3)? (                         \

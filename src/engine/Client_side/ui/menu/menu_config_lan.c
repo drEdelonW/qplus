@@ -28,7 +28,11 @@ typedef enum {
 static LanConfig_e _cursor = lc_UNINITED;
 LanConfig_t lanConfig;
 
-static int _y[] = { 72, 92, 124 };
+static int _y[] = {
+    72,     // lc_Port
+    92,     // lc_Search
+    124     // lc_Ok/lc_Search,
+};
 
 
 void M_Menu_LanConfig_f() {
@@ -36,17 +40,17 @@ void M_Menu_LanConfig_f() {
     m_state = m_lanconfig;
     m_entersound = true;
     if (_cursor == lc_UNINITED) {
-        if (is_JoinGame() && TCPIPConfig)   _cursor = 2;
+        if (is_JoinGame() && TCPIPConfig)   _cursor = lc_JoinName;
         else                                _cursor = 1;
     }
     if (is_CreateGame() &&
-        (_cursor == 2))
+        (_cursor == lc_JoinName))
         _cursor = 1;
     lanConfig.port = DEFAULTnet_hostport;
     sprintf(lanConfig.portname, "%u", lanConfig.port);
 
     m_return_onerror = false;
-    m_return_reason[0] = 0;
+    m_return_reason[0] = 0x00;
 }
 
 
@@ -63,21 +67,21 @@ void M_LanConfig_Draw() {
     M_Print(basex, 52, "Address:");
     M_Print(basex + 9 * 8, 52, (IPXConfig) ? my_ipx_address : my_tcpip_address);
 
-    M_Print(basex, _y[0], "Port");
-    M_DrawTextBox(basex + 8 * 8, _y[0] - 8, 6, 1); {
-        M_Print(basex + 9 * 8, _y[0], lanConfig.portname);
+    M_Print(basex, _y[lc_Port], "Port");
+    M_DrawTextBox(basex + 8 * 8, _y[lc_Port] - 8, 6, 1); {
+        M_Print(basex + 9 * 8, _y[lc_Port], lanConfig.portname);
     }
 
     if (is_JoinGame()) {
-        M_Print(basex, _y[1], "Search for local games...");
+        M_Print(basex, _y[lc_Search], "Search for local games...");
         M_Print(basex, 108, "Join game at:");
         M_DrawTextBox(basex + 8, _y[2] - 8, 22, 1); {
             M_Print(basex + 16, _y[2], lanConfig.joinname);
         }
     }
     else {
-        M_DrawTextBox(basex, _y[1] - 8, 2, 1); {
-            M_Print(basex + 8, _y[1], "OK");
+        M_DrawTextBox(basex, _y[lc_Search] - 8, 2, 1); {
+            M_Print(basex + 8, _y[lc_Search], "OK");
         }
     }
 
@@ -86,7 +90,7 @@ void M_LanConfig_Draw() {
     if (_cursor == lc_Port)
         M_DrawCharacter(basex + 9 * 8 + 8 * strlen(lanConfig.portname), _y[lc_Port], inpSymb());
 
-    if (_cursor == 2)
+    if (_cursor == lc_JoinName)
         M_DrawCharacter(basex + 16 + 8 * strlen(lanConfig.joinname), _y[lc_JoinName], inpSymb());
 
     if (*m_return_reason)
@@ -170,13 +174,12 @@ void M_LanConfig_Key(keycode_t Key) {
         (_cursor == lc_JoinName)
         ) {
         if (Key == K_UPARROW)   _cursor = 1;
-        else                    _cursor = 0;
+        else                    _cursor = lc_Port;
     }
 
     int l = Q_atoi(lanConfig.portname);
-    if (l > 0xFFFF)
-        l = lanConfig.port;
-    else
-        lanConfig.port = l;
+    if (l > 0xFFFF)     l = lanConfig.port;
+    else                lanConfig.port = l;
+
     sprintf(lanConfig.portname, "%u", lanConfig.port);
 }

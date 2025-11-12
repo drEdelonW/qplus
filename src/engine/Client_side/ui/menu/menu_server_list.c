@@ -18,7 +18,7 @@ void M_Menu_ServerList_f() {
     m_entersound = true;
     slist_cursor = 0;
     m_return_onerror = false;
-    m_return_reason[0] = 0;
+    m_return_reason[0] = 0x00;
     slist_sorted = false;
 }
 

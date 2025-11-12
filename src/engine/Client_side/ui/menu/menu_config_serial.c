@@ -60,7 +60,7 @@ void M_Menu_SerialConfig_f() {
         serialConfig_baud = n;
     }
     m_return_onerror = false;
-    m_return_reason[0] = 0;
+    m_return_reason[0] = 0x00;
 }
 
 

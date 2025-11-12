@@ -97,10 +97,9 @@ angles and bad trails.
 =================
 */
 edict_p ED_Alloc() {
-    edict_p edict;
     uint32_t i = svs.maxClients + 1;
     for (; i < sv.num_edicts; i++) {
-        edict = EDICT_NUM(i);
+        edict_p edict = EDICT_NUM(i);
         // the first couple seconds of server time can involve a lot of
         // freeing and allocating, so relax the replacement policy
         if ((edict->free) &&
@@ -117,7 +116,7 @@ edict_p ED_Alloc() {
     if (i == MAX_EDICTS)            Sys_Error("ED_Alloc: no free edicts");
 
     sv.num_edicts++;
-    edict = EDICT_NUM(i);
+    edict_p edict = EDICT_NUM(i);
     ED_ClearEdict(edict);
 
     return edict;
@@ -225,7 +224,7 @@ dFunction_p ED_FindFunction(cString name) {
 
 
 eval_p GetEdictFieldValue(edict_p ed, cString field) {
-    static int  rep = 0;
+    static int _rep = 0;
 
     dDef_p def = NULL;
     for (int i = 0; i < GEFV_CACHESIZE; i++) {
@@ -238,9 +237,9 @@ eval_p GetEdictFieldValue(edict_p ed, cString field) {
     def = ED_FindField(field);
 
     if (strlen(field) < MAX_FIELD_LEN) {
-        _gefvCache[rep].pcache = def;
-        strcpy(_gefvCache[rep].field, field);
-        rep ^= 1;
+        _gefvCache[_rep].pcache = def;
+        strcpy(_gefvCache[_rep].field, field);
+        _rep ^= 1;
     }
 
 Done:
@@ -258,28 +257,28 @@ Returns a string describing *data in a type specific manner
 =============
 */
 cString PR_ValueString(etype_t type, eval_p val) {
-    static char line[256];
+    static char _line[256];
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
-    case ev_string:     sprintf(line, "%s", pr_strings + val->string);                                          break;
-    case ev_entity:     sprintf(line, "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                   break;
+    case ev_string:     sprintf(_line, "%s", pr_strings + val->string);                                          break;
+    case ev_entity:     sprintf(_line, "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                   break;
     case ev_function:
         dFunction_p f = pr_functions + val->function;
-        sprintf(line, "%s()", pr_strings + f->s_name);
+        sprintf(_line, "%s()", pr_strings + f->s_name);
         break;
     case ev_field:
         dDef_p def = ED_FieldAtOfs(val->_int);
-        sprintf(line, ".%s", pr_strings + def->s_name);
+        sprintf(_line, ".%s", pr_strings + def->s_name);
         break;
-    case ev_void:       sprintf(line, "void");                                                                  break;
-    case ev_float:      sprintf(line, "%5.1f", val->_float);                                                    break;
-    case ev_vector:     sprintf(line, "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);   break;
-    case ev_pointer:    sprintf(line, "pointer");                                                               break;
-    default:            sprintf(line, "bad type %i", type);                                                     break;
+    case ev_void:       sprintf(_line, "void");                                                                  break;
+    case ev_float:      sprintf(_line, "%5.1f", val->_float);                                                    break;
+    case ev_vector:     sprintf(_line, "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);   break;
+    case ev_pointer:    sprintf(_line, "pointer");                                                               break;
+    default:            sprintf(_line, "bad type %i", type);                                                     break;
     }
 
-    return line;
+    return _line;
 }
 
 /*
@@ -291,27 +290,27 @@ Easier to parse than PR_ValueString
 =============
 */
 cString PR_UglyValueString(etype_t type, eval_p val) {
-    static char line[256];
+    static char _line[256];
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
-    case ev_string:     sprintf(line, "%s", pr_strings + val->string);                              break;
-    case ev_entity:     sprintf(line, "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));              break;
+    case ev_string:     sprintf(_line, "%s", pr_strings + val->string);                              break;
+    case ev_entity:     sprintf(_line, "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));              break;
     case ev_function:
         dFunction_p f = pr_functions + val->function;
-        sprintf(line, "%s", pr_strings + f->s_name);
+        sprintf(_line, "%s", pr_strings + f->s_name);
         break;
     case ev_field:
         dDef_p def = ED_FieldAtOfs(val->_int);
-        sprintf(line, "%s", pr_strings + def->s_name);
+        sprintf(_line, "%s", pr_strings + def->s_name);
         break;
-    case ev_void:       sprintf(line, "void");                                                      break;
-    case ev_float:      sprintf(line, "%f", val->_float);                                           break;
-    case ev_vector:     sprintf(line, "%f %f %f", val->vector[0], val->vector[1], val->vector[2]);  break;
-    default:            sprintf(line, "bad type %i", type);                                         break;
+    case ev_void:       sprintf(_line, "void");                                                      break;
+    case ev_float:      sprintf(_line, "%f", val->_float);                                           break;
+    case ev_vector:     sprintf(_line, "%f %f %f", val->vector[0], val->vector[1], val->vector[2]);  break;
+    default:            sprintf(_line, "bad type %i", type);                                         break;
     }
 
-    return line;
+    return _line;
 }
 
 /*
@@ -323,38 +322,38 @@ padded to 20 field width
 ============
 */
 cString PR_GlobalString(int ofs) {
-    static char line[128];
+    static char _line[128];
 
     TypeLess_ptr val = (TypeLess_ptr)&pr_globals[ofs];
     dDef_p def = ED_GlobalAtOfs(ofs);
     if (!def)
-        sprintf(line, "%i(???)", ofs);
+        sprintf(_line, "%i(???)", ofs);
     else {
         cString s = PR_ValueString(def->type, val);
-        sprintf(line, "%i(%s)%s", ofs, pr_strings + def->s_name, s);
+        sprintf(_line, "%i(%s)%s", ofs, pr_strings + def->s_name, s);
     }
 
-    size_t i = strlen(line);
+    size_t i = strlen(_line);
     for (; i < 20; i++)
-        strcat(line, " ");
-    strcat(line, " ");
+        strcat(_line, " ");
+    strcat(_line, " ");
 
-    return line;
+    return _line;
 }
 
 cString PR_GlobalStringNoContents(int ofs) {
-    static char line[128];
+    static char _line[128];
 
     dDef_p def = ED_GlobalAtOfs(ofs);
-    if (!def)   sprintf(line, "%i(???)", ofs);
-    else        sprintf(line, "%i(%s)", ofs, pr_strings + def->s_name);
+    if (!def)   sprintf(_line, "%i(???)", ofs);
+    else        sprintf(_line, "%i(%s)", ofs, pr_strings + def->s_name);
 
-    size_t i = strlen(line);
+    size_t i = strlen(_line);
     for (; i < 20; i++)
-        strcat(line, " ");
-    strcat(line, " ");
+        strcat(_line, " ");
+    strcat(_line, " ");
 
-    return line;
+    return _line;
 }
 
 
@@ -754,8 +753,8 @@ void ED_LoadFromFile(cString data) {
         if (!data)  break;
         if (com.token[0] != '{')    Sys_Error("ED_LoadFromFile: found %s when expecting {", com.token);
 
-        if (!ent)       ent = EDICT_NUM(0);
-        else            ent = ED_Alloc();
+        if (!ent)   ent = EDICT_NUM(0);
+        else        ent = ED_Alloc();
         data = ED_ParseEdict(data, ent);
 
         // remove things from different skill levels or deathmatch
