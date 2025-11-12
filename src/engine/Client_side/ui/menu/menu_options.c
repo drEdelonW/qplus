@@ -15,8 +15,8 @@
 //=============================================================================
 /* OPTIONS MENU */
 typedef enum {
-    o_force_signed = -1,
-    o_FIRST = 0,
+    o_force_signed  = -1,
+    o_FIRST         = 0,
     o_CostumizeCtrl = o_FIRST,
     o_GoConsole,
     o_ResetDefault,

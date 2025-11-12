@@ -7,7 +7,7 @@
 #include "SurfCache.h"
 
 typedef enum {
-    SURF_NONE           = 0,
+    SURF_NONE           = 0u,
     SURF_PLANEBACK      = 1u << 1, // 0x02
     SURF_DRAWSKY        = 1u << 2, // 0x04
     SURF_DRAWSPRITE     = 1u << 3, // 0x08

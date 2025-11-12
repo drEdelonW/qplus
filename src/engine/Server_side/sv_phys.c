@@ -53,10 +53,10 @@ solid_edge items only clip against bsp models.
 
 /* --- movement clip flags (bitmask) --- */
 typedef enum {
-    MOVECLIP_NONE       = 0,        /* no block */
-    MOVECLIP_FLOOR      = 1 << 0,   /* floor (normal[2] > 0) */
-    MOVECLIP_WALL       = 1 << 1,   /* wall/step (normal[2] == 0) */
-    MOVECLIP_DEADSTOP   = 1 << 2,   /* dead stop (reserved by original comment) */
+    MOVECLIP_NONE       = 0u,        /* no block */
+    MOVECLIP_FLOOR      = 1u << 0,   /* floor (normal[2] > 0) */
+    MOVECLIP_WALL       = 1u << 1,   /* wall/step (normal[2] == 0) */
+    MOVECLIP_DEADSTOP   = 1u << 2,   /* dead stop (reserved by original comment) */
 
     /* --- special early-return results (non-bitmask) --- */
     /* note: 3 == (MOVECLIP_FLOOR|MOVECLIP_WALL) by value; here it is used as “trapped/allsolid” */

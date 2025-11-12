@@ -7,8 +7,8 @@
 
 typedef enum {
     mp_force_signed = -1,
-    mp_FIRST = 0,
-    mp_Join = mp_FIRST,
+    mp_FIRST        = 0,
+    mp_Join         = mp_FIRST,
     mp_Create,
     mp_Setup,
 

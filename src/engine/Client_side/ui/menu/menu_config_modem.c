@@ -9,8 +9,8 @@
 
 typedef enum {
     mc_force_signed = -1,
-    mc_FIRST = 0,
-    mc_DialMode = mc_FIRST,
+    mc_FIRST        = 0,
+    mc_DialMode     = mc_FIRST,
     mc_Clear,
     mc_Init,
     mc_Hangup,

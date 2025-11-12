@@ -115,17 +115,17 @@ typedef enum {
 
 typedef enum {
     // requests
-    CCREQ_CONNECT       = 0x01,
-    CCREQ_SERVER_INFO   = 0x02,
-    CCREQ_PLAYER_INFO   = 0x03,
-    CCREQ_RULE_INFO     = 0x04,
+    CCREQ_CONNECT       = 0x01u,
+    CCREQ_SERVER_INFO   = 0x02u,
+    CCREQ_PLAYER_INFO   = 0x03u,
+    CCREQ_RULE_INFO     = 0x04u,
 
     // responses
-    CCREP_ACCEPT        = 0x81,
-    CCREP_REJECT        = 0x82,
-    CCREP_SERVER_INFO   = 0x83,
-    CCREP_PLAYER_INFO   = 0x84,
-    CCREP_RULE_INFO     = 0x85
+    CCREP_ACCEPT        = 0x81u,
+    CCREP_REJECT        = 0x82u,
+    CCREP_SERVER_INFO   = 0x83u,
+    CCREP_PLAYER_INFO   = 0x84u,
+    CCREP_RULE_INFO     = 0x85u
 } ccreq_t;
 
 typedef struct qsocket_s qsocket_t;

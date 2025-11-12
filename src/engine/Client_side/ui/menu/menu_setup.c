@@ -10,9 +10,9 @@
 //=============================================================================
 /* SETUP MENU */
 typedef enum {
-    s_force_signed = -1,
-    s_FIRST = 0,
-    s_HostName = s_FIRST,
+    s_force_signed  = -1,
+    s_FIRST         = 0,
+    s_HostName      = s_FIRST,
     s_PlayerName,
     s_ShirtCol,
     s_PantsCol,

@@ -901,7 +901,8 @@ void PR_Init() {
 }
 
 edict_p EDICT_NUM(uint32_t n) {
-    if ((n < 0) ||
+    if (
+        // (n < 0) ||
         (n >= sv.max_edicts))
         Sys_Error("EDICT_NUM: bad number %i", n);
 
@@ -911,7 +912,8 @@ edict_p EDICT_NUM(uint32_t n) {
 uint32_t NUM_FOR_EDICT(edict_p edict) {
     uint32_t b = (uint32_t)((uint8_p)edict - (uint8_p)sv.edicts) / pr_edict_size;
 
-    if ((b < 0) ||
+    if (
+        // (b < 0) ||
         (b >= sv.num_edicts))
         Sys_Error("NUM_FOR_EDICT: bad pointer");
 

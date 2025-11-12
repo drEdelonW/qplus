@@ -22,12 +22,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "net.h"
 
 typedef enum {
-    VCR_OP_CONNECT       = 1,
-    VCR_OP_GETMESSAGE    = 2,
-    VCR_OP_SENDMESSAGE   = 3,
-    VCR_OP_CANSENDMESSAGE= 4,
+    VCR_OP_CONNECT       = 1u,
+    VCR_OP_GETMESSAGE    = 2u,
+    VCR_OP_SENDMESSAGE   = 3u,
+    VCR_OP_CANSENDMESSAGE= 4u,
 
-    VCR_MAX_MESSAGE      = 4  // highest valid opcode
+    VCR_MAX_MESSAGE      = 4u  // highest valid opcode
 } vcr_opcode_t;
 
 extern int  vcrFile;

@@ -17,14 +17,14 @@ typedef mPlane_t* mPlane_p;
 
 typedef enum {
     // 0–2 are axial planes
-    PLANE_X = 0,
-    PLANE_Y = 1,
-    PLANE_Z = 2,
+    PLANE_X     = 0u,
+    PLANE_Y     = 1u,
+    PLANE_Z     = 2u,
 
     // 3–5 are non-axial planes snapped to the nearest
-    PLANE_ANYX = 3,
-    PLANE_ANYY = 4,
-    PLANE_ANYZ = 5
+    PLANE_ANYX  = 3u,
+    PLANE_ANYY  = 4u,
+    PLANE_ANYZ  = 5u
 } PlaneType_t;
 
 typedef struct {

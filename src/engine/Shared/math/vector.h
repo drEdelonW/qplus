@@ -2,11 +2,11 @@
 #include <stdbool.h>
 
 typedef float vec_t;
-typedef enum axis_e {
-    X_AX = 0,
-    Y_AX = 1,
-    Z_AX = 2,
-    VECT_DIM = 3,
+typedef enum {
+    X_AX    = 0u,
+    Y_AX    = 1u,
+    Z_AX    = 2u,
+    VECT_DIM = 3u,
 } axis_e;
 
 typedef vec_t vec3_t[VECT_DIM];

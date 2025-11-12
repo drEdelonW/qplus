@@ -120,8 +120,8 @@ extern uint8_p r_skysource;
 
 // transparency types for D_DrawRect ()
 typedef enum {
-    DR_SOLID = 0, // draw solid
-    DR_TRANSPARENT = 1  // draw transparent
+    DR_SOLID        = 0, // draw solid
+    DR_TRANSPARENT  = 1  // draw transparent
 } drawrect_t;
 
 // !!! must be kept the same as in quakeasm.h !!!

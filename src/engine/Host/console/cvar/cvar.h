@@ -85,12 +85,12 @@ interface from being ambiguous.
 
 
 typedef enum {
-    cvf_none            = 0,
-    cvf_archive         = 1 << 0,   // be saved to vars.rc
-    cvf_server          = 1 << 1,   // notifies players when changed
+    cvf_none            = 0u,
+    cvf_archive         = 1u << 0,   // be saved to vars.rc
+    cvf_server          = 1u << 1,   // notifies players when changed
     cvf_archive_server  = cvf_archive | cvf_server,   // both: be saved to vars.rc and notifies players when changed
 
-    cvf_all             = 0xFF,
+    cvf_all             = 0xFFu,
 } cvar_flags_t;
 
 /* convenience shorthands */

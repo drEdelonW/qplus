@@ -98,16 +98,16 @@ typedef unsigned int m_uint;
 /* Define the graphics subsystems available */
 
 typedef enum {
-    grDETECT  = -1, /* Auto detect the graphics subsystem  */
-    grNONE   = 0, /* No graphics hardware detected   */
-    grVGA,     /* Standard VGA        */
-    grVESA,     /* VESA VBE compliant SuperVGA    */
-    grSVGA,     /* Unaccelerated SuperVGA     */
-    grACCEL,    /* Accelerated SuperVGA      */
-    grDDRAW,    /* Unaccelerated DirectDraw     */
-    grDDRAWACCEL,   /* Accelerated DirectDraw      */
-    grDDRAW3D,    /* 3D Accelerated DirectDraw     */
-    grMAXDRIVER,   /* Maximum driver number     */
+    grDETECT    = -1,   /* Auto detect the graphics subsystem  */
+    grNONE      = 0,    /* No graphics hardware detected   */
+    grVGA,              /* Standard VGA        */
+    grVESA,             /* VESA VBE compliant SuperVGA    */
+    grSVGA,             /* Unaccelerated SuperVGA     */
+    grACCEL,            /* Accelerated SuperVGA      */
+    grDDRAW,            /* Unaccelerated DirectDraw     */
+    grDDRAWACCEL,       /* Accelerated DirectDraw      */
+    grDDRAW3D,          /* 3D Accelerated DirectDraw     */
+    grMAXDRIVER,        /* Maximum driver number     */
 } MGL_driverType;
 
 /* Graphics modes supported - the only video modes supported by this
@@ -235,37 +235,37 @@ typedef enum {
 /* MGL_result() error codes */
 
 typedef enum {
-    grOK   = 0, /* No error         */
-    grNoInit  = -1, /* Graphics driver has not been installed */
-    grNotDetected = -2, /* Graphics hardware was not detected  */
-    grDriverNotFound= -3, /* Graphics driver file not found   */
-    grBadDriver  = -4, /* File loaded was not a graphics driver */
-    grLoadMem  = -5, /* Not enough memory to load graphics driver*/
-    grInvalidMode = -6, /* Invalid graphics mode for selected driver*/
-    grError   = -8, /* General graphics error     */
-    grInvalidName = -9, /* Invalid driver name      */
-    grNoMem   = -10, /* Not enough memory to perform operation */
-    grNoModeSupport = -11, /* Select video mode not supported by hard. */
-    grInvalidFont = -12, /* Invalid font data      */
-    grBadFontFile = -13, /* File loaded was not a font file   */
-    grFontNotFound = -14, /* Font file was not found     */
-    grOldDriver     = -15, /* Driver file is an old version   */
-    grInvalidDevice = -16, /* Invalid device for selected operation */
-    grInvalidDC  = -17, /* Invalid device context     */
-    grInvalidCursor = -18, /* Invalid cursor file      */
-    grCursorNotFound= -19, /* Cursor file was not found    */
-    grInvalidIcon = -20, /* Invalid icon file      */
-    grIconNotFound = -21, /* Icon file was not found     */
-    grInvalidBitmap = -22, /* Invalid bitmap file      */
-    grBitmapNotFound= -23, /* Bitmap file was not found    */
-    grZbufferTooBig = -24, /* Zbuffer allocation is too large   */
-    grNewFontFile = -25, /* Only Windows 2.x font files supported */
-    grNoDoubleBuff  = -26, /* Double buffering is not available  */
-    grNoHardwareBlt = -28, /* No hardware bitBlt for OffscreenDC  */
-    grNoOffscreenMem= -29, /* No available offscreen memory   */
-    grInvalidPF  = -30, /* Invalid pixel format for memory DC  */
+    grOK                = 0, /* No error         */
+    grNoInit            = -1, /* Graphics driver has not been installed */
+    grNotDetected       = -2, /* Graphics hardware was not detected  */
+    grDriverNotFound    = -3, /* Graphics driver file not found   */
+    grBadDriver         = -4, /* File loaded was not a graphics driver */
+    grLoadMem           = -5, /* Not enough memory to load graphics driver*/
+    grInvalidMode       = -6, /* Invalid graphics mode for selected driver*/
+    grError             = -8, /* General graphics error     */
+    grInvalidName       = -9, /* Invalid driver name      */
+    grNoMem             = -10, /* Not enough memory to perform operation */
+    grNoModeSupport     = -11, /* Select video mode not supported by hard. */
+    grInvalidFont       = -12, /* Invalid font data      */
+    grBadFontFile       = -13, /* File loaded was not a font file   */
+    grFontNotFound      = -14, /* Font file was not found     */
+    grOldDriver         = -15, /* Driver file is an old version   */
+    grInvalidDevice     = -16, /* Invalid device for selected operation */
+    grInvalidDC         = -17, /* Invalid device context     */
+    grInvalidCursor     = -18, /* Invalid cursor file      */
+    grCursorNotFound    = -19, /* Cursor file was not found    */
+    grInvalidIcon       = -20, /* Invalid icon file      */
+    grIconNotFound      = -21, /* Icon file was not found     */
+    grInvalidBitmap     = -22, /* Invalid bitmap file      */
+    grBitmapNotFound    = -23, /* Bitmap file was not found    */
+    grZbufferTooBig     = -24, /* Zbuffer allocation is too large   */
+    grNewFontFile       = -25, /* Only Windows 2.x font files supported */
+    grNoDoubleBuff      = -26, /* Double buffering is not available  */
+    grNoHardwareBlt     = -28, /* No hardware bitBlt for OffscreenDC  */
+    grNoOffscreenMem    = -29, /* No available offscreen memory   */
+    grInvalidPF         = -30, /* Invalid pixel format for memory DC  */
 
-    grLastError  = -31, /* Last error number in list    */
+    grLastError         = -31, /* Last error number in list    */
 } MGL_errorType;
 
 #define MGL_CLIPON  true
@@ -310,26 +310,26 @@ enum MGL_COLORS {
 */
 
 enum MGL_WIN_COLORS {
-    MGL_WIN_BLACK    = 0,
-    MGL_WIN_DARKRED   = 1,
-    MGL_WIN_DARKGREEN  = 2,
-    MGL_WIN_DARKYELLOW  = 3,
-    MGL_WIN_DARKBLUE  = 4,
-    MGL_WIN_DARKMAGENTA  = 5,
-    MGL_WIN_DARKCYAN  = 6,
-    MGL_WIN_LIGHTGRAY  = 7,
-    MGL_WIN_TURQUOISE  = 8,  /* Reserved; dont count on this */
-    MGL_WIN_SKYBLUE   = 9,  /* Reserved; dont count on this */
-    MGL_WIN_CREAM   = 246,  /* Reserved; dont count on this */
-    MGL_WIN_MEDIUMGRAY  = 247,  /* Reserved; dont count on this */
-    MGL_WIN_DARKGRAY  = 248,
-    MGL_WIN_LIGHTRED  = 249,
-    MGL_WIN_LIGHTGREEN  = 250,
-    MGL_WIN_LIGHTYELLOW  = 251,
-    MGL_WIN_LIGHTBLUE  = 252,
-    MGL_WIN_LIGHTMAGENTA = 253,
-    MGL_WIN_LIGHTCYAN  = 254,
-    MGL_WIN_WHITE    = 255,
+    MGL_WIN_BLACK           = 0u,
+    MGL_WIN_DARKRED         = 1u,
+    MGL_WIN_DARKGREEN       = 2u,
+    MGL_WIN_DARKYELLOW      = 3u,
+    MGL_WIN_DARKBLUE        = 4u,
+    MGL_WIN_DARKMAGENTA     = 5u,
+    MGL_WIN_DARKCYAN        = 6u,
+    MGL_WIN_LIGHTGRAY       = 7u,
+    MGL_WIN_TURQUOISE       = 8u,   /* Reserved; dont count on this */
+    MGL_WIN_SKYBLUE         = 9u,   /* Reserved; dont count on this */
+    MGL_WIN_CREAM           = 246u, /* Reserved; dont count on this */
+    MGL_WIN_MEDIUMGRAY      = 247u, /* Reserved; dont count on this */
+    MGL_WIN_DARKGRAY        = 248u,
+    MGL_WIN_LIGHTRED        = 249u,
+    MGL_WIN_LIGHTGREEN      = 250u,
+    MGL_WIN_LIGHTYELLOW     = 251u,
+    MGL_WIN_LIGHTBLUE       = 252u,
+    MGL_WIN_LIGHTMAGENTA    = 253u,
+    MGL_WIN_LIGHTCYAN       = 254u,
+    MGL_WIN_WHITE           = 255u,
 };
 
 typedef enum {
@@ -338,11 +338,11 @@ typedef enum {
     MGL_MARKER_X,
 } MGL_markerStyleType;
 
-typedef enum {      /* Write mode operators    */
-    MGL_REPLACE_MODE,    /* Replace mode      */
-    MGL_AND_MODE,     /* AND mode       */
-    MGL_OR_MODE,     /* OR mode       */
-    MGL_XOR_MODE,     /* XOR mode       */
+typedef enum {          /* Write mode operators */
+    MGL_REPLACE_MODE,   /* Replace mode         */
+    MGL_AND_MODE,       /* AND mode             */
+    MGL_OR_MODE,        /* OR mode              */
+    MGL_XOR_MODE,       /* XOR mode             */
 } MGL_writeModeType;
 
 typedef enum {
@@ -366,40 +366,40 @@ typedef enum {
 /* Text manipulation defines */
 
 typedef enum {
-    MGL_LEFT_TEXT  = 0,  /* Justify from left    */
-    MGL_TOP_TEXT  = 0,  /* Justify from top     */
-    MGL_CENTER_TEXT  = 1,  /* Center the text     */
-    MGL_RIGHT_TEXT  = 2,  /* Justify from right    */
-    MGL_BOTTOM_TEXT  = 2,  /* Justify from bottom    */
-    MGL_BASELINE_TEXT = 3,  /* Justify from the baseline  */
+    MGL_LEFT_TEXT       = 0u,  /* Justify from left         */
+    MGL_TOP_TEXT        = 0u,  /* Justify from top          */
+    MGL_CENTER_TEXT     = 1u,  /* Center the text           */
+    MGL_RIGHT_TEXT      = 2u,  /* Justify from right        */
+    MGL_BOTTOM_TEXT     = 2u,  /* Justify from bottom       */
+    MGL_BASELINE_TEXT   = 3u,  /* Justify from the baseline */
 } MGL_textJustType;
 
 typedef enum {
-    MGL_LEFT_DIR  = 0,  /* Text goes to left    */
-    MGL_UP_DIR   = 1,  /* Text goes up      */
-    MGL_RIGHT_DIR  = 2,  /* Text goes right     */
-    MGL_DOWN_DIR  = 3,  /* Text goes down     */
+    MGL_LEFT_DIR    = 0u,  /* Text goes to left */
+    MGL_UP_DIR      = 1u,  /* Text goes up      */
+    MGL_RIGHT_DIR   = 2u,  /* Text goes right   */
+    MGL_DOWN_DIR    = 3u,  /* Text goes down    */
 } MGL_textDirType;
 
 /* Font types */
 
 typedef enum {
-    MGL_VECTORFONT = 1,    /* Vector font      */
-    MGL_FIXEDFONT,     /* Fixed width bitmap font   */
-    MGL_PROPFONT,     /* Proportional width bitmap font */
+    MGL_VECTORFONT = 1u,    /* Vector font      */
+    MGL_FIXEDFONT,          /* Fixed width bitmap font   */
+    MGL_PROPFONT,           /* Proportional width bitmap font */
 } MGL_fontType;
 
 /* Palette rotation directions */
 
 typedef enum {
-    MGL_ROTATE_UP,     /* Rotate the palette values up  */
+    MGL_ROTATE_UP,      /* Rotate the palette values up  */
     MGL_ROTATE_DOWN,    /* Rotate the palette values down */
 } MGL_palRotateType;
 
 /* Border drawing routine styles */
 
 typedef enum {
-    MGL_BDR_INSET,     /* Interior is inset into screen */
+    MGL_BDR_INSET,      /* Interior is inset into screen */
     MGL_BDR_OUTSET,     /* Interior is outset from screen */
     MGL_BDR_OUTLINE,    /* Border is 3d outline    */
 } MGL_bdrStyleType;

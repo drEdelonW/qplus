@@ -11,7 +11,7 @@
 //=============================================================================
 /* KEYS MENU */
 enum bind_st {
-    command = 0,
+    command     = 0u,
     description,
     bs_num
 };

@@ -35,27 +35,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
 typedef enum {
-    TE_SPIKE        = 0,
-    TE_SUPERSPIKE   = 1,
-    TE_GUNSHOT      = 2,
-    TE_EXPLOSION    = 3,
-    TE_TAREXPLOSION = 4,
-    TE_LIGHTNING1   = 5,
-    TE_LIGHTNING2   = 6,
-    TE_WIZSPIKE     = 7,
-    TE_KNIGHTSPIKE  = 8,
-    TE_LIGHTNING3   = 9,
-    TE_LAVASPLASH   = 10,
-    TE_TELEPORT     = 11,
-    TE_EXPLOSION2   = 12,
+    TE_SPIKE        = 0u,
+    TE_SUPERSPIKE   = 1u,
+    TE_GUNSHOT      = 2u,
+    TE_EXPLOSION    = 3u,
+    TE_TAREXPLOSION = 4u,
+    TE_LIGHTNING1   = 5u,
+    TE_LIGHTNING2   = 6u,
+    TE_WIZSPIKE     = 7u,
+    TE_KNIGHTSPIKE  = 8u,
+    TE_LIGHTNING3   = 9u,
+    TE_LAVASPLASH   = 10u,
+    TE_TELEPORT     = 11u,
+    TE_EXPLOSION2   = 12u,
 
     // PGM 01/21/97
-    TE_BEAM         = 13,
+    TE_BEAM         = 13u,
     // PGM 01/21/97
 
 #ifdef QUAKE2
-    TE_IMPLOSION    = 14,
-    TE_RAILTRAIL    = 15,
+    TE_IMPLOSION    = 14u,
+    TE_RAILTRAIL    = 15u,
 #endif
 } te_t;
 

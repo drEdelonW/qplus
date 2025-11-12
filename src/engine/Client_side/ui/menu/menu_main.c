@@ -5,9 +5,9 @@
 /* MAIN MENU */
 
 typedef enum {
-    m_force_signed = -1,
-    m_FIRST = 0,
-    m_SinglePlayer = m_FIRST,
+    m_force_signed  = -1,
+    m_FIRST         = 0,
+    m_SinglePlayer  = m_FIRST,
     m_MultiPlayer,
     m_Options,
     m_Help,

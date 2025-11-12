@@ -27,12 +27,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 HRESULT(WINAPI* pDirectSoundCreate)(GUID FAR* lpGUID, LPDIRECTSOUND FAR* lplpDS, IUnknown FAR* pUnkOuter);
 
 // 64K is > 1 second at 16-bit, 22050 Hz
-#define WAV_BUFFERS    64
-#define WAV_MASK    0x3F
-#define WAV_BUFFER_SIZE   0x0400
-#define SECONDARY_BUFFER_SIZE 0x10000
+#define WAV_BUFFERS             64
+#define WAV_MASK                0x3F
+#define WAV_BUFFER_SIZE         0x0400
+#define SECONDARY_BUFFER_SIZE   0x10000
 
-typedef enum { SIS_SUCCESS, SIS_FAILURE, SIS_NOTAVAIL } sndinitstat;
+typedef enum {
+    SIS_SUCCESS,
+    SIS_FAILURE,
+    SIS_NOTAVAIL
+} sndinitstat;
 
 static bool wavonly;
 static bool dsound_init;
@@ -112,8 +116,6 @@ FreeSound
 ==================
 */
 void FreeSound(void) {
-    int  i;
-
     if (pDSBuf) {
         pDSBuf->lpVtbl->Stop(pDSBuf);
         pDSBuf->lpVtbl->Release(pDSBuf);
@@ -133,7 +135,7 @@ void FreeSound(void) {
         waveOutReset(hWaveOut);
 
         if (lpWaveHdr) {
-            for (i=0; i< WAV_BUFFERS; i++)
+            for (int i=0; i< WAV_BUFFERS; i++)
                 waveOutUnprepareHeader(hWaveOut, lpWaveHdr+i, sizeof(WAVEHDR));
         }
 

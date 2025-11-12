@@ -62,15 +62,15 @@ static uint32_t		mstate_di;
 
 // joystick defines and variables
 // where should defines be moved?
-#define JOY_ABSOLUTE_AXIS	0x00000000		// control like a joystick
-#define JOY_RELATIVE_AXIS	0x00000010		// control like a mouse, spinner, trackball
-#define	JOY_MAX_AXES		6				// X, Y, Z, R, U, V
-#define JOY_AXIS_X			0
-#define JOY_AXIS_Y			1
-#define JOY_AXIS_Z			2
-#define JOY_AXIS_R			3
-#define JOY_AXIS_U			4
-#define JOY_AXIS_V			5
+#define JOY_ABSOLUTE_AXIS	0x00000000u		// control like a joystick
+#define JOY_RELATIVE_AXIS	0x00000010u		// control like a mouse, spinner, trackball
+#define	JOY_MAX_AXES		6u				// X, Y, Z, R, U, V
+#define JOY_AXIS_X			0u
+#define JOY_AXIS_Y			1u
+#define JOY_AXIS_Z			2u
+#define JOY_AXIS_R			3u
+#define JOY_AXIS_U			4u
+#define JOY_AXIS_V			5u
 
 enum _ControlList
 {

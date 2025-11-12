@@ -79,9 +79,9 @@ struct eSpan_s {
 };
 
 typedef enum {
-    invSpan = -1,   // = in inverted span (end before start)
-    notInSpan = 0,  // = not in span
-    inSpan = 1,     // = in span
+    invSpan     = -1,   // = in inverted span (end before start)
+    notInSpan   = 0,  // = not in span
+    inSpan      = 1,     // = in span
 } SnapState_e;
 // FIXME: compress, make a union if that will help
 // insubmodel is only 1, flags is fewer than 32, spanstate could be a byte

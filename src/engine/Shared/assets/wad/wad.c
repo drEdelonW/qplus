@@ -32,20 +32,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //   TYPES
 //===============
 typedef enum {
-    CMP_NONE = 0,
-    CMP_LZSS = 1
+    CMP_NONE = 0u,
+    CMP_LZSS = 1u
 } CmpType;
 
 typedef enum {
-    TYP_NONE    = 0,
-    TYP_LABEL   = 1,
+    TYP_NONE    = 0u,
+    TYP_LABEL   = 1u,
 
-    TYP_LUMPY   = 64,   // base offset for grab command number
-    TYP_PALETTE = 64,
-    TYP_QTEX    = 65,
-    TYP_QPIC    = 66,
-    TYP_SOUND   = 67,
-    TYP_MIPTEX  = 68
+    TYP_LUMPY   = 64u,   // base offset for grab command number
+    TYP_PALETTE = 64u,
+    TYP_QTEX    = 65u,
+    TYP_QPIC    = 66u,
+    TYP_SOUND   = 67u,
+    TYP_MIPTEX  = 68u
 } TypType;
 
 typedef struct {

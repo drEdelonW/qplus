@@ -55,10 +55,10 @@ typedef struct {
 } ColorShift_t;
 
 typedef enum cshift_kind_e {
-    CSHIFT_CONTENTS = 0,
-    CSHIFT_DAMAGE   = 1,
-    CSHIFT_BONUS    = 2,
-    CSHIFT_POWERUP  = 3,
+    CSHIFT_CONTENTS = 0u,
+    CSHIFT_DAMAGE   = 1u,
+    CSHIFT_BONUS    = 2u,
+    CSHIFT_POWERUP  = 3u,
 
     NUM_CSHIFTS // should be last
 } cshift_kind_t;

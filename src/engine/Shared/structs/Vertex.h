@@ -25,15 +25,15 @@ typedef AuxVert_t* AuxVert_p;
 // flags in FinalVert_t.flags
 
 typedef enum alias_clip_flags_e {
-    ALIAS_LEFT_CLIP     = 0x0001,
-    ALIAS_TOP_CLIP      = 0x0002,
-    ALIAS_RIGHT_CLIP    = 0x0004,
-    ALIAS_BOTTOM_CLIP   = 0x0008,
-    ALIAS_XY_CLIP_MASK  = 0x000F, //  must be kept in sync
-    ALIAS_Z_CLIP        = 0x0010,
+    ALIAS_LEFT_CLIP     = 0x0001u,
+    ALIAS_TOP_CLIP      = 0x0002u,
+    ALIAS_RIGHT_CLIP    = 0x0004u,
+    ALIAS_BOTTOM_CLIP   = 0x0008u,
+    ALIAS_XY_CLIP_MASK  = 0x000Fu, //  must be kept in sync
+    ALIAS_Z_CLIP        = 0x0010u,
 
     // must stay in sync with d_ifacea.h and modelgen.h
-    ALIAS_ONSEAM        = 0x0020,  // also defined in modelgen.h
+    ALIAS_ONSEAM        = 0x0020u,  // also defined in modelgen.h
 } AliasClipFlags_f;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!

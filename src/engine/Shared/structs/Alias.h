@@ -17,7 +17,7 @@ Alias models are position independent, so the cache manager can move them.
 ==============================================================================
 */
 typedef enum {
-    ALIAS_SINGLE = 0,
+    ALIAS_SINGLE = 0u,
     ALIAS_GROUP
 } AliasFrameType_t;
 
@@ -81,7 +81,7 @@ typedef AliasHdr_t* AliasHdr_p;
 
 
 typedef enum {
-    ALIAS_SKIN_SINGLE = 0,
+    ALIAS_SKIN_SINGLE = 0u,
     ALIAS_SKIN_GROUP
 } AliasSkinType_t;
 

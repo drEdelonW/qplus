@@ -52,16 +52,16 @@ typedef mSpriteGroup_t* mSpriteGroup_p;
 
 
 typedef enum {
-    SPR_VP_PARALLEL_UPRIGHT   = 0, // viewplane parallel, upright
-    SPR_FACING_UPRIGHT        = 1, // always faces viewer, upright
-    SPR_VP_PARALLEL           = 2, // viewplane parallel, rotates with view
-    SPR_ORIENTED              = 3, // fully oriented in 3D
-    SPR_VP_PARALLEL_ORIENTED  = 4  // viewplane parallel, but oriented
+    SPR_VP_PARALLEL_UPRIGHT   = 0u, // viewplane parallel, upright
+    SPR_FACING_UPRIGHT        = 1u, // always faces viewer, upright
+    SPR_VP_PARALLEL           = 2u, // viewplane parallel, rotates with view
+    SPR_ORIENTED              = 3u, // fully oriented in 3D
+    SPR_VP_PARALLEL_ORIENTED  = 4u  // viewplane parallel, but oriented
 } SpriteType_t;
 
 
 typedef enum {
-    SPR_SINGLE = 0,
+    SPR_SINGLE = 0u,
     SPR_GROUP
 } SpriteFrameType_t;
 

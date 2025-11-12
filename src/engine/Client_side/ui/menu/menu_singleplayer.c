@@ -9,8 +9,8 @@
 
 typedef enum {
     sp_force_signed = -1,
-    sp_FIRST = 0,
-    sp_NewGame = sp_FIRST,
+    sp_FIRST        = 0,
+    sp_NewGame      = sp_FIRST,
     sp_Load,
     sp_Save,
 

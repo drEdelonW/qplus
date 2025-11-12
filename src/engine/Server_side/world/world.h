@@ -48,9 +48,9 @@ typedef struct {
 typedef trace_t* trace_p;
 
 typedef enum {
-    MOVE_NORMAL     = 0, // normal movement, collide with everything
-    MOVE_NOMONSTERS = 1, // ignore monsters
-    MOVE_MISSILE    = 2  // special missile movement rules
+    MOVE_NORMAL     = 0u, // normal movement, collide with everything
+    MOVE_NOMONSTERS = 1u, // ignore monsters
+    MOVE_MISSILE    = 2u  // special missile movement rules
 } phymovetype_t;
 
 bool SV_RecursiveHullCheck(Hull_p hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_p trace);

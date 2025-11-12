@@ -1184,10 +1184,10 @@ MESSAGE WRITING
 */
 
 typedef enum msg_dest_e {
-    MSG_BROADCAST   = 0,  // unreliable to all
-    MSG_ONE         = 1,  // reliable to one (msg_entity)
-    MSG_ALL         = 2,  // reliable to all
-    MSG_INIT        = 3   // write to the init string
+    MSG_BROADCAST   = 0u,  // unreliable to all
+    MSG_ONE         = 1u,  // reliable to one (msg_entity)
+    MSG_ALL         = 2u,  // reliable to all
+    MSG_INIT        = 3u   // write to the init string
 } msg_dest_e;
 
 sizebuf_p WriteDest() {

@@ -37,7 +37,7 @@ typedef union eval_s {
 typedef eval_t* eval_p;
 
 typedef enum {
-    ev_void     = 0,
+    ev_void     = 0u,
     ev_string,
     ev_float,
     ev_vector,

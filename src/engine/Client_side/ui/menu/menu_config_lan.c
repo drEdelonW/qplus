@@ -17,10 +17,10 @@
 
 typedef enum {
     lc_UNINITED = -1,
-    lc_FIRST = 0,
-    lc_Port = lc_FIRST,
+    lc_FIRST    = 0,
+    lc_Port     = lc_FIRST,
     lc_Search,
-    lc_Ok = lc_Search,
+    lc_Ok       = lc_Search,
     lc_JoinName,
 
     lc_LAST     //should be last
