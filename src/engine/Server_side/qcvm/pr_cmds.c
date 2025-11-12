@@ -774,8 +774,8 @@ static char _pr_string_temp[128];
 void PF_ftos() {
     float v = G_FLOAT(OFS_PARM0);
 
-    if (v == (int)v)    sprintf(_pr_string_temp, "%d", (int)v);
-    else                sprintf(_pr_string_temp, "%5.1f", v);
+    if (v == (int)v)    snprintf(_pr_string_temp, sizeof(_pr_string_temp), "%d", (int)v);
+    else                snprintf(_pr_string_temp, sizeof(_pr_string_temp), "%5.1f", v);
     G_INT(OFS_RETURN) = _pr_string_temp - pr_strings;
 }
 
@@ -785,13 +785,13 @@ void PF_fabs() {
 }
 
 void PF_vtos() {
-    sprintf(_pr_string_temp, "'%5.1f %5.1f %5.1f'", G_VECTOR(OFS_PARM0)[0], G_VECTOR(OFS_PARM0)[1], G_VECTOR(OFS_PARM0)[2]);
+    snprintf(_pr_string_temp, sizeof(_pr_string_temp), "'%5.1f %5.1f %5.1f'", G_VECTOR(OFS_PARM0)[0], G_VECTOR(OFS_PARM0)[1], G_VECTOR(OFS_PARM0)[2]);
     G_INT(OFS_RETURN) = _pr_string_temp - pr_strings;
 }
 
 #ifdef QUAKE2
 void PF_etos() {
-    sprintf(_pr_string_temp, "entity %i", G_EDICTNUM(OFS_PARM0));
+    snprintf(_pr_string_temp, sizeof(_pr_string_temp), "entity %i", G_EDICTNUM(OFS_PARM0));
     G_INT(OFS_RETURN) = _pr_string_temp - pr_strings;
 }
 #endif

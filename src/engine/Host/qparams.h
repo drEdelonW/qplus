@@ -8,11 +8,11 @@
 // available for the program to use
 
 typedef struct {
-    cString basedir;
-    cString cachedir;  // for development over ISDN lines
-    int     argc;
-    cStringArray argv;
-    TypeLess_ptr membase;
-    size_t memsize;
+    cString         baseDir;
+    cString         cacheDir;  // for development over ISDN lines
+    int             argc;
+    cStringArray    argv;
+    TypeLess_ptr    membase;
+    size_t          memsize;
 } QuakeParms_t;
 typedef QuakeParms_t* QuakeParms_p;

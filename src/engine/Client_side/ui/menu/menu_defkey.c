@@ -102,8 +102,9 @@ void M_Keys_Key(keycode_t k) {
             _bind_grab = false;
         }
         else if (k != '`') {
-            sprintf(
-                cmd, "bind \"%s\" \"%s\"\n",
+            snprintf(
+                cmd, sizeof(cmd),
+                "bind \"%s\" \"%s\"\n",
                 Key_KeynumToString(k),
                 _bindnames[_keys_cursor][command]
             );

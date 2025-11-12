@@ -206,9 +206,9 @@ int main(int c, cStringArray v) {
         parms.memsize = (int)(Q_atof(com.argv[memParam + 1]) * 1024 * 1024);
     parms.membase = malloc(parms.memsize);
 
-    parms.basedir = _baseDir;
+    parms.baseDir = _baseDir;
     // caching is disabled by default, use -cachedir to enable
-    //	parms.cachedir = cachedir;
+    //	parms.cacheDir = cachedir;
 
     fcntl(0, F_SETFL, fcntl(0, F_GETFL, 0) | FNDELAY);
 

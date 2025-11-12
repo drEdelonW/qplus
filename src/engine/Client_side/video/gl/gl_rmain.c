@@ -128,14 +128,11 @@ R_GetSpriteFrame
 ================
 */
 mSpriteFrame_t* R_GetSpriteFrame(Entity_p currententity) {
-    mSprite_t* psprite;
-    mSpriteGroup_t* pspritegroup;
-    mSpriteFrame_t* pspriteframe;
-    int    i, numframes, frame;
+    mSpriteFrame_p pspriteframe;
     float_p pintervals, fullinterval, targettime, time;
 
-    psprite = currententity->model->cache.data;
-    frame = currententity->frame;
+    mSprite_p psprite = currententity->model->cache.data;
+    int frame = currententity->frame;
 
     if ((frame >= psprite->numframes) || (frame < 0)) {
         Con_Printf("R_DrawSprite: no such frame %d\n", frame);
@@ -146,9 +143,9 @@ mSpriteFrame_t* R_GetSpriteFrame(Entity_p currententity) {
         pspriteframe = psprite->frames[frame].frameptr;
     }
     else {
-        pspritegroup = (mSpriteGroup_t*)psprite->frames[frame].frameptr;
+        mSpriteGroup_p pspritegroup = (mSpriteGroup_p)psprite->frames[frame].frameptr;
         pintervals = pspritegroup->intervals;
-        numframes = pspritegroup->numframes;
+        int numframes = pspritegroup->numframes;
         fullinterval = pintervals[numframes - 1];
 
         time = cl.time + currententity->syncbase;
@@ -157,7 +154,8 @@ mSpriteFrame_t* R_GetSpriteFrame(Entity_p currententity) {
         // are positive, so we don't have to worry about division by 0
         targettime = time - ((int)(time / fullinterval)) * fullinterval;
 
-        for (i = 0; i < (numframes - 1); i++) {
+        int i = 0;
+        for (; i < (numframes - 1); i++) {
             if (pintervals[i] > targettime)
                 break;
         }

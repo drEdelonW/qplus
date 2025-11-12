@@ -423,7 +423,7 @@ void Sbar_UpdateScoreboard() {
     for (int i = 0; i < _scoreboardlines; i++) {
         int k = _fragsort[i];
         ScoreBoard_p s = &cl.scores[k];
-        sprintf(&_scoreboardtext[i][1], "%3i %s", s->frags, s->name);
+        snprintf(&_scoreboardtext[i][1], sizeof(_scoreboardtext[i][1]), "%3i %s", s->frags, s->name);
 
         int top = s->colors & 0xf0;
         int bottom = (s->colors & 15) << 4;
@@ -441,10 +441,10 @@ Sbar_SoloScoreboard
 */
 void Sbar_SoloScoreboard() {
     char str[80];
-    sprintf(str, "Monsters:%3i /%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
+    snprintf(str, sizeof(str), "Monsters:%3i /%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
     Sbar_DrawString(8, 4, str);
 
-    sprintf(str, "Secrets :%3i /%3i", cl.stats[STAT_SECRETS], cl.stats[STAT_TOTALSECRETS]);
+    snprintf(str, sizeof(str), "Secrets :%3i /%3i", cl.stats[STAT_SECRETS], cl.stats[STAT_TOTALSECRETS]);
     Sbar_DrawString(8, 12, str);
 
     // time
@@ -452,7 +452,7 @@ void Sbar_SoloScoreboard() {
     int seconds = cl.time - 60 * minutes;
     int tens = seconds / 10;
     int units = seconds - 10 * tens;
-    sprintf(str, "Time :%3i:%i%i", minutes, tens, units);
+    snprintf(str, sizeof(str), "Time :%3i:%i%i", minutes, tens, units);
     Sbar_DrawString(184, 4, str);
 
     // draw level name
@@ -602,7 +602,7 @@ void Sbar_DrawInventory() {
     // ammo counts
     for (int i = 0; i < 4; i++) {
         char num[6];
-        sprintf(num, "%3i", cl.stats[STAT_SHELLS + i]);
+        snprintf(num, sizeof(num), "%3i", cl.stats[STAT_SHELLS + i]);
         if (num[0] != ' ')  Sbar_DrawCharacter((6 * i + 1) * 8 - 2, -24, 18 + num[0] - '0');
         if (num[1] != ' ')  Sbar_DrawCharacter((6 * i + 2) * 8 - 2, -24, 18 + num[1] - '0');
         if (num[2] != ' ')  Sbar_DrawCharacter((6 * i + 3) * 8 - 2, -24, 18 + num[2] - '0');
@@ -708,7 +708,7 @@ void Sbar_DrawFrags() {
 
         // draw number
         char num[12];
-        sprintf(num, "%3i", s->frags);
+        snprintf(num, sizeof(num), "%3i", s->frags);
 
         Sbar_DrawCharacter((x + 1) * 8, -24, num[0]);
         Sbar_DrawCharacter((x + 2) * 8, -24, num[1]);
@@ -755,7 +755,7 @@ void Sbar_DrawFace() {
 
         // draw number
         char num[12];
-        sprintf(num, "%3i", s->frags);
+        snprintf(num, sizeof(num), "%3i", s->frags);
 
         if (top == 8) {
             if (num[0] != ' ')  Sbar_DrawCharacter(109, 3, 18 + num[0] - '0');
@@ -953,7 +953,7 @@ void Sbar_DeathmatchOverlay() {
         // draw number
         int f = s->frags;
         char num[12];
-        sprintf(num, "%3i", f);
+        snprintf(num, sizeof(num), "%3i", f);
 
         Draw_Character(x + 8, y, num[0]);
         Draw_Character(x + 16, y, num[1]);
@@ -972,7 +972,7 @@ void Sbar_DeathmatchOverlay() {
             int tens = n / 10;
             int units = n % 10;
 
-            sprintf(num, "%3i:%i%i", minutes, tens, units);
+            snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
             Draw_String(x + 48, y, num);
         }
@@ -1048,7 +1048,7 @@ void Sbar_MiniDeathmatchOverlay() {
 
             // draw number
             char num[12];
-            sprintf(num, "%3i", s->frags);
+            snprintf(num, sizeof(num), "%3i", s->frags);
 
             Draw_Character(x + 8, y, num[0]);
             Draw_Character(x + 16, y, num[1]);
@@ -1068,7 +1068,7 @@ void Sbar_MiniDeathmatchOverlay() {
                 int tens = n / 10;
                 int units = n % 10;
 
-                sprintf(num, "%3i:%i%i", minutes, tens, units);
+                snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
                 Draw_String(x + 48, y, num);
             }

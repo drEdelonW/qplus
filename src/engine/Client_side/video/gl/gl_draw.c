@@ -41,6 +41,7 @@ typedef struct {
     int  texnum;
     float sl, tl, sh, th;
 } glpic_t;
+typedef glpic_t* glpic_p;
 
 byte  conback_buffer[sizeof(qPic_t) + sizeof(glpic_t)];
 qPic_p conback = (qPic_p)&conback_buffer;
@@ -61,6 +62,7 @@ typedef struct {
     int  width, height;
     bool mipmap;
 } glTexture_t;
+typedef glTexture_t* glTexture_p;
 
 #define MAX_GLTEXTURES 1024
 glTexture_t gltextures[MAX_GLTEXTURES];
@@ -155,12 +157,12 @@ void Scrap_Upload(void) {
 //=============================================================================
 /* Support Routines */
 
-typedef struct cachepic_s
-{
-    char  name[MAX_QPATH];
+typedef struct cachepic_s {
+    char    name[MAX_QPATH];
     qPic_t  pic;
-    byte  padding[32]; // for appended glpic
+    byte    padding[32]; // for appended glpic
 } cachepic_t;
+typedef cachepic_t* cachepic_p;
 
 #define MAX_CACHED_PICS  128
 cachepic_t menu_cachepics[MAX_CACHED_PICS];
@@ -173,10 +175,10 @@ int  pic_count;
 
 qPic_p Draw_PicFromWad(cString name) {
     qPic_p p;
-    glpic_t* gl;
+    glpic_p gl;
 
     p = W_GetLumpName(name);
-    gl = (glpic_t*)p->data;
+    gl = (glpic_p)p->data;
 
     // load little ones into the scrap
     if (p->width < 64 && p->height < 64) {
@@ -217,10 +219,10 @@ Draw_CachePic
 ================
 */
 qPic_p Draw_CachePic(cString path) {
-    cachepic_t* pic;
+    cachepic_p pic;
     int   i;
     qPic_p dat;
-    glpic_t* gl;
+    glpic_p gl;
 
     for (pic = menu_cachepics, i = 0; i < menu_numcachepics; pic++, i++)
         if (!strcmp(path, pic->name))
@@ -248,7 +250,7 @@ qPic_p Draw_CachePic(cString path) {
     pic->pic.width = dat->width;
     pic->pic.height = dat->height;
 
-    gl = (glpic_t*)pic->pic.data;
+    gl = (glpic_p)pic->pic.data;
     gl->texnum = GL_LoadPicTexture(dat);
     gl->sl = 0;
     gl->sh = 1;
@@ -303,7 +305,7 @@ Draw_TextureMode_f
 */
 void Draw_TextureMode_f(void) {
     int  i;
-    glTexture_t* glt;
+    glTexture_p glt;
 
     if (Cmd_Argc() == 1) {
         for (i = 0; i < 6; i++)
@@ -348,7 +350,7 @@ void Draw_Init(void) {
     uint8_p dest,  src;
     int  x, y;
     char ver[40];
-    glpic_t* gl;
+    glpic_p gl;
     int  start;
     uint8_p ncdata;
     int  f, fstep;
@@ -386,9 +388,9 @@ void Draw_Init(void) {
 
     // hack the version number directly into the pic
 #if defined(__linux__)
-    sprintf(ver, "(Linux %2.2f, gl %4.2f) %4.2f", (float)LINUX_VERSION, (float)GLQUAKE_VERSION, (float)VERSION);
+    snprintf(ver, sizeof(ver), "(Linux %2.2f, gl %4.2f) %4.2f", (float)LINUX_VERSION, (float)GLQUAKE_VERSION, (float)VERSION);
 #else
-    sprintf(ver, "(gl %4.2f) %4.2f", (float)GLQUAKE_VERSION, (float)VERSION);
+    snprintf(ver, sizeof(ver), "(gl %4.2f) %4.2f", (float)GLQUAKE_VERSION, (float)VERSION);
 #endif
     dest = cb->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
     y = strlen(ver);
@@ -430,7 +432,7 @@ void Draw_Init(void) {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    gl = (glpic_t*)conback->data;
+    gl = (glpic_p)conback->data;
     gl->texnum = GL_LoadTexture("conback", conback->width, conback->height, ncdata, false, false);
     gl->sl = 0;
     gl->sh = 1;
@@ -538,11 +540,11 @@ void Draw_AlphaPic(int x, int y, qPic_p pic, float alpha) {
     uint8_p dest, source;
     uint16_p pusdest;
     int    v, u;
-    glpic_t* gl;
+    glpic_p gl;
 
     if (scrap_dirty)
         Scrap_Upload();
-    gl = (glpic_t*)pic->data;
+    gl = (glpic_p)pic->data;
     glDisable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -574,11 +576,11 @@ void Draw_Pic(int x, int y, qPic_p pic) {
     uint8_p dest,  source;
     uint16_p pusdest;
     int    v, u;
-    glpic_t* gl;
+    glpic_p gl;
 
     if (scrap_dirty)
         Scrap_Upload();
-    gl = (glpic_t*)pic->data;
+    gl = (glpic_p)pic->data;
     glColor4f(1, 1, 1, 1);
     GL_Bind(gl->texnum);
     glBegin(GL_QUADS);
@@ -819,7 +821,7 @@ GL_FindTexture
 */
 int GL_FindTexture(cString identifier) {
     int  i;
-    glTexture_t* glt;
+    glTexture_p glt;
 
     for (i = 0, glt = gltextures; i < numgltextures; i++, glt++) {
         if (!strcmp(identifier, glt->identifier))
@@ -1155,7 +1157,7 @@ GL_LoadTexture
 int GL_LoadTexture(cString identifier, int width, int height, uint8_p data, bool mipmap, bool alpha) {
     bool noalpha;
     int   i, p, s;
-    glTexture_t* glt;
+    glTexture_p glt;
 
     // see if the texture is allready present
     if (identifier[0]) {

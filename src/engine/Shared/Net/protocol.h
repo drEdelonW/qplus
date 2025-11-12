@@ -58,7 +58,7 @@ typedef enum {
     SU_VELOCITY1    = (1u << 5),
     SU_VELOCITY2    = (1u << 6),
     SU_VELOCITY3    = (1u << 7),
-    // SU_AIMENT    = (1u << 8),  // available bit
+    // SU_AIMENT       = (1u << 8),  // available bit
     SU_ITEMS        = (1u << 9),
     SU_ONGROUND     = (1u << 10), // no data follows
     SU_INWATER      = (1u << 11), // no data follows
@@ -98,31 +98,31 @@ typedef enum {
     svc_bad              = 0u,
     svc_nop              = 1u,
     svc_disconnect       = 2u,
-    svc_updatestat       = 3u,   // [byte] [long]
-    svc_version          = 4u,   // [long] server version
-    svc_setview          = 5u,   // [short] entity number
-    svc_sound            = 6u,   // <see code>
-    svc_time             = 7u,   // [float] server time
-    svc_print            = 8u,   // [string] null terminated string
-    svc_stufftext        = 9u,   // [string] stuffed into client's console buffer
+    svc_updatestat       = 3u,  // [byte] [long]
+    svc_version          = 4u,  // [long] server version
+    svc_setview          = 5u,  // [short] entity number
+    svc_sound            = 6u,  // <see code>
+    svc_time             = 7u,  // [float] server time
+    svc_print            = 8u,  // [string] null terminated string
+    svc_stufftext        = 9u,  // [string] stuffed into client's console buffer
                                 // the string should be \n terminated
-    svc_setangle         = 10u,  // [angle3] set the view angle to this absolute value
+    svc_setangle         = 10u, // [angle3] set the view angle to this absolute value
 
-    svc_serverinfo       = 11u,  // [long] version
+    svc_serverinfo       = 11u, // [long] version
                                 // [string] signon string
                                 // [string]..[0]model cache
                                 // [string]...[0]sounds cache
-    svc_lightstyle       = 12u,  // [byte] [string]
-    svc_updatename       = 13u,  // [byte] [string]
-    svc_updatefrags      = 14u,  // [byte] [short]
-    svc_clientdata       = 15u,  // <shortbits + data>
-    svc_stopsound        = 16u,  // <see code>
-    svc_updatecolors     = 17u,  // [byte] [byte]
-    svc_particle         = 18u,  // [vec3] <variable>
+    svc_lightstyle       = 12u, // [byte] [string]
+    svc_updatename       = 13u, // [byte] [string]
+    svc_updatefrags      = 14u, // [byte] [short]
+    svc_clientdata       = 15u, // <shortbits + data>
+    svc_stopsound        = 16u, // <see code>
+    svc_updatecolors     = 17u, // [byte] [byte]
+    svc_particle         = 18u, // [vec3] <variable>
     svc_damage           = 19u,
 
     svc_spawnstatic      = 20u,
-    // svc_spawnbinary      = 21u,  // unused
+    // svc_spawnbinary      = 21u, // unused
     svc_spawnbaseline    = 22u,
 
     svc_temp_entity      = 23u,
@@ -151,8 +151,8 @@ typedef enum {
     clc_bad         = 0u,
     clc_nop         = 1u,
     clc_disconnect  = 2u,
-    clc_move        = 3u, // [UserCmd_t]
-    clc_stringcmd   = 4u  // [string] message
+    clc_move        = 3u,   // [UserCmd_t]
+    clc_stringcmd   = 4u    // [string] message
 } clc_t;
 
 

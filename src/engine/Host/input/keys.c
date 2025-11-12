@@ -637,7 +637,7 @@ void Key_Event(keycode_t Key, bool down) {
         cString kb = keyBindings[Key];
         if (kb && (kb[0] == '+')
             ) {
-            char cmd[MAXCMD];   sprintf(cmd, "-%s %i\n", kb + 1, Key);
+            char cmd[MAXCMD];   snprintf(cmd, sizeof(cmd), "-%s %i\n", kb + 1, Key);
             Cbuf_AddText(cmd);
         }
 
@@ -654,7 +654,7 @@ void Key_Event(keycode_t Key, bool down) {
 
             if (kb && (kb[0] == '+')
                 ) {
-                char cmd[MAXCMD];   sprintf(cmd, "-%s %i\n", kb + 1, Key);
+                char cmd[MAXCMD];   snprintf(cmd, sizeof(cmd), "-%s %i\n", kb + 1, Key);
                 Cbuf_AddText(cmd);
             }
         }
@@ -683,7 +683,7 @@ void Key_Event(keycode_t Key, bool down) {
         cString kb = keyBindings[Key];
         if (kb) {
             if (kb[0] == '+') { // button commands add keynum as a parm
-                char cmd[MAXCMD];   sprintf(cmd, "%s %i\n", kb, Key);
+                char cmd[MAXCMD];   snprintf(cmd, sizeof(cmd), "%s %i\n", kb, Key);
                 Cbuf_AddText(cmd);
             }
             else {

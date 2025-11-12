@@ -194,7 +194,7 @@ int _write(int, cStringRO buf, int len) { (void)buf; return len; }
 //     cStringArray argv;
 //     parms.memsize = 8 * 1024 * 1024;
 //     parms.membase = malloc(parms.memsize);
-//     parms.basedir = ".";
+//     parms.baseDir = ".";
 
 //     COM_InitArgv(argc, argv);
 

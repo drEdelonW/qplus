@@ -286,7 +286,7 @@ void GL_MakeAliasModelDisplayLists(Model_p m, AliasHdr_p hdr) {
         //
         // save out the cached version
         //
-        char fullpath[MAX_OSPATH];  sprintf(fullpath, "%s/%s", com.gamedir, cache);
+        char fullpath[MAX_OSPATH];  snprintf(fullpath, sizeof(fullpath), "%s/%s", com.gamedir, cache);
         f = fopen(fullpath, "wb");
         if (f) {
             fwrite(&numcommands, 4, 1, f);

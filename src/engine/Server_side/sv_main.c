@@ -66,7 +66,7 @@ void SV_Init() {
     Cvar_RegisterVariable(&sv_nostep);
 
     for (int i = 0; i < MAX_MODELS; i++) {
-        sprintf(_localModels[i], "*%i", i);
+        snprintf(_localModels[i], sizeof(_localModels[i]), "*%i", i);
     }
 }
 
@@ -180,7 +180,7 @@ void SV_SendServerinfo(RmtClient_p client) {
 
     sizebuf_p pBuf = &client->message;
     MSG_WriteByte(pBuf, svc_print);
-    sprintf(message, "%c\nVERSION %4.2f SERVER (%i CRC)", 2, VERSION, pr_crc);
+    snprintf(message, sizeof(message), "%c\nVERSION %4.2f SERVER (%i CRC)", 2, VERSION, pr_crc);
     MSG_WriteString(pBuf, message);
 
     MSG_WriteByte(pBuf, svc_serverinfo);    MSG_WriteLong(pBuf, PROTOCOL_VERSION);    MSG_WriteByte(pBuf, svs.maxClients);
@@ -935,7 +935,7 @@ void SV_SpawnServer(
     sv.time = 1.0;
 
     strcpy(sv.name, server);
-    sprintf(sv.modelname, "maps/%s.bsp", server);
+    snprintf(sv.modelname, sizeof(sv.modelname), "maps/%s.bsp", server);
     sv.worldmodel = Mod_ForName(sv.modelname, false);
     if (!sv.worldmodel) {
         Con_Printf("Couldn't spawn server %s\n", sv.modelname);

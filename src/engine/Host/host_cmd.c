@@ -307,7 +307,7 @@ void Host_SavegameComment(cString text) {
     memcpy(text, cl.levelname, strlen(cl.levelname));
 
     char kills[20];
-    sprintf(kills, "kills:%3i/%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
+    snprintf(kills, sizeof(kills), "kills:%3i/%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
     memcpy(text + 22, kills, strlen(kills));
     // convert space to _ to make stdio happy
     for (int i = 0; i < SAVEGAME_COMMENT_LENGTH; i++)
@@ -500,7 +500,7 @@ void Host_Loadgame_f() {
 #ifdef QUAKE2
 void SaveGamestate() {
     char name[256];
-    sprintf(name, "%s/%s.gip", com.gamedir, sv.name);
+    snprintf(name, sizeof(name), "%s/%s.gip", com.gamedir, sv.name);
 
     Con_Printf("Saving game to %s...\n", name);
     FILE* saveGStFile = fopen(name, "w");
@@ -539,7 +539,7 @@ void SaveGamestate() {
 
 int LoadGamestate(cString level, cString startspot) {
     char name[MAX_OSPATH];
-    sprintf(name, "%s/%s.gip", com.gamedir, level);
+    snprintf(name, sizeof(name), "%s/%s.gip", com.gamedir, level);
 
     Con_Printf("Loading game from %s...\n", name);
     FILE* loadGStFile = fopen(name, "r");

@@ -52,8 +52,8 @@ r_Entity_t      cl_static_entities[MAX_STATIC_ENTITIES];
 LightStyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
 dLight_t        cl_dlights[MAX_DLIGHTS];
 
-int32_t    cl_numvisedicts;
-r_Entity_p cl_visedicts[MAX_VISEDICTS];
+uint32_t        cl_numvisedicts;
+r_Entity_p      cl_visedicts[MAX_VISEDICTS];
 
 /*
 =====================
@@ -184,7 +184,7 @@ void CL_SignonReply() {
 
         char  str[8192];
         MSG_WriteByte(&cls.message, clc_stringcmd);
-        sprintf(str, "spawn %s", cls.spawnparms);
+        snprintf(str, sizeof(str), "spawn %s", cls.spawnparms);
         MSG_WriteString(&cls.message, str);
         break;
 
@@ -223,7 +223,7 @@ void CL_NextDemo() {
     }
 
     char str[1024];
-    sprintf(str, "playdemo %s\n", cls.demos[cls.demonum]);
+    snprintf(str, sizeof(str), "playdemo %s\n", cls.demos[cls.demonum]);
     Cbuf_InsertText(str);
     cls.demonum++;
 }

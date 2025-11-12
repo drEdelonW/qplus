@@ -217,8 +217,8 @@ int main(int argc, cStringArray argv) {
     _getcwd(cwd, sizeof(cwd));
     if (cwd[Q_strlen(cwd) - 1] == '\\')
         cwd[Q_strlen(cwd) - 1] = 0;
-    parms.basedir = cwd; //"f:/quake";
-    // parms.basedir = "f:\\quake";
+    parms.baseDir = cwd; //"f:/quake";
+    // parms.baseDir = "f:\\quake";
 
     COM_InitArgv(argc, argv);
 

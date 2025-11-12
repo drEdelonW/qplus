@@ -544,9 +544,9 @@ Runs all active servers
 ==================
 */
 void Host::_Frame(float time) {
-    static double  time1 = 0;
-    static double  time2 = 0;
-    static double  time3 = 0;
+    static double  _time1 = 0.0;
+    static double  _time2 = 0.0;
+    static double  _time3 = 0.0;
 
     if (setjmp(host_abortserver))
         return;   // something bad happened, or the server disconnected
@@ -595,11 +595,11 @@ void Host::_Frame(float time) {
 
 
     // update video
-    if (host_speeds.value)  time1 = Sys_FloatTime();
+    if (host_speeds.value)  _time1 = Sys_FloatTime();
 
     SCR_UpdateScreen();
 
-    if (host_speeds.value)  time2 = Sys_FloatTime();
+    if (host_speeds.value)  _time2 = Sys_FloatTime();
 
     // update audio
     if (cls.signon == SIGNONS) {
@@ -612,10 +612,10 @@ void Host::_Frame(float time) {
     CDAudio_Update();
 
     if (host_speeds.value) {
-        int pass1 = (time1 - time3) * 1000;
-        time3 = Sys_FloatTime();
-        int pass2 = (time2 - time1) * 1000;
-        int pass3 = (time3 - time2) * 1000;
+        int pass1 = (_time1 - _time3) * 1000;
+        _time3 = Sys_FloatTime();
+        int pass2 = (_time2 - _time1) * 1000;
+        int pass3 = (_time3 - _time2) * 1000;
         Con_Printf("%3i tot %3i server %3i gfx %3i snd\n",
             pass1 + pass2 + pass3, pass1, pass2, pass3);
     }
@@ -624,8 +624,8 @@ void Host::_Frame(float time) {
 }
 
 void Host::Frame(float time) {
-    static double timetotal;
-    static int  timecount;
+    static double   _timeTotal;
+    static int      _timeCount = 0;
 
     if (!serverprofile.value) { _Frame(time); return; }
 
@@ -633,22 +633,22 @@ void Host::Frame(float time) {
     _Frame(time);
     double time2 = Sys_FloatTime();
 
-    timetotal += time2 - time1;
-    timecount++;
+    _timeTotal += time2 - time1;
+    _timeCount++;
 
-    if (timecount < 1000)
+    if (_timeCount < 1000)
         return;
 
-    int m = timetotal * 1000 / timecount;
-    timecount = 0;
-    timetotal = 0;
-    int c = 0;
+    int m = _timeTotal * 1000 / _timeCount;
+    _timeCount = 0;
+    _timeTotal = 0;
+    int numCli = 0;
     for (int i = 0; i < svs.maxClients; i++) {
         if (svs.clients[i].active)
-            c++;
+            numCli++;
     }
 
-    Con_Printf("serverprofile: %2i clients %2i msec\n", c, m);
+    Con_Printf("serverprofile: %2i clients %2i msec\n", numCli, m);
 }
 
 //============================================================================
@@ -740,7 +740,7 @@ void Host::Init(QuakeParms_p parms) {
     V_Init();
     Chase_Init();
     InitVCR(parms);
-    COM_Init(parms->basedir);
+    COM_Init(parms->baseDir);
     InitLocal();
     W_LoadWadFile("gfx.wad");
     Key_Init();

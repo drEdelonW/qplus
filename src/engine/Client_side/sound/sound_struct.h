@@ -18,11 +18,11 @@ typedef sfx_t* sfx_p;
 
 // !!! if this is changed, it much be changed in asm_i386.h too !!!
 typedef struct {
-    int length;
-    int loopstart;
-    int speed;
-    int width;
-    int stereo;
+    int     length;
+    int     loopstart;
+    int     speed;
+    int     width;
+    int     stereo;
     uint8_t data[1];  // variable sized
 } sfxcache_t;
 typedef sfxcache_t* sfxcache_p;

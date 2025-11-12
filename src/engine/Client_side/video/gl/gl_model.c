@@ -1103,7 +1103,7 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
         if (i < mod->numsubmodels - 1) { // duplicate the basic information
             char name[10];
 
-            sprintf(name, "*%i", i + 1);
+            snprintf(name, sizeof(name), "*%i", i + 1);
             loadmodel = Mod_FindName(name);
             *loadmodel = *mod;
             strcpy(loadmodel->name, name);
@@ -1314,7 +1314,7 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
             pheader->texels[i] = texels - (uint8_p)pheader;
             memcpy(texels, (uint8_p)(pskintype + 1), s);
             //  }
-            sprintf(name, "%s_%i", loadmodel->name, i);
+            snprintf(name, sizeof(name), "%s_%i", loadmodel->name, i);
             pheader->gl_texturenum[i][0] =
                 pheader->gl_texturenum[i][1] =
                 pheader->gl_texturenum[i][2] =
@@ -1339,7 +1339,7 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
                     pheader->texels[i] = texels - (uint8_p)pheader;
                     memcpy(texels, (uint8_p)(pskintype), s);
                 }
-                sprintf(name, "%s_%i_%i", loadmodel->name, i, j);
+                snprintf(name, sizeof(name), "%s_%i_%i", loadmodel->name, i, j);
                 pheader->gl_texturenum[i][j & 3] =
                     GL_LoadTexture(name, pheader->skinwidth,
                         pheader->skinheight, (uint8_p)(pskintype), true, false);
@@ -1550,7 +1550,7 @@ TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_p* ppframe, int 
     pspriteframe->left = origin[0];
     pspriteframe->right = width + origin[0];
 
-    sprintf(name, "%s_%i", loadmodel->name, framenum);
+    snprintf(name, sizeof(name), "%s_%i", loadmodel->name, framenum);
     pspriteframe->gl_texturenum = GL_LoadTexture(name, width, height, (uint8_p)(pinframe + 1), true, true);
 
     return (TypeLess_ptr)((uint8_p)pinframe + sizeof(dSpriteFrame_t) + size);

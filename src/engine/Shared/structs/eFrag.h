@@ -6,6 +6,7 @@ typedef r_Entity_t* r_Entity_p;
 // struct efrag_s;
 typedef struct efrag_s efrag_t;
 typedef efrag_t* efrag_p;
+typedef efrag_p* efrag_ar;
 struct efrag_s {
     // mLeaf_p leaf;
     struct mLeaf_s* leaf;  // TODO: fix include collision issue

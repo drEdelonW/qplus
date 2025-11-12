@@ -312,7 +312,7 @@ void Sys_Error(cStringRO error, ...) {
         vsnprintf(text, sizeof(text), error, argptr);
         va_end(argptr);
 
-        sprintf(text2, "ERROR: %s\n", text);
+        snprintf(text2, sizeof(text2), "ERROR: %s\n", text);
         WriteFile(houtput, text5, strlen(text5), &dummy, NULL);
         WriteFile(houtput, text4, strlen(text4), &dummy, NULL);
         WriteFile(houtput, text2, strlen(text2), &dummy, NULL);
@@ -603,8 +603,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     if (cwd[Q_strlen(cwd) - 1] == '/')
         cwd[Q_strlen(cwd) - 1] = 0;
 
-    parms.basedir = cwd;
-    parms.cachedir = NULL;
+    parms.baseDir = cwd;
+    parms.cacheDir = NULL;
 
     parms.argc = 1;
     argv[0] = _empty_string;

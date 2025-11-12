@@ -660,7 +660,7 @@ void VID_Init(uint8_p palette) {
 
     GL_Init();
 
-    sprintf(gldir, "%s/glquake", com.gamedir);
+    snprintf(gldir, sizeof(gldir), "%s/glquake", com.gamedir);
     Sys_mkdir(gldir);
 
     Check_Gamma(palette);

@@ -171,7 +171,7 @@ void R_ClearParticles() {
 
 void R_ReadPointFile_f() {
     char name[MAX_OSPATH];
-    sprintf(name, "maps/%s.pts", sv.name);
+    snprintf(name, sizeof(name), "maps/%s.pts", sv.name);
 
     FILE* pntFile;
     COM_FOpenFile(name, &pntFile);

@@ -53,11 +53,11 @@ extern vec3_t   listener_origin;
 extern vec3_t   listener_forward;
 extern vec3_t   listener_right;
 extern vec3_t   listener_up;
-extern volatile dma_t* shm;
+extern volatile dma_p shm;
 extern volatile dma_t sn;
 extern vec_t    sound_nominal_clip_dist;
 
-extern bool snd_initialized;
+extern bool     snd_initialized;
 extern int      snd_blocked;
 
 #ifdef __cplusplus

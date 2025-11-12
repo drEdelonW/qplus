@@ -64,7 +64,7 @@ bool rogue;
 bool hipnotic;
 
 // this graphic needs to be in the pak file to use registered features
-uint16_t pop[] = {
+uint16_t pop[128] = {
     0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
     0x0000,0x0000,0x6600,0x0000,0x0000,0x0000,0x6600,0x0000,
     0x0000,0x0066,0x0000,0x0000,0x0000,0x0000,0x0067,0x0000,
@@ -88,7 +88,7 @@ uint16_t pop[] = {
 
 All of Quake's data access is through a hierchal file system, but the contents of the file system can be transparently merged from several sources.
 
-The "base directory" is the path to the directory holding the quake.exe and all game directories.  The sys_* files pass this to host_init in QuakeParms_t->basedir.  This can be overridden with the "-basedir" command line parm to allow code debugging in a different directory.  The base directory is
+The "base directory" is the path to the directory holding the quake.exe and all game directories.  The sys_* files pass this to host_init in QuakeParms_t->baseDir.  This can be overridden with the "-basedir" command line parm to allow code debugging in a different directory.  The base directory is
 only used during filesystem initialization.
 
 The "game directory" is the first tree on the search path and directory that all generated files (savegames, screenshots, demos, config files) will be saved to.  This can be overridden with the "-game" command line parameter.  The game directory can never be changed while quake is executing.  This is a precacution against having a malicious server instruct clients to write files over areas they shouldn't.
@@ -706,7 +706,7 @@ uint8_p COM_LoadFile(cStringRO path, int usehunk) {
 
     if (!buf)   Sys_Error("COM_LoadFile: not enough space for %s", path);
 
-    ((uint8_p)buf)[len] = 0;
+    ((uint8_p)buf)[len] = 0x00;
 
     Draw_BeginDisc();
     Sys_FileRead(h, buf, len);
@@ -780,22 +780,22 @@ COM_InitFilesystem
 ================
 */
 void COM_InitFilesystem() {
-    char basedir[MAX_OSPATH];
+    static char _baseDir[MAX_OSPATH];
 
     //
     // -basedir <path>
     // Overrides the system supplied base directory (under GAMENAME)
     //
     int param = COM_CheckParm("-basedir");
-    if (param && (param < com.argc - 1))    strcpy(basedir, com.argv[param + 1]);
-    else                                    strcpy(basedir, host_parms.basedir);
+    if (param && (param < com.argc - 1))    strcpy(_baseDir, com.argv[param + 1]);
+    else                                    strcpy(_baseDir, host_parms.baseDir);
 
-    size_t st_len = strlen(basedir);
+    size_t st_len = strlen(_baseDir);
 
     if (st_len > 0) {
-        if ((basedir[st_len - 1] == '\\') ||
-            (basedir[st_len - 1] == '/'))
-            basedir[st_len - 1] = 0;
+        if ((_baseDir[st_len - 1] == '\\') ||
+            (_baseDir[st_len - 1] == '/'))
+            _baseDir[st_len - 1] = 0;
     }
 
     //
@@ -805,19 +805,19 @@ void COM_InitFilesystem() {
     //
     param = COM_CheckParm("-cachedir");
     if (param && (param < com.argc - 1)) {
-        if (com.argv[param + 1][0] == '-')  com_cachedir[0] = 0;
+        if (com.argv[param + 1][0] == '-')  com_cachedir[0] = 0x00;
         else                         strcpy(com_cachedir, com.argv[param + 1]);
     }
-    else if (host_parms.cachedir)    strcpy(com_cachedir, host_parms.cachedir);
-    else                                    com_cachedir[0] = 0;
+    else if (host_parms.cacheDir)    strcpy(com_cachedir, host_parms.cacheDir);
+    else                                    com_cachedir[0] = 0x00;
 
     //
     // start up with GAMENAME by default (id1)
     //
-    COM_AddGameDirectory(va("%s/"GAMENAME, basedir));
+    COM_AddGameDirectory(va("%s/"GAMENAME, _baseDir));
 
-    if (COM_CheckParm("-rogue"))    COM_AddGameDirectory(va("%s/rogue", basedir));
-    if (COM_CheckParm("-hipnotic")) COM_AddGameDirectory(va("%s/hipnotic", basedir));
+    if (COM_CheckParm("-rogue"))    COM_AddGameDirectory(va("%s/rogue", _baseDir));
+    if (COM_CheckParm("-hipnotic")) COM_AddGameDirectory(va("%s/hipnotic", _baseDir));
 
     //
     // -game <gamedir>
@@ -826,7 +826,7 @@ void COM_InitFilesystem() {
     param = COM_CheckParm("-game");
     if (param && (param < com.argc - 1)) {
         contModified = true;
-        COM_AddGameDirectory(va("%s/%s", basedir, com.argv[param + 1]));
+        COM_AddGameDirectory(va("%s/%s", _baseDir, com.argv[param + 1]));
     }
 
     //

@@ -207,14 +207,14 @@ float  v_blend[4];  // rgba 0.0 - 1.0
 void BuildGammaTable(float g) {
     if (g == 1.0) {
         for (int i = 0; i < 256; i++)
-            gammatable[i] = i;
+            gammatable[i] = (uint8_t)i;
         return;
     }
 
     for (int i = 0; i < 256; i++) {
-        int inf = 255 * pow((i + 0.5) / 255.5, g) + 0.5;
+        int inf = 255 * pow((i + 0.5f) / 255.5, g) + 0.5f;
         CLAMP(0, inf, 255);
-        gammatable[i] = inf;
+        gammatable[i] = (uint8_t)inf;
     }
 }
 
@@ -224,10 +224,10 @@ V_CheckGamma
 =================
 */
 bool V_CheckGamma() {
-    static float oldgammavalue;
+    static float _oldGammaValue;
 
-    if (v_gamma.value == oldgammavalue)     return false;
-    oldgammavalue = v_gamma.value;
+    if (v_gamma.value == _oldGammaValue)     return false;
+    _oldGammaValue = v_gamma.value;
 
     BuildGammaTable(v_gamma.value);
     vid.recalc_refdef = 1;    // force a surface cache flush
@@ -251,11 +251,11 @@ void V_ParseDamage() {
         MSG_ReadCoord()
     };
 
-    float count = blood * 0.5 + armor * 0.5;
+    float count = blood * 0.5f + armor * 0.5f;
     if (count < 10)
         count = 10;
 
-    cl.faceanimtime = cl.time + 0.2;  // but sbar face into pain frame
+    cl.faceanimtime = cl.time + 0.2f;  // but sbar face into pain frame
 
     cl.cshifts[CSHIFT_DAMAGE].percent += 3 * count;
     // if (cl.cshifts[CSHIFT_DAMAGE].percent < 0)
@@ -385,21 +385,21 @@ void V_CalcBlend() {
     float b = 0;
     float a = 0;
 
-    for (int j = 0; j < NUM_CSHIFTS; j++) {
+    for (int IdxShClr = 0; IdxShClr < NUM_CSHIFTS; IdxShClr++) {
         if (!gl_cshiftpercent.value)
             continue;
 
-        float a2 = ((cl.cshifts[j].percent * gl_cshiftpercent.value) / 100.0) / 255.0;
+        float a2 = ((cl.cshifts[IdxShClr].percent * gl_cshiftpercent.value) / 100.0) / 255.0;
 
-        //  a2 = cl.cshifts[j].percent/255.0;
+        //  a2 = cl.cshifts[IdxShClr].percent/255.0;
         if (!a2)
             continue;
         a = a + a2 * (1 - a);
-        //Con_Printf ("j:%i a:%f\n", j, a);
+        //Con_Printf ("IdxShClr:%i a:%f\n", IdxShClr, a);
         a2 = a2 / a;
-        r = r * (1 - a2) + cl.cshifts[j].destcolor[0] * a2;
-        g = g * (1 - a2) + cl.cshifts[j].destcolor[1] * a2;
-        b = b * (1 - a2) + cl.cshifts[j].destcolor[2] * a2;
+        r = r * (1 - a2) + cl.cshifts[IdxShClr].destcolor[0] * a2;
+        g = g * (1 - a2) + cl.cshifts[IdxShClr].destcolor[1] * a2;
+        b = b * (1 - a2) + cl.cshifts[IdxShClr].destcolor[2] * a2;
     }
 
     v_blend[0] = r / 255.0;
@@ -425,15 +425,15 @@ void V_UpdatePalette() {
 
     bool new = false;
 
-    for (int i = 0; i < NUM_CSHIFTS; i++) {
-        if (cl.cshifts[i].percent != cl.prev_cshifts[i].percent) {
+    for (int IdxShClr = 0; IdxShClr < NUM_CSHIFTS; IdxShClr++) {
+        if (cl.cshifts[IdxShClr].percent != cl.prev_cshifts[IdxShClr].percent) {
             new = true;
-            cl.prev_cshifts[i].percent = cl.cshifts[i].percent;
+            cl.prev_cshifts[IdxShClr].percent = cl.cshifts[IdxShClr].percent;
         }
-        for (int j = 0; j < 3; j++)
-            if (cl.cshifts[i].destcolor[j] != cl.prev_cshifts[i].destcolor[j]) {
+        for (int IdxDstClr = 0; IdxDstClr < 3; IdxDstClr++)
+            if (cl.cshifts[IdxShClr].destcolor[IdxDstClr] != cl.prev_cshifts[IdxShClr].destcolor[IdxDstClr]) {
                 new = true;
-                cl.prev_cshifts[i].destcolor[j] = cl.cshifts[i].destcolor[j];
+                cl.prev_cshifts[IdxShClr].destcolor[IdxDstClr] = cl.cshifts[IdxShClr].destcolor[IdxDstClr];
             }
     }
 
@@ -501,15 +501,15 @@ void V_UpdatePalette() {
 
     bool new = false;
 
-    for (int i = 0; i < NUM_CSHIFTS; i++) {
-        if (cl.cshifts[i].percent != cl.prev_cshifts[i].percent) {
+    for (int IdxShClr = 0; IdxShClr < NUM_CSHIFTS; IdxShClr++) {
+        if (cl.cshifts[IdxShClr].percent != cl.prev_cshifts[IdxShClr].percent) {
             new = true;
-            cl.prev_cshifts[i].percent = cl.cshifts[i].percent;
+            cl.prev_cshifts[IdxShClr].percent = cl.cshifts[IdxShClr].percent;
         }
-        for (int j = 0; j < 3; j++)
-            if (cl.cshifts[i].destcolor[j] != cl.prev_cshifts[i].destcolor[j]) {
+        for (int IdxDstClr = 0; IdxDstClr < 3; IdxDstClr++)
+            if (cl.cshifts[IdxShClr].destcolor[IdxDstClr] != cl.prev_cshifts[IdxShClr].destcolor[IdxDstClr]) {
                 new = true;
-                cl.prev_cshifts[i].destcolor[j] = cl.cshifts[i].destcolor[j];
+                cl.prev_cshifts[IdxShClr].destcolor[IdxDstClr] = cl.cshifts[IdxShClr].destcolor[IdxDstClr];
             }
     }
 
@@ -537,10 +537,10 @@ void V_UpdatePalette() {
         int b = basepal[2];
         basepal += 3;
 
-        for (int j = 0; j < NUM_CSHIFTS; j++) {
-            r += (cl.cshifts[j].percent * (cl.cshifts[j].destcolor[0] - r)) >> 8;
-            g += (cl.cshifts[j].percent * (cl.cshifts[j].destcolor[1] - g)) >> 8;
-            b += (cl.cshifts[j].percent * (cl.cshifts[j].destcolor[2] - b)) >> 8;
+        for (int IdxShClr = 0; IdxShClr < NUM_CSHIFTS; IdxShClr++) {
+            r += (cl.cshifts[IdxShClr].percent * (cl.cshifts[IdxShClr].destcolor[0] - r)) >> 8;
+            g += (cl.cshifts[IdxShClr].percent * (cl.cshifts[IdxShClr].destcolor[1] - g)) >> 8;
+            b += (cl.cshifts[IdxShClr].percent * (cl.cshifts[IdxShClr].destcolor[2] - b)) >> 8;
         }
 
         newpal[0] = gammatable[r];

@@ -261,21 +261,21 @@ cString PR_ValueString(etype_t type, eval_p val) {
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
-    case ev_string:     sprintf(_line, "%s", pr_strings + val->string);                                          break;
-    case ev_entity:     sprintf(_line, "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                   break;
+    case ev_string:     snprintf(_line, sizeof(_line), "%s", pr_strings + val->string);                                          break;
+    case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                   break;
     case ev_function:
         dFunction_p f = pr_functions + val->function;
-        sprintf(_line, "%s()", pr_strings + f->s_name);
+        snprintf(_line, sizeof(_line), "%s()", pr_strings + f->s_name);
         break;
     case ev_field:
         dDef_p def = ED_FieldAtOfs(val->_int);
-        sprintf(_line, ".%s", pr_strings + def->s_name);
+        snprintf(_line, sizeof(_line), ".%s", pr_strings + def->s_name);
         break;
-    case ev_void:       sprintf(_line, "void");                                                                  break;
-    case ev_float:      sprintf(_line, "%5.1f", val->_float);                                                    break;
-    case ev_vector:     sprintf(_line, "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);   break;
-    case ev_pointer:    sprintf(_line, "pointer");                                                               break;
-    default:            sprintf(_line, "bad type %i", type);                                                     break;
+    case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                  break;
+    case ev_float:      snprintf(_line, sizeof(_line), "%5.1f", val->_float);                                                    break;
+    case ev_vector:     snprintf(_line, sizeof(_line), "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);   break;
+    case ev_pointer:    snprintf(_line, sizeof(_line), "pointer");                                                               break;
+    default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                                     break;
     }
 
     return _line;
@@ -294,20 +294,20 @@ cString PR_UglyValueString(etype_t type, eval_p val) {
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
-    case ev_string:     sprintf(_line, "%s", pr_strings + val->string);                              break;
-    case ev_entity:     sprintf(_line, "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));              break;
+    case ev_string:     snprintf(_line, sizeof(_line), "%s", pr_strings + val->string);                              break;
+    case ev_entity:     snprintf(_line, sizeof(_line), "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));              break;
     case ev_function:
         dFunction_p f = pr_functions + val->function;
-        sprintf(_line, "%s", pr_strings + f->s_name);
+        snprintf(_line, sizeof(_line), "%s", pr_strings + f->s_name);
         break;
     case ev_field:
         dDef_p def = ED_FieldAtOfs(val->_int);
-        sprintf(_line, "%s", pr_strings + def->s_name);
+        snprintf(_line, sizeof(_line), "%s", pr_strings + def->s_name);
         break;
-    case ev_void:       sprintf(_line, "void");                                                      break;
-    case ev_float:      sprintf(_line, "%f", val->_float);                                           break;
-    case ev_vector:     sprintf(_line, "%f %f %f", val->vector[0], val->vector[1], val->vector[2]);  break;
-    default:            sprintf(_line, "bad type %i", type);                                         break;
+    case ev_void:       snprintf(_line, sizeof(_line), "void");                                                      break;
+    case ev_float:      snprintf(_line, sizeof(_line), "%f", val->_float);                                           break;
+    case ev_vector:     snprintf(_line, sizeof(_line), "%f %f %f", val->vector[0], val->vector[1], val->vector[2]);  break;
+    default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                         break;
     }
 
     return _line;
@@ -327,10 +327,10 @@ cString PR_GlobalString(int ofs) {
     TypeLess_ptr val = (TypeLess_ptr)&pr_globals[ofs];
     dDef_p def = ED_GlobalAtOfs(ofs);
     if (!def)
-        sprintf(_line, "%i(???)", ofs);
+        snprintf(_line, sizeof(_line), "%i(???)", ofs);
     else {
         cString s = PR_ValueString(def->type, val);
-        sprintf(_line, "%i(%s)%s", ofs, pr_strings + def->s_name, s);
+        snprintf(_line, sizeof(_line), "%i(%s)%s", ofs, pr_strings + def->s_name, s);
     }
 
     size_t i = strlen(_line);
@@ -345,8 +345,8 @@ cString PR_GlobalStringNoContents(int ofs) {
     static char _line[128];
 
     dDef_p def = ED_GlobalAtOfs(ofs);
-    if (!def)   sprintf(_line, "%i(???)", ofs);
-    else        sprintf(_line, "%i(%s)", ofs, pr_strings + def->s_name);
+    if (!def)   snprintf(_line, sizeof(_line), "%i(???)", ofs);
+    else        snprintf(_line, sizeof(_line), "%i(%s)", ofs, pr_strings + def->s_name);
 
     size_t i = strlen(_line);
     for (; i < 20; i++)
@@ -710,7 +710,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
         if (anglehack) {
             char temp[32];
             strcpy(temp, com.token);
-            sprintf(com.token, "0 %s 0", temp);
+            snprintf(com.token, sizeof(com.token), "0 %s 0", temp);
         }
 
         if (!ED_ParseEpair((TypeLess_ptr)&ent->v, key, com.token))

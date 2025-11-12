@@ -47,7 +47,7 @@ void M_Menu_LanConfig_f() {
         (_cursor == lc_JoinName))
         _cursor = 1;
     lanConfig.port = DEFAULTnet_hostport;
-    sprintf(lanConfig.portname, "%u", lanConfig.port);
+    snprintf(lanConfig.portname, sizeof(lanConfig.portname), "%u", lanConfig.port);
 
     m_return_onerror = false;
     m_return_reason[0] = 0x00;
@@ -181,5 +181,5 @@ void M_LanConfig_Key(keycode_t Key) {
     if (l > 0xFFFF)     l = lanConfig.port;
     else                lanConfig.port = l;
 
-    sprintf(lanConfig.portname, "%u", lanConfig.port);
+    snprintf(lanConfig.portname, sizeof(lanConfig.portname), "%u", lanConfig.port);
 }

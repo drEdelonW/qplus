@@ -36,8 +36,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 typedef struct {
-    uint32_t length;
-    char    map[MAX_STYLESTRING];
+    uint32_t    length;
+    char        map[MAX_STYLESTRING];
 } LightStyle_t;
 
 typedef struct {
@@ -232,7 +232,7 @@ extern dLight_t     cl_dlights[MAX_DLIGHTS];
 extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
 extern Beam_t       cl_beams[MAX_BEAMS];
 
-extern int32_t      cl_numvisedicts;
+extern uint32_t      cl_numvisedicts;
 extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
 
 // cl_input

@@ -278,7 +278,8 @@ int WIPX_Write(int handle, byte* buf, int len, qsockaddr_p addr) {
 cString WIPX_AddrToString(qsockaddr_p addr) {
     static char buf[28];
 
-    sprintf(buf, "%02x%02x%02x%02x:%02x%02x%02x%02x%02x%02x:%u",
+    snprintf(buf, sizeof(buf),
+        "%02x%02x%02x%02x:%02x%02x%02x%02x%02x%02x:%u",
         ((sockaddr_ipx_p)addr)->sa_netnum[0] & 0xff,
         ((sockaddr_ipx_p)addr)->sa_netnum[1] & 0xff,
         ((sockaddr_ipx_p)addr)->sa_netnum[2] & 0xff,
@@ -361,11 +362,11 @@ int WIPX_GetAddrFromName(cString name, qsockaddr_p addr) {
     n = Q_strlen(name);
 
     if (n == 12) {
-        sprintf(buf, "00000000:%s:%u", name, net_hostport);
+        snprintf(buf, sizeof(buf), "00000000:%s:%u", name, net_hostport);
         return WIPX_StringToAddr(buf, addr);
     }
     if (n == 21) {
-        sprintf(buf, "%s:%u", name, net_hostport);
+        snprintf(buf, sizeof(buf), "%s:%u", name, net_hostport);
         return WIPX_StringToAddr(buf, addr);
     }
     if (n > 21 && n <= 27)

@@ -118,7 +118,7 @@ void Sys_EditFile(cString filename) {
         if (!editor)    editor = getenv("EDITOR");
         if (!editor)    editor = getenv("EDIT");
         if (!editor)    editor = "vi";
-        sprintf(cmd, "xterm -e %s %s", editor, filename);
+        snprintf(cmd, sizeof(cmd), "xterm -e %s %s", editor, filename);
         system(cmd);
     }
 

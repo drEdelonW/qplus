@@ -198,7 +198,7 @@ void Con_Init() {
         cString t2 = "/qconsole.log";
         if (strlen(com.gamedir) < (MAXGAMEDIRLEN - strlen(t2))) {
             char temp[MAXGAMEDIRLEN + 1];
-            sprintf(temp, "%s%s", com.gamedir, t2);
+            snprintf(temp, sizeof(temp), "%s%s", com.gamedir, t2);
             unlink(temp);
         }
     }

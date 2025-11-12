@@ -1121,7 +1121,7 @@ cString VID_GetModeDescription(int mode) {
         pinfo = pv->modedesc;
     }
     else {
-        sprintf(temp, "Desktop resolution (%dx%d)",
+        snprintf(temp, sizeof(temp), "Desktop resolution (%dx%d)",
             modelist[MODE_FULLSCREEN_DEFAULT].width,
             modelist[MODE_FULLSCREEN_DEFAULT].height);
         pinfo = temp;
@@ -1143,19 +1143,17 @@ cString VID_GetExtModeDescription(int mode) {
     pv = VID_GetModePtr(mode);
     if (modelist[mode].type == MS_FULLDIB) {
         if (!leavecurrentmode) {
-            sprintf(pinfo, "%s fullscreen", pv->modedesc);
+            snprintf(pinfo, sizeof(pinfo), "%s fullscreen", pv->modedesc);
         }
         else {
-            sprintf(pinfo, "Desktop resolution (%dx%d)",
+            snprintf(pinfo, sizeof(pinfo), "Desktop resolution (%dx%d)",
                 modelist[MODE_FULLSCREEN_DEFAULT].width,
                 modelist[MODE_FULLSCREEN_DEFAULT].height);
         }
     }
     else {
-        if (modestate == MS_WINDOWED)
-            sprintf(pinfo, "%s windowed", pv->modedesc);
-        else
-            sprintf(pinfo, "windowed");
+        if (modestate == MS_WINDOWED)   snprintf(pinfo, sizeof(pinfo), "%s windowed", pv->modedesc);
+        else                            snprintf(pinfo, sizeof(pinfo), "windowed");
     }
 
     return pinfo;
@@ -1268,7 +1266,7 @@ void VID_InitDIB(HINSTANCE hInstance) {
     if (modelist[0].height < 240)
         modelist[0].height = 240;
 
-    sprintf(modelist[0].modedesc, "%dx%d",
+    snprintf(modelist[0].modedesc, sizeof(modelist[0].modedesc), "%dx%d",
         modelist[0].width, modelist[0].height);
 
     modelist[0].modenum = MODE_WINDOWED;
@@ -1317,7 +1315,8 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                 modelist[nummodes].dib = 1;
                 modelist[nummodes].fullscreen = 1;
                 modelist[nummodes].bpp = devmode.dmBitsPerPel;
-                sprintf(modelist[nummodes].modedesc, "%dx%dx%d",
+                snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
+                    "%dx%dx%d",
                     devmode.dmPelsWidth, devmode.dmPelsHeight,
                     devmode.dmBitsPerPel);
 
@@ -1327,7 +1326,8 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                     if (modelist[nummodes].width > (modelist[nummodes].height << 1)) {
                         modelist[nummodes].width >>= 1;
                         modelist[nummodes].halfscreen = 1;
-                        sprintf(modelist[nummodes].modedesc, "%dx%dx%d",
+                        snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
+                            "%dx%dx%d",
                             modelist[nummodes].width,
                             modelist[nummodes].height,
                             modelist[nummodes].bpp);
@@ -1374,7 +1374,8 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                 modelist[nummodes].dib = 1;
                 modelist[nummodes].fullscreen = 1;
                 modelist[nummodes].bpp = devmode.dmBitsPerPel;
-                sprintf(modelist[nummodes].modedesc, "%dx%dx%d",
+                snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
+                    "%dx%dx%d",
                     devmode.dmPelsWidth, devmode.dmPelsHeight,
                     devmode.dmBitsPerPel);
 
@@ -1574,7 +1575,8 @@ void	VID_Init(uint8_p palette) {
                     modelist[nummodes].dib = 1;
                     modelist[nummodes].fullscreen = 1;
                     modelist[nummodes].bpp = bpp;
-                    sprintf(modelist[nummodes].modedesc, "%dx%dx%d",
+                    snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
+                        "%dx%dx%d",
                         devmode.dmPelsWidth, devmode.dmPelsHeight,
                         devmode.dmBitsPerPel);
 
@@ -1691,7 +1693,7 @@ void	VID_Init(uint8_p palette) {
 
     GL_Init();
 
-    sprintf(gldir, "%s/glquake", com.gamedir);
+    snprintf(gldir, sizeof(gldir), "%s/glquake", com.gamedir);
     Sys_mkdir(gldir);
 
     vid_realmode = vid_modenum;

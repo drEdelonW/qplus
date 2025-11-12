@@ -67,7 +67,7 @@ void AddLightBlend(float r, float g, float b, float a2) {
 	v_blend[2] = v_blend[2]*(1-a2) + b*a2;
 }
 
-void R_RenderDlight(dLight_t* light) {
+void R_RenderDlight(dLight_p light) {
 	int		i, j;
 	float	a;
 	vec3_t	v;
@@ -104,7 +104,7 @@ R_RenderDlights
 */
 void R_RenderDlights(void) {
 	int		i;
-	dLight_t* l;
+	dLight_p l;
 
 	if (!gl_flashblend.value)
 		return;
@@ -145,7 +145,7 @@ DYNAMIC LIGHTS
 R_MarkLights
 =============
 */
-void R_MarkLights(dLight_t* light, int bit, mNode_p node) {
+void R_MarkLights(dLight_p light, int bit, mNode_p node) {
 	mPlane_p splitplane;
 	float		dist;
 	mSurface_p surf;
@@ -188,7 +188,7 @@ R_PushDlights
 */
 void R_PushDlights(void) {
 	int		i;
-	dLight_t* l;
+	dLight_p l;
 
 	if (gl_flashblend.value)
 		return;
@@ -225,7 +225,7 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
 	mSurface_p surf;
 	int			s, t, ds, dt;
 	int			i;
-	mTexInfo_t* tex;
+	mTexInfo_p tex;
 	byte* lightmap;
 	uint32_t	scale;
 	int			maps;
