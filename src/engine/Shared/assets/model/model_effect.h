@@ -1,13 +1,13 @@
 #pragma once
 
 typedef enum {
-    RT_ROCKET   = 0,
-    RT_GRENADE  = 1,
-    RT_GIB      = 2,
-    RT_TRACER   = 3,
-    RT_ZOMGIB   = 4,
-    RT_TRACER2  = 5,
-    RT_TRACER3  = 6
+    RT_ROCKET   = 0u,
+    RT_GRENADE  = 1u,
+    RT_GIB      = 2u,
+    RT_TRACER   = 3u,
+    RT_ZOMGIB   = 4u,
+    RT_TRACER2  = 5u,
+    RT_TRACER3  = 6u
 } RocketTrailType;
 
 /* Bit flags for entity effects */

@@ -24,6 +24,7 @@ ifeq ($(UNAME_S),Linux)
         LDLIBS     += -lX11 -lXext
 
         RUN_PREFIX := DISPLAY=:1
+        RUN_PREFIX2 := DISPLAY=:2
 
 else ifeq ($(UNAME_S),Darwin)
     $(info Darwin X11)

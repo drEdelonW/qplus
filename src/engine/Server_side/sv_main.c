@@ -183,7 +183,7 @@ void SV_SendServerinfo(RmtClient_p client) {
     snprintf(message, sizeof(message), "%c\nVERSION %4.2f SERVER (%i CRC)", 2, VERSION, pr_crc);
     MSG_WriteString(pBuf, message);
 
-    MSG_WriteByte(pBuf, svc_serverinfo);    MSG_WriteLong(pBuf, PROTOCOL_VERSION);    MSG_WriteByte(pBuf, svs.maxClients);
+    MSG_WriteByte(pBuf, svc_serverinfo); MSG_WriteLong(pBuf, PROTOCOL_VERSION); MSG_WriteByte(pBuf, svs.maxClients);
 
     MSG_WriteByte(pBuf, (!coop.value && deathmatch.value) ? GAME_DEATHMATCH : GAME_COOP);
 
@@ -200,16 +200,12 @@ void SV_SendServerinfo(RmtClient_p client) {
     MSG_WriteByte(pBuf, 0);
 
     // send music
-    MSG_WriteByte(pBuf, svc_cdtrack);
-    MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds);
-    MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds);
+    MSG_WriteByte(pBuf, svc_cdtrack);   MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds); MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds);
 
     // set view
-    MSG_WriteByte(pBuf, svc_setview);
-    MSG_WriteShort(pBuf, (int16_t)NUM_FOR_EDICT(client->edict));
+    MSG_WriteByte(pBuf, svc_setview);   MSG_WriteShort(pBuf, (int16_t)NUM_FOR_EDICT(client->edict));
 
-    MSG_WriteByte(pBuf, svc_signonnum);
-    MSG_WriteByte(pBuf, 1);
+    MSG_WriteByte(pBuf, svc_signonnum); MSG_WriteByte(pBuf, 1);
 
     client->sendsignon = true;
     client->spawned = false;    // need prespawn, spawn, etc
@@ -325,8 +321,8 @@ void SV_ClearDatagram() { SZ_Clear(&sv.datagram); }
     =============================================================================
 */
 
-static uint32_t  _fatBytes;
-static uint8_t _fatPvs[MAX_MAP_LEAFS / 8];
+static uint32_t _fatBytes;
+static uint8_t  _fatPvs[MAX_MAP_LEAFS / 8];
 
 void SV_AddToFatPVS(vec3_t org, mNode_p node) {
     while (1) {
@@ -378,7 +374,7 @@ uint8_p SV_FatPVS(vec3_t org) {
 */
 void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     // find the client's PVS
-    vec3_t  org;    VectorAdd(clent->v.origin, clent->v.view_ofs, org);
+    vec3_t  org;   VectorAdd(clent->v.origin, clent->v.view_ofs, org);
     uint8_p pvs = SV_FatPVS(org);
 
     // send over all entities (excpet the client) that touch the pvs
@@ -531,13 +527,12 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
 
     // send the data
 
-    MSG_WriteByte(msg, svc_clientdata);
-    MSG_WriteShort(msg, (int16_t)bits);
+    MSG_WriteByte(msg, svc_clientdata); MSG_WriteShort(msg, (int16_t)bits);
     if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, (int8_t)ent->v.view_ofs[2]);
     if (bits & SU_IDEALPITCH)           MSG_WriteChar(msg, (int8_t)ent->v.idealpitch);
     for (int i = 0; i < VECT_DIM; i++) {
-        if (bits & (SU_PUNCH1 << i))      MSG_WriteChar(msg, (int8_t)ent->v.punchangle[i]);
-        if (bits & (SU_VELOCITY1 << i))   MSG_WriteChar(msg, (int8_t)ent->v.velocity[i] / 16);
+        if (bits & (SU_PUNCH1 << i))    MSG_WriteChar(msg, (int8_t)ent->v.punchangle[i]);
+        if (bits & (SU_VELOCITY1 << i)) MSG_WriteChar(msg, (int8_t)ent->v.velocity[i] / 16);
     }
 
     // [always sent]
@@ -554,9 +549,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     MSG_WriteByte(msg, (uint8_t)ent->v.ammo_rockets);
     MSG_WriteByte(msg, (uint8_t)ent->v.ammo_cells);
 
-    if (standard_quake) {
-        MSG_WriteByte(msg, (uint8_t)ent->v.weapon);
-    }
+    if (standard_quake)                 MSG_WriteByte(msg, (uint8_t)ent->v.weapon);
     else {
         for (uint8_t i = 0; i < 32; i++) {
             if (((int)ent->v.weapon) & (1 << i)) {
@@ -866,7 +859,6 @@ void SV_SpawnServer(
     , cString startspot
 #endif
 ) {
-
     // let's not have any servers with no name
     if (hostname.string[0] == 0)
         Cvar_Set("hostname", "UNNAMED");
@@ -884,7 +876,7 @@ void SV_SpawnServer(
     // make cvars consistant
     //
     if (coop.value) Cvar_SetValue("deathmatch", 0);
-    current_skill = (int)(skill.value + 0.5);
+    current_skill = (int)(skill.value + 0.5f);
     CLAMP(0, current_skill, 3);
 
     Cvar_SetValue("skill", (float)current_skill);

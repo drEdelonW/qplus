@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 // stock defines
 typedef enum {
     IT_SHOTGUN          = (1u << 0),

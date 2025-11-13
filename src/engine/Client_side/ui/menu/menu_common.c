@@ -14,8 +14,6 @@ Draws one solid graphics character
 ================
 */
 
-
-
 static uint8_t _identityTable[256];
 static uint8_t _translationTable[256];
 
@@ -140,7 +138,7 @@ void M_DrawCheckbox(int x, int y, int on) {
     );
 }
 
-int blink(char sym) { return sym + ((int)(realtime * 4) & 1); }
 int curAnimFrame() { return ((int)(host_time * 10) % 6) + 1; }
+int blink(char sym) { return sym + ((int)(realtime * 4) & 1); }
 int curSymb() { return blink(12); }
 int inpSymb() { return blink(10); }

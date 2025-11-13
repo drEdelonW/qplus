@@ -556,17 +556,18 @@ static void Test_f() {
             goto JustDoIt;
     }
 
-    for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++) {
-        if (!net_landrivers[_net_landriverlevel].initialized)
-            continue;
+    {
+        for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++) {
+            if (!net_landrivers[_net_landriverlevel].initialized)
+                continue;
 
-        // see if we can resolve the host name
-        if (dfunc.GetAddrFromName(host, &sendaddr) != -1)
-            break;
+            // see if we can resolve the host name
+            if (dfunc.GetAddrFromName(host, &sendaddr) != -1)
+                break;
+        }
+        if (_net_landriverlevel == net_numlandrivers)
+            return;
     }
-    if (_net_landriverlevel == net_numlandrivers)
-        return;
-
 JustDoIt:
     _testSocket = dfunc.OpenSocket(0);
     if (_testSocket == -1)
@@ -671,17 +672,18 @@ static void Test2_f() {
             goto JustDoIt;
     }
 
-    for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++) {
-        if (!net_landrivers[_net_landriverlevel].initialized)
-            continue;
+    {
+        for (_net_landriverlevel = 0; _net_landriverlevel < net_numlandrivers; _net_landriverlevel++) {
+            if (!net_landrivers[_net_landriverlevel].initialized)
+                continue;
 
-        // see if we can resolve the host name
-        if (dfunc.GetAddrFromName(host, &sendaddr) != -1)
-            break;
+            // see if we can resolve the host name
+            if (dfunc.GetAddrFromName(host, &sendaddr) != -1)
+                break;
+        }
+        if (_net_landriverlevel == net_numlandrivers)
+            return;
     }
-    if (_net_landriverlevel == net_numlandrivers)
-        return;
-
 JustDoIt:
     _test2Socket = dfunc.OpenSocket(0);
     if (_test2Socket == -1)

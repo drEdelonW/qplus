@@ -138,6 +138,9 @@ fresh: clean build
 run: $(TARGETS)
 	@cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX) ./$(TARGET)
 
+run2: $(TARGETS)
+	@cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX2) ./$(TARGET)
+
 rund: $(TARGETS)
 	@cd run_env && $(RUN_PREFIX) gdbserver :1234 ./$(TARGET)
 

@@ -12,10 +12,10 @@ Handles uint8_t ordering and avoids alignment errors
 
 #include "net.h"  // net_message
 
-
 void MSG_SetSizeBuf(sizebuf_p sb) { nMSG.SetSizeBuf(sb); }
 void MSG_BeginReading() { nMSG.SetSizeBuf(&net_message); nMSG.BeginReading(); }
-int getMsgReadCount() { return nMSG.ReadCount(); }
+
+int  getMsgReadCount() { return nMSG.ReadCount(); }
 bool getMsgBadRead() { return nMSG.BadRead(); }
 
 void MSG_WriteChar(sizebuf_p sb, int8_t c) { ;      nMSG.SetSizeBuf(sb); nMSG.WriteChar(c); }

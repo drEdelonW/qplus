@@ -54,9 +54,9 @@ qPic_p sb_face_quad;
 qPic_p sb_face_invuln;
 qPic_p sb_face_invis_invuln;
 
-bool sb_showscores;
+bool    sb_showscores;
 
-int   sb_lines;   // scan lines to draw
+int     sb_lines;   // scan lines to draw
 
 qPic_p rsb_invbar[2];
 qPic_p rsb_weapons[5];

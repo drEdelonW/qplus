@@ -58,16 +58,12 @@ void M_Net_Draw() {
     M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 
     qPic_p p;
-    if (serialAvailable) {
-        p = Draw_CachePic("gfx/netmen1.lmp");
-    }
-    else {
+    if (serialAvailable)    p = Draw_CachePic("gfx/netmen1.lmp");
 #ifdef _WIN32
-        p = NULL;
+    else                    p = NULL;
 #else
-        p = Draw_CachePic("gfx/dim_modm.lmp");
+    else                    p = Draw_CachePic("gfx/dim_modm.lmp");
 #endif
-    }
 
     int f = 32;
     if (p)
@@ -86,9 +82,7 @@ void M_Net_Draw() {
     M_DrawTransPic(72, f += 19, Draw_CachePic((ipxAvailable) ? "gfx/netmen3.lmp" : "gfx/dim_ipx.lmp"));
     M_DrawTransPic(72, f += 19, Draw_CachePic((tcpipAvailable) ? "gfx/netmen4.lmp" : "gfx/dim_tcp.lmp"));
 
-    if (m_net_items == 5) { // JDC, could just be removed
-        M_DrawTransPic(72, f += 19, Draw_CachePic("gfx/netmen5.lmp"));
-    }
+    if (m_net_items == 5) M_DrawTransPic(72, f += 19, Draw_CachePic("gfx/netmen5.lmp")); // JDC, could just be removed
 
     f = (320 - 26 * 8) / 2;
     M_DrawTextBox(f, 134, 24, 4);
@@ -115,7 +109,7 @@ again:
         break;
 
     case K_UPARROW:     S_LocalSound("misc/menu1.wav");
-        if (--m_net_cursor < 0) m_net_cursor = m_net_items - 1;
+        if (--m_net_cursor < 0)     m_net_cursor = m_net_items - 1;
         break;
 
     case K_ENTER:
