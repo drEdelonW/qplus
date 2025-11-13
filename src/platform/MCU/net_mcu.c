@@ -85,13 +85,7 @@ net_landriver_t net_landrivers[MAX_NET_DRIVERS] = {
 
 int32_t net_numlandrivers = 0;
 
-struct in_addr { // [src/engine/net/net_dgrm.c]
-    union {
-        struct { uint8_t s_b1, s_b2, s_b3, s_b4; } S_un_b;
-        struct { uint16_t s_w1, s_w2; } S_un_w;
-        uint32_t S_addr;
-    } S_un;
-};
-cString inet_ntoa(struct in_addr in) {}
+
+cString inet_ntoa(in_addr_t in) {}
 uint32_t inet_addr(const cString cp) {return 0;};
 
