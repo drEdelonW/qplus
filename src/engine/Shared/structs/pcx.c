@@ -38,7 +38,7 @@ void WritePCXfile(cString filename, uint8_p data, int width, int height, int row
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            if ((*data & 0xc0) != 0xc0)
+            if ((*data & 0xC0) != 0xC0)
                 *pack++ = *data++;
             else {
                 *pack++ = 0xc1;
