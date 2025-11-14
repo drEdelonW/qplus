@@ -872,7 +872,7 @@ void PR_LoadProgs() {
     }
 
     for (int i = 0; i < progs->globals.num; i++)
-        ((int32_t*)pr_globals)[i] = LittleLong(((int32_t*)pr_globals)[i]);
+        ((int32_p)pr_globals)[i] = LittleLong(((int32_p)pr_globals)[i]);
 }
 
 

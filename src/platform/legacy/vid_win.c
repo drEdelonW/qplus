@@ -127,7 +127,7 @@ typedef struct {
 
 static vmode_t	modelist[MAX_MODE_LIST];
 static int		nummodes;
-static vmode_t* pcurrentmode;
+static vmode_p pcurrentmode;
 
 int		aPage;					// Current active display page
 int		vPage;					// Current visible display page
@@ -933,7 +933,7 @@ int VID_NumModes() {
 VID_GetModePtr
 =================
 */
-vmode_t* VID_GetModePtr(int modenum) {
+vmode_p VID_GetModePtr(int modenum) {
 
     if ((modenum >= 0) && (modenum < nummodes))
         return &modelist[modenum];
@@ -976,7 +976,7 @@ VID_GetModeDescriptionMemCheck
 */
 cString VID_GetModeDescriptionMemCheck(int mode) {
     cString pinfo;
-    vmode_t* pv;
+    vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
         return NULL;
@@ -1002,7 +1002,7 @@ VID_GetModeDescription
 */
 cString VID_GetModeDescription(int mode) {
     cString pinfo;
-    vmode_t* pv;
+    vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
         return NULL;
@@ -1024,7 +1024,7 @@ Tacks on "windowed" or "fullscreen"
 */
 cString VID_GetModeDescription2(int mode) {
     static char	pinfo[40];
-    vmode_t* pv;
+    vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
         return NULL;
@@ -1045,7 +1045,7 @@ cString VID_GetModeDescription2(int mode) {
 
 cString VID_GetExtModeDescription(int mode) {
     static char	pinfo[40];
-    vmode_t* pv;
+    vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
         return NULL;
@@ -1776,7 +1776,7 @@ void VID_DescribeModes_f() {
     int			i, lnummodes;
     cString pinfo;
     bool	na;
-    vmode_t* pv;
+    vmode_p pv;
 
     na = false;
 
@@ -2801,7 +2801,7 @@ void VID_MenuDraw() {
     cString ptr;
     int			lnummodes, i, j, k, column, row, dup, dupmode;
     char		temp[100];
-    vmode_t* pv;
+    vmode_p pv;
     modedesc_t	tmodedesc;
 
     M_DrawPic(4, Draw_CachePic("gfx/vidmodes.lmp"));

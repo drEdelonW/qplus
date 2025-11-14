@@ -31,7 +31,7 @@ int		lightmap_bytes;		// 1, 2, or 4
 
 int		lightmap_textures;
 
-uint32_t		blocklights[18*18];
+uint32_t		blocklights[18 * 18];
 
 #define	BLOCK_WIDTH		128
 #define	BLOCK_HEIGHT	128
@@ -43,7 +43,7 @@ typedef struct glRect_s {
 	uint8_t l, t, w, h;
 } glRect_t;
 
-glpoly_t* lightmap_polys[MAX_LIGHTMAPS];
+glpoly_p lightmap_polys[MAX_LIGHTMAPS];
 bool	lightmap_modified[MAX_LIGHTMAPS];
 glRect_t	lightmap_rectchange[MAX_LIGHTMAPS];
 
@@ -51,7 +51,7 @@ int			allocated[MAX_LIGHTMAPS][BLOCK_WIDTH];
 
 // the lightmap texture data needs to be kept in
 // main memory so texsubimage can update properly
-byte		lightmaps[4*MAX_LIGHTMAPS*BLOCK_WIDTH*BLOCK_HEIGHT];
+byte		lightmaps[4 * MAX_LIGHTMAPS * BLOCK_WIDTH * BLOCK_HEIGHT];
 
 // For gl_texsort 0
 mSurface_p skychain = NULL;
@@ -72,14 +72,14 @@ void R_AddDynamicLights(mSurface_p surf) {
 	int			s, t;
 	int			i;
 	int			smax, tmax;
-	mTexInfo_t* tex;
+	mTexInfo_p tex;
 
-	smax = (surf->extents[0]>>4)+1;
-	tmax = (surf->extents[1]>>4)+1;
+	smax = (surf->extents[0] >> 4) + 1;
+	tmax = (surf->extents[1] >> 4) + 1;
 	tex = surf->texinfo;
 
-	for (lnum=0; lnum<MAX_DLIGHTS; lnum++) {
-		if (!(surf->dlightbits & (1<<lnum)))
+	for (lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
+		if (!(surf->dlightbits & (1 << lnum)))
 			continue;		// not lit by this light
 
 		rad = cl_dlights[lnum].radius;
@@ -91,9 +91,9 @@ void R_AddDynamicLights(mSurface_p surf) {
 			continue;
 		minlight = rad - minlight;
 
-		for (i=0; i<3; i++) {
+		for (i = 0; i < 3; i++) {
 			impact[i] = cl_dlights[lnum].origin[i] -
-				surf->plane->normal[i]*dist;
+				surf->plane->normal[i] * dist;
 		}
 
 		local[0] = DotProduct(impact, tex->vecs[0]) + tex->vecs[0][3];
@@ -102,20 +102,20 @@ void R_AddDynamicLights(mSurface_p surf) {
 		local[0] -= surf->texturemins[0];
 		local[1] -= surf->texturemins[1];
 
-		for (t = 0; t<tmax; t++) {
-			td = local[1] - t*16;
+		for (t = 0; t < tmax; t++) {
+			td = local[1] - t * 16;
 			if (td < 0)
 				td = -td;
-			for (s=0; s<smax; s++) {
-				sd = local[0] - s*16;
+			for (s = 0; s < smax; s++) {
+				sd = local[0] - s * 16;
 				if (sd < 0)
 					sd = -sd;
 				if (sd > td)
-					dist = sd + (td>>1);
+					dist = sd + (td >> 1);
 				else
-					dist = td + (sd>>1);
+					dist = td + (sd >> 1);
 				if (dist < minlight)
-					blocklights[t*smax + s] += (rad - dist)*256;
+					blocklights[t * smax + s] += (rad - dist) * 256;
 			}
 		}
 	}
@@ -141,20 +141,20 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
 
 	surf->cached_dlight = (surf->dlightframe == r_framecount);
 
-	smax = (surf->extents[0]>>4)+1;
-	tmax = (surf->extents[1]>>4)+1;
-	size = smax*tmax;
+	smax = (surf->extents[0] >> 4) + 1;
+	tmax = (surf->extents[1] >> 4) + 1;
+	size = smax * tmax;
 	lightmap = surf->samples;
 
 	// set to full bright if no light data
 	if (r_fullbright.value || !cl.worldmodel->lightdata) {
-		for (i=0; i<size; i++)
-			blocklights[i] = 255*256;
+		for (i = 0; i < size; i++)
+			blocklights[i] = 255 * 256;
 		goto store;
 	}
 
 	// clear to no light
-	for (i=0; i<size; i++)
+	for (i = 0; i < size; i++)
 		blocklights[i] = 0;
 
 	// add all the lightmaps
@@ -163,7 +163,7 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
 			maps++) {
 		scale = d_lightstylevalue[surf->styles[maps]];
 		surf->cached_light[maps] = scale;	// 8.8 fraction
-		for (i=0; i<size; i++)
+		for (i = 0; i < size; i++)
 			blocklights[i] += lightmap[i] * scale;
 		lightmap += size;	// skip to next lightmap
 	}
@@ -176,15 +176,15 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
 store:
 	switch (gl_lightmap_format) {
 	case GL_RGBA:
-		stride -= (smax<<2);
+		stride -= (smax << 2);
 		bl = blocklights;
-		for (i=0; i<tmax; i++, dest += stride) {
-			for (j=0; j<smax; j++) {
+		for (i = 0; i < tmax; i++, dest += stride) {
+			for (j = 0; j < smax; j++) {
 				t = *bl++;
 				t >>= 7;
 				if (t > 255)
 					t = 255;
-				dest[3] = 255-t;
+				dest[3] = 255 - t;
 				dest += 4;
 			}
 		}
@@ -193,13 +193,13 @@ store:
 	case GL_LUMINANCE:
 	case GL_INTENSITY:
 		bl = blocklights;
-		for (i=0; i<tmax; i++, dest += stride) {
-			for (j=0; j<smax; j++) {
+		for (i = 0; i < tmax; i++, dest += stride) {
+			for (j = 0; j < smax; j++) {
 				t = *bl++;
 				t >>= 7;
 				if (t > 255)
 					t = 255;
-				dest[j] = 255-t;
+				dest[j] = 255 - t;
 			}
 		}
 		break;
@@ -216,7 +216,7 @@ R_TextureAnimation
 Returns the proper texture for a given time and base texture
 ===============
 */
-Texture_t* R_TextureAnimation(Texture_t* base) {
+Texture_p R_TextureAnimation(Texture_p base) {
 	int		reletive;
 	int		count;
 
@@ -228,7 +228,7 @@ Texture_t* R_TextureAnimation(Texture_t* base) {
 	if (!base->anim_total)
 		return base;
 
-	reletive = (int)(cl.time*10) % base->anim_total;
+	reletive = (int)(cl.time * 10) % base->anim_total;
 
 	count = 0;
 	while (base->anim_min > reletive || base->anim_max <= reletive) {
@@ -253,8 +253,8 @@ Texture_t* R_TextureAnimation(Texture_t* base) {
 
 
 
-void DrawGLWaterPoly(glpoly_t* p);
-void DrawGLWaterPolyLightmap(glpoly_t* p);
+void DrawGLWaterPoly(glpoly_p p);
+void DrawGLWaterPolyLightmap(glpoly_p p);
 
 lpMTexFUNC qglMTexCoord2fSGIS = NULL;
 lpSelTexFUNC qglSelectTextureSGIS = NULL;
@@ -289,22 +289,22 @@ just do everything as it passes with no need to sort
 ================
 */
 void R_DrawSequentialPoly(mSurface_p s) {
-	glpoly_t* p;
+	glpoly_p p;
 	float_p v;
 	int			i;
-	Texture_t* t;
+	Texture_p t;
 
 	//
 	// normal lightmaped poly
 	//
-	if (!(s->flags & (SURF_DRAWSKY|SURF_DRAWTURB|SURF_UNDERWATER))) {
+	if (!(s->flags & (SURF_DRAWSKY | SURF_DRAWTURB | SURF_UNDERWATER))) {
 		p = s->polys;
 
 		t = R_TextureAnimation(s->texinfo->texture);
 		GL_Bind(t->gl_texturenum);
 		glBegin(GL_POLYGON);
 		v = p->verts[0];
-		for (i=0; i<p->numverts; i++, v+= VERTEXSIZE) {
+		for (i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
 			glTexCoord2f(v[3], v[4]);
 			glVertex3fv(v);
 		}
@@ -314,7 +314,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
 		glEnable(GL_BLEND);
 		glBegin(GL_POLYGON);
 		v = p->verts[0];
-		for (i=0; i<p->numverts; i++, v+= VERTEXSIZE) {
+		for (i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
 			glTexCoord2f(v[5], v[6]);
 			glVertex3fv(v);
 		}
@@ -339,7 +339,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
 	//
 	if (s->flags & SURF_DRAWSKY) {
 		GL_Bind(solidskytexture);
-		speedscale = realtime*8;
+		speedscale = realtime * 8;
 		speedscale -= (int)speedscale;
 
 		EmitSkyPolys(s);
@@ -347,7 +347,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		GL_Bind(alphaskytexture);
-		speedscale = realtime*16;
+		speedscale = realtime * 16;
 		speedscale -= (int)speedscale;
 		EmitSkyPolys(s);
 		if (gl_lightmap_format == GL_LUMINANCE)
@@ -380,20 +380,20 @@ just do everything as it passes with no need to sort
 ================
 */
 void R_DrawSequentialPoly(mSurface_p s) {
-	glpoly_t* p;
+	glpoly_p p;
 	float_p v;
 	int			i;
-	Texture_t* t;
+	Texture_p t;
 	vec3_t		nv, dir;
 	float		ss, ss2, length;
 	float		s1, t1;
-	glRect_t* theRect;
+	glRect_p theRect;
 
 	//
 	// normal lightmaped poly
 	//
 
-	if (!(s->flags & (SURF_DRAWSKY|SURF_DRAWTURB|SURF_UNDERWATER))) {
+	if (!(s->flags & (SURF_DRAWSKY | SURF_DRAWTURB | SURF_UNDERWATER))) {
 		R_RenderDynamicLightmaps(s);
 		if (gl_mtexable) {
 			p = s->polys;
@@ -412,7 +412,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
 				theRect = &lightmap_rectchange[i];
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t,
 					BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
-					lightmaps+(i* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
+					lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes);
 				theRect->l = BLOCK_WIDTH;
 				theRect->t = BLOCK_HEIGHT;
 				theRect->h = 0;
@@ -421,7 +421,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 			glBegin(GL_POLYGON);
 			v = p->verts[0];
-			for (i=0; i<p->numverts; i++, v+= VERTEXSIZE) {
+			for (i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
 				qglMTexCoord2fSGIS(TEXTURE0_SGIS, v[3], v[4]);
 				qglMTexCoord2fSGIS(TEXTURE1_SGIS, v[5], v[6]);
 				glVertex3fv(v);
@@ -436,7 +436,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
 			GL_Bind(t->gl_texturenum);
 			glBegin(GL_POLYGON);
 			v = p->verts[0];
-			for (i=0; i<p->numverts; i++, v+= VERTEXSIZE) {
+			for (i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
 				glTexCoord2f(v[3], v[4]);
 				glVertex3fv(v);
 			}
@@ -446,7 +446,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
 			glEnable(GL_BLEND);
 			glBegin(GL_POLYGON);
 			v = p->verts[0];
-			for (i=0; i<p->numverts; i++, v+= VERTEXSIZE) {
+			for (i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
 				glTexCoord2f(v[5], v[6]);
 				glVertex3fv(v);
 			}
@@ -475,14 +475,14 @@ void R_DrawSequentialPoly(mSurface_p s) {
 	if (s->flags & SURF_DRAWSKY) {
 		GL_DisableMultitexture();
 		GL_Bind(solidskytexture);
-		speedscale = realtime*8;
+		speedscale = realtime * 8;
 		speedscale -= (int)speedscale & ~127;
 
 		EmitSkyPolys(s);
 
 		glEnable(GL_BLEND);
 		GL_Bind(alphaskytexture);
-		speedscale = realtime*16;
+		speedscale = realtime * 16;
 		speedscale -= (int)speedscale & ~127;
 		EmitSkyPolys(s);
 
@@ -509,7 +509,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
 			theRect = &lightmap_rectchange[i];
 			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t,
 				BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
-				lightmaps+(i* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
+				lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes);
 			theRect->l = BLOCK_WIDTH;
 			theRect->t = BLOCK_HEIGHT;
 			theRect->h = 0;
@@ -518,12 +518,12 @@ void R_DrawSequentialPoly(mSurface_p s) {
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 		glBegin(GL_TRIANGLE_FAN);
 		v = p->verts[0];
-		for (i=0; i<p->numverts; i++, v+= VERTEXSIZE) {
+		for (i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
 			qglMTexCoord2fSGIS(TEXTURE0_SGIS, v[3], v[4]);
 			qglMTexCoord2fSGIS(TEXTURE1_SGIS, v[5], v[6]);
 
-			nv[0] = v[0] + 8*sin(v[1]*0.05+realtime)*sin(v[2]*0.05+realtime);
-			nv[1] = v[1] + 8*sin(v[0]*0.05+realtime)*sin(v[2]*0.05+realtime);
+			nv[0] = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime);
+			nv[1] = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime);
 			nv[2] = v[2];
 
 			glVertex3fv(nv);
@@ -554,7 +554,7 @@ DrawGLWaterPoly
 Warp the vertex coordinates
 ================
 */
-void DrawGLWaterPoly(glpoly_t* p) {
+void DrawGLWaterPoly(glpoly_p p) {
 	int		i;
 	float_p v;
 	float	s, t, os, ot;
@@ -564,11 +564,11 @@ void DrawGLWaterPoly(glpoly_t* p) {
 
 	glBegin(GL_TRIANGLE_FAN);
 	v = p->verts[0];
-	for (i=0; i<p->numverts; i++, v+= VERTEXSIZE) {
+	for (i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
 		glTexCoord2f(v[3], v[4]);
 
-		nv[0] = v[0] + 8*sin(v[1]*0.05+realtime)*sin(v[2]*0.05+realtime);
-		nv[1] = v[1] + 8*sin(v[0]*0.05+realtime)*sin(v[2]*0.05+realtime);
+		nv[0] = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime);
+		nv[1] = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime);
 		nv[2] = v[2];
 
 		glVertex3fv(nv);
@@ -576,7 +576,7 @@ void DrawGLWaterPoly(glpoly_t* p) {
 	glEnd();
 }
 
-void DrawGLWaterPolyLightmap(glpoly_t* p) {
+void DrawGLWaterPolyLightmap(glpoly_p p) {
 	int		i;
 	float_p v;
 	float	s, t, os, ot;
@@ -586,11 +586,11 @@ void DrawGLWaterPolyLightmap(glpoly_t* p) {
 
 	glBegin(GL_TRIANGLE_FAN);
 	v = p->verts[0];
-	for (i=0; i<p->numverts; i++, v+= VERTEXSIZE) {
+	for (i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
 		glTexCoord2f(v[5], v[6]);
 
-		nv[0] = v[0] + 8*sin(v[1]*0.05+realtime)*sin(v[2]*0.05+realtime);
-		nv[1] = v[1] + 8*sin(v[0]*0.05+realtime)*sin(v[2]*0.05+realtime);
+		nv[0] = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime);
+		nv[1] = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime);
 		nv[2] = v[2];
 
 		glVertex3fv(nv);
@@ -603,13 +603,13 @@ void DrawGLWaterPolyLightmap(glpoly_t* p) {
 DrawGLPoly
 ================
 */
-void DrawGLPoly(glpoly_t* p) {
+void DrawGLPoly(glpoly_p p) {
 	int		i;
 	float_p v;
 
 	glBegin(GL_POLYGON);
 	v = p->verts[0];
-	for (i=0; i<p->numverts; i++, v+= VERTEXSIZE) {
+	for (i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
 		glTexCoord2f(v[3], v[4]);
 		glVertex3fv(v);
 	}
@@ -624,9 +624,9 @@ R_BlendLightmaps
 */
 void R_BlendLightmaps(void) {
 	int			i, j;
-	glpoly_t* p;
+	glpoly_p p;
 	float_p v;
-	glRect_t* theRect;
+	glRect_p theRect;
 
 	if (r_fullbright.value)
 		return;
@@ -647,11 +647,11 @@ void R_BlendLightmaps(void) {
 		glEnable(GL_BLEND);
 	}
 
-	for (i=0; i<MAX_LIGHTMAPS; i++) {
+	for (i = 0; i < MAX_LIGHTMAPS; i++) {
 		p = lightmap_polys[i];
 		if (!p)
 			continue;
-		GL_Bind(lightmap_textures+i);
+		GL_Bind(lightmap_textures + i);
 		if (lightmap_modified[i]) {
 			lightmap_modified[i] = false;
 			theRect = &lightmap_rectchange[i];
@@ -663,19 +663,19 @@ void R_BlendLightmaps(void) {
 			//				gl_lightmap_format, GL_UNSIGNED_BYTE, lightmaps+(i*BLOCK_HEIGHT+theRect->t)*BLOCK_WIDTH*lightmap_bytes);
 			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, theRect->t,
 				BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
-				lightmaps+(i* BLOCK_HEIGHT + theRect->t) *BLOCK_WIDTH*lightmap_bytes);
+				lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes);
 			theRect->l = BLOCK_WIDTH;
 			theRect->t = BLOCK_HEIGHT;
 			theRect->h = 0;
 			theRect->w = 0;
 		}
-		for (; p; p=p->chain) {
+		for (; p; p = p->chain) {
 			if (p->flags & SURF_UNDERWATER)
 				DrawGLWaterPolyLightmap(p);
 			else {
 				glBegin(GL_POLYGON);
 				v = p->verts[0];
-				for (j=0; j<p->numverts; j++, v+= VERTEXSIZE) {
+				for (j = 0; j < p->numverts; j++, v += VERTEXSIZE) {
 					glTexCoord2f(v[5], v[6]);
 					glVertex3fv(v);
 				}
@@ -701,10 +701,10 @@ R_RenderBrushPoly
 ================
 */
 void R_RenderBrushPoly(mSurface_p fa) {
-	Texture_t* t;
+	Texture_p t;
 	byte* base;
 	int			maps;
-	glRect_t* theRect;
+	glRect_p theRect;
 	int smax, tmax;
 
 	c_brush_polys++;
@@ -755,15 +755,15 @@ void R_RenderBrushPoly(mSurface_p fa) {
 					theRect->w += theRect->l - fa->light_s;
 				theRect->l = fa->light_s;
 			}
-			smax = (fa->extents[0]>>4)+1;
-			tmax = (fa->extents[1]>>4)+1;
+			smax = (fa->extents[0] >> 4) + 1;
+			tmax = (fa->extents[1] >> 4) + 1;
 			if ((theRect->w + theRect->l) < (fa->light_s + smax))
-				theRect->w = (fa->light_s-theRect->l)+smax;
+				theRect->w = (fa->light_s - theRect->l) + smax;
 			if ((theRect->h + theRect->t) < (fa->light_t + tmax))
-				theRect->h = (fa->light_t-theRect->t)+tmax;
-			base = lightmaps + fa->lightmaptexturenum*lightmap_bytes*BLOCK_WIDTH*BLOCK_HEIGHT;
+				theRect->h = (fa->light_t - theRect->t) + tmax;
+			base = lightmaps + fa->lightmaptexturenum * lightmap_bytes * BLOCK_WIDTH * BLOCK_HEIGHT;
 			base += fa->light_t * BLOCK_WIDTH * lightmap_bytes + fa->light_s * lightmap_bytes;
-			R_BuildLightMap(fa, base, BLOCK_WIDTH*lightmap_bytes);
+			R_BuildLightMap(fa, base, BLOCK_WIDTH * lightmap_bytes);
 		}
 	}
 }
@@ -775,10 +775,10 @@ Multitexture
 ================
 */
 void R_RenderDynamicLightmaps(mSurface_p fa) {
-	Texture_t* t;
+	Texture_p t;
 	byte* base;
 	int			maps;
-	glRect_t* theRect;
+	glRect_p theRect;
 	int smax, tmax;
 
 	c_brush_polys++;
@@ -812,15 +812,15 @@ void R_RenderDynamicLightmaps(mSurface_p fa) {
 					theRect->w += theRect->l - fa->light_s;
 				theRect->l = fa->light_s;
 			}
-			smax = (fa->extents[0]>>4)+1;
-			tmax = (fa->extents[1]>>4)+1;
+			smax = (fa->extents[0] >> 4) + 1;
+			tmax = (fa->extents[1] >> 4) + 1;
 			if ((theRect->w + theRect->l) < (fa->light_s + smax))
-				theRect->w = (fa->light_s-theRect->l)+smax;
+				theRect->w = (fa->light_s - theRect->l) + smax;
 			if ((theRect->h + theRect->t) < (fa->light_t + tmax))
-				theRect->h = (fa->light_t-theRect->t)+tmax;
-			base = lightmaps + fa->lightmaptexturenum*lightmap_bytes*BLOCK_WIDTH*BLOCK_HEIGHT;
+				theRect->h = (fa->light_t - theRect->t) + tmax;
+			base = lightmaps + fa->lightmaptexturenum * lightmap_bytes * BLOCK_WIDTH * BLOCK_HEIGHT;
 			base += fa->light_t * BLOCK_WIDTH * lightmap_bytes + fa->light_s * lightmap_bytes;
-			R_BuildLightMap(fa, base, BLOCK_WIDTH*lightmap_bytes);
+			R_BuildLightMap(fa, base, BLOCK_WIDTH * lightmap_bytes);
 		}
 	}
 }
@@ -847,7 +847,7 @@ R_DrawWaterSurfaces
 void R_DrawWaterSurfaces(void) {
 	int			i;
 	mSurface_p s;
-	Texture_t* t;
+	Texture_p t;
 
 	if (r_wateralpha.value == 1.0)
 		return;
@@ -861,7 +861,7 @@ void R_DrawWaterSurfaces(void) {
 	glColor4f(1, 1, 1, r_wateralpha.value);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-	for (i=0; i<cl.worldmodel->numtextures; i++) {
+	for (i = 0; i < cl.worldmodel->numtextures; i++) {
 		t = cl.worldmodel->textures[i];
 		if (!t)
 			continue;
@@ -874,7 +874,7 @@ void R_DrawWaterSurfaces(void) {
 		// set modulate mode explicitly
 		GL_Bind(t->gl_texturenum);
 
-		for (; s; s=s->texturechain)
+		for (; s; s = s->texturechain)
 			R_RenderBrushPoly(s);
 
 		t->texturechain = NULL;
@@ -894,7 +894,7 @@ R_DrawWaterSurfaces
 void R_DrawWaterSurfaces(void) {
 	int			i;
 	mSurface_p s;
-	Texture_t* t;
+	Texture_p t;
 
 	if (r_wateralpha.value == 1.0 && gl_texsort.value)
 		return;
@@ -915,7 +915,7 @@ void R_DrawWaterSurfaces(void) {
 		if (!waterchain)
 			return;
 
-		for (s = waterchain; s; s=s->texturechain) {
+		for (s = waterchain; s; s = s->texturechain) {
 			GL_Bind(s->texinfo->texture->gl_texturenum);
 			EmitWaterPolys(s);
 		}
@@ -924,7 +924,7 @@ void R_DrawWaterSurfaces(void) {
 	}
 	else {
 
-		for (i=0; i<cl.worldmodel->numtextures; i++) {
+		for (i = 0; i < cl.worldmodel->numtextures; i++) {
 			t = cl.worldmodel->textures[i];
 			if (!t)
 				continue;
@@ -938,7 +938,7 @@ void R_DrawWaterSurfaces(void) {
 
 			GL_Bind(t->gl_texturenum);
 
-			for (; s; s=s->texturechain)
+			for (; s; s = s->texturechain)
 				EmitWaterPolys(s);
 
 			t->texturechain = NULL;
@@ -965,7 +965,7 @@ DrawTextureChains
 void DrawTextureChains(void) {
 	int		i;
 	mSurface_p s;
-	Texture_t* t;
+	Texture_p t;
 
 	if (!gl_texsort.value) {
 		GL_DisableMultitexture();
@@ -978,7 +978,7 @@ void DrawTextureChains(void) {
 		return;
 	}
 
-	for (i=0; i<cl.worldmodel->numtextures; i++) {
+	for (i = 0; i < cl.worldmodel->numtextures; i++) {
 		t = cl.worldmodel->textures[i];
 		if (!t)
 			continue;
@@ -994,7 +994,7 @@ void DrawTextureChains(void) {
 		else {
 			if ((s->flags & SURF_DRAWTURB) && r_wateralpha.value != 1.0)
 				continue;	// draw translucent water later
-			for (; s; s=s->texturechain)
+			for (; s; s = s->texturechain)
 				R_RenderBrushPoly(s);
 		}
 
@@ -1007,14 +1007,14 @@ void DrawTextureChains(void) {
 R_DrawBrushModel
 =================
 */
-void R_DrawBrushModel(Entity_t* e) {
+void R_DrawBrushModel(Entity_p e) {
 	int			j, k;
 	vec3_t		mins, maxs;
 	int			i, numsurfaces;
 	mSurface_p psurf;
 	float		dot;
 	mPlane_p pplane;
-	Model_t* clmodel;
+	Model_p clmodel;
 	bool	rotated;
 
 	currententity = e;
@@ -1024,7 +1024,7 @@ void R_DrawBrushModel(Entity_t* e) {
 
 	if (e->angles[0] || e->angles[1] || e->angles[2]) {
 		rotated = true;
-		for (i=0; i<3; i++) {
+		for (i = 0; i < 3; i++) {
 			mins[i] = e->origin[i] - clmodel->radius;
 			maxs[i] = e->origin[i] + clmodel->radius;
 		}
@@ -1058,12 +1058,12 @@ void R_DrawBrushModel(Entity_t* e) {
 	// calculate dynamic lighting for bmodel if it's not an
 	// instanced model
 	if (clmodel->firstmodelsurface != 0 && !gl_flashblend.value) {
-		for (k=0; k<MAX_DLIGHTS; k++) {
+		for (k = 0; k < MAX_DLIGHTS; k++) {
 			if ((cl_dlights[k].die < cl.time) ||
 				(!cl_dlights[k].radius))
 				continue;
 
-			R_MarkLights(&cl_dlights[k], 1<<k,
+			R_MarkLights(&cl_dlights[k], 1 << k,
 				clmodel->nodes + clmodel->hulls[0].firstclipnode);
 		}
 	}
@@ -1076,7 +1076,7 @@ void R_DrawBrushModel(Entity_t* e) {
 	//
 	// draw texture
 	//
-	for (i=0; i<clmodel->nummodelsurfaces; i++, psurf++) {
+	for (i = 0; i < clmodel->nummodelsurfaces; i++, psurf++) {
 		// find which side of the node we are on
 		pplane = psurf->plane;
 
@@ -1111,11 +1111,12 @@ R_RecursiveWorldNode
 ================
 */
 void R_RecursiveWorldNode(mNode_p node) {
-	int			i, c, side, * pindex;
+	int			i, c, side;
+	int* pindex;
 	vec3_t		acceptpt, rejectpt;
 	mPlane_p plane;
-	mSurface_p surf, * mark;
-	mLeaf_t* pleaf;
+	mSurface_p surf, * mark; // TODO: check
+	mLeaf_p pleaf;
 	double		d, dot;
 	vec3_t		mins, maxs;
 
@@ -1124,12 +1125,12 @@ void R_RecursiveWorldNode(mNode_p node) {
 
 	if (node->visframe != r_visframecount)
 		return;
-	if (R_CullBox(node->minmaxs, node->minmaxs+3))
+	if (R_CullBox(node->minmaxs, node->minmaxs + 3))
 		return;
 
 	// if a leaf node, draw stuff
 	if (node->contents < 0) {
-		pleaf = (mLeaf_t*)node;
+		pleaf = (mLeaf_p)node;
 
 		mark = pleaf->firstmarksurface;
 		c = pleaf->nummarksurfaces;
@@ -1182,7 +1183,7 @@ void R_RecursiveWorldNode(mNode_p node) {
 	if (c) {
 		surf = cl.worldmodel->surfaces + node->firstsurface;
 
-		if (dot < 0 -BACKFACE_EPSILON)
+		if (dot < 0 - BACKFACE_EPSILON)
 			side = SURF_PLANEBACK;
 		else if (dot > BACKFACE_EPSILON)
 			side = 0;
@@ -1282,14 +1283,14 @@ void R_MarkLeaves(void) {
 
 	if (r_novis.value) {
 		vis = solid;
-		memset(solid, 0xff, (cl.worldmodel->numleafs+7)>>3);
+		memset(solid, 0xff, (cl.worldmodel->numleafs + 7) >> 3);
 	}
 	else
 		vis = Mod_LeafPVS(r_viewleaf, cl.worldmodel);
 
-	for (i=0; i<cl.worldmodel->numleafs; i++) {
-		if (vis[i>>3] & (1<<(i&7))) {
-			node = (mNode_p)&cl.worldmodel->leafs[i+1];
+	for (i = 0; i < cl.worldmodel->numleafs; i++) {
+		if (vis[i >> 3] & (1 << (i & 7))) {
+			node = (mNode_p)&cl.worldmodel->leafs[i + 1];
 			do {
 				if (node->visframe == r_visframecount)
 					break;
@@ -1317,17 +1318,17 @@ int AllocBlock(int w, int h, int* x, int* y) {
 	int		bestx;
 	int		texnum;
 
-	for (texnum=0; texnum<MAX_LIGHTMAPS; texnum++) {
+	for (texnum = 0; texnum < MAX_LIGHTMAPS; texnum++) {
 		best = BLOCK_HEIGHT;
 
-		for (i=0; i<BLOCK_WIDTH-w; i++) {
+		for (i = 0; i < BLOCK_WIDTH - w; i++) {
 			best2 = 0;
 
-			for (j=0; j<w; j++) {
-				if (allocated[texnum][i+j] >= best)
+			for (j = 0; j < w; j++) {
+				if (allocated[texnum][i + j] >= best)
 					break;
-				if (allocated[texnum][i+j] > best2)
-					best2 = allocated[texnum][i+j];
+				if (allocated[texnum][i + j] > best2)
+					best2 = allocated[texnum][i + j];
 			}
 			if (j == w) {	// this is a valid spot
 				*x = i;
@@ -1338,7 +1339,7 @@ int AllocBlock(int w, int h, int* x, int* y) {
 		if (best + h > BLOCK_HEIGHT)
 			continue;
 
-		for (i=0; i<w; i++)
+		for (i = 0; i < w; i++)
 			allocated[texnum][*x + i] = best + h;
 
 		return texnum;
@@ -1348,8 +1349,8 @@ int AllocBlock(int w, int h, int* x, int* y) {
 }
 
 
-mVertex_t* r_pcurrentvertbase;
-Model_t* currentmodel;
+mVertex_p r_pcurrentvertbase;
+Model_p currentmodel;
 
 int	nColinElim;
 
@@ -1369,7 +1370,7 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
 	bool	visible;
 	float_p vec;
 	float		s, t;
-	glpoly_t* poly;
+	glpoly_p poly;
 
 	// reconstruct the polygon
 	pedges = currentmodel->edges;
@@ -1379,13 +1380,13 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
 	//
 	// draw texture
 	//
-	poly = Hunk_Alloc(sizeof(glpoly_t) + (lnumverts-4) * VERTEXSIZE*sizeof(float));
+	poly = Hunk_Alloc(sizeof(glpoly_t) + (lnumverts - 4) * VERTEXSIZE * sizeof(float));
 	poly->next = fa->polys;
 	poly->flags = fa->flags;
 	fa->polys = poly;
 	poly->numverts = lnumverts;
 
-	for (i=0; i<lnumverts; i++) {
+	for (i = 0; i < lnumverts; i++) {
 		lindex = currentmodel->surfedges[fa->firstedge + i];
 
 		if (lindex > 0) {
@@ -1411,15 +1412,15 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
 		//
 		s = DotProduct(vec, fa->texinfo->vecs[0]) + fa->texinfo->vecs[0][3];
 		s -= fa->texturemins[0];
-		s += fa->light_s*16;
+		s += fa->light_s * 16;
 		s += 8;
-		s /= BLOCK_WIDTH*16; //fa->texinfo->texture->width;
+		s /= BLOCK_WIDTH * 16; //fa->texinfo->texture->width;
 
 		t = DotProduct(vec, fa->texinfo->vecs[1]) + fa->texinfo->vecs[1][3];
 		t -= fa->texturemins[1];
-		t += fa->light_t*16;
+		t += fa->light_t * 16;
 		t += 8;
-		t /= BLOCK_HEIGHT*16; //fa->texinfo->texture->height;
+		t /= BLOCK_HEIGHT * 16; //fa->texinfo->texture->height;
 
 		poly->verts[i][5] = s;
 		poly->verts[i][6] = t;
@@ -1474,16 +1475,16 @@ void GL_CreateSurfaceLightmap(mSurface_p surf) {
 	int		smax, tmax, s, t, l, i;
 	byte* base;
 
-	if (surf->flags & (SURF_DRAWSKY|SURF_DRAWTURB))
+	if (surf->flags & (SURF_DRAWSKY | SURF_DRAWTURB))
 		return;
 
-	smax = (surf->extents[0]>>4)+1;
-	tmax = (surf->extents[1]>>4)+1;
+	smax = (surf->extents[0] >> 4) + 1;
+	tmax = (surf->extents[1] >> 4) + 1;
 
 	surf->lightmaptexturenum = AllocBlock(smax, tmax, &surf->light_s, &surf->light_t);
-	base = lightmaps + surf->lightmaptexturenum*lightmap_bytes*BLOCK_WIDTH*BLOCK_HEIGHT;
+	base = lightmaps + surf->lightmaptexturenum * lightmap_bytes * BLOCK_WIDTH * BLOCK_HEIGHT;
 	base += (surf->light_t * BLOCK_WIDTH + surf->light_s) * lightmap_bytes;
-	R_BuildLightMap(surf, base, BLOCK_WIDTH*lightmap_bytes);
+	R_BuildLightMap(surf, base, BLOCK_WIDTH * lightmap_bytes);
 }
 
 
@@ -1497,7 +1498,7 @@ with all the surfaces from all brush models
 */
 void GL_BuildLightmaps(void) {
 	int		i, j;
-	Model_t* m;
+	Model_p m;
 
 	memset(allocated, 0, sizeof(allocated));
 
@@ -1513,40 +1514,28 @@ void GL_BuildLightmaps(void) {
 	if (isPermedia)
 		gl_lightmap_format = GL_RGBA;
 
-	if (COM_CheckParm("-lm_1"))
-		gl_lightmap_format = GL_LUMINANCE;
-	if (COM_CheckParm("-lm_a"))
-		gl_lightmap_format = GL_ALPHA;
-	if (COM_CheckParm("-lm_i"))
-		gl_lightmap_format = GL_INTENSITY;
-	if (COM_CheckParm("-lm_2"))
-		gl_lightmap_format = GL_RGBA4;
-	if (COM_CheckParm("-lm_4"))
-		gl_lightmap_format = GL_RGBA;
+	if (COM_CheckParm("-lm_1"))		gl_lightmap_format = GL_LUMINANCE;
+	if (COM_CheckParm("-lm_a"))		gl_lightmap_format = GL_ALPHA;
+	if (COM_CheckParm("-lm_i"))		gl_lightmap_format = GL_INTENSITY;
+	if (COM_CheckParm("-lm_2"))		gl_lightmap_format = GL_RGBA4;
+	if (COM_CheckParm("-lm_4"))		gl_lightmap_format = GL_RGBA;
 
 	switch (gl_lightmap_format) {
-	case GL_RGBA:
-		lightmap_bytes = 4;
-		break;
-	case GL_RGBA4:
-		lightmap_bytes = 2;
-		break;
+	case GL_RGBA:		lightmap_bytes = 4;		break;
+	case GL_RGBA4:		lightmap_bytes = 2;		break;
 	case GL_LUMINANCE:
 	case GL_INTENSITY:
-	case GL_ALPHA:
-		lightmap_bytes = 1;
-		break;
+	case GL_ALPHA:		lightmap_bytes = 1;		break;
 	}
 
-	for (j=1; j<MAX_MODELS; j++) {
+	for (j = 1; j < MAX_MODELS; j++) {
 		m = cl.model_precache[j];
-		if (!m)
-			break;
+		if (!m)			break;
 		if (m->name[0] == '*')
 			continue;
 		r_pcurrentvertbase = m->vertexes;
 		currentmodel = m;
-		for (i=0; i<m->numsurfaces; i++) {
+		for (i = 0; i < m->numsurfaces; i++) {
 			GL_CreateSurfaceLightmap(m->surfaces + i);
 			if (m->surfaces[i].flags & SURF_DRAWTURB)
 				continue;
@@ -1564,9 +1553,11 @@ void GL_BuildLightmaps(void) {
 	//
 	// upload all lightmaps that were filled
 	//
-	for (i=0; i<MAX_LIGHTMAPS; i++) {
+    i = 0;
+	for (; i < MAX_LIGHTMAPS; i++) {
 		if (!allocated[i][0])
 			break;		// no more used
+
 		lightmap_modified[i] = false;
 		lightmap_rectchange[i].l = BLOCK_WIDTH;
 		lightmap_rectchange[i].t = BLOCK_HEIGHT;
@@ -1577,7 +1568,7 @@ void GL_BuildLightmaps(void) {
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, lightmap_bytes
 			, BLOCK_WIDTH, BLOCK_HEIGHT, 0,
-			gl_lightmap_format, GL_UNSIGNED_BYTE, lightmaps+i*BLOCK_WIDTH*BLOCK_HEIGHT*lightmap_bytes);
+			gl_lightmap_format, GL_UNSIGNED_BYTE, lightmaps + i * BLOCK_WIDTH * BLOCK_HEIGHT * lightmap_bytes);
 	}
 
 	if (!gl_texsort.value)

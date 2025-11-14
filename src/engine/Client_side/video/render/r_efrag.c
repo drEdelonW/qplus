@@ -90,7 +90,7 @@ void R_SplitEntityOnNode(mNode_p node) {
         if (!r_pefragtopnode)
             r_pefragtopnode = node;
 
-        mLeaf_p leaf = (mLeaf_t*)node;
+        mLeaf_p leaf = (mLeaf_p)node;
 
         // grab an efrag off the free list
         efrag_p ef = cl.free_efrags;

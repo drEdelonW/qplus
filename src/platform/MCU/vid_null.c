@@ -38,10 +38,10 @@ uint8_t surfcache[256 * 1024];
 uint16_t d_8to16table[256];
 uint32_t d_8to24table[256];
 
-void VID_SetPalette(uint8_t* palette) {}
-void VID_ShiftPalette(uint8_t* palette) {}
+void VID_SetPalette(uint8_p palette) {}
+void VID_ShiftPalette(uint8_p palette) {}
 
-void VID_Init(uint8_t* palette) {
+void VID_Init(uint8_p palette) {
     vid.maxwarpwidth = vid.width = vid.conwidth = BASEWIDTH;
     vid.maxwarpheight = vid.height = vid.conheight = BASEHEIGHT;
     vid.aspect = 1.0;
@@ -63,7 +63,7 @@ void VID_Update(vRect_p rects) {}
 D_BeginDirectRect
 ================
 */
-void D_BeginDirectRect(int x, int y, uint8_t* pbitmap, int width, int height) {}
+void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {}
 
 
 /*

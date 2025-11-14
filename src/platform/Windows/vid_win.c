@@ -145,7 +145,7 @@ typedef struct {
 
 static vmode_t	modelist[MAX_MODE_LIST];
 static int		nummodes;
-// static vmode_t* pcurrentmode;
+// static vmode_p pcurrentmode;
 
 int		aPage;					// Current active display page
 int		vPage;					// Current visible display page
@@ -936,7 +936,7 @@ int VID_NumModes(void) {
 VID_GetModePtr
 =================
 */
-vmode_t* VID_GetModePtr(int modenum) {
+vmode_p VID_GetModePtr(int modenum) {
 
     if ((modenum >= 0) &&
         (modenum < nummodes))
@@ -979,7 +979,7 @@ VID_GetModeDescriptionMemCheck
 */
 cString VID_GetModeDescriptionMemCheck(int mode) {
     cString pinfo;
-    vmode_t* pv;
+    vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
         return NULL;
@@ -1005,7 +1005,7 @@ VID_GetModeDescription
 */
 cString VID_GetModeDescription(int mode) {
     cString pinfo;
-    vmode_t* pv;
+    vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
         return NULL;
@@ -1027,7 +1027,7 @@ Tacks on "windowed" or "fullscreen"
 */
 cString VID_GetModeDescription2(int mode) {
     static char	pinfo[40];
-    vmode_t* pv;
+    vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
         return NULL;
@@ -1048,7 +1048,7 @@ cString VID_GetModeDescription2(int mode) {
 
 cString VID_GetExtModeDescription(int mode) {
     static char	pinfo[40];
-    vmode_t* pv;
+    vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
         return NULL;
@@ -1757,7 +1757,7 @@ void VID_DescribeModes_f(void) {
     bool na = false;
     int lnummodes = VID_NumModes();
     for (int i = 0; i < lnummodes; i++) {
-        vmode_t* pv = VID_GetModePtr(i);
+        vmode_p pv = VID_GetModePtr(i);
         cString pinfo = VID_GetExtModeDescription(i);
 
         if (VID_CheckAdequateMem(pv->width, pv->height)) {
@@ -1992,7 +1992,7 @@ void	VID_Shutdown(void) {
 FlipScreen
 ================
 */
-void FlipScreen(vRect_t* rects) {
+void FlipScreen(vRect_p rects) {
     // Flip the surfaces
 
     if (DDActive) {
@@ -2733,7 +2733,7 @@ void VID_MenuDraw(void) {
     cString ptr;
     int			lnummodes, i, j, k, column, row, dup, dupmode;
     char		temp[100];
-    vmode_t* pv;
+    vmode_p pv;
     modedesc_t	tmodedesc;
 
     p = Draw_CachePic("gfx/vidmodes.lmp");

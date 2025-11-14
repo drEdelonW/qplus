@@ -82,14 +82,14 @@ extern "C" {
 #   define EDICT_TO_PROG(e)     ((int32_t)((uint8_p)(e) - PROG_EDICT_BASE))
 
 #   define G_FLOAT(o)       (pr_globals[(o)])
-#   define G_INT(o)         (*(int32_t*)&pr_globals[(o)])
+#   define G_INT(o)         (*(int32_p)&pr_globals[(o)])
 #   define G_VECTOR(o)      (&pr_globals[(o)])
 #   define G_FUNCTION(o)    (*(func_t*)&pr_globals[(o)])
 #   define G_EDICT(o)       PROG_TO_EDICT((uint32_t)G_INT((o)))
 #   define G_EDICTNUM(o)    NUM_FOR_EDICT(G_EDICT((o)))
 
 #   define E_FLOAT(e,o)     (((float_p)&(e)->v)[(o)])
-#   define E_INT(e,o)       (*(int32_t*)&((float_p)&(e)->v)[(o)])
+#   define E_INT(e,o)       (*(int32_p)&((float_p)&(e)->v)[(o)])
 #   define E_VECTOR(e,o)    (&((float_p)&(e)->v)[(o)])
 #   define G_STRING(o)      PR_GetStringSafe(*(string_t*)&pr_globals[(o)])
 #   define E_STRING(e,o)    PR_GetStringSafe(*(string_t*)&((float_p)&(e)->v)[(o)])

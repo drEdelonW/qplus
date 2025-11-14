@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vid_dos.h"
 
 int			vid_modenum;
-vmode_t* pcurrentmode = NULL;
+vmode_p pcurrentmode = NULL;
 int			vid_testingmode, vid_realmode;
 double		vid_testendtime;
 
@@ -57,7 +57,7 @@ CVAR_ARC(vid_window_y, "0");
 int	d_con_indirect = 0;
 
 int		numvidmodes;
-vmode_t* pvidmodes;
+vmode_p pvidmodes;
 
 static int	firstupdate = 1;
 
@@ -131,8 +131,8 @@ void    VID_Init(uint8_p palette) {
 VID_GetModePtr
 =================
 */
-vmode_t* VID_GetModePtr(int modenum) {
-	vmode_t* pv;
+vmode_p VID_GetModePtr(int modenum) {
+	vmode_p pv;
 
 	pv = pvidmodes;
 	if (!pv)
@@ -164,7 +164,7 @@ VID_ModeInfo
 */
 cString VID_ModeInfo(int modenum, cStringArray ppheader) {
 	static cString badmodestr = "Bad mode number";
-	vmode_t* pv;
+	vmode_p pv;
 
 	pv = VID_GetModePtr(modenum);
 
@@ -188,7 +188,7 @@ VID_SetMode
 */
 int VID_SetMode(int modenum, uint8_p palette) {
 	int		stat;
-	vmode_t* pnewmode, * poldmode;
+	vmode_p pnewmode,  poldmode;
 
 	if ((modenum >= numvidmodes) || (modenum < 0)) {
 		Cvar_SetValue("vid_mode", (float)vid_modenum);
@@ -382,7 +382,7 @@ VID_DescribeModes_f
 void VID_DescribeModes_f() {
 	int			i, nummodes;
 	cString pinfo, pheader;
-	vmode_t* pv;
+	vmode_p pv;
 	bool	na;
 
 	na = false;
@@ -417,7 +417,7 @@ VID_GetModeDescription
 */
 cString VID_GetModeDescription(int mode) {
 	cString pinfo, pheader;
-	vmode_t* pv;
+	vmode_p pv;
 
 	pv = VID_GetModePtr(mode);
 	pinfo = VID_ModeInfo(mode, &pheader);

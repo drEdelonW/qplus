@@ -280,7 +280,7 @@ int PR_EnterFunction(dFunction_p func) {
     int param_ofs = func->parm_start;
     for (int i = 0; i < func->numparms; i++) {
         for (int j = 0; j < func->parm_size[i]; j++) {
-            ((int32_t*)pr_globals)[param_ofs] = ((int32_t*)pr_globals)[OFS_PARM0 + i * 3 + j];
+            ((int32_p)pr_globals)[param_ofs] = ((int32_p)pr_globals)[OFS_PARM0 + i * 3 + j];
             param_ofs++;
         }
     }

@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes;
 uint8_p VGA_pagebase;
-vmode_t* VGA_pcurmode;
+vmode_p VGA_pcurmode;
 
 static int		VGA_planar;
 static int		VGA_numpages;
@@ -301,8 +301,8 @@ bool VGA_CheckAdequateMem(int width, int height, int rowbytes,
 VGA_InitMode
 ================
 */
-int VGA_InitMode(VidDef_p lvid, vmode_t* pcurrentmode) {
-	vextra_t* pextra;
+int VGA_InitMode(VidDef_p lvid, vmode_p pcurrentmode) {
+	vextra_p pextra;
 
 	pextra = pcurrentmode->pextradata;
 
@@ -367,7 +367,7 @@ int VGA_InitMode(VidDef_p lvid, vmode_t* pcurrentmode) {
 VGA_SetPalette
 ================
 */
-void VGA_SetPalette(VidDef_p lvid, vmode_t* pcurrentmode, uint8_p pal) {
+void VGA_SetPalette(VidDef_p lvid, vmode_p pcurrentmode, uint8_p pal) {
 	int shiftcomponents = 2;
 	int i;
 
@@ -385,7 +385,7 @@ void VGA_SetPalette(VidDef_p lvid, vmode_t* pcurrentmode, uint8_p pal) {
 VGA_SwapBuffersCopy
 ================
 */
-void VGA_SwapBuffersCopy(VidDef_p lvid, vmode_t* pcurrentmode,
+void VGA_SwapBuffersCopy(VidDef_p lvid, vmode_p pcurrentmode,
 	vRect_p rects) {
 
 	UNUSED(pcurrentmode);
@@ -420,7 +420,7 @@ void VGA_SwapBuffersCopy(VidDef_p lvid, vmode_t* pcurrentmode,
 VGA_SwapBuffers
 ================
 */
-void VGA_SwapBuffers(VidDef_p lvid, vmode_t* pcurrentmode, vRect_p rects) {
+void VGA_SwapBuffers(VidDef_p lvid, vmode_p pcurrentmode, vRect_p rects) {
 	UNUSED(lvid);
 
 	if (vid_wait.value == VID_WAIT_VSYNC)

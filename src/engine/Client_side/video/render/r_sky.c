@@ -90,7 +90,7 @@ void R_MakeSky() {
 	int			x, y;
 	int			ofs, baseofs;
 	int			xshift, yshift;
-	uint32_t* pnewsky;
+	uint32_p pnewsky;
 	static int	xlast = -1, ylast = -1;
 
 	xshift = skytime * skyspeed;
@@ -102,7 +102,7 @@ void R_MakeSky() {
 	xlast = xshift;
 	ylast = yshift;
 
-	pnewsky = (uint32_t*)&newsky[0];
+	pnewsky = (uint32_p)&newsky[0];
 
 	for (y = 0; y < SKYSIZE; y++) {
 		baseofs = ((y + yshift) & SKYMASK) * 131;

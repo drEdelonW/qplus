@@ -236,7 +236,7 @@ Model_p Mod_LoadModel(Model_p mod, bool crash) {
     // load the file
     //
     uint8_t stackbuf[1024];  // avoid dirtying the cache heap
-    uint32_p buf = (uint32_t*)COM_LoadStackFile(mod->name, stackbuf, sizeof(stackbuf));
+    uint32_p buf = (uint32_p)COM_LoadStackFile(mod->name, stackbuf, sizeof(stackbuf));
     if (!buf) {
         if (crash)      Sys_Error("Mod_NumForName: %s not found", mod->name);
 
@@ -257,7 +257,7 @@ Model_p Mod_LoadModel(Model_p mod, bool crash) {
     // call the apropriate loader
     mod->needload = NL_PRESENT;
 
-    switch (LittleLong(*(uint32_t*)buf)) {
+    switch (LittleLong(*(uint32_p)buf)) {
     case IDPOLYHEADER:      Mod_LoadAliasModel(mod, buf);   break;
     case IDSPRITEHEADER:    Mod_LoadSpriteModel(mod, buf);  break;
     default:                Mod_LoadBrushModel(mod, buf);   break;
@@ -1361,7 +1361,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 Mod_LoadSpriteFrame
 =================
 */
-TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_t** ppframe) {
+TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
     dSpriteFrame_p pinframe = (dSpriteFrame_p)pin;
 
     int width = LittleLong(pinframe->width);
@@ -1404,7 +1404,7 @@ TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_t** ppframe) {
 Mod_LoadSpriteGroup
 =================
 */
-TypeLess_ptr  Mod_LoadSpriteGroup(TypeLess_ptr  pin, mSpriteFrame_t** ppframe) {
+TypeLess_ptr  Mod_LoadSpriteGroup(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
     dSpriteGroup_p pingroup = (dSpriteGroup_p)pin;
     int numframes = LittleLong(pingroup->numframes);
 
@@ -1413,7 +1413,7 @@ TypeLess_ptr  Mod_LoadSpriteGroup(TypeLess_ptr  pin, mSpriteFrame_t** ppframe) {
         _loadName);
 
     pspritegroup->numframes = numframes;
-    *ppframe = (mSpriteFrame_t*)pspritegroup;
+    *ppframe = (mSpriteFrame_p)pspritegroup;
 
     dSpriteInterval_p pin_intervals = (dSpriteInterval_p)(pingroup + 1);
 

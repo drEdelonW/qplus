@@ -127,7 +127,7 @@ SPRITE MODELS
 R_GetSpriteFrame
 ================
 */
-mSpriteFrame_t* R_GetSpriteFrame(Entity_p currententity) {
+mSpriteFrame_p R_GetSpriteFrame(Entity_p currententity) {
     mSpriteFrame_p pspriteframe;
     float_p pintervals, fullinterval, targettime, time;
 
@@ -175,10 +175,10 @@ R_DrawSpriteModel
 */
 void R_DrawSpriteModel(Entity_p e) {
     vec3_t point;
-    mSpriteFrame_t* frame;
+    mSpriteFrame_p frame;
     float_p up, right;
     vec3_t  v_forward, v_right, v_up;
-    mSprite_t* psprite;
+    mSprite_p psprite;
 
     // don't even bother culling, because it's just a single
     // polygon without a surface cache
@@ -262,12 +262,12 @@ int lastposenum;
 GL_DrawAliasFrame
 =============
 */
-void GL_DrawAliasFrame(AliasHdr_t* paliashdr, int posenum) {
+void GL_DrawAliasFrame(AliasHdr_p paliashdr, int posenum) {
     float s, t;
     float  l;
     int  i, j;
     int  index;
-    TriVertx_t* v, * verts;
+    TriVertx_p v, verts;
     int  list;
     int* order;
     vec3_t point;
@@ -276,7 +276,7 @@ void GL_DrawAliasFrame(AliasHdr_t* paliashdr, int posenum) {
 
     lastposenum = posenum;
 
-    verts = (TriVertx_t*)((byte*)paliashdr + paliashdr->posedata);
+    verts = (TriVertx_p)((byte*)paliashdr + paliashdr->posedata);
     verts += posenum * paliashdr->poseverts;
     order = (int*)((byte*)paliashdr + paliashdr->commands);
 
@@ -315,11 +315,11 @@ GL_DrawAliasShadow
 =============
 */
 
-void GL_DrawAliasShadow(AliasHdr_t* paliashdr, int posenum) {
+void GL_DrawAliasShadow(AliasHdr_p paliashdr, int posenum) {
     float s, t, l;
     int  i, j;
     int  index;
-    TriVertx_t* v, * verts;
+    TriVertx_p v, verts;
     int  list;
     int* order;
     vec3_t point;
@@ -330,7 +330,7 @@ void GL_DrawAliasShadow(AliasHdr_t* paliashdr, int posenum) {
     lheight = currententity->origin[2] - lightspot[2];
 
     height = 0;
-    verts = (TriVertx_t*)((byte*)paliashdr + paliashdr->posedata);
+    verts = (TriVertx_p)((byte*)paliashdr + paliashdr->posedata);
     verts += posenum * paliashdr->poseverts;
     order = (int*)((byte*)paliashdr + paliashdr->commands);
 
@@ -379,7 +379,7 @@ R_SetupAliasFrame
 
 =================
 */
-void R_SetupAliasFrame(int frame, AliasHdr_t* paliashdr) {
+void R_SetupAliasFrame(int frame, AliasHdr_p paliashdr) {
     int    pose, numposes;
     float   interval;
 
@@ -412,10 +412,10 @@ void R_DrawAliasModel(Entity_p e) {
     int   lnum;
     vec3_t  dist;
     float  add;
-    Model_t* clmodel;
+    Model_p clmodel;
     vec3_t  mins, maxs;
-    AliasHdr_t* paliashdr;
-    TriVertx_t* verts, * v;
+    AliasHdr_p paliashdr;
+    TriVertx_p verts, v;
     int   index;
     float  s, t, an;
     int   anim;
@@ -486,7 +486,7 @@ void R_DrawAliasModel(Entity_p e) {
     //
     // locate the proper data
     //
-    paliashdr = (AliasHdr_t*)Mod_Extradata(currententity->model);
+    paliashdr = (AliasHdr_p)Mod_Extradata(currententity->model);
 
     c_alias_polys += paliashdr->numtris;
 

@@ -85,22 +85,22 @@ static inline void dcache_clean_range(TypeLess_ptr addr, size_t size) {
     uintptr_t a = ((uintptr_t)addr) & ~31u;               // 32B line align
     size += ((uintptr_t)addr - a);
     size = (size + 31u) & ~31u;
-    SCB_CleanDCache_by_Addr((uint32_t*)a, (int32_t)size);
+    SCB_CleanDCache_by_Addr((uint32_p)a, (int32_t)size);
 }
 
-void draw_gradient(uint16_t* fb) {
+void draw_gradient(uint16_p fb) {
     for (uint32_t y = 0; y < SCREEN_H; ++y) {
         uint8_t t =
             (uint8_t)((y * 255u) /
                 (SCREEN_H - 1u));
         uint16_t c = rgb565(0, t, 255);
-        uint16_t* row = fb + y * SCREEN_W;
+        uint16_p row = fb + y * SCREEN_W;
         for (uint32_t x = 0; x < SCREEN_W; ++x)
             row[x] = c;
     }
 }
 
-void fill_rect(uint16_t* fb, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t c) {
+void fill_rect(uint16_p fb, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t c) {
     if ((x >= SCREEN_W) ||
         (y >= SCREEN_H))
         return;
@@ -109,7 +109,7 @@ void fill_rect(uint16_t* fb, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uin
     if (y + h > SCREEN_H)
         h = SCREEN_H - y;
     for (uint32_t j = 0; j < h; ++j) {
-        uint16_t* row = fb + (y + j) * SCREEN_W + x;
+        uint16_p row = fb + (y + j) * SCREEN_W + x;
         for (uint32_t i = 0; i < w; ++i)
             row[i] = c;
     }
@@ -192,7 +192,7 @@ void Error_Handler() {
   * @param  line: assert_param error line source number
   * @retval None
   */
-void assert_failed(uint8_t* file, uint32_t line) {
+void assert_failed(uint8_p file, uint32_t line) {
     /* User can add his own implementation to report the file name and line number,
        ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
 }

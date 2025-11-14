@@ -286,12 +286,12 @@ VID_InitExtra
 void VID_InitExtra() {
     int				nummodes;
     int16_p pmodenums;
-    VbeInfoBlock_t* pinfoblock;
+    VbeInfoBlock_p pinfoblock;
     __dpmi_meminfo	phys_mem_info;
 
     pinfoblock = dos_getmemory(sizeof(VbeInfoBlock_t));
 
-    *(int32_t*)pinfoblock->VbeSignature = 'V' + ('B' << 8) + ('E' << 16) + ('2' << 24);
+    *(int32_p)pinfoblock->VbeSignature = 'V' + ('B' << 8) + ('E' << 16) + ('2' << 24);
 
     // see if VESA support is available
     regs.x.ax = 0x4f00;
@@ -508,7 +508,7 @@ bool VID_ExtraGetModeInfo(int modenum) {
         modeinfo.blue_width = *(int8_p)(infobuf + 35);
         modeinfo.blue_pos = *(int8_p)(infobuf + 36);
 
-        modeinfo.pptr = *(int32_t*)(infobuf + 40);
+        modeinfo.pptr = *(int32_p)(infobuf + 40);
 
 #if 0
         printf("VID: (VESA) info for mode 0x%x\n", modeinfo.modenum);
@@ -550,7 +550,7 @@ VID_ExtraInitMode
 ================
 */
 int VID_ExtraInitMode(VidDef_p lvid, vmode_p pcurrentmode) {
-    vesa_extra_t* pextra;
+    vesa_extra_p pextra;
     int				pageoffset;
 
     pextra = pcurrentmode->pextradata;

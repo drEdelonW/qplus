@@ -51,7 +51,7 @@ int p_mouse_y;
 bool	mouse_grabbed = false; // we grab it when console is up
 
 int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
-uint8_t* VGA_pagebase;
+uint8_p VGA_pagebase;
 
 // The following X property format is defined in Motif 1.1's
 // Xm/MwmUtils.h, but QUAKE should not depend on that header
@@ -193,7 +193,7 @@ PIXEL24 xlib_rgb24(int r, int g, int b) {
 
 void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
     int xi, yi;
-    uint8_t* src;
+    uint8_p src;
     PIXEL16* dest;
     register int count, n;
 
@@ -229,7 +229,7 @@ void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
 
 void st3_fixup(XImage* framebuf, int x, int y, int width, int height) {
     int xi, yi;
-    uint8_t* src;
+    uint8_p src;
     PIXEL24* dest;
     register int count, n;
 
@@ -370,7 +370,7 @@ void ResetFrameBuffer(void) {
 
     //	d_pzbuffer = (uint16_t *) Z_Malloc(vid.width*vid.height*
     //		sizeof(*d_pzbuffer));
-    d_pzbuffer = (int16_t*)Hunk_HighAllocName(vid.width * vid.height *
+    d_pzbuffer = (int16_p)Hunk_HighAllocName(vid.width * vid.height *
         sizeof(*d_pzbuffer), "zbuff");
 
     x_framebuffer[0] = XCreateImage(x_disp,
@@ -481,7 +481,7 @@ void VID_SetWindowTitle(Window win, cString pszName) {
     XWMHints* wmHints;
 
     // Setup ICCCM properties
-    textprop.value = (uint8_t*)pszName;
+    textprop.value = (uint8_p)pszName;
     textprop.encoding = XA_STRING;
     textprop.format = 8;
     textprop.nitems = strlen(pszName);
@@ -513,7 +513,7 @@ bool VID_FullScreen(Window win) {
 
     hints.flags = MWM_HINTS_DECORATIONS;
     hints.decorations = 0; // Absolutely no decorations.
-    XChangeProperty(x_disp, win, aHints, aHints, 32, PropModeReplace, (uint8_t*)&hints, 4);
+    XChangeProperty(x_disp, win, aHints, aHints, 32, PropModeReplace, (uint8_p)&hints, 4);
 
     changes.x = 0;
     changes.y = 0;
@@ -524,7 +524,7 @@ bool VID_FullScreen(Window win) {
     return(true);
 }
 
-void	VID_Init(uint8_t* palette) {
+void	VID_Init(uint8_p palette) {
 
     int pnum, i;
     XVisualInfo template;
@@ -748,11 +748,11 @@ void	VID_Init(uint8_t* palette) {
 
 }
 
-void VID_ShiftPalette(uint8_t* p) {
+void VID_ShiftPalette(uint8_p p) {
     VID_SetPalette(p);
 }
 
-void VID_SetPalette(uint8_t* palette) {
+void VID_SetPalette(uint8_p palette) {
 
     int i;
     XColor colors[256];

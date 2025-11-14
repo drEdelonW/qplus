@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct
 {
-	Plane_t* plane;
+	Plane_p plane;
 	vec3_t	origin;
 	vec3_t	normal;
 	vec3_t	up;
@@ -42,7 +42,7 @@ void Test_Init(void) {
 
 
 Plane_t	junk;
-Plane_t* HitPlane(vec3_t start, vec3_t end) {
+Plane_p HitPlane(vec3_t start, vec3_t end) {
 	trace_t		trace;
 
 	// fill in a default trace
@@ -59,11 +59,11 @@ Plane_t* HitPlane(vec3_t start, vec3_t end) {
 
 void Test_Spawn(vec3_t origin) {
 	int		i;
-	puff_t* p;
+	puff_p p;
 	vec3_t	temp;
 	vec3_t	normal;
 	vec3_t	incoming;
-	Plane_t* plane;
+	Plane_p plane;
 	float	d;
 
 	for (i=0, p=puffs; i<MAX_PUFFS; i++, p++) {
@@ -92,7 +92,7 @@ void Test_Spawn(vec3_t origin) {
 	p->length = 8;
 }
 
-void DrawPuff(puff_t* p) {
+void DrawPuff(puff_p p) {
 	vec3_t	pts[2][3];
 	int		i, j;
 	float	s, d;
@@ -157,7 +157,7 @@ void DrawPuff(puff_t* p) {
 
 void Test_Draw(void) {
 	int		i;
-	puff_t* p;
+	puff_p p;
 
 	for (i=0, p=puffs; i<MAX_PUFFS; i++, p++) {
 		if (p->length > 0)

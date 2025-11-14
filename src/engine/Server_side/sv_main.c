@@ -329,7 +329,7 @@ void SV_AddToFatPVS(vec3_t org, mNode_p node) {
         // if this is a leaf, accumulate the pvs bits
         if (node->contents < 0) {
             if (node->contents != CONTENTS_SOLID) {
-                uint8_p pvs = Mod_LeafPVS((mLeaf_t*)node, sv.worldmodel);
+                uint8_p pvs = Mod_LeafPVS((mLeaf_p)node, sv.worldmodel);
                 for (int i = 0; i < _fatBytes; i++) {
                     _fatPvs[i] |= pvs[i];
                 }
@@ -565,7 +565,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     SV_SendClientDatagram
     =======================
 */
-bool SV_SendClientDatagram(RmtClient_t* client) {
+bool SV_SendClientDatagram(RmtClient_p client) {
     uint8_t    buf[MAX_DATAGRAM];
     sizebuf_t   msg = {
         .data = buf,

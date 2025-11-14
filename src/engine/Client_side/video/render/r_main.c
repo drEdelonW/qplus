@@ -790,7 +790,7 @@ void R_EdgeDrawing() {
 
 #if 0
     if (r_surfsonstack) {
-        surfaces = (Surf_t*)
+        surfaces = (Surf_p)
             (((uintptr_t)&lsurfs[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
         surf_max = &surfaces[r_cnumsurfs];
         // surface 0 doesn't really exist; it's just a dummy because index 0

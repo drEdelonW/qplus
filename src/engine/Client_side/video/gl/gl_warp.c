@@ -55,7 +55,7 @@ void SubdividePolygon(int numverts, float_p verts) {
     int  f, b;
     float dist[64];
     float frac;
-    glpoly_t* poly;
+    glpoly_p poly;
     float s, t;
 
     if (numverts > 60)
@@ -137,7 +137,7 @@ void GL_SubdivideSurface(mSurface_p fa) {
     int   i;
     int   lindex;
     float_p vec;
-    Texture_t* t;
+    Texture_p t;
 
     warpface = fa;
 
@@ -178,7 +178,7 @@ Does a water warp on the pre-fragmented glpoly_t chain
 =============
 */
 void EmitWaterPolys(mSurface_p fa) {
-    glpoly_t* p;
+    glpoly_p p;
     float_p v;
     int   i;
     float  s, t, os, ot;
@@ -212,7 +212,7 @@ EmitSkyPolys
 =============
 */
 void EmitSkyPolys(mSurface_p fa) {
-    glpoly_t* p;
+    glpoly_p p;
     float_p v;
     int   i;
     float s, t;
@@ -352,7 +352,7 @@ LoadPCX
 ============
 */
 void LoadPCX(FILE* f) {
-    pcx_t* pcx, pcxbuf;
+    pcx_p pcx, pcxbuf;
     byte palette[768];
     byte* pix;
     int  x, y;
@@ -831,7 +831,7 @@ void R_DrawSkyChain(mSurface_p s) {
 
     int  i;
     vec3_t verts[MAX_CLIP_VERTS];
-    glpoly_t* p;
+    glpoly_p p;
 
     c_sky = 0;
     GL_Bind(solidskytexture);
@@ -955,7 +955,7 @@ R_InitSky
 A sky texture is 256*128, with the right side being a masked overlay
 ==============
 */
-void R_InitSky(Texture_t* mt) {
+void R_InitSky(Texture_p mt) {
     int   i, j, p;
     byte* src;
     uint32_t trans[128 * 128];
