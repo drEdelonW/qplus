@@ -71,7 +71,7 @@ typedef struct {
 #define	NUM_PING_TIMES		16
 #define	NUM_SPAWN_PARMS		16
 
-typedef struct {
+struct RmtClient_s {
     bool        active;     // false = client is free
     bool        spawned;    // false = don't send datagrams
     bool        dropasap;   // has been told to go to another level
@@ -90,7 +90,8 @@ typedef struct {
     int32_t     num_pings;  // ping_times[num_pings%NUM_PING_TIMES]
     float       spawn_parms[NUM_SPAWN_PARMS]; // spawn parms are carried from level to level
     int16_t     old_frags;  // client known data for deltas
-} RmtClient_t;
+};
+typedef struct RmtClient_s RmtClient_t;
 typedef RmtClient_t* RmtClient_p;
 
 

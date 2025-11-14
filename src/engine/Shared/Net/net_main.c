@@ -462,33 +462,33 @@ struct {
 } vcrGetMessage;
 
 
-NetGetMessageResult NET_GetMessage(qsocket_p sock) {
+int32_t  NET_GetMessage(qsocket_p sock) {
     if (!sock)
-        return NETMSG_CONNECTION_DIED;
+        return -1;
 
     if (sock->disconnected) {
         Con_Printf("NET_GetMessage: disconnected socket\n");
-        return NETMSG_CONNECTION_DIED;
+        return -1;
     }
 
     SetNetTime();
 
-    NetGetMessageResult ret = sfunc.QGetMessage(sock);
+    int32_t ret = sfunc.QGetMessage(sock);
 
     // see if this connection has timed out
-    if ((ret == NETMSG_NO_DATA) && (sock->driver)) {
+    if ((ret == 0) && (sock->driver)) {
         if (net_time - sock->lastMessageTime > net_messagetimeout.value) {
             NET_Close(sock);
-            return NETMSG_CONNECTION_DIED;
+            return -1;
         }
     }
 
 
-    if (ret > NETMSG_NO_DATA) {
+    if (ret > 0) {
         if (sock->driver) {
             sock->lastMessageTime = net_time;
-            if (ret == NETMSG_RELIABLE_MESSAGE)         messagesReceived++;
-            else if (ret == NETMSG_UNRELIABLE_MESSAGE)  unreliableMessagesReceived++;
+            if (ret == 1)       messagesReceived++;
+            else if (ret == 2)  unreliableMessagesReceived++;
         }
 
         if (recording) {
@@ -839,7 +839,7 @@ void SchedulePollProcedure(PollProcedure* proc, double timeOffset) {
 #ifdef IDGODS
 #define IDNET  0xc0f62800
 
-bool IsID(qsockaddr_p addr) {
+bool IsID(struct qsockaddr* addr) {
     if ((idgods.value == 0.0) ||
         (addr->sa_family != 2))
         return false;

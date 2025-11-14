@@ -47,16 +47,28 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #       include <arpa/inet.h>
 #   else
 #       include "types.h"
-// #       define AF_INET     2  /* internet */
 
-typedef in_addr_t* in_addr_p;
-
-
-cString inet_ntoa(in_addr_t in);
+#       define AF_INET     2  /* internet */
+struct in_addr {
+    union {
+        struct { uint8_t s_b1, s_b2, s_b3, s_b4; } S_un_b;
+        struct { uint16_t s_w1, s_w2; } S_un_w;
+        uint32_t S_addr;
+    } S_un;
+};
+#       define  s_addr  S_un.S_addr  /* can be used for most tcp & ip code */
+struct sockaddr_in {
+    int16_t sin_family;
+    uint16_t sin_port;
+    struct in_addr  sin_addr;
+    char      sin_zero[8];
+};
+cString inet_ntoa(struct in_addr in);
 uint32_t inet_addr(const cString cp);
 #   endif
 #endif  // BAN_TEST
-
+typedef struct in_addr in_addr_t;
+typedef in_addr_t* in_addr_p;
 
 #include "net_dgrm.h"
 
@@ -119,7 +131,7 @@ void NET_Ban_f() {
 
     switch (Cmd_Argc()) {
     case 1:
-        if (((in_addr_ty*)&banAddr)->s_addr) {
+        if (((in_addr_p)&banAddr)->s_addr) {
             Q_strcpy(addrStr, inet_ntoa(*(in_addr_p)&banAddr));
             Q_strcpy(maskStr, inet_ntoa(*(in_addr_p)&banMask));
             print("Banning %s [%s]\n", addrStr, maskStr);
@@ -283,8 +295,8 @@ int Datagram_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
 }
 
 
-NetGetMessageResult Datagram_GetMessage(qsocket_p sock) {
-    NetGetMessageResult ret = NETMSG_NO_DATA;
+int  Datagram_GetMessage(qsocket_p sock) {
+    int  ret = 0;
 
     if (!sock->canSend)
         if ((net_time - sock->lastSendTime) > 1.0)
@@ -297,12 +309,12 @@ NetGetMessageResult Datagram_GetMessage(qsocket_p sock) {
         //  if ((rand() & 255) > 220)
         //    continue;
 
-        if (length == -1)
+        if (length == 0)
             break;
 
-        if (length == NETMSG_CONNECTION_DIED) {
+        if (length == -1) {
             Con_Printf("Read error\n");
-            return NETMSG_CONNECTION_DIED;
+            return -1;
         }
 
         if (sfunc.AddrCompare(&readaddr, &sock->addr) != 0) {
@@ -332,7 +344,7 @@ NetGetMessageResult Datagram_GetMessage(qsocket_p sock) {
         if (flags & NETFLAG_UNRELIABLE) {
             if (sequence < sock->unreliableReceiveSequence) {
                 Con_DPrintf("Got a stale datagram\n");
-                ret = NETMSG_NO_DATA;
+                ret = 0;
                 break;
             }
             if (sequence != sock->unreliableReceiveSequence) {
@@ -347,7 +359,7 @@ NetGetMessageResult Datagram_GetMessage(qsocket_p sock) {
             SZ_Clear(&net_message);
             SZ_Write(&net_message, packetBuffer.data, length);
 
-            ret = NETMSG_UNRELIABLE_MESSAGE;
+            ret = 2;
             break;
         }
 
@@ -396,7 +408,7 @@ NetGetMessageResult Datagram_GetMessage(qsocket_p sock) {
                 SZ_Write(&net_message, packetBuffer.data, length);
                 sock->receiveMessageLength = 0;
 
-                ret = NETMSG_RELIABLE_MESSAGE;
+                ret = 1;
                 break;
             }
 
@@ -881,7 +893,7 @@ static qsocket_p _Datagram_CheckNewConnections() {
     // check for a ban
     if (clientaddr.sa_family == AF_INET) {
         uint32_t testAddr;
-        testAddr = ((sockaddr_in_p)&clientaddr)->sin_addr.s_addr;
+        testAddr = ((struct sockaddr_in*)&clientaddr)->sin_addr.s_addr;
         if ((testAddr & banMask) == banAddr) {
             SZ_Clear(&net_message);
             // save space for the header, filled in later

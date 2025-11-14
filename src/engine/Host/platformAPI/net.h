@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // net.h -- quake's interface to the networking layer
-#include <netinet/in.h>
 #include "types.h"
 #include "sizebuf.h"
 
@@ -129,32 +128,6 @@ typedef enum {
     CCREP_RULE_INFO     = 0x85u
 } ccreq_t;
 
-typedef enum {
-    NETMSG_CONNECTION_DIED     = -1, // connection dropped
-    NETMSG_NO_DATA             =  0, // no data waiting
-    NETMSG_RELIABLE_MESSAGE    =  1, // reliable message received
-    NETMSG_UNRELIABLE_MESSAGE  =  2  // unreliable message received
-} NetGetMessageResult;
-
-typedef struct {
-    union {
-        struct { uint8_t s_b1, s_b2, s_b3, s_b4; } S_un_b;
-        struct { uint16_t s_w1, s_w2; } S_un_w;
-        uint32_t S_addr;
-    } S_un;
-} in_addr_ty;
-#       define  s_addr  S_un.S_addr  /* can be used for most tcp & ip code */
-
-// typedef in_addr_ty* in_addr_p;
-
-typedef struct {
-    int16_t sin_family;
-    uint16_t sin_port;
-    in_addr_ty  sin_addr;
-    char      sin_zero[8];
-} sockaddr_in_t;
-typedef sockaddr_in_t* sockaddr_in_p;
-
 typedef struct qsocket_s qsocket_t;
 typedef qsocket_t* qsocket_p;
 struct qsocket_s {
@@ -227,7 +200,7 @@ typedef struct {
     void (*SearchForHosts)(bool xmit);
     qsocket_p(*Connect)(cString host);
     qsocket_p(*CheckNewConnections)();
-    NetGetMessageResult(*QGetMessage)(qsocket_p sock);
+    int(*QGetMessage)(qsocket_p sock);
     int(*QSendMessage)(qsocket_p sock, sizebuf_p data);
     int(*SendUnreliableMessage)(qsocket_p sock, sizebuf_p data);
     bool (*CanSendMessage)(qsocket_p sock);
@@ -331,7 +304,7 @@ extern "C" {
     qsocket_p NET_Connect(cString host);    // called by client to connect to a host.  Returns -1 if not able to
     bool NET_CanSendMessage(qsocket_p sock);   // Returns true or false if the given qsocket can currently accept a message to be transmitted.
 
-    NetGetMessageResult NET_GetMessage(qsocket_p sock);
+    int32_t NET_GetMessage(qsocket_p sock);
     // returns data in net_message sizebuf
     // returns 0 if no data is waiting
     // returns 1 if a message was received

@@ -112,9 +112,9 @@ static int IntAlign(int value) {
     return (value + (sizeof(int) - 1)) & (~(sizeof(int) - 1));
 }
 
-NetGetMessageResult Loop_GetMessage(qsocket_p sock) {
+int Loop_GetMessage(qsocket_p sock) {
     if (sock->receiveMessageLength == 0)
-        return NETMSG_NO_DATA;
+        return 0;
 
     int ret = sock->receiveMessage[0];
     int length = sock->receiveMessage[1] + (sock->receiveMessage[2] << 8);
@@ -128,7 +128,7 @@ NetGetMessageResult Loop_GetMessage(qsocket_p sock) {
     if (sock->receiveMessageLength)
         Q_memcpy(sock->receiveMessage, &sock->receiveMessage[length], sock->receiveMessageLength);
 
-    if (sock->driverdata && (ret == NETMSG_RELIABLE_MESSAGE))
+    if (sock->driverdata && ret == 1)
         ((qsocket_p)sock->driverdata)->canSend = true;
 
     return ret;
@@ -147,7 +147,7 @@ int Loop_SendMessage(qsocket_p sock, sizebuf_p data) {
     uint8_p buffer = ((qsocket_p)sock->driverdata)->receiveMessage + *bufferLength;
 
     // message type
-    *buffer++ = NETMSG_RELIABLE_MESSAGE;
+    *buffer++ = 1;
 
     // length
     *buffer++ = data->cursize & 0xff;
@@ -177,7 +177,7 @@ int Loop_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
     uint8_p buffer = ((qsocket_p)sock->driverdata)->receiveMessage + *bufferLength;
 
     // message type
-    *buffer++ = NETMSG_UNRELIABLE_MESSAGE;
+    *buffer++ = 2;
 
     // length
     *buffer++ = data->cursize & 0xff;

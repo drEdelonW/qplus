@@ -26,7 +26,7 @@ void Loop_Listen(bool state);
 void Loop_SearchForHosts(bool xmit);
 qsocket_p Loop_Connect(cString host);
 qsocket_p Loop_CheckNewConnections();
-NetGetMessageResult Loop_GetMessage(qsocket_p sock);
+int Loop_GetMessage(qsocket_p sock);
 int Loop_SendMessage(qsocket_p sock, sizebuf_p data);
 int Loop_SendUnreliableMessage(qsocket_p sock, sizebuf_p data);
 bool Loop_CanSendMessage(qsocket_p sock);
