@@ -19,7 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // input.h -- external (non-keyboard) input devices
-#include "client.h" // UserCmd_p
+// #include "client.h" // UserCmd_p
+#include "UserCmd.h"
+#include "keys.h"
+
+extern void (*vid_menukeyfn)(keycode_t key);
+
 #ifdef __cplusplus
 extern "C" {
 #endif

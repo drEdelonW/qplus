@@ -19,8 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // vid.h -- video driver defs
-#include "keys.h"
-
+#include "types.h"
 #define VID_CBITS	6
 #define VID_GRADES	(1 << VID_CBITS)
 
@@ -73,7 +72,6 @@ extern	VidDef_t    vid;				// global video state
 extern	uint16_t    d_8to16table[256];
 extern	uint32_t    d_8to24table[256];
 extern void (*vid_menudrawfn)();
-extern void (*vid_menukeyfn)(keycode_t key);
 
 #ifdef __cplusplus
 extern "C" {

@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "render.h"
 #include "sound/sound_struct.h"
 #include "net.h"
+#include "input.h"
 #include "UserCmd.h"
 #include "protocol.h"
 
