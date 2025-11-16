@@ -434,7 +434,7 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stvert_p pstverts) {
             pverts->v[1],
             pverts->v[2],
         };
-        float zi = 1.0 / (DotProduct(tv, aliastransform[2]) + aliastransform[2][3]);
+        float zi = 1.0f / (DotProduct(tv, aliastransform[2]) + aliastransform[2][3]);
 
         // x, y, and z are scaled down by 1/2**31 in the transform, so 1/z is
         // scaled up by 1/2**31, and the scaling cancels out for x and y in the

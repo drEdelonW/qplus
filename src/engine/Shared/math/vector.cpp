@@ -1,7 +1,7 @@
 
-extern "C" {
+// extern "C" {
 #include "vector.h"
-}
+// }
 
 #include <math.h>
 #include "Vector3d.hpp"
@@ -79,15 +79,15 @@ void VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_t vecc) {
 }
 
 vec_t DotProduct(vec3_t v1, vec3_t v2) {
-#if 1
+#if 0
     Vector3D aV(v1);
     Vector3D bV(v2);
-    return aV.dot(v2);
+    return aV.dot(bV);
 #else
     return
-        v1[0] * v2[0] +
-        v1[1] * v2[1] +
-        v1[2] * v2[2];
+        (v1[0] * v2[0]) +
+        (v1[1] * v2[1]) +
+        (v1[2] * v2[2]);
 #endif
 }
 

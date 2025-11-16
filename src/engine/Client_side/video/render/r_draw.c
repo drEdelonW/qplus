@@ -492,7 +492,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
     // FIXME: cache this?
     vec3_t p_normal; TransformVector(pplane->normal, p_normal);
     // FIXME: cache this?
-    float distinv = 1.0 / (pplane->dist - DotProduct(modelorg, pplane->normal));
+    float distinv = 1.0f / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
     surface_p->d_zistepu = p_normal[0] * xscaleinv * distinv;
     surface_p->d_zistepv = -p_normal[1] * yscaleinv * distinv;
@@ -592,7 +592,7 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
     // FIXME: cache this?
     vec3_t p_normal; TransformVector(pplane->normal, p_normal);
     // FIXME: cache this?
-    float distinv = 1.0 / (pplane->dist - DotProduct(modelorg, pplane->normal));
+    float distinv = 1.0f / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
     surface_p->d_zistepu = p_normal[0] * xscaleinv * distinv;
     surface_p->d_zistepv = -p_normal[1] * yscaleinv * distinv;

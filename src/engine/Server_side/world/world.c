@@ -451,7 +451,8 @@ int SV_HullPointContents(Hull_p hull, int num, vec3_t p) {
 
         float d =
             ((plane->type < 3) ?
-                p[plane->type] : DotProduct(plane->normal, p)) -
+                p[plane->type] : DotProduct(plane->normal, p)
+            ) -
             plane->dist;
 
         num = node->children[(d < 0) ? 1 : 0];
