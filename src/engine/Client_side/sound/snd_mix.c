@@ -47,15 +47,15 @@ void Snd_WriteLinearBlastStereo16() {
     for (int i = 0; i < _snd_linear_count; i += 2) {
         {
             int16_t val = (int16_t)((_snd_p[i] * _snd_vol) >> 8);
-            if (val > MAX_SND_VAL)      _snd_out[i] = MAX_SND_VAL;
-            else if (val < MIN_SND_VAL) _snd_out[i] = MIN_SND_VAL;
-            else                        _snd_out[i] = val;
+            // if (val > MAX_SND_VAL)      _snd_out[i] = MAX_SND_VAL;
+            // else if (val < MIN_SND_VAL) _snd_out[i] = MIN_SND_VAL;
+            /*else*/                        _snd_out[i] = val;
         }
         {
             int16_t val = (int16_t)((_snd_p[i + 1] * _snd_vol) >> 8);
-            if (val > MAX_SND_VAL)      _snd_out[i + 1] = MAX_SND_VAL;
-            else if (val < MIN_SND_VAL) _snd_out[i + 1] = MIN_SND_VAL;
-            else                        _snd_out[i + 1] = val;
+            // if (val > MAX_SND_VAL)      _snd_out[i + 1] = MAX_SND_VAL;
+            // else if (val < MIN_SND_VAL) _snd_out[i + 1] = MIN_SND_VAL;
+            /*else*/                        _snd_out[i + 1] = val;
         }
     }
 }
@@ -172,8 +172,8 @@ void S_TransferPaintBuffer(int endtime) {
         while (count--) {
             int16_t val = (int16_t)((*p * snd_vol) >> 8);
             p += step;
-            if (val > MAX_SND_VAL)          val = MAX_SND_VAL;
-            else if (val < MIN_SND_VAL)     val = MIN_SND_VAL;
+            // if (val > MAX_SND_VAL)          val = MAX_SND_VAL;
+            // else if (val < MIN_SND_VAL)     val = MIN_SND_VAL;
             out[out_idx] = val;
             out_idx = (out_idx + 1) & out_mask;
         }
@@ -183,8 +183,8 @@ void S_TransferPaintBuffer(int endtime) {
         while (count--) {
             int16_t val = (int16_t)((*p * snd_vol) >> 8);
             p += step;
-            if (val > MAX_SND_VAL)          val = MAX_SND_VAL;
-            else if (val < MIN_SND_VAL)     val = MIN_SND_VAL;
+            // if (val > MAX_SND_VAL)          val = MAX_SND_VAL;
+            // else if (val < MIN_SND_VAL)     val = MIN_SND_VAL;
             out[out_idx] = (uint8_t)((val >> 8) + 128);
             out_idx = (out_idx + 1) & out_mask;
         }

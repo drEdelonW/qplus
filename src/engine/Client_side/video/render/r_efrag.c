@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "r_local.h"
 #include "world.h"
+#include "console.h"
 
 mNode_p r_pefragtopnode;
 
@@ -35,7 +36,7 @@ mNode_p r_pefragtopnode;
 ===============================================================================
 */
 
-efrag_p* lastlink;
+efrag_ar    lastlink;
 vec3_t      r_emins, r_emaxs;
 r_Entity_p  r_addent;
 
@@ -50,17 +51,16 @@ Call when removing an object from the world or moving it to another position
 void R_RemoveEfrags(r_Entity_p ent) {
     efrag_p ef = ent->efrag;
     while (ef) {
-        efrag_p* prev = &ef->leaf->efrags;
+        efrag_ar prev = &ef->leaf->efrags;
         while (1) {
             efrag_p walk = *prev;
-            if (!walk)
-                break;
+            if (!walk)  break;
+
             if (walk == ef) { // remove this fragment
                 *prev = ef->leafnext;
                 break;
             }
-            else
-                prev = &walk->leafnext;
+            else    prev = &walk->leafnext;
         }
 
         efrag_p old = ef;
@@ -80,9 +80,7 @@ R_SplitEntityOnNode
 ===================
 */
 void R_SplitEntityOnNode(mNode_p node) {
-    if (node->contents == CONTENTS_SOLID) {
-        return;
-    }
+    if (node->contents == CONTENTS_SOLID)   return;
 
     // add an efrag if the node is a leaf
 
@@ -128,11 +126,8 @@ void R_SplitEntityOnNode(mNode_p node) {
     }
 
     // recurse down the contacted sides
-    if (sides & 1)
-        R_SplitEntityOnNode(node->children[0]);
-
-    if (sides & 2)
-        R_SplitEntityOnNode(node->children[1]);
+    if (sides & 1)  R_SplitEntityOnNode(node->children[0]);
+    if (sides & 2)  R_SplitEntityOnNode(node->children[1]);
 }
 
 
@@ -142,8 +137,7 @@ R_SplitEntityOnNode2
 ===================
 */
 void R_SplitEntityOnNode2(mNode_p node) {
-    if (node->visframe != r_visframecount)
-        return;
+    if (node->visframe != r_visframecount)  return;
 
     if (node->contents < 0) {
         if (node->contents != CONTENTS_SOLID)
@@ -162,10 +156,8 @@ void R_SplitEntityOnNode2(mNode_p node) {
     }
 
     // not split yet; recurse down the contacted side
-    if (sides & 1)
-        R_SplitEntityOnNode2(node->children[0]);
-    else
-        R_SplitEntityOnNode2(node->children[1]);
+    if (sides & 1)  R_SplitEntityOnNode2(node->children[0]);
+    else            R_SplitEntityOnNode2(node->children[1]);
 }
 
 
@@ -202,7 +194,7 @@ R_StoreEfrags
 // FIXME: a lot of this goes away with edge-based
 ================
 */
-void R_StoreEfrags(efrag_p* ppefrag) {
+void R_StoreEfrags(efrag_ar ppefrag) {
     efrag_p pefrag;
     while ((pefrag = *ppefrag) != NULL) {
         r_Entity_p pent = pefrag->entity;

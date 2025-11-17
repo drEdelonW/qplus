@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_shared.h"
 #include "client.h"
 #include "common.h"
-#include "console.h"
+// #include "console.h"
 #include "sys.h"
 #include "mathlib.h"
 #include "Alias.h"
@@ -170,7 +170,7 @@ extern mVertex_p r_ptverts, r_ptvertsmax;
 extern vec3_t   sbaseaxis[3], tbaseaxis[3];
 extern float    entity_rotation[3][3];
 
-extern int reinit_surfcache;
+// extern int reinit_surfcache;
 
 extern int r_currentkey;
 extern int r_currentbkey;
@@ -252,8 +252,13 @@ extern int      r_maxvalidedgeoffset;
 void R_AliasClipTriangle(mTriangle_p ptri);
 
 extern float    r_time1;
-extern float    dp_time1, dp_time2, db_time1, db_time2, rw_time1, rw_time2;
-extern float    se_time1, se_time2, de_time1, de_time2, dv_time1, dv_time2;
+extern float    dp_time1, dp_time2;
+extern float    db_time1, db_time2;
+extern float    rw_time1, rw_time2;
+extern float    se_time1, se_time2;
+extern float    de_time1, de_time2;
+extern float    dv_time1, dv_time2;
+
 extern int      r_frustum_indexes[4 * 6];
 extern int      r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
 extern bool r_surfsonstack;
@@ -268,7 +273,7 @@ extern int      r_clipflags;
 extern int      r_dlightframecount;
 extern bool r_fov_greater_than_90;
 
-void R_StoreEfrags(efrag_p* ppefrag);
+void R_StoreEfrags(efrag_ar ppefrag);
 void R_TimeRefresh_f();
 void R_TimeGraph();
 void R_PrintAliasStats();

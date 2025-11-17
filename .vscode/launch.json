@@ -37,31 +37,17 @@
           "text": "-enable-pretty-printing",
           "ignoreFailures": true
         },
-        {
-          "text": "set pagination off"
-        },
-        {
-          "text": "set breakpoint pending on"
-        },
+        { "text": "set pagination off" },
+        { "text": "set breakpoint pending on" },
         {
           // "text": "set architecture arm"
           "text": "set architecture aarch64"
         },
-        {
-          "text": "set endian little"
-        },
-        {
-          "text": "set sysroot target:"
-        },
-        {
-          "text": "set follow-fork-mode child"
-        },
-        {
-          "text": "set detach-on-fork off"
-        },
-        {
-          "text": "catch exec"
-        }
+        { "text": "set endian little" },
+        { "text": "set sysroot target:" },
+        { "text": "set follow-fork-mode child" },
+        { "text": "set detach-on-fork off" },
+        { "text": "catch exec" }
       ]
     }
   ]

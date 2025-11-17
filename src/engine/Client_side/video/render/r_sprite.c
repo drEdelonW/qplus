@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "q_tools.h"
 #include "r_local.h"
+#include "console.h"
 
 static int      _clipCurrent = 0;
 static vec5_t   _clip_verts[2][MAXWORKINGVERTS];

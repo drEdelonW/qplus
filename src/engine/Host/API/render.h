@@ -104,7 +104,7 @@ typedef struct {
 //
 // refresh
 //
-extern int      reinit_surfcache;
+// extern int      reinit_surfcache;
 extern refdef_t r_refdef;
 extern vec3_t   r_origin, vpn, vright, vup;
 extern Texture_p r_notexture_mip;

@@ -104,17 +104,17 @@ Mod_DecompressVis
 ===================
 */
 uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
-    static uint8_t decompressed[MAX_MAP_LEAFS / 8];
+    static uint8_t _decompressed[MAX_MAP_LEAFS / 8];
 
     int row = (model->numleafs + 7) >> 3;
-    uint8_p out = decompressed;
+    uint8_p out = _decompressed;
 
     if (!in) { // no vis info, so make all visible
         while (row) {
             *out++ = 0xff;
             row--;
         }
-        return decompressed;
+        return _decompressed;
     }
 
     do {
@@ -129,9 +129,9 @@ uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
             *out++ = 0;
             c--;
         }
-    } while (out - decompressed < row);
+    } while (out - _decompressed < row);
 
-    return decompressed;
+    return _decompressed;
 }
 
 uint8_p Mod_LeafPVS(mLeaf_p leaf, Model_p model) {
@@ -351,7 +351,7 @@ void Mod_LoadTextures(Lump_p l) {
 
         int max = tx->name[1];
         int altmax = 0;
-        if ((max >= 'a') && (max <= 'z')) max -= 'a' - 'A';
+        if ((max >= 'a') && (max <= 'z'))   max -= 'a' - 'A';
 
         if ((max >= '0') && (max <= '9')) {
             max -= '0';
@@ -373,11 +373,12 @@ void Mod_LoadTextures(Lump_p l) {
             Texture_p tx2 = _loadModel->textures[j];
             if (!tx2 ||
                 (tx2->name[0] != '+') ||
-                strcmp(tx2->name + 2, tx->name + 2))
+                strcmp(tx2->name + 2, tx->name + 2)
+                )
                 continue;
 
             int num = tx2->name[1];
-            if ((num >= 'a') && (num <= 'z')) num -= ('a' - 'A');
+            if ((num >= 'a') && (num <= 'z'))   num -= ('a' - 'A');
             if ((num >= '0') && (num <= '9')) {
                 num -= '0';
                 anims[num] = tx2;
@@ -671,7 +672,7 @@ void Mod_LoadFaces(Lump_p l) {
             out->styles[i] = in->styles[i];
         }
 
-        int i = LittleLong(in->lightofs);
+        int32_t i = LittleLong(in->lightofs);
         if (i == -1)    out->samples = NULL;
         else            out->samples = _loadModel->lightdata + i;
 
@@ -767,8 +768,7 @@ void Mod_LoadLeafs(Lump_p l) {
 
         out->contents = LittleLong(in->contents);
 
-        out->firstmarksurface = _loadModel->marksurfaces +
-            LittleShort(in->firstmarksurface);
+        out->firstmarksurface = _loadModel->marksurfaces + LittleShort(in->firstmarksurface);
         out->nummarksurfaces = LittleShort(in->nummarksurfaces);
 
         int p = LittleLong(in->visofs);
@@ -1035,8 +1035,15 @@ ALIAS MODELS
 Mod_LoadAliasFrame
 =================
 */
-TypeLess_ptr Mod_LoadAliasFrame(TypeLess_ptr  pin, int32_p pframeindex, int32_t numv, TriVertx_p pbboxmin,
-    TriVertx_p pbboxmax, AliasHdr_p pheader, cString name) {
+TypeLess_ptr Mod_LoadAliasFrame(
+    TypeLess_ptr  pin,
+    int32_p pframeindex,
+    int32_t numv,
+    TriVertx_p pbboxmin,
+    TriVertx_p pbboxmax,
+    AliasHdr_p pheader,
+    cString name
+) {
     dAliasFrame_p pdaliasframe = (dAliasFrame_p)pin;
 
     strcpy(name, pdaliasframe->name);
@@ -1073,8 +1080,15 @@ TypeLess_ptr Mod_LoadAliasFrame(TypeLess_ptr  pin, int32_p pframeindex, int32_t 
 Mod_LoadAliasGroup
 =================
 */
-TypeLess_ptr  Mod_LoadAliasGroup(TypeLess_ptr  pin, int32_p pframeindex, int numv,
-    TriVertx_p pbboxmin, TriVertx_p pbboxmax, AliasHdr_p pheader, cString name) {
+TypeLess_ptr  Mod_LoadAliasGroup(
+    TypeLess_ptr  pin,
+    int32_p pframeindex,
+    int numv,
+    TriVertx_p pbboxmin,
+    TriVertx_p pbboxmax,
+    AliasHdr_p pheader,
+    cString name
+) {
 
     dAliasGroup_p pingroup = (dAliasGroup_p)pin;
     int32_t numframes = LittleLong(pingroup->numframes);

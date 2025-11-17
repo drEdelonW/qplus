@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_bsp.c
 
 #include "r_local.h"
+#include "console.h"
 
 //
 // current entity info
@@ -549,9 +550,8 @@ void R_RenderWorld() {
     // if the driver wants the polygons back to front, play the visible ones back
     // in that order
     if (r_worldpolysbacktofront) {
-        for (int i = numbtofpolys - 1; i >= 0; i--) {
+        for (int i = numbtofpolys - 1; i >= 0; i--)
             R_RenderPoly(btofpolys[i].psurf, btofpolys[i].clipflags);
-        }
     }
 }
 

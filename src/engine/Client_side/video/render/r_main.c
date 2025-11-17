@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sound.h"
 #include "cmd.h"
 #include "gamedefs.h"
+#include "console.h"
 
 //define PASSAGES
 
@@ -42,14 +43,14 @@ int     r_outofedges;
 
 bool    r_dowarp, r_dowarpold, r_viewchanged;
 
-int   numbtofpolys;
+int         numbtofpolys;
 btofpoly_p  pbtofpolys;
-mVertex_p r_pcurrentvertbase;
+mVertex_p   r_pcurrentvertbase;
 
-int c_surf;
-int r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
-bool r_surfsonstack;
-int r_clipflags;
+int     c_surf;
+int     r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
+bool    r_surfsonstack;
+int     r_clipflags;
 
 uint8_p     r_warpbuffer;
 uint8_p     r_stack_start;
@@ -100,12 +101,12 @@ int modcount;
 int* pfrustum_indexes[4];
 int r_frustum_indexes[4 * 6];
 
-int  reinit_surfcache = 1; // if 1, surface cache is currently empty and
+// int  reinit_surfcache = 1; // if 1, surface cache is currently empty and
 // must be reinitialized for current cache size
 
-mLeaf_p r_viewleaf, r_oldviewleaf;
-Texture_p r_notexture_mip;
-float   r_aliastransition, r_resfudge;
+mLeaf_p     r_viewleaf, r_oldviewleaf;
+Texture_p   r_notexture_mip;
+float       r_aliastransition, r_resfudge;
 
 int  d_lightstylevalue[256]; // 8.8 fraction of base light value
 
@@ -385,8 +386,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     screenedge[0].type = PLANE_ANYZ;
 
     // right side clip
-    screenedge[1].normal[0] =
-        1.0 / ((1.0 - xOrigin) * r_refdef.horizontalFieldOfView);
+    screenedge[1].normal[0] = 1.0 / ((1.0 - xOrigin) * r_refdef.horizontalFieldOfView);
     screenedge[1].normal[1] = 0;
     screenedge[1].normal[2] = 1;
     screenedge[1].type = PLANE_ANYZ;
@@ -518,7 +518,7 @@ void R_DrawEntitiesOnList() {
                 // clamp lighting so it doesn't overbright as much
                 if (lighting.ambientlight > 128)
                     lighting.ambientlight = 128;
-                if (lighting.ambientlight + lighting.shadelight > 192)
+                if ((lighting.ambientlight + lighting.shadelight) > 192)
                     lighting.shadelight = 192 - lighting.ambientlight;
 
                 R_AliasDrawModel(&lighting);
@@ -526,8 +526,7 @@ void R_DrawEntitiesOnList() {
 
             break;
 
-        default:
-            break;
+        default:    break;
         }
     }
 }
@@ -579,7 +578,7 @@ void R_DrawViewModel() {
     // clamp lighting so it doesn't overbright as much
     if (r_viewlighting.ambientlight > 128)
         r_viewlighting.ambientlight = 128;
-    if (r_viewlighting.ambientlight + r_viewlighting.shadelight > 192)
+    if ((r_viewlighting.ambientlight + r_viewlighting.shadelight) > 192)
         r_viewlighting.shadelight = 192 - r_viewlighting.ambientlight;
 
     vec3_t lightvec = { -1, 0, 0 };
@@ -861,7 +860,8 @@ void R_RenderView_() {
 
     if (r_timegraph.value ||
         r_speeds.value ||
-        r_dspeeds.value)
+        r_dspeeds.value
+        )
         r_time1 = Sys_FloatTime();
 
     R_SetupFrame();
