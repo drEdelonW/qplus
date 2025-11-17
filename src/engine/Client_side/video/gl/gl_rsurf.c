@@ -1053,11 +1053,11 @@ void R_DrawBrushModel(Entity_p e) {
 		modelorg[2] = DotProduct(temp, up);
 	}
 
-	psurf = &clmodel->surfaces[clmodel->firstmodelsurface];
+	psurf = &clmodel->surfaces[clmodel->firstModelSurface];
 
 	// calculate dynamic lighting for bmodel if it's not an
 	// instanced model
-	if (clmodel->firstmodelsurface != 0 && !gl_flashblend.value) {
+	if (clmodel->firstModelSurface != 0 && !gl_flashblend.value) {
 		for (k = 0; k < MAX_DLIGHTS; k++) {
 			if ((cl_dlights[k].die < cl.time) ||
 				(!cl_dlights[k].radius))
@@ -1076,7 +1076,7 @@ void R_DrawBrushModel(Entity_p e) {
 	//
 	// draw texture
 	//
-	for (i = 0; i < clmodel->nummodelsurfaces; i++, psurf++) {
+	for (i = 0; i < clmodel->numModelSurfaces; i++, psurf++) {
 		// find which side of the node we are on
 		pplane = psurf->plane;
 

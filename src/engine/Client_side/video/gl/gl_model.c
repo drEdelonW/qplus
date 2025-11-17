@@ -520,8 +520,8 @@ void Mod_LoadSubmodels(Lump_p l) {
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
-    loadmodel->submodels = out;
-    loadmodel->numsubmodels = count;
+    loadmodel->SubModels = out;
+    loadmodel->numSubModels = count;
 
     for (i = 0; i < count; i++, in++, out++) {
         for (j = 0; j < 3; j++) { // spread the mins / maxs by a pixel
@@ -1079,10 +1079,10 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
     mod->numframes = 2;  // regular and alternate animation
 
     //
-    // set up the submodels (FIXME: this is confusing)
+    // set up the SubModels (FIXME: this is confusing)
     //
-    for (i = 0; i < mod->numsubmodels; i++) {
-        bm = &mod->submodels[i];
+    for (i = 0; i < mod->numSubModels; i++) {
+        bm = &mod->SubModels[i];
 
         mod->hulls[0].firstclipnode = bm->headnode[0];
         for (j = 1; j < MAX_MAP_HULLS; j++) {
@@ -1090,8 +1090,8 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
             mod->hulls[j].lastclipnode = mod->numclipnodes - 1;
         }
 
-        mod->firstmodelsurface = bm->firstface;
-        mod->nummodelsurfaces = bm->numfaces;
+        mod->firstModelSurface = bm->firstface;
+        mod->numModelSurfaces = bm->numfaces;
 
         VectorCopy(bm->maxs, mod->maxs);
         VectorCopy(bm->mins, mod->mins);
@@ -1100,7 +1100,7 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
 
         mod->numleafs = bm->visleafs;
 
-        if (i < mod->numsubmodels - 1) { // duplicate the basic information
+        if (i < mod->numSubModels - 1) { // duplicate the basic information
             char name[10];
 
             snprintf(name, sizeof(name), "*%i", i + 1);

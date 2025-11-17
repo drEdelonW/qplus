@@ -767,8 +767,8 @@ R_ZDrawSubmodelPolys
 ================
 */
 void R_ZDrawSubmodelPolys(Model_p pmodel) {
-    mSurface_p psurf = &pmodel->surfaces[pmodel->firstmodelsurface];
-    int numsurfaces = pmodel->nummodelsurfaces;
+    mSurface_p psurf = &pmodel->surfaces[pmodel->firstModelSurface];
+    int numsurfaces = pmodel->numModelSurfaces;
 
     for (int i = 0; i < numsurfaces; i++, psurf++) {
         // find which side of the node we are on

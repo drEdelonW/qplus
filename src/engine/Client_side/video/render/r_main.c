@@ -697,7 +697,7 @@ void R_DrawBEntitiesOnList() {
 
                 // calculate dynamic lighting for bmodel if it's not an
                 // instanced model
-                if (clmodel->firstmodelsurface != 0) {
+                if (clmodel->firstModelSurface != 0) {
                     for (int k = 0; k < MAX_DLIGHTS; k++) {
                         if ((cl_dlights[k].die < cl.time) ||
                             (!cl_dlights[k].radius)) {

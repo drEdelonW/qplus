@@ -945,7 +945,7 @@ void SV_SpawnServer(
 
     sv.model_precache[0] = pr_strings;
     sv.model_precache[1] = sv.modelname;
-    for (int i = 1; i < sv.worldmodel->numsubmodels; i++) {
+    for (int i = 1; i < sv.worldmodel->numSubModels; i++) {
         sv.model_precache[1 + i] = _localModels[i];
         sv.models[i + 1] = Mod_ForName(_localModels[i], false);
     }

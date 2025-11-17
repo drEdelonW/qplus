@@ -113,7 +113,7 @@ typedef dFace_t* dFace_p;
 
 //============================================================================
 
-#ifndef QUAKE_GAME
+// #ifndef QUAKE_GAME
 // #warning QUAKE_GAME NOT DEFINED!!!
 // #define ANGLE_UP -1
 // #define ANGLE_DOWN -2
@@ -208,4 +208,4 @@ void  GetVectorForKey(Entity_p ent, cString key, vec3_t vec);
 
 ePair_p ParseEpair();
 
-#endif
+// #endif

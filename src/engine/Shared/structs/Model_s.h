@@ -8,6 +8,7 @@
 #include "Vertex.h"
 #include "Edge.h"
 #include "ClipNode.h"
+#include "Hull.h"
 
 #include "platformdefs.h"
 #include "zone.h"
@@ -31,18 +32,6 @@ typedef struct {
     int32_t firstface, numfaces;
 } dModel_t;
 typedef dModel_t* dModel_p;
-
-
-// !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct {
-    dClipNode_p clipnodes;
-    mPlane_p    planes;
-    int32_t     firstclipnode;
-    int32_t     lastclipnode;
-    vec3_t      clip_mins;
-    vec3_t      clip_maxs;
-} Hull_t;
-typedef Hull_t* Hull_p;
 
 typedef enum {
     NL_PRESENT      = 0, // model is already loaded
@@ -76,8 +65,8 @@ struct Model_s {
     bool    clipbox;    // solid volume for clipping
     vec3_t  clipmins, clipmaxs;
 #endif
-    uint32_t firstmodelsurface, nummodelsurfaces;    // brush model
-    uint32_t numsubmodels;       dModel_p    submodels;
+    uint32_t numModelSurfaces,   firstModelSurface;    // brush model
+    uint32_t numSubModels;       dModel_p    SubModels;
     uint32_t numplanes;          mPlane_p    planes;
     uint32_t numleafs;           mLeaf_p     leafs;  // number of visible leafs, not counting 0
     uint32_t numvertexes;        mVertex_p   vertexes;
@@ -89,7 +78,7 @@ struct Model_s {
     uint32_t numclipnodes;       dClipNode_p clipnodes;
     uint32_t nummarksurfaces;    mSurface_p* marksurfaces;
     Hull_t  hulls[MAX_MAP_HULLS];
-    int32_t numtextures;        Texture_p* textures;
+    int32_t numtextures;         Texture_p* textures;
     uint8_p visdata;
     uint8_p lightdata;
     cString entities;
@@ -125,23 +114,23 @@ typedef struct {
 typedef Lump_t* Lump_p;
 
 typedef enum {
-    LUMP_ENTITIES     = 0,
-    LUMP_PLANES       = 1,
-    LUMP_TEXTURES     = 2,
-    LUMP_VERTEXES     = 3,
-    LUMP_VISIBILITY   = 4,
-    LUMP_NODES        = 5,
-    LUMP_TEXINFO      = 6,
-    LUMP_FACES        = 7,
-    LUMP_LIGHTING     = 8,
-    LUMP_CLIPNODES    = 9,
-    LUMP_LEAFS        = 10,
-    LUMP_MARKSURFACES = 11,
-    LUMP_EDGES        = 12,
-    LUMP_SURFEDGES    = 13,
-    LUMP_MODELS       = 14,
+    LUMP_ENTITIES     = 0u,
+    LUMP_PLANES       = 1u,
+    LUMP_TEXTURES     = 2u,
+    LUMP_VERTEXES     = 3u,
+    LUMP_VISIBILITY   = 4u,
+    LUMP_NODES        = 5u,
+    LUMP_TEXINFO      = 6u,
+    LUMP_FACES        = 7u,
+    LUMP_LIGHTING     = 8u,
+    LUMP_CLIPNODES    = 9u,
+    LUMP_LEAFS        = 10u,
+    LUMP_MARKSURFACES = 11u,
+    LUMP_EDGES        = 12u,
+    LUMP_SURFEDGES    = 13u,
+    LUMP_MODELS       = 14u,
 
-    HEADER_LUMPS      = 15  // total count of lumps in BSP header
+    HEADER_LUMPS      = 15u  // total count of lumps in BSP header
 } LumpType;
 
 typedef struct {

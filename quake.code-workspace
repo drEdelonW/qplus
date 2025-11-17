@@ -134,7 +134,8 @@
 			"resource.h": "c",
 			"angle.h": "c",
 			"wsipx.h": "c",
-			"WSIPX.H": "cpp"
+			"WSIPX.H": "cpp",
+			"model_s.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}
