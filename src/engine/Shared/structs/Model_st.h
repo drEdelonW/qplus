@@ -18,10 +18,10 @@
 
 #define IDPOLYHEADER    (uint32_t)(('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
 // little-endian "IDPO"
+
 //
 // Whole model
 //
-
 typedef struct {
     vec3_t  mins;
     vec3_t  maxs;
@@ -34,9 +34,9 @@ typedef struct {
 typedef dModel_t* dModel_p;
 
 typedef enum {
-    NL_PRESENT      = 0, // model is already loaded
-    NL_NEEDS_LOADED = 1, // model must be loaded
-    NL_UNREFERENCED = 2  // model is not referenced
+    NL_PRESENT      = 0u, // model is already loaded
+    NL_NEEDS_LOADED = 1u, // model must be loaded
+    NL_UNREFERENCED = 2u  // model is not referenced
 } NeedLoad_t;
 
 typedef enum {
@@ -50,7 +50,7 @@ typedef enum {
     ST_RAND
 } SyncType_t;
 
-typedef struct Model_s Model_t;
+typedef struct Model_s Model_t;  //  TODO: fix in render.h
 typedef Model_t* Model_p;
 struct Model_s {
     char        name[MAX_QPATH];

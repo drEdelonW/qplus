@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #error use:  #include "model.h"
 
-#include "Model_s.h"
+#include "Model_st.h"
 
 /*
 

@@ -27,7 +27,7 @@ ALIAS MODEL DISPLAY LIST GENERATION
 
 =================================================================
 */
-#include "Model_s.h"
+#include "Model_st.h"
 #include "Alias.h"
 
 Model_p aliasmodel;

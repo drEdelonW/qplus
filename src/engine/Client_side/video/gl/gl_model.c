@@ -1364,7 +1364,7 @@ Mod_LoadAliasModel
 */
 void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     int     i, j;
-    Mdl_p pinmodel;
+    Mdl_p   pinmodel;
     stvert_p pinstverts;
     dTriangle_p pintriangles;
     int     version, numframes, numskins;

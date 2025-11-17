@@ -347,7 +347,7 @@ Draw_Init
 void Draw_Init(void) {
     int  i;
     qPic_p cb;
-    uint8_p dest,  src;
+    uint8_p dest, src;
     int  x, y;
     char ver[40];
     glpic_p gl;
@@ -387,11 +387,13 @@ void Draw_Init(void) {
     SwapPic(cb);
 
     // hack the version number directly into the pic
+    snprintf(ver, sizeof(ver),
 #if defined(__linux__)
-    snprintf(ver, sizeof(ver), "(Linux %2.2f, gl %4.2f) %4.2f", (float)LINUX_VERSION, (float)GLQUAKE_VERSION, (float)VERSION);
+        "(Linux %2.2f, gl %4.2f) %4.2f", (float)LINUX_VERSION,
 #else
-    snprintf(ver, sizeof(ver), "(gl %4.2f) %4.2f", (float)GLQUAKE_VERSION, (float)VERSION);
+        "(gl %4.2f) %4.2f",
 #endif
+        (float)GLQUAKE_VERSION, (float)VERSION);
     dest = cb->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
     y = strlen(ver);
     for (x = 0; x < y; x++)
@@ -412,14 +414,10 @@ void Draw_Init(void) {
             f = 0;
             fstep = cb->width * 0x10000 / vid.conwidth;
             for (x = 0; x < vid.conwidth; x += 4) {
-                dest[x] = src[f >> 16];
-                f += fstep;
-                dest[x + 1] = src[f >> 16];
-                f += fstep;
-                dest[x + 2] = src[f >> 16];
-                f += fstep;
-                dest[x + 3] = src[f >> 16];
-                f += fstep;
+                dest[x + 0] = src[f >> 16];     f += fstep;
+                dest[x + 1] = src[f >> 16];     f += fstep;
+                dest[x + 2] = src[f >> 16];     f += fstep;
+                dest[x + 3] = src[f >> 16];     f += fstep;
             }
         }
     }
@@ -470,13 +468,6 @@ smoothly scrolled off.
 ================
 */
 void Draw_Character(int x, int y, int num) {
-    uint8_p dest;
-    uint8_p source;
-    uint16_p pusdest;
-    int    drawline;
-    int    row, col;
-    float   frow, fcol, size;
-
     if (num == 32)
         return;  // space
 
@@ -485,12 +476,12 @@ void Draw_Character(int x, int y, int num) {
     if (y <= -8)
         return;   // totally off screen
 
-    row = num >> 4;
-    col = num & 15;
+    int row = num >> 4;
+    int col = num & 15;
 
-    frow = row * 0.0625;
-    fcol = col * 0.0625;
-    size = 0.0625;
+    float frow = row * 0.0625;
+    float fcol = col * 0.0625;
+    float size = 0.0625;
 
     GL_Bind(char_texture);
 
@@ -528,8 +519,7 @@ This is for debugging lockups by drawing different chars in different parts
 of the code.
 ================
 */
-void Draw_DebugChar(char num) {
-}
+void Draw_DebugChar(char num) {}
 
 /*
 =============
@@ -537,14 +527,9 @@ Draw_AlphaPic
 =============
 */
 void Draw_AlphaPic(int x, int y, qPic_p pic, float alpha) {
-    uint8_p dest, source;
-    uint16_p pusdest;
-    int    v, u;
-    glpic_p gl;
-
     if (scrap_dirty)
         Scrap_Upload();
-    gl = (glpic_p)pic->data;
+    glpic_p gl = (glpic_p)pic->data;
     glDisable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -573,9 +558,6 @@ Draw_Pic
 =============
 */
 void Draw_Pic(int x, int y, qPic_p pic) {
-    uint8_p dest,  source;
-    uint16_p pusdest;
-    int    v, u;
     glpic_p gl;
 
     if (scrap_dirty)
@@ -602,13 +584,11 @@ Draw_TransPic
 =============
 */
 void Draw_TransPic(int x, int y, qPic_p pic) {
-    uint8_p dest,  source,
-    byte tbyte;
-    uint16_p pusdest;
-    int    v, u;
-
-    if (x < 0 || (uint32_t)(x + pic->width) > vid.width || y < 0 ||
-        (uint32_t)(y + pic->height) > vid.height) {
+    if ((x < 0) ||
+        ((uint32_t)(x + pic->width) > vid.width) ||
+        (y < 0) ||
+        ((uint32_t)(y + pic->height) > vid.height)
+        ) {
         Sys_Error("Draw_TransPic: bad coordinates");
     }
 
@@ -624,25 +604,19 @@ Only used for the player color selection menu
 =============
 */
 void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
-    int    v, u, c;
     uint32_t  trans[64 * 64];
-    uint32_p dest;
-    uint8_p src;
-    int    p;
 
     GL_Bind(translate_texture);
 
-    c = pic->width * pic->height;
+    int c = pic->width * pic->height;
 
-    dest = trans;
-    for (v = 0; v < 64; v++, dest += 64) {
-        src = &menuplyr_pixels[((v * pic->height) >> 6) * pic->width];
-        for (u = 0; u < 64; u++) {
-            p = src[(u * pic->width) >> 6];
-            if (p == 255)
-                dest[u] = p;
-            else
-                dest[u] = d_8to24table[translation[p]];
+    uint32_p dest = trans;
+    for (int v = 0; v < 64; v++, dest += 64) {
+        uint8_p src = &menuplyr_pixels[((v * pic->height) >> 6) * pic->width];
+        for (int u = 0; u < 64; u++) {
+            int p = src[(u * pic->width) >> 6];
+            if (p == 255)   dest[u] = p;
+            else            dest[u] = d_8to24table[translation[p]];
         }
     }
 
@@ -674,10 +648,8 @@ Draw_ConsoleBackground
 void Draw_ConsoleBackground(int lines) {
     int y = (vid.height * 3) >> 2;
 
-    if (lines > y)
-        Draw_Pic(0, lines - vid.height, conback);
-    else
-        Draw_AlphaPic(0, lines - vid.height, conback, (float)(1.2 * lines) / y);
+    if (lines > y)  Draw_Pic(0, lines - vid.height, conback);
+    else            Draw_AlphaPic(0, lines - vid.height, conback, (float)(1.2 * lines) / y);
 }
 
 
@@ -820,10 +792,8 @@ GL_FindTexture
 ================
 */
 int GL_FindTexture(cString identifier) {
-    int  i;
-    glTexture_p glt;
-
-    for (i = 0, glt = gltextures; i < numgltextures; i++, glt++) {
+    glTexture_p glt = gltextures;
+    for (int i = 0; i < numgltextures; i++, glt++) {
         if (!strcmp(identifier, glt->identifier))
             return gltextures[i].texnum;
     }
@@ -837,23 +807,15 @@ GL_ResampleTexture
 ================
 */
 void GL_ResampleTexture(uint32_p in, int inwidth, int inheight, uint32_p out, int outwidth, int outheight) {
-    int  i, j;
-    uint32_p inrow;
-    uint32_t frac, fracstep;
-
-    fracstep = inwidth * 0x10000 / outwidth;
-    for (i = 0; i < outheight; i++, out += outwidth) {
-        inrow = in + inwidth * (i * inheight / outheight);
-        frac = fracstep >> 1;
-        for (j = 0; j < outwidth; j += 4) {
-            out[j] = inrow[frac >> 16];
-            frac += fracstep;
-            out[j + 1] = inrow[frac >> 16];
-            frac += fracstep;
-            out[j + 2] = inrow[frac >> 16];
-            frac += fracstep;
-            out[j + 3] = inrow[frac >> 16];
-            frac += fracstep;
+    uint32_t fracstep = inwidth * 0x10000 / outwidth;
+    for (int i = 0; i < outheight; i++, out += outwidth) {
+        uint32_p inrow = in + inwidth * (i * inheight / outheight);
+        uint32_t frac = fracstep >> 1;
+        for (int j = 0; j < outwidth; j += 4) {
+            out[j + 0] = inrow[frac >> 16];     frac += fracstep;
+            out[j + 1] = inrow[frac >> 16];     frac += fracstep;
+            out[j + 2] = inrow[frac >> 16];     frac += fracstep;
+            out[j + 3] = inrow[frac >> 16];     frac += fracstep;
         }
     }
 }
@@ -864,23 +826,15 @@ GL_Resample8BitTexture -- JACK
 ================
 */
 void GL_Resample8BitTexture(uint8_p in, int inwidth, int inheight, uint8_p out, int outwidth, int outheight) {
-    int  i, j;
-    uint8_p inrow;
-    uint32_t frac, fracstep;
-
-    fracstep = inwidth * 0x10000 / outwidth;
-    for (i = 0; i < outheight; i++, out += outwidth) {
-        inrow = in + inwidth * (i * inheight / outheight);
-        frac = fracstep >> 1;
-        for (j = 0; j < outwidth; j += 4) {
-            out[j] = inrow[frac >> 16];
-            frac += fracstep;
-            out[j + 1] = inrow[frac >> 16];
-            frac += fracstep;
-            out[j + 2] = inrow[frac >> 16];
-            frac += fracstep;
-            out[j + 3] = inrow[frac >> 16];
-            frac += fracstep;
+    uint32_t fracstep = inwidth * 0x10000 / outwidth;
+    for (int i = 0; i < outheight; i++, out += outwidth) {
+        uint8_p inrow = in + inwidth * (i * inheight / outheight);
+        uint32_t frac = fracstep >> 1;
+        for (int j = 0; j < outwidth; j += 4) {
+            out[j + 1] = inrow[frac >> 16];     frac += fracstep;
+            out[j + 1] = inrow[frac >> 16];     frac += fracstep;
+            out[j + 2] = inrow[frac >> 16];     frac += fracstep;
+            out[j + 3] = inrow[frac >> 16];     frac += fracstep;
         }
     }
 }
@@ -918,23 +872,19 @@ Mipping for 8 bit textures
 ================
 */
 void GL_MipMap8Bit(uint8_p in, int width, int height) {
-    int  i, j;
-    uint16_t     r, g, b;
-    uint8_p out,  at1,  at2,  at3,  at4;
-
     // width <<=2;
     height >>= 1;
-    out = in;
-    for (i = 0; i < height; i++, in += width) {
-        for (j = 0; j < width; j += 2, out += 1, in += 2) {
-            at1 = (uint8_p)(d_8to24table + in[0]);
-            at2 = (uint8_p)(d_8to24table + in[1]);
-            at3 = (uint8_p)(d_8to24table + in[width + 0]);
-            at4 = (uint8_p)(d_8to24table + in[width + 1]);
+    uint8_p out = in;
+    for (int i = 0; i < height; i++, in += width) {
+        for (int j = 0; j < width; j += 2, out += 1, in += 2) {
+            uint8_p at1 = (uint8_p)(d_8to24table + in[0]);
+            uint8_p at2 = (uint8_p)(d_8to24table + in[1]);
+            uint8_p at3 = (uint8_p)(d_8to24table + in[width + 0]);
+            uint8_p at4 = (uint8_p)(d_8to24table + in[width + 1]);
 
-            r = (at1[0] + at2[0] + at3[0] + at4[0]); r >>= 5;
-            g = (at1[1] + at2[1] + at3[1] + at4[1]); g >>= 5;
-            b = (at1[2] + at2[2] + at3[2] + at4[2]); b >>= 5;
+            uint16_t r = (at1[0] + at2[0] + at3[0] + at4[0]); r >>= 5;
+            uint16_t g = (at1[1] + at2[1] + at3[1] + at4[1]); g >>= 5;
+            uint16_t b = (at1[2] + at2[2] + at3[2] + at4[2]); b >>= 5;
 
             out[0] = d_15to8table[(r << 0) + (g << 5) + (b << 10)];
         }
@@ -959,10 +909,8 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
 
-    if (scaled_width > gl_max_size.value)
-        scaled_width = gl_max_size.value;
-    if (scaled_height > gl_max_size.value)
-        scaled_height = gl_max_size.value;
+    if (scaled_width > gl_max_size.value)       scaled_width = gl_max_size.value;
+    if (scaled_height > gl_max_size.value)      scaled_height = gl_max_size.value;
 
     if (scaled_width * scaled_height > sizeof(scaled) / 4)
         Sys_Error("GL_LoadTexture: too big");
@@ -978,7 +926,7 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
         gluScaleImage(GL_RGBA, width, height, GL_UNSIGNED_BYTE, trans,
             scaled_width, scaled_height, GL_UNSIGNED_BYTE, scaled);
         glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, scaled);
-    }
+}
 #else
     texels += scaled_width * scaled_height;
 
@@ -1053,10 +1001,8 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
 
-    if (scaled_width > gl_max_size.value)
-        scaled_width = gl_max_size.value;
-    if (scaled_height > gl_max_size.value)
-        scaled_height = gl_max_size.value;
+    if (scaled_width > gl_max_size.value)   scaled_width = gl_max_size.value;
+    if (scaled_height > gl_max_size.value)  scaled_height = gl_max_size.value;
 
     if (scaled_width * scaled_height > sizeof(scaled))
         Sys_Error("GL_LoadTexture: too big");
@@ -1084,10 +1030,8 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
             GL_MipMap8Bit((uint8_p)scaled, scaled_width, scaled_height);
             scaled_width >>= 1;
             scaled_height >>= 1;
-            if (scaled_width < 1)
-                scaled_width = 1;
-            if (scaled_height < 1)
-                scaled_height = 1;
+            if (scaled_width < 1)       scaled_width = 1;
+            if (scaled_height < 1)      scaled_height = 1;
             miplevel++;
             glTexImage2D(GL_TEXTURE_2D, miplevel, GL_COLOR_INDEX8_EXT, scaled_width, scaled_height, 0, GL_COLOR_INDEX, GL_UNSIGNED_BYTE, scaled);
         }
@@ -1155,7 +1099,6 @@ GL_LoadTexture
 ================
 */
 int GL_LoadTexture(cString identifier, int width, int height, uint8_p data, bool mipmap, bool alpha) {
-    bool noalpha;
     int   i, p, s;
     glTexture_p glt;
 
@@ -1200,15 +1143,15 @@ int GL_LoadPicTexture(qPic_p pic) {
 
 /****************************************/
 
-static GLenum oldtarget = TEXTURE0_SGIS;
+static GLenum _oldTarget = TEXTURE0_SGIS;
 
 void GL_SelectTexture(GLenum target) {
     if (!gl_mtexable)
         return;
     qglSelectTextureSGIS(target);
-    if (target == oldtarget)
+    if (target == _oldTarget)
         return;
-    cnttextures[oldtarget - TEXTURE0_SGIS] = currenttexture;
+    cnttextures[_oldTarget - TEXTURE0_SGIS] = currenttexture;
     currenttexture = cnttextures[target - TEXTURE0_SGIS];
-    oldtarget = target;
+    _oldTarget = target;
 }
