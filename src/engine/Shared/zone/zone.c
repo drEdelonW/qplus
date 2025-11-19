@@ -21,8 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "zone.h"
 #include "zone_prv.h"
 
-#include "sys.h"
-#include "console.h"
+#include "host.h"
 #include "common.h"
 #include "q_tools.h"
 
@@ -44,7 +43,7 @@ void Memory_Init(TypeLess_ptr buf, size_t size) {
 		if (p < (com.argc - 1))
 			zonesize = Q_atoi(com.argv[p + 1]) * 1024;
 		else
-			Sys_Error("Memory_Init: you must specify a size in KB after -zone");
+			Host_Error("Memory_Init: you must specify a size in KB after -zone");
 	}
 	mainzone = Hunk_AllocName(zonesize, "zone");
 	Z_ClearZone(mainzone, zonesize);

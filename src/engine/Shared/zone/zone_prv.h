@@ -14,16 +14,15 @@ void Hulk_Init(TypeLess_ptr buf, size_t size);
 
 //========================[z_cache.c]========================//
 
-struct memblock_s;
 typedef struct memblock_s memblock_t;
 typedef memblock_t* memblock_p;
 struct memblock_s {
-	size_t      size;   // including the header and possibly tiny fragments
-	int         tag;    // a tag of 0 is a free block
-	int         id;     // should be ZONEID
 	memblock_p  next;
 	memblock_p  prev;
-	int		    pad;    // pad to 64 bit boundary
+	size_t      size;   // including the header and possibly tiny fragments
+	int32_t		tag;    // a tag of 0 is a free block
+	int32_t		id;     // should be ZONEID
+	int32_t		pad;    // pad to 64 bit boundary
 };
 
 

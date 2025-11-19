@@ -2,8 +2,7 @@
 #include "zone_prv.h"
 
 #include "q_tools.h"
-#include "sys.h"
-#include "console.h"
+#include "host.h"
 
 
 #define	ZONEID      (0x1D4A11)
@@ -57,11 +56,11 @@ void Z_ClearZone(memzone_p zone, size_t size) {
 */
 void Z_Free(TypeLess_ptr ptr) {
     if (!ptr)
-        Sys_Error("Z_Free: NULL pointer");
+        Host_Error("Z_Free: NULL pointer");
 
     memblock_p block = (memblock_p)((uint8_p)ptr - sizeof(memblock_t));
-    if (block->id != ZONEID)	Sys_Error("Z_Free: freed a pointer without ZONEID");
-    if (block->tag == 0)		Sys_Error("Z_Free: freed a freed pointer");
+    if (block->id != ZONEID)	Host_Error("Z_Free: freed a pointer without ZONEID");
+    if (block->tag == 0)		Host_Error("Z_Free: freed a freed pointer");
 
     block->tag = 0;		// mark as free
 
@@ -94,7 +93,7 @@ void Z_Free(TypeLess_ptr ptr) {
 TypeLess_ptr Z_Malloc(size_t size) {
     Z_CheckHeap();	// DEBUG
     TypeLess_ptr buf = Z_TagMalloc(size, 1);
-    if (!buf)        Sys_Error("Z_Malloc: failed on allocation of %i bytes", size);
+    if (!buf)        Host_Error("Z_Malloc: failed on allocation of %i bytes", size);
 
     Q_memset(buf, 0, size);
 
@@ -102,7 +101,7 @@ TypeLess_ptr Z_Malloc(size_t size) {
 }
 
 TypeLess_ptr Z_TagMalloc(size_t size, int tag) {
-    if (!tag)   Sys_Error("Z_TagMalloc: tried to use a 0 tag");
+    if (!tag)   Host_Error("Z_TagMalloc: tried to use a 0 tag");
 
     //
     // scan through the block list looking for the first free block
@@ -158,24 +157,24 @@ TypeLess_ptr Z_TagMalloc(size_t size, int tag) {
     ========================
 */
 void Z_Print(memzone_p zone) {
-    Con_Printf(
+    Host_Printf(
         "zone size: %i  location: %p\n",
         mainzone->size, mainzone
     );
 
     for (memblock_p block = zone->blocklist.next; ; block = block->next) {
-        Con_Printf("block:%p    size:%7i    tag:%3i\n",
+        Host_Printf("block:%p    size:%7i    tag:%3i\n",
             block, block->size, block->tag
         );
 
         if (block->next == &zone->blocklist)
             break;			// all blocks have been hit
         if (((uint8_p)block + block->size) != (uint8_p)block->next)
-            Con_Printf("ERROR: block size does not touch the next block\n");
+            Host_Printf("ERROR: block size does not touch the next block\n");
         if (block->next->prev != block)
-            Con_Printf("ERROR: next block doesn't have proper back link\n");
+            Host_Printf("ERROR: next block doesn't have proper back link\n");
         if (!block->tag && !block->next->tag)
-            Con_Printf("ERROR: two consecutive free blocks\n");
+            Host_Printf("ERROR: two consecutive free blocks\n");
     }
 }
 
@@ -191,11 +190,11 @@ void Z_CheckHeap() {
             break;			// all blocks have been hit
 
         if (((uint8_p)block + block->size) != (uint8_p)block->next)
-            Sys_Error("Z_CheckHeap: block size does not touch the next block\n");
+            Host_Error("Z_CheckHeap: block size does not touch the next block\n");
         if (block->next->prev != block)
-            Sys_Error("Z_CheckHeap: next block doesn't have proper back link\n");
+            Host_Error("Z_CheckHeap: next block doesn't have proper back link\n");
         if (!block->tag && !block->next->tag)
-            Sys_Error("Z_CheckHeap: two consecutive free blocks\n");
+            Host_Error("Z_CheckHeap: two consecutive free blocks\n");
     }
 }
 

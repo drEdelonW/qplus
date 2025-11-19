@@ -2,8 +2,7 @@
 #include "zone_prv.h"
 
 #include <string.h>
-#include "sys.h"
-#include "console.h"
+#include "host.h"
 #include "q_tools.h"
 
 
@@ -45,9 +44,9 @@ Run consistancy and sentinal trahing checks
 void Hunk_Check() {
     for (hunk_p h = (hunk_p)hunk_base; (uint8_p)h != (hunk_base + hunk_low_used); ) {
         if ((h->sentinal) != HUNK_SENTINAL)
-            Sys_Error("Hunk_Check: trahsed sentinal");
+            Host_Error("Hunk_Check: trahsed sentinal");
         if ((h->size < 16) || ((h->size + (uint8_p)h - hunk_base) > hunk_size))
-            Sys_Error("Hunk_Check: bad size");
+            Host_Error("Hunk_Check: bad size");
         h = (hunk_p)((uint8_p)h + h->size);
     }
 }
@@ -68,7 +67,7 @@ void Hunk_Print(bool all) {
     hunk_p starthigh = (hunk_p)(hunk_base + hunk_size - hunk_high_used);
     hunk_p endhigh = (hunk_p)(hunk_base + hunk_size);
 
-    Con_Printf(
+    Host_Printf(
         "          :%8i total hunk size\n"
         "-------------------------\n",
         hunk_size
@@ -82,7 +81,7 @@ void Hunk_Print(bool all) {
         // skip to the high hunk if done with low hunk
         //
         if (h == endlow) {
-            Con_Printf(
+            Host_Printf(
                 "-------------------------\n"
                 "          :%8i REMAINING\n"
                 "-------------------------\n",
@@ -101,12 +100,12 @@ void Hunk_Print(bool all) {
         // run consistancy checks
         //
         if (h->sentinal != HUNK_SENTINAL)
-            Sys_Error("Hunk_Check: trahsed sentinal");
+            Host_Error("Hunk_Check: trahsed sentinal");
 
         if ((h->size < 16) ||
             ((h->size + (uint8_p)h - hunk_base) > hunk_size)
             )
-            Sys_Error("Hunk_Check: bad size");
+            Host_Error("Hunk_Check: bad size");
 
         hunk_p next = (hunk_p)((uint8_p)h + h->size);
         count++;
@@ -118,7 +117,7 @@ void Hunk_Print(bool all) {
         //
         memcpy(name, h->name, 8);
         if (all)
-            Con_Printf("%8p :%8i %8s\n", h, h->size, name);
+            Host_Printf("%8p :%8i %8s\n", h, h->size, name);
 
         //
         // print the total
@@ -129,7 +128,7 @@ void Hunk_Print(bool all) {
             (strncmp(h->name, next->name, 8))
             ) {
             if (!all)
-                Con_Printf("          :%8i %8s (TOTAL)\n", sum, name);
+                Host_Printf("          :%8i %8s (TOTAL)\n", sum, name);
             count = 0;
             sum = 0;
         }
@@ -137,7 +136,7 @@ void Hunk_Print(bool all) {
         h = next;
     }
 
-    Con_Printf(
+    Host_Printf(
         "-------------------------\n"
         "%8i total blocks\n",
         totalblocks
@@ -158,7 +157,7 @@ TypeLess_ptr Hunk_AllocName(size_t size, cStringRO name) {
     size = sizeof(hunk_t) + ALIGN_UP(size, 16);
 
     if ((hunk_size - hunk_low_used - hunk_high_used) < size)
-        Sys_Error("Hunk_Alloc: failed on %i bytes", size);
+        Host_Error("Hunk_Alloc: failed on %i bytes", size);
 
     hunk_p h = (hunk_p)(hunk_base + hunk_low_used);
     hunk_low_used += size;
@@ -188,7 +187,7 @@ size_t	Hunk_LowMark() {
 
 void Hunk_FreeToLowMark(size_t mark) {
     if ((mark > hunk_low_used))
-        Sys_Error("Hunk_FreeToLowMark: bad mark %i", mark);
+        Host_Error("Hunk_FreeToLowMark: bad mark %i", mark);
     memset((hunk_base + mark), 0, (hunk_low_used - mark));
     hunk_low_used = mark;
 }
@@ -208,7 +207,7 @@ void Hunk_FreeToHighMark(size_t mark) {
         Hunk_FreeToHighMark(_hunk_tempmark);
     }
     if (mark > hunk_high_used)
-        Sys_Error("Hunk_FreeToHighMark: bad mark %i", mark);
+        Host_Error("Hunk_FreeToHighMark: bad mark %i", mark);
     memset((hunk_base + hunk_size - hunk_high_used), 0, (hunk_high_used - mark));
     hunk_high_used = mark;
 }
@@ -232,7 +231,7 @@ TypeLess_ptr Hunk_HighAllocName(size_t size, cStringRO name) {
     size = sizeof(hunk_t) + ALIGN_UP(size, 16);
 
     if ((hunk_size - hunk_low_used - hunk_high_used) < size) {
-        Con_Printf("Hunk_HighAlloc: failed on %i bytes\n", size);
+        Host_Printf("Hunk_HighAlloc: failed on %i bytes\n", size);
         return NULL;
     }
 
