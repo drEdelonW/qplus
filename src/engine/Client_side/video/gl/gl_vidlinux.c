@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define WARP_WIDTH              320
 #define WARP_HEIGHT             200
 
-static fxMesaContext fc = NULL;
+static fxMesaContext _fc = NULL;
 #define stringify(m) { #m, m }
 
 uint16_t	d_8to16table[256];
@@ -60,7 +60,7 @@ struct
     stringify(MOUSE_PS2),
 };
 
-static uint8_t scantokey[128];
+static uint8_t _scanToKey[128];
 
 int num_mice = sizeof(mice) / sizeof(mice[0]);
 
@@ -118,7 +118,7 @@ cStringRO gl_extensions;
 void (*qgl3DfxSetPaletteEXT) (GLuint*);
 void (*qglColorTableEXT) (int, int, int, int, int, const TypeLess_ptr);
 
-static float vid_gamma = 1.0;
+static float _vidGamma = 1.0;
 
 bool is8bit = false;
 bool isPermedia = false;
@@ -163,15 +163,15 @@ void keyhandler(int scancode, int state) {
 
     sc = scancode & 0x7f;
 
-    Key_Event(scantokey[sc], state == KEY_EVENTPRESS);
+    Key_Event(_scanToKey[sc], state == KEY_EVENTPRESS);
 
 }
 
 void VID_Shutdown(void) {
-    if (!fc)
+    if (!_fc)
         return;
 
-    fxMesaDestroyContext(fc);
+    fxMesaDestroyContext(_fc);
 
     if (UseKeyboard)
         keyboard_close();
@@ -211,7 +211,7 @@ void	VID_SetPalette(uint8_p palette) {
     FILE* f;
     char s[255];
     int dist, bestdist;
-    static bool palflag = false;
+    // static bool palflag = false;
 
     //
     // 8 8 8 encoding
@@ -352,107 +352,107 @@ void Init_KBD(void) {
 
     if (UseKeyboard) {
         for (i = 0; i < 128; i++)
-            scantokey[i] = ' ';
+            _scanToKey[i] = ' ';
 
-        scantokey[42] = K_SHIFT;
-        scantokey[54] = K_SHIFT;
-        scantokey[72] = K_UPARROW;
-        scantokey[103] = K_UPARROW;
-        scantokey[80] = K_DOWNARROW;
-        scantokey[108] = K_DOWNARROW;
-        scantokey[75] = K_LEFTARROW;
-        scantokey[105] = K_LEFTARROW;
-        scantokey[77] = K_RIGHTARROW;
-        scantokey[106] = K_RIGHTARROW;
-        scantokey[29] = K_CTRL;
-        scantokey[97] = K_CTRL;
-        scantokey[56] = K_ALT;
-        scantokey[100] = K_ALT;
-        //		scantokey[58] = JK_CAPS;
-        //		scantokey[69] = JK_NUM_LOCK;
-        scantokey[71] = K_HOME;
-        scantokey[73] = K_PGUP;
-        scantokey[79] = K_END;
-        scantokey[81] = K_PGDN;
-        scantokey[82] = K_INS;
-        scantokey[83] = K_DEL;
-        scantokey[1] = K_ESCAPE;
-        scantokey[28] = K_ENTER;
-        scantokey[15] = K_TAB;
-        scantokey[14] = K_BACKSPACE;
-        scantokey[119] = K_PAUSE;
-        scantokey[57] = ' ';
+        _scanToKey[42] = K_SHIFT;
+        _scanToKey[54] = K_SHIFT;
+        _scanToKey[72] = K_UPARROW;
+        _scanToKey[103] = K_UPARROW;
+        _scanToKey[80] = K_DOWNARROW;
+        _scanToKey[108] = K_DOWNARROW;
+        _scanToKey[75] = K_LEFTARROW;
+        _scanToKey[105] = K_LEFTARROW;
+        _scanToKey[77] = K_RIGHTARROW;
+        _scanToKey[106] = K_RIGHTARROW;
+        _scanToKey[29] = K_CTRL;
+        _scanToKey[97] = K_CTRL;
+        _scanToKey[56] = K_ALT;
+        _scanToKey[100] = K_ALT;
+        //		_scanToKey[58] = JK_CAPS;
+        //		_scanToKey[69] = JK_NUM_LOCK;
+        _scanToKey[71] = K_HOME;
+        _scanToKey[73] = K_PGUP;
+        _scanToKey[79] = K_END;
+        _scanToKey[81] = K_PGDN;
+        _scanToKey[82] = K_INS;
+        _scanToKey[83] = K_DEL;
+        _scanToKey[1] = K_ESCAPE;
+        _scanToKey[28] = K_ENTER;
+        _scanToKey[15] = K_TAB;
+        _scanToKey[14] = K_BACKSPACE;
+        _scanToKey[119] = K_PAUSE;
+        _scanToKey[57] = ' ';
 
-        scantokey[102] = K_HOME;
-        scantokey[104] = K_PGUP;
-        scantokey[107] = K_END;
-        scantokey[109] = K_PGDN;
-        scantokey[110] = K_INS;
-        scantokey[111] = K_DEL;
+        _scanToKey[102] = K_HOME;
+        _scanToKey[104] = K_PGUP;
+        _scanToKey[107] = K_END;
+        _scanToKey[109] = K_PGDN;
+        _scanToKey[110] = K_INS;
+        _scanToKey[111] = K_DEL;
 
-        scantokey[2] = '1';
-        scantokey[3] = '2';
-        scantokey[4] = '3';
-        scantokey[5] = '4';
-        scantokey[6] = '5';
-        scantokey[7] = '6';
-        scantokey[8] = '7';
-        scantokey[9] = '8';
-        scantokey[10] = '9';
-        scantokey[11] = '0';
-        scantokey[12] = '-';
-        scantokey[13] = '=';
-        scantokey[41] = '`';
-        scantokey[26] = '[';
-        scantokey[27] = ']';
-        scantokey[39] = ';';
-        scantokey[40] = '\'';
-        scantokey[51] = ',';
-        scantokey[52] = '.';
-        scantokey[53] = '/';
-        scantokey[43] = '\\';
+        _scanToKey[2] = '1';
+        _scanToKey[3] = '2';
+        _scanToKey[4] = '3';
+        _scanToKey[5] = '4';
+        _scanToKey[6] = '5';
+        _scanToKey[7] = '6';
+        _scanToKey[8] = '7';
+        _scanToKey[9] = '8';
+        _scanToKey[10] = '9';
+        _scanToKey[11] = '0';
+        _scanToKey[12] = '-';
+        _scanToKey[13] = '=';
+        _scanToKey[41] = '`';
+        _scanToKey[26] = '[';
+        _scanToKey[27] = ']';
+        _scanToKey[39] = ';';
+        _scanToKey[40] = '\'';
+        _scanToKey[51] = ',';
+        _scanToKey[52] = '.';
+        _scanToKey[53] = '/';
+        _scanToKey[43] = '\\';
 
-        scantokey[59] = K_F1;
-        scantokey[60] = K_F2;
-        scantokey[61] = K_F3;
-        scantokey[62] = K_F4;
-        scantokey[63] = K_F5;
-        scantokey[64] = K_F6;
-        scantokey[65] = K_F7;
-        scantokey[66] = K_F8;
-        scantokey[67] = K_F9;
-        scantokey[68] = K_F10;
-        scantokey[87] = K_F11;
-        scantokey[88] = K_F12;
-        scantokey[30] = 'a';
-        scantokey[48] = 'b';
-        scantokey[46] = 'c';
-        scantokey[32] = 'd';
-        scantokey[18] = 'e';
-        scantokey[33] = 'f';
-        scantokey[34] = 'g';
-        scantokey[35] = 'h';
-        scantokey[23] = 'i';
-        scantokey[36] = 'j';
-        scantokey[37] = 'k';
-        scantokey[38] = 'l';
-        scantokey[50] = 'm';
-        scantokey[49] = 'n';
-        scantokey[24] = 'o';
-        scantokey[25] = 'p';
-        scantokey[16] = 'q';
-        scantokey[19] = 'r';
-        scantokey[31] = 's';
-        scantokey[20] = 't';
-        scantokey[22] = 'u';
-        scantokey[47] = 'v';
-        scantokey[17] = 'w';
-        scantokey[45] = 'x';
-        scantokey[21] = 'y';
-        scantokey[44] = 'z';
+        _scanToKey[59] = K_F1;
+        _scanToKey[60] = K_F2;
+        _scanToKey[61] = K_F3;
+        _scanToKey[62] = K_F4;
+        _scanToKey[63] = K_F5;
+        _scanToKey[64] = K_F6;
+        _scanToKey[65] = K_F7;
+        _scanToKey[66] = K_F8;
+        _scanToKey[67] = K_F9;
+        _scanToKey[68] = K_F10;
+        _scanToKey[87] = K_F11;
+        _scanToKey[88] = K_F12;
+        _scanToKey[30] = 'a';
+        _scanToKey[48] = 'b';
+        _scanToKey[46] = 'c';
+        _scanToKey[32] = 'd';
+        _scanToKey[18] = 'e';
+        _scanToKey[33] = 'f';
+        _scanToKey[34] = 'g';
+        _scanToKey[35] = 'h';
+        _scanToKey[23] = 'i';
+        _scanToKey[36] = 'j';
+        _scanToKey[37] = 'k';
+        _scanToKey[38] = 'l';
+        _scanToKey[50] = 'm';
+        _scanToKey[49] = 'n';
+        _scanToKey[24] = 'o';
+        _scanToKey[25] = 'p';
+        _scanToKey[16] = 'q';
+        _scanToKey[19] = 'r';
+        _scanToKey[31] = 's';
+        _scanToKey[20] = 't';
+        _scanToKey[22] = 'u';
+        _scanToKey[47] = 'v';
+        _scanToKey[17] = 'w';
+        _scanToKey[45] = 'x';
+        _scanToKey[21] = 'y';
+        _scanToKey[44] = 'z';
 
-        scantokey[78] = '+';
-        scantokey[74] = '-';
+        _scanToKey[78] = '+';
+        _scanToKey[74] = '-';
 
         if (keyboard_init())
             Sys_Error("keyboard_init() failed");
@@ -462,7 +462,7 @@ void Init_KBD(void) {
 
 #define NUM_RESOLUTIONS 16
 
-static int resolutions[NUM_RESOLUTIONS][3] = {
+static int _resolutions[NUM_RESOLUTIONS][3] = {
     320,200,  GR_RESOLUTION_320x200,
     320,240,  GR_RESOLUTION_320x240,
     400,256,  GR_RESOLUTION_400x256,
@@ -482,13 +482,11 @@ static int resolutions[NUM_RESOLUTIONS][3] = {
 };
 
 int findres(int* width, int* height) {
-    int i;
-
-    for (i = 0;i < NUM_RESOLUTIONS;i++)
-        if ((*width <= resolutions[i][0]) && (*height <= resolutions[i][1])) {
-            *width = resolutions[i][0];
-            *height = resolutions[i][1];
-            return resolutions[i][2];
+    for (int i = 0;i < NUM_RESOLUTIONS;i++)
+        if ((*width <= _resolutions[i][0]) && (*height <= _resolutions[i][1])) {
+            *width = _resolutions[i][0];
+            *height = _resolutions[i][1];
+            return _resolutions[i][2];
         }
 
     *width = 640;
@@ -502,7 +500,6 @@ bool VID_Is8bit(void) {
 
 void VID_Init8bitPalette(void) {
     // Check for 8bit Extensions and initialize them.
-    int i;
     TypeLess_ptr prjobj;
 
     if (COM_CheckParm("-no8bit"))
@@ -521,7 +518,7 @@ void VID_Init8bitPalette(void) {
         Con_SafePrintf("... Using 3DFX_set_global_palette\n");
         glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
         oldpal = (int8_p)d_8to24table; //d_8to24table3dfx;
-        for (i = 0;i < 256;i++) {
+        for (int i = 0; i < 256; i++) {
             table[i][2] = *oldpal++;
             table[i][1] = *oldpal++;
             table[i][0] = *oldpal++;
@@ -542,7 +539,7 @@ void VID_Init8bitPalette(void) {
         glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
         oldPalette = (int8_p)d_8to24table; //d_8to24table3dfx;
         newPalette = thePalette;
-        for (i = 0;i < 256;i++) {
+        for (int i = 0; i < 256; i++) {
             *newPalette++ = *oldPalette++;
             *newPalette++ = *oldPalette++;
             *newPalette++ = *oldPalette++;
@@ -557,23 +554,21 @@ void VID_Init8bitPalette(void) {
 }
 
 static void Check_Gamma(uint8_p pal) {
-    float	f, inf;
     uint8_t	palette[768];
-    int		i;
 
-    if ((i = COM_CheckParm("-gamma")) == 0) {
+    if (COM_CheckParm("-gamma") == 0) {
         if ((gl_renderer && strstr(gl_renderer, "Voodoo")) ||
             (gl_vendor && strstr(gl_vendor, "3Dfx")))
-            vid_gamma = 1;
+            _vidGamma = 1;
         else
-            vid_gamma = 0.7; // default to 0.7 on non-3dfx hardware
+            _vidGamma = 0.7; // default to 0.7 on non-3dfx hardware
     }
     else
-        vid_gamma = Q_atof(com.argv[i + 1]);
+        _vidGamma = Q_atof(com.argv[i + 1]);
 
-    for (i = 0; i < 768; i++) {
-        f = pow((pal[i] + 1) / 256.0, vid_gamma);
-        inf = f * 255 + 0.5;
+    for (int i = 0; i < 768; i++) {
+        float f = pow((pal[i] + 1) / 256.0, _vidGamma);
+        float inf = f * 255 + 0.5;
         if (inf < 0)
             inf = 0;
         if (inf > 255)
@@ -612,32 +607,25 @@ void VID_Init(uint8_p palette) {
     attribs[4] = 1;
     attribs[5] = FXMESA_NONE;
 
-    if ((i = COM_CheckParm("-width")) != 0)
-        width = atoi(com.argv[i + 1]);
-    if ((i = COM_CheckParm("-height")) != 0)
-        height = atoi(com.argv[i + 1]);
+    if ((i = COM_CheckParm("-width")) != 0)     width = atoi(com.argv[i + 1]);
+    if ((i = COM_CheckParm("-height")) != 0)    height = atoi(com.argv[i + 1]);
 
-    if ((i = COM_CheckParm("-conwidth")) != 0)
-        vid.conwidth = Q_atoi(com.argv[i + 1]);
-    else
-        vid.conwidth = 640;
+    if ((i = COM_CheckParm("-conwidth")) != 0)  vid.conwidth = Q_atoi(com.argv[i + 1]);
+    else                                        vid.conwidth = 640;
 
     vid.conwidth &= 0xfff8; // make it a multiple of eight
 
-    if (vid.conwidth < 320)
-        vid.conwidth = 320;
+    if (vid.conwidth < 320)        vid.conwidth = 320;
 
     // pick a conheight that matches with correct aspect
     vid.conheight = vid.conwidth * 3 / 4;
 
-    if ((i = COM_CheckParm("-conheight")) != 0)
-        vid.conheight = Q_atoi(com.argv[i + 1]);
-    if (vid.conheight < 200)
-        vid.conheight = 200;
+    if ((i = COM_CheckParm("-conheight")) != 0)     vid.conheight = Q_atoi(com.argv[i + 1]);
+    if (vid.conheight < 200)                        vid.conheight = 200;
 
-    fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_75Hz,
+    _fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_75Hz,
         attribs);
-    if (!fc)
+    if (!_fc)
         Sys_Error("Unable to create 3DFX context.\n");
 
     InitSig(); // trap evil signals
@@ -645,17 +633,14 @@ void VID_Init(uint8_p palette) {
     scr_width = width;
     scr_height = height;
 
-    fxMesaMakeCurrent(fc);
+    fxMesaMakeCurrent(_fc);
 
-    if (vid.conheight > height)
-        vid.conheight = height;
-    if (vid.conwidth > width)
-        vid.conwidth = width;
+    if (vid.conheight > height)     vid.conheight = height;
+    if (vid.conwidth > width)       vid.conwidth = width;
     vid.width = vid.conwidth;
     vid.height = vid.conheight;
 
-    vid.aspect = ((float)vid.height / (float)vid.width) *
-        (320.0 / 240.0);
+    vid.aspect = ((float)vid.height / (float)vid.width) * (320.0 / 240.0);
     vid.numpages = 2;
 
     GL_Init();

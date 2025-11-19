@@ -264,10 +264,10 @@ Debugging tool, just flashes the screen
 */
 void SetPal(int i) {
 #if 0
-    static int old;
+    static int _old;
 
-    if (i == old)   return;
-    old = i;
+    if (i == _old)   return;
+    _old = i;
 
     if (i == 0)
         VID_SetPalette(host_basepal);

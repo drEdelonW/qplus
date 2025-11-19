@@ -179,3 +179,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
                 $(eval SBUF_DIR = $(SHARED_DIR)/sBuf) $(eval INCLUDES += $(SBUF_DIR))
                         SRC_LIST += $(SBUF_DIR)/sizebuf.c
+
+
+$(eval GAME_DIR := $(SRC_DIR)/game/Quake) $(eval INCLUDES += $(GAME_DIR))

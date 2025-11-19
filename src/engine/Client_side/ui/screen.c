@@ -59,9 +59,9 @@ typedef struct {
 } _Screen_t;
 static _Screen_t _scr;
 
-static float    oldscreensize, oldfov;
-static int      clearconsole;
-static vRect_p  pconupdate;
+static float    _oldScreenSize, _oldFov;
+static int      _clearConsole;
+static vRect_p  _pConUpdate;
 
 /*
 ===============================================================================
@@ -451,7 +451,7 @@ void SCR_SetUpToDrawConsole() {
             scr.con_current = scr.conlines;
     }
 
-    if (clearconsole++ < vid.numpages) {
+    if (_clearConsole++ < vid.numpages) {
         scr.copytop = 1;
         Draw_TileClear(0, (int)scr.con_current, vid.width, vid.height - (int)scr.con_current);
         Sbar_Changed();
@@ -473,7 +473,7 @@ void SCR_DrawConsole() {
     if (scr.con_current) {
         scr.copyeverything = 1;
         Con_DrawConsole(scr.con_current, true);
-        clearconsole = 0;
+        _clearConsole = 0;
     }
     else {
         if ((key.dest == key_game) || (key.dest == key_message))
@@ -622,8 +622,8 @@ needs almost the entire 256k of stack space!
 ==================
 */
 void SCR_UpdateScreen() {
-    static float oldscr_viewsize;
-    static float oldlcd_x;
+    static float _oldScrViewSize;
+    static float _oldLcdX;
 
     if (scr.skipupdate || block_drawing)
         return;
@@ -645,26 +645,26 @@ void SCR_UpdateScreen() {
     if (!_scr.initialized || !con.isInitialized)
         return;    // not initialized yet
 
-    if (scr_viewsize.value != oldscr_viewsize) {
-        oldscr_viewsize = scr_viewsize.value;
+    if (scr_viewsize.value != _oldScrViewSize) {
+        _oldScrViewSize = scr_viewsize.value;
         vid.recalc_refdef = 1;
     }
 
     //
     // check for vid changes
     //
-    if (oldfov != scr_fov.value) {
-        oldfov = scr_fov.value;
+    if (_oldFov != scr_fov.value) {
+        _oldFov = scr_fov.value;
         vid.recalc_refdef = true;
     }
 
-    if (oldlcd_x != lcd_x.value) {
-        oldlcd_x = lcd_x.value;
+    if (_oldLcdX != lcd_x.value) {
+        _oldLcdX = lcd_x.value;
         vid.recalc_refdef = true;
     }
 
-    if (oldscreensize != scr_viewsize.value) {
-        oldscreensize = scr_viewsize.value;
+    if (_oldScreenSize != scr_viewsize.value) {
+        _oldScreenSize = scr_viewsize.value;
         vid.recalc_refdef = true;
     }
 
@@ -684,7 +684,7 @@ void SCR_UpdateScreen() {
         Sbar_Changed();
     }
 
-    pconupdate = NULL;
+    _pConUpdate = NULL;
 
 
     SCR_SetUpToDrawConsole();
@@ -732,8 +732,8 @@ void SCR_UpdateScreen() {
 
     D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
     //  for linear writes all the time
-    if (pconupdate)
-        D_UpdateRects(pconupdate);
+    if (_pConUpdate)
+        D_UpdateRects(_pConUpdate);
 
 
     V_UpdatePalette();

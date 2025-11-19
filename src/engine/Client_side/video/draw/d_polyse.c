@@ -86,7 +86,7 @@ int    d_aspancount, d_countextrastep;
 
 SpanPackage_p a_spans;
 SpanPackage_p d_pedgespanpackage;
-static int    ystart;
+static int    _yStart;
 uint8_p d_pdest, d_ptex;
 int16_p d_pz;
 int     d_sfrac, d_tfrac, d_light, d_zi;
@@ -103,7 +103,7 @@ typedef struct {
 } adivtab_t;
 typedef adivtab_t* adivtab_p;
 
-static adivtab_t adivtab[32 * 32] = {
+static adivtab_t _aDivTab[32 * 32] = {
 #include "adivtab.h"
 };
 
@@ -435,7 +435,7 @@ void D_PolysetSetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv, fixed8_
 
     if (((tm <= 16) && (tm >= -15)) &&
         ((tn <= 16) && (tn >= -15))) {
-        adivtab_p ptemp = &adivtab[((tm + 15) << 5) + (tn + 15)];
+        adivtab_p ptemp = &_aDivTab[((tm + 15) << 5) + (tn + 15)];
         ubasestep = ptemp->quotient;
         erroradjustup = ptemp->remainder;
         erroradjustdown = tn;
@@ -637,7 +637,7 @@ void D_RasterizeAliasPolySmooth() {
     //
     d_pedgespanpackage = a_spans;
 
-    ystart = plefttop[1];
+    _yStart = plefttop[1];
     d_aspancount = plefttop[0] - prighttop[0];
 
     d_ptex = (uint8_p)r_affinetridesc.pskin + (plefttop[2] >> 16) +
@@ -653,8 +653,8 @@ void D_RasterizeAliasPolySmooth() {
     d_zi = plefttop[5];
 
     d_pdest = (uint8_p)d_viewbuffer +
-        ystart * screenwidth + plefttop[0];
-    d_pz = d_pzbuffer + ystart * d_zwidth + plefttop[0];
+        _yStart * screenwidth + plefttop[0];
+    d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop[0];
 
     if (initialleftheight == 1) {
         d_pedgespanpackage->pdest = d_pdest;
@@ -739,7 +739,7 @@ void D_RasterizeAliasPolySmooth() {
 
         // TODO: make this a function; modularize this function in general
 
-        ystart = plefttop[1];
+        _yStart = plefttop[1];
         d_aspancount = plefttop[0] - prighttop[0];
         d_ptex = (uint8_p)r_affinetridesc.pskin + (plefttop[2] >> 16) +
             (plefttop[3] >> 16) * r_affinetridesc.skinwidth;
@@ -748,8 +748,8 @@ void D_RasterizeAliasPolySmooth() {
         d_light = plefttop[4];
         d_zi = plefttop[5];
 
-        d_pdest = (uint8_p)d_viewbuffer + ystart * screenwidth + plefttop[0];
-        d_pz = d_pzbuffer + ystart * d_zwidth + plefttop[0];
+        d_pdest = (uint8_p)d_viewbuffer + _yStart * screenwidth + plefttop[0];
+        d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop[0];
 
         if (height == 1) {
             d_pedgespanpackage->pdest = d_pdest;

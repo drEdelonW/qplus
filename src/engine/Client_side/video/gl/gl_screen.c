@@ -382,18 +382,18 @@ SCR_DrawTurtle
 ==============
 */
 void SCR_DrawTurtle(void) {
-    static int	count;
+    static int	_count;
 
     if (!scr_showturtle.value)
         return;
 
     if (host_frametime < 0.1) {
-        count = 0;
+        _count = 0;
         return;
     }
 
-    count++;
-    if (count < 3)
+    _count++;
+    if (_count < 3)
         return;
 
     Draw_Pic(scr_vrect.x, scr_vrect.y, scr_turtle);

@@ -692,11 +692,11 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up) {
 }
 
 void GetSoundtime() {
-    static int  buffers;
-    static int  oldsamplepos;
+    static int  _buffers;
+    static int  _oldSamplePos;
     int fullsamples = shm->samples / shm->channels;
 
-    // it is possible to miscount buffers if it has wrapped twice between
+    // it is possible to miscount _buffers if it has wrapped twice between
     // calls to S_Update.  Oh well.
 #ifdef __sun__
     int soundtime = SNDDMA_GetSamples();
@@ -704,18 +704,18 @@ void GetSoundtime() {
     int samplepos = SNDDMA_GetDMAPos();
 
 
-    if (samplepos < oldsamplepos) {
-        buffers++;     // buffer wrapped
+    if (samplepos < _oldSamplePos) {
+        _buffers++;     // buffer wrapped
 
         if (paintedtime > 0x40000000) { // time to chop things off to avoid 32 bit limits
-            buffers = 0;
+            _buffers = 0;
             paintedtime = fullsamples;
             S_StopAllSounds(true);
         }
     }
-    oldsamplepos = samplepos;
+    _oldSamplePos = samplepos;
 
-    soundtime = buffers * fullsamples + samplepos / shm->channels;
+    soundtime = _buffers * fullsamples + samplepos / shm->channels;
 #endif
 }
 #ifdef _WIN32
@@ -782,7 +782,7 @@ console functions
 */
 
 void S_Play() {
-    static int hash = 345;
+    static int _hash = 345;
 
     int i = 1;
     while (i < Cmd_Argc()) {
@@ -794,13 +794,13 @@ void S_Play() {
         else
             Q_strcpy(name, Cmd_Argv(i));
         sfx_p sfx = S_PrecacheSound(name);
-        S_StartSound(hash++, 0, sfx, listener_origin, 1.0, 1.0);
+        S_StartSound(_hash++, 0, sfx, listener_origin, 1.0, 1.0);
         i++;
     }
 }
 
 void S_PlayVol() {
-    static int hash = 543;
+    static int _hash = 543;
 
     int i = 1;
     while (i < Cmd_Argc()) {
@@ -813,7 +813,7 @@ void S_PlayVol() {
             Q_strcpy(name, Cmd_Argv(i));
         sfx_p sfx = S_PrecacheSound(name);
         float vol = Q_atof(Cmd_Argv(i + 1));
-        S_StartSound(hash++, 0, sfx, listener_origin, vol, 1.0);
+        S_StartSound(_hash++, 0, sfx, listener_origin, vol, 1.0);
         i += 2;
     }
 }

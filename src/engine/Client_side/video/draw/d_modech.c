@@ -37,12 +37,12 @@ D_Patch
 void D_Patch() {
 #if id386
 
-    static bool protectset8 = false;
+    static bool _protectSet8 = false;
 
-    if (!protectset8) {
+    if (!_protectSet8) {
         Sys_MakeCodeWriteable((int)D_PolysetAff8Start,
             (int)D_PolysetAff8End - (int)D_PolysetAff8Start);
-        protectset8 = true;
+        _protectSet8 = true;
     }
 
 #endif	// id386

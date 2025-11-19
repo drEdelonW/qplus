@@ -27,9 +27,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define DS_SPAN_LIST_END   (-128)
 
-static int  sprite_height;
-static int  minindex, maxindex;
-static sSpan_p sprite_spans;
+static int  _spriteHeight;
+static int  _minIndex, _maxIndex;
+static sSpan_p _spriteSpans;
 
 #if !id386
 
@@ -174,12 +174,12 @@ D_SpriteScanLeftEdge
 =====================
 */
 void D_SpriteScanLeftEdge() {
-    sSpan_p pspan = sprite_spans;
-    int i = minindex;
+    sSpan_p pspan = _spriteSpans;
+    int i = _minIndex;
     if (i == 0)
         i = r_spritedesc.nump;
 
-    int lmaxindex = maxindex;
+    int lmaxindex = _maxIndex;
     if (lmaxindex == 0)
         lmaxindex = r_spritedesc.nump;
 
@@ -226,8 +226,8 @@ D_SpriteScanRightEdge
 =====================
 */
 void D_SpriteScanRightEdge() {
-    sSpan_p pspan = sprite_spans;
-    int i = minindex;
+    sSpan_p pspan = _spriteSpans;
+    int i = _minIndex;
 
     float vvert = r_spritedesc.pverts[i].v;
     if (vvert < r_refdef.fvrecty_adj)
@@ -286,7 +286,7 @@ void D_SpriteScanRightEdge() {
         if (i == r_spritedesc.nump)
             i = 0;
 
-    } while (i != maxindex);
+    } while (i != _maxIndex);
 
     pspan->count = DS_SPAN_LIST_END; // mark the end of the span list
 }
@@ -321,11 +321,11 @@ void D_SpriteCalculateGradients() {
     vec3_t p_temp1; TransformVector(modelorg, p_temp1);
 
     sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5)) - (-(cachewidth >> 1) << 16);
-    tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5)) - (-(sprite_height >> 1) << 16);
+    tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5)) - (-(_spriteHeight >> 1) << 16);
 
     // -1 (-epsilon) so we never wander off the edge of the texture
     bbextents = (cachewidth << 16) - 1;
-    bbextentt = (sprite_height << 16) - 1;
+    bbextentt = (_spriteHeight << 16) - 1;
 }
 
 
@@ -336,7 +336,7 @@ D_DrawSprite
 */
 void D_DrawSprite() {
     sSpan_t spans[MAXHEIGHT + 1];
-    sprite_spans = spans;
+    _spriteSpans = spans;
 
     // find the top and bottom vertices, and make sure there's at least one scan to
     // draw
@@ -347,12 +347,12 @@ void D_DrawSprite() {
     for (int i = 0; i < r_spritedesc.nump; i++) {
         if (pverts->v < ymin) {
             ymin = pverts->v;
-            minindex = i;
+            _minIndex = i;
         }
 
         if (pverts->v > ymax) {
             ymax = pverts->v;
-            maxindex = i;
+            _maxIndex = i;
         }
 
         pverts++;
@@ -364,7 +364,7 @@ void D_DrawSprite() {
     if (ymin >= ymax)       return;  // doesn't cross any scans at all
 
     cachewidth = r_spritedesc.pspriteframe->width;
-    sprite_height = r_spritedesc.pspriteframe->height;
+    _spriteHeight = r_spritedesc.pspriteframe->height;
     cacheblock = (uint8_p)&r_spritedesc.pspriteframe->pixels[0];
 
     // copy the first vertex to the last vertex, so we don't have to deal with
@@ -376,6 +376,6 @@ void D_DrawSprite() {
     D_SpriteCalculateGradients();
     D_SpriteScanLeftEdge();
     D_SpriteScanRightEdge();
-    D_SpriteDrawSpans(sprite_spans);
+    D_SpriteDrawSpans(_spriteSpans);
 }
 

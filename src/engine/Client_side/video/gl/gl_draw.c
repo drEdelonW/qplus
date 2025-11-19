@@ -898,7 +898,7 @@ GL_Upload32
 */
 void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) {
     int   samples;
-    static uint32_t scaled[1024 * 512]; // [512*256];
+    static uint32_t _scaled[1024 * 512]; // [512*256];
     int   scaled_width, scaled_height;
 
     for (scaled_width = 1; scaled_width < width; scaled_width <<= 1)
@@ -912,7 +912,7 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     if (scaled_width > gl_max_size.value)       scaled_width = gl_max_size.value;
     if (scaled_height > gl_max_size.value)      scaled_height = gl_max_size.value;
 
-    if (scaled_width * scaled_height > sizeof(scaled) / 4)
+    if (scaled_width * scaled_height > sizeof(_scaled) / 4)
         Sys_Error("GL_LoadTexture: too big");
 
     samples = alpha ? gl_alpha_format : gl_solid_format;
@@ -924,9 +924,9 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
         glTexImage2D(GL_TEXTURE_2D, 0, samples, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, trans);
     else {
         gluScaleImage(GL_RGBA, width, height, GL_UNSIGNED_BYTE, trans,
-            scaled_width, scaled_height, GL_UNSIGNED_BYTE, scaled);
-        glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, scaled);
-}
+            scaled_width, scaled_height, GL_UNSIGNED_BYTE, _scaled);
+        glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _scaled);
+    }
 #else
     texels += scaled_width * scaled_height;
 
@@ -935,18 +935,18 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
             glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             goto done;
         }
-        memcpy(scaled, data, width * height * 4);
+        memcpy(_scaled, data, width * height * 4);
     }
     else
-        GL_ResampleTexture(data, width, height, scaled, scaled_width, scaled_height);
+        GL_ResampleTexture(data, width, height, _scaled, scaled_width, scaled_height);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, scaled);
+    glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _scaled);
     if (mipmap) {
         int  miplevel;
 
         miplevel = 0;
         while (scaled_width > 1 || scaled_height > 1) {
-            GL_MipMap((uint8_p)scaled, scaled_width, scaled_height);
+            GL_MipMap((uint8_p)_scaled, scaled_width, scaled_height);
             scaled_width >>= 1;
             scaled_height >>= 1;
             if (scaled_width < 1)
@@ -954,7 +954,7 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
             if (scaled_height < 1)
                 scaled_height = 1;
             miplevel++;
-            glTexImage2D(GL_TEXTURE_2D, miplevel, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, scaled);
+            glTexImage2D(GL_TEXTURE_2D, miplevel, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _scaled);
         }
     }
 done:;
@@ -975,9 +975,8 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
     int   i, s;
     bool noalpha;
     int   p;
-    static uint32_t j;
     int   samples;
-    static uint8_t scaled[1024 * 512]; // [512*256];
+    static uint8_t _scaled[1024 * 512]; // [512*256];
     int   scaled_width, scaled_height;
 
     s = width * height;
@@ -1004,7 +1003,7 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
     if (scaled_width > gl_max_size.value)   scaled_width = gl_max_size.value;
     if (scaled_height > gl_max_size.value)  scaled_height = gl_max_size.value;
 
-    if (scaled_width * scaled_height > sizeof(scaled))
+    if (scaled_width * scaled_height > sizeof(_scaled))
         Sys_Error("GL_LoadTexture: too big");
 
     samples = 1; // alpha ? gl_alpha_format : gl_solid_format;
@@ -1016,24 +1015,26 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
             glTexImage2D(GL_TEXTURE_2D, 0, GL_COLOR_INDEX8_EXT, scaled_width, scaled_height, 0, GL_COLOR_INDEX, GL_UNSIGNED_BYTE, data);
             goto done;
         }
-        memcpy(scaled, data, width * height);
+        memcpy(_scaled, data, width * height);
     }
     else
-        GL_Resample8BitTexture(data, width, height, scaled, scaled_width, scaled_height);
+        GL_Resample8BitTexture(data, width, height, _scaled, scaled_width, scaled_height);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_COLOR_INDEX8_EXT, scaled_width, scaled_height, 0, GL_COLOR_INDEX, GL_UNSIGNED_BYTE, scaled);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_COLOR_INDEX8_EXT, scaled_width, scaled_height, 0, GL_COLOR_INDEX, GL_UNSIGNED_BYTE, _scaled);
     if (mipmap) {
         int  miplevel;
 
         miplevel = 0;
-        while (scaled_width > 1 || scaled_height > 1) {
-            GL_MipMap8Bit((uint8_p)scaled, scaled_width, scaled_height);
+        while ((scaled_width > 1) ||
+            (scaled_height > 1)
+            ) {
+            GL_MipMap8Bit((uint8_p)_scaled, scaled_width, scaled_height);
             scaled_width >>= 1;
             scaled_height >>= 1;
             if (scaled_width < 1)       scaled_width = 1;
             if (scaled_height < 1)      scaled_height = 1;
             miplevel++;
-            glTexImage2D(GL_TEXTURE_2D, miplevel, GL_COLOR_INDEX8_EXT, scaled_width, scaled_height, 0, GL_COLOR_INDEX, GL_UNSIGNED_BYTE, scaled);
+            glTexImage2D(GL_TEXTURE_2D, miplevel, GL_COLOR_INDEX8_EXT, scaled_width, scaled_height, 0, GL_COLOR_INDEX, GL_UNSIGNED_BYTE, _scaled);
         }
     }
 done:;
@@ -1055,7 +1056,7 @@ GL_Upload8
 ===============
 */
 void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
-    static uint32_t trans[640 * 480];  // FIXME, temporary
+    static uint32_t _trans[640 * 480];  // FIXME, temporary
     int   i, s;
     bool noalpha;
     int   p;
@@ -1069,7 +1070,7 @@ void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
             p = data[i];
             if (p == 255)
                 noalpha = false;
-            trans[i] = d_8to24table[p];
+            _trans[i] = d_8to24table[p];
         }
 
         if (alpha && noalpha)
@@ -1079,10 +1080,10 @@ void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
         if (s & 3)
             Sys_Error("GL_Upload8: s&3");
         for (i = 0; i < s; i += 4) {
-            trans[i] = d_8to24table[data[i]];
-            trans[i + 1] = d_8to24table[data[i + 1]];
-            trans[i + 2] = d_8to24table[data[i + 2]];
-            trans[i + 3] = d_8to24table[data[i + 3]];
+            _trans[i] = d_8to24table[data[i]];
+            _trans[i + 1] = d_8to24table[data[i + 1]];
+            _trans[i + 2] = d_8to24table[data[i + 2]];
+            _trans[i + 3] = d_8to24table[data[i + 3]];
         }
     }
 
@@ -1090,7 +1091,7 @@ void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
         GL_Upload8_EXT(data, width, height, mipmap, alpha);
         return;
     }
-    GL_Upload32(trans, width, height, mipmap, alpha);
+    GL_Upload32(_trans, width, height, mipmap, alpha);
 }
 
 /*

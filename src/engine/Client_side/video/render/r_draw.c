@@ -126,23 +126,18 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     {
         float scale = xscale * r_lzi1;
         r_u1 = (xcenter + scale * transformed[0]);
-        if (r_u1 < r_refdef.fvrectx_adj)
-            r_u1 = r_refdef.fvrectx_adj;
-        if (r_u1 > r_refdef.fvrectright_adj)
-            r_u1 = r_refdef.fvrectright_adj;
+        if (r_u1 < r_refdef.fvrectx_adj)        r_u1 = r_refdef.fvrectx_adj;
+        if (r_u1 > r_refdef.fvrectright_adj)    r_u1 = r_refdef.fvrectright_adj;
     }
 
     {
         float scale = yscale * r_lzi1;
         r_v1 = (ycenter - scale * transformed[1]);
-        if (r_v1 < r_refdef.fvrecty_adj)
-            r_v1 = r_refdef.fvrecty_adj;
-        if (r_v1 > r_refdef.fvrectbottom_adj)
-            r_v1 = r_refdef.fvrectbottom_adj;
+        if (r_v1 < r_refdef.fvrecty_adj)        r_v1 = r_refdef.fvrecty_adj;
+        if (r_v1 > r_refdef.fvrectbottom_adj)   r_v1 = r_refdef.fvrectbottom_adj;
     }
 
-    if (r_lzi1 > lzi0)
-        lzi0 = r_lzi1;
+    if (r_lzi1 > lzi0)      lzi0 = r_lzi1;
 
     if (lzi0 > r_nearzi) // for mipmap finding
         r_nearzi = lzi0;
@@ -205,10 +200,8 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     // it to incorrectly extend to the scan, and the extension of the line goes off
     // the edge of the screen
     // FIXME: is this actually needed?
-    if (edge->u < r_refdef.vrect_x_adj_shift20)
-        edge->u = r_refdef.vrect_x_adj_shift20;
-    if (edge->u > r_refdef.vrectright_adj_shift20)
-        edge->u = r_refdef.vrectright_adj_shift20;
+    if (edge->u < r_refdef.vrect_x_adj_shift20)     edge->u = r_refdef.vrect_x_adj_shift20;
+    if (edge->u > r_refdef.vrectright_adj_shift20)  edge->u = r_refdef.vrectright_adj_shift20;
 
     //
     // sort the edge in normally
@@ -327,10 +320,8 @@ R_EmitCachedEdge
 void R_EmitCachedEdge() {
     Edge_p pedge_t = (Edge_p)((uintptr_t)r_edges + (uintptr_t)r_pedge->cachededgeoffset);
 
-    if (!pedge_t->surfs[0])
-        pedge_t->surfs[0] = surface_p - surfaces;
-    else
-        pedge_t->surfs[1] = surface_p - surfaces;
+    if (!pedge_t->surfs[0])     pedge_t->surfs[0] = surface_p - surfaces;
+    else                        pedge_t->surfs[1] = surface_p - surfaces;
 
     if (pedge_t->nearzi > r_nearzi) // for mipmap finding
         r_nearzi = pedge_t->nearzi;
@@ -345,7 +336,7 @@ R_RenderFace
 ================
 */
 void R_RenderFace(mSurface_p fa, int clipflags) {
-    static mEdge_t tedge;
+    static mEdge_t _tEdge;
 
     // skip out if no more surfs
     if ((surface_p) >= surf_max) {
@@ -460,14 +451,14 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
     // FIXME: faster to do in screen space?
     // FIXME: share clipped edges?
     if (_makeLeftEdge) {
-        r_pedge = &tedge;
+        r_pedge = &_tEdge;
         _rLastVertValid = false;
         R_ClipEdge(&r_leftexit, &r_leftenter, pclip->next);
     }
 
     // if there was a clip off the right edge, get the right r_nearzi
     if (_makeRightEdge) {
-        r_pedge = &tedge;
+        r_pedge = &_tEdge;
         _rLastVertValid = false;
         r_nearzionly = true;
         R_ClipEdge(&r_rightexit, &r_rightenter, view_clipplanes[1].next);
@@ -511,7 +502,7 @@ R_RenderBmodelFace
 ================
 */
 void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
-    static mEdge_t tedge;
+    static mEdge_t _tEdge;
 
     // skip out if no more surfs
     if (surface_p >= surf_max) {
@@ -528,7 +519,7 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
     c_faceclip++;
 
     // this is a dummy to give the caching mechanism someplace to write to
-    r_pedge = &tedge;
+    r_pedge = &_tEdge;
 
     // set up clip planes
     ClipPlane_p pclip = NULL;
@@ -562,13 +553,13 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
     // FIXME: faster to do in screen space?
     // FIXME: share clipped edges?
     if (_makeLeftEdge) {
-        r_pedge = &tedge;
+        r_pedge = &_tEdge;
         R_ClipEdge(&r_leftexit, &r_leftenter, pclip->next);
     }
 
     // if there was a clip off the right edge, get the right r_nearzi
     if (_makeRightEdge) {
-        r_pedge = &tedge;
+        r_pedge = &_tEdge;
         r_nearzionly = true;
         R_ClipEdge(&r_rightexit, &r_rightenter, view_clipplanes[1].next);
     }
@@ -693,20 +684,11 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
     int s_axis, t_axis;
     switch (pplane->type) {
     case PLANE_X:
-    case PLANE_ANYX:
-        s_axis = 1;
-        t_axis = 2;
-        break;
+    case PLANE_ANYX:    s_axis = 1; t_axis = 2;     break;
     case PLANE_Y:
-    case PLANE_ANYY:
-        s_axis = 0;
-        t_axis = 2;
-        break;
+    case PLANE_ANYY:    s_axis = 0; t_axis = 2;     break;
     case PLANE_Z:
-    case PLANE_ANYZ:
-        s_axis = 0;
-        t_axis = 1;
-        break;
+    case PLANE_ANYZ:    s_axis = 0; t_axis = 1;     break;
     }
 
     r_nearzi = 0;
@@ -728,20 +710,16 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
         {
             float scale = xscale * lzi;
             float u = (xcenter + scale * transformed[0]);
-            if (u < r_refdef.fvrectx_adj)
-                u = r_refdef.fvrectx_adj;
-            if (u > r_refdef.fvrectright_adj)
-                u = r_refdef.fvrectright_adj;
+            if (u < r_refdef.fvrectx_adj)       u = r_refdef.fvrectx_adj;
+            if (u > r_refdef.fvrectright_adj)   u = r_refdef.fvrectright_adj;
             pverts[i].u = u;
         }
 
         {
             float scale = yscale * lzi;
             float v = (ycenter - scale * transformed[1]);
-            if (v < r_refdef.fvrecty_adj)
-                v = r_refdef.fvrecty_adj;
-            if (v > r_refdef.fvrectbottom_adj)
-                v = r_refdef.fvrectbottom_adj;
+            if (v < r_refdef.fvrecty_adj)       v = r_refdef.fvrecty_adj;
+            if (v > r_refdef.fvrectbottom_adj)  v = r_refdef.fvrectbottom_adj;
             pverts[i].v = v;
         }
         pverts[i].zi = lzi;

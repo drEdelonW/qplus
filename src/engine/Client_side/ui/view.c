@@ -46,7 +46,7 @@ when crossing a water boudnary.
 */
 
 
-static float v_dmg_time, v_dmg_roll, v_dmg_pitch;
+static float _v_DmgTime, _v_DmgRoll, _v_DmgPitch;
 
 
 
@@ -289,9 +289,9 @@ void V_ParseDamage() {
 
     vec3_t forward, right, up;  AngleVectors(ent->angles, forward, right, up);
 
-    v_dmg_roll = count * v_kickroll.value * DotProduct(from, right);
-    v_dmg_pitch = count * v_kickpitch.value * DotProduct(from, forward);
-    v_dmg_time = v_kicktime.value;
+    _v_DmgRoll = count * v_kickroll.value * DotProduct(from, right);
+    _v_DmgPitch = count * v_kickpitch.value * DotProduct(from, forward);
+    _v_DmgTime = v_kicktime.value;
 }
 
 
@@ -450,7 +450,7 @@ void V_UpdatePalette() {
     bool force = V_CheckGamma();
     if (!new && !force)
         return;
-//-------------------
+    //-------------------
     V_CalcBlend();
 
     float a = v_blend[3];
@@ -488,7 +488,7 @@ void V_UpdatePalette() {
         newpal[0] = ramps[0][ir];
         newpal[1] = ramps[1][ig];
         newpal[2] = ramps[2][ib];
-//-------------------
+        //-------------------
         newpal += 3;
     }
 
@@ -526,7 +526,7 @@ void V_UpdatePalette() {
     bool force = V_CheckGamma();
     if (!new && !force)
         return;
-//-------------------
+    //-------------------
     uint8_t pal[255 * 3];
     uint8_p basepal = host_basepal;
     uint8_p newpal = pal;
@@ -546,7 +546,7 @@ void V_UpdatePalette() {
         newpal[0] = gammatable[r];
         newpal[1] = gammatable[g];
         newpal[2] = gammatable[b];
-//-------------------
+        //-------------------
         newpal += 3;
     }
 
@@ -576,36 +576,36 @@ CalcGunAngle
 ==================
 */
 void CalcGunAngle() {
-    static float oldyaw = 0;
-    static float oldpitch = 0;
+    static float _oldYaw = 0;
+    static float _oldPitch = 0;
 
     float yaw = r_refdef.viewangles[YAW];
     yaw = angledelta(yaw - r_refdef.viewangles[YAW]) * 0.4;
     CLAMP(-10, yaw, 10);
     float move = host_frametime * 20;
-    if (yaw > oldyaw) {
-        if ((oldyaw + move) < yaw)
-            yaw = oldyaw + move;
+    if (yaw > _oldYaw) {
+        if ((_oldYaw + move) < yaw)
+            yaw = _oldYaw + move;
     }
     else {
-        if ((oldyaw - move) > yaw)
-            yaw = oldyaw - move;
+        if ((_oldYaw - move) > yaw)
+            yaw = _oldYaw - move;
     }
 
     float pitch = -r_refdef.viewangles[PITCH];
     pitch = angledelta(-pitch - r_refdef.viewangles[PITCH]) * 0.4;
     CLAMP(-10, pitch, 10);
-    if (pitch > oldpitch) {
-        if ((oldpitch + move) < pitch)
-            pitch = oldpitch + move;
+    if (pitch > _oldPitch) {
+        if ((_oldPitch + move) < pitch)
+            pitch = _oldPitch + move;
     }
     else {
-        if ((oldpitch - move) > pitch)
-            pitch = oldpitch - move;
+        if ((_oldPitch - move) > pitch)
+            pitch = _oldPitch - move;
     }
 
-    oldyaw = yaw;
-    oldpitch = pitch;
+    _oldYaw = yaw;
+    _oldPitch = pitch;
 
     cl.viewent.angles[YAW] = r_refdef.viewangles[YAW] + yaw;
     cl.viewent.angles[PITCH] = -(r_refdef.viewangles[PITCH] + pitch);
@@ -656,10 +656,10 @@ void V_CalcViewRoll() {
     float side = V_CalcRoll(cl_entities[cl.viewentity].angles, cl.velocity);
     r_refdef.viewangles[ROLL] += side;
 
-    if (v_dmg_time > 0) {
-        r_refdef.viewangles[ROLL] += v_dmg_time / v_kicktime.value * v_dmg_roll;
-        r_refdef.viewangles[PITCH] += v_dmg_time / v_kicktime.value * v_dmg_pitch;
-        v_dmg_time -= host_frametime;
+    if (_v_DmgTime > 0) {
+        r_refdef.viewangles[ROLL] += _v_DmgTime / v_kicktime.value * _v_DmgRoll;
+        r_refdef.viewangles[PITCH] += _v_DmgTime / v_kicktime.value * _v_DmgPitch;
+        _v_DmgTime -= host_frametime;
     }
 
     if (cl.stats[STAT_HEALTH] <= 0) {
@@ -698,7 +698,7 @@ V_CalcRefdef
 ==================
 */
 void V_CalcRefdef() {
-    static float oldz = 0;
+    static float _oldZ = 0;
 
     V_DriftPitch();
     r_Entity_p ent = &cl_entities[cl.viewentity];   // ent is the player model (visible when out of body)
@@ -780,7 +780,7 @@ void V_CalcRefdef() {
 
     // smooth out stair step ups
     if ((cl.onground) &&
-        ((ent->origin[2] - oldz) > 0)) {
+        ((ent->origin[2] - _oldZ) > 0)) {
 
         float steptime = cl.time - cl.oldtime;
         if (steptime < 0) {
@@ -788,17 +788,13 @@ void V_CalcRefdef() {
             steptime = 0;
         }
 
-        oldz += steptime * 80;
-        if (oldz > ent->origin[2]) {
-            oldz = ent->origin[2];
-        }
-        if ((ent->origin[2] - oldz) > 12) {
-            oldz = ent->origin[2] - 12;
-        }
-        r_refdef.vieworg[2] += oldz - ent->origin[2];
-        view->origin[2] += oldz - ent->origin[2];
+        _oldZ += steptime * 80;
+        if (_oldZ > ent->origin[2])         _oldZ = ent->origin[2];
+        if ((ent->origin[2] - _oldZ) > 12)  _oldZ = ent->origin[2] - 12;
+        r_refdef.vieworg[2] += _oldZ - ent->origin[2];
+        view->origin[2] += _oldZ - ent->origin[2];
     }
-    else { oldz = ent->origin[2]; }
+    else { _oldZ = ent->origin[2]; }
 
     if (chase_active.value)
         Chase_Update();

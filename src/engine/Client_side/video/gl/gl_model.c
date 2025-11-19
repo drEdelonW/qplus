@@ -97,10 +97,10 @@ Mod_DecompressVis
 ===================
 */
 uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
-    static uint8_t decompressed[MAX_MAP_LEAFS / 8];
+    static uint8_t _decompressed[MAX_MAP_LEAFS / 8];
 
     int row = (model->numleafs + 7) >> 3;
-    uint8_p out = decompressed;
+    uint8_p out = _decompressed;
 
 #if 0
     memcpy(out, in, row);
@@ -110,7 +110,7 @@ uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
             *out++ = 0xff;
             row--;
         }
-        return decompressed;
+        return _decompressed;
     }
 
     do {
@@ -125,10 +125,10 @@ uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
             *out++ = 0;
             c--;
         }
-    } while (out - decompressed < row);
+    } while (out - _decompressed < row);
 #endif
 
-    return decompressed;
+    return _decompressed;
 }
 
 uint8_p Mod_LeafPVS(mLeaf_p leaf, Model_p model) {
