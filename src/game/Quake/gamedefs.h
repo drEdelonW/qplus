@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types.h"
+
 // stock defines
 typedef enum {
     IT_SHOTGUN          = (1u << 0),
@@ -93,4 +95,20 @@ typedef enum {
     #define	GAMENAME	"id1"		/* directory to look in by default */
 #else
     #define	GAMENAME	"id1"
+#endif
+
+extern bool     standard_quake;
+extern bool     rogue;
+extern bool     hipnotic;
+extern int32_t  Registered;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    void GM_GameInit();
+    void GM_CheckRegistered();
+    void GM_Quit();
+
+#ifdef __cplusplus
+}
 #endif

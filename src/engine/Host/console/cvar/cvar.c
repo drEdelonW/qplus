@@ -20,11 +20,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cvar.c -- dynamic variable tracking
 
 #include "cvar.h"
+#include "cmd.h"
 #include "q_tools.h"
 #include "console.h"
 #include "zone.h"
-#include "cmd.h"
 #include "server.h"
+#include <math.h>
 
 
 cvar_p cvar_vars;
@@ -51,7 +52,8 @@ Cvar_VariableValue
 float	Cvar_VariableValue(cString var_name) {
     cvar_p var = Cvar_FindVar(var_name);
     if (!var)
-        return 0.0f;
+        // return 0.0f;
+        return NAN;
     return Q_atof(var->string);
 }
 
@@ -111,11 +113,11 @@ void Cvar_Set(cStringRO var_name, cString value) {
 
     // if (var->server && changed)
     if (changed &&
-        (var->flags & cvf_server)
-        ) {
-        if (sv.active)
-            SV_BroadcastPrintf("\"%s\" changed to \"%s\"\n", var->name, var->string);
-    }
+        (var->flags & cvf_server) &&
+        (sv.active)
+        )
+        SV_BroadcastPrintf("\"%s\" changed to \"%s\"\n", var->name, var->string);
+
 }
 
 /*
@@ -124,8 +126,7 @@ Cvar_SetValue
 ============
 */
 void Cvar_SetValue(cStringRO var_name, float value) {
-    char	val[32];
-    snprintf(val, sizeof(val), "%f", value);
+    char val[32]; snprintf(val, sizeof(val), "%f", value);
     Cvar_Set(var_name, val);
 }
 

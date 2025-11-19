@@ -135,7 +135,8 @@
 			"angle.h": "c",
 			"wsipx.h": "c",
 			"WSIPX.H": "cpp",
-			"model_s.h": "c"
+			"model_s.h": "c",
+			"gamedefs.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

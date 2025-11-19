@@ -301,10 +301,21 @@ V_cshift_f
 ==================
 */
 void V_cshift_f() {
+#if 0
     cshift_empty.destcolor[0] = atoi(Cmd_Argv(1));
     cshift_empty.destcolor[1] = atoi(Cmd_Argv(2));
     cshift_empty.destcolor[2] = atoi(Cmd_Argv(3));
     cshift_empty.percent = atoi(Cmd_Argv(4));
+#else
+    cl.cshifts[CSHIFT_BONUS] = (ColorShift_t){
+        {
+            atoi(Cmd_Argv(1)),
+            atoi(Cmd_Argv(2)),
+            atoi(Cmd_Argv(3))
+        },
+        atoi(Cmd_Argv(4))
+    };
+#endif
 }
 
 
@@ -316,10 +327,14 @@ When you run over an item, the server sends this command
 ==================
 */
 void V_BonusFlash_f() {
+#if 0
     cl.cshifts[CSHIFT_BONUS].destcolor[0] = 215;
     cl.cshifts[CSHIFT_BONUS].destcolor[1] = 186;
     cl.cshifts[CSHIFT_BONUS].destcolor[2] = 69;
     cl.cshifts[CSHIFT_BONUS].percent = 50;
+#else
+    cl.cshifts[CSHIFT_BONUS] = (ColorShift_t){ {215, 186, 69}, 50 };
+#endif
 }
 
 /*

@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "common.h"
 #include "host.h"
-#include "cvar_q1.h"
+// #include "cvar_q1.h"
 #include <string.h>
 #include <stdarg.h>
 #include "sys.h"
@@ -49,62 +49,13 @@ static cStringRO _safeArgvs[NUM_SAFE_ARGVS] = {
 };
 
 
-static int32_t  _Registered = 1;  // only for startup check, then set
 
 bool  msg_suppress_1 = false; // supress System messages
 
 // if a packfile directory differs from this, it is assumed to be hacked
 
 
-
 common_t com;
-
-bool standard_quake = true;
-bool rogue;
-bool hipnotic;
-
-// this graphic needs to be in the pak file to use registered features
-uint16_t pop[128] = {
-    0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-    0x0000,0x0000,0x6600,0x0000,0x0000,0x0000,0x6600,0x0000,
-    0x0000,0x0066,0x0000,0x0000,0x0000,0x0000,0x0067,0x0000,
-    0x0000,0x6665,0x0000,0x0000,0x0000,0x0000,0x0065,0x6600,
-    0x0063,0x6561,0x0000,0x0000,0x0000,0x0000,0x0061,0x6563,
-    0x0064,0x6561,0x0000,0x0000,0x0000,0x0000,0x0061,0x6564,
-    0x0064,0x6564,0x0000,0x6469,0x6969,0x6400,0x0064,0x6564,
-    0x0063,0x6568,0x6200,0x0064,0x6864,0x0000,0x6268,0x6563,
-    0x0000,0x6567,0x6963,0x0064,0x6764,0x0063,0x6967,0x6500,
-    0x0000,0x6266,0x6769,0x6a68,0x6768,0x6a69,0x6766,0x6200,
-    0x0000,0x0062,0x6566,0x6666,0x6666,0x6666,0x6562,0x0000,
-    0x0000,0x0000,0x0062,0x6364,0x6664,0x6362,0x0000,0x0000,
-    0x0000,0x0000,0x0000,0x0062,0x6662,0x0000,0x0000,0x0000,
-    0x0000,0x0000,0x0000,0x0061,0x6661,0x0000,0x0000,0x0000,
-    0x0000,0x0000,0x0000,0x0000,0x6500,0x0000,0x0000,0x0000,
-    0x0000,0x0000,0x0000,0x0000,0x6400,0x0000,0x0000,0x0000
-};
-
-/*
-
-
-All of Quake's data access is through a hierchal file system, but the contents of the file system can be transparently merged from several sources.
-
-The "base directory" is the path to the directory holding the quake.exe and all game directories.  The sys_* files pass this to host_init in QuakeParms_t->baseDir.  This can be overridden with the "-basedir" command line parm to allow code debugging in a different directory.  The base directory is
-only used during filesystem initialization.
-
-The "game directory" is the first tree on the search path and directory that all generated files (savegames, screenshots, demos, config files) will be saved to.  This can be overridden with the "-game" command line parameter.  The game directory can never be changed while quake is executing.  This is a precacution against having a malicious server instruct clients to write files over areas they shouldn't.
-
-The "cache directory" is only used during development to save network bandwidth, especially over ISDN / T1 lines.  If there is a cache directory
-specified, when a file is found by the normal search path, it will be mirrored
-into the cache directory, then opened there.
-
-
-
-FIXME:
-The file "parms.txt" will be read out of the game directory and appended to the current command line arguments to allow different games to initialize startup parms differently.  This could be used to add a "-sspeed 22050" for the high quality sound edition.  Because they are added at the end, they will not override an explicit setting on the original command line.
-
-*/
-
-
 
 //============================================================================
 
@@ -299,47 +250,6 @@ int COM_CheckParm(cStringRO parm) {
 
     return 0;
 }
-
-/*
-================
-COM_CheckRegistered
-
-Looks for the pop.txt file and verifies it.
-Sets the "registered" cvar.
-Immediately exits out if an alternate game was attempted to be started without
-being registered.
-================
-*/
-void COM_CheckRegistered() {
-    int h;
-    COM_OpenFile("gfx/pop.lmp", &h);
-    _Registered = 0;
-
-    if (h == -1) {
-#if WINDED
-        Sys_Error("This dedicated server requires a full registered copy of Quake");
-#endif
-        Con_Printf("Playing shareware version.\n");
-        if (contModified)
-            Sys_Error("You must have the registered version to use modified games");
-        return;
-    }
-
-    int16_t  check[128];
-    Sys_FileRead(h, check, sizeof(check));
-    COM_CloseFile(h);
-
-    for (int i = 0; i < 128; i++)
-        if (pop[i] != (uint16_t)BigShort(check[i]))
-            Sys_Error("Corrupted data file.");
-
-    Cvar_Set("cmdline", com.cmdline);
-    Cvar_Set("registered", "1");
-    _Registered = 1;
-    Con_Printf("Playing registered version.\n");
-}
-
-
 
 
 /*
@@ -571,7 +481,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
         }
         else {
             // check a file in the directory tree
-            if (!_Registered) {       // if not a registered version, don't ever go beyond base
+            if (!Registered) {       // if not a registered version, don't ever go beyond base
                 if (strchr(filename, '/') ||
                     strchr(filename, '\\'))
                     continue;
@@ -867,10 +777,9 @@ COM_Init
 void COM_Init(cStringRO basedir) {
     COM_Endian_Init();
 
-    Cvar_RegisterVariable(&registered);
-    Cvar_RegisterVariable(&cmdline);
+    GM_GameInit();
     Cmd_AddCommand("path", COM_Path_f);
 
     COM_InitFilesystem();
-    COM_CheckRegistered();
+    GM_CheckRegistered();
 }

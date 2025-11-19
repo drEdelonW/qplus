@@ -107,26 +107,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                                 SRC_LIST += $(RENDER_DIR)/r_vars.c
 
                         $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
-                                $(eval MENU_DIR = $(UI_DIR)/menu) $(eval INCLUDES += $(MENU_DIR))
-                                        SRC_LIST += $(MENU_DIR)/menu.c
-                                        SRC_LIST += $(MENU_DIR)/menu_common.c
-                                        SRC_LIST += $(MENU_DIR)/menu_main.c
-                                        SRC_LIST += $(MENU_DIR)/menu_singleplayer.c
-                                        SRC_LIST += $(MENU_DIR)/menu_load_save.c
-                                        SRC_LIST += $(MENU_DIR)/menu_multiplayer.c
-                                        SRC_LIST += $(MENU_DIR)/menu_setup.c
-                                        SRC_LIST += $(MENU_DIR)/menu_net.c
-                                        SRC_LIST += $(MENU_DIR)/menu_search.c
-                                        SRC_LIST += $(MENU_DIR)/menu_server_list.c
-                                        SRC_LIST += $(MENU_DIR)/menu_config_serial.c
-                                        SRC_LIST += $(MENU_DIR)/menu_config_modem.c
-                                        SRC_LIST += $(MENU_DIR)/menu_config_lan.c
-                                        SRC_LIST += $(MENU_DIR)/menu_options.c
-                                        SRC_LIST += $(MENU_DIR)/menu_game_options.c
-                                        SRC_LIST += $(MENU_DIR)/menu_defkey.c
-                                        SRC_LIST += $(MENU_DIR)/menu_help.c
-                                        SRC_LIST += $(MENU_DIR)/menu_quit.c
-
                                 SRC_LIST += $(UI_DIR)/screen.c
                                 SRC_LIST += $(UI_DIR)/sbar.c
                                 SRC_LIST += $(UI_DIR)/view.c
@@ -182,3 +162,24 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
 
 $(eval GAME_DIR := $(SRC_DIR)/game/Quake) $(eval INCLUDES += $(GAME_DIR))
+        $(eval MENU_DIR = $(GAME_DIR)/menu) $(eval INCLUDES += $(MENU_DIR))
+                SRC_LIST += $(MENU_DIR)/menu.c
+                SRC_LIST += $(MENU_DIR)/menu_common.c
+                SRC_LIST += $(MENU_DIR)/menu_main.c
+                SRC_LIST += $(MENU_DIR)/menu_singleplayer.c
+                SRC_LIST += $(MENU_DIR)/menu_load_save.c
+                SRC_LIST += $(MENU_DIR)/menu_multiplayer.c
+                SRC_LIST += $(MENU_DIR)/menu_setup.c
+                SRC_LIST += $(MENU_DIR)/menu_net.c
+                SRC_LIST += $(MENU_DIR)/menu_search.c
+                SRC_LIST += $(MENU_DIR)/menu_server_list.c
+                SRC_LIST += $(MENU_DIR)/menu_config_serial.c
+                SRC_LIST += $(MENU_DIR)/menu_config_modem.c
+                SRC_LIST += $(MENU_DIR)/menu_config_lan.c
+                SRC_LIST += $(MENU_DIR)/menu_options.c
+                SRC_LIST += $(MENU_DIR)/menu_game_options.c
+                SRC_LIST += $(MENU_DIR)/menu_defkey.c
+                SRC_LIST += $(MENU_DIR)/menu_help.c
+                SRC_LIST += $(MENU_DIR)/menu_quit.c
+
+        SRC_LIST += $(GAME_DIR)/game_rule.c

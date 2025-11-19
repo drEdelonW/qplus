@@ -49,9 +49,6 @@ typedef struct {
 
 extern common_t com;
 
-extern bool standard_quake;
-extern bool rogue;
-extern bool hipnotic;
 
 
 // extern bool com_eof; // not used

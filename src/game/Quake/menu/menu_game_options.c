@@ -5,6 +5,7 @@
 #include "host.h"
 #include "screen.h"
 #include "cbuf.h"
+#include "gamedefs.h"
 
 //=============================================================================
 /* GAME OPTIONS MENU */
