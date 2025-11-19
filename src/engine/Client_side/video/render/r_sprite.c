@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "q_tools.h"
 #include "r_local.h"
+#include "host.h"
 #include "console.h"
 
 static int      _clipCurrent = 0;
@@ -229,7 +230,7 @@ void R_SetupAndDrawSprite() {
     for (int i = 0; i < 4; i++) {
         nump = R_ClipSpriteFace(nump, &view_clipplanes[i]);
         if (nump < 3)                   return;
-        if (nump >= MAXWORKINGVERTS)    Sys_Error("R_SetupAndDrawSprite: too many points");
+        if (nump >= MAXWORKINGVERTS)    Host_SysError("R_SetupAndDrawSprite: too many points");
     }
 
     // transform vertices into viewspace and project
@@ -408,7 +409,7 @@ void R_DrawSprite() {
         }
     }
     else {
-        Sys_Error("R_DrawSprite: Bad sprite type %d", psprite->type);
+        Host_SysError("R_DrawSprite: Bad sprite type %d", psprite->type);
     }
 
     R_RotateSprite(psprite->beamlength);

@@ -7,7 +7,7 @@
 #include "client.h"
 #include "angle.h"
 #include "q_tools.h"
-#include "host.h"
+#include "gamedefs.h"
 
 #include <X11/keysym.h>
 #include <X11/Xutil.h>

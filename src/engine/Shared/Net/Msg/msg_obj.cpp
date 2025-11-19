@@ -49,7 +49,7 @@ void NetMsg::WriteChar(sizebuf_p sb, int8_t c) {
     if (!sb)    return;
 #ifdef PARANOID
     if ((c < -128) || (c > 127))
-        Sys_Error("NetMsg::WriteChar: range error");
+        Host_SysError("NetMsg::WriteChar: range error");
 #endif
 
     uint8_p buf = (uint8_p)SZ_GetSpace(sb, 1);
@@ -75,7 +75,7 @@ void NetMsg::WriteByte(sizebuf_p sb, uint8_t c) {
     if (!sb)    return;
 #ifdef PARANOID
     if ((c < 0x00) || (c > 0XFF))
-        Sys_Error("NetMsg::WriteByte: range error");
+        Host_SysError("NetMsg::WriteByte: range error");
 #endif
 
     uint8_p buf = (uint8_p)SZ_GetSpace(sb, 1);
@@ -104,7 +104,7 @@ void NetMsg::WriteShort(sizebuf_p sb, int16_t c) {
     if (!sb)    return;
 #ifdef PARANOID
     if ((c < ((int16_t)0x8000)) || (c > (int16_t)0x7fff))
-        Sys_Error("NetMsg::WriteShort: range error");
+        Host_SysError("NetMsg::WriteShort: range error");
 #endif
 
     uint8_p buf = (uint8_p)SZ_GetSpace(sb, 2);

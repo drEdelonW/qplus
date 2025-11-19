@@ -1040,11 +1040,11 @@ void R_RenderView(void) {
         return;
 
     if (!r_worldentity.model || !cl.worldmodel)
-        Sys_Error("R_RenderView: NULL worldmodel");
+        Host_SysError("R_RenderView: NULL worldmodel");
 
     if (r_speeds.value) {
         glFinish();
-        time1 = Sys_FloatTime();
+        time1 = Host_FloatTime();
         c_brush_polys = 0;
         c_alias_polys = 0;
     }
@@ -1081,7 +1081,7 @@ void R_RenderView(void) {
 
     if (r_speeds.value) {
         //  glFinish ();
-        time2 = Sys_FloatTime();
+        time2 = Host_FloatTime();
         Con_Printf("%3i ms  %4i wpoly %4i epoly\n", (int)((time2 - time1) * 1000), c_brush_polys, c_alias_polys);
     }
 }

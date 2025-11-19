@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "q_tools.h"
 #include "console.h"
-#include "sys.h"
 
 typedef struct sockaddr_ipx sockaddr_ipx_t;
 typedef sockaddr_ipx_t* sockaddr_ipx_p;
@@ -136,7 +135,7 @@ void WIPX_Listen(bool state) {
         if (net_acceptsocket != -1)
             return;
         if ((net_acceptsocket = WIPX_OpenSocket(net_hostport)) == -1)
-            Sys_Error("WIPX_Listen: Unable to open accept socket\n");
+            Host_SysError("WIPX_Listen: Unable to open accept socket\n");
         return;
     }
 
@@ -180,7 +179,7 @@ int WIPX_OpenSocket(int port) {
         return handle;
     }
 
-    Sys_Error("Winsock IPX bind failed\n");
+    Host_SysError("Winsock IPX bind failed\n");
 ErrorReturn:
     pclosesocket(newsocket);
     return -1;
@@ -213,7 +212,7 @@ int WIPX_CheckNewConnections(void) {
         return -1;
 
     if (pioctlsocket(ipxsocket[net_acceptsocket], FIONREAD, &available) == -1)
-        Sys_Error("WIPX: ioctlsocket (FIONREAD) failed\n");
+        Host_SysError("WIPX: ioctlsocket (FIONREAD) failed\n");
     if (available)
         return net_acceptsocket;
     return -1;

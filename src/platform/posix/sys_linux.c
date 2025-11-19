@@ -85,7 +85,7 @@ void Sys_Printf(cStringRO fmt, ...) {
     for (uint8_p p = (uint8_p)text; *p; p++) {
         *p &= 0x7f;
         if (((*p > 128) ||  // ASCII [DEL] last printable
-            (*p < 32)) &&  // ASCII [SP] first printable
+            (*p < 32)) &&   // ASCII [SP] first printable
             (*p != 10) &&   // ASCII [LF]
             (*p != 13) &&   // ASCII [CR]
             (*p != 9)       // ASCII [HT]

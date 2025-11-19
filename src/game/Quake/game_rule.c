@@ -1,4 +1,5 @@
 #include "gamedefs.h"
+#include "host.h"
 #include "common.h"
 #include "console.h"
 #include "sys.h"
@@ -74,11 +75,11 @@ void GM_CheckRegistered() {
 
     if (h == -1) {
 #if WINDED
-        Sys_Error("This dedicated server requires a full registered copy of Quake");
+        Host_SysError("This dedicated server requires a full registered copy of Quake");
 #endif
         Con_Printf("Playing shareware version.\n");
         if (contModified)
-            Sys_Error("You must have the registered version to use modified games");
+            Host_SysError("You must have the registered version to use modified games");
         return;
     }
 
@@ -88,7 +89,7 @@ void GM_CheckRegistered() {
 
     for (int i = 0; i < 128; i++)
         if (_pop[i] != (uint16_t)BigShort(check[i]))
-            Sys_Error("Corrupted data file.");
+            Host_SysError("Corrupted data file.");
 
     Cvar_Set("cmdline", com.cmdline);
     Cvar_Set("registered", "1");

@@ -53,7 +53,7 @@ int findhandle() {
     for (int i = 1; i < MAX_HANDLES; i++)
         if (!_sys_handles[i])
             return i;
-    Sys_Error("out of handles");
+    Host_SysError("out of handles");
     return -1;
 }
 
@@ -90,7 +90,7 @@ __attribute__((weak)) int Sys_FileOpenWrite(cStringRO path) {
 
     FILE* f = fopen(path, "wb");
     if (!f)
-        Sys_Error("Error opening %s: %s", path, strerror(errno));
+        Host_SysError("Error opening %s: %s", path, strerror(errno));
     _sys_handles[i] = f;
 
     return i;
@@ -134,8 +134,8 @@ SYSTEM IO
 __attribute__((weak)) void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
 
 
-__attribute__((weak)) void Sys_Error(cStringRO error, ...) {
-    printf("Sys_Error: ");
+__attribute__((weak)) void Host_SysError(cStringRO error, ...) {
+    printf("Host_SysError: ");
     va_list argptr;    va_start(argptr, error);
     vprintf(error, argptr);
     va_end(argptr);
@@ -152,7 +152,7 @@ __attribute__((weak)) void Sys_Printf(cStringRO fmt, ...) {
 
 __attribute__((weak)) void Sys_Quit() { exit(0); }
 
-__attribute__((weak)) double Sys_FloatTime() {
+__attribute__((weak)) double Sys_FloatTime_() {
     static double _time;
     _time += 0.1;
     return _time;

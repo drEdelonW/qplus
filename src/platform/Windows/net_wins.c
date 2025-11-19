@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include "console.h"
 #include "common.h"
-#include "sys.h"
 
 
 #define MAXHOSTNAMELEN  256
@@ -76,7 +75,7 @@ BOOL PASCAL FAR BlockingHook(void) {
     MSG  msg;
     BOOL ret;
 
-    if ((Sys_FloatTime() - blocktime) > 2.0) {
+    if ((Host_FloatTime() - blocktime) > 2.0) {
         WSACancelBlockingCall();
         return FALSE;
     }
@@ -106,7 +105,7 @@ void WINS_GetLocalAddress() {
     if (pgethostname(buff, MAXHOSTNAMELEN) == SOCKET_ERROR)
         return;
 
-    blocktime = Sys_FloatTime();
+    blocktime = Host_FloatTime();
     WSASetBlockingHook(BlockingHook);
     local = pgethostbyname(buff);
     WSAUnhookBlockingHook();
@@ -214,11 +213,11 @@ int WINS_Init(void) {
         if (i < com.argc-1) {
             myAddr = inet_addr(com.argv[i+1]);
             if (myAddr == INADDR_NONE)
-                Sys_Error("%s is not a valid IP address", com.argv[i+1]);
+                Host_SysError("%s is not a valid IP address", com.argv[i+1]);
             strcpy(my_tcpip_address, com.argv[i+1]);
         }
         else {
-            Sys_Error("NET_Init: you must specify an IP address after -ip");
+            Host_SysError("NET_Init: you must specify an IP address after -ip");
         }
     }
     else {
@@ -261,7 +260,7 @@ void WINS_Listen(bool state) {
             return;
         WINS_GetLocalAddress();
         if ((net_acceptsocket = WINS_OpenSocket(net_hostport)) == -1)
-            Sys_Error("WINS_Listen: Unable to open accept socket\n");
+            Host_SysError("WINS_Listen: Unable to open accept socket\n");
         return;
     }
 
@@ -291,7 +290,7 @@ int WINS_OpenSocket(int port) {
     if (bind(newsocket, (void*)&address, sizeof(address)) == 0)
         return newsocket;
 
-    Sys_Error("Unable to bind to %s", WINS_AddrToString((struct qsockaddr*)&address));
+    Host_SysError("Unable to bind to %s", WINS_AddrToString((struct qsockaddr*)&address));
 ErrorReturn:
     pclosesocket(newsocket);
     return -1;
@@ -417,7 +416,7 @@ int WINS_Broadcast(int socket, byte* buf, int len) {
 
     if (socket != net_broadcastsocket) {
         if (net_broadcastsocket != 0)
-            Sys_Error("Attempted to use multiple broadcasts sockets\n");
+            Host_SysError("Attempted to use multiple broadcasts sockets\n");
         WINS_GetLocalAddress();
         ret = WINS_MakeSocketBroadcastCapable(socket);
         if (ret == -1) {

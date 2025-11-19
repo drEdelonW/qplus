@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_alias.c: routines for setting up to draw alias models
 
 #include "r_local.h"
+#include "host.h"
 #include "d_local.h" // FIXME: shouldn't be needed (is needed for patch
                         // right now, but that should move)
 #include "console.h"
@@ -655,7 +656,7 @@ void R_AliasDrawModel(aLight_p plighting) {
     R_AliasSetupFrame();
 
     if (!currententity->colormap)
-        Sys_Error("R_AliasDrawModel: !currententity->colormap");
+        Host_SysError("R_AliasDrawModel: !currententity->colormap");
 
     r_affinetridesc.drawtype =
         (currententity->trivial_accept == 3) &&

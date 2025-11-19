@@ -359,7 +359,7 @@ void Con_Printf(cStringRO fmt, ...) {
     va_end(argptr);
 
     // also echo to debugging console
-    Sys_Printf("%s", msg); // also echo to debugging console
+    Host_Printf("%s", msg); // also echo to debugging console
 
     // log all messages to file
     if (_con.debuglog)
@@ -581,10 +581,10 @@ void Con_NotifyBox(cString text) {
     key.dest = key_console;
 
     do {
-        double t1 = Sys_FloatTime();
+        double t1 = Host_FloatTime();
         SCR_UpdateScreen();
         Sys_SendKeyEvents();
-        double t2 = Sys_FloatTime();
+        double t2 = Host_FloatTime();
         realtime += t2 - t1;    // make the cursor blink
     } while (key.count < 0);
 

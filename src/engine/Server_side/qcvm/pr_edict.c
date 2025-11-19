@@ -113,7 +113,7 @@ edict_p ED_Alloc() {
         }
     }
 
-    if (i == MAX_EDICTS)            Sys_Error("ED_Alloc: no free edicts");
+    if (i == MAX_EDICTS)            Host_SysError("ED_Alloc: no free edicts");
 
     sv.num_edicts++;
     edict_p edict = EDICT_NUM(i);
@@ -365,9 +365,9 @@ For debugging
 =============
 */
 void ED_Print(edict_p ed) {
-    if (ed->free) { Sys_Printf("FREE\n"); return; }
+    if (ed->free) { Host_Printf("FREE\n"); return; }
 
-    Sys_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
+    Host_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
     for (int i = 1; i < progs->fielddefs.num; i++) {
         dDef_p d = &pr_fielddefs[i];
         cString name = pr_strings + d->s_name;
@@ -387,12 +387,12 @@ void ED_Print(edict_p ed) {
         if (j == type_size[type])
             continue;
 
-        Sys_Printf("%s", name);
+        Host_Printf("%s", name);
         size_t l = strlen(name);
         while (l++ < 15)
-            Sys_Printf(" ");
+            Host_Printf(" ");
 
-        Sys_Printf("%s\n", PR_ValueString(d->type, (eval_p)v));
+        Host_Printf("%s\n", PR_ValueString(d->type, (eval_p)v));
     }
 }
 
@@ -445,7 +445,7 @@ For debugging, prints all the entities in the current server
 =============
 */
 void ED_PrintEdicts() {
-    Sys_Printf("%i entities\n", sv.num_edicts);
+    Host_Printf("%i entities\n", sv.num_edicts);
     for (uint32_t i = 0; i < sv.num_edicts; i++)
         ED_PrintNum(i);
 }
@@ -459,7 +459,7 @@ For debugging, prints a single edicy
 */
 void ED_PrintEdict_f() {
     uint32_t i = (uint32_t)Q_atoi(Cmd_Argv(1));
-    if (i >= sv.num_edicts) { Sys_Printf("Bad edict number\n"); return; }
+    if (i >= sv.num_edicts) { Host_Printf("Bad edict number\n"); return; }
     ED_PrintNum(i);
 }
 
@@ -485,11 +485,11 @@ void ED_Count() {
         if (ent->v.movetype == MOVETYPE_STEP)   step++;
     }
 
-    Sys_Printf("num_edicts:%3i\n", sv.num_edicts);
-    Sys_Printf("active    :%3i\n", active);
-    Sys_Printf("view      :%3i\n", models);
-    Sys_Printf("touch     :%3i\n", solid);
-    Sys_Printf("step      :%3i\n", step);
+    Host_Printf("num_edicts:%3i\n", sv.num_edicts);
+    Host_Printf("active    :%3i\n", active);
+    Host_Printf("view      :%3i\n", models);
+    Host_Printf("touch     :%3i\n", solid);
+    Host_Printf("step      :%3i\n", step);
 
 }
 
@@ -538,19 +538,19 @@ void ED_ParseGlobals(cString data) {
         // parse key
         data = COM_Parse(data);
         if (com.token[0] == '}')    break;
-        if (!data)                  Sys_Error("ED_ParseEntity: EOF without closing brace");
+        if (!data)                  Host_SysError("ED_ParseEntity: EOF without closing brace");
 
         char keyname[NAME_LENGTH];
         strcpy(keyname, com.token);
 
         // parse value
         data = COM_Parse(data);
-        if (!data)                  Sys_Error("ED_ParseEntity: EOF without closing brace");
-        if (com.token[0] == '}')    Sys_Error("ED_ParseEntity: closing brace without data");
+        if (!data)                  Host_SysError("ED_ParseEntity: EOF without closing brace");
+        if (com.token[0] == '}')    Host_SysError("ED_ParseEntity: closing brace without data");
 
         dDef_p key = ED_FindGlobal(keyname);
         if (!key) {
-            Sys_Printf("'%s' is not a global\n", keyname);
+            Host_Printf("'%s' is not a global\n", keyname);
             continue;
         }
 
@@ -622,7 +622,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
     case ev_field:
         dDef_p def = ED_FindField(s);
         if (!def) {
-            Sys_Printf("Can't find field %s\n", s);
+            Host_Printf("Can't find field %s\n", s);
             return false;
         }
         *(int*)d = G_INT(def->ofs);
@@ -631,7 +631,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
     case ev_function:
         dFunction_p func = ED_FindFunction(s);
         if (!func) {
-            Sys_Printf("Can't find function %s\n", s);
+            Host_Printf("Can't find function %s\n", s);
             return false;
         }
         *(func_t*)d = func - pr_functions;
@@ -663,7 +663,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
         // parse key
         data = COM_Parse(data);
         if (com.token[0] == '}')    break;
-        if (!data)                  Sys_Error("ED_ParseEntity: EOF without closing brace");
+        if (!data)                  Host_SysError("ED_ParseEntity: EOF without closing brace");
 
         // anglehack is to allow QuakeEd to write single scalar angles
         // and allow them to be turned into vectors. (FIXME...)
@@ -691,8 +691,8 @@ cString ED_ParseEdict(cString data, edict_p ent) {
 
         // parse value
         data = COM_Parse(data);
-        if (!data)                  Sys_Error("ED_ParseEntity: EOF without closing brace");
-        if (com.token[0] == '}')    Sys_Error("ED_ParseEntity: closing brace without data");
+        if (!data)                  Host_SysError("ED_ParseEntity: EOF without closing brace");
+        if (com.token[0] == '}')    Host_SysError("ED_ParseEntity: closing brace without data");
 
         init = true;
 
@@ -703,7 +703,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
 
         dDef_p key = ED_FindField(keyname);
         if (!key) {
-            Sys_Printf("'%s' is not a field\n", keyname);
+            Host_Printf("'%s' is not a field\n", keyname);
             continue;
         }
 
@@ -751,7 +751,7 @@ void ED_LoadFromFile(cString data) {
         // parse the opening brace
         data = COM_Parse(data);
         if (!data)  break;
-        if (com.token[0] != '{')    Sys_Error("ED_LoadFromFile: found %s when expecting {", com.token);
+        if (com.token[0] != '{')    Host_SysError("ED_LoadFromFile: found %s when expecting {", com.token);
 
         if (!ent)   ent = EDICT_NUM(0);
         else        ent = ED_Alloc();
@@ -778,7 +778,7 @@ void ED_LoadFromFile(cString data) {
         // immediately call spawn function
         //
         if (!ent->v.classname) {
-            Sys_Printf("No classname for:\n");
+            Host_Printf("No classname for:\n");
             ED_Print(ent);
             ED_Free(ent);
             continue;
@@ -788,7 +788,7 @@ void ED_LoadFromFile(cString data) {
         dFunction_p func = ED_FindFunction(pr_strings + ent->v.classname);
 
         if (!func) {
-            Sys_Printf("No spawn function for:\n");
+            Host_Printf("No spawn function for:\n");
             ED_Print(ent);
             ED_Free(ent);
             continue;
@@ -815,7 +815,7 @@ void PR_LoadProgs() {
     CRC_Init(&pr_crc);
 
     progs = (dprograms_p)COM_LoadHunkFile("progs.dat");
-    if (!progs)                             Sys_Error("PR_LoadProgs: couldn't load progs.dat");
+    if (!progs)                             Host_SysError("PR_LoadProgs: couldn't load progs.dat");
 
     Con_DPrintf("Programs occupy %iK.\n", com.filesize / 1024);
 
@@ -826,8 +826,8 @@ void PR_LoadProgs() {
     for (int i = 0; i < sizeof(*progs) / 4; i++)
         ((int*)progs)[i] = LittleLong(((int*)progs)[i]);
 
-    if (progs->version != PROG_VERSION)     Sys_Error("progs.dat has wrong version number (%i should be %i)", progs->version, PROG_VERSION);
-    if (progs->crc != PROGHEADER_CRC)       Sys_Error("progs.dat system vars have been modified, progdefs.h is out of date");
+    if (progs->version != PROG_VERSION)     Host_SysError("progs.dat has wrong version number (%i should be %i)", progs->version, PROG_VERSION);
+    if (progs->crc != PROGHEADER_CRC)       Host_SysError("progs.dat system vars have been modified, progdefs.h is out of date");
 
     pr_functions = (dFunction_p)((uint8_p)progs + progs->functions.ofs);
     pr_strings = (cString)progs + progs->strings.ofs;
@@ -865,7 +865,7 @@ void PR_LoadProgs() {
 
     for (int i = 0; i < progs->fielddefs.num; i++) {
         pr_fielddefs[i].type = (op_type)LittleShort((int16_t)pr_fielddefs[i].type);
-        if (pr_fielddefs[i].type & DEF_SAVEGLOBAL)      Sys_Error("PR_LoadProgs: pr_fielddefs[i].type & DEF_SAVEGLOBAL");
+        if (pr_fielddefs[i].type & DEF_SAVEGLOBAL)      Host_SysError("PR_LoadProgs: pr_fielddefs[i].type & DEF_SAVEGLOBAL");
 
         pr_fielddefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_fielddefs[i].ofs);
         pr_fielddefs[i].s_name = LittleLong(pr_fielddefs[i].s_name);
@@ -903,7 +903,7 @@ edict_p EDICT_NUM(uint32_t n) {
     if (
         // (n < 0) ||
         (n >= sv.max_edicts))
-        Sys_Error("EDICT_NUM: bad number %i", n);
+        Host_SysError("EDICT_NUM: bad number %i", n);
 
     return (edict_p)((uint8_p)sv.edicts + ((n)*pr_edict_size));
 }
@@ -914,7 +914,7 @@ uint32_t NUM_FOR_EDICT(edict_p edict) {
     if (
         // (b < 0) ||
         (b >= sv.num_edicts))
-        Sys_Error("NUM_FOR_EDICT: bad pointer");
+        Host_SysError("NUM_FOR_EDICT: bad pointer");
 
     return b;
 }

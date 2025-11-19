@@ -21,8 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "sound.h"
 #include <string.h>
-#include "sys.h"
 #include "msg.h"
+#include "host.h"
 #include "protocol.h"
 #include "console.h"
 #include "client.h"
@@ -314,7 +314,7 @@ void CL_ParseTEnt() {
     } break;
 #endif
 
-    default:    Sys_Error("CL_ParseTEnt: bad type");
+    default:    Host_SysError("CL_ParseTEnt: bad type");
     }
 }
 

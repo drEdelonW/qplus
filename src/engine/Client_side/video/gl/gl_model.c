@@ -64,7 +64,7 @@ TypeLess_ptr Mod_Extradata(Model_p mod) { // same
 
     Mod_LoadModel(mod, true);
 
-    if (!mod->cache.data)   Sys_Error("Mod_Extradata: caching failed");
+    if (!mod->cache.data)   Host_SysError("Mod_Extradata: caching failed");
 
     return mod->cache.data;
 }
@@ -75,7 +75,7 @@ Mod_PointInLeaf
 ===============
 */
 mLeaf_p Mod_PointInLeaf(vec3_t p, Model_p model) { // same
-    if (!model || !model->nodes)    Sys_Error("Mod_PointInLeaf: bad model");
+    if (!model || !model->nodes)    Host_SysError("Mod_PointInLeaf: bad model");
 
     mNode_p node = model->nodes;
     while (1) {
@@ -161,7 +161,7 @@ Model_p Mod_FindName(cString name) {
 
 
     if (!name[0])
-        Sys_Error("Mod_ForName: NULL name");
+        Host_SysError("Mod_ForName: NULL name");
 
     //
     // search the currently loaded models
@@ -174,7 +174,7 @@ Model_p Mod_FindName(cString name) {
 
     if (i == _mod_NumKnown) {
         if (_mod_NumKnown == MAX_MOD_KNOWN)
-            Sys_Error("_mod_NumKnown == MAX_MOD_KNOWN");
+            Host_SysError("_mod_NumKnown == MAX_MOD_KNOWN");
         strcpy(mod->name, name);
         mod->needload = true;
         _mod_NumKnown++;
@@ -235,7 +235,7 @@ Model_p Mod_LoadModel(Model_p mod, bool crash) {
     buf = (uint32_p)COM_LoadStackFile(mod->name, stackbuf, sizeof(stackbuf));
     if (!buf) {
         if (crash)
-            Sys_Error("Mod_NumForName: %s not found", mod->name);
+            Host_SysError("Mod_NumForName: %s not found", mod->name);
         return NULL;
     }
 
@@ -324,7 +324,7 @@ void Mod_LoadTextures(Lump_p l) {
             mt->offsets[j] = LittleLong(mt->offsets[j]);
 
         if ((mt->width & 15) || (mt->height & 15))
-            Sys_Error("Texture %s is not 16 aligned", mt->name);
+            Host_SysError("Texture %s is not 16 aligned", mt->name);
         pixels = mt->width * mt->height / 64 * 85;
         tx = Hunk_AllocName(sizeof(Texture_t) + pixels, _loadName);
         loadmodel->textures[i] = tx;
@@ -378,7 +378,7 @@ void Mod_LoadTextures(Lump_p l) {
             altmax++;
         }
         else
-            Sys_Error("Bad animating texture %s", tx->name);
+            Host_SysError("Bad animating texture %s", tx->name);
 
         for (j = i + 1; j < m->nummiptex; j++) {
             tx2 = loadmodel->textures[j];
@@ -403,7 +403,7 @@ void Mod_LoadTextures(Lump_p l) {
                     altmax = num + 1;
             }
             else
-                Sys_Error("Bad animating texture %s", tx->name);
+                Host_SysError("Bad animating texture %s", tx->name);
         }
 
 #define ANIM_CYCLE 2
@@ -411,7 +411,7 @@ void Mod_LoadTextures(Lump_p l) {
         for (j = 0; j < max; j++) {
             tx2 = anims[j];
             if (!tx2)
-                Sys_Error("Missing frame %i of %s", j, tx->name);
+                Host_SysError("Missing frame %i of %s", j, tx->name);
             tx2->anim_total = max * ANIM_CYCLE;
             tx2->anim_min = j * ANIM_CYCLE;
             tx2->anim_max = (j + 1) * ANIM_CYCLE;
@@ -422,7 +422,7 @@ void Mod_LoadTextures(Lump_p l) {
         for (j = 0; j < altmax; j++) {
             tx2 = altanims[j];
             if (!tx2)
-                Sys_Error("Missing frame %i of %s", j, tx->name);
+                Host_SysError("Missing frame %i of %s", j, tx->name);
             tx2->anim_total = altmax * ANIM_CYCLE;
             tx2->anim_min = j * ANIM_CYCLE;
             tx2->anim_max = (j + 1) * ANIM_CYCLE;
@@ -490,7 +490,7 @@ void Mod_LoadVertexes(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
@@ -516,7 +516,7 @@ void Mod_LoadSubmodels(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
@@ -549,7 +549,7 @@ void Mod_LoadEdges(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName((count + 1) * sizeof(*out), _loadName);
 
@@ -576,7 +576,7 @@ void Mod_LoadTexinfo(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
@@ -609,7 +609,7 @@ void Mod_LoadTexinfo(Lump_p l) {
         }
         else {
             if (miptex >= loadmodel->numtextures)
-                Sys_Error("miptex >= loadmodel->numtextures");
+                Host_SysError("miptex >= loadmodel->numtextures");
             out->texture = loadmodel->textures[miptex];
             if (!out->texture) {
                 out->texture = r_notexture_mip; // texture not found
@@ -664,7 +664,7 @@ void CalcSurfaceExtents(mSurface_p s) {
         s->texturemins[i] = bmins[i] * 16;
         s->extents[i] = (bmaxs[i] - bmins[i]) * 16;
         if (!(tex->flags & TEX_SPECIAL) && s->extents[i] > 512 /* 256 */)
-            Sys_Error("Bad surface extents");
+            Host_SysError("Bad surface extents");
     }
 }
 
@@ -682,7 +682,7 @@ void Mod_LoadFaces(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
@@ -766,7 +766,7 @@ void Mod_LoadNodes(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
@@ -809,7 +809,7 @@ void Mod_LoadLeafs(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
@@ -859,7 +859,7 @@ void Mod_LoadClipnodes(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
@@ -945,7 +945,7 @@ void Mod_LoadMarksurfaces(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
@@ -955,7 +955,7 @@ void Mod_LoadMarksurfaces(Lump_p l) {
     for (i = 0; i < count; i++) {
         j = LittleShort(in[i]);
         if (j >= loadmodel->numsurfaces)
-            Sys_Error("Mod_ParseMarksurfaces: bad surface number");
+            Host_SysError("Mod_ParseMarksurfaces: bad surface number");
         out[i] = loadmodel->surfaces + j;
     }
 }
@@ -971,7 +971,7 @@ void Mod_LoadSurfedges(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * sizeof(*out), _loadName);
 
@@ -997,7 +997,7 @@ void Mod_LoadPlanes(Lump_p l) {
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
-        Sys_Error("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
+        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
     count = l->fileLen / sizeof(*in);
     out = Hunk_AllocName(count * 2 * sizeof(*out), _loadName);
 
@@ -1048,7 +1048,7 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
 
     i = LittleLong(header->version);
     if (i != BSPVERSION)
-        Sys_Error("Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, i, BSPVERSION);
+        Host_SysError("Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, i, BSPVERSION);
 
     // swap all the lumps
     mod_base = (uint8_p)header;
@@ -1300,7 +1300,7 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
     skin = (uint8_p)(pskintype + 1);
 
     if (numskins < 1 || numskins > MAX_SKINS)
-        Sys_Error("Mod_LoadAliasModel: Invalid # of skins: %d\n", numskins);
+        Host_SysError("Mod_LoadAliasModel: Invalid # of skins: %d\n", numskins);
 
     s = pheader->skinwidth * pheader->skinheight;
 
@@ -1379,7 +1379,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
     version = LittleLong(pinmodel->version);
     if (version != ALIAS_VERSION)
-        Sys_Error("%s has wrong version number (%i should be %i)",
+        Host_SysError("%s has wrong version number (%i should be %i)",
             mod->name, version, ALIAS_VERSION);
 
     //
@@ -1402,26 +1402,26 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     pheader->skinheight = LittleLong(pinmodel->skinheight);
 
     if (pheader->skinheight > MAX_LBM_HEIGHT)
-        Sys_Error("model %s has a skin taller than %d", mod->name,
+        Host_SysError("model %s has a skin taller than %d", mod->name,
             MAX_LBM_HEIGHT);
 
     pheader->numverts = LittleLong(pinmodel->numverts);
 
     if (pheader->numverts <= 0)
-        Sys_Error("model %s has no vertices", mod->name);
+        Host_SysError("model %s has no vertices", mod->name);
 
     if (pheader->numverts > MAXALIASVERTS)
-        Sys_Error("model %s has too many vertices", mod->name);
+        Host_SysError("model %s has too many vertices", mod->name);
 
     pheader->numtris = LittleLong(pinmodel->numtris);
 
     if (pheader->numtris <= 0)
-        Sys_Error("model %s has no triangles", mod->name);
+        Host_SysError("model %s has no triangles", mod->name);
 
     pheader->numframes = LittleLong(pinmodel->numframes);
     numframes = pheader->numframes;
     if (numframes < 1)
-        Sys_Error("Mod_LoadAliasModel: Invalid # of frames: %d\n", numframes);
+        Host_SysError("Mod_LoadAliasModel: Invalid # of frames: %d\n", numframes);
 
     pheader->size = LittleFloat(pinmodel->size) * ALIAS_BASE_SIZE_RATIO;
     mod->synctype = LittleLong(pinmodel->synctype);
@@ -1590,7 +1590,7 @@ TypeLess_ptr Mod_LoadSpriteGroup(TypeLess_ptr pin, mSpriteFrame_p* ppframe, int 
     for (i = 0; i < numframes; i++) {
         *poutintervals = LittleFloat(pin_intervals->interval);
         if (*poutintervals <= 0.0)
-            Sys_Error("Mod_LoadSpriteGroup: interval<=0");
+            Host_SysError("Mod_LoadSpriteGroup: interval<=0");
 
         poutintervals++;
         pin_intervals++;
@@ -1624,7 +1624,7 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
 
     version = LittleLong(pin->version);
     if (version != SPRITE_VERSION)
-        Sys_Error("%s has wrong version number "
+        Host_SysError("%s has wrong version number "
             "(%i should be %i)", mod->name, version, SPRITE_VERSION);
 
     numframes = LittleLong(pin->numframes);
@@ -1651,7 +1651,7 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
     // load the frames
     //
     if (numframes < 1)
-        Sys_Error("Mod_LoadSpriteModel: Invalid # of frames: %d\n", numframes);
+        Host_SysError("Mod_LoadSpriteModel: Invalid # of frames: %d\n", numframes);
 
     mod->numframes = numframes;
 

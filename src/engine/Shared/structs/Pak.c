@@ -5,6 +5,7 @@
 #include "endian_tools.h"
 #include "crc.h"
 #include "console.h"
+#include "host.h"
 #include <string.h>
 
 bool     contModified;   // set true if using non-id files
@@ -35,14 +36,14 @@ pack_p COM_LoadPackFile(cStringRO packfile) {
         (header.id[1] != 'A') ||
         (header.id[2] != 'C') ||
         (header.id[3] != 'K'))
-        Sys_Error("%s is not a packfile", packfile);
+        Host_SysError("%s is not a packfile", packfile);
     header.dirofs = LittleLong(header.dirofs);
     header.dirlen = LittleLong(header.dirlen);
 
     int numpackfiles = header.dirlen / sizeof(dpackfile_t);
 
     if (numpackfiles > MAX_FILES_IN_PACK)
-        Sys_Error("%s has %i files", packfile, numpackfiles);
+        Host_SysError("%s has %i files", packfile, numpackfiles);
 
     if (numpackfiles != PAK0_COUNT)
         contModified = true;    // not the original file

@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "server.h"
 #include "cvar_q1.h"
-#include "sys.h"
 #include "cmd.h"
 #include "msg.h"
 #include "protocol.h"
@@ -249,7 +248,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, float time, trace_p steptrace) {
         }
 
         if (trace.fraction == 1)    break;  // moved the entire distance
-        if (!trace.ent)             Sys_Error("SV_FlyMove: !trace.ent");
+        if (!trace.ent)             Host_SysError("SV_FlyMove: !trace.ent");
 
         if (trace.plane.normal[2] > 0.7) {
             blocked |= MOVECLIP_FLOOR;  // floor
@@ -986,7 +985,7 @@ void SV_Physics_Client(edict_p ent, int num) {
     case MOVETYPE_BOUNCE:   SV_Physics_Toss(ent);                   break;
     case MOVETYPE_FLY:      SV_FlyMove(ent, (float)host_frametime, NULL);  break;
     case MOVETYPE_NOCLIP:   VectorMA(ent->v.origin, (float)host_frametime, ent->v.velocity, ent->v.origin);    break;
-    default:                Sys_Error("SV_Physics_Client: bad movetype %i", (int)ent->v.movetype);
+    default:                Host_SysError("SV_Physics_Client: bad movetype %i", (int)ent->v.movetype);
     }
 
     //
@@ -1358,7 +1357,7 @@ void SV_Physics() {
             case MOVETYPE_NOCLIP:       SV_Physics_Noclip(ent); break;
             case MOVETYPE_STEP:         SV_Physics_Step(ent);   break;
 
-            default:    Sys_Error("SV_Physics: bad movetype %i", (movetype_t)ent->v.movetype); break;
+            default:    Host_SysError("SV_Physics: bad movetype %i", (movetype_t)ent->v.movetype); break;
             }
         }
     }

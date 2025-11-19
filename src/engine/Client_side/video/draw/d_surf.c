@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // d_surf.c: rasterization driver surface heap manager
 
-#include "sys.h"
 #include "common.h"
+#include "host.h"
 #include "console.h"
 #include "d_local.h"
 #include "r_local.h"
@@ -50,7 +50,7 @@ void D_CheckCacheGuard() {
     uint8_p s = (uint8_p)sc_base + sc_size;
     for (int i = 0; i < GUARDSIZE; i++)
         if (s[i] != (uint8_t)i)
-            Sys_Error("D_CheckCacheGuard: failed");
+            Host_SysError("D_CheckCacheGuard: failed");
 }
 
 void D_ClearCacheGuard() {
@@ -107,12 +107,12 @@ D_SCAlloc
 =================
 */
 SurfCache_p D_SCAlloc(int width, int size) {
-    if ((width < 0) || (width > 256))       Sys_Error("D_SCAlloc: bad cache width %d\n", width);
-    if ((size <= 0) || (size > 0x10000))    Sys_Error("D_SCAlloc: bad cache size %d\n", size);
+    if ((width < 0) || (width > 256))       Host_SysError("D_SCAlloc: bad cache width %d\n", width);
+    if ((size <= 0) || (size > 0x10000))    Host_SysError("D_SCAlloc: bad cache size %d\n", size);
 
     size = (int)(offsetof(SurfCache_t, data) + size);
     size = (size + 3) & ~3;
-    if (size > sc_size)     Sys_Error("D_SCAlloc: %i > cache size", size);
+    if (size > sc_size)     Host_SysError("D_SCAlloc: %i > cache size", size);
 
     // if there is not size bytes after the rover, reset to the start
     bool wrapped_this_time = false;
@@ -133,7 +133,7 @@ SurfCache_p D_SCAlloc(int width, int size) {
     while (new->size < size) {
         // free another
         sc_rover = sc_rover->next;
-        if (!sc_rover)          Sys_Error("D_SCAlloc: hit the end of memory");
+        if (!sc_rover)          Host_SysError("D_SCAlloc: hit the end of memory");
         if (sc_rover->owner)    *sc_rover->owner = NULL;
 
         new->size += sc_rover->size;
@@ -182,7 +182,7 @@ D_SCDump
 void D_SCDump() {
     for (SurfCache_p test = sc_base; test; test = test->next) {
         if (test == sc_rover)
-            Sys_Printf("ROVER:\n");
+            Host_Printf("ROVER:\n");
         printf("%p : %i bytes     %i width\n", test, test->size, test->width);
     }
 }

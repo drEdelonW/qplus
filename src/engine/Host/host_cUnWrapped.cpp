@@ -27,12 +27,20 @@ void Host_EndGame(cString message, ...) {
     Con_DPrintf("Host.EndGame: %s\n", string);
 
     if (sv.active)                  host.ShutdownServer(false);
-    if (cls.state == ca_dedicated)  Sys_Error("Host.EndGame: %s\n", string); // dedicated servers exit
+    if (cls.state == ca_dedicated)  Host_SysError("Host.EndGame: %s\n", string); // dedicated servers exit
 
     if (cls.demonum != -1)  CL_NextDemo();
     else                    CL_Disconnect();
 
     longjmp(host_abortserver, 1);
+}
+
+void Host_Printf(cStringRO fmt, ...) {
+    va_list argptr;     va_start(argptr, fmt);
+    char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
+    va_end(argptr);
+
+    Sys_Printf("%s", string);
 }
 
 /*
@@ -44,7 +52,7 @@ This shuts down both the client and server
 */
 void Host_Error(cString error, ...) {
     static bool inerror = false;
-    if (inerror)    Sys_Error("Host.Error: recursively entered");
+    if (inerror)    Host_SysError("Host.Error: recursively entered");
     inerror = true;
 
     SCR_EndLoadingPlaque();  // reenable screen updates
@@ -56,7 +64,7 @@ void Host_Error(cString error, ...) {
     Con_Printf("Host.Error: %s\n", string);
 
     if (sv.active)                  host.ShutdownServer(false);
-    if (cls.state == ca_dedicated)  Sys_Error("Host.Error: %s\n", string); // dedicated servers exit
+    if (cls.state == ca_dedicated)  Host_SysError("Host.Error: %s\n", string); // dedicated servers exit
 
     CL_Disconnect();
     cls.demonum = -1;
@@ -64,6 +72,14 @@ void Host_Error(cString error, ...) {
     inerror = false;
 
     longjmp(host_abortserver, 1);
+}
+
+void Host_SysError(cStringRO error, ...) {
+    va_list argptr;     va_start(argptr, error);
+    char string[1024];  vsnprintf(string, sizeof(string), error, argptr);
+    va_end(argptr);
+
+    Sys_Error("%s", string);
 }
 
 /*

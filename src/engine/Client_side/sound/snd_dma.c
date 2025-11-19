@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "sound.h"
 #include "client.h"
-#include "sys.h"
 #include "cmd.h"
 #include "common.h"
 #include "cvar_q1.h"
@@ -249,8 +248,8 @@ S_FindName
 ==================
 */
 sfx_p S_FindName(cString name) {
-    if (!name)      Sys_Error("S_FindName: NULL\n");
-    if (Q_strlen(name) >= MAX_QPATH)        Sys_Error("Sound name too long: %s", name);
+    if (!name)      Host_SysError("S_FindName: NULL\n");
+    if (Q_strlen(name) >= MAX_QPATH)        Host_SysError("Sound name too long: %s", name);
 
     // see if already loaded
     int i = 0;
@@ -259,7 +258,7 @@ sfx_p S_FindName(cString name) {
             return &known_sfx[i];
         }
 
-    if (num_sfx == MAX_SFX) Sys_Error("S_FindName: out of sfx_t");
+    if (num_sfx == MAX_SFX) Host_SysError("S_FindName: out of sfx_t");
 
     sfx_p sfx = &known_sfx[i];
     strcpy(sfx->name, name);

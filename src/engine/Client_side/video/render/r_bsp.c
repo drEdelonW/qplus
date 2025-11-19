@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_bsp.c
 
 #include "r_local.h"
+#include "host.h"
 #include "console.h"
 
 //
@@ -334,7 +335,7 @@ void R_DrawSolidClippedSubmodelPolygons(Model_p pmodel) {
                 R_RecursiveClipBPoly(pbedge, currententity->topnode, psurf);
             }
             else {
-                Sys_Error("no edges in bmodel");
+                Host_SysError("no edges in bmodel");
             }
         }
     }

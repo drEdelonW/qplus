@@ -260,7 +260,7 @@ void R_TranslatePlayerSkin(int playernum) {
     else
         original = (uint8_p)paliashdr + paliashdr->texels[currententity->skinnum];
     if (s & 3)
-        Sys_Error("R_TranslateSkin: s&3");
+        Host_SysError("R_TranslateSkin: s&3");
 
     inwidth = paliashdr->skinwidth;
     inheight = paliashdr->skinheight;
@@ -391,7 +391,7 @@ void R_TimeRefresh_f(void) {
     glDrawBuffer(GL_FRONT);
     glFinish();
 
-    float start = Sys_FloatTime();
+    float start = Host_FloatTime();
     for (int i = 0; i < VIEWANGLE_STEPS; i++) {
         r_refdef.viewangles[YAW] = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
@@ -399,7 +399,7 @@ void R_TimeRefresh_f(void) {
     }
 
     glFinish();
-    float stop = Sys_FloatTime();
+    float stop = Host_FloatTime();
     float time = stop - start;
     Con_Printf("%f seconds (%f fps)\n", time, 128 / time);
 

@@ -137,7 +137,7 @@ int Scrap_AllocBlock(int w, int h, int* x, int* y) {
         return texnum;
     }
 
-    Sys_Error("Scrap_AllocBlock: full");
+    Host_SysError("Scrap_AllocBlock: full");
 }
 
 int scrap_uploads;
@@ -229,7 +229,7 @@ qPic_p Draw_CachePic(cString path) {
             return &pic->pic;
 
     if (menu_numcachepics == MAX_CACHED_PICS)
-        Sys_Error("menu_numcachepics == MAX_CACHED_PICS");
+        Host_SysError("menu_numcachepics == MAX_CACHED_PICS");
     menu_numcachepics++;
     strcpy(pic->name, path);
 
@@ -238,7 +238,7 @@ qPic_p Draw_CachePic(cString path) {
     //
     dat = (qPic_p)COM_LoadTempFile(path);
     if (!dat)
-        Sys_Error("Draw_CachePic: failed to load %s", path);
+        Host_SysError("Draw_CachePic: failed to load %s", path);
     SwapPic(dat);
 
     // HACK HACK HACK --- we need to keep the bytes for
@@ -383,7 +383,7 @@ void Draw_Init(void) {
 
     cb = (qPic_p)COM_LoadTempFile("gfx/conback.lmp");
     if (!cb)
-        Sys_Error("Couldn't load gfx/conback.lmp");
+        Host_SysError("Couldn't load gfx/conback.lmp");
     SwapPic(cb);
 
     // hack the version number directly into the pic
@@ -589,7 +589,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
         (y < 0) ||
         ((uint32_t)(y + pic->height) > vid.height)
         ) {
-        Sys_Error("Draw_TransPic: bad coordinates");
+        Host_SysError("Draw_TransPic: bad coordinates");
     }
 
     Draw_Pic(x, y, pic);
@@ -913,7 +913,7 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     if (scaled_height > gl_max_size.value)      scaled_height = gl_max_size.value;
 
     if (scaled_width * scaled_height > sizeof(_scaled) / 4)
-        Sys_Error("GL_LoadTexture: too big");
+        Host_SysError("GL_LoadTexture: too big");
 
     samples = alpha ? gl_alpha_format : gl_solid_format;
 
@@ -1004,7 +1004,7 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
     if (scaled_height > gl_max_size.value)  scaled_height = gl_max_size.value;
 
     if (scaled_width * scaled_height > sizeof(_scaled))
-        Sys_Error("GL_LoadTexture: too big");
+        Host_SysError("GL_LoadTexture: too big");
 
     samples = 1; // alpha ? gl_alpha_format : gl_solid_format;
 
@@ -1078,7 +1078,7 @@ void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
     }
     else {
         if (s & 3)
-            Sys_Error("GL_Upload8: s&3");
+            Host_SysError("GL_Upload8: s&3");
         for (i = 0; i < s; i += 4) {
             _trans[i] = d_8to24table[data[i]];
             _trans[i + 1] = d_8to24table[data[i + 1]];
@@ -1108,7 +1108,7 @@ int GL_LoadTexture(cString identifier, int width, int height, uint8_p data, bool
         for (i = 0, glt = gltextures; i < numgltextures; i++, glt++) {
             if (!strcmp(identifier, glt->identifier)) {
                 if (width != glt->width || height != glt->height)
-                    Sys_Error("GL_LoadTexture: cache mismatch");
+                    Host_SysError("GL_LoadTexture: cache mismatch");
                 return gltextures[i].texnum;
             }
         }

@@ -241,7 +241,7 @@ bool VID_ExtraVidLookForState(uint32_t state, uint32_t mask) {
     int		i;
     double	starttime, time;
 
-    starttime = Sys_FloatTime();
+    starttime = Host_FloatTime();
 
     do {
         for (i = 0; i < 100000; i++) {
@@ -249,7 +249,7 @@ bool VID_ExtraVidLookForState(uint32_t state, uint32_t mask) {
                 return true;
         }
 
-        time = Sys_FloatTime();
+        time = Host_FloatTime();
     } while ((time - starttime) < 0.1);
 
     return false;

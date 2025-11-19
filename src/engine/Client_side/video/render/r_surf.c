@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_surf.c: surface-related refresh code
 
 #include "r_local.h"
+#include "host.h"
 
 DrawSurf_t r_drawsurf;
 
@@ -193,9 +194,9 @@ Texture_p R_TextureAnimation(Texture_p base) {
         (base->anim_max <= reletive)) {
         base = base->anim_next;
         if (!base)
-            Sys_Error("R_TextureAnimation: broken cycle");
+            Host_SysError("R_TextureAnimation: broken cycle");
         if (++count > 100)
-            Sys_Error("R_TextureAnimation: infinite cycle");
+            Host_SysError("R_TextureAnimation: infinite cycle");
     }
 
     return base;
@@ -550,7 +551,7 @@ void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest) {
         }
     }
     else {
-        Sys_Error("Unknown tile type");
+        Host_SysError("Unknown tile type");
     }
 }
 

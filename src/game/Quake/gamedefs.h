@@ -90,6 +90,7 @@ typedef enum {
     HIT_EMPATHY_SHIELDS = (1u << HIT_EMPATHY_SHIELDS_BIT)
 } hipnotic_item_bits_t;
 
+extern bool noclip_anglehack;
 
 #ifdef QUAKE2
     #define	GAMENAME	"id1"		/* directory to look in by default */

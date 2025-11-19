@@ -88,7 +88,7 @@ int32_t  net_driverlevel;
 double net_time;
 
 double SetNetTime() {
-    net_time = Sys_FloatTime();
+    net_time = Host_FloatTime();
     return net_time;
 }
 
@@ -149,7 +149,7 @@ void NET_FreeQSocket(qsocket_p sock) {
                 break;
             }
         if (!s)
-            Sys_Error("NET_FreeQSocket: not active\n");
+            Host_SysError("NET_FreeQSocket: not active\n");
     }
 
     // add it to free list
@@ -260,7 +260,7 @@ void NET_Slist_f() {
     }
 
     slistInProgress = true;
-    slistStartTime = Sys_FloatTime();
+    slistStartTime = Host_FloatTime();
 
     SchedulePollProcedure(&slistSendProcedure, 0.0);
     SchedulePollProcedure(&slistPollProcedure, 0.1);
@@ -277,7 +277,7 @@ static void Slist_Send() {
         dfunc.SearchForHosts(true);
     }
 
-    if ((Sys_FloatTime() - slistStartTime) < 0.5)
+    if ((Host_FloatTime() - slistStartTime) < 0.5)
         SchedulePollProcedure(&slistSendProcedure, 0.75);
 }
 
@@ -292,7 +292,7 @@ static void Slist_Poll() {
 
     if (!slistSilent)   PrintSlist();
 
-    if ((Sys_FloatTime() - slistStartTime) < 1.5) {
+    if ((Host_FloatTime() - slistStartTime) < 1.5) {
         SchedulePollProcedure(&slistPollProcedure, 0.1);
         return;
     }
@@ -641,7 +641,7 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
         }
     }
 
-    double start = Sys_FloatTime();
+    double start = Host_FloatTime();
     while (count) {
         count = 0;
         remoteClient = svs.clients;
@@ -669,7 +669,7 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
                 continue;
             }
         }
-        if ((Sys_FloatTime() - start) > blocktime)
+        if ((Host_FloatTime() - start) > blocktime)
             break;
     }
     return count;
@@ -701,7 +701,7 @@ void NET_Init() {
         if (param < com.argc - 1)
             DEFAULTnet_hostport = Q_atoi(com.argv[param + 1]);
         else
-            Sys_Error("NET_Init: you must specify a number after -port");
+            Host_SysError("NET_Init: you must specify a number after -port");
     }
     net_hostport = DEFAULTnet_hostport;
 
@@ -816,7 +816,7 @@ void NET_Poll() {
 
 
 void SchedulePollProcedure(PollProcedure* proc, double timeOffset) {
-    proc->nextTime = Sys_FloatTime() + timeOffset;
+    proc->nextTime = Host_FloatTime() + timeOffset;
     PollProcedure* prev = NULL;
     PollProcedure* pp = pollProcedureList;
     for (; pp; pp = pp->next) {

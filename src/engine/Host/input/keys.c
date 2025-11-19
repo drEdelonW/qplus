@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include "zone.h"
 #include "menu.h"
-#include "sys.h"
+#include "host.h"
 #include "screen.h"
 #include <stdbool.h>
 /*
@@ -621,7 +621,7 @@ void Key_Event(keycode_t Key, bool down) {
         case key_menu:      M_Keydown(Key);     break;
         case key_game:
         case key_console:   M_ToggleMenu_f();   break;
-        default:            Sys_Error("Bad key.dest");
+        default:            Host_SysError("Bad key.dest");
         }
         return;
     }
@@ -706,7 +706,7 @@ void Key_Event(keycode_t Key, bool down) {
     case key_menu:      M_Keydown(Key);    break;
     case key_game:
     case key_console:   Key_Console(Key);  break;
-    default:            Sys_Error("Bad key.dest");
+    default:            Host_SysError("Bad key.dest");
     }
 }
 

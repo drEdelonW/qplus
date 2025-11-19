@@ -1,5 +1,6 @@
 #include "host.h"
 #include "host.hpp"
+#include "sys.h"
 
 void Host_ShutdownServer(bool crash) {
     host.ShutdownServer(crash);
@@ -19,4 +20,8 @@ void Host_Init(QuakeParms_p parms) {
 
 void Host_Shutdown() {
     host.Shutdown();
+}
+
+double Host_FloatTime() {
+    return Sys_FloatTime();
 }

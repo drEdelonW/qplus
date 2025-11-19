@@ -26,7 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "versions.h"
 #include "common.h"
 #include "screen.h"
-#include "sys.h"
 #include "msg.h"
 #include "q_tools.h"
 #include "cvar_q1.h"
@@ -118,9 +117,9 @@ void SV_StartParticle(vec3_t org, vec3_t dir, int color, size_t count) {
     ==================
 */
 void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation) {
-    if ((volume < 0) || (volume > 255))         Sys_Error("SV_StartSound: volume = %i", volume);
-    if ((attenuation < 0) || (attenuation > 4)) Sys_Error("SV_StartSound: attenuation = %f", attenuation);
-    if ((channel < 0) || (channel > 7))         Sys_Error("SV_StartSound: channel = %i", channel);
+    if ((volume < 0) || (volume > 255))         Host_SysError("SV_StartSound: volume = %i", volume);
+    if ((attenuation < 0) || (attenuation > 4)) Host_SysError("SV_StartSound: attenuation = %f", attenuation);
+    if ((channel < 0) || (channel > 7))         Host_SysError("SV_StartSound: channel = %i", channel);
 
     if (sv.datagram.cursize > (MAX_DATAGRAM - 16))  return;
 
@@ -284,7 +283,7 @@ void SV_CheckForNewClients() {
         for (; i < svs.maxClients; i++) {
             if (!svs.clients[i].active) break;
         }
-        if (i == svs.maxClients)        Sys_Error("Host_CheckForNewClients: no free clients");
+        if (i == svs.maxClients)        Host_SysError("Host_CheckForNewClients: no free clients");
 
         svs.clients[i].netconnection = ret;
         SV_ConnectClient(i);
@@ -740,7 +739,7 @@ int SV_ModelIndex(cString name) {
             return i;
     if ((i == MAX_MODELS) ||
         !sv.model_precache[i])
-        Sys_Error("SV_ModelIndex: model %s not precached", name);
+        Host_SysError("SV_ModelIndex: model %s not precached", name);
     return i;
 }
 

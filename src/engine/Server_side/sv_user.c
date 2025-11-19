@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sv_user.c -- server code for moving users
 
 #include "server.h"
-#include "sys.h"
 #include "input.h"
 #include "msg.h"
 #include "q_tools.h"
@@ -429,7 +428,7 @@ bool SV_ReadClientMessage() {
     nextmsg:
         ret = NET_GetMessage(remoteClient->netconnection);
         if (ret == -1) {
-            Sys_Printf("SV_ReadClientMessage: NET_GetMessage failed\n");
+            Host_Printf("SV_ReadClientMessage: NET_GetMessage failed\n");
             return false;
         }
         if (!ret) return true;
@@ -438,7 +437,7 @@ bool SV_ReadClientMessage() {
 
         while (1) {
             if (!remoteClient->active) return false; // a command caused an error
-            if (getMsgBadRead()) { Sys_Printf("SV_ReadClientMessage: badread\n"); return false; }
+            if (getMsgBadRead()) { Host_Printf("SV_ReadClientMessage: badread\n"); return false; }
 
             clc_t cmd = MSG_ReadChar();
             if (getMsgBadRead()) goto nextmsg;
@@ -447,10 +446,10 @@ bool SV_ReadClientMessage() {
                 // case MSG_ERROR:
                 //     goto nextmsg;  // end of message
 
-            default: Sys_Printf("SV_ReadClientMessage: unknown command char\n"); return false;
+            default: Host_Printf("SV_ReadClientMessage: unknown command char\n"); return false;
 
             case clc_nop:
-                //    Sys_Printf ("clc_nop\n");
+                //    Host_Printf ("clc_nop\n");
                 break;
 
             case clc_stringcmd:
@@ -485,7 +484,7 @@ bool SV_ReadClientMessage() {
                 break;
 
             case clc_disconnect:
-                //    Sys_Printf ("SV_ReadClientMessage: client disconnected\n");
+                //    Host_Printf ("SV_ReadClientMessage: client disconnected\n");
                 return false;
 
             case clc_move: SV_ReadClientMove(&remoteClient->cmd); break;

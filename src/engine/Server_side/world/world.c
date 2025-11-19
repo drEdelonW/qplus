@@ -22,11 +22,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "world.h"
 #include <string.h>
 #include "server.h"
-#include "sys.h"
 #include "console.h"
 #include "q_tools.h"
 #include "mathlib.h"
 #include "progs.h"
+#include "host.h"
 
 
 /*
@@ -125,14 +125,14 @@ Hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_t offset) {
     // decide which clipping hull to use, based on the size
     if (ent->v.solid == SOLID_BSP) { // explicit hulls in the BSP model
         if (ent->v.movetype != MOVETYPE_PUSH)
-            Sys_Error("SOLID_BSP without MOVETYPE_PUSH");
+            Host_SysError("SOLID_BSP without MOVETYPE_PUSH");
 
         Model_p model = sv.models[(int)ent->v.modelindex];
 
         if (!model ||
             (model->type != mod_brush)
             )
-            Sys_Error("MOVETYPE_PUSH with a non bsp model");
+            Host_SysError("MOVETYPE_PUSH with a non bsp model");
 
         vec3_t size; VectorSubtract(maxs, mins, size);
         if (size[0] < 3)        hull = &model->hulls[0];
@@ -444,7 +444,7 @@ int SV_HullPointContents(Hull_p hull, int num, vec3_t p) {
         if ((num < hull->firstclipnode) ||
             (num > hull->lastclipnode)
             )
-            Sys_Error("SV_HullPointContents: bad node number");
+            Host_SysError("SV_HullPointContents: bad node number");
 
         dClipNode_p node = hull->clipnodes + num;
         mPlane_p plane = hull->planes + node->planenum;
@@ -536,7 +536,7 @@ bool SV_RecursiveHullCheck(
     if ((num < hull->firstclipnode) ||
         (num > hull->lastclipnode)
         )
-        Sys_Error("SV_RecursiveHullCheck: bad node number");
+        Host_SysError("SV_RecursiveHullCheck: bad node number");
 
     //
     // find the point distances
@@ -732,7 +732,7 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
             (touch == clip->passedict))
             continue;
 
-        if (touch->v.solid == SOLID_TRIGGER)    Sys_Error("Trigger in clipping list");
+        if (touch->v.solid == SOLID_TRIGGER)    Host_SysError("Trigger in clipping list");
 
         if ((clip->type == MOVE_NOMONSTERS) &&
             (touch->v.solid != SOLID_BSP))
@@ -859,7 +859,7 @@ BOPS_Error
 Split out like this for ASM to call.
 ==================
 */
-void BOPS_Error() { Sys_Error("BoxOnPlaneSide:  Bad signbits"); }
+void BOPS_Error() { Host_SysError("BoxOnPlaneSide:  Bad signbits"); }
 
 
 #if !id386
@@ -999,7 +999,7 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
     if (dist2 < p->dist)    sides |= 2;
 
 #ifdef PARANOID
-    if (sides == 0) Sys_Error("BoxOnPlaneSide: sides==0");
+    if (sides == 0) Host_SysError("BoxOnPlaneSide: sides==0");
 #endif
 
     return sides;

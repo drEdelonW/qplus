@@ -36,11 +36,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <sys/param.h>
 #include <errno.h>
 
-#include "sys.h"
 #include "console.h"
 #include "common.h"
 #include "cvar_q1.h"
 #include "q_tools.h"
+#include "host.h"
 
 #ifdef __sun__
 #  include <sys/filio.h>
@@ -82,7 +82,7 @@ int UDP_Init() {
   }
 
   if ((net_controlsocket = UDP_OpenSocket(0)) == -1)
-    Sys_Error("UDP_Init: Unable to open control socket\n");
+    Host_SysError("UDP_Init: Unable to open control socket\n");
 
   ((struct sockaddr_in*)&broadcastaddr)->sin_family = AF_INET;
   ((struct sockaddr_in*)&broadcastaddr)->sin_addr.s_addr = INADDR_BROADCAST;
@@ -115,7 +115,7 @@ void UDP_Listen(bool state) {
     if (net_acceptsocket != -1)
       return;
     if ((net_acceptsocket = UDP_OpenSocket(net_hostport)) == -1)
-      Sys_Error("UDP_Listen: Unable to open accept socket\n");
+      Host_SysError("UDP_Listen: Unable to open accept socket\n");
     return;
   }
 
@@ -230,7 +230,7 @@ int UDP_CheckNewConnections() {
     return -1;
 
   if (ioctl(net_acceptsocket, FIONREAD, &available) == -1)
-    Sys_Error("UDP: ioctlsocket (FIONREAD) failed\n");
+    Host_SysError("UDP: ioctlsocket (FIONREAD) failed\n");
   if (available)
     return net_acceptsocket;
   return -1;
@@ -268,7 +268,7 @@ int UDP_Broadcast(int socket, uint8_p buf, int len) {
 
   if (socket != net_broadcastsocket) {
     if (net_broadcastsocket != 0)
-      Sys_Error("Attempted to use multiple broadcasts sockets\n");
+      Host_SysError("Attempted to use multiple broadcasts sockets\n");
     ret = UDP_MakeSocketBroadcastCapable(socket);
     if (ret == -1) {
       Con_Printf("Unable to make socket broadcast capable\n");

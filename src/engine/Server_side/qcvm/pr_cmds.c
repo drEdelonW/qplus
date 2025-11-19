@@ -31,7 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 #include "protocol.h"
 #include "msg.h"
-#include "sys.h"
 #include "common.h"
 #include "cmd.h"
 #include "cbuf.h"
@@ -484,15 +483,15 @@ void PF_sound() {
 
     if ((volume < 0) ||
         (volume > 255))
-        Sys_Error("SV_StartSound: volume = %i", volume);
+        Host_SysError("SV_StartSound: volume = %i", volume);
 
     if ((attenuation < 0) ||
         (attenuation > 4))
-        Sys_Error("SV_StartSound: attenuation = %f", attenuation);
+        Host_SysError("SV_StartSound: attenuation = %f", attenuation);
 
     if ((channel < 0) ||
         (channel > 7))
-        Sys_Error("SV_StartSound: channel = %i", channel);
+        Host_SysError("SV_StartSound: channel = %i", channel);
 
     SV_StartSound(entity, channel, sample, volume, attenuation);
 }

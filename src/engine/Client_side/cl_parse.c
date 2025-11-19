@@ -29,7 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sound.h"
 #include "cdaudio.h"
 #include "msg.h"
-#include "sys.h"
 #include "console.h"
 #include "common.h"
 #include "sbar.h"
@@ -187,7 +186,7 @@ void CL_KeepaliveMessage() {
     memcpy(net_message.data, olddata, net_message.cursize);
 
     // check time
-    float time = (float)Sys_FloatTime();
+    float time = (float)Host_FloatTime();
     if ((time - _lastMsg) < 5.0f)    return;
     _lastMsg = time;
 
@@ -361,7 +360,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 
     if (!i)     ent->colormap = vid.colormap;
     else {
-        if (i > cl.maxclients)  Sys_Error("i >= cl.maxclients %d > %d", i, cl.maxclients);
+        if (i > cl.maxclients)  Host_SysError("i >= cl.maxclients %d > %d", i, cl.maxclients);
 
         ent->colormap = cl.scores[i - 1].translations;
     }
@@ -485,7 +484,7 @@ void CL_ParseClientdata(server_update_bits_t bits) {
 void CL_NewTranslation(int32_t slot) {
     if ((slot < 0) ||
         (slot > cl.maxclients))
-        Sys_Error("CL_NewTranslation: bad slot %d (max %d)", slot, cl.maxclients);
+        Host_SysError("CL_NewTranslation: bad slot %d (max %d)", slot, cl.maxclients);
 
     uint8_p dest = cl.scores[slot].translations;
     uint8_p source = vid.colormap;
@@ -637,7 +636,7 @@ void CL_ParseServerMessage() {
         case svc_lightstyle: {
             uint8_t msg = MSG_ReadByte();
             if (msg >= MAX_LIGHTSTYLES)
-                Sys_Error("svc_lightstyle > MAX_LIGHTSTYLES");
+                Host_SysError("svc_lightstyle > MAX_LIGHTSTYLES");
             Q_strcpy(cl_lightstyle[msg].map, MSG_ReadString());
             cl_lightstyle[msg].length = Q_strlen(cl_lightstyle[msg].map);
         } break;
@@ -702,7 +701,7 @@ void CL_ParseServerMessage() {
         case svc_updatestat: {
             uint8_t msg = MSG_ReadByte();
             if (msg >= MAX_CL_STATS)
-                Sys_Error("svc_updatestat: %i is invalid", msg);
+                Host_SysError("svc_updatestat: %i is invalid", msg);
             cl.stats[msg] = (uint32_t)MSG_ReadLong();
         } break;
 

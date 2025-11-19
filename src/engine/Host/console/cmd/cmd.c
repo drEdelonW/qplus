@@ -29,7 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "host.h"
 #include "client.h"
-#include "sys.h"
 #include "protocol.h"
 #include "cvar.h"
 #include "msg.h"
@@ -294,7 +293,7 @@ void Cmd_TokenizeString(cString text) {
 */
 void Cmd_AddCommand(cStringRO cmd_name, xcommand_t function) {
     if (host_initialized) // because hunk allocation would get stomped
-        Sys_Error("Cmd_AddCommand after host_initialized");
+        Host_SysError("Cmd_AddCommand after host_initialized");
 
     // fail if the command is a variable name
     if (Cvar_VariableString(cmd_name)[0]) {
@@ -431,7 +430,7 @@ void Cmd_ForwardToServer() {
     ================
 */
 int Cmd_CheckParm(cString parm) {
-    if (!parm) { Sys_Error("Cmd_CheckParm: NULL"); }
+    if (!parm) { Host_SysError("Cmd_CheckParm: NULL"); }
 
     for (int i = 1; i < Cmd_Argc(); i++)
         if (!Q_strcasecmp(parm, Cmd_Argv(i)))

@@ -233,7 +233,7 @@ bool VID_SetWindowedMode(int modenum) {
         NULL);
 
     if (!dibwindow)
-        Sys_Error("Couldn't create DIB window");
+        Host_SysError("Couldn't create DIB window");
 
     // Center and show the DIB window
     CenterWindow(dibwindow, WindowRect.right - WindowRect.left,
@@ -284,7 +284,7 @@ bool VID_SetFullDIBMode(int modenum) {
         gdevmode.dmSize = sizeof(gdevmode);
 
         if (ChangeDisplaySettings(&gdevmode, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-            Sys_Error("Couldn't set fullscreen DIB mode");
+            Host_SysError("Couldn't set fullscreen DIB mode");
     }
 
     lastmodestate = modestate;
@@ -322,7 +322,7 @@ bool VID_SetFullDIBMode(int modenum) {
         NULL);
 
     if (!dibwindow)
-        Sys_Error("Couldn't create DIB window");
+        Host_SysError("Couldn't create DIB window");
 
     ShowWindow(dibwindow, SW_SHOWDEFAULT);
     UpdateWindow(dibwindow);
@@ -366,7 +366,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     if ((windowed && (modenum != 0)) ||
         (!windowed && (modenum < 1)) ||
         (!windowed && (modenum >= nummodes))) {
-        Sys_Error("Bad video mode\n");
+        Host_SysError("Bad video mode\n");
     }
 
     // so Con_Printfs don't mess us up by forcing vid and snd updates
@@ -399,7 +399,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
         IN_HideMouse();
     }
     else {
-        Sys_Error("VID_SetMode: Bad mode type in modelist");
+        Host_SysError("VID_SetMode: Bad mode type in modelist");
     }
 
     window_width = DIBWidth;
@@ -410,7 +410,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     scr_disabled_for_loading = temp;
 
     if (!stat) {
-        Sys_Error("Couldn't set video mode");
+        Host_SysError("Couldn't set video mode");
     }
 
     // now we try to make sure we get the focus on the mode switch, because
@@ -494,19 +494,19 @@ void CheckTextureExtensions(void) {
         hInstGL = LoadLibrary("opengl32.dll");
 
         if (hInstGL == NULL)
-            Sys_Error("Couldn't load opengl32.dll\n");
+            Host_SysError("Couldn't load opengl32.dll\n");
 
         bindTexFunc = (TypeLess_ptr)GetProcAddress(hInstGL, "glBindTexture");
 
         if (!bindTexFunc)
-            Sys_Error("No texture objects!");
+            Host_SysError("No texture objects!");
         return;
     }
 
     /* load library and get procedure adresses for texture extension API */
     if ((bindTexFunc = (BINDTEXFUNCPTR)
         wglGetProcAddress((LPCSTR)"glBindTextureEXT")) == NULL) {
-        Sys_Error("GetProcAddress for BindTextureEXT failed");
+        Host_SysError("GetProcAddress for BindTextureEXT failed");
         return;
     }
 }
@@ -523,7 +523,7 @@ void CheckArrayExtensions(void) {
                 ((glColorPointerEXT = wglGetProcAddress("glColorPointerEXT")) == NULL) ||
                 ((glTexCoordPointerEXT = wglGetProcAddress("glTexCoordPointerEXT")) == NULL) ||
                 ((glVertexPointerEXT = wglGetProcAddress("glVertexPointerEXT")) == NULL)) {
-                Sys_Error("GetProcAddress for vertex extension failed");
+                Host_SysError("GetProcAddress for vertex extension failed");
                 return;
             }
             return;
@@ -531,7 +531,7 @@ void CheckArrayExtensions(void) {
         tmp++;
     }
 
-    Sys_Error("Vertex array extension not present");
+    Host_SysError("Vertex array extension not present");
 }
 
 //int		texture_mode = GL_NEAREST;
@@ -629,7 +629,7 @@ void GL_BeginRendering(int* x, int* y, int* width, int* height) {
     *height = WindowRect.bottom - WindowRect.top;
 
     //    if (!wglMakeCurrent( maindc, baseRC ))
-    //		Sys_Error ("wglMakeCurrent failed");
+    //		Host_SysError ("wglMakeCurrent failed");
 
     //	glViewport (*x, *y, *width, *height);
 }
@@ -1246,7 +1246,7 @@ void VID_InitDIB(HINSTANCE hInstance) {
     wc.lpszClassName = "WinQuake";
 
     if (!RegisterClass(&wc))
-        Sys_Error("Couldn't register window class");
+        Host_SysError("Couldn't register window class");
 
     modelist[0].type = MS_WINDOWED;
 
@@ -1518,7 +1518,7 @@ void	VID_Init(uint8_p palette) {
         hdc = GetDC(NULL);
 
         if (GetDeviceCaps(hdc, RASTERCAPS) & RC_PALETTE) {
-            Sys_Error("Can't run in non-RGB mode");
+            Host_SysError("Can't run in non-RGB mode");
         }
 
         ReleaseDC(NULL, hdc);
@@ -1529,7 +1529,7 @@ void	VID_Init(uint8_p palette) {
     }
     else {
         if (nummodes == 1)
-            Sys_Error("No RGB fullscreen modes available");
+            Host_SysError("No RGB fullscreen modes available");
 
         windowed = false;
 
@@ -1644,7 +1644,7 @@ void	VID_Init(uint8_p palette) {
                 } while (!done);
 
                 if (!vid_default) {
-                    Sys_Error("Specified video mode not available");
+                    Host_SysError("Specified video mode not available");
                 }
             }
         }
@@ -1687,9 +1687,9 @@ void	VID_Init(uint8_p palette) {
 
     baseRC = wglCreateContext(maindc);
     if (!baseRC)
-        Sys_Error("Could not initialize GL (wglCreateContext failed).\n\nMake sure you in are 65535 color mode, and try running -window.");
+        Host_SysError("Could not initialize GL (wglCreateContext failed).\n\nMake sure you in are 65535 color mode, and try running -window.");
     if (!wglMakeCurrent(maindc, baseRC))
-        Sys_Error("wglMakeCurrent failed");
+        Host_SysError("wglMakeCurrent failed");
 
     GL_Init();
 

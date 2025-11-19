@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "sound.h"
 #include "cvar_q1.h"
-#include "sys.h"
+#include "host.h"
 #include "common.h"
 #include "endian_tools.h"
 #include <string.h>
@@ -187,7 +187,7 @@ void FindNextChunk(cString name) {
             return;
         }
         //  if (iff_chunk_len > 1024*1024)
-        //   Sys_Error ("FindNextChunk: %i length is past the 1 meg sanity limit", iff_chunk_len);
+        //   Host_SysError ("FindNextChunk: %i length is past the 1 meg sanity limit", iff_chunk_len);
         data_p -= 8;
         last_chunk = data_p + 8 + ((iff_chunk_len + 1) & ~1);
         if (!Q_strncmp(data_p, name, 4)) {
@@ -284,7 +284,7 @@ wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
 
     if (info.samples) {
         if (samples < info.samples)
-            Sys_Error("Sound %s has a bad loop length", name);
+            Host_SysError("Sound %s has a bad loop length", name);
     }
     else    info.samples = samples;
 

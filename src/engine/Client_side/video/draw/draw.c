@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "platformdefs.h"
 #include "zone.h"
 #include <string.h>
-#include "sys.h"
+#include "host.h"
 #include "common.h"
 #include "d_iface.h"
 #include "versions.h"
@@ -79,7 +79,7 @@ qPic_p Draw_CachePic(cStringRO path) {
 
     if (i == _menu_numcachepics) {
         if (_menu_numcachepics == MAX_CACHED_PICS)
-            Sys_Error("_menu_numcachepics == MAX_CACHED_PICS");
+            Host_SysError("_menu_numcachepics == MAX_CACHED_PICS");
 
         _menu_numcachepics++;
         strcpy(pic->name, path);
@@ -96,7 +96,7 @@ qPic_p Draw_CachePic(cStringRO path) {
 
     dat = (qPic_p)pic->cache.data;
     if (!dat)
-        Sys_Error("Draw_CachePic: failed to load %s", path);
+        Host_SysError("Draw_CachePic: failed to load %s", path);
 
     SwapPic(dat);
 
@@ -142,10 +142,10 @@ void Draw_Character(int x, int y, int num) {
     if ((y > vid.height - 80) ||
         (x < 0) ||
         (x > vid.width - 8))
-        Sys_Error("Con_DrawCharacter: (%i, %i)", x, y);
+        Host_SysError("Con_DrawCharacter: (%i, %i)", x, y);
     if ((num < 0) ||
         (num > 255))
-        Sys_Error("Con_DrawCharacter: char %i", num);
+        Host_SysError("Con_DrawCharacter: char %i", num);
 #endif
 
     int row = num >> 4;
@@ -243,7 +243,7 @@ void Draw_Pic(int x, int y, qPic_p pic) {
         ((x + pic->width) > vid.width) ||
         ((y + pic->height) > vid.height)
         ) {
-        Sys_Error("Draw_Pic: bad coordinates %i/%i-%i/%i", x, y, pic->width, pic->height);
+        Host_SysError("Draw_Pic: bad coordinates %i/%i-%i/%i", x, y, pic->width, pic->height);
     }
 
     uint8_p source = pic->data;
@@ -285,7 +285,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
         ((uint32_t)(x + pic->width) > vid.width) ||
         ((uint32_t)(y + pic->height) > vid.height)
         ) {
-        Sys_Error("Draw_TransPic: bad coordinates");
+        Host_SysError("Draw_TransPic: bad coordinates");
     }
     uint8_p source = pic->data;
 
@@ -347,7 +347,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
         ((uint32_t)(x + pic->width) > vid.width) ||
         (uint32_t)(y + pic->height) > vid.height
         ) {
-        Sys_Error("Draw_TransPic: bad coordinates");
+        Host_SysError("Draw_TransPic: bad coordinates");
     }
 
     uint8_p source = pic->data;

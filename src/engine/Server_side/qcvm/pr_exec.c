@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "progs.h"
 #include "console.h"
 #include "server.h"
-#include "sys.h"
 #include "host.h"
 #include <string.h>
 #include <stdarg.h>
@@ -295,7 +294,7 @@ PR_LeaveFunction
 ====================
 */
 int PR_LeaveFunction() {
-    if (_pr_depth <= 0)     Sys_Error("prog stack underflow");
+    if (_pr_depth <= 0)     Host_SysError("prog stack underflow");
 
     // restore locals from the stack
     int param_used = pr_xfunction->locals;

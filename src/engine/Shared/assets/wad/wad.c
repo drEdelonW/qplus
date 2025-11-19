@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "wad.h"
 #include <string.h>
 #include "common.h"
-#include "sys.h"
+#include "host.h"
 #include "endian_tools.h"
 #include "qPic.h"
 
@@ -104,7 +104,7 @@ void W_CleanupName(cStringRO in, cString out) {
 void W_LoadWadFile(cStringRO filename) {
     _wadBase = COM_LoadHunkFile(filename);
     if (!_wadBase)
-        Sys_Error("W_LoadWadFile: couldn't load %s", filename);
+        Host_SysError("W_LoadWadFile: couldn't load %s", filename);
 
     WadInfo_p header = (WadInfo_p)_wadBase;
 
@@ -114,7 +114,7 @@ void W_LoadWadFile(cStringRO filename) {
         (header->ID[2] != 'D') ||
         (header->ID[3] != '2')
         )
-        Sys_Error("Wad file %s doesn't have WAD2 id\n", filename);
+        Host_SysError("Wad file %s doesn't have WAD2 id\n", filename);
 
     _NumLumps = LittleLong(header->numLumps);
     int infoTableOfs = LittleLong(header->infoTableOfs);
@@ -146,7 +146,7 @@ LumpInfo_p W_GetLumpinfo(cStringRO name) {
             return lump_p;
     }
 
-    Sys_Error("W_GetLumpinfo: [%s] not found", name);
+    Host_SysError("W_GetLumpinfo: [%s] not found", name);
     return NULL;
 }
 
@@ -158,7 +158,7 @@ TypeLess_ptr W_GetLumpNum(int32_t num) {
     if ((num < 0) ||
         (num > _NumLumps)
         )
-        Sys_Error("W_GetLumpNum: bad number: %i", num);
+        Host_SysError("W_GetLumpNum: bad number: %i", num);
 
     return (TypeLess_ptr)(_wadBase + (_LumpsBase + num)->filepos);
 }

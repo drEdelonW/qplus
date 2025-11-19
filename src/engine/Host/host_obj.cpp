@@ -98,7 +98,7 @@ void Host::EndGame(cString message, ...) {
 
     if (sv.active)  ShutdownServer(false);
 
-    if (cls.state == ca_dedicated)  Sys_Error("Host::EndGame: %s\n", string); // dedicated servers exit
+    if (cls.state == ca_dedicated)  Host_SysError("Host::EndGame: %s\n", string); // dedicated servers exit
 
     if (cls.demonum != -1)  CL_NextDemo();
     else                    CL_Disconnect();
@@ -116,7 +116,7 @@ This shuts down both the client and server
 void Host::Error(cString error, ...) {
     static bool inerror = false;
 
-    if (inerror)    Sys_Error("Host::Error: recursively entered");
+    if (inerror)    Host_SysError("Host::Error: recursively entered");
     inerror = true;
 
     SCR_EndLoadingPlaque();  // reenable screen updates
@@ -128,7 +128,7 @@ void Host::Error(cString error, ...) {
 
     if (sv.active)  ShutdownServer(false);
 
-    if (cls.state == ca_dedicated)  Sys_Error("Host::Error: %s\n", string); // dedicated servers exit
+    if (cls.state == ca_dedicated)  Host_SysError("Host::Error: %s\n", string); // dedicated servers exit
 
     CL_Disconnect();
     cls.demonum = -1;
@@ -156,7 +156,7 @@ void Host::FindMaxClients() {
 
     param = COM_CheckParm("-listen");
     if (param) {
-        if (cls.state == ca_dedicated)  Sys_Error("Only one of -dedicated or -listen can be specified");
+        if (cls.state == ca_dedicated)  Host_SysError("Only one of -dedicated or -listen can be specified");
 
         if (param != (com.argc - 1))    svs.maxClients = Q_atoi(com.argv[param + 1]);
         else                            svs.maxClients = 8;
@@ -311,7 +311,7 @@ void SV_DropClient(bool crash) {
             pr_global_struct->self = saveSelf;
         }
 
-        Sys_Printf("Client %s removed\n", remoteClient->name);
+        Host_Printf("Client %s removed\n", remoteClient->name);
     }
 
     // break the net connection
@@ -353,7 +353,7 @@ void Host::ShutdownServer(bool crash) {
     if (cls.state == ca_connected)  CL_Disconnect();
 
     // flush any pending messages - like the score!!!
-    double start = Sys_FloatTime();
+    double start = Host_FloatTime();
     do {
         count = 0;
         remoteClient = svs.clients;
@@ -369,7 +369,7 @@ void Host::ShutdownServer(bool crash) {
                 }
             }
         }
-        if ((Sys_FloatTime() - start) > 3.0)    break;
+        if ((Host_FloatTime() - start) > 3.0)    break;
     } while (count);
 
     // make sure all the clients know we're disconnecting
@@ -596,11 +596,11 @@ void Host::_Frame(float time) {
 
 
     // update video
-    if (host_speeds.value)  _time1 = Sys_FloatTime();
+    if (host_speeds.value)  _time1 = Host_FloatTime();
 
     SCR_UpdateScreen();
 
-    if (host_speeds.value)  _time2 = Sys_FloatTime();
+    if (host_speeds.value)  _time2 = Host_FloatTime();
 
     // update audio
     if (cls.signon == SIGNONS) {
@@ -614,7 +614,7 @@ void Host::_Frame(float time) {
 
     if (host_speeds.value) {
         int pass1 = (_time1 - _time3) * 1000;
-        _time3 = Sys_FloatTime();
+        _time3 = Host_FloatTime();
         int pass2 = (_time2 - _time1) * 1000;
         int pass3 = (_time3 - _time2) * 1000;
         Con_Printf("%3i tot %3i server %3i gfx %3i snd\n",
@@ -630,9 +630,9 @@ void Host::Frame(float time) {
 
     if (!serverprofile.value) { _Frame(time); return; }
 
-    double time1 = Sys_FloatTime();
+    double time1 = Host_FloatTime();
     _Frame(time);
-    double time2 = Sys_FloatTime();
+    double time2 = Host_FloatTime();
 
     _timeTotal += time2 - time1;
     _timeCount++;
@@ -660,15 +660,15 @@ void Host::Frame(float time) {
 void Host::InitVCR(QuakeParms_p parms) {
 
     if (COM_CheckParm("-playback")) {
-        if (com.argc != 2)      Sys_Error("No other parameters allowed with -playback\n");
+        if (com.argc != 2)      Host_SysError("No other parameters allowed with -playback\n");
 
         Sys_FileOpenRead("quake.vcr", &vcrFile);
-        if (vcrFile == -1)      Sys_Error("playback file not found\n");
+        if (vcrFile == -1)      Host_SysError("playback file not found\n");
 
         {
             uint32_t sig;
             Sys_FileRead(vcrFile, &sig, sizeof(int));
-            if (sig != VCR_SIGNATURE) Sys_Error("Invalid signature in vcr file\n");
+            if (sig != VCR_SIGNATURE) Host_SysError("Invalid signature in vcr file\n");
         }
 
         Sys_FileRead(vcrFile, &com.argc, sizeof(int));
@@ -730,7 +730,7 @@ void Host::Init(QuakeParms_p parms) {
     host_parms = *parms;
 
     if (parms->memsize < minimum_memory)
-        Sys_Error("Only %4.1f megs of memory available, can't execute game", parms->memsize / (float)0x100000);
+        Host_SysError("Only %4.1f megs of memory available, can't execute game", parms->memsize / (float)0x100000);
 
     com.argc = parms->argc;
     com.argv = parms->argv;
@@ -759,9 +759,9 @@ void Host::Init(QuakeParms_p parms) {
 
     if (cls.state != ca_dedicated) {
         host_basepal = (uint8_p)COM_LoadHunkFile("gfx/palette.lmp");
-        if (!host_basepal)  Sys_Error("Couldn't load gfx/palette.lmp");
+        if (!host_basepal)  Host_SysError("Couldn't load gfx/palette.lmp");
         host_colormap = (uint8_p)COM_LoadHunkFile("gfx/colormap.lmp");
-        if (!host_colormap) Sys_Error("Couldn't load gfx/colormap.lmp");
+        if (!host_colormap) Host_SysError("Couldn't load gfx/colormap.lmp");
 
 #ifndef _WIN32 // on non win32, mouse comes before video for security reasons
         IN_Init();
@@ -798,7 +798,7 @@ void Host::Init(QuakeParms_p parms) {
 
     host_initialized = true;
 
-    Sys_Printf("========Quake Initialized=========\n");
+    Host_Printf("========Quake Initialized=========\n");
 }
 
 
@@ -806,7 +806,7 @@ void Host::Init(QuakeParms_p parms) {
 ===============
 Host::Shutdown
 
-FIXME: this is a callback from Sys_Quit and Sys_Error.  It would be better
+FIXME: this is a callback from Sys_Quit and Host_SysError.  It would be better
 to run quit through here before the final handoff to the sys code.
 ===============
 */

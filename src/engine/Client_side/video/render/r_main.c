@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_main.c
 
 #include "r_local.h"
+#include "host.h"
+#include "sys.h"
 #include "sound.h"
 #include "cmd.h"
 #include "gamedefs.h"
@@ -811,7 +813,7 @@ void R_EdgeDrawing() {
     R_BeginEdgeFrame();
 
     if (r_dspeeds.value) {
-        rw_time1 = Sys_FloatTime();
+        rw_time1 = Host_FloatTime();
     }
 
     R_RenderWorld();
@@ -824,14 +826,14 @@ void R_EdgeDrawing() {
     D_TurnZOn();
 
     if (r_dspeeds.value) {
-        rw_time2 = Sys_FloatTime();
+        rw_time2 = Host_FloatTime();
         db_time1 = rw_time2;
     }
 
     R_DrawBEntitiesOnList();
 
     if (r_dspeeds.value) {
-        db_time2 = Sys_FloatTime();
+        db_time2 = Host_FloatTime();
         se_time1 = db_time2;
     }
 
@@ -862,7 +864,7 @@ void R_RenderView_() {
         r_speeds.value ||
         r_dspeeds.value
         )
-        r_time1 = Sys_FloatTime();
+        r_time1 = Host_FloatTime();
 
     R_SetupFrame();
 
@@ -879,7 +881,7 @@ void R_RenderView_() {
     Sys_LowFPPrecision();
 
     if (!cl_entities[0].model || !cl.worldmodel)
-        Sys_Error("R_RenderView: NULL worldmodel");
+        Host_SysError("R_RenderView: NULL worldmodel");
 
     if (!r_dspeeds.value) {
         VID_UnlockBuffer();
@@ -896,27 +898,27 @@ void R_RenderView_() {
     }
 
     if (r_dspeeds.value) {
-        se_time2 = Sys_FloatTime();
+        se_time2 = Host_FloatTime();
         de_time1 = se_time2;
     }
 
     R_DrawEntitiesOnList();
 
     if (r_dspeeds.value) {
-        de_time2 = Sys_FloatTime();
+        de_time2 = Host_FloatTime();
         dv_time1 = de_time2;
     }
 
     R_DrawViewModel();
 
     if (r_dspeeds.value) {
-        dv_time2 = Sys_FloatTime();
-        dp_time1 = Sys_FloatTime();
+        dv_time2 = Host_FloatTime();
+        dp_time1 = Host_FloatTime();
     }
 
     R_DrawParticles();
 
-    if (r_dspeeds.value)    dp_time2 = Sys_FloatTime();
+    if (r_dspeeds.value)    dp_time2 = Host_FloatTime();
     if (r_dowarp)           D_WarpScreen();
 
     V_SetContentsColor(r_viewleaf->contents);
@@ -939,10 +941,10 @@ void R_RenderView_() {
 void R_RenderView() {
     int dummy;
     int delta = (uint8_p)&dummy - r_stack_start;
-    if ((delta < -10000) || (delta > 10000))    Sys_Error("R_RenderView: called without enough stack");
-    if (Hunk_LowMark() & 3)                     Sys_Error("Hunk is missaligned");
-    if ((uintptr_t)(&dummy) & 3)                Sys_Error("Stack is missaligned");
-    if ((uintptr_t)(&r_warpbuffer) & 3)         Sys_Error("Globals are missaligned");
+    if ((delta < -10000) || (delta > 10000))    Host_SysError("R_RenderView: called without enough stack");
+    if (Hunk_LowMark() & 3)                     Host_SysError("Hunk is missaligned");
+    if ((uintptr_t)(&dummy) & 3)                Host_SysError("Stack is missaligned");
+    if ((uintptr_t)(&r_warpbuffer) & 3)         Host_SysError("Globals are missaligned");
 
     R_RenderView_();
 }

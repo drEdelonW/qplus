@@ -21,9 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // This is enables a simple IP banning mechanism
 #include "server.h"
+#include "host.h"
 #include "progs.h"
 #include <stdint.h>
-#include "sys.h"
 #include "common.h"
 #include "cvar_q1.h"
 #include "cmd.h"
@@ -164,13 +164,13 @@ void NET_Ban_f() {
 int Datagram_SendMessage(qsocket_p sock, sizebuf_p data) {
 #ifdef DEBUG
     if (data->cursize == 0)
-        Sys_Error("Datagram_SendMessage: zero length message\n");
+        Host_SysError("Datagram_SendMessage: zero length message\n");
 
     if (data->cursize > NET_MAXMESSAGE)
-        Sys_Error("Datagram_SendMessage: message too big %u\n", data->cursize);
+        Host_SysError("Datagram_SendMessage: message too big %u\n", data->cursize);
 
     if (sock->canSend == false)
-        Sys_Error("SendMessage: called with canSend == false\n");
+        Host_SysError("SendMessage: called with canSend == false\n");
 #endif
 
     Q_memcpy(sock->sendMessage, data->data, data->cursize);
@@ -275,10 +275,10 @@ bool Datagram_CanSendUnreliableMessage(qsocket_p sock) { return true; }
 int Datagram_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
 #ifdef DEBUG
     if (data->cursize == 0)
-        Sys_Error("Datagram_SendUnreliableMessage: zero length message\n");
+        Host_SysError("Datagram_SendUnreliableMessage: zero length message\n");
 
     if (data->cursize > MAX_DATAGRAM)
-        Sys_Error("Datagram_SendUnreliableMessage: message too big %u\n", data->cursize);
+        Host_SysError("Datagram_SendUnreliableMessage: message too big %u\n", data->cursize);
 #endif
 
     int packetLen = NET_HEADERSIZE + data->cursize;
@@ -503,7 +503,7 @@ static void Test_Poll() {
         }
 
         if (MSG_ReadByte() != CCREP_PLAYER_INFO)
-            Sys_Error("Unexpected repsonse to Player Info request\n");
+            Host_SysError("Unexpected repsonse to Player Info request\n");
 
         int playerNumber = MSG_ReadByte();
         char name[32]; Q_strcpy(name, MSG_ReadString());

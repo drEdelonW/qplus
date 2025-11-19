@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include "common.h"
 // #include "console.h"
-#include "sys.h"
 #include "mathlib.h"
 #include "Alias.h"
 

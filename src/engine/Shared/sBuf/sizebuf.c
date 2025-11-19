@@ -3,7 +3,7 @@
 #include "types.h"
 #include "q_tools.h"
 #include "console.h"
-#include "sys.h"
+#include "host.h"
 #include "zone.h"
 
 //===========================================================================
@@ -29,8 +29,8 @@ void SZ_Clear(sizebuf_p buf) {
 
 TypeLess_ptr SZ_GetSpace(sizebuf_p buf, size_t length) {
     if ((buf->cursize + length) > buf->maxsize) {
-        if (!buf->allowoverflow)    Sys_Error("SZ_GetSpace: overflow without allowoverflow set");
-        if (length > buf->maxsize)  Sys_Error("SZ_GetSpace: %i is > full buffer size", length);
+        if (!buf->allowoverflow)    Host_SysError("SZ_GetSpace: overflow without allowoverflow set");
+        if (length > buf->maxsize)  Host_SysError("SZ_GetSpace: %i is > full buffer size", length);
 
         buf->overflowed = true;
         Con_Printf("SZ_GetSpace: overflow");

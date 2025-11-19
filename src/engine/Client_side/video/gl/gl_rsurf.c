@@ -204,7 +204,7 @@ store:
 		}
 		break;
 	default:
-		Sys_Error("Bad lightmap format");
+		Host_SysError("Bad lightmap format");
 	}
 }
 
@@ -234,9 +234,9 @@ Texture_p R_TextureAnimation(Texture_p base) {
 	while (base->anim_min > reletive || base->anim_max <= reletive) {
 		base = base->anim_next;
 		if (!base)
-			Sys_Error("R_TextureAnimation: broken cycle");
+			Host_SysError("R_TextureAnimation: broken cycle");
 		if (++count > 100)
-			Sys_Error("R_TextureAnimation: infinite cycle");
+			Host_SysError("R_TextureAnimation: infinite cycle");
 	}
 
 	return base;
@@ -1345,7 +1345,7 @@ int AllocBlock(int w, int h, int* x, int* y) {
 		return texnum;
 	}
 
-	Sys_Error("AllocBlock: full");
+	Host_SysError("AllocBlock: full");
 }
 
 

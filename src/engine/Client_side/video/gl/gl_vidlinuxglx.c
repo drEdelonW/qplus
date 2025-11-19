@@ -595,7 +595,7 @@ void GL_BeginRendering(int* x, int* y, int* width, int* height) {
     *height = _scrHeight;
 
     //    if (!wglMakeCurrent( maindc, baseRC ))
-    //		Sys_Error ("wglMakeCurrent failed");
+    //		Host_SysError ("wglMakeCurrent failed");
 
     //	glViewport (*x, *y, *width, *height);
 }

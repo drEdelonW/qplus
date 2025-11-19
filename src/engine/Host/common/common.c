@@ -377,11 +377,11 @@ void COM_WriteFile(cStringRO filename, TypeLess_ptr data, size_t len) {
 
     int handle = Sys_FileOpenWrite(name);
     if (handle == -1) {
-        Sys_Printf("COM_WriteFile: failed on %s\n", name);
+        Host_Printf("COM_WriteFile: failed on %s\n", name);
         return;
     }
 
-    Sys_Printf("COM_WriteFile: %s\n", name);
+    Host_Printf("COM_WriteFile: %s\n", name);
     Sys_FileWrite(handle, data, len);
     Sys_FileClose(handle);
 }
@@ -446,8 +446,8 @@ Sets com.filesize and one of handle or file
 static bool     _progHack;
 
 int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
-    if (file && handle)     Sys_Error("COM_FindFile: both handle and file set");
-    if (!file && !handle)   Sys_Error("COM_FindFile: neither handle or file set");
+    if (file && handle)     Host_SysError("COM_FindFile: both handle and file set");
+    if (!file && !handle)   Host_SysError("COM_FindFile: neither handle or file set");
 
     //
     // search through the path, one element at a time
@@ -465,7 +465,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
             pack_p pak = search->pack;
             for (int idxPak = 0; idxPak < pak->numfiles; idxPak++)
                 if (!strcmp(pak->files[idxPak].name, filename)) {       // found it!
-                    Sys_Printf("PackFile: %s : %s\n", pak->filename, filename);
+                    Host_Printf("PackFile: %s : %s\n", pak->filename, filename);
                     if (handle) {
                         *handle = pak->handle;
                         Sys_FileSeek(pak->handle, pak->files[idxPak].filepos);
@@ -515,7 +515,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
                 strcpy(netpath, cachepath);
             }
 
-            Sys_Printf("FindFile: %s\n", netpath);
+            Host_Printf("FindFile: %s\n", netpath);
             int fHandle;
 
             com.filesize = Sys_FileOpenRead(netpath, &fHandle);
@@ -530,7 +530,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
 
     }
 
-    Sys_Printf("FindFile: can't find %s\n", filename);
+    Host_Printf("FindFile: can't find %s\n", filename);
 
     if (handle) *handle = -1;
     else        *file = NULL;
@@ -612,9 +612,9 @@ uint8_p COM_LoadFile(cStringRO path, int usehunk) {
         if (len + 1 > loadsize) buf = Hunk_TempAlloc(len + 1);
         else                    buf = loadbuf;
     }
-    else        Sys_Error("COM_LoadFile: bad usehunk");
+    else        Host_SysError("COM_LoadFile: bad usehunk");
 
-    if (!buf)   Sys_Error("COM_LoadFile: not enough space for %s", path);
+    if (!buf)   Host_SysError("COM_LoadFile: not enough space for %s", path);
 
     ((uint8_p)buf)[len] = 0x00;
 
@@ -756,7 +756,7 @@ void COM_InitFilesystem() {
             searchpath_p search = Hunk_Alloc(sizeof(searchpath_t));
             if (!strcmp(COM_FileExtension(com.argv[param]), "pak")) {
                 search->pack = COM_LoadPackFile(com.argv[param]);
-                if (!search->pack)      Sys_Error("Couldn't load packfile: %s", com.argv[param]);
+                if (!search->pack)      Host_SysError("Couldn't load packfile: %s", com.argv[param]);
             }
             else    strcpy(search->filename, com.argv[param]);
             search->next = com_searchpaths;

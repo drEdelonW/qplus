@@ -461,12 +461,12 @@ void Host_Loadgame_f() {
                 break;
             }
         }
-        if (i == sizeof(str) - 1)   Sys_Error("Loadgame buffer overflow");
+        if (i == sizeof(str) - 1)   Host_SysError("Loadgame buffer overflow");
         str[i] = 0;
         cString start = str;
         start = COM_Parse(str);
         if (!com.token[0])  break;  // end of file
-        if (strcmp(com.token, "{")) Sys_Error("First token isn't a brace");
+        if (strcmp(com.token, "{")) Host_SysError("First token isn't a brace");
 
         if (entnum == -1) { ED_ParseGlobals(start); }   // parse the global vars
         else { // parse an edict
@@ -583,12 +583,12 @@ int LoadGamestate(cString level, cString startspot) {
             str[i] = r;
             if (r == '}') { i++;    break; }
         }
-        if (i == sizeof(str) - 1)   Sys_Error("Loadgame buffer overflow");
+        if (i == sizeof(str) - 1)   Host_SysError("Loadgame buffer overflow");
         str[i] = 0;
         cString start = str;
         start = COM_Parse(str);
         if (!com.token[0])  break;  // end of file
-        if (strcmp(com.token, "{")) Sys_Error("First token isn't a brace");
+        if (strcmp(com.token, "{")) Host_SysError("First token isn't a brace");
 
         // parse an edict
 
@@ -773,7 +773,7 @@ void Host_Say(bool teamonly) {
         }
         remoteClient = save;
 
-        Sys_Printf("%s", &text[1]);
+        Host_Printf("%s", &text[1]);
     }
 }
 
@@ -949,8 +949,8 @@ void Host_Spawn_f() {
         pr_global_struct->self = EDICT_TO_PROG(sv_player);
         PR_ExecuteProgram(pr_global_struct->ClientConnect);
 
-        if ((Sys_FloatTime() - remoteClient->netconnection->connecttime) <= sv.time)
-            Sys_Printf("%s entered the game\n", remoteClient->name);
+        if ((Host_FloatTime() - remoteClient->netconnection->connecttime) <= sv.time)
+            Host_Printf("%s entered the game\n", remoteClient->name);
 
         PR_ExecuteProgram(pr_global_struct->PutClientInServer);
     }

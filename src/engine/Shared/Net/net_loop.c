@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "server.h"
 #undef SERVER
 #include "client.h"
-#include "sys.h"
+#include "host.h"
 #include "q_tools.h"
 #include "net_loop.h"
 #include "cvar_q1.h"
@@ -142,7 +142,7 @@ int Loop_SendMessage(qsocket_p sock, sizebuf_p data) {
     int32_p bufferLength = &((qsocket_p)sock->driverdata)->receiveMessageLength;
 
     if ((*bufferLength + data->cursize + 4) > NET_MAXMESSAGE)
-        Sys_Error("Loop_SendMessage: overflow\n");
+        Host_SysError("Loop_SendMessage: overflow\n");
 
     uint8_p buffer = ((qsocket_p)sock->driverdata)->receiveMessage + *bufferLength;
 

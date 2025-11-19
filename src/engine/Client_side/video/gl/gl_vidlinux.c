@@ -334,7 +334,7 @@ void GL_BeginRendering(int* x, int* y, int* width, int* height) {
     *height = scr_height;
 
     //    if (!wglMakeCurrent( maindc, baseRC ))
-    //		Sys_Error ("wglMakeCurrent failed");
+    //		Host_SysError ("wglMakeCurrent failed");
 
     //	glViewport (*x, *y, *width, *height);
 }
@@ -455,7 +455,7 @@ void Init_KBD(void) {
         _scanToKey[74] = '-';
 
         if (keyboard_init())
-            Sys_Error("keyboard_init() failed");
+            Host_SysError("keyboard_init() failed");
         keyboard_seteventhandler(keyhandler);
     }
 }
@@ -626,7 +626,7 @@ void VID_Init(uint8_p palette) {
     _fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_75Hz,
         attribs);
     if (!_fc)
-        Sys_Error("Unable to create 3DFX context.\n");
+        Host_SysError("Unable to create 3DFX context.\n");
 
     InitSig(); // trap evil signals
 

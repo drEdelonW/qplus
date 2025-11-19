@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_efrag.c
 
 #include "r_local.h"
+#include "host.h"
 #include "world.h"
 #include "console.h"
 
@@ -218,7 +219,7 @@ void R_StoreEfrags(efrag_ar ppefrag) {
             break;
 
         default:
-            Sys_Error("R_StoreEfrags: Bad entity type %d\n", clmodel->type);
+            Host_SysError("R_StoreEfrags: Bad entity type %d\n", clmodel->type);
         }
     }
 }

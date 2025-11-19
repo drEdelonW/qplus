@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "console.h"
 #include "endian_tools.h"
-#include "sys.h"
 #include "protocol.h"
 #include "cmd.h"
 #include "msg.h"
@@ -135,7 +134,7 @@ int CL_GetMessage() {
 
         net_message.cursize = (size_t)LittleLong((int32_t)net_message.cursize);
         if (net_message.cursize > MAX_MSGLEN)
-            Sys_Error("Demo message > MAX_MSGLEN");
+            Host_SysError("Demo message > MAX_MSGLEN");
 
         size_t r = fread(net_message.data, net_message.cursize, 1, cls.demofile);
         if (r != 1) {

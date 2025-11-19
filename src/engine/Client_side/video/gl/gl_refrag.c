@@ -202,7 +202,7 @@ void R_StoreEfrags(efrag_ar ppefrag) {
             break;
 
         default:
-            Sys_Error("R_StoreEfrags: Bad entity type %d\n", clmodel->type);
+            Host_SysError("R_StoreEfrags: Bad entity type %d\n", clmodel->type);
         }
     }
 }
