@@ -580,6 +580,13 @@ void COM_CloseFile(int h) {
     Sys_FileClose(h);
 }
 
+typedef enum ComLoadHunk_e {
+    COM_LOADHUNK_ZMALLOC    = 0,  // Z_Malloc
+    COM_LOADHUNK_HUNK       = 1,  // Hunk_AllocName
+    COM_LOADHUNK_TEMP       = 2,  // Hunk_TempAlloc
+    COM_LOADHUNK_CACHE      = 3,  // Cache_Alloc
+    COM_LOADHUNK_STACK      = 4   // stack buffer, fallback to temp hunk
+} ComLoadHunk_t;
 
 /*
 ============
@@ -592,7 +599,7 @@ Allways appends a 0 uint8_t.
 CacheUser_p loadcache;
 uint8_p     loadbuf;
 int         loadsize;
-uint8_p COM_LoadFile(cStringRO path, int usehunk) {
+uint8_p COM_LoadFile(cStringRO path, ComLoadHunk_t usehunk) {
     uint8_p buf = NULL;     // quiet compiler warning
 
     // look for it in the filesystem or pack files
@@ -604,6 +611,7 @@ uint8_p COM_LoadFile(cStringRO path, int usehunk) {
     char    base[32];
     COM_FileBase(path, base);
 
+#if 0
     if (usehunk == 1)       buf = Hunk_AllocName(len + 1, base);
     else if (usehunk == 2)  buf = Hunk_TempAlloc(len + 1);
     else if (usehunk == 0)  buf = Z_Malloc(len + 1);
@@ -613,7 +621,16 @@ uint8_p COM_LoadFile(cStringRO path, int usehunk) {
         else                    buf = loadbuf;
     }
     else        Host_SysError("COM_LoadFile: bad usehunk");
-
+#else
+    switch (usehunk) {
+    case COM_LOADHUNK_ZMALLOC:  buf = Z_Malloc(len + 1);                        break;
+    case COM_LOADHUNK_HUNK:     buf = Hunk_AllocName(len + 1, base);            break;
+    case COM_LOADHUNK_TEMP:     buf = Hunk_TempAlloc(len + 1);                  break;
+    case COM_LOADHUNK_CACHE:    buf = Cache_Alloc(loadcache, len + 1, base);    break;
+    case COM_LOADHUNK_STACK:    buf = ((len + 1) > (size_t)loadsize) ? Hunk_TempAlloc(len + 1) : loadbuf; break;
+    default:    Host_SysError("COM_LoadFile: bad usehunk");     break;
+    }
+#endif
     if (!buf)   Host_SysError("COM_LoadFile: not enough space for %s", path);
 
     ((uint8_p)buf)[len] = 0x00;
@@ -626,19 +643,19 @@ uint8_p COM_LoadFile(cStringRO path, int usehunk) {
     return buf;
 }
 
-uint8_p COM_LoadHunkFile(cStringRO path) { return COM_LoadFile(path, 1); }
-uint8_p COM_LoadTempFile(cStringRO path) { return COM_LoadFile(path, 2); }
+uint8_p COM_LoadHunkFile(cStringRO path) { return COM_LoadFile(path, COM_LOADHUNK_HUNK); }
+uint8_p COM_LoadTempFile(cStringRO path) { return COM_LoadFile(path, COM_LOADHUNK_TEMP); }
 
 void COM_LoadCacheFile(cStringRO path, CacheUser_p cu) {
     loadcache = cu;
-    COM_LoadFile(path, 3);
+    COM_LoadFile(path, COM_LOADHUNK_CACHE);
 }
 
 // uses temp hunk if larger than bufsize
 uint8_p COM_LoadStackFile(cStringRO path, TypeLess_ptr buffer, int32_t bufsize) {
     loadbuf = (uint8_p)buffer;
     loadsize = bufsize;
-    uint8_p buf = COM_LoadFile(path, 4);
+    uint8_p buf = COM_LoadFile(path, COM_LOADHUNK_STACK);
 
     return buf;
 }
