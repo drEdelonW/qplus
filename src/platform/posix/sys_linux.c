@@ -120,7 +120,7 @@ void Sys_Error(cStringRO error, ...) {
     fcntl(0, F_SETFL, (fcntl(0, F_GETFL, 0) & ~FNDELAY));
 
     va_list argptr;     va_start(argptr, error);
-    char string[1024];  vsnprintf(string, sizeof(string),  error, argptr);
+    char string[1024];  vsnprintf(string, sizeof(string), error, argptr);
     va_end(argptr);
     fprintf(stderr, "Error: %s\n", string);
 
@@ -130,7 +130,7 @@ void Sys_Error(cStringRO error, ...) {
 
 void Sys_Warn(cStringRO warning, ...) {
     va_list argptr;     va_start(argptr, warning);
-    char string[1024];  vsnprintf(string, sizeof(string),  warning, argptr);
+    char string[1024];  vsnprintf(string, sizeof(string), warning, argptr);
     va_end(argptr);
     fprintf(stderr, "Warning: %s", string);
 }
@@ -189,11 +189,13 @@ int main(int c, cStringArray v) {
     parms.argc = com.argc;
     parms.argv = com.argv;
 
+    parms.memsize =
 #ifdef GLQUAKE
-    parms.memsize = 16 * 1024 * 1024;
+        16 *
 #else
-    parms.memsize = 8 * 1024 * 1024;
+        8 *
 #endif
+        1024 * 1024;
 
     int memParam = COM_CheckParm("-mem");
     if (memParam)

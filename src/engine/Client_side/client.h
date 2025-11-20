@@ -89,7 +89,8 @@ typedef struct {
     int32_t entity;
     Model_p model;
     float   endtime;
-    vec3_t  start, end;
+    vec3_t  start;
+    vec3_t  end;
 } Beam_t;
 typedef Beam_t* Beam_p;
 
@@ -107,23 +108,23 @@ typedef struct {
     ClientStatus state;
 
     // personalization data sent to server
-    char    mapstring[MAX_QPATH];
-    char    spawnparms[MAX_MAPSTRING]; // to restart a level
+    char        mapstring[MAX_QPATH];
+    char        spawnparms[MAX_MAPSTRING]; // to restart a level
 
     // demo loop control
-    int32_t demonum;  // -1 = don't play demos
-    char    demos[MAX_DEMOS][MAX_DEMONAME];  // when not playing
+    int32_t     demonum;  // -1 = don't play demos
+    char        demos[MAX_DEMOS][MAX_DEMONAME];  // when not playing
 
     // demo recording info must be here, because record is started before
     // entering a map (and clearing ClientState_t)
-    bool    demorecording;
-    bool    demoplayback;
-    bool    timedemo;
-    int32_t forcetrack;   // -1 = use normal cd track
+    bool        demorecording;
+    bool        demoplayback;
+    bool        timedemo;
+    int32_t     forcetrack;   // -1 = use normal cd track
     FILE* demofile;
-    int32_t td_lastframe;  // to meter out one message a frame
-    int32_t td_startframe;  // host_framecount at start
-    float   td_starttime;  // realtime at second frame of timedemo
+    int32_t     td_lastframe;  // to meter out one message a frame
+    int32_t     td_startframe;  // host_framecount at start
+    float       td_starttime;  // realtime at second frame of timedemo
 
     // connection information
     int32_t     signon;   // 0 to SIGNONS
@@ -145,17 +146,17 @@ typedef enum {
 // server signon
 //
 typedef struct {
-    int32_t   movemessages; // since connecting to this server
+    int32_t     movemessages; // since connecting to this server
     // throw out the first couple, so the player
     // doesn't accidentally do something the
     // first frame
     UserCmd_t   cmd;   // last command sent to the server
 
     // information for local display
-    uint32_t stats[MAX_CL_STATS]; // health, etc
-    uint32_t items;   // inventory bit flags
-    float   item_gettime[32]; // cl.time of aquiring item, for blinking
-    float   faceanimtime; // use anim frame if cl.time < this
+    uint32_t    stats[MAX_CL_STATS]; // health, etc
+    uint32_t    items;   // inventory bit flags
+    float       item_gettime[32]; // cl.time of aquiring item, for blinking
+    float       faceanimtime; // use anim frame if cl.time < this
 
     ColorShift_t    cshifts[NUM_CSHIFTS]; // color shifts for damage, powerups
     ColorShift_t    prev_cshifts[NUM_CSHIFTS]; // and content types
@@ -164,54 +165,55 @@ typedef struct {
     // sent to the server each frame.  The server sets punchangle when
     // the view is temporarliy offset, and an angle reset commands at the start
     // of each level and after teleporting.
-    vec3_t  mviewangles[2]; // during demo playback viewangles is lerped between these
-    vec3_t  viewangles;
-    vec3_t  mvelocity[2]; // update by server, used for lean+bob (0 is newest)
-    vec3_t  velocity;  // lerped between mvelocity[0] and [1]
-    vec3_t  punchangle;  // temporary offset
+    vec3_t      mviewangles[2]; // during demo playback viewangles is lerped between these
+    vec3_t      viewangles;
+    vec3_t      mvelocity[2]; // update by server, used for lean+bob (0 is newest)
+    vec3_t      velocity;  // lerped between mvelocity[0] and [1]
+    vec3_t      punchangle;  // temporary offset
 
     // pitch drifting vars
-    float   idealpitch;
-    float   pitchvel;
-    bool    nodrift;
-    float   driftmove;
-    double  laststop;
+    float       idealpitch;
+    float       pitchvel;
+    bool        nodrift;
+    float       driftmove;
+    double      laststop;
 
-    float   viewheight;
-    float   crouch;   // local amount for smoothing stepups
+    float       viewheight;
+    float       crouch;   // local amount for smoothing stepups
 
-    bool    paused;   // send over by server
-    bool    onground;
-    bool    inwater;
+    bool        paused;   // send over by server
+    bool        onground;
+    bool        inwater;
 
     IntermissionState_e intermission; // don't change view angle, full screen, etc
-    int32_t completed_time; // latched at intermission start
+    int32_t     completed_time; // latched at intermission start
 
-    double  mtime[2];  // the timestamp of last two messages
-    double  time;   // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
-    double  oldtime;  // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
+    double      mtime[2];  // the timestamp of last two messages
+    double      time;   // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
+    double      oldtime;  // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
 
-    float  last_received_message; // (realtime) for net trouble icon
+    float       last_received_message; // (realtime) for net trouble icon
 
     //
     // information that is static for the entire time connected to a server
     //
-    Model_p model_precache[MAX_MODELS];
-    sfx_p   sound_precache[MAX_SOUNDS];
+    Model_p     model_precache[MAX_MODELS];
+    sfx_p       sound_precache[MAX_SOUNDS];
 
-    char    levelname[40]; // for display on solo scoreboard
-    int32_t viewentity;  // cl_entitites[cl.viewentity] = player
-    uint8_t maxclients;
+    char        levelname[40]; // for display on solo scoreboard
+    int32_t     viewentity;  // cl_entitites[cl.viewentity] = player
+    uint8_t     maxclients;
     // int32_t gametype;   // game_type_t
     game_type_t gametype;   // game_type_t
 
     // refresh related state
-    Model_p worldmodel; // cl_entitites[0].model
-    efrag_p free_efrags;
-    int32_t num_entities; // held in cl_entities array
-    int32_t num_statics; // held in cl_staticentities array
-    r_Entity_t viewent;   // the gun model
-    uint8_t cdtrack, looptrack; // cd audio
+    Model_p     worldmodel; // cl_entitites[0].model
+    efrag_p     free_efrags;
+    int32_t     num_entities; // held in cl_entities array
+    int32_t     num_statics; // held in cl_staticentities array
+    r_Entity_t  viewent;   // the gun model
+    uint8_t     cdtrack;
+    uint8_t     looptrack; // cd audio
 
     // frag scoreboard
     ScoreBoard_p scores;  // [cl.maxclients]
@@ -233,7 +235,7 @@ extern dLight_t     cl_dlights[MAX_DLIGHTS];
 extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
 extern Beam_t       cl_beams[MAX_BEAMS];
 
-extern uint32_t      cl_numvisedicts;
+extern uint32_t     cl_numvisedicts;
 extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
 
 // cl_input
@@ -244,25 +246,25 @@ typedef struct {
 typedef kbutton_t* kbutton_p;
 
 typedef struct {
-    kbutton_t mlook;
-    kbutton_t klook;
-    kbutton_t left;
-    kbutton_t right;
-    kbutton_t forward;
-    kbutton_t forward2;
-    kbutton_t up;
-    kbutton_t down;
-    kbutton_t back;
-    kbutton_t lookup;
-    kbutton_t lookdown;
-    kbutton_t moveleft;
-    kbutton_t moveright;
-    kbutton_t strafe;
-    kbutton_t speed;
-    kbutton_t use;
-    kbutton_t jump;
-    kbutton_t attack;
-    int       impulse;
+    kbutton_t   mlook;
+    kbutton_t   klook;
+    kbutton_t   left;
+    kbutton_t   right;
+    kbutton_t   forward;
+    kbutton_t   forward2;
+    kbutton_t   up;
+    kbutton_t   down;
+    kbutton_t   back;
+    kbutton_t   lookup;
+    kbutton_t   lookdown;
+    kbutton_t   moveleft;
+    kbutton_t   moveright;
+    kbutton_t   strafe;
+    kbutton_t   speed;
+    kbutton_t   use;
+    kbutton_t   jump;
+    kbutton_t   attack;
+    uint8_t     impulse;
 } ClInput_t;
 extern ClInput_t in;
 
@@ -323,7 +325,7 @@ extern "C" {
     // DEMO SYSTEM
     // cl_demo.c
     void CL_StopPlayback();
-    int CL_GetMessage();
+    int  CL_GetMessage();
     void CL_Stop_f();
     void CL_Record_f();
     void CL_PlayDemo_f();

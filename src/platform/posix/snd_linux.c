@@ -115,20 +115,18 @@ bool SNDDMA_Init() {
 
     s = getenv("QUAKE_SOUND_CHANNELS");
     if (s) shm->channels = atoi(s);
-    else if ((param = COM_CheckParm("-sndmono")) != 0)
-        shm->channels = 1;
-    else if ((param = COM_CheckParm("-sndstereo")) != 0)
-        shm->channels = 2;
-    else
-        shm->channels = 2;
+    else if ((param = COM_CheckParm("-sndmono")) != 0)      shm->channels = 1;
+    else if ((param = COM_CheckParm("-sndstereo")) != 0)    shm->channels = 2;
+    else                                                    shm->channels = 2;
 
     shm->samples = info.fragstotal * info.fragsize / (shm->samplebits / 8);
     shm->submission_chunk = 1;
 
     // memory map the dma buffer
 
-    shm->buffer = (uint8_p)mmap(NULL, info.fragstotal
-        * info.fragsize, PROT_WRITE, MAP_FILE | MAP_SHARED, _audio_fd, 0);
+    shm->buffer = (uint8_p)mmap(NULL,
+        info.fragstotal * info.fragsize,
+        PROT_WRITE, MAP_FILE | MAP_SHARED, _audio_fd, 0);
     if (!shm->buffer || shm->buffer == (uint8_p)-1) {
         perror("/dev/dsp");
         Con_Printf("Could not mmap /dev/dsp\n");
@@ -146,10 +144,8 @@ bool SNDDMA_Init() {
         close(_audio_fd);
         return 0;
     }
-    if (tmp)
-        shm->channels = 2;
-    else
-        shm->channels = 1;
+    if (tmp)    shm->channels = 2;
+    else        shm->channels = 1;
 
     rc = ioctl(_audio_fd, SNDCTL_DSP_SPEED, &shm->speed);
     if (rc < 0) {

@@ -16,10 +16,12 @@
 static float   old_windowed_mouse;
 static bool    mouse_avail;
 static int     mouse_buttonstate;
-static float   mouse_x, mouse_y;
+static float   mouse_x;
+static float   mouse_y;
 static int     mouse_buttons = 3;
 static int     mouse_oldbuttonstate;
-static float   old_mouse_x, old_mouse_y;
+static float   old_mouse_x;
+static float   old_mouse_y;
 static int     p_mouse_x;
 static int     p_mouse_y;
 struct {
@@ -207,16 +209,17 @@ void GetEvent() {
             // x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
                         /* move the mouse to the window center again */
-            XSelectInput(x_disp, x_win, StructureNotifyMask | KeyPressMask
-                | KeyReleaseMask | ExposureMask
-                | ButtonPressMask
-                | ButtonReleaseMask);
+            XSelectInput(x_disp, x_win,
+                StructureNotifyMask | KeyPressMask |
+                KeyReleaseMask | ExposureMask |
+                ButtonPressMask | ButtonReleaseMask);
             XWarpPointer(x_disp, None, x_win, 0, 0, 0, 0,
                 (vid.width / 2), (vid.height / 2));
-            XSelectInput(x_disp, x_win, StructureNotifyMask | KeyPressMask
-                | KeyReleaseMask | ExposureMask
-                | PointerMotionMask | ButtonPressMask
-                | ButtonReleaseMask);
+            XSelectInput(x_disp, x_win,
+                StructureNotifyMask | KeyPressMask |
+                KeyReleaseMask | ExposureMask |
+                PointerMotionMask | ButtonPressMask |
+                ButtonReleaseMask);
         }
         else {
             mouse_x = (float)(x_event.xmotion.x - p_mouse_x);

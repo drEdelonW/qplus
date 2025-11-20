@@ -65,15 +65,15 @@ uint16_t d_8to16table[256];
 // int d_con_indirect = 0;
 // int vid_buffersize;
 
-bool     doShm;
+bool    doShm;
 Display* x_disp;
-static Colormap     x_cmap;
-Window       x_win;
-static GC           x_gc;
+static Colormap x_cmap;
+Window          x_win;
+static GC       x_gc;
 static Visual* x_vis;
 static XVisualInfo* x_visinfo;
 // static XImage*      x_image;
- int          x_shmeventtype;
+int          x_shmeventtype;
 // static XShmSegmentInfo x_shminfo;
 
 bool   oktodraw = false;
@@ -515,9 +515,11 @@ void VID_Init(uint8_p palette) {
         Colormap tmpcmap = XCreateColormap(x_disp, XRootWindow(x_disp,
             x_visinfo->screen), x_vis, AllocNone);
 
-        attribs.event_mask = StructureNotifyMask | KeyPressMask
-            | KeyReleaseMask | ExposureMask | PointerMotionMask |
-            ButtonPressMask | ButtonReleaseMask;
+        attribs.event_mask =
+            StructureNotifyMask | KeyPressMask |
+            KeyReleaseMask | ExposureMask |
+            PointerMotionMask | ButtonPressMask |
+            ButtonReleaseMask;
         attribs.border_pixel = 0;
         attribs.colormap = tmpcmap;
 

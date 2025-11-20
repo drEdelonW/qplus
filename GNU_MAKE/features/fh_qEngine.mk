@@ -109,7 +109,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
                                 SRC_LIST += $(UI_DIR)/screen.c
                                 SRC_LIST += $(UI_DIR)/view.c
-                                SRC_LIST += $(UI_DIR)/chase.c
 
 
 
@@ -183,3 +182,4 @@ $(eval GAME_DIR := $(SRC_DIR)/game/Quake) $(eval INCLUDES += $(GAME_DIR))
 
         SRC_LIST += $(GAME_DIR)/game_rule.c
         SRC_LIST += $(GAME_DIR)/sbar.c
+        SRC_LIST += $(GAME_DIR)/chase.c

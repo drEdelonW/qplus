@@ -175,10 +175,10 @@ void CL_KeepaliveMessage() {
         default:    Host_Error("CL_KeepaliveMessage: CL_GetMessage failed");    break;
         case 0:                                                                 break; // nothing waiting
         case 1:     Host_Error("CL_KeepaliveMessage: received a message");      break;
-        case 2:
+        case 2: {
             if (MSG_ReadByte() != svc_nop)
                 Host_Error("CL_KeepaliveMessage: datagram wasn't a nop");
-            break;
+        } break;
         }
     } while (ret);
 

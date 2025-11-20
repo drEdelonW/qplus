@@ -11,7 +11,7 @@
 
 
 cString Sys_ConsoleInput() {
-    static char text[256];
+    static char _text[256];
 
     if (cls.state == ca_dedicated) {
         fd_set	fdset;
@@ -27,12 +27,12 @@ cString Sys_ConsoleInput() {
             return NULL;
         }
 
-        int len = read(0, text, sizeof(text));
+        int len = read(0, _text, sizeof(_text));
         if (len < 1)
             return NULL;
-        text[len - 1] = 0;    // rip off the /n and terminate
+        _text[len - 1] = 0;    // rip off the /n and terminate
 
-        return text;
+        return _text;
     }
     return NULL;
 }

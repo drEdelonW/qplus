@@ -167,11 +167,11 @@ void CL_SignonReply() {
     Con_DPrintf("CL_SignonReply: %i\n", cls.signon);
 
     switch (cls.signon) {
-    case 1:
+    case 1: {
         MSG_WriteByte(&cls.message, clc_stringcmd); MSG_WriteString(&cls.message, "prespawn");
-        break;
+    } break;
 
-    case 2:
+    case 2: {
         MSG_WriteByte(&cls.message, clc_stringcmd); MSG_WriteString(&cls.message, va("name \"%s\"\n", cl_name.string));
 
         MSG_WriteByte(&cls.message, clc_stringcmd);
@@ -186,16 +186,16 @@ void CL_SignonReply() {
         MSG_WriteByte(&cls.message, clc_stringcmd);
         snprintf(str, sizeof(str), "spawn %s", cls.spawnparms);
         MSG_WriteString(&cls.message, str);
-        break;
+    } break;
 
-    case 3:
+    case 3: {
         MSG_WriteByte(&cls.message, clc_stringcmd); MSG_WriteString(&cls.message, "begin");
         Cache_Report();  // print remaining memory
-        break;
+    } break;
 
-    case 4:
+    case SIGNONS: {
         SCR_EndLoadingPlaque();  // allow normal screen updates
-        break;
+    } break;
     }
 }
 
