@@ -339,7 +339,6 @@ int32_t memsearch(uint8_p start, int32_t count, int32_t search) {
 
 char com_cachedir[MAX_OSPATH];
 
-
 typedef struct searchpath_s searchpath_t;
 typedef searchpath_t* searchpath_p;
 struct searchpath_s {
@@ -372,7 +371,7 @@ The filename will be prefixed by the current game directory
 ============
 */
 void COM_WriteFile(cStringRO filename, TypeLess_ptr data, size_t len) {
-    char    name[MAX_OSPATH];
+    char name[MAX_OSPATH];
     snprintf(name, sizeof(name), "%s/%s", com.gamedir, filename);
 
     int handle = Sys_FileOpenWrite(name);
@@ -397,7 +396,7 @@ Only used for CopyFile
 void COM_CreatePath(cStringRO path) {
     for (cString ofs = (cString)path + 1; *ofs; ofs++) {
         if (*ofs == '/') {       // create the directory
-            *ofs = 0;
+            *ofs = 0x00;
             Sys_mkdir(path);
             *ofs = '/';
         }
@@ -581,11 +580,11 @@ void COM_CloseFile(int h) {
 }
 
 typedef enum ComLoadHunk_e {
-    COM_LOADHUNK_ZMALLOC    = 0,  // Z_Malloc
-    COM_LOADHUNK_HUNK       = 1,  // Hunk_AllocName
-    COM_LOADHUNK_TEMP       = 2,  // Hunk_TempAlloc
-    COM_LOADHUNK_CACHE      = 3,  // Cache_Alloc
-    COM_LOADHUNK_STACK      = 4   // stack buffer, fallback to temp hunk
+    HUNK_ZMALLOC    = 0,  // Z_Malloc
+    HUNK_HUNK       = 1,  // Hunk_AllocName
+    HUNK_TEMP       = 2,  // Hunk_TempAlloc
+    HUNK_CACHE      = 3,  // Cache_Alloc
+    HUNK_STACK      = 4   // stack buffer, fallback to temp hunk
 } ComLoadHunk_t;
 
 /*
@@ -598,7 +597,7 @@ Allways appends a 0 uint8_t.
 */
 CacheUser_p loadcache;
 uint8_p     loadbuf;
-int         loadsize;
+size_t      loadsize;
 uint8_p COM_LoadFile(cStringRO path, ComLoadHunk_t usehunk) {
     uint8_p buf = NULL;     // quiet compiler warning
 
@@ -612,9 +611,9 @@ uint8_p COM_LoadFile(cStringRO path, ComLoadHunk_t usehunk) {
     COM_FileBase(path, base);
 
 #if 0
-    if (usehunk == 1)       buf = Hunk_AllocName(len + 1, base);
+    if (usehunk == 0)       buf = Z_Malloc(len + 1);
+    else if (usehunk == 1)  buf = Hunk_AllocName(len + 1, base);
     else if (usehunk == 2)  buf = Hunk_TempAlloc(len + 1);
-    else if (usehunk == 0)  buf = Z_Malloc(len + 1);
     else if (usehunk == 3)  buf = Cache_Alloc(loadcache, len + 1, base);
     else if (usehunk == 4) {
         if (len + 1 > loadsize) buf = Hunk_TempAlloc(len + 1);
@@ -623,14 +622,15 @@ uint8_p COM_LoadFile(cStringRO path, ComLoadHunk_t usehunk) {
     else        Host_SysError("COM_LoadFile: bad usehunk");
 #else
     switch (usehunk) {
-    case COM_LOADHUNK_ZMALLOC:  buf = Z_Malloc(len + 1);                        break;
-    case COM_LOADHUNK_HUNK:     buf = Hunk_AllocName(len + 1, base);            break;
-    case COM_LOADHUNK_TEMP:     buf = Hunk_TempAlloc(len + 1);                  break;
-    case COM_LOADHUNK_CACHE:    buf = Cache_Alloc(loadcache, len + 1, base);    break;
-    case COM_LOADHUNK_STACK:    buf = ((len + 1) > (size_t)loadsize) ? Hunk_TempAlloc(len + 1) : loadbuf; break;
+    case HUNK_ZMALLOC:  buf = Z_Malloc(len + 1);                        break;
+    case HUNK_HUNK:     buf = Hunk_AllocName(len + 1, base);            break;
+    case HUNK_TEMP:     buf = Hunk_TempAlloc(len + 1);                  break;
+    case HUNK_CACHE:    buf = Cache_Alloc(loadcache, len + 1, base);    break;
+    case HUNK_STACK:    buf = ((len + 1) > loadsize) ? Hunk_TempAlloc(len + 1) : loadbuf; break;
     default:    Host_SysError("COM_LoadFile: bad usehunk");     break;
     }
 #endif
+
     if (!buf)   Host_SysError("COM_LoadFile: not enough space for %s", path);
 
     ((uint8_p)buf)[len] = 0x00;
@@ -643,21 +643,20 @@ uint8_p COM_LoadFile(cStringRO path, ComLoadHunk_t usehunk) {
     return buf;
 }
 
-uint8_p COM_LoadHunkFile(cStringRO path) { return COM_LoadFile(path, COM_LOADHUNK_HUNK); }
-uint8_p COM_LoadTempFile(cStringRO path) { return COM_LoadFile(path, COM_LOADHUNK_TEMP); }
+uint8_p COM_LoadHunkFile(cStringRO path) { return COM_LoadFile(path, HUNK_HUNK); }
+uint8_p COM_LoadTempFile(cStringRO path) { return COM_LoadFile(path, HUNK_TEMP); }
 
 void COM_LoadCacheFile(cStringRO path, CacheUser_p cu) {
     loadcache = cu;
-    COM_LoadFile(path, COM_LOADHUNK_CACHE);
+    COM_LoadFile(path, HUNK_CACHE);
 }
 
 // uses temp hunk if larger than bufsize
-uint8_p COM_LoadStackFile(cStringRO path, TypeLess_ptr buffer, int32_t bufsize) {
+uint8_p COM_LoadStackFile(cStringRO path, TypeLess_ptr buffer, size_t bufsize) {
     loadbuf = (uint8_p)buffer;
     loadsize = bufsize;
-    uint8_p buf = COM_LoadFile(path, COM_LOADHUNK_STACK);
+    return COM_LoadFile(path, HUNK_STACK);
 
-    return buf;
 }
 
 
@@ -792,7 +791,7 @@ COM_Init
 */
 
 void COM_Init(cStringRO basedir) {
-    COM_Endian_Init();
+    Endian_Init();
 
     GM_GameInit();
     Cmd_AddCommand("path", COM_Path_f);

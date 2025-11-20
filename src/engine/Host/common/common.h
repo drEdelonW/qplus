@@ -29,11 +29,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //============================================================================
 
-extern bool		msg_suppress_1;		// suppresses resolution and cache size console output
-//  an fullscreen DIB focus gain/loss
-
+extern bool		msg_suppress_1;		// suppresses resolution and cache size console output an fullscreen DIB focus gain/loss
 #define CACHE_SIZE	32		// used to align key data structures
-
 
 //============================================================================
 #define CMDLINE_LENGTH 256
@@ -49,15 +46,14 @@ typedef struct {
 
 extern common_t com;
 
-
-
 // extern bool com_eof; // not used
 #ifdef __cplusplus
 extern "C" {
 #endif
+
     cString COM_Parse(cString data);
 
-    int COM_CheckParm(cStringRO parm);
+    int  COM_CheckParm(cStringRO parm);
     void COM_Init(cStringRO path);
     void COM_InitArgv(int argc, cStringArray argv);
 
@@ -76,10 +72,10 @@ extern "C" {
     int COM_FOpenFile(cStringRO filename, FILE** file);
     void COM_CloseFile(int h);
 
-    uint8_p COM_LoadStackFile(cStringRO path, TypeLess_ptr buffer, int32_t bufsize);
+    uint8_p COM_LoadStackFile(cStringRO path, TypeLess_ptr buffer, size_t bufsize);
     uint8_p COM_LoadTempFile(cStringRO path);
     uint8_p COM_LoadHunkFile(cStringRO path);
-    void COM_LoadCacheFile(cStringRO path, CacheUser_p cu);
+    void    COM_LoadCacheFile(cStringRO path, CacheUser_p cu);
 
 #ifdef __cplusplus
 }

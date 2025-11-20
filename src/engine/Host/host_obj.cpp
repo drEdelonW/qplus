@@ -167,8 +167,8 @@ void Host::FindMaxClients() {
         svs.maxClients = MAX_SCOREBOARD;
 
     svs.maxClientsLimit = svs.maxClients;
-    if (svs.maxClientsLimit < 4)
-        svs.maxClientsLimit = 4;
+    if (svs.maxClientsLimit < MAX_CLIENT_LIMIT)
+        svs.maxClientsLimit = MAX_CLIENT_LIMIT;
     svs.clients = (RmtClient_p)Hunk_AllocName(svs.maxClientsLimit * sizeof(RmtClient_t), "clients");
 
     if (svs.maxClients > 1) Cvar_SetValue("deathmatch", 1.0);

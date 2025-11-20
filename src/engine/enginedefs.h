@@ -36,3 +36,5 @@
 #define MAX_VISEDICTS           256
 
 #define MAX_DLIGHTS             32
+#define MAX_CLIENT_LIMIT        4
+
