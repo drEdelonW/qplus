@@ -15,8 +15,8 @@
 //=============================================================================
 /* OPTIONS MENU */
 typedef enum {
-    o_force_signed  = -1,
-    o_FIRST         = 0,
+    o_force_signed = -1,
+    o_FIRST = 0,
     o_CostumizeCtrl = o_FIRST,
     o_GoConsole,
     o_ResetDefault,
@@ -61,19 +61,19 @@ void M_AdjustSliders(menuDirection_e dir) {
     S_LocalSound("misc/menu3.wav");
 
     switch (_cursor) {
-    case o_ScreenSize:
+    case o_ScreenSize: {
         scr_viewsize.value += dir * 10; CLAMP(30.0f, scr_viewsize.value, 120.0f);
         Cvar_SetValue("viewsize", scr_viewsize.value);
-        break;
-    case o_Brightness: // gamma
+    } break;
+    case o_Brightness: {// gamma
         v_gamma.value -= dir * 0.05;    CLAMP(0.5f, v_gamma.value, 1.0f);
         Cvar_SetValue("gamma", v_gamma.value);
-        break;
-    case o_MouseSpeed: // mouse speed
+    } break;
+    case o_MouseSpeed: { // mouse speed
         sensitivity.value += dir * 0.5; CLAMP(1.0f, sensitivity.value, 11.0f);
         Cvar_SetValue("sensitivity", sensitivity.value);
-        break;
-    case o_CDVolume: // music volume
+    } break;
+    case o_CDVolume: { // music volume
 #ifdef _WIN32
         bgmvolume.value += dir * 1.0f;
 #else
@@ -81,13 +81,13 @@ void M_AdjustSliders(menuDirection_e dir) {
 #endif
         CLAMP(0.0f, bgmvolume.value, 1.0f);
         Cvar_SetValue("bgmvolume", bgmvolume.value);
-        break;
-    case o_SndVolume: // sfx volume
+    } break;
+    case o_SndVolume: {// sfx volume
         volume.value += dir * 0.1f; CLAMP(0.0f, volume.value, 1.0f);
         Cvar_SetValue("volume", volume.value);
-        break;
+    } break;
 
-    case o_AlwaysRun:
+    case o_AlwaysRun: {
         if (cl_forwardspeed.value > 200) {
             Cvar_SetValue("cl_forwardspeed", 200);
             Cvar_SetValue("cl_backspeed", 200);
@@ -96,16 +96,16 @@ void M_AdjustSliders(menuDirection_e dir) {
             Cvar_SetValue("cl_forwardspeed", 400);
             Cvar_SetValue("cl_backspeed", 400);
         }
-        break;
+    } break;
 
     case o_InvertMouse: Cvar_SetValue("m_pitch", -m_pitch.value);       break;
     case o_LookSpring:  Cvar_SetValue("lookspring", !lookspring.value); break;
     case o_LookStrafe:  Cvar_SetValue("lookstrafe", !lookstrafe.value); break;
 
 #ifdef _WIN32
-    case o_UseMouse: // _windowed_mouse
+    case o_UseMouse: {// _windowed_mouse
         Cvar_SetValue("_windowed_mouse", !_windowed_mouse.value);
-        break;
+    } break;
 #endif
     default: break;
     }
@@ -146,7 +146,7 @@ void M_Options_Key(keycode_t k) {
     switch (k) {
     case K_ESCAPE:  M_Menu_Main_f();    break;
 
-    case K_ENTER:
+    case K_ENTER: {
         m_entersound = true;
         switch (_cursor) {
         case o_CostumizeCtrl:                   M_Menu_Keys_f();                    break;
@@ -155,17 +155,17 @@ void M_Options_Key(keycode_t k) {
         case o_VideoOptions:                    M_Menu_Video_f();                   break;
         default:                                M_AdjustSliders(md_right);          break;
         }
-        return;
+    } return;
 
-    case K_UPARROW:
+    case K_UPARROW: {
         S_LocalSound("misc/menu1.wav");
         if (--_cursor < o_FIRST)  _cursor = o_LAST - 1;
-        break;
+    } break;
 
-    case K_DOWNARROW:
+    case K_DOWNARROW: {
         S_LocalSound("misc/menu1.wav");
         if (++_cursor >= o_LAST)  _cursor = o_FIRST;
-        break;
+    } break;
 
     case K_LEFTARROW:   M_AdjustSliders(md_left);   break;
     case K_RIGHTARROW:  M_AdjustSliders(md_right);  break;

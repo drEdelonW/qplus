@@ -9,8 +9,8 @@
 
 typedef enum {
     mc_force_signed = -1,
-    mc_FIRST        = 0,
-    mc_DialMode     = mc_FIRST,
+    mc_FIRST = 0,
+    mc_DialMode = mc_FIRST,
     mc_Clear,
     mc_Init,
     mc_Hangup,
@@ -85,29 +85,29 @@ void M_ModemConfig_Key(keycode_t key) {
     switch (key) {
     case K_ESCAPE:  M_Menu_SerialConfig_f();    break;
 
-    case K_UPARROW:
+    case K_UPARROW: {
         S_LocalSound("misc/menu1.wav");
         _mc.cursor--;
         if (_mc.cursor < mc_FIRST)
             _mc.cursor = mc_LAST - 1;
-        break;
+    } break;
 
-    case K_DOWNARROW:
+    case K_DOWNARROW: {
         S_LocalSound("misc/menu1.wav");
         _mc.cursor++;
         if (_mc.cursor >= mc_LAST)
             _mc.cursor = mc_FIRST;
-        break;
+    } break;
 
     case K_LEFTARROW:
-    case K_RIGHTARROW:
+    case K_RIGHTARROW: {
         if (_mc.cursor == mc_DialMode) {
             _mc.dialing = (_mc.dialing == 'P') ? 'T' : 'P';
             S_LocalSound("misc/menu1.wav");
         }
-        break;
+    } break;
 
-    case K_ENTER:
+    case K_ENTER: {
         if (_mc.cursor == mc_DialMode) {
             _mc.dialing = (_mc.dialing == 'P') ? 'T' : 'P';
             m_entersound = true;
@@ -118,38 +118,42 @@ void M_ModemConfig_Key(keycode_t key) {
             m_entersound = true;
             M_Menu_SerialConfig_f();
         }
-        break;
+    } break;
 
-    case K_BACKSPACE:
+    case K_BACKSPACE: {
         if ((_mc.cursor == mc_Clear) && (strlen(_mc.sClear)))   _mc.sClear[strlen(_mc.sClear) - 1] = 0x00;
         if ((_mc.cursor == mc_Init) && (strlen(_mc.sInit)))     _mc.sInit[strlen(_mc.sInit) - 1] = 0x00;
         if ((_mc.cursor == mc_Hangup) && (strlen(_mc.sHangup))) _mc.sHangup[strlen(_mc.sHangup) - 1] = 0x00;
-        break;
+    } break;
 
-    default:
+    default: {
         if ((key < 32) ||
             (key > 127))
             break; // is_printable
 
         if (_mc.cursor == mc_Clear) {
             int l = strlen(_mc.sClear);
-            if (l < CLEAR_LEN - 1) {
-                _mc.sClear[l] = key; _mc.sClear[l + 1] = 0x00;
+            if (l < (CLEAR_LEN - 1)) {
+                _mc.sClear[l] = key;
+                _mc.sClear[l + 1] = 0x00;
             }
         }
 
         if (_mc.cursor == mc_Init) {
             int l = strlen(_mc.sInit);
             if (l < INIT_LEN - 1) {
-                _mc.sInit[l] = key;  _mc.sInit[l + 1] = 0x00;
+                _mc.sInit[l] = key;
+                _mc.sInit[l + 1] = 0x00;
             }
         }
 
         if (_mc.cursor == mc_Hangup) {
             int l = strlen(_mc.sHangup);
             if (l < HANGUP_LEN - 1) {
-                _mc.sHangup[l] = key;    _mc.sHangup[l + 1] = 0x00;
+                _mc.sHangup[l] = key;
+                _mc.sHangup[l + 1] = 0x00;
             }
         }
+    } break;
     }
 }

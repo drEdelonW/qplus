@@ -17,10 +17,10 @@
 
 typedef enum {
     lc_UNINITED = -1,
-    lc_FIRST    = 0,
-    lc_Port     = lc_FIRST,
+    lc_FIRST = 0,
+    lc_Port = lc_FIRST,
     lc_Search,
-    lc_Ok       = lc_Search,
+    lc_Ok = lc_Search,
     lc_JoinName,
 
     lc_LAST     //should be last
@@ -102,15 +102,17 @@ void M_LanConfig_Key(keycode_t Key) {
     switch (Key) {
     case K_ESCAPE:  M_Menu_Net_f(); break;
 
-    case K_UPARROW:
+    case K_UPARROW: {
         S_LocalSound("misc/menu1.wav");
-        if (--_cursor < lc_FIRST) { _cursor = lc_LAST - 1; } break;
+        if (--_cursor < lc_FIRST)   _cursor = lc_LAST - 1;
+    } break;
 
-    case K_DOWNARROW:
+    case K_DOWNARROW: {
         S_LocalSound("misc/menu1.wav");
-        if (++_cursor >= lc_LAST) { _cursor = lc_FIRST; } break;
+        if (++_cursor >= lc_LAST)   _cursor = lc_FIRST;
+    } break;
 
-    case K_ENTER:
+    case K_ENTER: {
         if (_cursor == lc_Port) break;
 
         m_entersound = true;
@@ -135,9 +137,9 @@ void M_LanConfig_Key(keycode_t Key) {
             break;
         }
 
-        break;
+    } break;
 
-    case K_BACKSPACE:
+    case K_BACKSPACE: {
         if (_cursor == lc_Port) {
             if (strlen(lanConfig.portname))
                 lanConfig.portname[strlen(lanConfig.portname) - 1] = 0x00;
@@ -147,9 +149,9 @@ void M_LanConfig_Key(keycode_t Key) {
             if (strlen(lanConfig.joinname))
                 lanConfig.joinname[strlen(lanConfig.joinname) - 1] = 0x00;
         }
-        break;
+    } break;
 
-    default:
+    default: {
         if (!is_printable(Key)) break;
 
         if (_cursor == lc_JoinName) {
@@ -168,6 +170,7 @@ void M_LanConfig_Key(keycode_t Key) {
                 lanConfig.portname[l + 1] = 0x00;
             }
         }
+    } break;
     }
 
     if ((is_CreateGame()) &&

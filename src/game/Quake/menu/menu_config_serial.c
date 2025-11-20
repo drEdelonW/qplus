@@ -123,49 +123,45 @@ void M_SerialConfig_Key(keycode_t Key) {
     switch (Key) {
     case K_ESCAPE:  M_Menu_Net_f(); break;
 
-    case K_UPARROW:
+    case K_UPARROW: {
         S_LocalSound("misc/menu1.wav");
         serialConfigCursor--;
         if (serialConfigCursor < 0)
             serialConfigCursor = NUM_SERIALCONFIG_CMDS - 1;
-        break;
+    } break;
 
-    case K_DOWNARROW:
+    case K_DOWNARROW: {
         S_LocalSound("misc/menu1.wav");
         serialConfigCursor++;
         if (serialConfigCursor >= NUM_SERIALCONFIG_CMDS)
             serialConfigCursor = 0;
-        break;
+    } break;
 
-    case K_LEFTARROW:
+    case K_LEFTARROW: {
         if (serialConfigCursor > 2)
             break;
         S_LocalSound("misc/menu3.wav");
 
         if (serialConfigCursor == 0) {
             serialConfig_comport--;
-            if (serialConfig_comport == 0)
-                serialConfig_comport = 4;
+            if (serialConfig_comport == 0)  serialConfig_comport = 4;
             serialConfig_irq = _ISA_IRQs[serialConfig_comport - 1];
         }
 
         if (serialConfigCursor == 1) {
             serialConfig_irq--;
-            if (serialConfig_irq == 6)
-                serialConfig_irq = 5;
-            if (serialConfig_irq == 1)
-                serialConfig_irq = 7;
+            if (serialConfig_irq == 6)      serialConfig_irq = 5;
+            if (serialConfig_irq == 1)      serialConfig_irq = 7;
         }
 
         if (serialConfigCursor == 2) {
             serialConfig_baud--;
-            if (serialConfig_baud < 0)
-                serialConfig_baud = 5;
+            if (serialConfig_baud < 0)      serialConfig_baud = 5;
         }
 
-        break;
+    } break;
 
-    case K_RIGHTARROW:
+    case K_RIGHTARROW: {
         if (serialConfigCursor > 2)
             break;
     forward:
@@ -173,28 +169,24 @@ void M_SerialConfig_Key(keycode_t Key) {
 
         if (serialConfigCursor == 0) {
             serialConfig_comport++;
-            if (serialConfig_comport > 4)
-                serialConfig_comport = 1;
+            if (serialConfig_comport > 4)   serialConfig_comport = 1;
             serialConfig_irq = _ISA_IRQs[serialConfig_comport - 1];
         }
 
         if (serialConfigCursor == 1) {
             serialConfig_irq++;
-            if (serialConfig_irq == 6)
-                serialConfig_irq = 7;
-            if (serialConfig_irq == 8)
-                serialConfig_irq = 2;
+            if (serialConfig_irq == 6)      serialConfig_irq = 7;
+            if (serialConfig_irq == 8)      serialConfig_irq = 2;
         }
 
         if (serialConfigCursor == 2) {
             serialConfig_baud++;
-            if (serialConfig_baud > 5)
-                serialConfig_baud = 0;
+            if (serialConfig_baud > 5)      serialConfig_baud = 0;
         }
 
-        break;
+    } break;
 
-    case K_ENTER:
+    case K_ENTER: {
         if (serialConfigCursor < 3)
             goto forward;
 
@@ -229,16 +221,16 @@ void M_SerialConfig_Key(keycode_t Key) {
 
         if (SerialConfig)   Cbuf_AddText(va("connect \"%s\"\n", serialConfig_phone));
         else                Cbuf_AddText("connect\n");
-        break;
+    } break;
 
-    case K_BACKSPACE:
+    case K_BACKSPACE: {
         if (serialConfigCursor == 4) {
             if (strlen(serialConfig_phone))
                 serialConfig_phone[strlen(serialConfig_phone) - 1] = 0;
         }
-        break;
+    } break;
 
-    default:
+    default: {
         if ((Key < 32) ||
             (Key > 127))
             break;
@@ -249,6 +241,7 @@ void M_SerialConfig_Key(keycode_t Key) {
                 serialConfig_phone[l] = Key;
             }
         }
+    } break;
     }
 
     if ((DirectConfig) &&

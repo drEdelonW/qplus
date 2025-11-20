@@ -90,7 +90,7 @@ void M_Load_Key(keycode_t k) {
     switch (k) {
     case K_ESCAPE:  M_Menu_SinglePlayer_f();    break;
 
-    case K_ENTER:
+    case K_ENTER: {
         S_LocalSound("misc/menu2.wav");
         if (!loadable[load_cursor])
             return;
@@ -103,21 +103,21 @@ void M_Load_Key(keycode_t k) {
 
         // issue the load command
         Cbuf_AddText(va("load s%i\n", load_cursor));
-        return;
+    } return;
 
     case K_UPARROW:
-    case K_LEFTARROW:
+    case K_LEFTARROW: {
         S_LocalSound("misc/menu1.wav");
         if (--load_cursor < 0)
             load_cursor = MAX_SAVEGAMES - 1;
-        break;
+    } break;
 
     case K_DOWNARROW:
-    case K_RIGHTARROW:
+    case K_RIGHTARROW: {
         S_LocalSound("misc/menu1.wav");
         if (++load_cursor >= MAX_SAVEGAMES)
             load_cursor = 0;
-        break;
+    } break;
     default: break;
     }
 }
@@ -127,25 +127,25 @@ void M_Save_Key(keycode_t k) {
     switch (k) {
     case K_ESCAPE:  M_Menu_SinglePlayer_f();    break;
 
-    case K_ENTER:
+    case K_ENTER: {
         m_state = m_none;
         key.dest = key_game;
         Cbuf_AddText(va("save s%i\n", load_cursor));
-        return;
+    } return;
 
     case K_UPARROW:
-    case K_LEFTARROW:
+    case K_LEFTARROW: {
         S_LocalSound("misc/menu1.wav");
         if (--load_cursor < 0)
             load_cursor = MAX_SAVEGAMES - 1;
-        break;
+    } break;
 
     case K_DOWNARROW:
-    case K_RIGHTARROW:
+    case K_RIGHTARROW: {
         S_LocalSound("misc/menu1.wav");
         if (++load_cursor >= MAX_SAVEGAMES)
             load_cursor = 0;
-        break;
+    } break;
     default: break;
     }
 }

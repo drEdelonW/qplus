@@ -119,32 +119,32 @@ void M_Keys_Key(keycode_t k) {
     case K_ESCAPE:  M_Menu_Options_f(); break;
 
     case K_LEFTARROW:
-    case K_UPARROW:
+    case K_UPARROW: {
         S_LocalSound("misc/menu1.wav");
         if (--_keys_cursor < 0)
             _keys_cursor = NUMCOMMANDS - 1;
-        break;
+    } break;
 
     case K_DOWNARROW:
-    case K_RIGHTARROW:
+    case K_RIGHTARROW: {
         S_LocalSound("misc/menu1.wav");
         if (++_keys_cursor >= NUMCOMMANDS)
             _keys_cursor = 0;
-        break;
+    } break;
 
-    case K_ENTER:  // go into bind mode
+    case K_ENTER: { // go into bind mode
         M_FindKeysForCommand(_bindnames[_keys_cursor][command], keys);
         S_LocalSound("misc/menu2.wav");
         if (keys[1] != -1)
             M_UnbindCommand(_bindnames[_keys_cursor][command]);
         _bind_grab = true;
-        break;
+    } break;
 
     case K_BACKSPACE:  // delete bindings
-    case K_DEL:    // delete bindings
+    case K_DEL: {   // delete bindings
         S_LocalSound("misc/menu2.wav");
         M_UnbindCommand(_bindnames[_keys_cursor][command]);
-        break;
+    } break;
     default: break;
     }
 }

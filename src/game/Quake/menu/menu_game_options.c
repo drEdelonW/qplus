@@ -1,9 +1,9 @@
 #include "menu.h"
 #include "menu_prv.h"
 #include "server.h"
-#include "cvar_q1.h"
+#include "cvar.h"
 #include "host.h"
-#include "screen.h"
+#include "screen.h" // SCR_BeginLoadingPlaque();
 #include "cbuf.h"
 #include "gamedefs.h"
 
@@ -198,6 +198,21 @@ typedef enum {
     go_LAST     //should be last
 } GOm_e;
 static GOm_e  _cursor;
+static cString _TeamPlay[] = {
+    "Off",
+    "No Friendly Fire",
+    "Friendly Fire",
+    "Tag",
+    "Capture the Flag",
+    "One Flag CTF",
+    "Three Team CTF"
+};
+static cString _Skill[] = {
+    "Easy difficulty",
+    "Normal difficulty",
+    "Hard difficulty",
+    "Nightmare difficulty"
+};
 
 void M_GameOptions_Draw() {
     static int _x2 = 160;
@@ -211,48 +226,17 @@ void M_GameOptions_Draw() {
     }
 
     M_Print(0, _cur_ys[yIdx], "      Max players");     M_Print(_x2, _cur_ys[yIdx++], va("%i", _maxPlayers));
-    M_Print(0, _cur_ys[yIdx], "        Game Type");     M_Print(_x2, _cur_ys[yIdx++], (coop.value) ? "Cooperative" : "Deathmatch");
+    M_Print(0, _cur_ys[yIdx], "        Game Type");     M_Print(_x2, _cur_ys[yIdx++], (Cvar_VariableValue("coop")) ? "Cooperative" : "Deathmatch");
+    M_Print(0, _cur_ys[yIdx], "        Teamplay");      M_Print(_x2, _cur_ys[yIdx++], _TeamPlay[(int)Cvar_VariableValue("teamplay")]);
+    M_Print(0, _cur_ys[yIdx], "            Skill");     M_Print(_x2, _cur_ys[yIdx++], _Skill[(int)Cvar_VariableValue("skill")]);
 
-    M_Print(0, _cur_ys[yIdx], "        Teamplay"); {
-        if (rogue) {
-            cString msg;
-
-            switch ((int)teamplay.value) {
-            case 1:     msg = "No Friendly Fire";   break;
-            case 2:     msg = "Friendly Fire";      break;
-            case 3:     msg = "Tag";                break;
-            case 4:     msg = "Capture the Flag";   break;
-            case 5:     msg = "One Flag CTF";       break;
-            case 6:     msg = "Three Team CTF";     break;
-            default:    msg = "Off";                break;
-            }
-            M_Print(_x2, _cur_ys[yIdx++], msg);
-        }
-        else {
-            cString msg;
-
-            switch ((int)teamplay.value) {
-            case 1:     msg = "No Friendly Fire";   break;
-            case 2:     msg = "Friendly Fire";      break;
-            default:    msg = "Off";                break;
-            }
-            M_Print(_x2, _cur_ys[yIdx++], msg);
-        }
-    }
-
-    M_Print(0, _cur_ys[yIdx], "            Skill"); {
-        if (skill.value == 0)       M_Print(_x2, _cur_ys[yIdx++], "Easy difficulty");
-        else if (skill.value == 1)  M_Print(_x2, _cur_ys[yIdx++], "Normal difficulty");
-        else if (skill.value == 2)  M_Print(_x2, _cur_ys[yIdx++], "Hard difficulty");
-        else                        M_Print(_x2, _cur_ys[yIdx++], "Nightmare difficulty");
-    }
     M_Print(0, _cur_ys[yIdx], "       Frag Limit"); {
-        if (fraglimit.value == 0)   M_Print(_x2, _cur_ys[yIdx++], "none");
-        else                        M_Print(_x2, _cur_ys[yIdx++], va("%i frags", (int)fraglimit.value));
+        if (Cvar_VariableValue("fraglimit") == 0)   M_Print(_x2, _cur_ys[yIdx++], "none");
+        else                                        M_Print(_x2, _cur_ys[yIdx++], va("%i frags", (int)Cvar_VariableValue("fraglimit")));
     }
     M_Print(0, _cur_ys[yIdx], "       Time Limit"); {
-        if (timelimit.value == 0)   M_Print(_x2, _cur_ys[yIdx++], "none");
-        else                        M_Print(_x2, _cur_ys[yIdx++], va("%i minutes", (int)timelimit.value));
+        if (Cvar_VariableValue("timelimit") == 0)   M_Print(_x2, _cur_ys[yIdx++], "none");
+        else                                        M_Print(_x2, _cur_ys[yIdx++], va("%i minutes", (int)Cvar_VariableValue("timelimit")));
     }
     M_Print(0, _cur_ys[yIdx], "         Episode"); {
         //MED 01/06/97 added hipnotic episodes
@@ -279,17 +263,18 @@ void M_GameOptions_Draw() {
     }
 
     // line cursor
-    M_DrawCharacter(144, _cur_ys[_cursor], curSymb());
+    M_DrawCharacter(_x2 - 16, _cur_ys[_cursor], curSymb());
 
     if (_svInfoMsg) {
         if ((realtime - _svInfoMsgTime) < 5.0) {
             int x = (320 - 26 * 8) / 2;
-            M_DrawTextBox(x, 138, 24, 4);
-            x += 8;
-            M_Print(x, 146, "  More than 4 players   ");
-            M_Print(x, 154, " requires using command ");
-            M_Print(x, 162, "line parameters; please ");
-            M_Print(x, 170, "   see techinfo.txt.    ");
+            M_DrawTextBox(x, 138, 24, 4);{
+                x += 8;
+                M_Print(x, 146, "  More than 4 players   ");
+                M_Print(x, 154, " requires using command ");
+                M_Print(x, 162, "line parameters; please ");
+                M_Print(x, 170, "   see techinfo.txt.    ");
+            }
         }
         else {
             _svInfoMsg = false;
@@ -313,33 +298,33 @@ void M_NetStart_Change(int dir) {
             _maxPlayers = 2;
     } break;
 
-    case go_GameType: Cvar_SetValue("coop", coop.value ? 0 : 1);  break;
+    case go_GameType: Cvar_SetValue("coop", Cvar_VariableValue("coop") ? 0 : 1);  break;
 
     case go_TeamPlay: {
         if (rogue)  count = 6;
         else        count = 2;
 
-        Cvar_SetValue("teamplay", teamplay.value + dir);
-        if (teamplay.value > count)     Cvar_SetValue("teamplay", 0);
-        else if (teamplay.value < 0)    Cvar_SetValue("teamplay", count);
+        Cvar_SetValue("teamplay", Cvar_VariableValue("teamplay") + dir);
+        if (Cvar_VariableValue("teamplay") > count)     Cvar_SetValue("teamplay", 0);
+        else if (Cvar_VariableValue("teamplay") < 0)    Cvar_SetValue("teamplay", count);
     } break;
 
     case go_Skill: {
-        Cvar_SetValue("skill", skill.value + dir);
-        if (skill.value > 3)        Cvar_SetValue("skill", 0);
-        else if (skill.value < 0)   Cvar_SetValue("skill", 3);
+        Cvar_SetValue("skill", Cvar_VariableValue("skill") + dir);
+        if (Cvar_VariableValue("skill") > 3)            Cvar_SetValue("skill", 0);
+        else if (Cvar_VariableValue("skill") < 0)       Cvar_SetValue("skill", 3);
     } break;
 
     case go_FragLimit: {
-        Cvar_SetValue("fraglimit", fraglimit.value + dir * 10);
-        if (fraglimit.value > 100)      Cvar_SetValue("fraglimit", 0);
-        else if (fraglimit.value < 0)   Cvar_SetValue("fraglimit", 100);
+        Cvar_SetValue("fraglimit", Cvar_VariableValue("fraglimit") + dir * 10);
+        if (Cvar_VariableValue("fraglimit") > 100)      Cvar_SetValue("fraglimit", 0);
+        else if (Cvar_VariableValue("fraglimit") < 0)   Cvar_SetValue("fraglimit", 100);
     } break;
 
     case go_TimeLimit: {
-        Cvar_SetValue("timelimit", timelimit.value + dir * 5);
-        if (timelimit.value > 60)       Cvar_SetValue("timelimit", 0);
-        else if (timelimit.value < 0)   Cvar_SetValue("timelimit", 60);
+        Cvar_SetValue("timelimit", Cvar_VariableValue("timelimit") + dir * 5);
+        if (Cvar_VariableValue("timelimit") > 60)       Cvar_SetValue("timelimit", 0);
+        else if (Cvar_VariableValue("timelimit") < 0)   Cvar_SetValue("timelimit", 60);
     } break;
 
     case go_Episode: {
@@ -349,8 +334,8 @@ void M_NetStart_Change(int dir) {
         //PGM 03/02/97 added 1 for dmatch episode
         if (hipnotic)               count = 6;
         else if (rogue)             count = 4;
-        else if (registered.value)  count = 7;
-        else                        count = 2;
+        else if (Cvar_VariableValue("registered"))  count = 7;
+        else                                        count = 2;
 
         if (_startEpisode < 0)              _startEpisode = count - 1;
         else if (_startEpisode >= count)    _startEpisode = 0;
@@ -405,7 +390,7 @@ void M_GameOptions_Key(keycode_t key) {
 
     case K_ENTER: {
         S_LocalSound("misc/menu2.wav");
-        if (_cursor == 0) {
+        if (_cursor == go_BeginGame) {
             if (sv.active)
                 Cbuf_AddText("disconnect\n");
             Cbuf_AddText("listen 0\n"); // so host_netport will be re-examined

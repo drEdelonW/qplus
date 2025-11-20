@@ -31,17 +31,14 @@ void M_Menu_Main_f() {
 
 void M_Main_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-
     M_DrawPicHC(4, Draw_CachePic("gfx/ttl_main.lmp"));
-
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/mainmenu.lmp"));
-
     M_DrawTransPic(54, 32 + _cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame())));
 }
 
 void M_Main_Key(keycode_t Key) {
     switch (Key) {
-    case K_ESCAPE:
+    case K_ESCAPE: {
         key.dest = key_game;
         m_state = m_none;
         cls.demonum = m_save_demonum;
@@ -49,19 +46,19 @@ void M_Main_Key(keycode_t Key) {
             (!cls.demoplayback) &&
             (cls.state != ca_connected))
             CL_NextDemo();
-        break;
+    } break;
 
-    case K_DOWNARROW:
+    case K_DOWNARROW: {
         S_LocalSound("misc/menu1.wav");
         if (++_cursor >= m_LAST)    _cursor = m_FIRST;
-        break;
+    } break;
 
-    case K_UPARROW:
+    case K_UPARROW: {
         S_LocalSound("misc/menu1.wav");
         if (--_cursor < (int)m_FIRST)    _cursor = m_LAST - 1;
-        break;
+    } break;
 
-    case K_ENTER:
+    case K_ENTER: {
         m_entersound = true;
 
         switch (_cursor) {
@@ -72,6 +69,7 @@ void M_Main_Key(keycode_t Key) {
         case m_Quit:            M_Menu_Quit_f();            break;
         default: break;
         }
+    } break;
     default: break;
     }
 }

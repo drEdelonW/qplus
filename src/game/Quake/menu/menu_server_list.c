@@ -57,18 +57,18 @@ void M_ServerList_Key(keycode_t k) {
     case K_SPACE:   M_Menu_Search_f();      break;
 
     case K_UPARROW:
-    case K_LEFTARROW:
+    case K_LEFTARROW: {
         S_LocalSound("misc/menu1.wav");
         if (--slist_cursor < 0)   slist_cursor = hostCacheCount - 1;
-        break;
+    } break;
 
     case K_DOWNARROW:
-    case K_RIGHTARROW:
+    case K_RIGHTARROW: {
         S_LocalSound("misc/menu1.wav");
         if (++slist_cursor >= hostCacheCount) slist_cursor = 0;
-        break;
+    } break;
 
-    case K_ENTER:
+    case K_ENTER: {
         S_LocalSound("misc/menu2.wav");
         m_return_state = m_state;
         m_return_onerror = true;
@@ -76,7 +76,7 @@ void M_ServerList_Key(keycode_t k) {
         key.dest = key_game;
         m_state = m_none;
         Cbuf_AddText(va("connect \"%s\"\n", hostcache[slist_cursor].cname));
-        break;
+    } break;
 
     default:    break;
     }

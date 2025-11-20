@@ -10,9 +10,9 @@
 //=============================================================================
 /* SETUP MENU */
 typedef enum {
-    s_force_signed  = -1,
-    s_FIRST         = 0,
-    s_HostName      = s_FIRST,
+    s_force_signed = -1,
+    s_FIRST = 0,
+    s_HostName = s_FIRST,
     s_PlayerName,
     s_ShirtCol,
     s_PantsCol,
@@ -89,30 +89,32 @@ void M_Setup_Key(keycode_t k) {
     switch (k) {
     case K_ESCAPE:  M_Menu_MultiPlayer_f(); break;
 
-    case K_UPARROW:
+    case K_UPARROW: {
         S_LocalSound("misc/menu1.wav");
-        if (--_cursor < s_FIRST) { _cursor = s_NUM - 1; } break;
+        if (--_cursor < s_FIRST)    _cursor = s_NUM - 1;
+    } break;
 
-    case K_DOWNARROW:
+    case K_DOWNARROW: {
         S_LocalSound("misc/menu1.wav");
-        if (++_cursor >= s_NUM) { _cursor = s_FIRST; } break;
+        if (++_cursor >= s_NUM)     _cursor = s_FIRST;
+    } break;
 
-    case K_LEFTARROW:
+    case K_LEFTARROW: {
         if (_cursor < s_ShirtCol)   return;
         S_LocalSound("misc/menu3.wav");
         if (_cursor == s_ShirtCol)  _s.top--;
         if (_cursor == s_PantsCol)  _s.bottom--;
-        break;
+    } break;
 
-    case K_RIGHTARROW:
+    case K_RIGHTARROW: {
         if (_cursor < s_ShirtCol)   return;
     forward:
         S_LocalSound("misc/menu3.wav");
         if (_cursor == s_ShirtCol)  _s.top++;
         if (_cursor == s_PantsCol)  _s.bottom++;
-        break;
+    } break;
 
-    case K_ENTER:
+    case K_ENTER: {
         if ((_cursor == s_HostName) ||
             (_cursor == s_PlayerName))
             return;
@@ -122,16 +124,17 @@ void M_Setup_Key(keycode_t k) {
             goto forward;
 
         // _cursor == 4 (OK)
-        if (Q_strcmp(cl_name.string, _s.myname) != 0) { Cbuf_AddText(va("name \"%s\"\n", _s.myname)); }
-        if (Q_strcmp(hostname.string, _s.hostname) != 0) { Cvar_Set("hostname", _s.hostname); }
+        if (Q_strcmp(cl_name.string, _s.myname) != 0)       Cbuf_AddText(va("name \"%s\"\n", _s.myname));
+        if (Q_strcmp(hostname.string, _s.hostname) != 0)    Cvar_Set("hostname", _s.hostname);
         if ((_s.top != _s.oldtop) ||
-            (_s.bottom != _s.oldbottom))
+            (_s.bottom != _s.oldbottom)
+            )
             Cbuf_AddText(va("color %i %i\n", _s.top, _s.bottom));
         m_entersound = true;
         M_Menu_MultiPlayer_f();
-        break;
+    } break;
 
-    case K_BACKSPACE:
+    case K_BACKSPACE: {
         if ((_cursor == s_HostName) &&
             (strlen(_s.hostname)))
             _s.hostname[strlen(_s.hostname) - 1] = 0x00;
@@ -139,9 +142,9 @@ void M_Setup_Key(keycode_t k) {
         if ((_cursor == s_PlayerName) &&
             (strlen(_s.myname)))
             _s.myname[strlen(_s.myname) - 1] = 0x00;
-        break;
+    } break;
 
-    default:
+    default: {
         if (!is_printable(k)) break;
         if (_cursor == s_HostName) {
             int l = strlen(_s.hostname);
@@ -157,15 +160,12 @@ void M_Setup_Key(keycode_t k) {
                 _s.myname[l + 1] = 0x00;
             }
         }
+    } break;
     }
 
-    if (_s.top > 13)
-        _s.top = 0;
-    else if (_s.top < 0)
-        _s.top = 13;
+    if (_s.top > 13)        _s.top = 0;
+    else if (_s.top < 0)    _s.top = 13;
 
-    if (_s.bottom > 13)
-        _s.bottom = 0;
-    else if (_s.bottom < 0)
-        _s.bottom = 13;
+    if (_s.bottom > 13)     _s.bottom = 0;
+    else if (_s.bottom < 0) _s.bottom = 13;
 }

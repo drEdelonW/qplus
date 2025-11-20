@@ -32,16 +32,18 @@ void M_Help_Key(keycode_t key) {
     case K_ESCAPE:  M_Menu_Main_f();    break;
 
     case K_UPARROW:
-    case K_RIGHTARROW:  m_entersound = true;
+    case K_RIGHTARROW: {
+        m_entersound = true;
         if (++help_page >= NUM_HELP_PAGES)
             help_page = 0;
-        break;
+    } break;
 
     case K_DOWNARROW:
-    case K_LEFTARROW:   m_entersound = true;
+    case K_LEFTARROW: {
+        m_entersound = true;
         if (--help_page < 0)
             help_page = NUM_HELP_PAGES - 1;
-        break;
+    } break;
     default: break;
     }
 

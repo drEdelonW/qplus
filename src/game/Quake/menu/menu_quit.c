@@ -82,7 +82,7 @@ void M_Quit_Key(keycode_t Key) {
     switch ((char)Key) {
     case K_ESCAPE:
     case 'n':
-    case 'N':
+    case 'N': {
         if (_wasInMenus) {
             m_state = _m_quitPrevState;
             m_entersound = true;
@@ -91,13 +91,13 @@ void M_Quit_Key(keycode_t Key) {
             key.dest = key_game;
             m_state = m_none;
         }
-        break;
+    } break;
 
     case 'Y':
-    case 'y':
+    case 'y': {
         key.dest = key_console;
         Host_Quit_f();
-        break;
+    } break;
 
     default:    break;
     }

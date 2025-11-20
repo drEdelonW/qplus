@@ -7,8 +7,8 @@
 
 typedef enum {
     mp_force_signed = -1,
-    mp_FIRST        = 0,
-    mp_Join         = mp_FIRST,
+    mp_FIRST = 0,
+    mp_Join = mp_FIRST,
     mp_Create,
     mp_Setup,
 
@@ -29,11 +29,8 @@ void M_Menu_MultiPlayer_f() {
 
 void M_MultiPlayer_Draw() {
     M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
-
     M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
-
     M_DrawTransPic(72, 32, Draw_CachePic("gfx/mp_menu.lmp"));
-
     M_DrawTransPic(54, 32 + _mp_cursor * 20,
         Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame()))
     );
@@ -49,26 +46,28 @@ void M_MultiPlayer_Key(keycode_t key) {
     switch (key) {
     case K_ESCAPE:  M_Menu_Main_f();    break;
 
-    case K_DOWNARROW:
+    case K_DOWNARROW: {
         S_LocalSound("misc/menu1.wav");
         if (++_mp_cursor >= mp_NUM)     _mp_cursor = mp_FIRST;
-        break;
+    } break;
 
-    case K_UPARROW:
+    case K_UPARROW: {
         S_LocalSound("misc/menu1.wav");
         if (--_mp_cursor < mp_FIRST)    _mp_cursor = mp_NUM - 1;
-        break;
+    } break;
 
-    case K_ENTER:
+    case K_ENTER: {
         m_entersound = true;
         switch (_mp_cursor) {
         case mp_Join:
-        case mp_Create:
-            if (is_anyComAval()) {M_Menu_Net_f();} break;
+        case mp_Create: {
+            if (is_anyComAval())    M_Menu_Net_f();
+        } break;
 
         case mp_Setup: M_Menu_Setup_f(); break;
         default: break;
         }
+    }break;
     default: break;
     }
 }

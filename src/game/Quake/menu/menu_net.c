@@ -105,15 +105,15 @@ again:
     switch (k) {
     case K_ESCAPE:      M_Menu_MultiPlayer_f(); break;
 
-    case K_DOWNARROW:   S_LocalSound("misc/menu1.wav");
+    case K_DOWNARROW: {   S_LocalSound("misc/menu1.wav");
         if (++m_net_cursor >= m_net_items)  m_net_cursor = 0;
-        break;
+    } break;
 
-    case K_UPARROW:     S_LocalSound("misc/menu1.wav");
+    case K_UPARROW: {    S_LocalSound("misc/menu1.wav");
         if (--m_net_cursor < 0)     m_net_cursor = m_net_items - 1;
-        break;
+    } break;
 
-    case K_ENTER:
+    case K_ENTER: {
         m_entersound = true;
 
         switch (m_net_cursor) {
@@ -123,6 +123,7 @@ again:
         case 3: M_Menu_LanConfig_f();       break;
         case 4: /* multiprotocol */         break;
         }
+    } break;
     default: break;
     }
 
