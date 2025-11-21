@@ -7,13 +7,13 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 $(eval API_DIR := $(HOST_DIR)/API) $(eval INCLUDES += $(API_DIR))
 
                 $(eval PLAPI_DIR := $(HOST_DIR)/platformAPI) $(eval INCLUDES += $(PLAPI_DIR))
-                        #SRC_LIST += $(PLAPI_DIR)/sys_null.c
+                        SRC_LIST += $(PLAPI_DIR)/sys_null.c
                         SRC_LIST += $(PLAPI_DIR)/vid_null.c
                         SRC_LIST += $(PLAPI_DIR)/in_null.c
                         SRC_LIST += $(PLAPI_DIR)/snd_null.c
                         SRC_LIST += $(PLAPI_DIR)/cd_null.c
 
-                #SRC_LIST += $(HOST_DIR)/host.c
+                #SRC_LIST += $(HOST_DIR)/host.c # deprecated
                 SRC_LIST += $(HOST_DIR)/host_cmd.c
                 SRC_LIST += $(HOST_DIR)/host_obj.cpp
                 SRC_LIST += $(HOST_DIR)/host_cWrap.cpp
@@ -158,6 +158,9 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 $(eval SBUF_DIR = $(SHARED_DIR)/sBuf) $(eval INCLUDES += $(SBUF_DIR))
                         SRC_LIST += $(SBUF_DIR)/sizebuf.c
 
+
+
+#=============================[GAME DEPENDED LOGIC]=============================#
 
 $(eval GAME_DIR := $(SRC_DIR)/game/Quake) $(eval INCLUDES += $(GAME_DIR))
         $(eval MENU_DIR = $(GAME_DIR)/menu) $(eval INCLUDES += $(MENU_DIR))

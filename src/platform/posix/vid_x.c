@@ -90,9 +90,9 @@ static int verbose = 0;
 static uint8_t current_palette[768];
 
 static int32_t X11_highhunkmark;
-static int32_t X11_buffersize;
+static size_t X11_buffersize;
 
-int vid_surfcachesize;
+static size_t vid_surfcachesize;
 static TypeLess_ptr vid_surfcache;
 
 typedef uint16_t PIXEL16;

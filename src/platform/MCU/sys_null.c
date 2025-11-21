@@ -63,7 +63,7 @@ int filelength(FILE* f) {
     return end;
 }
 
-int Sys_FileOpenRead(cString path, int* hndl) {
+int Sys_FileOpenRead(cStringRO path, int* hndl) {
     int i = findhandle();
     FILE* f = fopen(path, "rb");
     if (!f) {
@@ -76,7 +76,7 @@ int Sys_FileOpenRead(cString path, int* hndl) {
     return filelength(f);
 }
 
-int Sys_FileOpenWrite(cString path) {
+int Sys_FileOpenWrite(cStringRO path) {
     int i = findhandle();
     FILE* f = fopen(path, "wb");
     if (!f)
@@ -95,15 +95,15 @@ void Sys_FileSeek(int handle, int position) {
     fseek(sys_handles[handle], position, SEEK_SET);
 }
 
-int Sys_FileRead(int handle, TypeLess_ptr dest, int count) {
+int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) {
     return fread(dest, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileWrite(int handle, TypeLess_ptr data, int count) {
+int Sys_FileWrite(int handle, TypeLess_ptr data, size_t count) {
     return fwrite(data, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileTime(cString path) {
+int Sys_FileTime(cStringRO path) {
     FILE* f = fopen(path, "rb");
     if (f) {
         fclose(f);
@@ -112,7 +112,7 @@ int Sys_FileTime(cString path) {
     return -1;
 }
 
-void Sys_mkdir(cString path) {}
+void Sys_mkdir(cStringRO path) {}
 
 
 /*
@@ -136,7 +136,7 @@ void Sys_Error(cStringRO error, ...) {
     exit(1);
 }
 
-void Sys_Printf(cString fmt, ...) {
+void Sys_Printf(cStringRO fmt, ...) {
     va_list argptr;
     va_start(argptr, fmt);
     vprintf(fmt, argptr);

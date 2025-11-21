@@ -68,19 +68,19 @@ Memory is cleared / released when a server or client begins, not when they end.
 */
 
 #if 1
-bool isDedicated;
 QuakeParms_t host_parms;
-bool host_initialized;  // true if into command execution
-double host_frametime;
-double host_time;
-double realtime;    // without any filtering or bounding
-double oldrealtime;   // last frame run
+bool    host_initialized;   // true if into command execution
+double  host_frametime;
+double  host_time;
 int32_t host_framecount;
-int host_hunklevel;
-size_t minimum_memory;
-jmp_buf  host_abortserver;
+int     host_hunklevel;
+jmp_buf host_abortserver;
 uint8_p host_basepal;
 uint8_p host_colormap;
+bool    isDedicated;
+double  realtime;           // without any filtering or bounding
+double  oldrealtime;        // last frame run
+size_t  minimum_memory;
 #endif
 
 
@@ -92,7 +92,7 @@ Host::EndGame
 */
 void Host::EndGame(cString message, ...) {
     va_list  argptr;    va_start(argptr, message);
-    char  string[1024]; vsnprintf(string, sizeof(string), message, argptr);
+    char string[1024]; vsnprintf(string, sizeof(string), message, argptr);
     va_end(argptr);
     Con_DPrintf("Host::EndGame: %s\n", string);
 
@@ -343,7 +343,6 @@ This only happens at the end of a game, not between levels
 ==================
 */
 void Host::ShutdownServer(bool crash) {
-    int  count;
 
     if (!sv.active) return;
 
@@ -354,6 +353,7 @@ void Host::ShutdownServer(bool crash) {
 
     // flush any pending messages - like the score!!!
     double start = Host_FloatTime();
+    int  count;
     do {
         count = 0;
         remoteClient = svs.clients;
@@ -380,10 +380,11 @@ void Host::ShutdownServer(bool crash) {
         .cursize = 0
     };
     MSG_WriteByte(&buf, svc_disconnect);
-    count = NET_SendToAll(&buf, 5);
-    if (count)
-        Con_Printf("Host::ShutdownServer: NET_SendToAll failed for %u clients\n", count);
-
+    {
+        int32_t count = NET_SendToAll(&buf, 5);
+        if (count)
+            Con_Printf("Host::ShutdownServer: NET_SendToAll failed for %u clients\n", count);
+    }
     remoteClient = svs.clients;
     for (int i = 0; i < svs.maxClients; i++, remoteClient++)
         if (remoteClient->active)
@@ -440,10 +441,8 @@ bool Host::FilterTime(float time) {
     if (host_framerate.value > 0)
         host_frametime = host_framerate.value;
     else { // don't allow really long or int16_t frames
-        if (host_frametime > 0.1)
-            host_frametime = 0.1;
-        if (host_frametime < 0.001)
-            host_frametime = 0.001;
+        if (host_frametime > 0.1)   host_frametime = 0.1;
+        if (host_frametime < 0.001) host_frametime = 0.001;
     }
 
     return true;
@@ -558,11 +557,8 @@ void Host::_Frame(float time) {
     if (!FilterTime(time)) return; // don't run too fast, or packets will flood out
 
     Sys_SendKeyEvents();    // get new key events
-
     IN_Commands();  // allow mice or other external controllers to add commands
-
     Cbuf_Execute(); // process console commands
-
     NET_Poll();
 
     // if running the server locally, make intentions now
@@ -593,7 +589,6 @@ void Host::_Frame(float time) {
 
     // fetch results from server
     if (cls.state == ca_connected)  CL_ReadFromServer();
-
 
     // update video
     if (host_speeds.value)  _time1 = Host_FloatTime();
@@ -700,8 +695,7 @@ void Host::InitVCR(QuakeParms_p parms) {
             Sys_FileWrite(vcrFile, &i, sizeof(int));
             for (int i = 1; i < com.argc; i++) {
                 if (i == n) {
-                    int len;
-                    len = 10;
+                    int len = 10;
                     Sys_FileWrite(vcrFile, &len, sizeof(int));
                     Sys_FileWrite(vcrFile, (cString)"-playback", len);
                     continue;
@@ -721,7 +715,6 @@ Host::Init
 ====================
 */
 void Host::Init(QuakeParms_p parms) {
-
     minimum_memory = (standard_quake) ? MINIMUM_MEMORY : MINIMUM_MEMORY_LEVELPAK;
 
     if (COM_CheckParm("-minmemory"))
@@ -759,9 +752,9 @@ void Host::Init(QuakeParms_p parms) {
 
     if (cls.state != ca_dedicated) {
         host_basepal = (uint8_p)COM_LoadHunkFile("gfx/palette.lmp");
-        if (!host_basepal)  Host_SysError("Couldn't load gfx/palette.lmp");
+        if (!host_basepal)      Host_SysError("Couldn't load gfx/palette.lmp");
         host_colormap = (uint8_p)COM_LoadHunkFile("gfx/colormap.lmp");
-        if (!host_colormap) Host_SysError("Couldn't load gfx/colormap.lmp");
+        if (!host_colormap)     Host_SysError("Couldn't load gfx/colormap.lmp");
 
 #ifndef _WIN32 // on non win32, mouse comes before video for security reasons
         IN_Init();

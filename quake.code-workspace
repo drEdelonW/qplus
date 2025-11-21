@@ -136,7 +136,8 @@
 			"wsipx.h": "c",
 			"WSIPX.H": "cpp",
 			"model_s.h": "c",
-			"gamedefs.h": "c"
+			"gamedefs.h": "c",
+			"mman.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

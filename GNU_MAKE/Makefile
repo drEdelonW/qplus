@@ -109,13 +109,13 @@ define compile_template
 endef
 
 COMPILE_C   = $(call compile_template,{C}  ,$(CC) ,$(CFLAGS))
-COMPILE_CXX = $(call compile_template,{C++},$(CXX),$(CXXFLAGS))
+COMPILE_CXX = $(call compile_template,{C++},$(CXX),$(CPPFLAGS))
 COMPILE_ASM = $(call compile_template,{ASM},$(CC) -c -x assembler-with-cpp,$(ASMFLAGS))
 
 # Search sources in ../src and ../ID_src/WinQuake
 vpath %.c   $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
 vpath %.cpp $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
-vpath %.s.  $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
+vpath %.s   $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
 vpath %.S   $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
 
 # Two rules instead of four — make will find % via vpath
@@ -128,6 +128,8 @@ $(OBJ_DIR)/%.o: %.cpp
 $(OBJ_DIR)/%.o: %.s
 	$(COMPILE_ASM)
 
+$(OBJ_DIR)/%.o: %.S
+	$(COMPILE_ASM)
 
 # ---------- Housekeeping ----------
 clean:

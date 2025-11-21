@@ -2,6 +2,8 @@
 #include "perepherial.h"
 #include "string.h"
 #include "cmsis_os.h"
+#include "types.h"
+
 
 osThreadId defaultTaskHandle;
 void StartDefaultTask(void const* argument);

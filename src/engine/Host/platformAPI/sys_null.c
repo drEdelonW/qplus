@@ -20,24 +20,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sys_null.h -- null system driver to aid porting efforts
 
 #include "sys.h"
-// #include "errno.h"
 #include "qparams.h"
 #include "host.h"
 #include "common.h"
-#include "console.h"
 #include <errno.h>
 #include <stdarg.h>
 #include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/shm.h>
-#include <sys/wait.h>
-#include <linux/soundcard.h>
 #include <stdio.h>
+#ifndef STM32
+
+#else
+#   warning STM32
+#endif
 /*
 ===============================================================================
 

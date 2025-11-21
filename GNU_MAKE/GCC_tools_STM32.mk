@@ -1,8 +1,10 @@
 TRG_PREFIX 		?= arm-none-eabi
 # GCC_VER			?= 11.3.rel1
-GCC_VER			?= 12.3.rel1
+# GCC_VER			?= 12.3.rel1
 # GCC_VER			?= 13.2.Rel1
-# GCC_VER			?= 13.3.Rel1
+GCC_VER			?= 13.3.rel1
+
+# tar -xf arm-gnu-toolchain-12.3.rel1-aarch64-arm-none-eabi.tar.xz
 
 TRG_PREFIX  ?= arm-none-eabi
 GCC_VER     ?= 12.3.rel1

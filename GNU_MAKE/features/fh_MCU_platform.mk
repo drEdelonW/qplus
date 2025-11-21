@@ -10,12 +10,12 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/AP
 
 $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/API)
     $(eval MCU_DIR = $(PLATFORM_DIR)/MCU) $(eval INCLUDES += $(MCU_DIR))
-        SRC_LIST += $(MCU_DIR)/cd_null.c
-        SRC_LIST += $(MCU_DIR)/snd_null.c
-        SRC_LIST += $(MCU_DIR)/sys_null.c
-        SRC_LIST += $(MCU_DIR)/vid_null.c
-        SRC_LIST += $(MCU_DIR)/net_mcu.c
-        SRC_LIST += $(MCU_DIR)/in_mcu.c
+#         SRC_LIST += $(MCU_DIR)/cd_null.c
+#         SRC_LIST += $(MCU_DIR)/snd_null.c
+#         SRC_LIST += $(MCU_DIR)/sys_null.c
+#         SRC_LIST += $(MCU_DIR)/vid_null.c
+#         SRC_LIST += $(MCU_DIR)/net_mcu.c
+#         SRC_LIST += $(MCU_DIR)/in_mcu.c
 
 # $(eval ROOT_DIR := $(STMSRC_DIR)) $(eval INCLUDES += $(ROOT_DIR))
 $(eval INCLUDES += $(STMSRC_DIR)/Drivers/CMSIS/Device/ST/STM32F7xx/Include)
@@ -35,3 +35,5 @@ $(eval INCLUDES += $(STMSRC_DIR)/Drivers/CMSIS/Include)
 
 include features/fh_HAL.mk
 include features/fh_RTOS.mk
+
+    DEFINES += STM32

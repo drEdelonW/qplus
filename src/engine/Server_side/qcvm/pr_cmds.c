@@ -1509,4 +1509,4 @@ builtin_t pr_builtin[] = {
 };
 
 builtin_t* pr_builtins = pr_builtin;
-int pr_numbuiltins = sizeof(pr_builtin) / sizeof(pr_builtin[0]);
+int32_t pr_numbuiltins = sizeof(pr_builtin) / sizeof(pr_builtin[0]);
