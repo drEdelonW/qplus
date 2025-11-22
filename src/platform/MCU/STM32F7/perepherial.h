@@ -28,7 +28,7 @@ extern LTDC_HandleTypeDef hltdc;
 // extern TIM_HandleTypeDef htim11;
 // extern TIM_HandleTypeDef htim12;
 // extern UART_HandleTypeDef huart5;
-// extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart1;   // ST-Link DEBUG UART
 // extern UART_HandleTypeDef huart6;
 // extern PCD_HandleTypeDef hpcd_USB_OTG_HS;
 // extern WWDG_HandleTypeDef hwwdg;

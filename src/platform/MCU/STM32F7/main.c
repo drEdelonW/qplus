@@ -3,7 +3,7 @@
 #include "string.h"
 #include "cmsis_os.h"
 #include "types.h"
-
+#include <stdio.h>
 
 osThreadId defaultTaskHandle;
 void StartDefaultTask(void const* argument);
@@ -11,6 +11,8 @@ void StartDefaultTask(void const* argument);
 int main() {
     CoreClock_Init();
     Pereph_Init();
+
+    printf("Boot ok\n");
 
     osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 4096);  /* Create the thread(s) */
     defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);        /* definition and creation of defaultTask */

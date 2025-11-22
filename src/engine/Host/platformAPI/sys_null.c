@@ -46,7 +46,7 @@ FILE IO
 #define MAX_HANDLES             10
 static FILE* _sys_handles[MAX_HANDLES];
 
-int findhandle() {
+WEAK int findhandle() {
     for (int i = 1; i < MAX_HANDLES; i++)
         if (!_sys_handles[i])
             return i;
@@ -59,7 +59,7 @@ int findhandle() {
 filelength
 ================
 */
-int filelength(FILE* f) {
+WEAK int filelength(FILE* f) {
     int pos = ftell(f);
     fseek(f, 0, SEEK_END);
     int end = ftell(f);
