@@ -25,17 +25,17 @@ $(eval INCLUDES += $(STMSRC_DIR)/Drivers/CMSIS/Include)
 
     $(eval CORE_DIR := $(STMSRC_DIR)/Core)
         $(eval INCLUDES += $(CORE_DIR)/Inc)
-        SRC_LIST += $(CORE_DIR)/Src/freertos.c
-#         SRC_LIST += $(CORE_DIR)/Src/main.c
+        # SRC_LIST += $(CORE_DIR)/Src/freertos.c
+        # SRC_LIST += $(CORE_DIR)/Src/main.c
         SRC_LIST += $(CORE_DIR)/Src/stm32f7xx_hal_msp.c
         SRC_LIST += $(CORE_DIR)/Src/stm32f7xx_hal_timebase_tim.c
         SRC_LIST += $(CORE_DIR)/Src/stm32f7xx_it.c
         SRC_LIST += $(CORE_DIR)/Src/syscalls.c
-        SRC_LIST += $(CORE_DIR)/Src/sysmem.c
+        # SRC_LIST += $(CORE_DIR)/Src/sysmem.c
         SRC_LIST += $(CORE_DIR)/Src/system_stm32f7xx.c
         SRC_LIST += $(CORE_DIR)/Startup/startup_stm32f769nihx.s
 
 include features/fh_HAL.mk
-include features/fh_RTOS.mk
+# include features/fh_RTOS.mk
 
     DEFINES += STM32

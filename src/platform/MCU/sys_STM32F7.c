@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sys_null.h -- null system driver to aid porting efforts
 
 #include "sys.h"
-#include "cmsis_os.h"
+// #include "cmsis_os.h"
 #include "perepherial.h"
 #include "errno.h"
 #include <stdio.h>
@@ -196,10 +196,11 @@ int main() {
     printf("Init ok\n");
 
     static QuakeParms_t parms;
-    int argc = 1;
-    cStringArray argv = {"quake"};
+    int argc = 0;
+    cStringArray argv;
     parms.memsize = 8 * 1024 * 1024;
     parms.membase = malloc(parms.memsize);
+    while (!parms.membase) { printf("NO MEMORY\n"); }
     parms.baseDir = ".";
 
     COM_InitArgv(argc, argv);
@@ -212,6 +213,30 @@ int main() {
     while (1) {
         Host_Frame(0.1);
     }
+}
+
+#include <stdint.h>
+#include <errno.h>
+
+extern uint8_t __sdram_heap_start;
+extern uint8_t __sdram_heap_end;
+
+static uint8_t* heap_ptr = NULL;
+
+void* _sbrk(ptrdiff_t incr) {
+    if (heap_ptr == NULL)
+        heap_ptr = &__sdram_heap_start;
+
+    uint8_t* prev = heap_ptr;
+    uint8_t* next = heap_ptr + incr;
+
+    if (next >= &__sdram_heap_end) {
+        errno = ENOMEM;
+        return (void*)-1;
+    }
+
+    heap_ptr = next;
+    return prev;
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {

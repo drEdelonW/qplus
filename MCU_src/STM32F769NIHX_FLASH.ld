@@ -187,6 +187,17 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
+  /* ============================================================
+   *            BIG HEAP IN SDRAM (для Quake/malloc/new)
+   * ============================================================ */
+  .sdram_heap (NOLOAD) :
+  {
+    . = ALIGN(8);
+    __sdram_heap_start = .;                       /* начало SDRAM heap */
+    __sdram_heap_end   = ORIGIN(SDRAM) + LENGTH(SDRAM);  /* конец SDRAM */
+    . = ALIGN(8);
+  } >SDRAM
+
   /* Remove information from the compiler libraries */
   /DISCARD/ :
   {

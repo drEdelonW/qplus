@@ -12,3 +12,5 @@ $(eval RTOS_DIR := $(STMSRC_DIR)/Middlewares/Third_Party/FreeRTOS/Source)
     $(eval INCLUDES += $(RTOS_DIR)/portable/GCC/ARM_CM7/r0p1)
     SRC_LIST += $(RTOS_DIR)/portable/MemMang/heap_4.c
     SRC_LIST += $(RTOS_DIR)/portable/GCC/ARM_CM7/r0p1/port.c
+
+    SRC_LIST += $(CORE_DIR)/Src/freertos.c
