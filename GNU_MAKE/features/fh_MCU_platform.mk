@@ -8,13 +8,13 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/AP
             SRC_LIST += $(STM32_DIR)/per_FMC_SDRAM.c
 
 
-$(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/API)
+$(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $(eval INCLUDES += $(PLATFORM_DIR)/API)
     $(eval MCU_DIR = $(PLATFORM_DIR)/MCU) $(eval INCLUDES += $(MCU_DIR))
 #         SRC_LIST += $(MCU_DIR)/cd_null.c
 #         SRC_LIST += $(MCU_DIR)/snd_null.c
 #         SRC_LIST += $(MCU_DIR)/sys_null.c
 #         SRC_LIST += $(MCU_DIR)/vid_null.c
-#         SRC_LIST += $(MCU_DIR)/net_mcu.c
+        SRC_LIST += $(MCU_DIR)/net_mcu.c
 #         SRC_LIST += $(MCU_DIR)/in_mcu.c
 
 # $(eval ROOT_DIR := $(STMSRC_DIR)) $(eval INCLUDES += $(ROOT_DIR))

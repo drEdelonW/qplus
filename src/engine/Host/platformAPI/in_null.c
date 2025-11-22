@@ -20,9 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // in_null.c -- for systems without a mouse
 
 #include "input.h"
+#include "mem_placement.h"
 
-__attribute__((weak)) void IN_Init() {}
-__attribute__((weak)) void IN_Shutdown() {}
-__attribute__((weak)) void IN_Commands() {}
-__attribute__((weak)) void IN_Move(UserCmd_p cmd) {}
+WEAK void IN_Init() {}
+WEAK void IN_Shutdown() {}
+WEAK void IN_Commands() {}
+WEAK void IN_Move(UserCmd_p cmd) {}
 

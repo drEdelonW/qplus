@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sys_null.h -- null system driver to aid porting efforts
 
 #include "sys.h"
+#include "mem_placement.h"
 #include "qparams.h"
 #include "host.h"
 #include "common.h"
@@ -28,10 +29,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
 #ifndef STM32
 
 #else
-#   warning STM32
+// #   warning STM32
 #endif
 /*
 ===============================================================================
@@ -66,7 +68,7 @@ int filelength(FILE* f) {
     return end;
 }
 
-__attribute__((weak)) int Sys_FileOpenRead(cStringRO path, int* hndl) {
+WEAK int Sys_FileOpenRead(cStringRO path, int* hndl) {
     int i = findhandle();
 
     FILE* f = fopen(path, "rb");
@@ -80,7 +82,7 @@ __attribute__((weak)) int Sys_FileOpenRead(cStringRO path, int* hndl) {
     return filelength(f);
 }
 
-__attribute__((weak)) int Sys_FileOpenWrite(cStringRO path) {
+WEAK int Sys_FileOpenWrite(cStringRO path) {
     int i = findhandle();
 
     FILE* f = fopen(path, "wb");
@@ -91,18 +93,18 @@ __attribute__((weak)) int Sys_FileOpenWrite(cStringRO path) {
     return i;
 }
 
-__attribute__((weak)) void Sys_FileClose(int handle) {
+WEAK void Sys_FileClose(int handle) {
     fclose(_sys_handles[handle]);
     _sys_handles[handle] = NULL;
 }
 
-__attribute__((weak)) void Sys_FileSeek(int handle, int position) { fseek(_sys_handles[handle], position, SEEK_SET); }
+WEAK void Sys_FileSeek(int handle, int position) { fseek(_sys_handles[handle], position, SEEK_SET); }
 
-__attribute__((weak)) int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) { return fread(dest, 1, count, _sys_handles[handle]); }
+WEAK int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) { return fread(dest, 1, count, _sys_handles[handle]); }
 
-__attribute__((weak)) int Sys_FileWrite(int handle, TypeLess_ptr data, size_t count) { return fwrite(data, 1, count, _sys_handles[handle]); }
+WEAK int Sys_FileWrite(int handle, TypeLess_ptr data, size_t count) { return fwrite(data, 1, count, _sys_handles[handle]); }
 
-__attribute__((weak)) int Sys_FileTime(cStringRO path) {
+WEAK int Sys_FileTime(cStringRO path) {
     FILE* f;
 
     f = fopen(path, "rb");
@@ -114,7 +116,7 @@ __attribute__((weak)) int Sys_FileTime(cStringRO path) {
     return -1;
 }
 
-__attribute__((weak)) void Sys_mkdir(cStringRO path) {
+WEAK void Sys_mkdir(cStringRO path) {
 }
 
 
@@ -126,11 +128,11 @@ SYSTEM IO
 ===============================================================================
 */
 
-__attribute__((weak)) void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
+WEAK void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
 
 
-__attribute__((weak)) void Host_SysError(cStringRO error, ...) {
-    printf("Host_SysError: ");
+WEAK void Sys_Error(cStringRO error, ...) {
+    printf("Sys_Error: ");
     va_list argptr;    va_start(argptr, error);
     vprintf(error, argptr);
     va_end(argptr);
@@ -139,30 +141,30 @@ __attribute__((weak)) void Host_SysError(cStringRO error, ...) {
     exit(1);
 }
 
-__attribute__((weak)) void Sys_Printf(cStringRO fmt, ...) {
+WEAK void Sys_Printf(cStringRO fmt, ...) {
     va_list argptr;    va_start(argptr, fmt);
     vprintf(fmt, argptr);
     va_end(argptr);
 }
 
-__attribute__((weak)) void Sys_Quit() { exit(0); }
+WEAK void Sys_Quit() { exit(0); }
 
-__attribute__((weak)) double Sys_FloatTime_() {
+WEAK double Sys_FloatTime() {
     static double _time;
     _time += 0.1;
     return _time;
 }
 
-__attribute__((weak)) cString Sys_ConsoleInput() { return NULL; }
+WEAK cString Sys_ConsoleInput() { return NULL; }
 
-__attribute__((weak)) void Sys_Sleep() {}
-__attribute__((weak)) void Sys_SendKeyEvents() {}
-__attribute__((weak)) void Sys_HighFPPrecision() {}
-__attribute__((weak)) void Sys_LowFPPrecision() {}
+WEAK void Sys_Sleep() {}
+WEAK void Sys_SendKeyEvents() {}
+WEAK void Sys_HighFPPrecision() {}
+WEAK void Sys_LowFPPrecision() {}
 
 //=============================================================================
 
-__attribute__((weak)) int main(int argc, cStringArray argv) {
+WEAK int main(int argc, cStringArray argv) {
     static QuakeParms_t	parms;
 
     parms.memsize = 8 * 1024 * 1024;

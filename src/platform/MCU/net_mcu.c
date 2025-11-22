@@ -92,6 +92,6 @@ struct in_addr { // [src/engine/net/net_dgrm.c]
         uint32_t S_addr;
     } S_un;
 };
-cString inet_ntoa(struct in_addr in) {}
-uint32_t inet_addr(const cString cp) {return 0;};
+cString inet_ntoa(struct in_addr in) { return ""; }
+uint32_t inet_addr(const cString cp) { return 0; };
 

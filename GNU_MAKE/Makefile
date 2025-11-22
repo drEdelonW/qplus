@@ -1,6 +1,6 @@
-TARGET ?= quakeX11
+# TARGET ?= quakeX11
 # TARGET ?= quakeWin
-# TARGET ?= quakeSTM32
+TARGET ?= quakeSTM32
 # TARGET ?= testSTM32
 # TARGET ?= testSDL2
 
@@ -60,8 +60,8 @@ map_obj = $(if $(filter $(SRC_DIR)/%,$1), \
 OBJS := $(foreach f,$(SRC_LIST),$(call map_obj,$(f)))
 
 # ---------- Toolchain ----------
-CPPFLAGS    := $(addprefix -I,$(INCLUDES))
-CPPFLAGS    += $(addprefix -D,$(DEFINES))
+CXXFLAGS    += $(addprefix -I,$(INCLUDES))
+CXXFLAGS    += $(addprefix -D,$(DEFINES))
 include GCC_tools_$(DST_PLATFORM).mk
 
 
@@ -96,20 +96,20 @@ $(OUT_DIR):
 include cli_tool.mk
 
 # ---------- Compile rules ----------
-# Note: use CPPFLAGS for -D/-I, CFLAGS for codegen; generate .d files
+# Note: use CXXFLAGS for -D/-I, CFLAGS for codegen; generate .d files
 
 # Canonical reusable recipe
 define compile_template
 	@printf "$(BLD)$(1)$(RST)[%-45s] " "$<"
 	@mkdir -p $(dir $@)
 	@{ out=$$($(TIME) \
-				$(2) $(CPPFLAGS) $(3) -c $< -o $@ 2>&1); \
+				$(2) $(CXXFLAGS) $(3) -c $< -o $@ 2>&1); \
 		rc=$$?; if [ $$rc -eq 0 ]; then st=$(GRN)OK$(RST); else st="$(RED)FAIL$(RST)\n"; fi; \
 		$(ECHO) "$$st  $$out"; exit $$rc;}
 endef
 
 COMPILE_C   = $(call compile_template,{C}  ,$(CC) ,$(CFLAGS))
-COMPILE_CXX = $(call compile_template,{C++},$(CXX),$(CPPFLAGS))
+COMPILE_CXX = $(call compile_template,{C++},$(CXX),$(CXXFLAGS))
 COMPILE_ASM = $(call compile_template,{ASM},$(CC) -c -x assembler-with-cpp,$(ASMFLAGS))
 
 # Search sources in ../src and ../ID_src/WinQuake
@@ -152,7 +152,7 @@ rund: $(TARGETS)
 # Debug helpers
 .PHONY: vars
 vars:
-	@echo "CPPFLAGS=$(CPPFLAGS)"
+	@echo "CXXFLAGS=$(CXXFLAGS)"
 	@echo "CFLAGS=$(CFLAGS)"
 	@echo "LDFLAGS=$(LDFLAGS)"
 	@echo "LDLIBS=$(LDLIBS)"

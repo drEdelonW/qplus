@@ -74,12 +74,12 @@ else
 endif
 
 # ---------- Base flags ----------
-# Put macros and include paths into CPPFLAGS
-CPPFLAGS     += -MMD -MP            # auto-deps
-CPPFLAGS     += -Dstricmp=strcasecmp
+# Put macros and include paths into CXXFLAGS
+CXXFLAGS     += -MMD -MP            # auto-deps
+CXXFLAGS     += -Dstricmp=strcasecmp
 
 ifeq ($(NO_ASM),1)
-  CPPFLAGS     += -DNO_ASM
+  CXXFLAGS     += -DNO_ASM
 endif
 
 # GCC10+ compatibility for old C codebases

@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // snd_mix.c -- portable code to mix sounds for snd_dma.c
 
 #include "sound.h"
+#include "mem_placement.h"
 #include "common.h"
 #include "cvar_q1.h"
 #include "q_tools.h"
@@ -33,8 +34,8 @@ typedef DWORD* LPVOID;
 #endif
 
 #define PAINTBUFFER_SIZE 512
-static portable_samplepair_t _paintbuffer[PAINTBUFFER_SIZE];
-static int _snd_scaletable[32][256];
+static portable_samplepair_t _paintbuffer[PAINTBUFFER_SIZE] PLACE_TO_SDRAM;
+static int _snd_scaletable[32][256] PLACE_TO_SDRAM;
 static int* _snd_p;
 static int _snd_linear_count, _snd_vol;
 static int16_p _snd_out;

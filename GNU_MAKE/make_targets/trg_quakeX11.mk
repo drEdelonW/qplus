@@ -3,7 +3,7 @@ DST_PLATFORM := PC
 INCLUDES += $(SRC_DIR)
 include features/fh_qEngine.mk
 
-$(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/API)
+$(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $(eval INCLUDES += $(PLATFORM_DIR)/API)
 
 ifeq ($(UNAME_S),Linux)
     $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))
@@ -17,7 +17,7 @@ ifeq ($(UNAME_S),Linux)
         SRC_LIST += $(POSIX_DIR)/net_bsd.c
 
         # X11 target on *nix
-        CPPFLAGS   += -DX11 -DVID_X11
+        CXXFLAGS   += -DX11 -DVID_X11
        # CFLAGS   += -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion \
 -Wint-to-pointer-cast -Wpointer-to-int-cast -Wformat=2 \
 -Werror=conversion -Werror=sign-conversion -Werror=int-to-pointer-cast -Werror=pointer-to-int-cast
@@ -41,8 +41,8 @@ else ifeq ($(UNAME_S),Darwin)
     # NOTE: skip xshm_stubs.c to avoid missing X11 headers
     CFLAGS  += -DNO_X11_SHM
     # X11 target on *nix
-    CPPFLAGS   += -DX11 -DVID_X11
-    CPPFLAGS += -I/opt/X11/include
+    CXXFLAGS += -DX11 -DVID_X11
+    CXXFLAGS += -I/opt/X11/include
 
     LDFLAGS  += -L/opt/X11/lib
     LDLIBS     += -lX11 -lXext

@@ -1,9 +1,10 @@
 
 #include "sound.h"
+#include "mem_placement.h"
 
-__attribute__((weak)) bool SNDDMA_Init() { fakedma = true; return false; }
-__attribute__((weak)) int  SNDDMA_GetDMAPos() { return 0; }
-__attribute__((weak)) void SNDDMA_Shutdown() {}
-__attribute__((weak)) void SNDDMA_Submit() {}
-// __attribute__((weak)) void SNDDMA_BeginPainting() {}
-// __attribute__((weak)) void SNDDMA_EndPainting() {}
+WEAK bool SNDDMA_Init() { fakedma = true; return false; }
+WEAK int  SNDDMA_GetDMAPos() { return 0; }
+WEAK void SNDDMA_Shutdown() {}
+WEAK void SNDDMA_Submit() {}
+// WEAK void SNDDMA_BeginPainting() {}
+// WEAK void SNDDMA_EndPainting() {}

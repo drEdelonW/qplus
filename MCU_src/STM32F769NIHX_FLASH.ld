@@ -45,6 +45,9 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 MEMORY
 {
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 512K
+    /* external SDRAM, 16MB on STM32F769I-DISCO */
+  SDRAM  (xrw) : ORIGIN = 0xC0000000, LENGTH = 16M
+
   FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 2048K
 }
 
@@ -164,6 +167,14 @@ SECTIONS
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
   } >RAM
+
+  .sdram_data (NOLOAD) :
+  {
+    . = ALIGN(4);
+    *(.sdram_data)
+    *(.sdram_data*)
+    . = ALIGN(4);
+  } >SDRAM
 
   /* User_heap_stack section, used to check that there is enough "RAM" Ram  type memory left */
   ._user_heap_stack :

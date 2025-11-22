@@ -5,7 +5,7 @@ INCLUDES += $(SRC_DIR)/platform/Windows
 
 include features/fh_qEngine.mk
 
-$(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/API)
+$(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $(eval INCLUDES += $(PLATFORM_DIR)/API)
     $(eval WIN_DIR = $(PLATFORM_DIR)/Windows) $(eval INCLUDES += $(WIN_DIR))
         # SRC_LIST += $(WIN_DIR)/sys_wind.c
         SRC_LIST += $(WIN_DIR)/sys_win.c

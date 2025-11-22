@@ -20,58 +20,61 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // vid.h -- video driver defs
 #include "types.h"
-#define VID_CBITS	6
-#define VID_GRADES	(1 << VID_CBITS)
+#define VID_CBITS 6
+#define VID_GRADES (1 << VID_CBITS)
 
 
 #if defined(_WIN32) && !defined(WINDED)
 #if defined(_M_IX86)
-#define __i386__	1
+#define __i386__ 1
 #endif
-void	VID_LockBuffer();
-void	VID_UnlockBuffer();
+void VID_LockBuffer();
+void VID_UnlockBuffer();
 #else
-#define	VID_LockBuffer()
-#define	VID_UnlockBuffer()
+#define VID_LockBuffer()
+#define VID_UnlockBuffer()
 #endif
 // a pixel can be one, two, or four bytes
 typedef uint8_t pixel_t;
 typedef pixel_t* pixel_p;
 
-
 typedef struct vRect_s vRect_t;
 typedef vRect_t* vRect_p;
 struct vRect_s {
-    int	    x, y, width, height;
+    int     x, y, width, height;
     vRect_p pnext;
 };
 
 typedef struct {
-    pixel_p     buffer;		// invisible buffer
-    pixel_p     colormap;		// 256 * VID_GRADES size
-    uint16_p   colormap16;	// 256 * VID_GRADES size
-    int         fullbright;		// index of first fullbright color
-    uint32_t    rowbytes;	// may be > width if displayed in a window
-    int32_t    width;
-    int32_t    height;
-    float       aspect;		// width / height -- < 0 is taller than wide
+    pixel_p     buffer;         // invisible buffer
+    pixel_p     colormap;       // 256 * VID_GRADES size
+    uint16_p    colormap16;     // 256 * VID_GRADES size
+    int         fullbright;     // index of first fullbright color
+    uint32_t    rowbytes;       // may be > width if displayed in a window
+
+    int32_t     width;
+    int32_t     height;
+    float       aspect;         // width / height -- < 0 is taller than wide
+
     int         numpages;
-    int         recalc_refdef;	// if true, recalc vid-based stuff
+    int         recalc_refdef;  // if true, recalc vid-based stuff
+
     pixel_p     conbuffer;
     int         conrowbytes;
     uint32_t    conwidth;
     uint32_t    conheight;
+
     int         maxwarpwidth;
     int         maxwarpheight;
-    pixel_p     direct;		// direct drawing to framebuffer, if not
+    pixel_p     direct;      // direct drawing to framebuffer, if not
     //  NULL
 } VidDef_t;
 typedef VidDef_t* VidDef_p;
 
-extern	VidDef_t    vid;				// global video state
-extern	uint16_t    d_8to16table[256];
-extern	uint32_t    d_8to24table[256];
-extern void (*vid_menudrawfn)();
+extern  VidDef_t    vid;    // global video state
+extern  uint16_t    d_8to16table[256];
+extern  uint32_t    d_8to24table[256];
+extern  void (*vid_menudrawfn)();
 
 #ifdef __cplusplus
 extern "C" {

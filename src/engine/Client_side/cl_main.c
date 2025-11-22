@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cl_main.c  -- client main loop
 
 #include "client.h"
+#include "mem_placement.h"
 #undef CLIENT
 #include "server.h"
 #include "host.h"
@@ -46,14 +47,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ClientState_t cl;
 ClientStatic_t cls;
 // FIXME: put these on hunk?
-static efrag_t  cl_efrags[MAX_EFRAGS];
-r_Entity_t      cl_entities[MAX_EDICTS];
-r_Entity_t      cl_static_entities[MAX_STATIC_ENTITIES];
-LightStyle_t    cl_lightstyle[MAX_LIGHTSTYLES];
-dLight_t        cl_dlights[MAX_DLIGHTS];
+static efrag_t  cl_efrags[MAX_EFRAGS] PLACE_TO_SDRAM;
+r_Entity_t      cl_entities[MAX_EDICTS] PLACE_TO_SDRAM;
+r_Entity_t      cl_static_entities[MAX_STATIC_ENTITIES] PLACE_TO_SDRAM;
+LightStyle_t    cl_lightstyle[MAX_LIGHTSTYLES] PLACE_TO_SDRAM;
+dLight_t        cl_dlights[MAX_DLIGHTS] PLACE_TO_SDRAM;
 
 uint32_t        cl_numvisedicts;
-r_Entity_p      cl_visedicts[MAX_VISEDICTS];
+r_Entity_p      cl_visedicts[MAX_VISEDICTS] PLACE_TO_SDRAM;
 
 /*
 =====================

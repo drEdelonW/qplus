@@ -114,10 +114,10 @@ This shuts down both the client and server
 ================
 */
 void Host::Error(cString error, ...) {
-    static bool inerror = false;
+    static bool _inError = false;
 
-    if (inerror)    Host_SysError("Host::Error: recursively entered");
-    inerror = true;
+    if (_inError)    Host_SysError("Host::Error: recursively entered");
+    _inError = true;
 
     SCR_EndLoadingPlaque();  // reenable screen updates
 
@@ -133,7 +133,7 @@ void Host::Error(cString error, ...) {
     CL_Disconnect();
     cls.demonum = -1;
 
-    inerror = false;
+    _inError = false;
 
     longjmp(host_abortserver, 1);
 }
@@ -161,14 +161,11 @@ void Host::FindMaxClients() {
         if (param != (com.argc - 1))    svs.maxClients = Q_atoi(com.argv[param + 1]);
         else                            svs.maxClients = 8;
     }
-    if (svs.maxClients < 1)
-        svs.maxClients = 8;
-    else if (svs.maxClients > MAX_SCOREBOARD)
-        svs.maxClients = MAX_SCOREBOARD;
+    if (svs.maxClients < 1)                     svs.maxClients = 8;
+    else if (svs.maxClients > MAX_SCOREBOARD)   svs.maxClients = MAX_SCOREBOARD;
 
     svs.maxClientsLimit = svs.maxClients;
-    if (svs.maxClientsLimit < MAX_CLIENT_LIMIT)
-        svs.maxClientsLimit = MAX_CLIENT_LIMIT;
+    if (svs.maxClientsLimit < MAX_CLIENT_LIMIT) svs.maxClientsLimit = MAX_CLIENT_LIMIT;
     svs.clients = (RmtClient_p)Hunk_AllocName(svs.maxClientsLimit * sizeof(RmtClient_t), "clients");
 
     if (svs.maxClients > 1) Cvar_SetValue("deathmatch", 1.0);
@@ -200,9 +197,7 @@ void Host::InitLocal() {
     Cvar_RegisterVariable(&developer);
     Cvar_RegisterVariable(&deathmatch);
     Cvar_RegisterVariable(&coop);
-
     Cvar_RegisterVariable(&pausable);
-
     Cvar_RegisterVariable(&temp1);
 
     FindMaxClients();
@@ -343,7 +338,6 @@ This only happens at the end of a game, not between levels
 ==================
 */
 void Host::ShutdownServer(bool crash) {
-
     if (!sv.active) return;
 
     sv.active = false;
@@ -357,7 +351,7 @@ void Host::ShutdownServer(bool crash) {
     do {
         count = 0;
         remoteClient = svs.clients;
-        for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+        for (int i = 0; i < svs.maxClients; i++, remoteClient++)
             if (remoteClient->active && remoteClient->message.cursize) {
                 if (NET_CanSendMessage(remoteClient->netconnection)) {
                     NET_SendMessage(remoteClient->netconnection, &remoteClient->message);
@@ -368,7 +362,6 @@ void Host::ShutdownServer(bool crash) {
                     count++;
                 }
             }
-        }
         if ((Host_FloatTime() - start) > 3.0)    break;
     } while (count);
 
@@ -804,11 +797,11 @@ to run quit through here before the final handoff to the sys code.
 ===============
 */
 void Host::Shutdown() {
-    static bool isdown = false;
+    static bool _isDown = false;
 
-    if (isdown) { printf("recursive shutdown\n"); return; }
+    if (_isDown) { printf("recursive shutdown\n"); return; }
 
-    isdown = true;
+    _isDown = true;
 
     // keep Con_Printf from trying to update the screen
     scr.disabled_for_loading = true;
@@ -831,48 +824,51 @@ Host::InitCommands
 ==================
 */
 void Host::InitCommands() {
-    Cmd_AddCommand("status", Host_Status_f);            // sv
-    Cmd_AddCommand("quit", Host_Quit_f);                // host
-    Cmd_AddCommand("god", Host_God_f);                  // sv
-    Cmd_AddCommand("notarget", Host_Notarget_f);        // sv
-    Cmd_AddCommand("fly", Host_Fly_f);                  // sv
+    Cmd_AddCommand("quit", Host_Quit_f);        // host
+    Cmd_AddCommand("version", Host_Version_f);  // host
+
     Cmd_AddCommand("map", Host_Map_f);                  // sv
-    Cmd_AddCommand("restart", Host_Restart_f);          // sv
     Cmd_AddCommand("changelevel", Host_Changelevel_f);  // sv
 #ifdef QUAKE2
     Cmd_AddCommand("changelevel2", Host_Changelevel2_f);    // sv
 #endif
-    Cmd_AddCommand("connect", Host_Connect_f);      // cl
-    Cmd_AddCommand("reconnect", Host_Reconnect_f);  // cl
-    Cmd_AddCommand("name", Host_Name_f);            // cl
-    Cmd_AddCommand("noclip", Host_Noclip_f);        // sv
-    Cmd_AddCommand("version", Host_Version_f);      // host
+    Cmd_AddCommand("status", Host_Status_f);    // sv
 #ifdef IDGODS
     Cmd_AddCommand("please", Host_Please_f);
 #endif
+    Cmd_AddCommand("kick", Host_Kick_f);        // sv
+    Cmd_AddCommand("ping", Host_Ping_f);        // net
+    Cmd_AddCommand("load", Host_Loadgame_f);    // sv
+    Cmd_AddCommand("save", Host_Savegame_f);    // sv
+    Cmd_AddCommand("pause", Host_Pause_f);      // sv
+
+    Cmd_AddCommand("begin", Host_Begin_f);          // sv\cl
+    Cmd_AddCommand("prespawn", Host_PreSpawn_f);    // sv\cl
+    Cmd_AddCommand("spawn", Host_Spawn_f);          // sv\cl
+    Cmd_AddCommand("connect", Host_Connect_f);      // cl
+    Cmd_AddCommand("reconnect", Host_Reconnect_f);  // cl
+
+    Cmd_AddCommand("give", Host_Give_f);            // cl
+    Cmd_AddCommand("god", Host_God_f);              // sv
+    Cmd_AddCommand("notarget", Host_Notarget_f);    // sv
+    Cmd_AddCommand("fly", Host_Fly_f);              // sv
+    Cmd_AddCommand("restart", Host_Restart_f);      // sv
+    Cmd_AddCommand("name", Host_Name_f);            // cl
+    Cmd_AddCommand("noclip", Host_Noclip_f);        // sv
     Cmd_AddCommand("say", Host_Say_f);              // cl
     Cmd_AddCommand("say_team", Host_Say_Team_f);    // cl
     Cmd_AddCommand("tell", Host_Tell_f);            // cl
     Cmd_AddCommand("color", Host_Color_f);          // cl
     Cmd_AddCommand("kill", Host_Kill_f);            // cl
-    Cmd_AddCommand("pause", Host_Pause_f);          // sv
-    Cmd_AddCommand("spawn", Host_Spawn_f);          // sv\cl
-    Cmd_AddCommand("begin", Host_Begin_f);          // sv\cl
-    Cmd_AddCommand("prespawn", Host_PreSpawn_f);    // sv\cl
-    Cmd_AddCommand("kick", Host_Kick_f);            // sv
-    Cmd_AddCommand("ping", Host_Ping_f);            // net
-    Cmd_AddCommand("load", Host_Loadgame_f);        // sv
-    Cmd_AddCommand("save", Host_Savegame_f);        // sv
-    Cmd_AddCommand("give", Host_Give_f);            // cl
 
     Cmd_AddCommand("startdemos", Host_Startdemos_f);    // cl
     Cmd_AddCommand("demos", Host_Demos_f);              // cl
     Cmd_AddCommand("stopdemo", Host_Stopdemo_f);        // cl
 
-    Cmd_AddCommand("viewmodel", Host_Viewmodel_f);      // prog
-    Cmd_AddCommand("viewframe", Host_Viewframe_f);      // prog
-    Cmd_AddCommand("viewnext", Host_Viewnext_f);        // prog
-    Cmd_AddCommand("viewprev", Host_Viewprev_f);        // prog
+    Cmd_AddCommand("viewmodel", Host_Viewmodel_f);  // prog
+    Cmd_AddCommand("viewframe", Host_Viewframe_f);  // prog
+    Cmd_AddCommand("viewnext", Host_Viewnext_f);    // prog
+    Cmd_AddCommand("viewprev", Host_Viewprev_f);    // prog
 
     Cmd_AddCommand("mcache", Mod_Print);
 }

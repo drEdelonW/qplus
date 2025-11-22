@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // snd_dma.c -- main control for any streaming sound output device
 
 #include "sound.h"
+#include "mem_placement.h"
 #include "client.h"
 #include "cmd.h"
 #include "common.h"
@@ -47,7 +48,7 @@ void S_StopAllSoundsC();
 // Internal sound data & structures
 // =======================================================================
 
-channel_t   channels[MAX_CHANNELS];
+channel_t   channels[MAX_CHANNELS] PLACE_TO_SDRAM;
 int   total_channels;
 
 int    snd_blocked = 0;
