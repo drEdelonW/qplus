@@ -1185,27 +1185,27 @@ void MX_SDMMC2_SD_Init() {
         SD_PrintMBR();
 
         if (FAT32_Mount(&g_fat32) == 0) {
-            FAT32_PrintTree();
+            // FAT32_PrintTree();
 
-            FAT32_File_t f;
-            if (FAT32_FileOpen("QUAKE/ID1/PAK0.PAK", &f) == 0) {
-                printf("PAK0.PAK size: %lu bytes\n", (unsigned long)f.file_size);
+            // FAT32_File_t f;
+            // if (FAT32_FileOpen("QUAKE/ID1/PAK0.PAK", &f) == 0) {
+            //     printf("PAK0.PAK size: %lu bytes\n", (unsigned long)f.file_size);
 
-                uint8_t header[64];
-                uint32_t got = 0;
-                if (FAT32_FileRead(&f, header, sizeof(header), &got) == 0) {
-                    printf("Read first %lu bytes:\n", (unsigned long)got);
-                    for (uint32_t i = 0; i < got; i += 16) {
-                        printf("%04lX: ", (unsigned long)i);
-                        for (uint32_t j = 0; j < 16 && i + j < got; ++j) {
-                            printf("%02X ", (unsigned int)header[i + j]);
-                        }
-                        printf("\n");
-                    }
-                }
+            //     uint8_t header[64];
+            //     uint32_t got = 0;
+            //     if (FAT32_FileRead(&f, header, sizeof(header), &got) == 0) {
+            //         printf("Read first %lu bytes:\n", (unsigned long)got);
+            //         for (uint32_t i = 0; i < got; i += 16) {
+            //             printf("%04lX: ", (unsigned long)i);
+            //             for (uint32_t j = 0; j < 16 && i + j < got; ++j) {
+            //                 printf("%02X ", (unsigned int)header[i + j]);
+            //             }
+            //             printf("\n");
+            //         }
+            //     }
 
-                FAT32_FileClose(&f);
-            }
+            //     FAT32_FileClose(&f);
+            // }
         }
     }
     else {
