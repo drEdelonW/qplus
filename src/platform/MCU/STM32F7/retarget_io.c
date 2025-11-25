@@ -26,10 +26,10 @@ int _write(int, cStringRO buf, int len) { (void)buf; return len; }
 #else
 int _write(int file, const char *buf, int len) {
     // stdout(1) и stderr(2) отправляем в UART
-    if (file == 1 || file == 2) {
+    if ((file == 1) || (file == 2)) {
         HAL_StatusTypeDef st = HAL_UART_Transmit(
             &huart1,
-            (uint8_t *)buf,
+            (uint8_p)buf,
             (uint16_t)len,
             HAL_MAX_DELAY
         );

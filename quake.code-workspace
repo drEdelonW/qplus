@@ -137,7 +137,8 @@
 			"WSIPX.H": "cpp",
 			"model_s.h": "c",
 			"gamedefs.h": "c",
-			"mman.h": "c"
+			"mman.h": "c",
+			"mem_placement.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

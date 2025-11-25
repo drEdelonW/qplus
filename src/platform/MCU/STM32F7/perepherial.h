@@ -1,5 +1,6 @@
 #pragma once
 #include "main.h"
+#include "types.h"
 // #include "stm32f7xx_hal.h"
 
 // extern ETH_TxPacketConfig TxConfig;
@@ -36,3 +37,8 @@ extern UART_HandleTypeDef huart1;   // ST-Link DEBUG UART
 
 void CoreClock_Init();
 void Pereph_Init();
+
+void MX_SDMMC2_SD_Init();
+HAL_StatusTypeDef SD_DumpBlock(uint32_t lba);
+
+void SD_PrintMBR();
