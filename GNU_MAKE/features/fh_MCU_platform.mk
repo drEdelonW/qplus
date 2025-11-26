@@ -6,6 +6,9 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/AP
 #             SRC_LIST += $(STM32_DIR)/main.c
             SRC_LIST += $(STM32_DIR)/perepherial.c
             SRC_LIST += $(STM32_DIR)/per_SD_tools.c
+            SRC_LIST += $(STM32_DIR)/SD_TF_tools.c
+            SRC_LIST += $(STM32_DIR)/MBR_tool.c
+
             SRC_LIST += $(STM32_DIR)/retarget_io.c
             SRC_LIST += $(STM32_DIR)/per_FMC_SDRAM.c
 

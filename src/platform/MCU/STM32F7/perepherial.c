@@ -1085,19 +1085,25 @@ void Pereph_Init() {
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
     MX_USART1_UART_Init();  // DEBUG UART
+    printf("\nDEBUG UART started\n");
     MX_FMC_Init();	        // SDRAM 16MB
     MX_SDMMC2_SD_Init();	// FileSystem
+    printf("MX_SDMMC2_SD_Init done\n");
     // MX_ADC1_Init();
     // MX_ADC3_Init();
     // MX_CRC_Init();
     MX_LTDC_Init();	        // display framebufer
     MX_DMA2D_Init();	    // 2D accelerator
+#if 0
     MX_DSIHOST_DSI_Init();	// Display
+#endif
     MX_ETH_Init();	        // Ethernet
     MX_HDMI_CEC_Init();
     // MX_I2C1_Init();
+#if 1
     MX_I2C4_Init();	        // Sound bus
-    MX_SAI1_Init();	        //  Sound
+    printf("MX_I2C4_Init done\n");
+#endif
     //  MX_IWDG_Init();
     // MX_QUADSPI_Init();
     // MX_RTC_Init();
@@ -1105,6 +1111,7 @@ void Pereph_Init() {
     // MX_SPDIFRX_Init();
     // MX_SPI2_Init();
     MX_TIM1_Init();
+    printf("MX_TIM1_Init done\n");
     // MX_TIM3_Init();
     // MX_TIM10_Init();
     // MX_TIM11_Init();
@@ -1113,4 +1120,6 @@ void Pereph_Init() {
     // MX_USART6_UART_Init();
     MX_USB_OTG_HS_PCD_Init();	// USB host - input
     //  MX_WWDG_Init();
+    printf("Pereph_Init done\n");
+
 }

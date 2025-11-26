@@ -196,18 +196,20 @@ int main() {
     Pereph_Init();
     printf("Init ok\n");
 
-    static QuakeParms_t parms;
+    size_t  memsize = 8 * 1024 * 1024;
     int argc = 0;
     cStringArray argv;
-    parms.memsize = 8 * 1024 * 1024;
-    parms.membase = malloc(parms.memsize);
-    while (!parms.membase) { printf("NO MEMORY\n"); }
-    parms.baseDir = ".";
 
     COM_InitArgv(argc, argv);
 
+    static QuakeParms_t parms;
+    parms.baseDir = ".";
     parms.argc = com.argc;
     parms.argv = com.argv;
+    parms.membase = malloc(memsize);
+    parms.memsize = memsize;
+
+    while (!parms.membase) { printf("NO MEMORY\n"); }
 
     printf("Host_Init\n");
     Host_Init(&parms);

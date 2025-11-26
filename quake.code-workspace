@@ -138,7 +138,9 @@
 			"model_s.h": "c",
 			"gamedefs.h": "c",
 			"mman.h": "c",
-			"mem_placement.h": "c"
+			"mem_placement.h": "c",
+			"sd_tf.h": "c",
+			"fs_fat32.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

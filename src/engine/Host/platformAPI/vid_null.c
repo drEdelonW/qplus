@@ -28,56 +28,46 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 VidDef_t vid;    // global video state
 
-#define BASEWIDTH 320
+#define BASEWIDTH  320
 #define BASEHEIGHT 200
 
-static uint8_t vid_buffer[BASEWIDTH * BASEHEIGHT] PLACE_TO_SDRAM;
-static int16_t zbuffer[BASEWIDTH * BASEHEIGHT] PLACE_TO_SDRAM;
-static uint8_t surfcache[256 * 1024] PLACE_TO_SDRAM;
+static uint8_t _vidBuf[BASEWIDTH * BASEHEIGHT] PLACE_TO_SDRAM;
+static int16_t _zBuf[BASEWIDTH * BASEHEIGHT] PLACE_TO_SDRAM;
+static uint8_t _surfCache[256 * 1024] PLACE_TO_SDRAM;
 
 uint16_t d_8to16table[256];
 uint32_t d_8to24table[256];
 
 WEAK void VID_SetPalette(uint8_p palette) {}
 WEAK void VID_ShiftPalette(uint8_p palette) {}
-WEAK void VID_Init(uint8_p palette) {
-#if 0
-    vid.maxwarpwidth = vid.width = vid.conwidth = BASEWIDTH;
-    vid.maxwarpheight = vid.height = vid.conheight = BASEHEIGHT;
-    vid.aspect = 1.0;
-    vid.numpages = 1;
-    vid.colormap = host_colormap;
-    vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
-    vid.buffer = vid.conbuffer = vid_buffer;
-    vid.rowbytes = vid.conrowbytes = BASEWIDTH;
-#else
-    vid = (VidDef_t){
-        .buffer = vid_buffer,
-        .colormap = host_colormap,
-        // .colormap16
-        .fullbright = 256 - LittleLong(*((int*)host_colormap + 2048)),
-        .rowbytes = BASEWIDTH,
-        .width = BASEWIDTH,
-        .height = BASEHEIGHT,
-        .aspect = 1.0,
-        .numpages = 1,
-        // .recalc_refdef
-        .conbuffer = vid_buffer,
-        .conrowbytes = BASEWIDTH,
-        .conwidth = BASEWIDTH,
-        .conheight = BASEHEIGHT,
-        .maxwarpwidth = BASEWIDTH,
-        .maxwarpheight = BASEHEIGHT,
-        // .direct
-    };
-#endif
-    d_pzbuffer = zbuffer;
-    D_InitCaches(surfcache, sizeof(surfcache));
-}
-
-WEAK void VID_Shutdown() {}
-WEAK void VID_Update(vRect_p rects) {}
 WEAK void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {}
 WEAK void D_EndDirectRect(int x, int y, int width, int height) {}
+WEAK void VID_Update(vRect_p rects) {}
+
+WEAK void VID_Shutdown() {}
+WEAK void VID_Init(uint8_p palette) {
+    vid = (VidDef_t){
+        .buffer         = _vidBuf,
+        .colormap       = host_colormap,
+        // .colormap16
+        .fullbright     = 256 - LittleLong(*((int*)host_colormap + 2048)),
+        .rowbytes       = BASEWIDTH,
+        .width          = BASEWIDTH,
+        .height         = BASEHEIGHT,
+        .aspect         = 1.0,
+        .numpages       = 1,
+        // .recalc_refdef
+        .conbuffer      = _vidBuf,
+        .conrowbytes    = BASEWIDTH,
+        .conwidth       = BASEWIDTH,
+        .conheight      = BASEHEIGHT,
+        .maxwarpwidth   = BASEWIDTH,
+        .maxwarpheight  = BASEHEIGHT,
+        // .direct
+    };
+
+    d_pzbuffer = _zBuf;
+    D_InitCaches(_surfCache, sizeof(_surfCache));
+}
 
 
