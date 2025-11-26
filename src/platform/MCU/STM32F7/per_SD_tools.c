@@ -693,7 +693,7 @@ static SD_FileSlot* SDFS_GetSlot(int hnd) {
 
 static bool s_sdfs_inited = false;
 
-int SD_FS_Init(void) {
+int SD_FS_Init() {
     if (s_sdfs_inited) return 0;
 
     if (SD_InitAndGetInfo() != 0) {
@@ -701,6 +701,7 @@ int SD_FS_Init(void) {
         return -1;
     }
 
+    printf("SD_FS_Init\n");
     if (FAT32_Mount(&g_fat32) != 0) {
         printf("SD_FS_Init: FAT32 mount failed\n");
         return -1;
@@ -800,9 +801,12 @@ int Sys_FileSeek(int handle, int position) {
 
 void MX_SDMMC2_SD_Init() {
     if (SD_InitAndGetInfo() == 0) {
+        SD_WaitCardReady();
         printf("SD inited\n");
         SD_PrintMBR();
 
+#if 0
+        printf("MX_SDMMC2_SD_Init\n");
         if (FAT32_Mount(&g_fat32) == 0) {
             // FAT32_PrintTree();
 
@@ -826,6 +830,10 @@ void MX_SDMMC2_SD_Init() {
             //     FAT32_FileClose(&f);
             // }
         }
+        else {
+            printf("MX_SDMMC2_SD_Init error\n");
+        }
+#endif
     }
     else {
         printf("SD ERROR\n");

@@ -16,7 +16,6 @@ uint32_t rd32_le(const uint8_p p) {
 
 
 
-
 static cStringRO SD_GetCardTypeStr(uint32_t t) {
 #ifdef CARD_SDHC_SDXC
     if (t == CARD_SDHC_SDXC)    return "SDHC / SDXC";
@@ -174,6 +173,19 @@ HAL_StatusTypeDef SD_ReadBlock(uint32_t lba, uint8_p buf) {
     return st;
 }
 
+
+void SD_WaitCardReady() {
+    HAL_SD_CardStateTypeDef state;
+    uint32_t timeout = HAL_GetTick() + 1000; // 1s safety
+
+    do {
+        state = HAL_SD_GetCardState(&hsd2);
+        if (HAL_GetTick() > timeout) {
+            // log timeout, break or assert
+            break;
+        }
+    } while (state != HAL_SD_CARD_TRANSFER);
+}
 
 HAL_SD_CardInfoTypeDef sd_info;
 

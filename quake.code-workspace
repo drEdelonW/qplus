@@ -140,7 +140,9 @@
 			"mman.h": "c",
 			"mem_placement.h": "c",
 			"sd_tf.h": "c",
-			"fs_fat32.h": "c"
+			"fs_fat32.h": "c",
+			"complex": "c",
+			"variant": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

@@ -25,6 +25,7 @@ static cStringRO MBR_PartTypeStr(uint8_t type) {
 
 void SD_PrintMBR() {
     uint8_t buf[512];
+        printf("SD_PrintMBR: begin\n");
 
     if (SD_ReadBlock(0, buf) != HAL_OK) {
         printf("SD_PrintMBR: can't read LBA0\n");
@@ -33,7 +34,7 @@ void SD_PrintMBR() {
 
     uint8_t sig_lo = buf[510];
     uint8_t sig_hi = buf[511];
-    if (sig_lo != 0x55 || sig_hi != 0xAA) {
+    if ((sig_lo != 0x55) || (sig_hi != 0xAA)) {
         printf("SD_PrintMBR: no valid MBR signature (0x%02X 0x%02X)\n",
             (uint16_t)sig_lo, (uint16_t)sig_hi);
         return;
@@ -59,21 +60,19 @@ void SD_PrintMBR() {
         uint64_t bytes = (uint64_t)sectors * 512u;
         uint32_t mb = (uint32_t)(bytes / (1024u * 1024u));
 
-        printf("Part %lu:\n", (unsigned long)(i + 1u));
+        printf("Part %lu:\n", (uint32_t)(i + 1u));
         printf("  Boot      : %s (0x%02X)\n",
             (status == 0x80) ? "yes" : "no",
             (uint32_t)status);
-        printf("  Type      : 0x%02X (%s)\n",
-            (uint32_t)type,
-            MBR_PartTypeStr(type));
-        printf("  LBA start : %lu\n",
-            (unsigned long)lba_first);
-        printf("  Sectors   : %lu\n",
-            (unsigned long)sectors);
-        printf("  Size      : %lu MB (approx)\n",
-            (unsigned long)mb);
+        printf("  Type      : 0x%02X (%s)\n", type, MBR_PartTypeStr(type));
+        printf("  LBA start : %lu\n", lba_first);
+        printf("  Sectors   : %lu\n", sectors);
+        printf("  Size      : %lu MB (approx)\n", mb);
 
-        if (g_part1_lba_start == 0 && (type == 0x0B || type == 0x0C)) {
+        if ((g_part1_lba_start == 0) &&
+            ((type == 0x0B) ||
+                (type == 0x0C))
+            ) {
             g_part1_lba_start = lba_first;
         }
     }

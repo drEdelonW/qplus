@@ -1088,7 +1088,7 @@ void Pereph_Init() {
     printf("\nDEBUG UART started\n");
     MX_FMC_Init();	        // SDRAM 16MB
     MX_SDMMC2_SD_Init();	// FileSystem
-    printf("MX_SDMMC2_SD_Init done\n");
+    // printf("MX_SDMMC2_SD_Init done\n");
     // MX_ADC1_Init();
     // MX_ADC3_Init();
     // MX_CRC_Init();
@@ -1102,7 +1102,7 @@ void Pereph_Init() {
     // MX_I2C1_Init();
 #if 1
     MX_I2C4_Init();	        // Sound bus
-    printf("MX_I2C4_Init done\n");
+    // printf("MX_I2C4_Init done\n");
 #endif
     //  MX_IWDG_Init();
     // MX_QUADSPI_Init();
@@ -1111,7 +1111,7 @@ void Pereph_Init() {
     // MX_SPDIFRX_Init();
     // MX_SPI2_Init();
     MX_TIM1_Init();
-    printf("MX_TIM1_Init done\n");
+    // printf("MX_TIM1_Init done\n");
     // MX_TIM3_Init();
     // MX_TIM10_Init();
     // MX_TIM11_Init();
