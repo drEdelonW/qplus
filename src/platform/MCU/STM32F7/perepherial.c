@@ -1081,12 +1081,25 @@ void CoreClock_Init() {
     PeriphCommonClock_Config(); /* Configure the peripherals common clocks */
 }
 
+void PrintCpuClock() {
+    SystemCoreClockUpdate();
+
+    uint32_t hclk = HAL_RCC_GetHCLKFreq();
+    uint32_t pclk1 = HAL_RCC_GetPCLK1Freq();
+    uint32_t pclk2 = HAL_RCC_GetPCLK2Freq();
+
+    printf("CPU(HCLK): %.f MHz\r\n", (double)hclk / 1000000.0);
+    printf("PCLK1:     %.f MHz\r\n", (double)pclk1 / 1000000.0);
+    printf("PCLK2:     %.f MHz\r\n", (double)pclk2 / 1000000.0);
+}
+
 void Pereph_Init() {
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
+    MX_FMC_Init();	        // SDRAM 16MB
     MX_USART1_UART_Init();  // DEBUG UART
     printf("\nDEBUG UART started\n");
-    MX_FMC_Init();	        // SDRAM 16MB
+    PrintCpuClock();
     MX_SDMMC2_SD_Init();	// FileSystem
     // printf("MX_SDMMC2_SD_Init done\n");
     // MX_ADC1_Init();
