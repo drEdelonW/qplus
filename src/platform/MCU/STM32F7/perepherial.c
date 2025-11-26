@@ -1094,11 +1094,12 @@ void Pereph_Init() {
     // MX_CRC_Init();
     MX_LTDC_Init();	        // display framebufer
     MX_DMA2D_Init();	    // 2D accelerator
-#if 0
+#if 1
     MX_DSIHOST_DSI_Init();	// Display
 #endif
-    MX_ETH_Init();	        // Ethernet
     MX_HDMI_CEC_Init();
+
+    MX_ETH_Init();	        // Ethernet
     // MX_I2C1_Init();
 #if 1
     MX_I2C4_Init();	        // Sound bus

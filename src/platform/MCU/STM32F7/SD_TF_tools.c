@@ -1,7 +1,7 @@
 #include "SD_TF.h"
 #include <stdio.h>
 
-#define SD_READ_TIMEOUT_MS  1000
+#define SD_READ_TIMEOUT_MS  100
 
 uint16_t rd16_le(const uint8_p p) {
     return (uint16_t)p[0] | ((uint16_t)p[1] << 8);
@@ -145,9 +145,11 @@ static void SD_PrintHalSdError(uint32_t err) {
 #endif
 }
 
+#if 0
 extern SD_HandleTypeDef hsd2;
 
 HAL_StatusTypeDef SD_ReadBlock(uint32_t lba, uint8_p buf) {
+    // printf("SD_ReadBlock %lu\n", lba);
     HAL_StatusTypeDef st;
 
     // на всякий случай можно проверить состояние карты
@@ -172,7 +174,93 @@ HAL_StatusTypeDef SD_ReadBlock(uint32_t lba, uint8_p buf) {
 
     return st;
 }
+#else
+#include <string.h>    // memcpy
 
+#define SD_BLOCK_SIZE         512U
+#define SD_CACHE_LINES        8U
+
+typedef struct {
+    uint32_t lba;
+    uint8_t  data[SD_BLOCK_SIZE];
+    uint8_t  valid;
+} SdCacheLine_t;
+
+static SdCacheLine_t sd_cache[SD_CACHE_LINES];
+static uint32_t sd_cache_next = 0;   // simple FIFO
+
+static SdCacheLine_t* SD_CacheFind(uint32_t lba) {
+    for (uint32_t i = 0; i < SD_CACHE_LINES; ++i) {
+        if (sd_cache[i].valid && (sd_cache[i].lba == lba)) {
+            return &sd_cache[i];
+        }
+    }
+    return NULL;
+}
+
+static SdCacheLine_t* SD_CacheAllocLine(uint32_t lba) {
+    SdCacheLine_t* line = &sd_cache[sd_cache_next];
+    sd_cache_next++;
+    if (sd_cache_next >= SD_CACHE_LINES) sd_cache_next = 0;
+
+    line->lba = lba;
+    line->valid = 0;
+    return line;
+}
+
+extern SD_HandleTypeDef hsd2;
+
+HAL_StatusTypeDef SD_ReadBlock(uint32_t lba, uint8_p buf) {
+    HAL_StatusTypeDef st;
+    SdCacheLine_t* line;
+
+    // cache hit
+    line = SD_CacheFind(lba);
+    if (line != NULL) {
+        // sector is cached
+        memcpy(buf, line->data, SD_BLOCK_SIZE);
+        return HAL_OK;
+    }
+
+    // cache miss: read from card into cache line
+    line = SD_CacheAllocLine(lba);
+
+#ifdef HAL_SD_CARD_TRANSFER
+    if (HAL_SD_GetCardState(&hsd2) != HAL_SD_CARD_TRANSFER) {
+        printf("SD_ReadBlock: card not in TRANSFER state\n");
+    }
+#endif
+
+    st = HAL_SD_ReadBlocks(
+        &hsd2,
+        line->data,         // read directly into cache
+        lba,
+        1,
+        SD_READ_TIMEOUT_MS
+    );
+
+    if (st != HAL_OK) {
+        uint32_t err = HAL_SD_GetError(&hsd2);
+        printf("SD_ReadBlock: HAL error, status=%d\n", (int)st);
+        SD_PrintHalSdError(err);
+        line->valid = 0;    // do not use this line
+        return st;
+    }
+
+    line->valid = 1;
+    memcpy(buf, line->data, SD_BLOCK_SIZE);
+    return HAL_OK;
+}
+
+void SD_CacheInvalidate(void) {
+    uint32_t i;
+    for (i = 0; i < SD_CACHE_LINES; ++i) {
+        sd_cache[i].valid = 0;
+        sd_cache[i].lba = 0;
+    }
+    sd_cache_next = 0;
+}
+#endif
 
 void SD_WaitCardReady() {
     HAL_SD_CardStateTypeDef state;

@@ -1,6 +1,4 @@
 #include <stdio.h>
-// #include <stdint.h>
-// #include "stm32f7xx_hal.h"
 #include "perepherial.h"
 #include "fs_FAT32.h"
 #include "SD_TF.h"
@@ -9,12 +7,12 @@
 SD_HandleTypeDef hsd2 = {
     .Instance = SDMMC2,
     .Init = {
-        .ClockEdge = SDMMC_CLOCK_EDGE_RISING,
-        .ClockBypass = SDMMC_CLOCK_BYPASS_DISABLE,
-        .ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE,
-        .BusWide = SDMMC_BUS_WIDE_1B,
-        .HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE,
-        .ClockDiv = 0,
+        .ClockEdge              = SDMMC_CLOCK_EDGE_RISING,
+        .ClockBypass            = SDMMC_CLOCK_BYPASS_DISABLE,
+        .ClockPowerSave         = SDMMC_CLOCK_POWER_SAVE_DISABLE,
+        .BusWide                = SDMMC_BUS_WIDE_1B,
+        .HardwareFlowControl    = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE,
+        .ClockDiv               = 0,
     }
 };
 
@@ -24,11 +22,11 @@ extern HAL_SD_CardInfoTypeDef sd_info;
 uint8_t SD_InitAndGetInfo(void) {
     if (HAL_SD_Init(&hsd2) != HAL_OK)   return 1;   // init error
 
-
-    // TODO: fix for 4 wire mode
-    // if (HAL_SD_ConfigWideBusOperation(&hsd2, SDMMC_BUS_WIDE_4B) != HAL_OK) {
-    //     return 2;   // bus config error
-    // }
+#if 0    // TODO: fix for 4 wire mode
+    if (HAL_SD_ConfigWideBusOperation(&hsd2, SDMMC_BUS_WIDE_4B) != HAL_OK) {
+        return 2;   // bus config error
+    }
+#endif
 
     if (HAL_SD_GetCardInfo(&hsd2, &sd_info) != HAL_OK) {
         return 3;   // card info error
@@ -97,6 +95,7 @@ static int FAT32_Mount(FAT32_Volume_t* vol) {
 }
 
 static uint32_t FAT32_GetNextCluster(FAT32_Volume_t* vol, uint32_t cluster) {
+    // printf("FAT32_GetNextCluster\n");
     uint32_t fat_offset = cluster * 4u; // 4 bytes per FAT32 entry
     uint32_t fat_sector_idx = fat_offset / vol->bytes_per_sector;
     uint32_t ent_offset = fat_offset % vol->bytes_per_sector;
@@ -121,6 +120,8 @@ static int FAT32_IsEOC(uint32_t cl) {
 }
 
 static int FAT32_ReadCluster(FAT32_Volume_t* vol, uint32_t cluster, uint8_p buf) {
+    // printf("FAT32_ReadCluster\n");
+
     uint32_t first_sector_of_cluster =
         vol->first_data_sector + (cluster - 2u) * (uint32_t)vol->sectors_per_cluster;
 
