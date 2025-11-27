@@ -361,19 +361,19 @@ void MX_LTDC_Init() {
         Error_Handler();
     }
     LTDC_LayerCfgTypeDef pLayerCfg = {
-        .WindowX0 = 0,
-        .WindowX1 = 200,
-        .WindowY0 = 0,
-        .WindowY1 = 480,
-        .PixelFormat = LTDC_PIXEL_FORMAT_RGB565,
-        .Alpha = 255,
-        .Alpha0 = 0,
-        .BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA,
-        .BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA,
-        .FBStartAdress = 0xC0000000,
-        .ImageWidth = 200,
-        .ImageHeight = 480,
-        .Backcolor = {
+        .WindowX0           = 0,
+        .WindowX1           = 200,
+        .WindowY0           = 0,
+        .WindowY1           = 480,
+        .PixelFormat        = LTDC_PIXEL_FORMAT_RGB565,
+        .Alpha              = 255,
+        .Alpha0             = 0,
+        .BlendingFactor1    = LTDC_BLENDING_FACTOR1_PAxCA,
+        .BlendingFactor2    = LTDC_BLENDING_FACTOR2_PAxCA,
+        .FBStartAdress      = 0xC0000000,
+        .ImageWidth         = 200,
+        .ImageHeight        = 480,
+        .Backcolor  = {
             .Blue = 0,
             .Green = 0,
             .Red = 0,
@@ -1015,12 +1015,29 @@ void MX_GPIO_Init() {
     GPIO_InitStruct.Alternate = GPIO_AF3_DFSDM1;
     HAL_GPIO_Init(DFSDM_DATIN5_GPIO_Port, &GPIO_InitStruct);
 
+#if 0
     /*Configure GPIO pins : NC4_Pin NC5_Pin uSD_Detect_Pin LCD_BL_CTRL_Pin */
     GPIO_InitStruct.Pin = NC4_Pin | NC5_Pin | uSD_Detect_Pin | LCD_BL_CTRL_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
+#else
+    /*Configure GPIO pins : NC4_Pin NC5_Pin uSD_Detect_Pin */
+    GPIO_InitStruct.Pin = NC4_Pin | NC5_Pin | uSD_Detect_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
+    /*Configure GPIO pin : LCD_BL_CTRL_Pin */
+    GPIO_InitStruct.Pin = LCD_BL_CTRL_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(LCD_BL_CTRL_GPIO_Port, &GPIO_InitStruct);
+
+    /* Сначала выключим подсветку */
+    HAL_GPIO_WritePin(LCD_BL_CTRL_GPIO_Port, LCD_BL_CTRL_Pin, GPIO_PIN_RESET);
+#endif
     /*Configure GPIO pins : NC3_Pin NC2_Pin NC1_Pin NC8_Pin NC7_Pin */
     GPIO_InitStruct.Pin = NC3_Pin | NC2_Pin | NC1_Pin | NC8_Pin | NC7_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -1092,47 +1109,85 @@ void PrintCpuClock() {
     printf("PCLK1:     %.f MHz\r\n", (double)pclk1 / 1000000.0);
     printf("PCLK2:     %.f MHz\r\n", (double)pclk2 / 1000000.0);
 }
+#if 1
+// LCD framebuffer params (LTDC layer 0)
+#define LCD_FB_ADDR   ((uint16_t *)0xC0000000)
+#define LCD_WIDTH     200
+#define LCD_HEIGHT    480
+
+// RGB565 basic colors
+#define COLOR_BLACK   0x0000
+#define COLOR_WHITE   0xFFFF
+#define COLOR_RED     0xF800
+#define COLOR_GREEN   0x07E0
+#define COLOR_BLUE    0x001F
+
+static void LCD_Clear(uint16_t color) {
+    uint16_t *fb = LCD_FB_ADDR;
+    uint32_t size = (uint32_t)LCD_WIDTH * (uint32_t)LCD_HEIGHT;
+    for (uint32_t i = 0; i < size; ++i) {
+        fb[i] = color;
+    }
+}
+
+static void LCD_TestBars(void) {
+    uint16_t *fb = LCD_FB_ADDR;
+    uint32_t stripe_h = LCD_HEIGHT / 5;
+
+    for (uint32_t y = 0; y < LCD_HEIGHT; ++y) {
+        uint16_t color;
+        if (y < stripe_h)              color = COLOR_RED;
+        else if (y < 2 * stripe_h)     color = COLOR_GREEN;
+        else if (y < 3 * stripe_h)     color = COLOR_BLUE;
+        else if (y < 4 * stripe_h)     color = COLOR_WHITE;
+        else                           color = COLOR_BLACK;
+
+        uint32_t row_off = y * LCD_WIDTH;
+        for (uint32_t x = 0; x < LCD_WIDTH; ++x) {
+            fb[row_off + x] = color;
+        }
+    }
+}
+#endif
+
 
 void Pereph_Init() {
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
-    MX_FMC_Init();	        // SDRAM 16MB
-    MX_USART1_UART_Init();  // DEBUG UART
-    printf("\nDEBUG UART started\n");
-    PrintCpuClock();
-    MX_SDMMC2_SD_Init();	// FileSystem
-    // printf("MX_SDMMC2_SD_Init done\n");
+
+    MX_FMC_Init();	        // SDRAM 16MB   [V]
+
+    MX_USART1_UART_Init();  // DEBUG UART   [V]
+    printf("\nDEBUG UART started\n");   PrintCpuClock();
+
+    MX_SDMMC2_SD_Init();	// FileSystem   [V] TODO: rework FAT32/PartTable
+
     // MX_ADC1_Init();
     // MX_ADC3_Init();
     // MX_CRC_Init();
-    MX_LTDC_Init();	        // display framebufer
-    MX_DMA2D_Init();	    // 2D accelerator
-#if 1
-    MX_DSIHOST_DSI_Init();	// Display
-#endif
-    MX_HDMI_CEC_Init();
 
-    MX_ETH_Init();	        // Ethernet
+    // MX_LTDC_Init();         // display framebufer
+    // MX_DMA2D_Init();        // 2D accelerator
+    // MX_DSIHOST_DSI_Init();  // Display
+    // MX_HDMI_CEC_Init();
+
+    // MX_ETH_Init();	        // Ethernet
     // MX_I2C1_Init();
-#if 1
-    MX_I2C4_Init();	        // Sound bus
-    // printf("MX_I2C4_Init done\n");
-#endif
-    //  MX_IWDG_Init();
+    // MX_I2C4_Init();	        // Sound bus
+    // MX_IWDG_Init();
     // MX_QUADSPI_Init();
     // MX_RTC_Init();
     // MX_SAI2_Init();
     // MX_SPDIFRX_Init();
     // MX_SPI2_Init();
-    MX_TIM1_Init();
-    // printf("MX_TIM1_Init done\n");
+    // MX_TIM1_Init();
     // MX_TIM3_Init();
     // MX_TIM10_Init();
     // MX_TIM11_Init();
     // MX_TIM12_Init();
     // MX_UART5_Init();
     // MX_USART6_UART_Init();
-    MX_USB_OTG_HS_PCD_Init();	// USB host - input
+    // MX_USB_OTG_HS_PCD_Init();	// USB host - input
     //  MX_WWDG_Init();
     printf("Pereph_Init done\n");
 
