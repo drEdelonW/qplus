@@ -6,7 +6,11 @@
 		},{
 			"name": "STM32F769.cube",
 			"path": "./MCU_src"
+		},{
+			"name": "STM32CubeF7",
+			"path": "/Users/edelon/SelfLab/STM32_src_docs/STM32CubeF7"
 		}
+		
 	],
 	"settings": {
 		"files.associations": {
