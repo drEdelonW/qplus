@@ -130,9 +130,12 @@ static void FAT32_MakeShortName(cStringRO e, cString out, uint32_t out_size) {
     char name[9];
     char ext[4];
 
-    for (int i = 0; i < 8; ++i) name[i] = (char)e[i];
+    for (int i = 0; i < 8; ++i)
+        name[i] = (char)e[i];
     name[8] = '\0';
-    for (int i = 0; i < 3; ++i) ext[i] = (char)e[8 + i];
+
+    for (int i = 0; i < 3; ++i)
+        ext[i] = (char)e[8 + i];
     ext[3] = '\0';
 
     // trim spaces

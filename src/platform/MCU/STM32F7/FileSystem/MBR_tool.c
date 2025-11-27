@@ -71,7 +71,8 @@ void SD_PrintMBR() {
         printf("  Size      : %lu MB (approx)\n", mb);
 
         if ((g_part1_lba_start == 0) &&
-            ((type == 0x0B) ||
+            (
+                (type == 0x0B) ||
                 (type == 0x0C))
             ) {
             g_part1_lba_start = lba_first;
