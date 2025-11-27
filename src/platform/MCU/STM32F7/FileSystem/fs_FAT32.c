@@ -1,49 +1,10 @@
 #include <stdio.h>
-#include "perepherial.h"
 #include "fs_FAT32.h"
-#include "SD_TF.h"
-
-
-SD_HandleTypeDef hsd2 = {
-    .Instance = SDMMC2,
-    .Init = {
-        .ClockEdge              = SDMMC_CLOCK_EDGE_RISING,
-        .ClockBypass            = SDMMC_CLOCK_BYPASS_DISABLE,
-        .ClockPowerSave         = SDMMC_CLOCK_POWER_SAVE_DISABLE,
-        .BusWide                = SDMMC_BUS_WIDE_1B,
-        .HardwareFlowControl    = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE,
-        .ClockDiv               = 0,
-    }
-};
-
-
-extern HAL_SD_CardInfoTypeDef sd_info;
-
-uint8_t SD_InitAndGetInfo(void) {
-    if (HAL_SD_Init(&hsd2) != HAL_OK)   return 1;   // init error
-
-#if 0    // TODO: fix for 4 wire mode
-    if (HAL_SD_ConfigWideBusOperation(&hsd2, SDMMC_BUS_WIDE_4B) != HAL_OK) {
-        return 2;   // bus config error
-    }
-#endif
-
-    if (HAL_SD_GetCardInfo(&hsd2, &sd_info) != HAL_OK) {
-        return 3;   // card info error
-    }
-
-    // SD_PrintCardInfo(&sd_info);
-
-    return 0;
-}
-
-
-
+#include "stm32f7xx_hal.h"
 
 uint32_t g_part1_lba_start = 0;
-static FAT32_Volume_t g_fat32;
 
-static int FAT32_Mount(FAT32_Volume_t* vol) {
+int FAT32_Mount(FAT32_Volume_t* vol) {
     if (g_part1_lba_start == 0) {
         printf("FAT32_Mount: no FAT32 partition LBA\n");
         return -1;
@@ -94,6 +55,9 @@ static int FAT32_Mount(FAT32_Volume_t* vol) {
     return 0;
 }
 
+
+FAT32_Volume_t g_fat32;
+
 static uint32_t FAT32_GetNextCluster(FAT32_Volume_t* vol, uint32_t cluster) {
     // printf("FAT32_GetNextCluster\n");
     uint32_t fat_offset = cluster * 4u; // 4 bytes per FAT32 entry
@@ -143,7 +107,7 @@ static void FAT32_PrintIndent(int depth) {
 }
 
 static char fat32_up(char c) {
-    if (c >= 'a' && c <= 'z') {
+    if ((c >= 'a') && (c <= 'z')) {
         return (char)(c - 'a' + 'A');
     }
     return c;
@@ -158,10 +122,10 @@ static int FAT32_NameEquals(cStringRO a, cStringRO b) {
         ++a;
         ++b;
     }
-    return (*a == '\0' && *b == '\0');
+    return ((*a == '\0') && (*b == '\0'));
 }
 
-static void FAT32_MakeShortName(cStringRO e, char* out, uint32_t out_size) {
+static void FAT32_MakeShortName(cStringRO e, cString out, uint32_t out_size) {
     // e[0..7] - name, e[8..10] - ext
     char name[9];
     char ext[4];
@@ -273,11 +237,6 @@ void FAT32_PrintTree() {
     printf("=== end of tree ===\n");
 }
 
-typedef struct {
-    uint32_t cluster;
-    uint32_t size;
-    uint8_t  attr;
-} FAT32_DirEntryInfo;
 
 static int FAT32_FindInDir(
     FAT32_Volume_t* vol,
@@ -572,7 +531,7 @@ static int FAT32_FileLoadCluster(FAT32_File_t* fh) {
     return 0;
 }
 
-int FAT32_FileRead(FAT32_File_t* fh, void* dst, uint32_t bytes_to_read, uint32_t* out_read) {
+int FAT32_FileRead(FAT32_File_t* fh, void* dst, uint32_t bytes_to_read, uint32_p out_read) {
     if (!fh || !dst) return -1;
 
     uint8_t* out = (uint8_t*)dst;
@@ -583,9 +542,9 @@ int FAT32_FileRead(FAT32_File_t* fh, void* dst, uint32_t bytes_to_read, uint32_t
     }
 
     uint32_t remaining = fh->file_size - fh->position;
-    if (bytes_to_read > remaining) {
+    if (bytes_to_read > remaining)
         bytes_to_read = remaining;
-    }
+
 
     uint32_t total_copied = 0;
 
@@ -593,8 +552,6 @@ int FAT32_FileRead(FAT32_File_t* fh, void* dst, uint32_t bytes_to_read, uint32_t
         if ((!fh->cluster_valid) &&
             (FAT32_FileLoadCluster(fh) != 0))
             break;
-
-
 
         uint32_t pos_in_cluster = fh->position % fh->bytes_per_cluster;
         uint32_t left_in_cluster = fh->bytes_per_cluster - pos_in_cluster;
@@ -643,126 +600,7 @@ int FAT32_FileRewind(FAT32_File_t* fh) {
     return 0;
 }
 
-static void SDFS_MakeFatPath(cStringRO quakePath, char* out, uint32_t outSize) {
-    // базовый префикс для карты
-    cStringRO base = "QUAKE/";
-    uint32_t i = 0;
-
-    // копируем префикс
-    while (*base && i + 1 < outSize) {
-        out[i++] = *base++;
-    }
-
-    // копируем исходный путь, поднимая регистр и заменяя '\' на '/'
-    for (cStringRO p = quakePath; *p && i + 1 < outSize; ++p) {
-        char c = *p;
-        if (c == '\\')  c = '/';
-        // uppercase латиницу
-        if ((c >= 'a') && (c <= 'z'))   c = (char)(c - 'a' + 'A');
-        out[i++] = c;
-    }
-
-    out[i] = '\0';
-}
-
-#define SDFS_MAX_OPEN_FILES 8
-
-typedef struct {
-    bool          used;
-    FAT32_File_t  file;
-} SD_FileSlot;
-
-static SD_FileSlot s_sdFiles[SDFS_MAX_OPEN_FILES];
-
-static int SDFS_AllocHandle(void) {
-    for (int i = 0; i < SDFS_MAX_OPEN_FILES; ++i) {
-        if (!s_sdFiles[i].used) {
-            s_sdFiles[i].used = true;
-            return i;
-        }
-    }
-    return -1;
-}
-
-static SD_FileSlot* SDFS_GetSlot(int hnd) {
-    if ((hnd < 0) ||
-        (hnd >= SDFS_MAX_OPEN_FILES) ||
-        (!s_sdFiles[hnd].used))         return NULL;
-    return &s_sdFiles[hnd];
-}
-
-
-static bool s_sdfs_inited = false;
-
-int SD_FS_Init() {
-    if (s_sdfs_inited) return 0;
-
-    if (SD_InitAndGetInfo() != 0) {
-        printf("SD_FS_Init: SD init failed\n");
-        return -1;
-    }
-
-    printf("SD_FS_Init\n");
-    if (FAT32_Mount(&g_fat32) != 0) {
-        printf("SD_FS_Init: FAT32 mount failed\n");
-        return -1;
-    }
-
-    s_sdfs_inited = true;
-    return 0;
-}
-
-int Sys_FileOpenRead(cStringRO quakePath, int* hnd) {
-    if (!hnd) return -1;
-
-    if (SD_FS_Init() != 0) {
-        *hnd = -1;
-        return -1;
-    }
-
-    char fatPath[128];
-    SDFS_MakeFatPath(quakePath, fatPath, sizeof(fatPath));
-
-    FAT32_File_t f;
-    if (FAT32_FileOpen(fatPath, &f) != 0) {
-        // можно отладочно писать:
-        // printf("Sys_FileOpenRead: '%s' -> '%s' not found\n", quakePath, fatPath);
-        *hnd = -1;
-        return -1;
-    }
-
-    int slot = SDFS_AllocHandle();
-    if (slot < 0) {
-        FAT32_FileClose(&f);
-        *hnd = -1;
-        return -1;
-    }
-
-    s_sdFiles[slot].file = f;
-
-    *hnd = slot;
-    return (int)f.file_size; // по контракту Quake возвращает длину
-}
-
-void Sys_FileClose(int handle) {
-    SD_FileSlot* slot = SDFS_GetSlot(handle);
-    if (!slot) return;
-
-    FAT32_FileClose(&slot->file);
-    slot->used = 0;
-}
-
-int Sys_FileRead(int handle, void* dest, int count) {
-    SD_FileSlot* slot = SDFS_GetSlot(handle);
-    if (!slot) return 0;
-
-    uint32_t got = 0;
-    if (FAT32_FileRead(&slot->file, dest, (uint32_t)count, &got) != 0) {
-        return 0;
-    }
-    return (int)got;
-}
-
+#if 0
 int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos) {
     if (!fh)    return -1;
     if (new_pos > fh->file_size)
@@ -788,55 +626,67 @@ int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos) {
 
     return 0;
 }
-int Sys_FileSeek(int handle, int position) {
-    SD_FileSlot* slot = SDFS_GetSlot(handle);
-    if (!slot) return -1;
+#else
+int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos) {
+    if (!fh) return -1;
 
-    if (FAT32_FileSeekSet(&slot->file, (uint32_t)position) != 0) {
+    // clamp to EOF
+    if (new_pos > fh->file_size) {
+        new_pos = fh->file_size;
+    }
+
+    // быстрый путь: в самое начало
+    if (new_pos == 0u) {
+        fh->current_cluster = fh->first_cluster;
+        fh->position        = 0u;
+        fh->cluster_index   = 0u;
+        fh->cluster_valid   = 0u;
+        return 0;
+    }
+
+    // быстрый путь: seek ровно в конец файла — читать там всё равно никто не будет
+    if (new_pos == fh->file_size) {
+        fh->position      = new_pos;
+        fh->cluster_valid = 0u;
+        // current_cluster/cluster_index можно не трогать: Read вернёт EOF по position
+        return 0;
+    }
+
+    uint32_t cluster_size = fh->bytes_per_cluster;
+    if (cluster_size == 0u) {
         return -1;
     }
+
+    // какой по счёту кластер и смещение внутри него
+    uint32_t target_cluster_index = new_pos / cluster_size;
+    // uint32_t inside_cluster       = new_pos % cluster_size; // для логики не нужен
+
+    uint32_t clus = fh->first_cluster;
+    uint32_t idx  = 0u;
+
+    // идём по FAT-цепочке, НЕ читая данных файла
+    while (idx < target_cluster_index) {
+        uint32_t next = FAT32_GetNextCluster(fh->vol, clus);
+
+        if (FAT32_IsEOC(next) || next < 2u) {
+            // цепочка закончилась раньше, чем ожидали — фиксируемся на EOF
+            fh->position      = fh->file_size;
+            fh->current_cluster = next;
+            fh->cluster_index = idx; // фактическая длина цепочки
+            fh->cluster_valid = 0u;
+            return 0;
+        }
+
+        clus = next;
+        idx++;
+    }
+
+    // теперь clus — это кластер, содержащий new_pos
+    fh->current_cluster = clus;
+    fh->position        = new_pos;
+    fh->cluster_index   = idx;
+    fh->cluster_valid   = 0u;  // буфер нужно будет перезагрузить при следующем чтении
+
     return 0;
 }
-
-
-
-void MX_SDMMC2_SD_Init() {
-    if (SD_InitAndGetInfo() == 0) {
-        SD_WaitCardReady();
-        printf("SD inited\n");
-        SD_PrintMBR();
-
-#if 0
-        printf("MX_SDMMC2_SD_Init\n");
-        if (FAT32_Mount(&g_fat32) == 0) {
-            // FAT32_PrintTree();
-
-            // FAT32_File_t f;
-            // if (FAT32_FileOpen("QUAKE/ID1/PAK0.PAK", &f) == 0) {
-            //     printf("PAK0.PAK size: %lu bytes\n", (uint32_t)f.file_size);
-
-            //     uint8_t header[64];
-            //     uint32_t got = 0;
-            //     if (FAT32_FileRead(&f, header, sizeof(header), &got) == 0) {
-            //         printf("Read first %lu bytes:\n", (uint32_t)got);
-            //         for (uint32_t i = 0; i < got; i += 16) {
-            //             printf("%04lX: ", (uint32_t)i);
-            //             for (uint32_t j = 0; j < 16 && i + j < got; ++j) {
-            //                 printf("%02X ", (uint32_t)header[i + j]);
-            //             }
-            //             printf("\n");
-            //         }
-            //     }
-
-            //     FAT32_FileClose(&f);
-            // }
-        }
-        else {
-            printf("MX_SDMMC2_SD_Init error\n");
-        }
 #endif
-    }
-    else {
-        printf("SD ERROR\n");
-    }
-}

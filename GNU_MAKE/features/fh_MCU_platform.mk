@@ -3,12 +3,14 @@ DST_PLATFORM := STM32
 $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)/API)
     $(eval MCU_DIR = $(PLATFORM_DIR)/MCU) $(eval INCLUDES += $(MCU_DIR))
         $(eval STM32_DIR = $(MCU_DIR)/STM32F7) $(eval INCLUDES += $(STM32_DIR))
+            $(eval FS_DIR = $(STM32_DIR)/FileSystem) $(eval INCLUDES += $(FS_DIR))
+                SRC_LIST += $(FS_DIR)/per_SD_tools.c
+                SRC_LIST += $(FS_DIR)/SD_TF_tools.c
+                SRC_LIST += $(FS_DIR)/MBR_tool.c
+                SRC_LIST += $(FS_DIR)/fs_FAT32.c
+
 #             SRC_LIST += $(STM32_DIR)/main.c
             SRC_LIST += $(STM32_DIR)/perepherial.c
-            SRC_LIST += $(STM32_DIR)/per_SD_tools.c
-            SRC_LIST += $(STM32_DIR)/SD_TF_tools.c
-            SRC_LIST += $(STM32_DIR)/MBR_tool.c
-
             SRC_LIST += $(STM32_DIR)/retarget_io.c
             SRC_LIST += $(STM32_DIR)/per_FMC_SDRAM.c
 

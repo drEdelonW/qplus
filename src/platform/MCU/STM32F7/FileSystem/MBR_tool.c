@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "types.h"
 #include "SD_TF.h"
+#include "fs_FAT32.h"
 
 
 
@@ -53,7 +54,7 @@ void SD_PrintMBR() {
         uint32_t lba_first = rd32_le(e + 8);
         uint32_t sectors = rd32_le(e + 12);
 
-        if (type == 0 && lba_first == 0 && sectors == 0) {
+        if ((type == 0) && (lba_first == 0) && (sectors == 0)) {
             continue; // empty entry
         }
 
@@ -61,7 +62,7 @@ void SD_PrintMBR() {
         uint32_t mb = (uint32_t)(bytes / (1024u * 1024u));
 
         printf("Part %lu:\n", (uint32_t)(i + 1u));
-        printf("  Boot      : %s (0x%02X)\n",
+        printf("  Boot      : %s (0x%02lX)\n",
             (status == 0x80) ? "yes" : "no",
             (uint32_t)status);
         printf("  Type      : 0x%02X (%s)\n", type, MBR_PartTypeStr(type));

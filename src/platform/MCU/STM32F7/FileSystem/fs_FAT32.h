@@ -1,5 +1,6 @@
 #pragma once
-
+// #include <stdint.h>
+#include "types.h"
 
 typedef struct {
     uint32_t part_lba_start;
@@ -28,3 +29,19 @@ typedef struct {
 
     uint8_t  cluster_buf[512 * 16]; // один кластер (512 * sectors_per_cluster)
 } FAT32_File_t;
+
+
+typedef struct {
+    uint32_t cluster;
+    uint32_t size;
+    uint8_t  attr;
+} FAT32_DirEntryInfo;
+
+extern FAT32_Volume_t g_fat32;
+
+
+int FAT32_Mount(FAT32_Volume_t* vol);
+int FAT32_FileOpen(cStringRO path, FAT32_File_t* fh);
+void FAT32_FileClose(FAT32_File_t* fh);
+int FAT32_FileRead(FAT32_File_t* fh, void* dst, uint32_t bytes_to_read, uint32_p out_read);
+int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos);
