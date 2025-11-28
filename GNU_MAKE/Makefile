@@ -1,6 +1,8 @@
 # TARGET ?= quakeX11
 # TARGET ?= quakeWin
-TARGET ?= quakeSTM32
+# TARGET ?= quakeSTM32
+TARGET ?= STM32_LCD
+
 # TARGET ?= testSTM32
 # TARGET ?= testSDL2
 
@@ -113,10 +115,10 @@ COMPILE_CXX = $(call compile_template,{C++},$(CXX),$(CXXFLAGS))
 COMPILE_ASM = $(call compile_template,{ASM},$(CC) -c -x assembler-with-cpp,$(ASMFLAGS))
 
 # Search sources in ../src and ../ID_src/WinQuake
-vpath %.c   $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
-vpath %.cpp $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
-vpath %.s   $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
-vpath %.S   $(SRC_DIR) $(IDSRC_DIR) $(STMSRC_DIR)
+vpath %.c   $(SRC_DIR) $(STMSRC_DIR) $(IDSRC_DIR)
+vpath %.cpp $(SRC_DIR) $(STMSRC_DIR) $(IDSRC_DIR)
+vpath %.s   $(SRC_DIR) $(STMSRC_DIR) $(IDSRC_DIR)
+vpath %.S   $(SRC_DIR) $(STMSRC_DIR) $(IDSRC_DIR)
 
 # Two rules instead of four — make will find % via vpath
 $(OBJ_DIR)/%.o: %.c
