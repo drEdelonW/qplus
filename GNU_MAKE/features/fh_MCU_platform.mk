@@ -26,8 +26,6 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
 #         SRC_LIST += $(MCU_DIR)/in_mcu.c
 
 # $(eval ROOT_DIR := $(STMSRC_DIR)) $(eval INCLUDES += $(ROOT_DIR))
-$(eval INCLUDES += $(STMSRC_DIR)/Drivers/CMSIS/Device/ST/STM32F7xx/Include)
-$(eval INCLUDES += $(STMSRC_DIR)/Drivers/CMSIS/Include)
 
     $(eval CORE_DIR := $(STMSRC_DIR)/Core)
         $(eval INCLUDES += $(CORE_DIR)/Inc)
