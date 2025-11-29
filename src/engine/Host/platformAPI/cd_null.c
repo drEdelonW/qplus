@@ -3,11 +3,11 @@
 #include "cdaudio.h"
 #include "mem_placement.h"
 
-WEAK int   CDAudio_Init() { return 0; }
-WEAK void  CDAudio_Shutdown() {}
-WEAK void  CDAudio_Play(uint8_t track, bool looping) {}
-WEAK void  CDAudio_Stop() {}
-WEAK void  CDAudio_Pause() {}
-WEAK void  CDAudio_Resume() {}
-WEAK void  CDAudio_Update() {}
+__weak int   CDAudio_Init() { return 0; }
+__weak void  CDAudio_Shutdown() {}
+__weak void  CDAudio_Play(uint8_t track, bool looping) {}
+__weak void  CDAudio_Stop() {}
+__weak void  CDAudio_Pause() {}
+__weak void  CDAudio_Resume() {}
+__weak void  CDAudio_Update() {}
 

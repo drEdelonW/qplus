@@ -1,3 +1,4 @@
+#pragma once
 /**
   ******************************************************************************
   * @file    otm8009a.h
@@ -16,33 +17,15 @@
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
-  */
+*/
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __OTM8009A_H
-#define __OTM8009A_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif
-
-/* Includes ------------------------------------------------------------------*/
+  /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
-/** @addtogroup BSP
-  * @{
-  */
+/** @addtogroup BSP */
+/** @addtogroup Components */
+/** @addtogroup otm8009a */
+/** @addtogroup OTM8009A_Exported_Variables */
 
-/** @addtogroup Components
-  * @{
-  */
-
-/** @addtogroup otm8009a
-  * @{
-  */
-
-/** @addtogroup OTM8009A_Exported_Variables
-  * @{
-  */
 /* OTM8009A ID */
 #define OTM8009A_ID                 0x40
 #if defined ( __GNUC__ ) || (defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) /* GNU and ARM Compiler 6 compilers */
@@ -51,23 +34,15 @@
 #endif /* __weak */
 #endif /* __GNUC__ || (__ARMCC_VERSION && (__ARMCC_VERSION >= 6010050)) */
 
-/**
- *  @brief LCD_OrientationTypeDef
- *  Possible values of Display Orientation
- */
+/** LCD_OrientationTypeDef  Possible values of Display Orientation */
 #define OTM8009A_ORIENTATION_PORTRAIT    ((uint32_t)0x00) /* Portrait orientation choice of LCD screen  */
 #define OTM8009A_ORIENTATION_LANDSCAPE   ((uint32_t)0x01) /* Landscape orientation choice of LCD screen */
 
-/**
- *  @brief  Possible values of
- *  pixel data format (ie color coding) transmitted on DSI Data lane in DSI packets
- */
+ /** Possible values of  pixel data format (ie color coding) transmitted on DSI Data lane in DSI packets */
 #define OTM8009A_FORMAT_RGB888    ((uint32_t)0x00) /* Pixel format chosen is RGB888 : 24 bpp */
 #define OTM8009A_FORMAT_RBG565    ((uint32_t)0x02) /* Pixel format chosen is RGB565 : 16 bpp */
 
-/**
-  * @brief  otm8009a_480x800 Size
-  */
+/** otm8009a_480x800 Size */
 
 /* Width and Height in Portrait mode */
 #define  OTM8009A_480X800_WIDTH             ((uint16_t)480)     /* LCD PIXEL WIDTH   */
@@ -77,9 +52,7 @@
 #define  OTM8009A_800X480_WIDTH             ((uint16_t)800)     /* LCD PIXEL WIDTH   */
 #define  OTM8009A_800X480_HEIGHT            ((uint16_t)480)     /* LCD PIXEL HEIGHT  */
 
-/**
-  * @brief  OTM8009A_480X800 Timing parameters for Portrait orientation mode
-  */
+/** OTM8009A_480X800 Timing parameters for Portrait orientation mode */
 #define  OTM8009A_480X800_HSYNC             ((uint16_t)2)      /* Horizontal synchronization */
 #define  OTM8009A_480X800_HBP               ((uint16_t)34)     /* Horizontal back porch      */
 #define  OTM8009A_480X800_HFP               ((uint16_t)34)     /* Horizontal front porch     */
@@ -87,10 +60,7 @@
 #define  OTM8009A_480X800_VBP               ((uint16_t)15)      /* Vertical back porch        */
 #define  OTM8009A_480X800_VFP               ((uint16_t)16)      /* Vertical front porch       */
 
-/**
-  * @brief  OTM8009A_800X480 Timing parameters for Landscape orientation mode
-  *         Same values as for Portrait mode in fact.
-  */
+/** OTM8009A_800X480 Timing parameters for Landscape orientation mode. Same values as for Portrait mode in fact. */
 #define  OTM8009A_800X480_HSYNC             OTM8009A_480X800_VSYNC  /* Horizontal synchronization */
 #define  OTM8009A_800X480_HBP               OTM8009A_480X800_VBP    /* Horizontal back porch      */
 #define  OTM8009A_800X480_HFP               OTM8009A_480X800_VFP    /* Horizontal front porch     */
@@ -159,51 +129,28 @@
 #define  OTM8009A_CMD_ID1                   0xDA  /* Read ID1 command      */
 #define  OTM8009A_CMD_ID2                   0xDB  /* Read ID2 command      */
 #define  OTM8009A_CMD_ID3                   0xDC  /* Read ID3 command      */
-/**
-  * @brief  OTM8009A_480X800 frequency divider
-  */
+
+/** OTM8009A_480X800 frequency divider */
 #define OTM8009A_480X800_FREQUENCY_DIVIDER  2   /* LCD Frequency divider      */
 
-/**
-  * @}
-  */
-   
-/* Exported macro ------------------------------------------------------------*/
-   
-/** @defgroup OTM8009A_Exported_Macros OTM8009A Exported Macros
-  * @{
-  */ 
 
-/**
-  * @}
-  */ 
+/* Exported macro ------------------------------------------------------------*/
+
+/** @defgroup OTM8009A_Exported_Macros OTM8009A Exported Macros */
 
 /* Exported functions --------------------------------------------------------*/
-  
-/** @addtogroup OTM8009A_Exported_Functions
-  * @{
-  */
-void DSI_IO_WriteCmd(uint32_t NbrParams, uint8_t *pParams);
-int32_t DSI_IO_ReadCmd(uint32_t Reg, uint8_t *pData, uint32_t Size);
-uint8_t OTM8009A_Init(uint32_t ColorCoding, uint32_t orientation);
-void OTM8009A_IO_Delay(uint32_t Delay);
-uint16_t OTM8009A_ReadID(void);
-/**
-  * @}
-  */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    /** @addtogroup OTM8009A_Exported_Functions */
+    void    DSI_IO_WriteCmd(uint32_t NbrParams, uint8_t* pParams);
+    int32_t DSI_IO_ReadCmd(uint32_t Reg, uint8_t* pData, uint32_t Size);
+    uint8_t OTM8009A_Init(uint32_t ColorCoding, uint32_t orientation);
+    void    OTM8009A_IO_Delay(uint32_t Delay);
+    uint16_t OTM8009A_ReadID(void);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __OTM8009A_480X800_H */
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */

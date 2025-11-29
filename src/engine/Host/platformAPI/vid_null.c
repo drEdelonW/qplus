@@ -38,14 +38,14 @@ static uint8_t _surfCache[256 * 1024] PLACE_TO_SDRAM;
 uint16_t d_8to16table[256];
 uint32_t d_8to24table[256];
 
-WEAK void VID_SetPalette(uint8_p palette) {}
-WEAK void VID_ShiftPalette(uint8_p palette) {}
-WEAK void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {}
-WEAK void D_EndDirectRect(int x, int y, int width, int height) {}
-WEAK void VID_Update(vRect_p rects) {}
+__weak void VID_SetPalette(uint8_p palette) {}
+__weak void VID_ShiftPalette(uint8_p palette) {}
+__weak void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {}
+__weak void D_EndDirectRect(int x, int y, int width, int height) {}
+__weak void VID_Update(vRect_p rects) {}
 
-WEAK void VID_Shutdown() {}
-WEAK void VID_Init(uint8_p palette) {
+__weak void VID_Shutdown() {}
+__weak void VID_Init(uint8_p palette) {
     vid = (VidDef_t){
         .buffer         = _vidBuf,
         .colormap       = host_colormap,

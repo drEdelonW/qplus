@@ -15,9 +15,7 @@ $(eval FSRC_DIR = $(SRC_DIR)/STM32_LCD) $(eval INCLUDES += $(FSRC_DIR)/Inc)
         SRC_LIST += $(CORE_DIR)/Src/syscalls.c
         SRC_LIST += $(CORE_DIR)/Src/system_stm32f7xx.c
         SRC_LIST += $(CORE_DIR)/Startup/startup_stm32f769nihx.s
-#         SRC_LIST += $(CORE_DIR)/Src/stm32f7xx_hal_msp.c
-#         SRC_LIST += $(CORE_DIR)/Src/stm32f7xx_hal_timebase_tim.c
-#         SRC_LIST += $(CORE_DIR)/Src/stm32f7xx_it.c
+
 # /Users/edelon/SelfLab/rnd/quake/MCU_src/BSP/STM32F769I-Discovery/stm32f769i_discovery.h
         $(eval INCLUDES += $(STMSRC_DIR)/Drivers/BSP/STM32F769I-Discovery)
         SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery.c

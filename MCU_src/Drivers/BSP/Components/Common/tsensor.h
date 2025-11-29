@@ -1,3 +1,4 @@
+#pragma once
 /**
   ******************************************************************************
   * @file    tsensor.h
@@ -5,7 +6,7 @@
   * @version V4.0.1
   * @date    21-July-2015
   * @brief   This header file contains the functions prototypes for the
-  *          Temperature Sensor driver. 
+  *          Temperature Sensor driver.
   ******************************************************************************
   * @attention
   *
@@ -34,85 +35,32 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-  */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TSENSOR_H
-#define __TSENSOR_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif
+*/
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
 
-/** @addtogroup BSP
-  * @{
-  */
-
-/** @addtogroup Components
-  * @{
-  */
-    
-/** @addtogroup TSENSOR
-  * @{
-  */
-
-/** @defgroup TSENSOR_Exported_Types
-  * @{
-  */ 
-
-/** @defgroup TSENSOR_Config_structure  Temperature Sensor Configuration structure
-  * @{
-  */
-typedef struct
-{
-  uint8_t AlertMode;            /* Alert Mode Temperature out of range*/
-  uint8_t ConversionMode;       /* Continuous/One Shot Mode */
-  uint8_t ConversionResolution; /* Temperature Resolution */
-  uint8_t ConversionRate;       /* Number of measure per second */
-  uint8_t TemperatureLimitHigh; /* High Temperature Limit Range */
-  uint8_t TemperatureLimitLow;  /* Low Temperature Limit Range */
+/** @addtogroup BSP */
+/** @addtogroup Components */
+/** @addtogroup TSENSOR */
+/** @defgroup TSENSOR_Exported_Types */
+/** @defgroup TSENSOR_Config_structure  Temperature Sensor Configuration structure */
+typedef struct{
+    uint8_t AlertMode;            /* Alert Mode Temperature out of range*/
+    uint8_t ConversionMode;       /* Continuous/One Shot Mode */
+    uint8_t ConversionResolution; /* Temperature Resolution */
+    uint8_t ConversionRate;       /* Number of measure per second */
+    uint8_t TemperatureLimitHigh; /* High Temperature Limit Range */
+    uint8_t TemperatureLimitLow;  /* Low Temperature Limit Range */
 }TSENSOR_InitTypeDef;
-/**
-  * @}
-  */
 
-/** @defgroup TSENSOR_Driver_structure  Temperature Sensor Driver structure
-  * @{
-  */
-typedef struct
-{  
-  void       (*Init)(uint16_t, TSENSOR_InitTypeDef *);
-  uint8_t    (*IsReady)(uint16_t, uint32_t);
-  uint8_t    (*ReadStatus)(uint16_t);
-  uint16_t   (*ReadTemp)(uint16_t); 
+
+/** @defgroup TSENSOR_Driver_structure  Temperature Sensor Driver structure */
+typedef struct {
+    void       (*Init)(uint16_t, TSENSOR_InitTypeDef *);
+    uint8_t    (*IsReady)(uint16_t, uint32_t);
+    uint8_t    (*ReadStatus)(uint16_t);
+    uint16_t   (*ReadTemp)(uint16_t);
 }TSENSOR_DrvTypeDef;
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __TSENSOR_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

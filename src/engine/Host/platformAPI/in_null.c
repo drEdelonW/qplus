@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "input.h"
 #include "mem_placement.h"
 
-WEAK void IN_Init() {}
-WEAK void IN_Shutdown() {}
-WEAK void IN_Commands() {}
-WEAK void IN_Move(UserCmd_p cmd) {}
+__weak void IN_Init() {}
+__weak void IN_Shutdown() {}
+__weak void IN_Commands() {}
+__weak void IN_Move(UserCmd_p cmd) {}
 

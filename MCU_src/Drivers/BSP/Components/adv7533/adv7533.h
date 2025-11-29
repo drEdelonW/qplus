@@ -1,4 +1,4 @@
-
+#pragma once
 /**
   ******************************************************************************
   * @file    adv7533.h
@@ -33,30 +33,15 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-  */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __ADV7533_H
-#define __ADV7533_H
+*/
 
 /* Includes ------------------------------------------------------------------*/
 #include "../Common/audio.h"
 
-/** @addtogroup BSP
-  * @{
-  */
- 
-/** @addtogroup Components
-  * @{
-  */
-
-/** @addtogroup adv7533
-  * @{
-  */
-
-/** @addtogroup ADV7533_Exported_Types
-  * @{
-  */
+/** @addtogroup BSP */
+/** @addtogroup Components */
+/** @addtogroup adv7533 */
+/** @addtogroup ADV7533_Exported_Types */
 
 typedef struct {
   uint8_t       DSI_LANES;
@@ -71,47 +56,31 @@ typedef struct {
   uint8_t       ASPECT_RATIO;
 } adv7533ConfigTypeDef;
 
-/** @defgroup ADV7533_Exported_Constants
-  * @{
-  */
+/** @defgroup ADV7533_Exported_Constants */
 
-/** 
-  * @brief HDMI audio output DEVICE
-  */ 
+/** HDMI audio output DEVICE */
 #define OUTPUT_DEVICE_ADV7533_HDMI       ((uint16_t)0x1000)
 
-/** 
-  * @brief  ADV7533 I2C Addresses 0x7A / 0x78
-  */  
+/** ADV7533 I2C Addresses 0x7A / 0x78 */
 #define  ADV7533_MAIN_I2C_ADDR           ((uint8_t)0x7A)
 #define  ADV7533_CEC_DSI_I2C_ADDR        ((uint8_t)0x78)
 
-/** 
-  * @brief  ADV7533 Aspect ratio
-  */  
+/** ADV7533 Aspect ratio */
 #define ADV7533_ASPECT_RATIO_16_9        ((uint8_t)0x00)
 #define ADV7533_ASPECT_RATIO_4_3         ((uint8_t)0x01)
 
-/** 
-  * @brief  ADV7533 Aspect ratio
-  */  
+/** ADV7533 Aspect ratio */
 #define ADV7533_MODE_HDMI                0x0
 #define ADV7533_MODE_DVI                 0x1
-   
-/** 
-  * @brief  ADV7533 Main Registers
-  */
+
+/** ADV7533 Main Registers */
 #define  ADV7533_MAIN_SYNC_REG           ((uint8_t)0x17)
 #define  ADV7533_MAIN_POWER_DOWN_REG     ((uint8_t)0x41)
 #define  ADV7533_MAIN_HPG_REG            ((uint8_t)0x42)
 
-/**
- * @brief   ADV7533 Main Features Parameters
- */
+/** ADV7533 Main Features Parameters */
 
-/**
-  * @brief ADV7533 CEC DSI Registers
-  */
+/** ADV7533 CEC DSI Registers */
 #define ADV7533_CEC_DSI_INTERNAL_TIMING_REG  ((uint8_t)0x27)
 #define ADV7533_CEC_DSI_TOTAL_WIDTH_H_REG    ((uint8_t)0x28)
 #define ADV7533_CEC_DSI_TOTAL_WIDTH_L_REG    ((uint8_t)0x29)
@@ -131,19 +100,17 @@ typedef struct {
 #define ADV7533_CEC_DSI_VBP_H_REG            ((uint8_t)0x36)
 #define ADV7533_CEC_DSI_VBP_L_REG            ((uint8_t)0x37)
 
-/** @Brief adv7533 ID
-  */
+/** @Brief adv7533 ID */
 #define ADV7533_ID  0x7533
-   
-/** @Brief device ID register 
-  */
+
+/** @Brief device ID register */
 #define   ADV7533_CHIPID_ADDR0   0x00
-#define   ADV7533_CHIPID_ADDR1   0x01    
+#define   ADV7533_CHIPID_ADDR1   0x01
 
 /* MUTE commands */
 #define AUDIO_MUTE_ON                 1
 #define AUDIO_MUTE_OFF                0
-    
+
 /* AUDIO FREQUENCY */
 #define AUDIO_FREQUENCY_192K           ((uint32_t)192000)
 #define AUDIO_FREQUENCY_176K           ((uint32_t)176400)
@@ -153,25 +120,11 @@ typedef struct {
 #define AUDIO_FREQUENCY_44K            ((uint32_t)44100)
 #define AUDIO_FREQUENCY_32K            ((uint32_t)32000) 
 
-/**
-  * @}
-  */
 
 /* Exported macro ------------------------------------------------------------*/
-   
-/** @defgroup ADV7533_Exported_Macros ADV7533 Exported Macros
-  * @{
-  */ 
-
-/**
-  * @}
-  */ 
-
+/** @defgroup ADV7533_Exported_Macros ADV7533 Exported Macros */ 
 /* Exported functions --------------------------------------------------------*/
-  
-/** @addtogroup ADV7533_Exported_Functions
-  * @{
-  */
+/** @addtogroup ADV7533_Exported_Functions */
 
 /*------------------------------------------------------------------------------
                            HDMI video functions 
@@ -184,7 +137,7 @@ void ADV7533_PatternEnable(void);
 void ADV7533_PatternDisable(void);
 
 /*------------------------------------------------------------------------------
-                           HDMI Audio functions 
+                           HDMI Audio functions
 ------------------------------------------------------------------------------*/
 uint32_t adv7533_AudioInit(uint16_t DeviceAddr, uint16_t OutputDevice, uint8_t Volume,uint32_t AudioFreq);
 void adv7533_DeInit(void);
@@ -207,24 +160,7 @@ uint8_t  HDMI_IO_Read(uint8_t addr, uint8_t reg);
 void     HDMI_IO_Delay(uint32_t delay);
 void     AUDIO_IO_DeInit(void);
 
-/**
-  * @}
-  */ 
-
 /* HDMI Audio driver structure */
 extern AUDIO_DrvTypeDef adv7533_drv;
-
-#endif /* __ADV7533_H */
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
