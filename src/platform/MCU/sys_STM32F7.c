@@ -66,7 +66,7 @@ int filelength(FILE* f) {
 }
 #include "mem_placement.h"
 
-WEAK int Sys_FileOpenRead(cStringRO path, int* hndl) {
+__weak int Sys_FileOpenRead(cStringRO path, int* hndl) {
     int i = findhandle();
     FILE* f = fopen(path, "rb");
     if (!f) {
@@ -79,7 +79,7 @@ WEAK int Sys_FileOpenRead(cStringRO path, int* hndl) {
     return filelength(f);
 }
 
-WEAK int Sys_FileOpenWrite(cStringRO path) {
+__weak int Sys_FileOpenWrite(cStringRO path) {
     int i = findhandle();
     FILE* f = fopen(path, "wb");
     if (!f)
@@ -89,16 +89,16 @@ WEAK int Sys_FileOpenWrite(cStringRO path) {
     return i;
 }
 
-WEAK void Sys_FileClose(int handle) {
+__weak void Sys_FileClose(int handle) {
     fclose(sys_handles[handle]);
     sys_handles[handle] = NULL;
 }
 
-WEAK void Sys_FileSeek(int handle, int position) {
+__weak void Sys_FileSeek(int handle, int position) {
     fseek(sys_handles[handle], position, SEEK_SET);
 }
 
-WEAK int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) {
+__weak int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) {
     return fread(dest, 1, count, sys_handles[handle]);
 }
 

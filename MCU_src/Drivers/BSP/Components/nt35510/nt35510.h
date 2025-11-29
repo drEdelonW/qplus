@@ -1,3 +1,4 @@
+#pragma once
 /**
   ******************************************************************************
   * @file    nt35510.h
@@ -18,57 +19,30 @@
   ******************************************************************************
   */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __NT35510_H
-#define __NT35510_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif
-
-/* Includes ------------------------------------------------------------------*/
+  /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
-/** @addtogroup BSP
-  * @{
-  */
-
-/** @addtogroup Components
-  * @{
-  */
-
-/** @addtogroup nt35510
-  * @{
-  */
-
-/** @addtogroup NT35510_Exported_Variables
-  * @{
-  */
+/** @addtogroup BSP */
+/** @addtogroup Components */
+/** @addtogroup nt35510 */
+/** @addtogroup NT35510_Exported_Variables */
 /* NT35510 ID */
 #define NT35510_ID                 0x80
-#if defined ( __GNUC__ )
-#ifndef __weak
-#define __weak __attribute__((weak))
-#endif /* __weak */
-#endif /* __GNUC__ */
 
 /**
  *  @brief LCD_OrientationTypeDef
  *  Possible values of Display Orientation
- */
+*/
 #define NT35510_ORIENTATION_PORTRAIT    ((uint32_t)0x00) /* Portrait orientation choice of LCD screen  */
 #define NT35510_ORIENTATION_LANDSCAPE   ((uint32_t)0x01) /* Landscape orientation choice of LCD screen */
 
 /**
  *  @brief  Possible values of
  *  pixel data format (ie color coding) transmitted on DSI Data lane in DSI packets
- */
+*/
 #define NT35510_FORMAT_RGB888    ((uint32_t)0x00) /* Pixel format chosen is RGB888 : 24 bpp */
 #define NT35510_FORMAT_RBG565    ((uint32_t)0x02) /* Pixel format chosen is RGB565 : 16 bpp */
 
-/**
-  * @brief  nt35510_480x800 Size
-  */
-
+/** nt35510_480x800 Size */
 /* Width and Height in Portrait mode */
 #define  NT35510_480X800_WIDTH             ((uint16_t)480)     /* LCD PIXEL WIDTH   */
 #define  NT35510_480X800_HEIGHT            ((uint16_t)800)     /* LCD PIXEL HEIGHT  */
@@ -77,9 +51,7 @@
 #define  NT35510_800X480_WIDTH             ((uint16_t)800)     /* LCD PIXEL WIDTH   */
 #define  NT35510_800X480_HEIGHT            ((uint16_t)480)     /* LCD PIXEL HEIGHT  */
 
-/**
-  * @brief  NT35510_480X800 Timing parameters for Portrait orientation mode
-  */
+/** NT35510_480X800 Timing parameters for Portrait orientation mode */
 #define  NT35510_480X800_HSYNC             ((uint16_t)2)      /* Horizontal synchronization */
 #define  NT35510_480X800_HBP               ((uint16_t)34)     /* Horizontal back porch      */
 #define  NT35510_480X800_HFP               ((uint16_t)34)     /* Horizontal front porch     */
@@ -91,7 +63,7 @@
 /**
   * @brief  NT35510_800X480 Timing parameters for Landscape orientation mode
   *         Same values as for Portrait mode in fact.
-  */
+*/
 #define  NT35510_800X480_HSYNC             NT35510_480X800_VSYNC  /* Horizontal synchronization */
 #define  NT35510_800X480_HBP               NT35510_480X800_VBP    /* Horizontal back porch      */
 #define  NT35510_800X480_HFP               NT35510_480X800_VFP    /* Horizontal front porch     */
@@ -197,53 +169,29 @@
 #define  NT35510_COLMOD_RGB565             0x55
 #define  NT35510_COLMOD_RGB888             0x77
 
-/**
-  * @brief  NT35510_480X800 frequency divider
-  */
+/** NT35510_480X800 frequency divider */
 #define NT35510_480X800_FREQUENCY_DIVIDER  2   /* LCD Frequency divider      */
 
-/**
-  * @}
-  */
 
 /* Exported macro ------------------------------------------------------------*/
-
-/** @defgroup NT35510_Exported_Macros NT35510 Exported Macros
-  * @{
-  */
-
-/**
-  * @}
-  */
-
+/** @defgroup NT35510_Exported_Macros NT35510 Exported Macros */
 /* Exported functions --------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/** @addtogroup NT35510_Exported_Functions
-  * @{
-  */
-void DSI_IO_WriteCmd(uint32_t NbrParams, uint8_t *pParams);
-int32_t DSI_IO_ReadCmd(uint32_t Reg, uint8_t *pData, uint32_t Size);
-uint8_t NT35510_Init(uint32_t ColorCoding, uint32_t orientation);
-uint8_t NT35510_DeInit(void);
-void NT35510_IO_Delay(uint32_t Delay);
-uint16_t NT35510_ReadID(void);
-/**
-  * @}
-  */
+    /** @addtogroup NT35510_Exported_Functions */
+    uint8_t NT35510_Init(uint32_t ColorCoding, uint32_t orientation);
+    uint8_t NT35510_DeInit(void);
+    uint16_t NT35510_ReadID(void);
+    void    NT35510_IO_Delay(uint32_t Delay);
+
+    void    DSI_IO_WriteCmd(uint32_t NbrParams, uint8_t* pParams);
+    int32_t DSI_IO_ReadCmd(uint32_t Reg, uint8_t* pData, uint32_t Size);
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __NT35510_H */
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 

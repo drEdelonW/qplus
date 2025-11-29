@@ -46,7 +46,7 @@ FILE IO
 #define MAX_HANDLES             10
 static FILE* _sys_handles[MAX_HANDLES];
 
-WEAK int findhandle() {
+__weak int findhandle() {
     for (int i = 1; i < MAX_HANDLES; i++)
         if (!_sys_handles[i])
             return i;
@@ -59,7 +59,7 @@ WEAK int findhandle() {
 filelength
 ================
 */
-WEAK int filelength(FILE* f) {
+__weak int filelength(FILE* f) {
     int pos = ftell(f);
     fseek(f, 0, SEEK_END);
     int end = ftell(f);
@@ -68,7 +68,7 @@ WEAK int filelength(FILE* f) {
     return end;
 }
 
-WEAK int Sys_FileOpenRead(cStringRO path, int* hndl) {
+__weak int Sys_FileOpenRead(cStringRO path, int* hndl) {
     int i = findhandle();
 
     FILE* f = fopen(path, "rb");
@@ -82,7 +82,7 @@ WEAK int Sys_FileOpenRead(cStringRO path, int* hndl) {
     return filelength(f);
 }
 
-WEAK int Sys_FileOpenWrite(cStringRO path) {
+__weak int Sys_FileOpenWrite(cStringRO path) {
     int i = findhandle();
 
     FILE* f = fopen(path, "wb");
@@ -93,18 +93,18 @@ WEAK int Sys_FileOpenWrite(cStringRO path) {
     return i;
 }
 
-WEAK void Sys_FileClose(int handle) {
+__weak void Sys_FileClose(int handle) {
     fclose(_sys_handles[handle]);
     _sys_handles[handle] = NULL;
 }
 
-WEAK void Sys_FileSeek(int handle, int position) { fseek(_sys_handles[handle], position, SEEK_SET); }
+__weak void Sys_FileSeek(int handle, int position) { fseek(_sys_handles[handle], position, SEEK_SET); }
 
-WEAK int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) { return fread(dest, 1, count, _sys_handles[handle]); }
+__weak int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) { return fread(dest, 1, count, _sys_handles[handle]); }
 
-WEAK int Sys_FileWrite(int handle, TypeLess_ptr data, size_t count) { return fwrite(data, 1, count, _sys_handles[handle]); }
+__weak int Sys_FileWrite(int handle, TypeLess_ptr data, size_t count) { return fwrite(data, 1, count, _sys_handles[handle]); }
 
-WEAK int Sys_FileTime(cStringRO path) {
+__weak int Sys_FileTime(cStringRO path) {
     FILE* f;
 
     f = fopen(path, "rb");
@@ -116,7 +116,7 @@ WEAK int Sys_FileTime(cStringRO path) {
     return -1;
 }
 
-WEAK void Sys_mkdir(cStringRO path) {
+__weak void Sys_mkdir(cStringRO path) {
 }
 
 
@@ -128,10 +128,10 @@ SYSTEM IO
 ===============================================================================
 */
 
-WEAK void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
+__weak void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
 
 
-WEAK void Sys_Error(cStringRO error, ...) {
+__weak void Sys_Error(cStringRO error, ...) {
     printf("Sys_Error: ");
     va_list argptr;    va_start(argptr, error);
     vprintf(error, argptr);
@@ -141,30 +141,30 @@ WEAK void Sys_Error(cStringRO error, ...) {
     exit(1);
 }
 
-WEAK void Sys_Printf(cStringRO fmt, ...) {
+__weak void Sys_Printf(cStringRO fmt, ...) {
     va_list argptr;    va_start(argptr, fmt);
     vprintf(fmt, argptr);
     va_end(argptr);
 }
 
-WEAK void Sys_Quit() { exit(0); }
+__weak void Sys_Quit() { exit(0); }
 
-WEAK double Sys_FloatTime() {
+__weak double Sys_FloatTime() {
     static double _time;
     _time += 0.1;
     return _time;
 }
 
-WEAK cString Sys_ConsoleInput() { return NULL; }
+__weak cString Sys_ConsoleInput() { return NULL; }
 
-WEAK void Sys_Sleep() {}
-WEAK void Sys_SendKeyEvents() {}
-WEAK void Sys_HighFPPrecision() {}
-WEAK void Sys_LowFPPrecision() {}
+__weak void Sys_Sleep() {}
+__weak void Sys_SendKeyEvents() {}
+__weak void Sys_HighFPPrecision() {}
+__weak void Sys_LowFPPrecision() {}
 
 //=============================================================================
 
-WEAK int main(int argc, cStringArray argv) {
+__weak int main(int argc, cStringArray argv) {
     static QuakeParms_t	parms;
 
     parms.memsize = 8 * 1024 * 1024;

@@ -1,3 +1,4 @@
+#pragma once
 /**
   ******************************************************************************
   * @file    io.h
@@ -33,46 +34,22 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-  */ 
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __IO_H
-#define __IO_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif
+  */
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
 
-/** @addtogroup BSP
-  * @{
-  */
-
-/** @addtogroup Components
-  * @{
-  */
-    
-/** @addtogroup IO
-  * @{
-  */
-
-/** @defgroup IO_Exported_Types
-  * @{
-  */
-
-/**
-  * @brief  IO Bit SET and Bit RESET enumeration
-  */
-typedef enum
-{
+/** @addtogroup BSP */
+/** @addtogroup Components */
+/** @addtogroup IO */
+/** @defgroup IO_Exported_Types */
+/** IO Bit SET and Bit RESET enumeration */
+typedef enum {
   IO_PIN_RESET = 0,
   IO_PIN_SET
-}IO_PinState;
+} IO_PinState;
 
-typedef enum
-{
+typedef enum {
    IO_MODE_INPUT = 0,   /* input floating */
    IO_MODE_OUTPUT,      /* output Push Pull */
    IO_MODE_IT_RISING_EDGE,   /* float input - irq detect on rising edge */
@@ -99,52 +76,24 @@ typedef enum
    IO_MODE_IT_HIGH_LEVEL_PU,    /* push up resistor input - irq detect on high level */
    IO_MODE_IT_HIGH_LEVEL_PD,    /* push dw resistor input - irq detect on high level */
 
-}IO_ModeTypedef;
+} IO_ModeTypedef;
 
-/** @defgroup IO_Driver_structure  IO Driver structure
-  * @{
-  */
-typedef struct
-{  
+/** @defgroup IO_Driver_structure  IO Driver structure */
+typedef struct {
   void       (*Init)(uint16_t);
   uint16_t   (*ReadID)(uint16_t);
   void       (*Reset)(uint16_t);
-  
+
   void       (*Start)(uint16_t, uint32_t);
   uint8_t    (*Config)(uint16_t, uint32_t, IO_ModeTypedef);
   void       (*WritePin)(uint16_t, uint32_t, uint8_t);
   uint32_t   (*ReadPin)(uint16_t, uint32_t);
-  
+
   void       (*EnableIT)(uint16_t);
   void       (*DisableIT)(uint16_t);
   uint32_t    (*ITStatus)(uint16_t, uint32_t);
   void       (*ClearIT)(uint16_t, uint32_t);
-    
-}IO_DrvTypeDef;
-/**
-  * @}
-  */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __IO_H */
+} IO_DrvTypeDef;
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
