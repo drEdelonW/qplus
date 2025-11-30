@@ -73,7 +73,7 @@ int main(void) {
 
     /* Configure the system clock to 180 MHz */
     SystemClock_Config();
-
+    MX_USART1_UART_Init();
     /* Configure LED1 */
     // BSP_LED_Init(LED1);
 
@@ -436,3 +436,82 @@ void assert_failed(uint8_t* file, uint32_t line) {
     }
 }
 #endif
+
+#include "types.h"
+#include "perepherial.h"
+#include <sys/errno.h>
+#define VCP_RX_Pin GPIO_PIN_10
+#define VCP_RX_GPIO_Port GPIOA
+#define VCP_TX_Pin GPIO_PIN_9
+#define VCP_TX_GPIO_Port GPIOA
+static void USART1_GPIO_Clock_Init(void) {
+    /* Enable clocks for GPIOA and USART1 */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_USART1_CLK_ENABLE();
+
+    /* Configure PA9 (VCP_TX) and PA10 (VCP_RX) as USART1 AF7 */
+    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitStruct.Pin = VCP_TX_Pin | VCP_RX_Pin;   // PA9, PA10
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+
+UART_HandleTypeDef huart1 = {
+    .Instance = USART1,
+    .Init = {
+        .BaudRate = 115200,
+        .WordLength = UART_WORDLENGTH_8B,
+        .StopBits = UART_STOPBITS_1,
+        .Parity = UART_PARITY_NONE,
+        .Mode = UART_MODE_TX_RX,
+        .HwFlowCtl = UART_HWCONTROL_NONE,
+        .OverSampling = UART_OVERSAMPLING_16,
+        .OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE,
+    },
+    .AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT,
+};
+
+void MX_USART1_UART_Init() {
+    USART1_GPIO_Clock_Init();
+
+    if (HAL_UART_Init(&huart1) != HAL_OK) {
+        Error_Handler();
+    }
+
+    /* Raw init message over UART1 */
+    {
+        const char msg[] = "UART1 init OK\r\n";
+        (void)HAL_UART_Transmit(
+            &huart1,
+            (uint8_p)msg,
+            (uint16_t)(sizeof(msg) - 1),
+            HAL_MAX_DELAY
+        );
+    }
+}
+
+int _write(int file, const char *buf, int len) {
+    // stdout(1) и stderr(2) отправляем в UART
+    if ((file == 1) || (file == 2)) {
+        HAL_StatusTypeDef st = HAL_UART_Transmit(
+            &huart1,
+            (uint8_p)buf,
+            (uint16_t)len,
+            HAL_MAX_DELAY
+        );
+
+        if (st == HAL_OK) {
+            return len;
+        } else {
+            errno = EIO;
+            return -1;
+        }
+    }
+
+    // остальные файловые дескрипторы не поддерживаем
+    errno = EBADF;
+    return -1;
+}

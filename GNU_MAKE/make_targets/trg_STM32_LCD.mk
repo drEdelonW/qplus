@@ -1,18 +1,21 @@
 DST_PLATFORM := STM32
 include features/fh_HAL.mk
 
-$(eval FSRC_DIR = $(SRC_DIR)/STM32_LCD) $(eval INCLUDES += $(FSRC_DIR)/Inc)
-        SRC_LIST += $(FSRC_DIR)/Src/main.c
-        SRC_LIST += $(FSRC_DIR)/Src/stm32f7xx_it.c
-#         SRC_LIST += $(FSRC_DIR)/Src/system_stm32f7xx.c
+$(eval INCLUDES += ../src/engine/Shared/utils)
+$(eval INCLUDES += ../src/platform/MCU/STM32F7)
+
+$(eval FSRC_DIR = $(SRC_DIR)/STM32_LCD) $(eval INCLUDES += $(FSRC_DIR))
+        SRC_LIST += $(FSRC_DIR)/main.c
+        SRC_LIST += $(FSRC_DIR)/stm32f7xx_it.c
+#         SRC_LIST += $(FSRC_DIR)/system_stm32f7xx.c
 #         SRC_LIST += $(FSRC_DIR)/SW4STM32/syscalls.c
 #         SRC_LIST += $(FSRC_DIR)/SW4STM32/startup_stm32f769xx.s
-#         SRC_LIST += $(FSRC_DIR)/Src/fatfs_storage.c
-#         SRC_LIST += $(FSRC_DIR)/Src/sd_diskio.c
+
 
    $(eval CORE_DIR := $(STMSRC_DIR)/Core)
         $(eval INCLUDES += $(CORE_DIR)/Inc)
         SRC_LIST += $(CORE_DIR)/Src/syscalls.c
+#         SRC_LIST += $(CORE_DIR)/Src/stm32f7xx_it.c
         SRC_LIST += $(CORE_DIR)/Src/system_stm32f7xx.c
         SRC_LIST += $(CORE_DIR)/Startup/startup_stm32f769nihx.s
 
@@ -21,7 +24,7 @@ $(eval FSRC_DIR = $(SRC_DIR)/STM32_LCD) $(eval INCLUDES += $(FSRC_DIR)/Inc)
         SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery.c
         SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery_lcd.c
         SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery_sdram.c
-        SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/Components/otm8009a/otm8009a.c
+#         SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/Components/otm8009a/otm8009a.c
         SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/Components/nt35510/nt35510.c
 
 # IDSRC_DIR := /Users/edelon/SelfLab/STM32_src_docs/STM32CubeF7
