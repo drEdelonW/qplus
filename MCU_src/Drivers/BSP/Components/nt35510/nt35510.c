@@ -84,23 +84,23 @@ uint8_t NT35510_Init(uint32_t ColorCoding, uint32_t orientation) {
   const uint8_t nt35510_reg22[] = { 0x00, 0x00, 0x00, 0xBC };
   const uint8_t nt35510_reg23[] = { 0x03, 0x00, 0x00, 0xCC };
   const uint8_t nt35510_reg24[] = { 0xBA, 0x01 };
-  const uint8_t nt35510_madctl_portrait[] = { NT35510_CMD_MADCTL ,0x00 };
-  const uint8_t nt35510_caset_portrait[] = { 0x00, 0x00, 0x01, 0xDF ,NT35510_CMD_CASET };
-  const uint8_t nt35510_raset_portrait[] = { 0x00, 0x00, 0x03, 0x1F ,NT35510_CMD_RASET };
-  const uint8_t nt35510_madctl_landscape[] = { NT35510_CMD_MADCTL, 0x60 };
-  const uint8_t nt35510_caset_landscape[] = { 0x00, 0x00, 0x03, 0x1F ,NT35510_CMD_CASET };
-  const uint8_t nt35510_raset_landscape[] = { 0x00, 0x00, 0x01, 0xDF ,NT35510_CMD_RASET };
-  const uint8_t nt35510_reg26[] = { NT35510_CMD_TEEON, 0x00 };  /* Tear on */
-  const uint8_t nt35510_reg27[] = { NT35510_CMD_SLPOUT, 0x00 }; /* Sleep out */
-  const uint8_t nt35510_reg30[] = { NT35510_CMD_DISPON, 0x00 };
+  const uint8_t nt35510_madctl_portrait[] = { Cmd_MadCtl ,NT35510_MADCTR_MODE_PORTRAIT };
+  const uint8_t nt35510_caset_portrait[] = { 0x00, 0x00, 0x01, 0xDF ,Cmd_CaSet };
+  const uint8_t nt35510_raset_portrait[] = { 0x00, 0x00, 0x03, 0x1F ,Cmd_RaSet };
+  const uint8_t nt35510_madctl_landscape[] = { Cmd_MadCtl, NT35510_MADCTR_MODE_LANDSCAPE };
+  const uint8_t nt35510_caset_landscape[] = { 0x00, 0x00, 0x03, 0x1F ,Cmd_CaSet };
+  const uint8_t nt35510_raset_landscape[] = { 0x00, 0x00, 0x01, 0xDF ,Cmd_RaSet };
+  const uint8_t nt35510_reg26[] = { Cmd_TeOn, 0x00 };  /* Tear on */
+  const uint8_t nt35510_reg27[] = { Cmd_SlpOut, 0x00 }; /* Sleep out */
+  const uint8_t nt35510_reg30[] = { Cmd_DispOn, 0x00 };
 
-  const uint8_t nt35510_reg31[] = { NT35510_CMD_WRDISBV, 0x7F };
-  const uint8_t nt35510_reg32[] = { NT35510_CMD_WRCTRLD, 0x2C };
-  const uint8_t nt35510_reg33[] = { NT35510_CMD_WRCABC, 0x02 };
-  const uint8_t nt35510_reg34[] = { NT35510_CMD_WRCABCMB, 0xFF };
-  const uint8_t nt35510_reg35[] = { NT35510_CMD_RAMWR, 0x00 };
-  const uint8_t nt35510_reg36[] = { NT35510_CMD_COLMOD, NT35510_COLMOD_RGB565 };
-  const uint8_t nt35510_reg37[] = { NT35510_CMD_COLMOD, NT35510_COLMOD_RGB888 };
+  const uint8_t nt35510_reg31[] = { Cmd_WrDisbv, 0x7F };
+  const uint8_t nt35510_reg32[] = { Cmd_WrCtrld, 0x2C };
+  const uint8_t nt35510_reg33[] = { Cmd_WrCabc, 0x02 };
+  const uint8_t nt35510_reg34[] = { Cmd_WrCabcMb, 0xFF };
+  const uint8_t nt35510_reg35[] = { Cmd_RamWr, 0x00 };
+  const uint8_t nt35510_reg36[] = { Cmd_ColMod, NT35510_COLMOD_RGB565 };
+  const uint8_t nt35510_reg37[] = { Cmd_ColMod, NT35510_COLMOD_RGB888 };
 
   DSI_IO_WriteCmd(5, (uint8_t*)nt35510_reg); /* LV2:  Page 1 enable */
   DSI_IO_WriteCmd(3, (uint8_t*)nt35510_reg1);/* AVDD: 5.2V */
@@ -162,10 +162,8 @@ uint8_t NT35510_Init(uint32_t ColorCoding, uint32_t orientation) {
   case NT35510_FORMAT_RBG565: { /* Set Pixel color format to RGB565 */
     DSI_IO_WriteCmd(1, (uint8_t*)nt35510_reg36);
   } break;
+  default:  /* Set Pixel color format to RGB888 */
   case NT35510_FORMAT_RGB888: { /* Set Pixel color format to RGB888 */
-    DSI_IO_WriteCmd(1, (uint8_t*)nt35510_reg37);
-  } break;
-  default: { /* Set Pixel color format to RGB888 */
     DSI_IO_WriteCmd(1, (uint8_t*)nt35510_reg37);
   } break;
   }
@@ -192,8 +190,8 @@ uint8_t NT35510_Init(uint32_t ColorCoding, uint32_t orientation) {
 }
 
 uint8_t NT35510_DeInit(void) {
-  const uint8_t nt35510_reg30b[] = { NT35510_CMD_DISPOFF, 0x00 };
-  const uint8_t nt35510_reg27b[] = { NT35510_CMD_SLPIN, 0x00 };
+  const uint8_t nt35510_reg30b[] = { Cmd_DispOff, 0x00 };
+  const uint8_t nt35510_reg27b[] = { Cmd_SlpIn, 0x00 };
   /* Display off */
   DSI_IO_WriteCmd(0, (uint8_t*)nt35510_reg30b);
   NT35510_IO_Delay(120);
@@ -208,6 +206,6 @@ uint8_t NT35510_DeInit(void) {
 */
 uint16_t NT35510_ReadID(void) {
   uint8_t pData = 0;
-  DSI_IO_ReadCmd(NT35510_CMD_RDID2, &pData, 1);
+  DSI_IO_ReadCmd(Cmd_RdId2, &pData, 1);
   return pData;
 }
