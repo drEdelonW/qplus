@@ -1,3 +1,4 @@
+#pragma once
 /**
   ******************************************************************************
   * @file    stm32f7xx_hal_conf.h
@@ -14,15 +15,8 @@
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
-  */
+*/
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F7xx_HAL_CONF_H
-#define __STM32F7xx_HAL_CONF_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -467,10 +461,5 @@
 #endif /* USE_FULL_ASSERT */
 
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __STM32F7xx_HAL_CONF_H */
  
 

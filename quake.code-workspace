@@ -147,7 +147,8 @@
 			"sd_tf.h": "c",
 			"fs_fat32.h": "c",
 			"complex": "c",
-			"variant": "c"
+			"variant": "c",
+			"nt35510.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}
