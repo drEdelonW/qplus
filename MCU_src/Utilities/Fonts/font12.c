@@ -38,56 +38,20 @@
 /* Includes ------------------------------------------------------------------*/
 #include "fonts.h"
 
-/** @addtogroup Utilities
-  * @{
-  */
-  
-/** @addtogroup STM32_EVAL
-  * @{
-  */ 
-
-/** @addtogroup Common
-  * @{
-  */
-
+/** @addtogroup Utilities */
+/** @addtogroup STM32_EVAL */ 
+/** @addtogroup Common */
 /** @addtogroup FONTS
-  * @brief      This file provides text Font12 for STM32xx-EVAL's LCD driver.
-  * @{
-  */  
-
-/** @defgroup FONTS_Private_Types
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-
-/** @defgroup FONTS_Private_Defines
-  * @{
-  */
-/**
-  * @}
-  */ 
-
-
-/** @defgroup FONTS_Private_Macros
-  * @{
-  */
-/**
-  * @}
-  */ 
-  
-
-/** @defgroup FONTS_Private_Variables
-  * @{
-  */
+  * @brief      This file provides text Font12 for STM32xx-EVAL's LCD driver. */  
+/** @defgroup FONTS_Private_Types */ 
+/** @defgroup FONTS_Private_Defines */
+/** @defgroup FONTS_Private_Macros */
+/** @defgroup FONTS_Private_Variables */
 // 
 //  Font data for Courier New 12pt
 // 
 
-const uint8_t Font12_Table[] = 
-{
+const uint8_t Font12_Table[] = {
 	// @0 ' ' (7 pixels wide)
 	0x00, //        
 	0x00, //        
@@ -1425,40 +1389,6 @@ sFONT Font12 = {
   12, /* Height */
 };
 
-/**
-  * @}
-  */ 
-
-
-/** @defgroup FONTS_Private_Function_Prototypes
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-
-/** @defgroup FONTS_Private_Functions
-  * @{
-  */
-    
-/**
-  * @}
-  */
-  
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */  
+/** @defgroup FONTS_Private_Function_Prototypes */ 
+/** @defgroup FONTS_Private_Functions */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

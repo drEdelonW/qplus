@@ -148,7 +148,8 @@
 			"fs_fat32.h": "c",
 			"complex": "c",
 			"variant": "c",
-			"nt35510.h": "c"
+			"nt35510.h": "c",
+			"stm32f769i_discovery_lcd.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

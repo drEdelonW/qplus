@@ -148,8 +148,8 @@ typedef enum {
 DMA2D_HandleTypeDef hdma2d_discovery;
 LTDC_HandleTypeDef  hltdc_discovery;
 DSI_HandleTypeDef hdsi_discovery;
-uint32_t lcd_x_size = OTM8009A_800X480_WIDTH;
-uint32_t lcd_y_size = OTM8009A_800X480_HEIGHT;
+uint32_t lcd_x_size = NT35510_800X480_WIDTH;
+uint32_t lcd_y_size = NT35510_800X480_HEIGHT;
 LCD_Driver_t        Lcd_Driver_Type = LCD_CTRL_NT35510;
 
 
@@ -287,13 +287,13 @@ uint8_t BSP_LCD_InitEx(LCD_OrientationTypeDef orientation) {
     * Set Timing parameters of LTDC depending on its chosen orientation
   */
     if (orientation == LCD_ORIENTATION_PORTRAIT) {
-        lcd_x_size = OTM8009A_480X800_WIDTH;  /* 480 */
-        lcd_y_size = OTM8009A_480X800_HEIGHT; /* 800 */
+        lcd_x_size = NT35510_480X800_WIDTH;  /* 480 */
+        lcd_y_size = NT35510_480X800_HEIGHT; /* 800 */
     }
     else {
         /* lcd_orientation == LCD_ORIENTATION_LANDSCAPE */
-        lcd_x_size = OTM8009A_800X480_WIDTH;  /* 800 */
-        lcd_y_size = OTM8009A_800X480_HEIGHT; /* 480 */
+        lcd_x_size = NT35510_800X480_WIDTH;  /* 800 */
+        lcd_y_size = NT35510_800X480_HEIGHT; /* 480 */
     }
 
     HACT = lcd_x_size;
@@ -686,30 +686,30 @@ void BSP_LCD_SetYSize(uint32_t imageHeightPixels) {
   * @retval None
 */
 void BSP_LCD_LayerDefaultInit(uint16_t LayerIndex, uint32_t FB_Address) {
-    LCD_LayerCfgTypeDef  Layercfg;
-
-    /* Layer Init */
-    Layercfg.WindowX0 = 0;
-    Layercfg.WindowX1 = BSP_LCD_GetXSize();
-    Layercfg.WindowY0 = 0;
-    Layercfg.WindowY1 = BSP_LCD_GetYSize();
-    Layercfg.PixelFormat = LTDC_PIXEL_FORMAT_ARGB8888;
-    Layercfg.FBStartAdress = FB_Address;
-    Layercfg.Alpha = 255;
-    Layercfg.Alpha0 = 0;
-    Layercfg.Backcolor.Blue = 0;
-    Layercfg.Backcolor.Green = 0;
-    Layercfg.Backcolor.Red = 0;
-    Layercfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
-    Layercfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
-    Layercfg.ImageWidth = BSP_LCD_GetXSize();
-    Layercfg.ImageHeight = BSP_LCD_GetYSize();
-
+    LCD_LayerCfgTypeDef  Layercfg = { /* Layer Init */
+        .WindowX0           = 0,
+        .WindowX1           = BSP_LCD_GetXSize(),
+        .WindowY0           = 0,
+        .WindowY1           = BSP_LCD_GetYSize(),
+        .PixelFormat        = LTDC_PIXEL_FORMAT_ARGB8888,
+        .Alpha              = 0xFFu,
+        .Alpha0             = 0x00u,
+        .BlendingFactor1    = LTDC_BLENDING_FACTOR1_PAxCA,
+        .BlendingFactor2    = LTDC_BLENDING_FACTOR2_PAxCA,
+        .FBStartAdress      = FB_Address,
+        .ImageWidth         = BSP_LCD_GetXSize(),
+        .ImageHeight        = BSP_LCD_GetYSize(),
+        .Backcolor          = {
+            .Blue   = 0,
+            .Green  = 0,
+            .Red    = 0
+        }
+    };
     HAL_LTDC_ConfigLayer(&hltdc_discovery, &Layercfg, LayerIndex);
 
-    DrawProp[LayerIndex].BackColor = LCD_COLOR_WHITE;
+    DrawProp[LayerIndex].BackColor = Color_White;
     DrawProp[LayerIndex].pFont = &Font24;
-    DrawProp[LayerIndex].TextColor = LCD_COLOR_BLACK;
+    DrawProp[LayerIndex].TextColor = Color_Black;
 }
 
 
@@ -1367,7 +1367,7 @@ void BSP_LCD_DisplayOn(void) {
         HAL_DSI_ShortWrite(&(hdsi_discovery),
             hdsivideo_handle.VirtualChannelID,
             DSI_DCS_SHORT_PKT_WRITE_P1,
-            OTM8009A_CMD_DISPON,
+            Cmd_DispOn,
             0x00);
     }
 }
@@ -1387,7 +1387,7 @@ void BSP_LCD_DisplayOff(void) {
         HAL_DSI_ShortWrite(&(hdsi_discovery),
             hdsivideo_handle.VirtualChannelID,
             DSI_DCS_SHORT_PKT_WRITE_P1,
-            OTM8009A_CMD_DISPOFF,
+            Cmd_DispOff,
             0x00);
     }
 }
@@ -1407,7 +1407,7 @@ void BSP_LCD_SetBrightness(uint8_t BrightnessValue) {
         HAL_DSI_ShortWrite(&hdsi_discovery,
             LCD_Driver_ID,
             DSI_DCS_SHORT_PKT_WRITE_P1,
-            OTM8009A_CMD_WRDISBV, (uint16_t)(BrightnessValue * 255) / 100);
+            Cmd_WrDisbv, (uint16_t)(BrightnessValue * 255) / 100);
     }
 }
 

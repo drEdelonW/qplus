@@ -79,10 +79,14 @@ int main(void) {
 
     /*##-1- Configure LCD ######################################################*/
     LCD_Config();
-
-    BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-    BSP_LCD_SetBackColor(LCD_COLOR_GRAY);
-    BSP_LCD_DisplayStringAtLine(0, (uint8_t*)"!!!LCD WORK!!!");
+    // BSP_LCD_SetBrightness(0xFF);
+    BSP_LCD_SetTextColor(Color_Green);
+    BSP_LCD_SetBackColor(Color_Gray);
+    // BSP_LCD_SetFont(&Font24);
+    // BSP_LCD_DisplayStringAtLine(0, (uint8_t*)"!!!LCD WORK!!!");
+    BSP_LCD_DisplayStringAt(0, 0, "!!!LCD WORK!!!", CENTER_MODE);
+    BSP_LCD_SetFont(&Font20);
+    BSP_LCD_DisplayStringAtLine(4, (uint8_t*)"!!!LCD WORK!!!");
     while (1) { ; }
 #if 0
     /*##-2- Link the SD Card disk I/O driver ###################################*/
@@ -242,7 +246,7 @@ static void LCD_Config(void) {
     BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
 
     /* Clear the Background Layer */
-    BSP_LCD_Clear(LCD_COLOR_WHITE);
+    BSP_LCD_Clear(Color_White);
     // BSP_LCD_Clear(LCD_COLOR_BLACK);
 
     BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_FOREGROUND, LCD_BG_LAYER_ADDRESS);
@@ -251,7 +255,7 @@ static void LCD_Config(void) {
     BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
 
     /* Clear the Foreground Layer */
-    BSP_LCD_Clear(LCD_COLOR_WHITE);
+    BSP_LCD_Clear(Color_White);
     // BSP_LCD_Clear(LCD_COLOR_BLACK);
 
     /* Configure the transparency for foreground and background :
