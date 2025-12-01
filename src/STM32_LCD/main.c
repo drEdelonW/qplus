@@ -19,275 +19,10 @@
   /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include <stdio.h>
-/** @addtogroup STM32F7xx_HAL_Applications */
-/** @addtogroup LCD_PicturesFromSDCard */
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-// FATFS SD_FatFs;  /* File system object for SD card logical drive */
-// char SD_Path[4]; /* SD card logical drive path */
-// #define MAX_BMP_FILES     25
-// #define MAX_BMP_FILE_NAME 11
-// char* pDirectoryFiles[MAX_BMP_FILES];
-// uint8_t  ubNumberOfFiles = 0;
-// uint32_t uwBmplen = 0;
-
-/* Internal Buffer defined in SDRAM memory */
 uint8_t* uwInternalBuffer;
 
 /* Private function prototypes -----------------------------------------------*/
-static void MPU_Config(void);
-static void LCD_Config(void);
-static void SystemClock_Config(void);
-void Error_Handler(void);
-static void CPU_CACHE_Enable(void);;
-
-/* Private functions ---------------------------------------------------------*/
-
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
-int main(void) {
-    // uint32_t counter = 0;
-    // uint32_t transparency = 0;
-    // uint8_t str[30];
-    uwInternalBuffer = (uint8_t*)INTERNAL_BUFFER_START_ADDRESS;
-
-    /* Configure the MPU attributes */
-    MPU_Config();
-
-    /* Enable the CPU Cache */
-    CPU_CACHE_Enable();
-
-    /* STM32F7xx HAL library initialization:
-         - Configure the Flash ART accelerator on ITCM interface
-         - Configure the Systick to generate an interrupt each 1 msec
-         - Set NVIC Group Priority to 4
-         - Global MSP (MCU Support Package) initialization
-       */
-    HAL_Init();
-
-    /* Configure the system clock to 180 MHz */
-    SystemClock_Config();
-    MX_USART1_UART_Init();
-    /* Configure LED1 */
-    // BSP_LED_Init(LED1);
-
-    /*##-1- Configure LCD ######################################################*/
-    LCD_Config();
-    // BSP_LCD_SetBrightness(0xFF);
-    BSP_LCD_SetTextColor(Color_Green);
-    BSP_LCD_SetBackColor(Color_Gray);
-    // BSP_LCD_SetFont(&Font24);
-    // BSP_LCD_DisplayStringAtLine(0, (uint8_t*)"!!!LCD WORK!!!");
-    BSP_LCD_DisplayStringAt(0, 0, "!!!LCD WORK!!!", CENTER_MODE);
-    BSP_LCD_SetFont(&Font20);
-    BSP_LCD_DisplayStringAtLine(4, (uint8_t*)"!!!LCD WORK!!!");
-    while (1) { ; }
-#if 0
-    /*##-2- Link the SD Card disk I/O driver ###################################*/
-    // if(FATFS_LinkDriver(&SD_Driver, SD_Path) == 0)
-    {
-        /*##-3- Initialize the Directory Files pointers (heap) ###################*/
-        for (counter = 0; counter < MAX_BMP_FILES; counter++) {
-            pDirectoryFiles[counter] = malloc(MAX_BMP_FILE_NAME);
-            if (pDirectoryFiles[counter] == NULL) {
-                /* Set the Text Color */
-                BSP_LCD_SetTextColor(LCD_COLOR_RED);
-
-                BSP_LCD_DisplayStringAtLine(8, (uint8_t*)"  Cannot allocate memory ");
-                while (1) { ; }
-            }
-        }
-
-        /* Get the BMP file names on root directory */
-        // ubNumberOfFiles = Storage_GetDirectoryBitmapFiles("/Media", pDirectoryFiles);
-
-        if (ubNumberOfFiles == 0) {
-            for (counter = 0; counter < MAX_BMP_FILES; counter++) {
-                free(pDirectoryFiles[counter]);
-            }
-            BSP_LCD_DisplayStringAtLine(8, (uint8_t*)"  No more Bitmap files...      ");
-            while (1) { ; }
-        }
-    }
-    // else
-    // {
-    //   /* FatFs Initialization Error */
-    //   Error_Handler();
-    // }
-
-    /* Main infinite loop */
-    while (1) {
-        counter = 0;
-
-        while ((counter) < ubNumberOfFiles) {
-            /* Step1 : Display on Foreground layer -------------------------------*/
-            /* Format the string */
-            sprintf((char*)str, "Media/%-11.11s", pDirectoryFiles[counter]);
-
-            // if (Storage_CheckBitmapFile((const char*)str, &uwBmplen) == 0)
-            {
-                /* Format the string */
-                sprintf((char*)str, "Media/%-11.11s", pDirectoryFiles[counter]);
-
-                /* Set LCD foreground Layer */
-                BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
-
-                /* Open a file and copy its content to an internal buffer */
-                // Storage_OpenReadFile(uwInternalBuffer, (const char*)str);
-
-                /* Write bmp file on LCD frame buffer */
-                BSP_LCD_DrawBitmap(0, 0, uwInternalBuffer);
-
-                /* Configure the transparency for background layer : Increase the transparency */
-                for (transparency = 0; transparency < 255; (transparency++)) {
-                    BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, transparency);
-
-                    /* Insert a delay of display */
-                    HAL_Delay(10);
-                }
-
-                /* Configure the transparency for foreground layer : decrease the transparency */
-                for (transparency = 255; transparency > 0; transparency--) {
-                    BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, transparency);
-
-                    /* Insert a delay of display */
-                    HAL_Delay(10);
-                }
-
-                HAL_Delay(1000);
-
-                /* Clear the Foreground Layer */
-                BSP_LCD_Clear(LCD_COLOR_BLACK);
-
-                /* Jump to the next image */
-                counter++;
-
-                /* Step2 : Display on Background layer -----------------------------*/
-                /* Format the string */
-                sprintf((char*)str, "Media/%-11.11s", pDirectoryFiles[counter]);
-
-                // if ((Storage_CheckBitmapFile((const char*)str, &uwBmplen) == 0) || (counter < (ubNumberOfFiles)))
-                {
-                    /* Connect the Output Buffer to LCD Background Layer  */
-                    BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
-
-                    /* Format the string */
-                    sprintf((char*)str, "Media/%-11.11s", pDirectoryFiles[counter]);
-
-                    /* Open a file and copy its content to an internal buffer */
-                    // Storage_OpenReadFile(uwInternalBuffer, (const char*)str);
-
-                    /* Write bmp file on LCD frame buffer */
-                    BSP_LCD_DrawBitmap(0, 0, uwInternalBuffer);
-
-                    /* Configure the transparency for background layer : decrease the transparency */
-                    for (transparency = 0; transparency < 255; (transparency++)) {
-                        BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_BACKGROUND, transparency);
-
-                        /* Insert a delay of display */
-                        HAL_Delay(10);
-                    }
-
-                    HAL_Delay(1000);
-
-                    /* Step3 : -------------------------------------------------------*/
-                    /* Configure the transparency for background layer : Increase the transparency */
-                    for (transparency = 255; transparency > 0; transparency--) {
-                        BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_BACKGROUND, transparency);
-
-                        /* Insert a delay of display */
-                        HAL_Delay(10);
-                    }
-
-                    HAL_Delay(1000);
-
-                    /* Clear the Background Layer */
-                    BSP_LCD_Clear(LCD_COLOR_BLACK);
-
-                    counter++;
-                }
-                // else if (Storage_CheckBitmapFile((const char*)str, &uwBmplen) == 0)
-                {
-                    /* Set the Text Color */
-                    BSP_LCD_SetTextColor(LCD_COLOR_RED);
-
-                    BSP_LCD_DisplayStringAtLine(7, (uint8_t*)str);
-                    BSP_LCD_DisplayStringAtLine(8, (uint8_t*)"    File type not supported. ");
-                    while (1) { ; }
-                }
-            }
-        }
-    }
-#endif
-}
-
-/**
-  * @brief  LCD configuration
-  * @param  None
-  * @retval None
-  */
-static void LCD_Config(void) {
-    uint8_t lcd_status = LCD_OK;
-
-    /* LCD DSI initialization in mode Video Burst */
-    /* Initialize DSI LCD */
-    BSP_LCD_Init();
-    while (lcd_status != LCD_OK);
-
-    BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_BACKGROUND, LCD_FB_START_ADDRESS);
-
-    /* Select the LCD Background Layer */
-    BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
-
-    /* Clear the Background Layer */
-    BSP_LCD_Clear(Color_White);
-    // BSP_LCD_Clear(LCD_COLOR_BLACK);
-
-    BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_FOREGROUND, LCD_BG_LAYER_ADDRESS);
-
-    /* Select the LCD Foreground Layer */
-    BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
-
-    /* Clear the Foreground Layer */
-    BSP_LCD_Clear(Color_White);
-    // BSP_LCD_Clear(LCD_COLOR_BLACK);
-
-    /* Configure the transparency for foreground and background :
-    Increase the transparency */
-    BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_BACKGROUND, 0);
-    BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 100);
-}
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  None
-  * @retval None
-  */
-void Error_Handler(void) {
-    /* Turn LED1 on */
-    // BSP_LED_On(LED1);
-    while (1) {
-    }
-}
-
-/**
-  * @brief  CPU L1-Cache enable.
-  * @param  None
-  * @retval None
-  */
-static void CPU_CACHE_Enable(void) {
-    /* Enable I-Cache */
-    SCB_EnableICache();
-
-    /* Enable D-Cache */
-    SCB_EnableDCache();
-}
 
 /**
   * @brief  System Clock Configuration
@@ -309,7 +44,7 @@ static void CPU_CACHE_Enable(void) {
   *            Flash Latency(WS)              = 5
   * @param  None
   * @retval None
-  */
+*/
 static void SystemClock_Config(void) {
     RCC_ClkInitTypeDef RCC_ClkInitStruct;
     RCC_OscInitTypeDef RCC_OscInitStruct;
@@ -359,15 +94,13 @@ static void SystemClock_Config(void) {
 }
 
 
-/**
-  * @brief  Configure the MPU attributes
-  * @param  None
-  * @retval None
-  */
-static void MPU_Config(void) {
+void Error_Handler(void) {
+    while (1) {}
+}
 
-    /* Disable the MPU */
-    HAL_MPU_Disable();
+/** Configure the MPU attributes */
+void MPU_Config(void) {
+    HAL_MPU_Disable();    /* Disable the MPU */
 
     /* Configure the MPU as Strongly ordered for not defined regions */
     MPU_Region_InitTypeDef MPU_WholeRange = (MPU_Region_InitTypeDef){
@@ -399,7 +132,6 @@ static void MPU_Config(void) {
         .IsCacheable        = MPU_ACCESS_CACHEABLE,
         .IsBufferable       = MPU_ACCESS_NOT_BUFFERABLE
     };
-
     HAL_MPU_ConfigRegion(&MPU_SdramRange);
 
     /* Configure the MPU attributes FMC control registers */
@@ -416,12 +148,83 @@ static void MPU_Config(void) {
         .IsCacheable      = MPU_ACCESS_NOT_CACHEABLE,
         .IsBufferable     = MPU_ACCESS_BUFFERABLE
     };
-
     HAL_MPU_ConfigRegion(&MPU_FMCRange);
 
-    /* Enable the MPU */
-    HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+    HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);    /* Enable the MPU */
 }
+
+
+/** CPU L1-Cache enable. */
+void CPU_CACHE_Enable(void) {
+    SCB_EnableICache(); /* Enable I-Cache */
+    SCB_EnableDCache(); /* Enable D-Cache */
+}
+
+void MX_USART1_UART_Init(); //extern from src/platform/MCU/STM32F7/perepherial.c
+
+int main(void) {
+    uwInternalBuffer = (uint8_t*)INTERNAL_BUFFER_START_ADDRESS;
+
+    MPU_Config();       /* Configure the MPU attributes */
+    CPU_CACHE_Enable(); /* Enable the CPU Cache */
+
+    /* STM32F7xx HAL library initialization:
+         - Configure the Flash ART accelerator on ITCM interface
+         - Configure the Systick to generate an interrupt each 1 msec
+         - Set NVIC Group Priority to 4
+         - Global MSP (MCU Support Package) initialization
+       */
+    HAL_Init();
+    SystemClock_Config();   /* Configure the system clock to 180 MHz */
+
+    MX_USART1_UART_Init();
+
+    /*##-1- Configure LCD ######################################################*/
+       /* LCD DSI initialization in mode Video Burst */
+    /* Initialize DSI LCD */
+    BSP_LCD_Init();
+    BSP_LCD_Clear(Color_Black); BSP_LCD_Clear(Color_Black); BSP_LCD_Clear(Color_Black);
+
+    BSP_LCD_LayerDefaultInit(background, LCD_FB_START_ADDRESS);
+    BSP_LCD_SetTransparency(background, 0x80);
+    BSP_LCD_SelectLayer(background);    /* Select the LCD Background Layer */
+    BSP_LCD_Clear(Color_Blue);          /* Clear the Background Layer */
+
+    BSP_LCD_LayerDefaultInit(foreground, LCD_BG_LAYER_ADDRESS);
+    BSP_LCD_SetTransparency(foreground, 0x80);
+    BSP_LCD_SelectLayer(foreground);    /* Select the LCD Foreground Layer */
+    BSP_LCD_Clear(Color_Red);           /* Clear the Foreground Layer */
+
+    /* Configure the transparency for foreground and background : Increase the transparency */
+    /*##-1- Configure LCD END ######################################################*/
+
+
+    // BSP_LCD_SetBrightness(0xFF);
+    BSP_LCD_SetTextColor(Color_White);
+    BSP_LCD_SetBackColor(Color_Black);
+    // BSP_LCD_SetFont(&Font24);
+    // BSP_LCD_DisplayStringAtLine(0, (uint8_t*)"!!!LCD WORK!!!");
+    BSP_LCD_DisplayStringAt(0, 0, "!!!LCD WORK!!!", CENTER_MODE);
+    BSP_LCD_SetFont(&Font20);
+    BSP_LCD_DisplayStringAtLine(4, "!!!LCD WORK!!!");
+    BSP_LCD_DisplayStringAt(0, 440, "!!!LCD WORK!!!", CENTER_MODE);
+    int y = 480;
+#if 1
+    for (int i = 0; i < y; i++) {
+        BSP_LCD_DrawPixel(i, i, Color_Black);
+        BSP_LCD_DrawPixel(i + y, y - i, Color_Black);
+    }
+#else
+    BSP_LCD_SetTextColor(Color_Black);
+    BSP_LCD_DrawLine(0, 0, y, y);
+    BSP_LCD_DrawLine(y + y, 0, y, y);
+#endif
+    while (1) { ; }
+
+}
+
+
+
 
 #ifdef  USE_FULL_ASSERT
 /**
@@ -497,7 +300,7 @@ void MX_USART1_UART_Init() {
     }
 }
 
-int _write(int file, const char *buf, int len) {
+int _write(int file, const char* buf, int len) {
     // stdout(1) и stderr(2) отправляем в UART
     if ((file == 1) || (file == 2)) {
         HAL_StatusTypeDef st = HAL_UART_Transmit(
@@ -509,7 +312,8 @@ int _write(int file, const char *buf, int len) {
 
         if (st == HAL_OK) {
             return len;
-        } else {
+        }
+        else {
             errno = EIO;
             return -1;
         }
