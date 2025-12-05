@@ -1,4 +1,5 @@
 #include "perepherial.h"
+#include "terminal_tools.h"
 
 
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
@@ -361,19 +362,19 @@ void MX_LTDC_Init() {
         Error_Handler();
     }
     LTDC_LayerCfgTypeDef pLayerCfg = {
-        .WindowX0           = 0,
-        .WindowX1           = 200,
-        .WindowY0           = 0,
-        .WindowY1           = 480,
-        .PixelFormat        = LTDC_PIXEL_FORMAT_RGB565,
-        .Alpha              = 255,
-        .Alpha0             = 0,
-        .BlendingFactor1    = LTDC_BLENDING_FACTOR1_PAxCA,
-        .BlendingFactor2    = LTDC_BLENDING_FACTOR2_PAxCA,
-        .FBStartAdress      = 0xC0000000,
-        .ImageWidth         = 200,
-        .ImageHeight        = 480,
-        .Backcolor  = {
+        .WindowX0 = 0,
+        .WindowX1 = 200,
+        .WindowY0 = 0,
+        .WindowY1 = 480,
+        .PixelFormat = LTDC_PIXEL_FORMAT_RGB565,
+        .Alpha = 255,
+        .Alpha0 = 0,
+        .BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA,
+        .BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA,
+        .FBStartAdress = 0xC0000000,
+        .ImageWidth = 200,
+        .ImageHeight = 480,
+        .Backcolor = {
             .Blue = 0,
             .Green = 0,
             .Red = 0,
@@ -1093,6 +1094,7 @@ void PrintCpuClock() {
     printf("PCLK2:     %.f MHz\r\n", (double)pclk2 / 1000000.0);
 }
 
+void LCD_Init(); // TODO move to h-file
 void Pereph_Init() {
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
@@ -1100,14 +1102,17 @@ void Pereph_Init() {
     MX_FMC_Init();	        // SDRAM 16MB   [V]
 
     MX_USART1_UART_Init();  // DEBUG UART   [V]
-    printf("\nDEBUG UART started\n");   PrintCpuClock();
+    printf(CLEAR_SCREEN "\nDEBUG UART " TEXT_GREEN "started" TEXT_RESET "\n");
+    PrintCpuClock();
 
+    LCD_Init();
     MX_SDMMC2_SD_Init();	// FileSystem   [V] TODO: rework FAT32/PartTable
 
     // MX_ADC1_Init();
     // MX_ADC3_Init();
     // MX_CRC_Init();
 
+    PrintCpuClock();
     // MX_LTDC_Init();         // display framebufer
     // MX_DMA2D_Init();        // 2D accelerator
     // MX_DSIHOST_DSI_Init();  // Display

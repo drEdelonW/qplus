@@ -345,7 +345,7 @@ void Host_Savegame_f() {
 
     Con_Printf("Saving game to %s...\n", name);
     FILE* saveFile = fopen(name, "w");
-    if (!saveFile) { ;     Con_Printf("ERROR: couldn't open.\n"); return; }
+    if (!saveFile) { ;     Con_Printf("ERROR: couldn't open[w].\n"); return; }
 
     fprintf(saveFile, "%i\n", SAVEGAME_VERSION);
     char comment[SAVEGAME_COMMENT_LENGTH + 1];
@@ -397,7 +397,7 @@ void Host_Loadgame_f() {
 
     Con_Printf("Loading game from %s...\n", name);
     FILE* loadFile = fopen(name, "r");
-    if (!loadFile) { Con_Printf("ERROR: couldn't open.\n"); return; }
+    if (!loadFile) { Con_Printf("ERROR: couldn't open[r].\n"); return; }
 
     int32_t version;
     fscanf(loadFile, "%i\n", &version);
@@ -504,7 +504,7 @@ void SaveGamestate() {
 
     Con_Printf("Saving game to %s...\n", name);
     FILE* saveGStFile = fopen(name, "w");
-    if (!saveGStFile) { Con_Printf("ERROR: couldn't open.\n");  return; }
+    if (!saveGStFile) { Con_Printf("ERROR: couldn't open[w].\n");  return; }
 
     fprintf(saveGStFile, "%i\n", SAVEGAME_VERSION);
 
@@ -543,7 +543,7 @@ int LoadGamestate(cString level, cString startspot) {
 
     Con_Printf("Loading game from %s...\n", name);
     FILE* loadGStFile = fopen(name, "r");
-    if (!loadGStFile) { Con_Printf("ERROR: couldn't open.\n");  return -1; }
+    if (!loadGStFile) { Con_Printf("ERROR: couldn't open[w].\n");  return -1; }
 
     int32_t version;    fscanf(loadGStFile, "%i\n", &version);
     if (version != SAVEGAME_VERSION) {

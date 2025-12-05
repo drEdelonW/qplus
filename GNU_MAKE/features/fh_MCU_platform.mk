@@ -18,6 +18,12 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
         SRC_LIST += $(MCU_DIR)/sysFS_mcu.c
         SRC_LIST += $(MCU_DIR)/sysIO_mcu.c
 
+        $(eval INCLUDES += $(STMSRC_DIR)/Drivers/BSP/STM32F769I-Discovery)
+        SRC_LIST += $(MCU_DIR)/LCD/LCD_tool.c
+        SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery.c
+        SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/STM32F769I-Discovery/stm32f769i_discovery_lcd.c
+        SRC_LIST += $(STMSRC_DIR)/Drivers/BSP/Components/nt35510/nt35510.c
+
         # SRC_LIST += $(MCU_DIR)/cd_null.c
         # SRC_LIST += $(MCU_DIR)/snd_null.c
         # SRC_LIST += $(MCU_DIR)/sys_null.c
@@ -43,3 +49,5 @@ include features/fh_HAL.mk
 # include features/fh_RTOS.mk
 
     DEFINES += STM32
+    DEFINES += DATA_IN_ExtSDRAM
+
