@@ -11,8 +11,9 @@
 #define ARGB8888_BYTE_PER_PIXEL       4
 
 #if 1
-uint8_t LCD_FG_LAYER_ADDRESS[LCD_SCREEN_WIDTH * LCD_SCREEN_HEIGHT * ARGB8888_BYTE_PER_PIXEL] PLACE_TO_SDRAM;
-// uint8_t LCD_BG_LAYER_ADDRESS[LCD_SCREEN_WIDTH * LCD_SCREEN_HEIGHT * ARGB8888_BYTE_PER_PIXEL] PLACE_TO_SDRAM;
+// uint8_t LCD_FG_LAYER_ADDRESS[LCD_SCREEN_WIDTH * LCD_SCREEN_HEIGHT * ARGB8888_BYTE_PER_PIXEL] PLACE_TO_SDRAM;
+// uint32_t LCD_FG_LAYER_ADDRESS[LCD_SCREEN_WIDTH * LCD_SCREEN_HEIGHT] PLACE_TO_SDRAM;
+uint8_t LCD_BG_LAYER_ADDRESS[LCD_SCREEN_WIDTH * LCD_SCREEN_HEIGHT * ARGB8888_BYTE_PER_PIXEL] PLACE_TO_SDRAM;
 #else
 /* LTDC foreground layer address 800x480 in ARGB8888 */
 #define LCD_FG_LAYER_ADDRESS          LCD_FB_START_ADDRESS
@@ -42,17 +43,17 @@ void LCD_Init() {
        /* LCD DSI initialization in mode Video Burst */
     /* Initialize DSI LCD */
     BSP_LCD_Init();
-    BSP_LCD_Clear(Color_Black); BSP_LCD_Clear(Color_Black); BSP_LCD_Clear(Color_Black);
+    // BSP_LCD_Clear(Color_Black); BSP_LCD_Clear(Color_Black); BSP_LCD_Clear(Color_Black);
 
-    BSP_LCD_LayerDefaultInit(background, LCD_FB_START_ADDRESS);
-    BSP_LCD_SetTransparency(background, 0x80);
-    BSP_LCD_SelectLayer(background);    /* Select the LCD Background Layer */
-    BSP_LCD_Clear(Color_Blue);          /* Clear the Background Layer */
+    // BSP_LCD_LayerDefaultInit(background, LCD_FB_START_ADDRESS);
+    // BSP_LCD_SetTransparency(background, 0x80);
+    // BSP_LCD_SelectLayer(background);    /* Select the LCD Background Layer */
+    // BSP_LCD_Clear(Color_Blue);          /* Clear the Background Layer */
 
-    // BSP_LCD_LayerDefaultInit(foreground, LCD_BG_LAYER_ADDRESS);
-    // BSP_LCD_SetTransparency(foreground, 0x80);
-    // BSP_LCD_SelectLayer(foreground);    /* Select the LCD Foreground Layer */
-    // BSP_LCD_Clear(Color_Red);           /* Clear the Foreground Layer */
+    BSP_LCD_LayerDefaultInit(foreground, LCD_BG_LAYER_ADDRESS);
+    BSP_LCD_SetTransparency(foreground, 0x80);
+    BSP_LCD_SelectLayer(foreground);    /* Select the LCD Foreground Layer */
+    BSP_LCD_Clear(Color_Gray);           /* Clear the Foreground Layer */
 
     /* Configure the transparency for foreground and background : Increase the transparency */
     /*##-1- Configure LCD END ######################################################*/
@@ -80,5 +81,15 @@ void LCD_Init() {
 #endif
     // LCD_BusPause();
     // while (1) { ; }
-    vid.buffer = LCD_FG_LAYER_ADDRESS;
+
+}
+
+void VID_Update(vRect_p rects) {
+    for (int y = 0; y < vid.height; y++)
+        for (int x = 0; x < vid.width; x++) {
+            uint32_t t = vid.buffer[x + y * vid.width];
+            // printf("[%ix%i] [%02X]\n", x, y, vid.buffer[x + y * vid.width]);
+            BSP_LCD_DrawPixel(x, y, t | t << 8 | t << 16 | Color_Transparent);
+            // LCD_FG_LAYER_ADDRESS[x + y * LCD_SCREEN_WIDTH] = Color_Red;//  t | t << 8 | t << 16;
+        }
 }
