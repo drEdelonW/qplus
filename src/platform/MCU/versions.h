@@ -5,4 +5,5 @@
 // #define	D3DQUAKE_VERSION	0.01
 // #define	WINQUAKE_VERSION	0.996
 #define	LINUX_VERSION		1.30
+#define	STM32_VERSION		0.01
 #define	X11_VERSION			1.10

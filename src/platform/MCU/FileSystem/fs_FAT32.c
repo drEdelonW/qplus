@@ -1,8 +1,8 @@
 #include <stdio.h>
+#include "MBR.h"
+#include "SD_TF.h"
 #include "fs_FAT32.h"
-#include "stm32f7xx_hal.h"
 
-uint32_t g_part1_lba_start = 0;
 
 int FAT32_Mount(FAT32_Volume_t* vol) {
     if (g_part1_lba_start == 0) {

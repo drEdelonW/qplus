@@ -149,7 +149,8 @@
 			"complex": "c",
 			"variant": "c",
 			"nt35510.h": "c",
-			"stm32f769i_discovery_lcd.h": "c"
+			"stm32f769i_discovery_lcd.h": "c",
+			"mbr.h": "c"
 		},
 		"makefile.makefilePath": "GNU_MAKE/Makefile"
 	}

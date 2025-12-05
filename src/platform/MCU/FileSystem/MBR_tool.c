@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include "types.h"
 #include "SD_TF.h"
-#include "fs_FAT32.h"
+// #include "fs_FAT32.h"
 
-
+uint32_t g_part1_lba_start = 0;
 
 static cStringRO MBR_PartTypeStr(uint8_t type) {
     switch (type) {

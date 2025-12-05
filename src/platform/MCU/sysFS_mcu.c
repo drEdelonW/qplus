@@ -20,16 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sys_null.h -- null system driver to aid porting efforts
 
 #include "sys.h"
-// #include "cmsis_os.h"
-#include "perepherial.h"
+// #include "perepherial.h"
 #include "errno.h"
 #include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
 #include <string.h>
-#include "common.h"
-#include "sys.h"
-#include "host.h"
 
 
 /*
@@ -51,11 +45,6 @@ int findhandle() {
     return -1;
 }
 
-/*
-================
-filelength
-================
-*/
 int filelength(FILE* f) {
     int pos = ftell(f);
     fseek(f, 0, SEEK_END);
@@ -118,53 +107,6 @@ int Sys_FileTime(cStringRO path) {
 void Sys_mkdir(cStringRO path) {}
 
 
-/*
-===============================================================================
-
-SYSTEM IO
-
-===============================================================================
-*/
-
-void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
-
-void Sys_Error(cStringRO error, ...) {
-    printf("Sys_Error: ");
-    va_list argptr;
-    va_start(argptr, error);
-    vprintf(error, argptr);
-    va_end(argptr);
-    printf("\n");
-
-    exit(1);
-}
-
-void Sys_Printf(cStringRO fmt, ...) {
-    va_list argptr;
-    va_start(argptr, fmt);
-    vprintf(fmt, argptr);
-    va_end(argptr);
-}
-
-void Sys_Quit() {
-    exit(0);
-}
-
-double Sys_FloatTime() {
-    static double t;
-    t += 0.1;
-    return t;
-}
-
-cString Sys_ConsoleInput() {
-    return NULL;
-}
-
-void Sys_Sleep() {}
-void Sys_SendKeyEvents() {}
-void Sys_HighFPPrecision() {}
-void Sys_LowFPPrecision() {}
-
 #if 0
 #include <sys/stat.h>
 // files
@@ -175,81 +117,4 @@ int _lseek(int, int, int) { errno = ENOSYS; return -1; }
 int _read(int, cStringArray, int) { errno = ENOSYS; return 0; }
 int _unlink(cStringRO) { errno = ENOSYS; return -1; }
 int _open(cStringRO, int, int) { errno = ENOSYS; return -1; }
-
-// procs
-int _kill(int, int) { errno = ENOSYS; return -1; }
-int _getpid(void) { return 1; }
-
-// memory
-static cStringArray heap_end;
-void* _sbrk(ptrdiff_t incr) { if (!heap_end) heap_end = &_end; cStringArray p = heap_end; heap_end += incr; return p; }
-
-// console write
-// Пишите в UART/ITM здесь, если нужно видеть printf
-int _write(int, cStringRO buf, int len) { (void)buf; return len; }
 #endif
-//=============================================================================
-
-// void main(int argc, cStringArray argv) {
-int main() {
-    CoreClock_Init();
-    Pereph_Init();
-    printf("Init ok\n");
-
-    size_t  memsize = 8 * 1024 * 1024;
-    int argc = 0;
-    cStringArray argv;
-
-    COM_InitArgv(argc, argv);
-
-    static QuakeParms_t parms;
-    parms.baseDir = ".";
-    parms.argc = com.argc;
-    parms.argv = com.argv;
-    parms.membase = malloc(memsize);
-    parms.memsize = memsize;
-
-    while (!parms.membase) { printf("NO MEMORY\n"); }
-
-    printf("Host_Init\n");
-    Host_Init(&parms);
-    while (1) {
-        Host_Frame(0.1);
-    }
-}
-
-#include <stdint.h>
-#include <errno.h>
-
-extern uint8_t __sdram_heap_start;
-extern uint8_t __sdram_heap_end;
-
-static uint8_t* heap_ptr = NULL;
-
-void* _sbrk(ptrdiff_t incr) {
-    if (heap_ptr == NULL)
-        heap_ptr = &__sdram_heap_start;
-
-    uint8_t* prev = heap_ptr;
-    uint8_t* next = heap_ptr + incr;
-
-    if (next >= &__sdram_heap_end) {
-        errno = ENOMEM;
-        return (void*)-1;
-    }
-
-    heap_ptr = next;
-    return prev;
-}
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
-    if (htim->Instance == TIM6) {
-        HAL_IncTick();
-    }
-}
-
-void Error_Handler() {
-    /* User can add his own implementation to report the HAL error return state */
-    __disable_irq();
-    while (1) {}
-}
