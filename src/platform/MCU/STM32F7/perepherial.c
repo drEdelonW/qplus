@@ -1131,6 +1131,6 @@ void Pereph_Init() {
     // MX_USART6_UART_Init();
     // MX_USB_OTG_HS_PCD_Init();	// USB host - input
     //  MX_WWDG_Init();
-    printf("Pereph_Init done\n");
 
+    // printf("Pereph_Init done\n");
 }
