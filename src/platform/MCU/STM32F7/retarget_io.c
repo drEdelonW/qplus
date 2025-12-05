@@ -1,7 +1,7 @@
 #include <sys/errno.h>
-#include <sys/stat.h>
+// #include <sys/stat.h>
 #include "types.h"
-#include "perepherial.h"
+// #include "perepherial.h"
 // files
 // int _close(int) { errno = ENOSYS; return -1; }
 // int _fstat(int, struct stat* st) { if (st) st->st_mode = S_IFCHR; return 0; }
@@ -23,27 +23,5 @@ int _read(int, cStringArray, int) { errno = ENOSYS; return 0; }
 // Пишите в UART/ITM здесь, если нужно видеть printf
 #if 0
 int _write(int, cStringRO buf, int len) { (void)buf; return len; }
-#else
-int _write(int file, const char *buf, int len) {
-    // stdout(1) и stderr(2) отправляем в UART
-    if ((file == 1) || (file == 2)) {
-        HAL_StatusTypeDef st = HAL_UART_Transmit(
-            &huart1,
-            (uint8_p)buf,
-            (uint16_t)len,
-            HAL_MAX_DELAY
-        );
 
-        if (st == HAL_OK) {
-            return len;
-        } else {
-            errno = EIO;
-            return -1;
-        }
-    }
-
-    // остальные файловые дескрипторы не поддерживаем
-    errno = EBADF;
-    return -1;
-}
 #endif

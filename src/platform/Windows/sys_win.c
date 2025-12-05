@@ -729,7 +729,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Host_Init(&parms);
 
     double oldtime = Sys_FloatTime();
-
     /* main window message loop */
     while (1) {
         double  time, newtime;
