@@ -40,7 +40,7 @@ static int SDFS_AllocHandle(void) {
     for (int i = 0; i < SDFS_MAX_OPEN_FILES; ++i) {
         if (!s_sdFiles[i].used) {
             s_sdFiles[i].used = true;
-            printf("SDFS_AllocHandle USED SLOTS [%i]\n", i);
+            // printf("SDFS_AllocHandle USED SLOTS [%i]\n", i);
             return i;
         }
     }
@@ -180,7 +180,8 @@ void MX_SDMMC2_SD_Init() {
     if (SD_InitAndGetInfo() == 0) {
         SD_WaitCardReady();
         printf("SD inited\n");
-        SD_PrintMBR();
+        SD_MBR_Init();
+        // SD_PrintMBR();
 
 #if 0
         printf("MX_SDMMC2_SD_Init\n");

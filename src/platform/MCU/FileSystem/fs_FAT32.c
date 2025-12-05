@@ -42,16 +42,17 @@ int FAT32_Mount(FAT32_Volume_t* vol) {
     vol->first_data_sector = first_data_sector;
     vol->fat_start_lba = g_part1_lba_start + rsvd_sec_cnt;
 
-    printf("FAT32 mounted:\n");
-    printf("  part LBA start      = %lu\n", vol->part_lba_start);
-    printf("  bytes/sector        = %u\n", vol->bytes_per_sector);
-    printf("  sectors/cluster     = %u\n", vol->sectors_per_cluster);
-    printf("  reserved sectors    = %u\n", vol->reserved_sectors);
-    printf("  num FATs            = %u\n", vol->num_fats);
-    printf("  FAT size (sectors)  = %lu\n", vol->fat_size_sectors);
-    printf("  first data sector   = %lu (rel)\n", vol->first_data_sector);
-    printf("  root cluster        = %lu\n", vol->root_cluster);
-
+    if (false) {
+        printf("FAT32 mounted:\n");
+        printf("  part LBA start      = %lu\n", vol->part_lba_start);
+        printf("  bytes/sector        = %u\n", vol->bytes_per_sector);
+        printf("  sectors/cluster     = %u\n", vol->sectors_per_cluster);
+        printf("  reserved sectors    = %u\n", vol->reserved_sectors);
+        printf("  num FATs            = %u\n", vol->num_fats);
+        printf("  FAT size (sectors)  = %lu\n", vol->fat_size_sectors);
+        printf("  first data sector   = %lu (rel)\n", vol->first_data_sector);
+        printf("  root cluster        = %lu\n", vol->root_cluster);
+    }
     return 0;
 }
 
@@ -641,15 +642,15 @@ int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos) {
     // быстрый путь: в самое начало
     if (new_pos == 0u) {
         fh->current_cluster = fh->first_cluster;
-        fh->position        = 0u;
-        fh->cluster_index   = 0u;
-        fh->cluster_valid   = 0u;
+        fh->position = 0u;
+        fh->cluster_index = 0u;
+        fh->cluster_valid = 0u;
         return 0;
     }
 
     // быстрый путь: seek ровно в конец файла — читать там всё равно никто не будет
     if (new_pos == fh->file_size) {
-        fh->position      = new_pos;
+        fh->position = new_pos;
         fh->cluster_valid = 0u;
         // current_cluster/cluster_index можно не трогать: Read вернёт EOF по position
         return 0;
@@ -665,7 +666,7 @@ int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos) {
     // uint32_t inside_cluster       = new_pos % cluster_size; // для логики не нужен
 
     uint32_t clus = fh->first_cluster;
-    uint32_t idx  = 0u;
+    uint32_t idx = 0u;
 
     // идём по FAT-цепочке, НЕ читая данных файла
     while (idx < target_cluster_index) {
@@ -673,7 +674,7 @@ int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos) {
 
         if (FAT32_IsEOC(next) || next < 2u) {
             // цепочка закончилась раньше, чем ожидали — фиксируемся на EOF
-            fh->position      = fh->file_size;
+            fh->position = fh->file_size;
             fh->current_cluster = next;
             fh->cluster_index = idx; // фактическая длина цепочки
             fh->cluster_valid = 0u;
@@ -686,9 +687,9 @@ int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos) {
 
     // теперь clus — это кластер, содержащий new_pos
     fh->current_cluster = clus;
-    fh->position        = new_pos;
-    fh->cluster_index   = idx;
-    fh->cluster_valid   = 0u;  // буфер нужно будет перезагрузить при следующем чтении
+    fh->position = new_pos;
+    fh->cluster_index = idx;
+    fh->cluster_valid = 0u;  // буфер нужно будет перезагрузить при следующем чтении
 
     return 0;
 }
