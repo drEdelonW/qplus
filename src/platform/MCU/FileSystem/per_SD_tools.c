@@ -2,7 +2,7 @@
 #include "perepherial.h"
 #include "fs_FAT32.h"
 #include "SD_TF.h"
-
+#include "terminal_tools.h"
 int SD_FS_Init();
 
 static void SDFS_MakeFatPath(cStringRO quakePath, char* out, uint32_t outSize) {
@@ -34,7 +34,7 @@ typedef struct {
     FAT32_File_t  file;
 } SD_FileSlot;
 
-static SD_FileSlot s_sdFiles[SDFS_MAX_OPEN_FILES] = {0};
+static SD_FileSlot s_sdFiles[SDFS_MAX_OPEN_FILES] = { 0 };
 
 static int SDFS_AllocHandle(void) {
     for (int i = 0; i < SDFS_MAX_OPEN_FILES; ++i) {
@@ -126,12 +126,12 @@ int Sys_FileSeek(int handle, int position) {
 SD_HandleTypeDef hsd2 = {
     .Instance = SDMMC2,
     .Init = {
-        .ClockEdge              = SDMMC_CLOCK_EDGE_RISING,
-        .ClockBypass            = SDMMC_CLOCK_BYPASS_DISABLE,
-        .ClockPowerSave         = SDMMC_CLOCK_POWER_SAVE_DISABLE,
-        .BusWide                = SDMMC_BUS_WIDE_1B,
-        .HardwareFlowControl    = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE,
-        .ClockDiv               = 0,
+        .ClockEdge = SDMMC_CLOCK_EDGE_RISING,
+        .ClockBypass = SDMMC_CLOCK_BYPASS_DISABLE,
+        .ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE,
+        .BusWide = SDMMC_BUS_WIDE_1B,
+        .HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE,
+        .ClockDiv = 7,
     }
 };
 
@@ -179,8 +179,12 @@ int SD_FS_Init() {
 void MX_SDMMC2_SD_Init() {
     if (SD_InitAndGetInfo() == 0) {
         SD_WaitCardReady();
-        printf("SD inited\n");
-        SD_MBR_Init();
+        if (SD_MBR_Init()) {
+            printf("SD "TEXT_GREEN"inited\n"TEXT_RESET);
+        }
+        else {
+            printf("SD "TEXT_RED"NOT inited\n"TEXT_RESET);
+        }
         // SD_PrintMBR();
 
 #if 0

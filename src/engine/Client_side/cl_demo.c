@@ -244,7 +244,7 @@ void CL_Record_f() {
     Con_Printf("recording to %s.\n", name);
     cls.demofile = fopen(name, "wb");
     if (!cls.demofile) {
-        Con_Printf("ERROR: couldn't open.\n");
+        Con_Printf("ERROR: couldn't open[wb].\n");
         return;
     }
 
@@ -279,7 +279,7 @@ void CL_PlayDemo_f() {
     strcpy(name, Cmd_Argv(1));
     COM_DefaultExtension(name, ".dem");
 
-    Con_Printf("Playing demo from %s.\n", name);
+    Con_Printf("Playing demo from %s .\n", name);
     COM_FOpenFile(name, &cls.demofile);
     if (!cls.demofile) {
         Con_Printf("ERROR: couldn't open.\n");
