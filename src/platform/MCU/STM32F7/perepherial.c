@@ -1112,7 +1112,6 @@ void Pereph_Init() {
     // MX_ADC3_Init();
     // MX_CRC_Init();
 
-    PrintCpuClock();
     // MX_LTDC_Init();         // display framebufer
     // MX_DMA2D_Init();        // 2D accelerator
     // MX_DSIHOST_DSI_Init();  // Display
