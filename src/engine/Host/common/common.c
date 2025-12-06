@@ -467,7 +467,6 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
                     Host_Printf("PackFile: %s : %s\n", pak->filename, filename);
                     if (handle) {
                         *handle = pak->handle;
-                        printf("Sys_FileSeek\n");
                         Sys_FileSeek(pak->handle, pak->files[idxPak].filepos);
                     }
                     else {       // open a new file on the pakfile

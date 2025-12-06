@@ -93,6 +93,7 @@ typedef enum lcd_color_argb8888_e { /* value in ARGB8888 format */
 
     Color_Brown        = 0xFFA52A2Au, /* Brown */
     Color_DarkGray     = 0xFF404040u, /* Dark Gray */
+    Color_DarkDarkGray = 0xFF202020u, /* Dark Gray */
     Color_DarkBlue     = 0xFF000080u, /* Dark Blue */
     Color_DarkGreen    = 0xFF008000u, /* Dark Green */
     Color_DarkRed      = 0xFF800000u, /* Dark Red */
