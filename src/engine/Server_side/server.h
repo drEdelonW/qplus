@@ -57,7 +57,7 @@ typedef struct {
     int32_t     num_edicts;
     int32_t     max_edicts;
     edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
-    sv_state_e  state;  // some actions are only valid during load
+    sv_state_e  state;          // some actions are only valid during load
     sizebuf_t   datagram;
     uint8_t     datagram_buf[MAX_DATAGRAM];
     sizebuf_t   reliable_datagram;	// copied to all clients at end of frame
@@ -71,7 +71,7 @@ typedef struct {
 #define	NUM_PING_TIMES		16
 #define	NUM_SPAWN_PARMS		16
 
-struct RmtClient_s {
+typedef struct {
     bool        active;     // false = client is free
     bool        spawned;    // false = don't send datagrams
     bool        dropasap;   // has been told to go to another level
@@ -90,8 +90,7 @@ struct RmtClient_s {
     int32_t     num_pings;  // ping_times[num_pings%NUM_PING_TIMES]
     float       spawn_parms[NUM_SPAWN_PARMS]; // spawn parms are carried from level to level
     int16_t     old_frags;  // client known data for deltas
-};
-typedef struct RmtClient_s RmtClient_t;
+} RmtClient_t;
 typedef RmtClient_t* RmtClient_p;
 
 
@@ -153,9 +152,9 @@ extern "C" {
     void SV_SaveSpawnparms();
     void SV_SpawnServer(
         cString server
-#ifdef QUAKE2
+#   ifdef QUAKE2
         , cString startspot
-#endif
+#   endif
     );
 
 #ifdef __cplusplus
