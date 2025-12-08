@@ -1,5 +1,7 @@
 #pragma once
 #include <stdbool.h>
+#include "assert.h"
+
 
 typedef float vec_t;
 typedef enum {
@@ -10,9 +12,11 @@ typedef enum {
 } axis_e;
 
 typedef vec_t vec3_t[VECT_DIM];
+STATIC_ASSERT(sizeof(vec3_t) == 3 * sizeof(vec_t), "vec3_t must be 12");
 typedef vec3_t* vec3_p;
 
 typedef vec_t vec5_t[5];
+STATIC_ASSERT(sizeof(vec5_t) == 5 * sizeof(vec_t), "vec5_t must be 20");
 typedef vec5_t* vec5_p;
 
 #ifdef __cplusplus

@@ -1,9 +1,6 @@
 #pragma once
 #include "vector.h"
 
-// class Vector3D;
-// typedef Vector3D vec3_t;
-
 #define VEC3_ENABLE_MUL_AS_CROSS 0
 
 typedef float vect_t;
@@ -94,3 +91,9 @@ public:
     Vector3D toDeg() const noexcept;
 };
 
+
+#include "assert.h"
+
+STATIC_ASSERT(sizeof(Vector3D) == sizeof(vec3_t), "Vector3D must be equal to vec3_t (12)");
+// class Vector3D;
+// typedef Vector3D vec3_t;
