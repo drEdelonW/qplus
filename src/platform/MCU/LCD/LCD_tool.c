@@ -38,7 +38,7 @@ void LCD_BusResume(void) {
     HAL_DSI_Start(&hdsi_discovery);
 }
 void LCD_Init() {
-    printf(TEXT_RED"LCD_Init\n"TEXT_RESET);
+    // printf(RED("LCD_Init\n"));
 
     /*##-1- Configure LCD ######################################################*/
        /* LCD DSI initialization in mode Video Burst */
