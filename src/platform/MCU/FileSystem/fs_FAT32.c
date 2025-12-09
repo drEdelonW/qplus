@@ -3,42 +3,9 @@
 #include "fs_FAT32.h"
 #include "terminal_tools.h"
 
-#pragma pack(push, 1)
-typedef struct {
-    uint8_t  jmpBoot[3];          // 0x00 Jump instruction
-    char     OEMName[8];          // 0x03 OEM string
 
-    uint16_t BytsPerSec;          // 0x0B Bytes per sector (512, 1024...)
-    uint8_t  SecPerClus;          // 0x0D Sectors per cluster (1,2,4,8,16…)
-    uint16_t RsvdSecCnt;          // 0x0E Reserved sectors (incl. BootSector)
-    uint8_t  NumFATs;             // 0x10 Usually 2
-    uint16_t RootEntCnt;          // 0x11 FAT12/16 only (0 for FAT32)
-    uint16_t TotSec16;            // 0x13 Total sectors (FAT12/16)
-    uint8_t  Media;               // 0x15 Media descriptor
-    uint16_t FATSz16;             // 0x16 FAT12/16 size (0 for FAT32)
-    uint16_t SecPerTrk;           // 0x18 CHS
-    uint16_t NumHeads;            // 0x1A CHS
-    uint32_t HiddSec;             // 0x1C Hidden sectors before partition
-    uint32_t TotSec32;            // 0x20 Total sectors FAT32
-
-    // ---- FAT32 Extended BPB ----
-    uint32_t FATSz32;             // 0x24 FAT size in sectors
-    uint16_t ExtFlags;            // 0x28 Flags
-    uint16_t FSVer;               // 0x2A FAT version
-    uint32_t RootClus;            // 0x2C First cluster of root directory
-    uint16_t FSInfo;              // 0x30 Sector number of FSINFO
-    uint16_t BkBootSec;           // 0x32 Sector number of backup boot
-    uint8_t  Reserved[12];        // 0x34 Reserved
-
-    uint8_t  DrvNum;              // 0x40 Drive number
-    uint8_t  Reserved1;           // 0x41 NT flags
-    uint8_t  BootSig;             // 0x42 Extended Signature == 0x29
-    uint32_t VolID;               // 0x43 Volume serial number
-    char     VolLab[11];          // 0x47 Volume label
-    char     FilSysType[8];       // 0x52 "FAT32   "
-
-} FAT32_BPB_t;
-#pragma pack(pop)
+// one cluster buffer (max 8 KB if SecPerClus up to 16)
+uint8_t cluster_buf[512 * 16];
 
 void printFAT_vol(FAT32_Volume_t* vol) {
     printf(GREEN("FAT32 mounted:\n"));
@@ -51,6 +18,7 @@ void printFAT_vol(FAT32_Volume_t* vol) {
     printf("  first data sector   = %lu (rel)\n", vol->first_data_sector);
     printf("  root cluster        = %lu\n", vol->root_cluster);
 }
+
 
 int FAT32_Mount(FAT32_Volume_t* vol) {
     if (!vol) return -1;
@@ -86,7 +54,7 @@ int FAT32_Mount(FAT32_Volume_t* vol) {
 
 FAT32_Volume_t g_fat32;
 
-static uint32_t FAT32_GetNextCluster(FAT32_Volume_t* vol, uint32_t cluster) {
+uint32_t FAT32_GetNextCluster(FAT32_Volume_t* vol, uint32_t cluster) {
     // printf("FAT32_GetNextCluster\n");
     uint32_t fat_offset = cluster * 4u; // 4 bytes per FAT32 entry
     uint32_t fat_sector_idx = fat_offset / vol->bytes_per_sector;
@@ -107,11 +75,7 @@ static uint32_t FAT32_GetNextCluster(FAT32_Volume_t* vol, uint32_t cluster) {
     return val;
 }
 
-static int FAT32_IsEOC(uint32_t cl) {
-    return (cl >= 0x0FFFFFF8u);
-}
-
-static int FAT32_ReadCluster(FAT32_Volume_t* vol, uint32_t cluster, uint8_p buf) {
+int FAT32_ReadCluster(FAT32_Volume_t* vol, uint32_t cluster, uint8_p buf) {
     // printf("FAT32_ReadCluster\n");
 
     uint32_t first_sector_of_cluster =
@@ -127,62 +91,7 @@ static int FAT32_ReadCluster(FAT32_Volume_t* vol, uint32_t cluster, uint8_p buf)
     return 0;
 }
 
-static void FAT32_PrintIndent(int depth) {
-    for (int i = 0; i < depth; ++i) {
-        printf("  ");
-    }
-}
 
-char fat32_up(char c) {
-    if ((c >= 'a') && (c <= 'z')) {
-        return (char)(c - 'a' + 'A');
-    }
-    return c;
-}
-
-// сравнение имени (из каталога) и запрошенного, без учёта регистра
-static int FAT32_NameEquals(cStringRO a, cStringRO b) {
-    while (*a && *b) {
-        char ca = fat32_up(*a);
-        char cb = fat32_up(*b);
-        if (ca != cb) return 0;
-        ++a;
-        ++b;
-    }
-    return ((*a == '\0') && (*b == '\0'));
-}
-
-static void FAT32_MakeShortName(cStringRO e, cString out, uint32_t out_size) {
-    // e[0..7] - name, e[8..10] - ext
-    char name[9];
-    char ext[4];
-
-    for (int i = 0; i < 8; ++i)
-        name[i] = (char)e[i];
-    name[8] = '\0';
-
-    for (int i = 0; i < 3; ++i)
-        ext[i] = (char)e[8 + i];
-    ext[3] = '\0';
-
-    // trim spaces
-    int end = 7;
-    while (end >= 0 && name[end] == ' ') {
-        name[end] = '\0';
-        --end;
-    }
-    end = 2;
-    while (end >= 0 && ext[end] == ' ') {
-        ext[end] = '\0';
-        --end;
-    }
-
-    if (ext[0] != '\0') snprintf(out, out_size, "%s.%s", name, ext);
-    else                snprintf(out, out_size, "%s", name);
-
-}
-// one cluster buffer (max 8 KB if SecPerClus up to 16)
-static uint8_t cluster_buf[512 * 16];
 
 static void FAT32_ListDir(FAT32_Volume_t* vol, uint32_t start_cluster, int depth) {
     if (start_cluster < 2u)     return;
@@ -387,226 +296,4 @@ int FAT32_FindPath(cStringRO path, FAT32_DirEntryInfo* out_file) {
     }
 
     return -1;
-}
-
-int FAT32_ReadFileToBuffer(cStringRO path, uint8_t* dst, uint32_t max_len, uint32_t* out_len) {
-    FAT32_DirEntryInfo info;
-
-    if (FAT32_FindPath(path, &info) != 0) {
-        printf("FAT32_ReadFileToBuffer: file '%s' not found\n", path);
-        return -1;
-    }
-
-    uint32_t want = info.size;
-    if (want > max_len) {
-        printf("FAT32_ReadFileToBuffer: file '%s' is %lu bytes, truncating to %lu\n",
-            path,
-            (uint32_t)info.size,
-            (uint32_t)max_len);
-        want = max_len;
-    }
-
-    FAT32_Volume_t* vol = &g_fat32;
-    uint32_t cluster = info.cluster;
-    uint32_t bytes_per_cluster =
-        (uint32_t)vol->bytes_per_sector * vol->sectors_per_cluster;
-
-    uint32_t bytes_left = want;
-    uint32_t offset = 0;
-
-    while (!FAT32_IsEOC(cluster) && bytes_left > 0u) {
-        if (FAT32_ReadCluster(vol, cluster, cluster_buf) != 0) {
-            printf("FAT32_ReadFileToBuffer: read cluster error\n");
-            return -1;
-        }
-
-        uint32_t to_copy = (bytes_left < bytes_per_cluster) ? bytes_left : bytes_per_cluster;
-
-        for (uint32_t i = 0; i < to_copy; ++i) {
-            dst[offset + i] = cluster_buf[i];
-        }
-
-        offset += to_copy;
-        bytes_left -= to_copy;
-
-        if (bytes_left == 0u) { break; }
-
-        uint32_t next = FAT32_GetNextCluster(vol, cluster);
-        if (FAT32_IsEOC(next))  break;
-        cluster = next;
-    }
-
-    if (out_len) { *out_len = want; }
-
-    return 0;
-}
-
-int FAT32_FileOpen(cStringRO path, FAT32_File_t* fh) {
-    FAT32_DirEntryInfo info;
-    if (!fh) return -1;
-    if (FAT32_FindPath(path, &info) != 0) { printf("FAT32_FileOpen: file '%s' not found\n", path); return -1; }
-
-    FAT32_Volume_t* vol = &g_fat32;
-    *fh = (FAT32_File_t) {
-        .vol              = vol,
-        .first_cluster    = info.cluster,
-        .current_cluster  = info.cluster,
-        .file_size        = info.size,
-        .position         = 0,
-        .bytes_per_cluster= (uint32_t)vol->bytes_per_sector * vol->sectors_per_cluster,
-        .cluster_index    = 0,
-        .cluster_valid    = 0,
-        // cluster_buf НЕ трогаем — он просто остаётся как есть
-    };
-
-    return 0;
-}
-
-void FAT32_FileClose(FAT32_File_t* fh) {
-    (void)fh; // do nothing for now
-}
-
-static int FAT32_FileLoadCluster(FAT32_File_t* fh) {
-    if (!fh || !fh->vol) return -1;
-
-    if ((fh->current_cluster < 2u) ||
-        FAT32_IsEOC(fh->current_cluster)
-        ) {
-        return -1;
-    }
-
-    if (FAT32_ReadCluster(fh->vol, fh->current_cluster, fh->cluster_buf) != 0) {
-        return -1;
-    }
-
-    fh->cluster_valid = 1;
-    return 0;
-}
-
-int FAT32_FileRead(FAT32_File_t* fh, void* dst, uint32_t bytes_to_read, uint32_p out_read) {
-    if (!fh || !dst) return -1;
-
-    uint8_t* out = (uint8_t*)dst;
-
-    if (fh->position >= fh->file_size) {
-        if (out_read) *out_read = 0;
-        return 0; // EOF
-    }
-
-    uint32_t remaining = fh->file_size - fh->position;
-    if (bytes_to_read > remaining)
-        bytes_to_read = remaining;
-
-
-    uint32_t total_copied = 0;
-
-    while (bytes_to_read > 0) {
-        if ((!fh->cluster_valid) &&
-            (FAT32_FileLoadCluster(fh) != 0))
-            break;
-
-        uint32_t pos_in_cluster = fh->position % fh->bytes_per_cluster;
-        uint32_t left_in_cluster = fh->bytes_per_cluster - pos_in_cluster;
-
-        uint32_t chunk = (bytes_to_read < left_in_cluster) ? bytes_to_read : left_in_cluster;
-
-        // copy chunk
-        for (uint32_t i = 0; i < chunk; ++i) {
-            out[total_copied + i] = fh->cluster_buf[pos_in_cluster + i];
-        }
-
-        fh->position += chunk;
-        total_copied += chunk;
-        bytes_to_read -= chunk;
-
-        if (chunk == left_in_cluster) {
-            // перешли к следующему кластеру
-            uint32_t next = FAT32_GetNextCluster(fh->vol, fh->current_cluster);
-            fh->current_cluster = next;
-            fh->cluster_valid = 0;
-            if (FAT32_IsEOC(next)) {
-                break;
-            }
-        }
-    }
-
-    if (out_read) {
-        *out_read = total_copied;
-    }
-
-    return 0;
-}
-
-int FAT32_FileRewind(FAT32_File_t* fh) {
-    if (!fh) return -1;
-
-    fh->current_cluster = fh->first_cluster;
-    fh->position = 0;
-    fh->cluster_index = 0;
-    fh->cluster_valid = 0;
-
-    return 0;
-}
-
-int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos) {
-    if (!fh) return -1;
-
-    // clamp to EOF
-    if (new_pos > fh->file_size) {
-        new_pos = fh->file_size;
-    }
-
-    // быстрый путь: в самое начало
-    if (new_pos == 0u) {
-        fh->current_cluster = fh->first_cluster;
-        fh->position = 0u;
-        fh->cluster_index = 0u;
-        fh->cluster_valid = 0u;
-        return 0;
-    }
-
-    // быстрый путь: seek ровно в конец файла — читать там всё равно никто не будет
-    if (new_pos == fh->file_size) {
-        fh->position = new_pos;
-        fh->cluster_valid = 0u;
-        // current_cluster/cluster_index можно не трогать: Read вернёт EOF по position
-        return 0;
-    }
-
-    uint32_t cluster_size = fh->bytes_per_cluster;
-    if (cluster_size == 0u) {
-        return -1;
-    }
-
-    // какой по счёту кластер и смещение внутри него
-    uint32_t target_cluster_index = new_pos / cluster_size;
-    // uint32_t inside_cluster       = new_pos % cluster_size; // для логики не нужен
-
-    uint32_t clus = fh->first_cluster;
-    uint32_t idx = 0u;
-
-    // идём по FAT-цепочке, НЕ читая данных файла
-    while (idx < target_cluster_index) {
-        uint32_t next = FAT32_GetNextCluster(fh->vol, clus);
-
-        if (FAT32_IsEOC(next) || next < 2u) {
-            // цепочка закончилась раньше, чем ожидали — фиксируемся на EOF
-            fh->position = fh->file_size;
-            fh->current_cluster = next;
-            fh->cluster_index = idx; // фактическая длина цепочки
-            fh->cluster_valid = 0u;
-            return 0;
-        }
-
-        clus = next;
-        idx++;
-    }
-
-    // теперь clus — это кластер, содержащий new_pos
-    fh->current_cluster = clus;
-    fh->position = new_pos;
-    fh->cluster_index = idx;
-    fh->cluster_valid = 0u;  // буфер нужно будет перезагрузить при следующем чтении
-
-    return 0;
 }
