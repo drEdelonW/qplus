@@ -1,8 +1,13 @@
 #include <stdio.h>
-#include "perepherial.h"
-#include "fs_FAT32.h"
-#include "SD_TF.h"
+#include <string.h>
 #include "terminal_tools.h"
+#include "perepherial.h"
+
+#include "SD_TF.h"
+#include "MBR.h"
+#include "fs_FAT32.h"
+
+
 int SD_FS_Init();
 
 static void SDFS_MakeFatPath(cStringRO quakePath, char* out, uint32_t outSize) {
@@ -11,16 +16,17 @@ static void SDFS_MakeFatPath(cStringRO quakePath, char* out, uint32_t outSize) {
     uint32_t i = 0;
 
     // копируем префикс
-    while (*base && i + 1 < outSize) {
+    while (*base && ((i + 1) < outSize)) {
         out[i++] = *base++;
     }
 
     // копируем исходный путь, поднимая регистр и заменяя '\' на '/'
-    for (cStringRO p = quakePath; *p && i + 1 < outSize; ++p) {
+    for (cStringRO p = quakePath; (*p && ((i + 1) < outSize)); ++p) {
         char c = *p;
-        if (c == '\\')  c = '/';
+        if (c == '\\')
+            c = '/';
         // uppercase латиницу
-        if ((c >= 'a') && (c <= 'z'))   c = (char)(c - 'a' + 'A');
+        c = fat32_up(c);
         out[i++] = c;
     }
 
@@ -51,14 +57,15 @@ static int SDFS_AllocHandle(void) {
 static SD_FileSlot* SDFS_GetSlot(int hnd) {
     if ((hnd < 0) ||
         (hnd >= SDFS_MAX_OPEN_FILES) ||
-        (!s_sdFiles[hnd].used))         return NULL;
+        (!s_sdFiles[hnd].used)
+        )   return NULL;
+
     return &s_sdFiles[hnd];
 }
 
 
 
 /*=======================[SysFS part begin]=======================*/
-
 int Sys_FileOpenRead(cStringRO quakePath, int* hnd) {
     if (!hnd) return -1;
 
@@ -67,30 +74,30 @@ int Sys_FileOpenRead(cStringRO quakePath, int* hnd) {
         return -1;
     }
 
+    int slot = SDFS_AllocHandle();
+    if (slot < 0) {
+        *hnd = -1;
+        return -1;
+    }
+
     char fatPath[128];
     SDFS_MakeFatPath(quakePath, fatPath, sizeof(fatPath));
 
-    FAT32_File_t f;
-    if (FAT32_FileOpen(fatPath, &f) != 0) {
-        // можно отладочно писать:
-        // printf("Sys_FileOpenRead: '%s' -> '%s' not found\n", quakePath, fatPath);
+    FAT32_File_t* f = &s_sdFiles[slot].file;
+
+    // обнулим, если вдруг FAT32_FileOpen рассчитывает на чистое состояние
+    memset(f, 0, sizeof(FAT32_File_t));
+
+    if (FAT32_FileOpen(fatPath, f) != 0) {
+        // открыть не удалось — слот освобождаем
+        s_sdFiles[slot].used = false;
         *hnd = -1;
         return -1;
     }
-
-    int slot = SDFS_AllocHandle();
-    if (slot < 0) {
-        FAT32_FileClose(&f);
-        *hnd = -1;
-        return -1;
-    }
-
-    s_sdFiles[slot].file = f;
 
     *hnd = slot;
-    return (int)f.file_size; // по контракту Quake возвращает длину
+    return (int)f->file_size;
 }
-
 void Sys_FileClose(int handle) {
     SD_FileSlot* slot = SDFS_GetSlot(handle);
     if (!slot) return;
