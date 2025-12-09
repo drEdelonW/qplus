@@ -443,6 +443,7 @@ Sets com.filesize and one of handle or file
 ===========
 */
 static bool     _progHack;
+#include "terminal_tools.h"
 
 int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
     if (file && handle)     Host_SysError("COM_FindFile: both handle and file set");
@@ -470,6 +471,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
                         Sys_FileSeek(pak->handle, pak->files[idxPak].filepos);
                     }
                     else {       // open a new file on the pakfile
+                        printf(RED("fseek\n"));
                         *file = fopen(pak->filename, "rb");
                         if (*file)
                             fseek(*file, pak->files[idxPak].filepos, SEEK_SET);

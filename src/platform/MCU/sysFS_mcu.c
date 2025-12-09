@@ -17,13 +17,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// sys_null.h -- null system driver to aid porting efforts
+// sysFS_mcu.c -- system driver to aid porting efforts
 
 #include "sys.h"
 // #include "perepherial.h"
-#include "errno.h"
-#include <stdio.h>
-#include <string.h>
+// #include <stdio.h>
+// #include <string.h>
+#include "terminal_tools.h"
 
 
 /*
@@ -34,87 +34,77 @@ FILE IO
 ===============================================================================
 */
 
-#define MAX_HANDLES 10
-FILE* sys_handles[MAX_HANDLES];
 
-int findhandle() {
-    for (int i = 1; i < MAX_HANDLES; i++)
-        if (!sys_handles[i])
-            return i;
-    Sys_Error("out of handles");
-    return -1;
-}
-
-int filelength(FILE* f) {
-    int pos = ftell(f);
-    fseek(f, 0, SEEK_END);
-    int end = ftell(f);
-    fseek(f, pos, SEEK_SET);
-
-    return end;
-}
-#include "mem_placement.h"
-
-__weak int Sys_FileOpenRead(cStringRO path, int* hndl) {
-    int i = findhandle();
-    FILE* f = fopen(path, "rb");
-    if (!f) {
-        *hndl = -1;
-        return -1;
-    }
-    sys_handles[i] = f;
-    *hndl = i;
-
-    return filelength(f);
-}
-
-__weak int Sys_FileOpenWrite(cStringRO path) {
-    int i = findhandle();
-    FILE* f = fopen(path, "wb");
-    if (!f)
-        Sys_Error("Error opening %s: %s", path, strerror(errno));
-    sys_handles[i] = f;
-
-    return i;
-}
-
-__weak void Sys_FileClose(int handle) {
-    fclose(sys_handles[handle]);
-    sys_handles[handle] = NULL;
-}
-
-__weak void Sys_FileSeek(int handle, int position) {
-    fseek(sys_handles[handle], position, SEEK_SET);
-}
-
-__weak int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) {
-    return fread(dest, 1, count, sys_handles[handle]);
-}
-
-int Sys_FileWrite(int handle, TypeLess_ptr data, size_t count) {
-    return fwrite(data, 1, count, sys_handles[handle]);
-}
-
-int Sys_FileTime(cStringRO path) {
-    FILE* f = fopen(path, "rb");
-    if (f) {
-        fclose(f);
-        return 1;
-    }
-    return -1;
-}
-
-void Sys_mkdir(cStringRO path) {}
-
-
-#if 0
 #include <sys/stat.h>
+#if 0
+#include "errno.h"
 // files
+int _open(cStringRO, int, int) { errno = ENOSYS; return -1; }
 int _close(int) { errno = ENOSYS; return -1; }
-int _fstat(int, struct stat* st) { if (st) st->st_mode = S_IFCHR; return 0; }
-int _isatty(int) { return 1; }
 int _lseek(int, int, int) { errno = ENOSYS; return -1; }
 int _read(int, cStringArray, int) { errno = ENOSYS; return 0; }
-int _unlink(cStringRO) { errno = ENOSYS; return -1; }
-int _open(cStringRO, int, int) { errno = ENOSYS; return -1; }
+int _fstat(int, struct stat* st) { if (st) st->st_mode = S_IFCHR; return 0; }
+int _isatty(int) { return 1; }
+
+#else
+
+int _open(char* path, int flags, ...) {
+    printf(RED("_open(path:[%s] flags:0x%X);\n"), path, flags);
+    (void)path;
+    (void)flags;
+    /* Pretend like we always fail */
+    return -1;
+}
+
+// int _close(int file) {
+//   (void)file;
+//   return -1;
+// }
+
+int _lseek(int file, int ptr, int dir) {
+    printf(RED("_lseek(file:%i, ptr:%i, dir:%i);\n"), file, ptr, dir);
+    (void)file;
+    (void)ptr;
+    (void)dir;
+    return 0;
+}
+
+// int _read(int file, char* ptr, int len) {
+//   (void)file;
+//   int DataIdx;
+
+//   for (DataIdx = 0; DataIdx < len; DataIdx++) {
+//     *ptr++ = __io_getchar();
+//   }
+
+//   return len;
+// }
+
+// int _write(int file, char* ptr, int len) {
+//   (void)file;
+//   int DataIdx;
+
+//   for (DataIdx = 0; DataIdx < len; DataIdx++) {
+//     __io_putchar(*ptr++);
+//   }
+//   return len;
+// }
+
+
+
+// int _fstat(int file, struct stat* st) {
+//     printf(RED("_fstat(file:%i, st:%p);\n"), file, st);
+//     (void)file;
+//     st->st_mode = S_IFCHR;
+//     return 0;
+// }
+
+// int _isatty(int file) {
+//     printf(RED("_isatty(file:%i);\n"), file);
+//     (void)file;
+//     return 1;
+// }
+
+
+
 #endif

@@ -3,11 +3,11 @@
 
 #define SD_READ_TIMEOUT_MS  100
 
-uint16_t rd16_le(const uint8_p p) {
+uint16_t rd16_le(cStringRO p) {
     return (uint16_t)p[0] | ((uint16_t)p[1] << 8);
 }
 
-uint32_t rd32_le(const uint8_p p) {
+uint32_t rd32_le(cStringRO p) {
     return  (uint32_t)p[0]
         | ((uint32_t)p[1] << 8)
         | ((uint32_t)p[2] << 16)
@@ -178,7 +178,7 @@ HAL_StatusTypeDef SD_ReadBlock(uint32_t lba, uint8_p buf) {
 #include <string.h>    // memcpy
 
 #define SD_BLOCK_SIZE         512U
-#define SD_CACHE_LINES        8U
+#define SD_CACHE_LINES        4U
 
 typedef struct {
     uint32_t lba;

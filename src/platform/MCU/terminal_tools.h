@@ -80,6 +80,9 @@
 /*
 #include "terminal_tools.h"
 */
+#define RED(text)       TEXT_RED    text    TEXT_RESET
+#define GREEN(text)     TEXT_GREEN  text    TEXT_RESET
+#define YELLOW(text)    TEXT_YELLOW text    TEXT_RESET
 
 #if DEBUG > 0
     #include <stdio.h>

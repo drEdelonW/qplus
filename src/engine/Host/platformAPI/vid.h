@@ -73,7 +73,7 @@ typedef VidDef_t* VidDef_p;
 
 extern  VidDef_t    vid;    // global video state
 extern  uint16_t    d_8to16table[256];
-extern  uint32_t    d_8to24table[256];
+extern  uint32_t    d_8to24table[256]; // 0xAABBGGRR
 extern  void (*vid_menudrawfn)();
 
 #ifdef __cplusplus

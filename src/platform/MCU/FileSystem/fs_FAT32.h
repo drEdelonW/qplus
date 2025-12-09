@@ -15,6 +15,14 @@ typedef struct {
 } FAT32_Volume_t;
 
 typedef struct {
+    uint32_t cluster;
+    uint32_t size;
+    uint8_t  attr;
+} FAT32_DirEntryInfo;
+
+extern FAT32_Volume_t g_fat32;
+
+typedef struct {
     FAT32_Volume_t* vol;
 
     uint32_t first_cluster;
@@ -31,15 +39,8 @@ typedef struct {
 } FAT32_File_t;
 
 
-typedef struct {
-    uint32_t cluster;
-    uint32_t size;
-    uint8_t  attr;
-} FAT32_DirEntryInfo;
 
-extern FAT32_Volume_t g_fat32;
-
-
+char fat32_up(char c);
 int FAT32_Mount(FAT32_Volume_t* vol);
 int FAT32_FileOpen(cStringRO path, FAT32_File_t* fh);
 void FAT32_FileClose(FAT32_File_t* fh);

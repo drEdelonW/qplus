@@ -66,8 +66,9 @@ else
 endif
 
 check_dir_exists = \
+#         $(info Directory $(GCC_BASE_PATH) exists.),
     $(if $(wildcard $(GCC_BASE_PATH)), \
-        $(info Directory $(GCC_BASE_PATH) exists.), \
+        ,\
         $(info Directory $(GCC_BASE_PATH) does not exist.) \
         $(error Download [https://developer.arm.com/-/media/Files/downloads/gnu/$(GCC_VER)/binrel/arm-gnu-toolchain-$(GCC_VER)-$(ARCH)-arm-none-eabi$(PKG_SUFIX)]))
 # Call the function at the beginning of the Makefile

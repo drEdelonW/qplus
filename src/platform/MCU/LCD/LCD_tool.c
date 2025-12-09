@@ -51,30 +51,30 @@ void LCD_Init() {
     // BSP_LCD_SelectLayer(background);    /* Select the LCD Background Layer */
     // BSP_LCD_Clear(Color_Blue);          /* Clear the Background Layer */
 
-    BSP_LCD_LayerDefaultInit(foreground, LCD_BG_LAYER_ADDRESS);
+    BSP_LCD_LayerDefaultInit(foreground, (uint32_t)LCD_BG_LAYER_ADDRESS);
     BSP_LCD_SetTransparency(foreground, 0xFF);
     BSP_LCD_SelectLayer(foreground);    /* Select the LCD Foreground Layer */
-    BSP_LCD_Clear(Color_DarkDarkGray);           /* Clear the Foreground Layer */
+    BSP_LCD_Clear(Color_Black);  /* Clear the Foreground Layer */
 
     /* Configure the transparency for foreground and background : Increase the transparency */
     /*##-1- Configure LCD END ######################################################*/
 
 
     // BSP_LCD_SetBrightness(0xFF);
-    BSP_LCD_SetTextColor(Color_White);
-    BSP_LCD_SetBackColor(Color_Black);
+    // BSP_LCD_SetTextColor(Color_White);
+    // BSP_LCD_SetBackColor(Color_Black);
     // BSP_LCD_SetFont(&Font24);
     // BSP_LCD_DisplayStringAtLine(0, (uint8_t*)"!!!LCD WORK!!!");
-    BSP_LCD_DisplayStringAt(0, 0, "!!!LCD WORK!!!", CENTER_MODE);
-    BSP_LCD_SetFont(&Font20);
-    BSP_LCD_DisplayStringAtLine(4, "!!!LCD WORK!!!");
-    BSP_LCD_DisplayStringAt(0, 440, "!!!LCD WORK!!!", CENTER_MODE);
-    int y = 480;
+    // BSP_LCD_DisplayStringAt(0, 0, "!!!LCD WORK!!!", CENTER_MODE);
+    // BSP_LCD_SetFont(&Font20);
+    // BSP_LCD_DisplayStringAtLine(4, "!!!LCD WORK!!!");
+    // BSP_LCD_DisplayStringAt(0, 440, "!!!LCD WORK!!!", CENTER_MODE);
+    // int y = 480;
 #if 1
-    for (int i = 0; i < y; i++) {
-        BSP_LCD_DrawPixel(i, i, Color_Black);
-        BSP_LCD_DrawPixel(i + y, y - i, Color_Black);
-    }
+    // for (int i = 0; i < y; i++) {
+    //     BSP_LCD_DrawPixel(i, i, Color_Black);
+    //     BSP_LCD_DrawPixel(i + y, y - i, Color_Black);
+    // }
 #else
     BSP_LCD_SetTextColor(Color_Black);
     BSP_LCD_DrawLine(0, 0, y, y);
@@ -86,13 +86,27 @@ void LCD_Init() {
 }
 
 void VID_Update(vRect_p rects) {
+    if (rects) {
+        if ((rects->x != 0) ||
+            (rects->y != 0) ||
+            (rects->width != 320) ||
+            (rects->height != 200)
+            ) {
+            printf(RED("rect:\n x:%i/%i\n y:%i/%i\n"),
+                rects->x, rects->width,
+                rects->y, rects->height
+            );
+            return;
+        }
+    }
+    int ofs = ((800 - 640) / 2) + (((480 - 400) / 2) * LCD_SCREEN_WIDTH);
     for (int y = 0; y < vid.height; y++)
         for (int x = 0; x < vid.width; x++) {
             uint8_t idx = vid.buffer[y * vid.width + x];
 
-            uint8_t r = d_8to24table[idx] >> 0;
-            uint8_t g = d_8to24table[idx] >> 8;
-            uint8_t b = d_8to24table[idx] >> 16;
+            uint8_t r = (d_8to24table[idx] >> 0) & 0xFF;
+            uint8_t g = (d_8to24table[idx] >> 8) & 0xFF;
+            uint8_t b = (d_8to24table[idx] >> 16) & 0xFF;
 
             uint32_t argb =
                 Color_Transparent |   // alpha
@@ -100,9 +114,9 @@ void VID_Update(vRect_p rects) {
                 (g << 8) |
                 (b << 0);
 #if 0
-            LCD_BG_LAYER_ADDRESS[(x + y * LCD_SCREEN_WIDTH)] = argb;
+            LCD_BG_LAYER_ADDRESS[(x + y * LCD_SCREEN_WIDTH) + ofs] = argb;
 #else
-            int base = (x * 2) + (y * 2) * LCD_SCREEN_WIDTH;
+            int base = ofs + (x * 2) + (y * 2) * LCD_SCREEN_WIDTH;
 
             LCD_BG_LAYER_ADDRESS[base] = argb;
             LCD_BG_LAYER_ADDRESS[base + 1] = argb;
@@ -110,12 +124,12 @@ void VID_Update(vRect_p rects) {
             LCD_BG_LAYER_ADDRESS[base + LCD_SCREEN_WIDTH + 1] = argb;
 #endif
         }
+        // LCD_BusResume(); LCD_BusPause();
 }
 
 
 
 void VID_SetPalette(uint8_p palette) { // TODO: make copy and upscale with DMA2D
-    printf(TEXT_RED "VID_SetPalette\n" TEXT_RESET);
     // 8 8 8 encoding
     uint8_p pal = palette;
     uint32_p table = d_8to24table;
@@ -125,12 +139,12 @@ void VID_SetPalette(uint8_p palette) { // TODO: make copy and upscale with DMA2D
         uint32_t b = pal[2];
         pal += 3;
 
-        // uint32_t v = (255 << 24) + (r << 16) + (g << 8) + (b << 0);
-        // uint32_t v = (255 << 0) + (r << 8) + (g << 16) + (b << 24);
-        uint32_t v = (255 << 24) + (r << 0) + (g << 8) + (b << 16);
+        // uint32_t v = (0xFF << 24) | (r << 16) | (g << 8) | (b << 0);
+        // uint32_t v = (b << 24) | (g << 16) | (r << 8) | (0xFF << 0);
+        uint32_t v = (0xFF << 24) | (b << 16) | (g << 8) | (r << 0);
         *table++ = v;
     }
-    d_8to24table[255] &= 0xffffff;	// 255 is transparent
+    d_8to24table[255] &= 0x00FFFFFF;    // 255 is transparent
 
 }
 
@@ -140,4 +154,4 @@ void VID_ShiftPalette(uint8_p p) {
 // void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) { printf(TEXT_RED "D_BeginDirectRect\n" TEXT_RESET); }
 // void D_EndDirectRect(int x, int y, int width, int height) { printf(TEXT_RED "D_EndDirectRect\n" TEXT_RESET); }
 
-void VID_Shutdown() { printf(TEXT_RED "VID_Shutdown\n" TEXT_RESET); }
+void VID_Shutdown() { printf(RED("VID_Shutdown\n")); }
