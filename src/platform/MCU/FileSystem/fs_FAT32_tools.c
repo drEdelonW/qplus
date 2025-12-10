@@ -46,17 +46,20 @@ void FAT32_MakeShortName(cStringRO e, cString out, uint32_t out_size) {
     ext[3] = '\0';
 
     // trim spaces
-    int end = 7;
-    while (end >= 0 && name[end] == ' ') {
-        name[end] = '\0';
-        --end;
+    {
+        int end = 7;
+        while ((end >= 0) && (name[end] == ' ')) {
+            name[end] = '\0';
+            --end;
+        }
     }
-    end = 2;
-    while (end >= 0 && ext[end] == ' ') {
-        ext[end] = '\0';
-        --end;
+    {
+        int end = 2;
+        while ((end >= 0) && (ext[end] == ' ')) {
+            ext[end] = '\0';
+            --end;
+        }
     }
-
     if (ext[0] != '\0') snprintf(out, out_size, "%s.%s", name, ext);
     else                snprintf(out, out_size, "%s", name);
 

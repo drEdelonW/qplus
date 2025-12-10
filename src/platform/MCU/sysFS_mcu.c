@@ -48,6 +48,7 @@ int _isatty(int) { return 1; }
 
 #else
 
+#if 0
 int _open(char* path, int flags, ...) {
     printf(RED("_open(path:[%s] flags:0x%X);\n"), path, flags);
     (void)path;
@@ -55,12 +56,16 @@ int _open(char* path, int flags, ...) {
     /* Pretend like we always fail */
     return -1;
 }
+#endif
 
-// int _close(int file) {
-//   (void)file;
-//   return -1;
-// }
-
+#if 0
+int _close(int file) {
+    printf(RED("_close(file:%i);\n"), file);
+    (void)file;
+    return -1;
+}
+#endif
+#if 0
 int _lseek(int file, int ptr, int dir) {
     printf(RED("_lseek(file:%i, ptr:%i, dir:%i);\n"), file, ptr, dir);
     (void)file;
@@ -68,26 +73,30 @@ int _lseek(int file, int ptr, int dir) {
     (void)dir;
     return 0;
 }
+#endif
 
-// int _read(int file, char* ptr, int len) {
-//   (void)file;
-//   int DataIdx;
+#if 0
+int _read(int file, char* ptr, int len) {
+    printf(RED("_read(file:%i, ptr:%p, len:%i);\n"), file, ptr, len);
+    (void)file;
 
-//   for (DataIdx = 0; DataIdx < len; DataIdx++) {
-//     *ptr++ = __io_getchar();
-//   }
+    // for (int DataIdx = 0; DataIdx < len; DataIdx++) {
+    //     *ptr++ = __io_getchar();
+    // }
 
-//   return len;
-// }
+    return len;
+}
+#endif
 
 // int _write(int file, char* ptr, int len) {
-//   (void)file;
-//   int DataIdx;
+//     printf(RED("_write(file:%i, ptr:%p, len:%i);\n"), file, ptr, len);
+//     (void)file;
+//     int DataIdx;
 
-//   for (DataIdx = 0; DataIdx < len; DataIdx++) {
-//     __io_putchar(*ptr++);
-//   }
-//   return len;
+//     for (DataIdx = 0; DataIdx < len; DataIdx++) {
+//         __io_putchar(*ptr++);
+//     }
+//     return len;
 // }
 
 
