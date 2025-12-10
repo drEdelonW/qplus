@@ -92,7 +92,32 @@ void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
     printf(RED("HardFault_Handler\n"));
+    uint32_t* sp;
+    __asm volatile ("mrs %0, msp" : "=r"(sp)); // если используешь MSP
 
+    uint32_t r0  = sp[0];
+    uint32_t r1  = sp[1];
+    uint32_t r2  = sp[2];
+    uint32_t r3  = sp[3];
+    uint32_t r12 = sp[4];
+    uint32_t lr  = sp[5];
+    uint32_t pc  = sp[6];
+    uint32_t psr = sp[7];
+
+    printf("\n*** HardFault ***\n");
+    printf(" R0  = 0x%08lX\n", r0);
+    printf(" R1  = 0x%08lX\n", r1);
+    printf(" R2  = 0x%08lX\n", r2);
+    printf(" R3  = 0x%08lX\n", r3);
+    printf(" R12 = 0x%08lX\n", r12);
+    printf(" LR  = 0x%08lX\n", lr);
+    printf(" PC  = 0x%08lX\n", pc);
+    printf(" PSR = 0x%08lX\n", psr);
+
+    printf(" HFSR= 0x%08lX\n", SCB->HFSR);
+    printf(" CFSR= 0x%08lX\n", SCB->CFSR);
+    printf(" BFAR= 0x%08lX\n", SCB->BFAR);
+    printf(" MMFAR=0x%08lX\n", SCB->MMFAR);
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
