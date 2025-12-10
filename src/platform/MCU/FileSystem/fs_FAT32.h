@@ -87,6 +87,5 @@ void FAT32_FileClose(FAT32_File_t* fh);
 int FAT32_FileRead(FAT32_File_t* fh, void* dst, uint32_t bytes_to_read, uint32_p out_read);
 int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos);
 
-
 int FAT32_IsEOC(uint32_t cl);
 int FAT32_FindPath(cStringRO path, FAT32_DirEntryInfo* out_file);

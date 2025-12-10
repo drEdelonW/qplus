@@ -281,7 +281,7 @@ void CL_PlayDemo_f() {
     COM_DefaultExtension(name, ".dem");
 
     Con_Printf("Playing demo from %s .\n", name);
-    printf(RED("NAME IS: [%s]\n"), name);
+    // printf(RED("NAME IS: [%s]\n"), name);
     COM_FOpenFile(name, &cls.demofile);
     if (!cls.demofile) {
         Con_Printf("ERROR: couldn't open.\n");

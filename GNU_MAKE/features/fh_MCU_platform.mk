@@ -8,6 +8,7 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
             SRC_LIST += $(FS_DIR)/MBR_tool.c
             SRC_LIST += $(FS_DIR)/fs_FAT32.c
             SRC_LIST += $(FS_DIR)/fs_FAT32_tools.c
+            SRC_LIST += $(FS_DIR)/fs_FAT32_path.c
             SRC_LIST += $(FS_DIR)/fs_FAT32_files.c
 
         $(eval STM32_DIR = $(MCU_DIR)/STM32F7) $(eval INCLUDES += $(STM32_DIR))

@@ -1,19 +1,22 @@
-#include <sys/errno.h>
+// #include <sys/errno.h>
 // #include <sys/stat.h>
-#include "types.h"
+// #include "types.h"
 // #include "perepherial.h"
+
 // files
+// int _open(cStringRO, int, int) { errno = ENOSYS; return -1; }
 // int _close(int) { errno = ENOSYS; return -1; }
+// int _lseek(int, int, int) { errno = ENOSYS; return -1; }
+
 // int _fstat(int, struct stat* st) { if (st) st->st_mode = S_IFCHR; return 0; }
 // int _isatty(int) { return 1; }
-// int _lseek(int, int, int) { errno = ENOSYS; return -1; }
-int _read(int, cStringArray, int) { errno = ENOSYS; return 0; }
-// int _unlink(cStringRO) { errno = ENOSYS; return -1; }
-// int _open(cStringRO, int, int) { errno = ENOSYS; return -1; }
+// int _read(int, cStringArray, int) { errno = ENOSYS; return 0; }
+// int _write(int, cStringRO buf, int len) { (void)buf; return len; }
 
 // procs
 // int _kill(int, int) { errno = ENOSYS; return -1; }
 // int _getpid(void) { return 1; }
+// int _unlink(cStringRO) { errno = ENOSYS; return -1; }
 
 // memory
 // static cStringArray heap_end;
@@ -22,6 +25,5 @@ int _read(int, cStringArray, int) { errno = ENOSYS; return 0; }
 // console write
 // Пишите в UART/ITM здесь, если нужно видеть printf
 #if 0
-int _write(int, cStringRO buf, int len) { (void)buf; return len; }
 
 #endif
