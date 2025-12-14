@@ -542,7 +542,7 @@ void V_UpdatePalette() {
     if (!new && !force)
         return;
     //-------------------
-    uint8_t pal[255 * 3];
+    uint8_t pal[256 * 3];
     uint8_p basepal = host_basepal;
     uint8_p newpal = pal;
 

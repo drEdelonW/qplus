@@ -47,7 +47,7 @@ else ifeq ($(UNAME_S),Darwin)
 
     LDFLAGS  += -L/opt/X11/lib
     LDLIBS     += -lX11 -lXext
-
+    FORCE_32     := 0
 else
     $(eval PL_NULL_DIR = $(PLATFORM_DIR)/null) $(eval INCLUDES += $(PL_NULL_DIR))
         SRC_LIST += $(PL_NULL_DIR)/xshm_stubs.c

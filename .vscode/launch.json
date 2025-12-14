@@ -49,6 +49,20 @@
         { "text": "set detach-on-fork off" },
         { "text": "catch exec" }
       ]
+    },{
+      "name": "LLDB: Launch quakeX11 (local)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/GNU_MAKE/run_env/quakeX11",
+      "args": [],
+      "cwd": "${workspaceFolder}/GNU_MAKE/run_env",
+      "env": { "DISPLAY": ":1" },
+      "stopOnEntry": false,
+      "initCommands": [
+        "settings set target.process.follow-fork-mode child",
+        "settings set target.process.stop-on-exec true"
+      ]
     }
+
   ]
 }
