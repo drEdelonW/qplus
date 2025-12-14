@@ -199,10 +199,7 @@ ColorShift_t cshift_lava = { {255, 80, 0}, 150 };
 
 uint8_t  gammatable[256]; // palette is sent through this
 
-#ifdef GLQUAKE
-uint8_t  ramps[3][256];
-float  v_blend[4];  // rgba 0.0 - 1.0
-#endif // GLQUAKE
+
 
 void BuildGammaTable(float g) {
     if (g == 1.0) {
@@ -394,19 +391,22 @@ V_CalcBlend
 =============
 */
 #ifdef GLQUAKE
+float  v_blend[4];  // rgba 0.0 - 1.0
+
 void V_CalcBlend() {
-    float r = 0;
-    float g = 0;
-    float b = 0;
-    float a = 0;
+    float r = 0.0f;
+    float g = 0.0f;
+    float b = 0.0f;
+    float a = 0.0f;
+    float byteScaleFactor = 1.0f / 255.0f;
 
     for (int IdxShClr = 0; IdxShClr < NUM_CSHIFTS; IdxShClr++) {
         if (!gl_cshiftpercent.value)
             continue;
 
-        float a2 = ((cl.cshifts[IdxShClr].percent * gl_cshiftpercent.value) / 100.0) / 255.0;
+        float a2 = ((cl.cshifts[IdxShClr].percent * gl_cshiftpercent.value) / 100.0) * byteScaleFactor;
 
-        //  a2 = cl.cshifts[IdxShClr].percent/255.0;
+        //  a2 = cl.cshifts[IdxShClr].percent * byteScaleFactor;
         if (!a2)
             continue;
         a = a + a2 * (1 - a);
@@ -417,14 +417,14 @@ void V_CalcBlend() {
         b = b * (1 - a2) + cl.cshifts[IdxShClr].destcolor[2] * a2;
     }
 
-    v_blend[0] = r / 255.0;
-    v_blend[1] = g / 255.0;
-    v_blend[2] = b / 255.0;
+    v_blend[0] = r * byteScaleFactor;
+    v_blend[1] = g * byteScaleFactor;
+    v_blend[2] = b * byteScaleFactor;
     v_blend[3] = a;
-    if (v_blend[3] > 1)
-        v_blend[3] = 1;
-    if (v_blend[3] < 0)
-        v_blend[3] = 0;
+    if (v_blend[3] > 1.0f)
+        v_blend[3] = 1.0f;
+    if (v_blend[3] < 0.0f)
+        v_blend[3] = 0.0f;
 }
 #endif
 
@@ -434,6 +434,8 @@ V_UpdatePalette
 =============
 */
 #ifdef GLQUAKE
+uint8_t  ramps[3][256];
+
 void V_UpdatePalette() {
 
     V_CalcPowerupCshift();
@@ -478,12 +480,9 @@ void V_UpdatePalette() {
         int ir = i * a + r;
         int ig = i * a + g;
         int ib = i * a + b;
-        if (ir > 255)
-            ir = 255;
-        if (ig > 255)
-            ig = 255;
-        if (ib > 255)
-            ib = 255;
+        if (ir > 255)   ir = 255;
+        if (ig > 255)   ig = 255;
+        if (ib > 255)   ib = 255;
 
         ramps[0][i] = gammatable[ir];
         ramps[1][i] = gammatable[ig];
