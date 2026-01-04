@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "q_tools.h"
 #include "console.h"
+#include "host.h"
 
 typedef struct sockaddr_ipx sockaddr_ipx_t;
 typedef sockaddr_ipx_t* sockaddr_ipx_p;

@@ -37,6 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qPic.h"
 #include "d_local.h"
 #include "resource.h"
+#include "render.h"
 
 #define MAX_MODE_LIST	30
 #define VID_ROW_SIZE	3
@@ -142,6 +143,7 @@ typedef struct {
     int			halfscreen;
     char		modedesc[13];
 } vmode_t;
+typedef vmode_t* vmode_p;
 
 static vmode_t	modelist[MAX_MODE_LIST];
 static int		nummodes;
