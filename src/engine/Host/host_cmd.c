@@ -667,7 +667,7 @@ void Host_Name_f() {
         Con_Printf("%s renamed to %s\n", remoteClient->name, newName);
 
     Q_strcpy(remoteClient->name, newName);
-    remoteClient->edict->v.netname = remoteClient->name - pr_strings;
+    remoteClient->edict->v.netname = PR_SetQString(remoteClient->name);
 
     // send notification to all clients
     sizebuf_p pBuf = &sv.reliable_datagram;
@@ -891,7 +891,7 @@ void Host_Pause_f() {
     else {
         sv.paused ^= 1;
 
-        SV_BroadcastPrintf("%s %spaused the game\n", (sv.paused) ? "" : "un", pr_strings + sv_player->v.netname);
+        SV_BroadcastPrintf("%s %spaused the game\n", (sv.paused) ? "" : "un", PR_GetQString(sv_player->v.netname));
 
         // send notification to all clients
         sizebuf_p pBuf = &sv.reliable_datagram;
@@ -937,7 +937,7 @@ void Host_Spawn_f() {
         memset(&ent->v, 0, progs->entityfields * 4);
         ent->v.colormap = (float)NUM_FOR_EDICT(ent);
         ent->v.team = (float)(remoteClient->colors & 15) + 1;
-        ent->v.netname = remoteClient->name - pr_strings;
+        ent->v.netname = PR_SetQString(remoteClient->name);
 
         // copy spawn parms out of the RmtClient_t
 
@@ -1204,7 +1204,7 @@ void Host_Give_f() {
 edict_p FindViewthing() {
     for (uint32_t i = 0; i < sv.num_edicts; i++) {
         edict_p eDict = EDICT_NUM(i);
-        if (!strcmp(pr_strings + eDict->v.classname, "viewthing"))  return eDict;
+        if (!strcmp(PR_GetQString(eDict->v.classname), "viewthing"))  return eDict;
     }
     Con_Printf("No viewthing on map\n");
     return NULL;
