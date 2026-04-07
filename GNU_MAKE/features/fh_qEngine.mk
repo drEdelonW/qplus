@@ -1,5 +1,6 @@
 # Set to 1 if you want 32-bit build on Linux x86_64 (requires multilibs)
 FORCE_32     ?= 1
+FORCE_32     ?= 0
 
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
@@ -55,6 +56,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(PROG_DIR)/pr_cmds.c
                         SRC_LIST += $(PROG_DIR)/pr_edict.c
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
+                        SRC_LIST += $(PROG_DIR)/pr_ops_tools.c
 
                 SRC_LIST += $(SV_SIDE_DIR)/sv_main.c
                 SRC_LIST += $(SV_SIDE_DIR)/sv_user.c
