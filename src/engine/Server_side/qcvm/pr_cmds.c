@@ -71,7 +71,7 @@ void PF_error() {
     cString str = PF_VarString(0);
     Con_Printf(
         "======SERVER ERROR in %s:\n%s\n",
-        pr_strings + pr_xfunction->s_name,
+        PR_GetQString(pr_xfunction->s_name),
         str);
     edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
     ED_Print(ed);
@@ -93,7 +93,7 @@ void PF_objerror() {
     cString str = PF_VarString(0);
     Con_Printf(
         "======OBJECT ERROR in %s:\n%s\n",
-        pr_strings + pr_xfunction->s_name,
+        PR_GetQString(pr_xfunction->s_name),
         str);
     edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
     ED_Print(ed);
@@ -235,7 +235,7 @@ void PF_setmodel() {
 
     if (!*check)        PR_RunError("no precache: %s\n", m);
 
-    edict->v.model = m - pr_strings;
+    edict->v.model = PR_SetQString(m);
     edict->v.modelindex = (float)i; // SV_ModelIndex (m);
 
     Model_p mod = sv.models[(int)edict->v.modelindex]; // Mod_ForName (m, true);
@@ -776,7 +776,7 @@ void PF_ftos() {
 
     if (v == (int)v)    snprintf(_pr_string_temp, sizeof(_pr_string_temp), "%d", (int)v);
     else                snprintf(_pr_string_temp, sizeof(_pr_string_temp), "%5.1f", v);
-    G_INT(OFS_RETURN) = _pr_string_temp - pr_strings;
+    G_INT(OFS_RETURN) = PR_SetQString(_pr_string_temp);
 }
 
 void PF_fabs() {
@@ -786,13 +786,13 @@ void PF_fabs() {
 
 void PF_vtos() {
     snprintf(_pr_string_temp, sizeof(_pr_string_temp), "'%5.1f %5.1f %5.1f'", G_VECTOR(OFS_PARM0)[0], G_VECTOR(OFS_PARM0)[1], G_VECTOR(OFS_PARM0)[2]);
-    G_INT(OFS_RETURN) = _pr_string_temp - pr_strings;
+    G_INT(OFS_RETURN) = PR_SetQString(_pr_string_temp);
 }
 
 #ifdef QUAKE2
 void PF_etos() {
     snprintf(_pr_string_temp, sizeof(_pr_string_temp), "entity %i", G_EDICTNUM(OFS_PARM0));
-    G_INT(OFS_RETURN) = _pr_string_temp - pr_strings;
+    G_INT(OFS_RETURN) = PR_SetQString(_pr_string_temp);
 }
 #endif
 
@@ -1224,7 +1224,7 @@ void PF_WriteEntity() { MSG_WriteShort(WriteDest(), (int16_t)G_EDICTNUM(OFS_PARM
 void PF_makestatic() {
     edict_p ent = G_EDICT(OFS_PARM0);
     MSG_WriteByte(&sv.signon, svc_spawnstatic);
-    MSG_WriteByte(&sv.signon, (uint8_t)SV_ModelIndex(pr_strings + ent->v.model));
+    MSG_WriteByte(&sv.signon, (uint8_t)SV_ModelIndex(PR_GetQString(ent->v.model)));
     MSG_WriteByte(&sv.signon, (uint8_t)ent->v.frame);
     MSG_WriteByte(&sv.signon, (uint8_t)ent->v.colormap);
     MSG_WriteByte(&sv.signon, (uint8_t)ent->v.skin);

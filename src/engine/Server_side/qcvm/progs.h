@@ -26,18 +26,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MAX_FIELD_LEN (64)
 #define GEFV_CACHESIZE (2)
 
+typedef int32_t qVmString_t;    // should be signed!!! it was [string_t] from "pr_comp.h"
+
 typedef struct {
     dDef_p  pcache;
     char    field[MAX_FIELD_LEN];
 } gefv_cache;
 
-extern gefv_cache _gefvCache[GEFV_CACHESIZE];
+extern gefv_cache gefvCache[GEFV_CACHESIZE];
 //============================================================================
 typedef void (*builtin_t)();
 extern builtin_t* pr_builtins;
 
 extern dFunction_p  pr_functions;
-extern cString      pr_strings;
+// extern cString      pr_strings; // should be static
 extern dDef_p       pr_globaldefs;
 extern dDef_p       pr_fielddefs;
 extern dStatement_p pr_statements;
@@ -64,6 +66,9 @@ extern "C" {
     void PR_ExecuteProgram(func_t fnum);
     void PR_LoadProgs();
 
+    cString PR_ValueString(etype_t type, eval_p val);
+    cString PR_UglyValueString(etype_t type, eval_p val);
+
     void PR_Profile_f();
 
 #   define G_FLOAT(o)       (pr_globals[(o)])
@@ -74,10 +79,12 @@ extern "C" {
 #   define E_FLOAT(e,o)     (((float_p)&(e)->v)[(o)])
 #   define E_INT(e,o)       (*(int32_p)&((float_p)&(e)->v)[(o)])
 #   define E_VECTOR(e,o)    (&((float_p)&(e)->v)[(o)])
-#   define G_STRING(o)      PR_GetStringSafe(*(string_t*)&pr_globals[(o)])
-#   define E_STRING(e,o)    PR_GetStringSafe(*(string_t*)&((float_p)&(e)->v)[(o)])
+#   define G_STRING(o)      PR_GetQString(*(string_t*)&pr_globals[(o)])
+#   define E_STRING(e,o)    PR_GetQString(*(string_t*)&((float_p)&(e)->v)[(o)])
 
-    static inline cString PR_GetStringSafe(int32_t str_ofs) { return pr_strings + str_ofs; }
+    qVmString_t PR_SetQString(cString str);
+    cString PR_GetQString(qVmString_t offs);
+
     void PR_RunError(cString error, ...);
 
 #ifdef __cplusplus

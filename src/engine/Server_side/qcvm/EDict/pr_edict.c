@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "progs.h"
 #include "Edict.h"
 #include "edicts.h"
-#include "server.h"
 #include "world.h"
 #include "q_tools.h"
 #include "console.h"
@@ -49,10 +48,7 @@ int type_size[ev_LAST] = {
 };
 
 
-
-
-
- gefv_cache _gefvCache[GEFV_CACHESIZE] = {
+ gefv_cache gefvCache[GEFV_CACHESIZE] = {
     {NULL, ""},
     {NULL, ""}
 };
@@ -88,8 +84,8 @@ edict_p ED_Alloc() {
         // freeing and allocating, so relax the replacement policy
         if ((edict->free) &&
             (
-                (edict->freetime < 2) ||
-                (sv.time - edict->freetime > 0.5)
+                (edict->freetime < 2.0f) ||
+                ((sv.time - edict->freetime) > 0.5f)
                 )
             ) {
             ED_ClearEdict(edict);
@@ -170,7 +166,7 @@ ED_FindField
 dDef_p ED_FindField(cString name) {
     for (int i = 0; i < progs->fielddefs.num; i++) {
         dDef_p def = &pr_fielddefs[i];
-        if (!strcmp(pr_strings + def->s_name, name))
+        if (!strcmp(PR_GetQString(def->s_name), name))
             return def;
     }
     return NULL;
@@ -185,7 +181,7 @@ ED_FindGlobal
 dDef_p ED_FindGlobal(cString name) {
     for (int i = 0; i < progs->globaldefs.num; i++) {
         dDef_p def = &pr_globaldefs[i];
-        if (!strcmp(pr_strings + def->s_name, name))
+        if (!strcmp(PR_GetQString(def->s_name), name))
             return def;
     }
     return NULL;
@@ -200,7 +196,7 @@ ED_FindFunction
 dFunction_p ED_FindFunction(cString name) {
     for (int i = 0; i < progs->functions.num; i++) {
         dFunction_p func = &pr_functions[i];
-        if (!strcmp(pr_strings + func->s_name, name))
+        if (!strcmp(PR_GetQString(func->s_name), name))
             return func;
     }
     return NULL;
@@ -212,8 +208,8 @@ eval_p GetEdictFieldValue(edict_p ed, cString field) {
 
     dDef_p def = NULL;
     for (int i = 0; i < GEFV_CACHESIZE; i++) {
-        if (!strcmp(field, _gefvCache[i].field)) {
-            def = _gefvCache[i].pcache;
+        if (!strcmp(field, gefvCache[i].field)) {
+            def = gefvCache[i].pcache;
             goto Done;
         }
     }
@@ -221,8 +217,8 @@ eval_p GetEdictFieldValue(edict_p ed, cString field) {
     def = ED_FindField(field);
 
     if (strlen(field) < MAX_FIELD_LEN) {
-        _gefvCache[_rep].pcache = def;
-        strcpy(_gefvCache[_rep].field, field);
+        gefvCache[_rep].pcache = def;
+        strcpy(gefvCache[_rep].field, field);
         _rep ^= 1;
     }
 
@@ -232,70 +228,6 @@ Done:
     return (eval_p)((cString)&ed->v + def->ofs * 4);
 }
 
-
-/*
-============
-PR_ValueString
-
-Returns a string describing *data in a type specific manner
-=============
-*/
-cString PR_ValueString(etype_t type, eval_p val) {
-    static char _line[256];
-    type &= ~DEF_SAVEGLOBAL;
-
-    switch (type) {
-    case ev_string:     snprintf(_line, sizeof(_line), "%s", pr_strings + val->string);                                          break;
-    case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                   break;
-    case ev_function: {
-        dFunction_p f = pr_functions + val->function;
-        snprintf(_line, sizeof(_line), "%s()", pr_strings + f->s_name);
-    } break;
-    case ev_field: {
-        dDef_p def = ED_FieldAtOfs(val->_int);
-        snprintf(_line, sizeof(_line), ".%s", pr_strings + def->s_name);
-    } break;
-    case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                  break;
-    case ev_float:      snprintf(_line, sizeof(_line), "%5.1f", val->_float);                                                    break;
-    case ev_vector:     snprintf(_line, sizeof(_line), "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);   break;
-    case ev_pointer:    snprintf(_line, sizeof(_line), "pointer");                                                               break;
-    default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                                     break;
-    }
-
-    return _line;
-}
-
-/*
-============
-PR_UglyValueString
-
-Returns a string describing *data in a type specific manner
-Easier to parse than PR_ValueString
-=============
-*/
-cString PR_UglyValueString(etype_t type, eval_p val) {
-    static char _line[256];
-    type &= ~DEF_SAVEGLOBAL;
-
-    switch (type) {
-    case ev_string:     snprintf(_line, sizeof(_line), "%s", pr_strings + val->string);                              break;
-    case ev_entity:     snprintf(_line, sizeof(_line), "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));              break;
-    case ev_function: {
-        dFunction_p f = pr_functions + val->function;
-        snprintf(_line, sizeof(_line), "%s", pr_strings + f->s_name);
-    } break;
-    case ev_field: {
-        dDef_p def = ED_FieldAtOfs(val->_int);
-        snprintf(_line, sizeof(_line), "%s", pr_strings + def->s_name);
-    } break;
-    case ev_void:       snprintf(_line, sizeof(_line), "void");                                                      break;
-    case ev_float:      snprintf(_line, sizeof(_line), "%f", val->_float);                                           break;
-    case ev_vector:     snprintf(_line, sizeof(_line), "%f %f %f", val->vector[0], val->vector[1], val->vector[2]);  break;
-    default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                         break;
-    }
-
-    return _line;
-}
 
 
 
@@ -312,7 +244,7 @@ void ED_Print(edict_p ed) {
     Host_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
     for (int i = 1; i < progs->fielddefs.num; i++) {
         dDef_p d = &pr_fielddefs[i];
-        cString name = pr_strings + d->s_name;
+        cString name = PR_GetQString(d->s_name);
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
@@ -352,7 +284,7 @@ void ED_Write(FILE* f, edict_p ed) {
 
     for (int i = 1; i < progs->fielddefs.num; i++) {
         dDef_p d = &pr_fielddefs[i];
-        cString name = pr_strings + d->s_name;
+        cString name = PR_GetQString(d->s_name);
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
@@ -463,7 +395,7 @@ void ED_WriteGlobals(FILE* f) {
             )
             continue;
 
-        cString name = pr_strings + def->s_name;
+        cString name = PR_GetQString(def->s_name);
         fprintf(f, "\"%s\" ", name);
         fprintf(f, "\"%s\"\n", PR_UglyValueString(type, (eval_p)&pr_globals[def->ofs]));
     }
@@ -541,7 +473,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
     TypeLess_ptr d = (TypeLess_ptr)((int32_p)base + key->ofs);
 
     switch (key->type & ~DEF_SAVEGLOBAL) {
-    case ev_string:     *(string_t*)d = ED_NewString(s) - pr_strings;               break;
+    case ev_string:     *(string_t*)d = PR_SetQString(ED_NewString(s));               break;
     case ev_float:      *(float_p)d = (float)atof(s);                               break;
     case ev_entity:     *(int32_p)d = EDICT_TO_PROG(EDICT_NUM((uint32_t)atoi(s)));  break;
 
@@ -725,7 +657,7 @@ void ED_LoadFromFile(cString data) {
         }
 
         // look for the spawn function
-        dFunction_p func = ED_FindFunction(pr_strings + ent->v.classname);
+        dFunction_p func = ED_FindFunction(PR_GetQString(ent->v.classname));
 
         if (!func) {
             Host_Printf("No spawn function for:\n");

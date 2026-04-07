@@ -1,6 +1,7 @@
 #pragma once
 #include "Edict.h"
 #include <stdio.h>
+#include "server.h"
 
 extern uint32_t     pr_edict_size;  // in bytes
 
@@ -13,6 +14,8 @@ extern "C" {
     void ED_Free(edict_p ed);
 
     cString ED_NewString(cString string);   // returns a copy of the string allocated from the server's string heap
+
+    dDef_p ED_FieldAtOfs(int ofs);
 
     void ED_Print(edict_p ed);
     void ED_Write(FILE* f, edict_p ed);

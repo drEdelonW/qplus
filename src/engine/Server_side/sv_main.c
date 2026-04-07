@@ -188,7 +188,7 @@ void SV_SendServerinfo(RmtClient_p client) {
 
     MSG_WriteByte(pBuf, (!coop.value && deathmatch.value) ? GAME_DEATHMATCH : GAME_COOP);
 
-    snprintf(message, sizeof(message), "%s", pr_strings + sv.edicts->v.message);
+    snprintf(message, sizeof(message), "%s", PR_GetQString(sv.edicts->v.message));
 
     MSG_WriteString(pBuf, message);
 
@@ -390,7 +390,8 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         // ignore if not touching a PV leaf
         if (ent != clent) {  // clent is ALLWAYS sent
             // ignore ents without visible models
-            if (!ent->v.modelindex || !pr_strings[ent->v.model])    continue;
+            // if (!ent->v.modelindex || !pr_strings[ent->v.model])    continue;
+            if (!ent->v.modelindex || !PR_GetQString(ent->v.model)[0])    continue;
 
             int i = 0;
             for (; i < ent->num_leafs; i++)
@@ -541,7 +542,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
 
     if (bits & SU_WEAPONFRAME)          MSG_WriteByte(msg, (uint8_t)ent->v.weaponframe);
     if (bits & SU_ARMOR)                MSG_WriteByte(msg, (uint8_t)ent->v.armorvalue);
-    if (bits & SU_WEAPON)               MSG_WriteByte(msg, (uint8_t)SV_ModelIndex(pr_strings + ent->v.weaponmodel));
+    if (bits & SU_WEAPON)               MSG_WriteByte(msg, (uint8_t)SV_ModelIndex(PR_GetQString(ent->v.weaponmodel)));
 
     MSG_WriteShort(msg, (int16_t)ent->v.health);
     MSG_WriteByte(msg, (uint8_t)ent->v.currentammo);
@@ -775,7 +776,7 @@ void SV_CreateBaseline() {
         else {
             svent->baseline.colormap = 0;
             svent->baseline.modelindex =
-                SV_ModelIndex(pr_strings + svent->v.model);
+                SV_ModelIndex(PR_GetQString(svent->v.model));
         }
 
         //
@@ -942,9 +943,9 @@ void SV_SpawnServer(
     //
     SV_ClearWorld();
 
-    sv.sound_precache[0] = pr_strings;
+    // sv.sound_precache[0] = pr_strings;
 
-    sv.model_precache[0] = pr_strings;
+    sv.model_precache[0] = PR_GetQString(0); // not sure
     sv.model_precache[1] = sv.modelname;
     for (int i = 1; i < sv.worldmodel->numSubModels; i++) {
         sv.model_precache[1 + i] = _localModels[i];
@@ -957,7 +958,7 @@ void SV_SpawnServer(
     edict_p ent = EDICT_NUM(0);
     memset(&ent->v, 0, progs->entityfields * 4);
     ent->free = false;
-    ent->v.model = sv.worldmodel->name - pr_strings;
+    ent->v.model = PR_SetQString(sv.worldmodel->name);
     ent->v.modelindex = 1;    // world model
     ent->v.solid = SOLID_BSP;
     ent->v.movetype = MOVETYPE_PUSH;
@@ -965,9 +966,9 @@ void SV_SpawnServer(
     if (coop.value) pr_global_struct->coop = coop.value;
     else            pr_global_struct->deathmatch = deathmatch.value;
 
-    pr_global_struct->mapname = sv.name - pr_strings;
+    pr_global_struct->mapname = PR_SetQString(sv.name);
 #ifdef QUAKE2
-    pr_global_struct->startspot = sv.startspot - pr_strings;
+    pr_global_struct->startspot = PR_SetQString(sv.startspot);
 #endif
 
     // serverflags are for cross level information (sigils)

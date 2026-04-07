@@ -131,7 +131,7 @@ cString PR_GlobalString(int32_t ofs) {
         snprintf(_line, sizeof(_line), "%i(???)", ofs);
     else {
         cString s = PR_ValueString(def->type, val);
-        snprintf(_line, sizeof(_line), "%i(%s)%s", ofs, pr_strings + def->s_name, s);
+        snprintf(_line, sizeof(_line), "%i(%s)%s", ofs, PR_GetQString(def->s_name), s);
     }
 
     size_t i = strlen(_line);
@@ -147,7 +147,7 @@ cString PR_GlobalStringNoContents(int32_t ofs) {
 
     dDef_p def = ED_GlobalAtOfs(ofs);
     if (!def)   snprintf(_line, sizeof(_line), "%i(???)", ofs);
-    else        snprintf(_line, sizeof(_line), "%i(%s)", ofs, pr_strings + def->s_name);
+    else        snprintf(_line, sizeof(_line), "%i(%s)", ofs, PR_GetQString(def->s_name));
 
     size_t i = strlen(_line);
     for (; i < 20; i++)

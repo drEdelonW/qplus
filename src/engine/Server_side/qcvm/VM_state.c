@@ -11,7 +11,7 @@
 
 dprograms_p    progs;
 dFunction_p    pr_functions;
-cString        pr_strings;         // much more
+static cString  _pr_strings;         // much more // should be static
 dDef_p         pr_fielddefs;
 dDef_p         pr_globaldefs;
 dStatement_p   pr_statements;
@@ -22,6 +22,72 @@ uint32_t       pr_edict_size;      // in bytes
 uint16_t pr_crc;
 
 
+
+/*
+============
+PR_ValueString
+
+Returns a string describing *data in a type specific manner
+=============
+*/
+cString PR_ValueString(etype_t type, eval_p val) {
+    static char _line[256];
+    type &= ~DEF_SAVEGLOBAL;
+
+    switch (type) {
+        case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                                          break;
+        case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                   break;
+        case ev_function: {
+            dFunction_p f = pr_functions + val->function;
+            snprintf(_line, sizeof(_line), "%s()", PR_GetQString(f->s_name));
+        } break;
+        case ev_field: {
+            dDef_p def = ED_FieldAtOfs(val->_int);
+            snprintf(_line, sizeof(_line), ".%s", PR_GetQString(def->s_name));
+        } break;
+        case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                  break;
+        case ev_float:      snprintf(_line, sizeof(_line), "%5.1f", val->_float);                                                    break;
+        case ev_vector:     snprintf(_line, sizeof(_line), "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);   break;
+        case ev_pointer:    snprintf(_line, sizeof(_line), "pointer");                                                               break;
+        default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                                     break;
+    }
+
+    return _line;
+}
+
+/*
+============
+PR_UglyValueString
+
+Returns a string describing *data in a type specific manner
+Easier to parse than PR_ValueString
+=============
+*/
+cString PR_UglyValueString(etype_t type, eval_p val) {
+    static char _line[256];
+    type &= ~DEF_SAVEGLOBAL;
+
+    switch (type) {
+    case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                              break;
+    case ev_entity:     snprintf(_line, sizeof(_line), "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));              break;
+    case ev_function: {
+        dFunction_p f = pr_functions + val->function;
+        snprintf(_line, sizeof(_line), "%s", PR_GetQString(f->s_name));
+    } break;
+    case ev_field: {
+        dDef_p def = ED_FieldAtOfs(val->_int);
+        snprintf(_line, sizeof(_line), "%s", PR_GetQString(def->s_name));
+    } break;
+    case ev_void:       snprintf(_line, sizeof(_line), "void");                                                      break;
+    case ev_float:      snprintf(_line, sizeof(_line), "%f", val->_float);                                           break;
+    case ev_vector:     snprintf(_line, sizeof(_line), "%f %f %f", val->vector[0], val->vector[1], val->vector[2]);  break;
+    default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                         break;
+    }
+
+    return _line;
+}
+
+
 /*
 ===============
 PR_LoadProgs
@@ -30,7 +96,7 @@ PR_LoadProgs
 void PR_LoadProgs() {
     // flush the non-C variable lookup cache
     for (int i = 0; i < GEFV_CACHESIZE; i++)
-        _gefvCache[i].field[0] = 0;
+        gefvCache[i].field[0] = 0;
 
     CRC_Init(&pr_crc);
 
@@ -50,7 +116,7 @@ void PR_LoadProgs() {
     if (progs->crc != PROGHEADER_CRC)       Host_SysError("progs.dat system vars have been modified, progdefs.h is out of date");
 
     pr_functions = (dFunction_p)((uint8_p)progs + progs->functions.ofs);
-    pr_strings = (cString)((uint8_p)progs + progs->strings.ofs);
+    _pr_strings = (cString)((uint8_p)progs + progs->strings.ofs);
     pr_globaldefs = (dDef_p)((uint8_p)progs + progs->globaldefs.ofs);
     pr_fielddefs = (dDef_p)((uint8_p)progs + progs->fielddefs.ofs);
     pr_statements = (dStatement_p)((uint8_p)progs + progs->statements.ofs);
@@ -93,6 +159,14 @@ void PR_LoadProgs() {
 
     for (int i = 0; i < progs->globals.num; i++)
         ((int32_p)pr_globals)[i] = LittleLong(((int32_p)pr_globals)[i]);
+}
+
+qVmString_t PR_SetQString(cString str) {
+    return str - _pr_strings;
+}
+
+cString PR_GetQString(qVmString_t offs) {
+    return _pr_strings + offs;
 }
 
 

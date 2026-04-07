@@ -90,8 +90,8 @@ void PR_StackTrace() {
 
         if (!func)  Con_Printf("<NO FUNCTION>\n");
         else        Con_Printf("%12s : %s\n",
-            pr_strings + func->s_file,
-            pr_strings + func->s_name
+            PR_GetQString(func->s_file),
+            PR_GetQString(func->s_name)
         );
     }
 }
@@ -121,7 +121,7 @@ void PR_Profile_f() {
                 Con_Printf(
                     "%7i %s\n",
                     best->profile,
-                    pr_strings + best->s_name
+                    PR_GetQString(best->s_name)
                 );
             num++;
             best->profile = 0;
@@ -317,11 +317,11 @@ void PR_ExecuteProgram(func_t fnum) {
                     (a->vector[2] == b->vector[2]);
             } break;
             case OP_EQ_S: {
-                // c->_float = !strcmp(pr_strings + a->string, pr_strings + b->string);
+                // c->_float = !strcmp(PR_GetQString(a->string), PR_GetQString(b->string));
                 // Con_DPrintf("[OP_EQ_S] a:0x%X(%d)\"%s\" b:0x%X(%d)\"%s\"\n",
-                //     a->string, a->string, PR_GetStringSafe(a->string),
-                //     b->string, b->string, PR_GetStringSafe(b->string));
-                c->_float = /*0.0f;*/!strcmp(PR_GetStringSafe(a->string), PR_GetStringSafe(b->string));
+                //     a->string, a->string, PR_GetQString(a->string),
+                //     b->string, b->string, PR_GetQString(b->string));
+                c->_float = /*0.0f;*/!strcmp(PR_GetQString(a->string), PR_GetQString(b->string));
                 // Con_DPrintf("c=%f\n",c->_float);
             } break;
             case OP_EQ_E:       c->_float = (a->_int == b->_int);                   break;
@@ -335,8 +335,8 @@ void PR_ExecuteProgram(func_t fnum) {
                     (a->vector[2] != b->vector[2]);
             } break;
             case OP_NE_S:
-                // c->_float = strcmp(pr_strings + a->string, pr_strings + b->string);
-                c->_float = (float)strcmp(PR_GetStringSafe(a->string), PR_GetStringSafe(b->string));   break;
+                // c->_float = strcmp(PR_GetQString(a->string), PR_GetQString(b->string));
+                c->_float = (float)strcmp(PR_GetQString(a->string), PR_GetQString(b->string));   break;
             case OP_NE_E:       c->_float = a->_int != b->_int;     break;
             case OP_NE_FNC:     c->_float = a->function != b->function;     break;
 
@@ -416,8 +416,8 @@ void PR_ExecuteProgram(func_t fnum) {
 
             case OP_NOT_F:      c->_float = !a->_float;     break;
             case OP_NOT_V:      c->_float = !a->vector[0] && !a->vector[1] && !a->vector[2];    break;
-            case OP_NOT_S:      c->_float = !a->string || !*PR_GetStringSafe(a->string);        break;        // c->_float = !a->string || !pr_strings[a->string];
-            case OP_NOT_ENT:    c->_float = (PROG_TO_EDICT(a->edict) == sv.edicts); break;
+            case OP_NOT_S:      c->_float = !a->string || !*PR_GetQString(a->string);           break;        // c->_float = !a->string || !pr_strings[a->string];
+            case OP_NOT_ENT:    c->_float = (PROG_TO_EDICT(a->edict) == sv.edicts);             break;
             case OP_NOT_FNC:    c->_float = !a->function;   break;
 
             case OP_IF: {
