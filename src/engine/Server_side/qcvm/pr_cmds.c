@@ -37,8 +37,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cbuf.h"
 #include <stdlib.h>
 
-#define RETURN_EDICT(edict) (((int *)pr_globals)[OFS_RETURN] = EDICT_TO_PROG(edict))
-
 /*
 ===============================================================================
 
@@ -71,7 +69,7 @@ void PF_error() {
     cString str = PF_VarString(0);
     Con_Printf(
         "======SERVER ERROR in %s:\n%s\n",
-        PR_GetQString(pr_xfunction->s_name),
+        PR_GetQString(pr_xFunction->s_name),
         str);
     edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
     ED_Print(ed);
@@ -93,7 +91,7 @@ void PF_objerror() {
     cString str = PF_VarString(0);
     Con_Printf(
         "======OBJECT ERROR in %s:\n%s\n",
-        PR_GetQString(pr_xfunction->s_name),
+        PR_GetQString(pr_xFunction->s_name),
         str);
     edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
     ED_Print(ed);
@@ -947,13 +945,13 @@ void PF_walkmove() {
     };
 
     // save program state, because SV_movestep may call other progs
-    dFunction_p oldf = pr_xfunction;
+    dFunction_p oldf = pr_xFunction;
     int oldself = pr_global_struct->self;
 
     G_FLOAT(OFS_RETURN) = SV_movestep(ent, move, true);
 
     // restore program state
-    pr_xfunction = oldf;
+    pr_xFunction = oldf;
     pr_global_struct->self = oldself;
 }
 

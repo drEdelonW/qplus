@@ -34,8 +34,9 @@ extern "C" {
 #   define PROG_EDICT_BASE      ((uint8_p)sv.edicts)
 #   define PROG_TO_EDICT(ofs)   ((edict_p)(PROG_EDICT_BASE + (uint32_t)(ofs)))
 #   define EDICT_TO_PROG(e)     ((int32_t)((uint8_p)(e) - PROG_EDICT_BASE))
-#   define G_EDICT(o)       PROG_TO_EDICT((uint32_t)G_INT((o)))
-#   define G_EDICTNUM(o)    NUM_FOR_EDICT(G_EDICT((o)))
+#   define G_EDICT(o)           PROG_TO_EDICT((uint32_t)G_INT((o)))
+#   define G_EDICTNUM(o)        NUM_FOR_EDICT(G_EDICT((o)))
+#   define RETURN_EDICT(edict)  (((int *)pr_globals)[OFS_RETURN] = EDICT_TO_PROG(edict))
 
     void ED_PrintEdicts();
     void ED_PrintNum(uint32_t ent);

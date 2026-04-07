@@ -30,26 +30,20 @@ PR_ValueString
 Returns a string describing *data in a type specific manner
 =============
 */
+static char _line[256];
 cString PR_ValueString(etype_t type, eval_p val) {
-    static char _line[256];
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
-        case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                                          break;
-        case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                   break;
-        case ev_function: {
-            dFunction_p f = pr_functions + val->function;
-            snprintf(_line, sizeof(_line), "%s()", PR_GetQString(f->s_name));
-        } break;
-        case ev_field: {
-            dDef_p def = ED_FieldAtOfs(val->_int);
-            snprintf(_line, sizeof(_line), ".%s", PR_GetQString(def->s_name));
-        } break;
-        case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                  break;
-        case ev_float:      snprintf(_line, sizeof(_line), "%5.1f", val->_float);                                                    break;
-        case ev_vector:     snprintf(_line, sizeof(_line), "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);   break;
-        case ev_pointer:    snprintf(_line, sizeof(_line), "pointer");                                                               break;
-        default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                                     break;
+        case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                                       break;
+        case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                  break;
+        case ev_function:   snprintf(_line, sizeof(_line), "%s()", PR_GetQString((pr_functions + val->function)->s_name));          break;
+        case ev_field:      snprintf(_line, sizeof(_line), ".%s", PR_GetQString(ED_FieldAtOfs(val->_int)->s_name));                 break;
+        case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                 break;
+        case ev_float:      snprintf(_line, sizeof(_line), "%5.1f", val->_float);                                                   break;
+        case ev_vector:     snprintf(_line, sizeof(_line), "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);  break;
+        case ev_pointer:    snprintf(_line, sizeof(_line), "pointer");                                                              break;
+        default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                                    break;
     }
 
     return _line;
@@ -64,24 +58,17 @@ Easier to parse than PR_ValueString
 =============
 */
 cString PR_UglyValueString(etype_t type, eval_p val) {
-    static char _line[256];
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
-    case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                              break;
-    case ev_entity:     snprintf(_line, sizeof(_line), "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));              break;
-    case ev_function: {
-        dFunction_p f = pr_functions + val->function;
-        snprintf(_line, sizeof(_line), "%s", PR_GetQString(f->s_name));
-    } break;
-    case ev_field: {
-        dDef_p def = ED_FieldAtOfs(val->_int);
-        snprintf(_line, sizeof(_line), "%s", PR_GetQString(def->s_name));
-    } break;
-    case ev_void:       snprintf(_line, sizeof(_line), "void");                                                      break;
-    case ev_float:      snprintf(_line, sizeof(_line), "%f", val->_float);                                           break;
-    case ev_vector:     snprintf(_line, sizeof(_line), "%f %f %f", val->vector[0], val->vector[1], val->vector[2]);  break;
-    default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                         break;
+        case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                           break;
+        case ev_entity:     snprintf(_line, sizeof(_line), "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));             break;
+        case ev_function:   snprintf(_line, sizeof(_line), "%s", PR_GetQString((pr_functions + val->function)->s_name));break;
+        case ev_field:      snprintf(_line, sizeof(_line), "%s", PR_GetQString(ED_FieldAtOfs(val->_int)->s_name));      break;
+        case ev_void:       snprintf(_line, sizeof(_line), "void");                                                     break;
+        case ev_float:      snprintf(_line, sizeof(_line), "%f", val->_float);                                          break;
+        case ev_vector:     snprintf(_line, sizeof(_line), "%f %f %f", val->vector[0], val->vector[1], val->vector[2]); break;
+        default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                        break;
     }
 
     return _line;
@@ -137,10 +124,11 @@ void PR_LoadProgs() {
     for (int i = 0; i < progs->functions.num; i++) {
         pr_functions[i].first_statement = LittleLong(pr_functions[i].first_statement);
         pr_functions[i].parm_start = LittleLong(pr_functions[i].parm_start);
+        pr_functions[i].locals = LittleLong(pr_functions[i].locals);
+
         pr_functions[i].s_name = LittleLong(pr_functions[i].s_name);
         pr_functions[i].s_file = LittleLong(pr_functions[i].s_file);
         pr_functions[i].numparms = LittleLong(pr_functions[i].numparms);
-        pr_functions[i].locals = LittleLong(pr_functions[i].locals);
     }
 
     for (int i = 0; i < progs->globaldefs.num; i++) {
@@ -161,8 +149,19 @@ void PR_LoadProgs() {
         ((int32_p)pr_globals)[i] = LittleLong(((int32_p)pr_globals)[i]);
 }
 
+
 qVmString_t PR_SetQString(cString str) {
+#if 0
     return str - _pr_strings;
+#else
+    ptrdiff_t delta = str - _pr_strings;
+
+    if ((delta > INT32_MAX) || (delta < INT32_MIN)) {
+        Host_SysError("PR_SetQString \"%s\": delta out of int32 (%lld) 0x%llX", str, (long long)delta, (long long)delta);
+    }
+
+    return (qVmString_t)delta;
+#endif
 }
 
 cString PR_GetQString(qVmString_t offs) {
