@@ -321,7 +321,7 @@ Returns a string with a description and the contents of a global,
 padded to 20 field width
 ============
 */
-cString PR_GlobalString(int ofs) {
+cString PR_GlobalString(int32_t ofs) {
     static char _line[128];
 
     TypeLess_ptr val = (TypeLess_ptr)&pr_globals[ofs];
@@ -341,7 +341,7 @@ cString PR_GlobalString(int ofs) {
     return _line;
 }
 
-cString PR_GlobalStringNoContents(int ofs) {
+cString PR_GlobalStringNoContents(int32_t ofs) {
     static char _line[128];
 
     dDef_p def = ED_GlobalAtOfs(ofs);

@@ -65,13 +65,17 @@ typedef enum {
 
 typedef enum {
     OP_DONE,
+
     OP_MUL_F,
     OP_MUL_V,
     OP_MUL_FV,
     OP_MUL_VF,
+
     OP_DIV_F,
+
     OP_ADD_F,
     OP_ADD_V,
+
     OP_SUB_F,
     OP_SUB_V,
 
@@ -116,13 +120,16 @@ typedef enum {
     OP_STOREP_FNC,
 
     OP_RETURN,
+
     OP_NOT_F,
     OP_NOT_V,
     OP_NOT_S,
     OP_NOT_ENT,
     OP_NOT_FNC,
+
     OP_IF,
     OP_IFNOT,
+
     OP_CALL0,
     OP_CALL1,
     OP_CALL2,
@@ -132,19 +139,24 @@ typedef enum {
     OP_CALL6,
     OP_CALL7,
     OP_CALL8,
+
     OP_STATE,
+
     OP_GOTO,
+
     OP_AND,
     OP_OR,
 
     OP_BITAND,
     OP_BITOR,
+
     OP_LAST     // Should be last
 } prog_operation_e;
 
 typedef uint16_t op_type;
 typedef int16_t arg_type;
-typedef struct statement_s {
+
+typedef struct {
     op_type     op;    // prog_operation_e
     arg_type    a;
     arg_type    b;
