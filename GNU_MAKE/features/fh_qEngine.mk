@@ -1,5 +1,5 @@
 # Set to 1 if you want 32-bit build on Linux x86_64 (requires multilibs)
-# FORCE_32     ?= 1
+FORCE_32     ?= 1
 FORCE_32     ?= 0
 
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
