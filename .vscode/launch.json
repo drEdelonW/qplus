@@ -6,7 +6,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/GNU_MAKE/run_env/quakeX11", // локальный путь к символам
-      "args": [], // арг-ты НЕ нужны: их дал gdbserver
+      "args": [],
       "cwd": "${workspaceFolder}",
       "MIMode": "gdb",
       "miDebuggerPath": "/usr/bin/gdb-multiarch", // <— установите: sudo apt-get install gdb-multiarch
@@ -29,10 +29,7 @@
         },
         { "text": "set pagination off" },
         { "text": "set breakpoint pending on" },
-        {
-          "text": "set architecture arm"
-          // "text": "set architecture aarch64"
-        },
+        { "text": "set architecture arm" },
         { "text": "set endian little" },
         { "text": "set sysroot target:" },
         { "text": "set follow-fork-mode child" },
@@ -67,16 +64,32 @@
         },
         { "text": "set pagination off" },
         { "text": "set breakpoint pending on" },
-        {
-          // "text": "set architecture arm"
-          "text": "set architecture aarch64"
-        },
+        { "text": "set architecture aarch64" },
         { "text": "set endian little" },
         { "text": "set sysroot target:" },
         { "text": "set follow-fork-mode child" },
         { "text": "set detach-on-fork off" },
         { "text": "catch exec" }
       ]
+    },{
+      "name": "Launch local quakeX11",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/GNU_MAKE/run_env/quakeX11",
+      "args": [],
+      "cwd": "${workspaceFolder}/GNU_MAKE/run_env",
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb-multiarch",
+      "stopAtEntry": false,
+      "environment": [
+        {
+          "name": "DISPLAY",
+          "value": ":1"
+        }
+      ],
+      "sourceFileMap": {
+        "/home/edelon/SelfLab/quake": "${workspaceFolder}"
+      }
     },{
       "name": "LLDB: arm64 Launch quakeX11 (local)",
       "type": "lldb",
