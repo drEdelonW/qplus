@@ -37,19 +37,19 @@ extern gefv_cache gefvCache[GEFV_CACHESIZE];
 //============================================================================
 typedef void (*builtin_t)();
 extern builtin_t* pr_builtins;
+extern int32_t    pr_numbuiltins;
 
 extern dFunction_p  pr_functions;
 // extern cString      pr_strings; // should be static
 extern dDef_p       pr_globaldefs;
 extern dDef_p       pr_fielddefs;
 extern dStatement_p pr_statements;
-extern globalvars_p pr_global_struct;
+extern globalvars_p pr_global_struct;   // global variable of game settings
 extern float_p      pr_globals;     // same as pr_global_struct
-extern int32_t      pr_numbuiltins;
-extern int32_t      pr_argc;
+extern int32_t      pr_argc;        // number of op_call
 extern bool         pr_trace;
-extern dFunction_p  pr_xfunction;
-extern int32_t      pr_xstatement;
+extern dFunction_p  pr_xFunction;
+// extern int32_t      pr_xstatement;
 extern uint16_t     pr_crc;
 
 extern dprograms_p  progs;
@@ -63,23 +63,24 @@ extern "C" {
 
     void PR_Init();
 
-    void PR_ExecuteProgram(func_t fnum);
     void PR_LoadProgs();
+    void PR_ExecuteProgram(func_t fnum);
 
     cString PR_ValueString(etype_t type, eval_p val);
     cString PR_UglyValueString(etype_t type, eval_p val);
 
     void PR_Profile_f();
 
+// #   define G_FUNCTION(o)    (*(func_t*)&pr_globals[(o)])
+
 #   define G_FLOAT(o)       (pr_globals[(o)])
 #   define G_INT(o)         (*(int32_p)&pr_globals[(o)])
 #   define G_VECTOR(o)      (&pr_globals[(o)])
-#   define G_FUNCTION(o)    (*(func_t*)&pr_globals[(o)])
-
-#   define E_FLOAT(e,o)     (((float_p)&(e)->v)[(o)])
-#   define E_INT(e,o)       (*(int32_p)&((float_p)&(e)->v)[(o)])
-#   define E_VECTOR(e,o)    (&((float_p)&(e)->v)[(o)])
 #   define G_STRING(o)      PR_GetQString(*(string_t*)&pr_globals[(o)])
+
+// #   define E_FLOAT(e,o)     (((float_p)&(e)->v)[(o)])
+// #   define E_INT(e,o)       (*(int32_p)&((float_p)&(e)->v)[(o)])
+// #   define E_VECTOR(e,o)    (&((float_p)&(e)->v)[(o)])
 #   define E_STRING(e,o)    PR_GetQString(*(string_t*)&((float_p)&(e)->v)[(o)])
 
     qVmString_t PR_SetQString(cString str);

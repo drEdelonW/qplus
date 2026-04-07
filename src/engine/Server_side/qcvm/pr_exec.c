@@ -34,17 +34,17 @@ typedef struct {
 } prstack_t;
 
 #define MAX_STACK_DEPTH  32
-static prstack_t _pr_stack[MAX_STACK_DEPTH];
-static int32_t   _pr_depth;
+static prstack_t _pr_Stack[MAX_STACK_DEPTH];
+static int32_t   _pr_Depth;
 
 #define LOCALSTACK_SIZE  2048
-static int32_t _localstack[LOCALSTACK_SIZE];
-static int32_t _localstack_used;
+static int32_t _localStack[LOCALSTACK_SIZE];
+static int32_t _localStack_used;
 
 bool  pr_trace;
-dFunction_p pr_xfunction;
-int32_t     pr_xstatement;
-int32_t     pr_argc;
+static int32_t _pr_xStatement;
+dFunction_p     pr_xFunction;
+int32_t         pr_argc;
 
 
 //=============================================================================
@@ -82,11 +82,11 @@ void PR_PrintStatement(dStatement_p state) {
     ============
 */
 void PR_StackTrace() {
-    if (_pr_depth == 0) { Con_Printf("<NO STACK>\n");   return; }
+    if (_pr_Depth == 0) { Con_Printf("<NO STACK>\n");   return; }
 
-    _pr_stack[_pr_depth].func = pr_xfunction;
-    for (int i = _pr_depth; i >= 0; i--) {
-        dFunction_p func = _pr_stack[i].func;
+    _pr_Stack[_pr_Depth].func = pr_xFunction;
+    for (int i = _pr_Depth; i >= 0; i--) {
+        dFunction_p func = _pr_Stack[i].func;
 
         if (!func)  Con_Printf("<NO FUNCTION>\n");
         else        Con_Printf("%12s : %s\n",
@@ -142,11 +142,11 @@ void PR_RunError(cString error, ...) {
     char string[1024];  vsnprintf(string, sizeof(string), error, argptr);
     va_end(argptr);
 
-    PR_PrintStatement(pr_statements + pr_xstatement);
+    PR_PrintStatement(pr_statements + _pr_xStatement);
     PR_StackTrace();
     Con_Printf("%s\n", string);
 
-    _pr_depth = 0;  // dump the stack so host_error can shutdown functions
+    _pr_Depth = 0;  // dump the stack so host_error can shutdown functions
 
     Host_Error("Program error");
 }
@@ -167,21 +167,21 @@ Returns the new program statement counter
 ====================
 */
 int32_t PR_EnterFunction(dFunction_p func) {
-    _pr_stack[_pr_depth] = (prstack_t){
-        .stack = pr_xstatement,
-        .func = pr_xfunction
+    _pr_Stack[_pr_Depth] = (prstack_t){
+        .stack = _pr_xStatement,
+        .func = pr_xFunction
     };
-    _pr_depth++;
-    if (_pr_depth >= MAX_STACK_DEPTH)        PR_RunError("stack overflow");
+    _pr_Depth++;
+    if (_pr_Depth >= MAX_STACK_DEPTH)        PR_RunError("stack overflow");
 
     // save off any locals that the new function steps on
     int param_used = func->locals;
-    if (_localstack_used + param_used > LOCALSTACK_SIZE)
+    if (_localStack_used + param_used > LOCALSTACK_SIZE)
         PR_RunError("PR_ExecuteProgram: locals stack overflow\n");
 
     for (int i = 0; i < param_used; i++)
-        _localstack[_localstack_used + i] = ((int32_p)pr_globals)[func->parm_start + i];
-    _localstack_used += param_used;
+        _localStack[_localStack_used + i] = ((int32_p)pr_globals)[func->parm_start + i];
+    _localStack_used += param_used;
 
     // copy parameters
     int param_ofs = func->parm_start;
@@ -192,7 +192,7 @@ int32_t PR_EnterFunction(dFunction_p func) {
         }
     }
 
-    pr_xfunction = func;
+    pr_xFunction = func;
     return func->first_statement - 1; // offset the state++
 }
 
@@ -202,20 +202,20 @@ PR_LeaveFunction
 ====================
 */
 int32_t PR_LeaveFunction() {
-    if (_pr_depth <= 0)     Host_SysError("prog stack underflow");
+    if (_pr_Depth <= 0)     Host_SysError("prog stack underflow");
 
     // restore locals from the stack
-    int32_t param_used = pr_xfunction->locals;
-    _localstack_used -= param_used;
-    if (_localstack_used < 0)   PR_RunError("PR_ExecuteProgram: locals stack underflow\n");
+    int32_t param_used = pr_xFunction->locals;
+    _localStack_used -= param_used;
+    if (_localStack_used < 0)   PR_RunError("PR_ExecuteProgram: locals stack underflow\n");
 
     for (int i = 0; i < param_used; i++)
-        ((int32_t*)pr_globals)[pr_xfunction->parm_start + i] = _localstack[_localstack_used + i];
+        ((int32_t*)pr_globals)[pr_xFunction->parm_start + i] = _localStack[_localStack_used + i];
 
     // up stack
-    _pr_depth--;
-    pr_xfunction = _pr_stack[_pr_depth].func;
-    return _pr_stack[_pr_depth].stack;
+    _pr_Depth--;
+    pr_xFunction = _pr_Stack[_pr_Depth].func;
+    return _pr_Stack[_pr_Depth].stack;
 }
 
 
@@ -238,7 +238,7 @@ void PR_ExecuteProgram(func_t fnum) {
     pr_trace = false;
 
     // make a stack frame
-    int32_t exitdepth = _pr_depth;
+    int32_t exitdepth = _pr_Depth;
 
     int32_t stack = PR_EnterFunction(func);
 
@@ -252,8 +252,8 @@ void PR_ExecuteProgram(func_t fnum) {
 
         if (!--runaway)     PR_RunError("runaway loop error");
 
-        pr_xfunction->profile++;
-        pr_xstatement = stack;
+        pr_xFunction->profile++;
+        _pr_xStatement = stack;
 
         if (pr_trace)       PR_PrintStatement(st);
 
@@ -271,7 +271,7 @@ void PR_ExecuteProgram(func_t fnum) {
                 pr_globals[OFS_RETURN + 2] = pr_globals[st->a + 2];
 
                 stack = PR_LeaveFunction();
-                if (_pr_depth == exitdepth)
+                if (_pr_Depth == exitdepth)
                     return;  // all done
             } break;
 
