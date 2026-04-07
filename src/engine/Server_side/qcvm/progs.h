@@ -64,6 +64,8 @@ extern "C" {
     void PR_Init();
 
     void PR_LoadProgs();
+    void PR_ClearAppStrings();
+
     void PR_ExecuteProgram(func_t fnum);
 
     cString PR_ValueString(etype_t type, eval_p val);
