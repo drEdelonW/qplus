@@ -33,7 +33,8 @@ CVAR_SV(noexit, "0");
 #ifdef QUAKE2
 CVAR(developer, "1");   // should be 0 for release!
 #else
-CVAR(developer, "0");
+// CVAR(developer, "0");
+CVAR(developer, "1");
 #endif
 
 CVAR(skill, "1");       // 0 - 3

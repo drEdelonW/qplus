@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef int32_t func_t;
 typedef int32_t string_t;
 
-typedef union eval_s {
+typedef union {
     string_t    string;
     float       _float;
     vec3_t      vector;
@@ -51,7 +51,7 @@ typedef enum {
 // VM global offsets; vectors occupy 3 float slots
 typedef enum {
     OFS_NULL      = 0u,
-    OFS_RETURN    = 1u,
+    OFS_RETURN    = 1u,     // +3
     OFS_PARM0     = 4u,   // parm0..parm7: +3 per parm
     OFS_PARM1     = 7u,
     OFS_PARM2     = 10u,
@@ -165,10 +165,10 @@ typedef struct {
 typedef dStatement_t* dStatement_p;
 
 typedef struct {
-    uint16_t type;  // if DEF_SAVEGLOBGAL bit is set
+    uint16_t    type;  // if DEF_SAVEGLOBGAL bit is set
     // the variable needs to be saved in savegames
-    uint16_t ofs;
-    int32_t   s_name;
+    uint16_t    ofs;
+    int32_t     s_name;
 } dDef_t;
 typedef dDef_t* dDef_p;
 

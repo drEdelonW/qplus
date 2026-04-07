@@ -63,6 +63,7 @@ int type_size[ev_LAST] = {
 
 #define MAX_FIELD_LEN (64)
 #define GEFV_CACHESIZE (2)
+
 typedef struct {
     dDef_p  pcache;
     char    field[MAX_FIELD_LEN];
@@ -263,14 +264,14 @@ cString PR_ValueString(etype_t type, eval_p val) {
     switch (type) {
     case ev_string:     snprintf(_line, sizeof(_line), "%s", pr_strings + val->string);                                          break;
     case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                   break;
-    case ev_function:
+    case ev_function: {
         dFunction_p f = pr_functions + val->function;
         snprintf(_line, sizeof(_line), "%s()", pr_strings + f->s_name);
-        break;
-    case ev_field:
+    } break;
+    case ev_field: {
         dDef_p def = ED_FieldAtOfs(val->_int);
         snprintf(_line, sizeof(_line), ".%s", pr_strings + def->s_name);
-        break;
+    } break;
     case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                  break;
     case ev_float:      snprintf(_line, sizeof(_line), "%5.1f", val->_float);                                                    break;
     case ev_vector:     snprintf(_line, sizeof(_line), "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);   break;
@@ -296,14 +297,14 @@ cString PR_UglyValueString(etype_t type, eval_p val) {
     switch (type) {
     case ev_string:     snprintf(_line, sizeof(_line), "%s", pr_strings + val->string);                              break;
     case ev_entity:     snprintf(_line, sizeof(_line), "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));              break;
-    case ev_function:
+    case ev_function: {
         dFunction_p f = pr_functions + val->function;
         snprintf(_line, sizeof(_line), "%s", pr_strings + f->s_name);
-        break;
-    case ev_field:
+    } break;
+    case ev_field: {
         dDef_p def = ED_FieldAtOfs(val->_int);
         snprintf(_line, sizeof(_line), "%s", pr_strings + def->s_name);
-        break;
+    } break;
     case ev_void:       snprintf(_line, sizeof(_line), "void");                                                      break;
     case ev_float:      snprintf(_line, sizeof(_line), "%f", val->_float);                                           break;
     case ev_vector:     snprintf(_line, sizeof(_line), "%f %f %f", val->vector[0], val->vector[1], val->vector[2]);  break;
@@ -374,7 +375,7 @@ void ED_Print(edict_p ed) {
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
-        int* v = (int*)((cString)&ed->v + d->ofs * 4);
+        int32_p v = (int32_p)((cString)&ed->v + d->ofs * 4);
 
         // if the value is still all 0, skip the field
         uint32_t type = d->type & ~DEF_SAVEGLOBAL;
@@ -414,7 +415,7 @@ void ED_Write(FILE* f, edict_p ed) {
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
-        int* v = (int*)((cString)&ed->v + d->ofs * 4);
+        int32_p v = (int32_p)((cString)&ed->v + d->ofs * 4);
 
         // if the value is still all 0, skip the field
         uint32_t type = d->type & ~DEF_SAVEGLOBAL;
@@ -596,48 +597,46 @@ returns false if error
 =============
 */
 bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
-    TypeLess_ptr d = (TypeLess_ptr)((int*)base + key->ofs);
+    TypeLess_ptr d = (TypeLess_ptr)((int32_p)base + key->ofs);
 
     switch (key->type & ~DEF_SAVEGLOBAL) {
-    case ev_string:     *(string_t*)d = ED_NewString(s) - pr_strings;       break;
+    case ev_string:     *(string_t*)d = ED_NewString(s) - pr_strings;               break;
+    case ev_float:      *(float_p)d = (float)atof(s);                               break;
+    case ev_entity:     *(int32_p)d = EDICT_TO_PROG(EDICT_NUM((uint32_t)atoi(s)));  break;
 
-    case ev_float:      *(float_p)d = (float)atof(s);                              break;
-
-    case ev_vector:
+    case ev_vector: {
         char string[128];
         strcpy(string, s);
         cString v = string;
         cString w = string;
         for (int i = 0; i < 3; i++) {
-            while (*v && *v != ' ')
+            while ((*v != 0) && (*v != ' '))
                 v++;
             *v = 0;
             ((float_p)d)[i] = (float)atof(w);
             w = v = v + 1;
         }
-        break;
+    } break;
 
-    case ev_entity:     *(int*)d = EDICT_TO_PROG(EDICT_NUM((uint32_t)atoi(s)));       break;
-
-    case ev_field:
+    case ev_field: {
         dDef_p def = ED_FindField(s);
         if (!def) {
             Host_Printf("Can't find field %s\n", s);
             return false;
         }
-        *(int*)d = G_INT(def->ofs);
-        break;
+        *(int32_p)d = G_INT(def->ofs);
+    } break;
 
-    case ev_function:
+    case ev_function: {
         dFunction_p func = ED_FindFunction(s);
         if (!func) {
             Host_Printf("Can't find function %s\n", s);
             return false;
         }
         *(func_t*)d = func - pr_functions;
-        break;
+    } break;
 
-    default:        break;
+    default:    break;
     }
     return true;
 }
@@ -824,13 +823,13 @@ void PR_LoadProgs() {
 
     // byte swap the header
     for (int i = 0; i < sizeof(*progs) / 4; i++)
-        ((int*)progs)[i] = LittleLong(((int*)progs)[i]);
+        ((int32_p)progs)[i] = LittleLong(((int32_p)progs)[i]);
 
     if (progs->version != PROG_VERSION)     Host_SysError("progs.dat has wrong version number (%i should be %i)", progs->version, PROG_VERSION);
     if (progs->crc != PROGHEADER_CRC)       Host_SysError("progs.dat system vars have been modified, progdefs.h is out of date");
 
     pr_functions = (dFunction_p)((uint8_p)progs + progs->functions.ofs);
-    pr_strings = (cString)progs + progs->strings.ofs;
+    pr_strings = (cString)((uint8_p)progs + progs->strings.ofs);
     pr_globaldefs = (dDef_p)((uint8_p)progs + progs->globaldefs.ofs);
     pr_fielddefs = (dDef_p)((uint8_p)progs + progs->fielddefs.ofs);
     pr_statements = (dStatement_p)((uint8_p)progs + progs->statements.ofs);
