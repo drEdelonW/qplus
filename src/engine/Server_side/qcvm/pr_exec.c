@@ -75,14 +75,21 @@ static cString _pr_opNames[OP_LAST] = {
     "GE",
     "LT",
     "GT",
-
+#if 0
     "INDIRECT",
     "INDIRECT",
     "INDIRECT",
     "INDIRECT",
     "INDIRECT",
     "INDIRECT",
-
+#else
+    "LOAD_F",
+    "LOAD_V",
+    "LOAD_S",
+    "LOAD_ENT",
+    "LOAD_FLD",
+    "LOAD_FNC",
+#endif
     "ADDRESS",
 
     "STORE_F",
@@ -349,6 +356,12 @@ void PR_ExecuteProgram(func_t fnum) {
 
         if (pr_trace)       PR_PrintStatement(st);
 
+        // Con_DPrintf("EXE[%s] a:0x%X b:0x%x\n",
+        //     _pr_opNames[st->op],
+        //     a->_int,
+        //     b->_int
+        // );
+
         switch (st->op) {
         case OP_DONE:
         case OP_RETURN: {
@@ -404,7 +417,11 @@ void PR_ExecuteProgram(func_t fnum) {
         } break;
         case OP_EQ_S: {
             // c->_float = !strcmp(pr_strings + a->string, pr_strings + b->string);
-            c->_float = !strcmp(PR_GetStringSafe(a->string), PR_GetStringSafe(b->string));
+            Con_DPrintf("[OP_EQ_S] a:0x%X(%d)\"%s\" b:0x%X(%d)\"%s\"\n",
+                a->string, a->string, PR_GetStringSafe(a->string),
+                b->string, b->string, PR_GetStringSafe(b->string));
+            c->_float = /*0.0f;*/!strcmp(PR_GetStringSafe(a->string), PR_GetStringSafe(b->string));
+            // Con_DPrintf("c=%f\n",c->_float);
         } break;
         case OP_EQ_E:       c->_float = (a->_int == b->_int);                   break;
         case OP_EQ_FNC:     c->_float = a->function == b->function;             break;
