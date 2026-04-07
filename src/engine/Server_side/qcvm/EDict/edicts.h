@@ -7,6 +7,7 @@ extern uint32_t     pr_edict_size;  // in bytes
 #ifdef __cplusplus
 extern "C" {
 #endif
+    void ED_Init();
 
     edict_p ED_Alloc();
     void ED_Free(edict_p ed);
@@ -37,7 +38,6 @@ extern "C" {
     void ED_PrintNum(uint32_t ent);
 
     eval_p GetEdictFieldValue(edict_p ed, cString field);
-
 #ifdef __cplusplus
 }
 #endif
