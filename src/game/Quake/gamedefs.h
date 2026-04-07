@@ -102,6 +102,9 @@ extern bool     standard_quake;
 extern bool     rogue;
 extern bool     hipnotic;
 extern int32_t  Registered;
+
+extern int32_t current_skill;  // skill level for currently loaded level (in case the user changes the cvar while the level is running, this reflects the level actually in use)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
