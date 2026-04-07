@@ -314,48 +314,6 @@ cString PR_UglyValueString(etype_t type, eval_p val) {
     return _line;
 }
 
-/*
-============
-PR_GlobalString
-
-Returns a string with a description and the contents of a global,
-padded to 20 field width
-============
-*/
-cString PR_GlobalString(int32_t ofs) {
-    static char _line[128];
-
-    TypeLess_ptr val = (TypeLess_ptr)&pr_globals[ofs];
-    dDef_p def = ED_GlobalAtOfs(ofs);
-    if (!def)
-        snprintf(_line, sizeof(_line), "%i(???)", ofs);
-    else {
-        cString s = PR_ValueString(def->type, val);
-        snprintf(_line, sizeof(_line), "%i(%s)%s", ofs, pr_strings + def->s_name, s);
-    }
-
-    size_t i = strlen(_line);
-    for (; i < 20; i++)
-        strcat(_line, " ");
-    strcat(_line, " ");
-
-    return _line;
-}
-
-cString PR_GlobalStringNoContents(int32_t ofs) {
-    static char _line[128];
-
-    dDef_p def = ED_GlobalAtOfs(ofs);
-    if (!def)   snprintf(_line, sizeof(_line), "%i(???)", ofs);
-    else        snprintf(_line, sizeof(_line), "%i(%s)", ofs, pr_strings + def->s_name);
-
-    size_t i = strlen(_line);
-    for (; i < 20; i++)
-        strcat(_line, " ");
-    strcat(_line, " ");
-
-    return _line;
-}
 
 
 /*
