@@ -22,7 +22,6 @@ uint32_t       pr_edict_size;      // in bytes
 uint16_t pr_crc;
 
 
-
 /*
 ===============
 PR_LoadProgs
