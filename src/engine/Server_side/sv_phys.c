@@ -31,7 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "mathlib.h"
 #include "progs.h"
-#include "edicts.h"
 
 /*
 
