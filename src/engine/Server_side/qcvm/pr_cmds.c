@@ -741,7 +741,7 @@ void PF_findradius() {
     float_p org = G_VECTOR(OFS_PARM0);
     float rad = G_FLOAT(OFS_PARM1);
 
-    edict_p ent = ED_GetEDictNext(sv.edicts);
+    edict_p ent = ED_GetEDictFirst();
     for (int i = 1; i < sv.num_edicts; i++, ent = ED_GetEDictNext(ent)) {
         if ((ent->free) ||
             (ent->v.solid == SOLID_NOT))
@@ -1084,7 +1084,7 @@ void PF_aim() {
     float bestdist = sv_aim.value;
     edict_p bestent = NULL;
 
-    edict_p check = ED_GetEDictNext(sv.edicts);
+    edict_p check = ED_GetEDictFirst();
     for (int i = 1; i < sv.num_edicts; i++, check = ED_GetEDictNext(check)) {
         if ((check->v.takedamage != DAMAGE_AIM) ||
             (check == ent) ||
