@@ -38,7 +38,7 @@ extern "C" {
     edict_p ED_GetEDictByOffs(int32_t eIdx);
     int32_t ED_GetEDictOffs(edict_p ePtr);
 
-    // edict_p ED_GetEDictFirst();
+    edict_p ED_GetEDictFirst();
     edict_p ED_GetEDictNext(edict_p edict);
 
     void ED_PrintEdicts();

@@ -612,8 +612,6 @@ Used for both fresh maps and savegame loads.  A fresh map would also need
 to call ED_CallSpawnFunctions () to let the objects initialize themselves.
 ================
 */
-
-
 void ED_LoadFromFile(cString data) {
     edict_p ent = NULL;
     int inhibit = 0;

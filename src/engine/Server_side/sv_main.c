@@ -379,7 +379,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     uint8_p pvs = SV_FatPVS(org);
 
     // send over all entities (excpet the client) that touch the pvs
-    edict_p ent = ED_GetEDictNext(sv.edicts);
+    edict_p ent = ED_GetEDictFirst();
     for (int e = 1; e < sv.num_edicts; e++, ent = ED_GetEDictNext(ent)) {
 #ifdef QUAKE2
         // don't send if flagged for NODRAW and there are no lighting effects
@@ -452,7 +452,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     =============
 */
 void SV_CleanupEnts() {
-    edict_p ent = ED_GetEDictNext(sv.edicts);
+    edict_p ent = ED_GetEDictFirst();
     for (int e = 1; e < sv.num_edicts; e++, ent = ED_GetEDictNext(ent)) {
         ent->v.effects = (int)ent->v.effects & ~EF_MUZZLEFLASH;
     }
