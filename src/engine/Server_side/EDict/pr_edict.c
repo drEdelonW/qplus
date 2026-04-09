@@ -19,10 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sv_edict.c -- entity dictionary
 
-#include "pr_comp.h"
+// #include "pr_comp.h"
 #include "progs.h"
-// #include "Edict.h"
-#include "edicts.h"
+#include "Edict.h"
 #include "world.h"
 #include "q_tools.h"
 #include "console.h"
@@ -32,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "mathlib.h"
 #include <string.h>
 #include <stdlib.h>
+#include "server.h"
 
 #include "cvar_q1.h"
 

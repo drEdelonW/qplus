@@ -1,5 +1,6 @@
-#include "edicts.h"
+#include "Edict.h"
 #include "host.h"
+#include "server.h"
 
 edict_p ED_GetEDictByIdx(uint32_t idx) {
     if (

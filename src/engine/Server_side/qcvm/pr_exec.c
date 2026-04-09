@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "progs.h"
-#include "edicts.h"
 #include "pr_ops.h"
 #include "console.h"
 #include "server.h"

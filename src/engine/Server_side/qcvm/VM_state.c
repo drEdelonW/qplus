@@ -1,5 +1,5 @@
 #include "progs.h"
-#include "edicts.h"
+#include "Edict.h"
 #include "common.h"
 #include "crc.h"
 #include "console.h"

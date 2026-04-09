@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "progs.h"
-#include "edicts.h"
 #include "pr_comp.h"
 #include <string.h>
 #include "console.h"
@@ -1191,18 +1190,18 @@ typedef enum msg_dest_e {
 sizebuf_p WriteDest() {
     msg_dest_e dest = G_FLOAT(OFS_PARM0);
     switch (dest) {
-    case MSG_BROADCAST: return &sv.datagram;
+        case MSG_BROADCAST: return &sv.datagram;
 
-    case MSG_ONE: {
-        edict_p ent = ED_GetEDictByOffs(pr_global_struct->msg_entity);
-        uint32_t entnum = ED_GetEDictIdx(ent);
-        if ((entnum < 1) || (entnum > svs.maxClients))
-            PR_RunError("WriteDest: not a client");
-        return &svs.clients[entnum - 1].message;
-    }
-    case MSG_ALL:       return &sv.reliable_datagram;
-    case MSG_INIT:      return &sv.signon;
-    default:            PR_RunError("WriteDest: bad destination");  break;
+        case MSG_ONE: {
+            edict_p ent = ED_GetEDictByOffs(pr_global_struct->msg_entity);
+            uint32_t entnum = ED_GetEDictIdx(ent);
+            if ((entnum < 1) || (entnum > svs.maxClients))
+                PR_RunError("WriteDest: not a client");
+            return &svs.clients[entnum - 1].message;
+        }
+        case MSG_ALL:       return &sv.reliable_datagram;
+        case MSG_INIT:      return &sv.signon;
+        default:            PR_RunError("WriteDest: bad destination");  break;
     }
 
     return NULL;
