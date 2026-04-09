@@ -228,7 +228,7 @@ void PR_ExecuteProgram(func_t fnum) {
     if (!fnum ||
         (fnum >= progs->functions.num)) {
         if (pr_global_struct->self)
-            ED_Print(PROG_TO_EDICT(pr_global_struct->self));
+            ED_Print(ED_GetEDictByOffs(pr_global_struct->self));
         Host_Error("PR_ExecuteProgram: NULL function");
     }
 
@@ -352,18 +352,18 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_LOAD_ENT:
             case OP_LOAD_FLD:
             case OP_LOAD_FNC: {
-                edict_p ed = PROG_TO_EDICT(a->edict);
+                edict_p ed = ED_GetEDictByOffs(a->edict);
 #ifdef PARANOID
-                NUM_FOR_EDICT(ed);  // make sure it's in range
+                ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
                 a = (eval_p)((int32_p)&ed->v + b->_int);
                 c->_int = a->_int;
             } break;
 
             case OP_LOAD_V: {
-                edict_p ed = PROG_TO_EDICT(a->edict);
+                edict_p ed = ED_GetEDictByOffs(a->edict);
 #ifdef PARANOID
-                NUM_FOR_EDICT(ed);  // make sure it's in range
+                ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
                 a = (eval_p)((int32_p)&ed->v + b->_int);
                 c->vector[0] = a->vector[0];
@@ -372,11 +372,13 @@ void PR_ExecuteProgram(func_t fnum) {
             } break;
 
             case OP_ADDRESS: {
-                edict_p ed = PROG_TO_EDICT(a->edict);
+                edict_p ed = ED_GetEDictByOffs(a->edict);
 #ifdef PARANOID
-                NUM_FOR_EDICT(ed);  // make sure it's in range
+                ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
-                if (ed == (edict_p)sv.edicts && sv.state == ss_active)
+                if ((ed == (edict_p)sv.edicts) &&
+                    (sv.state == ss_active)
+                )
                     PR_RunError("assignment to world entity");
 
                 // c->_int = (uint8_p)((int32_p)&ed->v + b->_int) - (uint8_p)sv.edicts;
@@ -417,7 +419,7 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_NOT_F:      c->_float = !a->_float;     break;
             case OP_NOT_V:      c->_float = !a->vector[0] && !a->vector[1] && !a->vector[2];    break;
             case OP_NOT_S:      c->_float = !a->string || !*PR_GetQString(a->string);           break;        // c->_float = !a->string || !pr_strings[a->string];
-            case OP_NOT_ENT:    c->_float = (PROG_TO_EDICT(a->edict) == sv.edicts);             break;
+            case OP_NOT_ENT:    c->_float = (ED_GetEDictByOffs(a->edict) == sv.edicts);             break;
             case OP_NOT_FNC:    c->_float = !a->function;   break;
 
             case OP_IF: {
@@ -456,7 +458,7 @@ void PR_ExecuteProgram(func_t fnum) {
             } break;
 
             case OP_STATE: {
-                edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
+                edict_p ed = ED_GetEDictByOffs(pr_global_struct->self);
                 ed->v.nextthink = pr_global_struct->time +
 #ifdef FPS_20
                     0.05f;

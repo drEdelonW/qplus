@@ -17,7 +17,6 @@ dDef_p         pr_globaldefs;
 dStatement_p   pr_statements;
 globalvars_p   pr_global_struct;   // much more
 float_p        pr_globals;         // same as pr_global_struct
-uint32_t       pr_edict_size;      // in bytes
 
 uint16_t pr_crc;
 
@@ -36,7 +35,7 @@ cString PR_ValueString(etype_t type, eval_p val) {
 
     switch (type) {
         case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                                       break;
-        case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));                  break;
+        case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", ED_GetEDictIdx(ED_GetEDictByOffs(val->edict)));                break;
         case ev_function:   snprintf(_line, sizeof(_line), "%s()", PR_GetQString((pr_functions + val->function)->s_name));          break;
         case ev_field:      snprintf(_line, sizeof(_line), ".%s", PR_GetQString(ED_FieldAtOfs(val->_int)->s_name));                 break;
         case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                 break;
@@ -62,7 +61,7 @@ cString PR_UglyValueString(etype_t type, eval_p val) {
 
     switch (type) {
         case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                           break;
-        case ev_entity:     snprintf(_line, sizeof(_line), "%i", NUM_FOR_EDICT(PROG_TO_EDICT(val->edict)));             break;
+        case ev_entity:     snprintf(_line, sizeof(_line), "%i", ED_GetEDictIdx(ED_GetEDictByOffs(val->edict)));             break;
         case ev_function:   snprintf(_line, sizeof(_line), "%s", PR_GetQString((pr_functions + val->function)->s_name));break;
         case ev_field:      snprintf(_line, sizeof(_line), "%s", PR_GetQString(ED_FieldAtOfs(val->_int)->s_name));      break;
         case ev_void:       snprintf(_line, sizeof(_line), "void");                                                     break;

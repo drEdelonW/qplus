@@ -73,7 +73,7 @@ void Hunk_Print(bool all) {
         hunk_size
     );
 
-    size_t count = 0;
+    // size_t count = 0;
     size_t sum = 0;
     int totalblocks = 0;
     while (1) {
@@ -108,7 +108,7 @@ void Hunk_Print(bool all) {
             Host_Error("Hunk_Check: bad size");
 
         hunk_p next = (hunk_p)((uint8_p)h + h->size);
-        count++;
+        // count++;
         totalblocks++;
         sum += h->size;
 
@@ -129,7 +129,7 @@ void Hunk_Print(bool all) {
             ) {
             if (!all)
                 Host_Printf("          :%8i %8s (TOTAL)\n", sum, name);
-            count = 0;
+            // count = 0;
             sum = 0;
         }
 

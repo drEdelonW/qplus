@@ -19,6 +19,7 @@ extern "C" {
 
     void ED_Print(edict_p ed);
     void ED_Write(FILE* f, edict_p ed);
+
     cString ED_ParseEdict(cString data, edict_p ent);
 
     void ED_WriteGlobals(FILE* f);
@@ -27,21 +28,25 @@ extern "C" {
     void ED_LoadFromFile(cString data);
     bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s);
 
-    edict_p EDICT_NUM(uint32_t n);
-    uint32_t NUM_FOR_EDICT(edict_p e);
+#   define G_EDICT(o)           ED_GetEDictByOffs((uint32_t)G_INT((o)))
+#   define G_EDICTNUM(o)        ED_GetEDictIdx(G_EDICT((o)))
+#   define RETURN_EDICT(edict)  (((int *)pr_globals)[OFS_RETURN] = ED_GetEDictOffs(edict))
 
-#   define NEXT_EDICT(e)        ((edict_p)((uint8_p)(e) + pr_edict_size))
-#   define PROG_EDICT_BASE      ((uint8_p)sv.edicts)
-#   define PROG_TO_EDICT(ofs)   ((edict_p)(PROG_EDICT_BASE + (uint32_t)(ofs)))
-#   define EDICT_TO_PROG(e)     ((int32_t)((uint8_p)(e) - PROG_EDICT_BASE))
-#   define G_EDICT(o)           PROG_TO_EDICT((uint32_t)G_INT((o)))
-#   define G_EDICTNUM(o)        NUM_FOR_EDICT(G_EDICT((o)))
-#   define RETURN_EDICT(edict)  (((int *)pr_globals)[OFS_RETURN] = EDICT_TO_PROG(edict))
+    edict_p ED_GetEDictByIdx(uint32_t idx);
+    uint32_t ED_GetEDictIdx(edict_p e);
+
+    edict_p ED_GetEDictByOffs(int32_t eIdx);
+    int32_t ED_GetEDictOffs(edict_p ePtr);
+
+    // edict_p ED_GetEDictFirst();
+    edict_p ED_GetEDictNext(edict_p edict);
 
     void ED_PrintEdicts();
     void ED_PrintNum(uint32_t ent);
 
     eval_p GetEdictFieldValue(edict_p ed, cString field);
+
+    edict_p FindViewthing();
 #ifdef __cplusplus
 }
 #endif

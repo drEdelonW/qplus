@@ -302,7 +302,7 @@ void SV_DropClient(bool crash) {
             // call the prog function for removing a client
             // this will set the body to a dead frame, among other things
             int saveSelf = pr_global_struct->self;
-            pr_global_struct->self = EDICT_TO_PROG(remoteClient->edict);
+            pr_global_struct->self = ED_GetEDictOffs(remoteClient->edict);
             PR_ExecuteProgram(pr_global_struct->ClientDisconnect);
             pr_global_struct->self = saveSelf;
         }

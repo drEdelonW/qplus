@@ -279,8 +279,8 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
         int old_self = pr_global_struct->self;
         int old_other = pr_global_struct->other;
 
-        pr_global_struct->self = EDICT_TO_PROG(touch);
-        pr_global_struct->other = EDICT_TO_PROG(ent);
+        pr_global_struct->self = ED_GetEDictOffs(touch);
+        pr_global_struct->other = ED_GetEDictOffs(ent);
         pr_global_struct->time = (float)sv.time;
         PR_ExecuteProgram(touch->v.touch);
 
@@ -760,8 +760,8 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
         if (clip->trace.allsolid)   return;
 
         if (clip->passedict) {
-            if ((PROG_TO_EDICT(touch->v.owner) == clip->passedict) || // don't clip against own missiles
-                (PROG_TO_EDICT(clip->passedict->v.owner) == touch)) // don't clip against owner
+            if ((ED_GetEDictByOffs(touch->v.owner) == clip->passedict) || // don't clip against own missiles
+                (ED_GetEDictByOffs(clip->passedict->v.owner) == touch)) // don't clip against owner
                 continue;
         }
 

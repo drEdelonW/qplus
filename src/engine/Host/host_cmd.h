@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Edict.h"
 #include "Model_st.h"
 
 #ifdef __cplusplus
@@ -59,7 +58,6 @@ extern "C" {
     void Host_Kick_f();
     void Host_Give_f();
     /* view helpers */
-    edict_p FindViewthing();
     void    Host_Viewmodel_f();
     void    Host_Viewframe_f();
     void    PrintFrameName(Model_p mdl, int frame);
