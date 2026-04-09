@@ -369,7 +369,7 @@ void Host_Savegame_f() {
 
     ED_WriteGlobals(saveFile);
     for (uint32_t i = 0; i < sv.num_edicts; i++) {
-        ED_Write(saveFile, EDICT_NUM(i));
+        ED_Write(saveFile, ED_GetEDictByIdx(i));
         fflush(saveFile);
     }
     fclose(saveFile);
@@ -471,7 +471,7 @@ void Host_Loadgame_f() {
 
         if (entnum == -1) { ED_ParseGlobals(start); }   // parse the global vars
         else { // parse an edict
-            edict_p ent = EDICT_NUM((uint32_t)entnum);
+            edict_p ent = ED_GetEDictByIdx((uint32_t)entnum);
             memset(&ent->v, 0, progs->entityfields * 4);
             ent->free = false;
             ED_ParseEdict(start, ent);
@@ -527,7 +527,7 @@ void SaveGamestate() {
 
 
     for (int i = svs.maxClients + 1; i < sv.num_edicts; i++) {
-        edict_p ent = EDICT_NUM(i);
+        edict_p ent = ED_GetEDictByIdx(i);
         if ((int32_t)ent->v.flags & FL_ARCHIVE_OVERRIDE)
             continue;
         fprintf(saveGStFile, "%i\n", i);
@@ -593,7 +593,7 @@ int LoadGamestate(cString level, cString startspot) {
 
         // parse an edict
 
-        edict_p ent = EDICT_NUM(entnum);
+        edict_p ent = ED_GetEDictByIdx(entnum);
         memset(&ent->v, 0, progs->entityfields * 4);
         ent->free = false;
         ED_ParseEdict(start, ent);
@@ -875,7 +875,7 @@ void Host_Kill_f() {
     if (sv_player->v.health <= 0) { ;   SV_ClientPrintf("Can't suicide -- allready dead!\n");   return; }
 
     pr_global_struct->time = (float)sv.time;
-    pr_global_struct->self = EDICT_TO_PROG(sv_player);
+    pr_global_struct->self = ED_GetEDictOffs(sv_player);
     PR_ExecuteProgram(pr_global_struct->ClientKill);
 }
 
@@ -935,7 +935,7 @@ void Host_Spawn_f() {
         // set up the edict
         edict_p ent = remoteClient->edict;
         memset(&ent->v, 0, progs->entityfields * 4);
-        ent->v.colormap = (float)NUM_FOR_EDICT(ent);
+        ent->v.colormap = (float)ED_GetEDictIdx(ent);
         ent->v.team = (float)(remoteClient->colors & 15) + 1;
         ent->v.netname = PR_SetQString(remoteClient->name);
 
@@ -947,7 +947,7 @@ void Host_Spawn_f() {
         // call the spawn function
 
         pr_global_struct->time = (float)sv.time;
-        pr_global_struct->self = EDICT_TO_PROG(sv_player);
+        pr_global_struct->self = ED_GetEDictOffs(sv_player);
         PR_ExecuteProgram(pr_global_struct->ClientConnect);
 
         if ((Host_FloatTime() - remoteClient->netconnection->connecttime) <= sv.time)
@@ -990,7 +990,7 @@ void Host_Spawn_f() {
     // in a state where it is expecting the client to correct the angle
     // and it won't happen if the game was just loaded, so you wind up
     // with a permanent head tilt
-    edict_p ent = EDICT_NUM(1 + (uint32_t)(remoteClient - svs.clients));
+    edict_p ent = ED_GetEDictByIdx(1 + (uint32_t)(remoteClient - svs.clients));
     MSG_WriteByte(pBuf, svc_setangle); MSG_WriteAngle(pBuf, ent->v.angles[0]); MSG_WriteAngle(pBuf, ent->v.angles[1]); MSG_WriteAngle(pBuf, 0);
 
     SV_WriteClientdataToMessage(sv_player, pBuf);
@@ -1201,14 +1201,6 @@ void Host_Give_f() {
     }
 }
 
-edict_p FindViewthing() {
-    for (uint32_t i = 0; i < sv.num_edicts; i++) {
-        edict_p eDict = EDICT_NUM(i);
-        if (!strcmp(PR_GetQString(eDict->v.classname), "viewthing"))  return eDict;
-    }
-    Con_Printf("No viewthing on map\n");
-    return NULL;
-}
 
 /*
 ==================

@@ -140,7 +140,7 @@ clean:
 fresh: clean build
 
 run: $(TARGETS)
-	@cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX) ./$(TARGET)
+	cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX) ./$(TARGET)
 
 run2: $(TARGETS)
 	@cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX2) ./$(TARGET)

@@ -92,6 +92,6 @@ typedef enum {
 } prog_operation_e; // uint16_t
 
 
-void PR_PrintOperation();
+void PR_PrintOperation(prog_operation_e op);
 cString PR_GlobalString(int32_t ofs);
 cString PR_GlobalStringNoContents(int32_t ofs);

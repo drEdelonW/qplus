@@ -17,4 +17,4 @@ typedef struct edict_s {
     // other fields from progs come immediately after
 } edict_t;
 typedef edict_t* edict_p;
-#define EDICT_FROM_AREA(l) STRUCT_FROM_LINK(l,edict_t,area)
+#define EDICT_FROM_AREA(l) STRUCT_FROM_LINK(l, edict_t, area)

@@ -139,7 +139,7 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
         return;
     }
 
-    channel |= (int)(NUM_FOR_EDICT(entity) << 3);
+    channel |= (int)(ED_GetEDictIdx(entity) << 3);
 
     int field_mask = 0x00;
     if (volume != DEFAULT_SOUND_PACKET_VOLUME)              field_mask |= SND_VOLUME;
@@ -204,7 +204,7 @@ void SV_SendServerinfo(RmtClient_p client) {
     MSG_WriteByte(pBuf, svc_cdtrack);   MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds); MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds);
 
     // set view
-    MSG_WriteByte(pBuf, svc_setview);   MSG_WriteShort(pBuf, (int16_t)NUM_FOR_EDICT(client->edict));
+    MSG_WriteByte(pBuf, svc_setview);   MSG_WriteShort(pBuf, (int16_t)ED_GetEDictIdx(client->edict));
 
     MSG_WriteByte(pBuf, svc_signonnum); MSG_WriteByte(pBuf, 1);
 
@@ -237,7 +237,7 @@ void SV_ConnectClient(uint32_t clientnum) {
     strcpy(client->name, "unconnected");
     client->active = true;
     client->spawned = false;
-    client->edict = EDICT_NUM(clientnum + 1);
+    client->edict = ED_GetEDictByIdx(clientnum + 1);
     client->message.data = client->msgbuf;
     client->message.maxsize = sizeof(client->msgbuf);
     client->message.allowoverflow = true;    // we can catch it
@@ -379,8 +379,8 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     uint8_p pvs = SV_FatPVS(org);
 
     // send over all entities (excpet the client) that touch the pvs
-    edict_p ent = NEXT_EDICT(sv.edicts);
-    for (int e = 1; e < sv.num_edicts; e++, ent = NEXT_EDICT(ent)) {
+    edict_p ent = ED_GetEDictNext(sv.edicts);
+    for (int e = 1; e < sv.num_edicts; e++, ent = ED_GetEDictNext(ent)) {
 #ifdef QUAKE2
         // don't send if flagged for NODRAW and there are no lighting effects
         if (ent->v.effects == EF_NODRAW)
@@ -452,8 +452,8 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     =============
 */
 void SV_CleanupEnts() {
-    edict_p ent = NEXT_EDICT(sv.edicts);
-    for (int e = 1; e < sv.num_edicts; e++, ent = NEXT_EDICT(ent)) {
+    edict_p ent = ED_GetEDictNext(sv.edicts);
+    for (int e = 1; e < sv.num_edicts; e++, ent = ED_GetEDictNext(ent)) {
         ent->v.effects = (int)ent->v.effects & ~EF_MUZZLEFLASH;
     }
 }
@@ -469,7 +469,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     // send a damage message
     //
     if (ent->v.dmg_take || ent->v.dmg_save) {
-        edict_p other = PROG_TO_EDICT(ent->v.dmg_inflictor);
+        edict_p other = ED_GetEDictByOffs(ent->v.dmg_inflictor);
         MSG_WriteByte(msg, svc_damage);
         MSG_WriteByte(msg, (uint8_t)ent->v.dmg_save);
         MSG_WriteByte(msg, (uint8_t)ent->v.dmg_take);
@@ -755,7 +755,7 @@ void SV_CreateBaseline() {
 
     for (uint32_t entnum = 0; entnum < sv.num_edicts; entnum++) {
         // get the current server version
-        edict_p svent = EDICT_NUM(entnum);
+        edict_p svent = ED_GetEDictByIdx(entnum);
         if ((svent->free) ||
             ((entnum > svs.maxClients) &&
                 !svent->v.modelindex)
@@ -839,7 +839,7 @@ void SV_SaveSpawnparms() {
         if (!remoteClient->active)       continue;
 
         // call the progs to get default spawn parms for the new client
-        pr_global_struct->self = EDICT_TO_PROG(remoteClient->edict);
+        pr_global_struct->self = ED_GetEDictOffs(remoteClient->edict);
         PR_ExecuteProgram(pr_global_struct->SetChangeParms);
         for (int j = 0; j < NUM_SPAWN_PARMS; j++)
             remoteClient->spawn_parms[j] = (&pr_global_struct->parm1)[j];
@@ -919,7 +919,7 @@ void SV_SpawnServer(
     // leave slots at start for clients only
     sv.num_edicts = svs.maxClients + 1;
     for (uint32_t i = 0; i < svs.maxClients; i++) {
-        edict_p ent = EDICT_NUM(i + 1);
+        edict_p ent = ED_GetEDictByIdx(i + 1);
         svs.clients[i].edict = ent;
     }
 
@@ -955,7 +955,7 @@ void SV_SpawnServer(
     //
     // load the rest of the entities
     //
-    edict_p ent = EDICT_NUM(0);
+    edict_p ent = ED_GetEDictByIdx(0);
     memset(&ent->v, 0, progs->entityfields * 4);
     ent->free = false;
     ent->v.model = PR_SetQString(sv.worldmodel->name);

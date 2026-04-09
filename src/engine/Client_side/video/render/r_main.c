@@ -671,8 +671,7 @@ void R_DrawBEntitiesOnList() {
         currententity = cl_visedicts[i];
 
         switch (currententity->model->type) {
-        case mod_brush:
-
+        case mod_brush: {
             Model_p clmodel = currententity->model;
 
             // see if the bounding box lets us trivially reject, also sets
@@ -755,7 +754,7 @@ void R_DrawBEntitiesOnList() {
                 R_TransformFrustum();
             }
 
-            break;
+        } break;
 
         default:    break;
         }

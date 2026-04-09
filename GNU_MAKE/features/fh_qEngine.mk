@@ -53,13 +53,14 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(WORLD_DIR)/world.c
 
                 $(eval PROG_DIR = $(SV_SIDE_DIR)/qcvm) $(eval INCLUDES += $(PROG_DIR))
-                        $(eval EDICT_DIR = $(PROG_DIR)/EDict) $(eval INCLUDES += $(EDICT_DIR))
-                                SRC_LIST += $(EDICT_DIR)/pr_edict.c
-
                         SRC_LIST += $(PROG_DIR)/VM_state.c
                         SRC_LIST += $(PROG_DIR)/pr_cmds.c
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
                         SRC_LIST += $(PROG_DIR)/pr_ops_tools.c
+
+                $(eval EDICT_DIR = $(SV_SIDE_DIR)/EDict) $(eval INCLUDES += $(EDICT_DIR))
+                        SRC_LIST += $(EDICT_DIR)/pr_edict.c
+                        SRC_LIST += $(EDICT_DIR)/edict_tools.c
 
                 SRC_LIST += $(SV_SIDE_DIR)/sv_main.c
                 SRC_LIST += $(SV_SIDE_DIR)/sv_user.c

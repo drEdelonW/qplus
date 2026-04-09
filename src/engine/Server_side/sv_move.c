@@ -119,9 +119,9 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
         // try one move with vertical motion, then one without
         for (int i = 0; i < 2; i++) {
             VectorAdd(ent->v.origin, move, neworg);
-            edict_p enemy = PROG_TO_EDICT(ent->v.enemy);
+            edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
             if (i == 0 && enemy != sv.edicts) {
-                float dz = ent->v.origin[2] - PROG_TO_EDICT(ent->v.enemy)->v.origin[2];
+                float dz = ent->v.origin[2] - ED_GetEDictByOffs(ent->v.enemy)->v.origin[2];
                 if (dz > 40)    neworg[2] -= 8;
                 if (dz < 30)    neworg[2] += 8;
             }
@@ -193,7 +193,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
         //  Con_Printf ("back on ground\n");
         ent->v.flags = (int)ent->v.flags & ~FL_PARTIALGROUND;
     }
-    ent->v.groundentity = EDICT_TO_PROG(trace.ent);
+    ent->v.groundentity = ED_GetEDictOffs(trace.ent);
 
     // the move is ok
     if (relink)
@@ -373,8 +373,8 @@ SV_MoveToGoal
 ======================
 */
 void SV_MoveToGoal() {
-    edict_p ent = PROG_TO_EDICT(pr_global_struct->self);
-    edict_p goal = PROG_TO_EDICT(ent->v.goalentity);
+    edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
+    edict_p goal = ED_GetEDictByOffs(ent->v.goalentity);
     float dist = G_FLOAT(OFS_PARM0);
 
     if (!((int)ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM))) {
@@ -384,10 +384,10 @@ void SV_MoveToGoal() {
 
     // if the next step hits the enemy, return immediately
 #ifdef QUAKE2
-    edict_p enemy = PROG_TO_EDICT(ent->v.enemy);
+    edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
     if ((enemy != sv.edicts) && SV_CloseEnough(ent, enemy, dist))
 #else
-    if ((PROG_TO_EDICT(ent->v.enemy) != sv.edicts) && SV_CloseEnough(ent, goal, dist))
+    if ((ED_GetEDictByOffs(ent->v.enemy) != sv.edicts) && SV_CloseEnough(ent, goal, dist))
 #endif
         return;
 

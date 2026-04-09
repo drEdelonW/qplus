@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "pr_comp.h"
 #include "progs.h"
-#include "Edict.h"
+// #include "Edict.h"
 #include "edicts.h"
 #include "world.h"
 #include "q_tools.h"
@@ -35,6 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "cvar_q1.h"
 
+uint32_t pr_edict_size;      // in bytes
 
 int type_size[ev_LAST] = {
     1,                          // ev_void,
@@ -79,7 +80,7 @@ angles and bad trails.
 edict_p ED_Alloc() {
     uint32_t i = svs.maxClients + 1;
     for (; i < sv.num_edicts; i++) {
-        edict_p edict = EDICT_NUM(i);
+        edict_p edict = ED_GetEDictByIdx(i);
         // the first couple seconds of server time can involve a lot of
         // freeing and allocating, so relax the replacement policy
         if ((edict->free) &&
@@ -96,7 +97,7 @@ edict_p ED_Alloc() {
     if (i == MAX_EDICTS)            Host_SysError("ED_Alloc: no free edicts");
 
     sv.num_edicts++;
-    edict_p edict = EDICT_NUM(i);
+    edict_p edict = ED_GetEDictByIdx(i);
     ED_ClearEdict(edict);
 
     return edict;
@@ -241,7 +242,7 @@ For debugging
 void ED_Print(edict_p ed) {
     if (ed->free) { Host_Printf("FREE\n"); return; }
 
-    Host_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
+    Host_Printf("\nEDICT %i:\n", ED_GetEDictIdx(ed));
     for (int i = 1; i < progs->fielddefs.num; i++) {
         dDef_p d = &pr_fielddefs[i];
         cString name = PR_GetQString(d->s_name);
@@ -308,7 +309,7 @@ void ED_Write(FILE* f, edict_p ed) {
 }
 
 void ED_PrintNum(uint32_t ent) {
-    ED_Print(EDICT_NUM(ent));
+    ED_Print(ED_GetEDictByIdx(ent));
 }
 
 /*
@@ -350,7 +351,7 @@ void ED_Count() {
     int solid = 0;
     int step = 0;
     for (uint32_t i = 0; i < sv.num_edicts; i++) {
-        edict_p ent = EDICT_NUM(i);
+        edict_p ent = ED_GetEDictByIdx(i);
         if (ent->free)  continue;
 
         active++;
@@ -475,7 +476,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
     switch (key->type & ~DEF_SAVEGLOBAL) {
     case ev_string:     *(string_t*)d = PR_SetQString(ED_NewString(s));               break;
     case ev_float:      *(float_p)d = (float)atof(s);                               break;
-    case ev_entity:     *(int32_p)d = EDICT_TO_PROG(EDICT_NUM((uint32_t)atoi(s)));  break;
+    case ev_entity:     *(int32_p)d = ED_GetEDictOffs(ED_GetEDictByIdx((uint32_t)atoi(s)));  break;
 
     case ev_vector: {
         char string[128];
@@ -625,7 +626,7 @@ void ED_LoadFromFile(cString data) {
         if (!data)  break;
         if (com.token[0] != '{')    Host_SysError("ED_LoadFromFile: found %s when expecting {", com.token);
 
-        if (!ent)   ent = EDICT_NUM(0);
+        if (!ent)   ent = ED_GetEDictByIdx(0);
         else        ent = ED_Alloc();
         data = ED_ParseEdict(data, ent);
 
@@ -666,7 +667,7 @@ void ED_LoadFromFile(cString data) {
             continue;
         }
 
-        pr_global_struct->self = EDICT_TO_PROG(ent);
+        pr_global_struct->self = ED_GetEDictOffs(ent);
         PR_ExecuteProgram(func - pr_functions);
     }
 
@@ -674,27 +675,15 @@ void ED_LoadFromFile(cString data) {
 }
 
 
-edict_p EDICT_NUM(uint32_t n) {
-    if (
-        // (n < 0) ||
-        (n >= sv.max_edicts))
-        Host_SysError("EDICT_NUM: bad number %i", n);
 
-    return (edict_p)((uint8_p)sv.edicts + ((n)*pr_edict_size));
+edict_p FindViewthing() {
+    for (uint32_t i = 0; i < sv.num_edicts; i++) {
+        edict_p eDict = ED_GetEDictByIdx(i);
+        if (!strcmp(PR_GetQString(eDict->v.classname), "viewthing"))  return eDict;
+    }
+    Con_Printf("No viewthing on map\n");
+    return NULL;
 }
-
-uint32_t NUM_FOR_EDICT(edict_p edict) {
-    uint32_t b = (uint32_t)((uint8_p)edict - (uint8_p)sv.edicts) / pr_edict_size;
-
-    if (
-        // (b < 0) ||
-        (b >= sv.num_edicts))
-        Host_SysError("NUM_FOR_EDICT: bad pointer");
-
-    return b;
-}
-
-
 
 /*
 ===============

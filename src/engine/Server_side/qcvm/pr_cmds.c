@@ -71,7 +71,7 @@ void PF_error() {
         "======SERVER ERROR in %s:\n%s\n",
         PR_GetQString(pr_xFunction->s_name),
         str);
-    edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
+    edict_p ed = ED_GetEDictByOffs(pr_global_struct->self);
     ED_Print(ed);
 
     Host_Error("Program error");
@@ -93,7 +93,7 @@ void PF_objerror() {
         "======OBJECT ERROR in %s:\n%s\n",
         PR_GetQString(pr_xFunction->s_name),
         str);
-    edict_p ed = PROG_TO_EDICT(pr_global_struct->self);
+    edict_p ed = ED_GetEDictByOffs(pr_global_struct->self);
     ED_Print(ed);
     ED_Free(ed);
 
@@ -535,8 +535,8 @@ void PF_traceline() {
     VectorCopy(trace.endpos, pr_global_struct->trace_endpos);
     VectorCopy(trace.plane.normal, pr_global_struct->trace_plane_normal);
     pr_global_struct->trace_plane_dist = trace.plane.dist;
-    if (trace.ent)  pr_global_struct->trace_ent = EDICT_TO_PROG(trace.ent);
-    else            pr_global_struct->trace_ent = EDICT_TO_PROG(sv.edicts);
+    if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
+    else            pr_global_struct->trace_ent = ED_GetEDictOffs(sv.edicts);
 }
 
 #ifdef QUAKE2
@@ -555,8 +555,8 @@ void PF_TraceToss() {
     VectorCopy(trace.endpos, pr_global_struct->trace_endpos);
     VectorCopy(trace.plane.normal, pr_global_struct->trace_plane_normal);
     pr_global_struct->trace_plane_dist = trace.plane.dist;
-    if (trace.ent)  pr_global_struct->trace_ent = EDICT_TO_PROG(trace.ent);
-    else            pr_global_struct->trace_ent = EDICT_TO_PROG(sv.edicts);
+    if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
+    else            pr_global_struct->trace_ent = ED_GetEDictOffs(sv.edicts);
 }
 #endif
 
@@ -587,7 +587,7 @@ uint8_t PF_newcheckclient(uint8_t check) {
         if (i == svs.maxClients + 1)
             i = 1;
 
-        ent = EDICT_NUM(i);
+        ent = ED_GetEDictByIdx(i);
 
         if (i == check) break; // didn't find anything else
 
@@ -636,7 +636,7 @@ void PF_checkclient() {
     }
 
     // return check if it might be visible
-    edict_p ent = EDICT_NUM(sv.lastcheck);
+    edict_p ent = ED_GetEDictByIdx(sv.lastcheck);
     if (ent->free ||
         (ent->v.health <= 0)
         ) {
@@ -645,7 +645,7 @@ void PF_checkclient() {
     }
 
     // if current entity can't possibly see the check entity, return 0
-    edict_p self = PROG_TO_EDICT(pr_global_struct->self);
+    edict_p self = ED_GetEDictByOffs(pr_global_struct->self);
     vec3_t view; VectorAdd(self->v.origin, self->v.view_ofs, view);
     mLeaf_p leaf = Mod_PointInLeaf(view, sv.worldmodel);
     int l = (leaf - sv.worldmodel->leafs) - 1;
@@ -741,8 +741,8 @@ void PF_findradius() {
     float_p org = G_VECTOR(OFS_PARM0);
     float rad = G_FLOAT(OFS_PARM1);
 
-    edict_p ent = NEXT_EDICT(sv.edicts);
-    for (int i = 1; i < sv.num_edicts; i++, ent = NEXT_EDICT(ent)) {
+    edict_p ent = ED_GetEDictNext(sv.edicts);
+    for (int i = 1; i < sv.num_edicts; i++, ent = ED_GetEDictNext(ent)) {
         if ((ent->free) ||
             (ent->v.solid == SOLID_NOT))
             continue;
@@ -753,7 +753,7 @@ void PF_findradius() {
 
         if (Length(eorg) > rad) continue;
 
-        ent->v.chain = EDICT_TO_PROG(chain);
+        ent->v.chain = ED_GetEDictOffs(chain);
         chain = ent;
     }
 
@@ -818,7 +818,7 @@ void PF_Find()
         PR_RunError("PF_Find: bad search string");
 
     for (int edict++; edict < sv.num_edicts; edict++) {
-        edict_p ed = EDICT_NUM(edict);
+        edict_p ed = ED_GetEDictByIdx(edict);
         if (ed->free)
             continue;
         cString t = E_STRING(ed, f);
@@ -826,19 +826,19 @@ void PF_Find()
         if (!strcmp(t, str)) {
             if (first == (edict_p)sv.edicts)        first = ed;
             else if (second == (edict_p)sv.edicts)  second = ed;
-            ed->v.chain = EDICT_TO_PROG(last);
+            ed->v.chain = ED_GetEDictOffs(last);
             last = ed;
         }
     }
 
     if (first != last) {
         if (last != second)     first->v.chain = last->v.chain;
-        else                    first->v.chain = EDICT_TO_PROG(last);
-        last->v.chain = EDICT_TO_PROG((edict_p)sv.edicts);
+        else                    first->v.chain = ED_GetEDictOffs(last);
+        last->v.chain = ED_GetEDictOffs((edict_p)sv.edicts);
         if (second &&
             (second != last)
             )
-            second->v.chain = EDICT_TO_PROG(last);
+            second->v.chain = ED_GetEDictOffs(last);
     }
     RETURN_EDICT(first);
 }
@@ -851,7 +851,7 @@ void PF_Find()
         PR_RunError("PF_Find: bad search string");
 
     for (edict++; edict < sv.num_edicts; edict++) {
-        edict_p ed = EDICT_NUM(edict);
+        edict_p ed = ED_GetEDictByIdx(edict);
         if (ed->free)   continue;
         cString t = E_STRING(ed, f);
         if (!t)         continue;
@@ -927,7 +927,7 @@ float(float yaw, float dist) walkmove
 ===============
 */
 void PF_walkmove() {
-    edict_p ent = PROG_TO_EDICT(pr_global_struct->self);
+    edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
     float yaw = G_FLOAT(OFS_PARM0);
     float dist = G_FLOAT(OFS_PARM1);
 
@@ -963,7 +963,7 @@ void() droptofloor
 ===============
 */
 void PF_droptofloor() {
-    edict_p ent = PROG_TO_EDICT(pr_global_struct->self);
+    edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
     vec3_t end;    VectorCopy(ent->v.origin, end);
     end[2] -= 256;
 
@@ -974,7 +974,7 @@ void PF_droptofloor() {
         VectorCopy(trace.endpos, ent->v.origin);
         SV_LinkEdict(ent, false);
         ent->v.flags = (int)ent->v.flags | FL_ONGROUND;
-        ent->v.groundentity = EDICT_TO_PROG(trace.ent);
+        ent->v.groundentity = ED_GetEDictOffs(trace.ent);
         G_FLOAT(OFS_RETURN) = 1;
     }
 }
@@ -1045,7 +1045,7 @@ void PF_nextent() {
     while (1) {
         i++;
         if (i == sv.num_edicts) { RETURN_EDICT(sv.edicts); return; }
-        edict_p ent = EDICT_NUM(i);
+        edict_p ent = ED_GetEDictByIdx(i);
         if (!ent->free) { RETURN_EDICT(ent); return; }
     }
 }
@@ -1084,8 +1084,8 @@ void PF_aim() {
     float bestdist = sv_aim.value;
     edict_p bestent = NULL;
 
-    edict_p check = NEXT_EDICT(sv.edicts);
-    for (int i = 1; i < sv.num_edicts; i++, check = NEXT_EDICT(check)) {
+    edict_p check = ED_GetEDictNext(sv.edicts);
+    for (int i = 1; i < sv.num_edicts; i++, check = ED_GetEDictNext(check)) {
         if ((check->v.takedamage != DAMAGE_AIM) ||
             (check == ent) ||
             (teamplay.value &&
@@ -1132,7 +1132,7 @@ This was a major timewaster in progs, so it was converted to C
 ==============
 */
 void PF_changeyaw() {
-    edict_p ent = PROG_TO_EDICT(pr_global_struct->self);
+    edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
     float current = anglemod(ent->v.angles[1]);
     float ideal = ent->v.ideal_yaw;
     float speed = ent->v.yaw_speed;
@@ -1194,8 +1194,8 @@ sizebuf_p WriteDest() {
     case MSG_BROADCAST: return &sv.datagram;
 
     case MSG_ONE: {
-        edict_p ent = PROG_TO_EDICT(pr_global_struct->msg_entity);
-        uint32_t entnum = NUM_FOR_EDICT(ent);
+        edict_p ent = ED_GetEDictByOffs(pr_global_struct->msg_entity);
+        uint32_t entnum = ED_GetEDictIdx(ent);
         if ((entnum < 1) || (entnum > svs.maxClients))
             PR_RunError("WriteDest: not a client");
         return &svs.clients[entnum - 1].message;
@@ -1244,7 +1244,7 @@ PF_setspawnparms
 */
 void PF_setspawnparms() {
     edict_p ent = G_EDICT(OFS_PARM0);
-    uint32_t i = NUM_FOR_EDICT(ent);
+    uint32_t i = ED_GetEDictIdx(ent);
     if ((i < 1) ||
         (i > svs.maxClients))
         PR_RunError("Entity is not a client");
@@ -1301,7 +1301,7 @@ void PF_changelevel() {
 
 void PF_WaterMove() {
     float damage = 0.0;
-    edict_p self = PROG_TO_EDICT(pr_global_struct->self);
+    edict_p self = ED_GetEDictByOffs(pr_global_struct->self);
 
     if (self->v.movetype == MOVETYPE_NOCLIP) {
         self->v.air_finished = sv.time + 12;

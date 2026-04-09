@@ -52,11 +52,14 @@ typedef struct {
     Model_p     worldmodel;
     cString     model_precache[MAX_MODELS];	    // NULL terminated
     Model_p     models[MAX_MODELS];
+
     cString     sound_precache[MAX_SOUNDS];	    // NULL terminated
     cString     lightstyles[MAX_LIGHTSTYLES];
+
     int32_t     num_edicts;
     int32_t     max_edicts;
     edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
+
     sv_state_e  state;          // some actions are only valid during load
     sizebuf_t   datagram;
     uint8_t     datagram_buf[MAX_DATAGRAM];
@@ -83,7 +86,7 @@ typedef struct {
     vec3_t      wishdir;    // intended motion calced from cmd
     sizebuf_t   message;    // can be added to at any time, copied and clear once per frame
     uint8_t     msgbuf[MAX_MSGLEN];
-    edict_p     edict;      // EDICT_NUM(clientnum+1)
+    edict_p     edict;      // ED_GetEDictByIdx(clientnum+1)
     char        name[32];   // for printing to other people
     uint8_t     colors;
     float       ping_times[NUM_PING_TIMES];
