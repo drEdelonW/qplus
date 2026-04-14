@@ -25,3 +25,4 @@ typedef struct {
     uint8_t skin;
     uint8_t effects; // EntityEffects_t
 } EntityState_t;
+// STATIC_ASSERT_SIZE(EntityState_t, (sizeof(vec_t) * 6) + 5) + 3; // why 3 ???
