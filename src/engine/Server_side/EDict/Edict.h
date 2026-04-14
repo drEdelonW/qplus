@@ -19,7 +19,10 @@ typedef struct edict_s {
 } edict_t;
 typedef edict_t* edict_p;
 
-#define EDICT_FROM_AREA(l) STRUCT_FROM_LINK(l, edict_t, area)
+#define EDICT_FROM_AREA(l)  STRUCT_FROM_LINK(l, edict_t, area)
+#define G_EDICT(o)          ED_GetEDictByOffs((uint32_t)G_INT((o)))
+#define G_EDICTNUM(o)       ED_GetEDictIdx(G_EDICT((o)))
+#define RETURN_EDICT(edict) (((int *)pr_globals)[OFS_RETURN] = ED_GetEDictOffs(edict))
 
 extern uint32_t     pr_edict_size;  // in bytes
 
@@ -46,15 +49,11 @@ extern "C" {
     void ED_LoadFromFile(cString data);
     bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s);
 
-#   define G_EDICT(o)           ED_GetEDictByOffs((uint32_t)G_INT((o)))
-#   define G_EDICTNUM(o)        ED_GetEDictIdx(G_EDICT((o)))
-#   define RETURN_EDICT(edict)  (((int *)pr_globals)[OFS_RETURN] = ED_GetEDictOffs(edict))
-
     edict_p ED_GetEDictByIdx(uint32_t idx);
-    uint32_t ED_GetEDictIdx(edict_p e);
+    uint32_t ED_GetEDictIdx(edict_p edict);
 
-    edict_p ED_GetEDictByOffs(int32_t eIdx);
-    int32_t ED_GetEDictOffs(edict_p ePtr);
+    edict_p ED_GetEDictByOffs(int32_t offs);
+    int32_t ED_GetEDictOffs(edict_p edict);
 
     edict_p ED_GetEDictFirst();
     edict_p ED_GetEDictNext(edict_p edict);
