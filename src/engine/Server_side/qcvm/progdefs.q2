@@ -3,7 +3,7 @@
 
 #pragma pack(push, 4)
 typedef struct{
-    int32_t pad[28];
+    int32_t pad[RESERVED_OFS]; // PrOfs_e::RESERVED_OFS
     int32_t self;
     int32_t other;
     int32_t world;

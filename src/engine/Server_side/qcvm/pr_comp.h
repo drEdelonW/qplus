@@ -20,8 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 // this file is shared by quake and qcc
-// #include "types.h"
-// #include "vector.h"
 #include "progdefs.h"
 
 
@@ -34,6 +32,8 @@ typedef union {
     int32_t     edict;   // 32-bit byte offset from sv.edicts
 } eval_t;
 typedef eval_t* eval_p;
+STATIC_ASSERT_SIZE(eval_t, 3*4);    // 12
+
 
 typedef enum {
     ev_void     = 0u,
@@ -44,23 +44,10 @@ typedef enum {
     ev_field,
     ev_function,
     ev_pointer,
-    ev_LAST
-} etype_t;
+    ev_LAST,
 
-// VM global offsets; vectors occupy 3 float slots
-typedef enum {
-    OFS_NULL      = 0u,
-    OFS_RETURN    = 1u,     // +3
-    OFS_PARM0     = 4u,   // parm0..parm7: +3 per parm
-    OFS_PARM1     = 7u,
-    OFS_PARM2     = 10u,
-    OFS_PARM3     = 13u,
-    OFS_PARM4     = 16u,
-    OFS_PARM5     = 19u,
-    OFS_PARM6     = 22u,
-    OFS_PARM7     = 25u,
-    RESERVED_OFS  = 28u
-} PrOfs_e;
+    DEF_SAVEGLOBAL = (1U << 15)
+} etype_t;  // :uint16_t
 
 typedef uint16_t op_type;
 typedef int16_t arg_type;   // should be signed int
@@ -72,34 +59,35 @@ typedef struct {
     arg_type    c;
 } dStatement_t;
 typedef dStatement_t* dStatement_p;
-STATIC_ASSERT_SIZE(dStatement_t, 2*4);
+STATIC_ASSERT_SIZE(dStatement_t, 2*4);  // 8
 
 typedef struct {
-    uint16_t    type;  // if DEF_SAVEGLOBGAL bit is set
-    // the variable needs to be saved in savegames
+    uint16_t    type;   // [etype_t] if DEF_SAVEGLOBAL bit is set
+                        // the variable needs to be saved in savegames
     uint16_t    ofs;
-    int32_t     s_name;
+    string_t    s_name;
 } dDef_t;
 typedef dDef_t* dDef_p;
+STATIC_ASSERT_SIZE(dDef_t, 2*2 + 4);    // 8
 
-#define DEF_SAVEGLOBAL (1U << 15)
+
 #define MAX_PARMS (8)
 
 typedef struct {
-    int32_t  first_statement; // negative numbers are builtins
-    int32_t  parm_start;
-    int32_t  locals;    // total ints of parms + locals
+    int32_t     first_statement; // negative numbers are builtins
+    int32_t     parm_start;
+    int32_t     locals;    // total ints of parms + locals
 
-    int32_t  profile;  // runtime
+    int32_t     profile;  // runtime
 
-    int32_t  s_name;
-    int32_t  s_file;   // source file defined in
+    string_t    s_name;
+    string_t    s_file;   // source file defined in
 
-    int32_t  numparms;
-    uint8_t parm_size[MAX_PARMS];
+    int32_t     numparms;
+    uint8_t     parm_size[MAX_PARMS];
 } dFunction_t;
 typedef dFunction_t* dFunction_p;
-
+STATIC_ASSERT_SIZE(dFunction_t, 7*4 + 1*8); // 36
 
 
 
@@ -123,5 +111,4 @@ typedef struct {
     uint32_t  entityfields;
 } dprograms_t;
 typedef dprograms_t* dprograms_p;
-
-STATIC_ASSERT_SIZE(dprograms_t, 2*4 + 6*8 + 4);
+STATIC_ASSERT_SIZE(dprograms_t, 2*4 + 6*8 + 4); // 60
