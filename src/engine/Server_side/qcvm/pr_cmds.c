@@ -521,10 +521,10 @@ traceline (vector1, vector2, tryents)
 void PF_traceline() {
     float_p v1 = G_VECTOR(OFS_PARM0);
     float_p v2 = G_VECTOR(OFS_PARM1);
-    int nomonsters = (int)G_FLOAT(OFS_PARM2);
+    phymovetype_t moveType = (int)G_FLOAT(OFS_PARM2);
     edict_p ent = G_EDICT(OFS_PARM3);
 
-    trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, nomonsters, ent);
+    trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, moveType, ent);
 
     pr_global_struct->trace_allsolid = trace.allsolid;
     pr_global_struct->trace_startsolid = trace.startsolid;
@@ -966,7 +966,7 @@ void PF_droptofloor() {
     vec3_t end;    VectorCopy(ent->v.origin, end);
     end[2] -= 256;
 
-    trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, false, ent);
+    trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
 
     if ((trace.fraction == 1) || trace.allsolid)    G_FLOAT(OFS_RETURN) = 0;
     else {
@@ -1067,7 +1067,7 @@ void PF_aim() {
     // try sending a trace straight
     vec3_t dir; VectorCopy(pr_global_struct->v_forward, dir);
     vec3_t end; VectorMA(start, 2048, dir, end);
-    trace_t tr = SV_Move(start, vec3_origin, vec3_origin, end, false, ent);
+    trace_t tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent);
     if (
         tr.ent &&
         (tr.ent->v.takedamage == DAMAGE_AIM) &&
@@ -1105,7 +1105,7 @@ void PF_aim() {
         float dist = DotProduct(dir, pr_global_struct->v_forward);
         if (dist < bestdist)    continue; // to far to turn
 
-        tr = SV_Move(start, vec3_origin, vec3_origin, end, false, ent);
+        tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent);
         if (tr.ent == check) { // can shoot at this one
             bestdist = dist;
             bestent = check;

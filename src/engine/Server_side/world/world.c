@@ -493,7 +493,7 @@ This could be a lot more efficient...
 ============
 */
 edict_p SV_TestEntityPosition(edict_p ent) {
-    trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, ent->v.origin, 0, ent);
+    trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, ent->v.origin, MOVE_NORMAL, ent);
 
     return (trace.startsolid) ? sv.edicts : NULL;
 }

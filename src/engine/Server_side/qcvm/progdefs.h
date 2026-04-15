@@ -18,6 +18,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+#include "types.h"
 #include "vector.h"
 
 
@@ -106,6 +107,8 @@ typedef enum {
     SFL_CROSS_TRIGGERS  = 0xFF00u    // 65280, covers multiple bits
 } spawnlevel_flags_t;
 #endif
+typedef int32_t string_t;
+typedef int32_t func_t;
 
 #ifndef QUAKE2
 #   include "progdefs.q1"
@@ -114,4 +117,7 @@ typedef enum {
 #endif
 
 typedef globalvars_t* globalvars_p;
+extern globalvars_p pr_global_struct;   // global variable of game settings
+extern float_p      pr_globals;     // same as pr_global_struct
+
 typedef entvars_t* entvars_p;

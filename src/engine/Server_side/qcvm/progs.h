@@ -44,8 +44,7 @@ extern dFunction_p  pr_functions;
 extern dDef_p       pr_globaldefs;
 extern dDef_p       pr_fielddefs;
 extern dStatement_p pr_statements;
-extern globalvars_p pr_global_struct;   // global variable of game settings
-extern float_p      pr_globals;     // same as pr_global_struct
+
 extern int32_t      pr_argc;        // number of op_call
 extern bool         pr_trace;
 extern dFunction_p  pr_xFunction;
@@ -78,12 +77,12 @@ extern "C" {
 #   define G_FLOAT(o)       (pr_globals[(o)])
 #   define G_INT(o)         (*(int32_p)&pr_globals[(o)])
 #   define G_VECTOR(o)      (&pr_globals[(o)])
-#   define G_STRING(o)      PR_GetQString(*(string_t*)&pr_globals[(o)])
+#   define G_STRING(o)      PR_GetQString(*(qVmString_t*)&pr_globals[(o)])
 
 // #   define E_FLOAT(e,o)     (((float_p)&(e)->v)[(o)])
 // #   define E_INT(e,o)       (*(int32_p)&((float_p)&(e)->v)[(o)])
 // #   define E_VECTOR(e,o)    (&((float_p)&(e)->v)[(o)])
-#   define E_STRING(e,o)    PR_GetQString(*(string_t*)&((float_p)&(e)->v)[(o)])
+#   define E_STRING(e,o)    PR_GetQString(*(qVmString_t*)&((float_p)&(e)->v)[(o)])
 
     qVmString_t PR_SetQString(cString str);
     cString PR_GetQString(qVmString_t offs);
