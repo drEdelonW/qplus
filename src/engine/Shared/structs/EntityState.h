@@ -16,6 +16,7 @@ typedef enum {
 #endif
 } EntityEffects_t;
 
+// #pragma pack(push, 1)
 typedef struct {
     vec3_t  origin;
     vec3_t  angles;
@@ -25,4 +26,6 @@ typedef struct {
     uint8_t skin;
     uint8_t effects; // EntityEffects_t
 } EntityState_t;
-// STATIC_ASSERT_SIZE(EntityState_t, (sizeof(vec_t) * 6) + 5) + 3; // why 3 ???
+// #pragma pack(pop)
+
+STATIC_ASSERT_SIZE(EntityState_t, ((sizeof(vec3_t) * 2) + (sizeof(uint8_t) * 5)) + 3); // why 3 ???
