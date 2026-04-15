@@ -234,7 +234,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, float time, trace_p steptrace) {
         for (int i = 0; i < VECT_DIM; i++)
             end[i] = ent->v.origin[i] + time_left * ent->v.velocity[i];
 
-        trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, false, ent);
+        trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
 
         if (trace.allsolid) { // entity is trapped in another solid
             VectorCopy(vec3_origin, ent->v.velocity);// ent->v.velocity = vec3_origin;

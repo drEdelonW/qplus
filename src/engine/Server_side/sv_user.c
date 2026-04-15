@@ -81,7 +81,7 @@ void SV_SetIdealPitch() {
             top[2] - 160
         };
 
-        trace_t tr = SV_Move(top, vec3_origin, vec3_origin, bottom, 1, sv_player);
+        trace_t tr = SV_Move(top, vec3_origin, vec3_origin, bottom, MOVE_NOMONSTERS, sv_player);
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
         if (tr.fraction == 1)   return; // near a dropoff
 
@@ -131,7 +131,7 @@ void SV_UserFriction() {
     start[2] = origin[2] + sv_player->v.mins[2];
     stop[2] = start[2] - 34;
 
-    trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, true, sv_player);
+    trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, sv_player);
 
     if (trace.fraction == 1.0)
         friction = sv_friction.value * sv_edgefriction.value;

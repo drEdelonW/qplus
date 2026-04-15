@@ -20,11 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 // this file is shared by quake and qcc
-#include "types.h"
-#include "vector.h"
+// #include "types.h"
+// #include "vector.h"
+#include "progdefs.h"
 
-typedef int32_t func_t;
-typedef int32_t string_t;
 
 typedef union {
     string_t    string;
@@ -73,6 +72,7 @@ typedef struct {
     arg_type    c;
 } dStatement_t;
 typedef dStatement_t* dStatement_p;
+STATIC_ASSERT_SIZE(dStatement_t, 2*4);
 
 typedef struct {
     uint16_t    type;  // if DEF_SAVEGLOBGAL bit is set
@@ -101,24 +101,27 @@ typedef struct {
 typedef dFunction_t* dFunction_p;
 
 
+
+
 #define PROG_VERSION 6
 typedef struct {
-    int32_t ofs;   /* byte offset from start of progs blob */
-    int32_t num;   /* element count (not bytes) */
-} prog_lump32_t;
+    uint32_t ofs;   /* byte offset from start of progs blob */
+    uint32_t num;   /* element count (not bytes) */
+} progLump_t;
 
 typedef struct {
     int32_t  version;
     int32_t  crc;   // check of header file
 
-    prog_lump32_t statements;   // statement 0 is an error
-    prog_lump32_t globaldefs;
-    prog_lump32_t fielddefs;
-    prog_lump32_t functions;    // function 0 is an empty
-    prog_lump32_t strings;      // first string is a null string
-    prog_lump32_t globals;
+    progLump_t statements;   // statement 0 is an error
+    progLump_t globaldefs;
+    progLump_t fielddefs;
+    progLump_t functions;    // function 0 is an empty
+    progLump_t strings;      // first string is a null string
+    progLump_t globals;
 
     uint32_t  entityfields;
 } dprograms_t;
 typedef dprograms_t* dprograms_p;
 
+STATIC_ASSERT_SIZE(dprograms_t, 2*4 + 6*8 + 4);

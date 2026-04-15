@@ -10,6 +10,7 @@
 #include "cvar_q1.h"
 
 dprograms_p    progs;
+
 dFunction_p    pr_functions;
 static cString  _pr_strings;         // much more // should be static
 dDef_p         pr_fielddefs;
@@ -87,7 +88,7 @@ void PR_LoadProgs() {
     CRC_Init(&pr_crc);
 
     progs = (dprograms_p)COM_LoadHunkFile("progs.dat");
-    if (!progs)                             Host_SysError("PR_LoadProgs: couldn't load progs.dat");
+    if (!progs)             Host_SysError("PR_LoadProgs: couldn't load progs.dat");
 
     Con_DPrintf("Programs occupy %iK.\n", com.filesize / 1024);
 
