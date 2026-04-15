@@ -30,7 +30,7 @@ int32_t ED_GetEDictOffs(edict_p ePtr) {
 }
 
 edict_p ED_GetEDictFirst() {
-    return ED_GetEDictNext(sv.edicts);
+    return ED_GetEDictNext(sv.edicts);  // first non word entity
 }
 edict_p ED_GetEDictNext(edict_p edict) {
     return  ((edict_p)((uint8_p)(edict) + pr_edict_size));

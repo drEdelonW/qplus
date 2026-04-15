@@ -21,6 +21,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "types.h"
 #include "vector.h"
 
+// VM global offsets; vectors occupy 3 float slots
+typedef enum {
+    OFS_NULL      = 0u,
+    OFS_RETURN    = 1u,     // +3
+    OFS_PARM0     = 4u,     // parm0..parm7: +3 per parm
+    OFS_PARM1     = 7u,
+    OFS_PARM2     = 10u,
+    OFS_PARM3     = 13u,
+    OFS_PARM4     = 16u,
+    OFS_PARM5     = 19u,
+    OFS_PARM6     = 22u,
+    OFS_PARM7     = 25u,
+    RESERVED_OFS  = 28u
+} PrOfs_e;
 
 // edict->movetype values
 typedef enum {
@@ -118,6 +132,8 @@ typedef int32_t func_t;
 
 typedef globalvars_t* globalvars_p;
 extern globalvars_p pr_global_struct;   // global variable of game settings
-extern float_p      pr_globals;     // same as pr_global_struct
+extern float_p      pr_globals;         // same as pr_global_struct
+
+#define RETURN_EDICT(edict)     (((int *)pr_globals)[OFS_RETURN] = ED_GetEDictOffs(edict))
 
 typedef entvars_t* entvars_p;

@@ -217,7 +217,7 @@ int32_t PR_LeaveFunction() {
     return _pr_Stack[_pr_Depth].stack;
 }
 
-
+void PF_Fixme();
 /*
 ====================
 PR_ExecuteProgram
@@ -315,14 +315,7 @@ void PR_ExecuteProgram(func_t fnum) {
                     (a->vector[1] == b->vector[1]) &&
                     (a->vector[2] == b->vector[2]);
             } break;
-            case OP_EQ_S: {
-                // c->_float = !strcmp(PR_GetQString(a->string), PR_GetQString(b->string));
-                // Con_DPrintf("[OP_EQ_S] a:0x%X(%d)\"%s\" b:0x%X(%d)\"%s\"\n",
-                //     a->string, a->string, PR_GetQString(a->string),
-                //     b->string, b->string, PR_GetQString(b->string));
-                c->_float = /*0.0f;*/!strcmp(PR_GetQString(a->string), PR_GetQString(b->string));
-                // Con_DPrintf("c=%f\n",c->_float);
-            } break;
+            case OP_EQ_S:       c->_float = !strcmp(PR_GetQString(a->string), PR_GetQString(b->string));    break;
             case OP_EQ_E:       c->_float = (a->_int == b->_int);                   break;
             case OP_EQ_FNC:     c->_float = a->function == b->function;             break;
 
@@ -333,11 +326,9 @@ void PR_ExecuteProgram(func_t fnum) {
                     (a->vector[1] != b->vector[1]) ||
                     (a->vector[2] != b->vector[2]);
             } break;
-            case OP_NE_S:
-                // c->_float = strcmp(PR_GetQString(a->string), PR_GetQString(b->string));
-                c->_float = (float)strcmp(PR_GetQString(a->string), PR_GetQString(b->string));   break;
-            case OP_NE_E:       c->_float = a->_int != b->_int;     break;
-            case OP_NE_FNC:     c->_float = a->function != b->function;     break;
+            case OP_NE_S:       c->_float = (float)strcmp(PR_GetQString(a->string), PR_GetQString(b->string));   break;
+            case OP_NE_E:       c->_float = a->_int != b->_int;         break;
+            case OP_NE_FNC:     c->_float = a->function != b->function; break;
 
             case OP_GE:         c->_float = a->_float >= b->_float;     break;
             case OP_LE:         c->_float = a->_float <= b->_float;     break;
@@ -446,9 +437,11 @@ void PR_ExecuteProgram(func_t fnum) {
                 dFunction_p newf = &pr_functions[a->function];
 
                 if (newf->first_statement < 0) { // negative statements are built in functions
-                    int i = -newf->first_statement;
+                    int i = -(newf->first_statement);
                     if (i >= pr_numbuiltins)
                         PR_RunError("Bad builtin call number");
+                    if (pr_builtins[i] == PF_Fixme)
+                        PR_RunError("Not Implimented builtin call number[%d]", i);
                     pr_builtins[i]();
                     break;
                 }

@@ -311,7 +311,10 @@ vector normalize(vector)
 */
 void PF_normalize() {
     float_p value1 = G_VECTOR(OFS_PARM0);
-    float new = value1[0] * value1[0] + value1[1] * value1[1] + value1[2] * value1[2];
+    float new =
+        value1[0] * value1[0] +
+        value1[1] * value1[1] +
+        value1[2] * value1[2];
     new = (float)sqrt(new);
 
     vec3_t newvalue;
@@ -336,7 +339,10 @@ scalar vlen(vector)
 void PF_vlen() {
     float_p value1 = G_VECTOR(OFS_PARM0);
 
-    float new = value1[0] * value1[0] + value1[1] * value1[1] + value1[2] * value1[2];
+    float new =
+        value1[0] * value1[0] +
+        value1[1] * value1[1] +
+        value1[2] * value1[2];
     new= (float)sqrt(new);
 
     G_FLOAT(OFS_RETURN) = new;
@@ -782,7 +788,13 @@ void PF_fabs() {
 }
 
 void PF_vtos() {
-    snprintf(_pr_string_temp, sizeof(_pr_string_temp), "'%5.1f %5.1f %5.1f'", G_VECTOR(OFS_PARM0)[0], G_VECTOR(OFS_PARM0)[1], G_VECTOR(OFS_PARM0)[2]);
+    snprintf(
+        _pr_string_temp, sizeof(_pr_string_temp),
+        "'%5.1f %5.1f %5.1f'",
+        G_VECTOR(OFS_PARM0)[0],
+        G_VECTOR(OFS_PARM0)[1],
+        G_VECTOR(OFS_PARM0)[2]
+    );
     G_INT(OFS_RETURN) = PR_SetQString(_pr_string_temp);
 }
 
@@ -1073,7 +1085,8 @@ void PF_aim() {
         (tr.ent->v.takedamage == DAMAGE_AIM) &&
         (!teamplay.value ||
             (ent->v.team <= 0) ||
-            (ent->v.team != tr.ent->v.team))) {
+            (ent->v.team != tr.ent->v.team))
+        ) {
         VectorCopy(pr_global_struct->v_forward, G_VECTOR(OFS_RETURN));
         return;
     }
@@ -1330,7 +1343,7 @@ void PF_WaterMove() {
                     self->v.dmg = self->v.dmg + 2;
                     if (self->v.dmg > 15)
                         self->v.dmg = 10;
-                    //					T_Damage (self, world, world, self.dmg, 0, FALSE);
+//					T_Damage (self, world, world, self.dmg, 0, FALSE);
                     damage = self->v.dmg;
                     self->v.pain_finished = sv.time + 1.0;
                 }
@@ -1357,7 +1370,7 @@ void PF_WaterMove() {
             if (self->v.dmgtime < sv.time) {
                 if (self->v.radsuit_finished < sv.time)     self->v.dmgtime = sv.time + 0.2;
                 else                                        self->v.dmgtime = sv.time + 1.0;
-                //				T_Damage (self, world, world, 10*self.waterlevel, 0, TRUE);
+//				T_Damage (self, world, world, 10*self.waterlevel, 0, TRUE);
                 damage = (float)(10 * waterlevel);
             }
     }
@@ -1365,13 +1378,12 @@ void PF_WaterMove() {
         if (!(flags & (FL_IMMUNE_SLIME + FL_GODMODE)))
             if (self->v.dmgtime < sv.time && self->v.radsuit_finished < sv.time) {
                 self->v.dmgtime = sv.time + 1.0;
-                //				T_Damage (self, world, world, 4*self.waterlevel, 0, TRUE);
+//				T_Damage (self, world, world, 4*self.waterlevel, 0, TRUE);
                 damage = (float)(4 * waterlevel);
             }
     }
 
     if (!(flags & FL_INWATER)) {
-
         // player enter water sound
         if (watertype == CONTENT_LAVA)  SV_StartSound(self, CHAN_BODY, "player/inlava.wav", 255, ATTN_NORM);
         if (watertype == CONTENT_WATER) SV_StartSound(self, CHAN_BODY, "player/inh2o.wav", 255, ATTN_NORM);
@@ -1382,29 +1394,19 @@ void PF_WaterMove() {
     }
 
     if (!(flags & FL_WATERJUMP)) {
-        //		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
+//		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
         VectorMA(self->v.velocity, -0.8 * self->v.waterlevel * host_frametime, self->v.velocity, self->v.velocity);
     }
 
     G_FLOAT(OFS_RETURN) = damage;
 }
 
-void PF_sin() {
-    G_FLOAT(OFS_RETURN)= (float)sin(G_FLOAT(OFS_PARM0));
-}
-
-void PF_cos() {
-    G_FLOAT(OFS_RETURN)= (float)cos(G_FLOAT(OFS_PARM0));
-}
-
-void PF_sqrt() {
-    G_FLOAT(OFS_RETURN)= (float)sqrt(G_FLOAT(OFS_PARM0));
-}
+void PF_sin() { G_FLOAT(OFS_RETURN)= (float)sin(G_FLOAT(OFS_PARM0)); }
+void PF_cos() { G_FLOAT(OFS_RETURN)= (float)cos(G_FLOAT(OFS_PARM0)); }
+void PF_sqrt() { G_FLOAT(OFS_RETURN)= (float)sqrt(G_FLOAT(OFS_PARM0)); }
 #endif
 
-void PF_Fixme() {
-    PR_RunError("unimplemented bulitin");
-}
+void PF_Fixme() { PR_RunError("unimplemented bulitin"); }
 
 builtin_t pr_builtin[] = {
     PF_Fixme,
