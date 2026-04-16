@@ -53,6 +53,9 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(WORLD_DIR)/world.c
 
                 $(eval PROG_DIR = $(SV_SIDE_DIR)/qcvm) $(eval INCLUDES += $(PROG_DIR))
+                        $(eval QSTRING_DIR = $(PROG_DIR)/qString) $(eval INCLUDES += $(QSTRING_DIR))
+                                SRC_LIST += $(QSTRING_DIR)/pr_qString.c
+
                         SRC_LIST += $(PROG_DIR)/VM_state.c
                         SRC_LIST += $(PROG_DIR)/pr_cmds.c
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
