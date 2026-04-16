@@ -1,6 +1,7 @@
 #include "progs.h"
 #include "types.h"
 #include "host.h"
+#include "console.h"
 
 static cString  _pr_strings;         // much more // should be static
 
@@ -9,19 +10,17 @@ void initProgSrting(dprograms_p progs){
     _pr_strings = (cString)((uint8_p)progs + progs->strings.ofs);
 }
 
-typedef int32_t qVmString_t;
+#define PR_APPSTR_MAX 10
 
-#define PR_APPSTR_MAX 4096
-
-static cString      _pr_appstrings[PR_APPSTR_MAX];
-static qVmString_t  _pr_appstrings_num = 0;
+static cString  _appStrings[PR_APPSTR_MAX];
+static uint8_t  _appStrings_num = 0;
 
 void PR_ClearAppStrings() {
-    for (qVmString_t i = 0; i < _pr_appstrings_num; ++i) {
-        _pr_appstrings[i] = NULL;
+    for (qVmString_t i = 0; i < _appStrings_num; ++i) {
+        _appStrings[i] = NULL;
     }
 
-    _pr_appstrings_num = 0;
+    _appStrings_num = 0;
 }
 
 qVmString_t PR_SetQString(cString str) {
@@ -33,32 +32,30 @@ qVmString_t PR_SetQString(cString str) {
         (delta <= INT32_MAX))
         return (qVmString_t)delta;
 
-    for (qVmString_t i = 0; i < _pr_appstrings_num; ++i)
-        if (_pr_appstrings[i] == str)
+    for (qVmString_t i = 0; i < _appStrings_num; ++i)
+        if (_appStrings[i] == str)
             return -(i + 1);
 
-    if (_pr_appstrings_num >= PR_APPSTR_MAX)
+    if (_appStrings_num >= PR_APPSTR_MAX)
         Host_SysError("PR_SetQString: app string table overflow");
 
-    qVmString_t idx = _pr_appstrings_num;
+    qVmString_t idx = _appStrings_num;
 
-    _pr_appstrings[_pr_appstrings_num] = str;
-    _pr_appstrings_num++;
+    _appStrings[_appStrings_num] = str;
+    _appStrings_num++;
+        Con_DPrintf("_appStrings_num %d\n", _appStrings_num);
 
     return -(idx + 1);
 }
 
 cString PR_GetQString(qVmString_t offs) {
-    int32_t idx;
-
     if (offs >= 0)
         return _pr_strings + offs;
 
-    idx = -offs - 1;
+    int32_t idx = -(offs + 1);
 
-    if ((idx < 0) || (idx >= _pr_appstrings_num))
+    if ((idx < 0) || (idx >= _appStrings_num))
         Host_SysError("PR_GetQString: bad app string index %d", idx);
 
-
-    return _pr_appstrings[idx];
+    return _appStrings[idx];
 }
