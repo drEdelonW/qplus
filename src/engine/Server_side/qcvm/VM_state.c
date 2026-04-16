@@ -6,16 +6,17 @@
 #include "host.h"
 #include "endian_tools.h"
 #include "cmd.h"
+#include "pr_qString.h"
 
 #include "cvar_q1.h"
 
 dprograms_p    progs;
 
 dFunction_p    pr_functions;
-static cString  _pr_strings;         // much more // should be static
 dDef_p         pr_fielddefs;
 dDef_p         pr_globaldefs;
 dStatement_p   pr_statements;
+
 globalvars_p   pr_global_struct;   // much more
 float_p        pr_globals;         // same as pr_global_struct
 
@@ -104,8 +105,7 @@ void PR_LoadProgs() {
 
     pr_functions = (dFunction_p)((uint8_p)progs + progs->functions.ofs);
 
-    PR_ClearAppStrings();
-    _pr_strings = (cString)((uint8_p)progs + progs->strings.ofs);
+    initProgSrting(progs);
     pr_globaldefs = (dDef_p)((uint8_p)progs + progs->globaldefs.ofs);
     pr_fielddefs = (dDef_p)((uint8_p)progs + progs->fielddefs.ofs);
     pr_statements = (dStatement_p)((uint8_p)progs + progs->statements.ofs);
@@ -150,80 +150,6 @@ void PR_LoadProgs() {
     for (int i = 0; i < progs->globals.num; i++)
         ((int32_p)pr_globals)[i] = LittleLong(((int32_p)pr_globals)[i]);
 }
-
-#if 0
-qVmString_t PR_SetQString(cString str) {
-#if 0
-    return str - _pr_strings;
-#else
-    ptrdiff_t delta = str - _pr_strings;
-
-    if ((delta > INT32_MAX) || (delta < INT32_MIN)) {
-        Host_SysError("PR_SetQString \"%s\": delta out of int32 (%lld) 0x%llX", str, (long long)delta, (long long)delta);
-    }
-
-    return (qVmString_t)delta;
-#endif
-}
-
-cStringRO PR_GetQString(qVmString_t offs) {
-    return _pr_strings + offs;
-}
-#else
-typedef int32_t qVmString_t;
-
-#define PR_APPSTR_MAX 4096
-
-static cString      _pr_appstrings[PR_APPSTR_MAX];
-static qVmString_t  _pr_appstrings_num = 0;
-
-void PR_ClearAppStrings() {
-    for (qVmString_t i = 0; i < _pr_appstrings_num; ++i) {
-        _pr_appstrings[i] = NULL;
-    }
-
-    _pr_appstrings_num = 0;
-}
-
-qVmString_t PR_SetQString(cString str) {
-    if (!str)   return 0;
-
-    ptrdiff_t delta = str - _pr_strings;
-
-    if ((delta >= 0) &&
-        (delta <= INT32_MAX))
-        return (qVmString_t)delta;
-
-    for (qVmString_t i = 0; i < _pr_appstrings_num; ++i)
-        if (_pr_appstrings[i] == str)
-            return -(i + 1);
-
-    if (_pr_appstrings_num >= PR_APPSTR_MAX)
-        Host_SysError("PR_SetQString: app string table overflow");
-
-    qVmString_t idx = _pr_appstrings_num;
-
-    _pr_appstrings[_pr_appstrings_num] = str;
-    _pr_appstrings_num++;
-
-    return -(idx + 1);
-}
-
-cString PR_GetQString(qVmString_t offs) {
-    int32_t idx;
-
-    if (offs >= 0)
-        return _pr_strings + offs;
-
-    idx = -offs - 1;
-
-    if ((idx < 0) || (idx >= _pr_appstrings_num))
-        Host_SysError("PR_GetQString: bad app string index %d", idx);
-
-
-    return _pr_appstrings[idx];
-}
-#endif
 
 
 /*
