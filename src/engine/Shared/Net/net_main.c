@@ -705,10 +705,10 @@ void NET_Init() {
     }
     net_hostport = DEFAULTnet_hostport;
 
-    if (COM_CheckParm("-listen") || (cls.state == ca_dedicated))
+    if (COM_CheckParm("-listen") || (Host_IsDedicated()))
         listening = true;
     net_numsockets = svs.maxClientsLimit;
-    if (cls.state != ca_dedicated)
+    if (!Host_IsDedicated())
         net_numsockets++;
 
     SetNetTime();

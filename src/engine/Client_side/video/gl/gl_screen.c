@@ -676,7 +676,7 @@ keypress.
 ==================
 */
 int SCR_ModalMessage(cString text) {
-    if (cls.state == ca_dedicated)
+    if (Host_IsDedicated())
         return true;
 
     scr_notifystring = text;

@@ -98,7 +98,7 @@ void Host::EndGame(cString message, ...) {
 
     if (sv.active)  ShutdownServer(false);
 
-    if (cls.state == ca_dedicated)  Host_SysError("Host::EndGame: %s\n", string); // dedicated servers exit
+    if (Host_IsDedicated())  Host_SysError("Host::EndGame: %s\n", string); // dedicated servers exit
 
     if (cls.demonum != -1)  CL_NextDemo();
     else                    CL_Disconnect();
@@ -128,7 +128,7 @@ void Host::Error(cString error, ...) {
 
     if (sv.active)  ShutdownServer(false);
 
-    if (cls.state == ca_dedicated)  Host_SysError("Host::Error: %s\n", string); // dedicated servers exit
+    if (Host_IsDedicated())  Host_SysError("Host::Error: %s\n", string); // dedicated servers exit
 
     CL_Disconnect();
     cls.demonum = -1;
@@ -156,7 +156,7 @@ void Host::FindMaxClients() {
 
     param = COM_CheckParm("-listen");
     if (param) {
-        if (cls.state == ca_dedicated)  Host_SysError("Only one of -dedicated or -listen can be specified");
+        if (Host_IsDedicated())  Host_SysError("Only one of -dedicated or -listen can be specified");
 
         if (param != (com.argc - 1))    svs.maxClients = Q_atoi(com.argv[param + 1]);
         else                            svs.maxClients = 8;

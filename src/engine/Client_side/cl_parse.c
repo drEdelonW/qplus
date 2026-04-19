@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cl_parse.c  -- parse a message received from the server
 
 #include "client.h"
-#undef CLIENT
+#undef CLIENT   // TODO: remove this workaround
 #include "server.h"
 #include "host.h"
 #include <string.h>

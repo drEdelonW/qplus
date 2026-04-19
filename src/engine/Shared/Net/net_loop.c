@@ -34,7 +34,7 @@ qsocket_p loop_client = NULL;
 qsocket_p loop_server = NULL;
 
 int Loop_Init() {
-    if (cls.state == ca_dedicated)
+    if (Host_IsDedicated())
         return -1;
     return 0;
 }

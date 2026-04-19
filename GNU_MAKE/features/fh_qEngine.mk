@@ -95,6 +95,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(SND_DIR)/snd_mix.c
 
                 SRC_LIST += $(CL_SIDE_DIR)/cl_main.c
+                SRC_LIST += $(CL_SIDE_DIR)/cl_net.c
                 SRC_LIST += $(CL_SIDE_DIR)/cl_input.c
                 SRC_LIST += $(CL_SIDE_DIR)/cl_demo.c
                 SRC_LIST += $(CL_SIDE_DIR)/cl_parse.c

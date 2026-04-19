@@ -133,3 +133,7 @@ void Host_ClientCommands(cString fmt, ...) {
     sizebuf_p pBuf = &remoteClient->message;
     MSG_WriteByte(pBuf, svc_stufftext); MSG_WriteString(pBuf, string);
 }
+
+bool Host_IsDedicated() {
+    return cls.state == ca_dedicated;
+}

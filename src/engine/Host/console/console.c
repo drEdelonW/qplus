@@ -367,7 +367,7 @@ void Con_Printf(cStringRO fmt, ...) {
 
 
     if ((!con.isInitialized) ||
-        (cls.state == ca_dedicated)
+        (Host_IsDedicated())
         )
         return;  // no graphics mode
 

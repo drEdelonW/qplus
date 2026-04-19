@@ -13,7 +13,7 @@
 cString Sys_ConsoleInput() {
     static char _text[256];
 
-    if (cls.state == ca_dedicated) {
+    if (Host_IsDedicated()) {
         fd_set	fdset;
         FD_ZERO(&fdset);
         FD_SET(0, &fdset); // stdin

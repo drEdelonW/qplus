@@ -824,7 +824,7 @@ IN_Commands
 ===========
 */
 void IN_Commands() {
-    if (UseMouse && cls.state != ca_dedicated) {
+    if (UseMouse && !Host_IsDedicated()) {
         // poll mouse values
         while (mouse_update())
             ;
