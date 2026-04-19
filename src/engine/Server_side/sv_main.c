@@ -65,6 +65,16 @@ cString SV_GetName() {
 bool SV_IsActive() {
     return sv.active;
 }
+
+double SV_GetTime() {
+    return sv.time;
+}
+
+void SV_SetTime(double time) {
+    sv.time = time;
+}
+
+
 /*
 =============================================================================
 
@@ -183,7 +193,7 @@ void SV_ClearDatagram() { SZ_Clear(&sv.datagram); }
 */
 void SV_CleanupEnts() {
     edict_p ent = ED_GetEDictFirst();
-    for (int e = 1; e < sv.num_edicts; e++, ent = ED_GetEDictNext(ent)) {
+    for (int e = 1; e < EdictsNum; e++, ent = ED_GetEDictNext(ent)) {
         ent->v.effects = (int)ent->v.effects & ~EF_MUZZLEFLASH;
     }
 }
@@ -354,11 +364,9 @@ void SV_SpawnServer(
     // load progs to get entity field count
     PR_LoadProgs();
 
-    // allocate server memory
-    sv.max_edicts = MAX_EDICTS;
+    // ED_Init();
+    Edicts = Hunk_AllocName((uint32_t)EdictsMax * pr_edict_size, "edicts");
 
-    Edicts = Hunk_AllocName((uint32_t)sv.max_edicts * pr_edict_size, "edicts");
-    // sv.edicts = Edicts;
 
     sv.datagram.maxsize = sizeof(sv.datagram_buf);
     sv.datagram.cursize = 0;
@@ -373,7 +381,7 @@ void SV_SpawnServer(
     sv.signon.data = sv.signon_buf;
 
     // leave slots at start for clients only
-    sv.num_edicts = svs.maxClients + 1;
+    EdictsNum = svs.maxClients + 1;
     for (uint32_t i = 0; i < svs.maxClients; i++) {
         edict_p ent = ED_GetEDictByIdx(i + 1);
         svs.clients[i].edict = ent;
@@ -382,7 +390,7 @@ void SV_SpawnServer(
     sv.state = ss_loading;
     sv.paused = false;
 
-    sv.time = 1.0;
+    SV_SetTime(1.0);
 
     strcpy(sv.name, server);
     snprintf(sv.modelname, sizeof(sv.modelname), "maps/%s.bsp", server);

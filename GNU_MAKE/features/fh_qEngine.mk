@@ -83,7 +83,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
 
                 $(eval EDICT_DIR = $(SV_SIDE_DIR)/EDict) $(eval INCLUDES += $(EDICT_DIR))
-                        SRC_LIST += $(EDICT_DIR)/pr_edict.c
+                        SRC_LIST += $(EDICT_DIR)/Edict.c
                         SRC_LIST += $(EDICT_DIR)/edict_tools.c
 
                 SRC_LIST += $(SV_SIDE_DIR)/sv_main.c

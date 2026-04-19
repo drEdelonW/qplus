@@ -165,7 +165,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
 
     // send over all entities (excpet the client) that touch the pvs
     edict_p ent = ED_GetEDictFirst();
-    for (int e = 1; e < sv.num_edicts; e++, ent = ED_GetEDictNext(ent)) {
+    for (int e = 1; e < EdictsNum; e++, ent = ED_GetEDictNext(ent)) {
 #ifdef QUAKE2
         // don't send if flagged for NODRAW and there are no lighting effects
         if (ent->v.effects == EF_NODRAW)
@@ -356,7 +356,7 @@ bool SV_SendClientDatagram(RmtClient_p client) {
     // msg.cursize = 0;
 
     MSG_WriteByte(&msg, svc_time);
-    MSG_WriteFloat(&msg, (float)sv.time);
+    MSG_WriteFloat(&msg, (float)SV_GetTime());
 
     // add the client specific data to the datagram
     SV_WriteClientdataToMessage(client->edict, &msg);
@@ -420,7 +420,7 @@ void SV_UpdateToReliableMessages() {
 */
 void SV_CreateBaseline() {
 
-    for (uint32_t entnum = 0; entnum < sv.num_edicts; entnum++) {
+    for (uint32_t entnum = 0; entnum < EdictsNum; entnum++) {
         // get the current server version
         edict_p svent = ED_GetEDictByIdx(entnum);
         if ((svent->free) ||
