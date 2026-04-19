@@ -1,3 +1,4 @@
+#include "server_priv.h"
 #include "sv_net.h"
 #include "msg.h"
 #include "protocol.h"

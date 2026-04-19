@@ -1,5 +1,5 @@
 #include "progs.h"
-#include "pr_Statment.h"
+#include "pr_Statement.h"
 #include "pr_Function.h"
 #include "Edict.h"
 #include "common.h"

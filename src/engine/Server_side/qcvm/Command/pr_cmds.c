@@ -20,11 +20,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "progs.h"
 #include "pr_cmds.h"
-#include "pr_comp.h"
 #include "pr_Function.h"
 #include <string.h>
 #include "console.h"
 #include "server.h"
+#include "server_priv.h"
 #include "q_tools.h"
 #include "host.h"
 #include "angle.h"
@@ -34,7 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "protocol.h"
 #include "msg.h"
 #include "common.h"
-#include "cmd.h"
 #include "cbuf.h"
 #include <stdlib.h>
 
