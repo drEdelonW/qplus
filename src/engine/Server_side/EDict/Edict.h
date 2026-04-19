@@ -2,7 +2,8 @@
 
 #include "link.h"
 #include "EntityState.h"
-#include "pr_comp.h"    // defs shared with qcc
+#include "pr_Argument.h"
+#include "pr_def.h"    // defs shared with qcc
 #include <stdio.h>
 
 

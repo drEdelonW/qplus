@@ -22,29 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // this file is shared by quake and qcc
 #include "progdefs.h"
 
-
-typedef union {
-    string_t    string;
-    float       _float;
-    vec3_t      vector;
-    func_t      function;
-    int32_t     _int;    // VM-slot as 32-bit
-    int32_t     edict;   // 32-bit byte offset from sv.edicts
-} eval_t;
-typedef eval_t* eval_p;
-STATIC_ASSERT_SIZE(eval_t, 3*4);    // 12
-
-
-typedef struct {
-    uint16_t    type;   // [etype_t] if DEF_SAVEGLOBAL bit is set
-                        // the variable needs to be saved in savegames
-    uint16_t    ofs;
-    string_t    s_name;
-} dDef_t;
-typedef dDef_t* dDef_p;
-STATIC_ASSERT_SIZE(dDef_t, 2*2 + 4);    // 8
-
-
 #define PROG_VERSION 6
 typedef struct {
     uint32_t ofs;   /* byte offset from start of progs blob */
@@ -68,3 +45,5 @@ typedef struct {
 } dprograms_t;
 typedef dprograms_t* dprograms_p;
 STATIC_ASSERT_SIZE(dprograms_t, 2*4 + 6*8 + 4); // 60
+
+extern dprograms_p  progs;
