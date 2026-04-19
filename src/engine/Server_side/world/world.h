@@ -55,8 +55,7 @@ typedef enum {
 
 bool SV_RecursiveHullCheck(Hull_p hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_p trace);
 
-void SV_ClearWorld();
-// called after the world model has been loaded, before linking any entities
+
 
 void SV_UnlinkEdict(edict_p ent);
 // call before removing an entity, and before trying to move one, so it doesn't clip against itself

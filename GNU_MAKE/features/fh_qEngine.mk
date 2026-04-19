@@ -82,6 +82,8 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(EDICT_DIR)/edict_tools.c
 
                 SRC_LIST += $(SV_SIDE_DIR)/sv_main.c
+                SRC_LIST += $(SV_SIDE_DIR)/sv_pvs.c
+                SRC_LIST += $(SV_SIDE_DIR)/sv_net.c
                 SRC_LIST += $(SV_SIDE_DIR)/sv_user.c
                 SRC_LIST += $(SV_SIDE_DIR)/sv_phys.c
                 SRC_LIST += $(SV_SIDE_DIR)/sv_move.c
