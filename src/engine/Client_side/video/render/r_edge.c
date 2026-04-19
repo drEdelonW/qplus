@@ -331,7 +331,7 @@ void R_LeadingEdgeBackwards(Edge_p edge) {
 
         goto gotposition;
 
-    newtop:
+    newtop: {
         // emit a span (obscures current top)
         int iu = edge->u >> 20;
 
@@ -346,6 +346,7 @@ void R_LeadingEdgeBackwards(Edge_p edge) {
 
         // set last_u on the new span
         surf->last_u = iu;
+    }
 
     gotposition:
         // insert before surf2
@@ -476,7 +477,7 @@ void R_LeadingEdge(Edge_p  edge) {
 
             goto gotposition;
 
-        newtop:
+        newtop: {
             // emit a span (obscures current top)
             int iu = edge->u >> 20;
 
@@ -491,6 +492,7 @@ void R_LeadingEdge(Edge_p  edge) {
 
             // set last_u on the new span
             surf->last_u = iu;
+        }
 
         gotposition:
             // insert before surf2

@@ -305,9 +305,9 @@ split2:
     lp2 = lp3;
     lp3 = temp;
 
+    int  _new[6];
 split:
     // split this edge
-    int  _new[6];
     _new[0] = (lp1[0] + lp2[0]) >> 1;
     _new[1] = (lp1[1] + lp2[1]) >> 1;
     _new[2] = (lp1[2] + lp2[2]) >> 1;
