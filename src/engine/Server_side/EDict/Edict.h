@@ -111,8 +111,6 @@ typedef edict_t* edict_p;
 #define G_EDICT(o)          ED_GetEDictByOffs((uint32_t)G_INT((o)))
 #define G_EDICTNUM(o)       ED_GetEDictIdx(G_EDICT((o)))
 
-extern uint32_t     pr_edict_size;  // in bytes
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -155,6 +153,7 @@ extern "C" {
 }
 #endif
 
-extern edict_p Edicts;
+extern uint32_t EdictSize;  // in bytes
+extern edict_p  Edicts;
 extern uint32_t EdictsMax;
 extern uint32_t EdictsNum;

@@ -8,11 +8,11 @@ edict_p ED_GetEDictByIdx(uint32_t idx) {
         (idx >= EdictsMax))
         Host_SysError("ED_GetEDictByIdx: bad index %i", idx);
 
-    return (edict_p)((uint8_p)Edicts + ((idx) * pr_edict_size));
+    return (edict_p)((uint8_p)Edicts + ((idx) * EdictSize));
 }
 
 uint32_t ED_GetEDictIdx(edict_p edict) {
-    uint32_t idx = (uint32_t)((uint8_p)edict - (uint8_p)Edicts) / pr_edict_size;
+    uint32_t idx = (uint32_t)((uint8_p)edict - (uint8_p)Edicts) / EdictSize;
 
     if (
         // (idx < 0) ||
@@ -33,5 +33,5 @@ edict_p ED_GetEDictFirst() {
     return ED_GetEDictNext(Edicts);  // first non word entity
 }
 edict_p ED_GetEDictNext(edict_p edict) {
-    return  ((edict_p)((uint8_p)(edict) + pr_edict_size));
+    return  ((edict_p)((uint8_p)(edict) + EdictSize));
 }

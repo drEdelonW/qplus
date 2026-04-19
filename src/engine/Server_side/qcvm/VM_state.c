@@ -108,7 +108,7 @@ void PR_LoadProgs() {
     pr_global_struct = (globalvars_p)((uint8_p)progs + progs->globals.ofs);
     pr_globals = (float_p)pr_global_struct;
 
-    pr_edict_size = progs->entityfields * 4 + sizeof(edict_t) - sizeof(entvars_t);
+    EdictSize = progs->entityfields * 4 + sizeof(edict_t) - sizeof(entvars_t);
 
     pr_statements = (dStatement_p)((uint8_p)progs + progs->statements.ofs);
     // uint8_t swap the lumps

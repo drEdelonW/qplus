@@ -364,9 +364,14 @@ void SV_SpawnServer(
     // load progs to get entity field count
     PR_LoadProgs();
 
-    // ED_Init();
-    Edicts = Hunk_AllocName((uint32_t)EdictsMax * pr_edict_size, "edicts");
+    // WARNING!!! don't use [EdictSize] before PR_LoadProgs() called!!!
+    // allocate server memory
+    // sv.max_edicts = MAX_EDICTS;
+    // EdictsMax = max_edicts;
 
+    if (!EdictSize) Host_Error("EdictSize - not inited\n");
+    Edicts = Hunk_AllocName((uint32_t)EdictsMax * EdictSize, "edicts");
+    // sv.edicts = Edicts;
 
     sv.datagram.maxsize = sizeof(sv.datagram_buf);
     sv.datagram.cursize = 0;
