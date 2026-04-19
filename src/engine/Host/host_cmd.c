@@ -71,7 +71,7 @@ void Host_Status_f() {
     void (*print) (cStringRO fmt, ...);
 
     if (cmd_source == src_command) {
-        if (!sv.active) { Cmd_ForwardToServer();    return; }
+        if (!SV_IsActive()) { Cmd_ForwardToServer();    return; }
         print = Con_Printf;
     }
     else    print = SV_ClientPrintf;
@@ -80,7 +80,7 @@ void Host_Status_f() {
     print("version: %4.2f\n", VERSION);
     if (tcpipAvailable)     print("tcp/ip:  %s\n", my_tcpip_address);
     if (ipxAvailable)       print("ipx:     %s\n", my_ipx_address);
-    print("map:     %s\n", sv.name);
+    print("map:     %s\n", SV_GetName());
     print("players: %i active (%i max)\n\n", net_activeconnections, svs.maxClients);
 
     RmtClient_p rClient = svs.clients;
@@ -175,7 +175,7 @@ void Host_Map_f() {
 #endif
     );
 
-    if (!sv.active)     return;
+    if (!SV_IsActive())     return;
 
     if (!Host_IsDedicated()) {
         strcpy(cls.spawnparms, "");
@@ -199,7 +199,7 @@ Goes to a new map, taking all clients along
 void Host_Changelevel_f() {
 #ifdef QUAKE2
     if (Cmd_Argc() < 2) { ;                 Con_Printf("changelevel <levelname> : continue game on a new level\n"); return; }
-    if (!sv.active || cls.demoplayback) { ; Con_Printf("Only the server may changelevel\n");                        return; }
+    if (!SV_IsActive() || cls.demoplayback) { ; Con_Printf("Only the server may changelevel\n");                        return; }
 
     strcpy(level, Cmd_Argv(1));
     cString startspot;
@@ -216,7 +216,7 @@ void Host_Changelevel_f() {
 #else
 
     if (Cmd_Argc() != 2) { ;                Con_Printf("changelevel <levelname> : continue game on a new level\n"); return; }
-    if (!sv.active || cls.demoplayback) { ; Con_Printf("Only the server may changelevel\n");                        return; }
+    if (!SV_IsActive() || cls.demoplayback) { ; Con_Printf("Only the server may changelevel\n");                        return; }
     SV_SaveSpawnparms();
 
     char level[MAX_QPATH];
@@ -234,13 +234,13 @@ Restarts the current server for a dead player
 */
 void Host_Restart_f() {
     if (cls.demoplayback ||
-        !sv.active ||
+        !SV_IsActive() ||
         cmd_source != src_command
         )
         return;
 
     char mapname[MAX_QPATH];
-    strcpy(mapname, sv.name); // must copy out, because it gets cleared
+    strcpy(mapname, SV_GetName()); // must copy out, because it gets cleared
     // in sv_spawnserver
 #ifdef QUAKE2
     char startspot[MAX_QPATH];
@@ -325,7 +325,7 @@ Host_Savegame_f
 */
 void Host_Savegame_f() {
     if (cmd_source != src_command)      return;
-    if (!sv.active) { ;                 Con_Printf("Not playing a local game.\n");              return; }
+    if (!SV_IsActive()) { ;                 Con_Printf("Not playing a local game.\n");              return; }
     if (cl.intermission != IM_NONE) { ; Con_Printf("Can't save in intermission.\n");            return; }
     if (svs.maxClients != 1) { ;        Con_Printf("Can't save multiplayer games.\n");          return; }
     if (Cmd_Argc() != 2) { ;            Con_Printf("save <savename> : save a game\n");          return; }
@@ -355,7 +355,7 @@ void Host_Savegame_f() {
         fprintf(saveFile, "%f\n", svs.clients->spawn_parms[i]);
 
     fprintf(saveFile, "%d\n", current_skill);
-    fprintf(saveFile, "%s\n", sv.name);
+    fprintf(saveFile, "%s\n", SV_GetName());
     fprintf(saveFile, "%f\n", sv.time);
 
     // write the light styles
@@ -435,7 +435,7 @@ void Host_Loadgame_f() {
 #endif
     );
 
-    if (!sv.active) { Con_Printf("Couldn't load map\n");    return; }
+    if (!SV_IsActive()) { Con_Printf("Couldn't load map\n");    return; }
     sv.paused = true;  // pause until all clients connect
     sv.loadgame = true;
 
@@ -500,7 +500,7 @@ void Host_Loadgame_f() {
 #ifdef QUAKE2
 void SaveGamestate() {
     char name[256];
-    snprintf(name, sizeof(name), "%s/%s.gip", com.gamedir, sv.name);
+    snprintf(name, sizeof(name), "%s/%s.gip", com.gamedir, SV_GetName());
 
     Con_Printf("Saving game to %s...\n", name);
     FILE* saveGStFile = fopen(name, "w");
@@ -514,7 +514,7 @@ void SaveGamestate() {
     // for (int i = 0; i < NUM_SPAWN_PARMS; i++)
     //     fprintf(saveGStFile, "%f\n", svs.clients->spawn_parms[i]);
     fprintf(saveGStFile, "%f\n", skill.value);
-    fprintf(saveGStFile, "%s\n", sv.name);
+    fprintf(saveGStFile, "%s\n", SV_GetName());
     fprintf(saveGStFile, "%f\n", sv.time);
 
     // write the light styles
@@ -563,7 +563,7 @@ int LoadGamestate(cString level, cString startspot) {
 
     SV_SpawnServer(mapname, startspot);
 
-    if (!sv.active) { Con_Printf("Couldn't load map\n"); return -1; }
+    if (!SV_IsActive()) { Con_Printf("Couldn't load map\n"); return -1; }
 
     // load the light styles
     for (int i = 0; i < MAX_LIGHTSTYLES; i++) {
@@ -614,7 +614,7 @@ int LoadGamestate(cString level, cString startspot) {
 // changing levels within a unit
 void Host_Changelevel2_f() {
     if (Cmd_Argc() < 2) { Con_Printf("changelevel2 <levelname> : continue game on a new level in the unit\n");  return; }
-    if (!sv.active || cls.demoplayback) { Con_Printf("Only the server may changelevel\n");  return; }
+    if (!SV_IsActive() || cls.demoplayback) { Con_Printf("Only the server may changelevel\n");  return; }
 
     char level[MAX_QPATH];
     strcpy(level, Cmd_Argv(1));
@@ -1021,7 +1021,7 @@ Kicks a user off of the server
 */
 void Host_Kick_f() {
     if (cmd_source == src_command) {
-        if (!sv.active) {
+        if (!SV_IsActive()) {
             Cmd_ForwardToServer(); return;
         }
     }
@@ -1293,7 +1293,7 @@ Host_Startdemos_f
 */
 void Host_Startdemos_f() {
     if (Host_IsDedicated()) {
-        if (!sv.active)
+        if (!SV_IsActive())
             Cbuf_AddText("map start\n");
         return;
     }
@@ -1308,7 +1308,7 @@ void Host_Startdemos_f() {
     for (int i = 1; i < demo + 1; i++)
         strncpy(cls.demos[i - 1], Cmd_Argv(i), sizeof(cls.demos[0]) - 1);
 
-    if ((!sv.active) &&
+    if ((!SV_IsActive()) &&
         (cls.demonum != -1) &&
         (!cls.demoplayback)
         ) {

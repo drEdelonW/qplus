@@ -120,6 +120,8 @@ extern edict_p      sv_player;
 extern "C" {
 #endif
     void SV_Init();
+    cString SV_GetName();
+    bool SV_IsActive();
 
     void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation);
 

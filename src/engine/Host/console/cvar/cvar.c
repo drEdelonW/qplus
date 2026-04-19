@@ -114,7 +114,7 @@ void Cvar_Set(cStringRO var_name, cString value) {
     // if (var->server && changed)
     if (changed &&
         (var->flags & cvf_server) &&
-        (sv.active)
+        (SV_IsActive())
         )
         SV_BroadcastPrintf("\"%s\" changed to \"%s\"\n", var->name, var->string);
 

@@ -26,7 +26,7 @@ void Host_EndGame(cString message, ...) {
 
     Con_DPrintf("Host.EndGame: %s\n", string);
 
-    if (sv.active)                  host.ShutdownServer(false);
+    if (SV_IsActive())                  host.ShutdownServer(false);
     if (cls.state == ca_dedicated)  Host_SysError("Host.EndGame: %s\n", string); // dedicated servers exit
 
     if (cls.demonum != -1)  CL_NextDemo();
@@ -63,7 +63,7 @@ void Host_Error(cString error, ...) {
 
     Con_Printf("Host.Error: %s\n", string);
 
-    if (sv.active)                  host.ShutdownServer(false);
+    if (SV_IsActive())                  host.ShutdownServer(false);
     if (cls.state == ca_dedicated)  Host_SysError("Host.Error: %s\n", string); // dedicated servers exit
 
     CL_Disconnect();
