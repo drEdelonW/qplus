@@ -339,7 +339,7 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     if (ent->area.prev)
         SV_UnlinkEdict(ent); // unlink from old position
 
-    if ((ent == sv.edicts) ||  // don't add the world
+    if ((ent == Edicts) ||  // don't add the world
         (ent->free))
         return;
 
@@ -495,7 +495,7 @@ This could be a lot more efficient...
 edict_p SV_TestEntityPosition(edict_p ent) {
     trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, ent->v.origin, MOVE_NORMAL, ent);
 
-    return (trace.startsolid) ? sv.edicts : NULL;
+    return (trace.startsolid) ? Edicts : NULL;
 }
 
 
@@ -824,7 +824,7 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
     moveClip_t clip;  memset(&clip, 0, sizeof(moveClip_t));
 
     // clip to world
-    clip.trace = SV_ClipMoveToEntity(sv.edicts, start, mins, maxs, end);
+    clip.trace = SV_ClipMoveToEntity(Edicts, start, mins, maxs, end);
 
     clip.start = start;
     clip.end = end;

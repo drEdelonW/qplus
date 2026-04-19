@@ -38,6 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 
 uint32_t pr_edict_size;      // in bytes
+edict_p Edicts;
 
 
 /*
@@ -514,7 +515,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
     bool init = false;
 
     // clear it
-    if (ent != sv.edicts) // hack
+    if (ent != Edicts) // hack
         memset(&ent->v, 0, progs->entityfields * 4);
 
     // go through all the dictionary pairs

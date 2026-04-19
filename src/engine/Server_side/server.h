@@ -58,7 +58,7 @@ typedef struct {
 
     int32_t     num_edicts;
     int32_t     max_edicts;
-    edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
+    // edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
 
     sv_state_e  state;          // some actions are only valid during load
     sizebuf_t   datagram;

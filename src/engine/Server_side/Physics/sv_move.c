@@ -119,7 +119,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
         for (int i = 0; i < 2; i++) {
             VectorAdd(ent->v.origin, move, neworg);
             edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
-            if (i == 0 && enemy != sv.edicts) {
+            if (i == 0 && (enemy != Edicts)) {
                 float dz = ent->v.origin[2] - ED_GetEDictByOffs(ent->v.enemy)->v.origin[2];
                 if (dz > 40)    neworg[2] -= 8;
                 if (dz < 30)    neworg[2] += 8;
@@ -137,7 +137,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
                 return true;
             }
 
-            if (enemy == sv.edicts)
+            if (enemy == Edicts)
                 break;
         }
 
@@ -384,9 +384,9 @@ void SV_MoveToGoal() {
     // if the next step hits the enemy, return immediately
 #ifdef QUAKE2
     edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
-    if ((enemy != sv.edicts) && SV_CloseEnough(ent, enemy, dist))
+    if ((enemy != Edicts) && SV_CloseEnough(ent, enemy, dist))
 #else
-    if ((ED_GetEDictByOffs(ent->v.enemy) != sv.edicts) && SV_CloseEnough(ent, goal, dist))
+    if ((ED_GetEDictByOffs(ent->v.enemy) != Edicts) && SV_CloseEnough(ent, goal, dist))
 #endif
         return;
 

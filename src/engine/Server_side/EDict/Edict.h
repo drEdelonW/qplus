@@ -154,3 +154,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+extern edict_p Edicts;

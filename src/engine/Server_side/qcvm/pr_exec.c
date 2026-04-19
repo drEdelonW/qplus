@@ -366,15 +366,15 @@ void PR_ExecuteProgram(func_t fnum) {
 #ifdef PARANOID
                 ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
-                if ((ed == (edict_p)sv.edicts) &&
+                if ((ed == Edicts) &&
                     (sv.state == ss_active)
                 )
                     PR_RunError("assignment to world entity");
 
-                // c->_int = (uint8_p)((int32_p)&ed->v + b->_int) - (uint8_p)sv.edicts;
+                // c->_int = (uint8_p)((int32_p)&ed->v + b->_int) - (uint8_p)Edicts;
                 {
                     eval_p ptr = (eval_p)((int32_p)&ed->v + b->_int);
-                    c->_int = (int32_t)((uintptr_t)ptr - (uintptr_t)sv.edicts);
+                    c->_int = (int32_t)((uintptr_t)ptr - (uintptr_t)Edicts);
                 }
             } break;
 
@@ -394,11 +394,11 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_STOREP_ENT:
             case OP_STOREP_FLD:  // integers
             case OP_STOREP_FNC: {  // pointers
-                eval_p ptr = (eval_p)((uint8_p)sv.edicts + b->_int);
+                eval_p ptr = (eval_p)((uint8_p)Edicts + b->_int);
                 ptr->_int = a->_int;
             } break;
             case OP_STOREP_V: {
-                eval_p ptr = (eval_p)((uint8_p)sv.edicts + b->_int);
+                eval_p ptr = (eval_p)((uint8_p)Edicts + b->_int);
                 ptr->vector[0] = a->vector[0];
                 ptr->vector[1] = a->vector[1];
                 ptr->vector[2] = a->vector[2];
@@ -409,7 +409,7 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_NOT_F:      c->_float = !a->_float;     break;
             case OP_NOT_V:      c->_float = !a->vector[0] && !a->vector[1] && !a->vector[2];    break;
             case OP_NOT_S:      c->_float = !a->string || !*PR_GetQString(a->string);           break;        // c->_float = !a->string || !pr_strings[a->string];
-            case OP_NOT_ENT:    c->_float = (ED_GetEDictByOffs(a->edict) == sv.edicts);             break;
+            case OP_NOT_ENT:    c->_float = (ED_GetEDictByOffs(a->edict) == Edicts);             break;
             case OP_NOT_FNC:    c->_float = !a->function;   break;
 
             case OP_IF: {

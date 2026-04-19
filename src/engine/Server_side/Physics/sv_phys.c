@@ -136,7 +136,7 @@ bool SV_RunThink(edict_p ent) {
     ent->v.nextthink = 0;
     pr_global_struct->time = thinktime;
     pr_global_struct->self = ED_GetEDictOffs(ent);
-    pr_global_struct->other = ED_GetEDictOffs(sv.edicts);
+    pr_global_struct->other = ED_GetEDictOffs(Edicts);
     PR_ExecuteProgram(ent->v.think);
     return !ent->free;
 }
@@ -662,7 +662,7 @@ void SV_Physics_Pusher(edict_p ent) {
         ent->v.nextthink = 0;
         pr_global_struct->time = (float)sv.time;
         pr_global_struct->self = ED_GetEDictOffs(ent);
-        pr_global_struct->other = ED_GetEDictOffs(sv.edicts);
+        pr_global_struct->other = ED_GetEDictOffs(Edicts);
         PR_ExecuteProgram(ent->v.think);
         if (ent->free)
             return;
@@ -1321,8 +1321,8 @@ SV_Physics
 */
 void SV_Physics() {
     // let the progs know that a new frame has started
-    pr_global_struct->self = ED_GetEDictOffs(sv.edicts);
-    pr_global_struct->other = ED_GetEDictOffs(sv.edicts);
+    pr_global_struct->self = ED_GetEDictOffs(Edicts);
+    pr_global_struct->other = ED_GetEDictOffs(Edicts);
     pr_global_struct->time = (float)sv.time;
     PR_ExecuteProgram(pr_global_struct->StartFrame);
 
@@ -1330,7 +1330,7 @@ void SV_Physics() {
 
     //
     // treat each object in turn
-    edict_p ent = sv.edicts;
+    edict_p ent = Edicts;
     for (int i = 0; i < sv.num_edicts; i++, ent = ED_GetEDictNext(ent)) {
         if (ent->free)  continue;
 
