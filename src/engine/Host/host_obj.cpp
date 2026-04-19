@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include "d_iface.h"
 #include "server.h"
-#undef SERVER
+#undef SERVER   // TODO: remove this workaround
 #include "common.h"
 #include "sys.h"
 #include "protocol.h"

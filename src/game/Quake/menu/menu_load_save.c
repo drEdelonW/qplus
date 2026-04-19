@@ -7,7 +7,7 @@
 #include "cmd.h"
 #include "cbuf.h"
 #include "screen.h"
-#undef SERVER
+#undef SERVER   // TODO: remove this workaround
 #include "client.h"
 
 

@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // net_loop.c
 
 #include "server.h"
-#undef SERVER
+#undef SERVER       // TODO: remove this workaround
 #include "client.h"
 #include "host.h"
 #include "q_tools.h"
