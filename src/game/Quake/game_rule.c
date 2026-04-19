@@ -8,6 +8,7 @@
 #include "cvar_q1.h"
 
 
+int32_t current_skill;
 
 bool standard_quake = true;
 bool rogue;

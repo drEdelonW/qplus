@@ -38,15 +38,15 @@ typedef enum {
 } sv_state_e;
 
 typedef struct {
-    bool    active;         // false if only a net client
-    bool    paused;
-    bool    loadgame;       // handle connections specially
-    double  time;
-    uint8_t lastcheck;      // used by PF_checkclient
-    double  lastchecktime;
-    char    name[NAME_LENGTH];       // map name
+    bool        active;         // false if only a net client
+    bool        paused;
+    bool        loadgame;       // handle connections specially
+    double      time;
+    uint8_t     lastcheck;      // used by PF_checkclient
+    double      lastchecktime;
+    char        name[NAME_LENGTH];       // map name
 #ifdef QUAKE2
-    char    startspot[NAME_LENGTH];
+    char        startspot[NAME_LENGTH];
 #endif
     char        modelname[NAME_LENGTH];  // maps/<name>.bsp, for model_precache[0]
     Model_p     worldmodel;
@@ -100,10 +100,10 @@ typedef RmtClient_t* RmtClient_p;
 //=============================================================================
 
 typedef struct {
-    uint8_t      maxClients;
-    uint8_t      maxClientsLimit;
+    uint8_t     maxClients;
+    uint8_t     maxClientsLimit;
     RmtClient_p clients;            // [maxClients]
-    uint32_t     serverflags;        // episode completion information
+    uint32_t    serverflags;        // episode completion information
     bool        changelevel_issued; // cleared when at SV_SpawnServer
 } sv_static_t;
 
@@ -160,6 +160,8 @@ extern "C" {
 #   endif
     );
 
+    void SV_ClearWorld();
+// called after the world model has been loaded, before linking any entities
 #ifdef __cplusplus
 }
 #endif
