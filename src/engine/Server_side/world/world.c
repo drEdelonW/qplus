@@ -280,7 +280,7 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
 
         pr_global_struct->self = ED_GetEDictOffs(touch);
         pr_global_struct->other = ED_GetEDictOffs(ent);
-        pr_global_struct->time = (float)sv.time;
+        pr_global_struct->time = (float)SV_GetTime();
         PR_ExecuteProgram(touch->v.touch);
 
         pr_global_struct->self = old_self;

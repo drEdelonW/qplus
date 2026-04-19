@@ -77,7 +77,7 @@ SV_CheckAllEnts
 void SV_CheckAllEnts() {
     // see if any solid entities are inside the final position
     edict_p check = ED_GetEDictFirst();
-    for (int e = 1; e < sv.num_edicts; e++, check = ED_GetEDictNext(check)) {
+    for (int e = 1; e < EdictsNum; e++, check = ED_GetEDictNext(check)) {
         if (check->free) continue;
         if (check->v.movetype == MOVETYPE_PUSH ||
             check->v.movetype == MOVETYPE_NONE ||
@@ -127,10 +127,10 @@ Returns false if the entity removed itself.
 bool SV_RunThink(edict_p ent) {
     float thinktime = ent->v.nextthink;
     if ((thinktime <= 0) ||
-        (thinktime > (sv.time + host_frametime)))
+        (thinktime > (SV_GetTime() + host_frametime)))
         return true;
 
-    CLAMP_LESS(thinktime, (float)sv.time); // don't let things stay in the past.
+    CLAMP_LESS(thinktime, (float)SV_GetTime()); // don't let things stay in the past.
     // it is possible to start that way
     // by a trigger with a local time.
     ent->v.nextthink = 0;
@@ -152,7 +152,7 @@ void SV_Impact(edict_p e1, edict_p e2) {
     int old_self = pr_global_struct->self;
     int old_other = pr_global_struct->other;
 
-    pr_global_struct->time = (float)sv.time;
+    pr_global_struct->time = (float)SV_GetTime();
     if (e1->v.touch && (e1->v.solid != SOLID_NOT)) {
         pr_global_struct->self = ED_GetEDictOffs(e1);
         pr_global_struct->other = ED_GetEDictOffs(e2);
@@ -408,7 +408,7 @@ void SV_PushMove(edict_p pusher, float movetime) {
     edict_p check = ED_GetEDictFirst();
     edict_p moved_edict[MAX_EDICTS];
     vec3_t  moved_from[MAX_EDICTS];
-    for (int e = 1; e < sv.num_edicts; e++, check = ED_GetEDictNext(check)) {
+    for (int e = 1; e < EdictsNum; e++, check = ED_GetEDictNext(check)) {
         if (check->free)    continue;
 
         switch ((movetype_t)check->v.movetype) {
@@ -530,7 +530,7 @@ void SV_PushRotate(edict_p pusher, float movetime) {
     edict_p check = ED_GetEDictFirst();
     edict_p moved_edict[MAX_EDICTS];
     vec3_t  moved_from[MAX_EDICTS];
-    for (int e = 1; e < sv.num_edicts; e++, check = ED_GetEDictNext(check)) {
+    for (int e = 1; e < EdictsNum; e++, check = ED_GetEDictNext(check)) {
         if (check->free)    continue;
 
         if (check->v.movetype == MOVETYPE_PUSH ||
@@ -660,7 +660,7 @@ void SV_Physics_Pusher(edict_p ent) {
         (thinktime <= ent->v.ltime)
         ) {
         ent->v.nextthink = 0;
-        pr_global_struct->time = (float)sv.time;
+        pr_global_struct->time = (float)SV_GetTime();
         pr_global_struct->self = ED_GetEDictOffs(ent);
         pr_global_struct->other = ED_GetEDictOffs(Edicts);
         PR_ExecuteProgram(ent->v.think);
@@ -938,7 +938,7 @@ void SV_Physics_Client(edict_p ent, int num) {
     //
     // call standard client pre-think
     //
-    pr_global_struct->time = (float)sv.time;
+    pr_global_struct->time = (float)SV_GetTime();
     pr_global_struct->self = ED_GetEDictOffs(ent);
     PR_ExecuteProgram(pr_global_struct->PlayerPreThink);
 
@@ -990,7 +990,7 @@ void SV_Physics_Client(edict_p ent, int num) {
     //
     SV_LinkEdict(ent, true);
 
-    pr_global_struct->time = (float)sv.time;
+    pr_global_struct->time = (float)SV_GetTime();
     pr_global_struct->self = ED_GetEDictOffs(ent);
     PR_ExecuteProgram(pr_global_struct->PlayerPostThink);
 }
@@ -1205,7 +1205,7 @@ void SV_Physics_Step(edict_p ent) {
     if ((EntityFlags_t)groundentity->v.flags & FL_CONVEYOR)   VectorScale(groundentity->v.movedir, groundentity->v.speed, ent->v.basevelocity);
     else                                            VectorCopy(_vecOrigin, ent->v.basevelocity);
     //@@
-    pr_global_struct->time = sv.time;
+    pr_global_struct->time = SV_GetTime();
     pr_global_struct->self = ED_GetEDictOffs(ent);
     PF_WaterMove();
 
@@ -1323,7 +1323,7 @@ void SV_Physics() {
     // let the progs know that a new frame has started
     pr_global_struct->self = ED_GetEDictOffs(Edicts);
     pr_global_struct->other = ED_GetEDictOffs(Edicts);
-    pr_global_struct->time = (float)sv.time;
+    pr_global_struct->time = (float)SV_GetTime();
     PR_ExecuteProgram(pr_global_struct->StartFrame);
 
     //SV_CheckAllEnts ();
@@ -1331,7 +1331,7 @@ void SV_Physics() {
     //
     // treat each object in turn
     edict_p ent = Edicts;
-    for (int i = 0; i < sv.num_edicts; i++, ent = ED_GetEDictNext(ent)) {
+    for (int i = 0; i < EdictsNum; i++, ent = ED_GetEDictNext(ent)) {
         if (ent->free)  continue;
 
         if (pr_global_struct->force_retouch) {

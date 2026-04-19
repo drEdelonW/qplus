@@ -5,7 +5,7 @@
 edict_p ED_GetEDictByIdx(uint32_t idx) {
     if (
         // (idx < 0) ||
-        (idx >= sv.max_edicts))
+        (idx >= EdictsMax))
         Host_SysError("ED_GetEDictByIdx: bad index %i", idx);
 
     return (edict_p)((uint8_p)Edicts + ((idx) * pr_edict_size));
@@ -16,7 +16,7 @@ uint32_t ED_GetEDictIdx(edict_p edict) {
 
     if (
         // (idx < 0) ||
-        (idx >= sv.num_edicts))
+        (idx >= EdictsNum))
         Host_SysError("ED_GetEDictIdx: bad pointer");
 
     return idx;

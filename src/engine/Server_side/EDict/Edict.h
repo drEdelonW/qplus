@@ -156,3 +156,5 @@ extern "C" {
 #endif
 
 extern edict_p Edicts;
+extern uint32_t EdictsMax;
+extern uint32_t EdictsNum;

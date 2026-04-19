@@ -356,7 +356,7 @@ void Host_Savegame_f() {
 
     fprintf(saveFile, "%d\n", current_skill);
     fprintf(saveFile, "%s\n", SV_GetName());
-    fprintf(saveFile, "%f\n", sv.time);
+    fprintf(saveFile, "%f\n", SV_GetTime());
 
     // write the light styles
 
@@ -367,7 +367,7 @@ void Host_Savegame_f() {
 
 
     ED_WriteGlobals(saveFile);
-    for (uint32_t i = 0; i < sv.num_edicts; i++) {
+    for (uint32_t i = 0; i < EdictsNum; i++) {
         ED_Write(saveFile, ED_GetEDictByIdx(i));
         fflush(saveFile);
     }
@@ -483,8 +483,8 @@ void Host_Loadgame_f() {
         entnum++;
     }
 
-    sv.num_edicts = entnum;
-    sv.time = time;
+    EdictsNum = entnum;
+    SV_SetTime(time);
 
     fclose(loadFile);
 
@@ -515,7 +515,7 @@ void SaveGamestate() {
     //     fprintf(saveGStFile, "%f\n", svs.clients->spawn_parms[i]);
     fprintf(saveGStFile, "%f\n", skill.value);
     fprintf(saveGStFile, "%s\n", SV_GetName());
-    fprintf(saveGStFile, "%f\n", sv.time);
+    fprintf(saveGStFile, "%f\n", SV_GetTime());
 
     // write the light styles
 
@@ -525,7 +525,7 @@ void SaveGamestate() {
     }
 
 
-    for (int i = svs.maxClients + 1; i < sv.num_edicts; i++) {
+    for (int i = svs.maxClients + 1; i < EdictsNum; i++) {
         edict_p ent = ED_GetEDictByIdx(i);
         if ((int32_t)ent->v.flags & FL_ARCHIVE_OVERRIDE)
             continue;
@@ -601,8 +601,8 @@ int LoadGamestate(cString level, cString startspot) {
         if (!ent->free) SV_LinkEdict(ent, false);
     }
 
-    // sv.num_edicts = entnum;
-    sv.time = time;
+    // EdictsNum = entnum;
+    SV_SetTime(time);
     fclose(loadGStFile);
 
     // for (int i = 0; i < NUM_SPAWN_PARMS; i++)
@@ -873,7 +873,7 @@ void Host_Kill_f() {
     if (cmd_source == src_command) { ;  Cmd_ForwardToServer();                                  return; }
     if (sv_player->v.health <= 0) { ;   SV_ClientPrintf("Can't suicide -- allready dead!\n");   return; }
 
-    pr_global_struct->time = (float)sv.time;
+    pr_global_struct->time = (float)SV_GetTime();
     pr_global_struct->self = ED_GetEDictOffs(sv_player);
     PR_ExecuteProgram(pr_global_struct->ClientKill);
 }
@@ -945,11 +945,11 @@ void Host_Spawn_f() {
 
         // call the spawn function
 
-        pr_global_struct->time = (float)sv.time;
+        pr_global_struct->time = (float)SV_GetTime();
         pr_global_struct->self = ED_GetEDictOffs(sv_player);
         PR_ExecuteProgram(pr_global_struct->ClientConnect);
 
-        if ((Host_FloatTime() - remoteClient->netconnection->connecttime) <= sv.time)
+        if ((Host_FloatTime() - remoteClient->netconnection->connecttime) <= SV_GetTime())
             Host_Printf("%s entered the game\n", remoteClient->name);
 
         PR_ExecuteProgram(pr_global_struct->PutClientInServer);
@@ -960,7 +960,7 @@ void Host_Spawn_f() {
     sizebuf_p pBuf = &remoteClient->message;    SZ_Clear(pBuf);
 
     // send time of update
-    MSG_WriteByte(pBuf, svc_time);    MSG_WriteFloat(pBuf, (float)sv.time);
+    MSG_WriteByte(pBuf, svc_time);    MSG_WriteFloat(pBuf, (float)SV_GetTime());
     {
         RmtClient_p rClient = svs.clients;
         for (uint8_t i = 0; i < svs.maxClients; i++, rClient++) {

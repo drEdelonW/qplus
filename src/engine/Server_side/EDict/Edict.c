@@ -39,6 +39,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 uint32_t pr_edict_size;      // in bytes
 edict_p Edicts;
+uint32_t EdictsMax = MAX_EDICTS;
+uint32_t EdictsNum;
+
 
 
 /*
@@ -66,14 +69,14 @@ angles and bad trails.
 */
 edict_p ED_Alloc() {
     uint32_t i = svs.maxClients + 1;
-    for (; i < sv.num_edicts; i++) {
+    for (; i < EdictsNum; i++) {
         edict_p edict = ED_GetEDictByIdx(i);
         // the first couple seconds of server time can involve a lot of
         // freeing and allocating, so relax the replacement policy
         if ((edict->free) &&
             (
                 (edict->freetime < 2.0f) ||
-                ((sv.time - edict->freetime) > 0.5f)
+                ((SV_GetTime() - edict->freetime) > 0.5f)
                 )
             ) {
             ED_ClearEdict(edict);
@@ -83,7 +86,7 @@ edict_p ED_Alloc() {
 
     if (i == MAX_EDICTS)            Host_SysError("ED_Alloc: no free edicts");
 
-    sv.num_edicts++;
+    EdictsNum++;
     edict_p edict = ED_GetEDictByIdx(i);
     ED_ClearEdict(edict);
 
@@ -113,7 +116,7 @@ void ED_Free(edict_p ed) {
     ed->v.nextthink = -1;
     ed->v.solid = 0;
 
-    ed->freetime = (float)sv.time;
+    ed->freetime = (float)SV_GetTime();
 }
 
 //===========================================================================
@@ -307,8 +310,8 @@ For debugging, prints all the entities in the current server
 =============
 */
 void ED_PrintEdicts() {
-    Host_Printf("%i entities\n", sv.num_edicts);
-    for (uint32_t i = 0; i < sv.num_edicts; i++)
+    Host_Printf("%i entities\n", EdictsNum);
+    for (uint32_t i = 0; i < EdictsNum; i++)
         ED_PrintNum(i);
 }
 
@@ -321,7 +324,7 @@ For debugging, prints a single edicy
 */
 void ED_PrintEdict_f() {
     uint32_t i = (uint32_t)Q_atoi(Cmd_Argv(1));
-    if (i >= sv.num_edicts) { Host_Printf("Bad edict number\n"); return; }
+    if (i >= EdictsNum) { Host_Printf("Bad edict number\n"); return; }
     ED_PrintNum(i);
 }
 
@@ -337,7 +340,7 @@ void ED_Count() {
     int models = 0;
     int solid = 0;
     int step = 0;
-    for (uint32_t i = 0; i < sv.num_edicts; i++) {
+    for (uint32_t i = 0; i < EdictsNum; i++) {
         edict_p ent = ED_GetEDictByIdx(i);
         if (ent->free)  continue;
 
@@ -347,7 +350,7 @@ void ED_Count() {
         if (ent->v.movetype == MOVETYPE_STEP)   step++;
     }
 
-    Host_Printf("num_edicts:%3i\n", sv.num_edicts);
+    Host_Printf("num_edicts:%3i\n", EdictsNum);
     Host_Printf("active    :%3i\n", active);
     Host_Printf("view      :%3i\n", models);
     Host_Printf("touch     :%3i\n", solid);
@@ -602,7 +605,7 @@ to call ED_CallSpawnFunctions () to let the objects initialize themselves.
 void ED_LoadFromFile(cString data) {
     edict_p ent = NULL;
     int inhibit = 0;
-    pr_global_struct->time = (float)sv.time;
+    pr_global_struct->time = (float)SV_GetTime();
 
     // parse ents
     while (1) {
@@ -662,7 +665,7 @@ void ED_LoadFromFile(cString data) {
 
 
 edict_p FindViewthing() {
-    for (uint32_t i = 0; i < sv.num_edicts; i++) {
+    for (uint32_t i = 0; i < EdictsNum; i++) {
         edict_p eDict = ED_GetEDictByIdx(i);
         if (!strcmp(PR_GetQString(eDict->v.classname), "viewthing"))  return eDict;
     }
@@ -676,6 +679,13 @@ PR_Init
 ===============
 */
 void ED_Init() {
+        // allocate server memory
+    // sv.max_edicts = MAX_EDICTS;
+    // EdictsMax = max_edicts;
+
+    // Edicts = Hunk_AllocName((uint32_t)EdictsMax * pr_edict_size, "edicts");
+    // sv.edicts = Edicts;
+
     Cmd_AddCommand("edict", ED_PrintEdict_f);
     Cmd_AddCommand("edicts", ED_PrintEdicts);
     Cmd_AddCommand("edictcount", ED_Count);

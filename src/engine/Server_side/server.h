@@ -56,8 +56,8 @@ typedef struct {
     cString     sound_precache[MAX_SOUNDS];	    // NULL terminated
     cString     lightstyles[MAX_LIGHTSTYLES];
 
-    int32_t     num_edicts;
-    int32_t     max_edicts;
+    // int32_t     num_edicts;
+    // int32_t     max_edicts;
     // edict_p     edicts;         // can NOT be array indexed, because edict_t is variable sized, but can be used to reference the world ent
 
     sv_state_e  state;          // some actions are only valid during load
@@ -122,6 +122,9 @@ extern "C" {
     void SV_Init();
     cString SV_GetName();
     bool SV_IsActive();
+    double SV_GetTime();
+    void SV_SetTime(double time);
+
 
     void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation);
 
