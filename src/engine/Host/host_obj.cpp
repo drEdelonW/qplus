@@ -96,7 +96,7 @@ void Host::EndGame(cString message, ...) {
     va_end(argptr);
     Con_DPrintf("Host::EndGame: %s\n", string);
 
-    if (sv.active)  ShutdownServer(false);
+    if (SV_IsActive())  ShutdownServer(false);
 
     if (Host_IsDedicated())  Host_SysError("Host::EndGame: %s\n", string); // dedicated servers exit
 
@@ -126,7 +126,7 @@ void Host::Error(cString error, ...) {
     va_end(argptr);
     Con_Printf("Host::Error: %s\n", string);
 
-    if (sv.active)  ShutdownServer(false);
+    if (SV_IsActive())  ShutdownServer(false);
 
     if (Host_IsDedicated())  Host_SysError("Host::Error: %s\n", string); // dedicated servers exit
 
@@ -337,8 +337,9 @@ Host::ShutdownServer
 This only happens at the end of a game, not between levels
 ==================
 */
+// TDDO: move this logic to Server private
 void Host::ShutdownServer(bool crash) {
-    if (!sv.active) return;
+    if (!SV_IsActive()) return;
 
     sv.active = false;
 
@@ -555,7 +556,7 @@ void Host::_Frame(float time) {
     NET_Poll();
 
     // if running the server locally, make intentions now
-    if (sv.active)  CL_SendCmd();
+    if (SV_IsActive())  CL_SendCmd();
 
     //-------------------
     //
@@ -566,7 +567,7 @@ void Host::_Frame(float time) {
     // check for commands typed to the host
     GetConsoleCommands();
 
-    if (sv.active)  ServerFrame();
+    if (SV_IsActive())  ServerFrame();
 
     //-------------------
     //
@@ -576,7 +577,7 @@ void Host::_Frame(float time) {
 
     // if running the server remotely, send intentions now after
     // the incoming messages have been read
-    if (!sv.active) CL_SendCmd();
+    if (!SV_IsActive()) CL_SendCmd();
 
     host_time += host_frametime;
 

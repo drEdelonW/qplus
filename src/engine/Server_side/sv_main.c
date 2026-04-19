@@ -58,6 +58,13 @@ void SV_Init() {
     }
 }
 
+cString SV_GetName() {
+    return sv.name;
+}
+
+bool SV_IsActive() {
+    return sv.active;
+}
 /*
 =============================================================================
 
@@ -320,7 +327,7 @@ void SV_SpawnServer(
     //
     // tell all connected clients that we are going to a new level
     //
-    if (sv.active) { SV_SendReconnect(); }
+    if (SV_IsActive()) { SV_SendReconnect(); }
 
     //
     // make cvars consistant
@@ -414,7 +421,7 @@ void SV_SpawnServer(
     if (coop.value) pr_global_struct->coop = coop.value;
     else            pr_global_struct->deathmatch = deathmatch.value;
 
-    pr_global_struct->mapname = PR_SetQString(sv.name);
+    pr_global_struct->mapname = PR_SetQString(SV_GetName());
 #ifdef QUAKE2
     pr_global_struct->startspot = PR_SetQString(sv.startspot);
 #endif

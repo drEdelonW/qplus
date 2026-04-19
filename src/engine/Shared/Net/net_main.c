@@ -180,7 +180,7 @@ static void MaxPlayers_f() {
         return;
     }
 
-    if (sv.active) {
+    if (SV_IsActive()) {
         Con_Printf("maxplayers can not be changed while a server is running.\n");
         return;
     }

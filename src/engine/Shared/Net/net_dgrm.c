@@ -117,7 +117,7 @@ void NET_Ban_f() {
     void (*print) (cStringRO fmt, ...);
 
     if (cmd_source == src_command) {
-        if (!sv.active) {
+        if (!SV_IsActive()) {
             Cmd_ForwardToServer();
             return;
         }
@@ -789,7 +789,7 @@ static qsocket_p _Datagram_CheckNewConnections() {
         dfunc.GetSocketAddr(acceptsock, &newaddr);
         MSG_WriteString(&net_message, dfunc.AddrToString(&newaddr));
         MSG_WriteString(&net_message, hostname.string);
-        MSG_WriteString(&net_message, sv.name);
+        MSG_WriteString(&net_message, SV_GetName());
         MSG_WriteByte(&net_message, net_activeconnections);
         MSG_WriteByte(&net_message, svs.maxClients);
         MSG_WriteByte(&net_message, NET_PROTOCOL_VERSION);
