@@ -13,5 +13,26 @@ typedef struct {
 typedef dDef_t* dDef_p;
 STATIC_ASSERT_SIZE(dDef_t, 2*2 + 4);    // 8
 
+
+#define MAX_FIELD_LEN (64)
+#define GEFV_CACHESIZE (2)
+
+typedef struct {
+    dDef_p  pcache;
+    char    field[MAX_FIELD_LEN];
+} gefv_cache;
+
+extern gefv_cache   gefvCache[GEFV_CACHESIZE];
+
 extern dDef_p       pr_globaldefs;
 extern dDef_p       pr_fielddefs;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    dDef_p ED_GlobalAtOfs(int ofs);
+
+#ifdef __cplusplus
+}
+#endif

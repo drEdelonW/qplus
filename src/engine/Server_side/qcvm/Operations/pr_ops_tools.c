@@ -1,8 +1,10 @@
 #include "progs.h"
+#include "pr_def.h"
 #include "pr_ops.h"
 #include "pr_Argument.h"
 #include "types.h"
 #include "console.h"
+#include <stdio.h>
 #include <string.h>
 
 static cString _pr_opNames[OP_LAST] = {

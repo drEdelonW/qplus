@@ -1,4 +1,6 @@
+#include "pr_qString.h"
 #include "progs.h"
+#include "pr_comp.h"
 #include "types.h"
 #include "host.h"
 #include "console.h"
