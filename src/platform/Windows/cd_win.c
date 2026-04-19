@@ -388,7 +388,7 @@ int CDAudio_Init(void) {
     MCI_SET_PARMS mciSetParms;
     int    n;
 
-    if (cls.state == ca_dedicated)
+    if (Host_IsDedicated())
         return -1;
 
     if (COM_CheckParm("-nocdaudio"))

@@ -563,7 +563,7 @@ keypress.
 ==================
 */
 int SCR_ModalMessage(cString text) {
-    if (cls.state == ca_dedicated)  return true;
+    if (Host_IsDedicated())  return true;
 
     _scr.notifystring = text;
 
@@ -639,7 +639,7 @@ void SCR_UpdateScreen() {
         else    return;
     }
 
-    if (cls.state == ca_dedicated)
+    if (Host_IsDedicated())
         return;    // stdout only
 
     if (!_scr.initialized || !con.isInitialized)

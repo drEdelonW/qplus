@@ -51,7 +51,7 @@ Host_Quit_f
 
 void Host_Quit_f() {
     if ((key.dest != key_console) &&
-        (cls.state != ca_dedicated)) {
+        (!Host_IsDedicated())) {
         M_Menu_Quit_f();
         return;
     }
@@ -177,7 +177,7 @@ void Host_Map_f() {
 
     if (!sv.active)     return;
 
-    if (cls.state != ca_dedicated) {
+    if (!Host_IsDedicated()) {
         strcpy(cls.spawnparms, "");
 
         for (int i = 2; i < Cmd_Argc(); i++) {
@@ -491,7 +491,7 @@ void Host_Loadgame_f() {
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
         svs.clients->spawn_parms[i] = spawn_parms[i];
 
-    if (cls.state != ca_dedicated) {
+    if (!Host_IsDedicated()) {
         CL_EstablishConnection("local");
         Host_Reconnect_f();
     }
@@ -727,7 +727,7 @@ void Host_Please_f() {
 void Host_Say(bool teamonly) {
     bool  fromServer = false;
     if (cmd_source == src_command) {
-        if (cls.state == ca_dedicated) {
+        if (Host_IsDedicated()) {
             fromServer = true;
             teamonly = false;
         }
@@ -1055,7 +1055,7 @@ void Host_Kick_f() {
     if (i < svs.maxClients) {
         cString who;
         if (cmd_source == src_command)
-            if (cls.state == ca_dedicated)  who = "Console";
+            if (Host_IsDedicated())  who = "Console";
             else                            who = cl_name.string;
         else                                who = save->name;
 
@@ -1292,7 +1292,7 @@ Host_Startdemos_f
 ==================
 */
 void Host_Startdemos_f() {
-    if (cls.state == ca_dedicated) {
+    if (Host_IsDedicated()) {
         if (!sv.active)
             Cbuf_AddText("map start\n");
         return;
@@ -1327,7 +1327,7 @@ Return to looping demos
 ==================
 */
 void Host_Demos_f() {
-    if (cls.state == ca_dedicated)  return;
+    if (Host_IsDedicated())  return;
     if (cls.demonum == -1)  cls.demonum = 1;
 
     CL_Disconnect_f();
@@ -1342,7 +1342,7 @@ Return to looping demos
 ==================
 */
 void Host_Stopdemo_f() {
-    if ((cls.state == ca_dedicated) || (!cls.demoplayback)) return;
+    if ((Host_IsDedicated()) || (!cls.demoplayback)) return;
 
     CL_StopPlayback();
     CL_Disconnect();

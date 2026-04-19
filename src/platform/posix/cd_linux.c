@@ -328,7 +328,7 @@ void CDAudio_Update() {
 }
 
 int CDAudio_Init() {
-    if ((cls.state == ca_dedicated) ||
+    if ((Host_IsDedicated()) ||
         (COM_CheckParm("-nocdaudio")))
         return -1;
 

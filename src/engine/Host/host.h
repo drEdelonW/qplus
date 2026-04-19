@@ -34,6 +34,7 @@ extern "C" {
     void Host_ClientCommands(cString fmt, ...);
     void Host_ShutdownServer(bool crash);
     double Host_FloatTime();
+    bool Host_IsDedicated();
 
 #ifdef __cplusplus
 }

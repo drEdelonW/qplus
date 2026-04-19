@@ -222,7 +222,7 @@ int main(int c, cStringArray v) {
         double newtime = Sys_FloatTime();
         double time = newtime - oldtime;    // find time spent rendering last frame
 
-        if (cls.state == ca_dedicated) {     // play vcrfiles at max speed
+        if (Host_IsDedicated()) {     // play vcrfiles at max speed
             if ((time < sys_ticrate.value) &&
                 ((vcrFile == -1) ||
                     (recording))
