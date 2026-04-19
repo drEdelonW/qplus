@@ -51,6 +51,11 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
         $(eval SV_SIDE_DIR = $(ENG_DIR)/Server_side) $(eval INCLUDES += $(SV_SIDE_DIR))
                 $(eval WORLD_DIR = $(SV_SIDE_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))
                         SRC_LIST += $(WORLD_DIR)/world.c
+                        SRC_LIST += $(WORLD_DIR)/sv_pvs.c
+
+                $(eval PR_PHYS_DIR = $(SV_SIDE_DIR)/Physics) $(eval INCLUDES += $(PR_PHYS_DIR))
+                        SRC_LIST += $(PR_PHYS_DIR)/sv_phys.c
+                        SRC_LIST += $(PR_PHYS_DIR)/sv_move.c
 
                 $(eval PROG_DIR = $(SV_SIDE_DIR)/qcvm) $(eval INCLUDES += $(PROG_DIR))
                         $(eval QSTRING_DIR = $(PROG_DIR)/qString) $(eval INCLUDES += $(QSTRING_DIR))
@@ -71,8 +76,8 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         $(eval PR_FUNC_DIR = $(PROG_DIR)/Function) $(eval INCLUDES += $(PR_FUNC_DIR))
                                 SRC_LIST += $(PR_FUNC_DIR)/pr_Function.c
 
-                        $(eval PR_STAT_DIR = $(PROG_DIR)/Statment) $(eval INCLUDES += $(PR_STAT_DIR))
-                                SRC_LIST += $(PR_STAT_DIR)/pr_Statment.c
+                        $(eval PR_STAT_DIR = $(PROG_DIR)/Statement) $(eval INCLUDES += $(PR_STAT_DIR))
+                                SRC_LIST += $(PR_STAT_DIR)/pr_Statement.c
 
                         SRC_LIST += $(PROG_DIR)/VM_state.c
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
@@ -82,11 +87,8 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(EDICT_DIR)/edict_tools.c
 
                 SRC_LIST += $(SV_SIDE_DIR)/sv_main.c
-                SRC_LIST += $(SV_SIDE_DIR)/sv_pvs.c
-                SRC_LIST += $(SV_SIDE_DIR)/sv_net.c
                 SRC_LIST += $(SV_SIDE_DIR)/sv_user.c
-                SRC_LIST += $(SV_SIDE_DIR)/sv_phys.c
-                SRC_LIST += $(SV_SIDE_DIR)/sv_move.c
+                SRC_LIST += $(SV_SIDE_DIR)/sv_net.c
 
         $(eval CL_SIDE_DIR = $(ENG_DIR)/Client_side) $(eval INCLUDES += $(CL_SIDE_DIR))
                 $(eval SND_DIR = $(CL_SIDE_DIR)/sound) $(eval INCLUDES += $(SND_DIR))

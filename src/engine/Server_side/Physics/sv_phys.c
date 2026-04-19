@@ -21,9 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "server.h"
 #include "cvar_q1.h"
-#include "cmd.h"
-#include "msg.h"
-#include "protocol.h"
 #include "q_tools.h"
 #include <string.h>
 #include "world.h"
@@ -1341,7 +1338,9 @@ void SV_Physics() {
             SV_LinkEdict(ent, true); // force retouch even for stationary
         }
 
-        if ((i > 0) && (i <= svs.maxClients)) { SV_Physics_Client(ent, i); }
+        if ((i > 0) && (i <= svs.maxClients)) {
+             SV_Physics_Client(ent, i);
+        }
         else {
             switch ((movetype_t)ent->v.movetype) {
 #ifdef QUAKE2

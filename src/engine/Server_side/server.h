@@ -121,7 +121,6 @@ extern "C" {
 #endif
     void SV_Init();
 
-    void SV_StartParticle(vec3_t org, vec3_t dir, int color, size_t count);
     void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation);
 
     void SV_DropClient(bool crash);
@@ -129,26 +128,14 @@ extern "C" {
     void SV_SendClientMessages();
     void SV_ClearDatagram();
 
-    int SV_ModelIndex(cString name);
-
-    void SV_SetIdealPitch();
-
-    void SV_AddUpdates();
-
     void SV_ClientThink();
-    void SV_AddClientToServer(qsocket_p ret);
 
     void SV_ClientPrintf(cStringRO fmt, ...);
     void SV_BroadcastPrintf(cString fmt, ...);
 
     void SV_Physics();
 
-    bool SV_CheckBottom(edict_p ent);
-    bool SV_movestep(edict_p ent, vec3_t move, bool relink);
-
     void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg);
-
-    void SV_MoveToGoal();
 
     void SV_CheckForNewClients();
     void SV_RunClients();
@@ -160,7 +147,6 @@ extern "C" {
 #   endif
     );
 
-    void SV_ClearWorld();
 // called after the world model has been loaded, before linking any entities
 #ifdef __cplusplus
 }
