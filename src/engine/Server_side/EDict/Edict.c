@@ -37,10 +37,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "cvar_q1.h"
 
-uint32_t pr_edict_size;      // in bytes
-edict_p Edicts;
-uint32_t EdictsMax = MAX_EDICTS;
-uint32_t EdictsNum;
+uint32_t    EdictSize = 0;      // in bytes
+edict_p     Edicts;
+uint32_t    EdictsMax = MAX_EDICTS;
+uint32_t    EdictsNum;
 
 
 
@@ -679,13 +679,6 @@ PR_Init
 ===============
 */
 void ED_Init() {
-        // allocate server memory
-    // sv.max_edicts = MAX_EDICTS;
-    // EdictsMax = max_edicts;
-
-    // Edicts = Hunk_AllocName((uint32_t)EdictsMax * pr_edict_size, "edicts");
-    // sv.edicts = Edicts;
-
     Cmd_AddCommand("edict", ED_PrintEdict_f);
     Cmd_AddCommand("edicts", ED_PrintEdicts);
     Cmd_AddCommand("edictcount", ED_Count);
