@@ -20,7 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 // this file is shared by quake and qcc
-#include "progdefs.h"
+// #include "progdefs.h"
+#include "types.h"
+#include "assert.h"
 
 #define PROG_VERSION 6
 typedef struct {
