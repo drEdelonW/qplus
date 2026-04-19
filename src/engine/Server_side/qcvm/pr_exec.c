@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "progs.h"
+#include "pr_cmds.h"
 #include "pr_ops.h"
 #include "pr_Statment.h"
 #include "pr_Function.h"
@@ -27,7 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include <string.h>
 #include <stdarg.h>
-
 
 typedef struct {
     int32_t     stack;
@@ -44,7 +44,6 @@ static int32_t _localStack_used;
 
 bool  pr_trace;
 static int32_t _pr_xStatement;
-dFunction_p     pr_xFunction;
 int32_t         pr_argc;
 
 
@@ -219,7 +218,6 @@ int32_t PR_LeaveFunction() {
     return _pr_Stack[_pr_Depth].stack;
 }
 
-void PF_Fixme();
 /*
 ====================
 PR_ExecuteProgram

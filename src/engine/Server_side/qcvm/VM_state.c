@@ -14,17 +14,15 @@
 
 dprograms_p    progs;
 
-dFunction_p    pr_functions;
-dDef_p         pr_fielddefs;
-dDef_p         pr_globaldefs;
-dStatement_p   pr_statements;
-
 globalvars_p   pr_global_struct;   // much more
 float_p        pr_globals;         // same as pr_global_struct
 
 uint16_t pr_crc;
 
-
+gefv_cache gefvCache[GEFV_CACHESIZE] = {
+    {NULL, ""},
+    {NULL, ""}
+};
 
 /*
 ============
@@ -105,18 +103,14 @@ void PR_LoadProgs() {
     if (progs->version != PROG_VERSION)     Host_SysError("progs.dat has wrong version number (%i should be %i)", progs->version, PROG_VERSION);
     if (progs->crc != PROGHEADER_CRC)       Host_SysError("progs.dat system vars have been modified, progdefs.h is out of date");
 
-    pr_functions = (dFunction_p)((uint8_p)progs + progs->functions.ofs);
-
     initProgSrting(progs);
-    pr_globaldefs = (dDef_p)((uint8_p)progs + progs->globaldefs.ofs);
-    pr_fielddefs = (dDef_p)((uint8_p)progs + progs->fielddefs.ofs);
-    pr_statements = (dStatement_p)((uint8_p)progs + progs->statements.ofs);
 
     pr_global_struct = (globalvars_p)((uint8_p)progs + progs->globals.ofs);
     pr_globals = (float_p)pr_global_struct;
 
     pr_edict_size = progs->entityfields * 4 + sizeof(edict_t) - sizeof(entvars_t);
 
+    pr_statements = (dStatement_p)((uint8_p)progs + progs->statements.ofs);
     // uint8_t swap the lumps
     for (int i = 0; i < progs->statements.num; i++) {
         pr_statements[i].op = (op_type)LittleShort((int16_t)pr_statements[i].op);
@@ -125,6 +119,8 @@ void PR_LoadProgs() {
         pr_statements[i].c = LittleShort(pr_statements[i].c);
     }
 
+
+    pr_functions = (dFunction_p)((uint8_p)progs + progs->functions.ofs);
     for (int i = 0; i < progs->functions.num; i++) {
         pr_functions[i].first_statement = LittleLong(pr_functions[i].first_statement);
         pr_functions[i].parm_start = LittleLong(pr_functions[i].parm_start);
@@ -135,12 +131,16 @@ void PR_LoadProgs() {
         pr_functions[i].numparms = LittleLong(pr_functions[i].numparms);
     }
 
+
+    pr_globaldefs = (dDef_p)((uint8_p)progs + progs->globaldefs.ofs);
     for (int i = 0; i < progs->globaldefs.num; i++) {
         pr_globaldefs[i].type = (op_type)LittleShort((int16_t)pr_globaldefs[i].type);
         pr_globaldefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_globaldefs[i].ofs);
         pr_globaldefs[i].s_name = LittleLong(pr_globaldefs[i].s_name);
     }
 
+
+    pr_fielddefs = (dDef_p)((uint8_p)progs + progs->fielddefs.ofs);
     for (int i = 0; i < progs->fielddefs.num; i++) {
         pr_fielddefs[i].type = (op_type)LittleShort((int16_t)pr_fielddefs[i].type);
         if (pr_fielddefs[i].type & DEF_SAVEGLOBAL)      Host_SysError("PR_LoadProgs: pr_fielddefs[i].type & DEF_SAVEGLOBAL");

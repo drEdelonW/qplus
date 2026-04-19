@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "assert.h"
+#include "pr_qString.h"
 
 #define MAX_PARMS (8)
 
@@ -22,3 +23,4 @@ typedef dFunction_t* dFunction_p;
 STATIC_ASSERT_SIZE(dFunction_t, 7*4 + 1*8); // 36
 
 extern dFunction_p  pr_functions;
+extern dFunction_p  pr_xFunction;
