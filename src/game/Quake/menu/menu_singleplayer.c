@@ -1,6 +1,6 @@
 #include "menu.h"
 #include "menu_prv.h"
-#include "server.h"
+#include "host.h"
 #include "screen.h"
 #include "cbuf.h"
 
@@ -51,11 +51,11 @@ void M_SinglePlayer_Key(keycode_t Key) {
 
         switch (_cursor) {
         case sp_NewGame: {
-            if ((sv.active) &&
+            if ((Host_IsServerActive()) &&
                 (!SCR_ModalMessage("Are you sure you want to\nstart a new game?\n")))
                 break;
             key.dest = key_game;
-            if (sv.active)
+            if (Host_IsServerActive())
                 Cbuf_AddText("disconnect\n");
             Cbuf_AddText("maxplayers 1\n");
             Cbuf_AddText("map start\n");

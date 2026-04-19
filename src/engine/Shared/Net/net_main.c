@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "host.h"
 #include "server.h"
-#undef SERVER   // TODO: remove this workaround
 #include "common.h"
 #include "sys.h"
 #include "cmd.h"
@@ -683,6 +682,7 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
 NET_Init
 ====================
 */
+#undef SERVER   // TODO: remove this workaround
 #include "client.h"
 void NET_Init() {
     if (COM_CheckParm("-playback")) {

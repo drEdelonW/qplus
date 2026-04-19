@@ -17,6 +17,8 @@ public:
     void Quit_f();
     void  ClientCommands(cString fmt, ...);
     void ShutdownServer(bool crash);
+    bool IsDedicated();
+    bool IsServerActive();
 
 #if 0
     QuakeParms_t parms;

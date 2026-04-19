@@ -20,8 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // net_loop.c
 
 #include "server.h"
-#undef SERVER       // TODO: remove this workaround
-#include "client.h"
 #include "host.h"
 #include "q_tools.h"
 #include "net_loop.h"
@@ -43,7 +41,7 @@ void Loop_Shutdown() {}
 void Loop_Listen(bool state) {}
 
 void Loop_SearchForHosts(bool xmit) {
-    if (!sv.active)
+    if (!Host_IsServerActive())
         return;
 
     hostCacheCount = 1;

@@ -22,6 +22,14 @@ void Host_Shutdown() {
     host.Shutdown();
 }
 
+bool Host_IsDedicated() {
+    return host.IsDedicated();
+}
+
+bool Host_IsServerActive() {
+    return host.IsServerActive();
+}
+
 double Host_FloatTime() {
     return Sys_FloatTime();
 }

@@ -9,8 +9,6 @@
 
 #include "cvar_q1.h"
 
-#undef CLIENT   // TODO: remove this workaround
-#include "server.h"
 /*
 =====================
 CL_Disconnect
@@ -39,7 +37,7 @@ void CL_Disconnect() {
         NET_Close(cls.netcon);
 
         cls.state = ca_disconnected;
-        if (sv.active)      Host_ShutdownServer(false);
+        if (Host_IsServerActive())      Host_ShutdownServer(false);
     }
 
     cls.demoplayback = cls.timedemo = false;
