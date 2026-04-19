@@ -45,26 +45,6 @@ typedef dDef_t* dDef_p;
 STATIC_ASSERT_SIZE(dDef_t, 2*2 + 4);    // 8
 
 
-#define MAX_PARMS (8)
-
-typedef struct {
-    int32_t     first_statement; // negative numbers are builtins
-    int32_t     parm_start;
-    int32_t     locals;    // total ints of parms + locals
-
-    int32_t     profile;  // runtime
-
-    string_t    s_name;
-    string_t    s_file;   // source file defined in
-
-    int32_t     numparms;
-    uint8_t     parm_size[MAX_PARMS];
-} dFunction_t;
-typedef dFunction_t* dFunction_p;
-STATIC_ASSERT_SIZE(dFunction_t, 7*4 + 1*8); // 36
-
-
-
 #define PROG_VERSION 6
 typedef struct {
     uint32_t ofs;   /* byte offset from start of progs blob */

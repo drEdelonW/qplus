@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "progs.h"
 #include "pr_comp.h"
+#include "pr_Function.h"
 #include <string.h>
 #include "console.h"
 #include "server.h"
@@ -64,6 +65,8 @@ Dumps self.
 error(value)
 =================
 */
+extern dFunction_p     pr_xFunction;
+
 void PF_error() {
     cString str = PF_VarString(0);
     Con_Printf(

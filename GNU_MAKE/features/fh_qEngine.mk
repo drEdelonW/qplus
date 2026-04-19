@@ -56,10 +56,16 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         $(eval QSTRING_DIR = $(PROG_DIR)/qString) $(eval INCLUDES += $(QSTRING_DIR))
                                 SRC_LIST += $(QSTRING_DIR)/pr_qString.c
 
+                        $(eval PR_ARG_DIR = $(PROG_DIR)/Argument) $(eval INCLUDES += $(PR_ARG_DIR))
+                        $(eval PR_FUNC_DIR = $(PROG_DIR)/Function) $(eval INCLUDES += $(PR_FUNC_DIR))
+                        $(eval PR_OPS_DIR = $(PROG_DIR)/Operations) $(eval INCLUDES += $(PR_OPS_DIR))
+                                SRC_LIST += $(PR_OPS_DIR)/pr_ops_tools.c
+
+                        $(eval PR_STAT_DIR = $(PROG_DIR)/Statment) $(eval INCLUDES += $(PR_STAT_DIR))
+
                         SRC_LIST += $(PROG_DIR)/VM_state.c
                         SRC_LIST += $(PROG_DIR)/pr_cmds.c
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
-                        SRC_LIST += $(PROG_DIR)/pr_ops_tools.c
 
                 $(eval EDICT_DIR = $(SV_SIDE_DIR)/EDict) $(eval INCLUDES += $(EDICT_DIR))
                         SRC_LIST += $(EDICT_DIR)/pr_edict.c
