@@ -543,7 +543,7 @@ void PF_traceline() {
     VectorCopy(trace.plane.normal, pr_global_struct->trace_plane_normal);
     pr_global_struct->trace_plane_dist = trace.plane.dist;
     if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
-    else            pr_global_struct->trace_ent = ED_GetEDictOffs(sv.edicts);
+    else            pr_global_struct->trace_ent = ED_GetEDictOffs(Edicts);
 }
 
 #ifdef QUAKE2
@@ -563,7 +563,7 @@ void PF_TraceToss() {
     VectorCopy(trace.plane.normal, pr_global_struct->trace_plane_normal);
     pr_global_struct->trace_plane_dist = trace.plane.dist;
     if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
-    else            pr_global_struct->trace_ent = ED_GetEDictOffs(sv.edicts);
+    else            pr_global_struct->trace_ent = ED_GetEDictOffs(Edicts);
 }
 #endif
 
@@ -647,7 +647,7 @@ void PF_checkclient() {
     if (ent->free ||
         (ent->v.health <= 0)
         ) {
-        RETURN_EDICT(sv.edicts);
+        RETURN_EDICT(Edicts);
         return;
     }
 
@@ -660,7 +660,7 @@ void PF_checkclient() {
         !(_checkPvs[l >> 3] & (1 << (l & 7)))
         ) {
         // c_notvis++;
-        RETURN_EDICT(sv.edicts);
+        RETURN_EDICT(Edicts);
         return;
     }
 
@@ -744,7 +744,7 @@ findradius (origin, radius)
 =================
 */
 void PF_findradius() {
-    edict_p chain = (edict_p)sv.edicts;
+    edict_p chain = Edicts;
     float_p org = G_VECTOR(OFS_PARM0);
     float rad = G_FLOAT(OFS_PARM1);
 
@@ -821,7 +821,7 @@ void PF_Remove() {
 void PF_Find()
 #ifdef QUAKE2
 {
-    edict_p first = (edict_p)sv.edicts;
+    edict_p first = Edicts;
     edict_p second = first;
     edict_p last = second;
     edict = G_EDICTNUM(OFS_PARM0);
@@ -837,8 +837,8 @@ void PF_Find()
         cString t = E_STRING(ed, f);
         if (!t)            continue;
         if (!strcmp(t, str)) {
-            if (first == (edict_p)sv.edicts)        first = ed;
-            else if (second == (edict_p)sv.edicts)  second = ed;
+            if (first == Edicts)        first = ed;
+            else if (second == Edicts)  second = ed;
             ed->v.chain = ED_GetEDictOffs(last);
             last = ed;
         }
@@ -847,7 +847,7 @@ void PF_Find()
     if (first != last) {
         if (last != second)     first->v.chain = last->v.chain;
         else                    first->v.chain = ED_GetEDictOffs(last);
-        last->v.chain = ED_GetEDictOffs((edict_p)sv.edicts);
+        last->v.chain = ED_GetEDictOffs(Edicts);
         if (second &&
             (second != last)
             )
@@ -875,7 +875,7 @@ void PF_Find()
         }
     }
 
-    RETURN_EDICT(sv.edicts);
+    RETURN_EDICT(Edicts);
 }
 #endif
 
@@ -1057,7 +1057,7 @@ void PF_nextent() {
     uint32_t i = G_EDICTNUM(OFS_PARM0);
     while (1) {
         i++;
-        if (i == sv.num_edicts) { RETURN_EDICT(sv.edicts); return; }
+        if (i == sv.num_edicts) { RETURN_EDICT(Edicts); return; }
         edict_p ent = ED_GetEDictByIdx(i);
         if (!ent->free) { RETURN_EDICT(ent); return; }
     }

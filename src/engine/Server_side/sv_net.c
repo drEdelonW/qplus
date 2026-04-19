@@ -126,7 +126,7 @@ void SV_SendServerinfo(RmtClient_p client) {
 
     MSG_WriteByte(pBuf, (!coop.value && deathmatch.value) ? GAME_DEATHMATCH : GAME_COOP);
 
-    snprintf(message, sizeof(message), "%s", PR_GetQString(sv.edicts->v.message));
+    snprintf(message, sizeof(message), "%s", PR_GetQString(Edicts->v.message));
 
     MSG_WriteString(pBuf, message);
 
@@ -139,7 +139,7 @@ void SV_SendServerinfo(RmtClient_p client) {
     MSG_WriteByte(pBuf, 0);
 
     // send music
-    MSG_WriteByte(pBuf, svc_cdtrack);   MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds); MSG_WriteByte(pBuf, (uint8_t)sv.edicts->v.sounds);
+    MSG_WriteByte(pBuf, svc_cdtrack);   MSG_WriteByte(pBuf, (uint8_t)Edicts->v.sounds); MSG_WriteByte(pBuf, (uint8_t)Edicts->v.sounds);
 
     // set view
     MSG_WriteByte(pBuf, svc_setview);   MSG_WriteShort(pBuf, (int16_t)ED_GetEDictIdx(client->edict));
