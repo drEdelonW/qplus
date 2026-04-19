@@ -3,7 +3,7 @@
 
 #include <stdarg.h>
 #include "server.h"
-#undef SERVER
+#undef SERVER   // TODO: remove this workaround
 #include "client.h"
 #include "sys.h"
 #include "protocol.h"

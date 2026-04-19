@@ -486,9 +486,8 @@ void SV_SendNop(RmtClient_p client) {
     client->last_message = realtime;
 }
 
-#undef SERVER
+#undef SERVER   // TODO: remove this workaround
 #include "client.h"
-// extern ClientStatic_t cls; //TODO: REMOVE IT!!!
 
 /*
     ================
