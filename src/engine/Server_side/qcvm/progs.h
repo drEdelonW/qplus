@@ -40,13 +40,11 @@ typedef void (*builtin_t)();
 extern builtin_t* pr_builtins;
 extern int32_t    pr_numbuiltins;
 
-extern dFunction_p  pr_functions;
 extern dDef_p       pr_globaldefs;
 extern dDef_p       pr_fielddefs;
 
 extern int32_t      pr_argc;        // number of op_call
 extern bool         pr_trace;
-extern dFunction_p  pr_xFunction;
 
 extern dprograms_p  progs;
 extern uint16_t     pr_crc;
