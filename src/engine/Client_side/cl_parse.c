@@ -20,8 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cl_parse.c  -- parse a message received from the server
 
 #include "client.h"
-#undef CLIENT   // TODO: remove this workaround
-#include "server.h"
+#include "model.h"
 #include "host.h"
 #include <string.h>
 #include <stdlib.h>
@@ -159,7 +158,7 @@ void CL_ParseStartSoundPacket() {
 void CL_KeepaliveMessage() {
     static float _lastMsg;
 
-    if ((sv.active) || // no need if server is local
+    if ((Host_IsServerActive()) || // no need if server is local
         (cls.demoplayback)) {
         return;
     }

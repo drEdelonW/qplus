@@ -816,6 +816,13 @@ void Host::Shutdown() {
     if (cls.state != ca_dedicated) { VID_Shutdown(); }
 }
 
+bool Host::IsDedicated() {
+    return cls.state == ca_dedicated;
+}
+
+bool Host::IsServerActive() {
+    return sv.active;
+}
 
 #include "host_cmd.h"
 /*

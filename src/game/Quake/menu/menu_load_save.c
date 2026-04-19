@@ -3,10 +3,11 @@
 #include "enginedefs.h"
 #include <string.h>
 #include "common.h"
-#include "server.h"
 #include "cmd.h"
 #include "cbuf.h"
 #include "screen.h"
+#include "host.h"
+#include "server.h"
 #undef SERVER   // TODO: remove this workaround
 #include "client.h"
 
@@ -54,7 +55,7 @@ void M_Menu_Load_f() {
 }
 
 void M_Menu_Save_f() {
-    if ((!sv.active) ||
+    if ((!Host_IsServerActive()) ||
         (cl.intermission != IM_NONE) ||
         (svs.maxClients != 1))
         return;

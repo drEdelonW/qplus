@@ -391,7 +391,7 @@ void M_GameOptions_Key(keycode_t key) {
     case K_ENTER: {
         S_LocalSound("misc/menu2.wav");
         if (_cursor == go_BeginGame) {
-            if (sv.active)
+            if (Host_IsServerActive())
                 Cbuf_AddText("disconnect\n");
             Cbuf_AddText("listen 0\n"); // so host_netport will be re-examined
             Cbuf_AddText(va("maxplayers %u\n", _maxPlayers));

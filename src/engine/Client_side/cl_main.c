@@ -64,7 +64,7 @@ CL_ClearState
 =====================
 */
 void CL_ClearState() {
-    if (!sv.active)
+    if (!Host_IsServerActive())
         Host_ClearMemory();
 
     // wipe the entire cl structure
@@ -92,7 +92,7 @@ void CL_ClearState() {
 
 void CL_Disconnect_f() {
     CL_Disconnect();
-    if (sv.active)  Host_ShutdownServer(false);
+    if (Host_IsServerActive())  Host_ShutdownServer(false);
 }
 
 
@@ -288,7 +288,7 @@ float CL_LerpPoint() {
     if (!f ||
         cl_nolerp.value ||
         cls.timedemo ||
-        sv.active
+        Host_IsServerActive()
         ) {
         cl.time = cl.mtime[0];
         return 1;

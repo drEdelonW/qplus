@@ -35,6 +35,7 @@ extern "C" {
     void Host_ShutdownServer(bool crash);
     double Host_FloatTime();
     bool Host_IsDedicated();
+    bool Host_IsServerActive();
 
 #ifdef __cplusplus
 }
