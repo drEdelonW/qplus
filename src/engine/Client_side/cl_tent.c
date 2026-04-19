@@ -246,14 +246,14 @@ void CL_ParseTEnt() {
     case TE_BEAM:           CL_ParseBeam(Mod_ForName("progs/beam.mdl", true));      break;  // grappling hook beam
         // PGM 01/21/97
 
-    case TE_LAVASPLASH:
+    case TE_LAVASPLASH: {
         vec3_t pos = {
             MSG_ReadCoord(),
             MSG_ReadCoord(),
             MSG_ReadCoord()
         };
         R_LavaSplash(pos);
-        break;
+    } break;
 
     case TE_TELEPORT: {
         vec3_t pos = {

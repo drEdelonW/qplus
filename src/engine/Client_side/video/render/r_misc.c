@@ -154,8 +154,8 @@ void R_TimeGraph() {
 
     int x =
         r_refdef.vrect.width -
-        (r_refdef.vrect.width <= MAX_TIMINGS) ?
-        1 : (r_refdef.vrect.width - MAX_TIMINGS) / 2;
+        ((r_refdef.vrect.width <= MAX_TIMINGS) ?
+            1 : (r_refdef.vrect.width - MAX_TIMINGS) / 2);
     do {
         R_LineGraph(x, r_refdef.vrect.height - 2, r_timings[a]);
         if (x == 0)

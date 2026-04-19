@@ -35,32 +35,6 @@ typedef eval_t* eval_p;
 STATIC_ASSERT_SIZE(eval_t, 3*4);    // 12
 
 
-typedef enum {
-    ev_void     = 0u,
-    ev_string,
-    ev_float,
-    ev_vector,
-    ev_entity,
-    ev_field,
-    ev_function,
-    ev_pointer,
-    ev_LAST,
-
-    DEF_SAVEGLOBAL = (1U << 15)
-} etype_t;  // :uint16_t
-
-typedef uint16_t op_type;
-typedef int16_t arg_type;   // should be signed int
-
-typedef struct {
-    op_type     op;    // prog_operation_e
-    arg_type    a;
-    arg_type    b;
-    arg_type    c;
-} dStatement_t;
-typedef dStatement_t* dStatement_p;
-STATIC_ASSERT_SIZE(dStatement_t, 2*4);  // 8
-
 typedef struct {
     uint16_t    type;   // [etype_t] if DEF_SAVEGLOBAL bit is set
                         // the variable needs to be saved in savegames
@@ -96,6 +70,8 @@ typedef struct {
     uint32_t ofs;   /* byte offset from start of progs blob */
     uint32_t num;   /* element count (not bytes) */
 } progLump_t;
+STATIC_ASSERT_SIZE(progLump_t, 2*4); // 60
+
 
 typedef struct {
     int32_t  version;

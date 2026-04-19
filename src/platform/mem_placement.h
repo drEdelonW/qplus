@@ -9,7 +9,8 @@
 #define PLACE_TO_SDRAM
 #endif
 
-// #ifndef __weak
+#ifdef __weak
+#undef __weak
+#endif
 #   define __weak __attribute__((weak))
-// #endif
 

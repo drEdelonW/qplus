@@ -452,9 +452,9 @@ bool SV_ReadClientMessage() {
                 //    Host_Printf ("clc_nop\n");
                 break;
 
-            case clc_stringcmd:
+            case clc_stringcmd: {
                 cString str = MSG_ReadString();
-                if (remoteClient->privileged)    ret = 2;
+                if (remoteClient->privileged)   ret = 2;
                 else                            ret = 0;
 
                 if ((Q_strncasecmp(str, "status", 6) == 0) ||
@@ -481,7 +481,7 @@ bool SV_ReadClientMessage() {
                 if (ret == 2)       Cbuf_InsertText(str);
                 else if (ret == 1)  Cmd_ExecuteString(str, src_client);
                 else                Con_DPrintf("%s tried to %s\n", remoteClient->name, str);
-                break;
+            }    break;
 
             case clc_disconnect:
                 //    Host_Printf ("SV_ReadClientMessage: client disconnected\n");

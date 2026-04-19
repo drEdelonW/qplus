@@ -43,7 +43,6 @@ extern int32_t    pr_numbuiltins;
 extern dFunction_p  pr_functions;
 extern dDef_p       pr_globaldefs;
 extern dDef_p       pr_fielddefs;
-extern dStatement_p pr_statements;
 
 extern int32_t      pr_argc;        // number of op_call
 extern bool         pr_trace;
@@ -65,8 +64,7 @@ extern "C" {
 
     void PR_ExecuteProgram(func_t fnum);
 
-    cString PR_ValueString(etype_t type, eval_p val);
-    cString PR_UglyValueString(etype_t type, eval_p val);
+
 
     void PR_Profile_f();
 
