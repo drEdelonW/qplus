@@ -347,8 +347,11 @@ void PF_vlen() {
         value1[1] * value1[1] +
         value1[2] * value1[2];
     new= (float)sqrt(new);
-
+#if 0
     G_FLOAT(OFS_RETURN) = new;
+#else
+    PR_Freturn new;
+#endif
 }
 
 /*
@@ -399,9 +402,9 @@ void PF_vectoangles() {
         if (pitch < 0)  pitch += 360;
     }
 
-    G_FLOAT(OFS_RETURN + 0) = pitch;
-    G_FLOAT(OFS_RETURN + 1) = yaw;
-    G_FLOAT(OFS_RETURN + 2) = 0;
+    G_FLOAT(OFS_RETURN + X_AX) = pitch;
+    G_FLOAT(OFS_RETURN + Y_AX) = yaw;
+    G_FLOAT(OFS_RETURN + Z_AX) = 0;
 }
 
 /*
@@ -1404,9 +1407,9 @@ void PF_WaterMove() {
     G_FLOAT(OFS_RETURN) = damage;
 }
 
-void PF_sin() { G_FLOAT(OFS_RETURN)= (float)sin(G_FLOAT(OFS_PARM0)); }
-void PF_cos() { G_FLOAT(OFS_RETURN)= (float)cos(G_FLOAT(OFS_PARM0)); }
-void PF_sqrt() { G_FLOAT(OFS_RETURN)= (float)sqrt(G_FLOAT(OFS_PARM0)); }
+void PF_sin() { G_FLOAT(OFS_RETURN) = (float)sin(G_FLOAT(OFS_PARM0)); }
+void PF_cos() { G_FLOAT(OFS_RETURN) = (float)cos(G_FLOAT(OFS_PARM0)); }
+void PF_sqrt() { G_FLOAT(OFS_RETURN) = (float)sqrt(G_FLOAT(OFS_PARM0)); }
 #endif
 
 void PF_Fixme() { PR_RunError("unimplemented bulitin"); }

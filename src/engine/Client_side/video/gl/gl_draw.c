@@ -1080,7 +1080,7 @@ void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
         if (s & 3)
             Host_SysError("GL_Upload8: s&3");
         for (i = 0; i < s; i += 4) {
-            _trans[i] = d_8to24table[data[i]];
+            _trans[i + 0] = d_8to24table[data[i + 0]];
             _trans[i + 1] = d_8to24table[data[i + 1]];
             _trans[i + 2] = d_8to24table[data[i + 2]];
             _trans[i + 3] = d_8to24table[data[i + 3]];

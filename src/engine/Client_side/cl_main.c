@@ -198,7 +198,7 @@ void SetPal(int i) {
     else if (i == 1) {
         uint8_t pal[768];
         for (int c = 0; c < 768; c += 3) {
-            pal[c] = 0;
+            pal[c + 0] = 0;
             pal[c + 1] = 255;
             pal[c + 2] = 0;
         }
@@ -207,7 +207,7 @@ void SetPal(int i) {
     else {
         uint8_t pal[768];
         for (int c = 0; c < 768; c += 3) {
-            pal[c] = 0;
+            pal[c + 0] = 0;
             pal[c + 1] = 0;
             pal[c + 2] = 255;
         }

@@ -268,9 +268,9 @@ void PR_ExecuteProgram(func_t fnum) {
         switch (st->op) {
             case OP_DONE:
             case OP_RETURN: {
-                G_FLOAT(OFS_RETURN + 0) = G_FLOAT(st->a + 0);
-                G_FLOAT(OFS_RETURN + 1) = G_FLOAT(st->a + 1);
-                G_FLOAT(OFS_RETURN + 2) = G_FLOAT(st->a + 2);
+                G_FLOAT(OFS_RETURN + X_AX) = G_FLOAT(st->a + X_AX);
+                G_FLOAT(OFS_RETURN + Y_AX) = G_FLOAT(st->a + Y_AX);
+                G_FLOAT(OFS_RETURN + Z_AX) = G_FLOAT(st->a + Z_AX);
 
                 stack = PR_LeaveFunction();
                 if (_pr_Depth == exitdepth)

@@ -26,7 +26,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // VM global offsets; vectors occupy 3 float slots
 typedef enum {
     OFS_NULL      = 0u,
+
     OFS_RETURN    = 1u,     // +3
+    OFS_RETURN_X  = 1u,
+    OFS_RETURN_Y  = 2u,
+    OFS_RETURN_Z  = 3u,
+
     OFS_PARM0     = 4u,     // parm0..parm7: +3 per parm
     OFS_PARM1     = 7u,
     OFS_PARM2     = 10u,
