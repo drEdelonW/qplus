@@ -5,11 +5,12 @@
 #include "host.h"
 #include "console.h"
 
-static cString  _pr_strings;         // much more // should be static
+static cString  _pr_strings;    // much more // should be static
 
-void initProgSrting(dprograms_p progs){
+void initProgSrting(TypeLess_ptr base, progLump_t pl) {
+
     PR_ClearAppStrings();
-    _pr_strings = (cString)((uint8_p)progs + progs->strings.ofs);
+    _pr_strings = (cString)((uint8_p)base + pl.ofs);
 }
 
 #define PR_APPSTR_MAX 10

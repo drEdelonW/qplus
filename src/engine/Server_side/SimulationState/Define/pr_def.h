@@ -1,5 +1,6 @@
 #pragma once
 
+#include "progLump.h"
 #include "types.h"
 #include "assert.h"
 #include "pr_qString.h"
@@ -32,6 +33,8 @@ extern dDef_p       pr_fielddefs;
 extern "C" {
 #endif
 
+    void ED_InitCache();
+    void initProgDefs(TypeLess_ptr base, progLump_t plg, progLump_t plf);
 
     void ED_WriteGlobals(FILE* f);
     void ED_ParseGlobals(cString data);
@@ -39,9 +42,7 @@ extern "C" {
     dDef_p ED_FindGlobal(cString name);
     dDef_p ED_FieldAtOfs(int ofs);
     dDef_p ED_FindField(cString name);
-    void ED_InitCache();
     dDef_p ED_FindFieldCached(cString name);
-
 
 #ifdef __cplusplus
 }

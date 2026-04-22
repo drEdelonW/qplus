@@ -9,15 +9,12 @@
 #include "endian_tools.h"
 #include "cmd.h"
 #include "pr_qString.h"
+#include "GlobVars.h"
 
 #include "cvar_q1.h"
 
-dprograms_p    progs;
-
-globalvars_p   pr_global_struct;   // much more
-float_p        pr_globals;         // same as pr_global_struct
-
-uint16_t pr_crc;
+dprograms_p progs;
+uint16_t    pr_crc;
 
 /*
 ===============
@@ -43,19 +40,23 @@ void PR_LoadProgs() {
     if (progs->crc != PROGHEADER_CRC)       Host_SysError("progs.dat system vars have been modified, progdefs.h is out of date");
 
     // ======[Prog Strings]======
-    initProgSrting(progs);
+    initProgSrting(progs, progs->strings);
 
     // ======[Global Struct]======
+#if 0
     pr_global_struct = (globalvars_p)((uint8_p)progs + progs->globals.ofs);
     pr_globals = (float_p)pr_global_struct;
     for (int i = 0; i < progs->globals.num; i++)
         ((int32_p)pr_globals)[i] = LittleLong(((int32_p)pr_globals)[i]);
+#else
+    initProgGlobals(progs, progs->globals);
+#endif
 
     // ======[Edict Size]======
     EdictSize = PROG_HEADER_SIZE + progs->entityfields * 4;
 
-
     // ======[Statements]======
+#if 0
     pr_statements = (dStatement_p)((uint8_p)progs + progs->statements.ofs);
     // uint8_t swap the lumps
     for (int i = 0; i < progs->statements.num; i++) {
@@ -64,9 +65,12 @@ void PR_LoadProgs() {
         pr_statements[i].b = LittleShort(pr_statements[i].b);
         pr_statements[i].c = LittleShort(pr_statements[i].c);
     }
-
+#else
+    initProgStatement(progs, progs->statements);
+#endif
 
     // ======[Function]======
+#if 0
     pr_functions = (dFunction_p)((uint8_p)progs + progs->functions.ofs);
     for (int i = 0; i < progs->functions.num; i++) {
         pr_functions[i].first_statement = LittleLong(pr_functions[i].first_statement);
@@ -78,17 +82,14 @@ void PR_LoadProgs() {
 
         pr_functions[i].numparms = LittleLong(pr_functions[i].numparms);
     }
-
-
-#if 0
-    // flush the non-C variable lookup cache
-    for (int i = 0; i < GEFV_CACHESIZE; i++)
-        gefvCache[i].field[0] = 0;
 #else
-    ED_InitCache();
+    initProgFunction(progs, progs->functions);
 #endif
 
     // ======[Global Defs]======
+#if 0
+    ED_InitCache();
+
     pr_globaldefs = (dDef_p)((uint8_p)progs + progs->globaldefs.ofs);
     for (int i = 0; i < progs->globaldefs.num; i++) {
         pr_globaldefs[i].type = (op_type)LittleShort((int16_t)pr_globaldefs[i].type);
@@ -105,7 +106,9 @@ void PR_LoadProgs() {
 
         if (pr_fielddefs[i].type & DEF_SAVEGLOBAL)      Host_SysError("PR_LoadProgs: pr_fielddefs[i].type & DEF_SAVEGLOBAL");
     }
-
+#else
+    initProgDefs(progs, progs->globaldefs, progs->fielddefs);
+#endif
 
 }
 
