@@ -440,7 +440,7 @@ SV_HullPointContents
 
 ==================
 */
-int SV_HullPointContents(Hull_p hull, int num, vec3_t p) {
+int SV_HullPointContents(Hull_p hull, int num, vec3_t point) {
     while (num >= 0) {
         if ((num < hull->firstclipnode) ||
             (num > hull->lastclipnode)
@@ -452,7 +452,7 @@ int SV_HullPointContents(Hull_p hull, int num, vec3_t p) {
 
         float d =
             ((plane->type < 3) ?
-                p[plane->type] : DotProduct(plane->normal, p)
+                point[plane->type] : DotProduct(plane->normal, point)
             ) -
             plane->dist;
 
@@ -471,8 +471,8 @@ SV_PointContents
 
 ==================
 */
-contents_t SV_PointContents(vec3_t p) {
-    contents_t cont = SV_HullPointContents(&sv.worldmodel->hulls[0], 0, p);
+contents_t SV_PointContents(vec3_t point) {
+    contents_t cont = SV_HullPointContents(&sv.worldmodel->hulls[0], 0, point);
     if ((cont <= CONTENTS_CURRENT_0) &&
         (cont >= CONTENTS_CURRENT_DOWN)
         )
@@ -480,8 +480,8 @@ contents_t SV_PointContents(vec3_t p) {
     return cont;
 }
 
-contents_t SV_TruePointContents(vec3_t p) {
-    return SV_HullPointContents(&sv.worldmodel->hulls[0], 0, p);
+contents_t SV_TruePointContents(vec3_t point) {
+    return SV_HullPointContents(&sv.worldmodel->hulls[0], 0, point);
 }
 
 //===========================================================================
@@ -875,99 +875,99 @@ BoxOnPlaneSide
 Returns 1, 2, or 1 + 2
 ==================
 */
-int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
+int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
 #if 0 // this is done by the BOX_ON_PLANE_SIDE macro before calling this
     // function
 // fast axial cases
-    if (p->type < 3) {
-        if (p->dist <= emins[p->type])  return 1;
-        if (p->dist >= emaxs[p->type])  return 2;
+    if (plane->type < 3) {
+        if (plane->dist <= emins[plane->type])  return 1;
+        if (plane->dist >= emaxs[plane->type])  return 2;
         return 3;
     }
 #endif
 
     // general case
     float dist1, dist2;
-    switch (p->signbits) {
+    switch (plane->signbits) {
     case 0:
         dist1 =
-            p->normal[0] * emaxs[0] +
-            p->normal[1] * emaxs[1] +
-            p->normal[2] * emaxs[2];
+            plane->normal[0] * emaxs[0] +
+            plane->normal[1] * emaxs[1] +
+            plane->normal[2] * emaxs[2];
         dist2 =
-            p->normal[0] * emins[0] +
-            p->normal[1] * emins[1] +
-            p->normal[2] * emins[2];
+            plane->normal[0] * emins[0] +
+            plane->normal[1] * emins[1] +
+            plane->normal[2] * emins[2];
         break;
     case 1:
         dist1 =
-            p->normal[0] * emins[0] +
-            p->normal[1] * emaxs[1] +
-            p->normal[2] * emaxs[2];
+            plane->normal[0] * emins[0] +
+            plane->normal[1] * emaxs[1] +
+            plane->normal[2] * emaxs[2];
         dist2 =
-            p->normal[0] * emaxs[0] +
-            p->normal[1] * emins[1] +
-            p->normal[2] * emins[2];
+            plane->normal[0] * emaxs[0] +
+            plane->normal[1] * emins[1] +
+            plane->normal[2] * emins[2];
         break;
     case 2:
         dist1 =
-            p->normal[0] * emaxs[0] +
-            p->normal[1] * emins[1] +
-            p->normal[2] * emaxs[2];
+            plane->normal[0] * emaxs[0] +
+            plane->normal[1] * emins[1] +
+            plane->normal[2] * emaxs[2];
         dist2 =
-            p->normal[0] * emins[0] +
-            p->normal[1] * emaxs[1] +
-            p->normal[2] * emins[2];
+            plane->normal[0] * emins[0] +
+            plane->normal[1] * emaxs[1] +
+            plane->normal[2] * emins[2];
         break;
     case 3:
         dist1 =
-            p->normal[0] * emins[0] +
-            p->normal[1] * emins[1] +
-            p->normal[2] * emaxs[2];
+            plane->normal[0] * emins[0] +
+            plane->normal[1] * emins[1] +
+            plane->normal[2] * emaxs[2];
         dist2 =
-            p->normal[0] * emaxs[0] +
-            p->normal[1] * emaxs[1] +
-            p->normal[2] * emins[2];
+            plane->normal[0] * emaxs[0] +
+            plane->normal[1] * emaxs[1] +
+            plane->normal[2] * emins[2];
         break;
     case 4:
         dist1 =
-            p->normal[0] * emaxs[0] +
-            p->normal[1] * emaxs[1] +
-            p->normal[2] * emins[2];
+            plane->normal[0] * emaxs[0] +
+            plane->normal[1] * emaxs[1] +
+            plane->normal[2] * emins[2];
         dist2 =
-            p->normal[0] * emins[0] +
-            p->normal[1] * emins[1] +
-            p->normal[2] * emaxs[2];
+            plane->normal[0] * emins[0] +
+            plane->normal[1] * emins[1] +
+            plane->normal[2] * emaxs[2];
         break;
     case 5:
         dist1 =
-            p->normal[0] * emins[0] +
-            p->normal[1] * emaxs[1] +
-            p->normal[2] * emins[2];
+            plane->normal[0] * emins[0] +
+            plane->normal[1] * emaxs[1] +
+            plane->normal[2] * emins[2];
         dist2 =
-            p->normal[0] * emaxs[0] +
-            p->normal[1] * emins[1] +
-            p->normal[2] * emaxs[2];
+            plane->normal[0] * emaxs[0] +
+            plane->normal[1] * emins[1] +
+            plane->normal[2] * emaxs[2];
         break;
     case 6:
         dist1 =
-            p->normal[0] * emaxs[0] +
-            p->normal[1] * emins[1] +
-            p->normal[2] * emins[2];
+            plane->normal[0] * emaxs[0] +
+            plane->normal[1] * emins[1] +
+            plane->normal[2] * emins[2];
         dist2 =
-            p->normal[0] * emins[0] +
-            p->normal[1] * emaxs[1] +
-            p->normal[2] * emaxs[2];
+            plane->normal[0] * emins[0] +
+            plane->normal[1] * emaxs[1] +
+            plane->normal[2] * emaxs[2];
         break;
     case 7:
         dist1 =
-            p->normal[0] * emins[0] +
-            p->normal[1] * emins[1] +
-            p->normal[2] * emins[2];
+            plane->normal[0] * emins[0] +
+            plane->normal[1] * emins[1] +
+            plane->normal[2] * emins[2];
         dist2 =
-            p->normal[0] * emaxs[0] +
-            p->normal[1] * emaxs[1] +
-            p->normal[2] * emaxs[2];
+            plane->normal[0] * emaxs[0] +
+            plane->normal[1] * emaxs[1] +
+            plane->normal[2] * emaxs[2];
         break;
     default:
         dist1 = dist2 = 0;  // shut up compiler
@@ -996,8 +996,8 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p p) {
 #endif
 
     int sides = 0;
-    if (dist1 >= p->dist)   sides |= 1;
-    if (dist2 < p->dist)    sides |= 2;
+    if (dist1 >= plane->dist)   sides |= 1;
+    if (dist2 < plane->dist)    sides |= 2;
 
 #ifdef PARANOID
     if (sides == 0) Host_SysError("BoxOnPlaneSide: sides==0");

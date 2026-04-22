@@ -126,9 +126,8 @@ Returns a string with a description and the contents of a global,
 padded to 20 field width
 ============
 */
+static char _line[128];
 cString PR_GlobalString(int32_t ofs) {
-    static char _line[128];
-
     TypeLess_ptr val = (TypeLess_ptr)&pr_globals[ofs];
     dDef_p def = ED_GlobalAtOfs(ofs);
     if (!def)
@@ -147,8 +146,6 @@ cString PR_GlobalString(int32_t ofs) {
 }
 
 cString PR_GlobalStringNoContents(int32_t ofs) {
-    static char _line[128];
-
     dDef_p def = ED_GlobalAtOfs(ofs);
     if (!def)   snprintf(_line, sizeof(_line), "%i(???)", ofs);
     else        snprintf(_line, sizeof(_line), "%i(%s)", ofs, PR_GetQString(def->s_name));

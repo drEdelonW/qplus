@@ -213,7 +213,7 @@ int32_t PR_LeaveFunction() {
     if (_localStack_used < 0)   PR_RunError("PR_ExecuteProgram: locals stack underflow\n");
 
     for (int i = 0; i < param_used; i++)
-        ((int32_t*)pr_globals)[pr_xFunction->parm_start + i] = _localStack[_localStack_used + i];
+        ((int32_p)pr_globals)[pr_xFunction->parm_start + i] = _localStack[_localStack_used + i];
 
     // up stack
     _pr_Depth--;
@@ -268,9 +268,9 @@ void PR_ExecuteProgram(func_t fnum) {
         switch (st->op) {
             case OP_DONE:
             case OP_RETURN: {
-                pr_globals[OFS_RETURN + 0] = pr_globals[st->a + 0];
-                pr_globals[OFS_RETURN + 1] = pr_globals[st->a + 1];
-                pr_globals[OFS_RETURN + 2] = pr_globals[st->a + 2];
+                G_FLOAT(OFS_RETURN + 0) = G_FLOAT(st->a + 0);
+                G_FLOAT(OFS_RETURN + 1) = G_FLOAT(st->a + 1);
+                G_FLOAT(OFS_RETURN + 2) = G_FLOAT(st->a + 2);
 
                 stack = PR_LeaveFunction();
                 if (_pr_Depth == exitdepth)
