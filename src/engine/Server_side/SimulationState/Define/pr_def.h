@@ -24,8 +24,7 @@ typedef struct {
 typedef dDef_t* dDef_p;
 STATIC_ASSERT_SIZE(dDef_t, 2*2 + 4);    // 8
 
-// extern dDef_p       pr_globaldefs;
-extern dDef_p       pr_fielddefs;
+extern dDef_p   pr_fielddefs;
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,6 +37,7 @@ extern "C" {
     void ED_ParseGlobals(cString data);
     dDef_p ED_GlobalAtOfs(int ofs);
     dDef_p ED_FindGlobal(cString name);
+
     dDef_p ED_FieldAtOfs(int ofs);
     dDef_p ED_FindField(cString name);
     dDef_p ED_FindFieldCached(cString name);

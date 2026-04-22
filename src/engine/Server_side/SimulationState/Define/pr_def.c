@@ -4,11 +4,12 @@
 #include "common.h"
 #include "host.h"
 #include "enginedefs.h"
+#include "GlobVars.h"
 #include "Edict.h"
 #include "endian_tools.h"
 
+static dDef_p   _globalDefs;
 dDef_p         pr_fielddefs;
-dDef_p         pr_globaldefs;
 
 /*
 ==============================================================================
@@ -27,7 +28,7 @@ ED_WriteGlobals
 void ED_WriteGlobals(FILE* f) {
     fprintf(f, "{\n");
     for (int i = 0; i < progs->globaldefs.num; i++) {
-        dDef_p def = &pr_globaldefs[i];
+        dDef_p def = &_globalDefs[i];
         uint32_t type = def->type;
         if (!(def->type & DEF_SAVEGLOBAL))  continue;
         type &= ~DEF_SAVEGLOBAL;
@@ -84,7 +85,7 @@ ED_GlobalAtOfs
 */
 dDef_p ED_GlobalAtOfs(int ofs) {
     for (int i = 0; i < progs->globaldefs.num; i++) {
-        dDef_p def = &pr_globaldefs[i];
+        dDef_p def = &_globalDefs[i];
         if (def->ofs == ofs)
             return def;
     }
@@ -98,7 +99,7 @@ ED_FindGlobal
 */
 dDef_p ED_FindGlobal(cString name) {
     for (int i = 0; i < progs->globaldefs.num; i++) {
-        dDef_p def = &pr_globaldefs[i];
+        dDef_p def = &_globalDefs[i];
         if (!strcmp(PR_GetQString(def->s_name), name))
             return def;
     }
@@ -180,11 +181,11 @@ void initProgDefs(TypeLess_ptr base, progLump_t plg, progLump_t plf) {
      ED_InitCache();
 
     // ======[Global Defs]======
-    pr_globaldefs = (dDef_p)((uint8_p)base + plg.ofs);
+    _globalDefs = (dDef_p)((uint8_p)base + plg.ofs);
     for (int i = 0; i < plg.num; i++) {
-        pr_globaldefs[i].type = (op_type)LittleShort((int16_t)pr_globaldefs[i].type);
-        pr_globaldefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_globaldefs[i].ofs);
-        pr_globaldefs[i].s_name = LittleLong(pr_globaldefs[i].s_name);
+        _globalDefs[i].type = (op_type)LittleShort((int16_t)_globalDefs[i].type);
+        _globalDefs[i].ofs = (uint16_t)LittleShort((int16_t)_globalDefs[i].ofs);
+        _globalDefs[i].s_name = LittleLong(_globalDefs[i].s_name);
     }
 
     // ======[File Defs]======

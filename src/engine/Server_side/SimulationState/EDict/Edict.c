@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // #include "pr_comp.h"
 #include "progs.h"
+#include "GlobVars.h"
 #include "vmValue.h"
 #include "pr_Function.h"
 #include "Edict.h"

@@ -1,4 +1,5 @@
 #include "progs.h"
+#include "GlobVars.h"
 #include "pr_def.h"
 #include "pr_ops.h"
 #include "vmValue.h"
