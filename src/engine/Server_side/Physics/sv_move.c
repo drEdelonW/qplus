@@ -37,7 +37,7 @@ is not a staircase.
 
 =============
 */
-int c_yes, c_no;
+// static int c_yes, c_no;
 
 bool SV_CheckBottom(edict_p ent) {
     vec3_t mins;    VectorAdd(ent->v.origin, ent->v.mins, mins);
@@ -56,11 +56,11 @@ bool SV_CheckBottom(edict_p ent) {
                 goto realcheck;
         }
 
-    c_yes++;
+    // c_yes++;
     return true;  // we got out easy
 
 realcheck:
-    c_no++;
+    // c_no++;
     //
     // check it for real...
     //
@@ -93,7 +93,7 @@ realcheck:
                 return false;
         }
 
-    c_yes++;
+    // c_yes++;
     return true;
 }
 
