@@ -28,7 +28,7 @@ cString PR_ValueString(etype_t type, eval_p val) {
 
     switch (type) {
         case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                                       break;
-        case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", ED_GetEDictIdx(ED_GetEDictByOffs(val->edict)));                break;
+        case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", ED_GetEDictIdx(ED_GetEDictByOffs(val->edict)));             break;
         case ev_function:   snprintf(_line, sizeof(_line), "%s()", PR_GetQString((pr_functions + val->function)->s_name));          break;
         case ev_field:      snprintf(_line, sizeof(_line), ".%s", PR_GetQString(ED_FieldAtOfs(val->_int)->s_name));                 break;
         case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                 break;

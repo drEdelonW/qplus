@@ -29,6 +29,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include <stdarg.h>
 
+extern dStatement_p pr_statements;
+
 typedef struct {
     int32_t     stack;
     dFunction_p func;

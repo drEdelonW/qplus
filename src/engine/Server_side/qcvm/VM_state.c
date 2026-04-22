@@ -39,77 +39,13 @@ void PR_LoadProgs() {
     if (progs->version != PROG_VERSION)     Host_SysError("progs.dat has wrong version number (%i should be %i)", progs->version, PROG_VERSION);
     if (progs->crc != PROGHEADER_CRC)       Host_SysError("progs.dat system vars have been modified, progdefs.h is out of date");
 
-    // ======[Prog Strings]======
-    initProgSrting(progs, progs->strings);
+    initProgString(progs, progs->strings);                      // ======[Prog Strings]======
+    initProgGlobals(progs, progs->globals);                     // ======[Global Struct]======
+    initProgStatement(progs, progs->statements);                // ======[Statements]======
+    initProgFunction(progs, progs->functions);                  // ======[Function]======
+    initProgDefs(progs, progs->globaldefs, progs->fielddefs);   // ======[Global Defs]======
 
-    // ======[Global Struct]======
-#if 0
-    pr_global_struct = (globalvars_p)((uint8_p)progs + progs->globals.ofs);
-    pr_globals = (float_p)pr_global_struct;
-    for (int i = 0; i < progs->globals.num; i++)
-        ((int32_p)pr_globals)[i] = LittleLong(((int32_p)pr_globals)[i]);
-#else
-    initProgGlobals(progs, progs->globals);
-#endif
-
-    // ======[Edict Size]======
-    EdictSize = PROG_HEADER_SIZE + progs->entityfields * 4;
-
-    // ======[Statements]======
-#if 0
-    pr_statements = (dStatement_p)((uint8_p)progs + progs->statements.ofs);
-    // uint8_t swap the lumps
-    for (int i = 0; i < progs->statements.num; i++) {
-        pr_statements[i].op = (op_type)LittleShort((int16_t)pr_statements[i].op);
-        pr_statements[i].a = LittleShort(pr_statements[i].a);
-        pr_statements[i].b = LittleShort(pr_statements[i].b);
-        pr_statements[i].c = LittleShort(pr_statements[i].c);
-    }
-#else
-    initProgStatement(progs, progs->statements);
-#endif
-
-    // ======[Function]======
-#if 0
-    pr_functions = (dFunction_p)((uint8_p)progs + progs->functions.ofs);
-    for (int i = 0; i < progs->functions.num; i++) {
-        pr_functions[i].first_statement = LittleLong(pr_functions[i].first_statement);
-        pr_functions[i].parm_start = LittleLong(pr_functions[i].parm_start);
-        pr_functions[i].locals = LittleLong(pr_functions[i].locals);
-
-        pr_functions[i].s_name = LittleLong(pr_functions[i].s_name);
-        pr_functions[i].s_file = LittleLong(pr_functions[i].s_file);
-
-        pr_functions[i].numparms = LittleLong(pr_functions[i].numparms);
-    }
-#else
-    initProgFunction(progs, progs->functions);
-#endif
-
-    // ======[Global Defs]======
-#if 0
-    ED_InitCache();
-
-    pr_globaldefs = (dDef_p)((uint8_p)progs + progs->globaldefs.ofs);
-    for (int i = 0; i < progs->globaldefs.num; i++) {
-        pr_globaldefs[i].type = (op_type)LittleShort((int16_t)pr_globaldefs[i].type);
-        pr_globaldefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_globaldefs[i].ofs);
-        pr_globaldefs[i].s_name = LittleLong(pr_globaldefs[i].s_name);
-    }
-
-    // ======[File Defs]======
-    pr_fielddefs = (dDef_p)((uint8_p)progs + progs->fielddefs.ofs);
-    for (int i = 0; i < progs->fielddefs.num; i++) {
-        pr_fielddefs[i].type = (op_type)LittleShort((int16_t)pr_fielddefs[i].type);
-        pr_fielddefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_fielddefs[i].ofs);
-        pr_fielddefs[i].s_name = LittleLong(pr_fielddefs[i].s_name);
-
-        if (pr_fielddefs[i].type & DEF_SAVEGLOBAL)      Host_SysError("PR_LoadProgs: pr_fielddefs[i].type & DEF_SAVEGLOBAL");
-    }
-#else
-    initProgDefs(progs, progs->globaldefs, progs->fielddefs);
-#endif
-
+    EdictSize = PROG_HEADER_SIZE + progs->entityfields * 4;     // ======[Edict Size]======
 }
 
 /*
