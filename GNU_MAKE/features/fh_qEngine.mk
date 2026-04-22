@@ -49,6 +49,23 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
 
         $(eval SV_SIDE_DIR = $(ENG_DIR)/Server_side) $(eval INCLUDES += $(SV_SIDE_DIR))
+                $(eval SIMSTATE_DIR = $(SV_SIDE_DIR)/SimulationState) $(eval INCLUDES += $(SIMSTATE_DIR))
+                        $(eval PR_DEF_DIR = $(SIMSTATE_DIR)/Define) $(eval INCLUDES += $(PR_DEF_DIR))
+                                SRC_LIST += $(PR_DEF_DIR)/pr_def.c
+
+                        $(eval GVARS_DIR = $(SIMSTATE_DIR)/GlobVars) $(eval INCLUDES += $(GVARS_DIR))
+                                SRC_LIST += $(GVARS_DIR)/GlobVars.c
+
+                        $(eval EDICT_DIR = $(SIMSTATE_DIR)/EDict) $(eval INCLUDES += $(EDICT_DIR))
+                                SRC_LIST += $(EDICT_DIR)/Edict.c
+                                SRC_LIST += $(EDICT_DIR)/edict_tools.c
+
+                        $(eval QSTRING_DIR = $(SIMSTATE_DIR)/qString) $(eval INCLUDES += $(QSTRING_DIR))
+                                SRC_LIST += $(QSTRING_DIR)/pr_qString.c
+
+                        $(eval PR_ARG_DIR = $(SIMSTATE_DIR)/vmValue) $(eval INCLUDES += $(PR_ARG_DIR))
+                                SRC_LIST += $(PR_ARG_DIR)/vmValue.c
+
                 $(eval WORLD_DIR = $(SV_SIDE_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))
                         SRC_LIST += $(WORLD_DIR)/world.c
                         SRC_LIST += $(WORLD_DIR)/sv_pvs.c
@@ -57,18 +74,9 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(PR_PHYS_DIR)/sv_phys.c
                         SRC_LIST += $(PR_PHYS_DIR)/sv_move.c
 
-                $(eval PR_DEF_DIR = $(SV_SIDE_DIR)/Define) $(eval INCLUDES += $(PR_DEF_DIR))
-                        SRC_LIST += $(PR_DEF_DIR)/pr_def.c
-
                 $(eval PROG_DIR = $(SV_SIDE_DIR)/qcvm) $(eval INCLUDES += $(PROG_DIR))
-                        $(eval QSTRING_DIR = $(PROG_DIR)/qString) $(eval INCLUDES += $(QSTRING_DIR))
-                                SRC_LIST += $(QSTRING_DIR)/pr_qString.c
-
                         $(eval PR_OPS_DIR = $(PROG_DIR)/Operations) $(eval INCLUDES += $(PR_OPS_DIR))
                                 SRC_LIST += $(PR_OPS_DIR)/pr_ops_tools.c
-
-                        $(eval PR_ARG_DIR = $(PROG_DIR)/vmValue) $(eval INCLUDES += $(PR_ARG_DIR))
-                                SRC_LIST += $(PR_ARG_DIR)/vmValue.c
 
                         $(eval PR_CMD_DIR = $(PROG_DIR)/Command) $(eval INCLUDES += $(PR_CMD_DIR))
                                 SRC_LIST += $(PR_CMD_DIR)/pr_cmds.c
@@ -81,13 +89,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
                         SRC_LIST += $(PROG_DIR)/VM_state.c
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
-
-                $(eval GVARS_DIR = $(SV_SIDE_DIR)/GlobVars) $(eval INCLUDES += $(GVARS_DIR))
-                        SRC_LIST += $(GVARS_DIR)/GlobVars.c
-
-                $(eval EDICT_DIR = $(SV_SIDE_DIR)/EDict) $(eval INCLUDES += $(EDICT_DIR))
-                        SRC_LIST += $(EDICT_DIR)/Edict.c
-                        SRC_LIST += $(EDICT_DIR)/edict_tools.c
 
                 SRC_LIST += $(SV_SIDE_DIR)/sv_main.c
                 SRC_LIST += $(SV_SIDE_DIR)/sv_user.c
