@@ -7,7 +7,7 @@
 
 static cString  _pr_strings;    // much more // should be static
 
-void initProgSrting(TypeLess_ptr base, progLump_t pl) {
+void initProgString(TypeLess_ptr base, progLump_t pl) {
 
     PR_ClearAppStrings();
     _pr_strings = (cString)((uint8_p)base + pl.ofs);

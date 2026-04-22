@@ -17,7 +17,6 @@ typedef struct {
 typedef dStatement_t* dStatement_p;
 STATIC_ASSERT_SIZE(dStatement_t, 2*4);  // 8
 
-extern dStatement_p pr_statements;
 
 
 #ifdef __cplusplus

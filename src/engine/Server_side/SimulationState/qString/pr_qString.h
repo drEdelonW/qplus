@@ -12,7 +12,7 @@ typedef int32_t qVmString_t;    // should be signed!!! it was [string_t] from "p
 extern "C" {
 #endif
 
-    void initProgSrting(TypeLess_ptr base, progLump_t pl);
+    void initProgString(TypeLess_ptr base, progLump_t pl);
     void PR_ClearAppStrings();
 
     qVmString_t PR_SetQString(cString str);
