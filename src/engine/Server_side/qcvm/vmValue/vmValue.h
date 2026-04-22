@@ -1,8 +1,10 @@
 #pragma once
 
 #include "types.h"
-#include "progdefs.h"
-
+// #include "progdefs.h"
+// #include "Edict.h"
+#include "pr_Function.h"
+#include "vector.h"
 
 typedef union {
     string_t    string;
@@ -32,7 +34,6 @@ typedef enum {
 
 extern int type_size[ev_LAST];
 
-typedef int16_t arg_type;   // should be signed int
 
 cString PR_ValueString(etype_t type, eval_p val);
 cString PR_UglyValueString(etype_t type, eval_p val);

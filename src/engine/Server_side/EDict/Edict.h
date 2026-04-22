@@ -1,10 +1,10 @@
 #pragma once
 
 #include "link.h"
-#include "EntityState.h"
-#include "pr_Argument.h"
 #include "pr_def.h"    // defs shared with qcc
-#include <stdio.h>
+#include "progdefs.h"       //for entvars_t
+#include "EntityState.h"
+#include "vmValue.h"
 
 
 // edict->movetype values
@@ -24,7 +24,7 @@ typedef enum {
     MOVETYPE_BOUNCEMISSILE  = 11u, // bounce w/o gravity
     MOVETYPE_FOLLOW         = 12u, // track movement of aiment
 #endif
-} movetype_t;
+} movetype_t;   // sv_phys.c
 
 
 // edict->solid values
@@ -34,7 +34,7 @@ typedef enum {
     SOLID_BBOX      = 2u, // touch on edge, block
     SOLID_SLIDEBOX  = 3u, // touch on edge, but not an onground
     SOLID_BSP       = 4u  // BSP clip, touch on edge, block
-} solid_t;
+} solid_t;      // world.c
 
 // edict->deadflag values
 typedef enum {
@@ -70,7 +70,7 @@ typedef enum {
     FL_FLASHLIGHT       = 1u << 13,
     FL_ARCHIVE_OVERRIDE = 1u << 20
 #endif
-} EntityFlags_t;
+} EntityFlags_t;   // sv_phys.c
 
 
 typedef enum {
@@ -106,6 +106,7 @@ typedef struct edict_s {
     // other fields from progs come immediately after
 } edict_t;
 typedef edict_t* edict_p;
+#define PROG_HEADER_SIZE (sizeof(edict_t) - sizeof(entvars_t))
 
 #define EDICT_FROM_AREA(l)  STRUCT_FROM_LINK(l, edict_t, area)
 #define G_EDICT(o)          ED_GetEDictByOffs((uint32_t)G_INT((o)))
@@ -121,15 +122,13 @@ extern "C" {
 
     cString ED_NewString(cString string);   // returns a copy of the string allocated from the server's string heap
 
-    dDef_p ED_FieldAtOfs(int ofs);
-
     void ED_Print(edict_p ed);
+    void ED_PrintEdicts();
+    void ED_PrintNum(uint32_t ent);
+
     void ED_Write(FILE* f, edict_p ed);
 
     cString ED_ParseEdict(cString data, edict_p ent);
-
-    void ED_WriteGlobals(FILE* f);
-    void ED_ParseGlobals(cString data);
 
     void ED_LoadFromFile(cString data);
     bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s);
@@ -142,9 +141,6 @@ extern "C" {
 
     edict_p ED_GetEDictFirst();
     edict_p ED_GetEDictNext(edict_p edict);
-
-    void ED_PrintEdicts();
-    void ED_PrintNum(uint32_t ent);
 
     eval_p GetEdictFieldValue(edict_p ed, cString field);
 

@@ -46,11 +46,11 @@ bool SV_CheckBottom(edict_p ent) {
     // if all of the points under the corners are solid world, don't bother
     // with the tougher checks
     // the corners must be within 16 of the midpoint
-    vec3_t start = { 0, 0, mins[2] - 1 };
+    vec3_t start = { 0, 0, mins[Z_AX] - 1 };
     for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++) {
-            start[0] = x ? maxs[0] : mins[0];
-            start[1] = y ? maxs[1] : mins[1];
+            start[X_AX] = x ? maxs[X_AX] : mins[X_AX];
+            start[Y_AX] = y ? maxs[Y_AX] : mins[Y_AX];
             if (SV_PointContents(start) != CONTENTS_SOLID)
                 goto realcheck;
         }
@@ -63,32 +63,32 @@ realcheck:
     //
     // check it for real...
     //
-    start[2] = mins[2];
+    start[Z_AX] = mins[Z_AX];
 
     // the midpoint must be within 16 of the bottom
     vec3_t stop;
-    start[0] = stop[0] = (mins[0] + maxs[0]) * 0.5f;
-    start[1] = stop[1] = (mins[1] + maxs[1]) * 0.5f;
-    stop[2] = start[2] - 2 * STEPSIZE;
+    start[X_AX] = stop[X_AX] = (mins[X_AX] + maxs[X_AX]) * 0.5f;
+    start[Y_AX] = stop[Y_AX] = (mins[Y_AX] + maxs[Y_AX]) * 0.5f;
+    stop[Z_AX] = start[Z_AX] - 2 * STEPSIZE;
     trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, ent);
 
     if (trace.fraction == 1.0)
         return false;
 
-    float mid = trace.endpos[2];
-    float bottom = trace.endpos[2];
+    float mid = trace.endpos[Z_AX];
+    float bottom = trace.endpos[Z_AX];
 
     // the corners must be within 16 of the midpoint
     for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++) {
-            start[0] = stop[0] = x ? maxs[0] : mins[0];
-            start[1] = stop[1] = y ? maxs[1] : mins[1];
+            start[X_AX] = stop[X_AX] = x ? maxs[X_AX] : mins[X_AX];
+            start[Y_AX] = stop[Y_AX] = y ? maxs[Y_AX] : mins[Y_AX];
 
             trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, ent);
 
-            if ((trace.fraction != 1.0) && (trace.endpos[2] > bottom))
-                bottom = trace.endpos[2];
-            if ((trace.fraction == 1.0) || (mid - trace.endpos[2] > STEPSIZE))
+            if ((trace.fraction != 1.0) && (trace.endpos[Z_AX] > bottom))
+                bottom = trace.endpos[Z_AX];
+            if ((trace.fraction == 1.0) || (mid - trace.endpos[Z_AX] > STEPSIZE))
                 return false;
         }
 
@@ -120,9 +120,9 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
             VectorAdd(ent->v.origin, move, neworg);
             edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
             if (i == 0 && (enemy != Edicts)) {
-                float dz = ent->v.origin[2] - ED_GetEDictByOffs(ent->v.enemy)->v.origin[2];
-                if (dz > 40)    neworg[2] -= 8;
-                if (dz < 30)    neworg[2] += 8;
+                float dz = ent->v.origin[Z_AX] - ED_GetEDictByOffs(ent->v.enemy)->v.origin[Z_AX];
+                if (dz > 40)    neworg[Z_AX] -= 8;
+                if (dz < 30)    neworg[Z_AX] += 8;
             }
             trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, neworg, MOVE_NORMAL, ent);
 
@@ -145,9 +145,9 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
     }
 
     // push down from a step height above the wished position
-    neworg[2] += STEPSIZE;
+    neworg[Z_AX] += STEPSIZE;
     vec3_t end; VectorCopy(neworg, end);
-    end[2] -= STEPSIZE * 2;
+    end[Z_AX] -= STEPSIZE * 2;
 
     trace_t trace = SV_Move(neworg, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
 
@@ -155,7 +155,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
         return false;
 
     if (trace.startsolid) {
-        neworg[2] -= STEPSIZE;
+        neworg[Z_AX] -= STEPSIZE;
         trace = SV_Move(neworg, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
         if (trace.allsolid || trace.startsolid)
             return false;
@@ -266,23 +266,23 @@ void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
     float olddir = anglemod((float)((int)(actor->v.ideal_yaw / 45) * 45));
     float turnaround = anglemod(olddir - 180);
 
-    float deltax = enemy->v.origin[0] - actor->v.origin[0];
-    if (deltax > 10)        orient[1] = 0;
-    else if (deltax < -10)  orient[1] = 180;
-    else                    orient[1] = DI_NODIR;
+    float deltax = enemy->v.origin[X_AX] - actor->v.origin[X_AX];
+    if (deltax > 10)        orient[Y_AX] = 0;
+    else if (deltax < -10)  orient[Y_AX] = 180;
+    else                    orient[Y_AX] = DI_NODIR;
 
-    float deltay = enemy->v.origin[1] - actor->v.origin[1];
-    if (deltay < -10)       orient[2] = 270;
-    else if (deltay > 10)   orient[2] = 90;
-    else                    orient[2] = DI_NODIR;
+    float deltay = enemy->v.origin[Y_AX] - actor->v.origin[Y_AX];
+    if (deltay < -10)       orient[Z_AX] = 270;
+    else if (deltay > 10)   orient[Z_AX] = 90;
+    else                    orient[Z_AX] = DI_NODIR;
 
     // try direct route
-    if ((orient[1] != DI_NODIR) &&
-        (orient[2] != DI_NODIR)
+    if ((orient[Y_AX] != DI_NODIR) &&
+        (orient[Z_AX] != DI_NODIR)
         ) {
         float tdir;
-        if (orient[1] == 0) tdir = orient[2] == 90 ? 45 : 315;
-        else                tdir = orient[2] == 90 ? 135 : 215;
+        if (orient[Y_AX] == 0) tdir = orient[Z_AX] == 90 ? 45 : 315;
+        else                tdir = orient[Z_AX] == 90 ? 135 : 215;
 
         if ((tdir != turnaround) &&
             SV_StepDirection(actor, tdir, dist)
@@ -294,21 +294,21 @@ void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
     if (((rand() & 3) & 1) ||
         (fabs(deltay) > fabs(deltax))
         ) {
-        float tdir = orient[1];
-        orient[1] = orient[2];
-        orient[2] = tdir;
+        float tdir = orient[Y_AX];
+        orient[Y_AX] = orient[Z_AX];
+        orient[Z_AX] = tdir;
     }
 
     if (
         (
-            (orient[1] != DI_NODIR) &&
-            (orient[1] != turnaround) &&
-            SV_StepDirection(actor, orient[1], dist)
+            (orient[Y_AX] != DI_NODIR) &&
+            (orient[Y_AX] != turnaround) &&
+            SV_StepDirection(actor, orient[Y_AX], dist)
             ) ||
         (
-            (orient[2] != DI_NODIR) &&
-            (orient[2] != turnaround) &&
-            SV_StepDirection(actor, orient[2], dist)
+            (orient[Z_AX] != DI_NODIR) &&
+            (orient[Z_AX] != turnaround) &&
+            SV_StepDirection(actor, orient[Z_AX], dist)
             )
         )
         return;

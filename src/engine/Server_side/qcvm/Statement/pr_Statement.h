@@ -1,11 +1,12 @@
 #pragma once
 
-#include "pr_Argument.h"
+#include "vmValue.h"
 
 #include "types.h"
 #include "assert.h"
 
 typedef uint16_t op_type;
+typedef int16_t arg_type;   // should be signed int
 
 typedef struct {
     op_type     op;    // prog_operation_e
