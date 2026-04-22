@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "types.h"
 #include "vector.h"
 #include "pr_qString.h"
+#include "pr_Function.h"
 
 // VM global offsets; vectors occupy 3 float slots
 typedef enum {
@@ -38,7 +39,6 @@ typedef enum {
 } PrOfs_e;
 
 
-typedef int32_t func_t;
 
 #ifndef QUAKE2
 #   include "progdefs.q1"

@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // #include "pr_comp.h"
 #include "progs.h"
-#include "pr_Argument.h"
+#include "vmValue.h"
 #include "pr_Function.h"
 #include "Edict.h"
 #include "world.h"
@@ -68,7 +68,7 @@ angles and bad trails.
 =================
 */
 edict_p ED_Alloc() {
-    uint32_t i = svs.maxClients + 1;
+    uint32_t i = svs.maxClients + 1; // Clients + World
     for (; i < EdictsNum; i++) {
         edict_p edict = ED_GetEDictByIdx(i);
         // the first couple seconds of server time can involve a lot of
@@ -121,80 +121,8 @@ void ED_Free(edict_p ed) {
 
 //===========================================================================
 
-/*
-============
-ED_GlobalAtOfs
-============
-*/
-dDef_p ED_GlobalAtOfs(int ofs) {
-    for (int i = 0; i < progs->globaldefs.num; i++) {
-        dDef_p def = &pr_globaldefs[i];
-        if (def->ofs == ofs)
-            return def;
-    }
-    return NULL;
-}
-
-/*
-============
-ED_FieldAtOfs
-============
-*/
-dDef_p ED_FieldAtOfs(int ofs) {
-    for (int i = 0; i < progs->fielddefs.num; i++) {
-        dDef_p def = &pr_fielddefs[i];
-        if (def->ofs == ofs)
-            return def;
-    }
-    return NULL;
-}
-
-/*
-============
-ED_FindField
-============
-*/
-dDef_p ED_FindField(cString name) {
-    for (int i = 0; i < progs->fielddefs.num; i++) {
-        dDef_p def = &pr_fielddefs[i];
-        if (!strcmp(PR_GetQString(def->s_name), name))
-            return def;
-    }
-    return NULL;
-}
-
-
-/*
-============
-ED_FindGlobal
-============
-*/
-dDef_p ED_FindGlobal(cString name) {
-    for (int i = 0; i < progs->globaldefs.num; i++) {
-        dDef_p def = &pr_globaldefs[i];
-        if (!strcmp(PR_GetQString(def->s_name), name))
-            return def;
-    }
-    return NULL;
-}
-
-
-/*
-============
-ED_FindFunction
-============
-*/
-dFunction_p ED_FindFunction(cString name) {
-    for (int i = 0; i < progs->functions.num; i++) {
-        dFunction_p func = &pr_functions[i];
-        if (!strcmp(PR_GetQString(func->s_name), name))
-            return func;
-    }
-    return NULL;
-}
-
-
 eval_p GetEdictFieldValue(edict_p ed, cString field) {
+#if 0
     static int _rep = 0;
 
     dDef_p def = NULL;
@@ -214,13 +142,12 @@ eval_p GetEdictFieldValue(edict_p ed, cString field) {
     }
 
 Done:
+#else
+    dDef_p def = ED_FindFieldCached(field);
+#endif
     if (!def)   return NULL;
-
     return (eval_p)((cString)&ed->v + def->ofs * 4);
 }
-
-
-
 
 /*
 =============
@@ -234,15 +161,15 @@ void ED_Print(edict_p ed) {
 
     Host_Printf("\nEDICT %i:\n", ED_GetEDictIdx(ed));
     for (int i = 1; i < progs->fielddefs.num; i++) {
-        dDef_p d = &pr_fielddefs[i];
-        cString name = PR_GetQString(d->s_name);
+        dDef_p flDef = &pr_fielddefs[i];
+        cString name = PR_GetQString(flDef->s_name);
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
-        int32_p v = (int32_p)((cString)&ed->v + d->ofs * 4);
+        int32_p v = (int32_p)((cString)&ed->v + flDef->ofs * 4);
 
         // if the value is still all 0, skip the field
-        uint32_t type = d->type & ~DEF_SAVEGLOBAL;
+        uint32_t type = flDef->type & ~DEF_SAVEGLOBAL;
 
         int j = 0;
         for (; j < type_size[type]; j++)
@@ -257,7 +184,7 @@ void ED_Print(edict_p ed) {
         while (l++ < 15)
             Host_Printf(" ");
 
-        Host_Printf("%s\n", PR_ValueString(d->type, (eval_p)v));
+        Host_Printf("%s\n", PR_ValueString(flDef->type, (eval_p)v));
     }
 }
 
@@ -274,25 +201,25 @@ void ED_Write(FILE* f, edict_p ed) {
     if (ed->free) { fprintf(f, "}\n"); return; }
 
     for (int i = 1; i < progs->fielddefs.num; i++) {
-        dDef_p d = &pr_fielddefs[i];
-        cString name = PR_GetQString(d->s_name);
+        dDef_p flDef = &pr_fielddefs[i];
+        cString name = PR_GetQString(flDef->s_name);
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
-        int32_p v = (int32_p)((cString)&ed->v + d->ofs * 4);
+        int32_p value = (int32_p)((cString)&ed->v + flDef->ofs * 4);
 
         // if the value is still all 0, skip the field
-        uint32_t type = d->type & ~DEF_SAVEGLOBAL;
+        uint32_t type = flDef->type & ~DEF_SAVEGLOBAL;
         int j = 0;
         for (; j < type_size[type]; j++)
-            if (v[j])
+            if (value[j])
                 break;
 
         if (j == type_size[type])
             continue;
 
         fprintf(f, "\"%s\" ", name);
-        fprintf(f, "\"%s\"\n", PR_UglyValueString(d->type, (eval_p)v));
+        fprintf(f, "\"%s\"\n", PR_UglyValueString(flDef->type, (eval_p)value));
     }
 
     fprintf(f, "}\n");
@@ -358,72 +285,6 @@ void ED_Count() {
 
 }
 
-/*
-==============================================================================
-
-                    ARCHIVING GLOBALS
-
-FIXME: need to tag constants, doesn't really work
-==============================================================================
-*/
-
-/*
-=============
-ED_WriteGlobals
-=============
-*/
-void ED_WriteGlobals(FILE* f) {
-    fprintf(f, "{\n");
-    for (int i = 0; i < progs->globaldefs.num; i++) {
-        dDef_p def = &pr_globaldefs[i];
-        uint32_t type = def->type;
-        if (!(def->type & DEF_SAVEGLOBAL))  continue;
-        type &= ~DEF_SAVEGLOBAL;
-
-        if ((type != ev_string) &&
-            (type != ev_float) &&
-            (type != ev_entity)
-            )
-            continue;
-
-        cString name = PR_GetQString(def->s_name);
-        fprintf(f, "\"%s\" ", name);
-        fprintf(f, "\"%s\"\n", PR_UglyValueString(type, (eval_p)&pr_globals[def->ofs]));
-    }
-    fprintf(f, "}\n");
-}
-
-/*
-=============
-ED_ParseGlobals
-=============
-*/
-void ED_ParseGlobals(cString data) {
-    while (1) {
-        // parse key
-        data = COM_Parse(data);
-        if (com.token[0] == '}')    break;
-        if (!data)                  Host_SysError("ED_ParseEntity: EOF without closing brace");
-
-        char keyname[NAME_LENGTH];
-        strcpy(keyname, com.token);
-
-        // parse value
-        data = COM_Parse(data);
-        if (!data)                  Host_SysError("ED_ParseEntity: EOF without closing brace");
-        if (com.token[0] == '}')    Host_SysError("ED_ParseEntity: closing brace without data");
-
-        dDef_p key = ED_FindGlobal(keyname);
-        if (!key) {
-            Host_Printf("'%s' is not a global\n", keyname);
-            continue;
-        }
-
-        if (!ED_ParseEpair((TypeLess_ptr)pr_globals, key, com.token))
-            Host_Error("ED_ParseGlobals: parse error");
-    }
-}
-
 //============================================================================
 
 
@@ -461,12 +322,12 @@ returns false if error
 =============
 */
 bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
-    TypeLess_ptr d = (TypeLess_ptr)((int32_p)base + key->ofs);
+    TypeLess_ptr dstPtr = (TypeLess_ptr)((int32_p)base + key->ofs);
 
     switch (key->type & ~DEF_SAVEGLOBAL) {
-    case ev_string:     *(string_t*)d = PR_SetQString(ED_NewString(s));               break;
-    case ev_float:      *(float_p)d = (float)atof(s);                               break;
-    case ev_entity:     *(int32_p)d = ED_GetEDictOffs(ED_GetEDictByIdx((uint32_t)atoi(s)));  break;
+    case ev_string:     *(string_t*)dstPtr = PR_SetQString(ED_NewString(s));                     break;
+    case ev_float:      *(float_p)dstPtr = (float)atof(s);                                       break;
+    case ev_entity:     *(int32_p)dstPtr = ED_GetEDictOffs(ED_GetEDictByIdx((uint32_t)atoi(s))); break;
 
     case ev_vector: {
         char string[128];
@@ -477,7 +338,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
             while ((*v != 0) && (*v != ' '))
                 v++;
             *v = 0;
-            ((float_p)d)[i] = (float)atof(w);
+            ((float_p)dstPtr)[i] = (float)atof(w);
             w = v = v + 1;
         }
     } break;
@@ -488,7 +349,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
             Host_Printf("Can't find field %s\n", s);
             return false;
         }
-        *(int32_p)d = G_INT(def->ofs);
+        *(int32_p)dstPtr = G_INT(def->ofs);
     } break;
 
     case ev_function: {
@@ -497,7 +358,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
             Host_Printf("Can't find function %s\n", s);
             return false;
         }
-        *(func_t*)d = func - pr_functions;
+        *(func_t*)dstPtr = func - pr_functions;
     } break;
 
     default:    break;
@@ -586,7 +447,6 @@ cString ED_ParseEdict(cString data, edict_p ent) {
     return data;
 }
 
-
 /*
 ================
 ED_LoadFromFile
@@ -661,8 +521,6 @@ void ED_LoadFromFile(cString data) {
 
     Con_DPrintf("%i entities inhibited\n", inhibit);
 }
-
-
 
 edict_p FindViewthing() {
     for (uint32_t i = 0; i < EdictsNum; i++) {

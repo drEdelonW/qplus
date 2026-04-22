@@ -4,6 +4,8 @@
 #include "assert.h"
 #include "pr_qString.h"
 
+typedef int32_t func_t;
+
 #define MAX_PARMS (8)
 
 typedef struct {
@@ -24,3 +26,13 @@ STATIC_ASSERT_SIZE(dFunction_t, 7*4 + 1*8); // 36
 
 extern dFunction_p  pr_functions;
 extern dFunction_p  pr_xFunction;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    dFunction_p ED_FindFunction(cString name);
+
+#ifdef __cplusplus
+}
+#endif

@@ -364,15 +364,24 @@ void SV_SpawnServer(
     // load progs to get entity field count
     PR_LoadProgs();
 
-    // WARNING!!! don't use [EdictSize] before PR_LoadProgs() called!!!
     // allocate server memory
-    // sv.max_edicts = MAX_EDICTS;
-    // EdictsMax = max_edicts;
-
+    // WARNING!!! don't use [EdictSize] before PR_LoadProgs() called!!!
     if (!EdictSize) Host_Error("EdictSize - not inited\n");
     Edicts = Hunk_AllocName((uint32_t)EdictsMax * EdictSize, "edicts");
     // sv.edicts = Edicts;
 
+    // leave slots at start for clients only
+    EdictsNum = svs.maxClients + 1;
+    for (uint32_t i = 0; i < svs.maxClients; i++) {
+#if 0
+        edict_p ent = ED_GetEDictByIdx(i + 1);
+        svs.clients[i].edict = ent;
+#else
+        svs.clients[i].edict = ED_GetEDictByIdx(i + 1);
+#endif
+    }
+
+#if 0
     sv.datagram.maxsize = sizeof(sv.datagram_buf);
     sv.datagram.cursize = 0;
     sv.datagram.data = sv.datagram_buf;
@@ -384,13 +393,23 @@ void SV_SpawnServer(
     sv.signon.maxsize = sizeof(sv.signon_buf);
     sv.signon.cursize = 0;
     sv.signon.data = sv.signon_buf;
-
-    // leave slots at start for clients only
-    EdictsNum = svs.maxClients + 1;
-    for (uint32_t i = 0; i < svs.maxClients; i++) {
-        edict_p ent = ED_GetEDictByIdx(i + 1);
-        svs.clients[i].edict = ent;
-    }
+#else
+    sv.datagram = (sizebuf_t){
+        .maxsize = sizeof(sv.datagram_buf),
+        .cursize = 0,
+        .data = sv.datagram_buf
+    };
+    sv.reliable_datagram = (sizebuf_t){
+        .maxsize = sizeof(sv.reliable_datagram_buf),
+        .cursize = 0,
+        .data = sv.reliable_datagram_buf
+    };
+    sv.signon = (sizebuf_t){
+        .maxsize = sizeof(sv.signon_buf),
+        .cursize = 0,
+        .data = sv.signon_buf
+    };
+#endif
 
     sv.state = ss_loading;
     sv.paused = false;
@@ -447,8 +466,7 @@ void SV_SpawnServer(
 
     sv.active = true;
 
-    // all setup is completed, any further precache statements are errors
-    sv.state = ss_active;
+    sv.state = ss_active;    // all setup is completed, any further precache statements are errors
 
     // run two frames to allow everything to settle
     host_frametime = 0.1;

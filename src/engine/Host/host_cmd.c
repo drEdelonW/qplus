@@ -99,7 +99,14 @@ void Host_Status_f() {
         }
         else    hours = 0;
 
-        print("#%-2u %-16.16s  %3i  %2i:%02i:%02i\n", j + 1, rClient->name, (int32_t)rClient->edict->v.frags, hours, minutes, seconds);
+        print("#%-2u %-16.16s  %3i  %2i:%02i:%02i\n",
+                j + 1,
+                rClient->name,
+                (int32_t)rClient->edict->v.frags,
+                hours,
+                minutes,
+                seconds
+            );
         print("   %s\n", rClient->netconnection->address);
     }
 }
