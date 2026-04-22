@@ -10,6 +10,7 @@
 #include "host.h"
 #include "sound.h"
 #include "gamedefs.h"
+#include "GlobVars.h"
 #include "cmd.h"
 
 #include "cvar_q1.h"

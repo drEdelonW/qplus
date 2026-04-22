@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "host.h"
 #include "progs.h"
+#include "GlobVars.h"
 
 server_t    sv;
 sv_static_t svs;
