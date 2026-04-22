@@ -23,14 +23,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // #include "progdefs.h"
 #include "types.h"
 #include "assert.h"
+#include "progLump.h"
 
 #define PROG_VERSION 6
-typedef struct {
-    uint32_t ofs;   /* byte offset from start of progs blob */
-    uint32_t num;   /* element count (not bytes) */
-} progLump_t;
-STATIC_ASSERT_SIZE(progLump_t, 2*4); // 60
-
 
 typedef struct {
     int32_t  version;

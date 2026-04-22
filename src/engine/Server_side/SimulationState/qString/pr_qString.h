@@ -1,6 +1,7 @@
 #pragma once
 #include "types.h"
 #include "pr_comp.h"
+#include "progLump.h"
 
 typedef int32_t string_t;
 typedef int32_t qVmString_t;    // should be signed!!! it was [string_t] from "pr_comp.h"
@@ -11,7 +12,7 @@ typedef int32_t qVmString_t;    // should be signed!!! it was [string_t] from "p
 extern "C" {
 #endif
 
-    void initProgSrting(dprograms_p progs);
+    void initProgSrting(TypeLess_ptr base, progLump_t pl);
     void PR_ClearAppStrings();
 
     qVmString_t PR_SetQString(cString str);

@@ -1,9 +1,11 @@
 #include "pr_def.h"
+#include "pr_Statement.h"
 #include <string.h>
 #include "common.h"
 #include "host.h"
 #include "enginedefs.h"
 #include "Edict.h"
+#include "endian_tools.h"
 
 dDef_p         pr_fielddefs;
 dDef_p         pr_globaldefs;
@@ -174,3 +176,24 @@ dDef_p ED_FindFieldCached(cString field) {
    return def;
 }
 
+void initProgDefs(TypeLess_ptr base, progLump_t plg, progLump_t plf) {
+     ED_InitCache();
+
+    // ======[Global Defs]======
+    pr_globaldefs = (dDef_p)((uint8_p)base + plg.ofs);
+    for (int i = 0; i < plg.num; i++) {
+        pr_globaldefs[i].type = (op_type)LittleShort((int16_t)pr_globaldefs[i].type);
+        pr_globaldefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_globaldefs[i].ofs);
+        pr_globaldefs[i].s_name = LittleLong(pr_globaldefs[i].s_name);
+    }
+
+    // ======[File Defs]======
+    pr_fielddefs = (dDef_p)((uint8_p)base + plf.ofs);
+    for (int i = 0; i < plf.num; i++) {
+        pr_fielddefs[i].type = (op_type)LittleShort((int16_t)pr_fielddefs[i].type);
+        pr_fielddefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_fielddefs[i].ofs);
+        pr_fielddefs[i].s_name = LittleLong(pr_fielddefs[i].s_name);
+
+        if (pr_fielddefs[i].type & DEF_SAVEGLOBAL)      Host_SysError("PR_LoadProgs: pr_fielddefs[i].type & DEF_SAVEGLOBAL");
+    }
+}

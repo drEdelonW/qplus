@@ -56,4 +56,4 @@ extern float_p      pr_globals;         // same as pr_global_struct
 #define G_VECTOR(o)         (&pr_globals[(o)])
 #define G_STRING(o)         PR_GetQString(*(qVmString_t*)&pr_globals[(o)])
 
-typedef entvars_t* entvars_p;
+// typedef entvars_t* entvars_p;  // not necessary yet
