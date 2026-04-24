@@ -24,6 +24,8 @@ extern "C" {
 #endif
 
     void initProgStatement(TypeLess_ptr base, progLump_t pl);
+    void PR_PrintStatement(dStatement_p state);
+    dStatement_p PR_GetStack(int32_t stack);
 
 #ifdef __cplusplus
 }

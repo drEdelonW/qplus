@@ -30,7 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include <stdarg.h>
 
-extern dStatement_p pr_statements;
 
 typedef struct {
     int32_t     stack;
@@ -51,33 +50,6 @@ int32_t         pr_argc;
 
 
 //=============================================================================
-
-/*
-    =================
-    PR_PrintStatement
-    =================
-*/
-void PR_PrintStatement(dStatement_p state) {
-    // if ((uint32_t)state->op < (sizeof(_pr_opNames) / sizeof(_pr_opNames[0]))) {
-    PR_PrintOperation(state->op);
-
-    if ((state->op == OP_IF) ||
-        (state->op == OP_IFNOT)
-        )
-        Con_Printf("%sbranch %i", PR_GlobalString(state->a), state->b);
-    else if (state->op == OP_GOTO)
-        Con_Printf("branch %i", state->a);
-    else if ((uint32_t)(state->op - OP_STORE_F) < 6) {
-        Con_Printf("%s", PR_GlobalString(state->a));
-        Con_Printf("%s", PR_GlobalStringNoContents(state->b));
-    }
-    else {
-        if (state->a)   Con_Printf("%s", PR_GlobalString(state->a));
-        if (state->b)   Con_Printf("%s", PR_GlobalString(state->b));
-        if (state->c)   Con_Printf("%s", PR_GlobalStringNoContents(state->c));
-    }
-    Con_Printf("\n");
-}
 
 /*
     ============
@@ -145,7 +117,11 @@ void PR_RunError(cString error, ...) {
     char string[1024];  vsnprintf(string, sizeof(string), error, argptr);
     va_end(argptr);
 
+#if 0
     PR_PrintStatement(pr_statements + _pr_xStatement);
+#else
+    PR_PrintStatement(PR_GetStack(_pr_xStatement));
+#endif
     PR_StackTrace();
     Con_Printf("%s\n", string);
 
@@ -247,7 +223,11 @@ void PR_ExecuteProgram(func_t fnum) {
     while (1) {
         stack++; // next statement
 
+#if 0
         dStatement_p st = &pr_statements[stack];
+#else
+        dStatement_p st = PR_GetStack(stack);
+#endif
         eval_p a = (eval_p)&pr_globals[st->a];
         eval_p b = (eval_p)&pr_globals[st->b];
         eval_p c = (eval_p)&pr_globals[st->c];
@@ -280,43 +260,43 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_MUL_F:      c->_float = a->_float * b->_float;      break;
             case OP_MUL_V: {
                 c->_float =
-                    a->vector[0] * b->vector[0] +
-                    a->vector[1] * b->vector[1] +
-                    a->vector[2] * b->vector[2];
+                    a->vector[X_AX] * b->vector[X_AX] +
+                    a->vector[Y_AX] * b->vector[Y_AX] +
+                    a->vector[Z_AX] * b->vector[Z_AX];
             } break;
             case OP_MUL_FV: {
-                c->vector[0] = a->_float * b->vector[0];
-                c->vector[1] = a->_float * b->vector[1];
-                c->vector[2] = a->_float * b->vector[2];
+                c->vector[X_AX] = a->_float * b->vector[X_AX];
+                c->vector[Y_AX] = a->_float * b->vector[Y_AX];
+                c->vector[Z_AX] = a->_float * b->vector[Z_AX];
             } break;
             case OP_MUL_VF: {
-                c->vector[0] = b->_float * a->vector[0];
-                c->vector[1] = b->_float * a->vector[1];
-                c->vector[2] = b->_float * a->vector[2];
+                c->vector[X_AX] = b->_float * a->vector[X_AX];
+                c->vector[Y_AX] = b->_float * a->vector[Y_AX];
+                c->vector[Z_AX] = b->_float * a->vector[Z_AX];
             } break;
 
             case OP_DIV_F:      c->_float = a->_float / b->_float;              break;
 
             case OP_ADD_F:      c->_float = a->_float + b->_float;      break;
             case OP_ADD_V: {
-                c->vector[0] = a->vector[0] + b->vector[0];
-                c->vector[1] = a->vector[1] + b->vector[1];
-                c->vector[2] = a->vector[2] + b->vector[2];
+                c->vector[X_AX] = a->vector[X_AX] + b->vector[X_AX];
+                c->vector[Y_AX] = a->vector[Y_AX] + b->vector[Y_AX];
+                c->vector[Z_AX] = a->vector[Z_AX] + b->vector[Z_AX];
             } break;
 
             case OP_SUB_F:      c->_float = a->_float - b->_float;      break;
             case OP_SUB_V: {
-                c->vector[0] = a->vector[0] - b->vector[0];
-                c->vector[1] = a->vector[1] - b->vector[1];
-                c->vector[2] = a->vector[2] - b->vector[2];
+                c->vector[X_AX] = a->vector[X_AX] - b->vector[X_AX];
+                c->vector[Y_AX] = a->vector[Y_AX] - b->vector[Y_AX];
+                c->vector[Z_AX] = a->vector[Z_AX] - b->vector[Z_AX];
             } break;
 
             case OP_EQ_F:       c->_float = a->_float == b->_float;                 break;
             case OP_EQ_V: {
                 c->_float =
-                    (a->vector[0] == b->vector[0]) &&
-                    (a->vector[1] == b->vector[1]) &&
-                    (a->vector[2] == b->vector[2]);
+                    (a->vector[X_AX] == b->vector[X_AX]) &&
+                    (a->vector[Y_AX] == b->vector[Y_AX]) &&
+                    (a->vector[Z_AX] == b->vector[Z_AX]);
             } break;
             case OP_EQ_S:       c->_float = !strcmp(PR_GetQString(a->string), PR_GetQString(b->string));    break;
             case OP_EQ_E:       c->_float = (a->_int == b->_int);                   break;
@@ -325,9 +305,9 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_NE_F:       c->_float = a->_float != b->_float;                 break;
             case OP_NE_V: {
                 c->_float =
-                    (a->vector[0] != b->vector[0]) ||
-                    (a->vector[1] != b->vector[1]) ||
-                    (a->vector[2] != b->vector[2]);
+                    (a->vector[X_AX] != b->vector[X_AX]) ||
+                    (a->vector[Y_AX] != b->vector[Y_AX]) ||
+                    (a->vector[Z_AX] != b->vector[Z_AX]);
             } break;
             case OP_NE_S:       c->_float = (float)strcmp(PR_GetQString(a->string), PR_GetQString(b->string));   break;
             case OP_NE_E:       c->_float = a->_int != b->_int;         break;
@@ -359,9 +339,9 @@ void PR_ExecuteProgram(func_t fnum) {
                 ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
                 a = (eval_p)((int32_p)&ed->v + b->_int);
-                c->vector[0] = a->vector[0];
-                c->vector[1] = a->vector[1];
-                c->vector[2] = a->vector[2];
+                c->vector[X_AX] = a->vector[X_AX];
+                c->vector[Y_AX] = a->vector[Y_AX];
+                c->vector[Z_AX] = a->vector[Z_AX];
             } break;
 
             case OP_ADDRESS: {
@@ -387,9 +367,9 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_STORE_FLD:  // integers
             case OP_STORE_FNC:  b->_int = a->_int;  break;  // pointers
             case OP_STORE_V: {
-                b->vector[0] = a->vector[0];
-                b->vector[1] = a->vector[1];
-                b->vector[2] = a->vector[2];
+                b->vector[X_AX] = a->vector[X_AX];
+                b->vector[Y_AX] = a->vector[Y_AX];
+                b->vector[Z_AX] = a->vector[Z_AX];
             } break;
 
             case OP_STOREP_F:
@@ -402,15 +382,15 @@ void PR_ExecuteProgram(func_t fnum) {
             } break;
             case OP_STOREP_V: {
                 eval_p ptr = (eval_p)((uint8_p)Edicts + b->_int);
-                ptr->vector[0] = a->vector[0];
-                ptr->vector[1] = a->vector[1];
-                ptr->vector[2] = a->vector[2];
+                ptr->vector[X_AX] = a->vector[X_AX];
+                ptr->vector[Y_AX] = a->vector[Y_AX];
+                ptr->vector[Z_AX] = a->vector[Z_AX];
             } break;
 
             //==================
 
             case OP_NOT_F:      c->_float = !a->_float;     break;
-            case OP_NOT_V:      c->_float = !a->vector[0] && !a->vector[1] && !a->vector[2];    break;
+            case OP_NOT_V:      c->_float = !a->vector[X_AX] && !a->vector[Y_AX] && !a->vector[Z_AX];    break;
             case OP_NOT_S:      c->_float = !a->string || !*PR_GetQString(a->string);           break;        // c->_float = !a->string || !pr_strings[a->string];
             case OP_NOT_ENT:    c->_float = (ED_GetEDictByOffs(a->edict) == Edicts);             break;
             case OP_NOT_FNC:    c->_float = !a->function;   break;

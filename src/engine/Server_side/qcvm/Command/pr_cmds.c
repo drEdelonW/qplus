@@ -797,9 +797,9 @@ void PF_vtos() {
     snprintf(
         _pr_string_temp, sizeof(_pr_string_temp),
         "'%5.1f %5.1f %5.1f'",
-        G_VECTOR(OFS_PARM0)[0],
-        G_VECTOR(OFS_PARM0)[1],
-        G_VECTOR(OFS_PARM0)[2]
+        G_VECTOR(OFS_PARM0)[X_AX],
+        G_VECTOR(OFS_PARM0)[Y_AX],
+        G_VECTOR(OFS_PARM0)[Z_AX]
     );
     G_INT(OFS_RETURN) = PR_SetQString(_pr_string_temp);
 }
