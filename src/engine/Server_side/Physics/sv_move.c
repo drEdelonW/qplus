@@ -378,7 +378,7 @@ void SV_MoveToGoal() {
     float dist = G_FLOAT(OFS_PARM0);
 
     if (!((int)ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM))) {
-        G_FLOAT(OFS_RETURN) = 0;
+        PR_Freturn 0;
         return;
     }
 
