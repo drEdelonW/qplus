@@ -72,7 +72,7 @@
         { "text": "catch exec" }
       ]
     },{
-      "name": "Launch local quakeX11",
+      "name": "Launch local quakeX11:1",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/GNU_MAKE/run_env/quakeX11",
@@ -87,6 +87,25 @@
           "value": ":1"
         }
       ],
+      "sourceFileMap": {
+        "/home/edelon/SelfLab/quake": "${workspaceFolder}"
+      }
+    },{
+      "name": "Launch local quakeX11",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/GNU_MAKE/run_env/quakeX11",
+      "args": [],
+      "cwd": "${workspaceFolder}/GNU_MAKE/run_env",
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb-multiarch",
+      "stopAtEntry": false,
+      // "environment": [
+      //   {
+      //     "name": "DISPLAY",
+      //     "value": ":1"
+      //   }
+      // ],
       "sourceFileMap": {
         "/home/edelon/SelfLab/quake": "${workspaceFolder}"
       }
