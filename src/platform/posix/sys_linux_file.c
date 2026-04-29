@@ -8,6 +8,7 @@
 
 #include "sys.h"
 #include "client.h"
+#include "host.h"
 
 
 cString Sys_ConsoleInput() {
