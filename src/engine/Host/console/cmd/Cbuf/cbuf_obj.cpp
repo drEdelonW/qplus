@@ -1,7 +1,6 @@
 #include "cbuf.hpp"
 #include "cmd.h"
 
-#include "sizebuf.h"
 #include <string.h>
 #include "q_tools.h"
 #include "zone.h"
