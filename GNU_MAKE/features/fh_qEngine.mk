@@ -140,9 +140,9 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                                 SRC_LIST += $(RENDER_DIR)/r_part.c
                                 SRC_LIST += $(RENDER_DIR)/r_vars.c
 
-                        $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
-                                SRC_LIST += $(UI_DIR)/screen.c
-                                SRC_LIST += $(UI_DIR)/view.c
+                $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
+                        SRC_LIST += $(UI_DIR)/screen.c
+                        SRC_LIST += $(UI_DIR)/view.c
 
 
 
@@ -153,11 +153,12 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                                 SRC_LIST += $(MSG_DIR)/msg_cWrap.cpp
                                 SRC_LIST += $(MSG_DIR)/msg_obj.cpp
 
-
                         SRC_LIST += $(NET_DIR)/net_main.c
                         SRC_LIST += $(NET_DIR)/net_dgrm.c
                         SRC_LIST += $(NET_DIR)/net_loop.c
                         SRC_LIST += $(NET_DIR)/net_vcr.c
+
+
                 $(eval MATH_DIR = $(SHARED_DIR)/math) $(eval INCLUDES += $(MATH_DIR))
                         SRC_LIST += $(MATH_DIR)/mathlib.c
                         SRC_LIST += $(MATH_DIR)/Vector3d.cpp
