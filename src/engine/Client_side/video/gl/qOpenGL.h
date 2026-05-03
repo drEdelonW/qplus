@@ -12,6 +12,8 @@
 #include "render.h"
 
 #include "glquake.h"
+#include "Model_st.h"
+#include "Alias.h"
 
 #define MAXHEIGHT  1024
 #define MAXWIDTH  1280
@@ -28,3 +30,6 @@ void R_RenderDlights();
 void R_DrawParticles();
 void R_DrawWaterSurfaces();
 void R_RenderBrushPoly(mSurface_p fa);
+void R_InitSky(Texture_p mt);
+void GL_SubdivideSurface(mSurface_p fa);
+void GL_MakeAliasModelDisplayLists(Model_p m, AliasHdr_p hdr);

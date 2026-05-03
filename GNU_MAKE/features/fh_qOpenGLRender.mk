@@ -37,3 +37,7 @@ DEFINES += GLQUAKE
 #                                 SRC_LIST += $(RENDER_DIR)/r_surf.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_part.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_vars.c
+
+        $(eval SHARED_DIR = $(ENG_DIR)/Shared) $(eval INCLUDES += $(SHARED_DIR))
+                $(eval AST_DIR = $(SHARED_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
+                        $(eval MDL_DIR = $(AST_DIR)/model) $(eval INCLUDES += $(MDL_DIR))
