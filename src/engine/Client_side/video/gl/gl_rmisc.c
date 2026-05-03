@@ -18,8 +18,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // r_misc.c
-
-
+#include "qOpenGL.h"
+#include "angles_indices.h"
+#include "common.h"
+#include "console.h"
+#include "cmd.h"
+#include "client.h"
+#include "model.h"
+#include "q_tools.h"
+#include "host.h"
+#include <string.h>
+extern cvar_t gl_finish;
 
 /*
 ==================
@@ -92,7 +101,7 @@ Grab six views for environment mapping tests
 */
 void R_Envmap_f(void) {
     uint8_t buffer[256 * 256 * 4];
-    char name[1024];
+    // char name[1024];
 
     glDrawBuffer(GL_FRONT);
     glReadBuffer(GL_FRONT);
