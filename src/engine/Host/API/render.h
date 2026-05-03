@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //=============================================================================
 
-
+// it was [entity_t] on render side
 typedef struct Model_s Model_t;
 typedef Model_t* Model_p;
 struct r_Entity_s {

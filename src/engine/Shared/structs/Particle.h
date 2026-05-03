@@ -15,6 +15,7 @@ typedef enum {
     pt_blob2
 } ParticleType_t;
 
+// it was [particle_t]
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct Particle_s Particle_t;
 typedef Particle_t* Particle_p;

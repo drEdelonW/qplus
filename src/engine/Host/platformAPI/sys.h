@@ -51,7 +51,7 @@ extern "C" {
     // system IO
     //
     void Sys_DebugLog(cStringRO file, cStringRO fmt, ...);
-    void Sys_Error(cStringRO error, ...);   // an error will cause the entire program to exit
+    Q_NORETURN void Sys_Error(cStringRO error, ...);   // an error will cause the entire program to exit
     void Sys_Printf(cStringRO fmt, ...);    // send text to the console
 
     void Sys_Quit();

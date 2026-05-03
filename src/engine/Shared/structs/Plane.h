@@ -3,6 +3,7 @@
 #include "types.h"
 #include "vector.h"
 
+// it was [mplane_t]
 // Plane_t structure
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
 typedef struct mPlane_s {

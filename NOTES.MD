@@ -56,3 +56,17 @@ export SDL_RENDER_DRIVER=opengles2     # рендерер SDL через GLES2
 OUTPUT/testSDL2/testSDL2.elf
 
 JackHummer - map editor in Steam
+
+# OpenGL files
+    vid_svgalib.c / vid_x.c -> gl_vidlinux.c / gl_vidlinuxglx.c
+    screen.c        -> gl_screen.c
+    [V] draw.c      -> gl_draw.c
+
+    model.c         -> gl_model.c / gl_mesh.c
+
+    r_main.c        -> gl_rmain.c
+    r_misc.c        -> gl_rmisc.c
+    r_surf.c        -> gl_rsurf.c
+    r_light.c       -> gl_rlight.c
+    r_efrag.c       -> gl_refrag.c
+    r_sky.c + d_sky.c       -> gl_warp.c частично

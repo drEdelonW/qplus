@@ -3,6 +3,10 @@
 #include "types.h"
 #include "Texture.h"
 
+struct Texture_s;
+typedef struct Texture_s Texture_t;
+typedef Texture_t* Texture_p;
+
 typedef struct {
     float   vecs[2][4];
     float  mipadjust;

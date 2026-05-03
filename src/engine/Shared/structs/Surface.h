@@ -31,6 +31,8 @@ struct glpoly_s {
 } ;
 #endif
 
+#include "Surface_pre.h"
+// it was [msurface_t]
 typedef struct mSurface_s {
     int32_t visframe;  // should be drawn when node is crossed
     int32_t dlightframe;
@@ -63,6 +65,8 @@ typedef mSurface_t* mSurface_p;
 typedef mSurface_p* mSurface_ar;
 
 #include "vid.h"  //    pixel_p
+// it was [drawsurf_t]
+#include "Texture_pre.h"
 typedef struct {
     pixel_p     surfdat;                // destination for generated surface
     int         rowbytes;               // destination logical width in bytes

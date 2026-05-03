@@ -4,6 +4,23 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+
+#if defined(__cplusplus)
+    #define Q_NORETURN [[noreturn]]
+#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+    #define Q_NORETURN _Noreturn
+#elif defined(__GNUC__) || defined(__clang__)
+    #define Q_NORETURN __attribute__((noreturn))
+#elif defined(_MSC_VER)
+    #define Q_NORETURN __declspec(noreturn)
+#else
+    #define Q_NORETURN
+#endif
+
+
+typedef uint8_t byte;
+// typedef bool qboolean;
+
 typedef char* cString;
 typedef char** cStringArray;
 typedef const char* cStringRO;  // read-only
