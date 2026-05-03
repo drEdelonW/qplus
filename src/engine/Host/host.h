@@ -27,7 +27,7 @@ extern "C" {
     void Host_Shutdown();
     void Host_Printf(cStringRO fmt, ...);
     void Host_Error(cString error, ...);
-    void Host_SysError(cStringRO error, ...);
+    Q_NORETURN void Host_SysError(cStringRO error, ...);
     void Host_EndGame(cString message, ...);
     void Host_Frame(float time);
     void Host_Quit_f();

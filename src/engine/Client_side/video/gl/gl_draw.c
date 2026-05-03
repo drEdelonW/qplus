@@ -18,6 +18,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include "draw.h"
+#include "qOpenGL.h"
+#include "versions.h"
+#include "cvar.h"
+#include "platformdefs.h"
+#include "console.h"
+#include "host.h"
+#include "wad.h"
+#include "common.h"
+#include "cmd.h"
+#include "q_tools.h"
+#include <string.h>
+#include "sbar.h"
+
 
 // draw.c -- this is the only file outside the refresh that touches the
 // vid buffer
@@ -105,17 +118,18 @@ int   scrap_texnum;
 
 // returns a texture number and the position inside it
 int Scrap_AllocBlock(int w, int h, int* x, int* y) {
-    int  i, j;
-    int  best, best2;
-    int  bestx;
-    int  texnum;
+    // int  i, j;
+    // int  best, best2;
+    // int  bestx;
+    // int  texnum;
 
-    for (texnum = 0; texnum < MAX_SCRAPS; texnum++) {
-        best = BLOCK_HEIGHT;
+    for (int texnum = 0; texnum < MAX_SCRAPS; texnum++) {
+        int best = BLOCK_HEIGHT;
 
-        for (i = 0; i < BLOCK_WIDTH - w; i++) {
-            best2 = 0;
+        for (int i = 0; i < BLOCK_WIDTH - w; i++) {
+            int best2 = 0;
 
+            int j;
             for (j = 0; j < w; j++) {
                 if (scrap_allocated[texnum][i + j] >= best)
                     break;
@@ -131,7 +145,7 @@ int Scrap_AllocBlock(int w, int h, int* x, int* y) {
         if (best + h > BLOCK_HEIGHT)
             continue;
 
-        for (i = 0; i < w; i++)
+        for (int i = 0; i < w; i++)
             scrap_allocated[texnum][*x + i] = best + h;
 
         return texnum;
@@ -141,7 +155,7 @@ int Scrap_AllocBlock(int w, int h, int* x, int* y) {
 }
 
 int scrap_uploads;
-
+void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha);
 void Scrap_Upload(void) {
     int  texnum;
 
@@ -173,7 +187,9 @@ byte  menuplyr_pixels[4096];
 int  pic_texels;
 int  pic_count;
 
-qPic_p Draw_PicFromWad(cString name) {
+int GL_LoadPicTexture(qPic_p pic);
+
+qPic_p Draw_PicFromWad(cStringRO name) {
     qPic_p p;
     glpic_p gl;
 
@@ -218,7 +234,7 @@ qPic_p Draw_PicFromWad(cString name) {
 Draw_CachePic
 ================
 */
-qPic_p Draw_CachePic(cString path) {
+qPic_p Draw_CachePic(cStringRO path) {
     cachepic_p pic;
     int   i;
     qPic_p dat;
@@ -347,13 +363,13 @@ Draw_Init
 void Draw_Init(void) {
     int  i;
     qPic_p cb;
-    uint8_p dest, src;
+    uint8_p dest;//, src;
     int  x, y;
     char ver[40];
     glpic_p gl;
     int  start;
     uint8_p ncdata;
-    int  f, fstep;
+    // int  f, fstep;
 
 
     Cvar_RegisterVariable(&gl_nobind);
@@ -502,7 +518,7 @@ void Draw_Character(int x, int y, int num) {
 Draw_String
 ================
 */
-void Draw_String(int x, int y, cString str) {
+void Draw_String(int x, int y, cStringRO str) {
     while (*str) {
         Draw_Character(x, y, *str);
         str++;
@@ -608,7 +624,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
 
     GL_Bind(translate_texture);
 
-    int c = pic->width * pic->height;
+    // int c = pic->width * pic->height;
 
     uint32_p dest = trans;
     for (int v = 0; v < 64; v++, dest += 64) {
@@ -974,8 +990,6 @@ done:;
 void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha) {
     int   i, s;
     bool noalpha;
-    int   p;
-    int   samples;
     static uint8_t _scaled[1024 * 512]; // [512*256];
     int   scaled_width, scaled_height;
 
@@ -1006,7 +1020,7 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
     if (scaled_width * scaled_height > sizeof(_scaled))
         Host_SysError("GL_LoadTexture: too big");
 
-    samples = 1; // alpha ? gl_alpha_format : gl_solid_format;
+    // int samples = 1; // alpha ? gl_alpha_format : gl_solid_format;
 
     texels += scaled_width * scaled_height;
 
@@ -1100,7 +1114,7 @@ GL_LoadTexture
 ================
 */
 int GL_LoadTexture(cString identifier, int width, int height, uint8_p data, bool mipmap, bool alpha) {
-    int   i, p, s;
+    int   i; //, p, s;
     glTexture_p glt;
 
     // see if the texture is allready present

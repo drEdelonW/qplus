@@ -2,7 +2,11 @@
 
 #include "types.h"
 #include "enginedefs.h"
+#ifdef GLQUAKE
+#   include "Surface.h"
+#endif
 
+// it was [texture_t]
 typedef struct Texture_s Texture_t;
 typedef Texture_t* Texture_p;
 struct Texture_s {
@@ -18,3 +22,6 @@ struct Texture_s {
     Texture_p   alternate_anims; // bmodels in frmae 1 use these
     uint32_t    offsets[MIPLEVELS];  // four mip maps stored
 };
+
+Texture_p R_TextureAnimation(Texture_p base);
+

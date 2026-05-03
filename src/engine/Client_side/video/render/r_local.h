@@ -20,6 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_local.h -- private refresh defs
 
+#ifdef GLQUAKE
+#   error GLQUAKE defined
+#endif
+
 #ifndef GLQUAKE
 #include "r_shared.h"
 #include "client.h"
@@ -108,7 +112,6 @@ void R_TransformFrustum();
 void R_SetSkyFrame();
 void R_DrawSurfaceBlock16();
 void R_DrawSurfaceBlock8();
-Texture_p R_TextureAnimation(Texture_p base);
 
 #if id386
 
