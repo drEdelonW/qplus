@@ -29,11 +29,16 @@ ALIAS MODEL DISPLAY LIST GENERATION
 */
 #include "Model_st.h"
 #include "Alias.h"
+#include "model.h"
+#include "console.h"
+#include "common.h"
+#include <string.h>
 
 Model_p aliasmodel;
 AliasHdr_p paliashdr;
 
-bool used[8192];
+// bool
+int used[8192];
 
 // the command list holds counts and s/t values that are valid for
 // every frame
@@ -72,8 +77,9 @@ int StripLength(int starttri, int startv) {
     int m2 = last->vertindex[(startv + 1) % 3];
 
     // look for a matching triangle
+    mTriangle_p check;
 nexttri:
-    mTriangle_p check = &triangles[starttri + 1];
+    check = &triangles[starttri + 1];
     for (int j = starttri + 1; j < pheader->numtris; j++, check++) {
         if (check->facesfront != last->facesfront)  continue;
         for (int k = 0; k < 3; k++) {

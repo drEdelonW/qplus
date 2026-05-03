@@ -13,7 +13,8 @@ typedef enum {
     SURF_DRAWSPRITE     = 1u << 3, // 0x08
     SURF_DRAWTURB       = 1u << 4, // 0x10
     SURF_DRAWTILED      = 1u << 5, // 0x20
-    SURF_DRAWBACKGROUND = 1u << 6  // 0x40
+    SURF_DRAWBACKGROUND = 1u << 6, // 0x40
+    SURF_UNDERWATER     = 1u << 7  // 0x80  for GLQUAKE
 } SurfaceFlags_e;
 
 #ifdef GLQUAKE

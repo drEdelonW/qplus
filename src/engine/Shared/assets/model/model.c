@@ -298,7 +298,7 @@ Mod_LoadTextures
 void Mod_LoadTextures(Lump_p l) {
     if (!l->fileLen) { _loadModel->textures = NULL; return; }
 
-    dmiptexlump_p m = (dmiptexlump_p)(mod_base + l->fileOfs);
+    dMipTexLump_p m = (dMipTexLump_p)(mod_base + l->fileOfs);
 
     m->nummiptex = LittleLong(m->nummiptex);
 

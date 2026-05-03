@@ -21,8 +21,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // models are the only shared resource between a client and server running
 // on the same machine.
-#include "gl_model.h"
+// #include "gl_model.h"
+#include "model.h"
+#include "qOpenGL.h"
 #include "types.h"
+#include "bspfile.h"
+#include "cvar.h"
+#include <string.h>
+#include "host.h"
+#include "common.h"
+#include "endian_tools.h"
+#include "spritegn.h"
+#include "q_tools.h"
+#include "mathlib.h"
+#include "Surface.h"
+#include "Sprite.h"
+#include "console.h"
 
 
 Model_p loadmodel;
@@ -855,7 +869,7 @@ Mod_LoadClipnodes
 void Mod_LoadClipnodes(Lump_p l) {
     dClipNode_p in, out;
     int   i, count;
-    Hull_t hull;
+    Hull_p hull;
 
     in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))
@@ -908,7 +922,7 @@ void Mod_MakeHull0(void) {
     mNode_p in, child;
     dClipNode_p out;
     int   i, j, count;
-    Hull_t hull;
+    Hull_p hull;
 
     hull = &loadmodel->hulls[0];
 
@@ -1139,8 +1153,8 @@ Mod_LoadAliasFrame
 =================
 */
 TypeLess_ptr Mod_LoadAliasFrame(TypeLess_ptr pin, mAliasFrameDesc_p frame) {
-    TriVertx_p pframe, pinframe;
-    int    i, j;
+    TriVertx_p pinframe;
+    // int    i, j;
     dAliasFrame_p pdaliasframe;
 
     pdaliasframe = (dAliasFrame_p)pin;
@@ -1149,7 +1163,7 @@ TypeLess_ptr Mod_LoadAliasFrame(TypeLess_ptr pin, mAliasFrameDesc_p frame) {
     frame->firstpose = posenum;
     frame->numposes = 1;
 
-    for (i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         // these are byte values, so we don't have to worry about
         // endianness
         frame->bboxmin.v[i] = pdaliasframe->bboxmin.v[i];
@@ -1290,7 +1304,7 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
     int  i, j, k;
     char name[32];
     int  s;
-    uint8_p copy;
+    // uint8_p copy;
     uint8_p skin;
     uint8_p texels;
     dAliasSkinGroup_p pinskingroup;
@@ -1367,7 +1381,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     Mdl_p   pinmodel;
     stvert_p pinstverts;
     dTriangle_p pintriangles;
-    int     version, numframes, numskins;
+    int     version, numframes; //, numskins;
     int     size;
     dAliasFrameType_p pframetype;
     dAliasSkinType_p pskintype;
@@ -1523,9 +1537,9 @@ Mod_LoadSpriteFrame
 TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_p* ppframe, int framenum) {
     dSpriteFrame_p pinframe;
     mSpriteFrame_p pspriteframe;
-    int     i, width, height, size, origin[2];
-    uint16_p ppixout;
-    uint8_p ppixin;
+    int     width, height, size, origin[2];
+    // uint16_p ppixout;
+    // uint8_p ppixin;
     char    name[NAME_LENGTH];
 
     pinframe = (dSpriteFrame_p)pin;

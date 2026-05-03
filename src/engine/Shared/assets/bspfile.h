@@ -65,7 +65,7 @@ typedef struct {
     int32_t nummiptex;
     int32_t dataofs[4]; // [nummiptex]
 } dMipTexLump_t;
-typedef dMipTexLump_t* dmiptexlump_p;
+typedef dMipTexLump_t* dMipTexLump_p;
 
 
 typedef struct MipTex_s {
