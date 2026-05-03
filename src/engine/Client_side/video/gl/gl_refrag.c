@@ -19,6 +19,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_efrag.c
 
+#include "Node.h"
+#include "eFrag.h"
+#include "qOpenGL.h"
+#include "client.h"
+#include "bspfile.h"
+#include "host.h"
+#include "console.h"
+#include "world.h"
+
 
 mNode_p r_pefragtopnode;
 
@@ -35,7 +44,7 @@ mNode_p r_pefragtopnode;
 
 efrag_ar 	lastlink;
 vec3_t		r_emins, r_emaxs;
-Entity_p 	r_addent;
+r_Entity_p 	r_addent;
 
 
 /*
@@ -45,7 +54,7 @@ R_RemoveEfrags
 Call when removing an object from the world or moving it to another position
 ================
 */
-void R_RemoveEfrags(Entity_p ent) {
+void R_RemoveEfrags(r_Entity_p ent) {
     efrag_p ef = ent->efrag;
 
     while (ef) {
@@ -146,7 +155,7 @@ void R_SplitEntityOnNode(mNode_p node) {
 R_AddEfrags
 ===========
 */
-void R_AddEfrags(Entity_p ent) {
+void R_AddEfrags(r_Entity_p ent) {
     Model_p entmodel;
     int			i;
 
@@ -181,7 +190,7 @@ R_StoreEfrags
 void R_StoreEfrags(efrag_ar ppefrag) {
     efrag_p pefrag;
     while ((pefrag = *ppefrag) != NULL) {
-        Entity_p pent = pefrag->entity;
+        r_Entity_p pent = pefrag->entity;
         Model_p clmodel = pent->model;
 
         switch (clmodel->type) {

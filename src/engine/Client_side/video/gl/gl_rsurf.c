@@ -18,7 +18,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // r_surf.c: surface-related refresh code
-
+#include "types.h"
+#include "qOpenGL.h"
+#include "Surface.h"
+#include "client.h"
+#include "mathlib.h"
+#include "host.h"
+#include "model.h"
+#include "common.h"
+#include <string.h>
 
 int			skytexturenum;
 
@@ -42,6 +50,7 @@ int			active_lightmaps;
 typedef struct glRect_s {
 	uint8_t l, t, w, h;
 } glRect_t;
+typedef glRect_t* glRect_p;
 
 glpoly_p lightmap_polys[MAX_LIGHTMAPS];
 bool	lightmap_modified[MAX_LIGHTMAPS];
@@ -136,7 +145,7 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
 	byte* lightmap;
 	uint32_t	scale;
 	int			maps;
-	int			lightadj[4];
+	// int			lightadj[4];
 	uint32_p bl;
 
 	surf->cached_dlight = (surf->dlightframe == r_framecount);
@@ -384,9 +393,9 @@ void R_DrawSequentialPoly(mSurface_p s) {
 	float_p v;
 	int			i;
 	Texture_p t;
-	vec3_t		nv, dir;
-	float		ss, ss2, length;
-	float		s1, t1;
+	vec3_t		nv;//, dir;
+	// float		ss, ss2, length;
+	// float		s1, t1;
 	glRect_p theRect;
 
 	//
@@ -557,7 +566,7 @@ Warp the vertex coordinates
 void DrawGLWaterPoly(glpoly_p p) {
 	int		i;
 	float_p v;
-	float	s, t, os, ot;
+	// float	s, t, os, ot;
 	vec3_t	nv;
 
 	GL_DisableMultitexture();
@@ -579,7 +588,7 @@ void DrawGLWaterPoly(glpoly_p p) {
 void DrawGLWaterPolyLightmap(glpoly_p p) {
 	int		i;
 	float_p v;
-	float	s, t, os, ot;
+	// float	s, t, os, ot;
 	vec3_t	nv;
 
 	GL_DisableMultitexture();
@@ -775,7 +784,7 @@ Multitexture
 ================
 */
 void R_RenderDynamicLightmaps(mSurface_p fa) {
-	Texture_p t;
+	// Texture_p t;
 	byte* base;
 	int			maps;
 	glRect_p theRect;
@@ -1007,10 +1016,10 @@ void DrawTextureChains(void) {
 R_DrawBrushModel
 =================
 */
-void R_DrawBrushModel(Entity_p e) {
-	int			j, k;
+void R_DrawBrushModel(r_Entity_p e) {
+	int			k;
 	vec3_t		mins, maxs;
-	int			i, numsurfaces;
+	int			i;//, numsurfaces;
 	mSurface_p psurf;
 	float		dot;
 	mPlane_p pplane;
@@ -1111,14 +1120,14 @@ R_RecursiveWorldNode
 ================
 */
 void R_RecursiveWorldNode(mNode_p node) {
-	int			i, c, side;
-	int* pindex;
-	vec3_t		acceptpt, rejectpt;
+	int			c, side;
+	// int* pindex;
+	// vec3_t		acceptpt, rejectpt;
 	mPlane_p plane;
 	mSurface_p surf, * mark; // TODO: check
 	mLeaf_p pleaf;
-	double		d, dot;
-	vec3_t		mins, maxs;
+	double		dot;
+	// vec3_t		mins, maxs;
 
 	if (node->contents == CONTENTS_SOLID)
 		return;		// solid
@@ -1232,8 +1241,8 @@ R_DrawWorld
 =============
 */
 void R_DrawWorld(void) {
-	Entity_t	ent;
-	int			i;
+	r_Entity_t	ent;
+	// int			i;
 
 	memset(&ent, 0, sizeof(ent));
 	ent.model = cl.worldmodel;
@@ -1315,7 +1324,7 @@ void R_MarkLeaves(void) {
 int AllocBlock(int w, int h, int* x, int* y) {
 	int		i, j;
 	int		best, best2;
-	int		bestx;
+	// int		bestx;
 	int		texnum;
 
 	for (texnum = 0; texnum < MAX_LIGHTMAPS; texnum++) {
@@ -1360,14 +1369,14 @@ BuildSurfaceDisplayList
 ================
 */
 void BuildSurfaceDisplayList(mSurface_p fa) {
-	int			i, lindex, lnumverts, s_axis, t_axis;
-	float		dist, lastdist, lzi, scale, u, v, frac;
-	uint32_t	mask;
-	vec3_t		local, transformed;
+	int			i, lindex, lnumverts;//, s_axis, t_axis;
+	// float		dist, lastdist, lzi, scale, u, v, frac;
+	// uint32_t	mask;
+	// vec3_t		local, transformed;
 	mEdge_p pedges, r_pedge;
-	mPlane_p pplane;
-	int			vertpage, newverts, newpage, lastvert;
-	bool	visible;
+	// mPlane_p pplane;
+	// int			vertpage, newverts, newpage, lastvert;
+	// bool	visible;
 	float_p vec;
 	float		s, t;
 	glpoly_p poly;
@@ -1375,7 +1384,7 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
 	// reconstruct the polygon
 	pedges = currentmodel->edges;
 	lnumverts = fa->numedges;
-	vertpage = 0;
+	// vertpage = 0;
 
 	//
 	// draw texture
@@ -1432,8 +1441,8 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
 	if (!gl_keeptjunctions.value && !(fa->flags & SURF_UNDERWATER)) {
 		for (i = 0; i < lnumverts; ++i) {
 			vec3_t v1, v2;
-			float_p prev, * this, * next;
-			float f;
+			float_p prev, this, next;
+			// float f;
 
 			prev = poly->verts[(i + lnumverts - 1) % lnumverts];
 			this = poly->verts[i];
@@ -1472,7 +1481,7 @@ GL_CreateSurfaceLightmap
 ========================
 */
 void GL_CreateSurfaceLightmap(mSurface_p surf) {
-	int		smax, tmax, s, t, l, i;
+	int		smax, tmax;//, s, t, l, i;
 	byte* base;
 
 	if (surf->flags & (SURF_DRAWSKY | SURF_DRAWTURB))

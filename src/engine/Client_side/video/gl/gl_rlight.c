@@ -18,7 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // r_light.c
-
+#include "qOpenGL.h"
+#include "client.h"
+#include "view.h"
+#include "mathlib.h"
 
 int	r_dlightframecount;
 

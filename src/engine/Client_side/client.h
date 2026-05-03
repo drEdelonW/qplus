@@ -69,7 +69,7 @@ typedef enum cshift_kind_e {
 //
 
 #define SIGNONS  4   // signon messages to receive before connected
-
+#if 0
 typedef struct {
     vec3_t  origin;
     float   radius;
@@ -82,7 +82,9 @@ typedef struct {
 #endif
 } dLight_t;
 typedef dLight_t* dLight_p;
-
+#else
+#   include "Light.h"
+#endif
 
 #define MAX_BEAMS 24
 typedef struct {

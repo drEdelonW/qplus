@@ -67,7 +67,25 @@ console is:
 
 
 */
-
+#include "qOpenGL.h"
+#include "screen.h"
+#include "cvar.h"
+#include "qPic.h"
+#include "vid.h"
+#include <string.h>
+#include "client.h"
+#include "host.h"
+#include "draw.h"
+#include "mathlib.h"
+#include "sbar.h"
+#include "cmd.h"
+#include "console.h"
+#include "common.h"
+#include "sys.h"
+#include "sound.h"
+#include "menu.h"
+#include "cvar_q1.h"
+#include <stdlib.h>
 
 int			glx, gly, glwidth, glheight;
 
@@ -467,9 +485,9 @@ void SCR_SetUpToDrawConsole(void) {
         return;		// never a console with loading plaque
 
     // decide on the height of the console
-    con_forcedup = !cl.worldmodel || cls.signon != SIGNONS;
+    con.forcedup = !cl.worldmodel || cls.signon != SIGNONS;
 
-    if (con_forcedup) {
+    if (con.forcedup) {
         scr_conlines = vid.height;		// full screen
         scr_con_current = scr_conlines;
     }
@@ -496,7 +514,7 @@ void SCR_SetUpToDrawConsole(void) {
     else if (clearnotify++ < vid.numpages) {
     }
     else
-        con_notifylines = 0;
+        con.notifylines = 0;
 }
 
 /*
@@ -540,7 +558,8 @@ SCR_ScreenShot_f
 ==================
 */
 void SCR_ScreenShot_f(void) {
-    byte* buffer;
+    // byte* buffer;
+    uint8_p buffer;
     char		pcxname[80];
     char		checkname[MAX_OSPATH];
     int			i, c, temp;
@@ -758,8 +777,6 @@ needs almost the entire 256k of stack space!
 ==================
 */
 void SCR_UpdateScreen(void) {
-    static float	oldscr_viewsize;
-
     if (block_drawing)
         return;
 
@@ -776,7 +793,7 @@ void SCR_UpdateScreen(void) {
         else    return;
     }
 
-    if (!scr_initialized || !con_initialized)
+    if (!scr_initialized || !con.isInitialized)
         return;				// not initialized yet
 
 

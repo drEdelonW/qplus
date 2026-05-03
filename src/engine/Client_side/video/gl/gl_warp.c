@@ -18,8 +18,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // gl_warp.c -- sky and water polygons
+#include "qOpenGL.h"
+#include "host.h"
+#include "mathlib.h"
 
-
+extern cvar_t gl_subdivide_size;
 
 int  skytexturenum;
 
@@ -126,7 +129,7 @@ can be done reasonably.
 void GL_SubdivideSurface(mSurface_p fa) {
     vec3_t  verts[64];
     float_p vec;
-    Texture_p t;
+    // Texture_p t;
 
     warpface = fa;
 
@@ -195,7 +198,7 @@ EmitSkyPolys
 =============
 */
 void EmitSkyPolys(mSurface_p fa) {
-    for (glpoly_p = fa->polys; p; p = p->next) {
+    for (glpoly_p p = fa->polys; p; p = p->next) {
         glBegin(GL_POLYGON);
         float_p v = p->verts[0];
         for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
