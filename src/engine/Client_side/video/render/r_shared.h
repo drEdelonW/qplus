@@ -18,6 +18,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+#ifdef GLQUAKE
+#   error GLQUAKE defined
+#endif
+
 #ifndef GLQUAKE
 
 #include "cvar_q1.h"
@@ -68,6 +72,7 @@ extern float r_avertexnormals[NUMVERTEXNORMALS][3];
 #define MINSURFACES         NUMSTACKSURFACES
 #define MAXSPANS            (3000)
 
+#if 0
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct eSpan_s eSpan_t;
 typedef eSpan_t* eSpan_p;
@@ -77,6 +82,9 @@ struct eSpan_s {
     int     count;
     eSpan_p pnext;
 };
+#else
+#include "Snap.h"
+#endif
 
 typedef enum {
     invSpan     = -1,   // = in inverted span (end before start)

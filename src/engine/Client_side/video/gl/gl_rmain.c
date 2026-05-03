@@ -19,13 +19,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_main.c
 #include "qOpenGL.h"
+#include "world.h"
+#include "Sprite.h"
+#include "console.h"
+#include "client.h"
+#include "angle.h"
+#include "Alias.h"
+#include <string.h>
+#include "mathlib.h"
+#include "model.h"
+#include "cvar_q1.h"
+#include "gamedefs.h"
+#include "view.h"
+#include "sound.h"
+#include "host.h"
 
-Entity_t r_worldentity;
+r_Entity_t r_worldentity; // was Entity_t
 
 bool r_cache_thrash;  // compatability
 
 vec3_t  modelorg, r_entorigin;
-Entity_p currententity;
+r_Entity_p currententity;
 int   r_visframecount; // bumped when going to a new PVS
 int   r_framecount;  // used for dlight push checking
 mPlane_t frustum[4];
@@ -106,7 +120,7 @@ bool R_CullBox(vec3_t mins, vec3_t maxs) {
 }
 
 
-void R_RotateForEntity(Entity_p e) {
+void R_RotateForEntity(r_Entity_p e) {
     glTranslatef(e->origin[0], e->origin[1], e->origin[2]);
 
     glRotatef(e->angles[1], 0, 0, 1);
@@ -127,9 +141,10 @@ SPRITE MODELS
 R_GetSpriteFrame
 ================
 */
-mSpriteFrame_p R_GetSpriteFrame(Entity_p currententity) {
+mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) {
     mSpriteFrame_p pspriteframe;
-    float_p pintervals, fullinterval, targettime, time;
+    float_p pintervals;
+    float  fullinterval, targettime, time;
 
     mSprite_p psprite = currententity->model->cache.data;
     int frame = currententity->frame;
@@ -173,7 +188,7 @@ R_DrawSpriteModel
 
 =================
 */
-void R_DrawSpriteModel(Entity_p e) {
+void R_DrawSpriteModel(r_Entity_p e) {
     vec3_t point;
     mSpriteFrame_p frame;
     float_p up, right;
@@ -263,15 +278,16 @@ GL_DrawAliasFrame
 =============
 */
 void GL_DrawAliasFrame(AliasHdr_p paliashdr, int posenum) {
-    float s, t;
+    // float s, t;
     float  l;
-    int  i, j;
-    int  index;
-    TriVertx_p v, verts;
-    int  list;
+    // int  i, j;
+    // int  index;
+    // TriVertx_p v;
+    TriVertx_p verts;
+    // int  list;
     int* order;
-    vec3_t point;
-    float_p normal;
+    // vec3_t point;
+    // float_p normal;
     int  count;
 
     lastposenum = posenum;
@@ -316,14 +332,15 @@ GL_DrawAliasShadow
 */
 
 void GL_DrawAliasShadow(AliasHdr_p paliashdr, int posenum) {
-    float s, t, l;
-    int  i, j;
-    int  index;
-    TriVertx_p v, verts;
-    int  list;
+    // float s, t, l;
+    // int  i, j;
+    // int  index;
+    // TriVertx_p v;
+    TriVertx_p verts;
+    // int  list;
     int* order;
     vec3_t point;
-    float_p normal;
+    // float_p normal;
     float height, lheight;
     int  count;
 
@@ -407,17 +424,18 @@ R_DrawAliasModel
 
 =================
 */
-void R_DrawAliasModel(Entity_p e) {
-    int   i, j;
+void R_DrawAliasModel(r_Entity_p e) {
+    int   i; //, j;
     int   lnum;
     vec3_t  dist;
     float  add;
     Model_p clmodel;
     vec3_t  mins, maxs;
     AliasHdr_p paliashdr;
-    TriVertx_p verts, v;
-    int   index;
-    float  s, t, an;
+    // TriVertx_p verts, v;
+    // int   index;
+    // float  s, t,
+    float an;
     int   anim;
 
     clmodel = currententity->model;
@@ -587,6 +605,7 @@ void R_DrawEntitiesOnList(void) {
         currententity = cl_visedicts[i];
 
         switch (currententity->model->type) {
+        default: break;
         case mod_sprite:
             R_DrawSpriteModel(currententity);
             break;
@@ -754,9 +773,9 @@ R_SetupFrame
 ===============
 */
 void R_SetupFrame(void) {
-    int    edgecount;
-    vRect_t   vrect;
-    float   w, h;
+    // int    edgecount;
+    // vRect_t   vrect;
+    // float   w, h;
 
     // don't allow cheats in multiplayer
     if (cl.maxclients > 1)
@@ -807,8 +826,8 @@ R_SetupGL
 */
 void R_SetupGL(void) {
     float screenaspect;
-    float yfov;
-    int  i;
+    // float yfov;
+    // int  i;
     int  x, x2, y2, y, w, h;
 
     //
@@ -919,6 +938,7 @@ void R_RenderScene(void) {
 R_Clear
 =============
 */
+extern cvar_t   gl_ztrick;
 void R_Clear(void) {
     if (r_mirroralpha.value != 1.0) {
         if (gl_clear.value)
@@ -968,7 +988,7 @@ R_Mirror
 void R_Mirror(void) {
     float  d;
     mSurface_p s;
-    Entity_p ent;
+    r_Entity_p ent;
 
     if (!mirror)
         return;
@@ -1034,7 +1054,7 @@ r_refdef must be set before the first call
 */
 void R_RenderView(void) {
     double time1, time2;
-    GLfloat colors[4] = { (GLfloat)0.0, (GLfloat)0.0, (GLfloat)1, (GLfloat)0.20 };
+    // GLfloat colors[4] = { (GLfloat)0.0, (GLfloat)0.0, (GLfloat)1, (GLfloat)0.20 }; // fog color
 
     if (r_norefresh.value)
         return;

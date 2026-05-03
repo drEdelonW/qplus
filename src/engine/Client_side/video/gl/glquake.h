@@ -24,10 +24,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   error GLQUAKE not defined
 #endif
 
+#ifndef __APPLE__
 #pragma warning(disable : 4244)     // MIPS
 #pragma warning(disable : 4136)     // X86
 #pragma warning(disable : 4051)     // ALPHA
-  
+#endif
+
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -40,6 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   include <GL/gl.h>
 #   include <GL/glu.h>
 #endif
+// #include "cvar.h"
 
 
 

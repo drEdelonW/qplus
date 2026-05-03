@@ -35,6 +35,9 @@ extern "C" {
     void V_RenderView();
     float V_CalcRoll(vec3_t angles, vec3_t velocity);
     void V_UpdatePalette();
+#ifdef GLQUAKE
+    void V_CalcBlend();
+#endif
 
 #ifdef __cplusplus
 }

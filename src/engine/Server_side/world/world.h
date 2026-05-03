@@ -25,8 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "bspfile.h"
 #include "Model_st.h"
 #ifdef GLQUAKE
-#   include "gl_model.h"
-#   include "glquake.h"
+// #   include "gl_model.h"
+// #   include "glquake.h"
+#   include "qOpenGL.h"
 #else
 // #   include "model/model.h"
 #endif

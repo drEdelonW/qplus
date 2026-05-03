@@ -45,7 +45,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "menu.h"
 #include "sbar.h"
 #include "chase.h"
-#include "r_local.h"
+#ifndef GLQUAKE
+#   include "r_local.h"
+#else
+#   include "qOpenGL.h"
+#   include "client.h"
+#   include "cvar_q1.h"
+#   include "common.h"
+#endif
 #include "mathlib.h"
 #include "screen.h"
 #include "q_tools.h"
