@@ -26,6 +26,8 @@ extern int      alphaskytexture;
 extern float    speedscale;  // for top sky and bottom sky
 extern bool     isPermedia;
 extern Model_p  loadmodel;
+#define NUMVERTEXNORMALS 162
+extern float r_avertexnormals[NUMVERTEXNORMALS][3];
 
 
 bool VID_Is8bit();
