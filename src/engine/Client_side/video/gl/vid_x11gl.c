@@ -1,10 +1,11 @@
 #include "vid.h"
 #include "x_prv.h"
 #include "cvar.h"
-// #include "types.h"
+#include "qOpenGL.h"
+#include <GL/glx.h>
 
 bool gl_mtexable;
-char *gl_renderer;
+const char* gl_renderer;
 cvar_t gl_ztrick;
 
 float gldepthmin;
@@ -26,7 +27,8 @@ Display*    x_disp;
 Window      x_win;
 int         x_shmeventtype;
 
-void D_InitCaches(void *buffer, int size) {
+// it live in d_surf.c
+void D_InitCaches(TypeLess_ptr buffer, int size) {
     (void)buffer;
     (void)size;
 }
@@ -38,8 +40,13 @@ void GL_BeginRendering(int *x, int *y, int *width, int *height) {
     *height = vid.height;
 }
 
-void GL_EndRendering(void) {}
+void GL_EndRendering(void) {
+    glFlush();
+    glXSwapBuffers(x_disp, x_win);
+}
 
-bool VID_Is8bit(void) {
-    return false;
+bool is8bit = false;
+
+bool VID_Is8bit() {
+    return is8bit;
 }

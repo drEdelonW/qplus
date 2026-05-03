@@ -1,6 +1,6 @@
 DEFINES += GLQUAKE
 CFLAGS  += -I/opt/X11/include
-LDFLAGS += -L/opt/X11/lib -framework OpenGL
+LDFLAGS += -L/opt/X11/lib -lGL -framework OpenGL
 
                 $(eval VID_DIR = $(CL_SIDE_DIR)/video) $(eval INCLUDES += $(VID_DIR))
                         $(eval OPENGL_DIR = $(VID_DIR)/gl) $(eval INCLUDES += $(OPENGL_DIR))

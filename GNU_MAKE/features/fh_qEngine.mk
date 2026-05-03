@@ -107,8 +107,8 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 SRC_LIST += $(CL_SIDE_DIR)/cl_parse.c
                 SRC_LIST += $(CL_SIDE_DIR)/cl_tent.c
 
-# include features/fh_qSoftCRender.mk
-include features/fh_qOpenGLRender.mk
+include features/fh_qSoftCRender.mk
+# include features/fh_qOpenGLRender.mk
 
                 $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
                         SRC_LIST += $(UI_DIR)/view.c
