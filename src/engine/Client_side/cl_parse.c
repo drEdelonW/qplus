@@ -37,6 +37,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "screen.h"
 #include "q_tools.h"
 #include "gamedefs.h"
+#ifdef GLQUAKE
+#   include "qOpenGL.h"
+#endif
 
 
 

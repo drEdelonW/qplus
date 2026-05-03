@@ -107,8 +107,8 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 SRC_LIST += $(CL_SIDE_DIR)/cl_parse.c
                 SRC_LIST += $(CL_SIDE_DIR)/cl_tent.c
 
-# include features/fh_qSoftCRender.mk
-include features/fh_qOpenGLRender.mk
+include features/fh_qSoftCRender.mk
+# include features/fh_qOpenGLRender.mk
 
                 $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
                         SRC_LIST += $(UI_DIR)/screen.c
@@ -136,8 +136,8 @@ include features/fh_qOpenGLRender.mk
                         SRC_LIST += $(MATH_DIR)/angle.c
 
                 $(eval AST_DIR = $(SHARED_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
-                        $(eval MDL_DIR = $(AST_DIR)/model) $(eval INCLUDES += $(MDL_DIR))
-                                SRC_LIST += $(MDL_DIR)/model.c
+#                         $(eval MDL_DIR = $(AST_DIR)/model) $(eval INCLUDES += $(MDL_DIR))
+#                                 SRC_LIST += $(MDL_DIR)/model.c
 
                         $(eval WAD_DIR = $(AST_DIR)/wad) $(eval INCLUDES += $(WAD_DIR))
                                 SRC_LIST += $(WAD_DIR)/wad.c

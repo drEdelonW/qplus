@@ -29,6 +29,7 @@ m*_t structures are in-memory
 
 */
 #ifdef GLQUAKE
+#include "Alias.h"
 
 #define MAXALIASVERTS 1024
 #define MAXALIASFRAMES 256

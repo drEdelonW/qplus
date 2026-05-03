@@ -9,9 +9,22 @@
 #include "render.h"
 #include "Texture.h"
 #include "cvar.h"
+#include "render.h"
 
 #include "glquake.h"
 
-extern uint8_t	d_15to8table[65536];
+#define MAXHEIGHT  1024
+#define MAXWIDTH  1280
 
-bool VID_Is8bit(void);
+extern uint8_t	d_15to8table[65536];
+extern vec3_t   lightspot;
+
+bool VID_Is8bit();
+int R_LightPoint(vec3_t p);
+void R_DrawBrushModel(r_Entity_p e);
+void R_DrawWorld();
+void R_AnimateLight();
+void R_RenderDlights();
+void R_DrawParticles();
+void R_DrawWaterSurfaces();
+void R_RenderBrushPoly(mSurface_p fa);

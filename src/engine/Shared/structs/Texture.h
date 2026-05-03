@@ -3,7 +3,7 @@
 #include "types.h"
 #include "enginedefs.h"
 #ifdef GLQUAKE
-#   include "Surface.h"
+#   include "Surface_pre.h"
 #endif
 
 // it was [texture_t]
