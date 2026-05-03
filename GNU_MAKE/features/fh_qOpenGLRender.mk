@@ -4,6 +4,7 @@ DEFINES += GLQUAKE
                         $(eval OPENGL_DIR = $(VID_DIR)/gl) $(eval INCLUDES += $(OPENGL_DIR))
                                 SRC_LIST += $(OPENGL_DIR)/gl_draw.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_rmain.c
+                                SRC_LIST += $(OPENGL_DIR)/gl_rmisc.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_model.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_mesh.c
 
