@@ -1,10 +1,19 @@
 DEFINES += GLQUAKE
+CFLAGS  += -I/opt/X11/include
+LDFLAGS += -L/opt/X11/lib -lX11 -lXext -framework OpenGL
 
                 $(eval VID_DIR = $(CL_SIDE_DIR)/video) $(eval INCLUDES += $(VID_DIR))
                         $(eval OPENGL_DIR = $(VID_DIR)/gl) $(eval INCLUDES += $(OPENGL_DIR))
+#                                 SRC_LIST += $(OPENGL_DIR)/gl_vidlinux.c
+                                SRC_LIST += $(OPENGL_DIR)/gl_vidlinuxglx.c
+                                SRC_LIST += $(OPENGL_DIR)/gl_screen.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_draw.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_rmain.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_rmisc.c
+                                SRC_LIST += $(OPENGL_DIR)/gl_rsurf.c
+                                SRC_LIST += $(OPENGL_DIR)/gl_rlight.c
+                                SRC_LIST += $(OPENGL_DIR)/gl_refrag.c
+                                SRC_LIST += $(OPENGL_DIR)/gl_warp.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_model.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_mesh.c
 
