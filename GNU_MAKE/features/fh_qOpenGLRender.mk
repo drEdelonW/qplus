@@ -1,11 +1,12 @@
 DEFINES += GLQUAKE
 CFLAGS  += -I/opt/X11/include
-LDFLAGS += -L/opt/X11/lib -lX11 -lXext -framework OpenGL
+LDFLAGS += -L/opt/X11/lib -framework OpenGL
 
                 $(eval VID_DIR = $(CL_SIDE_DIR)/video) $(eval INCLUDES += $(VID_DIR))
                         $(eval OPENGL_DIR = $(VID_DIR)/gl) $(eval INCLUDES += $(OPENGL_DIR))
 #                                 SRC_LIST += $(OPENGL_DIR)/gl_vidlinux.c
-                                SRC_LIST += $(OPENGL_DIR)/gl_vidlinuxglx.c
+#                                 SRC_LIST += $(OPENGL_DIR)/gl_vidlinuxglx.c
+                                SRC_LIST += $(OPENGL_DIR)/vid_x11gl.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_screen.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_draw.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_rmain.c
@@ -29,7 +30,7 @@ LDFLAGS += -L/opt/X11/lib -lX11 -lXext -framework OpenGL
 #                                 SRC_LIST += $(DRAW_DIR)/d_sky.c
 #                                 SRC_LIST += $(DRAW_DIR)/d_sprite.c
 #                                 SRC_LIST += $(DRAW_DIR)/d_surf.c
-#                                 SRC_LIST += $(DRAW_DIR)/d_vars.c
+                                SRC_LIST += $(DRAW_DIR)/d_vars.c
 #                                 SRC_LIST += $(DRAW_DIR)/d_zpoint.c
 
                         $(eval RENDER_DIR = $(VID_DIR)/render) $(eval INCLUDES += $(RENDER_DIR))
@@ -45,7 +46,7 @@ LDFLAGS += -L/opt/X11/lib -lX11 -lXext -framework OpenGL
 #                                 SRC_LIST += $(RENDER_DIR)/r_sky.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_sprite.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_surf.c
-#                                 SRC_LIST += $(RENDER_DIR)/r_part.c
+                                SRC_LIST += $(RENDER_DIR)/r_part.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_vars.c
 
         $(eval SHARED_DIR = $(ENG_DIR)/Shared) $(eval INCLUDES += $(SHARED_DIR))

@@ -18,7 +18,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "r_shared.h"
+#ifndef GLQUAKE
+#   include "r_shared.h"
+#else
+#   include "qOpenGL.h"
+#   include "cvar_q1.h"
+#endif
 #include "server.h"
 #undef SERVER   // TODO: remove this workaround
 #include "client.h"
