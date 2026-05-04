@@ -5,7 +5,6 @@ FORCE_32     ?= 0
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
         $(eval HOST_DIR = $(ENG_DIR)/Host) $(eval INCLUDES += $(HOST_DIR))
-                $(eval API_DIR := $(HOST_DIR)/API) $(eval INCLUDES += $(API_DIR))
 
                 $(eval PLAPI_DIR := $(HOST_DIR)/platformAPI) $(eval INCLUDES += $(PLAPI_DIR))
                         SRC_LIST += $(PLAPI_DIR)/sys_null.c
@@ -107,8 +106,10 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 SRC_LIST += $(CL_SIDE_DIR)/cl_parse.c
                 SRC_LIST += $(CL_SIDE_DIR)/cl_tent.c
 
-include features/fh_qRenderSoftC.mk
-# include features/fh_qRenderOpenGL.mk
+#         $(eval API_DIR := $(HOST_DIR)/API) $(eval INCLUDES += $(API_DIR))
+
+# include features/fh_qRenderSoftC.mk
+include features/fh_qRenderOpenGL.mk
 
                 $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
                         SRC_LIST += $(UI_DIR)/view.c

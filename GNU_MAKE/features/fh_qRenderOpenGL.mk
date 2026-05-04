@@ -2,8 +2,8 @@ DEFINES += GLQUAKE
 CFLAGS  += -I/opt/X11/include
 LDFLAGS += -L/opt/X11/lib -lGL -framework OpenGL
 
-
-                        $(eval DRAW_DIR = $(VID_DIR)/draw) $(eval INCLUDES += $(DRAW_DIR))
+                $(eval SOFTRND_DIR = $(CL_SIDE_DIR)/video/soft) $(eval INCLUDES += $(SOFTRND_DIR))
+                        $(eval DRAW_DIR = $(SOFTRND_DIR)/draw2D) $(eval INCLUDES += $(DRAW_DIR))
 #                                 SRC_LIST += $(DRAW_DIR)/nonintel.c
 #                                 SRC_LIST += $(DRAW_DIR)/d_edge.c
 #                                 SRC_LIST += $(DRAW_DIR)/d_fill.c
@@ -18,7 +18,7 @@ LDFLAGS += -L/opt/X11/lib -lGL -framework OpenGL
                                 SRC_LIST += $(DRAW_DIR)/d_vars.c
 #                                 SRC_LIST += $(DRAW_DIR)/d_zpoint.c
 
-                        $(eval RENDER_DIR = $(VID_DIR)/render) $(eval INCLUDES += $(RENDER_DIR))
+                        $(eval RENDER_DIR = $(SOFTRND_DIR)/render3D) $(eval INCLUDES += $(RENDER_DIR))
 #                                 SRC_LIST += $(RENDER_DIR)/r_aclip.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_alias.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_bsp.c
