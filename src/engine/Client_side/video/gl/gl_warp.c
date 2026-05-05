@@ -39,10 +39,8 @@ void BoundPoly(int numverts, float_p verts, vec3_t mins, vec3_t maxs) {
     float_p v = verts;
     for (int i = 0; i < numverts; i++)
         for (int j = 0; j < 3; j++, v++) {
-            if (*v < mins[j])
-                mins[j] = *v;
-            if (*v > maxs[j])
-                maxs[j] = *v;
+            if (*v < mins[j])   mins[j] = *v;
+            if (*v > maxs[j])   maxs[j] = *v;
         }
 }
 

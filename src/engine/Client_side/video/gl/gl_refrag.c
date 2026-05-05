@@ -42,9 +42,9 @@ mNode_p r_pefragtopnode;
 ===============================================================================
 */
 
-efrag_ar 	lastlink;
-vec3_t		r_emins, r_emaxs;
-r_Entity_p 	r_addent;
+efrag_ar    lastlink;
+vec3_t      r_emins, r_emaxs;
+r_Entity_p  r_addent;
 
 
 /*
@@ -63,7 +63,7 @@ void R_RemoveEfrags(r_Entity_p ent) {
             efrag_p walk = *prev;
             if (!walk)
                 break;
-            if (walk == ef) {	// remove this fragment
+            if (walk == ef) {    // remove this fragment
                 *prev = ef->leafnext;
                 break;
             }
@@ -88,14 +88,8 @@ R_SplitEntityOnNode
 ===================
 */
 void R_SplitEntityOnNode(mNode_p node) {
-    efrag_p ef;
-    mPlane_p splitplane;
-    mLeaf_p leaf;
-    int			sides;
-
-    if (node->contents == CONTENTS_SOLID) {
+    if (node->contents == CONTENTS_SOLID)
         return;
-    }
 
     // add an efrag if the node is a leaf
 
@@ -103,19 +97,19 @@ void R_SplitEntityOnNode(mNode_p node) {
         if (!r_pefragtopnode)
             r_pefragtopnode = node;
 
-        leaf = (mLeaf_p)node;
+        mLeaf_p leaf = (mLeaf_p)node;
 
         // grab an efrag off the free list
-        ef = cl.free_efrags;
+        efrag_p ef = cl.free_efrags;
         if (!ef) {
             Con_Printf("Too many efrags!\n");
-            return;		// no free fragments...
+            return;        // no free fragments...
         }
         cl.free_efrags = cl.free_efrags->entnext;
 
         ef->entity = r_addent;
 
-        // add the entity link	
+        // add the entity link
         *lastlink = ef;
         lastlink = &ef->entnext;
         ef->entnext = NULL;
@@ -130,8 +124,8 @@ void R_SplitEntityOnNode(mNode_p node) {
 
     // NODE_MIXED
 
-    splitplane = node->plane;
-    sides = BOX_ON_PLANE_SIDE(r_emins, r_emaxs, splitplane);
+    mPlane_p splitplane = node->plane;
+    int sides = BOX_ON_PLANE_SIDE(r_emins, r_emaxs, splitplane);
 
     if (sides == 3) {
         // split on this plane
@@ -141,11 +135,8 @@ void R_SplitEntityOnNode(mNode_p node) {
     }
 
     // recurse down the contacted sides
-    if (sides & 1)
-        R_SplitEntityOnNode(node->children[0]);
-
-    if (sides & 2)
-        R_SplitEntityOnNode(node->children[1]);
+    if (sides & 1)  R_SplitEntityOnNode(node->children[0]);
+    if (sides & 2)  R_SplitEntityOnNode(node->children[1]);
 }
 
 
@@ -156,9 +147,6 @@ R_AddEfrags
 ===========
 */
 void R_AddEfrags(r_Entity_p ent) {
-    Model_p entmodel;
-    int			i;
-
     if (!ent->model)
         return;
 
@@ -167,9 +155,9 @@ void R_AddEfrags(r_Entity_p ent) {
     lastlink = &ent->efrag;
     r_pefragtopnode = NULL;
 
-    entmodel = ent->model;
+    Model_p entmodel = ent->model;
 
-    for (i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
         r_emins[i] = ent->origin[i] + entmodel->mins[i];
         r_emaxs[i] = ent->origin[i] + entmodel->maxs[i];
     }
@@ -196,7 +184,7 @@ void R_StoreEfrags(efrag_ar ppefrag) {
         switch (clmodel->type) {
         case mod_alias:
         case mod_brush:
-        case mod_sprite:
+        case mod_sprite: {
             pent = pefrag->entity;
 
             if ((pent->visframe != r_framecount) &&
@@ -208,7 +196,7 @@ void R_StoreEfrags(efrag_ar ppefrag) {
             }
 
             ppefrag = &pefrag->leafnext;
-            break;
+        } break;
 
         default:
             Host_SysError("R_StoreEfrags: Bad entity type %d\n", clmodel->type);

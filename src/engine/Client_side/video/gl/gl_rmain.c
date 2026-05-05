@@ -139,8 +139,6 @@ R_GetSpriteFrame
 */
 mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) {
     mSpriteFrame_p pspriteframe;
-    float_p pintervals;
-    float  fullinterval, targettime, time;
 
     mSprite_p psprite = currententity->model->cache.data;
     int frame = currententity->frame;
@@ -155,15 +153,15 @@ mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) {
     }
     else {
         mSpriteGroup_p pspritegroup = (mSpriteGroup_p)psprite->frames[frame].frameptr;
-        pintervals = pspritegroup->intervals;
+        float_p pintervals = pspritegroup->intervals;
         int numframes = pspritegroup->numframes;
-        fullinterval = pintervals[numframes - 1];
+        float fullinterval = pintervals[numframes - 1];
 
-        time = cl.time + currententity->syncbase;
+        float time = cl.time + currententity->syncbase;
 
         // when loading in Mod_LoadSpriteGroup, we guaranteed all interval values
         // are positive, so we don't have to worry about division by 0
-        targettime = time - ((int)(time / fullinterval)) * fullinterval;
+        float targettime = time - ((int)(time / fullinterval)) * fullinterval;
 
         int i = 0;
         for (; i < (numframes - 1); i++) {
@@ -186,16 +184,13 @@ R_DrawSpriteModel
 */
 void R_DrawSpriteModel(r_Entity_p e) {
     vec3_t point;
-    mSpriteFrame_p frame;
-    float_p up, right;
-    vec3_t  v_forward, v_right, v_up;
-    mSprite_p psprite;
 
     // don't even bother culling, because it's just a single
     // polygon without a surface cache
-    frame = R_GetSpriteFrame(e);
-    psprite = currententity->model->cache.data;
-
+    mSpriteFrame_p frame = R_GetSpriteFrame(e);
+    mSprite_p psprite = currententity->model->cache.data;
+    float_p up, right;
+    vec3_t v_forward, v_right, v_up;
     if (psprite->type == SPR_ORIENTED) { // bullet marks on walls
         AngleVectors(currententity->angles, v_forward, v_right, v_up);
         up = v_up;
@@ -274,27 +269,15 @@ GL_DrawAliasFrame
 =============
 */
 void GL_DrawAliasFrame(AliasHdr_p paliashdr, int posenum) {
-    // float s, t;
-    float  l;
-    // int  i, j;
-    // int  index;
-    // TriVertx_p v;
-    TriVertx_p verts;
-    // int  list;
-    int* order;
-    // vec3_t point;
-    // float_p normal;
-    int  count;
-
     lastposenum = posenum;
 
-    verts = (TriVertx_p)((byte*)paliashdr + paliashdr->posedata);
+    TriVertx_p verts = (TriVertx_p)((byte*)paliashdr + paliashdr->posedata);
     verts += posenum * paliashdr->poseverts;
-    order = (int*)((byte*)paliashdr + paliashdr->commands);
+    int* order = (int*)((byte*)paliashdr + paliashdr->commands);
 
     while (1) {
         // get the vertex count and primitive type
-        count = *order++;
+        int count = *order++;
         if (!count)
             break;  // done
         if (count < 0) {
@@ -310,7 +293,7 @@ void GL_DrawAliasFrame(AliasHdr_p paliashdr, int posenum) {
             order += 2;
 
             // normals and vertexes come from the frame list
-            l = shadedots[verts->lightnormalindex] * shadelight;
+            float l = shadedots[verts->lightnormalindex] * shadelight;
             glColor3f(l, l, l);
             glVertex3f(verts->v[0], verts->v[1], verts->v[2]);
             verts++;
@@ -328,30 +311,19 @@ GL_DrawAliasShadow
 */
 
 void GL_DrawAliasShadow(AliasHdr_p paliashdr, int posenum) {
-    // float s, t, l;
-    // int  i, j;
-    // int  index;
-    // TriVertx_p v;
-    TriVertx_p verts;
-    // int  list;
-    int* order;
-    vec3_t point;
-    // float_p normal;
-    float height, lheight;
-    int  count;
 
-    lheight = currententity->origin[2] - lightspot[2];
+    float lheight = currententity->origin[2] - lightspot[2];
 
-    height = 0;
-    verts = (TriVertx_p)((byte*)paliashdr + paliashdr->posedata);
+    float height = 0;
+    TriVertx_p verts = (TriVertx_p)((byte*)paliashdr + paliashdr->posedata);
     verts += posenum * paliashdr->poseverts;
-    order = (int*)((byte*)paliashdr + paliashdr->commands);
+    int* order = (int*)((byte*)paliashdr + paliashdr->commands);
 
     height = -lheight + 1.0;
 
     while (1) {
         // get the vertex count and primitive type
-        count = *order++;
+        int count = *order++;
         if (!count)
             break;  // done
         if (count < 0) {
@@ -367,10 +339,11 @@ void GL_DrawAliasShadow(AliasHdr_p paliashdr, int posenum) {
             order += 2;
 
             // normals and vertexes come from the frame list
-            point[0] = verts->v[0] * paliashdr->scale[0] + paliashdr->scale_origin[0];
-            point[1] = verts->v[1] * paliashdr->scale[1] + paliashdr->scale_origin[1];
-            point[2] = verts->v[2] * paliashdr->scale[2] + paliashdr->scale_origin[2];
-
+            vec3_t point = {
+                verts->v[0] * paliashdr->scale[0] + paliashdr->scale_origin[0],
+                verts->v[1] * paliashdr->scale[1] + paliashdr->scale_origin[1],
+                verts->v[2] * paliashdr->scale[2] + paliashdr->scale_origin[2]
+            };
             point[0] -= shadevector[0] * (point[2] + lheight);
             point[1] -= shadevector[1] * (point[2] + lheight);
             point[2] = height;
@@ -393,19 +366,16 @@ R_SetupAliasFrame
 =================
 */
 void R_SetupAliasFrame(int frame, AliasHdr_p paliashdr) {
-    int    pose, numposes;
-    float   interval;
-
     if ((frame >= paliashdr->numframes) || (frame < 0)) {
         Con_DPrintf("R_AliasSetupFrame: no such frame %d\n", frame);
         frame = 0;
     }
 
-    pose = paliashdr->frames[frame].firstpose;
-    numposes = paliashdr->frames[frame].numposes;
+    int pose = paliashdr->frames[frame].firstpose;
+    int numposes = paliashdr->frames[frame].numposes;
 
     if (numposes > 1) {
-        interval = paliashdr->frames[frame].interval;
+        float interval = paliashdr->frames[frame].interval;
         pose += (int)(cl.time / interval) % numposes;
     }
 
@@ -421,20 +391,9 @@ R_DrawAliasModel
 =================
 */
 void R_DrawAliasModel(r_Entity_p e) {
-    int   i; //, j;
-    int   lnum;
-    vec3_t  dist;
-    float  add;
-    Model_p clmodel;
     vec3_t  mins, maxs;
-    AliasHdr_p paliashdr;
-    // TriVertx_p verts, v;
-    // int   index;
-    // float  s, t,
-    float an;
-    int   anim;
 
-    clmodel = currententity->model;
+    Model_p clmodel = currententity->model;
 
     VectorAdd(currententity->origin, clmodel->mins, mins);
     VectorAdd(currententity->origin, clmodel->maxs, maxs);
@@ -456,12 +415,15 @@ void R_DrawAliasModel(r_Entity_p e) {
     if (e == &cl.viewent && ambientlight < 24)
         ambientlight = shadelight = 24;
 
-    for (lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
+    for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
         if (cl_dlights[lnum].die >= cl.time) {
-            VectorSubtract(currententity->origin,
+            vec3_t  dist;
+            VectorSubtract(
+                currententity->origin,
                 cl_dlights[lnum].origin,
-                dist);
-            add = cl_dlights[lnum].radius - Length(dist);
+                dist
+            );
+            float add = cl_dlights[lnum].radius - Length(dist);
 
             if (add > 0) {
                 ambientlight += add;
@@ -478,20 +440,21 @@ void R_DrawAliasModel(r_Entity_p e) {
         shadelight = 192 - ambientlight;
 
     // ZOID: never allow players to go totally black
-    i = currententity - cl_entities;
-    if (i >= 1 && i <= cl.maxclients /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
+    int i = currententity - cl_entities;
+    if ((i >= 1) && (i <= cl.maxclients) /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
         if (ambientlight < 8)
             ambientlight = shadelight = 8;
 
     // HACK HACK HACK -- no fullbright colors, so make torches full light
-    if (!strcmp(clmodel->name, "progs/flame2.mdl")
-        || !strcmp(clmodel->name, "progs/flame.mdl"))
+    if (!strcmp(clmodel->name, "progs/flame2.mdl") ||
+        !strcmp(clmodel->name, "progs/flame.mdl")
+        )
         ambientlight = shadelight = 256;
 
     shadedots = r_avertexnormal_dots[((int)(e->angles[1] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
     shadelight = shadelight / 200.0;
 
-    an = e->angles[1] / 180 * M_PI;
+    float an = e->angles[1] / 180 * M_PI;
     shadevector[0] = cos(-an);
     shadevector[1] = sin(-an);
     shadevector[2] = 1;
@@ -500,7 +463,7 @@ void R_DrawAliasModel(r_Entity_p e) {
     //
     // locate the proper data
     //
-    paliashdr = (AliasHdr_p)Mod_Extradata(currententity->model);
+    AliasHdr_p paliashdr = (AliasHdr_p)Mod_Extradata(currententity->model);
 
     c_alias_polys += paliashdr->numtris;
 
@@ -523,13 +486,13 @@ void R_DrawAliasModel(r_Entity_p e) {
         glScalef(paliashdr->scale[0], paliashdr->scale[1], paliashdr->scale[2]);
     }
 
-    anim = (int)(cl.time * 10) & 3;
+    int anim = (int)(cl.time * 10) & 3;
     GL_Bind(paliashdr->gl_texturenum[currententity->skinnum][anim]);
 
     // we can't dynamically colormap textures, so they are cached
     // seperately for the players.  Heads are just uncolored.
     if (currententity->colormap != vid.colormap && !gl_nocolors.value) {
-        i = currententity - cl_entities;
+        int i = currententity - cl_entities;
         if (i >= 1 && i <= cl.maxclients /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
             GL_Bind(playertextures - 1 + i);
     }
@@ -574,13 +537,11 @@ R_DrawEntitiesOnList
 =============
 */
 void R_DrawEntitiesOnList(void) {
-    int  i;
-
     if (!r_drawentities.value)
         return;
 
     // draw sprites seperately, because of alpha blending
-    for (i = 0; i < cl_numvisedicts; i++) {
+    for (int i = 0; i < cl_numvisedicts; i++) {
         currententity = cl_visedicts[i];
 
         switch (currententity->model->type) {
@@ -597,7 +558,7 @@ void R_DrawEntitiesOnList(void) {
         }
     }
 
-    for (i = 0; i < cl_numvisedicts; i++) {
+    for (int i = 0; i < cl_numvisedicts; i++) {
         currententity = cl_visedicts[i];
 
         switch (currententity->model->type) {
@@ -615,61 +576,37 @@ R_DrawViewModel
 =============
 */
 void R_DrawViewModel(void) {
-    float  ambient[4], diffuse[4];
-    int   j;
-    int   lnum;
-    vec3_t  dist;
-    float  add;
-    dLight_p dl;
-    int   ambientlight, shadelight;
-
-    if (!r_drawviewmodel.value)
-        return;
-
-    if (chase_active.value)
-        return;
-
-    if (envmap)
-        return;
-
-    if (!r_drawentities.value)
-        return;
-
-    if (cl.items & IT_INVISIBILITY)
-        return;
-
-    if (cl.stats[STAT_HEALTH] <= 0)
-        return;
-
+    if (!r_drawviewmodel.value)     return;
+    if (chase_active.value)         return;
+    if (envmap)                     return;
+    if (!r_drawentities.value)      return;
+    if (cl.items & IT_INVISIBILITY) return;
+    if (cl.stats[STAT_HEALTH] <= 0) return;
     currententity = &cl.viewent;
-    if (!currententity->model)
-        return;
+    if (!currententity->model)      return;
 
-    j = R_LightPoint(currententity->origin);
+    int j = R_LightPoint(currententity->origin);
+    if (j < 24)        j = 24;  // allways give some light on gun
+    int ambientlight = j;
+    int shadelight = j;
 
-    if (j < 24)
-        j = 24;  // allways give some light on gun
-    ambientlight = j;
-    shadelight = j;
+    // add dynamic lights
+    for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
+        dLight_p dl = &cl_dlights[lnum];
+        if (!dl->radius)        continue;
+        if (!dl->radius)        continue;
+        if (dl->die < cl.time)  continue;
 
-    // add dynamic lights  
-    for (lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
-        dl = &cl_dlights[lnum];
-        if (!dl->radius)
-            continue;
-        if (!dl->radius)
-            continue;
-        if (dl->die < cl.time)
-            continue;
-
-        VectorSubtract(currententity->origin, dl->origin, dist);
-        add = dl->radius - Length(dist);
+        vec3_t dist; VectorSubtract(currententity->origin, dl->origin, dist);
+        float add = dl->radius - Length(dist);
         if (add > 0)
             ambientlight += add;
     }
 
+    float ambient[4], diffuse[4];
     ambient[0] = ambient[1] = ambient[2] = ambient[3] = (float)ambientlight / 128;
     diffuse[0] = diffuse[1] = diffuse[2] = diffuse[3] = (float)shadelight / 128;
+#warning TODO: investigate why ambient and diffuse go nowhere
 
     // hack the depth range to prevent view model from poking into walls
     glDepthRange(gldepthmin, gldepthmin + 0.3 * (gldepthmax - gldepthmin));
@@ -684,10 +621,8 @@ R_PolyBlend
 ============
 */
 void R_PolyBlend(void) {
-    if (!gl_polyblend.value)
-        return;
-    if (!v_blend[3])
-        return;
+    if (!gl_polyblend.value)    return;
+    if (!v_blend[3])            return;
 
     GL_DisableMultitexture();
 
@@ -718,12 +653,9 @@ void R_PolyBlend(void) {
 
 
 int SignbitsForPlane(mPlane_p out) {
-    int bits, j;
-
     // for fast box on planeside test
-
-    bits = 0;
-    for (j = 0; j < 3; j++) {
+    int bits = 0;
+    for (int j = 0; j < 3; j++) {
         if (out->normal[j] < 0)
             bits |= 1 << j;
     }
@@ -732,8 +664,6 @@ int SignbitsForPlane(mPlane_p out) {
 
 
 void R_SetFrustum(void) {
-    int  i;
-
     if (r_refdef.fov_x == 90) {
         // front side is visible
 
@@ -754,7 +684,7 @@ void R_SetFrustum(void) {
         RotatePointAroundVector(frustum[3].normal, vright, vpn, -(90 - r_refdef.fov_y / 2));
     }
 
-    for (i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
         frustum[i].type = PLANE_ANYZ;
         frustum[i].dist = DotProduct(r_origin, frustum[i].normal);
         frustum[i].signbits = SignbitsForPlane(&frustum[i]);
@@ -769,10 +699,6 @@ R_SetupFrame
 ===============
 */
 void R_SetupFrame(void) {
-    // int    edgecount;
-    // vRect_t   vrect;
-    // float   w, h;
-
     // don't allow cheats in multiplayer
     if (cl.maxclients > 1)
         Cvar_Set("r_fullbright", "0");
@@ -801,8 +727,12 @@ void R_SetupFrame(void) {
 }
 
 
-void MYgluPerspective(GLdouble fovy, GLdouble aspect,
-    GLdouble zNear, GLdouble zFar) {
+void MYgluPerspective(
+    GLdouble fovy,
+    GLdouble aspect,
+    GLdouble zNear,
+    GLdouble zFar
+) {
     GLdouble xmin, xmax, ymin, ymax;
 
     ymax = zNear * tan(fovy * M_PI / 360.0);
@@ -821,33 +751,24 @@ R_SetupGL
 =============
 */
 void R_SetupGL(void) {
-    float screenaspect;
-    // float yfov;
-    // int  i;
-    int  x, x2, y2, y, w, h;
-
     //
     // set up viewpoint
     //
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    x = r_refdef.vrect.x * glwidth / vid.width;
-    x2 = (r_refdef.vrect.x + r_refdef.vrect.width) * glwidth / vid.width;
-    y = (vid.height - r_refdef.vrect.y) * glheight / vid.height;
-    y2 = (vid.height - (r_refdef.vrect.y + r_refdef.vrect.height)) * glheight / vid.height;
+    int x = r_refdef.vrect.x * glwidth / vid.width;
+    int x2 = (r_refdef.vrect.x + r_refdef.vrect.width) * glwidth / vid.width;
+    int y = (vid.height - r_refdef.vrect.y) * glheight / vid.height;
+    int y2 = (vid.height - (r_refdef.vrect.y + r_refdef.vrect.height)) * glheight / vid.height;
 
     // fudge around because of frac screen scale
-    if (x > 0)
-        x--;
-    if (x2 < glwidth)
-        x2++;
-    if (y2 < 0)
-        y2--;
-    if (y < glheight)
-        y++;
+    if (x > 0)          x--;
+    if (y < glheight)   y++;
+    if (x2 < glwidth)   x2++;
+    if (y2 < 0)         y2--;
 
-    w = x2 - x;
-    h = y - y2;
+    int w = x2 - x;
+    int h = y - y2;
 
     if (envmap) {
         x = y2 = 0;
@@ -855,15 +776,13 @@ void R_SetupGL(void) {
     }
 
     glViewport(glx + x, gly + y2, w, h);
-    screenaspect = (float)r_refdef.vrect.width / r_refdef.vrect.height;
+    float screenaspect = (float)r_refdef.vrect.width / r_refdef.vrect.height;
     // yfov = 2*atan((float)r_refdef.vrect.height/r_refdef.vrect.width)*180/M_PI;
     MYgluPerspective(r_refdef.fov_y, screenaspect, 4, 4096);
 
     if (mirror) {
-        if (mirror_plane->normal[2])
-            glScalef(1, -1, 1);
-        else
-            glScalef(-1, 1, 1);
+        if (mirror_plane->normal[2])    glScalef(1, -1, 1);
+        else                            glScalef(-1, 1, 1);
         glCullFace(GL_BACK);
     }
     else
@@ -884,10 +803,8 @@ void R_SetupGL(void) {
     //
     // set drawing parms
     //
-    if (gl_cull.value)
-        glEnable(GL_CULL_FACE);
-    else
-        glDisable(GL_CULL_FACE);
+    if (gl_cull.value)  glEnable(GL_CULL_FACE);
+    else                glDisable(GL_CULL_FACE);
 
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
@@ -903,29 +820,18 @@ r_refdef must be set before the first call
 */
 void R_RenderScene(void) {
     R_SetupFrame();
-
     R_SetFrustum();
-
     R_SetupGL();
-
     R_MarkLeaves(); // done here so we know if we're in water
-
     R_DrawWorld();  // adds static entities to the list
-
     S_ExtraUpdate(); // don't let sound get messed up if going slow
-
     R_DrawEntitiesOnList();
-
     GL_DisableMultitexture();
-
     R_RenderDlights();
-
     R_DrawParticles();
-
 #ifdef GLTEST
     Test_Draw();
 #endif
-
 }
 
 
@@ -937,10 +843,8 @@ R_Clear
 extern cvar_t   gl_ztrick;
 void R_Clear(void) {
     if (r_mirroralpha.value != 1.0) {
-        if (gl_clear.value)
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        else
-            glClear(GL_DEPTH_BUFFER_BIT);
+        if (gl_clear.value)     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        else                    glClear(GL_DEPTH_BUFFER_BIT);
         gldepthmin = 0;
         gldepthmax = 0.5;
         glDepthFunc(GL_LEQUAL);
@@ -964,10 +868,8 @@ void R_Clear(void) {
         }
     }
     else {
-        if (gl_clear.value)
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        else
-            glClear(GL_DEPTH_BUFFER_BIT);
+        if (gl_clear.value)     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        else                    glClear(GL_DEPTH_BUFFER_BIT);
         gldepthmin = 0;
         gldepthmax = 1;
         glDepthFunc(GL_LEQUAL);
@@ -982,26 +884,23 @@ R_Mirror
 =============
 */
 void R_Mirror(void) {
-    float  d;
-    mSurface_p s;
-    r_Entity_p ent;
-
-    if (!mirror)
-        return;
+    if (!mirror)        return;
 
     memcpy(r_base_world_matrix, r_world_matrix, sizeof(r_base_world_matrix));
 
-    d = DotProduct(r_refdef.vieworg, mirror_plane->normal) - mirror_plane->dist;
-    VectorMA(r_refdef.vieworg, -2 * d, mirror_plane->normal, r_refdef.vieworg);
-
-    d = DotProduct(vpn, mirror_plane->normal);
-    VectorMA(vpn, -2 * d, mirror_plane->normal, vpn);
-
+    {
+        float d = DotProduct(r_refdef.vieworg, mirror_plane->normal) - mirror_plane->dist;
+        VectorMA(r_refdef.vieworg, -2 * d, mirror_plane->normal, r_refdef.vieworg);
+    }
+    {
+        float d = DotProduct(vpn, mirror_plane->normal);
+        VectorMA(vpn, -2 * d, mirror_plane->normal, vpn);
+    }
     r_refdef.viewangles[0] = -asin(vpn[2]) / M_PI * 180;
     r_refdef.viewangles[1] = atan2(vpn[1], vpn[0]) / M_PI * 180;
     r_refdef.viewangles[2] = -r_refdef.viewangles[2];
 
-    ent = &cl_entities[cl.viewentity];
+    r_Entity_p ent = &cl_entities[cl.viewentity];
     if (cl_numvisedicts < MAX_VISEDICTS) {
         cl_visedicts[cl_numvisedicts] = ent;
         cl_numvisedicts++;
@@ -1023,19 +922,19 @@ void R_Mirror(void) {
     // blend on top
     glEnable(GL_BLEND);
     glMatrixMode(GL_PROJECTION);
-    if (mirror_plane->normal[2])
-        glScalef(1, -1, 1);
-    else
-        glScalef(-1, 1, 1);
+
+    if (mirror_plane->normal[2])    glScalef(1, -1, 1);
+    else                            glScalef(-1, 1, 1);
+
     glCullFace(GL_FRONT);
     glMatrixMode(GL_MODELVIEW);
 
     glLoadMatrixf(r_base_world_matrix);
 
     glColor4f(1, 1, 1, r_mirroralpha.value);
-    s = cl.worldmodel->textures[mirrortexturenum]->texturechain;
-    for (; s; s = s->texturechain)
-        R_RenderBrushPoly(s);
+
+    for (mSurface_p surf = cl.worldmodel->textures[mirrortexturenum]->texturechain; surf; surf = surf->texturechain)
+        R_RenderBrushPoly(surf);
     cl.worldmodel->textures[mirrortexturenum]->texturechain = NULL;
     glDisable(GL_BLEND);
     glColor4f(1, 1, 1, 1);
@@ -1049,15 +948,14 @@ r_refdef must be set before the first call
 ================
 */
 void R_RenderView(void) {
-    double time1, time2;
     // GLfloat colors[4] = { (GLfloat)0.0, (GLfloat)0.0, (GLfloat)1, (GLfloat)0.20 }; // fog color
 
-    if (r_norefresh.value)
-        return;
+    if (r_norefresh.value)        return;
 
     if (!r_worldentity.model || !cl.worldmodel)
         Host_SysError("R_RenderView: NULL worldmodel");
 
+    double time1;
     if (r_speeds.value) {
         glFinish();
         time1 = Host_FloatTime();
@@ -1097,7 +995,7 @@ void R_RenderView(void) {
 
     if (r_speeds.value) {
         //  glFinish ();
-        time2 = Host_FloatTime();
+        double time2 = Host_FloatTime();
         Con_Printf("%3i ms  %4i wpoly %4i epoly\n", (int)((time2 - time1) * 1000), c_brush_polys, c_alias_polys);
     }
 }
