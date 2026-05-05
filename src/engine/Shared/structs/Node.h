@@ -10,7 +10,11 @@ struct mNode_s {
     // common with leaf
     int32_t     contents;  // 0, to differentiate from leafs
     int32_t     visframe;  // node needs to be traversed if current
+#ifdef GLQUAKE
+    float       minmaxs[6];  // for bounding box culling
+#else
     int16_t     minmaxs[6];  // for bounding box culling
+#endif
     mNode_p     parent;
     // node specific
     mPlane_p    plane;

@@ -361,17 +361,6 @@ Draw_Init
 ===============
 */
 void Draw_Init(void) {
-    int  i;
-    qPic_p cb;
-    uint8_p dest;//, src;
-    int  x, y;
-    char ver[40];
-    glpic_p gl;
-    int  start;
-    uint8_p ncdata;
-    // int  f, fstep;
-
-
     Cvar_RegisterVariable(&gl_nobind);
     Cvar_RegisterVariable(&gl_max_size);
     Cvar_RegisterVariable(&gl_picmip);
@@ -388,21 +377,22 @@ void Draw_Init(void) {
     // string into the background before turning
     // it into a texture
     _drawChars = W_GetLumpName("conchars");
-    for (i = 0; i < 256 * 64; i++)
+    for (int i = 0; i < 256 * 64; i++)
         if (_drawChars[i] == 0)
             _drawChars[i] = 255; // proper transparent color
 
     // now turn them into textures
     char_texture = GL_LoadTexture("charset", 128, 128, _drawChars, false, true);
 
-    start = Hunk_LowMark();
+    size_t start = Hunk_LowMark();
 
-    cb = (qPic_p)COM_LoadTempFile("gfx/conback.lmp");
+    qPic_p cb = (qPic_p)COM_LoadTempFile("gfx/conback.lmp");
     if (!cb)
         Host_SysError("Couldn't load gfx/conback.lmp");
     SwapPic(cb);
 
     // hack the version number directly into the pic
+    char ver[40];
     snprintf(ver, sizeof(ver),
 #if defined(__linux__)
         "(Linux %2.2f, gl %4.2f) %4.2f", (float)LINUX_VERSION,
@@ -410,9 +400,9 @@ void Draw_Init(void) {
         "(gl %4.2f) %4.2f",
 #endif
         (float)GLQUAKE_VERSION, (float)VERSION);
-    dest = cb->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
-    y = strlen(ver);
-    for (x = 0; x < y; x++)
+    uint8_p dest = cb->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    int y = strlen(ver);
+    for (int x = 0; x < y; x++)
         Draw_CharToConback(ver[x], dest + (x << 3));
 
 #if 0
@@ -420,16 +410,17 @@ void Draw_Init(void) {
     conback->height = vid.conheight;
 
     // scale console to vid size
-    dest = ncdata = Hunk_AllocName(vid.conwidth * vid.conheight, "conback");
+    uint8_p ncdata
+        uint8_p dest = ncdata = Hunk_AllocName(vid.conwidth * vid.conheight, "conback");
 
-    for (y = 0; y < vid.conheight; y++, dest += vid.conwidth) {
+    for (int y = 0; y < vid.conheight; y++, dest += vid.conwidth) {
         src = cb->data + cb->width * (y * cb->height / vid.conheight);
         if (vid.conwidth == cb->width)
             memcpy(dest, src, vid.conwidth);
         else {
             f = 0;
             fstep = cb->width * 0x10000 / vid.conwidth;
-            for (x = 0; x < vid.conwidth; x += 4) {
+            for (int x = 0; x < vid.conwidth; x += 4) {
                 dest[x + 0] = src[f >> 16];     f += fstep;
                 dest[x + 1] = src[f >> 16];     f += fstep;
                 dest[x + 2] = src[f >> 16];     f += fstep;
@@ -440,13 +431,13 @@ void Draw_Init(void) {
 #else
     conback->width = cb->width;
     conback->height = cb->height;
-    ncdata = cb->data;
+    uint8_p ncdata = cb->data;
 #endif
 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    gl = (glpic_p)conback->data;
+    glpic_p gl = (glpic_p)conback->data;
     gl->texnum = GL_LoadTexture("conback", conback->width, conback->height, ncdata, false, false);
     gl->sl = 0;
     gl->sh = 1;
@@ -574,11 +565,9 @@ Draw_Pic
 =============
 */
 void Draw_Pic(int x, int y, qPic_p pic) {
-    glpic_p gl;
-
     if (scrap_dirty)
         Scrap_Upload();
-    gl = (glpic_p)pic->data;
+    glpic_p gl = (glpic_p)pic->data;
     glColor4f(1, 1, 1, 1);
     GL_Bind(gl->texnum);
     glBegin(GL_QUADS);
@@ -864,14 +853,11 @@ Operates in place, quartering the size of the texture
 ================
 */
 void GL_MipMap(uint8_p in, int width, int height) {
-    int  i, j;
-    uint8_p out;
-
     width <<= 2;
     height >>= 1;
-    out = in;
-    for (i = 0; i < height; i++, in += width) {
-        for (j = 0; j < width; j += 8, out += 4, in += 8) {
+    uint8_p out = in;
+    for (int i = 0; i < height; i++, in += width) {
+        for (int j = 0; j < width; j += 8, out += 4, in += 8) {
             out[0] = (in[0] + in[4] + in[width + 0] + in[width + 4]) >> 2;
             out[1] = (in[1] + in[5] + in[width + 1] + in[width + 5]) >> 2;
             out[2] = (in[2] + in[6] + in[width + 2] + in[width + 6]) >> 2;
@@ -913,14 +899,12 @@ GL_Upload32
 ===============
 */
 void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) {
-    int   samples;
     static uint32_t _scaled[1024 * 512]; // [512*256];
-    int   scaled_width, scaled_height;
 
-    for (scaled_width = 1; scaled_width < width; scaled_width <<= 1)
-        ;
-    for (scaled_height = 1; scaled_height < height; scaled_height <<= 1)
-        ;
+    int scaled_width = 1;
+    for (; scaled_width < width; scaled_width <<= 1) {}
+    int scaled_height = 1;
+    for (; scaled_height < height; scaled_height <<= 1) {}
 
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
@@ -931,7 +915,7 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     if (scaled_width * scaled_height > sizeof(_scaled) / 4)
         Host_SysError("GL_LoadTexture: too big");
 
-    samples = alpha ? gl_alpha_format : gl_solid_format;
+    int samples = alpha ? gl_alpha_format : gl_solid_format;
 
 #if 0
     if (mipmap)
@@ -958,17 +942,13 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
 
     glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _scaled);
     if (mipmap) {
-        int  miplevel;
-
-        miplevel = 0;
+        int miplevel = 0;
         while (scaled_width > 1 || scaled_height > 1) {
             GL_MipMap((uint8_p)_scaled, scaled_width, scaled_height);
             scaled_width >>= 1;
             scaled_height >>= 1;
-            if (scaled_width < 1)
-                scaled_width = 1;
-            if (scaled_height < 1)
-                scaled_height = 1;
+            if (scaled_width < 1)   scaled_width = 1;
+            if (scaled_height < 1)  scaled_height = 1;
             miplevel++;
             glTexImage2D(GL_TEXTURE_2D, miplevel, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _scaled);
         }
@@ -988,17 +968,14 @@ done:;
 }
 
 void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha) {
-    int   i, s;
-    bool noalpha;
     static uint8_t _scaled[1024 * 512]; // [512*256];
-    int   scaled_width, scaled_height;
 
-    s = width * height;
+    int s = width * height;
     // if there are no transparent pixels, make it a 3 component
     // texture even if it was specified as otherwise
     if (alpha) {
-        noalpha = true;
-        for (i = 0; i < s; i++) {
+        bool noalpha = true;
+        for (int i = 0; i < s; i++) {
             if (data[i] == 255)
                 noalpha = false;
         }
@@ -1006,10 +983,10 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
         if (alpha && noalpha)
             alpha = false;
     }
-    for (scaled_width = 1; scaled_width < width; scaled_width <<= 1)
-        ;
-    for (scaled_height = 1; scaled_height < height; scaled_height <<= 1)
-        ;
+    int scaled_width = 1;
+    for (; scaled_width < width; scaled_width <<= 1) {}
+    int scaled_height = 1;
+    for (; scaled_height < height; scaled_height <<= 1) {}
 
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
@@ -1071,17 +1048,14 @@ GL_Upload8
 */
 void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
     static uint32_t _trans[640 * 480];  // FIXME, temporary
-    int   i, s;
-    bool noalpha;
-    int   p;
 
-    s = width * height;
+    int s = width * height;
     // if there are no transparent pixels, make it a 3 component
     // texture even if it was specified as otherwise
     if (alpha) {
-        noalpha = true;
-        for (i = 0; i < s; i++) {
-            p = data[i];
+        bool noalpha = true;
+        for (int i = 0; i < s; i++) {
+            int p = data[i];
             if (p == 255)
                 noalpha = false;
             _trans[i] = d_8to24table[p];
@@ -1093,7 +1067,7 @@ void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
     else {
         if (s & 3)
             Host_SysError("GL_Upload8: s&3");
-        for (i = 0; i < s; i += 4) {
+        for (int i = 0; i < s; i += 4) {
             _trans[i + 0] = d_8to24table[data[i + 0]];
             _trans[i + 1] = d_8to24table[data[i + 1]];
             _trans[i + 2] = d_8to24table[data[i + 2]];
@@ -1114,12 +1088,12 @@ GL_LoadTexture
 ================
 */
 int GL_LoadTexture(cString identifier, int width, int height, uint8_p data, bool mipmap, bool alpha) {
-    int   i; //, p, s;
     glTexture_p glt;
 
     // see if the texture is allready present
     if (identifier[0]) {
-        for (i = 0, glt = gltextures; i < numgltextures; i++, glt++) {
+        glt = gltextures;
+        for (int i = 0; i < numgltextures; i++, glt++) {
             if (!strcmp(identifier, glt->identifier)) {
                 if (width != glt->width || height != glt->height)
                     Host_SysError("GL_LoadTexture: cache mismatch");

@@ -24,7 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   error GLQUAKE not defined
 #endif
 
-#ifndef __APPLE__
+#if 0 
+ndef __APPLE__
 #pragma warning(disable : 4244)     // MIPS
 #pragma warning(disable : 4136)     // X86
 #pragma warning(disable : 4051)     // ALPHA
@@ -260,7 +261,9 @@ void GL_Bind (int texnum);
 #define    TEXTURE1_SGIS				0x835F
 
 #ifndef _WIN32
+#ifndef APIENTRY
 #define APIENTRY /* */
+#endif 
 #endif
 
 typedef void (APIENTRY *lpMTexFUNC) (GLenum, GLfloat, GLfloat);

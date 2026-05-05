@@ -1,6 +1,4 @@
 DEFINES += GLQUAKE
-CFLAGS  += -I/opt/X11/include
-LDFLAGS += -L/opt/X11/lib -lGL -framework OpenGL
 
                 $(eval SOFTRND_DIR = $(CL_SIDE_DIR)/video/soft) $(eval INCLUDES += $(SOFTRND_DIR))
                         $(eval DRAW_DIR = $(SOFTRND_DIR)/draw2D) $(eval INCLUDES += $(DRAW_DIR))
@@ -54,3 +52,14 @@ LDFLAGS += -L/opt/X11/lib -lGL -framework OpenGL
         $(eval SHARED_DIR = $(ENG_DIR)/Shared) $(eval INCLUDES += $(SHARED_DIR))
                 $(eval AST_DIR = $(SHARED_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
                         $(eval MDL_DIR = $(AST_DIR)/model) $(eval INCLUDES += $(MDL_DIR))
+
+
+#----------LINUX------------
+ifeq ($(UNAME_S),Linux)
+        LDLIBS += -lGL -lX11 -lm
+        RUN_PREFIX := DISPLAY=:1
+#----------MacOS------------
+else ifeq ($(UNAME_S),Darwin)
+        CFLAGS  += -I/opt/X11/include
+        LDFLAGS += -L/opt/X11/lib -lGL -framework OpenGL
+endif

@@ -220,28 +220,17 @@ Translates a skin texture by the per-player color lookup
 ===============
 */
 void R_TranslatePlayerSkin(int playernum) {
-    int  top, bottom;
-    uint8_t translate[256];
-    uint32_t translate32[256];
-    int  i, j, s;
-    Model_p model;
-    AliasHdr_p paliashdr;
-    uint8_p original;
-    uint32_t pixels[512 * 256], * out;
-    uint32_t scaled_width, scaled_height;
-    int   inwidth, inheight;
-    uint8_p inrow;
-    uint32_t frac, fracstep;
 
     GL_DisableMultitexture();
 
-    top = cl.scores[playernum].colors & 0xf0;
-    bottom = (cl.scores[playernum].colors & 15) << 4;
+    int top = cl.scores[playernum].colors & 0xf0;
+    int bottom = (cl.scores[playernum].colors & 15) << 4;
 
-    for (i = 0; i < 256; i++)
+    uint8_t translate[256];
+    for (int i = 0; i < 256; i++)
         translate[i] = i;
 
-    for (i = 0; i < 16; i++) {
+    for (int i = 0; i < 16; i++) {
         // the artists made some backwards ranges.  sigh.
         if (top < 128)  translate[TOP_RANGE + i] = top + i;
         else            translate[TOP_RANGE + i] = top + 15 - i;
@@ -254,15 +243,16 @@ void R_TranslatePlayerSkin(int playernum) {
     // locate the original skin pixels
     //
     currententity = &cl_entities[1 + playernum];
-    model = currententity->model;
-    if (!model)
-        return;  // player doesn't have a model yet
-    if (model->type != mod_alias)
-        return; // only translate skins on alias models
+    Model_p model = currententity->model;
+    if (!model)                     return;  // player doesn't have a model yet
+    if (model->type != mod_alias)   return; // only translate skins on alias models
 
-    paliashdr = (AliasHdr_p)Mod_Extradata(model);
-    s = paliashdr->skinwidth * paliashdr->skinheight;
-    if (currententity->skinnum < 0 || currententity->skinnum >= paliashdr->numskins) {
+    uint8_p original;
+    AliasHdr_p paliashdr = (AliasHdr_p)Mod_Extradata(model);
+    int s = paliashdr->skinwidth * paliashdr->skinheight;
+    if ((currententity->skinnum < 0) ||
+        (currententity->skinnum >= paliashdr->numskins)
+    ) {
         Con_Printf("(%d): Invalid player skin #%d\n", playernum, currententity->skinnum);
         original = (uint8_p)paliashdr + paliashdr->texels[0];
     }
@@ -271,8 +261,8 @@ void R_TranslatePlayerSkin(int playernum) {
     if (s & 3)
         Host_SysError("R_TranslateSkin: s&3");
 
-    inwidth = paliashdr->skinwidth;
-    inheight = paliashdr->skinheight;
+    int inwidth = paliashdr->skinwidth;
+    int inheight = paliashdr->skinheight;
 
     // because this happens during gameplay, do it fast
     // instead of sending it through gl_upload 8
@@ -281,7 +271,7 @@ void R_TranslatePlayerSkin(int playernum) {
 #if 0
     uint8_t translated[320 * 200];
 
-    for (i = 0; i < s; i += 4) {
+    for (int i = 0; i < s; i += 4) {
         translated[i] = translate[original[i]];
         translated[i + 1] = translate[original[i + 1]];
         translated[i + 2] = translate[original[i + 2]];
@@ -292,23 +282,24 @@ void R_TranslatePlayerSkin(int playernum) {
     // don't mipmap these, because it takes too long
     GL_Upload8(translated, paliashdr->skinwidth, paliashdr->skinheight, false, false, true);
 #else
-    scaled_width = gl_max_size.value < 512 ? gl_max_size.value : 512;
-    scaled_height = gl_max_size.value < 256 ? gl_max_size.value : 256;
+    uint32_t scaled_width = gl_max_size.value < 512 ? gl_max_size.value : 512;
+    uint32_t scaled_height = gl_max_size.value < 256 ? gl_max_size.value : 256;
 
     // allow users to crunch sizes down even more if they want
     scaled_width >>= (int)gl_playermip.value;
     scaled_height >>= (int)gl_playermip.value;
 
+    uint32_t pixels[512 * 256];
     if (VID_Is8bit()) { // 8bit texture upload
         uint8_p out2;
 
         out2 = (uint8_p)pixels;
         memset(pixels, 0, sizeof(pixels));
-        fracstep = inwidth * 0x10000 / scaled_width;
-        for (i = 0; i < scaled_height; i++, out2 += scaled_width) {
-            inrow = original + inwidth * (i * inheight / scaled_height);
-            frac = fracstep >> 1;
-            for (j = 0; j < scaled_width; j += 4) {
+        uint32_t fracstep = inwidth * 0x10000 / scaled_width;
+        for (int i = 0; i < scaled_height; i++, out2 += scaled_width) {
+            uint8_p inrow = original + inwidth * (i * inheight / scaled_height);
+            uint32_t frac = fracstep >> 1;
+            for (int j = 0; j < scaled_width; j += 4) {
                 out2[j = 0] = translate[inrow[frac >> 16]];     frac += fracstep;
                 out2[j + 1] = translate[inrow[frac >> 16]];     frac += fracstep;
                 out2[j + 2] = translate[inrow[frac >> 16]];     frac += fracstep;
@@ -320,15 +311,16 @@ void R_TranslatePlayerSkin(int playernum) {
         return;
     }
 
-    for (i = 0; i < 256; i++)
+    uint32_t translate32[256];
+    for (int i = 0; i < 256; i++)
         translate32[i] = d_8to24table[translate[i]];
 
-    out = pixels;
-    fracstep = inwidth * 0x10000 / scaled_width;
-    for (i = 0; i < scaled_height; i++, out += scaled_width) {
-        inrow = original + inwidth * (i * inheight / scaled_height);
-        frac = fracstep >> 1;
-        for (j = 0; j < scaled_width; j += 4) {
+    uint32_p out = pixels;
+    uint32_t fracstep = inwidth * 0x10000 / scaled_width;
+    for (int i = 0; i < scaled_height; i++, out += scaled_width) {
+        uint8_p inrow = original + inwidth * (i * inheight / scaled_height);
+        uint32_t frac = fracstep >> 1;
+        for (int j = 0; j < scaled_width; j += 4) {
             out[j + 0] = translate32[inrow[frac >> 16]];    frac += fracstep;
             out[j + 1] = translate32[inrow[frac >> 16]];    frac += fracstep;
             out[j + 2] = translate32[inrow[frac >> 16]];    frac += fracstep;
