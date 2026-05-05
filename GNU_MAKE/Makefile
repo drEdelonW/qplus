@@ -1,10 +1,11 @@
-TARGET ?= quakeX11
+# TARGET ?= quakeX11
 # TARGET ?= quakeWin
 # TARGET ?= quakeSTM32
 # TARGET ?= STM32_LCD
 
 # TARGET ?= testSTM32
 # TARGET ?= testSDL2
+TARGET ?= testX11GL
 
 
 # ---------- Paths ----------

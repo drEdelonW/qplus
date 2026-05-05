@@ -135,9 +135,6 @@ include features/fh_qRenderOpenGL.mk
                         SRC_LIST += $(MATH_DIR)/angle.c
 
                 $(eval AST_DIR = $(SHARED_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
-#                         $(eval MDL_DIR = $(AST_DIR)/model) $(eval INCLUDES += $(MDL_DIR))
-#                                 SRC_LIST += $(MDL_DIR)/model.c
-
                         $(eval WAD_DIR = $(AST_DIR)/wad) $(eval INCLUDES += $(WAD_DIR))
                                 SRC_LIST += $(WAD_DIR)/wad.c
 
