@@ -42,3 +42,14 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
                 $(eval AST_DIR = $(SHARED_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
                         $(eval MDL_DIR = $(AST_DIR)/model) $(eval INCLUDES += $(MDL_DIR))
                                 SRC_LIST += $(MDL_DIR)/model.c
+
+
+#----------LINUX------------
+ifeq ($(UNAME_S),Linux)
+        RUN_PREFIX := DISPLAY=:1
+        RUN_PREFIX2 := DISPLAY=:2
+#----------MacOS------------
+else ifeq ($(UNAME_S),Darwin)
+        RUN_PREFIX := DISPLAY=:1
+        RUN_PREFIX2 := DISPLAY=:2
+endif

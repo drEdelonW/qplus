@@ -5,16 +5,18 @@ include features/fh_qEngine.mk
 
 $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $(eval INCLUDES += $(PLATFORM_DIR)/API)
 
+#----------LINUX------------
 ifeq ($(UNAME_S),Linux)
+    $(info Linux X11)
     $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))
         SRC_LIST += $(POSIX_DIR)/sys_linux.c
         SRC_LIST += $(POSIX_DIR)/sys_linux_file.c
-#         SRC_LIST += $(POSIX_DIR)/vid_x.c
         SRC_LIST += $(POSIX_DIR)/in_x.c
         SRC_LIST += $(POSIX_DIR)/cd_linux.c
         # SRC_LIST += $(POSIX_DIR)/snd_linux.c  # TODO:
         SRC_LIST += $(POSIX_DIR)/net_udp.c
         SRC_LIST += $(POSIX_DIR)/net_bsd.c
+
 
         # X11 target on *nix
         CXXFLAGS   += -DX11 -DVID_X11
@@ -24,19 +26,17 @@ ifeq ($(UNAME_S),Linux)
 
         LDLIBS     += -lX11 -lXext
 
-        RUN_PREFIX := DISPLAY=:1
-        RUN_PREFIX2 := DISPLAY=:2
-
+#----------MacOS------------
 else ifeq ($(UNAME_S),Darwin)
     $(info Darwin X11)
 #     INCLUDES += /opt/homebrew/opt/libx11/include
     INCLUDES += /opt/homebrew/include
     $(eval POSIX_DIR = $(PLATFORM_DIR)/posix) $(eval INCLUDES += $(POSIX_DIR))
         SRC_LIST += $(POSIX_DIR)/sys_linux.c
-#         SRC_LIST += $(POSIX_DIR)/vid_x.c
         SRC_LIST += $(POSIX_DIR)/in_x.c
         SRC_LIST += $(POSIX_DIR)/net_udp.c
         SRC_LIST += $(POSIX_DIR)/net_bsd.c
+
 
     # macOS build: disable X11/SHM, use NULL stubs
     # NOTE: skip xshm_stubs.c to avoid missing X11 headers
