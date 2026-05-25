@@ -108,8 +108,9 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
 #         $(eval API_DIR := $(HOST_DIR)/API) $(eval INCLUDES += $(API_DIR))
 
-# include features/fh_qRenderSoftC.mk
-include features/fh_qRenderOpenGL.mk
+QRND ?= SoftC
+# QRND ?= OpenGL
+include features/fh_qRender$(QRND).mk
 
                 $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
                         SRC_LIST += $(UI_DIR)/view.c
