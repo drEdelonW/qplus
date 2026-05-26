@@ -101,13 +101,13 @@ void Host_Status_f() {
         else    hours = 0;
 
         print("#%-2u %-16.16s  %3i  %2i:%02i:%02i\n",
-                j + 1,
-                rClient->name,
-                (int32_t)rClient->edict->v.frags,
-                hours,
-                minutes,
-                seconds
-            );
+            j + 1,
+            rClient->name,
+            (int32_t)rClient->edict->v.frags,
+            hours,
+            minutes,
+            seconds
+        );
         print("   %s\n", rClient->netconnection->address);
     }
 }
@@ -333,7 +333,7 @@ Host_Savegame_f
 */
 void Host_Savegame_f() {
     if (cmd_source != src_command)      return;
-    if (!SV_IsActive()) { ;                 Con_Printf("Not playing a local game.\n");              return; }
+    if (!SV_IsActive()) { ;             Con_Printf("Not playing a local game.\n");              return; }
     if (cl.intermission != IM_NONE) { ; Con_Printf("Can't save in intermission.\n");            return; }
     if (svs.maxClients != 1) { ;        Con_Printf("Can't save multiplayer games.\n");          return; }
     if (Cmd_Argc() != 2) { ;            Con_Printf("save <savename> : save a game\n");          return; }

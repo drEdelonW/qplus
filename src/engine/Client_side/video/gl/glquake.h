@@ -24,8 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   error GLQUAKE not defined
 #endif
 
-#if 0 
-ndef __APPLE__
+#if 0
+ ndef __APPLE__
 #pragma warning(disable : 4244)     // MIPS
 #pragma warning(disable : 4136)     // X86
 #pragma warning(disable : 4051)     // ALPHA

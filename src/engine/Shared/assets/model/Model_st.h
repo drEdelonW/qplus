@@ -13,8 +13,8 @@
 #include "platformdefs.h"
 #include "zone.h"
 
-#define MAX_MAP_HULLS       (4)
-#define ALIAS_VERSION 6
+#define MAX_MAP_HULLS   (4)
+#define ALIAS_VERSION   6
 
 #define IDPOLYHEADER    (uint32_t)(('O' << 24) + ('P' << 16) + ('D' << 8) + 'I')
 // little-endian "IDPO"
@@ -45,10 +45,8 @@ typedef enum {
     mod_alias
 } ModType_t;
 
-typedef enum {
-    ST_SYNC = 0,
-    ST_RAND
-} SyncType_t;
+
+#include "SyncType.h"
 
 typedef struct Model_s Model_t;  //  TODO: fix in render.h
 typedef Model_t* Model_p;
@@ -63,7 +61,8 @@ struct Model_s {
     float   radius;
 #ifdef GLQUAKE
     bool    clipbox;    // solid volume for clipping
-    vec3_t  clipmins, clipmaxs;
+    vec3_t  clipmins;
+    vec3_t  clipmaxs;
 #endif
     uint32_t numModelSurfaces,   firstModelSurface;    // brush model
     uint32_t numSubModels;       dModel_p    SubModels;

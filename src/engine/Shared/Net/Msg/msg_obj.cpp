@@ -16,8 +16,8 @@ Handles uint8_t ordering and avoids alignment errors
 ==============================================================================
 */
 
-int  NetMsg::ReadCount() { return _readCount; }
-bool NetMsg::BadRead() { return _badRead; }
+int  NetMsg::ReadCount() { ;                        return _readCount; }
+bool NetMsg::BadRead() { ;                          return _badRead; }
 
 void NetMsg::BeginReading() {
     _readCount = 0;
@@ -55,7 +55,7 @@ void NetMsg::WriteChar(sizebuf_p sb, int8_t c) {
     uint8_p buf = (uint8_p)SZ_GetSpace(sb, 1);
     buf[0] = c;
 }
-void NetMsg::WriteChar(int8_t c) { WriteChar(_sb, c); }
+void NetMsg::WriteChar(int8_t c) { ;                WriteChar(_sb, c); }
 
 
 
@@ -74,14 +74,14 @@ uint8_t NetMsg::ReadByte() {
 void NetMsg::WriteByte(sizebuf_p sb, uint8_t c) {
     if (!sb)    return;
 #ifdef PARANOID
-    if ((c < 0x00) || (c > 0XFF))
+    if ((c < 0x00) || (c > 0xFF))
         Host_SysError("NetMsg::WriteByte: range error");
 #endif
 
     uint8_p buf = (uint8_p)SZ_GetSpace(sb, 1);
     buf[0] = c;
 }
-void NetMsg::WriteByte(uint8_t c) { WriteByte(_sb, c); }
+void NetMsg::WriteByte(uint8_t c) { ;               WriteByte(_sb, c); }
 
 
 int16_t NetMsg::ReadShort() {
@@ -108,10 +108,10 @@ void NetMsg::WriteShort(sizebuf_p sb, int16_t c) {
 #endif
 
     uint8_p buf = (uint8_p)SZ_GetSpace(sb, 2);
-    buf[0] = c & 0XFF;
+    buf[0] = c & 0xFF;
     buf[1] = c >> 8;
 }
-void NetMsg::WriteShort(int16_t c) { WriteShort(_sb, c); }
+void NetMsg::WriteShort(int16_t c) { ;              WriteShort(_sb, c); }
 
 
 int32_t NetMsg::ReadLong() {
@@ -121,7 +121,7 @@ int32_t NetMsg::ReadLong() {
     }
 
     int32_t c =
-        (_sb->data[_readCount]) +
+        (_sb->data[_readCount + 0] << 0) +
         (_sb->data[_readCount + 1] << 8) +
         (_sb->data[_readCount + 2] << 16) +
         (_sb->data[_readCount + 3] << 24);
@@ -134,12 +134,12 @@ int32_t NetMsg::ReadLong() {
 void NetMsg::WriteLong(sizebuf_p sb, int32_t c) {
     if (!sb)    return;
     uint8_p buf = (uint8_p)SZ_GetSpace(sb, 4);
-    buf[0] = (c & 0XFF);
-    buf[1] = (c >> 8) & 0XFF;
-    buf[2] = (c >> 16) & 0XFF;
-    buf[3] = (c >> 24);
+    buf[0] = (c >> 0) & 0xFF;
+    buf[1] = (c >> 8) & 0xFF;
+    buf[2] = (c >> 16) & 0xFF;
+    buf[3] = (c >> 24) & 0xFF;
 }
-void NetMsg::WriteLong(int32_t c) { WriteLong(_sb, c); }
+void NetMsg::WriteLong(int32_t c) { ;               WriteLong(_sb, c); }
 
 
 float NetMsg::ReadFloat() {
@@ -149,7 +149,7 @@ float NetMsg::ReadFloat() {
         int     l;
     } dat;
 
-    dat.b[0] = _sb->data[_readCount];
+    dat.b[0] = _sb->data[_readCount + 0];
     dat.b[1] = _sb->data[_readCount + 1];
     dat.b[2] = _sb->data[_readCount + 2];
     dat.b[3] = _sb->data[_readCount + 3];
@@ -172,7 +172,7 @@ void NetMsg::WriteFloat(sizebuf_p sb, float f) {
 
     SZ_Write(sb, &dat.l, 4);
 }
-void NetMsg::WriteFloat(float f) { WriteFloat(_sb, f); }
+void NetMsg::WriteFloat(float f) { ;                WriteFloat(_sb, f); }
 
 
 cString NetMsg::ReadString() {
@@ -198,15 +198,14 @@ void NetMsg::WriteString(sizebuf_p sb, cStringRO s) {
     if (!s) SZ_Write(sb, empSt, 1);
     else    SZ_Write(sb, (TypeLess_ptr)s, (Q_strlen(s) + 1));
 }
-void NetMsg::WriteString(cStringRO s) { WriteString(_sb, s); }
+void NetMsg::WriteString(cStringRO s) { ;           WriteString(_sb, s); }
 
 
+float NetMsg::ReadCoord() { ;                       return ReadShort() * (1.0 / 8); }
+void NetMsg::WriteCoord(sizebuf_p sb, float f) { ;  WriteShort(sb, (int)(f * 8)); }
+void NetMsg::WriteCoord(float f) { ;                WriteCoord(_sb, f); }
 
-float NetMsg::ReadCoord() { return ReadShort() * (1.0 / 8); }
-void NetMsg::WriteCoord(sizebuf_p sb, float f) { WriteShort(sb, (int)(f * 8)); }
-void NetMsg::WriteCoord(float f) { WriteCoord(_sb, f); }
-
-float NetMsg::ReadAngle() { return ReadChar() * (360.0 / 0xFF); }
-void NetMsg::WriteAngle(sizebuf_p sb, float f) { WriteByte(sb, ((int)f * 0xFF / 360) & 0xFF); }
-void NetMsg::WriteAngle(float f) { WriteAngle(_sb, f); }
+float NetMsg::ReadAngle() { ;                       return ReadChar() * (360.0 / 0xFF); }
+void NetMsg::WriteAngle(sizebuf_p sb, float f) { ;  WriteByte(sb, ((int)f * 0xFF / 360) & 0xFF); }
+void NetMsg::WriteAngle(float f) { ;                WriteAngle(_sb, f); }
 

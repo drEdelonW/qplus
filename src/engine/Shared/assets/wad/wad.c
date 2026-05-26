@@ -54,7 +54,8 @@ typedef struct {
     int32_t size;           // uncompressed
     char    type;           // TypType ?
     char    compression;    // CmpType ?
-    char    pad1, pad2;
+    char    pad1;
+    char    pad2;
     char    name[LUMP_NAME_LEN]; // must be null terminated
 } LumpInfo_t;
 typedef LumpInfo_t* LumpInfo_p;

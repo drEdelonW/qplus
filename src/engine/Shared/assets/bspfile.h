@@ -167,12 +167,12 @@ typedef dFace_t* dFace_p;
 // extern int32_t  dsurfedges[MAX_MAP_SURFEDGES];
 
 
-void DecompressVis(uint8_p in, uint8_p decompressed);
-int32_t CompressVis(uint8_p vis, uint8_p dest);
+// void DecompressVis(uint8_p in, uint8_p decompressed);
+// int32_t CompressVis(uint8_p vis, uint8_p dest);
 
-void LoadBSPFile(cString filename);
-void WriteBSPFile(cString filename);
-void PrintBSPFileSizes();
+// void LoadBSPFile(cString filename);
+// void WriteBSPFile(cString filename);
+// void PrintBSPFileSizes();
 
 //===============
 
@@ -196,16 +196,16 @@ typedef Entity_t* Entity_p;
 extern int32_t  num_entities;
 extern Entity_t entities[MAX_MAP_ENTITIES];
 
-void ParseEntities();
-void UnparseEntities();
+// void ParseEntities();
+// void UnparseEntities();
 
-void  SetKeyValue(Entity_p ent, cString key, cString value);
-cString ValueForKey(Entity_p ent, cString key);
+// void  SetKeyValue(Entity_p ent, cString key, cString value);
+// cString ValueForKey(Entity_p ent, cString key);
 // will return "" if not present
 
-vec_t FloatForKey(Entity_p ent, cString key);
-void  GetVectorForKey(Entity_p ent, cString key, vec3_t vec);
+// vec_t FloatForKey(Entity_p ent, cString key);
+// void  GetVectorForKey(Entity_p ent, cString key, vec3_t vec);
 
-ePair_p ParseEpair();
+// ePair_p ParseEpair();
 
 // #endif
