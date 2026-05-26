@@ -46,7 +46,8 @@ when crossing a water boudnary.
 */
 
 
-static float _v_DmgTime, _v_DmgRoll, _v_DmgPitch;
+static float _v_DmgTime;
+static float _v_DmgRoll, _v_DmgPitch;
 
 
 
@@ -108,7 +109,10 @@ void V_StartPitchDrift() {
 #if 1
     if (cl.laststop == cl.time) return;  // something else is keeping it from drifting
 #endif
-    if (cl.nodrift || !cl.pitchvel) {
+    if (
+        cl.nodrift ||
+        !cl.pitchvel
+        ) {
         cl.pitchvel = v_centerspeed.value;
         cl.nodrift = false;
         cl.driftmove = 0;
@@ -137,7 +141,8 @@ lookspring is non 0, or when
 void V_DriftPitch() {
     if (noclip_anglehack ||
         !cl.onground ||
-        cls.demoplayback) {
+        cls.demoplayback
+        ) {
         cl.driftmove = 0;
         cl.pitchvel = 0;
         return;
@@ -202,7 +207,7 @@ uint8_t  gammatable[256]; // palette is sent through this
 
 
 void BuildGammaTable(float g) {
-    if (g == 1.0) {
+    if (g == 1.0f) {
         for (int i = 0; i < 256; i++)
             gammatable[i] = (uint8_t)i;
         return;

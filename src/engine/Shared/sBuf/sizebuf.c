@@ -17,9 +17,9 @@ void SZ_Alloc(sizebuf_p buf, size_t startsize) {
 
 
 void SZ_Free(sizebuf_p buf) {
-    //      Z_Free(buf->data);
-    //      buf->data = NULL;
-    //      buf->maxsize = 0;
+    // Z_Free(buf->data);
+    // buf->data = NULL;
+    // buf->maxsize = 0;
     buf->cursize = 0;
 }
 

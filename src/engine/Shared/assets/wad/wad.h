@@ -28,7 +28,7 @@ extern "C" {
 
     void W_LoadWadFile(cStringRO filename);
     void W_CleanupName(cStringRO in, cString out);
-    // LumpInfo_p W_GetLumpinfo(cStringRO name);
+    // LumpInfo_p W_GetLumpinfo(cStringRO name); // used local
     TypeLess_ptr W_GetLumpName(cStringRO name);
     TypeLess_ptr W_GetLumpNum(int32_t num);
 

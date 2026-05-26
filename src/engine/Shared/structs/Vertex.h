@@ -46,7 +46,7 @@ typedef struct FinalVert_s {
 typedef FinalVert_t* FinalVert_p;
 
 
-typedef struct PolyVert_s {
+typedef struct {
     float u, v;
     float zi;
     float s, t;

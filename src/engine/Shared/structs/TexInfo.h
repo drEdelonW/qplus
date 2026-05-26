@@ -3,15 +3,13 @@
 #include "types.h"
 #include "Texture.h"
 
-struct Texture_s;
-typedef struct Texture_s Texture_t;
-typedef Texture_t* Texture_p;
+#include "Texture_pre.h"
 
 typedef struct {
-    float   vecs[2][4];
-    float  mipadjust;
-    Texture_p texture;
-    int32_t   flags;
+    float       vecs[2][4];
+    float       mipadjust;
+    Texture_p   texture;
+    int32_t     flags;
 } mTexInfo_t;
 typedef mTexInfo_t* mTexInfo_p;
 

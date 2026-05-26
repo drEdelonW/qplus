@@ -29,11 +29,11 @@ m*_t structures are in-memory
 
 */
 #ifdef GLQUAKE
-#include "Alias.h"
+#   include "Alias.h"
 
-#define MAXALIASVERTS 1024
-#define MAXALIASFRAMES 256
-#define MAXALIASTRIS 2048
+#   define MAXALIASVERTS 1024
+#   define MAXALIASFRAMES 256
+#   define MAXALIASTRIS 2048
 extern AliasHdr_p pheader;
 extern stvert_t stverts[MAXALIASVERTS];
 extern mTriangle_t triangles[MAXALIASTRIS];
