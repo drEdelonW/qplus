@@ -1,5 +1,9 @@
 #pragma once
 
+#include "types.h"
+#include "vector.h"
+#include "assert.h"
+
 typedef struct {
     vec3_t  origin;
     float   radius;
@@ -12,3 +16,6 @@ typedef struct {
 #endif
 } dLight_t;
 typedef dLight_t* dLight_p;
+STATIC_ASSERT_SIZE(dLight_t, 32); // QUAKE2 not handled
+
+extern dLight_t     cl_dlights[MAX_DLIGHTS];

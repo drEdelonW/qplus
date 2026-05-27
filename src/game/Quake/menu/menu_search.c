@@ -8,7 +8,7 @@
 /* SEARCH MENU */
 
 bool searchComplete = false;
-double searchCompleteTime;
+LegacyTimeStamp_t searchCompleteTime;
 
 void M_Menu_Search_f() {
     key.dest = key_menu;

@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cmd.h"
 #include "msg.h"
 #include "common.h"
+#include "qTime.h"
 
 
 /*
@@ -54,10 +55,10 @@ void CL_FinishTimeDemo() {
 
     // the first frame didn't count
     int frames = (host_framecount - cls.td_startframe) - 1;
-    float time = (float)(realtime - cls.td_starttime);
+    LegacyTimeDelta_t time = (LegacyTimeDelta_t)(realtime - cls.td_starttime);
     if (!time)
         time = 1;
-    Con_Printf("%i frames %5.1f seconds %5.1f fps\n", frames, time, (float)frames / time);
+    Con_Printf("%i frames %5.1f seconds %5.1f fps\n", frames, time, (LegacyTimeDelta_t)frames / time);
 }
 
 /*

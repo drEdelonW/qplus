@@ -914,7 +914,7 @@ VID_Update(vRect_p rects) {
         if (count++ == 200) {
             int64_t n = gethrtime();
             count = 1;
-            printf("%lf frames/secs\n", 200.0 / ((double)(n - s) / 1e9));
+            printf("%lf frames/secs\n", 200.0 / ((LegacyTimeStamp_t)(n - s) / 1e9));
             s = n;
         }
     }

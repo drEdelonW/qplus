@@ -135,7 +135,7 @@ void Sys_Warn(cStringRO warning, ...) {
     fprintf(stderr, "Warning: %s", string);
 }
 
-double Sys_FloatTime() {
+LegacyTimeStamp_t Sys_FloatTime() {
     struct timeval tp;
     struct timezone tzp;
     static int _secBase;
@@ -217,10 +217,10 @@ int main(int c, cStringArray v) {
         printf("Linux Quake -- Version %0.3f\n", LINUX_VERSION);
     }
 
-    double oldtime = Sys_FloatTime() - 0.1;
+    LegacyTimeStamp_t oldtime = Sys_FloatTime() - 0.1;
     while (1) {
-        double newtime = Sys_FloatTime();
-        double time = newtime - oldtime;    // find time spent rendering last frame
+        LegacyTimeStamp_t newtime = Sys_FloatTime();
+        LegacyTimeStamp_t time = newtime - oldtime;    // find time spent rendering last frame
 
         if (Host_IsDedicated()) {     // play vcrfiles at max speed
             if ((time < sys_ticrate.value) &&

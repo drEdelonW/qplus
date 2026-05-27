@@ -1112,7 +1112,7 @@ static qsocket_p _Datagram_Connect(cString host) {
 
     // send the connection request
     Con_Printf("trying...\n"); SCR_UpdateScreen();
-    double start_time = net_time;
+    LegacyTimeStamp_t start_time = net_time;
 
     int ret;
     for (int reps = 0; reps < 3; reps++) {

@@ -78,16 +78,16 @@ Memory is cleared / released when a server or client begins, not when they end.
 #if 1
 QuakeParms_t host_parms;
 bool    host_initialized;   // true if into command execution
-double  host_frametime;
-double  host_time;
+LegacyTimeStamp_t  host_frametime;
+LegacyTimeStamp_t  host_time;
 int32_t host_framecount;
 int     host_hunklevel;
 jmp_buf host_abortserver;
 uint8_p host_basepal;
 uint8_p host_colormap;
 bool    isDedicated;
-double  realtime;           // without any filtering or bounding
-double  oldrealtime;        // last frame run
+LegacyTimeStamp_t  realtime;           // without any filtering or bounding
+LegacyTimeStamp_t  oldrealtime;        // last frame run
 size_t  minimum_memory;
 #endif
 
@@ -355,7 +355,7 @@ void Host::ShutdownServer(bool crash) {
     if (cls.state == ca_connected)  CL_Disconnect();
 
     // flush any pending messages - like the score!!!
-    double start = Host_FloatTime();
+    LegacyTimeStamp_t start = Host_FloatTime();
     int  count;
     do {
         count = 0;
@@ -434,7 +434,9 @@ Returns false if the time is too int16_t to run a frame
 bool Host::FilterTime(float time) {
     realtime += time;
 
-    if (!cls.timedemo && ((realtime - oldrealtime) < (1.0 / 72.0)))
+    if (!(cls.timedemo) &&
+        ((realtime - oldrealtime) < (1.0 / 72.0))
+        )
         return false;  // framerate is too high
 
     host_frametime = realtime - oldrealtime;
@@ -546,9 +548,9 @@ Runs all active servers
 ==================
 */
 void Host::_Frame(float time) {
-    static double  _time1 = 0.0;
-    static double  _time2 = 0.0;
-    static double  _time3 = 0.0;
+    static LegacyTimeStamp_t  _time1 = 0.0;
+    static LegacyTimeStamp_t  _time2 = 0.0;
+    static LegacyTimeStamp_t  _time3 = 0.0;
 
     if (setjmp(host_abortserver))
         return;   // something bad happened, or the server disconnected
@@ -622,14 +624,14 @@ void Host::_Frame(float time) {
 }
 
 void Host::Frame(float time) {
-    static double   _timeTotal;
+    static LegacyTimeStamp_t   _timeTotal;
     static int      _timeCount = 0;
 
     if (!serverprofile.value) { _Frame(time); return; }
 
-    double time1 = Host_FloatTime();
+    LegacyTimeStamp_t time1 = Host_FloatTime();
     _Frame(time);
-    double time2 = Host_FloatTime();
+    LegacyTimeStamp_t time2 = Host_FloatTime();
 
     _timeTotal += time2 - time1;
     _timeCount++;

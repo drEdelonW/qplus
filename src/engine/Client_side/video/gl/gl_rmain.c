@@ -955,7 +955,7 @@ void R_RenderView(void) {
     if (!r_worldentity.model || !cl.worldmodel)
         Host_SysError("R_RenderView: NULL worldmodel");
 
-    double time1;
+    LegacyTimeStamp_t time1;
     if (r_speeds.value) {
         glFinish();
         time1 = Host_FloatTime();
@@ -995,7 +995,7 @@ void R_RenderView(void) {
 
     if (r_speeds.value) {
         //  glFinish ();
-        double time2 = Host_FloatTime();
+        LegacyTimeStamp_t time2 = Host_FloatTime();
         Con_Printf("%3i ms  %4i wpoly %4i epoly\n", (int)((time2 - time1) * 1000), c_brush_polys, c_alias_polys);
     }
 }

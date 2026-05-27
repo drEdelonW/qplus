@@ -1371,7 +1371,7 @@ void SV_Physics() {
 
 #ifndef QUAKE2
 trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
-    double save_frametime = host_frametime;
+    LegacyTimeStamp_t save_frametime = host_frametime;
     host_frametime = 0.05;
 
     edict_t tempent; memcpy(&tempent, ent, sizeof(edict_t));

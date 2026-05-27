@@ -158,7 +158,7 @@ static int  _startEpisode;
 static int  _startLevel;
 static int  _maxPlayers;
 static bool _svInfoMsg = false;
-static double   _svInfoMsgTime;
+static LegacyTimeStamp_t   _svInfoMsgTime;
 
 void M_Menu_GameOptions_f() {
     key.dest = key_menu;

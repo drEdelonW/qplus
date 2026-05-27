@@ -61,7 +61,8 @@ typedef enum {
 
 int      num_temp_entities;
 r_Entity_t  cl_temp_entities[MAX_TEMP_ENTITIES];
-Beam_t    cl_beams[MAX_BEAMS];
+
+
 
 sfx_p cl_sfx_wizhit;
 sfx_p cl_sfx_knighthit;
@@ -94,6 +95,8 @@ void CL_InitTEnts() {
 #endif
 }
 
+#include "Beam.h"
+Beam_t    cl_beams[MAX_BEAMS];
 /*
 =================
 CL_ParseBeam
