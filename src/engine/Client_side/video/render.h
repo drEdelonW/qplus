@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Texture.h"
 #include "EntityState.h"
 #include "vid.h"
+#include "qTime.h"
 
 // #define MAXCLIPPLANES (11). /* not used */
 
@@ -38,7 +39,7 @@ struct r_Entity_s {
     bool    forcelink;      // model changed
     int     update_type;
     EntityState_t baseline; // to fill in defaults in updates
-    double  msgtime;        // time of last update
+    LegacyTimeStamp_t  msgtime;        // time of last update
     vec3_t  msg_origins[2]; // last two updates(0 is newest)
     vec3_t  origin;
     vec3_t  msg_angles[2];  // last two updates(0 is newest)

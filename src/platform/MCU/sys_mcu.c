@@ -50,8 +50,8 @@ void Sys_Sleep() {}
 void Sys_HighFPPrecision() {}
 void Sys_LowFPPrecision() {}
 
-double Sys_FloatTime() {
-    static double t = 0.0;
+LegacyTimeStamp_t Sys_FloatTime() {
+    static LegacyTimeStamp_t t = 0.0;
     t += 0.1;
     return t;
 }
@@ -95,10 +95,10 @@ int main() {
     Host_Init(&parms);
     printf("STM32 Quake -- Version %0.3f\n", STM32_VERSION);
 
-    double oldtime = Sys_FloatTime();
+    LegacyTimeStamp_t oldtime = Sys_FloatTime();
     while (1) {
-        double newtime = Sys_FloatTime();
-        double time = newtime - oldtime;
+        LegacyTimeStamp_t newtime = Sys_FloatTime();
+        LegacyTimeStamp_t time = newtime - oldtime;
         Host_Frame(time);
         oldtime = newtime;
     }

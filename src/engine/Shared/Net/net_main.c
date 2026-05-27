@@ -55,7 +55,7 @@ static bool  listening = false;
 bool slistInProgress = false;
 bool slistSilent = false;
 bool slistLocal = true;
-static double slistStartTime;
+static LegacyTimeStamp_t slistStartTime;
 static int slistLastShown;
 
 static void Slist_Send();
@@ -84,9 +84,9 @@ bool recording = false;
 int32_t  net_driverlevel;
 
 
-double net_time;
+LegacyTimeStamp_t net_time;
 
-double SetNetTime() {
+LegacyTimeStamp_t SetNetTime() {
     net_time = Host_FloatTime();
     return net_time;
 }
@@ -386,7 +386,7 @@ NET_CheckNewConnections
 */
 
 struct {
-    double time;
+    LegacyTimeStamp_t time;
     vcr_opcode_t op;
     int32_t  session;
 } vcrConnect;
@@ -453,7 +453,7 @@ returns -1 if connection is invalid
 */
 
 struct {
-    double time;
+    LegacyTimeStamp_t time;
     vcr_opcode_t op;
     int32_t session;
     int32_t ret;
@@ -527,7 +527,7 @@ returns -1 if the connection died
 */
 struct
 {
-    double  time;
+    LegacyTimeStamp_t  time;
     vcr_opcode_t op;
     int32_t  session;
     int r;
@@ -640,7 +640,7 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
         }
     }
 
-    double start = Host_FloatTime();
+    LegacyTimeStamp_t start = Host_FloatTime();
     while (count) {
         count = 0;
         remoteClient = svs.clients;
@@ -815,7 +815,7 @@ void NET_Poll() {
 }
 
 
-void SchedulePollProcedure(PollProcedure* proc, double timeOffset) {
+void SchedulePollProcedure(PollProcedure* proc, LegacyTimeDelta_t timeOffset) {
     proc->nextTime = Host_FloatTime() + timeOffset;
     PollProcedure* prev = NULL;
     PollProcedure* pp = pollProcedureList;

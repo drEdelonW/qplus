@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sys.h -- non-portable functions
 #include "types.h"
+#include "qTime.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +56,7 @@ extern "C" {
     void Sys_Printf(cStringRO fmt, ...);    // send text to the console
 
     void Sys_Quit();
-    double Sys_FloatTime();
+    LegacyTimeStamp_t Sys_FloatTime();
     cString Sys_ConsoleInput();
 
     void Sys_Sleep();   // called to yield for a little bit so as not to hog cpu when paused or debugging

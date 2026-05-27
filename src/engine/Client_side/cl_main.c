@@ -38,6 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "input.h"
 #include "angle.h"
 #include "cvar_q1.h"
+#include "Beam.h"
 
 
 // we need to declare some mouse variables here, because the menu system

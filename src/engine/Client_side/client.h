@@ -86,16 +86,6 @@ typedef dLight_t* dLight_p;
 #   include "Light.h"
 #endif
 
-#define MAX_BEAMS 24
-typedef struct {
-    int32_t entity;
-    Model_p model;
-    float   endtime;
-    vec3_t  start;
-    vec3_t  end;
-} Beam_t;
-typedef Beam_t* Beam_p;
-
 typedef enum {
     ca_dedicated,       // a dedicated server with no ability to start a client
     ca_disconnected,    // full screen console with no connection
@@ -178,7 +168,7 @@ typedef struct {
     float       pitchvel;
     bool        nodrift;
     float       driftmove;
-    double      laststop;
+    LegacyTimeStamp_t   laststop;
 
     float       viewheight;
     float       crouch;   // local amount for smoothing stepups
@@ -190,9 +180,9 @@ typedef struct {
     IntermissionState_e intermission; // don't change view angle, full screen, etc
     int32_t     completed_time; // latched at intermission start
 
-    double      mtime[2];  // the timestamp of last two messages
-    double      time;   // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
-    double      oldtime;  // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
+    LegacyTimeStamp_t   mtime[2];  // the timestamp of last two messages
+    LegacyTimeStamp_t   time;   // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
+    LegacyTimeStamp_t   oldtime;  // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
 
     float       last_received_message; // (realtime) for net trouble icon
 
@@ -233,9 +223,7 @@ extern ClientState_t cl;
 extern r_Entity_t   cl_entities[MAX_EDICTS];
 extern r_Entity_t   cl_static_entities[MAX_STATIC_ENTITIES];
 extern LightStyle_t cl_lightstyle[MAX_LIGHTSTYLES];
-extern dLight_t     cl_dlights[MAX_DLIGHTS];
 extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
-extern Beam_t       cl_beams[MAX_BEAMS];
 
 extern uint32_t     cl_numvisedicts;
 extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];

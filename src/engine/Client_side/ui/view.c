@@ -289,7 +289,8 @@ void V_ParseDamage() {
     VectorSubtract(from, ent->origin, from);
     VectorNormalize(from);
 
-    vec3_t forward, right, up;  AngleVectors(ent->angles, forward, right, up);
+    // vec3_t forward, right, up;
+    AngleVectors(ent->angles, forward, right, up);
 
     _v_DmgRoll = count * v_kickroll.value * DotProduct(from, right);
     _v_DmgPitch = count * v_kickpitch.value * DotProduct(from, forward);
@@ -753,7 +754,8 @@ void V_CalcRefdef() {
        ent->angles[ROLL]   /* angles[ROLL] */
     };
 
-    vec3_t forward, right, up;  AngleVectors(angles, forward, right, up);
+    //vec3_t forward, right, up;
+    AngleVectors(angles, forward, right, up);
 
     for (int i = 0; i < VECT_DIM; i++) {
         r_refdef.vieworg[i] +=

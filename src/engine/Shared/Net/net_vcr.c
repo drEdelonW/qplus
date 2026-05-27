@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // from the viewpoint of everything above the network layer.
 
 static struct {
-    double  time;
+    LegacyTimeStamp_t  time;
     int    op;
     int32_t  session;
 }  next;

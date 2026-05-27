@@ -41,9 +41,9 @@ typedef struct {
     bool        active;         // false if only a net client
     bool        paused;
     bool        loadgame;       // handle connections specially
-    double      time;
+    LegacyTimeStamp_t      time;
     uint8_t     lastcheck;      // used by PF_checkclient
-    double      lastchecktime;
+    LegacyTimeStamp_t      lastchecktime;
     char        name[NAME_LENGTH];       // map name
 #ifdef QUAKE2
     char        startspot[NAME_LENGTH];
@@ -80,7 +80,7 @@ typedef struct {
     bool        dropasap;   // has been told to go to another level
     bool        privileged; // can execute any host command
     bool        sendsignon; // only valid before spawned
-    double      last_message;   // reliable messages must be sent periodically
+    LegacyTimeStamp_t      last_message;   // reliable messages must be sent periodically // TODO: add time to name like last_messageTime
     qsocket_p   netconnection;  // communications handle
     UserCmd_t   cmd;        // movement
     vec3_t      wishdir;    // intended motion calced from cmd
@@ -122,8 +122,8 @@ extern "C" {
     void SV_Init();
     cString SV_GetName();
     bool SV_IsActive();
-    double SV_GetTime();
-    void SV_SetTime(double time);
+    LegacyTimeStamp_t SV_GetTime();
+    void SV_SetTime(LegacyTimeStamp_t time);
 
 
     void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation);
