@@ -89,8 +89,6 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
 // passedict is explicitly excluded from clipping checks (normally NULL)
 
 
-int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane);
-
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)      \
     (((p)->type < 3)? (                         \
         ((p)->dist <= (emins)[(p)->type])?      \

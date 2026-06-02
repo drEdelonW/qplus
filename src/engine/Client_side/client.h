@@ -69,22 +69,7 @@ typedef enum cshift_kind_e {
 //
 
 #define SIGNONS  4   // signon messages to receive before connected
-#if 0
-typedef struct {
-    vec3_t  origin;
-    float   radius;
-    LegacyTimeDelta_t   die;        // stop lighting after this time
-    LegacyTimeDelta_t   decay;      // drop this each second
-    float   minlight;   // don't add when contributing less
-    int32_t key;
-#ifdef QUAKE2
-    bool dark;   // subtracts light instead of adding
-#endif
-} dLight_t;
-typedef dLight_t* dLight_p;
-#else
-#   include "Light.h"
-#endif
+// #include "Light.h"
 
 typedef enum {
     ca_dedicated,       // a dedicated server with no ability to start a client
@@ -300,7 +285,6 @@ extern "C" {
     void CL_InitTEnts();
     void CL_ParseTEnt();
     void CL_UpdateTEnts();
-    dLight_p CL_AllocDlight(int32_t key);
     void CL_DecayLights();
 
     // VIEW / SCREEN EFFECTS

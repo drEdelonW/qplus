@@ -37,9 +37,9 @@ m*_t structures are in-memory
 //
 
 typedef enum {
-    SIDE_FRONT  = 0, // point is in front of plane
-    SIDE_BACK   = 1, // point is behind plane
-    SIDE_ON     = 2  // point is on plane
+    SIDE_FRONT  = 0u, // point is in front of plane
+    SIDE_BACK   = 1u, // point is behind plane
+    SIDE_ON     = 2u  // point is on plane
 } Side_t;
 
 //============================================================================

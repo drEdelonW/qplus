@@ -36,9 +36,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static Model_p _loadModel;
 static char _loadName[32]; // for hunk tags
 
-void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer);
-void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer);
-void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer);
+void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer); // .spr file
+void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer);  // .bsp file
+void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer);  // .mdl file
 Model_p Mod_LoadModel(Model_p mod, bool crash);
 
 static uint8_t _modNoVis[MAX_MAP_LEAFS / 8];
@@ -206,7 +206,8 @@ void Mod_TouchModel(cString name) {
     Model_p mod = Mod_FindName(name);
 
     if ((mod->needload == NL_PRESENT) &&
-        (mod->type == mod_alias))
+        (mod->type == mod_alias)
+        )
         Cache_Check(&mod->cache);
 }
 
@@ -218,7 +219,8 @@ Loads a model into the cache
 ==================
 */
 Model_p Mod_LoadModel(Model_p mod, bool crash) {
-    if ((mod->type == mod_alias) &&
+    if (
+        (mod->type == mod_alias) &&
         (Cache_Check(&mod->cache))
         ) {
         mod->needload = NL_PRESENT;
@@ -287,7 +289,7 @@ Model_p Mod_ForName(cString name, bool crash) {
 ===============================================================================
 */
 
-uint8_p mod_base;
+static uint8_p mod_base;
 
 
 /*
@@ -342,7 +344,8 @@ void Mod_LoadTextures(Lump_p l) {
         Texture_p tx = _loadModel->textures[i];
         if (!tx ||
             (tx->name[0] != '+') ||
-            (tx->anim_next))
+            (tx->anim_next)
+            )
             continue; // allready sequenced
 
         // find the number of frames in the animation
@@ -382,15 +385,13 @@ void Mod_LoadTextures(Lump_p l) {
             if ((num >= '0') && (num <= '9')) {
                 num -= '0';
                 anims[num] = tx2;
-                if ((num + 1) > max)
-                    max = num + 1;
+                if ((num + 1) > max)        max = num + 1;
             }
             else
                 if ((num >= 'A') && (num <= 'J')) {
                     num = num - 'A';
                     altanims[num] = tx2;
-                    if (num + 1 > altmax)
-                        altmax = num + 1;
+                    if (num + 1 > altmax)       altmax = num + 1;
                 }
                 else    Host_SysError("Bad animating texture %s", tx->name);
         }
@@ -936,9 +937,11 @@ RadiusFromBounds
 float RadiusFromBounds(vec3_t mins, vec3_t maxs) {
     vec3_t corner;
     for (int i = 0; i < VECT_DIM; i++) {
-        corner[i] = (fabs(mins[i]) > fabs(maxs[i])) ?
+        corner[i] =
+            (fabs(mins[i]) > fabs(maxs[i])) ?
             fabs(mins[i]) : fabs(maxs[i]);
     }
+
     return Length(corner);
 }
 
@@ -954,7 +957,8 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
     int ver = LittleLong(header->version);
     if (ver != BSPVERSION)
         Host_SysError(
-            "Mod_LoadBrushModel: %s has wrong version number (%i should be %i)",
+            "Mod_LoadBrushModel: %s has wrong version number "
+            "(%i should be %i)",
             mod->name, ver, BSPVERSION
         );
 
@@ -1037,18 +1041,18 @@ Mod_LoadAliasFrame
 */
 TypeLess_ptr Mod_LoadAliasFrame(
     TypeLess_ptr  pin,
-    int32_p pframeindex,
-    int32_t numv,
-    TriVertx_p pbboxmin,
-    TriVertx_p pbboxmax,
-    AliasHdr_p pheader,
-    cString name
+    int32_p     pframeindex,
+    int32_t     numv,
+    TriVertx_p  pbboxmin,
+    TriVertx_p  pbboxmax,
+    AliasHdr_p  pheader,
+    cString     name
 ) {
     dAliasFrame_p pdaliasframe = (dAliasFrame_p)pin;
 
     strcpy(name, pdaliasframe->name);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         // these are uint8_t values, so we don't have to worry about
         // endianness
         pbboxmin->v[i] = pdaliasframe->bboxmin.v[i];
@@ -1096,7 +1100,7 @@ TypeLess_ptr  Mod_LoadAliasGroup(
         sizeof(mAliasGroup_t) + (numframes - 1) * sizeof(paliasgroup->frames[0]), _loadName);
     paliasgroup->numframes = numframes;
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         // these are uint8_t values, so we don't have to worry about endianness
         pbboxmin->v[i] = pingroup->bboxmin.v[i];
         pbboxmax->v[i] = pingroup->bboxmax.v[i];
@@ -1107,7 +1111,7 @@ TypeLess_ptr  Mod_LoadAliasGroup(
     float_p poutintervals = Hunk_AllocName(numframes * sizeof(float), _loadName);
     paliasgroup->intervals = (uint8_p)poutintervals - (uint8_p)pheader;
 
-    for (int32_t i = 0; i < numframes; i++) {
+    for (int i = 0; i < numframes; i++) {
         *poutintervals = LittleFloat(pin_intervals->interval);
         if (*poutintervals <= 0.0)      Host_SysError("Mod_LoadAliasGroup: interval<=0");
 
@@ -1117,7 +1121,7 @@ TypeLess_ptr  Mod_LoadAliasGroup(
 
     TypeLess_ptr ptemp = (TypeLess_ptr)pin_intervals;
 
-    for (int32_t i = 0; i < numframes; i++) {
+    for (int i = 0; i < numframes; i++) {
         ptemp = Mod_LoadAliasFrame(
             ptemp,
             &paliasgroup->frames[i].frame,
@@ -1231,13 +1235,12 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     pmodel->numskins = LittleLong(pinmodel->numskins);
     pmodel->skinwidth = LittleLong(pinmodel->skinwidth);
     pmodel->skinheight = LittleLong(pinmodel->skinheight);
-
     if (pmodel->skinheight > MAX_LBM_HEIGHT)    Host_SysError("model %s has a skin taller than %d", mod->name, MAX_LBM_HEIGHT);
 
     pmodel->numverts = LittleLong(pinmodel->numverts);
-
     if (pmodel->numverts <= 0)                  Host_SysError("model %s has no vertices", mod->name);
     if (pmodel->numverts > MAXALIASVERTS)       Host_SysError("model %s has too many vertices", mod->name);
+
     pmodel->numtris = LittleLong(pinmodel->numtris);
     if (pmodel->numtris <= 0)                   Host_SysError("model %s has no triangles", mod->name);
 
@@ -1277,14 +1280,9 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
         skintype = LittleLong(pskintype->type);
         pskindesc[i].type = skintype;
 
-        if (skintype == ALIAS_SKIN_SINGLE) {
-            pskintype = (dAliasSkinType_p)
-                Mod_LoadAliasSkin(pskintype + 1, &pskindesc[i].skin, skinsize, pheader);
-        }
-        else {
-            pskintype = (dAliasSkinType_p)
-                Mod_LoadAliasSkinGroup(pskintype + 1, &pskindesc[i].skin, skinsize, pheader);
-        }
+        if (skintype == ALIAS_SKIN_SINGLE)  pskintype = (dAliasSkinType_p)Mod_LoadAliasSkin(pskintype + 1, &pskindesc[i].skin, skinsize, pheader);
+        else                                pskintype = (dAliasSkinType_p)Mod_LoadAliasSkinGroup(pskintype + 1, &pskindesc[i].skin, skinsize, pheader);
+
     }
 
     //
@@ -1331,21 +1329,25 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
         if (frametype == ALIAS_SINGLE) {
             pframetype = (dAliasFrameType_p)
-                Mod_LoadAliasFrame(pframetype + 1,
+                Mod_LoadAliasFrame(
+                    pframetype + 1,
                     &pheader->frames[i].frame,
                     pmodel->numverts,
                     &pheader->frames[i].bboxmin,
                     &pheader->frames[i].bboxmax,
-                    pheader, pheader->frames[i].name);
+                    pheader, pheader->frames[i].name
+                );
         }
         else {
             pframetype = (dAliasFrameType_p)
-                Mod_LoadAliasGroup(pframetype + 1,
+                Mod_LoadAliasGroup(
+                    pframetype + 1,
                     &pheader->frames[i].frame,
                     pmodel->numverts,
                     &pheader->frames[i].bboxmin,
                     &pheader->frames[i].bboxmax,
-                    pheader, pheader->frames[i].name);
+                    pheader, pheader->frames[i].name
+                );
         }
     }
 
@@ -1382,7 +1384,10 @@ TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
     int height = LittleLong(pinframe->height);
     int size = width * height;
 
-    mSpriteFrame_p pspriteframe = Hunk_AllocName(sizeof(mSpriteFrame_t) + size * r_pixbytes, _loadName);
+    mSpriteFrame_p pspriteframe = Hunk_AllocName(
+        sizeof(mSpriteFrame_t) + size * r_pixbytes,
+        _loadName
+    );
 
     Q_memset(pspriteframe, 0, sizeof(mSpriteFrame_t) + size);
     *ppframe = pspriteframe;
@@ -1424,7 +1429,8 @@ TypeLess_ptr  Mod_LoadSpriteGroup(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
 
     mSpriteGroup_p pspritegroup = Hunk_AllocName(
         sizeof(mSpriteGroup_t) + (numframes - 1) * sizeof(pspritegroup->frames[0]),
-        _loadName);
+        _loadName
+    );
 
     pspritegroup->numframes = numframes;
     *ppframe = (mSpriteFrame_p)pspritegroup;
@@ -1462,8 +1468,11 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
 
     int version = LittleLong(pin->version);
     if (version != SPRITE_VERSION)
-        Host_SysError("%s has wrong version number "
-            "(%i should be %i)", mod->name, version, SPRITE_VERSION);
+        Host_SysError(
+            "%s has wrong version number "
+            "(%i should be %i)",
+            mod->name, version, SPRITE_VERSION
+        );
 
     int numframes = LittleLong(pin->numframes);
 

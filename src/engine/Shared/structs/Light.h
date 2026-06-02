@@ -2,6 +2,8 @@
 
 #include "types.h"
 #include "vector.h"
+#include "qTime.h"
+#include "enginedefs.h"
 #include "assert.h"
 
 typedef struct {
@@ -19,3 +21,13 @@ typedef dLight_t* dLight_p;
 STATIC_ASSERT_SIZE(dLight_t, 32); // QUAKE2 not handled
 
 extern dLight_t     cl_dlights[MAX_DLIGHTS];
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    dLight_p CL_AllocDlight(int32_t key);
+
+#ifdef __cplusplus
+}
+#endif

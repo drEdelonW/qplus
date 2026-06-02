@@ -38,6 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "input.h"
 #include "angle.h"
 #include "cvar_q1.h"
+#include "Light.h"
 #include "Beam.h"
 
 
@@ -53,7 +54,6 @@ static efrag_t  cl_efrags[MAX_EFRAGS] PLACE_TO_SDRAM;
 r_Entity_t      cl_entities[MAX_EDICTS] PLACE_TO_SDRAM;
 r_Entity_t      cl_static_entities[MAX_STATIC_ENTITIES] PLACE_TO_SDRAM;
 LightStyle_t    cl_lightstyle[MAX_LIGHTSTYLES] PLACE_TO_SDRAM;
-dLight_t        cl_dlights[MAX_DLIGHTS] PLACE_TO_SDRAM;
 
 uint32_t        cl_numvisedicts;
 r_Entity_p      cl_visedicts[MAX_VISEDICTS] PLACE_TO_SDRAM;
@@ -215,43 +215,6 @@ void SetPal(int i) {
         VID_SetPalette(pal);
     }
 #endif
-}
-
-/*
-===============
-CL_AllocDlight
-
-===============
-*/
-dLight_p CL_AllocDlight(int32_t key) {
-    // first look for an exact key match
-    if (key) {
-        dLight_p dl = cl_dlights;
-        for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
-            if (dl->key == key) {
-                memset(dl, 0, sizeof(*dl));
-                dl->key = key;
-                return dl;
-            }
-        }
-    }
-
-    // then look for anything else
-    {
-        dLight_p dl = cl_dlights;
-        for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
-            if (dl->die < cl.time) {
-                memset(dl, 0, sizeof(*dl));
-                dl->key = key;
-                return dl;
-            }
-        }
-    }
-
-    dLight_p dl = &cl_dlights[0];
-    memset(dl, 0, sizeof(*dl));
-    dl->key = key;
-    return dl;
 }
 
 
