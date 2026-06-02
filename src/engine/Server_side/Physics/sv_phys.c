@@ -50,10 +50,10 @@ solid_edge items only clip against bsp models.
 
 /* --- movement clip flags (bitmask) --- */
 typedef enum {
-    MOVECLIP_NONE       = 0u,        /* no block */
-    MOVECLIP_FLOOR      = 1u << 0,   /* floor (normal[Z_AX] > 0) */
-    MOVECLIP_WALL       = 1u << 1,   /* wall/step (normal[Z_AX] == 0) */
-    MOVECLIP_DEADSTOP   = 1u << 2,   /* dead stop (reserved by original comment) */
+    MOVECLIP_NONE = 0u,        /* no block */
+    MOVECLIP_FLOOR = 1u << 0,   /* floor (normal[Z_AX] > 0) */
+    MOVECLIP_WALL = 1u << 1,   /* wall/step (normal[Z_AX] == 0) */
+    MOVECLIP_DEADSTOP = 1u << 2,   /* dead stop (reserved by original comment) */
 
     /* --- special early-return results (non-bitmask) --- */
     /* note: 3 == (MOVECLIP_FLOOR|MOVECLIP_WALL) by value; here it is used as “trapped/allsolid” */
@@ -128,7 +128,8 @@ Returns false if the entity removed itself.
 bool SV_RunThink(edict_p ent) {
     float thinktime = ent->v.nextthink;
     if ((thinktime <= 0) ||
-        (thinktime > (SV_GetTime() + host_frametime)))
+        (thinktime > (SV_GetTime() + host_frametime))
+        )
         return true;
 
     CLAMP_LESS(thinktime, (float)SV_GetTime()); // don't let things stay in the past.
@@ -1081,7 +1082,7 @@ void SV_CheckWaterTransition(edict_p ent) {
         ent->v.watertype = CONTENTS_EMPTY;
         ent->v.waterlevel = (float)cont;
     }
-    }
+}
 
 /*
 =============
@@ -1340,7 +1341,7 @@ void SV_Physics() {
         }
 
         if ((i > 0) && (i <= svs.maxClients)) {
-             SV_Physics_Client(ent, i);
+            SV_Physics_Client(ent, i);
         }
         else {
             switch ((movetype_t)ent->v.movetype) {

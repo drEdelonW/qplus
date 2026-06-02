@@ -392,7 +392,7 @@ void R_TimeRefresh_f(void) {
     glDrawBuffer(GL_FRONT);
     glFinish();
 
-    float start = Host_FloatTime();
+    LegacyTimeStamp_t start = Host_FloatTime();
     for (int i = 0; i < VIEWANGLE_STEPS; i++) {
         r_refdef.viewangles[YAW] = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
@@ -400,8 +400,8 @@ void R_TimeRefresh_f(void) {
     }
 
     glFinish();
-    float stop = Host_FloatTime();
-    float time = stop - start;
+    LegacyTimeStamp_t stop = Host_FloatTime();
+    LegacyTimeDelta_t time = stop - start;
     Con_Printf("%f seconds (%f fps)\n", time, 128 / time);
 
     glDrawBuffer(GL_BACK);

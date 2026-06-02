@@ -27,7 +27,7 @@ int		iskyspeed = 8;
 int		iskyspeed2 = 2;
 float	skyspeed, skyspeed2;
 
-float		skytime;
+LegacyTimeDelta_t		skytime;
 
 uint8_p r_skysource;
 
@@ -240,19 +240,15 @@ R_SetSkyFrame
 ==============
 */
 void R_SetSkyFrame() {
-	int		g, s1, s2;
-	float	temp;
-
 	skyspeed = iskyspeed;
 	skyspeed2 = iskyspeed2;
 
-	g = GreatestCommonDivisor(iskyspeed, iskyspeed2);
-	s1 = iskyspeed / g;
-	s2 = iskyspeed2 / g;
-	temp = SKYSIZE * s1 * s2;
+	int g = GreatestCommonDivisor(iskyspeed, iskyspeed2);
+	int s1 = iskyspeed / g;
+	int s2 = iskyspeed2 / g;
+	float temp = SKYSIZE * s1 * s2;
 
 	skytime = cl.time - ((int)(cl.time / temp) * temp);
-
 
 	r_skymade = 0;
 }

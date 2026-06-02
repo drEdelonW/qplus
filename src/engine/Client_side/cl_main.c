@@ -262,7 +262,7 @@ CL_DecayLights
 ===============
 */
 void CL_DecayLights() {
-    float time = (float)(cl.time - cl.oldtime);
+    LegacyTimeDelta_t time = (LegacyTimeDelta_t)(cl.time - cl.oldtime);
     dLight_p dl = cl_dlights;
     for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
         if ((dl->die < cl.time) || !dl->radius)

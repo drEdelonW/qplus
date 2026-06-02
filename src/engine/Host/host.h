@@ -30,7 +30,7 @@ extern "C" {
     void Host_Error(cString error, ...);
     Q_NORETURN void Host_SysError(cStringRO error, ...);
     void Host_EndGame(cString message, ...);
-    void Host_Frame(float time);
+    void Host_Frame(LegacyTimeDelta_t time);
     void Host_Quit_f();
     void Host_ClientCommands(cString fmt, ...);
     void Host_ShutdownServer(bool crash);

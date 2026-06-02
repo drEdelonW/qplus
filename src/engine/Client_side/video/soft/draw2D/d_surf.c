@@ -118,7 +118,8 @@ SurfCache_p D_SCAlloc(int width, int size) {
     bool wrapped_this_time = false;
 
     if (!sc_rover ||
-        (((uint8_p)sc_rover - (uint8_p)sc_base) > sc_size - size)) {
+        (((uint8_p)sc_rover - (uint8_p)sc_base) > sc_size - size)
+        ) {
         if (sc_rover) {
             wrapped_this_time = true;
         }

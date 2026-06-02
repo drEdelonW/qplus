@@ -62,8 +62,7 @@ void Cmd_StuffCmds_f() {
     uint32_t s = 0;
     for (int i = 1; i < com.argc; i++) {
         if (!com.argv[i])   continue;  // NEXTSTEP nulls out -NXHost
-
-        s += Q_strlen(com.argv[i]) + 1;
+        else                s += Q_strlen(com.argv[i]) + 1;
     }
     if (!s)     return;
 

@@ -28,6 +28,7 @@ typedef enum {
     PLANE_ANYZ  = 5u
 } PlaneType_t;
 
+// it was [dplane_t]
 typedef struct {
     vec3_t      normal;
     float       dist;

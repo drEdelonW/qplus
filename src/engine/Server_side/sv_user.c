@@ -134,17 +134,14 @@ void SV_UserFriction() {
 
     trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, sv_player);
 
-    if (trace.fraction == 1.0)
-        friction = sv_friction.value * sv_edgefriction.value;
-    else
-        friction = sv_friction.value;
+    if (trace.fraction == 1.0)      friction = sv_friction.value * sv_edgefriction.value;
+    else                            friction = sv_friction.value;
 
     // apply friction
     float control = (speed < sv_stopspeed.value) ? sv_stopspeed.value : speed;
     float newspeed = (float)(speed - host_frametime * control * friction);
 
-    if (newspeed < 0)
-        newspeed = 0;
+    if (newspeed < 0.0f)   newspeed = 0.0f;
     newspeed /= speed;
 
     vel[0] = vel[0] * newspeed;

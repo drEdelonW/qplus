@@ -409,7 +409,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
 
         // another hack to fix heynames with trailing spaces
         size_t n = strlen(keyname);
-        while (n && keyname[n - 1] == ' ') {
+        while (n && (keyname[n - 1] == ' ')) {
             keyname[n - 1] = 0;
             n--;
         }

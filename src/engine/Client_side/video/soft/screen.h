@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // screen.h
 #include "types.h"
 #include "vid.h"
+#include "qTime.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,7 +55,7 @@ typedef struct {
     vRect_t  vrect;
     bool     disabled_for_loading;
     bool     skipupdate;
-    float    centertime_off;
+    LegacyTimeDelta_t    centertime_off;
 } Screen_t;
 extern Screen_t scr;
 

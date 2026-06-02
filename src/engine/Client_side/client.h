@@ -43,7 +43,7 @@ typedef struct {
 
 typedef struct {
     char    name[MAX_SCOREBOARDNAME];
-    float   entertime;
+    LegacyTimeDelta_t   entertime;
     int32_t frags;
     int32_t colors;   // two 4 bit fields
     uint8_t translations[VID_GRADES * 256];
@@ -73,8 +73,8 @@ typedef enum cshift_kind_e {
 typedef struct {
     vec3_t  origin;
     float   radius;
-    float   die;        // stop lighting after this time
-    float   decay;      // drop this each second
+    LegacyTimeDelta_t   die;        // stop lighting after this time
+    LegacyTimeDelta_t   decay;      // drop this each second
     float   minlight;   // don't add when contributing less
     int32_t key;
 #ifdef QUAKE2
@@ -116,7 +116,7 @@ typedef struct {
     FILE* demofile;
     int32_t     td_lastframe;  // to meter out one message a frame
     int32_t     td_startframe;  // host_framecount at start
-    float       td_starttime;  // realtime at second frame of timedemo
+    LegacyTimeDelta_t       td_starttime;  // realtime at second frame of timedemo
 
     // connection information
     int32_t     signon;   // 0 to SIGNONS
@@ -147,8 +147,8 @@ typedef struct {
     // information for local display
     uint32_t    stats[MAX_CL_STATS]; // health, etc
     uint32_t    items;   // inventory bit flags
-    float       item_gettime[32]; // cl.time of aquiring item, for blinking
-    float       faceanimtime; // use anim frame if cl.time < this
+    LegacyTimeDelta_t       item_gettime[32]; // cl.time of aquiring item, for blinking
+    LegacyTimeDelta_t       faceanimtime; // use anim frame if cl.time < this
 
     ColorShift_t    cshifts[NUM_CSHIFTS]; // color shifts for damage, powerups
     ColorShift_t    prev_cshifts[NUM_CSHIFTS]; // and content types
@@ -184,7 +184,7 @@ typedef struct {
     LegacyTimeStamp_t   time;   // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
     LegacyTimeStamp_t   oldtime;  // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
 
-    float       last_received_message; // (realtime) for net trouble icon
+    LegacyTimeDelta_t       last_received_message; // (realtime) for net trouble icon
 
     //
     // information that is static for the entire time connected to a server
