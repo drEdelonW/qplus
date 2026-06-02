@@ -159,7 +159,7 @@ void CL_ParseStartSoundPacket() {
     ==================
 */
 void CL_KeepaliveMessage() {
-    static float _lastMsg;
+    static LegacyTimeDelta_t _lastMsg;
 
     if ((Host_IsServerActive()) || // no need if server is local
         (cls.demoplayback)) {
@@ -188,7 +188,7 @@ void CL_KeepaliveMessage() {
     memcpy(net_message.data, olddata, net_message.cursize);
 
     // check time
-    float time = (float)Host_FloatTime();
+    LegacyTimeDelta_t time = (LegacyTimeDelta_t)Host_FloatTime();
     if ((time - _lastMsg) < 5.0f)    return;
     _lastMsg = time;
 
@@ -449,7 +449,7 @@ void CL_ParseClientdata(server_update_bits_t bits) {
                 if ((msg & (1u << i)) &&
                     !(cl.items & (1u << i))
                     ) {
-                    cl.item_gettime[i] = (float)cl.time;
+                    cl.item_gettime[i] = (LegacyTimeDelta_t)cl.time;
                 }
             }
             cl.items = msg;

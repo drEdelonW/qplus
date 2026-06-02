@@ -153,7 +153,9 @@ void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest);
 #define SKYMASK     (SKYSIZE - 1)
 
 extern float skyspeed, skyspeed2;
-extern float skytime;
+
+#include "qTime.h"
+extern LegacyTimeDelta_t skytime;
 
 extern int c_surf;
 extern vRect_t scr_vrect;

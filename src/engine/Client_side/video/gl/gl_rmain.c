@@ -157,11 +157,11 @@ mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) {
         int numframes = pspritegroup->numframes;
         float fullinterval = pintervals[numframes - 1];
 
-        float time = cl.time + currententity->syncbase;
+        LegacyTimeDelta_t time = cl.time + currententity->syncbase;
 
         // when loading in Mod_LoadSpriteGroup, we guaranteed all interval values
         // are positive, so we don't have to worry about division by 0
-        float targettime = time - ((int)(time / fullinterval)) * fullinterval;
+        LegacyTimeDelta_t targettime = time - ((int)(time / fullinterval)) * fullinterval;
 
         int i = 0;
         for (; i < (numframes - 1); i++) {

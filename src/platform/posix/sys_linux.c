@@ -171,7 +171,6 @@ void Sys_LineRefresh() {}
 
 #if !id386
 void Sys_HighFPPrecision() {}
-
 void Sys_LowFPPrecision() {}
 #endif
 
