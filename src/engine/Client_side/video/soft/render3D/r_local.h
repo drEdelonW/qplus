@@ -288,6 +288,8 @@ void R_cshift_f();
 void R_EmitEdge(mVertex_p pv0, mVertex_p pv1);
 void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip);
 void R_SplitEntityOnNode2(mNode_p node);
+
+#include "Light.h"
 void R_MarkLights(dLight_p light, int bit, mNode_p node);
 
 #endif

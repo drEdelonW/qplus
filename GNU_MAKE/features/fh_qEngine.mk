@@ -142,6 +142,8 @@ include features/fh_qRender$(QRND).mk
                 $(eval STRUCT_DIR := $(SHARED_DIR)/structs) $(eval INCLUDES += $(STRUCT_DIR))
                         SRC_LIST += $(STRUCT_DIR)/qPic.c
                         SRC_LIST += $(STRUCT_DIR)/pcx.c
+                        SRC_LIST += $(STRUCT_DIR)/Plane.c
+                        SRC_LIST += $(STRUCT_DIR)/Light.c
                         SRC_LIST += $(STRUCT_DIR)/Pak.c
 
 
