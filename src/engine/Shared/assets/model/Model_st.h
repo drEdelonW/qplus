@@ -112,7 +112,7 @@ typedef struct {
 } Lump_t;
 typedef Lump_t* Lump_p;
 
-typedef enum {
+typedef enum {      // BSP Lumps
     LUMP_ENTITIES     = 0u,
     LUMP_PLANES       = 1u,
     LUMP_TEXTURES     = 2u,

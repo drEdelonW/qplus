@@ -34,9 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "endian_tools.h"
 
 static Model_p _loadModel;
-static char _loadName[32]; // for hunk tags
+char Mod_loadName[32]; // for hunk tags
 
-void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer); // .spr file
 void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer);  // .bsp file
 void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer);  // .mdl file
 Model_p Mod_LoadModel(Model_p mod, bool crash);
@@ -248,7 +247,7 @@ Model_p Mod_LoadModel(Model_p mod, bool crash) {
     //
     // allocate a new model
     //
-    COM_FileBase(mod->name, _loadName);
+    COM_FileBase(mod->name, Mod_loadName);
 
     _loadModel = mod;
 
@@ -306,7 +305,7 @@ void Mod_LoadTextures(Lump_p l) {
 
     _loadModel->numtextures = m->nummiptex;
     _loadModel->textures = Hunk_AllocName(
-        m->nummiptex * sizeof(*_loadModel->textures), _loadName
+        m->nummiptex * sizeof(*_loadModel->textures), Mod_loadName
     );
 
     for (int i = 0; i < m->nummiptex; i++) {
@@ -322,7 +321,7 @@ void Mod_LoadTextures(Lump_p l) {
         if ((mt->width & 0x0F) || (mt->height & 0x0F))      Host_SysError("Texture %s is not 16 aligned", mt->name);
 
         int pixels = mt->width * mt->height / 64 * 85;
-        Texture_p tx = Hunk_AllocName(sizeof(Texture_t) + pixels, _loadName);
+        Texture_p tx = Hunk_AllocName(sizeof(Texture_t) + pixels, Mod_loadName);
         _loadModel->textures[i] = tx;
 
         memcpy(tx->name, mt->name, sizeof(tx->name));
@@ -431,7 +430,7 @@ Mod_LoadLighting
 void Mod_LoadLighting(Lump_p l) {
     if (!l->fileLen) { _loadModel->lightdata = NULL; return; }
 
-    _loadModel->lightdata = Hunk_AllocName(l->fileLen, _loadName);
+    _loadModel->lightdata = Hunk_AllocName(l->fileLen, Mod_loadName);
     memcpy(_loadModel->lightdata, mod_base + l->fileOfs, l->fileLen);
 }
 
@@ -444,7 +443,7 @@ Mod_LoadVisibility
 void Mod_LoadVisibility(Lump_p l) {
     if (!l->fileLen) { _loadModel->visdata = NULL; return; }
 
-    _loadModel->visdata = Hunk_AllocName(l->fileLen, _loadName);
+    _loadModel->visdata = Hunk_AllocName(l->fileLen, Mod_loadName);
     memcpy(_loadModel->visdata, mod_base + l->fileOfs, l->fileLen);
 }
 
@@ -457,7 +456,7 @@ Mod_LoadEntities
 void Mod_LoadEntities(Lump_p l) {
     if (!l->fileLen) { _loadModel->entities = NULL; return; }
 
-    _loadModel->entities = Hunk_AllocName(l->fileLen, _loadName);
+    _loadModel->entities = Hunk_AllocName(l->fileLen, Mod_loadName);
     memcpy(_loadModel->entities, mod_base + l->fileOfs, l->fileLen);
 }
 
@@ -472,7 +471,7 @@ void Mod_LoadVertexes(Lump_p l) {
     if (l->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    mVertex_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    mVertex_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->vertexes = out;
     _loadModel->numvertexes = count;
@@ -494,7 +493,7 @@ void Mod_LoadSubmodels(Lump_p l) {
     if (l->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    dModel_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    dModel_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->SubModels = out;
     _loadModel->numSubModels = count;
@@ -524,7 +523,7 @@ void Mod_LoadEdges(Lump_p l) {
     if (l->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    mEdge_p out = Hunk_AllocName((count + 1) * sizeof(*out), _loadName);
+    mEdge_p out = Hunk_AllocName((count + 1) * sizeof(*out), Mod_loadName);
 
     _loadModel->edges = out;
     _loadModel->numedges = count;
@@ -545,7 +544,7 @@ void Mod_LoadTexinfo(Lump_p l) {
     if (l->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    mTexInfo_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    mTexInfo_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->texinfo = out;
     _loadModel->numtexinfo = count;
@@ -646,7 +645,7 @@ void Mod_LoadFaces(Lump_p l) {
         Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    mSurface_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    mSurface_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->surfaces = out;
     _loadModel->numsurfaces = count;
@@ -720,7 +719,7 @@ void Mod_LoadNodes(Lump_p l) {
     if (l->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    mNode_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    mNode_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->nodes = out;
     _loadModel->numnodes = count;
@@ -756,7 +755,7 @@ void Mod_LoadLeafs(Lump_p l) {
     if (l->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    mLeaf_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    mLeaf_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->leafs = out;
     _loadModel->numleafs = count;
@@ -792,7 +791,7 @@ void Mod_LoadClipnodes(Lump_p l) {
     if (l->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    dClipNode_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    dClipNode_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->clipnodes = out;
     _loadModel->numclipnodes = count;
@@ -841,7 +840,7 @@ void Mod_MakeHull0() {
 
     mNode_p in = _loadModel->nodes;
     int count = _loadModel->numnodes;
-    dClipNode_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    dClipNode_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     hull->clipnodes = out;
     hull->firstclipnode = 0;
@@ -868,7 +867,7 @@ void Mod_LoadMarksurfaces(Lump_p l) {
     if (l->fileLen % sizeof(*in))           Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    mSurface_p* out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    mSurface_p* out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->marksurfaces = out;
     _loadModel->nummarksurfaces = count;
@@ -891,7 +890,7 @@ void Mod_LoadSurfedges(Lump_p l) {
     if (l->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    int32_p out = Hunk_AllocName(count * sizeof(*out), _loadName);
+    int32_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->surfedges = out;
     _loadModel->numsurfedges = count;
@@ -910,7 +909,7 @@ void Mod_LoadPlanes(Lump_p l) {
     if (l->fileLen % sizeof(*in))        Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = l->fileLen / sizeof(*in);
-    mPlane_p out = Hunk_AllocName(count * 2 * sizeof(*out), _loadName);
+    mPlane_p out = Hunk_AllocName(count * 2 * sizeof(*out), Mod_loadName);
 
     _loadModel->planes = out;
     _loadModel->numplanes = count;
@@ -1060,7 +1059,7 @@ TypeLess_ptr Mod_LoadAliasFrame(
     }
 
     TriVertx_p pinframe = (TriVertx_p)(pdaliasframe + 1);
-    TriVertx_p pframe = Hunk_AllocName(numv * sizeof(*pframe), _loadName);
+    TriVertx_p pframe = Hunk_AllocName(numv * sizeof(*pframe), Mod_loadName);
 
     *pframeindex = (uint8_p)pframe - (uint8_p)pheader;
 
@@ -1097,7 +1096,7 @@ TypeLess_ptr  Mod_LoadAliasGroup(
     dAliasGroup_p pingroup = (dAliasGroup_p)pin;
     int32_t numframes = LittleLong(pingroup->numframes);
     mAliasGroup_p paliasgroup = Hunk_AllocName(
-        sizeof(mAliasGroup_t) + (numframes - 1) * sizeof(paliasgroup->frames[0]), _loadName);
+        sizeof(mAliasGroup_t) + (numframes - 1) * sizeof(paliasgroup->frames[0]), Mod_loadName);
     paliasgroup->numframes = numframes;
 
     for (int i = 0; i < VECT_DIM; i++) {
@@ -1108,7 +1107,7 @@ TypeLess_ptr  Mod_LoadAliasGroup(
 
     *pframeindex = (uint8_p)paliasgroup - (uint8_p)pheader;
     dAliasInterval_p pin_intervals = (dAliasInterval_p)(pingroup + 1);
-    float_p poutintervals = Hunk_AllocName(numframes * sizeof(float), _loadName);
+    float_p poutintervals = Hunk_AllocName(numframes * sizeof(float), Mod_loadName);
     paliasgroup->intervals = (uint8_p)poutintervals - (uint8_p)pheader;
 
     for (int i = 0; i < numframes; i++) {
@@ -1142,7 +1141,7 @@ Mod_LoadAliasSkin
 =================
 */
 TypeLess_ptr Mod_LoadAliasSkin(TypeLess_ptr pin, int32_p pskinindex, int skinsize, AliasHdr_p pheader) {
-    uint8_p pskin = Hunk_AllocName(skinsize * r_pixbytes, _loadName);
+    uint8_p pskin = Hunk_AllocName(skinsize * r_pixbytes, Mod_loadName);
     uint8_p pinskin = (uint8_p)pin;
     *pskinindex = (uint8_p)pskin - (uint8_p)pheader;
 
@@ -1169,13 +1168,13 @@ TypeLess_ptr Mod_LoadAliasSkinGroup(TypeLess_ptr pin, int32_p pskinindex, int32_
     int32_t numskins = LittleLong(pinskingroup->numskins);
     mAliasSkinGroup_p paliasskingroup = Hunk_AllocName(
         sizeof(mAliasSkinGroup_t) + (numskins - 1) * sizeof(paliasskingroup->skindescs[0]),
-        _loadName
+        Mod_loadName
     );
 
     paliasskingroup->numskins = numskins;
     *pskinindex = (uint8_p)paliasskingroup - (uint8_p)pheader;
     dAliasSkinInterval_p pinskinintervals = (dAliasSkinInterval_p)(pinskingroup + 1);
-    float_p poutskinintervals = Hunk_AllocName(numskins * sizeof(float), _loadName);
+    float_p poutskinintervals = Hunk_AllocName(numskins * sizeof(float), Mod_loadName);
     paliasskingroup->intervals = (uint8_p)poutskinintervals - (uint8_p)pheader;
 
     for (int32_t i = 0; i < numskins; i++) {
@@ -1219,7 +1218,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
         sizeof(Mdl_t) +
         LittleLong(pinmodel->numverts) * sizeof(stvert_t) +
         LittleLong(pinmodel->numtris) * sizeof(mTriangle_t),
-        _loadName
+        Mod_loadName
     );
     Mdl_p pmodel = (Mdl_p)((uint8_p)&pheader[1] +
         (LittleLong(pinmodel->numframes) - 1) *
@@ -1270,7 +1269,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     if (numskins < 1)                           Host_SysError("Mod_LoadAliasModel: Invalid # of skins: %d\n", numskins);
 
     dAliasSkinType_p pskintype = (dAliasSkinType_p)&pinmodel[1];
-    mAliasSkinDesc_p pskindesc = Hunk_AllocName(numskins * sizeof(mAliasSkinDesc_t), _loadName);
+    mAliasSkinDesc_p pskindesc = Hunk_AllocName(numskins * sizeof(mAliasSkinDesc_t), Mod_loadName);
 
     pheader->skindesc = (uint8_p)pskindesc - (uint8_p)pheader;
 
@@ -1362,7 +1361,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     //
     size_t total = Hunk_LowMark() - start;
 
-    Cache_Alloc(&mod->cache, total, _loadName);
+    Cache_Alloc(&mod->cache, total, Mod_loadName);
     if (!mod->cache.data)       return;
 
     memcpy(mod->cache.data, pheader, total);
@@ -1372,151 +1371,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
 //=============================================================================
 
-/*
-=================
-Mod_LoadSpriteFrame
-=================
-*/
-TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
-    dSpriteFrame_p pinframe = (dSpriteFrame_p)pin;
 
-    int width = LittleLong(pinframe->width);
-    int height = LittleLong(pinframe->height);
-    int size = width * height;
-
-    mSpriteFrame_p pspriteframe = Hunk_AllocName(
-        sizeof(mSpriteFrame_t) + size * r_pixbytes,
-        _loadName
-    );
-
-    Q_memset(pspriteframe, 0, sizeof(mSpriteFrame_t) + size);
-    *ppframe = pspriteframe;
-
-    pspriteframe->width = width;
-    pspriteframe->height = height;
-
-    int origin[2];
-    origin[0] = LittleLong(pinframe->origin[0]);
-    origin[1] = LittleLong(pinframe->origin[1]);
-
-    pspriteframe->up = origin[1];
-    pspriteframe->down = origin[1] - height;
-    pspriteframe->left = origin[0];
-    pspriteframe->right = width + origin[0];
-
-    if (r_pixbytes == 1)    Q_memcpy(&pspriteframe->pixels[0], (uint8_p)(pinframe + 1), size);
-    else if (r_pixbytes == 2) {
-        uint8_p ppixin = (uint8_p)(pinframe + 1);
-        uint16_p ppixout = (uint16_p)&pspriteframe->pixels[0];
-
-        for (int i = 0; i < size; i++)
-            ppixout[i] = d_8to16table[ppixin[i]];
-    }
-    else                    Host_SysError("Mod_LoadSpriteFrame: driver set invalid r_pixbytes: %d\n", r_pixbytes);
-
-    return (TypeLess_ptr)((uint8_p)pinframe + sizeof(dSpriteFrame_t) + size);
-}
-
-
-/*
-=================
-Mod_LoadSpriteGroup
-=================
-*/
-TypeLess_ptr  Mod_LoadSpriteGroup(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
-    dSpriteGroup_p pingroup = (dSpriteGroup_p)pin;
-    int numframes = LittleLong(pingroup->numframes);
-
-    mSpriteGroup_p pspritegroup = Hunk_AllocName(
-        sizeof(mSpriteGroup_t) + (numframes - 1) * sizeof(pspritegroup->frames[0]),
-        _loadName
-    );
-
-    pspritegroup->numframes = numframes;
-    *ppframe = (mSpriteFrame_p)pspritegroup;
-
-    dSpriteInterval_p pin_intervals = (dSpriteInterval_p)(pingroup + 1);
-
-    float_p poutintervals = Hunk_AllocName(numframes * sizeof(float), _loadName);
-    pspritegroup->intervals = poutintervals;
-
-    for (int i = 0; i < numframes; i++) {
-        *poutintervals = LittleFloat(pin_intervals->interval);
-        if (*poutintervals <= 0.0)          Host_SysError("Mod_LoadSpriteGroup: interval<=0");
-
-        poutintervals++;
-        pin_intervals++;
-    }
-
-    TypeLess_ptr ptemp = (TypeLess_ptr)pin_intervals;
-
-    for (int i = 0; i < numframes; i++) {
-        ptemp = Mod_LoadSpriteFrame(ptemp, &pspritegroup->frames[i]);
-    }
-
-    return ptemp;
-}
-
-
-/*
-=================
-Mod_LoadSpriteModel
-=================
-*/
-void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
-    dSprite_p pin = (dSprite_p)buffer;
-
-    int version = LittleLong(pin->version);
-    if (version != SPRITE_VERSION)
-        Host_SysError(
-            "%s has wrong version number "
-            "(%i should be %i)",
-            mod->name, version, SPRITE_VERSION
-        );
-
-    int numframes = LittleLong(pin->numframes);
-
-    mSprite_p psprite = Hunk_AllocName(
-        sizeof(mSprite_t) + (numframes - 1) * sizeof(psprite->frames),
-        _loadName
-    );
-
-    mod->cache.data = psprite;
-
-    psprite->type = LittleLong(pin->type);
-    psprite->maxwidth = LittleLong(pin->width);
-    psprite->maxheight = LittleLong(pin->height);
-    psprite->beamlength = LittleFloat(pin->beamlength);
-    mod->synctype = LittleLong(pin->synctype);
-    psprite->numframes = numframes;
-
-    mod->mins[0] = mod->mins[1] = -psprite->maxwidth / 2;
-    mod->maxs[0] = mod->maxs[1] = psprite->maxwidth / 2;
-    mod->mins[2] = -psprite->maxheight / 2;
-    mod->maxs[2] = psprite->maxheight / 2;
-
-    //
-    // load the frames
-    //
-    if (numframes < 1)          Host_SysError("Mod_LoadSpriteModel: Invalid # of frames: %d\n", numframes);
-
-    mod->numframes = numframes;
-    mod->flags = 0;
-
-    dSpriteFrameType_p pframetype = (dSpriteFrameType_p)(pin + 1);
-
-    for (int i = 0; i < numframes; i++) {
-        SpriteFrameType_t frametype;
-
-        frametype = LittleLong(pframetype->type);
-        psprite->frames[i].type = frametype;
-
-        if (frametype == SPR_SINGLE)    pframetype = (dSpriteFrameType_p)Mod_LoadSpriteFrame(pframetype + 1, &psprite->frames[i].frameptr);
-        else                            pframetype = (dSpriteFrameType_p)Mod_LoadSpriteGroup(pframetype + 1, &psprite->frames[i].frameptr);
-    }
-
-    mod->type = mod_sprite;
-}
 
 //=============================================================================
 
