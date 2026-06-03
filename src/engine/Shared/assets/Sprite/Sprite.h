@@ -121,3 +121,7 @@ typedef struct {
     float   interval;
 } dSpriteInterval_t;
 typedef dSpriteInterval_t* dSpriteInterval_p;
+
+
+#include "Model_st.h"
+void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer); // .spr file

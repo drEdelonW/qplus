@@ -38,8 +38,9 @@ extern AliasHdr_p pheader;
 extern stvert_t stverts[MAXALIASVERTS];
 extern mTriangle_t triangles[MAXALIASTRIS];
 extern TriVertx_p poseverts[MAXALIASFRAMES];
-
+extern Model_p loadmodel;
 #endif
+extern char Mod_loadName[32]; // for hunk tags
 
 /*
 ==============================================================================
