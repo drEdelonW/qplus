@@ -125,5 +125,5 @@ typedef dSpriteInterval_t* dSpriteInterval_p;
 
 
 // #include "Model_st.h"
-#include "BrushModel.h"
+#include "model.h"
 void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer); // .spr file
