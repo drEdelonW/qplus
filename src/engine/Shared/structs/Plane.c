@@ -1,5 +1,6 @@
 #include "Plane.h"
 #include "host.h"
+#include "z_hunk.h"
 
 /*
 ==================

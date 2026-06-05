@@ -4,7 +4,7 @@
 #include "q_tools.h"
 #include "console.h"
 #include "host.h"
-#include "zone.h"
+#include "z_hunk.h"
 
 //===========================================================================
 

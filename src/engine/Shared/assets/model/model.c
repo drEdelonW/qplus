@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_iface.h"
 #include "r_local.h"
 #include "endian_tools.h"
+#include "z_hunk.h"
 
 Model_p _loadModel;
 char Mod_loadName[32]; // for hunk tags
@@ -922,6 +923,8 @@ float RadiusFromBounds(vec3_t mins, vec3_t maxs) {
 Mod_LoadBrushModel
 =================
 */
+void Mod_LoadPlanes(Lump_p l); // TODO: to solve dependence loop hell
+
 void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
     _loadModel->type = mod_brush;
     dHeader_p header = (dHeader_p)buffer;

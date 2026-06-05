@@ -1,7 +1,7 @@
 #include "pcx.h"
 #include "endian_tools.h"
 #include "q_tools.h"
-#include "zone.h"
+#include "z_hunk.h"
 #include "console.h"
 #include "common.h"
 

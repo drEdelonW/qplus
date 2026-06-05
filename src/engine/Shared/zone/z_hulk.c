@@ -1,4 +1,5 @@
-#include "zone.h"
+// #include "zone.h"
+#include "z_hunk.h"
 #include "zone_prv.h"
 
 #include <string.h>
@@ -6,13 +7,13 @@
 #include "q_tools.h"
 
 
-#define	HUNK_SENTINAL	(0x1Df001ED)
+#define	HUNK_SENTINAL	(0x1DF001ED)
 
 
 typedef struct {
-    int     sentinal;
-    size_t	size;       // including sizeof(hunk_t), -1 = not allocated
-    char 	name[8];
+    uint32_t    sentinal;
+    size_t	    size;       // including sizeof(hunk_t), -1 = not allocated
+    char 	    name[8];
 } hunk_t;
 typedef hunk_t* hunk_p;
 
@@ -43,10 +44,11 @@ Run consistancy and sentinal trahing checks
 */
 void Hunk_Check() {
     for (hunk_p h = (hunk_p)hunk_base; (uint8_p)h != (hunk_base + hunk_low_used); ) {
-        if ((h->sentinal) != HUNK_SENTINAL)
-            Host_Error("Hunk_Check: trahsed sentinal");
-        if ((h->size < 16) || ((h->size + (uint8_p)h - hunk_base) > hunk_size))
-            Host_Error("Hunk_Check: bad size");
+        if ((h->sentinal) != HUNK_SENTINAL)     Host_Error("Hunk_Check: trahsed sentinal");
+        if ((h->size < 16) ||
+            ((h->size + (uint8_p)h - hunk_base) > hunk_size)
+            )                                   Host_Error("Hunk_Check: bad size");
+
         h = (hunk_p)((uint8_p)h + h->size);
     }
 }
@@ -99,13 +101,11 @@ void Hunk_Print(bool all) {
         //
         // run consistancy checks
         //
-        if (h->sentinal != HUNK_SENTINAL)
-            Host_Error("Hunk_Check: trahsed sentinal");
+        if (h->sentinal != HUNK_SENTINAL)       Host_Error("Hunk_Check: trahsed sentinal");
 
         if ((h->size < 16) ||
             ((h->size + (uint8_p)h - hunk_base) > hunk_size)
-            )
-            Host_Error("Hunk_Check: bad size");
+            )                                   Host_Error("Hunk_Check: bad size");
 
         hunk_p next = (hunk_p)((uint8_p)h + h->size);
         // count++;
@@ -186,8 +186,8 @@ size_t	Hunk_LowMark() {
 }
 
 void Hunk_FreeToLowMark(size_t mark) {
-    if ((mark > hunk_low_used))
-        Host_Error("Hunk_FreeToLowMark: bad mark %i", mark);
+    if ((mark > hunk_low_used))             Host_Error("Hunk_FreeToLowMark: bad mark %i", mark);
+
     memset((hunk_base + mark), 0, (hunk_low_used - mark));
     hunk_low_used = mark;
 }
@@ -206,8 +206,8 @@ void Hunk_FreeToHighMark(size_t mark) {
         _hunk_tempactive = false;
         Hunk_FreeToHighMark(_hunk_tempmark);
     }
-    if (mark > hunk_high_used)
-        Host_Error("Hunk_FreeToHighMark: bad mark %i", mark);
+    if (mark > hunk_high_used)          Host_Error("Hunk_FreeToHighMark: bad mark %i", mark);
+
     memset((hunk_base + hunk_size - hunk_high_used), 0, (hunk_high_used - mark));
     hunk_high_used = mark;
 }

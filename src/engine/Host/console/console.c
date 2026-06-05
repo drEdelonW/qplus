@@ -43,7 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sys.h"
 #include "draw.h"
 #include "cvar_q1.h"
-
+#include "z_hunk.h"
 
 #define CON_TEXTSIZE    (int32_t)0x4000 /*16Kb - 16384b*/
 #define NUM_CON_TIMES 4

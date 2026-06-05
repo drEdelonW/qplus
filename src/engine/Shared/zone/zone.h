@@ -92,66 +92,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-//========================[z_hulk.c]========================//
-#ifdef __cplusplus
-extern "C" {
-#endif
-    void         Z_Free(TypeLess_ptr ptr);
-    TypeLess_ptr Z_Malloc(size_t size);   // returns 0 filled memory
-    TypeLess_ptr Z_TagMalloc(size_t size, int tag);
 
-    void Z_DumpHeap();
-    void Z_CheckHeap();
-    int  Z_FreeMemory();
-#ifdef __cplusplus
-}
-#endif
-
-//========================[z_hulk.c]========================//
-#ifdef __cplusplus
-extern "C" {
-#endif
-    TypeLess_ptr Hunk_Alloc(size_t size); // returns 0 filled memory
-    TypeLess_ptr Hunk_AllocName(size_t size, cStringRO name);
-
-    TypeLess_ptr Hunk_HighAllocName(size_t size, cStringRO name);
-
-    size_t  Hunk_LowMark();
-    void    Hunk_FreeToLowMark(size_t mark);
-
-    size_t  Hunk_HighMark();
-    void    Hunk_FreeToHighMark(size_t mark);
-
-    TypeLess_ptr Hunk_TempAlloc(size_t size);
-
-    void Hunk_Check();
-#ifdef __cplusplus
-}
-#endif
-
-//========================[z_cache.c]========================//
-typedef struct CacheUser_s {
-    TypeLess_ptr   data;
-} CacheUser_t;
-typedef CacheUser_t* CacheUser_p;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-    void Cache_Flush();
-
-    // returns the cached data, and moves to the head of the LRU list if present, otherwise returns NULL
-    TypeLess_ptr Cache_Check(CacheUser_p c);
-
-    void Cache_Free(CacheUser_p c);
-
-    // Returns NULL if all purgable data was tossed and there still wasn't enough room.
-    TypeLess_ptr Cache_Alloc(CacheUser_p c, size_t size, cString name);
-
-    void Cache_Report();
-
-
-
-#ifdef __cplusplus
-}
-#endif
+// #include "z_zone.h"     // 64-128Kb !HOT! to DTCM RAM [Data Tightly Coupled Memory] fast runtime allocator VM nad phisics
+// #include "z_hunk.h"     // 8-12Mb !WARM! to SDRAM (dual direction stack like)
+// #include "z_cache.h"    // 4-6Mb !COLD! to SDRAM (client side cache)

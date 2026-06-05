@@ -62,7 +62,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "progs.h"
 #include "gamedefs.h"
 #include "GlobVars.h"
-
+#include "z_hunk.h"
 
 /*
 
@@ -104,9 +104,8 @@ void Host::EndGame(cString message, ...) {
     va_end(argptr);
     Con_DPrintf("Host::EndGame: %s\n", string);
 
-    if (SV_IsActive())  ShutdownServer(false);
-
-    if (Host_IsDedicated())  Host_SysError("Host::EndGame: %s\n", string); // dedicated servers exit
+    if (SV_IsActive())          ShutdownServer(false);
+    if (Host_IsDedicated())     Host_SysError("Host::EndGame: %s\n", string); // dedicated servers exit
 
     if (cls.demonum != -1)  CL_NextDemo();
     else                    CL_Disconnect();
@@ -124,7 +123,8 @@ This shuts down both the client and server
 void Host::Error(cString error, ...) {
     static bool _inError = false;
 
-    if (_inError)    Host_SysError("Host::Error: recursively entered");
+    if (_inError)       Host_SysError("Host::Error: recursively entered");
+
     _inError = true;
 
     SCR_EndLoadingPlaque();  // reenable screen updates
@@ -135,7 +135,6 @@ void Host::Error(cString error, ...) {
     Con_Printf("Host::Error: %s\n", string);
 
     if (SV_IsActive())  ShutdownServer(false);
-
     if (Host_IsDedicated())  Host_SysError("Host::Error: %s\n", string); // dedicated servers exit
 
     CL_Disconnect();
@@ -247,14 +246,15 @@ Sends text across to be displayed
 FIXME: make this just a stuffed echo?
 =================
 */
-// void SV_ClientPrintf(cString fmt, ...) {
-//     va_list  argptr;    va_start(argptr, fmt);
-//     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
-//     va_end(argptr);
-//     sizebuf_p pBuf = &remoteClient->message;
-//     MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
-// }
-
+#if 0
+void SV_ClientPrintf(cString fmt, ...) {
+    va_list  argptr;    va_start(argptr, fmt);
+    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
+    va_end(argptr);
+    sizebuf_p pBuf = &remoteClient->message;
+    MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
+}
+#endif
 /*
 =================
 SV_BroadcastPrintf
@@ -262,17 +262,18 @@ SV_BroadcastPrintf
 Sends text to all active clients
 =================
 */
-// void SV_BroadcastPrintf(cString fmt, ...) {
-//    va_list  argptr;    va_start(argptr, fmt);
-//    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
-//    va_end(argptr);
-//     for (int i = 0; i < svs.maxClients; i++)
-//         if (svs.clients[i].active && svs.clients[i].spawned) {
-    //     sizebuf_p pBuf = &svs.clients[i].message;
-//             MSG_WriteByte(pBuf, svc_print);   MSG_WriteString(pBuf, string);
-//         }
-// }
-
+#if 0
+void SV_BroadcastPrintf(cString fmt, ...) {
+    va_list  argptr;    va_start(argptr, fmt);
+    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
+    va_end(argptr);
+    for (int i = 0; i < svs.maxClients; i++)
+        if (svs.clients[i].active && svs.clients[i].spawned) {
+            sizebuf_p pBuf = &svs.clients[i].message;
+            MSG_WriteByte(pBuf, svc_print);   MSG_WriteString(pBuf, string);
+        }
+}
+#endif
 /*
 =================
 Host::ClientCommands
@@ -757,6 +758,7 @@ void Host::Init(QuakeParms_p parms) {
     if (cls.state != ca_dedicated) {
         host_basepal = (uint8_p)COM_LoadHunkFile("gfx/palette.lmp");
         if (!host_basepal)      Host_SysError("Couldn't load gfx/palette.lmp");
+
         host_colormap = (uint8_p)COM_LoadHunkFile("gfx/colormap.lmp");
         if (!host_colormap)     Host_SysError("Couldn't load gfx/colormap.lmp");
 

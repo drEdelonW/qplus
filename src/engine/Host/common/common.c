@@ -596,6 +596,9 @@ Filename are reletive to the quake directory.
 Allways appends a 0 uint8_t.
 ============
 */
+#include "z_zone.h"
+#include "z_hunk.h"
+#include "z_cache.h"
 CacheUser_p loadcache;
 uint8_p     loadbuf;
 size_t      loadsize;

@@ -5,7 +5,7 @@
 #include "console.h"
 #include "types.h"
 #include "q_tools.h"
-#include "zone.h"
+#include "z_zone.h"
 
 
 #define MAX_ALIAS_NAME (32)

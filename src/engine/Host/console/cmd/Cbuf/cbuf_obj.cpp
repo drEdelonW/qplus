@@ -3,7 +3,7 @@
 
 #include <string.h>
 #include "q_tools.h"
-#include "zone.h"
+#include "z_zone.h"
 #include "console.h"
 
 #define CMD_BUSS_SIZE  (0x2000)  /* 8Kb*/

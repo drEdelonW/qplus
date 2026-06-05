@@ -383,7 +383,7 @@ void Host_Savegame_f() {
     Con_Printf("done.\n");
 }
 
-
+#include "z_hunk.h"
 /*
 ===============
 Host_Loadgame_f
