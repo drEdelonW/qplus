@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-    void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer);  // .bsp file
+    void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer);  // .mdl file
 
 #ifdef __cplusplus
 }

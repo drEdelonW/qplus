@@ -1,7 +1,10 @@
 #pragma once
 
 #include "types.h"
+#include "vector.h"
 #include "Triangle.h"
+#include "SyncType.h"
+
 
 #define ALIAS_BASE_SIZE_RATIO   (1.0 / 11.0)
                     // normalizing factor so player model works out to about
@@ -174,3 +177,4 @@ typedef struct {
     float       size;
 } Mdl_t;
 typedef Mdl_t* Mdl_p;
+

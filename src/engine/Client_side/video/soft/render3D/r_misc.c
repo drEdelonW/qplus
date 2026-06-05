@@ -19,8 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_misc.c
 
-// #include "server.h"
-// #undef SERVER   // TODO: remove this workaround
 #include "r_local.h"
 #include "host.h"
 #include "sbar.h"
