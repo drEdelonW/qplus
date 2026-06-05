@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "view.h"
 #include "sound.h"
 #include "host.h"
+#include "LeafModel.h"
 
 r_Entity_t r_worldentity; // was Entity_t
 

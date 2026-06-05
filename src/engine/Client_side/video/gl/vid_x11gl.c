@@ -105,9 +105,9 @@ void CheckMultiTextureExtensions(void) {
 GL_Init
 ===============
 */
-cStringRO gl_vendor;
-cStringRO gl_version;
-cStringRO gl_extensions;
+cString gl_vendor;
+cString gl_version;
+cString gl_extensions;
 
 void GL_Init(void) {
     gl_vendor = glGetString(GL_VENDOR);

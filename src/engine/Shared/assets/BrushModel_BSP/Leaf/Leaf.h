@@ -6,6 +6,8 @@
 #include "Sound_struct.h"
 #include "eFrag.h"
 
+#define MAX_MAP_LEAFS           (8192)
+
 // it was [mleaf_t]
 typedef struct mLeaf_s {
     // common with node

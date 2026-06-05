@@ -77,8 +77,6 @@ extern "C" {
     TypeLess_ptr Mod_Extradata(Model_p mod); // handles caching
     Model_p Mod_FindName(cString name);
     
-    mLeaf_p Mod_PointInLeaf(vec3_t p, Model_p model);
-    uint8_p Mod_LeafPVS(mLeaf_p leaf, Model_p model);
     void Mod_TouchModel(cString name);
     void Mod_Print();
 

@@ -5,6 +5,7 @@
 #include "Triangle.h"
 #include "SyncType.h"
 
+#define ALIAS_VERSION   6
 
 #define ALIAS_BASE_SIZE_RATIO   (1.0 / 11.0)
                     // normalizing factor so player model works out to about

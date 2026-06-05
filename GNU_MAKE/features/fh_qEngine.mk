@@ -141,6 +141,9 @@ include features/fh_qRender$(QRND).mk
                                 SRC_LIST += $(MDL_DIR)/AliasModel.c
 
                         $(eval BSP_DIR = $(AST_DIR)/BrushModel_BSP) $(eval INCLUDES += $(BSP_DIR))
+                                $(eval LEAF_DIR = $(BSP_DIR)/Leaf) $(eval INCLUDES += $(LEAF_DIR))
+                                        SRC_LIST += $(LEAF_DIR)/LeafModel.c
+
                                 SRC_LIST += $(BSP_DIR)/BrushModel.c
 
                         $(eval SPR_DIR = $(AST_DIR)/Sprite) $(eval INCLUDES += $(SPR_DIR))
