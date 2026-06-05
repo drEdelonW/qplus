@@ -33,6 +33,7 @@ ALIAS MODEL DISPLAY LIST GENERATION
 #include "console.h"
 #include "common.h"
 #include <string.h>
+#include "z_hunk.h"
 
 Model_p aliasmodel;
 AliasHdr_p paliashdr;

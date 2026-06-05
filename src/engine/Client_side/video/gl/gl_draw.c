@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include <string.h>
 #include "sbar.h"
+#include "z_hunk.h"
 
 
 // draw.c -- this is the only file outside the refresh that touches the

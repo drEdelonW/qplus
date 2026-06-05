@@ -923,7 +923,6 @@ float RadiusFromBounds(vec3_t mins, vec3_t maxs) {
 Mod_LoadBrushModel
 =================
 */
-void Mod_LoadPlanes(Lump_p l); // TODO: to solve dependence loop hell
 
 void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
     _loadModel->type = mod_brush;

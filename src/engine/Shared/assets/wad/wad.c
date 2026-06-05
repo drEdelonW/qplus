@@ -37,15 +37,15 @@ typedef enum {
 } CmpType;
 
 typedef enum {
-    TYP_NONE    = 0u,
-    TYP_LABEL   = 1u,
+    TYP_NONE = 0u,
+    TYP_LABEL = 1u,
 
-    TYP_LUMPY   = 64u,   // base offset for grab command number
+    TYP_LUMPY = 64u,   // base offset for grab command number
     TYP_PALETTE = 64u,
-    TYP_QTEX    = 65u,
-    TYP_QPIC    = 66u,
-    TYP_SOUND   = 67u,
-    TYP_MIPTEX  = 68u
+    TYP_QTEX = 65u,
+    TYP_QPIC = 66u,
+    TYP_SOUND = 67u,
+    TYP_MIPTEX = 68u
 } TypType;
 
 typedef struct {
@@ -104,8 +104,7 @@ void W_CleanupName(cStringRO in, cString out) {
 */
 void W_LoadWadFile(cStringRO filename) {
     _wadBase = COM_LoadHunkFile(filename);
-    if (!_wadBase)
-        Host_SysError("W_LoadWadFile: couldn't load %s", filename);
+    if (!_wadBase)      Host_SysError("W_LoadWadFile: couldn't load %s", filename);
 
     WadInfo_p header = (WadInfo_p)_wadBase;
 
@@ -114,8 +113,7 @@ void W_LoadWadFile(cStringRO filename) {
         (header->ID[1] != 'A') ||
         (header->ID[2] != 'D') ||
         (header->ID[3] != '2')
-        )
-        Host_SysError("Wad file %s doesn't have WAD2 id\n", filename);
+        )               Host_SysError("Wad file %s doesn't have WAD2 id\n", filename);
 
     _NumLumps = LittleLong(header->numLumps);
     int infoTableOfs = LittleLong(header->infoTableOfs);

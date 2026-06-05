@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include "d_iface.h"
 #include "server.h"
 #undef SERVER   // TODO: remove this workaround
 #include "common.h"
@@ -46,6 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sbar.h"
 #include "chase.h"
 #ifndef GLQUAKE
+#   include "d_iface.h"
 #   include "r_local.h"
 #else
 #   include "qOpenGL.h"
