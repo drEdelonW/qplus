@@ -4,7 +4,10 @@
 #include "common.h"
 #include "console.h"
 #include "qOpenGL.h"
-#include "d_iface.h"
+#ifdef GLQUAKE
+#   undef GLQUAKE
+#   include "d_iface.h"     // WARP_HEIGHT
+#endif
 #include "host.h"
 #include "endian_tools.h"
 #include "q_tools.h"

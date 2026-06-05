@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // d_iface.h: interface header file for rasterization driver modules
 #ifdef GLQUAKE
-// #   error   GLQUAKE defined
+#   error   GLQUAKE defined
 #endif
 #include "model/model.h"
 #include "Triangle.h"
