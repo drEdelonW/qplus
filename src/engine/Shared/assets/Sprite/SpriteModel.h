@@ -5,8 +5,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-    void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer);  // .bsp file
+    
+    void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer); // .spr file
 
 #ifdef __cplusplus
 }

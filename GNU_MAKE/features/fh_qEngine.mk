@@ -138,6 +138,7 @@ include features/fh_qRender$(QRND).mk
 
                 $(eval AST_DIR = $(SHARED_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
                         $(eval MDL_DIR = $(AST_DIR)/AliasModel_MDL) $(eval INCLUDES += $(MDL_DIR))
+                                SRC_LIST += $(MDL_DIR)/AliasModel.c
 
                         $(eval BSP_DIR = $(AST_DIR)/BrushModel_BSP) $(eval INCLUDES += $(BSP_DIR))
                                 SRC_LIST += $(BSP_DIR)/BrushModel.c
