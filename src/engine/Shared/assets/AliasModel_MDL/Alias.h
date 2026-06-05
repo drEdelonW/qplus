@@ -179,3 +179,6 @@ typedef struct {
 } Mdl_t;
 typedef Mdl_t* Mdl_p;
 
+extern AliasHdr_p pheader;
+extern AliasHdr_p   paliashdr;
+

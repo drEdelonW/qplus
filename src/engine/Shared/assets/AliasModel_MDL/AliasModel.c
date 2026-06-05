@@ -16,7 +16,11 @@
 #ifdef GLQUAKE
 
     int   posenum;
+    AliasHdr_p pheader;
+
 #endif
+
+AliasHdr_p  paliashdr;
 
 /*
 ==============================================================================

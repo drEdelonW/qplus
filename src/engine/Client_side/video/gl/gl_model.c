@@ -269,7 +269,6 @@ ALIAS MODELS
 ==============================================================================
 */
 
-AliasHdr_p pheader;
 
 stvert_t stverts[MAXALIASVERTS];
 mTriangle_t triangles[MAXALIASTRIS];

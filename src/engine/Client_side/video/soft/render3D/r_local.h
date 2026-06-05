@@ -199,9 +199,7 @@ void R_ZDrawSubmodelPolys(Model_p clmodel);
 
 extern int          numverts;
 extern int          a_skinwidth;
-extern mTriangle_p  ptriangles;
 extern int          numtriangles;
-extern AliasHdr_p   paliashdr;
 extern Mdl_p        pmdl;
 extern float        leftclip, topclip, rightclip, bottomclip;
 extern int          r_acliptype;
