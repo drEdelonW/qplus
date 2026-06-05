@@ -21,20 +21,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // refresh.h -- public interface to refresh functions
 #include "model_effect.h"
-#include "eFrag.h"
-#include "Node.h"
-#include "Texture.h"
+// #include "eFrag.h"
+// #include "Node.h"
+// #include "Texture.h"
 #include "EntityState.h"
-#include "vid.h"
+// #include "vid.h"
 #include "qTime.h"
+#include "BrushModel.h"
 
 // #define MAXCLIPPLANES (11). /* not used */
 
 //=============================================================================
 
 // it was [entity_t] on render side
-typedef struct Model_s Model_t;
-typedef Model_t* Model_p;
 struct r_Entity_s {
     bool    forcelink;      // model changed
     int     update_type;

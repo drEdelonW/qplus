@@ -43,13 +43,3 @@ typedef enum {
 } Side_t;
 
 //============================================================================
-
-void Mod_Init(void);
-void Mod_ClearAll(void);
-Model_p Mod_ForName(cString name, bool crash);
-TypeLess_ptr Mod_Extradata(Model_p mod); // handles caching
-void Mod_TouchModel(cString name);
-
-mLeaf_p Mod_PointInLeaf(float_p p, Model_p model);
-byte* Mod_LeafPVS(mLeaf_p leaf, Model_p model);
-

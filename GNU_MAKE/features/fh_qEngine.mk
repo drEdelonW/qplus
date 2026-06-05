@@ -2,7 +2,7 @@
 FORCE_32     ?= 1
 FORCE_32     ?= 0
 
-QRND ?= SoftC
+# QRND ?= SoftC
 QRND ?= OpenGL
 
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
@@ -137,6 +137,9 @@ include features/fh_qRender$(QRND).mk
                         SRC_LIST += $(MATH_DIR)/angle.c
 
                 $(eval AST_DIR = $(SHARED_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
+                        $(eval BSP_DIR = $(AST_DIR)/BrushModel_BSP) $(eval INCLUDES += $(BSP_DIR))
+                                SRC_LIST += $(BSP_DIR)/BrushModel.c
+
                         $(eval SPR_DIR = $(AST_DIR)/Sprite) $(eval INCLUDES += $(SPR_DIR))
                                 SRC_LIST += $(SPR_DIR)/Sprite.c
 

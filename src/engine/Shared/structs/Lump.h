@@ -1,9 +1,12 @@
 #pragma once
 
+#include "assert.h"
 #include "types.h"
 
 typedef struct {
-    int32_t fileOfs;
-    int32_t fileLen;
+    uint32_t fileOfs;
+    uint32_t fileLen;
 } Lump_t;
 typedef Lump_t* Lump_p;
+STATIC_ASSERT_SIZE(Lump_t, 2*4); // 8
+

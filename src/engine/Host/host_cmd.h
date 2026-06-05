@@ -60,7 +60,6 @@ extern "C" {
     /* view helpers */
     void    Host_Viewmodel_f();
     void    Host_Viewframe_f();
-    void    PrintFrameName(Model_p mdl, int frame);
     void    Host_Viewnext_f();
     void    Host_Viewprev_f();
 

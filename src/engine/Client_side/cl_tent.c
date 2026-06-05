@@ -27,7 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "client.h"
 #include "mathlib.h"
-#include "model.h"
+// #include "model.h"
+#include "BrushModel.h"
 #include "Light.h"
 #include <stdlib.h>
 

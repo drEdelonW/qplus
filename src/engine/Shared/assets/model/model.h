@@ -30,6 +30,7 @@ m*_t structures are in-memory
 */
 #ifdef GLQUAKE
 #   include "Alias.h"
+#   include "Vertex.h"
 
 #   define MAXALIASVERTS 1024
 #   define MAXALIASFRAMES 256
@@ -38,14 +39,10 @@ extern AliasHdr_p pheader;
 extern stvert_t stverts[MAXALIASVERTS];
 extern mTriangle_t triangles[MAXALIASTRIS];
 extern TriVertx_p poseverts[MAXALIASFRAMES];
-extern Model_p loadmodel;
 #endif
 extern char Mod_loadName[32]; // for hunk tags
 extern uint8_p mod_base;
-#ifdef GLQUAKE
-#   define _loadModel loadmodel
-#endif
-extern Model_p _loadModel;
+
 
 /*
 ==============================================================================
@@ -65,20 +62,3 @@ typedef enum {
 //===================================================================
 
 //============================================================================
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-    void Mod_Init();
-    void Mod_ClearAll();
-    Model_p Mod_ForName(cString name, bool crash);
-    TypeLess_ptr Mod_Extradata(Model_p mod); // handles caching
-    void Mod_TouchModel(cString name);
-
-    mLeaf_p Mod_PointInLeaf(vec3_t p, Model_p model);
-    uint8_p Mod_LeafPVS(mLeaf_p leaf, Model_p model);
-
-    void Mod_Print();
-#ifdef __cplusplus
-}
-#endif
