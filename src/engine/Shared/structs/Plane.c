@@ -155,6 +155,7 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
 #endif
 
 #include "model.h"
+#include "BrushModel.h"
 #include "endian_tools.h"
 
 /*

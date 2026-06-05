@@ -30,6 +30,7 @@ ALIAS MODEL DISPLAY LIST GENERATION
 #include "Model_st.h"
 #include "Alias.h"
 #include "model.h"
+#include "BrushModel.h"
 #include "console.h"
 #include "common.h"
 #include <string.h>

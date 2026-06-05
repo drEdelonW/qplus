@@ -124,5 +124,6 @@ typedef struct {
 typedef dSpriteInterval_t* dSpriteInterval_p;
 
 
-#include "Model_st.h"
+// #include "Model_st.h"
+#include "BrushModel.h"
 void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer); // .spr file

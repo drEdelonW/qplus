@@ -5,7 +5,7 @@
 #include "q_tools.h"
 #include "host.h"
 #include "server.h"
-
+#include "model.h"
 /*
 ================
 M_DrawCharacter
