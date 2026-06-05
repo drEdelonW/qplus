@@ -1,6 +1,7 @@
 #include "types.h"
 #include "world.h"
 #include "model.h"
+#include "LeafModel.h"
 #include "server.h"
 #include "q_tools.h"
 

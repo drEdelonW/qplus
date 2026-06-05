@@ -12,16 +12,9 @@
 #include "Hull.h"
 
 #include "platformdefs.h"
-// #include "zone.h"
-
 #include "SyncType.h"
 
-
-#define ALIAS_VERSION   6
 #define MAX_MAP_HULLS   (4)
-
-
-
 
 //
 // Whole model
@@ -85,8 +78,6 @@ typedef struct {
 } Model_t;
 typedef Model_t* Model_p;
 
+extern uint8_t _modNoVis[];
 
 // must match definition in spritegn.h
-
-
-
