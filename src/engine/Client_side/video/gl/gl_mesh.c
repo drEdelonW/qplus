@@ -30,6 +30,7 @@ ALIAS MODEL DISPLAY LIST GENERATION
 #include "Model_st.h"
 #include "Alias.h"
 #include "model.h"
+#include "AliasModel.h"
 #include "BrushModel.h"
 #include "console.h"
 #include "common.h"
@@ -37,7 +38,6 @@ ALIAS MODEL DISPLAY LIST GENERATION
 #include "z_hunk.h"
 
 Model_p aliasmodel;
-AliasHdr_p paliashdr;
 
 // bool
 int used[8192];

@@ -68,15 +68,13 @@ typedef struct {
 
 
 extern int  d_spanpixcount;
-extern int  r_framecount;            // sequence # of current frame since Quake started
-extern bool r_drawpolys;        // 1 if driver wants clipped polygons rather than a span list
-extern bool r_drawculledpolys;  // 1 if driver wants clipped polygons that have been culled by the edge list
+extern int  r_framecount;               // sequence # of current frame since Quake started
+extern bool r_drawpolys;                // 1 if driver wants clipped polygons rather than a span list
+extern bool r_drawculledpolys;          // 1 if driver wants clipped polygons that have been culled by the edge list
 extern bool r_worldpolysbacktofront;    // 1 if driver wants polygons delivered back to front rather than front to back
-extern bool r_recursiveaffinetriangles; // true if a driver wants to use
-//  recursive triangular subdivison and vertex drawing via D_PolysetDrawFinalVerts() past
-//  a certain distance (normally only used by the software driver)
-extern float r_aliasuvscale;    // scale-up factor for screen u and v on Alias vertices passed to driver
-extern int r_pixbytes;
+extern bool r_recursiveaffinetriangles; // true if a driver wants to use recursive triangular subdivison and vertex drawing via D_PolysetDrawFinalVerts() past a certain distance (normally only used by the software driver)
+extern float r_aliasuvscale;            // scale-up factor for screen u and v on Alias vertices passed to driver
+extern int  r_pixbytes;
 extern bool r_dowarp;
 
 extern AffineTriDesc_t r_affinetridesc;

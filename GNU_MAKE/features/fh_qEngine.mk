@@ -146,7 +146,7 @@ include features/fh_qRender$(QRND).mk
 
                                 SRC_LIST += $(BSP_DIR)/BrushModel.c
 
-                        $(eval SPR_DIR = $(AST_DIR)/Sprite) $(eval INCLUDES += $(SPR_DIR))
+                        $(eval SPR_DIR = $(AST_DIR)/SpriteModel_SPR) $(eval INCLUDES += $(SPR_DIR))
                                 SRC_LIST += $(SPR_DIR)/Sprite.c
 
                         $(eval WAD_DIR = $(AST_DIR)/wad) $(eval INCLUDES += $(WAD_DIR))

@@ -28,7 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define LIGHT_MIN (5)  // lowest light value we'll allow, to avoid the
                             //  need for inner-loop light clamping
 
-mTriangle_p     ptriangles;
 AffineTriDesc_t r_affinetridesc;
 TypeLess_ptr    acolormap; // FIXME: should go away
 TriVertx_p      r_apverts;
@@ -38,7 +37,6 @@ Mdl_p   pmdl;
 vec3_t  r_plightvec;
 int     r_ambientlight;
 float   r_shadelight;
-AliasHdr_p  paliashdr;
 FinalVert_p pfinalverts;
 AuxVert_p   pauxverts;
 
