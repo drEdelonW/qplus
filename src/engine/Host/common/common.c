@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "common.h"
 #include "host.h"
-// #include "cvar_q1.h"
 #include <string.h>
 #include <stdarg.h>
 #include "sys.h"
@@ -446,16 +445,17 @@ static bool     _progHack;
 #include "terminal_tools.h"
 
 int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
-    if (file && handle)     Host_SysError("COM_FindFile: both handle and file set");
-    if (!file && !handle)   Host_SysError("COM_FindFile: neither handle or file set");
+    if (file && handle)         Host_SysError("COM_FindFile: both handle and file set");
+    if (!file && !handle)       Host_SysError("COM_FindFile: neither handle or file set");
 
     //
     // search through the path, one element at a time
     //
     searchpath_p search = com_searchpaths;
-    if (_progHack) { // gross hack to use quake 1 progs with quake 2 maps
-        if (!strcmp(filename, "progs.dat"))
-            search = search->next;
+    if ((_progHack) && // gross hack to use quake 1 progs with quake 2 maps
+        (!strcmp(filename, "progs.dat"))
+        ) {
+        search = search->next;
     }
 
     for (; search; search = search->next) {
@@ -574,18 +574,18 @@ If it is a pak file handle, don't really close it
 */
 void COM_CloseFile(int h) {
     for (searchpath_p s = com_searchpaths; s; s = s->next)
-        if (s->pack && s->pack->handle == h)
+        if (s->pack && (s->pack->handle == h))
             return;
 
     Sys_FileClose(h);
 }
 
 typedef enum ComLoadHunk_e {
-    HUNK_ZMALLOC    = 0,  // Z_Malloc
-    HUNK_HUNK       = 1,  // Hunk_AllocName
-    HUNK_TEMP       = 2,  // Hunk_TempAlloc
-    HUNK_CACHE      = 3,  // Cache_Alloc
-    HUNK_STACK      = 4   // stack buffer, fallback to temp hunk
+    HUNK_ZMALLOC = 0u,   // Z_Malloc
+    HUNK_HUNK = 1u,   // Hunk_AllocName
+    HUNK_TEMP = 2u,   // Hunk_TempAlloc
+    HUNK_CACHE = 3u,   // Cache_Alloc
+    HUNK_STACK = 4u    // stack buffer, fallback to temp hunk
 } ComLoadHunk_t;
 
 /*
@@ -628,11 +628,10 @@ uint8_p COM_LoadFile(cStringRO path, ComLoadHunk_t usehunk) {
     case HUNK_TEMP:     buf = Hunk_TempAlloc(len + 1);                  break;
     case HUNK_CACHE:    buf = Cache_Alloc(loadcache, len + 1, base);    break;
     case HUNK_STACK:    buf = ((len + 1) > loadsize) ? Hunk_TempAlloc(len + 1) : loadbuf; break;
-    default:    Host_SysError("COM_LoadFile: bad usehunk");     break;
+    default:            Host_SysError("COM_LoadFile: bad usehunk");     break;
     }
 #endif
-
-    if (!buf)   Host_SysError("COM_LoadFile: not enough space for %s", path);
+    if (!buf)           Host_SysError("COM_LoadFile: not enough space for %s", path);
 
     ((uint8_p)buf)[len] = 0x00;
 

@@ -7,7 +7,14 @@ typedef float vect_t;
 
 class Vector3D {
 public:
+#if 0
     vect_t x, y, z;
+#else
+    union {
+            struct { vect_t x, y, z; };
+            vect_t v[3];
+        };
+#endif
 
     Vector3D(
         vect_t const _x = 0.0f,
