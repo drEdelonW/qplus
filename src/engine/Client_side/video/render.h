@@ -27,7 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "EntityState.h"
 // #include "vid.h"
 #include "qTime.h"
-#include "BrushModel.h"
+#include "model.h"
+// #include "BrushModel.h"
 
 // #define MAXCLIPPLANES (11). /* not used */
 

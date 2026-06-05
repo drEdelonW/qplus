@@ -1,5 +1,5 @@
 #pragma once
-
+// particle effects
 typedef enum {
     RT_ROCKET   = 0u,
     RT_GRENADE  = 1u,
