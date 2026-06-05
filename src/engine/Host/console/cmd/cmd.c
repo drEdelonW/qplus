@@ -25,7 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include "q_tools.h"
 #include "console.h"
-#include "zone.h"
+#include "z_zone.h"
+#include "z_hunk.h"
 #include "common.h"
 #include "host.h"
 #include "client.h"

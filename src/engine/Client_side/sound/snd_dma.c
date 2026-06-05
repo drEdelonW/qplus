@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "model.h"
 #include "q_tools.h"
 #include "console.h"
+#include "z_hunk.h"
 
 #ifdef _WIN32
 #include "winquake.h"

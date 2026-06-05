@@ -38,4 +38,14 @@ typedef struct {
 typedef dPlane_t* dPlane_p;
 STATIC_ASSERT_SIZE(dPlane_t, 5*4); // 20
 
-int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane);
+
+    // void Mod_LoadPlanes(Lump_p l); // TODO: to solve dependence loop hell
+
+#ifdef __cplusplus
+}
+#endif

@@ -199,6 +199,7 @@ void CL_KeepaliveMessage() {
     SZ_Clear(&cls.message);
 }
 
+#include "z_hunk.h"
 /*
     ==================
     CL_ParseServerInfo

@@ -312,7 +312,7 @@ void SV_SaveSpawnparms() {
     }
 }
 
-
+#include "z_hunk.h"
 /*
     ================
     SV_SpawnServer

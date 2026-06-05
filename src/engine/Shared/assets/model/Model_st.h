@@ -47,6 +47,7 @@ typedef enum {
 
 
 #include "SyncType.h"
+#include "z_cache.h"
 
 typedef struct Model_s Model_t;  //  TODO: fix in render.h
 typedef Model_t* Model_p;

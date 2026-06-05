@@ -9,6 +9,7 @@
 #else
 #   include "d_iface.h"
 #endif
+#include "z_hunk.h"
 
 /*
 =================

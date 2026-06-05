@@ -1,12 +1,12 @@
 #include "Pak.h"
 #include "enginedefs.h"
-#include "zone.h"
 #include "sys.h"
 #include "endian_tools.h"
 #include "crc.h"
 #include "console.h"
 #include "host.h"
 #include <string.h>
+#include "z_hunk.h"
 
 bool     contModified;   // set true if using non-id files
 

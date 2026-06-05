@@ -1,7 +1,7 @@
 #pragma once
 
 #include "platformdefs.h"
-#include "zone.h"
+#include "z_cache.h"
 #include "vector.h"
 // !!! if this is changed, it much be changed in asm_i386.h too !!!
 typedef struct {

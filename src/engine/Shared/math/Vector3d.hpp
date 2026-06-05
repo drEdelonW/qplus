@@ -7,7 +7,7 @@ typedef float vect_t;
 
 class Vector3D {
 public:
-#if 0
+#if 0   // check for back compatibility
     vect_t x, y, z;
 #else
     union {

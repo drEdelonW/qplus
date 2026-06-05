@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "zone.h"
 #include "zone_prv.h"
+#include "z_hunk.h"
 
 #include "host.h"
 #include "common.h"
