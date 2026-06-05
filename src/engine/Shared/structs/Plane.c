@@ -152,3 +152,36 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
 }
 
 #endif
+
+#include "model.h"
+#include "endian_tools.h"
+
+/*
+=================
+Mod_LoadPlanes
+=================
+*/
+
+void Mod_LoadPlanes(Lump_p l) {
+    dPlane_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))        Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
+
+    int count = l->fileLen / sizeof(*in);
+    mPlane_p out = Hunk_AllocName(count * 2 * sizeof(*out), Mod_loadName);
+
+    _loadModel->planes = out;
+    _loadModel->numplanes = count;
+
+    for (int i = 0; i < count; i++, in++, out++) {
+        int bits = 0;
+        for (int j = 0; j < VECT_DIM; j++) {
+            out->normal[j] = LittleFloat(in->normal[j]);
+            if (out->normal[j] < 0)
+                bits |= 1 << j;
+        }
+
+        out->dist = LittleFloat(in->dist);
+        out->type = LittleLong(in->type);
+        out->signbits = bits;
+    }
+}

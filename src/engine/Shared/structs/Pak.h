@@ -15,17 +15,17 @@ extern bool contModified;   // set true if using non-id files
 //
 // in memory
 //
-
 typedef struct {
     char    name[MAX_QPATH];
-    int32_t filepos, filelen;
+    uint32_t filepos;
+    uint32_t filelen;
 } packfile_t;
 typedef packfile_t* packfile_p;
 
 typedef struct pack_s {
     char        filename[MAX_OSPATH];
-    int32_t     handle;
-    int32_t     numfiles;
+    uint32_t     handle;
+    uint32_t     numfiles;
     packfile_p  files;
 } pack_t;
 typedef pack_t* pack_p;
@@ -35,13 +35,22 @@ typedef pack_t* pack_p;
 //
 typedef struct {
     char    name[56];
-    int32_t filepos, filelen;
+    uint32_t filepos;
+    uint32_t filelen;
 } dpackfile_t;
 
 typedef struct {
     char    id[4];
-    int32_t dirofs;
-    int32_t dirlen;
+    uint32_t dirofs;
+    uint32_t dirlen;
 } dpackHeader_t;
 
-pack_p COM_LoadPackFile(cStringRO packfile);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    pack_p COM_LoadPackFile(cStringRO packfile);
+
+#ifdef __cplusplus
+}
+#endif

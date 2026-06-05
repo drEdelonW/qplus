@@ -31,7 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "common.h"
 #include "endian_tools.h"
-#include "spritegn.h"
 #include "q_tools.h"
 #include "mathlib.h"
 #include "Surface.h"
@@ -283,7 +282,7 @@ Model_p Mod_ForName(cString name, bool crash) {
 ===============================================================================
 */
 
-static uint8_p mod_base;
+uint8_p mod_base;
 
 
 /*
@@ -300,7 +299,8 @@ void Mod_LoadTextures(Lump_p l) {
 
     loadmodel->numtextures = m->nummiptex;
     loadmodel->textures = Hunk_AllocName(
-        m->nummiptex * sizeof(*loadmodel->textures), Mod_loadName
+        m->nummiptex * sizeof(*loadmodel->textures),
+        Mod_loadName
     );
 
     for (int i = 0; i < m->nummiptex; i++) {
@@ -310,10 +310,11 @@ void Mod_LoadTextures(Lump_p l) {
         MipTex_p mt = (MipTex_p)((uint8_p)m + m->dataofs[i]);
         mt->width = LittleLong(mt->width);
         mt->height = LittleLong(mt->height);
+
         for (int j = 0; j < MIPLEVELS; j++)
             mt->offsets[j] = LittleLong(mt->offsets[j]);
 
-        if ((mt->width & 15) || (mt->height & 15))      Host_SysError("Texture %s is not 16 aligned", mt->name);
+        if ((mt->width & 0x0F) || (mt->height & 0x0F))      Host_SysError("Texture %s is not 16 aligned", mt->name);
 
         int pixels = mt->width * mt->height / 64 * 85;
         Texture_p tx = Hunk_AllocName(sizeof(Texture_t) + pixels, Mod_loadName);
@@ -332,7 +333,12 @@ void Mod_LoadTextures(Lump_p l) {
             R_InitSky(tx);
         else {
             texture_mode = GL_LINEAR_MIPMAP_NEAREST; //_LINEAR;
-            tx->gl_texturenum = GL_LoadTexture(mt->name, tx->width, tx->height, (uint8_p)(tx + 1), true, false);
+            tx->gl_texturenum = GL_LoadTexture(
+                mt->name,
+                tx->width, tx->height,
+                (uint8_p)(tx + 1),
+                true, false
+            );
             texture_mode = GL_LINEAR;
         }
     }
@@ -906,51 +912,21 @@ Mod_LoadSurfedges
 =================
 */
 void Mod_LoadSurfedges(Lump_p l) {
-    int  i, count;
-    int* in, * out;
+    int32_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
+    if (l->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    in = (TypeLess_ptr)(mod_base + l->fileOfs);
-    if (l->fileLen % sizeof(*in))
-        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
-    count = l->fileLen / sizeof(*in);
-    out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
+    int count = l->fileLen / sizeof(*in);
+    int32_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     loadmodel->surfedges = out;
     loadmodel->numsurfedges = count;
 
-    for (i = 0; i < count; i++)
+    for (int i = 0; i < count; i++)
         out[i] = LittleLong(in[i]);
 }
 
 
-/*
-=================
-Mod_LoadPlanes
-=================
-*/
-void Mod_LoadPlanes(Lump_p l) {
-    dPlane_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
-    if (l->fileLen % sizeof(*in))        Host_SysError("MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 
-    int count = l->fileLen / sizeof(*in);
-    mPlane_p out = Hunk_AllocName(count * 2 * sizeof(*out), Mod_loadName);
-
-    loadmodel->planes = out;
-    loadmodel->numplanes = count;
-
-    for (int i = 0; i < count; i++, in++, out++) {
-        int bits = 0;
-        for (int j = 0; j < VECT_DIM; j++) {
-            out->normal[j] = LittleFloat(in->normal[j]);
-            if (out->normal[j] < 0)
-                bits |= 1 << j;
-        }
-
-        out->dist = LittleFloat(in->dist);
-        out->type = LittleLong(in->type);
-        out->signbits = bits;
-    }
-}
 
 /*
 =================
@@ -991,7 +967,7 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
     mod_base = (uint8_p)header;
 
     for (int i = 0; i < sizeof(dHeader_t) / 4; i++) {
-        ((int*)header)[i] = LittleLong(((int*)header)[i]);
+        ((int32_p)header)[i] = LittleLong(((int32_p)header)[i]);
     }
 
     // load into heap

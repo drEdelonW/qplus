@@ -22,10 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // models are the only shared resource between a client and server running
 // on the same machine.
 
+#include "model.h"
 #include <string.h>
 #include "host.h"
-#include "model.h"
-#include "spritegn.h"
 #include "common.h"
 #include "q_tools.h"
 #include "console.h"
@@ -33,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "endian_tools.h"
 
-static Model_p _loadModel;
+Model_p _loadModel;
 char Mod_loadName[32]; // for hunk tags
 
 void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer);  // .bsp file
@@ -173,7 +172,8 @@ Model_p Mod_FindName(cString name) {
         if (!strcmp(mod->name, name))   break;
 
         if ((mod->needload == NL_UNREFERENCED) &&
-            (!avail || (mod->type != mod_alias)))
+            (!avail || (mod->type != mod_alias))
+            )
             avail = mod;
     }
 
@@ -288,7 +288,7 @@ Model_p Mod_ForName(cString name, bool crash) {
 ===============================================================================
 */
 
-static uint8_p mod_base;
+uint8_p mod_base;
 
 
 /*
@@ -315,6 +315,7 @@ void Mod_LoadTextures(Lump_p l) {
         MipTex_p mt = (MipTex_p)((uint8_p)m + m->dataofs[i]);
         mt->width = LittleLong(mt->width);
         mt->height = LittleLong(mt->height);
+
         for (int j = 0; j < MIPLEVELS; j++)
             mt->offsets[j] = LittleLong(mt->offsets[j]);
 
@@ -899,34 +900,6 @@ void Mod_LoadSurfedges(Lump_p l) {
         out[i] = LittleLong(in[i]);
 }
 
-/*
-=================
-Mod_LoadPlanes
-=================
-*/
-void Mod_LoadPlanes(Lump_p l) {
-    dPlane_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
-    if (l->fileLen % sizeof(*in))        Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
-
-    int count = l->fileLen / sizeof(*in);
-    mPlane_p out = Hunk_AllocName(count * 2 * sizeof(*out), Mod_loadName);
-
-    _loadModel->planes = out;
-    _loadModel->numplanes = count;
-
-    for (int i = 0; i < count; i++, in++, out++) {
-        int bits = 0;
-        for (int j = 0; j < VECT_DIM; j++) {
-            out->normal[j] = LittleFloat(in->normal[j]);
-            if (out->normal[j] < 0)
-                bits |= 1 << j;
-        }
-
-        out->dist = LittleFloat(in->dist);
-        out->type = LittleLong(in->type);
-        out->signbits = bits;
-    }
-}
 
 /*
 =================
@@ -1187,7 +1160,9 @@ TypeLess_ptr Mod_LoadAliasSkinGroup(TypeLess_ptr pin, int32_p pskinindex, int32_
 
     TypeLess_ptr ptemp = (TypeLess_ptr)pinskinintervals;
     for (int32_t i = 0; i < numskins; i++) {
-        ptemp = Mod_LoadAliasSkin(ptemp, &paliasskingroup->skindescs[i].skin, skinsize, pheader);
+        ptemp = Mod_LoadAliasSkin(
+            ptemp, &paliasskingroup->skindescs[i].skin, skinsize, pheader
+        );
     }
 
     return ptemp;
@@ -1233,6 +1208,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     pmodel->boundingradius = LittleFloat(pinmodel->boundingradius);
     pmodel->numskins = LittleLong(pinmodel->numskins);
     pmodel->skinwidth = LittleLong(pinmodel->skinwidth);
+
     pmodel->skinheight = LittleLong(pinmodel->skinheight);
     if (pmodel->skinheight > MAX_LBM_HEIGHT)    Host_SysError("model %s has a skin taller than %d", mod->name, MAX_LBM_HEIGHT);
 

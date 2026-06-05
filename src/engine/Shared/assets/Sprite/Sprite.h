@@ -1,5 +1,6 @@
 #pragma once
 
+#include "spritegn.h"
 #include "vector.h"
 #include "types.h"
 #include "SyncType.h"

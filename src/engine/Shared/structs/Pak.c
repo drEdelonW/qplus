@@ -24,10 +24,9 @@ of the list so they override previous pack files.
 =================
 */
 pack_p COM_LoadPackFile(cStringRO packfile) {
-
     int packhandle;
     if (Sys_FileOpenRead(packfile, &packhandle) == -1) {
-        //              Con_Printf ("Couldn't open %s\n", packfile);
+        //  Con_Printf ("Couldn't open %s\n", packfile);
         return NULL;
     }
     dpackHeader_t header;
@@ -35,15 +34,14 @@ pack_p COM_LoadPackFile(cStringRO packfile) {
     if ((header.id[0] != 'P') ||
         (header.id[1] != 'A') ||
         (header.id[2] != 'C') ||
-        (header.id[3] != 'K'))
-        Host_SysError("%s is not a packfile", packfile);
+        (header.id[3] != 'K')
+        )                                       Host_SysError("%s is not a packfile", packfile);
+
     header.dirofs = LittleLong(header.dirofs);
     header.dirlen = LittleLong(header.dirlen);
 
     int numpackfiles = header.dirlen / sizeof(dpackfile_t);
-
-    if (numpackfiles > MAX_FILES_IN_PACK)
-        Host_SysError("%s has %i files", packfile, numpackfiles);
+    if (numpackfiles > MAX_FILES_IN_PACK)       Host_SysError("%s has %i files", packfile, numpackfiles);
 
     if (numpackfiles != PAK0_COUNT)
         contModified = true;    // not the original file
