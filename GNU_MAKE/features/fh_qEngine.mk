@@ -137,6 +137,9 @@ include features/fh_qRender$(QRND).mk
                         SRC_LIST += $(MATH_DIR)/angle.c
 
                 $(eval AST_DIR = $(SHARED_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
+                        $(eval PAK_DIR = $(AST_DIR)/PAK) $(eval INCLUDES += $(PAK_DIR))
+                                SRC_LIST += $(PAK_DIR)/Pak.c
+
                         $(eval MDL_DIR = $(AST_DIR)/AliasModel_MDL) $(eval INCLUDES += $(MDL_DIR))
                                 SRC_LIST += $(MDL_DIR)/AliasModel.c
 
@@ -157,7 +160,6 @@ include features/fh_qRender$(QRND).mk
                         SRC_LIST += $(STRUCT_DIR)/pcx.c
                         SRC_LIST += $(STRUCT_DIR)/Plane.c
                         SRC_LIST += $(STRUCT_DIR)/Light.c
-                        SRC_LIST += $(STRUCT_DIR)/Pak.c
 
 
                 $(eval CUTILS_DIR = $(SHARED_DIR)/utils) $(eval INCLUDES += $(CUTILS_DIR))
