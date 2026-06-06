@@ -30,21 +30,6 @@ typedef struct pack_s {
 } pack_t;
 typedef pack_t* pack_p;
 
-//
-// on disk
-//
-typedef struct {
-    char    name[56];
-    uint32_t filepos;
-    uint32_t filelen;
-} dpackfile_t;
-
-typedef struct {
-    char    id[4];
-    uint32_t dirofs;
-    uint32_t dirlen;
-} dpackHeader_t;
-
 #ifdef __cplusplus
 extern "C" {
 #endif

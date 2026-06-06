@@ -44,8 +44,8 @@ typedef enum {
 
 typedef struct {
     char        name[MAX_QPATH];
-    NeedLoad_t  needload;  // bmodels and sprites don't cache normally
-    ModType_t   type;       // TODO: check is it needed?
+    NeedLoad_t  needload;   // bmodels and sprites don't cache normally
+    ModType_t   type;       // kind of content
     int32_t     numframes;
     SyncType_t  synctype;
     int32_t     flags;

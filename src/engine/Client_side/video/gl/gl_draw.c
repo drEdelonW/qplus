@@ -566,6 +566,9 @@ Draw_Pic
 =============
 */
 void Draw_Pic(int x, int y, qPic_p pic) {
+    if (!pic)
+       return;
+
     if (scrap_dirty)
         Scrap_Upload();
     glpic_p gl = (glpic_p)pic->data;
