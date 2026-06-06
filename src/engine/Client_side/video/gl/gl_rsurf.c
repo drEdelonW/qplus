@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "mathlib.h"
 #include "host.h"
 #include "model.h"
+#include "LeafModel.h"
 #include "common.h"
 #include <string.h>
 #include "z_hunk.h"
@@ -1077,18 +1078,19 @@ R_RecursiveWorldNode
 ================
 */
 void R_RecursiveWorldNode(mNode_p node) {
-    if (node->contents == CONTENTS_SOLID)               return;        // solid
-    if (node->visframe != r_visframecount)              return;
-    if (R_CullBox(node->minmaxs, node->minmaxs + 3))    return;
+    if ((node->contents == CONTENTS_SOLID) ||   // solid
+        (node->visframe != r_visframecount) ||
+        (R_CullBox(node->minmaxs, node->minmaxs + 3))
+        )   return;
 
     // if a leaf node, draw stuff
     if (node->contents < 0) {
         mLeaf_p pleaf = (mLeaf_p)node;
 
-        mSurface_p* mark = pleaf->firstmarksurface;
+        mSurface_ar mark = pleaf->firstmarksurface;
         int c = pleaf->nummarksurfaces;
 
-        if (c) {
+        if (c && (*mark)) {
             do {
                 (*mark)->visframe = r_framecount;
                 mark++;
@@ -1099,73 +1101,72 @@ void R_RecursiveWorldNode(mNode_p node) {
         if (pleaf->efrags)
             R_StoreEfrags(&pleaf->efrags);
 
-        return;
+        return; // recursive exit
     }
+    else {
+        // node is just a decision point, so go down the apropriate sides
 
-    // node is just a decision point, so go down the apropriate sides
-
-    // find which side of the node we are on
-    mPlane_p plane = node->plane;
-    double dot;
-    int side;
-
-    switch (plane->type) {
-    case PLANE_X: { dot = modelorg[0] - plane->dist; } break;
-    case PLANE_Y: { dot = modelorg[1] - plane->dist; } break;
-    case PLANE_Z: { dot = modelorg[2] - plane->dist; } break;
-    default: { dot = DotProduct(modelorg, plane->normal) - plane->dist; } break;
-    }
-
-    if (dot >= 0)   side = 0;
-    else            side = 1;
-
-    // recurse down the children, front side first
-    R_RecursiveWorldNode(node->children[side]);
-
-    // draw stuff
-    int c = node->numsurfaces;
-
-    if (c) {
-        mSurface_p surf = cl.worldmodel->surfaces + node->firstsurface;
-
-        if (dot < 0 - BACKFACE_EPSILON)     side = SURF_PLANEBACK;
-        else if (dot > BACKFACE_EPSILON)    side = 0;
-        {
-            for (; c; c--, surf++) {
-                if (surf->visframe != r_framecount)
-                    continue;
-
-                // don't backface underwater surfaces, because they warp
-                if (!(surf->flags & SURF_UNDERWATER) && ((dot < 0) ^ !!(surf->flags & SURF_PLANEBACK)))
-                    continue;        // wrong side
-
-                // if sorting by texture, just store it out
-                if (gl_texsort.value) {
-                    if (!mirror ||
-                        (surf->texinfo->texture != cl.worldmodel->textures[mirrortexturenum])
-                        ) {
-                        surf->texturechain = surf->texinfo->texture->texturechain;
-                        surf->texinfo->texture->texturechain = surf;
-                    }
-                }
-                else if (surf->flags & SURF_DRAWSKY) {
-                    surf->texturechain = skychain;
-                    skychain = surf;
-                }
-                else if (surf->flags & SURF_DRAWTURB) {
-                    surf->texturechain = waterchain;
-                    waterchain = surf;
-                }
-                else
-                    R_DrawSequentialPoly(surf);
-
-            }
+        // find which side of the node we are on
+        mPlane_p plane = node->plane;
+        
+        double dot;
+        switch (plane->type) {
+        case PLANE_X: { dot = modelorg[0] - plane->dist; } break;
+        case PLANE_Y: { dot = modelorg[1] - plane->dist; } break;
+        case PLANE_Z: { dot = modelorg[2] - plane->dist; } break;
+        default: { dot = DotProduct(modelorg, plane->normal) - plane->dist; } break;
         }
 
-    }
+        int side = (dot >= 0) ? 0 : 1;
 
-    // recurse down the back side
-    R_RecursiveWorldNode(node->children[!side]);
+        // recurse down the children, front side first
+        R_RecursiveWorldNode(node->children[side]);
+
+        // draw stuff
+        int c = node->numsurfaces;
+
+        if (c) {
+            mSurface_p surf = cl.worldmodel->surfaces + node->firstsurface;
+
+            if (dot < 0 - BACKFACE_EPSILON)     side = SURF_PLANEBACK;
+            else if (dot > BACKFACE_EPSILON)    side = 0;
+            {
+                for (; c; c--, surf++) {
+                    if (surf->visframe != r_framecount)
+                        continue;
+
+                    // don't backface underwater surfaces, because they warp
+                    if (!(surf->flags & SURF_UNDERWATER) && ((dot < 0) ^ !!(surf->flags & SURF_PLANEBACK)))
+                        continue;        // wrong side
+
+                    // if sorting by texture, just store it out
+                    if (gl_texsort.value) {
+                        if (!mirror ||
+                            (surf->texinfo->texture != cl.worldmodel->textures[mirrortexturenum])
+                            ) {
+                            surf->texturechain = surf->texinfo->texture->texturechain;
+                            surf->texinfo->texture->texturechain = surf;
+                        }
+                    }
+                    else if (surf->flags & SURF_DRAWSKY) {
+                        surf->texturechain = skychain;
+                        skychain = surf;
+                    }
+                    else if (surf->flags & SURF_DRAWTURB) {
+                        surf->texturechain = waterchain;
+                        waterchain = surf;
+                    }
+                    else
+                        R_DrawSequentialPoly(surf);
+
+                }
+            }
+
+        }
+
+        // recurse down the back side
+        R_RecursiveWorldNode(node->children[!side]);
+    }
 }
 
 

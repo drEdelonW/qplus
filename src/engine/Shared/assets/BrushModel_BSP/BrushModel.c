@@ -332,7 +332,7 @@ void Mod_LoadMarksurfaces(Lump_p l) {
     int16_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
     if (l->fileLen % sizeof(*in))           Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
-    int count = l->fileLen / sizeof(*in);
+    int32_t count = l->fileLen / sizeof(*in);
     mSurface_p* out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
 
     _loadModel->marksurfaces = out;

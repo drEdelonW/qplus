@@ -567,7 +567,7 @@ Draw_Pic
 */
 void Draw_Pic(int x, int y, qPic_p pic) {
     if (!pic)
-       return;
+        return;
 
     if (scrap_dirty)
         Scrap_Upload();
@@ -1050,7 +1050,12 @@ done:;
 GL_Upload8
 ===============
 */
-void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
+void GL_Upload8(
+    uint8_p data,
+    int width, int height,
+    bool mipmap,
+    bool alpha
+) {
     static uint32_t _trans[640 * 480];  // FIXME, temporary
 
     int s = width * height;
@@ -1069,8 +1074,8 @@ void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
             alpha = false;
     }
     else {
-        if (s & 3)
-            Host_SysError("GL_Upload8: s&3");
+        if (s & 3)      Host_SysError("GL_Upload8: s&3");
+
         for (int i = 0; i < s; i += 4) {
             _trans[i + 0] = d_8to24table[data[i + 0]];
             _trans[i + 1] = d_8to24table[data[i + 1]];
@@ -1079,7 +1084,11 @@ void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
         }
     }
 
-    if (VID_Is8bit() && !alpha && (data != scrap_texels[0])) {
+    if (
+        VID_Is8bit() &&
+        !alpha &&
+        (data != scrap_texels[0])
+        ) {
         GL_Upload8_EXT(data, width, height, mipmap, alpha);
         return;
     }
@@ -1091,7 +1100,12 @@ void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha) {
 GL_LoadTexture
 ================
 */
-int GL_LoadTexture(cString identifier, int width, int height, uint8_p data, bool mipmap, bool alpha) {
+int GL_LoadTexture(
+    cString identifier,
+    int width, int height,
+    uint8_p data,
+    bool mipmap, bool alpha
+) {
     glTexture_p glt;
 
     // see if the texture is allready present
@@ -1099,8 +1113,9 @@ int GL_LoadTexture(cString identifier, int width, int height, uint8_p data, bool
         glt = gltextures;
         for (int i = 0; i < numgltextures; i++, glt++) {
             if (!strcmp(identifier, glt->identifier)) {
-                if (width != glt->width || height != glt->height)
-                    Host_SysError("GL_LoadTexture: cache mismatch");
+                if ((width != glt->width) ||
+                    (height != glt->height)
+                    )   Host_SysError("GL_LoadTexture: cache mismatch");
                 return gltextures[i].texnum;
             }
         }

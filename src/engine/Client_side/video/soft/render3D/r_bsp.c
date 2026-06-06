@@ -378,12 +378,12 @@ R_RecursiveWorldNode
 */
 void R_RecursiveWorldNode(mNode_p node, int clipflags) {
     if ((node->contents == CONTENTS_SOLID) ||  // solid
-        (node->visframe != r_visframecount))
-        return;
+        (node->visframe != r_visframecount)
+        )   return;
 
     // cull the clipping planes if not trivial accept
     // FIXME: the compiler is doing a lousy job of optimizing here; it could be
-    //  twice as fast in ASM
+    // twice as fast in ASM
     if (clipflags) {
         for (int i = 0; i < 4; i++) {
             if (!(clipflags & (1 << i)))
@@ -427,7 +427,7 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
     if (node->contents < 0) {
         mLeaf_p pleaf = (mLeaf_p)node;
 
-        mSurface_p* mark = pleaf->firstmarksurface;
+        mSurface_ar mark = pleaf->firstmarksurface;
         int c = pleaf->nummarksurfaces;
 
         if (c) {
@@ -444,6 +444,8 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
 
         pleaf->key = r_currentkey;
         r_currentkey++;  // all bmodels in a leaf share the same key
+
+        return; // recursive exit
     }
     else {
         // node is just a decision point, so go down the apropriate sides
@@ -453,9 +455,9 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
 
         double  dot;
         switch (plane->type) {
-        case PLANE_X: dot = modelorg[0] - plane->dist;  break;
-        case PLANE_Y: dot = modelorg[1] - plane->dist;  break;
-        case PLANE_Z: dot = modelorg[2] - plane->dist;  break;
+        case PLANE_X: { dot = modelorg[0] - plane->dist; } break;
+        case PLANE_Y: { dot = modelorg[1] - plane->dist; } break;
+        case PLANE_Z: { dot = modelorg[2] - plane->dist; } break;
         default: dot = DotProduct(modelorg, plane->normal) - plane->dist; break;
         }
 
@@ -476,19 +478,15 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
                         if (r_drawpolys) {
                             if (r_worldpolysbacktofront) {
                                 if (numbtofpolys < MAX_BTOFPOLYS) {
-                                    pbtofpolys[numbtofpolys].clipflags =
-                                        clipflags;
-                                    pbtofpolys[numbtofpolys].psurf = surf;
-                                    numbtofpolys++;
+                                    pbtofpolys[numbtofpolys++] = (btofpoly_t){
+                                        .clipflags = clipflags,
+                                        .psurf = surf
+                                    };
                                 }
                             }
-                            else {
-                                R_RenderPoly(surf, clipflags);
-                            }
+                            else { R_RenderPoly(surf, clipflags); }
                         }
-                        else {
-                            R_RenderFace(surf, clipflags);
-                        }
+                        else { R_RenderFace(surf, clipflags); }
                     }
 
                     surf++;
@@ -501,19 +499,15 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
                         if (r_drawpolys) {
                             if (r_worldpolysbacktofront) {
                                 if (numbtofpolys < MAX_BTOFPOLYS) {
-                                    pbtofpolys[numbtofpolys].clipflags =
-                                        clipflags;
-                                    pbtofpolys[numbtofpolys].psurf = surf;
-                                    numbtofpolys++;
+                                    pbtofpolys[numbtofpolys++] = (btofpoly_t){
+                                        .clipflags = clipflags,
+                                        .psurf = surf
+                                    };
                                 }
                             }
-                            else {
-                                R_RenderPoly(surf, clipflags);
-                            }
+                            else { R_RenderPoly(surf, clipflags); }
                         }
-                        else {
-                            R_RenderFace(surf, clipflags);
-                        }
+                        else { R_RenderFace(surf, clipflags); }
                     }
 
                     surf++;
