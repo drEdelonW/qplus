@@ -17,8 +17,11 @@ typedef struct {
 typedef dVertex_t* dVertex_p;
 
 typedef struct {
-    // float   fv[3];  // viewspace x, y
-    vec3_t fv;  // viewspace x, y
+#if 0
+    float   fv[3];  // viewspace x, y
+#else
+    vec3_t  fv;     // viewspace x, y
+#endif
 } AuxVert_t;
 typedef AuxVert_t* AuxVert_p;
 
@@ -39,8 +42,11 @@ typedef enum alias_clip_flags_e {
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct FinalVert_s {
     int     v[6];   // u, v, s, t, l, 1/z
-    // int     flags;  //alias_clip_flags_t
+#if 0
+    int                 flags;  //alias_clip_flags_t
+#else
     AliasClipFlags_f    flags;  //alias_clip_flags_t
+#endif
     float   reserved;
 } FinalVert_t;
 typedef FinalVert_t* FinalVert_p;

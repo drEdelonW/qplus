@@ -382,19 +382,7 @@ void SV_SpawnServer(
 #endif
     }
 
-#if 0
-    sv.datagram.maxsize = sizeof(sv.datagram_buf);
-    sv.datagram.cursize = 0;
-    sv.datagram.data = sv.datagram_buf;
 
-    sv.reliable_datagram.maxsize = sizeof(sv.reliable_datagram_buf);
-    sv.reliable_datagram.cursize = 0;
-    sv.reliable_datagram.data = sv.reliable_datagram_buf;
-
-    sv.signon.maxsize = sizeof(sv.signon_buf);
-    sv.signon.cursize = 0;
-    sv.signon.data = sv.signon_buf;
-#else
     sv.datagram = (sizebuf_t){
         .maxsize = sizeof(sv.datagram_buf),
         .cursize = 0,
@@ -410,7 +398,6 @@ void SV_SpawnServer(
         .cursize = 0,
         .data = sv.signon_buf
     };
-#endif
 
     sv.state = ss_loading;
     sv.paused = false;

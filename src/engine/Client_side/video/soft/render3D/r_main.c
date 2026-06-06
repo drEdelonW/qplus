@@ -382,6 +382,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     xscaleshrink = (r_refdef.vrect.width - 6) / r_refdef.horizontalFieldOfView;
     yscaleshrink = xscaleshrink * pixelAspect;
 
+#if 0
     // left side clip
     screenedge[0].normal[0] = -1.0 / (xOrigin * r_refdef.horizontalFieldOfView);
     screenedge[0].normal[1] = 0;
@@ -405,6 +406,40 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     screenedge[3].normal[1] = 1.0 / ((1.0 - yOrigin) * verticalFieldOfView);
     screenedge[3].normal[2] = 1;
     screenedge[3].type = PLANE_ANYZ;
+#else
+    screenedge[0] = (mPlane_t){  // left side clip
+        .normal = {
+            -1.0f / (xOrigin * r_refdef.horizontalFieldOfView),
+            0.0f,
+            1.0f
+        },
+        .type = PLANE_ANYZ
+    };
+    screenedge[1] = (mPlane_t){   // right side clip
+        .normal = {
+            1.0f / ((1.0f - xOrigin) * r_refdef.horizontalFieldOfView),
+            0.0f,
+            1.0f
+        },
+        .type = PLANE_ANYZ
+    };
+        screenedge[2] = (mPlane_t){  // top side clip
+        .normal = {
+            0.0f,
+            -1.0f / (yOrigin * verticalFieldOfView),
+            1.0f
+        },
+        .type = PLANE_ANYZ
+    };
+    screenedge[3] = (mPlane_t){   // bottom side clip
+        .normal = {
+            0.0f,
+            1.0f / ((1.0f - yOrigin) * verticalFieldOfView),
+            1.0f
+        },
+        .type = PLANE_ANYZ
+    };
+#endif
 
     for (int i = 0; i < 4; i++)
         VectorNormalize(screenedge[i].normal);
@@ -445,6 +480,8 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
 R_MarkLeaves
 ===============
 */
+uint8_p Mod_LeafPVS(mLeaf_p leaf, Model_p model); // TODO: FIX include hell
+
 void R_MarkLeaves() {
     if (r_oldviewleaf == r_viewleaf)
         return;

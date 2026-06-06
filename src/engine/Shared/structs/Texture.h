@@ -7,6 +7,9 @@
 #endif
 
 #include "Texture_pre.h"
+
+extern Texture_p r_notexture_mip;
+
 struct Texture_s {
     char        name[16];
     uint32_t    width, height;
