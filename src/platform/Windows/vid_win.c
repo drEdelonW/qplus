@@ -1650,7 +1650,7 @@ void VID_ForceLockState(int lk) {
 }
 
 
-void	VID_SetPalette(uint8_p palette) {
+void VID_SetPalette(uint8_p palette) {
     INT			i;
     palette_t	pal[256];
     HDC			hdc;

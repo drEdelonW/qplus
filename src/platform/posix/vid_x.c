@@ -622,16 +622,28 @@ void VID_SetPalette(uint8_p palette) {
         st2d_8to24table[i] = xlib_rgb24(palette[i * 3], palette[i * 3 + 1], palette[i * 3 + 2]);
     }
 
-    if (x_visinfo->class == PseudoColor && x_visinfo->depth == 8) {
+    if ((x_visinfo->class == PseudoColor) &&
+        (x_visinfo->depth == 8)
+        ) {
         if (palette != current_palette)
             memcpy(current_palette, palette, 768);
         XColor colors[256];
         for (int i = 0; i < 256; i++) {
+#if 0
             colors[i].pixel = i;
             colors[i].flags = DoRed | DoGreen | DoBlue;
             colors[i].red = palette[i * 3] * 257;
             colors[i].green = palette[i * 3 + 1] * 257;
-            colors[i].blue = palette[i * 3 + 2] * 257;
+            colors[i].blue =  palette[i * 3 + 2] * 257;
+#else
+            colors[i] = (XColor) {
+                .pixel = i,
+                .flags = DoRed | DoGreen | DoBlue,
+                .red = palette[i * 3] * 257,
+                .green = palette[i * 3 + 1] * 257,
+                .blue = palette[i * 3 + 2] * 257
+            };
+#endif
         }
         XStoreColors(x_disp, x_cmap, colors, 256);
     }

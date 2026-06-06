@@ -589,7 +589,11 @@ void R_DrawParticles() {
             (prt->org[2] - r_origin[2]) * vpn[2];
         if (scale < 20) scale = 1;
         else            scale = 1 + scale * 0.004;
+# if 0
+        glColor3ub(255, 0, 0);  // DEBUG: make all particle RED
+# else
         glColor3ubv((uint8_p)&d_8to24table[(int)prt->color]);
+# endif
         glTexCoord2f(0, 0);
         glVertex3fv(prt->org);
         glTexCoord2f(1, 0);
