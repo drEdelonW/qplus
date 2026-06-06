@@ -1,5 +1,6 @@
 #pragma once
 
+#include "assert.h"
 #include "types.h"
 #include "Node.h"
 #include "Surface.h"
@@ -42,3 +43,5 @@ typedef struct {
     uint8_t ambient_level[NUM_AMBIENTS];
 } dLeaf_t;
 typedef dLeaf_t* dLeaf_p;
+STATIC_ASSERT_SIZE(dLeaf_t, 4*2 + 2*3*2 + 2*2 + 4); // 28
+

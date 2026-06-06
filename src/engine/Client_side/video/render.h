@@ -21,16 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // refresh.h -- public interface to refresh functions
 #include "model_effect.h"
-// #include "eFrag.h"
-// #include "Node.h"
-// #include "Texture.h"
 #include "EntityState.h"
-// #include "vid.h"
 #include "qTime.h"
 #include "model.h"
-// #include "BrushModel.h"
-
-// #define MAXCLIPPLANES (11). /* not used */
 
 //=============================================================================
 
@@ -51,15 +44,13 @@ struct r_Entity_s {
     uint8_p colormap;
     EntityEffects_t effects;  // light, particals, etc
     int     skinnum;        // for Alias models
-    int     visframe;       // last frame this entity was
-    //  found in an active leaf
+    int     visframe;       // last frame this entity was found in an active leaf
     int     dlightframe;    // dynamic lighting
     int     dlightbits;
 
     // FIXME: could turn these into a union
-    int             trivial_accept;
-    mNode_p topnode;  // for bmodels, first world node
-    //  that splits bmodel, or NULL if not split
+    int     trivial_accept;
+    mNode_p topnode;  // for bmodels, first world node that splits bmodel, or NULL if not split
 };
 typedef r_Entity_t* r_Entity_p;
 
@@ -94,7 +85,6 @@ typedef struct {
 // extern int      reinit_surfcache;
 extern refdef_t r_refdef;
 extern vec3_t   r_origin, vpn, vright, vup;
-extern Texture_p r_notexture_mip;
 
 #ifdef __cplusplus
 extern "C" {

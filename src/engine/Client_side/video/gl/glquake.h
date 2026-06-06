@@ -113,59 +113,10 @@ extern  PROC glVertexPointerEXT;
 void R_TimeRefresh_f(void);
 void R_ReadPointFile_f(void);
 
-#if 0
-typedef struct surfcache_s {
-    struct surfcache_s* next;
-    struct surfcache_s** owner;        // NULL is an empty chunk of memory
-    int                    lightadj[MAXLIGHTMAPS]; // checked for strobe flush
-    int                    dlight;
-    int                    size;        // including header
-    unsigned            width;
-    unsigned            height;        // DEBUG only needed for debug
-    float                mipscale;
-    struct texture_s* texture;    // checked for animating textures
-    byte                data[4];    // width*height elements
-} surfcache_t;
-#else
-#   include "SurfCache.h"
-#endif
 
-#if 0
-typedef struct {
-    pixel_t* surfdat;    // destination for generated surface
-    int            rowbytes;    // destination logical width in bytes
-    mSurface_p surf;        // description for surface to generate
-    fixed8_t    lightadj[MAXLIGHTMAPS];
-    // adjust for lightmap levels for dynamic lighting
-    Texture_t* texture;    // corrected for animating textures
-    int            surfmip;    // mipmapped ratio of surface texels / world pixels
-    int            surfwidth;    // in mipmapped texels
-    int            surfheight;    // in mipmapped texels
-} drawsurf_t;
-#else
-#   include "Surface.h"
-#endif
-
-#if 0
-typedef enum {
-    pt_static, pt_grav, pt_slowgrav, pt_fire, pt_explode, pt_explode2, pt_blob, pt_blob2
-} ptype_t;
-
-// !!! if this is changed, it must be changed in d_ifacea.h too !!!
-typedef struct particle_s {
-    // driver-usable fields
-    vec3_t        org;
-    float        color;
-    // drivers never touch the following fields
-    struct particle_s* next;
-    vec3_t        vel;
-    float        ramp;
-    float        die;
-    ptype_t        type;
-} particle_t;
-#else
-#   include "Particle.h"
-#endif
+#include "SurfCache.h"
+#include "Surface.h"
+#include "Particle.h"
 
 //====================================================
 
@@ -193,7 +144,6 @@ extern  vec3_t      r_origin;
 //
 extern  refdef_t    r_refdef;
 extern  mLeaf_p  r_viewleaf, r_oldviewleaf;
-extern  Texture_p    r_notexture_mip;
 extern  int        d_lightstylevalue[256];    // 8.8 fraction of base light value
 
 extern  bool    envmap;

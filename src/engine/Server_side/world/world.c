@@ -39,7 +39,8 @@ typedef struct {
     vec3_t  boxmins, boxmaxs;// enclose the test object along entire move
     float_p mins;
     float_p maxs; // size of the moving object
-    vec3_t  mins2, maxs2; // size when clipping against mosnters
+    vec3_t  mins2;
+    vec3_t  maxs2; // size when clipping against mosnters
     float_p start;
     float_p end;
     trace_t trace;

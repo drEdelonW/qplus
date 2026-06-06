@@ -310,7 +310,7 @@ void V_cshift_f() {
     cshift_empty.destcolor[2] = atoi(Cmd_Argv(3));
     cshift_empty.percent = atoi(Cmd_Argv(4));
 #else
-    cl.cshifts[CSHIFT_BONUS] = (ColorShift_t){
+    cshift_empty = (ColorShift_t){
         {
             atoi(Cmd_Argv(1)),
             atoi(Cmd_Argv(2)),
