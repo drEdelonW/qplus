@@ -615,6 +615,11 @@ void GL_EndRendering(void) {
     if (fullsbardraw)   Sbar_Changed();
 }
 
+void    VID_ShiftPalette(uint8_p palette) {
+    //    VID_SetPalette (palette);
+    //    gammaworks = SetDeviceGammaRamp (maindc, ramps);
+}
+
 void    VID_SetPalette(uint8_p palette) {
     //
     // 8 8 8 encoding
@@ -664,11 +669,6 @@ void    VID_SetPalette(uint8_p palette) {
 }
 
 BOOL    gammaworks;
-
-void    VID_ShiftPalette(uint8_p palette) {
-    //    VID_SetPalette (palette);
-    //    gammaworks = SetDeviceGammaRamp (maindc, ramps);
-}
 
 
 void VID_SetDefaultMode(void) {

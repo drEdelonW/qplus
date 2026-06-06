@@ -82,6 +82,17 @@ typedef glTexture_t* glTexture_p;
 glTexture_t gltextures[MAX_GLTEXTURES];
 int   numgltextures;
 
+static GLenum last_bind_error = GL_NO_ERROR;
+static int error_texture_id = 0;
+
+bool GL_PrintLastError() {
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        printf("GL_Bind error: 0x%X\n", err);
+        last_bind_error = err;
+    }
+    return err != GL_NO_ERROR;
+}
 
 void GL_Bind(int texnum) {
     if (gl_nobind.value)
@@ -90,10 +101,13 @@ void GL_Bind(int texnum) {
         return;
     currenttexture = texnum;
 #ifdef _WIN32
-    bindTexFunc(GL_TEXTURE_2D, texnum);
+    bindTexFunc(GL_TEXTURE_2D, texnum); // the same  but in thu GetProcAddress "glBindTexture"
 #else
     glBindTexture(GL_TEXTURE_2D, texnum);
 #endif
+    if (GL_PrintLastError()) {
+        error_texture_id = texnum;
+    }
 }
 
 
@@ -934,9 +948,17 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
 #else
     texels += scaled_width * scaled_height;
 
-    if (scaled_width == width && scaled_height == height) {
+    if ((scaled_width == width) &&
+        (scaled_height == height)
+        ) {
         if (!mipmap) {
-            glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(
+                GL_TEXTURE_2D,
+                0, samples,
+                scaled_width, scaled_height,
+                0, GL_RGBA,
+                GL_UNSIGNED_BYTE, data
+            );      GL_PrintLastError();
             goto done;
         }
         memcpy(_scaled, data, width * height * 4);
@@ -944,17 +966,33 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     else
         GL_ResampleTexture(data, width, height, _scaled, scaled_width, scaled_height);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _scaled);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0, samples,
+        scaled_width, scaled_height,
+        0, GL_RGBA,
+        GL_UNSIGNED_BYTE, _scaled
+    );      GL_PrintLastError();
+
     if (mipmap) {
         int miplevel = 0;
-        while (scaled_width > 1 || scaled_height > 1) {
+        while (
+            (scaled_width > 1) ||
+            (scaled_height > 1)
+            ) {
             GL_MipMap((uint8_p)_scaled, scaled_width, scaled_height);
             scaled_width >>= 1;
             scaled_height >>= 1;
             if (scaled_width < 1)   scaled_width = 1;
             if (scaled_height < 1)  scaled_height = 1;
             miplevel++;
-            glTexImage2D(GL_TEXTURE_2D, miplevel, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _scaled);
+            glTexImage2D(
+                GL_TEXTURE_2D,
+                miplevel, samples,
+                scaled_width, scaled_height,
+                0, GL_RGBA,
+                GL_UNSIGNED_BYTE, _scaled
+            );      GL_PrintLastError();
         }
     }
 done:;
@@ -1090,9 +1128,11 @@ void GL_Upload8(
         (data != scrap_texels[0])
         ) {
         GL_Upload8_EXT(data, width, height, mipmap, alpha);
-        return;
     }
-    GL_Upload32(_trans, width, height, mipmap, alpha);
+    else {
+        GL_Upload32(_trans, width, height, mipmap, alpha);
+    }
+    return;
 }
 
 /*
@@ -1111,14 +1151,13 @@ int GL_LoadTexture(
     // see if the texture is allready present
     if (identifier[0]) {
         glt = gltextures;
-        for (int i = 0; i < numgltextures; i++, glt++) {
+        for (int i = 0; i < numgltextures; i++, glt++)
             if (!strcmp(identifier, glt->identifier)) {
                 if ((width != glt->width) ||
                     (height != glt->height)
                     )   Host_SysError("GL_LoadTexture: cache mismatch");
                 return gltextures[i].texnum;
             }
-        }
     }
     else {
         glt = &gltextures[numgltextures];

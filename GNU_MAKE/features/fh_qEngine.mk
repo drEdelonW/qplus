@@ -2,7 +2,7 @@
 FORCE_32     ?= 1
 FORCE_32     ?= 0
 
-QRND ?= SoftC
+# QRND ?= SoftC
 QRND ?= OpenGL
 
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))

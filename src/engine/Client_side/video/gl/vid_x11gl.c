@@ -110,6 +110,7 @@ cString gl_version;
 cString gl_extensions;
 
 void GL_Init(void) {
+#if 1 // DEBUG: init output
     gl_vendor = glGetString(GL_VENDOR);
     Con_Printf("GL_VENDOR: %s\n", gl_vendor);
     gl_renderer = glGetString(GL_RENDERER);
@@ -121,6 +122,7 @@ void GL_Init(void) {
     Con_Printf("GL_EXTENSIONS: %s\n", gl_extensions);
 
     //	Con_Printf ("%s %s\n", gl_renderer, gl_version);
+#endif
 
     CheckMultiTextureExtensions();
 
@@ -141,7 +143,7 @@ void GL_Init(void) {
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     // glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
@@ -570,12 +572,31 @@ int init(App_p app) {
     return 1;
 }
 
+void VID_SetPalette(uint8_p palette) {
+    // 8 8 8 encoding
+    uint8_p pal = palette;
+    uint32_p table = d_8to24table;
+    for (int i = 0; i < 256; i++) {
+        uint32_t r = pal[0];
+        uint32_t g = pal[1];
+        uint32_t b = pal[2];
+        pal += 3;
+
+        // uint32_t v = (0xFF << 24) | (r << 16) | (g << 8) | (b << 0);
+        // uint32_t v = (b << 24) | (g << 16) | (r << 8) | (0xFF << 0);
+        uint32_t v = (0xFF << 24) | (b << 16) | (g << 8) | (r << 0);
+        *table++ = v;
+    }
+    d_8to24table[255] &= 0x00FFFFFF;    // 255 is transparent
+
+}
+
 void VID_Init(uint8_p palette) {
-    (void)palette;
 
     if (!init(&app))
         Host_SysError("VID_Init: init failed\n");
 
+    VID_SetPalette(palette);
     GL_Init();
 
     Con_SafePrintf(
