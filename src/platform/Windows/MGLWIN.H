@@ -82,7 +82,7 @@ extern "C" {			/* Use "C" linkage when in C++ mode	*/
 
     /* Obtain the handle to the MGL fullscreen window when in fullscreen modes */
 
-    MGL_HWND MGLAPI MGL_getFullScreenWindow(void);
+    MGL_HWND MGLAPI MGL_getFullScreenWindow();
 
     /* Tell the MGL what your applications main window is */
 
@@ -96,8 +96,8 @@ extern "C" {			/* Use "C" linkage when in C++ mode	*/
 
     MGLDC* MGLAPI MGL_createDisplayDC(m_int numBuffers);
     MGLDC* MGLAPI MGL_createSrollingDC(m_int virtualX, m_int virtualY, m_int numBuffers);
-    MGLDC* MGLAPI MGL_createOffscreenDC(void);
-    MGLDC* MGLAPI MGL_createLinearOffscreenDC(void);
+    MGLDC* MGLAPI MGL_createOffscreenDC();
+    MGLDC* MGLAPI MGL_createLinearOffscreenDC();
     MGLDC* MGLAPI MGL_createWindowedDC(MGL_HWND hwnd);
     MGLDC* MGLAPI MGL_createMemoryDC(m_int xSize, m_int ySize, m_int bitsPerPixel, pixel_format_t* pf);
     bool	MGLAPI MGL_destroyDC(MGLDC* dc);
@@ -132,8 +132,8 @@ extern "C" {			/* Use "C" linkage when in C++ mode	*/
 
     /* Generic helper functions */
 
-    ulong	MGLAPI MGL_getTicks(void);
-    ulong	MGLAPI MGL_getTickResolution(void);
+    ulong	MGLAPI MGL_getTicks();
+    ulong	MGLAPI MGL_getTickResolution();
     void	MGLAPI MGL_delay(m_int millseconds);
     void	MGLAPI MGL_beep(m_int freq, m_int milliseconds);
 

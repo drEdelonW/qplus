@@ -208,7 +208,7 @@ void D_DrawSurfaces() {
                     // FIXME: we don't want to do all this for every polygon!
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
-                    // R_RotateBmodel ()
+                    // R_RotateBmodel()
                     vec3_t local_modelorg;  VectorSubtract(r_origin, currententity->origin, local_modelorg);
                     TransformVector(local_modelorg, transformed_modelorg);
 
@@ -241,7 +241,7 @@ void D_DrawSurfaces() {
                     // FIXME: we don't want to do all this for every polygon!
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
-                    // R_RotateBmodel ()
+                    // R_RotateBmodel()
                     vec3_t local_modelorg;  VectorSubtract(r_origin, currententity->origin, local_modelorg);
                     TransformVector(local_modelorg, transformed_modelorg);
 

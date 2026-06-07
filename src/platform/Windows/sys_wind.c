@@ -36,7 +36,7 @@ FILE IO
 #define MAX_HANDLES  10
 FILE* sys_handles[MAX_HANDLES];
 
-int  findhandle(void) {
+int  findhandle() {
     int  i;
 
     for (i = 1; i < MAX_HANDLES; i++)
@@ -142,9 +142,9 @@ void Sys_Printf(cString fmt, ...) {
     va_end(argptr);
 }
 
-void Sys_Quit(void) { exit(0); }
+void Sys_Quit() { exit(0); }
 
-LegacyTimeStamp_t Sys_FloatTime(void) {
+LegacyTimeStamp_t Sys_FloatTime() {
     struct _timeb tstruct;
     _ftime(&tstruct);
 
@@ -156,12 +156,12 @@ LegacyTimeStamp_t Sys_FloatTime(void) {
     return t;
 }
 
-void Sys_Sleep(void) {}
-void Sys_SendKeyEvents(void) {}
-void Sys_HighFPPrecision(void) {}
-void Sys_LowFPPrecision(void) {}
+void Sys_Sleep() {}
+void Sys_SendKeyEvents() {}
+void Sys_HighFPPrecision() {}
+void Sys_LowFPPrecision() {}
 
-cString Sys_ConsoleInput(void) {
+cString Sys_ConsoleInput() {
     static char text[256];
     static int  len;
     INPUT_RECORD recs[1024];

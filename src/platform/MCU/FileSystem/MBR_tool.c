@@ -37,7 +37,7 @@ static cStringRO MBR_PartTypeStr(uint8_t type) {
  * Fills g_mbr_parts[] and g_part1_lba_start.
  * Returns 1 on success, 0 on error.
  */
-int SD_MBR_Init(void) {
+int SD_MBR_Init() {
     uint8_t buf[512];
 
     if (SD_ReadBlock(0u, buf) != HAL_OK) {
@@ -92,7 +92,7 @@ int SD_MBR_Init(void) {
 }
 
 /* Print parsed MBR partition table and FAT32 LBA. */
-void SD_MBR_Print(void) {
+void SD_MBR_Print() {
     if (!g_mbr_inited) {
         printf("SD_MBR_Print: MBR not initialized\n");
         return;
@@ -128,7 +128,7 @@ void SD_MBR_Print(void) {
 }
 
 /* Legacy wrapper: keeps old name, now just init + print. */
-void SD_PrintMBR(void) {
+void SD_PrintMBR() {
     if (!SD_MBR_Init()) return;
     SD_MBR_Print();
 }

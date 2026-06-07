@@ -45,20 +45,20 @@ static GLXContext _ctx = NULL;
 
 #define KEY_MASK (KeyPressMask | KeyReleaseMask)
 #define MOUSE_MASK (ButtonPressMask | ButtonReleaseMask | \
-		    PointerMotionMask | ButtonMotionMask )
+            PointerMotionMask | ButtonMotionMask )
 #define X_MASK (KEY_MASK | MOUSE_MASK | VisibilityChangeMask | StructureNotifyMask )
 
 
-uint16_t	d_8to16table[256];
-uint32_t		d_8to24table[256];
-uint8_t	d_15to8table[65536];
+uint16_t    d_8to16table[256];
+uint32_t        d_8to24table[256];
+uint8_t    d_15to8table[65536];
 
-cvar_t	vid_mode = { "vid_mode","0",false };
+cvar_t    vid_mode = { "vid_mode","0",false };
 
 static bool _isMouseAvail;
 static bool _isMouseActive;
 static int  _mx, _my;
-static int	_oldMouseX, _oldMouseY;
+static int    _oldMouseX, _oldMouseY;
 
 static cvar_t in_mouse = { "in_mouse", "1", false };
 static cvar_t in_dgamouse = { "in_dgamouse", "1", false };
@@ -78,18 +78,18 @@ static bool vidmode_active = false;
 
 /*-----------------------------------------------------------------------*/
 
-//int		texture_mode = GL_NEAREST;
-//int		texture_mode = GL_NEAREST_MIPMAP_NEAREST;
-//int		texture_mode = GL_NEAREST_MIPMAP_LINEAR;
-int		texture_mode = GL_LINEAR;
-//int		texture_mode = GL_LINEAR_MIPMAP_NEAREST;
-//int		texture_mode = GL_LINEAR_MIPMAP_LINEAR;
+//int        texture_mode = GL_NEAREST;
+//int        texture_mode = GL_NEAREST_MIPMAP_NEAREST;
+//int        texture_mode = GL_NEAREST_MIPMAP_LINEAR;
+int        texture_mode = GL_LINEAR;
+//int        texture_mode = GL_LINEAR_MIPMAP_NEAREST;
+//int        texture_mode = GL_LINEAR_MIPMAP_LINEAR;
 
-int		texture_extension_number = 1;
+int        texture_extension_number = 1;
 
-float		gldepthmin, gldepthmax;
+float        gldepthmin, gldepthmax;
 
-cvar_t	gl_ztrick = { "gl_ztrick","1" };
+cvar_t    gl_ztrick = { "gl_ztrick","1" };
 
 cStringRO gl_vendor;
 cStringRO gl_renderer;
@@ -114,90 +114,73 @@ void D_EndDirectRect(int x, int y, int width, int height) {
 
 static int XLateKey(XKeyEvent* ev) {
 
-    int key;
     char buf[NAME_LENGTH];
     KeySym keysym;
 
-    key = 0;
+    int key = 0;
 
     XLookupString(ev, buf, sizeof buf, &keysym, 0);
 
     switch (keysym) {
     case XK_KP_Page_Up:
-    case XK_Page_Up:	 key = K_PGUP; break;
+    case XK_Page_Up:     key = K_PGUP; break;
 
     case XK_KP_Page_Down:
-    case XK_Page_Down:	 key = K_PGDN; break;
+    case XK_Page_Down:     key = K_PGDN; break;
 
     case XK_KP_Home:
-    case XK_Home:	 key = K_HOME; break;
+    case XK_Home:     key = K_HOME; break;
 
     case XK_KP_End:
-    case XK_End:	 key = K_END; break;
+    case XK_End:     key = K_END; break;
 
     case XK_KP_Left:
-    case XK_Left:	 key = K_LEFTARROW; break;
+    case XK_Left:     key = K_LEFTARROW; break;
 
     case XK_KP_Right:
-    case XK_Right:	key = K_RIGHTARROW;		break;
+    case XK_Right:    key = K_RIGHTARROW;        break;
 
     case XK_KP_Down:
-    case XK_Down:	 key = K_DOWNARROW; break;
+    case XK_Down:     key = K_DOWNARROW; break;
 
     case XK_KP_Up:
-    case XK_Up:		 key = K_UPARROW;	 break;
+    case XK_Up:         key = K_UPARROW;     break;
 
-    case XK_Escape: key = K_ESCAPE;		break;
+    case XK_Escape: key = K_ESCAPE;        break;
 
     case XK_KP_Enter:
-    case XK_Return: key = K_ENTER;		 break;
+    case XK_Return: key = K_ENTER;         break;
 
-    case XK_Tab:		key = K_TAB;			 break;
-
-    case XK_F1:		 key = K_F1;				break;
-
-    case XK_F2:		 key = K_F2;				break;
-
-    case XK_F3:		 key = K_F3;				break;
-
-    case XK_F4:		 key = K_F4;				break;
-
-    case XK_F5:		 key = K_F5;				break;
-
-    case XK_F6:		 key = K_F6;				break;
-
-    case XK_F7:		 key = K_F7;				break;
-
-    case XK_F8:		 key = K_F8;				break;
-
-    case XK_F9:		 key = K_F9;				break;
-
-    case XK_F10:		key = K_F10;			 break;
-
-    case XK_F11:		key = K_F11;			 break;
-
-    case XK_F12:		key = K_F12;			 break;
-
+    case XK_Tab:        key = K_TAB;             break;
+    case XK_F1:         key = K_F1;                break;
+    case XK_F2:         key = K_F2;                break;
+    case XK_F3:         key = K_F3;                break;
+    case XK_F4:         key = K_F4;                break;
+    case XK_F5:         key = K_F5;                break;
+    case XK_F6:         key = K_F6;                break;
+    case XK_F7:         key = K_F7;                break;
+    case XK_F8:         key = K_F8;                break;
+    case XK_F9:         key = K_F9;                break;
+    case XK_F10:        key = K_F10;             break;
+    case XK_F11:        key = K_F11;             break;
+    case XK_F12:        key = K_F12;             break;
     case XK_BackSpace: key = K_BACKSPACE; break;
-
     case XK_KP_Delete:
     case XK_Delete: key = K_DEL; break;
-
-    case XK_Pause:	key = K_PAUSE;		 break;
-
+    case XK_Pause:    key = K_PAUSE;         break;
     case XK_Shift_L:
-    case XK_Shift_R:	key = K_SHIFT;		break;
+    case XK_Shift_R:    key = K_SHIFT;        break;
 
     case XK_Execute:
     case XK_Control_L:
-    case XK_Control_R:	key = K_CTRL;		 break;
+    case XK_Control_R:    key = K_CTRL;         break;
 
     case XK_Alt_L:
     case XK_Meta_L:
     case XK_Alt_R:
-    case XK_Meta_R: key = K_ALT;			break;
+    case XK_Meta_R: key = K_ALT;            break;
 
-    case XK_KP_Begin: key = '5';	break;
+    case XK_KP_Begin: key = '5';    break;
 
     case XK_KP_Insert:
     case XK_Insert:key = K_INS; break;
@@ -232,7 +215,9 @@ static int XLateKey(XKeyEvent* ev) {
 
     default:
         key = *(uint8_p)buf;
-        if (key >= 'A' && key <= 'Z')
+        if ((key >= 'A') &&
+            (key <= 'Z')
+            )
             key = key - 'A' + 'a';
         break;
     }
@@ -254,25 +239,27 @@ static Cursor CreateNullCursor(Display* display, Window root) {
     dummycolour.pixel = 0;
     dummycolour.red = 0;
     dummycolour.flags = 04;
-    cursor = XCreatePixmapCursor(display, cursormask, cursormask,
-        &dummycolour, &dummycolour, 0, 0);
+    cursor = XCreatePixmapCursor(
+        display, cursormask, cursormask,
+        &dummycolour, &dummycolour, 0, 0
+    );
     XFreePixmap(display, cursormask);
     XFreeGC(display, gc);
     return cursor;
 }
 
-static void install_grabs(void) {
+static void install_grabs() {
 
     // inviso cursor
     XDefineCursor(_dpy, _win, CreateNullCursor(_dpy, _win));
 
-    XGrabPointer(_dpy, _win,
-        True,
-        0,
+    XGrabPointer(
+        _dpy, _win,
+        True, 0,
         GrabModeAsync, GrabModeAsync,
-        _win,
-        None,
-        CurrentTime);
+        _win, None,
+        CurrentTime
+    );
 
     if (in_dgamouse.value) {
         int MajorVersion, MinorVersion;
@@ -289,23 +276,29 @@ static void install_grabs(void) {
         }
     }
     else {
-        XWarpPointer(_dpy, None, _win,
+        XWarpPointer(
+            _dpy, None, _win,
             0, 0, 0, 0,
-            vid.width / 2, vid.height / 2);
+            vid.width / 2, vid.height / 2
+        );
     }
 
-    XGrabKeyboard(_dpy, _win,
+    XGrabKeyboard(
+        _dpy, _win,
         False,
         GrabModeAsync, GrabModeAsync,
-        CurrentTime);
+        CurrentTime
+    );
 
     _isMouseActive = true;
 
-    //	XSync(_dpy, True);
+    //    XSync(_dpy, True);
 }
 
-static void uninstall_grabs(void) {
-    if (!_dpy || !_win)
+static void uninstall_grabs() {
+    if (!(_dpy) ||
+        !(_win)
+        )
         return;
 
     if (dgamouse) {
@@ -322,7 +315,7 @@ static void uninstall_grabs(void) {
     _isMouseActive = false;
 }
 
-static void HandleEvents(void) {
+static void HandleEvents() {
     XEvent event;
     KeySym ks;
     int b;
@@ -338,11 +331,11 @@ static void HandleEvents(void) {
 
         switch (event.type) {
         case KeyPress:
-        case KeyRelease:
+        case KeyRelease: {
             Key_Event(XLateKey(&event.xkey), event.type == KeyPress);
-            break;
+        } break;
 
-        case MotionNotify:
+        case MotionNotify: {
             if (_isMouseActive) {
                 if (dgamouse) {
                     _mx += (event.xmotion.x + _winX) * 2;
@@ -358,49 +351,56 @@ static void HandleEvents(void) {
                         dowarp = true;
                 }
             }
-            break;
+        } break;
 
-            break;
+                         break;
 
-        case ButtonPress:
+        case ButtonPress: {
             b = -1;
             if (event.xbutton.button == 1)          b = 0;
             else if (event.xbutton.button == 2)     b = 2;
             else if (event.xbutton.button == 3)     b = 1;
 
             if (b >= 0)     Key_Event(K_MOUSE1 + b, true);
-            break;
+        } break;
 
-        case ButtonRelease: // TODO: combine this two
+        case ButtonRelease: {// TODO: combine this two
             b = -1;
             if (event.xbutton.button == 1)          b = 0;
             else if (event.xbutton.button == 2)     b = 2;
             else if (event.xbutton.button == 3)     b = 1;
 
             if (b >= 0)     Key_Event(K_MOUSE1 + b, false);
-            break;
+        } break;
 
-        case CreateNotify:
+        case CreateNotify: {
             _winX = event.xcreatewindow.x;
             _winY = event.xcreatewindow.y;
-            break;
+        } break;
 
-        case ConfigureNotify:
+        case ConfigureNotify: {
             _winX = event.xconfigure.x;
             _winY = event.xconfigure.y;
-            break;
+        } break;
         }
     }
 
     if (dowarp) {
         /* move the mouse to the window center again */
-        XWarpPointer(_dpy, None, _win, 0, 0, 0, 0, vid.width / 2, vid.height / 2);
+        XWarpPointer(
+            _dpy, None, _win,
+            0, 0, 0, 0,
+            vid.width / 2, vid.height / 2
+        );
     }
 
 }
 
-static void IN_DeactivateMouse(void) {
-    if (!_isMouseAvail || !_dpy || !_win)
+static void IN_DeactivateMouse() {
+    if (!(_isMouseAvail) ||
+        !(_dpy) ||
+        !(_win)
+        )
         return;
 
     if (_isMouseActive) {
@@ -409,8 +409,11 @@ static void IN_DeactivateMouse(void) {
     }
 }
 
-static void IN_ActivateMouse(void) {
-    if (!_isMouseAvail || !_dpy || !_win)
+static void IN_ActivateMouse() {
+    if (!(_isMouseAvail) ||
+        !(_dpy) ||
+        !(_win)
+        )
         return;
 
     if (!_isMouseActive) {
@@ -421,17 +424,17 @@ static void IN_ActivateMouse(void) {
 }
 
 
-void VID_Shutdown(void) {
-    if (!_ctx || !_dpy)
+void VID_Shutdown() {
+    if (!(_ctx) ||
+        !(_dpy)
+        )
         return;
+
     IN_DeactivateMouse();
     if (_dpy) {
-        if (_ctx)
-            glXDestroyContext(_dpy, _ctx);
-        if (_win)
-            XDestroyWindow(_dpy, _win);
-        if (vidmode_active)
-            XF86VidModeSwitchToMode(_dpy, _scrNum, _vidModes[0]);
+        if (_ctx)           glXDestroyContext(_dpy, _ctx);
+        if (_win)           XDestroyWindow(_dpy, _win);
+        if (vidmode_active) XF86VidModeSwitchToMode(_dpy, _scrNum, _vidModes[0]);
         XCloseDisplay(_dpy);
     }
     vidmode_active = false;
@@ -446,7 +449,7 @@ void signal_handler(int sig) {
     exit(0);
 }
 
-void InitSig(void) {
+void InitSig() {
     signal(SIGHUP, signal_handler);
     signal(SIGINT, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -460,53 +463,52 @@ void InitSig(void) {
 }
 
 void VID_ShiftPalette(uint8_p p) {
-    //	VID_SetPalette(p);
+    // VID_SetPalette(p);
 }
 
-void	VID_SetPalette(uint8_p palette) {
-    byte* pal;
-    uint32_t r, g, b;
-    uint32_t v;
-    int     r1, g1, b1;
-    int		j, k, l, m;
-    uint16_t i;
-    uint32_p table;
-    FILE* f;
-    char s[255];
-    int dist, bestdist;
-
+void VID_SetPalette(uint8_p palette) {
     //
     // 8 8 8 encoding
     //
-    pal = palette;
-    table = d_8to24table;
-    for (i = 0; i < 256; i++) {
-        r = pal[0];
-        g = pal[1];
-        b = pal[2];
+    byte* pal = palette;
+    uint32_p table = d_8to24table;
+    for (int i = 0; i < 256; i++) {
+        uint32_t r = pal[0];
+        uint32_t g = pal[1];
+        uint32_t b = pal[2];
         pal += 3;
 
-        v = (255 << 24) + (r << 0) + (g << 8) + (b << 16);
+        uint32_t v =
+            (255 << 24) +
+            (r << 0) +
+            (g << 8) +
+            (b << 16)
+            ;
         *table++ = v;
     }
-    d_8to24table[255] &= 0xffffff;	// 255 is transparent
+    d_8to24table[255] &= 0xffffff;    // 255 is transparent
 
-    for (i = 0; i < (1 << 15); i++) {
+    for (uint16_t i = 0; i < (1 << 15); i++) {
         /* Maps
         000000000000000
         000000000011111 = Red  = 0x1F
         000001111100000 = Blue = 0x03E0
         111110000000000 = Grn  = 0x7C00
         */
-        r = ((i & 0x1F) << 3) + 4;
-        g = ((i & 0x03E0) >> 2) + 4;
-        b = ((i & 0x7C00) >> 7) + 4;
+        uint32_t r = ((i & 0x1F) << 3) + 4;
+        uint32_t g = ((i & 0x03E0) >> 2) + 4;
+        uint32_t b = ((i & 0x7C00) >> 7) + 4;
         pal = (uint8_p)d_8to24table;
-        for (v = 0, k = 0, bestdist = 10000 * 10000; v < 256; v++, pal += 4) {
-            r1 = (int)r - (int)pal[0];
-            g1 = (int)g - (int)pal[1];
-            b1 = (int)b - (int)pal[2];
-            dist = (r1 * r1) + (g1 * g1) + (b1 * b1);
+        int bestdist = 10000 * 10000;
+        int k = 0;
+        for (uint32_t v = 0; v < 256; v++, pal += 4) {
+            int r1 = (int)r - (int)pal[0];
+            int g1 = (int)g - (int)pal[1];
+            int b1 = (int)b - (int)pal[2];
+            int dist =
+                (r1 * r1) +
+                (g1 * g1) +
+                (b1 * b1);
             if (dist < bestdist) {
                 k = v;
                 bestdist = dist;
@@ -516,7 +518,7 @@ void	VID_SetPalette(uint8_p palette) {
     }
 }
 
-void CheckMultiTextureExtensions(void) {
+void CheckMultiTextureExtensions() {
     TypeLess_ptr prjobj;
 
     if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
@@ -546,7 +548,7 @@ void CheckMultiTextureExtensions(void) {
 GL_Init
 ===============
 */
-void GL_Init(void) {
+void GL_Init() {
     gl_vendor = glGetString(GL_VENDOR);
     Con_Printf("GL_VENDOR: %s\n", gl_vendor);
     gl_renderer = glGetString(GL_RENDERER);
@@ -557,7 +559,7 @@ void GL_Init(void) {
     gl_extensions = glGetString(GL_EXTENSIONS);
     Con_Printf("GL_EXTENSIONS: %s\n", gl_extensions);
 
-    //	Con_Printf ("%s %s\n", gl_renderer, gl_version);
+    //    Con_Printf ("%s %s\n", gl_renderer, gl_version);
 
     CheckMultiTextureExtensions();
 
@@ -578,7 +580,7 @@ void GL_Init(void) {
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    //    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
@@ -595,22 +597,22 @@ void GL_BeginRendering(int* x, int* y, int* width, int* height) {
     *height = _scrHeight;
 
     //    if (!wglMakeCurrent( maindc, baseRC ))
-    //		Host_SysError ("wglMakeCurrent failed");
+    //        Host_SysError ("wglMakeCurrent failed");
 
-    //	glViewport (*x, *y, *width, *height);
+    //    glViewport (*x, *y, *width, *height);
 }
 
 
-void GL_EndRendering(void) {
+void GL_EndRendering() {
     glFlush();
     glXSwapBuffers(_dpy, _win);
 }
 
-bool VID_Is8bit(void) {
+bool VID_Is8bit() {
     return is8bit;
 }
 
-void VID_Init8bitPalette(void) {
+void VID_Init8bitPalette() {
     // Check for 8bit Extensions and initialize them.
     int i;
     TypeLess_ptr prjobj;
@@ -654,7 +656,11 @@ void VID_Init8bitPalette(void) {
             *newPalette++ = *oldPalette++;
             oldPalette++;
         }
-        qglColorTableEXT(GL_SHARED_TEXTURE_PALETTE_EXT, GL_RGB, 256, GL_RGB, GL_UNSIGNED_BYTE, (TypeLess_ptr)thePalette);
+        qglColorTableEXT(
+            GL_SHARED_TEXTURE_PALETTE_EXT, GL_RGB,
+            256, GL_RGB,
+            GL_UNSIGNED_BYTE, (TypeLess_ptr)thePalette
+        );
         is8bit = true;
     }
 
@@ -662,9 +668,8 @@ void VID_Init8bitPalette(void) {
 }
 
 static void Check_Gamma(uint8_p pal) {
-    float	f, inf;
-    uint8_t	palette[768];
-    int		i;
+    uint8_t    palette[768];
+    int        i;
 
     if ((i = COM_CheckParm("-gamma")) == 0) {
         if ((gl_renderer && strstr(gl_renderer, "Voodoo")) ||
@@ -677,12 +682,10 @@ static void Check_Gamma(uint8_p pal) {
         vid_gamma = Q_atof(com.argv[i + 1]);
 
     for (i = 0; i < 768; i++) {
-        f = pow((pal[i] + 1) / 256.0, vid_gamma);
-        inf = f * 255 + 0.5;
-        if (inf < 0)
-            inf = 0;
-        if (inf > 255)
-            inf = 255;
+        float f = pow((pal[i] + 1) / 256.0, vid_gamma);
+        float inf = f * 255 + 0.5;
+        if (inf < 0)    inf = 0;
+        if (inf > 255)  inf = 255;
         palette[i] = inf;
     }
 
@@ -700,7 +703,7 @@ void VID_Init(uint8_p palette) {
         GLX_DEPTH_SIZE, 1,
         None
     };
-    char	gldir[MAX_OSPATH];
+    char    gldir[MAX_OSPATH];
     int width = 640, height = 480;
     XSetWindowAttributes attr;
     uint32_t mask;
@@ -785,8 +788,9 @@ void VID_Init(uint8_p palette) {
             best_fit = -1;
 
             for (i = 0; i < _numVidModes; i++) {
-                if (width > _vidModes[i]->hdisplay ||
-                    height > _vidModes[i]->vdisplay)
+                if ((width > _vidModes[i]->hdisplay) ||
+                    (height > _vidModes[i]->vdisplay)
+                    )
                     continue;
 
                 x = width - _vidModes[i]->hdisplay;
@@ -820,18 +824,32 @@ void VID_Init(uint8_p palette) {
     attr.colormap = XCreateColormap(_dpy, root, visinfo->visual, AllocNone);
     attr.event_mask = X_MASK;
     if (vidmode_active) {
-        mask = CWBackPixel | CWColormap | CWSaveUnder | CWBackingStore |
-            CWEventMask | CWOverrideRedirect;
+        mask =
+            CWBackPixel |
+            CWColormap |
+            CWSaveUnder |
+            CWBackingStore |
+            CWEventMask |
+            CWOverrideRedirect;
         attr.override_redirect = True;
         attr.backing_store = NotUseful;
         attr.save_under = False;
     }
     else
-        mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
+        mask =
+        CWBackPixel |
+        CWBorderPixel |
+        CWColormap |
+        CWEventMask;
 
-    _win = XCreateWindow(_dpy, root, 0, 0, width, height,
-        0, visinfo->depth, InputOutput,
-        visinfo->visual, mask, &attr);
+    _win = XCreateWindow(
+        _dpy, root,
+        0, 0,
+        width, height,
+        0, visinfo->depth,
+        InputOutput, visinfo->visual,
+        mask, &attr
+    );
     XMapWindow(_dpy, _win);
 
     if (vidmode_active) {
@@ -874,28 +892,28 @@ void VID_Init(uint8_p palette) {
 
     Con_SafePrintf("Video mode %dx%d initialized.\n", width, height);
 
-    vid.recalc_refdef = 1;				// force a surface cache flush
+    vid.recalc_refdef = 1;                // force a surface cache flush
 }
 
-void Sys_SendKeyEvents(void) {
+void Sys_SendKeyEvents() {
     HandleEvents();
 }
 
-void Force_CenterView_f(void) {
+void Force_CenterView_f() {
     cl.viewangles[PITCH] = 0;
 }
 
-void IN_Init(void) {}
+void IN_Init() {}
 
-void IN_Shutdown(void) {}
+void IN_Shutdown() {}
 
 /*
 ===========
 IN_Commands
 ===========
 */
-void IN_Commands(void) {
-    if (!_dpy || !_win)
+void IN_Commands() {
+    if (!(_dpy) || !(_win))
         return;
 
     if (vidmode_active || (key.dest == key_game))   IN_ActivateMouse();
@@ -922,7 +940,11 @@ void IN_MouseMove(UserCmd_p cmd) {
     _my *= sensitivity.value;
 
     // add mouse X/Y movement to cmd
-    if ((in.strafe.state & 1) || (lookstrafe.value && (in.mlook.state & 1)))
+    if ((in.strafe.state & 1) ||
+        (
+            lookstrafe.value &&
+            (in.mlook.state & 1))
+        )
         cmd->sidemove += m_side.value * _mx;
     else
         cl.viewangles[YAW] -= m_yaw.value * _mx;

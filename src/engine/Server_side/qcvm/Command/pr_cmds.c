@@ -635,7 +635,7 @@ If there are more than one valid options, they are cycled each frame
 If (self.origin + self.viewofs) is not in the PVS of the current target,
 it is not returned at all.
 
-name checkclient ()
+name checkclient()
 =================
 */
 // #define MAX_CHECK 16

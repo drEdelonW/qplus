@@ -190,7 +190,7 @@ Generate a list of trifans or strips
 for the model, which holds for all frames
 ================
 */
-void BuildTris(void) {
+void BuildTris() {
     //
     // build tristrips
     //

@@ -353,7 +353,7 @@ static Cursor CreateNullCursor(Display* display, Window root) {
     return cursor;
 }
 
-void ResetFrameBuffer(void) {
+void ResetFrameBuffer() {
 
     int mem;
     int pwidth;
@@ -388,7 +388,7 @@ void ResetFrameBuffer(void) {
 
 }
 
-void ResetSharedFrameBuffers(void) {
+void ResetSharedFrameBuffers() {
 
     int size;
     int key;
@@ -452,7 +452,7 @@ void ResetSharedFrameBuffers(void) {
 
 }
 
-void VID_MenuDraw(void) {
+void VID_MenuDraw() {
     qPic_p p;
     cString ptr;
     int			i, j, column, row, dup;
@@ -860,7 +860,7 @@ int config_notify = 0;
 int config_notify_width;
 int config_notify_height;
 
-void GetEvent(void) {
+void GetEvent() {
     XEvent x_event;
 
     XNextEvent(x_disp, &x_event);
@@ -1033,24 +1033,24 @@ void	VID_Update(vRect_p rects) {
 
 static int dither;
 
-void VID_DitherOn(void) {
+void VID_DitherOn() {
     if (dither == 0) {
         vid.recalc_refdef = 1;
         dither = 1;
     }
 }
 
-void VID_DitherOff(void) {
+void VID_DitherOff() {
     if (dither) {
         vid.recalc_refdef = 1;
         dither = 0;
     }
 }
 
-void VID_SetDefaultMode(void) {
+void VID_SetDefaultMode() {
 }
 
-int I_OpenWindow(void) {
+int I_OpenWindow() {
     return 0;
 }
 
@@ -1063,7 +1063,7 @@ void I_DrawCircle(int window, int x, int y, int r) {
 void I_DisplayWindow(int window) {
 }
 
-void Sys_SendKeyEvents(void) {
+void Sys_SendKeyEvents() {
     // get events from x server
     if (x_disp) {
         while (XPending(x_disp)) GetEvent();

@@ -120,10 +120,10 @@ float CL_KeyState(kbutton_p key) {
 
     if (impulsedown && !impulseup) {
         if (down)   val = 0.5; // pressed and held this frame
-        else        val = 0; // I_Error ();
+        else        val = 0; // I_Error();
     }
     if (impulseup && !impulsedown) {
-        if (down)   val = 0; // I_Error ();
+        if (down)   val = 0; // I_Error();
         else        val = 0; // released this frame
     }
     if (!impulsedown && !impulseup) {

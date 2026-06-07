@@ -77,7 +77,7 @@ Texture_p r_notexture_mip;
 int  d_lightstylevalue[256]; // 8.8 fraction of base light value
 
 
-void R_MarkLeaves(void);
+void R_MarkLeaves();
 
 cvar_t r_norefresh = { "r_norefresh", "0" };
 cvar_t r_lightmap = { "r_lightmap", "0" };
@@ -209,29 +209,29 @@ void R_DrawSpriteModel(r_Entity_p e) {
     GL_Bind(frame->gl_texturenum);
 
     glEnable(GL_ALPHA_TEST);
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); {
 
-    glTexCoord2f(0, 1);
-    VectorMA(e->origin, frame->down, up, point);
-    VectorMA(point, frame->left, right, point);
-    glVertex3fv(point);
+        glTexCoord2f(0, 1);
+        VectorMA(e->origin, frame->down, up, point);
+        VectorMA(point, frame->left, right, point);
+        glVertex3fv(point);
 
-    glTexCoord2f(0, 0);
-    VectorMA(e->origin, frame->up, up, point);
-    VectorMA(point, frame->left, right, point);
-    glVertex3fv(point);
+        glTexCoord2f(0, 0);
+        VectorMA(e->origin, frame->up, up, point);
+        VectorMA(point, frame->left, right, point);
+        glVertex3fv(point);
 
-    glTexCoord2f(1, 0);
-    VectorMA(e->origin, frame->up, up, point);
-    VectorMA(point, frame->right, right, point);
-    glVertex3fv(point);
+        glTexCoord2f(1, 0);
+        VectorMA(e->origin, frame->up, up, point);
+        VectorMA(point, frame->right, right, point);
+        glVertex3fv(point);
 
-    glTexCoord2f(1, 1);
-    VectorMA(e->origin, frame->down, up, point);
-    VectorMA(point, frame->right, right, point);
-    glVertex3fv(point);
+        glTexCoord2f(1, 1);
+        VectorMA(e->origin, frame->down, up, point);
+        VectorMA(point, frame->right, right, point);
+        glVertex3fv(point);
 
-    glEnd();
+    } glEnd();
 
     glDisable(GL_ALPHA_TEST);
 }
@@ -279,28 +279,30 @@ void GL_DrawAliasFrame(AliasHdr_p paliashdr, int posenum) {
     while (1) {
         // get the vertex count and primitive type
         int count = *order++;
-        if (!count)
-            break;  // done
+        if (!count)     break;  // done
+
+        GLenum mode;
         if (count < 0) {
             count = -count;
-            glBegin(GL_TRIANGLE_FAN);
+            mode = GL_TRIANGLE_FAN;
         }
         else
-            glBegin(GL_TRIANGLE_STRIP);
+            mode = GL_TRIANGLE_STRIP;
 
-        do {
-            // texture coordinates come from the draw list
-            glTexCoord2f(((float_p)order)[0], ((float_p)order)[1]);
-            order += 2;
+        glBegin(mode); {
+            do {
+                // texture coordinates come from the draw list
+                glTexCoord2f(((float_p)order)[0], ((float_p)order)[1]);
+                order += 2;
 
-            // normals and vertexes come from the frame list
-            float l = shadedots[verts->lightnormalindex] * shadelight;
-            glColor3f(l, l, l);
-            glVertex3f(verts->v[0], verts->v[1], verts->v[2]);
-            verts++;
-        } while (--count);
+                // normals and vertexes come from the frame list
+                float l = shadedots[verts->lightnormalindex] * shadelight;
+                glColor3f(l, l, l);
+                glVertex3f(verts->v[0], verts->v[1], verts->v[2]);
+                verts++;
+            } while (--count);
 
-        glEnd();
+        } glEnd();
     }
 }
 
@@ -325,36 +327,39 @@ void GL_DrawAliasShadow(AliasHdr_p paliashdr, int posenum) {
     while (1) {
         // get the vertex count and primitive type
         int count = *order++;
-        if (!count)
-            break;  // done
+        if (!count)     break;  // done
+
+        GLenum mode;
         if (count < 0) {
             count = -count;
-            glBegin(GL_TRIANGLE_FAN);
+            mode = GL_TRIANGLE_FAN;
         }
         else
-            glBegin(GL_TRIANGLE_STRIP);
+            mode = GL_TRIANGLE_STRIP;
 
-        do {
-            // texture coordinates come from the draw list
-            // (skipped for shadows) glTexCoord2fv ((float *)order);
-            order += 2;
+        glBegin(mode); {
 
-            // normals and vertexes come from the frame list
-            vec3_t point = {
-                verts->v[0] * paliashdr->scale[0] + paliashdr->scale_origin[0],
-                verts->v[1] * paliashdr->scale[1] + paliashdr->scale_origin[1],
-                verts->v[2] * paliashdr->scale[2] + paliashdr->scale_origin[2]
-            };
-            point[0] -= shadevector[0] * (point[2] + lheight);
-            point[1] -= shadevector[1] * (point[2] + lheight);
-            point[2] = height;
-            //   height -= 0.001;
-            glVertex3fv(point);
+            do {
+                // texture coordinates come from the draw list
+                // (skipped for shadows) glTexCoord2fv ((float *)order);
+                order += 2;
 
-            verts++;
-        } while (--count);
+                // normals and vertexes come from the frame list
+                vec3_t point = {
+                    verts->v[0] * paliashdr->scale[0] + paliashdr->scale_origin[0],
+                    verts->v[1] * paliashdr->scale[1] + paliashdr->scale_origin[1],
+                    verts->v[2] * paliashdr->scale[2] + paliashdr->scale_origin[2]
+                };
+                point[0] -= shadevector[0] * (point[2] + lheight);
+                point[1] -= shadevector[1] * (point[2] + lheight);
+                point[2] = height;
+                //   height -= 0.001;
+                glVertex3fv(point);
 
-        glEnd();
+                verts++;
+            } while (--count);
+
+        } glEnd();
     }
 }
 
@@ -537,7 +542,7 @@ void R_DrawAliasModel(r_Entity_p e) {
 R_DrawEntitiesOnList
 =============
 */
-void R_DrawEntitiesOnList(void) {
+void R_DrawEntitiesOnList() {
     if (!r_drawentities.value)
         return;
 
@@ -576,7 +581,7 @@ void R_DrawEntitiesOnList(void) {
 R_DrawViewModel
 =============
 */
-void R_DrawViewModel(void) {
+void R_DrawViewModel() {
     if (!r_drawviewmodel.value)     return;
     if (chase_active.value)         return;
     if (envmap)                     return;
@@ -589,7 +594,6 @@ void R_DrawViewModel(void) {
     int j = R_LightPoint(currententity->origin);
     if (j < 24)        j = 24;  // allways give some light on gun
     int ambientlight = j;
-    int shadelight = j;
 
     // add dynamic lights
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
@@ -601,12 +605,15 @@ void R_DrawViewModel(void) {
         vec3_t dist; VectorSubtract(currententity->origin, dl->origin, dist);
         float add = dl->radius - Length(dist);
         if (add > 0)
-            ambientlight += add;
+        ambientlight += add;
     }
 
+#if 0
+    int shadelight = j;
     float ambient[4], diffuse[4];
     ambient[0] = ambient[1] = ambient[2] = ambient[3] = (float)ambientlight / 128;
     diffuse[0] = diffuse[1] = diffuse[2] = diffuse[3] = (float)shadelight / 128;
+#endif    
 #warning TODO: investigate why ambient and diffuse go nowhere
 
     // hack the depth range to prevent view model from poking into walls
@@ -621,7 +628,7 @@ void R_DrawViewModel(void) {
 R_PolyBlend
 ============
 */
-void R_PolyBlend(void) {
+void R_PolyBlend() {
     if (!gl_polyblend.value)    return;
     if (!v_blend[3])            return;
 
@@ -639,13 +646,13 @@ void R_PolyBlend(void) {
 
     glColor4fv(v_blend);
 
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); {
 
-    glVertex3f(10, 100, 100);
-    glVertex3f(10, -100, 100);
-    glVertex3f(10, -100, -100);
-    glVertex3f(10, 100, -100);
-    glEnd();
+        glVertex3f(10, 100, 100);
+        glVertex3f(10, -100, 100);
+        glVertex3f(10, -100, -100);
+        glVertex3f(10, 100, -100);
+    } glEnd();
 
     glDisable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
@@ -664,7 +671,7 @@ int SignbitsForPlane(mPlane_p out) {
 }
 
 
-void R_SetFrustum(void) {
+void R_SetFrustum() {
     if (r_refdef.fov_x == 90) {
         // front side is visible
 
@@ -699,7 +706,7 @@ void R_SetFrustum(void) {
 R_SetupFrame
 ===============
 */
-void R_SetupFrame(void) {
+void R_SetupFrame() {
     // don't allow cheats in multiplayer
     if (cl.maxclients > 1)
         Cvar_Set("r_fullbright", "0");
@@ -751,7 +758,7 @@ void MYgluPerspective(
 R_SetupGL
 =============
 */
-void R_SetupGL(void) {
+void R_SetupGL() {
     //
     // set up viewpoint
     //
@@ -819,7 +826,7 @@ R_RenderScene
 r_refdef must be set before the first call
 ================
 */
-void R_RenderScene(void) {
+void R_RenderScene() {
     R_SetupFrame();
     R_SetFrustum();
     R_SetupGL();
@@ -842,7 +849,7 @@ R_Clear
 =============
 */
 extern cvar_t   gl_ztrick;
-void R_Clear(void) {
+void R_Clear() {
     if (r_mirroralpha.value != 1.0) {
         if (gl_clear.value)     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         else                    glClear(GL_DEPTH_BUFFER_BIT);
@@ -884,7 +891,7 @@ void R_Clear(void) {
 R_Mirror
 =============
 */
-void R_Mirror(void) {
+void R_Mirror() {
     if (!mirror)        return;
 
     memcpy(r_base_world_matrix, r_world_matrix, sizeof(r_base_world_matrix));
@@ -948,7 +955,7 @@ R_RenderView
 r_refdef must be set before the first call
 ================
 */
-void R_RenderView(void) {
+void R_RenderView() {
     // GLfloat colors[4] = { (GLfloat)0.0, (GLfloat)0.0, (GLfloat)1, (GLfloat)0.20 }; // fog color
 
     if (r_norefresh.value)        return;
@@ -995,7 +1002,7 @@ void R_RenderView(void) {
     R_PolyBlend();
 
     if (r_speeds.value) {
-        //  glFinish ();
+        //  glFinish();
         LegacyTimeStamp_t time2 = Host_FloatTime();
         Con_Printf("%3i ms  %4i wpoly %4i epoly\n", (int)((time2 - time1) * 1000), c_brush_polys, c_alias_polys);
     }

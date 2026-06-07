@@ -346,14 +346,14 @@ void R_LeadingEdgeBackwards(Edge_p edge) {
 
         // set last_u on the new span
         surf->last_u = iu;
-    }
+        }
 
-    gotposition:
-        // insert before surf2
-        surf->next = surf2;
-        surf->prev = surf2->prev;
-        surf2->prev->next = surf;
-        surf2->prev = surf;
+gotposition:
+    // insert before surf2
+    surf->next = surf2;
+    surf->prev = surf2->prev;
+    surf2->prev->next = surf;
+    surf2->prev = surf;
     }
 }
 
@@ -492,14 +492,14 @@ void R_LeadingEdge(Edge_p  edge) {
 
             // set last_u on the new span
             surf->last_u = iu;
-        }
+            }
 
-        gotposition:
-            // insert before surf2
-            surf->next = surf2;
-            surf->prev = surf2->prev;
-            surf2->prev->next = surf;
-            surf2->prev = surf;
+    gotposition:
+        // insert before surf2
+        surf->next = surf2;
+        surf->prev = surf2->prev;
+        surf2->prev->next = surf;
+        surf2->prev = surf;
         }
     }
 }
@@ -623,7 +623,7 @@ void R_ScanEdges() {
         surfaces[1].spanstate = inSpan;
 
         if (newedges[iv])   R_InsertNewEdges(newedges[iv], edge_head.next);
-        (*_pDrawFunc) ();
+        (*_pDrawFunc)();
 
         // flush the span list if we can't be sure we have enough spans left for
         // the next scan
@@ -656,7 +656,7 @@ void R_ScanEdges() {
     surfaces[1].spanstate = inSpan;
 
     if (newedges[iv])   R_InsertNewEdges(newedges[iv], edge_head.next);
-    (*_pDrawFunc) ();
+    (*_pDrawFunc)();
 
     // draw whatever's left in the span list
     if (r_drawculledpolys)  R_DrawCulledPolys();

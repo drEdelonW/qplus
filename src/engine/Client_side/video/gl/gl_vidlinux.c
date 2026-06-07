@@ -167,7 +167,7 @@ void keyhandler(int scancode, int state) {
 
 }
 
-void VID_Shutdown(void) {
+void VID_Shutdown() {
     if (!_fc)
         return;
 
@@ -183,7 +183,7 @@ void signal_handler(int sig) {
     exit(0);
 }
 
-void InitSig(void) {
+void InitSig() {
     signal(SIGHUP, signal_handler);
     signal(SIGINT, signal_handler);
     signal(SIGQUIT, signal_handler);
@@ -255,7 +255,7 @@ void	VID_SetPalette(uint8_p palette) {
     }
 }
 
-void CheckMultiTextureExtensions(void) {
+void CheckMultiTextureExtensions() {
     TypeLess_ptr prjobj;
 
     if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
@@ -285,7 +285,7 @@ void CheckMultiTextureExtensions(void) {
 GL_Init
 ===============
 */
-void GL_Init(void) {
+void GL_Init() {
     gl_vendor = glGetString(GL_VENDOR);
     Con_Printf("GL_VENDOR: %s\n", gl_vendor);
     gl_renderer = glGetString(GL_RENDERER);
@@ -340,12 +340,12 @@ void GL_BeginRendering(int* x, int* y, int* width, int* height) {
 }
 
 
-void GL_EndRendering(void) {
+void GL_EndRendering() {
     glFlush();
     fxMesaSwapBuffers();
 }
 
-void Init_KBD(void) {
+void Init_KBD() {
     int i;
 
     if (COM_CheckParm("-nokbd")) UseKeyboard = 0;
@@ -494,11 +494,11 @@ int findres(int* width, int* height) {
     return GR_RESOLUTION_640x480;
 }
 
-bool VID_Is8bit(void) {
+bool VID_Is8bit() {
     return is8bit;
 }
 
-void VID_Init8bitPalette(void) {
+void VID_Init8bitPalette() {
     // Check for 8bit Extensions and initialize them.
     TypeLess_ptr prjobj;
 
@@ -659,12 +659,12 @@ void VID_Init(uint8_p palette) {
     vid.recalc_refdef = 1;				// force a surface cache flush
 }
 
-void Sys_SendKeyEvents(void) {
+void Sys_SendKeyEvents() {
     if (UseKeyboard)
         while (keyboard_update());
 }
 
-void Force_CenterView_f(void) {
+void Force_CenterView_f() {
     cl.viewangles[PITCH] = 0;
 }
 
@@ -675,7 +675,7 @@ void mousehandler(int buttonstate, int dx, int dy) {
     my += dy;
 }
 
-void IN_Init(void) {
+void IN_Init() {
 
     int mtype;
     cString mousedev;
@@ -713,7 +713,7 @@ void IN_Init(void) {
 
 }
 
-void IN_Shutdown(void) {
+void IN_Shutdown() {
     if (UseMouse)
         mouse_close();
 }
@@ -723,7 +723,7 @@ void IN_Shutdown(void) {
 IN_Commands
 ===========
 */
-void IN_Commands(void) {
+void IN_Commands() {
     if (UseMouse && !Host_IsDedicated()) {
         // poll mouse values
         while (mouse_update())

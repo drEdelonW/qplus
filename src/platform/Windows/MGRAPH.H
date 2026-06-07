@@ -948,20 +948,20 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     /* Environment detection and initialisation */
 
     m_int  MGLAPI MGL_registerDriver(cStringRO name, void* driver);
-    void MGLAPI MGL_unregisterAllDrivers(void);
+    void MGLAPI MGL_unregisterAllDrivers();
     void MGLAPI MGL_registerAllDispDrivers(bool useLinear, bool useDirectDraw, bool useWinDirect);
-    void MGLAPI MGL_registerAllMemDrivers(void);
+    void MGLAPI MGL_registerAllMemDrivers();
     void  MGLAPI MGL_detectGraph(m_int* driver, m_int* mode);
-    uchar* MGLAPI MGL_availableModes(void);
+    uchar* MGLAPI MGL_availableModes();
     m_int MGLAPI MGL_availablePages(m_int mode);
     m_int MGLAPI MGL_modeResolution(m_int mode, m_int* xRes, m_int* yRes, m_int* bitsPerPixel);
     bool MGLAPI MGL_isDisplayDC(MGLDC* dc);
     bool MGLAPI MGL_isWindowedDC(MGLDC* dc);
     bool MGLAPI MGL_isMemoryDC(MGLDC* dc);
-    void  MGLAPI MGL_exit(void);
+    void  MGLAPI MGL_exit();
     void  MGLAPI MGL_setBufSize(unsigned size);
     void MGLAPI MGL_fatalError(cStringRO msg);
-    m_int  MGLAPI MGL_result(void);
+    m_int  MGLAPI MGL_result();
     void MGLAPI MGL_setResult(m_int result);
     cStringRO MGLAPI MGL_errorMsg(m_int err);
     cStringRO MGLAPI MGL_modeName(m_int mode);
@@ -1069,38 +1069,38 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
 
     /* Current device context information and manipulation */
 
-    m_int  MGLAPI MGL_getAspectRatio(void);
+    m_int  MGLAPI MGL_getAspectRatio();
     void  MGLAPI MGL_setAspectRatio(m_int aspectRatio);
     void  ASMAPI MGL_setColor(color_t color);
     void MGLAPI MGL_setColorRGB(uchar R, uchar G, uchar B);
     void MGLAPI MGL_setColorCI(m_int index);
-    color_t MGLAPI MGL_getColor(void);
+    color_t MGLAPI MGL_getColor();
     void  ASMAPI MGL_setBackColor(color_t color);
-    color_t MGLAPI MGL_getBackColor(void);
+    color_t MGLAPI MGL_getBackColor();
     color_t ASMAPI MGL_packColor(pixel_format_t* pf, uchar R, uchar G, uchar B);
     void MGLAPI MGL_unpackColor(pixel_format_t* pf, color_t color, uchar* R, uchar* G, uchar* B);
     color_t ASMAPI MGL_packColorRGB(uchar R, uchar G, uchar B);
     void MGLAPI MGL_unpackColorRGB(color_t color, uchar* R, uchar* G, uchar* B);
-    color_t MGLAPI MGL_defaultColor(void);
+    color_t MGLAPI MGL_defaultColor();
 #ifndef MGL_LITE
     void MGLAPI MGL_setMarkerSize(m_int size);
-    m_int MGLAPI MGL_getMarkerSize(void);
+    m_int MGLAPI MGL_getMarkerSize();
     void MGLAPI MGL_setMarkerStyle(m_int style);
-    m_int MGLAPI MGL_getMarkerStyle(void);
+    m_int MGLAPI MGL_getMarkerStyle();
     void MGLAPI MGL_setMarkerColor(color_t color);
-    color_t MGLAPI MGL_getMarkerColor(void);
+    color_t MGLAPI MGL_getMarkerColor();
     void MGLAPI MGL_setBorderColors(color_t bright, color_t dark);
     void MGLAPI MGL_getBorderColors(color_t* bright, color_t* dark);
     void  ASMAPI MGL_setWriteMode(m_int mode);
-    m_int  MGLAPI MGL_getWriteMode(void);
+    m_int  MGLAPI MGL_getWriteMode();
     void  ASMAPI MGL_setPenStyle(m_int style);
-    m_int  MGLAPI MGL_getPenStyle(void);
+    m_int  MGLAPI MGL_getPenStyle();
     void  MGLAPI MGL_setLineStyle(m_int style);
-    m_int  MGLAPI MGL_getLineStyle(void);
+    m_int  MGLAPI MGL_getLineStyle();
     void  ASMAPI MGL_setLineStipple(ushort stipple);
-    ushort MGLAPI MGL_getLineStipple(void);
+    ushort MGLAPI MGL_getLineStipple();
     void  ASMAPI MGL_setLineStippleCount(m_uint stippleCount);
-    m_uint MGLAPI MGL_getLineStippleCount(void);
+    m_uint MGLAPI MGL_getLineStippleCount();
     void  ASMAPI MGL_setPenBitmapPattern(const pattern_t* pat);
     void  MGLAPI MGL_getPenBitmapPattern(pattern_t* pat);
     void  ASMAPI MGL_setPenPixmapPattern(const pixpattern_t* pat);
@@ -1109,18 +1109,18 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     void  MGLAPI MGL_getPenSize(m_int* height, m_int* width);
 #ifndef MGL_LITE
     void  MGLAPI MGL_setColorMapMode(m_int mode);
-    m_int MGLAPI MGL_getColorMapMode(void);
+    m_int MGLAPI MGL_getColorMapMode();
 #endif
     void MGLAPI MGL_setPolygonType(m_int type);
-    m_int MGLAPI MGL_getPolygonType(void);
+    m_int MGLAPI MGL_getPolygonType();
 #endif
     void  MGLAPI MGL_getAttributes(attributes_t* attr);
     void  MGLAPI MGL_restoreAttributes(attributes_t* attr);
 
     /* Device clearing */
 
-    void ASMAPI MGL_clearDevice(void);
-    void  MGLAPI MGL_clearViewport(void);
+    void ASMAPI MGL_clearDevice();
+    void  MGLAPI MGL_clearViewport();
 
     /* Viewport and clip rectangle manipulation */
 
@@ -1131,21 +1131,21 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     void MGLAPI MGL_getViewportOrg(point_t* org);
     void MGLAPI MGL_globalToLocal(point_t* p);
     void MGLAPI MGL_localToGlobal(point_t* p);
-    m_int  MGLAPI MGL_maxx(void);
-    m_int  MGLAPI MGL_maxy(void);
+    m_int  MGLAPI MGL_maxx();
+    m_int  MGLAPI MGL_maxy();
     void  MGLAPI MGL_setClipRect(rect_t clip);
     void  MGLAPI MGL_getClipRect(rect_t* clip);
     void  MGLAPI MGL_setClipMode(bool mode);
-    bool  MGLAPI MGL_getClipMode(void);
+    bool  MGLAPI MGL_getClipMode();
 
     /* Pixel plotting */
 
     void  MGLAPI MGL_pixelCoord(m_int x, m_int y);
     color_t MGLAPI MGL_getPixelCoord(m_int x, m_int y);
-    void ASMAPI MGL_beginPixel(void);
+    void ASMAPI MGL_beginPixel();
     void  MGLAPI MGL_pixelCoordFast(m_int x, m_int y);
     color_t MGLAPI MGL_getPixelCoordFast(m_int x, m_int y);
-    void ASMAPI MGL_endPixel(void);
+    void ASMAPI MGL_endPixel();
 
     /* Line drawing and clipping */
 
@@ -1153,8 +1153,8 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     void  MGLAPI MGL_moveRelCoord(m_int dx, m_int dy);
     void  MGLAPI MGL_lineToCoord(m_int x, m_int y);
     void  MGLAPI MGL_lineRelCoord(m_int dx, m_int dy);
-    m_int  MGLAPI MGL_getX(void);
-    m_int  MGLAPI MGL_getY(void);
+    m_int  MGLAPI MGL_getX();
+    m_int  MGLAPI MGL_getY();
     void MGLAPI MGL_getCP(point_t* CP);
     void  MGLAPI MGL_lineCoord(m_int x1, m_int y1, m_int x2, m_int y2);
     void  MGLAPI MGL_lineCoordFX(fix32_t x1, fix32_t y1, fix32_t x2, fix32_t y2);
@@ -1173,7 +1173,7 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     * RUNNING WITH A LINEAR FRAMEBUFFER!!!
     */
 
-    void _ASMAPI SVGA_setBank(void);
+    void _ASMAPI SVGA_setBank();
     void _ASMAPI SVGA_setBankC(int bank);
 
     /* Routines to begin/end direct framebuffer access. You must call these
@@ -1181,23 +1181,23 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     * device surface.
     */
 
-    void  ASMAPI MGL_beginDirectAccess(void);
-    void  ASMAPI MGL_endDirectAccess(void);
+    void  ASMAPI MGL_beginDirectAccess();
+    void  ASMAPI MGL_endDirectAccess();
 
     /* Routines to begin/end fast rendering of flat shaded lines, scanlines
     * and polygons.
     */
 
-    void  ASMAPI MGL_beginDrawing(void);
-    void  ASMAPI MGL_endDrawing(void);
+    void  ASMAPI MGL_beginDrawing();
+    void  ASMAPI MGL_endDrawing();
 
     /* Routines to begin/end fast rendering of smooth shaded lines, scanlines
     * and polygons.
     */
 
 #ifdef MGL_3D
-    void  ASMAPI MGL_beginShadedDrawing(void);
-    void  ASMAPI MGL_endShadedDrawing(void);
+    void  ASMAPI MGL_beginShadedDrawing();
+    void  ASMAPI MGL_endShadedDrawing();
 #endif
 
     /* Routines to begin/end fast rendering of flat shaded, zbuffered lines and
@@ -1205,8 +1205,8 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     */
 
 #ifdef MGL_3D
-    void  ASMAPI MGL_beginZDrawing(void);
-    void  ASMAPI MGL_endZDrawing(void);
+    void  ASMAPI MGL_beginZDrawing();
+    void  ASMAPI MGL_endZDrawing();
 #endif
 
     /* Routines to begin/end fast rendering of smooth shaded, zbuffered lines and
@@ -1214,8 +1214,8 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     */
 
 #ifdef MGL_3D
-    void  ASMAPI MGL_beginZShadedDrawing(void);
-    void  ASMAPI MGL_endZShadedDrawing(void);
+    void  ASMAPI MGL_beginZShadedDrawing();
+    void  ASMAPI MGL_endZShadedDrawing();
 #endif
 
     /* Polygon drawing: Note that the following fast polygon routines
@@ -1322,7 +1322,7 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     void MGLAPI MGL_fillEllipseArcCoord(m_int x, m_int y, m_int xradius, m_int yradius, m_int startAngle, m_int endAngle);
     void MGLAPI MGL_fillEllipse(rect_t extentRect);
     void MGLAPI MGL_fillEllipseCoord(m_int x, m_int y, m_int xradius, m_int yradius);
-    void MGLAPI MGL_ellipseEngine(rect_t extentRect, void (ASMAPI* setup)(m_int topY, m_int botY, m_int left, m_int right), void (ASMAPI* set4pixels)(bool inc_x, bool inc_y, bool region1), void (ASMAPI* finished)(void));
+    void MGLAPI MGL_ellipseEngine(rect_t extentRect, void (ASMAPI* setup)(m_int topY, m_int botY, m_int left, m_int right), void (ASMAPI* set4pixels)(bool inc_x, bool inc_y, bool region1), void (ASMAPI* finished)());
     void  MGLAPI MGL_ellipseArcEngine(rect_t extentRect, m_int startAngle, m_int endAngle, arc_coords_t* ac, void (ASMAPI* plotPoint)(m_int x, m_int y));
 #endif
 
@@ -1332,20 +1332,20 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     void  MGLAPI MGL_setTextJustify(m_int horiz, m_int vert);
     void  MGLAPI MGL_getTextJustify(m_int* horiz, m_int* vert);
     void  MGLAPI MGL_setTextDirection(m_int direction);
-    m_int   MGLAPI MGL_getTextDirection(void);
+    m_int   MGLAPI MGL_getTextDirection();
     void MGLAPI MGL_setTextSize(m_int numerx, m_int denomx, m_int numery, m_int denomy);
     void MGLAPI MGL_getTextSize(m_int* numerx, m_int* denomx, m_int* numery, m_int* denomy);
     void MGLAPI MGL_setSpaceExtra(m_int extra);
-    m_int MGLAPI MGL_getSpaceExtra(void);
+    m_int MGLAPI MGL_getSpaceExtra();
     void MGLAPI MGL_setTextSettings(text_settings_t* settings);
     void MGLAPI MGL_getTextSettings(text_settings_t* settings);
-    m_int  MGLAPI MGL_textHeight(void);
+    m_int  MGLAPI MGL_textHeight();
     m_int  MGLAPI MGL_textWidth(cStringRO str);
     void MGLAPI MGL_textBounds(m_int x, m_int y, cStringRO str, rect_t* bounds);
     m_int MGLAPI MGL_charWidth(char ch);
     void MGLAPI MGL_getFontMetrics(metrics_t* metrics);
     void MGLAPI MGL_getCharMetrics(char ch, metrics_t* metrics);
-    m_int MGLAPI MGL_maxCharWidth(void);
+    m_int MGLAPI MGL_maxCharWidth();
     void MGLAPI MGL_underScoreLocation(m_int* x, m_int* y, cStringRO str);
 #endif
 
@@ -1355,7 +1355,7 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     void  MGLAPI MGL_drawStr(cStringRO str);
     void MGLAPI MGL_drawStrXY(m_int x, m_int y, cStringRO str);
     bool MGLAPI MGL_useFont(font_t* font);
-    font_t* MGLAPI MGL_getFont(void);
+    font_t* MGLAPI MGL_getFont();
     bool MGLAPI MGL_vecFontEngine(m_int x, m_int y, cStringRO str, void (ASMAPI* move)(m_int x, m_int y), void (ASMAPI* draw)(m_int x, m_int y));
 #endif
 
@@ -1398,7 +1398,7 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     /* Region management */
 
 #ifndef MGL_LITE
-    region_t* MGLAPI MGL_newRegion(void);
+    region_t* MGLAPI MGL_newRegion();
     region_t* MGLAPI MGL_copyRegion(const region_t* s);
     void MGLAPI MGL_clearRegion(region_t* r);
     void  MGLAPI MGL_freeRegion(region_t* r);
@@ -1497,15 +1497,15 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
 
     /* Mouse support */
 
-    bool MGLAPI MS_available(void);
-    void MGLAPI MS_show(void);
-    void MGLAPI MS_hide(void);
-    void MGLAPI MS_obscure(void);
+    bool MGLAPI MS_available();
+    void MGLAPI MS_show();
+    void MGLAPI MS_hide();
+    void MGLAPI MS_obscure();
     void MGLAPI MS_setCursor(cursor_t* curs);
     void MGLAPI MS_setCursorColor(color_t color);
     void  MGLAPI MS_moveTo(m_int x, m_int y);
     void MGLAPI MS_getPos(m_int* x, m_int* y);
-    void MGLAPI MS_drawCursor(void);
+    void MGLAPI MS_drawCursor();
 
     /* Rectangle and Point manipulation */
 
@@ -1519,11 +1519,11 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
     /* Built-in patterns and mouse cursor */
 
 #ifndef MGL_LITE
-    pattern_t* MGLAPI _MGL_getEmptyPat(void);
-    pattern_t* MGLAPI _MGL_getGrayPat(void);
-    pattern_t* MGLAPI _MGL_getSolidPat(void);
+    pattern_t* MGLAPI _MGL_getEmptyPat();
+    pattern_t* MGLAPI _MGL_getGrayPat();
+    pattern_t* MGLAPI _MGL_getSolidPat();
 #endif
-    cursor_t* MGLAPI _MGL_getDefCursor(void);
+    cursor_t* MGLAPI _MGL_getDefCursor();
 
     /* Fixed point multiplication/divide routines */
 
@@ -1627,36 +1627,36 @@ extern "C" {   /* Use "C" linkage when in C++ mode */
 
 #ifndef BUILD_MGL
 #if defined(MGL_DLL) && !defined(BUILD_MGLDLL)
-    void* MGLAPI VGA4_getDriverAddr(void);
-    void* MGLAPI VGAX_getDriverAddr(void);
-    void* MGLAPI SVGA4_getDriverAddr(void);
-    void* MGLAPI SVGA8_getDriverAddr(void);
-    void* MGLAPI SVGA16_getDriverAddr(void);
-    void* MGLAPI SVGA24_getDriverAddr(void);
-    void* MGLAPI SVGA32_getDriverAddr(void);
+    void* MGLAPI VGA4_getDriverAddr();
+    void* MGLAPI VGAX_getDriverAddr();
+    void* MGLAPI SVGA4_getDriverAddr();
+    void* MGLAPI SVGA8_getDriverAddr();
+    void* MGLAPI SVGA16_getDriverAddr();
+    void* MGLAPI SVGA24_getDriverAddr();
+    void* MGLAPI SVGA32_getDriverAddr();
 #if !defined(__16BIT__)
-    void* MGLAPI VGA8_getDriverAddr(void);
-    void* MGLAPI LINEAR8_getDriverAddr(void);
-    void* MGLAPI LINEAR16_getDriverAddr(void);
-    void* MGLAPI LINEAR24_getDriverAddr(void);
-    void* MGLAPI LINEAR32_getDriverAddr(void);
-    void* MGLAPI ACCEL8_getDriverAddr(void);
-    void* MGLAPI ACCEL16_getDriverAddr(void);
-    void* MGLAPI ACCEL24_getDriverAddr(void);
-    void* MGLAPI ACCEL32_getDriverAddr(void);
+    void* MGLAPI VGA8_getDriverAddr();
+    void* MGLAPI LINEAR8_getDriverAddr();
+    void* MGLAPI LINEAR16_getDriverAddr();
+    void* MGLAPI LINEAR24_getDriverAddr();
+    void* MGLAPI LINEAR32_getDriverAddr();
+    void* MGLAPI ACCEL8_getDriverAddr();
+    void* MGLAPI ACCEL16_getDriverAddr();
+    void* MGLAPI ACCEL24_getDriverAddr();
+    void* MGLAPI ACCEL32_getDriverAddr();
 #if defined(MGLWIN) || defined(__WINDOWS__)
-    void* MGLAPI DDRAW8_getDriverAddr(void);
-    void* MGLAPI DDRAW16_getDriverAddr(void);
-    void* MGLAPI DDRAW24_getDriverAddr(void);
-    void* MGLAPI DDRAW32_getDriverAddr(void);
+    void* MGLAPI DDRAW8_getDriverAddr();
+    void* MGLAPI DDRAW16_getDriverAddr();
+    void* MGLAPI DDRAW24_getDriverAddr();
+    void* MGLAPI DDRAW32_getDriverAddr();
 #endif
 #endif
-    void* MGLAPI PACKED1_getDriverAddr(void);
-    void* MGLAPI PACKED4_getDriverAddr(void);
-    void* MGLAPI PACKED8_getDriverAddr(void);
-    void* MGLAPI PACKED16_getDriverAddr(void);
-    void* MGLAPI PACKED24_getDriverAddr(void);
-    void* MGLAPI PACKED32_getDriverAddr(void);
+    void* MGLAPI PACKED1_getDriverAddr();
+    void* MGLAPI PACKED4_getDriverAddr();
+    void* MGLAPI PACKED8_getDriverAddr();
+    void* MGLAPI PACKED16_getDriverAddr();
+    void* MGLAPI PACKED24_getDriverAddr();
+    void* MGLAPI PACKED32_getDriverAddr();
 #define VGA4_driver   VGA4_getDriverAddr()
 #define VGAX_driver   VGAX_getDriverAddr()
 #define SVGA4_driver  SVGA4_getDriverAddr()

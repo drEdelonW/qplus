@@ -252,7 +252,7 @@ HAL_StatusTypeDef SD_ReadBlock(uint32_t lba, uint8_p buf) {
     return HAL_OK;
 }
 
-void SD_CacheInvalidate(void) {
+void SD_CacheInvalidate() {
     uint32_t i;
     for (i = 0; i < SD_CACHE_LINES; ++i) {
         sd_cache[i].valid = 0;

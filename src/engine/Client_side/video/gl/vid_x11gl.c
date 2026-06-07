@@ -63,7 +63,7 @@ void GL_BeginRendering(int *x, int *y, int *width, int *height) {
     *height = vid.height;
 }
 
-void GL_EndRendering(void) {
+void GL_EndRendering() {
     glFlush();
     glXSwapBuffers(x_disp, x_win);
 }
@@ -75,7 +75,7 @@ bool VID_Is8bit() {
 }
 
 
-void CheckMultiTextureExtensions(void) {
+void CheckMultiTextureExtensions() {
     TypeLess_ptr prjobj;
 
     if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
@@ -109,7 +109,7 @@ cString gl_vendor;
 cString gl_version;
 cString gl_extensions;
 
-void GL_Init(void) {
+void GL_Init() {
 #if 1 // DEBUG: init output
     gl_vendor = glGetString(GL_VENDOR);
     Con_Printf("GL_VENDOR: %s\n", gl_vendor);

@@ -448,10 +448,10 @@ void CalcSurfaceExtents(mSurface_p s) {
         s->extents[i] = (bmaxs[i] - bmins[i]) * 16;
         if ((!(tex->flags & TEX_SPECIAL)) &&
 #ifdef GLQUAKE
-            (s->extents[i] > 512) /* 256 */
+            // (s->extents[i] > 512) /* 256 */
 #else
-            (s->extents[i] > 256)
 #endif
+        (s->extents[i] > 256)
         ) {
             Host_SysError("Bad surface extents");
         }

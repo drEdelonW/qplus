@@ -48,7 +48,7 @@ ndef __APPLE__
 
 
 void GL_BeginRendering(int* x, int* y, int* width, int* height);
-void GL_EndRendering(void);
+void GL_EndRendering();
 
 
 #ifdef _WIN32
@@ -110,8 +110,8 @@ extern  PROC glVertexPointerEXT;
 #define BACKFACE_EPSILON    0.01
 
 
-void R_TimeRefresh_f(void);
-void R_ReadPointFile_f(void);
+void R_TimeRefresh_f();
+void R_ReadPointFile_f();
 
 
 #include "SurfCache.h"
@@ -219,5 +219,5 @@ extern lpSelTexFUNC qglSelectTextureSGIS;
 
 extern bool gl_mtexable;
 
-void GL_DisableMultitexture(void);
-void GL_EnableMultitexture(void);
+void GL_DisableMultitexture();
+void GL_EnableMultitexture();

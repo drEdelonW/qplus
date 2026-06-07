@@ -35,7 +35,7 @@ typedef struct {
 puff_t  puffs[MAX_PUFFS];
 
 
-void Test_Init(void) {}
+void Test_Init() {}
 
 
 
@@ -148,7 +148,7 @@ void DrawPuff(puff_p p) {
 }
 
 
-void Test_Draw(void) {
+void Test_Draw() {
     puff_p p = puffs;
     for (int i = 0; i < MAX_PUFFS; i++, p++) {
         if (p->length > 0)

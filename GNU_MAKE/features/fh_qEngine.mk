@@ -1,9 +1,12 @@
 # Set to 1 if you want 32-bit build on Linux x86_64 (requires multilibs)
+
 FORCE_32     ?= 1
+# [VVV] next ONE [VVV] in case of no FORCE_32 defined
 FORCE_32     ?= 0
 
-# QRND ?= SoftC
-QRND ?= OpenGL
+# QRND ?= OpenGL
+# [VVV] next ONE [VVV] in case of no QRND defined
+QRND ?= SoftC
 
 $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 

@@ -60,7 +60,7 @@ LegacyTimeStamp_t Sys_FloatTime() {
 
 // procs
 int _kill(int, int) { errno = ENOSYS; return -1; }
-int _getpid(void) { return 1; }
+int _getpid() { return 1; }
 
 // memory
 static cStringArray heap_end;

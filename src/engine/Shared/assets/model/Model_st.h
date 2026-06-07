@@ -67,7 +67,7 @@ typedef struct {
     uint32_t numsurfaces;        mSurface_p  surfaces;
     uint32_t numsurfedges;       int32_p     surfedges;
     uint32_t numclipnodes;       dClipNode_p clipnodes;
-    uint32_t nummarksurfaces;    mSurface_p* marksurfaces;
+    uint32_t nummarksurfaces;    mSurface_ar marksurfaces;
     Hull_t  hulls[MAX_MAP_HULLS];
     int32_t numtextures;         Texture_p* textures;
     uint8_p visdata;

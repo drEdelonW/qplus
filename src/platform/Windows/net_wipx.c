@@ -45,7 +45,7 @@ static int sequence[IPXSOCKETS];
 
 //=============================================================================
 
-int WIPX_Init(void) {
+int WIPX_Init() {
     int  i;
     char buff[MAXHOSTNAMELEN];
     qsockaddr_t addr;
@@ -121,7 +121,7 @@ int WIPX_Init(void) {
 
 //=============================================================================
 
-void WIPX_Shutdown(void) {
+void WIPX_Shutdown() {
     WIPX_Listen(false);
     WIPX_CloseSocket(net_controlsocket);
     if (--winsock_initialized == 0)
@@ -206,7 +206,7 @@ int WIPX_Connect(int handle, qsockaddr_p addr) {
 
 //=============================================================================
 
-int WIPX_CheckNewConnections(void) {
+int WIPX_CheckNewConnections() {
     u_long available;
 
     if (net_acceptsocket == -1)

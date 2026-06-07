@@ -119,7 +119,7 @@ void D_PolysetUpdateTables();
 extern int r_skydirect;
 extern uint8_p r_skysource;
 
-// transparency types for D_DrawRect ()
+// transparency types for D_DrawRect()
 typedef enum {
     DR_SOLID        = 0, // draw solid
     DR_TRANSPARENT  = 1  // draw transparent

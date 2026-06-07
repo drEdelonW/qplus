@@ -115,15 +115,15 @@ float        gldepthmin, gldepthmax;
 
 modestate_t    modestate = MS_UNINIT;
 
-void VID_MenuDraw(void);
+void VID_MenuDraw();
 void VID_MenuKey(int key);
 
 LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void AppActivate(BOOL fActive, BOOL minimize);
 cString VID_GetModeDescription(int mode);
-void ClearAllStates(void);
-void VID_UpdateWindowStatus(void);
-void GL_Init(void);
+void ClearAllStates();
+void VID_UpdateWindowStatus();
+void GL_Init();
 
 PROC glArrayElementEXT;
 PROC glColorPointerEXT;
@@ -158,9 +158,9 @@ RECT        window_rect;
 
 void VID_HandlePause(bool pause) {}
 void VID_ForceLockState(int lk) {}
-void VID_LockBuffer(void) {}
-void VID_UnlockBuffer(void) {}
-int VID_ForceUnlockedAndReturnState(void) { return 0; }
+void VID_LockBuffer() {}
+void VID_UnlockBuffer() {}
+int VID_ForceUnlockedAndReturnState() { return 0; }
 void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {}
 void D_EndDirectRect(int x, int y, int width, int height) {}
 
@@ -420,7 +420,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 VID_UpdateWindowStatus
 ================
 */
-void VID_UpdateWindowStatus(void) {
+void VID_UpdateWindowStatus() {
     window_rect.left = window_x;
     window_rect.top = window_y;
     window_rect.right = window_x + window_width;
@@ -439,7 +439,7 @@ BINDTEXFUNCPTR bindTexFunc;
 #define TEXTURE_EXT_STRING "GL_EXT_texture_object"
 
 
-void CheckTextureExtensions(void) {
+void CheckTextureExtensions() {
     bool texture_ext = FALSE;
     /* check for texture extension */
     cString tmp = (uint8_p)glGetString(GL_EXTENSIONS);
@@ -468,7 +468,7 @@ void CheckTextureExtensions(void) {
     }
 }
 
-void CheckArrayExtensions(void) {
+void CheckArrayExtensions() {
     /* check for texture extension */
     cString tmp = (uint8_p)glGetString(GL_EXTENSIONS);
     while (*tmp) {
@@ -500,7 +500,7 @@ int texture_mode = GL_LINEAR;
 int        texture_extension_number = 1;
 
 #ifdef _WIN32
-void CheckMultiTextureExtensions(void) {
+void CheckMultiTextureExtensions() {
     if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
         Con_Printf("Multitexture extensions found.\n");
         qglMTexCoord2fSGIS = (TypeLess_ptr)wglGetProcAddress("glMTexCoord2fSGIS");
@@ -509,7 +509,7 @@ void CheckMultiTextureExtensions(void) {
     }
 }
 #else
-void CheckMultiTextureExtensions(void) {
+void CheckMultiTextureExtensions() {
     gl_mtexable = true;
 }
 #endif
@@ -519,7 +519,7 @@ void CheckMultiTextureExtensions(void) {
 GL_Init
 ===============
 */
-void GL_Init(void) {
+void GL_Init() {
     gl_vendor = glGetString(GL_VENDOR);
     Con_Printf("GL_VENDOR: %s\n", gl_vendor);
     gl_renderer = glGetString(GL_RENDERER);
@@ -588,7 +588,7 @@ void GL_BeginRendering(int* x, int* y, int* width, int* height) {
 }
 
 
-void GL_EndRendering(void) {
+void GL_EndRendering() {
     if (!scr_skipupdate || block_drawing)   SwapBuffers(maindc);
 
     // handle the mouse state when windowed if that's changed
@@ -671,12 +671,12 @@ void    VID_SetPalette(uint8_p palette) {
 BOOL    gammaworks;
 
 
-void VID_SetDefaultMode(void) {
+void VID_SetDefaultMode() {
     IN_DeactivateMouse();
 }
 
 
-void VID_Shutdown(void) {
+void VID_Shutdown() {
     if (vid_initialized) {
         vid_canalttab = false;
         HGLRC hRC = wglGetCurrentContext();
@@ -807,7 +807,7 @@ MAIN WINDOW
 ClearAllStates
 ================
 */
-void ClearAllStates(void) {
+void ClearAllStates() {
     // send an up event for each key, to make sure the server clears them all
     for (inti = 0; i < 256; i++) {
         Key_Event(i, false);
@@ -989,7 +989,7 @@ LONG WINAPI MainWndProc(
 VID_NumModes
 =================
 */
-int VID_NumModes(void) {
+int VID_NumModes() {
     return nummodes;
 }
 
@@ -1068,7 +1068,7 @@ cString VID_GetExtModeDescription(int mode) {
 VID_DescribeCurrentMode_f
 =================
 */
-void VID_DescribeCurrentMode_f(void) {
+void VID_DescribeCurrentMode_f() {
     Con_Printf("%s\n", VID_GetExtModeDescription(vid_modenum));
 }
 
@@ -1078,7 +1078,7 @@ void VID_DescribeCurrentMode_f(void) {
 VID_NumModes_f
 =================
 */
-void VID_NumModes_f(void) {
+void VID_NumModes_f() {
     if (nummodes == 1)  Con_Printf("%d video mode is available\n", nummodes);
     else                Con_Printf("%d video modes are available\n", nummodes);
 }
@@ -1089,7 +1089,7 @@ void VID_NumModes_f(void) {
 VID_DescribeMode_f
 =================
 */
-void VID_DescribeMode_f(void) {
+void VID_DescribeMode_f() {
     int modenum = Q_atoi(Cmd_Argv(1));
 
     int t = leavecurrentmode;
@@ -1106,7 +1106,7 @@ void VID_DescribeMode_f(void) {
 VID_DescribeModes_f
 =================
 */
-void VID_DescribeModes_f(void) {
+void VID_DescribeModes_f() {
     int lnummodes = VID_NumModes();
 
     int t = leavecurrentmode;
@@ -1612,7 +1612,7 @@ static modedesc_t    modedescs[MAX_MODEDESCS];
 VID_MenuDraw
 ================
 */
-void VID_MenuDraw(void) {
+void VID_MenuDraw() {
     qPic_p p = Draw_CachePic("gfx/vidmodes.lmp");
     M_DrawPic((320 - p->width) / 2, 4, p);
 

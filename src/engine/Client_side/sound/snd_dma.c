@@ -723,7 +723,7 @@ void GetSoundtime() {
 #endif
 }
 #ifdef _WIN32
-void IN_Accumulate(void);
+void IN_Accumulate();
 #endif
 void S_ExtraUpdate() {
 

@@ -252,7 +252,7 @@ typedef struct {
 
 static SD_FileSlot s_sdFiles[SDFS_MAX_OPEN_FILES] = { 0 };
 
-static int SDFS_AllocHandle(void) {
+static int SDFS_AllocHandle() {
     for (int i = 0; i < SDFS_MAX_OPEN_FILES; ++i) {
         if (!s_sdFiles[i].used) {
             s_sdFiles[i].used = true;

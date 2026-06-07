@@ -288,7 +288,7 @@ static Cursor CreateNullCursor(Display* display, Window root) {
 }
 
 
-void VID_MenuDraw(void) {
+void VID_MenuDraw() {
     qPic_p p;
     cString ptr;
     int			i, j, column, row, dup;
@@ -797,7 +797,7 @@ int config_notify = 0;
 int config_notify_width;
 int config_notify_height;
 
-void GetEvent(void) {
+void GetEvent() {
     XEvent x_event;
     int b;
 
@@ -1133,24 +1133,24 @@ TypeLess_ptr update_thread() {
 
 static int dither;
 
-void VID_DitherOn(void) {
+void VID_DitherOn() {
     if (dither == 0) {
         vid.recalc_refdef = 1;
         dither = 1;
     }
 }
 
-void VID_DitherOff(void) {
+void VID_DitherOff() {
     if (dither) {
         vid.recalc_refdef = 1;
         dither = 0;
     }
 }
 
-void VID_SetDefaultMode(void) {
+void VID_SetDefaultMode() {
 }
 
-int I_OpenWindow(void) {
+int I_OpenWindow() {
     return 0;
 }
 
@@ -1164,7 +1164,7 @@ void I_DrawCircle(int window, int x, int y, int r) {
 void I_DisplayWindow(int window) {
 }
 
-void Sys_SendKeyEvents(void) {
+void Sys_SendKeyEvents() {
     // get events from x server
     if (x_disp) {
         while (XPending(x_disp)) GetEvent();
@@ -1241,6 +1241,6 @@ void IN_Move(UserCmd_p cmd) {
     mouse_x = mouse_y = 0.0;
 }
 
-//void VID_UnlockBuffer(void) { }
-//void VID_LockBuffer(void) { }
+//void VID_UnlockBuffer() { }
+//void VID_LockBuffer() { }
 

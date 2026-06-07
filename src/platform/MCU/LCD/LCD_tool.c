@@ -27,13 +27,13 @@ extern DSI_HandleTypeDef hdsi_discovery;
 extern LTDC_HandleTypeDef  hltdc_discovery;
 
 /* Stop LCD streaming to free SDRAM / AXI bus */
-void LCD_BusPause(void) {
+void LCD_BusPause() {
     HAL_DSI_Stop(&hdsi_discovery);
     __HAL_LTDC_DISABLE(&hltdc_discovery);
 }
 
 /* Resume LCD streaming after heavy SD / FS operations */
-void LCD_BusResume(void) {
+void LCD_BusResume() {
     __HAL_LTDC_ENABLE(&hltdc_discovery);
     HAL_DSI_Start(&hdsi_discovery);
 }

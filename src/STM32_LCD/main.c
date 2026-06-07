@@ -45,7 +45,7 @@ uint8_t* uwInternalBuffer;
   * @param  None
   * @retval None
 */
-static void SystemClock_Config(void) {
+static void SystemClock_Config() {
     RCC_ClkInitTypeDef RCC_ClkInitStruct;
     RCC_OscInitTypeDef RCC_OscInitStruct;
     HAL_StatusTypeDef ret = HAL_OK;
@@ -94,12 +94,12 @@ static void SystemClock_Config(void) {
 }
 
 
-void Error_Handler(void) {
+void Error_Handler() {
     while (1) {}
 }
 
 /** Configure the MPU attributes */
-void MPU_Config(void) {
+void MPU_Config() {
     HAL_MPU_Disable();    /* Disable the MPU */
 
     /* Configure the MPU as Strongly ordered for not defined regions */
@@ -155,14 +155,14 @@ void MPU_Config(void) {
 
 
 /** CPU L1-Cache enable. */
-void CPU_CACHE_Enable(void) {
+void CPU_CACHE_Enable() {
     SCB_EnableICache(); /* Enable I-Cache */
     SCB_EnableDCache(); /* Enable D-Cache */
 }
 
 void MX_USART1_UART_Init(); //extern from src/platform/MCU/STM32F7/perepherial.c
 
-int main(void) {
+int main() {
     uwInternalBuffer = (uint8_t*)INTERNAL_BUFFER_START_ADDRESS;
 
     MPU_Config();       /* Configure the MPU attributes */
@@ -251,7 +251,7 @@ void assert_failed(uint8_t* file, uint32_t line) {
 #define VCP_RX_GPIO_Port GPIOA
 #define VCP_TX_Pin GPIO_PIN_9
 #define VCP_TX_GPIO_Port GPIOA
-static void USART1_GPIO_Clock_Init(void) {
+static void USART1_GPIO_Clock_Init() {
     /* Enable clocks for GPIOA and USART1 */
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_USART1_CLK_ENABLE();

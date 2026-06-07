@@ -31,7 +31,7 @@ int r_dlightframecount;
 R_AnimateLight
 ==================
 */
-void R_AnimateLight(void) {
+void R_AnimateLight() {
     //
     // light animations
     // 'm' is normal light, 'a' is no light, 'z' is double bright
@@ -76,22 +76,22 @@ void R_RenderDlight(dLight_p light) {
         return;
     }
 
-    glBegin(GL_TRIANGLE_FAN);
-    glColor3f(0.2, 0.1, 0.0);
-    for (int i = 0; i < 3; i++)
-        v[i] = light->origin[i] - vpn[i] * rad;
+    glBegin(GL_TRIANGLE_FAN); {
+        glColor3f(0.2, 0.1, 0.0);
+        for (int i = 0; i < 3; i++)
+            v[i] = light->origin[i] - vpn[i] * rad;
 
-    glVertex3fv(v);
-    glColor3f(0, 0, 0);
-    for (int i = 16; i >= 0; i--) {
-        float a = i / 16.0 * M_PI * 2;
-        for (int j = 0; j < 3; j++)
-            v[j] = light->origin[j] +
-            vright[j] * cos(a) * rad +
-            vup[j] * sin(a) * rad;
         glVertex3fv(v);
-    }
-    glEnd();
+        glColor3f(0, 0, 0);
+        for (int i = 16; i >= 0; i--) {
+            float a = i / 16.0 * M_PI * 2;
+            for (int j = 0; j < 3; j++)
+                v[j] = light->origin[j] +
+                vright[j] * cos(a) * rad +
+                vup[j] * sin(a) * rad;
+            glVertex3fv(v);
+        }
+    } glEnd();
 }
 
 /*
@@ -99,7 +99,7 @@ void R_RenderDlight(dLight_p light) {
 R_RenderDlights
 =============
 */
-void R_RenderDlights(void) {
+void R_RenderDlights() {
     if (!gl_flashblend.value)
         return;
 
@@ -175,7 +175,7 @@ void R_MarkLights(dLight_p light, int bit, mNode_p node) {
 R_PushDlights
 =============
 */
-void R_PushDlights(void) {
+void R_PushDlights() {
     if (gl_flashblend.value)
         return;
 

@@ -16,6 +16,7 @@ ifeq ($(UNAME_S),Linux)
         # SRC_LIST += $(POSIX_DIR)/snd_linux.c  # TODO:
         SRC_LIST += $(POSIX_DIR)/net_udp.c
         SRC_LIST += $(POSIX_DIR)/net_bsd.c
+        SRC_LIST += $(POSIX_DIR)/vid_x.c
 
 
         # X11 target on *nix
@@ -36,6 +37,7 @@ else ifeq ($(UNAME_S),Darwin)
         SRC_LIST += $(POSIX_DIR)/in_x.c
         SRC_LIST += $(POSIX_DIR)/net_udp.c
         SRC_LIST += $(POSIX_DIR)/net_bsd.c
+#         SRC_LIST += $(POSIX_DIR)/vid_x.c      # may be macos also needed?
 
 
     # macOS build: disable X11/SHM, use NULL stubs

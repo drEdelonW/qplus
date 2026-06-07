@@ -42,7 +42,7 @@ extern TriVertx_p poseverts[MAXALIASFRAMES];
 extern char Mod_loadName[32]; // for hunk tags
 extern uint8_p mod_base;
 #ifdef GLQUAKE
-#   define _loadModel loadmodel
+// #   define _loadModel loadmodel
 #endif
 extern Model_p _loadModel;
 
