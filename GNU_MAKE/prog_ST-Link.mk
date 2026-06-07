@@ -7,6 +7,10 @@ ifeq ($(UNAME_S),Linux)
     ST_FLASH_BL  ?= st-flash write $(TARGET_FILE).bin 0x08004000
     ST_PROGRAMBL ?= $(ST_FLASH_BL) && $(ST_RESET_CMD)
 
+stdebug:
+	openocd -f interface/stlink.cfg -f target/stm32f7x.cfg -c "bindto 0.0.0.0"
+
+
 else ifeq ($(UNAME_S),MINGW64_NT-10.0-19045)
     ST_LINK_PATH    ?= "/c/Program Files (x86)/STMicroelectronics/STM32 ST-LINK Utility/ST-LINK Utility/"
     ST_LINK_EXE     ?= ST-LINK_CLI.exe

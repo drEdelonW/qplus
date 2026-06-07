@@ -122,6 +122,20 @@
         "settings set target.process.follow-fork-mode child",
         "settings set target.process.stop-on-exec true"
       ]
+    },{
+      "name": "Remote Debug STM32F7",
+      "type": "cortex-debug",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "executable": "${workspaceRoot}/GNU_MAKE/OUTPUT/quakeSTM32/quakeSTM32.elf", // путь к твоему .elf
+      "targetId": "stm32f769",
+      "servertype": "external",
+      "gdbTarget": "127.0.0.1:3333", // IP твоей Raspberry Pi и порт OpenOCD
+      "toolchainPrefix": "arm-none-eabi",
+      "runToEntryPoint": "main",
+      // "gdbPath": "/home/edelon/arm-gnu-toolchain-13.3.rel1-aarch64-arm-none-eabi/bin/arm-none-eabi-gdb",
+      "gdbPath": "/usr/bin/gdb-multiarch",
+      // "showDevDebugOutput": "raw"
     }
 
   ]
