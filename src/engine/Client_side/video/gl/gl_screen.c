@@ -49,10 +49,10 @@ xblited, but sync draw can just ignore it.
 sync
 draw
 
-CenterPrint ()
-SlowPrint ()
-Screen_Update ();
-Con_Printf ();
+CenterPrint()
+SlowPrint()
+Screen_Update();
+Con_Printf();
 
 net
 turn off messages option
@@ -124,7 +124,7 @@ float   scr_disabled_time;
 
 bool    block_drawing;
 
-void SCR_ScreenShot_f(void);
+void SCR_ScreenShot_f();
 
 /*
 ===============================================================================
@@ -164,7 +164,7 @@ void SCR_CenterPrint(cString str) {
 }
 
 
-void SCR_DrawCenterString(void) {
+void SCR_DrawCenterString() {
 
     int remaining;
     // the finale prints the characters one at a time
@@ -202,7 +202,7 @@ void SCR_DrawCenterString(void) {
     } while (1);
 }
 
-void SCR_CheckDrawCenterString(void) {
+void SCR_CheckDrawCenterString() {
     scr_copytop = 1;
     if (scr_center_lines > scr_erase_lines)
         scr_erase_lines = scr_center_lines;
@@ -244,7 +244,7 @@ Must be called whenever vid changes
 Internal use only
 =================
 */
-static void SCR_CalcRefdef(void) {
+static void SCR_CalcRefdef() {
     scr_fullupdate = 0;        // force a background redraw
     vid.recalc_refdef = 0;
 
@@ -315,7 +315,7 @@ SCR_SizeUp_f
 Keybinding command
 =================
 */
-void SCR_SizeUp_f(void) {
+void SCR_SizeUp_f() {
     Cvar_SetValue("viewsize", scr_viewsize.value + 10);
     vid.recalc_refdef = 1;
 }
@@ -328,7 +328,7 @@ SCR_SizeDown_f
 Keybinding command
 =================
 */
-void SCR_SizeDown_f(void) {
+void SCR_SizeDown_f() {
     Cvar_SetValue("viewsize", scr_viewsize.value - 10);
     vid.recalc_refdef = 1;
 }
@@ -340,7 +340,7 @@ void SCR_SizeDown_f(void) {
 SCR_Init
 ==================
 */
-void SCR_Init(void) {
+void SCR_Init() {
 
     Cvar_RegisterVariable(&scr_fov);
     Cvar_RegisterVariable(&scr_viewsize);
@@ -373,7 +373,7 @@ void SCR_Init(void) {
 SCR_DrawRam
 ==============
 */
-void SCR_DrawRam(void) {
+void SCR_DrawRam() {
     if (!scr_showram.value)     return;
     if (!r_cache_thrash)        return;
 
@@ -385,7 +385,7 @@ void SCR_DrawRam(void) {
 SCR_DrawTurtle
 ==============
 */
-void SCR_DrawTurtle(void) {
+void SCR_DrawTurtle() {
     static int    _count;
 
     if (!scr_showturtle.value)  return;
@@ -407,7 +407,7 @@ void SCR_DrawTurtle(void) {
 SCR_DrawNet
 ==============
 */
-void SCR_DrawNet(void) {
+void SCR_DrawNet() {
     if ((realtime - cl.last_received_message) < 0.3)    return;
     if (cls.demoplayback)                               return;
 
@@ -419,7 +419,7 @@ void SCR_DrawNet(void) {
 DrawPause
 ==============
 */
-void SCR_DrawPause(void) {
+void SCR_DrawPause() {
     if (!scr_showpause.value)   return; // turn off for screenshots
     if (!cl.paused)             return;
 
@@ -435,7 +435,7 @@ void SCR_DrawPause(void) {
 SCR_DrawLoading
 ==============
 */
-void SCR_DrawLoading(void) {
+void SCR_DrawLoading() {
     if (!scr_drawloading)
         return;
 
@@ -454,7 +454,7 @@ void SCR_DrawLoading(void) {
 SCR_SetUpToDrawConsole
 ==================
 */
-void SCR_SetUpToDrawConsole(void) {
+void SCR_SetUpToDrawConsole() {
     Con_CheckResize();
 
     if (scr_drawloading)
@@ -498,7 +498,7 @@ void SCR_SetUpToDrawConsole(void) {
 SCR_DrawConsole
 ==================
 */
-void SCR_DrawConsole(void) {
+void SCR_DrawConsole() {
     if (scr_con_current) {
         scr_copyeverything = 1;
         Con_DrawConsole(scr_con_current, true);
@@ -533,7 +533,7 @@ typedef struct _TargaHeader {
 SCR_ScreenShot_f
 ==================
 */
-void SCR_ScreenShot_f(void) {
+void SCR_ScreenShot_f() {
     //
     // find a file name to save it to
     //
@@ -589,7 +589,7 @@ SCR_BeginLoadingPlaque
 
 ================
 */
-void SCR_BeginLoadingPlaque(void) {
+void SCR_BeginLoadingPlaque() {
     S_StopAllSounds(true);
 
     if (cls.state != ca_connected)  return;
@@ -617,7 +617,7 @@ SCR_EndLoadingPlaque
 
 ================
 */
-void SCR_EndLoadingPlaque(void) {
+void SCR_EndLoadingPlaque() {
     scr_disabled_for_loading = false;
     scr_fullupdate = 0;
     Con_ClearNotify();
@@ -628,7 +628,7 @@ void SCR_EndLoadingPlaque(void) {
 cString scr_notifystring;
 bool    scr_drawdialog;
 
-void SCR_DrawNotifyString(void) {
+void SCR_DrawNotifyString() {
     cString start = scr_notifystring;
     int y = vid.height * 0.35;
 
@@ -702,7 +702,7 @@ SCR_BringDownConsole
 Brings the console down and fades the palettes back to normal
 ================
 */
-void SCR_BringDownConsole(void) {
+void SCR_BringDownConsole() {
     scr_centertime_off = 0;
 
     for (int i = 0; i < 20 && scr_conlines != scr_con_current; i++)
@@ -712,7 +712,7 @@ void SCR_BringDownConsole(void) {
     VID_SetPalette(host_basepal);
 }
 
-void SCR_TileClear(void) {
+void SCR_TileClear() {
     if (r_refdef.vrect.x > 0) {
         // left
         Draw_TileClear(0, 0, r_refdef.vrect.x, vid.height - sb_lines);
@@ -746,7 +746,7 @@ WARNING: be very careful calling this from elsewhere, because the refresh
 needs almost the entire 256k of stack space!
 ==================
 */
-void SCR_UpdateScreen(void) {
+void SCR_UpdateScreen() {
     if (block_drawing)
         return;
 

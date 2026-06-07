@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "mathlib.h"
 #include "Alias.h"
 
-#define BMODEL_FULLY_CLIPPED 0x10 // value returned by R_BmodelCheckBBox ()
+#define BMODEL_FULLY_CLIPPED 0x10 // value returned by R_BmodelCheckBBox()
                                      //  if bbox is trivially rejected
 
 //===========================================================================

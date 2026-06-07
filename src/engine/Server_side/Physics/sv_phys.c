@@ -1328,7 +1328,7 @@ void SV_Physics() {
     pr_global_struct->time = (float)SV_GetTime();
     PR_ExecuteProgram(pr_global_struct->StartFrame);
 
-    //SV_CheckAllEnts ();
+    //SV_CheckAllEnts();
 
     //
     // treat each object in turn

@@ -281,7 +281,7 @@ bool VID_AllocBuffers(int width, int height) {
 }
 
 
-void initFatalError(void) {
+void initFatalError() {
     MGL_exit();
     MGL_fatalError(MGL_errorMsg(MGL_result()));
     exit(EXIT_FAILURE);
@@ -328,7 +328,7 @@ int VID_Suspend(MGLDC* dc, m_int flags) {
 }
 
 
-void registerAllDispDrivers(void) {
+void registerAllDispDrivers() {
     /* Event though these driver require WinDirect, we register
     * them so that they will still be available even if DirectDraw
     * is present and the user has disable the high performance
@@ -352,7 +352,7 @@ void registerAllDispDrivers(void) {
 }
 
 
-void registerAllMemDrivers(void) {
+void registerAllMemDrivers() {
     /* Register memory context drivers */
     MGL_registerDriver(MGL_PACKED8NAME, PACKED8_driver);
 }

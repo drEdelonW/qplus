@@ -58,10 +58,8 @@ void SubdividePolygon(int numverts, float_p verts) {
     for (int i = 0; i < 3; i++) {
         float m = (mins[i] + maxs[i]) * 0.5;
         m = gl_subdivide_size.value * floor(m / gl_subdivide_size.value + 0.5);
-        if ((maxs[i] - m) < 8)
-            continue;
-        if ((m - mins[i]) < 8)
-            continue;
+        if ((maxs[i] - m) < 8)      continue;
+        if ((m - mins[i]) < 8)      continue;
 
         // cut it
         float_p v = verts + i;
@@ -86,7 +84,9 @@ void SubdividePolygon(int numverts, float_p verts) {
                 VectorCopy(v, back[b]);
                 b++;
             }
-            if ((dist[j] == 0) || (dist[j + 1] == 0))
+            if ((dist[j] == 0) ||
+                (dist[j + 1] == 0)
+                )
                 continue;
             if ((dist[j] > 0) != (dist[j + 1] > 0)) {
                 // clip point
@@ -127,8 +127,6 @@ can be done reasonably.
 */
 void GL_SubdivideSurface(mSurface_p fa) {
     vec3_t  verts[64];
-    float_p vec;
-    // Texture_p t;
 
     warpface = fa;
 
@@ -137,12 +135,13 @@ void GL_SubdivideSurface(mSurface_p fa) {
     //
     int numverts = 0;
     for (int i = 0; i < fa->numedges; i++) {
-        int lindex = loadmodel->surfedges[fa->firstedge + i];
+        int lindex = _loadModel->surfedges[fa->firstedge + i];
 
+        float_p vec;
         if (lindex > 0)
-            vec = loadmodel->vertexes[loadmodel->edges[lindex].v[0]].position;
+            vec = _loadModel->vertexes[_loadModel->edges[lindex].v[0]].position;
         else
-            vec = loadmodel->vertexes[loadmodel->edges[-lindex].v[1]].position;
+            vec = _loadModel->vertexes[_loadModel->edges[-lindex].v[1]].position;
         VectorCopy(vec, verts[numverts]);
         numverts++;
     }
@@ -204,7 +203,10 @@ void EmitSkyPolys(mSurface_p fa) {
             vec3_t dir; VectorSubtract(v, r_origin, dir);
             dir[2] *= 3; // flatten the sphere
 
-            float length = dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2];
+            float length =
+                dir[0] * dir[0] +
+                dir[1] * dir[1] +
+                dir[2] * dir[2];
             length = sqrt(length);
             length = 6 * 63 / length;
 
@@ -420,9 +422,8 @@ LoadTGA
 =============
 */
 void LoadTGA(FILE* fin) {
-    int    columns, rows, numPixels;
     byte* pixbuf;
-    int    row, column;
+    int row, column;
 
     targa_header.id_length = fgetc(fin);
     targa_header.colormap_type = fgetc(fin);
@@ -438,17 +439,19 @@ void LoadTGA(FILE* fin) {
     targa_header.pixel_size = fgetc(fin);
     targa_header.attributes = fgetc(fin);
 
-    if (targa_header.image_type != 2
-        && targa_header.image_type != 10)
-        Host_SysError("LoadTGA: Only type 2 and 10 targa RGB images supported\n");
+    if ((targa_header.image_type != 2) &&
+        (targa_header.image_type != 10)
+        )   Host_SysError("LoadTGA: Only type 2 and 10 targa RGB images supported\n");
 
-    if (targa_header.colormap_type != 0
-        || (targa_header.pixel_size != 32 && targa_header.pixel_size != 24))
-        Host_SysError("Texture_LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n");
+    if ((targa_header.colormap_type != 0) ||
+        (
+            (targa_header.pixel_size != 32) &&
+            (targa_header.pixel_size != 24))
+        )   Host_SysError("Texture_LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n");
 
-    columns = targa_header.width;
-    rows = targa_header.height;
-    numPixels = columns * rows;
+    int columns = targa_header.width;
+    int rows = targa_header.height;
+    int numPixels = columns * rows;
 
     targa_rgba = malloc(numPixels * 4);
 
@@ -461,8 +464,7 @@ void LoadTGA(FILE* fin) {
             for (column = 0; column < columns; column++) {
                 uint8_t red, green, blue, alphabyte;
                 switch (targa_header.pixel_size) {
-                case 24:
-
+                case 24: {
                     blue = getc(fin);
                     green = getc(fin);
                     red = getc(fin);
@@ -470,8 +472,8 @@ void LoadTGA(FILE* fin) {
                     *pixbuf++ = green;
                     *pixbuf++ = blue;
                     *pixbuf++ = 255;
-                    break;
-                case 32:
+                } break;
+                case 32: {
                     blue = getc(fin);
                     green = getc(fin);
                     red = getc(fin);
@@ -480,7 +482,7 @@ void LoadTGA(FILE* fin) {
                     *pixbuf++ = green;
                     *pixbuf++ = blue;
                     *pixbuf++ = alphabyte;
-                    break;
+                } break;
                 }
             }
         }
@@ -494,18 +496,18 @@ void LoadTGA(FILE* fin) {
                 packetSize = 1 + (packetHeader & 0x7f);
                 if (packetHeader & 0x80) {        // run-length packet
                     switch (targa_header.pixel_size) {
-                    case 24:
+                    case 24: {
                         blue = getc(fin);
                         green = getc(fin);
                         red = getc(fin);
                         alphabyte = 255;
-                        break;
-                    case 32:
+                    } break;
+                    case 32: {
                         blue = getc(fin);
                         green = getc(fin);
                         red = getc(fin);
                         alphabyte = getc(fin);
-                        break;
+                    } break;
                     }
 
                     for (j = 0;j < packetSize;j++) {
@@ -571,8 +573,16 @@ void LoadTGA(FILE* fin) {
 R_LoadSkys
 ==================
 */
-cString suf[6] = { "rt", "bk", "lf", "ft", "up", "dn" };
-void R_LoadSkys(void) {
+cString suf[6] = {
+    "rt",
+    "bk",
+    "lf",
+    "ft",
+    "up",
+    "dn"
+};
+
+void R_LoadSkys() {
 
     for (int i = 0; i < 6; i++) {
         GL_Bind(SKY_TEX + i);
@@ -586,8 +596,19 @@ void R_LoadSkys(void) {
         LoadTGA(f);
         //  LoadPCX (f);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, gl_solid_format, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, targa_rgba);
-        //  glTexImage2D (GL_TEXTURE_2D, 0, gl_solid_format, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, pcx_rgb);
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0, gl_solid_format,
+            256, 256,
+            0, GL_RGBA,
+            GL_UNSIGNED_BYTE,
+#if 1
+            targa_rgba
+#else
+            pcx_rgb
+#endif
+        );
+
 
         free(targa_rgba);
         //  free (pcx_rgb);
@@ -599,43 +620,43 @@ void R_LoadSkys(void) {
 
 
 vec3_t skyclip[6] = {
-    {1,1,0},
-    {1,-1,0},
-    {0,-1,1},
-    {0,1,1},
-    {1,0,1},
-    {-1,0,1}
+    {1, 1, 0},
+    {1, -1, 0},
+    {0, -1, 1},
+    {0, 1, 1},
+    {1, 0, 1},
+    {-1, 0, 1}
 };
 int c_sky;
 
 // 1 = s, 2 = t, 3 = 2048
 int st_to_vec[6][3] = {
-    {3,-1,2},
-    {-3,1,2},
+    {3, -1, 2},
+    {-3, 1, 2},
 
-    {1,3,2},
-    {-1,-3,2},
+    {1, 3, 2},
+    {-1, -3, 2},
 
-    {-2,-1,3},  // 0 degrees yaw, look straight up
-    {2,-1,-3}  // look straight down
+    {-2, -1, 3},  // 0 degrees yaw, look straight up
+    {2, -1, -3}  // look straight down
 
-    // {-1,2,3},
-    // {1,2,-3}
+    // {-1, 2, 3},
+    // {1, 2, -3}
 };
 
 // s = [0]/[2], t = [1]/[2]
 int vec_to_st[6][3] = {
-    {-2,3,1},
-    {2,3,-1},
+    {-2, 3, 1},
+    {2, 3, -1},
 
-    {1,3,2},
-    {-1,3,-2},
+    {1, 3, 2},
+    {-1, 3, -2},
 
-    {-2,-1,3},
-    {-2,1,-3}
+    {-2, -1, 3},
+    {-2, 1, -3}
 
-    // {-1,2,3},
-    // {1,2,-3}
+    // {-1, 2, 3},
+    // {1, 2, -3}
 };
 
 float skymins[2][6], skymaxs[2][6];
@@ -703,27 +724,23 @@ void DrawSkyPolygon(int nump, vec3_t vecs) {
 
 #define MAX_CLIP_VERTS 64
 void ClipSkyPolygon(int nump, vec3_t vecs, int stage) {
-    float_p norm;
-    float_p v;
     bool front, back;
-    float d, e;
     float dists[MAX_CLIP_VERTS];
     Side_t sides[MAX_CLIP_VERTS];
-    vec3_t newv[2][MAX_CLIP_VERTS];
-    int  newc[2];
-    int  i, j;
 
     if (nump > MAX_CLIP_VERTS - 2)
         Host_SysError("ClipSkyPolygon: MAX_CLIP_VERTS");
+
     if (stage == 6) { // fully clipped, so draw it
         DrawSkyPolygon(nump, vecs);
         return;
     }
 
     front = back = false;
-    norm = skyclip[stage];
-    for (i = 0, v = vecs; i < nump; i++, v += 3) {
-        d = DotProduct(v, norm);
+    float_p norm = skyclip[stage];
+    int i = 0;
+    for (float_p v = vecs; i < nump; i++, v += 3) {
+        float d = DotProduct(v, norm);
         if (d > ON_EPSILON) {
             front = true;
             sides[i] = SIDE_FRONT;
@@ -746,32 +763,34 @@ void ClipSkyPolygon(int nump, vec3_t vecs, int stage) {
     sides[i] = sides[0];
     dists[i] = dists[0];
     VectorCopy(vecs, (vecs + (i * 3)));
-    newc[0] = newc[1] = 0;
+    int newc[2] = { 0, 0 };
 
-    for (i = 0, v = vecs; i < nump; i++, v += 3) {
+    vec3_t newv[2][MAX_CLIP_VERTS];
+
+    float_p v;
+    for (int i = 0, v = vecs; i < nump; i++, v += 3) {
         switch (sides[i]) {
-        case SIDE_FRONT:
-            VectorCopy(v, newv[0][newc[0]]);
-            newc[0]++;
-            break;
-        case SIDE_BACK:
-            VectorCopy(v, newv[1][newc[1]]);
-            newc[1]++;
-            break;
-        case SIDE_ON:
-            VectorCopy(v, newv[0][newc[0]]);
-            newc[0]++;
-            VectorCopy(v, newv[1][newc[1]]);
-            newc[1]++;
-            break;
+        case SIDE_FRONT: {
+            VectorCopy(v, newv[0][newc[0]]);    newc[0]++;
+        } break;
+        case SIDE_BACK: {
+            VectorCopy(v, newv[1][newc[1]]);    newc[1]++;
+        } break;
+        case SIDE_ON: {
+            VectorCopy(v, newv[0][newc[0]]);    newc[0]++;
+            VectorCopy(v, newv[1][newc[1]]);    newc[1]++;
+        } break;
         }
 
-        if (sides[i] == SIDE_ON || sides[i + 1] == SIDE_ON || sides[i + 1] == sides[i])
+        if ((sides[i] == SIDE_ON) ||
+            (sides[i + 1] == SIDE_ON) ||
+            (sides[i + 1] == sides[i])
+            )
             continue;
 
-        d = dists[i] / (dists[i] - dists[i + 1]);
-        for (j = 0; j < 3; j++) {
-            e = v[j] + d * (v[j + 3] - v[j]);
+        float d = dists[i] / (dists[i] - dists[i + 1]);
+        for (int j = 0; j < 3; j++) {
+            float e = v[j] + d * (v[j + 3] - v[j]);
             newv[0][newc[0]][j] = e;
             newv[1][newc[1]][j] = e;
         }
@@ -795,7 +814,7 @@ void R_DrawSkyChain(mSurface_p s) {
 
     // calculate vertex values for sky box
 
-    for (mSurface_p fa = s; fa; fa = fa->texturechain) {
+    for (mSurface_p fa = s; fa; fa = fa->texturechain)
         for (glpoly_p p = fa->polys; p; p = p->next) {
             vec3_t verts[MAX_CLIP_VERTS];
             for (int i = 0; i < p->numverts; i++) {
@@ -803,7 +822,6 @@ void R_DrawSkyChain(mSurface_p s) {
             }
             ClipSkyPolygon(p->numverts, verts[0], 0);
         }
-    }
 }
 
 
@@ -812,7 +830,7 @@ void R_DrawSkyChain(mSurface_p s) {
 R_ClearSkyBox
 ==============
 */
-void R_ClearSkyBox(void) {
+void R_ClearSkyBox() {
     for (int i = 0; i < 6; i++) {
         skymins[0][i] = skymins[1][i] = 9999;
         skymaxs[0][i] = skymaxs[1][i] = -9999;
@@ -839,15 +857,11 @@ void MakeSkyVec(float s, float t, int axis) {
     s = (s + 1) * 0.5f;
     t = (t + 1) * 0.5f;
 
-    if (s < 1.0f / 512)
-        s = 1.0f / 512;
-    else if (s > 511.0f / 512)
-        s = 511.0f / 512;
+    if (s < 1.0f / 512)         s = 1.0f / 512;
+    else if (s > 511.0f / 512)  s = 511.0f / 512;
 
-    if (t < 1.0f / 512)
-        t = 1.0f / 512;
-    else if (t > 511.0f / 512)
-        t = 511.0f / 512;
+    if (t < 1.0f / 512)         t = 1.0f / 512;
+    else if (t > 511.0f / 512)  t = 511.0f / 512;
 
     t = 1.0f - t;
     glTexCoord2f(s, t);
@@ -859,8 +873,8 @@ void MakeSkyVec(float s, float t, int axis) {
 R_DrawSkyBox
 ==============
 */
-int skytexorder[6] = { 0,2,1,3,4,5 };
-void R_DrawSkyBox(void) {
+int skytexorder[6] = { 0, 2, 1, 3, 4, 5 };
+void R_DrawSkyBox() {
 #if 0
     glEnable(GL_BLEND);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -868,8 +882,9 @@ void R_DrawSkyBox(void) {
     glDisable(GL_DEPTH_TEST);
 #endif
     for (int i = 0; i < 6; i++) {
-        if (skymins[0][i] >= skymaxs[0][i]
-            || skymins[1][i] >= skymaxs[1][i])
+        if ((skymins[0][i] >= skymaxs[0][i]) ||
+            (skymins[1][i] >= skymaxs[1][i])
+            )
             continue;
 
         GL_Bind(SKY_TEX + skytexorder[i]);
@@ -937,7 +952,14 @@ void R_InitSky(Texture_p mt) {
     if (!solidskytexture)
         solidskytexture = texture_extension_number++;
     GL_Bind(solidskytexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, gl_solid_format, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, trans);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0, gl_solid_format,
+        128, 128,
+        0, GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        trans
+    );
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -952,7 +974,14 @@ void R_InitSky(Texture_p mt) {
     if (!alphaskytexture)
         alphaskytexture = texture_extension_number++;
     GL_Bind(alphaskytexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, gl_alpha_format, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, trans);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0, gl_alpha_format,
+        128, 128,
+        0, GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        trans
+    );
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }

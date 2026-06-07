@@ -35,7 +35,7 @@
 
 /* Variables */
 extern int __io_putchar(int ch) __weak;
-extern int __io_getchar(void) __weak;
+extern int __io_getchar() __weak;
 
 
 char* __env[1] = { 0 };
@@ -46,7 +46,7 @@ char** environ = __env;
 __weak void initialise_monitor_handles() {
 }
 
-__weak int _getpid(void) {
+__weak int _getpid() {
     return 1;
 }
 
@@ -144,7 +144,7 @@ __weak int _link(char* old, char* new) {
     return -1;
 }
 
-__weak int _fork(void) {
+__weak int _fork() {
     errno = EAGAIN;
     return -1;
 }

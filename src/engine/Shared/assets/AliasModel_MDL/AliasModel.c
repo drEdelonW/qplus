@@ -307,12 +307,12 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
             Mod_FloodFillSkin(skin, pheader->skinwidth, pheader->skinheight);
 
             // save 8 bit texels for the player model to remap
-    //  if (!strcmp(loadmodel->name,"progs/player.mdl")) {
+    //  if (!strcmp(_loadModel->name,"progs/player.mdl")) {
             uint8_p texels = Hunk_AllocName(s, Mod_loadName);
             pheader->texels[i] = texels - (uint8_p)pheader;
             memcpy(texels, (uint8_p)(pskintype + 1), s);
             //  }
-            char name[32];  snprintf(name, sizeof(name), "%s_%i", loadmodel->name, i);
+            char name[32];  snprintf(name, sizeof(name), "%s_%i", _loadModel->name, i);
             pheader->gl_texturenum[i][0] =
                 pheader->gl_texturenum[i][1] =
                 pheader->gl_texturenum[i][2] =
@@ -340,7 +340,7 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
                     pheader->texels[i] = texels - (uint8_p)pheader;
                     memcpy(texels, (uint8_p)(pskintype), s);
                 }
-                char name[32];  snprintf(name, sizeof(name), "%s_%i_%i", loadmodel->name, i, j);
+                char name[32];  snprintf(name, sizeof(name), "%s_%i_%i", _loadModel->name, i, j);
                 pheader->gl_texturenum[i][j & 3] =
                     GL_LoadTexture(
                         name, pheader->skinwidth,

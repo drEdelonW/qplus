@@ -20,15 +20,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // net_ser.h
 
-int			Serial_Init(void);
+int			Serial_Init();
 void		Serial_Listen(bool state);
 void		Serial_SearchForHosts(bool xmit);
 qsocket_p   Serial_Connect(cString host);
-qsocket_p   Serial_CheckNewConnections(void);
+qsocket_p   Serial_CheckNewConnections();
 int			Serial_GetMessage(qsocket_p sock);
 int			Serial_SendMessage(qsocket_p sock, sizebuf_p data);
 int			Serial_SendUnreliableMessage(qsocket_p sock, sizebuf_p data);
 bool	    Serial_CanSendMessage(qsocket_p sock);
 bool	    Serial_CanSendUnreliableMessage(qsocket_p sock);
 void		Serial_Close(qsocket_p sock);
-void		Serial_Shutdown(void);
+void		Serial_Shutdown();

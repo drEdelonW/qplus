@@ -292,7 +292,7 @@ void VID_Debug_f() {
 
 
 
-void VID_InitModes(void) {
+void VID_InitModes() {
 
     int i;
 
@@ -386,7 +386,7 @@ void keyhandler(int scancode, int state) {
 
 }
 
-void VID_Shutdown(void) {
+void VID_Shutdown() {
 
     if (!svgalib_inited) return;
 
@@ -739,21 +739,21 @@ void VID_Update(vRect_p rects) {
 
 static int dither;
 
-void VID_DitherOn(void) {
+void VID_DitherOn() {
     if (dither == 0) {
         //		R_ViewChanged (&vrect, sb_lines, vid.aspect);
         dither = 1;
     }
 }
 
-void VID_DitherOff(void) {
+void VID_DitherOff() {
     if (dither) {
         //		R_ViewChanged (&vrect, sb_lines, vid.aspect);
         dither = 0;
     }
 }
 
-void Sys_SendKeyEvents(void) {
+void Sys_SendKeyEvents() {
     if (!svgalib_inited)
         return;
 
@@ -772,7 +772,7 @@ void mousehandler(int buttonstate, int dx, int dy) {
     my += dy;
 }
 
-void IN_Init(void) {
+void IN_Init() {
 
     int mtype;
     cString mousedev;
@@ -813,7 +813,7 @@ void IN_Init(void) {
 
 }
 
-void IN_Shutdown(void) {
+void IN_Shutdown() {
     if (UseMouse)
         mouse_close();
 }

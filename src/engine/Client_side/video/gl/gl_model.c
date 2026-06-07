@@ -41,7 +41,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BrushModel.h"
 #include "SpriteModel.h"
 
-Model_p loadmodel;
+Model_p _loadModel;
 char Mod_loadName[32]; // for hunk tags
 
 Model_p Mod_LoadModel(Model_p mod, bool crash);
@@ -59,7 +59,7 @@ cvar_t gl_subdivide_size = { "gl_subdivide_size", "128", true };    // GL diff
 Mod_Init
 ===============
 */
-void Mod_Init(void) {
+void Mod_Init() {
     Cvar_RegisterVariable(&gl_subdivide_size);      // GL diff
     memset(_modNoVis, 0xff, sizeof(_modNoVis));
 }
@@ -129,7 +129,7 @@ uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
 Mod_ClearAll
 ===================
 */
-void Mod_ClearAll(void) {
+void Mod_ClearAll() {
     Model_p mod = _mod_Known;
     for (int i = 0; i < _mod_NumKnown; i++, mod++)
         if (mod->type != mod_alias)
@@ -219,7 +219,7 @@ Model_p Mod_LoadModel(Model_p mod, bool crash) {
     //
     COM_FileBase(mod->name, Mod_loadName);
 
-    loadmodel = mod;
+    _loadModel = mod;
 
     //
     // fill it in
@@ -290,7 +290,7 @@ uint8_p player_8bit_texels;
 Mod_Print
 ================
 */
-void Mod_Print(void) {
+void Mod_Print() {
     Con_Printf("Cached models:\n");
     Model_p mod = _mod_Known;
     for (int i = 0; i < _mod_NumKnown; i++, mod++) {

@@ -22,7 +22,7 @@ SD_HandleTypeDef hsd2 = {
 
 extern HAL_SD_CardInfoTypeDef sd_info;
 
-uint8_t SD_InitAndGetInfo(void) {
+uint8_t SD_InitAndGetInfo() {
     if (HAL_SD_Init(&hsd2) != HAL_OK)   return 1;   // init error
 
     // TODO: fix for 4 wire mode

@@ -460,7 +460,7 @@ Creates a server's entity / program execution context by
 parsing textual entity definitions out of an ent file.
 
 Used for both fresh maps and savegame loads.  A fresh map would also need
-to call ED_CallSpawnFunctions () to let the objects initialize themselves.
+to call ED_CallSpawnFunctions() to let the objects initialize themselves.
 ================
 */
 void ED_LoadFromFile(cString data) {

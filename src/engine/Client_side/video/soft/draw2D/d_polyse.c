@@ -468,7 +468,7 @@ void D_PolysetCalcGradients(int skinwidth) {
 
     float ystepdenominv = -xstepdenominv;
 
-    // ceil () for light so positive steps are exaggerated, negative steps
+    // ceil() for light so positive steps are exaggerated, negative steps
     // diminished,  pushing us away from underflow toward overflow. Underflow is
     // very visible, overflow is very unlikely, because of ambient lighting
     float t0 = r_p0[4] - r_p2[4];
@@ -689,8 +689,8 @@ void D_RasterizeAliasPolySmooth() {
         // TODO: can reuse partial expressions here
 
         // for negative steps in x along left edge, bias toward overflow rather than
-        // underflow (sort of turning the floor () we did in the gradient calcs into
-        // ceil (), but plus a little bit)
+        // underflow (sort of turning the floor() we did in the gradient calcs into
+        // ceil(), but plus a little bit)
         if (ubasestep < 0)
             working_lstepx = r_lstepx - 1;
         else

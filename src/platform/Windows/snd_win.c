@@ -74,8 +74,8 @@ LPDIRECTSOUNDBUFFER pDSBuf, pDSPBuf;
 
 HINSTANCE hInstDS;
 
-sndinitstat SNDDMA_InitDirect(void);
-bool SNDDMA_InitWav(void);
+sndinitstat SNDDMA_InitDirect();
+bool SNDDMA_InitWav();
 
 
 /*
@@ -83,7 +83,7 @@ bool SNDDMA_InitWav(void);
 S_BlockSound
 ==================
 */
-void S_BlockSound(void) {
+void S_BlockSound() {
 
     // DirectSound takes care of blocking itself
     if (snd_iswave) {
@@ -101,7 +101,7 @@ void S_BlockSound(void) {
 S_UnblockSound
 ==================
 */
-void S_UnblockSound(void) {
+void S_UnblockSound() {
 
     // DirectSound takes care of blocking itself
     if (snd_iswave) {
@@ -115,7 +115,7 @@ void S_UnblockSound(void) {
 FreeSound
 ==================
 */
-void FreeSound(void) {
+void FreeSound() {
     if (pDSBuf) {
         pDSBuf->lpVtbl->Stop(pDSBuf);
         pDSBuf->lpVtbl->Release(pDSBuf);
@@ -173,7 +173,7 @@ SNDDMA_InitDirect
 Direct-Sound support
 ==================
 */
-sndinitstat SNDDMA_InitDirect(void) {
+sndinitstat SNDDMA_InitDirect() {
     DSBUFFERDESC dsbuf;
     DSBCAPS   dsbcaps;
     DWORD   dwSize, dwWrite;
@@ -389,7 +389,7 @@ SNDDM_InitWav
 Crappy windows multimedia base
 ==================
 */
-bool SNDDMA_InitWav(void) {
+bool SNDDMA_InitWav() {
     WAVEFORMATEX  format;
     int    i;
     HRESULT   hr;
@@ -514,7 +514,7 @@ Returns false if nothing is found.
 ==================
 */
 
-bool SNDDMA_Init(void) {
+bool SNDDMA_Init() {
     sndinitstat stat;
 
     if (COM_CheckParm("-wavonly"))
@@ -582,7 +582,7 @@ inside the recirculating dma buffer, so the mixing code will know
 how many sample are required to fill it up.
 ===============
 */
-int SNDDMA_GetDMAPos(void) {
+int SNDDMA_GetDMAPos() {
     MMTIME mmtime;
     int  s;
     DWORD dwWrite;
@@ -611,7 +611,7 @@ SNDDMA_Submit
 Send sound to device if buffer isn't really the dma buffer
 ===============
 */
-void SNDDMA_Submit(void) {
+void SNDDMA_Submit() {
     LPWAVEHDR h;
     int   wResult;
 
@@ -663,7 +663,7 @@ SNDDMA_Shutdown
 Reset the sound device for exiting
 ===============
 */
-void SNDDMA_Shutdown(void) {
+void SNDDMA_Shutdown() {
     FreeSound();
 }
 

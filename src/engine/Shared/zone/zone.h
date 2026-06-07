@@ -27,7 +27,7 @@ contiguous.  Memory can be allocated from either the low or high end in a
 stack fashion.  The only way memory is released is by resetting one of the
 pointers.
 
-Hunk allocations should be given a name, so the Hunk_Print () function
+Hunk allocations should be given a name, so the Hunk_Print() function
 can display usage.
 
 Hunk allocations are guaranteed to be 16 byte aligned.

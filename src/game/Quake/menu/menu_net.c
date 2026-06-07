@@ -105,11 +105,13 @@ again:
     switch (k) {
     case K_ESCAPE:      M_Menu_MultiPlayer_f(); break;
 
-    case K_DOWNARROW: {   S_LocalSound("misc/menu1.wav");
+    case K_DOWNARROW: {
+        S_LocalSound("misc/menu1.wav");
         if (++m_net_cursor >= m_net_items)  m_net_cursor = 0;
     } break;
 
-    case K_UPARROW: {    S_LocalSound("misc/menu1.wav");
+    case K_UPARROW: {
+        S_LocalSound("misc/menu1.wav");
         if (--m_net_cursor < 0)     m_net_cursor = m_net_items - 1;
     } break;
 
@@ -130,7 +132,8 @@ again:
     if ((SerialConfig && (!serialAvailable)) ||
         (DirectConfig && (!serialAvailable)) ||
         (IPXConfig && (!ipxAvailable)) ||
-        (TCPIPConfig && (!tcpipAvailable)))
+        (TCPIPConfig && (!tcpipAvailable))
+        )
         goto again;
 }
 
@@ -145,7 +148,7 @@ void M_Menu_Video_f() {
 }
 
 
-void M_Video_Draw() { (*vid_menudrawfn) (); }
+void M_Video_Draw() { (*vid_menudrawfn)(); }
 void M_Video_Key(keycode_t key) { (*vid_menukeyfn) (key); }
 void M_ConfigureNetSubsystem() {
     // enable/disable net systems to match desired config

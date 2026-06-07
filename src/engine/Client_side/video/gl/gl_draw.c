@@ -171,7 +171,7 @@ int Scrap_AllocBlock(int w, int h, int* x, int* y) {
 
 int scrap_uploads;
 void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha);
-void Scrap_Upload(void) {
+void Scrap_Upload() {
     int  texnum;
 
     scrap_uploads++;
@@ -334,7 +334,7 @@ glmode_t modes[] = {
 Draw_TextureMode_f
 ===============
 */
-void Draw_TextureMode_f(void) {
+void Draw_TextureMode_f() {
     int  i;
     glTexture_p glt;
 
@@ -375,7 +375,7 @@ void Draw_TextureMode_f(void) {
 Draw_Init
 ===============
 */
-void Draw_Init(void) {
+void Draw_Init() {
     Cvar_RegisterVariable(&gl_nobind);
     Cvar_RegisterVariable(&gl_max_size);
     Cvar_RegisterVariable(&gl_picmip);
@@ -507,16 +507,16 @@ void Draw_Character(int x, int y, int num) {
 
     GL_Bind(char_texture);
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(fcol, frow);
-    glVertex2f(x, y);
-    glTexCoord2f(fcol + size, frow);
-    glVertex2f(x + 8, y);
-    glTexCoord2f(fcol + size, frow + size);
-    glVertex2f(x + 8, y + 8);
-    glTexCoord2f(fcol, frow + size);
-    glVertex2f(x, y + 8);
-    glEnd();
+    glBegin(GL_QUADS); {
+        glTexCoord2f(fcol, frow);
+        glVertex2f(x, y);
+        glTexCoord2f(fcol + size, frow);
+        glVertex2f(x + 8, y);
+        glTexCoord2f(fcol + size, frow + size);
+        glVertex2f(x + 8, y + 8);
+        glTexCoord2f(fcol, frow + size);
+        glVertex2f(x, y + 8);
+    } glEnd();
 }
 
 /*
@@ -558,16 +558,16 @@ void Draw_AlphaPic(int x, int y, qPic_p pic, float alpha) {
     // glCullFace(GL_FRONT);
     glColor4f(1, 1, 1, alpha);
     GL_Bind(gl->texnum);
-    glBegin(GL_QUADS);
-    glTexCoord2f(gl->sl, gl->tl);
-    glVertex2f(x, y);
-    glTexCoord2f(gl->sh, gl->tl);
-    glVertex2f(x + pic->width, y);
-    glTexCoord2f(gl->sh, gl->th);
-    glVertex2f(x + pic->width, y + pic->height);
-    glTexCoord2f(gl->sl, gl->th);
-    glVertex2f(x, y + pic->height);
-    glEnd();
+    glBegin(GL_QUADS); {
+        glTexCoord2f(gl->sl, gl->tl);
+        glVertex2f(x, y);
+        glTexCoord2f(gl->sh, gl->tl);
+        glVertex2f(x + pic->width, y);
+        glTexCoord2f(gl->sh, gl->th);
+        glVertex2f(x + pic->width, y + pic->height);
+        glTexCoord2f(gl->sl, gl->th);
+        glVertex2f(x, y + pic->height);
+    } glEnd();
     glColor4f(1, 1, 1, 1);
     glEnable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
@@ -588,16 +588,16 @@ void Draw_Pic(int x, int y, qPic_p pic) {
     glpic_p gl = (glpic_p)pic->data;
     glColor4f(1, 1, 1, 1);
     GL_Bind(gl->texnum);
-    glBegin(GL_QUADS);
-    glTexCoord2f(gl->sl, gl->tl);
-    glVertex2f(x, y);
-    glTexCoord2f(gl->sh, gl->tl);
-    glVertex2f(x + pic->width, y);
-    glTexCoord2f(gl->sh, gl->th);
-    glVertex2f(x + pic->width, y + pic->height);
-    glTexCoord2f(gl->sl, gl->th);
-    glVertex2f(x, y + pic->height);
-    glEnd();
+    glBegin(GL_QUADS); {
+        glTexCoord2f(gl->sl, gl->tl);
+        glVertex2f(x, y);
+        glTexCoord2f(gl->sh, gl->tl);
+        glVertex2f(x + pic->width, y);
+        glTexCoord2f(gl->sh, gl->th);
+        glVertex2f(x + pic->width, y + pic->height);
+        glTexCoord2f(gl->sl, gl->th);
+        glVertex2f(x, y + pic->height);
+    } glEnd();
 }
 
 
@@ -649,16 +649,16 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glColor3f(1, 1, 1);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0);
-    glVertex2f(x, y);
-    glTexCoord2f(1, 0);
-    glVertex2f(x + pic->width, y);
-    glTexCoord2f(1, 1);
-    glVertex2f(x + pic->width, y + pic->height);
-    glTexCoord2f(0, 1);
-    glVertex2f(x, y + pic->height);
-    glEnd();
+    glBegin(GL_QUADS); {
+        glTexCoord2f(0, 0);
+        glVertex2f(x, y);
+        glTexCoord2f(1, 0);
+        glVertex2f(x + pic->width, y);
+        glTexCoord2f(1, 1);
+        glVertex2f(x + pic->width, y + pic->height);
+        glTexCoord2f(0, 1);
+        glVertex2f(x, y + pic->height);
+    } glEnd();
 }
 
 
@@ -687,16 +687,16 @@ refresh window.
 void Draw_TileClear(int x, int y, int w, int h) {
     glColor3f(1, 1, 1);
     GL_Bind(*(int*)draw_backtile->data);
-    glBegin(GL_QUADS);
-    glTexCoord2f(x / 64.0, y / 64.0);
-    glVertex2f(x, y);
-    glTexCoord2f((x + w) / 64.0, y / 64.0);
-    glVertex2f(x + w, y);
-    glTexCoord2f((x + w) / 64.0, (y + h) / 64.0);
-    glVertex2f(x + w, y + h);
-    glTexCoord2f(x / 64.0, (y + h) / 64.0);
-    glVertex2f(x, y + h);
-    glEnd();
+    glBegin(GL_QUADS); {
+        glTexCoord2f(x / 64.0, y / 64.0);
+        glVertex2f(x, y);
+        glTexCoord2f((x + w) / 64.0, y / 64.0);
+        glVertex2f(x + w, y);
+        glTexCoord2f((x + w) / 64.0, (y + h) / 64.0);
+        glVertex2f(x + w, y + h);
+        glTexCoord2f(x / 64.0, (y + h) / 64.0);
+        glVertex2f(x, y + h);
+    } glEnd();
 }
 
 
@@ -713,14 +713,14 @@ void Draw_Fill(int x, int y, int w, int h, int c) {
         host_basepal[c * 3 + 1] / 255.0,
         host_basepal[c * 3 + 2] / 255.0);
 
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); {
 
-    glVertex2f(x, y);
-    glVertex2f(x + w, y);
-    glVertex2f(x + w, y + h);
-    glVertex2f(x, y + h);
+        glVertex2f(x, y);
+        glVertex2f(x + w, y);
+        glVertex2f(x + w, y + h);
+        glVertex2f(x, y + h);
 
-    glEnd();
+    } glEnd();
     glColor3f(1, 1, 1);
     glEnable(GL_TEXTURE_2D);
 }
@@ -732,18 +732,18 @@ Draw_FadeScreen
 
 ================
 */
-void Draw_FadeScreen(void) {
+void Draw_FadeScreen() {
     glEnable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
     glColor4f(0, 0, 0, 0.8);
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); {
 
     glVertex2f(0, 0);
     glVertex2f(vid.width, 0);
     glVertex2f(vid.width, vid.height);
     glVertex2f(0, vid.height);
 
-    glEnd();
+    } glEnd();
     glColor4f(1, 1, 1, 1);
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
@@ -761,7 +761,7 @@ Draws the little blue disc in the corner of the screen.
 Call before beginning any disc IO.
 ================
 */
-void Draw_BeginDisc(void) {
+void Draw_BeginDisc() {
     if (!draw_disc)
         return;
     glDrawBuffer(GL_FRONT);
@@ -778,7 +778,7 @@ Erases the disc icon.
 Call after completing any disc IO
 ================
 */
-void Draw_EndDisc(void) {
+void Draw_EndDisc() {
 }
 
 /*
@@ -788,7 +788,7 @@ GL_Set2D
 Setup as if the screen was 320*200
 ================
 */
-void GL_Set2D(void) {
+void GL_Set2D() {
     glViewport(glx, gly, glwidth, glheight);
 
     glMatrixMode(GL_PROJECTION);

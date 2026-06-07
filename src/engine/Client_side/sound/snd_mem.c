@@ -241,7 +241,7 @@ wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
 
     // get "fmt " chunk
     iff_data = data_p + 12;
-    // DumpChunks ();
+    // DumpChunks();
 
     FindChunk("fmt ");
     if (!data_p) { Con_Printf("Missing fmt chunk\n");   return info; }

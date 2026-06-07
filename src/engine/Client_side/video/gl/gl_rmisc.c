@@ -37,7 +37,7 @@ extern cvar_t gl_finish;
 R_InitTextures
 ==================
 */
-void R_InitTextures(void) {
+void R_InitTextures() {
     // create a simple checkerboard texture for the default
     r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + 16 * 16 + 8 * 8 + 4 * 4 + 2 * 2, "notexture");
 
@@ -69,7 +69,7 @@ uint8_t dottexture[8][8] = {
     {0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0},
 };
-void R_InitParticleTexture(void) {
+void R_InitParticleTexture() {
     uint8_t data[8][8][4];
 
     //
@@ -101,7 +101,7 @@ R_Envmap_f
 Grab six views for environment mapping tests
 ===============
 */
-void R_Envmap_f(void) {
+void R_Envmap_f() {
     uint8_t buffer[256 * 256 * 4];
     // char name[1024];
 
@@ -165,7 +165,7 @@ void R_Envmap_f(void) {
 R_Init
 ===============
 */
-void R_Init(void) {
+void R_Init() {
 
     Cmd_AddCommand("timerefresh", R_TimeRefresh_f);
     Cmd_AddCommand("envmap", R_Envmap_f);
@@ -344,7 +344,7 @@ void R_TranslatePlayerSkin(int playernum) {
 R_NewMap
 ===============
 */
-void R_NewMap(void) {
+void R_NewMap() {
     for (int i = 0; i < 256; i++)
         d_lightstylevalue[i] = 264;  // normal light value
 
@@ -388,7 +388,7 @@ For program optimization
 */
 #define VIEWANGLE_STEPS 128
 
-void R_TimeRefresh_f(void) {
+void R_TimeRefresh_f() {
     int startangle = r_refdef.viewangles[YAW];
 
     glDrawBuffer(GL_FRONT);
@@ -412,7 +412,7 @@ void R_TimeRefresh_f(void) {
     r_refdef.viewangles[YAW] = startangle;
 }
 
-void D_FlushCaches(void) {
+void D_FlushCaches() {
 }
 
 

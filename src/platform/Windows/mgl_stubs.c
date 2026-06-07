@@ -1,16 +1,16 @@
-/* src/platform/Windows/mgl_stubs.c: грубые заглушки MGL, чтобы собрать без библиотеки */
-void MGL_exit(void) {}
-int  MGL_result(void) { return 0; }
+/* src/platform/Windows/mgl_stubs.c: Rough MGL stubs to build without the library */
+void MGL_exit() {}
+int  MGL_result() { return 0; }
 cStringRO MGL_errorMsg(int) { return "MGL stub"; }
 void MGL_fatalError(cStringRO, ...) {}
 
 void MGL_registerDriver(void*) {}
-void MGL_unregisterAllDrivers(void) {}
-int  MGL_detectGraph(void) { return 0; }
-void* MGL_availableModes(void) { return 0; }
+void MGL_unregisterAllDrivers() {}
+int  MGL_detectGraph() { return 0; }
+void* MGL_availableModes() { return 0; }
 void  MGL_modeResolution(int, int*, int*) {}
 
-int  MGL_init(void) { return 0; }
+int  MGL_init() { return 0; }
 void MGL_setSuspendAppCallback(void (*)(int)) {}
 
 int  MGL_changeDisplayMode(int, int, int, int) { return 0; }
@@ -23,7 +23,7 @@ int  MGL_sizex(void*) { return 0; }
 void* MGL_createMemoryDC(int, int, int, int) { return 0; }
 void MGL_setActivePage(void*, int) {}
 void MGL_setVisualPage(void*, int, int) {}
-int  MGL_initWindowed(void) { return 1; }
+int  MGL_initWindowed() { return 1; }
 cStringRO MGL_modeDriverName(int) { return "stub"; }
 void MGL_destroyDC(void*) {}
 void MGL_registerFullScreenWindow(void*) {}
@@ -39,7 +39,7 @@ void MGL_bitBltCoord(void*, int, int, int, int, void*, int, int, int) {}
 void MGL_setWinDC(void*, void*) {}
 void MGL_appActivate(int) {}
 
-/* драйверные символы, к которым идёт ссылка в vid_win.c */
+/* driver symbols referenced in vid_win.c */
 int PACKED8_driver = 0;
 int DDRAW8_driver  = 0;
 int ACCEL8_driver  = 0;
@@ -67,8 +67,14 @@ void MGL_setAppInstance(
 }
 
 MGLDC MGL_createWindowedDC(int a, int b, int c, int d, void* e, void* f, int g) {
-    (void)a;(void)b;(void)c;(void)d;(void)e;(void)f;(void)g;
-    return NULL; // код выше проверяет на NULL → работоспособно как “no-MGL”
+    (void)a;
+    (void)b;
+    (void)c;
+    (void)d;
+    (void)e;
+    (void)f;
+    (void)g;
+    return NULL;
 }
 
 void MGL_activatePalette(void* dc) { (void)dc; }
