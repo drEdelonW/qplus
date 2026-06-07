@@ -91,6 +91,7 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
+    fflush(stdout);
     printf(RED("HardFault_Handler\n"));
     uint32_t* sp;
     __asm volatile ("mrs %0, msp" : "=r"(sp)); // если используешь MSP
@@ -118,6 +119,7 @@ void HardFault_Handler(void)
     printf(" CFSR= 0x%08lX\n", SCB->CFSR);
     printf(" BFAR= 0x%08lX\n", SCB->BFAR);
     printf(" MMFAR=0x%08lX\n", SCB->MMFAR);
+    fflush(stdout);
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
