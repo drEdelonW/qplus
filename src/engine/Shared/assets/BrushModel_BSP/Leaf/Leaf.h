@@ -4,7 +4,7 @@
 #include "types.h"
 #include "Node.h"
 #include "Surface.h"
-#include "Sound_struct.h"
+#include "structs/Sound_struct.h" // TODO: fix name and kind of content
 #include "eFrag.h"
 
 #define MAX_MAP_LEAFS           (8192)
