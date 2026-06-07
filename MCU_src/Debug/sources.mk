@@ -40,6 +40,8 @@ CPP_DEPS :=
 SUBDIRS := \
 Core/Src \
 Core/Startup \
+Drivers/BSP/Components/nt35510 \
+Drivers/BSP/STM32F769I-Discovery \
 Drivers/STM32F7xx_HAL_Driver/Src \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS \
 Middlewares/Third_Party/FreeRTOS/Source \

@@ -94,7 +94,9 @@ int main() {
     printf("Host_Init\n");
     Host_Init(&parms);
     printf("STM32 Quake -- Version %0.3f\n", STM32_VERSION);
-
+    
+    // SCB->CCR &= ~SCB_CCR_UNALIGN_TRP_Msk; // TODO: disable it
+    
     LegacyTimeStamp_t oldtime = Sys_FloatTime();
     while (1) {
         LegacyTimeStamp_t newtime = Sys_FloatTime();

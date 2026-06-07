@@ -529,8 +529,8 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 }
 #else
 void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
+    // return;
     size_t start = Hunk_LowMark();
-
     Mdl_p pinmodel = (Mdl_p)buffer;
 
     int32_t version = LittleLong(pinmodel->version);
