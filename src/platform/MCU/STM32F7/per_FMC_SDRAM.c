@@ -32,7 +32,34 @@ FMC_SDRAM_TimingTypeDef SdramTiming = {
     .RCDDelay               = 3, // tRCD ≥ 18 ns → 3 tCK safe
 };
 
+void MPU_Config_SDRAM(void) {
+    MPU_Region_InitTypeDef MPU_InitStruct;
+
+    HAL_MPU_Disable();
+
+    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+    MPU_InitStruct.BaseAddress = 0xC0000000;
+    MPU_InitStruct.Size = MPU_REGION_SIZE_16MB; 
+    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+    
+    // make Normal Memory (Outer/Inner Non-cacheable)
+    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
+    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+    MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+    
+    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+    MPU_InitStruct.Number = MPU_REGION_NUMBER0;
+    MPU_InitStruct.SubRegionDisable = 0x00;
+    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+
+    HAL_MPU_ConfigRegion(&MPU_InitStruct);
+    HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+}
+
 void MX_FMC_Init() {
+    // SCB->CCR &= ~SCB_CCR_UNALIGN_TRP_Msk; // TODO: disable it
+
+    MPU_Config_SDRAM();
     /** Perform the SDRAM1 memory initialization sequence    */
     /*** GPIO clocks must be enabled ***/
     __HAL_RCC_FMC_CLK_ENABLE();

@@ -76,7 +76,7 @@ int main() {
     Pereph_Init();
     printf("\n[MCU Init ok]\n\n");
 
-    size_t  memsize = 8 * 1024 * 1024;
+    size_t  memsize = 8 * 1024 * 1024; // 8Mb
     int argc = 0;
     cStringArray argv = 0;
 
@@ -94,9 +94,7 @@ int main() {
     printf("Host_Init\n");
     Host_Init(&parms);
     printf("STM32 Quake -- Version %0.3f\n", STM32_VERSION);
-    
-    // SCB->CCR &= ~SCB_CCR_UNALIGN_TRP_Msk; // TODO: disable it
-    
+
     LegacyTimeStamp_t oldtime = Sys_FloatTime();
     while (1) {
         LegacyTimeStamp_t newtime = Sys_FloatTime();

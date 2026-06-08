@@ -58,7 +58,8 @@ $(info Linux build)
     ARCH             := $(shell uname -m)
     PKG_SUFIX        := .tar.xz
 
-    GCC_BASE_PATH    ?= ~/arm-gnu-toolchain-$(GCC_VER)-$(ARCH)-$(TRG_PREFIX)/
+#     GCC_BASE_PATH    ?= ~/arm-gnu-toolchain-$(GCC_VER)-$(ARCH)-$(TRG_PREFIX)/
+    GCC_BASE_PATH    ?= ~/gnu-tools-for-stm32-13.3.rel1.20250523-0900/
     GCC_PATH         ?= $(GCC_BASE_PATH)bin/
 else
     $(info UNAME_S is $(UNAME_S))
