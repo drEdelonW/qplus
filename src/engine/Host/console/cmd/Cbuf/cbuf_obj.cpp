@@ -87,13 +87,41 @@ void Cbuf::InsertText(cStringRO text) {
     }
 }
 
+#include <stdio.h>
+void* Debug_Memcpy(void* dst, const void* src, size_t count) {
+    // Приводим к указателям на байты для побайтовой арифметики
+    uint8_t* d = (uint8_t*)dst;
+    const uint8_t* s = (const uint8_t*)src;
+
+    // printf("[MEMCPY START] Src: %p, Dst: %p, Total Bytes: %zu\n", src, dst, count);
+    // printf("--------------------------------------------------------------------\n");
+
+    for (size_t index = 0; index < count; index++) {
+        // Выводим текущее состояние ДО копирования байта.
+        // Это важно: если на текущем индексе случится HardFault, 
+        // последний принт в консоли покажет, на каком именно адресе все сломалось.
+        // printf("Idx: %4zu | Read Src: %p [0x%02X] -> Write Dst: %p\n", 
+        //        index, 
+        //        (void*)(s + index), 
+        //        *(s + index), 
+        //        (void*)(d + index));
+        
+        // Само копирование
+        d[index] = s[index];
+    }
+
+    // printf("--------------------------------------------------------------------\n");
+    // printf("[MEMCPY SUCCESS] Successfully copied %zu bytes\n", count);
+    
+    return dst;
+}
 /*
     ============
     Cbuf::Execute
     ============
 */
 void Cbuf::Execute() {
-
+    char line[1024];
     while (_cmdText.cursize) {
         // find a \n or ; line break
         cString text = (cString)_cmdText.data;
@@ -111,7 +139,11 @@ void Cbuf::Execute() {
         }
 
 
-        char line[1024]; memcpy(line, text, i);
+#if 
+        Debug_Memcpy(line, text, i);
+#else
+        memcpy(line, text, i);
+#endif
         line[i] = 0;
 
         // delete the text from the command buffer and move remaining commands down
