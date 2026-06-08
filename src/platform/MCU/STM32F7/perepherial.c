@@ -1102,7 +1102,10 @@ void Pereph_Init() {
     MX_FMC_Init();	        // SDRAM 16MB   [V]
 
     MX_USART1_UART_Init();  // DEBUG UART   [V]
-    printf(CLEAR_SCREEN "\nDEBUG UART " TEXT_GREEN "started" TEXT_RESET "\n");
+    LOG(CLEAR_SCREEN);
+    LOG("Branch:\t%s\n" TEXT_RESET, TEXT_BOLD GIT_BRANCH);
+    LOG("Commit:\t%s\n" TEXT_RESET, TEXT_BOLD GIT_COMMIT_HASH);
+    LOG("\nDEBUG UART %s\n" TEXT_RESET, TEXT_GREEN "started" );
     PrintCpuClock();
 
     LCD_Init();

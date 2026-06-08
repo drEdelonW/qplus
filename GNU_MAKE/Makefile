@@ -67,6 +67,8 @@ COMFLAGS    := $(addprefix -I,$(INCLUDES))
 COMFLAGS    += $(addprefix -D,$(DEFINES))
 include GCC_tools_$(DST_PLATFORM).mk
 
+include git_tools.mk
+COMFLAGS += $(GIT_INFO)
 
 ifneq ($(NO_PARALLEL),1)
   J ?= $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || \

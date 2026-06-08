@@ -84,7 +84,8 @@
 #define GREEN(text)     TEXT_GREEN  text    TEXT_RESET
 #define YELLOW(text)    TEXT_YELLOW text    TEXT_RESET
 
-#if DEBUG > 0
+#if 1
+// DEBUG > 0
     #include <stdio.h>
     #define LLOG(...)    printf(__VA_ARGS__);                /* Lazy log */
     #define LOG(...)     LLOG(__VA_ARGS__); fflush(stdout);  /* Strong log */
