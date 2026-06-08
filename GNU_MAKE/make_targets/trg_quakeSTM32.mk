@@ -1,3 +1,4 @@
+FORCE_32     := 1
 
 include features/fh_qEngine.mk
 include features/fh_MCU_platform.mk
