@@ -853,7 +853,9 @@ void R_EdgeDrawing() {
         rw_time1 = Host_FloatTime();
     }
 
-    R_RenderWorld();
+#ifndef STM32
+    R_RenderWorld();  // TODO: it make overflow and corrupt 'bool configRestored' and 'bool serialAvailable'
+#endif
 
     if (r_drawculledpolys)
         R_ScanEdges();
@@ -892,10 +894,10 @@ R_RenderView
 r_refdef must be set before the first call
 ================
 */
+static  uint8_t _warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 void R_RenderView_() {
-    uint8_t warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 
-    r_warpbuffer = warpbuffer;
+    r_warpbuffer = _warpbuffer;
 
     if (r_timegraph.value ||
         r_speeds.value ||
@@ -926,7 +928,7 @@ void R_RenderView_() {
         VID_LockBuffer();
     }
 
-    R_EdgeDrawing();
+    R_EdgeDrawing(); // TODO: it make overflow and corrupt 'bool configRestored' and 'bool serialAvailable'
 
     if (!r_dspeeds.value) {
         VID_UnlockBuffer();

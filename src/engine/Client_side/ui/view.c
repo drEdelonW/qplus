@@ -879,7 +879,9 @@ void V_RenderView() {
         vid.rowbytes >>= 1;
         vid.aspect *= 2;
     }
-    else { R_RenderView(); }
+    else {
+        R_RenderView();
+    }
 
 #ifndef GLQUAKE
     if (crosshair.value)

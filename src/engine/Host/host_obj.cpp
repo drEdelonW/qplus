@@ -612,44 +612,46 @@ void Host::_Frame(float time) {
 
     CDAudio_Update();
 
-    if (host_speeds.value) {
+    if (host_speeds.value == 1.0f) {
         int pass1 = (_time1 - _time3) * 1000;
         _time3 = Host_FloatTime();
         int pass2 = (_time2 - _time1) * 1000;
         int pass3 = (_time3 - _time2) * 1000;
         Con_Printf("%3i tot %3i server %3i gfx %3i snd\n",
-            pass1 + pass2 + pass3, pass1, pass2, pass3);
+            pass1 + pass2 + pass3, pass1, pass2, pass3
+        );
     }
 
     host_framecount++;
 }
 
 void Host::Frame(float time) {
-    static LegacyTimeStamp_t   _timeTotal;
-    static int      _timeCount = 0;
+    if (serverprofile.value) {
+        LegacyTimeStamp_t time1 = Host_FloatTime();
+        _Frame(time);
+        LegacyTimeStamp_t time2 = Host_FloatTime();
 
-    if (!serverprofile.value) { _Frame(time); return; }
+        static LegacyTimeStamp_t _timeTotal;
+        _timeTotal += time2 - time1;
+        static int _timeCount = 0;
+        _timeCount++;
 
-    LegacyTimeStamp_t time1 = Host_FloatTime();
-    _Frame(time);
-    LegacyTimeStamp_t time2 = Host_FloatTime();
+        if (_timeCount >= 1000) {
+            int m = _timeTotal * 1000 / _timeCount;
+            _timeCount = 0;
+            _timeTotal = 0;
+            int numCli = 0;
+            for (int i = 0; i < svs.maxClients; i++) {
+                if (svs.clients[i].active)
+                    numCli++;
+            }
 
-    _timeTotal += time2 - time1;
-    _timeCount++;
-
-    if (_timeCount < 1000)
-        return;
-
-    int m = _timeTotal * 1000 / _timeCount;
-    _timeCount = 0;
-    _timeTotal = 0;
-    int numCli = 0;
-    for (int i = 0; i < svs.maxClients; i++) {
-        if (svs.clients[i].active)
-            numCli++;
+            Con_Printf("serverprofile: %2i clients %2i msec\n", numCli, m);
+        }
     }
-
-    Con_Printf("serverprofile: %2i clients %2i msec\n", numCli, m);
+    else {
+        _Frame(time);
+    }
 }
 
 //============================================================================

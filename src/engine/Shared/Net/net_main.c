@@ -792,13 +792,21 @@ static PollProcedure* pollProcedureList = NULL;
 void NET_Poll() {
     if (!configRestored) {
         if (serialAvailable) {
-            bool useModem;
-            if (config_com_modem.value == 1.0)
-                useModem = true;
-            else
-                useModem = false;
-            SetComPortConfig(0, (int)config_com_port.value, (int)config_com_irq.value, (int)config_com_baud.value, useModem);
-            SetModemConfig(0, config_modem_dialtype.string, config_modem_clear.string, config_modem_init.string, config_modem_hangup.string);
+            bool useModem = (config_com_modem.value == 1.0);
+            SetComPortConfig(
+                0,
+                (int)config_com_port.value,
+                (int)config_com_irq.value,
+                (int)config_com_baud.value,
+                useModem
+            );
+            SetModemConfig(
+                0,
+                config_modem_dialtype.string,
+                config_modem_clear.string,
+                config_modem_init.string,
+                config_modem_hangup.string
+            );
         }
         configRestored = true;
     }
