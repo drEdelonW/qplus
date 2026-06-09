@@ -79,7 +79,7 @@ typedef struct {
 
 extern uint8_t cluster_buf[];
 
-
+int SD_FS_Init();
 char fat32_up(char c);
 int FAT32_Mount(FAT32_Volume_t* vol);
 int FAT32_FileOpen(cStringRO path, FAT32_File_t* fh);
@@ -89,3 +89,9 @@ int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos);
 
 int FAT32_IsEOC(uint32_t cl);
 int FAT32_FindPath(cStringRO path, FAT32_DirEntryInfo* out_file);
+
+int FAT32_ReadCluster(FAT32_Volume_t* vol, uint32_t cluster, uint8_p buf);
+void FAT32_MakeShortName(cStringRO e, cString out, uint32_t out_size);
+void FAT32_PrintIndent(int depth);
+uint32_t FAT32_GetNextCluster(FAT32_Volume_t* vol, uint32_t cluster);
+int FAT32_NameEquals(cStringRO a, cStringRO b);

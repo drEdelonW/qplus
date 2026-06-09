@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "client.h"
 #include "angle.h"
-#include "Alias.h"
+// #include "Alias.h"
 #include <string.h>
 #include "mathlib.h"
 #include "model.h"
@@ -613,7 +613,7 @@ void R_DrawViewModel() {
     float ambient[4], diffuse[4];
     ambient[0] = ambient[1] = ambient[2] = ambient[3] = (float)ambientlight / 128;
     diffuse[0] = diffuse[1] = diffuse[2] = diffuse[3] = (float)shadelight / 128;
-#endif    
+#endif
 #warning TODO: investigate why ambient and diffuse go nowhere
 
     // hack the depth range to prevent view model from poking into walls

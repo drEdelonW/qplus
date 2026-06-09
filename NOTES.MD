@@ -32,6 +32,9 @@
     make TARGET=quakeX11 fresh && \
     make TARGET=quakeGLX11 fresh && \
     make TARGET=quakeSTM32 fresh
+
+    make TARGET=quakeX11 && \
+    make TARGET=quakeGLX11
 ```
 
 code --install-extension ms-vscode.cpptools

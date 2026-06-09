@@ -20,7 +20,6 @@
 #include <GL/glx.h>
 
 bool gl_mtexable;
-const char* gl_renderer;
 cvar_t gl_ztrick;
 
 float gldepthmin;
@@ -105,9 +104,10 @@ void CheckMultiTextureExtensions() {
 GL_Init
 ===============
 */
-cString gl_vendor;
-cString gl_version;
-cString gl_extensions;
+cStringGlRO gl_vendor;
+cStringGlRO gl_renderer;
+cStringGlRO gl_version;
+cStringGlRO gl_extensions;
 
 void GL_Init() {
 #if 1 // DEBUG: init output

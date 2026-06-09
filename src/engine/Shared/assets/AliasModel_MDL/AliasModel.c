@@ -772,3 +772,13 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     Hunk_FreeToLowMark(start);
     #endif
 }
+
+#include "console.h"
+
+void PrintFrameName(Model_p mdl, int frame) {
+    AliasHdr_p hdr = (AliasHdr_p)Mod_Extradata(mdl);
+    if (!hdr)   return;
+
+    mAliasFrameDesc_p pframedesc = &hdr->frames[frame];
+    Con_Printf("frame %i: %s\n", frame, pframedesc->name);
+}

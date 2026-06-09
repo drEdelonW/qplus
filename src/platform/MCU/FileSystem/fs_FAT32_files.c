@@ -301,7 +301,7 @@ int _lseek(int file, int ptr, int dir) {
     return 0;
 }
 
-
+int Sys_FileRead(int handle, void* dest, int count); // TODO: cleanup
 int _read(int file, char* ptr, int len) {
     // printf(RED("_read(file:%i, ptr:%p, len:%i);\n"), file, ptr, len);
 
