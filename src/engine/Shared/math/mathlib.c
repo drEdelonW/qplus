@@ -22,9 +22,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "mathlib.h"
 #include <math.h>
 #include <string.h>
-#include "host.h"    // void Host_SysError(cString error, ...);
+#ifndef PARANOID
+#   include "host.h"    // void Host_SysError(cString error, ...);
+#endif
 
-vec3_t vec3_origin = { 0.0f, 0.0f, 0.0f };
+
+vec3_t vec3_origin = { 0.0f, 0.0f, 0.0f };  // TODO: move to more specific place
 uint32_t nanmask = 0xFF << 23;
 
 /*-----------------------------------------------------------------*/
@@ -263,8 +266,11 @@ void FloorDivMod(double numer, double denom, int* quotient, int* rem) {
 #ifndef PARANOID
     if (denom <= 0.0)       Host_SysError("FloorDivMod: bad denominator %d\n", denom);
 
-    // if ((floor(numer) != numer) || (floor(denom) != denom))
-    //  Host_SysError ("FloorDivMod: non-integer numer or denom %f %f\n", numer, denom);
+#   if 0
+    if ((floor(numer) != numer) ||
+        (floor(denom) != denom)
+        )        Host_SysError("FloorDivMod: non-integer numer or denom %f %f\n", numer, denom);
+#   endif
 #endif
 
     if (numer >= 0.0) {

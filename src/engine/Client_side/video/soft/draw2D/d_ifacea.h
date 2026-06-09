@@ -70,7 +70,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define fv_shift			5
 
 
-// stvert_t structure
+// stVert_t structure       // TODO: movr this to "Vertex.h"
 // !!! if this is changed, it must be changed in modelgen.h too !!!
 #define stv_onseam	0
 #define stv_s		4

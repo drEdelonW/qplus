@@ -498,7 +498,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     //
     // load base s and t vertices
     //
-    stvert_p pinstverts = (stvert_p)pskintype;
+    stVert_p pinstverts = (stVert_p)pskintype;
 
     for (int i = 0; i < pheader->numverts; i++) {
         stverts[i].onseam = LittleLong(pinstverts[i].onseam);
@@ -586,7 +586,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
         sizeof(AliasHdr_t) +
         sizeof(pheader->frames[0]) * (LittleLong(pinmodel->numframes) - 1) +
         sizeof(Mdl_t) +
-        sizeof(stvert_t) * LittleLong(pinmodel->numverts) +
+        sizeof(stVert_t) * LittleLong(pinmodel->numverts) +
         sizeof(mTriangle_t) * LittleLong(pinmodel->numtris),
         Mod_loadName
     );
@@ -667,8 +667,8 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     //
     // set base s and t vertices
     //
-    stvert_p pstverts = (stvert_p)&pmodel[1];
-    stvert_p pinstverts = (stvert_p)pskintype;
+    stVert_p pstverts = (stVert_p)&pmodel[1];
+    stVert_p pinstverts = (stVert_p)pskintype;
 
     pheader->stverts = (uint8_p)pstverts - (uint8_p)pheader;
 

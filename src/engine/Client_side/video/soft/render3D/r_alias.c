@@ -67,10 +67,10 @@ float r_avertexnormals[NUMVERTEXNORMALS][3] = {
 #   include "anorms.h"
 };
 
-void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stvert_p pstverts);
+void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts);
 void R_AliasSetUpTransform(int trivial_accept);
 void R_AliasTransformVector(vec3_t in, vec3_t out);
-void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stvert_p pstverts);
+void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stVert_p pstverts);
 void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av);
 
 
@@ -249,7 +249,7 @@ General clipped case
 ================
 */
 void R_AliasPreparePoints() {
-    stvert_p pstverts = (stvert_p)((uint8_p)paliashdr + paliashdr->stverts);
+    stVert_p pstverts = (stVert_p)((uint8_p)paliashdr + paliashdr->stverts);
     r_anumverts = pmdl->numverts;
     FinalVert_p fv = pfinalverts;
     AuxVert_p av = pauxverts;
@@ -384,7 +384,7 @@ void R_AliasSetUpTransform(int trivial_accept) {
 R_AliasTransformFinalVert
 ================
 */
-void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stvert_p pstverts) {
+void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stVert_p pstverts) {
     vec3_t tv = {
         pverts->v[0],
         pverts->v[1],
@@ -424,7 +424,7 @@ void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, 
 R_AliasTransformAndProjectFinalVerts
 ================
 */
-void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stvert_p pstverts) {
+void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
     TriVertx_p pverts = r_apverts;
 
     for (int i = 0; i < r_anumverts; i++, fv++, pverts++, pstverts++) {
@@ -491,7 +491,7 @@ R_AliasPrepareUnclippedPoints
 ================
 */
 void R_AliasPrepareUnclippedPoints() {
-    stvert_p pstverts = (stvert_p)((uint8_p)paliashdr + paliashdr->stverts);
+    stVert_p pstverts = (stVert_p)((uint8_p)paliashdr + paliashdr->stverts);
     r_anumverts = pmdl->numverts;
     // FIXME: just use pfinalverts directly?
     FinalVert_p fv = pfinalverts;

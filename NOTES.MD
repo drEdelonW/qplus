@@ -28,6 +28,11 @@
     DISPLAY=:1 ./quake.x11 -nosound
     DISPLAY=:1 ./quake.x11
 
+```
+    make TARGET=quakeX11 fresh && \
+    make TARGET=quakeGLX11 fresh && \
+    make TARGET=quakeSTM32 fresh
+```
 
 code --install-extension ms-vscode.cpptools
 

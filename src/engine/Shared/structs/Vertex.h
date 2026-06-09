@@ -66,5 +66,5 @@ typedef struct {
     int32_t onseam;
     int32_t s;
     int32_t t;
-} stvert_t;
-typedef stvert_t* stvert_p;
+} stVert_t;
+typedef stVert_t* stVert_p;
