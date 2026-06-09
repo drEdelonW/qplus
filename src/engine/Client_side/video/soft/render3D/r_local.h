@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include "common.h"
 #include "mathlib.h"
-#include "Alias.h"
+// #include "Alias.h"
 
 #define BMODEL_FULLY_CLIPPED 0x10 // value returned by R_BmodelCheckBBox()
                                      //  if bbox is trivially rejected

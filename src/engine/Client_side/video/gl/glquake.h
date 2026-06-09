@@ -194,10 +194,10 @@ extern  mPlane_p mirror_plane;
 
 extern  float    r_world_matrix[16];
 
-extern  cString gl_vendor;
-extern  cStringRO gl_renderer;
-extern  cString gl_version;
-extern  cString gl_extensions;
+extern  cStringGlRO gl_vendor;
+extern  cStringGlRO gl_renderer;
+extern  cStringGlRO gl_version;
+extern  cStringGlRO gl_extensions;
 
 void R_TranslatePlayerSkin(int playernum);
 void GL_Bind(int texnum);

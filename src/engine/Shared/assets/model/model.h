@@ -29,7 +29,7 @@ m*_t structures are in-memory
 
 */
 #ifdef GLQUAKE
-#   include "Alias.h"
+#   include "Alias.h"   // for mTriangle_t
 #   include "Vertex.h"
 
 #   define MAXALIASVERTS 1024

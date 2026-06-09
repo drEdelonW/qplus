@@ -24,6 +24,7 @@ typedef uint8_t byte;
 typedef char* cString;
 typedef char** cStringArray;
 typedef const char* cStringRO;  // read-only
+typedef const unsigned char* cStringGlRO;  // read-only
 typedef void* TypeLess_ptr;
 
 // Pointers to standard integer types

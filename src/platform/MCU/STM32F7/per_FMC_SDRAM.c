@@ -56,6 +56,7 @@ void MPU_Config_SDRAM(void) {
     HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
+void Error_Handler(void); // TODO: cleanup
 void MX_FMC_Init() {
     // SCB->CCR &= ~SCB_CCR_UNALIGN_TRP_Msk; // TODO: disable it
 

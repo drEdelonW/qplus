@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "world.h"
 #include "versions.h"
 #include "cvar_q1.h"
-#include "Alias.h"
+// #include "Alias.h"
 #include "screen.h"
 #include "q_tools.h"
 #include "msg.h"
@@ -1243,13 +1243,7 @@ void Host_Viewframe_f() {
 }
 
 
-void PrintFrameName(Model_p mdl, int frame) {
-    AliasHdr_p hdr = (AliasHdr_p)Mod_Extradata(mdl);
-    if (!hdr)   return;
 
-    mAliasFrameDesc_p pframedesc = &hdr->frames[frame];
-    Con_Printf("frame %i: %s\n", frame, pframedesc->name);
-}
 
 /*
 ==================
