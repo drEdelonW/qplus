@@ -58,7 +58,10 @@ typedef enum {
 
 typedef enum {
     SPR_SINGLE = 0u,
-    SPR_GROUP
+    SPR_GROUP,
+#ifdef STM32
+    SPR_FRAME_TYPE_FORCE_DWORD = 0x7FFFFFFF
+#endif
 } SpriteFrameType_t;
 
 
@@ -66,6 +69,7 @@ typedef struct {
     SpriteFrameType_t	type;
 } dSpriteFrameType_t;
 typedef dSpriteFrameType_t* dSpriteFrameType_p;
+STATIC_ASSERT_SIZE(dSpriteFrameType_t, 4); // 4
 
 typedef struct {
     SpriteFrameType_t   type;
@@ -99,6 +103,7 @@ typedef struct {
     SyncType_t  synctype;
 } dSprite_t;
 typedef dSprite_t* dSprite_p;
+STATIC_ASSERT_SIZE(dSprite_t, 4*8 + 4); // 
 
 typedef struct {
     int32_t origin[2];
@@ -106,15 +111,18 @@ typedef struct {
     int32_t height;
 } dSpriteFrame_t;
 typedef dSpriteFrame_t* dSpriteFrame_p;
+STATIC_ASSERT_SIZE(dSpriteFrame_t, 4*4); // 16
 
 typedef struct {
     int32_t numframes;
 } dSpriteGroup_t;
 typedef dSpriteGroup_t* dSpriteGroup_p;
+STATIC_ASSERT_SIZE(dSpriteGroup_t, 4); // 4
 
 typedef struct {
     float   interval;
 } dSpriteInterval_t;
 typedef dSpriteInterval_t* dSpriteInterval_p;
+STATIC_ASSERT_SIZE(dSpriteInterval_t, 4); // 4
 
 
