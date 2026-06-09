@@ -35,7 +35,7 @@ m*_t structures are in-memory
 #   define MAXALIASVERTS 1024
 #   define MAXALIASFRAMES 256
 #   define MAXALIASTRIS 2048
-extern stvert_t stverts[MAXALIASVERTS];
+extern stVert_t stverts[MAXALIASVERTS];
 extern mTriangle_t triangles[MAXALIASTRIS];
 extern TriVertx_p poseverts[MAXALIASFRAMES];
 #endif

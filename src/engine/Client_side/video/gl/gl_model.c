@@ -270,7 +270,7 @@ ALIAS MODELS
 */
 
 
-stvert_t stverts[MAXALIASVERTS];
+stVert_t stverts[MAXALIASVERTS];
 mTriangle_t triangles[MAXALIASTRIS];
 
 // a pose is a single set of vertexes.  a frame may be
