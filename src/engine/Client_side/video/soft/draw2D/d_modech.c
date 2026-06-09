@@ -40,8 +40,10 @@ void D_Patch() {
     static bool _protectSet8 = false;
 
     if (!_protectSet8) {
-        Sys_MakeCodeWriteable((int)D_PolysetAff8Start,
-            (int)D_PolysetAff8End - (int)D_PolysetAff8Start);
+        Sys_MakeCodeWriteable(
+            (int)D_PolysetAff8Start,
+            (int)D_PolysetAff8End - (int)D_PolysetAff8Start
+        );
         _protectSet8 = true;
     }
 

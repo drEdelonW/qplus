@@ -128,8 +128,10 @@ D_PolysetDraw
 ================
 */
 void D_PolysetDraw() {
-    SpanPackage_t spans[DPS_MAXSPANS + 1 +
-        ((CACHE_SIZE - 1) / sizeof(SpanPackage_t)) + 1];
+    SpanPackage_t spans[
+        DPS_MAXSPANS + 1 +
+            ((CACHE_SIZE - 1) / sizeof(SpanPackage_t)) + 1
+    ];
     // one extra because of cache line pretouching
 
     a_spans = (SpanPackage_p)
@@ -151,7 +153,8 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts) {
         // valid triangle coordinates for filling can include the bottom and
         // right clip edges, due to the fill rule; these shouldn't be drawn
         if ((fv->v[0] < r_refdef.vrectright) &&
-            (fv->v[1] < r_refdef.vrectbottom)) {
+            (fv->v[1] < r_refdef.vrectbottom)
+            ) {
             int z = fv->v[5] >> 16;
             int16_p zbuf = zspantable[fv->v[1]] + fv->v[0];
             if (z >= *zbuf) {
@@ -182,10 +185,8 @@ void D_DrawSubdiv() {
         FinalVert_p index1 = pfv + ptri[i].vertindex[1];
         FinalVert_p index2 = pfv + ptri[i].vertindex[2];
 
-        if (((index0->v[1] - index1->v[1]) *
-            (index0->v[0] - index2->v[0]) -
-            (index0->v[0] - index1->v[0]) *
-            (index0->v[1] - index2->v[1])) >= 0) {
+        if (((index0->v[1] - index1->v[1]) * (index0->v[0] - index2->v[0]) -
+            (index0->v[0] - index1->v[0]) * (index0->v[1] - index2->v[1])) >= 0) {
             continue;
         }
 
@@ -271,65 +272,88 @@ D_PolysetRecursiveTriangle
 ================
 */
 void D_PolysetRecursiveTriangle(int* lp1, int* lp2, int* lp3) {
-    int* temp;
-    int  d;
-
-    d = lp2[0] - lp1[0];
-    if ((d < -1) || (d > 1))    goto split;
-    d = lp2[1] - lp1[1];
-    if ((d < -1) || (d > 1))    goto split;
-
-    d = lp3[0] - lp2[0];
-    if ((d < -1) || (d > 1))    goto split2;
-    d = lp3[1] - lp2[1];
-    if ((d < -1) || (d > 1))    goto split2;
-
-    d = lp1[0] - lp3[0];
-    if ((d < -1) || (d > 1))    goto split3;
-    d = lp1[1] - lp3[1];
-    if ((d < -1) || (d > 1)) {
-    split3:
-        temp = lp1;
-        lp1 = lp3;
-        lp3 = lp2;
-        lp2 = temp;
-
-        goto split;
+    int d;
+    if (
+        (
+            ((d = lp2[0] - lp1[0]) < -1) ||
+            (d > 1)) ||
+        (
+            ((d = lp2[1] - lp1[1]) < -1) ||
+            (d > 1))
+        ) {
+    }
+    else  if (
+        (
+            ((d = lp3[0] - lp2[0]) < -1) ||
+            (d > 1)) ||
+        (
+            ((d = lp3[1] - lp2[1]) < -1) ||
+            (d > 1))
+        ) {
+            {
+                int* temp = lp1;
+                lp1 = lp2;
+                lp2 = lp3;
+                lp3 = temp;
+            }
+    }
+    else if (
+        (
+            ((d = lp1[0] - lp3[0]) < -1) ||
+            (d > 1)) ||
+        (
+            ((d = lp1[1] - lp3[1]) < -1) ||
+            (d > 1))
+        ) {
+            {
+                int* temp = lp1;
+                lp1 = lp3;
+                lp3 = lp2;
+                lp2 = temp;
+            }
+    }
+    else {
+        return;   // entire tri is filled
     }
 
-    return;   // entire tri is filled
-
-split2:
-    temp = lp1;
-    lp1 = lp2;
-    lp2 = lp3;
-    lp3 = temp;
-
-    int  _new[6];
-split:
     // split this edge
-    _new[0] = (lp1[0] + lp2[0]) >> 1;
-    _new[1] = (lp1[1] + lp2[1]) >> 1;
-    _new[2] = (lp1[2] + lp2[2]) >> 1;
-    _new[3] = (lp1[3] + lp2[3]) >> 1;
-    _new[5] = (lp1[5] + lp2[5]) >> 1;
-
-    // draw the point if splitting a leading edge
-    if (lp2[1] > lp1[1])                            goto nodraw;
-    if ((lp2[1] == lp1[1]) && (lp2[0] < lp1[0]))    goto nodraw;
-
-
-    int z = _new[5] >> 16;
-    int16_p zbuf = zspantable[_new[1]] + _new[0];
-    if (z >= *zbuf) {
-        int pix;
-
-        *zbuf = z;
-        pix = d_pcolormap[skintable[_new[3] >> 16][_new[2] >> 16]];
-        d_viewbuffer[d_scantable[_new[1]] + _new[0]] = pix;
+    int  _new[6] = {
+        (lp1[0] + lp2[0]) >> 1,
+        (lp1[1] + lp2[1]) >> 1,
+        (lp1[2] + lp2[2]) >> 1,
+        (lp1[3] + lp2[3]) >> 1,
+        (lp1[5] + lp2[5]) >> 1
+    };
+    if ((_new[1] < 0) ||
+        (_new[0] < 0)
+        ) {
+        return;
     }
+    // draw the point if splitting a leading edge
+    if (
+        !(
+            (lp2[1] > lp1[1]) ||
+            (
+                (lp2[1] == lp1[1]) &&
+                (lp2[0] < lp1[0]))
+            )
+        ) {
 
-nodraw:
+        int z = _new[5] >> 16;
+        if (_new[1] >= MAXHEIGHT) {
+            printf("CRAP! D_PolysetRecursiveTriangle 0x%X %i\n", _new[1],_new[1]);
+            return;
+        }
+
+        int16_p zbuf = zspantable[_new[1]] + _new[0];
+        if (z >= *zbuf) {
+            int pix;
+
+            *zbuf = z;
+            pix = d_pcolormap[skintable[_new[3] >> 16][_new[2] >> 16]];
+            d_viewbuffer[d_scantable[_new[1]] + _new[0]] = pix;
+        }
+    }
     // recursively continue
     D_PolysetRecursiveTriangle(lp3, lp1, _new);
     D_PolysetRecursiveTriangle(lp3, _new, lp2);
