@@ -697,40 +697,40 @@ void SCR_UpdateScreen() {
     V_RenderView();
     VID_UnlockBuffer();
 
-    D_EnableBackBufferAccess(); // of all overlay stuff if drawing directly
+    D_EnableBackBufferAccess(); { // of all overlay stuff if drawing directly
 
-    if (_scr.drawdialog) {
-        Sbar_Draw();
-        Draw_FadeScreen();
-        SCR_DrawNotifyString();
-        scr.copyeverything = true;
-    }
-    else if (_scr.drawloading) {
-        SCR_DrawLoading();
-        Sbar_Draw();
-    }
-    else if ((cl.intermission == IM_LEVEL) && (key.dest == key_game)) {
-        Sbar_IntermissionOverlay();
-    }
-    else if ((cl.intermission == IM_FINALE) && (key.dest == key_game)) {
-        Sbar_FinaleOverlay();
-        SCR_CheckDrawCenterString();
-    }
-    else if ((cl.intermission == IM_CUTSCENE) && (key.dest == key_game)) {
-        SCR_CheckDrawCenterString();
-    }
-    else {
-        SCR_DrawRam();
-        SCR_DrawNet();
-        SCR_DrawTurtle();
-        SCR_DrawPause();
-        SCR_CheckDrawCenterString();
-        Sbar_Draw();
-        SCR_DrawConsole();
-        M_Draw();
-    }
+        if (_scr.drawdialog) {
+            Sbar_Draw();
+            Draw_FadeScreen();
+            SCR_DrawNotifyString();
+            scr.copyeverything = true;
+        }
+        else if (_scr.drawloading) {
+            SCR_DrawLoading();
+            Sbar_Draw();
+        }
+        else if ((cl.intermission == IM_LEVEL) && (key.dest == key_game)) {
+            Sbar_IntermissionOverlay();
+        }
+        else if ((cl.intermission == IM_FINALE) && (key.dest == key_game)) {
+            Sbar_FinaleOverlay();
+            SCR_CheckDrawCenterString();
+        }
+        else if ((cl.intermission == IM_CUTSCENE) && (key.dest == key_game)) {
+            SCR_CheckDrawCenterString();
+        }
+        else {
+            SCR_DrawRam();
+            SCR_DrawNet();
+            SCR_DrawTurtle();
+            SCR_DrawPause();
+            SCR_CheckDrawCenterString();
+            Sbar_Draw();
+            SCR_DrawConsole();
+            M_Draw();
+        }
 
-    D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
+    } D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
     //  for linear writes all the time
     if (_pConUpdate)
         D_UpdateRects(_pConUpdate);
