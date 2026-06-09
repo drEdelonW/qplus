@@ -148,11 +148,14 @@ void Hunk_Print(bool all) {
 Hunk_AllocName
 ===================
 */
+#include <stdio.h>
 TypeLess_ptr Hunk_AllocName(size_t size, cStringRO name) {
 #ifdef PARANOID
     Hunk_Check();
 #endif
-
+#if 0 //DEBUG
+    printf("Hunk_AllocName([%d],\"%s\")\n", size, name);
+#endif
     size = sizeof(hunk_t) + ALIGN_UP(size, 16);
 
     if ((hunk_size - hunk_low_used - hunk_high_used) < size)

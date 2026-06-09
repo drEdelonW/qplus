@@ -1,4 +1,5 @@
 # TARGET ?= quakeX11
+# TARGET ?= quakeGLX11
 # TARGET ?= quakeWin
 TARGET ?= quakeSTM32
 

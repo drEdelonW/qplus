@@ -122,3 +122,4 @@ make[1]: *** [Makefile:3119: all-bfd] Error 2
 make[1]: Leaving directory '/root/stm32_toolchain/gnu-tools-for-stm32/build-native/binutils'
 make: *** [Makefile:1031: all] Error 2
 root@GitLab-Pi5:~/stm32_toolchain/gnu-tools-for-stm32#
+
