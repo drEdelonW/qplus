@@ -535,7 +535,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
         case ALIAS_SINGLE: { pframetype = Mod_LoadAliasFrame(pframetype + 1, &pheader->frames[i]); } break;
         case ALIAS_GROUP: { pframetype = Mod_LoadAliasGroup(pframetype + 1, &pheader->frames[i]); } break;
         default: {
-            Host_Error("frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
+            Host_Error(".MDL frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
         } break;
         }
 #   endif
@@ -716,7 +716,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
             );
         } break;
         default: {
-            Host_Error("frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
+            Host_Error(".MDL frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
         } break;
         }
 #   else
