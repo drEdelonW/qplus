@@ -35,6 +35,8 @@
 
     make TARGET=quakeX11 && \
     make TARGET=quakeGLX11
+
+    make && make stupload && make stdebug
 ```
 
 code --install-extension ms-vscode.cpptools

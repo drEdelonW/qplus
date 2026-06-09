@@ -14,13 +14,11 @@
 #include <string.h>
 
 #ifdef GLQUAKE
-
-int   posenum;
-AliasHdr_p pheader;
-
+    int posenum;
 #endif
 
-AliasHdr_p  paliashdr;
+AliasHdr_p pheader;
+AliasHdr_p paliashdr;
 
 /*
 ==============================================================================
@@ -443,13 +441,13 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     Mdl_p pinmodel = (Mdl_p)buffer;
 
     int32_t version = LittleLong(pinmodel->version);
-#ifdef GLQUAKE
-    if (version != ALIAS_VERSION)        Host_SysError("%s has wrong version number (%i should be %i)", mod->name, version, ALIAS_VERSION);
+    if (version != ALIAS_VERSION)   Host_SysError("%s has wrong version number (%i should be %i)", mod->name, version, ALIAS_VERSION);
 
     //
     // allocate space for a working header, plus all the data except the frames,
     // skin and group info
     //
+#ifdef GLQUAKE
     pheader = Hunk_AllocName(
         sizeof(AliasHdr_t) +
         sizeof(pheader->frames[0]) * (LittleLong(pinmodel->numframes) - 1),
@@ -570,17 +568,6 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     Hunk_FreeToLowMark(start);
 
 #else
-// void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
-//     size_t start = Hunk_LowMark();
-//     Mdl_p pinmodel = (Mdl_p)buffer;
-
-//     int32_t version = LittleLong(pinmodel->version);
-    if (version != ALIAS_VERSION)       Host_SysError("%s has wrong version number (%i should be %i)", mod->name, version, ALIAS_VERSION);
-
-    //
-    // allocate space for a working header, plus all the data except the frames,
-    // skin and group info
-    //
 
     AliasHdr_p pheader = Hunk_AllocName(
         sizeof(AliasHdr_t) +
@@ -590,7 +577,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
         sizeof(mTriangle_t) * LittleLong(pinmodel->numtris),
         Mod_loadName
     );
-    Mdl_p pmodel = (Mdl_p)(
+    Mdl_p pMdl = (Mdl_p)(
         (uint8_p)&pheader[1] +
         sizeof(pheader->frames[0]) * (LittleLong(pinmodel->numframes) - 1)
         );
@@ -601,42 +588,42 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     //
     // endian-adjust and copy the data, starting with the alias model header
     //
-    pmodel->boundingradius = LittleFloat(pinmodel->boundingradius);
-    pmodel->numskins = LittleLong(pinmodel->numskins);
-    pmodel->skinwidth = LittleLong(pinmodel->skinwidth);
+    pMdl->boundingradius = LittleFloat(pinmodel->boundingradius);
+    pMdl->numskins = LittleLong(pinmodel->numskins);
+    pMdl->skinwidth = LittleLong(pinmodel->skinwidth);
 
-    pmodel->skinheight = LittleLong(pinmodel->skinheight);
-    if (pmodel->skinheight > MAX_LBM_HEIGHT)    Host_SysError("model %s has a skin taller than %d", mod->name, MAX_LBM_HEIGHT);
+    pMdl->skinheight = LittleLong(pinmodel->skinheight);
+    if (pMdl->skinheight > MAX_LBM_HEIGHT)    Host_SysError("model %s has a skin taller than %d", mod->name, MAX_LBM_HEIGHT);
 
-    pmodel->numverts = LittleLong(pinmodel->numverts);
-    if (pmodel->numverts <= 0)                  Host_SysError("model %s has no vertices", mod->name);
-    if (pmodel->numverts > MAXALIASVERTS)       Host_SysError("model %s has too many vertices", mod->name);
+    pMdl->numverts = LittleLong(pinmodel->numverts);
+    if (pMdl->numverts <= 0)                  Host_SysError("model %s has no vertices", mod->name);
+    if (pMdl->numverts > MAXALIASVERTS)       Host_SysError("model %s has too many vertices", mod->name);
 
-    pmodel->numtris = LittleLong(pinmodel->numtris);
-    if (pmodel->numtris <= 0)                   Host_SysError("model %s has no triangles", mod->name);
+    pMdl->numtris = LittleLong(pinmodel->numtris);
+    if (pMdl->numtris <= 0)                   Host_SysError("model %s has no triangles", mod->name);
 
-    pmodel->numframes = LittleLong(pinmodel->numframes);
-    pmodel->size = LittleFloat(pinmodel->size) * ALIAS_BASE_SIZE_RATIO;
+    pMdl->numframes = LittleLong(pinmodel->numframes);
+    pMdl->size = LittleFloat(pinmodel->size) * ALIAS_BASE_SIZE_RATIO;
     mod->synctype = LittleLong(pinmodel->synctype);
-    mod->numframes = pmodel->numframes;
+    mod->numframes = pMdl->numframes;
 
     for (int i = 0; i < VECT_DIM; i++) {
-        pmodel->scale[i] = LittleFloat(pinmodel->scale[i]);
-        pmodel->scale_origin[i] = LittleFloat(pinmodel->scale_origin[i]);
-        pmodel->eyeposition[i] = LittleFloat(pinmodel->eyeposition[i]);
+        pMdl->scale[i] = LittleFloat(pinmodel->scale[i]);
+        pMdl->scale_origin[i] = LittleFloat(pinmodel->scale_origin[i]);
+        pMdl->eyeposition[i] = LittleFloat(pinmodel->eyeposition[i]);
     }
 
-    int numskins = pmodel->numskins;
-    int numframes = pmodel->numframes;
+    int numskins = pMdl->numskins;
+    int numframes = pMdl->numframes;
 
-    if (pmodel->skinwidth & 0x03)               Host_SysError("Mod_LoadAliasModel: skinwidth not multiple of 4");
+    if (pMdl->skinwidth & 0x03)               Host_SysError("Mod_LoadAliasModel: skinwidth not multiple of 4");
 
-    pheader->model = (uint8_p)pmodel - (uint8_p)pheader;
+    pheader->model = (uint8_p)pMdl - (uint8_p)pheader;
 
     //
     // load the skins
     //
-    int skinsize = pmodel->skinheight * pmodel->skinwidth;
+    int skinsize = pMdl->skinheight * pMdl->skinwidth;
 
     if (numskins < 1)                           Host_SysError("Mod_LoadAliasModel: Invalid # of skins: %d\n", numskins);
 
@@ -667,12 +654,12 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     //
     // set base s and t vertices
     //
-    stVert_p pstverts = (stVert_p)&pmodel[1];
+    stVert_p pstverts = (stVert_p)&pMdl[1];
     stVert_p pinstverts = (stVert_p)pskintype;
 
     pheader->stverts = (uint8_p)pstverts - (uint8_p)pheader;
 
-    for (int32_t i = 0; i < pmodel->numverts; i++) {
+    for (int32_t i = 0; i < pMdl->numverts; i++) {
         pstverts[i].onseam = LittleLong(pinstverts[i].onseam);
         pstverts[i].s = LittleLong(pinstverts[i].s) << 16; // put s and t in 16.16 format
         pstverts[i].t = LittleLong(pinstverts[i].t) << 16;
@@ -681,12 +668,12 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     //
     // set up the triangles
     //
-    mTriangle_p ptri = (mTriangle_p)&pstverts[pmodel->numverts];
-    dTriangle_p pintriangles = (dTriangle_p)&pinstverts[pmodel->numverts];
+    mTriangle_p ptri = (mTriangle_p)&pstverts[pMdl->numverts];
+    dTriangle_p pintriangles = (dTriangle_p)&pinstverts[pMdl->numverts];
 
     pheader->triangles = (uint8_p)ptri - (uint8_p)pheader;
 
-    for (int32_t i = 0; i < pmodel->numtris; i++) {
+    for (int32_t i = 0; i < pMdl->numtris; i++) {
         ptri[i].facesfront = LittleLong(pintriangles[i].facesfront);
 
         for (int j = 0; j < 3; j++) {
@@ -699,7 +686,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     //
     if (numframes < 1)      Host_SysError("Mod_LoadAliasModel: Invalid # of frames: %d\n", numframes);
 
-    dAliasFrameType_p pframetype = (dAliasFrameType_p)&pintriangles[pmodel->numtris];
+    dAliasFrameType_p pframetype = (dAliasFrameType_p)&pintriangles[pMdl->numtris];
 
     for (int i = 0; i < numframes; i++) {
         AliasFrameType_t frametype = LittleLong(pframetype->type);
@@ -711,7 +698,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
             pframetype = Mod_LoadAliasFrame(
                 (dAliasFrameType_p)(pframetype + 1),
                 &pheader->frames[i].frame,
-                pmodel->numverts,
+                pMdl->numverts,
                 &pheader->frames[i].bboxmin,
                 &pheader->frames[i].bboxmax,
                 pheader, pheader->frames[i].name
@@ -721,7 +708,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
             pframetype = Mod_LoadAliasGroup(
                 (dAliasFrameType_p)(pframetype + 1),
                 &pheader->frames[i].frame,
-                pmodel->numverts,
+                pMdl->numverts,
                 &pheader->frames[i].bboxmin,
                 &pheader->frames[i].bboxmax,
                 pheader, pheader->frames[i].name
@@ -734,7 +721,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
             pframetype = Mod_LoadAliasFrame(
                 pframetype + 1,
                 &pheader->frames[i].frame,
-                pmodel->numverts,
+                pMdl->numverts,
                 &pheader->frames[i].bboxmin,
                 &pheader->frames[i].bboxmax,
                 pheader, pheader->frames[i].name
@@ -744,7 +731,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
             pframetype = Mod_LoadAliasGroup(
                 pframetype + 1,
                 &pheader->frames[i].frame,
-                pmodel->numverts,
+                pMdl->numverts,
                 &pheader->frames[i].bboxmin,
                 &pheader->frames[i].bboxmax,
                 pheader, pheader->frames[i].name

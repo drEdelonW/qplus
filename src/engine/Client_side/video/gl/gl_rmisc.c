@@ -250,21 +250,21 @@ void R_TranslatePlayerSkin(int playernum) {
     if (model->type != mod_alias)   return; // only translate skins on alias models
 
     uint8_p original;
-    AliasHdr_p paliashdr = (AliasHdr_p)Mod_Extradata(model);
-    int s = paliashdr->skinwidth * paliashdr->skinheight;
+    AliasHdr_p pAliasHdr = (AliasHdr_p)Mod_Extradata(model);
+    int s = pAliasHdr->skinwidth * pAliasHdr->skinheight;
     if ((currententity->skinnum < 0) ||
-        (currententity->skinnum >= paliashdr->numskins)
+        (currententity->skinnum >= pAliasHdr->numskins)
     ) {
         Con_Printf("(%d): Invalid player skin #%d\n", playernum, currententity->skinnum);
-        original = (uint8_p)paliashdr + paliashdr->texels[0];
+        original = (uint8_p)pAliasHdr + pAliasHdr->texels[0];
     }
     else
-        original = (uint8_p)paliashdr + paliashdr->texels[currententity->skinnum];
+        original = (uint8_p)pAliasHdr + pAliasHdr->texels[currententity->skinnum];
     if (s & 3)
         Host_SysError("R_TranslateSkin: s&3");
 
-    int inwidth = paliashdr->skinwidth;
-    int inheight = paliashdr->skinheight;
+    int inwidth = pAliasHdr->skinwidth;
+    int inheight = pAliasHdr->skinheight;
 
     // because this happens during gameplay, do it fast
     // instead of sending it through gl_upload 8
@@ -282,7 +282,7 @@ void R_TranslatePlayerSkin(int playernum) {
 
 
     // don't mipmap these, because it takes too long
-    GL_Upload8(translated, paliashdr->skinwidth, paliashdr->skinheight, false, false, true);
+    GL_Upload8(translated, pAliasHdr->skinwidth, pAliasHdr->skinheight, false, false, true);
 #else
     uint32_t scaled_width = gl_max_size.value < 512 ? gl_max_size.value : 512;
     uint32_t scaled_height = gl_max_size.value < 256 ? gl_max_size.value : 256;
