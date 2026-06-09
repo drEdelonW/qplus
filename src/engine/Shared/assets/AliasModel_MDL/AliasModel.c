@@ -14,7 +14,7 @@
 #include <string.h>
 
 #ifdef GLQUAKE
-    int posenum;
+int posenum;
 #endif
 
 AliasHdr_p pheader;
@@ -72,8 +72,7 @@ dAliasFrameType_p Mod_LoadAliasFrame(
     strcpy(name, pdaliasframe->name);
 
     for (int i = 0; i < VECT_DIM; i++) {
-        // these are uint8_t values, so we don't have to worry about
-        // endianness
+        // these are uint8_t values, so we don't have to worry about endianness
         pbboxmin->v[i] = pdaliasframe->bboxmin.v[i];
         pbboxmax->v[i] = pdaliasframe->bboxmax.v[i];
     }
@@ -535,7 +534,9 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
         switch (frametype) {
         case ALIAS_SINGLE: { pframetype = Mod_LoadAliasFrame(pframetype + 1, &pheader->frames[i]); } break;
         case ALIAS_GROUP: { pframetype = Mod_LoadAliasGroup(pframetype + 1, &pheader->frames[i]); } break;
-        default: { Host_Error("frametype [0x%X] UNKNOWN!\n", frametype); } break;
+        default: {
+            Host_Error("frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
+        } break;
         }
 #   endif
 
@@ -578,7 +579,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
         Mod_loadName
     );
     Mdl_p pMdl = (Mdl_p)(
-        (uint8_p)&pheader[1] +
+        (uint8_p)(&pheader[1]) +
         sizeof(pheader->frames[0]) * (LittleLong(pinmodel->numframes) - 1)
         );
 
@@ -714,7 +715,9 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
                 pheader, pheader->frames[i].name
             );
         } break;
-        default: { Host_Error("frametype [0x%X] UNKNOWN!\n", frametype); } break;
+        default: {
+            Host_Error("frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
+        } break;
         }
 #   else
         if (frametype == ALIAS_SINGLE) {
@@ -757,7 +760,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     memcpy(mod->cache.data, pheader, total);
 
     Hunk_FreeToLowMark(start);
-    #endif
+#endif
 }
 
 #include "console.h"

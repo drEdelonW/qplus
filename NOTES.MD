@@ -29,6 +29,7 @@
     DISPLAY=:1 ./quake.x11
 
 ```
+    clear ; \
     make TARGET=quakeX11 fresh && \
     make TARGET=quakeGLX11 fresh && \
     make TARGET=quakeSTM32 fresh
