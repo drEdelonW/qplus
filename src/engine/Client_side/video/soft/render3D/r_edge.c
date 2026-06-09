@@ -572,9 +572,10 @@ Output:
 Each surface has a linked list of its visible spans
 ==============
 */
+#include "mem_placement.h"
+uint8_t BaseSpans[MAXSPANS * sizeof(eSpan_t) + CACHE_SIZE] PLACE_TO_SDRAM;
 void R_ScanEdges() {
-    uint8_t basespans[MAXSPANS * sizeof(eSpan_t) + CACHE_SIZE];
-    eSpan_p basespan_p = (eSpan_p)((uintptr_t)(basespans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+    eSpan_p basespan_p = (eSpan_p)((uintptr_t)(BaseSpans + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
     max_span_p = &basespan_p[MAXSPANS - r_refdef.vrect.width];
 
     span_p = basespan_p;

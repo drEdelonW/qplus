@@ -90,7 +90,7 @@ void VID_Update(vRect_p rects) {
         if ((rects->x != 0) ||
             (rects->y != 0) ||
             (rects->width != 320) ||
-            (rects->height != 200)
+            ((rects->height != 200) && (rects->height != 152))
             ) {
             printf(RED("rect:\n x:%i/%i\n y:%i/%i\n"),
                 rects->x, rects->width,

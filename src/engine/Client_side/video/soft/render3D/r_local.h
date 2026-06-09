@@ -175,13 +175,23 @@ extern float    entity_rotation[3][3];
 extern int r_currentkey;
 extern int r_currentbkey;
 
+#ifdef STM32
+    typedef uint8_t ClipFlag_t ;
+#else
+    typedef int     ClipFlag_t;
+#endif
+
 typedef struct btofpoly_s {
-    int         clipflags;
     mSurface_p  psurf;
+    ClipFlag_t  clipflags;
 } btofpoly_t;
 typedef btofpoly_t* btofpoly_p;
 
-#define MAX_BTOFPOLYS   5000 // FIXME: tune this
+#ifdef STM32
+#   define MAX_BTOFPOLYS   500
+#else
+#   define MAX_BTOFPOLYS   5000 // FIXME: tune this
+#endif
 
 extern int          numbtofpolys;
 extern btofpoly_p   pbtofpolys;
