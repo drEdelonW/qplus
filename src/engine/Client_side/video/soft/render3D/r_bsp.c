@@ -376,7 +376,7 @@ void R_DrawSubmodelPolygons(Model_p pmodel, int clipflags) {
 R_RecursiveWorldNode
 ================
 */
-void R_RecursiveWorldNode(mNode_p node, int clipflags) {
+void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
     if ((node->contents == CONTENTS_SOLID) ||  // solid
         (node->visframe != r_visframecount)
         )   return;
@@ -530,23 +530,23 @@ void R_RecursiveWorldNode(mNode_p node, int clipflags) {
 R_RenderWorld
 ================
 */
+#include "mem_placement.h"
+btofpoly_t _bTofPolys[MAX_BTOFPOLYS] PLACE_TO_SDRAM;
 void R_RenderWorld() {
-    btofpoly_t btofpolys[MAX_BTOFPOLYS];
 
-    pbtofpolys = btofpolys;
+    pbtofpolys = _bTofPolys;
 
     currententity = &cl_entities[0];
     VectorCopy(r_origin, modelorg);
     Model_p clmodel = currententity->model;
     r_pcurrentvertbase = clmodel->vertexes;
 
-    R_RecursiveWorldNode(clmodel->nodes, 15);
+    R_RecursiveWorldNode(clmodel->nodes, 15); // TODO: it make overflow and corrupt 'bool configRestored' and 'bool serialAvailable'
 
-    // if the driver wants the polygons back to front, play the visible ones back
-    // in that order
+    // if the driver wants the polygons back to front, play the visible ones back in that order
     if (r_worldpolysbacktofront) {
         for (int i = numbtofpolys - 1; i >= 0; i--)
-            R_RenderPoly(btofpolys[i].psurf, btofpolys[i].clipflags);
+            R_RenderPoly(_bTofPolys[i].psurf, _bTofPolys[i].clipflags);
     }
 }
 

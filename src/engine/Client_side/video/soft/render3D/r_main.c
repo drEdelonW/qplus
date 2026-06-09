@@ -807,16 +807,16 @@ void R_DrawBEntitiesOnList() {
 R_EdgeDrawing
 ================
 */
-void R_EdgeDrawing() {
 #if 0
     Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 1];
     Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 1];
 #else
-    /* запас +2: выравнивание + место для surfaces-1 */
-    Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 2];
-    Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2];
-
+    #include "mem_placement.h"
+    // TODO: check it and clean --> /* запас +2: выравнивание + место для surfaces-1 */
+    Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 2] PLACE_TO_SDRAM;
+    Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2] PLACE_TO_SDRAM;
 #endif
+void R_EdgeDrawing() {
 #  define ALIGN_PTR(p, a) ((TypeLess_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
     if (auxedges) { r_edges = auxedges; }
     else {
@@ -853,7 +853,8 @@ void R_EdgeDrawing() {
         rw_time1 = Host_FloatTime();
     }
 
-#ifndef STM32
+#if 1
+// ndef STM32
     R_RenderWorld();  // TODO: it make overflow and corrupt 'bool configRestored' and 'bool serialAvailable'
 #endif
 
@@ -928,7 +929,7 @@ void R_RenderView_() {
         VID_LockBuffer();
     }
 
-    R_EdgeDrawing(); // TODO: it make overflow and corrupt 'bool configRestored' and 'bool serialAvailable'
+    R_EdgeDrawing();
 
     if (!r_dspeeds.value) {
         VID_UnlockBuffer();
