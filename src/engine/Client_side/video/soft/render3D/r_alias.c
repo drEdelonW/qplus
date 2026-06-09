@@ -42,7 +42,9 @@ AuxVert_p   pauxverts;
 
 static float    _ziscale;
 static Model_p  _pmodel;
-static vec3_t   _aliasForward, _aliasRight, _aliasUp;
+static vec3_t   _aliasForward;
+static vec3_t   _aliasRight;
+static vec3_t   _aliasUp;
 static mAliasSkinDesc_p _pSkinDesc;
 
 int r_amodels_drawn;
@@ -57,9 +59,10 @@ typedef struct {
 } aEdge_t;
 
 static aEdge_t _aEdges[12] = {
-    {0, 1}, {1, 2}, {2, 3}, {3, 0},
-    {4, 5}, {5, 6}, {6, 7}, {7, 4},
-    {0, 5}, {1, 4}, {2, 7}, {3, 6}
+    {0, 1}, {1, 2}, {2, 3},
+    {3, 0}, {4, 5}, {5, 6},
+    {6, 7}, {7, 4}, {0, 5},
+    {1, 4}, {2, 7}, {3, 6}
 };
 
 
@@ -222,7 +225,8 @@ bool R_AliasCheckBBox() {
     currententity->trivial_accept = !anyclip & !zclipped;
 
     if ((currententity->trivial_accept) &&
-        (minz > (r_aliastransition + (pmdl->size * r_resfudge)))) {
+        (minz > (r_aliastransition + (pmdl->size * r_resfudge)))
+        ) {
         currententity->trivial_accept |= 2;
     }
 
@@ -249,7 +253,8 @@ General clipped case
 ================
 */
 void R_AliasPreparePoints() {
-    stVert_p pstverts = (stVert_p)((uint8_p)paliashdr + paliashdr->stverts);
+    stVert_p pstverts = (stVert_p)
+        ((uint8_p)paliashdr + paliashdr->stverts);
     r_anumverts = pmdl->numverts;
     FinalVert_p fv = pfinalverts;
     AuxVert_p av = pauxverts;
@@ -273,7 +278,8 @@ void R_AliasPreparePoints() {
     //
     r_affinetridesc.numtriangles = 1;
 
-    mTriangle_p ptri = (mTriangle_p)((uint8_p)paliashdr + paliashdr->triangles);
+    mTriangle_p ptri = (mTriangle_p)
+        ((uint8_p)paliashdr + paliashdr->triangles);
     for (int i = 0; i < pmdl->numtris; i++, ptri++) {
         FinalVert_p pfv[3] = {
             &pfinalverts[ptri->vertindex[0]],
@@ -373,7 +379,7 @@ void R_AliasSetUpTransform(int trivial_accept) {
         for (int i = 0; i < 4; i++) {
             aliastransform[0][i] *= aliasxscale * (1.0 / ((float)0x8000 * 0x10000));
             aliastransform[1][i] *= aliasyscale * (1.0 / ((float)0x8000 * 0x10000));
-            aliastransform[2][i] *= (1.0 / ((float)0x8000 * 0x10000));
+            aliastransform[2][i] *= /*       */   (1.0 / ((float)0x8000 * 0x10000));
         }
     }
 }
@@ -434,7 +440,8 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
             pverts->v[1],
             pverts->v[2],
         };
-        float zi = 1.0f / (DotProduct(tv, aliastransform[2]) + aliastransform[2][3]);
+        float zi = 1.0f /
+            (DotProduct(tv, aliastransform[2]) + aliastransform[2][3]);
 
         // x, y, and z are scaled down by 1/2**31 in the transform, so 1/z is
         // scaled up by 1/2**31, and the scaling cancels out for x and y in the
@@ -491,7 +498,8 @@ R_AliasPrepareUnclippedPoints
 ================
 */
 void R_AliasPrepareUnclippedPoints() {
-    stVert_p pstverts = (stVert_p)((uint8_p)paliashdr + paliashdr->stverts);
+    stVert_p pstverts = (stVert_p)
+        ((uint8_p)paliashdr + paliashdr->stverts);
     r_anumverts = pmdl->numverts;
     // FIXME: just use pfinalverts directly?
     FinalVert_p fv = pfinalverts;
@@ -517,7 +525,8 @@ R_AliasSetupSkin
 void R_AliasSetupSkin() {
     int skinnum = currententity->skinnum;
     if ((skinnum >= pmdl->numskins) ||
-        (skinnum < 0)) {
+        (skinnum < 0)
+        ) {
         Con_DPrintf("R_AliasSetupSkin: no such skin # %d\n", skinnum);
         skinnum = 0;
     }
@@ -528,8 +537,10 @@ void R_AliasSetupSkin() {
     a_skinwidth = pmdl->skinwidth;
 
     if (_pSkinDesc->type == ALIAS_SKIN_GROUP) {
-        mAliasSkinGroup_p paliasskingroup = (mAliasSkinGroup_p)((uint8_p)paliashdr + _pSkinDesc->skin);
-        float_p pskinintervals = (float_p)((uint8_p)paliashdr + paliasskingroup->intervals);
+        mAliasSkinGroup_p paliasskingroup = (mAliasSkinGroup_p)
+            ((uint8_p)paliashdr + _pSkinDesc->skin);
+        float_p pskinintervals = (float_p)
+            ((uint8_p)paliashdr + paliasskingroup->intervals);
         int numskins = paliasskingroup->numskins;
         float fullskininterval = pskinintervals[numskins - 1];
         float skintime = cl.time + currententity->syncbase;
@@ -565,16 +576,13 @@ void R_AliasSetupLighting(aLight_p plighting) {
     // guarantee that no vertex will ever be lit below LIGHT_MIN, so we don't have
     // to clamp off the bottom
     r_ambientlight = plighting->ambientlight;
-    if (r_ambientlight < LIGHT_MIN)
-        r_ambientlight = LIGHT_MIN;
+    if (r_ambientlight < LIGHT_MIN)     r_ambientlight = LIGHT_MIN;
 
     r_ambientlight = (255 - r_ambientlight) << VID_CBITS;
-    if (r_ambientlight < LIGHT_MIN)
-        r_ambientlight = LIGHT_MIN;
+    if (r_ambientlight < LIGHT_MIN)     r_ambientlight = LIGHT_MIN;
 
     r_shadelight = plighting->shadelight;
-    if (r_shadelight < 0)
-        r_shadelight = 0;
+    if (r_shadelight < 0)               r_shadelight = 0;
 
     r_shadelight *= VID_GRADES;
 
@@ -594,18 +602,22 @@ set r_apverts
 void R_AliasSetupFrame() {
     int frame = currententity->frame;
     if ((frame >= pmdl->numframes) ||
-        (frame < 0)) {
+        (frame < 0)
+        ) {
         Con_DPrintf("R_AliasSetupFrame: no such frame %d\n", frame);
         frame = 0;
     }
 
     if (paliashdr->frames[frame].type == ALIAS_SINGLE) {
-        r_apverts = (TriVertx_p)((uint8_p)paliashdr + paliashdr->frames[frame].frame);
+        r_apverts = (TriVertx_p)
+            ((uint8_p)paliashdr + paliashdr->frames[frame].frame);
         return;
     }
 
-    mAliasGroup_p paliasgroup = (mAliasGroup_p)((uint8_p)paliashdr + paliashdr->frames[frame].frame);
-    float_p pintervals = (float_p)((uint8_p)paliashdr + paliasgroup->intervals);
+    mAliasGroup_p paliasgroup = (mAliasGroup_p)
+        ((uint8_p)paliashdr + paliashdr->frames[frame].frame);
+    float_p pintervals = (float_p)
+        ((uint8_p)paliashdr + paliasgroup->intervals);
     int numframes = paliasgroup->numframes;
     float fullinterval = pintervals[numframes - 1];
     float time = cl.time + currententity->syncbase;
@@ -622,7 +634,8 @@ void R_AliasSetupFrame() {
             break;
     }
 
-    r_apverts = (TriVertx_p)((uint8_p)paliashdr + paliasgroup->frames[i].frame);
+    r_apverts = (TriVertx_p)
+        ((uint8_p)paliashdr + paliasgroup->frames[i].frame);
 }
 
 
@@ -634,19 +647,25 @@ R_AliasDrawModel
 void R_AliasDrawModel(aLight_p plighting) {
     FinalVert_t finalverts[
         MAXALIASVERTS +
-            ((CACHE_SIZE - 1) /
-                sizeof(FinalVert_t)) +
-            1];
+            (
+                (CACHE_SIZE - 1) /
+                sizeof(FinalVert_t)
+                ) +
+            1
+    ];
 
     r_amodels_drawn++;
 
     // cache align
-    pfinalverts = (FinalVert_p)(((uintptr_t)&finalverts[0] + CACHE_SIZE - 1) & ~(uintptr_t)(CACHE_SIZE - 1));
+    pfinalverts = (FinalVert_p)
+        (((uintptr_t)&finalverts[0] + CACHE_SIZE - 1) & ~(uintptr_t)(CACHE_SIZE - 1));
     AuxVert_t auxverts[MAXALIASVERTS];
     pauxverts = &auxverts[0];
 
-    paliashdr = (AliasHdr_p)Mod_Extradata(currententity->model);
-    pmdl = (Mdl_p)((uint8_p)paliashdr + paliashdr->model);
+    paliashdr = (AliasHdr_p)
+        Mod_Extradata(currententity->model);
+    pmdl = (Mdl_p)
+        ((uint8_p)paliashdr + paliashdr->model);
 
     R_AliasSetupSkin();
     R_AliasSetUpTransform(currententity->trivial_accept);

@@ -181,7 +181,6 @@ Mod_LoadSpriteModel
 */
 
 void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
-    // return;
     dSprite_p pin = (dSprite_p)buffer;
 
     int version = LittleLong(pin->version);

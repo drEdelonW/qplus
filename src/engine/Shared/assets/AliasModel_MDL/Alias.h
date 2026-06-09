@@ -24,13 +24,17 @@ Alias models are position independent, so the cache manager can move them.
 */
 typedef enum {
     ALIAS_SINGLE = 0u,
-    ALIAS_GROUP
+    ALIAS_GROUP,
+#ifdef STM32
+    ALIAS_FRAME_TYPE_FORCE_DWORD = 0x7FFFFFFF
+#endif
 } AliasFrameType_t;
 
 typedef struct {
     AliasFrameType_t type;
 } dAliasFrameType_t;
 typedef dAliasFrameType_t* dAliasFrameType_p;
+STATIC_ASSERT_SIZE(dAliasFrameType_t, 4); // 4
 
 typedef struct {
 #ifdef GLQUAKE
@@ -88,13 +92,17 @@ typedef AliasHdr_t* AliasHdr_p;
 
 typedef enum {
     ALIAS_SKIN_SINGLE = 0u,
-    ALIAS_SKIN_GROUP
+    ALIAS_SKIN_GROUP,
+#ifdef STM32
+    ALIAS_SKIN_TYPE_FORCE_DWORD = 0x7FFFFFFF
+#endif
 } AliasSkinType_t;
 
 typedef struct {
     AliasSkinType_t type;
 } dAliasSkinType_t;
 typedef dAliasSkinType_t* dAliasSkinType_p;
+STATIC_ASSERT_SIZE(dAliasSkinType_t, 4); // 4
 
 typedef struct {
     AliasSkinType_t type;
@@ -131,6 +139,7 @@ typedef struct {
     char        name[16];   // frame name from grabbing
 } dAliasFrame_t;
 typedef dAliasFrame_t* dAliasFrame_p;
+STATIC_ASSERT_SIZE(dAliasFrame_t, 4*2 + 1*16); // 25
 
 
 typedef struct {
@@ -139,24 +148,28 @@ typedef struct {
     TriVertx_t  bboxmax;    // lightnormal isn't used
 } dAliasGroup_t;
 typedef dAliasGroup_t* dAliasGroup_p;
+STATIC_ASSERT_SIZE(dAliasGroup_t, 4 + 4*2); // 12
 
 
 typedef struct {
     int32_t numskins;
 } dAliasSkinGroup_t;
 typedef dAliasSkinGroup_t* dAliasSkinGroup_p;
+STATIC_ASSERT_SIZE(dAliasSkinGroup_t, 4); // 4
 
 
 typedef struct {
     float interval;
 } dAliasInterval_t;
 typedef dAliasInterval_t* dAliasInterval_p;
+STATIC_ASSERT_SIZE(dAliasInterval_t, 4); // 4
 
 
 typedef struct {
     float interval;
 } dAliasSkinInterval_t;
 typedef dAliasSkinInterval_t* dAliasSkinInterval_p;
+STATIC_ASSERT_SIZE(dAliasSkinInterval_t, 4); // 4
 
 
 
@@ -178,7 +191,8 @@ typedef struct {
     float       size;
 } Mdl_t;
 typedef Mdl_t* Mdl_p;
+STATIC_ASSERT_SIZE(Mdl_t, 9*4 + 2*4 + 3*12 + 4); // 84
 
 extern AliasHdr_p pheader;
-extern AliasHdr_p   paliashdr;
+extern AliasHdr_p paliashdr;
 
