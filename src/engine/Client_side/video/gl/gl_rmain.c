@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "client.h"
 #include "angle.h"
-// #include "Alias.h"
 #include <string.h>
 #include "mathlib.h"
 #include "model.h"
@@ -269,12 +268,12 @@ int lastposenum;
 GL_DrawAliasFrame
 =============
 */
-void GL_DrawAliasFrame(AliasHdr_p paliashdr, int posenum) {
+void GL_DrawAliasFrame(AliasHdr_p pAliasHdr, int posenum) {
     lastposenum = posenum;
 
-    TriVertx_p verts = (TriVertx_p)((byte*)paliashdr + paliashdr->posedata);
-    verts += posenum * paliashdr->poseverts;
-    int* order = (int*)((byte*)paliashdr + paliashdr->commands);
+    TriVertx_p verts = (TriVertx_p)((byte*)pAliasHdr + pAliasHdr->posedata);
+    verts += posenum * pAliasHdr->poseverts;
+    int* order = (int*)((byte*)pAliasHdr + pAliasHdr->commands);
 
     while (1) {
         // get the vertex count and primitive type
@@ -313,14 +312,14 @@ GL_DrawAliasShadow
 =============
 */
 
-void GL_DrawAliasShadow(AliasHdr_p paliashdr, int posenum) {
+void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
 
     float lheight = currententity->origin[2] - lightspot[2];
 
     float height = 0;
-    TriVertx_p verts = (TriVertx_p)((byte*)paliashdr + paliashdr->posedata);
-    verts += posenum * paliashdr->poseverts;
-    int* order = (int*)((byte*)paliashdr + paliashdr->commands);
+    TriVertx_p verts = (TriVertx_p)((byte*)pAliasHdr + pAliasHdr->posedata);
+    verts += posenum * pAliasHdr->poseverts;
+    int* order = (int*)((byte*)pAliasHdr + pAliasHdr->commands);
 
     height = -lheight + 1.0;
 
@@ -346,9 +345,9 @@ void GL_DrawAliasShadow(AliasHdr_p paliashdr, int posenum) {
 
                 // normals and vertexes come from the frame list
                 vec3_t point = {
-                    verts->v[0] * paliashdr->scale[0] + paliashdr->scale_origin[0],
-                    verts->v[1] * paliashdr->scale[1] + paliashdr->scale_origin[1],
-                    verts->v[2] * paliashdr->scale[2] + paliashdr->scale_origin[2]
+                    verts->v[0] * pAliasHdr->scale[0] + pAliasHdr->scale_origin[0],
+                    verts->v[1] * pAliasHdr->scale[1] + pAliasHdr->scale_origin[1],
+                    verts->v[2] * pAliasHdr->scale[2] + pAliasHdr->scale_origin[2]
                 };
                 point[0] -= shadevector[0] * (point[2] + lheight);
                 point[1] -= shadevector[1] * (point[2] + lheight);
@@ -371,21 +370,23 @@ R_SetupAliasFrame
 
 =================
 */
-void R_SetupAliasFrame(int frame, AliasHdr_p paliashdr) {
-    if ((frame >= paliashdr->numframes) || (frame < 0)) {
+void R_SetupAliasFrame(int frame, AliasHdr_p pAliasHdr) {
+    if ((frame >= pAliasHdr->numframes) ||
+        (frame < 0)
+        ) {
         Con_DPrintf("R_AliasSetupFrame: no such frame %d\n", frame);
         frame = 0;
     }
 
-    int pose = paliashdr->frames[frame].firstpose;
-    int numposes = paliashdr->frames[frame].numposes;
+    int pose = pAliasHdr->frames[frame].firstpose;
+    int numposes = pAliasHdr->frames[frame].numposes;
 
     if (numposes > 1) {
-        float interval = paliashdr->frames[frame].interval;
+        float interval = pAliasHdr->frames[frame].interval;
         pose += (int)(cl.time / interval) % numposes;
     }
 
-    GL_DrawAliasFrame(paliashdr, pose);
+    GL_DrawAliasFrame(pAliasHdr, pose);
 }
 
 
@@ -469,9 +470,9 @@ void R_DrawAliasModel(r_Entity_p e) {
     //
     // locate the proper data
     //
-    AliasHdr_p paliashdr = (AliasHdr_p)Mod_Extradata(currententity->model);
+    AliasHdr_p pAliasHdr = (AliasHdr_p)Mod_Extradata(currententity->model);
 
-    c_alias_polys += paliashdr->numtris;
+    c_alias_polys += pAliasHdr->numtris;
 
     //
     // draw all the triangles
@@ -483,17 +484,33 @@ void R_DrawAliasModel(r_Entity_p e) {
     R_RotateForEntity(e);
 
     if (!strcmp(clmodel->name, "progs/eyes.mdl") && gl_doubleeyes.value) {
-        glTranslatef(paliashdr->scale_origin[0], paliashdr->scale_origin[1], paliashdr->scale_origin[2] - (22 + 8));
+        glTranslatef(
+            pAliasHdr->scale_origin[0],
+            pAliasHdr->scale_origin[1],
+            pAliasHdr->scale_origin[2] - (22 + 8)
+        );
         // double size of eyes, since they are really hard to see in gl
-        glScalef(paliashdr->scale[0] * 2, paliashdr->scale[1] * 2, paliashdr->scale[2] * 2);
+        glScalef(
+            pAliasHdr->scale[0] * 2,
+            pAliasHdr->scale[1] * 2,
+            pAliasHdr->scale[2] * 2
+        );
     }
     else {
-        glTranslatef(paliashdr->scale_origin[0], paliashdr->scale_origin[1], paliashdr->scale_origin[2]);
-        glScalef(paliashdr->scale[0], paliashdr->scale[1], paliashdr->scale[2]);
+        glTranslatef(
+            pAliasHdr->scale_origin[0],
+            pAliasHdr->scale_origin[1],
+            pAliasHdr->scale_origin[2]
+        );
+        glScalef(
+            pAliasHdr->scale[0],
+            pAliasHdr->scale[1],
+            pAliasHdr->scale[2]
+        );
     }
 
     int anim = (int)(cl.time * 10) & 3;
-    GL_Bind(paliashdr->gl_texturenum[currententity->skinnum][anim]);
+    GL_Bind(pAliasHdr->gl_texturenum[currententity->skinnum][anim]);
 
     // we can't dynamically colormap textures, so they are cached
     // seperately for the players.  Heads are just uncolored.
@@ -510,7 +527,7 @@ void R_DrawAliasModel(r_Entity_p e) {
     if (gl_affinemodels.value)
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 
-    R_SetupAliasFrame(currententity->frame, paliashdr);
+    R_SetupAliasFrame(currententity->frame, pAliasHdr);
 
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
@@ -526,7 +543,7 @@ void R_DrawAliasModel(r_Entity_p e) {
         glDisable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glColor4f(0, 0, 0, 0.5);
-        GL_DrawAliasShadow(paliashdr, lastposenum);
+        GL_DrawAliasShadow(pAliasHdr, lastposenum);
         glEnable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);
         glColor4f(1, 1, 1, 1);
@@ -605,7 +622,7 @@ void R_DrawViewModel() {
         vec3_t dist; VectorSubtract(currententity->origin, dl->origin, dist);
         float add = dl->radius - Length(dist);
         if (add > 0)
-        ambientlight += add;
+            ambientlight += add;
     }
 
 #if 0
@@ -613,8 +630,8 @@ void R_DrawViewModel() {
     float ambient[4], diffuse[4];
     ambient[0] = ambient[1] = ambient[2] = ambient[3] = (float)ambientlight / 128;
     diffuse[0] = diffuse[1] = diffuse[2] = diffuse[3] = (float)shadelight / 128;
-#endif
 #warning TODO: investigate why ambient and diffuse go nowhere
+#endif
 
     // hack the depth range to prevent view model from poking into walls
     glDepthRange(gldepthmin, gldepthmin + 0.3 * (gldepthmax - gldepthmin));

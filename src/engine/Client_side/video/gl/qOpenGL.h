@@ -13,7 +13,6 @@
 
 #include "glquake.h"
 #include "Model_st.h"
-// #include "Alias.h"
 #include "Light.h"
 
 #define MAXHEIGHT  1024

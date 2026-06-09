@@ -1,6 +1,6 @@
 # TARGET ?= quakeX11
 # TARGET ?= quakeGLX11
-TARGET ?= quakeWin
+# TARGET ?= quakeWin
 TARGET ?= quakeSTM32
 
 # TARGET ?= STM32_LCD
