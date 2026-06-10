@@ -426,13 +426,13 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
         },
         .type = PLANE_ANYZ
     };
-        screenedge[2] = (mPlane_t){  // top side clip
-        .normal = {
-            0.0f,
-            -1.0f / (yOrigin * verticalFieldOfView),
-            1.0f
-        },
-        .type = PLANE_ANYZ
+    screenedge[2] = (mPlane_t){  // top side clip
+    .normal = {
+        0.0f,
+        -1.0f / (yOrigin * verticalFieldOfView),
+        1.0f
+    },
+    .type = PLANE_ANYZ
     };
     screenedge[3] = (mPlane_t){   // bottom side clip
         .normal = {
@@ -738,7 +738,9 @@ void R_DrawBEntitiesOnList() {
 
                 // calculate dynamic lighting for bmodel if it's not an
                 // instanced model
-                if (clmodel->firstModelSurface != 0) {
+                if ((r_dlightmap.value) &&
+                    (clmodel->firstModelSurface != 0)
+                    ) {
                     for (int k = 0; k < MAX_DLIGHTS; k++) {
                         if ((cl_dlights[k].die < cl.time) ||
                             (!cl_dlights[k].radius)) {
@@ -811,13 +813,13 @@ R_EdgeDrawing
 ================
 */
 #if 0
-    Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 1];
-    Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 1];
+Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 1];
+Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 1];
 #else
-    #include "mem_placement.h"
-    // TODO: check it and clean --> /* запас +2: выравнивание + место для surfaces-1 */
-    Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 2] PLACE_TO_SDRAM;
-    Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2] PLACE_TO_SDRAM;
+#include "mem_placement.h"
+// TODO: check it and clean --> /* запас +2: выравнивание + место для surfaces-1 */
+Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 2] PLACE_TO_SDRAM;
+Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2] PLACE_TO_SDRAM;
 #endif
 void R_EdgeDrawing() {
 #  define ALIGN_PTR(p, a) ((TypeLess_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))

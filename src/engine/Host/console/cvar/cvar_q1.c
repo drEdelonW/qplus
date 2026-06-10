@@ -226,7 +226,7 @@ CVAR(scr_printspeed, "8");
 // FROM: src/ui/screen.c
 CVAR(d_subdiv16, "1");
 #ifdef STM32
-/* */CVAR_ARC(d_mipcap, "4");
+/* */CVAR_ARC(d_mipcap, "1");
 #else
 /* */CVAR_ARC(d_mipcap, "0");
 #endif
