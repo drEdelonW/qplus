@@ -102,6 +102,7 @@ JackHummer - map editor in Steam
     ./build-toolchain.sh | tee buil.log
 ```
 
+# BUILD STM GCC om ARM host
 ```
     mkdir -p ~/stm32_toolchain && cd ~/stm32_toolchain
 
@@ -115,22 +116,55 @@ JackHummer - map editor in Steam
     ./bin/arm-none-eabi-gcc --version
 ```
 
-/root/stm32_toolchain/gnu-tools-for-stm32/src/binutils/missing: 81: makeinfo: not found
-WARNING: 'makeinfo' is missing on your system.
-         You should only need it if you modified a '.texi' file, or
-         any other file indirectly affecting the aspect of the manual.
-         You might want to install the Texinfo package:
-         <http://www.gnu.org/software/texinfo/>
-         The spurious makeinfo call might also be the consequence of
-         using a buggy 'make' (AIX, DU, IRIX), in which case you might
-         want to install GNU make:
-         <http://www.gnu.org/software/make/>
-make[3]: *** [Makefile:1792: doc/bfd.info] Error 127
-make[3]: Leaving directory '/root/stm32_toolchain/gnu-tools-for-stm32/build-native/binutils/bfd'
-make[2]: *** [Makefile:1952: info-recursive] Error 1
-make[2]: Leaving directory '/root/stm32_toolchain/gnu-tools-for-stm32/build-native/binutils/bfd'
-make[1]: *** [Makefile:3119: all-bfd] Error 2
-make[1]: Leaving directory '/root/stm32_toolchain/gnu-tools-for-stm32/build-native/binutils'
-make: *** [Makefile:1031: all] Error 2
-root@GitLab-Pi5:~/stm32_toolchain/gnu-tools-for-stm32#
 
+
+# make SD image
+    fdisk -l /dev/sda
+```
+    Disk /dev/sda: 29.13 GiB, 31281119232 bytes, 61095936 sectors
+    Disk model: MassStorageClass
+    Units: sectors of 1 * 512 = 512 bytes
+    Sector size (logical/physical): 512 bytes / 512 bytes
+    I/O size (minimum/optimal): 512 bytes / 512 bytes
+    Disklabel type: dos
+    Disk identifier: 0x54531ad4
+
+    Device     Boot Start     End Sectors Size Id Type
+    /dev/sda1        2048 2099199 2097152   1G  c W95 FAT32 (LBA)
+```
+
+# make Image
+    dd if=/dev/sda of=/root/sda_head_and_sda1.img bs=512 count=$(Sectors)+1 status=progress && sync
+    dd if=/dev/sda of=/root/sda_head_and_sda1.img bs=512 count=2099200 status=progress && sync
+    sudo dd if=/dev/sda of=./QUAKE_SD.img bs=512 count=131073 status=progress && sync
+
+# write image to SD card
+    sudo dd if=/root/sda_head_and_sda1.img of=/dev/sda bs=4M status=progress && sync
+    sudo dd if=./QUAKE_SD.img of=/dev/sda bs=4M status=progress && sync
+
+# make partition table
+    parted -s /dev/sda mklabel msdos mkpart primary fat32 2048s 133119s
+    dd if=/dev/zero of=/dev/sda1 bs=4M status=progress && sync
+    mkfs.vfat -F 32 -s 1 -S 512 -R 4110 -n "Q_SHARE" /dev/sda1 && sync
+
+# fsck.vfat -nvv /dev/sda1
+fsck.fat 4.2 (2021-01-31)
+Checking we can access the last sector of the filesystem
+Boot sector contents:
+System ID "MSDOS5.0"
+Media byte 0xf8 (hard disk)
+       512 bytes per logical sector
+      4096 bytes per cluster
+      4110 reserved sectors
+First FAT starts at byte 2104320 (sector 4110)
+         2 FATs, 32 bit entries
+   1044992 bytes per FAT (= 2041 sectors)
+Root directory start at cluster 2 (arbitrary size)
+Data area starts at byte 4194304 (sector 8192)
+    261120 data clusters (1069547520 bytes)
+63 sectors/track, 255 heads
+      2048 hidden sectors
+   2097152 sectors total
+Checking for unused clusters.
+Checking free cluster summary.
+/dev/sda1: 5 files, 4567/261120 clusters
