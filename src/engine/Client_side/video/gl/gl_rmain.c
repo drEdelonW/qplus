@@ -79,7 +79,7 @@ int  d_lightstylevalue[256]; // 8.8 fraction of base light value
 void R_MarkLeaves();
 
 cvar_t r_norefresh = { "r_norefresh", "0" };
-cvar_t r_lightmap = { "r_lightmap", "0" };
+// cvar_t r_lightmap = { "r_lightmap", "0" };
 cvar_t r_shadows = { "r_shadows", "0" };
 cvar_t r_mirroralpha = { "r_mirroralpha", "1" };
 cvar_t r_wateralpha = { "r_wateralpha", "1" };

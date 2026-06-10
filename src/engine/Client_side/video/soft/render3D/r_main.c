@@ -178,6 +178,9 @@ void R_Init() {
     Cvar_RegisterVariable(&r_fullbright);
     Cvar_RegisterVariable(&r_drawentities);
     Cvar_RegisterVariable(&r_drawviewmodel);
+    Cvar_RegisterVariable(&r_drawworld);
+    Cvar_RegisterVariable(&r_lightmap);
+    Cvar_RegisterVariable(&r_dlightmap);
     Cvar_RegisterVariable(&r_aliasstats);
     Cvar_RegisterVariable(&r_dspeeds);
     Cvar_RegisterVariable(&r_reportsurfout);
@@ -853,10 +856,9 @@ void R_EdgeDrawing() {
         rw_time1 = Host_FloatTime();
     }
 
-#if 1
-// ndef STM32
-    R_RenderWorld();  // TODO: it make overflow and corrupt 'bool configRestored' and 'bool serialAvailable'
-#endif
+    if (r_drawworld.value) {
+        R_RenderWorld();
+    }
 
     if (r_drawculledpolys)
         R_ScanEdges();
