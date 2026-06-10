@@ -1008,7 +1008,10 @@ void R_DrawBrushModel(r_Entity_p e) {
 
     // calculate dynamic lighting for bmodel if it's not an
     // instanced model
-    if (clmodel->firstModelSurface != 0 && !gl_flashblend.value) {
+    // TODO: apply r_dlightmap
+    if ((clmodel->firstModelSurface != 0) &&
+        (!gl_flashblend.value)
+        ) {
         for (int k = 0; k < MAX_DLIGHTS; k++) {
             if ((cl_dlights[k].die < cl.time) ||
                 (!cl_dlights[k].radius)

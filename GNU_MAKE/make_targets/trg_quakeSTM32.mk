@@ -1,5 +1,8 @@
 FORCE_32     := 1
 
+OPT_LVL ?= 3
+OPT_LVL ?= 0
+
 include features/fh_qEngine.mk
 include features/fh_MCU_platform.mk
 
@@ -8,7 +11,7 @@ CFLAGS += $(MCU_FLAGS)
 CFLAGS += \
     -std=gnu11 \
     -g3 -DDEBUG -DUSE_HAL_DRIVER \
-    -DSTM32F769xx -c -O0 \
+    -DSTM32F769xx -c -O$(OPT_LVL) \
     -ffunction-sections \
     -fdata-sections -Wall \
     -fstack-usage \
@@ -17,7 +20,7 @@ CFLAGS += \
 CXXFLAGS += $(MCU_FLAGS)
 CXXFLAGS += \
     -g3 -DDEBUG -DUSE_HAL_DRIVER \
-    -DSTM32F769xx -c -O0 \
+    -DSTM32F769xx -c -O$(OPT_LVL) \
     -ffunction-sections \
     -fdata-sections -Wall \
     -fstack-usage \
