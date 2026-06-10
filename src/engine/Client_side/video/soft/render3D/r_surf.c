@@ -129,14 +129,15 @@ Combine and scale multiple lightmaps into the 8.8 format in blocklights
 ===============
 */
 void R_BuildLightMap() {
-    // return;
     mSurface_p surf = r_drawsurf.surf;
     int smax = (surf->extents[0] >> 4) + 1;
     int tmax = (surf->extents[1] >> 4) + 1;
     int size = smax * tmax;
     uint8_p lightmap = surf->samples;
 
-    if (r_fullbright.value || !cl.worldmodel->lightdata) {
+    if ((r_fullbright.value) ||
+        (!cl.worldmodel->lightdata)
+        ) {
         for (int i = 0; i < size; i++)
             blocklights[i] = 0;
         return;
@@ -212,7 +213,9 @@ R_DrawSurface
 void R_DrawSurface() {
     void (*pblockdrawer)();
     // calculate the lightings
-    R_BuildLightMap();
+    if (r_lightmap.value) {
+        R_BuildLightMap();
+    }
 
     surfrowbytes = r_drawsurf.rowbytes;
     Texture_p mt = r_drawsurf.texture;

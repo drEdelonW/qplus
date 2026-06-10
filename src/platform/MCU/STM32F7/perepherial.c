@@ -1094,11 +1094,21 @@ void PrintCpuClock() {
     printf("PCLK2:     %.f MHz\r\n", (double)pclk2 / 1000000.0);
 }
 
+void Sys_InitCycleCounter() {
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    
+    // Unlock CoreSight registers for Cortex-M7 DWT access
+    DWT->LAR = 0xC5ACCE55; 
+    
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+}
+
 void LCD_Init(); // TODO move to h-file
 void Pereph_Init() {
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
-
+    Sys_InitCycleCounter();
     MX_FMC_Init();	        // SDRAM 16MB   [V]
 
     MX_USART1_UART_Init();  // DEBUG UART   [V]

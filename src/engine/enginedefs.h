@@ -21,7 +21,11 @@
 
 #define SAVEGAME_COMMENT_LENGTH 39
 
-#define MAX_PARTICLES           2048 /* default max # of particles at one time */
+#ifdef STM32
+#   define MAX_PARTICLES           200 /* default max # of particles at one time */
+#else
+#   define MAX_PARTICLES           2048 /* default max # of particles at one time */
+#endif
 #define ABSOLUTE_MIN_PARTICLES  512  /* no fewer than this no matter what's on the command line */
 
 #define MAX_EFRAGS              640

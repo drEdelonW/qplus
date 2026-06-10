@@ -50,11 +50,34 @@ void Sys_Sleep() {}
 void Sys_HighFPPrecision() {}
 void Sys_LowFPPrecision() {}
 
+#if 0
 LegacyTimeStamp_t Sys_FloatTime() {
     static LegacyTimeStamp_t t = 0.0;
     t += 0.1;
     return t;
 }
+#else
+
+LegacyTimeStamp_t Sys_FloatTime() {
+    static uint32_t last_cycles = 0;
+    static double accumulated_time = 0.0;
+    static bool is_initialized = false;
+
+    uint32_t current_cycles = DWT->CYCCNT;
+
+    if (!is_initialized) {
+        last_cycles = current_cycles;
+        is_initialized = true;
+        return (LegacyTimeStamp_t)accumulated_time;
+    }
+
+    uint32_t delta_cycles = current_cycles - last_cycles;
+    accumulated_time += (double)delta_cycles / SystemCoreClock;
+    last_cycles = current_cycles;
+
+    return (LegacyTimeStamp_t)accumulated_time;
+}
+#endif
 
 #if 0
 

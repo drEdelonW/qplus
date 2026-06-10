@@ -145,6 +145,13 @@ CVAR(r_waterwarp, "1");
 CVAR(r_fullbright, "0");
 CVAR(r_drawentities, "1");
 CVAR(r_drawviewmodel, "1");
+CVAR(r_drawworld, "1");
+CVAR(r_lightmap, "1");
+#ifdef STM32
+/* */CVAR_ARC(r_dlightmap, "0");
+#else
+/* */CVAR_ARC(r_dlightmap, "1");
+#endif
 CVAR_NAMED(r_aliasstats, "r_polymodelstats", "0");
 CVAR(r_dspeeds, "0");
 CVAR_ARC(r_drawflat, "0");
@@ -219,9 +226,9 @@ CVAR(scr_printspeed, "8");
 // FROM: src/ui/screen.c
 CVAR(d_subdiv16, "1");
 #ifdef STM32
-CVAR_ARC(d_mipcap, "4");
+/* */CVAR_ARC(d_mipcap, "4");
 #else
-CVAR_ARC(d_mipcap, "0");
+/* */CVAR_ARC(d_mipcap, "0");
 #endif
 CVAR(d_mipscale, "1");
 

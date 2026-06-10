@@ -97,6 +97,8 @@ R_PushDlights
 =============
 */
 void R_PushDlights() {
+    if (!r_dlightmap.value)    return;
+
     r_dlightframecount = r_framecount + 1; // because the count hasn't
     //  advanced yet for this frame
     dLight_p l = cl_dlights;
