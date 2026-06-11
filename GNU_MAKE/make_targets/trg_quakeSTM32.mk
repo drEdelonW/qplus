@@ -29,7 +29,7 @@ CXXFLAGS += \
 LDFLAGS += $(MCU_FLAGS)
 LDFLAGS += \
     -T"$(STMSRC_DIR)/STM32F769NIHX_FLASH.ld" \
-    -Wl,-Map="stm32f7q1.map" \
+    -Wl,-Map="$(OUT_DIR)/$(TARGET).map" \
     -Wl,--gc-sections -static \
     -Wl,--start-group \
     -lc -lm -lstdc++ -lsupc++ \

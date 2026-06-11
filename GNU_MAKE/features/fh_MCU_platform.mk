@@ -32,7 +32,7 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
         # SRC_LIST += $(MCU_DIR)/sys_null.c
         # SRC_LIST += $(MCU_DIR)/vid_null.c
         SRC_LIST += $(MCU_DIR)/net_mcu.c
-        SRC_LIST += $(MCU_DIR)/serial_input/in_UART.c
+        SRC_LIST += $(MCU_DIR)/in_UART.c
         # SRC_LIST += $(MCU_DIR)/in_mcu.c
 
 # $(eval ROOT_DIR := $(STMSRC_DIR)) $(eval INCLUDES += $(ROOT_DIR))
