@@ -190,7 +190,7 @@ typedef btofpoly_t* btofpoly_p;
 #ifdef STM32
 #   define MAX_BTOFPOLYS   500
 #else
-#   define MAX_BTOFPOLYS   5000 // FIXME: tune this
+#   define MAX_BTOFPOLYS   5000 /* FIXME: tune this */
 #endif
 
 extern int          numbtofpolys;

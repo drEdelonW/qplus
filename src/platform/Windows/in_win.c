@@ -78,8 +78,7 @@ enum _ControlList
     AxisNada = 0, AxisForward, AxisLook, AxisSide, AxisTurn
 };
 
-DWORD	dwAxisFlags[JOY_MAX_AXES] =
-{
+DWORD	dwAxisFlags[JOY_MAX_AXES] = {
     JOY_RETURNX, JOY_RETURNY, JOY_RETURNZ, JOY_RETURNR, JOY_RETURNU, JOY_RETURNV
 };
 
@@ -516,14 +515,14 @@ void IN_MouseEvent(int mstate) {
 
     if (mouseactive && !dinput) {
         // perform button actions
-        for (i=0; i<mouse_buttons; i++) {
-            if ((mstate & (1<<i)) &&
-                !(mouse_oldbuttonstate & (1<<i))) {
+        for (i = 0; i < mouse_buttons; i++) {
+            if ((mstate & (1 << i)) &&
+                !(mouse_oldbuttonstate & (1 << i))) {
                 Key_Event(K_MOUSE1 + i, true);
             }
 
-            if (!(mstate & (1<<i)) &&
-                (mouse_oldbuttonstate & (1<<i))) {
+            if (!(mstate & (1 << i)) &&
+                (mouse_oldbuttonstate & (1 << i))) {
                 Key_Event(K_MOUSE1 + i, false);
             }
         }
@@ -590,29 +589,29 @@ void IN_MouseMove(UserCmd_p cmd) {
 
             case DIMOFS_BUTTON1:
                 if (od.dwData & 0x80)
-                    mstate_di |= (1<<1);
+                    mstate_di |= (1 << 1);
                 else
-                    mstate_di &= ~(1<<1);
+                    mstate_di &= ~(1 << 1);
                 break;
 
             case DIMOFS_BUTTON2:
                 if (od.dwData & 0x80)
-                    mstate_di |= (1<<2);
+                    mstate_di |= (1 << 2);
                 else
-                    mstate_di &= ~(1<<2);
+                    mstate_di &= ~(1 << 2);
                 break;
             }
         }
 
         // perform button actions
-        for (i=0; i<mouse_buttons; i++) {
-            if ((mstate_di & (1<<i)) &&
-                !(mouse_oldbuttonstate & (1<<i))) {
+        for (i = 0; i < mouse_buttons; i++) {
+            if ((mstate_di & (1 << i)) &&
+                !(mouse_oldbuttonstate & (1 << i))) {
                 Key_Event(K_MOUSE1 + i, true);
             }
 
-            if (!(mstate_di & (1<<i)) &&
-                (mouse_oldbuttonstate & (1<<i))) {
+            if (!(mstate_di & (1 << i)) &&
+                (mouse_oldbuttonstate & (1 << i))) {
                 Key_Event(K_MOUSE1 + i, false);
             }
         }
@@ -752,7 +751,7 @@ void IN_StartupJoystick() {
     }
 
     // cycle through the joystick ids for the first valid one
-    for (joy_id=0; joy_id<numdevs; joy_id++) {
+    for (joy_id = 0; joy_id < numdevs; joy_id++) {
         memset(&ji, 0, sizeof(ji));
         ji.dwSize = sizeof(ji);
         ji.dwFlags = JOY_RETURNCENTERED;
@@ -897,13 +896,13 @@ void IN_Commands() {
     // loop through the joystick buttons
     // key a joystick event or auxillary event for higher number buttons for each state change
     buttonstate = ji.dwButtons;
-    for (i=0; i < joy_numbuttons; i++) {
-        if ((buttonstate & (1<<i)) && !(joy_oldbuttonstate & (1<<i))) {
+    for (i = 0; i < joy_numbuttons; i++) {
+        if ((buttonstate & (1 << i)) && !(joy_oldbuttonstate & (1 << i))) {
             key_index = (i < 4) ? K_JOY1 : K_AUX1;
             Key_Event(key_index + i, true);
         }
 
-        if (!(buttonstate & (1<<i)) && (joy_oldbuttonstate & (1<<i))) {
+        if (!(buttonstate & (1 << i)) && (joy_oldbuttonstate & (1 << i))) {
             key_index = (i < 4) ? K_JOY1 : K_AUX1;
             Key_Event(key_index + i, false);
         }
@@ -922,12 +921,12 @@ void IN_Commands() {
             if (ji.dwPOV == JOY_POVLEFT)				povstate |= 0x08;
         }
         // determine which bits have changed and key an auxillary event for each change
-        for (i=0; i < 4; i++) {
-            if ((povstate & (1<<i)) && !(joy_oldpovstate & (1<<i))) {
+        for (i = 0; i < 4; i++) {
+            if ((povstate & (1 << i)) && !(joy_oldpovstate & (1 << i))) {
                 Key_Event(K_AUX29 + i, true);
             }
 
-            if (!(povstate & (1<<i)) && (joy_oldpovstate & (1<<i))) {
+            if (!(povstate & (1 << i)) && (joy_oldpovstate & (1 << i))) {
                 Key_Event(K_AUX29 + i, false);
             }
         }

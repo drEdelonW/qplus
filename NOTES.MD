@@ -134,12 +134,10 @@ Device     Boot Start     End Sectors Size Id Type
 ```
 
 # make Image
-    # dd if=/dev/sda of=/root/sda_head_and_sda1.img bs=512 count=$(Sectors)+1 status=progress && sync
-    # dd if=/dev/sda of=/root/sda_head_and_sda1.img bs=512 count=2099200 status=progress && sync
+    # sudo dd if=/dev/sda of=./QUAKE_SD.img bs=512 count=$(Sectors)+1 status=progress && sync
     sudo dd if=/dev/sda of=./QUAKE_SD.img bs=512 count=131073 status=progress && sync
 
 # write image to SD card
-    # sudo dd if=/root/sda_head_and_sda1.img of=/dev/sda bs=4M status=progress && sync
     sudo dd if=./QUAKE_SD.img of=/dev/sda bs=4M status=progress && sync
 
 # make partition table
@@ -148,7 +146,9 @@ Device     Boot Start     End Sectors Size Id Type
     mkfs.vfat -F 32 -s 1 -S 512 -R 4110 -n "QUAKE_SD" /dev/sda1 && sync
 
 
-# fsck.vfat -nvv /dev/sda1
+# get FAT specific geometry
+    fsck.vfat -nvv /dev/sda1
+```
 fsck.fat 4.2 (2021-01-31)
 Checking we can access the last sector of the filesystem
 Boot sector contents:
@@ -169,3 +169,4 @@ Data area starts at byte 4194304 (sector 8192)
 Checking for unused clusters.
 Checking free cluster summary.
 /dev/sda1: 5 files, 4567/261120 clusters
+```
