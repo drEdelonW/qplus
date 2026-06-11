@@ -121,31 +121,32 @@ JackHummer - map editor in Steam
 # make SD image
     fdisk -l /dev/sda
 ```
-    Disk /dev/sda: 29.13 GiB, 31281119232 bytes, 61095936 sectors
-    Disk model: MassStorageClass
-    Units: sectors of 1 * 512 = 512 bytes
-    Sector size (logical/physical): 512 bytes / 512 bytes
-    I/O size (minimum/optimal): 512 bytes / 512 bytes
-    Disklabel type: dos
-    Disk identifier: 0x54531ad4
+Disk /dev/sda: 29.13 GiB, 31281119232 bytes, 61095936 sectors
+Disk model: MassStorageClass
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x54531ad4
 
-    Device     Boot Start     End Sectors Size Id Type
-    /dev/sda1        2048 2099199 2097152   1G  c W95 FAT32 (LBA)
+Device     Boot Start     End Sectors Size Id Type
+/dev/sda1        2048 2099199 2097152   1G  c W95 FAT32 (LBA)
 ```
 
 # make Image
-    dd if=/dev/sda of=/root/sda_head_and_sda1.img bs=512 count=$(Sectors)+1 status=progress && sync
-    dd if=/dev/sda of=/root/sda_head_and_sda1.img bs=512 count=2099200 status=progress && sync
+    # dd if=/dev/sda of=/root/sda_head_and_sda1.img bs=512 count=$(Sectors)+1 status=progress && sync
+    # dd if=/dev/sda of=/root/sda_head_and_sda1.img bs=512 count=2099200 status=progress && sync
     sudo dd if=/dev/sda of=./QUAKE_SD.img bs=512 count=131073 status=progress && sync
 
 # write image to SD card
-    sudo dd if=/root/sda_head_and_sda1.img of=/dev/sda bs=4M status=progress && sync
+    # sudo dd if=/root/sda_head_and_sda1.img of=/dev/sda bs=4M status=progress && sync
     sudo dd if=./QUAKE_SD.img of=/dev/sda bs=4M status=progress && sync
 
 # make partition table
     parted -s /dev/sda mklabel msdos mkpart primary fat32 2048s 133119s
     dd if=/dev/zero of=/dev/sda1 bs=4M status=progress && sync
-    mkfs.vfat -F 32 -s 1 -S 512 -R 4110 -n "Q_SHARE" /dev/sda1 && sync
+    mkfs.vfat -F 32 -s 1 -S 512 -R 4110 -n "QUAKE_SD" /dev/sda1 && sync
+
 
 # fsck.vfat -nvv /dev/sda1
 fsck.fat 4.2 (2021-01-31)
