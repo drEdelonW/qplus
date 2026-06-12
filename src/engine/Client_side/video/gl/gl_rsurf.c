@@ -296,22 +296,20 @@ void R_DrawSequentialPoly(mSurface_p s) {
         glBegin(GL_POLYGON); {
             float_p v = p->verts[0];
             for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                glTexCoord2f(v[3], v[4]);
-                glVertex3fv(v);
+                glTexCoord2f(v[3], v[4]);   glVertex3fv(v);
             }
         } glEnd();
 
         GL_Bind(lightmap_textures + s->lightmaptexturenum);
-        glEnable(GL_BLEND);
-        glBegin(GL_POLYGON); {
-            float_p v = p->verts[0];
-            for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                glTexCoord2f(v[5], v[6]);
-                glVertex3fv(v);
-            }
-        } glEnd();
+        glEnable(GL_BLEND); {
+            glBegin(GL_POLYGON); {
+                float_p v = p->verts[0];
+                for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
+                    glTexCoord2f(v[5], v[6]);   glVertex3fv(v);
+                }
+            } glEnd();
 
-        glDisable(GL_BLEND);
+        } glDisable(GL_BLEND);
 
         return;
     }
@@ -335,16 +333,16 @@ void R_DrawSequentialPoly(mSurface_p s) {
 
         EmitSkyPolys(s);
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        GL_Bind(alphaskytexture);
-        speedscale = realtime * 16;
-        speedscale -= (int)speedscale;
-        EmitSkyPolys(s);
-        if (gl_lightmap_format == GL_LUMINANCE)
-            glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+        glEnable(GL_BLEND); {
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            GL_Bind(alphaskytexture);
+            speedscale = realtime * 16;
+            speedscale -= (int)speedscale;
+            EmitSkyPolys(s);
+            if (gl_lightmap_format == GL_LUMINANCE)
+                glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
 
-        glDisable(GL_BLEND);
+        } glDisable(GL_BLEND);
     }
 
     //
@@ -358,9 +356,9 @@ void R_DrawSequentialPoly(mSurface_p s) {
         DrawGLWaterPoly(p);
 
         GL_Bind(lightmap_textures + s->lightmaptexturenum);
-        glEnable(GL_BLEND);
-        DrawGLWaterPolyLightmap(p);
-        glDisable(GL_BLEND);
+        glEnable(GL_BLEND); {
+            DrawGLWaterPolyLightmap(p);
+        } glDisable(GL_BLEND);
     }
 }
 #else
@@ -423,8 +421,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
             glBegin(GL_POLYGON); {
                 float_p v = p->verts[0];
                 for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                    glTexCoord2f(v[3], v[4]);
-                    glVertex3fv(v);
+                    glTexCoord2f(v[3], v[4]);   glVertex3fv(v);
                 }
             } glEnd();
 
@@ -433,8 +430,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
             glBegin(GL_POLYGON); {
                 float_p v = p->verts[0];
                 for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                    glTexCoord2f(v[5], v[6]);
-                    glVertex3fv(v);
+                    glTexCoord2f(v[5], v[6]);   glVertex3fv(v);
                 }
             } glEnd();
 
@@ -589,8 +585,7 @@ void DrawGLPoly(glpoly_p p) {
     glBegin(GL_POLYGON); {
         float_p v = p->verts[0];
         for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-            glTexCoord2f(v[3], v[4]);
-            glVertex3fv(v);
+            glTexCoord2f(v[3], v[4]);   glVertex3fv(v);
         }
     } glEnd();
 }
@@ -660,8 +655,7 @@ void R_BlendLightmaps() {
                 glBegin(GL_POLYGON); {
                     float_p v = p->verts[0];
                     for (int j = 0; j < p->numverts; j++, v += VERTEXSIZE) {
-                        glTexCoord2f(v[5], v[6]);
-                        glVertex3fv(v);
+                        glTexCoord2f(v[5], v[6]);   glVertex3fv(v);
                     }
                 } glEnd();
             }
@@ -700,10 +694,8 @@ void R_RenderBrushPoly(mSurface_p fa) {
         return;
     }
 
-    if (fa->flags & SURF_UNDERWATER)
-        DrawGLWaterPoly(fa->polys);
-    else
-        DrawGLPoly(fa->polys);
+    if (fa->flags & SURF_UNDERWATER)    DrawGLWaterPoly(fa->polys);
+    else                                DrawGLPoly(fa->polys);
 
     // add the poly to the proper lightmap chain
 

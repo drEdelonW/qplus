@@ -393,18 +393,13 @@ void draw_triangle(App_p app) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glBegin(GL_TRIANGLES);
+    glBegin(GL_TRIANGLES); {
 
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex2f(-0.6f, -0.4f);
+    glColor3f(1.0f, 0.0f, 0.0f);    glVertex2f(-0.6f, -0.4f);
+    glColor3f(0.0f, 1.0f, 0.0f);    glVertex2f(0.6f, -0.4f);
+    glColor3f(0.0f, 0.0f, 1.0f);    glVertex2f(0.0f, 0.6f);
 
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex2f(0.6f, -0.4f);
-
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex2f(0.0f, 0.6f);
-
-    glEnd();
+    } glEnd();
 
     if (app->glx.doublebuffer)
         glXSwapBuffers(app->display, app->xwin.window);

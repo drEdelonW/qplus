@@ -459,31 +459,31 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
         prt->die = cl.time + 2;
 
         switch (type) {
-        case RT_ROCKET: // rocket trail
+        case RT_ROCKET: {// rocket trail
             prt->ramp = (rand() & 3);
             prt->color = ramp3[(int)prt->ramp];
             prt->type = pt_fire;
             for (int j = 0; j < VECT_DIM; j++)
                 prt->org[j] = start[j] + ((rand() % 6) - 3);
-            break;
+        } break;
 
-        case RT_GRENADE: // smoke smoke
+        case RT_GRENADE: {// smoke smoke
             prt->ramp = (rand() & 3) + 2;
             prt->color = ramp3[(int)prt->ramp];
             prt->type = pt_fire;
             for (int j = 0; j < VECT_DIM; j++)
                 prt->org[j] = start[j] + ((rand() % 6) - 3);
-            break;
+        } break;
 
-        case RT_GIB: // blood
+        case RT_GIB: {// blood
             prt->type = pt_grav;
             prt->color = 67 + (rand() & 3);
             for (int j = 0; j < VECT_DIM; j++)
                 prt->org[j] = start[j] + ((rand() % 6) - 3);
-            break;
+        } break;
 
         case RT_TRACER:
-        case RT_TRACER2: // tracer
+        case RT_TRACER2: {// tracer
             prt->die = cl.time + 0.5;
             prt->type = pt_static;
             prt->color = ((type == 3) ? 52 : 230) +
@@ -500,23 +500,23 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
                 prt->vel[0] = 30 * -vec[1];
                 prt->vel[1] = 30 * vec[0];
             }
-            break;
+        } break;
 
-        case RT_ZOMGIB: // slight blood
+        case RT_ZOMGIB: {// slight blood
             prt->type = pt_grav;
             prt->color = 67 + (rand() & 3);
             for (int j = 0; j < VECT_DIM; j++)
                 prt->org[j] = start[j] + ((rand() % 6) - 3);
             len -= 3;
-            break;
+        } break;
 
-        case RT_TRACER3: // voor trail
+        case RT_TRACER3: {// voor trail
             prt->color = 9 * 16 + 8 + (rand() & 3);
             prt->type = pt_static;
             prt->die = cl.time + 0.3;
             for (int j = 0; j < VECT_DIM; j++)
                 prt->org[j] = start[j] + ((rand() & 15) - 8);
-            break;
+        } break;
         }
 
 
@@ -536,10 +536,10 @@ void R_DrawParticles() {
     GL_Bind(particletexture);
     glEnable(GL_BLEND);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glBegin(GL_TRIANGLES);
+    glBegin(GL_TRIANGLES); {
 
-    vec3_t up;  VectorScale(vup, 1.5, up);
-    vec3_t right;   VectorScale(vright, 1.5, right);
+        vec3_t up;  VectorScale(vup, 1.5, up);
+        vec3_t right;   VectorScale(vright, 1.5, right);
 #else
     D_StartParticles();
 
@@ -556,7 +556,8 @@ void R_DrawParticles() {
 
     for (;; ) {
         Particle_p kill = _activeParticles;
-        if (kill && (kill->die < cl.time)
+        if (kill &&
+            (kill->die < cl.time)
             ) {
             _activeParticles = kill->next;
             kill->next = _freeParticles;
@@ -587,23 +588,20 @@ void R_DrawParticles() {
             (prt->org[0] - r_origin[0]) * vpn[0] +
             (prt->org[1] - r_origin[1]) * vpn[1] +
             (prt->org[2] - r_origin[2]) * vpn[2];
-        if (scale < 20) scale = 1;
-        else            scale = 1 + scale * 0.004;
+        if (scale < 20.0f)  scale = 1.0f;
+        else                scale = 1.0f + scale * 0.004f;
 # if 0
         glColor3ub(255, 0, 0);  // DEBUG: make all particle RED
 # else
         glColor3ubv((uint8_p)&d_8to24table[(int)prt->color]);
 # endif
-        glTexCoord2f(0, 0);
-        glVertex3fv(prt->org);
-        glTexCoord2f(1, 0);
-        glVertex3f(
+        glTexCoord2f(0, 0);        glVertex3fv(prt->org);
+        glTexCoord2f(1, 0);        glVertex3f(
             prt->org[0] + up[0] * scale,
             prt->org[1] + up[1] * scale,
             prt->org[2] + up[2] * scale
         );
-        glTexCoord2f(0, 1);
-        glVertex3f(
+        glTexCoord2f(0, 1);        glVertex3f(
             prt->org[0] + right[0] * scale,
             prt->org[1] + right[1] * scale,
             prt->org[2] + right[2] * scale
@@ -617,58 +615,58 @@ void R_DrawParticles() {
 
         switch (prt->type) {
         case pt_static:     break;
-        case pt_fire:
+        case pt_fire: {
             prt->ramp += time1;
             if (prt->ramp >= 6)   prt->die = -1;
             else                prt->color = ramp3[(int)prt->ramp];
             prt->vel[2] += grav;
-            break;
+        } break;
 
-        case pt_explode:
+        case pt_explode: {
             prt->ramp += time2;
-            if (prt->ramp >= 8)   prt->die = -1;
+            if (prt->ramp >= 8) prt->die = -1;
             else                prt->color = ramp1[(int)prt->ramp];
             for (int i = 0; i < VECT_DIM; i++)
                 prt->vel[i] += prt->vel[i] * dvel;
             prt->vel[2] -= grav;
-            break;
+        } break;
 
-        case pt_explode2:
+        case pt_explode2: {
             prt->ramp += time3;
             if (prt->ramp >= 8)   prt->die = -1;
             else                prt->color = ramp2[(int)prt->ramp];
             for (int i = 0; i < VECT_DIM; i++)
                 prt->vel[i] -= prt->vel[i] * frametime;
             prt->vel[2] -= grav;
-            break;
+        } break;
 
-        case pt_blob:
+        case pt_blob: {
             for (int i = 0; i < VECT_DIM; i++)
                 prt->vel[i] += prt->vel[i] * dvel;
             prt->vel[2] -= grav;
-            break;
+        } break;
 
-        case pt_blob2:
+        case pt_blob2: {
             for (int i = 0; i < 2; i++)
                 prt->vel[i] -= prt->vel[i] * dvel;
             prt->vel[2] -= grav;
-            break;
+        } break;
 
-        case pt_grav:
+        case pt_grav: {
 #ifdef QUAKE2
             prt->vel[2] -= grav * 20;
-            break;
 #endif
-        case pt_slowgrav:
+        } break;
+        case pt_slowgrav: {
             prt->vel[2] -= grav;
-            break;
+        } break;
         }
     }
 
 #ifdef GLQUAKE      // TODO: wrap this in D_EndParticles on GL_side
-    glEnd();
-    glDisable(GL_BLEND);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+} glEnd();
+glDisable(GL_BLEND);
+glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 #else
     D_EndParticles();
 #endif

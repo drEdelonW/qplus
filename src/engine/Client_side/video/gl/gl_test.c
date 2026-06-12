@@ -56,8 +56,6 @@ Plane_p HitPlane(vec3_t start, vec3_t end) {
 }
 
 void Test_Spawn(vec3_t origin) {
-    // vec3_t  normal;
-
     puff_p p = puffs;
     int i = 0;
     for (; i < MAX_PUFFS; i++, p++) {
@@ -110,39 +108,39 @@ void DrawPuff(puff_p p) {
     glColor3f(1, 0, 0);
 
 #if 0
-    glBegin(GL_LINES);
-    glVertex3fv(p->origin);
-    glVertex3f(p->origin[0] + p->length * p->reflect[0],
-        p->origin[1] + p->length * p->reflect[1],
-        p->origin[2] + p->length * p->reflect[2]);
+    glBegin(GL_LINES); {
+        glVertex3fv(p->origin);
+        glVertex3f(p->origin[0] + p->length * p->reflect[0],
+            p->origin[1] + p->length * p->reflect[1],
+            p->origin[2] + p->length * p->reflect[2]);
 
-    glVertex3fv(pts[0][0]);
-    glVertex3fv(pts[1][0]);
+        glVertex3fv(pts[0][0]);
+        glVertex3fv(pts[1][0]);
 
-    glVertex3fv(pts[0][1]);
-    glVertex3fv(pts[1][1]);
+        glVertex3fv(pts[0][1]);
+        glVertex3fv(pts[1][1]);
 
-    glVertex3fv(pts[0][2]);
-    glVertex3fv(pts[1][2]);
+        glVertex3fv(pts[0][2]);
+        glVertex3fv(pts[1][2]);
 
-    glEnd();
+    } glEnd();
 #endif
 
-    glBegin(GL_QUADS);
-    for (int i = 0; i < 3; i++) {
-        int j = (i + 1) % 3;
-        glVertex3fv(pts[0][j]);
-        glVertex3fv(pts[1][j]);
-        glVertex3fv(pts[1][i]);
-        glVertex3fv(pts[0][i]);
-    }
-    glEnd();
+    glBegin(GL_QUADS); {
+        for (int i = 0; i < 3; i++) {
+            int j = (i + 1) % 3;
+            glVertex3fv(pts[0][j]);
+            glVertex3fv(pts[1][j]);
+            glVertex3fv(pts[1][i]);
+            glVertex3fv(pts[0][i]);
+        }
+    } glEnd();
 
-    glBegin(GL_TRIANGLES);
-    glVertex3fv(pts[1][0]);
-    glVertex3fv(pts[1][1]);
-    glVertex3fv(pts[1][2]);
-    glEnd();
+    glBegin(GL_TRIANGLES); {
+        glVertex3fv(pts[1][0]);
+        glVertex3fv(pts[1][1]);
+        glVertex3fv(pts[1][2]);
+    } glEnd();
 
     p->length -= host_frametime * 2;
 }

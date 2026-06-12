@@ -137,11 +137,13 @@ void GL_SubdivideSurface(mSurface_p fa) {
     for (int i = 0; i < fa->numedges; i++) {
         int lindex = _loadModel->surfedges[fa->firstedge + i];
 
-        float_p vec;
-        if (lindex > 0)
-            vec = _loadModel->vertexes[_loadModel->edges[lindex].v[0]].position;
-        else
-            vec = _loadModel->vertexes[_loadModel->edges[-lindex].v[1]].position;
+        float_p vec =
+            _loadModel->vertexes[
+                (lindex > 0) ?
+                    _loadModel->edges[lindex].v[0] :
+                    _loadModel->edges[-lindex].v[1]
+            ].position;
+
         VectorCopy(vec, verts[numverts]);
         numverts++;
     }
@@ -168,22 +170,21 @@ Does a water warp on the pre-fragmented glpoly_t chain
 */
 void EmitWaterPolys(mSurface_p fa) {
     for (glpoly_p p = fa->polys; p; p = p->next) {
-        glBegin(GL_POLYGON);
-        float_p v = p->verts[0];
-        for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-            float os = v[3];
-            float ot = v[4];
+        glBegin(GL_POLYGON); {
+            float_p v = p->verts[0];
+            for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
+                float os = v[3];
+                float ot = v[4];
 
-            float s = os + turbsin[(int)((ot * 0.125 + realtime) * TURBSCALE) & 255];
-            s *= (1.0 / 64);
+                float s = os + turbsin[(int)((ot * 0.125 + realtime) * TURBSCALE) & 255];
+                s *= (1.0 / 64);
 
-            float t = ot + turbsin[(int)((os * 0.125 + realtime) * TURBSCALE) & 255];
-            t *= (1.0 / 64);
+                float t = ot + turbsin[(int)((os * 0.125 + realtime) * TURBSCALE) & 255];
+                t *= (1.0 / 64);
 
-            glTexCoord2f(s, t);
-            glVertex3fv(v);
-        }
-        glEnd();
+                glTexCoord2f(s, t);     glVertex3fv(v);
+            }
+        } glEnd();
     }
 }
 
@@ -197,29 +198,28 @@ EmitSkyPolys
 */
 void EmitSkyPolys(mSurface_p fa) {
     for (glpoly_p p = fa->polys; p; p = p->next) {
-        glBegin(GL_POLYGON);
-        float_p v = p->verts[0];
-        for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-            vec3_t dir; VectorSubtract(v, r_origin, dir);
-            dir[2] *= 3; // flatten the sphere
+        glBegin(GL_POLYGON); {
+            float_p v = p->verts[0];
+            for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
+                vec3_t dir; VectorSubtract(v, r_origin, dir);
+                dir[2] *= 3; // flatten the sphere
 
-            float length =
-                dir[0] * dir[0] +
-                dir[1] * dir[1] +
-                dir[2] * dir[2];
-            length = sqrt(length);
-            length = 6 * 63 / length;
+                float length =
+                    dir[0] * dir[0] +
+                    dir[1] * dir[1] +
+                    dir[2] * dir[2];
+                length = sqrt(length);
+                length = 6 * 63 / length;
 
-            dir[0] *= length;
-            dir[1] *= length;
+                dir[0] *= length;
+                dir[1] *= length;
 
-            float s = (speedscale + dir[0]) * (1.0 / 128);
-            float t = (speedscale + dir[1]) * (1.0 / 128);
+                float s = (speedscale + dir[0]) * (1.0 / 128);
+                float t = (speedscale + dir[1]) * (1.0 / 128);
 
-            glTexCoord2f(s, t);
-            glVertex3fv(v);
-        }
-        glEnd();
+                glTexCoord2f(s, t);     glVertex3fv(v);
+            }
+        } glEnd();
     }
 }
 
@@ -241,14 +241,14 @@ void EmitBothSkyLayers(mSurface_p fa) {
 
     EmitSkyPolys(fa);
 
-    glEnable(GL_BLEND);
-    GL_Bind(alphaskytexture);
-    speedscale = realtime * 16;
-    speedscale -= (int)speedscale & ~127;
+    glEnable(GL_BLEND); {
+        GL_Bind(alphaskytexture);
+        speedscale = realtime * 16;
+        speedscale -= (int)speedscale & ~127;
 
-    EmitSkyPolys(fa);
+        EmitSkyPolys(fa);
 
-    glDisable(GL_BLEND);
+    } glDisable(GL_BLEND);
 }
 
 #ifndef QUAKE2
@@ -268,15 +268,15 @@ void R_DrawSkyChain(mSurface_p s) {
     for (mSurface_p fa = s; fa; fa = fa->texturechain)
         EmitSkyPolys(fa);
 
-    glEnable(GL_BLEND);
-    GL_Bind(alphaskytexture);
-    speedscale = realtime * 16;
-    speedscale -= (int)speedscale & ~127;
+    glEnable(GL_BLEND); {
+        GL_Bind(alphaskytexture);
+        speedscale = realtime * 16;
+        speedscale -= (int)speedscale & ~127;
 
-    for (mSurface_p fa = s; fa; fa = fa->texturechain)
-        EmitSkyPolys(fa);
+        for (mSurface_p fa = s; fa; fa = fa->texturechain)
+            EmitSkyPolys(fa);
 
-    glDisable(GL_BLEND);
+    } glDisable(GL_BLEND);
 }
 
 #endif
@@ -388,11 +388,18 @@ TARGA LOADING
 */
 
 typedef struct _TargaHeader {
-    uint8_t  id_length, colormap_type, image_type;
-    uint16_p colormap_index, colormap_length;
+    uint8_t  id_length;
+    uint8_t colormap_type;
+    uint8_t image_type;
+    uint16_p colormap_index;
+    uint16_p colormap_length;
     uint8_t colormap_size;
-    uint16_p x_origin, y_origin, width, height;
-    uint8_t pixel_size, attributes;
+    uint16_p x_origin;
+    uint16_p y_origin;
+    uint16_p width;
+    uint16_p height;
+    uint8_t pixel_size;
+    uint8_t attributes;
 } TargaHeader;
 
 
@@ -529,7 +536,7 @@ void LoadTGA(FILE* fin) {
                 else {                            // non run-length packet
                     for (j = 0;j < packetSize;j++) {
                         switch (targa_header.pixel_size) {
-                        case 24:
+                        case 24: {
                             blue = getc(fin);
                             green = getc(fin);
                             red = getc(fin);
@@ -537,8 +544,8 @@ void LoadTGA(FILE* fin) {
                             *pixbuf++ = green;
                             *pixbuf++ = blue;
                             *pixbuf++ = 255;
-                            break;
-                        case 32:
+                        } break;
+                        case 32: {
                             blue = getc(fin);
                             green = getc(fin);
                             red = getc(fin);
@@ -547,13 +554,12 @@ void LoadTGA(FILE* fin) {
                             *pixbuf++ = green;
                             *pixbuf++ = blue;
                             *pixbuf++ = alphabyte;
-                            break;
+                        } break;
                         }
                         column++;
                         if (column == columns) { // pixel packet run spans across rows
                             column = 0;
-                            if (row > 0)
-                                row--;
+                            if (row > 0)    row--;
                             else
                                 goto breakOut;
                             pixbuf = targa_rgba + row * columns * 4;
@@ -664,12 +670,12 @@ float skymins[2][6], skymaxs[2][6];
 void DrawSkyPolygon(int nump, vec3_t vecs) {
     c_sky++;
 #if 0
-    glBegin(GL_POLYGON);
-    for (int i = 0; i < nump; i++, vecs += 3) {
-        VectorAdd(vecs, r_origin, v);
-        glVertex3fv(v);
-    }
-    glEnd();
+    glBegin(GL_POLYGON); {
+        for (int i = 0; i < nump; i++, vecs += 3) {
+            VectorAdd(vecs, r_origin, v);
+            glVertex3fv(v);
+        }
+    } glEnd();
     return;
 #endif
     // decide which face it maps to
@@ -864,8 +870,7 @@ void MakeSkyVec(float s, float t, int axis) {
     else if (t > 511.0f / 512)  t = 511.0f / 512;
 
     t = 1.0f - t;
-    glTexCoord2f(s, t);
-    glVertex3fv(v);
+    glTexCoord2f(s, t);     glVertex3fv(v);
 }
 
 /*
@@ -894,12 +899,12 @@ void R_DrawSkyBox() {
         skymaxs[0][i] = 1;
         skymaxs[1][i] = 1;
 #endif
-        glBegin(GL_QUADS);
-        MakeSkyVec(skymins[0][i], skymins[1][i], i);
-        MakeSkyVec(skymins[0][i], skymaxs[1][i], i);
-        MakeSkyVec(skymaxs[0][i], skymaxs[1][i], i);
-        MakeSkyVec(skymaxs[0][i], skymins[1][i], i);
-        glEnd();
+        glBegin(GL_QUADS); {
+            MakeSkyVec(skymins[0][i], skymins[1][i], i);
+            MakeSkyVec(skymins[0][i], skymaxs[1][i], i);
+            MakeSkyVec(skymaxs[0][i], skymaxs[1][i], i);
+            MakeSkyVec(skymaxs[0][i], skymins[1][i], i);
+        } glEnd();
     }
 #if 0
     glDisable(GL_BLEND);

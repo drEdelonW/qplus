@@ -36,13 +36,13 @@ ALIAS MODEL DISPLAY LIST GENERATION
 #include <string.h>
 #include "z_hunk.h"
 
-// bool
+
 typedef enum {
     USED_FREE = 0u,
     USED_INUSE,
     USED_TEMP
-} gl_used_t;
-gl_used_t used[8192]; // 0 is free, 1 is used, 2 is temp_used
+} gl_used_t; // 0 is free, 1 is use, 2 is temp_used
+gl_used_t used[8192];
 
 // the command list holds counts and s/t values that are valid for every frame
 int  commands[8192];
@@ -126,7 +126,7 @@ int FanLength(int starttri, int startv) {
 
     mTriangle_p last = &triangles[starttri];
 
-    stripverts[0] = last->vertindex[(startv) % 3];
+    stripverts[0] = last->vertindex[(startv + 0) % 3];
     stripverts[1] = last->vertindex[(startv + 1) % 3];
     stripverts[2] = last->vertindex[(startv + 2) % 3];
 
@@ -194,38 +194,44 @@ void BuildTris() {
     memset(used, 0, sizeof(used));
     for (int i = 0; i < pheader->numtris; i++) {
         // pick an unused triangle and start the trifan
-        if (used[i])
-            continue;
+        if (used[i])    continue;
 
-        int bestlen = 0;
-        int len, besttype;
-        int  bestverts[1024];
-        int  besttris[1024];
+        int bestLen = 0;
+        int besttype;
+        int bestverts[1024];
+        int besttris[1024];
         for (int type = 0; type < 2; type++)
             // type = 1;
         {
             for (int startv = 0; startv < 3; startv++) {
+#if 1
+                int len = (type == 1) ?
+                    StripLength(i, startv) :
+                    FanLength(i, startv);
+#else
+                int len;
                 if (type == 1)  len = StripLength(i, startv);
                 else            len = FanLength(i, startv);
-                if (len > bestlen) {
+#endif
+                if (len > bestLen) {
                     besttype = type;
-                    bestlen = len;
-                    for (int j = 0; j < bestlen + 2; j++)
+                    bestLen = len;
+                    for (int j = 0; j < bestLen + 2; j++)
                         bestverts[j] = stripverts[j];
-                    for (int j = 0; j < bestlen; j++)
+                    for (int j = 0; j < bestLen; j++)
                         besttris[j] = striptris[j];
                 }
             }
         }
 
         // mark the tris on the best strip as used
-        for (int j = 0; j < bestlen; j++)
+        for (int j = 0; j < bestLen; j++)
             used[besttris[j]] = USED_INUSE;
 
-        if (besttype == 1)  commands[numcommands++] = (bestlen + 2);
-        else                commands[numcommands++] = -(bestlen + 2);
+        if (besttype == 1)  commands[numcommands++] = (bestLen + 2);
+        else                commands[numcommands++] = -(bestLen + 2);
 
-        for (int j = 0; j < bestlen + 2; j++) {
+        for (int j = 0; j < bestLen + 2; j++) {
             // emit a vertex into the reorder buffer
             int k = bestverts[j];
             vertexorder[numorder++] = k;

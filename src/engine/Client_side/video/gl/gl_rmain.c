@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "view.h"
 #include "sound.h"
 #include "host.h"
+#include "q_tools.h"
 #include "LeafModel.h"
 
 r_Entity_t r_worldentity; // was Entity_t
@@ -419,7 +420,9 @@ void R_DrawAliasModel(r_Entity_p e) {
     ambientlight = shadelight = R_LightPoint(currententity->origin);
 
     // allways give the gun some light
-    if (e == &cl.viewent && ambientlight < 24)
+    if ((e == &cl.viewent) &&
+        (ambientlight < 24)
+        )
         ambientlight = shadelight = 24;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
@@ -441,8 +444,8 @@ void R_DrawAliasModel(r_Entity_p e) {
     }
 
     // clamp lighting so it doesn't overbright as much
-    if (ambientlight > 128)
-        ambientlight = 128;
+    CLAMP_MORE(ambientlight, 128);
+
     if (ambientlight + shadelight > 192)
         shadelight = 192 - ambientlight;
 
@@ -973,8 +976,8 @@ r_refdef must be set before the first call
 void R_RenderView() {
     if (r_norefresh.value)      return;
 
-    if (!r_worldentity.model ||
-        !cl.worldmodel
+    if (!(r_worldentity.model) ||
+        !(cl.worldmodel)
         )                       Host_SysError("R_RenderView: NULL worldmodel");
 
     LegacyTimeStamp_t time1;
