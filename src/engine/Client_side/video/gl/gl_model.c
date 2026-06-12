@@ -37,6 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Sprite.h"
 #include "console.h"
 #include "z_hunk.h"
+#include "LeafModel.h"
 #include "AliasModel.h"
 #include "BrushModel.h"
 #include "SpriteModel.h"
@@ -46,7 +47,7 @@ char Mod_loadName[32]; // for hunk tags
 
 Model_p Mod_LoadModel(Model_p mod, bool crash);
 
-uint8_t _modNoVis[MAX_MAP_LEAFS / 8];
+
 
 #define MAX_MOD_KNOWN 512
 static uint16_t  _mod_NumKnown = 0;
@@ -61,7 +62,7 @@ Mod_Init
 */
 void Mod_Init() {
     Cvar_RegisterVariable(&gl_subdivide_size);      // GL diff
-    memset(_modNoVis, 0xff, sizeof(_modNoVis));
+    Mod_LeafClear();
 }
 
 /*
@@ -81,47 +82,6 @@ TypeLess_ptr Mod_Extradata(Model_p mod) { // same
 
     return mod->cache.data;
 }
-
-/*
-===================
-Mod_DecompressVis
-===================
-*/
-uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
-    static uint8_t _decompressed[MAX_MAP_LEAFS / 8];
-
-    int row = (model->numleafs + 7) >> 3;
-    uint8_p out = _decompressed;
-
-#if 0
-    memcpy(out, in, row);
-#else
-    if (!in) { // no vis info, so make all visible
-        while (row) {
-            *out++ = 0xff;
-            row--;
-        }
-        return _decompressed;
-    }
-
-    do {
-        if (*in) {
-            *out++ = *in++;
-            continue;
-        }
-
-        int c = in[1];
-        in += 2;
-        while (c) {
-            *out++ = 0;
-            c--;
-        }
-    } while (out - _decompressed < row);
-#endif
-
-    return _decompressed;
-}
-
 
 
 /*
@@ -190,6 +150,7 @@ Loads a model into the cache
 ==================
 */
 Model_p Mod_LoadModel(Model_p mod, bool crash) {
+#if 0
     if (!mod->needload) {
         if ((mod->type == mod_alias) &&
             (Cache_Check(&mod->cache))
@@ -199,11 +160,21 @@ Model_p Mod_LoadModel(Model_p mod, bool crash) {
         else
             return mod;  // not cached at all
     }
-
+#else
+    if (
+        (mod->type == mod_alias) &&
+        (Cache_Check(&mod->cache))
+        ) {
+        mod->needload = NL_PRESENT;
+        return mod;
+    }
+    else {
+        if (mod->needload == NL_PRESENT)        return mod;
+    }
+#endif
     //
     // because the world is so huge, load it one piece at a time
     //
-    if (!crash) {}
 
     //
     // load the file

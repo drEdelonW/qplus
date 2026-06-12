@@ -7,6 +7,8 @@ typedef struct dTriangle_s {
     int32_t vertindex[3];
 } dTriangle_t;
 typedef dTriangle_t* dTriangle_p;
+STATIC_ASSERT_SIZE(dTriangle_t, 4 + 3*4); // 16
+
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct mTriangle_s {

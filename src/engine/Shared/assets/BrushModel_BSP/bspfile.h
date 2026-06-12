@@ -67,7 +67,7 @@ typedef struct {
     int32_t dataofs[4]; // [nummiptex]
 } dMipTexLump_t;
 typedef dMipTexLump_t* dMipTexLump_p;
-
+STATIC_ASSERT_SIZE(dMipTexLump_t, 4 + 4*4); // 20
 
 typedef struct MipTex_s {
     char        name[16];
@@ -109,6 +109,8 @@ typedef struct {
     int32_t lightofs;   // start of [numstyles*surfsize] samples
 } dFace_t;
 typedef dFace_t* dFace_p;
+STATIC_ASSERT_SIZE(dFace_t, 2*2 + 4 + 2*2 + 1*4 + 4); // 20
+
 
 
 

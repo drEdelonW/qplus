@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cmd.h"
 #include "gamedefs.h"
 #include "console.h"
+#include "q_tools.h"
 #include "z_hunk.h"
 
 //define PASSAGES
@@ -515,9 +516,7 @@ R_DrawEntitiesOnList
 */
 void R_DrawEntitiesOnList() {
     // FIXME: remove and do real lighting
-
-    if (!r_drawentities.value)
-        return;
+    if (!r_drawentities.value)      return;
 
     for (int i = 0; i < cl_numvisedicts; i++) {
         currententity = cl_visedicts[i];
@@ -526,18 +525,17 @@ void R_DrawEntitiesOnList() {
             continue; // don't draw the player
 
         switch (currententity->model->type) {
-        case mod_sprite:
+        case mod_sprite: {
             VectorCopy(currententity->origin, r_entorigin);
             VectorSubtract(r_origin, r_entorigin, modelorg);
             R_DrawSprite();
-            break;
+        } break;
 
-        case mod_alias:
+        case mod_alias: {
             VectorCopy(currententity->origin, r_entorigin);
             VectorSubtract(r_origin, r_entorigin, modelorg);
 
-            // see if the bounding box lets us trivially reject, also sets
-            // trivial accept status
+            // see if the bounding box lets us trivially reject, also sets trivial accept status
             if (R_AliasCheckBBox()) {
                 int j = R_LightPoint(currententity->origin);
 
@@ -545,7 +543,7 @@ void R_DrawEntitiesOnList() {
                 lighting.ambientlight = j;
                 lighting.shadelight = j;
 
-                vec3_t  lightvec = { -1, 0, 0 };
+                vec3_t  lightvec = { -1.0f , 0.0f, 0.0f };
                 lighting.plightvec = lightvec;
 
                 for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
@@ -553,23 +551,30 @@ void R_DrawEntitiesOnList() {
                         vec3_t dist; VectorSubtract(currententity->origin, cl_dlights[lnum].origin, dist);
                         float add = cl_dlights[lnum].radius - Length(dist);
 
-                        if (add > 0)
+                        if (add > 0.0f)
                             lighting.ambientlight += add;
                     }
                 }
 
                 // clamp lighting so it doesn't overbright as much
-                if (lighting.ambientlight > 128)
-                    lighting.ambientlight = 128;
-                if ((lighting.ambientlight + lighting.shadelight) > 192)
+                CLAMP_MORE(lighting.ambientlight, 128);
+
+                if ((lighting.ambientlight + lighting.shadelight) > 192) // loop?
                     lighting.shadelight = 192 - lighting.ambientlight;
 
                 R_AliasDrawModel(&lighting);
             }
 
-            break;
+        } break;
 
-        default:    break;
+        case mod_brush: {/* skipped in R_DrawEntitiesOnList*/ } break;
+
+        default:
+            Host_Error(
+                "model->type [0x%X] UNKNOWN\n",
+                currententity->model->type
+            );
+            break;
         }
     }
 }
@@ -582,9 +587,13 @@ R_DrawViewModel
 void R_DrawViewModel() {
     // FIXME: remove and do real lighting
 
-    if ((!r_drawviewmodel.value || r_fov_greater_than_90) ||
+    if (
+        ((!r_drawviewmodel.value) ||
+            (r_fov_greater_than_90)
+            ) ||
         (cl.items & IT_INVISIBILITY) ||
-        (cl.stats[STAT_HEALTH] <= 0))
+        (cl.stats[STAT_HEALTH] <= 0)
+        )
         return;
 
     currententity = &cl.viewent;
@@ -599,8 +608,8 @@ void R_DrawViewModel() {
 
     int j = R_LightPoint(currententity->origin);
 
-    if (j < 24)
-        j = 24;  // allways give some light on gun
+    CLAMP_LESS(j, 24);  // allways give some light on gun
+
     r_viewlighting.ambientlight = j;
     r_viewlighting.shadelight = j;
 
@@ -618,13 +627,12 @@ void R_DrawViewModel() {
             r_viewlighting.ambientlight += add;
     }
 
-    // clamp lighting so it doesn't overbright as much
-    if (r_viewlighting.ambientlight > 128)
-        r_viewlighting.ambientlight = 128;
-    if ((r_viewlighting.ambientlight + r_viewlighting.shadelight) > 192)
-        r_viewlighting.shadelight = 192 - r_viewlighting.ambientlight;
+    CLAMP_LESS(r_viewlighting.ambientlight, 128);    // clamp lighting so it doesn't overbright as much
 
-    vec3_t lightvec = { -1, 0, 0 };
+        if ((r_viewlighting.ambientlight + r_viewlighting.shadelight) > 192)
+            r_viewlighting.shadelight = 192 - r_viewlighting.ambientlight;
+
+    vec3_t lightvec = { -1.0f, 0.0f, 0.0f };
     r_viewlighting.plightvec = lightvec;
 
 #ifdef QUAKE2
@@ -645,7 +653,8 @@ int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
 
     if (currententity->angles[0] ||
         currententity->angles[1] ||
-        currententity->angles[2]) {
+        currententity->angles[2]
+        ) {
         for (int i = 0; i < 4; i++) {
             double d = DotProduct(currententity->origin, view_clipplanes[i].normal);
             d -= view_clipplanes[i].dist;
@@ -660,8 +669,7 @@ int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
     else {
         for (int i = 0; i < 4; i++) {
             // generate accept and reject points
-            // FIXME: do with fast look-ups or integer tests based on the sign bit
-            // of the floating point values
+            // FIXME: do with fast look-ups or integer tests based on the sign bit of the floating point values
 
             int* pindex = pfrustum_indexes[i];
             {
@@ -715,8 +723,7 @@ void R_DrawBEntitiesOnList() {
         case mod_brush: {
             Model_p clmodel = currententity->model;
 
-            // see if the bounding box lets us trivially reject, also sets
-            // trivial accept status
+            // see if the bounding box lets us trivially reject, also sets trivial accept status
             float  minmaxs[6];
             for (int j = 0; j < VECT_DIM; j++) {
                 minmaxs[j] = currententity->origin[j] + clmodel->mins[j];
@@ -736,19 +743,22 @@ void R_DrawBEntitiesOnList() {
                 // FIXME: stop transforming twice
                 R_RotateBmodel();
 
-                // calculate dynamic lighting for bmodel if it's not an
-                // instanced model
+                // calculate dynamic lighting for bmodel if it's not an instanced model
                 if ((r_dlightmap.value) &&
                     (clmodel->firstModelSurface != 0)
                     ) {
                     for (int k = 0; k < MAX_DLIGHTS; k++) {
                         if ((cl_dlights[k].die < cl.time) ||
-                            (!cl_dlights[k].radius)) {
+                            (!cl_dlights[k].radius)
+                            ) {
                             continue;
                         }
 
-                        R_MarkLights(&cl_dlights[k], 1 << k,
-                            clmodel->nodes + clmodel->hulls[0].firstclipnode);
+                        R_MarkLights(
+                            &cl_dlights[k],
+                            1 << k,
+                            clmodel->nodes + clmodel->hulls[0].firstclipnode
+                        );
                     }
                 }
 
@@ -777,9 +787,7 @@ void R_DrawBEntitiesOnList() {
                             R_DrawSolidClippedSubmodelPolygons(clmodel);
                         }
                         else {
-                            // falls entirely in one leaf, so we just put all the
-                            // edges in the edge list and let 1/z sorting handle
-                            // drawing order
+                            // falls entirely in one leaf, so we just put all the edges in the edge list and let 1/z sorting handle drawing order
                             R_DrawSubmodelPolygons(clmodel, clipflags);
                         }
 
@@ -816,28 +824,28 @@ R_EdgeDrawing
 Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 1];
 Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 1];
 #else
-#include "mem_placement.h"
+#   include "mem_placement.h"
 // TODO: check it and clean --> /* запас +2: выравнивание + место для surfaces-1 */
 Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 2] PLACE_TO_SDRAM;
 Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2] PLACE_TO_SDRAM;
 #endif
-void R_EdgeDrawing() {
-#  define ALIGN_PTR(p, a) ((TypeLess_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
-    if (auxedges) { r_edges = auxedges; }
-    else {
-        r_edges = (Edge_p)
-            // (((uintptr_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
-            ALIGN_PTR(&ledges[0], CACHE_SIZE);
 
-    }
+#define ALIGN_PTR(p, a) \
+    ((TypeLess_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
+
+void R_EdgeDrawing() {
+    r_edges = (auxedges) ?
+        auxedges :
+        (Edge_p)ALIGN_PTR(&ledges[0], CACHE_SIZE);
+    // (((uintptr_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+
 
 #if 0
     if (r_surfsonstack) {
         surfaces = (Surf_p)
             (((uintptr_t)&lsurfs[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
         surf_max = &surfaces[r_cnumsurfs];
-        // surface 0 doesn't really exist; it's just a dummy because index 0
-        // is used to indicate no edge attached to surface
+        // surface 0 doesn't really exist; it's just a dummy because index 0 is used to indicate no edge attached to surface
         surfaces--;
         R_SurfacePatch();
     }
@@ -865,8 +873,7 @@ void R_EdgeDrawing() {
     if (r_drawculledpolys)
         R_ScanEdges();
 
-    // only the world can be drawn back to front with no z reads or compares, just
-    // z writes, so have the driver turn z compares on now
+    // only the world can be drawn back to front with no z reads or compares, just z writes, so have the driver turn z compares on now
     D_TurnZOn();
 
     if (r_dspeeds.value) {
@@ -889,7 +896,7 @@ void R_EdgeDrawing() {
 
     if (!(r_drawpolys | r_drawculledpolys))
         R_ScanEdges();
-}
+    }
 
 
 /*

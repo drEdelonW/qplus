@@ -8,6 +8,7 @@ typedef struct {
     uint16_t    v[2];  // Vertex numbers
 } dEdge_t;
 typedef dEdge_t* dEdge_p;
+STATIC_ASSERT_SIZE(dEdge_t, 2*2); // 4
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct {

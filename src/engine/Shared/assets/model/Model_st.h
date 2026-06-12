@@ -37,7 +37,7 @@ typedef enum {
 } NeedLoad_t;
 
 typedef enum {
-    mod_brush,  //  .BSP
+    mod_brush,  //  .bsp
     mod_sprite, //  .spr
     mod_alias   //  .mdl
 } ModType_t;
@@ -77,7 +77,5 @@ typedef struct {
     CacheUser_t cache;  // only access through Mod_Extradata
 } Model_t;
 typedef Model_t* Model_p;
-
-extern uint8_t _modNoVis[];
 
 // must match definition in spritegn.h

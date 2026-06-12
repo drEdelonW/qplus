@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "endian_tools.h"
 #include "z_hunk.h"
+#include "LeafModel.h"
 #include "AliasModel.h"
 #include "BrushModel.h"
 #include "SpriteModel.h"
@@ -41,7 +42,6 @@ char Mod_loadName[32]; // for hunk tags
 
 Model_p Mod_LoadModel(Model_p mod, bool crash);
 
-uint8_t _modNoVis[MAX_MAP_LEAFS / 8];
 
 #define MAX_MOD_KNOWN 256
 static uint16_t _mod_NumKnown = 0;
@@ -55,7 +55,7 @@ Mod_Init
 ===============
 */
 void Mod_Init() {
-    memset(_modNoVis, 0xFF, sizeof(_modNoVis));
+    Mod_LeafClear();
 }
 
 /*
@@ -74,43 +74,6 @@ TypeLess_ptr Mod_Extradata(Model_p mod) {
     if (!mod->cache.data)   Host_SysError("Mod_Extradata: caching failed");
 
     return mod->cache.data;
-}
-
-
-/*
-===================
-Mod_DecompressVis
-===================
-*/
-uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
-    static uint8_t _decompressed[MAX_MAP_LEAFS / 8];
-
-    int row = (model->numleafs + 7) >> 3;
-    uint8_p out = _decompressed;
-
-    if (!in) { // no vis info, so make all visible
-        while (row) {
-            *out++ = 0xff;
-            row--;
-        }
-        return _decompressed;
-    }
-
-    do {
-        if (*in) {
-            *out++ = *in++;
-            continue;
-        }
-
-        int c = in[1];
-        in += 2;
-        while (c) {
-            *out++ = 0;
-            c--;
-        }
-    } while (out - _decompressed < row);
-
-    return _decompressed;
 }
 
 

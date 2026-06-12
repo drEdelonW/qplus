@@ -33,3 +33,4 @@ typedef struct {
     uint16_t    numfaces; // counting both sides
 } dNode_t;
 typedef dNode_t* dNode_p;
+STATIC_ASSERT_SIZE(dNode_t, 4 + 2*2 + 2*2*3 + 2*2); // 24

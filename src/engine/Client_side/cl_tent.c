@@ -124,7 +124,7 @@ void CL_ParseBeam(Model_p m) {
         if (b->entity == ent) {
             b->entity = ent;
             b->model = m;
-            b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2);
+            b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2f);
             VectorCopy(start, b->start);
             VectorCopy(end, b->end);
             return;
@@ -136,7 +136,7 @@ void CL_ParseBeam(Model_p m) {
         if (!b->model || (b->endtime < cl.time)) {
             b->entity = ent;
             b->model = m;
-            b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2);
+            b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2f);
             VectorCopy(start, b->start);
             VectorCopy(end, b->end);
             return;
@@ -228,7 +228,7 @@ void CL_ParseTEnt() {
         dLight_p dl = CL_AllocDlight(0);
         VectorCopy(pos, dl->origin);
         dl->radius = 350;
-        dl->die = (LegacyTimeDelta_t)(cl.time + 0.5);
+        dl->die = (LegacyTimeDelta_t)(cl.time + 0.5f);
         dl->decay = 300;
         S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
     } break;
@@ -281,7 +281,7 @@ void CL_ParseTEnt() {
         dLight_p dl = CL_AllocDlight(0);
         VectorCopy(pos, dl->origin);
         dl->radius = 350;
-        dl->die = (LegacyTimeDelta_t)(cl.time + 0.5);
+        dl->die = (LegacyTimeDelta_t)(cl.time + 0.5f);
         dl->decay = 300;
         S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
     } break;
@@ -314,7 +314,7 @@ void CL_ParseTEnt() {
         dLight_p dl = CL_AllocDlight(-1);
         VectorCopy(endpos, dl->origin);
         dl->radius = 350;
-        dl->die = cl.time + 0.5;
+        dl->die = (LegacyTimeDelta_t)cl.time + 0.5f;
         dl->decay = 300;
     } break;
 #endif
@@ -331,7 +331,8 @@ CL_NewTempEntity
 */
 r_Entity_p CL_NewTempEntity() {
     if ((cl_numvisedicts == MAX_VISEDICTS) ||
-        (num_temp_entities == MAX_TEMP_ENTITIES))
+        (num_temp_entities == MAX_TEMP_ENTITIES)
+    )
         return NULL;
 
     r_Entity_p ent = &cl_temp_entities[num_temp_entities];
