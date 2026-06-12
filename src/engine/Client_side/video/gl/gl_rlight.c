@@ -78,15 +78,16 @@ void R_RenderDlight(dLight_p light) {
 
     glBegin(GL_TRIANGLE_FAN); {
         glColor3f(0.2, 0.1, 0.0);
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < VECT_DIM; i++)
             v[i] = light->origin[i] - vpn[i] * rad;
 
         glVertex3fv(v);
         glColor3f(0, 0, 0);
         for (int i = 16; i >= 0; i--) {
             float a = i / 16.0 * M_PI * 2;
-            for (int j = 0; j < 3; j++)
-                v[j] = light->origin[j] +
+            for (int j = 0; j < VECT_DIM; j++)
+                v[j] =
+                light->origin[j] +
                 vright[j] * cos(a) * rad +
                 vup[j] * sin(a) * rad;
             glVertex3fv(v);
@@ -100,11 +101,9 @@ R_RenderDlights
 =============
 */
 void R_RenderDlights() {
-    if (!gl_flashblend.value)
-        return;
+    if (!gl_flashblend.value)   return;
 
-    r_dlightframecount = r_framecount + 1;    // because the count hasn't
-    //  advanced yet for this frame
+    r_dlightframecount = r_framecount + 1;    // because the count hasn't advanced yet for this frame
     glDepthMask(0);
     glDisable(GL_TEXTURE_2D);
     glShadeModel(GL_SMOOTH);
@@ -113,7 +112,9 @@ void R_RenderDlights() {
 
     dLight_p l = cl_dlights;
     for (int i = 0; i < MAX_DLIGHTS; i++, l++) {
-        if (l->die < cl.time || !l->radius)
+        if ((l->die < cl.time) ||
+            !(l->radius)
+            )
             continue;
         R_RenderDlight(l);
     }

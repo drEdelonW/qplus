@@ -157,6 +157,7 @@ Model_p Mod_FindName(cString name) {
     if (i == _mod_NumKnown) {
         if (_mod_NumKnown == MAX_MOD_KNOWN)
             Host_SysError("_mod_NumKnown == MAX_MOD_KNOWN");
+
         strcpy(mod->name, name);
         mod->needload = true;
         _mod_NumKnown++;
@@ -228,10 +229,17 @@ Model_p Mod_LoadModel(Model_p mod, bool crash) {
     // call the apropriate loader
     mod->needload = false;
 
+
     switch (LittleLong(*(uint32_p)buf)) {
     case IDPOLYHEADER:      Mod_LoadAliasModel(mod, buf);   break;
     case IDSPRITEHEADER:    Mod_LoadSpriteModel(mod, buf);  break;
-    default:                Mod_LoadBrushModel(mod, buf);   break;
+    case IDBRUSHHEADER:     Mod_LoadBrushModel(mod, buf);   break;
+    default: {
+        Host_Error(
+            "Mod_LoadModel UNKNOWN header [0x%.8lX] \n",
+            LittleLong(*(uint32_p)buf)
+        );
+    } break;
     }
 
     return mod;

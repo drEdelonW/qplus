@@ -2,23 +2,23 @@
 #include "Lump.h"
 
 typedef enum {      // BSP Lumps
-    LUMP_ENTITIES     = 0u,     // Mod_LoadEntities
-    LUMP_PLANES       = 1u,     // Mod_LoadPlanes
-    LUMP_TEXTURES     = 2u,     // Mod_LoadTextures
-    LUMP_VERTEXES     = 3u,     // Mod_LoadVertexes
-    LUMP_VISIBILITY   = 4u,     // Mod_LoadVisibility
-    LUMP_NODES        = 5u,     // Mod_LoadNodes
-    LUMP_TEXINFO      = 6u,     // Mod_LoadTexinfo
-    LUMP_FACES        = 7u,     // Mod_LoadFaces
-    LUMP_LIGHTING     = 8u,     // Mod_LoadLighting
-    LUMP_CLIPNODES    = 9u,     // Mod_LoadClipnodes
-    LUMP_LEAFS        = 10u,    // Mod_LoadLeafs
+    LUMP_ENTITIES = 0u,     // Mod_LoadEntities
+    LUMP_PLANES = 1u,     // Mod_LoadPlanes
+    LUMP_TEXTURES = 2u,     // Mod_LoadTextures
+    LUMP_VERTEXES = 3u,     // Mod_LoadVertexes
+    LUMP_VISIBILITY = 4u,     // Mod_LoadVisibility
+    LUMP_NODES = 5u,     // Mod_LoadNodes
+    LUMP_TEXINFO = 6u,     // Mod_LoadTexinfo
+    LUMP_FACES = 7u,     // Mod_LoadFaces
+    LUMP_LIGHTING = 8u,     // Mod_LoadLighting
+    LUMP_CLIPNODES = 9u,     // Mod_LoadClipnodes
+    LUMP_LEAFS = 10u,    // Mod_LoadLeafs
     LUMP_MARKSURFACES = 11u,    // Mod_LoadMarksurfaces
-    LUMP_EDGES        = 12u,    // Mod_LoadEdges
-    LUMP_SURFEDGES    = 13u,    // Mod_LoadSurfedges
-    LUMP_MODELS       = 14u,    // Mod_LoadSubmodels
+    LUMP_EDGES = 12u,    // Mod_LoadEdges
+    LUMP_SURFEDGES = 13u,    // Mod_LoadSurfedges
+    LUMP_MODELS = 14u,    // Mod_LoadSubmodels
 
-    HEADER_LUMPS      = 15u  // total count of lumps in BSP header
+    HEADER_LUMPS = 15u  // total count of lumps in BSP header
 } LumpType;
 
 
@@ -27,7 +27,7 @@ typedef struct {
     Lump_t  lumps[HEADER_LUMPS];    // LumpType
 } dHeader_t;
 typedef dHeader_t* dHeader_p;
-STATIC_ASSERT_SIZE(dHeader_t, 4 + 15*8 ); // 124
+STATIC_ASSERT_SIZE(dHeader_t, 4 + 15 * 8); // 124
 
 
 /*
@@ -344,7 +344,7 @@ void Mod_LoadMarksurfaces(Lump_p l) {
 
         out[i] = _loadModel->surfaces + j;
     }
-} 
+}
 
 /*
 =================
@@ -446,13 +446,14 @@ void CalcSurfaceExtents(mSurface_p s) {
 
         s->texturemins[i] = bmins[i] * 16;
         s->extents[i] = (bmaxs[i] - bmins[i]) * 16;
-        if ((!(tex->flags & TEX_SPECIAL)) &&
+        if (
+            (!(tex->flags & TEX_SPECIAL)) &&
 #ifdef GLQUAKE
-            // (s->extents[i] > 512) /* 256 */
+            (s->extents[i] > 512) /* 256 */
 #else
+            (s->extents[i] > 256)
 #endif
-        (s->extents[i] > 256)
-        ) {
+            ) {
             Host_SysError("Bad surface extents");
         }
     }

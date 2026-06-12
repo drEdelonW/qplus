@@ -36,18 +36,19 @@ ALIAS MODEL DISPLAY LIST GENERATION
 #include <string.h>
 #include "z_hunk.h"
 
-Model_p aliasmodel;
-
 // bool
-int used[8192];
+typedef enum {
+    USED_FREE = 0u,
+    USED_INUSE,
+    USED_TEMP
+} gl_used_t;
+gl_used_t used[8192]; // 0 is free, 1 is used, 2 is temp_used
 
-// the command list holds counts and s/t values that are valid for
-// every frame
+// the command list holds counts and s/t values that are valid for every frame
 int  commands[8192];
 int  numcommands;
 
-// all frames will have their vertexes rearranged and expanded
-// so they are in the order expected by the command list
+// all frames will have their vertexes rearranged and expanded so they are in the order expected by the command list
 int  vertexorder[8192];
 int  numorder;
 
@@ -62,8 +63,9 @@ int  stripcount;
 StripLength
 ================
 */
+
 int StripLength(int starttri, int startv) {
-    used[starttri] = 2;
+    used[starttri] = USED_TEMP;
 
     mTriangle_p last = &triangles[starttri];
 
@@ -78,9 +80,8 @@ int StripLength(int starttri, int startv) {
     int m2 = last->vertindex[(startv + 1) % 3];
 
     // look for a matching triangle
-    mTriangle_p check;
 nexttri:
-    check = &triangles[starttri + 1];
+    mTriangle_p check = &triangles[starttri + 1];
     for (int j = starttri + 1; j < pheader->numtris; j++, check++) {
         if (check->facesfront != last->facesfront)  continue;
         for (int k = 0; k < 3; k++) {
@@ -94,16 +95,14 @@ nexttri:
                 goto done;
 
             // the new edge
-            if (stripcount & 1)
-                m2 = check->vertindex[(k + 2) % 3];
-            else
-                m1 = check->vertindex[(k + 2) % 3];
+            if (stripcount & 1)     m2 = check->vertindex[(k + 2) % 3];
+            else                    m1 = check->vertindex[(k + 2) % 3];
 
             stripverts[stripcount + 2] = check->vertindex[(k + 2) % 3];
             striptris[stripcount] = j;
             stripcount++;
 
-            used[j] = 2;
+            used[j] = USED_TEMP;
             goto nexttri;
         }
     }
@@ -111,8 +110,8 @@ done:
 
     // clear the temp used flags
     for (int j = starttri + 1; j < pheader->numtris; j++)
-        if (used[j] == 2)
-            used[j] = 0;
+        if (used[j] == USED_TEMP)
+            used[j] = USED_FREE;
 
     return stripcount;
 }
@@ -123,14 +122,9 @@ FanLength
 ===========
 */
 int FanLength(int starttri, int startv) {
-    int  m1, m2;
-    int  j;
-    mTriangle_p last, check;
-    int  k;
+    used[starttri] = USED_TEMP;
 
-    used[starttri] = 2;
-
-    last = &triangles[starttri];
+    mTriangle_p last = &triangles[starttri];
 
     stripverts[0] = last->vertindex[(startv) % 3];
     stripverts[1] = last->vertindex[(startv + 1) % 3];
@@ -139,18 +133,20 @@ int FanLength(int starttri, int startv) {
     striptris[0] = starttri;
     stripcount = 1;
 
-    m1 = last->vertindex[(startv + 0) % 3];
-    m2 = last->vertindex[(startv + 2) % 3];
+    int m1 = last->vertindex[(startv + 0) % 3];
+    int m2 = last->vertindex[(startv + 2) % 3];
 
 
     // look for a matching triangle
 nexttri:
-    for (j = starttri + 1, check = &triangles[starttri + 1]; j < pheader->numtris; j++, check++) {
+    mTriangle_p check = &triangles[starttri + 1];
+    for (int j = starttri + 1; j < pheader->numtris; j++, check++) {
         if (check->facesfront != last->facesfront)
             continue;
-        for (k = 0; k < 3; k++) {
+        for (int k = 0; k < 3; k++) {
             if ((check->vertindex[k] != m1) ||
-                (check->vertindex[(k + 1) % 3] != m2))
+                (check->vertindex[(k + 1) % 3] != m2)
+                )
                 continue;
 
             // this is the next part of the fan
@@ -166,16 +162,16 @@ nexttri:
             striptris[stripcount] = j;
             stripcount++;
 
-            used[j] = 2;
+            used[j] = USED_TEMP;
             goto nexttri;
         }
     }
 done:
 
     // clear the temp used flags
-    for (j = starttri + 1; j < pheader->numtris; j++)
-        if (used[j] == 2)
-            used[j] = 0;
+    for (int j = starttri + 1; j < pheader->numtris; j++)
+        if (used[j] == USED_TEMP)
+            used[j] = USED_FREE;
 
     return stripcount;
 }
@@ -224,7 +220,7 @@ void BuildTris() {
 
         // mark the tris on the best strip as used
         for (int j = 0; j < bestlen; j++)
-            used[besttris[j]] = 1;
+            used[besttris[j]] = USED_INUSE;
 
         if (besttype == 1)  commands[numcommands++] = (bestlen + 2);
         else                commands[numcommands++] = -(bestlen + 2);
@@ -237,7 +233,9 @@ void BuildTris() {
             // emit s/t coords into the commands stream
             float s = stverts[k].s;
             float t = stverts[k].t;
-            if (!triangles[besttris[0]].facesfront && stverts[k].onseam)
+            if (!triangles[besttris[0]].facesfront &&
+                stverts[k].onseam
+                )
                 s += pheader->skinwidth / 2; // on back side
             s = (s + 0.5) / pheader->skinwidth;
             t = (t + 0.5) / pheader->skinheight;
@@ -262,8 +260,6 @@ GL_MakeAliasModelDisplayLists
 ================
 */
 void GL_MakeAliasModelDisplayLists(Model_p m, AliasHdr_p hdr) {
-
-    aliasmodel = m;
     paliashdr = hdr; // (AliasHdr_t *)Mod_Extradata (m);
 
     //

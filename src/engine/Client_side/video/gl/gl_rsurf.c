@@ -934,8 +934,7 @@ void DrawTextureChains() {
 
     for (int i = 0; i < cl.worldmodel->numtextures; i++) {
         Texture_p texture = cl.worldmodel->textures[i];
-        if (!texture)
-            continue;
+        if (!texture)   continue;
         mSurface_p surf = texture->texturechain;
         if (!surf)      continue;
 
@@ -950,7 +949,8 @@ void DrawTextureChains() {
         }
         else {
             if ((surf->flags & SURF_DRAWTURB) &&
-                (r_wateralpha.value != 1.0))
+                (r_wateralpha.value != 1.0)
+                )
                 continue;    // draw translucent water later
             for (; surf; surf = surf->texturechain)
                 R_RenderBrushPoly(surf);
@@ -1116,7 +1116,7 @@ void R_RecursiveWorldNode(mNode_p node) {
         if (c) {
             mSurface_p surf = cl.worldmodel->surfaces + node->firstsurface;
 
-            if (dot < 0 - BACKFACE_EPSILON)     side = SURF_PLANEBACK;
+            if (dot < 0.0 - BACKFACE_EPSILON)     side = SURF_PLANEBACK;
             else if (dot > BACKFACE_EPSILON)    side = 0;
             {
                 for (; c; c--, surf++) {
@@ -1124,7 +1124,9 @@ void R_RecursiveWorldNode(mNode_p node) {
                         continue;
 
                     // don't backface underwater surfaces, because they warp
-                    if (!(surf->flags & SURF_UNDERWATER) && ((dot < 0) ^ !!(surf->flags & SURF_PLANEBACK)))
+                    if (!(surf->flags & SURF_UNDERWATER) &&
+                        ((dot < 0.0) ^ (!!(surf->flags & SURF_PLANEBACK)))
+                        )
                         continue;        // wrong side
 
                     // if sorting by texture, just store it out
@@ -1165,7 +1167,7 @@ R_DrawWorld
 =============
 */
 void R_DrawWorld() {
-#if 0
+#if 1
     r_Entity_t    ent;
     memset(&ent, 0, sizeof(ent));
     ent.model = cl.worldmodel;
@@ -1202,8 +1204,6 @@ R_MarkLeaves
 ===============
 */
 void R_MarkLeaves() {
-    byte    solid[4096];
-
     if (
         (r_oldviewleaf == r_viewleaf) &&
         (!r_novis.value)
@@ -1216,13 +1216,15 @@ void R_MarkLeaves() {
     r_visframecount++;
     r_oldviewleaf = r_viewleaf;
 
-    byte* vis;
-    if (r_novis.value) {
-        vis = solid;
-        memset(solid, 0xff, (cl.worldmodel->numleafs + 7) >> 3);
-    }
-    else
+    uint8_p vis;
+    uint8_t solid[4096];
+    if (!r_novis.value) {
         vis = Mod_LeafPVS(r_viewleaf, cl.worldmodel);
+    }
+    else {
+        memset(solid, 0xFF, (cl.worldmodel->numleafs + 7) >> 3);
+        vis = solid;
+    }
 
     for (int i = 0; i < cl.worldmodel->numleafs; i++) {
         if (vis[i >> 3] & (1 << (i & 7))) {

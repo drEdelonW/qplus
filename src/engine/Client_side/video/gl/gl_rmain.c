@@ -560,24 +560,22 @@ R_DrawEntitiesOnList
 =============
 */
 void R_DrawEntitiesOnList() {
-    if (!r_drawentities.value)
-        return;
+    if (!r_drawentities.value)      return;
 
     // draw sprites seperately, because of alpha blending
     for (int i = 0; i < cl_numvisedicts; i++) {
         currententity = cl_visedicts[i];
 
         switch (currententity->model->type) {
-        case mod_alias:
-            R_DrawAliasModel(currententity);
-            break;
-
-        case mod_brush:
-            R_DrawBrushModel(currententity);
-            break;
-
-        default:
-            break;
+        case mod_alias: { R_DrawAliasModel(currententity); } break;
+        case mod_brush: { R_DrawBrushModel(currententity); } break;
+        case mod_sprite: break; // will be in next loop
+        default: {
+            Host_SysError(
+                "R_DrawEntitiesOnList first loop [0x%X] UNKNOWN type of model->type\n",
+                currententity->model->type
+            );
+        } break;
         }
     }
 
@@ -585,10 +583,15 @@ void R_DrawEntitiesOnList() {
         currententity = cl_visedicts[i];
 
         switch (currententity->model->type) {
-        default: break;
-        case mod_sprite:
-            R_DrawSpriteModel(currententity);
-            break;
+        case mod_alias:
+        case mod_brush: break; // already drawed
+        case mod_sprite: { R_DrawSpriteModel(currententity); } break;
+        default: {
+            Host_SysError(
+                "R_DrawEntitiesOnList second loop [0x%X] UNKNOWN type of model->type\n",
+                currententity->model->type
+            );
+        } break;
         }
     }
 }
@@ -664,7 +667,6 @@ void R_PolyBlend() {
     glColor4fv(v_blend);
 
     glBegin(GL_QUADS); {
-
         glVertex3f(10, 100, 100);
         glVertex3f(10, -100, 100);
         glVertex3f(10, -100, -100);
@@ -699,14 +701,10 @@ void R_SetFrustum() {
         VectorSubtract(vpn, vup, frustum[3].normal);
     }
     else {
-        // rotate VPN right by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[0].normal, vup, vpn, -(90 - r_refdef.fov_x / 2));
-        // rotate VPN left by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[1].normal, vup, vpn, 90 - r_refdef.fov_x / 2);
-        // rotate VPN up by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[2].normal, vright, vpn, 90 - r_refdef.fov_y / 2);
-        // rotate VPN down by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[3].normal, vright, vpn, -(90 - r_refdef.fov_y / 2));
+        RotatePointAroundVector(frustum[0].normal, vup, vpn, -(90 - r_refdef.fov_x / 2));       // rotate VPN right by FOV_X/2 degrees
+        RotatePointAroundVector(frustum[1].normal, vup, vpn, 90 - r_refdef.fov_x / 2);          // rotate VPN left by FOV_X/2 degrees
+        RotatePointAroundVector(frustum[2].normal, vright, vpn, 90 - r_refdef.fov_y / 2);       // rotate VPN up by FOV_X/2 degrees
+        RotatePointAroundVector(frustum[3].normal, vright, vpn, -(90 - r_refdef.fov_y / 2));    // rotate VPN down by FOV_X/2 degrees
     }
 
     for (int i = 0; i < 4; i++) {
@@ -973,12 +971,11 @@ r_refdef must be set before the first call
 ================
 */
 void R_RenderView() {
-    // GLfloat colors[4] = { (GLfloat)0.0, (GLfloat)0.0, (GLfloat)1, (GLfloat)0.20 }; // fog color
+    if (r_norefresh.value)      return;
 
-    if (r_norefresh.value)        return;
-
-    if (!r_worldentity.model || !cl.worldmodel)
-        Host_SysError("R_RenderView: NULL worldmodel");
+    if (!r_worldentity.model ||
+        !cl.worldmodel
+        )                       Host_SysError("R_RenderView: NULL worldmodel");
 
     LegacyTimeStamp_t time1;
     if (r_speeds.value) {
@@ -998,19 +995,30 @@ void R_RenderView() {
     // render normal view
 
 /***** Experimental silly looking fog ******
-****** Use r_fullbright if you enable ******
+****** Use r_fullbright if you enable ******/
+#if 0
+    GLfloat colors[4] = {
+        (GLfloat)0.0,
+        (GLfloat)0.0,
+        (GLfloat)1,
+        (GLfloat)0.20
+    }; // fog color id BLUE
+
     glFogi(GL_FOG_MODE, GL_LINEAR);
     glFogfv(GL_FOG_COLOR, colors);
     glFogf(GL_FOG_END, 512.0);
     glEnable(GL_FOG);
-********************************************/
+#endif
+    /********************************************/
 
     R_RenderScene();
     R_DrawViewModel();
     R_DrawWaterSurfaces();
 
     //  More fog right here :)
-    // glDisable(GL_FOG);
+#if 0
+    glDisable(GL_FOG);
+#endif
     //  End of all fog code...
 
         // render mirror view
