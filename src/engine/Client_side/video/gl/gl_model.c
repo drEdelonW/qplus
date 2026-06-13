@@ -135,7 +135,7 @@ Mod_TouchModel
 void Mod_TouchModel(cString name) {
     Model_p mod = Mod_FindName(name);
 
-    if ((!mod->needload) &&
+    if (!(mod->needload) &&
         (mod->type == mod_alias)
         )
         Cache_Check(&mod->cache);
@@ -197,8 +197,7 @@ Model_p Mod_LoadModel(Model_p mod, bool crash) {
     // fill it in
     //
 
-    // call the apropriate loader
-    mod->needload = false;
+    mod->needload = false;  // call the apropriate loader
 
 
     switch (LittleLong(*(uint32_p)buf)) {

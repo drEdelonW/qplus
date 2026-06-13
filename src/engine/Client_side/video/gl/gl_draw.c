@@ -342,9 +342,9 @@ typedef struct {
     cString name;
     int minimize;
     int maximize;
-} glmode_t;
+} glMode_t;
 
-glmode_t modes[] = {
+glMode_t modes[] = {
     {"GL_NEAREST", GL_NEAREST, GL_NEAREST},
     {"GL_LINEAR", GL_LINEAR, GL_LINEAR},
     {"GL_NEAREST_MIPMAP_NEAREST", GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST},
@@ -353,7 +353,7 @@ glmode_t modes[] = {
     {"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR}
 };
 
-#define NUMFILTERMODE  (6) 
+#define NUMFILTERMODE  (sizeof(modes)/sizeof(glMode_t)) 
 /*
 ===============
 Draw_TextureMode_f
@@ -366,30 +366,29 @@ void Draw_TextureMode_f() {
                 Con_Printf("%s\n", modes[i].name);
                 return;
             }
-        Con_Printf("current filter [0x%X] is unknown???\n", gl_filter_min);
-        return;
+        Con_Printf("current filter [0x%X] is unknown???\n", gl_filter_min);     return;
     }
+    else {
+        int i = 0;
+        for (; i < NUMFILTERMODE; i++) {
+            if (!Q_strcasecmp(modes[i].name, Cmd_Argv(1)))
+                break;
+        }
+        if (i == NUMFILTERMODE) {
+            Con_Printf("bad filter name \"%s\"\n", Cmd_Argv(1));    return;
+        }
 
-    int i = 0;
-    for (; i < NUMFILTERMODE; i++) {
-        if (!Q_strcasecmp(modes[i].name, Cmd_Argv(1)))
-            break;
-    }
-    if (i == NUMFILTERMODE) {
-        Con_Printf("bad filter name \"%s\"\n", Cmd_Argv(1));
-        return;
-    }
+        gl_filter_min = modes[i].minimize;
+        gl_filter_max = modes[i].maximize;
 
-    gl_filter_min = modes[i].minimize;
-    gl_filter_max = modes[i].maximize;
-
-    // change all the existing mipmap texture objects
-    glTexture_p glt = gltextures;
-    for (int i = 0; i < numgltextures; i++, glt++) {
-        if (glt->mipmap) {
-            GL_Bind(glt->texnum);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
+        // change all the existing mipmap texture objects
+        glTexture_p glt = gltextures;
+        for (int i = 0; i < numgltextures; i++, glt++) {
+            if (glt->mipmap) {
+                GL_Bind(glt->texnum);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
+            }
         }
     }
 }
@@ -666,17 +665,23 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
         }
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, gl_alpha_format, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, trans);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0, gl_alpha_format,
+        64, 64,
+        0, GL_RGBA,
+        GL_UNSIGNED_BYTE, trans
+    );
 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glColor3f(1, 1, 1);
     glBegin(GL_QUADS); {
-        glTexCoord2f(0, 0);     glVertex2f(x, y);
-        glTexCoord2f(1, 0);     glVertex2f(x + pic->width, y);
-        glTexCoord2f(1, 1);     glVertex2f(x + pic->width, y + pic->height);
-        glTexCoord2f(0, 1);     glVertex2f(x, y + pic->height);
+        glTexCoord2f(0.0f, 0.0f);   glVertex2f(x, y);
+        glTexCoord2f(1.0f, 0.0f);   glVertex2f(x + pic->width, y);
+        glTexCoord2f(1.0f, 1.0f);   glVertex2f(x + pic->width, y + pic->height);
+        glTexCoord2f(0.0f, 1.0f);   glVertex2f(x, y + pic->height);
     } glEnd();
 }
 
@@ -971,7 +976,7 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     else {
         gluScaleImage(GL_RGBA, width, height, GL_UNSIGNED_BYTE, trans, scaled_width, scaled_height, GL_UNSIGNED_BYTE, _scaled);
         glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _scaled);
-    }
+}
 #else
     texels += scaled_width * scaled_height;
 

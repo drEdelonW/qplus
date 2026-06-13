@@ -164,11 +164,11 @@ Mod_LoadPlanes
 =================
 */
 
-void Mod_LoadPlanes(Lump_p l) {
-    dPlane_p in = (TypeLess_ptr)(mod_base + l->fileOfs);
-    if (l->fileLen % sizeof(*in))        Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
+void Mod_LoadPlanes(Lump_p Lump_in) {
+    dPlane_p in = getMapLumpPtr(Lump_in);
+    if (Lump_in->fileLen % sizeof(*in))        Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
-    int count = l->fileLen / sizeof(*in);
+    int count = Lump_in->fileLen / sizeof(*in);
     mPlane_p out = Hunk_AllocName(count * 2 * sizeof(*out), Mod_loadName);
 
     _loadModel->planes = out;
