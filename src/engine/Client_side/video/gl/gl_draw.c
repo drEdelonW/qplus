@@ -530,7 +530,7 @@ void Draw_Character(int x, int y, int num) {
     if (y <= -8)        return; // totally off screen
 
     int row = num >> 4;
-    int col = num & 15;
+    int col = num & 0x0F;
 
     float frow = row * CHAR_SCALE_F;
     float fcol = col * CHAR_SCALE_F;

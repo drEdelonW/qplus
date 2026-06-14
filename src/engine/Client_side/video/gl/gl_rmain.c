@@ -208,32 +208,31 @@ void R_DrawSpriteModel(r_Entity_p e) {
 
     GL_Bind(frame->gl_texturenum);
 
-    glEnable(GL_ALPHA_TEST);
-    glBegin(GL_QUADS); {
+    glEnable(GL_ALPHA_TEST); {
+        glBegin(GL_QUADS); {
 
-        glTexCoord2f(0, 1);
-        VectorMA(e->origin, frame->down, up, point);
-        VectorMA(point, frame->left, right, point);
-        glVertex3fv(point);
+            glTexCoord2f(0, 1);
+            VectorMA(e->origin, frame->down, up, point);
+            VectorMA(point, frame->left, right, point);
+            glVertex3fv(point);
 
-        glTexCoord2f(0, 0);
-        VectorMA(e->origin, frame->up, up, point);
-        VectorMA(point, frame->left, right, point);
-        glVertex3fv(point);
+            glTexCoord2f(0, 0);
+            VectorMA(e->origin, frame->up, up, point);
+            VectorMA(point, frame->left, right, point);
+            glVertex3fv(point);
 
-        glTexCoord2f(1, 0);
-        VectorMA(e->origin, frame->up, up, point);
-        VectorMA(point, frame->right, right, point);
-        glVertex3fv(point);
+            glTexCoord2f(1, 0);
+            VectorMA(e->origin, frame->up, up, point);
+            VectorMA(point, frame->right, right, point);
+            glVertex3fv(point);
 
-        glTexCoord2f(1, 1);
-        VectorMA(e->origin, frame->down, up, point);
-        VectorMA(point, frame->right, right, point);
-        glVertex3fv(point);
+            glTexCoord2f(1, 1);
+            VectorMA(e->origin, frame->down, up, point);
+            VectorMA(point, frame->right, right, point);
+            glVertex3fv(point);
 
-    } glEnd();
-
-    glDisable(GL_ALPHA_TEST);
+        } glEnd();
+    } glDisable(GL_ALPHA_TEST);
 }
 
 /*

@@ -407,12 +407,21 @@ void R_DrawSequentialPoly(mSurface_p s) {
             }
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
             glBegin(GL_POLYGON); {
+#if 1
                 float_p v = p->verts[0];
                 for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
                     qglMTexCoord2fSGIS(TEXTURE0_SGIS, v[3], v[4]);
                     qglMTexCoord2fSGIS(TEXTURE1_SGIS, v[5], v[6]);
                     glVertex3fv(v);
                 }
+#else
+                glVert_p v = p->verts[0];
+                for (int i = 0; i < p->numverts; i++, v++) {
+                    qglMTexCoord2fSGIS(TEXTURE0_SGIS, v->tx[S_AX], v->[T_AX]);
+                    qglMTexCoord2fSGIS(TEXTURE1_SGIS, v[5], v[6]);
+                    glVertex3fv(v->v);
+                }
+#endif
             } glEnd();
             return;
         }
@@ -940,14 +949,14 @@ void DrawTextureChains() {
             R_DrawSkyChain(surf);
         else if (
             (i == mirrortexturenum) &&
-            (r_mirroralpha.value != 1.0)
+            (r_mirroralpha.value != 1.0f)
             ) {
             R_MirrorChain(surf);
             continue;
         }
         else {
             if ((surf->flags & SURF_DRAWTURB) &&
-                (r_wateralpha.value != 1.0)
+                (r_wateralpha.value != 1.0f)
                 )
                 continue;    // draw translucent water later
             for (; surf; surf = surf->texturechain)
@@ -1317,6 +1326,7 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
             mEdge_p r_pedge = &pedges[-lindex];
             vec = r_pcurrentvertbase[r_pedge->v[1]].position;
         }
+
         float s = DotProduct(vec, fa->texinfo->vecs[0]) + fa->texinfo->vecs[0][3];
         s /= fa->texinfo->texture->width;
 
