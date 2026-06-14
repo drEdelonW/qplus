@@ -407,7 +407,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
             }
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
             glBegin(GL_POLYGON); {
-#if 1
+#if 1   // TODO: remake to glVert_t
                 float_p v = p->verts[0];
                 for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
                     qglMTexCoord2fSGIS(TEXTURE0_SGIS, v[3], v[4]);

@@ -235,7 +235,7 @@ void R_SetupAndDrawSprite() {
 
     // transform vertices into viewspace and project
     float_p pv = &_clip_verts[_clipCurrent][0][0];
-    r_spritedesc.nearzi = -999999;
+    r_spritedesc.nearzi = -999999.0f;
 
     EmitPoint_t outverts[MAXWORKINGVERTS + 1];
     for (int i = 0; i < nump; i++) {

@@ -4,6 +4,8 @@
 
 
 typedef float vec_t;
+STATIC_ASSERT_SIZE(vec_t, sizeof(float));
+
 typedef enum {
     S_AX = 0u,
     T_AX = 1u,
@@ -20,23 +22,18 @@ typedef enum {
     Z_AX = 2u,
     VECT_DIM = 3u,
 } axis_e;
-
-STATIC_ASSERT_SIZE(vec_t, sizeof(float));
-
 #if 1
-typedef vec_t vec3_t[VECT_DIM];
+    typedef vec_t vec3_t[VECT_DIM];
 #else
-typedef union {
-    struct { vec_t x, y, z; };
-    vec_t v[VECT_DIM];
-} vec3_t;
+    typedef union {
+        struct { vec_t x, y, z; };
+        vec_t v[VECT_DIM];
+    } vec3_t;
 #endif
-
-// STATIC_ASSERT(sizeof(vec3_t) == 3 * sizeof(vec_t), "vec3_t must be 12");
 STATIC_ASSERT_SIZE(vec3_t, 3 * sizeof(vec_t));
 typedef vec3_t* vec3_p;
 
-typedef vec_t vec5_t[5];
+typedef vec_t vec5_t[5];    // vec3_t(x/y/z) + vec2(s/t)
 // STATIC_ASSERT(sizeof(vec5_t) == 5 * sizeof(vec_t), "vec5_t must be 20");
 STATIC_ASSERT_SIZE(vec5_t, 5 * sizeof(vec_t));
 typedef vec5_t* vec5_p;
