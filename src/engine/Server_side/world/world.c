@@ -102,12 +102,12 @@ BSP trees instead of being compared directly.
 ===================
 */
 Hull_p SV_HullForBox(vec3_t mins, vec3_t maxs) {
-    _boxPlanes[0].dist = maxs.v[0];
-    _boxPlanes[1].dist = mins.v[0];
-    _boxPlanes[2].dist = maxs.v[1];
-    _boxPlanes[3].dist = mins.v[1];
-    _boxPlanes[4].dist = maxs.v[2];
-    _boxPlanes[5].dist = mins.v[2];
+    _boxPlanes[0].dist = maxs.x;
+    _boxPlanes[1].dist = mins.x;
+    _boxPlanes[2].dist = maxs.y;
+    _boxPlanes[3].dist = mins.y;
+    _boxPlanes[4].dist = maxs.z;
+    _boxPlanes[5].dist = mins.z;
     return &_boxHull;
 }
 
@@ -138,9 +138,9 @@ Hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_p offset) {
             Host_SysError("MOVETYPE_PUSH with a non bsp model");
 
         vec3_t size; VectorSubtract(maxs, mins, &size);
-        if (size.v[0] < 3)          hull = &model->hulls[0];
-        else if (size.v[0] <= 32)   hull = &model->hulls[1];
-        else                        hull = &model->hulls[2];
+        if (size.x < 3)         hull = &model->hulls[0];
+        else if (size.x <= 32)  hull = &model->hulls[1];
+        else                    hull = &model->hulls[2];
 
         // calculate an offset value to center the origin
         VectorSubtract(hull->clip_mins, mins, offset);
@@ -207,8 +207,8 @@ areaNode_p SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
     }
 
     vec3_t size; VectorSubtract(maxs, mins, &size);
-    if (size.v[0] > size.v[1])  anode->axis = AXIS_X;
-    else                        anode->axis = AXIS_Y;
+    if (size.x > size.y)    anode->axis = AXIS_X;
+    else                    anode->axis = AXIS_Y;
 
     anode->dist = 0.5f * (maxs.v[anode->axis] + mins.v[anode->axis]);
     vec3_t mins1; VectorCopy(mins, &mins1);
@@ -270,12 +270,12 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
             (touch->v.solid != SOLID_TRIGGER))
             continue;
 
-        if ((ent->v.absmin.v[0] > touch->v.absmax.v[0]) ||
-            (ent->v.absmin.v[1] > touch->v.absmax.v[1]) ||
-            (ent->v.absmin.v[2] > touch->v.absmax.v[2]) ||
-            (ent->v.absmax.v[0] < touch->v.absmin.v[0]) ||
-            (ent->v.absmax.v[1] < touch->v.absmin.v[1]) ||
-            (ent->v.absmax.v[2] < touch->v.absmin.v[2]))
+        if ((ent->v.absmin.x > touch->v.absmax.x) ||
+            (ent->v.absmin.y > touch->v.absmax.y) ||
+            (ent->v.absmin.z > touch->v.absmax.z) ||
+            (ent->v.absmax.x < touch->v.absmin.x) ||
+            (ent->v.absmax.y < touch->v.absmin.y) ||
+            (ent->v.absmax.z < touch->v.absmin.z))
             continue;
 
         int old_self = pr_global_struct->self;
@@ -381,21 +381,21 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     // of shelves, the abs sizes are expanded
     //
     if ((int)ent->v.flags & FL_ITEM) {
-        ent->v.absmin.v[0] -= 15;
-        ent->v.absmin.v[1] -= 15;
+        ent->v.absmin.x -= 15;
+        ent->v.absmin.y -= 15;
 
-        ent->v.absmax.v[0] += 15;
-        ent->v.absmax.v[1] += 15;
+        ent->v.absmax.x += 15;
+        ent->v.absmax.y += 15;
     }
     else { // because movement is clipped an epsilon away from an actual edge,
         // we must fully check even when bounding boxes don't quite touch
-        ent->v.absmin.v[0] -= 1;
-        ent->v.absmin.v[1] -= 1;
-        ent->v.absmin.v[2] -= 1;
+        ent->v.absmin.x -= 1;
+        ent->v.absmin.y -= 1;
+        ent->v.absmin.z -= 1;
 
-        ent->v.absmax.v[0] += 1;
-        ent->v.absmax.v[1] += 1;
-        ent->v.absmax.v[2] += 1;
+        ent->v.absmax.x += 1;
+        ent->v.absmax.y += 1;
+        ent->v.absmax.z += 1;
     }
 
     // link to PVS leafs
@@ -690,9 +690,9 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
 
         {
             vec3_t temp; VectorCopy(trace.endpos, &temp);
-            trace.endpos.v[0] = DotProduct(temp, forward);
-            trace.endpos.v[1] = -DotProduct(temp, right);
-            trace.endpos.v[2] = DotProduct(temp, up);
+            trace.endpos.x = DotProduct(temp, forward);
+            trace.endpos.y = -DotProduct(temp, right);
+            trace.endpos.z = DotProduct(temp, up);
         }
         {
             vec3_t temp; VectorCopy(trace.plane.normal, &temp);
@@ -741,17 +741,17 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
 
         if (
             (
-                clip->boxmins.v[0] > touch->v.absmax.v[0] ||
-                clip->boxmins.v[1] > touch->v.absmax.v[1] ||
-                clip->boxmins.v[2] > touch->v.absmax.v[2]) ||
+                clip->boxmins.x > touch->v.absmax.x ||
+                clip->boxmins.y > touch->v.absmax.y ||
+                clip->boxmins.z > touch->v.absmax.z) ||
             (
-                clip->boxmaxs.v[0] < touch->v.absmin.v[0] ||
-                clip->boxmaxs.v[1] < touch->v.absmin.v[1] ||
-                clip->boxmaxs.v[2] < touch->v.absmin.v[2]) ||
+                clip->boxmaxs.x < touch->v.absmin.x ||
+                clip->boxmaxs.y < touch->v.absmin.y ||
+                clip->boxmaxs.z < touch->v.absmin.z) ||
             (
                 clip->passedict &&
-                clip->passedict->v.size.v[0] &&
-                !touch->v.size.v[0]
+                clip->passedict->v.size.x &&
+                !touch->v.size.x
                 )
             )
             continue; // points never interact

@@ -655,9 +655,9 @@ R_BmodelCheckBBox
 int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
     int clipflags = 0;
 
-    if (currententity->angles.v[0] ||
-        currententity->angles.v[1] ||
-        currententity->angles.v[2]
+    if (currententity->angles.pitch ||
+        currententity->angles.yaw ||
+        currententity->angles.roll
         ) {
         for (int i = 0; i < 4; i++) {
             double d = DotProduct(currententity->origin, view_clipplanes[i].normal);

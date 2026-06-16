@@ -168,11 +168,11 @@ void CL_PrintEntities_f() {
             ent->model->name,
             ent->frame,
 
-            ent->origin.v[0],
+            ent->origin.x,
             ent->origin.v[1],
             ent->origin.v[2],
 
-            ent->angles.v[0],
+            ent->angles.pitch,
             ent->angles.v[1],
             ent->angles.v[2]
         );

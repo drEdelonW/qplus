@@ -32,94 +32,117 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
     }
 #endif
 
+#if 0
     // general case
     float dist1, dist2;
     switch (plane->signbits) {
     case 0:
         dist1 =
-            plane->normal.v[0] * emaxs.v[0] +
-            plane->normal.v[1] * emaxs.v[1] +
-            plane->normal.v[2] * emaxs.v[2];
+            plane->normal.x * emaxs.x +
+            plane->normal.y * emaxs.y +
+            plane->normal.z * emaxs.z;
         dist2 =
-            plane->normal.v[0] * emins.v[0] +
-            plane->normal.v[1] * emins.v[1] +
-            plane->normal.v[2] * emins.v[2];
+            plane->normal.x * emins.x +
+            plane->normal.y * emins.y +
+            plane->normal.z * emins.z;
         break;
     case 1:
         dist1 =
-            plane->normal.v[0] * emins.v[0] +
-            plane->normal.v[1] * emaxs.v[1] +
-            plane->normal.v[2] * emaxs.v[2];
+            plane->normal.x * emins.x +
+            plane->normal.y * emaxs.y +
+            plane->normal.z * emaxs.z;
         dist2 =
-            plane->normal.v[0] * emaxs.v[0] +
-            plane->normal.v[1] * emins.v[1] +
-            plane->normal.v[2] * emins.v[2];
+            plane->normal.x * emaxs.x +
+            plane->normal.y * emins.y +
+            plane->normal.z * emins.z;
         break;
     case 2:
         dist1 =
-            plane->normal.v[0] * emaxs.v[0] +
-            plane->normal.v[1] * emins.v[1] +
-            plane->normal.v[2] * emaxs.v[2];
+            plane->normal.x * emaxs.x +
+            plane->normal.y * emins.y +
+            plane->normal.z * emaxs.z;
         dist2 =
-            plane->normal.v[0] * emins.v[0] +
-            plane->normal.v[1] * emaxs.v[1] +
-            plane->normal.v[2] * emins.v[2];
+            plane->normal.x * emins.x +
+            plane->normal.y * emaxs.y +
+            plane->normal.z * emins.z;
         break;
     case 3:
         dist1 =
-            plane->normal.v[0] * emins.v[0] +
-            plane->normal.v[1] * emins.v[1] +
-            plane->normal.v[2] * emaxs.v[2];
+            plane->normal.x * emins.x +
+            plane->normal.y * emins.y +
+            plane->normal.z * emaxs.z;
         dist2 =
-            plane->normal.v[0] * emaxs.v[0] +
-            plane->normal.v[1] * emaxs.v[1] +
-            plane->normal.v[2] * emins.v[2];
+            plane->normal.x * emaxs.x +
+            plane->normal.y * emaxs.y +
+            plane->normal.z * emins.z;
         break;
     case 4:
         dist1 =
-            plane->normal.v[0] * emaxs.v[0] +
-            plane->normal.v[1] * emaxs.v[1] +
-            plane->normal.v[2] * emins.v[2];
+            plane->normal.x * emaxs.x +
+            plane->normal.y * emaxs.y +
+            plane->normal.z * emins.z;
         dist2 =
-            plane->normal.v[0] * emins.v[0] +
-            plane->normal.v[1] * emins.v[1] +
-            plane->normal.v[2] * emaxs.v[2];
+            plane->normal.x * emins.x +
+            plane->normal.y * emins.y +
+            plane->normal.z * emaxs.z;
         break;
     case 5:
         dist1 =
-            plane->normal.v[0] * emins.v[0] +
-            plane->normal.v[1] * emaxs.v[1] +
-            plane->normal.v[2] * emins.v[2];
+            plane->normal.x * emins.x +
+            plane->normal.y * emaxs.y +
+            plane->normal.z * emins.z;
         dist2 =
-            plane->normal.v[0] * emaxs.v[0] +
-            plane->normal.v[1] * emins.v[1] +
-            plane->normal.v[2] * emaxs.v[2];
+            plane->normal.x * emaxs.x +
+            plane->normal.y * emins.y +
+            plane->normal.z * emaxs.z;
         break;
     case 6:
         dist1 =
-            plane->normal.v[0] * emaxs.v[0] +
-            plane->normal.v[1] * emins.v[1] +
-            plane->normal.v[2] * emins.v[2];
+            plane->normal.x * emaxs.x +
+            plane->normal.y * emins.y +
+            plane->normal.z * emins.z;
         dist2 =
-            plane->normal.v[0] * emins.v[0] +
-            plane->normal.v[1] * emaxs.v[1] +
-            plane->normal.v[2] * emaxs.v[2];
+            plane->normal.x * emins.x +
+            plane->normal.y * emaxs.y +
+            plane->normal.z * emaxs.z;
         break;
     case 7:
         dist1 =
-            plane->normal.v[0] * emins.v[0] +
-            plane->normal.v[1] * emins.v[1] +
-            plane->normal.v[2] * emins.v[2];
+            plane->normal.x * emins.x +
+            plane->normal.y * emins.y +
+            plane->normal.z * emins.z;
         dist2 =
-            plane->normal.v[0] * emaxs.v[0] +
-            plane->normal.v[1] * emaxs.v[1] +
-            plane->normal.v[2] * emaxs.v[2];
+            plane->normal.x * emaxs.x +
+            plane->normal.y * emaxs.y +
+            plane->normal.z * emaxs.z;
         break;
     default:
         dist1 = dist2 = 0.0f;  // shut up compiler
         BOPS_Error();
         break;
     }
+#else
+    // bounds[0] = emins, bounds[1] = emaxs
+    const vec3_p bounds[2] = {
+        &emins,
+        &emaxs
+    };
+
+    // Extract bits: 0 if bit is set (negative -> use min), 1 if bit is clear (positive -> use max)
+    const int bit_x = ((plane->signbits >> 0) & 1) ^ 1;
+    const int bit_y = ((plane->signbits >> 1) & 1) ^ 1;
+    const int bit_z = ((plane->signbits >> 2) & 1) ^ 1;
+
+    float dist1 =
+        plane->normal.x * bounds[bit_x]->x +
+        plane->normal.y * bounds[bit_y]->y +
+        plane->normal.z * bounds[bit_z]->z;
+
+    float dist2 =   // For dist2 we just invert the selection
+        plane->normal.x * bounds[bit_x ^ 1]->x +
+        plane->normal.y * bounds[bit_y ^ 1]->y +
+        plane->normal.z * bounds[bit_z ^ 1]->z;
+#endif
 
 #if 0
     vec3_t corners[2];

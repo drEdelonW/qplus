@@ -118,10 +118,10 @@ bool R_CullBox(vec3_t mins, vec3_t maxs) {
 
 
 void R_RotateForEntity(r_Entity_p e) {
-    glTranslatef(e->origin.v[0], e->origin.v[1], e->origin.v[2]);
+    glTranslatef(e->origin.x, e->origin.v[1], e->origin.v[2]);
 
     glRotatef(e->angles.v[1], 0, 0, 1);
-    glRotatef(-e->angles.v[0], 0, 1, 0);
+    glRotatef(-e->angles.pitch, 0, 1, 0);
     glRotatef(e->angles.v[2], 1, 0, 0);
 }
 
@@ -345,11 +345,11 @@ void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
 
                 // normals and vertexes come from the frame list
                 vec3_t point = {
-                    .x = verts->v[0] * pAliasHdr->scale.v[0] + pAliasHdr->scale_origin.v[0],
+                    .x = verts->v[0] * pAliasHdr->scale.x + pAliasHdr->scale_origin.x,
                     .y = verts->v[1] * pAliasHdr->scale.v[1] + pAliasHdr->scale_origin.v[1],
                     .z = verts->v[2] * pAliasHdr->scale.v[2] + pAliasHdr->scale_origin.v[2]
                 };
-                point.v[0] -= shadevector.v[0] * (point.v[2] + lheight);
+                point.x -= shadevector.x * (point.v[2] + lheight);
                 point.v[1] -= shadevector.v[1] * (point.v[2] + lheight);
                 point.v[2] = height;
                 //   height -= 0.001;
@@ -464,7 +464,7 @@ void R_DrawAliasModel(r_Entity_p e) {
     shadelight = shadelight / 200.0;
 
     float an = e->angles.v[1] / 180 * M_PI;
-    shadevector.v[0] = cos(-an);
+    shadevector.x = cos(-an);
     shadevector.v[1] = sin(-an);
     shadevector.v[2] = 1;
     VectorNormalize(&shadevector);
@@ -487,25 +487,25 @@ void R_DrawAliasModel(r_Entity_p e) {
 
     if (!strcmp(clmodel->name, "progs/eyes.mdl") && gl_doubleeyes.value) {
         glTranslatef(
-            pAliasHdr->scale_origin.v[0],
+            pAliasHdr->scale_origin.x,
             pAliasHdr->scale_origin.v[1],
             pAliasHdr->scale_origin.v[2] - (22 + 8)
         );
         // double size of eyes, since they are really hard to see in gl
         glScalef(
-            pAliasHdr->scale.v[0] * 2,
+            pAliasHdr->scale.x * 2,
             pAliasHdr->scale.v[1] * 2,
             pAliasHdr->scale.v[2] * 2
         );
     }
     else {
         glTranslatef(
-            pAliasHdr->scale_origin.v[0],
+            pAliasHdr->scale_origin.x,
             pAliasHdr->scale_origin.v[1],
             pAliasHdr->scale_origin.v[2]
         );
         glScalef(
-            pAliasHdr->scale.v[0],
+            pAliasHdr->scale.x,
             pAliasHdr->scale.v[1],
             pAliasHdr->scale.v[2]
         );
@@ -693,7 +693,7 @@ int SignbitsForPlane(mPlane_p out) {
 
 
 void R_SetFrustum() {
-    if (r_refdef.fov_x == 90) {
+    if (r_refdef.fov_x == 90.0f) {
         // front side is visible
 
         VectorAdd(vpn, vright, &frustum[0].normal);
@@ -704,8 +704,8 @@ void R_SetFrustum() {
     }
     else {
         RotatePointAroundVector(&frustum[0].normal, vup, vpn, -(90 - r_refdef.fov_x / 2));       // rotate VPN right by FOV_X/2 degrees
-        RotatePointAroundVector(&frustum[1].normal, vup, vpn, 90 - r_refdef.fov_x / 2);          // rotate VPN left by FOV_X/2 degrees
-        RotatePointAroundVector(&frustum[2].normal, vright, vpn, 90 - r_refdef.fov_y / 2);       // rotate VPN up by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[1].normal, vup, vpn, (90 - r_refdef.fov_x / 2));          // rotate VPN left by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[2].normal, vright, vpn, (90 - r_refdef.fov_y / 2));       // rotate VPN up by FOV_X/2 degrees
         RotatePointAroundVector(&frustum[3].normal, vright, vpn, -(90 - r_refdef.fov_y / 2));    // rotate VPN down by FOV_X/2 degrees
     }
 
@@ -819,9 +819,9 @@ void R_SetupGL() {
     glRotatef(-90, 1, 0, 0);     // put Z going up
     glRotatef(90, 0, 0, 1);     // put Z going up
     glRotatef(-r_refdef.viewangles.v[2], 1, 0, 0);
-    glRotatef(-r_refdef.viewangles.v[0], 0, 1, 0);
+    glRotatef(-r_refdef.viewangles.pitch, 0, 1, 0);
     glRotatef(-r_refdef.viewangles.v[1], 0, 0, 1);
-    glTranslatef(-r_refdef.vieworg.v[0], -r_refdef.vieworg.v[1], -r_refdef.vieworg.v[2]);
+    glTranslatef(-r_refdef.vieworg.x, -r_refdef.vieworg.v[1], -r_refdef.vieworg.v[2]);
 
     glGetFloatv(GL_MODELVIEW_MATRIX, r_world_matrix);
 
@@ -921,8 +921,8 @@ void R_Mirror() {
         float d = DotProduct(vpn, mirror_plane->normal);
         VectorMA(vpn, -2 * d, mirror_plane->normal, &vpn);
     }
-    r_refdef.viewangles.v[0] = -asin(vpn.v[2]) / M_PI * 180;
-    r_refdef.viewangles.v[1] = atan2(vpn.v[1], vpn.v[0]) / M_PI * 180;
+    r_refdef.viewangles.pitch = -asin(vpn.v[2]) / M_PI * 180;
+    r_refdef.viewangles.v[1] = atan2(vpn.v[1], vpn.x) / M_PI * 180;
     r_refdef.viewangles.v[2] = -r_refdef.viewangles.v[2];
 
     r_Entity_p ent = &cl_entities[cl.viewentity];

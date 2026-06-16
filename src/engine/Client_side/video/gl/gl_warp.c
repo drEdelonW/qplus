@@ -34,32 +34,41 @@ float speedscale;  // for top sky and bottom sky
 mSurface_p warpface;
 
 
-void BoundPoly(int numverts, float_p verts, vec3_t mins, vec3_t maxs) {
-    mins.v[0] = mins.v[1] = mins.v[2] = 9999.0f;
-    maxs.v[0] = maxs.v[1] = maxs.v[2] = -9999.0f;
+void BoundPoly(int numverts, float_p verts, vec3_p mins, vec3_p maxs) {
+    *mins = {
+        .x = 9999.0f,
+        .y = 9999.0f,
+        .z = 9999.0f
+    };
+    *maxs = {
+        .x = -9999.0f,
+        .y = -9999.0f,
+        .z = -9999.0f
+    };
     float_p v = verts;
     for (int i = 0; i < numverts; i++)
         for (int j = 0; j < 3; j++, v++) {
-            if (*v < mins.v[j])   mins.v[j] = *v;
-            if (*v > maxs.v[j])   maxs.v[j] = *v;
+            if (*v < mins->v[j])   mins->v[j] = *v;
+            if (*v > maxs->v[j])   maxs->v[j] = *v;
         }
 }
 
 void SubdividePolygon(int numverts, float_p verts) {
-    vec3_t mins, maxs;
-    vec3_t front[64], back[64];
+    vec3_t front[64];
+    vec3_t back[64];
     float dist[64];
 
     if (numverts > 60)
-        Host_SysError("numverts = %i", numverts);
+    Host_SysError("numverts = %i", numverts);
 
-    BoundPoly(numverts, verts, mins, maxs);
+    vec3_t mins, maxs;
+    BoundPoly(numverts, verts, &mins, &maxs);
 
     for (int i = 0; i < 3; i++) {
         float m = (mins.v[i] + maxs.v[i]) * 0.5;
         m = gl_subdivide_size.value * floor(m / gl_subdivide_size.value + 0.5);
-        if ((maxs.v[i] - m) < 8)      continue;
-        if ((m - mins.v[i]) < 8)      continue;
+        if ((maxs.v[i] - m) < 8.0f)      continue;
+        if ((m - mins.v[i]) < 8.0f)      continue;
 
         // cut it
         float_p v = verts + i;
@@ -76,22 +85,21 @@ void SubdividePolygon(int numverts, float_p verts) {
         int b = 0;
         v = verts;
         for (int j = 0; j < numverts; j++, v += 3) {
-            if (dist[j] >= 0) {
-                VectorCopy(*(vec3_p)v, &front[f]);
-                f++;
+            if (dist[j] >= 0.0f) {
+                VectorCopy(*(vec3_p)v, &front[f++]);
             }
-            if (dist[j] <= 0) {
-                VectorCopy(*(vec3_p)v, &back[b]);
-                b++;
+            if (dist[j] <= 0.0f) {
+                VectorCopy(*(vec3_p)v, &back[b++]);
             }
-            if ((dist[j] == 0) ||
-                (dist[j + 1] == 0)
+            if ((dist[j] == 0.0f) ||
+                (dist[j + 1] == 0.0f)
                 )
                 continue;
+
             if ((dist[j] > 0) != (dist[j + 1] > 0)) {
                 // clip point
                 float frac = dist[j] / (dist[j] - dist[j + 1]);
-                for (int k = 0; k < 3; k++)
+                for (int k = 0; k < VECT_DIM; k++)
                     front[f].v[k] = back[b].v[k] = v[k] + frac * (v[3 + k] - v[k]);
                 f++;
                 b++;
@@ -204,7 +212,7 @@ void EmitSkyPolys(mSurface_p fa) {
                 vec3_t dir; VectorSubtract(*(vec3_p)v, r_origin, &dir);
                 dir.v[2] *= 3; // flatten the sphere
 
-                float length =
+                float length =  // TODO: replace to length(dir);
                     dir.v[0] * dir.v[0] +
                     dir.v[1] * dir.v[1] +
                     dir.v[2] * dir.v[2];

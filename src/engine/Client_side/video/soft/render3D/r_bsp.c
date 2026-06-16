@@ -207,18 +207,18 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
             // generate the clipped vertex
             float frac = lastdist / (lastdist - dist);
             mVertex_p ptvert = &_pbVerts[_numbVerts++];
-            ptvert->position.v[0] =
-                plastvert->position.v[0] +
-                frac * (pvert->position.v[0] -
-                    plastvert->position.v[0]);
-            ptvert->position.v[1] =
-                plastvert->position.v[1] +
-                frac * (pvert->position.v[1] -
-                    plastvert->position.v[1]);
-            ptvert->position.v[2] =
-                plastvert->position.v[2] +
-                frac * (pvert->position.v[2] -
-                    plastvert->position.v[2]);
+            ptvert->position.x =
+                plastvert->position.x +
+                frac * (pvert->position.x -
+                    plastvert->position.x);
+            ptvert->position.y =
+                plastvert->position.y +
+                frac * (pvert->position.y -
+                    plastvert->position.y);
+            ptvert->position.z =
+                plastvert->position.z +
+                frac * (pvert->position.z -
+                    plastvert->position.z);
 
             // split into two edges, one on each side, and remember entering
             // and exiting points
@@ -488,9 +488,9 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
 
         double  dot;
         switch (plane->type) {
-        case PLANE_X: { dot = modelorg.v[0] - plane->dist; } break;
-        case PLANE_Y: { dot = modelorg.v[1] - plane->dist; } break;
-        case PLANE_Z: { dot = modelorg.v[2] - plane->dist; } break;
+        case PLANE_X: { dot = modelorg.x - plane->dist; } break;
+        case PLANE_Y: { dot = modelorg.y - plane->dist; } break;
+        case PLANE_Z: { dot = modelorg.z - plane->dist; } break;
         default: dot = DotProduct(modelorg, plane->normal) - plane->dist; break;
         }
 

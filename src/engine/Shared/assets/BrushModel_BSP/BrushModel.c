@@ -69,9 +69,9 @@ void Mod_LoadVertexes(Lump_p Lump_in) {
     _loadModel->numvertexes = count;
 
     for (int i = 0; i < count; i++, in++, out++) {
-        out->position.v[0] = LittleFloat(in->point.v[0]);
-        out->position.v[1] = LittleFloat(in->point.v[1]);
-        out->position.v[2] = LittleFloat(in->point.v[2]);
+        out->position.x = LittleFloat(in->point.x);
+        out->position.y = LittleFloat(in->point.y);
+        out->position.z = LittleFloat(in->point.z);
     }
 }
 
@@ -432,10 +432,10 @@ void CalcSurfaceExtents(mSurface_p s) {
 
         for (int j = 0; j < 2; j++) {
             float val =
-                v->position.v[0] * tex->vecs[j][0] +
-                v->position.v[1] * tex->vecs[j][1] +
-                v->position.v[2] * tex->vecs[j][2] +
-                /*              */ tex->vecs[j][3];
+                v->position.x * tex->vecs[j][0] +
+                v->position.y * tex->vecs[j][1] +
+                v->position.z * tex->vecs[j][2] +
+                /*           */ tex->vecs[j][3];
             if (val < mins[j]) mins[j] = val;
             if (val > maxs[j]) maxs[j] = val;
         }

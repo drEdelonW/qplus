@@ -45,26 +45,27 @@ uint32_t nanmask = 0xFF << 23;
 
 
 void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, float degrees) {
-    vec3_t vf = {
-        .x = dir.v[0],
-        .y = dir.v[1],
-        .z = dir.v[2]
-    };
+    vec3_t vf = dir; 
+    // {
+    //     .x = dir.x,
+    //     .y = dir.y,
+    //     .z = dir.z
+    // };
     vec3_t vr;  PerpendicularVector(&vr, dir);
     vec3_t vup; CrossProduct(vr, vf, &vup);
 #if 0
     float m[3][3];
-    m[0][0] = vr.v[0];
-    m[1][0] = vr.v[1];
-    m[2][0] = vr.v[2];
+    m[0][0] = vr.x;
+    m[1][0] = vr.y;
+    m[2][0] = vr.z;
 
-    m[0][1] = vup.v[0];
-    m[1][1] = vup.v[1];
-    m[2][1] = vup.v[2];
+    m[0][1] = vup.x;
+    m[1][1] = vup.y;
+    m[2][1] = vup.z;
 
-    m[0][2] = vf.v[0];
-    m[1][2] = vf.v[1];
-    m[2][2] = vf.v[2];
+    m[0][2] = vf.x;
+    m[1][2] = vf.y;
+    m[2][2] = vf.z;
 #else
     mat3_t m = {
         .m = {
@@ -119,9 +120,9 @@ void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, f
 
     for (int i = 0; i < VECT_DIM; i++) {
         dst->v[i] =
-            rot.m[i][0] * point.v[0] +
-            rot.m[i][1] * point.v[1] +
-            rot.m[i][2] * point.v[2];
+            rot.m[i][0] * point.x +
+            rot.m[i][1] * point.y +
+            rot.m[i][2] * point.z;
     }
 }
 

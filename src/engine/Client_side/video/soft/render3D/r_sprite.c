@@ -96,8 +96,8 @@ int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
             outcount++;
         }
 
-        if ((dists[i] == 0) || (dists[i + 1] == 0))     continue;
-        if ((dists[i] > 0) == (dists[i + 1] > 0))       continue;
+        if ((dists[i] == 0.0f) || (dists[i + 1] == 0.0f))     continue;
+        if ((dists[i] > 0.0f) == (dists[i + 1] > 0.0f))       continue;
 
         // split it into a new vertex
         float frac = dists[i] / (dists[i] - dists[i + 1]);
@@ -199,27 +199,27 @@ void R_SetupAndDrawSprite() {
 
     vec5_p pverts = _clip_verts[0];
 
-    pverts[0][0] = r_entorigin.v[0] + up.v[0] + left.v[0];
-    pverts[0][1] = r_entorigin.v[1] + up.v[1] + left.v[1];
-    pverts[0][2] = r_entorigin.v[2] + up.v[2] + left.v[2];
+    pverts[0][0] = r_entorigin.x + up.x + left.x;
+    pverts[0][1] = r_entorigin.y + up.y + left.y;
+    pverts[0][2] = r_entorigin.z + up.z + left.z;
     pverts[0][3] = 0.0f;
     pverts[0][4] = 0.0f;
 
-    pverts[1][0] = r_entorigin.v[0] + up.v[0] + right.v[0];
-    pverts[1][1] = r_entorigin.v[1] + up.v[1] + right.v[1];
-    pverts[1][2] = r_entorigin.v[2] + up.v[2] + right.v[2];
+    pverts[1][0] = r_entorigin.x + up.x + right.x;
+    pverts[1][1] = r_entorigin.y + up.y + right.y;
+    pverts[1][2] = r_entorigin.z + up.z + right.z;
     pverts[1][3] = _sprite_width;
     pverts[1][4] = 0.0f;
 
-    pverts[2][0] = r_entorigin.v[0] + down.v[0] + right.v[0];
-    pverts[2][1] = r_entorigin.v[1] + down.v[1] + right.v[1];
-    pverts[2][2] = r_entorigin.v[2] + down.v[2] + right.v[2];
+    pverts[2][0] = r_entorigin.x + down.x + right.x;
+    pverts[2][1] = r_entorigin.y + down.y + right.y;
+    pverts[2][2] = r_entorigin.z + down.z + right.z;
     pverts[2][3] = _sprite_width;
     pverts[2][4] = _sprite_height;
 
-    pverts[3][0] = r_entorigin.v[0] + down.v[0] + left.v[0];
-    pverts[3][1] = r_entorigin.v[1] + down.v[1] + left.v[1];
-    pverts[3][2] = r_entorigin.v[2] + down.v[2] + left.v[2];
+    pverts[3][0] = r_entorigin.x + down.x + left.x;
+    pverts[3][1] = r_entorigin.y + down.y + left.y;
+    pverts[3][2] = r_entorigin.z + down.z + left.z;
     pverts[3][3] = 0.0f;
     pverts[3][4] = _sprite_height;
 
@@ -242,18 +242,18 @@ void R_SetupAndDrawSprite() {
         vec3_t local;   VectorSubtract(*(vec3_p)pv, r_origin, &local);
         vec3_t transformed; TransformVector(local, &transformed);
 
-        if (transformed.v[2] < NEAR_CLIP)
-            transformed.v[2] = NEAR_CLIP;
+        if (transformed.z < NEAR_CLIP)
+            transformed.z = NEAR_CLIP;
 
         EmitPoint_p pout = &outverts[i];
-        pout->zi = 1.0 / transformed.v[2];
+        pout->zi = 1.0 / transformed.z;
         if (pout->zi > r_spritedesc.nearzi)
             r_spritedesc.nearzi = pout->zi;
 
         pout->s = pv[3];
         pout->t = pv[4];
-        pout->u = xcenter + xscale * pout->zi * transformed.v[0];
-        pout->v = ycenter - yscale * pout->zi * transformed.v[1];
+        pout->u = xcenter + xscale * pout->zi * transformed.x;
+        pout->v = ycenter - yscale * pout->zi * transformed.y;
         pv += sizeof(vec5_t) / sizeof(*pv);
     }
 
@@ -326,26 +326,28 @@ void R_DrawSprite() {
         // vectors and starts to approach an undefined state, so we don't draw if
         // the two vectors are less than 1 degree apart
         vec3_t tvec = {
-            .x = -modelorg.v[0],
-            .y = -modelorg.v[1],
-            .z = -modelorg.v[2]
+            .x = -modelorg.x,
+            .y = -modelorg.y,
+            .z = -modelorg.z
         };
         VectorNormalize(&tvec);
-        float dot = tvec.v[2]; // same as DotProduct (tvec, r_spritedesc.vup) because r_spritedesc.vup is 0, 0, 1
+        float dot = tvec.z; // same as DotProduct (tvec, r_spritedesc.vup) because r_spritedesc.vup is 0, 0, 1
         if ((dot > 0.999848f) ||
             (dot < -0.999848f)) // cos(1 degree) = 0.999848
             return;
-        r_spritedesc.vup.v[0] = 0;
-        r_spritedesc.vup.v[1] = 0;
-        r_spritedesc.vup.v[2] = 1;
-        r_spritedesc.vright.v[0] = tvec.v[1];
+        r_spritedesc.vup.x = 0;
+        r_spritedesc.vup.y = 0;
+        r_spritedesc.vup.z = 1;
+
+        r_spritedesc.vright.x = tvec.y;
         // CrossProduct(r_spritedesc.vup, -modelorg, r_spritedesc.vright)
-        r_spritedesc.vright.v[1] = -tvec.v[0]; 
-        r_spritedesc.vright.v[2] = 0;
+        r_spritedesc.vright.y = -tvec.x; 
+        r_spritedesc.vright.z = 0;
         VectorNormalize(&r_spritedesc.vright);
-        r_spritedesc.vpn.v[0] = -r_spritedesc.vright.v[1];
-        r_spritedesc.vpn.v[1] = r_spritedesc.vright.v[0];
-        r_spritedesc.vpn.v[2] = 0;
+
+        r_spritedesc.vpn.x = -r_spritedesc.vright.y;
+        r_spritedesc.vpn.y = r_spritedesc.vright.x;
+        r_spritedesc.vpn.z = 0;
         // CrossProduct (r_spritedesc.vright, r_spritedesc.vup, r_spritedesc.vpn)
     }
     else if (psprite->type == SPR_VP_PARALLEL) {
@@ -365,7 +367,7 @@ void R_DrawSprite() {
         // down, because the cross product will be between two nearly parallel
         // vectors and starts to approach an undefined state, so we don't draw if
         // the two vectors are less than 1 degree apart
-        float dot = vpn.v[2]; // same as DotProduct (vpn, r_spritedesc.vup) because
+        float dot = vpn.z; // same as DotProduct (vpn, r_spritedesc.vup) because
         //  r_spritedesc.vup is 0, 0, 1
         if ((dot > 0.999848f) ||
             (dot < -0.999848f)) // cos(1 degree) = 0.999848
@@ -379,15 +381,15 @@ void R_DrawSprite() {
 
         // CrossProduct (r_spritedesc.vup, vpn, r_spritedesc.vright)
         r_spritedesc.vright = (vec3_t){
-             .x = vpn.v[1],
-             .y = -vpn.v[0],
+             .x = vpn.y,
+             .y = -vpn.x,
              .z = 0.0f
         };
         VectorNormalize(&r_spritedesc.vright);
 
         r_spritedesc.vpn = (vec3_t){
-             .x = -r_spritedesc.vright.v[1],
-             .y = r_spritedesc.vright.v[0],
+             .x = -r_spritedesc.vright.y,
+             .y = r_spritedesc.vright.x,
              .z = 0.0f
         };
         // CrossProduct (r_spritedesc.vright, r_spritedesc.vup, r_spritedesc.vpn)

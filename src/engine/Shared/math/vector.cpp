@@ -31,14 +31,14 @@ void ProjectPointOnPlane(vec3_p dst, const vec3_t p, const vec3_t normal) {
     float d = DotProduct(normal, p) * inv_denom;
 
     vec3_t n = {
-        .x = normal.v[0] * inv_denom,
-        .y = normal.v[1] * inv_denom,
-        .z = normal.v[2] * inv_denom
+        .x = normal.x * inv_denom,
+        .y = normal.y * inv_denom,
+        .z = normal.z * inv_denom
     };
 
-    dst->v[0] = p.v[0] - d * n.v[0];
-    dst->v[1] = p.v[1] - d * n.v[1];
-    dst->v[2] = p.v[2] - d * n.v[2];
+    dst->x = p.x - d * n.x;
+    dst->y = p.y - d * n.y;
+    dst->z = p.z - d * n.z;
 }
 
 bool VectorCompare(vec3_t const v1, vec3_t const v2) {
@@ -54,9 +54,9 @@ void VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_p vecc) {
     Vector3D bV(vecb);
     (aV + (bV * scale)).toVec3(vecc);
 #else
-    vecc->v[0] = veca.v[0] + scale * vecb.v[0];
-    vecc->v[1] = veca.v[1] + scale * vecb.v[1];
-    vecc->v[2] = veca.v[2] + scale * vecb.v[2];
+    vecc->x = veca.x + scale * vecb.x;
+    vecc->y = veca.y + scale * vecb.y;
+    vecc->z = veca.z + scale * vecb.z;
 #endif
 }
 
@@ -67,9 +67,9 @@ vec_t DotProduct(vec3_t const v1, vec3_t const v2) {
     return aV.dot(bV);
 #else
     return
-        (v1.v[0] * v2.v[0]) +
-        (v1.v[1] * v2.v[1]) +
-        (v1.v[2] * v2.v[2]);
+        (v1.x * v2.x) +
+        (v1.y * v2.y) +
+        (v1.z * v2.z);
 #endif
 }
 
@@ -91,9 +91,9 @@ void VectorAdd(vec3_t const veca, vec3_t const vecb, vec3_p out) {
     Vector3D bV(vecb);
     (aV + bV).toVec3(out);
 #else
-    out->v[0] = veca.v[0] + vecb.v[0];
-    out->v[1] = veca.v[1] + vecb.v[1];
-    out->v[2] = veca.v[2] + vecb.v[2];
+    out->x = veca.x + vecb.x;
+    out->y = veca.y + vecb.y;
+    out->z = veca.z + vecb.z;
 #endif
 }
 
@@ -102,9 +102,9 @@ void VectorCopy(vec3_t const in, vec3_p out) {
     Vector3D V(in);
     V.toVec3(out);
 #else
-    out->v[0] = in.v[0];
-    out->v[1] = in.v[1];
-    out->v[2] = in.v[2];
+    out->x = in.x;
+    out->y = in.y;
+    out->z = in.z;
 #endif
 }
 
@@ -142,14 +142,14 @@ float VectorNormalize(vec3_p v) {
     V.normalize().toVec3(v);
     return len;
 #else
-    float length = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+    float length = (x * x) + (y * y) + (z * z);
     length = sqrt(length);  // FIXME
 
     if (length) {
         float ilength = 1 / length;
-        v[0] *= ilength;
-        v[1] *= ilength;
-        v[2] *= ilength;
+        x *= ilength;
+        y *= ilength;
+        z *= ilength;
     }
 
     return length;
@@ -161,9 +161,9 @@ void VectorInverse(vec3_p v) {
     Vector3D V(*v);
     (-V).toVec3(v);
 #else
-    v[0] = -v[0];
-    v[1] = -v[1];
-    v[2] = -v[2];
+    x = -x;
+    y = -y;
+    z = -z;
 #endif
 }
 

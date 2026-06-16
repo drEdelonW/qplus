@@ -27,9 +27,9 @@ void SV_StartParticle(vec3_t org, vec3_t dir, int color, size_t count) {
     if (sv.datagram.cursize > (MAX_DATAGRAM - 16))  return;
 
     MSG_WriteByte(&sv.datagram, svc_particle);
-    MSG_WriteCoord(&sv.datagram, org.v[0]);
-    MSG_WriteCoord(&sv.datagram, org.v[1]);
-    MSG_WriteCoord(&sv.datagram, org.v[2]);
+    MSG_WriteCoord(&sv.datagram, org.x);
+    MSG_WriteCoord(&sv.datagram, org.y);
+    MSG_WriteCoord(&sv.datagram, org.z);
     for (int i = 0; i < VECT_DIM; i++) {
         int v = (int)(dir.v[i] * 16.0f);
         CLAMP(-128, v, 127);
@@ -196,9 +196,9 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
             if ((miss < -0.1f) || (miss > 0.1f))                bits |= (U_ORIGIN1 << i);
         }
 
-        if (ent->v.angles.v[0] != ent->baseline.angles.v[0])    bits |= U_ANGLE1;
-        if (ent->v.angles.v[1] != ent->baseline.angles.v[1])    bits |= U_ANGLE2;
-        if (ent->v.angles.v[2] != ent->baseline.angles.v[2])    bits |= U_ANGLE3;
+        if (ent->v.angles.pitch != ent->baseline.angles.pitch)  bits |= U_ANGLE1;
+        if (ent->v.angles.yaw != ent->baseline.angles.yaw)      bits |= U_ANGLE2;
+        if (ent->v.angles.z != ent->baseline.angles.z)    bits |= U_ANGLE3;
         if (ent->v.movetype == MOVETYPE_STEP)                   bits |= U_NOLERP;  // don't mess up the step animation
         if (ent->v.colormap != ent->baseline.colormap)          bits |= U_COLORMAP;
         if (ent->v.skin != ent->baseline.skin)                  bits |= U_SKIN;
@@ -222,12 +222,12 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         if (bits & U_COLORMAP)  MSG_WriteByte(msg, (uint8_t)ent->v.colormap);
         if (bits & U_SKIN)      MSG_WriteByte(msg, (uint8_t)ent->v.skin);
         if (bits & U_EFFECTS)   MSG_WriteByte(msg, (uint8_t)ent->v.effects);
-        if (bits & U_ORIGIN1)   MSG_WriteCoord(msg, ent->v.origin.v[0]);
-        if (bits & U_ANGLE1)    MSG_WriteAngle(msg, ent->v.angles.v[0]);
-        if (bits & U_ORIGIN2)   MSG_WriteCoord(msg, ent->v.origin.v[1]);
-        if (bits & U_ANGLE2)    MSG_WriteAngle(msg, ent->v.angles.v[1]);
-        if (bits & U_ORIGIN3)   MSG_WriteCoord(msg, ent->v.origin.v[2]);
-        if (bits & U_ANGLE3)    MSG_WriteAngle(msg, ent->v.angles.v[2]);
+        if (bits & U_ORIGIN1)   MSG_WriteCoord(msg, ent->v.origin.x);
+        if (bits & U_ANGLE1)    MSG_WriteAngle(msg, ent->v.angles.pitch);
+        if (bits & U_ORIGIN2)   MSG_WriteCoord(msg, ent->v.origin.y);
+        if (bits & U_ANGLE2)    MSG_WriteAngle(msg, ent->v.angles.yaw);
+        if (bits & U_ORIGIN3)   MSG_WriteCoord(msg, ent->v.origin.z);
+        if (bits & U_ANGLE3)    MSG_WriteAngle(msg, ent->v.angles.roll);
     }
 }
 
@@ -274,7 +274,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     }
 
     int bits = 0;
-    if (ent->v.view_ofs.v[2] != DEFAULT_VIEWHEIGHT) bits |= SU_VIEWHEIGHT;
+    if (ent->v.view_ofs.z != DEFAULT_VIEWHEIGHT)    bits |= SU_VIEWHEIGHT;
     if (ent->v.idealpitch)                          bits |= SU_IDEALPITCH;
 
     // stuff the sigil bits into the high bits of items for sbar, or else
@@ -305,7 +305,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     // send the data
 
     MSG_WriteByte(msg, svc_clientdata); MSG_WriteShort(msg, (int16_t)bits);
-    if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, (int8_t)ent->v.view_ofs.v[2]);
+    if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, (int8_t)ent->v.view_ofs.z);
     if (bits & SU_IDEALPITCH)           MSG_WriteChar(msg, (int8_t)ent->v.idealpitch);
     for (int i = 0; i < VECT_DIM; i++) {
         if (bits & (SU_PUNCH1 << i))    MSG_WriteChar(msg, (int8_t)ent->v.punchangle.v[i]);

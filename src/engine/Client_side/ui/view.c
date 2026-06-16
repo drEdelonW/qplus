@@ -94,7 +94,7 @@ float V_CalcBob() {
     // (don't count Z, or jumping messes it up)
 
     float bob = sqrt(
-        (cl.velocity.v[0] * cl.velocity.v[0]) +
+        (cl.velocity.x * cl.velocity.x) +
         (cl.velocity.v[1] * cl.velocity.v[1])
     ) * cl_bob.value;
     //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
@@ -161,7 +161,7 @@ void V_DriftPitch() {
         return;
     }
 
-    float delta = cl.idealpitch - cl.viewangles.v[PITCH];
+    float delta = cl.idealpitch - cl.viewangles.pitch;
 
     if (!delta) { cl.pitchvel = 0; return; }
 
@@ -175,14 +175,14 @@ void V_DriftPitch() {
             cl.pitchvel = 0;
             move = delta;
         }
-        cl.viewangles.v[PITCH] += move;
+        cl.viewangles.pitch += move;
     }
     else if (delta < 0) {
         if (move > -delta) {
             cl.pitchvel = 0;
             move = -delta;
         }
-        cl.viewangles.v[PITCH] -= move;
+        cl.viewangles.pitch -= move;
     }
 }
 
@@ -615,8 +615,8 @@ void CalcGunAngle() {
             yaw = _oldYaw - move;
     }
 
-    float pitch = -r_refdef.viewangles.v[PITCH];
-    pitch = angledelta(-pitch - r_refdef.viewangles.v[PITCH]) * 0.4;
+    float pitch = -r_refdef.viewangles.pitch;
+    pitch = angledelta(-pitch - r_refdef.viewangles.pitch) * 0.4;
     CLAMP(-10, pitch, 10);
     if (pitch > _oldPitch) {
         if ((_oldPitch + move) < pitch)
@@ -631,10 +631,10 @@ void CalcGunAngle() {
     _oldPitch = pitch;
 
     cl.viewent.angles.v[YAW] = r_refdef.viewangles.v[YAW] + yaw;
-    cl.viewent.angles.v[PITCH] = -(r_refdef.viewangles.v[PITCH] + pitch);
+    cl.viewent.angles.pitch = -(r_refdef.viewangles.pitch + pitch);
 
     cl.viewent.angles.v[ROLL] -= v_idlescale.value * sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value;
-    cl.viewent.angles.v[PITCH] -= v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
+    cl.viewent.angles.pitch -= v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
     cl.viewent.angles.v[YAW] -= v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
 }
 
@@ -649,7 +649,7 @@ void V_BoundOffsets() {
     // absolutely bound refresh reletive to entity clipping hull
     // so the view can never be inside a solid wall
 
-    CLAMP(ent->origin.v[0] - 14, r_refdef.vieworg.v[0], ent->origin.v[0] + 14);
+    CLAMP(ent->origin.x - 14, r_refdef.vieworg.x, ent->origin.x + 14);
     CLAMP(ent->origin.v[1] - 14, r_refdef.vieworg.v[1], ent->origin.v[1] + 14);
     CLAMP(ent->origin.v[2] - 22, r_refdef.vieworg.v[2], ent->origin.v[2] + 30);
 }
@@ -663,7 +663,7 @@ Idle swaying
 */
 void V_AddIdle() {
     r_refdef.viewangles.v[ROLL] += v_idlescale.value * sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value;
-    r_refdef.viewangles.v[PITCH] += v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
+    r_refdef.viewangles.pitch += v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
     r_refdef.viewangles.v[YAW] += v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
 }
 
@@ -681,7 +681,7 @@ void V_CalcViewRoll() {
 
     if (_v_DmgTime > 0) {
         r_refdef.viewangles.v[ROLL] += _v_DmgTime / v_kicktime.value * _v_DmgRoll;
-        r_refdef.viewangles.v[PITCH] += _v_DmgTime / v_kicktime.value * _v_DmgPitch;
+        r_refdef.viewangles.pitch += _v_DmgTime / v_kicktime.value * _v_DmgPitch;
         _v_DmgTime -= host_frametime;
     }
 
@@ -730,7 +730,7 @@ void V_CalcRefdef() {
 
     // transform the view offset by the model's matrix to get the offset from model origin for the view
     ent->angles.v[YAW] = cl.viewangles.v[YAW]; // the model should face the view dir
-    ent->angles.v[PITCH] = -cl.viewangles.v[PITCH]; // the model should face the view dir
+    ent->angles.pitch = -cl.viewangles.pitch; // the model should face the view dir
 
 
     float bob = V_CalcBob();
@@ -741,7 +741,7 @@ void V_CalcRefdef() {
     // never let it sit exactly on a node line, because a water plane can
     // dissapear when viewed with the eye exactly on it.
     // the server protocol only specifies to 1/16 pixel, so add 1/32 in each axis
-    r_refdef.vieworg.v[0] += 1.0 / 32;
+    r_refdef.vieworg.x += 1.0 / 32;
     r_refdef.vieworg.v[1] += 1.0 / 32;
     r_refdef.vieworg.v[2] += 1.0 / 32;
 
@@ -751,7 +751,7 @@ void V_CalcRefdef() {
 
     vec3_t angles = {
         // offsets
-       .x = -ent->angles.v[PITCH],  /* angles[PITCH] */ // because entity pitches are actually backward
+       .x = -ent->angles.pitch,  /* angles[PITCH] */ // because entity pitches are actually backward
        .y = ent->angles.v[YAW],   /* angles[YAW] */
        .z = ent->angles.v[ROLL]   /* angles[ROLL] */
     };

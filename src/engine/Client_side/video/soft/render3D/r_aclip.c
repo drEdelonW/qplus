@@ -46,12 +46,12 @@ void R_Alias_clip_z(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
 
     if (pfv0->v[1] >= pfv1->v[1]) {
         float scale =
-            (ALIAS_Z_CLIP_PLANE - pav0->fv.v[2]) /
-            (pav1->fv.v[2] - pav0->fv.v[2]);
+            (ALIAS_Z_CLIP_PLANE - pav0->fv.z) /
+            (pav1->fv.z - pav0->fv.z);
 
-        avout.fv.v[0] = pav0->fv.v[0] + (pav1->fv.v[0] - pav0->fv.v[0]) * scale;
-        avout.fv.v[1] = pav0->fv.v[1] + (pav1->fv.v[1] - pav0->fv.v[1]) * scale;
-        avout.fv.v[2] = ALIAS_Z_CLIP_PLANE;
+        avout.fv.x = pav0->fv.x + (pav1->fv.x - pav0->fv.x) * scale;
+        avout.fv.y = pav0->fv.y + (pav1->fv.y - pav0->fv.y) * scale;
+        avout.fv.z = ALIAS_Z_CLIP_PLANE;
 
         out->v[2] = pfv0->v[2] + (pfv1->v[2] - pfv0->v[2]) * scale;
         out->v[3] = pfv0->v[3] + (pfv1->v[3] - pfv0->v[3]) * scale;
@@ -59,12 +59,12 @@ void R_Alias_clip_z(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
     }
     else {
         float scale =
-            (ALIAS_Z_CLIP_PLANE - pav1->fv.v[2]) /
-            (pav0->fv.v[2] - pav1->fv.v[2]);
+            (ALIAS_Z_CLIP_PLANE - pav1->fv.z) /
+            (pav0->fv.z - pav1->fv.z);
 
-        avout.fv.v[0] = pav1->fv.v[0] + (pav0->fv.v[0] - pav1->fv.v[0]) * scale;
-        avout.fv.v[1] = pav1->fv.v[1] + (pav0->fv.v[1] - pav1->fv.v[1]) * scale;
-        avout.fv.v[2] = ALIAS_Z_CLIP_PLANE;
+        avout.fv.x = pav1->fv.x + (pav0->fv.x - pav1->fv.x) * scale;
+        avout.fv.y = pav1->fv.y + (pav0->fv.y - pav1->fv.y) * scale;
+        avout.fv.z = ALIAS_Z_CLIP_PLANE;
 
         out->v[2] = pfv1->v[2] + (pfv0->v[2] - pfv1->v[2]) * scale;
         out->v[3] = pfv1->v[3] + (pfv0->v[3] - pfv1->v[3]) * scale;

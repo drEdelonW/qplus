@@ -548,8 +548,8 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
     // FIXME: do this right
 # if 0
-    mod->mins.v[0] = mod->mins.v[1] = mod->mins.v[2] = -16;
-    mod->maxs.v[0] = mod->maxs.v[1] = mod->maxs.v[2] = 16;
+    mod->mins.x = mod->mins.y = mod->mins.z = -16;
+    mod->maxs.x = mod->maxs.y = mod->maxs.z = 16;
 # else
     mod->mins = (vec3_t){
             .x = -16.0f,
@@ -760,8 +760,8 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
     // FIXME: do this right
 # if 0
-    mod->mins.v[0] = mod->mins.v[1] = mod->mins.v[2] = -16;
-    mod->maxs.v[0] = mod->maxs.v[1] = mod->maxs.v[2] = 16;
+    mod->mins.x = mod->mins.y = mod->mins.z = -16;
+    mod->maxs.x = mod->maxs.y = mod->maxs.z = 16;
 # else
     mod->mins = (vec3_t){
             .x = -16.0f,

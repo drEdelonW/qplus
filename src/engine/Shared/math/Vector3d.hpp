@@ -27,19 +27,19 @@ public:
     Vector3D(
         vec3_t const v
     )  noexcept :
-        x(v.v[0]), y(v.v[1]), z(v.v[2]) {
+        x(v.x), y(v.y), z(v.z) {
     };
 
     Vector3D& operator=(
         const vec3_t v
         ) noexcept {
-        x = v.v[0];
-        y = v.v[1];
-        z = v.v[2];
+        x = v.x;
+        y = v.y;
+        z = v.z;
         return *this;
     }
 
-    void toVec3(vec3_p out) const noexcept { out->v[0] = x; out->v[1] = y; out->v[2] = z; }
+    void toVec3(vec3_p out) const noexcept { out->x = x; out->y = y; out->z = z; }
 
     // vect_t& operator[](int i) noexcept {
     //     switch (i) {

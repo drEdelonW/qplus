@@ -62,14 +62,14 @@ void D_DrawParticle(Particle_p pparticle) {
         .z = DotProduct(local, r_ppn)
     };
 
-    if (transformed.v[2] < PARTICLE_Z_CLIP)
+    if (transformed.z < PARTICLE_Z_CLIP)
         return;
 
     // project the point
     // FIXME: preadjust xcenter and ycenter
-    float zi = 1.0 / transformed.v[2];
-    int u = (int)(xcenter + zi * transformed.v[0] + 0.5);
-    int v = (int)(ycenter - zi * transformed.v[1] + 0.5);
+    float zi = 1.0f / transformed.z;
+    int u = (int)(xcenter + zi * transformed.x + 0.5f);
+    int v = (int)(ycenter - zi * transformed.y + 0.5f);
 
     if ((v > d_vrectbottom_particle) ||
         (u > d_vrectright_particle) ||

@@ -42,7 +42,7 @@ enum {
 STATIC_ASSERT_SIZE(vec3_t, 3 * sizeof(vec_t));
 typedef vec3_t* vec3_p;
 
-#if 0
+#if 1   // TODO: rework textured vertex
 typedef vec_t vec5_t[5];    // vec3_t(x/y/z) + vec2(s/t)
 #else
 typedef union {
@@ -67,24 +67,25 @@ typedef vec5_t* vec5_p;
 extern "C" {
 #endif
 
-    vec_t   DotProduct(vec3_t const v1, vec3_t const v2);
-    void    VectorSubtract(vec3_t const veca, vec3_t const vecb, vec3_p out);
-    void    VectorAdd(vec3_t const veca, vec3_t const vecb, vec3_p out);
     void    VectorCopy(vec3_t const in, vec3_p out);
 
-    void    VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_p vecc);
+    void    VectorAdd(vec3_t const veca, vec3_t const vecb, vec3_p out);        // va + vb
+    void    VectorSubtract(vec3_t const veca, vec3_t const vecb, vec3_p out);   // va - vb
+    void    VectorScale(vec3_t const in, vec_t const scale, vec3_p out);        // va + s
+    void    VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_p vecc);       // va + (vb * s)
 
-    bool    VectorCompare(vec3_t const v1, vec3_t const v2);
-    vec_t   Length(vec3_t const v);
+    void    VectorInverse(vec3_p v);                            // va = -va
+    bool    VectorCompare(vec3_t const v1, vec3_t const v2);    // va == vb (all dimension)
+    vec_t   Length(vec3_t const v);         // returns vector length
+    float   VectorNormalize(vec3_p v);
 
+    vec_t   DotProduct(vec3_t const v1, vec3_t const v2);
     void    CrossProduct(vec3_t const v1, vec3_t const v2, vec3_p cross);
+
     void    PerpendicularVector(vec3_p dst, const vec3_t src);
     void    ProjectPointOnPlane(vec3_p dst, const vec3_t p, const vec3_t normal);
-    void    TransformVector(vec3_t in, vec3_p out);
 
-    float   VectorNormalize(vec3_p v);  // returns vector length
-    void    VectorInverse(vec3_p v);
-    void    VectorScale(vec3_t const in, vec_t const scale, vec3_p out);
+    void    TransformVector(vec3_t in, vec3_p out);
 
 
 #ifdef __cplusplus

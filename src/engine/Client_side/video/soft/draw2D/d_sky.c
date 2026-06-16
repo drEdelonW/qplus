@@ -34,26 +34,27 @@ D_Sky_uv_To_st
 =================
 */
 void D_Sky_uv_To_st(int u, int v, fixed16_p s, fixed16_p t) {
-    float temp;
-    if (r_refdef.vrect.width >= r_refdef.vrect.height)
-        temp = (float)r_refdef.vrect.width;
-    else
-        temp = (float)r_refdef.vrect.height;
+    float temp = (float)(
+        (r_refdef.vrect.width >= r_refdef.vrect.height) ?
+        r_refdef.vrect.width : r_refdef.vrect.height
+        );
 
-    float wu = 8192.0 * (float)(u - ((int)vid.width >> 1)) / temp;
-    float wv = 8192.0 * (float)(((int)vid.height >> 1) - v) / temp;
+    float wu = 8192.0f * (float)(u - ((int)vid.width >> 1)) / temp;
+    float wv = 8192.0f * (float)(((int)vid.height >> 1) - v) / temp;
 
     vec3_t end = {
-        .x = 4096 * vpn.v[0] + wu * vright.v[0] + wv * vup.v[0],
-        .y = 4096 * vpn.v[1] + wu * vright.v[1] + wv * vup.v[1],
-        .z = 4096 * vpn.v[2] + wu * vright.v[2] + wv * vup.v[2]
+        .x = 4096.0f * vpn.x + wu * vright.x + wv * vup.x,
+        .y = 4096.0f * vpn.y + wu * vright.y + wv * vup.y,
+        .z = 4096.0f * vpn.z + wu * vright.z + wv * vup.z
     };
-    end.v[2] *= 3;
+    end.z *= 3.0f;
     VectorNormalize(&end);
 
-    temp = skytime * skyspeed; // TODO: add D_SetupFrame & set this there
-    *s = (int)((temp + 6 * (SKYSIZE / 2 - 1) * end.v[0]) * 0x10000);
-    *t = (int)((temp + 6 * (SKYSIZE / 2 - 1) * end.v[1]) * 0x10000);
+    {
+        float temp = skytime * skyspeed; // TODO: add D_SetupFrame & set this there
+        *s = (int)((temp + 6 * (SKYSIZE / 2 - 1) * end.v[0]) * 0x10000);
+        *t = (int)((temp + 6 * (SKYSIZE / 2 - 1) * end.v[1]) * 0x10000);
+    }
 }
 
 
@@ -63,15 +64,13 @@ D_DrawSkyScans8
 =================
 */
 void D_DrawSkyScans8(eSpan_p pspan) {
-    fixed16_t  s, t, snext, tnext;
-    fixed16_t sstep = 0; // keep compiler happy
-    fixed16_t tstep = 0; // ditto
-
     do {
         uint8_p pdest = (uint8_p)((uint8_p)d_viewbuffer +
             (screenwidth * pspan->v) + pspan->u);
 
         int count = pspan->count;
+
+        fixed16_t  s, t;
 
         // calculate the initial s & t
         int u = pspan->u;
@@ -79,9 +78,16 @@ void D_DrawSkyScans8(eSpan_p pspan) {
         D_Sky_uv_To_st(u, v, &s, &t);
 
         do {
-            int spancount = (count >= SKY_SPAN_MAX) ? SKY_SPAN_MAX : count;
+            int spancount =
+                (count >= SKY_SPAN_MAX) ?
+                SKY_SPAN_MAX : count;
 
             count -= spancount;
+
+            fixed16_t  snext, tnext;
+
+            fixed16_t sstep = 0; // keep compiler happy
+            fixed16_t tstep = 0; // ditto
 
             if (count) {
                 u += spancount;

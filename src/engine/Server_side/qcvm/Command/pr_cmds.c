@@ -152,7 +152,7 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
         // find min / max for rotations
         vec3_t angles = edict->v.angles;
 
-        float a = angles.v[1] / 180.0f * (float)M_PI;
+        float a = angles.yaw / 180.0f * (float)M_PI;
 
         float xvector[2] = {
             (float)cos(a),
@@ -168,22 +168,22 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
         VectorCopy(min, &bounds[0]);
         VectorCopy(max, &bounds[1]);
 
-        rmin.v[0] = rmin.v[1] = rmin.v[2] = 9999.0f;
-        rmax.v[0] = rmax.v[1] = rmax.v[2] = -9999.0f;
+        rmin.x = rmin.y = rmin.z = 9999.0f;
+        rmax.x = rmax.y = rmax.z = -9999.0f;
 
         vec3_t base;
         for (int i = 0; i <= 1; i++) {
-            base.v[0] = bounds[i].v[0];
+            base.x = bounds[i].x;
             for (int j = 0; j <= 1; j++) {
-                base.v[1] = bounds[j].v[1];
+                base.y = bounds[j].y;
                 for (int k = 0; k <= 1; k++) {
-                    base.v[2] = bounds[k].v[2];
+                    base.z = bounds[k].z;
 
                     // transform the point
                     vec3_t transformed = {
-                        .x = xvector[0] * base.v[0] + yvector[0] * base.v[1],
-                        .y = xvector[1] * base.v[0] + yvector[1] * base.v[1],
-                        .z = base.v[2]
+                        .x = xvector[0] * base.x + yvector[0] * base.y,
+                        .y = xvector[1] * base.x + yvector[1] * base.y,
+                        .z = base.z
                     };
                     for (int l = 0; l < VECT_DIM; l++) {
                         if (transformed.v[l] < rmin.v[l])   rmin.v[l] = transformed.v[l];
@@ -317,18 +317,18 @@ vector normalize(vector)
 void PF_normalize() {
     vec3_t value1 = G_VECTOR(OFS_PARM0);
     float new =
-        value1.v[0] * value1.v[0] +
-        value1.v[1] * value1.v[1] +
-        value1.v[2] * value1.v[2];
+        value1.x * value1.x +
+        value1.y * value1.y +
+        value1.z * value1.z;
     new = (float)sqrt(new);
 
     vec3_t newvalue;
     if (new == 0.0f)   newvalue = (vec3_t){ .x = 0.0f, .y = 0.0f, .z = 0.0f };
     else {
         new = 1 / new;
-        newvalue.v[0] = value1.v[0] * new;  // newvalue = value1 * new;
-        newvalue.v[1] = value1.v[1] * new;
-        newvalue.v[2] = value1.v[2] * new;
+        newvalue.x = value1.x * new;  // newvalue = value1 * new;
+        newvalue.y = value1.y * new;
+        newvalue.z = value1.z * new;
     }
 
     VectorCopy(newvalue, &G_VECTOR(OFS_RETURN));
@@ -345,9 +345,9 @@ void PF_vlen() {
     vec3_t value1 = G_VECTOR(OFS_PARM0);
 
     float new =
-        value1.v[0] * value1.v[0] +
-        value1.v[1] * value1.v[1] +
-        value1.v[2] * value1.v[2];
+        value1.x * value1.x +
+        value1.y * value1.y +
+        value1.z * value1.z;
     new = (float)sqrt(new);
 #if 0
     G_FLOAT(OFS_RETURN) = new;
@@ -368,7 +368,7 @@ void PF_vectoyaw() {
 
     float yaw;
     if ((value1.v[1] == 0.0f) &&
-        (value1.v[0] == 0.0f))
+        (value1.v[0] == 0.0f))      // TODO: replace to x/pitch
         yaw = 0.0f;
     else {
         yaw = (float)(atan2(value1.v[1], value1.v[0]) * 180 / M_PI);
@@ -390,7 +390,7 @@ void PF_vectoangles() {
     vec3_t value1 = G_VECTOR(OFS_PARM0);
 
     if ((value1.v[1] == 0.0f) &&
-        (value1.v[0] == 0.0f)) {
+        (value1.v[0] == 0.0f)) {    // TODO: replace to x/pitch
         yaw = 0;
         if (value1.v[2] > 0.0f)  pitch = 90.0f;
         else                pitch = 270.0f;
@@ -399,7 +399,7 @@ void PF_vectoangles() {
         yaw = (float)(atan2(value1.v[1], value1.v[0]) * 180 / M_PI);
         if (yaw < 0.0f)    yaw += 360.0f;
 
-        float forward = (float)sqrt(value1.v[0] * value1.v[0] + value1.v[1] * value1.v[1]);
+        float forward = (float)sqrt((value1.v[0] * value1.v[0]) + (value1.v[1] * value1.v[1]));
         pitch = (float)(atan2(value1.v[2], forward) * 180 / M_PI);
         if (pitch < 0.0f)  pitch += 360.0f;
     }
@@ -984,7 +984,7 @@ void() droptofloor
 void PF_droptofloor() {
     edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
     vec3_t end;    VectorCopy(ent->v.origin, &end);
-    end.v[2] -= 256;
+    end.z -= 256.0f;
 
     trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
 
@@ -1082,7 +1082,7 @@ void PF_aim() {
     // float speed = G_FLOAT(OFS_PARM1);
 
     vec3_t start;   VectorCopy(ent->v.origin, &start);
-    start.v[2] += 20;
+    start.z += 20.0f;
 
     // try sending a trace straight
     vec3_t dir; VectorCopy(pr_global_struct->v_forward, &dir);
@@ -1137,7 +1137,7 @@ void PF_aim() {
         VectorSubtract(bestent->v.origin, ent->v.origin, &dir);
         float dist = DotProduct(dir, pr_global_struct->v_forward);
         VectorScale(pr_global_struct->v_forward, dist, &end);
-        end.v[2] = dir.v[2];
+        end.z = dir.z;
         VectorNormalize(&end);
         VectorCopy(end, &G_VECTOR(OFS_RETURN));
     }
@@ -1153,7 +1153,7 @@ This was a major timewaster in progs, so it was converted to C
 */
 void PF_changeyaw() {
     edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
-    float current = anglemod(ent->v.angles.v[1]);
+    float current = anglemod(ent->v.angles.yaw);
     float ideal = ent->v.ideal_yaw;
     float speed = ent->v.yaw_speed;
 
@@ -1165,7 +1165,7 @@ void PF_changeyaw() {
     if (move > 0)   CLAMP_MORE(move, speed);
     else            CLAMP_LESS(move, -speed);
 
-    ent->v.angles.v[1] = anglemod(current + move);
+    ent->v.angles.yaw = anglemod(current + move);
 }
 
 #ifdef QUAKE2
@@ -1176,7 +1176,7 @@ PF_changepitch
 */
 void PF_changepitch() {
     edict_p ent = G_EDICT(OFS_PARM0);
-    float current = anglemod(ent->v.angles.v[0]);
+    float current = anglemod(ent->v.angles.pitch);
     float ideal = ent->v.idealpitch;
     float speed = ent->v.pitch_speed;
 

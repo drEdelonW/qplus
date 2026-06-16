@@ -371,18 +371,18 @@ void CL_UpdateTEnts() {
 
         float yaw, pitch;
         if ((dist.v[1] == 0.0f) &&
-            (dist.v[0] == 0.0f)
+            (dist.x == 0.0f)
             ) {
             yaw = 0;
             if (dist.v[2] > 0.0f)   pitch = 90;
             else                    pitch = 270;
         }
         else {
-            yaw = (float)(atan2(dist.v[1], dist.v[0]) * 180 / M_PI);
+            yaw = (float)(atan2(dist.v[1], dist.x) * 180 / M_PI);
             if (yaw < 0.0f)
                 yaw += 360.0f;
 
-            float forward = (float)sqrt(dist.v[0] * dist.v[0] + dist.v[1] * dist.v[1]);
+            float forward = (float)sqrt(dist.x * dist.x + dist.v[1] * dist.v[1]);
             pitch = (float)(atan2(dist.v[2], forward) * 180 / M_PI);
             if (pitch < 0)
                 pitch += 360;
@@ -397,7 +397,7 @@ void CL_UpdateTEnts() {
                 return;
             VectorCopy(org, &ent->origin);
             ent->model = b->model;
-            ent->angles.v[0] = pitch;
+            ent->angles.pitch = pitch;
             ent->angles.v[1] = yaw;
             ent->angles.v[2] = (float)(rand() % 360);
 

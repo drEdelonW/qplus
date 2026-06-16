@@ -254,15 +254,15 @@ void WarpPalette() {
 void R_TransformFrustum() {
 
     for (int i = 0; i < 4; i++) {
-        vec3_t v = {
-            .x = screenedge[i].normal.v[2],
-            .y = -screenedge[i].normal.v[0],
-            .z = screenedge[i].normal.v[1]
-        };
+        vec3_t v = {        // Map screen-space normal components to camera basis:
+            .x = screenedge[i].normal.z,
+            .y = -screenedge[i].normal.x,
+            .z = screenedge[i].normal.y
+        };                  // z -> forward (vpn), -x -> right (vright), y -> up (vup)
         vec3_t v2 = {
-            .x = v.v[1] * vright.v[0] + v.v[2] * vup.v[0] + v.v[0] * vpn.v[0],
-            .y = v.v[1] * vright.v[1] + v.v[2] * vup.v[1] + v.v[0] * vpn.v[1],
-            .z = v.v[1] * vright.v[2] + v.v[2] * vup.v[2] + v.v[0] * vpn.v[2]
+            .x = v.y * vright.x + v.z * vup.x + v.x * vpn.x,
+            .y = v.y * vright.y + v.z * vup.y + v.x * vpn.y,
+            .z = v.y * vright.z + v.z * vup.z + v.x * vpn.z
         };
 
         VectorCopy(v2, &view_clipplanes[i].normal);

@@ -118,34 +118,34 @@ bool R_AliasCheckBBox() {
     vec3_t basepts[8];
 #endif
     // x worldspace coordinates
-    basepts[0].v[0] =
-        basepts[1].v[0] =
-        basepts[2].v[0] =
-        basepts[3].v[0] = (float)pframedesc->bboxmin.v[0];
-    basepts[4].v[0] =
-        basepts[5].v[0] =
-        basepts[6].v[0] =
-        basepts[7].v[0] = (float)pframedesc->bboxmax.v[0];
+    basepts[0].x =
+        basepts[1].x =
+        basepts[2].x =
+        basepts[3].x = (float)pframedesc->bboxmin.v[0];
+    basepts[4].x =
+        basepts[5].x =
+        basepts[6].x =
+        basepts[7].x = (float)pframedesc->bboxmax.v[0];
 
     // y worldspace coordinates
-    basepts[0].v[1] =
-        basepts[3].v[1] =
-        basepts[5].v[1] =
-        basepts[6].v[1] = (float)pframedesc->bboxmin.v[1];
-    basepts[1].v[1] =
-        basepts[2].v[1] =
-        basepts[4].v[1] =
-        basepts[7].v[1] = (float)pframedesc->bboxmax.v[1];
+    basepts[0].y =
+        basepts[3].y =
+        basepts[5].y =
+        basepts[6].y = (float)pframedesc->bboxmin.v[1];
+    basepts[1].y =
+        basepts[2].y =
+        basepts[4].y =
+        basepts[7].y = (float)pframedesc->bboxmax.v[1];
 
     // z worldspace coordinates
-    basepts[0].v[2] =
-        basepts[1].v[2] =
-        basepts[4].v[2] =
-        basepts[5].v[2] = (float)pframedesc->bboxmin.v[2];
-    basepts[2].v[2] =
-        basepts[3].v[2] =
-        basepts[6].v[2] =
-        basepts[7].v[2] = (float)pframedesc->bboxmax.v[2];
+    basepts[0].z =
+        basepts[1].z =
+        basepts[4].z =
+        basepts[5].z = (float)pframedesc->bboxmin.v[2];
+    basepts[2].z =
+        basepts[3].z =
+        basepts[6].z =
+        basepts[7].z = (float)pframedesc->bboxmax.v[2];
 
     bool zclipped = false;
     bool zfullyclipped = true;
@@ -156,14 +156,14 @@ bool R_AliasCheckBBox() {
     for (int i = 0; i < 8; i++) {
         R_AliasTransformVector(basepts[i], (vec3_p)&viewaux[i].fv.v[0]);
 
-        if (viewaux[i].fv.v[2] < ALIAS_Z_CLIP_PLANE) {
+        if (viewaux[i].fv.z < ALIAS_Z_CLIP_PLANE) {
             // we must clip points that are closer than the near clip plane
             viewpts[i].flags = ALIAS_Z_CLIP;
             zclipped = true;
         }
         else {
-            if (viewaux[i].fv.v[2] < minz)
-                minz = viewaux[i].fv.v[2];
+            if (viewaux[i].fv.z < minz)
+                minz = viewaux[i].fv.z;
             viewpts[i].flags = 0;
             zfullyclipped = false;
         }
@@ -189,15 +189,15 @@ bool R_AliasCheckBBox() {
             // if one end is clipped and the other isn't, make a new point
             if (pv0->flags ^ pv1->flags) {
                 float frac =
-                    (ALIAS_Z_CLIP_PLANE - pa0->fv.v[2]) /
-                    (pa1->fv.v[2] - pa0->fv.v[2]);
-                viewaux[numv].fv.v[0] =
-                    pa0->fv.v[0] +
-                    (pa1->fv.v[0] - pa0->fv.v[0]) * frac;
-                viewaux[numv].fv.v[1] =
-                    pa0->fv.v[1] +
-                    (pa1->fv.v[1] - pa0->fv.v[1]) * frac;
-                viewaux[numv].fv.v[2] = ALIAS_Z_CLIP_PLANE;
+                    (ALIAS_Z_CLIP_PLANE - pa0->fv.z) /
+                    (pa1->fv.z - pa0->fv.z);
+                viewaux[numv].fv.x =
+                    pa0->fv.x +
+                    (pa1->fv.x - pa0->fv.x) * frac;
+                viewaux[numv].fv.y =
+                    pa0->fv.y +
+                    (pa1->fv.y - pa0->fv.y) * frac;
+                viewaux[numv].fv.z = ALIAS_Z_CLIP_PLANE;
                 viewpts[numv].flags = 0;
                 numv++;
             }
@@ -214,11 +214,11 @@ bool R_AliasCheckBBox() {
         if (viewpts[i].flags & ALIAS_Z_CLIP)
             continue;
 
-        float zi = 1.0 / viewaux[i].fv.v[2];
+        float zi = 1.0 / viewaux[i].fv.z;
 
         // FIXME: do with chop mode in ASM, or convert to float
-        float v0 = (viewaux[i].fv.v[0] * xscale * zi) + xcenter;
-        float v1 = (viewaux[i].fv.v[1] * yscale * zi) + ycenter;
+        float v0 = (viewaux[i].fv.x * xscale * zi) + xcenter;
+        float v1 = (viewaux[i].fv.y * yscale * zi) + ycenter;
 
         int flags = 0;
 
@@ -273,7 +273,7 @@ void R_AliasPreparePoints() {
 
     for (int i = 0; i < r_anumverts; i++, fv++, av++, r_apverts++, pstverts++) {
         R_AliasTransformFinalVert(fv, av, r_apverts, pstverts);
-        if (av->fv.v[2] < ALIAS_Z_CLIP_PLANE)
+        if (av->fv.z < ALIAS_Z_CLIP_PLANE)
             fv->flags |= ALIAS_Z_CLIP;
         else {
             R_AliasProjectFinalVert(fv, av);
@@ -351,13 +351,13 @@ void R_AliasSetUpTransform(int trivial_accept) {
     };
     AngleVectors(angles, &_aliasForward, &_aliasRight, &_aliasUp);
 
-    tmatrix.m[0][0] = pmdl->scale.v[0];
-    tmatrix.m[1][1] = pmdl->scale.v[1];
-    tmatrix.m[2][2] = pmdl->scale.v[2];
+    tmatrix.m[0][0] = pmdl->scale.x;
+    tmatrix.m[1][1] = pmdl->scale.y;
+    tmatrix.m[2][2] = pmdl->scale.z;
 
-    tmatrix.m[0][3] = pmdl->scale_origin.v[0];
-    tmatrix.m[1][3] = pmdl->scale_origin.v[1];
-    tmatrix.m[2][3] = pmdl->scale_origin.v[2];
+    tmatrix.m[0][3] = pmdl->scale_origin.x;
+    tmatrix.m[1][3] = pmdl->scale_origin.y;
+    tmatrix.m[2][3] = pmdl->scale_origin.z;
 
     // TODO: can do this with simple matrix rearrangement
 #if 0
@@ -372,9 +372,9 @@ void R_AliasSetUpTransform(int trivial_accept) {
         t2matrix.m[i][2] = _aliasUp.v[i];
     }
 
-    t2matrix.m[0][3] = -modelorg.v[0];
-    t2matrix.m[1][3] = -modelorg.v[1];
-    t2matrix.m[2][3] = -modelorg.v[2];
+    t2matrix.m[0][3] = -modelorg.x;
+    t2matrix.m[1][3] = -modelorg.y;
+    t2matrix.m[2][3] = -modelorg.z;
 
     // FIXME: can do more efficiently than full concatenation
     R_ConcatTransforms(&t2matrix, &tmatrix, &rotationmatrix);
@@ -417,9 +417,9 @@ void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, 
         .y = pverts->v[1],
         .z = pverts->v[2],
     };
-    av->fv.v[0] = DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3];
-    av->fv.v[1] = DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3];
-    av->fv.v[2] = DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3];
+    av->fv.x = DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3];
+    av->fv.y = DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3];
+    av->fv.z = DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3];
 
     fv->v[2] = pstverts->s;
     fv->v[3] = pstverts->t;
@@ -504,12 +504,12 @@ R_AliasProjectFinalVert
 */
 void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av) {
     // project points
-    float zi = 1.0 / av->fv.v[2];
+    float zi = 1.0 / av->fv.z;
 
     fv->v[5] = zi * _ziscale;
 
-    fv->v[0] = (av->fv.v[0] * aliasxscale * zi) + aliasxcenter;
-    fv->v[1] = (av->fv.v[1] * aliasyscale * zi) + aliasycenter;
+    fv->v[0] = (av->fv.x * aliasxscale * zi) + aliasxcenter;
+    fv->v[1] = (av->fv.y * aliasyscale * zi) + aliasycenter;
 }
 
 
@@ -608,9 +608,9 @@ void R_AliasSetupLighting(aLight_p plighting) {
     r_shadelight *= VID_GRADES;
 
     // rotate the lighting vector into the model's frame of reference
-    r_plightvec.v[0] = DotProduct(*(vec3_p)plighting->plightvec, _aliasForward);
-    r_plightvec.v[1] = -DotProduct(*(vec3_p)plighting->plightvec, _aliasRight);
-    r_plightvec.v[2] = DotProduct(*(vec3_p)plighting->plightvec, _aliasUp);
+    r_plightvec.x = DotProduct(*(vec3_p)plighting->plightvec, _aliasForward);
+    r_plightvec.y = -DotProduct(*(vec3_p)plighting->plightvec, _aliasRight);
+    r_plightvec.z = DotProduct(*(vec3_p)plighting->plightvec, _aliasUp);
 }
 
 /*

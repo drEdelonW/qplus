@@ -115,7 +115,7 @@ static float _beamLength = 16;
 // float timescale = 0.01; // not used
 
 void R_EntityParticles(r_Entity_p ent) {
-    if (!_aVelocities[0].v[0]) {
+    if (!_aVelocities[0].x) {
         for (int i = 0; i < (NUMVERTEXNORMALS * 3); i++) {
             _aVelocities[0].v[i] = (rand() & 255) * 0.01;
         }
@@ -123,15 +123,17 @@ void R_EntityParticles(r_Entity_p ent) {
 
     float dist = 64;
     for (int i = 0; i < NUMVERTEXNORMALS; i++) {
-        float angle = cl.time * _aVelocities[i].v[0];
+        float angle = cl.time * _aVelocities[i].x;
         float sy = sin(angle);
         float cy = cos(angle);
-        angle = cl.time * _aVelocities[i].v[1];
+        angle = cl.time * _aVelocities[i].y;
         float sp = sin(angle);
         float cp = cos(angle);
-        // angle = cl.time * _aVelocities[i][2];
-        // float sr = sin(angle);
-        // float cr = cos(angle);
+#if 0 // it was disabled
+        angle = cl.time * _aVelocities[i].z;
+        float sr = sin(angle);
+        float cr = cos(angle);
+#endif
 
         vec3_t forward = {
             .x = cp * cy,
@@ -150,9 +152,9 @@ void R_EntityParticles(r_Entity_p ent) {
         prt->color = 0x6F;
         prt->type = pt_explode;
 
-        prt->org.v[0] = ent->origin.v[0] + r_avertexnormals[i][0] * dist + forward.v[0] * _beamLength;
-        prt->org.v[1] = ent->origin.v[1] + r_avertexnormals[i][1] * dist + forward.v[1] * _beamLength;
-        prt->org.v[2] = ent->origin.v[2] + r_avertexnormals[i][2] * dist + forward.v[2] * _beamLength;
+        prt->org.x = ent->origin.x + r_avertexnormals[i][0] * dist + forward.x * _beamLength;
+        prt->org.y = ent->origin.y + r_avertexnormals[i][1] * dist + forward.y * _beamLength;
+        prt->org.z = ent->origin.z + r_avertexnormals[i][2] * dist + forward.z * _beamLength;
     }
 }
 
@@ -186,7 +188,7 @@ void R_ReadPointFile_f() {
     int c = 0;
     for (;; ) {
         vec3_t org;
-        if (fscanf(pntFile, "%f %f %f\n", &org.v[0], &org.v[1], &org.v[2]) != 3) break;
+        if (fscanf(pntFile, "%f %f %f\n", &org.x, &org.y, &org.z) != 3) break;
         c++;
 
         if (!_freeParticles) { Con_Printf("Not enough free particles\n"); break; }
@@ -385,9 +387,9 @@ void R_LavaSplash(vec3_t org) {
                     .z = 256.0f
                 };
 
-                prt->org.v[0] = org.v[0] + dir.v[0];
-                prt->org.v[1] = org.v[1] + dir.v[1];
-                prt->org.v[2] = org.v[2] + (rand() & 63);
+                prt->org.x = org.x + dir.x;
+                prt->org.y = org.y + dir.y;
+                prt->org.z = org.z + (rand() & 63);
 
                 VectorNormalize(&dir);
                 float vel = 50 + (rand() & 63);
@@ -421,9 +423,9 @@ void R_TeleportSplash(vec3_t org) {
                     .z = k * 8
                 };
 
-                prt->org.v[0] = org.v[0] + i + (rand() & 3);
-                prt->org.v[1] = org.v[1] + j + (rand() & 3);
-                prt->org.v[2] = org.v[2] + k + (rand() & 3);
+                prt->org.x = org.x + i + (rand() & 3);
+                prt->org.y = org.y + j + (rand() & 3);
+                prt->org.z = org.z + k + (rand() & 3);
 
                 VectorNormalize(&dir);
                 float vel = 50 + (rand() & 63);
@@ -493,12 +495,12 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
 
             VectorCopy(start, &prt->org);
             if (tracercount & 1) {
-                prt->vel.v[0] = 30 * vec.v[1];
-                prt->vel.v[1] = 30 * -vec.v[0];
+                prt->vel.x = 30 * vec.y;
+                prt->vel.y = 30 * -vec.x;
             }
             else {
-                prt->vel.v[0] = 30 * -vec.v[1];
-                prt->vel.v[1] = 30 * vec.v[0];
+                prt->vel.x = 30 * -vec.y;
+                prt->vel.y = 30 * vec.x;
             }
         } break;
 
@@ -585,9 +587,9 @@ void R_DrawParticles() {
 #ifdef GLQUAKE      // TODO: wrap this in D_DrawParticle on GL_side
         // hack a scale up to keep particles from disapearing
         float scale =
-            (prt->org.v[0] - r_origin.v[0]) * vpn.v[0] +
-            (prt->org.v[1] - r_origin.v[1]) * vpn.v[1] +
-            (prt->org.v[2] - r_origin.v[2]) * vpn.v[2];
+            (prt->org.x - r_origin.x) * vpn.x +
+            (prt->org.y - r_origin.y) * vpn.y +
+            (prt->org.z - r_origin.z) * vpn.z;
         if (scale < 20.0f)  scale = 1.0f;
         else                scale = 1.0f + scale * 0.004f;
 # if 0
@@ -597,21 +599,21 @@ void R_DrawParticles() {
 # endif
         glTexCoord2f(0, 0);        glVertex3fv(prt->org.v);
         glTexCoord2f(1, 0);        glVertex3f(
-            prt->org.v[0] + up.v[0] * scale,
-            prt->org.v[1] + up.v[1] * scale,
-            prt->org.v[2] + up.v[2] * scale
+            prt->org.x + up.x * scale,
+            prt->org.y + up.y * scale,
+            prt->org.z + up.z * scale
         );
         glTexCoord2f(0, 1);        glVertex3f(
-            prt->org.v[0] + right.v[0] * scale,
-            prt->org.v[1] + right.v[1] * scale,
-            prt->org.v[2] + right.v[2] * scale
+            prt->org.x + right.x * scale,
+            prt->org.y + right.y * scale,
+            prt->org.z + right.z * scale
         );
 #else
         D_DrawParticle(prt);
 #endif
-        prt->org.v[0] += prt->vel.v[0] * frametime; // prt->org += prt->vel * frametime;
-        prt->org.v[1] += prt->vel.v[1] * frametime;
-        prt->org.v[2] += prt->vel.v[2] * frametime;
+        prt->org.x += prt->vel.x * frametime; // prt->org += prt->vel * frametime;
+        prt->org.y += prt->vel.y * frametime;
+        prt->org.z += prt->vel.z * frametime;
 
         switch (prt->type) {
         case pt_static:     break;
@@ -619,7 +621,7 @@ void R_DrawParticles() {
             prt->ramp += time1;
             if (prt->ramp >= 6)   prt->die = -1;
             else                prt->color = ramp3[(int)prt->ramp];
-            prt->vel.v[2] += grav;
+            prt->vel.z += grav;
         } break;
 
         case pt_explode: {
@@ -628,7 +630,7 @@ void R_DrawParticles() {
             else                prt->color = ramp1[(int)prt->ramp];
             for (int i = 0; i < VECT_DIM; i++)
                 prt->vel.v[i] += prt->vel.v[i] * dvel;
-            prt->vel.v[2] -= grav;
+            prt->vel.z -= grav;
         } break;
 
         case pt_explode2: {
@@ -637,28 +639,28 @@ void R_DrawParticles() {
             else                prt->color = ramp2[(int)prt->ramp];
             for (int i = 0; i < VECT_DIM; i++)
                 prt->vel.v[i] -= prt->vel.v[i] * frametime;
-            prt->vel.v[2] -= grav;
+            prt->vel.z -= grav;
         } break;
 
         case pt_blob: {
             for (int i = 0; i < VECT_DIM; i++)
                 prt->vel.v[i] += prt->vel.v[i] * dvel;
-            prt->vel.v[2] -= grav;
+            prt->vel.z -= grav;
         } break;
 
         case pt_blob2: {
             for (int i = 0; i < 2; i++)
                 prt->vel.v[i] -= prt->vel.v[i] * dvel;
-            prt->vel.v[2] -= grav;
+            prt->vel.z -= grav;
         } break;
 
         case pt_grav: {
 #ifdef QUAKE2
-            prt->vel.v[2] -= grav * 20;
+            prt->vel.z -= grav * 20;
 #endif
         } break;
         case pt_slowgrav: {
-            prt->vel.v[2] -= grav;
+            prt->vel.z -= grav;
         } break;
         }
     }

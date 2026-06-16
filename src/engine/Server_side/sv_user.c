@@ -70,22 +70,22 @@ void SV_SetIdealPitch() {
     int i = 0;
     for (; i < MAX_FORWARD; i++) {
         vec3_t top = {
-            .x = sv_player->v.origin.v[0] + cosval * ((float)i + 3) * 12,
-            .y = sv_player->v.origin.v[1] + sinval * ((float)i + 3) * 12,
-            .z = sv_player->v.origin.v[2] + sv_player->v.view_ofs.v[2]
+            .x = sv_player->v.origin.x + cosval * ((float)i + 3) * 12,
+            .y = sv_player->v.origin.y + sinval * ((float)i + 3) * 12,
+            .z = sv_player->v.origin.z + sv_player->v.view_ofs.z
         };
 
         vec3_t bottom = {
-            .x = top.v[0],
-            .y = top.v[1],
-            .z = top.v[2] - 160.0f
+            .x = top.x,
+            .y = top.y,
+            .z = top.z - 160.0f
         };
 
         trace_t tr = SV_Move(top, vec3_origin, vec3_origin, bottom, MOVE_NOMONSTERS, sv_player);
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
         if (tr.fraction == 1)   return; // near a dropoff
 
-        z[i] = top.v[2] + tr.fraction * (bottom.v[2] - top.v[2]);
+        z[i] = top.z + tr.fraction * (bottom.z - top.z);
     }
 
     float dir = 0;
@@ -119,19 +119,19 @@ SV_UserFriction
 void SV_UserFriction() {
     vec3_p vel = _velocity;
 
-    float speed = (float)sqrt((vel->v[0] * vel->v[0]) + (vel->v[1] * vel->v[1]));
+    float speed = (float)sqrt((vel->x * vel->x) + (vel->y * vel->y));
     if (!speed) return;
 
     // if the leading edge is over a dropoff, increase friction
     vec3_t start = {
-        .x = _origin->v[0] + vel->v[0] / speed * 16.0f,
-        .y = _origin->v[1] + vel->v[1] / speed * 16.0f,
-        .z = _origin->v[2] + sv_player->v.mins.v[2]
+        .x = _origin->x + vel->x / speed * 16.0f,
+        .y = _origin->y + vel->y / speed * 16.0f,
+        .z = _origin->z + sv_player->v.mins.z
     };
     vec3_t stop = {
-        .x = start.v[0],
-        .y = start.v[1],
-        .z = start.v[2] - 34.0f
+        .x = start.x,
+        .y = start.y,
+        .z = start.z - 34.0f
     };
 
     trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, sv_player);
@@ -147,9 +147,9 @@ void SV_UserFriction() {
     if (newspeed < 0.0f)   newspeed = 0.0f;
     newspeed /= speed;
 
-    vel->v[0] = vel->v[0] * newspeed;
-    vel->v[1] = vel->v[1] * newspeed;
-    vel->v[2] = vel->v[2] * newspeed;
+    vel->x = vel->x * newspeed;
+    vel->y = vel->y * newspeed;
+    vel->z = vel->z * newspeed;
 }
 
 /*
@@ -234,9 +234,9 @@ void SV_WaterMove() {
     if (!(cmd.forwardmove) &&
         !(cmd.sidemove) &&
         !(cmd.upmove))
-        wishvel.v[2] -= 60;  // drift towards bottom
+        wishvel.z -= 60;  // drift towards bottom
     else
-        wishvel.v[2] += cmd.upmove;
+        wishvel.z += cmd.upmove;
 
     _wishSpeed = Length(wishvel);
     if (_wishSpeed > sv_maxspeed.value) {
@@ -279,8 +279,8 @@ void SV_WaterJump() {
         sv_player->v.flags = (int)sv_player->v.flags & ~FL_WATERJUMP;
         sv_player->v.teleport_time = 0;
     }
-    sv_player->v.velocity.v[0] = sv_player->v.movedir.v[0];
-    sv_player->v.velocity.v[1] = sv_player->v.movedir.v[1];
+    sv_player->v.velocity.x = sv_player->v.movedir.x;
+    sv_player->v.velocity.y = sv_player->v.movedir.y;
 }
 
 
@@ -307,9 +307,9 @@ void SV_AirMove() {
         wishvel.v[i] = _forward.v[i] * fmove + _right.v[i] * smove;
 
     if ((int)sv_player->v.movetype != MOVETYPE_WALK)
-        wishvel.v[2] = cmd.upmove;
+        wishvel.z = cmd.upmove;
     else
-        wishvel.v[2] = 0.0f;
+        wishvel.z = 0.0f;
 
     VectorCopy(wishvel, &_wishDir);
     _wishSpeed = VectorNormalize(&_wishDir);
