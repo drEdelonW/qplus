@@ -26,8 +26,8 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
     // function
 // fast axial cases
     if (plane->type < 3) {
-        if (plane->dist <= emins[plane->type])  return 1;
-        if (plane->dist >= emaxs[plane->type])  return 2;
+        if (plane->dist <= emins.v[plane->type])  return 1;
+        if (plane->dist >= emaxs.v[plane->type])  return 2;
         return 3;
     }
 #endif
@@ -37,86 +37,86 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
     switch (plane->signbits) {
     case 0:
         dist1 =
-            plane->normal[0] * emaxs[0] +
-            plane->normal[1] * emaxs[1] +
-            plane->normal[2] * emaxs[2];
+            plane->normal.v[0] * emaxs.v[0] +
+            plane->normal.v[1] * emaxs.v[1] +
+            plane->normal.v[2] * emaxs.v[2];
         dist2 =
-            plane->normal[0] * emins[0] +
-            plane->normal[1] * emins[1] +
-            plane->normal[2] * emins[2];
+            plane->normal.v[0] * emins.v[0] +
+            plane->normal.v[1] * emins.v[1] +
+            plane->normal.v[2] * emins.v[2];
         break;
     case 1:
         dist1 =
-            plane->normal[0] * emins[0] +
-            plane->normal[1] * emaxs[1] +
-            plane->normal[2] * emaxs[2];
+            plane->normal.v[0] * emins.v[0] +
+            plane->normal.v[1] * emaxs.v[1] +
+            plane->normal.v[2] * emaxs.v[2];
         dist2 =
-            plane->normal[0] * emaxs[0] +
-            plane->normal[1] * emins[1] +
-            plane->normal[2] * emins[2];
+            plane->normal.v[0] * emaxs.v[0] +
+            plane->normal.v[1] * emins.v[1] +
+            plane->normal.v[2] * emins.v[2];
         break;
     case 2:
         dist1 =
-            plane->normal[0] * emaxs[0] +
-            plane->normal[1] * emins[1] +
-            plane->normal[2] * emaxs[2];
+            plane->normal.v[0] * emaxs.v[0] +
+            plane->normal.v[1] * emins.v[1] +
+            plane->normal.v[2] * emaxs.v[2];
         dist2 =
-            plane->normal[0] * emins[0] +
-            plane->normal[1] * emaxs[1] +
-            plane->normal[2] * emins[2];
+            plane->normal.v[0] * emins.v[0] +
+            plane->normal.v[1] * emaxs.v[1] +
+            plane->normal.v[2] * emins.v[2];
         break;
     case 3:
         dist1 =
-            plane->normal[0] * emins[0] +
-            plane->normal[1] * emins[1] +
-            plane->normal[2] * emaxs[2];
+            plane->normal.v[0] * emins.v[0] +
+            plane->normal.v[1] * emins.v[1] +
+            plane->normal.v[2] * emaxs.v[2];
         dist2 =
-            plane->normal[0] * emaxs[0] +
-            plane->normal[1] * emaxs[1] +
-            plane->normal[2] * emins[2];
+            plane->normal.v[0] * emaxs.v[0] +
+            plane->normal.v[1] * emaxs.v[1] +
+            plane->normal.v[2] * emins.v[2];
         break;
     case 4:
         dist1 =
-            plane->normal[0] * emaxs[0] +
-            plane->normal[1] * emaxs[1] +
-            plane->normal[2] * emins[2];
+            plane->normal.v[0] * emaxs.v[0] +
+            plane->normal.v[1] * emaxs.v[1] +
+            plane->normal.v[2] * emins.v[2];
         dist2 =
-            plane->normal[0] * emins[0] +
-            plane->normal[1] * emins[1] +
-            plane->normal[2] * emaxs[2];
+            plane->normal.v[0] * emins.v[0] +
+            plane->normal.v[1] * emins.v[1] +
+            plane->normal.v[2] * emaxs.v[2];
         break;
     case 5:
         dist1 =
-            plane->normal[0] * emins[0] +
-            plane->normal[1] * emaxs[1] +
-            plane->normal[2] * emins[2];
+            plane->normal.v[0] * emins.v[0] +
+            plane->normal.v[1] * emaxs.v[1] +
+            plane->normal.v[2] * emins.v[2];
         dist2 =
-            plane->normal[0] * emaxs[0] +
-            plane->normal[1] * emins[1] +
-            plane->normal[2] * emaxs[2];
+            plane->normal.v[0] * emaxs.v[0] +
+            plane->normal.v[1] * emins.v[1] +
+            plane->normal.v[2] * emaxs.v[2];
         break;
     case 6:
         dist1 =
-            plane->normal[0] * emaxs[0] +
-            plane->normal[1] * emins[1] +
-            plane->normal[2] * emins[2];
+            plane->normal.v[0] * emaxs.v[0] +
+            plane->normal.v[1] * emins.v[1] +
+            plane->normal.v[2] * emins.v[2];
         dist2 =
-            plane->normal[0] * emins[0] +
-            plane->normal[1] * emaxs[1] +
-            plane->normal[2] * emaxs[2];
+            plane->normal.v[0] * emins.v[0] +
+            plane->normal.v[1] * emaxs.v[1] +
+            plane->normal.v[2] * emaxs.v[2];
         break;
     case 7:
         dist1 =
-            plane->normal[0] * emins[0] +
-            plane->normal[1] * emins[1] +
-            plane->normal[2] * emins[2];
+            plane->normal.v[0] * emins.v[0] +
+            plane->normal.v[1] * emins.v[1] +
+            plane->normal.v[2] * emins.v[2];
         dist2 =
-            plane->normal[0] * emaxs[0] +
-            plane->normal[1] * emaxs[1] +
-            plane->normal[2] * emaxs[2];
+            plane->normal.v[0] * emaxs.v[0] +
+            plane->normal.v[1] * emaxs.v[1] +
+            plane->normal.v[2] * emaxs.v[2];
         break;
     default:
-        dist1 = dist2 = 0;  // shut up compiler
+        dist1 = dist2 = 0.0f;  // shut up compiler
         BOPS_Error();
         break;
     }
@@ -125,12 +125,12 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
     vec3_t corners[2];
     for (int i = 0; i < VECT_DIM; i++) {
         if (plane->normal[i] < 0) {
-            corners[0][i] = emins[i];
-            corners[1][i] = emaxs[i];
+            corners[0].v[i] = emins.v[i];
+            corners[1].v[i] = emaxs.v[i];
         }
         else {
-            corners[1][i] = emins[i];
-            corners[0][i] = emaxs[i];
+            corners[1].v[i] = emins.v[i];
+            corners[0].v[i] = emaxs.v[i];
         }
     }
     dist = DotProduct(plane->normal, corners[0]) - plane->dist;
@@ -177,8 +177,8 @@ void Mod_LoadPlanes(Lump_p Lump_in) {
     for (int i = 0; i < count; i++, in++, out++) {
         int bits = 0;
         for (int j = 0; j < VECT_DIM; j++) {
-            out->normal[j] = LittleFloat(in->normal[j]);
-            if (out->normal[j] < 0)
+            out->normal.v[j] = LittleFloat(in->normal.v[j]);
+            if (out->normal.v[j] < 0.0f)
                 bits |= 1 << j;
         }
 

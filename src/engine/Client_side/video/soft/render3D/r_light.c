@@ -137,9 +137,9 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
 
     float frac = front / (front - back);
     vec3_t mid = {
-        start[0] + (end[0] - start[0]) * frac,
-        start[1] + (end[1] - start[1]) * frac,
-        start[2] + (end[2] - start[2]) * frac
+        .x = start.v[0] + (end.v[0] - start.v[0]) * frac,
+        .y = start.v[1] + (end.v[1] - start.v[1]) * frac,
+        .z = start.v[2] + (end.v[2] - start.v[2]) * frac
     };
 
     // go down front side
@@ -159,8 +159,8 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
 
         mTexInfo_p tex = surf->texinfo;
 
-        int s = DotProduct(mid, tex->vecs[0]) + tex->vecs[0][3];
-        int t = DotProduct(mid, tex->vecs[1]) + tex->vecs[1][3];;
+        int s = DotProduct(mid, *(vec3_p)tex->vecs[0]) + tex->vecs[0][3];
+        int t = DotProduct(mid, *(vec3_p)tex->vecs[1]) + tex->vecs[1][3];;
 
         if (s < surf->texturemins[0] ||
             t < surf->texturemins[1])
@@ -206,9 +206,9 @@ int R_LightPoint(vec3_t p) {
         return 255;
 
     vec3_t end = {
-        p[0],
-        p[1],
-        p[2] - 2048
+        .x = p.v[0],
+        .y = p.v[1],
+        .z = p.v[2] - 2048.0f
     };
     int r = RecursiveLightPoint(cl.worldmodel->nodes, p, end);
 

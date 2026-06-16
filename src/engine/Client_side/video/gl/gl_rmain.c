@@ -118,11 +118,11 @@ bool R_CullBox(vec3_t mins, vec3_t maxs) {
 
 
 void R_RotateForEntity(r_Entity_p e) {
-    glTranslatef(e->origin[0], e->origin[1], e->origin[2]);
+    glTranslatef(e->origin.v[0], e->origin.v[1], e->origin.v[2]);
 
-    glRotatef(e->angles[1], 0, 0, 1);
-    glRotatef(-e->angles[0], 0, 1, 0);
-    glRotatef(e->angles[2], 1, 0, 0);
+    glRotatef(e->angles.v[1], 0, 0, 1);
+    glRotatef(-e->angles.v[0], 0, 1, 0);
+    glRotatef(e->angles.v[2], 1, 0, 0);
 }
 
 /*
@@ -190,10 +190,10 @@ void R_DrawSpriteModel(r_Entity_p e) {
     // polygon without a surface cache
     mSpriteFrame_p frame = R_GetSpriteFrame(e);
     mSprite_p psprite = currententity->model->cache.data;
-    float_p up, right;
+    vec3_t up, right;
     vec3_t v_forward, v_right, v_up;
     if (psprite->type == SPR_ORIENTED) { // bullet marks on walls
-        AngleVectors(currententity->angles, v_forward, v_right, v_up);
+        AngleVectors(currententity->angles, &v_forward, &v_right, &v_up);
         up = v_up;
         right = v_right;
     }
@@ -212,24 +212,24 @@ void R_DrawSpriteModel(r_Entity_p e) {
         glBegin(GL_QUADS); {
 
             glTexCoord2f(0, 1);
-            VectorMA(e->origin, frame->down, up, point);
-            VectorMA(point, frame->left, right, point);
-            glVertex3fv(point);
+            VectorMA(e->origin, frame->down, up, &point);
+            VectorMA(point, frame->left, right, &point);
+            glVertex3fv(point.v);
 
             glTexCoord2f(0, 0);
-            VectorMA(e->origin, frame->up, up, point);
-            VectorMA(point, frame->left, right, point);
-            glVertex3fv(point);
+            VectorMA(e->origin, frame->up, up, &point);
+            VectorMA(point, frame->left, right, &point);
+            glVertex3fv(point.v);
 
             glTexCoord2f(1, 0);
-            VectorMA(e->origin, frame->up, up, point);
-            VectorMA(point, frame->right, right, point);
-            glVertex3fv(point);
+            VectorMA(e->origin, frame->up, up, &point);
+            VectorMA(point, frame->right, right, &point);
+            glVertex3fv(point.v);
 
             glTexCoord2f(1, 1);
-            VectorMA(e->origin, frame->down, up, point);
-            VectorMA(point, frame->right, right, point);
-            glVertex3fv(point);
+            VectorMA(e->origin, frame->down, up, &point);
+            VectorMA(point, frame->right, right, &point);
+            glVertex3fv(point.v);
 
         } glEnd();
     } glDisable(GL_ALPHA_TEST);
@@ -314,7 +314,7 @@ GL_DrawAliasShadow
 
 void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
 
-    float lheight = currententity->origin[2] - lightspot[2];
+    float lheight = currententity->origin.v[2] - lightspot.v[2];
 
     float height = 0;
     TriVertx_p verts = (TriVertx_p)((byte*)pAliasHdr + pAliasHdr->posedata);
@@ -345,15 +345,15 @@ void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
 
                 // normals and vertexes come from the frame list
                 vec3_t point = {
-                    verts->v[0] * pAliasHdr->scale[0] + pAliasHdr->scale_origin[0],
-                    verts->v[1] * pAliasHdr->scale[1] + pAliasHdr->scale_origin[1],
-                    verts->v[2] * pAliasHdr->scale[2] + pAliasHdr->scale_origin[2]
+                    .x = verts->v[0] * pAliasHdr->scale.v[0] + pAliasHdr->scale_origin.v[0],
+                    .y = verts->v[1] * pAliasHdr->scale.v[1] + pAliasHdr->scale_origin.v[1],
+                    .z = verts->v[2] * pAliasHdr->scale.v[2] + pAliasHdr->scale_origin.v[2]
                 };
-                point[0] -= shadevector[0] * (point[2] + lheight);
-                point[1] -= shadevector[1] * (point[2] + lheight);
-                point[2] = height;
+                point.v[0] -= shadevector.v[0] * (point.v[2] + lheight);
+                point.v[1] -= shadevector.v[1] * (point.v[2] + lheight);
+                point.v[2] = height;
                 //   height -= 0.001;
-                glVertex3fv(point);
+                glVertex3fv(point.v);
 
                 verts++;
             } while (--count);
@@ -402,15 +402,15 @@ void R_DrawAliasModel(r_Entity_p e) {
 
     Model_p clmodel = currententity->model;
 
-    VectorAdd(currententity->origin, clmodel->mins, mins);
-    VectorAdd(currententity->origin, clmodel->maxs, maxs);
+    VectorAdd(currententity->origin, clmodel->mins, &mins);
+    VectorAdd(currententity->origin, clmodel->maxs, &maxs);
 
     if (R_CullBox(mins, maxs))
         return;
 
 
-    VectorCopy(currententity->origin, r_entorigin);
-    VectorSubtract(r_origin, r_entorigin, modelorg);
+    VectorCopy(currententity->origin, &r_entorigin);
+    VectorSubtract(r_origin, r_entorigin, &modelorg);
 
     //
     // get lighting information
@@ -430,7 +430,7 @@ void R_DrawAliasModel(r_Entity_p e) {
             VectorSubtract(
                 currententity->origin,
                 cl_dlights[lnum].origin,
-                dist
+                &dist
             );
             float add = cl_dlights[lnum].radius - Length(dist);
 
@@ -460,14 +460,14 @@ void R_DrawAliasModel(r_Entity_p e) {
         )
         ambientlight = shadelight = 256;
 
-    shadedots = r_avertexnormal_dots[((int)(e->angles[1] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
+    shadedots = r_avertexnormal_dots[((int)(e->angles.v[1] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
     shadelight = shadelight / 200.0;
 
-    float an = e->angles[1] / 180 * M_PI;
-    shadevector[0] = cos(-an);
-    shadevector[1] = sin(-an);
-    shadevector[2] = 1;
-    VectorNormalize(shadevector);
+    float an = e->angles.v[1] / 180 * M_PI;
+    shadevector.v[0] = cos(-an);
+    shadevector.v[1] = sin(-an);
+    shadevector.v[2] = 1;
+    VectorNormalize(&shadevector);
 
     //
     // locate the proper data
@@ -487,27 +487,27 @@ void R_DrawAliasModel(r_Entity_p e) {
 
     if (!strcmp(clmodel->name, "progs/eyes.mdl") && gl_doubleeyes.value) {
         glTranslatef(
-            pAliasHdr->scale_origin[0],
-            pAliasHdr->scale_origin[1],
-            pAliasHdr->scale_origin[2] - (22 + 8)
+            pAliasHdr->scale_origin.v[0],
+            pAliasHdr->scale_origin.v[1],
+            pAliasHdr->scale_origin.v[2] - (22 + 8)
         );
         // double size of eyes, since they are really hard to see in gl
         glScalef(
-            pAliasHdr->scale[0] * 2,
-            pAliasHdr->scale[1] * 2,
-            pAliasHdr->scale[2] * 2
+            pAliasHdr->scale.v[0] * 2,
+            pAliasHdr->scale.v[1] * 2,
+            pAliasHdr->scale.v[2] * 2
         );
     }
     else {
         glTranslatef(
-            pAliasHdr->scale_origin[0],
-            pAliasHdr->scale_origin[1],
-            pAliasHdr->scale_origin[2]
+            pAliasHdr->scale_origin.v[0],
+            pAliasHdr->scale_origin.v[1],
+            pAliasHdr->scale_origin.v[2]
         );
         glScalef(
-            pAliasHdr->scale[0],
-            pAliasHdr->scale[1],
-            pAliasHdr->scale[2]
+            pAliasHdr->scale.v[0],
+            pAliasHdr->scale.v[1],
+            pAliasHdr->scale.v[2]
         );
     }
 
@@ -624,7 +624,7 @@ void R_DrawViewModel() {
         if (!dl->radius)        continue;
         if (dl->die < cl.time)  continue;
 
-        vec3_t dist; VectorSubtract(currententity->origin, dl->origin, dist);
+        vec3_t dist; VectorSubtract(currententity->origin, dl->origin, &dist);
         float add = dl->radius - Length(dist);
         if (add > 0)
             ambientlight += add;
@@ -685,7 +685,7 @@ int SignbitsForPlane(mPlane_p out) {
     // for fast box on planeside test
     int bits = 0;
     for (int j = 0; j < 3; j++) {
-        if (out->normal[j] < 0)
+        if (out->normal.v[j] < 0)
             bits |= 1 << j;
     }
     return bits;
@@ -696,17 +696,17 @@ void R_SetFrustum() {
     if (r_refdef.fov_x == 90) {
         // front side is visible
 
-        VectorAdd(vpn, vright, frustum[0].normal);
-        VectorSubtract(vpn, vright, frustum[1].normal);
+        VectorAdd(vpn, vright, &frustum[0].normal);
+        VectorSubtract(vpn, vright, &frustum[1].normal);
 
-        VectorAdd(vpn, vup, frustum[2].normal);
-        VectorSubtract(vpn, vup, frustum[3].normal);
+        VectorAdd(vpn, vup, &frustum[2].normal);
+        VectorSubtract(vpn, vup, &frustum[3].normal);
     }
     else {
-        RotatePointAroundVector(frustum[0].normal, vup, vpn, -(90 - r_refdef.fov_x / 2));       // rotate VPN right by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[1].normal, vup, vpn, 90 - r_refdef.fov_x / 2);          // rotate VPN left by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[2].normal, vright, vpn, 90 - r_refdef.fov_y / 2);       // rotate VPN up by FOV_X/2 degrees
-        RotatePointAroundVector(frustum[3].normal, vright, vpn, -(90 - r_refdef.fov_y / 2));    // rotate VPN down by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[0].normal, vup, vpn, -(90 - r_refdef.fov_x / 2));       // rotate VPN right by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[1].normal, vup, vpn, 90 - r_refdef.fov_x / 2);          // rotate VPN left by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[2].normal, vright, vpn, 90 - r_refdef.fov_y / 2);       // rotate VPN up by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[3].normal, vright, vpn, -(90 - r_refdef.fov_y / 2));    // rotate VPN down by FOV_X/2 degrees
     }
 
     for (int i = 0; i < 4; i++) {
@@ -733,9 +733,9 @@ void R_SetupFrame() {
     r_framecount++;
 
     // build the transformation matrix for the given view angles
-    VectorCopy(r_refdef.vieworg, r_origin);
+    VectorCopy(r_refdef.vieworg, &r_origin);
 
-    AngleVectors(r_refdef.viewangles, vpn, vright, vup);
+    AngleVectors(r_refdef.viewangles, &vpn, &vright, &vup);
 
     // current viewleaf
     r_oldviewleaf = r_viewleaf;
@@ -806,7 +806,7 @@ void R_SetupGL() {
     MYgluPerspective(r_refdef.fov_y, screenaspect, 4, 4096);
 
     if (mirror) {
-        if (mirror_plane->normal[2])    glScalef(1, -1, 1);
+        if (mirror_plane->normal.v[2])    glScalef(1, -1, 1);
         else                            glScalef(-1, 1, 1);
         glCullFace(GL_BACK);
     }
@@ -818,10 +818,10 @@ void R_SetupGL() {
 
     glRotatef(-90, 1, 0, 0);     // put Z going up
     glRotatef(90, 0, 0, 1);     // put Z going up
-    glRotatef(-r_refdef.viewangles[2], 1, 0, 0);
-    glRotatef(-r_refdef.viewangles[0], 0, 1, 0);
-    glRotatef(-r_refdef.viewangles[1], 0, 0, 1);
-    glTranslatef(-r_refdef.vieworg[0], -r_refdef.vieworg[1], -r_refdef.vieworg[2]);
+    glRotatef(-r_refdef.viewangles.v[2], 1, 0, 0);
+    glRotatef(-r_refdef.viewangles.v[0], 0, 1, 0);
+    glRotatef(-r_refdef.viewangles.v[1], 0, 0, 1);
+    glTranslatef(-r_refdef.vieworg.v[0], -r_refdef.vieworg.v[1], -r_refdef.vieworg.v[2]);
 
     glGetFloatv(GL_MODELVIEW_MATRIX, r_world_matrix);
 
@@ -915,15 +915,15 @@ void R_Mirror() {
 
     {
         float d = DotProduct(r_refdef.vieworg, mirror_plane->normal) - mirror_plane->dist;
-        VectorMA(r_refdef.vieworg, -2 * d, mirror_plane->normal, r_refdef.vieworg);
+        VectorMA(r_refdef.vieworg, -2 * d, mirror_plane->normal, &r_refdef.vieworg);
     }
     {
         float d = DotProduct(vpn, mirror_plane->normal);
-        VectorMA(vpn, -2 * d, mirror_plane->normal, vpn);
+        VectorMA(vpn, -2 * d, mirror_plane->normal, &vpn);
     }
-    r_refdef.viewangles[0] = -asin(vpn[2]) / M_PI * 180;
-    r_refdef.viewangles[1] = atan2(vpn[1], vpn[0]) / M_PI * 180;
-    r_refdef.viewangles[2] = -r_refdef.viewangles[2];
+    r_refdef.viewangles.v[0] = -asin(vpn.v[2]) / M_PI * 180;
+    r_refdef.viewangles.v[1] = atan2(vpn.v[1], vpn.v[0]) / M_PI * 180;
+    r_refdef.viewangles.v[2] = -r_refdef.viewangles.v[2];
 
     r_Entity_p ent = &cl_entities[cl.viewentity];
     if (cl_numvisedicts < MAX_VISEDICTS) {
@@ -948,7 +948,7 @@ void R_Mirror() {
     glEnable(GL_BLEND);
     glMatrixMode(GL_PROJECTION);
 
-    if (mirror_plane->normal[2])    glScalef(1, -1, 1);
+    if (mirror_plane->normal.v[2])  glScalef(1, -1, 1);
     else                            glScalef(-1, 1, 1);
 
     glCullFace(GL_FRONT);

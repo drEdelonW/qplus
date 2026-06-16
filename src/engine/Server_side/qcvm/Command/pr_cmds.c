@@ -114,9 +114,9 @@ makevectors(vector)
 void PF_makevectors() {
     AngleVectors(
         G_VECTOR(OFS_PARM0),
-        pr_global_struct->v_forward,
-        pr_global_struct->v_right,
-        pr_global_struct->v_up
+        &pr_global_struct->v_forward,
+        &pr_global_struct->v_right,
+        &pr_global_struct->v_up
     );
 }
 
@@ -131,28 +131,28 @@ setorigin (entity, origin)
 */
 void PF_setorigin() {
     edict_p edict = G_EDICT(OFS_PARM0);
-    float_p org = G_VECTOR(OFS_PARM1);
-    VectorCopy(org, edict->v.origin);
+    vec3_t org = G_VECTOR(OFS_PARM1);
+    VectorCopy(org, &edict->v.origin);
     SV_LinkEdict(edict, false);
 }
 
-void SetMinMaxSize(edict_p edict, float_p min, float_p max, bool rotate) {
+void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
     for (int i = 0; i < VECT_DIM; i++)
-        if (min[i] > max[i])
+        if (min.v[i] > max.v[i])
             PR_RunError("backwards mins/maxs");
 
     rotate = false; // FIXME: implement rotation properly again
 
     vec3_t rmin, rmax;
     if (!rotate) {
-        VectorCopy(min, rmin);
-        VectorCopy(max, rmax);
+        VectorCopy(min, &rmin);
+        VectorCopy(max, &rmax);
     }
     else {
         // find min / max for rotations
-        float_p angles = edict->v.angles;
+        vec3_t angles = edict->v.angles;
 
-        float a = angles[1] / 180.0f * (float)M_PI;
+        float a = angles.v[1] / 180.0f * (float)M_PI;
 
         float xvector[2] = {
             (float)cos(a),
@@ -163,30 +163,31 @@ void SetMinMaxSize(edict_p edict, float_p min, float_p max, bool rotate) {
             (float)cos(a)
         };
 
-        float bounds[2][3];
-        VectorCopy(min, bounds[0]);
-        VectorCopy(max, bounds[1]);
+        // float bounds[2][3];
+        vec3_t bounds[2];
+        VectorCopy(min, &bounds[0]);
+        VectorCopy(max, &bounds[1]);
 
-        rmin[0] = rmin[1] = rmin[2] = 9999;
-        rmax[0] = rmax[1] = rmax[2] = -9999;
+        rmin.v[0] = rmin.v[1] = rmin.v[2] = 9999.0f;
+        rmax.v[0] = rmax.v[1] = rmax.v[2] = -9999.0f;
 
         vec3_t base;
         for (int i = 0; i <= 1; i++) {
-            base[0] = bounds[i][0];
+            base.v[0] = bounds[i].v[0];
             for (int j = 0; j <= 1; j++) {
-                base[1] = bounds[j][1];
+                base.v[1] = bounds[j].v[1];
                 for (int k = 0; k <= 1; k++) {
-                    base[2] = bounds[k][2];
+                    base.v[2] = bounds[k].v[2];
 
                     // transform the point
                     vec3_t transformed = {
-                        xvector[0] * base[0] + yvector[0] * base[1],
-                        xvector[1] * base[0] + yvector[1] * base[1],
-                        base[2]
+                        .x = xvector[0] * base.v[0] + yvector[0] * base.v[1],
+                        .y = xvector[1] * base.v[0] + yvector[1] * base.v[1],
+                        .z = base.v[2]
                     };
                     for (int l = 0; l < VECT_DIM; l++) {
-                        if (transformed[l] < rmin[l])       rmin[l] = transformed[l];
-                        if (transformed[l] > rmax[l])       rmax[l] = transformed[l];
+                        if (transformed.v[l] < rmin.v[l])   rmin.v[l] = transformed.v[l];
+                        if (transformed.v[l] > rmax.v[l])   rmax.v[l] = transformed.v[l];
                     }
                 }
             }
@@ -194,9 +195,9 @@ void SetMinMaxSize(edict_p edict, float_p min, float_p max, bool rotate) {
     }
 
     // set derived values
-    VectorCopy(rmin, edict->v.mins);
-    VectorCopy(rmax, edict->v.maxs);
-    VectorSubtract(max, min, edict->v.size);
+    VectorCopy(rmin, &edict->v.mins);
+    VectorCopy(rmax, &edict->v.maxs);
+    VectorSubtract(max, min, &edict->v.size);
 
     SV_LinkEdict(edict, false);
 }
@@ -212,8 +213,8 @@ setsize (entity, minvector, maxvector)
 */
 void PF_setsize() {
     edict_p edict = G_EDICT(OFS_PARM0);
-    float_p min = G_VECTOR(OFS_PARM1);
-    float_p max = G_VECTOR(OFS_PARM2);
+    vec3_t min = G_VECTOR(OFS_PARM1);
+    vec3_t max = G_VECTOR(OFS_PARM2);
     SetMinMaxSize(edict, min, max, false);
 }
 
@@ -314,23 +315,23 @@ vector normalize(vector)
 =================
 */
 void PF_normalize() {
-    float_p value1 = G_VECTOR(OFS_PARM0);
+    vec3_t value1 = G_VECTOR(OFS_PARM0);
     float new =
-        value1[0] * value1[0] +
-        value1[1] * value1[1] +
-        value1[2] * value1[2];
+        value1.v[0] * value1.v[0] +
+        value1.v[1] * value1.v[1] +
+        value1.v[2] * value1.v[2];
     new = (float)sqrt(new);
 
     vec3_t newvalue;
-    if (new == 0)   newvalue[0] = newvalue[1] = newvalue[2] = 0;
+    if (new == 0.0f)   newvalue = (vec3_t){ .x = 0.0f, .y = 0.0f, .z = 0.0f };
     else {
         new = 1 / new;
-        newvalue[0] = value1[0] * new;  // newvalue = value1 * new;
-        newvalue[1] = value1[1] * new;
-        newvalue[2] = value1[2] * new;
+        newvalue.v[0] = value1.v[0] * new;  // newvalue = value1 * new;
+        newvalue.v[1] = value1.v[1] * new;
+        newvalue.v[2] = value1.v[2] * new;
     }
 
-    VectorCopy(newvalue, G_VECTOR(OFS_RETURN));
+    VectorCopy(newvalue, &G_VECTOR(OFS_RETURN));
 }
 
 /*
@@ -341,13 +342,13 @@ scalar vlen(vector)
 =================
 */
 void PF_vlen() {
-    float_p value1 = G_VECTOR(OFS_PARM0);
+    vec3_t value1 = G_VECTOR(OFS_PARM0);
 
     float new =
-        value1[0] * value1[0] +
-        value1[1] * value1[1] +
-        value1[2] * value1[2];
-    new= (float)sqrt(new);
+        value1.v[0] * value1.v[0] +
+        value1.v[1] * value1.v[1] +
+        value1.v[2] * value1.v[2];
+    new = (float)sqrt(new);
 #if 0
     G_FLOAT(OFS_RETURN) = new;
 #else
@@ -363,15 +364,15 @@ float vectoyaw(vector)
 =================
 */
 void PF_vectoyaw() {
-    float_p value1 = G_VECTOR(OFS_PARM0);
+    vec3_t value1 = G_VECTOR(OFS_PARM0);
 
     float yaw;
-    if ((value1[1] == 0) &&
-        (value1[0] == 0))
-        yaw = 0;
+    if ((value1.v[1] == 0.0f) &&
+        (value1.v[0] == 0.0f))
+        yaw = 0.0f;
     else {
-        yaw = (float)(atan2(value1[1], value1[0]) * 180 / M_PI);
-        if (yaw < 0)    yaw += 360;
+        yaw = (float)(atan2(value1.v[1], value1.v[0]) * 180 / M_PI);
+        if (yaw < 0.0f)    yaw += 360.0f;
     }
 
     G_FLOAT(OFS_RETURN) = yaw;
@@ -386,26 +387,26 @@ vector vectoangles(vector)
 */
 void PF_vectoangles() {
     float yaw, pitch;
-    float_p value1 = G_VECTOR(OFS_PARM0);
+    vec3_t value1 = G_VECTOR(OFS_PARM0);
 
-    if ((value1[1] == 0) &&
-        (value1[0] == 0)) {
+    if ((value1.v[1] == 0.0f) &&
+        (value1.v[0] == 0.0f)) {
         yaw = 0;
-        if (value1[2] > 0)  pitch = 90;
-        else                pitch = 270;
+        if (value1.v[2] > 0.0f)  pitch = 90.0f;
+        else                pitch = 270.0f;
     }
     else {
-        yaw = (float)(atan2(value1[1], value1[0]) * 180 / M_PI);
-        if (yaw < 0)    yaw += 360;
+        yaw = (float)(atan2(value1.v[1], value1.v[0]) * 180 / M_PI);
+        if (yaw < 0.0f)    yaw += 360.0f;
 
-        float forward= (float)sqrt(value1[0] * value1[0] + value1[1] * value1[1]);
-        pitch = (float)(atan2(value1[2], forward) * 180 / M_PI);
-        if (pitch < 0)  pitch += 360;
+        float forward = (float)sqrt(value1.v[0] * value1.v[0] + value1.v[1] * value1.v[1]);
+        pitch = (float)(atan2(value1.v[2], forward) * 180 / M_PI);
+        if (pitch < 0.0f)  pitch += 360.0f;
     }
 
     G_FLOAT(OFS_RETURN + X_AX) = pitch;
     G_FLOAT(OFS_RETURN + Y_AX) = yaw;
-    G_FLOAT(OFS_RETURN + Z_AX) = 0;
+    G_FLOAT(OFS_RETURN + Z_AX) = 0.0f;
 }
 
 /*
@@ -427,8 +428,8 @@ particle(origin, color, count)
 =================
 */
 void PF_particle() {
-    float_p org = G_VECTOR(OFS_PARM0);
-    float_p dir = G_VECTOR(OFS_PARM1);
+    vec3_t org = G_VECTOR(OFS_PARM0);
+    vec3_t dir = G_VECTOR(OFS_PARM1);
     float color = G_FLOAT(OFS_PARM2);
     float count = G_FLOAT(OFS_PARM3);
     SV_StartParticle(org, dir, (int)color, (size_t)count);
@@ -441,7 +442,7 @@ PF_ambientsound
 =================
 */
 void PF_ambientsound() {
-    float_p pos = G_VECTOR(OFS_PARM0);
+    vec3_t pos = G_VECTOR(OFS_PARM0);
     cString samp = G_STRING(OFS_PARM1);
     float vol = G_FLOAT(OFS_PARM2);
     float attenuation = G_FLOAT(OFS_PARM3);
@@ -461,8 +462,8 @@ void PF_ambientsound() {
     // add an svc_spawnambient command to the level signon packet
 
     MSG_WriteByte(&sv.signon, svc_spawnstaticsound);
-    for (int i = 0; i < 3; i++)
-        MSG_WriteCoord(&sv.signon, pos[i]);
+    for (int i = 0; i < VECT_DIM; i++)
+        MSG_WriteCoord(&sv.signon, pos.v[i]);
 
     MSG_WriteByte(&sv.signon, soundnum);
 
@@ -532,8 +533,8 @@ traceline (vector1, vector2, tryents)
 =================
 */
 void PF_traceline() {
-    float_p v1 = G_VECTOR(OFS_PARM0);
-    float_p v2 = G_VECTOR(OFS_PARM1);
+    vec3_t v1 = G_VECTOR(OFS_PARM0);
+    vec3_t v2 = G_VECTOR(OFS_PARM1);
     phymovetype_t moveType = (int)G_FLOAT(OFS_PARM2);
     edict_p ent = G_EDICT(OFS_PARM3);
 
@@ -544,8 +545,8 @@ void PF_traceline() {
     pr_global_struct->trace_fraction = trace.fraction;
     pr_global_struct->trace_inwater = trace.inwater;
     pr_global_struct->trace_inopen = trace.inopen;
-    VectorCopy(trace.endpos, pr_global_struct->trace_endpos);
-    VectorCopy(trace.plane.normal, pr_global_struct->trace_plane_normal);
+    VectorCopy(trace.endpos, &pr_global_struct->trace_endpos);
+    VectorCopy(trace.plane.normal, &pr_global_struct->trace_plane_normal);
     pr_global_struct->trace_plane_dist = trace.plane.dist;
     if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
     else            pr_global_struct->trace_ent = ED_GetEDictOffs(Edicts);
@@ -564,8 +565,8 @@ void PF_TraceToss() {
     pr_global_struct->trace_fraction = trace.fraction;
     pr_global_struct->trace_inwater = trace.inwater;
     pr_global_struct->trace_inopen = trace.inopen;
-    VectorCopy(trace.endpos, pr_global_struct->trace_endpos);
-    VectorCopy(trace.plane.normal, pr_global_struct->trace_plane_normal);
+    VectorCopy(trace.endpos, &pr_global_struct->trace_endpos);
+    VectorCopy(trace.plane.normal, &pr_global_struct->trace_plane_normal);
     pr_global_struct->trace_plane_dist = trace.plane.dist;
     if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
     else            pr_global_struct->trace_ent = ED_GetEDictOffs(Edicts);
@@ -615,7 +616,7 @@ uint8_t PF_newcheckclient(uint8_t check) {
     }
 
     // get the PVS for the entity
-    vec3_t org;    VectorAdd(ent->v.origin, ent->v.view_ofs, org);
+    vec3_t org;    VectorAdd(ent->v.origin, ent->v.view_ofs, &org);
     mLeaf_p leaf = Mod_PointInLeaf(org, sv.worldmodel);
     uint8_p pvs = Mod_LeafPVS(leaf, sv.worldmodel);
     memcpy(_checkPvs, pvs, (sv.worldmodel->numleafs + 7) >> 3);
@@ -658,7 +659,7 @@ void PF_checkclient() {
 
     // if current entity can't possibly see the check entity, return 0
     edict_p self = ED_GetEDictByOffs(pr_global_struct->self);
-    vec3_t view; VectorAdd(self->v.origin, self->v.view_ofs, view);
+    vec3_t view; VectorAdd(self->v.origin, self->v.view_ofs, &view);
     mLeaf_p leaf = Mod_PointInLeaf(view, sv.worldmodel);
     int l = (leaf - sv.worldmodel->leafs) - 1;
     if ((l < 0) ||
@@ -750,7 +751,7 @@ findradius (origin, radius)
 */
 void PF_findradius() {
     edict_p chain = Edicts;
-    float_p org = G_VECTOR(OFS_PARM0);
+    vec3_t org = G_VECTOR(OFS_PARM0);
     float rad = G_FLOAT(OFS_PARM1);
 
     edict_p ent = ED_GetEDictFirst();
@@ -761,7 +762,7 @@ void PF_findradius() {
 
         vec3_t eorg;
         for (int j = 0; j < VECT_DIM; j++) // eorg -= ent->v.origin + (ent->v.mins + ent->v.maxs) * 0.5;
-            eorg[j] = org[j] - (ent->v.origin[j] + (ent->v.mins[j] + ent->v.maxs[j]) * 0.5f);
+            eorg.v[j] = org.v[j] - (ent->v.origin.v[j] + (ent->v.mins.v[j] + ent->v.maxs.v[j]) * 0.5f);
 
         if (Length(eorg) > rad) continue;
 
@@ -798,9 +799,9 @@ void PF_vtos() {
     snprintf(
         _pr_string_temp, sizeof(_pr_string_temp),
         "'%5.1f %5.1f %5.1f'",
-        G_VECTOR(OFS_PARM0)[X_AX],
-        G_VECTOR(OFS_PARM0)[Y_AX],
-        G_VECTOR(OFS_PARM0)[Z_AX]
+        G_VECTOR(OFS_PARM0).v[X_AX],
+        G_VECTOR(OFS_PARM0).v[Y_AX],
+        G_VECTOR(OFS_PARM0).v[Z_AX]
     );
     G_INT(OFS_RETURN) = PR_SetQString(_pr_string_temp);
 }
@@ -957,9 +958,9 @@ void PF_walkmove() {
     yaw = yaw * (float)M_PI * 2 / 360;
 
     vec3_t move = {
-        (float)cos(yaw) * dist,
-        (float)sin(yaw) * dist,
-        0,
+        .x = (float)cos(yaw) * dist,
+        .y = (float)sin(yaw) * dist,
+        .z = 0.0f,
     };
 
     // save program state, because SV_movestep may call other progs
@@ -982,14 +983,14 @@ void() droptofloor
 */
 void PF_droptofloor() {
     edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
-    vec3_t end;    VectorCopy(ent->v.origin, end);
-    end[2] -= 256;
+    vec3_t end;    VectorCopy(ent->v.origin, &end);
+    end.v[2] -= 256;
 
     trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
 
     if ((trace.fraction == 1) || trace.allsolid)    G_FLOAT(OFS_RETURN) = 0;
     else {
-        VectorCopy(trace.endpos, ent->v.origin);
+        VectorCopy(trace.endpos, &ent->v.origin);
         SV_LinkEdict(ent, false);
         ent->v.flags = (int)ent->v.flags | FL_ONGROUND;
         ent->v.groundentity = ED_GetEDictOffs(trace.ent);
@@ -1047,7 +1048,7 @@ PF_pointcontents
 =============
 */
 void PF_pointcontents() {
-    float_p v = G_VECTOR(OFS_PARM0);
+    vec3_t v = G_VECTOR(OFS_PARM0);
     G_FLOAT(OFS_RETURN) = SV_PointContents(v);
 }
 
@@ -1080,12 +1081,12 @@ void PF_aim() {
     edict_p ent = G_EDICT(OFS_PARM0);
     // float speed = G_FLOAT(OFS_PARM1);
 
-    vec3_t start;   VectorCopy(ent->v.origin, start);
-    start[2] += 20;
+    vec3_t start;   VectorCopy(ent->v.origin, &start);
+    start.v[2] += 20;
 
     // try sending a trace straight
-    vec3_t dir; VectorCopy(pr_global_struct->v_forward, dir);
-    vec3_t end; VectorMA(start, 2048, dir, end);
+    vec3_t dir; VectorCopy(pr_global_struct->v_forward, &dir);
+    vec3_t end; VectorMA(start, 2048, dir, &end);
     trace_t tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent);
     if (
         tr.ent &&
@@ -1094,12 +1095,12 @@ void PF_aim() {
             (ent->v.team <= 0) ||
             (ent->v.team != tr.ent->v.team))
         ) {
-        VectorCopy(pr_global_struct->v_forward, G_VECTOR(OFS_RETURN));
+        VectorCopy(pr_global_struct->v_forward, &G_VECTOR(OFS_RETURN));
         return;
     }
 
     // try all possible entities
-    vec3_t bestdir; VectorCopy(dir, bestdir);
+    vec3_t bestdir; VectorCopy(dir, &bestdir);
     float bestdist = sv_aim.value;
     edict_p bestent = NULL;
 
@@ -1115,13 +1116,13 @@ void PF_aim() {
         }
 
         for (int j = 0; j < VECT_DIM; j++) {
-            end[j] =
-                check->v.origin[j] +
-                0.5f * (check->v.mins[j] +
-                    check->v.maxs[j]);
+            end.v[j] =
+                check->v.origin.v[j] +
+                0.5f * (check->v.mins.v[j] +
+                    check->v.maxs.v[j]);
         }
-        VectorSubtract(end, start, dir);
-        VectorNormalize(dir);
+        VectorSubtract(end, start, &dir);
+        VectorNormalize(&dir);
         float dist = DotProduct(dir, pr_global_struct->v_forward);
         if (dist < bestdist)    continue; // to far to turn
 
@@ -1133,14 +1134,14 @@ void PF_aim() {
     }
 
     if (bestent) {
-        VectorSubtract(bestent->v.origin, ent->v.origin, dir);
+        VectorSubtract(bestent->v.origin, ent->v.origin, &dir);
         float dist = DotProduct(dir, pr_global_struct->v_forward);
-        VectorScale(pr_global_struct->v_forward, dist, end);
-        end[2] = dir[2];
-        VectorNormalize(end);
-        VectorCopy(end, G_VECTOR(OFS_RETURN));
+        VectorScale(pr_global_struct->v_forward, dist, &end);
+        end.v[2] = dir.v[2];
+        VectorNormalize(&end);
+        VectorCopy(end, &G_VECTOR(OFS_RETURN));
     }
-    else    VectorCopy(bestdir, G_VECTOR(OFS_RETURN));
+    else    VectorCopy(bestdir, &G_VECTOR(OFS_RETURN));
 }
 
 /*
@@ -1152,7 +1153,7 @@ This was a major timewaster in progs, so it was converted to C
 */
 void PF_changeyaw() {
     edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
-    float current = anglemod(ent->v.angles[1]);
+    float current = anglemod(ent->v.angles.v[1]);
     float ideal = ent->v.ideal_yaw;
     float speed = ent->v.yaw_speed;
 
@@ -1164,7 +1165,7 @@ void PF_changeyaw() {
     if (move > 0)   CLAMP_MORE(move, speed);
     else            CLAMP_LESS(move, -speed);
 
-    ent->v.angles[1] = anglemod(current + move);
+    ent->v.angles.v[1] = anglemod(current + move);
 }
 
 #ifdef QUAKE2
@@ -1175,7 +1176,7 @@ PF_changepitch
 */
 void PF_changepitch() {
     edict_p ent = G_EDICT(OFS_PARM0);
-    float current = anglemod(ent->v.angles[0]);
+    float current = anglemod(ent->v.angles.v[0]);
     float ideal = ent->v.idealpitch;
     float speed = ent->v.pitch_speed;
 
@@ -1210,18 +1211,18 @@ typedef enum msg_dest_e {
 sizebuf_p WriteDest() {
     msg_dest_e dest = G_FLOAT(OFS_PARM0);
     switch (dest) {
-        case MSG_BROADCAST: return &sv.datagram;
+    case MSG_BROADCAST: return &sv.datagram;
 
-        case MSG_ONE: {
-            edict_p ent = ED_GetEDictByOffs(pr_global_struct->msg_entity);
-            uint32_t entnum = ED_GetEDictIdx(ent);
-            if ((entnum < 1) || (entnum > svs.maxClients))
-                PR_RunError("WriteDest: not a client");
-            return &svs.clients[entnum - 1].message;
-        }
-        case MSG_ALL:       return &sv.reliable_datagram;
-        case MSG_INIT:      return &sv.signon;
-        default:            PR_RunError("WriteDest: bad destination");  break;
+    case MSG_ONE: {
+        edict_p ent = ED_GetEDictByOffs(pr_global_struct->msg_entity);
+        uint32_t entnum = ED_GetEDictIdx(ent);
+        if ((entnum < 1) || (entnum > svs.maxClients))
+            PR_RunError("WriteDest: not a client");
+        return &svs.clients[entnum - 1].message;
+    }
+    case MSG_ALL:       return &sv.reliable_datagram;
+    case MSG_INIT:      return &sv.signon;
+    default:            PR_RunError("WriteDest: bad destination");  break;
     }
 
     return NULL;
@@ -1246,8 +1247,8 @@ void PF_makestatic() {
     MSG_WriteByte(&sv.signon, (uint8_t)ent->v.colormap);
     MSG_WriteByte(&sv.signon, (uint8_t)ent->v.skin);
     for (int i = 0; i < VECT_DIM; i++) {
-        MSG_WriteCoord(&sv.signon, ent->v.origin[i]);
-        MSG_WriteAngle(&sv.signon, ent->v.angles[i]);
+        MSG_WriteCoord(&sv.signon, ent->v.origin.v[i]);
+        MSG_WriteAngle(&sv.signon, ent->v.angles.v[i]);
     }
 
     // throw the entity away now
@@ -1350,7 +1351,7 @@ void PF_WaterMove() {
                     self->v.dmg = self->v.dmg + 2;
                     if (self->v.dmg > 15)
                         self->v.dmg = 10;
-//					T_Damage (self, world, world, self.dmg, 0, FALSE);
+                    //					T_Damage (self, world, world, self.dmg, 0, FALSE);
                     damage = self->v.dmg;
                     self->v.pain_finished = SV_GetTime() + 1.0;
                 }
@@ -1377,7 +1378,7 @@ void PF_WaterMove() {
             if (self->v.dmgtime < SV_GetTime()) {
                 if (self->v.radsuit_finished < SV_GetTime())     self->v.dmgtime = SV_GetTime() + 0.2;
                 else                                        self->v.dmgtime = SV_GetTime() + 1.0;
-//				T_Damage (self, world, world, 10*self.waterlevel, 0, TRUE);
+                //				T_Damage (self, world, world, 10*self.waterlevel, 0, TRUE);
                 damage = (float)(10 * waterlevel);
             }
     }
@@ -1385,7 +1386,7 @@ void PF_WaterMove() {
         if (!(flags & (FL_IMMUNE_SLIME + FL_GODMODE)))
             if (self->v.dmgtime < SV_GetTime() && self->v.radsuit_finished < SV_GetTime()) {
                 self->v.dmgtime = SV_GetTime() + 1.0;
-//				T_Damage (self, world, world, 4*self.waterlevel, 0, TRUE);
+                //				T_Damage (self, world, world, 4*self.waterlevel, 0, TRUE);
                 damage = (float)(4 * waterlevel);
             }
     }
@@ -1401,7 +1402,7 @@ void PF_WaterMove() {
     }
 
     if (!(flags & FL_WATERJUMP)) {
-//		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
+        //		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
         VectorMA(self->v.velocity, -0.8 * self->v.waterlevel * host_frametime, self->v.velocity, self->v.velocity);
     }
 

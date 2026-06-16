@@ -11,7 +11,13 @@ struct mNode_s {
     int32_t     contents;  // 0, to differentiate from leafs
     int32_t     visframe;  // node needs to be traversed if current
 #ifdef GLQUAKE
+# if 0
     float       minmaxs[6];  // for bounding box culling
+# else
+    vec3_t      min;
+    vec3_t      max;
+# endif
+
 #else
     int16_t     minmaxs[6];  // for bounding box culling
 #endif

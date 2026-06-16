@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct {
     int     ambientlight;
     int     shadelight;
-    float_p plightvec;
+    vec3_p plightvec;
 } aLight_t;
 typedef aLight_t* aLight_p;
 
@@ -105,7 +105,7 @@ void R_DrawSprite();
 void R_RenderFace(mSurface_p fa, int clipflags);
 void R_RenderPoly(mSurface_p fa, int clipflags);
 void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf);
-void R_TransformPlane(mPlane_p p, float_p normal, float_p dist);
+void R_TransformPlane(mPlane_p p, vec3_p normal, float_p dist);
 void R_TransformFrustum();
 void R_SetSkyFrame();
 void R_DrawSurfaceBlock16();
@@ -167,8 +167,8 @@ extern fixed16_t    bbextents, bbextentt;
 //  to the world BSP
 extern mVertex_p r_ptverts, r_ptvertsmax;
 
-extern vec3_t   sbaseaxis[3], tbaseaxis[3];
-extern float    entity_rotation[3][3];
+extern mat3_t   sbaseaxis, tbaseaxis;
+extern mat3_t    entity_rotation;
 
 // extern int reinit_surfcache;
 

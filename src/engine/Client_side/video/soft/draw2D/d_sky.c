@@ -44,16 +44,16 @@ void D_Sky_uv_To_st(int u, int v, fixed16_p s, fixed16_p t) {
     float wv = 8192.0 * (float)(((int)vid.height >> 1) - v) / temp;
 
     vec3_t end = {
-        4096 * vpn[0] + wu * vright[0] + wv * vup[0],
-        4096 * vpn[1] + wu * vright[1] + wv * vup[1],
-        4096 * vpn[2] + wu * vright[2] + wv * vup[2]
+        .x = 4096 * vpn.v[0] + wu * vright.v[0] + wv * vup.v[0],
+        .y = 4096 * vpn.v[1] + wu * vright.v[1] + wv * vup.v[1],
+        .z = 4096 * vpn.v[2] + wu * vright.v[2] + wv * vup.v[2]
     };
-    end[2] *= 3;
-    VectorNormalize(end);
+    end.v[2] *= 3;
+    VectorNormalize(&end);
 
     temp = skytime * skyspeed; // TODO: add D_SetupFrame & set this there
-    *s = (int)((temp + 6 * (SKYSIZE / 2 - 1) * end[0]) * 0x10000);
-    *t = (int)((temp + 6 * (SKYSIZE / 2 - 1) * end[1]) * 0x10000);
+    *s = (int)((temp + 6 * (SKYSIZE / 2 - 1) * end.v[0]) * 0x10000);
+    *t = (int)((temp + 6 * (SKYSIZE / 2 - 1) * end.v[1]) * 0x10000);
 }
 
 

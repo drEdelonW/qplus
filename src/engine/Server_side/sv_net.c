@@ -27,11 +27,11 @@ void SV_StartParticle(vec3_t org, vec3_t dir, int color, size_t count) {
     if (sv.datagram.cursize > (MAX_DATAGRAM - 16))  return;
 
     MSG_WriteByte(&sv.datagram, svc_particle);
-    MSG_WriteCoord(&sv.datagram, org[0]);
-    MSG_WriteCoord(&sv.datagram, org[1]);
-    MSG_WriteCoord(&sv.datagram, org[2]);
+    MSG_WriteCoord(&sv.datagram, org.v[0]);
+    MSG_WriteCoord(&sv.datagram, org.v[1]);
+    MSG_WriteCoord(&sv.datagram, org.v[2]);
     for (int i = 0; i < VECT_DIM; i++) {
-        int v = (int)(dir[i] * 16.0f);
+        int v = (int)(dir.v[i] * 16.0f);
         CLAMP(-128, v, 127);
         MSG_WriteChar(&sv.datagram, (int8_t)v);
     }
@@ -92,8 +92,8 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
     for (int i = 0; i < VECT_DIM; i++) {
         MSG_WriteCoord(
             &sv.datagram,
-            entity->v.origin[i] +
-            0.5f * (entity->v.mins[i] + entity->v.maxs[i])
+            entity->v.origin.v[i] +
+            0.5f * (entity->v.mins.v[i] + entity->v.maxs.v[i])
         );
     }
 }
@@ -161,7 +161,7 @@ void SV_SendServerinfo(RmtClient_p client) {
 */
 void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     // find the client's PVS
-    vec3_t  org;   VectorAdd(clent->v.origin, clent->v.view_ofs, org);
+    vec3_t  org;   VectorAdd(clent->v.origin, clent->v.view_ofs, &org);
     uint8_p pvs = SV_FatPVS(org);
 
     // send over all entities (excpet the client) that touch the pvs
@@ -192,21 +192,21 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         uint16_t bits = 0;
 
         for (int i = 0; i < VECT_DIM; i++) {
-            float miss = ent->v.origin[i] - ent->baseline.origin[i];
-            if ((miss < -0.1) || (miss > 0.1))              bits |= (U_ORIGIN1 << i);
+            float miss = ent->v.origin.v[i] - ent->baseline.origin.v[i];
+            if ((miss < -0.1f) || (miss > 0.1f))                bits |= (U_ORIGIN1 << i);
         }
 
-        if (ent->v.angles[0] != ent->baseline.angles[0])    bits |= U_ANGLE1;
-        if (ent->v.angles[1] != ent->baseline.angles[1])    bits |= U_ANGLE2;
-        if (ent->v.angles[2] != ent->baseline.angles[2])    bits |= U_ANGLE3;
-        if (ent->v.movetype == MOVETYPE_STEP)               bits |= U_NOLERP;  // don't mess up the step animation
-        if (ent->v.colormap != ent->baseline.colormap)      bits |= U_COLORMAP;
-        if (ent->v.skin != ent->baseline.skin)              bits |= U_SKIN;
-        if (ent->v.frame != ent->baseline.frame)            bits |= U_FRAME;
-        if (ent->v.effects != ent->baseline.effects)        bits |= U_EFFECTS;
-        if (ent->v.modelindex != ent->baseline.modelindex)  bits |= U_MODEL;
-        if (e >= 256)                                       bits |= U_LONGENTITY;
-        if (bits >= 256)                                    bits |= U_MOREBITS;
+        if (ent->v.angles.v[0] != ent->baseline.angles.v[0])    bits |= U_ANGLE1;
+        if (ent->v.angles.v[1] != ent->baseline.angles.v[1])    bits |= U_ANGLE2;
+        if (ent->v.angles.v[2] != ent->baseline.angles.v[2])    bits |= U_ANGLE3;
+        if (ent->v.movetype == MOVETYPE_STEP)                   bits |= U_NOLERP;  // don't mess up the step animation
+        if (ent->v.colormap != ent->baseline.colormap)          bits |= U_COLORMAP;
+        if (ent->v.skin != ent->baseline.skin)                  bits |= U_SKIN;
+        if (ent->v.frame != ent->baseline.frame)                bits |= U_FRAME;
+        if (ent->v.effects != ent->baseline.effects)            bits |= U_EFFECTS;
+        if (ent->v.modelindex != ent->baseline.modelindex)      bits |= U_MODEL;
+        if (e >= 256)                                           bits |= U_LONGENTITY;
+        if (bits >= 256)                                        bits |= U_MOREBITS;
 
         //
         // write the message
@@ -222,12 +222,12 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         if (bits & U_COLORMAP)  MSG_WriteByte(msg, (uint8_t)ent->v.colormap);
         if (bits & U_SKIN)      MSG_WriteByte(msg, (uint8_t)ent->v.skin);
         if (bits & U_EFFECTS)   MSG_WriteByte(msg, (uint8_t)ent->v.effects);
-        if (bits & U_ORIGIN1)   MSG_WriteCoord(msg, ent->v.origin[0]);
-        if (bits & U_ANGLE1)    MSG_WriteAngle(msg, ent->v.angles[0]);
-        if (bits & U_ORIGIN2)   MSG_WriteCoord(msg, ent->v.origin[1]);
-        if (bits & U_ANGLE2)    MSG_WriteAngle(msg, ent->v.angles[1]);
-        if (bits & U_ORIGIN3)   MSG_WriteCoord(msg, ent->v.origin[2]);
-        if (bits & U_ANGLE3)    MSG_WriteAngle(msg, ent->v.angles[2]);
+        if (bits & U_ORIGIN1)   MSG_WriteCoord(msg, ent->v.origin.v[0]);
+        if (bits & U_ANGLE1)    MSG_WriteAngle(msg, ent->v.angles.v[0]);
+        if (bits & U_ORIGIN2)   MSG_WriteCoord(msg, ent->v.origin.v[1]);
+        if (bits & U_ANGLE2)    MSG_WriteAngle(msg, ent->v.angles.v[1]);
+        if (bits & U_ORIGIN3)   MSG_WriteCoord(msg, ent->v.origin.v[2]);
+        if (bits & U_ANGLE3)    MSG_WriteAngle(msg, ent->v.angles.v[2]);
     }
 }
 
@@ -250,10 +250,10 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
         MSG_WriteByte(msg, (uint8_t)ent->v.dmg_take);
         for (int i = 0; i < VECT_DIM; i++)
             MSG_WriteCoord(msg,
-                other->v.origin[i] +
+                other->v.origin.v[i] +
                 0.5f *
-                (other->v.mins[i] +
-                    other->v.maxs[i])
+                (other->v.mins.v[i] +
+                    other->v.maxs.v[i])
             );
 
         ent->v.dmg_take = 0;
@@ -269,12 +269,12 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     if (ent->v.fixangle) {
         MSG_WriteByte(msg, svc_setangle);
         for (int i = 0; i < VECT_DIM; i++)
-            MSG_WriteAngle(msg, ent->v.angles[i]);
+            MSG_WriteAngle(msg, ent->v.angles.v[i]);
         ent->v.fixangle = 0;
     }
 
     int bits = 0;
-    if (ent->v.view_ofs[2] != DEFAULT_VIEWHEIGHT)   bits |= SU_VIEWHEIGHT;
+    if (ent->v.view_ofs.v[2] != DEFAULT_VIEWHEIGHT) bits |= SU_VIEWHEIGHT;
     if (ent->v.idealpitch)                          bits |= SU_IDEALPITCH;
 
     // stuff the sigil bits into the high bits of items for sbar, or else
@@ -295,8 +295,8 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     if ((int)ent->v.flags & FL_ONGROUND)    bits |= SU_ONGROUND;
     if (ent->v.waterlevel >= 2)             bits |= SU_INWATER;
     for (int i = 0; i < VECT_DIM; i++) {
-        if (ent->v.punchangle[i])           bits |= (SU_PUNCH1 << i);
-        if (ent->v.velocity[i])             bits |= (SU_VELOCITY1 << i);
+        if (ent->v.punchangle.v[i])         bits |= (SU_PUNCH1 << i);
+        if (ent->v.velocity.v[i])           bits |= (SU_VELOCITY1 << i);
     }
     if (ent->v.weaponframe)                 bits |= SU_WEAPONFRAME;
     if (ent->v.armorvalue)                  bits |= SU_ARMOR;
@@ -305,11 +305,11 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     // send the data
 
     MSG_WriteByte(msg, svc_clientdata); MSG_WriteShort(msg, (int16_t)bits);
-    if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, (int8_t)ent->v.view_ofs[2]);
+    if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, (int8_t)ent->v.view_ofs.v[2]);
     if (bits & SU_IDEALPITCH)           MSG_WriteChar(msg, (int8_t)ent->v.idealpitch);
     for (int i = 0; i < VECT_DIM; i++) {
-        if (bits & (SU_PUNCH1 << i))    MSG_WriteChar(msg, (int8_t)ent->v.punchangle[i]);
-        if (bits & (SU_VELOCITY1 << i)) MSG_WriteChar(msg, (int8_t)ent->v.velocity[i] / 16);
+        if (bits & (SU_PUNCH1 << i))    MSG_WriteChar(msg, (int8_t)ent->v.punchangle.v[i]);
+        if (bits & (SU_VELOCITY1 << i)) MSG_WriteChar(msg, (int8_t)ent->v.velocity.v[i] / 16);
     }
 
     // [always sent]
@@ -433,8 +433,8 @@ void SV_CreateBaseline() {
         //
         // create entity baseline
         //
-        VectorCopy(svent->v.origin, svent->baseline.origin);
-        VectorCopy(svent->v.angles, svent->baseline.angles);
+        VectorCopy(svent->v.origin, &svent->baseline.origin);
+        VectorCopy(svent->v.angles, &svent->baseline.angles);
         svent->baseline.frame = (int32_t)svent->v.frame;
         svent->baseline.skin = (int32_t)svent->v.skin;
         if ((entnum > 0) && (entnum <= svs.maxClients)) {
@@ -457,8 +457,8 @@ void SV_CreateBaseline() {
         MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.colormap);
         MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.skin);
         for (int i = 0; i < VECT_DIM; i++) {
-            MSG_WriteCoord(&sv.signon, svent->baseline.origin[i]);
-            MSG_WriteAngle(&sv.signon, svent->baseline.angles[i]);
+            MSG_WriteCoord(&sv.signon, svent->baseline.origin.v[i]);
+            MSG_WriteAngle(&sv.signon, svent->baseline.angles.v[i]);
         }
     }
 }

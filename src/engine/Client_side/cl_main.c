@@ -168,13 +168,13 @@ void CL_PrintEntities_f() {
             ent->model->name,
             ent->frame,
 
-            ent->origin[0],
-            ent->origin[1],
-            ent->origin[2],
+            ent->origin.v[0],
+            ent->origin.v[1],
+            ent->origin.v[2],
 
-            ent->angles[0],
-            ent->angles[1],
-            ent->angles[2]
+            ent->angles.v[0],
+            ent->angles.v[1],
+            ent->angles.v[2]
         );
     }
 }
@@ -300,16 +300,20 @@ void CL_RelinkEntities() {
 
     // interpolate player info
     for (int i = 0; i < VECT_DIM; i++)
-        cl.velocity[i] = cl.mvelocity[1][i] +
-        frac * (cl.mvelocity[0][i] - cl.mvelocity[1][i]);
+        cl.velocity.v[i] = (
+            cl.mvelocity[1].v[i] +
+            frac * (
+                cl.mvelocity[0].v[i] -
+                cl.mvelocity[1].v[i])
+            );
 
     if (cls.demoplayback) {
         // interpolate the angles
         for (int j = 0; j < VECT_DIM; j++) {
-            float d = cl.mviewangles[0][j] - cl.mviewangles[1][j];
+            float d = cl.mviewangles[0].v[j] - cl.mviewangles[1].v[j];
             if (d > 180)        d -= 360;
             else if (d < -180)  d += 360;
-            cl.viewangles[j] = cl.mviewangles[1][j] + frac * d;
+            cl.viewangles.v[j] = cl.mviewangles[1].v[j] + frac * d;
         }
     }
 
@@ -330,40 +334,38 @@ void CL_RelinkEntities() {
             continue;
         }
 
-        vec3_t oldorg;  VectorCopy(ent->origin, oldorg);
+        vec3_t oldorg;  VectorCopy(ent->origin, &oldorg);
 
         if (ent->forcelink) { // the entity was not updated in the last message
             // so move to the final spot
-            VectorCopy(ent->msg_origins[0], ent->origin);
-            VectorCopy(ent->msg_angles[0], ent->angles);
+            VectorCopy(ent->msg_origins[0], &ent->origin);
+            VectorCopy(ent->msg_angles[0], &ent->angles);
         }
         else { // if the delta is large, assume a teleport and don't lerp
             float f = frac;
             vec3_t delta;
             for (int j = 0; j < VECT_DIM; j++) {
-                delta[j] = ent->msg_origins[0][j] - ent->msg_origins[1][j];
-                if ((delta[j] > 100) ||
-                    (delta[j] < -100))
-                    f = 1;  // assume a teleportation, not a motion
+                delta.v[j] = ent->msg_origins[0].v[j] - ent->msg_origins[1].v[j];
+                if ((delta.v[j] > 100) ||
+                    (delta.v[j] < -100))
+                    f = 1.0f;  // assume a teleportation, not a motion
             }
 
             // interpolate the origin and angles
             for (int j = 0; j < VECT_DIM; j++) {
-                ent->origin[j] = ent->msg_origins[1][j] + f * delta[j];
+                ent->origin.v[j] = ent->msg_origins[1].v[j] + f * delta.v[j];
 
-                float d = ent->msg_angles[0][j] - ent->msg_angles[1][j];
-                if (d > 180)
-                    d -= 360;
-                else if (d < -180)
-                    d += 360;
-                ent->angles[j] = ent->msg_angles[1][j] + f * d;
+                float d = ent->msg_angles[0].v[j] - ent->msg_angles[1].v[j];
+                if (d > 180)            d -= 360;
+                else if (d < -180)      d += 360;
+                ent->angles.v[j] = ent->msg_angles[1].v[j] + f * d;
             }
 
         }
 
         // rotate binary objects locally
         if (ent->model->flags & EF_ROTATE)
-            ent->angles[1] = bobjrotate;
+            ent->angles.v[1] = bobjrotate;
 
         if (ent->effects & EF_BRIGHTFIELD)
             R_EntityParticles(ent);
@@ -374,39 +376,39 @@ void CL_RelinkEntities() {
         if (ent->effects & EF_MUZZLEFLASH) {
 
             dLight_p dl = CL_AllocDlight(i);
-            VectorCopy(ent->origin, dl->origin);
-            dl->origin[2] += 16;
-            vec3_t fv, rv, uv;  AngleVectors(ent->angles, fv, rv, uv);
+            VectorCopy(ent->origin, &dl->origin);
+            dl->origin.v[2] += 16;
+            vec3_t fv, rv, uv;  AngleVectors(ent->angles, &fv, &rv, &uv);
 
-            VectorMA(dl->origin, 18, fv, dl->origin);
+            VectorMA(dl->origin, 18, fv, &dl->origin);
             dl->radius = (float)(200 + (rand() & 31));
             dl->minlight = 32;
             dl->die = (float)(cl.time + 0.1);
         }
         if (ent->effects & EF_BRIGHTLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
-            VectorCopy(ent->origin, dl->origin);
-            dl->origin[2] += 16;
+            VectorCopy(ent->origin, &dl->origin);
+            dl->origin.v[2] += 16;
             dl->radius = (float)(400 + (rand() & 31));
             dl->die = (float)(cl.time + 0.001);
         }
         if (ent->effects & EF_DIMLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
-            VectorCopy(ent->origin, dl->origin);
+            VectorCopy(ent->origin, &dl->origin);
             dl->radius = (float)(200 + (rand() & 31));
             dl->die = (float)(cl.time + 0.001);
         }
 #ifdef QUAKE2
         if (ent->effects & EF_DARKLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
-            VectorCopy(ent->origin, dl->origin);
+            VectorCopy(ent->origin, &dl->origin);
             dl->radius = 200.0 + (rand() & 31);
             dl->die = cl.time + 0.001;
             dl->dark = true;
         }
         if (ent->effects & EF_LIGHT) {
             dLight_p dl = CL_AllocDlight(i);
-            VectorCopy(ent->origin, dl->origin);
+            VectorCopy(ent->origin, &dl->origin);
             dl->radius = 200;
             dl->die = cl.time + 0.001;
         }
@@ -419,7 +421,7 @@ void CL_RelinkEntities() {
         else if (ent->model->flags & EF_ROCKET) {
             R_RocketTrail(oldorg, ent->origin, RT_ROCKET);
             dLight_p dl = CL_AllocDlight(i);
-            VectorCopy(ent->origin, dl->origin);
+            VectorCopy(ent->origin, &dl->origin);
             dl->radius = 200;
             dl->die = (float)(cl.time + 0.01);
         }
@@ -428,7 +430,7 @@ void CL_RelinkEntities() {
 
         ent->forcelink = false;
 
-        if ((i == cl.viewentity) && !chase_active.value)  continue;
+        if ((i == cl.viewentity) && (!chase_active.value))  continue;
 
 #ifdef QUAKE2
         if (ent->effects & EF_NODRAW)                   continue;

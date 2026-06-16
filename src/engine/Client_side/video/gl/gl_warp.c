@@ -35,13 +35,13 @@ mSurface_p warpface;
 
 
 void BoundPoly(int numverts, float_p verts, vec3_t mins, vec3_t maxs) {
-    mins[0] = mins[1] = mins[2] = 9999;
-    maxs[0] = maxs[1] = maxs[2] = -9999;
+    mins.v[0] = mins.v[1] = mins.v[2] = 9999.0f;
+    maxs.v[0] = maxs.v[1] = maxs.v[2] = -9999.0f;
     float_p v = verts;
     for (int i = 0; i < numverts; i++)
         for (int j = 0; j < 3; j++, v++) {
-            if (*v < mins[j])   mins[j] = *v;
-            if (*v > maxs[j])   maxs[j] = *v;
+            if (*v < mins.v[j])   mins.v[j] = *v;
+            if (*v > maxs.v[j])   maxs.v[j] = *v;
         }
 }
 
@@ -56,10 +56,10 @@ void SubdividePolygon(int numverts, float_p verts) {
     BoundPoly(numverts, verts, mins, maxs);
 
     for (int i = 0; i < 3; i++) {
-        float m = (mins[i] + maxs[i]) * 0.5;
+        float m = (mins.v[i] + maxs.v[i]) * 0.5;
         m = gl_subdivide_size.value * floor(m / gl_subdivide_size.value + 0.5);
-        if ((maxs[i] - m) < 8)      continue;
-        if ((m - mins[i]) < 8)      continue;
+        if ((maxs.v[i] - m) < 8)      continue;
+        if ((m - mins.v[i]) < 8)      continue;
 
         // cut it
         float_p v = verts + i;
@@ -70,18 +70,18 @@ void SubdividePolygon(int numverts, float_p verts) {
         // wrap cases
         dist[j] = dist[0];
         v -= i;
-        VectorCopy(verts, v);
+        VectorCopy(*(vec3_p)verts, (vec3_p)v);
 
         int f = 0;
         int b = 0;
         v = verts;
         for (int j = 0; j < numverts; j++, v += 3) {
             if (dist[j] >= 0) {
-                VectorCopy(v, front[f]);
+                VectorCopy(*(vec3_p)v, &front[f]);
                 f++;
             }
             if (dist[j] <= 0) {
-                VectorCopy(v, back[b]);
+                VectorCopy(*(vec3_p)v, &back[b]);
                 b++;
             }
             if ((dist[j] == 0) ||
@@ -92,14 +92,14 @@ void SubdividePolygon(int numverts, float_p verts) {
                 // clip point
                 float frac = dist[j] / (dist[j] - dist[j + 1]);
                 for (int k = 0; k < 3; k++)
-                    front[f][k] = back[b][k] = v[k] + frac * (v[3 + k] - v[k]);
+                    front[f].v[k] = back[b].v[k] = v[k] + frac * (v[3 + k] - v[k]);
                 f++;
                 b++;
             }
         }
 
-        SubdividePolygon(f, front[0]);
-        SubdividePolygon(b, back[0]);
+        SubdividePolygon(f, front[0].v);
+        SubdividePolygon(b, back[0].v);
         return;
     }
 
@@ -108,9 +108,9 @@ void SubdividePolygon(int numverts, float_p verts) {
     warpface->polys = poly;
     poly->numverts = numverts;
     for (int i = 0; i < numverts; i++, verts += 3) {
-        VectorCopy(verts, poly->verts[i]);
-        float s = DotProduct(verts, warpface->texinfo->vecs[0]);
-        float t = DotProduct(verts, warpface->texinfo->vecs[1]);
+        VectorCopy(*(vec3_p)verts, (vec3_p)poly->verts[i]);
+        float s = DotProduct(*(vec3_p)verts, *(vec3_p)warpface->texinfo->vecs[0]);
+        float t = DotProduct(*(vec3_p)verts, *(vec3_p)warpface->texinfo->vecs[1]);
         poly->verts[i][3] = s;
         poly->verts[i][4] = t;
     }
@@ -137,18 +137,18 @@ void GL_SubdivideSurface(mSurface_p fa) {
     for (int i = 0; i < fa->numedges; i++) {
         int lindex = _loadModel->surfedges[fa->firstedge + i];
 
-        float_p vec =
+        vec3_t vec =
             _loadModel->vertexes[
                 (lindex > 0) ?
                     _loadModel->edges[lindex].v[0] :
                     _loadModel->edges[-lindex].v[1]
             ].position;
 
-        VectorCopy(vec, verts[numverts]);
+        VectorCopy(vec, &verts[numverts]);
         numverts++;
     }
 
-    SubdividePolygon(numverts, verts[0]);
+    SubdividePolygon(numverts, (float_p)&verts[0]);
 }
 
 //=========================================================
@@ -201,21 +201,21 @@ void EmitSkyPolys(mSurface_p fa) {
         glBegin(GL_POLYGON); {
             float_p v = p->verts[0];
             for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                vec3_t dir; VectorSubtract(v, r_origin, dir);
-                dir[2] *= 3; // flatten the sphere
+                vec3_t dir; VectorSubtract(*(vec3_p)v, r_origin, &dir);
+                dir.v[2] *= 3; // flatten the sphere
 
                 float length =
-                    dir[0] * dir[0] +
-                    dir[1] * dir[1] +
-                    dir[2] * dir[2];
+                    dir.v[0] * dir.v[0] +
+                    dir.v[1] * dir.v[1] +
+                    dir.v[2] * dir.v[2];
                 length = sqrt(length);
                 length = 6 * 63 / length;
 
-                dir[0] *= length;
-                dir[1] *= length;
+                dir.v[0] *= length;
+                dir.v[1] *= length;
 
-                float s = (speedscale + dir[0]) * (1.0 / 128);
-                float t = (speedscale + dir[1]) * (1.0 / 128);
+                float s = (speedscale + dir.v[0]) * (1.0 / 128);
+                float t = (speedscale + dir.v[1]) * (1.0 / 128);
 
                 glTexCoord2f(s, t);     glVertex3fv(v);
             }

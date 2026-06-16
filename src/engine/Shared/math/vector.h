@@ -22,18 +22,43 @@ typedef enum {
     Z_AX = 2u,
     VECT_DIM = 3u,
 } axis_e;
-#if 1
+
+/* Euler angle indices: up/down, left/right, roll (fall over) */
+enum {
+    PITCH       = 0u,  /* up/down */
+    YAW         = 1u,  /* left/right */
+    ROLL        = 2u,  /* roll (fall over) */
+    ANGLES_COUNT = 3u
+};
+#if 0
     typedef vec_t vec3_t[VECT_DIM];
 #else
     typedef union {
         struct { vec_t x, y, z; };
+        struct { float pitch, yaw, roll; };
         vec_t v[VECT_DIM];
     } vec3_t;
 #endif
 STATIC_ASSERT_SIZE(vec3_t, 3 * sizeof(vec_t));
 typedef vec3_t* vec3_p;
 
+#if 0
 typedef vec_t vec5_t[5];    // vec3_t(x/y/z) + vec2(s/t)
+#else
+typedef union {
+    struct {
+        vec3_t vx;  //  Vertex          vec3_t(x/y/z)
+        vec2_t vt;  //  Texture Coord   vec2_t(s/t)
+    };
+    struct {
+        vec_t x, y, z;
+        vec_t s, t;
+    };
+    vec_t arr[5];
+} vec5_t;
+STATIC_ASSERT_SIZE(vec5_t, 5 * sizeof(vec_t));
+typedef vec5_t* vec5_p;
+#endif
 // STATIC_ASSERT(sizeof(vec5_t) == 5 * sizeof(vec_t), "vec5_t must be 20");
 STATIC_ASSERT_SIZE(vec5_t, 5 * sizeof(vec_t));
 typedef vec5_t* vec5_p;
@@ -43,22 +68,23 @@ extern "C" {
 #endif
 
     vec_t   DotProduct(vec3_t const v1, vec3_t const v2);
-    void    VectorSubtract(vec3_t const veca, vec3_t const vecb, vec3_t out);
-    void    VectorAdd(vec3_t const veca, vec3_t const vecb, vec3_t out);
-    void    VectorCopy(vec3_t const in, vec3_t out);
+    void    VectorSubtract(vec3_t const veca, vec3_t const vecb, vec3_p out);
+    void    VectorAdd(vec3_t const veca, vec3_t const vecb, vec3_p out);
+    void    VectorCopy(vec3_t const in, vec3_p out);
 
-    void    VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_t vecc);
+    void    VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_p vecc);
 
     bool    VectorCompare(vec3_t const v1, vec3_t const v2);
     vec_t   Length(vec3_t const v);
 
-    void    CrossProduct(vec3_t const v1, vec3_t const v2, vec3_t cross);
-    void    PerpendicularVector(vec3_t dst, const vec3_t src);
-    void    ProjectPointOnPlane(vec3_t dst, const vec3_t p, const vec3_t normal);
+    void    CrossProduct(vec3_t const v1, vec3_t const v2, vec3_p cross);
+    void    PerpendicularVector(vec3_p dst, const vec3_t src);
+    void    ProjectPointOnPlane(vec3_p dst, const vec3_t p, const vec3_t normal);
+    void    TransformVector(vec3_t in, vec3_p out);
 
-    float   VectorNormalize(vec3_t v);  // returns vector length
-    void    VectorInverse(vec3_t v);
-    void    VectorScale(vec3_t const in, vec_t const scale, vec3_t out);
+    float   VectorNormalize(vec3_p v);  // returns vector length
+    void    VectorInverse(vec3_p v);
+    void    VectorScale(vec3_t const in, vec_t const scale, vec3_p out);
 
 
 #ifdef __cplusplus

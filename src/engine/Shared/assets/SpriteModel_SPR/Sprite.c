@@ -207,10 +207,10 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
     mod->synctype = LittleLong(pin->synctype);
     psprite->numframes = numframes;
 
-    mod->mins[0] = mod->mins[1] = -psprite->maxwidth / 2;
-    mod->maxs[0] = mod->maxs[1] = psprite->maxwidth / 2;
-    mod->mins[2] = -psprite->maxheight / 2;
-    mod->maxs[2] = psprite->maxheight / 2;
+    mod->mins.v[0] = mod->mins.v[1] = -psprite->maxwidth / 2;
+    mod->maxs.v[0] = mod->maxs.v[1] = psprite->maxwidth / 2;
+    mod->mins.v[2] = -psprite->maxheight / 2;
+    mod->maxs.v[2] = psprite->maxheight / 2;
 
     //
     // load the frames

@@ -72,21 +72,21 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         em = _r;
     }
     else {
-        float_p world = &pv0->position[0];
+        vec3_t world = pv0->position;
 
         // transform and project
-        vec3_t local;   VectorSubtract(world, modelorg, local);
-        vec3_t transformed; TransformVector(local, transformed);
+        vec3_t local;   VectorSubtract(world, modelorg, &local);
+        vec3_t transformed; TransformVector(local, &transformed);
 
-        if (transformed[2] < NEAR_CLIP)
-            transformed[2] = NEAR_CLIP;
+        if (transformed.v[2] < NEAR_CLIP)
+            transformed.v[2] = NEAR_CLIP;
 
-        em.lzi = 1.0 / transformed[2];
+        em.lzi = 1.0 / transformed.v[2];
 
         // FIXME: build x/yscale into transform?
         {
             float scale = xscale * em.lzi;
-            em.u = (xcenter + scale * transformed[0]);
+            em.u = (xcenter + scale * transformed.v[0]);
             if (em.u < r_refdef.fvrectx_adj)
                 em.u = r_refdef.fvrectx_adj;
             if (em.u > r_refdef.fvrectright_adj)
@@ -95,7 +95,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
 
         {
             float scale = yscale * em.lzi;
-            em.v = (ycenter - scale * transformed[1]);
+            em.v = (ycenter - scale * transformed.v[1]);
             if (em.v < r_refdef.fvrecty_adj)
                 em.v = r_refdef.fvrecty_adj;
             if (em.v > r_refdef.fvrectbottom_adj)
@@ -104,27 +104,27 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         em.ceilv = (int)ceil(em.v);
     }
 
-    float_p world = &pv1->position[0];
+    vec3_t world = pv1->position;
 
     // transform and project
-    vec3_t local; VectorSubtract(world, modelorg, local);
-    vec3_t transformed; TransformVector(local, transformed);
+    vec3_t local; VectorSubtract(world, modelorg, &local);
+    vec3_t transformed; TransformVector(local, &transformed);
 
-    if (transformed[2] < NEAR_CLIP)
-        transformed[2] = NEAR_CLIP;
+    if (transformed.v[2] < NEAR_CLIP)
+        transformed.v[2] = NEAR_CLIP;
 
-    _r.lzi = 1.0 / transformed[2];
+    _r.lzi = 1.0 / transformed.v[2];
 
     {
         float scale = xscale * _r.lzi;
-        _r.u = (xcenter + scale * transformed[0]);
+        _r.u = (xcenter + scale * transformed.v[0]);
         if (_r.u < r_refdef.fvrectx_adj)        _r.u = r_refdef.fvrectx_adj;
         if (_r.u > r_refdef.fvrectright_adj)    _r.u = r_refdef.fvrectright_adj;
     }
 
     {
         float scale = yscale * _r.lzi;
-        _r.v = (ycenter - scale * transformed[1]);
+        _r.v = (ycenter - scale * transformed.v[1]);
         if (_r.v < r_refdef.fvrecty_adj)        _r.v = r_refdef.fvrecty_adj;
         if (_r.v > r_refdef.fvrectbottom_adj)   _r.v = r_refdef.fvrectbottom_adj;
     }
@@ -244,9 +244,8 @@ void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip) {
 
                 float f = d0 / (d0 - d1);
                 mVertex_t clipvert;
-                clipvert.position[0] = pv0->position[0] + f * (pv1->position[0] - pv0->position[0]);
-                clipvert.position[1] = pv0->position[1] + f * (pv1->position[1] - pv0->position[1]);
-                clipvert.position[2] = pv0->position[2] + f * (pv1->position[2] - pv0->position[2]);
+                for (int i = 0; i < VECT_DIM; i++)
+                    clipvert.position.v[i] = pv0->position.v[i] + f * (pv1->position.v[i] - pv0->position.v[i]);
 
                 if (clip->leftedge) {
                     _r_leftclipped = true;
@@ -280,7 +279,7 @@ void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip) {
                 float f = d0 / (d0 - d1);
                 mVertex_t clipvert;
                 for (int i = 0; i < VECT_DIM; i++)
-                    clipvert.position[i] = pv0->position[i] + f * (pv1->position[i] - pv0->position[i]);
+                    clipvert.position.v[i] = pv0->position.v[i] + f * (pv1->position.v[i] - pv0->position.v[i]);
 
                 if (clip->leftedge) {
                     _r_leftclipped = true;
@@ -473,13 +472,13 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
 
     mPlane_p pplane = fa->plane;
     // FIXME: cache this?
-    vec3_t p_normal; TransformVector(pplane->normal, p_normal);
+    vec3_t p_normal; TransformVector(pplane->normal, &p_normal);
     // FIXME: cache this?
     float distinv = 1.0f / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
-    surface_p->d_zistepu = p_normal[0] * xscaleinv * distinv;
-    surface_p->d_zistepv = -p_normal[1] * yscaleinv * distinv;
-    surface_p->d_ziorigin = p_normal[2] * distinv -
+    surface_p->d_zistepu = p_normal.v[0] * xscaleinv * distinv;
+    surface_p->d_zistepv = -p_normal.v[1] * yscaleinv * distinv;
+    surface_p->d_ziorigin = p_normal.v[2] * distinv -
         xcenter * surface_p->d_zistepu -
         ycenter * surface_p->d_zistepv;
 
@@ -573,13 +572,13 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
 
     mPlane_p pplane = psurf->plane;
     // FIXME: cache this?
-    vec3_t p_normal; TransformVector(pplane->normal, p_normal);
+    vec3_t p_normal; TransformVector(pplane->normal, &p_normal);
     // FIXME: cache this?
     float distinv = 1.0f / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
-    surface_p->d_zistepu = p_normal[0] * xscaleinv * distinv;
-    surface_p->d_zistepv = -p_normal[1] * yscaleinv * distinv;
-    surface_p->d_ziorigin = p_normal[2] * distinv -
+    surface_p->d_zistepu = p_normal.v[0] * xscaleinv * distinv;
+    surface_p->d_zistepv = -p_normal.v[1] * yscaleinv * distinv;
+    surface_p->d_ziorigin = p_normal.v[2] * distinv -
         xcenter * surface_p->d_zistepu -
         ycenter * surface_p->d_zistepv;
 
@@ -645,9 +644,14 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
 
             if ((lastdist > 0) != (dist > 0)) {
                 float frac = dist / (dist - lastdist);
-                verts[newpage][newverts].position[0] = verts[vertpage][i].position[0] + ((verts[vertpage][lastvert].position[0] - verts[vertpage][i].position[0]) * frac);
-                verts[newpage][newverts].position[1] = verts[vertpage][i].position[1] + ((verts[vertpage][lastvert].position[1] - verts[vertpage][i].position[1]) * frac);
-                verts[newpage][newverts].position[2] = verts[vertpage][i].position[2] + ((verts[vertpage][lastvert].position[2] - verts[vertpage][i].position[2]) * frac);
+                for (int k = 0; k < VECT_DIM; k++)
+                    verts[newpage][newverts].position.v[k] =
+                    verts[vertpage][i].position.v[k] +
+                    (
+                        (verts[vertpage][lastvert].position.v[k] -
+                            verts[vertpage][i].position.v[k]
+                            ) * frac
+                        );
                 newverts++;
             }
 
@@ -687,13 +691,13 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
 
     for (int i = 0; i < lnumverts; i++) {
         // transform and project
-        vec3_t local; VectorSubtract(verts[vertpage][i].position, modelorg, local);
-        vec3_t transformed; TransformVector(local, transformed);
+        vec3_t local; VectorSubtract(verts[vertpage][i].position, modelorg, &local);
+        vec3_t transformed; TransformVector(local, &transformed);
 
-        if (transformed[2] < NEAR_CLIP)
-            transformed[2] = NEAR_CLIP;
+        if (transformed.v[2] < NEAR_CLIP)
+            transformed.v[2] = NEAR_CLIP;
 
-        float lzi = 1.0 / transformed[2];
+        float lzi = 1.0 / transformed.v[2];
 
         if (lzi > _r_nearzi) // for mipmap finding
             _r_nearzi = lzi;
@@ -701,7 +705,7 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
         // FIXME: build x/yscale into transform?
         {
             float scale = xscale * lzi;
-            float u = (xcenter + scale * transformed[0]);
+            float u = (xcenter + scale * transformed.v[0]);
             if (u < r_refdef.fvrectx_adj)       u = r_refdef.fvrectx_adj;
             if (u > r_refdef.fvrectright_adj)   u = r_refdef.fvrectright_adj;
             pverts[i].u = u;
@@ -709,14 +713,14 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
 
         {
             float scale = yscale * lzi;
-            float v = (ycenter - scale * transformed[1]);
+            float v = (ycenter - scale * transformed.v[1]);
             if (v < r_refdef.fvrecty_adj)       v = r_refdef.fvrecty_adj;
             if (v > r_refdef.fvrectbottom_adj)  v = r_refdef.fvrectbottom_adj;
             pverts[i].v = v;
         }
         pverts[i].zi = lzi;
-        pverts[i].s = verts[vertpage][i].position[s_axis];
-        pverts[i].t = verts[vertpage][i].position[t_axis];
+        pverts[i].s = verts[vertpage][i].position.v[s_axis];
+        pverts[i].t = verts[vertpage][i].position.v[t_axis];
     }
 
     // build the polygon descriptor, including fa, _r_nearzi, and u, v, s, t, and z

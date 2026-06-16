@@ -41,7 +41,7 @@ void Chase_Init() {
 
 void Chase_Reset() {} // for respawning and teleporting start position 12 units behind head
 
-void TraceLine(vec3_t start, vec3_t end, vec3_t impact) {
+void TraceLine(vec3_t start, vec3_t end, vec3_p impact) {
     trace_t  trace; memset(&trace, 0, sizeof(trace));
     SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
 
@@ -50,31 +50,31 @@ void TraceLine(vec3_t start, vec3_t end, vec3_t impact) {
 
 void Chase_Update() {
     // if can't see player, reset
-    vec3_t forward, up, right;  AngleVectors(cl.viewangles, forward, right, up);
+    vec3_t forward, up, right;  AngleVectors(cl.viewangles, &forward, &right, &up);
 
     // calc exact destination
     for (int i = 0; i < VECT_DIM; i++) {
-        _chaseDest[i] =
-            r_refdef.vieworg[i] -
-            forward[i] * chase_back.value -
-            right[i] * chase_right.value;
+        _chaseDest.v[i] =
+            r_refdef.vieworg.v[i] -
+            forward.v[i] * chase_back.value -
+            right.v[i] * chase_right.value;
     }
-    _chaseDest[2] = r_refdef.vieworg[2] + chase_up.value;
+    _chaseDest.v[2] = r_refdef.vieworg.v[2] + chase_up.value;
 
     // find the spot the player is looking at
-    vec3_t dest;  VectorMA(r_refdef.vieworg, 4096, forward, dest);
-    vec3_t stop;  TraceLine(r_refdef.vieworg, dest, stop);
+    vec3_t dest;  VectorMA(r_refdef.vieworg, 4096, forward, &dest);
+    vec3_t stop;  TraceLine(r_refdef.vieworg, dest, &stop);
 
     // calculate pitch to look at the same spot from camera
-    VectorSubtract(stop, r_refdef.vieworg, stop);
+    VectorSubtract(stop, r_refdef.vieworg, &stop);
     float dist = DotProduct(stop, forward);
     CLAMP_LESS(dist, 1);
 
-    r_refdef.viewangles[PITCH] =
-        -atan(stop[2] / dist) /
+    r_refdef.viewangles.v[PITCH] =
+        -atan(stop.v[2] / dist) /
         M_PI * 180;
 
     // move towards destination
-    VectorCopy(_chaseDest, r_refdef.vieworg);
+    VectorCopy(_chaseDest, &r_refdef.vieworg);
 }
 

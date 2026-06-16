@@ -19,7 +19,10 @@ typedef struct mSpriteFrame_s {
     int32_t         width;
     int32_t         height;
     TypeLess_ptr    pcachespot;   // remove?
-    float           up, down, left, right;
+    float           up;
+    float           down;
+    float           left;
+    float           right;
 #ifdef GLQUAKE
     int             gl_texturenum;
 #else

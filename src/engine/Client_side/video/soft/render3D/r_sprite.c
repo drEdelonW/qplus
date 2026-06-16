@@ -37,11 +37,11 @@ R_RotateSprite
 ================
 */
 void R_RotateSprite(float beamlength) {
-    if (beamlength == 0.0)      return;
+    if (beamlength == 0.0f)      return;
 
-    vec3_t vec; VectorScale(r_spritedesc.vpn, -beamlength, vec); // vec = r_spritedesc.vpn * (-beamlength);
-    VectorAdd(r_entorigin, vec, r_entorigin);   // r_entorigin += vec;
-    VectorSubtract(modelorg, vec, modelorg);    // modelorg -= vec;
+    vec3_t vec; VectorScale(r_spritedesc.vpn, -beamlength, &vec); // vec = r_spritedesc.vpn * (-beamlength);
+    VectorAdd(r_entorigin, vec, &r_entorigin);   // r_entorigin += vec;
+    VectorSubtract(modelorg, vec, &modelorg);    // modelorg -= vec;
 }
 
 
@@ -57,7 +57,7 @@ Throws out the back side
 int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
     // printf("R_ClipSpriteFace\n");
     float clipdist = pclipplane->dist;
-    float_p pclipnormal = pclipplane->normal;
+    vec3_t pclipnormal = pclipplane->normal;
 
     // calc dists
     float_p in;
@@ -77,7 +77,7 @@ int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
     int vsize = sizeof(vec5_t) / sizeof(float);
     float dists[MAXWORKINGVERTS + 1];
     for (int i = 0; i < nump; i++, instep += vsize) {
-        dists[i] = DotProduct(instep, pclipnormal) - clipdist;
+        dists[i] = DotProduct(*(vec3_p)instep, pclipnormal) - clipdist;
     }
 
     // handle wraparound case
@@ -192,35 +192,35 @@ void R_SetupAndDrawSprite() {
     if (dot >= 0)       return;
 
     // build the sprite poster in worldspace
-    vec3_t right;   VectorScale(r_spritedesc.vright, r_spritedesc.pspriteframe->right, right);
-    vec3_t up;      VectorScale(r_spritedesc.vup, r_spritedesc.pspriteframe->up, up);
-    vec3_t left;    VectorScale(r_spritedesc.vright, r_spritedesc.pspriteframe->left, left);
-    vec3_t down;    VectorScale(r_spritedesc.vup, r_spritedesc.pspriteframe->down, down);
+    vec3_t right;   VectorScale(r_spritedesc.vright, r_spritedesc.pspriteframe->right, &right);
+    vec3_t up;      VectorScale(r_spritedesc.vup, r_spritedesc.pspriteframe->up, &up);
+    vec3_t left;    VectorScale(r_spritedesc.vright, r_spritedesc.pspriteframe->left, &left);
+    vec3_t down;    VectorScale(r_spritedesc.vup, r_spritedesc.pspriteframe->down, &down);
 
     vec5_p pverts = _clip_verts[0];
 
-    pverts[0][0] = r_entorigin[0] + up[0] + left[0];
-    pverts[0][1] = r_entorigin[1] + up[1] + left[1];
-    pverts[0][2] = r_entorigin[2] + up[2] + left[2];
-    pverts[0][3] = 0;
-    pverts[0][4] = 0;
+    pverts[0][0] = r_entorigin.v[0] + up.v[0] + left.v[0];
+    pverts[0][1] = r_entorigin.v[1] + up.v[1] + left.v[1];
+    pverts[0][2] = r_entorigin.v[2] + up.v[2] + left.v[2];
+    pverts[0][3] = 0.0f;
+    pverts[0][4] = 0.0f;
 
-    pverts[1][0] = r_entorigin[0] + up[0] + right[0];
-    pverts[1][1] = r_entorigin[1] + up[1] + right[1];
-    pverts[1][2] = r_entorigin[2] + up[2] + right[2];
+    pverts[1][0] = r_entorigin.v[0] + up.v[0] + right.v[0];
+    pverts[1][1] = r_entorigin.v[1] + up.v[1] + right.v[1];
+    pverts[1][2] = r_entorigin.v[2] + up.v[2] + right.v[2];
     pverts[1][3] = _sprite_width;
-    pverts[1][4] = 0;
+    pverts[1][4] = 0.0f;
 
-    pverts[2][0] = r_entorigin[0] + down[0] + right[0];
-    pverts[2][1] = r_entorigin[1] + down[1] + right[1];
-    pverts[2][2] = r_entorigin[2] + down[2] + right[2];
+    pverts[2][0] = r_entorigin.v[0] + down.v[0] + right.v[0];
+    pverts[2][1] = r_entorigin.v[1] + down.v[1] + right.v[1];
+    pverts[2][2] = r_entorigin.v[2] + down.v[2] + right.v[2];
     pverts[2][3] = _sprite_width;
     pverts[2][4] = _sprite_height;
 
-    pverts[3][0] = r_entorigin[0] + down[0] + left[0];
-    pverts[3][1] = r_entorigin[1] + down[1] + left[1];
-    pverts[3][2] = r_entorigin[2] + down[2] + left[2];
-    pverts[3][3] = 0;
+    pverts[3][0] = r_entorigin.v[0] + down.v[0] + left.v[0];
+    pverts[3][1] = r_entorigin.v[1] + down.v[1] + left.v[1];
+    pverts[3][2] = r_entorigin.v[2] + down.v[2] + left.v[2];
+    pverts[3][3] = 0.0f;
     pverts[3][4] = _sprite_height;
 
     // clip to the frustum in worldspace
@@ -239,21 +239,21 @@ void R_SetupAndDrawSprite() {
 
     EmitPoint_t outverts[MAXWORKINGVERTS + 1];
     for (int i = 0; i < nump; i++) {
-        vec3_t local;   VectorSubtract(pv, r_origin, local);
-        vec3_t transformed; TransformVector(local, transformed);
+        vec3_t local;   VectorSubtract(*(vec3_p)pv, r_origin, &local);
+        vec3_t transformed; TransformVector(local, &transformed);
 
-        if (transformed[2] < NEAR_CLIP)
-            transformed[2] = NEAR_CLIP;
+        if (transformed.v[2] < NEAR_CLIP)
+            transformed.v[2] = NEAR_CLIP;
 
         EmitPoint_p pout = &outverts[i];
-        pout->zi = 1.0 / transformed[2];
+        pout->zi = 1.0 / transformed.v[2];
         if (pout->zi > r_spritedesc.nearzi)
             r_spritedesc.nearzi = pout->zi;
 
         pout->s = pv[3];
         pout->t = pv[4];
-        pout->u = xcenter + xscale * pout->zi * transformed[0];
-        pout->v = ycenter - yscale * pout->zi * transformed[1];
+        pout->u = xcenter + xscale * pout->zi * transformed.v[0];
+        pout->v = ycenter - yscale * pout->zi * transformed.v[1];
         pv += sizeof(vec5_t) / sizeof(*pv);
     }
 
@@ -326,38 +326,36 @@ void R_DrawSprite() {
         // vectors and starts to approach an undefined state, so we don't draw if
         // the two vectors are less than 1 degree apart
         vec3_t tvec = {
-            -modelorg[0],
-            -modelorg[1],
-            -modelorg[2]
+            .x = -modelorg.v[0],
+            .y = -modelorg.v[1],
+            .z = -modelorg.v[2]
         };
-        VectorNormalize(tvec);
-        float dot = tvec[2]; // same as DotProduct (tvec, r_spritedesc.vup) because
-        //  r_spritedesc.vup is 0, 0, 1
-        if ((dot > 0.999848) ||
-            (dot < -0.999848)) // cos(1 degree) = 0.999848
+        VectorNormalize(&tvec);
+        float dot = tvec.v[2]; // same as DotProduct (tvec, r_spritedesc.vup) because r_spritedesc.vup is 0, 0, 1
+        if ((dot > 0.999848f) ||
+            (dot < -0.999848f)) // cos(1 degree) = 0.999848
             return;
-        r_spritedesc.vup[0] = 0;
-        r_spritedesc.vup[1] = 0;
-        r_spritedesc.vup[2] = 1;
-        r_spritedesc.vright[0] = tvec[1];
-        // CrossProduct(r_spritedesc.vup, -modelorg,
-        r_spritedesc.vright[1] = -tvec[0]; // r_spritedesc.vright)
-        r_spritedesc.vright[2] = 0;
-        VectorNormalize(r_spritedesc.vright);
-        r_spritedesc.vpn[0] = -r_spritedesc.vright[1];
-        r_spritedesc.vpn[1] = r_spritedesc.vright[0];
-        r_spritedesc.vpn[2] = 0;
-        // CrossProduct (r_spritedesc.vright, r_spritedesc.vup,
-        //  r_spritedesc.vpn)
+        r_spritedesc.vup.v[0] = 0;
+        r_spritedesc.vup.v[1] = 0;
+        r_spritedesc.vup.v[2] = 1;
+        r_spritedesc.vright.v[0] = tvec.v[1];
+        // CrossProduct(r_spritedesc.vup, -modelorg, r_spritedesc.vright)
+        r_spritedesc.vright.v[1] = -tvec.v[0]; 
+        r_spritedesc.vright.v[2] = 0;
+        VectorNormalize(&r_spritedesc.vright);
+        r_spritedesc.vpn.v[0] = -r_spritedesc.vright.v[1];
+        r_spritedesc.vpn.v[1] = r_spritedesc.vright.v[0];
+        r_spritedesc.vpn.v[2] = 0;
+        // CrossProduct (r_spritedesc.vright, r_spritedesc.vup, r_spritedesc.vpn)
     }
     else if (psprite->type == SPR_VP_PARALLEL) {
         // generate the sprite's axes, completely parallel to the viewplane. There
         // are no problem situations, because the sprite is always in the same
         // position relative to the viewer
         for (int i = 0; i < VECT_DIM; i++) {
-            r_spritedesc.vup[i] = vup[i];
-            r_spritedesc.vright[i] = vright[i];
-            r_spritedesc.vpn[i] = vpn[i];
+            r_spritedesc.vup.v[i] = vup.v[i];
+            r_spritedesc.vright.v[i] = vright.v[i];
+            r_spritedesc.vpn.v[i] = vpn.v[i];
         }
     }
     else if (psprite->type == SPR_VP_PARALLEL_UPRIGHT) {
@@ -367,45 +365,49 @@ void R_DrawSprite() {
         // down, because the cross product will be between two nearly parallel
         // vectors and starts to approach an undefined state, so we don't draw if
         // the two vectors are less than 1 degree apart
-        float dot = vpn[2]; // same as DotProduct (vpn, r_spritedesc.vup) because
+        float dot = vpn.v[2]; // same as DotProduct (vpn, r_spritedesc.vup) because
         //  r_spritedesc.vup is 0, 0, 1
-        if ((dot > 0.999848) ||
-            (dot < -0.999848)) // cos(1 degree) = 0.999848
+        if ((dot > 0.999848f) ||
+            (dot < -0.999848f)) // cos(1 degree) = 0.999848
             return;
 
-        r_spritedesc.vup[0] = 0;
-        r_spritedesc.vup[1] = 0;
-        r_spritedesc.vup[2] = 1;
+        r_spritedesc.vup = (vec3_t){
+             .x = 0.0f,
+             .y = 0.0f,
+             .z = 0.0f
+        };
 
-        r_spritedesc.vright[0] = vpn[1];
-        // CrossProduct (r_spritedesc.vup, vpn,
-        r_spritedesc.vright[1] = -vpn[0]; //  r_spritedesc.vright)
-        r_spritedesc.vright[2] = 0;
-        VectorNormalize(r_spritedesc.vright);
+        // CrossProduct (r_spritedesc.vup, vpn, r_spritedesc.vright)
+        r_spritedesc.vright = (vec3_t){
+             .x = vpn.v[1],
+             .y = -vpn.v[0],
+             .z = 0.0f
+        };
+        VectorNormalize(&r_spritedesc.vright);
 
-        r_spritedesc.vpn[0] = -r_spritedesc.vright[1];
-        r_spritedesc.vpn[1] = r_spritedesc.vright[0];
-        r_spritedesc.vpn[2] = 0;
-        // CrossProduct (r_spritedesc.vright, r_spritedesc.vup,
-        //  r_spritedesc.vpn)
+        r_spritedesc.vpn = (vec3_t){
+             .x = -r_spritedesc.vright.v[1],
+             .y = r_spritedesc.vright.v[0],
+             .z = 0.0f
+        };
+        // CrossProduct (r_spritedesc.vright, r_spritedesc.vup, r_spritedesc.vpn)
     }
     else if (psprite->type == SPR_ORIENTED) {
         // generate the sprite's axes, according to the sprite's world orientation
-        AngleVectors(currententity->angles, r_spritedesc.vpn,
-            r_spritedesc.vright, r_spritedesc.vup);
+        AngleVectors(currententity->angles, &r_spritedesc.vpn, &r_spritedesc.vright, &r_spritedesc.vup);
     }
     else if (psprite->type == SPR_VP_PARALLEL_ORIENTED) {
         // generate the sprite's axes, parallel to the viewplane, but rotated in
         // that plane around the center according to the sprite entity's roll
         // angle. So vpn stays the same, but vright and vup rotate
-        float angle = currententity->angles[ROLL] * (M_PI * 2 / 360);
+        float angle = currententity->angles.v[ROLL] * (M_PI * 2 / 360);
         float sr = sin(angle);
         float cr = cos(angle);
 
         for (int i = 0; i < VECT_DIM; i++) {
-            r_spritedesc.vpn[i] = vpn[i];
-            r_spritedesc.vright[i] = vright[i] * cr + vup[i] * sr;
-            r_spritedesc.vup[i] = vright[i] * -sr + vup[i] * cr;
+            r_spritedesc.vpn.v[i] = vpn.v[i];
+            r_spritedesc.vright.v[i] = vright.v[i] * cr + vup.v[i] * sr;
+            r_spritedesc.vup.v[i] = vright.v[i] * -sr + vup.v[i] * cr;
         }
     }
     else {

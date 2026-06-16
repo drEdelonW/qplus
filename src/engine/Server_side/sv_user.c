@@ -45,9 +45,8 @@ static vec3_t _wishDir;
 static float _wishSpeed;
 
 // world
-static float_p _angles;
-float_p origin;
-float_p velocity;
+static vec3_p _origin;     // TODO: make ti vec3_t
+static vec3_p _velocity;   // TODO: make ti vec3_t
 
 static bool _onGround;
 
@@ -64,29 +63,29 @@ void SV_SetIdealPitch() {
     if (!((int)sv_player->v.flags & FL_ONGROUND))   return;
 
     float z[MAX_FORWARD];
-    float angleval = sv_player->v.angles[YAW] * (float)M_PI * 2 / 360;
+    float angleval = sv_player->v.angles.v[YAW] * (float)M_PI * 2.0f / 360;
     float sinval = (float)sin(angleval);
     float cosval = (float)cos(angleval);
 
     int i = 0;
     for (; i < MAX_FORWARD; i++) {
         vec3_t top = {
-            sv_player->v.origin[0] + cosval * ((float)i + 3) * 12,
-            sv_player->v.origin[1] + sinval * ((float)i + 3) * 12,
-            sv_player->v.origin[2] + sv_player->v.view_ofs[2]
+            .x = sv_player->v.origin.v[0] + cosval * ((float)i + 3) * 12,
+            .y = sv_player->v.origin.v[1] + sinval * ((float)i + 3) * 12,
+            .z = sv_player->v.origin.v[2] + sv_player->v.view_ofs.v[2]
         };
 
         vec3_t bottom = {
-            top[0],
-            top[1],
-            top[2] - 160
+            .x = top.v[0],
+            .y = top.v[1],
+            .z = top.v[2] - 160.0f
         };
 
         trace_t tr = SV_Move(top, vec3_origin, vec3_origin, bottom, MOVE_NOMONSTERS, sv_player);
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
         if (tr.fraction == 1)   return; // near a dropoff
 
-        z[i] = top[2] + tr.fraction * (bottom[2] - top[2]);
+        z[i] = top.v[2] + tr.fraction * (bottom.v[2] - top.v[2]);
     }
 
     float dir = 0;
@@ -118,23 +117,27 @@ SV_UserFriction
 ==================
 */
 void SV_UserFriction() {
-    vec3_t start, stop;
-    float friction;
+    vec3_p vel = _velocity;
 
-    float_p vel = velocity;
-
-    float speed = (float)sqrt(vel[0] * vel[0] + vel[1] * vel[1]);
+    float speed = (float)sqrt((vel->v[0] * vel->v[0]) + (vel->v[1] * vel->v[1]));
     if (!speed) return;
 
     // if the leading edge is over a dropoff, increase friction
-    start[0] = stop[0] = origin[0] + vel[0] / speed * 16;
-    start[1] = stop[1] = origin[1] + vel[1] / speed * 16;
-    start[2] = origin[2] + sv_player->v.mins[2];
-    stop[2] = start[2] - 34;
+    vec3_t start = {
+        .x = _origin->v[0] + vel->v[0] / speed * 16.0f,
+        .y = _origin->v[1] + vel->v[1] / speed * 16.0f,
+        .z = _origin->v[2] + sv_player->v.mins.v[2]
+    };
+    vec3_t stop = {
+        .x = start.v[0],
+        .y = start.v[1],
+        .z = start.v[2] - 34.0f
+    };
 
     trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, sv_player);
 
-    if (trace.fraction == 1.0)      friction = sv_friction.value * sv_edgefriction.value;
+    float friction;
+    if (trace.fraction == 1.0f)     friction = sv_friction.value * sv_edgefriction.value;
     else                            friction = sv_friction.value;
 
     // apply friction
@@ -144,9 +147,9 @@ void SV_UserFriction() {
     if (newspeed < 0.0f)   newspeed = 0.0f;
     newspeed /= speed;
 
-    vel[0] = vel[0] * newspeed;
-    vel[1] = vel[1] * newspeed;
-    vel[2] = vel[2] * newspeed;
+    vel->v[0] = vel->v[0] * newspeed;
+    vel->v[1] = vel->v[1] * newspeed;
+    vel->v[2] = vel->v[2] * newspeed;
 }
 
 /*
@@ -172,7 +175,7 @@ void SV_Accelerate(vec3_t wishvel) {
 }
 #endif
 void SV_Accelerate() {
-    float currentspeed = DotProduct(velocity, _wishDir);
+    float currentspeed = DotProduct(*_velocity, _wishDir);
     float addspeed = _wishSpeed - currentspeed;
     if (addspeed <= 0)
         return;
@@ -182,15 +185,15 @@ void SV_Accelerate() {
         accelspeed = addspeed;
 
     for (int i = 0; i < VECT_DIM; i++)
-        velocity[i] += accelspeed * _wishDir[i];
+        _velocity->v[i] += accelspeed * _wishDir.v[i];
 }
 
 void SV_AirAccelerate(vec3_t wishveloc) {
-    float wishspd = VectorNormalize(wishveloc);
+    float wishspd = VectorNormalize(&wishveloc);
     if (wishspd > 30)
         wishspd = 30;
 
-    float currentspeed = DotProduct(velocity, wishveloc);
+    float currentspeed = DotProduct(*_velocity, wishveloc);
     float addspeed = wishspd - currentspeed;
     if (addspeed <= 0)
         return;
@@ -201,17 +204,17 @@ void SV_AirAccelerate(vec3_t wishveloc) {
         accelspeed = addspeed;
 
     for (int i = 0; i < VECT_DIM; i++)
-        velocity[i] += accelspeed * wishveloc[i];
+        _velocity->v[i] += accelspeed * wishveloc.v[i];
 }
 
 
 void DropPunchAngle() {
-    float len = VectorNormalize(sv_player->v.punchangle);
+    float len = VectorNormalize(&sv_player->v.punchangle);
 
     len -= (float)(10.0 * host_frametime);
     if (len < 0)
         len = 0;
-    VectorScale(sv_player->v.punchangle, len, sv_player->v.punchangle);
+    VectorScale(sv_player->v.punchangle, len, &sv_player->v.punchangle);
 }
 
 /*
@@ -222,34 +225,34 @@ SV_WaterMove
 */
 void SV_WaterMove() {
     // user intentions
-    AngleVectors(sv_player->v.v_angle, _forward, _right, _up);
+    AngleVectors(sv_player->v.v_angle, &_forward, &_right, &_up);
 
     vec3_t wishvel;
     for (int i = 0; i < VECT_DIM; i++)
-        wishvel[i] = _forward[i] * cmd.forwardmove + _right[i] * cmd.sidemove;
+        wishvel.v[i] = _forward.v[i] * cmd.forwardmove + _right.v[i] * cmd.sidemove;
 
-    if (!cmd.forwardmove &&
-        !cmd.sidemove &&
-        !cmd.upmove)
-        wishvel[2] -= 60;  // drift towards bottom
+    if (!(cmd.forwardmove) &&
+        !(cmd.sidemove) &&
+        !(cmd.upmove))
+        wishvel.v[2] -= 60;  // drift towards bottom
     else
-        wishvel[2] += cmd.upmove;
+        wishvel.v[2] += cmd.upmove;
 
     _wishSpeed = Length(wishvel);
     if (_wishSpeed > sv_maxspeed.value) {
-        VectorScale(wishvel, sv_maxspeed.value / _wishSpeed, wishvel);
+        VectorScale(wishvel, sv_maxspeed.value / _wishSpeed, &wishvel);
         _wishSpeed = sv_maxspeed.value;
     }
     _wishSpeed *= 0.7f;
 
     // water friction
-    float speed = Length(velocity);
+    float speed = Length(*_velocity);
     float newspeed;
     if (speed) {
         newspeed = (float)(speed - host_frametime * speed * sv_friction.value);
         if (newspeed < 0)
             newspeed = 0;
-        VectorScale(velocity, newspeed / speed, velocity);
+        VectorScale(*_velocity, newspeed / speed, _velocity);
     }
     else
         newspeed = 0;
@@ -260,13 +263,13 @@ void SV_WaterMove() {
     float addspeed = _wishSpeed - newspeed;
     if (addspeed <= 0)  return;
 
-    VectorNormalize(wishvel);
+    VectorNormalize(&wishvel);
     float accelspeed = (float)(sv_accelerate.value * _wishSpeed * host_frametime);
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
     for (int i = 0; i < VECT_DIM; i++)
-        velocity[i] += accelspeed * wishvel[i];
+        _velocity->v[i] += accelspeed * wishvel.v[i];
 }
 
 void SV_WaterJump() {
@@ -276,8 +279,8 @@ void SV_WaterJump() {
         sv_player->v.flags = (int)sv_player->v.flags & ~FL_WATERJUMP;
         sv_player->v.teleport_time = 0;
     }
-    sv_player->v.velocity[0] = sv_player->v.movedir[0];
-    sv_player->v.velocity[1] = sv_player->v.movedir[1];
+    sv_player->v.velocity.v[0] = sv_player->v.movedir.v[0];
+    sv_player->v.velocity.v[1] = sv_player->v.movedir.v[1];
 }
 
 
@@ -288,33 +291,35 @@ SV_AirMove
 ===================
 */
 void SV_AirMove() {
-    AngleVectors(sv_player->v.angles, _forward, _right, _up);
+    AngleVectors(sv_player->v.angles, &_forward, &_right, &_up);
 
     float fmove = cmd.forwardmove;
     float smove = cmd.sidemove;
 
     // hack to not let you back into teleporter
-    if (SV_GetTime() < sv_player->v.teleport_time && fmove < 0)
-        fmove = 0;
+    if ((SV_GetTime() < sv_player->v.teleport_time) &&
+        (fmove < 0.0f)
+        )
+        fmove = 0.0f;
 
     vec3_t  wishvel;
     for (int i = 0; i < VECT_DIM; i++)
-        wishvel[i] = _forward[i] * fmove + _right[i] * smove;
+        wishvel.v[i] = _forward.v[i] * fmove + _right.v[i] * smove;
 
     if ((int)sv_player->v.movetype != MOVETYPE_WALK)
-        wishvel[2] = cmd.upmove;
+        wishvel.v[2] = cmd.upmove;
     else
-        wishvel[2] = 0;
+        wishvel.v[2] = 0.0f;
 
-    VectorCopy(wishvel, _wishDir);
-    _wishSpeed = VectorNormalize(_wishDir);
+    VectorCopy(wishvel, &_wishDir);
+    _wishSpeed = VectorNormalize(&_wishDir);
     if (_wishSpeed > sv_maxspeed.value) {
-        VectorScale(wishvel, sv_maxspeed.value / _wishSpeed, wishvel);
+        VectorScale(wishvel, sv_maxspeed.value / _wishSpeed, &wishvel);
         _wishSpeed = sv_maxspeed.value;
     }
 
     if (sv_player->v.movetype == MOVETYPE_NOCLIP) { // noclip
-        VectorCopy(wishvel, velocity);
+        VectorCopy(wishvel, _velocity);
     }
     else if (_onGround) {
         SV_UserFriction();
@@ -338,8 +343,8 @@ void SV_ClientThink() {
 
     _onGround = (int)sv_player->v.flags & FL_ONGROUND;
 
-    origin = sv_player->v.origin;
-    velocity = sv_player->v.velocity;
+    _origin = &sv_player->v.origin;
+    _velocity = &sv_player->v.velocity;
 
     DropPunchAngle();
 
@@ -349,14 +354,14 @@ void SV_ClientThink() {
     // angles
     // show 1/3 the pitch angle and all the roll angle
     cmd = remoteClient->cmd;
-    _angles = sv_player->v.angles;
+    vec3_p _angles = &sv_player->v.angles;
 
     vec3_t v_angle;
-    VectorAdd(sv_player->v.v_angle, sv_player->v.punchangle, v_angle);
-    _angles[ROLL] = V_CalcRoll(sv_player->v.angles, sv_player->v.velocity) * 4;
-    if (!sv_player->v.fixangle) {
-        _angles[PITCH] = -v_angle[PITCH] / 3;
-        _angles[YAW] = v_angle[YAW];
+    VectorAdd(sv_player->v.v_angle, sv_player->v.punchangle, &v_angle);
+    _angles->v[ROLL] = V_CalcRoll(sv_player->v.angles, sv_player->v.velocity) * 4;
+    if (!(sv_player->v.fixangle)) {
+        _angles->v[PITCH] = -v_angle.v[PITCH] / 3;
+        _angles->v[YAW] = v_angle.v[YAW];
     }
 
     if ((int)sv_player->v.flags & FL_WATERJUMP) { SV_WaterJump(); return; }
@@ -386,12 +391,12 @@ void SV_ReadClientMove(UserCmd_p move) {
     // for (int i = 0; i < VECT_DIM; i++)
     //     angle[i] = MSG_ReadAngle();
     vec3_t angle = {
-        MSG_ReadAngle(),
-        MSG_ReadAngle(),
-        MSG_ReadAngle()
+        .x = MSG_ReadAngle(),
+        .y = MSG_ReadAngle(),
+        .z = MSG_ReadAngle()
     };
 
-    VectorCopy(angle, remoteClient->edict->v.v_angle);
+    VectorCopy(angle, &remoteClient->edict->v.v_angle);
 
     // read movement
     move->forwardmove = MSG_ReadShort();

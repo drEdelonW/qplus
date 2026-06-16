@@ -8,54 +8,55 @@
 /*
 ** assumes "src" is normalized
 */
-void PerpendicularVector(vec3_t dst, const vec3_t src) {
+void PerpendicularVector(vec3_p dst, const vec3_t src) {
     float minelem = 1.0F;
 
     // find the smallest magnitude axially aligned vector
     int pos = 0;
     for (int i = 0; i < VECT_DIM; i++)
-        if (fabs(src[i]) < minelem) {
+        if (fabs(src.v[i]) < minelem) {
             pos = i;
-            minelem = fabs(src[i]);
+            minelem = fabs(src.v[i]);
         }
 
-    vec3_t tempvec = { 0.0f, 0.0f, 0.0f };
-    tempvec[pos] = 1.0F;
+    vec3_t tempvec = { .x = 0.0f, .y = 0.0f, .z = 0.0f };
+    tempvec.v[pos] = 1.0F;
 
     ProjectPointOnPlane(dst, tempvec, src); // project the point onto the plane defined by src
     VectorNormalize(dst);    // normalize the result
 }
 
-void ProjectPointOnPlane(vec3_t dst, const vec3_t p, const vec3_t normal) {
+void ProjectPointOnPlane(vec3_p dst, const vec3_t p, const vec3_t normal) {
     float inv_denom = 1.0F / DotProduct(normal, normal);
     float d = DotProduct(normal, p) * inv_denom;
 
-    vec3_t n;
-    n[0] = normal[0] * inv_denom;
-    n[1] = normal[1] * inv_denom;
-    n[2] = normal[2] * inv_denom;
+    vec3_t n = {
+        .x = normal.v[0] * inv_denom,
+        .y = normal.v[1] * inv_denom,
+        .z = normal.v[2] * inv_denom
+    };
 
-    dst[0] = p[0] - d * n[0];
-    dst[1] = p[1] - d * n[1];
-    dst[2] = p[2] - d * n[2];
+    dst->v[0] = p.v[0] - d * n.v[0];
+    dst->v[1] = p.v[1] - d * n.v[1];
+    dst->v[2] = p.v[2] - d * n.v[2];
 }
 
 bool VectorCompare(vec3_t const v1, vec3_t const v2) {
     for (int i = 0; i < VECT_DIM; i++)
-        if (v1[i] != v2[i])
+        if (v1.v[i] != v2.v[i])
             return false;
     return true;
 }
 
-void VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_t vecc) {
+void VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_p vecc) {
 #if 1
     Vector3D aV(veca);
     Vector3D bV(vecb);
     (aV + (bV * scale)).toVec3(vecc);
 #else
-    vecc[0] = veca[0] + scale * vecb[0];
-    vecc[1] = veca[1] + scale * vecb[1];
-    vecc[2] = veca[2] + scale * vecb[2];
+    vecc->v[0] = veca.v[0] + scale * vecb.v[0];
+    vecc->v[1] = veca.v[1] + scale * vecb.v[1];
+    vecc->v[2] = veca.v[2] + scale * vecb.v[2];
 #endif
 }
 
@@ -66,13 +67,13 @@ vec_t DotProduct(vec3_t const v1, vec3_t const v2) {
     return aV.dot(bV);
 #else
     return
-        (v1[0] * v2[0]) +
-        (v1[1] * v2[1]) +
-        (v1[2] * v2[2]);
+        (v1.v[0] * v2.v[0]) +
+        (v1.v[1] * v2.v[1]) +
+        (v1.v[2] * v2.v[2]);
 #endif
 }
 
-void VectorSubtract(vec3_t const veca, vec3_t const vecb, vec3_t out) {
+void VectorSubtract(vec3_t const veca, vec3_t const vecb, vec3_p out) {
 #if 1
     Vector3D aV(veca);
     Vector3D bV(vecb);
@@ -84,30 +85,30 @@ void VectorSubtract(vec3_t const veca, vec3_t const vecb, vec3_t out) {
 #endif
 }
 
-void VectorAdd(vec3_t const veca, vec3_t const vecb, vec3_t out) {
+void VectorAdd(vec3_t const veca, vec3_t const vecb, vec3_p out) {
 #if 1
     Vector3D aV(veca);
     Vector3D bV(vecb);
     (aV + bV).toVec3(out);
 #else
-    out[0] = veca[0] + vecb[0];
-    out[1] = veca[1] + vecb[1];
-    out[2] = veca[2] + vecb[2];
+    out->v[0] = veca.v[0] + vecb.v[0];
+    out->v[1] = veca.v[1] + vecb.v[1];
+    out->v[2] = veca.v[2] + vecb.v[2];
 #endif
 }
 
-void VectorCopy(vec3_t const in, vec3_t out) {
+void VectorCopy(vec3_t const in, vec3_p out) {
 #if 1
     Vector3D V(in);
     V.toVec3(out);
 #else
-    out[0] = in[0];
-    out[1] = in[1];
-    out[2] = in[2];
+    out->v[0] = in.v[0];
+    out->v[1] = in.v[1];
+    out->v[2] = in.v[2];
 #endif
 }
 
-void CrossProduct(vec3_t const v1, vec3_t const v2, vec3_t cross) {
+void CrossProduct(vec3_t const v1, vec3_t const v2, vec3_p cross) {
 #if 1
     Vector3D aV(v1);
     Vector3D bV(v2);
@@ -134,9 +135,9 @@ vec_t Length(vec3_t const v) {
 #endif
 }
 
-float VectorNormalize(vec3_t v) {
+float VectorNormalize(vec3_p v) {
 #if 1
-    Vector3D V(v);
+    Vector3D V(*v);
     float len = V.length();
     V.normalize().toVec3(v);
     return len;
@@ -155,9 +156,9 @@ float VectorNormalize(vec3_t v) {
 #endif
 }
 
-void VectorInverse(vec3_t v) {
+void VectorInverse(vec3_p v) {
 #if 1
-    Vector3D V(v);
+    Vector3D V(*v);
     (-V).toVec3(v);
 #else
     v[0] = -v[0];
@@ -166,7 +167,7 @@ void VectorInverse(vec3_t v) {
 #endif
 }
 
-void VectorScale(vec3_t const in, vec_t scale, vec3_t out) {
+void VectorScale(vec3_t const in, vec_t scale, vec3_p out) {
 #if 1
     Vector3D V(in);
     (V * scale).toVec3(out);

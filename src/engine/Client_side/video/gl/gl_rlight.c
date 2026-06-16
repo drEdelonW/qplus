@@ -70,7 +70,7 @@ void AddLightBlend(float r, float g, float b, float a2) {
 void R_RenderDlight(dLight_p light) {
     float rad = light->radius * 0.35;
 
-    vec3_t v; VectorSubtract(light->origin, r_origin, v);
+    vec3_t v; VectorSubtract(light->origin, r_origin, &v);
     if (Length(v) < rad) {    // view is inside the dlight
         AddLightBlend(1, 0.5, 0, light->radius * 0.0003);
         return;
@@ -79,18 +79,18 @@ void R_RenderDlight(dLight_p light) {
     glBegin(GL_TRIANGLE_FAN); {
         glColor3f(0.2, 0.1, 0.0);
         for (int i = 0; i < VECT_DIM; i++)
-            v[i] = light->origin[i] - vpn[i] * rad;
+            v.v[i] = light->origin.v[i] - vpn.v[i] * rad;
 
-        glVertex3fv(v);
+        glVertex3fv(v.v);
         glColor3f(0, 0, 0);
         for (int i = 16; i >= 0; i--) {
             float a = i / 16.0 * M_PI * 2;
             for (int j = 0; j < VECT_DIM; j++)
-                v[j] =
-                light->origin[j] +
-                vright[j] * cos(a) * rad +
-                vup[j] * sin(a) * rad;
-            glVertex3fv(v);
+                v.v[j] =
+                light->origin.v[j] +
+                vright.v[j] * cos(a) * rad +
+                vup.v[j] * sin(a) * rad;
+            glVertex3fv(v.v);
         }
     } glEnd();
 }
@@ -220,9 +220,9 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
 
     float frac = front / (front - back);
     vec3_t mid = {
-        start[0] + (end[0] - start[0]) * frac,
-        start[1] + (end[1] - start[1]) * frac,
-        start[2] + (end[2] - start[2]) * frac
+        .x = start.v[0] + (end.v[0] - start.v[0]) * frac,
+        .y = start.v[1] + (end.v[1] - start.v[1]) * frac,
+        .z = start.v[2] + (end.v[2] - start.v[2]) * frac
     };
 
     // go down front side
@@ -231,7 +231,7 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
     if ((back < 0) == side)     return -1;        // didn't hit anuthing
 
     // check for impact on this node
-    VectorCopy(mid, lightspot);
+    VectorCopy(mid, &lightspot);
     lightplane = plane;
 
     mSurface_p surf = cl.worldmodel->surfaces + node->firstsurface;
@@ -241,8 +241,8 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
 
         mTexInfo_p tex = surf->texinfo;
 
-        int s = DotProduct(mid, tex->vecs[0]) + tex->vecs[0][3];
-        int t = DotProduct(mid, tex->vecs[1]) + tex->vecs[1][3];;
+        int s = DotProduct(mid, *(vec3_p)(&tex->vecs[0])) + tex->vecs[0][3];
+        int t = DotProduct(mid, *(vec3_p)(&tex->vecs[1])) + tex->vecs[1][3];
 
         if ((s < surf->texturemins[0]) ||
             (t < surf->texturemins[1])
@@ -287,9 +287,9 @@ int R_LightPoint(vec3_t p) {
         return 255;
 
     vec3_t end = {
-        p[0],
-        p[1],
-        p[2] - 2048
+        .x = p.v[0],
+        .y = p.v[1],
+        .z = p.v[2] - 2048
     };
 
     int r = RecursiveLightPoint(cl.worldmodel->nodes, p, end);

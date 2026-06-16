@@ -27,15 +27,15 @@ cString PR_ValueString(etype_t type, eval_p val) {
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
-        case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                                       break;
-        case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", ED_GetEDictIdx(ED_GetEDictByOffs(val->edict)));             break;
-        case ev_function:   snprintf(_line, sizeof(_line), "%s()", PR_GetQString((pr_functions + val->function)->s_name));          break;
-        case ev_field:      snprintf(_line, sizeof(_line), ".%s", PR_GetQString(ED_FieldAtOfs(val->_int)->s_name));                 break;
-        case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                 break;
-        case ev_float:      snprintf(_line, sizeof(_line), "%5.1f", val->_float);                                                   break;
-        case ev_vector:     snprintf(_line, sizeof(_line), "'%5.1f %5.1f %5.1f'", val->vector[0], val->vector[1], val->vector[2]);  break;
-        case ev_pointer:    snprintf(_line, sizeof(_line), "pointer");                                                              break;
-        default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                                    break;
+        case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                                               break;
+        case ev_entity:     snprintf(_line, sizeof(_line), "entity %i", ED_GetEDictIdx(ED_GetEDictByOffs(val->edict)));                     break;
+        case ev_function:   snprintf(_line, sizeof(_line), "%s()", PR_GetQString((pr_functions + val->function)->s_name));                  break;
+        case ev_field:      snprintf(_line, sizeof(_line), ".%s", PR_GetQString(ED_FieldAtOfs(val->_int)->s_name));                         break;
+        case ev_void:       snprintf(_line, sizeof(_line), "void");                                                                         break;
+        case ev_float:      snprintf(_line, sizeof(_line), "%5.1f", val->_float);                                                           break;
+        case ev_vector:     snprintf(_line, sizeof(_line), "'%5.1f %5.1f %5.1f'", val->vector.v[0], val->vector.v[1], val->vector.v[2]);    break;
+        case ev_pointer:    snprintf(_line, sizeof(_line), "pointer");                                                                      break;
+        default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                                            break;
     }
 
     return _line;
@@ -54,14 +54,14 @@ cString PR_UglyValueString(etype_t type, eval_p val) {
     type &= ~DEF_SAVEGLOBAL;
 
     switch (type) {
-        case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                           break;
-        case ev_entity:     snprintf(_line, sizeof(_line), "%i", ED_GetEDictIdx(ED_GetEDictByOffs(val->edict)));             break;
-        case ev_function:   snprintf(_line, sizeof(_line), "%s", PR_GetQString((pr_functions + val->function)->s_name));break;
-        case ev_field:      snprintf(_line, sizeof(_line), "%s", PR_GetQString(ED_FieldAtOfs(val->_int)->s_name));      break;
-        case ev_void:       snprintf(_line, sizeof(_line), "void");                                                     break;
-        case ev_float:      snprintf(_line, sizeof(_line), "%f", val->_float);                                          break;
-        case ev_vector:     snprintf(_line, sizeof(_line), "%f %f %f", val->vector[0], val->vector[1], val->vector[2]); break;
-        default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                        break;
+        case ev_string:     snprintf(_line, sizeof(_line), "%s", PR_GetQString(val->string));                                   break;
+        case ev_entity:     snprintf(_line, sizeof(_line), "%i", ED_GetEDictIdx(ED_GetEDictByOffs(val->edict)));                break;
+        case ev_function:   snprintf(_line, sizeof(_line), "%s", PR_GetQString((pr_functions + val->function)->s_name));        break;
+        case ev_field:      snprintf(_line, sizeof(_line), "%s", PR_GetQString(ED_FieldAtOfs(val->_int)->s_name));              break;
+        case ev_void:       snprintf(_line, sizeof(_line), "void");                                                             break;
+        case ev_float:      snprintf(_line, sizeof(_line), "%f", val->_float);                                                  break;
+        case ev_vector:     snprintf(_line, sizeof(_line), "%f %f %f", val->vector.v[0], val->vector.v[1], val->vector.v[2]);   break;
+        default:            snprintf(_line, sizeof(_line), "bad type %i", type);                                                break;
     }
 
     return _line;

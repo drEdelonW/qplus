@@ -34,7 +34,7 @@ vec3_t      modelorg, base_modelorg;
 vec3_t      r_entorigin; // the currently rendering entity in world
 // coordinates
 
-vec3_t  entity_rotation[3];
+mat3_t  entity_rotation;
 vec3_t  r_worldmodelorg;
 int     r_currentbkey;
 
@@ -61,10 +61,10 @@ static bool         _makeClippedEdge;
 R_EntityRotate
 ================
 */
-void R_EntityRotate(vec3_t vec) {
-    vec3_t tvec; VectorCopy(vec, tvec);
+void R_EntityRotate(vec3_p vec) {
+    vec3_t tvec; VectorCopy(*vec, &tvec);
     for (int i = 0; i < VECT_DIM; i++)
-        vec[i] = DotProduct(entity_rotation[i], tvec);
+        vec->v[i] = DotProduct(entity_rotation.rows[i], tvec);
 }
 
 
@@ -81,49 +81,82 @@ void R_RotateBmodel() {
     // TODO: share work with R_SetUpAliasTransform
 
     // yaw
-    float angle = currententity->angles[YAW];
+    float angle = currententity->angles.v[YAW];
     angle = angle * M_PI * 2 / 360;
     float s = sin(angle);
     float c = cos(angle);
 
+#if 0
     float temp1[3][3];
     temp1[0][0] = c;    temp1[0][1] = s;    temp1[0][2] = 0;
     temp1[1][0] = -s;   temp1[1][1] = c;    temp1[1][2] = 0;
     temp1[2][0] = 0;    temp1[2][1] = 0;    temp1[2][2] = 1;
-
+#else
+    mat3_t temp1 = {
+            .m = {
+                { c,  s, 0.0f},
+                {-s,  c, 0.0f},
+                {0.0f, 0.0f, 1.0f}
+            }
+    };
+#endif
     // pitch
-    angle = currententity->angles[PITCH];
+    angle = currententity->angles.v[PITCH];
     angle = angle * M_PI * 2 / 360;
     s = sin(angle);
     c = cos(angle);
 
+#if 0
     float temp2[3][3];
     temp2[0][0] = c;    temp2[0][1] = 0;    temp2[0][2] = -s;
     temp2[1][0] = 0;    temp2[1][1] = 1;    temp2[1][2] = 0;
     temp2[2][0] = s;    temp2[2][1] = 0;    temp2[2][2] = c;
+#else
+    mat3_t temp2 = {
+        .m = {
+            { c, 0.0f, -s},
+            { 0.0f, 1.0f, 0.0f},
+            { s, 0.0f, c}
+        }
+    };
+#endif
 
+#if 0
     float temp3[3][3];
-    R_ConcatRotations(temp2, temp1, temp3);
+#else
+    mat3_t temp3;
+#endif
+    R_ConcatRotations(&temp2, &temp1, &temp3);
 
     // roll
-    angle = currententity->angles[ROLL];
+    angle = currententity->angles.v[ROLL];
     angle = angle * M_PI * 2 / 360;
     s = sin(angle);
     c = cos(angle);
 
+#if 0
     temp1[0][0] = 1;    temp1[0][1] = 0;    temp1[0][2] = 0;
     temp1[1][0] = 0;    temp1[1][1] = c;    temp1[1][2] = s;
     temp1[2][0] = 0;    temp1[2][1] = -s;   temp1[2][2] = c;
+#else
+    temp1 = (mat3_t){
+        .m = {
+            { 1.0f, 0.0f, 0.0f},
+            { 0.0f, c, s},
+            { 0.0f, -s, c}
+        }
+    };
+#endif
 
-    R_ConcatRotations(temp1, temp3, entity_rotation);
+    R_ConcatRotations(&temp1, &temp3, &entity_rotation);
 
     //
     // rotate modelorg and the transformation matrix
     //
-    R_EntityRotate(modelorg);
-    R_EntityRotate(vpn);
-    R_EntityRotate(vright);
-    R_EntityRotate(vup);
+    R_EntityRotate(&modelorg);
+    R_EntityRotate(&vpn);
+    R_EntityRotate(&vright);
+    R_EntityRotate(&vup);
 
     R_TransformFrustum();
 }
@@ -149,7 +182,7 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
             DotProduct(r_entorigin, splitplane->normal)
     };
     for (int i = 0; i < VECT_DIM; i++)
-        tplane.normal[i] = DotProduct(entity_rotation[i], splitplane->normal);
+        tplane.normal.v[i] = DotProduct(entity_rotation.rows[i], splitplane->normal);
 
     // clip edges to BSP plane
     for (; pedges; pedges = pnextedge) {
@@ -174,18 +207,18 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
             // generate the clipped vertex
             float frac = lastdist / (lastdist - dist);
             mVertex_p ptvert = &_pbVerts[_numbVerts++];
-            ptvert->position[0] =
-                plastvert->position[0] +
-                frac * (pvert->position[0] -
-                    plastvert->position[0]);
-            ptvert->position[1] =
-                plastvert->position[1] +
-                frac * (pvert->position[1] -
-                    plastvert->position[1]);
-            ptvert->position[2] =
-                plastvert->position[2] +
-                frac * (pvert->position[2] -
-                    plastvert->position[2]);
+            ptvert->position.v[0] =
+                plastvert->position.v[0] +
+                frac * (pvert->position.v[0] -
+                    plastvert->position.v[0]);
+            ptvert->position.v[1] =
+                plastvert->position.v[1] +
+                frac * (pvert->position.v[1] -
+                    plastvert->position.v[1]);
+            ptvert->position.v[2] =
+                plastvert->position.v[2] +
+                frac * (pvert->position.v[2] -
+                    plastvert->position.v[2]);
 
             // split into two edges, one on each side, and remember entering
             // and exiting points
@@ -397,9 +430,9 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
 
             {
                 vec3_t rejectpt = {
-                    (float)node->minmaxs[pindex[0]],
-                    (float)node->minmaxs[pindex[1]],
-                    (float)node->minmaxs[pindex[2]],
+                    .x = (float)node->minmaxs[pindex[0]],
+                    .y = (float)node->minmaxs[pindex[1]],
+                    .z = (float)node->minmaxs[pindex[2]],
                 };
                 double d = DotProduct(rejectpt, view_clipplanes[i].normal);
                 d -= view_clipplanes[i].dist;
@@ -410,9 +443,9 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
 
             {
                 vec3_t acceptpt = {
-                    (float)node->minmaxs[pindex[3 + 0]],
-                    (float)node->minmaxs[pindex[3 + 1]],
-                    (float)node->minmaxs[pindex[3 + 2]]
+                    .x = (float)node->minmaxs[pindex[3 + 0]],
+                    .y = (float)node->minmaxs[pindex[3 + 1]],
+                    .z = (float)node->minmaxs[pindex[3 + 2]]
                 };
                 double d = DotProduct(acceptpt, view_clipplanes[i].normal);
                 d -= view_clipplanes[i].dist;
@@ -455,9 +488,9 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
 
         double  dot;
         switch (plane->type) {
-        case PLANE_X: { dot = modelorg[0] - plane->dist; } break;
-        case PLANE_Y: { dot = modelorg[1] - plane->dist; } break;
-        case PLANE_Z: { dot = modelorg[2] - plane->dist; } break;
+        case PLANE_X: { dot = modelorg.v[0] - plane->dist; } break;
+        case PLANE_Y: { dot = modelorg.v[1] - plane->dist; } break;
+        case PLANE_Z: { dot = modelorg.v[2] - plane->dist; } break;
         default: dot = DotProduct(modelorg, plane->normal) - plane->dist; break;
         }
 
@@ -537,7 +570,7 @@ void R_RenderWorld() {
     pbtofpolys = _bTofPolys;
 
     currententity = &cl_entities[0];
-    VectorCopy(r_origin, modelorg);
+    VectorCopy(r_origin, &modelorg);
     Model_p clmodel = currententity->model;
     r_pcurrentvertbase = clmodel->vertexes;
 

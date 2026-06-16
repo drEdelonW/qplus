@@ -54,22 +54,22 @@ D_DrawParticle
 */
 void D_DrawParticle(Particle_p pparticle) {
     // transform point
-    vec3_t local; VectorSubtract(pparticle->org, r_origin, local);
+    vec3_t local; VectorSubtract(pparticle->org, r_origin, &local);
 
     vec3_t transformed = {
-        DotProduct(local, r_pright),
-        DotProduct(local, r_pup),
-        DotProduct(local, r_ppn)
+        .x = DotProduct(local, r_pright),
+        .y = DotProduct(local, r_pup),
+        .z = DotProduct(local, r_ppn)
     };
 
-    if (transformed[2] < PARTICLE_Z_CLIP)
+    if (transformed.v[2] < PARTICLE_Z_CLIP)
         return;
 
     // project the point
     // FIXME: preadjust xcenter and ycenter
-    float zi = 1.0 / transformed[2];
-    int u = (int)(xcenter + zi * transformed[0] + 0.5);
-    int v = (int)(ycenter - zi * transformed[1] + 0.5);
+    float zi = 1.0 / transformed.v[2];
+    int u = (int)(xcenter + zi * transformed.v[0] + 0.5);
+    int v = (int)(ycenter - zi * transformed.v[1] + 0.5);
 
     if ((v > d_vrectbottom_particle) ||
         (u > d_vrectright_particle) ||

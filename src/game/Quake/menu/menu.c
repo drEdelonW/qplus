@@ -96,9 +96,7 @@ void M_Draw() {
 
         if (scr.con_current) {
             Draw_ConsoleBackground(vid.height);
-            VID_UnlockBuffer();
-            S_ExtraUpdate();
-            VID_LockBuffer();
+            VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
         }
         else    Draw_FadeScreen();
 
@@ -133,9 +131,7 @@ void M_Draw() {
         m_entersound = false;
     }
 
-    VID_UnlockBuffer();
-    S_ExtraUpdate();
-    VID_LockBuffer();
+    VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
 }
 
 

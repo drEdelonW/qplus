@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 
-vec3_t vec3_origin = { 0.0f, 0.0f, 0.0f };  // TODO: move to more specific place
+vec3_t vec3_origin = { .x = 0.0f, .y = 0.0f, .z = 0.0f };  // TODO: move to more specific place
 uint32_t nanmask = 0xFF << 23;
 
 /*-----------------------------------------------------------------*/
@@ -44,27 +44,37 @@ uint32_t nanmask = 0xFF << 23;
 #endif
 
 
-void RotatePointAroundVector(vec3_t dst, const vec3_t dir, const vec3_t point, float degrees) {
+void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, float degrees) {
     vec3_t vf = {
-        dir[0],
-        dir[1],
-        dir[2]
+        .x = dir.v[0],
+        .y = dir.v[1],
+        .z = dir.v[2]
     };
-    vec3_t vr;  PerpendicularVector(vr, dir);
-    vec3_t vup; CrossProduct(vr, vf, vup);
+    vec3_t vr;  PerpendicularVector(&vr, dir);
+    vec3_t vup; CrossProduct(vr, vf, &vup);
+#if 0
     float m[3][3];
-    m[0][0] = vr[0];
-    m[1][0] = vr[1];
-    m[2][0] = vr[2];
+    m[0][0] = vr.v[0];
+    m[1][0] = vr.v[1];
+    m[2][0] = vr.v[2];
 
-    m[0][1] = vup[0];
-    m[1][1] = vup[1];
-    m[2][1] = vup[2];
+    m[0][1] = vup.v[0];
+    m[1][1] = vup.v[1];
+    m[2][1] = vup.v[2];
 
-    m[0][2] = vf[0];
-    m[1][2] = vf[1];
-    m[2][2] = vf[2];
-
+    m[0][2] = vf.v[0];
+    m[1][2] = vf.v[1];
+    m[2][2] = vf.v[2];
+#else
+    mat3_t m = {
+        .m = {
+            {vr.x, vup.x, vf.x},
+            {vr.y, vup.y, vf.y},
+            {vr.z, vup.z, vf.z}
+        }
+    };
+#endif
+#if 0
     float im[3][3];    memcpy(im, m, sizeof(im));
 
     im[0][1] = m[1][0];
@@ -75,24 +85,43 @@ void RotatePointAroundVector(vec3_t dst, const vec3_t dir, const vec3_t point, f
 
     im[2][0] = m[0][2];
     im[2][1] = m[1][2];
+#else
+    mat3_t im;
+    
+    im.rows[0] = (vec3_t){m.m[0][0], m.m[1][0], m.m[2][0]};
+    im.rows[1] = (vec3_t){m.m[0][1], m.m[1][1], m.m[2][1]};
+    im.rows[2] = (vec3_t){m.m[0][2], m.m[1][2], m.m[2][2]};
+#endif
 
+#if 0
     float zrot[3][3];   memset(zrot, 0, sizeof(zrot));
-    float rot[3][3];
     zrot[0][0] = zrot[1][1] = zrot[2][2] = 1.0F;
-
+    
     zrot[0][0] = cos(DEG2RAD(degrees));
     zrot[0][1] = sin(DEG2RAD(degrees));
     zrot[1][0] = -sin(DEG2RAD(degrees));
     zrot[1][1] = cos(DEG2RAD(degrees));
+#else
+    float angle_rad = DEG2RAD(degrees);
+    float c = cos(angle_rad);
+    float s = sin(angle_rad);
 
-    float tmpmat[3][3]; R_ConcatRotations(m, zrot, tmpmat);
-    R_ConcatRotations(tmpmat, im, rot);
+    mat3_t zrot = {
+        .m = {
+            {   c,    s, 0.0f},
+            {  -s,    c, 0.0f},
+            {0.0f, 0.0f, 1.0f}
+        }
+    };
+#endif
+    mat3_t tmpmat; R_ConcatRotations(&m, &zrot, &tmpmat);
+    mat3_t rot;    R_ConcatRotations(&tmpmat, &im, &rot);
 
     for (int i = 0; i < VECT_DIM; i++) {
-        dst[i] =
-            rot[i][0] * point[0] +
-            rot[i][1] * point[1] +
-            rot[i][2] * point[2];
+        dst->v[i] =
+            rot.m[i][0] * point.v[0] +
+            rot.m[i][1] * point.v[1] +
+            rot.m[i][2] * point.v[2];
     }
 }
 
@@ -117,8 +146,8 @@ int Q_log2(int val) {
 R_ConcatRotations
 ================
 */
+void R_ConcatRotations(const mat3_p in1, const mat3_p in2, mat3_p out) {
 #if 0
-void R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]) {
     out[0][0] =
         in1[0][0] * in2[0][0] +
         in1[0][1] * in2[1][0] +
@@ -158,27 +187,25 @@ void R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]) {
         in1[2][1] * in2[1][2] +
         in1[2][2] * in2[2][2];
 
-}
 #else
-void R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             float sum = 0.0f;
             for (int k = 0; k < 3; k++)
-                sum += in1[i][k] * in2[k][j];
-            out[i][j] = sum;
+                sum += in1->m[i][k] * in2->m[k][j];
+            out->m[i][j] = sum;
         }
     }
-}
 #endif
+}
 
 /*
 ================
 R_ConcatTransforms
 ================
 */
+void R_ConcatTransforms(const mat3x4_p in1, const mat3x4_p in2, mat3x4_p out) {
 #if 0
-void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]) {
     out[0][0] =
         in1[0][0] * in2[0][0] +
         in1[0][1] * in2[1][0] +
@@ -232,23 +259,21 @@ void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]) {
         in1[2][1] * in2[1][3] +
         in1[2][2] * in2[2][3] +
         in1[2][3];
-}
 #else
-void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             float sum = 0.0f;
             for (int k = 0; k < 3; k++)
-                sum += in1[i][k] * in2[k][j];
-            out[i][j] = sum;
+                sum += in1->m[i][k] * in2->m[k][j];
+            out->m[i][j] = sum;
         }
-        float sum = in1[i][3];
+        float sum = in1->m[i][3];
         for (int k = 0; k < 3; k++)
-            sum += in1[i][k] * in2[k][3];
-        out[i][3] = sum;
+            sum += in1->m[i][k] * in2->m[k][3];
+        out->m[i][3] = sum;
     }
-}
 #endif
+}
 
 /*
 ===================

@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 TypeLess_ptr colormap;
 vec3_t  viewlightvec;
-aLight_t    r_viewlighting = { 128, 192, viewlightvec };
+aLight_t    r_viewlighting = { 128, 192, &viewlightvec };
 float   r_time1;
 int     r_numallocatededges;
 bool    r_drawpolys;
@@ -41,7 +41,7 @@ bool    r_drawculledpolys;
 bool    r_worldpolysbacktofront;
 bool    r_recursiveaffinetriangles = true;
 int     r_pixbytes = 1;
-float   r_aliasuvscale = 1.0;
+float   r_aliasuvscale = 1.0f;
 int     r_outofsurfaces;
 int     r_outofedges;
 
@@ -413,63 +413,67 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
 #else
     screenedge[0] = (mPlane_t){  // left side clip
         .normal = {
-            -1.0f / (xOrigin * r_refdef.horizontalFieldOfView),
-            0.0f,
-            1.0f
+            .x = -1.0f / (xOrigin * r_refdef.horizontalFieldOfView),
+            .y = 0.0f,
+            .z = 1.0f
         },
         .type = PLANE_ANYZ
     };
     screenedge[1] = (mPlane_t){   // right side clip
         .normal = {
-            1.0f / ((1.0f - xOrigin) * r_refdef.horizontalFieldOfView),
-            0.0f,
-            1.0f
+            .x = 1.0f / ((1.0f - xOrigin) * r_refdef.horizontalFieldOfView),
+            .y = 0.0f,
+            .z = 1.0f
         },
         .type = PLANE_ANYZ
     };
     screenedge[2] = (mPlane_t){  // top side clip
-    .normal = {
-        0.0f,
-        -1.0f / (yOrigin * verticalFieldOfView),
-        1.0f
-    },
-    .type = PLANE_ANYZ
+        .normal = {
+            .x = 0.0f,
+            .y = -1.0f / (yOrigin * verticalFieldOfView),
+            .z = 1.0f
+        },
+        .type = PLANE_ANYZ
     };
     screenedge[3] = (mPlane_t){   // bottom side clip
         .normal = {
-            0.0f,
-            1.0f / ((1.0f - yOrigin) * verticalFieldOfView),
-            1.0f
+            .x = 0.0f,
+            .y = 1.0f / ((1.0f - yOrigin) * verticalFieldOfView),
+            .z = 1.0f
         },
         .type = PLANE_ANYZ
     };
 #endif
 
     for (int i = 0; i < 4; i++)
-        VectorNormalize(screenedge[i].normal);
+        VectorNormalize(&screenedge[i].normal);
 
-    float res_scale = sqrt((double)(r_refdef.vrect.width * r_refdef.vrect.height) /
-        (320.0 * 152.0)) *
+    float res_scale =
+        sqrt(
+            (double)(
+                r_refdef.vrect.width * r_refdef.vrect.height) /
+            (320.0 * 152.0)) *
         (2.0 / r_refdef.horizontalFieldOfView);
     r_aliastransition = r_aliastransbase.value * res_scale;
     r_resfudge = r_aliastransadj.value * res_scale;
 
-    if (scr_fov.value <= 90.0)
-        r_fov_greater_than_90 = false;
-    else
-        r_fov_greater_than_90 = true;
+    r_fov_greater_than_90 = (scr_fov.value > 90.0f);
 
     // TODO: collect 386-specific code in one place
 #if id386
     if (r_pixbytes == 1) {
-        Sys_MakeCodeWriteable((int32_t)R_Surf8Start,
-            (int32_t)R_Surf8End - (int32_t)R_Surf8Start);
+        Sys_MakeCodeWriteable(
+            (int32_t)R_Surf8Start,
+            (int32_t)R_Surf8End - (int32_t)R_Surf8Start
+        );
         colormap = vid.colormap;
         R_Surf8Patch();
     }
     else {
-        Sys_MakeCodeWriteable((int32_t)R_Surf16Start,
-            (int32_t)R_Surf16End - (int32_t)R_Surf16Start);
+        Sys_MakeCodeWriteable(
+            (int32_t)R_Surf16Start,
+            (int32_t)R_Surf16End - (int32_t)R_Surf16Start
+        );
         colormap = vid.colormap16;
         R_Surf16Patch();
     }
@@ -526,14 +530,14 @@ void R_DrawEntitiesOnList() {
 
         switch (currententity->model->type) {
         case mod_sprite: {
-            VectorCopy(currententity->origin, r_entorigin);
-            VectorSubtract(r_origin, r_entorigin, modelorg);
+            VectorCopy(currententity->origin, &r_entorigin);
+            VectorSubtract(r_origin, r_entorigin, &modelorg);
             R_DrawSprite();
         } break;
 
         case mod_alias: {
-            VectorCopy(currententity->origin, r_entorigin);
-            VectorSubtract(r_origin, r_entorigin, modelorg);
+            VectorCopy(currententity->origin, &r_entorigin);
+            VectorSubtract(r_origin, r_entorigin, &modelorg);
 
             // see if the bounding box lets us trivially reject, also sets trivial accept status
             if (R_AliasCheckBBox()) {
@@ -543,12 +547,12 @@ void R_DrawEntitiesOnList() {
                 lighting.ambientlight = j;
                 lighting.shadelight = j;
 
-                vec3_t  lightvec = { -1.0f , 0.0f, 0.0f };
-                lighting.plightvec = lightvec;
+                vec3_t lightvec = { .x = -1.0f, .y = 0.0f, .z = 0.0f };
+                lighting.plightvec = &lightvec;
 
                 for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
                     if (cl_dlights[lnum].die >= cl.time) {
-                        vec3_t dist; VectorSubtract(currententity->origin, cl_dlights[lnum].origin, dist);
+                        vec3_t dist; VectorSubtract(currententity->origin, cl_dlights[lnum].origin, &dist);
                         float add = cl_dlights[lnum].radius - Length(dist);
 
                         if (add > 0.0f)
@@ -600,11 +604,11 @@ void R_DrawViewModel() {
     if (!currententity->model)
         return;
 
-    VectorCopy(currententity->origin, r_entorigin);
-    VectorSubtract(r_origin, r_entorigin, modelorg);
+    VectorCopy(currententity->origin, &r_entorigin);
+    VectorSubtract(r_origin, r_entorigin, &modelorg);
 
-    VectorCopy(vup, viewlightvec);
-    VectorInverse(viewlightvec);
+    VectorCopy(vup, &viewlightvec);
+    VectorInverse(&viewlightvec);
 
     int j = R_LightPoint(currententity->origin);
 
@@ -621,7 +625,7 @@ void R_DrawViewModel() {
             (dl->die < cl.time))
             continue;
 
-        vec3_t dist; VectorSubtract(currententity->origin, dl->origin, dist);
+        vec3_t dist; VectorSubtract(currententity->origin, dl->origin, &dist);
         float add = dl->radius - Length(dist);
         if (add > 0)
             r_viewlighting.ambientlight += add;
@@ -629,11 +633,11 @@ void R_DrawViewModel() {
 
     CLAMP_LESS(r_viewlighting.ambientlight, 128);    // clamp lighting so it doesn't overbright as much
 
-        if ((r_viewlighting.ambientlight + r_viewlighting.shadelight) > 192)
-            r_viewlighting.shadelight = 192 - r_viewlighting.ambientlight;
+    if ((r_viewlighting.ambientlight + r_viewlighting.shadelight) > 192)
+        r_viewlighting.shadelight = 192 - r_viewlighting.ambientlight;
 
-    vec3_t lightvec = { -1.0f, 0.0f, 0.0f };
-    r_viewlighting.plightvec = lightvec;
+    vec3_t lightvec = { .x = -1.0f, .y = 0.0f, .z = 0.0f };
+    r_viewlighting.plightvec = &lightvec;
 
 #ifdef QUAKE2
     cl.light_level = r_viewlighting.ambientlight;
@@ -651,9 +655,9 @@ R_BmodelCheckBBox
 int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
     int clipflags = 0;
 
-    if (currententity->angles[0] ||
-        currententity->angles[1] ||
-        currententity->angles[2]
+    if (currententity->angles.v[0] ||
+        currententity->angles.v[1] ||
+        currententity->angles.v[2]
         ) {
         for (int i = 0; i < 4; i++) {
             double d = DotProduct(currententity->origin, view_clipplanes[i].normal);
@@ -674,9 +678,9 @@ int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
             int* pindex = pfrustum_indexes[i];
             {
                 vec3_t rejectpt = {
-                    minmaxs[pindex[0]],
-                    minmaxs[pindex[1]],
-                    minmaxs[pindex[2]]
+                    .x = minmaxs[pindex[0]],
+                    .y = minmaxs[pindex[1]],
+                    .z = minmaxs[pindex[2]]
                 };
                 double d = DotProduct(rejectpt, view_clipplanes[i].normal);
                 d -= view_clipplanes[i].dist;
@@ -686,9 +690,9 @@ int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
             }
             {
                 vec3_t acceptpt = {
-                    minmaxs[pindex[3 + 0]],
-                    minmaxs[pindex[3 + 1]],
-                    minmaxs[pindex[3 + 2]]
+                    .x = minmaxs[pindex[3 + 0]],
+                    .y = minmaxs[pindex[3 + 1]],
+                    .z = minmaxs[pindex[3 + 2]]
                 };
 
                 double d = DotProduct(acceptpt, view_clipplanes[i].normal);
@@ -712,7 +716,7 @@ R_DrawBEntitiesOnList
 void R_DrawBEntitiesOnList() {
     if (!r_drawentities.value)  return;
 
-    vec3_t oldorigin; VectorCopy(modelorg, oldorigin);
+    vec3_t oldorigin; VectorCopy(modelorg, &oldorigin);
     insubmodel = true;
     r_dlightframecount = r_framecount;
 
@@ -726,22 +730,21 @@ void R_DrawBEntitiesOnList() {
             // see if the bounding box lets us trivially reject, also sets trivial accept status
             float  minmaxs[6];
             for (int j = 0; j < VECT_DIM; j++) {
-                minmaxs[j] = currententity->origin[j] + clmodel->mins[j];
-                minmaxs[3 + j] = currententity->origin[j] + clmodel->maxs[j];
+                minmaxs[j] = currententity->origin.v[j] + clmodel->mins.v[j];
+                minmaxs[3 + j] = currententity->origin.v[j] + clmodel->maxs.v[j];
             }
 
             int clipflags = R_BmodelCheckBBox(clmodel, minmaxs);
 
             if (clipflags != BMODEL_FULLY_CLIPPED) {
-                VectorCopy(currententity->origin, r_entorigin);
-                VectorSubtract(r_origin, r_entorigin, modelorg);
+                VectorCopy(currententity->origin, &r_entorigin);
+                VectorSubtract(r_origin, r_entorigin, &modelorg);
                 // FIXME: is this needed?
-                VectorCopy(modelorg, r_worldmodelorg);
+                VectorCopy(modelorg, &r_worldmodelorg);
 
                 r_pcurrentvertbase = clmodel->vertexes;
 
-                // FIXME: stop transforming twice
-                R_RotateBmodel();
+                R_RotateBmodel();   // FIXME: stop transforming twice
 
                 // calculate dynamic lighting for bmodel if it's not an instanced model
                 if ((r_dlightmap.value) &&
@@ -762,9 +765,7 @@ void R_DrawBEntitiesOnList() {
                     }
                 }
 
-                // if the driver wants polygons, deliver those. Z-buffering is on
-                // at this point, so no clipping to the world tree is needed, just
-                // frustum clipping
+                // if the driver wants polygons, deliver those. Z-buffering is on at this point, so no clipping to the world tree is needed, just frustum clipping
                 if (r_drawpolys | r_drawculledpolys) {
                     R_ZDrawSubmodelPolys(clmodel);
                 }
@@ -772,8 +773,8 @@ void R_DrawBEntitiesOnList() {
                     r_pefragtopnode = NULL;
 
                     for (int j = 0; j < VECT_DIM; j++) {
-                        r_emins[j] = minmaxs[j];
-                        r_emaxs[j] = minmaxs[3 + j];
+                        r_emins.v[j] = minmaxs[j];
+                        r_emaxs.v[j] = minmaxs[3 + j];
                     }
 
                     R_SplitEntityOnNode2(cl.worldmodel->nodes);
@@ -781,13 +782,11 @@ void R_DrawBEntitiesOnList() {
                     if (r_pefragtopnode) {
                         currententity->topnode = r_pefragtopnode;
 
-                        if (r_pefragtopnode->contents >= 0) {
-                            // not a leaf; has to be clipped to the world BSP
+                        if (r_pefragtopnode->contents >= 0) {   // not a leaf; has to be clipped to the world BSP
                             r_clipflags = clipflags;
                             R_DrawSolidClippedSubmodelPolygons(clmodel);
                         }
-                        else {
-                            // falls entirely in one leaf, so we just put all the edges in the edge list and let 1/z sorting handle drawing order
+                        else {  // falls entirely in one leaf, so we just put all the edges in the edge list and let 1/z sorting handle drawing order
                             R_DrawSubmodelPolygons(clmodel, clipflags);
                         }
 
@@ -797,11 +796,11 @@ void R_DrawBEntitiesOnList() {
 
                 // put back world rotation and frustum clipping
                 // FIXME: R_RotateBmodel should just work off base_vxx
-                VectorCopy(base_vpn, vpn);
-                VectorCopy(base_vup, vup);
-                VectorCopy(base_vright, vright);
-                VectorCopy(base_modelorg, modelorg);
-                VectorCopy(oldorigin, modelorg);
+                VectorCopy(base_vpn, &vpn);
+                VectorCopy(base_vup, &vup);
+                VectorCopy(base_vright, &vright);
+                VectorCopy(base_modelorg, &modelorg);
+                VectorCopy(oldorigin, &modelorg);
                 R_TransformFrustum();
             }
 
@@ -820,11 +819,11 @@ void R_DrawBEntitiesOnList() {
 R_EdgeDrawing
 ================
 */
+#include "mem_placement.h"
 #if 0
-Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 1];
-Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 1];
+Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 1] PLACE_TO_SDRAM;
+Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 1] PLACE_TO_SDRAM;
 #else
-#   include "mem_placement.h"
 // TODO: check it and clean --> /* запас +2: выравнивание + место для surfaces-1 */
 Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 2] PLACE_TO_SDRAM;
 Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2] PLACE_TO_SDRAM;
@@ -889,14 +888,12 @@ void R_EdgeDrawing() {
     }
 
     if (!r_dspeeds.value) {
-        VID_UnlockBuffer();
-        S_ExtraUpdate(); // don't let sound get messed up if going slow
-        VID_LockBuffer();
+        VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); // don't let sound get messed up if going slow
     }
 
     if (!(r_drawpolys | r_drawculledpolys))
         R_ScanEdges();
-    }
+}
 
 
 /*
@@ -935,17 +932,13 @@ void R_RenderView_() {
         Host_SysError("R_RenderView: NULL worldmodel");
 
     if (!r_dspeeds.value) {
-        VID_UnlockBuffer();
-        S_ExtraUpdate(); // don't let sound get messed up if going slow
-        VID_LockBuffer();
+        VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); // don't let sound get messed up if going slow
     }
 
     R_EdgeDrawing();
 
     if (!r_dspeeds.value) {
-        VID_UnlockBuffer();
-        S_ExtraUpdate(); // don't let sound get messed up if going slow
-        VID_LockBuffer();
+        VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); // don't let sound get messed up if going slow
     }
 
     if (r_dspeeds.value) {

@@ -69,9 +69,9 @@ void Mod_LoadVertexes(Lump_p Lump_in) {
     _loadModel->numvertexes = count;
 
     for (int i = 0; i < count; i++, in++, out++) {
-        out->position[0] = LittleFloat(in->point[0]);
-        out->position[1] = LittleFloat(in->point[1]);
-        out->position[2] = LittleFloat(in->point[2]);
+        out->position.v[0] = LittleFloat(in->point.v[0]);
+        out->position.v[1] = LittleFloat(in->point.v[1]);
+        out->position.v[2] = LittleFloat(in->point.v[2]);
     }
 }
 
@@ -293,8 +293,8 @@ void Mod_LoadTexinfo(Lump_p Lump_in) {
         for (int j = 0; j < 8; j++)
             out->vecs[0][j] = LittleFloat(in->vecs[0][j]);
 
-        float len1 = Length(out->vecs[0]);
-        float len2 = Length(out->vecs[1]);
+        float len1 = Length(*(vec3_p)(&out->vecs[0]));
+        float len2 = Length(*(vec3_p)(&out->vecs[1]));
         len1 = (len1 + len2) / 2;
         if (len1 < 0.32f)       out->mipadjust = 4.0f;
         else if (len1 < 0.49f)  out->mipadjust = 3.0f;
@@ -432,10 +432,10 @@ void CalcSurfaceExtents(mSurface_p s) {
 
         for (int j = 0; j < 2; j++) {
             float val =
-                v->position[0] * tex->vecs[j][0] +
-                v->position[1] * tex->vecs[j][1] +
-                v->position[2] * tex->vecs[j][2] +
-                /*            */ tex->vecs[j][3];
+                v->position.v[0] * tex->vecs[j][0] +
+                v->position.v[1] * tex->vecs[j][1] +
+                v->position.v[2] * tex->vecs[j][2] +
+                /*              */ tex->vecs[j][3];
             if (val < mins[j]) mins[j] = val;
             if (val > maxs[j]) maxs[j] = val;
         }
@@ -560,8 +560,13 @@ void Mod_LoadNodes(Lump_p Lump_in) {
 
     for (int i = 0; i < count; i++, in++, out++) {
         for (int j = 0; j < 3; j++) {
+#ifdef GLQUAKE
+            out->min.v[j] = LittleShort(in->mins[j]);
+            out->max.v[j] = LittleShort(in->maxs[j]);
+#else
             out->minmaxs[j] = LittleShort(in->mins[j]);
             out->minmaxs[3 + j] = LittleShort(in->maxs[j]);
+#endif
         }
 
         out->plane = _loadModel->planes + LittleLong(in->planenum);
@@ -595,30 +600,40 @@ void Mod_LoadClipnodes(Lump_p Lump_in) {
     _loadModel->clipnodes = out;
     _loadModel->numclipnodes = count;
 
-    Hull_p hull;
-    hull = &_loadModel->hulls[1];
-    hull->clipnodes = out;
-    hull->firstclipnode = 0;
-    hull->lastclipnode = count - 1;
-    hull->planes = _loadModel->planes;
-    hull->clip_mins[0] = -16;
-    hull->clip_mins[1] = -16;
-    hull->clip_mins[2] = -24;
-    hull->clip_maxs[0] = 16;
-    hull->clip_maxs[1] = 16;
-    hull->clip_maxs[2] = 32;
-
-    hull = &_loadModel->hulls[2];
-    hull->clipnodes = out;
-    hull->firstclipnode = 0;
-    hull->lastclipnode = count - 1;
-    hull->planes = _loadModel->planes;
-    hull->clip_mins[0] = -32;
-    hull->clip_mins[1] = -32;
-    hull->clip_mins[2] = -24;
-    hull->clip_maxs[0] = 32;
-    hull->clip_maxs[1] = 32;
-    hull->clip_maxs[2] = 64;
+    {
+        Hull_p hull = &_loadModel->hulls[1];
+        hull->clipnodes = out;
+        hull->firstclipnode = 0;
+        hull->lastclipnode = count - 1;
+        hull->planes = _loadModel->planes;
+        hull->clip_mins = (vec3_t){
+            .x = -16.0f,
+            .y = -16.0f,
+            .z = -24.0f
+        };
+        hull->clip_maxs = (vec3_t){
+            .x = 16.0f,
+            .y = 16.0f,
+            .z = 32.0f
+        };
+    }
+    {
+        Hull_p hull = &_loadModel->hulls[2];
+        hull->clipnodes = out;
+        hull->firstclipnode = 0;
+        hull->lastclipnode = count - 1;
+        hull->planes = _loadModel->planes;
+        hull->clip_mins = (vec3_t){
+            .x = -32.0f,
+            .y = -32.0f,
+            .z = -24.0f
+        };
+        hull->clip_maxs = (vec3_t){
+            .x = 32.0f,
+            .y = 32.0f,
+            .z = 64.0f
+        };
+    }
 
     for (int i = 0; i < count; i++, out++, in++) {
         out->planenum = LittleLong(in->planenum);
@@ -656,10 +671,10 @@ void Mod_LoadSubmodels(Lump_p Lump_in) {
     _loadModel->numSubModels = count;
 
     for (int i = 0; i < count; i++, in++, out++) {
-        for (int j = 0; j < 3; j++) {    // spread the mins / maxs by a pixel
-            out->mins[j] = LittleFloat(in->mins[j]) - 1;
-            out->maxs[j] = LittleFloat(in->maxs[j]) + 1;
-            out->origin[j] = LittleFloat(in->origin[j]);
+        for (int j = 0; j < VECT_DIM; j++) {    // spread the mins / maxs by a pixel
+            out->mins.v[j] = LittleFloat(in->mins.v[j]) - 1;
+            out->maxs.v[j] = LittleFloat(in->maxs.v[j]) + 1;
+            out->origin.v[j] = LittleFloat(in->origin.v[j]);
         }
         for (int j = 0; j < MAX_MAP_HULLS; j++)
             out->headnode[j] = LittleLong(in->headnode[j]);
@@ -709,9 +724,9 @@ RadiusFromBounds
 float RadiusFromBounds(vec3_t mins, vec3_t maxs) {
     vec3_t corner;
     for (int i = 0; i < VECT_DIM; i++) {
-        corner[i] =
-            (fabs(mins[i]) > fabs(maxs[i])) ?
-            fabs(mins[i]) : fabs(maxs[i]);
+        corner.v[i] =
+            (fabs(mins.v[i]) > fabs(maxs.v[i])) ?
+            fabs(mins.v[i]) : fabs(maxs.v[i]);
     }
 
     return Length(corner);
@@ -780,8 +795,8 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
         mod->firstModelSurface = bm->firstface;
         mod->numModelSurfaces = bm->numfaces;
 
-        VectorCopy(bm->maxs, mod->maxs);
-        VectorCopy(bm->mins, mod->mins);
+        VectorCopy(bm->maxs, &mod->maxs);
+        VectorCopy(bm->mins, &mod->mins);
         mod->radius = RadiusFromBounds(mod->mins, mod->maxs);
 
         mod->numleafs = bm->visleafs;

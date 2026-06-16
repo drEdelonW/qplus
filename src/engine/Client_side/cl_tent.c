@@ -108,14 +108,14 @@ void CL_ParseBeam(Model_p m) {
     int16_t ent = MSG_ReadShort();
 
     vec3_t  start = {
-        MSG_ReadCoord(),
-        MSG_ReadCoord(),
-        MSG_ReadCoord()
+        .x = MSG_ReadCoord(),
+        .y = MSG_ReadCoord(),
+        .z = MSG_ReadCoord()
     };
     vec3_t  end = {
-        MSG_ReadCoord(),
-        MSG_ReadCoord(),
-        MSG_ReadCoord()
+        .x = MSG_ReadCoord(),
+        .y = MSG_ReadCoord(),
+        .z = MSG_ReadCoord()
     };
 
     // override any beam with the same entity
@@ -125,8 +125,8 @@ void CL_ParseBeam(Model_p m) {
             b->entity = ent;
             b->model = m;
             b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2f);
-            VectorCopy(start, b->start);
-            VectorCopy(end, b->end);
+            VectorCopy(start, &b->start);
+            VectorCopy(end, &b->end);
             return;
         }
 
@@ -137,8 +137,8 @@ void CL_ParseBeam(Model_p m) {
             b->entity = ent;
             b->model = m;
             b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2f);
-            VectorCopy(start, b->start);
-            VectorCopy(end, b->end);
+            VectorCopy(start, &b->start);
+            VectorCopy(end, &b->end);
             return;
         }
 
@@ -155,9 +155,9 @@ void CL_ParseTEnt() {
     switch (type) {
     case TE_WIZSPIKE: {      // spike hitting wall
         vec3_t  pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         R_RunParticleEffect(pos, vec3_origin, 20, 30);
         S_StartSound(-1, 0, cl_sfx_wizhit, pos, 1, 1);
@@ -165,9 +165,9 @@ void CL_ParseTEnt() {
 
     case TE_KNIGHTSPIKE: {      // spike hitting wall
         vec3_t  pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         R_RunParticleEffect(pos, vec3_origin, 226, 20);
         S_StartSound(-1, 0, cl_sfx_knighthit, pos, 1, 1);
@@ -175,9 +175,9 @@ void CL_ParseTEnt() {
 
     case TE_SPIKE: {    // spike hitting wall
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
 #ifdef GLTEST
         Test_Spawn(pos);
@@ -194,9 +194,9 @@ void CL_ParseTEnt() {
     } break;
     case TE_SUPERSPIKE: {    // super spike hitting wall
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         R_RunParticleEffect(pos, vec3_origin, 0, 20);
 
@@ -211,22 +211,22 @@ void CL_ParseTEnt() {
 
     case TE_GUNSHOT: {      // bullet hitting wall
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         R_RunParticleEffect(pos, vec3_origin, 0, 20);
     } break;
 
     case TE_EXPLOSION: {      // rocket explosion
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         R_ParticleExplosion(pos);
         dLight_p dl = CL_AllocDlight(0);
-        VectorCopy(pos, dl->origin);
+        VectorCopy(pos, &dl->origin);
         dl->radius = 350;
         dl->die = (LegacyTimeDelta_t)(cl.time + 0.5f);
         dl->decay = 300;
@@ -235,9 +235,9 @@ void CL_ParseTEnt() {
 
     case TE_TAREXPLOSION: {      // tarbaby explosion
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         R_BlobExplosion(pos);
 
@@ -253,33 +253,33 @@ void CL_ParseTEnt() {
 
     case TE_LAVASPLASH: {
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         R_LavaSplash(pos);
     } break;
 
     case TE_TELEPORT: {
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         R_TeleportSplash(pos);
     } break;
 
     case TE_EXPLOSION2: {        // color mapped explosion
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         int colorStart = MSG_ReadByte();
         int colorLength = MSG_ReadByte();
         R_ParticleExplosion2(pos, colorStart, colorLength);
         dLight_p dl = CL_AllocDlight(0);
-        VectorCopy(pos, dl->origin);
+        VectorCopy(pos, &dl->origin);
         dl->radius = 350;
         dl->die = (LegacyTimeDelta_t)(cl.time + 0.5f);
         dl->decay = 300;
@@ -289,30 +289,30 @@ void CL_ParseTEnt() {
 #ifdef QUAKE2
     case TE_IMPLOSION: {
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         S_StartSound(-1, 0, cl_sfx_imp, pos, 1, 1);
     } break;
 
     case TE_RAILTRAIL: {
         vec3_t pos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         vec3_t endpos = {
-            MSG_ReadCoord(),
-            MSG_ReadCoord(),
-            MSG_ReadCoord()
+            .x = MSG_ReadCoord(),
+            .y = MSG_ReadCoord(),
+            .z = MSG_ReadCoord()
         };
         S_StartSound(-1, 0, cl_sfx_rail, pos, 1, 1);
         S_StartSound(-1, 1, cl_sfx_r_exp3, endpos, 1, 1);
         R_RocketTrail(pos, endpos, 0 + 128);
         R_ParticleExplosion(endpos);
         dLight_p dl = CL_AllocDlight(-1);
-        VectorCopy(endpos, dl->origin);
+        VectorCopy(endpos, &dl->origin);
         dl->radius = 350;
         dl->die = (LegacyTimeDelta_t)cl.time + 0.5f;
         dl->decay = 300;
@@ -363,46 +363,46 @@ void CL_UpdateTEnts() {
 
         // if coming from the player, update the start position
         if (b->entity == cl.viewentity) {
-            VectorCopy(cl_entities[cl.viewentity].origin, b->start);
+            VectorCopy(cl_entities[cl.viewentity].origin, &b->start);
         }
 
         // calculate pitch and yaw
-        vec3_t dist;    VectorSubtract(b->end, b->start, dist);
+        vec3_t dist;    VectorSubtract(b->end, b->start, &dist);
 
         float yaw, pitch;
-        if ((dist[1] == 0) &&
-            (dist[0] == 0)
+        if ((dist.v[1] == 0.0f) &&
+            (dist.v[0] == 0.0f)
             ) {
             yaw = 0;
-            if (dist[2] > 0)    pitch = 90;
-            else                pitch = 270;
+            if (dist.v[2] > 0.0f)   pitch = 90;
+            else                    pitch = 270;
         }
         else {
-            yaw = (float)(atan2(dist[1], dist[0]) * 180 / M_PI);
-            if (yaw < 0)
-                yaw += 360;
+            yaw = (float)(atan2(dist.v[1], dist.v[0]) * 180 / M_PI);
+            if (yaw < 0.0f)
+                yaw += 360.0f;
 
-            float forward = (float)sqrt(dist[0] * dist[0] + dist[1] * dist[1]);
-            pitch = (float)(atan2(dist[2], forward) * 180 / M_PI);
+            float forward = (float)sqrt(dist.v[0] * dist.v[0] + dist.v[1] * dist.v[1]);
+            pitch = (float)(atan2(dist.v[2], forward) * 180 / M_PI);
             if (pitch < 0)
                 pitch += 360;
         }
 
         // add new entities for the lightning
-        vec3_t org; VectorCopy(b->start, org);
-        float d = VectorNormalize(dist);
+        vec3_t org; VectorCopy(b->start, &org);
+        float d = VectorNormalize(&dist);
         while (d > 0) {
             r_Entity_p  ent = CL_NewTempEntity();
             if (!ent)
                 return;
-            VectorCopy(org, ent->origin);
+            VectorCopy(org, &ent->origin);
             ent->model = b->model;
-            ent->angles[0] = pitch;
-            ent->angles[1] = yaw;
-            ent->angles[2] = (float)(rand() % 360);
+            ent->angles.v[0] = pitch;
+            ent->angles.v[1] = yaw;
+            ent->angles.v[2] = (float)(rand() % 360);
 
             for (i = 0; i < VECT_DIM; i++)
-                org[i] += dist[i] * 30;
+                org.v[i] += dist.v[i] * 30;
             d -= 30;
         }
     }

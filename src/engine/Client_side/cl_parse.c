@@ -139,9 +139,9 @@ void CL_ParseStartSoundPacket() {
     }
 #else
     vec3_t pos = {
-        MSG_ReadCoord(),
-        MSG_ReadCoord(),
-        MSG_ReadCoord()
+        .x = MSG_ReadCoord(),
+        .y = MSG_ReadCoord(),
+        .z = MSG_ReadCoord()
     };
 #endif
     S_StartSound(
@@ -384,24 +384,24 @@ void CL_ParseUpdate(update_bits_t bits) {
     ent->effects = (bits & U_EFFECTS) ? MSG_ReadByte() : ent->baseline.effects;
 
     // shift the known values for interpolation
-    VectorCopy(ent->msg_origins[0], ent->msg_origins[1]);
-    VectorCopy(ent->msg_angles[0], ent->msg_angles[1]);
+    VectorCopy(ent->msg_origins[0], &ent->msg_origins[1]);
+    VectorCopy(ent->msg_angles[0], &ent->msg_angles[1]);
 
-    ent->msg_origins[0][0] = (bits & U_ORIGIN1) ? MSG_ReadCoord() : ent->baseline.origin[0];
-    ent->msg_angles[0][0] = (bits & U_ANGLE1) ? MSG_ReadAngle() : ent->baseline.angles[0];
-    ent->msg_origins[0][1] = (bits & U_ORIGIN2) ? MSG_ReadCoord() : ent->baseline.origin[1];
-    ent->msg_angles[0][1] = (bits & U_ANGLE2) ? MSG_ReadAngle() : ent->baseline.angles[1];
-    ent->msg_origins[0][2] = (bits & U_ORIGIN3) ? MSG_ReadCoord() : ent->baseline.origin[2];
-    ent->msg_angles[0][2] = (bits & U_ANGLE3) ? MSG_ReadAngle() : ent->baseline.angles[2];
+    ent->msg_origins[0].v[0] = (bits & U_ORIGIN1) ? MSG_ReadCoord() : ent->baseline.origin.v[0];
+    ent->msg_angles[0].v[0] = (bits & U_ANGLE1) ? MSG_ReadAngle() : ent->baseline.angles.v[0];
+    ent->msg_origins[0].v[1] = (bits & U_ORIGIN2) ? MSG_ReadCoord() : ent->baseline.origin.v[1];
+    ent->msg_angles[0].v[1] = (bits & U_ANGLE2) ? MSG_ReadAngle() : ent->baseline.angles.v[1];
+    ent->msg_origins[0].v[2] = (bits & U_ORIGIN3) ? MSG_ReadCoord() : ent->baseline.origin.v[2];
+    ent->msg_angles[0].v[2] = (bits & U_ANGLE3) ? MSG_ReadAngle() : ent->baseline.angles.v[2];
 
     if (bits & U_NOLERP)
         ent->forcelink = true;
 
     if (forcelink) { // didn't have an update last message
-        VectorCopy(ent->msg_origins[0], ent->msg_origins[1]);
-        VectorCopy(ent->msg_origins[0], ent->origin);
-        VectorCopy(ent->msg_angles[0], ent->msg_angles[1]);
-        VectorCopy(ent->msg_angles[0], ent->angles);
+        VectorCopy(ent->msg_origins[0], &ent->msg_origins[1]);
+        VectorCopy(ent->msg_origins[0], &ent->origin);
+        VectorCopy(ent->msg_angles[0], &ent->msg_angles[1]);
+        VectorCopy(ent->msg_angles[0], &ent->angles);
         ent->forcelink = true;
     }
 }
@@ -417,8 +417,8 @@ void CL_ParseBaseline(r_Entity_p ent) {
     ent->baseline.colormap = MSG_ReadByte();
     ent->baseline.skin = MSG_ReadByte();
     for (int i = 0; i < VECT_DIM; i++) {
-        ent->baseline.origin[i] = MSG_ReadCoord();
-        ent->baseline.angles[i] = MSG_ReadAngle();
+        ent->baseline.origin.v[i] = MSG_ReadCoord();
+        ent->baseline.angles.v[i] = MSG_ReadAngle();
     }
 }
 
@@ -436,10 +436,10 @@ void CL_ParseClientdata(server_update_bits_t bits) {
     cl.viewheight = (bits & SU_VIEWHEIGHT) ? MSG_ReadChar() : DEFAULT_VIEWHEIGHT;
     cl.idealpitch = (bits & SU_IDEALPITCH) ? MSG_ReadChar() : 0;
 
-    VectorCopy(cl.mvelocity[0], cl.mvelocity[1]);
+    VectorCopy(cl.mvelocity[0], &cl.mvelocity[1]);
     for (int i = 0; i < VECT_DIM; i++) {
-        cl.punchangle[i] = (bits & (SU_PUNCH1 << i)) ? MSG_ReadChar() : 0;
-        cl.mvelocity[0][i] = (bits & (SU_VELOCITY1 << i)) ? (MSG_ReadChar() * 16) : 0;
+        cl.punchangle.v[i] = (bits & (SU_PUNCH1 << i)) ? MSG_ReadChar() : 0;
+        cl.mvelocity[0].v[i] = (bits & (SU_VELOCITY1 << i)) ? (MSG_ReadChar() * 16) : 0;
     }
     uint32_t msg;
     // [always sent]    SU_ITEMS
@@ -537,8 +537,8 @@ void CL_ParseStatic() {
     ent->skinnum = ent->baseline.skin;
     ent->effects = ent->baseline.effects;
 
-    VectorCopy(ent->baseline.origin, ent->origin);
-    VectorCopy(ent->baseline.angles, ent->angles);
+    VectorCopy(ent->baseline.origin, &ent->origin);
+    VectorCopy(ent->baseline.angles, &ent->angles);
     R_AddEfrags(ent);
 }
 
@@ -549,9 +549,9 @@ void CL_ParseStatic() {
 */
 void CL_ParseStaticSound() {
     vec3_t org = {
-        MSG_ReadCoord(),
-        MSG_ReadCoord(),
-        MSG_ReadCoord()
+        .x = MSG_ReadCoord(),
+        .y = MSG_ReadCoord(),
+        .z = MSG_ReadCoord()
     };
     uint8_t sound_num = MSG_ReadByte();
     uint8_t vol = MSG_ReadByte();
@@ -632,7 +632,7 @@ void CL_ParseServerMessage() {
 
         case svc_setangle: {
             for (int i = 0; i < VECT_DIM; i++)
-                cl.viewangles[i] = MSG_ReadAngle();
+                cl.viewangles.v[i] = MSG_ReadAngle();
         } break;
 
         case svc_setview:       cl.viewentity = MSG_ReadShort();        break;

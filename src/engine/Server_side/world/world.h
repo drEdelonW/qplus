@@ -91,9 +91,9 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
 
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)      \
     (((p)->type < 3)? (                         \
-        ((p)->dist <= (emins)[(p)->type])?      \
+        ((p)->dist <= (emins).v[(p)->type])?    \
             1 : (                               \
-            ((p)->dist >= (emaxs)[(p)->type])?  \
+            ((p)->dist >= (emaxs).v[(p)->type])?\
                 2 : 3                           \
         )                                       \
     ) : BoxOnPlaneSide( (emins), (emaxs), (p)))

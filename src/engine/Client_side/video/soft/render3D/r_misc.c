@@ -72,11 +72,11 @@ void Show() {
 #define VIEWANGLE_STEPS 128
 
 void R_TimeRefresh_f() {
-    int startangle = r_refdef.viewangles[YAW];
+    int startangle = r_refdef.viewangles.v[YAW];
 
     float start = Host_FloatTime();
     for (int i = 0; i < VIEWANGLE_STEPS; i++) {
-        r_refdef.viewangles[YAW] = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
+        r_refdef.viewangles.v[YAW] = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
         VID_LockBuffer();
         R_RenderView();
@@ -96,7 +96,7 @@ void R_TimeRefresh_f() {
     float time = stop - start;
     Con_Printf("%f seconds (%f fps)\n", time, VIEWANGLE_STEPS / time);
 
-    r_refdef.viewangles[YAW] = startangle;
+    r_refdef.viewangles.v[YAW] = startangle;
 }
 
 
@@ -255,17 +255,17 @@ void R_TransformFrustum() {
 
     for (int i = 0; i < 4; i++) {
         vec3_t v = {
-            screenedge[i].normal[2],
-            -screenedge[i].normal[0],
-            screenedge[i].normal[1]
+            .x = screenedge[i].normal.v[2],
+            .y = -screenedge[i].normal.v[0],
+            .z = screenedge[i].normal.v[1]
         };
         vec3_t v2 = {
-            v[1] * vright[0] + v[2] * vup[0] + v[0] * vpn[0],
-            v[1] * vright[1] + v[2] * vup[1] + v[0] * vpn[1],
-            v[1] * vright[2] + v[2] * vup[2] + v[0] * vpn[2]
+            .x = v.v[1] * vright.v[0] + v.v[2] * vup.v[0] + v.v[0] * vpn.v[0],
+            .y = v.v[1] * vright.v[1] + v.v[2] * vup.v[1] + v.v[0] * vpn.v[1],
+            .z = v.v[1] * vright.v[2] + v.v[2] * vup.v[2] + v.v[0] * vpn.v[2]
         };
 
-        VectorCopy(v2, view_clipplanes[i].normal);
+        VectorCopy(v2, &view_clipplanes[i].normal);
 
         view_clipplanes[i].dist = DotProduct(modelorg, v2);
     }
@@ -279,10 +279,12 @@ void R_TransformFrustum() {
     TransformVector
     ================
 */
-void TransformVector(vec3_t in, vec3_t out) {
-    out[0] = DotProduct(in, vright);
-    out[1] = DotProduct(in, vup);
-    out[2] = DotProduct(in, vpn);
+void TransformVector(vec3_t in, vec3_p out) {
+    *out = (vec3_t){
+        .x = DotProduct(in, vright),
+        .y = DotProduct(in, vup),
+        .z = DotProduct(in, vpn)
+    };
 }
 
 #endif
@@ -293,7 +295,7 @@ void TransformVector(vec3_t in, vec3_t out) {
     R_TransformPlane
     ================
 */
-void R_TransformPlane(mPlane_p p, float_p normal, float_p dist) {
+void R_TransformPlane(mPlane_p p, vec3_p normal, float_p dist) {
     float d = DotProduct(r_origin, p->normal);
     *dist = p->dist - d;
     // TODO: when we have rotating entities, this will need to use the view matrix
@@ -311,7 +313,7 @@ void R_SetUpFrustumIndexes() {
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < VECT_DIM; j++) {
-            if (view_clipplanes[i].normal[j] < 0) {
+            if (view_clipplanes[i].normal.v[j] < 0) {
                 pindex[j] = j;
                 pindex[j + 3] = j + 3;
             }
@@ -387,10 +389,10 @@ void R_SetupFrame() {
 #endif
 
     // build the transformation matrix for the given view angles
-    VectorCopy(r_refdef.vieworg, modelorg);
-    VectorCopy(r_refdef.vieworg, r_origin);
+    VectorCopy(r_refdef.vieworg, &modelorg);
+    VectorCopy(r_refdef.vieworg, &r_origin);
 
-    AngleVectors(r_refdef.viewangles, vpn, vright, vup);
+    AngleVectors(r_refdef.viewangles, &vpn, &vright, &vup);
 
     // current viewleaf
     r_oldviewleaf = r_viewleaf;
@@ -455,10 +457,10 @@ void R_SetupFrame() {
     R_TransformFrustum();
 
     // save base values
-    VectorCopy(vpn, base_vpn);
-    VectorCopy(vright, base_vright);
-    VectorCopy(vup, base_vup);
-    VectorCopy(modelorg, base_modelorg);
+    VectorCopy(vpn, &base_vpn);
+    VectorCopy(vright, &base_vright);
+    VectorCopy(vup, &base_vup);
+    VectorCopy(modelorg, &base_modelorg);
 
     R_SetSkyFrame();
 

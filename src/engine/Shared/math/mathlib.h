@@ -33,12 +33,42 @@ extern vec3_t vec3_origin;    // TODO: move to more specific place
 extern uint32_t nanmask;
 #define IS_NAN(x) (((*(uint32_t *)&x)&nanmask) == nanmask)
 
+typedef union {
+#if 0
+    struct {
+        vec3_t right;   // X axis basis vector
+        vec3_t up;      // Y axis basis vector
+        vec3_t forward; // Z axis basis vector
+    };
+#endif
+    vec3_t rows[3];     // rows[0] = right, rows[1] = up, rows[2] = forward
+    float m[3][3];
+} mat3_t;
+typedef mat3_t* mat3_p;
+
+typedef union {
+#if 0
+    struct {
+        vec3_t right;   // Right direction + X scaling
+        vec3_t up;      // Up direction + Y scaling
+        vec3_t forward; // Forward direction + Z scaling
+        vec3_t origin;  // World position (translation)
+    };
+    vec3_t cols[4];     // Column access as vector array
+#else
+    // vec3_t rows[3];     // Каждая строка содержит 4 float (последний — координата)
+#endif
+    float m[3][4];      // Raw array access for R_ConcatTransforms
+} mat3x4_t;
+typedef mat3x4_t* mat3x4_p;
+
+
 int     Q_log2(int val);
 
-void    R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]);
-void    R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]);
+void    R_ConcatRotations(const mat3_p in1, const mat3_p in2, mat3_p out);
+void    R_ConcatTransforms(const mat3x4_p in1, const mat3x4_p in2, mat3x4_p out);
 
-void    RotatePointAroundVector(vec3_t dst, const vec3_t dir, const vec3_t point, float degrees);
+void    RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, float degrees);
 
 void    FloorDivMod(double numer, double denom, int* quotient, int* rem);
 int     GreatestCommonDivisor(int i1, int i2);

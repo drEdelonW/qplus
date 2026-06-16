@@ -159,27 +159,27 @@ void CL_AdjustAngles() {
     else                    speed = (float)host_frametime;
 
     if (!(in.strafe.state & 1)) {
-        cl.viewangles[YAW] -= speed * cl_yawspeed.value * CL_KeyState(&in.right);
-        cl.viewangles[YAW] += speed * cl_yawspeed.value * CL_KeyState(&in.left);
-        cl.viewangles[YAW] = anglemod(cl.viewangles[YAW]);
+        cl.viewangles.v[YAW] -= speed * cl_yawspeed.value * CL_KeyState(&in.right);
+        cl.viewangles.v[YAW] += speed * cl_yawspeed.value * CL_KeyState(&in.left);
+        cl.viewangles.v[YAW] = anglemod(cl.viewangles.v[YAW]);
     }
     if (in.klook.state & 1) {
         V_StopPitchDrift();
-        cl.viewangles[PITCH] -= speed * cl_pitchspeed.value * CL_KeyState(&in.forward);
-        cl.viewangles[PITCH] += speed * cl_pitchspeed.value * CL_KeyState(&in.back);
+        cl.viewangles.v[PITCH] -= speed * cl_pitchspeed.value * CL_KeyState(&in.forward);
+        cl.viewangles.v[PITCH] += speed * cl_pitchspeed.value * CL_KeyState(&in.back);
     }
 
     float up = CL_KeyState(&in.lookup);
     float down = CL_KeyState(&in.lookdown);
 
-    cl.viewangles[PITCH] -= speed * cl_pitchspeed.value * up;
-    cl.viewangles[PITCH] += speed * cl_pitchspeed.value * down;
+    cl.viewangles.v[PITCH] -= speed * cl_pitchspeed.value * up;
+    cl.viewangles.v[PITCH] += speed * cl_pitchspeed.value * down;
 
     if (up || down)
         V_StopPitchDrift();
 
-    CLAMP(-70, cl.viewangles[PITCH], 80);    // down look
-    CLAMP(-50, cl.viewangles[ROLL], 50);
+    CLAMP(-70, cl.viewangles.v[PITCH], 80);    // down look
+    CLAMP(-50, cl.viewangles.v[ROLL], 50);
 
 }
 
@@ -251,7 +251,7 @@ void CL_SendMove(UserCmd_p cmd) {
     MSG_WriteByte(&buf, clc_move); MSG_WriteFloat(&buf, (float)cl.mtime[0]); // so server can get ping times
 
     for (int i = 0; i < VECT_DIM; i++)
-        MSG_WriteAngle(&buf, cl.viewangles[i]);
+        MSG_WriteAngle(&buf, cl.viewangles.v[i]);
 
     MSG_WriteShort(&buf, (int16_t)cmd->forwardmove);
     MSG_WriteShort(&buf, (int16_t)cmd->sidemove);

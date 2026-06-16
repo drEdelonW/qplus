@@ -480,9 +480,9 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     mod->numframes = pheader->numframes;
 
     for (int i = 0; i < VECT_DIM; i++) {
-        pheader->scale[i] = LittleFloat(pinmodel->scale[i]);
-        pheader->scale_origin[i] = LittleFloat(pinmodel->scale_origin[i]);
-        pheader->eyeposition[i] = LittleFloat(pinmodel->eyeposition[i]);
+        pheader->scale.v[i] = LittleFloat(pinmodel->scale.v[i]);
+        pheader->scale_origin.v[i] = LittleFloat(pinmodel->scale_origin.v[i]);
+        pheader->eyeposition.v[i] = LittleFloat(pinmodel->eyeposition.v[i]);
     }
 
 
@@ -527,10 +527,10 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
         frametype = LittleLong(pframetype->type);
 
-#   if 0
+# if 0
         if (frametype == ALIAS_SINGLE)  pframetype = Mod_LoadAliasFrame(pframetype + 1, &pheader->frames[i]);
         else                            pframetype = Mod_LoadAliasGroup(pframetype + 1, &pheader->frames[i]);
-#   else
+# else
         switch (frametype) {
         case ALIAS_SINGLE: { pframetype = Mod_LoadAliasFrame(pframetype + 1, &pheader->frames[i]); } break;
         case ALIAS_GROUP: { pframetype = Mod_LoadAliasGroup(pframetype + 1, &pheader->frames[i]); } break;
@@ -538,7 +538,7 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
             Host_Error(".MDL frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
         } break;
         }
-#   endif
+# endif
 
     }
 
@@ -547,8 +547,21 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     mod->type = mod_alias;
 
     // FIXME: do this right
-    mod->mins[0] = mod->mins[1] = mod->mins[2] = -16;
-    mod->maxs[0] = mod->maxs[1] = mod->maxs[2] = 16;
+# if 0
+    mod->mins.v[0] = mod->mins.v[1] = mod->mins.v[2] = -16;
+    mod->maxs.v[0] = mod->maxs.v[1] = mod->maxs.v[2] = 16;
+# else
+    mod->mins = (vec3_t){
+            .x = -16.0f,
+            .y = -16.0f,
+            .z = -16.f
+        };
+    mod->maxs = (vec3_t){
+            .x = 16.0f,
+            .y = 16.0f,
+            .z = 16.f
+        };
+# endif
 
     //
     // build the draw lists
@@ -609,9 +622,9 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     mod->numframes = pMdl->numframes;
 
     for (int i = 0; i < VECT_DIM; i++) {
-        pMdl->scale[i] = LittleFloat(pinmodel->scale[i]);
-        pMdl->scale_origin[i] = LittleFloat(pinmodel->scale_origin[i]);
-        pMdl->eyeposition[i] = LittleFloat(pinmodel->eyeposition[i]);
+        pMdl->scale.v[i] = LittleFloat(pinmodel->scale.v[i]);
+        pMdl->scale_origin.v[i] = LittleFloat(pinmodel->scale_origin.v[i]);
+        pMdl->eyeposition.v[i] = LittleFloat(pinmodel->eyeposition.v[i]);
     }
 
     int numskins = pMdl->numskins;
@@ -746,9 +759,21 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     mod->type = mod_alias;
 
     // FIXME: do this right
-    mod->mins[0] = mod->mins[1] = mod->mins[2] = -16;
-    mod->maxs[0] = mod->maxs[1] = mod->maxs[2] = 16;
-
+# if 0
+    mod->mins.v[0] = mod->mins.v[1] = mod->mins.v[2] = -16;
+    mod->maxs.v[0] = mod->maxs.v[1] = mod->maxs.v[2] = 16;
+# else
+    mod->mins = (vec3_t){
+            .x = -16.0f,
+            .y = -16.0f,
+            .z = -16.f
+        };
+    mod->maxs = (vec3_t){
+            .x = 16.0f,
+            .y = 16.0f,
+            .z = 16.f
+        };
+# endif
     //
     // move the complete, relocatable alias model to the cache
     //

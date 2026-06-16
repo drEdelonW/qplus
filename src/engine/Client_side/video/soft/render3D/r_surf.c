@@ -79,29 +79,24 @@ void R_AddDynamicLights() {
 
         vec3_t impact;
         for (int i = 0; i < VECT_DIM; i++) {
-            impact[i] = cl_dlights[lnum].origin[i] - surf->plane->normal[i] * dist;
+            impact.v[i] = cl_dlights[lnum].origin.v[i] - surf->plane->normal.v[i] * dist;   // impact = cl_dlights[lnum].origin - (surf->plane->normal * dist);
         }
 
         vec3_t local = {
-            DotProduct(impact, tex->vecs[0]) + tex->vecs[0][3],
-            DotProduct(impact, tex->vecs[1]) + tex->vecs[1][3]
+            .x = DotProduct(impact, *(vec3_p)tex->vecs[0]) + tex->vecs[0][3] - surf->texturemins[0],
+            .y = DotProduct(impact, *(vec3_p)tex->vecs[1]) + tex->vecs[1][3] - surf->texturemins[1]
         };
 
-        local[0] -= surf->texturemins[0];
-        local[1] -= surf->texturemins[1];
-
         for (int t = 0; t < tmax; t++) {
-            int td = local[1] - t * 16;
+            int td = local.v[1] - t * 16;
             if (td < 0)
                 td = -td;
             for (int s = 0; s < smax; s++) {
-                int sd = local[0] - s * 16;
-                if (sd < 0)
-                    sd = -sd;
-                if (sd > td)
-                    dist = sd + (td >> 1);
-                else
-                    dist = td + (sd >> 1);
+                int sd = local.v[0] - s * 16;
+                if (sd < 0)     sd = -sd;
+                if (sd > td)    dist = sd + (td >> 1);
+                else            dist = td + (sd >> 1);
+
                 if (dist < minlight)
 #ifdef QUAKE2
                 {
@@ -503,8 +498,8 @@ void R_GenTurbTile(pixel_p pbasetex, TypeLess_ptr pdest) {
 
     for (int i = 0; i < TILE_SIZE; i++) {
         for (int j = 0; j < TILE_SIZE; j++) {
-            int s = (((j << 16) + turb[i & (CYCLE - 1)]) >> 16) & 63;
-            int t = (((i << 16) + turb[j & (CYCLE - 1)]) >> 16) & 63;
+            int s = (((j << 16) + turb[i & (CYCLE - 1)]) >> 16) & 0x3F;
+            int t = (((i << 16) + turb[j & (CYCLE - 1)]) >> 16) & 0x3F;
             *pd++ = *(pbasetex + (t << 6) + s);
         }
     }
@@ -522,8 +517,8 @@ void R_GenTurbTile16(pixel_p pbasetex, TypeLess_ptr pdest) {
 
     for (int i = 0; i < TILE_SIZE; i++) {
         for (int j = 0; j < TILE_SIZE; j++) {
-            int s = (((j << 16) + turb[i & (CYCLE - 1)]) >> 16) & 63;
-            int t = (((i << 16) + turb[j & (CYCLE - 1)]) >> 16) & 63;
+            int s = (((j << 16) + turb[i & (CYCLE - 1)]) >> 16) & 0x3F;
+            int t = (((i << 16) + turb[j & (CYCLE - 1)]) >> 16) & 0x3F;
             *pd++ = d_8to16table[*(pbasetex + (t << 6) + s)];
         }
     }
@@ -538,24 +533,24 @@ R_GenTile
 void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest) {
     if (psurf->flags & SURF_DRAWTURB) {
         if (r_pixbytes == 1) {
-            R_GenTurbTile((pixel_p)
-                ((uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]), pdest);
+            R_GenTurbTile(
+                (pixel_p)(
+                    (uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]),
+                pdest
+            );
         }
         else {
-            R_GenTurbTile16((pixel_p)
-                ((uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]), pdest);
+            R_GenTurbTile16(
+                (pixel_p)(
+                    (uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]),
+                pdest
+            );
         }
     }
     else if (psurf->flags & SURF_DRAWSKY) {
-        if (r_pixbytes == 1) {
-            R_GenSkyTile(pdest);
-        }
-        else {
-            R_GenSkyTile16(pdest);
-        }
+        if (r_pixbytes == 1)    R_GenSkyTile(pdest);
+        else                    R_GenSkyTile16(pdest);
     }
-    else {
-        Host_SysError("Unknown tile type");
-    }
+    else    Host_SysError("Unknown tile type");
 }
 

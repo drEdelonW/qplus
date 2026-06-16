@@ -95,23 +95,23 @@ void R_AddDynamicLights(mSurface_p surf) {
         minlight = rad - minlight;
 
         vec3_t  impact;
-        for (int i = 0; i < 3; i++) {
-            impact[i] = cl_dlights[lnum].origin[i] - surf->plane->normal[i] * dist;
+        for (int i = 0; i < VECT_DIM; i++) {
+            impact.v[i] = cl_dlights[lnum].origin.v[i] - surf->plane->normal.v[i] * dist;
         }
 
         vec3_t local;
-        local[0] = DotProduct(impact, tex->vecs[0]) + tex->vecs[0][3];
-        local[1] = DotProduct(impact, tex->vecs[1]) + tex->vecs[1][3];
+        local.v[0] = DotProduct(impact, *(vec3_p)tex->vecs[0]) + tex->vecs[0][3];   // TODO: fix this workaround
+        local.v[1] = DotProduct(impact, *(vec3_p)tex->vecs[1]) + tex->vecs[1][3];   // TODO: fix this workaround
 
-        local[0] -= surf->texturemins[0];
-        local[1] -= surf->texturemins[1];
+        local.v[0] -= surf->texturemins[0];
+        local.v[1] -= surf->texturemins[1];
 
         for (int t = 0; t < tmax; t++) {
-            int td = local[1] - t * 16;
+            int td = local.v[1] - t * 16;
             if (td < 0) td = -td;
 
             for (int s = 0; s < smax; s++) {
-                int sd = local[0] - s * 16;
+                int sd = local.v[0] - s * 16;
                 if (sd < 0) sd = -sd;
 
                 if (sd > td)    dist = sd + (td >> 1);
@@ -517,12 +517,12 @@ void R_DrawSequentialPoly(mSurface_p s) {
                 qglMTexCoord2fSGIS(TEXTURE0_SGIS, v[3], v[4]);
                 qglMTexCoord2fSGIS(TEXTURE1_SGIS, v[5], v[6]);
 
-                vec3_t  nv;
-                nv[0] = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime);
-                nv[1] = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime);
-                nv[2] = v[2];
-
-                glVertex3fv(nv);
+                vec3_t nv = {
+                    .x = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
+                    .y = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
+                    .z = v[2]
+                };
+                glVertex3fv(nv.v);
             }
         } glEnd();
 
@@ -559,12 +559,12 @@ void DrawGLWaterPoly(glpoly_p p) {
             glTexCoord2f(v[3], v[4]);
 
             vec3_t nv = {
-                nv[0] = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                nv[1] = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                nv[2] = v[2]
+                .x = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
+                .y = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
+                .z = v[2]
             };
 
-            glVertex3fv(nv);
+            glVertex3fv(nv.v);
         }
     } glEnd();
 }
@@ -578,12 +578,12 @@ void DrawGLWaterPolyLightmap(glpoly_p p) {
             glTexCoord2f(v[5], v[6]);
 
             vec3_t nv = {
-                nv[0] = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                nv[1] = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                nv[2] = v[2]
+                .x = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
+                .y = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
+                .z = v[2]
             };
 
-            glVertex3fv(nv);
+            glVertex3fv(nv.v);
         }
     } glEnd();
 }
@@ -980,20 +980,20 @@ void R_DrawBrushModel(r_Entity_p e) {
     bool rotated;
     {
         vec3_t  mins, maxs;
-        if (e->angles[0] ||
-            e->angles[1] ||
-            e->angles[2]
+        if (e->angles.v[0] ||
+            e->angles.v[1] ||
+            e->angles.v[2]
             ) {
             rotated = true;
             for (int i = 0; i < 3; i++) {
-                mins[i] = e->origin[i] - clmodel->radius;
-                maxs[i] = e->origin[i] + clmodel->radius;
+                mins.v[i] = e->origin.v[i] - clmodel->radius;
+                maxs.v[i] = e->origin.v[i] + clmodel->radius;
             }
         }
         else {
             rotated = false;
-            VectorAdd(e->origin, clmodel->mins, mins);
-            VectorAdd(e->origin, clmodel->maxs, maxs);
+            VectorAdd(e->origin, clmodel->mins, &mins);
+            VectorAdd(e->origin, clmodel->maxs, &maxs);
         }
 
         if (R_CullBox(mins, maxs))
@@ -1002,13 +1002,15 @@ void R_DrawBrushModel(r_Entity_p e) {
     glColor3f(1, 1, 1);
     memset(lightmap_polys, 0, sizeof(lightmap_polys));
 
-    VectorSubtract(r_refdef.vieworg, e->origin, modelorg);
+    VectorSubtract(r_refdef.vieworg, e->origin, &modelorg);
     if (rotated) {
-        vec3_t temp; VectorCopy(modelorg, temp);
-        vec3_t forward, right, up; AngleVectors(e->angles, forward, right, up);
-        modelorg[0] = DotProduct(temp, forward);
-        modelorg[1] = -DotProduct(temp, right);
-        modelorg[2] = DotProduct(temp, up);
+        vec3_t temp; VectorCopy(modelorg, &temp);
+        vec3_t forward, right, up; AngleVectors(e->angles, &forward, &right, &up);
+        modelorg = (vec3_t){
+            .x = DotProduct(temp, forward),
+            .y = -DotProduct(temp, right),
+            .z = DotProduct(temp, up)
+        };
     }
 
     mSurface_p psurf = &clmodel->surfaces[clmodel->firstModelSurface];
@@ -1031,9 +1033,9 @@ void R_DrawBrushModel(r_Entity_p e) {
     }
 
     glPushMatrix();
-    e->angles[0] = -e->angles[0];    // stupid quake bug
+    e->angles.v[0] = -e->angles.v[0];    // stupid quake bug
     R_RotateForEntity(e);
-    e->angles[0] = -e->angles[0];    // stupid quake bug
+    e->angles.v[0] = -e->angles.v[0];    // stupid quake bug
 
     //
     // draw texture
@@ -1075,7 +1077,7 @@ R_RecursiveWorldNode
 void R_RecursiveWorldNode(mNode_p node) {
     if ((node->contents == CONTENTS_SOLID) ||   // solid
         (node->visframe != r_visframecount) ||
-        (R_CullBox(node->minmaxs, node->minmaxs + 3))
+        (R_CullBox(node->min, node->max))
         )   return;
 
     // if a leaf node, draw stuff
@@ -1106,9 +1108,9 @@ void R_RecursiveWorldNode(mNode_p node) {
 
         double dot;
         switch (plane->type) {
-        case PLANE_X: { dot = modelorg[0] - plane->dist; } break;
-        case PLANE_Y: { dot = modelorg[1] - plane->dist; } break;
-        case PLANE_Z: { dot = modelorg[2] - plane->dist; } break;
+        case PLANE_X: { dot = modelorg.v[0] - plane->dist; } break;
+        case PLANE_Y: { dot = modelorg.v[1] - plane->dist; } break;
+        case PLANE_Z: { dot = modelorg.v[2] - plane->dist; } break;
         default: { dot = DotProduct(modelorg, plane->normal) - plane->dist; } break;
         }
 
@@ -1184,7 +1186,7 @@ void R_DrawWorld() {
     };
 #endif
 
-    VectorCopy(r_refdef.vieworg, modelorg);
+    VectorCopy(r_refdef.vieworg, &modelorg);
 
     currententity = &ent;
     currenttexture = -1;
@@ -1317,7 +1319,7 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
     for (int i = 0; i < lnumverts; i++) {
         int lindex = currentmodel->surfedges[fa->firstedge + i];
 
-        float_p vec;
+        vec3_t vec;
         if (lindex > 0) {
             mEdge_p r_pedge = &pedges[lindex];
             vec = r_pcurrentvertbase[r_pedge->v[0]].position;
@@ -1327,26 +1329,26 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
             vec = r_pcurrentvertbase[r_pedge->v[1]].position;
         }
 
-        float s = DotProduct(vec, fa->texinfo->vecs[0]) + fa->texinfo->vecs[0][3];
+        float s = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[0])) + fa->texinfo->vecs[0][3]; // TODO: fix this workaround
         s /= fa->texinfo->texture->width;
 
-        float t = DotProduct(vec, fa->texinfo->vecs[1]) + fa->texinfo->vecs[1][3];
+        float t = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[1])) + fa->texinfo->vecs[1][3]; // TODO: fix this workaround
         t /= fa->texinfo->texture->height;
 
-        VectorCopy(vec, poly->verts[i]);
+        VectorCopy(vec, (vec3_p)(&poly->verts[i]));
         poly->verts[i][3] = s;
         poly->verts[i][4] = t;
 
         //
         // lightmap texture coordinates
         //
-        s = DotProduct(vec, fa->texinfo->vecs[0]) + fa->texinfo->vecs[0][3];
+        s = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[0])) + fa->texinfo->vecs[0][3];    // TODO: fix this workaround
         s -= fa->texturemins[0];
         s += fa->light_s * 16;
         s += 8;
         s /= BLOCK_WIDTH * 16; //fa->texinfo->texture->width;
 
-        t = DotProduct(vec, fa->texinfo->vecs[1]) + fa->texinfo->vecs[1][3];
+        t = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[1])) + fa->texinfo->vecs[1][3];  // TODO: fix this workaround
         t -= fa->texturemins[1];
         t += fa->light_t * 16;
         t += 8;
@@ -1362,23 +1364,22 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
     if (!gl_keeptjunctions.value && !(fa->flags & SURF_UNDERWATER)) {
         for (int i = 0; i < lnumverts; ++i) {
             vec3_t v1, v2;
-            float_p prev, this, next;
-            // float f;
+            vec3_t prev, this, next;
 
-            prev = poly->verts[(i + lnumverts - 1) % lnumverts];
-            this = poly->verts[i];
-            next = poly->verts[(i + 1) % lnumverts];
+            prev = *(vec3_p)(&poly->verts[(i + lnumverts - 1) % lnumverts]);
+            this = *(vec3_p)(&poly->verts[i]);
+            next = *(vec3_p)(&poly->verts[(i + 1) % lnumverts]);
 
-            VectorSubtract(this, prev, v1);
-            VectorNormalize(v1);
-            VectorSubtract(next, prev, v2);
-            VectorNormalize(v2);
+            VectorSubtract(this, prev, &v1);
+            VectorNormalize(&v1);
+            VectorSubtract(next, prev, &v2);
+            VectorNormalize(&v2);
 
             // skip co-linear points
 #define COLINEAR_EPSILON 0.001
-            if ((fabs(v1[0] - v2[0]) <= COLINEAR_EPSILON) &&
-                (fabs(v1[1] - v2[1]) <= COLINEAR_EPSILON) &&
-                (fabs(v1[2] - v2[2]) <= COLINEAR_EPSILON)) {
+            if ((fabs(v1.v[0] - v2.v[0]) <= COLINEAR_EPSILON) &&
+                (fabs(v1.v[1] - v2.v[1]) <= COLINEAR_EPSILON) &&
+                (fabs(v1.v[2] - v2.v[2]) <= COLINEAR_EPSILON)) {
                 for (int j = i + 1; j < lnumverts; ++j) {
                     for (int k = 0; k < VERTEXSIZE; ++k)
                         poly->verts[j - 1][k] = poly->verts[j][k];
