@@ -377,8 +377,13 @@ void Mod_LoadLeafs(Lump_p Lump_in) {
 
     for (int i = 0; i < count; i++, in++, out++) {
         for (int j = 0; j < 3; j++) {
+#ifdef GLQUAKE
+            out->min.v[j] = LittleShort(in->mins[j]);
+            out->max.v[j] = LittleShort(in->maxs[j]);
+#else
             out->minmaxs[j] = LittleShort(in->mins[j]);
             out->minmaxs[3 + j] = LittleShort(in->maxs[j]);
+#endif
         }
 
         out->contents = LittleLong(in->contents);

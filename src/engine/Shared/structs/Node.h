@@ -6,22 +6,18 @@
 struct mNode_s;
 typedef struct mNode_s mNode_t;
 typedef mNode_t* mNode_p;
-struct mNode_s {
+struct mNode_s {    // TODO: merge in shared head structure with  mLeaf_s
     // common with leaf
     int32_t     contents;  // 0, to differentiate from leafs
     int32_t     visframe;  // node needs to be traversed if current
 #ifdef GLQUAKE
-# if 0
-    float       minmaxs[6];  // for bounding box culling
-# else
     vec3_t      min;
     vec3_t      max;
-# endif
-
 #else
     int16_t     minmaxs[6];  // for bounding box culling
 #endif
     mNode_p     parent;
+
     // node specific
     mPlane_p    plane;
     mNode_p     children[2];
@@ -33,8 +29,10 @@ struct mNode_s {
 typedef struct {
     int32_t     planenum;
     int16_t     children[2]; // negative numbers are -(leafs+1), not nodes
+
     int16_t     mins[3];  // for sphere culling
     int16_t     maxs[3];
+
     uint16_t    firstface;
     uint16_t    numfaces; // counting both sides
 } dNode_t;

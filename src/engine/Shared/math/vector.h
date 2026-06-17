@@ -56,10 +56,7 @@ typedef union {
     };
     vec_t arr[5];
 } vec5_t;
-STATIC_ASSERT_SIZE(vec5_t, 5 * sizeof(vec_t));
-typedef vec5_t* vec5_p;
 #endif
-// STATIC_ASSERT(sizeof(vec5_t) == 5 * sizeof(vec_t), "vec5_t must be 20");
 STATIC_ASSERT_SIZE(vec5_t, 5 * sizeof(vec_t));
 typedef vec5_t* vec5_p;
 

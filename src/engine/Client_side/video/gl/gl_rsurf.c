@@ -1129,7 +1129,7 @@ void R_RecursiveWorldNode(mNode_p node) {
             else if (dot > BACKFACE_EPSILON)    side = 0;
             {
                 for (; c; c--, surf++) {
-                    if (surf->visframe != r_framecount)
+                    if (surf->visframe != r_framecount) // TODO: find whay we always fall out from render?
                         continue;
 
                     // don't backface underwater surfaces, because they warp
