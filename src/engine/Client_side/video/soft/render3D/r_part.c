@@ -540,8 +540,8 @@ void R_DrawParticles() {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glBegin(GL_TRIANGLES); {
 
-        vec3_t up = VectorScale(vup, 1.5, &up);
-        vec3_t right = VectorScale(vright, 1.5, &right);
+        vec3_t up = VectorScale(vup, 1.5);
+        vec3_t right = VectorScale(vright, 1.5);
 #else
     D_StartParticles();
 
@@ -586,10 +586,14 @@ void R_DrawParticles() {
 
 #ifdef GLQUAKE      // TODO: wrap this in D_DrawParticle on GL_side
         // hack a scale up to keep particles from disapearing
+# if 0
         float scale =
             (prt->org.x - r_origin.x) * vpn.x +
             (prt->org.y - r_origin.y) * vpn.y +
             (prt->org.z - r_origin.z) * vpn.z;
+# else
+        float scale = DotProduct(VectorSubtract(prt->org, r_origin), vpn);
+# endif
         if (scale < 20.0f)  scale = 1.0f;
         else                scale = 1.0f + scale * 0.004f;
 # if 0
@@ -597,6 +601,7 @@ void R_DrawParticles() {
 # else
         glColor3ubv((uint8_p)&d_8to24table[(int)prt->color]);
 # endif
+#if 0
         glTexCoord2f(0, 0);        glVertex3fv(prt->org.v);
         glTexCoord2f(1, 0);        glVertex3f(
             prt->org.x + up.x * scale,
@@ -609,11 +614,20 @@ void R_DrawParticles() {
             prt->org.z + right.z * scale
         );
 #else
+        glTexCoord2f(0, 0);         glVertex3fv(prt->org.v);
+        glTexCoord2f(1, 0);         glVertex3fv(VectorMA(prt->org, scale, up).v);
+        glTexCoord2f(0, 1);         glVertex3fv(VectorMA(prt->org, scale, right).v);
+#endif
+#else
         D_DrawParticle(prt);
 #endif
+#if 0
         prt->org.x += prt->vel.x * frametime; // prt->org += prt->vel * frametime;
         prt->org.y += prt->vel.y * frametime;
         prt->org.z += prt->vel.z * frametime;
+#else
+        prt->org = VectorMA(prt->org, frametime, prt->vel);
+#endif
 
         switch (prt->type) {
         case pt_static:     break;

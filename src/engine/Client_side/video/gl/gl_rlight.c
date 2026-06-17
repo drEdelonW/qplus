@@ -95,7 +95,9 @@ void R_RenderDlight(dLight_p light) {
                     vright.v[j] * cos(a) * rad +
                     vup.v[j] * sin(a) * rad);
 #else
-            v = 
+            v = VectorMA(VectorMA(light->origin,
+                cos(a) * rad, vright),
+                sin(a) * rad, vup);
 #endif
             glVertex3fv(v.v);
         }
