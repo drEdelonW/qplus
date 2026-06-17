@@ -159,27 +159,27 @@ void CL_AdjustAngles() {
     else                    speed = (float)host_frametime;
 
     if (!(in.strafe.state & 1)) {
-        cl.viewangles.v[YAW] -= speed * cl_yawspeed.value * CL_KeyState(&in.right);
-        cl.viewangles.v[YAW] += speed * cl_yawspeed.value * CL_KeyState(&in.left);
-        cl.viewangles.v[YAW] = anglemod(cl.viewangles.v[YAW]);
+        cl.viewangles.yaw -= speed * cl_yawspeed.value * CL_KeyState(&in.right);
+        cl.viewangles.yaw += speed * cl_yawspeed.value * CL_KeyState(&in.left);
+        cl.viewangles.yaw = anglemod(cl.viewangles.yaw);
     }
     if (in.klook.state & 1) {
         V_StopPitchDrift();
-        cl.viewangles.v[PITCH] -= speed * cl_pitchspeed.value * CL_KeyState(&in.forward);
-        cl.viewangles.v[PITCH] += speed * cl_pitchspeed.value * CL_KeyState(&in.back);
+        cl.viewangles.pitch -= speed * cl_pitchspeed.value * CL_KeyState(&in.forward);
+        cl.viewangles.pitch += speed * cl_pitchspeed.value * CL_KeyState(&in.back);
     }
 
     float up = CL_KeyState(&in.lookup);
     float down = CL_KeyState(&in.lookdown);
 
-    cl.viewangles.v[PITCH] -= speed * cl_pitchspeed.value * up;
-    cl.viewangles.v[PITCH] += speed * cl_pitchspeed.value * down;
+    cl.viewangles.pitch -= speed * cl_pitchspeed.value * up;
+    cl.viewangles.pitch += speed * cl_pitchspeed.value * down;
 
     if (up || down)
         V_StopPitchDrift();
 
-    CLAMP(-70, cl.viewangles.v[PITCH], 80);    // down look
-    CLAMP(-50, cl.viewangles.v[ROLL], 50);
+    CLAMP(-70, cl.viewangles.pitch, 80);    // down look
+    CLAMP(-50, cl.viewangles.roll, 50);
 
 }
 

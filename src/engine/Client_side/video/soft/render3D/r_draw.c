@@ -391,8 +391,8 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
             _cacheOffset = (uint8_p)edge_p - (uint8_p)r_edges;
             _r_leftclipped = _r_rightclipped = false;
             R_ClipEdge(
-                &r_pcurrentvertbase[_r_pedge->v[0]],
-                &r_pcurrentvertbase[_r_pedge->v[1]],
+                &r_pcurrentvertbase[_r_pedge->v16[0]],
+                &r_pcurrentvertbase[_r_pedge->v16[1]],
                 pclip);
             _r_pedge->cachededgeoffset = _cacheOffset;
 
@@ -427,8 +427,8 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
             _cacheOffset = (uint8_p)edge_p - (uint8_p)r_edges;
             _r_leftclipped = _r_rightclipped = false;
             R_ClipEdge(
-                &r_pcurrentvertbase[_r_pedge->v[1]],
-                &r_pcurrentvertbase[_r_pedge->v[0]],
+                &r_pcurrentvertbase[_r_pedge->v16[1]],
+                &r_pcurrentvertbase[_r_pedge->v16[0]],
                 pclip);
             _r_pedge->cachededgeoffset = _cacheOffset;
 
@@ -534,7 +534,7 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
 
     for (; pedges; pedges = pedges->pnext) {
         _r_leftclipped = _r_rightclipped = false;
-        R_ClipEdge(pedges->v[0], pedges->v[1], pclip);
+        R_ClipEdge(pedges->v2[0], pedges->v2[1], pclip);
 
         if (_r_leftclipped)  _makeLeftEdge = true;
         if (_r_rightclipped) _makeRightEdge = true;
@@ -620,11 +620,11 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
 
         if (lindex > 0) {
             _r_pedge = &pedges[lindex];
-            verts[0][i] = r_pcurrentvertbase[_r_pedge->v[0]];
+            verts[0][i] = r_pcurrentvertbase[_r_pedge->v16[0]];
         }
         else {
             _r_pedge = &pedges[-lindex];
-            verts[0][i] = r_pcurrentvertbase[_r_pedge->v[1]];
+            verts[0][i] = r_pcurrentvertbase[_r_pedge->v16[1]];
         }
     }
 
@@ -723,8 +723,7 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
         pverts[i].t = verts[vertpage][i].position.v[t_axis];
     }
 
-    // build the polygon descriptor, including fa, _r_nearzi, and u, v, s, t, and z
-    // for each vertex
+    // build the polygon descriptor, including fa, _r_nearzi, and u, v, s, t, and z for each vertex
     r_polydesc.numverts = lnumverts;
     r_polydesc.nearzi = _r_nearzi;
     r_polydesc.pcurrentface = fa;

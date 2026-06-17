@@ -43,7 +43,16 @@ typedef enum alias_clip_flags_e {
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct FinalVert_s {
-    int     v[6];   // u, v, s, t, l, 1/z
+    union {
+        struct {
+            struct {int32_t u, v; } tx;
+            struct {int32_t s, t; } lMap;
+            int32_t Light;
+            int32_t iz;
+        } vx;
+        int32_t v32[6]; /* !!!MUST BE SIGNED!!! */  // u, v, s, t, l, 1/z  // (u, v), (s, t), light, iz
+    };
+    
 #if 0
     int                 flags;  //alias_clip_flags_t
 #else

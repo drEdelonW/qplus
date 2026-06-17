@@ -81,7 +81,7 @@ void R_RotateBmodel() {
     // TODO: share work with R_SetUpAliasTransform
 
     // yaw
-    float angle = currententity->angles.v[YAW];
+    float angle = currententity->angles.yaw;
     angle = angle * M_PI * 2 / 360;
     float s = sin(angle);
     float c = cos(angle);
@@ -101,7 +101,7 @@ void R_RotateBmodel() {
     };
 #endif
     // pitch
-    angle = currententity->angles.v[PITCH];
+    angle = currententity->angles.pitch;
     angle = angle * M_PI * 2 / 360;
     s = sin(angle);
     c = cos(angle);
@@ -129,7 +129,7 @@ void R_RotateBmodel() {
     R_ConcatRotations(&temp2, &temp1, &temp3);
 
     // roll
-    angle = currententity->angles.v[ROLL];
+    angle = currententity->angles.roll;
     angle = angle * M_PI * 2 / 360;
     s = sin(angle);
     c = cos(angle);
@@ -190,12 +190,12 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
 
         // set the status for the last point as the previous point
         // FIXME: cache this stuff somehow?
-        mVertex_p plastvert = pedges->v[0];
+        mVertex_p plastvert = pedges->v2[0];
         float lastdist =
             DotProduct(plastvert->position, tplane.normal) -
             tplane.dist;
         int lastside = (lastdist > 0) ? 0 : 1;
-        mVertex_p pvert = pedges->v[1];
+        mVertex_p pvert = pedges->v2[1];
         float dist = DotProduct(pvert->position, tplane.normal) - tplane.dist;
         int side = (dist > 0) ? 0 : 1;
 
@@ -231,14 +231,14 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
             bEdge_p ptedge = &_pbEdges[_numbEges];
             ptedge->pnext = psideedges[lastside];
             psideedges[lastside] = ptedge;
-            ptedge->v[0] = plastvert;
-            ptedge->v[1] = ptvert;
+            ptedge->v2[0] = plastvert;
+            ptedge->v2[1] = ptvert;
 
             ptedge = &_pbEdges[_numbEges + 1];
             ptedge->pnext = psideedges[side];
             psideedges[side] = ptedge;
-            ptedge->v[0] = ptvert;
-            ptedge->v[1] = pvert;
+            ptedge->v2[0] = ptvert;
+            ptedge->v2[1] = pvert;
 
             _numbEges += 2;
 
@@ -270,14 +270,14 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
         bEdge_p ptedge = &_pbEdges[_numbEges];
         ptedge->pnext = psideedges[0];
         psideedges[0] = ptedge;
-        ptedge->v[0] = _pFrontExit;
-        ptedge->v[1] = _pFrontEnter;
+        ptedge->v2[0] = _pFrontExit;
+        ptedge->v2[1] = _pFrontEnter;
 
         ptedge = &_pbEdges[_numbEges + 1];
         ptedge->pnext = psideedges[1];
         psideedges[1] = ptedge;
-        ptedge->v[0] = _pFrontEnter;
-        ptedge->v[1] = _pFrontExit;
+        ptedge->v2[0] = _pFrontEnter;
+        ptedge->v2[1] = _pFrontExit;
 
         _numbEges += 2;
     }
@@ -352,14 +352,14 @@ void R_DrawSolidClippedSubmodelPolygons(Model_p pmodel) {
 
                     if (lindex > 0) {
                         mEdge_p pedge = &pedges[lindex];
-                        pbedge[j].v[0] = &r_pcurrentvertbase[pedge->v[0]];
-                        pbedge[j].v[1] = &r_pcurrentvertbase[pedge->v[1]];
+                        pbedge[j].v2[0] = &r_pcurrentvertbase[pedge->v16[0]];
+                        pbedge[j].v2[1] = &r_pcurrentvertbase[pedge->v16[1]];
                     }
                     else {
                         lindex = -lindex;
                         mEdge_p pedge = &pedges[lindex];
-                        pbedge[j].v[0] = &r_pcurrentvertbase[pedge->v[1]];
-                        pbedge[j].v[1] = &r_pcurrentvertbase[pedge->v[0]];
+                        pbedge[j].v2[0] = &r_pcurrentvertbase[pedge->v16[1]];
+                        pbedge[j].v2[1] = &r_pcurrentvertbase[pedge->v16[0]];
                     }
 
                     pbedge[j].pnext = &pbedge[j + 1];

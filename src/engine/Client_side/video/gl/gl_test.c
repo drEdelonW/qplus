@@ -98,10 +98,10 @@ void DrawPuff(puff_p p) {
             d = 0;
         }
 
-        for (int j = 0; j < 3; j++) {
-            pts[i][0][j] = p->origin[j] + p->up[j] * s + p->reflect[j] * d;
-            pts[i][1][j] = p->origin[j] + p->right[j] * s + p->reflect[j] * d;
-            pts[i][2][j] = p->origin[j] + -p->right[j] * s + p->reflect[j] * d;
+        for (int j = 0; j < VECT_DIM; j++) {
+            pts[i][0][j] = p->origin.v[j] + p->up.v[j] * s + p->reflect.v[j] * d;
+            pts[i][1][j] = p->origin.v[j] + p->right.v[j] * s + p->reflect.v[j] * d;
+            pts[i][2][j] = p->origin.v[j] + -p->right.v[j] * s + p->reflect.v[j] * d;
         }
     }
 

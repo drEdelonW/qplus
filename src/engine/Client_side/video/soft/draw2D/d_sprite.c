@@ -305,18 +305,18 @@ void D_SpriteCalculateGradients() {
 
     float distinv = 1.0 / (-DotProduct(modelorg, r_spritedesc.vpn));
 
-    d_sdivzstepu = p_saxis.v[0] * xscaleinv;
-    d_tdivzstepu = p_taxis.v[0] * xscaleinv;
+    d_sdivzstepu = p_saxis.x * xscaleinv;
+    d_tdivzstepu = p_taxis.x * xscaleinv;
 
-    d_sdivzstepv = -p_saxis.v[1] * yscaleinv;
-    d_tdivzstepv = -p_taxis.v[1] * yscaleinv;
+    d_sdivzstepv = -p_saxis.y * yscaleinv;
+    d_tdivzstepv = -p_taxis.y * yscaleinv;
 
-    d_zistepu = p_normal.v[0] * xscaleinv * distinv;
-    d_zistepv = -p_normal.v[1] * yscaleinv * distinv;
+    d_zistepu = p_normal.x * xscaleinv * distinv;
+    d_zistepv = -p_normal.y * yscaleinv * distinv;
 
-    d_sdivzorigin = p_saxis.v[2] - xcenter * d_sdivzstepu - ycenter * d_sdivzstepv;
-    d_tdivzorigin = p_taxis.v[2] - xcenter * d_tdivzstepu - ycenter * d_tdivzstepv;
-    d_ziorigin = p_normal.v[2] * distinv - xcenter * d_zistepu - ycenter * d_zistepv;
+    d_sdivzorigin = p_saxis.z - xcenter * d_sdivzstepu - ycenter * d_sdivzstepv;
+    d_tdivzorigin = p_taxis.z - xcenter * d_tdivzstepu - ycenter * d_tdivzstepv;
+    d_ziorigin = p_normal.z * distinv - xcenter * d_zistepu - ycenter * d_zistepv;
 
     vec3_t p_temp1; TransformVector(modelorg, &p_temp1);
 

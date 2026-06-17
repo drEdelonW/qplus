@@ -118,11 +118,11 @@ bool R_CullBox(vec3_t mins, vec3_t maxs) {
 
 
 void R_RotateForEntity(r_Entity_p e) {
-    glTranslatef(e->origin.x, e->origin.v[1], e->origin.v[2]);
+    glTranslatef(e->origin.x, e->origin.y, e->origin.z);
 
-    glRotatef(e->angles.v[1], 0, 0, 1);
+    glRotatef(e->angles.yaw, 0, 0, 1);
     glRotatef(-e->angles.pitch, 0, 1, 0);
-    glRotatef(e->angles.v[2], 1, 0, 0);
+    glRotatef(e->angles.roll, 1, 0, 0);
 }
 
 /*
@@ -297,7 +297,7 @@ void GL_DrawAliasFrame(AliasHdr_p pAliasHdr, int posenum) {
                 // normals and vertexes come from the frame list
                 float l = shadedots[verts->lightnormalindex] * shadelight;
                 glColor3f(l, l, l);
-                glVertex3f(verts->v[0], verts->v[1], verts->v[2]);
+                glVertex3f(verts->v8[0], verts->v8[1], verts->v8[2]);
                 verts++;
             } while (--count);
 
@@ -314,7 +314,7 @@ GL_DrawAliasShadow
 
 void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
 
-    float lheight = currententity->origin.v[2] - lightspot.v[2];
+    float lheight = currententity->origin.z - lightspot.z;
 
     float height = 0;
     TriVertx_p verts = (TriVertx_p)((byte*)pAliasHdr + pAliasHdr->posedata);
@@ -345,13 +345,13 @@ void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
 
                 // normals and vertexes come from the frame list
                 vec3_t point = {
-                    .x = verts->v[0] * pAliasHdr->scale.x + pAliasHdr->scale_origin.x,
-                    .y = verts->v[1] * pAliasHdr->scale.v[1] + pAliasHdr->scale_origin.v[1],
-                    .z = verts->v[2] * pAliasHdr->scale.v[2] + pAliasHdr->scale_origin.v[2]
+                    .x = verts->v8[0] * pAliasHdr->scale.x + pAliasHdr->scale_origin.x,
+                    .y = verts->v8[1] * pAliasHdr->scale.y + pAliasHdr->scale_origin.y,
+                    .z = verts->v8[2] * pAliasHdr->scale.z + pAliasHdr->scale_origin.z
                 };
-                point.x -= shadevector.x * (point.v[2] + lheight);
-                point.v[1] -= shadevector.v[1] * (point.v[2] + lheight);
-                point.v[2] = height;
+                point.x -= shadevector.x * (point.z + lheight);
+                point.y -= shadevector.y * (point.z + lheight);
+                point.z = height;
                 //   height -= 0.001;
                 glVertex3fv(point.v);
 
@@ -460,13 +460,13 @@ void R_DrawAliasModel(r_Entity_p e) {
         )
         ambientlight = shadelight = 256;
 
-    shadedots = r_avertexnormal_dots[((int)(e->angles.v[1] * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
+    shadedots = r_avertexnormal_dots[((int)(e->angles.yaw * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
     shadelight = shadelight / 200.0;
 
-    float an = e->angles.v[1] / 180 * M_PI;
+    float an = e->angles.yaw / 180 * M_PI;
     shadevector.x = cos(-an);
-    shadevector.v[1] = sin(-an);
-    shadevector.v[2] = 1;
+    shadevector.y = sin(-an);
+    shadevector.z = 1;
     VectorNormalize(&shadevector);
 
     //
@@ -488,26 +488,26 @@ void R_DrawAliasModel(r_Entity_p e) {
     if (!strcmp(clmodel->name, "progs/eyes.mdl") && gl_doubleeyes.value) {
         glTranslatef(
             pAliasHdr->scale_origin.x,
-            pAliasHdr->scale_origin.v[1],
-            pAliasHdr->scale_origin.v[2] - (22 + 8)
+            pAliasHdr->scale_origin.y,
+            pAliasHdr->scale_origin.z - (22 + 8)
         );
         // double size of eyes, since they are really hard to see in gl
         glScalef(
             pAliasHdr->scale.x * 2,
-            pAliasHdr->scale.v[1] * 2,
-            pAliasHdr->scale.v[2] * 2
+            pAliasHdr->scale.y * 2,
+            pAliasHdr->scale.z * 2
         );
     }
     else {
         glTranslatef(
             pAliasHdr->scale_origin.x,
-            pAliasHdr->scale_origin.v[1],
-            pAliasHdr->scale_origin.v[2]
+            pAliasHdr->scale_origin.y,
+            pAliasHdr->scale_origin.z
         );
         glScalef(
             pAliasHdr->scale.x,
-            pAliasHdr->scale.v[1],
-            pAliasHdr->scale.v[2]
+            pAliasHdr->scale.y,
+            pAliasHdr->scale.z
         );
     }
 
@@ -684,8 +684,8 @@ void R_PolyBlend() {
 int SignbitsForPlane(mPlane_p out) {
     // for fast box on planeside test
     int bits = 0;
-    for (int j = 0; j < 3; j++) {
-        if (out->normal.v[j] < 0)
+    for (int j = 0; j < VECT_DIM; j++) {
+        if (out->normal.v[j] < 0.0f)
             bits |= 1 << j;
     }
     return bits;
@@ -806,7 +806,7 @@ void R_SetupGL() {
     MYgluPerspective(r_refdef.fov_y, screenaspect, 4, 4096);
 
     if (mirror) {
-        if (mirror_plane->normal.v[2])    glScalef(1, -1, 1);
+        if (mirror_plane->normal.z)    glScalef(1, -1, 1);
         else                            glScalef(-1, 1, 1);
         glCullFace(GL_BACK);
     }
@@ -818,10 +818,10 @@ void R_SetupGL() {
 
     glRotatef(-90, 1, 0, 0);     // put Z going up
     glRotatef(90, 0, 0, 1);     // put Z going up
-    glRotatef(-r_refdef.viewangles.v[2], 1, 0, 0);
+    glRotatef(-r_refdef.viewangles.roll, 1, 0, 0);
     glRotatef(-r_refdef.viewangles.pitch, 0, 1, 0);
-    glRotatef(-r_refdef.viewangles.v[1], 0, 0, 1);
-    glTranslatef(-r_refdef.vieworg.x, -r_refdef.vieworg.v[1], -r_refdef.vieworg.v[2]);
+    glRotatef(-r_refdef.viewangles.yaw, 0, 0, 1);
+    glTranslatef(-r_refdef.vieworg.x, -r_refdef.vieworg.y, -r_refdef.vieworg.z);
 
     glGetFloatv(GL_MODELVIEW_MATRIX, r_world_matrix);
 
@@ -921,9 +921,9 @@ void R_Mirror() {
         float d = DotProduct(vpn, mirror_plane->normal);
         VectorMA(vpn, -2 * d, mirror_plane->normal, &vpn);
     }
-    r_refdef.viewangles.pitch = -asin(vpn.v[2]) / M_PI * 180;
-    r_refdef.viewangles.v[1] = atan2(vpn.v[1], vpn.x) / M_PI * 180;
-    r_refdef.viewangles.v[2] = -r_refdef.viewangles.v[2];
+    r_refdef.viewangles.pitch = -asin(vpn.z) / M_PI * 180;
+    r_refdef.viewangles.yaw = atan2(vpn.y, vpn.x) / M_PI * 180;
+    r_refdef.viewangles.roll = -r_refdef.viewangles.roll;
 
     r_Entity_p ent = &cl_entities[cl.viewentity];
     if (cl_numvisedicts < MAX_VISEDICTS) {
@@ -948,7 +948,7 @@ void R_Mirror() {
     glEnable(GL_BLEND);
     glMatrixMode(GL_PROJECTION);
 
-    if (mirror_plane->normal.v[2])  glScalef(1, -1, 1);
+    if (mirror_plane->normal.z)  glScalef(1, -1, 1);
     else                            glScalef(-1, 1, 1);
 
     glCullFace(GL_FRONT);

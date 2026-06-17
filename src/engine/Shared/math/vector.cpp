@@ -9,7 +9,7 @@
 ** assumes "src" is normalized
 */
 void PerpendicularVector(vec3_p dst, const vec3_t src) {
-    float minelem = 1.0F;
+    float minelem = 1.0f;
 
     // find the smallest magnitude axially aligned vector
     int pos = 0;
@@ -20,7 +20,7 @@ void PerpendicularVector(vec3_p dst, const vec3_t src) {
         }
 
     vec3_t tempvec = { .x = 0.0f, .y = 0.0f, .z = 0.0f };
-    tempvec.v[pos] = 1.0F;
+    tempvec.v[pos] = 1.0f;
 
     ProjectPointOnPlane(dst, tempvec, src); // project the point onto the plane defined by src
     VectorNormalize(dst);    // normalize the result

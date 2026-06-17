@@ -92,8 +92,8 @@ void Mod_LoadEdges(Lump_p Lump_in) {
     _loadModel->numedges = count;
 
     for (int i = 0; i < count; i++, in++, out++) {
-        out->v[0] = (uint16_t)LittleShort(in->v[0]);
-        out->v[1] = (uint16_t)LittleShort(in->v[1]);
+        out->v16[0] = (uint16_t)LittleShort(in->v16[0]);
+        out->v16[1] = (uint16_t)LittleShort(in->v16[1]);
     }
 }
 
@@ -426,8 +426,8 @@ void CalcSurfaceExtents(mSurface_p s) {
         mVertex_p v =
             &_loadModel->vertexes[
                 (e >= 0) ?
-                    _loadModel->edges[e].v[0] :
-                    _loadModel->edges[-e].v[1]
+                    _loadModel->edges[e].v16[0] :
+                    _loadModel->edges[-e].v16[1]
             ];
 
         for (int j = 0; j < 2; j++) {

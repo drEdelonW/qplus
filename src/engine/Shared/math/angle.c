@@ -2,27 +2,47 @@
 #include <math.h>
 
 void AngleVectors(vec3_t angles, vec3_p forward, vec3_p right, vec3_p up) {
-    float  angle;
+#if 0
+    angles.yaw *= (M_PI * 2 / 360);
+    angles.pitch *= (M_PI * 2 / 360);
+    angles.roll *= (M_PI * 2 / 360);
+#else
+    VectorScale(angles, (M_PI * 2 / 360), &angles);
+#endif
+    float sy = sin(angles.yaw);
+    float cy = cos(angles.yaw);
+    float sp = sin(angles.pitch);
+    float cp = cos(angles.pitch);
+    float sr = sin(angles.roll);
+    float cr = cos(angles.roll);
 
-    angle = angles.v[YAW] * (M_PI * 2 / 360);
-    float sy = sin(angle);
-    float cy = cos(angle);
-    angle = angles.v[PITCH] * (M_PI * 2 / 360);
-    float sp = sin(angle);
-    float cp = cos(angle);
-    angle = angles.v[ROLL] * (M_PI * 2 / 360);
-    float sr = sin(angle);
-    float cr = cos(angle);
-
-    forward->v[0] = cp * cy;
-    forward->v[1] = cp * sy;
-    forward->v[2] = -sp;
-    right->v[0] = (-1 * sr * sp * cy + -1 * cr * -sy);
-    right->v[1] = (-1 * sr * sp * sy + -1 * cr * cy);
-    right->v[2] = -1 * sr * cp;
-    up->v[0] = (cr * sp * cy + -sr * -sy);
-    up->v[1] = (cr * sp * sy + -sr * cy);
-    up->v[2] = cr * cp;
+#if 0
+    forward->x = cp * cy;
+    forward->y = cp * sy;
+    forward->z = -sp;
+    right->x = (-sr * sp * cy) + (cr * sy);
+    right->y = (-sr * sp * sy) + (-cr * cy);
+    right->z = (-sr * cp);
+    up->x = (cr * sp * cy) + (sr * sy);
+    up->y = (cr * sp * sy) + (-sr * cy);
+    up->z = cr * cp;
+#else
+    *forward = (vec3_t){
+        .x = cp * cy,
+        .y = cp * sy,
+        .z = -sp
+    };
+    *right = (vec3_t){
+        .x = (-sr * sp * cy) + (cr * sy),
+        .y = (-sr * sp * sy) + (-cr * cy),
+        .z = (-sr * cp)
+    };
+    *up = (vec3_t){
+        .x = (cr * sp * cy) + (sr * sy),
+        .y = (cr * sp * sy) + (-sr * cy),
+        .z = cr * cp
+    };
+#endif
 }
 
 float anglemod(float a) {
@@ -30,6 +50,6 @@ float anglemod(float a) {
     if (a >= 0) a -= 360 * (int)(a / 360);
     else        a += 360 * (1 + (int)(-a / 360));
 #endif
-    a = (360.0 / 65536) * ((int)(a * (65536 / 360.0)) & 65535);
+    a = (360.0f / (0xFFFF + 1)) * ((int)(a * ((0xFFFF + 1) / 360.0f)) & 0xFFFF);
     return a;
 }

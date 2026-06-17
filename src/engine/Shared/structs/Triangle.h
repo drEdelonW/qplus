@@ -21,7 +21,7 @@ typedef mTriangle_t* mTriangle_p;
 // load this data
 
 typedef struct {
-    uint8_t v[3];
+    uint8_t v8[3];
     uint8_t lightnormalindex;
 } TriVertx_t;
 typedef TriVertx_t* TriVertx_p;

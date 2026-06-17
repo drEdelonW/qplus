@@ -72,11 +72,11 @@ void Show() {
 #define VIEWANGLE_STEPS 128
 
 void R_TimeRefresh_f() {
-    int startangle = r_refdef.viewangles.v[YAW];
+    int startangle = r_refdef.viewangles.yaw;
 
     float start = Host_FloatTime();
     for (int i = 0; i < VIEWANGLE_STEPS; i++) {
-        r_refdef.viewangles.v[YAW] = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
+        r_refdef.viewangles.yaw = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
         VID_LockBuffer();
         R_RenderView();
@@ -96,7 +96,7 @@ void R_TimeRefresh_f() {
     float time = stop - start;
     Con_Printf("%f seconds (%f fps)\n", time, VIEWANGLE_STEPS / time);
 
-    r_refdef.viewangles.v[YAW] = startangle;
+    r_refdef.viewangles.yaw = startangle;
 }
 
 

@@ -243,7 +243,7 @@ bool SV_StepDirection(edict_p ent, float yaw, float dist) {
 
     vec3_t oldorigin;   VectorCopy(ent->v.origin, &oldorigin);
     if (SV_movestep(ent, move, false)) {
-        float delta = ent->v.angles.v[YAW] - ent->v.ideal_yaw;
+        float delta = ent->v.angles.yaw - ent->v.ideal_yaw;
         if ((delta > 45) &&
             (delta < 315)  // not turned far enough, so don't take the step
             ) {
@@ -285,35 +285,35 @@ void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
     float olddir = anglemod((float)((int)(actor->v.ideal_yaw / 45) * 45));
     float turnaround = anglemod(olddir - 180);
 
-    float deltax = enemy->v.origin.v[PITCH] - actor->v.origin.v[PITCH];
-    float deltay = enemy->v.origin.v[YAW] - actor->v.origin.v[YAW];
+    float deltax = enemy->v.origin.pitch - actor->v.origin.pitch;
+    float deltay = enemy->v.origin.yaw - actor->v.origin.yaw;
 
 #if 0
-    if (deltax > 10.0f)         orient.v[YAW] = 0.0f;
-    else if (deltax < -10.0f)   orient.v[YAW] = 180.0f;
-    else                        orient.v[YAW] = DI_NODIR;
+    if (deltax > 10.0f)         orient.yaw = 0.0f;
+    else if (deltax < -10.0f)   orient.yaw = 180.0f;
+    else                        orient.yaw = DI_NODIR;
 
-    if (deltay < -10.0f)        orient.v[ROLL] = 270.0f;
-    else if (deltay > 10.0f)    orient.v[ROLL] = 90.0f;
-    else                        orient.v[ROLL] = DI_NODIR;
+    if (deltay < -10.0f)        orient.roll = 270.0f;
+    else if (deltay > 10.0f)    orient.roll = 90.0f;
+    else                        orient.roll = DI_NODIR;
 #else
-    orient.v[YAW] =
+    orient.yaw =
         (deltax > 10.0f) ?
         0.0f : ((deltax < -10.0f) ?
             180.0f : DI_NODIR);
 
-    orient.v[ROLL] =
+    orient.roll =
         (deltay < -10.0f) ?
         270.0f : ((deltay > 10.0f) ?
             90.0f : DI_NODIR);
 #endif
     // try direct route
-    if ((orient.v[YAW] != DI_NODIR) &&
-        (orient.v[ROLL] != DI_NODIR)
+    if ((orient.yaw != DI_NODIR) &&
+        (orient.roll != DI_NODIR)
         ) {
         float tdir;
-        if (orient.v[YAW] == 0.0f)  tdir = (orient.v[ROLL] == 90.0f) ? 45.0f : 315.0f;
-        else                        tdir = (orient.v[ROLL] == 90.0f) ? 135.0f : 215.0f;
+        if (orient.yaw == 0.0f)  tdir = (orient.roll == 90.0f) ? 45.0f : 315.0f;
+        else                        tdir = (orient.roll == 90.0f) ? 135.0f : 215.0f;
 
         if ((tdir != turnaround) &&
             SV_StepDirection(actor, tdir, dist)
@@ -325,21 +325,21 @@ void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
     if (((rand() & 3) & 1) ||
         (fabs(deltay) > fabs(deltax))
         ) {
-        float tdir = orient.v[YAW];
-        orient.v[YAW] = orient.v[ROLL];
-        orient.v[ROLL] = tdir;
+        float tdir = orient.yaw;
+        orient.yaw = orient.roll;
+        orient.roll = tdir;
     }
 
     if (
         (
-            (orient.v[YAW] != DI_NODIR) &&
-            (orient.v[YAW] != turnaround) &&
-            SV_StepDirection(actor, orient.v[YAW], dist)
+            (orient.yaw != DI_NODIR) &&
+            (orient.yaw != turnaround) &&
+            SV_StepDirection(actor, orient.yaw, dist)
             ) ||
         (
-            (orient.v[ROLL] != DI_NODIR) &&
-            (orient.v[ROLL] != turnaround) &&
-            SV_StepDirection(actor, orient.v[ROLL], dist)
+            (orient.roll != DI_NODIR) &&
+            (orient.roll != turnaround) &&
+            SV_StepDirection(actor, orient.roll, dist)
             )
         )
         return;

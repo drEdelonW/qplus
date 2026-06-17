@@ -157,7 +157,7 @@ void R_AddEfrags(r_Entity_p ent) {
 
     Model_p entmodel = ent->model;
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         r_emins.v[i] = ent->origin.v[i] + entmodel->mins.v[i];
         r_emaxs.v[i] = ent->origin.v[i] + entmodel->maxs.v[i];
     }

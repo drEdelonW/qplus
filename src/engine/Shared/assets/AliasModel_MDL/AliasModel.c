@@ -43,8 +43,8 @@ dAliasFrameType_p Mod_LoadAliasFrame(TypeLess_ptr pin, mAliasFrameDesc_p frame) 
     for (int i = 0; i < VECT_DIM; i++) {
         // these are byte values, so we don't have to worry about
         // endianness
-        frame->bboxmin.v[i] = pdaliasframe->bboxmin.v[i];
-        frame->bboxmin.v[i] = pdaliasframe->bboxmax.v[i];
+        frame->bboxmin.v8[i] = pdaliasframe->bboxmin.v8[i];
+        frame->bboxmin.v8[i] = pdaliasframe->bboxmax.v8[i];
     }
 
     TriVertx_p pinframe = (TriVertx_p)(pdaliasframe + 1);
@@ -73,8 +73,8 @@ dAliasFrameType_p Mod_LoadAliasFrame(
 
     for (int i = 0; i < VECT_DIM; i++) {
         // these are uint8_t values, so we don't have to worry about endianness
-        pbboxmin->v[i] = pdaliasframe->bboxmin.v[i];
-        pbboxmax->v[i] = pdaliasframe->bboxmax.v[i];
+        pbboxmin->v8[i] = pdaliasframe->bboxmin.v8[i];
+        pbboxmax->v8[i] = pdaliasframe->bboxmax.v8[i];
     }
 
     TriVertx_p pinframe = (TriVertx_p)(pdaliasframe + 1);
@@ -90,7 +90,7 @@ dAliasFrameType_p Mod_LoadAliasFrame(
         pframe[j].lightnormalindex = pinframe[j].lightnormalindex;
 
         for (int k = 0; k < 3; k++) {
-            pframe[j].v[k] = pinframe[j].v[k];
+            pframe[j].v8[k] = pinframe[j].v8[k];
         }
     }
 
@@ -120,8 +120,8 @@ dAliasFrameType_p Mod_LoadAliasGroup(
 
     for (int i = 0; i < VECT_DIM; i++) {
         // these are byte values, so we don't have to worry about endianness
-        frame->bboxmin.v[i] = pingroup->bboxmin.v[i];
-        frame->bboxmin.v[i] = pingroup->bboxmax.v[i];
+        frame->bboxmin.v8[i] = pingroup->bboxmin.v8[i];
+        frame->bboxmin.v8[i] = pingroup->bboxmax.v8[i];
     }
 
     dAliasInterval_p pin_intervals = (dAliasInterval_p)(pingroup + 1);
@@ -163,8 +163,8 @@ dAliasFrameType_p  Mod_LoadAliasGroup(
 
     for (int i = 0; i < VECT_DIM; i++) {
         // these are uint8_t values, so we don't have to worry about endianness
-        pbboxmin->v[i] = pingroup->bboxmin.v[i];
-        pbboxmax->v[i] = pingroup->bboxmax.v[i];
+        pbboxmin->v8[i] = pingroup->bboxmin.v8[i];
+        pbboxmax->v8[i] = pingroup->bboxmax.v8[i];
     }
 
     *pframeindex = (uint8_p)paliasgroup - (uint8_p)pheader;

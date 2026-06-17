@@ -86,10 +86,9 @@ void R_RenderDlight(dLight_p light) {
         for (int i = 16; i >= 0; i--) {
             float a = i / 16.0 * M_PI * 2;
             for (int j = 0; j < VECT_DIM; j++)
-                v.v[j] =
-                light->origin.v[j] +
-                vright.v[j] * cos(a) * rad +
-                vup.v[j] * sin(a) * rad;
+                v.v[j] = (light->origin.v[j] +
+                    vright.v[j] * cos(a) * rad +
+                    vup.v[j] * sin(a) * rad);
             glVertex3fv(v.v);
         }
     } glEnd();
@@ -221,8 +220,8 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
     float frac = front / (front - back);
     vec3_t mid = {
         .x = start.x + (end.x - start.x) * frac,
-        .y = start.v[1] + (end.v[1] - start.v[1]) * frac,
-        .z = start.v[2] + (end.v[2] - start.v[2]) * frac
+        .y = start.y + (end.y - start.y) * frac,
+        .z = start.z + (end.z - start.z) * frac
     };
 
     // go down front side
@@ -288,8 +287,8 @@ int R_LightPoint(vec3_t p) {
 
     vec3_t end = {
         .x = p.x,
-        .y = p.v[1],
-        .z = p.v[2] - 2048
+        .y = p.y,
+        .z = p.z - 2048
     };
 
     int r = RecursiveLightPoint(cl.worldmodel->nodes, p, end);

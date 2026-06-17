@@ -152,18 +152,18 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts) {
     for (int i = 0; i < numverts; i++, fv++) {
         // valid triangle coordinates for filling can include the bottom and
         // right clip edges, due to the fill rule; these shouldn't be drawn
-        if ((fv->v[0] < r_refdef.vrectright) &&
-            (fv->v[1] < r_refdef.vrectbottom)
+        if ((fv->v32[0] < r_refdef.vrectright) &&
+            (fv->v32[1] < r_refdef.vrectbottom)
             ) {
-            int z = fv->v[5] >> 16;
-            int16_p zbuf = zspantable[fv->v[1]] + fv->v[0];
+            int z = fv->v32[5] >> 16;
+            int16_p zbuf = zspantable[fv->v32[1]] + fv->v32[0];
             if (z >= *zbuf) {
                 int  pix;
 
                 *zbuf = z;
-                pix = skintable[fv->v[3] >> 16][fv->v[2] >> 16];
-                pix = ((uint8_p)acolormap)[pix + (fv->v[4] & 0xFF00)];
-                d_viewbuffer[d_scantable[fv->v[1]] + fv->v[0]] = pix;
+                pix = skintable[fv->v32[3] >> 16][fv->v32[2] >> 16];
+                pix = ((uint8_p)acolormap)[pix + (fv->v32[4] & 0xFF00)];
+                d_viewbuffer[d_scantable[fv->v32[1]] + fv->v32[0]] = pix;
             }
         }
     }
@@ -185,28 +185,28 @@ void D_DrawSubdiv() {
         FinalVert_p index1 = pfv + ptri[i].vertindex[1];
         FinalVert_p index2 = pfv + ptri[i].vertindex[2];
 
-        if (((index0->v[1] - index1->v[1]) * (index0->v[0] - index2->v[0]) -
-            (index0->v[0] - index1->v[0]) * (index0->v[1] - index2->v[1])) >= 0) {
+        if (((index0->v32[1] - index1->v32[1]) * (index0->v32[0] - index2->v32[0]) -
+            (index0->v32[0] - index1->v32[0]) * (index0->v32[1] - index2->v32[1])) >= 0) {
             continue;
         }
 
-        d_pcolormap = &((uint8_p)acolormap)[index0->v[4] & 0xFF00];
+        d_pcolormap = &((uint8_p)acolormap)[index0->v32[4] & 0xFF00];
 
-        if (ptri[i].facesfront) { D_PolysetRecursiveTriangle(index0->v, index1->v, index2->v); }
+        if (ptri[i].facesfront) { D_PolysetRecursiveTriangle(index0->v32, index1->v32, index2->v32); }
         else {
-            int s0 = index0->v[2];
-            int s1 = index1->v[2];
-            int s2 = index2->v[2];
+            int s0 = index0->v32[2];
+            int s1 = index1->v32[2];
+            int s2 = index2->v32[2];
 
-            if (index0->flags & ALIAS_ONSEAM)   index0->v[2] += r_affinetridesc.seamfixupX16;
-            if (index1->flags & ALIAS_ONSEAM)   index1->v[2] += r_affinetridesc.seamfixupX16;
-            if (index2->flags & ALIAS_ONSEAM)   index2->v[2] += r_affinetridesc.seamfixupX16;
+            if (index0->flags & ALIAS_ONSEAM)   index0->v32[2] += r_affinetridesc.seamfixupX16;
+            if (index1->flags & ALIAS_ONSEAM)   index1->v32[2] += r_affinetridesc.seamfixupX16;
+            if (index2->flags & ALIAS_ONSEAM)   index2->v32[2] += r_affinetridesc.seamfixupX16;
 
-            D_PolysetRecursiveTriangle(index0->v, index1->v, index2->v);
+            D_PolysetRecursiveTriangle(index0->v32, index1->v32, index2->v32);
 
-            index0->v[2] = s0;
-            index1->v[2] = s1;
-            index2->v[2] = s2;
+            index0->v32[2] = s0;
+            index1->v32[2] = s1;
+            index2->v32[2] = s2;
         }
     }
 }
@@ -227,32 +227,32 @@ void D_DrawNonSubdiv() {
         FinalVert_p index1 = pfv + ptri->vertindex[1];
         FinalVert_p index2 = pfv + ptri->vertindex[2];
 
-        d_xdenom = (index0->v[1] - index1->v[1]) *
-            (index0->v[0] - index2->v[0]) -
-            (index0->v[0] - index1->v[0]) * (index0->v[1] - index2->v[1]);
+        d_xdenom = (index0->v32[1] - index1->v32[1]) *
+            (index0->v32[0] - index2->v32[0]) -
+            (index0->v32[0] - index1->v32[0]) * (index0->v32[1] - index2->v32[1]);
 
         if (d_xdenom >= 0) { continue; }
 
-        r_p0[0] = index0->v[0];  // u
-        r_p0[1] = index0->v[1];  // v
-        r_p0[2] = index0->v[2];  // s
-        r_p0[3] = index0->v[3];  // t
-        r_p0[4] = index0->v[4];  // light
-        r_p0[5] = index0->v[5];  // iz
+        r_p0[0] = index0->v32[0];  // u
+        r_p0[1] = index0->v32[1];  // v
+        r_p0[2] = index0->v32[2];  // s
+        r_p0[3] = index0->v32[3];  // t
+        r_p0[4] = index0->v32[4];  // light
+        r_p0[5] = index0->v32[5];  // iz
 
-        r_p1[0] = index1->v[0];
-        r_p1[1] = index1->v[1];
-        r_p1[2] = index1->v[2];
-        r_p1[3] = index1->v[3];
-        r_p1[4] = index1->v[4];
-        r_p1[5] = index1->v[5];
+        r_p1[0] = index1->v32[0];
+        r_p1[1] = index1->v32[1];
+        r_p1[2] = index1->v32[2];
+        r_p1[3] = index1->v32[3];
+        r_p1[4] = index1->v32[4];
+        r_p1[5] = index1->v32[5];
 
-        r_p2[0] = index2->v[0];
-        r_p2[1] = index2->v[1];
-        r_p2[2] = index2->v[2];
-        r_p2[3] = index2->v[3];
-        r_p2[4] = index2->v[4];
-        r_p2[5] = index2->v[5];
+        r_p2[0] = index2->v32[0];
+        r_p2[1] = index2->v32[1];
+        r_p2[2] = index2->v32[2];
+        r_p2[3] = index2->v32[3];
+        r_p2[4] = index2->v32[4];
+        r_p2[5] = index2->v32[5];
 
         if (!ptri->facesfront) {
             if (index0->flags & ALIAS_ONSEAM)   r_p0[2] += r_affinetridesc.seamfixupX16;

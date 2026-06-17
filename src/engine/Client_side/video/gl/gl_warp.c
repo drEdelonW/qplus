@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "mathlib.h"
 #include "z_hunk.h"
+#include "q_tools.h"
 
 extern cvar_t gl_subdivide_size;
 
@@ -35,22 +36,28 @@ mSurface_p warpface;
 
 
 void BoundPoly(int numverts, float_p verts, vec3_p mins, vec3_p maxs) {
-    *mins = {
+    *mins = (vec3_t){
         .x = 9999.0f,
         .y = 9999.0f,
         .z = 9999.0f
     };
-    *maxs = {
+    *maxs = (vec3_t){
         .x = -9999.0f,
         .y = -9999.0f,
         .z = -9999.0f
     };
-    float_p v = verts;
-    for (int i = 0; i < numverts; i++)
-        for (int j = 0; j < 3; j++, v++) {
-            if (*v < mins->v[j])   mins->v[j] = *v;
-            if (*v > maxs->v[j])   maxs->v[j] = *v;
+    for (int i = 0; i < numverts; i++) {
+        vec3_t v = ((vec3_p)verts)[i];
+        for (int j = 0; j < VECT_DIM; j++) {
+#if 0
+            if (v.v[j] < mins->v[j])   mins->v[j] = v.v[j];
+            if (v.v[j] > maxs->v[j])   maxs->v[j] = v.v[j];
+#else
+            CLAMP_LESS(maxs->v[j], v.v[j]);
+            CLAMP_MORE(mins->v[j], v.v[j]);
+#endif
         }
+    }
 }
 
 void SubdividePolygon(int numverts, float_p verts) {
@@ -59,12 +66,12 @@ void SubdividePolygon(int numverts, float_p verts) {
     float dist[64];
 
     if (numverts > 60)
-    Host_SysError("numverts = %i", numverts);
+        Host_SysError("numverts = %i", numverts);
 
     vec3_t mins, maxs;
     BoundPoly(numverts, verts, &mins, &maxs);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {
         float m = (mins.v[i] + maxs.v[i]) * 0.5;
         m = gl_subdivide_size.value * floor(m / gl_subdivide_size.value + 0.5);
         if ((maxs.v[i] - m) < 8.0f)      continue;
@@ -111,16 +118,20 @@ void SubdividePolygon(int numverts, float_p verts) {
         return;
     }
 
-    glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (numverts - 4) * VERTEXSIZE * sizeof(float));
+#if 0
+    glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (numverts - 4) * (VERTEXSIZE * sizeof(float)));
+#else
+    glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (numverts - 4) * sizeof(glVert_t));
+#endif    
     poly->next = warpface->polys;
     warpface->polys = poly;
     poly->numverts = numverts;
     for (int i = 0; i < numverts; i++, verts += 3) {
-        VectorCopy(*(vec3_p)verts, (vec3_p)poly->verts[i]);
+        VectorCopy(*(vec3_p)verts, &poly->verts[i].v);
         float s = DotProduct(*(vec3_p)verts, *(vec3_p)warpface->texinfo->vecs[0]);
         float t = DotProduct(*(vec3_p)verts, *(vec3_p)warpface->texinfo->vecs[1]);
-        poly->verts[i][3] = s;
-        poly->verts[i][4] = t;
+        poly->verts[i].tx.s = s;
+        poly->verts[i].tx.t = t;
     }
 }
 
@@ -148,8 +159,8 @@ void GL_SubdivideSurface(mSurface_p fa) {
         vec3_t vec =
             _loadModel->vertexes[
                 (lindex > 0) ?
-                    _loadModel->edges[lindex].v[0] :
-                    _loadModel->edges[-lindex].v[1]
+                    _loadModel->edges[lindex].v16[0] :
+                    _loadModel->edges[-lindex].v16[1]
             ].position;
 
         VectorCopy(vec, &verts[numverts]);
@@ -179,10 +190,10 @@ Does a water warp on the pre-fragmented glpoly_t chain
 void EmitWaterPolys(mSurface_p fa) {
     for (glpoly_p p = fa->polys; p; p = p->next) {
         glBegin(GL_POLYGON); {
-            float_p v = p->verts[0];
-            for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                float os = v[3];
-                float ot = v[4];
+            for (int i = 0; i < p->numverts; i++) {
+                glVert_t v = p->verts[i];
+                float os = v.tx.s;
+                float ot = v.tx.t;
 
                 float s = os + turbsin[(int)((ot * 0.125 + realtime) * TURBSCALE) & 255];
                 s *= (1.0 / 64);
@@ -190,7 +201,7 @@ void EmitWaterPolys(mSurface_p fa) {
                 float t = ot + turbsin[(int)((os * 0.125 + realtime) * TURBSCALE) & 255];
                 t *= (1.0 / 64);
 
-                glTexCoord2f(s, t);     glVertex3fv(v);
+                glTexCoord2f(s, t);     glVertex3fv(v.vf);
             }
         } glEnd();
     }
@@ -207,25 +218,25 @@ EmitSkyPolys
 void EmitSkyPolys(mSurface_p fa) {
     for (glpoly_p p = fa->polys; p; p = p->next) {
         glBegin(GL_POLYGON); {
-            float_p v = p->verts[0];
-            for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                vec3_t dir; VectorSubtract(*(vec3_p)v, r_origin, &dir);
-                dir.v[2] *= 3; // flatten the sphere
+            for (int i = 0; i < p->numverts; i++) {
+                glVert_t v = p->verts[i];
+                vec3_t dir; VectorSubtract(v.v, r_origin, &dir);
+                dir.z *= 3; // flatten the sphere
 
                 float length =  // TODO: replace to length(dir);
-                    dir.v[0] * dir.v[0] +
-                    dir.v[1] * dir.v[1] +
-                    dir.v[2] * dir.v[2];
+                    dir.x * dir.x +
+                    dir.y * dir.y +
+                    dir.z * dir.z;
                 length = sqrt(length);
                 length = 6 * 63 / length;
 
-                dir.v[0] *= length;
-                dir.v[1] *= length;
+                dir.x *= length;
+                dir.y *= length;
 
-                float s = (speedscale + dir.v[0]) * (1.0 / 128);
-                float t = (speedscale + dir.v[1]) * (1.0 / 128);
+                float s = (speedscale + dir.x) * (1.0 / 128);
+                float t = (speedscale + dir.y) * (1.0 / 128);
 
-                glTexCoord2f(s, t);     glVertex3fv(v);
+                glTexCoord2f(s, t);     glVertex3fv(v.vf);
             }
         } glEnd();
     }
@@ -687,27 +698,33 @@ void DrawSkyPolygon(int nump, vec3_t vecs) {
     return;
 #endif
     // decide which face it maps to
-    vec3_t v;   VectorCopy(vec3_origin, v);
+    vec3_t v;   VectorCopy(vec3_origin, &v);
     float_p vp = vecs;
     for (int i = 0; i < nump; i++, vp += 3) {
-        VectorAdd(vp, v, v);
+        VectorAdd(vp, v, &v);
     }
     vec3_t av = {
-        fabs(v[0]),
-        fabs(v[1]),
-        fabs(v[2])
+        fabs(v.x),
+        fabs(v.y),
+        fabs(v.z)
     };
     int  axis;
-    if (av[0] > av[1] && av[0] > av[2]) {
-        if (v[0] < 0)   axis = 1;
+    if (
+        (av[0] > av[1]) &&
+        (av[0] > av[2])
+        ) {
+        if (v.x < 0)   axis = 1;
         else            axis = 0;
     }
-    else if (av[1] > av[2] && av[1] > av[0]) {
-        if (v[1] < 0)   axis = 3;
+    else if (
+        (av[1] > av[2]) &&
+        (av[1] > av[0])
+        ) {
+        if (v.y < 0.0f)   axis = 3;
         else            axis = 2;
     }
     else {
-        if (v[2] < 0)   axis = 5;
+        if (v.z < 0.0f)   axis = 5;
         else            axis = 4;
     }
 
@@ -716,18 +733,18 @@ void DrawSkyPolygon(int nump, vec3_t vecs) {
         float s, t, dv;
         {
             int j = vec_to_st[axis][2];
-            if (j > 0)  dv = vecs[j - 1];
-            else        dv = -vecs[-j - 1];
+            if (j > 0)  dv = vecs.v[j - 1];
+            else        dv = -vecs.v[-j - 1];
         }
         {
             int j = vec_to_st[axis][0];
-            if (j < 0)      s = -vecs[-j - 1] / dv;
-            else            s = vecs[j - 1] / dv;
+            if (j < 0)      s = -vecs.v[-j - 1] / dv;
+            else            s = vecs.v[j - 1] / dv;
         }
         {
             int j = vec_to_st[axis][1];
-            if (j < 0)      t = -vecs[-j - 1] / dv;
-            else            t = vecs[j - 1] / dv;
+            if (j < 0)      t = -vecs.v[-j - 1] / dv;
+            else            t = vecs.v[j - 1] / dv;
         }
         if (s < skymins[0][axis]) skymins[0][axis] = s;
         if (t < skymins[1][axis]) skymins[1][axis] = t;
@@ -855,16 +872,16 @@ void R_ClearSkyBox() {
 void MakeSkyVec(float s, float t, int axis) {
     vec3_t v;
     vec3_t b = {
-        s * 2048,
-        t * 2048,
-        2048
+        .x = s * 2048,
+        .y = t * 2048,
+        .z = 2048
     };
 
-    for (int j = 0; j < 3; j++) {
+    for (int j = 0; j < VECT_DIM; j++) {
         int k = st_to_vec[axis][j];
-        if (k < 0)      v[j] = -b[-k - 1];
-        else            v[j] = b[k - 1];
-        v[j] += r_origin[j];
+        if (k < 0)      v.v[j] = -b.v[-k - 1];
+        else            v.v[j] = b.v[k - 1];
+        v.v[j] += r_origin[j];
     }
 
     // avoid bilerp seam

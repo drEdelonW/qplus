@@ -63,7 +63,7 @@ void SV_SetIdealPitch() {
     if (!((int)sv_player->v.flags & FL_ONGROUND))   return;
 
     float z[MAX_FORWARD];
-    float angleval = sv_player->v.angles.v[YAW] * (float)M_PI * 2.0f / 360;
+    float angleval = sv_player->v.angles.yaw * (float)M_PI * 2.0f / 360;
     float sinval = (float)sin(angleval);
     float cosval = (float)cos(angleval);
 
@@ -358,10 +358,10 @@ void SV_ClientThink() {
 
     vec3_t v_angle;
     VectorAdd(sv_player->v.v_angle, sv_player->v.punchangle, &v_angle);
-    _angles->v[ROLL] = V_CalcRoll(sv_player->v.angles, sv_player->v.velocity) * 4;
+    _angles->roll = V_CalcRoll(sv_player->v.angles, sv_player->v.velocity) * 4;
     if (!(sv_player->v.fixangle)) {
-        _angles->v[PITCH] = -v_angle.v[PITCH] / 3;
-        _angles->v[YAW] = v_angle.v[YAW];
+        _angles->pitch = -v_angle.pitch / 3;
+        _angles->yaw = v_angle.yaw;
     }
 
     if ((int)sv_player->v.flags & FL_WATERJUMP) { SV_WaterJump(); return; }

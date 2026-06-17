@@ -296,18 +296,18 @@ void R_DrawSequentialPoly(mSurface_p s) {
         Texture_p t = R_TextureAnimation(s->texinfo->texture);
         GL_Bind(t->gl_texturenum);
         glBegin(GL_POLYGON); {
-            float_p v = p->verts[0];
-            for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                glTexCoord2f(v[3], v[4]);   glVertex3fv(v);
+            for (int i = 0; i < p->numverts; i++) {
+                float_t v = p->verts[i];
+                glTexCoord2f(v.vf[3], v.vf[4]);   glVertex3fv(v.vf);
             }
         } glEnd();
 
         GL_Bind(lightmap_textures + s->lightmaptexturenum);
         glEnable(GL_BLEND); {
             glBegin(GL_POLYGON); {
-                float_p v = p->verts[0];
-                for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                    glTexCoord2f(v[5], v[6]);   glVertex3fv(v);
+                for (int i = 0; i < p->numverts; i++) {
+                    float_t v = p->verts[i];
+                    glTexCoord2f(v.vf[5], v.vf[6]);   glVertex3fv(v.vf);
                 }
             } glEnd();
 
@@ -407,21 +407,12 @@ void R_DrawSequentialPoly(mSurface_p s) {
             }
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
             glBegin(GL_POLYGON); {
-#if 1   // TODO: remake to glVert_t
-                float_p v = p->verts[0];
-                for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                    qglMTexCoord2fSGIS(TEXTURE0_SGIS, v[3], v[4]);
-                    qglMTexCoord2fSGIS(TEXTURE1_SGIS, v[5], v[6]);
-                    glVertex3fv(v);
+                for (int i = 0; i < p->numverts; i++) {
+                    glVert_t v = p->verts[i];
+                    qglMTexCoord2fSGIS(TEXTURE0_SGIS, v.vf[3], v.vf[4]);
+                    qglMTexCoord2fSGIS(TEXTURE1_SGIS, v.vf[5], v.vf[6]);
+                    glVertex3fv(v.vf);
                 }
-#else
-                glVert_p v = p->verts[0];
-                for (int i = 0; i < p->numverts; i++, v++) {
-                    qglMTexCoord2fSGIS(TEXTURE0_SGIS, v->tx[S_AX], v->[T_AX]);
-                    qglMTexCoord2fSGIS(TEXTURE1_SGIS, v[5], v[6]);
-                    glVertex3fv(v->v);
-                }
-#endif
             } glEnd();
             return;
         }
@@ -431,18 +422,18 @@ void R_DrawSequentialPoly(mSurface_p s) {
             Texture_p t = R_TextureAnimation(s->texinfo->texture);
             GL_Bind(t->gl_texturenum);
             glBegin(GL_POLYGON); {
-                float_p v = p->verts[0];
-                for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                    glTexCoord2f(v[3], v[4]);   glVertex3fv(v);
+                for (int i = 0; i < p->numverts; i++) {
+                    glVert_t v = p->verts[i];
+                    glTexCoord2f(v.vf[3], v.vf[4]);   glVertex3fv(v.vf);
                 }
             } glEnd();
 
             GL_Bind(lightmap_textures + s->lightmaptexturenum);
             glEnable(GL_BLEND);
             glBegin(GL_POLYGON); {
-                float_p v = p->verts[0];
-                for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                    glTexCoord2f(v[5], v[6]);   glVertex3fv(v);
+                for (int i = 0; i < p->numverts; i++) {
+                    glVert_t v = p->verts[i];
+                    glTexCoord2f(v.vf[5], v.vf[6]);   glVertex3fv(v.vf);
                 }
             } glEnd();
 
@@ -512,15 +503,15 @@ void R_DrawSequentialPoly(mSurface_p s) {
         }
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
         glBegin(GL_TRIANGLE_FAN); {
-            float_p v = p->verts[0];
-            for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-                qglMTexCoord2fSGIS(TEXTURE0_SGIS, v[3], v[4]);
-                qglMTexCoord2fSGIS(TEXTURE1_SGIS, v[5], v[6]);
+            for (int i = 0; i < p->numverts; i++) {
+                glVert_t v = p->verts[i];
+                qglMTexCoord2fSGIS(TEXTURE0_SGIS, v.vf[3], v.vf[4]);
+                qglMTexCoord2fSGIS(TEXTURE1_SGIS, v.vf[5], v.vf[6]);
 
                 vec3_t nv = {
-                    .x = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                    .y = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                    .z = v[2]
+                    .x = v.v.x + 8 * sin(v.v.y * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
+                    .y = v.v.y + 8 * sin(v.v.x * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
+                    .z = v.v.z
                 };
                 glVertex3fv(nv.v);
             }
@@ -554,14 +545,14 @@ void DrawGLWaterPoly(glpoly_p p) {
     GL_DisableMultitexture();
 
     glBegin(GL_TRIANGLE_FAN); {
-        float_p v = p->verts[0];
-        for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-            glTexCoord2f(v[3], v[4]);
+        for (int i = 0; i < p->numverts; i++) {
+            glVert_t v = p->verts[i];
+            glTexCoord2f(v.vf[3], v.vf[4]);
 
             vec3_t nv = {
-                .x = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                .y = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                .z = v[2]
+                .x = v.v.x + 8 * sin(v.v.y * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
+                .y = v.v.y + 8 * sin(v.v.x * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
+                .z = v.v.z
             };
 
             glVertex3fv(nv.v);
@@ -573,14 +564,14 @@ void DrawGLWaterPolyLightmap(glpoly_p p) {
     GL_DisableMultitexture();
 
     glBegin(GL_TRIANGLE_FAN); {
-        float_p v = p->verts[0];
-        for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-            glTexCoord2f(v[5], v[6]);
+        for (int i = 0; i < p->numverts; i++) {
+            glVert_t v = p->verts[i];
+            glTexCoord2f(v.vf[5], v.vf[6]);
 
             vec3_t nv = {
-                .x = v[0] + 8 * sin(v[1] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                .y = v[1] + 8 * sin(v[0] * 0.05 + realtime) * sin(v[2] * 0.05 + realtime),
-                .z = v[2]
+                .x = v.v.x + 8 * sin(v.v.y * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
+                .y = v.v.y + 8 * sin(v.v.x * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
+                .z = v.v.z
             };
 
             glVertex3fv(nv.v);
@@ -595,9 +586,9 @@ DrawGLPoly
 */
 void DrawGLPoly(glpoly_p p) {
     glBegin(GL_POLYGON); {
-        float_p v = p->verts[0];
-        for (int i = 0; i < p->numverts; i++, v += VERTEXSIZE) {
-            glTexCoord2f(v[3], v[4]);   glVertex3fv(v);
+        for (int i = 0; i < p->numverts; i++) {
+            glVert_t v = p->verts[i];
+            glTexCoord2f(v.vf[3], v.vf[4]);   glVertex3fv(v.vf);
         }
     } glEnd();
 }
@@ -665,9 +656,9 @@ void R_BlendLightmaps() {
                 DrawGLWaterPolyLightmap(p);
             else {
                 glBegin(GL_POLYGON); {
-                    float_p v = p->verts[0];
-                    for (int j = 0; j < p->numverts; j++, v += VERTEXSIZE) {
-                        glTexCoord2f(v[5], v[6]);   glVertex3fv(v);
+                    for (int j = 0; j < p->numverts; j++) {
+                        glVert_t v = p->verts[i];
+                        glTexCoord2f(v.vf[5], v.vf[6]);   glVertex3fv(v.vf);
                     }
                 } glEnd();
             }
@@ -980,12 +971,12 @@ void R_DrawBrushModel(r_Entity_p e) {
     bool rotated;
     {
         vec3_t  mins, maxs;
-        if (e->angles.v[0] ||
-            e->angles.v[1] ||
-            e->angles.v[2]
+        if (e->angles.pitch ||
+            e->angles.yaw ||
+            e->angles.roll
             ) {
             rotated = true;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < VECT_DIM; i++) {
                 mins.v[i] = e->origin.v[i] - clmodel->radius;
                 maxs.v[i] = e->origin.v[i] + clmodel->radius;
             }
@@ -1033,9 +1024,9 @@ void R_DrawBrushModel(r_Entity_p e) {
     }
 
     glPushMatrix();
-    e->angles.v[0] = -e->angles.v[0];    // stupid quake bug
+    e->angles.pitch = -e->angles.pitch;    // stupid quake bug
     R_RotateForEntity(e);
-    e->angles.v[0] = -e->angles.v[0];    // stupid quake bug
+    e->angles.pitch = -e->angles.pitch;    // stupid quake bug
 
     //
     // draw texture
@@ -1108,9 +1099,9 @@ void R_RecursiveWorldNode(mNode_p node) {
 
         double dot;
         switch (plane->type) {
-        case PLANE_X: { dot = modelorg.v[0] - plane->dist; } break;
-        case PLANE_Y: { dot = modelorg.v[1] - plane->dist; } break;
-        case PLANE_Z: { dot = modelorg.v[2] - plane->dist; } break;
+        case PLANE_X: { dot = modelorg.x - plane->dist; } break;
+        case PLANE_Y: { dot = modelorg.y - plane->dist; } break;
+        case PLANE_Z: { dot = modelorg.z - plane->dist; } break;
         default: { dot = DotProduct(modelorg, plane->normal) - plane->dist; } break;
         }
 
@@ -1310,7 +1301,11 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
     //
     // draw texture
     //
+#if 0
     glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (lnumverts - 4) * VERTEXSIZE * sizeof(float));
+#else
+    glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (lnumverts - 4) * sizeof(glVert_t));
+#endif
     poly->next = fa->polys;
     poly->flags = fa->flags;
     fa->polys = poly;
@@ -1322,11 +1317,11 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
         vec3_t vec;
         if (lindex > 0) {
             mEdge_p r_pedge = &pedges[lindex];
-            vec = r_pcurrentvertbase[r_pedge->v[0]].position;
+            vec = r_pcurrentvertbase[r_pedge->v16[0]].position;
         }
         else {
             mEdge_p r_pedge = &pedges[-lindex];
-            vec = r_pcurrentvertbase[r_pedge->v[1]].position;
+            vec = r_pcurrentvertbase[r_pedge->v16[1]].position;
         }
 
         float s = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[0])) + fa->texinfo->vecs[0][3]; // TODO: fix this workaround
@@ -1336,8 +1331,8 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
         t /= fa->texinfo->texture->height;
 
         VectorCopy(vec, (vec3_p)(&poly->verts[i]));
-        poly->verts[i][3] = s;
-        poly->verts[i][4] = t;
+        poly->verts[i].tx.s = s;
+        poly->verts[i].tx.t = t;
 
         //
         // lightmap texture coordinates
@@ -1354,8 +1349,8 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
         t += 8;
         t /= BLOCK_HEIGHT * 16; //fa->texinfo->texture->height;
 
-        poly->verts[i][5] = s;
-        poly->verts[i][6] = t;
+        poly->verts[i].lMap.s = s;
+        poly->verts[i].lMap.t = t;
     }
 
     //
@@ -1377,12 +1372,16 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
 
             // skip co-linear points
 #define COLINEAR_EPSILON 0.001
-            if ((fabs(v1.v[0] - v2.v[0]) <= COLINEAR_EPSILON) &&
-                (fabs(v1.v[1] - v2.v[1]) <= COLINEAR_EPSILON) &&
-                (fabs(v1.v[2] - v2.v[2]) <= COLINEAR_EPSILON)) {
+            if ((fabs(v1.x - v2.x) <= COLINEAR_EPSILON) &&
+                (fabs(v1.y - v2.y) <= COLINEAR_EPSILON) &&
+                (fabs(v1.z - v2.z) <= COLINEAR_EPSILON)) {
                 for (int j = i + 1; j < lnumverts; ++j) {
+#if 0
                     for (int k = 0; k < VERTEXSIZE; ++k)
                         poly->verts[j - 1][k] = poly->verts[j][k];
+#else
+                        poly->verts[j - 1] = poly->verts[j];
+#endif
                 }
                 --lnumverts;
                 ++nColinElim;

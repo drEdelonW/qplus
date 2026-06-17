@@ -59,7 +59,7 @@ void Chase_Update() {
             forward.v[i] * chase_back.value -
             right.v[i] * chase_right.value;
     }
-    _chaseDest.v[2] = r_refdef.vieworg.v[2] + chase_up.value;
+    _chaseDest.z = r_refdef.vieworg.z + chase_up.value;
 
     // find the spot the player is looking at
     vec3_t dest;  VectorMA(r_refdef.vieworg, 4096, forward, &dest);
@@ -70,8 +70,8 @@ void Chase_Update() {
     float dist = DotProduct(stop, forward);
     CLAMP_LESS(dist, 1);
 
-    r_refdef.viewangles.v[PITCH] =
-        -atan(stop.v[2] / dist) /
+    r_refdef.viewangles.pitch =
+        -atan(stop.z / dist) /
         M_PI * 180;
 
     // move towards destination

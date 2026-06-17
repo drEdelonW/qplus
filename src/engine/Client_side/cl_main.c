@@ -169,12 +169,12 @@ void CL_PrintEntities_f() {
             ent->frame,
 
             ent->origin.x,
-            ent->origin.v[1],
-            ent->origin.v[2],
+            ent->origin.y,
+            ent->origin.z,
 
             ent->angles.pitch,
-            ent->angles.v[1],
-            ent->angles.v[2]
+            ent->angles.yaw,
+            ent->angles.roll
         );
     }
 }
@@ -365,7 +365,7 @@ void CL_RelinkEntities() {
 
         // rotate binary objects locally
         if (ent->model->flags & EF_ROTATE)
-            ent->angles.v[1] = bobjrotate;
+            ent->angles.yaw = bobjrotate;
 
         if (ent->effects & EF_BRIGHTFIELD)
             R_EntityParticles(ent);
@@ -377,7 +377,7 @@ void CL_RelinkEntities() {
 
             dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, &dl->origin);
-            dl->origin.v[2] += 16;
+            dl->origin.z += 16;
             vec3_t fv, rv, uv;  AngleVectors(ent->angles, &fv, &rv, &uv);
 
             VectorMA(dl->origin, 18, fv, &dl->origin);
@@ -388,7 +388,7 @@ void CL_RelinkEntities() {
         if (ent->effects & EF_BRIGHTLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
             VectorCopy(ent->origin, &dl->origin);
-            dl->origin.v[2] += 16;
+            dl->origin.z += 16;
             dl->radius = (float)(400 + (rand() & 31));
             dl->die = (float)(cl.time + 0.001);
         }

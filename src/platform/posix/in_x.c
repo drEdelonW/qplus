@@ -321,23 +321,23 @@ void IN_Move(UserCmd_p cmd) {
     if ((in.strafe.state & 1) || (lookstrafe.value && (in.mlook.state & 1)))
         cmd->sidemove += m_side.value * mouse_x;
     else
-        cl.viewangles.v[YAW] -= m_yaw.value * mouse_x;    // mouseLook
+        cl.viewangles.yaw -= m_yaw.value * mouse_x;    // mouseLook
     if (in.mlook.state & 1)
         V_StopPitchDrift();
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {  // mouseLook
-        cl.viewangles.v[PITCH] += m_pitch.value * mouse_y;
+        cl.viewangles.pitch += m_pitch.value * mouse_y;
 #if 0
-        if (cl.viewangles.v[PITCH] > 80)
-            cl.viewangles.v[PITCH] = 80;
+        if (cl.viewangles.pitch > 80)
+            cl.viewangles.pitch = 80;
 #else
-        CLAMP_MAX(cl.viewangles.v[PITCH], 80);  // down look
+        CLAMP_MAX(cl.viewangles.pitch, 80);  // down look
 #endif
 #if 0
-        if (cl.viewangles.v[PITCH] < -70)
-            cl.viewangles.v[PITCH] = -70;
+        if (cl.viewangles.pitch < -70)
+            cl.viewangles.pitch = -70;
 #else
-        CLAMP_MIN(cl.viewangles.v[PITCH], -70);   // up look
+        CLAMP_MIN(cl.viewangles.pitch, -70);   // up look
 #endif
     }
     else {

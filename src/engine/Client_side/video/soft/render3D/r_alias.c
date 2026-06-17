@@ -121,31 +121,31 @@ bool R_AliasCheckBBox() {
     basepts[0].x =
         basepts[1].x =
         basepts[2].x =
-        basepts[3].x = (float)pframedesc->bboxmin.v[0];
+        basepts[3].x = (float)pframedesc->bboxmin.v8[0];
     basepts[4].x =
         basepts[5].x =
         basepts[6].x =
-        basepts[7].x = (float)pframedesc->bboxmax.v[0];
+        basepts[7].x = (float)pframedesc->bboxmax.v8[0];
 
     // y worldspace coordinates
     basepts[0].y =
         basepts[3].y =
         basepts[5].y =
-        basepts[6].y = (float)pframedesc->bboxmin.v[1];
+        basepts[6].y = (float)pframedesc->bboxmin.v8[1];
     basepts[1].y =
         basepts[2].y =
         basepts[4].y =
-        basepts[7].y = (float)pframedesc->bboxmax.v[1];
+        basepts[7].y = (float)pframedesc->bboxmax.v8[1];
 
     // z worldspace coordinates
     basepts[0].z =
         basepts[1].z =
         basepts[4].z =
-        basepts[5].z = (float)pframedesc->bboxmin.v[2];
+        basepts[5].z = (float)pframedesc->bboxmin.v8[2];
     basepts[2].z =
         basepts[3].z =
         basepts[6].z =
-        basepts[7].z = (float)pframedesc->bboxmax.v[2];
+        basepts[7].z = (float)pframedesc->bboxmax.v8[2];
 
     bool zclipped = false;
     bool zfullyclipped = true;
@@ -252,7 +252,7 @@ R_AliasTransformVector
 ================
 */
 void R_AliasTransformVector(vec3_t in, vec3_p out) {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < VECT_DIM; i++)
         out->v[i] = DotProduct(in, *(vec3_p)&aliastransform.m[i][0]) + aliastransform.m[i][3];
 }
 
@@ -278,10 +278,10 @@ void R_AliasPreparePoints() {
         else {
             R_AliasProjectFinalVert(fv, av);
 
-            if (fv->v[0] < r_refdef.aliasvrect.x)       fv->flags |= ALIAS_LEFT_CLIP;
-            if (fv->v[1] < r_refdef.aliasvrect.y)       fv->flags |= ALIAS_TOP_CLIP;
-            if (fv->v[0] > r_refdef.aliasvrectright)    fv->flags |= ALIAS_RIGHT_CLIP;
-            if (fv->v[1] > r_refdef.aliasvrectbottom)   fv->flags |= ALIAS_BOTTOM_CLIP;
+            if (fv->v32[0] < r_refdef.aliasvrect.x)       fv->flags |= ALIAS_LEFT_CLIP;
+            if (fv->v32[1] < r_refdef.aliasvrect.y)       fv->flags |= ALIAS_TOP_CLIP;
+            if (fv->v32[0] > r_refdef.aliasvrectright)    fv->flags |= ALIAS_RIGHT_CLIP;
+            if (fv->v32[1] > r_refdef.aliasvrectbottom)   fv->flags |= ALIAS_BOTTOM_CLIP;
         }
     }
 
@@ -345,9 +345,9 @@ void R_AliasSetUpTransform(int trivial_accept) {
     // TODO: could cache lazily, stored in the entity
 
     vec3_t angles = {
-        .pitch =  -currententity->angles.v[PITCH],
-        .yaw = currententity->angles.v[YAW],
-        .roll = currententity->angles.v[ROLL]
+        .pitch =  -currententity->angles.pitch,
+        .yaw = currententity->angles.yaw,
+        .roll = currententity->angles.roll
     };
     AngleVectors(angles, &_aliasForward, &_aliasRight, &_aliasUp);
 
@@ -413,16 +413,16 @@ R_AliasTransformFinalVert
 */
 void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stVert_p pstverts) {
     vec3_t tv = {
-        .x = pverts->v[0],
-        .y = pverts->v[1],
-        .z = pverts->v[2],
+        .x = pverts->v8[0],
+        .y = pverts->v8[1],
+        .z = pverts->v8[2],
     };
     av->fv.x = DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3];
     av->fv.y = DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3];
     av->fv.z = DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3];
 
-    fv->v[2] = pstverts->s;
-    fv->v[3] = pstverts->t;
+    fv->v32[2] = pstverts->s;
+    fv->v32[3] = pstverts->t;
 
     fv->flags = pstverts->onseam;
 
@@ -440,7 +440,7 @@ void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, 
             temp = 0;
     }
 
-    fv->v[4] = temp;
+    fv->v32[4] = temp;
 }
 
 
@@ -457,9 +457,9 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
     for (int i = 0; i < r_anumverts; i++, fv++, pverts++, pstverts++) {
         // transform and project
         vec3_t tv = {
-            .x = pverts->v[0],
-            .y = pverts->v[1],
-            .z = pverts->v[2],
+            .x = pverts->v8[0],
+            .y = pverts->v8[1],
+            .z = pverts->v8[2],
         };
         float zi = 1.0f /
             (DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3]);
@@ -467,13 +467,13 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
         // x, y, and z are scaled down by 1/2**31 in the transform, so 1/z is
         // scaled up by 1/2**31, and the scaling cancels out for x and y in the
         // projection
-        fv->v[5] = zi;
+        fv->v32[5] = zi;
 
-        fv->v[0] = ((DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3]) * zi) + aliasxcenter;
-        fv->v[1] = ((DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3]) * zi) + aliasycenter;
+        fv->v32[0] = ((DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3]) * zi) + aliasxcenter;
+        fv->v32[1] = ((DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3]) * zi) + aliasycenter;
 
-        fv->v[2] = pstverts->s;
-        fv->v[3] = pstverts->t;
+        fv->v32[2] = pstverts->s;
+        fv->v32[3] = pstverts->t;
         fv->flags = pstverts->onseam;
 
         // lighting
@@ -490,7 +490,7 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
                 temp = 0;
         }
 
-        fv->v[4] = temp;
+        fv->v32[4] = temp;
     }
 }
 
@@ -506,10 +506,10 @@ void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av) {
     // project points
     float zi = 1.0 / av->fv.z;
 
-    fv->v[5] = zi * _ziscale;
+    fv->v32[5] = zi * _ziscale;
 
-    fv->v[0] = (av->fv.x * aliasxscale * zi) + aliasxcenter;
-    fv->v[1] = (av->fv.y * aliasyscale * zi) + aliasycenter;
+    fv->v32[0] = (av->fv.x * aliasxscale * zi) + aliasxcenter;
+    fv->v32[1] = (av->fv.y * aliasyscale * zi) + aliasycenter;
 }
 
 

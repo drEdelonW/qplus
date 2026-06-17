@@ -18,15 +18,20 @@ typedef enum {
 } SurfaceFlags_e;
 
 #ifdef GLQUAKE
-#   if 1
+#   if 0
 #       define VERTEXSIZE 7
 #   else
-typedef struct {
-    vec3_t  v;
-    vec2_t  tx;
-    vec2_t  lMap;
+typedef union {
+    struct {
+        vec3_t  v;      // 0, 1, 2,
+        vec2_t  tx;     // 3, 4,
+        vec2_t  lMap;   // 5, 6
+    };
+    float vf[7];
 } glVert_t;
 typedef glVert_t* glVert_p;
+STATIC_ASSERT_SIZE(glVert_t, 7 * sizeof(vec_t));
+
 #   endif
 
 typedef struct glpoly_s glpoly_t;
@@ -36,12 +41,12 @@ struct glpoly_s {
     glpoly_p    chain;
     int         numverts;
     int         flags;   // for SURF_UNDERWATER
-#if 1
+#if 0
     float       verts[4][VERTEXSIZE]; // variable sized (xyz s1t1 s2t2)
 #else
     glVert_t    verts[4];
 #endif
-    };
+};
 #endif
 
 #include "Surface_pre.h"

@@ -95,7 +95,7 @@ float V_CalcBob() {
 
     float bob = sqrt(
         (cl.velocity.x * cl.velocity.x) +
-        (cl.velocity.v[1] * cl.velocity.v[1])
+        (cl.velocity.y * cl.velocity.y)
     ) * cl_bob.value;
     //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
     bob = bob * 0.3 + bob * 0.7 * sin(cycle);
@@ -602,8 +602,8 @@ void CalcGunAngle() {
     static float _oldYaw = 0;
     static float _oldPitch = 0;
 
-    float yaw = r_refdef.viewangles.v[YAW];
-    yaw = angledelta(yaw - r_refdef.viewangles.v[YAW]) * 0.4;
+    float yaw = r_refdef.viewangles.yaw;
+    yaw = angledelta(yaw - r_refdef.viewangles.yaw) * 0.4;
     CLAMP(-10, yaw, 10);
     float move = host_frametime * 20;
     if (yaw > _oldYaw) {
@@ -630,12 +630,12 @@ void CalcGunAngle() {
     _oldYaw = yaw;
     _oldPitch = pitch;
 
-    cl.viewent.angles.v[YAW] = r_refdef.viewangles.v[YAW] + yaw;
+    cl.viewent.angles.yaw = r_refdef.viewangles.yaw + yaw;
     cl.viewent.angles.pitch = -(r_refdef.viewangles.pitch + pitch);
 
-    cl.viewent.angles.v[ROLL] -= v_idlescale.value * sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value;
+    cl.viewent.angles.roll -= v_idlescale.value * sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value;
     cl.viewent.angles.pitch -= v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
-    cl.viewent.angles.v[YAW] -= v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
+    cl.viewent.angles.yaw -= v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
 }
 
 /*
@@ -650,8 +650,8 @@ void V_BoundOffsets() {
     // so the view can never be inside a solid wall
 
     CLAMP(ent->origin.x - 14, r_refdef.vieworg.x, ent->origin.x + 14);
-    CLAMP(ent->origin.v[1] - 14, r_refdef.vieworg.v[1], ent->origin.v[1] + 14);
-    CLAMP(ent->origin.v[2] - 22, r_refdef.vieworg.v[2], ent->origin.v[2] + 30);
+    CLAMP(ent->origin.y - 14, r_refdef.vieworg.y, ent->origin.y + 14);
+    CLAMP(ent->origin.z - 22, r_refdef.vieworg.z, ent->origin.z + 30);
 }
 
 /*
@@ -662,9 +662,9 @@ Idle swaying
 ==============
 */
 void V_AddIdle() {
-    r_refdef.viewangles.v[ROLL] += v_idlescale.value * sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value;
+    r_refdef.viewangles.roll += v_idlescale.value * sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value;
     r_refdef.viewangles.pitch += v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
-    r_refdef.viewangles.v[YAW] += v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
+    r_refdef.viewangles.yaw += v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
 }
 
 
@@ -677,16 +677,16 @@ Roll is induced by movement and damage
 */
 void V_CalcViewRoll() {
     float side = V_CalcRoll(cl_entities[cl.viewentity].angles, cl.velocity);
-    r_refdef.viewangles.v[ROLL] += side;
+    r_refdef.viewangles.roll += side;
 
     if (_v_DmgTime > 0) {
-        r_refdef.viewangles.v[ROLL] += _v_DmgTime / v_kicktime.value * _v_DmgRoll;
+        r_refdef.viewangles.roll += _v_DmgTime / v_kicktime.value * _v_DmgRoll;
         r_refdef.viewangles.pitch += _v_DmgTime / v_kicktime.value * _v_DmgPitch;
         _v_DmgTime -= host_frametime;
     }
 
     if (cl.stats[STAT_HEALTH] <= 0) {
-        r_refdef.viewangles.v[ROLL] = 80; // dead view angle
+        r_refdef.viewangles.roll = 80; // dead view angle
         return;
     }
 
@@ -729,21 +729,21 @@ void V_CalcRefdef() {
 
 
     // transform the view offset by the model's matrix to get the offset from model origin for the view
-    ent->angles.v[YAW] = cl.viewangles.v[YAW]; // the model should face the view dir
+    ent->angles.yaw = cl.viewangles.yaw; // the model should face the view dir
     ent->angles.pitch = -cl.viewangles.pitch; // the model should face the view dir
 
 
     float bob = V_CalcBob();
     // refresh position
     VectorCopy(ent->origin, &r_refdef.vieworg);
-    r_refdef.vieworg.v[2] += cl.viewheight + bob;
+    r_refdef.vieworg.z += cl.viewheight + bob;
 
     // never let it sit exactly on a node line, because a water plane can
     // dissapear when viewed with the eye exactly on it.
     // the server protocol only specifies to 1/16 pixel, so add 1/32 in each axis
     r_refdef.vieworg.x += 1.0 / 32;
-    r_refdef.vieworg.v[1] += 1.0 / 32;
-    r_refdef.vieworg.v[2] += 1.0 / 32;
+    r_refdef.vieworg.y += 1.0 / 32;
+    r_refdef.vieworg.z += 1.0 / 32;
 
     VectorCopy(cl.viewangles, &r_refdef.viewangles);
     V_CalcViewRoll();
@@ -752,8 +752,8 @@ void V_CalcRefdef() {
     vec3_t angles = {
         // offsets
        .x = -ent->angles.pitch,  /* angles[PITCH] */ // because entity pitches are actually backward
-       .y = ent->angles.v[YAW],   /* angles[YAW] */
-       .z = ent->angles.v[ROLL]   /* angles[ROLL] */
+       .y = ent->angles.yaw,   /* angles[YAW] */
+       .z = ent->angles.roll   /* angles[ROLL] */
     };
 
     //vec3_t forward, right, up;
@@ -774,14 +774,14 @@ void V_CalcRefdef() {
     CalcGunAngle();
 
     VectorCopy(ent->origin, &view->origin);
-    view->origin.v[2] += cl.viewheight;
+    view->origin.z += cl.viewheight;
 
     for (int i = 0; i < VECT_DIM; i++) {
         view->origin.v[i] += forward.v[i] * bob * 0.4;
         //  view->origin[i] += right[i]*bob*0.4;
         //  view->origin[i] += up[i]*bob*0.8;
     }
-    view->origin.v[2] += bob;
+    view->origin.z += bob;
 
     // fudge position around to keep amount of weapon visible
     // roughly equal with different FOV
@@ -789,10 +789,10 @@ void V_CalcRefdef() {
 #if 0
     if (cl.model_precache[cl.stats[STAT_WEAPON]] && strcmp(cl.model_precache[cl.stats[STAT_WEAPON]]->name, "progs/v_shot2.mdl")) {}
 #endif
-    if (scr_viewsize.value == 110)      view->origin.v[2] += 1;
-    else if (scr_viewsize.value == 100) view->origin.v[2] += 2;
-    else if (scr_viewsize.value == 90)  view->origin.v[2] += 1;
-    else if (scr_viewsize.value == 80)  view->origin.v[2] += 0.5;
+    if (scr_viewsize.value == 110)      view->origin.z += 1;
+    else if (scr_viewsize.value == 100) view->origin.z += 2;
+    else if (scr_viewsize.value == 90)  view->origin.z += 1;
+    else if (scr_viewsize.value == 80)  view->origin.z += 0.5;
 
     view->model = cl.model_precache[cl.stats[STAT_WEAPON]];
     view->frame = cl.stats[STAT_WEAPONFRAME];
@@ -803,7 +803,7 @@ void V_CalcRefdef() {
 
     // smooth out stair step ups
     if ((cl.onground) &&
-        ((ent->origin.v[2] - _oldZ) > 0)) {
+        ((ent->origin.z - _oldZ) > 0)) {
 
         float steptime = cl.time - cl.oldtime;
         if (steptime < 0) {
@@ -812,12 +812,12 @@ void V_CalcRefdef() {
         }
 
         _oldZ += steptime * 80;
-        if (_oldZ > ent->origin.v[2])         _oldZ = ent->origin.v[2];
-        if ((ent->origin.v[2] - _oldZ) > 12)  _oldZ = ent->origin.v[2] - 12;
-        r_refdef.vieworg.v[2] += _oldZ - ent->origin.v[2];
-        view->origin.v[2] += _oldZ - ent->origin.v[2];
+        if (_oldZ > ent->origin.z)         _oldZ = ent->origin.z;
+        if ((ent->origin.z - _oldZ) > 12)  _oldZ = ent->origin.z - 12;
+        r_refdef.vieworg.z += _oldZ - ent->origin.z;
+        view->origin.z += _oldZ - ent->origin.z;
     }
-    else { _oldZ = ent->origin.v[2]; }
+    else { _oldZ = ent->origin.z; }
 
     if (chase_active.value)
         Chase_Update();
@@ -860,7 +860,7 @@ void V_RenderView() {
         vid.rowbytes <<= 1;
         vid.aspect *= 0.5;
 
-        r_refdef.viewangles.v[YAW] -= lcd_yaw.value;
+        r_refdef.viewangles.yaw -= lcd_yaw.value;
         for (int i = 0; i < VECT_DIM; i++)
             r_refdef.vieworg.v[i] -= right.v[i] * lcd_x.value;
         R_RenderView();
@@ -869,7 +869,7 @@ void V_RenderView() {
 
         R_PushDlights();
 
-        r_refdef.viewangles.v[YAW] += lcd_yaw.value * 2;
+        r_refdef.viewangles.yaw += lcd_yaw.value * 2;
         for (int i = 0; i < VECT_DIM; i++)
             r_refdef.vieworg.v[i] += 2 * right.v[i] * lcd_x.value;
         R_RenderView();

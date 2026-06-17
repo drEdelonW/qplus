@@ -186,8 +186,12 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
                         .z = base.z
                     };
                     for (int l = 0; l < VECT_DIM; l++) {
+#if 0
                         if (transformed.v[l] < rmin.v[l])   rmin.v[l] = transformed.v[l];
                         if (transformed.v[l] > rmax.v[l])   rmax.v[l] = transformed.v[l];
+#else
+                        CLAMP(rmin.v[l], transformed.v[l], rmax.v[l]);
+#endif
                     }
                 }
             }
@@ -367,11 +371,11 @@ void PF_vectoyaw() {
     vec3_t value1 = G_VECTOR(OFS_PARM0);
 
     float yaw;
-    if ((value1.v[1] == 0.0f) &&
-        (value1.v[0] == 0.0f))      // TODO: replace to x/pitch
+    if ((value1.y == 0.0f) &&
+        (value1.x == 0.0f))      // TODO: replace to x/pitch
         yaw = 0.0f;
     else {
-        yaw = (float)(atan2(value1.v[1], value1.v[0]) * 180 / M_PI);
+        yaw = (float)(atan2(value1.y, value1.x) * 180 / M_PI);
         if (yaw < 0.0f)    yaw += 360.0f;
     }
 
@@ -389,18 +393,18 @@ void PF_vectoangles() {
     float yaw, pitch;
     vec3_t value1 = G_VECTOR(OFS_PARM0);
 
-    if ((value1.v[1] == 0.0f) &&
-        (value1.v[0] == 0.0f)) {    // TODO: replace to x/pitch
+    if ((value1.y == 0.0f) &&
+        (value1.x == 0.0f)) {    // TODO: replace to x/pitch
         yaw = 0;
-        if (value1.v[2] > 0.0f)  pitch = 90.0f;
-        else                pitch = 270.0f;
+        if (value1.z > 0.0f)    pitch = 90.0f;
+        else                    pitch = 270.0f;
     }
     else {
-        yaw = (float)(atan2(value1.v[1], value1.v[0]) * 180 / M_PI);
+        yaw = (float)(atan2(value1.y, value1.x) * 180 / M_PI);
         if (yaw < 0.0f)    yaw += 360.0f;
 
-        float forward = (float)sqrt((value1.v[0] * value1.v[0]) + (value1.v[1] * value1.v[1]));
-        pitch = (float)(atan2(value1.v[2], forward) * 180 / M_PI);
+        float forward = (float)sqrt((value1.x * value1.x) + (value1.y * value1.y));
+        pitch = (float)(atan2(value1.z, forward) * 180 / M_PI);
         if (pitch < 0.0f)  pitch += 360.0f;
     }
 

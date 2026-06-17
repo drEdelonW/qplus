@@ -389,10 +389,10 @@ void CL_ParseUpdate(update_bits_t bits) {
 
     ent->msg_origins[0].x = (bits & U_ORIGIN1) ? MSG_ReadCoord() : ent->baseline.origin.x;
     ent->msg_angles[0].pitch = (bits & U_ANGLE1) ? MSG_ReadAngle() : ent->baseline.angles.pitch;
-    ent->msg_origins[0].v[1] = (bits & U_ORIGIN2) ? MSG_ReadCoord() : ent->baseline.origin.v[1];
-    ent->msg_angles[0].v[1] = (bits & U_ANGLE2) ? MSG_ReadAngle() : ent->baseline.angles.v[1];
-    ent->msg_origins[0].v[2] = (bits & U_ORIGIN3) ? MSG_ReadCoord() : ent->baseline.origin.v[2];
-    ent->msg_angles[0].v[2] = (bits & U_ANGLE3) ? MSG_ReadAngle() : ent->baseline.angles.v[2];
+    ent->msg_origins[0].y = (bits & U_ORIGIN2) ? MSG_ReadCoord() : ent->baseline.origin.y;
+    ent->msg_angles[0].yaw = (bits & U_ANGLE2) ? MSG_ReadAngle() : ent->baseline.angles.yaw;
+    ent->msg_origins[0].z = (bits & U_ORIGIN3) ? MSG_ReadCoord() : ent->baseline.origin.z;
+    ent->msg_angles[0].roll = (bits & U_ANGLE3) ? MSG_ReadAngle() : ent->baseline.angles.roll;
 
     if (bits & U_NOLERP)
         ent->forcelink = true;

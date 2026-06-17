@@ -402,7 +402,7 @@ void R_DrawSprite() {
         // generate the sprite's axes, parallel to the viewplane, but rotated in
         // that plane around the center according to the sprite entity's roll
         // angle. So vpn stays the same, but vright and vup rotate
-        float angle = currententity->angles.v[ROLL] * (M_PI * 2 / 360);
+        float angle = currententity->angles.roll * (M_PI * 2 / 360);
         float sr = sin(angle);
         float cr = cos(angle);
 
