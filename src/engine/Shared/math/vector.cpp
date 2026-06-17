@@ -191,3 +191,10 @@ vec3_t/*void*/  VectorScale(vec3_t const in, vec_t const scale/*, vec3_p out */ 
 #endif
     return out;
 }
+
+vec3_t VectorAddVal(vec3_t v, vec_t val) {
+    v.x += val;
+    v.y += val;
+    v.z += val;
+    return v;
+}

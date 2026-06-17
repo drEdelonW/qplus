@@ -97,11 +97,17 @@ void DrawPuff(puff_p p) {
             d = 0;
         }
 
+#if 0
         for (int j = 0; j < VECT_DIM; j++) {
             pts[i][0][j] = p->origin.v[j] + p->up.v[j] * s + p->reflect.v[j] * d;
             pts[i][1][j] = p->origin.v[j] + p->right.v[j] * s + p->reflect.v[j] * d;
-            pts[i][2][j] = p->origin.v[j] + -p->right.v[j] * s + p->reflect.v[j] * d;
+            pts[i][2][j] = p->origin.v[j] + p->right.v[j] * -s + p->reflect.v[j] * d;
         }
+#else
+        pts[i][0] = VectorMA(VectorMA(p->origin, s, p->up), d, p->reflect);
+        pts[i][1] = VectorMA(VectorMA(p->origin, s, p->right), d, p->reflect);
+        pts[i][2] = VectorMA(VectorMA(p->origin, -s, p->right), d, p->reflect);
+#endif
     }
 
     glColor3f(1, 0, 0);

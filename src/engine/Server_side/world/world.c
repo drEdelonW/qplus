@@ -363,10 +363,15 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
             if (v > max)
                 max = v;
         }
+#if 0
         for (int i = 0; i < VECT_DIM; i++) {
             ent->v.absmin[i] = ent->v.origin[i] - max;
             ent->v.absmax[i] = ent->v.origin[i] + max;
         }
+#else
+        ent->v.absmin = VectorSubtract(ent->v.origin, vec3_scalar(max));
+        ent->v.absmax = VectorAdd(ent->v.origin, vec3_scalar(max));
+#endif
     }
     else
 #endif
@@ -571,10 +576,13 @@ bool SV_RecursiveHullCheck(
     CLAMP(0.0, frac, 1.0);
 
     float midf = p1f + (p2f - p1f) * frac;
+#if 0
     vec3_t  mid;
     for (int i = 0; i < VECT_DIM; i++)
         mid.v[i] = p1.v[i] + frac * (p2.v[i] - p1.v[i]);
-
+#else
+    vec3_t mid = VectorMA(p1, frac, VectorSubtract(p2, p1));
+#endif
 
     int side = (t1 < 0);
 
@@ -616,9 +624,13 @@ bool SV_RecursiveHullCheck(
             return false;
         }
         midf = p1f + (p2f - p1f) * frac;
+#if 0
         for (int i = 0; i < VECT_DIM; i++) {
             mid.v[i] = p1.v[i] + frac * (p2.v[i] - p1.v[i]);
         }
+#else
+        mid = VectorMA(p1, frac, VectorSubtract(p2, p1));
+#endif
     }
 
     trace->fraction = midf;

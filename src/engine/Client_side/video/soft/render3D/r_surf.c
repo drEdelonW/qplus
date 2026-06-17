@@ -77,15 +77,18 @@ void R_AddDynamicLights() {
 
         minlight = rad - minlight;
 
+#if 0
         vec3_t impact;
         for (int i = 0; i < VECT_DIM; i++) {
             impact.v[i] = cl_dlights[lnum].origin.v[i] - surf->plane->normal.v[i] * dist;   // impact = cl_dlights[lnum].origin - (surf->plane->normal * dist);
         }
-
+#else
+        vec3_t impact = VectorMA(cl_dlights[lnum].origin, -dist, surf->plane->normal);
+#endif
         vec3_t local = {
             .x = DotProduct(impact, *(vec3_p)tex->vecs[0]) + tex->vecs[0][3] - surf->texturemins[0],
             .y = DotProduct(impact, *(vec3_p)tex->vecs[1]) + tex->vecs[1][3] - surf->texturemins[1]
-        };
+    };
 
         for (int t = 0; t < tmax; t++) {
             int td = local.v[1] - t * 16;
@@ -112,9 +115,9 @@ void R_AddDynamicLights() {
                     blocklights[t * smax + s] += (rad - dist) * 256;
 #endif
             }
+                }
+            }
         }
-    }
-}
 
 /*
 ===============

@@ -69,10 +69,10 @@ extern "C" {
 
     void    VectorCopy(vec3_t const in, vec3_p out); // src/engine/Client_side/video/soft/render3D/r_alias.c:383
 
-    vec3_t/*void*/  VectorAdd(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ );         // va + vb
-    vec3_t/*void*/  VectorSubtract(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ );    // va - vb
-    vec3_t/*void*/  VectorScale(vec3_t const in, vec_t const scale /*, vec3_p out */ );         // va + s
-    vec3_t/*void*/  VectorMA(vec3_t veca, float scale, vec3_t vecb /*, vec3_p vecc */ );        // va + (vb * s)
+    vec3_t  VectorAdd(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ );         // va + vb
+    vec3_t  VectorSubtract(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ );    // va - vb
+    vec3_t  VectorScale(vec3_t const in, vec_t const scale /*, vec3_p out */ );         // va + s
+    vec3_t  VectorMA(vec3_t veca, float scale, vec3_t vecb /*, vec3_p vecc */ );        // va + (vb * s)
 
     void    VectorInverse(vec3_p v);                            // va = -va
     bool    VectorCompare(vec3_t const v1, vec3_t const v2);    // va == vb (all dimension)
@@ -80,13 +80,13 @@ extern "C" {
     float   VectorNormalize(vec3_p v);
 
     vec_t   DotProduct(vec3_t const v1, vec3_t const v2);
-    vec3_t/*void*/  CrossProduct(vec3_t const v1, vec3_t const v2 /*, vec3_p cross */ );
+    vec3_t  CrossProduct(vec3_t const v1, vec3_t const v2 /*, vec3_p cross */ );
 
-    vec3_t/*void*/  PerpendicularVector(/* vec3_p dst, */ const vec3_t src);
-    vec3_t/*void*/  ProjectPointOnPlane(/* vec3_p dst, */ const vec3_t p, const vec3_t normal);
+    vec3_t  PerpendicularVector(/* vec3_p dst, */ const vec3_t src);
+    vec3_t  ProjectPointOnPlane(/* vec3_p dst, */ const vec3_t p, const vec3_t normal);
 
-    vec3_t/*void*/  TransformVector(vec3_t in /*, vec3_p out */ );
-
+    vec3_t  TransformVector(vec3_t in /*, vec3_p out */ );  // TODO: move from  src/engine/Client_side/video/soft/render3D/r_misc.c
+    vec3_t  VectorAddVal(vec3_t v, vec_t val);
 
 #ifdef __cplusplus
 }

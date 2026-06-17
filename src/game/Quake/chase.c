@@ -52,6 +52,7 @@ void Chase_Update() {
     // if can't see player, reset
     vec3_t forward, up, right;  AngleVectors(cl.viewangles, &forward, &right, &up);
 
+#if 0
     // calc exact destination
     for (int i = 0; i < VECT_DIM; i++) {
         _chaseDest.v[i] =
@@ -60,9 +61,17 @@ void Chase_Update() {
             right.v[i] * chase_right.value;
     }
     _chaseDest.z = r_refdef.vieworg.z + chase_up.value;
+#else
+    // Using VectorMA for the base XY plane displacement
+    _chaseDest = VectorMA(r_refdef.vieworg, -chase_back.value, forward);
+    _chaseDest = VectorMA(_chaseDest, -chase_right.value, right);
+
+    // Applying vertical offset
+    _chaseDest.z = r_refdef.vieworg.z + chase_up.value;
+#endif
 
     // find the spot the player is looking at
-    vec3_t dest = VectorMA(r_refdef.vieworg, 4096, forward);
+    vec3_t dest = VectorMA(r_refdef.vieworg, 4096, forward );
     vec3_t stop;  TraceLine(r_refdef.vieworg, dest, &stop);
 
     // calculate pitch to look at the same spot from camera

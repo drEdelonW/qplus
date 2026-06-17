@@ -401,8 +401,12 @@ void CL_UpdateTEnts() {
             ent->angles.yaw = yaw;
             ent->angles.roll = (float)(rand() % 360);
 
+#if 0
             for (i = 0; i < VECT_DIM; i++)
                 org.v[i] += dist.v[i] * 30;
+#else
+            org = VectorMA(org, 30, dist);
+#endif
             d -= 30;
         }
     }

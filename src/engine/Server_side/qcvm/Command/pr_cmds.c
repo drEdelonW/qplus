@@ -764,9 +764,17 @@ void PF_findradius() {
             (ent->v.solid == SOLID_NOT))
             continue;
 
+#if 0
         vec3_t eorg;
         for (int j = 0; j < VECT_DIM; j++) // eorg -= ent->v.origin + (ent->v.mins + ent->v.maxs) * 0.5;
             eorg.v[j] = org.v[j] - (ent->v.origin.v[j] + (ent->v.mins.v[j] + ent->v.maxs.v[j]) * 0.5f);
+#else
+        vec3_t eorg = VectorSubtract(org,
+            VectorAdd(ent->v.origin,
+                VectorScale(VectorAdd(ent->v.mins, ent->v.maxs), 0.5f)
+            )
+        );
+#endif
 
         if (Length(eorg) > rad) continue;
 
@@ -1119,12 +1127,18 @@ void PF_aim() {
             continue; // don't aim at teammate
         }
 
+#if 0
         for (int j = 0; j < VECT_DIM; j++) {
             end.v[j] =
                 check->v.origin.v[j] +
                 0.5f * (check->v.mins.v[j] +
                     check->v.maxs.v[j]);
         }
+#else
+        vec3_t end = VectorAdd(check->v.origin,
+            VectorScale(VectorAdd(check->v.mins, check->v.maxs), 0.5f)
+        );
+#endif
         dir = VectorSubtract(end, start);
         VectorNormalize(&dir);
         float dist = DotProduct(dir, pr_global_struct->v_forward);
@@ -1206,10 +1220,10 @@ MESSAGE WRITING
 */
 
 typedef enum msg_dest_e {
-    MSG_BROADCAST   = 0u,  // unreliable to all
-    MSG_ONE         = 1u,  // reliable to one (msg_entity)
-    MSG_ALL         = 2u,  // reliable to all
-    MSG_INIT        = 3u   // write to the init string
+    MSG_BROADCAST = 0u,  // unreliable to all
+    MSG_ONE = 1u,  // reliable to one (msg_entity)
+    MSG_ALL = 2u,  // reliable to all
+    MSG_INIT = 3u   // write to the init string
 } msg_dest_e;
 
 sizebuf_p WriteDest() {

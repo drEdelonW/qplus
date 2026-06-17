@@ -178,10 +178,15 @@ void R_AddEfrags(r_Entity_p ent) {
     r_pefragtopnode = NULL;
 
     Model_p entmodel = ent->model;
+#if 0
     for (int i = 0; i < VECT_DIM; i++) {
         r_emins.v[i] = ent->origin.v[i] + entmodel->mins.v[i];
         r_emaxs.v[i] = ent->origin.v[i] + entmodel->maxs.v[i];
     }
+#else
+    r_emins = VectorAdd(ent->origin, entmodel->mins);
+    r_emaxs = VectorAdd(ent->origin, entmodel->maxs);
+#endif
 
     R_SplitEntityOnNode(cl.worldmodel->nodes);
     ent->topnode = r_pefragtopnode;

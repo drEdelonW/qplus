@@ -170,7 +170,7 @@ void SV_Accelerate(vec3_t wishvel) {
         accelspeed = addspeed;
 
     for (int i = 0; i < VECT_DIM; i++)
-        velocity[i] += accelspeed * pushvec[i];
+        velocity.v[i] += accelspeed * pushvec.v[i];
 }
 #endif
 void SV_Accelerate() {
@@ -183,8 +183,12 @@ void SV_Accelerate() {
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
+#if 0
     for (int i = 0; i < VECT_DIM; i++)
         _velocity->v[i] += accelspeed * _wishDir.v[i];
+#else
+    * _velocity = VectorMA(*_velocity, accelspeed, _wishDir);
+#endif
 }
 
 void SV_AirAccelerate(vec3_t wishveloc) {
@@ -202,8 +206,12 @@ void SV_AirAccelerate(vec3_t wishveloc) {
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
+#if 0
     for (int i = 0; i < VECT_DIM; i++)
         _velocity->v[i] += accelspeed * wishveloc.v[i];
+#else
+    * _velocity = VectorMA(*_velocity, accelspeed, wishveloc);
+#endif
 }
 
 
@@ -226,9 +234,13 @@ void SV_WaterMove() {
     // user intentions
     AngleVectors(sv_player->v.v_angle, &_forward, &_right, &_up);
 
+#if 0
     vec3_t wishvel;
     for (int i = 0; i < VECT_DIM; i++)
         wishvel.v[i] = _forward.v[i] * cmd.forwardmove + _right.v[i] * cmd.sidemove;
+#else
+    vec3_t wishvel = VectorMA(VectorScale(_forward, cmd.forwardmove), cmd.sidemove, _right);
+#endif
 
     if (!(cmd.forwardmove) &&
         !(cmd.sidemove) &&
@@ -267,8 +279,12 @@ void SV_WaterMove() {
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
+#if 0
     for (int i = 0; i < VECT_DIM; i++)
         _velocity->v[i] += accelspeed * wishvel.v[i];
+#else
+    * _velocity = VectorMA(*_velocity, accelspeed, wishvel);
+#endif
 }
 
 void SV_WaterJump() {
@@ -300,10 +316,13 @@ void SV_AirMove() {
         (fmove < 0.0f)
         )
         fmove = 0.0f;
-
+#if 0
     vec3_t  wishvel;
     for (int i = 0; i < VECT_DIM; i++)
         wishvel.v[i] = _forward.v[i] * fmove + _right.v[i] * smove;
+#else
+    vec3_t wishvel = VectorMA(VectorScale(_forward, fmove), smove, _right);
+#endif
 
     if ((int)sv_player->v.movetype != MOVETYPE_WALK)
         wishvel.z = cmd.upmove;
@@ -387,8 +406,6 @@ void SV_ReadClientMove(UserCmd_p move) {
     remoteClient->num_pings++;
 
     // read current angles
-    // for (int i = 0; i < VECT_DIM; i++)
-    //     angle[i] = MSG_ReadAngle();
     vec3_t angle = {
         .x = MSG_ReadAngle(),
         .y = MSG_ReadAngle(),

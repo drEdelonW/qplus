@@ -78,17 +78,25 @@ void R_RenderDlight(dLight_p light) {
 
     glBegin(GL_TRIANGLE_FAN); {
         glColor3f(0.2, 0.1, 0.0);
+#if 0
         for (int i = 0; i < VECT_DIM; i++)
             v.v[i] = light->origin.v[i] - vpn.v[i] * rad;
+#else
+        v = VectorMA(light->origin, -rad, vpn);
+#endif
 
         glVertex3fv(v.v);
         glColor3f(0, 0, 0);
         for (int i = 16; i >= 0; i--) {
             float a = i / 16.0 * M_PI * 2;
+#if 0
             for (int j = 0; j < VECT_DIM; j++)
                 v.v[j] = (light->origin.v[j] +
                     vright.v[j] * cos(a) * rad +
                     vup.v[j] * sin(a) * rad);
+#else
+            v = 
+#endif
             glVertex3fv(v.v);
         }
     } glEnd();

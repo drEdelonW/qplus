@@ -299,6 +299,7 @@ void CL_RelinkEntities() {
     cl_numvisedicts = 0;
 
     // interpolate player info
+#if 0
     for (int i = 0; i < VECT_DIM; i++)
         cl.velocity.v[i] = (
             cl.mvelocity[1].v[i] +
@@ -306,7 +307,10 @@ void CL_RelinkEntities() {
                 cl.mvelocity[0].v[i] -
                 cl.mvelocity[1].v[i])
             );
-
+#else
+    cl.velocity = VectorMA(cl.mvelocity[1], frac, VectorSubtract(cl.mvelocity[0], cl.mvelocity[1]));
+#endif
+            
     if (cls.demoplayback) {
         // interpolate the angles
         for (int j = 0; j < VECT_DIM; j++) {
