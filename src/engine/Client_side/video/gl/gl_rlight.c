@@ -70,7 +70,7 @@ void AddLightBlend(float r, float g, float b, float a2) {
 void R_RenderDlight(dLight_p light) {
     float rad = light->radius * 0.35;
 
-    vec3_t v; VectorSubtract(light->origin, r_origin, &v);
+    vec3_t v = VectorSubtract(light->origin, r_origin);
     if (Length(v) < rad) {    // view is inside the dlight
         AddLightBlend(1, 0.5, 0, light->radius * 0.0003);
         return;
@@ -230,7 +230,7 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
     if ((back < 0) == side)     return -1;        // didn't hit anuthing
 
     // check for impact on this node
-    VectorCopy(mid, &lightspot);
+    lightspot = mid;
     lightplane = plane;
 
     mSurface_p surf = cl.worldmodel->surfaces + node->firstsurface;

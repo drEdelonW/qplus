@@ -795,8 +795,8 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
         mod->firstModelSurface = bm->firstface;
         mod->numModelSurfaces = bm->numfaces;
 
-        VectorCopy(bm->maxs, &mod->maxs);
-        VectorCopy(bm->mins, &mod->mins);
+        mod->maxs = bm->maxs;
+        mod->mins = bm->mins;
         mod->radius = RadiusFromBounds(mod->mins, mod->maxs);
 
         mod->numleafs = bm->visleafs;

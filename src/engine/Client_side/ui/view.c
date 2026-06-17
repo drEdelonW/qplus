@@ -289,7 +289,7 @@ void V_ParseDamage() {
     //
     r_Entity_p ent = &cl_entities[cl.viewentity];
 
-    VectorSubtract(from, ent->origin, &from);
+    from = VectorSubtract(from, ent->origin);
     VectorNormalize(&from);
 
     // vec3_t forward, right, up;
@@ -703,8 +703,8 @@ void V_CalcIntermissionRefdef() {
     r_Entity_p ent = &cl_entities[cl.viewentity];    // ent is the player model (visible when out of body)
     r_Entity_p view = &cl.viewent;    // view is the weapon model (only visible from inside body)
 
-    VectorCopy(ent->origin, &r_refdef.vieworg);
-    VectorCopy(ent->angles, &r_refdef.viewangles);
+    r_refdef.vieworg = ent->origin;
+    r_refdef.viewangles = ent->angles;
     view->model = NULL;
 
     // allways idle in intermission
@@ -735,7 +735,7 @@ void V_CalcRefdef() {
 
     float bob = V_CalcBob();
     // refresh position
-    VectorCopy(ent->origin, &r_refdef.vieworg);
+    r_refdef.vieworg = ent->origin;
     r_refdef.vieworg.z += cl.viewheight + bob;
 
     // never let it sit exactly on a node line, because a water plane can
@@ -745,7 +745,7 @@ void V_CalcRefdef() {
     r_refdef.vieworg.y += 1.0 / 32;
     r_refdef.vieworg.z += 1.0 / 32;
 
-    VectorCopy(cl.viewangles, &r_refdef.viewangles);
+    r_refdef.viewangles = cl.viewangles;
     V_CalcViewRoll();
     V_AddIdle();
 
@@ -769,11 +769,11 @@ void V_CalcRefdef() {
 
     V_BoundOffsets();
 
-    VectorCopy(cl.viewangles, &view->angles);    // set up gun position
+    view->angles = cl.viewangles;    // set up gun position
 
     CalcGunAngle();
 
-    VectorCopy(ent->origin, &view->origin);
+    view->origin = ent->origin;
     view->origin.z += cl.viewheight;
 
     for (int i = 0; i < VECT_DIM; i++) {
@@ -799,7 +799,7 @@ void V_CalcRefdef() {
     view->colormap = vid.colormap;
 
     // set up the refresh position
-    VectorAdd(r_refdef.viewangles, cl.punchangle, &r_refdef.viewangles);
+    r_refdef.viewangles = VectorAdd(r_refdef.viewangles, cl.punchangle);
 
     // smooth out stair step ups
     if ((cl.onground) &&

@@ -125,8 +125,8 @@ void CL_ParseBeam(Model_p m) {
             b->entity = ent;
             b->model = m;
             b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2f);
-            VectorCopy(start, &b->start);
-            VectorCopy(end, &b->end);
+            b->start = start;
+            b->end = end;
             return;
         }
 
@@ -137,8 +137,8 @@ void CL_ParseBeam(Model_p m) {
             b->entity = ent;
             b->model = m;
             b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2f);
-            VectorCopy(start, &b->start);
-            VectorCopy(end, &b->end);
+            b->start = start;
+            b->end = end;
             return;
         }
 
@@ -226,7 +226,7 @@ void CL_ParseTEnt() {
         };
         R_ParticleExplosion(pos);
         dLight_p dl = CL_AllocDlight(0);
-        VectorCopy(pos, &dl->origin);
+        dl->origin = pos;
         dl->radius = 350;
         dl->die = (LegacyTimeDelta_t)(cl.time + 0.5f);
         dl->decay = 300;
@@ -279,7 +279,7 @@ void CL_ParseTEnt() {
         int colorLength = MSG_ReadByte();
         R_ParticleExplosion2(pos, colorStart, colorLength);
         dLight_p dl = CL_AllocDlight(0);
-        VectorCopy(pos, &dl->origin);
+        dl->origin = pos;
         dl->radius = 350;
         dl->die = (LegacyTimeDelta_t)(cl.time + 0.5f);
         dl->decay = 300;
@@ -312,7 +312,7 @@ void CL_ParseTEnt() {
         R_RocketTrail(pos, endpos, 0 + 128);
         R_ParticleExplosion(endpos);
         dLight_p dl = CL_AllocDlight(-1);
-        VectorCopy(endpos, &dl->origin);
+        dl->origin = endpos;
         dl->radius = 350;
         dl->die = (LegacyTimeDelta_t)cl.time + 0.5f;
         dl->decay = 300;
@@ -363,11 +363,11 @@ void CL_UpdateTEnts() {
 
         // if coming from the player, update the start position
         if (b->entity == cl.viewentity) {
-            VectorCopy(cl_entities[cl.viewentity].origin, &b->start);
+            b->start = cl_entities[cl.viewentity].origin;
         }
 
         // calculate pitch and yaw
-        vec3_t dist;    VectorSubtract(b->end, b->start, &dist);
+        vec3_t dist = VectorSubtract(b->end, b->start);
 
         float yaw, pitch;
         if ((dist.y == 0.0f) &&
@@ -389,13 +389,13 @@ void CL_UpdateTEnts() {
         }
 
         // add new entities for the lightning
-        vec3_t org; VectorCopy(b->start, &org);
+        vec3_t org = b->start;
         float d = VectorNormalize(&dist);
         while (d > 0) {
             r_Entity_p  ent = CL_NewTempEntity();
             if (!ent)
                 return;
-            VectorCopy(org, &ent->origin);
+            ent->origin = org;
             ent->model = b->model;
             ent->angles.pitch = pitch;
             ent->angles.yaw = yaw;

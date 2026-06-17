@@ -212,23 +212,23 @@ void R_DrawSpriteModel(r_Entity_p e) {
         glBegin(GL_QUADS); {
 
             glTexCoord2f(0, 1);
-            VectorMA(e->origin, frame->down, up, &point);
-            VectorMA(point, frame->left, right, &point);
+            point = VectorMA(e->origin, frame->down, up);
+            point = VectorMA(point, frame->left, right);
             glVertex3fv(point.v);
 
             glTexCoord2f(0, 0);
-            VectorMA(e->origin, frame->up, up, &point);
-            VectorMA(point, frame->left, right, &point);
+            point = VectorMA(e->origin, frame->up, up);
+            point = VectorMA(point, frame->left, right);
             glVertex3fv(point.v);
 
             glTexCoord2f(1, 0);
-            VectorMA(e->origin, frame->up, up, &point);
-            VectorMA(point, frame->right, right, &point);
+            point = VectorMA(e->origin, frame->up, up);
+            point = VectorMA(point, frame->right, right);
             glVertex3fv(point.v);
 
             glTexCoord2f(1, 1);
-            VectorMA(e->origin, frame->down, up, &point);
-            VectorMA(point, frame->right, right, &point);
+            point = VectorMA(e->origin, frame->down, up);
+            point = VectorMA(point, frame->right, right);
             glVertex3fv(point.v);
 
         } glEnd();
@@ -402,15 +402,15 @@ void R_DrawAliasModel(r_Entity_p e) {
 
     Model_p clmodel = currententity->model;
 
-    VectorAdd(currententity->origin, clmodel->mins, &mins);
-    VectorAdd(currententity->origin, clmodel->maxs, &maxs);
+    mins = VectorAdd(currententity->origin, clmodel->mins);
+    maxs = VectorAdd(currententity->origin, clmodel->maxs);
 
     if (R_CullBox(mins, maxs))
         return;
 
 
-    VectorCopy(currententity->origin, &r_entorigin);
-    VectorSubtract(r_origin, r_entorigin, &modelorg);
+    r_entorigin = currententity->origin;
+    modelorg = VectorSubtract(r_origin, r_entorigin);
 
     //
     // get lighting information
@@ -426,11 +426,9 @@ void R_DrawAliasModel(r_Entity_p e) {
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
         if (cl_dlights[lnum].die >= cl.time) {
-            vec3_t  dist;
-            VectorSubtract(
+            vec3_t  dist = VectorSubtract(
                 currententity->origin,
-                cl_dlights[lnum].origin,
-                &dist
+                cl_dlights[lnum].origin
             );
             float add = cl_dlights[lnum].radius - Length(dist);
 
@@ -624,7 +622,7 @@ void R_DrawViewModel() {
         if (!dl->radius)        continue;
         if (dl->die < cl.time)  continue;
 
-        vec3_t dist; VectorSubtract(currententity->origin, dl->origin, &dist);
+        vec3_t dist = VectorSubtract(currententity->origin, dl->origin);
         float add = dl->radius - Length(dist);
         if (add > 0)
             ambientlight += add;
@@ -695,12 +693,10 @@ int SignbitsForPlane(mPlane_p out) {
 void R_SetFrustum() {
     if (r_refdef.fov_x == 90.0f) {
         // front side is visible
-
-        VectorAdd(vpn, vright, &frustum[0].normal);
-        VectorSubtract(vpn, vright, &frustum[1].normal);
-
-        VectorAdd(vpn, vup, &frustum[2].normal);
-        VectorSubtract(vpn, vup, &frustum[3].normal);
+        frustum[0].normal = VectorAdd(vpn, vright);
+        frustum[1].normal = VectorSubtract(vpn, vright);
+        frustum[2].normal = VectorAdd(vpn, vup);
+        frustum[3].normal = VectorSubtract(vpn, vup);
     }
     else {
         RotatePointAroundVector(&frustum[0].normal, vup, vpn, -(90 - r_refdef.fov_x / 2));       // rotate VPN right by FOV_X/2 degrees
@@ -733,7 +729,7 @@ void R_SetupFrame() {
     r_framecount++;
 
     // build the transformation matrix for the given view angles
-    VectorCopy(r_refdef.vieworg, &r_origin);
+    r_origin = r_refdef.vieworg;
 
     AngleVectors(r_refdef.viewangles, &vpn, &vright, &vup);
 
@@ -915,11 +911,11 @@ void R_Mirror() {
 
     {
         float d = DotProduct(r_refdef.vieworg, mirror_plane->normal) - mirror_plane->dist;
-        VectorMA(r_refdef.vieworg, -2 * d, mirror_plane->normal, &r_refdef.vieworg);
+        r_refdef.vieworg = VectorMA(r_refdef.vieworg, -2 * d, mirror_plane->normal);
     }
     {
         float d = DotProduct(vpn, mirror_plane->normal);
-        VectorMA(vpn, -2 * d, mirror_plane->normal, &vpn);
+        vpn = VectorMA(vpn, -2 * d, mirror_plane->normal);
     }
     r_refdef.viewangles.pitch = -asin(vpn.z) / M_PI * 180;
     r_refdef.viewangles.yaw = atan2(vpn.y, vpn.x) / M_PI * 180;

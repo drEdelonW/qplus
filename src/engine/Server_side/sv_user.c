@@ -162,8 +162,7 @@ SV_Accelerate
 void SV_Accelerate(vec3_t wishvel) {
     if (_wishSpeed == 0) return;
 
-    vec3_t  pushvec;
-    VectorSubtract(wishvel, velocity, pushvec);
+    vec3_t pushvec = VectorSubtract(wishvel, velocity);
     float addspeed = VectorNormalize(pushvec);
 
     float accelspeed = sv_accelerate.value * host_frametime * addspeed;
@@ -214,7 +213,7 @@ void DropPunchAngle() {
     len -= (float)(10.0 * host_frametime);
     if (len < 0)
         len = 0;
-    VectorScale(sv_player->v.punchangle, len, &sv_player->v.punchangle);
+    sv_player->v.punchangle = VectorScale(sv_player->v.punchangle, len);
 }
 
 /*
@@ -240,7 +239,7 @@ void SV_WaterMove() {
 
     _wishSpeed = Length(wishvel);
     if (_wishSpeed > sv_maxspeed.value) {
-        VectorScale(wishvel, sv_maxspeed.value / _wishSpeed, &wishvel);
+        wishvel = VectorScale(wishvel, sv_maxspeed.value / _wishSpeed);
         _wishSpeed = sv_maxspeed.value;
     }
     _wishSpeed *= 0.7f;
@@ -252,7 +251,7 @@ void SV_WaterMove() {
         newspeed = (float)(speed - host_frametime * speed * sv_friction.value);
         if (newspeed < 0)
             newspeed = 0;
-        VectorScale(*_velocity, newspeed / speed, _velocity);
+        *_velocity = VectorScale(*_velocity, newspeed / speed);
     }
     else
         newspeed = 0;
@@ -311,15 +310,15 @@ void SV_AirMove() {
     else
         wishvel.z = 0.0f;
 
-    VectorCopy(wishvel, &_wishDir);
+    _wishDir = wishvel;
     _wishSpeed = VectorNormalize(&_wishDir);
     if (_wishSpeed > sv_maxspeed.value) {
-        VectorScale(wishvel, sv_maxspeed.value / _wishSpeed, &wishvel);
+        wishvel = VectorScale(wishvel, sv_maxspeed.value / _wishSpeed);
         _wishSpeed = sv_maxspeed.value;
     }
 
     if (sv_player->v.movetype == MOVETYPE_NOCLIP) { // noclip
-        VectorCopy(wishvel, _velocity);
+        *_velocity = wishvel;
     }
     else if (_onGround) {
         SV_UserFriction();
@@ -357,7 +356,7 @@ void SV_ClientThink() {
     vec3_p _angles = &sv_player->v.angles;
 
     vec3_t v_angle;
-    VectorAdd(sv_player->v.v_angle, sv_player->v.punchangle, &v_angle);
+    v_angle = VectorAdd(sv_player->v.v_angle, sv_player->v.punchangle);
     _angles->roll = V_CalcRoll(sv_player->v.angles, sv_player->v.velocity) * 4;
     if (!(sv_player->v.fixangle)) {
         _angles->pitch = -v_angle.pitch / 3;
@@ -396,7 +395,7 @@ void SV_ReadClientMove(UserCmd_p move) {
         .z = MSG_ReadAngle()
     };
 
-    VectorCopy(angle, &remoteClient->edict->v.v_angle);
+    remoteClient->edict->v.v_angle = angle;
 
     // read movement
     move->forwardmove = MSG_ReadShort();

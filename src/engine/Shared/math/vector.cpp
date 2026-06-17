@@ -8,7 +8,8 @@
 /*
 ** assumes "src" is normalized
 */
-void PerpendicularVector(vec3_p dst, const vec3_t src) {
+vec3_t/*void*/  PerpendicularVector(/* vec3_p dst, */ const vec3_t src) {
+    vec3_t out;
     float minelem = 1.0f;
 
     // find the smallest magnitude axially aligned vector
@@ -22,11 +23,13 @@ void PerpendicularVector(vec3_p dst, const vec3_t src) {
     vec3_t tempvec = { .x = 0.0f, .y = 0.0f, .z = 0.0f };
     tempvec.v[pos] = 1.0f;
 
-    ProjectPointOnPlane(dst, tempvec, src); // project the point onto the plane defined by src
-    VectorNormalize(dst);    // normalize the result
+    out = ProjectPointOnPlane(tempvec, src); // project the point onto the plane defined by src
+    VectorNormalize(&out);    // normalize the result
+    return out;
 }
 
-void ProjectPointOnPlane(vec3_p dst, const vec3_t p, const vec3_t normal) {
+vec3_t/*void*/  ProjectPointOnPlane(/* vec3_p dst, */ const vec3_t p, const vec3_t normal) {
+    vec3_t out;
     float inv_denom = 1.0F / DotProduct(normal, normal);
     float d = DotProduct(normal, p) * inv_denom;
 
@@ -36,9 +39,10 @@ void ProjectPointOnPlane(vec3_p dst, const vec3_t p, const vec3_t normal) {
         .z = normal.z * inv_denom
     };
 
-    dst->x = p.x - d * n.x;
-    dst->y = p.y - d * n.y;
-    dst->z = p.z - d * n.z;
+    out.x = p.x - d * n.x;
+    out.y = p.y - d * n.y;
+    out.z = p.z - d * n.z;
+    return out;
 }
 
 bool VectorCompare(vec3_t const v1, vec3_t const v2) {
@@ -48,16 +52,18 @@ bool VectorCompare(vec3_t const v1, vec3_t const v2) {
     return true;
 }
 
-void VectorMA(vec3_t veca, float scale, vec3_t vecb, vec3_p vecc) {
+vec3_t/*void*/ VectorMA(vec3_t veca, float scale, vec3_t vecb /*, vec3_p vecc */ ) {
+    vec3_t out;
 #if 1
     Vector3D aV(veca);
     Vector3D bV(vecb);
-    (aV + (bV * scale)).toVec3(vecc);
+    (aV + (bV * scale)).toVec3(&out);
 #else
-    vecc->x = veca.x + scale * vecb.x;
-    vecc->y = veca.y + scale * vecb.y;
-    vecc->z = veca.z + scale * vecb.z;
+    out.x = veca.x + scale * vecb.x;
+    out.y = veca.y + scale * vecb.y;
+    out.z = veca.z + scale * vecb.z;
 #endif
+    return out;
 }
 
 vec_t DotProduct(vec3_t const v1, vec3_t const v2) {
@@ -73,28 +79,32 @@ vec_t DotProduct(vec3_t const v1, vec3_t const v2) {
 #endif
 }
 
-void VectorSubtract(vec3_t const veca, vec3_t const vecb, vec3_p out) {
+vec3_t/*void*/ VectorSubtract(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ ) {
+    vec3_t out;
 #if 1
     Vector3D aV(veca);
     Vector3D bV(vecb);
-    (aV - bV).toVec3(out);
+    (aV - bV).toVec3(&out);
 #else
-    out[0] = veca[0] - vecb[0];
-    out[1] = veca[1] - vecb[1];
-    out[2] = veca[2] - vecb[2];
+    out.x = veca.x - vecb.x;
+    out.y = veca.y - vecb.y;
+    out.z = veca.z - vecb.z;
 #endif
+    return out;
 }
 
-void VectorAdd(vec3_t const veca, vec3_t const vecb, vec3_p out) {
+vec3_t/*void*/ VectorAdd(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ ) {
+    vec3_t out;
 #if 1
     Vector3D aV(veca);
     Vector3D bV(vecb);
-    (aV + bV).toVec3(out);
+    (aV + bV).toVec3(&out);
 #else
-    out->x = veca.x + vecb.x;
-    out->y = veca.y + vecb.y;
-    out->z = veca.z + vecb.z;
+    out.x = veca.x + vecb.x;
+    out.y = veca.y + vecb.y;
+    out.z = veca.z + vecb.z;
 #endif
+    return out;
 }
 
 void VectorCopy(vec3_t const in, vec3_p out) {
@@ -108,16 +118,18 @@ void VectorCopy(vec3_t const in, vec3_p out) {
 #endif
 }
 
-void CrossProduct(vec3_t const v1, vec3_t const v2, vec3_p cross) {
+vec3_t/*void*/  CrossProduct(vec3_t const v1, vec3_t const v2 /*, vec3_p cross */ ) {
+    vec3_t out;
 #if 1
     Vector3D aV(v1);
     Vector3D bV(v2);
-    aV.cross(v2).toVec3(cross);
+    aV.cross(v2).toVec3(&out);
 #else
-    cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
-    cross[1] = v1[2] * v2[0] - v1[0] * v2[2];
-    cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
+    out.x = v1.y * v2.z - v1.z * v2.y;
+    out.y = v1.z * v2.x - v1.x * v2.z;
+    out.z = v1.x * v2.y - v1.y * v2.x;
 #endif
+    return out;
 }
 
 
@@ -167,13 +179,15 @@ void VectorInverse(vec3_p v) {
 #endif
 }
 
-void VectorScale(vec3_t const in, vec_t scale, vec3_p out) {
+vec3_t/*void*/  VectorScale(vec3_t const in, vec_t const scale/*, vec3_p out */ ) {
+    vec3_t out;
 #if 1
     Vector3D V(in);
-    (V * scale).toVec3(out);
+    (V * scale).toVec3(&out);
 #else
-    out[0] = in[0] * scale;
-    out[1] = in[1] * scale;
-    out[2] = in[2] * scale;
+    out.x = in.x * scale;
+    out.y = in.y * scale;
+    out.z = in.z * scale;
 #endif
+    return out;
 }

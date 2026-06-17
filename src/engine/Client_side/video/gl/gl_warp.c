@@ -220,7 +220,7 @@ void EmitSkyPolys(mSurface_p fa) {
         glBegin(GL_POLYGON); {
             for (int i = 0; i < p->numverts; i++) {
                 glVert_t v = p->verts[i];
-                vec3_t dir; VectorSubtract(v.v, r_origin, &dir);
+                vec3_t dir = VectorSubtract(v.v, r_origin);
                 dir.z *= 3; // flatten the sphere
 
                 float length =  // TODO: replace to length(dir);
@@ -691,7 +691,7 @@ void DrawSkyPolygon(int nump, vec3_t vecs) {
 #if 0
     glBegin(GL_POLYGON); {
         for (int i = 0; i < nump; i++, vecs += 3) {
-            VectorAdd(vecs, r_origin, v);
+            v = VectorAdd(vecs, r_origin, );
             glVertex3fv(v);
         }
     } glEnd();
@@ -701,7 +701,7 @@ void DrawSkyPolygon(int nump, vec3_t vecs) {
     vec3_t v;   VectorCopy(vec3_origin, &v);
     float_p vp = vecs;
     for (int i = 0; i < nump; i++, vp += 3) {
-        VectorAdd(vp, v, &v);
+        v = VectorAdd(vp, v);
     }
     vec3_t av = {
         fabs(v.x),
@@ -849,7 +849,7 @@ void R_DrawSkyChain(mSurface_p s) {
         for (glpoly_p p = fa->polys; p; p = p->next) {
             vec3_t verts[MAX_CLIP_VERTS];
             for (int i = 0; i < p->numverts; i++) {
-                VectorSubtract(p->verts[i], r_origin, verts[i]);
+                verts[i] = VectorSubtract(p->verts[i], r_origin);
             }
             ClipSkyPolygon(p->numverts, verts[0], 0);
         }

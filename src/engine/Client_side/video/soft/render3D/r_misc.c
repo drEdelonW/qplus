@@ -265,7 +265,7 @@ void R_TransformFrustum() {
             .z = v.y * vright.z + v.z * vup.z + v.x * vpn.z
         };
 
-        VectorCopy(v2, &view_clipplanes[i].normal);
+        view_clipplanes[i].normal = v2;
 
         view_clipplanes[i].dist = DotProduct(modelorg, v2);
     }
@@ -279,12 +279,13 @@ void R_TransformFrustum() {
     TransformVector
     ================
 */
-void TransformVector(vec3_t in, vec3_p out) {
-    *out = (vec3_t){
+vec3_t/*void*/  TransformVector(vec3_t in /*, vec3_p out */ ) {
+    vec3_t out = (vec3_t){
         .x = DotProduct(in, vright),
         .y = DotProduct(in, vup),
         .z = DotProduct(in, vpn)
     };
+    return out;
 }
 
 #endif
@@ -299,7 +300,7 @@ void R_TransformPlane(mPlane_p p, vec3_p normal, float_p dist) {
     float d = DotProduct(r_origin, p->normal);
     *dist = p->dist - d;
     // TODO: when we have rotating entities, this will need to use the view matrix
-    TransformVector(p->normal, normal);
+    *normal = TransformVector(p->normal);
 }
 
 
@@ -389,8 +390,8 @@ void R_SetupFrame() {
 #endif
 
     // build the transformation matrix for the given view angles
-    VectorCopy(r_refdef.vieworg, &modelorg);
-    VectorCopy(r_refdef.vieworg, &r_origin);
+    modelorg = r_refdef.vieworg;
+    r_origin = r_refdef.vieworg;
 
     AngleVectors(r_refdef.viewangles, &vpn, &vright, &vup);
 
@@ -457,10 +458,10 @@ void R_SetupFrame() {
     R_TransformFrustum();
 
     // save base values
-    VectorCopy(vpn, &base_vpn);
-    VectorCopy(vright, &base_vright);
-    VectorCopy(vup, &base_vup);
-    VectorCopy(modelorg, &base_modelorg);
+    base_vpn = vpn;
+    base_vright = vright;
+    base_vup = vup;
+    base_modelorg = modelorg;
 
     R_SetSkyFrame();
 

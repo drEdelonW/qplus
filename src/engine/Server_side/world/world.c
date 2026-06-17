@@ -137,22 +137,22 @@ Hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_p offset) {
             )
             Host_SysError("MOVETYPE_PUSH with a non bsp model");
 
-        vec3_t size; VectorSubtract(maxs, mins, &size);
+        vec3_t size = VectorSubtract(maxs, mins);
         if (size.x < 3)         hull = &model->hulls[0];
         else if (size.x <= 32)  hull = &model->hulls[1];
         else                    hull = &model->hulls[2];
 
         // calculate an offset value to center the origin
-        VectorSubtract(hull->clip_mins, mins, offset);
-        VectorAdd(*offset, ent->v.origin, offset);
+        *offset = VectorSubtract(hull->clip_mins, mins);
+        *offset = VectorAdd(*offset, ent->v.origin);
     }
     else { // create a temp hull from bounding box sizes
 
-        vec3_t hullmins; VectorSubtract(ent->v.mins, maxs, &hullmins);
-        vec3_t hullmaxs; VectorSubtract(ent->v.maxs, mins, &hullmaxs);
+        vec3_t hullmins = VectorSubtract(ent->v.mins, maxs);
+        vec3_t hullmaxs = VectorSubtract(ent->v.maxs, mins);
         hull = SV_HullForBox(hullmins, hullmaxs);
 
-        VectorCopy(ent->v.origin, offset);
+        *offset = ent->v.origin;
     }
 
     return hull;
@@ -206,16 +206,15 @@ areaNode_p SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
         return anode;
     }
 
-    vec3_t size; VectorSubtract(maxs, mins, &size);
+    vec3_t size = VectorSubtract(maxs, mins);
     if (size.x > size.y)    anode->axis = AXIS_X;
     else                    anode->axis = AXIS_Y;
 
     anode->dist = 0.5f * (maxs.v[anode->axis] + mins.v[anode->axis]);
-    vec3_t mins1; VectorCopy(mins, &mins1);
-    vec3_t mins2; VectorCopy(mins, &mins2);
-    vec3_t maxs1; VectorCopy(maxs, &maxs1);
-    vec3_t maxs2; VectorCopy(maxs, &maxs2);
-
+    vec3_t mins1 = mins;
+    vec3_t mins2 = mins;
+    vec3_t maxs1 = maxs;
+    vec3_t maxs2 = maxs;
     maxs1.v[anode->axis] = mins2.v[anode->axis] = anode->dist;
 
     anode->children[0] = SV_CreateAreaNode(depth + 1, mins2, maxs2);
@@ -372,8 +371,8 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     else
 #endif
     {
-        VectorAdd(ent->v.origin, ent->v.mins, &ent->v.absmin);
-        VectorAdd(ent->v.origin, ent->v.maxs, &ent->v.absmax);
+        ent->v.absmin = VectorAdd(ent->v.origin, ent->v.mins);
+        ent->v.absmax = VectorAdd(ent->v.origin, ent->v.maxs);
     }
 
     //
@@ -599,11 +598,11 @@ bool SV_RecursiveHullCheck(
     // the other side of the node is solid, this is the impact point
     //==================
     if (!side) {
-        VectorCopy(plane->normal, &trace->plane.normal);
+        trace->plane.normal = plane->normal;
         trace->plane.dist = plane->dist;
     }
     else {
-        VectorSubtract(vec3_origin, plane->normal, &trace->plane.normal);
+        trace->plane.normal = VectorSubtract(vec3_origin, plane->normal);
         trace->plane.dist = -plane->dist;
     }
 
@@ -612,7 +611,7 @@ bool SV_RecursiveHullCheck(
         frac -= 0.1f;
         if (frac < 0) {
             trace->fraction = midf;
-            VectorCopy(mid, &trace->endpos);
+            trace->endpos = mid;
             Con_DPrintf("backup past 0\n");
             return false;
         }
@@ -623,7 +622,7 @@ bool SV_RecursiveHullCheck(
     }
 
     trace->fraction = midf;
-    VectorCopy(mid, &trace->endpos);
+    trace->endpos = mid;
 
     return false;
 }
@@ -642,14 +641,14 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
     trace_t trace;  memset(&trace, 0, sizeof(trace_t));
     trace.fraction = 1;
     trace.allsolid = true;
-    VectorCopy(end, &trace.endpos);
+    trace.endpos = end;
 
     // get the clipping hull
     vec3_t offset;
     Hull_p hull = SV_HullForEntity(ent, mins, maxs, &offset);
 
-    vec3_t start_l; VectorSubtract(start, offset, &start_l);
-    vec3_t end_l; VectorSubtract(end, offset, &end_l);
+    vec3_t start_l = VectorSubtract(start, offset);
+    vec3_t end_l = VectorSubtract(end, offset);
 
 #ifdef QUAKE2
     // rotate start and end into the models frame of reference
@@ -662,12 +661,12 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
         // vec3_t a;
         vec3_t forward, right, up; AngleVectors(ent->v.angles, forward, right, up);
 
-        vec3_t temp; VectorCopy(start_l, temp);
+        vec3_t temp = start_l;
         start_l[0] = DotProduct(temp, forward);
         start_l[1] = -DotProduct(temp, right);
         start_l[2] = DotProduct(temp, up);
 
-        VectorCopy(end_l, temp);
+        temp = end_l;
         end_l[0] = DotProduct(temp, forward);
         end_l[1] = -DotProduct(temp, right);
         end_l[2] = DotProduct(temp, up);
@@ -685,17 +684,17 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
             ent->v.angles[1] ||
             ent->v.angles[2]) &&
         (trace.fraction != 1)) {
-        vec3_t a; VectorSubtract(vec3_origin, ent->v.angles, &a);
+        vec3_t a = VectorSubtract(vec3_origin, ent->v.angles);
         vec3_t forward, right, up;  AngleVectors(a, &forward, &right, &up);
 
         {
-            vec3_t temp; VectorCopy(trace.endpos, &temp);
+            vec3_t temp = trace.endpos;
             trace.endpos.x = DotProduct(temp, forward);
             trace.endpos.y = -DotProduct(temp, right);
             trace.endpos.z = DotProduct(temp, up);
         }
         {
-            vec3_t temp; VectorCopy(trace.plane.normal, &temp);
+            vec3_t temp = trace.plane.normal;
             trace.plane.normal[0] = DotProduct(temp, forward);
             trace.plane.normal[1] = -DotProduct(temp, right);
             trace.plane.normal[2] = DotProduct(temp, up);
@@ -705,7 +704,7 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
 
     // fix trace up by the offset
     if (trace.fraction != 1)
-        VectorAdd(trace.endpos, offset, &trace.endpos);
+        trace.endpos = VectorAdd(trace.endpos, offset);
 
     // did we clip the move?
     if ((trace.fraction < 1) || trace.startsolid)
@@ -842,8 +841,8 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
             clip.maxs2.v[i] = 15.0f;
         }
     else {
-        VectorCopy(mins, &clip.mins2);
-        VectorCopy(maxs, &clip.maxs2);
+        clip.mins2 = mins;
+        clip.maxs2 = maxs;
     }
 
     SV_MoveBounds(start, clip.mins2, clip.maxs2, end, &clip.boxmins, &clip.boxmaxs);  // create the bounding box of the entire move

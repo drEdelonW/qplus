@@ -384,8 +384,8 @@ void CL_ParseUpdate(update_bits_t bits) {
     ent->effects = (bits & U_EFFECTS) ? MSG_ReadByte() : ent->baseline.effects;
 
     // shift the known values for interpolation
-    VectorCopy(ent->msg_origins[0], &ent->msg_origins[1]);
-    VectorCopy(ent->msg_angles[0], &ent->msg_angles[1]);
+    ent->msg_origins[1] = ent->msg_origins[0];
+    ent->msg_angles[1] = ent->msg_angles[0];
 
     ent->msg_origins[0].x = (bits & U_ORIGIN1) ? MSG_ReadCoord() : ent->baseline.origin.x;
     ent->msg_angles[0].pitch = (bits & U_ANGLE1) ? MSG_ReadAngle() : ent->baseline.angles.pitch;
@@ -398,10 +398,10 @@ void CL_ParseUpdate(update_bits_t bits) {
         ent->forcelink = true;
 
     if (forcelink) { // didn't have an update last message
-        VectorCopy(ent->msg_origins[0], &ent->msg_origins[1]);
-        VectorCopy(ent->msg_origins[0], &ent->origin);
-        VectorCopy(ent->msg_angles[0], &ent->msg_angles[1]);
-        VectorCopy(ent->msg_angles[0], &ent->angles);
+        ent->msg_origins[1] = ent->msg_origins[0];
+        ent->origin = ent->msg_origins[0];
+        ent->msg_angles[1] = ent->msg_angles[0];
+        ent->angles = ent->msg_angles[0];
         ent->forcelink = true;
     }
 }
@@ -436,7 +436,7 @@ void CL_ParseClientdata(server_update_bits_t bits) {
     cl.viewheight = (bits & SU_VIEWHEIGHT) ? MSG_ReadChar() : DEFAULT_VIEWHEIGHT;
     cl.idealpitch = (bits & SU_IDEALPITCH) ? MSG_ReadChar() : 0;
 
-    VectorCopy(cl.mvelocity[0], &cl.mvelocity[1]);
+    cl.mvelocity[1] = cl.mvelocity[0];
     for (int i = 0; i < VECT_DIM; i++) {
         cl.punchangle.v[i] = (bits & (SU_PUNCH1 << i)) ? MSG_ReadChar() : 0;
         cl.mvelocity[0].v[i] = (bits & (SU_VELOCITY1 << i)) ? (MSG_ReadChar() * 16) : 0;
@@ -537,8 +537,8 @@ void CL_ParseStatic() {
     ent->skinnum = ent->baseline.skin;
     ent->effects = ent->baseline.effects;
 
-    VectorCopy(ent->baseline.origin, &ent->origin);
-    VectorCopy(ent->baseline.angles, &ent->angles);
+    ent->origin = ent->baseline.origin;
+    ent->angles = ent->baseline.angles;
     R_AddEfrags(ent);
 }
 

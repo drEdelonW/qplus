@@ -40,8 +40,8 @@ is not a staircase.
 // static int c_yes, c_no;
 
 bool SV_CheckBottom(edict_p ent) {
-    vec3_t mins;    VectorAdd(ent->v.origin, ent->v.mins, &mins);
-    vec3_t maxs;    VectorAdd(ent->v.origin, ent->v.maxs, &maxs);
+    vec3_t mins = VectorAdd(ent->v.origin, ent->v.mins);
+    vec3_t maxs = VectorAdd(ent->v.origin, ent->v.maxs);
 
 
     // if all of the points under the corners are solid world, don't bother
@@ -126,15 +126,15 @@ pr_global_struct->trace_normal is set to the normal of the blocking wall
 */
 bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
     // try the move
-    vec3_t oldorg;  VectorCopy(ent->v.origin, &oldorg);
-    vec3_t neworg;  VectorAdd(ent->v.origin, move, &neworg);
+    vec3_t oldorg = ent->v.origin;
+    vec3_t neworg = VectorAdd(ent->v.origin, move);
 
 
     // flying monsters don't step up
     if ((int)ent->v.flags & (FL_SWIM | FL_FLY)) {
         // try one move with vertical motion, then one without
         for (int i = 0; i < 2; i++) {
-            VectorAdd(ent->v.origin, move, &neworg);
+            neworg = VectorAdd(ent->v.origin, move);
             edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
             if (i == 0 && (enemy != Edicts)) {
                 float dz = ent->v.origin.v[Z_AX] - ED_GetEDictByOffs(ent->v.enemy)->v.origin.v[Z_AX];
@@ -148,7 +148,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
                     SV_PointContents(trace.endpos) == CONTENTS_EMPTY)
                     return false; // swim monster left water
 
-                VectorCopy(trace.endpos, &ent->v.origin);
+                ent->v.origin = trace.endpos;
                 if (relink)
                     SV_LinkEdict(ent, true);
                 return true;
@@ -163,7 +163,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
 
     // push down from a step height above the wished position
     neworg.v[Z_AX] += STEPSIZE;
-    vec3_t end; VectorCopy(neworg, &end);
+    vec3_t end = neworg;
     end.v[Z_AX] -= STEPSIZE * 2;
 
     trace_t trace = SV_Move(neworg, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
@@ -180,7 +180,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
     if (trace.fraction == 1) {
         // if monster had the ground pulled out, go ahead and fall
         if ((int)ent->v.flags & FL_PARTIALGROUND) {
-            VectorAdd(ent->v.origin, move, &ent->v.origin);
+            ent->v.origin = VectorAdd(ent->v.origin, move);
             if (relink)
                 SV_LinkEdict(ent, true);
             ent->v.flags = (int)ent->v.flags & ~FL_ONGROUND;
@@ -192,7 +192,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
     }
 
     // check point traces down for dangling corners
-    VectorCopy(trace.endpos, &ent->v.origin);
+    ent->v.origin = trace.endpos;
 
     if (!SV_CheckBottom(ent)) {
         if ((int)ent->v.flags & FL_PARTIALGROUND) { // entity had floor mostly pulled out from underneath it
@@ -201,7 +201,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
                 SV_LinkEdict(ent, true);
             return true;
         }
-        VectorCopy(oldorg, &ent->v.origin);
+        ent->v.origin = oldorg;
         return false;
     }
 
@@ -241,13 +241,13 @@ bool SV_StepDirection(edict_p ent, float yaw, float dist) {
         .z = 0.0f
     };
 
-    vec3_t oldorigin;   VectorCopy(ent->v.origin, &oldorigin);
+    vec3_t oldorigin = ent->v.origin;
     if (SV_movestep(ent, move, false)) {
         float delta = ent->v.angles.yaw - ent->v.ideal_yaw;
         if ((delta > 45) &&
             (delta < 315)  // not turned far enough, so don't take the step
             ) {
-            VectorCopy(oldorigin, &ent->v.origin);
+            ent->v.origin = oldorigin;
         }
         SV_LinkEdict(ent, true);
         return true;

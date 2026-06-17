@@ -161,7 +161,7 @@ void SV_SendServerinfo(RmtClient_p client) {
 */
 void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     // find the client's PVS
-    vec3_t  org;   VectorAdd(clent->v.origin, clent->v.view_ofs, &org);
+    vec3_t  org = VectorAdd(clent->v.origin, clent->v.view_ofs);
     uint8_p pvs = SV_FatPVS(org);
 
     // send over all entities (excpet the client) that touch the pvs
@@ -433,8 +433,8 @@ void SV_CreateBaseline() {
         //
         // create entity baseline
         //
-        VectorCopy(svent->v.origin, &svent->baseline.origin);
-        VectorCopy(svent->v.angles, &svent->baseline.angles);
+        svent->baseline.origin = svent->v.origin;
+        svent->baseline.angles = svent->v.angles;
         svent->baseline.frame = (int32_t)svent->v.frame;
         svent->baseline.skin = (int32_t)svent->v.skin;
         if ((entnum > 0) && (entnum <= svs.maxClients)) {

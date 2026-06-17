@@ -983,8 +983,8 @@ void R_DrawBrushModel(r_Entity_p e) {
         }
         else {
             rotated = false;
-            VectorAdd(e->origin, clmodel->mins, &mins);
-            VectorAdd(e->origin, clmodel->maxs, &maxs);
+            mins = VectorAdd(e->origin, clmodel->mins);
+            maxs = VectorAdd(e->origin, clmodel->maxs);
         }
 
         if (R_CullBox(mins, maxs))
@@ -993,9 +993,9 @@ void R_DrawBrushModel(r_Entity_p e) {
     glColor3f(1, 1, 1);
     memset(lightmap_polys, 0, sizeof(lightmap_polys));
 
-    VectorSubtract(r_refdef.vieworg, e->origin, &modelorg);
+    modelorg = VectorSubtract(r_refdef.vieworg, e->origin);
     if (rotated) {
-        vec3_t temp; VectorCopy(modelorg, &temp);
+        vec3_t temp = modelorg;
         vec3_t forward, right, up; AngleVectors(e->angles, &forward, &right, &up);
         modelorg = (vec3_t){
             .x = DotProduct(temp, forward),
@@ -1177,7 +1177,7 @@ void R_DrawWorld() {
     };
 #endif
 
-    VectorCopy(r_refdef.vieworg, &modelorg);
+    modelorg = r_refdef.vieworg;
 
     currententity = &ent;
     currenttexture = -1;
@@ -1330,7 +1330,7 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
         float t = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[1])) + fa->texinfo->vecs[1][3]; // TODO: fix this workaround
         t /= fa->texinfo->texture->height;
 
-        VectorCopy(vec, (vec3_p)(&poly->verts[i]));
+        poly->verts[i].v = vec;
         poly->verts[i].tx.s = s;
         poly->verts[i].tx.t = t;
 
@@ -1365,9 +1365,9 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
             this = *(vec3_p)(&poly->verts[i]);
             next = *(vec3_p)(&poly->verts[(i + 1) % lnumverts]);
 
-            VectorSubtract(this, prev, &v1);
+            v1 = VectorSubtract(this, prev);
             VectorNormalize(&v1);
-            VectorSubtract(next, prev, &v2);
+            v2 = VectorSubtract(next, prev);
             VectorNormalize(&v2);
 
             // skip co-linear points

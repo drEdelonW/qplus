@@ -298,9 +298,9 @@ D_SpriteCalculateGradients
 =====================
 */
 void D_SpriteCalculateGradients() {
-    vec3_t p_normal; TransformVector(r_spritedesc.vpn, &p_normal);
-    vec3_t p_saxis;  TransformVector(r_spritedesc.vright, &p_saxis);
-    vec3_t p_taxis;  TransformVector(r_spritedesc.vup, &p_taxis);
+    vec3_t p_normal = TransformVector(r_spritedesc.vpn);
+    vec3_t p_saxis = TransformVector(r_spritedesc.vright);
+    vec3_t p_taxis = TransformVector(r_spritedesc.vup);
     VectorInverse(&p_taxis);
 
     float distinv = 1.0 / (-DotProduct(modelorg, r_spritedesc.vpn));
@@ -318,7 +318,7 @@ void D_SpriteCalculateGradients() {
     d_tdivzorigin = p_taxis.z - xcenter * d_tdivzstepu - ycenter * d_tdivzstepv;
     d_ziorigin = p_normal.z * distinv - xcenter * d_zistepu - ycenter * d_zistepv;
 
-    vec3_t p_temp1; TransformVector(modelorg, &p_temp1);
+    vec3_t p_temp1 = TransformVector(modelorg);
 
     sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5)) - (-(cachewidth >> 1) << 16);
     tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5)) - (-(_spriteHeight >> 1) << 16);

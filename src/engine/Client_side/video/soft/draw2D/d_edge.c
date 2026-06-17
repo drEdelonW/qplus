@@ -105,8 +105,8 @@ void D_CalcGradients(mSurface_p pface) {
 
     float mipscale = 1.0 / (float)(1 << _miplevel);
 
-    vec3_t p_saxis; TransformVector(*(vec3_p)(&pface->texinfo->vecs[0]), &p_saxis);
-    vec3_t p_taxis; TransformVector(*(vec3_p)(&pface->texinfo->vecs[1]), &p_taxis);
+    vec3_t p_saxis = TransformVector(*(vec3_p)(&pface->texinfo->vecs[0]));
+    vec3_t p_taxis = TransformVector(*(vec3_p)(&pface->texinfo->vecs[1]));
     {
         float t = xscaleinv * mipscale;
         d_sdivzstepu = p_saxis.v[0] * t;
@@ -126,7 +126,7 @@ void D_CalcGradients(mSurface_p pface) {
         xcenter * d_tdivzstepu -
         ycenter * d_tdivzstepv;
 
-    vec3_t p_temp1; VectorScale(transformed_modelorg, mipscale, &p_temp1);
+    vec3_t p_temp1 = VectorScale(transformed_modelorg, mipscale);
 
     {
         float t = 0x10000 * mipscale;
@@ -152,8 +152,8 @@ D_DrawSurfaces
 */
 void D_DrawSurfaces() {
     currententity = &cl_entities[0];
-    TransformVector(modelorg, &transformed_modelorg);
-    vec3_t world_transformed_modelorg; VectorCopy(transformed_modelorg, &world_transformed_modelorg);
+    transformed_modelorg = TransformVector(modelorg);
+    vec3_t world_transformed_modelorg = transformed_modelorg;
 
     // TODO: could preset a lot of this at mode set time
     if (r_drawflat.value) {
@@ -209,8 +209,8 @@ void D_DrawSurfaces() {
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel()
-                    vec3_t local_modelorg;  VectorSubtract(r_origin, currententity->origin, &local_modelorg);
-                    TransformVector(local_modelorg, &transformed_modelorg);
+                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->origin);
+                    transformed_modelorg = TransformVector(local_modelorg);
 
                     R_RotateBmodel(); // FIXME: don't mess with the frustum,
                     // make entity passed in
@@ -227,11 +227,11 @@ void D_DrawSurfaces() {
                     // TODO: speed up
                     //
                     currententity = &cl_entities[0];
-                    VectorCopy(world_transformed_modelorg, &transformed_modelorg);
-                    VectorCopy(base_vpn, &vpn);
-                    VectorCopy(base_vup, &vup);
-                    VectorCopy(base_vright, &vright);
-                    VectorCopy(base_modelorg, &modelorg);
+                    transformed_modelorg = world_transformed_modelorg;
+                    vpn = base_vpn;
+                    vup = base_vup;
+                    vright = base_vright;
+                    modelorg = base_modelorg;
                     R_TransformFrustum();
                 }
             }
@@ -241,8 +241,8 @@ void D_DrawSurfaces() {
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel()
-                    vec3_t local_modelorg;  VectorSubtract(r_origin, currententity->origin, &local_modelorg);
-                    TransformVector(local_modelorg, &transformed_modelorg);
+                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->origin);
+                    transformed_modelorg = TransformVector(local_modelorg);
 
                     R_RotateBmodel(); // FIXME: don't mess with the frustum,
                     // make entity passed in
@@ -273,11 +273,11 @@ void D_DrawSurfaces() {
                     // TODO: speed up
                     //
                     currententity = &cl_entities[0];
-                    VectorCopy(world_transformed_modelorg, &transformed_modelorg);
-                    VectorCopy(base_vpn, &vpn);
-                    VectorCopy(base_vup, &vup);
-                    VectorCopy(base_vright, &vright);
-                    VectorCopy(base_modelorg, &modelorg);
+                    transformed_modelorg = world_transformed_modelorg;
+                    vpn = base_vpn;
+                    vup = base_vup;
+                    vright = base_vright;
+                    modelorg = base_modelorg;
                     R_TransformFrustum();
                 }
             }

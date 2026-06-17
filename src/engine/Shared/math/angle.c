@@ -7,7 +7,7 @@ void AngleVectors(vec3_t angles, vec3_p forward, vec3_p right, vec3_p up) {
     angles.pitch *= (M_PI * 2 / 360);
     angles.roll *= (M_PI * 2 / 360);
 #else
-    VectorScale(angles, (M_PI * 2 / 360), &angles);
+    angles = VectorScale(angles, (M_PI * 2 / 360));
 #endif
     float sy = sin(angles.yaw);
     float cy = cos(angles.yaw);

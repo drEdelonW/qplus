@@ -62,7 +62,7 @@ R_EntityRotate
 ================
 */
 void R_EntityRotate(vec3_p vec) {
-    vec3_t tvec; VectorCopy(*vec, &tvec);
+    vec3_t tvec = *vec;
     for (int i = 0; i < VECT_DIM; i++)
         vec->v[i] = DotProduct(entity_rotation.rows[i], tvec);
 }
@@ -570,7 +570,7 @@ void R_RenderWorld() {
     pbtofpolys = _bTofPolys;
 
     currententity = &cl_entities[0];
-    VectorCopy(r_origin, &modelorg);
+    modelorg = r_origin;
     Model_p clmodel = currententity->model;
     r_pcurrentvertbase = clmodel->vertexes;
 

@@ -530,14 +530,14 @@ void R_DrawEntitiesOnList() {
 
         switch (currententity->model->type) {
         case mod_sprite: {
-            VectorCopy(currententity->origin, &r_entorigin);
-            VectorSubtract(r_origin, r_entorigin, &modelorg);
+            r_entorigin = currententity->origin;
+            modelorg = VectorSubtract(r_origin, r_entorigin);
             R_DrawSprite();
         } break;
 
         case mod_alias: {
-            VectorCopy(currententity->origin, &r_entorigin);
-            VectorSubtract(r_origin, r_entorigin, &modelorg);
+            r_entorigin = currententity->origin;
+            modelorg = VectorSubtract(r_origin, r_entorigin);
 
             // see if the bounding box lets us trivially reject, also sets trivial accept status
             if (R_AliasCheckBBox()) {
@@ -552,7 +552,7 @@ void R_DrawEntitiesOnList() {
 
                 for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
                     if (cl_dlights[lnum].die >= cl.time) {
-                        vec3_t dist; VectorSubtract(currententity->origin, cl_dlights[lnum].origin, &dist);
+                        vec3_t dist = VectorSubtract(currententity->origin, cl_dlights[lnum].origin);
                         float add = cl_dlights[lnum].radius - Length(dist);
 
                         if (add > 0.0f)
@@ -604,10 +604,10 @@ void R_DrawViewModel() {
     if (!currententity->model)
         return;
 
-    VectorCopy(currententity->origin, &r_entorigin);
-    VectorSubtract(r_origin, r_entorigin, &modelorg);
+    r_entorigin = currententity->origin;
+    modelorg = VectorSubtract(r_origin, r_entorigin);
 
-    VectorCopy(vup, &viewlightvec);
+    viewlightvec = vup;
     VectorInverse(&viewlightvec);
 
     int j = R_LightPoint(currententity->origin);
@@ -625,7 +625,7 @@ void R_DrawViewModel() {
             (dl->die < cl.time))
             continue;
 
-        vec3_t dist; VectorSubtract(currententity->origin, dl->origin, &dist);
+        vec3_t dist = VectorSubtract(currententity->origin, dl->origin);
         float add = dl->radius - Length(dist);
         if (add > 0)
             r_viewlighting.ambientlight += add;
@@ -716,7 +716,7 @@ R_DrawBEntitiesOnList
 void R_DrawBEntitiesOnList() {
     if (!r_drawentities.value)  return;
 
-    vec3_t oldorigin; VectorCopy(modelorg, &oldorigin);
+    vec3_t oldorigin = modelorg;
     insubmodel = true;
     r_dlightframecount = r_framecount;
 
@@ -737,10 +737,10 @@ void R_DrawBEntitiesOnList() {
             int clipflags = R_BmodelCheckBBox(clmodel, minmaxs);
 
             if (clipflags != BMODEL_FULLY_CLIPPED) {
-                VectorCopy(currententity->origin, &r_entorigin);
-                VectorSubtract(r_origin, r_entorigin, &modelorg);
+                r_entorigin = currententity->origin;
+                modelorg = VectorSubtract(r_origin, r_entorigin);
                 // FIXME: is this needed?
-                VectorCopy(modelorg, &r_worldmodelorg);
+                r_worldmodelorg = modelorg;
 
                 r_pcurrentvertbase = clmodel->vertexes;
 
@@ -796,11 +796,11 @@ void R_DrawBEntitiesOnList() {
 
                 // put back world rotation and frustum clipping
                 // FIXME: R_RotateBmodel should just work off base_vxx
-                VectorCopy(base_vpn, &vpn);
-                VectorCopy(base_vup, &vup);
-                VectorCopy(base_vright, &vright);
-                VectorCopy(base_modelorg, &modelorg);
-                VectorCopy(oldorigin, &modelorg);
+                vpn = base_vpn;
+                vup= base_vup;
+                vright = base_vright;
+                modelorg = base_modelorg;
+                modelorg = oldorigin;
                 R_TransformFrustum();
             }
 

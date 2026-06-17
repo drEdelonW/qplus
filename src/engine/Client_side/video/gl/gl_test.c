@@ -47,7 +47,7 @@ Plane_p HitPlane(vec3_t start, vec3_t end) {
     memset(&trace, 0, sizeof(trace_t));
     trace.fraction = 1;
     trace.allsolid = true;
-    VectorCopy(end, trace.endpos);
+    trace.endpos = end;
 
     SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
 
@@ -65,21 +65,20 @@ void Test_Spawn(vec3_t origin) {
     if (i == MAX_PUFFS)
         return;
 
-    vec3_t incoming; VectorSubtract(r_refdef.vieworg, origin, incoming);
-    vec3_t temp; VectorSubtract(origin, incoming, temp);
+    vec3_t incoming = VectorSubtract(r_refdef.vieworg, origin);
+    vec3_t temp = VectorSubtract(origin, incoming);
     Plane_p plane = HitPlane(r_refdef.vieworg, temp);
 
     VectorNormalize(incoming);
     float d = DotProduct(incoming, plane->normal);
-    VectorSubtract(vec3_origin, incoming, p->reflect);
-    VectorMA(p->reflect, d * 2, plane->normal, p->reflect);
+    p->reflect = VectorSubtract(vec3_origin, incoming);
+    p->reflect = VectorMA(p->reflect, d * 2, plane->normal);
 
-    VectorCopy(origin, p->origin);
-    VectorCopy(plane->normal, p->normal);
+    p->origin = origin;
+    p->normal = plane->normal;
 
-    CrossProduct(incoming, p->normal, p->up);
-
-    CrossProduct(p->up, p->normal, p->right);
+    p->up = CrossProduct(incoming, p->normal);
+    p->right = CrossProduct(p->up, p->normal);
 
     p->length = 8;
 }

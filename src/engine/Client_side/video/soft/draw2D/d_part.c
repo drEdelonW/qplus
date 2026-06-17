@@ -54,7 +54,7 @@ D_DrawParticle
 */
 void D_DrawParticle(Particle_p pparticle) {
     // transform point
-    vec3_t local; VectorSubtract(pparticle->org, r_origin, &local);
+    vec3_t local = VectorSubtract(pparticle->org, r_origin);
 
     vec3_t transformed = {
         .x = DotProduct(local, r_pright),

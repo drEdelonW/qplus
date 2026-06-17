@@ -75,8 +75,8 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         vec3_t world = pv0->position;
 
         // transform and project
-        vec3_t local;   VectorSubtract(world, modelorg, &local);
-        vec3_t transformed; TransformVector(local, &transformed);
+        vec3_t local = VectorSubtract(world, modelorg);
+        vec3_t transformed = TransformVector(local);
 
         if (transformed.z < NEAR_CLIP)
             transformed.z = NEAR_CLIP;
@@ -107,8 +107,8 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     vec3_t world = pv1->position;
 
     // transform and project
-    vec3_t local; VectorSubtract(world, modelorg, &local);
-    vec3_t transformed; TransformVector(local, &transformed);
+    vec3_t local = VectorSubtract(world, modelorg);
+    vec3_t transformed = TransformVector(local);
 
     if (transformed.z < NEAR_CLIP)
         transformed.z = NEAR_CLIP;
@@ -472,7 +472,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
 
     mPlane_p pplane = fa->plane;
     // FIXME: cache this?
-    vec3_t p_normal; TransformVector(pplane->normal, &p_normal);
+    vec3_t p_normal = TransformVector(pplane->normal);
     // FIXME: cache this?
     float distinv = 1.0f / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
@@ -572,7 +572,7 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
 
     mPlane_p pplane = psurf->plane;
     // FIXME: cache this?
-    vec3_t p_normal; TransformVector(pplane->normal, &p_normal);
+    vec3_t p_normal = TransformVector(pplane->normal);
     // FIXME: cache this?
     float distinv = 1.0f / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
@@ -691,8 +691,8 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
 
     for (int i = 0; i < lnumverts; i++) {
         // transform and project
-        vec3_t local; VectorSubtract(verts[vertpage][i].position, modelorg, &local);
-        vec3_t transformed; TransformVector(local, &transformed);
+        vec3_t local = VectorSubtract(verts[vertpage][i].position, modelorg);
+        vec3_t transformed = TransformVector(local);
 
         if (transformed.z < NEAR_CLIP)
             transformed.z = NEAR_CLIP;

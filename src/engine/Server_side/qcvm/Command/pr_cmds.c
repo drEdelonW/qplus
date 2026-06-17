@@ -132,7 +132,7 @@ setorigin (entity, origin)
 void PF_setorigin() {
     edict_p edict = G_EDICT(OFS_PARM0);
     vec3_t org = G_VECTOR(OFS_PARM1);
-    VectorCopy(org, &edict->v.origin);
+    edict->v.origin = org;
     SV_LinkEdict(edict, false);
 }
 
@@ -145,8 +145,8 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
 
     vec3_t rmin, rmax;
     if (!rotate) {
-        VectorCopy(min, &rmin);
-        VectorCopy(max, &rmax);
+        rmin = min;
+        rmax = max;
     }
     else {
         // find min / max for rotations
@@ -165,8 +165,8 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
 
         // float bounds[2][3];
         vec3_t bounds[2];
-        VectorCopy(min, &bounds[0]);
-        VectorCopy(max, &bounds[1]);
+        bounds[0] = min;
+        bounds[1] = max;
 
         rmin.x = rmin.y = rmin.z = 9999.0f;
         rmax.x = rmax.y = rmax.z = -9999.0f;
@@ -199,9 +199,9 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
     }
 
     // set derived values
-    VectorCopy(rmin, &edict->v.mins);
-    VectorCopy(rmax, &edict->v.maxs);
-    VectorSubtract(max, min, &edict->v.size);
+    edict->v.mins = rmin;
+    edict->v.maxs = rmax;
+    edict->v.size = VectorSubtract(max, min);
 
     SV_LinkEdict(edict, false);
 }
@@ -335,7 +335,7 @@ void PF_normalize() {
         newvalue.z = value1.z * new;
     }
 
-    VectorCopy(newvalue, &G_VECTOR(OFS_RETURN));
+    G_VECTOR(OFS_RETURN) = newvalue;
 }
 
 /*
@@ -549,8 +549,8 @@ void PF_traceline() {
     pr_global_struct->trace_fraction = trace.fraction;
     pr_global_struct->trace_inwater = trace.inwater;
     pr_global_struct->trace_inopen = trace.inopen;
-    VectorCopy(trace.endpos, &pr_global_struct->trace_endpos);
-    VectorCopy(trace.plane.normal, &pr_global_struct->trace_plane_normal);
+    pr_global_struct->trace_endpos = trace.endpos;
+    pr_global_struct->trace_plane_normal = trace.plane.normal;
     pr_global_struct->trace_plane_dist = trace.plane.dist;
     if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
     else            pr_global_struct->trace_ent = ED_GetEDictOffs(Edicts);
@@ -569,8 +569,8 @@ void PF_TraceToss() {
     pr_global_struct->trace_fraction = trace.fraction;
     pr_global_struct->trace_inwater = trace.inwater;
     pr_global_struct->trace_inopen = trace.inopen;
-    VectorCopy(trace.endpos, &pr_global_struct->trace_endpos);
-    VectorCopy(trace.plane.normal, &pr_global_struct->trace_plane_normal);
+    pr_global_struct->trace_endpos = trace.endpos;
+    pr_global_struct->trace_plane_normal = trace.plane.normal;
     pr_global_struct->trace_plane_dist = trace.plane.dist;
     if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
     else            pr_global_struct->trace_ent = ED_GetEDictOffs(Edicts);
@@ -620,7 +620,7 @@ uint8_t PF_newcheckclient(uint8_t check) {
     }
 
     // get the PVS for the entity
-    vec3_t org;    VectorAdd(ent->v.origin, ent->v.view_ofs, &org);
+    vec3_t org = VectorAdd(ent->v.origin, ent->v.view_ofs);
     mLeaf_p leaf = Mod_PointInLeaf(org, sv.worldmodel);
     uint8_p pvs = Mod_LeafPVS(leaf, sv.worldmodel);
     memcpy(_checkPvs, pvs, (sv.worldmodel->numleafs + 7) >> 3);
@@ -663,7 +663,7 @@ void PF_checkclient() {
 
     // if current entity can't possibly see the check entity, return 0
     edict_p self = ED_GetEDictByOffs(pr_global_struct->self);
-    vec3_t view; VectorAdd(self->v.origin, self->v.view_ofs, &view);
+    vec3_t view = VectorAdd(self->v.origin, self->v.view_ofs);
     mLeaf_p leaf = Mod_PointInLeaf(view, sv.worldmodel);
     int l = (leaf - sv.worldmodel->leafs) - 1;
     if ((l < 0) ||
@@ -987,14 +987,14 @@ void() droptofloor
 */
 void PF_droptofloor() {
     edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
-    vec3_t end;    VectorCopy(ent->v.origin, &end);
+    vec3_t end = ent->v.origin;
     end.z -= 256.0f;
 
     trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
 
     if ((trace.fraction == 1) || trace.allsolid)    G_FLOAT(OFS_RETURN) = 0;
     else {
-        VectorCopy(trace.endpos, &ent->v.origin);
+        ent->v.origin = trace.endpos;
         SV_LinkEdict(ent, false);
         ent->v.flags = (int)ent->v.flags | FL_ONGROUND;
         ent->v.groundentity = ED_GetEDictOffs(trace.ent);
@@ -1085,12 +1085,12 @@ void PF_aim() {
     edict_p ent = G_EDICT(OFS_PARM0);
     // float speed = G_FLOAT(OFS_PARM1);
 
-    vec3_t start;   VectorCopy(ent->v.origin, &start);
+    vec3_t start = ent->v.origin;
     start.z += 20.0f;
 
     // try sending a trace straight
-    vec3_t dir; VectorCopy(pr_global_struct->v_forward, &dir);
-    vec3_t end; VectorMA(start, 2048, dir, &end);
+    vec3_t dir = pr_global_struct->v_forward;
+    vec3_t end = VectorMA(start, 2048, dir);
     trace_t tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent);
     if (
         tr.ent &&
@@ -1099,12 +1099,12 @@ void PF_aim() {
             (ent->v.team <= 0) ||
             (ent->v.team != tr.ent->v.team))
         ) {
-        VectorCopy(pr_global_struct->v_forward, &G_VECTOR(OFS_RETURN));
+        G_VECTOR(OFS_RETURN) = pr_global_struct->v_forward;
         return;
     }
 
     // try all possible entities
-    vec3_t bestdir; VectorCopy(dir, &bestdir);
+    vec3_t bestdir = dir;
     float bestdist = sv_aim.value;
     edict_p bestent = NULL;
 
@@ -1125,7 +1125,7 @@ void PF_aim() {
                 0.5f * (check->v.mins.v[j] +
                     check->v.maxs.v[j]);
         }
-        VectorSubtract(end, start, &dir);
+        dir = VectorSubtract(end, start);
         VectorNormalize(&dir);
         float dist = DotProduct(dir, pr_global_struct->v_forward);
         if (dist < bestdist)    continue; // to far to turn
@@ -1138,14 +1138,14 @@ void PF_aim() {
     }
 
     if (bestent) {
-        VectorSubtract(bestent->v.origin, ent->v.origin, &dir);
+        dir = VectorSubtract(bestent->v.origin, ent->v.origin);
         float dist = DotProduct(dir, pr_global_struct->v_forward);
-        VectorScale(pr_global_struct->v_forward, dist, &end);
+        end = VectorScale(pr_global_struct->v_forward, dist);
         end.z = dir.z;
         VectorNormalize(&end);
-        VectorCopy(end, &G_VECTOR(OFS_RETURN));
+        G_VECTOR(OFS_RETURN) = end;
     }
-    else    VectorCopy(bestdir, &G_VECTOR(OFS_RETURN));
+    else G_VECTOR(OFS_RETURN) = bestdir;
 }
 
 /*
@@ -1407,7 +1407,7 @@ void PF_WaterMove() {
 
     if (!(flags & FL_WATERJUMP)) {
         //		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
-        VectorMA(self->v.velocity, -0.8 * self->v.waterlevel * host_frametime, self->v.velocity, self->v.velocity);
+        self->v.velocity = VectorMA(self->v.velocity, -0.8 * self->v.waterlevel * host_frametime, self->v.velocity);
     }
 
     G_FLOAT(OFS_RETURN) = damage;

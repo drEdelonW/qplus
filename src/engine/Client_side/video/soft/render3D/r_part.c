@@ -95,7 +95,7 @@ void R_DarkFieldParticles(r_Entity_p ent) {
 
                 VectorNormalize(dir);
                 float vel = 50 + (rand() & 63);
-                VectorScale(dir, vel, prt->vel);
+                prt->vel = VectorScale(dir, vel);
             }
 }
 #endif
@@ -200,8 +200,8 @@ void R_ReadPointFile_f() {
         prt->die = 99999;
         prt->color = (-c) & 15;
         prt->type = pt_static;
-        VectorCopy(vec3_origin, &prt->vel);
-        VectorCopy(org, &prt->org);
+        prt->vel = vec3_origin;
+        prt->org = org;
     }
 
     fclose(pntFile);
@@ -393,7 +393,7 @@ void R_LavaSplash(vec3_t org) {
 
                 VectorNormalize(&dir);
                 float vel = 50 + (rand() & 63);
-                VectorScale(dir, vel, &prt->vel);
+                prt->vel = VectorScale(dir, vel);
             }
 }
 
@@ -429,14 +429,14 @@ void R_TeleportSplash(vec3_t org) {
 
                 VectorNormalize(&dir);
                 float vel = 50 + (rand() & 63);
-                VectorScale(dir, vel, &prt->vel);
+                prt->vel = VectorScale(dir, vel);
             }
 }
 
 void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
     static int tracercount;
 
-    vec3_t vec; VectorSubtract(end, start, &vec);
+    vec3_t vec = VectorSubtract(end, start);
     float len = VectorNormalize(&vec);
 
     int dec;
@@ -457,7 +457,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
         prt->next = _activeParticles;
         _activeParticles = prt;
 
-        VectorCopy(vec3_origin, &prt->vel);
+        prt->vel = vec3_origin;
         prt->die = cl.time + 2;
 
         switch (type) {
@@ -493,7 +493,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
 
             tracercount++;
 
-            VectorCopy(start, &prt->org);
+            prt->org = start;
             if (tracercount & 1) {
                 prt->vel.x = 30 * vec.y;
                 prt->vel.y = 30 * -vec.x;
@@ -522,7 +522,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
         }
 
 
-        VectorAdd(start, vec, &start);
+        start = VectorAdd(start, vec);
     }
 }
 
@@ -540,14 +540,14 @@ void R_DrawParticles() {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glBegin(GL_TRIANGLES); {
 
-        vec3_t up;  VectorScale(vup, 1.5, &up);
-        vec3_t right;   VectorScale(vright, 1.5, &right);
+        vec3_t up = VectorScale(vup, 1.5, &up);
+        vec3_t right = VectorScale(vright, 1.5, &right);
 #else
     D_StartParticles();
 
-    VectorScale(vright, xscaleshrink, &r_pright);
-    VectorScale(vup, yscaleshrink, &r_pup);
-    VectorCopy(vpn, &r_ppn);
+    r_pright = VectorScale(vright, xscaleshrink);
+    r_pup = VectorScale(vup, yscaleshrink);
+    r_ppn = vpn;
 #endif
     float frametime = cl.time - cl.oldtime;
     float time3 = frametime * 15;
