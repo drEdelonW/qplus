@@ -110,42 +110,38 @@ bool R_AliasCheckBBox() {
         frame = 0;
     }
 
-    mAliasFrameDesc_p pframedesc = &pahdr->frames[frame];
+    mAliasFrameDesc_p pFDesc = &pahdr->frames[frame];
 
-#if 0
-    float basepts[8][3];
-#else
     vec3_t basepts[8];
-#endif
     // x worldspace coordinates
     basepts[0].x =
         basepts[1].x =
         basepts[2].x =
-        basepts[3].x = (float)pframedesc->bboxmin.v8[0];
+        basepts[3].x = (float)pFDesc->bboxmin.v8[X_AX];
     basepts[4].x =
         basepts[5].x =
         basepts[6].x =
-        basepts[7].x = (float)pframedesc->bboxmax.v8[0];
+        basepts[7].x = (float)pFDesc->bboxmax.v8[X_AX];
 
     // y worldspace coordinates
     basepts[0].y =
         basepts[3].y =
         basepts[5].y =
-        basepts[6].y = (float)pframedesc->bboxmin.v8[1];
+        basepts[6].y = (float)pFDesc->bboxmin.v8[Y_AX];
     basepts[1].y =
         basepts[2].y =
         basepts[4].y =
-        basepts[7].y = (float)pframedesc->bboxmax.v8[1];
+        basepts[7].y = (float)pFDesc->bboxmax.v8[Y_AX];
 
     // z worldspace coordinates
     basepts[0].z =
         basepts[1].z =
         basepts[4].z =
-        basepts[5].z = (float)pframedesc->bboxmin.v8[2];
+        basepts[5].z = (float)pFDesc->bboxmin.v8[Z_AX];
     basepts[2].z =
         basepts[3].z =
         basepts[6].z =
-        basepts[7].z = (float)pframedesc->bboxmax.v8[2];
+        basepts[7].z = (float)pFDesc->bboxmax.v8[Z_AX];
 
     bool zclipped = false;
     bool zfullyclipped = true;
@@ -413,9 +409,9 @@ R_AliasTransformFinalVert
 */
 void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stVert_p pstverts) {
     vec3_t tv = {
-        .x = pverts->v8[0],
-        .y = pverts->v8[1],
-        .z = pverts->v8[2],
+        .x = pverts->v8[X_AX],
+        .y = pverts->v8[Y_AX],
+        .z = pverts->v8[Z_AX],
     };
     av->fv.x = DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3];
     av->fv.y = DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3];
@@ -457,9 +453,9 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
     for (int i = 0; i < r_anumverts; i++, fv++, pverts++, pstverts++) {
         // transform and project
         vec3_t tv = {
-            .x = pverts->v8[0],
-            .y = pverts->v8[1],
-            .z = pverts->v8[2],
+            .x = pverts->v8[X_AX],
+            .y = pverts->v8[Y_AX],
+            .z = pverts->v8[Z_AX],
         };
         float zi = 1.0f /
             (DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3]);

@@ -85,7 +85,7 @@ void R_SplitEntityOnNode(mNode_p node) {
 
     // add an efrag if the node is a leaf
 
-    if (node->contents < 0) {
+    if (node->contents < CONTENTS_NODE) {
         if (!r_pefragtopnode)
             r_pefragtopnode = node;
 
@@ -140,7 +140,7 @@ R_SplitEntityOnNode2
 void R_SplitEntityOnNode2(mNode_p node) {
     if (node->visframe != r_visframecount)  return;
 
-    if (node->contents < 0) {
+    if (node->contents < CONTENTS_NODE) {
         if (node->contents != CONTENTS_SOLID)
             r_pefragtopnode = node; // we've reached a non-solid leaf, so it's
         //  visible and not BSP clipped

@@ -150,7 +150,7 @@ R_MarkLights
 =============
 */
 void R_MarkLights(dLight_p light, int bit, mNode_p node) {
-    if (node->contents < 0)
+    if (node->contents < CONTENTS_NODE)
         return;
 
     mPlane_p splitplane = node->plane;
@@ -215,7 +215,7 @@ mPlane_p    lightplane;
 vec3_t      lightspot;
 
 int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
-    if (node->contents < 0)     return -1;        // didn't hit anything
+    if (node->contents < CONTENTS_NODE)     return -1;        // didn't hit anything
     // calculate mid point
 
     // FIXME: optimize for axial
@@ -228,11 +228,16 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
         return RecursiveLightPoint(node->children[side], start, end);
 
     float frac = front / (front - back);
+#if 0
     vec3_t mid = {
         .x = start.x + (end.x - start.x) * frac,
         .y = start.y + (end.y - start.y) * frac,
         .z = start.z + (end.z - start.z) * frac
     };
+#else
+    // Linear interpolation: mid = start + (end - start) * frac
+    vec3_t mid = VectorMA(start, frac, VectorSubtract(end, start));
+#endif
 
     // go down front side
     int r = RecursiveLightPoint(node->children[side], start, mid);
@@ -295,11 +300,16 @@ int R_LightPoint(vec3_t p) {
     if (!cl.worldmodel->lightdata)
         return 255;
 
+#if 0
     vec3_t end = {
         .x = p.x,
         .y = p.y,
         .z = p.z - 2048
     };
+#else
+    vec3_t end = p;
+    end.z -= 2048;
+#endif
 
     int r = RecursiveLightPoint(cl.worldmodel->nodes, p, end);
 

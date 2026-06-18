@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "eFrag.h"
 #include "qOpenGL.h"
 #include "client.h"
-#include "bspfile.h"
 #include "host.h"
 #include "console.h"
 #include "world.h"
@@ -93,7 +92,7 @@ void R_SplitEntityOnNode(mNode_p node) {
 
     // add an efrag if the node is a leaf
 
-    if (node->contents < 0) {
+    if (node->contents < CONTENTS_NODE) {
         if (!r_pefragtopnode)
             r_pefragtopnode = node;
 

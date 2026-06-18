@@ -5,6 +5,7 @@
 #ifdef GLQUAKE
 #   include "Surface_pre.h"
 #endif
+#include "assert.h"
 
 #include "Texture_pre.h"
 
@@ -23,6 +24,23 @@ struct Texture_s {
     Texture_p   alternate_anims;    // bmodels in frmae 1 use these
     uint32_t    offsets[MIPLEVELS]; // four mip maps stored
 };
+
+#define TEX_SPECIAL  1  // sky or slime, no lightmap or 256 subdivision
+
+typedef struct {
+    int32_t nummiptex;
+    int32_t dataofs[4]; // [nummiptex]
+} dMipTexLump_t;
+typedef dMipTexLump_t* dMipTexLump_p;
+STATIC_ASSERT_SIZE(dMipTexLump_t, 4 + 4*4); // 20
+
+typedef struct MipTex_s {
+    char        name[16];
+    uint32_t    width, height;
+    uint32_t    offsets[MIPLEVELS];  // four mip maps stored
+} MipTex_t;
+typedef MipTex_t* MipTex_p;
+
 
 Texture_p R_TextureAnimation(Texture_p base);
 

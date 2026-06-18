@@ -2,6 +2,9 @@
 
 #include "model.h"
 
+#define BSPVERSION      (29)
+#define IDBRUSHHEADER	(uint32_t)(0x0000001D)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

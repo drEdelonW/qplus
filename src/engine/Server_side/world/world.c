@@ -307,7 +307,7 @@ void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
     if (node->contents == CONTENTS_SOLID)       return;
 
     // add an efrag if the node is a leaf
-    if (node->contents < 0) {
+    if (node->contents < CONTENTS_NODE) {
         if (ent->num_leafs == MAX_ENT_LEAFS)    return;
 
         mLeaf_p leaf = (mLeaf_p)node;

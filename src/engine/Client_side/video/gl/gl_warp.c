@@ -223,12 +223,7 @@ void EmitSkyPolys(mSurface_p fa) {
                 vec3_t dir = VectorSubtract(v.v, r_origin);
                 dir.z *= 3; // flatten the sphere
 
-                float length =  // TODO: replace to length(dir);
-                    dir.x * dir.x +
-                    dir.y * dir.y +
-                    dir.z * dir.z;
-                length = sqrt(length);
-                length = 6 * 63 / length;
+                float length = (6 * 63) / Length(dir);
 
                 dir.x *= length;
                 dir.y *= length;

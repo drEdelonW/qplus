@@ -23,7 +23,7 @@ static uint8_t  _fatPvs[MAX_MAP_LEAFS / 8];
 void SV_AddToFatPVS(vec3_t org, mNode_p node) {
     while (1) {
         // if this is a leaf, accumulate the pvs bits
-        if (node->contents < 0) {
+        if (node->contents < CONTENTS_NODE) {
             if (node->contents != CONTENTS_SOLID) {
                 uint8_p pvs = Mod_LeafPVS((mLeaf_p)node, sv.worldmodel);
                 for (int i = 0; i < _fatBytes; i++) {

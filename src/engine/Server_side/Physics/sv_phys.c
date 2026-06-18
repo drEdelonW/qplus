@@ -188,8 +188,8 @@ returns the blocked flags (1 = floor, 2 = step / wall)
 
 MoveClipFlags_e ClipVelocity(vec3_t in, vec3_t normal, vec3_p out, float overbounce) {
     MoveClipFlags_e blocked = MOVECLIP_NONE;
-    if (normal.v[Z_AX] > 0.0f)  blocked |= MOVECLIP_FLOOR;  // floor
-    if (!(normal.v[Z_AX]))   blocked |= MOVECLIP_WALL;  // step
+    if (normal.z > 0.0f)    blocked |= MOVECLIP_FLOOR;  // floor
+    if (!(normal.z))        blocked |= MOVECLIP_WALL;  // step
 
     float backoff = DotProduct(in, normal) * overbounce;
 
@@ -230,9 +230,9 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, float time, trace_p steptrace) {
     int numbumps = 4;
     vec3_t planes[MAX_CLIP_PLANES];
     for (int bumpcount = 0; bumpcount < numbumps; bumpcount++) {
-        if (!(ent->v.velocity.v[X_AX]) &&
-            !(ent->v.velocity.v[Y_AX]) &&
-            !(ent->v.velocity.v[Z_AX])) break; // ent->v.velocity.is_zero()
+        if (!(ent->v.velocity.x) &&
+            !(ent->v.velocity.y) &&
+            !(ent->v.velocity.z)) break; // ent->v.velocity.is_zero()
 
 #if 0
         vec3_t end; // end = ent->v.origin + (timeleft * ent->v.velocity); in vect3df
@@ -258,14 +258,14 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, float time, trace_p steptrace) {
         if (trace.fraction == 1)    break;  // moved the entire distance
         if (!trace.ent)             Host_SysError("SV_FlyMove: !trace.ent");
 
-        if (trace.plane.normal.v[Z_AX] > 0.7) {
+        if (trace.plane.normal.z > 0.7) {
             blocked |= MOVECLIP_FLOOR;  // floor
             if (trace.ent->v.solid == SOLID_BSP) {
                 ent->v.flags = (float)((EntityFlags_t)ent->v.flags | FL_ONGROUND);
                 ent->v.groundentity = ED_GetEDictOffs(trace.ent);
             }
         }
-        if (!trace.plane.normal.v[Z_AX]) {
+        if (!trace.plane.normal.z) {
             blocked |= MOVECLIP_WALL;  // step
             if (steptrace)
                 *steptrace = trace; // save for player extrafriction
@@ -348,7 +348,7 @@ void SV_AddGravity(edict_p ent) {
     eval_p val = GetEdictFieldValue(ent, "gravity");
     float ent_gravity = (val && val->_float) ? val->_float : 1.0f;
 #endif
-    ent->v.velocity.v[Z_AX] -= (float)(ent_gravity * sv_gravity.value * host_frametime);
+    ent->v.velocity.z -= (float)(ent_gravity * sv_gravity.value * host_frametime);
 }
 
 
@@ -395,9 +395,9 @@ SV_PushMove
 ============
 */
 void SV_PushMove(edict_p pusher, float movetime) {
-    if (!(pusher->v.velocity.v[X_AX]) &&
-        !(pusher->v.velocity.v[Y_AX]) &&
-        !(pusher->v.velocity.v[Z_AX])
+    if (!(pusher->v.velocity.x) &&
+        !(pusher->v.velocity.y) &&
+        !(pusher->v.velocity.z)
         ) {
         pusher->v.ltime += movetime;
         return;
@@ -447,13 +447,13 @@ void SV_PushMove(edict_p pusher, float movetime) {
             ED_GetEDictByOffs(check->v.groundentity) == pusher)) {
             if (
                 (
-                    check->v.absmin.v[X_AX] >= maxs.v[X_AX] ||
-                    check->v.absmin.v[Y_AX] >= maxs.v[Y_AX] ||
-                    check->v.absmin.v[Z_AX] >= maxs.v[Z_AX]) ||
+                    check->v.absmin.x >= maxs.x ||
+                    check->v.absmin.y >= maxs.y ||
+                    check->v.absmin.z >= maxs.z) ||
                 (
-                    check->v.absmax.v[X_AX] <= mins.v[X_AX] ||
-                    check->v.absmax.v[Y_AX] <= mins.v[Y_AX] ||
-                    check->v.absmax.v[Z_AX] <= mins.v[Z_AX])
+                    check->v.absmax.x <= mins.x ||
+                    check->v.absmax.y <= mins.y ||
+                    check->v.absmax.z <= mins.z)
                 )
                 continue;
 
@@ -479,11 +479,11 @@ void SV_PushMove(edict_p pusher, float movetime) {
         // if it is still inside the pusher, block
         edict_p block = SV_TestEntityPosition(check);
         if (block) { // fail the move
-            if (check->v.mins.v[X_AX] == check->v.maxs.v[X_AX]) continue;
+            if (check->v.mins.x == check->v.maxs.x) continue;
 
             if (check->v.solid == SOLID_NOT ||
                 check->v.solid == SOLID_TRIGGER) { // corpse
-                check->v.mins.v[X_AX] = check->v.mins.v[Y_AX] = 0;
+                check->v.mins.x = check->v.mins.y = 0;
                 check->v.maxs = check->v.mins;
                 continue;
             }
@@ -523,9 +523,9 @@ SV_PushRotate
 ============
 */
 void SV_PushRotate(edict_p pusher, float movetime) {
-    if (!(pusher->v.avelocity.v[X_AX]) &&
-        !(pusher->v.avelocity.v[Y_AX]) &&
-        !(pusher->v.avelocity.v[Z_AX])) {
+    if (!(pusher->v.avelocity.x) &&
+        !(pusher->v.avelocity.y) &&
+        !(pusher->v.avelocity.z)) {
         pusher->v.ltime += movetime;
         return;
     }
@@ -568,13 +568,13 @@ void SV_PushRotate(edict_p pusher, float movetime) {
             ED_GetEDictByOffs(check->v.groundentity) == pusher)) {
             if (
                 (
-                    check->v.absmin.v[X_AX] >= pusher->v.absmax.v[X_AX] ||
-                    check->v.absmin.v[Y_AX] >= pusher->v.absmax.v[Y_AX] ||
-                    check->v.absmin.v[Z_AX] >= pusher->v.absmax.v[Z_AX]) ||
+                    check->v.absmin.x >= pusher->v.absmax.x ||
+                    check->v.absmin.y >= pusher->v.absmax.y ||
+                    check->v.absmin.z >= pusher->v.absmax.z) ||
                 (
-                    check->v.absmax.v[X_AX] <= pusher->v.absmin.v[X_AX] ||
-                    check->v.absmax.v[Y_AX] <= pusher->v.absmin.v[Y_AX] ||
-                    check->v.absmax.v[Z_AX] <= pusher->v.absmin.v[Z_AX])
+                    check->v.absmax.x <= pusher->v.absmin.x ||
+                    check->v.absmax.y <= pusher->v.absmin.y ||
+                    check->v.absmax.z <= pusher->v.absmin.z)
                 )
                 continue;
 
@@ -609,11 +609,11 @@ void SV_PushRotate(edict_p pusher, float movetime) {
         // if it is still inside the pusher, block
         edict_p block = SV_TestEntityPosition(check);
         if (block) { // fail the move
-            if (check->v.mins.v[X_AX] == check->v.maxs.v[X_AX])   continue;
+            if (check->v.mins.x == check->v.maxs.x)   continue;
 
             if ((check->v.solid == SOLID_NOT) ||
                 (check->v.solid == SOLID_TRIGGER)) { // corpse
-                check->v.mins.v[X_AX] = check->v.mins.v[Y_AX] = 0;
+                check->v.mins.x = check->v.mins.y = 0;
                 check->v.maxs = check->v.mins;
                 continue;
             }
@@ -729,9 +729,9 @@ void SV_CheckStuck(edict_p ent) {
     for (int z = 0; z < 18; z++)
         for (int i = -1; i <= 1; i++)
             for (int j = -1; j <= 1; j++) {
-                ent->v.origin.v[X_AX] = org.v[X_AX] + (float)i;
-                ent->v.origin.v[Y_AX] = org.v[Y_AX] + (float)j;
-                ent->v.velocity.v[Z_AX] = org.v[Z_AX] + (float)z;
+                ent->v.origin.x = org.x + (float)i;
+                ent->v.origin.y = org.y + (float)j;
+                ent->v.velocity.z = org.z + (float)z;
                 if (!SV_TestEntityPosition(ent)) {
                     Con_DPrintf("Unstuck.\n");
                     SV_LinkEdict(ent, true);
@@ -751,9 +751,9 @@ SV_CheckWater
 */
 bool SV_CheckWater(edict_p ent) {
     vec3_t point = {
-        .x = ent->v.origin.v[X_AX],
-        .y = ent->v.origin.v[Y_AX],
-        .z = ent->v.velocity.v[Z_AX] + ent->v.mins.v[Z_AX] + 1
+        .x = ent->v.origin.x,
+        .y = ent->v.origin.y,
+        .z = ent->v.velocity.z + ent->v.mins.z + 1
     };
 
     ent->v.waterlevel = 0;
@@ -765,11 +765,11 @@ bool SV_CheckWater(edict_p ent) {
 #endif
         ent->v.watertype = cont;
         ent->v.waterlevel = 1;
-        point.v[Z_AX] = ent->v.origin.v[Z_AX] + (ent->v.mins.v[Z_AX] + ent->v.maxs.v[Z_AX]) * 0.5f;
+        point.z = ent->v.origin.z + (ent->v.mins.z + ent->v.maxs.z) * 0.5f;
         cont = SV_PointContents(point);
         if (cont <= CONTENTS_WATER) {
             ent->v.waterlevel = 2;
-            point.v[Z_AX] = ent->v.origin.v[Z_AX] + ent->v.view_ofs.v[Z_AX];
+            point.z = ent->v.origin.z + ent->v.view_ofs.z;
             cont = SV_PointContents(point);
             if (cont <= CONTENTS_WATER)
                 ent->v.waterlevel = 3;
@@ -818,8 +818,8 @@ void SV_WallFriction(edict_p ent, trace_p trace) {
     vec3_t into = VectorScale(trace->plane.normal, i);
     vec3_t side = VectorSubtract(ent->v.velocity, into);
 
-    ent->v.velocity.v[X_AX] = side.v[X_AX] * (1 + d);
-    ent->v.velocity.v[Y_AX] = side.v[Y_AX] * (1 + d);
+    ent->v.velocity.x = side.x * (1 + d);
+    ent->v.velocity.y = side.y * (1 + d);
 }
 
 /*
@@ -841,27 +841,27 @@ MoveClipFlags_e SV_TryUnstick(edict_p ent, vec3_t oldvel) {
     for (int i = 0; i < 8; i++) {
         // try pushing a little in an axial direction
         switch (i) {
-        case 0:     dir.v[X_AX] = 2;  dir.v[Y_AX] = 0;  break;
-        case 1:     dir.v[X_AX] = 0;  dir.v[Y_AX] = 2;  break;
-        case 2:     dir.v[X_AX] = -2; dir.v[Y_AX] = 0;  break;
-        case 3:     dir.v[X_AX] = 0;  dir.v[Y_AX] = -2; break;
-        case 4:     dir.v[X_AX] = 2;  dir.v[Y_AX] = 2;  break;
-        case 5:     dir.v[X_AX] = -2; dir.v[Y_AX] = 2;  break;
-        case 6:     dir.v[X_AX] = 2;  dir.v[Y_AX] = -2; break;
-        case 7:     dir.v[X_AX] = -2; dir.v[Y_AX] = -2; break;
+        case 0:     dir.x = 2;  dir.y = 0;  break;
+        case 1:     dir.x = 0;  dir.y = 2;  break;
+        case 2:     dir.x = -2; dir.y = 0;  break;
+        case 3:     dir.x = 0;  dir.y = -2; break;
+        case 4:     dir.x = 2;  dir.y = 2;  break;
+        case 5:     dir.x = -2; dir.y = 2;  break;
+        case 6:     dir.x = 2;  dir.y = -2; break;
+        case 7:     dir.x = -2; dir.y = -2; break;
         }
 
         SV_PushEntity(ent, dir);
 
         // retry the original move
-        ent->v.velocity.v[X_AX] = oldvel.v[X_AX];
-        ent->v.velocity.v[Y_AX] = oldvel.v[Y_AX];
-        ent->v.velocity.v[Z_AX] = 0;
+        ent->v.velocity.x = oldvel.x;
+        ent->v.velocity.y = oldvel.y;
+        ent->v.velocity.z = 0;
         trace_t steptrace;
         MoveClipFlags_e clip = SV_FlyMove(ent, 0.1f, &steptrace);
 
-        if ((fabs(oldorg.v[Y_AX] - ent->v.origin.v[Y_AX]) > 4) ||
-            (fabs(oldorg.v[X_AX] - ent->v.origin.v[X_AX]) > 4)) {
+        if ((fabs(oldorg.y - ent->v.origin.y) > 4) ||
+            (fabs(oldorg.x - ent->v.origin.x) > 4)) {
             //Con_DPrintf ("unstuck!\n");
             return clip;
         }
@@ -909,24 +909,24 @@ void SV_WalkMove(edict_p ent) {
     ent->v.origin = oldorg; // back to start pos
 
     vec3_t upmove = vec3_origin;
-    upmove.v[Z_AX] = STEPSIZE;
+    upmove.z = STEPSIZE;
     vec3_t downmove = vec3_origin;
-    downmove.v[Z_AX] = (float)(-STEPSIZE + oldvel.v[Z_AX] * host_frametime);
+    downmove.z = (float)(-STEPSIZE + oldvel.z * host_frametime);
 
     // move up
     SV_PushEntity(ent, upmove); // FIXME: don't link?
 
     // move forward
-    ent->v.velocity.v[X_AX] = oldvel.v[X_AX];
-    ent->v.velocity.v[Y_AX] = oldvel.v[Y_AX];
-    ent->v.velocity.v[Z_AX] = 0.0f;
+    ent->v.velocity.x = oldvel.x;
+    ent->v.velocity.y = oldvel.y;
+    ent->v.velocity.z = 0.0f;
     MoveClipFlags_e clip = SV_FlyMove(ent, (float)host_frametime, &steptrace);
 
     // check for stuckness, possibly due to the limited precision of floats
     // in the clipping hulls
     if (clip) {
-        if ((fabs(oldorg.v[Y_AX] - ent->v.origin.v[Y_AX]) < 0.03125) &&
-            (fabs(oldorg.v[X_AX] - ent->v.origin.v[X_AX]) < 0.03125)    // stepping up didn't make any progress
+        if ((fabs(oldorg.y - ent->v.origin.y) < 0.03125) &&
+            (fabs(oldorg.x - ent->v.origin.x) < 0.03125)    // stepping up didn't make any progress
             ) {
             clip = SV_TryUnstick(ent, oldvel);
         }
@@ -938,7 +938,7 @@ void SV_WalkMove(edict_p ent) {
     // move down
     trace_t downtrace = SV_PushEntity(ent, downmove); // FIXME: don't link?
 
-    if (downtrace.plane.normal.v[Z_AX] > 0.7) {
+    if (downtrace.plane.normal.z > 0.7) {
         if (ent->v.solid == SOLID_BSP) {
             ent->v.flags = (float)((int)((EntityFlags_t)ent->v.flags) | FL_ONGROUND);
             ent->v.groundentity = ED_GetEDictOffs(downtrace.ent);
@@ -1188,8 +1188,8 @@ void SV_Physics_Toss(edict_p ent) {
     ClipVelocity(ent->v.velocity, trace.plane.normal, &ent->v.velocity, backoff);
 
     // stop if on ground
-    if ((trace.plane.normal.v[Z_AX] > 0.7) &&
-        ((ent->v.velocity.v[Z_AX] < 60) ||
+    if ((trace.plane.normal.z > 0.7) &&
+        ((ent->v.velocity.z < 60) ||
             (
                 (ent->v.movetype != MOVETYPE_BOUNCE)
 #ifdef QUAKE2
@@ -1322,7 +1322,7 @@ void SV_Physics_Step(edict_p ent) {
 void SV_Physics_Step(edict_p ent) {
     // freefall if not onground
     if (!((EntityFlags_t)ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM))) {
-        bool hitsound = (ent->v.velocity.v[Z_AX] < sv_gravity.value * -0.1);
+        bool hitsound = (ent->v.velocity.z < sv_gravity.value * -0.1);
 
         SV_AddGravity(ent);
         SV_CheckVelocity(ent);

@@ -597,7 +597,7 @@ uint8_t PF_newcheckclient(uint8_t check) {
     // cycle to the next one
     CLAMP(1u, check, svs.maxClients);
 
-    uint8_t i = (check == svs.maxClients) ? 0 : check + 1;
+    uint8_t i = (check == svs.maxClients) ? 0 : (check + 1);
 
     edict_p ent;
     for (;; i++) {
@@ -811,9 +811,9 @@ void PF_vtos() {
     snprintf(
         _pr_string_temp, sizeof(_pr_string_temp),
         "'%5.1f %5.1f %5.1f'",
-        G_VECTOR(OFS_PARM0).v[X_AX],
-        G_VECTOR(OFS_PARM0).v[Y_AX],
-        G_VECTOR(OFS_PARM0).v[Z_AX]
+        G_VECTOR(OFS_PARM0).x,
+        G_VECTOR(OFS_PARM0).y,
+        G_VECTOR(OFS_PARM0).z
     );
     G_INT(OFS_RETURN) = PR_SetQString(_pr_string_temp);
 }

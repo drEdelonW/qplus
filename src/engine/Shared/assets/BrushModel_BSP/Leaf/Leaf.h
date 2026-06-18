@@ -12,7 +12,7 @@
 // it was [mleaf_t]
 typedef struct mLeaf_s {    // TODO: merge in shared head structure with  mNode_s
     // common with node
-    int32_t contents;   // wil be a negative contents number
+    /* contents_t */int32_t contents;   // wil be a negative contents number
     int32_t visframe;   // node needs to be traversed if current
 #ifdef GLQUAKE
     vec3_t  min;

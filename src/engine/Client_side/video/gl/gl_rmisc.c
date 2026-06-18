@@ -38,13 +38,13 @@ R_InitTextures
 */
 void R_InitTextures() {
     // create a simple checkerboard texture for the default
-    r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + 16 * 16 + 8 * 8 + 4 * 4 + 2 * 2, "notexture");
+    r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + (16*16) + (8*8) + (4*4) + (2*2), "notexture");
 
     r_notexture_mip->width = r_notexture_mip->height = 16;
     r_notexture_mip->offsets[0] = sizeof(Texture_t);
-    r_notexture_mip->offsets[1] = r_notexture_mip->offsets[0] + 16 * 16;
-    r_notexture_mip->offsets[2] = r_notexture_mip->offsets[1] + 8 * 8;
-    r_notexture_mip->offsets[3] = r_notexture_mip->offsets[2] + 4 * 4;
+    r_notexture_mip->offsets[1] = r_notexture_mip->offsets[0] + (16 * 16);
+    r_notexture_mip->offsets[2] = r_notexture_mip->offsets[1] + (8 * 8);
+    r_notexture_mip->offsets[3] = r_notexture_mip->offsets[2] + (4 * 4);
 
     for (int m = 0; m < 4; m++) {
         uint8_p dest = (uint8_p)r_notexture_mip + r_notexture_mip->offsets[m];

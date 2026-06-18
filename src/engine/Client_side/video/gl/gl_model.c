@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "model.h"
 #include "qOpenGL.h"
 #include "types.h"
-#include "bspfile.h"
 #include "cvar.h"
 #include <string.h>
 #include "host.h"

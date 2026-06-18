@@ -61,7 +61,7 @@ R_MarkLights
 =============
 */
 void R_MarkLights(dLight_p light, int bit, mNode_p node) {
-    if (node->contents < 0)
+    if (node->contents < CONTENTS_NODE)
         return;
 
     mPlane_p splitplane = node->plane;
@@ -121,7 +121,7 @@ LIGHT SAMPLING
 */
 
 int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
-    if (node->contents < 0)
+    if (node->contents < CONTENTS_NODE)
         return -1;  // didn't hit anything
 
     // calculate mid point

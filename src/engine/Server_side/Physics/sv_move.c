@@ -50,12 +50,12 @@ bool SV_CheckBottom(edict_p ent) {
     vec3_t start = {
         .x = 0.0f,
         .y = 0.0f,
-        .z = mins.v[Z_AX] - 1.0f
+        .z = mins.z - 1.0f
     };
     for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++) {
-            (start.v[X_AX] = x) ? maxs.v[X_AX] : mins.v[X_AX];
-            (start.v[Y_AX] = y) ? maxs.v[Y_AX] : mins.v[Y_AX];
+            (start.x = x) ? maxs.x : mins.x;
+            (start.y = y) ? maxs.y : mins.y;
             if (SV_PointContents(start) != CONTENTS_SOLID)
                 goto realcheck;
         }
@@ -69,22 +69,25 @@ realcheck:
     // check it for real...
     //
 #if 0
-    start.v[Z_AX] = mins.v[Z_AX];
+    start.z = mins.z;
 
     // the midpoint must be within 16 of the bottom
-    vec3_t stop;
-    stop.v[X_AX] = start.v[X_AX] = (mins.v[X_AX] + maxs.v[X_AX]) * 0.5f;
-    stop.v[Y_AX] = start.v[Y_AX] = (mins.v[Y_AX] + maxs.v[Y_AX]) * 0.5f;
-    stop.v[Z_AX] = start.v[Z_AX] - 2 * STEPSIZE;
+    vec3_t stop = {
+        .x = start.x = (mins.x + maxs.x) * 0.5f,
+        .y = start.y = (mins.y + maxs.y) * 0.5f,
+        .z = start.z - 2 * STEPSIZE
+    };
 #else
-    start.v[X_AX] = (mins.v[X_AX] + maxs.v[X_AX]) * 0.5f,
-    start.v[Y_AX] = (mins.v[Y_AX] + maxs.v[Y_AX]) * 0.5f,
-    start.v[Z_AX] = mins.v[Z_AX];   // the midpoint must be within 16 of the bottom
+    start = (vec3_t){
+        .x = (mins.x + maxs.x) * 0.5f,
+        .y = (mins.y + maxs.y) * 0.5f,
+        .z = mins.z   // the midpoint must be within 16 of the bottom
+    };
 
     vec3_t stop = {
-        .x = start.v[X_AX],
-        .y = start.v[Y_AX],
-        .z = start.v[Z_AX] - 2 * STEPSIZE
+        .x = start.x,
+        .y = start.y,
+        .z = start.z - 2 * STEPSIZE
     };
 #endif
     trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, ent);
@@ -92,20 +95,24 @@ realcheck:
     if (trace.fraction == 1.0)
         return false;
 
-    float mid = trace.endpos.v[Z_AX];
-    float bottom = trace.endpos.v[Z_AX];
+    float mid = trace.endpos.z;
+    float bottom = trace.endpos.z;
 
     // the corners must be within 16 of the midpoint
     for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++) {
-            start.v[X_AX] = stop.v[X_AX] = x ? maxs.v[X_AX] : mins.v[X_AX];
-            start.v[Y_AX] = stop.v[Y_AX] = y ? maxs.v[Y_AX] : mins.v[Y_AX];
+            start.x = stop.x = (x) ? maxs.x : mins.x;
+            start.y = stop.y = (y) ? maxs.y : mins.y;
 
             trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, ent);
 
-            if ((trace.fraction != 1.0) && (trace.endpos.v[Z_AX] > bottom))
-                bottom = trace.endpos.v[Z_AX];
-            if ((trace.fraction == 1.0) || (mid - trace.endpos.v[Z_AX] > STEPSIZE))
+            if ((trace.fraction != 1.0) &&
+                (trace.endpos.z > bottom)
+                )
+                bottom = trace.endpos.z;
+            if ((trace.fraction == 1.0) ||
+                (mid - trace.endpos.z > STEPSIZE)
+                )
                 return false;
         }
 
@@ -137,9 +144,9 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
             neworg = VectorAdd(ent->v.origin, move);
             edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
             if (i == 0 && (enemy != Edicts)) {
-                float dz = ent->v.origin.v[Z_AX] - ED_GetEDictByOffs(ent->v.enemy)->v.origin.v[Z_AX];
-                if (dz > 40)    neworg.v[Z_AX] -= 8;
-                if (dz < 30)    neworg.v[Z_AX] += 8;
+                float dz = ent->v.origin.z - ED_GetEDictByOffs(ent->v.enemy)->v.origin.z;
+                if (dz > 40)    neworg.z -= 8;
+                if (dz < 30)    neworg.z += 8;
             }
             trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, neworg, MOVE_NORMAL, ent);
 
@@ -162,9 +169,9 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
     }
 
     // push down from a step height above the wished position
-    neworg.v[Z_AX] += STEPSIZE;
+    neworg.z += STEPSIZE;
     vec3_t end = neworg;
-    end.v[Z_AX] -= STEPSIZE * 2;
+    end.z -= STEPSIZE * 2;
 
     trace_t trace = SV_Move(neworg, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
 
@@ -172,7 +179,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
         return false;
 
     if (trace.startsolid) {
-        neworg.v[Z_AX] -= STEPSIZE;
+        neworg.z -= STEPSIZE;
         trace = SV_Move(neworg, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
         if (trace.allsolid || trace.startsolid)
             return false;
@@ -235,7 +242,7 @@ bool SV_StepDirection(edict_p ent, float yaw, float dist) {
     PF_changeyaw();
 
     yaw = yaw * (float)M_PI * 2 / 360;
-    vec3_t  move = {
+    vec3_t move = {
         .x = (float)cos(yaw) * dist,
         .y = (float)sin(yaw) * dist,
         .z = 0.0f

@@ -117,11 +117,7 @@ void PR_RunError(cString error, ...) {
     char string[1024];  vsnprintf(string, sizeof(string), error, argptr);
     va_end(argptr);
 
-#if 0
-    PR_PrintStatement(pr_statements + _pr_xStatement);
-#else
     PR_PrintStatement(PR_GetStack(_pr_xStatement));
-#endif
     PR_StackTrace();
     Con_Printf("%s\n", string);
 
@@ -223,11 +219,7 @@ void PR_ExecuteProgram(func_t fnum) {
     while (1) {
         stack++; // next statement
 
-#if 0
-        dStatement_p st = &pr_statements[stack];
-#else
         dStatement_p st = PR_GetStack(stack);
-#endif
         eval_p a = (eval_p)&pr_globals[st->a];
         eval_p b = (eval_p)&pr_globals[st->b];
         eval_p c = (eval_p)&pr_globals[st->c];
@@ -257,59 +249,27 @@ void PR_ExecuteProgram(func_t fnum) {
                     return;  // all done
             } break;
 
-            case OP_MUL_F:      c->_float = a->_float * b->_float;      break;
-            case OP_MUL_V: {
-                c->_float =
-                    a->vector.v[X_AX] * b->vector.v[X_AX] +
-                    a->vector.v[Y_AX] * b->vector.v[Y_AX] +
-                    a->vector.v[Z_AX] * b->vector.v[Z_AX];
-            } break;
-            case OP_MUL_FV: {
-                c->vector.v[X_AX] = a->_float * b->vector.v[X_AX];
-                c->vector.v[Y_AX] = a->_float * b->vector.v[Y_AX];
-                c->vector.v[Z_AX] = a->_float * b->vector.v[Z_AX];
-            } break;
-            case OP_MUL_VF: {
-                c->vector.v[X_AX] = b->_float * a->vector.v[X_AX];
-                c->vector.v[Y_AX] = b->_float * a->vector.v[Y_AX];
-                c->vector.v[Z_AX] = b->_float * a->vector.v[Z_AX];
-            } break;
+            case OP_MUL_F:  c->_float = a->_float * b->_float;              break;
+            case OP_MUL_V:  c->_float = DotProduct(a->vector, b->vector);   break;
+            case OP_MUL_FV: c->vector = VectorScale(b->vector, a->_float);  break;
+            case OP_MUL_VF: c->vector = VectorScale(a->vector, b->_float);  break;
 
-            case OP_DIV_F:      c->_float = a->_float / b->_float;              break;
-
+            case OP_DIV_F:      c->_float = a->_float / b->_float;      break;
             case OP_ADD_F:      c->_float = a->_float + b->_float;      break;
-            case OP_ADD_V: {
-                c->vector.v[X_AX] = a->vector.v[X_AX] + b->vector.v[X_AX];
-                c->vector.v[Y_AX] = a->vector.v[Y_AX] + b->vector.v[Y_AX];
-                c->vector.v[Z_AX] = a->vector.v[Z_AX] + b->vector.v[Z_AX];
-            } break;
+            case OP_ADD_V: c->vector = VectorAdd(a->vector, b->vector); break;
 
             case OP_SUB_F:      c->_float = a->_float - b->_float;      break;
-            case OP_SUB_V: {
-                c->vector.v[X_AX] = a->vector.v[X_AX] - b->vector.v[X_AX];
-                c->vector.v[Y_AX] = a->vector.v[Y_AX] - b->vector.v[Y_AX];
-                c->vector.v[Z_AX] = a->vector.v[Z_AX] - b->vector.v[Z_AX];
-            } break;
+            case OP_SUB_V: c->vector = VectorSubtract(a->vector, b->vector); break;
 
-            case OP_EQ_F:       c->_float = a->_float == b->_float;                 break;
-            case OP_EQ_V: {
-                c->_float =
-                    (a->vector.v[X_AX] == b->vector.v[X_AX]) &&
-                    (a->vector.v[Y_AX] == b->vector.v[Y_AX]) &&
-                    (a->vector.v[Z_AX] == b->vector.v[Z_AX]);
-            } break;
-            case OP_EQ_S:       c->_float = !strcmp(PR_GetQString(a->string), PR_GetQString(b->string));    break;
+            case OP_EQ_F:       c->_float = a->_float == b->_float;     break;
+            case OP_EQ_V:       c->_float = VectorCompare(a->vector, b->vector);    break;
+            case OP_EQ_S:       c->_float = !strcmp(PR_GetQString(a->string), PR_GetQString(b->string));        break;
             case OP_EQ_E:       c->_float = (a->_int == b->_int);                   break;
             case OP_EQ_FNC:     c->_float = a->function == b->function;             break;
 
             case OP_NE_F:       c->_float = a->_float != b->_float;                 break;
-            case OP_NE_V: {
-                c->_float =
-                    (a->vector.v[X_AX] != b->vector.v[X_AX]) ||
-                    (a->vector.v[Y_AX] != b->vector.v[Y_AX]) ||
-                    (a->vector.v[Z_AX] != b->vector.v[Z_AX]);
-            } break;
-            case OP_NE_S:       c->_float = (float)strcmp(PR_GetQString(a->string), PR_GetQString(b->string));   break;
+            case OP_NE_V:       c->_float = !VectorCompare(a->vector, b->vector);   break;
+            case OP_NE_S:       c->_float = (float)strcmp(PR_GetQString(a->string), PR_GetQString(b->string));  break;
             case OP_NE_E:       c->_float = a->_int != b->_int;         break;
             case OP_NE_FNC:     c->_float = a->function != b->function; break;
 
@@ -339,9 +299,7 @@ void PR_ExecuteProgram(func_t fnum) {
                 ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
                 a = (eval_p)((int32_p)&ed->v + b->_int);
-                c->vector.v[X_AX] = a->vector.v[X_AX];
-                c->vector.v[Y_AX] = a->vector.v[Y_AX];
-                c->vector.v[Z_AX] = a->vector.v[Z_AX];
+                    c->vector = a->vector;
             } break;
 
             case OP_ADDRESS: {
@@ -365,12 +323,8 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_STORE_S:
             case OP_STORE_ENT:
             case OP_STORE_FLD:  // integers
-            case OP_STORE_FNC:  b->_int = a->_int;  break;  // pointers
-            case OP_STORE_V: {
-                b->vector.v[X_AX] = a->vector.v[X_AX];
-                b->vector.v[Y_AX] = a->vector.v[Y_AX];
-                b->vector.v[Z_AX] = a->vector.v[Z_AX];
-            } break;
+            case OP_STORE_FNC:  b->_int = a->_int;          break;  // pointers
+            case OP_STORE_V:    b->vector = a->vector;      break;
 
             case OP_STOREP_F:
             case OP_STOREP_S:
@@ -382,15 +336,13 @@ void PR_ExecuteProgram(func_t fnum) {
             } break;
             case OP_STOREP_V: {
                 eval_p ptr = (eval_p)((uint8_p)Edicts + b->_int);
-                ptr->vector.v[X_AX] = a->vector.v[X_AX];
-                ptr->vector.v[Y_AX] = a->vector.v[Y_AX];
-                ptr->vector.v[Z_AX] = a->vector.v[Z_AX];
+                ptr->vector = a->vector;
             } break;
 
             //==================
 
             case OP_NOT_F:      c->_float = !a->_float;     break;
-            case OP_NOT_V:      c->_float = (!a->vector.v[X_AX]) && (!a->vector.v[Y_AX]) && (!a->vector.v[Z_AX]);    break;
+            case OP_NOT_V:      c->_float = (!a->vector.x) && (!a->vector.y) && (!a->vector.z); break;
             case OP_NOT_S:      c->_float = (!a->string) || (!(*PR_GetQString(a->string)));   break;        // c->_float = !a->string || !pr_strings[a->string];
             case OP_NOT_ENT:    c->_float = (ED_GetEDictByOffs(a->edict) == Edicts);        break;
             case OP_NOT_FNC:    c->_float = !a->function;   break;

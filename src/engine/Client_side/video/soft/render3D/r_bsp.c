@@ -207,18 +207,22 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
             // generate the clipped vertex
             float frac = lastdist / (lastdist - dist);
             mVertex_p ptvert = &_pbVerts[_numbVerts++];
+#if 0
             ptvert->position.x =
                 plastvert->position.x +
-                frac * (pvert->position.x -
-                    plastvert->position.x);
+                frac * (pvert->position.x - plastvert->position.x);
             ptvert->position.y =
                 plastvert->position.y +
-                frac * (pvert->position.y -
-                    plastvert->position.y);
+                frac * (pvert->position.y - plastvert->position.y);
             ptvert->position.z =
                 plastvert->position.z +
-                frac * (pvert->position.z -
-                    plastvert->position.z);
+                frac * (pvert->position.z - plastvert->position.z);
+#else
+            // Linear interpolation: pt = plast + frac * (pvert - plast)
+            ptvert->position = VectorMA(plastvert->position,
+                frac, VectorSubtract(pvert->position, plastvert->position)
+            );
+#endif
 
             // split into two edges, one on each side, and remember entering
             // and exiting points
@@ -291,8 +295,9 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
 
             // we're done with this branch if the node or leaf isn't in the PVS
             if (pn->visframe == r_visframecount) {
-                if ((pn->contents < 0) &&
-                    (pn->contents != CONTENTS_SOLID)) {
+                if ((pn->contents < CONTENTS_NODE) &&
+                    (pn->contents != CONTENTS_SOLID)
+                    ) {
                     r_currentbkey = ((mLeaf_p)pn)->key;
                     R_RenderBmodelFace(psideedges[i], psurf);
                 }
@@ -300,7 +305,8 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
                     R_RecursiveClipBPoly(
                         psideedges[i],
                         pnode->children[i],
-                        psurf);
+                        psurf
+                    );
                 }
             }
         }
@@ -457,7 +463,7 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
     }
 
     // if a leaf node, draw stuff
-    if (node->contents < 0) {
+    if (node->contents < CONTENTS_NODE) {
         mLeaf_p pleaf = (mLeaf_p)node;
 
         mSurface_ar mark = pleaf->firstmarksurface;

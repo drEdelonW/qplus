@@ -541,7 +541,7 @@ void Mod_LoadFaces(Lump_p Lump_in) {
 */
 void Mod_SetParent(mNode_p node, mNode_p parent) {
     node->parent = parent;
-    if (node->contents < 0) return;
+    if (node->contents < CONTENTS_NODE) return;
 
     Mod_SetParent(node->children[0], node);
     Mod_SetParent(node->children[1], node);
@@ -714,8 +714,8 @@ void Mod_MakeHull0() {
         out->planenum = in->plane - _loadModel->planes;
         for (int j = 0; j < 2; j++) {
             mNode_p child = in->children[j];
-            if (child->contents < 0)    out->children[j] = child->contents;
-            else                        out->children[j] = child - _loadModel->nodes;
+            if (child->contents < CONTENTS_NODE)    out->children[j] = child->contents;
+            else                                    out->children[j] = child - _loadModel->nodes;
         }
     }
 }

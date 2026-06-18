@@ -297,7 +297,7 @@ void GL_DrawAliasFrame(AliasHdr_p pAliasHdr, int posenum) {
                 // normals and vertexes come from the frame list
                 float l = shadedots[verts->lightnormalindex] * shadelight;
                 glColor3f(l, l, l);
-                glVertex3f(verts->v8[0], verts->v8[1], verts->v8[2]);
+                glVertex3f(verts->v8[X_AX], verts->v8[Y_AX], verts->v8[Z_AX]);
                 verts++;
             } while (--count);
 
@@ -345,9 +345,9 @@ void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
 
                 // normals and vertexes come from the frame list
                 vec3_t point = {
-                    .x = verts->v8[0] * pAliasHdr->scale.x + pAliasHdr->scale_origin.x,
-                    .y = verts->v8[1] * pAliasHdr->scale.y + pAliasHdr->scale_origin.y,
-                    .z = verts->v8[2] * pAliasHdr->scale.z + pAliasHdr->scale_origin.z
+                    .x = verts->v8[X_AX] * pAliasHdr->scale.x + pAliasHdr->scale_origin.x,
+                    .y = verts->v8[Y_AX] * pAliasHdr->scale.y + pAliasHdr->scale_origin.y,
+                    .z = verts->v8[Z_AX] * pAliasHdr->scale.z + pAliasHdr->scale_origin.z
                 };
                 point.x -= shadevector.x * (point.z + lheight);
                 point.y -= shadevector.y * (point.z + lheight);

@@ -28,7 +28,6 @@ typedef struct {
 typedef AuxVert_t* AuxVert_p;
 
 // flags in FinalVert_t.flags
-
 typedef enum alias_clip_flags_e {
     ALIAS_LEFT_CLIP     = 0x0001u,
     ALIAS_TOP_CLIP      = 0x0002u,
@@ -52,12 +51,7 @@ typedef struct FinalVert_s {
         } vx;
         int32_t v32[6]; /* !!!MUST BE SIGNED!!! */  // u, v, s, t, l, 1/z  // (u, v), (s, t), light, iz
     };
-    
-#if 0
-    int                 flags;  //alias_clip_flags_t
-#else
     AliasClipFlags_f    flags;  //alias_clip_flags_t
-#endif
     float   reserved;
 } FinalVert_t;
 typedef FinalVert_t* FinalVert_p;

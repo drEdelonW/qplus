@@ -5,6 +5,7 @@
 #include "TexInfo.h"
 #include "enginedefs.h"
 #include "SurfCache.h"
+#include "Face.h"
 
 typedef enum {
     SURF_NONE           = 0u,

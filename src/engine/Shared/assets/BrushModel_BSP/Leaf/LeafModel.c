@@ -1,5 +1,6 @@
 #include "LeafModel.h"
 #include "host.h"
+#include "bspfile.h"
 
 /*
 ===============
@@ -11,11 +12,11 @@ mLeaf_p Mod_PointInLeaf(vec3_t p, Model_p model) {
 
     mNode_p node = model->nodes;
     while (1) {
-        if (node->contents < 0)     return (mLeaf_p)node;
+        if (node->contents < CONTENTS_NODE)     return (mLeaf_p)node;
 
         float d = DotProduct(p, node->plane->normal) - node->plane->dist;
-        if (d > 0)  node = node->children[0];
-        else        node = node->children[1];
+        if (d > 0.0f)   node = node->children[0];
+        else            node = node->children[1];
     }
 
     return NULL; // never reached

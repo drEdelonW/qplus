@@ -8,7 +8,7 @@ typedef struct mNode_s mNode_t;
 typedef mNode_t* mNode_p;
 struct mNode_s {    // TODO: merge in shared head structure with  mLeaf_s
     // common with leaf
-    int32_t     contents;  // 0, to differentiate from leafs
+    /* contents_t */int32_t contents;  // 0, to differentiate from leafs
     int32_t     visframe;  // node needs to be traversed if current
 #ifdef GLQUAKE
     vec3_t      min;

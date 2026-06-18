@@ -1081,7 +1081,7 @@ void R_RecursiveWorldNode(mNode_p node) {
         )   return;
 
     // if a leaf node, draw stuff
-    if (node->contents < 0) {
+    if (node->contents < CONTENTS_NODE) {
         mLeaf_p pleaf = (mLeaf_p)node;
 
         mSurface_ar mark = pleaf->firstmarksurface;
