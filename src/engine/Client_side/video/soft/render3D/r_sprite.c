@@ -354,17 +354,9 @@ void R_DrawSprite() {
         // generate the sprite's axes, completely parallel to the viewplane. There
         // are no problem situations, because the sprite is always in the same
         // position relative to the viewer
-#if 0
-        for (int i = 0; i < VECT_DIM; i++) {
-            r_spritedesc.vup.v[i] = vup.v[i];
-            r_spritedesc.vright.v[i] = vright.v[i];
-            r_spritedesc.vpn.v[i] = vpn.v[i];
-        }
-#else
         r_spritedesc.vup = vup;
         r_spritedesc.vright = vright;
         r_spritedesc.vpn = vpn;
-#endif
     }
     else if (psprite->type == SPR_VP_PARALLEL_UPRIGHT) {
         // generate the sprite's axes, with vup straight up in worldspace, and
@@ -412,17 +404,9 @@ void R_DrawSprite() {
         float sr = sin(angle);
         float cr = cos(angle);
 
-#if 0
-        for (int i = 0; i < VECT_DIM; i++) {
-            r_spritedesc.vpn.v[i] = vpn.v[i];
-            r_spritedesc.vright.v[i] = vright.v[i] * cr + vup.v[i] * sr;
-            r_spritedesc.vup.v[i] = vright.v[i] * -sr + vup.v[i] * cr;
-        }
-#else
         r_spritedesc.vpn = vpn;
         r_spritedesc.vright = VectorMA(VectorScale(vright, cr), sr, vup);
         r_spritedesc.vup = VectorMA(VectorScale(vright, -sr), cr, vup);
-#endif
     }
     else {
         Host_SysError("R_DrawSprite: Bad sprite type %d", psprite->type);

@@ -118,7 +118,16 @@ void VectorCopy(vec3_t const in, vec3_p out) {
 #endif
 }
 
-vec3_t/*void*/  CrossProduct(vec3_t const v1, vec3_t const v2 /*, vec3_p cross */ ) {
+vec3_t  Scalar2Vector(vec_t scale) {
+    vec3_t out = {
+        .x = scale,
+        .y = scale,
+        .z = scale
+    };
+    return out;
+}
+
+vec3_t CrossProduct(vec3_t const v1, vec3_t const v2 /*, vec3_p cross */ ) {
     vec3_t out;
 #if 1
     Vector3D aV(v1);
@@ -179,7 +188,7 @@ void VectorInverse(vec3_p v) {
 #endif
 }
 
-vec3_t/*void*/  VectorScale(vec3_t const in, vec_t const scale/*, vec3_p out */ ) {
+vec3_t VectorScale(vec3_t const in, vec_t const scale/*, vec3_p out */ ) {
     vec3_t out;
 #if 1
     Vector3D V(in);

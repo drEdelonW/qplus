@@ -1,6 +1,6 @@
 #pragma once
-#include <stdbool.h>
 #include "assert.h"
+#include <stdbool.h>
 
 
 typedef float vec_t;
@@ -65,7 +65,7 @@ extern "C" {
 #endif
 
     void    VectorCopy(vec3_t const in, vec3_p out); // src/engine/Client_side/video/soft/render3D/r_alias.c:383
-
+    vec3_t  Scalar2Vector(vec_t scale);
     vec3_t  VectorAdd(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ );         // va + vb
     vec3_t  VectorSubtract(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ );    // va - vb
     vec3_t  VectorScale(vec3_t const in, vec_t const scale /*, vec3_p out */ );         // va + s

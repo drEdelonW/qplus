@@ -94,14 +94,9 @@ void R_AddDynamicLights(mSurface_p surf) {
             continue;
         minlight = rad - minlight;
 
-#if 0
-        vec3_t  impact;
-        for (int i = 0; i < VECT_DIM; i++) {
-            impact.v[i] = cl_dlights[lnum].origin.v[i] - surf->plane->normal.v[i] * dist;
-        }
-#else
-        vec3_t impact = VectorMA(cl_dlights[lnum].origin, -dist, surf->plane->normal);
-#endif
+        vec3_t impact = VectorMA(cl_dlights[lnum].origin,
+            -dist, surf->plane->normal
+        );
 
         vec3_t local;
         local.v[0] = DotProduct(impact, *(vec3_p)tex->vecs[0]) + tex->vecs[0][3];   // TODO: fix this workaround
@@ -980,15 +975,9 @@ void R_DrawBrushModel(r_Entity_p e) {
             e->angles.roll
             ) {
             rotated = true;
-#if 0
-            for (int i = 0; i < VECT_DIM; i++) {
-                mins.v[i] = e->origin.v[i] - clmodel->radius;
-                maxs.v[i] = e->origin.v[i] + clmodel->radius;
-            }
-#else
+
             mins = VectorAddVal(e->origin, -clmodel->radius);
             maxs = VectorAddVal(e->origin, +clmodel->radius);
-#endif
         }
         else {
             rotated = false;
@@ -1389,7 +1378,7 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
                     for (int k = 0; k < VERTEXSIZE; ++k)
                         poly->verts[j - 1][k] = poly->verts[j][k];
 #else
-                        poly->verts[j - 1] = poly->verts[j];
+                    poly->verts[j - 1] = poly->verts[j];
 #endif
                 }
                 --lnumverts;

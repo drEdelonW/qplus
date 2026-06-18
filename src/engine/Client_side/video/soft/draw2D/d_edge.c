@@ -131,11 +131,11 @@ void D_CalcGradients(mSurface_p pface) {
     {
         float t = 0x10000 * mipscale;
         sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5f)) -
-            ((pface->texturemins[0] << 16) >> _miplevel)
-            + pface->texinfo->vecs[0][3] * t;
+            ((pface->texturemins[0] << 16) >> _miplevel) +
+            (pface->texinfo->vecs[0][3] * t);
         tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5f)) -
-            ((pface->texturemins[1] << 16) >> _miplevel)
-            + pface->texinfo->vecs[1][3] * t;
+            ((pface->texturemins[1] << 16) >> _miplevel) +
+            pface->texinfo->vecs[1][3] * t;
     }
     //
     // -1 (-epsilon) so we never wander off the edge of the texture

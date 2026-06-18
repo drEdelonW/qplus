@@ -759,22 +759,13 @@ void V_CalcRefdef() {
     //vec3_t forward, right, up;
     AngleVectors(angles, &forward, &right, &up);
 
-#if 0
-    for (int i = 0; i < VECT_DIM; i++) {
-        r_refdef.vieworg.v[i] +=
-            scr_ofsx.value * forward.v[i] +
-            scr_ofsy.value * right.v[i] +
-            scr_ofsz.value * up.v[i];
-    }
-#else
+
     r_refdef.vieworg =
-        VectorMA(
-            VectorMA(
-                VectorMA(r_refdef.vieworg,
-                    scr_ofsz.value, up),
-                scr_ofsy.value, right),
-            scr_ofsx.value, forward);
-#endif
+        VectorMA(VectorMA(VectorMA(r_refdef.vieworg,
+            scr_ofsz.value, up),
+            scr_ofsy.value, right),
+            scr_ofsx.value, forward
+        );
 
 
     V_BoundOffsets();
@@ -786,15 +777,9 @@ void V_CalcRefdef() {
     view->origin = ent->origin;
     view->origin.z += cl.viewheight;
 
-#if 0
-    for (int i = 0; i < VECT_DIM; i++) {
-        view->origin.v[i] += forward.v[i] * bob * 0.4;
-        //  view->origin[i] += right[i]*bob*0.4;
-        //  view->origin[i] += up[i]*bob*0.8;
-    }
-#else
-    view->origin = VectorMA(view->origin, bob * 0.4, forward);
-#endif
+    view->origin = VectorMA(view->origin, bob * 0.4f, forward);
+    // view->origin = VectorMA(view->origin, bob * 0.4f, right);
+    // view->origin = VectorMA(view->origin, bob * 0.8f, up);
     view->origin.z += bob;
 
     // fudge position around to keep amount of weapon visible
@@ -875,12 +860,7 @@ void V_RenderView() {
         vid.aspect *= 0.5;
 
         r_refdef.viewangles.yaw -= lcd_yaw.value;
-#if 0
-        for (int i = 0; i < VECT_DIM; i++)
-            r_refdef.vieworg.v[i] -= right.v[i] * lcd_x.value;
-#else
         r_refdef.vieworg = VectorMA(r_refdef.vieworg, -lcd_x.value, right);
-#endif
 
         R_RenderView();
 
@@ -889,12 +869,8 @@ void V_RenderView() {
         R_PushDlights();
 
         r_refdef.viewangles.yaw += lcd_yaw.value * 2;
-#if 0
-        for (int i = 0; i < VECT_DIM; i++)
-            r_refdef.vieworg.v[i] += 2 * right.v[i] * lcd_x.value;
-#else
+
         r_refdef.vieworg = VectorMA(r_refdef.vieworg, 2 * lcd_x.value, right);
-#endif 
         R_RenderView();
 
         vid.buffer -= vid.rowbytes >> 1;

@@ -193,9 +193,8 @@ MoveClipFlags_e ClipVelocity(vec3_t in, vec3_t normal, vec3_p out, float overbou
 
     float backoff = DotProduct(in, normal) * overbounce;
 
+    *out = VectorMA(in, -backoff, normal);
     for (int i = 0; i < VECT_DIM; i++) {
-        float change = normal.v[i] * backoff;
-        out->v[i] = in.v[i] - change;
         if ((out->v[i] > -STOP_EPSILON) &&
             (out->v[i] < STOP_EPSILON)
             )
@@ -234,13 +233,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, float time, trace_p steptrace) {
             !(ent->v.velocity.y) &&
             !(ent->v.velocity.z)) break; // ent->v.velocity.is_zero()
 
-#if 0
-        vec3_t end; // end = ent->v.origin + (timeleft * ent->v.velocity); in vect3df
-        for (int i = 0; i < VECT_DIM; i++)
-            end.v[i] = ent->v.origin.v[i] + time_left * ent->v.velocity.v[i];
-#else
         vec3_t end = VectorMA(ent->v.origin, time_left, ent->v.velocity);
-#endif
 
         trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
 
@@ -403,18 +396,9 @@ void SV_PushMove(edict_p pusher, float movetime) {
         return;
     }
 
-#if 0
-    vec3_t  mins, maxs, move;
-    for (int i = 0; i < VECT_DIM; i++) {
-        move.v[i] = pusher->v.velocity.v[i] * movetime;
-        mins.v[i] = pusher->v.absmin.v[i] + move.v[i];
-        maxs.v[i] = pusher->v.absmax.v[i] + move.v[i];
-    }
-#else
     vec3_t move = VectorScale(pusher->v.velocity, movetime);
     vec3_t mins = VectorAdd(pusher->v.absmin, move);
     vec3_t maxs = VectorAdd(pusher->v.absmax, move);
-#endif
 
     vec3_t pushorig = pusher->v.origin;
 
@@ -530,13 +514,8 @@ void SV_PushRotate(edict_p pusher, float movetime) {
         return;
     }
 
-#if 0
-    vec3_t amove;
-    for (int i = 0; i < VECT_DIM; i++)
-        amove.v[i] = pusher->v.avelocity.v[i] * movetime;
-#else
+
     vec3_t amove = VectorScale(pusher->v.avelocity, movetime);
-#endif
 
     vec3_t a = VectorSubtract(vec3_origin, amove);
     vec3_t forward, right, up;  AngleVectors(a, forward, right, up);

@@ -299,18 +299,13 @@ void CL_RelinkEntities() {
     cl_numvisedicts = 0;
 
     // interpolate player info
-#if 0
-    for (int i = 0; i < VECT_DIM; i++)
-        cl.velocity.v[i] = (
-            cl.mvelocity[1].v[i] +
-            frac * (
-                cl.mvelocity[0].v[i] -
-                cl.mvelocity[1].v[i])
-            );
-#else
-    cl.velocity = VectorMA(cl.mvelocity[1], frac, VectorSubtract(cl.mvelocity[0], cl.mvelocity[1]));
-#endif
-            
+
+    cl.velocity = VectorMA(cl.mvelocity[1],
+        frac, VectorSubtract(
+            cl.mvelocity[0], cl.mvelocity[1]
+        )
+    );
+
     if (cls.demoplayback) {
         // interpolate the angles
         for (int j = 0; j < VECT_DIM; j++) {
@@ -347,18 +342,17 @@ void CL_RelinkEntities() {
         }
         else { // if the delta is large, assume a teleport and don't lerp
             float f = frac;
-            vec3_t delta;
+            vec3_t delta = VectorSubtract(ent->msg_origins[0], ent->msg_origins[1]);
             for (int j = 0; j < VECT_DIM; j++) {
-                delta.v[j] = ent->msg_origins[0].v[j] - ent->msg_origins[1].v[j];
                 if ((delta.v[j] > 100) ||
-                    (delta.v[j] < -100))
+                    (delta.v[j] < -100)
+                    )
                     f = 1.0f;  // assume a teleportation, not a motion
             }
 
             // interpolate the origin and angles
+            ent->origin = VectorMA(ent->msg_origins[1], f, delta);
             for (int j = 0; j < VECT_DIM; j++) {
-                ent->origin.v[j] = ent->msg_origins[1].v[j] + f * delta.v[j];
-
                 float d = ent->msg_angles[0].v[j] - ent->msg_angles[1].v[j];
                 if (d > 180)            d -= 360;
                 else if (d < -180)      d += 360;
@@ -415,7 +409,7 @@ void CL_RelinkEntities() {
             dl->origin = ent->origin;
             dl->radius = 200;
             dl->die = cl.time + 0.001;
-        }
+    }
 #endif
 
         if (ent->model->flags & EF_GIB)             R_RocketTrail(oldorg, ent->origin, RT_GIB);
@@ -443,7 +437,7 @@ void CL_RelinkEntities() {
             cl_visedicts[cl_numvisedicts] = ent;
             cl_numvisedicts++;
         }
-    }
+}
 
 }
 

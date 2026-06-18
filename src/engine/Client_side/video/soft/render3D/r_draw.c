@@ -244,12 +244,7 @@ void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip) {
 
                 float f = d0 / (d0 - d1);
                 mVertex_t clipvert;
-#if 0
-                for (int i = 0; i < VECT_DIM; i++)
-                    clipvert.position.v[i] = pv0->position.v[i] + f * (pv1->position.v[i] - pv0->position.v[i]);
-#else
                 clipvert.position = VectorMA(pv0->position, f, VectorSubtract(pv1->position, pv0->position));
-#endif
 
                 if (clip->leftedge) {
                     _r_leftclipped = true;
@@ -282,12 +277,7 @@ void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip) {
 
                 float f = d0 / (d0 - d1);
                 mVertex_t clipvert;
-#if 0
-                for (int i = 0; i < VECT_DIM; i++)
-                    clipvert.position.v[i] = pv0->position.v[i] + f * (pv1->position.v[i] - pv0->position.v[i]);
-#else
                 clipvert.position = VectorMA(pv0->position, f, VectorSubtract(pv1->position, pv0->position));
-#endif
                 if (clip->leftedge) {
                     _r_leftclipped = true;
                     _r_leftenter = clipvert;
@@ -651,21 +641,14 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
 
             if ((lastdist > 0) != (dist > 0)) {
                 float frac = dist / (dist - lastdist);
-#if 0
-                for (int k = 0; k < VECT_DIM; k++)
-                    verts[newpage][newverts].position.v[k] =
-                    verts[vertpage][i].position.v[k] +
-                    (
-                        (verts[vertpage][lastvert].position.v[k] -
-                            verts[vertpage][i].position.v[k]
-                            ) * frac
-                        );
-#else
+
                 verts[newpage][newverts].position = VectorMA(
                     verts[vertpage][i].position,
-                    frac, VectorSubtract(verts[vertpage][lastvert].position, verts[vertpage][i].position)
+                    frac, VectorSubtract(
+                        verts[vertpage][lastvert].position,
+                        verts[vertpage][i].position
+                    )
                 );
-#endif
                 newverts++;
             }
 

@@ -350,9 +350,9 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
 #ifdef QUAKE2
     if (ent->v.solid == SOLID_BSP &&
         (
-            ent->v.angles[0] ||
-            ent->v.angles[1] ||
-            ent->v.angles[2]
+            ent->v.angles.pitch ||
+            ent->v.angles.yaw ||
+            ent->v.angles.roll
             )) { // expand for rotation
         float max = 0;
         for (int i = 0; i < VECT_DIM; i++) {
@@ -363,15 +363,10 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
             if (v > max)
                 max = v;
         }
-#if 0
-        for (int i = 0; i < VECT_DIM; i++) {
-            ent->v.absmin[i] = ent->v.origin[i] - max;
-            ent->v.absmax[i] = ent->v.origin[i] + max;
-        }
-#else
-        ent->v.absmin = VectorSubtract(ent->v.origin, vec3_scalar(max));
-        ent->v.absmax = VectorAdd(ent->v.origin, vec3_scalar(max));
-#endif
+
+        ent->v.absmin = VectorSubtract(ent->v.origin, Scalar2Vector(max));
+        ent->v.absmax = VectorAdd(ent->v.origin, Scalar2Vector(max));
+
     }
     else
 #endif
@@ -462,7 +457,7 @@ int SV_HullPointContents(Hull_p hull, int num, vec3_t point) {
                 ) -
             plane->dist;
 
-        num = node->children[(d < 0) ? 1 : 0];
+        num = node->children[(d < 0.0f) ? 1 : 0];
     }
 
     return num;
@@ -576,13 +571,8 @@ bool SV_RecursiveHullCheck(
     CLAMP(0.0, frac, 1.0);
 
     float midf = p1f + (p2f - p1f) * frac;
-#if 0
-    vec3_t  mid;
-    for (int i = 0; i < VECT_DIM; i++)
-        mid.v[i] = p1.v[i] + frac * (p2.v[i] - p1.v[i]);
-#else
+
     vec3_t mid = VectorMA(p1, frac, VectorSubtract(p2, p1));
-#endif
 
     int side = (t1 < 0);
 
@@ -624,13 +614,7 @@ bool SV_RecursiveHullCheck(
             return false;
         }
         midf = p1f + (p2f - p1f) * frac;
-#if 0
-        for (int i = 0; i < VECT_DIM; i++) {
-            mid.v[i] = p1.v[i] + frac * (p2.v[i] - p1.v[i]);
-        }
-#else
         mid = VectorMA(p1, frac, VectorSubtract(p2, p1));
-#endif
     }
 
     trace->fraction = midf;
@@ -664,24 +648,26 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
 
 #ifdef QUAKE2
     // rotate start and end into the models frame of reference
-    if ((solid_t)ent->v.solid == SOLID_BSP &&
+    if (((solid_t)ent->v.solid == SOLID_BSP) &&
         (
-            ent->v.angles[0] ||
-            ent->v.angles[1] ||
-            ent->v.angles[2])
+            ent->v.angles.pitch ||
+            ent->v.angles.yaw ||
+            ent->v.angles.roll)
         ) {
         // vec3_t a;
-        vec3_t forward, right, up; AngleVectors(ent->v.angles, forward, right, up);
+        vec3_t forward, right, up; AngleVectors(ent->v.angles, &forward, &right, &up);
 
-        vec3_t temp = start_l;
-        start_l[0] = DotProduct(temp, forward);
-        start_l[1] = -DotProduct(temp, right);
-        start_l[2] = DotProduct(temp, up);
+        vec3_t start_l{
+            .x = DotProduct(start_l, forward);
+            .y = -DotProduct(start_l, right);
+            .z = DotProduct(start_l, up);
+        }
 
-        temp = end_l;
-        end_l[0] = DotProduct(temp, forward);
-        end_l[1] = -DotProduct(temp, right);
-        end_l[2] = DotProduct(temp, up);
+            end_l = {
+                .x = DotProduct(end_l, forward);
+                .y = -DotProduct(end_l, right);
+                .z = DotProduct(end_l, up);
+        }
     }
 #endif
 
@@ -692,9 +678,9 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
     // rotate endpos back to world frame of reference
     if (((solid_t)ent->v.solid == SOLID_BSP) &&
         (
-            ent->v.angles[0] ||
-            ent->v.angles[1] ||
-            ent->v.angles[2]) &&
+            ent->v.angles.pitch ||
+            ent->v.angles.yaw ||
+            ent->v.angles.roll) &&
         (trace.fraction != 1)) {
         vec3_t a = VectorSubtract(vec3_origin, ent->v.angles);
         vec3_t forward, right, up;  AngleVectors(a, &forward, &right, &up);
@@ -707,9 +693,9 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
         }
         {
             vec3_t temp = trace.plane.normal;
-            trace.plane.normal[0] = DotProduct(temp, forward);
-            trace.plane.normal[1] = -DotProduct(temp, right);
-            trace.plane.normal[2] = DotProduct(temp, up);
+            trace.plane.normal.x = DotProduct(temp, forward);
+            trace.plane.normal.y = -DotProduct(temp, right);
+            trace.plane.normal.z = DotProduct(temp, up);
         }
     }
 #endif
@@ -813,8 +799,8 @@ SV_MoveBounds
 void SV_MoveBounds(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, vec3_p boxmins, vec3_p boxmaxs) {
 #if 0
     // debug to test against everything
-    boxmins[0] = boxmins[1] = boxmins[2] = -9999;
-    boxmaxs[0] = boxmaxs[1] = boxmaxs[2] = 9999;
+    boxmins = Scalar2Vector(-9999);
+    boxmaxs = Scalar2Vector(9999);
 #else
     for (int i = 0; i < VECT_DIM; i++) {
         if (end.v[i] > start.v[i]) {
@@ -847,11 +833,10 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
     clip.type = type;
     clip.passedict = passedict;
 
-    if (type == MOVE_MISSILE)
-        for (int i = 0; i < VECT_DIM; i++) {
-            clip.mins2.v[i] = -15.0f;
-            clip.maxs2.v[i] = 15.0f;
-        }
+    if (type == MOVE_MISSILE) {
+        clip.mins2 = Scalar2Vector(-15.0f);
+        clip.maxs2 = Scalar2Vector(15.0f);
+    }
     else {
         clip.mins2 = mins;
         clip.maxs2 = maxs;

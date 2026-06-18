@@ -49,13 +49,8 @@ void BoundPoly(int numverts, float_p verts, vec3_p mins, vec3_p maxs) {
     for (int i = 0; i < numverts; i++) {
         vec3_t v = ((vec3_p)verts)[i];
         for (int j = 0; j < VECT_DIM; j++) {
-#if 0
-            if (v.v[j] < mins->v[j])   mins->v[j] = v.v[j];
-            if (v.v[j] > maxs->v[j])   maxs->v[j] = v.v[j];
-#else
             CLAMP_LESS(maxs->v[j], v.v[j]);
             CLAMP_MORE(mins->v[j], v.v[j]);
-#endif
         }
     }
 }
@@ -107,7 +102,7 @@ void SubdividePolygon(int numverts, float_p verts) {
                 // clip point
                 float frac = dist[j] / (dist[j] - dist[j + 1]);
                 for (int k = 0; k < VECT_DIM; k++)
-                    front[f].v[k] = back[b].v[k] = v[k] + frac * (v[3 + k] - v[k]);
+                    front[f].v[k] = back[b].v[k] = v[k] + frac * /*>>>*/(v[3 + k] - v[k]);/*<<< this is NOT vector yet */
                 f++;
                 b++;
             }
@@ -725,21 +720,20 @@ void DrawSkyPolygon(int nump, vec3_t vecs) {
 
     // project new texture coords
     for (int i = 0; i < nump; i++, vecs += 3) {
-        float s, t, dv;
-        {
+        float dv; {
             int j = vec_to_st[axis][2];
             if (j > 0)  dv = vecs.v[j - 1];
             else        dv = -vecs.v[-j - 1];
         }
-        {
+        float s; {
             int j = vec_to_st[axis][0];
-            if (j < 0)      s = -vecs.v[-j - 1] / dv;
-            else            s = vecs.v[j - 1] / dv;
+            if (j < 0)  s = -vecs.v[-j - 1] / dv;
+            else        s = vecs.v[j - 1] / dv;
         }
-        {
+        float t; {
             int j = vec_to_st[axis][1];
-            if (j < 0)      t = -vecs.v[-j - 1] / dv;
-            else            t = vecs.v[j - 1] / dv;
+            if (j < 0)  t = -vecs.v[-j - 1] / dv;
+            else        t = vecs.v[j - 1] / dv;
         }
         if (s < skymins[0][axis]) skymins[0][axis] = s;
         if (t < skymins[1][axis]) skymins[1][axis] = t;
@@ -874,8 +868,8 @@ void MakeSkyVec(float s, float t, int axis) {
 
     for (int j = 0; j < VECT_DIM; j++) {
         int k = st_to_vec[axis][j];
-        if (k < 0)      v.v[j] = -b.v[-k - 1];
-        else            v.v[j] = b.v[k - 1];
+        if (k < 0)  v.v[j] = -b.v[-k - 1];
+        else        v.v[j] = b.v[k - 1];
         v.v[j] += r_origin[j];
     }
 

@@ -1,10 +1,9 @@
 #pragma once
 
+#include "assert.h"
 #include "types.h"
-// #include "progdefs.h"
-// #include "Edict.h"
-#include "pr_Function.h"
 #include "vector.h"
+#include "pr_Function.h"    // for func_t
 
 typedef union {
     string_t    string;

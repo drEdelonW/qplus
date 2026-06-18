@@ -85,9 +85,9 @@ void Test_Spawn(vec3_t origin) {
 
 void DrawPuff(puff_p p) {
     vec3_t pts[2][3];
-    float  s, d;
 
     for (int i = 0; i < 2; i++) {
+        float s, d;
         if (i == 1) {
             s = 6;
             d = p->length;
@@ -97,17 +97,9 @@ void DrawPuff(puff_p p) {
             d = 0;
         }
 
-#if 0
-        for (int j = 0; j < VECT_DIM; j++) {
-            pts[i][0][j] = p->origin.v[j] + p->up.v[j] * s + p->reflect.v[j] * d;
-            pts[i][1][j] = p->origin.v[j] + p->right.v[j] * s + p->reflect.v[j] * d;
-            pts[i][2][j] = p->origin.v[j] + p->right.v[j] * -s + p->reflect.v[j] * d;
-        }
-#else
         pts[i][0] = VectorMA(VectorMA(p->origin, s, p->up), d, p->reflect);
         pts[i][1] = VectorMA(VectorMA(p->origin, s, p->right), d, p->reflect);
         pts[i][2] = VectorMA(VectorMA(p->origin, -s, p->right), d, p->reflect);
-#endif
     }
 
     glColor3f(1, 0, 0);
@@ -115,9 +107,11 @@ void DrawPuff(puff_p p) {
 #if 0
     glBegin(GL_LINES); {
         glVertex3fv(p->origin);
-        glVertex3f(p->origin[0] + p->length * p->reflect[0],
+        glVertex3f(
+            p->origin[0] + p->length * p->reflect[0],
             p->origin[1] + p->length * p->reflect[1],
-            p->origin[2] + p->length * p->reflect[2]);
+            p->origin[2] + p->length * p->reflect[2]
+        );
 
         glVertex3fv(pts[0][0]);
         glVertex3fv(pts[1][0]);
