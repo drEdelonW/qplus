@@ -35,9 +35,13 @@ have a sentinal at both ends ?
 
 
 Edge_p auxedges;
-Edge_p r_edges, edge_p, edge_max;
+Edge_p r_edges;
+Edge_p edge_p;
+Edge_p edge_max;
 
-Surf_p surfaces, surface_p, surf_max;
+Surf_p surfaces;
+Surf_p surface_p;
+Surf_p surf_max;
 
 // surfaces are generated in back to front order by the bsp, so if a surf
 // pointer is greater than another one, it should be drawn in front

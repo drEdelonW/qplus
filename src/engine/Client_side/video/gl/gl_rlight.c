@@ -234,18 +234,18 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
 
         mTexInfo_p tex = surf->texinfo;
 
-        int s = DotProduct(mid, *(vec3_p)(&tex->vecs[0])) + tex->vecs[0][3];
-        int t = DotProduct(mid, *(vec3_p)(&tex->vecs[1])) + tex->vecs[1][3];
+        int s = DotProduct(mid, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs;
+        int t = DotProduct(mid, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs;
 
-        if ((s < surf->texturemins[0]) ||
-            (t < surf->texturemins[1])
+        if ((s < surf->texturemins[S_AX]) ||
+            (t < surf->texturemins[T_AX])
             ) continue;
 
-        int ds = s - surf->texturemins[0];
-        int dt = t - surf->texturemins[1];
+        int ds = s - surf->texturemins[S_AX];
+        int dt = t - surf->texturemins[T_AX];
 
-        if ((ds > surf->extents[0]) ||
-            (dt > surf->extents[1])
+        if ((ds > surf->extents[S_AX]) ||
+            (dt > surf->extents[T_AX])
             ) continue;
 
         if (!surf->samples)     return 0;
@@ -257,12 +257,14 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
         r = 0;
         if (lightmap) {
 
-            lightmap += dt * ((surf->extents[0] >> 4) + 1) + ds;
+            lightmap += dt * ((surf->extents[S_AX] >> 4) + 1) + ds;
 
             for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 255); maps++) {
                 uint32_t scale = d_lightstylevalue[surf->styles[maps]];
                 r += *lightmap * scale;
-                lightmap += ((surf->extents[0] >> 4) + 1) * ((surf->extents[1] >> 4) + 1);
+                lightmap +=
+                    ((surf->extents[S_AX] >> 4) + 1) *
+                    ((surf->extents[T_AX] >> 4) + 1);
             }
 
             r >>= 8;

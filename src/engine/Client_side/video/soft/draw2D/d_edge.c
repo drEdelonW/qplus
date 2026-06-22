@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "client.h"
 
-static int _miplevel;
+static int _miplevel;   // TODO: make mipLevel enum
 
 float  scale_for_mip;
 int   ubasestep, errorterm, erroradjustup, erroradjustdown;
@@ -48,10 +48,10 @@ D_MipLevelForScale
 */
 int D_MipLevelForScale(float scale) {
     int lMipLevel;
-    if (scale >= d_scalemip[0])         lMipLevel = 0;
+    /**/ if (scale >= d_scalemip[0])    lMipLevel = 0;
     else if (scale >= d_scalemip[1])    lMipLevel = 1;
     else if (scale >= d_scalemip[2])    lMipLevel = 2;
-    else                                lMipLevel = 3;
+    else /*                          */ lMipLevel = 3;
 
     CLAMP_MIN(lMipLevel, d_minmip);
 
@@ -105,17 +105,17 @@ void D_CalcGradients(mSurface_p pface) {
 
     float mipscale = 1.0 / (float)(1 << _miplevel);
 
-    vec3_t p_saxis = TransformVector(*(vec3_p)(&pface->texinfo->vecs[0]));
-    vec3_t p_taxis = TransformVector(*(vec3_p)(&pface->texinfo->vecs[1]));
+    vec3_t p_saxis = TransformVector(*(vec3_p)(&pface->texinfo->vecs[S_AX]));
+    vec3_t p_taxis = TransformVector(*(vec3_p)(&pface->texinfo->vecs[T_AX]));
     {
-        float t = xscaleinv * mipscale;
-        d_sdivzstepu = p_saxis.v[0] * t;
-        d_tdivzstepu = p_taxis.v[0] * t;
+        float s = xscaleinv * mipscale;
+        d_sdivzstepu = p_saxis.v[S_AX] * s;
+        d_tdivzstepu = p_taxis.v[S_AX] * s;
     }
     {
         float t = yscaleinv * mipscale;
-        d_sdivzstepv = -p_saxis.v[1] * t;
-        d_tdivzstepv = -p_taxis.v[1] * t;
+        d_sdivzstepv = -p_saxis.v[T_AX] * t;
+        d_tdivzstepv = -p_taxis.v[T_AX] * t;
     }
     d_sdivzorigin =
         p_saxis.v[2] * mipscale -
@@ -131,17 +131,17 @@ void D_CalcGradients(mSurface_p pface) {
     {
         float t = 0x10000 * mipscale;
         sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5f)) -
-            ((pface->texturemins[0] << 16) >> _miplevel) +
-            (pface->texinfo->vecs[0][3] * t);
+            ((pface->texturemins[S_AX] << 16) >> _miplevel) +
+            (pface->texinfo->vecs[S_AX].offs * t);
         tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5f)) -
-            ((pface->texturemins[1] << 16) >> _miplevel) +
-            pface->texinfo->vecs[1][3] * t;
+            ((pface->texturemins[T_AX] << 16) >> _miplevel) +
+            pface->texinfo->vecs[T_AX].offs * t;
     }
     //
     // -1 (-epsilon) so we never wander off the edge of the texture
     //
-    bbextents = ((pface->extents[0] << 16) >> _miplevel) - 1;
-    bbextentt = ((pface->extents[1] << 16) >> _miplevel) - 1;
+    bbextents = ((pface->extents[S_AX] << 16) >> _miplevel) - 1;
+    bbextentt = ((pface->extents[T_AX] << 16) >> _miplevel) - 1;
 }
 
 

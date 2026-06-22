@@ -291,15 +291,15 @@ void Mod_LoadTexinfo(Lump_p Lump_in) {
 
     for (int i = 0; i < count; i++, in++, out++) {
         for (int j = 0; j < 8; j++)
-            out->vecs[0][j] = LittleFloat(in->vecs[0][j]);
+            out->vecs[S_AX].V[j] = LittleFloat(in->vecs[S_AX].V[j]);
 
-        float len1 = Length(*(vec3_p)(&out->vecs[0]));
-        float len2 = Length(*(vec3_p)(&out->vecs[1]));
+        float len1 = Length((out->vecs[S_AX].vx));
+        float len2 = Length((out->vecs[T_AX].vx));
         len1 = (len1 + len2) / 2;
-        if (len1 < 0.32f)       out->mipadjust = 4.0f;
+        /**/ if (len1 < 0.32f)  out->mipadjust = 4.0f;
         else if (len1 < 0.49f)  out->mipadjust = 3.0f;
         else if (len1 < 0.99f)  out->mipadjust = 2.0f;
-        else                    out->mipadjust = 1.0f;
+        else /*              */ out->mipadjust = 1.0f;
 #if 0
         if (len1 + len2 < 0.001)    out->mipadjust = 1.0f;  // don't crash
         else                        out->mipadjust = 1 / floor((len1 + len2) / 2 + 0.1f);
@@ -418,11 +418,10 @@ Fills in s->texturemins[] and s->extents[]
 ================
 */
 void CalcSurfaceExtents(mSurface_p s) {
-    float mins[2], maxs[2];
-    int  bmins[2], bmaxs[2];
-
-    mins[0] = mins[1] = 999999;
-    maxs[0] = maxs[1] = -99999;
+    vec2_t mins = { .s = 999999.0f,  .t = 999999.0f  };
+    vec2_t maxs = { .s = -999999.0f, .t = -999999.0f };
+    int bmins[VECT_TX_DIM];
+    int bmaxs[VECT_TX_DIM];
 
     mTexInfo_p tex = s->texinfo;
 
@@ -435,20 +434,16 @@ void CalcSurfaceExtents(mSurface_p s) {
                     _loadModel->edges[-e].v16[1]
             ];
 
-        for (int j = 0; j < 2; j++) {
-            float val =
-                v->position.x * tex->vecs[j][0] +
-                v->position.y * tex->vecs[j][1] +
-                v->position.z * tex->vecs[j][2] +
-                /*           */ tex->vecs[j][3];
-            if (val < mins[j]) mins[j] = val;
-            if (val > maxs[j]) maxs[j] = val;
-        }
+        for (int j = 0; j < VECT_TX_DIM; j++) {
+            float val = DotProduct(v->position, tex->vecs[j].vx) + tex->vecs[j].offs;
+            if (val < mins.v[j])  mins.v[j] = val;  // not CLAMP but GET MIN
+            if (val > maxs.v[j])  maxs.v[j] = val;  // not CLAMP but GET MAX
+            }
     }
 
-    for (int i = 0; i < 2; i++) {
-        bmins[i] = floor(mins[i] / 16);
-        bmaxs[i] = ceil(maxs[i] / 16);
+    for (int i = 0; i < VECT_TX_DIM; i++) {
+        bmins[i] = floor(mins.v[i] / 16.0f);
+        bmaxs[i] = ceil(maxs.v[i] / 16.0f);
 
         s->texturemins[i] = bmins[i] * 16;
         s->extents[i] = (bmaxs[i] - bmins[i]) * 16;

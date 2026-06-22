@@ -61,8 +61,8 @@ R_AddDynamicLights
 */
 void R_AddDynamicLights() {
     mSurface_p surf = r_drawsurf.surf;
-    int smax = (surf->extents[0] >> 4) + 1;
-    int tmax = (surf->extents[1] >> 4) + 1;
+    int smax = (surf->extents[S_AX] >> 4) + 1;
+    int tmax = (surf->extents[T_AX] >> 4) + 1;
     mTexInfo_p tex = surf->texinfo;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
@@ -79,17 +79,17 @@ void R_AddDynamicLights() {
 
 
         vec3_t impact = VectorMA(cl_dlights[lnum].origin, -dist, surf->plane->normal);
-        vec3_t local = {
-            .x = DotProduct(impact, *(vec3_p)tex->vecs[0]) + tex->vecs[0][3] - surf->texturemins[0],
-            .y = DotProduct(impact, *(vec3_p)tex->vecs[1]) + tex->vecs[1][3] - surf->texturemins[1]
-    };
+        vec2_t local = {
+            .s = DotProduct(impact, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs - surf->texturemins[S_AX],
+            .t = DotProduct(impact, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs - surf->texturemins[T_AX]
+        };
 
         for (int t = 0; t < tmax; t++) {
-            int td = local.v[1] - t * 16;
+            int td = local.t - t * 16;
             if (td < 0)
                 td = -td;
             for (int s = 0; s < smax; s++) {
-                int sd = local.v[0] - s * 16;
+                int sd = local.s - s * 16;
                 if (sd < 0)     sd = -sd;
                 if (sd > td)    dist = sd + (td >> 1);
                 else            dist = td + (sd >> 1);
@@ -122,8 +122,8 @@ Combine and scale multiple lightmaps into the 8.8 format in blocklights
 */
 void R_BuildLightMap() {
     mSurface_p surf = r_drawsurf.surf;
-    int smax = (surf->extents[0] >> 4) + 1;
-    int tmax = (surf->extents[1] >> 4) + 1;
+    int smax = (surf->extents[S_AX] >> 4) + 1;
+    int tmax = (surf->extents[T_AX] >> 4) + 1;
     int size = smax * tmax;
     uint8_p lightmap = surf->samples;
 

@@ -204,15 +204,10 @@ void BuildTris() {
             // type = 1;
         {
             for (int startv = 0; startv < 3; startv++) {
-#if 1
                 int len = (type == 1) ?
                     StripLength(i, startv) :
                     FanLength(i, startv);
-#else
-                int len;
-                if (type == 1)  len = StripLength(i, startv);
-                else            len = FanLength(i, startv);
-#endif
+
                 if (len > bestLen) {
                     besttype = type;
                     bestLen = len;

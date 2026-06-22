@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef enum {
     CMP_NONE = 0u,
     CMP_LZSS = 1u
-} CmpType;
+} CmpType;  // uint8_t
 
 typedef enum {
     TYP_NONE = 0u,
@@ -46,17 +46,17 @@ typedef enum {
     TYP_QPIC = 66u,
     TYP_SOUND = 67u,
     TYP_MIPTEX = 68u
-} TypType;
+} TypType;  // uint8_t
 
 typedef struct {
-    int32_t filepos;
-    int32_t disksize;
-    int32_t size;           // uncompressed
-    char    type;           // TypType ?
-    char    compression;    // CmpType ?
-    char    pad1;
-    char    pad2;
-    char    name[LUMP_NAME_LEN]; // must be null terminated
+    int32_t             filepos;
+    int32_t             disksize;
+    int32_t             size;           // uncompressed
+    /* TypType */char   type;           // TypType ?
+    /* CmpType */char   compression;    // CmpType ?
+    uint8_t             pad1;
+    uint8_t             pad2;
+    char                name[LUMP_NAME_LEN]; // must be null terminated
 } LumpInfo_t;
 typedef LumpInfo_t* LumpInfo_p;
 
@@ -65,7 +65,7 @@ static int32_t     _NumLumps;
 static uint8_p     _wadBase;
 
 typedef struct {
-    char    ID[4];		// should be WAD2 or 2DAW
+    uint8_t ID[4];  // should be WAD2 or 2DAW
     int32_t numLumps;
     int32_t infoTableOfs;
 } WadInfo_t;

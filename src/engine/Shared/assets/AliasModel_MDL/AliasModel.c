@@ -681,7 +681,6 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
         AliasFrameType_t frametype = LittleLong(pframetype->type);
         pheader->frames[i].type = frametype;
 
-#   if 1
         switch (frametype) {
         case ALIAS_SINGLE: {
             pframetype = Mod_LoadAliasFrame(
@@ -707,28 +706,6 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
             Host_Error(".MDL frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
         } break;
         }
-#   else
-        if (frametype == ALIAS_SINGLE) {
-            pframetype = Mod_LoadAliasFrame(
-                pframetype + 1,
-                &pheader->frames[i].frame,
-                pMdl->numverts,
-                &pheader->frames[i].bboxmin,
-                &pheader->frames[i].bboxmax,
-                pheader, pheader->frames[i].name
-            );
-        }
-        else {
-            pframetype = Mod_LoadAliasGroup(
-                pframetype + 1,
-                &pheader->frames[i].frame,
-                pMdl->numverts,
-                &pheader->frames[i].bboxmin,
-                &pheader->frames[i].bboxmax,
-                pheader, pheader->frames[i].name
-            );
-        }
-#   endif
     }
 
     mod->type = mod_alias;

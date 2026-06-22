@@ -236,7 +236,9 @@ void R_SurfacePatch();
 extern int      r_amodels_drawn;
 extern Edge_p   auxedges;
 extern int      r_numallocatededges;
-extern Edge_p   r_edges, edge_p, edge_max;
+extern Edge_p   r_edges;
+extern Edge_p   edge_p;
+extern Edge_p   edge_max;
 extern Edge_p   newedges[MAXHEIGHT];
 extern Edge_p   removeedges[MAXHEIGHT];
 

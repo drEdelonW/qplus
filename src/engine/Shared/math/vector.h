@@ -13,6 +13,7 @@ typedef enum {
 } axis_tx_e;
 typedef union {
     struct { vec_t s, t; };
+    // struct { vec_t u, v; }; // TODO: make by modern naming access
     vec_t v[VECT_TX_DIM];
 } vec2_t;
 

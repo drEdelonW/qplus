@@ -55,8 +55,10 @@ extern float d_sdivzstepu, d_tdivzstepu, d_zistepu;
 extern float d_sdivzstepv, d_tdivzstepv, d_zistepv;
 extern float d_sdivzorigin, d_tdivzorigin, d_ziorigin;
 
-extern fixed16_t sadjust, tadjust;
-extern fixed16_t bbextents, bbextentt;
+extern fixed16_t sadjust;
+extern fixed16_t tadjust;
+extern fixed16_t bbextents;
+extern fixed16_t bbextentt;
 
 
 void D_DrawSpans8(eSpan_p  pspans);

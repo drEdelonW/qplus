@@ -35,95 +35,87 @@ float speedscale;  // for top sky and bottom sky
 mSurface_p warpface;
 
 
-void BoundPoly(int numverts, float_p verts, vec3_p mins, vec3_p maxs) {
-    *mins = (vec3_t){
-        .x = 9999.0f,
-        .y = 9999.0f,
-        .z = 9999.0f
-    };
-    *maxs = (vec3_t){
-        .x = -9999.0f,
-        .y = -9999.0f,
-        .z = -9999.0f
-    };
+void BoundPoly(int numverts, vec3_p verts, vec3_p mins, vec3_p maxs) {
+    *mins = Scalar2Vector(9999.0f);
+    *maxs = Scalar2Vector(-9999.0f);
     for (int i = 0; i < numverts; i++) {
-        vec3_t v = ((vec3_p)verts)[i];
         for (int j = 0; j < VECT_DIM; j++) {
-            CLAMP_LESS(maxs->v[j], v.v[j]);
-            CLAMP_MORE(mins->v[j], v.v[j]);
+            CLAMP_LESS(maxs->v[j], verts[i].v[j]);
+            CLAMP_MORE(mins->v[j], verts[i].v[j]);
         }
     }
 }
 
-void SubdividePolygon(int numverts, float_p verts) {
+void SubdividePolygon(int numverts, vec3_p verts) {
     vec3_t front[64];
     vec3_t back[64];
     float dist[64];
 
-    if (numverts > 60)
-        Host_SysError("numverts = %i", numverts);
+    if (numverts > 60)      Host_SysError("numverts = %i", numverts);
 
-    vec3_t mins, maxs;
+    vec3_t mins;
+    vec3_t maxs;
     BoundPoly(numverts, verts, &mins, &maxs);
 
-    for (int i = 0; i < VECT_DIM; i++) {
-        float m = (mins.v[i] + maxs.v[i]) * 0.5;
-        m = gl_subdivide_size.value * floor(m / gl_subdivide_size.value + 0.5);
+    float subDivSz = gl_subdivide_size.value;
+    vec3_t snap_arg = VectorAddVal(VectorScale(
+        VectorAdd(mins, maxs),
+        (0.5f / subDivSz)), 0.5f
+    );
+    vec_t m;
+    int i = 0;
+    for (; i < VECT_DIM; i++) {
+        m = subDivSz * floor(snap_arg.v[i]);
         if ((maxs.v[i] - m) < 8.0f)      continue;
         if ((m - mins.v[i]) < 8.0f)      continue;
-
-        // cut it
-        float_p v = verts + i;
-        int j = 0;
-        for (; j < numverts; j++, v += 3)
-            dist[j] = *v - m;
-
-        // wrap cases
-        dist[j] = dist[0];
-        v -= i;
-        VectorCopy(*(vec3_p)verts, (vec3_p)v);
-
-        int f = 0;
-        int b = 0;
-        v = verts;
-        for (int j = 0; j < numverts; j++, v += 3) {
-            if (dist[j] >= 0.0f) {
-                VectorCopy(*(vec3_p)v, &front[f++]);
-            }
-            if (dist[j] <= 0.0f) {
-                VectorCopy(*(vec3_p)v, &back[b++]);
-            }
-            if ((dist[j] == 0.0f) ||
-                (dist[j + 1] == 0.0f)
-                )
-                continue;
-
-            if ((dist[j] > 0) != (dist[j + 1] > 0)) {
-                // clip point
-                float frac = dist[j] / (dist[j] - dist[j + 1]);
-                for (int k = 0; k < VECT_DIM; k++)
-                    front[f].v[k] = back[b].v[k] = v[k] + frac * /*>>>*/(v[3 + k] - v[k]);/*<<< this is NOT vector yet */
-                f++;
-                b++;
-            }
-        }
-
-        SubdividePolygon(f, front[0].v);
-        SubdividePolygon(b, back[0].v);
-        return;
+        break;
     }
 
-    glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (numverts - 4) * sizeof(glVert_t));
+    if (i != VECT_DIM) { // cut it
+        for (int j = 0; j < numverts; j++)
+            dist[j] = verts[j].v[i] - m;
 
-    poly->next = warpface->polys;
-    warpface->polys = poly;
-    poly->numverts = numverts;
-    for (int i = 0; i < numverts; i++, verts += 3) {
-        VectorCopy(*(vec3_p)verts, &poly->verts[i].v);
-        float s = DotProduct(*(vec3_p)verts, *(vec3_p)warpface->texinfo->vecs[0]);
-        float t = DotProduct(*(vec3_p)verts, *(vec3_p)warpface->texinfo->vecs[1]);
-        poly->verts[i].tx.s = s;
-        poly->verts[i].tx.t = t;
+        dist[numverts] = dist[0];      // wrap: close polygon loop
+        verts[numverts] = verts[0];    // wrap: duplicate first vertex for clipping
+
+        {
+            int f = 0;
+            int b = 0;
+            for (int j = 0; j < numverts; j++) {
+                if (dist[j] >= 0.0f)        front[f++] = verts[j];
+                if (dist[j] <= 0.0f)        back[b++] = verts[j];
+                if ((dist[j] == 0.0f) || (dist[j + 1] == 0.0f))     continue;
+
+                if ((dist[j] > 0.0f) != (dist[j + 1] > 0.0f)) { // clip point
+                    float frac = dist[j] / (dist[j] - dist[j + 1]);
+                    vec3_t clip_point =
+                        VectorMA(verts[j],
+                            frac, VectorSubtract(verts[j + 1], verts[j])
+                        );
+                    front[f++] = clip_point;
+                    back[b++] = clip_point;
+                }
+            }
+
+            SubdividePolygon(f, front);
+            SubdividePolygon(b, back);
+        }
+    }
+    else {
+        glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (numverts - 4) * sizeof(glVert_t));
+
+        poly->next = warpface->polys;
+        warpface->polys = poly;
+        poly->numverts = numverts;
+        for (int i = 0; i < numverts; i++, verts++) {
+            poly->verts[i] = (glVert_t){
+                .v = *verts,
+                .tx = {
+                    .s = DotProduct(*verts, warpface->texinfo->vecs[S_AX].vx),
+                    .t = DotProduct(*verts, warpface->texinfo->vecs[T_AX].vx)
+                }
+            };
+        }
     }
 }
 
@@ -159,7 +151,7 @@ void GL_SubdivideSurface(mSurface_p fa) {
         numverts++;
     }
 
-    SubdividePolygon(numverts, (float_p)&verts[0]);
+    SubdividePolygon(numverts, verts);
 }
 
 //=========================================================
@@ -374,7 +366,7 @@ void LoadPCX(FILE* f) {
                 runLength = 1;
 
             while (runLength-- > 0) {
-                pix[0] = palette[dataByte * 3];
+                pix[0] = palette[dataByte * 3 + 0];
                 pix[1] = palette[dataByte * 3 + 1];
                 pix[2] = palette[dataByte * 3 + 2];
                 pix[3] = 255;
@@ -671,24 +663,23 @@ int vec_to_st[6][3] = {
     // {1, 2, -3}
 };
 
-float skymins[2][6], skymaxs[2][6];
+float skymins[2][6], skymaxs[2][6]; // TODO: avoid not clear array
 
-void DrawSkyPolygon(int nump, vec3_t vecs) {
+void DrawSkyPolygon(int nump, vec3_p vecs) {
     c_sky++;
 #if 0
     glBegin(GL_POLYGON); {
-        for (int i = 0; i < nump; i++, vecs += 3) {
-            v = VectorAdd(vecs, r_origin, );
-            glVertex3fv(v);
+        for (int i = 0; i < nump; i++, vecs++) {
+            glVertex3fv(VectorAdd(vecs, r_origin).v);
         }
     } glEnd();
     return;
 #endif
     // decide which face it maps to
-    vec3_t v;   VectorCopy(vec3_origin, &v);
-    float_p vp = vecs;
-    for (int i = 0; i < nump; i++, vp += 3) {
-        v = VectorAdd(vp, v);
+    vec3_t v = vec3_origin;
+    float_p vp = vecs->vx;
+    for (int i = 0; i < nump; i++, vp += VECT_DIM) {
+        v = VectorAdd(vp, v);   // v += vp;
     }
     vec3_t av = {
         fabs(v.x),
@@ -700,23 +691,23 @@ void DrawSkyPolygon(int nump, vec3_t vecs) {
         (av[0] > av[1]) &&
         (av[0] > av[2])
         ) {
-        if (v.x < 0)   axis = 1;
+        if (v.x < 0)    axis = 1;
         else            axis = 0;
     }
     else if (
         (av[1] > av[2]) &&
         (av[1] > av[0])
         ) {
-        if (v.y < 0.0f)   axis = 3;
+        if (v.y < 0.0f) axis = 3;
         else            axis = 2;
     }
     else {
-        if (v.z < 0.0f)   axis = 5;
+        if (v.z < 0.0f) axis = 5;
         else            axis = 4;
     }
 
     // project new texture coords
-    for (int i = 0; i < nump; i++, vecs += 3) {
+    for (int i = 0; i < nump; i++, vecs += VECT_DIM) {
         float dv; {
             int j = vec_to_st[axis][2];
             if (j > 0)  dv = vecs.v[j - 1];
@@ -756,7 +747,7 @@ void ClipSkyPolygon(int nump, vec3_t vecs, int stage) {
     front = back = false;
     float_p norm = skyclip[stage];
     int i = 0;
-    for (float_p v = vecs; i < nump; i++, v += 3) {
+    for (float_p v = vecs; i < nump; i++, v += VECT_DIM) {
         float d = DotProduct(v, norm);
         if (d > ON_EPSILON) {
             front = true;
@@ -785,7 +776,7 @@ void ClipSkyPolygon(int nump, vec3_t vecs, int stage) {
     vec3_t newv[2][MAX_CLIP_VERTS];
 
     float_p v;
-    for (int i = 0, v = vecs; i < nump; i++, v += 3) {
+    for (int i = 0, v = vecs; i < nump; i++, v += VECT_DIM) {
         switch (sides[i]) {
         case SIDE_FRONT: {
             VectorCopy(v, newv[0][newc[0]]);    newc[0]++;
@@ -806,8 +797,8 @@ void ClipSkyPolygon(int nump, vec3_t vecs, int stage) {
             continue;
 
         float d = dists[i] / (dists[i] - dists[i + 1]);
-        for (int j = 0; j < 3; j++) {
-            float e = v[j] + d * (v[j + 3] - v[j]);
+        for (int j = 0; j < VECT_DIM; j++) {
+            float e = v[j] + d * (v[j + VECT_DIM] - v[j]);
             newv[0][newc[0]][j] = e;
             newv[1][newc[1]][j] = e;
         }

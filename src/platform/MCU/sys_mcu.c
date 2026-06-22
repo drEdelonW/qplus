@@ -57,7 +57,6 @@ LegacyTimeStamp_t Sys_FloatTime() {
     return t;
 }
 #else
-
 LegacyTimeStamp_t Sys_FloatTime() {
     static uint32_t last_cycles = 0;
     static double accumulated_time = 0.0;

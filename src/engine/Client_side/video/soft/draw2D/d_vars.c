@@ -39,7 +39,10 @@ float d_sdivzstepu, d_tdivzstepu, d_zistepu;
 float d_sdivzstepv, d_tdivzstepv, d_zistepv;
 float d_sdivzorigin, d_tdivzorigin, d_ziorigin;
 
-fixed16_t sadjust, tadjust, bbextents, bbextentt;
+fixed16_t sadjust;
+fixed16_t tadjust;
+fixed16_t bbextents;
+fixed16_t bbextentt;
 
 pixel_p cacheblock;
 int     cachewidth;

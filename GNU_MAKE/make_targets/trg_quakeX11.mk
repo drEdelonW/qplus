@@ -13,7 +13,7 @@ ifeq ($(UNAME_S),Linux)
         SRC_LIST += $(POSIX_DIR)/sys_linux_file.c
         SRC_LIST += $(POSIX_DIR)/in_x.c
         SRC_LIST += $(POSIX_DIR)/cd_linux.c
-        # SRC_LIST += $(POSIX_DIR)/snd_linux.c  # TODO:
+        # SRC_LIST += $(POSIX_DIR)/snd_linux.c  # TODO: bring-up linux sound
         SRC_LIST += $(POSIX_DIR)/net_udp.c
         SRC_LIST += $(POSIX_DIR)/net_bsd.c
         SRC_LIST += $(POSIX_DIR)/vid_x.c

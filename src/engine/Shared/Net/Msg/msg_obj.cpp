@@ -36,7 +36,7 @@ void NetMsg::SetSizeBuf(sizebuf_p sb) {
 int8_t NetMsg::ReadChar() {
     if ((_readCount + 1) > _sb->cursize) {
         _badRead = true;
-        return 0;
+        return 0x00;
     }
 
     int8_t c = (int8_t)_sb->data[_readCount];
@@ -146,7 +146,7 @@ float NetMsg::ReadFloat() {
     union {
         uint8_t b[4];
         float   f;
-        int     l;
+        int32_t l;
     } dat;
 
     dat.b[0] = _sb->data[_readCount + 0];
@@ -164,7 +164,7 @@ void NetMsg::WriteFloat(sizebuf_p sb, float f) {
     if (!sb)    return;
     union {
         float   f;
-        int     l;
+        int32_t l;
     } dat;
 
     dat.f = f;

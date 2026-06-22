@@ -78,8 +78,8 @@ R_AddDynamicLights
 ===============
 */
 void R_AddDynamicLights(mSurface_p surf) {
-    int smax = (surf->extents[0] >> 4) + 1;
-    int tmax = (surf->extents[1] >> 4) + 1;
+    int smax = (surf->extents[S_AX] >> 4) + 1;
+    int tmax = (surf->extents[T_AX] >> 4) + 1;
     mTexInfo_p tex = surf->texinfo;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
@@ -98,19 +98,20 @@ void R_AddDynamicLights(mSurface_p surf) {
             -dist, surf->plane->normal
         );
 
-        vec3_t local;
-        local.v[0] = DotProduct(impact, *(vec3_p)tex->vecs[0]) + tex->vecs[0][3];   // TODO: fix this workaround
-        local.v[1] = DotProduct(impact, *(vec3_p)tex->vecs[1]) + tex->vecs[1][3];   // TODO: fix this workaround
+        vec2_t local = {
+            .s = DotProduct(impact, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs, // TODO: fix this workaround
+            .t = DotProduct(impact, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs  // TODO: fix this workaround
+        };
 
-        local.v[0] -= surf->texturemins[0];
-        local.v[1] -= surf->texturemins[1];
+        local.s -= surf->texturemins[S_AX];
+        local.t -= surf->texturemins[T_AX];
 
         for (int t = 0; t < tmax; t++) {
-            int td = local.v[1] - t * 16;
+            int td = local.t - t * 16;
             if (td < 0) td = -td;
 
             for (int s = 0; s < smax; s++) {
-                int sd = local.v[0] - s * 16;
+                int sd = local.s - s * 16;
                 if (sd < 0) sd = -sd;
 
                 if (sd > td)    dist = sd + (td >> 1);
@@ -134,8 +135,8 @@ Combine and scale multiple lightmaps into the 8.8 format in blocklights
 void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
     surf->cached_dlight = (surf->dlightframe == r_framecount);
 
-    int smax = (surf->extents[0] >> 4) + 1;
-    int tmax = (surf->extents[1] >> 4) + 1;
+    int smax = (surf->extents[S_AX] >> 4) + 1;
+    int tmax = (surf->extents[T_AX] >> 4) + 1;
     int size = smax * tmax;
     uint8_p lightmap = surf->samples;
 
@@ -726,8 +727,8 @@ void R_RenderBrushPoly(mSurface_p fa) {
                         theRect->w += theRect->l - fa->light_s;
                     theRect->l = fa->light_s;
                 }
-                int smax = (fa->extents[0] >> 4) + 1;
-                int tmax = (fa->extents[1] >> 4) + 1;
+                int smax = (fa->extents[S_AX] >> 4) + 1;
+                int tmax = (fa->extents[T_AX] >> 4) + 1;
                 if ((theRect->w + theRect->l) < (fa->light_s + smax))   theRect->w = (fa->light_s - theRect->l) + smax;
                 if ((theRect->h + theRect->t) < (fa->light_t + tmax))   theRect->h = (fa->light_t - theRect->t) + tmax;
 
@@ -777,8 +778,8 @@ void R_RenderDynamicLightmaps(mSurface_p fa) {
                         theRect->w += theRect->l - fa->light_s;
                     theRect->l = fa->light_s;
                 }
-                int smax = (fa->extents[0] >> 4) + 1;
-                int tmax = (fa->extents[1] >> 4) + 1;
+                int smax = (fa->extents[S_AX] >> 4) + 1;
+                int tmax = (fa->extents[T_AX] >> 4) + 1;
                 if ((theRect->w + theRect->l) < (fa->light_s + smax))   theRect->w = (fa->light_s - theRect->l) + smax;
                 if ((theRect->h + theRect->t) < (fa->light_t + tmax))   theRect->h = (fa->light_t - theRect->t) + tmax;
 
@@ -1319,33 +1320,29 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
             vec = r_pcurrentvertbase[r_pedge->v16[1]].position;
         }
 
-        float s = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[0])) + fa->texinfo->vecs[0][3]; // TODO: fix this workaround
-        s /= fa->texinfo->texture->width;
-
-        float t = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[1])) + fa->texinfo->vecs[1][3]; // TODO: fix this workaround
-        t /= fa->texinfo->texture->height;
-
         poly->verts[i].v = vec;
-        poly->verts[i].tx.s = s;
-        poly->verts[i].tx.t = t;
+        poly->verts[i].tx.s = (DotProduct(vec, fa->texinfo->vecs[S_AX].vx) + fa->texinfo->vecs[S_AX].offs) / fa->texinfo->texture->width;
+        poly->verts[i].tx.t = (DotProduct(vec, fa->texinfo->vecs[T_AX].vx) + fa->texinfo->vecs[T_AX].offs) / fa->texinfo->texture->height;
 
         //
         // lightmap texture coordinates
         //
-        s = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[0])) + fa->texinfo->vecs[0][3];    // TODO: fix this workaround
-        s -= fa->texturemins[0];
-        s += fa->light_s * 16;
-        s += 8;
-        s /= BLOCK_WIDTH * 16; //fa->texinfo->texture->width;
+        poly->verts[i].lMap.s = (
+            DotProduct(vec, fa->texinfo->vecs[S_AX].vx) +
+            fa->texinfo->vecs[S_AX].offs -
+            fa->texturemins[S_AX] + 8.0f +
+            (fa->light_s * 16.0f)
+            ) /
+            (BLOCK_WIDTH * 16.0f); //fa->texinfo->texture->width;
 
-        t = DotProduct(vec, *(vec3_p)(&fa->texinfo->vecs[1])) + fa->texinfo->vecs[1][3];  // TODO: fix this workaround
-        t -= fa->texturemins[1];
-        t += fa->light_t * 16;
-        t += 8;
-        t /= BLOCK_HEIGHT * 16; //fa->texinfo->texture->height;
+        poly->verts[i].lMap.t = (
+            DotProduct(vec, fa->texinfo->vecs[T_AX].vx) +
+            fa->texinfo->vecs[T_AX].offs -
+            fa->texturemins[T_AX] + 8.0f +
+            (fa->light_t * 16.0f)
+            ) /
+            (BLOCK_HEIGHT * 16.0f); //fa->texinfo->texture->height;
 
-        poly->verts[i].lMap.s = s;
-        poly->verts[i].lMap.t = t;
     }
 
     //
@@ -1393,8 +1390,8 @@ void GL_CreateSurfaceLightmap(mSurface_p surf) {
     if (surf->flags & (SURF_DRAWSKY | SURF_DRAWTURB))
         return;
 
-    int smax = (surf->extents[0] >> 4) + 1;
-    int tmax = (surf->extents[1] >> 4) + 1;
+    int smax = (surf->extents[S_AX] >> 4) + 1;
+    int tmax = (surf->extents[T_AX] >> 4) + 1;
 
     surf->lightmaptexturenum = AllocBlock(smax, tmax, &surf->light_s, &surf->light_t);
     byte* base = lightmaps + surf->lightmaptexturenum * lightmap_bytes * BLOCK_WIDTH * BLOCK_HEIGHT;

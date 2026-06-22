@@ -5,8 +5,21 @@
 
 #include "Texture_pre.h"
 
+#if 0
+typedef float txVec_t[VECT_TX_DIM][4];   // [s/t][xyz offset]
+#else
+typedef union {
+    struct {
+        vec3_t  vx;
+        vec_t   offs;
+    };
+    vec_t   V[4];
+}txVec_t[VECT_TX_DIM];
+#endif
+STATIC_ASSERT_SIZE(txVec_t, 2*(3*4 + 4));
+
 typedef struct {
-    float       vecs[2][4];
+    txVec_t     vecs;
     float       mipadjust;
     Texture_p   texture;
     int32_t     flags;
@@ -14,7 +27,7 @@ typedef struct {
 typedef mTexInfo_t* mTexInfo_p;
 
 typedef struct TexInfo_s {
-    float   vecs[2][4];  // [s/t][xyz offset]
+    txVec_t vecs;
     int32_t miptex;
     int32_t flags;
 } TexInfo_t;

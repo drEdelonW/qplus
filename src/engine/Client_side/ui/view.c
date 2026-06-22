@@ -417,10 +417,12 @@ void V_CalcBlend() {
     v_blend[1] = g * byteScaleFactor;
     v_blend[2] = b * byteScaleFactor;
     v_blend[3] = a;
-    if (v_blend[3] > 1.0f)
-        v_blend[3] = 1.0f;
-    if (v_blend[3] < 0.0f)
-        v_blend[3] = 0.0f;
+# if 0
+    if (v_blend[3] > 1.0f)        v_blend[3] = 1.0f;
+    if (v_blend[3] < 0.0f)        v_blend[3] = 0.0f;
+# else
+    CLAMP(0.0f, v_blend[3], 1.0f);
+# endif
 }
 #endif
 
