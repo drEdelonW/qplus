@@ -378,12 +378,12 @@ void CL_UpdateTEnts() {
             else                    pitch = 270;
         }
         else {
-            yaw = (float)(atan2(dist.y, dist.x) * 180 / M_PI);
+            yaw = (float)(RAD2DEG(atan2(dist.y, dist.x)));
             if (yaw < 0.0f)
                 yaw += 360.0f;
 
             float forward = (float)sqrt((dist.x * dist.x) + (dist.y * dist.y));
-            pitch = (float)(atan2(dist.z, forward) * 180 / M_PI);
+            pitch = (float)(RAD2DEG(atan2(dist.z, forward)));
             if (pitch < 0)
                 pitch += 360;
         }

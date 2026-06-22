@@ -575,13 +575,6 @@ void V_UpdatePalette() {
 ==============================================================================
 */
 
-float angledelta(float a) {
-    a = anglemod(a);
-    if (a > 180)
-        a -= 360;
-    return a;
-}
-
 /*
 ==================
 CalcGunAngle

@@ -347,7 +347,6 @@ void R_AliasSetUpTransform(int trivial_accept) {
     mat3x4_t t2matrix;
 
     for (int i = 0; i < VECT_DIM; i++) {
-
         t2matrix.m[i][0] = _alias.forward.v[i];
         t2matrix.m[i][1] = -_alias.right.v[i];
         t2matrix.m[i][2] = _alias.up.v[i];

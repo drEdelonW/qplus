@@ -459,7 +459,7 @@ void R_DrawAliasModel(r_Entity_p e) {
     shadedots = r_avertexnormal_dots[((int)(e->angles.yaw * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
     shadelight = shadelight / 200.0;
 
-    float an = e->angles.yaw / 180 * M_PI;
+    float an = DEG2RAD(e->angles.yaw);
     shadevector.x = cos(-an);
     shadevector.y = sin(-an);
     shadevector.z = 1;
@@ -795,7 +795,9 @@ void R_SetupGL() {
 
     glViewport(glx + x, gly + y2, w, h);
     float screenaspect = (float)r_refdef.vrect.width / r_refdef.vrect.height;
-    // yfov = 2*atan((float)r_refdef.vrect.height/r_refdef.vrect.width)*180/M_PI;
+#if 0
+    yfov = 2 * DEG2RAD(atan((float)r_refdef.vrect.height / r_refdef.vrect.width));
+#endif
     MYgluPerspective(r_refdef.fov_y, screenaspect, 4, 4096);
 
     if (mirror) {
@@ -915,8 +917,8 @@ void R_Mirror() {
         mirror_plane->normal
     );
     r_refdef.viewangles = (vec3_t){
-        .pitch = -asin(BS.forward.z) / M_PI * 180,
-        .yaw = atan2(BS.forward.y, BS.forward.x) / M_PI * 180,
+        .pitch = DEG2RAD(-asin(BS.forward.z)),
+        .yaw = DEG2RAD(atan2(BS.forward.y, BS.forward.x)),
         .roll = -r_refdef.viewangles.roll
     };
     r_Entity_p ent = &cl_entities[cl.viewentity];

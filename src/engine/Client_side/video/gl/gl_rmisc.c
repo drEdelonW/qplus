@@ -38,7 +38,7 @@ R_InitTextures
 */
 void R_InitTextures() {
     // create a simple checkerboard texture for the default
-    r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + (16*16) + (8*8) + (4*4) + (2*2), "notexture");
+    r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + (16 * 16) + (8 * 8) + (4 * 4) + (2 * 2), "notexture");
 
     r_notexture_mip->width = r_notexture_mip->height = 16;
     r_notexture_mip->offsets[0] = sizeof(Texture_t);
@@ -50,10 +50,9 @@ void R_InitTextures() {
         uint8_p dest = (uint8_p)r_notexture_mip + r_notexture_mip->offsets[m];
         for (int y = 0; y < (16 >> m); y++)
             for (int x = 0; x < (16 >> m); x++) {
-                if ((y < (8 >> m)) ^ (x < (8 >> m)))
-                    *dest++ = 0;
-                else
-                    *dest++ = 0xff;
+                *dest++ =
+                    ((y < (8 >> m)) ^ (x < (8 >> m))) ?
+                    0x00 : 0xFF;
             }
     }
 }
@@ -79,13 +78,19 @@ void R_InitParticleTexture() {
 
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
-            data[y][x][0] = 255;
-            data[y][x][1] = 255;
-            data[y][x][2] = 255;
-            data[y][x][3] = dottexture[x][y] * 255;
+            data[y][x][0] = 0xFF;
+            data[y][x][1] = 0xFF;
+            data[y][x][2] = 0xFF;
+            data[y][x][3] = (dottexture[x][y]) ? 0xFF : 0x00;
         }
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, gl_alpha_format, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0, gl_alpha_format,
+        8, 8,
+        0, GL_RGBA,
+        GL_UNSIGNED_BYTE, data
+    );
 
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
@@ -253,7 +258,7 @@ void R_TranslatePlayerSkin(int playernum) {
     int s = pAliasHdr->skinwidth * pAliasHdr->skinheight;
     if ((currententity->skinnum < 0) ||
         (currententity->skinnum >= pAliasHdr->numskins)
-    ) {
+        ) {
         Con_Printf("(%d): Invalid player skin #%d\n", playernum, currententity->skinnum);
         original = (uint8_p)pAliasHdr + pAliasHdr->texels[0];
     }

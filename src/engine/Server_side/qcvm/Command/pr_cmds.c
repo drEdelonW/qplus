@@ -161,7 +161,7 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
         // find min / max for rotations
         vec3_t angles = edict->v.angles;
 
-        float a = angles.yaw / 180.0f * (float)M_PI;
+        float a = DEG2RAD(angles.yaw);
 
         float xvector[2] = {
             (float)cos(a),
@@ -379,7 +379,7 @@ void PF_vectoyaw() {
         (value1.x == 0.0f))      // TODO: replace to x/pitch
         yaw = 0.0f;
     else {
-        yaw = (float)(atan2(value1.y, value1.x) * 180 / M_PI);
+        yaw = (float)(RAD2DEG(atan2(value1.y, value1.x)));
         if (yaw < 0.0f)    yaw += 360.0f;
     }
 
@@ -404,11 +404,11 @@ void PF_vectoangles() {
         else                    pitch = 270.0f;
     }
     else {
-        yaw = (float)(atan2(value1.y, value1.x) * 180 / M_PI);
+        yaw = (float)(RAD2DEG(atan2(value1.y, value1.x)));
         if (yaw < 0.0f)    yaw += 360.0f;
 
         float forward = (float)sqrt((value1.x * value1.x) + (value1.y * value1.y));
-        pitch = (float)(atan2(value1.z, forward) * 180 / M_PI);
+        pitch = (float)(RAD2DEG(atan2(value1.z, forward)));
         if (pitch < 0.0f)  pitch += 360.0f;
     }
 

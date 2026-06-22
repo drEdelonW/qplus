@@ -110,11 +110,11 @@ void SV_CheckVelocity(edict_p ent) {
     for (int i = 0; i < VECT_DIM; i++) {
         if (IS_NAN(ent->v.velocity.v[i])) {
             Con_Printf("Got a NaN velocity on %s\n", PR_GetQString(ent->v.classname));
-            ent->v.velocity.v[i] = 0;
+            ent->v.velocity.v[i] = 0.0f;
         }
         if (IS_NAN(ent->v.origin.v[i])) {
             Con_Printf("Got a NaN origin on %s\n", PR_GetQString(ent->v.classname));
-            ent->v.origin.v[i] = 0;
+            ent->v.origin.v[i] = 0.0f;
         }
         CLAMP(-sv_maxvelocity.value, ent->v.velocity.v[i], sv_maxvelocity.value);
     }

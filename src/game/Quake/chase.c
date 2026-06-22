@@ -70,9 +70,7 @@ void Chase_Update() {
     float dist = DotProduct(stop, bs.forward);
     CLAMP_LESS(dist, 1);
 
-    r_refdef.viewangles.pitch =
-        -atan(stop.z / dist) /
-        M_PI * 180;
+    r_refdef.viewangles.pitch = DEG2RAD(-atan(stop.z / dist));
 
     // move towards destination
     r_refdef.vieworg = _chaseDest;

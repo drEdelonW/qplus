@@ -308,12 +308,10 @@ void CL_RelinkEntities() {
 
     if (cls.demoplayback) {
         // interpolate the angles
-        for (int j = 0; j < VECT_DIM; j++) {
-            float d = cl.mviewangles[0].v[j] - cl.mviewangles[1].v[j];
-            if (d > 180)        d -= 360;
-            else if (d < -180)  d += 360;
-            cl.viewangles.v[j] = cl.mviewangles[1].v[j] + frac * d;
-        }
+        cl.viewangles = VectorMA(cl.mviewangles[1],
+            frac, VectorAngleProc(
+                VectorSubtract(cl.mviewangles[0], cl.mviewangles[1]))
+        );
     }
 
     float bobjrotate = anglemod((float)(100 * cl.time));
@@ -352,13 +350,11 @@ void CL_RelinkEntities() {
 
             // interpolate the origin and angles
             ent->origin = VectorMA(ent->msg_origins[1], f, delta);
-            for (int j = 0; j < VECT_DIM; j++) {
-                float d = ent->msg_angles[0].v[j] - ent->msg_angles[1].v[j];
-                if (d > 180)            d -= 360;
-                else if (d < -180)      d += 360;
-                ent->angles.v[j] = ent->msg_angles[1].v[j] + f * d;
-            }
 
+            ent->angles = VectorMA(ent->msg_angles[1],
+                f, VectorAngleProc(
+                    VectorSubtract(ent->msg_angles[0], ent->msg_angles[1]))
+            );
         }
 
         // rotate binary objects locally

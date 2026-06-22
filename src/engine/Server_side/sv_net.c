@@ -89,13 +89,21 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
     if (field_mask & SND_ATTENUATION)   MSG_WriteByte(&sv.datagram, (uint8_t)(attenuation * 64));
     MSG_WriteShort(&sv.datagram, (int16_t)channel);
     MSG_WriteByte(&sv.datagram, (uint8_t)sound_num);
+#if 0
     for (int i = 0; i < VECT_DIM; i++) {
-        MSG_WriteCoord(
-            &sv.datagram,
+        MSG_WriteCoord(&sv.datagram,
             entity->v.origin.v[i] +
             0.5f * (entity->v.mins.v[i] + entity->v.maxs.v[i])
         );
     }
+#else
+    vec3_t out = VectorMA(entity->v.origin,
+        0.5f, VectorAdd(
+            entity->v.mins, entity->v.maxs
+        ));
+    for (int i = 0; i < VECT_DIM; i++)
+        MSG_WriteCoord(&sv.datagram, out.v[i]);
+#endif
 }
 
 

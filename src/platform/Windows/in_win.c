@@ -1086,12 +1086,18 @@ void IN_JoyMove(UserCmd_p cmd) {
             if (in.mlook.state & 1) {
                 if (fabs(fAxisValue) > joy_pitchthreshold.value) {
                     // pitch movement detected and pitch movement desired by user
+#if 0
                     if (dwControlMap[i] == JOY_ABSOLUTE_AXIS) {
                         cl.viewangles[PITCH] += (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
                     }
                     else {
                         cl.viewangles[PITCH] += (fAxisValue * joy_pitchsensitivity.value) * speed * 180.0;
                     }
+#else
+                    cl.viewangles[PITCH] += (fAxisValue * joy_pitchsensitivity.value) *
+                        (dwControlMap[i] == JOY_ABSOLUTE_AXIS) ?
+                        (aspeed * cl_pitchspeed.value) : (speed * 180.0);
+#endif
                     V_StopPitchDrift();
                 }
                 else {
