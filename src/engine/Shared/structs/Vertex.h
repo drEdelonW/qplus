@@ -19,11 +19,7 @@ STATIC_ASSERT_SIZE(dVertex_t, 3*4); // 12
 
 
 typedef struct {
-#if 0
-    float   fv[3];  // viewspace x, y
-#else
     vec3_t  fv;     // viewspace x, y
-#endif
 } AuxVert_t;
 typedef AuxVert_t* AuxVert_p;
 

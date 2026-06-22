@@ -994,11 +994,12 @@ void R_DrawBrushModel(r_Entity_p e) {
     modelorg = VectorSubtract(r_refdef.vieworg, e->origin);
     if (rotated) {
         vec3_t temp = modelorg;
-        vec3_t forward, right, up; AngleVectors(e->angles, &forward, &right, &up);
+
+        Basis_t bs = GetBasis(e->angles);
         modelorg = (vec3_t){
-            .x = DotProduct(temp, forward),
-            .y = -DotProduct(temp, right),
-            .z = DotProduct(temp, up)
+            .x = DotProduct(temp, bs.forward),
+            .y = -DotProduct(temp, bs.right),
+            .z = DotProduct(temp, bs.up)
         };
     }
 
@@ -1299,11 +1300,7 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
     //
     // draw texture
     //
-#if 0
-    glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (lnumverts - 4) * VERTEXSIZE * sizeof(float));
-#else
     glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (lnumverts - 4) * sizeof(glVert_t));
-#endif
     poly->next = fa->polys;
     poly->flags = fa->flags;
     fa->polys = poly;
@@ -1374,12 +1371,7 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
                 (fabs(v1.y - v2.y) <= COLINEAR_EPSILON) &&
                 (fabs(v1.z - v2.z) <= COLINEAR_EPSILON)) {
                 for (int j = i + 1; j < lnumverts; ++j) {
-#if 0
-                    for (int k = 0; k < VERTEXSIZE; ++k)
-                        poly->verts[j - 1][k] = poly->verts[j][k];
-#else
                     poly->verts[j - 1] = poly->verts[j];
-#endif
                 }
                 --lnumverts;
                 ++nColinElim;

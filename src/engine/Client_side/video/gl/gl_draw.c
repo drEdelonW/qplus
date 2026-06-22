@@ -220,47 +220,27 @@ qPic_p Draw_PicFromWad(cStringRO name) {
                 scrap_texels[texnum][(y + i) * BLOCK_WIDTH + x + j] = p->data[k];
 
         texnum += scrap_texnum;
-#if 0   // REWORK
-        glpic_p gl = (glpic_p)p->data;
 
-        gl->texnum = texnum;
-        gl->sl = (x + 0.01) / (float)BLOCK_WIDTH;
-        gl->sh = (x + p->width - 0.01) / (float)BLOCK_WIDTH;
-        gl->tl = (y + 0.01) / (float)BLOCK_WIDTH;
-        gl->th = (y + p->height - 0.01) / (float)BLOCK_WIDTH;
-#else
-        * ((glpic_p)p->data) = (glpic_t){
+        *((glpic_p)p->data) = (glpic_t){
             .texnum = texnum,
             .sl = (x + 0.01) / (float)BLOCK_WIDTH,
             .tl = (y + 0.01) / (float)BLOCK_WIDTH,
             .sh = (x + p->width - 0.01) / (float)BLOCK_WIDTH,
             .th = (y + p->height - 0.01) / (float)BLOCK_WIDTH
         };
-#endif
 #ifdef GLTEST
         pic_count++;
         pic_texels += p->width * p->height;
 #endif
     }
     else {
-#if 0   // REWORK
-        glpic_p gl = (glpic_p)p->data;
-
-        gl->texnum = GL_LoadPicTexture(p);
-        gl->sl = 0;
-        gl->sh = 1;
-        gl->tl = 0;
-        gl->th = 1;
-#else
-        * ((glpic_p)p->data) = (glpic_t){
+        *((glpic_p)p->data) = (glpic_t){
             .texnum = GL_LoadPicTexture(p),
             .sl = 0.0f,
             .tl = 0.0f,
             .sh = 1.0f,
             .th = 1.0f
         };
-#endif
-
     }
     return p;
 }
@@ -301,14 +281,6 @@ qPic_p Draw_CachePic(cStringRO path) {
     pic->pic.width = dat->width;
     pic->pic.height = dat->height;
 
-#if 0   // REWORK
-    glpic_p gl = (glpic_p)pic->pic.data;
-    gl->texnum = GL_LoadPicTexture(dat);
-    gl->sl = 0;
-    gl->sh = 1;
-    gl->tl = 0;
-    gl->th = 1;
-#else
     * ((glpic_p)pic->pic.data) = (glpic_t){
         .texnum = GL_LoadPicTexture(dat),
         .sl = 0.0f,
@@ -316,7 +288,6 @@ qPic_p Draw_CachePic(cStringRO path) {
         .sh = 1.0f,
         .th = 1.0f
     };
-#endif
     return &pic->pic;
 }
 
@@ -475,22 +446,14 @@ void Draw_Init() {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-#if 0   // REWORK
-    glpic_p gl = (glpic_p)conback->data;
-    gl->texnum = GL_LoadTexture("conback", conback->width, conback->height, ncdata, false, false);
-    gl->sl = 0.0f;
-    gl->sh = 1.0f;
-    gl->tl = 0.0f;
-    gl->th = 1.0f;
-#else
-    * ((glpic_p)conback->data) = (glpic_t){
+    *((glpic_p)conback->data) = (glpic_t){
         .texnum = GL_LoadTexture("conback", conback->width, conback->height, ncdata, false, false),
         .sl = 0.0f,
         .tl = 0.0f,
         .sh = 1.0f,
         .th = 1.0f
     };
-#endif
+
     conback->width = vid.width;
     conback->height = vid.height;
 

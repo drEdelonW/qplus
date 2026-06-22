@@ -614,17 +614,6 @@ uint8_p COM_LoadFile(cStringRO path, ComLoadHunk_t usehunk) {
     char    base[32];
     COM_FileBase(path, base);
 
-#if 0
-    if (usehunk == 0)       buf = Z_Malloc(len + 1);
-    else if (usehunk == 1)  buf = Hunk_AllocName(len + 1, base);
-    else if (usehunk == 2)  buf = Hunk_TempAlloc(len + 1);
-    else if (usehunk == 3)  buf = Cache_Alloc(loadcache, len + 1, base);
-    else if (usehunk == 4) {
-        if (len + 1 > loadsize) buf = Hunk_TempAlloc(len + 1);
-        else                    buf = loadbuf;
-    }
-    else        Host_SysError("COM_LoadFile: bad usehunk");
-#else
     switch (usehunk) {
     case HUNK_ZMALLOC:  buf = Z_Malloc(len + 1);                        break;
     case HUNK_HUNK:     buf = Hunk_AllocName(len + 1, base);            break;
@@ -633,7 +622,7 @@ uint8_p COM_LoadFile(cStringRO path, ComLoadHunk_t usehunk) {
     case HUNK_STACK:    buf = ((len + 1) > loadsize) ? Hunk_TempAlloc(len + 1) : loadbuf; break;
     default:            Host_SysError("COM_LoadFile: bad usehunk");     break;
     }
-#endif
+
     if (!buf)           Host_SysError("COM_LoadFile: not enough space for %s", path);
 
     ((uint8_p)buf)[len] = 0x00;

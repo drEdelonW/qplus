@@ -56,14 +56,9 @@ extern float    pixelAspect;
 extern int      r_drawnpolycount;
 extern int      sintable[SIN_BUFFER_SIZE];
 extern int      intsintable[SIN_BUFFER_SIZE];
-#if 0
-extern vec3_t   vup, base_vup;
-extern vec3_t   vpn, base_vpn;
-extern vec3_t   vright, base_vright;
-#else
-extern Basis_t  BS; //vpn, vright, vup;
-extern Basis_t  base_BS; //base_vpn, base_vright, base_vup;
-#endif
+
+extern Basis_t  BS; // it was vpn, vright, vup;
+extern Basis_t  base_BS; // it was base_vpn, base_vright, base_vup;
 extern r_Entity_p   currententity;
 
 #define NUMVERTEXNORMALS 162
@@ -79,20 +74,7 @@ extern float r_avertexnormals[NUMVERTEXNORMALS][3];
 #   define MAXSPANS         (3000)
 #endif
 
-
-#if 0
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct eSpan_s eSpan_t;
-typedef eSpan_t* eSpan_p;
-struct eSpan_s {
-    int     u;
-    int     v;
-    int     count;
-    eSpan_p pnext;
-};
-#else
 #include "Snap.h"
-#endif
 
 typedef enum {
     invSpan     = -1,   // = in inverted span (end before start)

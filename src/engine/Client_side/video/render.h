@@ -85,12 +85,9 @@ typedef struct {
 //
 // extern int      reinit_surfcache;
 extern refdef_t r_refdef;
+
+extern Basis_t  BS;
 extern vec3_t   r_origin;
-#if 0
-extern vec3_t   vpn, vright, vup;
-#else
-extern Basis_t  BS; //vpn, vright, vup;
-#endif
 
 #ifdef __cplusplus
 extern "C" {

@@ -86,46 +86,31 @@ void R_RotateBmodel() {
     float s = sin(angle);
     float c = cos(angle);
 
-#if 0
-    float temp1[3][3];
-    temp1[0][0] = c;    temp1[0][1] = s;    temp1[0][2] = 0;
-    temp1[1][0] = -s;   temp1[1][1] = c;    temp1[1][2] = 0;
-    temp1[2][0] = 0;    temp1[2][1] = 0;    temp1[2][2] = 1;
-#else
+
     mat3_t temp1 = {
             .m = {
-                { c,  s, 0.0f},
-                {-s,  c, 0.0f},
+                {   c,    s, 0.0f},
+                {  -s,    c, 0.0f},
                 {0.0f, 0.0f, 1.0f}
             }
     };
-#endif
     // pitch
     angle = currententity->angles.pitch;
     angle = angle * M_PI * 2 / 360;
     s = sin(angle);
     c = cos(angle);
 
-#if 0
-    float temp2[3][3];
-    temp2[0][0] = c;    temp2[0][1] = 0;    temp2[0][2] = -s;
-    temp2[1][0] = 0;    temp2[1][1] = 1;    temp2[1][2] = 0;
-    temp2[2][0] = s;    temp2[2][1] = 0;    temp2[2][2] = c;
-#else
+
     mat3_t temp2 = {
         .m = {
-            { c, 0.0f, -s},
+            {    c, 0.0f,   -s},
             { 0.0f, 1.0f, 0.0f},
-            { s, 0.0f, c}
+            {    s, 0.0f,    c}
         }
     };
-#endif
 
-#if 0
-    float temp3[3][3];
-#else
+
     mat3_t temp3;
-#endif
     R_ConcatRotations(&temp2, &temp1, &temp3);
 
     // roll
@@ -134,19 +119,13 @@ void R_RotateBmodel() {
     s = sin(angle);
     c = cos(angle);
 
-#if 0
-    temp1[0][0] = 1;    temp1[0][1] = 0;    temp1[0][2] = 0;
-    temp1[1][0] = 0;    temp1[1][1] = c;    temp1[1][2] = s;
-    temp1[2][0] = 0;    temp1[2][1] = -s;   temp1[2][2] = c;
-#else
     temp1 = (mat3_t){
         .m = {
             { 1.0f, 0.0f, 0.0f},
-            { 0.0f, c, s},
-            { 0.0f, -s, c}
+            { 0.0f,    c,    s},
+            { 0.0f,   -s,    c}
         }
     };
-#endif
 
     R_ConcatRotations(&temp1, &temp3, &entity_rotation);
 
@@ -154,15 +133,10 @@ void R_RotateBmodel() {
     // rotate modelorg and the transformation matrix
     //
     R_EntityRotate(&modelorg);
-#if 0
-    R_EntityRotate(&vpn);
-    R_EntityRotate(&vright);
-    R_EntityRotate(&vup);
-#else
+
     R_EntityRotate(&BS.forward);
     R_EntityRotate(&BS.right);
     R_EntityRotate(&BS.up);
-#endif
 
     R_TransformFrustum();
 }
@@ -213,22 +187,11 @@ void R_RecursiveClipBPoly(bEdge_p pedges, mNode_p pnode, mSurface_p psurf) {
             // generate the clipped vertex
             float frac = lastdist / (lastdist - dist);
             mVertex_p ptvert = &_pbVerts[_numbVerts++];
-#if 0
-            ptvert->position.x =
-                plastvert->position.x +
-                frac * (pvert->position.x - plastvert->position.x);
-            ptvert->position.y =
-                plastvert->position.y +
-                frac * (pvert->position.y - plastvert->position.y);
-            ptvert->position.z =
-                plastvert->position.z +
-                frac * (pvert->position.z - plastvert->position.z);
-#else
+
             // Linear interpolation: pt = plast + frac * (pvert - plast)
             ptvert->position = VectorMA(plastvert->position,
                 frac, VectorSubtract(pvert->position, plastvert->position)
             );
-#endif
 
             // split into two edges, one on each side, and remember entering
             // and exiting points

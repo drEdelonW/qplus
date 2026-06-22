@@ -64,14 +64,9 @@ bool r_fov_greater_than_90;
 //
 // view origin
 //
-#if 0
-vec3_t vup, base_vup;
-vec3_t vpn, base_vpn;
-vec3_t vright, base_vright;
-#else
+
 Basis_t BS;
 Basis_t base_BS;
-#endif
 vec3_t r_origin;    // TODO: mx 3x4?
 
 //
@@ -392,31 +387,6 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     xscaleshrink = (r_refdef.vrect.width - 6) / r_refdef.horizontalFieldOfView;
     yscaleshrink = xscaleshrink * pixelAspect;
 
-#if 0
-    // left side clip
-    screenedge[0].normal[0] = -1.0 / (xOrigin * r_refdef.horizontalFieldOfView);
-    screenedge[0].normal[1] = 0;
-    screenedge[0].normal[2] = 1;
-    screenedge[0].type = PLANE_ANYZ;
-
-    // right side clip
-    screenedge[1].normal[0] = 1.0 / ((1.0 - xOrigin) * r_refdef.horizontalFieldOfView);
-    screenedge[1].normal[1] = 0;
-    screenedge[1].normal[2] = 1;
-    screenedge[1].type = PLANE_ANYZ;
-
-    // top side clip
-    screenedge[2].normal[0] = 0;
-    screenedge[2].normal[1] = -1.0 / (yOrigin * verticalFieldOfView);
-    screenedge[2].normal[2] = 1;
-    screenedge[2].type = PLANE_ANYZ;
-
-    // bottom side clip
-    screenedge[3].normal[0] = 0;
-    screenedge[3].normal[1] = 1.0 / ((1.0 - yOrigin) * verticalFieldOfView);
-    screenedge[3].normal[2] = 1;
-    screenedge[3].type = PLANE_ANYZ;
-#else
     screenedge[0] = (mPlane_t){  // left side clip
         .normal = {
             .x = -1.0f / (xOrigin * r_refdef.horizontalFieldOfView),
@@ -449,7 +419,6 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
         },
         .type = PLANE_ANYZ
     };
-#endif
 
     for (int i = 0; i < 4; i++)
         VectorNormalize(&screenedge[i].normal);
@@ -612,12 +581,7 @@ void R_DrawViewModel() {
 
     r_entorigin = currententity->origin;
     modelorg = VectorSubtract(r_origin, r_entorigin);
-
-#if 0
-    viewlightvec = vup;
-#else
     viewlightvec = BS.up;
-#endif
     VectorInverse(&viewlightvec);
 
     int j = R_LightPoint(currententity->origin);
@@ -806,13 +770,7 @@ void R_DrawBEntitiesOnList() {
 
                 // put back world rotation and frustum clipping
                 // FIXME: R_RotateBmodel should just work off base_vxx
-#if 0
-                vpn = base_vpn;
-                vup = base_vup;
-                vright = base_vright;
-#else
                 BS = base_BS;
-#endif
                 modelorg = base_modelorg;
                 modelorg = oldorigin;
                 R_TransformFrustum();
@@ -852,17 +810,6 @@ void R_EdgeDrawing() {
         (Edge_p)ALIGN_PTR(&ledges[0], CACHE_SIZE);
     // (((uintptr_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
 
-
-#if 0
-    if (r_surfsonstack) {
-        surfaces = (Surf_p)
-            (((uintptr_t)&lsurfs[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
-        surf_max = &surfaces[r_cnumsurfs];
-        // surface 0 doesn't really exist; it's just a dummy because index 0 is used to indicate no edge attached to surface
-        surfaces--;
-        R_SurfacePatch();
-    }
-#else
     if (r_surfsonstack) {
         /* выравниваем от (lsurfs + 1), чтобы потом surfaces = base - 1 было легально */
         Surf_p base = (Surf_p)ALIGN_PTR(&lsurfs[1], CACHE_SIZE);
@@ -871,7 +818,6 @@ void R_EdgeDrawing() {
         /* surface 0 — фиктивный элемент */
         R_SurfacePatch();
     }
-#endif
 
     R_BeginEdgeFrame();
 

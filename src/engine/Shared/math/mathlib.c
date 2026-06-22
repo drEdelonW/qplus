@@ -53,20 +53,7 @@ void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, f
     // };
     vec3_t vr = PerpendicularVector(dir);
     vec3_t vup = CrossProduct(vr, vf);
-#if 0
-    float m[3][3];
-    m[0][0] = vr.x;
-    m[1][0] = vr.y;
-    m[2][0] = vr.z;
 
-    m[0][1] = vup.x;
-    m[1][1] = vup.y;
-    m[2][1] = vup.z;
-
-    m[0][2] = vf.x;
-    m[1][2] = vf.y;
-    m[2][2] = vf.z;
-#else
     mat3_t m = {
         .m = {
             {vr.x, vup.x, vf.x},
@@ -74,35 +61,13 @@ void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, f
             {vr.z, vup.z, vf.z}
         }
     };
-#endif
-#if 0
-    float im[3][3];    memcpy(im, m, sizeof(im));
 
-    im[0][1] = m[1][0];
-    im[0][2] = m[2][0];
-
-    im[1][0] = m[0][1];
-    im[1][2] = m[2][1];
-
-    im[2][0] = m[0][2];
-    im[2][1] = m[1][2];
-#else
     mat3_t im;
-    
+
     im.rows[0] = (vec3_t){m.m[0][0], m.m[1][0], m.m[2][0]};
     im.rows[1] = (vec3_t){m.m[0][1], m.m[1][1], m.m[2][1]};
     im.rows[2] = (vec3_t){m.m[0][2], m.m[1][2], m.m[2][2]};
-#endif
 
-#if 0
-    float zrot[3][3];   memset(zrot, 0, sizeof(zrot));
-    zrot[0][0] = zrot[1][1] = zrot[2][2] = 1.0F;
-    
-    zrot[0][0] = cos(DEG2RAD(degrees));
-    zrot[0][1] = sin(DEG2RAD(degrees));
-    zrot[1][0] = -sin(DEG2RAD(degrees));
-    zrot[1][1] = cos(DEG2RAD(degrees));
-#else
     float angle_rad = DEG2RAD(degrees);
     float c = cos(angle_rad);
     float s = sin(angle_rad);
@@ -114,7 +79,7 @@ void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, f
             {0.0f, 0.0f, 1.0f}
         }
     };
-#endif
+
     mat3_t tmpmat; R_ConcatRotations(&m, &zrot, &tmpmat);
     mat3_t rot;    R_ConcatRotations(&tmpmat, &im, &rot);
 

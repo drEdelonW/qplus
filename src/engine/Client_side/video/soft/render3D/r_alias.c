@@ -41,29 +41,15 @@ FinalVert_p pfinalverts;
 AuxVert_p   pauxverts;
 
 static float    _ziscale;
-static Model_p  _pmodel;
-#if 1
-# if 0
-static vec3_t   _aliasForward;
-static vec3_t   _aliasRight;
-static vec3_t   _aliasUp;
-# else
+static Model_p _pmodel;
 static Basis_t _alias;
-# endif
-#else
-static mat3_t   _alias;
-#endif
 static mAliasSkinDesc_p _pSkinDesc;
 
 int r_amodels_drawn;
 int a_skinwidth;
 int r_anumverts;
 
-#if 0
-float aliastransform[3][4];
-#else
 mat3x4_t aliastransform;
-#endif
 
 typedef struct {
     int index0;
@@ -333,13 +319,8 @@ R_AliasSetUpTransform
 ================
 */
 void R_AliasSetUpTransform(int trivial_accept) {
-#if 0
-    static float tmatrix[3][4];
-    static float viewmatrix[3][4];
-#else
     static mat3x4_t tmatrix;
     static mat3x4_t viewmatrix;
-#endif
     // TODO: should really be stored with the entity instead of being reconstructed
     // TODO: should use a look-up table
     // TODO: could cache lazily, stored in the entity
@@ -349,11 +330,9 @@ void R_AliasSetUpTransform(int trivial_accept) {
         .yaw = currententity->angles.yaw,
         .roll = currententity->angles.roll
     };
-#if 0
-    AngleVectors(angles, &_aliasForward, &_aliasRight, &_aliasUp);
-#else
+
     _alias = GetBasis(angles);
-#endif
+
 
     tmatrix.m[0][0] = pmdl->scale.x;
     tmatrix.m[1][1] = pmdl->scale.y;
@@ -364,22 +343,14 @@ void R_AliasSetUpTransform(int trivial_accept) {
     tmatrix.m[2][3] = pmdl->scale_origin.z;
 
     // TODO: can do this with simple matrix rearrangement
-#if 0
-    float rotationmatrix[3][4], t2matrix[3][4];
-#else
     mat3x4_t rotationmatrix;
     mat3x4_t t2matrix;
-#endif
+
     for (int i = 0; i < VECT_DIM; i++) {
-#if 0
-        t2matrix.m[i][0] = _aliasForward.v[i];
-        t2matrix.m[i][1] = -_aliasRight.v[i];
-        t2matrix.m[i][2] = _aliasUp.v[i];
-#else
+
         t2matrix.m[i][0] = _alias.forward.v[i];
         t2matrix.m[i][1] = -_alias.right.v[i];
         t2matrix.m[i][2] = _alias.up.v[i];
-#endif
     }
 
     t2matrix.m[0][3] = -modelorg.x;
@@ -390,17 +361,10 @@ void R_AliasSetUpTransform(int trivial_accept) {
     R_ConcatTransforms(&t2matrix, &tmatrix, &rotationmatrix);
 
     // TODO: should be global, set when vright, etc., set
-#if 0
-    VectorCopy(vright, (vec3_p)viewmatrix.m[0]);
-    VectorCopy(vup, (vec3_p)viewmatrix.m[1]);
-    VectorInverse((vec3_p)viewmatrix.m[1]);
-    VectorCopy(vpn, (vec3_p)viewmatrix.m[2]);
-#else
     VectorCopy(BS.right, (vec3_p)viewmatrix.m[0]);
     VectorCopy(BS.up, (vec3_p)viewmatrix.m[1]);
     VectorInverse((vec3_p)viewmatrix.m[1]);
     VectorCopy(BS.forward, (vec3_p)viewmatrix.m[2]);
-#endif
 
     // viewmatrix[0][3] = 0;
     // viewmatrix[1][3] = 0;
@@ -625,15 +589,9 @@ void R_AliasSetupLighting(aLight_p plighting) {
     r_shadelight *= VID_GRADES;
 
     // rotate the lighting vector into the model's frame of reference
-#if 0
-    r_plightvec.x = DotProduct(*(vec3_p)plighting->plightvec, _aliasForward);
-    r_plightvec.y = -DotProduct(*(vec3_p)plighting->plightvec, _aliasRight);
-    r_plightvec.z = DotProduct(*(vec3_p)plighting->plightvec, _aliasUp);
-#else
     r_plightvec.x = DotProduct(*(vec3_p)plighting->plightvec, _alias.forward);
     r_plightvec.y = -DotProduct(*(vec3_p)plighting->plightvec, _alias.right);
     r_plightvec.z = DotProduct(*(vec3_p)plighting->plightvec, _alias.up);
-#endif
 }
 
 /*

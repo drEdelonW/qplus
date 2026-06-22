@@ -374,12 +374,7 @@ void SV_SpawnServer(
     // leave slots at start for clients only
     EdictsNum = svs.maxClients + 1;
     for (uint32_t i = 0; i < svs.maxClients; i++) {
-#if 0
-        edict_p ent = ED_GetEDictByIdx(i + 1);
-        svs.clients[i].edict = ent;
-#else
         svs.clients[i].edict = ED_GetEDictByIdx(i + 1);
-#endif
     }
 
 

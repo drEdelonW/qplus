@@ -216,15 +216,6 @@ dAliasSkinType_p Mod_LoadAliasSkin(
     uint8_p pinskin = (uint8_p)pin;
     *pskinindex = (uint8_p)pskin - (uint8_p)pheader;
 
-#if 0
-    if (r_pixbytes == 1)    Q_memcpy(pskin, pinskin, skinsize);
-    else if (r_pixbytes == 2) {
-        uint16_p pusskin = (uint16_p)pskin;
-        for (int i = 0; i < skinsize; i++)
-            pusskin[i] = d_8to16table[pinskin[i]];
-    }
-    else                    Host_SysError("Mod_LoadAliasSkin: driver set invalid r_pixbytes: %d\n", r_pixbytes);
-#else
     switch (r_pixbytes) {
     case 1: { Q_memcpy(pskin, pinskin, skinsize); } break;
     case 2: {
@@ -234,7 +225,7 @@ dAliasSkinType_p Mod_LoadAliasSkin(
     } break;
     default: { Host_SysError("Mod_LoadAliasSkin: driver set invalid r_pixbytes: %d\n", r_pixbytes); } break;
     }
-#endif
+
 
     pinskin += skinsize;
     return ((dAliasSkinType_p)pinskin);
@@ -527,10 +518,6 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
         frametype = LittleLong(pframetype->type);
 
-# if 0
-        if (frametype == ALIAS_SINGLE)  pframetype = Mod_LoadAliasFrame(pframetype + 1, &pheader->frames[i]);
-        else                            pframetype = Mod_LoadAliasGroup(pframetype + 1, &pheader->frames[i]);
-# else
         switch (frametype) {
         case ALIAS_SINGLE: { pframetype = Mod_LoadAliasFrame(pframetype + 1, &pheader->frames[i]); } break;
         case ALIAS_GROUP: { pframetype = Mod_LoadAliasGroup(pframetype + 1, &pheader->frames[i]); } break;
@@ -538,8 +525,6 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
             Host_Error(".MDL frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
         } break;
         }
-# endif
-
     }
 
     pheader->numposes = posenum;
@@ -547,10 +532,6 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     mod->type = mod_alias;
 
     // FIXME: do this right
-# if 0
-    mod->mins.x = mod->mins.y = mod->mins.z = -16;
-    mod->maxs.x = mod->maxs.y = mod->maxs.z = 16;
-# else
     mod->mins = (vec3_t){
             .x = -16.0f,
             .y = -16.0f,
@@ -561,7 +542,6 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
             .y = 16.0f,
             .z = 16.f
         };
-# endif
 
     //
     // build the draw lists
@@ -653,16 +633,11 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
         AliasSkinType_t skintype = LittleLong(pskintype->type);
         pskindesc[i].type = skintype;
 
-#   if 0
-        if (skintype == ALIAS_SKIN_SINGLE)  pskintype = Mod_LoadAliasSkin(pskintype + 1, &pskindesc[i].skin, skinsize, pheader);
-        else                                pskintype = Mod_LoadAliasSkinGroup(pskintype + 1, &pskindesc[i].skin, skinsize, pheader);
-#   else
         switch (skintype) {
         case ALIAS_SKIN_SINGLE: { pskintype = Mod_LoadAliasSkin(pskintype + 1, &pskindesc[i].skin, skinsize, pheader); } break;
         case ALIAS_SKIN_GROUP: { pskintype = Mod_LoadAliasSkinGroup(pskintype + 1, &pskindesc[i].skin, skinsize, pheader); } break;
         default: { Host_Error("skintype [0x%X] UNKNOWN!\n", skintype); } break;
         }
-#   endif
     }
 
     //
@@ -759,21 +734,9 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     mod->type = mod_alias;
 
     // FIXME: do this right
-# if 0
-    mod->mins.x = mod->mins.y = mod->mins.z = -16;
-    mod->maxs.x = mod->maxs.y = mod->maxs.z = 16;
-# else
-    mod->mins = (vec3_t){
-            .x = -16.0f,
-            .y = -16.0f,
-            .z = -16.f
-        };
-    mod->maxs = (vec3_t){
-            .x = 16.0f,
-            .y = 16.0f,
-            .z = 16.f
-        };
-# endif
+    mod->mins = Scalar2Vector(-16.0f);
+    mod->maxs = Scalar2Vector(16.0f);
+
     //
     // move the complete, relocatable alias model to the cache
     //

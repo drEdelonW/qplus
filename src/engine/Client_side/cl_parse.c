@@ -132,18 +132,12 @@ void CL_ParseStartSoundPacket() {
     if (ent > MAX_EDICTS)
         Host_Error("CL_ParseStartSoundPacket: ent = %i", ent);
 
-#if 0
-    vec3_t pos;
-    for (int i = 0; i < VECT_DIM; i++) {
-        pos[i] = MSG_ReadCoord();
-    }
-#else
     vec3_t pos = {
         .x = MSG_ReadCoord(),
         .y = MSG_ReadCoord(),
         .z = MSG_ReadCoord()
     };
-#endif
+
     S_StartSound(
         ent, channel,
         cl.sound_precache[sound_num], pos,

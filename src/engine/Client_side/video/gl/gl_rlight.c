@@ -70,28 +70,22 @@ void AddLightBlend(float r, float g, float b, float a2) {
 void R_RenderDlight(dLight_p light) {
     float rad = light->radius * 0.35;
 
-    vec3_t v = VectorSubtract(light->origin, r_origin);
-    if (Length(v) < rad) {    // view is inside the dlight
-        AddLightBlend(1, 0.5, 0, light->radius * 0.0003);
+    if (Length(VectorSubtract(light->origin, r_origin)) < rad) {    // view is inside the dlight
+        AddLightBlend(1.0f, 0.5f, 0.0f, light->radius * 0.0003f);
         return;
     }
 
     glBegin(GL_TRIANGLE_FAN); {
-        glColor3f(0.2, 0.1, 0.0);
 
-        v = VectorMA(light->origin, -rad, vpn);
-
-        glVertex3fv(v.v);
-        glColor3f(0, 0, 0);
+        glColor3f(0.2f, 0.1f, 0.0f);    glVertex3fv(VectorMA(light->origin, -rad, BS.forward).v);
+        glColor3f(0.0f, 0.0f, 0.0f);
         for (int i = 16; i >= 0; i--) {
-            float a = i / 16.0 * M_PI * 2;
+            float a = i / 16.0f * M_PI * 2.0f;
 
-            v = VectorMA(VectorMA(light->origin,
-                cos(a) * rad, vright),
-                sin(a) * rad, vup
-            );
-
-            glVertex3fv(v.v);
+            glVertex3fv(VectorMA(VectorMA(light->origin,
+                cos(a) * rad, BS.right),
+                sin(a) * rad, BS.up
+            ).v);
         }
     } glEnd();
 }
@@ -220,16 +214,9 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
         return RecursiveLightPoint(node->children[side], start, end);
 
     float frac = front / (front - back);
-#if 0
-    vec3_t mid = {
-        .x = start.x + (end.x - start.x) * frac,
-        .y = start.y + (end.y - start.y) * frac,
-        .z = start.z + (end.z - start.z) * frac
-    };
-#else
+
     // Linear interpolation: mid = start + (end - start) * frac
     vec3_t mid = VectorMA(start, frac, VectorSubtract(end, start));
-#endif
 
     // go down front side
     int r = RecursiveLightPoint(node->children[side], start, mid);
@@ -292,16 +279,8 @@ int R_LightPoint(vec3_t p) {
     if (!cl.worldmodel->lightdata)
         return 255;
 
-#if 0
-    vec3_t end = {
-        .x = p.x,
-        .y = p.y,
-        .z = p.z - 2048
-    };
-#else
     vec3_t end = p;
-    end.z -= 2048;
-#endif
+    end.z -= 2048.0f;
 
     int r = RecursiveLightPoint(cl.worldmodel->nodes, p, end);
 

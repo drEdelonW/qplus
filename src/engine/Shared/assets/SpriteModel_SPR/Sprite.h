@@ -38,11 +38,7 @@ typedef struct {
     //  if the driver wants to duplicate element [0] at
     //  element [nump] to avoid dealing with wrapping
     mSpriteFrame_p  pspriteframe;
-#if 0
-    vec3_t          vup, vright, vpn; // in worldspace
-#else
     Basis_t         bs; // in worldspace
-#endif
     float           nearzi;
 } SpriteDesc_t;
 

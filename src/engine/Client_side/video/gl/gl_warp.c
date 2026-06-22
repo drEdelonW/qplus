@@ -113,11 +113,8 @@ void SubdividePolygon(int numverts, float_p verts) {
         return;
     }
 
-#if 0
-    glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (numverts - 4) * (VERTEXSIZE * sizeof(float)));
-#else
     glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (numverts - 4) * sizeof(glVert_t));
-#endif    
+
     poly->next = warpface->polys;
     warpface->polys = poly;
     poly->numverts = numverts;

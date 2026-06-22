@@ -43,12 +43,7 @@ static Particle_p _freeParticles;
 static Particle_p _particles;
 static int _rNumParticles;
 
-#if 0
-vec3_t   r_pright, r_pup, r_ppn;
-#else
 Basis_t r_p;
-#endif
-
 
 /*
 ===============
@@ -544,22 +539,16 @@ void R_DrawParticles() {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glBegin(GL_TRIANGLES); {
 
-        vec3_t up = VectorScale(vup, 1.5);
-        vec3_t right = VectorScale(vright, 1.5);
+        vec3_t up = VectorScale(BS.up, 1.5f);
+        vec3_t right = VectorScale(BS.right, 1.5f);
 #else
     D_StartParticles();
 
-#   if 0
-    r_pright = VectorScale(vright, xscaleshrink);
-    r_pup = VectorScale(vup, yscaleshrink);
-    r_ppn = vpn;
-# else
     r_p = (Basis_t){
         .forward = BS.forward,
         .right = VectorScale(BS.right, xscaleshrink),
         .up = VectorScale(BS.up, yscaleshrink)
     };
-# endif
 #endif
     float frametime = cl.time - cl.oldtime;
     float time3 = frametime * 15;
@@ -598,48 +587,21 @@ void R_DrawParticles() {
 
 #ifdef GLQUAKE      // TODO: wrap this in D_DrawParticle on GL_side
         // hack a scale up to keep particles from disapearing
-# if 0
-        float scale =
-            (prt->org.x - r_origin.x) * vpn.x +
-            (prt->org.y - r_origin.y) * vpn.y +
-            (prt->org.z - r_origin.z) * vpn.z;
-# else
-        float scale = DotProduct(VectorSubtract(prt->org, r_origin), vpn);
-# endif
+
+        float scale = DotProduct(VectorSubtract(prt->org, r_origin), BS.forward);
         if (scale < 20.0f)  scale = 1.0f;
         else                scale = 1.0f + scale * 0.004f;
-# if 0
-        glColor3ub(255, 0, 0);  // DEBUG: make all particle RED
-# else
+
         glColor3ubv((uint8_p)&d_8to24table[(int)prt->color]);
-# endif
-#if 0
-        glTexCoord2f(0, 0);        glVertex3fv(prt->org.v);
-        glTexCoord2f(1, 0);        glVertex3f(
-            prt->org.x + up.x * scale,
-            prt->org.y + up.y * scale,
-            prt->org.z + up.z * scale
-        );
-        glTexCoord2f(0, 1);        glVertex3f(
-            prt->org.x + right.x * scale,
-            prt->org.y + right.y * scale,
-            prt->org.z + right.z * scale
-        );
-#else
+
         glTexCoord2f(0, 0);         glVertex3fv(prt->org.v);
         glTexCoord2f(1, 0);         glVertex3fv(VectorMA(prt->org, scale, up).v);
         glTexCoord2f(0, 1);         glVertex3fv(VectorMA(prt->org, scale, right).v);
-#endif
 #else
         D_DrawParticle(prt);
 #endif
-#if 0
-        prt->org.x += prt->vel.x * frametime; // prt->org += prt->vel * frametime;
-        prt->org.y += prt->vel.y * frametime;
-        prt->org.z += prt->vel.z * frametime;
-#else
+
         prt->org = VectorMA(prt->org, frametime, prt->vel);
-#endif
 
         switch (prt->type) {
         case pt_static:     break;
@@ -692,9 +654,9 @@ void R_DrawParticles() {
     }
 
 #ifdef GLQUAKE      // TODO: wrap this in D_EndParticles on GL_side
-} glEnd();
-glDisable(GL_BLEND);
-glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    } glEnd();
+    glDisable(GL_BLEND);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 #else
     D_EndParticles();
 #endif

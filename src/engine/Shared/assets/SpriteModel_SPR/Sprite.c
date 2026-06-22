@@ -94,17 +94,6 @@ TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
     pspriteframe->left = origin[0];
     pspriteframe->right = width + origin[0];
 
-#if 0
-    if (r_pixbytes == 1)    Q_memcpy(&pspriteframe->pixels[0], (uint8_p)(pinframe + 1), size);
-    else if (r_pixbytes == 2) {
-        uint8_p ppixin = (uint8_p)(pinframe + 1);
-        uint16_p ppixout = (uint16_p)&pspriteframe->pixels[0];
-
-        for (int i = 0; i < size; i++)
-            ppixout[i] = d_8to16table[ppixin[i]];
-    }
-    else     Host_SysError("Mod_LoadSpriteFrame: driver set invalid r_pixbytes: %d\n", r_pixbytes);
-#else
     switch (r_pixbytes) {
     case 1: { Q_memcpy(&pspriteframe->pixels[0], (uint8_p)(pinframe + 1), size); } break;
     case 2: {
@@ -116,7 +105,6 @@ TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
     } break;
     default:    Host_SysError("Mod_LoadSpriteFrame: driver set invalid r_pixbytes: %d\n", r_pixbytes);
     }
-#endif
     return (TypeLess_ptr)((uint8_p)pinframe + sizeof(dSpriteFrame_t) + size);
 }
 #endif
