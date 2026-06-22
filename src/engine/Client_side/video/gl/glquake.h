@@ -134,9 +134,13 @@ extern  int         c_brush_polys, c_alias_polys;
 //
 // view origin
 //
+#if 0
 extern  vec3_t      vup;
 extern  vec3_t      vpn;
 extern  vec3_t      vright;
+#else
+extern Basis_t  BS; //vpn, vright, vup;
+#endif
 extern  vec3_t      r_origin;
 
 //

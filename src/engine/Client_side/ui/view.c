@@ -58,11 +58,20 @@ V_CalcRoll
 Used by view and sv_user
 ===============
 */
+#if 0
 static vec3_t forward, right, up;
+#else
+static Basis_t _bs;
+#endif
 
 float V_CalcRoll(vec3_t angles, vec3_t velocity) {
+#if 0
     AngleVectors(angles, &forward, &right, &up);
     float side = DotProduct(velocity, right);
+#else
+    _bs = GetBasis(angles);
+    float side = DotProduct(velocity, _bs.right);
+#endif
     float sign = (side < 0.0f) ? -1.0f : 1.0f;
     side = fabs(side);
 
@@ -293,10 +302,18 @@ void V_ParseDamage() {
     VectorNormalize(&from);
 
     // vec3_t forward, right, up;
+#if 0
     AngleVectors(ent->angles, &forward, &right, &up);
 
     _v_DmgRoll = count * v_kickroll.value * DotProduct(from, right);
     _v_DmgPitch = count * v_kickpitch.value * DotProduct(from, forward);
+#else
+    _bs = GetBasis(ent->angles);
+
+    _v_DmgRoll = count * v_kickroll.value * DotProduct(from, _bs.right);
+    _v_DmgPitch = count * v_kickpitch.value * DotProduct(from, _bs.forward);
+#endif
+
     _v_DmgTime = v_kicktime.value;
 }
 
@@ -757,8 +774,8 @@ void V_CalcRefdef() {
     };
 
     //vec3_t forward, right, up;
+#if 0
     AngleVectors(angles, &forward, &right, &up);
-
 
     r_refdef.vieworg =
         VectorMA(VectorMA(VectorMA(r_refdef.vieworg,
@@ -766,7 +783,17 @@ void V_CalcRefdef() {
             scr_ofsy.value, right),
             scr_ofsx.value, forward
         );
+#else
+    _bs = GetBasis(angles);
+    
+    r_refdef.vieworg =
+        VectorMA(VectorMA(VectorMA(r_refdef.vieworg,
+            scr_ofsz.value, _bs.up),
+            scr_ofsy.value, _bs.right),
+            scr_ofsx.value, _bs.forward
+        );
 
+#endif
 
     V_BoundOffsets();
 
@@ -777,9 +804,15 @@ void V_CalcRefdef() {
     view->origin = ent->origin;
     view->origin.z += cl.viewheight;
 
+#if 0
     view->origin = VectorMA(view->origin, bob * 0.4f, forward);
     // view->origin = VectorMA(view->origin, bob * 0.4f, right);
     // view->origin = VectorMA(view->origin, bob * 0.8f, up);
+#else
+    view->origin = VectorMA(view->origin, bob * 0.4f, _bs.forward);
+    // view->origin = VectorMA(view->origin, bob * 0.4f, _bs.right);
+    // view->origin = VectorMA(view->origin, bob * 0.8f, _bs.up);
+#endif
     view->origin.z += bob;
 
     // fudge position around to keep amount of weapon visible
@@ -860,19 +893,23 @@ void V_RenderView() {
         vid.aspect *= 0.5;
 
         r_refdef.viewangles.yaw -= lcd_yaw.value;
+#if 0
         r_refdef.vieworg = VectorMA(r_refdef.vieworg, -lcd_x.value, right);
-
+#else
+        r_refdef.vieworg = VectorMA(r_refdef.vieworg, -lcd_x.value, _bs.right);
+#endif
         R_RenderView();
-
         vid.buffer += vid.rowbytes >> 1;
 
         R_PushDlights();
 
         r_refdef.viewangles.yaw += lcd_yaw.value * 2;
-
+#if 0
         r_refdef.vieworg = VectorMA(r_refdef.vieworg, 2 * lcd_x.value, right);
+#else
+        r_refdef.vieworg = VectorMA(r_refdef.vieworg, 2 * lcd_x.value, _bs.right);
+#endif
         R_RenderView();
-
         vid.buffer -= vid.rowbytes >> 1;
 
         r_refdef.vrect.height <<= 1;

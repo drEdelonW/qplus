@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 bool        insubmodel;
 r_Entity_p  currententity;
-vec3_t      modelorg, base_modelorg;
+vec3_t      modelorg, base_modelorg;    // TODO: move to transform code
 // modelorg is the viewpoint reletive to
 // the currently rendering entity
 vec3_t      r_entorigin; // the currently rendering entity in world
@@ -154,9 +154,15 @@ void R_RotateBmodel() {
     // rotate modelorg and the transformation matrix
     //
     R_EntityRotate(&modelorg);
+#if 0
     R_EntityRotate(&vpn);
     R_EntityRotate(&vright);
     R_EntityRotate(&vup);
+#else
+    R_EntityRotate(&BS.forward);
+    R_EntityRotate(&BS.right);
+    R_EntityRotate(&BS.up);
+#endif
 
     R_TransformFrustum();
 }

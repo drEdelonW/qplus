@@ -228,9 +228,13 @@ void D_DrawSurfaces() {
                     //
                     currententity = &cl_entities[0];
                     transformed_modelorg = world_transformed_modelorg;
+#if 0
                     vpn = base_vpn;
                     vup = base_vup;
                     vright = base_vright;
+#else
+                    BS = base_BS;
+#endif
                     modelorg = base_modelorg;
                     R_TransformFrustum();
                 }
@@ -274,9 +278,13 @@ void D_DrawSurfaces() {
                     //
                     currententity = &cl_entities[0];
                     transformed_modelorg = world_transformed_modelorg;
+#if 0
                     vpn = base_vpn;
                     vup = base_vup;
                     vright = base_vright;
+#else
+                    BS = base_BS;
+#endif
                     modelorg = base_modelorg;
                     R_TransformFrustum();
                 }

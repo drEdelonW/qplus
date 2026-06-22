@@ -56,9 +56,14 @@ extern float    pixelAspect;
 extern int      r_drawnpolycount;
 extern int      sintable[SIN_BUFFER_SIZE];
 extern int      intsintable[SIN_BUFFER_SIZE];
+#if 0
 extern vec3_t   vup, base_vup;
 extern vec3_t   vpn, base_vpn;
 extern vec3_t   vright, base_vright;
+#else
+extern Basis_t  BS; //vpn, vright, vup;
+extern Basis_t  base_BS; //base_vpn, base_vright, base_vup;
+#endif
 extern r_Entity_p   currententity;
 
 #define NUMVERTEXNORMALS 162

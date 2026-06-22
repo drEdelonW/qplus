@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "angle.h"
 #include "world.h"
 #include "mathlib.h"
+#include "transform.h"
 #include "cvar_q1.h"
 #include "protocol.h"
 #include "msg.h"
@@ -112,12 +113,20 @@ makevectors(vector)
 ==============
 */
 void PF_makevectors() {
+#if 0
     AngleVectors(
         G_VECTOR(OFS_PARM0),
         &pr_global_struct->v_forward,
         &pr_global_struct->v_right,
         &pr_global_struct->v_up
     );
+#else
+    Basis_t bs = GetBasis(G_VECTOR(OFS_PARM0));
+    pr_global_struct->v_forward = bs.forward;
+    pr_global_struct->v_right = bs.right;
+    pr_global_struct->v_up = bs.up;
+
+#endif
 }
 
 /*

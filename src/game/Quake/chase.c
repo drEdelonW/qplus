@@ -50,22 +50,41 @@ void TraceLine(vec3_t start, vec3_t end, vec3_p impact) {
 
 void Chase_Update() {
     // if can't see player, reset
+#if 0
     vec3_t forward, up, right;  AngleVectors(cl.viewangles, &forward, &right, &up);
-
+#else
+    Basis_t bs = GetBasis(cl.viewangles);
+#endif
 
     _chaseDest = VectorMA(VectorMA(r_refdef.vieworg,
+#if 0
         -chase_back.value, forward),
         -chase_right.value, right
+#else
+        -chase_back.value, bs.forward),
+        -chase_right.value, bs.right
+#endif
     );
     _chaseDest.z = r_refdef.vieworg.z + chase_up.value;
 
     // find the spot the player is looking at
-    vec3_t dest = VectorMA(r_refdef.vieworg, 4096, forward);
-    vec3_t stop;  TraceLine(r_refdef.vieworg, dest, &stop);
+    vec3_t stop;  TraceLine(    // TODO: remake to stack vector return
+        r_refdef.vieworg,
+#if 0
+        VectorMA(r_refdef.vieworg, 4096, forward),
+#else
+        VectorMA(r_refdef.vieworg, 4096, bs.forward),
+#endif
+        &stop
+    );
 
     // calculate pitch to look at the same spot from camera
-    stop = VectorSubtract(stop, r_refdef.vieworg);
+    stop = VectorSubtract(stop, r_refdef.vieworg);  // stop -= r_refdef.vieworg;
+#if 0
     float dist = DotProduct(stop, forward);
+#else
+    float dist = DotProduct(stop, bs.forward);
+#endif
     CLAMP_LESS(dist, 1);
 
     r_refdef.viewangles.pitch =

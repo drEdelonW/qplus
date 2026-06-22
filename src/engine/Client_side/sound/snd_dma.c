@@ -63,10 +63,14 @@ bool  snd_initialized = false;
 volatile dma_p shm = 0;
 volatile dma_t sn;
 
+#if 1
 vec3_t  listener_origin;
 vec3_t  listener_forward;
 vec3_t  listener_right;
 vec3_t  listener_up;
+#else
+// TODO: remake to TranMx_t 3x4
+#endif
 vec_t   sound_nominal_clip_dist = 1000.0;
 
 int     soundtime;  // sample PAIRS
@@ -620,7 +624,7 @@ S_Update
 Called once each time through the main loop
 ============
 */
-void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up) {
+void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up) { // TODO rework for Basis_t
     if (!sound_started || (snd_blocked > 0))    return;
 
     listener_origin = origin;

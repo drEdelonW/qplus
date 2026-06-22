@@ -57,9 +57,15 @@ void D_DrawParticle(Particle_p pparticle) {
     vec3_t local = VectorSubtract(pparticle->org, r_origin);
 
     vec3_t transformed = {
+#if 0
         .x = DotProduct(local, r_pright),
         .y = DotProduct(local, r_pup),
         .z = DotProduct(local, r_ppn)
+#else
+        .x = DotProduct(local, r_p.right),
+        .y = DotProduct(local, r_p.up),
+        .z = DotProduct(local, r_p.forward)
+#endif
     };
 
     if (transformed.z < PARTICLE_Z_CLIP)

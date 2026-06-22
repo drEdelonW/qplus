@@ -6,5 +6,4 @@
 #endif
 #define DEG2RAD(a) (a * M_PI) / 180.0F
 
-void    AngleVectors(vec3_t angles, vec3_p forward, vec3_p right, vec3_p up);
 float   anglemod(float a);

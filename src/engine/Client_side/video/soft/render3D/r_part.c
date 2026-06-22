@@ -43,7 +43,11 @@ static Particle_p _freeParticles;
 static Particle_p _particles;
 static int _rNumParticles;
 
+#if 0
 vec3_t   r_pright, r_pup, r_ppn;
+#else
+Basis_t r_p;
+#endif
 
 
 /*
@@ -545,9 +549,17 @@ void R_DrawParticles() {
 #else
     D_StartParticles();
 
+#   if 0
     r_pright = VectorScale(vright, xscaleshrink);
     r_pup = VectorScale(vup, yscaleshrink);
     r_ppn = vpn;
+# else
+    r_p = (Basis_t){
+        .forward = BS.forward,
+        .right = VectorScale(BS.right, xscaleshrink),
+        .up = VectorScale(BS.up, yscaleshrink)
+    };
+# endif
 #endif
     float frametime = cl.time - cl.oldtime;
     float time3 = frametime * 15;

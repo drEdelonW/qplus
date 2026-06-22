@@ -48,11 +48,17 @@ void D_Sky_uv_To_st(int u, int v, fixed16_p s, fixed16_p t) {
         .y = 4096.0f * vpn.y + wu * vright.y + wv * vup.y,
         .z = 4096.0f * vpn.z + wu * vright.z + wv * vup.z
     };
-#else
+#elif 0
     vec3_t end = VectorMA(VectorMA(
         VectorScale(vpn, 4096.0f),
         wu, vright),
         wv, vup
+    );
+#else
+    vec3_t end = VectorMA(VectorMA(
+        VectorScale(BS.forward, 4096.0f),
+        wu, BS.right),
+        wv, BS.up
     );
 #endif
     end.z *= 3.0f;

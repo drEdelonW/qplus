@@ -64,10 +64,15 @@ bool r_fov_greater_than_90;
 //
 // view origin
 //
+#if 0
 vec3_t vup, base_vup;
 vec3_t vpn, base_vpn;
 vec3_t vright, base_vright;
-vec3_t r_origin;
+#else
+Basis_t BS;
+Basis_t base_BS;
+#endif
+vec3_t r_origin;    // TODO: mx 3x4?
 
 //
 // screen size info
@@ -608,7 +613,11 @@ void R_DrawViewModel() {
     r_entorigin = currententity->origin;
     modelorg = VectorSubtract(r_origin, r_entorigin);
 
+#if 0
     viewlightvec = vup;
+#else
+    viewlightvec = BS.up;
+#endif
     VectorInverse(&viewlightvec);
 
     int j = R_LightPoint(currententity->origin);
@@ -797,9 +806,13 @@ void R_DrawBEntitiesOnList() {
 
                 // put back world rotation and frustum clipping
                 // FIXME: R_RotateBmodel should just work off base_vxx
+#if 0
                 vpn = base_vpn;
-                vup= base_vup;
+                vup = base_vup;
                 vright = base_vright;
+#else
+                BS = base_BS;
+#endif
                 modelorg = base_modelorg;
                 modelorg = oldorigin;
                 R_TransformFrustum();

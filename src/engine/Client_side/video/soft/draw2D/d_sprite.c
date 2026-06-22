@@ -298,12 +298,21 @@ D_SpriteCalculateGradients
 =====================
 */
 void D_SpriteCalculateGradients() {
+#if 0
     vec3_t p_normal = TransformVector(r_spritedesc.vpn);
     vec3_t p_saxis = TransformVector(r_spritedesc.vright);
     vec3_t p_taxis = TransformVector(r_spritedesc.vup);
     VectorInverse(&p_taxis);
 
     float distinv = 1.0 / (-DotProduct(modelorg, r_spritedesc.vpn));
+#else
+    vec3_t p_normal = TransformVector(r_spritedesc.bs.forward);
+    vec3_t p_saxis = TransformVector(r_spritedesc.bs.right);
+    vec3_t p_taxis = TransformVector(r_spritedesc.bs.up);
+    VectorInverse(&p_taxis);
+
+    float distinv = 1.0 / (-DotProduct(modelorg, r_spritedesc.bs.forward));
+#endif
 
     d_sdivzstepu = p_saxis.x * xscaleinv;
     d_tdivzstepu = p_taxis.x * xscaleinv;

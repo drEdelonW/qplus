@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "model_effect.h"
 #include "EntityState.h"
 #include "qTime.h"
+#include "transform.h"
 #include "model.h"
 
 //=============================================================================
@@ -84,7 +85,12 @@ typedef struct {
 //
 // extern int      reinit_surfcache;
 extern refdef_t r_refdef;
-extern vec3_t   r_origin, vpn, vright, vup;
+extern vec3_t   r_origin;
+#if 0
+extern vec3_t   vpn, vright, vup;
+#else
+extern Basis_t  BS; //vpn, vright, vup;
+#endif
 
 #ifdef __cplusplus
 extern "C" {

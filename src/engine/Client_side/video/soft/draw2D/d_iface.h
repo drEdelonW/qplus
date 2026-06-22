@@ -85,8 +85,11 @@ extern PolyDesc_t r_polydesc;
 extern int d_con_indirect; // if 0, Quake will draw console directly to vid.buffer; if 1, Quake will
 //  draw console via D_DrawRect. Must be defined by driver
 
+#if 0
 extern vec3_t r_pright, r_pup, r_ppn;
-
+#else
+extern Basis_t r_p;
+#endif
 
 void D_Aff8Patch(TypeLess_ptr pcolormap);
 void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height);

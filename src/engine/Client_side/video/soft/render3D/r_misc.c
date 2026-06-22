@@ -259,11 +259,25 @@ void R_TransformFrustum() {
             .y = -screenedge[i].normal.x,
             .z = screenedge[i].normal.y
         };                  // z -> forward (vpn), -x -> right (vright), y -> up (vup)
+#if 0
         vec3_t v2 = {
+# if 0
             .x = v.y * vright.x + v.z * vup.x + v.x * vpn.x,
             .y = v.y * vright.y + v.z * vup.y + v.x * vpn.y,
             .z = v.y * vright.z + v.z * vup.z + v.x * vpn.z
+# else
+            .x = v.y * BS.right.x + v.z * BS.up.x + v.x * BS.forward.x,
+            .y = v.y * BS.right.y + v.z * BS.up.y + v.x * BS.forward.y,
+            .z = v.y * BS.right.z + v.z * BS.up.z + v.x * BS.forward.z
+# endif
         };
+#else
+        vec3_t v2 = VectorMA(VectorMA(
+            VectorScale(BS.forward, v.x),
+            v.y, BS.right),
+            v.z, BS.up
+        );
+#endif
 
         view_clipplanes[i].normal = v2;
 
@@ -279,11 +293,17 @@ void R_TransformFrustum() {
     TransformVector
     ================
 */
-vec3_t/*void*/  TransformVector(vec3_t in /*, vec3_p out */ ) {
+vec3_t/*void*/  TransformVector(vec3_t in /*, vec3_p out */) {
     vec3_t out = (vec3_t){
+#if 0
         .x = DotProduct(in, vright),
         .y = DotProduct(in, vup),
         .z = DotProduct(in, vpn)
+#else
+        .x = DotProduct(in, BS.right),
+        .y = DotProduct(in, BS.up),
+        .z = DotProduct(in, BS.forward)
+#endif
     };
     return out;
 }
@@ -393,8 +413,11 @@ void R_SetupFrame() {
     modelorg = r_refdef.vieworg;
     r_origin = r_refdef.vieworg;
 
+#if 0
     AngleVectors(r_refdef.viewangles, &vpn, &vright, &vup);
-
+#else
+    BS = GetBasis(r_refdef.viewangles);
+#endif
     // current viewleaf
     r_oldviewleaf = r_viewleaf;
     r_viewleaf = Mod_PointInLeaf(r_origin, cl.worldmodel);
@@ -458,9 +481,13 @@ void R_SetupFrame() {
     R_TransformFrustum();
 
     // save base values
+#if 0
     base_vpn = vpn;
     base_vright = vright;
     base_vup = vup;
+#else
+    base_BS = BS;
+#endif
     base_modelorg = modelorg;
 
     R_SetSkyFrame();

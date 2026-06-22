@@ -604,7 +604,11 @@ void Host::_Frame(float time) {
 
     // update audio
     if (cls.signon == SIGNONS) {
+#if 0
         S_Update(r_origin, vpn, vright, vup);
+#else
+        S_Update(r_origin, BS.forward, BS.right, BS.up);
+#endif
         CL_DecayLights();
     }
     else

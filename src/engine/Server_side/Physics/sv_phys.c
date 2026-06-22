@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "host.h"
 #include "mathlib.h"
+#include "transform.h"
 #include "progs.h"
 #include "GlobVars.h"
 
@@ -785,8 +786,12 @@ SV_WallFriction
 ============
 */
 void SV_WallFriction(edict_p ent, trace_p trace) {
+#if 0
     vec3_t  forward, right, up; AngleVectors(ent->v.v_angle, &forward, &right, &up);
-    float d = DotProduct(trace->plane.normal, forward);
+#else
+    Basis_t bs = GetBasis(ent->v.v_angle);
+#endif
+    float d = DotProduct(trace->plane.normal, bs.forward);
 
     d += 0.5f;
     if (d >= 0)

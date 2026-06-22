@@ -138,6 +138,7 @@ include features/fh_qRender$(QRND).mk
                         SRC_LIST += $(MATH_DIR)/Vector3d.cpp
                         SRC_LIST += $(MATH_DIR)/vector.cpp
                         SRC_LIST += $(MATH_DIR)/angle.c
+                        SRC_LIST += $(MATH_DIR)/transform.c
 
                 $(eval AST_DIR = $(SHARED_DIR)/assets) $(eval INCLUDES += $(AST_DIR))
                         $(eval PAK_DIR = $(AST_DIR)/PAK) $(eval INCLUDES += $(PAK_DIR))

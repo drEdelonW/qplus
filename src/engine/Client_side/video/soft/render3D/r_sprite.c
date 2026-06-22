@@ -39,7 +39,11 @@ R_RotateSprite
 void R_RotateSprite(float beamlength) {
     if (beamlength == 0.0f)      return;
 
+#if 0
     vec3_t vec = VectorScale(r_spritedesc.vpn, -beamlength); // vec = r_spritedesc.vpn * (-beamlength);
+#else
+    vec3_t vec = VectorScale(r_spritedesc.bs.forward, -beamlength); // vec = r_spritedesc.vpn * (-beamlength);
+#endif
     r_entorigin = VectorAdd(r_entorigin, vec);   // r_entorigin += vec;
     modelorg = VectorSubtract(modelorg, vec);    // modelorg -= vec;
 }
@@ -187,15 +191,26 @@ R_SetupAndDrawSprite
 ================
 */
 void R_SetupAndDrawSprite() {
+#if 0
     float dot = DotProduct(r_spritedesc.vpn, modelorg);
+#else
+    float dot = DotProduct(r_spritedesc.bs.forward, modelorg);
+#endif
     // backface cull
     if (dot >= 0)       return;
 
     // build the sprite poster in worldspace
+#if 0
     vec3_t right = VectorScale(r_spritedesc.vright, r_spritedesc.pspriteframe->right);
     vec3_t up = VectorScale(r_spritedesc.vup, r_spritedesc.pspriteframe->up);
     vec3_t left = VectorScale(r_spritedesc.vright, r_spritedesc.pspriteframe->left);
     vec3_t down = VectorScale(r_spritedesc.vup, r_spritedesc.pspriteframe->down);
+#else
+    vec3_t right = VectorScale(r_spritedesc.bs.right, r_spritedesc.pspriteframe->right);
+    vec3_t up = VectorScale(r_spritedesc.bs.up, r_spritedesc.pspriteframe->up);
+    vec3_t left = VectorScale(r_spritedesc.bs.right, r_spritedesc.pspriteframe->left);
+    vec3_t down = VectorScale(r_spritedesc.bs.up, r_spritedesc.pspriteframe->down);
+#endif
 
     vec5_p pverts = _clip_verts[0];
 
@@ -335,6 +350,8 @@ void R_DrawSprite() {
         if ((dot > 0.999848f) ||
             (dot < -0.999848f)) // cos(1 degree) = 0.999848
             return;
+
+#if 0
         r_spritedesc.vup.x = 0;
         r_spritedesc.vup.y = 0;
         r_spritedesc.vup.z = 1;
@@ -349,14 +366,34 @@ void R_DrawSprite() {
         r_spritedesc.vpn.y = r_spritedesc.vright.x;
         r_spritedesc.vpn.z = 0;
         // r_spritedesc.vpn = CrossProduct(r_spritedesc.vright, r_spritedesc.vup);
+#else
+        r_spritedesc.bs.up.x = 0;
+        r_spritedesc.bs.up.y = 0;
+        r_spritedesc.bs.up.z = 1;
+
+        r_spritedesc.bs.right.x = tvec.y;
+        // r_spritedesc.vright = CrossProduct(r_spritedesc.vup, -modelorg);
+        r_spritedesc.bs.right.y = -tvec.x;
+        r_spritedesc.bs.right.z = 0;
+        VectorNormalize(&r_spritedesc.bs.right);
+
+        r_spritedesc.bs.forward.x = -r_spritedesc.bs.right.y;
+        r_spritedesc.bs.forward.y = r_spritedesc.bs.right.x;
+        r_spritedesc.bs.forward.z = 0;
+        // r_spritedesc.vpn = CrossProduct(r_spritedesc.vright, r_spritedesc.vup);
+#endif
     }
     else if (psprite->type == SPR_VP_PARALLEL) {
         // generate the sprite's axes, completely parallel to the viewplane. There
         // are no problem situations, because the sprite is always in the same
         // position relative to the viewer
+#if 0
         r_spritedesc.vup = vup;
         r_spritedesc.vright = vright;
         r_spritedesc.vpn = vpn;
+#else
+        r_spritedesc.bs = BS;
+#endif
     }
     else if (psprite->type == SPR_VP_PARALLEL_UPRIGHT) {
         // generate the sprite's axes, with vup straight up in worldspace, and
@@ -365,19 +402,28 @@ void R_DrawSprite() {
         // down, because the cross product will be between two nearly parallel
         // vectors and starts to approach an undefined state, so we don't draw if
         // the two vectors are less than 1 degree apart
+#if 0
         float dot = vpn.z; // same as DotProduct (vpn, r_spritedesc.vup) because
+#else
+        float dot = BS.forward.z; // same as DotProduct (vpn, r_spritedesc.vup) because
+#endif
         //  r_spritedesc.vup is 0, 0, 1
         if ((dot > 0.999848f) ||
             (dot < -0.999848f)) // cos(1 degree) = 0.999848
             return;
 
+#if 0
         r_spritedesc.vup = (vec3_t){
+#else
+        r_spritedesc.bs.up = (vec3_t){
+#endif
              .x = 0.0f,
              .y = 0.0f,
              .z = 0.0f
         };
 
         //  r_spritedesc.vright = CrossProduct(r_spritedesc.vup, vpn)
+#if 0
         r_spritedesc.vright = (vec3_t){
              .x = vpn.y,
              .y = -vpn.x,
@@ -390,23 +436,55 @@ void R_DrawSprite() {
              .y = r_spritedesc.vright.x,
              .z = 0.0f
         };
+#else
+        r_spritedesc.bs.right = (vec3_t){
+             .x = BS.forward.y,
+             .y = -BS.forward.x,
+             .z = 0.0f
+        };
+        VectorNormalize(&r_spritedesc.bs.right);
+
+        r_spritedesc.bs.forward = (vec3_t){
+             .x = -r_spritedesc.bs.right.y,
+             .y = r_spritedesc.bs.right.x,
+             .z = 0.0f
+        };
+#endif
         // r_spritedesc.vpn = CrossProduct(r_spritedesc.vright, r_spritedesc.vup)
     }
     else if (psprite->type == SPR_ORIENTED) {
         // generate the sprite's axes, according to the sprite's world orientation
+#if 0
         AngleVectors(currententity->angles, &r_spritedesc.vpn, &r_spritedesc.vright, &r_spritedesc.vup);
+#else
+        r_spritedesc.bs = GetBasis(currententity->angles);
+#endif
     }
     else if (psprite->type == SPR_VP_PARALLEL_ORIENTED) {
         // generate the sprite's axes, parallel to the viewplane, but rotated in
         // that plane around the center according to the sprite entity's roll
         // angle. So vpn stays the same, but vright and vup rotate
-        float angle = currententity->angles.roll * (M_PI * 2 / 360);
+        float angle = currententity->angles.roll * (M_PI * 2.0f / 360.0f);
         float sr = sin(angle);
         float cr = cos(angle);
 
+#if 0
         r_spritedesc.vpn = vpn;
         r_spritedesc.vright = VectorMA(VectorScale(vright, cr), sr, vup);
         r_spritedesc.vup = VectorMA(VectorScale(vright, -sr), cr, vup);
+#else
+        r_spritedesc.bs = (Basis_t){
+            .forward = BS.forward,
+            .right = VectorMA(
+                VectorScale(BS.right, cr),
+                 sr, BS.up
+                ),
+            .up = VectorMA(
+                VectorScale(BS.right, -sr),
+                cr, BS.up
+                )
+        };
+#endif
     }
     else {
         Host_SysError("R_DrawSprite: Bad sprite type %d", psprite->type);

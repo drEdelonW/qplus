@@ -33,13 +33,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "view.h"
 #include "host.h"
 #include "mathlib.h"
+#include "transform.h"
 #include "progs.h"
 #include "GlobVars.h"
 
 
 edict_p sv_player;
 
+#if 0 
 static vec3_t  _forward, _right, _up;
+#else
+    Basis_t _bs;
+#endif
 
 static vec3_t _wishDir;
 static float _wishSpeed;
@@ -221,9 +226,15 @@ SV_WaterMove
 */
 void SV_WaterMove() {
     // user intentions
+#if 0
     AngleVectors(sv_player->v.v_angle, &_forward, &_right, &_up);
 
     vec3_t wishvel = VectorMA(VectorScale(_forward, cmd.forwardmove), cmd.sidemove, _right);
+#else
+    _bs = GetBasis(sv_player->v.v_angle); 
+
+    vec3_t wishvel = VectorMA(VectorScale(_bs.forward, cmd.forwardmove), cmd.sidemove, _bs.right);
+#endif
 
     if (!(cmd.forwardmove) &&
         !(cmd.sidemove) &&
@@ -284,7 +295,11 @@ SV_AirMove
 ===================
 */
 void SV_AirMove() {
+#if 0
     AngleVectors(sv_player->v.angles, &_forward, &_right, &_up);
+#else
+    _bs = GetBasis(sv_player->v.v_angle); 
+#endif
 
     float fmove = cmd.forwardmove;
     float smove = cmd.sidemove;
@@ -295,7 +310,11 @@ void SV_AirMove() {
         )
         fmove = 0.0f;
 
+#if 0
     vec3_t wishvel = VectorMA(VectorScale(_forward, fmove), smove, _right);
+#else
+    vec3_t wishvel = VectorMA(VectorScale(_bs.forward, fmove), smove, _bs.right);
+#endif
 
     if ((int)sv_player->v.movetype != MOVETYPE_WALK)
         wishvel.z = cmd.upmove;
