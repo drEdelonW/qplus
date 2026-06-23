@@ -676,6 +676,7 @@ void R_RenderPoly(mSurface_p fa, int clipflags) {
 
     int s_axis, t_axis;
     switch (pplane->type) {
+    default:    // compilator warning fix
     case PLANE_X:
     case PLANE_ANYX:    s_axis = 1; t_axis = 2;     break;
     case PLANE_Y:

@@ -200,7 +200,7 @@ void R_AliasClipTriangle(mTriangle_p ptri) {
         for (int i = 0; i < 3; i++) {
             _fv[0][i] = pfinalverts[ptri->vertindex[i]];
 
-            if (!ptri->facesfront && (_fv[0][i].flags & ALIAS_ONSEAM))
+            if (!(ptri->facesfront) && (_fv[0][i].flags & ALIAS_ONSEAM))
                 _fv[0][i].vAttr.s += r_affinetridesc.seamfixupX16;
         }
     }

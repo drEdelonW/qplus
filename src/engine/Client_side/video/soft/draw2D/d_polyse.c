@@ -92,7 +92,7 @@ SpanPackage_p d_pedgespanpackage;
 static int    _yStart;
 uint8_p d_pdest, d_ptex;
 int16_p d_pz;
-int d_sfrac, d_tfrac, d_light, d_zi;    // s t l zi
+fixed16_t d_sfrac, d_tfrac, d_light, d_zi;    // s t l zi
 
 int d_sfracbasestep, d_sfracextrastep;  // s
 int d_tfracbasestep, d_tfracextrastep;  // t
@@ -161,13 +161,13 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts) {
         if ((fv->vAttr.x < r_refdef.vrectright) &&
             (fv->vAttr.y < r_refdef.vrectbottom)
             ) {
-            int z = fv->vAttr.zi >> 16;
+            int z = FIXED16_TO_INT(fv->vAttr.zi);
             int16_p zbuf = zspantable[fv->vAttr.y] + fv->vAttr.x;
             if (z >= *zbuf) {
                 int  pix;
 
                 *zbuf = z;
-                pix = skintable[fv->vAttr.t >> 16][fv->vAttr.s >> 16];
+                pix = skintable[FIXED16_TO_INT(fv->vAttr.t)][FIXED16_TO_INT(fv->vAttr.s)];
                 pix = ((uint8_p)acolormap)[pix + (fv->vAttr.light & 0xFF00)];
                 d_viewbuffer[d_scantable[fv->vAttr.y] + fv->vAttr.x] = pix;
             }
@@ -198,7 +198,9 @@ void D_DrawSubdiv() {
 
         d_pcolormap = &((uint8_p)acolormap)[index0->vAttr.light & 0xFF00];
 
-        if (ptri[i].facesfront) { D_PolysetRecursiveTriangle(&index0->vAttr, &index1->vAttr, &index2->vAttr); }
+        if (ptri[i].facesfront) {
+            D_PolysetRecursiveTriangle(&index0->vAttr, &index1->vAttr, &index2->vAttr);
+        }
         else {
             int s0 = index0->vAttr.s;
             int s1 = index1->vAttr.s;
@@ -239,32 +241,10 @@ void D_DrawNonSubdiv() {
 
         if (d_xdenom >= 0) { continue; }
 
-#if 0
-        r_p0[0] = index0->vAttr.x;  // u
-        r_p0[1] = index0->vAttr.y;  // v
-        r_p0[2] = index0->vAttr.s;  // s
-        r_p0[3] = index0->vAttr.t;  // t
-        r_p0[4] = index0->vAttr.light;  // light
-        r_p0[5] = index0->vAttr.zi;  // iz
-
-        r_p1[0] = index1->vAttr.x;
-        r_p1[1] = index1->vAttr.y;
-        r_p1[2] = index1->vAttr.s;
-        r_p1[3] = index1->vAttr.t;
-        r_p1[4] = index1->vAttr.light;
-        r_p1[5] = index1->vAttr.zi;
-
-        r_p2[0] = index2->vAttr.x;
-        r_p2[1] = index2->vAttr.y;
-        r_p2[2] = index2->vAttr.s;
-        r_p2[3] = index2->vAttr.t;
-        r_p2[4] = index2->vAttr.light;
-        r_p2[5] = index2->vAttr.zi;
-#else
         r_p0 = index0->vAttr;
         r_p1 = index1->vAttr;
         r_p2 = index2->vAttr;
-#endif
+
         if (!ptri->facesfront) {
             if (index0->flags & ALIAS_ONSEAM)   r_p0.s += r_affinetridesc.seamfixupX16;
             if (index1->flags & ALIAS_ONSEAM)   r_p1.s += r_affinetridesc.seamfixupX16;
@@ -352,7 +332,7 @@ void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) 
             )
         ) {
 
-        int z = _new.zi >> 16;
+        int z = FIXED16_TO_INT(_new.zi);
         if (_new.y >= MAXHEIGHT) {
             printf("CRAP! D_PolysetRecursiveTriangle 0x%X %i\n", _new.y, _new.y);
             return;
@@ -403,20 +383,7 @@ D_PolysetScanLeftEdge
 void D_PolysetScanLeftEdge(int height) {
 
     do {
-#if 0
-        d_pedgespanpackage->pdest = d_pdest;
-        d_pedgespanpackage->pz = d_pz;
-        d_pedgespanpackage->count = d_aspancount;
-        d_pedgespanpackage->ptex = d_ptex;
-
-        d_pedgespanpackage->sfrac = d_sfrac;
-        d_pedgespanpackage->tfrac = d_tfrac;
-
-        // FIXME: need to clamp l, s, t, at both ends?
-        d_pedgespanpackage->light = d_light;
-        d_pedgespanpackage->zi = d_zi;
-#else
-        * d_pedgespanpackage = (SpanPackage_t){
+        *d_pedgespanpackage = (SpanPackage_t){
             .pdest = d_pdest,
             .pz = d_pz,
             .count = d_aspancount,
@@ -427,7 +394,7 @@ void D_PolysetScanLeftEdge(int height) {
             .light = d_light,
             .zi = d_zi
         };
-#endif
+
         d_pedgespanpackage++;
         errorterm += erroradjustup;
         if (errorterm >= 0) {
@@ -436,7 +403,7 @@ void D_PolysetScanLeftEdge(int height) {
             d_aspancount += d_countextrastep;
             d_ptex += d_ptexextrastep;
             d_sfrac += d_sfracextrastep;
-            d_ptex += d_sfrac >> 16;
+            d_ptex += FIXED16_TO_INT(d_sfrac);
 
             d_sfrac &= 0xFFFF;
             d_tfrac += d_tfracextrastep;
@@ -454,7 +421,7 @@ void D_PolysetScanLeftEdge(int height) {
             d_aspancount += ubasestep;
             d_ptex += d_ptexbasestep;
             d_sfrac += d_sfracbasestep;
-            d_ptex += d_sfrac >> 16;
+            d_ptex += FIXED16_TO_INT(d_sfrac);
             d_sfrac &= 0xFFFF;
             d_tfrac += d_tfracbasestep;
             if (d_tfrac & 0x10000) {
@@ -549,7 +516,7 @@ void D_PolysetCalcGradients(int skinwidth) {
     a_tstepxfrac = r_tstepx & 0xFFFF;
 #endif
 
-    a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
+    a_ststepxwhole = skinwidth * FIXED16_TO_INT(r_tstepx) + FIXED16_TO_INT(r_sstepx);
 }
 
 #endif // !id386
@@ -590,16 +557,16 @@ void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
             uint8_p lpdest = pspanpackage->pdest;
             uint8_p lptex = pspanpackage->ptex;
             int16_p lpz = pspanpackage->pz;
-            int lsfrac = pspanpackage->sfrac;
+            fixed16_t lsfrac = pspanpackage->sfrac;
             int ltfrac = pspanpackage->tfrac;
             int llight = pspanpackage->light;
-            int lzi = pspanpackage->zi;
+            fixed16_t lzi = pspanpackage->zi;
 
             do {
-                if ((lzi >> 16) >= *lpz) {
+                if (FIXED16_TO_INT(lzi) >= *lpz) {
                     *lpdest = ((uint8_p)acolormap)[*lptex + (llight & 0xFF00)];
                     // gel mapping     *lpdest = gelmap[*lpdest];
-                    *lpz = lzi >> 16;
+                    *lpz = FIXED16_TO_INT(lzi);
                 }
                 lpdest++;
                 lzi += r_zistepx;
@@ -607,7 +574,7 @@ void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
                 llight += r_lstepx;
                 lptex += a_ststepxwhole;
                 lsfrac += a_sstepxfrac;
-                lptex += lsfrac >> 16;
+                lptex += FIXED16_TO_INT(lsfrac);
                 lsfrac &= 0xFFFF;
                 ltfrac += a_tstepxfrac;
                 if (ltfrac & 0x10000) {
@@ -683,8 +650,8 @@ void D_RasterizeAliasPolySmooth() {
     d_aspancount = plefttop->x - prighttop->x;
 
     d_ptex = (uint8_p)r_affinetridesc.pskin +
-        (plefttop->s >> 16) +
-        (plefttop->t >> 16) * r_affinetridesc.skinwidth;
+        FIXED16_TO_INT(plefttop->s) +
+        FIXED16_TO_INT(plefttop->t) * r_affinetridesc.skinwidth;
 #if id386
     d_sfrac = (plefttop.s & 0xFFFF) << 16;
     d_tfrac = (plefttop.t & 0xFFFF) << 16;
@@ -699,20 +666,8 @@ void D_RasterizeAliasPolySmooth() {
     d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
 
     if (initialleftheight == 1) {
-#if 0 
-        d_pedgespanpackage->pdest = d_pdest;
-        d_pedgespanpackage->pz = d_pz;
-        d_pedgespanpackage->count = d_aspancount;
-        d_pedgespanpackage->ptex = d_ptex;
 
-        d_pedgespanpackage->sfrac = d_sfrac;
-        d_pedgespanpackage->tfrac = d_tfrac;
-
-        // FIXME: need to clamp l, s, t, at both ends?
-        d_pedgespanpackage->light = d_light;
-        d_pedgespanpackage->zi = d_zi;
-#else
-        * d_pedgespanpackage = (SpanPackage_t){
+        *d_pedgespanpackage = (SpanPackage_t){
             .pdest = d_pdest,
             .pz = d_pz,
             .count = d_aspancount,
@@ -723,7 +678,7 @@ void D_RasterizeAliasPolySmooth() {
             .light = d_light,
             .zi = d_zi
         };
-#endif
+
         d_pedgespanpackage++;
     }
     else {
@@ -765,9 +720,9 @@ void D_RasterizeAliasPolySmooth() {
         d_lightbasestep = r_lstepy + working_lstepx * ubasestep;
         d_zibasestep = r_zistepy + r_zistepx * ubasestep;
 
-        d_ptexextrastep = ((r_sstepy + r_sstepx * d_countextrastep) >> 16) +
-            ((r_tstepy + r_tstepx * d_countextrastep) >> 16) *
-            r_affinetridesc.skinwidth;
+        d_ptexextrastep =
+            ((r_sstepy + r_sstepx * d_countextrastep) >> 16) +
+            ((r_tstepy + r_tstepx * d_countextrastep) >> 16) * r_affinetridesc.skinwidth;
 #if id386
         d_sfracextrastep = (r_sstepy + r_sstepx * d_countextrastep) << 16;
         d_tfracextrastep = (r_tstepy + r_tstepx * d_countextrastep) << 16;
@@ -795,8 +750,8 @@ void D_RasterizeAliasPolySmooth() {
         _yStart = plefttop->y;
         d_aspancount = plefttop->x - prighttop->x;
         d_ptex = (uint8_p)r_affinetridesc.pskin +
-            (plefttop->s >> 16) +
-            (plefttop->t >> 16) * r_affinetridesc.skinwidth;
+            FIXED16_TO_INT(plefttop->s) +
+            FIXED16_TO_INT(plefttop->t) * r_affinetridesc.skinwidth;
         d_sfrac = 0;
         d_tfrac = 0;
         d_light = plefttop->light;
@@ -806,20 +761,7 @@ void D_RasterizeAliasPolySmooth() {
         d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
 
         if (height == 1) {
-#if 0
-            d_pedgespanpackage->pdest = d_pdest;
-            d_pedgespanpackage->pz = d_pz;
-            d_pedgespanpackage->count = d_aspancount;
-            d_pedgespanpackage->ptex = d_ptex;
-
-            d_pedgespanpackage->sfrac = d_sfrac;
-            d_pedgespanpackage->tfrac = d_tfrac;
-
-            // FIXME: need to clamp l, s, t, at both ends?
-            d_pedgespanpackage->light = d_light;
-            d_pedgespanpackage->zi = d_zi;
-#else
-            * d_pedgespanpackage = (SpanPackage_t){
+            *d_pedgespanpackage = (SpanPackage_t){
                 .pdest = d_pdest,
                 .pz = d_pz,
                 .count = d_aspancount,
@@ -830,7 +772,6 @@ void D_RasterizeAliasPolySmooth() {
                 .light = d_light,
                 .zi = d_zi
             };
-#endif
             d_pedgespanpackage++;
         }
         else {
@@ -991,7 +932,7 @@ split:
     int ofs = d_scantable[_new[1]] + _new[0];
     if (_new[5] > d_pzbuffer[ofs]) {
         d_pzbuffer[ofs] = _new[5];
-        int pix = skintable[_new[3] >> 16][_new[2] >> 16];
+        int pix = skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)];
         //  pix = ((uint8_t *)acolormap)[pix + (_new[4] & 0xFF00)];
         d_viewbuffer[ofs] = pix;
     }

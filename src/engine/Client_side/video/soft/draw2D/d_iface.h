@@ -50,7 +50,7 @@ typedef struct {
     mTriangle_p ptriangles;
     FinalVert_p pfinalverts;
     int         numtriangles;
-    int         drawtype;
+    int         drawtype;   // TODO: check is it bool? SubDiv/NoSubDiv?
     int         seamfixupX16;
 } AffineTriDesc_t;
 

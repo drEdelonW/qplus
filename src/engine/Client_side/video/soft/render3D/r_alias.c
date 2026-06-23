@@ -326,7 +326,7 @@ void R_AliasSetUpTransform(int trivial_accept) {
     // TODO: could cache lazily, stored in the entity
 
     vec3_t angles = {
-        .pitch =  -currententity->angles.pitch,
+        .pitch = -currententity->angles.pitch,
         .yaw = currententity->angles.yaw,
         .roll = currententity->angles.roll
     };
@@ -676,9 +676,9 @@ void R_AliasDrawModel(aLight_p plighting) {
     if (!currententity->colormap)
         Host_SysError("R_AliasDrawModel: !currententity->colormap");
 
-    r_affinetridesc.drawtype =
+    r_affinetridesc.drawtype = (
         (currententity->trivial_accept == 3) &&
-        r_recursiveaffinetriangles;
+        r_recursiveaffinetriangles);
 
     if (r_affinetridesc.drawtype)   D_PolysetUpdateTables();  // FIXME: precalc...
 #if id386

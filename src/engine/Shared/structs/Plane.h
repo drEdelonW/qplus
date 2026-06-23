@@ -4,19 +4,6 @@
 #include "vector.h"
 #include "assert.h"
 
-// it was [mplane_t]
-// Plane_t structure
-// !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct mPlane_s {
-    vec3_t  normal;
-    float   dist;
-    uint8_t type;       // for texture axis selection and fast side tests
-    uint8_t signbits;   // signx + signy<<1 + signz<<1
-    uint8_t pad[2];
-} mPlane_t;
-typedef mPlane_t* mPlane_p;
-
-
 typedef enum {
     // 0–2 are axial planes
     PLANE_X     = 0u,
@@ -28,6 +15,23 @@ typedef enum {
     PLANE_ANYY  = 4u,
     PLANE_ANYZ  = 5u
 } PlaneType_t; // should be size int on 32 os
+
+// it was [mplane_t]
+// Plane_t structure
+// !!! if this is changed, it must be changed in asm_i386.h too !!!
+typedef struct mPlane_s {
+    vec3_t  normal;
+    float   dist;
+#if 0
+    uint8_t type;       // for texture axis selection and fast side tests
+#else
+    PlaneType_t type;       // for texture axis selection and fast side tests
+#endif
+    uint8_t signbits;   // signx + signy<<1 + signz<<1
+    uint8_t pad[2];
+} mPlane_t;
+typedef mPlane_t* mPlane_p;
+
 
 // it was [dplane_t]
 typedef struct {
