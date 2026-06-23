@@ -44,17 +44,17 @@ typedef SpanPackage_t* SpanPackage_p;
 typedef struct {
     int  isflattop;
     int  numLeftEdges;
-    int* pLeftEdgeVert0;
-    int* pLeftEdgeVert1;
-    int* pLeftEdgeVert2;
+    VertAttr_p pLeftEdgeVert0;
+    VertAttr_p pLeftEdgeVert1;
+    VertAttr_p pLeftEdgeVert2;
     int  numRightEdges;
-    int* pRightEdgeVert0;
-    int* pRightEdgeVert1;
-    int* pRightEdgeVert2;
+    VertAttr_p pRightEdgeVert0;
+    VertAttr_p pRightEdgeVert1;
+    VertAttr_p pRightEdgeVert2;
 } EdgeTable_t;
 typedef EdgeTable_t* EdgeTable_p;
 
-int r_p0[FV_COUNT], r_p1[FV_COUNT], r_p2[FV_COUNT];
+VertAttr_t r_p0, r_p1, r_p2;
 
 uint8_p d_pcolormap;
 
@@ -64,18 +64,18 @@ int   d_xdenom;
 EdgeTable_p pedgetable;
 
 EdgeTable_t edgetables[12] = {
-    {0, 1, r_p0, r_p2, NULL, 2, r_p0, r_p1, r_p2},
-    {0, 2, r_p1, r_p0, r_p2, 1, r_p1, r_p2, NULL},
-    {1, 1, r_p0, r_p2, NULL, 1, r_p1, r_p2, NULL},
-    {0, 1, r_p1, r_p0, NULL, 2, r_p1, r_p2, r_p0},
-    {0, 2, r_p0, r_p2, r_p1, 1, r_p0, r_p1, NULL},
-    {0, 1, r_p2, r_p1, NULL, 1, r_p2, r_p0, NULL},
-    {0, 1, r_p2, r_p1, NULL, 2, r_p2, r_p0, r_p1},
-    {0, 2, r_p2, r_p1, r_p0, 1, r_p2, r_p0, NULL},
-    {0, 1, r_p1, r_p0, NULL, 1, r_p1, r_p2, NULL},
-    {1, 1, r_p2, r_p1, NULL, 1, r_p0, r_p1, NULL},
-    {1, 1, r_p1, r_p0, NULL, 1, r_p2, r_p0, NULL},
-    {0, 1, r_p0, r_p2, NULL, 1, r_p0, r_p1, NULL},
+    {0, 1, &r_p0, &r_p2, NULL,  2, &r_p0, &r_p1, &r_p2},
+    {0, 2, &r_p1, &r_p0, &r_p2, 1, &r_p1, &r_p2, NULL },
+    {1, 1, &r_p0, &r_p2, NULL,  1, &r_p1, &r_p2, NULL },
+    {0, 1, &r_p1, &r_p0, NULL,  2, &r_p1, &r_p2, &r_p0},
+    {0, 2, &r_p0, &r_p2, &r_p1, 1, &r_p0, &r_p1, NULL },
+    {0, 1, &r_p2, &r_p1, NULL,  1, &r_p2, &r_p0, NULL },
+    {0, 1, &r_p2, &r_p1, NULL,  2, &r_p2, &r_p0, &r_p1},
+    {0, 2, &r_p2, &r_p1, &r_p0, 1, &r_p2, &r_p0, NULL },
+    {0, 1, &r_p1, &r_p0, NULL,  1, &r_p1, &r_p2, NULL },
+    {1, 1, &r_p2, &r_p1, NULL,  1, &r_p0, &r_p1, NULL },
+    {1, 1, &r_p1, &r_p0, NULL,  1, &r_p2, &r_p0, NULL },
+    {0, 1, &r_p0, &r_p2, NULL,  1, &r_p0, &r_p1, NULL },
 };
 
 // FIXME: some of these can become statics
@@ -121,7 +121,7 @@ void D_PolysetDrawSpans8(SpanPackage_p pspanpackage);
 void D_PolysetCalcGradients(int skinwidth);
 void D_DrawSubdiv();
 void D_DrawNonSubdiv();
-void D_PolysetRecursiveTriangle(int* p1, int* p2, int* p3);
+void D_PolysetRecursiveTriangle(VertAttr_p p1, VertAttr_p p2, VertAttr_p p3);
 void D_PolysetSetEdgeTable();
 void D_RasterizeAliasPolySmooth();
 void D_PolysetScanLeftEdge(int height);
@@ -158,18 +158,18 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts) {
     for (int i = 0; i < numverts; i++, fv++) {
         // valid triangle coordinates for filling can include the bottom and
         // right clip edges, due to the fill rule; these shouldn't be drawn
-        if ((fv->q16[0] < r_refdef.vrectright) &&
-            (fv->q16[1] < r_refdef.vrectbottom)
+        if ((fv->vAttr.x < r_refdef.vrectright) &&
+            (fv->vAttr.y < r_refdef.vrectbottom)
             ) {
-            int z = fv->q16[5] >> 16;
-            int16_p zbuf = zspantable[fv->q16[1]] + fv->q16[0];
+            int z = fv->vAttr.zi >> 16;
+            int16_p zbuf = zspantable[fv->vAttr.y] + fv->vAttr.x;
             if (z >= *zbuf) {
                 int  pix;
 
                 *zbuf = z;
-                pix = skintable[fv->q16[3] >> 16][fv->q16[2] >> 16];
-                pix = ((uint8_p)acolormap)[pix + (fv->q16[4] & 0xFF00)];
-                d_viewbuffer[d_scantable[fv->q16[1]] + fv->q16[0]] = pix;
+                pix = skintable[fv->vAttr.t >> 16][fv->vAttr.s >> 16];
+                pix = ((uint8_p)acolormap)[pix + (fv->vAttr.light & 0xFF00)];
+                d_viewbuffer[d_scantable[fv->vAttr.y] + fv->vAttr.x] = pix;
             }
         }
     }
@@ -191,28 +191,28 @@ void D_DrawSubdiv() {
         FinalVert_p index1 = pfv + ptri[i].vertindex[1];
         FinalVert_p index2 = pfv + ptri[i].vertindex[2];
 
-        if (((index0->q16[1] - index1->q16[1]) * (index0->q16[0] - index2->q16[0]) -
-            (index0->q16[0] - index1->q16[0]) * (index0->q16[1] - index2->q16[1])) >= 0) {
+        if (((index0->vAttr.y - index1->vAttr.y) * (index0->vAttr.x - index2->vAttr.x) -
+            (index0->vAttr.x - index1->vAttr.x) * (index0->vAttr.y - index2->vAttr.y)) >= 0) {
             continue;
         }
 
-        d_pcolormap = &((uint8_p)acolormap)[index0->q16[4] & 0xFF00];
+        d_pcolormap = &((uint8_p)acolormap)[index0->vAttr.light & 0xFF00];
 
-        if (ptri[i].facesfront) { D_PolysetRecursiveTriangle(index0->q16, index1->q16, index2->q16); }
+        if (ptri[i].facesfront) { D_PolysetRecursiveTriangle(&index0->vAttr, &index1->vAttr, &index2->vAttr); }
         else {
-            int s0 = index0->q16[2];
-            int s1 = index1->q16[2];
-            int s2 = index2->q16[2];
+            int s0 = index0->vAttr.s;
+            int s1 = index1->vAttr.s;
+            int s2 = index2->vAttr.s;
 
-            if (index0->flags & ALIAS_ONSEAM)   index0->q16[2] += r_affinetridesc.seamfixupX16;
-            if (index1->flags & ALIAS_ONSEAM)   index1->q16[2] += r_affinetridesc.seamfixupX16;
-            if (index2->flags & ALIAS_ONSEAM)   index2->q16[2] += r_affinetridesc.seamfixupX16;
+            if (index0->flags & ALIAS_ONSEAM)   index0->vAttr.s += r_affinetridesc.seamfixupX16;
+            if (index1->flags & ALIAS_ONSEAM)   index1->vAttr.s += r_affinetridesc.seamfixupX16;
+            if (index2->flags & ALIAS_ONSEAM)   index2->vAttr.s += r_affinetridesc.seamfixupX16;
 
-            D_PolysetRecursiveTriangle(index0->q16, index1->q16, index2->q16);
+            D_PolysetRecursiveTriangle(&index0->vAttr, &index1->vAttr, &index2->vAttr);
 
-            index0->q16[2] = s0;
-            index1->q16[2] = s1;
-            index2->q16[2] = s2;
+            index0->vAttr.s = s0;
+            index1->vAttr.s = s1;
+            index2->vAttr.s = s2;
         }
     }
 }
@@ -233,37 +233,42 @@ void D_DrawNonSubdiv() {
         FinalVert_p index1 = pfv + ptri->vertindex[1];
         FinalVert_p index2 = pfv + ptri->vertindex[2];
 
-        d_xdenom = (index0->q16[1] - index1->q16[1]) *
-            (index0->q16[0] - index2->q16[0]) -
-            (index0->q16[0] - index1->q16[0]) * (index0->q16[1] - index2->q16[1]);
+        d_xdenom = (index0->vAttr.y - index1->vAttr.y) *
+            (index0->vAttr.x - index2->vAttr.x) -
+            (index0->vAttr.x - index1->vAttr.x) * (index0->vAttr.y - index2->vAttr.y);
 
         if (d_xdenom >= 0) { continue; }
 
-        r_p0[0] = index0->q16[0];  // u
-        r_p0[1] = index0->q16[1];  // v
-        r_p0[2] = index0->q16[2];  // s
-        r_p0[3] = index0->q16[3];  // t
-        r_p0[4] = index0->q16[4];  // light
-        r_p0[5] = index0->q16[5];  // iz
+#if 0
+        r_p0[0] = index0->vAttr.x;  // u
+        r_p0[1] = index0->vAttr.y;  // v
+        r_p0[2] = index0->vAttr.s;  // s
+        r_p0[3] = index0->vAttr.t;  // t
+        r_p0[4] = index0->vAttr.light;  // light
+        r_p0[5] = index0->vAttr.zi;  // iz
 
-        r_p1[0] = index1->q16[0];
-        r_p1[1] = index1->q16[1];
-        r_p1[2] = index1->q16[2];
-        r_p1[3] = index1->q16[3];
-        r_p1[4] = index1->q16[4];
-        r_p1[5] = index1->q16[5];
+        r_p1[0] = index1->vAttr.x;
+        r_p1[1] = index1->vAttr.y;
+        r_p1[2] = index1->vAttr.s;
+        r_p1[3] = index1->vAttr.t;
+        r_p1[4] = index1->vAttr.light;
+        r_p1[5] = index1->vAttr.zi;
 
-        r_p2[0] = index2->q16[0];
-        r_p2[1] = index2->q16[1];
-        r_p2[2] = index2->q16[2];
-        r_p2[3] = index2->q16[3];
-        r_p2[4] = index2->q16[4];
-        r_p2[5] = index2->q16[5];
-
+        r_p2[0] = index2->vAttr.x;
+        r_p2[1] = index2->vAttr.y;
+        r_p2[2] = index2->vAttr.s;
+        r_p2[3] = index2->vAttr.t;
+        r_p2[4] = index2->vAttr.light;
+        r_p2[5] = index2->vAttr.zi;
+#else
+        r_p0 = index0->vAttr;
+        r_p1 = index1->vAttr;
+        r_p2 = index2->vAttr;
+#endif
         if (!ptri->facesfront) {
-            if (index0->flags & ALIAS_ONSEAM)   r_p0[2] += r_affinetridesc.seamfixupX16;
-            if (index1->flags & ALIAS_ONSEAM)   r_p1[2] += r_affinetridesc.seamfixupX16;
-            if (index2->flags & ALIAS_ONSEAM)   r_p2[2] += r_affinetridesc.seamfixupX16;
+            if (index0->flags & ALIAS_ONSEAM)   r_p0.s += r_affinetridesc.seamfixupX16;
+            if (index1->flags & ALIAS_ONSEAM)   r_p1.s += r_affinetridesc.seamfixupX16;
+            if (index2->flags & ALIAS_ONSEAM)   r_p2.s += r_affinetridesc.seamfixupX16;
         }
 
         D_PolysetSetEdgeTable();
@@ -277,28 +282,28 @@ void D_DrawNonSubdiv() {
 D_PolysetRecursiveTriangle
 ================
 */
-void D_PolysetRecursiveTriangle(int* lp1, int* lp2, int* lp3) {
+void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) {
     int d;
     if (
         (
-            ((d = lp2[0] - lp1[0]) < -1) ||
+            ((d = lp2->x - lp1->x) < -1) ||
             (d > 1)) ||
         (
-            ((d = lp2[1] - lp1[1]) < -1) ||
+            ((d = lp2->y - lp1->y) < -1) ||
             (d > 1))
         ) {
         /*  no rotation needed. do nothing */
     }
     else  if (
         (
-            ((d = lp3[0] - lp2[0]) < -1) ||
+            ((d = lp3->x - lp2->x) < -1) ||
             (d > 1)) ||
         (
-            ((d = lp3[1] - lp2[1]) < -1) ||
+            ((d = lp3->y - lp2->y) < -1) ||
             (d > 1))
         ) {
             {   // rotate
-                int* temp = lp1;
+                VertAttr_p temp = lp1;
                 lp1 = lp2;
                 lp2 = lp3;
                 lp3 = temp;
@@ -306,14 +311,14 @@ void D_PolysetRecursiveTriangle(int* lp1, int* lp2, int* lp3) {
     }
     else if (
         (
-            ((d = lp1[0] - lp3[0]) < -1) ||
+            ((d = lp1->x - lp3->x) < -1) ||
             (d > 1)) ||
         (
-            ((d = lp1[1] - lp3[1]) < -1) ||
+            ((d = lp1->y - lp3->y) < -1) ||
             (d > 1))
         ) {
             {   // rotate opposite
-                int* temp = lp1;
+                VertAttr_p temp = lp1;
                 lp1 = lp3;
                 lp3 = lp2;
                 lp2 = temp;
@@ -324,47 +329,47 @@ void D_PolysetRecursiveTriangle(int* lp1, int* lp2, int* lp3) {
     }
 
     // split this edge
-    int  _new[FV_COUNT] = {
-        [0] = (lp1[0] + lp2[0]) >> 1,
-        [1] = (lp1[1] + lp2[1]) >> 1,
-        [2] = (lp1[2] + lp2[2]) >> 1,
-        [3] = (lp1[3] + lp2[3]) >> 1,
-     /* [4] light — skipped */
-        [5] = (lp1[5] + lp2[5]) >> 1,
+    VertAttr_t  _new = {
+        .x = (lp1->x + lp2->x) >> 1,
+        .y = (lp1->y + lp2->y) >> 1,
+        .s = (lp1->s + lp2->s) >> 1,
+        .t = (lp1->t + lp2->t) >> 1,
+        /* .light — skipped */
+        .zi = (lp1->zi + lp2->zi) >> 1,
     };
-    if ((_new[1] < 0) ||
-        (_new[0] < 0)
+    if ((_new.y < 0) ||
+        (_new.x < 0)
         ) {
         return;
     }
     // draw the point if splitting a leading edge
     if (
         !(
-            (lp2[1] > lp1[1]) ||
+            (lp2->y > lp1->y) ||
             (
-                (lp2[1] == lp1[1]) &&
-                (lp2[0] < lp1[0]))
+                (lp2->y == lp1->y) &&
+                (lp2->x < lp1->x))
             )
         ) {
 
-        int z = _new[5] >> 16;
-        if (_new[1] >= MAXHEIGHT) {
-            printf("CRAP! D_PolysetRecursiveTriangle 0x%X %i\n", _new[1], _new[1]);
+        int z = _new.zi >> 16;
+        if (_new.y >= MAXHEIGHT) {
+            printf("CRAP! D_PolysetRecursiveTriangle 0x%X %i\n", _new.y, _new.y);
             return;
         }
 
-        int16_p zbuf = zspantable[_new[1]] + _new[0];
+        int16_p zbuf = zspantable[_new.y] + _new.x;
         if (z >= *zbuf) {
             int pix;
 
             *zbuf = z;
-            pix = d_pcolormap[skintable[_new[3] >> 16][_new[2] >> 16]];
-            d_viewbuffer[d_scantable[_new[1]] + _new[0]] = pix;
+            pix = d_pcolormap[skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)]];
+            d_viewbuffer[d_scantable[_new.y] + _new.x] = pix;
         }
     }
     // recursively continue
-    D_PolysetRecursiveTriangle(lp3, lp1, _new);
-    D_PolysetRecursiveTriangle(lp3, _new, lp2);
+    D_PolysetRecursiveTriangle(lp3, lp1, &_new);
+    D_PolysetRecursiveTriangle(lp3, &_new, lp2);
 }
 
 #endif // !id386
@@ -504,10 +509,10 @@ D_PolysetCalcGradients
 ================
 */
 void D_PolysetCalcGradients(int skinwidth) {
-    float p00_minus_p20 = r_p0[0] - r_p2[0];
-    float p01_minus_p21 = r_p0[1] - r_p2[1];
-    float p10_minus_p20 = r_p1[0] - r_p2[0];
-    float p11_minus_p21 = r_p1[1] - r_p2[1];
+    float p00_minus_p20 = r_p0.x - r_p2.x;
+    float p01_minus_p21 = r_p0.y - r_p2.y;
+    float p10_minus_p20 = r_p1.x - r_p2.x;
+    float p11_minus_p21 = r_p1.y - r_p2.y;
 
     float xstepdenominv = 1.0 / (float)d_xdenom;
 
@@ -516,23 +521,23 @@ void D_PolysetCalcGradients(int skinwidth) {
     // ceil() for light so positive steps are exaggerated, negative steps
     // diminished,  pushing us away from underflow toward overflow. Underflow is
     // very visible, overflow is very unlikely, because of ambient lighting
-    float t0 = r_p0[4] - r_p2[4];
-    float t1 = r_p1[4] - r_p2[4];
+    float t0 = r_p0.light - r_p2.light;
+    float t1 = r_p1.light - r_p2.light;
     r_lstepx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
     r_lstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
-    t0 = r_p0[2] - r_p2[2];
-    t1 = r_p1[2] - r_p2[2];
+    t0 = r_p0.s - r_p2.s;
+    t1 = r_p1.s - r_p2.s;
     r_sstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
     r_sstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
-    t0 = r_p0[3] - r_p2[3];
-    t1 = r_p1[3] - r_p2[3];
+    t0 = r_p0.t - r_p2.t;
+    t1 = r_p1.t - r_p2.t;
     r_tstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
     r_tstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
-    t0 = r_p0[5] - r_p2[5];
-    t1 = r_p1[5] - r_p2[5];
+    t0 = r_p0.zi - r_p2.zi;
+    t1 = r_p1.zi - r_p2.zi;
     r_zistepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
     r_zistepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
@@ -651,19 +656,13 @@ D_RasterizeAliasPolySmooth
 ================
 */
 void D_RasterizeAliasPolySmooth() {
-    int* plefttop;
-    int* prighttop;
-    int* pleftbottom;
-    int* prightbottom;
+    VertAttr_p plefttop = pedgetable->pLeftEdgeVert0;
+    VertAttr_p prighttop = pedgetable->pRightEdgeVert0;
+    VertAttr_p pleftbottom = pedgetable->pLeftEdgeVert1;
+    VertAttr_p prightbottom = pedgetable->pRightEdgeVert1;
 
-    plefttop = pedgetable->pLeftEdgeVert0;
-    prighttop = pedgetable->pRightEdgeVert0;
-
-    pleftbottom = pedgetable->pLeftEdgeVert1;
-    prightbottom = pedgetable->pRightEdgeVert1;
-
-    int initialleftheight = pleftbottom[1] - plefttop[1];
-    int initialrightheight = prightbottom[1] - prighttop[1];
+    int initialleftheight = pleftbottom->y - plefttop->y;
+    int initialrightheight = prightbottom->y - prighttop->y;
 
     //
     // set the s, t, and light gradients, which are consistent across the triangle
@@ -680,24 +679,24 @@ void D_RasterizeAliasPolySmooth() {
     //
     d_pedgespanpackage = a_spans;
 
-    _yStart = plefttop[1];
-    d_aspancount = plefttop[0] - prighttop[0];
+    _yStart = plefttop->y;
+    d_aspancount = plefttop->x - prighttop->x;
 
     d_ptex = (uint8_p)r_affinetridesc.pskin +
-        (plefttop[2] >> 16) +
-        (plefttop[3] >> 16) * r_affinetridesc.skinwidth;
+        (plefttop->s >> 16) +
+        (plefttop->t >> 16) * r_affinetridesc.skinwidth;
 #if id386
-    d_sfrac = (plefttop[2] & 0xFFFF) << 16;
-    d_tfrac = (plefttop[3] & 0xFFFF) << 16;
+    d_sfrac = (plefttop.s & 0xFFFF) << 16;
+    d_tfrac = (plefttop.t & 0xFFFF) << 16;
 #else
-    d_sfrac = plefttop[2] & 0xFFFF;
-    d_tfrac = plefttop[3] & 0xFFFF;
+    d_sfrac = plefttop->s & 0xFFFF;
+    d_tfrac = plefttop->t & 0xFFFF;
 #endif
-    d_light = plefttop[4];
-    d_zi = plefttop[5];
+    d_light = plefttop->light;
+    d_zi = plefttop->zi;
 
-    d_pdest = (uint8_p)d_viewbuffer + _yStart * screenwidth + plefttop[0];
-    d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop[0];
+    d_pdest = (uint8_p)d_viewbuffer + _yStart * screenwidth + plefttop->x;
+    d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
 
     if (initialleftheight == 1) {
 #if 0 
@@ -729,8 +728,8 @@ void D_RasterizeAliasPolySmooth() {
     }
     else {
         D_PolysetSetUpForLineScan(
-            plefttop[0], plefttop[1],
-            pleftbottom[0], pleftbottom[1]
+            plefttop->x, plefttop->y,
+            pleftbottom->x, pleftbottom->y
         );
 
 #if id386
@@ -789,22 +788,22 @@ void D_RasterizeAliasPolySmooth() {
         plefttop = pleftbottom;
         pleftbottom = pedgetable->pLeftEdgeVert2;
 
-        int height = pleftbottom[1] - plefttop[1];
+        int height = pleftbottom->y - plefttop->y;
 
         // TODO: make this a function; modularize this function in general
 
-        _yStart = plefttop[1];
-        d_aspancount = plefttop[0] - prighttop[0];
+        _yStart = plefttop->y;
+        d_aspancount = plefttop->x - prighttop->x;
         d_ptex = (uint8_p)r_affinetridesc.pskin +
-            (plefttop[2] >> 16) +
-            (plefttop[3] >> 16) * r_affinetridesc.skinwidth;
+            (plefttop->s >> 16) +
+            (plefttop->t >> 16) * r_affinetridesc.skinwidth;
         d_sfrac = 0;
         d_tfrac = 0;
-        d_light = plefttop[4];
-        d_zi = plefttop[5];
+        d_light = plefttop->light;
+        d_zi = plefttop->zi;
 
-        d_pdest = (uint8_p)d_viewbuffer + _yStart * screenwidth + plefttop[0];
-        d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop[0];
+        d_pdest = (uint8_p)d_viewbuffer + _yStart * screenwidth + plefttop->x;
+        d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
 
         if (height == 1) {
 #if 0
@@ -836,8 +835,8 @@ void D_RasterizeAliasPolySmooth() {
         }
         else {
             D_PolysetSetUpForLineScan(
-                plefttop[0], plefttop[1],
-                pleftbottom[0], pleftbottom[1]
+                plefttop->x, plefttop->y,
+                pleftbottom->x, pleftbottom->y
             );
 
             d_pdestbasestep = screenwidth + ubasestep;
@@ -890,8 +889,8 @@ void D_RasterizeAliasPolySmooth() {
     d_pedgespanpackage = a_spans;
 
     D_PolysetSetUpForLineScan(
-        prighttop[0], prighttop[1],
-        prightbottom[0], prightbottom[1]
+        prighttop->x, prighttop->y,
+        prightbottom->x, prightbottom->y
     );
     d_aspancount = 0;
     d_countextrastep = ubasestep + 1;
@@ -904,16 +903,16 @@ void D_RasterizeAliasPolySmooth() {
         SpanPackage_p pstart = a_spans + initialrightheight;
         pstart->count = originalcount;
 
-        d_aspancount = prightbottom[0] - prighttop[0];
+        d_aspancount = prightbottom->x - prighttop->x;
 
         prighttop = prightbottom;
         prightbottom = pedgetable->pRightEdgeVert2;
 
-        int height = prightbottom[1] - prighttop[1];
+        int height = prightbottom->y - prighttop->y;
 
         D_PolysetSetUpForLineScan(
-            prighttop[0], prighttop[1],
-            prightbottom[0], prightbottom[1]
+            prighttop->x, prighttop->y,
+            prightbottom->x, prightbottom->y
         );
 
         d_countextrastep = ubasestep + 1;
@@ -937,9 +936,9 @@ void D_PolysetSetEdgeTable() {
 // determine which edges are right & left, and the order in which
 // to rasterize them
 //
-    if (r_p0[1] >= r_p1[1]) {
-        if (r_p0[1] == r_p1[1]) {
-            if (r_p0[1] < r_p2[1])  pedgetable = &edgetables[2];
+    if (r_p0.y >= r_p1.y) {
+        if (r_p0.y == r_p1.y) {
+            if (r_p0.y < r_p2.y)  pedgetable = &edgetables[2];
             else                    pedgetable = &edgetables[5];
 
             return;
@@ -948,21 +947,21 @@ void D_PolysetSetEdgeTable() {
 
     }
 
-    if (r_p0[1] == r_p2[1]) {
+    if (r_p0.y == r_p2.y) {
         if (edgetableindex)     pedgetable = &edgetables[8];
         else                    pedgetable = &edgetables[9];
 
         return;
     }
-    else if (r_p1[1] == r_p2[1]) {
+    else if (r_p1.y == r_p2.y) {
         if (edgetableindex)     pedgetable = &edgetables[10];
         else                    pedgetable = &edgetables[11];
 
         return;
     }
 
-    if (r_p0[1] > r_p2[1])      edgetableindex += 2;
-    if (r_p1[1] > r_p2[1])      edgetableindex += 4;
+    if (r_p0.y > r_p2.y)      edgetableindex += 2;
+    if (r_p1.y > r_p2.y)      edgetableindex += 4;
 
     pedgetable = &edgetables[edgetableindex];
 }
@@ -970,10 +969,10 @@ void D_PolysetSetEdgeTable() {
 
 #if 0
 
-void D_PolysetRecursiveDrawLine(int* lp1, int* lp2) {
-    int d = lp2[0] - lp1[0];
+void D_PolysetRecursiveDrawLine(VertAttr_p lp1, VertAttr_p lp2) {
+    int d = lp2->x - lp1->x;
     if ((d < -1) || (d > 1))    goto split;
-    int d = lp2[1] - lp1[1];
+    int d = lp2->.y - lp1->.y;
     if ((d < -1) || (d > 1))    goto split;
 
     return; // line is completed
@@ -981,8 +980,8 @@ void D_PolysetRecursiveDrawLine(int* lp1, int* lp2) {
 split:
     // split this edge
     int  _new[FV_COUNT];
-    _new[0] = (lp1[0] + lp2[0]) >> 1;
-    _new[1] = (lp1[1] + lp2[1]) >> 1;
+    _new[0] = (lp1->x + lp2->x) >> 1;
+    _new[1] = (lp1->.y + lp2->.y) >> 1;
     _new[5] = (lp1[5] + lp2[5]) >> 1;
     _new[2] = (lp1[2] + lp2[2]) >> 1;
     _new[3] = (lp1[3] + lp2[3]) >> 1;
@@ -1002,18 +1001,18 @@ split:
     D_PolysetRecursiveDrawLine(_new, lp2);
 }
 
-void D_PolysetRecursiveTriangle2(int* lp1, int* lp2, int* lp3) {
-    int d = lp2[0] - lp1[0];
+void D_PolysetRecursiveTriangle2(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) {
+    int d = lp2->x - lp1->x;
     if ((d < -1) || (d > 1))    goto split;
-    d = lp2[1] - lp1[1];
+    d = lp2->.y - lp1->.y;
     if ((d < -1) || (d > 1))    goto split;
     return;
 
 split:
     // split this edge
     int _new[FV_COUNT];
-    _new[0] = (lp1[0] + lp2[0]) >> 1;
-    _new[1] = (lp1[1] + lp2[1]) >> 1;
+    _new[0] = (lp1->x + lp2->x) >> 1;
+    _new[1] = (lp1->.y + lp2->.y) >> 1;
     _new[5] = (lp1[5] + lp2[5]) >> 1;
     _new[2] = (lp1[2] + lp2[2]) >> 1;
     _new[3] = (lp1[3] + lp2[3]) >> 1;

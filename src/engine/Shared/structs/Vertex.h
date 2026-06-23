@@ -46,19 +46,25 @@ typedef enum {
     FV_COUNT,
 } FinalVertIdx_e;
 
+typedef union VertAttr_u {
+    struct {
+        int32_t     x, y;      // screen pixel coords - plain int
+        fixed16_t   s, t;      // texture coords - 16.16
+        fixed16_t   light;     // per-vertex light - 16.16
+        fixed16_t   zi;        // 1/z - 16.16
+    };
+    fixed16_t q16[FV_COUNT]; /* !!!MUST BE SIGNED!!! */  // u, v, s, t, l, 1/z  // (u, v), (s, t), light, iz
+} VertAttr_t;
+typedef VertAttr_t* VertAttr_p;
+
+
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct FinalVert_s {
-    union {
-        struct {
-            int32_t     x, y;      // screen pixel coords — plain int
-            fixed16_t   s, t;      // texture coords — 16.16
-            fixed16_t   light;     // per-vertex light — 16.16
-            fixed16_t   zi;        // 1/z — 16.16
-        };
-        int32_t q16[FV_COUNT]; /* !!!MUST BE SIGNED!!! */  // u, v, s, t, l, 1/z  // (u, v), (s, t), light, iz
-    };
+    VertAttr_t          vAttr;
     AliasClipFlags_f    flags;  //alias_clip_flags_t
-    float   reserved;
+#if 0
+    float   reserved;   // no one use it 
+#endif
 } FinalVert_t;
 typedef FinalVert_t* FinalVert_p;
 

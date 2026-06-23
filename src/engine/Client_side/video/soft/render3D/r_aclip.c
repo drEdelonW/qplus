@@ -45,7 +45,7 @@ void R_Alias_clip_z(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
     AuxVert_p pav0 = &_av[pfv0 - &_fv[0][0]];
     AuxVert_p pav1 = &_av[pfv1 - &_fv[0][0]];
 
-    if (pfv0->q16[1] >= pfv1->q16[1]) {
+    if (pfv0->vAttr.y >= pfv1->vAttr.y) {
         float scale =
             (ALIAS_Z_CLIP_PLANE - pav0->fv.z) /
             (pav1->fv.z - pav0->fv.z);
@@ -54,9 +54,9 @@ void R_Alias_clip_z(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
         avout.fv = VectorMA(pav0->fv, scale, VectorSubtract(pav1->fv, pav0->fv));
         avout.fv.z = ALIAS_Z_CLIP_PLANE;
 
-        out->q16[2] = pfv0->q16[2] + (pfv1->q16[2] - pfv0->q16[2]) * scale;
-        out->q16[3] = pfv0->q16[3] + (pfv1->q16[3] - pfv0->q16[3]) * scale;
-        out->q16[4] = pfv0->q16[4] + (pfv1->q16[4] - pfv0->q16[4]) * scale;
+        out->vAttr.s = pfv0->vAttr.s + (pfv1->vAttr.s - pfv0->vAttr.s) * scale;
+        out->vAttr.t = pfv0->vAttr.t + (pfv1->vAttr.t - pfv0->vAttr.t) * scale;
+        out->vAttr.light = pfv0->vAttr.light + (pfv1->vAttr.light - pfv0->vAttr.light) * scale;
     }
     else {
         float scale =
@@ -66,90 +66,90 @@ void R_Alias_clip_z(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
         avout.fv = VectorMA(pav1->fv, scale, VectorSubtract(pav0->fv, pav1->fv));
         avout.fv.z = ALIAS_Z_CLIP_PLANE;
 
-        out->q16[2] = pfv1->q16[2] + (pfv0->q16[2] - pfv1->q16[2]) * scale;
-        out->q16[3] = pfv1->q16[3] + (pfv0->q16[3] - pfv1->q16[3]) * scale;
-        out->q16[4] = pfv1->q16[4] + (pfv0->q16[4] - pfv1->q16[4]) * scale;
+        out->vAttr.s = pfv1->vAttr.s + (pfv0->vAttr.s - pfv1->vAttr.s) * scale;
+        out->vAttr.t = pfv1->vAttr.t + (pfv0->vAttr.t - pfv1->vAttr.t) * scale;
+        out->vAttr.light = pfv1->vAttr.light + (pfv0->vAttr.light - pfv1->vAttr.light) * scale;
     }
 
     R_AliasProjectFinalVert(out, &avout);
 
-    if (out->q16[0] < r_refdef.aliasvrect.x)      out->flags |= ALIAS_LEFT_CLIP;
-    if (out->q16[1] < r_refdef.aliasvrect.y)      out->flags |= ALIAS_TOP_CLIP;
-    if (out->q16[0] > r_refdef.aliasvrectright)   out->flags |= ALIAS_RIGHT_CLIP;
-    if (out->q16[1] > r_refdef.aliasvrectbottom)  out->flags |= ALIAS_BOTTOM_CLIP;
+    if (out->vAttr.x < r_refdef.aliasvrect.x)      out->flags |= ALIAS_LEFT_CLIP;
+    if (out->vAttr.y < r_refdef.aliasvrect.y)      out->flags |= ALIAS_TOP_CLIP;
+    if (out->vAttr.x > r_refdef.aliasvrectright)   out->flags |= ALIAS_RIGHT_CLIP;
+    if (out->vAttr.y > r_refdef.aliasvrectbottom)  out->flags |= ALIAS_BOTTOM_CLIP;
 }
 
 
 #if !id386
 
 void R_Alias_clip_left(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
-    if (pfv0->q16[1] >= pfv1->q16[1]) {
+    if (pfv0->vAttr.y >= pfv1->vAttr.y) {
         float scale = (float)(
-            r_refdef.aliasvrect.x - pfv0->q16[0]) /
-            (pfv1->q16[0] - pfv0->q16[0]);
+            r_refdef.aliasvrect.x - pfv0->vAttr.x) /
+            (pfv1->vAttr.x - pfv0->vAttr.x);
         for (int i = 0; i < 6; i++)
-            out->q16[i] = pfv0->q16[i] + (pfv1->q16[i] - pfv0->q16[i]) * scale + 0.5;
+            out->vAttr.q16[i] = pfv0->vAttr.q16[i] + (pfv1->vAttr.q16[i] - pfv0->vAttr.q16[i]) * scale + 0.5;
     }
     else {
         float scale = (float)(
-            r_refdef.aliasvrect.x - pfv1->q16[0]) /
-            (pfv0->q16[0] - pfv1->q16[0]);
+            r_refdef.aliasvrect.x - pfv1->vAttr.x) /
+            (pfv0->vAttr.x - pfv1->vAttr.x);
         for (int i = 0; i < 6; i++)
-            out->q16[i] = pfv1->q16[i] + (pfv0->q16[i] - pfv1->q16[i]) * scale + 0.5;
+            out->vAttr.q16[i] = pfv1->vAttr.q16[i] + (pfv0->vAttr.q16[i] - pfv1->vAttr.q16[i]) * scale + 0.5;
     }
 }
 
 
 void R_Alias_clip_right(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
-    if (pfv0->q16[1] >= pfv1->q16[1]) {
+    if (pfv0->vAttr.y >= pfv1->vAttr.y) {
         float scale = (float)(
-            r_refdef.aliasvrectright - pfv0->q16[0]) /
-            (pfv1->q16[0] - pfv0->q16[0]);
+            r_refdef.aliasvrectright - pfv0->vAttr.x) /
+            (pfv1->vAttr.x - pfv0->vAttr.x);
         for (int i = 0; i < 6; i++)
-            out->q16[i] = pfv0->q16[i] + (pfv1->q16[i] - pfv0->q16[i]) * scale + 0.5;
+            out->vAttr.q16[i] = pfv0->vAttr.q16[i] + (pfv1->vAttr.q16[i] - pfv0->vAttr.q16[i]) * scale + 0.5;
     }
     else {
         float scale = (float)(
-            r_refdef.aliasvrectright - pfv1->q16[0]) /
-            (pfv0->q16[0] - pfv1->q16[0]);
+            r_refdef.aliasvrectright - pfv1->vAttr.x) /
+            (pfv0->vAttr.x - pfv1->vAttr.x);
         for (int i = 0; i < 6; i++)
-            out->q16[i] = pfv1->q16[i] + (pfv0->q16[i] - pfv1->q16[i]) * scale + 0.5;
+            out->vAttr.q16[i] = pfv1->vAttr.q16[i] + (pfv0->vAttr.q16[i] - pfv1->vAttr.q16[i]) * scale + 0.5;
     }
 }
 
 
 void R_Alias_clip_top(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
-    if (pfv0->q16[1] >= pfv1->q16[1]) {
+    if (pfv0->vAttr.y >= pfv1->vAttr.y) {
         float scale = (float)(
-            r_refdef.aliasvrect.y - pfv0->q16[1]) /
-            (pfv1->q16[1] - pfv0->q16[1]);
+            r_refdef.aliasvrect.y - pfv0->vAttr.y) /
+            (pfv1->vAttr.y - pfv0->vAttr.y);
         for (int i = 0; i < 6; i++)
-            out->q16[i] = pfv0->q16[i] + (pfv1->q16[i] - pfv0->q16[i]) * scale + 0.5;
+            out->vAttr.q16[i] = pfv0->vAttr.q16[i] + (pfv1->vAttr.q16[i] - pfv0->vAttr.q16[i]) * scale + 0.5;
     }
     else {
         float scale =
-            (float)(r_refdef.aliasvrect.y - pfv1->q16[1]) /
-            (pfv0->q16[1] - pfv1->q16[1]);
+            (float)(r_refdef.aliasvrect.y - pfv1->vAttr.y) /
+            (pfv0->vAttr.y - pfv1->vAttr.y);
         for (int i = 0; i < 6; i++)
-            out->q16[i] = pfv1->q16[i] + (pfv0->q16[i] - pfv1->q16[i]) * scale + 0.5;
+            out->vAttr.q16[i] = pfv1->vAttr.q16[i] + (pfv0->vAttr.q16[i] - pfv1->vAttr.q16[i]) * scale + 0.5;
     }
 }
 
 
 void R_Alias_clip_bottom(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
-    if (pfv0->q16[1] >= pfv1->q16[1]) {
+    if (pfv0->vAttr.y >= pfv1->vAttr.y) {
         float scale = (float)(
-            r_refdef.aliasvrectbottom - pfv0->q16[1]) /
-            (pfv1->q16[1] - pfv0->q16[1]);
+            r_refdef.aliasvrectbottom - pfv0->vAttr.y) /
+            (pfv1->vAttr.y - pfv0->vAttr.y);
         for (int i = 0; i < 6; i++)
-            out->q16[i] = pfv0->q16[i] + (pfv1->q16[i] - pfv0->q16[i]) * scale + 0.5;
+            out->vAttr.q16[i] = pfv0->vAttr.q16[i] + (pfv1->vAttr.q16[i] - pfv0->vAttr.q16[i]) * scale + 0.5;
     }
     else {
         float scale = (float)(
-            r_refdef.aliasvrectbottom - pfv1->q16[1]) /
-            (pfv0->q16[1] - pfv1->q16[1]);
+            r_refdef.aliasvrectbottom - pfv1->vAttr.y) /
+            (pfv0->vAttr.y - pfv1->vAttr.y);
         for (int i = 0; i < 6; i++)
-            out->q16[i] = pfv1->q16[i] + (pfv0->q16[i] - pfv1->q16[i]) * scale + 0.5;
+            out->vAttr.q16[i] = pfv1->vAttr.q16[i] + (pfv0->vAttr.q16[i] - pfv1->vAttr.q16[i]) * scale + 0.5;
     }
 }
 
@@ -169,10 +169,10 @@ int R_AliasClip(FinalVert_p in, FinalVert_p out, int flag, int count, alias_clip
         if (oldflags ^ flags) {
             clip_fn(&in[j], &in[i], &out[k]);
             out[k].flags = 0;
-            if (out[k].q16[0] < r_refdef.aliasvrect.x)    out[k].flags |= ALIAS_LEFT_CLIP;
-            if (out[k].q16[1] < r_refdef.aliasvrect.y)    out[k].flags |= ALIAS_TOP_CLIP;
-            if (out[k].q16[0] > r_refdef.aliasvrectright) out[k].flags |= ALIAS_RIGHT_CLIP;
-            if (out[k].q16[1] > r_refdef.aliasvrectbottom) out[k].flags |= ALIAS_BOTTOM_CLIP;
+            if (out[k].vAttr.x < r_refdef.aliasvrect.x)    out[k].flags |= ALIAS_LEFT_CLIP;
+            if (out[k].vAttr.y < r_refdef.aliasvrect.y)    out[k].flags |= ALIAS_TOP_CLIP;
+            if (out[k].vAttr.x > r_refdef.aliasvrectright) out[k].flags |= ALIAS_RIGHT_CLIP;
+            if (out[k].vAttr.y > r_refdef.aliasvrectbottom) out[k].flags |= ALIAS_BOTTOM_CLIP;
             k++;
         }
         if (!flags) {
@@ -201,7 +201,7 @@ void R_AliasClipTriangle(mTriangle_p ptri) {
             _fv[0][i] = pfinalverts[ptri->vertindex[i]];
 
             if (!ptri->facesfront && (_fv[0][i].flags & ALIAS_ONSEAM))
-                _fv[0][i].q16[2] += r_affinetridesc.seamfixupX16;
+                _fv[0][i].vAttr.s += r_affinetridesc.seamfixupX16;
         }
     }
 
@@ -269,8 +269,8 @@ void R_AliasClipTriangle(mTriangle_p ptri) {
     }
 
     for (int i = 0; i < k; i++) {
-        CLAMP(r_refdef.aliasvrect.x, _fv[pingpong][i].q16[0], r_refdef.aliasvrectright);
-        CLAMP(r_refdef.aliasvrect.y, _fv[pingpong][i].q16[1], r_refdef.aliasvrectbottom);
+        CLAMP(r_refdef.aliasvrect.x, _fv[pingpong][i].vAttr.x, r_refdef.aliasvrectright);
+        CLAMP(r_refdef.aliasvrect.y, _fv[pingpong][i].vAttr.y, r_refdef.aliasvrectbottom);
         _fv[pingpong][i].flags = 0;
     }
 
