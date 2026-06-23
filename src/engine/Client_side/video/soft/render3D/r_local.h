@@ -157,7 +157,7 @@ extern int* pfrustum_indexes[4];
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 #define NEAR_CLIP 0.01
 
-extern int  ubasestep, errorterm, erroradjustup, erroradjustdown;
+extern int errorterm, erroradjustup, erroradjustdown;   // TODO: remove multipy external declarations
 extern int  vstartscan;
 
 extern fixed16_t    sadjust, tadjust;

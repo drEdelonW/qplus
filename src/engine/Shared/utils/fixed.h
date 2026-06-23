@@ -12,7 +12,7 @@ typedef uint16_t    fixed8_t;   // 8.8   unsigned
 typedef fixed8_t*   fixed8_p;
 
 // typedef int         fixed16_t; // DO NOT USE int!!!
-typedef int32_t     fixed16_t;  // 16.16 signed  ← !!!MUST BE SIGNED!!!
+typedef int32_t     fixed16_t;  // 16.16 signed !!!MUST BE SIGNED!!!
 // typedef int16_t     fixed16_t; // X
 typedef fixed16_t*  fixed16_p;
 

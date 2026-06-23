@@ -34,23 +34,19 @@ typedef struct {
     int16_p         pz;
     int             count;
     uint8_p         ptex;
-    int             sfrac;
-    int             tfrac;
-    int             light;
-    int             zi;
+    fixed16_t       sfrac;
+    fixed16_t       tfrac;
+    fixed16_t       light;
+    fixed16_t       zi;
 } SpanPackage_t;
 typedef SpanPackage_t* SpanPackage_p;
 
 typedef struct {
-    int  isflattop;
+    int  isflattop;     // TODO: not used
     int  numLeftEdges;
-    VertAttr_p pLeftEdgeVert0;
-    VertAttr_p pLeftEdgeVert1;
-    VertAttr_p pLeftEdgeVert2;
+    VertAttr_p pLeftEdgeVert[3];
     int  numRightEdges;
-    VertAttr_p pRightEdgeVert0;
-    VertAttr_p pRightEdgeVert1;
-    VertAttr_p pRightEdgeVert2;
+    VertAttr_p pRightEdgeVert[3];
 } EdgeTable_t;
 typedef EdgeTable_t* EdgeTable_p;
 
@@ -64,18 +60,18 @@ int   d_xdenom;
 EdgeTable_p pedgetable;
 
 EdgeTable_t edgetables[12] = {
-    {0, 1, &r_p0, &r_p2, NULL,  2, &r_p0, &r_p1, &r_p2},
-    {0, 2, &r_p1, &r_p0, &r_p2, 1, &r_p1, &r_p2, NULL },
-    {1, 1, &r_p0, &r_p2, NULL,  1, &r_p1, &r_p2, NULL },
-    {0, 1, &r_p1, &r_p0, NULL,  2, &r_p1, &r_p2, &r_p0},
-    {0, 2, &r_p0, &r_p2, &r_p1, 1, &r_p0, &r_p1, NULL },
-    {0, 1, &r_p2, &r_p1, NULL,  1, &r_p2, &r_p0, NULL },
-    {0, 1, &r_p2, &r_p1, NULL,  2, &r_p2, &r_p0, &r_p1},
-    {0, 2, &r_p2, &r_p1, &r_p0, 1, &r_p2, &r_p0, NULL },
-    {0, 1, &r_p1, &r_p0, NULL,  1, &r_p1, &r_p2, NULL },
-    {1, 1, &r_p2, &r_p1, NULL,  1, &r_p0, &r_p1, NULL },
-    {1, 1, &r_p1, &r_p0, NULL,  1, &r_p2, &r_p0, NULL },
-    {0, 1, &r_p0, &r_p2, NULL,  1, &r_p0, &r_p1, NULL },
+    {0, 1, {&r_p0, &r_p2, NULL},  2, {&r_p0, &r_p1, &r_p2}},
+    {0, 2, {&r_p1, &r_p0, &r_p2}, 1, {&r_p1, &r_p2, NULL }},
+    {1, 1, {&r_p0, &r_p2, NULL},  1, {&r_p1, &r_p2, NULL }},
+    {0, 1, {&r_p1, &r_p0, NULL},  2, {&r_p1, &r_p2, &r_p0}},
+    {0, 2, {&r_p0, &r_p2, &r_p1}, 1, {&r_p0, &r_p1, NULL }},
+    {0, 1, {&r_p2, &r_p1, NULL},  1, {&r_p2, &r_p0, NULL }},
+    {0, 1, {&r_p2, &r_p1, NULL},  2, {&r_p2, &r_p0, &r_p1}},
+    {0, 2, {&r_p2, &r_p1, &r_p0}, 1, {&r_p2, &r_p0, NULL }},
+    {0, 1, {&r_p1, &r_p0, NULL},  1, {&r_p1, &r_p2, NULL }},
+    {1, 1, {&r_p2, &r_p1, NULL},  1, {&r_p0, &r_p1, NULL }},
+    {1, 1, {&r_p1, &r_p0, NULL},  1, {&r_p2, &r_p0, NULL }},
+    {0, 1, {&r_p0, &r_p2, NULL},  1, {&r_p0, &r_p1, NULL }},
 };
 
 // FIXME: some of these can become statics
@@ -83,25 +79,36 @@ int a_sstepxfrac, a_tstepxfrac;
 int r_sstepx, r_tstepx, r_lstepx, r_zistepx;    // s t l zi
 int r_sstepy, r_tstepy, r_lstepy, r_zistepy;    // s t l zi
 
-int d_aspancount;
 int a_ststepxwhole;
-int d_countextrastep;
 
 SpanPackage_p a_spans;
 SpanPackage_p d_pedgespanpackage;
 static int    _yStart;
-uint8_p d_pdest, d_ptex;
+
+#if 0
+uint8_p d_pdest;
 int16_p d_pz;
-fixed16_t d_sfrac, d_tfrac, d_light, d_zi;    // s t l zi
+int d_aspancount;
+uint8_p d_ptex;
+fixed16_t d_sfrac;
+fixed16_t d_tfrac;
+fixed16_t d_light;
+fixed16_t d_zi;    // s t l zi
+#else
+SpanPackage_t d_snap;
+#endif
 
-int d_sfracbasestep, d_sfracextrastep;  // s
-int d_tfracbasestep, d_tfracextrastep;  // t
-int d_lightbasestep, d_lightextrastep;  // l
-int d_zibasestep, d_ziextrastep;        //zi
+int d_pdestbasestep;//, d_pdestextrastep;
+int d_pzbasestep;//, d_pzextrastep;
+int ubasestep;//, d_countextrastep;
+int d_ptexbasestep;//, d_ptexextrastep;
+fixed16_t d_sfracbasestep;//, d_sfracextrastep;  // s
+fixed16_t d_tfracbasestep;//, d_tfracextrastep;  // t
+fixed16_t d_lightbasestep;//, d_lightextrastep;  // l
+fixed16_t d_zibasestep;//, d_ziextrastep;        //zi
 
-int d_ptexbasestep, d_ptexextrastep;
-int d_pdestbasestep, d_pdestextrastep;
-int d_pzbasestep, d_pzextrastep;
+SpanPackage_t d_basestep;
+SpanPackage_t d_extrastep;
 
 typedef struct {
     int  quotient;
@@ -383,7 +390,8 @@ D_PolysetScanLeftEdge
 void D_PolysetScanLeftEdge(int height) {
 
     do {
-        *d_pedgespanpackage = (SpanPackage_t){
+#if 0
+        * d_pedgespanpackage = (SpanPackage_t){
             .pdest = d_pdest,
             .pz = d_pz,
             .count = d_aspancount,
@@ -394,42 +402,45 @@ void D_PolysetScanLeftEdge(int height) {
             .light = d_light,
             .zi = d_zi
         };
+#else
+        * d_pedgespanpackage = d_snap;
+#endif
 
         d_pedgespanpackage++;
         errorterm += erroradjustup;
         if (errorterm >= 0) {
-            d_pdest += d_pdestextrastep;
-            d_pz += d_pzextrastep;
-            d_aspancount += d_countextrastep;
-            d_ptex += d_ptexextrastep;
-            d_sfrac += d_sfracextrastep;
-            d_ptex += FIXED16_TO_INT(d_sfrac);
+            d_snap.pdest += (int)d_extrastep.pdest; // TODO: can be address issue. take care!
+            d_snap.pz += (int)d_extrastep.pz;
+            d_snap.count += d_extrastep.count;
+            d_snap.ptex += (int)d_extrastep.ptex;
+            d_snap.sfrac += d_extrastep.sfrac;
+            d_snap.ptex += FIXED16_TO_INT(d_snap.sfrac);
 
-            d_sfrac &= 0xFFFF;
-            d_tfrac += d_tfracextrastep;
-            if (d_tfrac & 0x10000) {
-                d_ptex += r_affinetridesc.skinwidth;
-                d_tfrac &= 0xFFFF;
+            d_snap.sfrac &= 0xFFFF;
+            d_snap.tfrac += d_extrastep.tfrac;
+            if (d_snap.tfrac & 0x10000) {
+                d_snap.ptex += r_affinetridesc.skinwidth;
+                d_snap.tfrac &= 0xFFFF;
             }
-            d_light += d_lightextrastep;
-            d_zi += d_ziextrastep;
+            d_snap.light += d_extrastep.light;
+            d_snap.zi += d_extrastep.zi;
             errorterm -= erroradjustdown;
         }
         else {
-            d_pdest += d_pdestbasestep;
-            d_pz += d_pzbasestep;
-            d_aspancount += ubasestep;
-            d_ptex += d_ptexbasestep;
-            d_sfrac += d_sfracbasestep;
-            d_ptex += FIXED16_TO_INT(d_sfrac);
-            d_sfrac &= 0xFFFF;
-            d_tfrac += d_tfracbasestep;
-            if (d_tfrac & 0x10000) {
-                d_ptex += r_affinetridesc.skinwidth;
-                d_tfrac &= 0xFFFF;
+            d_snap.pdest += d_pdestbasestep;
+            d_snap.pz += d_pzbasestep;
+            d_snap.count += ubasestep;
+            d_snap.ptex += d_ptexbasestep;
+            d_snap.sfrac += d_sfracbasestep;
+            d_snap.ptex += FIXED16_TO_INT(d_snap.sfrac);
+            d_snap.sfrac &= 0xFFFF;
+            d_snap.tfrac += d_tfracbasestep;
+            if (d_snap.tfrac & 0x10000) {
+                d_snap.ptex += r_affinetridesc.skinwidth;
+                d_snap.tfrac &= 0xFFFF;
             }
-            d_light += d_lightbasestep;
-            d_zi += d_zibasestep;
+            d_snap.light += d_lightbasestep;
+            d_snap.zi += d_zibasestep;
         }
     } while (--height);
 }
@@ -442,7 +453,12 @@ void D_PolysetScanLeftEdge(int height) {
 D_PolysetSetUpForLineScan
 ====================
 */
-void D_PolysetSetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv, fixed8_t endvertu, fixed8_t endvertv) {
+void D_PolysetSetUpForLineScan(
+    int startvertu,
+    int startvertv,
+    int endvertu,
+    int endvertv
+) {
     // TODO: implement x86 version
 
     errorterm = -1;
@@ -543,14 +559,14 @@ D_PolysetDrawSpans8
 */
 void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
     do {
-        int lcount = d_aspancount - pspanpackage->count;
+        int lcount = d_snap.count - pspanpackage->count;
 
         errorterm += erroradjustup;
         if (errorterm >= 0) {
-            d_aspancount += d_countextrastep;
+            d_snap.count += d_extrastep.count;
             errorterm -= erroradjustdown;
         }
-        else d_aspancount += ubasestep;
+        else d_snap.count += ubasestep;
 
 
         if (lcount) {
@@ -623,10 +639,10 @@ D_RasterizeAliasPolySmooth
 ================
 */
 void D_RasterizeAliasPolySmooth() {
-    VertAttr_p plefttop = pedgetable->pLeftEdgeVert0;
-    VertAttr_p prighttop = pedgetable->pRightEdgeVert0;
-    VertAttr_p pleftbottom = pedgetable->pLeftEdgeVert1;
-    VertAttr_p prightbottom = pedgetable->pRightEdgeVert1;
+    VertAttr_p plefttop = pedgetable->pLeftEdgeVert[0];
+    VertAttr_p prighttop = pedgetable->pRightEdgeVert[0];
+    VertAttr_p pleftbottom = pedgetable->pLeftEdgeVert[1];
+    VertAttr_p prightbottom = pedgetable->pRightEdgeVert[1];
 
     int initialleftheight = pleftbottom->y - plefttop->y;
     int initialrightheight = prightbottom->y - prighttop->y;
@@ -647,27 +663,28 @@ void D_RasterizeAliasPolySmooth() {
     d_pedgespanpackage = a_spans;
 
     _yStart = plefttop->y;
-    d_aspancount = plefttop->x - prighttop->x;
+    d_snap.count = plefttop->x - prighttop->x;
 
-    d_ptex = (uint8_p)r_affinetridesc.pskin +
+    d_snap.ptex = (uint8_p)r_affinetridesc.pskin +
         FIXED16_TO_INT(plefttop->s) +
         FIXED16_TO_INT(plefttop->t) * r_affinetridesc.skinwidth;
 #if id386
-    d_sfrac = (plefttop.s & 0xFFFF) << 16;
-    d_tfrac = (plefttop.t & 0xFFFF) << 16;
+    d_snap.sfrac = (plefttop.s & 0xFFFF) << 16;
+    d_snap.tfrac = (plefttop.t & 0xFFFF) << 16;
 #else
-    d_sfrac = plefttop->s & 0xFFFF;
-    d_tfrac = plefttop->t & 0xFFFF;
+    d_snap.sfrac = plefttop->s & 0xFFFF;
+    d_snap.tfrac = plefttop->t & 0xFFFF;
 #endif
-    d_light = plefttop->light;
-    d_zi = plefttop->zi;
+    d_snap.light = plefttop->light;
+    d_snap.zi = plefttop->zi;
 
-    d_pdest = (uint8_p)d_viewbuffer + _yStart * screenwidth + plefttop->x;
-    d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
+    d_snap.pdest = (uint8_p)d_viewbuffer + plefttop->x + (_yStart * screenwidth);
+    d_snap.pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
 
     if (initialleftheight == 1) {
 
-        *d_pedgespanpackage = (SpanPackage_t){
+#if 0
+        * d_pedgespanpackage = (SpanPackage_t){
             .pdest = d_pdest,
             .pz = d_pz,
             .count = d_aspancount,
@@ -678,7 +695,9 @@ void D_RasterizeAliasPolySmooth() {
             .light = d_light,
             .zi = d_zi
         };
-
+#else
+        * d_pedgespanpackage = d_snap;
+#endif
         d_pedgespanpackage++;
     }
     else {
@@ -692,11 +711,11 @@ void D_RasterizeAliasPolySmooth() {
         d_pzextrastep = d_pzbasestep + 2;
 #else
         d_pzbasestep = d_zwidth + ubasestep;
-        d_pzextrastep = d_pzbasestep + 1;
+        d_extrastep.pz = (int16_p)d_pzbasestep + 1;
 #endif
 
         d_pdestbasestep = screenwidth + ubasestep;
-        d_pdestextrastep = d_pdestbasestep + 1;
+        d_extrastep.pdest = (TypeLess_ptr)d_pdestbasestep + 1;
 
         // TODO: can reuse partial expressions here
 
@@ -706,7 +725,7 @@ void D_RasterizeAliasPolySmooth() {
         int working_lstepx = (ubasestep < 0) ?
             (r_lstepx - 1) : r_lstepx;
 
-        d_countextrastep = ubasestep + 1;
+        d_extrastep.count = ubasestep + 1;
         d_ptexbasestep =
             ((r_sstepy + r_sstepx * ubasestep) >> 16) +
             ((r_tstepy + r_tstepx * ubasestep) >> 16) * r_affinetridesc.skinwidth;
@@ -720,18 +739,19 @@ void D_RasterizeAliasPolySmooth() {
         d_lightbasestep = r_lstepy + working_lstepx * ubasestep;
         d_zibasestep = r_zistepy + r_zistepx * ubasestep;
 
-        d_ptexextrastep =
-            ((r_sstepy + r_sstepx * d_countextrastep) >> 16) +
-            ((r_tstepy + r_tstepx * d_countextrastep) >> 16) * r_affinetridesc.skinwidth;
+        d_extrastep.ptex = (uint8_p)(
+            ((r_sstepy + r_sstepx * d_extrastep.count) >> 16) +
+            ((r_tstepy + r_tstepx * d_extrastep.count) >> 16) * r_affinetridesc.skinwidth
+            );
 #if id386
-        d_sfracextrastep = (r_sstepy + r_sstepx * d_countextrastep) << 16;
-        d_tfracextrastep = (r_tstepy + r_tstepx * d_countextrastep) << 16;
+        d_extrastep.sfrac = (r_sstepy + r_sstepx * d_countextrastep) << 16;
+        d_extrastep.tfrac = (r_tstepy + r_tstepx * d_countextrastep) << 16;
 #else
-        d_sfracextrastep = (r_sstepy + r_sstepx * d_countextrastep) & 0xFFFF;
-        d_tfracextrastep = (r_tstepy + r_tstepx * d_countextrastep) & 0xFFFF;
+        d_extrastep.sfrac = (r_sstepy + r_sstepx * d_extrastep.count) & 0xFFFF;
+        d_extrastep.tfrac = (r_tstepy + r_tstepx * d_extrastep.count) & 0xFFFF;
 #endif
-        d_lightextrastep = d_lightbasestep + working_lstepx;
-        d_ziextrastep = d_zibasestep + r_zistepx;
+        d_extrastep.light = d_lightbasestep + working_lstepx;
+        d_extrastep.zi = d_zibasestep + r_zistepx;
 
         D_PolysetScanLeftEdge(initialleftheight);
     }
@@ -741,27 +761,28 @@ void D_RasterizeAliasPolySmooth() {
     //
     if (pedgetable->numLeftEdges == 2) {
         plefttop = pleftbottom;
-        pleftbottom = pedgetable->pLeftEdgeVert2;
+        pleftbottom = pedgetable->pLeftEdgeVert[2];
 
         int height = pleftbottom->y - plefttop->y;
 
         // TODO: make this a function; modularize this function in general
 
         _yStart = plefttop->y;
-        d_aspancount = plefttop->x - prighttop->x;
-        d_ptex = (uint8_p)r_affinetridesc.pskin +
+        d_snap.count = plefttop->x - prighttop->x;
+        d_snap.ptex = (uint8_p)r_affinetridesc.pskin +
             FIXED16_TO_INT(plefttop->s) +
             FIXED16_TO_INT(plefttop->t) * r_affinetridesc.skinwidth;
-        d_sfrac = 0;
-        d_tfrac = 0;
-        d_light = plefttop->light;
-        d_zi = plefttop->zi;
+        d_snap.sfrac = 0;
+        d_snap.tfrac = 0;
+        d_snap.light = plefttop->light;
+        d_snap.zi = plefttop->zi;
 
-        d_pdest = (uint8_p)d_viewbuffer + _yStart * screenwidth + plefttop->x;
-        d_pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
+        d_snap.pdest = (uint8_p)d_viewbuffer + _yStart * screenwidth + plefttop->x;
+        d_snap.pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
 
         if (height == 1) {
-            *d_pedgespanpackage = (SpanPackage_t){
+#if 0
+            * d_pedgespanpackage = (SpanPackage_t){
                 .pdest = d_pdest,
                 .pz = d_pz,
                 .count = d_aspancount,
@@ -771,9 +792,12 @@ void D_RasterizeAliasPolySmooth() {
                 // FIXME: need to clamp l, s, t, at both ends?
                 .light = d_light,
                 .zi = d_zi
-            };
+        };
+#else
+            * d_pedgespanpackage = d_snap;
+#endif
             d_pedgespanpackage++;
-        }
+    }
         else {
             D_PolysetSetUpForLineScan(
                 plefttop->x, plefttop->y,
@@ -781,20 +805,20 @@ void D_RasterizeAliasPolySmooth() {
             );
 
             d_pdestbasestep = screenwidth + ubasestep;
-            d_pdestextrastep = d_pdestbasestep + 1;
+            d_extrastep.pdest = (uint8_p)d_pdestbasestep + 1;
 
 #if id386
             d_pzbasestep = (d_zwidth + ubasestep) << 1;
-            d_pzextrastep = d_pzbasestep + 2;
+            d_extrastep.pz = (int16_p)d_pzbasestep + 2;
 #else
             d_pzbasestep = d_zwidth + ubasestep;
-            d_pzextrastep = d_pzbasestep + 1;
+            d_extrastep.pz = (int16_p)d_pzbasestep + 1;
 #endif
 
             int working_lstepx = (ubasestep < 0) ?
                 (r_lstepx - 1) : r_lstepx;
 
-            d_countextrastep = ubasestep + 1;
+            d_extrastep.count = ubasestep + 1;
             d_ptexbasestep =
                 ((r_sstepy + r_sstepx * ubasestep) >> 16) +
                 ((r_tstepy + r_tstepx * ubasestep) >> 16) * r_affinetridesc.skinwidth;
@@ -808,33 +832,32 @@ void D_RasterizeAliasPolySmooth() {
             d_lightbasestep = r_lstepy + working_lstepx * ubasestep;
             d_zibasestep = r_zistepy + r_zistepx * ubasestep;
 
-            d_ptexextrastep =
-                ((r_sstepy + r_sstepx * d_countextrastep) >> 16) +
-                ((r_tstepy + r_tstepx * d_countextrastep) >> 16) * r_affinetridesc.skinwidth;
+            d_extrastep.ptex = (uint8_p)(
+                ((r_sstepy + r_sstepx * d_extrastep.count) >> 16) +
+                ((r_tstepy + r_tstepx * d_extrastep.count) >> 16) * r_affinetridesc.skinwidth);
 #if id386
             d_sfracextrastep = ((r_sstepy + r_sstepx * d_countextrastep) & 0xFFFF) << 16;
             d_tfracextrastep = ((r_tstepy + r_tstepx * d_countextrastep) & 0xFFFF) << 16;
 #else
-            d_sfracextrastep = (r_sstepy + r_sstepx * d_countextrastep) & 0xFFFF;
-            d_tfracextrastep = (r_tstepy + r_tstepx * d_countextrastep) & 0xFFFF;
+            d_extrastep.sfrac = (r_sstepy + r_sstepx * d_extrastep.count) & 0xFFFF;
+            d_extrastep.tfrac = (r_tstepy + r_tstepx * d_extrastep.count) & 0xFFFF;
 #endif
-            d_lightextrastep = d_lightbasestep + working_lstepx;
-            d_ziextrastep = d_zibasestep + r_zistepx;
+            d_extrastep.light = d_lightbasestep + working_lstepx;
+            d_extrastep.zi = d_zibasestep + r_zistepx;
 
             D_PolysetScanLeftEdge(height);
         }
-    }
+}
 
-    // scan out the top (and possibly only) part of the right edge, updating the
-    // count field
+    // scan out the top (and possibly only) part of the right edge, updating the count field
     d_pedgespanpackage = a_spans;
 
     D_PolysetSetUpForLineScan(
         prighttop->x, prighttop->y,
         prightbottom->x, prightbottom->y
     );
-    d_aspancount = 0;
-    d_countextrastep = ubasestep + 1;
+    d_snap.count = 0;
+    d_extrastep.count = ubasestep + 1;
     int originalcount = a_spans[initialrightheight].count;
     a_spans[initialrightheight].count = -999999; // mark end of the spanpackages
     D_PolysetDrawSpans8(a_spans);
@@ -844,10 +867,10 @@ void D_RasterizeAliasPolySmooth() {
         SpanPackage_p pstart = a_spans + initialrightheight;
         pstart->count = originalcount;
 
-        d_aspancount = prightbottom->x - prighttop->x;
+        d_snap.count = prightbottom->x - prighttop->x;
 
         prighttop = prightbottom;
-        prightbottom = pedgetable->pRightEdgeVert2;
+        prightbottom = pedgetable->pRightEdgeVert[2];
 
         int height = prightbottom->y - prighttop->y;
 
@@ -856,7 +879,7 @@ void D_RasterizeAliasPolySmooth() {
             prightbottom->x, prightbottom->y
         );
 
-        d_countextrastep = ubasestep + 1;
+        d_extrastep.count = ubasestep + 1;
         a_spans[initialrightheight + height].count = -999999;
         // mark end of the spanpackages
         D_PolysetDrawSpans8(pstart);

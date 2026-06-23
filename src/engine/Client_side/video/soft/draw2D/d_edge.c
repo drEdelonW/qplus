@@ -25,10 +25,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 
 static int _miplevel;   // TODO: make mipLevel enum
+float scale_for_mip;
 
-float  scale_for_mip;
-int   ubasestep, errorterm, erroradjustup, erroradjustdown;
-int   vstartscan;
+int errorterm;
+int erroradjustup;
+int erroradjustdown;
+int vstartscan;
 
 vec3_t  transformed_modelorg;
 
