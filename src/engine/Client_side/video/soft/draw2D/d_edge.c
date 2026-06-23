@@ -51,7 +51,7 @@ int D_MipLevelForScale(float scale) {
     /**/ if (scale >= d_scalemip[0])    lMipLevel = 0;
     else if (scale >= d_scalemip[1])    lMipLevel = 1;
     else if (scale >= d_scalemip[2])    lMipLevel = 2;
-    else /*                          */ lMipLevel = 3;
+    else /*                       */    lMipLevel = 3;
 
     CLAMP_MIN(lMipLevel, d_minmip);
 
@@ -71,7 +71,7 @@ void D_DrawSolidSurface(Surf_p surf, int color) {
     int pix = (color << 24) | (color << 16) | (color << 8) | color;
 
     for (eSpan_p span = surf->spans; span; span = span->pnext) {
-        uint8_p pdest = (uint8_p)d_viewbuffer + screenwidth * span->v;
+        uint8_p pdest = (uint8_p)d_viewbuffer + (screenwidth * span->v);
         int u = span->u;
         int u2 = span->u + span->count - 1;
         ((uint8_p)pdest)[u] = pix;
@@ -118,13 +118,13 @@ void D_CalcGradients(mSurface_p pface) {
         d_tdivzstepv = -p_taxis.v[T_AX] * t;
     }
     d_sdivzorigin =
-        mipscale * p_saxis.v[2] -
-        xcenter * d_sdivzstepu -
-        ycenter * d_sdivzstepv;
+        mipscale * p_saxis.z +
+        -xcenter * d_sdivzstepu +
+        -ycenter * d_sdivzstepv;
     d_tdivzorigin =
-        mipscale * p_taxis.v[2] -
-        xcenter * d_tdivzstepu -
-        ycenter * d_tdivzstepv;
+        mipscale * p_taxis.z +
+        -xcenter * d_tdivzstepu +
+        -ycenter * d_tdivzstepv;
 
     vec3_t p_temp1 = VectorScale(transformed_modelorg, mipscale);
 
@@ -191,9 +191,9 @@ void D_DrawSurfaces() {
             else if (surf->flags & SURF_DRAWBACKGROUND) {
                 // set up a gradient for the background surface that places it
                 // effectively at infinity distance from the viewpoint
-                d_zistepu = 0;
-                d_zistepv = 0;
-                d_ziorigin = -0.9;
+                d_zistepu = 0.0f;
+                d_zistepv = 0.0f;
+                d_ziorigin = -0.9f;
 
                 D_DrawSolidSurface(surf, (int)r_clearcolor.value & 0xFF);
                 D_DrawZSpans(surf->spans);
@@ -201,9 +201,10 @@ void D_DrawSurfaces() {
             else if (surf->flags & SURF_DRAWTURB) {
                 mSurface_p pface = surf->data;
                 _miplevel = 0;
-                cacheblock = (pixel_p)
-                    ((uint8_p)pface->texinfo->texture +
-                        pface->texinfo->texture->offsets[0]);
+                cacheblock = (pixel_p)(
+                    (uint8_p)pface->texinfo->texture +
+                    pface->texinfo->texture->offsets[0]
+                    );
                 cachewidth = 64;
 
                 if (surf->insubmodel) {
@@ -262,7 +263,7 @@ void D_DrawSurfaces() {
 
                 D_CalcGradients(pface);
 
-                (*d_drawspans) (surf->spans);
+                (*d_drawspans)(surf->spans);
 
                 D_DrawZSpans(surf->spans);
 

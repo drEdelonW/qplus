@@ -284,10 +284,8 @@ void SND_InitScaletable() {
 #if !id386
 
 void SND_PaintChannelFrom8(channel_p ch, sfxcache_p sc, int count) {
-    if (ch->leftvol > 255)
-        ch->leftvol = 255;
-    if (ch->rightvol > 255)
-        ch->rightvol = 255;
+    if (ch->leftvol > 255)      ch->leftvol = 255;
+    if (ch->rightvol > 255)     ch->rightvol = 255;
 
     int* lscale = _snd_scaletable[ch->leftvol >> 3];
     int* rscale = _snd_scaletable[ch->rightvol >> 3];

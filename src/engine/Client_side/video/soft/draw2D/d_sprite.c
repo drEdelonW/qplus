@@ -303,7 +303,7 @@ void D_SpriteCalculateGradients() {
     vec3_t p_taxis = TransformVector(r_spritedesc.bs.up);
     VectorInverse(&p_taxis);
 
-    float distinv = 1.0 / (-DotProduct(modelorg, r_spritedesc.bs.forward));
+    float distinv = 1.0f / (-DotProduct(modelorg, r_spritedesc.bs.forward));
 
     d_sdivzstepu = p_saxis.x * xscaleinv;
     d_tdivzstepu = p_taxis.x * xscaleinv;
@@ -314,14 +314,21 @@ void D_SpriteCalculateGradients() {
     d_zistepu = p_normal.x * xscaleinv * distinv;
     d_zistepv = -p_normal.y * yscaleinv * distinv;
 
-    d_sdivzorigin = p_saxis.z - xcenter * d_sdivzstepu - ycenter * d_sdivzstepv;
-    d_tdivzorigin = p_taxis.z - xcenter * d_tdivzstepu - ycenter * d_tdivzstepv;
-    d_ziorigin = p_normal.z * distinv - xcenter * d_zistepu - ycenter * d_zistepv;
+    d_sdivzorigin = p_saxis.z +
+        -xcenter * d_sdivzstepu +
+        -ycenter * d_sdivzstepv;
+    d_tdivzorigin = p_taxis.z +
+        -xcenter * d_tdivzstepu +
+        -ycenter * d_tdivzstepv;
+    d_ziorigin =
+        distinv * p_normal.z +
+        -xcenter * d_zistepu +
+        -ycenter * d_zistepv;
 
     vec3_t p_temp1 = TransformVector(modelorg);
 
-    sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5)) - (-(cachewidth >> 1) << 16);
-    tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5)) - (-(_spriteHeight >> 1) << 16);
+    sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5f)) - (-(cachewidth >> 1) << 16);
+    tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5f)) - (-(_spriteHeight >> 1) << 16);
 
     // -1 (-epsilon) so we never wander off the edge of the texture
     bbextents = (cachewidth << 16) - 1;

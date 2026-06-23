@@ -26,7 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   include "qOpenGL.h"
 #endif
 #include "SurfCache.h"
-#include "Snap.h"
 
 //
 // TODO: fine-tune this; it's based on providing some overage even if there
@@ -35,15 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define SURFCACHE_SIZE_AT_320X200  (600 * 1024)
 
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
-typedef struct sSpan_s {
-    int u;
-    int v;
-    int count;
-} sSpan_t;
-typedef sSpan_t* sSpan_p;
-
-
 extern float scale_for_mip;
 extern int   d_aflatcolor;
 extern bool  d_roverwrapped;
@@ -51,6 +41,7 @@ extern bool  d_roverwrapped;
 extern SurfCache_p sc_rover;
 extern SurfCache_p d_initial_rover;
 
+#if 1
 extern float d_sdivzstepu, d_tdivzstepu, d_zistepu;
 extern float d_sdivzstepv, d_tdivzstepv, d_zistepv;
 extern float d_sdivzorigin, d_tdivzorigin, d_ziorigin;
@@ -59,16 +50,9 @@ extern fixed16_t sadjust;
 extern fixed16_t tadjust;
 extern fixed16_t bbextents;
 extern fixed16_t bbextentt;
-
-
-void D_DrawSpans8(eSpan_p  pspans);
-void D_DrawSpans16(eSpan_p pspans);
-void D_DrawZSpans(eSpan_p  pspans);
-void Turbulent8(eSpan_p    pspan);
-void D_SpriteDrawSpans(sSpan_p pspan);
-
-void D_DrawSkyScans8(eSpan_p   pspan);
-void D_DrawSkyScans16(eSpan_p  pspan);
+#else
+// TODO: Rework gradient globals to vector like operations
+#endif
 
 void R_ShowSubDiv();
 extern void(*prealspandrawer)();
@@ -92,5 +76,5 @@ extern int16_p  zspantable[MAXHEIGHT];
 extern int      d_minmip;
 extern float    d_scalemip[3];
 
-extern void(*d_drawspans)(eSpan_p pspan);
+
 

@@ -35,7 +35,7 @@ static float _BaseMip[NUM_MIPS - 1] = {
     0.25f * 0.8f
 };
 
-void (*d_drawspans) (eSpan_p pspan);
+void (*d_drawspans)(eSpan_p pspan);
 
 
 /*

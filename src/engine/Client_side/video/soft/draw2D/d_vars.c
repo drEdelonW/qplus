@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // global refresh variables
 //-------------------------------------------------------
 
+#if 1
 // FIXME: make into one big structure, like cl or sv
 // FIXME: do separately for refresh engine and driver
 
@@ -43,6 +44,9 @@ fixed16_t sadjust;
 fixed16_t tadjust;
 fixed16_t bbextents;
 fixed16_t bbextentt;
+#else
+// TODO: Rework gradient globals to vector like operations
+#endif
 
 pixel_p cacheblock;
 int     cachewidth;

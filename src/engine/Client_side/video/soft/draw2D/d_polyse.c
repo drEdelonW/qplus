@@ -715,10 +715,8 @@ void D_RasterizeAliasPolySmooth() {
         // for negative steps in x along left edge, bias toward overflow rather than
         // underflow (sort of turning the floor() we did in the gradient calcs into
         // ceil(), but plus a little bit)
-        if (ubasestep < 0)
-            working_lstepx = r_lstepx - 1;
-        else
-            working_lstepx = r_lstepx;
+        if (ubasestep < 0)      working_lstepx = r_lstepx - 1;
+        else                    working_lstepx = r_lstepx;
 
         d_countextrastep = ubasestep + 1;
         d_ptexbasestep = ((r_sstepy + r_sstepx * ubasestep) >> 16) +

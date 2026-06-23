@@ -31,15 +31,12 @@ enum {
     ROLL        = 2u,  /* roll (fall over) */
     ANGLES_COUNT = 3u
 };
-#if 0
-    typedef vec_t vec3_t[VECT_DIM];
-#else
-    typedef union {
-        struct { vec_t x, y, z; };
-        struct { float pitch, yaw, roll; };
-        vec_t v[VECT_DIM];
-    } vec3_t;
-#endif
+
+typedef union {
+    struct { vec_t x, y, z; };
+    struct { float pitch, yaw, roll; };
+    vec_t v[VECT_DIM];
+} vec3_t;
 STATIC_ASSERT_SIZE(vec3_t, 3 * sizeof(vec_t));
 typedef vec3_t* vec3_p;
 
