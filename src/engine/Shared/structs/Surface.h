@@ -79,6 +79,7 @@ typedef mSurface_p* mSurface_ar;
 // it was [drawsurf_t]
 
 #include "Texture_pre.h"    // Texture_p
+#include "fixed.h"          // fixed8_t
 typedef struct {
     pixel_p     surfdat;                // destination for generated surface
     int         rowbytes;               // destination logical width in bytes

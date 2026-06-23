@@ -36,16 +36,26 @@ typedef enum alias_clip_flags_e {
     ALIAS_ONSEAM        = 0x0020u,  // also defined in modelgen.h
 } AliasClipFlags_f;
 
+typedef enum {
+    FV_X = 0,   // screen x - plain int
+    FV_Y,       // screen y - plain int
+    FV_S,       // texture s - Q16.16
+    FV_T,       // texture t - Q16.16
+    FV_LIGHT,   // per-vertex light - Q16.16
+    FV_ZI,      // 1/z - Q16.16
+    FV_COUNT,
+} FinalVertIdx_e;
+
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 typedef struct FinalVert_s {
     union {
         struct {
-            struct {int32_t u, v; } tx;
-            struct {int32_t s, t; } lMap;
-            int32_t Light;
-            int32_t iz;
-        } vx;
-        int32_t v32[6]; /* !!!MUST BE SIGNED!!! */  // u, v, s, t, l, 1/z  // (u, v), (s, t), light, iz
+            int32_t     x, y;      // screen pixel coords — plain int
+            fixed16_t   s, t;      // texture coords — 16.16
+            fixed16_t   light;     // per-vertex light — 16.16
+            fixed16_t   zi;        // 1/z — 16.16
+        };
+        int32_t q16[FV_COUNT]; /* !!!MUST BE SIGNED!!! */  // u, v, s, t, l, 1/z  // (u, v), (s, t), light, iz
     };
     AliasClipFlags_f    flags;  //alias_clip_flags_t
     float   reserved;

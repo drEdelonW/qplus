@@ -264,10 +264,10 @@ void R_AliasPreparePoints() {
         else {
             R_AliasProjectFinalVert(fv, av);
 
-            if (fv->v32[0] < r_refdef.aliasvrect.x)       fv->flags |= ALIAS_LEFT_CLIP;
-            if (fv->v32[1] < r_refdef.aliasvrect.y)       fv->flags |= ALIAS_TOP_CLIP;
-            if (fv->v32[0] > r_refdef.aliasvrectright)    fv->flags |= ALIAS_RIGHT_CLIP;
-            if (fv->v32[1] > r_refdef.aliasvrectbottom)   fv->flags |= ALIAS_BOTTOM_CLIP;
+            if (fv->q16[0] < r_refdef.aliasvrect.x)       fv->flags |= ALIAS_LEFT_CLIP;
+            if (fv->q16[1] < r_refdef.aliasvrect.y)       fv->flags |= ALIAS_TOP_CLIP;
+            if (fv->q16[0] > r_refdef.aliasvrectright)    fv->flags |= ALIAS_RIGHT_CLIP;
+            if (fv->q16[1] > r_refdef.aliasvrectbottom)   fv->flags |= ALIAS_BOTTOM_CLIP;
         }
     }
 
@@ -401,8 +401,8 @@ void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, 
     av->fv.y = DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3];
     av->fv.z = DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3];
 
-    fv->v32[2] = pstverts->s;
-    fv->v32[3] = pstverts->t;
+    fv->q16[2] = pstverts->s;
+    fv->q16[3] = pstverts->t;
 
     fv->flags = pstverts->onseam;
 
@@ -420,7 +420,7 @@ void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, 
             temp = 0;
     }
 
-    fv->v32[4] = temp;
+    fv->q16[4] = temp;
 }
 
 
@@ -447,13 +447,13 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
         // x, y, and z are scaled down by 1/2**31 in the transform, so 1/z is
         // scaled up by 1/2**31, and the scaling cancels out for x and y in the
         // projection
-        fv->v32[5] = zi;
+        fv->q16[5] = zi;
 
-        fv->v32[0] = ((DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3]) * zi) + aliasxcenter;
-        fv->v32[1] = ((DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3]) * zi) + aliasycenter;
+        fv->q16[0] = ((DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3]) * zi) + aliasxcenter;
+        fv->q16[1] = ((DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3]) * zi) + aliasycenter;
 
-        fv->v32[2] = pstverts->s;
-        fv->v32[3] = pstverts->t;
+        fv->q16[2] = pstverts->s;
+        fv->q16[3] = pstverts->t;
         fv->flags = pstverts->onseam;
 
         // lighting
@@ -470,7 +470,7 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
                 temp = 0;
         }
 
-        fv->v32[4] = temp;
+        fv->q16[4] = temp;
     }
 }
 
@@ -486,10 +486,10 @@ void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av) {
     // project points
     float zi = 1.0 / av->fv.z;
 
-    fv->v32[5] = zi * _ziscale;
+    fv->q16[5] = zi * _ziscale;
 
-    fv->v32[0] = (av->fv.x * aliasxscale * zi) + aliasxcenter;
-    fv->v32[1] = (av->fv.y * aliasyscale * zi) + aliasycenter;
+    fv->q16[0] = (av->fv.x * aliasxscale * zi) + aliasxcenter;
+    fv->q16[1] = (av->fv.y * aliasyscale * zi) + aliasycenter;
 }
 
 

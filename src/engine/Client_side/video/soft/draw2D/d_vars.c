@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #if !id386
 
 #include "types.h"
+#include "fixed.h"  // fixed16_t
 #include "vid.h"
 
 
