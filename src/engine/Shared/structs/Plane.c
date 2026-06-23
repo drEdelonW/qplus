@@ -198,7 +198,7 @@ void Mod_LoadPlanes(Lump_p Lump_in) {
     _loadModel->numplanes = count;
 
     for (int i = 0; i < count; i++, in++, out++) {
-        int bits = 0;
+        int bits = 0x00;
         for (int j = 0; j < VECT_DIM; j++) {
             out->normal.v[j] = LittleFloat(in->normal.v[j]);
             if (out->normal.v[j] < 0.0f)

@@ -299,7 +299,6 @@ void CL_RelinkEntities() {
     cl_numvisedicts = 0;
 
     // interpolate player info
-
     cl.velocity = VectorMA(cl.mvelocity[1],
         frac, VectorSubtract(
             cl.mvelocity[0], cl.mvelocity[1]
@@ -342,8 +341,8 @@ void CL_RelinkEntities() {
             float f = frac;
             vec3_t delta = VectorSubtract(ent->msg_origins[0], ent->msg_origins[1]);
             for (int j = 0; j < VECT_DIM; j++) {
-                if ((delta.v[j] > 100) ||
-                    (delta.v[j] < -100)
+                if ((delta.v[j] > 100.0f) ||
+                    (delta.v[j] < -100.0f)
                     )
                     f = 1.0f;  // assume a teleportation, not a motion
             }

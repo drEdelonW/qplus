@@ -118,11 +118,11 @@ void D_CalcGradients(mSurface_p pface) {
         d_tdivzstepv = -p_taxis.v[T_AX] * t;
     }
     d_sdivzorigin =
-        p_saxis.v[2] * mipscale -
+        mipscale * p_saxis.v[2] -
         xcenter * d_sdivzstepu -
         ycenter * d_sdivzstepv;
     d_tdivzorigin =
-        p_taxis.v[2] * mipscale -
+        mipscale * p_taxis.v[2] -
         xcenter * d_tdivzstepu -
         ycenter * d_tdivzstepv;
 

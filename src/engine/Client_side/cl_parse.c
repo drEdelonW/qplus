@@ -410,7 +410,7 @@ void CL_ParseBaseline(r_Entity_p ent) {
     ent->baseline.frame = MSG_ReadByte();
     ent->baseline.colormap = MSG_ReadByte();
     ent->baseline.skin = MSG_ReadByte();
-    for (int i = 0; i < VECT_DIM; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {    // TODO: wrap MSG_ReadCoord/MSG_ReadAngle to MSG_vector_tools
         ent->baseline.origin.v[i] = MSG_ReadCoord();
         ent->baseline.angles.v[i] = MSG_ReadAngle();
     }
@@ -431,7 +431,7 @@ void CL_ParseClientdata(server_update_bits_t bits) {
     cl.idealpitch = (bits & SU_IDEALPITCH) ? MSG_ReadChar() : 0;
 
     cl.mvelocity[1] = cl.mvelocity[0];
-    for (int i = 0; i < VECT_DIM; i++) {
+    for (int i = 0; i < VECT_DIM; i++) {    // TODO: wrap MSG_ReadChar to MSG_vector_tools
         cl.punchangle.v[i] = (bits & (SU_PUNCH1 << i)) ? MSG_ReadChar() : 0;
         cl.mvelocity[0].v[i] = (bits & (SU_VELOCITY1 << i)) ? (MSG_ReadChar() * 16) : 0;
     }
@@ -564,11 +564,10 @@ void CL_ParseStaticSound() {
 */
 void CL_ParseServerMessage() {
     // if recording demos, copy the message out
-    if (cl_shownet.value == 1)      Con_Printf("%i ", net_message.cursize);
+    /**/ if (cl_shownet.value == 1) Con_Printf("%i ", net_message.cursize);
     else if (cl_shownet.value == 2) Con_Printf("------------------\n");
 
-    cl.onground = false; // unless the server says otherwise
-    // parse the message
+    cl.onground = false; // unless the server says otherwise parse the message
     MSG_BeginReading();
 
     while (1) {
@@ -593,11 +592,11 @@ void CL_ParseServerMessage() {
         // other commands
         // int msg;
         switch (cmd) {
-        default:            Host_Error("CL_ParseServerMessage: Illegible server message\n"); break;
+        default:    Host_Error("CL_ParseServerMessage: Illegible server message [0x%X]\n", cmd); break;
 
         case svc_nop:       Con_Printf("%s\n", svc_strings[svc_nop]); break;
 
-        case svc_time: {
+        case svc_time: {    // timestamp rotation
             cl.mtime[1] = cl.mtime[0];
             cl.mtime[0] = MSG_ReadFloat();
         } break;
@@ -625,16 +624,24 @@ void CL_ParseServerMessage() {
         } break;
 
         case svc_setangle: {
+#if 0
             for (int i = 0; i < VECT_DIM; i++)
                 cl.viewangles.v[i] = MSG_ReadAngle();
+#else
+            cl.viewangles = (vec3_t){
+                .pitch = MSG_ReadAngle(),
+                .yaw = MSG_ReadAngle(),
+                .roll = MSG_ReadAngle()
+            };
+#endif
         } break;
 
         case svc_setview:       cl.viewentity = MSG_ReadShort();        break;
 
         case svc_lightstyle: {
             uint8_t msg = MSG_ReadByte();
-            if (msg >= MAX_LIGHTSTYLES)
-                Host_SysError("svc_lightstyle > MAX_LIGHTSTYLES");
+            if (msg >= MAX_LIGHTSTYLES)     Host_SysError("svc_lightstyle > MAX_LIGHTSTYLES");
+
             Q_strcpy(cl_lightstyle[msg].map, MSG_ReadString());
             cl_lightstyle[msg].length = Q_strlen(cl_lightstyle[msg].map);
         } break;
@@ -649,24 +656,24 @@ void CL_ParseServerMessage() {
         case svc_updatename: {
             Sbar_Changed();
             uint8_t msg = MSG_ReadByte();
-            if (msg >= cl.maxclients)
-                Host_Error("CL_ParseServerMessage: svc_updatename > MAX_SCOREBOARD");
+            if (msg >= cl.maxclients)       Host_Error("CL_ParseServerMessage: svc_updatename > MAX_SCOREBOARD");
+
             strcpy(cl.scores[msg].name, MSG_ReadString());
         } break;
 
         case svc_updatefrags: {
             Sbar_Changed();
             uint8_t msg = MSG_ReadByte();
-            if (msg >= cl.maxclients)
-                Host_Error("CL_ParseServerMessage: svc_updatefrags > MAX_SCOREBOARD");
+            if (msg >= cl.maxclients)       Host_Error("CL_ParseServerMessage: svc_updatefrags > MAX_SCOREBOARD");
+
             cl.scores[msg].frags = MSG_ReadShort();
         } break;
 
         case svc_updatecolors: {
             Sbar_Changed();
             uint8_t msg = MSG_ReadByte();
-            if (msg >= cl.maxclients)
-                Host_Error("CL_ParseServerMessage: svc_updatecolors > MAX_SCOREBOARD");
+            if (msg >= cl.maxclients)       Host_Error("CL_ParseServerMessage: svc_updatecolors > MAX_SCOREBOARD");
+
             cl.scores[msg].colors = MSG_ReadByte();
             CL_NewTranslation(msg);
         }   break;
@@ -687,8 +694,8 @@ void CL_ParseServerMessage() {
 
         case svc_signonnum: {
             uint8_t msg = MSG_ReadByte();
-            if (msg <= cls.signon)
-                Host_Error("Received signon %i when at %i", msg, cls.signon);
+            if (msg <= cls.signon)          Host_Error("Received signon %i when at %i", msg, cls.signon);
+
             cls.signon = msg;
             CL_SignonReply();
         } break;
@@ -698,8 +705,8 @@ void CL_ParseServerMessage() {
 
         case svc_updatestat: {
             uint8_t msg = MSG_ReadByte();
-            if (msg >= MAX_CL_STATS)
-                Host_SysError("svc_updatestat: %i is invalid", msg);
+            if (msg >= MAX_CL_STATS)        Host_SysError("svc_updatestat: %i is invalid", msg);
+
             cl.stats[msg] = (uint32_t)MSG_ReadLong();
         } break;
 
@@ -708,7 +715,10 @@ void CL_ParseServerMessage() {
         case svc_cdtrack:
             cl.cdtrack = MSG_ReadByte();
             cl.looptrack = MSG_ReadByte();
-            if ((cls.demoplayback || cls.demorecording) && (cls.forcetrack != -1))
+            if ((cls.demoplayback ||
+                cls.demorecording) &&
+                (cls.forcetrack != -1)
+                )
                 CDAudio_Play((uint8_t)cls.forcetrack, true);
             else CDAudio_Play((uint8_t)cl.cdtrack, true);
             break;

@@ -37,7 +37,7 @@ struct glpoly_s {
     glpoly_p    next;
     glpoly_p    chain;
     int         numverts;
-    int         flags;   // for SURF_UNDERWATER
+    int         flags;      // for SURF_UNDERWATER
     glVert_t    verts[4];
 };
 #endif
@@ -45,22 +45,22 @@ struct glpoly_s {
 #include "Surface_pre.h"
 // it was [msurface_t]
 typedef struct mSurface_s {
-    int32_t     visframe;  // should be drawn when node is crossed
+    int32_t     visframe;   // should be drawn when node is crossed
     int32_t     dlightframe;
     int32_t     dlightbits;
     mPlane_p        plane;
     SurfaceFlags_e  flags;
-    int32_t     firstedge; // look up in model->surfedges[], negative numbers
-    int32_t     numedges; // are backwards edges
+    int32_t     firstedge;  // look up in model->surfedges[], negative numbers
+    int32_t     numedges;   // are backwards edges
 
     // surface generation data
 #ifdef GLQUAKE
     mSurface_p  texturechain;
-    int         light_s, light_t; // gl lightmap coordinates
-    glpoly_p    polys;    // multiple if warped
+    int         light_s, light_t;           // gl lightmap coordinates
+    glpoly_p    polys;                      // multiple if warped
     int         lightmaptexturenum;
     int         cached_light[MAXLIGHTMAPS]; // values currently used in lightmap
-    bool        cached_dlight;    // true if dynamic light in cache
+    bool        cached_dlight;              // true if dynamic light in cache
 #else
     SurfCache_p cachespots[MIPLEVELS];
 #endif
@@ -70,14 +70,15 @@ typedef struct mSurface_s {
 
     // lighting info
     uint8_t     styles[MAXLIGHTMAPS];
-    uint8_p     samples;  // [numstyles*surfsize]
+    uint8_p     samples;                // [numstyles*surfsize]
 } mSurface_t;
 typedef mSurface_t* mSurface_p;
 typedef mSurface_p* mSurface_ar;
 
 #include "vid.h"  //    pixel_p
 // it was [drawsurf_t]
-#include "Texture_pre.h"
+
+#include "Texture_pre.h"    // Texture_p
 typedef struct {
     pixel_p     surfdat;                // destination for generated surface
     int         rowbytes;               // destination logical width in bytes

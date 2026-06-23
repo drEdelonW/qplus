@@ -1,16 +1,17 @@
 #pragma once
 
 #include "types.h"
-#include "enginedefs.h"
+// #include "enginedefs.h"
 #ifdef GLQUAKE
-#   include "Surface_pre.h"
+# include "Surface_pre.h"
 #endif
 #include "assert.h"
 
-#include "Texture_pre.h"
 
 extern Texture_p r_notexture_mip;
+#include "Texture_pre.h"    // Texture_p
 
+#define MIPLEVELS   (4)
 struct Texture_s {
     char        name[16];
     uint32_t    width, height;
@@ -29,7 +30,7 @@ struct Texture_s {
 
 typedef struct {
     int32_t nummiptex;
-    int32_t dataofs[4]; // [nummiptex]
+    int32_t dataOfs[MIPLEVELS]; // [nummiptex]
 } dMipTexLump_t;
 typedef dMipTexLump_t* dMipTexLump_p;
 STATIC_ASSERT_SIZE(dMipTexLump_t, 4 + 4*4); // 20
@@ -40,7 +41,6 @@ typedef struct MipTex_s {
     uint32_t    offsets[MIPLEVELS];  // four mip maps stored
 } MipTex_t;
 typedef MipTex_t* MipTex_p;
-
 
 Texture_p R_TextureAnimation(Texture_p base);
 

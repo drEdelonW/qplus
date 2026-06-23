@@ -1,26 +1,25 @@
 #include "assert.h"
 #include "Lump.h"
 
-typedef enum {              // BSP Lumps
-    LUMP_ENTITIES = 0u,     // Mod_LoadEntities
-    LUMP_PLANES = 1u,     // Mod_LoadPlanes
-    LUMP_TEXTURES = 2u,     // Mod_LoadTextures
-    LUMP_VERTEXES = 3u,     // Mod_LoadVertexes
-    LUMP_VISIBILITY = 4u,     // Mod_LoadVisibility
-    LUMP_NODES = 5u,     // Mod_LoadNodes
-    LUMP_TEXINFO = 6u,     // Mod_LoadTexinfo
-    LUMP_FACES = 7u,     // Mod_LoadFaces
-    LUMP_LIGHTING = 8u,     // Mod_LoadLighting
-    LUMP_CLIPNODES = 9u,     // Mod_LoadClipnodes
-    LUMP_LEAFS = 10u,    // Mod_LoadLeafs
-    LUMP_MARKSURFACES = 11u,    // Mod_LoadMarksurfaces
-    LUMP_EDGES = 12u,    // Mod_LoadEdges
-    LUMP_SURFEDGES = 13u,    // Mod_LoadSurfedges
-    LUMP_MODELS = 14u,    // Mod_LoadSubmodels
+typedef enum {  // BSP Lumps
+    LUMP_ENTITIES = 0u, // Mod_LoadEntities
+    LUMP_PLANES,        // Mod_LoadPlanes
+    LUMP_TEXTURES,      // Mod_LoadTextures
+    LUMP_VERTEXES,      // Mod_LoadVertexes
+    LUMP_VISIBILITY,    // Mod_LoadVisibility
+    LUMP_NODES,         // Mod_LoadNodes
+    LUMP_TEXINFO,       // Mod_LoadTexinfo
+    LUMP_FACES,         // Mod_LoadFaces
+    LUMP_LIGHTING,      // Mod_LoadLighting
+    LUMP_CLIPNODES,     // Mod_LoadClipnodes
+    LUMP_LEAFS,         // Mod_LoadLeafs
+    LUMP_MARKSURFACES,  // Mod_LoadMarksurfaces
+    LUMP_EDGES,         // Mod_LoadEdges
+    LUMP_SURFEDGES,     // Mod_LoadSurfedges
+    LUMP_MODELS,        // Mod_LoadSubmodels
 
-    HEADER_LUMPS = 15u  // total count of lumps in BSP header
+    HEADER_LUMPS        // total count of lumps in BSP header
 } LumpType;
-
 
 typedef struct {
     int32_t version;
@@ -49,7 +48,7 @@ STATIC_ASSERT_SIZE(dHeader_t, 4 + 15 * 8); // 124
 // #else
 #endif
 #include "render.h"
-#include <string.h>
+#include <string.h>  // strcpy, memcpy
 #include <stdio.h>
 #include <math.h>
 
@@ -136,10 +135,10 @@ void Mod_LoadTextures(Lump_p Lump_in) {
     );
 
     for (int i = 0; i < m->nummiptex; i++) {
-        m->dataofs[i] = LittleLong(m->dataofs[i]);
-        if (m->dataofs[i] == -1)        continue;
+        m->dataOfs[i] = LittleLong(m->dataOfs[i]);
+        if (m->dataOfs[i] == -1)        continue;
 
-        MipTex_p mt = (MipTex_p)((uint8_p)m + m->dataofs[i]);
+        MipTex_p mt = (MipTex_p)((uint8_p)m + m->dataOfs[i]);
         mt->width = LittleLong(mt->width);
         mt->height = LittleLong(mt->height);
 
@@ -188,8 +187,8 @@ void Mod_LoadTextures(Lump_p Lump_in) {
             continue; // allready sequenced
 
         // find the number of frames in the animation
-        Texture_p anims[10];    memset(anims, 0, sizeof(anims));
-        Texture_p altanims[10]; memset(altanims, 0, sizeof(altanims));
+        Texture_p anims[10] = { 0 };
+        Texture_p altanims[10] = { 0 };
 
         int max = tx->name[1];
         int altmax = 0;
@@ -418,7 +417,7 @@ Fills in s->texturemins[] and s->extents[]
 ================
 */
 void CalcSurfaceExtents(mSurface_p s) {
-    vec2_t mins = { .s = 999999.0f,  .t = 999999.0f  };
+    vec2_t mins = { .s = 999999.0f,  .t = 999999.0f };
     vec2_t maxs = { .s = -999999.0f, .t = -999999.0f };
     int bmins[VECT_TX_DIM];
     int bmaxs[VECT_TX_DIM];
@@ -438,7 +437,7 @@ void CalcSurfaceExtents(mSurface_p s) {
             float val = DotProduct(v->position, tex->vecs[j].vx) + tex->vecs[j].offs;
             if (val < mins.v[j])  mins.v[j] = val;  // not CLAMP but GET MIN
             if (val > maxs.v[j])  maxs.v[j] = val;  // not CLAMP but GET MAX
-            }
+        }
     }
 
     for (int i = 0; i < VECT_TX_DIM; i++) {

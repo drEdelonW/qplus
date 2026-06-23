@@ -821,6 +821,7 @@ SV_Move
 ==================
 */
 trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_t type, edict_p passedict) {
+#if 0
     moveClip_t clip;  memset(&clip, 0, sizeof(moveClip_t));
 
     // clip to world
@@ -841,7 +842,25 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
         clip.mins2 = mins;
         clip.maxs2 = maxs;
     }
+#else
+    moveClip_t clip = {
+        // .boxmins = ,
+        // .boxmaxs = ,
 
+        .mins = mins,
+        .maxs = maxs,
+
+        .mins2 = (type == MOVE_MISSILE)? Scalar2Vector(-15.0f) : mins,
+        .maxs2 = (type == MOVE_MISSILE)? Scalar2Vector(15.0f) : maxs,
+
+        .start = start,
+        .end = end,
+
+        .trace = SV_ClipMoveToEntity(Edicts, start, mins, maxs, end),
+        .type = type,
+        .passedict = passedict
+    };
+#endif
     SV_MoveBounds(start, clip.mins2, clip.maxs2, end, &clip.boxmins, &clip.boxmaxs);  // create the bounding box of the entire move
     SV_ClipToLinks(_sv_AreaNodes, &clip); // clip to entities
 

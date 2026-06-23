@@ -679,7 +679,7 @@ void R_PolyBlend() {
 
 int SignbitsForPlane(mPlane_p out) {
     // for fast box on planeside test
-    int bits = 0;
+    int bits = 0x00;
     for (int j = 0; j < VECT_DIM; j++) {
         if (out->normal.v[j] < 0.0f)
             bits |= 1 << j;

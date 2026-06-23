@@ -251,7 +251,7 @@ void CL_SendMove(UserCmd_p cmd) {
     MSG_WriteByte(&buf, clc_move); MSG_WriteFloat(&buf, (float)cl.mtime[0]); // so server can get ping times
 
     for (int i = 0; i < VECT_DIM; i++)
-        MSG_WriteAngle(&buf, cl.viewangles.v[i]);
+        MSG_WriteAngle(&buf, cl.viewangles.v[i]);   // TODO: wrap MSG_WriteAngle to vector tools
 
     MSG_WriteShort(&buf, (int16_t)cmd->forwardmove);
     MSG_WriteShort(&buf, (int16_t)cmd->sidemove);

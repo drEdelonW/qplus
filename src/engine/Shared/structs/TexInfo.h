@@ -1,9 +1,7 @@
 #pragma once
 
 #include "types.h"
-#include "Texture.h"
-
-#include "Texture_pre.h"
+#include "vector.h"
 
 #if 0
 typedef float txVec_t[VECT_TX_DIM][4];   // [s/t][xyz offset]
@@ -18,6 +16,7 @@ typedef union {
 #endif
 STATIC_ASSERT_SIZE(txVec_t, 2*(3*4 + 4));
 
+#include "Texture_pre.h"    // Texture_p
 typedef struct {
     txVec_t     vecs;
     float       mipadjust;
@@ -26,7 +25,7 @@ typedef struct {
 } mTexInfo_t;
 typedef mTexInfo_t* mTexInfo_p;
 
-typedef struct TexInfo_s {
+typedef struct {
     txVec_t vecs;
     int32_t miptex;
     int32_t flags;

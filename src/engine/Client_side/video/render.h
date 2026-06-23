@@ -33,7 +33,7 @@ struct r_Entity_s {
     bool    forcelink;      // model changed
     int     update_type;
     EntityState_t baseline; // to fill in defaults in updates
-    LegacyTimeStamp_t  msgtime;        // time of last update
+    LegacyTimeStamp_t msgtime;// time of last update
     vec3_t  msg_origins[2]; // last two updates(0 is newest)
     vec3_t  origin;
     vec3_t  msg_angles[2];  // last two updates(0 is newest)
@@ -43,7 +43,7 @@ struct r_Entity_s {
     int     frame;
     float   syncbase;       // for client-side animations
     uint8_p colormap;
-    EntityEffects_t effects;  // light, particals, etc
+    EntityEffects_t effects;// light, particals, etc
     int     skinnum;        // for Alias models
     int     visframe;       // last frame this entity was found in an active leaf
     int     dlightframe;    // dynamic lighting
@@ -60,11 +60,11 @@ typedef struct {
     vRect_t vrect;                  // subwindow in video for refresh
     // FIXME: not need vrect next field here?
     vRect_t aliasvrect;             // scaled Alias version
-    int     vrectright, vrectbottom; // right & bottom screen coords
+    int     vrectright, vrectbottom;// right & bottom screen coords
     int     aliasvrectright, aliasvrectbottom; // scaled Alias versions
     float   vrectrightedge;         // rightmost right edge we care about, for use in edge list
     float   fvrectx, fvrecty;       // for floating-point compares
-    float   fvrectx_adj, fvrecty_adj; // left and top edges, for clamping
+    float   fvrectx_adj, fvrecty_adj;// left and top edges, for clamping
     int     vrect_x_adj_shift20;    //(vrect.x + 0.5 - epsilon) << 20
     int     vrectright_adj_shift20; //(vrectright + 0.5 - epsilon) << 20
     float   fvrectright_adj, fvrectbottom_adj;  // right and bottom edges, for clamping
