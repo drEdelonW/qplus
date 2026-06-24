@@ -20,11 +20,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // d_local.h:  private rasterization driver defs
 
-#ifndef GLQUAKE
-#   include "r_shared.h"
-#else
+#ifdef GLQUAKE
 #   include "qOpenGL.h"
+#else
+#   include "r_shared.h"
+#   include "render.h"
 #endif
+#include "fixed.h"
 #include "SurfCache.h"
 
 //

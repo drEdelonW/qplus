@@ -8,8 +8,8 @@
 #include "assert.h"
 
 
-extern Texture_p r_notexture_mip;
 #include "Texture_pre.h"    // Texture_p
+extern Texture_p r_notexture_mip;
 
 #define MIPLEVELS   (4)
 struct Texture_s {

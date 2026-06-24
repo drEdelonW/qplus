@@ -35,6 +35,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "msg.h"
 #include "q_tools.h"
+#include "transform.h"
+#include "render.h"
 
 /*
 

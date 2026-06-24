@@ -21,16 +21,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "client.h"
 #include "model.h"
-#include "BrushModel.h"
 #include "host.h"
 #include <string.h>
 #include <stdlib.h>
-#include "protocol.h"
 #include "sound.h"
 #include "cdaudio.h"
 #include "msg.h"
 #include "console.h"
-#include "common.h"
 #include "sbar.h"
 #include "cmd.h"
 #include "cbuf.h"
@@ -40,7 +37,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "gamedefs.h"
 #ifdef GLQUAKE
 #   include "qOpenGL.h"
+#   include "glquake.h"
+// #else
 #endif
+#   include "render.h"
 
 
 

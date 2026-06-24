@@ -19,9 +19,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_efrag.c
 
+#include "Node.h"
+// #include "eFrag_pre.h"
+#include "rEntity.h"
+#include "eFrag.h"
+#include "Leaf.h"
+#include "client.h"
 #include "r_local.h"
 #include "host.h"
-#include "world.h"
+#include "world.h"  // BOX_ON_PLANE_SIDE
 #include "console.h"
 
 mNode_p r_pefragtopnode;

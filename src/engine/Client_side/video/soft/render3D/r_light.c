@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_light.c
 
 #include "r_local.h"
+#include "d_local.h"
+#include "Surface.h"
 
 int r_dlightframecount;
 

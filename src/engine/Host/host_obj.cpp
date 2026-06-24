@@ -44,14 +44,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "menu.h"
 #include "sbar.h"
 #include "chase.h"
-#ifndef GLQUAKE
-#   include "d_iface.h"
-#   include "r_local.h"
-#else
+#ifdef GLQUAKE
 #   include "qOpenGL.h"
 #   include "client.h"
 #   include "cvar_q1.h"
 #   include "common.h"
+#else
+#   include "d_iface.h"
+#   include "r_local.h"
 #endif
 #include "mathlib.h"
 #include "screen.h"
@@ -63,7 +63,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "gamedefs.h"
 #include "GlobVars.h"
 #include "z_hunk.h"
-
+#include "render.h"
 /*
 
 A server can allways be started, even if the system started out as a client

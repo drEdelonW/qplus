@@ -44,7 +44,7 @@ struct glpoly_s {
 
 #include "Surface_pre.h"
 // it was [msurface_t]
-typedef struct mSurface_s {
+struct mSurface_s {
     int32_t     visframe;   // should be drawn when node is crossed
     int32_t     dlightframe;
     int32_t     dlightbits;
@@ -71,9 +71,7 @@ typedef struct mSurface_s {
     // lighting info
     uint8_t     styles[MAXLIGHTMAPS];
     uint8_p     samples;                // [numstyles*surfsize]
-} mSurface_t;
-typedef mSurface_t* mSurface_p;
-typedef mSurface_p* mSurface_ar;
+};
 
 #include "vid.h"  //    pixel_p
 // it was [drawsurf_t]

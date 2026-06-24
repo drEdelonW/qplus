@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "mathlib.h"
 #include "z_hunk.h"
 #include "q_tools.h"
+#include "model.h"
 
 extern cvar_t gl_subdivide_size;
 

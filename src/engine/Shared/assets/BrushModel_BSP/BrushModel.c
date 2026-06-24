@@ -1,5 +1,7 @@
 #include "assert.h"
 #include "Lump.h"
+#include "Texture.h"
+#include "Surface.h"
 
 typedef enum {  // BSP Lumps
     LUMP_ENTITIES = 0u, // Mod_LoadEntities
@@ -45,9 +47,9 @@ STATIC_ASSERT_SIZE(dHeader_t, 4 + 15 * 8); // 124
 #include "q_tools.h"
 #ifdef GLQUAKE
 #   include "qOpenGL.h"
-// #else
+#else
+#   include "render.h"
 #endif
-#include "render.h"
 #include <string.h>  // strcpy, memcpy
 #include <stdio.h>
 #include <math.h>

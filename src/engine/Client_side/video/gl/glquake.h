@@ -117,6 +117,7 @@ void R_ReadPointFile_f();
 #include "SurfCache.h"
 #include "Surface.h"
 #include "Particle.h"
+#include "RefDef.h"
 
 //====================================================
 

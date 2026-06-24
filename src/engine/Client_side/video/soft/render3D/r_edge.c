@@ -20,7 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_edge.c
 
 #include "r_local.h"
+#include "d_local.h"
 #include "sound.h"
+#include "Surface.h"
 
 #if 0
 // FIXME

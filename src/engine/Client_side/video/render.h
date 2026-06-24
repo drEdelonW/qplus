@@ -20,41 +20,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 // refresh.h -- public interface to refresh functions
-#include "model_effect.h"
-#include "EntityState.h"
-#include "qTime.h"
+#include "model_effect.h"   // RocketTrailType
 #include "transform.h"
-#include "model.h"
+#include "rEntity.h"
+#include "Texture_pre.h"
+#include "render.h"
 
 //=============================================================================
 
-// it was [entity_t] on render side
-struct r_Entity_s {
-    bool    forcelink;      // model changed
-    int     update_type;
-    EntityState_t baseline; // to fill in defaults in updates
-    LegacyTimeStamp_t msgtime;// time of last update
-    vec3_t  msg_origins[2]; // last two updates(0 is newest)
-    vec3_t  origin;
-    vec3_t  msg_angles[2];  // last two updates(0 is newest)
-    vec3_t  angles;
-    Model_p model;          // NULL = no model
-    efrag_p efrag;          // linked list of efrags
-    int     frame;
-    float   syncbase;       // for client-side animations
-    uint8_p colormap;
-    EntityEffects_t effects;// light, particals, etc
-    int     skinnum;        // for Alias models
-    int     visframe;       // last frame this entity was found in an active leaf
-    int     dlightframe;    // dynamic lighting
-    int     dlightbits;
-
-    // FIXME: could turn these into a union
-    int     trivial_accept;
-    mNode_p topnode;  // for bmodels, first world node that splits bmodel, or NULL if not split
-};
-typedef r_Entity_t* r_Entity_p;
-
+#if 1
+#include "RefDef.h"
+#else
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct {
     vRect_t vrect;                  // subwindow in video for refresh
@@ -78,16 +54,21 @@ typedef struct {
     float   fov_x, fov_y;
     int     ambientlight;
 } refdef_t;
-
+#endif
 
 //
 // refresh
 //
-// extern int      reinit_surfcache;
 extern refdef_t r_refdef;
 
 extern Basis_t  BS;
 extern vec3_t   r_origin;
+
+//
+// surface cache related
+//
+extern bool r_cache_thrash; // set if thrashing the surface cache
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -122,13 +103,6 @@ extern "C" {
     void R_TeleportSplash(vec3_t org);
 
     void R_PushDlights();
-
-
-    //
-    // surface cache related
-    //
-    // extern int  reinit_surfcache; // if 1, surface cache is currently empty and
-    extern bool r_cache_thrash; // set if thrashing the surface cache
 
     int  D_SurfaceCacheForRes(int width, int height);
     void D_FlushCaches();

@@ -20,32 +20,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // cl_main.c  -- client main loop
 
 #include "client.h"
-#include "cl_net.h"
 #include "mem_placement.h"
-#undef CLIENT   // TODO: remove this workaround
-#include "server.h"
 #include "host.h"
 #include <string.h>
-#include "sound.h"
 #include "console.h"
-// #include "msg.h"
-#include "protocol.h"
 #include <stdlib.h>
 #include "screen.h"
-#include "common.h"
 #include "cmd.h"
 #include "cbuf.h"
-#include "input.h"
 #include "angle.h"
 #include "cvar_q1.h"
 #include "Light.h"
 #include "Beam.h"
-
+#include "eFrag.h"
+#include "render.h"
 
 // we need to declare some mouse variables here, because the menu system
 // references them even when on a unix system.
-
-
 
 ClientState_t cl;
 ClientStatic_t cls;

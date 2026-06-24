@@ -2,15 +2,16 @@
 
 #include "assert.h"
 #include "types.h"
+#include "Leaf_pre.h"
 #include "Node.h"
-#include "Surface.h"
+#include "Surface_pre.h"
 #include "structs/Sound_struct.h" // TODO: fix name and kind of content
-#include "eFrag.h"
+#include "eFrag_pre.h"
 
 #define MAX_MAP_LEAFS           (8192)
 
 // it was [mleaf_t]
-typedef struct mLeaf_s {    // TODO: merge in shared head structure with  mNode_s
+struct mLeaf_s {    // TODO: merge in shared head structure with  mNode_s
     // common with node
     /* contents_t */int32_t contents;   // wil be a negative contents number
     int32_t visframe;   // node needs to be traversed if current
@@ -29,8 +30,8 @@ typedef struct mLeaf_s {    // TODO: merge in shared head structure with  mNode_
     int32_t nummarksurfaces;
     int32_t key;        // BSP sequence number for leaf's contents
     uint8_t ambient_sound_level[NUM_AMBIENTS];
-} mLeaf_t;
-typedef mLeaf_t* mLeaf_p;
+};
+
 
 
 // leaf 0 is the generic CONTENTS_SOLID leaf, used for all solid areas

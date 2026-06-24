@@ -13,6 +13,7 @@
 
 #include "platformdefs.h"
 #include "SyncType.h"
+#include "TexInfo.h"
 
 #define MAX_MAP_HULLS   (4)
 
@@ -42,7 +43,7 @@ typedef enum {
     mod_alias   //  .mdl
 } ModType_t;
 
-typedef struct {
+struct Model_s{
     char        name[MAX_QPATH];
     NeedLoad_t  needload;   // bmodels and sprites don't cache normally
     ModType_t   type;       // kind of content
@@ -75,7 +76,5 @@ typedef struct {
     cString entities;
     // additional model data
     CacheUser_t cache;  // only access through Mod_Extradata
-} Model_t;
-typedef Model_t* Model_p;
-
+};
 // must match definition in spritegn.h

@@ -19,18 +19,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // cl_tent.c -- client side temporary entities
 
+#include "client.h"
 #include "sound.h"
 #include <string.h>
-#include "msg.h"
-#include "host.h"
-#include "protocol.h"
-#include "console.h"
-#include "client.h"
-#include "mathlib.h"
-// #include "model.h"
-#include "BrushModel.h"
-#include "Light.h"
 #include <stdlib.h>
+#include "msg.h"
+#include "model.h"
+#include "host.h"
+#include "console.h"
+#include "mathlib.h"
+#include "render.h"
+#include "Light.h"
 
 //
 // temp entity events

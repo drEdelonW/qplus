@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_misc.c
 
 #include "r_local.h"
+#include "render.h"
 #include "host.h"
 #include "sbar.h"
 #include "q_tools.h"

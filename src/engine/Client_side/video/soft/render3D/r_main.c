@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // r_main.c
 
 #include "r_local.h"
+#include "render.h"
 #include "host.h"
 #include "sys.h"
 #include "sound.h"
@@ -28,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "q_tools.h"
 #include "z_hunk.h"
+#include "Texture.h"
 
 //define PASSAGES
 
@@ -104,9 +106,6 @@ int modcount;
 
 int* pfrustum_indexes[4];
 int r_frustum_indexes[4 * 6];
-
-// int  reinit_surfcache = 1; // if 1, surface cache is currently empty and
-// must be reinitialized for current cache size
 
 mLeaf_p     r_viewleaf, r_oldviewleaf;
 Texture_p   r_notexture_mip;

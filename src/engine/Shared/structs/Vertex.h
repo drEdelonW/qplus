@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector.h"
+#include "fixed.h"
 //
 // in memory representation
 //
