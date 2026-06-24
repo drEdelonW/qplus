@@ -52,7 +52,7 @@ typedef ScoreBoard_t* ScoreBoard_p;
 
 typedef struct {
     uint8_t  destcolor[3];
-    uint8_t  percent;  // 0-256
+    int16_t  percent;  // 0-255 after clipping. should be signed and with higer dinamic range!
 } ColorShift_t;
 
 typedef enum cshift_kind_e {
