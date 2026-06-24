@@ -152,6 +152,18 @@ void R_InitTextures() {
 }
 
 /*
+================
+R_InitTurb
+================
+*/
+void R_InitTurb() {
+    for (int i = 0; i < (SIN_BUFFER_SIZE); i++) {
+        sintable[i] = AMP + sin(i * 3.14159 * 2 / CYCLE) * AMP;
+        intsintable[i] = AMP2 + sin(i * 3.14159 * 2 / CYCLE) * AMP2; // AMP2, not 20
+    }
+}
+
+/*
 ===============
 R_Init
 ===============
@@ -972,15 +984,4 @@ void R_RenderView() {
     R_RenderView_();
 }
 
-/*
-================
-R_InitTurb
-================
-*/
-void R_InitTurb() {
-    for (int i = 0; i < (SIN_BUFFER_SIZE); i++) {
-        sintable[i] = AMP + sin(i * 3.14159 * 2 / CYCLE) * AMP;
-        intsintable[i] = AMP2 + sin(i * 3.14159 * 2 / CYCLE) * AMP2; // AMP2, not 20
-    }
-}
 
