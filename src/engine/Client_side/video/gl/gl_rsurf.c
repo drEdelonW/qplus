@@ -657,7 +657,7 @@ void R_BlendLightmaps() {
             else {
                 glBegin(GL_POLYGON); {
                     for (int j = 0; j < p->numverts; j++) {
-                        glVert_t v = p->verts[i];
+                        glVert_t v = p->verts[j];
                         glTexCoord2f(v.vf[5], v.vf[6]);   glVertex3fv(v.vf);
                     }
                 } glEnd();
