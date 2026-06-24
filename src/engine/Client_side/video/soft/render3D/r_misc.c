@@ -267,7 +267,7 @@ vec3_t/*void*/  TransformVector(vec3_t in /*, vec3_p out */) {
 
 #endif
 
-
+#if 0  // not used
 /*
     ================
     R_TransformPlane
@@ -279,7 +279,7 @@ void R_TransformPlane(mPlane_p p, vec3_p normal, float_p dist) {
     // TODO: when we have rotating entities, this will need to use the view matrix
     *normal = TransformVector(p->normal);
 }
-
+#endif
 
 /*
     ===============

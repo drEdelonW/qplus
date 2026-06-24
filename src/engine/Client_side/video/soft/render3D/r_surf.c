@@ -43,7 +43,7 @@ void R_DrawSurfaceBlock8_mip1();
 void R_DrawSurfaceBlock8_mip2();
 void R_DrawSurfaceBlock8_mip3();
 
-static void (*surfmiptable[4])() = {
+static void (*surfmiptable[MIPLEVELS])() = {
     R_DrawSurfaceBlock8_mip0,
     R_DrawSurfaceBlock8_mip1,
     R_DrawSurfaceBlock8_mip2,

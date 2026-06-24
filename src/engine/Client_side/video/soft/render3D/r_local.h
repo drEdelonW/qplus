@@ -39,20 +39,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct {
     int     ambientlight;
     int     shadelight;
-    vec3_p plightvec;
+    vec3_p  plightvec;
 } aLight_t;
 typedef aLight_t* aLight_p;
 
-
-
 //===========================================================================
-
 
 #define XCENTERING (1.0 / 2.0)
 #define YCENTERING (1.0 / 2.0)
-
 #define CLIP_EPSILON  0.001
-
 #define BACKFACE_EPSILON 0.01
 
 //===========================================================================
@@ -81,17 +76,9 @@ void R_RenderWorld();
 extern mPlane_t screenedge[4];  // r_main.c
 extern vec3_t   r_origin;
 extern vec3_t   r_entorigin;
-#if 0   // not needed extern
-extern float    screenAspect;
-extern float    verticalFieldOfView;
-extern float    xOrigin, yOrigin;
-#endif
 extern int      r_visframecount;    // r_main.c
 
 //=============================================================================
-
-void R_ClearPolyList();
-void R_DrawPolyList();
 
 //
 // current entity info
@@ -106,44 +93,39 @@ void R_DrawSprite();
 void R_RenderFace(mSurface_p fa, int clipflags);
 void R_RenderPoly(mSurface_p fa, int clipflags);
 void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf);
-void R_TransformPlane(mPlane_p p, vec3_p normal, float_p dist);
+// void R_TransformPlane(mPlane_p p, vec3_p normal, float_p dist);
 void R_TransformFrustum();
 void R_SetSkyFrame();
 void R_DrawSurfaceBlock16();
-void R_DrawSurfaceBlock8();
 
 #if id386
-
+// used for surfmiptable[]
 void R_DrawSurfaceBlock8_mip0();
 void R_DrawSurfaceBlock8_mip1();
 void R_DrawSurfaceBlock8_mip2();
 void R_DrawSurfaceBlock8_mip3();
-
 #endif
 
 void R_GenSkyTile(TypeLess_ptr pdest);
 void R_GenSkyTile16(TypeLess_ptr pdest);
-void R_Surf8Patch();
-void R_Surf16Patch();
+void R_Surf8Patch();    // we only patch code on Intel
+void R_Surf16Patch();   // we only patch code on Intel
 void R_DrawSubmodelPolygons(Model_p pmodel, int clipflags);
 void R_DrawSolidClippedSubmodelPolygons(Model_p pmodel);
 
-void R_AddPolygonEdges(EmitPoint_p pverts, int numverts, int miplevel);
-Surf_p R_GetSurf();
 void R_AliasDrawModel(aLight_p plighting);
 void R_BeginEdgeFrame();
 void R_ScanEdges();
 void D_DrawSurfaces();
-void R_InsertNewEdges(Edge_p edgestoadd, Edge_p edgelist);
-void R_StepActiveU(Edge_p pedge);
-void R_RemoveEdges(Edge_p pedge);
 
+#if id386
 extern void R_Surf8Start();
 extern void R_Surf8End();
 extern void R_Surf16Start();
 extern void R_Surf16End();
 extern void R_EdgeCodeStart();
 extern void R_EdgeCodeEnd();
+#endif
 
 extern void R_RotateBmodel();
 
@@ -190,7 +172,6 @@ typedef btofpoly_t* btofpoly_p;
 extern btofpoly_p   pbtofpolys;     // r_main.c
 extern int          numbtofpolys;   // r_main.c
 
-void R_InitTurb();
 void R_ZDrawSubmodelPolys(Model_p clmodel);
 
 //=========================================================
@@ -215,10 +196,12 @@ bool R_AliasCheckBBox();
 //=========================================================
 // particle stuff
 
+#if 1   // Public functions for Soft and OpenGL render
 void R_DrawParticles();
 void R_InitParticles();
 void R_ClearParticles();
 void R_ReadPointFile_f();
+#endif
 void R_SurfacePatch();
 
 extern int      r_numallocatededges;
@@ -236,12 +219,7 @@ extern mVertex_p    r_pcurrentvertbase; // r_main.c
 
 void R_AliasClipTriangle(mTriangle_p ptri);
 
-#if 1   // TIME
-extern float    r_time1;    // r_main.c
-#else
-// TODO: move this to time specific code
-#endif
-
+extern float    r_time1; // r_main.c // TODO: move this to time specific code
 extern int      r_frustum_indexes[];   // r_main.c
 extern int      r_maxsurfsseen, r_maxedgesseen;
 extern int      r_cnumsurfs;
@@ -253,16 +231,15 @@ extern int      r_clipflags;
 extern int      r_dlightframecount;
 
 void R_StoreEfrags(efrag_ar ppefrag);
+#if 1   // Public functions for Soft and OpenGL render
 void R_TimeRefresh_f();
+void R_AnimateLight();
+int  R_LightPoint(vec3_t p);
+#endif
 void R_TimeGraph();
 void R_PrintAliasStats();
 void R_PrintTimes();
-void R_AnimateLight();
-int  R_LightPoint(vec3_t p);
 void R_SetupFrame();
-void R_cshift_f();
-void R_EmitEdge(mVertex_p pv0, mVertex_p pv1);
-void R_ClipEdge(mVertex_p pv0, mVertex_p pv1, ClipPlane_p clip);
 void R_SplitEntityOnNode2(mNode_p node);
 
 #include "Light.h"

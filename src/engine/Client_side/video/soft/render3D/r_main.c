@@ -131,7 +131,7 @@ R_InitTextures
 */
 void R_InitTextures() {
     // create a simple checkerboard texture for the default
-    r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + (16*16) + (8*8) + (4*4) + (2*2), "notexture");
+    r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + (16 * 16) + (8 * 8) + (4 * 4) + (2 * 2), "notexture");
 
     r_notexture_mip->width = r_notexture_mip->height = 16;
     r_notexture_mip->offsets[0] = sizeof(Texture_t);
@@ -868,7 +868,7 @@ void R_PrintDSpeeds() {
     float se_time = (se_time2 - se_time1) * 1000;
     float de_time = (de_time2 - de_time1) * 1000;
     float dv_time = (dv_time2 - dv_time1) * 1000;
-    float ms = (r_time2 - r_time1) * 1000;
+    float ms = /*   */(r_time2 - r_time1) * 1000;
 
     Con_Printf(
         "%3i %4.1fp %3iw %4.1fb %3is %4.1fe %4.1fv\n",
@@ -915,15 +915,10 @@ void R_RenderView_() {
     if (!cl_entities[0].model || !cl.worldmodel)
         Host_SysError("R_RenderView: NULL worldmodel");
 
-    if (!r_dspeeds.value) {
-        VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); // don't let sound get messed up if going slow
-    }
-
+    if (!r_dspeeds.value) { VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); } // don't let sound get messed up if going slow
     R_EdgeDrawing();
-
-    if (!r_dspeeds.value) {
-        VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); // don't let sound get messed up if going slow
-    }
+    if (!r_dspeeds.value) { VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); } // don't let sound get messed up if going slow
+    
 
     if (r_dspeeds.value) {
         se_time2 = Host_FloatTime();
