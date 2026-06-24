@@ -39,7 +39,8 @@ r_Entity_t r_worldentity; // was Entity_t
 
 bool r_cache_thrash;  // compatability
 
-vec3_t  modelorg, r_entorigin;
+vec3_t  modelorg;
+vec3_t  r_entorigin;
 r_Entity_p currententity;
 int   r_visframecount; // bumped when going to a new PVS
 int   r_framecount;  // used for dlight push checking

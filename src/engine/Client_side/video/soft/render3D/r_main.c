@@ -52,7 +52,8 @@ btofpoly_p  pbtofpolys;
 mVertex_p   r_pcurrentvertbase;
 
 int     c_surf;
-int     r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
+int     r_maxsurfsseen, r_maxedgesseen;
+int r_cnumsurfs;
 bool    r_surfsonstack;
 int     r_clipflags;
 
@@ -77,7 +78,6 @@ float  xcenter, ycenter;
 float  xscale, yscale;
 float  xscaleinv, yscaleinv;
 float  xscaleshrink, yscaleshrink;
-float  aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
 
 int  screenwidth;
 
@@ -110,7 +110,6 @@ int r_frustum_indexes[4 * 6];
 
 mLeaf_p     r_viewleaf, r_oldviewleaf;
 Texture_p   r_notexture_mip;
-float       r_aliastransition, r_resfudge;
 
 int  d_lightstylevalue[256]; // 8.8 fraction of base light value
 
@@ -713,9 +712,9 @@ void R_DrawBEntitiesOnList() {
             if (clipflags != BMODEL_FULLY_CLIPPED) {
                 r_entorigin = currententity->origin;
                 modelorg = VectorSubtract(r_origin, r_entorigin);
-                // FIXME: is this needed?
-                r_worldmodelorg = modelorg;
-
+#if 0
+                r_worldmodelorg = modelorg;                // FIXME: is this needed?
+#endif
                 r_pcurrentvertbase = clmodel->vertexes;
 
                 R_RotateBmodel();   // FIXME: stop transforming twice
@@ -853,6 +852,31 @@ void R_EdgeDrawing() {
 
     if (!(r_drawpolys | r_drawculledpolys))
         R_ScanEdges();
+}
+
+/*
+    =============
+    R_PrintDSpeeds
+    =============
+*/
+void R_PrintDSpeeds() {
+    float r_time2 = Host_FloatTime();
+
+    float dp_time = (dp_time2 - dp_time1) * 1000;
+    float rw_time = (rw_time2 - rw_time1) * 1000;
+    float db_time = (db_time2 - db_time1) * 1000;
+    float se_time = (se_time2 - se_time1) * 1000;
+    float de_time = (de_time2 - de_time1) * 1000;
+    float dv_time = (dv_time2 - dv_time1) * 1000;
+    float ms = (r_time2 - r_time1) * 1000;
+
+    Con_Printf(
+        "%3i %4.1fp %3iw %4.1fb %3is %4.1fe %4.1fv\n",
+        (int)ms, dp_time,
+        (int)rw_time, db_time,
+        (int)se_time, de_time,
+        dv_time
+    );
 }
 
 

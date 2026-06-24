@@ -188,31 +188,6 @@ void R_PrintTimes() {
 }
 
 
-/*
-    =============
-    R_PrintDSpeeds
-    =============
-*/
-void R_PrintDSpeeds() {
-    float r_time2 = Host_FloatTime();
-
-    float dp_time = (dp_time2 - dp_time1) * 1000;
-    float rw_time = (rw_time2 - rw_time1) * 1000;
-    float db_time = (db_time2 - db_time1) * 1000;
-    float se_time = (se_time2 - se_time1) * 1000;
-    float de_time = (de_time2 - de_time1) * 1000;
-    float dv_time = (dv_time2 - dv_time1) * 1000;
-    float ms = (r_time2 - r_time1) * 1000;
-
-    Con_Printf(
-        "%3i %4.1fp %3iw %4.1fb %3is %4.1fe %4.1fv\n",
-        (int)ms, dp_time,
-        (int)rw_time, db_time,
-        (int)se_time, de_time,
-        dv_time
-    );
-}
-
 
 /*
     =============
@@ -363,7 +338,8 @@ void R_SetupFrame() {
         CLAMP_MIN(r_maxedgesseen, edgecount);
 
         Con_Printf("Used %d of %d edges; %d max\n",
-            edgecount, r_numallocatededges, r_maxedgesseen);
+            edgecount, r_numallocatededges, r_maxedgesseen
+        );
     }
 
     r_refdef.ambientlight = r_ambient.value;

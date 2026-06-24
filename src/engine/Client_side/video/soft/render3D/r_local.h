@@ -78,18 +78,17 @@ void R_RenderWorld();
 
 //=============================================================================
 
-extern mPlane_t screenedge[4];
+extern mPlane_t screenedge[4];  // r_main.c
 extern vec3_t   r_origin;
 extern vec3_t   r_entorigin;
+#if 0   // not needed extern
 extern float    screenAspect;
 extern float    verticalFieldOfView;
 extern float    xOrigin, yOrigin;
-extern int      r_visframecount;
+#endif
+extern int      r_visframecount;    // r_main.c
 
 //=============================================================================
-
-extern int vstartscan;
-
 
 void R_ClearPolyList();
 void R_DrawPolyList();
@@ -97,8 +96,10 @@ void R_DrawPolyList();
 //
 // current entity info
 //
-extern bool insubmodel;
+extern bool insubmodel; // r_bsp.c
+#if 0   // not needed extern
 extern vec3_t  r_worldmodelorg;
+#endif
 
 
 void R_DrawSprite();
@@ -146,34 +147,27 @@ extern void R_EdgeCodeEnd();
 
 extern void R_RotateBmodel();
 
+#if 1   // Debug counters
 extern int c_faceclip;
 extern int r_polycount;
 extern int r_wholepolycount;
+extern int r_amodels_drawn;
+extern int r_bmodelactive;
+extern int r_outofsurfaces;
+extern int r_outofedges;
+#endif 
 
-extern Model_p cl_worldmodel;
-
-extern int* pfrustum_indexes[4];
+extern int* pfrustum_indexes[4];    // TODO: avoid int*
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 #define NEAR_CLIP 0.01
 
-extern int errorterm, erroradjustup, erroradjustdown;   // TODO: remove multipy external declarations
-extern int  vstartscan;
-
-extern fixed16_t    sadjust, tadjust;
-extern fixed16_t    bbextents, bbextentt;
-
 #define MAXBVERTINDEXES 1000 // new clipped vertices when clipping bmodels
 //  to the world BSP
-extern mVertex_p r_ptverts, r_ptvertsmax;
 
-extern mat3_t   sbaseaxis, tbaseaxis;
-extern mat3_t    entity_rotation;
 
-// extern int reinit_surfcache;
-
-extern int r_currentkey;
-extern int r_currentbkey;
+extern int r_currentkey;    // r_edge.c
+extern int r_currentbkey;   // r_bsp.c
 
 #ifdef STM32
     typedef uint8_t ClipFlag_t ;
@@ -193,8 +187,8 @@ typedef btofpoly_t* btofpoly_p;
 #   define MAX_BTOFPOLYS   5000 /* FIXME: tune this */
 #endif
 
-extern int          numbtofpolys;
-extern btofpoly_p   pbtofpolys;
+extern btofpoly_p   pbtofpolys;     // r_main.c
+extern int          numbtofpolys;   // r_main.c
 
 void R_InitTurb();
 void R_ZDrawSubmodelPolys(Model_p clmodel);
@@ -206,12 +200,6 @@ void R_ZDrawSubmodelPolys(Model_p clmodel);
 #define MAXALIASVERTS  2000 // TODO: tune this
 #define ALIAS_Z_CLIP_PLANE 5
 
-extern int          numverts;
-extern int          a_skinwidth;
-extern int          numtriangles;
-extern Mdl_p        pmdl;
-extern float        leftclip, topclip, rightclip, bottomclip;
-extern int          r_acliptype;
 extern FinalVert_p  pfinalverts;
 extern AuxVert_p    pauxverts;
 
@@ -233,62 +221,42 @@ void R_ClearParticles();
 void R_ReadPointFile_f();
 void R_SurfacePatch();
 
-extern int      r_amodels_drawn;
-extern Edge_p   auxedges;
 extern int      r_numallocatededges;
+extern Edge_p   auxedges;
 extern Edge_p   r_edges;
 extern Edge_p   edge_p;
 extern Edge_p   edge_max;
 extern Edge_p   newedges[MAXHEIGHT];
 extern Edge_p   removeedges[MAXHEIGHT];
 
-
-// FIXME: make stack vars when debugging done
-extern Edge_t   edge_head;
-extern Edge_t   edge_tail;
-extern Edge_t   edge_aftertail;
-extern int      r_bmodelactive;
-// extern vRect_p  pconupdate;
-
-extern float    aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
+extern float    aliasxscale, aliasyscale, aliasxcenter, aliasycenter;   // r_alias.c
 extern float    r_aliastransition, r_resfudge;
 
-extern int      r_outofsurfaces;
-extern int      r_outofedges;
-
-extern mVertex_p    r_pcurrentvertbase;
-extern int      r_maxvalidedgeoffset;
+extern mVertex_p    r_pcurrentvertbase; // r_main.c
 
 void R_AliasClipTriangle(mTriangle_p ptri);
 
-extern float    r_time1;
-extern float    dp_time1, dp_time2;
-extern float    db_time1, db_time2;
-extern float    rw_time1, rw_time2;
-extern float    se_time1, se_time2;
-extern float    de_time1, de_time2;
-extern float    dv_time1, dv_time2;
+#if 1   // TIME
+extern float    r_time1;    // r_main.c
+#else
+// TODO: move this to time specific code
+#endif
 
-extern int      r_frustum_indexes[4 * 6];
-extern int      r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
-extern bool r_surfsonstack;
-extern ColorShift_t cshift_water;
-extern bool r_dowarpold, r_viewchanged;
-
+extern int      r_frustum_indexes[];   // r_main.c
+extern int      r_maxsurfsseen, r_maxedgesseen;
+extern int      r_cnumsurfs;
+extern bool     r_dowarpold, r_viewchanged;
 extern mLeaf_p  r_viewleaf, r_oldviewleaf;
-
 extern vec3_t   r_emins, r_emaxs;
 extern mNode_p  r_pefragtopnode;
 extern int      r_clipflags;
 extern int      r_dlightframecount;
-extern bool r_fov_greater_than_90;
 
 void R_StoreEfrags(efrag_ar ppefrag);
 void R_TimeRefresh_f();
 void R_TimeGraph();
 void R_PrintAliasStats();
 void R_PrintTimes();
-void R_PrintDSpeeds();
 void R_AnimateLight();
 int  R_LightPoint(vec3_t p);
 void R_SetupFrame();

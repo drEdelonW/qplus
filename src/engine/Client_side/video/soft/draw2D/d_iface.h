@@ -95,7 +95,7 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts);
 void D_DrawPoly();
 void D_DrawSprite();
 void D_DrawSurfaces();
-void D_DrawZPoint();
+// void D_DrawZPoint();     //NOT USED
 void D_EnableBackBufferAccess();
 void D_EndParticles();
 void D_Init();

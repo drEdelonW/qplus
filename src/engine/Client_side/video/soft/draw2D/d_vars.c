@@ -52,6 +52,7 @@ fixed16_t bbextentt;
 pixel_p cacheblock;
 int     cachewidth;
 pixel_p d_viewbuffer;
+
 int16_p d_pzbuffer;
 uint32_t d_zrowbytes;
 uint32_t d_zwidth;

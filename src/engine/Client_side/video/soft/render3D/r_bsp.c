@@ -35,7 +35,10 @@ vec3_t      r_entorigin; // the currently rendering entity in world
 // coordinates
 
 mat3_t  entity_rotation;
+#if 0   // not needed extern
 vec3_t  r_worldmodelorg;
+#endif
+
 int     r_currentbkey;
 
 typedef enum {

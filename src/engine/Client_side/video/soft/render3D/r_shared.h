@@ -131,7 +131,6 @@ extern int d_lightstylevalue[256]; // 8.8 frac of base light value
 extern int r_skymade;
 extern void R_MakeSky();
 
-extern int errorterm, erroradjustup, erroradjustdown;   // TODO: remove multipy external declarations
 
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!

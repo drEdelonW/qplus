@@ -39,6 +39,8 @@ int     r_ambientlight;
 float   r_shadelight;
 FinalVert_p pfinalverts;
 AuxVert_p   pauxverts;
+float   aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
+float   r_aliastransition, r_resfudge;
 
 static float    _ziscale;
 static Model_p _pmodel;

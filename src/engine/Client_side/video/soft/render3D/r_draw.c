@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define FRAMECOUNT_MASK   (0x7FFFFFFF)
 
 static uint32_t _cacheOffset;
-int             c_faceclip;     // number of faces clipped
+int             c_faceclip;     // number of faces clipped - debug data
 zPointDesc_t    r_zpointdesc;
 PolyDesc_t      r_polydesc;
 
