@@ -67,7 +67,7 @@ extern vec3_t   r_origin;
 //
 // surface cache related
 //
-extern bool r_cache_thrash; // set if thrashing the surface cache
+
 
 
 #ifdef __cplusplus

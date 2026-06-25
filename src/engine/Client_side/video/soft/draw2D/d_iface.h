@@ -155,6 +155,5 @@ extern float skyspeed, skyspeed2;
 extern LegacyTimeDelta_t skytime;
 
 extern int c_surf;
-extern vRect_t scr_vrect;
 extern uint8_p r_warpbuffer;
 

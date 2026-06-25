@@ -123,7 +123,6 @@ void R_ReadPointFile_f();
 
 
 extern  r_Entity_t  r_worldentity;
-extern  bool        r_cache_thrash;        // compatability
 extern  vec3_t      modelorg, r_entorigin;
 extern  r_Entity_t* currententity;
 extern  int         r_visframecount;    // ??? what difs?

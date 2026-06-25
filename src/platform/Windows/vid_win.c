@@ -319,7 +319,7 @@ int VID_Suspend(MGLDC* dc, m_int flags) {
         // keep WM_PAINT from trying to redraw
         in_mode_set = true;
 
-        block_drawing = true;	// so we don't try to draw while switched away
+        scr.block_drawing = true;	// so we don't try to draw while switched away
 
         return MGL_NO_SUSPEND_APP;
     }
@@ -334,7 +334,7 @@ int VID_Suspend(MGLDC* dc, m_int flags) {
 
         vid.recalc_refdef = 1;
 
-        block_drawing = false;
+        scr.block_drawing = false;
 
         return MGL_NO_SUSPEND_APP;
     }

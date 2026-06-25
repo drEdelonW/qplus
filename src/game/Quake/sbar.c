@@ -793,7 +793,7 @@ void Sbar_Draw() {
         (sb_updates >= vid.numpages))
         return;
 
-    scr.copyeverything = 1;
+    scr.copyeverything = true;
 
     sb_updates++;
 
@@ -912,7 +912,7 @@ Sbar_DeathmatchOverlay
 int M_DrawPicHC(int y, qPic_p pic);
 
 void Sbar_DeathmatchOverlay() {
-    scr.copyeverything = 1;
+    scr.copyeverything = true;
     scr.fullupdate = 0;
 
     M_DrawPicHC(8, Draw_CachePic("gfx/ranking.lmp"));
@@ -988,7 +988,7 @@ void Sbar_MiniDeathmatchOverlay() {
         return;
     }
 
-    scr.copyeverything = 1;
+    scr.copyeverything = true;
     scr.fullupdate = 0;
 
     // scores
@@ -1073,7 +1073,7 @@ Sbar_IntermissionOverlay
 ==================
 */
 void Sbar_IntermissionOverlay() {
-    scr.copyeverything = 1;
+    scr.copyeverything = true;
     scr.fullupdate = 0;
 
     if (cl.gametype == GAME_DEATHMATCH) {
@@ -1110,7 +1110,7 @@ Sbar_FinaleOverlay
 ==================
 */
 void Sbar_FinaleOverlay() {
-    scr.copyeverything = 1;
+    scr.copyeverything = true;
     qPic_p pic = Draw_CachePic("gfx/finale.lmp");
     Draw_TransPic((vid.width - pic->width) / 2, 16, pic);
 }

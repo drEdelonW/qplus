@@ -112,6 +112,10 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 SRC_LIST += $(CL_SIDE_DIR)/cl_parse.c
                 SRC_LIST += $(CL_SIDE_DIR)/cl_tent.c
 
+                $(eval VID_DIR = $(CL_SIDE_DIR)/video) $(eval INCLUDES += $(VID_DIR))
+                        $(eval RENDER_DIR = $(VID_DIR)/comAPI) $(eval INCLUDES += $(RENDER_DIR))
+                                SRC_LIST += $(RENDER_DIR)/cScreen.c
+
 #         $(eval API_DIR := $(HOST_DIR)/API) $(eval INCLUDES += $(API_DIR))
 
 include features/fh_qRender$(QRND).mk

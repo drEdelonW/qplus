@@ -589,7 +589,7 @@ void GL_BeginRendering(int* x, int* y, int* width, int* height) {
 
 
 void GL_EndRendering() {
-    if (!scr_skipupdate || block_drawing)   SwapBuffers(maindc);
+    if (!scr_skipupdate || scr.block_drawing)   SwapBuffers(maindc);
 
     // handle the mouse state when windowed if that's changed
     if (modestate == MS_WINDOWED) {

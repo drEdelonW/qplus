@@ -19,9 +19,51 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // screen.h
+
+/*  Screen layout concept
+ * vid      (platform specific graphic environment)
+ * └── screen   (layer compositor)
+ *     ├── render viewport  (back layer)
+ *     ├── HUD              (overlay viewport)
+ *     │   ├── crosshair    (center of viewport)
+ *     │   ├── sbar         (bottom)
+ *     │   ├── status msgs  (top left corner)
+ *     │   └── sys icons    (top right corner)
+ *     ├── menu            (front layer)
+ *     └── echo console    (top layer, full/half screen)
+ * 
+ *  +--echo console (full / half screen)-----------+
+ *  +--menu----------------------------------------+
+ *  +--HUD-----------------------------------------+
+ *  |  [status msgs]                  [sys icons]  |
+ *  |                   [+]                        |
+ *  |               crosshair                      |
+ *  |  [==================sbar==================]  |
+ *  +--render viewport-----------------------------+
+ *  |  3D scene - player POV                       |
+ *  +----------------------------------------------+
+ */
+
 #include "types.h"
 #include "vid.h"
 #include "qTime.h"
+
+// only the refresh window will be updated unless these variables are flagged
+typedef struct {
+    bool    copytop;
+    bool    copyeverything;
+    float   con_current;
+    float   conlines;           // lines of console to display
+    int     fullupdate;         // set to 0 to force full redraw
+    vRect_t vrect;
+    bool    disabled_for_loading;
+    bool    skipupdate;
+    LegacyTimeDelta_t    centertime_off;
+    int     clearnotify;        // set to 0 whenever notify text is drawn
+    bool    block_drawing;
+    bool    r_cache_thrash;     // compatability
+} Screen_t;
+extern Screen_t scr;
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,11 +72,8 @@ extern "C" {
     void SCR_Init();
 
     void SCR_UpdateScreen();
-    void SCR_UpdateWholeScreen();
+    void SCR_UpdateWholeScreen();   // INFO: Win VID specific
 
-    void SCR_SizeUp();
-    void SCR_SizeDown();
-    void SCR_BringDownConsole();
     void SCR_CenterPrint(cString str);
 
     void SCR_BeginLoadingPlaque();
@@ -45,20 +84,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-// only the refresh window will be updated unless these variables are flagged
-typedef struct {
-    int      copytop;
-    int      copyeverything;
-    float    con_current;
-    float    conlines;  // lines of console to display
-    int      fullupdate; // set to 0 to force full redraw
-    vRect_t  vrect;
-    bool     disabled_for_loading;
-    bool     skipupdate;
-    LegacyTimeDelta_t    centertime_off;
-} Screen_t;
-extern Screen_t scr;
 
-extern int      clearnotify; // set to 0 whenever notify text is drawn
-extern bool     block_drawing;
+
 

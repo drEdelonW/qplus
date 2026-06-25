@@ -217,6 +217,10 @@ CVAR_EXTERN(scr_printspeed);
 CVAR_EXTERN(d_subdiv16);
 CVAR_EXTERN(d_mipcap);
 CVAR_EXTERN(d_mipscale);
+#ifdef GLQUAKE
+extern cvar_t  gl_triplebuffer;
+#endif
+
 
 // FROM: src/ui/chase.c
 CVAR_EXTERN(chase_back);
@@ -229,3 +233,4 @@ CVAR_EXTERN(v_gamma);
 
 CVAR_EXTERN(v_centermove);
 CVAR_EXTERN(v_centerspeed);
+

@@ -877,11 +877,7 @@ void V_RenderView() {
         Draw_Character(
             scr.vrect.x + scr.vrect.width / 2 + cl_crossx.value,
             scr.vrect.y + scr.vrect.height / 2 + cl_crossy.value,
-#if 1
             '+'
-#else
-            'Q'
-#endif
         );
 #endif
 

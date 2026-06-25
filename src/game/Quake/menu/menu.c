@@ -92,7 +92,7 @@ void M_Draw() {
         return;
 
     if (!m_recursiveDraw) {
-        scr.copyeverything = 1;
+        scr.copyeverything = true;
 
         if (scr.con_current) {
             Draw_ConsoleBackground(vid.height);

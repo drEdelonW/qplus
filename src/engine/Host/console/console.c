@@ -494,8 +494,8 @@ void Con_DrawNotify() {
 
         cString text = _con.text + (i % (int32_t)con.totallines) * _con.linewidth;
 
-        clearnotify = 0;
-        scr.copytop = 1;
+        scr.clearnotify = 0;
+        scr.copytop = true;
 
         for (int32_t x = 0; x < _con.linewidth; x++)
             Draw_Character((x + 1) << 3, v, text[x]);
@@ -504,8 +504,8 @@ void Con_DrawNotify() {
     }
 
     if (key.dest == key_message) {
-        clearnotify = 0;
-        scr.copytop = 1;
+        scr.clearnotify = 0;
+        scr.copytop = true;
 
         int32_t x = 0;
 

@@ -25,3 +25,4 @@ typedef struct {
     float   fov_x, fov_y;
     int     ambientlight;
 } refdef_t;
+extern bool r_cache_thrash; // set if thrashing the surface cache. OpenGL compatability;

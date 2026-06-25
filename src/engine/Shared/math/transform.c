@@ -65,23 +65,23 @@ void AngleVectors(vec3_t angles, vec3_p forward, vec3_p right, vec3_p up) {
     const float sr = sinf(angles.roll),  cr = cosf(angles.roll);  /* ring 3: roll  about X */
 
     /* Intermediate vectors from rings 1 and 2 */
-    const vec3_t rgt0 = {  sy,    -cy,    0  };  /* right after yaw   */
-    const vec3_t up1  = {  sp*cy,  sp*sy, cp };  /* up    after pitch */
+    const vec3_t rgt0 = {{  sy,    -cy,    0  }};  /* right after yaw   */
+    const vec3_t up1  = {{  sp*cy,  sp*sy, cp }};  /* up    after pitch */
 
     /* forward is the roll axis, so it is roll-invariant */
-    *forward = (vec3_t){ cp*cy,  cp*sy,  -sp };
+    *forward = (vec3_t){{ cp*cy,  cp*sy,  -sp }};
 
     /* ring 3: roll mixes rgt0 and up1 */
-    *right = (vec3_t){
+    *right = (vec3_t){{
         cr*rgt0.x - sr*up1.x,   /*  cr*sy  - sr*sp*cy */
         cr*rgt0.y - sr*up1.y,   /* -cr*cy  - sr*sp*sy */
         cr*rgt0.z - sr*up1.z,   /* -sr*cp             */
-    };
-    *up = (vec3_t){
+    }};
+    *up = (vec3_t){{
         sr*rgt0.x + cr*up1.x,   /*  sr*sy  + cr*sp*cy */
         sr*rgt0.y + cr*up1.y,   /* -sr*cy  + cr*sp*sy */
         sr*rgt0.z + cr*up1.z,   /*  cr*cp             */
-    };
+    }};
 #endif
 }
 
