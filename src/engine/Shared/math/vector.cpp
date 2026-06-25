@@ -3,12 +3,13 @@
 
 #include <math.h>
 #include "Vector3d.hpp"
-
+/* UNDER CONSTRUCTION */
+/* Will be cleaned after all necessary functionality was bringup */
 
 /*
 ** assumes "src" is normalized
 */
-vec3_t/*void*/  PerpendicularVector(/* vec3_p dst, */ const vec3_t src) {
+vec3_t PerpendicularVector(const vec3_t src) {
     vec3_t out;
     float minelem = 1.0f;
 
@@ -28,7 +29,7 @@ vec3_t/*void*/  PerpendicularVector(/* vec3_p dst, */ const vec3_t src) {
     return out;
 }
 
-vec3_t/*void*/  ProjectPointOnPlane(/* vec3_p dst, */ const vec3_t p, const vec3_t normal) {
+vec3_t ProjectPointOnPlane( const vec3_t p, const vec3_t normal) {
     vec3_t out;
     float inv_denom = 1.0F / DotProduct(normal, normal);
     float d = DotProduct(normal, p) * inv_denom;
@@ -52,7 +53,7 @@ bool VectorCompare(vec3_t const v1, vec3_t const v2) {
     return true;
 }
 
-vec3_t/*void*/ VectorMA(vec3_t veca, float scale, vec3_t vecb /*, vec3_p vecc */ ) {
+vec3_t VectorMA(vec3_t veca, float scale, vec3_t vecb) {
     vec3_t out;
 #if 1
     Vector3D aV(veca);
@@ -79,7 +80,7 @@ vec_t DotProduct(vec3_t const v1, vec3_t const v2) {
 #endif
 }
 
-vec3_t/*void*/ VectorSubtract(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ ) {
+vec3_t VectorSubtract(vec3_t const veca, vec3_t const vecb) {
     vec3_t out;
 #if 1
     Vector3D aV(veca);
@@ -93,7 +94,7 @@ vec3_t/*void*/ VectorSubtract(vec3_t const veca, vec3_t const vecb /*, vec3_p ou
     return out;
 }
 
-vec3_t/*void*/ VectorAdd(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ ) {
+vec3_t VectorAdd(vec3_t const veca, vec3_t const vecb) {
     vec3_t out;
 #if 1
     Vector3D aV(veca);
@@ -127,7 +128,7 @@ vec3_t  Scalar2Vector(vec_t scale) {
     return out;
 }
 
-vec3_t CrossProduct(vec3_t const v1, vec3_t const v2 /*, vec3_p cross */ ) {
+vec3_t CrossProduct(vec3_t const v1, vec3_t const v2) {
     vec3_t out;
 #if 1
     Vector3D aV(v1);
@@ -188,7 +189,7 @@ void VectorInverse(vec3_p v) {
 #endif
 }
 
-vec3_t VectorScale(vec3_t const in, vec_t const scale/*, vec3_p out */ ) {
+vec3_t VectorScale(vec3_t const in, vec_t const scale) {
     vec3_t out;
 #if 1
     Vector3D V(in);

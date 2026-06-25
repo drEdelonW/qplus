@@ -72,7 +72,7 @@ void CL_SignonReply() {
                 ((int)cl_color.value) & 15
             ));
 
-        char  str[8192];
+        char  str[8192];    // TODO: make this huge buffer out of stack!
         MSG_WriteByte(&cls.message, clc_stringcmd);
         snprintf(str, sizeof(str), "spawn %s", cls.spawnparms);
         MSG_WriteString(&cls.message, str);

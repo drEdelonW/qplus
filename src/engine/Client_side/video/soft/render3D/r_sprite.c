@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "console.h"
 
-static int      _clipCurrent = 0;
+static bool     _clipCurrent = false;
 static vec5_t   _clip_verts[2][MAXWORKINGVERTS];
 static int      _sprite_width, _sprite_height;
 
@@ -53,46 +53,30 @@ Clips the winding at _clip_verts[_clipCurrent] and changes _clipCurrent
 Throws out the back side
 ==============
 */
-#if 1
 int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
-    // printf("R_ClipSpriteFace\n");
-    float clipdist = pclipplane->dist;
-    vec3_t pclipnormal = pclipplane->normal;
-
     // calc dists
-    float_p in;
-    float_p outstep;
-    if (_clipCurrent) {
-        in = _clip_verts[1][0];
-        outstep = _clip_verts[0][0];
-        _clipCurrent = 0;
-    }
-    else {
-        in = _clip_verts[0][0];
-        outstep = _clip_verts[1][0];
-        _clipCurrent = 1;
-    }
+    _clipCurrent = !_clipCurrent;
+    vec5_p in = &_clip_verts[!_clipCurrent][0];
+    vec5_p outstep = &_clip_verts[_clipCurrent][0];
 
-    float_p instep = in;
-    int vsize = sizeof(vec5_t) / sizeof(float);
+    vec5_p instep = in;
     float dists[MAXWORKINGVERTS + 1];
-    for (int i = 0; i < nump; i++, instep += vsize) {
-        dists[i] = DotProduct(*(vec3_p)instep, pclipnormal) - clipdist;
+    int i = 0;
+    for (; i < nump; i++) {
+        dists[i] = DotProduct(instep[i].vx, pclipplane->normal) - pclipplane->dist;
     }
 
     // handle wraparound case
     dists[nump] = dists[0];
-    Q_memcpy(instep, in, sizeof(vec5_t));
-
+    instep[i] = *in;
 
     // clip the winding
     instep = in;
     int outcount = 0;
-
-    for (int i = 0; i < nump; i++, instep += vsize) {
+    for (int i = 0; i < nump; i++) {
         if (dists[i] >= 0) {
-            Q_memcpy(outstep, instep, sizeof(vec5_t));
-            outstep += vsize;
+            *outstep = instep[i];
+            outstep++;
             outcount++;
         }
 
@@ -102,84 +86,20 @@ int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
         // split it into a new vertex
         float frac = dists[i] / (dists[i] - dists[i + 1]);
 
-        float_p vert2 = instep + vsize;
+        for (int v = 0; v < sizeof(vec5_t); v++)
+            outstep->arr[v] = (
+                instep[i].arr[v] +
+                frac * (
+                    instep[i + 1].arr[v] -
+                    instep[i].arr[v])
+                );
 
-        for (int v = 0; v < vsize; v++)
-            outstep[v] = instep[v] + frac * (vert2[v] - instep[v]);
-
-        outstep += vsize;
+        outstep++;
         outcount++;
     }
 
     return outcount;
 }
-#else
-int R_ClipSpriteFace(int nump, ClipPlane_p pclipplane) {
-    printf("R_ClipSpriteFace\n");
-    float clipdist = pclipplane->dist;
-    vec3_p pclipnormal = &pclipplane->normal;
-
-    // calc dists
-    float_p in;         // vec5_t
-    float_p outstep;    // vec5_t
-#if 1
-    if (_clipCurrent) {
-        in = _clip_verts[1][0];
-        outstep = _clip_verts[0][0];
-        _clipCurrent = 0;
-    }
-    else {
-        in = _clip_verts[0][0];
-        outstep = _clip_verts[1][0];
-        _clipCurrent = 1;
-    }
-#else
-    _clipCurrent = !_clipCurrent;
-    in = _clip_verts[!_clipCurrent][0];
-    outstep = _clip_verts[_clipCurrent][0];
-#endif
-
-    float_p instep = in;    // vec5_t
-    int vsize = sizeof(vec5_t) / sizeof(float);
-    float dists[MAXWORKINGVERTS + 1];
-    for (int i = 0; i < nump; i++, instep += vsize) {
-        dists[i] = DotProduct(instep, *pclipnormal) - clipdist;
-    }
-
-    // handle wraparound case
-    dists[nump] = dists[0];
-    Q_memcpy(instep, in, sizeof(vec5_t));
-
-
-    // clip the winding
-    instep = in;
-    int outcount = 0;
-
-    for (int i = 0; i < nump; i++, instep += vsize) {
-        if (dists[i] >= 0) {
-            Q_memcpy(outstep, instep, sizeof(vec5_t));
-            outstep += vsize;
-            outcount++;
-        }
-
-        if ((dists[i] == 0) || (dists[i + 1] == 0))     continue;
-        if ((dists[i] > 0) == (dists[i + 1] > 0))       continue;
-
-        // split it into a new vertex
-        float frac = dists[i] / (dists[i] - dists[i + 1]);
-
-        float_p vert2 = instep + vsize;    // vec5_t
-
-        for (int v = 0; v < vsize; v++)
-            outstep[v] = instep[v] + frac * (vert2[v] - instep[v]);
-
-        outstep += vsize;
-        outcount++;
-    }
-
-    return outcount;
-}
-#endif
 
 /*
 ================
@@ -198,35 +118,29 @@ void R_SetupAndDrawSprite() {
     vec3_t left = VectorScale(r_spritedesc.bs.right, r_spritedesc.pspriteframe->left);
     vec3_t down = VectorScale(r_spritedesc.bs.up, r_spritedesc.pspriteframe->down);
 
+    vec3_t EntUp = VectorAdd(r_entorigin, up);
     vec5_p pverts = _clip_verts[0];
-
-    pverts[0][0] = r_entorigin.x + up.x + left.x;
-    pverts[0][1] = r_entorigin.y + up.y + left.y;
-    pverts[0][2] = r_entorigin.z + up.z + left.z;
-    pverts[0][3] = 0.0f;
-    pverts[0][4] = 0.0f;
-
-    pverts[1][0] = r_entorigin.x + up.x + right.x;
-    pverts[1][1] = r_entorigin.y + up.y + right.y;
-    pverts[1][2] = r_entorigin.z + up.z + right.z;
-    pverts[1][3] = _sprite_width;
-    pverts[1][4] = 0.0f;
-
-    pverts[2][0] = r_entorigin.x + down.x + right.x;
-    pverts[2][1] = r_entorigin.y + down.y + right.y;
-    pverts[2][2] = r_entorigin.z + down.z + right.z;
-    pverts[2][3] = _sprite_width;
-    pverts[2][4] = _sprite_height;
-
-    pverts[3][0] = r_entorigin.x + down.x + left.x;
-    pverts[3][1] = r_entorigin.y + down.y + left.y;
-    pverts[3][2] = r_entorigin.z + down.z + left.z;
-    pverts[3][3] = 0.0f;
-    pverts[3][4] = _sprite_height;
+    pverts[0] = (vec5_t){
+        .vx = VectorAdd(EntUp, left),
+        .vt = {.s = 0.0f,           .t = 0.0f}
+    };
+    pverts[1] = (vec5_t){
+        .vx = VectorAdd(EntUp, right),
+        .vt = {.s = _sprite_width,  .t = 0.0f}
+    };
+    vec3_t EntDown = VectorAdd(r_entorigin, down);
+    pverts[2] = (vec5_t){
+        .vx = VectorAdd(EntDown, right),
+        .vt = {.s = _sprite_width,  .t = _sprite_height}
+    };
+    pverts[3] = (vec5_t){
+        .vx = VectorAdd(EntDown, left),
+        .vt = {.s = 0.0f,           .t = _sprite_height}
+    };
 
     // clip to the frustum in worldspace
     int nump = 4;
-    _clipCurrent = 0;
+    _clipCurrent = false;
 
     for (int i = 0; i < 4; i++) {
         nump = R_ClipSpriteFace(nump, &view_clipplanes[i]);
@@ -235,12 +149,12 @@ void R_SetupAndDrawSprite() {
     }
 
     // transform vertices into viewspace and project
-    float_p pv = &_clip_verts[_clipCurrent][0][0];
+    vec5_p pv = &_clip_verts[_clipCurrent][0];
     r_spritedesc.nearzi = -999999.0f;
 
     EmitPoint_t outverts[MAXWORKINGVERTS + 1];
     for (int i = 0; i < nump; i++) {
-        vec3_t local = VectorSubtract(*(vec3_p)pv, r_origin);
+        vec3_t local = VectorSubtract(pv->vx, r_origin);
         vec3_t transformed = TransformVector(local);
 
         if (transformed.z < NEAR_CLIP)
@@ -251,8 +165,8 @@ void R_SetupAndDrawSprite() {
         if (pout->zi > r_spritedesc.nearzi)
             r_spritedesc.nearzi = pout->zi;
 
-        pout->s = pv[3];
-        pout->t = pv[4];
+        pout->s = pv->s;
+        pout->t = pv->t;
         pout->u = xcenter + xscale * pout->zi * transformed.x;
         pout->v = ycenter - yscale * pout->zi * transformed.y;
         pv += sizeof(vec5_t) / sizeof(*pv);
@@ -270,7 +184,7 @@ void R_SetupAndDrawSprite() {
 R_GetSpriteframe
 ================
 */
-mSpriteFrame_p R_GetSpriteframe(mSprite_p psprite) {
+mSpriteFrame_p R_GetSpriteframe(mSprite_p psprite) { // TODO: seems like OpenGL function as is
     int frame = currententity->frame;
     if ((frame >= psprite->numframes) || (frame < 0)) {
         Con_Printf("R_DrawSprite: no such frame %d\n", frame);
@@ -283,7 +197,7 @@ mSpriteFrame_p R_GetSpriteframe(mSprite_p psprite) {
     }
     else {
         mSpriteGroup_p pspritegroup = (mSpriteGroup_p)psprite->frames[frame].frameptr;
-        float_p pintervals = pspritegroup->intervals;
+        float_p pintervals = pspritegroup->intervals;   // TODO: replace by time interval specific type
         int numframes = pspritegroup->numframes;
         float fullinterval = pintervals[numframes - 1];
 
@@ -326,30 +240,32 @@ void R_DrawSprite() {
         // down, because the cross product will be between two nearly parallel
         // vectors and starts to approach an undefined state, so we don't draw if
         // the two vectors are less than 1 degree apart
-        vec3_t tvec = {
-            .x = -modelorg.x,
-            .y = -modelorg.y,
-            .z = -modelorg.z
-        };
+        vec3_t tvec = { .x = -modelorg.x, .y = -modelorg.y, .z = -modelorg.z };
         VectorNormalize(&tvec);
         float dot = tvec.z; // same as DotProduct (tvec, r_spritedesc.vup) because r_spritedesc.vup is 0, 0, 1
         if ((dot > 0.999848f) ||
             (dot < -0.999848f)) // cos(1 degree) = 0.999848
             return;
 
-        r_spritedesc.bs.up.x = 0;
-        r_spritedesc.bs.up.y = 0;
-        r_spritedesc.bs.up.z = 1;
-
-        r_spritedesc.bs.right.x = tvec.y;
+        r_spritedesc.bs.up = (vec3_t){
+            .x = 0.0f,
+            .y = 0.0f,
+            .z = 1.0f
+        };
         // r_spritedesc.bs.right = CrossProduct(r_spritedesc.bs.up, -modelorg);
-        r_spritedesc.bs.right.y = -tvec.x;
-        r_spritedesc.bs.right.z = 0;
+
+        r_spritedesc.bs.right = (vec3_t){
+            .x = tvec.y,
+            .y = -tvec.x,
+            .z = 0.0f
+        };
         VectorNormalize(&r_spritedesc.bs.right);
 
-        r_spritedesc.bs.forward.x = -r_spritedesc.bs.right.y;
-        r_spritedesc.bs.forward.y = r_spritedesc.bs.right.x;
-        r_spritedesc.bs.forward.z = 0;
+        r_spritedesc.bs.forward = (vec3_t){
+            .x = -r_spritedesc.bs.right.y,
+            .y = r_spritedesc.bs.right.x,
+            .z = 0.0f
+        };
         // r_spritedesc.bs.forward = CrossProduct(r_spritedesc.bs.right, r_spritedesc.bs.up);
     }
     else if (psprite->type == SPR_VP_PARALLEL) {
@@ -370,24 +286,20 @@ void R_DrawSprite() {
             (dot < -0.999848f)) // cos(1 degree) = 0.999848
             return;
 
-        r_spritedesc.bs.up = (vec3_t){
-             .x = 0.0f,
-             .y = 0.0f,
-             .z = 0.0f
-        };
+        r_spritedesc.bs.up = Scalar2Vector(0.0f);
 
         //  r_spritedesc.vright = CrossProduct(r_spritedesc.bs.up, BS.forward)
         r_spritedesc.bs.right = (vec3_t){
-             .x = BS.forward.y,
-             .y = -BS.forward.x,
-             .z = 0.0f
+            .x = BS.forward.y,
+            .y = -BS.forward.x,
+            .z = 0.0f
         };
         VectorNormalize(&r_spritedesc.bs.right);
 
         r_spritedesc.bs.forward = (vec3_t){
-             .x = -r_spritedesc.bs.right.y,
-             .y = r_spritedesc.bs.right.x,
-             .z = 0.0f
+            .x = -r_spritedesc.bs.right.y,
+            .y = r_spritedesc.bs.right.x,
+            .z = 0.0f
         };
         // r_spritedesc.bs.forward = CrossProduct(r_spritedesc.bs.right, r_spritedesc.bs.up)
     }
@@ -407,20 +319,15 @@ void R_DrawSprite() {
             .forward = BS.forward,
             .right = VectorMA(
                 VectorScale(BS.right, cr),
-                 sr, BS.up
-                ),
+                sr, BS.up),
             .up = VectorMA(
                 VectorScale(BS.right, -sr),
-                cr, BS.up
-                )
+                cr, BS.up)
         };
     }
-    else {
-        Host_SysError("R_DrawSprite: Bad sprite type %d", psprite->type);
-    }
+    else { Host_SysError("R_DrawSprite: Bad sprite type %d", psprite->type); }
 
     R_RotateSprite(psprite->beamlength);
-
     R_SetupAndDrawSprite();
 }
 

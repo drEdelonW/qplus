@@ -37,7 +37,11 @@ extern float    speedscale;  // for top sky and bottom sky
 extern bool     isPermedia;
 extern Model_p  _loadModel;
 #define NUMVERTEXNORMALS 162
-extern float r_avertexnormals[NUMVERTEXNORMALS][3];
+#if 0
+float r_avertexnormals[NUMVERTEXNORMALS][3];
+#else
+extern vec3_t r_avertexnormals[NUMVERTEXNORMALS];
+#endif
 
 #ifdef __cplusplus
 extern "C" {

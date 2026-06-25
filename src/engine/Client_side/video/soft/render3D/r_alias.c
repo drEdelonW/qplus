@@ -65,10 +65,16 @@ static aEdge_t _aEdges[12] = {
     {1, 4}, {2, 7}, {3, 6}
 };
 
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#if 0
 float r_avertexnormals[NUMVERTEXNORMALS][3] = {
+#else
+vec3_t r_avertexnormals[NUMVERTEXNORMALS] = {
+#endif
 #   include "anorms.h"
 };
+#pragma GCC diagnostic pop
 
 void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts);
 void R_AliasSetUpTransform(int trivial_accept);
@@ -409,8 +415,8 @@ void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, 
     fv->flags = pstverts->onseam;
 
     // lighting
-    float_p plightnormal = r_avertexnormals[pverts->lightnormalindex];
-    float lightcos = DotProduct(*(vec3_p)plightnormal, r_plightvec);
+    vec3_p plightnormal = &r_avertexnormals[pverts->lightnormalindex];
+    float lightcos = DotProduct(*plightnormal, r_plightvec);
     int temp = r_ambientlight;
 
     if (lightcos < 0) {
@@ -459,8 +465,8 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
         fv->flags = pstverts->onseam;
 
         // lighting
-        float_p plightnormal = r_avertexnormals[pverts->lightnormalindex];
-        float lightcos = DotProduct(*(vec3_p)plightnormal, r_plightvec);
+        vec3_p plightnormal = &r_avertexnormals[pverts->lightnormalindex];
+        float lightcos = DotProduct(*plightnormal, r_plightvec);
         int temp = r_ambientlight;
 
         if (lightcos < 0) {

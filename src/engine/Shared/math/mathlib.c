@@ -64,9 +64,9 @@ void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, f
 
     mat3_t im;
 
-    im.rows[0] = (vec3_t){m.m[0][0], m.m[1][0], m.m[2][0]};
-    im.rows[1] = (vec3_t){m.m[0][1], m.m[1][1], m.m[2][1]};
-    im.rows[2] = (vec3_t){m.m[0][2], m.m[1][2], m.m[2][2]};
+    im.rows[0] = (vec3_t){{m.m[0][0], m.m[1][0], m.m[2][0]}};
+    im.rows[1] = (vec3_t){{m.m[0][1], m.m[1][1], m.m[2][1]}};
+    im.rows[2] = (vec3_t){{m.m[0][2], m.m[1][2], m.m[2][2]}};
 
     float angle_rad = DEG2RAD(degrees);
     float c = cos(angle_rad);

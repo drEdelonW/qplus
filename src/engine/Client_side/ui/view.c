@@ -646,9 +646,18 @@ Idle swaying
 ==============
 */
 void V_AddIdle() {
+#if 0
     r_refdef.viewangles.roll += v_idlescale.value * sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value;
     r_refdef.viewangles.pitch += v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
     r_refdef.viewangles.yaw += v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
+#else
+    vec3_t v_i = (vec3_t){
+        .pitch = sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value,
+        .yaw = sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value,
+        .roll = sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value,
+    };
+    r_refdef.viewangles = VectorMA(r_refdef.viewangles, v_idlescale.value, v_i);
+#endif
 }
 
 
@@ -663,14 +672,14 @@ void V_CalcViewRoll() {
     float side = V_CalcRoll(cl_entities[cl.viewentity].angles, cl.velocity);
     r_refdef.viewangles.roll += side;
 
-    if (_v_DmgTime > 0) {
+    if (_v_DmgTime > 0.0f) {
         r_refdef.viewangles.roll += _v_DmgTime / v_kicktime.value * _v_DmgRoll;
         r_refdef.viewangles.pitch += _v_DmgTime / v_kicktime.value * _v_DmgPitch;
         _v_DmgTime -= host_frametime;
     }
 
-    if (cl.stats[STAT_HEALTH] <= 0) {
-        r_refdef.viewangles.roll = 80; // dead view angle
+    if (cl.stats[STAT_HEALTH] <= 0.0f) {
+        r_refdef.viewangles.roll = 80.0f; // dead view angle
         return;
     }
 

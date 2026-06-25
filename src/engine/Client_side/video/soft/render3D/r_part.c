@@ -152,10 +152,19 @@ void R_EntityParticles(r_Entity_p ent) {
         prt->color = 0x6F;
         prt->type = pt_explode;
 
+#if 0
         prt->org.x = ent->origin.x + r_avertexnormals[i][0] * dist + forward.x * _beamLength;
         prt->org.y = ent->origin.y + r_avertexnormals[i][1] * dist + forward.y * _beamLength;
         prt->org.z = ent->origin.z + r_avertexnormals[i][2] * dist + forward.z * _beamLength;
-    }
+#else
+        prt->org = VectorMA(VectorMA(
+            ent->origin, 
+            dist, r_avertexnormals[i]),
+            _beamLength, forward 
+        );
+#endif
+
+        }
 }
 
 

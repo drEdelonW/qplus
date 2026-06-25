@@ -1247,8 +1247,8 @@ void SV_Physics_Step(edict_p ent) {
         if (wasonground)
             if (!((ent->v.health <= 0.0) &&
                 !SV_CheckBottom(ent))) {
-                float_p vel = ent->v.velocity;
-                float speed = sqrt(vel[X_AX] * vel[X_AX] + vel[Y_AX] * vel[Y_AX]);
+                vec3_p vel = ent->v.velocity;
+                float speed = sqrt((vel->x * vel->x) + (vel->y * vel->y));
                 if (speed) {
                     float friction = sv_friction.value;
 
@@ -1259,8 +1259,8 @@ void SV_Physics_Step(edict_p ent) {
                         newspeed = 0;
                     newspeed /= speed;
 
-                    vel[X_AX] = vel[X_AX] * newspeed;
-                    vel[Y_AX] = vel[Y_AX] * newspeed;
+                    vel->x = vel->x * newspeed;
+                    vel->y = vel->y * newspeed;
                 }
             }
 

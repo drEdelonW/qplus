@@ -64,7 +64,11 @@ extern Basis_t  base_BS; // it was base_vpn, base_vright, base_vup;
 extern r_Entity_p   currententity;
 
 #define NUMVERTEXNORMALS 162
+#if 0
 extern float r_avertexnormals[NUMVERTEXNORMALS][3];
+#else
+extern vec3_t r_avertexnormals[NUMVERTEXNORMALS];
+#endif
 
 #define NUMSTACKEDGES       (2400)
 #define MINEDGES            NUMSTACKEDGES

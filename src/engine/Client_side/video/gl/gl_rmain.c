@@ -137,30 +137,27 @@ SPRITE MODELS
 R_GetSpriteFrame
 ================
 */
-mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) {
-    mSpriteFrame_p pspriteframe;
-
+mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) { // TODO: seems like software function as is
     mSprite_p psprite = currententity->model->cache.data;
     int frame = currententity->frame;
-
     if ((frame >= psprite->numframes) || (frame < 0)) {
         Con_Printf("R_DrawSprite: no such frame %d\n", frame);
         frame = 0;
     }
 
+    mSpriteFrame_p pspriteframe;
     if (psprite->frames[frame].type == SPR_SINGLE) {
         pspriteframe = psprite->frames[frame].frameptr;
     }
     else {
         mSpriteGroup_p pspritegroup = (mSpriteGroup_p)psprite->frames[frame].frameptr;
-        float_p pintervals = pspritegroup->intervals;
+        float_p pintervals = pspritegroup->intervals;   // TODO: replace by time interval specific type
         int numframes = pspritegroup->numframes;
         float fullinterval = pintervals[numframes - 1];
 
         LegacyTimeDelta_t time = cl.time + currententity->syncbase;
 
-        // when loading in Mod_LoadSpriteGroup, we guaranteed all interval values
-        // are positive, so we don't have to worry about division by 0
+        // when loading in Mod_LoadSpriteGroup, we guaranteed all interval values are positive, so we don't have to worry about division by 0
         LegacyTimeDelta_t targettime = time - ((int)(time / fullinterval)) * fullinterval;
 
         int i = 0;
@@ -168,7 +165,6 @@ mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) {
             if (pintervals[i] > targettime)
                 break;
         }
-
         pspriteframe = pspritegroup->frames[i];
     }
 
@@ -183,10 +179,7 @@ R_DrawSpriteModel
 =================
 */
 void R_DrawSpriteModel(r_Entity_p e) {
-    vec3_t point;
-
-    // don't even bother culling, because it's just a single
-    // polygon without a surface cache
+    // don't even bother culling, because it's just a single polygon without a surface cache
     mSpriteFrame_p frame = R_GetSpriteFrame(e);
     mSprite_p psprite = currententity->model->cache.data;
     vec3_t up, right;
@@ -202,34 +195,14 @@ void R_DrawSpriteModel(r_Entity_p e) {
     }
 
     glColor3f(1.0f, 1.0f, 1.0f);
-
     GL_DisableMultitexture();
-
     GL_Bind(frame->gl_texturenum);
-
     glEnable(GL_ALPHA_TEST); {
         glBegin(GL_QUADS); {
-
-            glTexCoord2f(0.0f, 1.0f);
-            point = VectorMA(e->origin, frame->down, up);
-            point = VectorMA(point, frame->left, right);
-            glVertex3fv(point.v);
-
-            glTexCoord2f(0.0f, 0.0f);
-            point = VectorMA(e->origin, frame->up, up);
-            point = VectorMA(point, frame->left, right);
-            glVertex3fv(point.v);
-
-            glTexCoord2f(1.0f, 0.0f);
-            point = VectorMA(e->origin, frame->up, up);
-            point = VectorMA(point, frame->right, right);
-            glVertex3fv(point.v);
-
-            glTexCoord2f(1.0f, 1.0f);
-            point = VectorMA(e->origin, frame->down, up);
-            point = VectorMA(point, frame->right, right);
-            glVertex3fv(point.v);
-
+            glTexCoord2f(0.0f, 1.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->down, up), frame->left,  right).v);
+            glTexCoord2f(0.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->up,   up), frame->left,  right).v);
+            glTexCoord2f(1.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->up,   up), frame->right, right).v);
+            glTexCoord2f(1.0f, 1.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->down, up), frame->right, right).v);
         } glEnd();
     } glDisable(GL_ALPHA_TEST);
 }
@@ -245,9 +218,16 @@ ALIAS MODELS
 
 #define NUMVERTEXNORMALS 162
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#if 0
 float r_avertexnormals[NUMVERTEXNORMALS][3] = {
-#include "anorms.h"
+#else
+vec3_t r_avertexnormals[NUMVERTEXNORMALS] = {
+#endif
+#   include "anorms.h"
 };
+#pragma GCC diagnostic pop
 
 vec3_t shadevector;
 float shadelight, ambientlight;

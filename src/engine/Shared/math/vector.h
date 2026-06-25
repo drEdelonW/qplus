@@ -26,9 +26,9 @@ typedef enum {
 
 /* Euler angle indices: up/down, left/right, roll (fall over) */
 enum {
-    PITCH       = 0u,  /* up/down */
-    YAW         = 1u,  /* left/right */
-    ROLL        = 2u,  /* roll (fall over) */
+    PITCH = 0u,  /* up/down */
+    YAW = 1u,  /* left/right */
+    ROLL = 2u,  /* roll (fall over) */
     ANGLES_COUNT = 3u
 };
 
@@ -40,7 +40,7 @@ typedef union {
 STATIC_ASSERT_SIZE(vec3_t, 3 * sizeof(vec_t));
 typedef vec3_t* vec3_p;
 
-#if 1   // TODO: rework textured vertex
+#if 0   /* TODO: rework textured vertex */
 typedef vec_t vec5_t[5];    // vec3_t(x/y/z) + vec2(s/t)
 #else
 typedef union {
@@ -64,23 +64,23 @@ extern "C" {
 
     void    VectorCopy(vec3_t const in, vec3_p out); // src/engine/Client_side/video/soft/render3D/r_alias.c:383
     vec3_t  Scalar2Vector(vec_t scale);
-    vec3_t  VectorAdd(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ );         // va + vb
-    vec3_t  VectorSubtract(vec3_t const veca, vec3_t const vecb /*, vec3_p out */ );    // va - vb
-    vec3_t  VectorScale(vec3_t const in, vec_t const scale /*, vec3_p out */ );         // va + s
-    vec3_t  VectorMA(vec3_t veca, float scale, vec3_t vecb /*, vec3_p vecc */ );        // va + (vb * s)
+    vec3_t  VectorAdd(vec3_t const veca, vec3_t const vecb);        // va + vb
+    vec3_t  VectorSubtract(vec3_t const veca, vec3_t const vecb);   // va - vb
+    vec3_t  VectorScale(vec3_t const in, vec_t const scale);        // va + s
+    vec3_t  VectorMA(vec3_t veca, float scale, vec3_t vecb);        // va + (vb * s)
 
-    void    VectorInverse(vec3_p v);                            // va = -va
-    bool    VectorCompare(vec3_t const v1, vec3_t const v2);    // va == vb (all dimension)
+    void    VectorInverse(vec3_p v);                                // va = -va
+    bool    VectorCompare(vec3_t const v1, vec3_t const v2);        // va == vb (all dimension)
     vec_t   Length(vec3_t const v);         // returns vector length
     float   VectorNormalize(vec3_p v);
 
     vec_t   DotProduct(vec3_t const v1, vec3_t const v2);
-    vec3_t  CrossProduct(vec3_t const v1, vec3_t const v2 /*, vec3_p cross */ );
+    vec3_t  CrossProduct(vec3_t const v1, vec3_t const v2);
 
-    vec3_t  PerpendicularVector(/* vec3_p dst, */ const vec3_t src);
-    vec3_t  ProjectPointOnPlane(/* vec3_p dst, */ const vec3_t p, const vec3_t normal);
+    vec3_t  PerpendicularVector(const vec3_t src);
+    vec3_t  ProjectPointOnPlane(const vec3_t p, const vec3_t normal);
 
-    vec3_t  TransformVector(vec3_t in /*, vec3_p out */ );  // TODO: move from  src/engine/Client_side/video/soft/render3D/r_misc.c
+    vec3_t  TransformVector(vec3_t in);  // TODO: move from  src/engine/Client_side/video/soft/render3D/r_misc.c
     vec3_t  VectorAddVal(vec3_t v, vec_t val);
 
 #ifdef __cplusplus

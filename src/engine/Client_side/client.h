@@ -70,7 +70,6 @@ typedef enum cshift_kind_e {
 //
 
 #define SIGNONS  4   // signon messages to receive before connected
-// #include "Light.h"
 
 typedef enum {
     ca_dedicated,       // a dedicated server with no ability to start a client
