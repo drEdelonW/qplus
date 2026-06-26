@@ -19,6 +19,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // console.c
 
+#include "types.h"
+#include "console.h"
+#include "common.h"
+#include "z_hunk.h"
+#include "enginedefs.h"
+#include "cvar_q1.h"
+#include "cmd.h"
 #ifdef NeXT
 #   include <libc.h>
 #endif
@@ -29,38 +36,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#include "console.h"
-// #include "keys.h"
-#include "client.h"
 #include "q_tools.h"
-#include "common.h"
-#include "zone.h"
-#include "cmd.h"
+#include "client.h"
 #include "sound.h"
 #include "screen.h"
 #include "host.h"
-#include "sys.h"
-// #include "draw.h"
-#include "cvar_q1.h"
-#include "z_hunk.h"
-
-#define CON_TEXTSIZE    (int32_t)0x4000 /*16Kb - 16384b*/
-
-
-int32_t edit_line;
 
 console_t con = {
     .cursorspeed = 4
 };
-
-typedef struct {
-    uint32_t  x;         // offset in current line for next print
-    bool     debuglog;
-} _console_t;
-
-static _console_t _con;
-
-
 
 /*
     ================
@@ -84,92 +68,15 @@ void Con_ClearNotify() {
         con.times[i] = 0;
 }
 
-
-/*
-    ================
-    Con_MessageMode_f
-    ================
-*/
-
-void Con_MessageMode_f() {
-    key.dest = key_message;
-    team_message = false;
-}
-
-
-/*
-    ================
-    Con_MessageMode2_f
-    ================
-*/
-void Con_MessageMode2_f() {
-    key.dest = key_message;
-    team_message = true;
-}
-
-
-/*
-    ================
-    Con_CheckResize
-
-    If the line width has changed, reformat the buffer.
-    ================
-*/
-void Con_CheckResize() {
-    int32_t width = (vid.width >> 3) - 2;
-    if (width == con.linewidth)
-        return;
-
-    if (width < 1) {   // video hasn't been initialized yet
-        width = 38;
-        con.linewidth = (int32_t)width;
-        con.totallines = CON_TEXTSIZE / con.linewidth;
-        Q_memset(con.text, ' ', CON_TEXTSIZE);
-    }
-    else {
-        uint32_t oldwidth = (uint32_t)con.linewidth;
-        con.linewidth = (int32_t)width;
-        int32_t oldtotallines = con.totallines;
-        con.totallines = CON_TEXTSIZE / con.linewidth;
-        int32_t numlines = oldtotallines;
-
-        if (con.totallines < numlines)
-            numlines = con.totallines;
-
-        uint32_t numchars = oldwidth;
-
-        if (con.linewidth < numchars)
-            numchars = (uint32_t)con.linewidth;
-
-        char tbuf[CON_TEXTSIZE];
-        Q_memcpy(tbuf, con.text, CON_TEXTSIZE);
-        Q_memset(con.text, ' ', CON_TEXTSIZE);
-
-        for (int32_t i = 0; i < numlines; i++) {
-            for (int32_t j = 0; j < numchars; j++) {
-                con.text[(con.totallines - 1 - i) * con.linewidth + j] =
-                    tbuf[((con.current - i + oldtotallines) %
-                        oldtotallines) * (int32_t)oldwidth + j];
-            }
-        }
-
-        Con_ClearNotify();
-    }
-
-    con.backscroll = 0;
-    con.current = (int32_t)con.totallines - 1;
-}
-
-
 /*
     ================
     Con_Init
     ================
 */
 void Con_Init() {
-    _con.debuglog = COM_CheckParm("-condebug");
+    con.debuglog = COM_CheckParm("-condebug");
 
-    if (_con.debuglog) {
+    if (con.debuglog) {
         cString t2 = "/qconsole.log";
         if (strlen(com.gamedir) < (MAXGAMEDIRLEN - strlen(t2))) {
             char temp[MAXGAMEDIRLEN + 1];
@@ -190,9 +97,7 @@ void Con_Init() {
     //
     Cvar_RegisterVariable(&con_notifytime);
 
-    Cmd_AddCommand("toggleconsole", Con_ToggleConsole_f);
-    Cmd_AddCommand("messagemode", Con_MessageMode_f);
-    Cmd_AddCommand("messagemode2", Con_MessageMode2_f);
+
     Cmd_AddCommand("clear", Con_Clear_f);
     con.isInitialized = true;
 }
@@ -204,7 +109,7 @@ void Con_Init() {
     ===============
 */
 void Con_Linefeed() {
-    _con.x = 0;
+    con.x = 0;
     con.current++;
     Q_memset(
         &con.text[
@@ -229,20 +134,18 @@ void Con_Print(cStringRO txt) {
     con.backscroll = 0;
 
     uint8_t mask;
-    if (txt[0] == 1) {
-        mask = 128;  // go to colored text
-        S_LocalSound("misc/talk.wav");
-        // play talk wav
+    switch (txt[0]) {
+    case 1:     S_LocalSound("misc/talk.wav");
+        /* fall through */
+    case 2: {
+        mask = 0x80; /* 128 */
         txt++;
-    }
-    else if (txt[0] == 2) {
-        mask = 128;  // go to colored text
-        txt++;
-    }
-    else    mask = 0;
+    } break;
 
+    default: { mask = 0x00; } break;
+    }
 
-    char    c;
+    char c;
     while ((c = *txt)) {
         // count word length
         uint32_t l = 0;
@@ -253,8 +156,8 @@ void Con_Print(cStringRO txt) {
 
         // word wrap
         if ((l != con.linewidth) &&
-            ((_con.x + l) > (uint32_t)con.linewidth)) {
-            _con.x = 0;
+            ((con.x + l) > (uint32_t)con.linewidth)) {
+            con.x = 0;
         }
 
         txt++;
@@ -265,7 +168,7 @@ void Con_Print(cStringRO txt) {
         }
 
 
-        if (!_con.x) {
+        if (!con.x) {
             Con_Linefeed();
             // mark time for transparent overlay
             if (con.current >= 0)
@@ -273,27 +176,25 @@ void Con_Print(cStringRO txt) {
         }
 
         switch (c) {
-        case '\n':
-            _con.x = 0;
-            break;
+        case '\r':  cr = 1;
+            /* fall through */
+        case '\n': {
+            con.x = 0;
+        } break;
 
-        case '\r':
-            _con.x = 0;
-            cr = 1;
-            break;
 
-        default: // display character and advance
+        default: { // display character and advance
             con.text[
                 (uint32_t)(
                     (con.current % (int32_t)con.totallines) *
                     con.linewidth) +
-                    _con.x
+                    con.x
             ] = (uint32_t)c | mask;
-            _con.x++;
-            if (_con.x >= con.linewidth) {
-                _con.x = 0;
+            con.x++;
+            if (con.x >= con.linewidth) {
+                con.x = 0;
             }
-            break;
+        } break;
         }
 
     }
@@ -337,7 +238,7 @@ void Con_Printf(cStringRO fmt, ...) {
     Host_Printf("%s", msg); // also echo to debugging console
 
     // log all messages to file
-    if (_con.debuglog)
+    if (con.debuglog)
         Con_DebugLog(va("%s/qconsole.log", com.gamedir), "%s", msg);
 
 
@@ -402,43 +303,4 @@ void Con_SafePrintf(cStringRO fmt, ...) {
 }
 
 
-/*
-    ==============================================================================
-
-    DRAWING
-
-    ==============================================================================
-*/
-
-
-
-/*
-    ==================
-    Con_NotifyBox
-    ==================
-*/
-void Con_NotifyBox(cString text) {
-    // during startup for sound / cd warnings
-    Con_Printf("\n\n" CON_HORIZONLINE);
-
-    Con_Printf(text);
-
-    Con_Printf("Press a key.\n");
-    Con_Printf(CON_HORIZONLINE);
-
-    key.count = -2; // wait for a key down and up
-    key.dest = key_console;
-
-    do {
-        LegacyTimeStamp_t t1 = Host_FloatTime();
-        SCR_UpdateScreen();
-        Sys_SendKeyEvents();
-        LegacyTimeStamp_t t2 = Host_FloatTime();
-        realtime += t2 - t1;    // make the cursor blink
-    } while (key.count < 0);
-
-    Con_Printf("\n");
-    key.dest = key_game;
-    realtime = 0;       // put the cursor back to invisible
-}
 

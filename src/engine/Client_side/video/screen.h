@@ -50,16 +50,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // only the refresh window will be updated unless these variables are flagged
 typedef struct {
-    bool    copytop;
-    bool    copyeverything;
+    vRect_t vrect;
+    LegacyTimeDelta_t    centertime_off;
     float   con_current;
     float   conlines;           // lines of console to display
     int     fullupdate;         // set to 0 to force full redraw
-    vRect_t vrect;
+    int     clearnotify;        // set to 0 whenever notify text is drawn
+    bool    copytop;
+    bool    copyeverything;
     bool    disabled_for_loading;
     bool    skipupdate;
-    LegacyTimeDelta_t    centertime_off;
-    int     clearnotify;        // set to 0 whenever notify text is drawn
     bool    block_drawing;
     bool    r_cache_thrash;     // compatability
 } Screen_t;
@@ -70,16 +70,14 @@ extern "C" {
 #endif
 
     void SCR_Init();
-
     void SCR_UpdateScreen();
     void SCR_UpdateWholeScreen();   // INFO: Win VID specific
-
     void SCR_CenterPrint(cString str);
-
     void SCR_BeginLoadingPlaque();
     void SCR_EndLoadingPlaque();
-
     int  SCR_ModalMessage(cString text);
+    void Con_CheckResize();
+    void Con_ToggleConsole_f();
 
 #ifdef __cplusplus
 }

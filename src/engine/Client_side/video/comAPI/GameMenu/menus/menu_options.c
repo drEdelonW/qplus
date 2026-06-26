@@ -8,6 +8,7 @@
 #include "cbuf.h"
 #include "vid.h"
 #include "q_tools.h"
+#include "screen.h"
 #ifdef _WIN32
 #   include "winquake.h"
 #endif

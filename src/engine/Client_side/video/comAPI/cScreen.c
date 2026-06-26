@@ -40,7 +40,11 @@ void SCR_Init() {
     //
     // register our commands
     //
+    Cmd_AddCommand("toggleconsole", Con_ToggleConsole_f);
     Cmd_AddCommand("screenshot", SCR_ScreenShot_f);
+    Cmd_AddCommand("messagemode", Con_MessageMode_f);
+    Cmd_AddCommand("messagemode2", Con_MessageMode2_f);
+
 
 #if 1 /* System status */
     _scr.ram = Draw_PicFromWad("ram");
@@ -235,10 +239,6 @@ void SCR_EndLoadingPlaque() {
     Con_ClearNotify();
 }
 
-
-
-
-
 /*
 ==============
 SCR_DrawRam
@@ -261,7 +261,6 @@ void SCR_DrawTurtle() {
     static int _cnt;
 
     if (!scr_showturtle.value)  return;
-
     if (host_frametime < 0.1) { _cnt = 0;  return; }
 
     _cnt++;
@@ -276,42 +275,13 @@ SCR_DrawNet
 ==============
 */
 void SCR_DrawNet() {
-    if ((realtime - cl.last_received_message < 0.3) ||
+    if (((realtime - cl.last_received_message) < 0.3) ||
         (cls.demoplayback))
         return;
 
     Draw_Pic(scr.vrect.x + 64, scr.vrect.y, _scr.net);
 }
 
-/*
-==============
-DrawPause
-==============
-*/
-void SCR_DrawPause() {
-    if ((!scr_showpause.value) ||  // turn off for screenshots
-        (!cl.paused))
-        return;
-
-    qPic_p pic = Draw_CachePic("gfx/pause.lmp");
-    Draw_Pic((vid.width - pic->width) / 2,
-        (vid.height - 48 - pic->height) / 2, pic);
-}
-
-
-
-/*
-==============
-SCR_DrawLoading
-==============
-*/
-void SCR_DrawLoading() {
-    if (!_scr.drawloading)   return;
-
-    qPic_p pic = Draw_CachePic("gfx/loading.lmp");
-    Draw_Pic((vid.width - pic->width) / 2,
-        (vid.height - 48 - pic->height) / 2, pic);
-}
 
 void SCR_CheckDrawCenterString() {
     scr.copytop = true;

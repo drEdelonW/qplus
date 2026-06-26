@@ -486,11 +486,10 @@ smoothly scrolled off.
 #define CHAR_SCALE_F    (0.0625f) /* seems like character size in texture 1.0f space (1/16)*/
 
 void Draw_Character(int x, int y, int num) {
+    num &= 0xFF;
     if (num == ' ')     return; // 32 - space
 
-    num &= 0xFF;
-
-    if (y <= -8)        return; // totally off screen
+    if (y <= -8)    return; // totally off screen
 
     int row = num >> 4;
     int col = num & 0x0F;
@@ -500,7 +499,6 @@ void Draw_Character(int x, int y, int num) {
     float size = CHAR_SCALE_F;
 
     GL_Bind(char_texture);
-
     glBegin(GL_QUADS); {
         glTexCoord2f(fcol, frow);               glVertex2f(x, y);
         glTexCoord2f(fcol + size, frow);        glVertex2f(x + 8, y);
@@ -552,10 +550,10 @@ void Draw_AlphaPic(int x, int y, qPic_p pic, float alpha) {
     glColor4f(1.0f, 1.0f, 1.0f, alpha);
     GL_Bind(gl->texnum);
     glBegin(GL_QUADS); {
-        glTexCoord2f(gl->sl, gl->tl);        glVertex2f(x, y);
-        glTexCoord2f(gl->sh, gl->tl);        glVertex2f(x + pic->width, y);
-        glTexCoord2f(gl->sh, gl->th);        glVertex2f(x + pic->width, y + pic->height);
-        glTexCoord2f(gl->sl, gl->th);        glVertex2f(x, y + pic->height);
+        glTexCoord2f(gl->sl, gl->tl);   glVertex2f(x, y);
+        glTexCoord2f(gl->sh, gl->tl);   glVertex2f(x + pic->width, y);
+        glTexCoord2f(gl->sh, gl->th);   glVertex2f(x + pic->width, y + pic->height);
+        glTexCoord2f(gl->sl, gl->th);   glVertex2f(x, y + pic->height);
     } glEnd();
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_ALPHA_TEST);
@@ -703,12 +701,10 @@ void Draw_Fill(int x, int y, int w, int h, int c) {
     );
 
     glBegin(GL_QUADS); {
-
         glVertex2f(x, y);
         glVertex2f(x1, y);
         glVertex2f(x1, y1);
         glVertex2f(x, y1);
-
     } glEnd();
     glColor3f(1, 1, 1);
     glEnable(GL_TEXTURE_2D);
@@ -726,12 +722,10 @@ void Draw_FadeScreen() {
     glDisable(GL_TEXTURE_2D);
     glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
     glBegin(GL_QUADS); {
-
         glVertex2f(0.0f, 0.0f);
         glVertex2f(vid.width, 0.0f);
         glVertex2f(vid.width, vid.height);
         glVertex2f(0.0f, vid.height);
-
     } glEnd();
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_TEXTURE_2D);

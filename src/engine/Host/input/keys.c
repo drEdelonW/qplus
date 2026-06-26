@@ -29,7 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "menu.h"
 #include "host.h"
 #include "screen.h"
-#include <stdbool.h>
 /*
 key up events are sent even if in console mode
 */
@@ -37,15 +36,16 @@ key up events are sent even if in console mode
 #define MAXCMD      (1024)
 
 Key_t key;
-cString keyBindings[MAX_KEYS];
 
-static int  _key_repeats[MAX_KEYS]; // if > 1, it is autorepeating
 static int  _history_line = 0;
 static bool _shift_down = false;
-static bool _isConKeys[MAX_KEYS]; // if true, can't be rebound while in console
-static bool _isMenuBound[MAX_KEYS]; // if true, can't be rebound while in menu
+
+cString keyBindings[MAX_KEYS];
+static keycode_t _keyshift[MAX_KEYS];   // key to map to if shift held down in console
+static int  _key_repeats[MAX_KEYS];     // if > 1, it is autorepeating
+static bool _isConKeys[MAX_KEYS];       // if true, can't be rebound while in console
+static bool _isMenuBound[MAX_KEYS];     // if true, can't be rebound while in menu
 static bool _isKeyDown[MAX_KEYS];
-static keycode_t _keyshift[MAX_KEYS];  // key to map to if shift held down in console
 
 /*
 ==============================================================================
@@ -75,31 +75,31 @@ Interactive line editing and console scrollback
 ====================
 */
 void Key_Console(keycode_t key) {
+#if 0
     if (key == K_ENTER) {
-        Cbuf_AddText(con.lines[edit_line] + 1);    // skip the >
+        Cbuf_AddText(con.lines[con.edit_line] + 1);    // skip the >
         Cbuf_AddText("\n");
-        Con_Printf("%s\n", con.lines[edit_line]);
-        edit_line = (edit_line + 1) & 31;
-        _history_line = edit_line;
-        con.lines[edit_line][0] = ']';
+        Con_Printf("%s\n", con.lines[con.edit_line]);
+        con.edit_line = (con.edit_line + 1) & 31;
+        _history_line = con.edit_line;
+        con.lines[con.edit_line][0] = ']';
         con.linepos = 1;
         if (cls.state == ca_disconnected)
-            SCR_UpdateScreen(); // force an update, because the command
-        // may take some time
+            SCR_UpdateScreen(); // force an update, because the command may take some time
         return;
     }
 
     if (key == K_TAB) { // command completion
-        cString cmd = Cmd_CompleteCommand(con.lines[edit_line] + 1);
+        cString cmd = Cmd_CompleteCommand(con.lines[con.edit_line] + 1);
         if (!cmd)
-            cmd = Cvar_CompleteVariable(con.lines[edit_line] + 1);
+            cmd = Cvar_CompleteVariable(con.lines[con.edit_line] + 1);
 
         if (cmd) {
-            Q_strcpy(con.lines[edit_line] + 1, cmd);
+            Q_strcpy(con.lines[con.edit_line] + 1, cmd);
             con.linepos = Q_strlen(cmd) + 1;
-            con.lines[edit_line][con.linepos] = ' ';
+            con.lines[con.edit_line][con.linepos] = ' ';
             con.linepos++;
-            con.lines[edit_line][con.linepos] = 0;
+            con.lines[con.edit_line][con.linepos] = 0;
             return;
         }
     }
@@ -114,30 +114,30 @@ void Key_Console(keycode_t key) {
     if (key == K_UPARROW) {
         do {
             _history_line = (_history_line - 1) & 31;
-        } while ((_history_line != edit_line) &&
+        } while ((_history_line != con.edit_line) &&
             (!con.lines[_history_line][1])
             );
-        if (_history_line == edit_line)
-            _history_line = (edit_line + 1) & 31;
-        Q_strcpy(con.lines[edit_line], con.lines[_history_line]);
-        con.linepos = Q_strlen(con.lines[edit_line]);
+        if (_history_line == con.edit_line)
+            _history_line = (con.edit_line + 1) & 31;
+        Q_strcpy(con.lines[con.edit_line], con.lines[_history_line]);
+        con.linepos = Q_strlen(con.lines[con.edit_line]);
         return;
     }
 
     if (key == K_DOWNARROW) {
-        if (_history_line == edit_line) return;
+        if (_history_line == con.edit_line) return;
         do {
             _history_line = (_history_line + 1) & 31;
-        } while ((_history_line != edit_line) &&
+        } while ((_history_line != con.edit_line) &&
             (!con.lines[_history_line][1]));
 
-        if (_history_line == edit_line) {
-            con.lines[edit_line][0] = ']';
+        if (_history_line == con.edit_line) {
+            con.lines[con.edit_line][0] = ']';
             con.linepos = 1;
         }
         else {
-            Q_strcpy(con.lines[edit_line], con.lines[_history_line]);
-            con.linepos = Q_strlen(con.lines[edit_line]);
+            Q_strcpy(con.lines[con.edit_line], con.lines[_history_line]);
+            con.linepos = Q_strlen(con.lines[con.edit_line]);
         }
         return;
     }
@@ -174,10 +174,100 @@ void Key_Console(keycode_t key) {
         return; // non printable
 
     if (con.linepos < (MAXCMDLINE - 1)) {
-        con.lines[edit_line][con.linepos] = key;
+        con.lines[con.edit_line][con.linepos] = key;
         con.linepos++;
-        con.lines[edit_line][con.linepos] = 0;
+        con.lines[con.edit_line][con.linepos] = 0;
     }
+#else
+    switch (key) {
+    case K_ENTER: {
+        Cbuf_AddText(con.lines[con.edit_line] + 1);    // skip the >
+        Cbuf_AddText("\n");
+        Con_Printf("%s\n", con.lines[con.edit_line]);
+        con.edit_line = (con.edit_line + 1) & 31;
+        _history_line = con.edit_line;
+        con.lines[con.edit_line][0] = ']';
+        con.linepos = 1;
+        if (cls.state == ca_disconnected)
+            SCR_UpdateScreen(); // force an update, because the command may take some time
+    } return;
+
+    case K_BACKSPACE:
+    case K_LEFTARROW: { if (con.linepos > 1)    con.linepos--; } return;
+
+    case K_UPARROW: {
+        do {
+            _history_line = (_history_line - 1) & 31;
+        } while (
+            (_history_line != con.edit_line) &&
+            (!con.lines[_history_line][1]));
+
+        if (_history_line == con.edit_line)
+            _history_line = (con.edit_line + 1) & 31;
+
+        Q_strcpy(con.lines[con.edit_line], con.lines[_history_line]);
+        con.linepos = Q_strlen(con.lines[con.edit_line]);
+    } return;
+
+    case K_DOWNARROW: {
+        if (_history_line == con.edit_line)     return;
+
+        do {
+            _history_line = (_history_line + 1) & 31;
+        } while ((_history_line != con.edit_line) &&
+            (!con.lines[_history_line][1]));
+
+        if (_history_line == con.edit_line) {
+            con.lines[con.edit_line][0] = ']';
+            con.linepos = 1;
+        }
+        else {
+            Q_strcpy(con.lines[con.edit_line], con.lines[_history_line]);
+            con.linepos = Q_strlen(con.lines[con.edit_line]);
+        }
+    } return;
+
+    case K_PGUP:
+    case K_MWHEELUP: {
+        con.backscroll += 2;
+        if (con.backscroll > (con.totallines - (vid.height >> 3) - 1))
+            con.backscroll = con.totallines - (vid.height >> 3) - 1;
+    } return;
+
+    case K_PGDN:
+    case K_MWHEELDOWN: {
+        con.backscroll -= 2;
+        if (con.backscroll < 0)
+            con.backscroll = 0;
+    } return;
+
+    case K_HOME: { con.backscroll = con.totallines - (vid.height >> 3) - 1; } return;
+    case K_END: { con.backscroll = 0; } return;
+
+    case K_TAB: { // command completion
+        cString cmd = Cmd_CompleteCommand(con.lines[con.edit_line] + 1);
+        if (!cmd)
+            cmd = Cvar_CompleteVariable(con.lines[con.edit_line] + 1);
+
+        if (cmd) {
+            Q_strcpy(con.lines[con.edit_line] + 1, cmd);
+            con.linepos = Q_strlen(cmd) + 1;
+            con.lines[con.edit_line][con.linepos++] = ' ';
+            con.lines[con.edit_line][con.linepos] = 0;
+            return;
+        }
+    }
+
+    default:
+        if (!is_printable(key)) return; // non printable
+
+        if (con.linepos < (MAXCMDLINE - 1)) {
+            con.lines[con.edit_line][con.linepos++] = key;
+            con.lines[con.edit_line][con.linepos] = 0;
+        }
+        return;
+    }
+#endif
 }
 
 //============================================================================
@@ -447,12 +537,8 @@ void Key_Bind_f() {
     }
 
     if (argcnt == 2) {
-        if (keyBindings[btn]) {
-            Con_Printf("\"%s\" = \"%s\"\n", Cmd_Argv(1), keyBindings[btn]);
-        }
-        else {
-            Con_Printf("\"%s\" is not bound\n", Cmd_Argv(1));
-        }
+        if (keyBindings[btn])   Con_Printf("\"%s\" = \"%s\"\n", Cmd_Argv(1), keyBindings[btn]);
+        else                    Con_Printf("\"%s\" is not bound\n", Cmd_Argv(1));
         return;
     }
 
@@ -567,6 +653,14 @@ void Key_Init() {
 
 }
 
+
+static inline void Key_ReleaseBinding(cString kb, keycode_t Key) {
+    if (kb && (kb[0] == '+')) {
+        char cmd[MAXCMD];
+        snprintf(cmd, sizeof(cmd), "-%s %i\n", kb + 1, Key);
+        Cbuf_AddText(cmd);
+    }
+}
 /*
 ===================
 Key_Event
@@ -583,8 +677,7 @@ void Key_Event(keycode_t Key, bool down) {
 
     key.lastpress = Key;
     key.count++;
-    if (key.count <= 0)
-        return;  // just catching keys for Con_NotifyBox
+    if (key.count <= 0)     return;  // just catching keys for Con_NotifyBox
 
     // update auto-repeat status
     if (down) {
@@ -592,9 +685,7 @@ void Key_Event(keycode_t Key, bool down) {
         if ((Key != K_BACKSPACE) &&
             (Key != K_PAUSE) &&
             (_key_repeats[Key] > 1)
-            ) {
-            return; // ignore most autorepeats
-        }
+            )               return; // ignore most autorepeats
 
         if ((Key >= 200) &&
             !keyBindings[Key]
@@ -606,6 +697,7 @@ void Key_Event(keycode_t Key, bool down) {
         }
     }
 
+#if 0
     if (Key == K_SHIFT)
         _shift_down = down;
 
@@ -625,6 +717,28 @@ void Key_Event(keycode_t Key, bool down) {
         }
         return;
     }
+#else
+    switch (Key) {
+    case K_SHIFT:   _shift_down = down; break;
+
+        //
+        // handle escape specialy, so the user can never unbind it
+        //
+    case K_ESCAPE: {
+        if (!down) return;
+
+        switch (key.dest) {
+        case key_message:   Key_Message(Key);   break;
+        case key_menu:      M_Keydown(Key);     break;
+        case key_game:
+        case key_console:   M_ToggleMenu_f();   break;
+        default:            Host_SysError("Bad key.dest");
+        }
+        return;
+    } break;
+    default: break;
+    }
+#endif
 
     //
     // key up events only generate commands if the game key binding is
@@ -634,29 +748,16 @@ void Key_Event(keycode_t Key, bool down) {
     // downs can be matched with ups
     //
     if (!down) {
-        cString kb = keyBindings[Key];
-        if (kb && (kb[0] == '+')
-            ) {
-            char cmd[MAXCMD];   snprintf(cmd, sizeof(cmd), "-%s %i\n", kb + 1, Key);
-            Cbuf_AddText(cmd);
-        }
+        Key_ReleaseBinding(keyBindings[Key], Key);
 
         if (_keyshift[Key] != Key) {
-            if ((uint32_t)Key < MAX_KEYS
+            cString kb = NULL;
+            if (((uint32_t)Key < MAX_KEYS) &&
+                ((uint32_t)_keyshift[Key] < MAX_KEYS)
                 ) {
-                keycode_t sh = _keyshift[Key];
-                if ((uint32_t)sh < MAX_KEYS) {
-                    kb = keyBindings[(uint32_t)sh];
-                }
-                else { kb = NULL; }
+                kb = keyBindings[(uint32_t)_keyshift[Key]];
             }
-            else { kb = NULL; }
-
-            if (kb && (kb[0] == '+')
-                ) {
-                char cmd[MAXCMD];   snprintf(cmd, sizeof(cmd), "-%s %i\n", kb + 1, Key);
-                Cbuf_AddText(cmd);
-            }
+            Key_ReleaseBinding(kb, Key);
         }
         return;
     }
@@ -664,8 +765,10 @@ void Key_Event(keycode_t Key, bool down) {
     //
     // during demo playback, most keys bring up the main menu
     //
-    if (cls.demoplayback && down &&
-        _isConKeys[Key] && (key.dest == key_game)
+    if (cls.demoplayback &&
+        down &&
+        _isConKeys[Key] &&
+        (key.dest == key_game)
         ) {
         M_ToggleMenu_f();
         return;
@@ -694,16 +797,14 @@ void Key_Event(keycode_t Key, bool down) {
         return;
     }
 
-    if (!down)
-        return;  // other systems only care about key down events
+    if (!down)      return;  // other systems only care about key down events
 
     if (_shift_down)
         Key = _keyshift[Key];
 
-
     switch (key.dest) {
-    case key_message:   Key_Message(Key);  break;
-    case key_menu:      M_Keydown(Key);    break;
+    case key_message:   Key_Message(Key);   break;
+    case key_menu:      M_Keydown(Key);     break;
     case key_game:
     case key_console:   Key_Console(Key);  break;
     default:            Host_SysError("Bad key.dest");

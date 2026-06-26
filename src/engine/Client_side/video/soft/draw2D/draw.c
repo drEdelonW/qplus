@@ -133,10 +133,9 @@ smoothly scrolled off.
 ================
 */
 void Draw_Character(int x, int y, int num) {
-    num &= 255;
+    num &= 0xFF;
 
-    if (y <= -8)
-        return;   // totally off screen
+    if (y <= -8)    return; // totally off screen
 
 #ifdef PARANOID
     if ((y > vid.height - 80) ||

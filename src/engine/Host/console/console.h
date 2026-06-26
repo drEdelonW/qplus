@@ -25,44 +25,43 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // console
 //
+#define CON_TEXTSIZE    (int32_t)0x4000 /*16Kb - 16384b*/
+
 #define NUM_CON_TIMES (4)
-#define MAXCMDLINE  (256)
 #define MAXCHATLEN  (32)
+#define MAXCMDLINE  (256)
 typedef struct {
-    int32_t totallines; // total lines in console scrollback
-    int32_t backscroll; // lines up from bottom to display
-    int32_t notifylines;  // scan lines to clear for notify lines
-    int32_t vislines;
-    int32_t linewidth;
-    int32_t current;   // where next message will be printed
-    bool    forcedup; // because no entities to refresh
     bool    isInitialized;
     char    lines[MAXCHATLEN][MAXCMDLINE];
-    float   cursorspeed;
     float   times[NUM_CON_TIMES]; // realtime time the line was generated for transparent notify lines
-    cString text;
+    int32_t totallines; // total lines in console scrollback
+    int32_t backscroll; // lines up from bottom to display
+    int32_t notifylines;// scan lines to clear for notify lines
+    int32_t vislines;
+    int32_t linewidth;
+    int32_t current;    // where next message will be printed
+    int32_t edit_line;
     uint32_t linepos;
+    uint32_t x;         // offset in current line for next print
+    float   cursorspeed;
+    cString text;
+    bool    forcedup;   // because no entities to refresh
+    bool    debuglog;
 } console_t;
 extern console_t con;
 
-extern int32_t edit_line;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    void Con_DrawCharacter(int32_t cx, int32_t line, int32_t num);
-    void Con_CheckResize();
     void Con_Init();
     void Con_Print(cStringRO txt);
     void Con_Printf(cStringRO fmt, ...);
     void Con_DPrintf(cStringRO fmt, ...);
     void Con_SafePrintf(cStringRO fmt, ...);
     void Con_Clear_f();
-    void Con_DrawNotify();
     void Con_ClearNotify();
-    void Con_ToggleConsole_f();
-    void Con_NotifyBox(cString text); // during startup for sound / cd warnings
 
 #ifdef __cplusplus
 }

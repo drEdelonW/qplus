@@ -42,6 +42,9 @@ extern "C" {
     void SCR_DrawLoading();
     void SCR_CalcRefdef();
 
+    void Con_MessageMode_f();
+    void Con_MessageMode2_f();
+
 #ifdef __cplusplus
 }
 #endif

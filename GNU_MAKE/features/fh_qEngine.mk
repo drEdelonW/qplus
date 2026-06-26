@@ -116,8 +116,12 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(VID_DIR)/cScreen.c
 
                         $(eval GSCR_DIR = $(VID_DIR)/GameScreen) $(eval INCLUDES += $(GSCR_DIR))
+                                SRC_LIST += $(GSCR_DIR)/gameScreen.c
+
                                 $(eval VP_DIR = $(GSCR_DIR)/ViewPort) $(eval INCLUDES += $(VP_DIR))
                                         SRC_LIST += $(VP_DIR)/view.c
+                                        SRC_LIST += $(VP_DIR)/chase.c
+
 
                                 $(eval SB_DIR = $(GSCR_DIR)/HUD) $(eval INCLUDES += $(SB_DIR))
                                         SRC_LIST += $(SB_DIR)/sbar.c
@@ -219,4 +223,3 @@ include features/fh_qRender$(QRND).mk
 
 $(eval GAME_DIR := $(SRC_DIR)/game/Quake) $(eval INCLUDES += $(GAME_DIR))
         SRC_LIST += $(GAME_DIR)/game_rule.c
-        SRC_LIST += $(GAME_DIR)/chase.c
