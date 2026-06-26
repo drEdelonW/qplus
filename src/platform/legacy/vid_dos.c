@@ -254,7 +254,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 	Con_Printf("%s\n", VID_ModeInfo(vid_modenum, NULL));
 	nomodecheck = false;
 
-	vid.recalc_refdef = 1;
+	vid.recalc_refdef = true;
 
 	return 1;
 }

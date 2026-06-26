@@ -1,0 +1,177 @@
+#include "screen.h"
+#include "screen_prv.h"
+#include "keys.h"
+#include "draw.h"
+#include "console.h"
+#include "q_tools.h"
+#include "host.h"
+#include "cvar_q1.h"
+#include "client.h"
+#include "menu_prv.h"
+#include <string.h>
+
+
+/*
+    ================
+    Con_ToggleConsole_f
+    ================
+*/
+void Con_ToggleConsole_f() {
+    if (key.dest == key_console) {
+        if (cls.state == ca_connected) {
+            key.dest = key_game;
+            con.lines[edit_line][1] = 0; // clear any typing
+            con.linepos = 1;
+        }
+        else    M_Menu_Main_f();
+    }
+    else    key.dest = key_console;
+
+    SCR_EndLoadingPlaque();
+    memset(con.times, 0, sizeof(con.times));
+}
+/*
+    ================
+    Con_DrawInput
+
+    The input line scrolls horizontally if typing goes beyond the right edge
+    ================
+*/
+void Con_DrawInput() {
+    if ((key.dest != key_console) &&
+        (!con.forcedup)) {
+        return;  // don't draw anything
+    }
+
+    cString text = con.lines[edit_line];
+
+    // add the cursor frame
+    text[con.linepos] = 10 + ((int)(realtime * con.cursorspeed) & 1);
+
+    // fill out remainder with spaces
+    for (uint32_t i = (con.linepos + 1); i < con.linewidth; i++)
+        text[i] = ' ';
+
+    // prestep if horizontally scrolling
+    if (con.linepos >= con.linewidth)
+        text += 1 + con.linepos - (uint32_t)con.linewidth;
+
+    // draw it
+    int32_t y = con.vislines - 16;
+
+    for (int32_t i = 0; i < con.linewidth; i++)
+        Draw_Character((i + 1) << 3, y, text[i]);
+
+    // remove cursor
+    con.lines[edit_line][con.linepos] = 0;
+}
+
+/*
+    ================
+    Con_DrawConsole
+
+    Draws the console with the solid background
+    The typing input line at the bottom should only be drawn if typing is allowed
+    ================
+*/
+void Con_DrawConsole(int32_t lines, bool drawinput) {
+    if (lines <= 0)
+        return;
+
+    // draw the background
+    Draw_ConsoleBackground(lines);
+
+    // draw the text
+    con.vislines = lines;
+
+    int32_t rows = (lines - 16) >> 3;  // rows of text to draw
+    int32_t y = lines - 16 - (rows << 3); // may start slightly negative
+
+    for (int32_t i = (con.current - rows + 1); i <= con.current; i++, y += D_CHAR_HEIGHT) {
+        int32_t j = i - con.backscroll;
+
+        CLAMP_LESS(j, 0);
+
+        cString text = con.text + (j % con.totallines) * con.linewidth;
+
+        for (int32_t x = 0; x < con.linewidth; x++)
+            Draw_Character((x + 1) << 3, y, text[x]);
+
+    }
+
+    // draw the input prompt, user text, and cursor if desired
+    if (drawinput)
+        Con_DrawInput();
+
+}
+
+
+/*
+    ================
+    Con_DrawNotify
+
+    Draws the last few lines of output transparently over the game top
+    ================
+*/
+void Con_DrawNotify() {
+
+    int32_t v = 0;
+    for (int32_t i = (con.current - NUM_CON_TIMES + 1); i <= con.current; i++) {
+        if (i < 0)  continue;
+
+        float time = con.times[i % NUM_CON_TIMES];
+        if (time == 0)  continue;
+
+        time = (float)realtime - time;
+        if (time > con_notifytime.value)    continue;
+
+        cString text = con.text + (i % (int32_t)con.totallines) * con.linewidth;
+
+        scr.clearnotify = 0;
+        scr.copytop = true;
+
+        for (int32_t x = 0; x < con.linewidth; x++)
+            Draw_Character((x + 1) << 3, v, text[x]);
+
+        v += D_CHAR_HEIGHT;
+    }
+
+    if (key.dest == key_message) {
+        scr.clearnotify = 0;
+        scr.copytop = true;
+
+        int32_t x = 0;
+
+        Draw_String(8, v, "say:");
+        while (chatBuffer[x]) {
+            Draw_Character((x + 5) << 3, v, chatBuffer[x]);
+            x++;
+        }
+        Draw_Character((x + 5) << 3, v, 10 + ((int)(realtime * con.cursorspeed) & 1));
+        v += D_CHAR_HEIGHT;
+    }
+
+    if (v > con.notifylines) {
+        con.notifylines = v;
+    }
+}
+
+
+/*
+==================
+SCR_DrawConsole
+==================
+*/
+void SCR_DrawConsole() {
+    if (scr.con_current) {
+        scr.copyeverything = true;
+        Con_DrawConsole(scr.con_current, true);
+        _scr.clearConsole = 0;
+    }
+    else {
+        if ((key.dest == key_game) ||
+            (key.dest == key_message)
+            )
+            Con_DrawNotify();   // only draw notify in game
+    }
+}

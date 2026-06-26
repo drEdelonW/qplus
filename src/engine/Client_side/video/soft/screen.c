@@ -62,66 +62,6 @@ void SCR_EraseCenterString() {
 
 //=============================================================================
 
-
-
-/*
-=================
-SCR_CalcRefdef
-
-Must be called whenever vid changes
-Internal use only
-=================
-*/
-static void SCR_CalcRefdef() {
-    scr.fullupdate = 0;  // force a background redraw
-    vid.recalc_refdef = 0;
-
-    // force the status bar to redraw
-    Sbar_Changed();
-
-    //========================================
-
-    // bound viewsize
-    if (scr_viewsize.value < 30)    Cvar_Set("viewsize", "30");
-    if (scr_viewsize.value > 120)   Cvar_Set("viewsize", "120");
-
-    // bound field of view
-    if (scr_fov.value < 10)         Cvar_Set("fov", "10");
-    if (scr_fov.value > 170)        Cvar_Set("fov", "170");
-
-    r_refdef.fov_x = scr_fov.value;
-    r_refdef.fov_y = CalcFov(r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
-
-    // intermission is always full screen
-    float  size;
-    if (cl.intermission != IM_NONE) size = 120;
-    else                            size = scr_viewsize.value;
-
-    if (size >= 120)        sb_lines = 0;  // no status bar at all
-    else if (size >= 110)   sb_lines = 24;  // no inventory
-    else                    sb_lines = 24 + 16 + 8;
-
-    // these calculations mirror those in R_Init() for r_refdef, but take no
-    // account of water warping
-    vRect_t vrect = {
-        .width = vid.width,
-        .height = vid.height
-    };
-
-    R_SetVrect(&vrect, &scr.vrect, sb_lines);
-
-    // guard against going from one mode to another that's less than half the
-    // vertical resolution
-    if (scr.con_current > vid.height)
-        scr.con_current = vid.height;
-
-    // notify the refresh of the change
-    R_ViewChanged(&vrect, sb_lines, vid.aspect);
-}
-
-
-//============================================================================
-
 /*
 ==============================================================================
 
@@ -184,31 +124,29 @@ needs almost the entire 256k of stack space!
 ==================
 */
 void SCR_UpdateScreen() {
-    static float _oldLcdX;
-
-    if (scr.skipupdate || scr.block_drawing)
+    if (scr.block_drawing ||
+        scr.skipupdate)
         return;
 
     scr.copytop = false;
     scr.copyeverything = false;
 
     if (scr.disabled_for_loading) {
-        if (realtime - _scr.disabled_time > 60) {
+        if ((realtime - _scr.disabled_time) > 60) {
             scr.disabled_for_loading = false;
             Con_Printf("load failed.\n");
         }
         else    return;
     }
 
-    if (Host_IsDedicated())
-        return;    // stdout only
+    if (Host_IsDedicated())     return; // stdout only
 
     if (!_scr.initialized || !con.isInitialized)
-        return;    // not initialized yet
+        return;     // not initialized yet
 
-    if (_scr.oldScrViewSize != scr_viewsize.value) {
-        _scr.oldScrViewSize = scr_viewsize.value;
-        vid.recalc_refdef = 1;
+    if (_scr.oldViewSize != scr_viewsize.value) {
+        _scr.oldViewSize = scr_viewsize.value;
+        vid.recalc_refdef = true;
     }
 
     //
@@ -219,20 +157,18 @@ void SCR_UpdateScreen() {
         vid.recalc_refdef = true;
     }
 
+    static float _oldLcdX;
     if (_oldLcdX != lcd_x.value) {
         _oldLcdX = lcd_x.value;
         vid.recalc_refdef = true;
     }
 
-    if (_scr.oldScrViewSize != scr_viewsize.value) {
-        _scr.oldScrViewSize = scr_viewsize.value;
+    if (_scr.oldViewSize != scr_viewsize.value) {
+        _scr.oldViewSize = scr_viewsize.value;
         vid.recalc_refdef = true;
     }
 
-    if (vid.recalc_refdef) {
-        // something changed, so reorder the screen
-        SCR_CalcRefdef();
-    }
+    SCR_CalcRefdef();
 
     //
     // do 3D refresh drawing, and then update the screen

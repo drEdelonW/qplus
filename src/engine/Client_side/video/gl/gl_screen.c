@@ -83,6 +83,7 @@ console is:
 #include "sys.h"
 #include "sound.h"
 #include "menu.h"
+#include "view.h"
 #include "cvar_q1.h"
 #include <stdlib.h>
 
@@ -91,90 +92,7 @@ console is:
 int glx, gly, glwidth, glheight; // extern
 cvar_t  gl_triplebuffer = { "gl_triplebuffer", "1", true };
 
-int     scr_fullupdate;     // TODO: check is it needed to vid_win.c as extern
-vRect_t     scr_vrect;  // extern vRect_t scr_vrect; //
 bool    scr_disabled_for_loading;
-
-/*
-===============================================================================
-
-CENTER PRINTING
-
-===============================================================================
-*/
-
-
-/*
-=================
-SCR_CalcRefdef
-
-Must be called whenever vid changes
-Internal use only
-=================
-*/
-static void SCR_CalcRefdef() {
-    scr_fullupdate = 0;        // force a background redraw
-    vid.recalc_refdef = 0;
-
-    // force the status bar to redraw
-    Sbar_Changed();
-
-    //========================================
-
-    // bound viewsize
-    if (scr_viewsize.value < 30)    Cvar_Set("viewsize", "30");
-    if (scr_viewsize.value > 120)   Cvar_Set("viewsize", "120");
-
-    // bound field of view
-    if (scr_fov.value < 10)         Cvar_Set("fov", "10");
-    if (scr_fov.value > 170)        Cvar_Set("fov", "170");
-
-    // intermission is always full screen
-    float   size;
-    if (cl.intermission != IM_NONE)     size = 120;
-    else                                size = scr_viewsize.value;
-
-    /**/ if (size >= 120.0f)    sb_lines = 0;        // no status bar at all
-    else if (size >= 110.0f)    sb_lines = 24;       // no inventory
-    else /*               */    sb_lines = 24 + 16 + 8;
-
-    bool    full = false;
-    if (scr_viewsize.value >= 100.0f) {
-        full = true;
-        size = 100.0f;
-    }
-    else
-        size = scr_viewsize.value;
-    if (cl.intermission != IM_NONE) {
-        full = true;
-        size = 100.0f;
-        sb_lines = 0;
-    }
-    size /= 100.0f;
-
-    int h = vid.height - sb_lines;
-
-    r_refdef.vrect.width = vid.width * size;
-    if (r_refdef.vrect.width < 96) {
-        size = 96.0 / r_refdef.vrect.width;
-        r_refdef.vrect.width = 96;    // min for icons
-    }
-
-    r_refdef.vrect.height = vid.height * size;
-    if (r_refdef.vrect.height > (vid.height - sb_lines))
-        r_refdef.vrect.height = (vid.height - sb_lines);
-    if (r_refdef.vrect.height > vid.height)
-        r_refdef.vrect.height = vid.height;
-    r_refdef.vrect.x = (vid.width - r_refdef.vrect.width) / 2;
-    if (full)   r_refdef.vrect.y = 0;
-    else        r_refdef.vrect.y = (h - r_refdef.vrect.height) / 2;
-
-    r_refdef.fov_x = scr_fov.value;
-    r_refdef.fov_y = CalcFov(r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
-
-    scr_vrect = r_refdef.vrect;
-}
-
 
 /*
 ==============================================================================
@@ -308,15 +226,17 @@ void SCR_UpdateScreen() {
     scr.copyeverything = false;
 
     if (scr_disabled_for_loading) {
-        if (realtime - _scr.disabled_time > 60) {
+        if ((realtime - _scr.disabled_time) > 60) {
             scr_disabled_for_loading = false;
             Con_Printf("load failed.\n");
         }
         else    return;
     }
 
+    if (Host_IsDedicated())     return; // stdout only
+
     if (!_scr.initialized || !con.isInitialized)
-        return;                // not initialized yet
+        return;     // not initialized yet
 
 
     GL_BeginRendering(&glx, &gly, &glwidth, &glheight); {
@@ -329,13 +249,12 @@ void SCR_UpdateScreen() {
             vid.recalc_refdef = true;
         }
 
-        if (_scr.oldScrViewSize != scr_viewsize.value) {
-            _scr.oldScrViewSize = scr_viewsize.value;
+        if (_scr.oldViewSize != scr_viewsize.value) {
+            _scr.oldViewSize = scr_viewsize.value;
             vid.recalc_refdef = true;
         }
 
-        if (vid.recalc_refdef)
-            SCR_CalcRefdef();
+        SCR_CalcRefdef();
 
         //
         // do 3D refresh drawing, and then update the screen
@@ -369,13 +288,7 @@ void SCR_UpdateScreen() {
             SCR_CheckDrawCenterString();
         }
         else {
-            if (crosshair.value)
-                Draw_Character(
-                    scr_vrect.x + scr_vrect.width / 2 + cl_crossx.value,
-                    scr_vrect.y + scr_vrect.height / 2 + cl_crossy.value,
-                    '+'
-                );
-
+            Draw_crosshair();
             SCR_DrawRam();
             SCR_DrawNet();
             SCR_DrawTurtle();

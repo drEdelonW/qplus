@@ -830,16 +830,20 @@ void Sbar_Draw() {
         }
         else {
             if (rogue) {
-                Sbar_DrawNum(24, 0, cl.stats[STAT_ARMOR], 3,
-                    cl.stats[STAT_ARMOR] <= 25);
-                if (cl.items & RIT_ARMOR3)      Sbar_DrawPic(0, 0, sb_armor[2]);
+                Sbar_DrawNum(
+                    24, 0, cl.stats[STAT_ARMOR], 3,
+                    cl.stats[STAT_ARMOR] <= 25
+                );
+                /**/ if (cl.items & RIT_ARMOR3) Sbar_DrawPic(0, 0, sb_armor[2]);
                 else if (cl.items & RIT_ARMOR2) Sbar_DrawPic(0, 0, sb_armor[1]);
                 else if (cl.items & RIT_ARMOR1) Sbar_DrawPic(0, 0, sb_armor[0]);
             }
             else {
-                Sbar_DrawNum(24, 0, cl.stats[STAT_ARMOR], 3
-                    , cl.stats[STAT_ARMOR] <= 25);
-                if (cl.items & IT_ARMOR3)       Sbar_DrawPic(0, 0, sb_armor[2]);
+                Sbar_DrawNum(
+                    24, 0, cl.stats[STAT_ARMOR], 3,
+                    cl.stats[STAT_ARMOR] <= 25
+                );
+                /**/ if (cl.items & IT_ARMOR3)  Sbar_DrawPic(0, 0, sb_armor[2]);
                 else if (cl.items & IT_ARMOR2)  Sbar_DrawPic(0, 0, sb_armor[1]);
                 else if (cl.items & IT_ARMOR1)  Sbar_DrawPic(0, 0, sb_armor[0]);
             }
@@ -854,7 +858,7 @@ void Sbar_Draw() {
 
         // ammo icon
         if (rogue) {
-            if (cl.items & RIT_SHELLS)              Sbar_DrawPic(224, 0, sb_ammo[0]);
+            /**/ if (cl.items & RIT_SHELLS)         Sbar_DrawPic(224, 0, sb_ammo[0]);
             else if (cl.items & RIT_NAILS)          Sbar_DrawPic(224, 0, sb_ammo[1]);
             else if (cl.items & RIT_ROCKETS)        Sbar_DrawPic(224, 0, sb_ammo[2]);
             else if (cl.items & RIT_CELLS)          Sbar_DrawPic(224, 0, sb_ammo[3]);
@@ -863,7 +867,7 @@ void Sbar_Draw() {
             else if (cl.items & RIT_MULTI_ROCKETS)  Sbar_DrawPic(224, 0, rsb_ammo[2]);
         }
         else {
-            if (cl.items & IT_SHELLS)       Sbar_DrawPic(224, 0, sb_ammo[0]);
+            /**/ if (cl.items & IT_SHELLS)  Sbar_DrawPic(224, 0, sb_ammo[0]);
             else if (cl.items & IT_NAILS)   Sbar_DrawPic(224, 0, sb_ammo[1]);
             else if (cl.items & IT_ROCKETS) Sbar_DrawPic(224, 0, sb_ammo[2]);
             else if (cl.items & IT_CELLS)   Sbar_DrawPic(224, 0, sb_ammo[3]);
@@ -890,7 +894,7 @@ void Sbar_IntermissionNumber(int x, int y, int num, int digits, int color) {
     char str[12];
     int l = Sbar_itoa(num, str);
     cString ptr = str;
-    if (l > digits)         ptr += (l - digits);
+    /**/ if (l > digits)    ptr += (l - digits);
     else if (l < digits)    x += (digits - l) * 24;
 
     while (*ptr) {

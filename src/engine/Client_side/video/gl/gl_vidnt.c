@@ -409,7 +409,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     VID_SetPalette(palette);
 
-    vid.recalc_refdef = 1;
+    vid.recalc_refdef = true;
 
     return true;
 }

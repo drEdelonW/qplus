@@ -712,7 +712,7 @@ void CL_ParseServerMessage() {
 
         case svc_spawnstaticsound:  CL_ParseStaticSound();  break;
 
-        case svc_cdtrack:
+        case svc_cdtrack: {
             cl.cdtrack = MSG_ReadByte();
             cl.looptrack = MSG_ReadByte();
             if ((cls.demoplayback ||
@@ -721,27 +721,27 @@ void CL_ParseServerMessage() {
                 )
                 CDAudio_Play((uint8_t)cls.forcetrack, true);
             else CDAudio_Play((uint8_t)cl.cdtrack, true);
-            break;
+        } break;
 
-        case svc_intermission:
+        case svc_intermission: {
             cl.intermission = IM_LEVEL;
             cl.completed_time = (int32_t)cl.time;
             vid.recalc_refdef = true; // go to full screen
-            break;
+        } break;
 
-        case svc_finale:
+        case svc_finale: {
             cl.intermission = IM_FINALE;
             cl.completed_time = (int32_t)cl.time;
             vid.recalc_refdef = true; // go to full screen
             SCR_CenterPrint(MSG_ReadString());
-            break;
+        } break;
 
-        case svc_cutscene:
+        case svc_cutscene: {
             cl.intermission = IM_CUTSCENE;
             cl.completed_time = (int32_t)cl.time;
             vid.recalc_refdef = true; // go to full screen
             SCR_CenterPrint(MSG_ReadString());
-            break;
+        } break;
 
         case svc_sellscreen:    Cmd_ExecuteString("help", src_command); break;
         }

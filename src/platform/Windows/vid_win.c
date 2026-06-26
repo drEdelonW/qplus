@@ -332,7 +332,7 @@ int VID_Suspend(MGLDC* dc, m_int flags) {
 
         in_mode_set = false;
 
-        vid.recalc_refdef = 1;
+        vid.recalc_refdef = true;
 
         scr.block_drawing = false;
 
@@ -1560,7 +1560,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     VID_SetPalette(palette);
 
     in_mode_set = false;
-    vid.recalc_refdef = 1;
+    vid.recalc_refdef = true;
 
     return true;
 }

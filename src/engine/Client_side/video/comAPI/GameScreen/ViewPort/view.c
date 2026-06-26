@@ -238,7 +238,7 @@ bool V_CheckGamma() {
     _oldGammaValue = v_gamma.value;
 
     BuildGammaTable(v_gamma.value);
-    vid.recalc_refdef = 1;    // force a surface cache flush
+    vid.recalc_refdef = true;    // force a surface cache flush
 
     return true;
 }
@@ -744,9 +744,9 @@ void V_CalcRefdef() {
 
     vec3_t angles = {
         // offsets
-       .x = -ent->angles.pitch,  /* angles[PITCH] */ // because entity pitches are actually backward
-       .y = ent->angles.yaw,   /* angles[YAW] */
-       .z = ent->angles.roll   /* angles[ROLL] */
+       .x = -ent->angles.pitch, /* angles[PITCH] */ // because entity pitches are actually backward
+       .y = ent->angles.yaw,    /* angles[YAW] */
+       .z = ent->angles.roll    /* angles[ROLL] */
     };
 
     _bs = GetBasis(angles);
@@ -779,7 +779,7 @@ void V_CalcRefdef() {
 #if 0
     if (cl.model_precache[cl.stats[STAT_WEAPON]] && strcmp(cl.model_precache[cl.stats[STAT_WEAPON]]->name, "progs/v_shot2.mdl")) {}
 #endif
-    if (scr_viewsize.value == 110)      view->origin.z += 1;
+    /**/ if (scr_viewsize.value == 110) view->origin.z += 1;
     else if (scr_viewsize.value == 100) view->origin.z += 2;
     else if (scr_viewsize.value == 90)  view->origin.z += 1;
     else if (scr_viewsize.value == 80)  view->origin.z += 0.5;
@@ -873,14 +873,44 @@ void V_RenderView() {
     }
 
 #ifndef GLQUAKE
-    if (crosshair.value)
-        Draw_Character(
-            scr.vrect.x + scr.vrect.width / 2 + cl_crossx.value,
-            scr.vrect.y + scr.vrect.height / 2 + cl_crossy.value,
-            '+'
-        );
+     Draw_crosshair();
 #endif
 
+}
+
+
+void Draw_crosshair() {
+    if (crosshair.value)
+    Draw_Character(
+        scr.vrect.x + scr.vrect.width / 2 + cl_crossx.value,
+        scr.vrect.y + scr.vrect.height / 2 + cl_crossy.value,
+        '+'
+    );
+}
+
+/*
+=================
+V_SizeUp_f
+
+Keybinding command
+=================
+*/
+void V_SizeUp_f() {
+    Cvar_SetValue("viewsize", scr_viewsize.value + 10);
+    vid.recalc_refdef = true;
+}
+
+
+/*
+=================
+V_SizeDown_f
+
+Keybinding command
+=================
+*/
+void V_SizeDown_f() {
+    Cvar_SetValue("viewsize", scr_viewsize.value - 10);
+    vid.recalc_refdef = true;
 }
 
 //============================================================================
@@ -894,6 +924,9 @@ void V_Init() {
     Cmd_AddCommand("v_cshift", V_cshift_f);
     Cmd_AddCommand("bf", V_BonusFlash_f);
     Cmd_AddCommand("centerview", V_StartPitchDrift);
+
+    Cmd_AddCommand("sizeup", V_SizeUp_f);
+    Cmd_AddCommand("sizedown", V_SizeDown_f);
 
     Cvar_RegisterVariable(&lcd_x);
     Cvar_RegisterVariable(&lcd_yaw);
@@ -927,6 +960,8 @@ void V_Init() {
     Cvar_RegisterVariable(&v_kicktime);
     Cvar_RegisterVariable(&v_kickroll);
     Cvar_RegisterVariable(&v_kickpitch);
+    Cvar_RegisterVariable(&scr_fov);
+
 
     BuildGammaTable(1.0); // no gamma yet
     Cvar_RegisterVariable(&v_gamma);

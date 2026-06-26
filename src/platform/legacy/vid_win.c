@@ -318,7 +318,7 @@ int VID_Suspend(MGLDC* dc, m_int flags) {
 
         in_mode_set = false;
 
-        vid.recalc_refdef = 1;
+        vid.recalc_refdef = true;
 
         scr.block_drawing = false;
 
@@ -1569,7 +1569,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     VID_SetPalette(palette);
 
     in_mode_set = false;
-    vid.recalc_refdef = 1;
+    vid.recalc_refdef = true;
 
     return true;
 }
@@ -2452,7 +2452,6 @@ void AppActivate(BOOL fActive, BOOL minimize)
         if (!Minimized)
             VID_SetPalette(vid_curpal);
 
-        scr_fullupdate = 0;
 
         ReleaseDC(NULL, hdc);
     }
@@ -2724,7 +2723,6 @@ LONG WINAPI MainWndProc(
 
         ReleaseDC(NULL, hdc);
 
-        scr_fullupdate = 0;
 
         if (vid_initialized && !in_mode_set && windc && MGL_activatePalette(windc, false) && !Minimized) {
             VID_SetPalette(vid_curpal);

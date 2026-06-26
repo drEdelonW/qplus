@@ -112,16 +112,43 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                 SRC_LIST += $(CL_SIDE_DIR)/cl_parse.c
                 SRC_LIST += $(CL_SIDE_DIR)/cl_tent.c
 
-                $(eval VID_DIR = $(CL_SIDE_DIR)/video) $(eval INCLUDES += $(VID_DIR))
-                        $(eval RENDER_DIR = $(VID_DIR)/comAPI) $(eval INCLUDES += $(RENDER_DIR))
-                                SRC_LIST += $(RENDER_DIR)/cScreen.c
+                $(eval VID_DIR = $(CL_SIDE_DIR)/video/comAPI) $(eval INCLUDES += $(VID_DIR))
+                        SRC_LIST += $(VID_DIR)/cScreen.c
 
-#         $(eval API_DIR := $(HOST_DIR)/API) $(eval INCLUDES += $(API_DIR))
+                        $(eval GSCR_DIR = $(VID_DIR)/GameScreen) $(eval INCLUDES += $(GSCR_DIR))
+                                $(eval VP_DIR = $(GSCR_DIR)/ViewPort) $(eval INCLUDES += $(VP_DIR))
+                                        SRC_LIST += $(VP_DIR)/view.c
+
+                                $(eval SB_DIR = $(GSCR_DIR)/HUD) $(eval INCLUDES += $(SB_DIR))
+                                        SRC_LIST += $(SB_DIR)/sbar.c
+
+                        $(eval GAMECON_DIR = $(VID_DIR)/GameConsole) $(eval INCLUDES += $(GAMECON_DIR))
+                                SRC_LIST += $(GAMECON_DIR)/echoConsole.c
+
+
+                        $(eval MENU_DIR = $(VID_DIR)/GameMenu) $(eval INCLUDES += $(MENU_DIR))
+                                $(eval GMENU_DIR = $(MENU_DIR)/menus) $(eval INCLUDES += $(GMENU_DIR))
+                                        SRC_LIST += $(GMENU_DIR)/menu_main.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_singleplayer.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_load_save.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_multiplayer.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_setup.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_net.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_search.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_server_list.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_config_serial.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_config_modem.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_config_lan.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_options.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_game_options.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_defkey.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_help.c
+                                        SRC_LIST += $(GMENU_DIR)/menu_quit.c
+
+                                SRC_LIST += $(MENU_DIR)/menu.c
+                                SRC_LIST += $(MENU_DIR)/menu_common.c
 
 include features/fh_qRender$(QRND).mk
-
-                $(eval UI_DIR = $(CL_SIDE_DIR)/ui) $(eval INCLUDES += $(UI_DIR))
-                        SRC_LIST += $(UI_DIR)/view.c
 
 
         $(eval SHARED_DIR = $(ENG_DIR)/Shared) $(eval INCLUDES += $(SHARED_DIR))
@@ -191,26 +218,5 @@ include features/fh_qRender$(QRND).mk
 #=============================[GAME DEPENDED LOGIC]=============================#
 
 $(eval GAME_DIR := $(SRC_DIR)/game/Quake) $(eval INCLUDES += $(GAME_DIR))
-        $(eval MENU_DIR = $(GAME_DIR)/menu) $(eval INCLUDES += $(MENU_DIR))
-                SRC_LIST += $(MENU_DIR)/menu.c
-                SRC_LIST += $(MENU_DIR)/menu_common.c
-                SRC_LIST += $(MENU_DIR)/menu_main.c
-                SRC_LIST += $(MENU_DIR)/menu_singleplayer.c
-                SRC_LIST += $(MENU_DIR)/menu_load_save.c
-                SRC_LIST += $(MENU_DIR)/menu_multiplayer.c
-                SRC_LIST += $(MENU_DIR)/menu_setup.c
-                SRC_LIST += $(MENU_DIR)/menu_net.c
-                SRC_LIST += $(MENU_DIR)/menu_search.c
-                SRC_LIST += $(MENU_DIR)/menu_server_list.c
-                SRC_LIST += $(MENU_DIR)/menu_config_serial.c
-                SRC_LIST += $(MENU_DIR)/menu_config_modem.c
-                SRC_LIST += $(MENU_DIR)/menu_config_lan.c
-                SRC_LIST += $(MENU_DIR)/menu_options.c
-                SRC_LIST += $(MENU_DIR)/menu_game_options.c
-                SRC_LIST += $(MENU_DIR)/menu_defkey.c
-                SRC_LIST += $(MENU_DIR)/menu_help.c
-                SRC_LIST += $(MENU_DIR)/menu_quit.c
-
         SRC_LIST += $(GAME_DIR)/game_rule.c
-        SRC_LIST += $(GAME_DIR)/sbar.c
         SRC_LIST += $(GAME_DIR)/chase.c

@@ -686,7 +686,7 @@ void VID_Update(vRect_p rects) {
         vid.conwidth = vid.width;
         vid.conheight = vid.height;
         vid.conrowbytes = vid.rowbytes;
-        vid.recalc_refdef = 1;    // force a surface cache flush
+        vid.recalc_refdef = true;    // force a surface cache flush
         Con_CheckResize();
         Con_Clear_f();
         return;
@@ -746,14 +746,14 @@ static int dither;
 
 void VID_DitherOn() {
     if (dither == 0) {
-        vid.recalc_refdef = 1;
+        vid.recalc_refdef = true;
         dither = 1;
     }
 }
 
 void VID_DitherOff() {
     if (dither) {
-        vid.recalc_refdef = 1;
+        vid.recalc_refdef = true;
         dither = 0;
     }
 }

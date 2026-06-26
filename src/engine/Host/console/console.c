@@ -30,8 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdarg.h>
 #include <string.h>
 #include "console.h"
-#include "keys.h"
-#include "menu_prv.h"
+// #include "keys.h"
 #include "client.h"
 #include "q_tools.h"
 #include "common.h"
@@ -41,51 +40,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "screen.h"
 #include "host.h"
 #include "sys.h"
-#include "draw.h"
+// #include "draw.h"
 #include "cvar_q1.h"
 #include "z_hunk.h"
 
 #define CON_TEXTSIZE    (int32_t)0x4000 /*16Kb - 16384b*/
-#define NUM_CON_TIMES 4
+
 
 int32_t edit_line;
 
-console_t con;
-
-typedef struct {
-    int32_t  linewidth;
-    float    cursorspeed;
-    int32_t  current;   // where next message will be printed
-    uint32_t  x;         // offset in current line for next print
-    cString  text;
-    int32_t  vislines;
-    bool     debuglog;
-    float    times[NUM_CON_TIMES]; // realtime time the line was generated for transparent notify lines
-} _console_t;
-
-static _console_t _con = {
+console_t con = {
     .cursorspeed = 4
 };
 
-/*
-    ================
-    Con_ToggleConsole_f
-    ================
-*/
-void Con_ToggleConsole_f() {
-    if (key.dest == key_console) {
-        if (cls.state == ca_connected) {
-            key.dest = key_game;
-            con.lines[edit_line][1] = 0; // clear any typing
-            con.linepos = 1;
-        }
-        else    M_Menu_Main_f();
-    }
-    else    key.dest = key_console;
+typedef struct {
+    uint32_t  x;         // offset in current line for next print
+    bool     debuglog;
+} _console_t;
 
-    SCR_EndLoadingPlaque();
-    memset(_con.times, 0, sizeof(_con.times));
-}
+static _console_t _con;
+
+
 
 /*
     ================
@@ -93,8 +68,8 @@ void Con_ToggleConsole_f() {
     ================
 */
 void Con_Clear_f() {
-    if (_con.text) {
-        Q_memset(_con.text, ' ', CON_TEXTSIZE);
+    if (con.text) {
+        Q_memset(con.text, ' ', CON_TEXTSIZE);
     }
 }
 
@@ -106,7 +81,7 @@ void Con_Clear_f() {
 */
 void Con_ClearNotify() {
     for (int i = 0; i < NUM_CON_TIMES; i++)
-        _con.times[i] = 0;
+        con.times[i] = 0;
 }
 
 
@@ -142,20 +117,20 @@ void Con_MessageMode2_f() {
 */
 void Con_CheckResize() {
     int32_t width = (vid.width >> 3) - 2;
-    if (width == _con.linewidth)
+    if (width == con.linewidth)
         return;
 
     if (width < 1) {   // video hasn't been initialized yet
         width = 38;
-        _con.linewidth = (int32_t)width;
-        con.totallines = CON_TEXTSIZE / _con.linewidth;
-        Q_memset(_con.text, ' ', CON_TEXTSIZE);
+        con.linewidth = (int32_t)width;
+        con.totallines = CON_TEXTSIZE / con.linewidth;
+        Q_memset(con.text, ' ', CON_TEXTSIZE);
     }
     else {
-        uint32_t oldwidth = (uint32_t)_con.linewidth;
-        _con.linewidth = (int32_t)width;
+        uint32_t oldwidth = (uint32_t)con.linewidth;
+        con.linewidth = (int32_t)width;
         int32_t oldtotallines = con.totallines;
-        con.totallines = CON_TEXTSIZE / _con.linewidth;
+        con.totallines = CON_TEXTSIZE / con.linewidth;
         int32_t numlines = oldtotallines;
 
         if (con.totallines < numlines)
@@ -163,17 +138,17 @@ void Con_CheckResize() {
 
         uint32_t numchars = oldwidth;
 
-        if (_con.linewidth < numchars)
-            numchars = (uint32_t)_con.linewidth;
+        if (con.linewidth < numchars)
+            numchars = (uint32_t)con.linewidth;
 
         char tbuf[CON_TEXTSIZE];
-        Q_memcpy(tbuf, _con.text, CON_TEXTSIZE);
-        Q_memset(_con.text, ' ', CON_TEXTSIZE);
+        Q_memcpy(tbuf, con.text, CON_TEXTSIZE);
+        Q_memset(con.text, ' ', CON_TEXTSIZE);
 
         for (int32_t i = 0; i < numlines; i++) {
             for (int32_t j = 0; j < numchars; j++) {
-                _con.text[(con.totallines - 1 - i) * _con.linewidth + j] =
-                    tbuf[((_con.current - i + oldtotallines) %
+                con.text[(con.totallines - 1 - i) * con.linewidth + j] =
+                    tbuf[((con.current - i + oldtotallines) %
                         oldtotallines) * (int32_t)oldwidth + j];
             }
         }
@@ -182,7 +157,7 @@ void Con_CheckResize() {
     }
 
     con.backscroll = 0;
-    _con.current = (int32_t)con.totallines - 1;
+    con.current = (int32_t)con.totallines - 1;
 }
 
 
@@ -203,9 +178,9 @@ void Con_Init() {
         }
     }
 
-    _con.text = Hunk_AllocName(CON_TEXTSIZE, "context");
-    Q_memset(_con.text, ' ', CON_TEXTSIZE);
-    _con.linewidth = -1;
+    con.text = Hunk_AllocName(CON_TEXTSIZE, "context");
+    Q_memset(con.text, ' ', CON_TEXTSIZE);
+    con.linewidth = -1;
     Con_CheckResize();
 
     Con_Printf("Console initialized.\n");
@@ -230,12 +205,12 @@ void Con_Init() {
 */
 void Con_Linefeed() {
     _con.x = 0;
-    _con.current++;
+    con.current++;
     Q_memset(
-        &_con.text[
-            (uint32_t)((_con.current % (int32_t)con.totallines) * _con.linewidth)
+        &con.text[
+            (uint32_t)((con.current % (int32_t)con.totallines) * con.linewidth)
         ],
-        ' ', (uint32_t)_con.linewidth
+        ' ', (uint32_t)con.linewidth
     );
 }
 
@@ -271,21 +246,21 @@ void Con_Print(cStringRO txt) {
     while ((c = *txt)) {
         // count word length
         uint32_t l = 0;
-        for (; l < _con.linewidth; l++) {
+        for (; l < con.linewidth; l++) {
             if (txt[l] <= ' ')
                 break;
         }
 
         // word wrap
-        if ((l != _con.linewidth) &&
-            ((_con.x + l) > (uint32_t)_con.linewidth)) {
+        if ((l != con.linewidth) &&
+            ((_con.x + l) > (uint32_t)con.linewidth)) {
             _con.x = 0;
         }
 
         txt++;
 
         if (cr) {
-            _con.current--;
+            con.current--;
             cr = false;
         }
 
@@ -293,8 +268,8 @@ void Con_Print(cStringRO txt) {
         if (!_con.x) {
             Con_Linefeed();
             // mark time for transparent overlay
-            if (_con.current >= 0)
-                _con.times[_con.current % NUM_CON_TIMES] = (float)realtime;
+            if (con.current >= 0)
+                con.times[con.current % NUM_CON_TIMES] = (float)realtime;
         }
 
         switch (c) {
@@ -308,14 +283,14 @@ void Con_Print(cStringRO txt) {
             break;
 
         default: // display character and advance
-            _con.text[
+            con.text[
                 (uint32_t)(
-                    (_con.current % (int32_t)con.totallines) *
-                    _con.linewidth) +
+                    (con.current % (int32_t)con.totallines) *
+                    con.linewidth) +
                     _con.x
             ] = (uint32_t)c | mask;
             _con.x++;
-            if (_con.x >= _con.linewidth) {
+            if (_con.x >= con.linewidth) {
                 _con.x = 0;
             }
             break;
@@ -435,132 +410,6 @@ void Con_SafePrintf(cStringRO fmt, ...) {
     ==============================================================================
 */
 
-
-/*
-    ================
-    Con_DrawInput
-
-    The input line scrolls horizontally if typing goes beyond the right edge
-    ================
-*/
-void Con_DrawInput() {
-    if ((key.dest != key_console) &&
-        (!con.forcedup)) {
-        return;  // don't draw anything
-    }
-
-    cString text = con.lines[edit_line];
-
-    // add the cursor frame
-    text[con.linepos] = 10 + ((int)(realtime * _con.cursorspeed) & 1);
-
-    // fill out remainder with spaces
-    for (uint32_t i = (con.linepos + 1); i < _con.linewidth; i++)
-        text[i] = ' ';
-
-    // prestep if horizontally scrolling
-    if (con.linepos >= _con.linewidth)
-        text += 1 + con.linepos - (uint32_t)_con.linewidth;
-
-    // draw it
-    int32_t y = _con.vislines - 16;
-
-    for (int32_t i = 0; i < _con.linewidth; i++)
-        Draw_Character((i + 1) << 3, y, text[i]);
-
-    // remove cursor
-    con.lines[edit_line][con.linepos] = 0;
-}
-
-
-/*
-    ================
-    Con_DrawNotify
-
-    Draws the last few lines of output transparently over the game top
-    ================
-*/
-void Con_DrawNotify() {
-
-    int32_t v = 0;
-    for (int32_t i = (_con.current - NUM_CON_TIMES + 1); i <= _con.current; i++) {
-        if (i < 0)  continue;
-
-        float time = _con.times[i % NUM_CON_TIMES];
-        if (time == 0)  continue;
-
-        time = (float)realtime - time;
-        if (time > con_notifytime.value)    continue;
-
-        cString text = _con.text + (i % (int32_t)con.totallines) * _con.linewidth;
-
-        scr.clearnotify = 0;
-        scr.copytop = true;
-
-        for (int32_t x = 0; x < _con.linewidth; x++)
-            Draw_Character((x + 1) << 3, v, text[x]);
-
-        v += D_CHAR_HEIGHT;
-    }
-
-    if (key.dest == key_message) {
-        scr.clearnotify = 0;
-        scr.copytop = true;
-
-        int32_t x = 0;
-
-        Draw_String(8, v, "say:");
-        while (chatBuffer[x]) {
-            Draw_Character((x + 5) << 3, v, chatBuffer[x]);
-            x++;
-        }
-        Draw_Character((x + 5) << 3, v, 10 + ((int)(realtime * _con.cursorspeed) & 1));
-        v += D_CHAR_HEIGHT;
-    }
-
-    if (v > con.notifylines) {
-        con.notifylines = v;
-    }
-}
-
-/*
-    ================
-    Con_DrawConsole
-
-    Draws the console with the solid background
-    The typing input line at the bottom should only be drawn if typing is allowed
-    ================
-*/
-void Con_DrawConsole(int32_t lines, bool drawinput) {
-    if (lines <= 0)
-        return;
-
-    // draw the background
-    Draw_ConsoleBackground(lines);
-
-    // draw the text
-    _con.vislines = lines;
-
-    int32_t rows = (lines - 16) >> 3;  // rows of text to draw
-    int32_t y = lines - 16 - (rows << 3); // may start slightly negative
-
-    for (int32_t i = (_con.current - rows + 1); i <= _con.current; i++, y += D_CHAR_HEIGHT) {
-        int32_t j = i - con.backscroll;
-
-        CLAMP_LESS(j, 0);
-
-        cString text = _con.text + (j % con.totallines) * _con.linewidth;
-
-        for (int32_t x = 0; x < _con.linewidth; x++)
-            Draw_Character((x + 1) << 3, y, text[x]);
-
-    }
-
-    // draw the input prompt, user text, and cursor if desired
-    if (drawinput)
-        Con_DrawInput();
-
-}
 
 
 /*

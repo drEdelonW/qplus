@@ -12,6 +12,11 @@
 #include "sbar.h"
 #include "RefDef.h"
 #include <math.h>
+#ifdef GLQUAKE
+# include "qOpenGL.h"
+#else
+# include "render.h"
+#endif
 
 Screen_t scr;
 _Screen_t _scr;
@@ -22,7 +27,6 @@ SCR_Init
 ==================
 */
 void SCR_Init() {
-    Cvar_RegisterVariable(&scr_fov);
     Cvar_RegisterVariable(&scr_viewsize);
     Cvar_RegisterVariable(&scr_conspeed);
     Cvar_RegisterVariable(&scr_showram);
@@ -37,12 +41,12 @@ void SCR_Init() {
     // register our commands
     //
     Cmd_AddCommand("screenshot", SCR_ScreenShot_f);
-    Cmd_AddCommand("sizeup", SCR_SizeUp_f);
-    Cmd_AddCommand("sizedown", SCR_SizeDown_f);
 
+#if 1 /* System status */
     _scr.ram = Draw_PicFromWad("ram");
     _scr.net = Draw_PicFromWad("net");
     _scr.turtle = Draw_PicFromWad("turtle");
+#endif
 
     _scr.initialized = true;
 }
@@ -233,31 +237,6 @@ void SCR_EndLoadingPlaque() {
 
 
 
-/*
-=================
-SCR_SizeUp_f
-
-Keybinding command
-=================
-*/
-void SCR_SizeUp_f() {
-    Cvar_SetValue("viewsize", scr_viewsize.value + 10);
-    vid.recalc_refdef = 1;
-}
-
-
-/*
-=================
-SCR_SizeDown_f
-
-Keybinding command
-=================
-*/
-void SCR_SizeDown_f() {
-    Cvar_SetValue("viewsize", scr_viewsize.value - 10);
-    vid.recalc_refdef = 1;
-}
-
 
 
 /*
@@ -423,25 +402,97 @@ void SCR_SetUpToDrawConsole() {
 
 
 /*
-==================
-SCR_DrawConsole
-==================
+=================
+SCR_CalcRefdef
+
+Must be called whenever vid changes
+Internal use only
+=================
 */
-void SCR_DrawConsole() {
-    if (scr.con_current) {
-        scr.copyeverything = true;
-        Con_DrawConsole(scr.con_current, true);
-        _scr.clearConsole = 0;
-    }
-    else {
-        if ((key.dest == key_game) ||
-            (key.dest == key_message)
-            )
-            Con_DrawNotify();   // only draw notify in game
-    }
-}
+void SCR_CalcRefdef() {
+    if (!vid.recalc_refdef)     return;
 
+    vid.recalc_refdef = false;
 
+    // force the status bar to redraw
+    Sbar_Changed();
+
+    //========================================
+
+    // bound viewsize
+    if (scr_viewsize.value < 30)    Cvar_Set("viewsize", "30");
+    if (scr_viewsize.value > 120)   Cvar_Set("viewsize", "120");
+
+    // bound field of view
+    if (scr_fov.value < 10)         Cvar_Set("fov", "10");
+    if (scr_fov.value > 170)        Cvar_Set("fov", "170");
+
+    // intermission is always full screen
+    {
+        float size = (cl.intermission != IM_NONE) ? 120 : scr_viewsize.value;
+        /**/ if (size >= 120.0f)    sb_lines = 0;        // no status bar at all
+        else if (size >= 110.0f)    sb_lines = 24;       // no inventory
+        else /*               */    sb_lines = 24 + 16 + 8;
+    }
 #ifdef GLQUAKE
+
+    bool full = false;
+    float size;
+    if (scr_viewsize.value >= 100.0f) {
+        full = true;
+        size = 100.0f;
+    }
+    else
+        size = scr_viewsize.value;
+
+    if (cl.intermission != IM_NONE) {
+        full = true;
+        size = 100.0f;
+        sb_lines = 0;
+    }
+    size /= 100.0f;
+
+    int h = vid.height - sb_lines;
+
+    r_refdef.vrect.width = vid.width * size;
+    if (r_refdef.vrect.width < 96) {
+        size = 96.0 / r_refdef.vrect.width;
+        r_refdef.vrect.width = 96;    // min for icons
+    }
+
+    r_refdef.vrect.height = vid.height * size;
+    if (r_refdef.vrect.height > (vid.height - sb_lines))
+        r_refdef.vrect.height = (vid.height - sb_lines);
+    if (r_refdef.vrect.height > vid.height)
+        r_refdef.vrect.height = vid.height;
+
+    r_refdef.vrect.x = (vid.width - r_refdef.vrect.width) / 2;
+    r_refdef.vrect.y = (full) ? 0 : (h - r_refdef.vrect.height) / 2;
+
+    r_refdef.fov_x = scr_fov.value;
+    r_refdef.fov_y = CalcFov(r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
+
 #else
+
+    // these calculations mirror those in R_Init() for r_refdef, but take no
+    // account of water warping
+    vRect_t vrect = {
+        .width = vid.width,
+        .height = vid.height
+    };
+
+    R_SetVrect(&vrect, &scr.vrect, sb_lines);
+
+    r_refdef.fov_x = scr_fov.value;
+    r_refdef.fov_y = CalcFov(r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
+
+    // guard against going from one mode to another that's less than half the
+    // vertical resolution
+    if (scr.con_current > vid.height)
+        scr.con_current = vid.height;
+
+    // notify the refresh of the change
+    R_ViewChanged(&vrect, sb_lines, vid.aspect);
+
 #endif
+}

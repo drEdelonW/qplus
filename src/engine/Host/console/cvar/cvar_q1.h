@@ -124,9 +124,6 @@ CVAR_EXTERN(saved2);
 CVAR_EXTERN(saved3);
 CVAR_EXTERN(saved4);
 
-// FROM: src/video/render/r_main.c
-CVAR_EXTERN(scr_fov);
-
 // FROM: src/video/render/r_local.h
 CVAR_EXTERN(r_draworder);
 CVAR_EXTERN(r_speeds);
@@ -154,6 +151,8 @@ CVAR_EXTERN(r_aliastransbase);
 CVAR_EXTERN(r_aliastransadj);
 
 // FROM: src/ui/view.c
+CVAR_EXTERN(scr_fov);   // 10 - 170
+
 CVAR_EXTERN(lcd_x);
 CVAR_EXTERN(lcd_yaw);
 
@@ -205,7 +204,6 @@ CVAR_EXTERN(_snd_mixahead);
 
 // FROM: src/ui/screen.c
 CVAR_EXTERN(scr_viewsize);
-CVAR_EXTERN(scr_fov);	// 10 - 170
 CVAR_EXTERN(scr_conspeed);
 CVAR_EXTERN(scr_centertime);
 CVAR_EXTERN(scr_showram);

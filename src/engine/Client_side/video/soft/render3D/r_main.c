@@ -294,7 +294,7 @@ R_SetVrect
 ===============
 */
 void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) {
-    float size = scr_viewsize.value > 100 ? 100 : scr_viewsize.value;
+    float size = (scr_viewsize.value > 100.0f) ? 100.0f : scr_viewsize.value;
     if (cl.intermission != IM_NONE) {
         size = 100;
         lineadj = 0;

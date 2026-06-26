@@ -656,7 +656,7 @@ void VID_Init(uint8_p palette) {
 
     Con_SafePrintf("Video mode %dx%d initialized.\n", width, height);
 
-    vid.recalc_refdef = 1;				// force a surface cache flush
+    vid.recalc_refdef = true;				// force a surface cache flush
 }
 
 void Sys_SendKeyEvents() {

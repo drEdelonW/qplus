@@ -16,7 +16,7 @@ typedef struct {
     int     center_lines;
     char    centerstring[1024];
     int      clearConsole;
-    float    oldScrViewSize, oldFov;
+    float    oldViewSize, oldFov;
 } _Screen_t;
 
 extern _Screen_t _scr;
@@ -26,8 +26,6 @@ extern "C" {
 #endif
 
     void SCR_ScreenShot_f();
-    void SCR_SizeUp_f();
-    void SCR_SizeDown_f();
     void SCR_DrawCenterString();
     int SCR_ModalMessage(cString text);
     void SCR_DrawNotifyString();
@@ -42,6 +40,7 @@ extern "C" {
     void SCR_DrawNet();
     void SCR_DrawPause();
     void SCR_DrawLoading();
+    void SCR_CalcRefdef();
 
 #ifdef __cplusplus
 }

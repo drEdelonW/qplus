@@ -25,15 +25,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // console
 //
+#define NUM_CON_TIMES (4)
 #define MAXCMDLINE  (256)
 #define MAXCHATLEN  (32)
 typedef struct {
     int32_t totallines; // total lines in console scrollback
     int32_t backscroll; // lines up from bottom to display
     int32_t notifylines;  // scan lines to clear for notify lines
+    int32_t vislines;
+    int32_t linewidth;
+    int32_t current;   // where next message will be printed
     bool    forcedup; // because no entities to refresh
     bool    isInitialized;
     char    lines[MAXCHATLEN][MAXCMDLINE];
+    float   cursorspeed;
+    float   times[NUM_CON_TIMES]; // realtime time the line was generated for transparent notify lines
+    cString text;
     uint32_t linepos;
 } console_t;
 extern console_t con;
@@ -47,7 +54,6 @@ extern "C" {
     void Con_DrawCharacter(int32_t cx, int32_t line, int32_t num);
     void Con_CheckResize();
     void Con_Init();
-    void Con_DrawConsole(int32_t lines, bool drawinput);
     void Con_Print(cStringRO txt);
     void Con_Printf(cStringRO fmt, ...);
     void Con_DPrintf(cStringRO fmt, ...);

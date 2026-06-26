@@ -194,8 +194,8 @@ CVAR(v_ipitch_level, "0.3");
 CVAR(v_idlescale, "0");
 
 CVAR_ARC(crosshair, "0");
-CVAR(cl_crossx, "0");
-CVAR(cl_crossy, "0");
+CVAR(cl_crossx, "-4");
+CVAR(cl_crossy, "-4");
 
 CVAR(gl_cshiftpercent, "100");
 

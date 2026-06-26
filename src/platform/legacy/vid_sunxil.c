@@ -201,7 +201,7 @@ void VID_Gamma_f() {
 
         VID_SetPalette(current_palette);
 
-        vid.recalc_refdef = 1;				// force a surface cache flush
+        vid.recalc_refdef = true;				// force a surface cache flush
     }
 
 }
@@ -648,7 +648,7 @@ VID_ResetFramebuffer() {
 
     vid.maxwarpwidth = WARP_WIDTH;
     vid.maxwarpheight = WARP_HEIGHT;
-    vid.recalc_refdef = 1;				// force a surface cache flush
+    vid.recalc_refdef = true;				// force a surface cache flush
 
     free(d_pzbuffer);
 
@@ -1078,7 +1078,7 @@ drain_renderpipeline(XilImage old) {
 
     vid.maxwarpwidth = WARP_WIDTH;
     vid.maxwarpheight = WARP_HEIGHT;
-    vid.recalc_refdef = 1;				// force a surface cache flush
+    vid.recalc_refdef = true;				// force a surface cache flush
 
     return(new);
 
@@ -1135,14 +1135,14 @@ static int dither;
 
 void VID_DitherOn() {
     if (dither == 0) {
-        vid.recalc_refdef = 1;
+        vid.recalc_refdef = true;
         dither = 1;
     }
 }
 
 void VID_DitherOff() {
     if (dither) {
-        vid.recalc_refdef = 1;
+        vid.recalc_refdef = true;
         dither = 0;
     }
 }
