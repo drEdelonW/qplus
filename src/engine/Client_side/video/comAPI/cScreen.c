@@ -88,7 +88,7 @@ void SCR_DrawCenterString() {
     cString start = _scr.centerstring;
 
     int y = (_scr.center_lines <= 4) ?
-        vid.height * 0.35 : 48;
+        vid.scr.height * 0.35 : 48;
 
     do {
         // scan the width of the line
@@ -97,7 +97,7 @@ void SCR_DrawCenterString() {
             if ((start[inLine] == '\n') || !start[inLine])
                 break;
 
-        int x = (vid.width - inLine * 8) / 2;
+        int x = (vid.scr.width - inLine * 8) / 2;
         for (int j = 0; j < inLine; j++, x += 8) {
             Draw_Character(x, y, start[j]);
             if (!remaining--)
@@ -155,7 +155,7 @@ int SCR_ModalMessage(cString text) {
 
 void SCR_DrawNotifyString() {
     cString start = _scr.notifystring;
-    int y = vid.height * 0.35f;
+    int y = vid.scr.height * 0.35f;
 
     do {
         // scan the width of the line
@@ -166,7 +166,7 @@ void SCR_DrawNotifyString() {
                 )
                 break;
 
-        int x = (vid.width - inLine * 8) / 2;
+        int x = (vid.scr.width - inLine * 8) / 2;
         for (int j = 0; j < inLine; j++, x += 8)
             Draw_Character(x, y, start[j]);
 
@@ -330,10 +330,10 @@ void SCR_SetUpToDrawConsole() {
     con.forcedup = !cl.worldmodel || cls.signon != SIGNONS;
 
     if (con.forcedup) {
-        scr.conlines = vid.height;  // full screen
+        scr.conlines = vid.scr.height;  // full screen
         scr.con_current = scr.conlines;
     }
-    else if (key.dest == key_console)   scr.conlines = vid.height / 2;  // half screen
+    else if (key.dest == key_console)   scr.conlines = vid.scr.height / 2;  // half screen
     else                                scr.conlines = 0;               // none visible
 
     if (scr.con_current > scr.conlines) {
@@ -354,8 +354,8 @@ void SCR_SetUpToDrawConsole() {
         Draw_TileClear(
             0,
             scr.con_current,
-            vid.width,
-            vid.height - scr.con_current
+            vid.scr.width,
+            vid.scr.height - scr.con_current
         );
 #endif
         Sbar_Changed();
@@ -364,7 +364,7 @@ void SCR_SetUpToDrawConsole() {
 #ifdef GLQUAKE
 #else
         scr.copytop = true;
-        Draw_TileClear(0, 0, vid.width, con.notifylines);
+        Draw_TileClear(0, 0, vid.scr.width, con.notifylines);
 #endif
     }
     else
@@ -409,8 +409,8 @@ void SCR_CalcRefdef() {
     }
 
     vRect_t vrect = {
-        .width = vid.width,
-        .height = vid.height
+        .width = vid.scr.width,
+        .height = vid.scr.height
     };
     vRect_p pvrectin = &vrect;
     vRect_p pvrect = &r_refdef.vrect;
@@ -458,11 +458,11 @@ void SCR_CalcRefdef() {
 #ifdef GLQUAKE
 #else
     // guard against going from one mode to another that's less than half the vertical resolution
-    if (scr.con_current > vid.height)
-        scr.con_current = vid.height;
+    if (scr.con_current > vid.scr.height)
+        scr.con_current = vid.scr.height;
 
     // notify the refresh of the change
-    R_ViewChanged(pvrectin, sb_lines, vid.aspect);
+    R_ViewChanged(pvrectin, sb_lines, scr.aspect);
 #endif
 }
 

@@ -68,7 +68,7 @@ void D_CopyRects(vRect_p prects, int transparent) {
     // this function is only required if the CPU doesn't have direct access to the
     // back buffer, and there's some driver interface function that the driver
     // doesn't support and requires Quake to do in software (such as drawing the
-    // console); Quake will then draw into wherever the driver points vid.buffer
+    // console); Quake will then draw into wherever the driver points vid.scr.pBuff
     // and will call this function before swapping buffers
 
     // UNUSED(prects);
@@ -108,7 +108,7 @@ D_SetupFrame
 ===============
 */
 void D_SetupFrame() {
-    d_viewbuffer = (r_dowarp) ? r_warpbuffer : (TypeLess_ptr)(uint8_p)vid.buffer;
+    d_viewbuffer = (r_dowarp) ? r_warpbuffer : (TypeLess_ptr)(uint8_p)vid.scr.pBuff;
 
     screenwidth = (r_dowarp) ? WARP_WIDTH : vid.rowbytes;
 

@@ -279,7 +279,7 @@ static void install_grabs() {
         XWarpPointer(
             _dpy, None, _win,
             0, 0, 0, 0,
-            vid.width / 2, vid.height / 2
+            vid.scr.width / 2, vid.scr.height / 2
         );
     }
 
@@ -320,8 +320,8 @@ static void HandleEvents() {
     KeySym ks;
     int b;
     bool dowarp = false;
-    int mwx = vid.width / 2;
-    int mwy = vid.height / 2;
+    int mwx = vid.scr.width / 2;
+    int mwy = vid.scr.height / 2;
 
     if (!_dpy)
         return;
@@ -390,7 +390,7 @@ static void HandleEvents() {
         XWarpPointer(
             _dpy, None, _win,
             0, 0, 0, 0,
-            vid.width / 2, vid.height / 2
+            vid.scr.width / 2, vid.scr.height / 2
         );
     }
 
@@ -719,10 +719,10 @@ void VID_Init(uint8_p palette) {
     Cvar_RegisterVariable(&m_filter);
     Cvar_RegisterVariable(&gl_ztrick);
 
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
-    vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
+    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
 
     // interpret command-line params
 
@@ -737,21 +737,21 @@ void VID_Init(uint8_p palette) {
         height = atoi(com.argv[i + 1]);
 
     if ((i = COM_CheckParm("-conwidth")) != 0)
-        vid.conwidth = Q_atoi(com.argv[i + 1]);
+        vid.con.width = Q_atoi(com.argv[i + 1]);
     else
-        vid.conwidth = 640;
+        vid.con.width = 640;
 
-    vid.conwidth &= 0xfff8; // make it a multiple of eight
+    vid.con.width &= 0xfff8; // make it a multiple of eight
 
-    if (vid.conwidth < 320)     vid.conwidth = 320;
+    if (vid.con.width < 320)     vid.con.width = 320;
 
     // pick a conheight that matches with correct aspect
-    vid.conheight = vid.conwidth * 3 / 4;
+    vid.con.height = vid.con.width * 3 / 4;
 
     if ((i = COM_CheckParm("-conheight")) != 0)
-        vid.conheight = Q_atoi(com.argv[i + 1]);
-    if (vid.conheight < 200)
-        vid.conheight = 200;
+        vid.con.height = Q_atoi(com.argv[i + 1]);
+    if (vid.con.height < 200)
+        vid.con.height = 200;
 
     if (!(_dpy = XOpenDisplay(NULL))) {
         fprintf(stderr, "Error couldn't open the X display\n");
@@ -870,12 +870,12 @@ void VID_Init(uint8_p palette) {
     _scrWidth = width;
     _scrHeight = height;
 
-    if (vid.conheight > height)     vid.conheight = height;
-    if (vid.conwidth > width)       vid.conwidth = width;
-    vid.width = vid.conwidth;
-    vid.height = vid.conheight;
+    if (vid.con.height > height)     vid.con.height = height;
+    if (vid.con.width > width)       vid.con.width = width;
+    vid.scr.width = vid.con.width;
+    vid.scr.height = vid.con.height;
 
-    vid.aspect = ((float)vid.height / (float)vid.width) * (320.0 / 240.0);
+    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
     vid.numpages = 2;
 
     InitSig(); // trap evil signals

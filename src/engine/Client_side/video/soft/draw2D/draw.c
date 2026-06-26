@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // vid buffer
 
 #include "draw.h"
-#include "vid.h"
+#include "vid.h"    // vid.con.pBuff
 #include "platformdefs.h"
 #include "zone.h"
 #include <string.h>
@@ -138,9 +138,9 @@ void Draw_Character(int x, int y, int num) {
     if (y <= -8)    return; // totally off screen
 
 #ifdef PARANOID
-    if ((y > vid.height - 80) ||
+    if ((y > vid.scr.height - 80) ||
         (x < 0) ||
-        (x > vid.width - 8))
+        (x > vid.scr.width - 8))
         Host_SysError("Con_DrawCharacter: (%i, %i)", x, y);
     if ((num < 0) ||
         (num > 255))
@@ -162,7 +162,7 @@ void Draw_Character(int x, int y, int num) {
 
 
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.conbuffer + y * vid.conrowbytes + x;
+        uint8_p dest = vid.con.pBuff + y * vid.conrowbytes + x;
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
@@ -176,7 +176,7 @@ void Draw_Character(int x, int y, int num) {
     else {
         // FIXME: pre-expand to native format?
         uint16_p pusdest = (uint16_p)
-            ((uint8_p)vid.conbuffer + y * vid.conrowbytes + (x << 1));
+            ((uint8_p)vid.con.pBuff + y * vid.conrowbytes + (x << 1));
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
@@ -239,8 +239,8 @@ Draw_Pic
 void Draw_Pic(int x, int y, qPic_p pic) {
     if ((x < 0) ||
         (y < 0) ||
-        ((x + pic->width) > vid.width) ||
-        ((y + pic->height) > vid.height)
+        ((x + pic->width) > vid.scr.width) ||
+        ((y + pic->height) > vid.scr.height)
         ) {
         Host_SysError("Draw_Pic: bad coordinates %i/%i-%i/%i", x, y, pic->width, pic->height);
     }
@@ -248,7 +248,7 @@ void Draw_Pic(int x, int y, qPic_p pic) {
     uint8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.buffer + y * vid.rowbytes + x;
+        uint8_p dest = vid.scr.pBuff + y * vid.rowbytes + x;
 
         for (int v = 0; v < pic->height; v++) {
             Q_memcpy(dest, source, pic->width);
@@ -258,7 +258,7 @@ void Draw_Pic(int x, int y, qPic_p pic) {
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)vid.buffer + y * (vid.rowbytes >> 1) + x;
+        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * (vid.rowbytes >> 1) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++)
@@ -281,15 +281,15 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
 
     if ((x < 0) ||
         (y < 0) ||
-        ((uint32_t)(x + pic->width) > vid.width) ||
-        ((uint32_t)(y + pic->height) > vid.height)
+        ((uint32_t)(x + pic->width) > vid.scr.width) ||
+        ((uint32_t)(y + pic->height) > vid.scr.height)
         ) {
         Host_SysError("Draw_TransPic: bad coordinates");
     }
     uint8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.buffer + y * vid.rowbytes + x;
+        uint8_p dest = vid.scr.pBuff + y * vid.rowbytes + x;
         uint8_t tbyte;
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
@@ -315,7 +315,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)vid.buffer + y * (vid.rowbytes >> 1) + x;
+        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * (vid.rowbytes >> 1) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
@@ -343,15 +343,15 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
 
     if ((x < 0) ||
         (y < 0) ||
-        ((uint32_t)(x + pic->width) > vid.width) ||
-        (uint32_t)(y + pic->height) > vid.height
+        ((uint32_t)(x + pic->width) > vid.scr.width) ||
+        (uint32_t)(y + pic->height) > vid.scr.height
         ) {
         Host_SysError("Draw_TransPic: bad coordinates");
     }
 
     uint8_p source = pic->data;
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.buffer + y * vid.rowbytes + x;
+        uint8_p dest = vid.scr.pBuff + y * vid.rowbytes + x;
 
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
@@ -376,7 +376,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)vid.buffer + y * (vid.rowbytes >> 1) + x;
+        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * (vid.rowbytes >> 1) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
@@ -439,17 +439,17 @@ void Draw_ConsoleBackground(int lines) {
 
     // draw the pic
     if (r_pixbytes == 1) {
-        dest = vid.conbuffer;
+        dest = vid.con.pBuff;
 
         for (int y = 0; y < lines; y++, dest += vid.conrowbytes) {
-            int v = (vid.conheight - lines + y) * 200 / vid.conheight;
+            int v = (vid.con.height - lines + y) * 200 / vid.con.height;
             uint8_p src = conback->data + v * 320;
-            if (vid.conwidth == 320)
-                memcpy(dest, src, vid.conwidth);
+            if (vid.con.width == 320)
+                memcpy(dest, src, vid.con.width);
             else {
                 int f = 0;
-                int fstep = 320 * 0x10000 / vid.conwidth;
-                for (int x = 0; x < vid.conwidth; x += 4) {
+                int fstep = 320 * 0x10000 / vid.con.width;
+                for (int x = 0; x < vid.con.width; x += 4) {
                     dest[x + 0] = src[f >> 16];     f += fstep;
                     dest[x + 1] = src[f >> 16];     f += fstep;
                     dest[x + 2] = src[f >> 16];     f += fstep;
@@ -459,16 +459,16 @@ void Draw_ConsoleBackground(int lines) {
         }
     }
     else {
-        uint16_p pusdest = (uint16_p)vid.conbuffer;
+        uint16_p pusdest = (uint16_p)vid.con.pBuff;
 
         for (int y = 0; y < lines; y++, pusdest += (vid.conrowbytes >> 1)) {
             // FIXME: pre-expand to native format?
             // FIXME: does the endian switching go away in production?
-            int v = (vid.conheight - lines + y) * 200 / vid.conheight;
+            int v = (vid.con.height - lines + y) * 200 / vid.con.height;
             uint8_p src = conback->data + v * 320;
             int f = 0;
-            int fstep = 320 * 0x10000 / vid.conwidth;
-            for (int x = 0; x < vid.conwidth; x += 4) {
+            int fstep = 320 * 0x10000 / vid.con.width;
+            for (int x = 0; x < vid.con.width; x += 4) {
                 pusdest[x + 0] = d_8to16table[src[f >> 16]];    f += fstep;
                 pusdest[x + 1] = d_8to16table[src[f >> 16]];    f += fstep;
                 pusdest[x + 2] = d_8to16table[src[f >> 16]];    f += fstep;
@@ -485,7 +485,7 @@ R_DrawRect8
 ==============
 */
 void R_DrawRect8(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
-    uint8_p pdest = vid.buffer + (prect->y * vid.rowbytes) + prect->x;
+    uint8_p pdest = vid.scr.pBuff + (prect->y * vid.rowbytes) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
     int destdelta = vid.rowbytes - prect->width;
@@ -523,7 +523,7 @@ R_DrawRect16
 void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
     // FIXME: would it be better to pre-expand native-format versions?
 
-    uint16_p pdest = (uint16_p)vid.buffer +
+    uint16_p pdest = (uint16_p)vid.scr.pBuff +
         (prect->y * (vid.rowbytes >> 1)) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
@@ -625,14 +625,14 @@ Fills a box of pixels with a single color
 */
 void Draw_Fill(int x, int y, int w, int h, int c) {
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.buffer + y * vid.rowbytes + x;
+        uint8_p dest = vid.scr.pBuff + y * vid.rowbytes + x;
         for (int v = 0; v < h; v++, dest += vid.rowbytes)
             for (int u = 0; u < w; u++)
                 dest[u] = c;
     }
     else {
         uint32_t uc = d_8to16table[c];
-        uint16_p pusdest = (uint16_p)vid.buffer + y * (vid.rowbytes >> 1) + x;
+        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * (vid.rowbytes >> 1) + x;
         for (int v = 0; v < h; v++, pusdest += (vid.rowbytes >> 1))
             for (int u = 0; u < w; u++)
                 pusdest[u] = uc;
@@ -649,11 +649,11 @@ Draw_FadeScreen
 void Draw_FadeScreen() {
     VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
 
-    for (int y = 0; y < vid.height; y++) {
-        uint8_p pbuf = (uint8_p)(vid.buffer + vid.rowbytes * y);
+    for (int y = 0; y < vid.scr.height; y++) {
+        uint8_p pbuf = (uint8_p)(vid.scr.pBuff + vid.rowbytes * y);
         int t = (y & 1) << 1;
 
-        for (int x = 0; x < vid.width; x++)
+        for (int x = 0; x < vid.scr.width; x++)
             if ((x & 3) != t)
                 pbuf[x] = 0;
     }
@@ -672,7 +672,7 @@ Call before beginning any disc IO.
 ================
 */
 void Draw_BeginDisc() {
-    D_BeginDirectRect(vid.width - 24, 0, draw_disc->data, 24, 24);
+    D_BeginDirectRect(vid.scr.width - 24, 0, draw_disc->data, 24, 24);
 }
 
 
@@ -685,6 +685,6 @@ Call after completing any disc IO
 ================
 */
 void Draw_EndDisc() {
-    D_EndDirectRect(vid.width - 24, 0, 24, 24);
+    D_EndDirectRect(vid.scr.width - 24, 0, 24, 24);
 }
 

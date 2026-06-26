@@ -105,7 +105,7 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
 
     if (!svgalib_inited || !vid.direct || !vga_oktowrite()) return;
 
-    if (vid.aspect > 1.5) {
+    if (scr.aspect > 1.5) {
         reps = 2;
         repshift = 1;
     }
@@ -162,7 +162,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
 
     if (!svgalib_inited || !vid.direct || !vga_oktowrite()) return;
 
-    if (vid.aspect > 1.5) {
+    if (scr.aspect > 1.5) {
         reps = 2;
         repshift = 1;
     }
@@ -285,9 +285,9 @@ void VID_NumModes_f() {
 
 void VID_Debug_f() {
     Con_Printf("mode: %d\n", current_mode);
-    Con_Printf("height x width: %d x %d\n", vid.height, vid.width);
+    Con_Printf("height x width: %d x %d\n", vid.scr.height, vid.scr.width);
     Con_Printf("bpp: %d\n", modes[current_mode].bytesperpixel * 8);
-    Con_Printf("vid.aspect: %f\n", vid.aspect);
+    Con_Printf("scr.aspect: %f\n", scr.aspect);
 }
 
 
@@ -443,8 +443,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     current_mode = modenum;
 
-    vid.width = modes[current_mode].width;
-    vid.height = modes[current_mode].height;
+    vid.scr.width = modes[current_mode].width;
+    vid.scr.height = modes[current_mode].height;
 
     VGA_width = modes[current_mode].width;
     VGA_height = modes[current_mode].height;
@@ -456,16 +456,16 @@ int VID_SetMode(int modenum, uint8_p palette) {
         vid.rowbytes = modes[current_mode].linewidth * 4;
     }
 
-    vid.aspect = ((float)vid.height / (float)vid.width) * (320.0 / 240.0);
+    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
     vid.colormap = (pixel_p)host_colormap;
-    vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
+    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
     vid.conrowbytes = vid.rowbytes;
-    vid.conwidth = vid.width;
-    vid.conheight = vid.height;
+    vid.con.width = vid.scr.width;
+    vid.con.height = vid.scr.height;
     vid.numpages = 1;
 
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
 
     // alloc zbuffer and surface cache
     if (d_pzbuffer) {
@@ -475,9 +475,9 @@ int VID_SetMode(int modenum, uint8_p palette) {
         vid_surfcache = NULL;
     }
 
-    bsize = vid.rowbytes * vid.height;
-    tsize = D_SurfaceCacheForRes(vid.width, vid.height);
-    zsize = vid.width * vid.height * sizeof(*d_pzbuffer);
+    bsize = vid.rowbytes * vid.scr.height;
+    tsize = D_SurfaceCacheForRes(vid.scr.width, vid.scr.height);
+    zsize = vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer);
 
     VID_highhunkmark = Hunk_HighMark();
 
@@ -485,7 +485,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     vid_surfcache = ((uint8_p)d_pzbuffer) + zsize;
 
-    vid.conbuffer = vid.buffer = (pixel_p)(((uint8_p)d_pzbuffer) + zsize + tsize);
+    vid.con.pBuff = vid.scr.pBuff = (pixel_p)(((uint8_p)d_pzbuffer) + zsize + tsize);
 
     D_InitCaches(vid_surfcache, tsize);
 
@@ -683,16 +683,16 @@ void VID_Update(vRect_p rects) {
         vga_waitretrace();
 
     if (VGA_planar)
-        VGA_UpdatePlanarScreen(vid.buffer);
+        VGA_UpdatePlanarScreen(vid.scr.pBuff);
 
     else if (vid_redrawfull.value) {
-        int total = vid.rowbytes * vid.height;
+        int total = vid.rowbytes * vid.scr.height;
         int offset;
 
         for (offset = 0;offset < total;offset += 0x10000) {
             vga_setpage(offset / 0x10000);
             memcpy(framebuffer_ptr,
-                vid.buffer + offset,
+                vid.scr.pBuff + offset,
                 ((total - offset > 0x10000) ? 0x10000 : (total - offset)));
         }
     }
@@ -715,16 +715,16 @@ void VID_Update(vRect_p rects) {
                 }
                 if (rects->width + i > 0x10000) {
                     memcpy(framebuffer_ptr + i,
-                        vid.buffer + offset,
+                        vid.scr.pBuff + offset,
                         0x10000 - i);
                     vga_setpage(++vidpage);
                     memcpy(framebuffer_ptr,
-                        vid.buffer + offset + 0x10000 - i,
+                        vid.scr.pBuff + offset + 0x10000 - i,
                         rects->width - 0x10000 + i);
                 }
                 else
                     memcpy(framebuffer_ptr + i,
-                        vid.buffer + offset,
+                        vid.scr.pBuff + offset,
                         rects->width);
                 offset += vid.rowbytes;
             }
@@ -737,21 +737,23 @@ void VID_Update(vRect_p rects) {
         VID_SetMode((int)vid_mode.value, vid_current_palette);
 }
 
-static int dither;
+#if 0 /* NOT USED */
+static bool dither;
 
 void VID_DitherOn() {
-    if (dither == 0) {
-        //		R_ViewChanged (&vrect, sb_lines, vid.aspect);
-        dither = 1;
+    if (!dither) {
+        // R_ViewChanged (&vrect, sb_lines, scr.aspect);
+        dither = true;
     }
 }
 
 void VID_DitherOff() {
     if (dither) {
-        //		R_ViewChanged (&vrect, sb_lines, vid.aspect);
-        dither = 0;
+		// R_ViewChanged (&vrect, sb_lines, scr.aspect);
+        dither = false;
     }
 }
+#endif
 
 void Sys_SendKeyEvents() {
     if (!svgalib_inited)
@@ -923,7 +925,7 @@ cString VID_ModeInfo(int modenum) {
 
     if (modenum == 0) {
         snprintf(modestr, sizeof(modestr), "%d x %d, %d bpp",
-            vid.width, vid.height, modes[current_mode].bytesperpixel * 8);
+            vid.scr.width, vid.scr.height, modes[current_mode].bytesperpixel * 8);
         return (modestr);
     }
     else {

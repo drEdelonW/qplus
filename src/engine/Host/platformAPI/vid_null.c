@@ -47,23 +47,29 @@ __weak void VID_Update(vRect_p rects) {}
 __weak void VID_Shutdown() {}
 __weak void VID_Init(uint8_p palette) {
     vid = (VidDef_t){
-        .buffer         = _vidBuf,
         .colormap       = host_colormap,
         // .colormap16
-        .fullbright     = 256 - LittleLong(*((int*)host_colormap + 2048)),
+        // .fullbright     = 256 - LittleLong(*((int*)host_colormap + 2048)),
         .rowbytes       = BASEWIDTH,
-        .width          = BASEWIDTH,
-        .height         = BASEHEIGHT,
-        .aspect         = 1.0,
+        .scr = {
+            .width      = BASEWIDTH,
+            .height     = BASEHEIGHT,
+            .pBuff      = _vidBuf,
+
+        },
         .numpages       = 1,
 
-        .conbuffer      = _vidBuf,
         .conrowbytes    = BASEWIDTH,
-        .conwidth       = BASEWIDTH,
-        .conheight      = BASEHEIGHT,
-        .maxwarpwidth   = BASEWIDTH,
-        .maxwarpheight  = BASEHEIGHT,
-        // .direct
+        .con = {
+            .width      = BASEWIDTH,
+            .height     = BASEHEIGHT,
+            .pBuff      = _vidBuf,
+        },
+        .maxwarp = {
+            .width   = BASEWIDTH,
+            .height  = BASEHEIGHT
+        },
+        .direct = NULL
     };
 
     d_pzbuffer = _zBuf;

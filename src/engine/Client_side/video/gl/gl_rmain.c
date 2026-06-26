@@ -755,10 +755,10 @@ void R_SetupGL() {
     //
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    int x = r_refdef.vrect.x * glwidth / vid.width;
-    int x2 = (r_refdef.vrect.x + r_refdef.vrect.width) * glwidth / vid.width;
-    int y = (vid.height - r_refdef.vrect.y) * glheight / vid.height;
-    int y2 = (vid.height - (r_refdef.vrect.y + r_refdef.vrect.height)) * glheight / vid.height;
+    int x = r_refdef.vrect.x * glwidth / vid.scr.width;
+    int x2 = (r_refdef.vrect.x + r_refdef.vrect.width) * glwidth / vid.scr.width;
+    int y = (vid.scr.height - r_refdef.vrect.y) * glheight / vid.scr.height;
+    int y2 = (vid.scr.height - (r_refdef.vrect.y + r_refdef.vrect.height)) * glheight / vid.scr.height;
 
     // fudge around because of frac screen scale
     if (x > 0)          x--;

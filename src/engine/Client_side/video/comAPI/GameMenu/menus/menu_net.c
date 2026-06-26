@@ -3,7 +3,7 @@
 #include "menu_net.h"
 #include "net.h"
 #include "input.h"
-#include "vid.h"
+#include "vid.h" // (*vid_menudrawfn)();
 #include "cbuf.h"
 
 

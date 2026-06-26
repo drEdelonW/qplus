@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "r_local.h"
 #include "render.h"
+#include "screen.h"
 #include "host.h"
 #include "sbar.h"
 #include "q_tools.h"
@@ -54,8 +55,8 @@ void Show() {
     vRect_t vr = {
         // .x      = 0,
         // .y      = 0,
-        .width = vid.width,
-        .height = vid.height,
+        .width = vid.scr.width,
+        .height = vid.scr.height,
         // .pnext  = NULL
     };
 
@@ -116,7 +117,7 @@ void R_LineGraph(int x, int y, int h) {
     x += r_refdef.vrect.x;
     y += r_refdef.vrect.y;
 
-    uint8_p dest = vid.buffer + (vid.rowbytes * y) + x;
+    uint8_p dest = vid.scr.pBuff + (vid.rowbytes * y) + x;
 
     int s = r_graphheight.value;
 
@@ -385,28 +386,28 @@ void R_SetupFrame() {
         lcd_x.value
         ) {
         if (r_dowarp) {
-            if ((vid.width <= vid.maxwarpwidth) &&
-                (vid.height <= vid.maxwarpheight)
+            if ((vid.scr.width <= vid.maxwarp.width) &&
+                (vid.scr.height <= vid.maxwarp.height)
                 ) {
                 vRect_t vrect = {
-                    .width = vid.width,
-                    .height = vid.height
+                    .width = vid.scr.width,
+                    .height = vid.scr.height
                 };
 
-                R_ViewChanged(&vrect, sb_lines, vid.aspect);
+                R_ViewChanged(&vrect, sb_lines, scr.aspect);
             }
             else {
-                float w = vid.width;
-                float h = vid.height;
+                float w = vid.scr.width;
+                float h = vid.scr.height;
 
-                if (w > vid.maxwarpwidth) {
-                    h *= (float)vid.maxwarpwidth / w;
-                    w = vid.maxwarpwidth;
+                if (w > vid.maxwarp.width) {
+                    h *= (float)vid.maxwarp.width / w;
+                    w = vid.maxwarp.width;
                 }
 
-                if (h > vid.maxwarpheight) {
-                    h = vid.maxwarpheight;
-                    w *= (float)vid.maxwarpheight / h;
+                if (h > vid.maxwarp.height) {
+                    h = vid.maxwarp.height;
+                    w *= (float)vid.maxwarp.height / h;
                 }
 
                 vRect_t vrect = {
@@ -415,18 +416,18 @@ void R_SetupFrame() {
                 };
 
                 R_ViewChanged(&vrect,
-                    (int)((float)sb_lines * (h / (float)vid.height)),
-                    vid.aspect * (h / w) *
-                    ((float)vid.width / (float)vid.height));
+                    (int)((float)sb_lines * (h / (float)vid.scr.height)),
+                    scr.aspect * (h / w) *
+                    ((float)vid.scr.width / (float)vid.scr.height));
             }
         }
         else {
             vRect_t vrect = {
-                .width = vid.width,
-                .height = vid.height
+                .width = vid.scr.width,
+                .height = vid.scr.height
             };
 
-            R_ViewChanged(&vrect, sb_lines, vid.aspect);
+            R_ViewChanged(&vrect, sb_lines, scr.aspect);
         }
 
         r_viewchanged = false;

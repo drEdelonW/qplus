@@ -6,7 +6,7 @@
 #include "console.h"
 #include "cmd.h"
 #include "cbuf.h"
-#include "vid.h"
+#include "vid.h"    // vid_menudrawfn
 #include "q_tools.h"
 #include "screen.h"
 #ifdef _WIN32

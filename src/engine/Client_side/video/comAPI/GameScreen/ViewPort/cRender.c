@@ -1,5 +1,4 @@
 // #include "render.h"
-#include "vid.h"
 #include "screen.h"
 #include "client.h"
 #include "cvar_q1.h"

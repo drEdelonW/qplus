@@ -238,13 +238,13 @@ bool CheckPixelMultiply() {
 
         XConfigureWindow(x_disp, x_win, CWWidth | CWHeight, &chg);
 
-        vid.width = MP(wattr.width) & ~3;
-        vid.height = MP(wattr.height);
+        vid.scr.width = MP(wattr.width) & ~3;
+        vid.scr.height = MP(wattr.height);
 
-        if (vid.width < 320)
-            vid.width = 320;
-        if (vid.height < 200)
-            vid.height = 200;
+        if (vid.scr.width < 320)
+            vid.scr.width = 320;
+        if (vid.scr.height < 200)
+            vid.scr.height = 200;
         VID_ResetFramebuffer();
 
         return true;
@@ -380,12 +380,12 @@ void	VID_Init(uint8_p palette) {
     for (i = 0; i < 256; i++)
         vid_gamma[i] = i;
 
-    vid.width = 320;
-    vid.height = 200;
-    vid.aspect = 1.0;
+    vid.scr.width = 320;
+    vid.scr.height = 200;
+    // scr.aspect = 1.0;
     vid.numpages = 2;
     vid.colormap = host_colormap;
-    vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
+    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
     //vid.cbits = VID_CBITS;
     //vid.grades = VID_GRADES;
 
@@ -499,17 +499,17 @@ void	VID_Init(uint8_p palette) {
     if (desired_height < h)
         desired_height = h;
 
-    vid.width = MP(desired_width);
-    vid.height = MP(desired_height);
+    vid.scr.width = MP(desired_width);
+    vid.scr.height = MP(desired_height);
 
     //
     // patch things up so game doesn't fail if window is too small
     //
 
-    if (vid.width < 320)
-        vid.width = 320;
-    if (vid.height < 200)
-        vid.height = 200;
+    if (vid.scr.width < 320)
+        vid.scr.width = 320;
+    if (vid.scr.height < 200)
+        vid.scr.height = 200;
 
     //
     // see if we're going to use threads
@@ -619,14 +619,14 @@ VID_ResetFramebuffer() {
         return;
     }
 
-    //printf("VID_ResetFramebuffer: vid.width %d, vid.height %d\n", vid.width, vid.height);
+    //printf("VID_ResetFramebuffer: vid.scr.width %d, vid.scr.height %d\n", vid.scr.width, vid.scr.height);
 
     xil_destroy(display_image);
 
     xil_destroy(quake_image);
 
     display_image = xil_create_from_window(state, x_disp, x_win);
-    quake_image = xil_create(state, vid.width, vid.height, 1, XIL_BYTE);
+    quake_image = xil_create(state, vid.scr.width, vid.scr.height, 1, XIL_BYTE);
 
     xil_export(quake_image);
 
@@ -640,20 +640,20 @@ VID_ResetFramebuffer() {
         Sys_Error("xil_get_memory_storage");
 
     vid.rowbytes = storage.byte.scanline_stride;
-    vid.buffer = storage.byte.data;
-    vid.conbuffer = vid.buffer;
+    vid.scr.pBuff = storage.byte.data;
+    vid.con.pBuff = vid.scr.pBuff;
     vid.conrowbytes = vid.rowbytes;
-    vid.conwidth = vid.width;
-    vid.conheight = vid.height;
+    vid.con.width = vid.scr.width;
+    vid.con.height = vid.scr.height;
 
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
     SCR_RequestCalcRefdef();				// force a surface cache flush
 
     free(d_pzbuffer);
 
-    d_pzbuffer = malloc(PM(vid.width) * PM(vid.height) * sizeof(*d_pzbuffer));
-    //Hunk_HighAllocName(PM(vid.width)*PM(vid.height)*sizeof(*d_pzbuffer), "zbuff");
+    d_pzbuffer = malloc(PM(vid.scr.width) * PM(vid.scr.height) * sizeof(*d_pzbuffer));
+    //Hunk_HighAllocName(PM(vid.scr.width)*PM(vid.scr.height)*sizeof(*d_pzbuffer), "zbuff");
 }
 
 VID_ResetFramebuffer_MT() {
@@ -663,7 +663,7 @@ VID_ResetFramebuffer_MT() {
 
     TypeLess_ptr  update_thread();
 
-    printf("VID_ResetFramebuffer: vid.width %d, vid.height %d\n", vid.width, vid.height);
+    printf("VID_ResetFramebuffer: vid.scr.width %d, vid.scr.height %d\n", vid.scr.width, vid.scr.height);
 
     old_display_image = display_image;
 
@@ -679,7 +679,7 @@ VID_ResetFramebuffer_MT() {
 
     free(d_pzbuffer);
 
-    d_pzbuffer = malloc(PM(vid.width) * PM(vid.height) * sizeof(*d_pzbuffer));
+    d_pzbuffer = malloc(PM(vid.scr.width) * PM(vid.scr.height) * sizeof(*d_pzbuffer));
 }
 
 void VID_ShiftPalette(uint8_p p) {
@@ -813,15 +813,15 @@ void GetEvent() {
     case MotionNotify:
 
         if (_windowed_mouse.value) {
-            mouse_x = (float)((int)x_event.xmotion.x - (int)(vid.width / 2));
-            mouse_y = (float)((int)x_event.xmotion.y - (int)(vid.height / 2));
+            mouse_x = (float)((int)x_event.xmotion.x - (int)(vid.scr.width / 2));
+            mouse_y = (float)((int)x_event.xmotion.y - (int)(vid.scr.height / 2));
             //printf("m: x=%d,y=%d, mx=%3.2f,my=%3.2f\n",
             //	x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
                         /* move the mouse to the window center again */
             XSelectInput(x_disp, x_win, x_std_event_mask & ~PointerMotionMask);
             XWarpPointer(x_disp, None, x_win, 0, 0, 0, 0,
-                (vid.width / 2), (vid.height / 2));
+                (vid.scr.width / 2), (vid.scr.height / 2));
             XSelectInput(x_disp, x_win, x_std_event_mask);
         }
         else {
@@ -952,13 +952,13 @@ VID_Update(vRect_p rects) {
 
         config_notify = 0;
 
-        vid.width = MP(config_notify_width) & ~3;
-        vid.height = MP(config_notify_height);
+        vid.scr.width = MP(config_notify_width) & ~3;
+        vid.scr.height = MP(config_notify_height);
 
-        if (vid.width < 320)
-            vid.width = 320;
-        if (vid.height < 200)
-            vid.height = 200;
+        if (vid.scr.width < 320)
+            vid.scr.width = 320;
+        if (vid.scr.height < 200)
+            vid.scr.height = 200;
 
         VID_ResetFramebuffer();
 
@@ -984,8 +984,8 @@ VID_Update(vRect_p rects) {
         if (xil_get_memory_storage(quake_image, &storage) == FALSE)
             Sys_Error("xil_get_memory_storage");
 
-        vid.buffer = storage.byte.data;
-        vid.conbuffer = vid.buffer;
+        vid.scr.pBuff = storage.byte.data;
+        vid.con.pBuff = vid.scr.pBuff;
 
         rects = rects->pnext;
     }
@@ -1023,13 +1023,13 @@ VID_Update_MT(vRect_p rects) {
 
         config_notify = 0;
 
-        vid.width = MP(config_notify_width) & ~3;
-        vid.height = MP(config_notify_height);
+        vid.scr.width = MP(config_notify_width) & ~3;
+        vid.scr.height = MP(config_notify_height);
 
-        if (vid.width < 320)
-            vid.width = 320;
-        if (vid.height < 200)
-            vid.height = 200;
+        if (vid.scr.width < 320)
+            vid.scr.width = 320;
+        if (vid.scr.height < 200)
+            vid.scr.height = 200;
 
         VID_ResetFramebuffer_MT();
 
@@ -1057,12 +1057,12 @@ drain_renderpipeline(XilImage old) {
     xil_destroy(old);
 
 
-    new = xil_create(state, vid.width, vid.height, 1, XIL_BYTE);
+    new = xil_create(state, vid.scr.width, vid.scr.height, 1, XIL_BYTE);
 
     if (write(render_pipeline[0], &new, sizeof(new)) != sizeof(new))
         Sys_Error("drain_renderpipeline: write");
 
-    new = xil_create(state, vid.width, vid.height, 1, XIL_BYTE);
+    new = xil_create(state, vid.scr.width, vid.scr.height, 1, XIL_BYTE);
 
     xil_export(new);
 
@@ -1070,14 +1070,14 @@ drain_renderpipeline(XilImage old) {
         Sys_Error("xil_get_memory_storage");
 
     vid.rowbytes = storage.byte.scanline_stride;
-    vid.buffer = storage.byte.data;
-    vid.conbuffer = vid.buffer;
+    vid.scr.pBuff = storage.byte.data;
+    vid.con.pBuff = vid.scr.pBuff;
     vid.conrowbytes = vid.rowbytes;
-    vid.conwidth = vid.width;
-    vid.conheight = vid.height;
+    vid.con.width = vid.scr.width;
+    vid.con.height = vid.scr.height;
 
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
     SCR_RequestCalcRefdef();				// force a surface cache flush
 
     return(new);
@@ -1100,8 +1100,8 @@ sched_update(XilImage image) {
     if (xil_get_memory_storage(new, &storage) == FALSE)
         Sys_Error("xil_get_memory_storage");
 
-    vid.buffer = storage.byte.data;
-    vid.conbuffer = vid.buffer;
+    vid.scr.pBuff = storage.byte.data;
+    vid.con.pBuff = vid.scr.pBuff;
 
     return (new);
 }
@@ -1130,22 +1130,23 @@ TypeLess_ptr update_thread() {
     }
 }
 
-
-static int dither;
+#if 0 /* NOT USED */
+static bool dither;
 
 void VID_DitherOn() {
-    if (dither == 0) {
+    if (!dither) {
         SCR_RequestCalcRefdef();
-        dither = 1;
+        dither = true;
     }
 }
 
 void VID_DitherOff() {
     if (dither) {
         SCR_RequestCalcRefdef();
-        dither = 0;
+        dither = false;
     }
 }
+#endif
 
 void VID_SetDefaultMode() {
 }

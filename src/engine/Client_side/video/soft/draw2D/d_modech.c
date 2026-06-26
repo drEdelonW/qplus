@@ -62,8 +62,8 @@ void D_ViewChanged() {
     if (yscale > xscale)
         scale_for_mip = yscale;
 
-    d_zrowbytes = vid.width * 2;
-    d_zwidth = vid.width;
+    d_zrowbytes = vid.scr.width * 2;
+    d_zwidth = vid.scr.width;
 
     d_pix_min = r_refdef.vrect.width / 320;
     if (d_pix_min < 1)
@@ -83,7 +83,7 @@ void D_ViewChanged() {
         r_refdef.vrectbottom - (d_pix_max << d_y_aspect_shift);
 
     int rowbytes = (r_dowarp) ? WARP_WIDTH : vid.rowbytes;
-    for (int i = 0; i < vid.height; i++) {
+    for (int i = 0; i < vid.scr.height; i++) {
         d_scantable[i] = i * rowbytes;
         zspantable[i] = d_pzbuffer + i * d_zwidth;
     }

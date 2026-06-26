@@ -269,9 +269,9 @@ void ResetFrameBuffer() {
     X11_highhunkmark = Hunk_HighMark();
 
     // alloc an extra line in case we want to wrap, and allocate the z-buffer
-    X11_buffersize = vid.width * vid.height * sizeof(*d_pzbuffer);
+    X11_buffersize = vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer);
 
-    vid_surfcachesize = D_SurfaceCacheForRes(vid.width, vid.height);
+    vid_surfcachesize = D_SurfaceCacheForRes(vid.scr.width, vid.scr.height);
 
     X11_buffersize += vid_surfcachesize;
 
@@ -280,13 +280,13 @@ void ResetFrameBuffer() {
         Sys_Error("Not enough memory for video mode\n");
 
     vid_surfcache = (uint8_p)d_pzbuffer
-        + vid.width * vid.height * sizeof(*d_pzbuffer);
+        + vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer);
 
     D_InitCaches(vid_surfcache, vid_surfcachesize);
 
     int pwidth = x_visinfo->depth / 8;
     if (pwidth == 3)    pwidth = 4;
-    int mem = ((vid.width * pwidth + 7) & ~7) * vid.height;
+    int mem = ((vid.scr.width * pwidth + 7) & ~7) * vid.scr.height;
 
     x_framebuffer[0] = XCreateImage(x_disp,
         x_vis,
@@ -294,7 +294,7 @@ void ResetFrameBuffer() {
         ZPixmap,
         0,
         malloc(mem),
-        vid.width, vid.height,
+        vid.scr.width, vid.scr.height,
         32,
         0
     );
@@ -302,8 +302,8 @@ void ResetFrameBuffer() {
     if (!x_framebuffer[0])
         Sys_Error("VID: XCreateImage failed\n");
 
-    vid.buffer = (uint8_p)(x_framebuffer[0]);
-    vid.conbuffer = vid.buffer;
+    vid.scr.pBuff = (uint8_p)(x_framebuffer[0]);
+    vid.con.pBuff = vid.scr.pBuff;
 
 }
 
@@ -319,9 +319,9 @@ void ResetSharedFrameBuffers() {
     X11_highhunkmark = Hunk_HighMark();
 
     // alloc an extra line in case we want to wrap, and allocate the z-buffer
-    X11_buffersize = vid.width * vid.height * sizeof(*d_pzbuffer);
+    X11_buffersize = vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer);
 
-    vid_surfcachesize = D_SurfaceCacheForRes(vid.width, vid.height);
+    vid_surfcachesize = D_SurfaceCacheForRes(vid.scr.width, vid.scr.height);
 
     X11_buffersize += vid_surfcachesize;
 
@@ -330,7 +330,7 @@ void ResetSharedFrameBuffers() {
         Sys_Error("Not enough memory for video mode\n");
 
     vid_surfcache = (uint8_p)d_pzbuffer
-        + vid.width * vid.height * sizeof(*d_pzbuffer);
+        + vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer);
 
     D_InitCaches(vid_surfcache, vid_surfcachesize);
 
@@ -352,8 +352,8 @@ void ResetSharedFrameBuffers() {
             ZPixmap,
             0,
             &x_shminfo[frm],
-            vid.width,
-            vid.height);
+            vid.scr.width,
+            vid.scr.height);
 
         // grab shared memory
 
@@ -394,22 +394,21 @@ void ResetSharedFrameBuffers() {
 // the video driver will need it again
 
 void VID_Init(uint8_p palette) {
-#
     int pnum;
     XVisualInfo template;
     int num_visuals;
     int template_mask;
 
     ignorenext = 0;
-    vid.width = 320;
-    vid.height = 200;
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
+    vid.scr.width = 320;
+    vid.scr.height = 200;
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
     vid.numpages = 2;
     vid.colormap = host_colormap;
     // vid.cbits = VID_CBITS;
     // vid.grades = VID_GRADES;
-    vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
+    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));s
 
     srandom(getpid());
 
@@ -444,23 +443,23 @@ void VID_Init(uint8_p palette) {
     if ((pnum = COM_CheckParm("-winsize"))) {
         if (pnum >= com.argc - 2)           Sys_Error("VID: -winsize <width> <height>\n");
 
-        vid.width = Q_atoi(com.argv[pnum + 1]);
-        vid.height = Q_atoi(com.argv[pnum + 2]);
-        if (!vid.width || !vid.height)      Sys_Error("VID: Bad window width/height\n");
+        vid.scr.width = Q_atoi(com.argv[pnum + 1]);
+        vid.scr.height = Q_atoi(com.argv[pnum + 2]);
+        if (!vid.scr.width || !vid.scr.height)      Sys_Error("VID: Bad window width/height\n");
 
     }
     if ((pnum = COM_CheckParm("-width"))) {
         if (pnum >= com.argc - 1)       Sys_Error("VID: -width <width>\n");
 
-        vid.width = Q_atoi(com.argv[pnum + 1]);
-        if (!vid.width)                 Sys_Error("VID: Bad window width\n");
+        vid.scr.width = Q_atoi(com.argv[pnum + 1]);
+        if (!vid.scr.width)                 Sys_Error("VID: Bad window width\n");
 
     }
     if ((pnum = COM_CheckParm("-height"))) {
         if (pnum >= com.argc - 1)       Sys_Error("VID: -height <height>\n");
 
-        vid.height = Q_atoi(com.argv[pnum + 1]);
-        if (!vid.height)                Sys_Error("VID: Bad window height\n");
+        vid.scr.height = Q_atoi(com.argv[pnum + 1]);
+        if (!vid.scr.height)                Sys_Error("VID: Bad window height\n");
     }
 
     template_mask = 0;
@@ -527,7 +526,7 @@ void VID_Init(uint8_p palette) {
         x_win = XCreateWindow(x_disp,
             XRootWindow(x_disp, x_visinfo->screen),
             0, 0, // x, y
-            vid.width, vid.height,
+            vid.scr.width, vid.scr.height,
             0, // borderwidth
             x_visinfo->depth,
             InputOutput,
@@ -598,13 +597,13 @@ void VID_Init(uint8_p palette) {
 
     current_framebuffer = 0;
     vid.rowbytes = x_framebuffer[0]->bytes_per_line;
-    vid.buffer = (pixel_p)x_framebuffer[0]->data;
-    vid.direct = 0;
-    vid.conbuffer = (pixel_p)x_framebuffer[0]->data;
+    vid.scr.pBuff = (pixel_p)x_framebuffer[0]->data;
+    vid.direct = NULL;
+    vid.con.pBuff = (pixel_p)x_framebuffer[0]->data;
     vid.conrowbytes = vid.rowbytes;
-    vid.conwidth = vid.width;
-    vid.conheight = vid.height;
-    vid.aspect = ((float)vid.height / (float)vid.width) * (320.0 / 240.0);
+    vid.con.width = vid.scr.width;
+    vid.con.height = vid.scr.height;
+    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
 
     // XSynchronize(x_disp, False);
 
@@ -629,13 +628,6 @@ void VID_SetPalette(uint8_p palette) {
             memcpy(current_palette, palette, 768);
         XColor colors[256];
         for (int i = 0; i < 256; i++) {
-#if 0
-            colors[i].pixel = i;
-            colors[i].flags = DoRed | DoGreen | DoBlue;
-            colors[i].red = palette[i * 3] * 257;
-            colors[i].green = palette[i * 3 + 1] * 257;
-            colors[i].blue =  palette[i * 3 + 2] * 257;
-#else
             colors[i] = (XColor) {
                 .pixel = i,
                 .flags = DoRed | DoGreen | DoBlue,
@@ -643,7 +635,6 @@ void VID_SetPalette(uint8_p palette) {
                 .green = palette[i * 3 + 1] * 257,
                 .blue = palette[i * 3 + 2] * 257
             };
-#endif
         }
         XStoreColors(x_disp, x_cmap, colors, 256);
     }
@@ -674,17 +665,17 @@ void VID_Update(vRect_p rects) {
     if (config_notify) {
         fprintf(stderr, "config notify\n");
         config_notify = 0;
-        vid.width = config_notify_width & ~7;
-        vid.height = config_notify_height;
+        vid.scr.width = config_notify_width & ~7;
+        vid.scr.height = config_notify_height;
         if (doShm)
             ResetSharedFrameBuffers();
         else
             ResetFrameBuffer();
         vid.rowbytes = x_framebuffer[0]->bytes_per_line;
-        vid.buffer = (uint8_p)x_framebuffer[current_framebuffer]->data;
-        vid.conbuffer = vid.buffer;
-        vid.conwidth = vid.width;
-        vid.conheight = vid.height;
+        vid.scr.pBuff = (uint8_p)x_framebuffer[current_framebuffer]->data;
+        vid.con.pBuff = vid.scr.pBuff;
+        vid.con.width = vid.scr.width;
+        vid.con.height = vid.scr.height;
         vid.conrowbytes = vid.rowbytes;
         SCR_RequestCalcRefdef();    // force a surface cache flush
         Con_CheckResize();
@@ -718,8 +709,8 @@ void VID_Update(vRect_p rects) {
             rects = rects->pnext;
         }
         current_framebuffer = !current_framebuffer;
-        vid.conbuffer = vid.buffer = (uint8_p)x_framebuffer[current_framebuffer]->data;
-        // vid.conbuffer = vid.buffer;
+        vid.con.pBuff = vid.scr.pBuff = (uint8_p)x_framebuffer[current_framebuffer]->data;
+        // vid.con.pBuff = vid.scr.pBuff;
         XSync(x_disp, False);
     }
     else {
@@ -741,21 +732,23 @@ void VID_Update(vRect_p rects) {
 
 }
 
-static int dither;
+#if 0 /* NOT USED */
+static bool dither;
 
 void VID_DitherOn() {
-    if (dither == 0) {
+    if (!dither) {
         SCR_RequestCalcRefdef();
-        dither = 1;
+        dither = true;
     }
 }
 
 void VID_DitherOff() {
     if (dither) {
         SCR_RequestCalcRefdef();
-        dither = 0;
+        dither = false;
     }
 }
+#endif
 
 int Sys_OpenWindow() { return 0; }
 void Sys_EraseWindow(int window) {}

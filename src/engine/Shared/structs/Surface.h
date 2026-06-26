@@ -73,7 +73,7 @@ struct mSurface_s {
     uint8_p     samples;                // [numstyles*surfsize]
 };
 
-#include "vid.h"  //    pixel_p
+#include "vid.h"  // pixel_p
 // it was [drawsurf_t]
 
 #include "Texture_pre.h"    // Texture_p

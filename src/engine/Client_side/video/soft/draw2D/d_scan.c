@@ -69,7 +69,7 @@ void D_WarpScreen() {
 	}
 
 	turb = intsintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
-	dest = vid.buffer + scr.vrect.y * vid.rowbytes + scr.vrect.x;
+	dest = vid.scr.pBuff + scr.vrect.y * vid.rowbytes + scr.vrect.x;
 
 	for (v = 0; v < scr.vrect.height; v++, dest += vid.rowbytes) {
 		col = &column[turb[v]];

@@ -100,9 +100,9 @@ void VID_Update(vRect_p rects) {
         }
     }
     int ofs = ((800 - 640) / 2) + (((480 - 400) / 2) * LCD_SCREEN_WIDTH);
-    for (int y = 0; y < vid.height; y++)
-        for (int x = 0; x < vid.width; x++) {
-            uint8_t idx = vid.buffer[y * vid.width + x];
+    for (int y = 0; y < vid.scr.height; y++)
+        for (int x = 0; x < vid.scr.width; x++) {
+            uint8_t idx = vid.scr.pBuff[y * vid.scr.width + x];
 
             uint8_t r = (d_8to24table[idx] >> 0) & 0xFF;
             uint8_t g = (d_8to24table[idx] >> 8) & 0xFF;

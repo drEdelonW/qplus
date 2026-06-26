@@ -592,10 +592,10 @@ void VID_Init(uint8_p palette) {
     Cvar_RegisterVariable(&vid_waitforrefresh);
     Cvar_RegisterVariable(&gl_ztrick);
 
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
-    vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
+    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
 
     // interpret command-line params
 
@@ -610,18 +610,18 @@ void VID_Init(uint8_p palette) {
     if ((i = COM_CheckParm("-width")) != 0)     width = atoi(com.argv[i + 1]);
     if ((i = COM_CheckParm("-height")) != 0)    height = atoi(com.argv[i + 1]);
 
-    if ((i = COM_CheckParm("-conwidth")) != 0)  vid.conwidth = Q_atoi(com.argv[i + 1]);
-    else                                        vid.conwidth = 640;
+    if ((i = COM_CheckParm("-conwidth")) != 0)  vid.con.width = Q_atoi(com.argv[i + 1]);
+    else                                        vid.con.width = 640;
 
-    vid.conwidth &= 0xfff8; // make it a multiple of eight
+    vid.con.width &= 0xfff8; // make it a multiple of eight
 
-    if (vid.conwidth < 320)        vid.conwidth = 320;
+    if (vid.con.width < 320)        vid.con.width = 320;
 
     // pick a conheight that matches with correct aspect
-    vid.conheight = vid.conwidth * 3 / 4;
+    vid.con.height = vid.con.width * 3 / 4;
 
-    if ((i = COM_CheckParm("-conheight")) != 0)     vid.conheight = Q_atoi(com.argv[i + 1]);
-    if (vid.conheight < 200)                        vid.conheight = 200;
+    if ((i = COM_CheckParm("-conheight")) != 0)     vid.con.height = Q_atoi(com.argv[i + 1]);
+    if (vid.con.height < 200)                        vid.con.height = 200;
 
     _fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_75Hz,
         attribs);
@@ -635,12 +635,12 @@ void VID_Init(uint8_p palette) {
 
     fxMesaMakeCurrent(_fc);
 
-    if (vid.conheight > height)     vid.conheight = height;
-    if (vid.conwidth > width)       vid.conwidth = width;
-    vid.width = vid.conwidth;
-    vid.height = vid.conheight;
+    if (vid.con.height > height)     vid.con.height = height;
+    if (vid.con.width > width)       vid.con.width = width;
+    vid.scr.width = vid.con.width;
+    vid.scr.height = vid.con.height;
 
-    vid.aspect = ((float)vid.height / (float)vid.width) * (320.0 / 240.0);
+    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
     vid.numpages = 2;
 
     GL_Init();

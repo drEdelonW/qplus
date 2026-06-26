@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "types.h"
 #include "fixed.h"  // fixed16_t
-#include "vid.h"
+#include "vid.h"    // pixel_p
 
 
 // all global and static refresh variables are collected in a contiguous block

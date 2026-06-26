@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Triangle.h"
 #include "Sprite.h"
 #include "Alias.h"
-#include "vid.h"
+#include "vRect.h"
 
 
 #define WARP_WIDTH  (320)
@@ -83,7 +83,7 @@ extern SpriteDesc_t r_spritedesc;
 extern zPointDesc_t r_zpointdesc;
 extern PolyDesc_t r_polydesc;
 
-extern int d_con_indirect; // if 0, Quake will draw console directly to vid.buffer; if 1, Quake will draw console via D_DrawRect. Must be defined by driver
+extern int d_con_indirect; // if 0, Quake will draw console directly to vid.scr.pBuff; if 1, Quake will draw console via D_DrawRect. Must be defined by driver
 
 extern Basis_t r_p;
 

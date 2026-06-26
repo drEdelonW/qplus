@@ -70,7 +70,6 @@ console is:
 #include "qOpenGL.h"
 #include "screen.h"
 #include "cvar.h"
-#include "vid.h"
 #include <string.h>
 #include "client.h"
 #include "host.h"
@@ -167,14 +166,14 @@ void SCR_TileClear() {
             0,
             0,
             r_refdef.vrect.x,
-            vid.height - sb_lines
+            vid.scr.height - sb_lines
         );
         // right
         Draw_TileClear(
             r_refdef.vrect.x + r_refdef.vrect.width,
             0,
-            vid.width - r_refdef.vrect.x + r_refdef.vrect.width,
-            vid.height - sb_lines
+            vid.scr.width - r_refdef.vrect.x + r_refdef.vrect.width,
+            vid.scr.height - sb_lines
         );
     }
     if (r_refdef.vrect.y > 0) {
@@ -190,7 +189,7 @@ void SCR_TileClear() {
             r_refdef.vrect.x,
             r_refdef.vrect.y + r_refdef.vrect.height,
             r_refdef.vrect.width,
-            vid.height - sb_lines - (r_refdef.vrect.height + r_refdef.vrect.y)
+            vid.scr.height - sb_lines - (r_refdef.vrect.height + r_refdef.vrect.y)
         );
     }
 }

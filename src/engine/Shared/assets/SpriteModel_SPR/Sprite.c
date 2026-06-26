@@ -8,6 +8,7 @@
 #   include "qOpenGL.h"
 #else
 #   include "d_iface.h"
+#   include "vid.h"    // d_8to16table[]
 #endif
 #include "z_hunk.h"
 
@@ -46,14 +47,14 @@ TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_p* ppframe, int 
     pspriteframe->width = width;
     pspriteframe->height = height;
     int origin[2] = {
-        LittleLong(pinframe->origin[0]),
-        LittleLong(pinframe->origin[1])
+        LittleLong(pinframe->origin[X_AX]),
+        LittleLong(pinframe->origin[Y_AX])
     };
 
-    pspriteframe->up = origin[1];
-    pspriteframe->down = origin[1] - height;
-    pspriteframe->left = origin[0];
-    pspriteframe->right = width + origin[0];
+    pspriteframe->up = origin[Y_AX];
+    pspriteframe->down = origin[Y_AX] - height;
+    pspriteframe->left = origin[X_AX];
+    pspriteframe->right = origin[X_AX] + width;
 
     char name[NAME_LENGTH]; snprintf(name, sizeof(name), "%s_%i", _loadModel->name, framenum);               //
     pspriteframe->gl_texturenum = GL_LoadTexture(
@@ -85,14 +86,14 @@ TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
     pspriteframe->width = width;
     pspriteframe->height = height;
     int origin[2] = {
-        LittleLong(pinframe->origin[0]),
-        LittleLong(pinframe->origin[1])
+        LittleLong(pinframe->origin[X_AX]),
+        LittleLong(pinframe->origin[Y_AX])
     };
 
-    pspriteframe->up = origin[1];
-    pspriteframe->down = origin[1] - height;
-    pspriteframe->left = origin[0];
-    pspriteframe->right = width + origin[0];
+    pspriteframe->up = origin[Y_AX];
+    pspriteframe->down = origin[Y_AX] - height;
+    pspriteframe->left = origin[X_AX];
+    pspriteframe->right = origin[X_AX] + width;
 
     switch (r_pixbytes) {
     case 1: { Q_memcpy(&pspriteframe->pixels[0], (uint8_p)(pinframe + 1), size); } break;
@@ -119,11 +120,12 @@ Mod_LoadSpriteGroup
 
 // TODO: extract similar logic outside #ifdef
 
+TypeLess_ptr Mod_LoadSpriteGroup(TypeLess_ptr pin, mSpriteFrame_p* ppframe
 #ifdef GLQUAKE
-TypeLess_ptr Mod_LoadSpriteGroup(TypeLess_ptr pin, mSpriteFrame_p* ppframe, int framenum) {
-#else
-TypeLess_ptr Mod_LoadSpriteGroup(TypeLess_ptr pin, mSpriteFrame_p * ppframe) {
+    , int framenum
 #endif
+) {
+
     dSpriteGroup_p pingroup = (dSpriteGroup_p)pin;
     int numframes = LittleLong(pingroup->numframes);
 
@@ -142,7 +144,7 @@ TypeLess_ptr Mod_LoadSpriteGroup(TypeLess_ptr pin, mSpriteFrame_p * ppframe) {
 
     for (int i = 0; i < numframes; i++) {
         *poutintervals = LittleFloat(pin_intervals->interval);
-        if (*poutintervals <= 0.0)          Host_SysError("Mod_LoadSpriteGroup: interval<=0");
+        if (*poutintervals <= 0.0f)          Host_SysError("Mod_LoadSpriteGroup: interval<=0");
 
         poutintervals++;
         pin_intervals++;
@@ -151,11 +153,11 @@ TypeLess_ptr Mod_LoadSpriteGroup(TypeLess_ptr pin, mSpriteFrame_p * ppframe) {
     TypeLess_ptr ptemp = (TypeLess_ptr)pin_intervals;
 
     for (int i = 0; i < numframes; i++) {
+        ptemp = Mod_LoadSpriteFrame(ptemp, &pspritegroup->frames[i]
 #ifdef GLQUAKE
-        ptemp = Mod_LoadSpriteFrame(ptemp, &pspritegroup->frames[i], framenum * 100 + i);
-#else
-        ptemp = Mod_LoadSpriteFrame(ptemp, &pspritegroup->frames[i]);
+            , framenum * 100 + i    // debug info of recursion?
 #endif
+        );
     }
 
     return ptemp;
@@ -248,9 +250,9 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
         default: {
             Host_Error(".SPR frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
         } break;
-        }
+    }
 
 #endif
-    }
+}
     mod->type = mod_sprite;
 }

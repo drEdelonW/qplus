@@ -848,12 +848,12 @@ void V_RenderView() {
         //
 
         vid.rowbytes <<= 1;
-        vid.aspect *= 0.5;
+        scr.aspect *= 0.5;
 
         r_refdef.viewangles.yaw -= lcd_yaw.value;
         r_refdef.vieworg = VectorMA(r_refdef.vieworg, -lcd_x.value, _bs.right);
         R_RenderView();
-        vid.buffer += vid.rowbytes >> 1;
+        vid.scr.pBuff += vid.rowbytes >> 1;
 
         R_PushDlights();
 
@@ -861,12 +861,12 @@ void V_RenderView() {
 
         r_refdef.vieworg = VectorMA(r_refdef.vieworg, 2 * lcd_x.value, _bs.right);
         R_RenderView();
-        vid.buffer -= vid.rowbytes >> 1;
+        vid.scr.pBuff -= vid.rowbytes >> 1;
 
         r_refdef.vrect.height <<= 1;
 
         vid.rowbytes >>= 1;
-        vid.aspect *= 2;
+        scr.aspect *= 2;
     }
     else {
         R_RenderView();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vid.h"
+#include "vRect.h"
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct {

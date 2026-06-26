@@ -415,21 +415,21 @@ void Draw_Init() {
         Draw_CharToConback(ver[x], dest + (x << 3));
 
 #if 0
-    conback->width = vid.conwidth;
-    conback->height = vid.conheight;
+    conback->width = vid.con.width;
+    conback->height = vid.con.height;
 
     // scale console to vid size
     uint8_p ncdata
-        uint8_p dest = ncdata = Hunk_AllocName(vid.conwidth * vid.conheight, "conback");
+        uint8_p dest = ncdata = Hunk_AllocName(vid.con.width * vid.con.height, "conback");
 
-    for (int y = 0; y < vid.conheight; y++, dest += vid.conwidth) {
-        src = cb->data + cb->width * (y * cb->height / vid.conheight);
-        if (vid.conwidth == cb->width)
-            memcpy(dest, src, vid.conwidth);
+    for (int y = 0; y < vid.con.height; y++, dest += vid.con.width) {
+        src = cb->data + cb->width * (y * cb->height / vid.con.height);
+        if (vid.con.width == cb->width)
+            memcpy(dest, src, vid.con.width);
         else {
             f = 0;
-            fstep = cb->width * 0x10000 / vid.conwidth;
-            for (int x = 0; x < vid.conwidth; x += 4) {
+            fstep = cb->width * 0x10000 / vid.con.width;
+            for (int x = 0; x < vid.con.width; x += 4) {
                 dest[x + 0] = src[f >> 16];     f += fstep;
                 dest[x + 1] = src[f >> 16];     f += fstep;
                 dest[x + 2] = src[f >> 16];     f += fstep;
@@ -454,8 +454,8 @@ void Draw_Init() {
         .th = 1.0f
     };
 
-    conback->width = vid.width;
-    conback->height = vid.height;
+    conback->width = vid.scr.width;
+    conback->height = vid.scr.height;
 
     Hunk_FreeToLowMark(start);      // free loaded console
 
@@ -592,8 +592,8 @@ Draw_TransPic
 void Draw_TransPic(int x, int y, qPic_p pic) {
     if ((x < 0) ||
         (y < 0) ||
-        ((uint32_t)(x + pic->width) > vid.width) ||
-        ((uint32_t)(y + pic->height) > vid.height)
+        ((uint32_t)(x + pic->width) > vid.scr.width) ||
+        ((uint32_t)(y + pic->height) > vid.scr.height)
         ) {
         Host_SysError("Draw_TransPic: bad coordinates");
     }
@@ -654,10 +654,10 @@ Draw_ConsoleBackground
 ================
 */
 void Draw_ConsoleBackground(int lines) {
-    int y = (vid.height * 3) >> 2;
+    int y = (vid.scr.height * 3) >> 2;
 
-    if (lines > y)  Draw_Pic(0, lines - vid.height, conback);
-    else            Draw_AlphaPic(0, lines - vid.height, conback, (float)(1.2 * lines) / y);
+    if (lines > y)  Draw_Pic(0, lines - vid.scr.height, conback);
+    else            Draw_AlphaPic(0, lines - vid.scr.height, conback, (float)(1.2 * lines) / y);
 }
 
 
@@ -723,9 +723,9 @@ void Draw_FadeScreen() {
     glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
     glBegin(GL_QUADS); {
         glVertex2f(0.0f, 0.0f);
-        glVertex2f(vid.width, 0.0f);
-        glVertex2f(vid.width, vid.height);
-        glVertex2f(0.0f, vid.height);
+        glVertex2f(vid.scr.width, 0.0f);
+        glVertex2f(vid.scr.width, vid.scr.height);
+        glVertex2f(0.0f, vid.scr.height);
     } glEnd();
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_TEXTURE_2D);
@@ -748,7 +748,7 @@ void Draw_BeginDisc() {
     if (!draw_disc)     return;
 
     glDrawBuffer(GL_FRONT);
-    Draw_Pic(vid.width - 24, 0, draw_disc);
+    Draw_Pic(vid.scr.width - 24, 0, draw_disc);
     glDrawBuffer(GL_BACK);
 }
 
@@ -775,7 +775,7 @@ void GL_Set2D() {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, vid.width, vid.height, 0, -99999, 99999);
+    glOrtho(0, vid.scr.width, vid.scr.height, 0, -99999, 99999);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

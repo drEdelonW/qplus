@@ -50,7 +50,7 @@ void Con_NotifyBox(cString text) {
     ================
 */
 void Con_CheckResize() {
-    int32_t width = (vid.width >> 3) - 2;
+    int32_t width = (vid.scr.width >> 3) - 2;
     if (width == con.linewidth)
         return;
 

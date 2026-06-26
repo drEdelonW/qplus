@@ -1,5 +1,5 @@
 #include "menu_prv.h"
-#include "vid.h"
+#include "vid.h"    // vid.scr.width
 #include "render.h"
 #include <string.h>
 #include "q_tools.h"
@@ -39,7 +39,7 @@ void M_BuildTranslationTable(int top, int bottom) {
 }
 
 
-void M_DrawTransPicTranslate(int x, int y, qPic_p pic) { Draw_TransPicTranslate(x + ((vid.width - 320) >> 1), y, pic, _translationTable); }
+void M_DrawTransPicTranslate(int x, int y, qPic_p pic) { Draw_TransPicTranslate(x + ((vid.scr.width - 320) >> 1), y, pic, _translationTable); }
 
 
 void M_DrawTextBox(int x, int y, int width, int lines) {
@@ -80,9 +80,9 @@ void M_DrawTextBox(int x, int y, int width, int lines) {
     M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_br.lmp"));
 }
 
-void M_DrawCharacter(int cx, int line, int num) { Draw_Character(cx + ((vid.width - 320) >> 1), line, num); }
+void M_DrawCharacter(int cx, int line, int num) { Draw_Character(cx + ((vid.scr.width - 320) >> 1), line, num); }
 
-void M_DrawTransPic(int x, int y, qPic_p pic) { Draw_TransPic(x + ((vid.width - 320) >> 1), y, pic); }
+void M_DrawTransPic(int x, int y, qPic_p pic) { Draw_TransPic(x + ((vid.scr.width - 320) >> 1), y, pic); }
 
 int M_DrawPicHC(int y, qPic_p pic) {
     if (pic) {
@@ -93,7 +93,7 @@ int M_DrawPicHC(int y, qPic_p pic) {
     return -1;
 }
 void M_DrawPic(int x, int y, qPic_p pic) {
-    Draw_Pic(x + ((vid.width - 320) >> 1), y, pic);
+    Draw_Pic(x + ((vid.scr.width - 320) >> 1), y, pic);
 }
 
 void M_Print(int cx, int cy, cStringRO str) {

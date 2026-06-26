@@ -19,8 +19,8 @@ void SCR_DrawPause() {
         return;
 
     qPic_p pic = Draw_CachePic("gfx/pause.lmp");
-    Draw_Pic((vid.width - pic->width) / 2,
-        (vid.height - 48 - pic->height) / 2, pic);
+    Draw_Pic((vid.scr.width - pic->width) / 2,
+        (vid.scr.height - 48 - pic->height) / 2, pic);
 }
 
 
@@ -34,8 +34,8 @@ void SCR_DrawLoading() {
     if (!_scr.drawloading)   return;
 
     qPic_p pic = Draw_CachePic("gfx/loading.lmp");
-    Draw_Pic((vid.width - pic->width) / 2,
-        (vid.height - 48 - pic->height) / 2, pic);
+    Draw_Pic((vid.scr.width - pic->width) / 2,
+        (vid.scr.height - 48 - pic->height) / 2, pic);
 }
 
 

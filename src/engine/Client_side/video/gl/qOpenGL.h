@@ -1,21 +1,11 @@
 #pragma once
 
-// #include "enginedefs.h"
-// #include "types.h"
-// #include "vid.h"
-// #include "vector.h"
-// #include "Surface.h"
-// #include "Leaf.h"
 #include "Leaf_pre.h"
-// #include "render.h"
-// #include "Texture.h"
 #include "cvar.h"
-// #include "render.h"
 #include "rEntity.h"
 #include "transform.h"
 
 #include "glquake.h"
-// #include "Model_st.h"
 #include "Light.h"
 #include "Node.h"
 #include "Model_pre.h"

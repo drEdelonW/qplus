@@ -57,10 +57,10 @@ void SCR_EraseCenterString() {
     }
 
     int y = (_scr.center_lines <= 4) ?
-        vid.height * 0.35 : 48;
+        vid.scr.height * 0.35 : 48;
 
     scr.copytop = true;
-    Draw_TileClear(0, y, vid.width, 8 * _scr.erase_lines);
+    Draw_TileClear(0, y, vid.scr.width, 8 * _scr.erase_lines);
 }
 
 //=============================================================================
@@ -97,8 +97,8 @@ void SCR_ScreenShot_f() {
             //  buffer
 
             WritePCXfile(
-                pcxname, vid.buffer,
-                vid.width, vid.height,
+                pcxname, vid.scr.pBuff,
+                vid.scr.width, vid.scr.height,
                 vid.rowbytes, host_basepal
             );
 
@@ -178,7 +178,7 @@ void SCR_UpdateScreen() {
 
     if (fullupdate++ < vid.numpages) { // clear the entire screen
         scr.copyeverything = true;
-        Draw_TileClear(0, 0, vid.width, vid.height);
+        Draw_TileClear(0, 0, vid.scr.width, vid.scr.height);
         Sbar_Changed();
     }
 
@@ -216,8 +216,8 @@ void SCR_UpdateScreen() {
         vrect = (vRect_t){
             .x = 0,
             .y = 0,
-            .width = vid.width,
-            .height = vid.height,
+            .width = vid.scr.width,
+            .height = vid.scr.height,
             .pnext = 0
         };
     }
@@ -225,8 +225,8 @@ void SCR_UpdateScreen() {
         vrect = (vRect_t){
             .x = 0,
             .y = 0,
-            .width = vid.width,
-            .height = vid.height - sb_lines,
+            .width = vid.scr.width,
+            .height = vid.scr.height - sb_lines,
             .pnext = 0
         };
     }
@@ -234,8 +234,8 @@ void SCR_UpdateScreen() {
         vrect = (vRect_t){
             .x = scr.vrect.x,
             .y = scr.vrect.y,
-            .width = vid.width,
-            .height = vid.height,
+            .width = vid.scr.width,
+            .height = vid.scr.height,
             .pnext = 0
         };
     }

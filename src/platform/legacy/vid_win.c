@@ -1230,14 +1230,14 @@ bool VID_SetWindowedMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    vid.buffer = vid.conbuffer = vid.direct = dibdc->surface;
+    vid.scr.pBuff = vid.con.pBuff = vid.direct = dibdc->surface;
     vid.rowbytes = vid.conrowbytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
-    vid.height = vid.conheight = DIBHeight;
-    vid.width = vid.conwidth = DIBWidth;
-    vid.aspect = ((float)vid.height / (float)vid.width) *
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
+    vid.scr.height = vid.con.height = DIBHeight;
+    vid.scr.width = vid.con.width = DIBWidth;
+    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
         (320.0 / 240.0);
 
     vid_stretched = stretched;
@@ -1273,12 +1273,12 @@ bool VID_SetFullscreenMode(int modenum) {
     modestate = MS_FULLSCREEN;
     vid_fulldib_on_focus_mode = 0;
 
-    vid.buffer = vid.conbuffer = vid.direct = NULL;
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
-    DIBHeight = vid.height = vid.conheight = modelist[modenum].height;
-    DIBWidth = vid.width = vid.conwidth = modelist[modenum].width;
-    vid.aspect = ((float)vid.height / (float)vid.width) *
+    vid.scr.pBuff = vid.con.pBuff = vid.direct = NULL;
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
+    DIBHeight = vid.scr.height = vid.con.height = modelist[modenum].height;
+    DIBWidth = vid.scr.width = vid.con.width = modelist[modenum].width;
+    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
         (320.0 / 240.0);
 
     vid_stretched = modelist[modenum].stretched;
@@ -1384,14 +1384,14 @@ bool VID_SetFullDIBMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    vid.buffer = vid.conbuffer = vid.direct = dibdc->surface;
+    vid.scr.pBuff = vid.con.pBuff = vid.direct = dibdc->surface;
     vid.rowbytes = vid.conrowbytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
-    vid.height = vid.conheight = DIBHeight;
-    vid.width = vid.conwidth = DIBWidth;
-    vid.aspect = ((float)vid.height / (float)vid.width) *
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
+    vid.scr.height = vid.con.height = DIBHeight;
+    vid.scr.width = vid.con.width = DIBWidth;
+    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
         (320.0 / 240.0);
 
     vid_stretched = modelist[modenum].stretched;
@@ -1499,8 +1499,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
         IN_HideMouse();
     }
 
-    window_width = vid.width << vid_stretched;
-    window_height = vid.height << vid_stretched;
+    window_width = vid.scr.width << vid_stretched;
+    window_height = vid.scr.height << vid_stretched;
     VID_UpdateWindowStatus();
 
     CDAudio_Resume();
@@ -1537,7 +1537,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     vid_modenum = modenum;
     Cvar_SetValue("vid_mode", (float)vid_modenum);
 
-    if (!VID_AllocBuffers(vid.width, vid.height)) {
+    if (!VID_AllocBuffers(vid.scr.width, vid.scr.height)) {
         // couldn't get memory for this mode; try to fall back to previous mode
         VID_RestoreOldMode(original_mode);
         return false;
@@ -1588,19 +1588,19 @@ void VID_LockBuffer() {
 
     if (memdc) {
         // Update surface pointer for linear access modes
-        vid.buffer = vid.conbuffer = vid.direct = memdc->surface;
+        vid.scr.pBuff = vid.con.pBuff = vid.direct = memdc->surface;
         vid.rowbytes = vid.conrowbytes = memdc->mi.bytesPerLine;
     }
     else if (mgldc) {
         // Update surface pointer for linear access modes
-        vid.buffer = vid.conbuffer = vid.direct = mgldc->surface;
+        vid.scr.pBuff = vid.con.pBuff = vid.direct = mgldc->surface;
         vid.rowbytes = vid.conrowbytes = mgldc->mi.bytesPerLine;
     }
 
     if (r_dowarp)
         d_viewbuffer = r_warpbuffer;
     else
-        d_viewbuffer = (TypeLess_ptr)(uint8_p)vid.buffer;
+        d_viewbuffer = (TypeLess_ptr)(uint8_p)vid.scr.pBuff;
 
     if (r_dowarp)
         screenwidth = WARP_WIDTH;
@@ -1627,7 +1627,7 @@ void VID_UnlockBuffer() {
     MGL_endDirectAccess();
 
     // to turn up any unlocked accesses
-    vid.buffer = vid.conbuffer = vid.direct = d_viewbuffer = NULL;
+    vid.scr.pBuff = vid.con.pBuff = vid.direct = d_viewbuffer = NULL;
 
 }
 
@@ -1928,10 +1928,10 @@ void	VID_Init(uint8_p palette) {
         VID_InitFullDIB(global_hInstance);
     }
 
-    vid.maxwarpwidth = WARP_WIDTH;
-    vid.maxwarpheight = WARP_HEIGHT;
+    vid.maxwarp.width = WARP_WIDTH;
+    vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
-    vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
+    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
     vid_testingmode = 0;
 
     // GDI doesn't let us remap palette index 0, so we'll remap color
@@ -2112,8 +2112,8 @@ void	VID_Update(vRect_p rects) {
         palette_changed = false;
         rect.x = 0;
         rect.y = 0;
-        rect.width = vid.width;
-        rect.height = vid.height;
+        rect.width = vid.scr.width;
+        rect.height = vid.scr.height;
         rect.pnext = NULL;
         rects = &rect;
     }
@@ -2203,7 +2203,7 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
     if (!vid_initialized)
         return;
 
-    if (vid.aspect > 1.5) {
+    if (scr.aspect > 1.5) {
         reps = 2;
         repshift = 1;
     }
@@ -2289,7 +2289,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
     if (!vid_initialized)
         return;
 
-    if (vid.aspect > 1.5) {
+    if (scr.aspect > 1.5) {
         reps = 2;
         repshift = 1;
     }

@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #include "types.h"
-#include "vid.h"
+#include "vRect.h"
 #include "qTime.h"
 
 // only the refresh window will be updated unless these variables are flagged
@@ -63,6 +63,7 @@ typedef struct {
     bool    skipupdate;
     bool    block_drawing;
     bool    r_cache_thrash;     // compatability
+    float   aspect;             // width / height -- < 0 is taller than wide
 } Screen_t;
 extern Screen_t scr;
 
