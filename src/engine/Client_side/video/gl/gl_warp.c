@@ -386,22 +386,20 @@ TARGA LOADING
 =========================================================
 */
 
-typedef struct _TargaHeader {
+typedef struct {
     uint8_t  id_length;
     uint8_t colormap_type;
     uint8_t image_type;
-    uint16_p colormap_index;
-    uint16_p colormap_length;
+    uint16_t colormap_index;
+    uint16_t colormap_length;
     uint8_t colormap_size;
-    uint16_p x_origin;
-    uint16_p y_origin;
-    uint16_p width;
-    uint16_p height;
+    uint16_t x_origin;
+    uint16_t y_origin;
+    uint16_t width;
+    uint16_t height;
     uint8_t pixel_size;
     uint8_t attributes;
 } TargaHeader;
-
-
 TargaHeader  targa_header;
 byte* targa_rgba;
 

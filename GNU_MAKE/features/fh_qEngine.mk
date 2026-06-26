@@ -116,15 +116,14 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         SRC_LIST += $(VID_DIR)/cScreen.c
 
                         $(eval GSCR_DIR = $(VID_DIR)/GameScreen) $(eval INCLUDES += $(GSCR_DIR))
-                                SRC_LIST += $(GSCR_DIR)/gameScreen.c
-
                                 $(eval VP_DIR = $(GSCR_DIR)/ViewPort) $(eval INCLUDES += $(VP_DIR))
                                         SRC_LIST += $(VP_DIR)/view.c
+                                        SRC_LIST += $(VP_DIR)/cRender.c
                                         SRC_LIST += $(VP_DIR)/chase.c
 
-
-                                $(eval SB_DIR = $(GSCR_DIR)/HUD) $(eval INCLUDES += $(SB_DIR))
-                                        SRC_LIST += $(SB_DIR)/sbar.c
+                                $(eval HUD_DIR = $(GSCR_DIR)/HUD) $(eval INCLUDES += $(HUD_DIR))
+                                        SRC_LIST += $(HUD_DIR)/sbar.c
+                                        SRC_LIST += $(HUD_DIR)/hud.c
 
                         $(eval GAMECON_DIR = $(VID_DIR)/GameConsole) $(eval INCLUDES += $(GAMECON_DIR))
                                 SRC_LIST += $(GAMECON_DIR)/echoConsole.c

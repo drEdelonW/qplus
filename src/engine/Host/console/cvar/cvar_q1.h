@@ -153,7 +153,7 @@ CVAR_EXTERN(r_aliastransadj);
 // FROM: src/ui/view.c
 CVAR_EXTERN(scr_fov);   // 10 - 170
 
-CVAR_EXTERN(lcd_x);
+CVAR_EXTERN(lcd_x); // stereo software render features 
 CVAR_EXTERN(lcd_yaw);
 
 CVAR_EXTERN(scr_ofsx);
@@ -203,7 +203,7 @@ CVAR_EXTERN(_snd_mixahead);
 
 
 // FROM: src/ui/screen.c
-CVAR_EXTERN(scr_viewsize);
+CVAR_EXTERN(scr_viewsize);  // TODO: taka look
 CVAR_EXTERN(scr_conspeed);
 CVAR_EXTERN(scr_centertime);
 CVAR_EXTERN(scr_showram);

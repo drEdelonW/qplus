@@ -20,11 +20,13 @@ typedef struct {
 } _Screen_t;
 
 extern _Screen_t _scr;
+extern int fullupdate; // set to 0 to force full redraw
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+    void SCR_Composite();
     void SCR_ScreenShot_f();
     void SCR_DrawCenterString();
     int SCR_ModalMessage(cString text);
@@ -44,6 +46,7 @@ extern "C" {
 
     void Con_MessageMode_f();
     void Con_MessageMode2_f();
+    void Con_DrawNotify();
 
 #ifdef __cplusplus
 }

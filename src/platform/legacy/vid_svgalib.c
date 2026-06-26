@@ -236,7 +236,7 @@ void VID_Gamma_f() {
 
         VID_SetPalette(palette);
 
-        vid.recalc_refdef = true;				// force a surface cache flush
+        SCR_RequestCalcRefdef();				// force a surface cache flush
     }
 }
 
@@ -504,7 +504,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     svgalib_inited = 1;
 
-    vid.recalc_refdef = true;				// force a surface cache flush
+    SCR_RequestCalcRefdef();				// force a surface cache flush
 
     return 0;
 }

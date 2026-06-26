@@ -108,7 +108,9 @@ void D_WarpScreen();
 
 void D_FillRect(vRect_p vrect, int color);
 // void D_DrawRect();
+#if 0
 void D_UpdateRects(vRect_p prect);
+#endif
 
 // currently for internal use only, and should be a do-nothing function in hardware drivers
 // FIXME: this should go away

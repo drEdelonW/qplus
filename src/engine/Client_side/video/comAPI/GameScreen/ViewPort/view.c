@@ -238,7 +238,7 @@ bool V_CheckGamma() {
     _oldGammaValue = v_gamma.value;
 
     BuildGammaTable(v_gamma.value);
-    vid.recalc_refdef = true;    // force a surface cache flush
+    SCR_RequestCalcRefdef();    // force a surface cache flush
 
     return true;
 }
@@ -872,9 +872,7 @@ void V_RenderView() {
         R_RenderView();
     }
 
-#ifndef GLQUAKE
-     Draw_crosshair();
-#endif
+    Draw_crosshair();
 
 }
 
@@ -882,8 +880,13 @@ void V_RenderView() {
 void Draw_crosshair() {
     if (crosshair.value)
     Draw_Character(
+#if GLQUAKE
+        scr.vrect.x + scr.vrect.width / 2,
+        scr.vrect.y + scr.vrect.height / 2,
+#else
         scr.vrect.x + scr.vrect.width / 2 + cl_crossx.value,
         scr.vrect.y + scr.vrect.height / 2 + cl_crossy.value,
+#endif
         '+'
     );
 }
@@ -897,7 +900,7 @@ Keybinding command
 */
 void V_SizeUp_f() {
     Cvar_SetValue("viewsize", scr_viewsize.value + 10);
-    vid.recalc_refdef = true;
+    SCR_RequestCalcRefdef();
 }
 
 
@@ -910,7 +913,7 @@ Keybinding command
 */
 void V_SizeDown_f() {
     Cvar_SetValue("viewsize", scr_viewsize.value - 10);
-    vid.recalc_refdef = true;
+    SCR_RequestCalcRefdef();
 }
 
 //============================================================================

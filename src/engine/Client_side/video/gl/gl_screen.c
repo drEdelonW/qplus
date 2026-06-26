@@ -82,7 +82,6 @@ console is:
 #include "common.h"
 #include "sys.h"
 #include "sound.h"
-#include "menu.h"
 #include "view.h"
 #include "cvar_q1.h"
 #include <stdlib.h>
@@ -101,15 +100,6 @@ bool    scr_disabled_for_loading;
 
 ==============================================================================
 */
-
-typedef struct _TargaHeader {
-    uint8_t     id_length, colormap_type, image_type;
-    uint16_t    colormap_index, colormap_length;
-    uint8_t     colormap_size;
-    uint16_t    x_origin, y_origin, width, height;
-    uint8_t     pixel_size, attributes;
-} TargaHeader;
-
 
 /*
 ==================
@@ -217,13 +207,14 @@ needs almost the entire 256k of stack space!
 ==================
 */
 void SCR_UpdateScreen() {
-    if (scr.block_drawing)
-        return;
+    if (scr.block_drawing)  return;
 
     vid.numpages = 2 + gl_triplebuffer.value;
 
-    scr.copytop = false;
-    scr.copyeverything = false;
+#if 0   /* this specific for software render. not applicable for OpenGL */
+    scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing
+    scr.copyeverything = false; // TODO: wrap this valuse to avoid global publishing
+#endif
 
     if (scr_disabled_for_loading) {
         if ((realtime - _scr.disabled_time) > 60) {
@@ -246,12 +237,12 @@ void SCR_UpdateScreen() {
         //
         if (_scr.oldFov != scr_fov.value) {
             _scr.oldFov = scr_fov.value;
-            vid.recalc_refdef = true;
+            SCR_RequestCalcRefdef();
         }
 
         if (_scr.oldViewSize != scr_viewsize.value) {
             _scr.oldViewSize = scr_viewsize.value;
-            vid.recalc_refdef = true;
+            SCR_RequestCalcRefdef();
         }
 
         SCR_CalcRefdef();
@@ -269,36 +260,7 @@ void SCR_UpdateScreen() {
         // draw any areas not covered by the refresh
         //
         SCR_TileClear();
-
-        if (_scr.drawdialog) {
-            Sbar_Draw();
-            Draw_FadeScreen();
-            SCR_DrawNotifyString();
-            scr.copyeverything = true;
-        }
-        else if (_scr.drawloading) {
-            SCR_DrawLoading();
-            Sbar_Draw();
-        }
-        else if ((cl.intermission == IM_LEVEL) && (key.dest == key_game)) {
-            Sbar_IntermissionOverlay();
-        }
-        else if ((cl.intermission == IM_FINALE) && (key.dest == key_game)) {
-            Sbar_FinaleOverlay();
-            SCR_CheckDrawCenterString();
-        }
-        else {
-            Draw_crosshair();
-            SCR_DrawRam();
-            SCR_DrawNet();
-            SCR_DrawTurtle();
-            SCR_DrawPause();
-            SCR_CheckDrawCenterString();
-            Sbar_Draw();
-            SCR_DrawConsole();
-            M_Draw();
-        }
-
+            SCR_Composite();    // main state based compositor
         V_UpdatePalette();
 
     } GL_EndRendering();

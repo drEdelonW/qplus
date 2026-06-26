@@ -52,12 +52,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct {
     vRect_t vrect;
     LegacyTimeDelta_t    centertime_off;
-    float   con_current;
-    float   conlines;           // lines of console to display
-    int     fullupdate;         // set to 0 to force full redraw
+    int32_t con_current;
+    int32_t conlines;           // lines of console to display
     int     clearnotify;        // set to 0 whenever notify text is drawn
+#if 1   /* this specific for software render. not applicable for OpenGL */
     bool    copytop;
-    bool    copyeverything;
+    bool    copyeverything;     // software frame buffer copy request
+#endif
     bool    disabled_for_loading;
     bool    skipupdate;
     bool    block_drawing;
@@ -71,6 +72,8 @@ extern "C" {
 
     void SCR_Init();
     void SCR_UpdateScreen();
+    void SCR_RequestRedraw();
+    void SCR_RequestCalcRefdef();
     void SCR_UpdateWholeScreen();   // INFO: Win VID specific
     void SCR_CenterPrint(cString str);
     void SCR_BeginLoadingPlaque();

@@ -56,7 +56,7 @@ __weak void VID_Init(uint8_p palette) {
         .height         = BASEHEIGHT,
         .aspect         = 1.0,
         .numpages       = 1,
-        // .recalc_refdef
+
         .conbuffer      = _vidBuf,
         .conrowbytes    = BASEWIDTH,
         .conwidth       = BASEWIDTH,

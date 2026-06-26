@@ -100,7 +100,7 @@ void M_Draw() {
         }
         else    Draw_FadeScreen();
 
-        scr.fullupdate = 0;
+        SCR_RequestRedraw();
     }
     else { m_recursiveDraw = false; }
 

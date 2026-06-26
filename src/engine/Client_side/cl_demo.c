@@ -89,8 +89,8 @@ Dumps the current net message, prefixed by the length and view angles
 ====================
 */
 void CL_WriteDemoMessage() {
-    int len = LittleLong((int32_t)net_message.cursize);
-    fwrite(&len, 4, 1, cls.demofile);
+    int32_t len = LittleLong((int32_t)net_message.cursize);
+    fwrite(&len, sizeof(int32_t), 1, cls.demofile);
     for (int i = 0; i < VECT_DIM; i++) {
         vec_t f = LittleFloat(cl.viewangles.v[i]);
         fwrite(&f, sizeof(vec_t), 1, cls.demofile);

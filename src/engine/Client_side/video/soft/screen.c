@@ -32,12 +32,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "d_iface.h"
 #include "sound.h"
-#include "menu.h"
+// #include "menu.h"
 #include "render.h"
+#include "view.h"
 
 #include "screen_prv.h"
 
+#if 0
 static vRect_p  _pConUpdate;
+#endif
 
 /*
 ===============================================================================
@@ -112,6 +115,7 @@ void SCR_ScreenShot_f() {
 //=============================================================================
 
 
+
 /*
 ==================
 SCR_UpdateScreen
@@ -128,8 +132,8 @@ void SCR_UpdateScreen() {
         scr.skipupdate)
         return;
 
-    scr.copytop = false;
-    scr.copyeverything = false;
+    scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing
+    scr.copyeverything = false; // TODO: wrap this valuse to avoid global publishing
 
     if (scr.disabled_for_loading) {
         if ((realtime - _scr.disabled_time) > 60) {
@@ -144,28 +148,25 @@ void SCR_UpdateScreen() {
     if (!_scr.initialized || !con.isInitialized)
         return;     // not initialized yet
 
-    if (_scr.oldViewSize != scr_viewsize.value) {
-        _scr.oldViewSize = scr_viewsize.value;
-        vid.recalc_refdef = true;
-    }
-
     //
     // check for vid changes
     //
-    if (_scr.oldFov != scr_fov.value) {
-        _scr.oldFov = scr_fov.value;
-        vid.recalc_refdef = true;
-    }
-
+#ifndef STM32
     static float _oldLcdX;
     if (_oldLcdX != lcd_x.value) {
         _oldLcdX = lcd_x.value;
-        vid.recalc_refdef = true;
+        SCR_RequestCalcRefdef();
+    }
+#endif
+
+    if (_scr.oldFov != scr_fov.value) {
+        _scr.oldFov = scr_fov.value;
+        SCR_RequestCalcRefdef();
     }
 
     if (_scr.oldViewSize != scr_viewsize.value) {
         _scr.oldViewSize = scr_viewsize.value;
-        vid.recalc_refdef = true;
+        SCR_RequestCalcRefdef();
     }
 
     SCR_CalcRefdef();
@@ -175,14 +176,15 @@ void SCR_UpdateScreen() {
     //
     D_EnableBackBufferAccess(); // of all overlay stuff if drawing directly
 
-    if (scr.fullupdate++ < vid.numpages) { // clear the entire screen
+    if (fullupdate++ < vid.numpages) { // clear the entire screen
         scr.copyeverything = true;
         Draw_TileClear(0, 0, vid.width, vid.height);
         Sbar_Changed();
     }
 
+#if 0
     _pConUpdate = NULL;
-
+#endif
 
     SCR_SetUpToDrawConsole();
     SCR_EraseCenterString();
@@ -195,43 +197,13 @@ void SCR_UpdateScreen() {
     VID_UnlockBuffer();
 
     D_EnableBackBufferAccess(); { // of all overlay stuff if drawing directly
-
-        if (_scr.drawdialog) {
-            Sbar_Draw();
-            Draw_FadeScreen();
-            SCR_DrawNotifyString();
-            scr.copyeverything = true;
-        }
-        else if (_scr.drawloading) {
-            SCR_DrawLoading();
-            Sbar_Draw();
-        }
-        else if ((cl.intermission == IM_LEVEL) && (key.dest == key_game)) {
-            Sbar_IntermissionOverlay();
-        }
-        else if ((cl.intermission == IM_FINALE) && (key.dest == key_game)) {
-            Sbar_FinaleOverlay();
-            SCR_CheckDrawCenterString();
-        }
-        else if ((cl.intermission == IM_CUTSCENE) && (key.dest == key_game)) {
-            SCR_CheckDrawCenterString();
-        }
-        else {
-            SCR_DrawRam();
-            SCR_DrawNet();
-            SCR_DrawTurtle();
-            SCR_DrawPause();
-            SCR_CheckDrawCenterString();
-            Sbar_Draw();
-            SCR_DrawConsole();
-            M_Draw();
-        }
-
+        SCR_Composite();    // main state based compositor
     } D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
     //  for linear writes all the time
+#if 0
     if (_pConUpdate)
         D_UpdateRects(_pConUpdate);
-
+#endif
 
     V_UpdatePalette();
 
@@ -277,6 +249,6 @@ SCR_UpdateWholeScreen
 ==================
 */
 void SCR_UpdateWholeScreen() {
-    scr.fullupdate = 0;
+    SCR_RequestRedraw();
     SCR_UpdateScreen();
 }

@@ -131,6 +131,7 @@ void D_SetupFrame() {
 }
 
 
+#if 0
 /*
 ===============
 D_UpdateRects
@@ -140,4 +141,4 @@ void D_UpdateRects(vRect_p prect) {
     // the software driver draws these directly to the vid buffer
     // UNUSED(prect);
 }
-
+#endif

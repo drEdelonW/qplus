@@ -12,6 +12,7 @@
 #include "sbar.h"
 #include "RefDef.h"
 #include <math.h>
+#include "menu.h"
 #ifdef GLQUAKE
 # include "qOpenGL.h"
 #else
@@ -128,7 +129,7 @@ int SCR_ModalMessage(cString text) {
     _scr.notifystring = text;
 
     // draw a fresh screen
-    scr.fullupdate = 0;
+    SCR_RequestRedraw();
     _scr.drawdialog = true;
     SCR_UpdateScreen();
     _scr.drawdialog = false;
@@ -144,7 +145,7 @@ int SCR_ModalMessage(cString text) {
         (key.lastpress != K_ESCAPE)
         );
 
-    scr.fullupdate = 0;
+    SCR_RequestRedraw();
     SCR_UpdateScreen();
 
     return key.lastpress == 'y';
@@ -217,14 +218,14 @@ void SCR_BeginLoadingPlaque() {
     scr.con_current = 0;
 
     _scr.drawloading = true;
-    scr.fullupdate = 0;
+    SCR_RequestRedraw();
     Sbar_Changed();
     SCR_UpdateScreen();
     _scr.drawloading = false;
 
     scr.disabled_for_loading = true;
     _scr.disabled_time = realtime;
-    scr.fullupdate = 0;
+    SCR_RequestRedraw();
 }
 
 /*
@@ -235,7 +236,7 @@ SCR_EndLoadingPlaque
 */
 void SCR_EndLoadingPlaque() {
     scr.disabled_for_loading = false;
-    scr.fullupdate = 0;
+    SCR_RequestRedraw();
     Con_ClearNotify();
 }
 
@@ -352,9 +353,9 @@ void SCR_SetUpToDrawConsole() {
         scr.copytop = true;
         Draw_TileClear(
             0,
-            (int)scr.con_current,
+            scr.con_current,
             vid.width,
-            vid.height - (int)scr.con_current
+            vid.height - scr.con_current
         );
 #endif
         Sbar_Changed();
@@ -370,7 +371,10 @@ void SCR_SetUpToDrawConsole() {
         con.notifylines = 0;
 }
 
-
+bool recalc_refdef;  // if true, recalc vid-based stuff
+void SCR_RequestCalcRefdef() {
+    recalc_refdef = true;
+}
 /*
 =================
 SCR_CalcRefdef
@@ -380,9 +384,8 @@ Internal use only
 =================
 */
 void SCR_CalcRefdef() {
-    if (!vid.recalc_refdef)     return;
-
-    vid.recalc_refdef = false;
+    if (!recalc_refdef) return;
+    else recalc_refdef = false;
 
     // force the status bar to redraw
     Sbar_Changed();
@@ -404,65 +407,112 @@ void SCR_CalcRefdef() {
         else if (size >= 110.0f)    sb_lines = 24;       // no inventory
         else /*               */    sb_lines = 24 + 16 + 8;
     }
-#ifdef GLQUAKE
 
-    bool full = false;
-    float size;
-    if (scr_viewsize.value >= 100.0f) {
-        full = true;
-        size = 100.0f;
-    }
-    else
-        size = scr_viewsize.value;
-
-    if (cl.intermission != IM_NONE) {
-        full = true;
-        size = 100.0f;
-        sb_lines = 0;
-    }
-    size /= 100.0f;
-
-    int h = vid.height - sb_lines;
-
-    r_refdef.vrect.width = vid.width * size;
-    if (r_refdef.vrect.width < 96) {
-        size = 96.0 / r_refdef.vrect.width;
-        r_refdef.vrect.width = 96;    // min for icons
-    }
-
-    r_refdef.vrect.height = vid.height * size;
-    if (r_refdef.vrect.height > (vid.height - sb_lines))
-        r_refdef.vrect.height = (vid.height - sb_lines);
-    if (r_refdef.vrect.height > vid.height)
-        r_refdef.vrect.height = vid.height;
-
-    r_refdef.vrect.x = (vid.width - r_refdef.vrect.width) / 2;
-    r_refdef.vrect.y = (full) ? 0 : (h - r_refdef.vrect.height) / 2;
-
-    r_refdef.fov_x = scr_fov.value;
-    r_refdef.fov_y = CalcFov(r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
-
-#else
-
-    // these calculations mirror those in R_Init() for r_refdef, but take no
-    // account of water warping
     vRect_t vrect = {
         .width = vid.width,
         .height = vid.height
     };
+    vRect_p pvrectin = &vrect;
+    vRect_p pvrect = &r_refdef.vrect;
+    int lineadj = sb_lines;
+#ifdef GLQUAKE
+    bool full = ((scr_viewsize.value >= 100.0f) || (cl.intermission != IM_NONE));
+    /* look like void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) in r_main.c */ {
+        float size = (scr_viewsize.value > 100.0f) ?
+            100.0f : scr_viewsize.value;
 
-    R_SetVrect(&vrect, &scr.vrect, sb_lines);
+        if (cl.intermission != IM_NONE) {
+            size = 100.0f;
+            lineadj = 0;
+        }
+        size /= 100.0f;
+
+        int h = pvrectin->height - lineadj;
+        pvrect->width = pvrectin->width * size;
+        if (pvrect->width < 96.0f) {
+            size = 96.0f / pvrect->width;
+            pvrect->width = 96.0f;    // min for icons
+        }
+
+        pvrect->height = pvrectin->height * size;
+        if (pvrect->height > (pvrectin->height - lineadj))
+            pvrect->height = (pvrectin->height - lineadj);
+
+        {   /* GLQUAKE specific */
+            if (pvrect->height > pvrectin->height)
+                pvrect->height = pvrectin->height;
+
+            pvrect->x = (pvrectin->width - pvrect->width) / 2;
+            pvrect->y = (full) ? 0 : (h - pvrect->height) / 2;
+        }
+    }
+#else
+    // these calculations mirror those in R_Init() for r_refdef, but take no account of water warping
+
+    R_SetVrect(pvrectin, &scr.vrect, lineadj);
+#endif
 
     r_refdef.fov_x = scr_fov.value;
-    r_refdef.fov_y = CalcFov(r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
+    r_refdef.fov_y = CalcFov(r_refdef.fov_x, pvrect->width, pvrect->height);
 
-    // guard against going from one mode to another that's less than half the
-    // vertical resolution
+#ifdef GLQUAKE
+#else
+    // guard against going from one mode to another that's less than half the vertical resolution
     if (scr.con_current > vid.height)
         scr.con_current = vid.height;
 
     // notify the refresh of the change
-    R_ViewChanged(&vrect, sb_lines, vid.aspect);
-
+    R_ViewChanged(pvrectin, sb_lines, vid.aspect);
 #endif
+}
+
+
+
+
+int fullupdate; // set to 0 to force full redraw
+void SCR_RequestRedraw() {
+    fullupdate = 0;
+}
+
+// scr_common.c
+
+/*
+==================
+SCR_Composite
+Composite HUD, intermission, dialog and loading
+overlays based on current game state.
+Called from platform-specific SCR_UpdateScreen.
+==================
+*/
+void SCR_Composite() {
+    if (_scr.drawdialog) {
+        Sbar_Draw();
+        Draw_FadeScreen();
+        SCR_DrawNotifyString();
+        scr.copyeverything = true;
+    }
+    else if (_scr.drawloading) {
+        SCR_DrawLoading();
+        Sbar_Draw();
+    }
+    else if ((cl.intermission == IM_LEVEL) && (key.dest == key_game)) {
+        Sbar_IntermissionOverlay();
+    }
+    else if ((cl.intermission == IM_FINALE) && (key.dest == key_game)) {
+        Sbar_FinaleOverlay();
+        SCR_CheckDrawCenterString();
+    }
+    else if ((cl.intermission == IM_CUTSCENE) && (key.dest == key_game)) {
+        SCR_CheckDrawCenterString();
+    }
+    else {
+        SCR_DrawRam();
+        SCR_DrawNet();
+        SCR_DrawTurtle();
+        SCR_DrawPause();
+        SCR_CheckDrawCenterString();
+        Sbar_Draw();
+        SCR_DrawConsole();
+        M_Draw();
+    }
 }

@@ -686,7 +686,7 @@ void VID_Update(vRect_p rects) {
         vid.conwidth = vid.width;
         vid.conheight = vid.height;
         vid.conrowbytes = vid.rowbytes;
-        vid.recalc_refdef = true;    // force a surface cache flush
+        SCR_RequestCalcRefdef();    // force a surface cache flush
         Con_CheckResize();
         Con_Clear_f();
         return;
@@ -694,8 +694,7 @@ void VID_Update(vRect_p rects) {
 
     // force full update if not 8bit
     if (x_visinfo->depth != 8) {
-
-        scr.fullupdate = 0;
+        SCR_RequestRedraw();
     }
 
 
@@ -746,14 +745,14 @@ static int dither;
 
 void VID_DitherOn() {
     if (dither == 0) {
-        vid.recalc_refdef = true;
+        SCR_RequestCalcRefdef();
         dither = 1;
     }
 }
 
 void VID_DitherOff() {
     if (dither) {
-        vid.recalc_refdef = true;
+        SCR_RequestCalcRefdef();
         dither = 0;
     }
 }

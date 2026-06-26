@@ -1,8 +1,12 @@
+#ifndef GLQUAKE
+# error This is OpenGL target! GLQUAKE should be defined
+#endif
 #include "vid.h"
 #include "x_prv.h"
 #include "cvar.h"
 #include "common.h"
 #include "console.h"
+#include "screen.h"
 #include "qOpenGL.h"
 #ifdef GLQUAKE
 #   undef GLQUAKE
@@ -552,7 +556,7 @@ void apply_vid_state(App_p app) {
     vid.height = app->xwin.height;
     vid.aspect = ((float)vid.height / (float)vid.width) * (320.0f / 240.0f);
     vid.numpages = 2;
-    vid.recalc_refdef = true;
+    SCR_RequestCalcRefdef();
 
     glViewport(0, 0, app->xwin.width, app->xwin.height);
 }

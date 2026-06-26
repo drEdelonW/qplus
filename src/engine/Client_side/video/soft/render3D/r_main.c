@@ -290,42 +290,6 @@ void R_NewMap() {
 
 /*
 ===============
-R_SetVrect
-===============
-*/
-void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) {
-    float size = (scr_viewsize.value > 100.0f) ? 100.0f : scr_viewsize.value;
-    if (cl.intermission != IM_NONE) {
-        size = 100;
-        lineadj = 0;
-    }
-    size /= 100;
-
-    int h = pvrectin->height - lineadj;
-    pvrect->width = pvrectin->width * size;
-    if (pvrect->width < 96) {
-        size = 96.0 / pvrectin->width;
-        pvrect->width = 96; // min for icons
-    }
-    pvrect->width &= ~7;
-    pvrect->height = pvrectin->height * size;
-    if (pvrect->height > pvrectin->height - lineadj)
-        pvrect->height = pvrectin->height - lineadj;
-
-    pvrect->height &= ~1;
-
-    pvrect->x = (pvrectin->width - pvrect->width) / 2;
-    pvrect->y = (h - pvrect->height) / 2;
-
-    if (lcd_x.value) {
-        pvrect->y >>= 1;
-        pvrect->height >>= 1;
-    }
-}
-
-
-/*
-===============
 R_ViewChanged
 
 Called every time the vid structure or r_refdef changes.
@@ -381,10 +345,12 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     // the polygon rasterization will never render in the first row or column
     // but will definately render in the [range] row and column, so adjust the
     // buffer origin to get an exact edge to edge fill
-    xcenter = ((float)r_refdef.vrect.width * XCENTERING) +
+    xcenter =
+        ((float)r_refdef.vrect.width * XCENTERING) +
         r_refdef.vrect.x - 0.5;
     aliasxcenter = xcenter * r_aliasuvscale;
-    ycenter = ((float)r_refdef.vrect.height * YCENTERING) +
+    ycenter =
+        ((float)r_refdef.vrect.height * YCENTERING) +
         r_refdef.vrect.y - 0.5;
     aliasycenter = ycenter * r_aliasuvscale;
 
@@ -929,7 +895,7 @@ void R_RenderView_() {
     if (!r_dspeeds.value) { VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); } // don't let sound get messed up if going slow
     R_EdgeDrawing();
     if (!r_dspeeds.value) { VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); } // don't let sound get messed up if going slow
-    
+
 
     if (r_dspeeds.value) {
         se_time2 = Host_FloatTime();
