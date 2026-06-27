@@ -631,7 +631,7 @@ void Draw_Fill(int x, int y, int w, int h, int c) {
                 dest[u] = c;
     }
     else {
-        uint32_t uc = d_8to16table[c];
+        uint16_t uc = d_8to16table[c];
         uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * (vid.rowbytes >> 1) + x;
         for (int v = 0; v < h; v++, pusdest += (vid.rowbytes >> 1))
             for (int u = 0; u < w; u++)

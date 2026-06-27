@@ -1,7 +1,7 @@
 #ifndef GLQUAKE
 # error This is OpenGL target! GLQUAKE should be defined
 #endif
-#include "vid.h"
+// #include "vid.h"
 #include "x_prv.h"
 #include "cvar.h"
 #include "common.h"
