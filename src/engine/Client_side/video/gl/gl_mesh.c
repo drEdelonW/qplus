@@ -143,7 +143,7 @@ nexttri:
         for (int j = starttri + 1; j < pheader->numtris; j++, check++)
             if (check->facesfront == last->facesfront)
                 for (int k = 0; k < 3; k++)
-                    if ((check->vertindex[k] == m1) ||
+                    if ((check->vertindex[k] == m1) &&
                         (check->vertindex[(k + 1) % 3] == m2)
                         ) {
                         // this is the next part of the fan
