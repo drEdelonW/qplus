@@ -19,9 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // d_part.c: software driver module for drawing particles
 
-// #include "q_tools.h"
 #include "d_local.h"
-// #include "r_local.h"
 
 #include "Particle.h"
 

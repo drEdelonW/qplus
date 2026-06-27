@@ -18,6 +18,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#include "Particle.h"
+
 #ifdef GLQUAKE
 #   include "qOpenGL.h"
 #   include "cvar_q1.h"
@@ -29,15 +31,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "console.h"
 #include "mathlib.h"
-#include "Particle.h"
 #include "q_tools.h"
 #include "msg.h"
 #include <stdlib.h>
 #include "z_hunk.h"
 
-int  ramp1[8] = { 0x6F, 0x6D, 0x6B, 0x69, 0x67, 0x65, 0x63, 0x61 };
-int  ramp2[8] = { 0x6F, 0x6E, 0x6D, 0x6C, 0x6B, 0x6A, 0x68, 0x66 };
-int  ramp3[8] = { 0x6D, 0x6B, 0x06, 0x05, 0x04, 0x03, 0x00, 0x00 };
+int  ramp1[8] = { 0x6F, 0x6D, 0x6B, 0x69, 0x67, 0x65, 0x63, 0x61 }; // pt_explode
+int  ramp2[8] = { 0x6F, 0x6E, 0x6D, 0x6C, 0x6B, 0x6A, 0x68, 0x66 }; // pt_explode2
+int  ramp3[6] = { 0x6D, 0x6B, 0x06, 0x05, 0x04, 0x03 };             // pt_fire
 
 static Particle_p _activeParticles;
 static Particle_p _freeParticles;
@@ -66,15 +67,12 @@ void R_InitParticles() {
 
 #ifdef QUAKE2
 void R_DarkFieldParticles(r_Entity_p ent) {
-    vec3_t org = {
-        ent->origin[0],
-        ent->origin[1],
-        ent->origin[2]
-    };
+    vec3_t org = ent->origin;
     for (int i = -16; i < 16; i += 8)
         for (int j = -16; j < 16; j += 8)
             for (int k = 0; k < 32; k += 8) {
                 if (!_freeParticles)        return;
+
                 Particle_p prt = _freeParticles;
                 _freeParticles = prt->next;
                 prt->next = _activeParticles;
@@ -89,9 +87,11 @@ void R_DarkFieldParticles(r_Entity_p ent) {
                     i * 8,
                     k * 8
                 };
-                prt->org[0] = org[0] + i + (rand() & 3);
-                prt->org[1] = org[1] + j + (rand() & 3);
-                prt->org[2] = org[2] + k + (rand() & 3);
+                prt->org = {
+                    .x = org.x + i + (rand() & 3),
+                    .y = org.y + j + (rand() & 3),
+                    .z = org.z + k + (rand() & 3)
+                };
 
                 VectorNormalize(dir);
                 float vel = 50 + (rand() & 63);
@@ -109,10 +109,7 @@ R_EntityParticles
 
 #define NUMVERTEXNORMALS 162
 static vec3_t _aVelocities[NUMVERTEXNORMALS];
-static float _beamLength = 16;
-// vec3_t avelocity = { 23, 7, 3 }; // not used
-// float partstep = 0.01;  // not used
-// float timescale = 0.01; // not used
+static float _beamLength = 16.0f;
 
 void R_EntityParticles(r_Entity_p ent) {
     if (!_aVelocities[0].x) {
@@ -121,7 +118,7 @@ void R_EntityParticles(r_Entity_p ent) {
         }
     }
 
-    float dist = 64;
+    float dist = 64.0f;
     for (int i = 0; i < NUMVERTEXNORMALS; i++) {
         float angle = cl.time * _aVelocities[i].x;
         float sy = sin(angle);
@@ -152,18 +149,11 @@ void R_EntityParticles(r_Entity_p ent) {
         prt->color = 0x6F;
         prt->type = pt_explode;
 
-#if 0
-        prt->org.x = ent->origin.x + r_avertexnormals[i][0] * dist + forward.x * _beamLength;
-        prt->org.y = ent->origin.y + r_avertexnormals[i][1] * dist + forward.y * _beamLength;
-        prt->org.z = ent->origin.z + r_avertexnormals[i][2] * dist + forward.z * _beamLength;
-#else
         prt->org = VectorMA(VectorMA(
             ent->origin,
             dist, r_avertexnormals[i]),
             _beamLength, forward
         );
-#endif
-
     }
 }
 
@@ -232,10 +222,12 @@ void R_ParseParticleEffect() {
     };
 
     vec3_t dir = {
-        .x = MSG_ReadChar() * (1.0 / 16),
-        .y = MSG_ReadChar() * (1.0 / 16),
-        .z = MSG_ReadChar() * (1.0 / 16)
+        .x = MSG_ReadChar(),
+        .y = MSG_ReadChar(),
+        .z = MSG_ReadChar()
     };
+    dir = VectorScale(dir, (1.0f / 16.0f));
+
     int msgcount = MSG_ReadByte();
     int color = MSG_ReadByte();
 
@@ -535,6 +527,17 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
     }
 }
 
+static Particle_p Particle_KillFromHead(Particle_p head) {
+    while (head &&
+        (head->die < cl.time)
+        ) {
+        Particle_p kill = head;
+        head = kill->next;
+        kill->next = _freeParticles;
+        _freeParticles = kill;
+    }
+    return head;
+}
 
 /*
 ===============
@@ -548,35 +551,13 @@ void R_DrawParticles() {
         float time2 = frametime * 10; // 15;
         float time1 = frametime * 5;
         float grav = frametime * sv_gravity.value * 0.05;
-        float dvel = 4 * frametime;
+        float dvel = frametime * 4;
 
-        for (;; ) {
-            Particle_p kill = _activeParticles;
-            if (kill &&
-                (kill->die < cl.time)
-                ) {
-                _activeParticles = kill->next;
-                kill->next = _freeParticles;
-                _freeParticles = kill;
-                continue;
-            }
-            break;
-        }
+        _activeParticles = Particle_KillFromHead(_activeParticles);
 
         Particle_p prt = _activeParticles;
         for (; prt; prt = prt->next) {
-            for (;; ) {
-                Particle_p kill = prt->next;
-                if (kill &&
-                    (kill->die < cl.time)
-                    ) {
-                    prt->next = kill->next;
-                    kill->next = _freeParticles;
-                    _freeParticles = kill;
-                    continue;
-                }
-                break;
-            }
+            prt->next = Particle_KillFromHead(prt->next);
 
             D_DrawParticle(prt);
 
@@ -586,39 +567,51 @@ void R_DrawParticles() {
             case pt_static:     break;
             case pt_fire: {
                 prt->ramp += time1;
-                if (prt->ramp >= 6) prt->die = -1;
-                else                prt->color = ramp3[(int)prt->ramp];
-                prt->vel.z += grav;
+                if (prt->ramp >= 6.0f)  prt->die = -1;
+                else                    prt->color = ramp3[(int)prt->ramp];
+                prt->vel.z += grav; // fly up
             } break;
 
             case pt_explode: {
                 prt->ramp += time2;
-                if (prt->ramp >= 8) prt->die = -1;
-                else                prt->color = ramp1[(int)prt->ramp];
+                if (prt->ramp >= 8.0f)  prt->die = -1;
+                else                    prt->color = ramp1[(int)prt->ramp];
+#if 0
                 for (int i = 0; i < VECT_DIM; i++)
                     prt->vel.v[i] += prt->vel.v[i] * dvel;
-                prt->vel.z -= grav;
+#else
+                prt->vel = VectorMA(prt->vel, dvel, prt->vel);
+#endif
+                prt->vel.z -= grav; // fall down
             } break;
 
             case pt_explode2: {
                 prt->ramp += time3;
-                if (prt->ramp >= 8)   prt->die = -1;
-                else                prt->color = ramp2[(int)prt->ramp];
+                if (prt->ramp >= 8.0f)  prt->die = -1;
+                else                    prt->color = ramp2[(int)prt->ramp];
+#if 0
                 for (int i = 0; i < VECT_DIM; i++)
                     prt->vel.v[i] -= prt->vel.v[i] * frametime;
-                prt->vel.z -= grav;
+#else
+                prt->vel = VectorMA(prt->vel, -frametime, prt->vel);
+#endif
+                prt->vel.z -= grav; // fall down
             } break;
 
             case pt_blob: {
+#if 0
                 for (int i = 0; i < VECT_DIM; i++)
                     prt->vel.v[i] += prt->vel.v[i] * dvel;
-                prt->vel.z -= grav;
+#else
+                prt->vel = VectorMA(prt->vel, dvel, prt->vel);
+#endif
+                prt->vel.z -= grav; // fall down
             } break;
 
             case pt_blob2: {
                 for (int i = 0; i < 2; i++)
                     prt->vel.v[i] -= prt->vel.v[i] * dvel;
-                prt->vel.z -= grav;
+                prt->vel.z -= grav; // fall down
             } break;
 
             case pt_grav: {
@@ -626,8 +619,9 @@ void R_DrawParticles() {
                 prt->vel.z -= grav * 20;
 #endif
             } break;
+
             case pt_slowgrav: {
-                prt->vel.z -= grav;
+                prt->vel.z -= grav; // fall down
             } break;
             }
         }
