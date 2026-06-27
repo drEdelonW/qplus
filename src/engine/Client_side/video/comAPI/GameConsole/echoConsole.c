@@ -211,9 +211,6 @@ void Con_DrawConsole(int32_t lines, bool drawinput) {
 }
 
 
-
-
-
 /*
 ==================
 SCR_DrawConsole

@@ -50,11 +50,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // only the refresh window will be updated unless these variables are flagged
 typedef struct {
-    vRect_t vrect;
+    vRect_t vrect;          // 3D viewport rectangle on screen
     LegacyTimeDelta_t    centertime_off;
     int32_t con_current;
-    int32_t conlines;           // lines of console to display
-    int     clearnotify;        // set to 0 whenever notify text is drawn
+    int32_t conlines;       // lines of console to display
+    int     clearnotify;    // set to 0 whenever notify text is drawn
 #if 1   /* this specific for software render. not applicable for OpenGL */
     bool    copytop;
     bool    copyeverything;     // software frame buffer copy request
