@@ -35,6 +35,7 @@ DEFINES += GLQUAKE
                                 SRC_LIST += $(OPENGL_DIR)/gl_screen.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_draw.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_draw.c
+                                SRC_LIST += $(OPENGL_DIR)/gl_part.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_main.c
                                 SRC_LIST += $(OPENGL_DIR)/gl_rmain.c
 #                                 SRC_LIST += $(RENDER_DIR)/r_misc.c

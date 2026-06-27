@@ -41,6 +41,8 @@ void VID_UnlockBuffer();
 #include "vRect.h"
 typedef uint8_t pixel_t;
 typedef pixel_t* pixel_p;
+extern  uint16_t    d_8to16table[256];
+extern  uint32_t    d_8to24table[256]; // 0xAABBGGRR
 
 typedef struct {
     vRect_t     scr;            // invisible buffer inside pBuff
@@ -59,8 +61,7 @@ typedef struct {
 typedef VidDef_t* VidDef_p;
 
 extern  VidDef_t    vid;    // global video state
-extern  uint16_t    d_8to16table[256];
-extern  uint32_t    d_8to24table[256]; // 0xAABBGGRR
+
 extern  void (*vid_menudrawfn)();
 
 #ifdef __cplusplus

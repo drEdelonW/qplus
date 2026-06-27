@@ -32,3 +32,5 @@ struct Particle_s {
 };
 
 void D_DrawParticle(Particle_p pparticle);
+void D_EndParticles();
+void D_StartParticles();

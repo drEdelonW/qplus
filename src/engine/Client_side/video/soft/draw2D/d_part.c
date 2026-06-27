@@ -27,20 +27,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 /*
 ==============
-D_EndParticles
+D_StartParticles
 ==============
 */
-void D_EndParticles() {
-    // not used by software driver
+void D_StartParticles() {
+    r_p = (Basis_t){
+        .forward = BS.forward,
+        .right = VectorScale(BS.right, xscaleshrink),
+        .up = VectorScale(BS.up, yscaleshrink)
+    };
 }
 
 
 /*
 ==============
-D_StartParticles
+D_EndParticles
 ==============
 */
-void D_StartParticles() {
+void D_EndParticles() {
     // not used by software driver
 }
 

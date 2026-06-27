@@ -85,7 +85,11 @@ typedef struct {
     fixed8_t    lightadj[MAXLIGHTMAPS]; // adjust for lightmap levels for dynamic lighting
     Texture_p   texture;                // corrected for animating textures
     int         surfmip;                // mipmapped ratio of surface texels / world pixels
+#if 1
     int         surfwidth;              // in mipmapped texels
     int         surfheight;             // in mipmapped texels
+#else
+    vRect_t     surf;       // TODO: solve the name collision
+#endif
 } DrawSurf_t;
 extern DrawSurf_t r_drawsurf;

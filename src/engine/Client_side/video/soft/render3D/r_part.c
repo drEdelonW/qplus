@@ -158,13 +158,13 @@ void R_EntityParticles(r_Entity_p ent) {
         prt->org.z = ent->origin.z + r_avertexnormals[i][2] * dist + forward.z * _beamLength;
 #else
         prt->org = VectorMA(VectorMA(
-            ent->origin, 
+            ent->origin,
             dist, r_avertexnormals[i]),
-            _beamLength, forward 
+            _beamLength, forward
         );
 #endif
 
-        }
+    }
 }
 
 
@@ -542,52 +542,20 @@ R_DrawParticles
 ===============
 */
 void R_DrawParticles() {
-#ifdef GLQUAKE      // TODO: wrap this in D_StartParticles on GL_side
+    D_StartParticles(); {
+        float frametime = cl.time - cl.oldtime;
+        float time3 = frametime * 15;
+        float time2 = frametime * 10; // 15;
+        float time1 = frametime * 5;
+        float grav = frametime * sv_gravity.value * 0.05;
+        float dvel = 4 * frametime;
 
-    GL_Bind(particletexture);
-    glEnable(GL_BLEND);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glBegin(GL_TRIANGLES); {
-
-        vec3_t up = VectorScale(BS.up, 1.5f);
-        vec3_t right = VectorScale(BS.right, 1.5f);
-#else
-    D_StartParticles();
-
-    r_p = (Basis_t){
-        .forward = BS.forward,
-        .right = VectorScale(BS.right, xscaleshrink),
-        .up = VectorScale(BS.up, yscaleshrink)
-    };
-#endif
-    float frametime = cl.time - cl.oldtime;
-    float time3 = frametime * 15;
-    float time2 = frametime * 10; // 15;
-    float time1 = frametime * 5;
-    float grav = frametime * sv_gravity.value * 0.05;
-    float dvel = 4 * frametime;
-
-    for (;; ) {
-        Particle_p kill = _activeParticles;
-        if (kill &&
-            (kill->die < cl.time)
-            ) {
-            _activeParticles = kill->next;
-            kill->next = _freeParticles;
-            _freeParticles = kill;
-            continue;
-        }
-        break;
-    }
-
-    Particle_p prt = _activeParticles;
-    for (; prt; prt = prt->next) {
         for (;; ) {
-            Particle_p kill = prt->next;
+            Particle_p kill = _activeParticles;
             if (kill &&
                 (kill->die < cl.time)
                 ) {
-                prt->next = kill->next;
+                _activeParticles = kill->next;
                 kill->next = _freeParticles;
                 _freeParticles = kill;
                 continue;
@@ -595,80 +563,75 @@ void R_DrawParticles() {
             break;
         }
 
-#ifdef GLQUAKE      // TODO: wrap this in D_DrawParticle on GL_side
-        // hack a scale up to keep particles from disapearing
+        Particle_p prt = _activeParticles;
+        for (; prt; prt = prt->next) {
+            for (;; ) {
+                Particle_p kill = prt->next;
+                if (kill &&
+                    (kill->die < cl.time)
+                    ) {
+                    prt->next = kill->next;
+                    kill->next = _freeParticles;
+                    _freeParticles = kill;
+                    continue;
+                }
+                break;
+            }
 
-        float scale = DotProduct(VectorSubtract(prt->org, r_origin), BS.forward);
-        if (scale < 20.0f)  scale = 1.0f;
-        else                scale = 1.0f + scale * 0.004f;
+            D_DrawParticle(prt);
 
-        glColor3ubv((uint8_p)&d_8to24table[(int)prt->color]);
+            prt->org = VectorMA(prt->org, frametime, prt->vel);
 
-        glTexCoord2f(0, 0);         glVertex3fv(prt->org.v);
-        glTexCoord2f(1, 0);         glVertex3fv(VectorMA(prt->org, scale, up).v);
-        glTexCoord2f(0, 1);         glVertex3fv(VectorMA(prt->org, scale, right).v);
-#else
-        D_DrawParticle(prt);
-#endif
+            switch (prt->type) {
+            case pt_static:     break;
+            case pt_fire: {
+                prt->ramp += time1;
+                if (prt->ramp >= 6) prt->die = -1;
+                else                prt->color = ramp3[(int)prt->ramp];
+                prt->vel.z += grav;
+            } break;
 
-        prt->org = VectorMA(prt->org, frametime, prt->vel);
+            case pt_explode: {
+                prt->ramp += time2;
+                if (prt->ramp >= 8) prt->die = -1;
+                else                prt->color = ramp1[(int)prt->ramp];
+                for (int i = 0; i < VECT_DIM; i++)
+                    prt->vel.v[i] += prt->vel.v[i] * dvel;
+                prt->vel.z -= grav;
+            } break;
 
-        switch (prt->type) {
-        case pt_static:     break;
-        case pt_fire: {
-            prt->ramp += time1;
-            if (prt->ramp >= 6)   prt->die = -1;
-            else                prt->color = ramp3[(int)prt->ramp];
-            prt->vel.z += grav;
-        } break;
+            case pt_explode2: {
+                prt->ramp += time3;
+                if (prt->ramp >= 8)   prt->die = -1;
+                else                prt->color = ramp2[(int)prt->ramp];
+                for (int i = 0; i < VECT_DIM; i++)
+                    prt->vel.v[i] -= prt->vel.v[i] * frametime;
+                prt->vel.z -= grav;
+            } break;
 
-        case pt_explode: {
-            prt->ramp += time2;
-            if (prt->ramp >= 8) prt->die = -1;
-            else                prt->color = ramp1[(int)prt->ramp];
-            for (int i = 0; i < VECT_DIM; i++)
-                prt->vel.v[i] += prt->vel.v[i] * dvel;
-            prt->vel.z -= grav;
-        } break;
+            case pt_blob: {
+                for (int i = 0; i < VECT_DIM; i++)
+                    prt->vel.v[i] += prt->vel.v[i] * dvel;
+                prt->vel.z -= grav;
+            } break;
 
-        case pt_explode2: {
-            prt->ramp += time3;
-            if (prt->ramp >= 8)   prt->die = -1;
-            else                prt->color = ramp2[(int)prt->ramp];
-            for (int i = 0; i < VECT_DIM; i++)
-                prt->vel.v[i] -= prt->vel.v[i] * frametime;
-            prt->vel.z -= grav;
-        } break;
+            case pt_blob2: {
+                for (int i = 0; i < 2; i++)
+                    prt->vel.v[i] -= prt->vel.v[i] * dvel;
+                prt->vel.z -= grav;
+            } break;
 
-        case pt_blob: {
-            for (int i = 0; i < VECT_DIM; i++)
-                prt->vel.v[i] += prt->vel.v[i] * dvel;
-            prt->vel.z -= grav;
-        } break;
-
-        case pt_blob2: {
-            for (int i = 0; i < 2; i++)
-                prt->vel.v[i] -= prt->vel.v[i] * dvel;
-            prt->vel.z -= grav;
-        } break;
-
-        case pt_grav: {
+            case pt_grav: {
 #ifdef QUAKE2
-            prt->vel.z -= grav * 20;
+                prt->vel.z -= grav * 20;
 #endif
-        } break;
-        case pt_slowgrav: {
-            prt->vel.z -= grav;
-        } break;
+            } break;
+            case pt_slowgrav: {
+                prt->vel.z -= grav;
+            } break;
+            }
         }
-    }
 
-#ifdef GLQUAKE      // TODO: wrap this in D_EndParticles on GL_side
-    } glEnd();
-    glDisable(GL_BLEND);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-#else
-    D_EndParticles();
-#endif
+    } D_EndParticles();
 }
 

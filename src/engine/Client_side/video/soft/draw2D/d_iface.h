@@ -98,11 +98,9 @@ void D_DrawSprite();
 void D_DrawSurfaces();
 // void D_DrawZPoint();     //NOT USED
 void D_EnableBackBufferAccess();
-void D_EndParticles();
 void D_Init();
 void D_ViewChanged();
 void D_SetupFrame();
-void D_StartParticles();
 void D_TurnZOn();
 void D_WarpScreen();
 
