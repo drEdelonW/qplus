@@ -44,8 +44,7 @@ bool SV_CheckBottom(edict_p ent) {
     vec3_t maxs = VectorAdd(ent->v.origin, ent->v.maxs);
 
 
-    // if all of the points under the corners are solid world, don't bother
-    // with the tougher checks
+    // if all of the points under the corners are solid world, don't bother with the tougher checks
     // the corners must be within 16 of the midpoint
     vec3_t start = {
         .x = 0.0f,
@@ -54,8 +53,8 @@ bool SV_CheckBottom(edict_p ent) {
     };
     for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++) {
-            (start.x = x) ? maxs.x : mins.x;
-            (start.y = y) ? maxs.y : mins.y;
+            start.x = (x) ? maxs.x : mins.x;
+            start.y = (y) ? maxs.y : mins.y;
             if (SV_PointContents(start) != CONTENTS_SOLID)
                 goto realcheck;
         }

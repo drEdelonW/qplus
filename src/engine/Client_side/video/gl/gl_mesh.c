@@ -69,7 +69,7 @@ int StripLength(int starttri, int startv) {
 
     mTriangle_p last = &triangles[starttri];
 
-    stripverts[0] = last->vertindex[(startv) % 3];
+    stripverts[0] = last->vertindex[(startv + 0) % 3];
     stripverts[1] = last->vertindex[(startv + 1) % 3];
     stripverts[2] = last->vertindex[(startv + 2) % 3];
 
@@ -81,30 +81,29 @@ int StripLength(int starttri, int startv) {
 
     // look for a matching triangle
 nexttri:
-    mTriangle_p check = &triangles[starttri + 1];
-    for (int j = starttri + 1; j < pheader->numtris; j++, check++) {
-        if (check->facesfront != last->facesfront)  continue;
-        for (int k = 0; k < 3; k++) {
-            if (check->vertindex[k] != m1)              continue;
-            if (check->vertindex[(k + 1) % 3] != m2)    continue;
+    {
+        mTriangle_p check = &triangles[starttri + 1];
+        for (int j = starttri + 1; j < pheader->numtris; j++, check++)
+            if (check->facesfront == last->facesfront)
+                for (int k = 0; k < 3; k++)
+                    if ((check->vertindex[k] == m1) &&
+                        (check->vertindex[(k + 1) % 3] == m2)
+                        ) {
+                        // this is the next part of the fan
+                        // if we can't use this triangle, this tristrip is done
+                        if (used[j])    goto done;
 
-            // this is the next part of the fan
+                        // the new edge
+                        if (stripcount & 1)     m2 = check->vertindex[(k + 2) % 3];
+                        else                    m1 = check->vertindex[(k + 2) % 3];
 
-            // if we can't use this triangle, this tristrip is done
-            if (used[j])
-                goto done;
+                        stripverts[stripcount + 2] = check->vertindex[(k + 2) % 3];
+                        striptris[stripcount] = j;
+                        stripcount++;
 
-            // the new edge
-            if (stripcount & 1)     m2 = check->vertindex[(k + 2) % 3];
-            else                    m1 = check->vertindex[(k + 2) % 3];
-
-            stripverts[stripcount + 2] = check->vertindex[(k + 2) % 3];
-            striptris[stripcount] = j;
-            stripcount++;
-
-            used[j] = USED_TEMP;
-            goto nexttri;
-        }
+                        used[j] = USED_TEMP;
+                        goto nexttri;
+                    }
     }
 done:
 
@@ -139,32 +138,30 @@ int FanLength(int starttri, int startv) {
 
     // look for a matching triangle
 nexttri:
-    mTriangle_p check = &triangles[starttri + 1];
-    for (int j = starttri + 1; j < pheader->numtris; j++, check++) {
-        if (check->facesfront != last->facesfront)
-            continue;
-        for (int k = 0; k < 3; k++) {
-            if ((check->vertindex[k] != m1) ||
-                (check->vertindex[(k + 1) % 3] != m2)
-                )
-                continue;
+    {
+        mTriangle_p check = &triangles[starttri + 1];
+        for (int j = starttri + 1; j < pheader->numtris; j++, check++)
+            if (check->facesfront == last->facesfront)
+                for (int k = 0; k < 3; k++)
+                    if ((check->vertindex[k] == m1) ||
+                        (check->vertindex[(k + 1) % 3] == m2)
+                        ) {
+                        // this is the next part of the fan
 
-            // this is the next part of the fan
+                        // if we can't use this triangle, this tristrip is done
+                        if (used[j])
+                            goto done;
 
-            // if we can't use this triangle, this tristrip is done
-            if (used[j])
-                goto done;
+                        // the new edge
+                        m2 = check->vertindex[(k + 2) % 3];
 
-            // the new edge
-            m2 = check->vertindex[(k + 2) % 3];
+                        stripverts[stripcount + 2] = m2;
+                        striptris[stripcount] = j;
+                        stripcount++;
 
-            stripverts[stripcount + 2] = m2;
-            striptris[stripcount] = j;
-            stripcount++;
-
-            used[j] = USED_TEMP;
-            goto nexttri;
-        }
+                        used[j] = USED_TEMP;
+                        goto nexttri;
+                    }
     }
 done:
 
@@ -213,6 +210,7 @@ void BuildTris() {
                     bestLen = len;
                     for (int j = 0; j < bestLen + 2; j++)
                         bestverts[j] = stripverts[j];
+
                     for (int j = 0; j < bestLen; j++)
                         besttris[j] = striptris[j];
                 }

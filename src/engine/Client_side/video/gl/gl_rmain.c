@@ -612,8 +612,8 @@ void R_DrawViewModel() {
     float ambient[4], diffuse[4];
     ambient[0] = ambient[1] = ambient[2] = ambient[3] = (float)ambientlight / 128;
     diffuse[0] = diffuse[1] = diffuse[2] = diffuse[3] = (float)shadelight / 128;
-#warning TODO: investigate why ambient and diffuse go nowhere
 #endif
+    #warning TODO: investigate why ambient and diffuse go nowhere
 
     // hack the depth range to prevent view model from poking into walls
     glDepthRange(gldepthmin, gldepthmin + 0.3 * (gldepthmax - gldepthmin));
