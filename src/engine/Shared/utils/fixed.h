@@ -29,7 +29,7 @@ typedef fixed16_t*  fixed16_p;
 
 #define FIXED16_TO_INT(x)       ((x) >> FIXED16_FRAC_BITS)
 #define INT_TO_FIXED16(x)       ((fixed16_t)(x) << FIXED16_FRAC_BITS)
-#define FIXED16_FRAC(x)         ((x) & (FIXED16_ONE - 1))  // дробная часть
+#define FIXED16_FRAC(x)         ((x) & (FIXED16_ONE - 1))  // Frac part (x & 0xFFFF)
 
 // -- Arithmetic ---------------------------------------------------------------
 

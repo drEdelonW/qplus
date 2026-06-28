@@ -49,7 +49,7 @@ typedef enum {
 
 typedef union VertAttr_u {
     struct {
-        int32_t     x, y;      // screen pixel coords - plain int
+        fixed16_t   x, y;      // screen pixel coords - plain int
         fixed16_t   s, t;      // texture coords - 16.16
         fixed16_t   light;     // per-vertex light - 16.16
         fixed16_t   zi;        // 1/z - 16.16
@@ -82,7 +82,7 @@ typedef PolyVert_t* PolyVert_p;
 
 typedef struct {
     int32_t onseam;
-    int32_t s;
-    int32_t t;
+    fixed16_t s;
+    fixed16_t t;
 } stVert_t;
 typedef stVert_t* stVert_p;

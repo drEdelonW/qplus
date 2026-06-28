@@ -497,8 +497,8 @@ void R_GenTurbTile(pixel_p pbasetex, TypeLess_ptr pdest) {
 
     for (int i = 0; i < TILE_SIZE; i++) {
         for (int j = 0; j < TILE_SIZE; j++) {
-            int s = (((j << 16) + turb[i & (CYCLE - 1)]) >> 16) & 0x3F;
-            int t = (((i << 16) + turb[j & (CYCLE - 1)]) >> 16) & 0x3F;
+            fixed16_t s = (FIXED16_TO_INT((INT_TO_FIXED16(j)) + turb[i & (CYCLE - 1)])) & 0x3F;
+            fixed16_t t = (FIXED16_TO_INT((INT_TO_FIXED16(i)) + turb[j & (CYCLE - 1)])) & 0x3F;
             *pd++ = *(pbasetex + (t << 6) + s);
         }
     }
@@ -516,8 +516,8 @@ void R_GenTurbTile16(pixel_p pbasetex, TypeLess_ptr pdest) {
 
     for (int i = 0; i < TILE_SIZE; i++) {
         for (int j = 0; j < TILE_SIZE; j++) {
-            int s = (((j << 16) + turb[i & (CYCLE - 1)]) >> 16) & 0x3F;
-            int t = (((i << 16) + turb[j & (CYCLE - 1)]) >> 16) & 0x3F;
+            fixed16_t s = (FIXED16_TO_INT((INT_TO_FIXED16(j)) + turb[i & (CYCLE - 1)])) & 0x3F;
+            fixed16_t t = (FIXED16_TO_INT((INT_TO_FIXED16(i)) + turb[j & (CYCLE - 1)])) & 0x3F;
             *pd++ = d_8to16table[*(pbasetex + (t << 6) + s)];
         }
     }

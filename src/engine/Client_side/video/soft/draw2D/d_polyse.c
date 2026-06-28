@@ -62,7 +62,8 @@ typedef EdgeTable_t* EdgeTable_p;
 
 static VertAttr_t _p[3];
 
-uint8_p d_pcolormap;
+pixel_p acolormap;
+pixel_p d_pcolormap;
 
 int   d_aflatcolor;
 int   d_xdenom;
@@ -85,18 +86,18 @@ EdgeTable_t edgetables[12] = {
 };
 
 static inline int getOrder() {
-    int edgetableindex = 0; // assume the vertices are already in top to bottom order
+    int edgeTableIdx = 0; // assume the vertices are already in top to bottom order
     // determine which edges are right & left, and the order in which to rasterize them
     if (_p[0].y >= _p[1].y) {
         if (_p[0].y == _p[1].y)         return (_p[0].y < _p[2].y) ? 2 : 5;
-        else                    edgetableindex = 1;
+        else                    edgeTableIdx = 1;
     }
-    /* */if (_p[0].y == _p[2].y)        return (edgetableindex) ? 8 : 9;
-    else if (_p[1].y == _p[2].y)        return (edgetableindex) ? 10 : 11;
-    if (_p[0].y > _p[2].y)      edgetableindex += 2;
-    if (_p[1].y > _p[2].y)      edgetableindex += 4;
+    /* */if (_p[0].y == _p[2].y)        return (edgeTableIdx) ? 8 : 9;
+    else if (_p[1].y == _p[2].y)        return (edgeTableIdx) ? 10 : 11;
+    if (_p[0].y > _p[2].y)      edgeTableIdx += 2;
+    if (_p[1].y > _p[2].y)      edgeTableIdx += 4;
 
-    return edgetableindex;
+    return edgeTableIdx;
 }
 
 /*
@@ -113,9 +114,7 @@ void D_PolysetSetEdgeTable() {
     //
     if (_p[0].y >= _p[1].y) {
         if (_p[0].y == _p[1].y) {
-            pedgetable = (_p[0].y < _p[2].y) ?
-                &edgetables[2] : &edgetables[5];
-
+            pedgetable = (_p[0].y < _p[2].y) ? &edgetables[2] : &edgetables[5];
             return;
         }
         else    edgetableindex = 1;
@@ -123,15 +122,11 @@ void D_PolysetSetEdgeTable() {
     }
 
     if (_p[0].y == _p[2].y) {
-        pedgetable = (edgetableindex) ?
-            &edgetables[8] : &edgetables[9];
-
+        pedgetable = (edgetableindex) ? &edgetables[8] : &edgetables[9];
         return;
     }
     else if (_p[1].y == _p[2].y) {
-        pedgetable = (edgetableindex) ?
-            &edgetables[10] : &edgetables[11];
-
+        pedgetable = (edgetableindex) ? &edgetables[10] : &edgetables[11];
         return;
     }
 
@@ -217,12 +212,12 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts) {
             int z = FIXED16_TO_INT(fv->vAttr.zi);
             int16_p zbuf = zspantable[fv->vAttr.y] + fv->vAttr.x;
             if (z >= *zbuf) {
-                int  pix;
-
                 *zbuf = z;
-                pix = skintable[FIXED16_TO_INT(fv->vAttr.t)][FIXED16_TO_INT(fv->vAttr.s)];
-                pix = ((pixel_p)acolormap)[pix + (fv->vAttr.light & 0xFF00)];
-                d_viewbuffer[d_scantable[fv->vAttr.y] + fv->vAttr.x] = pix;
+                d_viewbuffer[d_scantable[fv->vAttr.y] + fv->vAttr.x] =
+                    acolormap[
+                        skintable[FIXED16_TO_INT(fv->vAttr.t)][FIXED16_TO_INT(fv->vAttr.s)] +
+                            (fv->vAttr.light & 0xFF00)
+                    ];
             }
         }
     }
@@ -249,7 +244,7 @@ void D_DrawSubdiv() {
             continue;
         }
 
-        d_pcolormap = &((pixel_p)acolormap)[index0->vAttr.light & 0xFF00];
+        d_pcolormap = &acolormap[index0->vAttr.light & 0xFF00];
 
         if (ptri[i].facesfront) {
             D_PolysetRecursiveTriangle(&index0->vAttr, &index1->vAttr, &index2->vAttr);
@@ -288,8 +283,8 @@ void D_DrawNonSubdiv() {
         FinalVert_p index1 = pfv + ptri->vertindex[1];
         FinalVert_p index2 = pfv + ptri->vertindex[2];
 
-        d_xdenom = (index0->vAttr.y - index1->vAttr.y) *
-            (index0->vAttr.x - index2->vAttr.x) -
+        d_xdenom =
+            (index0->vAttr.y - index1->vAttr.y) * (index0->vAttr.x - index2->vAttr.x) -
             (index0->vAttr.x - index1->vAttr.x) * (index0->vAttr.y - index2->vAttr.y);
 
         if (d_xdenom >= 0) { continue; }
@@ -397,11 +392,9 @@ void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) 
 
         int16_p zbuf = zspantable[_new.y] + _new.x;
         if (z >= *zbuf) {
-            int pix;
-
             *zbuf = z;
-            pix = d_pcolormap[skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)]];
-            d_viewbuffer[d_scantable[_new.y] + _new.x] = pix;
+            d_viewbuffer[d_scantable[_new.y] + _new.x] =
+                d_pcolormap[skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)]];
         }
     }
     // recursively continue
@@ -448,10 +441,8 @@ void D_PolysetScanLeftEdge(int height) {
             d_snap.pz += (ptrdiff_t)d_extrastep.pz;
             d_snap.count += d_extrastep.count;
             d_snap.ptex += (ptrdiff_t)d_extrastep.ptex;
-
             d_snap.sfrac += d_extrastep.sfrac;
             d_snap.ptex += FIXED16_TO_INT(d_snap.sfrac);
-
             d_snap.sfrac &= 0xFFFF;
             d_snap.tfrac += d_extrastep.tfrac;
             if (d_snap.tfrac & 0x10000) {
@@ -460,6 +451,7 @@ void D_PolysetScanLeftEdge(int height) {
             }
             d_snap.light += d_extrastep.light;
             d_snap.zi += d_extrastep.zi;
+
             errorterm -= erroradjustdown;
         }
         else {
@@ -503,7 +495,8 @@ void D_PolysetSetUpForLineScan(
     int tn = endvertv - startvertv;
 
     if (((tm <= 16) && (tm >= -15)) &&
-        ((tn <= 16) && (tn >= -15))) {
+        ((tn <= 16) && (tn >= -15))
+        ) {
         adivtab_p ptemp = &_aDivTab[((tm + 15) << 5) + (tn + 15)];
         d_basestep.count = ptemp->quotient;
         erroradjustup = ptemp->remainder;
@@ -540,26 +533,30 @@ void D_PolysetCalcGradients(int skinwidth) {
     // ceil() for light so positive steps are exaggerated, negative steps
     // diminished,  pushing us away from underflow toward overflow. Underflow is
     // very visible, overflow is very unlikely, because of ambient lighting
-    float t0 = _p[0].light - _p[2].light;
-    float t1 = _p[1].light - _p[2].light;
-    r_lstepx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-    r_lstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
-
-    t0 = _p[0].s - _p[2].s;
-    t1 = _p[1].s - _p[2].s;
-    r_sstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-    r_sstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
-
-    t0 = _p[0].t - _p[2].t;
-    t1 = _p[1].t - _p[2].t;
-    r_tstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-    r_tstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
-
-    t0 = _p[0].zi - _p[2].zi;
-    t1 = _p[1].zi - _p[2].zi;
-    r_zistepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-    r_zistepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
-
+    {
+        float t0 = _p[0].light - _p[2].light;
+        float t1 = _p[1].light - _p[2].light;
+        r_lstepx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+        r_lstepy = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+    }
+    {
+        float t0 = _p[0].s - _p[2].s;
+        float t1 = _p[1].s - _p[2].s;
+        r_sstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+        r_sstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+    }
+    {
+        float t0 = _p[0].t - _p[2].t;
+        float t1 = _p[1].t - _p[2].t;
+        r_tstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+        r_tstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+    }
+    {
+        float t0 = _p[0].zi - _p[2].zi;
+        float t1 = _p[1].zi - _p[2].zi;
+        r_zistepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+        r_zistepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+    }
 #if id386
     a_sstepxfrac = r_sstepx << 16;
     a_tstepxfrac = r_tstepx << 16;
@@ -604,23 +601,12 @@ void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
         }
         else d_snap.count += d_basestep.count;
 
-
         if (lcount) {
-#if 0
-            uint8_p lpdest = pspanpackage->pdest;
-            uint8_p lptex = pspanpackage->ptex;
-            int16_p lpz = pspanpackage->pz;
-            fixed16_t lsfrac = pspanpackage->sfrac;
-            fixed16_t ltfrac = pspanpackage->tfrac;
-            fixed16_t llight = pspanpackage->light;
-            fixed16_t lzi = pspanpackage->zi;
-#else
             SpanPackage_t l = *pspanpackage;
-#endif
 
             do {
                 if (FIXED16_TO_INT(l.zi) >= *l.pz) {
-                    *l.pdest = ((pixel_p)acolormap)[*l.ptex + (l.light & 0xFF00)];
+                    *l.pdest = acolormap[*l.ptex + (l.light & 0xFF00)];
                     // gel mapping     *lpdest = gelmap[*lpdest];
                     *l.pz = FIXED16_TO_INT(l.zi);
                 }
@@ -685,19 +671,12 @@ void D_RasterizeAliasPolySmooth() {
     int initialleftheight = pleftbottom->y - plefttop->y;
     int initialrightheight = prightbottom->y - prighttop->y;
 
-    //
     // set the s, t, and light gradients, which are consistent across the triangle
     // because being a triangle, things are affine
-    //
     D_PolysetCalcGradients(r_affinetridesc.skinwidth);
 
-    //
     // rasterize the polygon
-    //
-
-    //
     // scan out the top (and possibly only) part of the left edge
-    //
     d_pedgespanpackage = a_spans;
 
     _yStart = plefttop->y;
@@ -711,13 +690,13 @@ void D_RasterizeAliasPolySmooth() {
     d_snap.sfrac = (plefttop.s & 0xFFFF) << 16;
     d_snap.tfrac = (plefttop.t & 0xFFFF) << 16;
 #else
-    d_snap.sfrac = plefttop->s & 0xFFFF;
-    d_snap.tfrac = plefttop->t & 0xFFFF;
+    d_snap.sfrac = (plefttop->s & 0xFFFF);
+    d_snap.tfrac = (plefttop->t & 0xFFFF);
 #endif
     d_snap.light = plefttop->light;
     d_snap.zi = plefttop->zi;
 
-    d_snap.pdest = (d_viewbuffer + plefttop->x + (_yStart * screenwidth));
+    d_snap.pdest = (d_viewbuffer + (_yStart * screenwidth) + plefttop->x);
     d_snap.pz = (d_pzbuffer + (_yStart * d_zwidth) + plefttop->x);
 
     if (initialleftheight == 1) {
@@ -751,8 +730,8 @@ void D_RasterizeAliasPolySmooth() {
         int working_lstepx = (d_basestep.count < 0) ?
             (r_lstepx - 1) : r_lstepx;
         d_basestep.ptex = (TypeLess_ptr)(
-            ((r_sstepy + r_sstepx * d_basestep.count) >> 16) +
-            ((r_tstepy + r_tstepx * d_basestep.count) >> 16) * r_affinetridesc.skinwidth
+            FIXED16_TO_INT(r_sstepy + r_sstepx * d_basestep.count) +
+            FIXED16_TO_INT(r_tstepy + r_tstepx * d_basestep.count) * r_affinetridesc.skinwidth
             );
 #if id386
         d_basestep.sfrac = (r_sstepy + r_sstepx * d_basestep.count) << 16;
@@ -765,8 +744,8 @@ void D_RasterizeAliasPolySmooth() {
         d_basestep.zi = r_zistepy + r_zistepx * d_basestep.count;
 
         d_extrastep.ptex = (TypeLess_ptr)(
-            ((r_sstepy + r_sstepx * d_extrastep.count) >> 16) +
-            ((r_tstepy + r_tstepx * d_extrastep.count) >> 16) * r_affinetridesc.skinwidth
+            FIXED16_TO_INT(r_sstepy + r_sstepx * d_extrastep.count) +
+            FIXED16_TO_INT(r_tstepy + r_tstepx * d_extrastep.count) * r_affinetridesc.skinwidth
             );
 #if id386
         d_extrastep.sfrac = (r_sstepy + r_sstepx * d_extrastep.count) << 16;
@@ -834,8 +813,8 @@ void D_RasterizeAliasPolySmooth() {
             int working_lstepx = (d_basestep.count < 0) ?
                 (r_lstepx - 1) : r_lstepx;
             d_basestep.ptex = (TypeLess_ptr)(
-                ((r_sstepy + r_sstepx * d_basestep.count) >> 16) +
-                ((r_tstepy + r_tstepx * d_basestep.count) >> 16) * r_affinetridesc.skinwidth
+                FIXED16_TO_INT(r_sstepy + r_sstepx * d_basestep.count) +
+                FIXED16_TO_INT(r_tstepy + r_tstepx * d_basestep.count) * r_affinetridesc.skinwidth
                 );
 #if id386
             d_basestep.sfrac = (r_sstepy + r_sstepx * d_basestep.count) << 16;
@@ -848,8 +827,8 @@ void D_RasterizeAliasPolySmooth() {
             d_basestep.zi = r_zistepy + r_zistepx * d_basestep.count;
 
             d_extrastep.ptex = (TypeLess_ptr)(
-                ((r_sstepy + r_sstepx * d_extrastep.count) >> 16) +
-                ((r_tstepy + r_tstepx * d_extrastep.count) >> 16) * r_affinetridesc.skinwidth
+                FIXED16_TO_INT(r_sstepy + r_sstepx * d_extrastep.count) +
+                FIXED16_TO_INT(r_tstepy + r_tstepx * d_extrastep.count) * r_affinetridesc.skinwidth
                 );
 #if id386
             d_extrastep.sfrac = ((r_sstepy + r_sstepx * d_extrastep.count) & 0xFFFF) << 16;
@@ -906,59 +885,72 @@ void D_RasterizeAliasPolySmooth() {
 #if 0
 
 void D_PolysetRecursiveDrawLine(VertAttr_p lp1, VertAttr_p lp2) {
-    int d = lp2->x - lp1->x;
-    if ((d < -1) || (d > 1))    goto split;
-    int d = lp2->.y - lp1->.y;
-    if ((d < -1) || (d > 1))    goto split;
-
+    {
+        int d;
+        if (
+            (((d = (lp2->x - lp1->x)) < -1) ||
+                (d > 1)) ||
+            (((d = (lp2->y - lp1->y)) < -1) ||
+                (d > 1))
+            )
+            goto split;
+    }
     return; // line is completed
 
 split:
     // split this edge
-    int  _new[FV_COUNT];
-    _new[0] = (lp1->x + lp2->x) >> 1;
-    _new[1] = (lp1->.y + lp2->.y) >> 1;
-    _new[5] = (lp1[5] + lp2[5]) >> 1;
-    _new[2] = (lp1[2] + lp2[2]) >> 1;
-    _new[3] = (lp1[3] + lp2[3]) >> 1;
-    _new[4] = (lp1[4] + lp2[4]) >> 1;
+    VertAttr_t  _new = {
+        .x = (lp1->x + lp2->x) >> 1,
+        .y = (lp1->y + lp2->y) >> 1,
+        .s = (lp1->s + lp2->s) >> 1,
+        .t = (lp1->t + lp2->t) >> 1,
+        .light = (lp1->light + lp2->light) >> 1,
+        .zi = (lp1->zi + lp2->zi) >> 1
+    };
 
     // draw the point
-    int ofs = d_scantable[_new[1]] + _new[0];
-    if (_new[5] > d_pzbuffer[ofs]) {
-        d_pzbuffer[ofs] = _new[5];
+    int ofs = d_scantable[_new.y] + _new.x;
+    if (_new.zi > d_pzbuffer[ofs]) {
+        d_pzbuffer[ofs] = _new.zi;
         int pix = skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)];
-        //  pix = ((uint8_t *)acolormap)[pix + (_new[4] & 0xFF00)];
+        //  pix = ((uint8_t *)acolormap)[pix + (_new.light & 0xFF00)];
         d_viewbuffer[ofs] = pix;
     }
 
     // recursively continue
-    D_PolysetRecursiveDrawLine(lp1, _new);
-    D_PolysetRecursiveDrawLine(_new, lp2);
+    D_PolysetRecursiveDrawLine(lp1, &_new);
+    D_PolysetRecursiveDrawLine(&_new, lp2);
 }
 
 void D_PolysetRecursiveTriangle2(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) {
-    int d = lp2->x - lp1->x;
-    if ((d < -1) || (d > 1))    goto split;
-    d = lp2->.y - lp1->.y;
-    if ((d < -1) || (d > 1))    goto split;
+    {
+        int d;
+        if (
+            (((d = (lp2->x - lp1->x)) < -1) ||
+                (d > 1)) ||
+            (((d = (lp2->y - lp1->y)) < -1) ||
+                (d > 1))
+            )
+            goto split;
+    }
     return;
 
 split:
     // split this edge
-    int _new[FV_COUNT];
-    _new[0] = (lp1->x + lp2->x) >> 1;
-    _new[1] = (lp1->.y + lp2->.y) >> 1;
-    _new[5] = (lp1[5] + lp2[5]) >> 1;
-    _new[2] = (lp1[2] + lp2[2]) >> 1;
-    _new[3] = (lp1[3] + lp2[3]) >> 1;
-    _new[4] = (lp1[4] + lp2[4]) >> 1;
+    VertAttr_t  _new = {
+        .x = (lp1->x + lp2->x) >> 1,
+        .y = (lp1->y + lp2->y) >> 1,
+        .s = (lp1->s + lp2->s) >> 1,
+        .t = (lp1->t + lp2->t) >> 1,
+        .light = (lp1->light + lp2->light) >> 1,
+        .zi = (lp1->zi + lp2->zi) >> 1
+    };
 
-    D_PolysetRecursiveDrawLine(_new, lp3);
+    D_PolysetRecursiveDrawLine(&_new, lp3);
 
     // recursively continue
-    D_PolysetRecursiveTriangle(lp1, _new, lp3);
-    D_PolysetRecursiveTriangle(_new, lp2, lp3);
+    D_PolysetRecursiveTriangle(lp1, &_new, lp3);
+    D_PolysetRecursiveTriangle(&_new, lp2, lp3);
 }
 
 #endif

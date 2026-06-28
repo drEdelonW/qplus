@@ -122,7 +122,8 @@ void WINS_GetLocalAddress() {
         (uint32_t)(addr >> 24) & 0xff,
         (uint32_t)(addr >> 16) & 0xff,
         (uint32_t)(addr >> 8) & 0xff,
-        (uint32_t)addr & 0xff);
+        (uint32_t)(addr >> 0) & 0xff
+    );
 }
 
 
@@ -211,11 +212,11 @@ int WINS_Init() {
 
     i = COM_CheckParm("-ip");
     if (i) {
-        if (i < com.argc-1) {
-            myAddr = inet_addr(com.argv[i+1]);
+        if (i < com.argc - 1) {
+            myAddr = inet_addr(com.argv[i + 1]);
             if (myAddr == INADDR_NONE)
-                Host_SysError("%s is not a valid IP address", com.argv[i+1]);
-            strcpy(my_tcpip_address, com.argv[i+1]);
+                Host_SysError("%s is not a valid IP address", com.argv[i + 1]);
+            strcpy(my_tcpip_address, com.argv[i + 1]);
         }
         else {
             Host_SysError("NET_Init: you must specify an IP address after -ip");
@@ -326,18 +327,18 @@ static int PartialIPAddress(cString in, struct qsockaddr* hostaddr) {
 
     buff[0] = '.';
     b = buff;
-    strcpy(buff+1, in);
+    strcpy(buff + 1, in);
     if (buff[1] == '.')
         b++;
 
     addr = 0;
-    mask=-1;
+    mask = -1;
     while (*b == '.') {
         b++;
         num = 0;
         run = 0;
         while (!(*b < '0' || *b > '9')) {
-            num = num*10 + *b++ - '0';
+            num = num * 10 + *b++ - '0';
             if (++run > 3)
                 return -1;
         }
@@ -345,8 +346,8 @@ static int PartialIPAddress(cString in, struct qsockaddr* hostaddr) {
             return -1;
         if (num < 0 || num > 255)
             return -1;
-        mask<<=8;
-        addr = (addr<<8) + num;
+        mask <<= 8;
+        addr = (addr << 8) + num;
     }
 
     if (*b++ == ':')
@@ -463,7 +464,7 @@ cString WINS_AddrToString(struct qsockaddr* addr) {
 
 int WINS_StringToAddr(cString string, struct qsockaddr* addr) {
     int ha1, ha2, ha3, ha4, hp;
-    int ipaddr;
+    uint32_t ipaddr;
 
     sscanf(string, "%d.%d.%d.%d:%d", &ha1, &ha2, &ha3, &ha4, &hp);
     ipaddr = (ha1 << 24) | (ha2 << 16) | (ha3 << 8) | ha4;
@@ -494,7 +495,7 @@ int WINS_GetSocketAddr(int socket, struct qsockaddr* addr) {
 int WINS_GetNameFromAddr(struct qsockaddr* addr, cString name) {
     struct hostent* hostentry;
 
-    hostentry = pgethostbyaddr((int8_p)&((struct sockaddr_in*)addr)->sin_addr, sizeof(struct in_addr), AF_INET);
+    hostentry = pgethostbyaddr((int8_p) & ((struct sockaddr_in*)addr)->sin_addr, sizeof(struct in_addr), AF_INET);
     if (hostentry) {
         Q_strncpy(name, (cString)hostentry->h_name, NET_NAMELEN - 1);
         return 0;

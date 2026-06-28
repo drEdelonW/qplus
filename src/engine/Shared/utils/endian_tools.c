@@ -17,12 +17,12 @@ float   (*BigFloat)     (float l);
 float   (*LittleFloat)  (float l);
 
 int16_t ShortSwap(int16_t l) {
-    uint8_t b1 =  l       & 0xFF;
+    uint8_t b1 = (l >> 0) & 0xFF;
     uint8_t b2 = (l >> 8) & 0xFF;
 
     return
         (b1 << 8) +
-         b2;
+        (b2 << 0);
 }
 
 int16_t ShortNoSwap(int16_t l) {
@@ -30,7 +30,7 @@ int16_t ShortNoSwap(int16_t l) {
 }
 
 int32_t LongSwap(int32_t l) {
-    uint8_t b1 =  l        & 0xFF;
+    uint8_t b1 = (l >>  0) & 0xFF;
     uint8_t b2 = (l >>  8) & 0xFF;
     uint8_t b3 = (l >> 16) & 0xFF;
     uint8_t b4 = (l >> 24) & 0xFF;
@@ -39,7 +39,7 @@ int32_t LongSwap(int32_t l) {
         ((int32_t)b1 << 24) +
         ((int32_t)b2 << 16) +
         ((int32_t)b3 <<  8) +
-                  b4;
+        ((int32_t)b4 <<  0);
 }
 
 int32_t LongNoSwap(int32_t l) {

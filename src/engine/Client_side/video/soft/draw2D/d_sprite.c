@@ -140,10 +140,11 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
             }
 
             do {
-                uint8_t btemp = *(pbase + (s >> 16) + (t >> 16) * cachewidth);
-                if ((btemp != 255) &&
-                    (*pz <= (izi >> 16))) {
-                    *pz = izi >> 16;
+                uint8_t btemp = *(pbase + FIXED16_TO_INT(s) + FIXED16_TO_INT(t) * cachewidth);
+                if ((btemp != 0xFF) &&
+                    (*pz <= FIXED16_TO_INT(izi))
+                    ) {
+                    *pz = FIXED16_TO_INT(izi);
                     *pdest = btemp;
                 }
 
@@ -203,7 +204,7 @@ void D_SpriteScanLeftEdge() {
             int ibottom = (int)vbottom;
 
             for (int v = itop; v < ibottom; v++) {
-                pspan->u = u >> 16;
+                pspan->u = FIXED16_TO_INT(u);
                 pspan->v = v;
                 u += u_step;
                 pspan++;
@@ -267,13 +268,14 @@ void D_SpriteScanRightEdge() {
             float slope = du / dv;
             fixed16_t u_step = (int)(slope * 0x10000);
             // adjust u to ceil the integer portion
-            fixed16_t u = (int)((uvert + (slope * (vtop - vvert))) * 0x10000) +
+            fixed16_t u = (int)(
+                (uvert + (slope * (vtop - vvert))) * 0x10000) +
                 (0x10000 - 1);
             int itop = (int)vtop;
             int ibottom = (int)vbottom;
 
             for (int v = itop; v < ibottom; v++) {
-                pspan->count = (u >> 16) - pspan->u;
+                pspan->count = FIXED16_TO_INT(u) - pspan->u;
                 u += u_step;
                 pspan++;
             }
@@ -327,12 +329,12 @@ void D_SpriteCalculateGradients() {
 
     vec3_t p_temp1 = TransformVector(modelorg);
 
-    sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5f)) - (-(cachewidth >> 1) << 16);
-    tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5f)) - (-(_spriteHeight >> 1) << 16);
+    sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5f)) - (-INT_TO_FIXED16(cachewidth >> 1));
+    tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5f)) - (-INT_TO_FIXED16(_spriteHeight >> 1));
 
     // -1 (-epsilon) so we never wander off the edge of the texture
-    bbextents = (cachewidth << 16) - 1;
-    bbextentt = (_spriteHeight << 16) - 1;
+    bbextents = INT_TO_FIXED16(cachewidth) - 1;
+    bbextentt = INT_TO_FIXED16(_spriteHeight) - 1;
 }
 
 

@@ -654,8 +654,8 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
     for (int32_t i = 0; i < pMdl->numverts; i++) {
         pstverts[i].onseam = LittleLong(pinstverts[i].onseam);
-        pstverts[i].s = LittleLong(pinstverts[i].s) << 16; // put s and t in 16.16 format
-        pstverts[i].t = LittleLong(pinstverts[i].t) << 16;
+        pstverts[i].s = INT_TO_FIXED16(LittleLong(pinstverts[i].s)); // put s and t in 16.16 format
+        pstverts[i].t = INT_TO_FIXED16(LittleLong(pinstverts[i].t));
     }
 
     //

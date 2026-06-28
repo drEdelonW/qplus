@@ -312,7 +312,7 @@ cString UDP_AddrToString(struct qsockaddr* addr) {
 
 int UDP_StringToAddr(cString string, struct qsockaddr* addr) {
   int ha1, ha2, ha3, ha4, hp;
-  int ipaddr;
+  uint32_t ipaddr;
 
   sscanf(string, "%d.%d.%d.%d:%d", &ha1, &ha2, &ha3, &ha4, &hp);
   ipaddr = (ha1 << 24) | (ha2 << 16) | (ha3 << 8) | ha4;

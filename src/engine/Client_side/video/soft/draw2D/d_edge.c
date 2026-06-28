@@ -67,7 +67,11 @@ D_DrawSolidSurface
 // FIXME: clean this up
 
 void D_DrawSolidSurface(Surf_p surf, int color) {
-    int pix = (color << 24) | (color << 16) | (color << 8) | color;
+    int32_t pix =
+        (color << 24) |
+        (color << 16) |
+        (color << 8) |
+        (color << 0);
 
     for (eSpan_p span = surf->spans; span; span = span->pnext) {
         uint8_p pdest = (uint8_p)d_viewbuffer + (screenwidth * span->v);
@@ -131,18 +135,18 @@ void D_CalcGradients(mSurface_p pface) {
         float t = 0x10000 * mipscale;
         sadjust =
             ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5f)) -
-            ((pface->texturemins[S_AX] << 16) >> _miplevel) +
+            (INT_TO_FIXED16(pface->texturemins[S_AX]) >> _miplevel) +
             (pface->texinfo->vecs[S_AX].offs * t);
         tadjust =
             ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5f)) -
-            ((pface->texturemins[T_AX] << 16) >> _miplevel) +
+            (INT_TO_FIXED16(pface->texturemins[T_AX]) >> _miplevel) +
             pface->texinfo->vecs[T_AX].offs * t;
     }
     //
     // -1 (-epsilon) so we never wander off the edge of the texture
     //
-    bbextents = ((pface->extents[S_AX] << 16) >> _miplevel) - 1;
-    bbextentt = ((pface->extents[T_AX] << 16) >> _miplevel) - 1;
+    bbextents = (INT_TO_FIXED16(pface->extents[S_AX]) >> _miplevel) - 1;
+    bbextentt = (INT_TO_FIXED16(pface->extents[T_AX]) >> _miplevel) - 1;
 }
 
 

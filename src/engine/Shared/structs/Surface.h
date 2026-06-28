@@ -6,6 +6,7 @@
 #include "enginedefs.h"
 #include "SurfCache.h"
 #include "Face.h"
+#include "fixed.h"
 
 typedef enum {
     SURF_NONE           = 0u,
@@ -64,8 +65,8 @@ struct mSurface_s {
 #else
     SurfCache_p cachespots[MIPLEVELS];
 #endif
-    int16_t     texturemins[VECT_TX_DIM];
-    int16_t     extents[VECT_TX_DIM];
+    fixed16_t     texturemins[VECT_TX_DIM];
+    fixed16_t     extents[VECT_TX_DIM];
     mTexInfo_p  texinfo;
 
     // lighting info

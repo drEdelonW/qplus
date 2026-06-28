@@ -447,13 +447,13 @@ void Draw_ConsoleBackground(int lines) {
             if (vid.con.width == 320)
                 memcpy(dest, src, vid.con.width);
             else {
-                int f = 0;
-                int fstep = 320 * 0x10000 / vid.con.width;
+                fixed16_t f = 0;
+                fixed16_t fstep = 320 * 0x10000 / vid.con.width;
                 for (int x = 0; x < vid.con.width; x += 4) {
-                    dest[x + 0] = src[f >> 16];     f += fstep;
-                    dest[x + 1] = src[f >> 16];     f += fstep;
-                    dest[x + 2] = src[f >> 16];     f += fstep;
-                    dest[x + 3] = src[f >> 16];     f += fstep;
+                    dest[x + 0] = src[FIXED16_TO_INT(f)];     f += fstep;
+                    dest[x + 1] = src[FIXED16_TO_INT(f)];     f += fstep;
+                    dest[x + 2] = src[FIXED16_TO_INT(f)];     f += fstep;
+                    dest[x + 3] = src[FIXED16_TO_INT(f)];     f += fstep;
                 }
             }
         }
@@ -466,13 +466,13 @@ void Draw_ConsoleBackground(int lines) {
             // FIXME: does the endian switching go away in production?
             int v = (vid.con.height - lines + y) * 200 / vid.con.height;
             uint8_p src = conback->data + v * 320;
-            int f = 0;
-            int fstep = 320 * 0x10000 / vid.con.width;
+            fixed16_t f = 0;
+            fixed16_t fstep = 320 * 0x10000 / vid.con.width;
             for (int x = 0; x < vid.con.width; x += 4) {
-                pusdest[x + 0] = d_8to16table[src[f >> 16]];    f += fstep;
-                pusdest[x + 1] = d_8to16table[src[f >> 16]];    f += fstep;
-                pusdest[x + 2] = d_8to16table[src[f >> 16]];    f += fstep;
-                pusdest[x + 3] = d_8to16table[src[f >> 16]];    f += fstep;
+                pusdest[x + 0] = d_8to16table[src[FIXED16_TO_INT(f)]];    f += fstep;
+                pusdest[x + 1] = d_8to16table[src[FIXED16_TO_INT(f)]];    f += fstep;
+                pusdest[x + 2] = d_8to16table[src[FIXED16_TO_INT(f)]];    f += fstep;
+                pusdest[x + 3] = d_8to16table[src[FIXED16_TO_INT(f)]];    f += fstep;
             }
         }
     }

@@ -479,11 +479,11 @@ void VID_SetPalette(uint8_p palette) {
         pal += 3;
 
         uint32_t v =
-            (255 << 24) +
-            (r << 0) +
-            (g << 8) +
-            (b << 16)
-            ;
+            (r << 0) |
+            (g << 8) |
+            (b << 16) |
+            (0xFF << 24);
+            
         *table++ = v;
     }
     d_8to24table[255] &= 0xffffff;    // 255 is transparent

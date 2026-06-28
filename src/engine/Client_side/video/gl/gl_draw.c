@@ -427,13 +427,13 @@ void Draw_Init() {
         if (vid.con.width == cb->width)
             memcpy(dest, src, vid.con.width);
         else {
-            f = 0;
-            fstep = cb->width * 0x10000 / vid.con.width;
+            fixed16_t f = 0;
+            fixed16_t fstep = cb->width * 0x10000 / vid.con.width;
             for (int x = 0; x < vid.con.width; x += 4) {
-                dest[x + 0] = src[f >> 16];     f += fstep;
-                dest[x + 1] = src[f >> 16];     f += fstep;
-                dest[x + 2] = src[f >> 16];     f += fstep;
-                dest[x + 3] = src[f >> 16];     f += fstep;
+                dest[x + 0] = src[FIXED16_TO_INT(f)];     f += fstep;
+                dest[x + 1] = src[FIXED16_TO_INT(f)];     f += fstep;
+                dest[x + 2] = src[FIXED16_TO_INT(f)];     f += fstep;
+                dest[x + 3] = src[FIXED16_TO_INT(f)];     f += fstep;
             }
         }
     }
@@ -815,15 +815,15 @@ void GL_ResampleTexture(
     uint32_p in, int inwidth, int inheight,
     uint32_p out, int outwidth, int outheight
 ) {
-    uint32_t fracstep = inwidth * 0x10000 / outwidth;
+    fixed16_t fracstep = inwidth * 0x10000 / outwidth;
     for (int i = 0; i < outheight; i++, out += outwidth) {
         uint32_p inrow = in + inwidth * (i * inheight / outheight);
-        uint32_t frac = fracstep >> 1;
+        fixed16_t frac = fracstep >> 1;
         for (int j = 0; j < outwidth; j += 4) {
-            out[j + 0] = inrow[frac >> 16];     frac += fracstep;
-            out[j + 1] = inrow[frac >> 16];     frac += fracstep;
-            out[j + 2] = inrow[frac >> 16];     frac += fracstep;
-            out[j + 3] = inrow[frac >> 16];     frac += fracstep;
+            out[j + 0] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
+            out[j + 1] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
+            out[j + 2] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
+            out[j + 3] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
         }
     }
 }
@@ -837,15 +837,15 @@ void GL_Resample8BitTexture(
     uint8_p in, int inwidth, int inheight,
     uint8_p out, int outwidth, int outheight
 ) {
-    uint32_t fracstep = inwidth * 0x10000 / outwidth;
+    fixed16_t fracstep = inwidth * 0x10000 / outwidth;
     for (int i = 0; i < outheight; i++, out += outwidth) {
         uint8_p inrow = in + inwidth * (i * inheight / outheight);
-        uint32_t frac = fracstep >> 1;
+        fixed16_t frac = fracstep >> 1;
         for (int j = 0; j < outwidth; j += 4) {
-            out[j + 1] = inrow[frac >> 16];     frac += fracstep;
-            out[j + 1] = inrow[frac >> 16];     frac += fracstep;
-            out[j + 2] = inrow[frac >> 16];     frac += fracstep;
-            out[j + 3] = inrow[frac >> 16];     frac += fracstep;
+            out[j + 1] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
+            out[j + 1] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
+            out[j + 2] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
+            out[j + 3] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
         }
     }
 }

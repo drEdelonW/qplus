@@ -301,15 +301,15 @@ void R_TranslatePlayerSkin(int playernum) {
 
         out2 = (uint8_p)pixels;
         memset(pixels, 0, sizeof(pixels));
-        uint32_t fracstep = inwidth * 0x10000 / scaled_width;
+        fixed16_t fracstep = inwidth * 0x10000 / scaled_width;
         for (int i = 0; i < scaled_height; i++, out2 += scaled_width) {
             uint8_p inrow = original + inwidth * (i * inheight / scaled_height);
-            uint32_t frac = fracstep >> 1;
+            fixed16_t frac = fracstep >> 1;
             for (int j = 0; j < scaled_width; j += 4) {
-                out2[j = 0] = translate[inrow[frac >> 16]];     frac += fracstep;
-                out2[j + 1] = translate[inrow[frac >> 16]];     frac += fracstep;
-                out2[j + 2] = translate[inrow[frac >> 16]];     frac += fracstep;
-                out2[j + 3] = translate[inrow[frac >> 16]];     frac += fracstep;
+                out2[j = 0] = translate[inrow[FIXED16_TO_INT(frac)]];     frac += fracstep;
+                out2[j + 1] = translate[inrow[FIXED16_TO_INT(frac)]];     frac += fracstep;
+                out2[j + 2] = translate[inrow[FIXED16_TO_INT(frac)]];     frac += fracstep;
+                out2[j + 3] = translate[inrow[FIXED16_TO_INT(frac)]];     frac += fracstep;
             }
         }
 
@@ -322,15 +322,15 @@ void R_TranslatePlayerSkin(int playernum) {
         translate32[i] = d_8to24table[translate[i]];
 
     uint32_p out = pixels;
-    uint32_t fracstep = inwidth * 0x10000 / scaled_width;
+    fixed16_t fracstep = inwidth * 0x10000 / scaled_width;
     for (int i = 0; i < scaled_height; i++, out += scaled_width) {
         uint8_p inrow = original + inwidth * (i * inheight / scaled_height);
-        uint32_t frac = fracstep >> 1;
+        fixed16_t frac = fracstep >> 1;
         for (int j = 0; j < scaled_width; j += 4) {
-            out[j + 0] = translate32[inrow[frac >> 16]];    frac += fracstep;
-            out[j + 1] = translate32[inrow[frac >> 16]];    frac += fracstep;
-            out[j + 2] = translate32[inrow[frac >> 16]];    frac += fracstep;
-            out[j + 3] = translate32[inrow[frac >> 16]];    frac += fracstep;
+            out[j + 0] = translate32[inrow[FIXED16_TO_INT(frac)]];    frac += fracstep;
+            out[j + 1] = translate32[inrow[FIXED16_TO_INT(frac)]];    frac += fracstep;
+            out[j + 2] = translate32[inrow[FIXED16_TO_INT(frac)]];    frac += fracstep;
+            out[j + 3] = translate32[inrow[FIXED16_TO_INT(frac)]];    frac += fracstep;
         }
     }
     glTexImage2D(GL_TEXTURE_2D, 0, gl_solid_format, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);

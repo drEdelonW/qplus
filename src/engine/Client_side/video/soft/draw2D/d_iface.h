@@ -120,7 +120,6 @@ typedef enum {
 // !!! must be kept the same as in quakeasm.h !!!
 #define TRANSPARENT_COLOR (0xFF)
 
-extern TypeLess_ptr acolormap; // FIXME: should go away
 
 //=======================================================================//
 
