@@ -33,13 +33,13 @@ void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) {
     {   /* Soft Render specific */
         pvrect->height &= ~1;
 
-        pvrect->x = (pvrectin->width - pvrect->width) / 2;
-        pvrect->y = (h - pvrect->height) / 2;
+        pvrect->x = HALF(pvrectin->width - pvrect->width);
+        pvrect->y = HALF(h - pvrect->height);
 
 #ifndef STM32
         if (lcd_x.value) {
-            pvrect->y >>= 1;
-            pvrect->height >>= 1;
+            pvrect->y = HALF(pvrect->y);
+            pvrect->height = HALF(pvrect->height);
         }
 #endif
     }

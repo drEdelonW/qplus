@@ -47,7 +47,7 @@ struct glpoly_s {
 struct mSurface_s {
     int32_t     visframe;   // should be drawn when node is crossed
     int32_t     dlightframe;
-    int32_t     dlightbits;
+    fixed8_t     dlightbits;
     mPlane_p        plane;
     SurfaceFlags_e  flags;
     int32_t     firstedge;  // look up in model->surfedges[], negative numbers

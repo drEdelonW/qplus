@@ -362,12 +362,12 @@ void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) 
 
     // split this edge
     VertAttr_t  _new = {
-        .x = FIXED16_MID(lp1->x, lp2->x),
-        .y = FIXED16_MID(lp1->y, lp2->y),
-        .s = FIXED16_MID(lp1->s, lp2->s),
-        .t = FIXED16_MID(lp1->t, lp2->t),
+        .x = FIXED_MID(lp1->x, lp2->x),
+        .y = FIXED_MID(lp1->y, lp2->y),
+        .s = FIXED_MID(lp1->s, lp2->s),
+        .t = FIXED_MID(lp1->t, lp2->t),
         /* .light — skipped */
-        .zi = FIXED16_MID(lp1->zi, lp2->zi),
+        .zi = FIXED_MID(lp1->zi, lp2->zi),
     };
     if ((_new.y < 0) ||
         (_new.x < 0)
@@ -497,7 +497,7 @@ void D_PolysetSetUpForLineScan(
     if (((tm <= 16) && (tm >= -15)) &&
         ((tn <= 16) && (tn >= -15))
         ) {
-        adivtab_p ptemp = &_aDivTab[((tm + 15) << 5) + (tn + 15)];
+        adivtab_p ptemp = &_aDivTab[(MUL32(tm + 15)) + (tn + 15)];
         d_basestep.count = ptemp->quotient;
         erroradjustup = ptemp->remainder;
         erroradjustdown = tn;
@@ -558,8 +558,8 @@ void D_PolysetCalcGradients(int skinwidth) {
         r_zistepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
     }
 #if id386
-    a_sstepxfrac = r_sstepx << 16;
-    a_tstepxfrac = r_tstepx << 16;
+    a_sstepxfrac = INT_TO_FIXED16(r_sstepx);
+    a_tstepxfrac = INT_TO_FIXED16(r_tstepx);
 #else
     a_sstepxfrac = FIXED16_FRAC(r_sstepx);
     a_tstepxfrac = FIXED16_FRAC(r_tstepx);
@@ -900,12 +900,12 @@ void D_PolysetRecursiveDrawLine(VertAttr_p lp1, VertAttr_p lp2) {
 split:
     // split this edge
     VertAttr_t  _new = {
-        .x = (lp1->x + lp2->x) >> 1,
-        .y = (lp1->y + lp2->y) >> 1,
-        .s = (lp1->s + lp2->s) >> 1,
-        .t = (lp1->t + lp2->t) >> 1,
-        .light = (lp1->light + lp2->light) >> 1,
-        .zi = (lp1->zi + lp2->zi) >> 1
+        .x = FIXED_MID(lp1->x, lp2->x),
+        .y = FIXED_MID(lp1->y, lp2->y),
+        .s = FIXED_MID(lp1->s, lp2->s),
+        .t = FIXED_MID(lp1->t, lp2->t),
+        .light = FIXED_MID(lp1->light, lp2->light),
+        .zi = FIXED_MID(lp1->zi, lp2->zi)
     };
 
     // draw the point
@@ -938,12 +938,12 @@ void D_PolysetRecursiveTriangle2(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3)
 split:
     // split this edge
     VertAttr_t  _new = {
-        .x = (lp1->x + lp2->x) >> 1,
-        .y = (lp1->y + lp2->y) >> 1,
-        .s = (lp1->s + lp2->s) >> 1,
-        .t = (lp1->t + lp2->t) >> 1,
-        .light = (lp1->light + lp2->light) >> 1,
-        .zi = (lp1->zi + lp2->zi) >> 1
+        .x = FIXED_MID(lp1->x, lp2->x),
+        .y = FIXED_MID(lp1->y, lp2->y),
+        .s = FIXED_MID(lp1->s, lp2->s),
+        .t = FIXED_MID(lp1->t, lp2->t),
+        .light = FIXED_MID(lp1->light, lp2->light),
+        .zi = FIXED_MID(lp1->zi, lp2->zi)
     };
 
     D_PolysetRecursiveDrawLine(&_new, lp3);

@@ -110,7 +110,7 @@ int r_frustum_indexes[4 * 6];
 mLeaf_p     r_viewleaf, r_oldviewleaf;
 Texture_p   r_notexture_mip;
 
-int  d_lightstylevalue[256]; // 8.8 fraction of base light value
+fixed8_t  d_lightstylevalue[256]; // 8.8 fraction of base light value
 
 float dp_time1, dp_time2;
 float db_time1, db_time2;

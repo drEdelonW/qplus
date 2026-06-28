@@ -203,7 +203,7 @@ int MaskForNum(int num) {
 
 int D_log2(int num) {
     int c = 0;
-    while (num >>= 1)
+    while (num = HALF(num))
         c++;
     return c;
 }

@@ -171,14 +171,13 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
 
     switch (gl_lightmap_format) {
     case GL_RGBA: {
-        stride -= (smax << 2);
+        stride -= QUAD(smax);
         uint32_p bl = blocklights;
         for (int i = 0; i < tmax; i++, dest += stride) {
             for (int j = 0; j < smax; j++) {
-                int t = *bl++;
-                t >>= 7;
-                if (t > 255)    t = 255;
-                dest[3] = 255 - t;
+                int t = DIV128(*bl++);
+                if (t > 0xFF)    t = 0xFF;
+                dest[3] = 0xFF - t;
                 dest += 4;
             }
         }
@@ -189,10 +188,9 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
         uint32_p bl = blocklights;
         for (int i = 0; i < tmax; i++, dest += stride) {
             for (int j = 0; j < smax; j++) {
-                int t = *bl++;
-                t >>= 7;
-                if (t > 255)    t = 255;
-                dest[j] = 255 - t;
+                int t = DIV128(*bl++);
+                if (t > 0xFF)    t = 0xFF;
+                dest[j] = 0xFF - t;
             }
         }
     } break;
@@ -1227,7 +1225,7 @@ void R_MarkLeaves() {
     }
 
     for (int i = 0; i < cl.worldmodel->numleafs; i++) {
-        if (vis[i >> 3] & (1 << (i & 7))) {
+        if (vis[EIGHTH(i)] & (1 << (i & 7))) {
             mNode_p node = (mNode_p)&cl.worldmodel->leafs[i + 1];
             do {
                 if (node->visframe == r_visframecount)

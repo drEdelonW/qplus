@@ -260,9 +260,8 @@ void Sys_Init() {
 
     while (highpart || (lowpart > 2000000.0)) {
         _lowshift++;
-        lowpart >>= 1;
-        lowpart |= (highpart & 1) << 31;
-        highpart >>= 1;
+        lowpart = HALF(lowpart) | (highpart & 1) << 31;
+        highpart = HALF(highpart);
     }
 
     _pfreq = 1.0 / (double)lowpart;
@@ -647,7 +646,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 ) {
                 SetWindowPos(
                     hwnd_dialog, 0,
-                    (rect.left / 2) - ((rect.right - rect.left) / 2),
+                    HALF(rect.left) - HALF(rect.right - rect.left),
                     rect.top, 0, 0,
                     SWP_NOZORDER | SWP_NOSIZE);
             }

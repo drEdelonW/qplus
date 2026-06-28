@@ -8,7 +8,7 @@
 // typedef uint8_t     fixed4_t; // ?
 
 // typedef int         fixed8_t; // DO NOT USE int!!!
-typedef uint16_t    fixed8_t;   // 8.8   unsigned
+typedef int16_t     fixed8_t;   // 8.8   signed !!!MUST BE SIGNED!!!
 typedef fixed8_t*   fixed8_p;
 
 // typedef int         fixed16_t; // DO NOT USE int!!!
@@ -19,26 +19,55 @@ typedef fixed16_t*  fixed16_p;
 
 // -- Constants ----------------------------------------------------------------
 
-#define FIXED16_FRAC_BITS   16
-#define FIXED16_ONE         (1 << FIXED16_FRAC_BITS)    // 1.0 в 16.16
-
 #define FIXED8_FRAC_BITS    8
 #define FIXED8_ONE          (1 << FIXED8_FRAC_BITS)
 
-// -- Conversion ---------------------------------------------------------------
-
-#define FIXED16_TO_INT(x)       ((x) >> FIXED16_FRAC_BITS)
-#define INT_TO_FIXED16(x)       ((fixed16_t)(x) << FIXED16_FRAC_BITS)
-#define FIXED16_FRAC(x)         ((x) & (FIXED16_ONE - 1))  // Frac part (x & 0xFFFF)
+#define FIXED16_FRAC_BITS   16
+#define FIXED16_ONE         (1 << FIXED16_FRAC_BITS)    // 1.0 в 16.16
 
 // -- Bit ops ------------------------------------------------------------------
 
 #define HALF(x)     ((x) >> 1)  /* fast divide by 2 */
 #define TWICE(x)    ((x) << 1)  /* fast multiply by 2 */
 
+#define QUARTER(x)  ((x) >> 2)  /* fast divide by 4 */
+#define QUAD(x)     ((x) << 2)  /* fast multiply by 4 */
+
+#define EIGHTH(x)   ((x) >> 3)  /* fast divide by 8 */
+#define OCTO(x)     ((x) << 3)  /* fast multiply by 8 */
+
+#define DIV16(x)    ((x) >> 4)  /* fast divide by 16 */
+#define MUL16(x)    ((x) << 4)  /* fast multiply by 16 */
+
+#define DIV32(x)    ((x) >> 5)  /* fast divide by 32 */
+#define MUL32(x)    ((x) << 5)  /* fast multiply by 32 */
+
+#define DIV64(x)    ((x) >> 6)  /* fast divide by 64 */
+#define MUL64(x)    ((x) << 6)  /* fast multiply by 64 */
+
+#define DIV128(x)   ((x) >> 7)  /* fast divide by 128 */
+#define MUL128(x)   ((x) << 7)  /* fast multiply by 128 */
+
+#define DIV256(x)   ((x) >> 8)  /* fast divide by 256 */
+#define MUL256(x)   ((x) << 8)  /* fast multiply by 256 */
+
+// -- Conversion ---------------------------------------------------------------
+
+#define FIXED8_TO_INT(x)        ((x) >> FIXED8_FRAC_BITS)
+#define INT_TO_FIXED8(x)        ((fixed8_t)(x) << FIXED8_FRAC_BITS)
+#define FIXED8_FRAC(x)          ((x) & (FIXED8_ONE - 1))    // Frac part (x & 0xFF)
+
+#define FIXED16_TO_INT(x)       ((x) >> FIXED16_FRAC_BITS)
+#define INT_TO_FIXED16(x)       ((fixed16_t)(x) << FIXED16_FRAC_BITS)
+#define FIXED16_FRAC(x)         ((x) & (FIXED16_ONE - 1))   // Frac part (x & 0xFFFF)
+
 // -- Arithmetic ---------------------------------------------------------------
 
-#define FIXED16_MID(a, b)       HALF(((a) + (b)))         // midpoint, stays in 16.16
+#define FIXED_MID(a, b)         HALF(((a) + (b)))   // midpoint, stays in int
+
+static inline fixed8_t fixed8_mul(fixed8_t a, fixed8_t b) {
+    return (fixed8_t)(((int32_t)a * b) >> FIXED8_FRAC_BITS);
+}
 
 static inline fixed16_t fixed16_mul(fixed16_t a, fixed16_t b) {
     return (fixed16_t)(((int64_t)a * b) >> FIXED16_FRAC_BITS);

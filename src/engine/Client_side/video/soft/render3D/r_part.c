@@ -490,7 +490,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
             prt->die = cl.time + 0.5;
             prt->type = pt_static;
             prt->color = ((type == 3) ? 52 : 230) +
-                ((tracercount & 4) << 1);
+                (TWICE(tracercount & 4));
 
             tracercount++;
 

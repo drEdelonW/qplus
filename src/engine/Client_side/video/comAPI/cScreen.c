@@ -97,7 +97,7 @@ void SCR_DrawCenterString() {
             if ((start[inLine] == '\n') || !start[inLine])
                 break;
 
-        int x = (vid.scr.width - inLine * 8) / 2;
+        int x = HALF(vid.scr.width - OCTO(inLine));
         for (int j = 0; j < inLine; j++, x += 8) {
             Draw_Character(x, y, start[j]);
             if (!remaining--)
@@ -166,7 +166,7 @@ void SCR_DrawNotifyString() {
                 )
                 break;
 
-        int x = (vid.scr.width - inLine * 8) / 2;
+        int x = HALF(vid.scr.width - OCTO(inLine));
         for (int j = 0; j < inLine; j++, x += 8)
             Draw_Character(x, y, start[j]);
 
@@ -329,12 +329,12 @@ void SCR_SetUpToDrawConsole() {
     // decide on the height of the console
     con.forcedup = !cl.worldmodel || cls.signon != SIGNONS;
 
-    if (con.forcedup) {
+    /**/ if (con.forcedup) {
         scr.conlines = vid.scr.height;  // full screen
         scr.con_current = scr.conlines;
     }
-    else if (key.dest == key_console)   scr.conlines = vid.scr.height / 2;  // half screen
-    else                                scr.conlines = 0;               // none visible
+    else if (key.dest == key_console)   scr.conlines = HALF(vid.scr.height);    // half screen
+    else                                scr.conlines = 0;                       // none visible
 
     if (scr.con_current > scr.conlines) {
         scr.con_current -= scr_conspeed.value * host_frametime;

@@ -50,7 +50,7 @@ void Con_NotifyBox(cString text) {
     ================
 */
 void Con_CheckResize() {
-    int32_t width = (vid.scr.width >> 3) - 2;
+    int32_t width = EIGHTH(vid.scr.width) - 2;
     if (width == con.linewidth)
         return;
 
@@ -165,7 +165,7 @@ void Con_DrawInput() {
     int32_t y = con.vislines - 16;
 
     for (int32_t i = 0; i < con.linewidth; i++)
-        Draw_Character((i + 1) << 3, y, text[i]);
+        Draw_Character(OCTO(i + 1), y, text[i]);
 
     // remove cursor
     con.lines[con.edit_line][con.linepos] = 0;
@@ -189,8 +189,8 @@ void Con_DrawConsole(int32_t lines, bool drawinput) {
     // draw the text
     con.vislines = lines;
 
-    int32_t rows = (lines - 16) >> 3;  // rows of text to draw
-    int32_t y = lines - 16 - (rows << 3); // may start slightly negative
+    int32_t rows = EIGHTH(lines - 16);  // rows of text to draw
+    int32_t y = lines - 16 - OCTO(rows); // may start slightly negative
 
     for (int32_t i = (con.current - rows + 1); i <= con.current; i++, y += D_CHAR_HEIGHT) {
         int32_t j = i - con.backscroll;
@@ -200,7 +200,7 @@ void Con_DrawConsole(int32_t lines, bool drawinput) {
         cString text = con.text + (j % con.totallines) * con.linewidth;
 
         for (int32_t x = 0; x < con.linewidth; x++)
-            Draw_Character((x + 1) << 3, y, text[x]);
+            Draw_Character(OCTO(x + 1), y, text[x]);
 
     }
 

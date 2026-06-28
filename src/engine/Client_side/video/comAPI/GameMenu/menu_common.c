@@ -87,7 +87,7 @@ void M_DrawTransPic(int x, int y, qPic_p pic) { Draw_TransPic(x + HALF(vid.scr.w
 
 int M_DrawPicHC(int y, qPic_p pic) {
     if (pic) {
-        int ret = (320 - pic->width) / 2;
+        int ret = HALF(320 - pic->width);
         M_DrawPic(ret, y, pic);
         return ret;
     }

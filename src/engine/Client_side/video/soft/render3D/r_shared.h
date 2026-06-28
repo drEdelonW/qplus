@@ -133,7 +133,7 @@ extern float xscale, yscale;
 extern float xscaleinv, yscaleinv;
 extern float xscaleshrink, yscaleshrink;
 
-extern int d_lightstylevalue[256]; // 8.8 frac of base light value
+extern fixed8_t d_lightstylevalue[256]; // 8.8 frac of base light value
 
 extern int r_skymade;
 extern void R_MakeSky();

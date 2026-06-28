@@ -847,7 +847,7 @@ void V_RenderView() {
         // render two interleaved views
         //
 
-        vid.rowbytes <<= 1;
+        vid.rowbytes = TWICE(vid.rowbytes);
         scr.aspect *= 0.5;
 
         r_refdef.viewangles.yaw -= lcd_yaw.value;
@@ -863,9 +863,9 @@ void V_RenderView() {
         R_RenderView();
         vid.scr.pBuff -= HALF(vid.rowbytes);
 
-        r_refdef.vrect.height <<= 1;
+        r_refdef.vrect.height = TWICE(r_refdef.vrect.height);
 
-        vid.rowbytes >>= 1;
+        vid.rowbytes = HALF(vid.rowbytes);
         scr.aspect *= 2;
     }
     else {
@@ -881,11 +881,11 @@ void Draw_crosshair() {
     if (crosshair.value)
     Draw_Character(
 #if GLQUAKE
-        scr.vrect.x + scr.vrect.width / 2,
-        scr.vrect.y + scr.vrect.height / 2,
+        scr.vrect.x + HALF(scr.vrect.width),
+        scr.vrect.y + HALF(scr.vrect.height),
 #else
-        scr.vrect.x + scr.vrect.width / 2 + cl_crossx.value,
-        scr.vrect.y + scr.vrect.height / 2 + cl_crossy.value,
+        scr.vrect.x + HALF(scr.vrect.width) + cl_crossx.value,
+        scr.vrect.y + HALF(scr.vrect.height) + cl_crossy.value,
 #endif
         '+'
     );

@@ -54,7 +54,7 @@ static void (*surfmiptable[MIPLEVELS])() = {
 
 
 
-uint32_t  blocklights[18 * 18];
+fixed8_t  blocklights[18 * 18];
 
 /*
 ===============
@@ -111,9 +111,9 @@ void R_AddDynamicLights() {
                     blocklights[t * smax + s] += (rad - dist) * 256;
 #endif
             }
-                }
-            }
         }
+    }
+}
 
 /*
 ===============
@@ -145,7 +145,7 @@ void R_BuildLightMap() {
     // add all the lightmaps
     if (lightmap)
         for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 255); maps++) {
-            uint32_t scale = r_drawsurf.lightadj[maps]; // 8.8 fraction
+            fixed8_t scale = r_drawsurf.lightadj[maps]; // 8.8 fraction
             for (int i = 0; i < size; i++)
                 blocklights[i] += lightmap[i] * scale;
             lightmap += size; // skip to next lightmap
@@ -159,8 +159,7 @@ void R_BuildLightMap() {
     for (int i = 0; i < size; i++) {
         int t = (255 * 256 - (int)blocklights[i]) >> (8 - VID_CBITS);
 
-        if (t < (1 << 6))
-            t = (1 << 6);
+        if (t < 64)     t = 64;
 
         blocklights[i] = t;
     }
@@ -215,7 +214,7 @@ void R_DrawSurface() {
     Texture_p mt = r_drawsurf.texture;
     r_source = (uint8_p)mt + mt->offsets[r_drawsurf.surfmip];
 
-    // the fractional light values should range from 0 to (VID_GRADES - 1) << 16
+    // the fractional light values should range from 0 to INT_TO_FIXED16(VID_GRADES - 1)
     // from a source range of 0 - 255
 
     int texwidth = mt->width >> r_drawsurf.surfmip;
@@ -239,12 +238,12 @@ void R_DrawSurface() {
     else {
         pblockdrawer = R_DrawSurfaceBlock16;
         // TODO: only needs to be set when there is a display settings change
-        horzblockstep = blocksize << 1;
+        horzblockstep = TWICE(blocksize);
     }
 
-    int smax = mt->width >> r_drawsurf.surfmip;
+    fixed16_t smax = mt->width >> r_drawsurf.surfmip;
     int twidth = texwidth;
-    int tmax = mt->height >> r_drawsurf.surfmip;
+    fixed16_t tmax = mt->height >> r_drawsurf.surfmip;
     sourcetstep = texwidth;
     r_stepback = tmax * twidth;
     r_sourcemax = r_source + (tmax * smax);
@@ -252,11 +251,13 @@ void R_DrawSurface() {
     int basetoffset = r_drawsurf.surf->texturemins[1];
 
     // << 16 components are to guarantee positive values for %
-    soffset = ((soffset >> r_drawsurf.surfmip) + (smax << 16)) % smax;
-    uint8_p basetptr = &r_source[(
-        (((basetoffset >> r_drawsurf.surfmip) +
-            (tmax << 16)) % tmax) *
-        twidth)];
+    soffset = ((soffset >> r_drawsurf.surfmip) + INT_TO_FIXED16(smax)) % smax;
+    uint8_p basetptr = &r_source[
+        ((((basetoffset >> r_drawsurf.surfmip) +
+            INT_TO_FIXED16(tmax)) %
+            tmax) *
+            twidth)
+    ];
 
     uint8_p pcolumndest = r_drawsurf.surfdat;
     for (int u = 0; u < r_numhblocks; u++) {
@@ -498,7 +499,7 @@ void R_GenTurbTile(pixel_p pbasetex, TypeLess_ptr pdest) {
         for (int j = 0; j < TILE_SIZE; j++) {
             fixed16_t s = (FIXED16_TO_INT((INT_TO_FIXED16(j)) + turb[i & (CYCLE - 1)])) & 0x3F;
             fixed16_t t = (FIXED16_TO_INT((INT_TO_FIXED16(i)) + turb[j & (CYCLE - 1)])) & 0x3F;
-            *pd++ = *(pbasetex + (t << 6) + s);
+            *pd++ = *(pbasetex + MUL64(t) + s);
         }
     }
 }
@@ -517,7 +518,7 @@ void R_GenTurbTile16(pixel_p pbasetex, TypeLess_ptr pdest) {
         for (int j = 0; j < TILE_SIZE; j++) {
             fixed16_t s = (FIXED16_TO_INT((INT_TO_FIXED16(j)) + turb[i & (CYCLE - 1)])) & 0x3F;
             fixed16_t t = (FIXED16_TO_INT((INT_TO_FIXED16(i)) + turb[j & (CYCLE - 1)])) & 0x3F;
-            *pd++ = d_8to16table[*(pbasetex + (t << 6) + s)];
+            *pd++ = d_8to16table[*(pbasetex + MUL64(t) + s)];
         }
     }
 }

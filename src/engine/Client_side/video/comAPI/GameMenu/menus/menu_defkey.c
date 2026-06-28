@@ -43,7 +43,7 @@ static cString _bindnames[][bs_num] = {
 
 void M_Keys_Draw() {
     qPic_p p = Draw_CachePic("gfx/ttl_cstm.lmp");
-    M_DrawPic((vid.scr.width - p->width) / 2, 4, p);
+    M_DrawPic(HALF(vid.scr.width - p->width), 4, p);
 
     M_Print(12, 32, (_bind_grab) ?
         "Press a key or button for this action" :

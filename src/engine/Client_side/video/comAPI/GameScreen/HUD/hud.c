@@ -19,8 +19,8 @@ void SCR_DrawPause() {
         return;
 
     qPic_p pic = Draw_CachePic("gfx/pause.lmp");
-    Draw_Pic((vid.scr.width - pic->width) / 2,
-        (vid.scr.height - 48 - pic->height) / 2, pic);
+    Draw_Pic(HALF(vid.scr.width - pic->width),
+        HALF(vid.scr.height - 48 - pic->height), pic);
 }
 
 
@@ -34,8 +34,8 @@ void SCR_DrawLoading() {
     if (!_scr.drawloading)   return;
 
     qPic_p pic = Draw_CachePic("gfx/loading.lmp");
-    Draw_Pic((vid.scr.width - pic->width) / 2,
-        (vid.scr.height - 48 - pic->height) / 2, pic);
+    Draw_Pic(HALF(vid.scr.width - pic->width),
+        HALF(vid.scr.height - 48 - pic->height), pic);
 }
 
 
@@ -63,7 +63,7 @@ void Con_DrawNotify() {
         scr.copytop = true;
 
         for (int32_t x = 0; x < con.linewidth; x++)
-            Draw_Character((x + 1) << 3, v, text[x]);
+            Draw_Character(OCTO(x + 1), v, text[x]);
 
         v += D_CHAR_HEIGHT;
     }
@@ -76,10 +76,10 @@ void Con_DrawNotify() {
 
         Draw_String(8, v, "say:");
         while (chatBuffer[x]) {
-            Draw_Character((x + 5) << 3, v, chatBuffer[x]);
+            Draw_Character(OCTO(x + 5), v, chatBuffer[x]);
             x++;
         }
-        Draw_Character((x + 5) << 3, v, 10 + ((int)(realtime * con.cursorspeed) & 1));
+        Draw_Character(OCTO(x + 5), v, 10 + ((int)(realtime * con.cursorspeed) & 1));
         v += D_CHAR_HEIGHT;
     }
 

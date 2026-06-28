@@ -651,7 +651,7 @@ void Draw_FadeScreen() {
 
     for (int y = 0; y < vid.scr.height; y++) {
         uint8_p pbuf = (uint8_p)(vid.scr.pBuff + vid.rowbytes * y);
-        int t = (y & 1) << 1;
+        int t = TWICE(y & 1);
 
         for (int x = 0; x < vid.scr.width; x++)
             if ((x & 3) != t)

@@ -101,7 +101,7 @@ void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, f
 
 int Q_log2(int val) {
     int answer = 0;
-    while (val >>= 1)
+    while ((val = HALF(val)))
         answer++;
     return answer;
 }

@@ -235,7 +235,7 @@ void BuildTris() {
             if (!triangles[besttris[0]].facesfront &&
                 stverts[k].onseam
                 )
-                s += pheader->skinwidth / 2; // on back side
+                s += HALF(pheader->skinwidth); // on back side
             s = (s + 0.5) / pheader->skinwidth;
             t = (t + 0.5) / pheader->skinheight;
 

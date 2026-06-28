@@ -120,14 +120,16 @@ r_Entity_p CL_EntityNum(int num) {
 void CL_ParseStartSoundPacket() {
     uint8_t field_mask = MSG_ReadByte();
 
-    uint8_t volume = (field_mask & SND_VOLUME) ? MSG_ReadByte() : DEFAULT_SOUND_PACKET_VOLUME;
-    float attenuation = (field_mask & SND_ATTENUATION) ? ((float)MSG_ReadByte() / 64.0f) : DEFAULT_SOUND_PACKET_ATTENUATION;
+    uint8_t volume = (field_mask & SND_VOLUME) ?
+        MSG_ReadByte() : DEFAULT_SOUND_PACKET_VOLUME;
+        
+    float attenuation = (field_mask & SND_ATTENUATION) ?
+        ((float)MSG_ReadByte() / 64.0f) : DEFAULT_SOUND_PACKET_ATTENUATION;
 
     int16_t channel = MSG_ReadShort();
     uint8_t sound_num = MSG_ReadByte();
 
-    int16_t ent = channel >> 3;
-    channel &= 7;
+    int16_t ent = EIGHTH(channel) & 0x07; // b0111
 
     if (ent > MAX_EDICTS)
         Host_Error("CL_ParseStartSoundPacket: ent = %i", ent);
@@ -650,7 +652,7 @@ void CL_ParseServerMessage() {
 
         case svc_stopsound: {
             int16_t msg = MSG_ReadShort();
-            S_StopSound((msg >> 3), (msg & 7));
+            S_StopSound(EIGHTH(msg), (msg & 0x07));
         } break;
 
         case svc_updatename: {

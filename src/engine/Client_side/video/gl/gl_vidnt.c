@@ -165,9 +165,9 @@ void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {}
 void D_EndDirectRect(int x, int y, int width, int height) {}
 
 void CenterWindow(HWND hWndCenter, int width, int height, BOOL lefttopjustify) {
-    int CenterX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
-    int CenterY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
-    if (CenterX > CenterY * 2)        CenterX >>= 1;    // dual screens
+    int CenterX = HALF(GetSystemMetrics(SM_CXSCREEN) - width);
+    int CenterY = HALF(GetSystemMetrics(SM_CYSCREEN) - height);
+    if (CenterX > CenterY * 2)        CenterX = HALF(CenterX);    // dual screens
     CenterX = (CenterX < 0) ? 0 : CenterX;
     CenterY = (CenterY < 0) ? 0 : CenterY;
     SetWindowPos(
@@ -425,8 +425,8 @@ void VID_UpdateWindowStatus() {
     window_rect.top = window_y;
     window_rect.right = window_x + window_width;
     window_rect.bottom = window_y + window_height;
-    window_center_x = (window_rect.left + window_rect.right) / 2;
-    window_center_y = (window_rect.top + window_rect.bottom) / 2;
+    window_center_x = HALF(window_rect.left + window_rect.right);
+    window_center_y = HALF(window_rect.top + window_rect.bottom);
 
     IN_UpdateClipCursor();
 }
@@ -1211,9 +1211,9 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                 // if the width is more than twice the height, reduce it by half because this
                 // is probably a dual-screen monitor
                 if (!COM_CheckParm("-noadjustaspect")) {
-                    if (modelist[nummodes].width > (modelist[nummodes].height << 1)
+                    if (modelist[nummodes].width > (TWICE(modelist[nummodes].height))
                         ) {
-                        modelist[nummodes].width >>= 1;
+                        modelist[nummodes].width = HALF(modelist[nummodes].width);
                         modelist[nummodes].halfscreen = 1;
                         snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
                             "%dx%dx%d",
@@ -1614,7 +1614,7 @@ VID_MenuDraw
 */
 void VID_MenuDraw() {
     qPic_p p = Draw_CachePic("gfx/vidmodes.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
+    M_DrawPic(HALF(320 - p->width), 4, p);
 
     vid_wmodes = 0;
     int lnummodes = VID_NumModes();

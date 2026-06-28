@@ -279,7 +279,7 @@ static void install_grabs() {
         XWarpPointer(
             _dpy, None, _win,
             0, 0, 0, 0,
-            vid.scr.width / 2, vid.scr.height / 2
+            HALF(vid.scr.width), HALF(vid.scr.height)
         );
     }
 
@@ -320,8 +320,8 @@ static void HandleEvents() {
     KeySym ks;
     int b;
     bool dowarp = false;
-    int mwx = vid.scr.width / 2;
-    int mwy = vid.scr.height / 2;
+    int mwx = HALF(vid.scr.width);
+    int mwy = HALF(vid.scr.height);
 
     if (!_dpy)
         return;
@@ -390,7 +390,7 @@ static void HandleEvents() {
         XWarpPointer(
             _dpy, None, _win,
             0, 0, 0, 0,
-            vid.scr.width / 2, vid.scr.height / 2
+            HALF(vid.scr.width), HALF(vid.scr.height)
         );
     }
 

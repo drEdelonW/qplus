@@ -475,8 +475,8 @@ void VID_InitMGLFull(HINSTANCE hInstance) {
         if (lowstretched) {
             modelist[MODE_FULLSCREEN_DEFAULT] = modelist[stretchedmode];
             modelist[MODE_FULLSCREEN_DEFAULT].stretched = 1;
-            modelist[MODE_FULLSCREEN_DEFAULT].width >>= 1;
-            modelist[MODE_FULLSCREEN_DEFAULT].height >>= 1;
+            modelist[MODE_FULLSCREEN_DEFAULT].width = HALF(modelist[MODE_FULLSCREEN_DEFAULT].width);
+            modelist[MODE_FULLSCREEN_DEFAULT].height = HALF(modelist[MODE_FULLSCREEN_DEFAULT].height);
             snprintf(modelist[MODE_FULLSCREEN_DEFAULT].modedesc,
                 sizeof(modelist[MODE_FULLSCREEN_DEFAULT].modedesc),
                 "%dx%d",
@@ -701,7 +701,7 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                 // is probably a dual-screen monitor
                 if (!COM_CheckParm("-noadjustaspect")) {
                     if (modelist[nummodes].width > (modelist[nummodes].height << 1)) {
-                        modelist[nummodes].width >>= 1;
+                        modelist[nummodes].width = HALF(modelist[nummodes].width);
                         modelist[nummodes].halfscreen = 1;
                         snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
                             "%dx%d",
@@ -773,7 +773,7 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                     // is probably a dual-screen monitor
                     if (!COM_CheckParm("-noadjustaspect")) {
                         if (modelist[nummodes].width > (modelist[nummodes].height * 2)) {
-                            modelist[nummodes].width >>= 1;
+                            modelist[nummodes].width = HALF(modelist[nummodes].width);
                             modelist[nummodes].halfscreen = 1;
                             snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
                                 "%dx%d",
@@ -904,8 +904,8 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
             istretch = originalnummodes;
 
             modelist[istretch] = modelist[mstretch];
-            modelist[istretch].width >>= 1;
-            modelist[istretch].height >>= 1;
+            modelist[istretch].width = HALF(modelist[istretch].width);
+            modelist[istretch].height = HALF(modelist[istretch].height);
             modelist[istretch].stretched = 1;
             snprintf(modelist[istretch].modedesc, sizeof(modelist[nummodes].modedesc),
                 "%dx%d",
@@ -1147,8 +1147,8 @@ bool VID_SetWindowedMode(int modenum) {
     DIBHeight = modelist[modenum].height;
 
     if (stretched) {
-        DIBWidth >>= 1;
-        DIBHeight >>= 1;
+        DIBWidth = HALF(DIBWidth);
+        DIBHeight = HALF(DIBHeight);
     }
 
     WindowStyle = WS_OVERLAPPED | WS_BORDER | WS_CAPTION | WS_SYSMENU |
@@ -1599,18 +1599,14 @@ void VID_LockBuffer() {
         vid.rowbytes = vid.conrowbytes = mgldc->mi.bytesPerLine;
     }
 
-    if (r_dowarp)
-        d_viewbuffer = r_warpbuffer;
-    else
-        d_viewbuffer = (TypeLess_ptr)(uint8_p)vid.scr.pBuff;
+    d_viewbuffer = (r_dowarp) ?
+        r_warpbuffer : (TypeLess_ptr)(uint8_p)vid.scr.pBuff;
 
-    if (r_dowarp)
-        screenwidth = WARP_WIDTH;
-    else
-        screenwidth = vid.rowbytes;
+    screenwidth = (r_dowarp) ?
+        WARP_WIDTH : vid.rowbytes;
 
     if (lcd_x.value)
-        screenwidth <<= 1;
+        screenwidth = TWICE(screenwidth);
 }
 
 
@@ -2916,8 +2912,8 @@ void VID_MenuDraw() {
             "Please wait 5 seconds...");
     }
     else {
-        M_Print(9 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8,       "Press Enter to set mode");
-        M_Print(6 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8 * 3,   "T to test mode for 5 seconds");
+        M_Print(9 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8, "Press Enter to set mode");
+        M_Print(6 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8 * 3, "T to test mode for 5 seconds");
         ptr = VID_GetModeDescription2(vid_modenum);
 
         if (ptr) {

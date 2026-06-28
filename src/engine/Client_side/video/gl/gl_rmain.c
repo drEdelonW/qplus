@@ -73,7 +73,7 @@ refdef_t r_refdef;
 mLeaf_p r_viewleaf, r_oldviewleaf;
 Texture_p r_notexture_mip;
 
-int  d_lightstylevalue[256]; // 8.8 fraction of base light value
+fixed8_t d_lightstylevalue[256]; // 8.8 fraction of base light value
 
 
 void R_MarkLeaves();
@@ -437,10 +437,10 @@ void R_DrawAliasModel(r_Entity_p e) {
     if (!strcmp(clmodel->name, "progs/flame2.mdl") ||
         !strcmp(clmodel->name, "progs/flame.mdl")
         )
-        ambientlight = shadelight = 256;
+        ambientlight = shadelight = 256.0f;
 
-    shadedots = r_avertexnormal_dots[((int)(e->angles.yaw * (SHADEDOT_QUANT / 360.0))) & (SHADEDOT_QUANT - 1)];
-    shadelight = shadelight / 200.0;
+    shadedots = r_avertexnormal_dots[((int)(e->angles.yaw * (SHADEDOT_QUANT / 360.0f))) & (SHADEDOT_QUANT - 1)];
+    shadelight = shadelight / 200.0f;
 
     float an = DEG2RAD(e->angles.yaw);
     shadevector.x = cos(-an);
@@ -680,10 +680,10 @@ void R_SetFrustum() {
         frustum[3].normal = VectorSubtract(BS.forward, BS.up);
     }
     else {
-        RotatePointAroundVector(&frustum[0].normal, BS.up, BS.forward, -(90 - r_refdef.fov_x / 2));       // rotate VPN right by FOV_X/2 degrees
-        RotatePointAroundVector(&frustum[1].normal, BS.up, BS.forward, (90 - r_refdef.fov_x / 2));          // rotate VPN left by FOV_X/2 degrees
-        RotatePointAroundVector(&frustum[2].normal, BS.right, BS.forward, (90 - r_refdef.fov_y / 2));       // rotate VPN up by FOV_X/2 degrees
-        RotatePointAroundVector(&frustum[3].normal, BS.right, BS.forward, -(90 - r_refdef.fov_y / 2));    // rotate VPN down by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[0].normal, BS.up, BS.forward, -(90 - r_refdef.fov_x / 2.0f));       // rotate VPN right by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[1].normal, BS.up, BS.forward, (90 - r_refdef.fov_x / 2.0f));          // rotate VPN left by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[2].normal, BS.right, BS.forward, (90 - r_refdef.fov_y / 2.0f));       // rotate VPN up by FOV_X/2 degrees
+        RotatePointAroundVector(&frustum[3].normal, BS.right, BS.forward, -(90 - r_refdef.fov_y / 2.0f));    // rotate VPN down by FOV_X/2 degrees
     }
     for (int i = 0; i < 4; i++) {
         frustum[i].type = PLANE_ANYZ;
@@ -736,7 +736,7 @@ void MYgluPerspective(
 ) {
     GLdouble xmin, xmax, ymin, ymax;
 
-    ymax = zNear * tan(fovy * M_PI / 360.0);
+    ymax = zNear * tan(fovy * M_PI / 360.0f);
     ymin = -ymax;
 
     xmin = ymin * aspect;

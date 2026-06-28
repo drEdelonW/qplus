@@ -204,7 +204,7 @@ void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
 
         // Duff's Device
         count = width;
-        n = (count + 7) / 8;
+        n = EIGHTH(count + 7);
         dest = ((PIXEL16*)src) + x + width - 1;
         src += x + width - 1;
 
@@ -240,7 +240,7 @@ void st3_fixup(XImage* framebuf, int x, int y, int width, int height) {
 
         // Duff's Device
         count = width;
-        n = (count + 7) / 8;
+        n = EIGHTH(count + 7);
         dest = ((PIXEL24*)src) + x + width - 1;
         src += x + width - 1;
 
@@ -302,12 +302,10 @@ void VID_Gamma_f() {
         g = Q_atof(Cmd_Argv(1));
 
         for (i = 0; i < 255; i++) {
-            f = pow((i + 1) / 256.0, g);
+            f = pow((i + 1) / 256.0f, g);
             inf = f * 255 + 0.5;
-            if (inf < 0)
-                inf = 0;
-            if (inf > 255)
-                inf = 255;
+            if (inf < 0)        inf = 0;
+            if (inf > 255)      inf = 255;
             vid_gamma[i] = inf;
         }
 
@@ -364,7 +362,7 @@ void ResetFrameBuffer() {
         free(x_framebuffer[0]);
     }
 
-    pwidth = x_visinfo->depth / 8;
+    pwidth = EIGHTH(x_visinfo->depth);
     if (pwidth == 3) pwidth = 4;
     mem = ((vid.scr.width * pwidth + 3) & ~3) * vid.scr.height;
 
@@ -562,9 +560,9 @@ void	VID_Init(uint8_p palette) {
     x_screen_width = WidthOfScreen(ScreenOfDisplay(x_disp, x_screen));
     x_screen_height = HeightOfScreen(ScreenOfDisplay(x_disp, x_screen));
 
-    x_center_width = x_screen_width / 2;
+    x_center_width = HALF(x_screen_width);
 
-    x_center_height = x_screen_height / 2;
+    x_center_height = HALF(x_screen_height)  ;
 
     Con_Printf("Using screen %d: %dx%d\n", x_screen, x_screen_width, x_screen_height);
 
@@ -881,14 +879,14 @@ void GetEvent() {
         break;
     case MotionNotify:
         if (mouse_avail && mouse_grabbed) {
-            mouse_x = (float)((int)x_event.xmotion.x - (int)(vid.scr.width / 2));
-            mouse_y = (float)((int)x_event.xmotion.y - (int)(vid.scr.height / 2));
+            mouse_x = (float)((int)x_event.xmotion.x - HALF(vid.scr.width));
+            mouse_y = (float)((int)x_event.xmotion.y - HALF(vid.scr.height));
             //printf("m: x=%d,y=%d, mx=%3.2f,my=%3.2f\n",
             //	x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
                         /* move the mouse to the window center again */
             XSelectInput(x_disp, x_win, STD_EVENT_MASK & ~PointerMotionMask);
-            XWarpPointer(x_disp, None, x_win, 0, 0, 0, 0, (vid.scr.width / 2), (vid.scr.height / 2));
+            XWarpPointer(x_disp, None, x_win, 0, 0, 0, 0, HALF(vid.scr.width), HALF(vid.scr.height));
             XSelectInput(x_disp, x_win, STD_EVENT_MASK);
         }
         else {

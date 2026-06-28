@@ -156,7 +156,7 @@ void R_TimeGraph() {
     int x =
         r_refdef.vrect.width -
         ((r_refdef.vrect.width <= MAX_TIMINGS) ?
-            1 : (r_refdef.vrect.width - MAX_TIMINGS) / 2);
+            1 : HALF(r_refdef.vrect.width - MAX_TIMINGS));
     do {
         R_LineGraph(x, r_refdef.vrect.height - 2, r_timings[a]);
         if (x == 0)
@@ -215,7 +215,7 @@ void WarpPalette() {
     // pull the colors halfway to bright brown
     for (int i = 0; i < 256; i++) {
         for (int j = 0; j < 3; j++) {
-            newpalette[(i * 3) + j] = (host_basepal[(i * 3) + j] + basecolor[j]) / 2;
+            newpalette[(i * 3) + j] = HALF(host_basepal[(i * 3) + j] + basecolor[j]);
         }
     }
 

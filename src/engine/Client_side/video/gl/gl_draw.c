@@ -294,7 +294,7 @@ qPic_p Draw_CachePic(cStringRO path) {
 
 void Draw_CharToConback(int num, uint8_p dest) {
     int row = num >> 4;
-    int col = num & 15;
+    int col = num & 0x0F;
     uint8_p source = _drawChars + (row << 10) + (col << 3);
 
     int drawline = 8;
@@ -618,9 +618,9 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
 
     uint32_p dest = trans;
     for (int v = 0; v < 64; v++, dest += 64) {
-        uint8_p src = &menuplyr_pixels[((v * pic->height) >> 6) * pic->width];
+        uint8_p src = &menuplyr_pixels[(DIV64(v * pic->height)) * pic->width];
         for (int u = 0; u < 64; u++) {
-            int p = src[(u * pic->width) >> 6];
+            int p = src[DIV64(u * pic->width)];
             if (p == 255)   dest[u] = p;
             else            dest[u] = d_8to24table[translation[p]];
         }
@@ -654,7 +654,7 @@ Draw_ConsoleBackground
 ================
 */
 void Draw_ConsoleBackground(int lines) {
-    int y = (vid.scr.height * 3) >> 2;
+    int y = QUARTER(vid.scr.height * 3);
 
     if (lines > y)  Draw_Pic(0, lines - vid.scr.height, conback);
     else            Draw_AlphaPic(0, lines - vid.scr.height, conback, (float)(1.2 * lines) / y);
@@ -859,15 +859,15 @@ Operates in place, quartering the size of the texture
 ================
 */
 void GL_MipMap(uint8_p in, int width, int height) {
-    width <<= 2;
-    height >>= 1;
+    width = QUAD(width);
+    height = HALF(height);
     uint8_p out = in;
     for (int i = 0; i < height; i++, in += width) {
         for (int j = 0; j < width; j += 8, out += 4, in += 8) {
-            out[0] = (in[0] + in[4] + in[width + 0] + in[width + 4]) >> 2;
-            out[1] = (in[1] + in[5] + in[width + 1] + in[width + 5]) >> 2;
-            out[2] = (in[2] + in[6] + in[width + 2] + in[width + 6]) >> 2;
-            out[3] = (in[3] + in[7] + in[width + 3] + in[width + 7]) >> 2;
+            out[0] = QUARTER(in[0] + in[4] + in[width + 0] + in[width + 4]);
+            out[1] = QUARTER(in[1] + in[5] + in[width + 1] + in[width + 5]);
+            out[2] = QUARTER(in[2] + in[6] + in[width + 2] + in[width + 6]);
+            out[3] = QUARTER(in[3] + in[7] + in[width + 3] + in[width + 7]);
         }
     }
 }
@@ -880,8 +880,8 @@ Mipping for 8 bit textures
 ================
 */
 void GL_MipMap8Bit(uint8_p in, int width, int height) {
-    // width <<=2;
-    height >>= 1;
+    // width = QUAD(width);
+    height = HALF(height);
     uint8_p out = in;
     for (int i = 0; i < height; i++, in += width) {
         for (int j = 0; j < width; j += 2, out += 1, in += 2) {
@@ -890,9 +890,9 @@ void GL_MipMap8Bit(uint8_p in, int width, int height) {
             uint8_p at3 = (uint8_p)(d_8to24table + in[width + 0]);
             uint8_p at4 = (uint8_p)(d_8to24table + in[width + 1]);
 
-            uint16_t r = (at1[0] + at2[0] + at3[0] + at4[0]);   r >>= 5;
-            uint16_t g = (at1[1] + at2[1] + at3[1] + at4[1]);   g >>= 5;
-            uint16_t b = (at1[2] + at2[2] + at3[2] + at4[2]);   b >>= 5;
+            uint16_t r = DIV32(at1[0] + at2[0] + at3[0] + at4[0]);
+            uint16_t g = DIV32(at1[1] + at2[1] + at3[1] + at4[1]);
+            uint16_t b = DIV32(at1[2] + at2[2] + at3[2] + at4[2]);
 
             out[0] = d_15to8table[(r << 0) + (g << 5) + (b << 10)];
         }
@@ -908,9 +908,9 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     static uint32_t _scaled[1024 * 512]; // [512*256];
 
     int scaled_width = 1;
-    for (; scaled_width < width; scaled_width <<= 1) {}
+    for (; scaled_width < width; scaled_width = TWICE(scaled_width)) {}
     int scaled_height = 1;
-    for (; scaled_height < height; scaled_height <<= 1) {}
+    for (; scaled_height < height; scaled_height = TWICE(scaled_height)) {}
 
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
@@ -970,9 +970,10 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
             (scaled_height > 1)
             ) {
             GL_MipMap((uint8_p)_scaled, scaled_width, scaled_height);
-            scaled_width >>= 1;
-            scaled_height >>= 1;
+            scaled_width = HALF(scaled_width);
             if (scaled_width < 1)   scaled_width = 1;
+
+            scaled_height = HALF(scaled_height);
             if (scaled_height < 1)  scaled_height = 1;
             miplevel++;
             glTexImage2D(
@@ -1015,10 +1016,10 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
             alpha = false;
     }
     int scaled_width = 1;
-    for (; scaled_width < width; scaled_width <<= 1) {}
+    for (; scaled_width < width; scaled_width = TWICE(scaled_width)) {}
 
     int scaled_height = 1;
-    for (; scaled_height < height; scaled_height <<= 1) {}
+    for (; scaled_height < height; scaled_height = TWICE(scaled_height)) {}
 
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
@@ -1062,9 +1063,10 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
             (scaled_height > 1)
             ) {
             GL_MipMap8Bit((uint8_p)_scaled, scaled_width, scaled_height);
-            scaled_width >>= 1;
-            scaled_height >>= 1;
+            scaled_width = HALF(scaled_width);
             if (scaled_width < 1)       scaled_width = 1;
+
+            scaled_height = HALF(scaled_height);
             if (scaled_height < 1)      scaled_height = 1;
             miplevel++;
             glTexImage2D(

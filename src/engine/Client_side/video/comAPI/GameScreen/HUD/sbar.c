@@ -679,7 +679,7 @@ void Sbar_DrawFrags() {
 
     int x = 23;
     int xofs = (cl.gametype == GAME_DEATHMATCH) ?
-        0 : (vid.scr.width - 320) >> 1;
+        0 : HALF(vid.scr.width - 320);
     int y = vid.scr.height - SBAR_HEIGHT - 23;
 
     for (int i = 0; i < l; i++) {
@@ -1003,7 +1003,7 @@ void Sbar_MiniDeathmatchOverlay() {
     // draw the text
     int sbl = _scoreboardlines;
     int y = vid.scr.height - sb_lines;
-    int numlines = sb_lines / 8;
+    int numlines = EIGHTH(sb_lines);
     if (numlines < 3)
         return;
 
@@ -1016,7 +1016,7 @@ void Sbar_MiniDeathmatchOverlay() {
 
     i = (i == sbl) ?
         0 :                 // we're not there
-        i - (numlines / 2); // figure out start
+        i - HALF(numlines); // figure out start
 
     if (i > sbl - numlines)     i = sbl - numlines;
     else if (i < 0)                  i = 0;
@@ -1118,5 +1118,5 @@ Sbar_FinaleOverlay
 void Sbar_FinaleOverlay() {
     scr.copyeverything = true;
     qPic_p pic = Draw_CachePic("gfx/finale.lmp");
-    Draw_TransPic((vid.scr.width - pic->width) / 2, 16, pic);
+    Draw_TransPic(HALF(vid.scr.width - pic->width), 16, pic);
 }

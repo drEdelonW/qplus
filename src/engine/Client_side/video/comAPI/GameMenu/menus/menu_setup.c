@@ -44,7 +44,7 @@ void M_Menu_Setup_f() {
     Q_strcpy(_s.myname, cl_name.string);
     Q_strcpy(_s.hostname, hostname.string);
     _s.top = _s.oldtop = ((int)cl_color.value) >> 4;
-    _s.bottom = _s.oldbottom = ((int)cl_color.value) & 15;
+    _s.bottom = _s.oldbottom = ((int)cl_color.value) & 0x0F;
 }
 
 

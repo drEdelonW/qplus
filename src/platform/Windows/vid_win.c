@@ -212,8 +212,8 @@ void VID_UpdateWindowStatus() {
     window_rect.top = window_y;
     window_rect.right = window_x + window_width;
     window_rect.bottom = window_y + window_height;
-    window_center_x = (window_rect.left + window_rect.right) / 2;
-    window_center_y = (window_rect.top + window_rect.bottom) / 2;
+    window_center_x = HALF(window_rect.left + window_rect.right);
+    window_center_y = HALF(window_rect.top + window_rect.bottom);
 
     IN_UpdateClipCursor();
 }
@@ -493,8 +493,8 @@ void VID_InitMGLFull(HINSTANCE hInstance) {
         if (lowstretched) {
             modelist[MODE_FULLSCREEN_DEFAULT] = modelist[stretchedmode];
             modelist[MODE_FULLSCREEN_DEFAULT].stretched = 1;
-            modelist[MODE_FULLSCREEN_DEFAULT].width >>= 1;
-            modelist[MODE_FULLSCREEN_DEFAULT].height >>= 1;
+            modelist[MODE_FULLSCREEN_DEFAULT].width = HALF(modelist[MODE_FULLSCREEN_DEFAULT].width);
+            modelist[MODE_FULLSCREEN_DEFAULT].height = HALF(modelist[MODE_FULLSCREEN_DEFAULT].height);
             snprintf(modelist[MODE_FULLSCREEN_DEFAULT].modedesc, sizeof(modelist[curmode].modedesc),
                 "%dx%d",
                 modelist[MODE_FULLSCREEN_DEFAULT].width,
@@ -714,7 +714,7 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                 // is probably a dual-screen monitor
                 if (!COM_CheckParm("-noadjustaspect")) {
                     if (modelist[nummodes].width > (modelist[nummodes].height << 1)) {
-                        modelist[nummodes].width >>= 1;
+                        modelist[nummodes].width = HALF(modelist[nummodes].width);
                         modelist[nummodes].halfscreen = 1;
                         snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
                             "%dx%d",
@@ -786,7 +786,7 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                     // is probably a dual-screen monitor
                     if (!COM_CheckParm("-noadjustaspect")) {
                         if (modelist[nummodes].width > (modelist[nummodes].height * 2)) {
-                            modelist[nummodes].width >>= 1;
+                            modelist[nummodes].width = HALF(modelist[nummodes].width);
                             modelist[nummodes].halfscreen = 1;
                             snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
                                 "%dx%d",
@@ -909,8 +909,8 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
             istretch = originalnummodes;
 
             modelist[istretch] = modelist[mstretch];
-            modelist[istretch].width >>= 1;
-            modelist[istretch].height >>= 1;
+            modelist[istretch].width = HALF(modelist[istretch].width);
+            modelist[istretch].height = HALF(modelist[istretch].height);
             modelist[istretch].stretched = 1;
             snprintf(modelist[istretch].modedesc, sizeof(modelist[nummodes].modedesc),
                 "%dx%d",
@@ -1150,8 +1150,8 @@ bool VID_SetWindowedMode(int modenum) {
     DIBHeight = modelist[modenum].height;
 
     if (stretched) {
-        DIBWidth >>= 1;
-        DIBHeight >>= 1;
+        DIBWidth = HALF(DIBWidth);
+        DIBHeight = HALF(DIBWidth);
     }
 
     WindowStyle = WS_OVERLAPPED | WS_BORDER | WS_CAPTION | WS_SYSMENU |
@@ -1594,7 +1594,7 @@ void VID_LockBuffer() {
     else            screenwidth = vid.rowbytes;
 
     if (lcd_x.value)
-        screenwidth <<= 1;
+        screenwidth = TWICE(screenwidth);
 }
 
 
@@ -2738,7 +2738,7 @@ void VID_MenuDraw() {
     modedesc_t	tmodedesc;
 
     p = Draw_CachePic("gfx/vidmodes.lmp");
-    M_DrawPic((320 - p->width) / 2, 4, p);
+    M_DrawPic(HALF(320 - p->width), 4, p);
 
     for (i = 0; i < 3; i++) {
         ptr = VID_GetModeDescriptionMemCheck(i);
