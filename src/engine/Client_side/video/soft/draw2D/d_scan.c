@@ -27,8 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 static uint8_p r_turb_pbase;
 static uint8_p r_turb_pdest;
-fixed4_t r_turb_s, r_turb_sstep;
-fixed4_t r_turb_t, r_turb_tstep;
+fixed16_t r_turb_s, r_turb_sstep;
+fixed16_t r_turb_t, r_turb_tstep;
 int* r_turb_turb;
 int r_turb_spancount;
 
