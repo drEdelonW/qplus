@@ -531,18 +531,22 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
     mod->type = mod_alias;
 
+#if 0
     // FIXME: do this right
     mod->mins = (vec3_t){
             .x = -16.0f,
             .y = -16.0f,
-            .z = -16.f
+            .z = -16.0f
         };
     mod->maxs = (vec3_t){
             .x = 16.0f,
             .y = 16.0f,
-            .z = 16.f
+            .z = 16.0f
         };
-
+#else
+     mod->mins = Scalar2Vector(-16.0f);
+     mod->maxs = Scalar2Vector(16.0f);
+#endif
     //
     // build the draw lists
     //

@@ -42,7 +42,7 @@ bool    r_drawpolys;
 bool    r_drawculledpolys;
 bool    r_worldpolysbacktofront;
 bool    r_recursiveaffinetriangles = true;
-int     r_pixbytes = 1;
+int     r_pixbytes = 1; // TODO: make enum
 float   r_aliasuvscale = 1.0f;
 int     r_outofsurfaces;
 int     r_outofedges;

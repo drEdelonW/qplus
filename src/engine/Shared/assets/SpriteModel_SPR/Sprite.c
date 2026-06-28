@@ -221,30 +221,22 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
         frametype = LittleLong(pframetype->type);
         psprite->frames[i].type = frametype;
 
-#if 0
-# ifdef GLQUAKE
-        if (frametype == SPR_SINGLE)    pframetype = (dSpriteFrameType_p)Mod_LoadSpriteFrame(pframetype + 1, &psprite->frames[i].frameptr, i);
-        else                            pframetype = (dSpriteFrameType_p)Mod_LoadSpriteGroup(pframetype + 1, &psprite->frames[i].frameptr, i);
-# else
-        if (frametype == SPR_SINGLE)    pframetype = (dSpriteFrameType_p)Mod_LoadSpriteFrame(pframetype + 1, &psprite->frames[i].frameptr);
-        else                            pframetype = (dSpriteFrameType_p)Mod_LoadSpriteGroup(pframetype + 1, &psprite->frames[i].frameptr);
-# endif
-#else
+
         switch (frametype) {
         case SPR_SINGLE: {
             pframetype = (dSpriteFrameType_p)Mod_LoadSpriteFrame(
                 pframetype + 1, &psprite->frames[i].frameptr
-# ifdef GLQUAKE
+#ifdef GLQUAKE
                 , i
-# endif
+#endif
             );
         } break;
         case SPR_GROUP: {
             pframetype = (dSpriteFrameType_p)Mod_LoadSpriteGroup(
                 pframetype + 1, &psprite->frames[i].frameptr
-# ifdef GLQUAKE
+#ifdef GLQUAKE
                 , i
-# endif
+#endif
             );
         } break;
         default: {
@@ -252,7 +244,6 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
         } break;
     }
 
-#endif
 }
     mod->type = mod_sprite;
 }

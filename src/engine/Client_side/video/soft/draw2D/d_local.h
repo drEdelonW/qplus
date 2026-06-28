@@ -66,8 +66,10 @@ extern void D_PolysetAff8Start();
 extern void D_PolysetAff8End();
 #endif
 
+#if 1   /* Z-buffer */
 extern int16_p  d_pzbuffer;
 extern uint32_t d_zrowbytes, d_zwidth;
+#endif
 
 extern int* d_pscantable;
 extern int      d_scantable[MAXHEIGHT];

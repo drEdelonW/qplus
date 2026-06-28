@@ -70,19 +70,76 @@ int   d_xdenom;
 EdgeTable_p pedgetable;
 
 EdgeTable_t edgetables[12] = {
-    {0, 1, {&_p[0], &_p[2], NULL},  2, {&_p[0], &_p[1], &_p[2]}},
-    {0, 2, {&_p[1], &_p[0], &_p[2]},1, {&_p[1], &_p[2], NULL }},
-    {1, 1, {&_p[0], &_p[2], NULL},  1, {&_p[1], &_p[2], NULL }},
-    {0, 1, {&_p[1], &_p[0], NULL},  2, {&_p[1], &_p[2], &_p[0]}},
-    {0, 2, {&_p[0], &_p[2], &_p[1]},1, {&_p[0], &_p[1], NULL }},
-    {0, 1, {&_p[2], &_p[1], NULL},  1, {&_p[2], &_p[0], NULL }},
-    {0, 1, {&_p[2], &_p[1], NULL},  2, {&_p[2], &_p[0], &_p[1]}},
-    {0, 2, {&_p[2], &_p[1], &_p[0]},1, {&_p[2], &_p[0], NULL }},
-    {0, 1, {&_p[1], &_p[0], NULL},  1, {&_p[1], &_p[2], NULL }},
-    {1, 1, {&_p[2], &_p[1], NULL},  1, {&_p[0], &_p[1], NULL }},
-    {1, 1, {&_p[1], &_p[0], NULL},  1, {&_p[2], &_p[0], NULL }},
-    {0, 1, {&_p[0], &_p[2], NULL},  1, {&_p[0], &_p[1], NULL }},
+    {0, 1, {&_p[0], &_p[2], NULL  },    2, {&_p[0], &_p[1], &_p[2]}},
+    {0, 2, {&_p[1], &_p[0], &_p[2]},    1, {&_p[1], &_p[2], NULL  }},
+    {1, 1, {&_p[0], &_p[2], NULL  },    1, {&_p[1], &_p[2], NULL  }},
+    {0, 1, {&_p[1], &_p[0], NULL  },    2, {&_p[1], &_p[2], &_p[0]}},
+    {0, 2, {&_p[0], &_p[2], &_p[1]},    1, {&_p[0], &_p[1], NULL  }},
+    {0, 1, {&_p[2], &_p[1], NULL  },    1, {&_p[2], &_p[0], NULL  }},
+    {0, 1, {&_p[2], &_p[1], NULL  },    2, {&_p[2], &_p[0], &_p[1]}},
+    {0, 2, {&_p[2], &_p[1], &_p[0]},    1, {&_p[2], &_p[0], NULL  }},
+    {0, 1, {&_p[1], &_p[0], NULL  },    1, {&_p[1], &_p[2], NULL  }},
+    {1, 1, {&_p[2], &_p[1], NULL  },    1, {&_p[0], &_p[1], NULL  }},
+    {1, 1, {&_p[1], &_p[0], NULL  },    1, {&_p[2], &_p[0], NULL  }},
+    {0, 1, {&_p[0], &_p[2], NULL  },    1, {&_p[0], &_p[1], NULL  }},
 };
+
+static inline int getOrder() {
+    int edgetableindex = 0; // assume the vertices are already in top to bottom order
+    // determine which edges are right & left, and the order in which to rasterize them
+    if (_p[0].y >= _p[1].y) {
+        if (_p[0].y == _p[1].y)         return (_p[0].y < _p[2].y) ? 2 : 5;
+        else                    edgetableindex = 1;
+    }
+    /* */if (_p[0].y == _p[2].y)        return (edgetableindex) ? 8 : 9;
+    else if (_p[1].y == _p[2].y)        return (edgetableindex) ? 10 : 11;
+    if (_p[0].y > _p[2].y)      edgetableindex += 2;
+    if (_p[1].y > _p[2].y)      edgetableindex += 4;
+
+    return edgetableindex;
+}
+
+/*
+================
+D_PolysetSetEdgeTable
+================
+*/
+void D_PolysetSetEdgeTable() {
+    int edgetableindex = 0; // assume the vertices are already in top to bottom order
+
+    //
+    // determine which edges are right & left, and the order in which
+    // to rasterize them
+    //
+    if (_p[0].y >= _p[1].y) {
+        if (_p[0].y == _p[1].y) {
+            pedgetable = (_p[0].y < _p[2].y) ?
+                &edgetables[2] : &edgetables[5];
+
+            return;
+        }
+        else    edgetableindex = 1;
+
+    }
+
+    if (_p[0].y == _p[2].y) {
+        pedgetable = (edgetableindex) ?
+            &edgetables[8] : &edgetables[9];
+
+        return;
+    }
+    else if (_p[1].y == _p[2].y) {
+        pedgetable = (edgetableindex) ?
+            &edgetables[10] : &edgetables[11];
+
+        return;
+    }
+
+    if (_p[0].y > _p[2].y)      edgetableindex += 2;
+    if (_p[1].y > _p[2].y)      edgetableindex += 4;
+
+    pedgetable = &edgetables[edgetableindex];
+}
 
 // FIXME: some of these can become statics
 int a_sstepxfrac, a_tstepxfrac;
@@ -119,7 +176,7 @@ void D_PolysetCalcGradients(int skinwidth);
 void D_DrawSubdiv();
 void D_DrawNonSubdiv();
 void D_PolysetRecursiveTriangle(VertAttr_p p1, VertAttr_p p2, VertAttr_p p3);
-void D_PolysetSetEdgeTable();
+// void D_PolysetSetEdgeTable();
 void D_RasterizeAliasPolySmooth();
 void D_PolysetScanLeftEdge(int height);
 
@@ -247,7 +304,11 @@ void D_DrawNonSubdiv() {
             if (index2->flags & ALIAS_ONSEAM)   _p[2].s += r_affinetridesc.seamfixupX16;
         }
 
+#if 0
         D_PolysetSetEdgeTable();
+#else
+        pedgetable = &edgetables[getOrder()];
+#endif
         D_RasterizeAliasPolySmooth();
     }
 }
@@ -378,7 +439,7 @@ D_PolysetScanLeftEdge
 */
 void D_PolysetScanLeftEdge(int height) {
     do {
-        * d_pedgespanpackage = d_snap;
+        *d_pedgespanpackage = d_snap;
         d_pedgespanpackage++;
 
         errorterm += erroradjustup;
@@ -645,7 +706,7 @@ void D_RasterizeAliasPolySmooth() {
     d_snap.ptex = (r_affinetridesc.pskin +
         FIXED16_TO_INT(plefttop->s) +
         FIXED16_TO_INT(plefttop->t) * r_affinetridesc.skinwidth
-    );
+        );
 #if id386
     d_snap.sfrac = (plefttop.s & 0xFFFF) << 16;
     d_snap.tfrac = (plefttop.t & 0xFFFF) << 16;
@@ -748,7 +809,7 @@ void D_RasterizeAliasPolySmooth() {
 
         if (height == 1) {
 
-            * d_pedgespanpackage = d_snap;
+            *d_pedgespanpackage = d_snap;
             d_pedgespanpackage++;
         }
         else {
@@ -839,50 +900,6 @@ void D_RasterizeAliasPolySmooth() {
         // mark end of the spanpackages
         D_PolysetDrawSpans8(pstart);
     }
-}
-
-
-/*
-================
-D_PolysetSetEdgeTable
-================
-*/
-void D_PolysetSetEdgeTable() {
-    int edgetableindex = 0; // assume the vertices are already in
-    //  top to bottom order
-
-//
-// determine which edges are right & left, and the order in which
-// to rasterize them
-//
-    if (_p[0].y >= _p[1].y) {
-        if (_p[0].y == _p[1].y) {
-            if (_p[0].y < _p[2].y)  pedgetable = &edgetables[2];
-            else                    pedgetable = &edgetables[5];
-
-            return;
-        }
-        else    edgetableindex = 1;
-
-    }
-
-    if (_p[0].y == _p[2].y) {
-        if (edgetableindex)     pedgetable = &edgetables[8];
-        else                    pedgetable = &edgetables[9];
-
-        return;
-    }
-    else if (_p[1].y == _p[2].y) {
-        if (edgetableindex)     pedgetable = &edgetables[10];
-        else                    pedgetable = &edgetables[11];
-
-        return;
-    }
-
-    if (_p[0].y > _p[2].y)      edgetableindex += 2;
-    if (_p[1].y > _p[2].y)      edgetableindex += 4;
-
-    pedgetable = &edgetables[edgetableindex];
 }
 
 

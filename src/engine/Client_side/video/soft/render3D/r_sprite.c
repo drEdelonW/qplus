@@ -186,7 +186,9 @@ R_GetSpriteframe
 */
 mSpriteFrame_p R_GetSpriteframe(mSprite_p psprite) { // TODO: seems like OpenGL function as is
     int frame = currententity->frame;
-    if ((frame >= psprite->numframes) || (frame < 0)) {
+    if ((frame >= psprite->numframes) ||
+        (frame < 0)
+        ) {
         Con_Printf("R_DrawSprite: no such frame %d\n", frame);
         frame = 0;
     }

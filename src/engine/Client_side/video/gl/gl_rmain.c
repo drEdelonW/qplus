@@ -140,7 +140,9 @@ R_GetSpriteFrame
 mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) { // TODO: seems like software function as is
     mSprite_p psprite = currententity->model->cache.data;
     int frame = currententity->frame;
-    if ((frame >= psprite->numframes) || (frame < 0)) {
+    if ((frame >= psprite->numframes) ||
+        (frame < 0)
+        ) {
         Con_Printf("R_DrawSprite: no such frame %d\n", frame);
         frame = 0;
     }
@@ -199,9 +201,9 @@ void R_DrawSpriteModel(r_Entity_p e) {
     GL_Bind(frame->gl_texturenum);
     glEnable(GL_ALPHA_TEST); {
         glBegin(GL_QUADS); {
-            glTexCoord2f(0.0f, 1.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->down, up), frame->left,  right).v);
-            glTexCoord2f(0.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->up,   up), frame->left,  right).v);
-            glTexCoord2f(1.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->up,   up), frame->right, right).v);
+            glTexCoord2f(0.0f, 1.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->down, up), frame->left, right).v);
+            glTexCoord2f(0.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->up, up), frame->left, right).v);
+            glTexCoord2f(1.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->up, up), frame->right, right).v);
             glTexCoord2f(1.0f, 1.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->down, up), frame->right, right).v);
         } glEnd();
     } glDisable(GL_ALPHA_TEST);

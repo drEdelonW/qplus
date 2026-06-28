@@ -61,11 +61,6 @@ typedef struct {
 // } ScreenPart_t; // ???
 
 
-typedef struct {
-    int     u, v;
-    float   zi;
-    int     color;
-} zPointDesc_t;
 
 
 extern int  d_spanpixcount;
@@ -75,12 +70,11 @@ extern bool r_drawculledpolys;          // 1 if driver wants clipped polygons th
 extern bool r_worldpolysbacktofront;    // 1 if driver wants polygons delivered back to front rather than front to back
 extern bool r_recursiveaffinetriangles; // true if a driver wants to use recursive triangular subdivison and vertex drawing via D_PolysetDrawFinalVerts() past a certain distance (normally only used by the software driver)
 extern float r_aliasuvscale;            // scale-up factor for screen u and v on Alias vertices passed to driver
-extern int  r_pixbytes;
+extern int  r_pixbytes; // TODO: make enum and move to VID
 extern bool r_dowarp;
 
 extern AffineTriDesc_t r_affinetridesc;
 extern SpriteDesc_t r_spritedesc;
-extern zPointDesc_t r_zpointdesc;
 extern PolyDesc_t r_polydesc;
 
 extern int d_con_indirect; // if 0, Quake will draw console directly to vid.scr.pBuff; if 1, Quake will draw console via D_DrawRect. Must be defined by driver
@@ -96,7 +90,6 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts);
 void D_DrawPoly();
 void D_DrawSprite();
 void D_DrawSurfaces();
-// void D_DrawZPoint();     //NOT USED
 void D_EnableBackBufferAccess();
 void D_Init();
 void D_ViewChanged();

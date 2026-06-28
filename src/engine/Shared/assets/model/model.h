@@ -46,9 +46,6 @@ extern uint8_p mod_base;
 #define getMapLumpPtr(Lump_p) \
     (TypeLess_ptr)(mod_base + Lump_p->fileOfs)
 
-#ifdef GLQUAKE
-// #   define _loadModel loadmodel
-#endif
 extern Model_p _loadModel;
 
 /*
@@ -84,7 +81,7 @@ extern "C" {
     void Mod_TouchModel(cString name);
     void Mod_Print();
 
-    void    PrintFrameName(Model_p mdl, int frame);
+    void PrintFrameName(Model_p mdl, int frame);
 
 #ifdef __cplusplus
 }

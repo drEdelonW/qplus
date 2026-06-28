@@ -20,12 +20,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // d_zpoint.c: software driver module for drawing z-buffered points
 
 #include "d_local.h"
+#include "types.h"
 
 /*
 =====================
 D_DrawZPoint
 =====================
 */
+
+
+typedef struct {
+    int     u, v;
+    float   zi;
+    int     color;
+} zPointDesc_t;
+
+// extern zPointDesc_t r_zpointdesc;
+zPointDesc_t    r_zpointdesc;
+
+// void D_DrawZPoint();     //NOT USED
 void D_DrawZPoint() {
     int16_p pz = d_pzbuffer + (d_zwidth * r_zpointdesc.v) + r_zpointdesc.u;
     uint8_p pdest = d_viewbuffer + d_scantable[r_zpointdesc.v] + r_zpointdesc.u;

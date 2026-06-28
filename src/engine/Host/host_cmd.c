@@ -1256,7 +1256,7 @@ void Host_Viewnext_f() {
     Model_p mdl = cl.model_precache[(int)eDict->v.modelindex];
     eDict->v.frame++;
     if (eDict->v.frame >= mdl->numframes)
-        eDict->v.frame = (float)mdl->numframes - 1;
+        eDict->v.frame = (float)(mdl->numframes - 1);
 
     PrintFrameName(mdl, (int)eDict->v.frame);
 }

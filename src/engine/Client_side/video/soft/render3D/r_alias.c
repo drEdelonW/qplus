@@ -102,7 +102,8 @@ bool R_AliasCheckBBox() {
     int frame = currententity->frame;
     // TODO: don't repeat this check when drawing?
     if ((frame >= pmdl->numframes) ||
-        (frame < 0)) {
+        (frame < 0)
+        ) {
         Con_DPrintf("No such frame %d %s\n", frame,
             _pmodel->name);
         frame = 0;
