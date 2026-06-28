@@ -362,7 +362,7 @@ void VID_InitExtra() {
                 vesa_extra[nummodes].vesamode = modeinfo.modenum | LINEAR_MODE;
                 vesa_extra[nummodes].pages[0] = 0;
                 vesa_extra[nummodes].pages[1] = modeinfo.pagesize;
-                vesa_extra[nummodes].pages[2] = modeinfo.pagesize * 2;
+                vesa_extra[nummodes].pages[2] = TWICE(modeinfo.pagesize);
                 vesa_modes[nummodes].numpages = modeinfo.numpages;
 
                 vesa_modes[nummodes].begindirectrect = VGA_BeginDirectRect;
@@ -388,7 +388,7 @@ void VID_InitExtra() {
                     VGA_BankedBeginDirectRect;
                 vesa_modes[nummodes].enddirectrect = VGA_BankedEndDirectRect;
                 vesa_extra[nummodes].pages[1] = modeinfo.pagesize;
-                vesa_extra[nummodes].pages[2] = modeinfo.pagesize * 2;
+                vesa_extra[nummodes].pages[2] = TWICE(modeinfo.pagesize);
                 vesa_modes[nummodes].numpages = modeinfo.numpages;
             }
 

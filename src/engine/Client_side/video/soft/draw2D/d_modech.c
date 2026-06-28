@@ -62,7 +62,7 @@ void D_ViewChanged() {
     if (yscale > xscale)
         scale_for_mip = yscale;
 
-    d_zrowbytes = vid.scr.width * 2;
+    d_zrowbytes = TWICE(vid.scr.width);
     d_zwidth = vid.scr.width;
 
     d_pix_min = r_refdef.vrect.width / 320;

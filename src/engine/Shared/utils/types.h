@@ -30,6 +30,7 @@ typedef void* TypeLess_ptr;
 // Pointers to standard integer types
 typedef int8_t* int8_p;
 typedef uint8_t* uint8_p;
+typedef uint8_p* uint8_ar;
 typedef int16_t* int16_p;
 typedef uint16_t* uint16_p;
 typedef int32_t* int32_p;

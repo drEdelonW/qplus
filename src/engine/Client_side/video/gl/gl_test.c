@@ -72,7 +72,7 @@ void Test_Spawn(vec3_t origin) {
     VectorNormalize(incoming);
     float d = DotProduct(incoming, plane->normal);
     p->reflect = VectorSubtract(vec3_origin, incoming);
-    p->reflect = VectorMA(p->reflect, d * 2, plane->normal);
+    p->reflect = VectorMA(p->reflect, d * 2.0f, plane->normal);
 
     p->origin = origin;
     p->normal = plane->normal;
@@ -141,7 +141,7 @@ void DrawPuff(puff_p p) {
         glVertex3fv(pts[1][2]);
     } glEnd();
 
-    p->length -= host_frametime * 2;
+    p->length -= host_frametime * 2.0f;
 }
 
 

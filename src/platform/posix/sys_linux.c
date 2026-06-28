@@ -216,7 +216,7 @@ int main(int c, cStringArray v) {
         printf("Linux Quake -- Version %0.3f\n", LINUX_VERSION);
     }
 
-    LegacyTimeStamp_t oldtime = Sys_FloatTime() - 0.1;
+    LegacyTimeStamp_t oldtime = Sys_FloatTime() - 0.1f;
     while (1) {
         LegacyTimeStamp_t newtime = Sys_FloatTime();
         LegacyTimeStamp_t time = newtime - oldtime;    // find time spent rendering last frame
@@ -232,7 +232,7 @@ int main(int c, cStringArray v) {
             time = sys_ticrate.value;
         }
 
-        if (time > (sys_ticrate.value * 2))     oldtime = newtime;
+        if (time > (sys_ticrate.value * 2.0f))     oldtime = newtime;
         else                                    oldtime += time;
 
 

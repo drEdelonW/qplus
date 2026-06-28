@@ -167,7 +167,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {}
 void CenterWindow(HWND hWndCenter, int width, int height, BOOL lefttopjustify) {
     int CenterX = HALF(GetSystemMetrics(SM_CXSCREEN) - width);
     int CenterY = HALF(GetSystemMetrics(SM_CYSCREEN) - height);
-    if (CenterX > CenterY * 2)        CenterX = HALF(CenterX);    // dual screens
+    if (CenterX > TWICE(CenterY))        CenterX = HALF(CenterX);    // dual screens
     CenterX = (CenterX < 0) ? 0 : CenterX;
     CenterY = (CenterY < 0) ? 0 : CenterY;
     SetWindowPos(

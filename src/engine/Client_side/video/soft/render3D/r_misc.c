@@ -127,7 +127,7 @@ void R_LineGraph(int x, int y, int h) {
         dest[0] = (i < h) ? GRAPH_FG : GRAPH_BG;
 
         dest[-vid.rowbytes] = GRAPH_BG;
-        dest -= (vid.rowbytes * 2);
+        dest -= TWICE(vid.rowbytes);
     }
 }
 

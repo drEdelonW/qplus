@@ -745,8 +745,8 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
             if ((((devmode.dmPelsWidth <= MAXWIDTH) &&
                 (devmode.dmPelsHeight <= MAXHEIGHT)) ||
                 (!COM_CheckParm("-noadjustaspect") &&
-                    (devmode.dmPelsWidth <= (MAXWIDTH * 2)) &&
-                    (devmode.dmPelsWidth > (devmode.dmPelsHeight * 2)))) &&
+                    (devmode.dmPelsWidth <= TWICE(MAXWIDTH)) &&
+                    (devmode.dmPelsWidth > TWICE(devmode.dmPelsHeight)))) &&
                 (nummodes < MAX_MODE_LIST) &&
                 (devmode.dmBitsPerPel > 8)) {
                 devmode.dmFields = DM_BITSPERPEL |
@@ -772,7 +772,7 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                     // if the width is more than twice the height, reduce it by half because this
                     // is probably a dual-screen monitor
                     if (!COM_CheckParm("-noadjustaspect")) {
-                        if (modelist[nummodes].width > (modelist[nummodes].height * 2)) {
+                        if (modelist[nummodes].width > TWICE(modelist[nummodes].height)) {
                             modelist[nummodes].width = HALF(modelist[nummodes].width);
                             modelist[nummodes].halfscreen = 1;
                             snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),

@@ -45,7 +45,7 @@ int current_mode;
 
 int num_shades = 32;
 
-struct{
+struct {
     cString name;
     int num;
 } mice[] = {
@@ -321,7 +321,7 @@ int get_mode(cString name, int width, int height, int depth) {
     int i;
     int ok, match;
 
-    match = (!!width) + (!!height) * 2 + (!!depth) * 4;
+    match = (!!width) | ((!!height) << 1) | ((!!depth) << 2);
 
     if (name) {
         i = vga_getmodenumber(name);
@@ -333,9 +333,9 @@ int get_mode(cString name, int width, int height, int depth) {
     else {
         for (i = 0; i < num_modes; i++)
             if (modes[i].width) {
-                ok = (modes[i].width == width)
-                    + (modes[i].height == height) * 2
-                    + (modes[i].bytesperpixel == depth / 8) * 4;
+                ok = ((modes[i].width == width) << 0) |
+                    ((modes[i].height == height) << 1) |
+                    ((modes[i].bytesperpixel == EIGHTH(depth)) << 2);
                 if ((ok & match) == ok)
                     break;
             }
@@ -749,7 +749,7 @@ void VID_DitherOn() {
 
 void VID_DitherOff() {
     if (dither) {
-		// R_ViewChanged (&vrect, sb_lines, scr.aspect);
+        // R_ViewChanged (&vrect, sb_lines, scr.aspect);
         dither = false;
     }
 }

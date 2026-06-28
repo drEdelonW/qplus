@@ -857,9 +857,9 @@ void V_RenderView() {
 
         R_PushDlights();
 
-        r_refdef.viewangles.yaw += lcd_yaw.value * 2;
+        r_refdef.viewangles.yaw += lcd_yaw.value * 2.0f;
 
-        r_refdef.vieworg = VectorMA(r_refdef.vieworg, 2 * lcd_x.value, _bs.right);
+        r_refdef.vieworg = VectorMA(r_refdef.vieworg, lcd_x.value * 2.0f, _bs.right);
         R_RenderView();
         vid.scr.pBuff -= HALF(vid.rowbytes);
 

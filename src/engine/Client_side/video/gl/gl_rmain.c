@@ -472,9 +472,9 @@ void R_DrawAliasModel(r_Entity_p e) {
         );
         // double size of eyes, since they are really hard to see in gl
         glScalef(
-            pAliasHdr->scale.x * 2,
-            pAliasHdr->scale.y * 2,
-            pAliasHdr->scale.z * 2
+            pAliasHdr->scale.x * 2.0f,
+            pAliasHdr->scale.y * 2.0f,
+            pAliasHdr->scale.z * 2.0f
         );
     }
     else {

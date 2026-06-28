@@ -11,7 +11,7 @@ WritePCXfile
 ==============
 */
 void WritePCXfile(cString filename, uint8_p data, int width, int height, int rowbytes, uint8_p palette) {
-    pcx_p pcx = Hunk_TempAlloc(width * height * 2 + 1000);
+    pcx_p pcx = Hunk_TempAlloc(TWICE(width * height) + 1000);
     if (pcx == NULL) {
         Con_Printf("SCR_ScreenShot_f: not enough memory\n");
         return;

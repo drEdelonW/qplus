@@ -170,7 +170,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
     // push down from a step height above the wished position
     neworg.z += STEPSIZE;
     vec3_t end = neworg;
-    end.z -= STEPSIZE * 2;
+    end.z -= STEPSIZE * 2.0f;
 
     trace_t trace = SV_Move(neworg, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
 

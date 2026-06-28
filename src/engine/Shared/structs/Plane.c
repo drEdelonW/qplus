@@ -101,7 +101,7 @@ void Mod_LoadPlanes(Lump_p Lump_in) {
     if (Lump_in->fileLen % sizeof(*in))        Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);
-    mPlane_p out = Hunk_AllocName(count * 2 * sizeof(*out), Mod_loadName);
+    mPlane_p out = Hunk_AllocName(TWICE(count) * sizeof(*out), Mod_loadName);
 
     _loadModel->planes = out;
     _loadModel->numplanes = count;

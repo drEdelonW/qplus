@@ -116,7 +116,7 @@ void VID_Update(vRect_p rects) {
 #if 0
             LCD_BG_LAYER_ADDRESS[(x + y * LCD_SCREEN_WIDTH) + ofs] = argb;
 #else
-            int base = ofs + (x * 2) + (y * 2) * LCD_SCREEN_WIDTH;
+            int base = ofs + TWICE(x) + TWICE(y) * LCD_SCREEN_WIDTH;
 
             LCD_BG_LAYER_ADDRESS[base] = argb;
             LCD_BG_LAYER_ADDRESS[base + 1] = argb;

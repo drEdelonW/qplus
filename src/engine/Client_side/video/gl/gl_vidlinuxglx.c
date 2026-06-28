@@ -338,12 +338,12 @@ static void HandleEvents() {
         case MotionNotify: {
             if (_isMouseActive) {
                 if (dgamouse) {
-                    _mx += (event.xmotion.x + _winX) * 2;
-                    _my += (event.xmotion.y + _winY) * 2;
+                    _mx += TWICE(event.xmotion.x + _winX);
+                    _my += TWICE(event.xmotion.y + _winY);
                 }
                 else {
-                    _mx += ((int)event.xmotion.x - mwx) * 2;
-                    _my += ((int)event.xmotion.y - mwy) * 2;
+                    _mx += TWICE((int)event.xmotion.x - mwx);
+                    _my += TWICE((int)event.xmotion.y - mwy);
                     mwx = event.xmotion.x;
                     mwy = event.xmotion.y;
 
