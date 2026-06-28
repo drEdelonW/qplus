@@ -451,7 +451,7 @@ void R_MarkLeaves() {
     uint8_p vis = Mod_LeafPVS(r_viewleaf, cl.worldmodel);
 
     for (int i = 0; i < cl.worldmodel->numleafs; i++) {
-        if (vis[i >> 3] & (1 << (i & 7))) {
+        if (vis[EIGHTH(i)] & (1 << (i & 7))) {
             mNode_p node = (mNode_p)&cl.worldmodel->leafs[i + 1];
             do {
                 if (node->visframe == r_visframecount)

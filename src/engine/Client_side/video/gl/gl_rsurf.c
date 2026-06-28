@@ -78,8 +78,8 @@ R_AddDynamicLights
 ===============
 */
 void R_AddDynamicLights(mSurface_p surf) {
-    int smax = (surf->extents[S_AX] >> 4) + 1;
-    int tmax = (surf->extents[T_AX] >> 4) + 1;
+    int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
+    int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
     mTexInfo_p tex = surf->texinfo;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
@@ -135,8 +135,8 @@ Combine and scale multiple lightmaps into the 8.8 format in blocklights
 void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
     surf->cached_dlight = (surf->dlightframe == r_framecount);
 
-    int smax = (surf->extents[S_AX] >> 4) + 1;
-    int tmax = (surf->extents[T_AX] >> 4) + 1;
+    int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
+    int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
     int size = smax * tmax;
     uint8_p lightmap = surf->samples;
 
@@ -155,7 +155,7 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
         // add all the lightmaps
         if (lightmap)
             for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 255); maps++) {
-                uint32_t scale = d_lightstylevalue[surf->styles[maps]];
+                fixed8_t scale = d_lightstylevalue[surf->styles[maps]];
                 surf->cached_light[maps] = scale;    // 8.8 fraction
                 for (int i = 0; i < size; i++)
                     blocklights[i] += lightmap[i] * scale;
@@ -725,8 +725,8 @@ void R_RenderBrushPoly(mSurface_p fa) {
                         theRect->w += theRect->l - fa->light_s;
                     theRect->l = fa->light_s;
                 }
-                int smax = (fa->extents[S_AX] >> 4) + 1;
-                int tmax = (fa->extents[T_AX] >> 4) + 1;
+                int smax = FIXED4_TO_INT(fa->extents[S_AX]) + 1;
+                int tmax = FIXED4_TO_INT(fa->extents[T_AX]) + 1;
                 if ((theRect->w + theRect->l) < (fa->light_s + smax))   theRect->w = (fa->light_s - theRect->l) + smax;
                 if ((theRect->h + theRect->t) < (fa->light_t + tmax))   theRect->h = (fa->light_t - theRect->t) + tmax;
 
@@ -776,8 +776,8 @@ void R_RenderDynamicLightmaps(mSurface_p fa) {
                         theRect->w += theRect->l - fa->light_s;
                     theRect->l = fa->light_s;
                 }
-                int smax = (fa->extents[S_AX] >> 4) + 1;
-                int tmax = (fa->extents[T_AX] >> 4) + 1;
+                int smax = FIXED4_TO_INT(fa->extents[S_AX]) + 1;
+                int tmax = FIXED4_TO_INT(fa->extents[T_AX]) + 1;
                 if ((theRect->w + theRect->l) < (fa->light_s + smax))   theRect->w = (fa->light_s - theRect->l) + smax;
                 if ((theRect->h + theRect->t) < (fa->light_t + tmax))   theRect->h = (fa->light_t - theRect->t) + tmax;
 
@@ -1220,7 +1220,7 @@ void R_MarkLeaves() {
         vis = Mod_LeafPVS(r_viewleaf, cl.worldmodel);
     }
     else {
-        memset(solid, 0xFF, (cl.worldmodel->numleafs + 7) >> 3);
+        memset(solid, 0xFF, EIGHTH(cl.worldmodel->numleafs + 7));
         vis = solid;
     }
 
@@ -1388,8 +1388,8 @@ void GL_CreateSurfaceLightmap(mSurface_p surf) {
     if (surf->flags & (SURF_DRAWSKY | SURF_DRAWTURB))
         return;
 
-    int smax = (surf->extents[S_AX] >> 4) + 1;
-    int tmax = (surf->extents[T_AX] >> 4) + 1;
+    int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
+    int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
 
     surf->lightmaptexturenum = AllocBlock(smax, tmax, &surf->light_s, &surf->light_t);
     byte* base = lightmaps + surf->lightmaptexturenum * lightmap_bytes * BLOCK_WIDTH * BLOCK_HEIGHT;

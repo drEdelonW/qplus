@@ -90,7 +90,7 @@ int16_t NetMsg::ReadShort() {
         return 0;
     }
 
-    int c = (int16_t)(
+    int16_t c = (int16_t)(
         _sb->data[_readCount] +
         (_sb->data[_readCount + 1] << 8)
         );

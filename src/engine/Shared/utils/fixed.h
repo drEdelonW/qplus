@@ -2,29 +2,6 @@
 #pragma once
 #include "types.h"
 
-// -- Types -------------------------------------------------------------------
-
-// typedef int         fixed4_t; // not used
-// typedef uint8_t     fixed4_t; // ?
-
-// typedef int         fixed8_t; // DO NOT USE int!!!
-typedef int16_t     fixed8_t;   // 8.8   signed !!!MUST BE SIGNED!!!
-typedef fixed8_t*   fixed8_p;
-
-// typedef int         fixed16_t; // DO NOT USE int!!!
-typedef int32_t     fixed16_t;  // 16.16 signed !!!MUST BE SIGNED!!!
-// typedef int16_t     fixed16_t; // X
-typedef fixed16_t*  fixed16_p;
-
-
-// -- Constants ----------------------------------------------------------------
-
-#define FIXED8_FRAC_BITS    8
-#define FIXED8_ONE          (1 << FIXED8_FRAC_BITS)
-
-#define FIXED16_FRAC_BITS   16
-#define FIXED16_ONE         (1 << FIXED16_FRAC_BITS)    // 1.0 в 16.16
-
 // -- Bit ops ------------------------------------------------------------------
 
 #define HALF(x)     ((x) >> 1)  /* fast divide by 2 */
@@ -51,7 +28,35 @@ typedef fixed16_t*  fixed16_p;
 #define DIV256(x)   ((x) >> 8)  /* fast divide by 256 */
 #define MUL256(x)   ((x) << 8)  /* fast multiply by 256 */
 
+// -- Types -------------------------------------------------------------------
+
+// typedef int8_t     fixed4_t;   // 4.4   signed !!!MUST BE SIGNED!!!
+// typedef uint8_t     fixed4_t;   // 4.4   signed !!!MUST BE SIGNED!!!
+typedef int16_t     fixed4_t;   // 12.4   signed !!!MUST BE SIGNED!!!
+typedef fixed4_t*   fixed4_p;
+
+typedef int16_t     fixed8_t;   // 8.8   signed !!!MUST BE SIGNED!!!
+typedef fixed8_t*   fixed8_p;
+
+typedef int32_t     fixed16_t;  // 16.16 signed !!!MUST BE SIGNED!!!
+typedef fixed16_t*  fixed16_p;
+
+
+// -- Constants ----------------------------------------------------------------
+
+#define FIXED4_FRAC_BITS    4
+#define FIXED4_ONE          (1 << FIXED4_FRAC_BITS)
+
+#define FIXED8_FRAC_BITS    8
+#define FIXED8_ONE          (1 << FIXED8_FRAC_BITS)
+
+#define FIXED16_FRAC_BITS   16
+#define FIXED16_ONE         (1 << FIXED16_FRAC_BITS)    // 1.0 в 16.16
+
 // -- Conversion ---------------------------------------------------------------
+#define FIXED4_TO_INT(x)        ((x) >> FIXED4_FRAC_BITS)
+#define INT_TO_FIXED4(x)        ((fixed4_t)(x) << FIXED4_FRAC_BITS)
+#define FIXED4_FRAC(x)          ((x) & (FIXED4_ONE - 1))    // Frac part (x & 0x0F)
 
 #define FIXED8_TO_INT(x)        ((x) >> FIXED8_FRAC_BITS)
 #define INT_TO_FIXED8(x)        ((fixed8_t)(x) << FIXED8_FRAC_BITS)

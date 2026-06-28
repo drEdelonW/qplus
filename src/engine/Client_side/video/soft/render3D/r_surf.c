@@ -26,17 +26,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 DrawSurf_t r_drawsurf;
 
-int    lightleft, sourcesstep, blocksize, sourcetstep;
-int    lightdelta, lightdeltastep;
-int    lightright, lightleftstep, lightrightstep, blockdivshift;
-uint32_t  blockdivmask;
+int sourcetstep;
+int blocksize;
+int lightleft;
+int lightright;
+int blockdivshift;
+int lightleftstep, lightrightstep;
 TypeLess_ptr prowdestbase;
 uint8_p pbasesource;
-int    surfrowbytes; // used by ASM files
-uint32_p r_lightptr;
-int    r_stepback;
-int    r_lightwidth;
-int    r_numhblocks, r_numvblocks;
+int surfrowbytes; // used by ASM files
+int r_stepback;
+int r_lightwidth;
+int r_numhblocks, r_numvblocks;
 uint8_p r_source;
 uint8_p r_sourcemax;
 
@@ -53,8 +54,8 @@ static void (*surfmiptable[MIPLEVELS])() = {
 };
 
 
-
-fixed8_t  blocklights[18 * 18];
+fixed16_p r_lightptr;
+fixed16_t  blocklights[18 * 18];
 
 /*
 ===============
@@ -63,8 +64,8 @@ R_AddDynamicLights
 */
 void R_AddDynamicLights() {
     mSurface_p surf = r_drawsurf.surf;
-    int smax = (surf->extents[S_AX] >> 4) + 1;
-    int tmax = (surf->extents[T_AX] >> 4) + 1;
+    int smax = (FIXED4_TO_INT(surf->extents[S_AX])) + 1;
+    int tmax = (FIXED4_TO_INT(surf->extents[T_AX])) + 1;
     mTexInfo_p tex = surf->texinfo;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
@@ -124,8 +125,8 @@ Combine and scale multiple lightmaps into the 8.8 format in blocklights
 */
 void R_BuildLightMap() {
     mSurface_p surf = r_drawsurf.surf;
-    int smax = (surf->extents[S_AX] >> 4) + 1;
-    int tmax = (surf->extents[T_AX] >> 4) + 1;
+    int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
+    int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
     int size = smax * tmax;
     uint8_p lightmap = surf->samples;
 
@@ -139,7 +140,7 @@ void R_BuildLightMap() {
 
     // clear to ambient
     for (int i = 0; i < size; i++)
-        blocklights[i] = r_refdef.ambientlight << 8;
+        blocklights[i] = INT_TO_FIXED8(r_refdef.ambientlight);
 
 
     // add all the lightmaps
@@ -221,9 +222,9 @@ void R_DrawSurface() {
 
     blocksize = 16 >> r_drawsurf.surfmip;
     blockdivshift = 4 - r_drawsurf.surfmip;
-    blockdivmask = (1 << blockdivshift) - 1;
+    // blockdivmask = (1 << blockdivshift) - 1;
 
-    r_lightwidth = (r_drawsurf.surf->extents[0] >> 4) + 1;
+    r_lightwidth = FIXED4_TO_INT(r_drawsurf.surf->extents[0]) + 1;
     r_numhblocks = r_drawsurf.surfwidth >> blockdivshift;
     r_numvblocks = r_drawsurf.surfheight >> blockdivshift;
 
@@ -260,7 +261,7 @@ void R_DrawSurface() {
     ];
 
     uint8_p pcolumndest = r_drawsurf.surfdat;
-    for (int u = 0; u < r_numhblocks; u++) {
+    for (uint8_t u = 0; u < r_numhblocks; u++) {
         r_lightptr = blocklights + u;
         prowdestbase = pcolumndest;
         pbasesource = basetptr + soffset;
@@ -292,12 +293,12 @@ void R_DrawSurfaceBlock8_mip0() {   // nearest surfaces
         lightleft = r_lightptr[0];
         lightright = r_lightptr[1];
         r_lightptr += r_lightwidth;
-        lightleftstep = (r_lightptr[0] - lightleft) >> 4;
-        lightrightstep = (r_lightptr[1] - lightright) >> 4;
+        lightleftstep = DIV16(r_lightptr[0] - lightleft);
+        lightrightstep = DIV16(r_lightptr[1] - lightright);
 
         for (int i = 0; i < 16; i++) {
             int lighttemp = lightleft - lightright;
-            int lightstep = lighttemp >> 4;
+            int lightstep = DIV16(lighttemp);
             int light = lightright;
 
             for (int b = 15; b >= 0; b--) {
@@ -334,12 +335,12 @@ void R_DrawSurfaceBlock8_mip1() {
         lightleft = r_lightptr[0];
         lightright = r_lightptr[1];
         r_lightptr += r_lightwidth;
-        lightleftstep = (r_lightptr[0] - lightleft) >> 3;
-        lightrightstep = (r_lightptr[1] - lightright) >> 3;
+        lightleftstep = EIGHTH(r_lightptr[0] - lightleft);
+        lightrightstep = EIGHTH(r_lightptr[1] - lightright);
 
         for (int i = 0; i < 8; i++) {
             int lighttemp = lightleft - lightright;
-            int lightstep = lighttemp >> 3;
+            int lightstep = EIGHTH(lighttemp);
             int light = lightright;
 
             for (int b = 7; b >= 0; b--) {
@@ -376,13 +377,12 @@ void R_DrawSurfaceBlock8_mip2() {
         lightleft = r_lightptr[0];
         lightright = r_lightptr[1];
         r_lightptr += r_lightwidth;
-        lightleftstep = (r_lightptr[0] - lightleft) >> 2;
-        lightrightstep = (r_lightptr[1] - lightright) >> 2;
+        lightleftstep = QUARTER(r_lightptr[0] - lightleft);
+        lightrightstep = QUARTER(r_lightptr[1] - lightright);
 
         for (int i = 0; i < 4; i++) {
             int lighttemp = lightleft - lightright;
-            int lightstep = lighttemp >> 2;
-
+            int lightstep = QUARTER(lighttemp);
             int light = lightright;
 
             for (int b = 3; b >= 0; b--) {
@@ -424,7 +424,6 @@ void R_DrawSurfaceBlock8_mip3() {
 
         for (int i = 0; i < 2; i++) {
             int lightstep = HALF(lightleft - lightright);
-
             int light = lightright;
 
             for (int b = 1; b >= 0; b--) {
@@ -467,7 +466,7 @@ void R_DrawSurfaceBlock16() {
         for (int b = 0; b < blocksize; b++) {
             uint8_t pix = *psource;
             *pdest = vid.colormap16[(light & 0xFF00) + pix];
-            psource += sourcesstep;
+            // psource += sourcesstep;  // TODO: is this correct?
             pdest++;
             light += lightstep;
         }

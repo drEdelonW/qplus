@@ -115,10 +115,7 @@ void D_DrawSkyScans8(eSpan_p pspan) {
             }
 
             do {
-                *pdest++ = r_skysource[
-                    ((t & R_SKY_TMASK) >> 8) +
-                        (FIXED16_TO_INT(s & R_SKY_SMASK))
-                ];
+                *pdest++ = r_skysource[FIXED8_TO_INT(t & R_SKY_TMASK) + FIXED16_TO_INT(s & R_SKY_SMASK)];
                 s += sstep;
                 t += tstep;
             } while (--spancount > 0);

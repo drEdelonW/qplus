@@ -104,15 +104,15 @@ static int32_t r_shift, g_shift, b_shift;
 static uint32_t r_mask, g_mask, b_mask;
 
 void shiftmask_init() {
-    uint32_t x;
     r_mask = x_vis->red_mask;
     g_mask = x_vis->green_mask;
     b_mask = x_vis->blue_mask;
-    for (r_shift = -8, x = 1; x < r_mask; x = x << 1)
+    uint32_t x;
+    for (r_shift = -8, x = 1; x < r_mask; x = TWICE(x))
         r_shift++;
-    for (g_shift = -8, x = 1; x < g_mask; x = x << 1)
+    for (g_shift = -8, x = 1; x < g_mask; x = TWICE(x))
         g_shift++;
-    for (b_shift = -8, x = 1; x < b_mask; x = x << 1)
+    for (b_shift = -8, x = 1; x < b_mask; x = TWICE(x))
         b_shift++;
     shiftmask_fl = 1;
 }
@@ -121,15 +121,15 @@ PIXEL16 xlib_rgb16(int r, int g, int b) {
     if (shiftmask_fl == 0) shiftmask_init();
     PIXEL16 p = 0;
 
-    if (r_shift > 0)        p = (r << (r_shift)) & r_mask;
+    /* */if (r_shift > 0)   p = (r << (r_shift)) & r_mask;
     else if (r_shift < 0)   p = (r >> (-r_shift)) & r_mask;
     else                    p |= (r & r_mask);
 
-    if (g_shift > 0)        p |= (g << (g_shift)) & g_mask;
+    /* */if (g_shift > 0)   p |= (g << (g_shift)) & g_mask;
     else if (g_shift < 0)   p |= (g >> (-g_shift)) & g_mask;
     else                    p |= (g & g_mask);
 
-    if (b_shift > 0)        p |= (b << (b_shift)) & b_mask;
+    /* */if (b_shift > 0)   p |= (b << (b_shift)) & b_mask;
     else if (b_shift < 0)   p |= (b >> (-b_shift)) & b_mask;
     else                    p |= (b & b_mask);
 
@@ -140,15 +140,15 @@ PIXEL24 xlib_rgb24(int r, int g, int b) {
     if (shiftmask_fl == 0) shiftmask_init();
     PIXEL24 p = 0;
 
-    if (r_shift > 0)        p = (r << (r_shift)) & r_mask;
+    /* */if (r_shift > 0)   p = (r << (r_shift)) & r_mask;
     else if (r_shift < 0)   p = (r >> (-r_shift)) & r_mask;
     else                    p |= (r & r_mask);
 
-    if (g_shift > 0)        p |= (g << (g_shift)) & g_mask;
+    /* */if (g_shift > 0)   p |= (g << (g_shift)) & g_mask;
     else if (g_shift < 0)   p |= (g >> (-g_shift)) & g_mask;
     else                    p |= (g & g_mask);
 
-    if (b_shift > 0)        p |= (b << (b_shift)) & b_mask;
+    /* */if (b_shift > 0)   p |= (b << (b_shift)) & b_mask;
     else if (b_shift < 0)   p |= (b >> (-b_shift)) & b_mask;
     else                    p |= (b & b_mask);
 
@@ -357,7 +357,8 @@ void ResetSharedFrameBuffers() {
 
         // grab shared memory
 
-        int size = x_framebuffer[frm]->bytes_per_line *
+        int size =
+            x_framebuffer[frm]->bytes_per_line *
             x_framebuffer[frm]->height;
         if (size < minsize)
             Sys_Error("VID: Window must use at least %d bytes\n", minsize);
@@ -628,7 +629,7 @@ void VID_SetPalette(uint8_p palette) {
             memcpy(current_palette, palette, 768);
         XColor colors[256];
         for (int i = 0; i < 256; i++) {
-            colors[i] = (XColor) {
+            colors[i] = (XColor){
                 .pixel = i,
                 .flags = DoRed | DoGreen | DoBlue,
                 .red = palette[i * 3] * 257,

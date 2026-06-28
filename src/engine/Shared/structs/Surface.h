@@ -64,8 +64,8 @@ struct mSurface_s {
 #else
     SurfCache_p cachespots[MIPLEVELS];
 #endif
-    fixed16_t     texturemins[VECT_TX_DIM];
-    fixed16_t     extents[VECT_TX_DIM];
+    fixed4_t    texturemins[VECT_TX_DIM];
+    fixed4_t    extents[VECT_TX_DIM];
     mTexInfo_p  texinfo;
 
     // lighting info

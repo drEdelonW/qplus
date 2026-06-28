@@ -532,14 +532,8 @@ void Sbar_DrawInventory() {
         if (cl.items & (IT_SHOTGUN << i)) {
             float time = cl.item_gettime[i];
             int flashon = (int)((cl.time - time) * 10);
-            if (flashon >= 10) {
-                if (cl.stats[STAT_ACTIVEWEAPON] == (IT_SHOTGUN << i))
-                    flashon = 1;
-                else
-                    flashon = 0;
-            }
-            else
-                flashon = (flashon % 5) + 2;
+            flashon = (flashon >= 10) ?
+                (cl.stats[STAT_ACTIVEWEAPON] == (IT_SHOTGUN << i)) : (flashon % 5) + 2;
 
             Sbar_DrawPic(i * 24, -16, _sb.weapons[flashon][i]);
 

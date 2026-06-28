@@ -320,9 +320,9 @@ void CL_ParseUpdate(update_bits_t bits) {
     }
 
     if (bits & U_MOREBITS) {
-        int ext = MSG_ReadByte();
+        uint32_t ext = MSG_ReadByte();
         if (getMsgBadRead()) { Host_Error("CL_ParseUpdate: bad MOREBITS"); }
-        bits |= ((uint32_t)ext) << 8;
+        bits |= (ext) << 8;
     }
 
     int num = (bits & U_LONGENTITY) ? MSG_ReadShort() : MSG_ReadByte();

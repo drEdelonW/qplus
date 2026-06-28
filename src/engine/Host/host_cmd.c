@@ -835,7 +835,10 @@ Host_Color_f
 */
 void Host_Color_f() {
     if (Cmd_Argc() == 1) {
-        Con_Printf("\"color\" is \"%i %i\"\n", ((uint8_t)cl_color.value) >> 4, ((uint8_t)cl_color.value) & 0x0f);
+        Con_Printf("\"color\" is \"%i %i\"\n",
+            ((uint8_t)cl_color.value) >> 4,
+            ((uint8_t)cl_color.value) & 0x0f
+        );
         Con_Printf("color <0-13> [0-13]\n");
         return;
     }

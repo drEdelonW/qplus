@@ -146,8 +146,8 @@ void Key_Console(keycode_t key) {
         (key == K_MWHEELUP)
         ) {
         con.backscroll += 2;
-        if (con.backscroll > (con.totallines - (vid.scr.height >> 3) - 1))
-            con.backscroll = con.totallines - (vid.scr.height >> 3) - 1;
+        if (con.backscroll > (con.totallines - EIGHTH(vid.scr.height) - 1))
+            con.backscroll = con.totallines - EIGHTH(vid.scr.height) - 1;
         return;
     }
 
@@ -161,7 +161,7 @@ void Key_Console(keycode_t key) {
     }
 
     if (key == K_HOME) {
-        con.backscroll = con.totallines - (vid.scr.height >> 3) - 1;
+        con.backscroll = con.totallines - EIGHTH(vid.scr.height) - 1;
         return;
     }
 
@@ -230,8 +230,8 @@ void Key_Console(keycode_t key) {
     case K_PGUP:
     case K_MWHEELUP: {
         con.backscroll += 2;
-        if (con.backscroll > (con.totallines - (vid.scr.height >> 3) - 1))
-            con.backscroll = con.totallines - (vid.scr.height >> 3) - 1;
+        if (con.backscroll > (con.totallines - EIGHTH(vid.scr.height) - 1))
+            con.backscroll = con.totallines - EIGHTH(vid.scr.height) - 1;
     } return;
 
     case K_PGDN:
@@ -241,7 +241,7 @@ void Key_Console(keycode_t key) {
             con.backscroll = 0;
     } return;
 
-    case K_HOME: { con.backscroll = con.totallines - (vid.scr.height >> 3) - 1; } return;
+    case K_HOME: { con.backscroll = con.totallines - EIGHTH(vid.scr.height) - 1; } return;
     case K_END: { con.backscroll = 0; } return;
 
     case K_TAB: { // command completion

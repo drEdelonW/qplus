@@ -27,8 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 static uint8_p r_turb_pbase;
 static uint8_p r_turb_pdest;
-fixed16_t r_turb_s, r_turb_sstep;
-fixed16_t r_turb_t, r_turb_tstep;
+fixed4_t r_turb_s, r_turb_sstep;
+fixed4_t r_turb_t, r_turb_tstep;
 int* r_turb_turb;
 int r_turb_spancount;
 
@@ -187,8 +187,8 @@ void Turbulent8(eSpan_p pspan) {
                 else if (tnext < 16)
                     tnext = 16;    // guard against round-off error on <0 steps
 
-                r_turb_sstep = (snext - r_turb_s) >> 4;
-                r_turb_tstep = (tnext - r_turb_t) >> 4;
+                r_turb_sstep = FIXED4_TO_INT(snext - r_turb_s);
+                r_turb_tstep = FIXED4_TO_INT(tnext - r_turb_t);
             }
             else {
                 // calculate s/z, t/z, zi->fixed s and t at last pixel in span (so
@@ -315,8 +315,8 @@ void D_DrawSpans8(eSpan_p pspan) {
                 else if (tnext < 8)
                     tnext = 8;    // guard against round-off error on <0 steps
 
-                sstep = (snext - s) >> 3;
-                tstep = (tnext - t) >> 3;
+                sstep = EIGHTH(snext - s);
+                tstep = EIGHTH(tnext - t);
             }
             else {
                 // calculate s/z, t/z, zi->fixed s and t at last pixel in span (so

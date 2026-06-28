@@ -687,8 +687,8 @@ void D_RasterizeAliasPolySmooth() {
         FIXED16_TO_INT(plefttop->t) * r_affinetridesc.skinwidth
         );
 #if id386
-    d_snap.sfrac = FIXED16_FRAC(plefttop.s) << 16;
-    d_snap.tfrac = FIXED16_FRAC(plefttop.t) << 16;
+    d_snap.sfrac = FIXED16_FRAC(plefttop->s) << 16;
+    d_snap.tfrac = FIXED16_FRAC(plefttop->t) << 16;
 #else
     d_snap.sfrac = FIXED16_FRAC(plefttop->s);
     d_snap.tfrac = FIXED16_FRAC(plefttop->t);

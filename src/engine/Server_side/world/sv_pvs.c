@@ -53,7 +53,7 @@ void SV_AddToFatPVS(vec3_t org, mNode_p node) {
     =============
 */
 uint8_p SV_FatPVS(vec3_t org) {
-    _fatBytes = (sv.worldmodel->numleafs + 31) >> 3;
+    _fatBytes = EIGHTH(sv.worldmodel->numleafs + 31);
     Q_memset(_fatPvs, 0, _fatBytes);
     SV_AddToFatPVS(org, sv.worldmodel->nodes);
     return _fatPvs;

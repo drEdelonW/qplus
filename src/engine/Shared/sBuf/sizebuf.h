@@ -5,8 +5,8 @@ typedef struct sizebuf_s {
     bool    allowoverflow;  // if false, do a Sys_Error
     bool    overflowed;     // set to true if the buffer size failed
     uint8_p data;
-    size_t maxsize;
-    size_t cursize;
+    uint16_t maxsize;
+    uint16_t cursize; 
 } sizebuf_t;
 typedef sizebuf_t* sizebuf_p;
 

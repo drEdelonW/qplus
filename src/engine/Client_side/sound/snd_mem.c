@@ -57,19 +57,21 @@ void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cString data) {
 
     // resample / decimate to the current source rate
 
-    if (stepscale == 1 && inwidth == 1 && sc->width == 1) {
+    if ((stepscale == 1) &&
+        (inwidth == 1) &&
+        (sc->width == 1)) {
         // fast special case
         for (int i = 0; i < outcount; i++)
             ((int8_p)sc->data)[i] = ((int8_t)(data[i]) - 128);
     }
     else {
         // general case
-        int samplefrac = 0;
+        fixed8_t samplefrac = 0;
         int fracstep = (int)(stepscale * 256);
         for (int i = 0; i < outcount; i++) {
-            int srcsample = samplefrac >> 8;
+            int srcsample = FIXED8_TO_INT(samplefrac);
             samplefrac += fracstep;
-            int sample;
+            fixed8_t sample;    // TODO:  make data valid INT_TO_FIXED8()/FIXED8_TO_INT()
             if (inwidth == 2)   sample = LittleShort(((int16_p)data)[srcsample]);
             else                sample = (int)((uint8_t)(data[srcsample]) - 128) << 8;
 
@@ -163,8 +165,8 @@ int16_t GetLittleShort() {
 
 int32_t GetLittleLong() {
     return         (
-        (*(data_p + 0) << 0 ) |
-        (*(data_p + 1) << 8 ) |
+        (*(data_p + 0) << 0) |
+        (*(data_p + 1) << 8) |
         (*(data_p + 2) << 16) |
         (*(data_p + 3) << 24)) +
         4;
