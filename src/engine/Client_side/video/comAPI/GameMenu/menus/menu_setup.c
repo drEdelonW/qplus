@@ -71,7 +71,7 @@ void M_Setup_Draw() {
     }
 
     M_DrawTransPic(160, 64, Draw_CachePic("gfx/bigbox.lmp"));
-    M_BuildTranslationTable(_s.top * 16, _s.bottom * 16); {
+    M_BuildTranslationTable(MUL16(_s.top), MUL16(_s.bottom)); {
         M_DrawTransPicTranslate(172, 72, Draw_CachePic("gfx/menuplyr.lmp"));
     }
 

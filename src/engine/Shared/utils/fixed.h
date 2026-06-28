@@ -30,15 +30,15 @@
 
 // -- Types -------------------------------------------------------------------
 
-// typedef int8_t     fixed4_t;   // 4.4   signed !!!MUST BE SIGNED!!!
-// typedef uint8_t     fixed4_t;   // 4.4   signed !!!MUST BE SIGNED!!!
-typedef int16_t     fixed4_t;   // 12.4   signed !!!MUST BE SIGNED!!!
+
+typedef uint16_t     fixed4_t;   // 12.4   unsigned
+// typedef int16_t     fixed4_t;   // 11.4   signed
 typedef fixed4_t*   fixed4_p;
 
-typedef int16_t     fixed8_t;   // 8.8   signed !!!MUST BE SIGNED!!!
+typedef int16_t     fixed8_t;   // 7.8   signed !!!MUST BE SIGNED!!!
 typedef fixed8_t*   fixed8_p;
 
-typedef int32_t     fixed16_t;  // 16.16 signed !!!MUST BE SIGNED!!!
+typedef int32_t     fixed16_t;  // 15.16 signed !!!MUST BE SIGNED!!!
 typedef fixed16_t*  fixed16_p;
 
 

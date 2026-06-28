@@ -88,11 +88,11 @@ void R_AddDynamicLights() {
         };
 
         for (int t = 0; t < tmax; t++) {
-            int td = local.t - t * 16;
-            if (td < 0)
-                td = -td;
+            int td = local.t - MUL16(t);
+            if (td < 0)     td = -td;
+
             for (int s = 0; s < smax; s++) {
-                int sd = local.s - s * 16;
+                int sd = local.s - MUL16(s);
                 if (sd < 0)     sd = -sd;
                 if (sd > td)    dist = sd + HALF(td);
                 else            dist = td + HALF(sd);

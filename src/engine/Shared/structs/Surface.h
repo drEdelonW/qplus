@@ -56,7 +56,8 @@ struct mSurface_s {
     // surface generation data
 #ifdef GLQUAKE
     mSurface_p  texturechain;
-    int         light_s, light_t;           // gl lightmap coordinates
+    int         light_s;
+    int         light_t;           // gl lightmap coordinates
     glpoly_p    polys;                      // multiple if warped
     int         lightmaptexturenum;
     int         cached_light[MAXLIGHTMAPS]; // values currently used in lightmap
@@ -64,7 +65,7 @@ struct mSurface_s {
 #else
     SurfCache_p cachespots[MIPLEVELS];
 #endif
-    fixed4_t    texturemins[VECT_TX_DIM];
+    fixed4_t    texturemins[VECT_TX_DIM];   // TODO: check is it fixed4_ jh fixed16_t
     fixed4_t    extents[VECT_TX_DIM];
     mTexInfo_p  texinfo;
 

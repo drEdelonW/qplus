@@ -252,22 +252,23 @@ float Q_atof(cStringRO str) {
     if (*str == '-') { sign = -1;   str++; }
     else                sign = 1;
 
-    double val = 0;
+    double val = 0; // because export format float
 
     //
     // check for hex
     //
     if (
         (str[0] == '0') &&
-        ((str[1] == 'x') ||
+        (
+            (str[1] == 'x') ||
             (str[1] == 'X'))
         ) {
-        str += 2;
+        str += 2;   // skip '0x' prefix
         while (1) {
             int c = *str++;
-            if ((c >= '0') && (c <= '9'))           val = (val * 16) + c - '0';
-            else if ((c >= 'a') && (c <= 'f'))      val = (val * 16) + c - 'a' + 10;
-            else if ((c >= 'A') && (c <= 'F'))      val = (val * 16) + c - 'A' + 10;
+            /**/ if ((c >= '0') && (c <= '9'))      val = (val * 16.0) + c - '0';
+            else if ((c >= 'a') && (c <= 'f'))      val = (val * 16.0) + c - 'a' + 10;
+            else if ((c >= 'A') && (c <= 'F'))      val = (val * 16.0) + c - 'A' + 10;
             else                                    return val * sign;
         }
     }

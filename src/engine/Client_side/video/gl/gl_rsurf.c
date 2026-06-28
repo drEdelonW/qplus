@@ -107,11 +107,11 @@ void R_AddDynamicLights(mSurface_p surf) {
         local.t -= surf->texturemins[T_AX];
 
         for (int t = 0; t < tmax; t++) {
-            int td = local.t - t * 16;
+            int td = local.t - MUL16(t);
             if (td < 0) td = -td;
 
             for (int s = 0; s < smax; s++) {
-                int sd = local.s - s * 16;
+                int sd = local.s - MUL16(s);
                 if (sd < 0) sd = -sd;
 
                 if (sd > td)    dist = sd + HALF(td);
@@ -328,7 +328,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
     //
     if (s->flags & SURF_DRAWSKY) {
         GL_Bind(solidskytexture);
-        speedscale = realtime * 8;
+        speedscale = realtime * 8.0f;
         speedscale -= (int)speedscale;
 
         EmitSkyPolys(s);
@@ -336,7 +336,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
         glEnable(GL_BLEND); {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             GL_Bind(alphaskytexture);
-            speedscale = realtime * 16;
+            speedscale = realtime * 16.0f;
             speedscale -= (int)speedscale;
             EmitSkyPolys(s);
             if (gl_lightmap_format == GL_LUMINANCE)
@@ -464,7 +464,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
 
         glEnable(GL_BLEND);
         GL_Bind(alphaskytexture);
-        speedscale = realtime * 16;
+        speedscale = realtime * 16.0f;
         speedscale -= (int)speedscale & ~127;
         EmitSkyPolys(s);
 

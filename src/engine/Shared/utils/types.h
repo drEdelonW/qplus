@@ -28,6 +28,7 @@ typedef const unsigned char* cStringGlRO;  // read-only
 typedef void* TypeLess_ptr;
 
 // Pointers to standard integer types
+// (ptrdiff_t) - pointer diff type
 typedef int8_t* int8_p;
 typedef uint8_t* uint8_p;
 typedef uint8_p* uint8_ar;

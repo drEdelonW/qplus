@@ -446,8 +446,8 @@ void CalcSurfaceExtents(mSurface_p s) {
         bmins[i] = floor(mins.v[i] / 16.0f);
         bmaxs[i] = ceil(maxs.v[i] / 16.0f);
 
-        s->texturemins[i] = bmins[i] * 16;
-        s->extents[i] = (bmaxs[i] - bmins[i]) * 16;
+        s->texturemins[i] = MUL16(bmins[i]);
+        s->extents[i] = MUL16(bmaxs[i] - bmins[i]);
         if (
             (!(tex->flags & TEX_SPECIAL)) &&
 #ifdef GLQUAKE

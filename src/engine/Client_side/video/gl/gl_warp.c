@@ -242,7 +242,7 @@ void EmitBothSkyLayers(mSurface_p fa) {
 
     glEnable(GL_BLEND); {
         GL_Bind(alphaskytexture);
-        speedscale = realtime * 16;
+        speedscale = realtime * 16.0f;
         speedscale -= (int)speedscale & ~127;
 
         EmitSkyPolys(fa);
@@ -269,7 +269,7 @@ void R_DrawSkyChain(mSurface_p s) {
 
     glEnable(GL_BLEND); {
         GL_Bind(alphaskytexture);
-        speedscale = realtime * 16;
+        speedscale = realtime * 16.0f;
         speedscale -= (int)speedscale & ~127;
 
         for (mSurface_p fa = s; fa; fa = fa->texturechain)

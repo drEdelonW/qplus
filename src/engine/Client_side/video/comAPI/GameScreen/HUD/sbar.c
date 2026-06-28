@@ -607,7 +607,7 @@ void Sbar_DrawInventory() {
                 _sb.updates = 0;
             else
                 //MED 01/04/97 changed keys
-                if (!hipnotic || (i > 1))   Sbar_DrawPic(192 + i * 16, -16, _sb.items[i]);
+                if (!hipnotic || (i > 1))   Sbar_DrawPic(192 + MUL16(i), -16, _sb.items[i]);
 
 
             if (time && (time > (cl.time - 2)))
@@ -621,7 +621,7 @@ void Sbar_DrawInventory() {
                 float time = cl.item_gettime[24 + i];
                 if (time && (time > (cl.time - 2)) && flashon)   // flash frame
                     _sb.updates = 0;
-                else    Sbar_DrawPic(288 + i * 16, -16, hsb_items[i]);
+                else    Sbar_DrawPic(288 + MUL16(i), -16, hsb_items[i]);
 
                 if (time && (time > (cl.time - 2)))
                     _sb.updates = 0;
@@ -635,7 +635,7 @@ void Sbar_DrawInventory() {
                 float time = cl.item_gettime[29 + i];
                 if (time && (time > (cl.time - 2)) && flashon)  // flash frame
                     _sb.updates = 0;
-                else    Sbar_DrawPic(288 + i * 16, -16, rsb_items[i]);
+                else    Sbar_DrawPic(288 + MUL16(i), -16, rsb_items[i]);
 
                 if (time && (time > (cl.time - 2)))
                     _sb.updates = 0;

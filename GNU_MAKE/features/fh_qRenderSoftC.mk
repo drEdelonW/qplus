@@ -23,7 +23,7 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
                                         SRC_LIST += $(RENDER_DIR)/r_aclip.c
                                         SRC_LIST += $(RENDER_DIR)/r_alias.c
                                         SRC_LIST += $(RENDER_DIR)/r_bsp.c
-                                        SRC_LIST += $(RENDER_DIR)/r_light.c
+                                        # SRC_LIST += $(RENDER_DIR)/r_light.c ## moved to r_Light.c
                                         SRC_LIST += $(RENDER_DIR)/r_draw.c
                                         SRC_LIST += $(RENDER_DIR)/r_efrag.c
                                         SRC_LIST += $(RENDER_DIR)/r_edge.c

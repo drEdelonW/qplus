@@ -19,12 +19,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_light.c
 
-#include "r_local.h"
-#include "d_local.h"
-#include "Surface.h"
+#ifdef GLQUAKE
+# include "qOpenGL.h"
+# include "client.h"
+# include "model.h"
+#else
+# include "r_local.h"
+# include "render.h"
+# include "Surface.h"
+#endif
 
 int r_dlightframecount;
-
 
 /*
 ==================
@@ -63,8 +68,7 @@ R_MarkLights
 =============
 */
 void R_MarkLights(dLight_p light, int bit, mNode_p node) {
-    if (node->contents < CONTENTS_NODE)
-        return;
+    if (node->contents < CONTENTS_NODE)     return;
 
     mPlane_p splitplane = node->plane;
     float dist = DotProduct(light->origin, splitplane->normal) - splitplane->dist;
@@ -93,16 +97,21 @@ void R_MarkLights(dLight_p light, int bit, mNode_p node) {
 }
 
 
+
+
 /*
 =============
 R_PushDlights
 =============
 */
 void R_PushDlights() {
+#ifdef GLQUAKE
+    if (gl_flashblend.value)        return;
+#else
     if (!r_dlightmap.value)    return;
+#endif
 
-    r_dlightframecount = r_framecount + 1; // because the count hasn't
-    //  advanced yet for this frame
+    r_dlightframecount = r_framecount + 1; // because the count hasn't advanced yet for this frame
     dLight_p l = cl_dlights;
 
     for (int i = 0; i < MAX_DLIGHTS; i++, l++) {
@@ -113,7 +122,6 @@ void R_PushDlights() {
     }
 }
 
-
 /*
 =============================================================================
 
@@ -122,89 +130,88 @@ LIGHT SAMPLING
 =============================================================================
 */
 
-int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
-    if (node->contents < CONTENTS_NODE)
-        return -1;  // didn't hit anything
 
+#ifdef GLQUAKE
+mPlane_p    lightplane;
+vec3_t      lightspot;
+#endif
+
+
+int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
+    if (node->contents < CONTENTS_NODE)     return -1;  // didn't hit anything
     // calculate mid point
 
     // FIXME: optimize for axial
     mPlane_p plane = node->plane;
     float front = DotProduct(start, plane->normal) - plane->dist;
     float back = DotProduct(end, plane->normal) - plane->dist;
-    int side = front < 0;
+    bool side = (front < 0.0f);
 
     if ((back < 0) == side)
         return RecursiveLightPoint(node->children[side], start, end);
 
     float frac = front / (front - back);
-    vec3_t mid = {
-        .x = start.x + (end.x - start.x) * frac,
-        .y = start.y + (end.y - start.y) * frac,
-        .z = start.z + (end.z - start.z) * frac
-    };
+
+    // Linear interpolation: mid = start + (end - start) * frac
+    vec3_t mid = VectorMA(start, frac, VectorSubtract(end, start));
 
     // go down front side
     int r = RecursiveLightPoint(node->children[side], start, mid);
-    if (r >= 0)
-        return r;  // hit something
+    if (r >= 0)                 return r;        // hit something
+    if ((back < 0) == side)     return -1;        // didn't hit anuthing
 
-    if ((back < 0) == side)
-        return -1;  // didn't hit anuthing
-
+#ifdef GLQUAKE
     // check for impact on this node
+    lightspot = mid;
+    lightplane = plane;
+#endif
 
     mSurface_p surf = cl.worldmodel->surfaces + node->firstsurface;
     for (int i = 0; i < node->numsurfaces; i++, surf++) {
         if (surf->flags & SURF_DRAWTILED)
-            continue; // no lightmaps
+            continue;   // no lightmaps
 
         mTexInfo_p tex = surf->texinfo;
 
-        int s = DotProduct(mid, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs;
-        int t = DotProduct(mid, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs;
+        fixed4_t s = DotProduct(mid, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs;
+        fixed4_t t = DotProduct(mid, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs;
 
-        if (s < surf->texturemins[S_AX] ||
-            t < surf->texturemins[T_AX])
-            continue;
+        if ((s < surf->texturemins[S_AX]) ||
+            (t < surf->texturemins[T_AX])
+            ) continue;
 
-        int ds = s - surf->texturemins[S_AX];
-        int dt = t - surf->texturemins[T_AX];
+        fixed4_t tds = s - surf->texturemins[S_AX];
+        fixed4_t tdt = t - surf->texturemins[T_AX];
 
-        if ((ds > surf->extents[S_AX]) ||
-            (dt > surf->extents[T_AX])
-        )
-            continue;
+        if ((tds > surf->extents[S_AX]) ||
+            (tdt > surf->extents[T_AX])
+            ) continue;
 
-        if (!surf->samples)
-            return 0;
-
-        ds = DIV16(ds);
-        dt = DIV16(dt);
-
-        uint8_p lightmap = surf->samples;
-        r = 0;
-        if (lightmap) {
-            lightmap += dt * (DIV16(surf->extents[S_AX]) + 1) + ds;
-
-            for (int maps = 0; maps < MAXLIGHTMAPS && surf->styles[maps] != 255;
-                maps++) {
-                uint32_t scale = d_lightstylevalue[surf->styles[maps]];
-                r += *lightmap * scale;
-                lightmap += 
-                    (DIV16(surf->extents[S_AX]) + 1) *
-                    (DIV16(surf->extents[T_AX]) + 1);
+        if (surf->samples) {
+            r = 0;
+            uint8_p lightmap =
+                surf->samples + (ptrdiff_t)(
+                    FIXED4_TO_INT(tdt) * (FIXED4_TO_INT(surf->extents[S_AX]) + 1) +
+                    FIXED4_TO_INT(tds));
+            ptrdiff_t lmStep = (ptrdiff_t)(
+                (FIXED4_TO_INT(surf->extents[S_AX]) + 1) *
+                (FIXED4_TO_INT(surf->extents[T_AX]) + 1)
+                );
+            for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 0xFF); maps++) {
+                r += (*lightmap) * d_lightstylevalue[surf->styles[maps]];
+                lightmap += lmStep;
             }
 
-            r = r >> 8;
+            return r >> 8;
         }
-
-        return r;
+        return 0;
     }
 
     // go down back side
     return RecursiveLightPoint(node->children[!side], mid, end);
 }
+
+
 
 int R_LightPoint(vec3_t p) {
     if (!cl.worldmodel->lightdata)
@@ -220,8 +227,10 @@ int R_LightPoint(vec3_t p) {
     if (r == -1)
         r = 0;
 
+#ifndef GLQUAKE
     if (r < r_refdef.ambientlight)
         r = r_refdef.ambientlight;
+#endif
 
     return r;
 }

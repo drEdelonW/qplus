@@ -31,7 +31,7 @@ void SV_StartParticle(vec3_t org, vec3_t dir, int color, size_t count) {
     MSG_WriteCoord(&sv.datagram, org.y);
     MSG_WriteCoord(&sv.datagram, org.z);
     for (int i = 0; i < VECT_DIM; i++) {
-        int v = (int)(dir.v[i] * 16.0f);
+        int v = (int)(dir.v[i] * 16.0f); // TODO: adjust type
         CLAMP(-128, v, 127);
         MSG_WriteChar(&sv.datagram, (int8_t)v);
     }

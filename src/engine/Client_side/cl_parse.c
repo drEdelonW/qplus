@@ -434,8 +434,8 @@ void CL_ParseClientdata(server_update_bits_t bits) {
 
     cl.mvelocity[1] = cl.mvelocity[0];
     for (int i = 0; i < VECT_DIM; i++) {    // TODO: wrap MSG_ReadChar to MSG_vector_tools
-        cl.punchangle.v[i] = (bits & (SU_PUNCH1 << i)) ? MSG_ReadChar() : 0;
-        cl.mvelocity[0].v[i] = (bits & (SU_VELOCITY1 << i)) ? (MSG_ReadChar() * 16) : 0;
+        cl.punchangle.v[i] = (bits & (SU_PUNCH1 << i)) ? (MSG_ReadChar() * 1.0f) : 0.0f;
+        cl.mvelocity[0].v[i] = (bits & (SU_VELOCITY1 << i)) ? (MSG_ReadChar() * 16.0f) : 0.0f;
     }
     uint32_t msg;
     // [always sent]    SU_ITEMS

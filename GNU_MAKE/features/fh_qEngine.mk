@@ -120,6 +120,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                                         SRC_LIST += $(VP_DIR)/view.c
                                         SRC_LIST += $(VP_DIR)/cRender.c
                                         SRC_LIST += $(VP_DIR)/chase.c
+                                        SRC_LIST += $(VP_DIR)/render/r_Light.c
 
                                 $(eval HUD_DIR = $(GSCR_DIR)/HUD) $(eval INCLUDES += $(HUD_DIR))
                                         SRC_LIST += $(HUD_DIR)/sbar.c

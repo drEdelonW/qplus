@@ -276,7 +276,7 @@ SCR_DrawNet
 ==============
 */
 void SCR_DrawNet() {
-    if (((realtime - cl.last_received_message) < 0.3) ||
+    if (((realtime - cl.last_received_message) < 0.3f) ||
         (cls.demoplayback))
         return;
 
