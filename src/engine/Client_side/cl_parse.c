@@ -311,7 +311,7 @@ void CL_ParseServerInfo() {
     relinked.  Other attributes can change without relinking.
     ==================
 */
-int bitcounts[16];
+static int _bitCnt[16]; // FYI: DEBUG metrics
 
 void CL_ParseUpdate(update_bits_t bits) {
     if (cls.signon == SIGNONS - 1) { // first update is the final signon stage
@@ -331,7 +331,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 
     for (int i = 0; i < 16; i++) {
         if (bits & (1u << i))
-            bitcounts[i]++;
+            _bitCnt[i]++;
     }
 
     bool forcelink = (ent->msgtime != cl.mtime[1]); // no previous frame to lerp from

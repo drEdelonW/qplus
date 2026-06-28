@@ -37,10 +37,12 @@ int skytexturenum;
 #endif
 
 
-int lightmap_bytes;        // 1, 2, or 4
-int lightmap_textures;
+static int _lightMapBytes;        // 1, 2, or 4
+static int _lightMapTextures;
+int texture_extension_number = 1;
 
-uint32_t blocklights[18 * 18];
+
+fixed16_t blocklights[18 * 18];
 
 #define BLOCK_WIDTH     128
 #define BLOCK_HEIGHT    128
@@ -78,8 +80,6 @@ R_AddDynamicLights
 ===============
 */
 void R_AddDynamicLights(mSurface_p surf) {
-    int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
-    int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
     mTexInfo_p tex = surf->texinfo;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
@@ -98,24 +98,20 @@ void R_AddDynamicLights(mSurface_p surf) {
             -dist, surf->plane->normal
         );
 
-        vec2_t local = {
-            .s = DotProduct(impact, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs, // TODO: fix this workaround
-            .t = DotProduct(impact, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs  // TODO: fix this workaround
-        };
-
-        local.s -= surf->texturemins[S_AX];
-        local.t -= surf->texturemins[T_AX];
-
+        fixed4_t ts = DotProduct(impact, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs - surf->texturemins[S_AX];
+        fixed4_t tt = DotProduct(impact, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs - surf->texturemins[T_AX];
+        int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
+        int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
         for (int t = 0; t < tmax; t++) {
-            int td = local.t - MUL16(t);
-            if (td < 0) td = -td;
+            fixed4_t td = tt - INT_TO_FIXED4(t);
+            if (td < 0)     td = -td;
 
             for (int s = 0; s < smax; s++) {
-                int sd = local.s - MUL16(s);
-                if (sd < 0) sd = -sd;
+                fixed4_t sd = ts - INT_TO_FIXED4(s);
+                if (sd < 0)     sd = -sd;
 
-                if (sd > td)    dist = sd + HALF(td);
-                else            dist = td + HALF(sd);
+                float dist = (sd > td) ?
+                    sd + HALF(td) : td + HALF(sd);
 
                 if (dist < minlight)
                     blocklights[t * smax + s] += (rad - dist) * 256;
@@ -199,36 +195,6 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
 }
 
 
-/*
-===============
-R_TextureAnimation
-
-Returns the proper texture for a given time and base texture
-===============
-*/
-Texture_p R_TextureAnimation(Texture_p base) {
-    if (
-        (currententity->frame) &&
-        (base->alternate_anims)
-        )
-        base = base->alternate_anims;
-
-    if (!base->anim_total)      return base;
-
-    int reletive = (int)(cl.time * 10) % base->anim_total;
-
-    int count = 0;
-    while (
-        (base->anim_min > reletive) ||
-        (base->anim_max <= reletive)
-        ) {
-        base = base->anim_next;
-        if (!base)          Host_SysError("R_TextureAnimation: broken cycle");
-        if (++count > 100)  Host_SysError("R_TextureAnimation: infinite cycle");
-    }
-
-    return base;
-}
 
 
 /*
@@ -300,7 +266,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
             }
         } glEnd();
 
-        GL_Bind(lightmap_textures + s->lightmaptexturenum);
+        GL_Bind(_lightMapTextures + s->lightmaptexturenum);
         glEnable(GL_BLEND); {
             glBegin(GL_POLYGON); {
                 for (int i = 0; i < p->numverts; i++) {
@@ -355,7 +321,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
         GL_Bind(t->gl_texturenum);
         DrawGLWaterPoly(p);
 
-        GL_Bind(lightmap_textures + s->lightmaptexturenum);
+        GL_Bind(_lightMapTextures + s->lightmaptexturenum);
         glEnable(GL_BLEND); {
             DrawGLWaterPolyLightmap(p);
         } glDisable(GL_BLEND);
@@ -387,7 +353,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
             // Binds lightmap to texenv 1
             GL_EnableMultitexture(); // Same as SelectTexture (TEXTURE1)
-            GL_Bind(lightmap_textures + s->lightmaptexturenum);
+            GL_Bind(_lightMapTextures + s->lightmaptexturenum);
             int i = s->lightmaptexturenum;
             if (lightmap_modified[i]
                 ) {
@@ -396,7 +362,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
                 glTexSubImage2D(
                     GL_TEXTURE_2D, 0, 0, theRect->t,
                     BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
-                    lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes
+                    lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
                 );
                 theRect->l = BLOCK_WIDTH;
                 theRect->t = BLOCK_HEIGHT;
@@ -426,7 +392,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
                 }
             } glEnd();
 
-            GL_Bind(lightmap_textures + s->lightmaptexturenum);
+            GL_Bind(_lightMapTextures + s->lightmaptexturenum);
             glEnable(GL_BLEND);
             glBegin(GL_POLYGON); {
                 for (int i = 0; i < p->numverts; i++) {
@@ -484,7 +450,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
         GL_Bind(t->gl_texturenum);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
         GL_EnableMultitexture();
-        GL_Bind(lightmap_textures + s->lightmaptexturenum);
+        GL_Bind(_lightMapTextures + s->lightmaptexturenum);
         int i = s->lightmaptexturenum;
         if (lightmap_modified[i]) {
             lightmap_modified[i] = false;
@@ -492,7 +458,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
             glTexSubImage2D(
                 GL_TEXTURE_2D, 0, 0, theRect->t,
                 BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
-                lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes
+                lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
             );
             theRect->l = BLOCK_WIDTH;
             theRect->t = BLOCK_HEIGHT;
@@ -523,7 +489,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
         GL_Bind(t->gl_texturenum);
         DrawGLWaterPoly(p);
 
-        GL_Bind(lightmap_textures + s->lightmaptexturenum);
+        GL_Bind(_lightMapTextures + s->lightmaptexturenum);
         glEnable(GL_BLEND); {
             DrawGLWaterPolyLightmap(p);
         } glDisable(GL_BLEND);
@@ -618,28 +584,28 @@ void R_BlendLightmaps() {
         glpoly_p p = lightmap_polys[i];
         if (!p)     continue;
 
-        GL_Bind(lightmap_textures + i);
+        GL_Bind(_lightMapTextures + i);
         if (lightmap_modified[i]) {
             lightmap_modified[i] = false;
             glRect_p theRect = &lightmap_rectchange[i];
 #if 0
             glTexImage2D(
-                GL_TEXTURE_2D, 0, lightmap_bytes,
+                GL_TEXTURE_2D, 0, _lightMapBytes,
                 BLOCK_WIDTH, BLOCK_HEIGHT, 0,
                 gl_lightmap_format, GL_UNSIGNED_BYTE,
-                lightmaps + i * BLOCK_WIDTH * BLOCK_HEIGHT * lightmap_bytes
+                lightmaps + i * BLOCK_WIDTH * BLOCK_HEIGHT * _lightMapBytes
             );
             glTexImage2D(
-                GL_TEXTURE_2D, 0, lightmap_bytes,
+                GL_TEXTURE_2D, 0, _lightMapBytes,
                 BLOCK_WIDTH, theRect->h, 0,
                 gl_lightmap_format, GL_UNSIGNED_BYTE,
-                lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes
+                lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
             );
 #else
             glTexSubImage2D(
                 GL_TEXTURE_2D, 0, 0, theRect->t,
                 BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
-                lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * lightmap_bytes
+                lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
             );
 #endif
             * theRect = (glRect_t){
@@ -730,9 +696,9 @@ void R_RenderBrushPoly(mSurface_p fa) {
                 if ((theRect->w + theRect->l) < (fa->light_s + smax))   theRect->w = (fa->light_s - theRect->l) + smax;
                 if ((theRect->h + theRect->t) < (fa->light_t + tmax))   theRect->h = (fa->light_t - theRect->t) + tmax;
 
-                byte* base = lightmaps + fa->lightmaptexturenum * lightmap_bytes * BLOCK_WIDTH * BLOCK_HEIGHT;
-                base += fa->light_t * BLOCK_WIDTH * lightmap_bytes + fa->light_s * lightmap_bytes;
-                R_BuildLightMap(fa, base, BLOCK_WIDTH * lightmap_bytes);
+                byte* base = lightmaps + fa->lightmaptexturenum * _lightMapBytes * BLOCK_WIDTH * BLOCK_HEIGHT;
+                base += fa->light_t * BLOCK_WIDTH * _lightMapBytes + fa->light_s * _lightMapBytes;
+                R_BuildLightMap(fa, base, BLOCK_WIDTH * _lightMapBytes);
             }
         }
     }
@@ -781,9 +747,9 @@ void R_RenderDynamicLightmaps(mSurface_p fa) {
                 if ((theRect->w + theRect->l) < (fa->light_s + smax))   theRect->w = (fa->light_s - theRect->l) + smax;
                 if ((theRect->h + theRect->t) < (fa->light_t + tmax))   theRect->h = (fa->light_t - theRect->t) + tmax;
 
-                byte* base = lightmaps + fa->lightmaptexturenum * lightmap_bytes * BLOCK_WIDTH * BLOCK_HEIGHT;
-                base += fa->light_t * BLOCK_WIDTH * lightmap_bytes + fa->light_s * lightmap_bytes;
-                R_BuildLightMap(fa, base, BLOCK_WIDTH * lightmap_bytes);
+                byte* base = lightmaps + fa->lightmaptexturenum * _lightMapBytes * BLOCK_WIDTH * BLOCK_HEIGHT;
+                base += fa->light_t * BLOCK_WIDTH * _lightMapBytes + fa->light_s * _lightMapBytes;
+                R_BuildLightMap(fa, base, BLOCK_WIDTH * _lightMapBytes);
             }
         }
     }
@@ -1392,9 +1358,9 @@ void GL_CreateSurfaceLightmap(mSurface_p surf) {
     int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
 
     surf->lightmaptexturenum = AllocBlock(smax, tmax, &surf->light_s, &surf->light_t);
-    byte* base = lightmaps + surf->lightmaptexturenum * lightmap_bytes * BLOCK_WIDTH * BLOCK_HEIGHT;
-    base += (surf->light_t * BLOCK_WIDTH + surf->light_s) * lightmap_bytes;
-    R_BuildLightMap(surf, base, BLOCK_WIDTH * lightmap_bytes);
+    byte* base = lightmaps + surf->lightmaptexturenum * _lightMapBytes * BLOCK_WIDTH * BLOCK_HEIGHT;
+    base += (surf->light_t * BLOCK_WIDTH + surf->light_s) * _lightMapBytes;
+    R_BuildLightMap(surf, base, BLOCK_WIDTH * _lightMapBytes);
 }
 
 
@@ -1411,8 +1377,8 @@ void GL_BuildLightmaps() {
 
     r_framecount = 1;        // no dlightcache
 
-    if (!lightmap_textures) {
-        lightmap_textures = texture_extension_number;
+    if (!_lightMapTextures) {
+        _lightMapTextures = texture_extension_number;
         texture_extension_number += MAX_LIGHTMAPS;
     }
 
@@ -1428,9 +1394,9 @@ void GL_BuildLightmaps() {
     switch (gl_lightmap_format) {
     case GL_LUMINANCE:
     case GL_INTENSITY:
-    case GL_ALPHA:      lightmap_bytes = 1;        break;
-    case GL_RGBA4:      lightmap_bytes = 2;        break;
-    case GL_RGBA:       lightmap_bytes = 4;        break;
+    case GL_ALPHA:      _lightMapBytes = 1;        break;
+    case GL_RGBA4:      _lightMapBytes = 2;        break;
+    case GL_RGBA:       _lightMapBytes = 4;        break;
     default:                                       break;
     }
 
@@ -1472,14 +1438,14 @@ void GL_BuildLightmaps() {
             .w = 0,
             .h = 0
         };
-        GL_Bind(lightmap_textures + i);
+        GL_Bind(_lightMapTextures + i);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexImage2D(
-            GL_TEXTURE_2D, 0, lightmap_bytes,
+            GL_TEXTURE_2D, 0, _lightMapBytes,
             BLOCK_WIDTH, BLOCK_HEIGHT, 0,
             gl_lightmap_format, GL_UNSIGNED_BYTE,
-            lightmaps + i * BLOCK_WIDTH * BLOCK_HEIGHT * lightmap_bytes
+            lightmaps + i * BLOCK_WIDTH * BLOCK_HEIGHT * _lightMapBytes
         );
     }
 

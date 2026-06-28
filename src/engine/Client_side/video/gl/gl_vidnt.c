@@ -111,8 +111,6 @@ uint16_t    d_8to16table[256];
 uint32_t    d_8to24table[256];
 uint8_t     d_15to8table[65536];
 
-float        gldepthmin, gldepthmax;
-
 modestate_t    modestate = MS_UNINIT;
 
 void VID_MenuDraw();
@@ -497,7 +495,6 @@ int texture_mode = GL_LINEAR;
 // int texture_mode = GL_LINEAR_MIPMAP_NEAREST;
 // int texture_mode = GL_LINEAR_MIPMAP_LINEAR;
 
-int        texture_extension_number = 1;
 
 #ifdef _WIN32
 void CheckMultiTextureExtensions() {

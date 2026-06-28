@@ -32,28 +32,7 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
     }
 #endif
 
-    // bounds[0] = emins, bounds[1] = emaxs
-    const vec3_p bounds[2] = {
-        &emins,
-        &emaxs
-    };
-
-    // Extract bits: 0 if bit is set (negative -> use min), 1 if bit is clear (positive -> use max)
-    const int bit_x = ((plane->signbits >> 0) & 1) ^ 1;
-    const int bit_y = ((plane->signbits >> 1) & 1) ^ 1;
-    const int bit_z = ((plane->signbits >> 2) & 1) ^ 1;
-
-    float dist1 =
-        plane->normal.x * bounds[bit_x]->x +
-        plane->normal.y * bounds[bit_y]->y +
-        plane->normal.z * bounds[bit_z]->z;
-
-    float dist2 =   // For dist2 we just invert the selection
-        plane->normal.x * bounds[bit_x ^ 1]->x +
-        plane->normal.y * bounds[bit_y ^ 1]->y +
-        plane->normal.z * bounds[bit_z ^ 1]->z;
-
-#if 0
+#if 0   // it was disabled
     vec3_t corners[2];
     for (int i = 0; i < VECT_DIM; i++) {
         if (plane->normal[i] < 0) {
@@ -68,15 +47,34 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
     dist = DotProduct(plane->normal, corners[0]) - plane->dist;
     dist2 = DotProduct(plane->normal, corners[1]) - plane->dist;
     sides = 0;
-    if (dist1 >= 0)     sides = 1;
+    if (dist1 >= 0)     sides |= 1;
     if (dist2 < 0)      sides |= 2;
+#else
+    // bounds[0] = emins, bounds[1] = emaxs
+    const vec3_t bounds[2] = {
+        emins,
+        emaxs
+    };
 
-#endif
+    // Extract bits: 0 if bit is set (negative -> use min), 1 if bit is clear (positive -> use max)
+    const int bit_x = ((plane->signbits >> 0) & 1) ^ 1;
+    const int bit_y = ((plane->signbits >> 1) & 1) ^ 1;
+    const int bit_z = ((plane->signbits >> 2) & 1) ^ 1;
+
+    float dist1 =
+        plane->normal.x * bounds[bit_x].x +
+        plane->normal.y * bounds[bit_y].y +
+        plane->normal.z * bounds[bit_z].z;
+
+    float dist2 =   // For dist2 we just invert the selection
+        plane->normal.x * bounds[bit_x ^ 1].x +
+        plane->normal.y * bounds[bit_y ^ 1].y +
+        plane->normal.z * bounds[bit_z ^ 1].z;
 
     int sides = 0;
     if (dist1 >= plane->dist)   sides |= 1;
     if (dist2 < plane->dist)    sides |= 2;
-
+#endif
 #ifdef PARANOID
     if (sides == 0) Host_SysError("BoxOnPlaneSide: sides==0");
 #endif

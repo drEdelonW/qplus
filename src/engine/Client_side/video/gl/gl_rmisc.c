@@ -31,31 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern cvar_t gl_finish;
 
-/*
-==================
-R_InitTextures
-==================
-*/
-void R_InitTextures() {
-    // create a simple checkerboard texture for the default
-    r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + (16 * 16) + (8 * 8) + (4 * 4) + (2 * 2), "notexture");
-
-    r_notexture_mip->width = r_notexture_mip->height = 16;
-    r_notexture_mip->offsets[0] = sizeof(Texture_t);
-    r_notexture_mip->offsets[1] = r_notexture_mip->offsets[0] + (16 * 16);
-    r_notexture_mip->offsets[2] = r_notexture_mip->offsets[1] + (8 * 8);
-    r_notexture_mip->offsets[3] = r_notexture_mip->offsets[2] + (4 * 4);
-
-    for (int m = 0; m < 4; m++) {
-        uint8_p dest = (uint8_p)r_notexture_mip + r_notexture_mip->offsets[m];
-        for (int y = 0; y < (16 >> m); y++)
-            for (int x = 0; x < (16 >> m); x++) {
-                *dest++ =
-                    ((y < (8 >> m)) ^ (x < (8 >> m))) ?
-                    0x00 : 0xFF;
-            }
-    }
-}
 
 uint8_t dottexture[8][8] = {
     {0,1,1,0,0,0,0,0},

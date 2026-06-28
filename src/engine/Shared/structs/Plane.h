@@ -25,7 +25,7 @@ typedef
 // it was [mplane_t]
 // Plane_t structure
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
-typedef struct mPlane_s {
+typedef struct {
     vec3_t      normal;
     float       dist;
     PlaneType_t type;       // for texture axis selection and fast side tests
@@ -33,6 +33,7 @@ typedef struct mPlane_s {
     uint8_t     pad[2];
 } mPlane_t;
 typedef mPlane_t* mPlane_p;
+
 
 // it was [dplane_t]
 typedef struct {

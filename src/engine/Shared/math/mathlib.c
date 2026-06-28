@@ -44,13 +44,9 @@ uint32_t nanmask = 0xFF << 23;
 #endif
 
 
-void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, float degrees) {
+vec3_t GetRotatePointAroundVector(const vec3_t dir, const vec3_t point, float degrees) {
+    vec3_t out;
     vec3_t vf = dir; 
-    // {
-    //     .x = dir.x,
-    //     .y = dir.y,
-    //     .z = dir.z
-    // };
     vec3_t vr = PerpendicularVector(dir);
     vec3_t vup = CrossProduct(vr, vf);
 
@@ -84,11 +80,12 @@ void RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, f
     mat3_t rot;    R_ConcatRotations(&tmpmat, &im, &rot);
 
     for (int i = 0; i < VECT_DIM; i++) {
-        dst->v[i] =
+        out.v[i] =
             rot.m[i][0] * point.x +
             rot.m[i][1] * point.y +
             rot.m[i][2] * point.z;
     }
+    return out;
 }
 
 #ifdef _WIN32

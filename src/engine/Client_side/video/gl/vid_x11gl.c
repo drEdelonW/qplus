@@ -26,12 +26,9 @@
 bool gl_mtexable;
 cvar_t gl_ztrick;
 
-float gldepthmin;
-float gldepthmax;
 
 bool isPermedia;
 
-int texture_extension_number;
 int texture_mode;
 
 int config_notify = 0;

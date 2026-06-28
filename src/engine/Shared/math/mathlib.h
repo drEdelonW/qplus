@@ -68,7 +68,7 @@ int     Q_log2(int val);
 void    R_ConcatRotations(const mat3_p in1, const mat3_p in2, mat3_p out);
 void    R_ConcatTransforms(const mat3x4_p in1, const mat3x4_p in2, mat3x4_p out);
 
-void    RotatePointAroundVector(vec3_p dst, const vec3_t dir, const vec3_t point, float degrees);
+vec3_t GetRotatePointAroundVector(const vec3_t dir, const vec3_t point, float degrees);
 
 void    FloorDivMod(double numer, double denom, int* quotient, int* rem);
 int     GreatestCommonDivisor(int i1, int i2);

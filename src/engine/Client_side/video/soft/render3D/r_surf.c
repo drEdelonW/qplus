@@ -167,36 +167,6 @@ void R_BuildLightMap() {
 }
 
 
-/*
-===============
-R_TextureAnimation
-
-Returns the proper texture for a given time and base texture
-===============
-*/
-Texture_p R_TextureAnimation(Texture_p base) {
-    if (
-        (currententity->frame) &&
-        (base->alternate_anims)
-        )
-        base = base->alternate_anims;
-
-    if (!base->anim_total)      return base;
-
-    int reletive = (int)(cl.time * 10) % base->anim_total;
-
-    int count = 0;
-    while (
-        (base->anim_min > reletive) ||
-        (base->anim_max <= reletive)
-        ) {
-        base = base->anim_next;
-        if (!base)          Host_SysError("R_TextureAnimation: broken cycle");
-        if (++count > 100)  Host_SysError("R_TextureAnimation: infinite cycle");
-    }
-
-    return base;
-}
 
 
 /*

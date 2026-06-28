@@ -70,7 +70,6 @@ extern  TEXSUBIMAGEPTR TexSubImage2DFunc;
 extern  int texture_extension_number;
 extern  int texture_mode;
 
-extern  float   gldepthmin, gldepthmax;
 
 void GL_Upload32(unsigned* data, int width, int height, bool mipmap, bool alpha);
 void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha);
@@ -124,11 +123,10 @@ void R_ReadPointFile_f();
 
 extern  r_Entity_t  r_worldentity;
 extern  vec3_t      modelorg, r_entorigin;
-extern  r_Entity_t* currententity;
+extern  r_Entity_p  currententity;
 extern  int         r_visframecount;    // ??? what difs?
 extern  int         r_framecount;
-extern  mPlane_t    frustum[4];
-extern  int         c_brush_polys, c_alias_polys;
+extern  int         c_brush_polys, c_alias_polys;   // FYI: DEBUG metrics
 
 
 //

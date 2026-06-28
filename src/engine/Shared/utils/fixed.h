@@ -31,8 +31,8 @@
 // -- Types -------------------------------------------------------------------
 
 
-typedef uint16_t     fixed4_t;   // 12.4   unsigned
-// typedef int16_t     fixed4_t;   // 11.4   signed
+// typedef uint16_t    fixed4_t;   // 12.4   unsigned
+typedef int16_t     fixed4_t;   // 11.4   signed
 typedef fixed4_t*   fixed4_p;
 
 typedef int16_t     fixed8_t;   // 7.8   signed !!!MUST BE SIGNED!!!

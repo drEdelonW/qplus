@@ -108,7 +108,6 @@ int* pfrustum_indexes[4];
 int r_frustum_indexes[4 * 6];
 
 mLeaf_p     r_viewleaf, r_oldviewleaf;
-Texture_p   r_notexture_mip;
 
 fixed8_t  d_lightstylevalue[256]; // 8.8 fraction of base light value
 
@@ -123,32 +122,6 @@ void R_MarkLeaves();
 void CreatePassages();
 void SetVisibilityByPassages();
 
-/*
-==================
-R_InitTextures
-==================
-*/
-void R_InitTextures() {
-    // create a simple checkerboard texture for the default
-    r_notexture_mip = Hunk_AllocName(sizeof(Texture_t) + (16 * 16) + (8 * 8) + (4 * 4) + (2 * 2), "notexture");
-
-    r_notexture_mip->width = r_notexture_mip->height = 16;
-    r_notexture_mip->offsets[0] = sizeof(Texture_t);
-    r_notexture_mip->offsets[1] = r_notexture_mip->offsets[0] + (16 * 16);
-    r_notexture_mip->offsets[2] = r_notexture_mip->offsets[1] + (8 * 8);
-    r_notexture_mip->offsets[3] = r_notexture_mip->offsets[2] + (4 * 4);
-
-    for (int m = 0; m < 4; m++) {
-        uint8_p dest = (uint8_p)r_notexture_mip + r_notexture_mip->offsets[m];
-        for (int y = 0; y < (16 >> m); y++)
-            for (int x = 0; x < (16 >> m); x++) {
-                if ((y < (8 >> m)) ^ (x < (8 >> m)))
-                    *dest++ = 0;
-                else
-                    *dest++ = 0xff;
-            }
-    }
-}
 
 /*
 ================
