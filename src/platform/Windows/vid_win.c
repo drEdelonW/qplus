@@ -431,9 +431,9 @@ void VID_InitMGLFull(HINSTANCE hInstance) {
                 }
 
                 if ((xRes < lowstretchedres) &&
-                    ((xRes >> 1) >= 320)
+                    (HALF(xRes) >= 320)
                     ) {
-                    lowstretchedres = xRes >> 1;
+                    lowstretchedres = HALF(xRes);
                     stretchedmode = i;
                 }
             }
@@ -890,9 +890,9 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
     // don't bother if we have a real VGA mode 0x13 mode
     if (!is_mode0x13) {
         for (i = originalnummodes, cstretch = 0; i < nummodes; i++) {
-            if (((modelist[i].width >> 1) < lowestres) &&
-                ((modelist[i].width >> 1) >= 320)) {
-                lowestres = modelist[i].width >> 1;
+            if ((HALF(modelist[i].width) < lowestres) &&
+                (HALF(modelist[i].width) >= 320)) {
+                lowestres = HALF(modelist[i].width);
                 cstretch = 1;
                 mstretch = i;
             }

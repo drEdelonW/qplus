@@ -25,10 +25,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_local.h"
 #include "screen.h"
 
-uint8_p r_turb_pbase, r_turb_pdest;
-fixed16_t r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
+static uint8_p r_turb_pbase;
+static uint8_p r_turb_pdest;
+fixed16_t r_turb_s, r_turb_sstep;
+fixed16_t r_turb_t, r_turb_tstep;
 int* r_turb_turb;
-int                r_turb_spancount;
+int r_turb_spancount;
 
 void D_DrawTurbulent8Span();
 
@@ -41,7 +43,7 @@ D_WarpScreen
 // the sine warp, to keep the edges from wrapping
 =============
 */
-void D_WarpScreen() {
+void D_WarpScreen() {   // Under water warp
     int        w, h;
     int        u, v;
     uint8_p dest;
@@ -401,7 +403,7 @@ void D_DrawZSpans(eSpan_p pspan) {
             count--;
         }
 
-        if ((doublecount = count >> 1) > 0) {
+        if ((doublecount = HALF(count)) > 0) {
             do {
                 ltemp = FIXED16_TO_INT(izi);
                 izi += izistep;

@@ -114,8 +114,8 @@ void R_AddDynamicLights(mSurface_p surf) {
                 int sd = local.s - s * 16;
                 if (sd < 0) sd = -sd;
 
-                if (sd > td)    dist = sd + (td >> 1);
-                else            dist = td + (sd >> 1);
+                if (sd > td)    dist = sd + HALF(td);
+                else            dist = td + HALF(sd);
 
                 if (dist < minlight)
                     blocklights[t * smax + s] += (rad - dist) * 256;

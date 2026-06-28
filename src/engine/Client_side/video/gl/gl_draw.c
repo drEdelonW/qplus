@@ -818,7 +818,7 @@ void GL_ResampleTexture(
     fixed16_t fracstep = inwidth * 0x10000 / outwidth;
     for (int i = 0; i < outheight; i++, out += outwidth) {
         uint32_p inrow = in + inwidth * (i * inheight / outheight);
-        fixed16_t frac = fracstep >> 1;
+        fixed16_t frac = HALF(fracstep);
         for (int j = 0; j < outwidth; j += 4) {
             out[j + 0] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
             out[j + 1] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
@@ -840,7 +840,7 @@ void GL_Resample8BitTexture(
     fixed16_t fracstep = inwidth * 0x10000 / outwidth;
     for (int i = 0; i < outheight; i++, out += outwidth) {
         uint8_p inrow = in + inwidth * (i * inheight / outheight);
-        fixed16_t frac = fracstep >> 1;
+        fixed16_t frac = HALF(fracstep);
         for (int j = 0; j < outwidth; j += 4) {
             out[j + 1] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
             out[j + 1] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;

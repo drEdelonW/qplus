@@ -411,8 +411,10 @@ void VID_InitMGLFull(HINSTANCE hInstance) {
                     mode = i;
                 }
 
-                if ((xRes < lowstretchedres) && ((xRes >> 1) >= 320)) {
-                    lowstretchedres = xRes >> 1;
+                if ((xRes < lowstretchedres) &&
+                    (HALF(xRes) >= 320)
+                    ) {
+                    lowstretchedres = HALF(xRes);
                     stretchedmode = i;
                 }
             }
@@ -883,9 +885,9 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
     // don't bother if we have a real VGA mode 0x13 mode
     if (!is_mode0x13) {
         for (i = originalnummodes, cstretch = 0; i < nummodes; i++) {
-            if (((modelist[i].width >> 1) < lowestres) &&
-                ((modelist[i].width >> 1) >= 320)) {
-                lowestres = modelist[i].width >> 1;
+            if ((HALF(modelist[i].width) < lowestres) &&
+                (HALF(modelist[i].width) >= 320)) {
+                lowestres = HALF(modelist[i].width);
                 cstretch = 1;
                 mstretch = i;
             }
@@ -1053,7 +1055,7 @@ cString VID_GetExtModeDescription(int mode) {
     VID_CheckModedescFixup(mode);
 
     pv = VID_GetModePtr(mode);
-    if (modelist[mode].type == MS_FULLSCREEN)   snprintf(pinfo, sizeof(pinfo), "%s fullscreen %s", pv->modedesc,	MGL_modeDriverName(pv->modenum));
+    if (modelist[mode].type == MS_FULLSCREEN)   snprintf(pinfo, sizeof(pinfo), "%s fullscreen %s", pv->modedesc, MGL_modeDriverName(pv->modenum));
     else if (modelist[mode].type == MS_FULLDIB) snprintf(pinfo, sizeof(pinfo), "%s fullscreen DIB", pv->modedesc);
     else                                        snprintf(pinfo, sizeof(pinfo), "%s windowed", pv->modedesc);
 

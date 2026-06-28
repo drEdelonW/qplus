@@ -93,8 +93,8 @@ void R_AddDynamicLights() {
             for (int s = 0; s < smax; s++) {
                 int sd = local.s - s * 16;
                 if (sd < 0)     sd = -sd;
-                if (sd > td)    dist = sd + (td >> 1);
-                else            dist = td + (sd >> 1);
+                if (sd > td)    dist = sd + HALF(td);
+                else            dist = td + HALF(sd);
 
                 if (dist < minlight)
 #ifdef QUAKE2
@@ -418,12 +418,11 @@ void R_DrawSurfaceBlock8_mip3() {
         lightleft = r_lightptr[0];
         lightright = r_lightptr[1];
         r_lightptr += r_lightwidth;
-        lightleftstep = (r_lightptr[0] - lightleft) >> 1;
-        lightrightstep = (r_lightptr[1] - lightright) >> 1;
+        lightleftstep = HALF(r_lightptr[0] - lightleft);
+        lightrightstep = HALF(r_lightptr[1] - lightright);
 
         for (int i = 0; i < 2; i++) {
-            int lighttemp = lightleft - lightright;
-            int lightstep = lighttemp >> 1;
+            int lightstep = HALF(lightleft - lightright);
 
             int light = lightright;
 

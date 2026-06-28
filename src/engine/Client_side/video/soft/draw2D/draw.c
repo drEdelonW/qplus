@@ -184,7 +184,7 @@ void Draw_Character(int x, int y, int num) {
                     pusdest[i] = d_8to16table[source[i]];
 
             source += 128;
-            pusdest += (vid.conrowbytes >> 1);
+            pusdest += HALF(vid.conrowbytes);
         }
     }
 }
@@ -258,13 +258,13 @@ void Draw_Pic(int x, int y, qPic_p pic) {
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * (vid.rowbytes >> 1) + x;
+        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * HALF(vid.rowbytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++)
                 pusdest[u] = d_8to16table[source[u]];
 
-            pusdest += vid.rowbytes >> 1;
+            pusdest += HALF(vid.rowbytes);
             source += pic->width;
         }
     }
@@ -315,7 +315,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * (vid.rowbytes >> 1) + x;
+        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * HALF(vid.rowbytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
@@ -324,7 +324,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                     pusdest[u] = d_8to16table[tbyte];
             }
 
-            pusdest += vid.rowbytes >> 1;
+            pusdest += HALF(vid.rowbytes);
             source += pic->width;
         }
     }
@@ -376,7 +376,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * (vid.rowbytes >> 1) + x;
+        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * HALF(vid.rowbytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
@@ -386,7 +386,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
                     pusdest[u] = d_8to16table[tbyte];
             }
 
-            pusdest += vid.rowbytes >> 1;
+            pusdest += HALF(vid.rowbytes);
             source += pic->width;
         }
     }
@@ -461,7 +461,7 @@ void Draw_ConsoleBackground(int lines) {
     else {
         uint16_p pusdest = (uint16_p)vid.con.pBuff;
 
-        for (int y = 0; y < lines; y++, pusdest += (vid.conrowbytes >> 1)) {
+        for (int y = 0; y < lines; y++, pusdest += HALF(vid.conrowbytes)) {
             // FIXME: pre-expand to native format?
             // FIXME: does the endian switching go away in production?
             int v = (vid.con.height - lines + y) * 200 / vid.con.height;
@@ -469,10 +469,10 @@ void Draw_ConsoleBackground(int lines) {
             fixed16_t f = 0;
             fixed16_t fstep = 320 * 0x10000 / vid.con.width;
             for (int x = 0; x < vid.con.width; x += 4) {
-                pusdest[x + 0] = d_8to16table[src[FIXED16_TO_INT(f)]];    f += fstep;
-                pusdest[x + 1] = d_8to16table[src[FIXED16_TO_INT(f)]];    f += fstep;
-                pusdest[x + 2] = d_8to16table[src[FIXED16_TO_INT(f)]];    f += fstep;
-                pusdest[x + 3] = d_8to16table[src[FIXED16_TO_INT(f)]];    f += fstep;
+                pusdest[x + 0] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;
+                pusdest[x + 1] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;
+                pusdest[x + 2] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;
+                pusdest[x + 3] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;
             }
         }
     }
@@ -524,10 +524,10 @@ void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
     // FIXME: would it be better to pre-expand native-format versions?
 
     uint16_p pdest = (uint16_p)vid.scr.pBuff +
-        (prect->y * (vid.rowbytes >> 1)) + prect->x;
+        (prect->y * HALF(vid.rowbytes)) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
-    int destdelta = (vid.rowbytes >> 1) - prect->width;
+    int destdelta = HALF(vid.rowbytes) - prect->width;
 
     uint8_t t;
     if (transparent) {
@@ -632,8 +632,8 @@ void Draw_Fill(int x, int y, int w, int h, int c) {
     }
     else {
         uint16_t uc = d_8to16table[c];
-        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * (vid.rowbytes >> 1) + x;
-        for (int v = 0; v < h; v++, pusdest += (vid.rowbytes >> 1))
+        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * HALF(vid.rowbytes) + x;
+        for (int v = 0; v < h; v++, pusdest += HALF(vid.rowbytes))
             for (int u = 0; u < w; u++)
                 pusdest[u] = uc;
     }

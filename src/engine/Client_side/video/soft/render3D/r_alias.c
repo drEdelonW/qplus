@@ -573,7 +573,7 @@ void R_AliasSetupSkin() {
     r_affinetridesc.pskindesc = _pSkinDesc;
     r_affinetridesc.pskin = (TypeLess_ptr)((uint8_p)paliashdr + _pSkinDesc->skin);
     r_affinetridesc.skinwidth = a_skinwidth;
-    r_affinetridesc.seamfixupX16 = (a_skinwidth >> 1) << 16;
+    r_affinetridesc.seamfixupX16 = INT_TO_FIXED16(HALF(a_skinwidth));
     r_affinetridesc.skinheight = pmdl->skinheight;
 }
 

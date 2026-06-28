@@ -86,8 +86,8 @@ void SV_InitBoxHull() {
         if (i != 5)     _boxClipNodes[i].children[side ^ 1] = i + 1;
         else            _boxClipNodes[i].children[side ^ 1] = CONTENTS_SOLID;
 
-        _boxPlanes[i].type = i >> 1;
-        _boxPlanes[i].normal.v[i >> 1] = 1;
+        _boxPlanes[i].type = HALF(i);
+        _boxPlanes[i].normal.v[HALF(i)] = 1;
     }
 
 }

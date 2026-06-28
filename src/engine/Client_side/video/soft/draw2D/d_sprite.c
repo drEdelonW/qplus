@@ -329,8 +329,9 @@ void D_SpriteCalculateGradients() {
 
     vec3_t p_temp1 = TransformVector(modelorg);
 
-    sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5f)) - (-INT_TO_FIXED16(cachewidth >> 1));
-    tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5f)) - (-INT_TO_FIXED16(_spriteHeight >> 1));
+    // TODO: research what is going on here? [vvv]
+    sadjust = ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5f)) - (-INT_TO_FIXED16(HALF(cachewidth)));
+    tadjust = ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5f)) - (-INT_TO_FIXED16(HALF(_spriteHeight)));
 
     // -1 (-epsilon) so we never wander off the edge of the texture
     bbextents = INT_TO_FIXED16(cachewidth) - 1;

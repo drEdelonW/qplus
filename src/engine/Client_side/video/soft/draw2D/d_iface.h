@@ -52,7 +52,7 @@ typedef struct {
     FinalVert_p pfinalverts;
     int         numtriangles;
     int         drawtype;   // TODO: check is it bool? SubDiv/NoSubDiv?
-    int         seamfixupX16;
+    fixed16_t   seamfixupX16;
 } AffineTriDesc_t;
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!

@@ -362,12 +362,12 @@ void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) 
 
     // split this edge
     VertAttr_t  _new = {
-        .x = (lp1->x + lp2->x) >> 1,
-        .y = (lp1->y + lp2->y) >> 1,
-        .s = (lp1->s + lp2->s) >> 1,
-        .t = (lp1->t + lp2->t) >> 1,
+        .x = FIXED16_MID(lp1->x, lp2->x),
+        .y = FIXED16_MID(lp1->y, lp2->y),
+        .s = FIXED16_MID(lp1->s, lp2->s),
+        .t = FIXED16_MID(lp1->t, lp2->t),
         /* .light — skipped */
-        .zi = (lp1->zi + lp2->zi) >> 1,
+        .zi = FIXED16_MID(lp1->zi, lp2->zi),
     };
     if ((_new.y < 0) ||
         (_new.x < 0)
@@ -561,8 +561,8 @@ void D_PolysetCalcGradients(int skinwidth) {
     a_sstepxfrac = r_sstepx << 16;
     a_tstepxfrac = r_tstepx << 16;
 #else
-    a_sstepxfrac = r_sstepx & 0xFFFF;
-    a_tstepxfrac = r_tstepx & 0xFFFF;
+    a_sstepxfrac = FIXED16_FRAC(r_sstepx);
+    a_tstepxfrac = FIXED16_FRAC(r_tstepx);
 #endif
 
     a_ststepxwhole = skinwidth * FIXED16_TO_INT(r_tstepx) + FIXED16_TO_INT(r_sstepx);
@@ -687,11 +687,11 @@ void D_RasterizeAliasPolySmooth() {
         FIXED16_TO_INT(plefttop->t) * r_affinetridesc.skinwidth
         );
 #if id386
-    d_snap.sfrac = (plefttop.s & 0xFFFF) << 16;
-    d_snap.tfrac = (plefttop.t & 0xFFFF) << 16;
+    d_snap.sfrac = FIXED16_FRAC(plefttop.s) << 16;
+    d_snap.tfrac = FIXED16_FRAC(plefttop.t) << 16;
 #else
-    d_snap.sfrac = (plefttop->s & 0xFFFF);
-    d_snap.tfrac = (plefttop->t & 0xFFFF);
+    d_snap.sfrac = FIXED16_FRAC(plefttop->s);
+    d_snap.tfrac = FIXED16_FRAC(plefttop->t);
 #endif
     d_snap.light = plefttop->light;
     d_snap.zi = plefttop->zi;
@@ -737,8 +737,8 @@ void D_RasterizeAliasPolySmooth() {
         d_basestep.sfrac = (r_sstepy + r_sstepx * d_basestep.count) << 16;
         d_basestep.tfrac = (r_tstepy + r_tstepx * d_basestep.count) << 16;
 #else
-        d_basestep.sfrac = (r_sstepy + r_sstepx * d_basestep.count) & 0xFFFF;
-        d_basestep.tfrac = (r_tstepy + r_tstepx * d_basestep.count) & 0xFFFF;
+        d_basestep.sfrac = FIXED16_FRAC(r_sstepy + r_sstepx * d_basestep.count);
+        d_basestep.tfrac = FIXED16_FRAC(r_tstepy + r_tstepx * d_basestep.count);
 #endif
         d_basestep.light = r_lstepy + working_lstepx * d_basestep.count;
         d_basestep.zi = r_zistepy + r_zistepx * d_basestep.count;
@@ -751,8 +751,8 @@ void D_RasterizeAliasPolySmooth() {
         d_extrastep.sfrac = (r_sstepy + r_sstepx * d_extrastep.count) << 16;
         d_extrastep.tfrac = (r_tstepy + r_tstepx * d_extrastep.count) << 16;
 #else
-        d_extrastep.sfrac = (r_sstepy + r_sstepx * d_extrastep.count) & 0xFFFF;
-        d_extrastep.tfrac = (r_tstepy + r_tstepx * d_extrastep.count) & 0xFFFF;
+        d_extrastep.sfrac = FIXED16_FRAC(r_sstepy + r_sstepx * d_extrastep.count);
+        d_extrastep.tfrac = FIXED16_FRAC(r_tstepy + r_tstepx * d_extrastep.count);
 #endif
         d_extrastep.light = d_basestep.light + working_lstepx;
         d_extrastep.zi = d_basestep.zi + r_zistepx;
@@ -820,8 +820,8 @@ void D_RasterizeAliasPolySmooth() {
             d_basestep.sfrac = (r_sstepy + r_sstepx * d_basestep.count) << 16;
             d_basestep.tfrac = (r_tstepy + r_tstepx * d_basestep.count) << 16;
 #else
-            d_basestep.sfrac = (r_sstepy + r_sstepx * d_basestep.count) & 0xFFFF;
-            d_basestep.tfrac = (r_tstepy + r_tstepx * d_basestep.count) & 0xFFFF;
+            d_basestep.sfrac = FIXED16_FRAC(r_sstepy + r_sstepx * d_basestep.count);
+            d_basestep.tfrac = FIXED16_FRAC(r_tstepy + r_tstepx * d_basestep.count);
 #endif
             d_basestep.light = r_lstepy + working_lstepx * d_basestep.count;
             d_basestep.zi = r_zistepy + r_zistepx * d_basestep.count;
@@ -831,11 +831,11 @@ void D_RasterizeAliasPolySmooth() {
                 FIXED16_TO_INT(r_tstepy + r_tstepx * d_extrastep.count) * r_affinetridesc.skinwidth
                 );
 #if id386
-            d_extrastep.sfrac = ((r_sstepy + r_sstepx * d_extrastep.count) & 0xFFFF) << 16;
-            d_extrastep.tfrac = ((r_tstepy + r_tstepx * d_extrastep.count) & 0xFFFF) << 16;
+            d_extrastep.sfrac = (FIXED16_FRAC(r_sstepy + r_sstepx * d_extrastep.count)) << 16;
+            d_extrastep.tfrac = (FIXED16_FRAC(r_tstepy + r_tstepx * d_extrastep.count)) << 16;
 #else
-            d_extrastep.sfrac = (r_sstepy + r_sstepx * d_extrastep.count) & 0xFFFF;
-            d_extrastep.tfrac = (r_tstepy + r_tstepx * d_extrastep.count) & 0xFFFF;
+            d_extrastep.sfrac = FIXED16_FRAC(r_sstepy + r_sstepx * d_extrastep.count);
+            d_extrastep.tfrac = FIXED16_FRAC(r_tstepy + r_tstepx * d_extrastep.count);
 #endif
             d_extrastep.light = d_basestep.light + working_lstepx;
             d_extrastep.zi = d_basestep.zi + r_zistepx;

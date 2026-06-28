@@ -31,9 +31,14 @@ typedef fixed16_t*  fixed16_p;
 #define INT_TO_FIXED16(x)       ((fixed16_t)(x) << FIXED16_FRAC_BITS)
 #define FIXED16_FRAC(x)         ((x) & (FIXED16_ONE - 1))  // Frac part (x & 0xFFFF)
 
+// -- Bit ops ------------------------------------------------------------------
+
+#define HALF(x)     ((x) >> 1)  /* fast divide by 2 */
+#define TWICE(x)    ((x) << 1)  /* fast multiply by 2 */
+
 // -- Arithmetic ---------------------------------------------------------------
 
-#define FIXED16_MID(a, b)       (((a) + (b)) >> 1)         // midpoint, stays in 16.16
+#define FIXED16_MID(a, b)       HALF(((a) + (b)))         // midpoint, stays in 16.16
 
 static inline fixed16_t fixed16_mul(fixed16_t a, fixed16_t b) {
     return (fixed16_t)(((int64_t)a * b) >> FIXED16_FRAC_BITS);

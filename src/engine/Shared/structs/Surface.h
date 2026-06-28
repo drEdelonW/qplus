@@ -6,7 +6,6 @@
 #include "enginedefs.h"
 #include "SurfCache.h"
 #include "Face.h"
-#include "fixed.h"
 
 typedef enum {
     SURF_NONE           = 0u,
