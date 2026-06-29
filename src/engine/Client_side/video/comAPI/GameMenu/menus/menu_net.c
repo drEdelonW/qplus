@@ -85,7 +85,7 @@ void M_Net_Draw() {
 
     if (m_net_items == 5) M_DrawTransPic(72, f += 19, Draw_CachePic("gfx/netmen5.lmp")); // JDC, could just be removed
 
-    f = (320 - 26 * 8) / 2;
+    f = HALF(320 - 26 * 8);
     M_DrawTextBox(f, 134, 24, 4);
     f += 8;
     for (int i = 0; i < 4; i++)

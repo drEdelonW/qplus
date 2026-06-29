@@ -442,8 +442,8 @@ void SCR_CalcRefdef() {
             if (pvrect->height > pvrectin->height)
                 pvrect->height = pvrectin->height;
 
-            pvrect->x = (pvrectin->width - pvrect->width) / 2;
-            pvrect->y = (full) ? 0 : (h - pvrect->height) / 2;
+            pvrect->x = HALF(pvrectin->width - pvrect->width);
+            pvrect->y = (full) ? 0 : HALF(h - pvrect->height);
         }
     }
 #else

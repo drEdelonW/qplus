@@ -112,11 +112,9 @@ static vec3_t _aVelocities[NUMVERTEXNORMALS];
 static float _beamLength = 16.0f;
 
 void R_EntityParticles(r_Entity_p ent) {
-    if (!_aVelocities[0].x) {
-        for (int i = 0; i < (NUMVERTEXNORMALS * 3); i++) {
+    if (!_aVelocities[0].x)
+        for (int i = 0; i < (NUMVERTEXNORMALS * 3); i++)
             _aVelocities[0].v[i] = (rand() & 255) * 0.01;
-        }
-    }
 
     float dist = 64.0f;
     for (int i = 0; i < NUMVERTEXNORMALS; i++) {
@@ -196,11 +194,11 @@ void R_ReadPointFile_f() {
         prt->next = _activeParticles;
         _activeParticles = prt;
 
-        prt->die = 99999;
-        prt->color = (-c) & 15;
-        prt->type = pt_static;
-        prt->vel = vec3_origin;
         prt->org = org;
+        prt->color = (-c) & 15;
+        prt->vel = vec3_origin;
+        prt->die = 99999;
+        prt->type = pt_static;
     }
 
     fclose(pntFile);

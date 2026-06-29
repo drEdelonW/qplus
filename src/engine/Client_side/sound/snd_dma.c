@@ -525,7 +525,7 @@ void S_ClearBuffer() {
             }
         }
 
-        Q_memset(pData, clear, shm->samples * shm->samplebits / 8);
+        Q_memset(pData, clear, EIGHTH(shm->samples * shm->samplebits));
 
         pDSBuf->lpVtbl->Unlock(pDSBuf, pData, dwSize, NULL, 0);
 
@@ -533,7 +533,7 @@ void S_ClearBuffer() {
     else
 #endif
     {
-        Q_memset(shm->buffer, clear, (size_t)(shm->samples * shm->samplebits / 8));
+        Q_memset(shm->buffer, clear, (size_t)(EIGHTH(shm->samples * shm->samplebits)));
     }
     }
 
@@ -565,7 +565,7 @@ void S_StaticSound(sfx_p sfx, vec3_t origin, float vol, float attenuation) {
     ss->sfx = sfx;
     ss->origin = origin;
     ss->master_vol = (int)vol;
-    ss->dist_mult = (attenuation / 64) / sound_nominal_clip_dist;
+    ss->dist_mult = (attenuation / 64.0f) / sound_nominal_clip_dist;
     ss->end = paintedtime + sc->length;
 
     SND_Spatialize(ss);

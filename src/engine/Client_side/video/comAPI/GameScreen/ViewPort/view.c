@@ -266,8 +266,8 @@ void V_ParseDamage() {
     cl.faceanimtime = cl.time + 0.2f;  // but sbar face into pain frame
 
     cl.cshifts[CSHIFT_DAMAGE].percent += 3 * count;
-    // if (cl.cshifts[CSHIFT_DAMAGE].percent < 0)
-    //     cl.cshifts[CSHIFT_DAMAGE].percent = 0;
+    if (cl.cshifts[CSHIFT_DAMAGE].percent < 0)  // for x86 must be signed and more then 8bit
+        cl.cshifts[CSHIFT_DAMAGE].percent = 0;
     if (cl.cshifts[CSHIFT_DAMAGE].percent > 150)
         cl.cshifts[CSHIFT_DAMAGE].percent = 150;
 
@@ -734,20 +734,30 @@ void V_CalcRefdef() {
     // never let it sit exactly on a node line, because a water plane can
     // dissapear when viewed with the eye exactly on it.
     // the server protocol only specifies to 1/16 pixel, so add 1/32 in each axis
+#if 0
     r_refdef.vieworg.x += 1.0 / 32;
     r_refdef.vieworg.y += 1.0 / 32;
     r_refdef.vieworg.z += 1.0 / 32;
+#else
+    r_refdef.vieworg = VectorAdd(r_refdef.vieworg, Scalar2Vector(1.0 / 32));
+#endif
 
     r_refdef.viewangles = cl.viewangles;
     V_CalcViewRoll();
     V_AddIdle();
 
+#if 0
     vec3_t angles = {
         // offsets
        .x = -ent->angles.pitch, /* angles[PITCH] */ // because entity pitches are actually backward
        .y = ent->angles.yaw,    /* angles[YAW] */
        .z = ent->angles.roll    /* angles[ROLL] */
     };
+#else
+    vec3_t angles = ent->angles;
+    angles.pitch = -angles.pitch;   // because entity pitches are actually backward
+#endif
+
 
     _bs = GetBasis(angles);
 
@@ -879,16 +889,16 @@ void V_RenderView() {
 
 void Draw_crosshair() {
     if (crosshair.value)
-    Draw_Character(
+        Draw_Character(
 #if GLQUAKE
-        scr.vrect.x + HALF(scr.vrect.width),
-        scr.vrect.y + HALF(scr.vrect.height),
+            scr.vrect.x + HALF(scr.vrect.width),
+            scr.vrect.y + HALF(scr.vrect.height),
 #else
-        scr.vrect.x + HALF(scr.vrect.width) + cl_crossx.value,
-        scr.vrect.y + HALF(scr.vrect.height) + cl_crossy.value,
+            scr.vrect.x + HALF(scr.vrect.width) + cl_crossx.value,
+            scr.vrect.y + HALF(scr.vrect.height) + cl_crossy.value,
 #endif
-        '+'
-    );
+            '+'
+        );
 }
 
 /*

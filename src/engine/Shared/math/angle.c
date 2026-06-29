@@ -6,14 +6,14 @@ float anglemod(float a) {
     if (a >= 0) a -= 360 * (int)(a / 360);
     else        a += 360 * (1 + (int)(-a / 360));
 #endif
-    a = (360.0f / FIXED16_ONE) * FIXED16_FRAC((fixed16_t)(a * (FIXED16_ONE / 360.0f)));
-    return a;
+    return
+        (360.0f / FIXED16_ONE) *
+        FIXED16_FRAC((fixed16_t)(a * (FIXED16_ONE / 360.0f)));
 }
 
 float angledelta(float a) {
     a = anglemod(a);
-    if (a > 180)
-        a -= 360;
+    if (a > 180.0f)     a -= 360.0f;
     return a;
 }
 

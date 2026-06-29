@@ -302,8 +302,8 @@ void Mod_LoadTexinfo(Lump_p Lump_in) {
         else if (len1 < 0.99f)  out->mipadjust = 2.0f;
         else /*              */ out->mipadjust = 1.0f;
 #if 0
-        if (len1 + len2 < 0.001)    out->mipadjust = 1.0f;  // don't crash
-        else                        out->mipadjust = 1 / floor((len1 + len2) / 2 + 0.1f);
+        if ((len1 + len2) < 0.001)      out->mipadjust = 1.0f;  // don't crash
+        else                            out->mipadjust = 1 / floor((len1 + len2) / 2 + 0.1f);
 #endif
 
         int miptex = LittleLong(in->miptex);

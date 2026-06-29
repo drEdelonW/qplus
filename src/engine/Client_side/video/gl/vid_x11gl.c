@@ -1,6 +1,8 @@
 #ifndef GLQUAKE
 # error This is OpenGL target! GLQUAKE should be defined
 #endif
+
+// TODO: cleanup this IA slop!
 // #include "vid.h"
 #include "x_prv.h"
 #include "cvar.h"

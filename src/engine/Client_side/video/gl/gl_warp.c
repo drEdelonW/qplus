@@ -180,11 +180,8 @@ void EmitWaterPolys(mSurface_p fa) {
                 float os = v.tx.s;
                 float ot = v.tx.t;
 
-                float s = os + turbsin[(int)((ot * 0.125 + realtime) * TURBSCALE) & 255];
-                s *= (1.0 / 64);
-
-                float t = ot + turbsin[(int)((os * 0.125 + realtime) * TURBSCALE) & 255];
-                t *= (1.0 / 64);
+                float s = (os + turbsin[(int)((ot * 0.125 + realtime) * TURBSCALE) & 255]) / 64.0f;
+                float t = (ot + turbsin[(int)((os * 0.125 + realtime) * TURBSCALE) & 255]) / 64.0f;
 
                 glTexCoord2f(s, t);     glVertex3fv(v.vf);
             }
@@ -208,13 +205,13 @@ void EmitSkyPolys(mSurface_p fa) {
                 vec3_t dir = VectorSubtract(v.v, r_origin);
                 dir.z *= 3; // flatten the sphere
 
-                float length = (6 * 63) / Length(dir);
+                float length = (6 * 63.0f) / Length(dir);
 
                 dir.x *= length;
                 dir.y *= length;
 
-                float s = (speedscale + dir.x) * (1.0 / 128);
-                float t = (speedscale + dir.y) * (1.0 / 128);
+                float s = (speedscale + dir.x) / 128.0f;
+                float t = (speedscale + dir.y) / 128.0f;
 
                 glTexCoord2f(s, t);     glVertex3fv(v.vf);
             }

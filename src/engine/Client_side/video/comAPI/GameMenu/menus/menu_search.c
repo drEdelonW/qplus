@@ -24,7 +24,7 @@ void M_Menu_Search_f() {
 void M_Search_Draw() {
     M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 
-    int x = (320 / 2) - ((12 * 8) / 2) + 4;
+    int x = HALF(320) - (HALF(12 * 8)) + 4;
     M_DrawTextBox(x - 8, 32, 12, 1); {
         M_Print(x, 40, "Searching...");
     }
@@ -38,7 +38,7 @@ void M_Search_Draw() {
 
     if (hostCacheCount) { M_Menu_ServerList_f();    return; }
 
-    M_PrintWhite((320 / 2) - ((22 * 8) / 2), 64, "No Quake servers found");
+    M_PrintWhite(HALF(320) - (HALF(22 * 8)), 64, "No Quake servers found");
     if ((realtime - searchCompleteTime) < 3.0)
         return;
 

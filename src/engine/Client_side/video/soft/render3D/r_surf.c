@@ -62,40 +62,42 @@ fixed16_t  blocklights[18 * 18];
 R_AddDynamicLights
 ===============
 */
-void R_AddDynamicLights() {
+void R_AddDynamicLights() { // TODO: merge with GL function almoust the same
     mSurface_p surf = r_drawsurf.surf;
-    int smax = (FIXED4_TO_INT(surf->extents[S_AX])) + 1;
-    int tmax = (FIXED4_TO_INT(surf->extents[T_AX])) + 1;
-    mTexInfo_p tex = surf->texinfo;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
-        if (!(surf->dlightbits & (1 << lnum)))  continue;  // not lit by this light
+        if (!(surf->dlightbits & (1 << lnum)))
+            continue;   // not lit by this light
 
-        float rad = cl_dlights[lnum].radius;
-        float dist = DotProduct(cl_dlights[lnum].origin, surf->plane->normal) -
-            surf->plane->dist;
-        rad -= fabs(dist);
+        float dist = DotProduct(cl_dlights[lnum].origin, surf->plane->normal) - surf->plane->dist;
+        float rad = cl_dlights[lnum].radius - fabs(dist);
+
         float minlight = cl_dlights[lnum].minlight;
-        if (rad < minlight)     continue;
+        if (rad < minlight)
+            continue;
 
         minlight = rad - minlight;
 
-
-        vec3_t impact = VectorMA(cl_dlights[lnum].origin, -dist, surf->plane->normal);
-        vec2_t local = {
-            .s = DotProduct(impact, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs - surf->texturemins[S_AX],
-            .t = DotProduct(impact, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs - surf->texturemins[T_AX]
-        };
+        vec3_t impact = VectorMA(
+            cl_dlights[lnum].origin,
+            -dist, surf->plane->normal
+        );
+        mTexInfo_p tex = surf->texinfo;
+        fixed4_t ts = DotProduct(impact, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs - surf->texturemins[S_AX];
+        fixed4_t tt = DotProduct(impact, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs - surf->texturemins[T_AX];
+        int smax = (FIXED4_TO_INT(surf->extents[S_AX])) + 1;
+        int tmax = (FIXED4_TO_INT(surf->extents[T_AX])) + 1;
 
         for (int t = 0; t < tmax; t++) {
-            int td = local.t - MUL16(t);
+            int td = tt - MUL16(t);
             if (td < 0)     td = -td;
 
             for (int s = 0; s < smax; s++) {
-                int sd = local.s - MUL16(s);
+                int sd = ts - MUL16(s);
                 if (sd < 0)     sd = -sd;
-                if (sd > td)    dist = sd + HALF(td);
-                else            dist = td + HALF(sd);
+
+                float dist = (sd > td) ?
+                    sd + HALF(td) : td + HALF(sd);
 
                 if (dist < minlight)
 #ifdef QUAKE2
@@ -109,7 +111,7 @@ void R_AddDynamicLights() {
                     }
                 }
 #else
-                    blocklights[t * smax + s] += (rad - dist) * 256;
+                    blocklights[(t * smax) + s] += (rad - dist) * 256;
 #endif
             }
         }
@@ -123,12 +125,12 @@ R_BuildLightMap
 Combine and scale multiple lightmaps into the 8.8 format in blocklights
 ===============
 */
-void R_BuildLightMap() {
+void R_BuildLightMap() {// TODO: merge with GL function almoust the same
     mSurface_p surf = r_drawsurf.surf;
     int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
     int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
     int size = smax * tmax;
-    uint8_p lightmap = surf->samples;
+
 
     if ((r_fullbright.value) ||
         (!cl.worldmodel->lightdata)
@@ -137,26 +139,26 @@ void R_BuildLightMap() {
             blocklights[i] = 0;
         return;
     }
+    else {  // clear to ambient
+        for (int i = 0; i < size; i++)
+            blocklights[i] = INT_TO_FIXED8(r_refdef.ambientlight);
 
-    // clear to ambient
-    for (int i = 0; i < size; i++)
-        blocklights[i] = INT_TO_FIXED8(r_refdef.ambientlight);
-
-
-    // add all the lightmaps
-    if (lightmap)
-        for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 255); maps++) {
-            fixed8_t scale = r_drawsurf.lightadj[maps]; // 8.8 fraction
-            for (int i = 0; i < size; i++)
-                blocklights[i] += lightmap[i] * scale;
-            lightmap += size; // skip to next lightmap
+        {   // add all the lightmaps
+            uint8_p lightmap = surf->samples;
+            if (lightmap)
+                for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 255); maps++) {
+                    fixed8_t scale = r_drawsurf.lightadj[maps]; // 8.8 fraction
+                    for (int i = 0; i < size; i++)
+                        blocklights[i] += lightmap[i] * scale;
+                    lightmap += size; // skip to next lightmap
+                }
         }
+        // add all the dynamic lights
+        if (surf->dlightframe == r_framecount)
+            R_AddDynamicLights();
 
-    // add all the dynamic lights
-    if (surf->dlightframe == r_framecount)
-        R_AddDynamicLights();
-
-    // bound, invert, and shift
+        // bound, invert, and shift
+    }
     for (int i = 0; i < size; i++) {
         int t = (255 * 256 - (int)blocklights[i]) >> (8 - VID_CBITS);
 

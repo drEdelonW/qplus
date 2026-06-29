@@ -79,29 +79,30 @@ void R_RenderDynamicLightmaps(mSurface_p fa);
 R_AddDynamicLights
 ===============
 */
-void R_AddDynamicLights(mSurface_p surf) {
-    mTexInfo_p tex = surf->texinfo;
-
+void R_AddDynamicLights(mSurface_p surf) { // TODO: merge with SoftR function almoust the same
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
         if (!(surf->dlightbits & (1 << lnum)))
-            continue;        // not lit by this light
+            continue;   // not lit by this light
 
-        float rad = cl_dlights[lnum].radius;
         float dist = DotProduct(cl_dlights[lnum].origin, surf->plane->normal) - surf->plane->dist;
-        rad -= fabs(dist);
+        float rad = cl_dlights[lnum].radius - fabs(dist);
+
         float minlight = cl_dlights[lnum].minlight;
         if (rad < minlight)
             continue;
+
         minlight = rad - minlight;
 
-        vec3_t impact = VectorMA(cl_dlights[lnum].origin,
+        vec3_t impact = VectorMA(
+            cl_dlights[lnum].origin,
             -dist, surf->plane->normal
         );
-
+        mTexInfo_p tex = surf->texinfo;
         fixed4_t ts = DotProduct(impact, tex->vecs[S_AX].vx) + tex->vecs[S_AX].offs - surf->texturemins[S_AX];
         fixed4_t tt = DotProduct(impact, tex->vecs[T_AX].vx) + tex->vecs[T_AX].offs - surf->texturemins[T_AX];
         int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
         int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
+
         for (int t = 0; t < tmax; t++) {
             fixed4_t td = tt - INT_TO_FIXED4(t);
             if (td < 0)     td = -td;
@@ -114,7 +115,7 @@ void R_AddDynamicLights(mSurface_p surf) {
                     sd + HALF(td) : td + HALF(sd);
 
                 if (dist < minlight)
-                    blocklights[t * smax + s] += (rad - dist) * 256;
+                    blocklights[(t * smax) + s] += (rad - dist) * 256;
             }
         }
     }
@@ -128,13 +129,12 @@ R_BuildLightMap
 Combine and scale multiple lightmaps into the 8.8 format in blocklights
 ===============
 */
-void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
+void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {// TODO: merge with GL function almoust the same
     surf->cached_dlight = (surf->dlightframe == r_framecount);
 
     int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
     int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
     int size = smax * tmax;
-    uint8_p lightmap = surf->samples;
 
     // set to full bright if no light data
     if ((r_fullbright.value) ||
@@ -143,21 +143,21 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
         for (int i = 0; i < size; i++)
             blocklights[i] = 255 * 256;
     }
-    else {
-        // clear to no light
+    else {  // clear to no light
         for (int i = 0; i < size; i++)
             blocklights[i] = 0;
 
-        // add all the lightmaps
-        if (lightmap)
-            for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 255); maps++) {
-                fixed8_t scale = d_lightstylevalue[surf->styles[maps]];
-                surf->cached_light[maps] = scale;    // 8.8 fraction
-                for (int i = 0; i < size; i++)
-                    blocklights[i] += lightmap[i] * scale;
-                lightmap += size;    // skip to next lightmap
-            }
-
+        {   // add all the lightmaps
+            uint8_p lightmap = surf->samples;
+            if (lightmap)
+                for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 255); maps++) {
+                    fixed8_t scale = d_lightstylevalue[surf->styles[maps]];
+                    surf->cached_light[maps] = scale;    // 8.8 fraction
+                    for (int i = 0; i < size; i++)
+                        blocklights[i] += lightmap[i] * scale;
+                    lightmap += size;    // skip to next lightmap
+                }
+        }
         // add all the dynamic lights
         if (surf->dlightframe == r_framecount)
             R_AddDynamicLights(surf);
@@ -168,27 +168,25 @@ void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {
     switch (gl_lightmap_format) {
     case GL_RGBA: {
         stride -= QUAD(smax);
-        uint32_p bl = blocklights;
-        for (int i = 0; i < tmax; i++, dest += stride) {
+        fixed16_p bl = blocklights;
+        for (int i = 0; i < tmax; i++, dest += stride)
             for (int j = 0; j < smax; j++) {
                 int t = DIV128(*bl++);
                 if (t > 0xFF)    t = 0xFF;
                 dest[3] = 0xFF - t;
                 dest += 4;
             }
-        }
     } break;
     case GL_ALPHA:
     case GL_LUMINANCE:
     case GL_INTENSITY: {
-        uint32_p bl = blocklights;
-        for (int i = 0; i < tmax; i++, dest += stride) {
+        fixed16_p bl = blocklights;
+        for (int i = 0; i < tmax; i++, dest += stride)
             for (int j = 0; j < smax; j++) {
                 int t = DIV128(*bl++);
                 if (t > 0xFF)    t = 0xFF;
                 dest[j] = 0xFF - t;
             }
-        }
     } break;
     default: { Host_SysError("Bad lightmap format"); } break;
     }
@@ -360,7 +358,8 @@ void R_DrawSequentialPoly(mSurface_p s) {
                 lightmap_modified[i] = false;
                 glRect_p theRect = &lightmap_rectchange[i];
                 glTexSubImage2D(
-                    GL_TEXTURE_2D, 0, 0, theRect->t,
+                    GL_TEXTURE_2D, 0,
+                    0, theRect->t,
                     BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
                     lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
                 );
@@ -577,7 +576,7 @@ void R_BlendLightmaps() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    if (!r_lightmap.value)
+    if (r_lightmap.value)   // kind of fix light map
         glEnable(GL_BLEND);
 
     for (int i = 0; i < MAX_LIGHTMAPS; i++) {

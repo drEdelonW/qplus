@@ -956,7 +956,7 @@ R_RenderView
 r_refdef must be set before the first call
 ================
 */
-#define GLFOG
+// #define GLFOG
 void R_RenderView() {
     if (r_norefresh.value)      return;
 
