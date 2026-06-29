@@ -165,9 +165,9 @@ typedef struct {
     IntermissionState_e intermission; // don't change view angle, full screen, etc
     int32_t     completed_time; // latched at intermission start
 
-    LegacyTimeStamp_t   mtime[2];  // the timestamp of last two messages
-    LegacyTimeStamp_t   time;   // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
-    LegacyTimeStamp_t   oldtime;  // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
+    LegacyTimeStamp_t   mtime[2];   // the timestamp of last two messages
+    LegacyTimeStamp_t   time;       // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
+    LegacyTimeStamp_t   oldtime;    // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
 
     LegacyTimeDelta_t       last_received_message; // (realtime) for net trouble icon
 

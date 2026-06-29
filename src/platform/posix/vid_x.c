@@ -81,7 +81,7 @@ bool   oktodraw = false;
 // int XShmQueryExtension(Display*);
 // int XShmGetEventBase(Display*);
 
-static int current_framebuffer;
+static bool current_framebuffer;
 static XImage* x_framebuffer[2] = { 0, 0 };
 static XShmSegmentInfo x_shminfo[2];
 
@@ -156,16 +156,14 @@ PIXEL24 xlib_rgb24(int r, int g, int b) {
 }
 
 void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
-    register int count, n;
-
-    if ((x < 0) || (y < 0))return;
+    if ((x < 0) || (y < 0))     return;
 
     for (int yi = y; yi < (y + height); yi++) {
         uint8_p src = (uint8_p)&framebuf->data[yi * framebuf->bytes_per_line];
 
         // Duff's Device
-        count = width;
-        n = (count + 7) / 8;
+        register int count = width;
+        register int n = (count + 7) / 8;
         PIXEL16* dest = ((PIXEL16*)src) + x + width - 1;
         src += x + width - 1;
 
@@ -288,15 +286,12 @@ void ResetFrameBuffer() {
     if (pwidth == 3)    pwidth = 4;
     int mem = ((vid.scr.width * pwidth + 7) & ~7) * vid.scr.height;
 
-    x_framebuffer[0] = XCreateImage(x_disp,
-        x_vis,
-        x_visinfo->depth,
-        ZPixmap,
-        0,
-        malloc(mem),
+    x_framebuffer[0] = XCreateImage(
+        x_disp, x_vis,
+        x_visinfo->depth, ZPixmap,
+        0, malloc(mem),
         vid.scr.width, vid.scr.height,
-        32,
-        0
+        32, 0
     );
 
     if (!x_framebuffer[0])
@@ -596,7 +591,7 @@ void VID_Init(uint8_p palette) {
     else
         ResetFrameBuffer();
 
-    current_framebuffer = 0;
+    current_framebuffer = false;
     vid.rowbytes = x_framebuffer[0]->bytes_per_line;
     vid.scr.pBuff = (pixel_p)x_framebuffer[0]->data;
     vid.direct = NULL;
@@ -668,10 +663,8 @@ void VID_Update(vRect_p rects) {
         config_notify = 0;
         vid.scr.width = config_notify_width & ~7;
         vid.scr.height = config_notify_height;
-        if (doShm)
-            ResetSharedFrameBuffers();
-        else
-            ResetFrameBuffer();
+        if (doShm)      ResetSharedFrameBuffers();
+        else            ResetFrameBuffer();
         vid.rowbytes = x_framebuffer[0]->bytes_per_line;
         vid.scr.pBuff = (uint8_p)x_framebuffer[current_framebuffer]->data;
         vid.con.pBuff = vid.scr.pBuff;
@@ -691,23 +684,30 @@ void VID_Update(vRect_p rects) {
 
 
     if (doShm) {
-
         while (rects) {
-            if (x_visinfo->depth == 16)
+            /**/ if (x_visinfo->depth == 16)
                 st2_fixup(x_framebuffer[current_framebuffer],
-                    rects->x, rects->y, rects->width,
-                    rects->height);
+                    rects->x, rects->y,
+                    rects->width, rects->height);
             else if (x_visinfo->depth == 24)
                 st3_fixup(x_framebuffer[current_framebuffer],
-                    rects->x, rects->y, rects->width,
-                    rects->height);
-            if (!XShmPutImage(x_disp, x_win, x_gc,
-                x_framebuffer[current_framebuffer], rects->x, rects->y,
-                rects->x, rects->y, rects->width, rects->height, True))
+                    rects->x, rects->y,
+                    rects->width, rects->height);
+
+            if (!XShmPutImage(x_disp, x_win,
+                x_gc, x_framebuffer[current_framebuffer],
+                rects->x, rects->y,
+                rects->x, rects->y,
+                rects->width, rects->height,
+                True))
                 Sys_Error("VID_Update: XShmPutImage failed\n");
             oktodraw = false;
             while (!oktodraw) GetEvent();
+#if 0   /* TODO: check is here something not NULL ? */
             rects = rects->pnext;
+#else
+            rects = (vRect_p)rects->pBuff;
+#endif
         }
         current_framebuffer = !current_framebuffer;
         vid.con.pBuff = vid.scr.pBuff = (uint8_p)x_framebuffer[current_framebuffer]->data;
@@ -716,17 +716,25 @@ void VID_Update(vRect_p rects) {
     }
     else {
         while (rects) {
-            if (x_visinfo->depth == 16)
+            /**/ if (x_visinfo->depth == 16)
                 st2_fixup(x_framebuffer[current_framebuffer],
-                    rects->x, rects->y, rects->width,
-                    rects->height);
+                    rects->x, rects->y,
+                    rects->width, rects->height);
             else if (x_visinfo->depth == 24)
                 st3_fixup(x_framebuffer[current_framebuffer],
-                    rects->x, rects->y, rects->width,
-                    rects->height);
-            XPutImage(x_disp, x_win, x_gc, x_framebuffer[0], rects->x,
-                rects->y, rects->x, rects->y, rects->width, rects->height);
+                    rects->x, rects->y,
+                    rects->width, rects->height);
+
+            XPutImage(x_disp, x_win,
+                x_gc, x_framebuffer[0],
+                rects->x, rects->y,
+                rects->x, rects->y,
+                rects->width, rects->height);
+#if 0   /* TODO: check is here something not NULL ? */
             rects = rects->pnext;
+#else
+            rects = (vRect_p)rects->pBuff;
+#endif
         }
         XSync(x_disp, False);
     }

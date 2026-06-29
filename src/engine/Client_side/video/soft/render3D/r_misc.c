@@ -89,7 +89,7 @@ void R_TimeRefresh_f() {
             .y = r_refdef.vrect.y,
             .width = r_refdef.vrect.width,
             .height = r_refdef.vrect.height,
-            .pnext = NULL,
+            // .pnext = NULL,
         };
         VID_Update(&vr);
     }

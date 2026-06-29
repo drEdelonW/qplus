@@ -124,7 +124,7 @@ static bool			oktodraw = false;
 int XShmQueryExtension(Display*);
 int XShmGetEventBase(Display*);
 
-int current_framebuffer;
+static bool current_framebuffer;
 static XImage* x_framebuffer[2] = { 0, 0 };
 static XShmSegmentInfo	x_shminfo[2];
 
@@ -726,7 +726,7 @@ void	VID_Init(uint8_p palette) {
     else
         ResetFrameBuffer();
 
-    current_framebuffer = 0;
+    current_framebuffer = false;
     vid.rowbytes = x_framebuffer[0]->bytes_per_line;
     vid.scr.pBuff = x_framebuffer[0]->data;
     vid.con.pBuff = x_framebuffer[0]->data;

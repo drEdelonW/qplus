@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "integer_tools.h"
 #include "fixed.h"
 
 #if defined(__cplusplus)

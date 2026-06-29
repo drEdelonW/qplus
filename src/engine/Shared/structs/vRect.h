@@ -8,6 +8,8 @@ struct vRect_s {
     int width, height;
     union {
         uint8_p pBuff;
+#if 0   /* seems like  it used only in vid_x.c */
         vRect_p pnext;
+#endif
     };
 };
