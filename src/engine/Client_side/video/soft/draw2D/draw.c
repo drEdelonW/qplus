@@ -448,7 +448,7 @@ void Draw_ConsoleBackground(int lines) {
                 memcpy(dest, src, vid.con.width);
             else {
                 fixed16_t f = 0;
-                fixed16_t fstep = 320 * 0x10000 / vid.con.width;
+                fixed16_t fstep = 320 * FIXED16_ONE / vid.con.width;
                 for (int x = 0; x < vid.con.width; x += 4) {
                     dest[x + 0] = src[FIXED16_TO_INT(f)];     f += fstep;
                     dest[x + 1] = src[FIXED16_TO_INT(f)];     f += fstep;
@@ -467,7 +467,7 @@ void Draw_ConsoleBackground(int lines) {
             int v = (vid.con.height - lines + y) * 200 / vid.con.height;
             uint8_p src = conback->data + v * 320;
             fixed16_t f = 0;
-            fixed16_t fstep = 320 * 0x10000 / vid.con.width;
+            fixed16_t fstep = 320 * FIXED16_ONE / vid.con.width;
             for (int x = 0; x < vid.con.width; x += 4) {
                 pusdest[x + 0] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;
                 pusdest[x + 1] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;

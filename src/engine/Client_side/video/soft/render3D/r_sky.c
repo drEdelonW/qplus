@@ -22,27 +22,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "d_local.h"
 
-
-int		iskyspeed = 8;
-int		iskyspeed2 = 2;
-float	skyspeed, skyspeed2;
-
-LegacyTimeDelta_t		skytime;
+static int _iSkySpeed = 8;
+static int _iSkySpeed2 = 2;
+float skyspeed;
+float skyspeed2;
+LegacyTimeDelta_t   skytime;
 
 uint8_p r_skysource;
 
-int r_skymade;
-int r_skydirect;		// not used?
-
-
+bool r_skymade;
 // TODO: clean up these routines
 
-uint8_t	bottomsky[128 * 131];
-uint8_t	bottommask[128 * 131];
-uint8_t	newsky[128 * 256];	// newsky and topsky both pack in here, 128 bytes
-//  of newsky on the left of each scan, 128 bytes
-//  of topsky on the right, because the low-level
-//  drawers need 256-uint8_t scan widths
+static uint8_t bottomsky[128 * 131];
+static uint8_t bottommask[128 * 131];
+static uint8_t newsky[128 * 256];
+// newsky and topsky both pack in here,
+// 128 bytes of newsky on the left of each scan,
+// 128 bytes of topsky on the right,
+// because the low-level drawers need 256-uint8_t scan widths
 
 
 /*
@@ -53,31 +50,25 @@ A sky texture is 256*128, with the right side being a masked overlay
 ==============
 */
 void R_InitSky(Texture_p mt) {
-	int			i, j;
-	uint8_p src;
+    uint8_p src = (uint8_p)mt + mt->offsets[0];
 
-	src = (uint8_p)mt + mt->offsets[0];
+    for (int i = 0; i < 128; i++)
+        for (int j = 0; j < 128; j++)
+            newsky[MUL256(i) + j + 128] = src[MUL256(i) + j + 128];
 
-	for (i = 0; i < 128; i++) {
-		for (j = 0; j < 128; j++) {
-			newsky[(i * 256) + j + 128] = src[i * 256 + j + 128];
-		}
-	}
+    for (int i = 0; i < 128; i++)
+        for (int j = 0; j < 131; j++)
+            if (src[MUL256(i) + (j & 0x7F)]) {
+                bottomsky[(i * 131) + j] = src[MUL256(i) + (j & 0x7F)];
+                bottommask[(i * 131) + j] = 0x00;
+            }
+            else {
+                bottomsky[(i * 131) + j] = 0x00;
+                bottommask[(i * 131) + j] = 0xFF;
+            }
 
-	for (i = 0; i < 128; i++) {
-		for (j = 0; j < 131; j++) {
-			if (src[i * 256 + (j & 0x7F)]) {
-				bottomsky[(i * 131) + j] = src[i * 256 + (j & 0x7F)];
-				bottommask[(i * 131) + j] = 0;
-			}
-			else {
-				bottomsky[(i * 131) + j] = 0;
-				bottommask[(i * 131) + j] = 0xff;
-			}
-		}
-	}
 
-	r_skysource = newsky;
+    r_skysource = newsky;
 }
 
 
@@ -87,57 +78,57 @@ R_MakeSky
 =================
 */
 void R_MakeSky() {
-	int			x, y;
-	int			ofs, baseofs;
-	int			xshift, yshift;
-	uint32_p pnewsky;
-	static int	xlast = -1, ylast = -1;
+    static int xlast = -1;
+    static int ylast = -1;
 
-	xshift = skytime * skyspeed;
-	yshift = skytime * skyspeed;
+    int xshift = skytime * skyspeed;
+    int yshift = skytime * skyspeed;
 
-	if ((xshift == xlast) && (yshift == ylast))
-		return;
+    if ((xshift == xlast) &&
+        (yshift == ylast)
+        ) return;
 
-	xlast = xshift;
-	ylast = yshift;
+    xlast = xshift;
+    ylast = yshift;
 
-	pnewsky = (uint32_p)&newsky[0];
+    uint8_p pnewsky = &newsky[0];
 
-	for (y = 0; y < SKYSIZE; y++) {
-		baseofs = ((y + yshift) & SKYMASK) * 131;
+    for (int y = 0; y < SKYSIZE; y++) {
+        int baseofs = ((y + yshift) & SKYMASK) * 131;
 
-		// FIXME: clean this up
+        // FIXME: clean this up
 #if UNALIGNED_OK
 
-		for (x = 0; x < SKYSIZE; x += 4) {
-			ofs = baseofs + ((x + xshift) & SKYMASK);
+        for (int x = 0; x < SKYSIZE; x += 4) {
+            int ofs = baseofs + ((x + xshift) & SKYMASK);
 
-			// PORT: unaligned dword access to bottommask and bottomsky
+            // PORT: unaligned dword access to bottommask and bottomsky
 
-			*pnewsky = (*(pnewsky + (128 / sizeof(uint32_t))) &
-				*(uint32_p)&bottommask[ofs]) |
-				*(uint32_p)&bottomsky[ofs];
-			pnewsky++;
-		}
+            *pnewsky = (
+                *(pnewsky + (128 / sizeof(uint32_t))) &
+                *(uint32_p)&bottommask[ofs]) |
+                *(uint32_p)&bottomsky[ofs];
+            pnewsky++;
+        }
 
 #else
 
-		for (x = 0; x < SKYSIZE; x++) {
-			ofs = baseofs + ((x + xshift) & SKYMASK);
+        for (int x = 0; x < SKYSIZE; x++) {
+            int ofs = baseofs + ((x + xshift) & SKYMASK);
 
-			*(uint8_p)pnewsky = (*((uint8_p)pnewsky + 128) &
-				*(uint8_p)&bottommask[ofs]) |
-				*(uint8_p)&bottomsky[ofs];
-			pnewsky = (uint32_p)((uint8_p)pnewsky + 1);
-		}
+            *(uint8_p)pnewsky = (
+                *((uint8_p)pnewsky + 128) &
+                *(uint8_p)&bottommask[ofs]) |
+                *(uint8_p)&bottomsky[ofs];
+            pnewsky = ((uint8_p)pnewsky + 1);
+        }
 
 #endif
 
-		pnewsky += 128 / sizeof(uint32_t);
-	}
+        pnewsky += 128 / sizeof(uint32_t);
+    }
 
-	r_skymade = 1;
+    r_skymade = true;
 }
 
 
@@ -146,53 +137,51 @@ void R_MakeSky() {
 R_GenSkyTile
 =================
 */
-void R_GenSkyTile(TypeLess_ptr pdest) {
-	int			x, y;
-	int			ofs, baseofs;
-	int			xshift, yshift;
-	uint32_p pnewsky;
-	uint32_p pd;
+void R_GenSkyTile(uint8_p pdest) {
+    int xshift = skytime * skyspeed;
+    int yshift = skytime * skyspeed;
 
-	xshift = skytime * skyspeed;
-	yshift = skytime * skyspeed;
+    uint8_p pnewsky = &newsky[0];
+    uint8_p pd = pdest;
 
-	pnewsky = (uint32_p)&newsky[0];
-	pd = (uint32_p)pdest;
+    for (int y = 0; y < SKYSIZE; y++) {
+        int baseofs = ((y + yshift) & SKYMASK) * 131;
 
-	for (y = 0; y < SKYSIZE; y++) {
-		baseofs = ((y + yshift) & SKYMASK) * 131;
-
-		// FIXME: clean this up
+        // FIXME: clean this up
 #if UNALIGNED_OK
 
-		for (x = 0; x < SKYSIZE; x += 4) {
-			ofs = baseofs + ((x + xshift) & SKYMASK);
+        for (int x = 0; x < SKYSIZE; x += 4) {
+            int ofs = baseofs + ((x + xshift) & SKYMASK);
 
-			// PORT: unaligned dword access to bottommask and bottomsky
+            // PORT: unaligned dword access to bottommask and bottomsky
 
-			*pd = (*(pnewsky + (128 / sizeof(uint32_t))) &
-				*(uint32_p)&bottommask[ofs]) |
-				*(uint32_p)&bottomsky[ofs];
-			pnewsky++;
-			pd++;
-		}
+            *pd = (
+                *(pnewsky + (128 / sizeof(uint32_t))) &
+                *(uint8_p)&bottommask[ofs]
+                ) |
+                *(uint8_p)&bottomsky[ofs];
+            pnewsky++;
+            pd++;
+        }
 
 #else
 
-		for (x = 0; x < SKYSIZE; x++) {
-			ofs = baseofs + ((x + xshift) & SKYMASK);
+        for (int x = 0; x < SKYSIZE; x++) {
+            int ofs = baseofs + ((x + xshift) & SKYMASK);
 
-			*(uint8_p)pd = (*((uint8_p)pnewsky + 128) &
-				*(uint8_p)&bottommask[ofs]) |
-				*(uint8_p)&bottomsky[ofs];
-			pnewsky = (uint32_p)((uint8_p)pnewsky + 1);
-			pd = (uint32_p)((uint8_p)pd + 1);
-		}
+            *(uint8_p)pd = (
+                *((uint8_p)pnewsky + 128) &
+                *(uint8_p)&bottommask[ofs]
+                ) |
+                *(uint8_p)&bottomsky[ofs];
+            pnewsky++;
+            pd++;
+        }
 
 #endif
 
-		pnewsky += 128 / sizeof(uint32_t);
-	}
+        pnewsky += 128 / sizeof(uint32_t);
+    }
 }
 
 
@@ -201,36 +190,34 @@ void R_GenSkyTile(TypeLess_ptr pdest) {
 R_GenSkyTile16
 =================
 */
-void R_GenSkyTile16(TypeLess_ptr pdest) {
-	int				x, y;
-	int				ofs, baseofs;
-	int				xshift, yshift;
-	uint8_p pnewsky;
-	uint16_p pd;
+void R_GenSkyTile16(uint16_p pdest) {
+    int xshift = skytime * skyspeed;
+    int yshift = skytime * skyspeed;
 
-	xshift = skytime * skyspeed;
-	yshift = skytime * skyspeed;
+    uint8_p pnewsky = &newsky[0];
+    uint16_p pd = pdest;
 
-	pnewsky = (uint8_p)&newsky[0];
-	pd = (uint16_p)pdest;
+    for (int y = 0; y < SKYSIZE; y++) {
+        int baseofs = ((y + yshift) & SKYMASK) * 131;
 
-	for (y = 0; y < SKYSIZE; y++) {
-		baseofs = ((y + yshift) & SKYMASK) * 131;
+        // FIXME: clean this up
+        // FIXME: do faster unaligned version?
+        for (int x = 0; x < SKYSIZE; x++) {
+            int ofs = baseofs + ((x + xshift) & SKYMASK);
 
-		// FIXME: clean this up
-		// FIXME: do faster unaligned version?
-		for (x = 0; x < SKYSIZE; x++) {
-			ofs = baseofs + ((x + xshift) & SKYMASK);
+            *pd = d_8to16table[
+                (
+                    *(pnewsky + 128) &
+                    *(uint8_p)&bottommask[ofs]
+                    ) |
+                    *(uint8_p)&bottomsky[ofs]
+            ];
+            pnewsky++;
+            pd++;
+        }
 
-			*pd = d_8to16table[(*(pnewsky + 128) &
-				*(uint8_p)&bottommask[ofs]) |
-				*(uint8_p)&bottomsky[ofs]];
-			pnewsky++;
-			pd++;
-		}
-
-		pnewsky += TILE_SIZE;
-	}
+        pnewsky += TILE_SIZE;
+    }
 }
 
 
@@ -240,17 +227,17 @@ R_SetSkyFrame
 ==============
 */
 void R_SetSkyFrame() {
-	skyspeed = iskyspeed;
-	skyspeed2 = iskyspeed2;
+    skyspeed = _iSkySpeed;
+    skyspeed2 = _iSkySpeed2;
 
-	int g = GreatestCommonDivisor(iskyspeed, iskyspeed2);
-	int s1 = iskyspeed / g;
-	int s2 = iskyspeed2 / g;
-	float temp = SKYSIZE * s1 * s2;
+    int g = GreatestCommonDivisor(_iSkySpeed, _iSkySpeed2);
+    int s1 = _iSkySpeed / g;
+    int s2 = _iSkySpeed2 / g;
+    float temp = SKYSIZE * s1 * s2;
 
-	skytime = cl.time - ((int)(cl.time / temp) * temp);
+    skytime = cl.time - ((int)(cl.time / temp) * temp);
 
-	r_skymade = 0;
+    r_skymade = false;
 }
 
 

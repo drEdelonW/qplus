@@ -5,6 +5,7 @@
 #include "types.h"
 #include "transform.h"
 #include "SyncType.h"
+#include "vid.h"
 
 
 typedef struct {
@@ -27,7 +28,7 @@ typedef struct mSpriteFrame_s {
 #ifdef GLQUAKE
     int             gl_texturenum;
 #else
-    uint8_t         pixels[4];
+    pixel_t         pixels[4];
 #endif
 } mSpriteFrame_t;
 typedef mSpriteFrame_t* mSpriteFrame_p;

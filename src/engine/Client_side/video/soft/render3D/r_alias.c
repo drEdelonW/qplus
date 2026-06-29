@@ -388,9 +388,9 @@ void R_AliasSetUpTransform(int trivial_accept) {
     // FIXME: make this work for clipped case too?
     if (trivial_accept) {
         for (int i = 0; i < 4; i++) {
-            aliastransform.m[0][i] *= aliasxscale * (1.0 / ((float)0x8000 * 0x10000));
-            aliastransform.m[1][i] *= aliasyscale * (1.0 / ((float)0x8000 * 0x10000));
-            aliastransform.m[2][i] *= /*       */   (1.0 / ((float)0x8000 * 0x10000));
+            aliastransform.m[0][i] *= aliasxscale * (1.0 / ((float)0x8000 * FIXED16_ONE));
+            aliastransform.m[1][i] *= aliasyscale * (1.0 / ((float)0x8000 * FIXED16_ONE));
+            aliastransform.m[2][i] *= /*       */   (1.0 / ((float)0x8000 * FIXED16_ONE));
         }
     }
 }
@@ -697,8 +697,8 @@ void R_AliasDrawModel(aLight_p plighting) {
 
     acolormap = currententity->colormap;
 
-    if (currententity != &cl.viewent)   _ziscale = (float)0x8000 * (float)0x10000;
-    else                                _ziscale = (float)0x8000 * (float)0x10000 * 3.0;
+    if (currententity != &cl.viewent)   _ziscale = (float)0x8000 * (float)FIXED16_ONE;
+    else                                _ziscale = (float)0x8000 * (float)FIXED16_ONE * 3.0;
 
     if (currententity->trivial_accept)  R_AliasPrepareUnclippedPoints();
     else                                R_AliasPreparePoints();

@@ -443,11 +443,11 @@ void D_PolysetScanLeftEdge(int height) {
             d_snap.ptex += (ptrdiff_t)d_extrastep.ptex;
             d_snap.sfrac += d_extrastep.sfrac;
             d_snap.ptex += FIXED16_TO_INT(d_snap.sfrac);
-            d_snap.sfrac &= 0xFFFF;
+            d_snap.sfrac &= FIXED16_FRAC_MASK;
             d_snap.tfrac += d_extrastep.tfrac;
-            if (d_snap.tfrac & 0x10000) {
+            if (d_snap.tfrac & FIXED16_ONE) {
                 d_snap.ptex += r_affinetridesc.skinwidth;
-                d_snap.tfrac &= 0xFFFF;
+                d_snap.tfrac &= FIXED16_FRAC_MASK;
             }
             d_snap.light += d_extrastep.light;
             d_snap.zi += d_extrastep.zi;
@@ -461,11 +461,11 @@ void D_PolysetScanLeftEdge(int height) {
             d_snap.ptex += (ptrdiff_t)d_basestep.ptex;
             d_snap.sfrac += d_basestep.sfrac;
             d_snap.ptex += FIXED16_TO_INT(d_snap.sfrac);
-            d_snap.sfrac &= 0xFFFF;
+            d_snap.sfrac &= FIXED16_FRAC_MASK;
             d_snap.tfrac += d_basestep.tfrac;
-            if (d_snap.tfrac & 0x10000) {
+            if (d_snap.tfrac & FIXED16_ONE) {
                 d_snap.ptex += r_affinetridesc.skinwidth;
-                d_snap.tfrac &= 0xFFFF;
+                d_snap.tfrac &= FIXED16_FRAC_MASK;
             }
             d_snap.light += d_basestep.light;
             d_snap.zi += d_basestep.zi;
@@ -617,11 +617,11 @@ void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
                 l.ptex += a_ststepxwhole;
                 l.sfrac += a_sstepxfrac;
                 l.ptex += FIXED16_TO_INT(l.sfrac);
-                l.sfrac &= 0xFFFF;
+                l.sfrac &= FIXED16_FRAC_MASK;
                 l.tfrac += a_tstepxfrac;
-                if (l.tfrac & 0x10000) {
+                if (l.tfrac & FIXED16_ONE) {
                     l.ptex += r_affinetridesc.skinwidth;
-                    l.tfrac &= 0xFFFF;
+                    l.tfrac &= FIXED16_FRAC_MASK;
                 }
             } while (--lcount);
         }

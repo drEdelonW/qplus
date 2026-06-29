@@ -53,8 +53,8 @@ void D_Sky_uv_To_st(int u, int v, fixed16_p s, fixed16_p t) {
 
     {
         float temp = skytime * skyspeed; // TODO: add D_SetupFrame & set this there
-        *s = (int)((temp + 6 * (HALF(SKYSIZE) - 1) * end.x) * 0x10000);
-        *t = (int)((temp + 6 * (HALF(SKYSIZE) - 1) * end.y) * 0x10000);
+        *s = (int)((temp + 6 * (HALF(SKYSIZE) - 1) * end.x) * FIXED16_ONE);
+        *t = (int)((temp + 6 * (HALF(SKYSIZE) - 1) * end.y) * FIXED16_ONE);
     }
 }
 
@@ -71,11 +71,10 @@ void D_DrawSkyScans8(eSpan_p pspan) {
 
         int count = pspan->count;
 
-        fixed16_t  s, t;
-
         // calculate the initial s & t
         int u = pspan->u;
         int v = pspan->v;
+        fixed16_t  s, t;
         D_Sky_uv_To_st(u, v, &s, &t);
 
         do {

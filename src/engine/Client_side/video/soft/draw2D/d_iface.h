@@ -108,7 +108,6 @@ void D_UpdateRects(vRect_p prect);
 void D_PolysetUpdateTables();
 
 // these are currently for internal use only, and should not be used by drivers
-extern int r_skydirect;
 extern uint8_p r_skysource;
 
 // transparency types for D_DrawRect()
@@ -141,7 +140,8 @@ void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest);
 #define SKYSIZE     (1 << SKYSHIFT)
 #define SKYMASK     (SKYSIZE - 1)
 
-extern float skyspeed, skyspeed2;
+extern float skyspeed;
+extern float skyspeed2;
 
 #include "qTime.h"
 extern LegacyTimeDelta_t skytime;

@@ -133,7 +133,7 @@ void Turbulent8(eSpan_p pspan) {
         float sdivz = d_sdivzorigin + dv * d_sdivzstepv + du * d_sdivzstepu;
         float tdivz = d_tdivzorigin + dv * d_tdivzstepv + du * d_tdivzstepu;
         float zi = d_ziorigin + dv * d_zistepv + du * d_zistepu;
-        float z = (float)0x10000 / zi;    // prescale to 16.16 fixed-point
+        float z = (float)FIXED16_ONE / zi;    // prescale to 16.16 fixed-point
 
         r_turb_s = (int)(sdivz * z) + sadjust;
         /**/ if (r_turb_s > bbextents)      r_turb_s = bbextents;
@@ -156,7 +156,7 @@ void Turbulent8(eSpan_p pspan) {
                 sdivz += sdivz16stepu;
                 tdivz += tdivz16stepu;
                 zi += zi16stepu;
-                float z = (float)0x10000 / zi;    // prescale to 16.16 fixed-point
+                float z = (float)FIXED16_ONE / zi;    // prescale to 16.16 fixed-point
 
                 snext = (int)(sdivz * z) + sadjust;
                 /**/ if (snext > bbextents)     snext = bbextents;
@@ -179,7 +179,7 @@ void Turbulent8(eSpan_p pspan) {
                 sdivz += d_sdivzstepu * spancountminus1;
                 tdivz += d_tdivzstepu * spancountminus1;
                 zi += d_zistepu * spancountminus1;
-                float z = (float)0x10000 / zi;    // prescale to 16.16 fixed-point
+                float z = (float)FIXED16_ONE / zi;    // prescale to 16.16 fixed-point
                 snext = (int)(sdivz * z) + sadjust;
                 /**/ if (snext > bbextents)     snext = bbextents;
                 else if (snext < 16)            snext = 16;    // prevent round-off error on <0 steps from
@@ -237,7 +237,7 @@ void D_DrawSpans8(eSpan_p pspan) {
         float sdivz = d_sdivzorigin + dv * d_sdivzstepv + du * d_sdivzstepu;
         float tdivz = d_tdivzorigin + dv * d_tdivzstepv + du * d_tdivzstepu;
         float zi = d_ziorigin + dv * d_zistepv + du * d_zistepu;
-        float z = (float)0x10000 / zi;    // prescale to 16.16 fixed-point
+        float z = (float)FIXED16_ONE / zi;    // prescale to 16.16 fixed-point
 
         fixed16_t s = (int)(sdivz * z) + sadjust;
         /**/ if (s > bbextents)     s = bbextents;
@@ -263,7 +263,7 @@ void D_DrawSpans8(eSpan_p pspan) {
                 sdivz += sdivz8stepu;
                 tdivz += tdivz8stepu;
                 zi += zi8stepu;
-                float z = (float)0x10000 / zi;    // prescale to 16.16 fixed-point
+                float z = (float)FIXED16_ONE / zi;    // prescale to 16.16 fixed-point
 
                 snext = (int)(sdivz * z) + sadjust;
                 /**/ if (snext > bbextents)         snext = bbextents;
@@ -286,7 +286,7 @@ void D_DrawSpans8(eSpan_p pspan) {
                 sdivz += d_sdivzstepu * spancountminus1;
                 tdivz += d_tdivzstepu * spancountminus1;
                 zi += d_zistepu * spancountminus1;
-                float z = (float)0x10000 / zi;    // prescale to 16.16 fixed-point
+                float z = (float)FIXED16_ONE / zi;    // prescale to 16.16 fixed-point
                 snext = (int)(sdivz * z) + sadjust;
                 /**/ if (snext > bbextents)     snext = bbextents;
                 else if (snext < 8)             snext = 8;    // prevent round-off error on <0 steps from
@@ -332,7 +332,7 @@ void D_DrawZSpans(eSpan_p pspan) {
 
     // FIXME: check for clamping/range problems
     // we count on FP exceptions being turned off to avoid range problems
-    int izistep = (int)(d_zistepu * 0x8000 * 0x10000);
+    int izistep = (int)(d_zistepu * 0x8000 * FIXED16_ONE);
 
     do {
         int16_p pdest = d_pzbuffer + (d_zwidth * pspan->v) + pspan->u;
@@ -345,7 +345,7 @@ void D_DrawZSpans(eSpan_p pspan) {
 
         double zi = d_ziorigin + dv * d_zistepv + du * d_zistepu;
         // we count on FP exceptions being turned off to avoid range problems
-        fixed16_t izi = (int)(zi * 0x8000 * 0x10000);
+        fixed16_t izi = (int)(zi * 0x8000 * FIXED16_ONE);
 
         if (((uintptr_t)pdest) & 0x02u) {
             *pdest++ = (int16_t)(FIXED16_TO_INT(izi));

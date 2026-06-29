@@ -1,7 +1,6 @@
 #include "Texture.h"
 #include "z_hunk.h"
 #ifdef GLQUAKE
-// # include "glquake.h"
 # include "qOpenGL.h"
 #else
 # include "r_shared.h"
@@ -33,7 +32,8 @@ void R_InitTextures() {
         uint8_p dest = (uint8_p)r_notexture_mip + r_notexture_mip->offsets[m];
         for (int y = 0; y < (16 >> m); y++)
             for (int x = 0; x < (16 >> m); x++) {
-                *dest++ = ((y < (8 >> m)) ^ (x < (8 >> m))) ?
+                *dest++ =
+                    ((y < (8 >> m)) ^ (x < (8 >> m))) ?
                     0x00 : 0xFF;
             }
     }

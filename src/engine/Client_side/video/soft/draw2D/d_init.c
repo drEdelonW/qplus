@@ -44,7 +44,6 @@ D_Init
 ===============
 */
 void D_Init() {
-    r_skydirect = 1;
 
     Cvar_RegisterVariable(&d_subdiv16);
     Cvar_RegisterVariable(&d_mipcap);

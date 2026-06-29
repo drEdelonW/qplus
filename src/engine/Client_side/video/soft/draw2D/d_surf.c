@@ -109,7 +109,7 @@ D_SCAlloc
 */
 SurfCache_p D_SCAlloc(int width, int size) {
     if ((width < 0) || (width > 256))       Host_SysError("D_SCAlloc: bad cache width %d\n", width);
-    if ((size <= 0) || (size > 0x10000))    Host_SysError("D_SCAlloc: bad cache size %d\n", size);
+    if ((size <= 0) || (size > FIXED16_ONE))    Host_SysError("D_SCAlloc: bad cache size %d\n", size);
 
     size = (int)(offsetof(SurfCache_t, data) + size);
     size = (size + 3) & ~3;

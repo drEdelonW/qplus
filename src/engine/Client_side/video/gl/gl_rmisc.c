@@ -276,7 +276,7 @@ void R_TranslatePlayerSkin(int playernum) {
 
         out2 = (uint8_p)pixels;
         memset(pixels, 0, sizeof(pixels));
-        fixed16_t fracstep = inwidth * 0x10000 / scaled_width;
+        fixed16_t fracstep = inwidth * FIXED16_ONE / scaled_width;
         for (int i = 0; i < scaled_height; i++, out2 += scaled_width) {
             uint8_p inrow = original + inwidth * (i * inheight / scaled_height);
             fixed16_t frac = HALF(fracstep);
@@ -297,7 +297,7 @@ void R_TranslatePlayerSkin(int playernum) {
         translate32[i] = d_8to24table[translate[i]];
 
     uint32_p out = pixels;
-    fixed16_t fracstep = inwidth * 0x10000 / scaled_width;
+    fixed16_t fracstep = inwidth * FIXED16_ONE / scaled_width;
     for (int i = 0; i < scaled_height; i++, out += scaled_width) {
         uint8_p inrow = original + inwidth * (i * inheight / scaled_height);
         fixed16_t frac = HALF(fracstep);

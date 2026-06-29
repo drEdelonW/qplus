@@ -132,13 +132,13 @@ void D_CalcGradients(mSurface_p pface) {
     vec3_t p_temp1 = VectorScale(transformed_modelorg, mipscale);
 
     {
-        float t = 0x10000 * mipscale;
+        float t = FIXED16_ONE * mipscale;
         sadjust =
-            ((fixed16_t)(DotProduct(p_temp1, p_saxis) * 0x10000 + 0.5f)) -
+            ((fixed16_t)(DotProduct(p_temp1, p_saxis) * FIXED16_ONE + 0.5f)) -
             (INT_TO_FIXED16(pface->texturemins[S_AX]) >> _miplevel) +
             (pface->texinfo->vecs[S_AX].offs * t);
         tadjust =
-            ((fixed16_t)(DotProduct(p_temp1, p_taxis) * 0x10000 + 0.5f)) -
+            ((fixed16_t)(DotProduct(p_temp1, p_taxis) * FIXED16_ONE + 0.5f)) -
             (INT_TO_FIXED16(pface->texturemins[T_AX]) >> _miplevel) +
             pface->texinfo->vecs[T_AX].offs * t;
     }
