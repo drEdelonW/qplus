@@ -93,9 +93,9 @@ typedef enum {
 extern bool noclip_anglehack;
 
 #ifdef QUAKE2
-    #define	GAMENAME	"id1"		/* directory to look in by default */
+    #define GAMENAME "id1"  /* directory to look in by default */
 #else
-    #define	GAMENAME	"id1"
+    #define GAMENAME "id1"
 #endif
 
 extern bool     standard_quake;

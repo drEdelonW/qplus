@@ -128,7 +128,7 @@ extern cString   keyBindings[MAX_KEYS];
 typedef struct {
     keycode_t lastpress;
     keydest_t dest;
-    int       count;			// incremented every key event
+    int       count;    // incremented every key event
 } Key_t;
 
 extern Key_t key;

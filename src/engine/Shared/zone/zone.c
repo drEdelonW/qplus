@@ -26,27 +26,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "q_tools.h"
 
-#define	DYNAMIC_SIZE    (0xC000)    /* 48Kb */
+#define DYNAMIC_SIZE    (0xC000)    /* 48Kb */
 
 /*
-	========================
-	Memory_Init
-	========================
+    ========================
+    Memory_Init
+    ========================
 */
 void Memory_Init(TypeLess_ptr buf, size_t size) {
-	int zonesize = DYNAMIC_SIZE;
+    int zonesize = DYNAMIC_SIZE;
 
-	Hulk_Init(buf, size);
+    Hulk_Init(buf, size);
 
-	Cache_Init();
-	int p = COM_CheckParm("-zone");
-	if (p) {
-		if (p < (com.argc - 1))
-			zonesize = Q_atoi(com.argv[p + 1]) * 1024;
-		else
-			Host_Error("Memory_Init: you must specify a size in KB after -zone");
-	}
-	mainzone = Hunk_AllocName(zonesize, "zone");
-	Z_ClearZone(mainzone, zonesize);
+    Cache_Init();
+    int p = COM_CheckParm("-zone");
+    if (p) {
+        if (p < (com.argc - 1))
+            zonesize = Q_atoi(com.argv[p + 1]) * 1024;
+        else
+            Host_Error("Memory_Init: you must specify a size in KB after -zone");
+    }
+    mainzone = Hunk_AllocName(zonesize, "zone");
+    Z_ClearZone(mainzone, zonesize);
 }
 

@@ -6,13 +6,13 @@
 #include "q_tools.h"
 
 
-#define	HUNK_SENTINAL	(0x1DF001ED)
+#define HUNK_SENTINAL (0x1DF001ED)
 
 
 typedef struct {
     uint32_t    sentinal;
-    size_t	    size;       // including sizeof(hunk_t), -1 = not allocated
-    char 	    name[8];
+    size_t      size;       // including sizeof(hunk_t), -1 = not allocated
+    char        name[8];
 } hunk_t;
 typedef hunk_t* hunk_p;
 
@@ -183,7 +183,7 @@ TypeLess_ptr Hunk_Alloc(size_t size) {
     return Hunk_AllocName(size, "unknown");
 }
 
-size_t	Hunk_LowMark() {
+size_t Hunk_LowMark() {
     return hunk_low_used;
 }
 
@@ -194,7 +194,7 @@ void Hunk_FreeToLowMark(size_t mark) {
     hunk_low_used = mark;
 }
 
-size_t	Hunk_HighMark() {
+size_t Hunk_HighMark() {
     if (_hunk_tempactive) {
         _hunk_tempactive = false;
         Hunk_FreeToHighMark(_hunk_tempmark);

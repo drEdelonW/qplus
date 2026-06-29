@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define D_CHAR_WIDTH  (8)
 #define D_CHAR_HEIGHT (8)
 
-extern qPic_p draw_disc;	// also used on sbar
+extern qPic_p draw_disc;    // also used on sbar
 #ifdef __cplusplus
 extern "C" {
 #endif

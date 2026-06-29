@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 uint16_t       d_8to16table[256];
 static uint8_p vid_surfcache;
-static int		VID_highhunkmark;
+static int  VID_highhunkmark;
 
 int num_modes;
 vga_modeinfo* modes;
@@ -62,14 +62,14 @@ static uint8_t vid_current_palette[768];
 
 int num_mice = sizeof(mice) / sizeof(mice[0]);
 
-int	d_con_indirect = 0;
+int d_con_indirect = 0;
 
-int		svgalib_inited = 0;
-int		UseMouse = 1;
-int		UseDisplay = 1;
-int		UseKeyboard = 1;
+int  svgalib_inited = 0;
+int  UseMouse = 1;
+int  UseDisplay = 1;
+int  UseKeyboard = 1;
 
-int		mouserate = MOUSE_DEFAULTSAMPLERATE;
+int  mouserate = MOUSE_DEFAULTSAMPLERATE;
 
 // CVAR(vid_mode, "5");
 // CVAR(vid_redrawfull, "0");
@@ -88,14 +88,14 @@ int     mouse_buttons;
 int     mouse_buttonstate;
 int     mouse_oldbuttonstate;
 float   mouse_x, mouse_y;
-float	old_mouse_x, old_mouse_y;
-int		mx, my;
+float old_mouse_x, old_mouse_y;
+int  mx, my;
 
 // CVAR(m_filter, "0");
 
 static uint8_t     backingbuf[48 * 24];
 
-int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
+int  VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
 uint8_p VGA_pagebase;
 
 void VGA_UpdatePlanarScreen(TypeLess_ptr srcbuffer);
@@ -217,9 +217,9 @@ Keybinding command
 =================
 */
 void VID_Gamma_f() {
-    float	gamma, f, inf;
-    uint8_t	palette[768];
-    int		i;
+    float gamma, f, inf;
+    uint8_t palette[768];
+    int  i;
 
     if (Cmd_Argc() == 2) {
         gamma = Q_atof(Cmd_Argv(1));
@@ -236,7 +236,7 @@ void VID_Gamma_f() {
 
         VID_SetPalette(palette);
 
-        SCR_RequestCalcRefdef();				// force a surface cache flush
+        SCR_RequestCalcRefdef();    // force a surface cache flush
     }
 }
 
@@ -381,7 +381,7 @@ void keyhandler(int scancode, int state) {
     int sc;
 
     sc = scancode & 0x7f;
-    //	Con_Printf("scancode=%x (%d%s)\n", scancode, sc, scancode&0x80?"+128":"");
+    // Con_Printf("scancode=%x (%d%s)\n", scancode, sc, scancode&0x80?"+128":"");
     Key_Event(scantokey[sc], state == KEY_EVENTPRESS);
 
 }
@@ -390,12 +390,12 @@ void VID_Shutdown() {
 
     if (!svgalib_inited) return;
 
-    //	printf("shutdown graphics called\n");
+    // printf("shutdown graphics called\n");
     if (UseKeyboard)
         keyboard_close();
     if (UseDisplay)
         vga_setmode(TEXT);
-    //	printf("shutdown graphics finished\n");
+    // printf("shutdown graphics finished\n");
 
     svgalib_inited = 0;
 
@@ -495,8 +495,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
     VID_SetPalette(palette);
 
     VGA_pagebase = vid.direct = framebuffer_ptr = (cString)vga_getgraphmem();
-    //		if (vga_setlinearaddressing()>0)
-    //			framebuffer_ptr = (cString ) vga_getgraphmem();
+    //  if (vga_setlinearaddressing()>0)
+    //   framebuffer_ptr = (cString ) vga_getgraphmem();
     if (!framebuffer_ptr)
         Sys_Error("This mode isn't hapnin'\n");
 
@@ -504,7 +504,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     svgalib_inited = 1;
 
-    SCR_RequestCalcRefdef();				// force a surface cache flush
+    SCR_RequestCalcRefdef();    // force a surface cache flush
 
     return 0;
 }
@@ -517,7 +517,7 @@ void VID_Init(uint8_p palette) {
     if (svgalib_inited)
         return;
 
-    //	Cmd_AddCommand("gamma", VID_Gamma_f);
+    // Cmd_AddCommand("gamma", VID_Gamma_f);
 
     if (UseDisplay) {
         vga_init();
@@ -582,8 +582,8 @@ void VID_Init(uint8_p palette) {
         scantokey[97] = K_CTRL;
         scantokey[56] = K_ALT;
         scantokey[100] = K_ALT;
-        //		scantokey[58] = JK_CAPS;
-        //		scantokey[69] = JK_NUM_LOCK;
+        //  scantokey[58] = JK_CAPS;
+        //  scantokey[69] = JK_NUM_LOCK;
         scantokey[71] = K_HOME;
         scantokey[73] = K_PGUP;
         scantokey[79] = K_END;
@@ -802,8 +802,8 @@ void IN_Init() {
         if (COM_CheckParm("-mrate"))
             mouserate = atoi(com.argv[COM_CheckParm("-mrate") + 1]);
 
-        //		printf("Mouse: dev=%s,type=%s,speed=%d\n",
-        //			mousedev, mice[mtype].name, mouserate);
+        //  printf("Mouse: dev=%s,type=%s,speed=%d\n",
+        //   mousedev, mice[mtype].name, mouserate);
         if (mouse_init(mousedev, mtype, mouserate)) {
             Con_Printf("No mouse found\n");
             UseMouse = 0;

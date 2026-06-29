@@ -50,7 +50,7 @@ CVAR(registered, "0");
 CVAR_SV(cmdline, "0");
 
 // FROM: src/engine/core/console/console.c
-CVAR(con_notifytime, "3");		//seconds
+CVAR(con_notifytime, "3");  //seconds
 
 
 // FROM: src/engine/net/net_main.c
@@ -90,7 +90,7 @@ CVAR(cl_anglespeedkey, "1.5");
 CVAR_CFG(cl_name, "player");
 CVAR_CFG(cl_color, "0");
 
-CVAR(cl_shownet, "0");	// can be 0, 1, or 2
+CVAR(cl_shownet, "0"); // can be 0, 1, or 2
 CVAR(cl_nolerp, "0");
 
 CVAR_ARC(lookspring, "0");
@@ -215,7 +215,7 @@ CVAR_ARC(_snd_mixahead, "0.1");
 
 // FROM: src/ui/screen.c
 CVAR_NAMED_AR(scr_viewsize, "viewsize", "100");
-CVAR_NAMED(scr_fov, "fov", "90");	// 10 - 170
+CVAR_NAMED(scr_fov, "fov", "90"); // 10 - 170
 CVAR(scr_conspeed, "300");
 CVAR(scr_centertime, "2");
 CVAR_NAMED(scr_showram, "showram", "1");

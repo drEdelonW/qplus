@@ -33,7 +33,7 @@ int Q_strncmp(cStringRO     s1, cStringRO s2, uint32_t count);
 int Q_strcasecmp(cStringRO  s1, cStringRO s2);
 int Q_strncasecmp(cStringRO s1, cStringRO s2, int32_t n);
 
-int	Q_atoi(cStringRO str);
+int Q_atoi(cStringRO str);
 float Q_atof(cStringRO str);
 
 #ifdef __cplusplus

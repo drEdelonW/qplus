@@ -25,13 +25,13 @@ struct cache_system_s {
     cache_system_p  prev;
     cache_system_p  next;
     cache_system_p  lru_prev;
-    cache_system_p  lru_next;	// for LRU flushing
+    cache_system_p  lru_next; // for LRU flushing
 };
 
 
 cache_system_p Cache_TryAlloc(size_t size, bool nobottom);
 
-cache_system_t	cache_head;
+cache_system_t cache_head;
 
 /*
 ===========
@@ -42,7 +42,7 @@ void Cache_Move(cache_system_p c) {
     // we are clearing up space at the bottom, so only allocate it late
     cache_system_p new = Cache_TryAlloc(c->size, true);
     if (new) {
-        //		Host_Printf("cache_move ok\n");
+        //  Host_Printf("cache_move ok\n");
 
         Q_memcpy(new + 1, c + 1, c->size - sizeof(cache_system_t));
         new->user = c->user;
@@ -51,9 +51,9 @@ void Cache_Move(cache_system_p c) {
         new->user->data = (TypeLess_ptr)(new + 1);
     }
     else {
-        //		Host_Printf("cache_move failed\n");
+        //  Host_Printf("cache_move failed\n");
 
-        Cache_Free(c->user);		// tough luck...
+        Cache_Free(c->user);  // tough luck...
     }
 }
 
@@ -67,9 +67,9 @@ Throw things out until the hunk can be expanded to the given point
 void Cache_FreeLow(int new_low_hunk) {
     while (1) {
         cache_system_p c = cache_head.next;
-        if (c == &cache_head)                       return;		// nothing in cache at all
-        if ((uint8_p)c >= hunk_base + new_low_hunk) return;		// there is space to grow the hunk
-        Cache_Move(c);	// reclaim the space
+        if (c == &cache_head)                       return;  // nothing in cache at all
+        if ((uint8_p)c >= hunk_base + new_low_hunk) return;  // there is space to grow the hunk
+        Cache_Move(c); // reclaim the space
     }
 }
 
@@ -85,13 +85,13 @@ void Cache_FreeHigh(int new_high_hunk) {
     while (1) {
         cache_system_p c = cache_head.prev;
         if (c == &cache_head)
-            return;		// nothing in cache at all
+            return;  // nothing in cache at all
         if (((uint8_p)c + c->size) <= (hunk_base + hunk_size - new_high_hunk))
-            return;		// there is space to grow the hunk
+            return;  // there is space to grow the hunk
         if (c == prev)
-            Cache_Free(c->user);	// didn't move out of the way
+            Cache_Free(c->user); // didn't move out of the way
         else {
-            Cache_Move(c);	// try to move it
+            Cache_Move(c); // try to move it
             prev = c;
         }
     }
@@ -150,7 +150,7 @@ cache_system_p Cache_TryAlloc(size_t size, bool nobottom) {
     do {
         if ((!nobottom || (cs != cache_head.next)) &&
             (((uint8_p)cs - (uint8_p)new) >= size)
-            ) {	// found space
+            ) { // found space
             memset(new, 0, sizeof(*new));
             new->size = size;
 
@@ -185,7 +185,7 @@ cache_system_p Cache_TryAlloc(size_t size, bool nobottom) {
         return new;
     }
 
-    return NULL;		// couldn't allocate
+    return NULL;  // couldn't allocate
 }
 
 /*
@@ -197,7 +197,7 @@ cache_system_p Cache_TryAlloc(size_t size, bool nobottom) {
 */
 void Cache_Flush() {
     while (cache_head.next != &cache_head)
-        Cache_Free(cache_head.next->user);	// reclaim the space
+        Cache_Free(cache_head.next->user); // reclaim the space
 }
 
 

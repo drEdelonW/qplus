@@ -71,7 +71,7 @@ typedef enum {
 
 
 typedef struct {
-    SpriteFrameType_t	type;
+    SpriteFrameType_t type;
 } dSpriteFrameType_t;
 typedef dSpriteFrameType_t* dSpriteFrameType_p;
 STATIC_ASSERT_SIZE(dSpriteFrameType_t, 4); // 4

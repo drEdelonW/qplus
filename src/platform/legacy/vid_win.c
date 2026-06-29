@@ -23,41 +23,41 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_local.h"
 #include "resource.h"
 
-#define MAX_MODE_LIST	30
-#define VID_ROW_SIZE	3
+#define MAX_MODE_LIST 30
+#define VID_ROW_SIZE 3
 
-bool	dibonly;
+bool dibonly;
 
 
-HWND		mainwindow;
+HWND  mainwindow;
 
 HWND WINAPI InitializeWindow(HINSTANCE hInstance, int nCmdShow);
 
-int			DIBWidth, DIBHeight;
-bool	DDActive;
-RECT		WindowRect;
-DWORD		WindowStyle, ExWindowStyle;
+int   DIBWidth, DIBHeight;
+bool DDActive;
+RECT  WindowRect;
+DWORD  WindowStyle, ExWindowStyle;
 
-int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
-RECT		window_rect;
+int   window_center_x, window_center_y, window_x, window_y, window_width, window_height;
+RECT  window_rect;
 
-static DEVMODE	gdevmode;
-static bool	startwindowed = 0, windowed_mode_set;
-static int		firstupdate = 1;
-static bool	vid_initialized = false, vid_palettized;
-static int		lockcount;
-static int		vid_fulldib_on_focus_mode;
-static bool	force_minimized, in_mode_set, is_mode0x13, force_mode_set;
-static int		vid_stretched, windowed_mouse;
-static bool	palette_changed, syscolchg, vid_mode_set, hide_window, pal_is_nostatic;
-static HICON	hIcon;
+static DEVMODE gdevmode;
+static bool startwindowed = 0, windowed_mode_set;
+static int  firstupdate = 1;
+static bool vid_initialized = false, vid_palettized;
+static int  lockcount;
+static int  vid_fulldib_on_focus_mode;
+static bool force_minimized, in_mode_set, is_mode0x13, force_mode_set;
+static int  vid_stretched, windowed_mouse;
+static bool palette_changed, syscolchg, vid_mode_set, hide_window, pal_is_nostatic;
+static HICON hIcon;
 
-VidDef_t	vid;				// global video state
+VidDef_t vid;    // global video state
 
-#define MODE_WINDOWED			0
-#define MODE_SETTABLE_WINDOW	2
-#define NO_MODE					(MODE_WINDOWED - 1)
-#define MODE_FULLSCREEN_DEFAULT	(MODE_WINDOWED + 3)
+#define MODE_WINDOWED   0
+#define MODE_SETTABLE_WINDOW 2
+#define NO_MODE     (MODE_WINDOWED - 1)
+#define MODE_FULLSCREEN_DEFAULT (MODE_WINDOWED + 3)
 
 // Note that 0 is MODE_WINDOWED
 CVAR(vid_mode, "0");
@@ -79,63 +79,63 @@ CVAR_ARC(vid_window_x, "0");
 CVAR_ARC(vid_window_y, "0");
 
 typedef struct {
-    int		width;
-    int		height;
+    int  width;
+    int  height;
 } lmode_t;
 
-lmode_t	lowresmodes[] = {
+lmode_t lowresmodes[] = {
     {320, 200},
     {320, 240},
     {400, 300},
     {512, 384},
 };
 
-int			vid_modenum = NO_MODE;
-int			vid_testingmode, vid_realmode;
-LegacyTimeStamp_t		vid_testendtime;
-int			vid_default = MODE_WINDOWED;
-static int	windowed_default;
+int   vid_modenum = NO_MODE;
+int   vid_testingmode, vid_realmode;
+LegacyTimeStamp_t  vid_testendtime;
+int   vid_default = MODE_WINDOWED;
+static int windowed_default;
 
-modestate_t	modestate = MS_UNINIT;
+modestate_t modestate = MS_UNINIT;
 
 static uint8_p vid_surfcache;
-static int		vid_surfcachesize;
-static int		VID_highhunkmark;
+static int  vid_surfcachesize;
+static int  VID_highhunkmark;
 
-uint8_t	vid_curpal[256 * 3];
+uint8_t vid_curpal[256 * 3];
 
-uint16_t	d_8to16table[256];
-uint32_t	d_8to24table[256];
+uint16_t d_8to16table[256];
+uint32_t d_8to24table[256];
 
 int     driver = grDETECT, mode;
 bool    useWinDirect = true, useDirectDraw = true;
 MGLDC* mgldc = NULL, * memdc = NULL, * dibdc = NULL, * windc = NULL;
 
 typedef struct {
-    modestate_t	type;
-    int			width;
-    int			height;
-    int			modenum;
-    int			mode13;
-    int			stretched;
-    int			dib;
-    int			fullscreen;
-    int			bpp;
-    int			halfscreen;
-    char		modedesc[13];
+    modestate_t type;
+    int   width;
+    int   height;
+    int   modenum;
+    int   mode13;
+    int   stretched;
+    int   dib;
+    int   fullscreen;
+    int   bpp;
+    int   halfscreen;
+    char  modedesc[13];
 } vmode_t;
 
-static vmode_t	modelist[MAX_MODE_LIST];
-static int		nummodes;
+static vmode_t modelist[MAX_MODE_LIST];
+static int  nummodes;
 static vmode_p pcurrentmode;
 
-int		aPage;					// Current active display page
-int		vPage;					// Current visible display page
-int		waitVRT = true;			// True to wait for retrace on flip
+int  aPage;     // Current active display page
+int  vPage;     // Current visible display page
+int  waitVRT = true;   // True to wait for retrace on flip
 
-static vmode_t	badmode;
+static vmode_t badmode;
 
-static uint8_t	backingbuf[48 * 24];
+static uint8_t backingbuf[48 * 24];
 
 void VID_MenuDraw();
 void VID_MenuKey(int key);
@@ -150,7 +150,7 @@ VID_RememberWindowPos
 ================
 */
 void VID_RememberWindowPos() {
-    RECT	rect;
+    RECT rect;
 
     if (GetWindowRect(mainwindow, &rect)) {
         if ((rect.left < GetSystemMetrics(SM_CXSCREEN)) &&
@@ -205,7 +205,7 @@ ClearAllStates
 ================
 */
 void ClearAllStates() {
-    int		i;
+    int  i;
 
     // send an up event for each key, to make sure the server clears them all
     for (i = 0; i < 256; i++) {
@@ -223,7 +223,7 @@ VID_CheckAdequateMem
 ================
 */
 bool VID_CheckAdequateMem(int width, int height) {
-    int		tbuffersize;
+    int  tbuffersize;
 
     tbuffersize = width * height * sizeof(*d_pzbuffer);
 
@@ -233,7 +233,7 @@ bool VID_CheckAdequateMem(int width, int height) {
     // z, and surface buffers
     if ((host_parms.memsize - tbuffersize + SURFCACHE_SIZE_AT_320X200 +
         0x10000 * 3) < minimum_memory) {
-        return false;		// not enough memory for mode
+        return false;  // not enough memory for mode
     }
 
     return true;
@@ -246,7 +246,7 @@ VID_AllocBuffers
 ================
 */
 bool VID_AllocBuffers(int width, int height) {
-    int		tsize, tbuffersize;
+    int  tsize, tbuffersize;
 
     tbuffersize = width * height * sizeof(*d_pzbuffer);
 
@@ -259,7 +259,7 @@ bool VID_AllocBuffers(int width, int height) {
     if ((host_parms.memsize - tbuffersize + SURFCACHE_SIZE_AT_320X200 +
         0x10000 * 3) < minimum_memory) {
         Con_SafePrintf("Not enough memory for video mode\n");
-        return false;		// not enough memory for mode
+        return false;  // not enough memory for mode
     }
 
     vid_surfcachesize = tsize;
@@ -305,7 +305,7 @@ int VID_Suspend(MGLDC* dc, m_int flags) {
         // keep WM_PAINT from trying to redraw
         in_mode_set = true;
 
-        scr.block_drawing = true;	// so we don't try to draw while switched away
+        scr.block_drawing = true; // so we don't try to draw while switched away
 
         return MGL_NO_SUSPEND_APP;
     }
@@ -335,11 +335,11 @@ void registerAllDispDrivers() {
     * WinDirect modes.
     */
     MGL_registerDriver(MGL_VGA8NAME, VGA8_driver);
-    //	MGL_registerDriver(MGL_VGAXNAME,VGAX_driver);
+    // MGL_registerDriver(MGL_VGAXNAME,VGAX_driver);
 
         /* Register display drivers */
     if (useWinDirect) {
-        //we don't want VESA 1.X drivers		MGL_registerDriver(MGL_SVGA8NAME,SVGA8_driver);
+        //we don't want VESA 1.X drivers  MGL_registerDriver(MGL_SVGA8NAME,SVGA8_driver);
         MGL_registerDriver(MGL_LINEAR8NAME, LINEAR8_driver);
 
         if (!COM_CheckParm("-novbeaf"))
@@ -359,8 +359,8 @@ void registerAllMemDrivers() {
 
 
 void VID_InitMGLFull(HINSTANCE hInstance) {
-    int			i, xRes, yRes, bits, vMode, lowres, curmode, temp;
-    int			lowstretchedres, stretchedmode, lowstretched;
+    int   i, xRes, yRes, bits, vMode, lowres, curmode, temp;
+    int   lowstretchedres, stretchedmode, lowstretched;
     uchar* m;
 
     // FIXME: NT is checked for because MGL currently has a bug that causes it
@@ -432,7 +432,7 @@ void VID_InitMGLFull(HINSTANCE hInstance) {
         }
 
         // build the mode list, leaving room for the low-res stretched mode, if any
-        nummodes++;		// leave room for default mode
+        nummodes++;  // leave room for default mode
 
         for (i = 0; m[i] != 0xFF; i++) {
             MGL_modeResolution(m[i], &xRes, &yRes, &bits);
@@ -512,8 +512,8 @@ MGLDC* createDisplayDC(int forcemem)
 ****************************************************************************/
 {
     MGLDC* dc;
-    pixel_format_t	pf;
-    int				npages;
+    pixel_format_t pf;
+    int    npages;
 
     // Start the specified video mode
     if (!MGL_changeDisplayMode(mode))
@@ -570,9 +570,9 @@ MGLDC* createDisplayDC(int forcemem)
 
 
 void VID_InitMGLDIB(HINSTANCE hInstance) {
-    WNDCLASS		wc;
-    HDC				hdc;
-    int				i;
+    WNDCLASS  wc;
+    HDC    hdc;
+    int    i;
 
     hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON2));
 
@@ -647,7 +647,7 @@ void VID_InitMGLDIB(HINSTANCE hInstance) {
 
     ReleaseDC(NULL, hdc);
 
-    nummodes = 3;	// reserve space for windowed mode
+    nummodes = 3; // reserve space for windowed mode
 
     DDActive = 0;
 }
@@ -659,11 +659,11 @@ VID_InitFullDIB
 =================
 */
 void VID_InitFullDIB(HINSTANCE hInstance) {
-    DEVMODE	devmode;
-    int		i, j, modenum, cmodes, existingmode, originalnummodes, lowestres;
-    int		numlowresmodes, bpp, done;
-    int		cstretch, istretch, mstretch;
-    BOOL	stat;
+    DEVMODE devmode;
+    int  i, j, modenum, cmodes, existingmode, originalnummodes, lowestres;
+    int  numlowresmodes, bpp, done;
+    int  cstretch, istretch, mstretch;
+    BOOL stat;
 
     // enumerate 8 bpp modes
     originalnummodes = nummodes;
@@ -950,7 +950,7 @@ VID_CheckModedescFixup
 =================
 */
 void VID_CheckModedescFixup(int mode) {
-    int		x, y, stretch;
+    int  x, y, stretch;
 
     if (mode == MODE_SETTABLE_WINDOW) {
         modelist[mode].stretched = (int)vid_stretch_by_2.value;
@@ -1025,7 +1025,7 @@ Tacks on "windowed" or "fullscreen"
 =================
 */
 cString VID_GetModeDescription2(int mode) {
-    static char	pinfo[40];
+    static char pinfo[40];
     vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
@@ -1035,8 +1035,8 @@ cString VID_GetModeDescription2(int mode) {
 
     pv = VID_GetModePtr(mode);
 
-    if (modelist[mode].type == MS_FULLSCREEN)	snprintf(pinfo, sizeof(pinfo), "%s fullscreen", pv->modedesc);
-    else if (modelist[mode].type == MS_FULLDIB)	snprintf(pinfo, sizeof(pinfo), "%s fullscreen", pv->modedesc);
+    if (modelist[mode].type == MS_FULLSCREEN) snprintf(pinfo, sizeof(pinfo), "%s fullscreen", pv->modedesc);
+    else if (modelist[mode].type == MS_FULLDIB) snprintf(pinfo, sizeof(pinfo), "%s fullscreen", pv->modedesc);
     else                                        snprintf(pinfo, sizeof(pinfo), "%s windowed", pv->modedesc);
 
     return pinfo;
@@ -1046,7 +1046,7 @@ cString VID_GetModeDescription2(int mode) {
 // KJB: Added this to return the mode driver name in description for console
 
 cString VID_GetExtModeDescription(int mode) {
-    static char	pinfo[40];
+    static char pinfo[40];
     vmode_p pv;
 
     if ((mode < 0) || (mode >= nummodes))
@@ -1104,11 +1104,11 @@ void DestroyFullDIBWindow() {
 
 
 bool VID_SetWindowedMode(int modenum) {
-    HDC				hdc;
-    pixel_format_t	pf;
-    bool		stretched;
-    int				lastmodestate;
-    LONG			wlong;
+    HDC    hdc;
+    pixel_format_t pf;
+    bool  stretched;
+    int    lastmodestate;
+    LONG   wlong;
 
     if (!windowed_mode_set) {
         if (COM_CheckParm("-resetwinpos")) {
@@ -1302,9 +1302,9 @@ bool VID_SetFullscreenMode(int modenum) {
 
 
 bool VID_SetFullDIBMode(int modenum) {
-    HDC				hdc;
-    pixel_format_t	pf;
-    int				lastmodestate;
+    HDC    hdc;
+    pixel_format_t pf;
+    int    lastmodestate;
 
     DDActive = 0;
 
@@ -1407,7 +1407,7 @@ bool VID_SetFullDIBMode(int modenum) {
 
 
 void VID_RestoreOldMode(int original_mode) {
-    static bool	inerror = false;
+    static bool inerror = false;
 
     if (inerror)
         return;
@@ -1439,10 +1439,10 @@ void VID_SetDefaultMode() {
 
 
 int VID_SetMode(int modenum, uint8_p palette) {
-    int				original_mode, temp, dummy;
-    bool		stat;
-    MSG				msg;
-    HDC				hdc;
+    int    original_mode, temp, dummy;
+    bool  stat;
+    MSG    msg;
+    HDC    hdc;
 
     while ((modenum >= nummodes) || (modenum < 0)) {
         if (vid_modenum == NO_MODE) {
@@ -1631,7 +1631,7 @@ void VID_UnlockBuffer() {
 
 
 int VID_ForceUnlockedAndReturnState() {
-    int	lk;
+    int lk;
 
     if (!lockcount)
         return 0;
@@ -1661,10 +1661,10 @@ void VID_ForceLockState(int lk) {
 }
 
 
-void	VID_SetPalette(uint8_p palette) {
-    INT			i;
-    palette_t	pal[256];
-    HDC			hdc;
+void VID_SetPalette(uint8_p palette) {
+    INT   i;
+    palette_t pal[256];
+    HDC   hdc;
 
     if (!Minimized) {
         palette_changed = true;
@@ -1722,7 +1722,7 @@ void	VID_SetPalette(uint8_p palette) {
 }
 
 
-void	VID_ShiftPalette(uint8_p palette) {
+void VID_ShiftPalette(uint8_p palette) {
     VID_SetPalette(palette);
 }
 
@@ -1757,7 +1757,7 @@ VID_DescribeMode_f
 =================
 */
 void VID_DescribeMode_f() {
-    int		modenum;
+    int  modenum;
 
     modenum = Q_atoi(Cmd_Argv(1));
 
@@ -1771,9 +1771,9 @@ VID_DescribeModes_f
 =================
 */
 void VID_DescribeModes_f() {
-    int			i, lnummodes;
+    int   i, lnummodes;
     cString pinfo;
-    bool	na;
+    bool na;
     vmode_p pv;
 
     na = false;
@@ -1805,8 +1805,8 @@ VID_TestMode_f
 =================
 */
 void VID_TestMode_f() {
-    int		modenum;
-    LegacyTimeDelta_t	testduration;
+    int  modenum;
+    LegacyTimeDelta_t testduration;
 
     if (!vid_testingmode) {
         modenum = Q_atoi(Cmd_Argv(1));
@@ -1875,9 +1875,9 @@ void VID_ForceMode_f() {
 }
 
 
-void	VID_Init(uint8_p palette) {
-    int		i, bestmatch, bestmatchmetric, t, dr, dg, db;
-    int		basenummodes;
+void VID_Init(uint8_p palette) {
+    int  i, bestmatch, bestmatchmetric, t, dr, dg, db;
+    int  basenummodes;
     uint8_p ptmp;
 
     Cvar_RegisterVariable(&vid_mode);
@@ -1993,9 +1993,9 @@ void	VID_Init(uint8_p palette) {
 }
 
 
-void	VID_Shutdown() {
-    HDC				hdc;
-    int				dummy;
+void VID_Shutdown() {
+    HDC    hdc;
+    int    dummy;
 
     if (vid_initialized) {
         if (modestate == MS_FULLDIB)
@@ -2029,7 +2029,7 @@ FlipScreen
 ================
 */
 void FlipScreen(vRect_p rects) {
-    HRESULT		ddrval;
+    HRESULT  ddrval;
 
     // Flip the surfaces
 
@@ -2102,9 +2102,9 @@ void FlipScreen(vRect_p rects) {
 }
 
 
-void	VID_Update(vRect_p rects) {
-    vRect_t	rect;
-    RECT	trect;
+void VID_Update(vRect_p rects) {
+    vRect_t rect;
+    RECT trect;
 
     if (!vid_palettized && palette_changed) {
         palette_changed = false;
@@ -2195,8 +2195,8 @@ D_BeginDirectRect
 ================
 */
 void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
-    int		i, j, reps, repshift;
-    vRect_t	rect;
+    int  i, j, reps, repshift;
+    vRect_t rect;
 
     if (!vid_initialized)
         return;
@@ -2281,8 +2281,8 @@ D_EndDirectRect
 ================
 */
 void D_EndDirectRect(int x, int y, int width, int height) {
-    int		i, j, reps, repshift;
-    vRect_t	rect;
+    int  i, j, reps, repshift;
+    vRect_t rect;
 
     if (!vid_initialized)
         return;
@@ -2405,9 +2405,9 @@ void AppActivate(BOOL fActive, BOOL minimize)
 *
 ****************************************************************************/
 {
-    HDC			hdc;
-    int			i, t;
-    static BOOL	sound_active;
+    HDC   hdc;
+    int   i, t;
+    static BOOL sound_active;
 
     ActiveApp = fActive;
 
@@ -2471,7 +2471,7 @@ void AppActivate(BOOL fActive, BOOL minimize)
         if (ActiveApp) {
             if (vid_fulldib_on_focus_mode) {
                 if (vid_initialized) {
-                    msg_suppress_1 = true;	// don't want to see normal mode set message
+                    msg_suppress_1 = true; // don't want to see normal mode set message
                     VID_SetMode(vid_fulldib_on_focus_mode, vid_curpal);
                     msg_suppress_1 = false;
 
@@ -2495,7 +2495,7 @@ void AppActivate(BOOL fActive, BOOL minimize)
                 if (vid_initialized) {
                     force_minimized = true;
                     i = vid_fulldib_on_focus_mode;
-                    msg_suppress_1 = true;	// don't want to see normal mode set message
+                    msg_suppress_1 = true; // don't want to see normal mode set message
                     VID_SetMode(windowed_default, vid_curpal);
                     msg_suppress_1 = false;
                     vid_fulldib_on_focus_mode = i;
@@ -2557,11 +2557,11 @@ LONG WINAPI MainWndProc(
     UINT    uMsg,
     WPARAM  wParam,
     LPARAM  lParam) {
-    LONG			lRet = 0;
-    int				fwKeys, xPos, yPos, fActive, fMinimized, temp;
-    HDC				hdc;
-    PAINTSTRUCT		ps;
-    static int		recursiveflag;
+    LONG   lRet = 0;
+    int    fwKeys, xPos, yPos, fActive, fMinimized, temp;
+    HDC    hdc;
+    PAINTSTRUCT  ps;
+    static int  recursiveflag;
 
     switch (uMsg) {
     case WM_CREATE:
@@ -2767,22 +2767,22 @@ LONG WINAPI MainWndProc(
 
 
 
-static int	vid_line, vid_wmodes;
+static int vid_line, vid_wmodes;
 
 typedef struct
 {
-    int		modenum;
+    int  modenum;
     cString desc;
-    int		iscur;
-    int		ismode13;
-    int		width;
+    int  iscur;
+    int  ismode13;
+    int  width;
 } modedesc_t;
 
-#define MAX_COLUMN_SIZE		5
-#define MODE_AREA_HEIGHT	(MAX_COLUMN_SIZE + 6)
-#define MAX_MODEDESCS		(MAX_COLUMN_SIZE*3)
+#define MAX_COLUMN_SIZE  5
+#define MODE_AREA_HEIGHT (MAX_COLUMN_SIZE + 6)
+#define MAX_MODEDESCS  (MAX_COLUMN_SIZE*3)
 
-static modedesc_t	modedescs[MAX_MODEDESCS];
+static modedesc_t modedescs[MAX_MODEDESCS];
 
 /*
 ================
@@ -2792,10 +2792,10 @@ VID_MenuDraw
 void VID_MenuDraw() {
     qPic_p p;
     cString ptr;
-    int			lnummodes, i, j, k, column, row, dup, dupmode;
-    char		temp[100];
+    int   lnummodes, i, j, k, column, row, dup, dupmode;
+    char  temp[100];
     vmode_p pv;
-    modedesc_t	tmodedesc;
+    modedesc_t tmodedesc;
 
     M_DrawPic(4, Draw_CachePic("gfx/vidmodes.lmp"));
 

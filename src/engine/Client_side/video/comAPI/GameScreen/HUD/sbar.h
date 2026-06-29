@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // does, the entire thing will be redrawn for the next vid.numpages frames.
 
 
-extern  int sb_lines;			// scan lines to draw
+extern  int sb_lines;   // scan lines to draw
 #ifdef __cplusplus
 extern "C" {
 #endif

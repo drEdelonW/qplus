@@ -165,7 +165,7 @@ __weak void Sys_LowFPPrecision() {}
 //=============================================================================
 
 __weak int main(int argc, cStringArray argv) {
-    static QuakeParms_t	parms;
+    static QuakeParms_t parms;
 
     parms.memsize = 8 * 1024 * 1024;
     parms.membase = malloc(parms.memsize);

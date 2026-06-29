@@ -20,10 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // protocol.h -- communications protocols
 
-#define	PROTOCOL_VERSION	15
+#define PROTOCOL_VERSION 15
 enum {
-	FAST_MASK = 0x7Fu,
-	FAST_FLAG = 0x80u
+    FAST_MASK = 0x7Fu,
+    FAST_FLAG = 0x80u
 };
 
 // if the high bit of the servercmd is set, the low bits are fast update flags:
@@ -76,7 +76,7 @@ typedef enum {
 } sound_bits_t;
 
 // defaults for clientinfo messages
-#define	DEFAULT_VIEWHEIGHT	22
+#define DEFAULT_VIEWHEIGHT 22
 
 
 // game types sent by serverinfo

@@ -18,30 +18,30 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // */
-#error
-// // #define	GLTEST			// experimental stuff
-// #define	QUAKE_GAME			// as opposed to utilities
-// //define	PARANOID			// speed sapping error checking
+#error deprecated
+// // #define GLTEST   // experimental stuff
+// #define QUAKE_GAME   // as opposed to utilities
+// //define PARANOID   // speed sapping error checking
 
 
 // #if defined __i386__ && !defined NO_ASM// && !defined __sun__
 //     #define id386   1
-//     #define UNALIGNED_OK	1	/* set to 0 if unaligned accesses are not supported */
+//     #define UNALIGNED_OK 1 /* set to 0 if unaligned accesses are not supported */
 // #else
-// 	#define id386	0
-//     #define UNALIGNED_OK	0
+//  #define id386 0
+//     #define UNALIGNED_OK 0
 // #endif
 
 
-// // #define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings
+// // #define UNUSED(x) (x = x) // for pesky compiler / lint warnings
 
 
-// #define	ON_EPSILON		0.1			// point on plane side epsilon
+// #define ON_EPSILON  0.1   // point on plane side epsilon
 
 // //===========================================
 
 
-// // #define	SOUND_CHANNELS		8
+// // #define SOUND_CHANNELS  8
 
 // // This makes anyone on id's net privileged
 // // Use for multiplayer testing only - VERY dangerous!!!

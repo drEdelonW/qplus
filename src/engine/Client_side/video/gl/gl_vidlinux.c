@@ -40,8 +40,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static fxMesaContext _fc = NULL;
 #define stringify(m) { #m, m }
 
-uint16_t	d_8to16table[256];
-uint32_t	d_8to24table[256];
+uint16_t    d_8to16table[256];
+uint32_t    d_8to24table[256];
 uint8_t d_15to8table[65536];
 
 int num_shades = 32;
@@ -64,17 +64,17 @@ static uint8_t _scanToKey[128];
 
 int num_mice = sizeof(mice) / sizeof(mice[0]);
 
-int	d_con_indirect = 0;
+int    d_con_indirect = 0;
 
-int		svgalib_inited = 0;
-int		UseMouse = 1;
-int		UseKeyboard = 1;
+int        svgalib_inited = 0;
+int        UseMouse = 1;
+int        UseKeyboard = 1;
 
-int		mouserate = MOUSE_DEFAULTSAMPLERATE;
+int        mouserate = MOUSE_DEFAULTSAMPLERATE;
 
-cvar_t		vid_mode = { "vid_mode","5",false };
-cvar_t		vid_redrawfull = { "vid_redrawfull","0",false };
-cvar_t		vid_waitforrefresh = { "vid_waitforrefresh","0",true };
+cvar_t        vid_mode = { "vid_mode","5",false };
+cvar_t        vid_redrawfull = { "vid_redrawfull","0",false };
+cvar_t        vid_waitforrefresh = { "vid_waitforrefresh","0",true };
 
 int8_p framebuffer_ptr;
 
@@ -88,23 +88,23 @@ int     mouse_buttons;
 int     mouse_buttonstate;
 int     mouse_oldbuttonstate;
 float   mouse_x, mouse_y;
-float	old_mouse_x, old_mouse_y;
-int		mx, my;
+float    old_mouse_x, old_mouse_y;
+int        mx, my;
 
-cvar_t	m_filter = { "m_filter","1" };
+cvar_t    m_filter = { "m_filter","1" };
 
 int scr_width, scr_height;
 
 /*-----------------------------------------------------------------------*/
 
-//int		texture_mode = GL_NEAREST;
-//int		texture_mode = GL_NEAREST_MIPMAP_NEAREST;
-//int		texture_mode = GL_NEAREST_MIPMAP_LINEAR;
-int		texture_mode = GL_LINEAR;
-//int		texture_mode = GL_LINEAR_MIPMAP_NEAREST;
-//int		texture_mode = GL_LINEAR_MIPMAP_LINEAR;
+//int        texture_mode = GL_NEAREST;
+//int        texture_mode = GL_NEAREST_MIPMAP_NEAREST;
+//int        texture_mode = GL_NEAREST_MIPMAP_LINEAR;
+int        texture_mode = GL_LINEAR;
+//int        texture_mode = GL_LINEAR_MIPMAP_NEAREST;
+//int        texture_mode = GL_LINEAR_MIPMAP_LINEAR;
 
-cvar_t	gl_ztrick = { "gl_ztrick","1" };
+cvar_t    gl_ztrick = { "gl_ztrick","1" };
 
 cStringRO gl_vendor;
 cStringRO gl_renderer;
@@ -193,15 +193,15 @@ void InitSig() {
 }
 
 void VID_ShiftPalette(uint8_p p) {
-    //	VID_SetPalette(p);
+    //    VID_SetPalette(p);
 }
 
-void	VID_SetPalette(uint8_p palette) {
+void    VID_SetPalette(uint8_p palette) {
     byte* pal;
     uint32_t r, g, b;
     uint32_t v;
     int     r1, g1, b1;
-    int		j, k, l, m;
+    int        j, k, l, m;
     uint16_t i;
     uint32_p table;
     FILE* f;
@@ -223,7 +223,7 @@ void	VID_SetPalette(uint8_p palette) {
         v = (255 << 24) + (r << 0) + (g << 8) + (b << 16);
         *table++ = v;
     }
-    d_8to24table[255] &= 0xffffff;	// 255 is transparent
+    d_8to24table[255] &= 0xffffff;    // 255 is transparent
 
     // JACK: 3D distance calcs - k is last closest, l is the distance.
     for (i = 0; i < (1 << 15); i++) {
@@ -292,7 +292,7 @@ void GL_Init() {
     gl_extensions = glGetString(GL_EXTENSIONS);
     Con_Printf("GL_EXTENSIONS: %s\n", gl_extensions);
 
-    //	Con_Printf ("%s %s\n", gl_renderer, gl_version);
+    //    Con_Printf ("%s %s\n", gl_renderer, gl_version);
 
     CheckMultiTextureExtensions();
 
@@ -313,7 +313,7 @@ void GL_Init() {
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    //	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    //    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
@@ -330,9 +330,9 @@ void GL_BeginRendering(int* x, int* y, int* width, int* height) {
     *height = scr_height;
 
     //    if (!wglMakeCurrent( maindc, baseRC ))
-    //		Host_SysError ("wglMakeCurrent failed");
+    //        Host_SysError ("wglMakeCurrent failed");
 
-    //	glViewport (*x, *y, *width, *height);
+    //    glViewport (*x, *y, *width, *height);
 }
 
 
@@ -364,8 +364,8 @@ void Init_KBD() {
         _scanToKey[97] = K_CTRL;
         _scanToKey[56] = K_ALT;
         _scanToKey[100] = K_ALT;
-        //		_scanToKey[58] = JK_CAPS;
-        //		_scanToKey[69] = JK_NUM_LOCK;
+        //        _scanToKey[58] = JK_CAPS;
+        //        _scanToKey[69] = JK_NUM_LOCK;
         _scanToKey[71] = K_HOME;
         _scanToKey[73] = K_PGUP;
         _scanToKey[79] = K_END;
@@ -550,7 +550,7 @@ void VID_Init8bitPalette() {
 }
 
 static void Check_Gamma(uint8_p pal) {
-    uint8_t	palette[768];
+    uint8_t    palette[768];
 
     if (COM_CheckParm("-gamma") == 0) {
         if ((gl_renderer && strstr(gl_renderer, "Voodoo")) ||
@@ -578,7 +578,7 @@ static void Check_Gamma(uint8_p pal) {
 void VID_Init(uint8_p palette) {
     int i;
     GLint attribs[32];
-    char	gldir[MAX_OSPATH];
+    char    gldir[MAX_OSPATH];
     int width = 640, height = 480;
 
     Init_KBD();

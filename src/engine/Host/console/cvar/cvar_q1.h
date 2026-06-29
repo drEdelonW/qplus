@@ -34,7 +34,7 @@ CVAR_EXTERN(cmdline);
 
 
 // FROM: src/engine/core/console/console.c
-CVAR_EXTERN(con_notifytime);		//seconds
+CVAR_EXTERN(con_notifytime);  //seconds
 
 // FROM: src/engine/net/net_main.c
 CVAR_EXTERN(net_messagetimeout);
@@ -58,7 +58,7 @@ CVAR_EXTERN(idgods);
 CVAR_EXTERN(cl_name);
 CVAR_EXTERN(cl_color);
 
-CVAR_EXTERN(cl_shownet);	// can be 0, 1, or 2
+CVAR_EXTERN(cl_shownet); // can be 0, 1, or 2
 CVAR_EXTERN(cl_nolerp);
 
 CVAR_EXTERN(lookspring);

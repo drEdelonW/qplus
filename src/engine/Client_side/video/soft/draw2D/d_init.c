@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include "d_local.h"
 
-#define NUM_MIPS	4
+#define NUM_MIPS 4
 
 SurfCache_p d_initial_rover;
 bool        d_roverwrapped;
@@ -121,7 +121,7 @@ void D_SetupFrame() {
         d_scalemip[i] = _BaseMip[i] * d_mipscale.value;
 
     d_drawspans =
-#if	id386
+#if id386
     (d_subdiv16.value) ? D_DrawSpans16 :
 #endif
         D_DrawSpans8;

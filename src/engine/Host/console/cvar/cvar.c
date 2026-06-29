@@ -49,7 +49,7 @@ cvar_p Cvar_FindVar(cStringRO var_name) {
 Cvar_VariableValue
 ============
 */
-float	Cvar_VariableValue(cString var_name) {
+float Cvar_VariableValue(cString var_name) {
     cvar_p var = Cvar_FindVar(var_name);
     if (!var)
         // return 0.0f;
@@ -98,14 +98,14 @@ Cvar_Set
 */
 void Cvar_Set(cStringRO var_name, cString value) {
     cvar_p var = Cvar_FindVar(var_name);
-    if (!var) {	// there is an error in C code if this happens
+    if (!var) { // there is an error in C code if this happens
         Con_Printf("Cvar_Set: variable %s not found\n", var_name);
         return;
     }
 
     bool changed = Q_strcmp(var->string, value);
 
-    Z_Free(var->string);	// free the old value string
+    Z_Free(var->string); // free the old value string
 
     var->string = Z_Malloc(Q_strlen(value) + 1);
     Q_strcpy(var->string, value);
@@ -169,7 +169,7 @@ Cvar_Command
 Handles variable inspection and changing from the console
 ============
 */
-bool	Cvar_Command() {
+bool Cvar_Command() {
     // check variables
     cvar_p v = Cvar_FindVar(Cmd_Argv(0));
     if (!v)

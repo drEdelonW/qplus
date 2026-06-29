@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // vid_sunxil.c -- uses X to setup windows and XIL to copy images (scaled as needed)
-// 		   to screen
+//      to screen
 
 #define _BSD
 #define BYTE_DEFINED 1
@@ -63,15 +63,15 @@ typedef struct {
     int32_t input_mode;
 } MotifWmHints;
 
-#define MAX_COLUMN_SIZE	11
+#define MAX_COLUMN_SIZE 11
 
-#define MAX_MODEDESCS	(MAX_COLUMN_SIZE*3)
+#define MAX_MODEDESCS (MAX_COLUMN_SIZE*3)
 
 typedef struct
 {
-    int		modenum;
-    int		iscur;
-    char	desc[256];
+    int  modenum;
+    int  iscur;
+    char desc[256];
 } modedesc_t;
 
 
@@ -92,11 +92,11 @@ typedef struct {
 VidDef_t vid; // global video state
 uint16_t       d_8to16table[256];
 
-int		num_shades = 32;
+int  num_shades = 32;
 
-int	d_con_indirect = 0;
+int d_con_indirect = 0;
 
-int		vid_buffersize;
+int  vid_buffersize;
 
 #define STD_EVENT_MASK \
 ( \
@@ -110,28 +110,28 @@ int		vid_buffersize;
     FocusChangeMask \
 )
 
-int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
+int  VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
 byte* VGA_pagebase;
 
-bool			x_fullscreen = true;
+bool   x_fullscreen = true;
 Display* x_disp = NULL;
-int				x_screen, x_screen_width, x_screen_height;
-int				x_center_width, x_center_height;
-int				x_std_event_mask = STD_EVENT_MASK;
-Window				x_win, x_root_win;
-bool			x_focus = true;
-int				global_dx, global_dy;
+int    x_screen, x_screen_width, x_screen_height;
+int    x_center_width, x_center_height;
+int    x_std_event_mask = STD_EVENT_MASK;
+Window    x_win, x_root_win;
+bool   x_focus = true;
+int    global_dx, global_dy;
 
 
-static Colormap			x_cmap;
-static GC			x_gc;
+static Colormap   x_cmap;
+static GC   x_gc;
 static Visual* x_vis;
 static XVisualInfo* x_visinfo;
-static Atom			aHints = NULL;
-static Atom			aWMDelete = NULL;
+static Atom   aHints = NULL;
+static Atom   aWMDelete = NULL;
 
-static bool			oktodraw = false;
-static bool			X11_active = false;
+static bool   oktodraw = false;
+static bool   X11_active = false;
 
 
 static int verbose = 1;
@@ -144,12 +144,12 @@ int current_pixel_multiply = 2;
 #define PM(a) (int)((current_pixel_multiply)?((a)*current_pixel_multiply):(a))
 #define MP(a) (int)((current_pixel_multiply)?((a)/current_pixel_multiply):(a))
 
-static int 				render_pipeline[2];
-static XilSystemState 			state;
-static XilImage				display_image = NULL;
-static XilImage				quake_image = NULL;
-static int				use_mt = 0;
-static int				count_frames = 0;
+static int     render_pipeline[2];
+static XilSystemState    state;
+static XilImage    display_image = NULL;
+static XilImage    quake_image = NULL;
+static int    use_mt = 0;
+static int    count_frames = 0;
 
 /*
 ================
@@ -183,8 +183,8 @@ byte vid_gamma[256];
 
 void VID_Gamma_f() {
 
-    float	g, f, inf;
-    int		i;
+    float g, f, inf;
+    int  i;
 
     if (Cmd_Argc() == 2) {
         g = Q_atof(Cmd_Argv(1));
@@ -201,7 +201,7 @@ void VID_Gamma_f() {
 
         VID_SetPalette(current_palette);
 
-        SCR_RequestCalcRefdef();				// force a surface cache flush
+        SCR_RequestCalcRefdef();    // force a surface cache flush
     }
 
 }
@@ -291,8 +291,8 @@ static Cursor CreateNullCursor(Display* display, Window root) {
 void VID_MenuDraw() {
     qPic_p p;
     cString ptr;
-    int			i, j, column, row, dup;
-    char		temp[100];
+    int   i, j, column, row, dup;
+    char  temp[100];
 
     M_DrawPic(4, Draw_CachePic("gfx/vidmodes.lmp"));
 
@@ -306,14 +306,14 @@ void VID_MenuKey(int key) { M_Menu_Options_f(); }
 // the palette data will go away after the call, so it must be copied off if
 // the video driver will need it again
 
-byte	surfcache[1024 * 1024];
+byte surfcache[1024 * 1024];
 
 //
 // VID_SetWindowTitle - set the window and icon titles
 //
 
 void VID_SetWindowTitle(Window win, cString pszName) {
-    XTextProperty	textprop;
+    XTextProperty textprop;
     XWMHints* wmHints;
 
     // Setup ICCCM properties
@@ -360,7 +360,7 @@ bool VID_FullScreen(Window win) {
     return(true);
 }
 
-void	VID_Init(uint8_p palette) {
+void VID_Init(uint8_p palette) {
 
     int pnum, i;
     XVisualInfo template;
@@ -450,8 +450,8 @@ void	VID_Init(uint8_p palette) {
     }
     else {
         // If not specified, find an 8 bit visual since others don't work
-//		template.depth = 8;
-//		template_mask |= VisualDepthMask;
+//  template.depth = 8;
+//  template_mask |= VisualDepthMask;
         int screen;
         screen = XDefaultScreen(x_disp);
         template.visualid =
@@ -465,7 +465,7 @@ void	VID_Init(uint8_p palette) {
     if (num_visuals > 1) {
         printf("Found more than one visual id at depth %d:\n", template.depth);
         for (i = 0; i < num_visuals; i++)
-            printf("	-visualid %d\n", (int)(x_visinfo[i].visualid));
+            printf(" -visualid %d\n", (int)(x_visinfo[i].visualid));
     }
     else if (num_visuals == 0) {
         if (template_mask == VisualIDMask)
@@ -476,12 +476,12 @@ void	VID_Init(uint8_p palette) {
 
     if (verbose) {
         printf("Using visualid %d:\n", (int)(x_visinfo->visualid));
-        printf("	screen %d\n", x_visinfo->screen);
-        printf("	red_mask 0x%x\n", (int)(x_visinfo->red_mask));
-        printf("	green_mask 0x%x\n", (int)(x_visinfo->green_mask));
-        printf("	blue_mask 0x%x\n", (int)(x_visinfo->blue_mask));
-        printf("	colormap_size %d\n", x_visinfo->colormap_size);
-        printf("	bits_per_rgb %d\n", x_visinfo->bits_per_rgb);
+        printf(" screen %d\n", x_visinfo->screen);
+        printf(" red_mask 0x%x\n", (int)(x_visinfo->red_mask));
+        printf(" green_mask 0x%x\n", (int)(x_visinfo->green_mask));
+        printf(" blue_mask 0x%x\n", (int)(x_visinfo->blue_mask));
+        printf(" colormap_size %d\n", x_visinfo->colormap_size);
+        printf(" bits_per_rgb %d\n", x_visinfo->bits_per_rgb);
     }
 
     x_vis = x_visinfo->visual;
@@ -536,7 +536,7 @@ void	VID_Init(uint8_p palette) {
         // create the main window
         x_win = XCreateWindow(x_disp,
             XRootWindow(x_disp, x_visinfo->screen),
-            0, 0,	// x, y
+            0, 0, // x, y
             desired_width, desired_height,
             0, // borderwidth
             x_visinfo->depth,
@@ -648,7 +648,7 @@ VID_ResetFramebuffer() {
 
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
-    SCR_RequestCalcRefdef();				// force a surface cache flush
+    SCR_RequestCalcRefdef();    // force a surface cache flush
 
     free(d_pzbuffer);
 
@@ -708,7 +708,7 @@ void VID_SetPalette(uint8_p palette) {
 
 // Called at shutdown
 
-void	VID_Shutdown() {
+void VID_Shutdown() {
     X11_active = false;
     Con_Printf("VID_Shutdown\n");
     //XAutoRepeatOn(x_disp);
@@ -728,41 +728,41 @@ int XLateKey(XKeyEvent* ev) {
     XLookupString(ev, buf, sizeof buf, &keysym, 0);
 
     switch (keysym) {
-    case XK_Page_Up:	 key = K_PGUP; break;
-    case XK_Page_Down:	 key = K_PGDN; break;
-    case XK_Home:	 key = K_HOME; break;
-    case XK_End:	 key = K_END; break;
-    case XK_Left:	 key = K_LEFTARROW; break;
-    case XK_Right:	key = K_RIGHTARROW;		break;
-    case XK_Down:	 key = K_DOWNARROW; break;
-    case XK_Up:		 key = K_UPARROW;	 break;
-    case XK_Escape: key = K_ESCAPE;		break;
-    case XK_Return: key = K_ENTER;		 break;
-    case XK_Tab:		key = K_TAB;			 break;
+    case XK_Page_Up:  key = K_PGUP; break;
+    case XK_Page_Down:  key = K_PGDN; break;
+    case XK_Home:  key = K_HOME; break;
+    case XK_End:  key = K_END; break;
+    case XK_Left:  key = K_LEFTARROW; break;
+    case XK_Right: key = K_RIGHTARROW;  break;
+    case XK_Down:  key = K_DOWNARROW; break;
+    case XK_Up:   key = K_UPARROW;  break;
+    case XK_Escape: key = K_ESCAPE;  break;
+    case XK_Return: key = K_ENTER;   break;
+    case XK_Tab:  key = K_TAB;    break;
     case XK_Help:
-    case XK_F1:		 key = K_F1;				break;
-    case XK_F2:		 key = K_F2;				break;
-    case XK_F3:		 key = K_F3;				break;
-    case XK_F4:		 key = K_F4;				break;
-    case XK_F5:		 key = K_F5;				break;
-    case XK_F6:		 key = K_F6;				break;
-    case XK_F7:		 key = K_F7;				break;
-    case XK_F8:		 key = K_F8;				break;
-    case XK_F9:		 key = K_F9;				break;
-    case XK_F10:		key = K_F10;			 break;
-    case XK_F11:		key = K_F11;			 break;
-    case XK_F12:		key = K_F12;			 break;
+    case XK_F1:   key = K_F1;    break;
+    case XK_F2:   key = K_F2;    break;
+    case XK_F3:   key = K_F3;    break;
+    case XK_F4:   key = K_F4;    break;
+    case XK_F5:   key = K_F5;    break;
+    case XK_F6:   key = K_F6;    break;
+    case XK_F7:   key = K_F7;    break;
+    case XK_F8:   key = K_F8;    break;
+    case XK_F9:   key = K_F9;    break;
+    case XK_F10:  key = K_F10;    break;
+    case XK_F11:  key = K_F11;    break;
+    case XK_F12:  key = K_F12;    break;
     case XK_BackSpace:
     case XK_Delete: key = K_BACKSPACE; break;
-    case XK_Pause:	key = K_PAUSE;		 break;
+    case XK_Pause: key = K_PAUSE;   break;
     case XK_Shift_L:
-    case XK_Shift_R:		key = K_SHIFT;		break;
+    case XK_Shift_R:  key = K_SHIFT;  break;
     case XK_Control_L:
-    case XK_Control_R:	key = K_CTRL;		 break;
+    case XK_Control_R: key = K_CTRL;   break;
     case XK_Alt_L:
     case XK_Meta_L:
     case XK_Alt_R:
-    case XK_Meta_R: key = K_ALT;			break;
+    case XK_Meta_R: key = K_ALT;   break;
         // various other keys on the keyboard
     case XK_F27: key = K_HOME; break;
     case XK_F29: key = K_PGUP; break;
@@ -816,7 +816,7 @@ void GetEvent() {
             mouse_x = (float)((int)x_event.xmotion.x - (int)(vid.scr.width / 2));
             mouse_y = (float)((int)x_event.xmotion.y - (int)(vid.scr.height / 2));
             //printf("m: x=%d,y=%d, mx=%3.2f,my=%3.2f\n",
-            //	x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
+            // x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
                         /* move the mouse to the window center again */
             XSelectInput(x_disp, x_win, x_std_event_mask & ~PointerMotionMask);
@@ -857,7 +857,7 @@ void GetEvent() {
         break;
 
     case ConfigureNotify:
-        //			printf("config notify\n");
+        //   printf("config notify\n");
         config_notify_width = x_event.xconfigure.width;
         config_notify_height = x_event.xconfigure.height;
         config_notify = 1;
@@ -1078,7 +1078,7 @@ drain_renderpipeline(XilImage old) {
 
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
-    SCR_RequestCalcRefdef();				// force a surface cache flush
+    SCR_RequestCalcRefdef();    // force a surface cache flush
 
     return(new);
 

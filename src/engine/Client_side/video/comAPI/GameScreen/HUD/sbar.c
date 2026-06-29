@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "screen.h"
 #include <string.h>
 
-#define	SBAR_HEIGHT		24
+#define SBAR_HEIGHT (24)
 
 int     sb_lines;   // scan lines to draw
 #define STAT_MINUS  10 // num frame for '-' stats digit

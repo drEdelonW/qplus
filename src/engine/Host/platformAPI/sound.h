@@ -30,15 +30,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     // User-setable variables
     // ====================================================================
 
-#define	MAX_CHANNELS			(128)
-#define	MAX_DYNAMIC_CHANNELS	(8)
+#define MAX_CHANNELS            (128)
+#define MAX_DYNAMIC_CHANNELS    (8)
 
-extern	channel_t channels[MAX_CHANNELS];
-// 0 to MAX_DYNAMIC_CHANNELS-1	= normal entity sounds
+extern  channel_t channels[MAX_CHANNELS];
+// 0 to MAX_DYNAMIC_CHANNELS-1 = normal entity sounds
 // MAX_DYNAMIC_CHANNELS to MAX_DYNAMIC_CHANNELS + NUM_AMBIENTS -1 = water, etc
 // MAX_DYNAMIC_CHANNELS + NUM_AMBIENTS to total_channels = static sounds
 
-extern	int total_channels;
+extern int total_channels;
 
 //
 // Fake dma is a synchronous faking of the DMA progress used for

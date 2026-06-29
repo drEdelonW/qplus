@@ -19,7 +19,7 @@
 #define MAXHEIGHT  1024
 #define MAXWIDTH  1280
 
-extern uint8_t	d_15to8table[65536];
+extern uint8_t  d_15to8table[65536];
 extern vec3_t   lightspot;
 extern int      solidskytexture;
 extern int      alphaskytexture;

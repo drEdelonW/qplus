@@ -35,7 +35,7 @@ int config_notify = 0;
 int config_notify_width;
 int config_notify_height;
 
-uint8_t	d_15to8table[65536];
+uint8_t d_15to8table[65536];
 bool    doShm;
 bool    oktodraw = false;
 Display*    x_disp = NULL;
@@ -45,7 +45,7 @@ Window      x_win;
 int         x_shmeventtype;
 bool vidmode_ext = false;
 
-// cvar_t	vid_mode = { "vid_mode","0",false };
+// cvar_t   vid_mode = { "vid_mode","0",false };
 // static cvar_t in_mouse = { "in_mouse", "1", false };
 // static cvar_t in_dgamouse = { "in_dgamouse", "1", false };
 // static cvar_t m_filter = { "m_filter", "0" };
@@ -122,7 +122,7 @@ void GL_Init() {
     gl_extensions = glGetString(GL_EXTENSIONS);
     Con_Printf("GL_EXTENSIONS: %s\n", gl_extensions);
 
-    //	Con_Printf ("%s %s\n", gl_renderer, gl_version);
+    // Con_Printf ("%s %s\n", gl_renderer, gl_version);
 #endif
 
     CheckMultiTextureExtensions();
@@ -153,7 +153,7 @@ static int _scrWidth, _scrHeight;
 
 #define KEY_MASK (KeyPressMask | KeyReleaseMask)
 #define MOUSE_MASK (ButtonPressMask | ButtonReleaseMask | \
-		    PointerMotionMask | ButtonMotionMask )
+                    PointerMotionMask | ButtonMotionMask )
 #define X_MASK (KEY_MASK | MOUSE_MASK | VisibilityChangeMask | StructureNotifyMask )
 
 typedef struct GlxState_s {

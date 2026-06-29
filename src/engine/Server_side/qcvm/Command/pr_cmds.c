@@ -526,7 +526,7 @@ break()
 void PF_break() {
     Con_Printf("break statement\n");
     *(int*)-4 = 0; // dump to debugger
-    //	PR_RunError ("break statement");
+    // PR_RunError ("break statement");
 }
 
 /*
@@ -1359,7 +1359,7 @@ void PF_WaterMove() {
                     self->v.dmg = self->v.dmg + 2;
                     if (self->v.dmg > 15)
                         self->v.dmg = 10;
-                    //					T_Damage (self, world, world, self.dmg, 0, FALSE);
+                    //     T_Damage (self, world, world, self.dmg, 0, FALSE);
                     damage = self->v.dmg;
                     self->v.pain_finished = SV_GetTime() + 1.0;
                 }
@@ -1386,7 +1386,7 @@ void PF_WaterMove() {
             if (self->v.dmgtime < SV_GetTime()) {
                 if (self->v.radsuit_finished < SV_GetTime())     self->v.dmgtime = SV_GetTime() + 0.2;
                 else                                        self->v.dmgtime = SV_GetTime() + 1.0;
-                //				T_Damage (self, world, world, 10*self.waterlevel, 0, TRUE);
+                //    T_Damage (self, world, world, 10*self.waterlevel, 0, TRUE);
                 damage = (float)(10 * waterlevel);
             }
     }
@@ -1394,7 +1394,7 @@ void PF_WaterMove() {
         if (!(flags & (FL_IMMUNE_SLIME + FL_GODMODE)))
             if (self->v.dmgtime < SV_GetTime() && self->v.radsuit_finished < SV_GetTime()) {
                 self->v.dmgtime = SV_GetTime() + 1.0;
-                //				T_Damage (self, world, world, 4*self.waterlevel, 0, TRUE);
+                //    T_Damage (self, world, world, 4*self.waterlevel, 0, TRUE);
                 damage = (float)(4 * waterlevel);
             }
     }
@@ -1410,7 +1410,7 @@ void PF_WaterMove() {
     }
 
     if (!(flags & FL_WATERJUMP)) {
-        //		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
+        //  self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
         self->v.velocity = VectorMA(self->v.velocity, -0.8 * self->v.waterlevel * host_frametime, self->v.velocity);
     }
 
@@ -1426,39 +1426,39 @@ void PF_Fixme() { PR_RunError("unimplemented bulitin"); }
 
 builtin_t pr_builtin[] = {
     PF_Fixme,
-    PF_makevectors,	   // void(entity e)	makevectors 		= #1;
-    PF_setorigin,	   // void(entity e, vector o) setorigin	= #2;
-    PF_setmodel,	   // void(entity e, string m) setmodel	= #3;
-    PF_setsize,		   // void(entity e, vector min, vector max) setsize = #4;
-    PF_Fixme,		   // void(entity e, vector min, vector max) setabssize = #5;
-    PF_break,		   // void() break						= #6;
-    PF_random,		   // float() random						= #7;
-    PF_sound,		   // void(entity e, float chan, string samp) sound = #8;
-    PF_normalize,	   // vector(vector v) normalize			= #9;
-    PF_error,		   // void(string e) error				= #10;
-    PF_objerror,	   // void(string e) objerror				= #11;
-    PF_vlen,		   // float(vector v) vlen				= #12;
-    PF_vectoyaw,	   // float(vector v) vectoyaw		= #13;
-    PF_Spawn,		   // entity() spawn						= #14;
-    PF_Remove,		   // void(entity e) remove				= #15;
-    PF_traceline,	   // float(vector v1, vector v2, float tryents) traceline = #16;
-    PF_checkclient,	   // entity() clientlist					= #17;
-    PF_Find,		   // entity(entity start, .string fld, string match) find = #18;
-    PF_precache_sound, // void(string str) precache_sound		= #19;
-    PF_precache_model, // void(string str) precache_model		= #20;
-    PF_stuffcmd,	   // void(entity client, string str)stuffcmd = #21;
-    PF_findradius,	   // entity(vector org, float rad) findradius = #22;
-    PF_bprint,		   // void(string str) bprint				= #23;
-    PF_sprint,		   // void(entity client, string str) sprint = #24;
-    PF_dprint,		   // void(string str) dprint				= #25;
-    PF_ftos,		   // void(string str) ftos				= #26;
-    PF_vtos,		   // void(string str) vtos				= #27;
+    PF_makevectors,     // void(entity e) makevectors                           = #1;
+    PF_setorigin,       // void(entity e, vector o) setorigin                   = #2;
+    PF_setmodel,        // void(entity e, string m) setmodel                    = #3;
+    PF_setsize,         // void(entity e, vector min, vector max) setsize       = #4;
+    PF_Fixme,           // void(entity e, vector min, vector max) setabssize    = #5;
+    PF_break,           // void() break                                         = #6;
+    PF_random,          // float() random                                       = #7;
+    PF_sound,           // void(entity e, float chan, string samp) sound        = #8;
+    PF_normalize,       // vector(vector v) normalize                           = #9;
+    PF_error,           // void(string e) error                                 = #10;
+    PF_objerror,        // void(string e) objerror                              = #11;
+    PF_vlen,            // float(vector v) vlen                                 = #12;
+    PF_vectoyaw,        // float(vector v) vectoyaw                             = #13;
+    PF_Spawn,           // entity() spawn                                       = #14;
+    PF_Remove,          // void(entity e) remove                                = #15;
+    PF_traceline,       // float(vector v1, vector v2, float tryents) traceline = #16;
+    PF_checkclient,     // entity() clientlist                                  = #17;
+    PF_Find,            // entity(entity start, .string fld, string match) find = #18;
+    PF_precache_sound,  // void(string str) precache_sound                      = #19;
+    PF_precache_model,  // void(string str) precache_model                      = #20;
+    PF_stuffcmd,        // void(entity client, string str)stuffcmd              = #21;
+    PF_findradius,      // entity(vector org, float rad) findradius             = #22;
+    PF_bprint,          // void(string str) bprint                              = #23;
+    PF_sprint,          // void(entity client, string str) sprint               = #24;
+    PF_dprint,          // void(string str) dprint                              = #25;
+    PF_ftos,            // void(string str) ftos                                = #26;
+    PF_vtos,            // void(string str) vtos                                = #27;
     PF_coredump,
     PF_traceon,
     PF_traceoff,
-    PF_eprint,	 // void(entity e) debug print an entire entity
-    PF_walkmove, // float(float yaw, float dist) walkmove
-    PF_Fixme,	 // float(float yaw, float dist) walkmove
+    PF_eprint,          // void(entity e) debug print an entire entity
+    PF_walkmove,        // float(float yaw, float dist) walkmove
+    PF_Fixme,           // float(float yaw, float dist) walkmove
     PF_droptofloor,
     PF_lightstyle,
     PF_rint,

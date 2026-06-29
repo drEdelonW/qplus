@@ -52,10 +52,10 @@ typedef struct {
 #endif
     char        modelname[NAME_LENGTH];  // maps/<name>.bsp, for model_precache[0]
     Model_p     worldmodel;
-    cString     model_precache[MAX_MODELS];	    // NULL terminated
+    cString     model_precache[MAX_MODELS];     // NULL terminated
     Model_p     models[MAX_MODELS];
 
-    cString     sound_precache[MAX_SOUNDS];	    // NULL terminated
+    cString     sound_precache[MAX_SOUNDS];     // NULL terminated
     cString     lightstyles[MAX_LIGHTSTYLES];
 
     // int32_t     num_edicts;
@@ -65,7 +65,7 @@ typedef struct {
     sv_state_e  state;          // some actions are only valid during load
     sizebuf_t   datagram;
     uint8_t     datagram_buf[MAX_DATAGRAM];
-    sizebuf_t   reliable_datagram;	// copied to all clients at end of frame
+    sizebuf_t   reliable_datagram; // copied to all clients at end of frame
     uint8_t     reliable_datagram_buf[MAX_DATAGRAM];
     sizebuf_t   signon;
     uint8_t     signon_buf[8192];
@@ -73,8 +73,8 @@ typedef struct {
 
 
 
-#define	NUM_PING_TIMES		16
-#define	NUM_SPAWN_PARMS		16
+#define NUM_PING_TIMES  16
+#define NUM_SPAWN_PARMS 16
 
 typedef struct {
     bool        active;     // false = client is free
