@@ -108,8 +108,8 @@ D_SCAlloc
 =================
 */
 SurfCache_p D_SCAlloc(int width, int size) {
-    if ((width < 0) || (width > 256))       Host_SysError("D_SCAlloc: bad cache width %d\n", width);
-    if ((size <= 0) || (size > FIXED16_ONE))    Host_SysError("D_SCAlloc: bad cache size %d\n", size);
+    if ((width < 0) || (width > 256))           Host_SysError("D_SCAlloc: bad cache width %d\n", width);
+    if ((size <= 0) || (size > 0x10000))        Host_SysError("D_SCAlloc: bad cache size %d\n", size);
 
     size = (int)(offsetof(SurfCache_t, data) + size);
     size = (size + 3) & ~3;
@@ -215,7 +215,7 @@ int D_log2(int num) {
 D_CacheSurface
 ================
 */
-SurfCache_p D_CacheSurface(mSurface_p surface, int miplevel) {
+SurfCache_p D_CacheSurface(mSurface_p surface, MipLevel_t miplevel) {
     //
     // if the surface is animating or flashing, flush the cache
     //

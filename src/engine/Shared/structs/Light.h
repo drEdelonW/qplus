@@ -6,11 +6,13 @@
 #include "enginedefs.h"
 #include "assert.h"
 
+#define MAX_DLIGHTS             32
+
 typedef struct {
     vec3_t  origin;
     float   radius;
-    LegDt_t   die;        // stop lighting after this time
-    LegDt_t   decay;      // drop this each second
+    LegDt_t die;        // stop lighting after this time
+    LegDt_t decay;      // drop this each second
     float   minlight;   // don't add when contributing less
     int32_t key;
 #ifdef QUAKE2
@@ -27,6 +29,7 @@ extern "C" {
 #endif
 
     dLight_p CL_AllocDlight(int32_t key);
+    void CL_DecayLights();
 
 #ifdef __cplusplus
 }

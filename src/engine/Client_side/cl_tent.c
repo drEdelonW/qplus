@@ -34,66 +34,67 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // temp entity events
 //
-
 typedef enum {
-    TE_SPIKE        = 0u,
-    TE_SUPERSPIKE   = 1u,
-    TE_GUNSHOT      = 2u,
-    TE_EXPLOSION    = 3u,
-    TE_TAREXPLOSION = 4u,
-    TE_LIGHTNING1   = 5u,
-    TE_LIGHTNING2   = 6u,
-    TE_WIZSPIKE     = 7u,
-    TE_KNIGHTSPIKE  = 8u,
-    TE_LIGHTNING3   = 9u,
-    TE_LAVASPLASH   = 10u,
-    TE_TELEPORT     = 11u,
-    TE_EXPLOSION2   = 12u,
+    TE_SPIKE = 0u,                  // 0  - spike hitting wall (tink/ricochet sound)
+    TE_SUPERSPIKE,                  // 1  - super spike hitting wall
+    TE_GUNSHOT,                     // 2  - bullet hitting wall
+    TE_EXPLOSION,                   // 3  - rocket explosion
+    TE_TAREXPLOSION,                // 4  - tarbaby explosion
+    TE_LIGHTNING1,                  // 5  - lightning bolt (progs/bolt.mdl)
+    TE_LIGHTNING2,                  // 6  - lightning bolt (progs/bolt2.mdl)
+    TE_WIZSPIKE,                    // 7  - spike hitting wall (wizard hit sound)
+    TE_KNIGHTSPIKE,                 // 8  - spike hitting wall (knight hit sound)
+    TE_LIGHTNING3,                  // 9  - lightning bolt (progs/bolt3.mdl)
+    TE_LAVASPLASH,                  // 10 - lava splash
+    TE_TELEPORT,                    // 11 - teleport splash
+    TE_EXPLOSION2,                  // 12 - color mapped explosion
 
     // PGM 01/21/97
-    TE_BEAM         = 13u,
+    TE_BEAM,                        // 13 - grappling hook beam (progs/beam.mdl)
     // PGM 01/21/97
 
 #ifdef QUAKE2
-    TE_IMPLOSION    = 14u,
-    TE_RAILTRAIL    = 15u,
+    TE_IMPLOSION,                   // 14 - implosion
+    TE_RAILTRAIL,                   // 15 - railgun trail
 #endif
-} te_t;
+} TempEntEvent_t;
 
-int      num_temp_entities;
+int         num_temp_entities;
 r_Entity_t  cl_temp_entities[MAX_TEMP_ENTITIES];
 
-
-
-sfx_p cl_sfx_wizhit;
-sfx_p cl_sfx_knighthit;
-sfx_p cl_sfx_tink1;
-sfx_p cl_sfx_ric1;
-sfx_p cl_sfx_ric2;
-sfx_p cl_sfx_ric3;
-sfx_p cl_sfx_r_exp3;
+typedef struct {
+    sfx_p wizhit;
+    sfx_p knighthit;
+    sfx_p tink1;
+    sfx_p ric1;
+    sfx_p ric2;
+    sfx_p ric3;
+    sfx_p r_exp3;
 #ifdef QUAKE2
-sfx_p cl_sfx_imp;
-sfx_p cl_sfx_rail;
+    sfx_p imp;
+    sfx_p rail;
 #endif
-
+} clSFX_t;
+clSFX_t cl_sfx;
 /*
 =================
 CL_ParseTEnt
 =================
 */
 void CL_InitTEnts() {
-    cl_sfx_wizhit = S_PrecacheSound("wizard/hit.wav");
-    cl_sfx_knighthit = S_PrecacheSound("hknight/hit.wav");
-    cl_sfx_tink1 = S_PrecacheSound("weapons/tink1.wav");
-    cl_sfx_ric1 = S_PrecacheSound("weapons/ric1.wav");
-    cl_sfx_ric2 = S_PrecacheSound("weapons/ric2.wav");
-    cl_sfx_ric3 = S_PrecacheSound("weapons/ric3.wav");
-    cl_sfx_r_exp3 = S_PrecacheSound("weapons/r_exp3.wav");
+    cl_sfx = (clSFX_t){
+        .wizhit = S_PrecacheSound("wizard/hit.wav"),
+        .knighthit = S_PrecacheSound("hknight/hit.wav"),
+        .tink1 = S_PrecacheSound("weapons/tink1.wav"),
+        .ric1 = S_PrecacheSound("weapons/ric1.wav"),
+        .ric2 = S_PrecacheSound("weapons/ric2.wav"),
+        .ric3 = S_PrecacheSound("weapons/ric3.wav"),
+        .r_exp3 = S_PrecacheSound("weapons/r_exp3.wav"),
 #ifdef QUAKE2
-    cl_sfx_imp = S_PrecacheSound("shambler/sattck1.wav");
-    cl_sfx_rail = S_PrecacheSound("weapons/lstart.wav");
+        .imp = S_PrecacheSound("shambler/sattck1.wav"),
+        .rail = S_PrecacheSound("weapons/lstart.wav"),
 #endif
+    };
 }
 
 #include "Beam.h"
@@ -118,26 +119,30 @@ void CL_ParseBeam(Model_p m) {
     };
 
     // override any beam with the same entity
-    Beam_p  b = cl_beams;
-    for (int i = 0; i < MAX_BEAMS; i++, b++)
-        if (b->entity == ent) {
-            b->entity = ent;
-            b->model = m;
-            b->endtime = (LegDt_t)(cl.time + 0.2f);
-            b->start = start;
-            b->end = end;
+    for (int i = 0; i < MAX_BEAMS; i++)
+        if (cl_beams[i].entity == ent) {
+            cl_beams[i] = (Beam_t){
+                .entity = ent,
+                .model = m,
+                .endtime = (LegDt_t)(cl.time + 0.2f),
+                .start = start,
+                .end = end,
+            };
             return;
         }
 
     // find a free beam
-    b = cl_beams;
-    for (int i = 0; i < MAX_BEAMS; i++, b++)
-        if (!b->model || (b->endtime < cl.time)) {
-            b->entity = ent;
-            b->model = m;
-            b->endtime = (LegDt_t)(cl.time + 0.2f);
-            b->start = start;
-            b->end = end;
+    for (int i = 0; i < MAX_BEAMS; i++)
+        if (!(cl_beams[i].model) ||
+            (cl_beams[i].endtime < cl.time)
+            ) {
+            cl_beams[i] = (Beam_t){
+                .entity = ent,
+                .model = m,
+                .endtime = (LegDt_t)(cl.time + 0.2f),
+                .start = start,
+                .end = end,
+            };
             return;
         }
 
@@ -150,7 +155,7 @@ CL_ParseTEnt
 =================
 */
 void CL_ParseTEnt() {
-    te_t type = MSG_ReadByte();
+    TempEntEvent_t type = MSG_ReadByte();
     switch (type) {
     case TE_WIZSPIKE: {      // spike hitting wall
         vec3_t  pos = {
@@ -159,7 +164,7 @@ void CL_ParseTEnt() {
             .z = MSG_ReadCoord()
         };
         R_RunParticleEffect(pos, vec3_origin, 20, 30);
-        S_StartSound(-1, 0, cl_sfx_wizhit, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.wizhit, pos, 1, 1);
     } break;
 
     case TE_KNIGHTSPIKE: {      // spike hitting wall
@@ -169,7 +174,7 @@ void CL_ParseTEnt() {
             .z = MSG_ReadCoord()
         };
         R_RunParticleEffect(pos, vec3_origin, 226, 20);
-        S_StartSound(-1, 0, cl_sfx_knighthit, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.knighthit, pos, 1, 1);
     } break;
 
     case TE_SPIKE: {    // spike hitting wall
@@ -183,12 +188,12 @@ void CL_ParseTEnt() {
 #else
         R_RunParticleEffect(pos, vec3_origin, 0, 10);
 #endif
-        if (rand() % 5)         S_StartSound(-1, 0, cl_sfx_tink1, pos, 1, 1);
+        if (rand() % 5)         S_StartSound(-1, 0, cl_sfx.tink1, pos, 1, 1);
         else {
             int rnd = rand() & 3;
-            if (rnd == 1)       S_StartSound(-1, 0, cl_sfx_ric1, pos, 1, 1);
-            else if (rnd == 2)  S_StartSound(-1, 0, cl_sfx_ric2, pos, 1, 1);
-            else                S_StartSound(-1, 0, cl_sfx_ric3, pos, 1, 1);
+            if (rnd == 1)       S_StartSound(-1, 0, cl_sfx.ric1, pos, 1, 1);
+            else if (rnd == 2)  S_StartSound(-1, 0, cl_sfx.ric2, pos, 1, 1);
+            else                S_StartSound(-1, 0, cl_sfx.ric3, pos, 1, 1);
         }
     } break;
     case TE_SUPERSPIKE: {    // super spike hitting wall
@@ -199,12 +204,12 @@ void CL_ParseTEnt() {
         };
         R_RunParticleEffect(pos, vec3_origin, 0, 20);
 
-        if (rand() % 5)     S_StartSound(-1, 0, cl_sfx_tink1, pos, 1, 1);
+        if (rand() % 5)     S_StartSound(-1, 0, cl_sfx.tink1, pos, 1, 1);
         else {
             int rnd = rand() & 3;
-            if (rnd == 1)       S_StartSound(-1, 0, cl_sfx_ric1, pos, 1, 1);
-            else if (rnd == 2)  S_StartSound(-1, 0, cl_sfx_ric2, pos, 1, 1);
-            else                S_StartSound(-1, 0, cl_sfx_ric3, pos, 1, 1);
+            if (rnd == 1)       S_StartSound(-1, 0, cl_sfx.ric1, pos, 1, 1);
+            else if (rnd == 2)  S_StartSound(-1, 0, cl_sfx.ric2, pos, 1, 1);
+            else                S_StartSound(-1, 0, cl_sfx.ric3, pos, 1, 1);
         }
     } break;
 
@@ -224,12 +229,15 @@ void CL_ParseTEnt() {
             .z = MSG_ReadCoord()
         };
         R_ParticleExplosion(pos);
-        dLight_p dl = CL_AllocDlight(0);
-        dl->origin = pos;
-        dl->radius = 350;
-        dl->die = (LegDt_t)(cl.time + 0.5f);
-        dl->decay = 300;
-        S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
+        dLight_p dl;
+        *(dl = CL_AllocDlight(0)) = (dLight_t){
+            .origin = pos,
+            .radius = 350.0f,
+            .die = (LegDt_t)(cl.time + 0.5f),
+            .decay = 300.0f,
+            .key = 0,
+        };
+        S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1, 1);
     } break;
 
     case TE_TAREXPLOSION: {      // tarbaby explosion
@@ -240,7 +248,7 @@ void CL_ParseTEnt() {
         };
         R_BlobExplosion(pos);
 
-        S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1, 1);
     } break;
 
     case TE_LIGHTNING1:     CL_ParseBeam(Mod_ForName("progs/bolt.mdl", true));      break;  // lightning bolts
@@ -277,12 +285,15 @@ void CL_ParseTEnt() {
         int colorStart = MSG_ReadByte();
         int colorLength = MSG_ReadByte();
         R_ParticleExplosion2(pos, colorStart, colorLength);
-        dLight_p dl = CL_AllocDlight(0);
-        dl->origin = pos;
-        dl->radius = 350;
-        dl->die = (LegDt_t)(cl.time + 0.5f);
-        dl->decay = 300;
-        S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
+        dLight_p dl;
+        *(dl = CL_AllocDlight(0)) = (dLight_t){
+            .origin = pos,
+            .radius = 350.0f,
+            .die = (LegDt_t)(cl.time + 0.5f),
+            .decay = 300.0f,
+            .key = 0,
+        };
+        S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1, 1);
     } break;
 
 #ifdef QUAKE2
@@ -292,7 +303,7 @@ void CL_ParseTEnt() {
             .y = MSG_ReadCoord(),
             .z = MSG_ReadCoord()
         };
-        S_StartSound(-1, 0, cl_sfx_imp, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.imp, pos, 1, 1);
     } break;
 
     case TE_RAILTRAIL: {
@@ -306,20 +317,23 @@ void CL_ParseTEnt() {
             .y = MSG_ReadCoord(),
             .z = MSG_ReadCoord()
         };
-        S_StartSound(-1, 0, cl_sfx_rail, pos, 1, 1);
-        S_StartSound(-1, 1, cl_sfx_r_exp3, endpos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.rail, pos, 1, 1);
+        S_StartSound(-1, 1, cl_sfx.r_exp3, endpos, 1, 1);
         R_RocketTrail(pos, endpos, 0 + 128);
         R_ParticleExplosion(endpos);
-        dLight_p dl = CL_AllocDlight(-1);
-        dl->origin = endpos;
-        dl->radius = 350;
-        dl->die = (LegDt_t)cl.time + 0.5f;
-        dl->decay = 300;
+        dLight_p dl;
+        *(dl = CL_AllocDlight(-1)) = (dLight_t){
+            .origin = endpos,
+            .radius = 350.0f,
+            .die = (LegDt_t)(cl.time + 0.5f),
+            .decay = 300.0f,
+            .key = -1;
+        };
     } break;
 #endif
 
     default:    Host_SysError("CL_ParseTEnt: bad type");
-    }
+}
 }
 
 
@@ -331,7 +345,7 @@ CL_NewTempEntity
 r_Entity_p CL_NewTempEntity() {
     if ((cl_numvisedicts == MAX_VISEDICTS) ||
         (num_temp_entities == MAX_TEMP_ENTITIES)
-    )
+        )
         return NULL;
 
     r_Entity_p ent = &cl_temp_entities[num_temp_entities];
@@ -368,23 +382,24 @@ void CL_UpdateTEnts() {
         // calculate pitch and yaw
         vec3_t dist = VectorSubtract(b->end, b->start);
 
-        float yaw, pitch;   // TODO: wrap to vec3_t
+        // float yaw, pitch;   // TODO: wrap to vec3_t
+        vec3_t tV;
         if ((dist.y == 0.0f) &&
             (dist.x == 0.0f)
             ) {
-            yaw = 0.0f;
-            if (dist.z > 0.0f)  pitch = 90.0f;
-            else                pitch = 270.0f;
+            tV.yaw = 0.0f;
+            if (dist.z > 0.0f)  tV.pitch = 90.0f;
+            else                tV.pitch = 270.0f;
         }
         else {
-            yaw = (float)(RAD2DEG(atan2(dist.y, dist.x)));
-            if (yaw < 0.0f)
-                yaw += 360.0f;
+            tV.yaw = (float)(RAD2DEG(atan2(dist.y, dist.x)));
+            if (tV.yaw < 0.0f)
+                tV.yaw += 360.0f;
 
             float forward = (float)sqrt((dist.x * dist.x) + (dist.y * dist.y));
-            pitch = (float)(RAD2DEG(atan2(dist.z, forward)));
-            if (pitch < 0)
-                pitch += 360;
+            tV.pitch = (float)(RAD2DEG(atan2(dist.z, forward)));
+            if (tV.pitch < 0)
+                tV.pitch += 360;
         }
 
         // add new entities for the lightning
@@ -394,11 +409,10 @@ void CL_UpdateTEnts() {
             r_Entity_p  ent = CL_NewTempEntity();
             if (!ent)       return;
 
+            tV.roll = (float)(rand() % 360);
             ent->origin = org;
             ent->model = b->model;
-            ent->angles.pitch = pitch;
-            ent->angles.yaw = yaw;
-            ent->angles.roll = (float)(rand() % 360);
+            ent->angles = tV;
 
             org = VectorMA(org, 30.0f, dist);
             d -= 30.0f;

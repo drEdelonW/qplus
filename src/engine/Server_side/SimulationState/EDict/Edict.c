@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 uint32_t    EdictSize = 0;      // in bytes
 edict_p     Edicts;
-uint32_t    EdictsMax = MAX_EDICTS;
+const uint32_t  EdictsMax = MAX_EDICTS;
 uint32_t    EdictsNum;
 
 

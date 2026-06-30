@@ -22,10 +22,10 @@ void R_InitTextures() {
         "notexture")
         ) = (Texture_t){
         .width = r_notexture_mip->height = 16,
-        .offsets[0] = sizeof(Texture_t),
-        .offsets[1] = r_notexture_mip->offsets[0] + (16 * 16),
-        .offsets[2] = r_notexture_mip->offsets[1] + (8 * 8),
-        .offsets[3] = r_notexture_mip->offsets[2] + (4 * 4),
+        .offsets[Mip0] = sizeof(Texture_t),
+        .offsets[Mip1] = r_notexture_mip->offsets[Mip0] + (16 * 16),
+        .offsets[Mip2] = r_notexture_mip->offsets[Mip1] + (8 * 8),
+        .offsets[Mip3] = r_notexture_mip->offsets[Mip2] + (4 * 4),
     };
 
     for (int m = 0; m < 4; m++) {

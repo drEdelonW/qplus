@@ -505,14 +505,14 @@ void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest) {
         if (r_pixbytes == 1) {
             R_GenTurbTile(
                 (pixel_p)(
-                    (uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]),
+                    (uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[Mip0]),
                 pdest
             );
         }
         else {
             R_GenTurbTile16(
                 (pixel_p)(
-                    (uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[0]),
+                    (uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[Mip0]),
                 pdest
             );
         }

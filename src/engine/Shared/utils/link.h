@@ -1,11 +1,11 @@
 #pragma once
 //============================================================================
 
-struct link_s;
 typedef struct link_s link_t;
 typedef link_t* link_p;
 struct link_s {
-    link_p prev, next;
+    link_p prev;
+    link_p next;
 };
 
 

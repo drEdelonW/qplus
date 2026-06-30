@@ -209,24 +209,7 @@ void SetPal(int i) {
 }
 
 
-/*
-===============
-CL_DecayLights
 
-===============
-*/
-void CL_DecayLights() {
-    LegDt_t time = (LegDt_t)(cl.time - cl.oldtime);
-    dLight_p dl = cl_dlights;
-    for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
-        if ((dl->die < cl.time) || !dl->radius)
-            continue;
-
-        dl->radius -= time * dl->decay;
-        if (dl->radius < 0)
-            dl->radius = 0;
-    }
-}
 
 
 /*

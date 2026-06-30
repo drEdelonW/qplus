@@ -10,7 +10,14 @@
 
 #include "Texture_pre.h"    // Texture_p
 
-#define MIPLEVELS   (4)
+typedef enum {
+    Mip0,        // full size
+    Mip1,        // half size
+    Mip2,        // quarter size
+    Mip3,        // eighth size
+    MIPLEVELS    // count, used as array size
+} MipLevel_t;
+
 struct Texture_s {
     char        name[16];
     uint32_t    width, height;
@@ -32,7 +39,7 @@ typedef struct {
     int32_t dataOfs[MIPLEVELS]; // [nummiptex]
 } dMipTexLump_t;
 typedef dMipTexLump_t* dMipTexLump_p;
-STATIC_ASSERT_SIZE(dMipTexLump_t, 4 + 4*4); // 20
+STATIC_ASSERT_SIZE(dMipTexLump_t, 4 + 4 * 4); // 20
 
 typedef struct MipTex_s {
     char        name[16];

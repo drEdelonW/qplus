@@ -206,7 +206,7 @@ void D_DrawSurfaces() {
                 _miplevel = 0;
                 cacheblock = (pixel_p)(
                     (uint8_p)pface->texinfo->texture +
-                    pface->texinfo->texture->offsets[0]
+                    pface->texinfo->texture->offsets[Mip0]
                     );
                 cachewidth = 64;
 

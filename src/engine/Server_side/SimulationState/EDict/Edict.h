@@ -5,7 +5,9 @@
 #include "progdefs.h"       //for entvars_t
 #include "EntityState.h"
 #include "vmValue.h"
+#include "qTime.h"
 
+#define MAX_EDICTS          600   /* FIXME: ouch! ouch! ouch! */
 
 // edict->movetype values
 typedef enum {
@@ -101,7 +103,7 @@ typedef struct edict_s {
     int32_t         num_leafs;
     int16_t         leafnums[MAX_ENT_LEAFS];
     EntityState_t   baseline;
-    float           freetime;   // sv.time when the object was freed
+    LegDt_t         freetime;   // sv.time when the object was freed
     entvars_t       v;          // C exported fields from progs
     // other fields from progs come immediately after
 } edict_t;
@@ -151,5 +153,5 @@ extern "C" {
 
 extern uint32_t EdictSize;  // in bytes
 extern edict_p  Edicts;
-extern uint32_t EdictsMax;
+extern const uint32_t EdictsMax;
 extern uint32_t EdictsNum;

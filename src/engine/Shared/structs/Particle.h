@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector.h"
+#include "qTime.h"
 
 #define PARTICLE_Z_CLIP 8.0
 
@@ -27,7 +28,7 @@ struct Particle_s {
     Particle_p      next;
     vec3_t          vel;
     float           ramp;
-    float           die;
+    LegDt_t         die;
     ParticleType_t  type;
 };
 

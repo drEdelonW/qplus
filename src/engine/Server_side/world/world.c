@@ -138,13 +138,12 @@ Hull_p SV_HullForEntity(edict_p ent, vec3_t mins, vec3_t maxs, vec3_p offset) {
             Host_SysError("MOVETYPE_PUSH with a non bsp model");
 
         vec3_t size = VectorSubtract(maxs, mins);
-        if (size.x < 3)         hull = &model->hulls[0];
-        else if (size.x <= 32)  hull = &model->hulls[1];
-        else                    hull = &model->hulls[2];
+        /**/ if (size.x < 3.0f)     hull = &model->hulls[0];
+        else if (size.x <= 32.0f)   hull = &model->hulls[1];
+        else                        hull = &model->hulls[2];
 
         // calculate an offset value to center the origin
-        *offset = VectorSubtract(hull->clip_mins, mins);
-        *offset = VectorAdd(*offset, ent->v.origin);
+        *offset = VectorAdd(VectorSubtract(hull->clip_mins, mins), ent->v.origin);
     }
     else { // create a temp hull from bounding box sizes
 
@@ -166,7 +165,7 @@ ENTITY AREA CHECKING
 ===============================================================================
 */
 typedef enum AreaAxis_e {
-    AXIS_LEAF = -1,   // leaf node (no split)
+    AXIS_LEAF = -1,// leaf node (no split)
     AXIS_X = 0,    // split along X
     AXIS_Y = 1     // split along Y
 } AreaAxis;
@@ -179,7 +178,7 @@ typedef struct areaNode_s {
     areaNode_p  children[2];
     link_t      trigger_edicts;
     link_t      solid_edicts;
-} areaNode_t;
+};
 
 #define AREA_DEPTH 4
 #define AREA_NODES 32
@@ -207,8 +206,8 @@ areaNode_p SV_CreateAreaNode(int depth, vec3_t mins, vec3_t maxs) {
     }
 
     vec3_t size = VectorSubtract(maxs, mins);
-    if (size.x > size.y)    anode->axis = AXIS_X;
-    else                    anode->axis = AXIS_Y;
+    anode->axis = (size.x > size.y) ?
+        AXIS_X : AXIS_Y;
 
     anode->dist = 0.5f * (maxs.v[anode->axis] + mins.v[anode->axis]);
     vec3_t mins1 = mins;
@@ -357,11 +356,9 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
         float max = 0;
         for (int i = 0; i < VECT_DIM; i++) {
             float v = fabs(ent->v.mins[i]);
-            if (v > max)
-                max = v;
+            if (v > max)    max = v;
             v = fabs(ent->v.maxs[i]);
-            if (v > max)
-                max = v;
+            if (v > max)    max = v;
         }
 
         ent->v.absmin = VectorSubtract(ent->v.origin, Scalar2Vector(max));
@@ -409,8 +406,8 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     while (1) {
         if (node->axis == AXIS_LEAF)       break;
 
-        if (ent->v.absmin.v[node->axis] > node->dist)         node = node->children[0];
-        else if (ent->v.absmax.v[node->axis] < node->dist)    node = node->children[1];
+        /**/ if (ent->v.absmin.v[node->axis] > node->dist)      node = node->children[0];
+        else if (ent->v.absmax.v[node->axis] < node->dist)      node = node->children[1];
         else    break;  // crosses the node
     }
 
@@ -565,9 +562,11 @@ bool SV_RecursiveHullCheck(
 #endif
 
     // put the crosspoint DIST_EPSILON pixels on the near side
-    float  frac;
-    if (t1 < 0)     frac = (t1 + DIST_EPSILON) / (t1 - t2);
-    else            frac = (t1 - DIST_EPSILON) / (t1 - t2);
+    float  frac =
+        (t1 + ((t1 < 0) ?
+            DIST_EPSILON : -DIST_EPSILON)) /
+        (t1 - t2);
+
     CLAMP(0.0, frac, 1.0);
 
     float midf = p1f + (p2f - p1f) * frac;
@@ -821,28 +820,6 @@ SV_Move
 ==================
 */
 trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_t type, edict_p passedict) {
-#if 0
-    moveClip_t clip;  memset(&clip, 0, sizeof(moveClip_t));
-
-    // clip to world
-    clip.trace = SV_ClipMoveToEntity(Edicts, start, mins, maxs, end);
-
-    clip.start = start;
-    clip.end = end;
-    clip.mins = mins;
-    clip.maxs = maxs;
-    clip.type = type;
-    clip.passedict = passedict;
-
-    if (type == MOVE_MISSILE) {
-        clip.mins2 = Scalar2Vector(-15.0f);
-        clip.maxs2 = Scalar2Vector(15.0f);
-    }
-    else {
-        clip.mins2 = mins;
-        clip.maxs2 = maxs;
-    }
-#else
     moveClip_t clip = {
         // .boxmins = ,
         // .boxmaxs = ,
@@ -850,8 +827,8 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
         .mins = mins,
         .maxs = maxs,
 
-        .mins2 = (type == MOVE_MISSILE)? Scalar2Vector(-15.0f) : mins,
-        .maxs2 = (type == MOVE_MISSILE)? Scalar2Vector(15.0f) : maxs,
+        .mins2 = (type == MOVE_MISSILE) ? Scalar2Vector(-15.0f) : mins,
+        .maxs2 = (type == MOVE_MISSILE) ? Scalar2Vector(15.0f) : maxs,
 
         .start = start,
         .end = end,
@@ -860,7 +837,7 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
         .type = type,
         .passedict = passedict
     };
-#endif
+
     SV_MoveBounds(start, clip.mins2, clip.maxs2, end, &clip.boxmins, &clip.boxmaxs);  // create the bounding box of the entire move
     SV_ClipToLinks(_sv_AreaNodes, &clip); // clip to entities
 

@@ -85,7 +85,7 @@ typedef struct {
     mSurface_p  surf;                   // description for surface to generate
     fixed8_t    lightadj[MAXLIGHTMAPS]; // adjust for lightmap levels for dynamic lighting
     Texture_p   texture;                // corrected for animating textures
-    int         surfmip;                // mipmapped ratio of surface texels / world pixels
+    MipLevel_t  surfmip;                // mipmapped ratio of surface texels / world pixels
 #if 1
     int         surfwidth;              // in mipmapped texels
     int         surfheight;             // in mipmapped texels

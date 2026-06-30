@@ -57,7 +57,7 @@ extern fixed16_t bbextentt;
 
 void R_ShowSubDiv();
 extern void(*prealspandrawer)();
-SurfCache_p D_CacheSurface(mSurface_p surface, int miplevel);
+SurfCache_p D_CacheSurface(mSurface_p surface, MipLevel_t miplevel);
 
 
 #if id386

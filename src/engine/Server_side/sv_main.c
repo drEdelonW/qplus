@@ -368,7 +368,7 @@ void SV_SpawnServer(
     // allocate server memory
     // WARNING!!! don't use [EdictSize] before PR_LoadProgs() called!!!
     if (!EdictSize) Host_Error("EdictSize - not inited\n");
-    Edicts = Hunk_AllocName((uint32_t)EdictsMax * EdictSize, "edicts");
+    Edicts = Hunk_AllocName(EdictsMax * EdictSize, "edicts");
     // sv.edicts = Edicts;
 
     // leave slots at start for clients only

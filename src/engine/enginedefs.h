@@ -5,7 +5,7 @@
 //
 // per-level limits
 //
-#define MAX_EDICTS          600   /* FIXME: ouch! ouch! ouch! */
+
 #define MAX_LIGHTSTYLES     64
 #define MAX_MODELS          256   /* these are sent over the net as bytes */
 #define MAX_SOUNDS          256   /* so they cannot be blindly increased */
@@ -38,7 +38,6 @@
 
 #define MAX_VISEDICTS           256
 
-#define MAX_DLIGHTS             32
 #define MAX_CLIENT_LIMIT        4
 
 

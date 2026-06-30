@@ -315,7 +315,7 @@ typedef struct {
 } pcx_t;
 typedef pcx_t* pcx_p;
 
-byte* pcx_rgb;
+uint8_p pcx_rgb;
 
 /*
 ============
@@ -351,7 +351,7 @@ void LoadPCX(FILE* f) {
     pcx_rgb = malloc(count * 4);
 
     for (int y = 0; y <= pcx->ymax; y++) {
-        byte* pix = pcx_rgb + 4 * y * (pcx->xmax + 1);
+        uint8_p pix = pcx_rgb + 4 * y * (pcx->xmax + 1);
         for (int x = 0; x <= pcx->ymax; ) {
             int dataByte = fgetc(f);
 
@@ -398,7 +398,7 @@ typedef struct {
     uint8_t attributes;
 } TargaHeader;
 TargaHeader  targa_header;
-byte* targa_rgba;
+uint8_p targa_rgba;
 
 int16_t fgetLittleShort(FILE* f) {
     byte b1 = fgetc(f);
@@ -423,7 +423,7 @@ LoadTGA
 =============
 */
 void LoadTGA(FILE* fin) {
-    byte* pixbuf;
+    uint8_p pixbuf;
     int row, column;
 
     targa_header.id_length = fgetc(fin);
@@ -928,7 +928,7 @@ void R_InitSky(Texture_p mt) {
 
     uint32_t trans[128 * 128];
 
-    byte* src = (byte*)mt + mt->offsets[0];
+    uint8_p src = (uint8_p)mt + mt->offsets[Mip0];
 
     // make an average value for the back to avoid
     // a fringe on the top level
@@ -940,16 +940,16 @@ void R_InitSky(Texture_p mt) {
             int p = src[i * 256 + j + 128];
             uint32_p rgba = &d_8to24table[p];
             trans[(i * 128) + j] = *rgba;
-            r += ((byte*)rgba)[0];
-            g += ((byte*)rgba)[1];
-            b += ((byte*)rgba)[2];
+            r += ((uint8_p)rgba)[0];
+            g += ((uint8_p)rgba)[1];
+            b += ((uint8_p)rgba)[2];
         }
 
     uint32_t transpix;
-    ((byte*)&transpix)[0] = r / (128 * 128);
-    ((byte*)&transpix)[1] = g / (128 * 128);
-    ((byte*)&transpix)[2] = b / (128 * 128);
-    ((byte*)&transpix)[3] = 0;
+    ((uint8_p)&transpix)[0] = r / (128 * 128);
+    ((uint8_p)&transpix)[1] = g / (128 * 128);
+    ((uint8_p)&transpix)[2] = b / (128 * 128);
+    ((uint8_p)&transpix)[3] = 0;
 
 
     if (!solidskytexture)
