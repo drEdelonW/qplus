@@ -70,7 +70,6 @@ extern int16_p  d_pzbuffer;
 extern uint32_t d_zrowbytes, d_zwidth;
 #endif
 
-extern int* d_pscantable;
 extern int      d_scantable[MAXHEIGHT];
 extern int      d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
 extern int      d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;

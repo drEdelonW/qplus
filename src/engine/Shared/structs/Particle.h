@@ -3,8 +3,6 @@
 #include "vector.h"
 #include "qTime.h"
 
-#define PARTICLE_Z_CLIP 8.0
-
 typedef enum {
     pt_static,
     pt_grav,

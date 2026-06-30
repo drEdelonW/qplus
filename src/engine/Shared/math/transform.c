@@ -2,6 +2,8 @@
 #include "angle.h"
 #include <math.h>
 
+Basis_t BS;
+Basis_t base_BS;
 
 void AngleVectors(vec3_t angles, vec3_p forward, vec3_p right, vec3_p up) {
 #if 0

@@ -172,7 +172,7 @@ typedef enum AreaAxis_e {
 
 typedef struct areaNode_s areaNode_t;
 typedef areaNode_t* areaNode_p;
-typedef struct areaNode_s {
+struct areaNode_s {
     AreaAxis    axis;  // -1 = leaf node
     float       dist;
     areaNode_p  children[2];
@@ -562,9 +562,7 @@ bool SV_RecursiveHullCheck(
 #endif
 
     // put the crosspoint DIST_EPSILON pixels on the near side
-    float  frac =
-        (t1 + ((t1 < 0) ?
-            DIST_EPSILON : -DIST_EPSILON)) /
+    float  frac = (t1 + ((t1 < 0) ? DIST_EPSILON : -DIST_EPSILON)) /
         (t1 - t2);
 
     CLAMP(0.0, frac, 1.0);
@@ -633,10 +631,11 @@ eventually rotation) of the end points
 */
 trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end) {
     // fill in a default trace
-    trace_t trace;  memset(&trace, 0, sizeof(trace_t));
-    trace.fraction = 1;
-    trace.allsolid = true;
-    trace.endpos = end;
+    trace_t trace = {
+        .fraction = 1,
+        .allsolid = true,
+        .endpos = end
+    };
 
     // get the clipping hull
     vec3_t offset;
@@ -656,13 +655,13 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
         // vec3_t a;
         vec3_t forward, right, up; AngleVectors(ent->v.angles, &forward, &right, &up);
 
-        vec3_t start_l{
+        start_l = (vec3_t){
             .x = DotProduct(start_l, forward);
             .y = -DotProduct(start_l, right);
             .z = DotProduct(start_l, up);
         }
 
-            end_l = {
+            end_l = (vec3_t){
                 .x = DotProduct(end_l, forward);
                 .y = -DotProduct(end_l, right);
                 .z = DotProduct(end_l, up);
@@ -681,21 +680,23 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, vec3_t mins, vec3_t maxs,
             ent->v.angles.yaw ||
             ent->v.angles.roll) &&
         (trace.fraction != 1)) {
-        vec3_t a = VectorSubtract(vec3_origin, ent->v.angles);
-        vec3_t forward, right, up;  AngleVectors(a, &forward, &right, &up);
+        vec3_t forward, right, up;  AngleVectors(
+            VectorSubtract(vec3_origin, ent->v.angles),
+            &forward, &right, &up
+        );
 
-        {
-            vec3_t temp = trace.endpos;
-            trace.endpos.x = DotProduct(temp, forward);
-            trace.endpos.y = -DotProduct(temp, right);
-            trace.endpos.z = DotProduct(temp, up);
-        }
-        {
-            vec3_t temp = trace.plane.normal;
-            trace.plane.normal.x = DotProduct(temp, forward);
-            trace.plane.normal.y = -DotProduct(temp, right);
-            trace.plane.normal.z = DotProduct(temp, up);
-        }
+        trace.endpos = (vec3_t){
+            .x = DotProduct(trace.endpos, forward),
+            .y = -DotProduct(trace.endpos, right),
+            .z = DotProduct(trace.endpos, up),
+        };
+
+        trace.plane.normal = (vec3_t){
+            .x = DotProduct(trace.plane.normal, forward),
+            .y = -DotProduct(trace.plane.normal, right),
+            .z = DotProduct(trace.plane.normal, up),
+        };
+
     }
 #endif
 
@@ -770,8 +771,7 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
             (trace.fraction < clip->trace.fraction)
             ) {
             trace.ent = touch;
-            if (clip->trace.startsolid
-                ) {
+            if (clip->trace.startsolid) {
                 clip->trace = trace;
                 clip->trace.startsolid = true;
             }

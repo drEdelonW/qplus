@@ -20,7 +20,8 @@ typedef enum {
 
 struct Texture_s {
     char        name[16];
-    uint32_t    width, height;
+    uint32_t    width;
+    uint32_t    height;
 #ifdef GLQUAKE
     int         gl_texturenum;
     mSurface_p  texturechain;       // for gl_texsort drawing
@@ -43,7 +44,8 @@ STATIC_ASSERT_SIZE(dMipTexLump_t, 4 + 4 * 4); // 20
 
 typedef struct MipTex_s {
     char        name[16];
-    uint32_t    width, height;
+    uint32_t    width;
+    uint32_t    height;
     uint32_t    offsets[MIPLEVELS];  // four mip maps stored
 } MipTex_t;
 typedef MipTex_t* MipTex_p;
@@ -51,6 +53,8 @@ typedef MipTex_t* MipTex_p;
 
 extern Texture_p r_notexture_mip;
 
-
 Texture_p R_TextureAnimation(Texture_p base);
 
+static inline uint8_p Mip_GetPtr(Texture_p mt, MipLevel_t level) {
+    return (uint8_p)mt + mt->offsets[level];
+}

@@ -76,7 +76,7 @@ void Show() {
 void R_TimeRefresh_f() {
     int startangle = r_refdef.viewangles.yaw;
 
-    float start = Host_FloatTime();
+    RealTime_t start = Host_FloatTime();
     for (int i = 0; i < VIEWANGLE_STEPS; i++) {
         r_refdef.viewangles.yaw = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
@@ -94,8 +94,8 @@ void R_TimeRefresh_f() {
         VID_Update(&vr);
     }
 
-    float stop = Host_FloatTime();
-    float time = stop - start;
+    RealTime_t stop = Host_FloatTime();
+    RealDt_t time = stop - start;
     Con_Printf("%f seconds (%f fps)\n", time, VIEWANGLE_STEPS / time);
 
     r_refdef.viewangles.yaw = startangle;
@@ -143,7 +143,7 @@ void R_LineGraph(int x, int y, int h) {
 void R_TimeGraph() {
     static int timex;
     static uint8_t r_timings[MAX_TIMINGS];
-    float r_time2 = Host_FloatTime();
+    RealTime_t r_time2 = Host_FloatTime();
     int a = (r_time2 - r_time1) / 0.01;
     //a = fabs(mouse_y * 0.05);
     //a = (int)((r_refdef.vieworg[2] + 1024)/1)%(int)r_graphheight.value;
@@ -177,8 +177,8 @@ void R_TimeGraph() {
     =============
 */
 void R_PrintTimes() {
-    float r_time2 = Host_FloatTime();
-    float ms = 1000 * (r_time2 - r_time1);
+    RealTime_t r_time2 = Host_FloatTime();
+    RealDt_t ms = 1000 * (r_time2 - r_time1);
 
     Con_Printf(
         "%5.1f ms %3i/%3i/%3i poly %3i surf\n",

@@ -67,11 +67,11 @@ bool SV_IsActive() {
     return sv.active;
 }
 
-LegTime_t SV_GetTime() {
+SimTime_t SV_GetTime() {
     return sv.time;
 }
 
-void SV_SetTime(LegTime_t time) {
+void SV_SetTime(SimTime_t time) {
     sv.time = time;
 }
 

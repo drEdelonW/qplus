@@ -39,7 +39,7 @@ void Con_NotifyBox(cString text) {
 
     Con_Printf("\n");
     key.dest = key_game;
-    realtime = 0;       // put the cursor back to invisible
+    realtime = 0.0;       // put the cursor back to invisible
 }
 
 /*

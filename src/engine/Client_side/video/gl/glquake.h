@@ -125,7 +125,6 @@ extern  int         c_brush_polys, c_alias_polys;   // FYI: DEBUG metrics
 //
 // view origin
 //
-extern Basis_t  BS;
 extern  vec3_t  r_origin;
 
 //

@@ -63,6 +63,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "GlobVars.h"
 #include "z_hunk.h"
 #include "render.h"
+#include "qTime.h"
 /*
 
 A server can allways be started, even if the system started out as a client
@@ -77,16 +78,16 @@ Memory is cleared / released when a server or client begins, not when they end.
 #if 1
 QuakeParms_t host_parms;
 bool    host_initialized;   // true if into command execution
-LegTime_t  host_frametime;
-LegTime_t  host_time;
+SimDt_t host_frametime;
+SimTime_t   host_time;
 int32_t host_framecount;
 int     host_hunklevel;
 jmp_buf host_abortserver;
 uint8_p host_basepal;
 uint8_p host_colormap;
 bool    isDedicated;
-LegTime_t  realtime;           // without any filtering or bounding
-LegTime_t  oldrealtime;        // last frame run
+RealTime_t  realtime;           // without any filtering or bounding
+RealTime_t  oldrealtime;        // last frame run
 size_t  minimum_memory;
 #endif
 

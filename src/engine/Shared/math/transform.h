@@ -8,6 +8,9 @@ typedef struct {
 } Basis_t;
 typedef Basis_t* Basis_p;
 
+extern Basis_t  BS; // it was vpn, vright, vup;
+extern Basis_t  base_BS; // it was base_vpn, base_vright, base_vup;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

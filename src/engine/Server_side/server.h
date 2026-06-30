@@ -43,9 +43,9 @@ typedef struct {
     bool        active;         // false if only a net client
     bool        paused;
     bool        loadgame;       // handle connections specially
-    LegTime_t      time;
+    SimTime_t   time;
     uint8_t     lastcheck;      // used by PF_checkclient
-    LegTime_t      lastchecktime;
+    SimTime_t   lastchecktime;
     char        name[NAME_LENGTH];       // map name
 #ifdef QUAKE2
     char        startspot[NAME_LENGTH];

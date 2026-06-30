@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include "Surface.h"
 
-static int _miplevel;   // TODO: make mipLevel enum
+static MipLevel_t _miplevel;
 float scale_for_mip;
 
 
@@ -45,12 +45,12 @@ void D_DrawPoly() {} // this driver takes spans, not polygons
 D_MipLevelForScale
 =============
 */
-int D_MipLevelForScale(float scale) {
-    int lMipLevel;
-    /**/ if (scale >= d_scalemip[0])    lMipLevel = 0;
-    else if (scale >= d_scalemip[1])    lMipLevel = 1;
-    else if (scale >= d_scalemip[2])    lMipLevel = 2;
-    else /*                       */    lMipLevel = 3;
+MipLevel_t D_MipLevelForScale(float scale) {
+    MipLevel_t lMipLevel;
+    /**/ if (scale >= d_scalemip[0])    lMipLevel = Mip0;
+    else if (scale >= d_scalemip[1])    lMipLevel = Mip1;
+    else if (scale >= d_scalemip[2])    lMipLevel = Mip2;
+    else /*                       */    lMipLevel = Mip3;
 
     CLAMP_MIN(lMipLevel, d_minmip);
 
@@ -203,7 +203,7 @@ void D_DrawSurfaces() {
             }
             else if (surf->flags & SURF_DRAWTURB) {
                 mSurface_p pface = surf->data;
-                _miplevel = 0;
+                _miplevel = Mip0;
                 cacheblock = (pixel_p)(
                     (uint8_p)pface->texinfo->texture +
                     pface->texinfo->texture->offsets[Mip0]

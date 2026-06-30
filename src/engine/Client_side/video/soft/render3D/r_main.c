@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include "z_hunk.h"
 #include "Texture.h"
+#include "qTime.h"
 
 //define PASSAGES
 
@@ -68,8 +69,7 @@ bool r_fov_greater_than_90;
 // view origin
 //
 
-Basis_t BS;
-Basis_t base_BS;
+
 vec3_t r_origin;    // TODO: mx 3x4?
 
 //
@@ -111,12 +111,12 @@ mLeaf_p     r_viewleaf, r_oldviewleaf;
 
 fixed8_t  d_lightstylevalue[256]; // 8.8 fraction of base light value
 
-float dp_time1, dp_time2;
-float db_time1, db_time2;
-float rw_time1, rw_time2;
-float se_time1, se_time2;
-float de_time1, de_time2;
-float dv_time1, dv_time2;
+RealTime_t dp_time1, dp_time2;
+RealTime_t db_time1, db_time2;
+RealTime_t rw_time1, rw_time2;
+RealTime_t se_time1, se_time2;
+RealTime_t de_time1, de_time2;
+RealTime_t dv_time1, dv_time2;
 
 void R_MarkLeaves();
 void CreatePassages();
@@ -810,15 +810,15 @@ void R_EdgeDrawing() {
     =============
 */
 void R_PrintDSpeeds() {
-    float r_time2 = Host_FloatTime();
+    RealTime_t r_time2 = Host_FloatTime();
 
-    float dp_time = (dp_time2 - dp_time1) * 1000;
-    float rw_time = (rw_time2 - rw_time1) * 1000;
-    float db_time = (db_time2 - db_time1) * 1000;
-    float se_time = (se_time2 - se_time1) * 1000;
-    float de_time = (de_time2 - de_time1) * 1000;
-    float dv_time = (dv_time2 - dv_time1) * 1000;
-    float ms = /*   */(r_time2 - r_time1) * 1000;
+    RealDt_t dp_time = (dp_time2 - dp_time1) * 1000;
+    RealDt_t rw_time = (rw_time2 - rw_time1) * 1000;
+    RealDt_t db_time = (db_time2 - db_time1) * 1000;
+    RealDt_t se_time = (se_time2 - se_time1) * 1000;
+    RealDt_t de_time = (de_time2 - de_time1) * 1000;
+    RealDt_t dv_time = (dv_time2 - dv_time1) * 1000;
+    RealDt_t ms = /*   */(r_time2 - r_time1) * 1000;
 
     Con_Printf(
         "%3i %4.1fp %3iw %4.1fb %3is %4.1fe %4.1fv\n",

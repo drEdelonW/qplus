@@ -22,7 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_local.h"
 #include "render.h"
 
-int d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
+int d_vrectx, d_vrecty;
+int d_vrectright_particle, d_vrectbottom_particle;
 int d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
 int d_scantable[MAXHEIGHT];
 int16_p zspantable[MAXHEIGHT];

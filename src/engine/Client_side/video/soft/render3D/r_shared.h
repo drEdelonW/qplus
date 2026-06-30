@@ -60,8 +60,6 @@ extern int      r_drawnpolycount;
 extern int      sintable[SIN_BUFFER_SIZE];
 extern int      intsintable[SIN_BUFFER_SIZE];
 
-extern Basis_t  BS; // it was vpn, vright, vup;
-extern Basis_t  base_BS; // it was base_vpn, base_vright, base_vup;
 extern r_Entity_p   currententity;
 
 #define NUMVERTEXNORMALS 162
