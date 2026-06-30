@@ -41,6 +41,18 @@ static uint8_t newsky[128 * 256];
 // 128 bytes of topsky on the right,
 // because the low-level drawers need 256-uint8_t scan widths
 
+// blends one texel: topsky masked by bottommask, or-ed with bottomsky
+static inline uint8_t SkyBlendByte(uint8_p ptopsky, int ofs) {
+    return (uint8_t)((*(ptopsky + 128) & bottommask[ofs]) | bottomsky[ofs]);
+}
+
+// same blend, 4 texels at once; requires UNALIGNED_OK (unaligned dword access)
+static inline uint32_t SkyBlendDword(uint32_p ptopsky, int ofs) {
+    return (*(ptopsky + (128 / sizeof(uint32_t))) &
+        *(uint32_p)&bottommask[ofs]) |
+        *(uint32_p)&bottomsky[ofs];
+}
+
 
 /*
 =============
@@ -104,21 +116,13 @@ void R_MakeSky() {
 #if UNALIGNED_OK
         for (int x = 0; x < SKYSIZE; x += 4) {
             int ofs = baseofs + ((x + xshift) & SKYMASK);
-
-            *pnewsky = (
-                *(pnewsky + (128 / sizeof(uint32_t))) &
-                *(uint32_p)&bottommask[ofs]) |
-                *(uint32_p)&bottomsky[ofs];
+            *pnewsky = SkyBlendDword(pnewsky, ofs);
             pnewsky++;
         }
 #else
         for (int x = 0; x < SKYSIZE; x++) {
             int ofs = baseofs + ((x + xshift) & SKYMASK);
-
-            *pnewsky = (
-                *(pnewsky + 128) &
-                *(uint8_p)&bottommask[ofs]) |
-                *(uint8_p)&bottomsky[ofs];
+            *pnewsky = SkyBlendByte(pnewsky, ofs);
             pnewsky++;
         }
 #endif
@@ -153,24 +157,14 @@ void R_GenSkyTile(uint8_p pdest) {
 #if UNALIGNED_OK
         for (int x = 0; x < SKYSIZE; x += 4) {
             int ofs = baseofs + ((x + xshift) & SKYMASK);
-
-            *pd = (
-                *(pnewsky + (128 / sizeof(uint32_t))) &
-                *(uint32_p)&bottommask[ofs]
-                ) |
-                *(uint32_p)&bottomsky[ofs];
+            *pd = SkyBlendDword(pnewsky, ofs);
             pnewsky++;
             pd++;
         }
 #else
         for (int x = 0; x < SKYSIZE; x++) {
             int ofs = baseofs + ((x + xshift) & SKYMASK);
-
-            *pd = (
-                *(pnewsky + 128) &
-                *(uint8_p)&bottommask[ofs]
-                ) |
-                *(uint8_p)&bottomsky[ofs];
+            *pd = SkyBlendByte(pnewsky, ofs);
             pnewsky++;
             pd++;
         }
@@ -196,18 +190,10 @@ void R_GenSkyTile16(uint16_p pdest) {
     for (int y = 0; y < SKYSIZE; y++) {
         int baseofs = ((y + yshift) & SKYMASK) * 131;
 
-        // FIXME: clean this up
         // FIXME: do faster unaligned version?
         for (int x = 0; x < SKYSIZE; x++) {
             int ofs = baseofs + ((x + xshift) & SKYMASK);
-
-            *pd = d_8to16table[
-                (
-                    *(pnewsky + 128) &
-                    *(uint8_p)&bottommask[ofs]
-                    ) |
-                    *(uint8_p)&bottomsky[ofs]
-            ];
+            *pd = d_8to16table[SkyBlendByte(pnewsky, ofs)];
             pnewsky++;
             pd++;
         }
