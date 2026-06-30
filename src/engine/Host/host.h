@@ -10,14 +10,14 @@ extern bool    isDedicated;
 
 extern QuakeParms_t host_parms;
 extern bool    host_initialized;  // true if into command execution
-extern LegacyTimeStamp_t  host_frametime;
+extern LegTime_t  host_frametime;
 extern uint8_p host_basepal;
 extern uint8_p host_colormap;
 extern int32_t host_framecount; // incremented every frame, never reset
-extern LegacyTimeStamp_t  host_time;
+extern LegTime_t  host_time;
 // extern jmp_buf host_abortserver;
 
-extern LegacyTimeStamp_t  realtime;   // not bounded in any way, changed at start of every frame, never reset
+extern LegTime_t  realtime;   // not bounded in any way, changed at start of every frame, never reset
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,11 +30,11 @@ extern "C" {
     void Host_Error(cString error, ...);
     Q_NORETURN void Host_SysError(cStringRO error, ...);
     void Host_EndGame(cString message, ...);
-    void Host_Frame(LegacyTimeDelta_t time);
+    void Host_Frame(LegDt_t time);
     void Host_Quit_f();
     void Host_ClientCommands(cString fmt, ...);
     void Host_ShutdownServer(bool crash);
-    LegacyTimeStamp_t Host_FloatTime();
+    LegTime_t Host_FloatTime();
     bool Host_IsDedicated();
     bool Host_IsServerActive();
 

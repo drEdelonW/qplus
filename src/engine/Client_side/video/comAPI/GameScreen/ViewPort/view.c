@@ -48,7 +48,7 @@ when crossing a water boudnary.
 */
 
 
-static float _v_DmgTime;
+static LegDt_t _v_DmgTime;
 static float _v_DmgRoll, _v_DmgPitch;
 
 
@@ -87,8 +87,7 @@ V_CalcBob
 ===============
 */
 float V_CalcBob() {
-    float cycle = cl.time - (int)(cl.time / cl_bobcycle.value) * cl_bobcycle.value;
-    cycle /= cl_bobcycle.value;
+    LegDt_t cycle = (cl.time - (int)(cl.time / cl_bobcycle.value) * cl_bobcycle.value) / cl_bobcycle.value;
 
     if (cycle < cl_bobup.value) cycle = M_PI * cycle / cl_bobup.value;
     else                        cycle = M_PI + M_PI * (cycle - cl_bobup.value) / (1.0 - cl_bobup.value);
@@ -805,10 +804,9 @@ void V_CalcRefdef() {
     if ((cl.onground) &&
         ((ent->origin.z - _oldZ) > 0)) {
 
-        float steptime = cl.time - cl.oldtime;
-        if (steptime < 0) {
-            //FIXME  I_Error ("steptime < 0");
-            steptime = 0;
+        LegDt_t steptime = cl.time - cl.oldtime;
+        if (steptime < 0.0f) {
+            steptime = 0.0f;    //FIXME  I_Error ("steptime < 0");
         }
 
         _oldZ += steptime * 80;
@@ -821,7 +819,7 @@ void V_CalcRefdef() {
 
     if (chase_active.value)
         Chase_Update();
-}
+    }
 
 /*
 ==================

@@ -431,14 +431,14 @@ void R_LeadingEdge(Edge_p  edge) {
                 double fu = (float)(edge->u - 0xFFFFF) * (1.0 / 0x100000);
                 double newzi =
                     surf->d_ziorigin +
-                    fv * surf->d_zistepv +
-                    fu * surf->d_zistepu;
+                    surf->d_zistepv * fv +
+                    surf->d_zistepu * fu;
                 double newzibottom = newzi * 0.99;
 
                 double testzi =
                     surf2->d_ziorigin +
-                    fv * surf2->d_zistepv +
-                    fu * surf2->d_zistepu;
+                    surf2->d_zistepv * fv+
+                    surf2->d_zistepu * fu;
 
                 if (newzibottom >= testzi)      goto newtop;
 

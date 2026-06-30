@@ -51,10 +51,10 @@ void Con_DrawNotify() {
     for (int32_t i = (con.current - NUM_CON_TIMES + 1); i <= con.current; i++) {
         if (i < 0)  continue;
 
-        float time = con.times[i % NUM_CON_TIMES];
+        LegDt_t time = con.times[i % NUM_CON_TIMES];
         if (time == 0)  continue;
 
-        time = (float)realtime - time;
+        time = (LegDt_t)realtime - time;
         if (time > con_notifytime.value)    continue;
 
         cString text = con.text + (i % (int32_t)con.totallines) * con.linewidth;

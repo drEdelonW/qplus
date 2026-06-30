@@ -30,10 +30,10 @@ void Con_NotifyBox(cString text) {
     key.dest = key_console;
 
     do {
-        LegacyTimeStamp_t t1 = Host_FloatTime();
+        LegTime_t t1 = Host_FloatTime();
         SCR_UpdateScreen();
         Sys_SendKeyEvents();
-        LegacyTimeStamp_t t2 = Host_FloatTime();
+        LegTime_t t2 = Host_FloatTime();
         realtime += t2 - t1;    // make the cursor blink
     } while (key.count < 0);
 

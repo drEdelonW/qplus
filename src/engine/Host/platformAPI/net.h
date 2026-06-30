@@ -133,9 +133,9 @@ typedef struct qsocket_s qsocket_t;
 typedef qsocket_t* qsocket_p;
 struct qsocket_s {
     qsocket_p next;
-    LegacyTimeStamp_t connecttime;
-    LegacyTimeStamp_t lastMessageTime;
-    LegacyTimeStamp_t lastSendTime;
+    LegTime_t connecttime;
+    LegTime_t lastMessageTime;
+    LegTime_t lastSendTime;
 
     bool disconnected;
     bool canSend;
@@ -250,12 +250,12 @@ typedef struct {
 extern int32_t hostCacheCount;
 extern hostcache_t hostcache[HOSTCACHESIZE];
 
-extern LegacyTimeStamp_t       net_time;
+extern LegTime_t       net_time;
 extern sizebuf_t    net_message;
 extern int32_t      net_activeconnections;
 typedef struct _PollProcedure {
     struct _PollProcedure* next;
-    LegacyTimeStamp_t nextTime;
+    LegTime_t nextTime;
     void (*procedure)();
     TypeLess_ptr arg;
 } PollProcedure;
@@ -270,7 +270,7 @@ extern "C" {
 
     qsocket_p NET_NewQSocket();
     void NET_FreeQSocket(qsocket_p);
-    LegacyTimeStamp_t SetNetTime();
+    LegTime_t SetNetTime();
 
 #if !defined(_WIN32 ) && !defined (__linux__) && !defined (__sun__)
 #ifndef htonl
@@ -328,7 +328,7 @@ extern "C" {
 
     void NET_Poll();
 
-    void SchedulePollProcedure(PollProcedure* pp, LegacyTimeDelta_t timeOffset);
+    void SchedulePollProcedure(PollProcedure* pp, LegDt_t timeOffset);
 
 
     extern void (*GetComPortConfig)(int32_t portNumber, int32_p port, int32_p irq, int32_p baud, bool* useModem);

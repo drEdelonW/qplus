@@ -92,7 +92,7 @@ lmode_t lowresmodes[] = {
 
 int   vid_modenum = NO_MODE;
 int   vid_testingmode, vid_realmode;
-LegacyTimeStamp_t  vid_testendtime;
+LegTime_t  vid_testendtime;
 int   vid_default = MODE_WINDOWED;
 static int windowed_default;
 
@@ -1806,7 +1806,7 @@ VID_TestMode_f
 */
 void VID_TestMode_f() {
     int  modenum;
-    LegacyTimeDelta_t testduration;
+    LegDt_t testduration;
 
     if (!vid_testingmode) {
         modenum = Q_atoi(Cmd_Argv(1));

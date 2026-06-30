@@ -11,8 +11,8 @@ typedef struct {
     int     erase_lines;
     int     erase_center;
     cString notifystring;
-    LegacyTimeDelta_t    disabled_time;
-    LegacyTimeDelta_t    centertime_start; // for slow victory printing
+    LegDt_t    disabled_time;
+    LegDt_t    centertime_start; // for slow victory printing
     int     center_lines;
     char    centerstring[1024];
     int      clearConsole;

@@ -77,16 +77,16 @@ Memory is cleared / released when a server or client begins, not when they end.
 #if 1
 QuakeParms_t host_parms;
 bool    host_initialized;   // true if into command execution
-LegacyTimeStamp_t  host_frametime;
-LegacyTimeStamp_t  host_time;
+LegTime_t  host_frametime;
+LegTime_t  host_time;
 int32_t host_framecount;
 int     host_hunklevel;
 jmp_buf host_abortserver;
 uint8_p host_basepal;
 uint8_p host_colormap;
 bool    isDedicated;
-LegacyTimeStamp_t  realtime;           // without any filtering or bounding
-LegacyTimeStamp_t  oldrealtime;        // last frame run
+LegTime_t  realtime;           // without any filtering or bounding
+LegTime_t  oldrealtime;        // last frame run
 size_t  minimum_memory;
 #endif
 
@@ -355,7 +355,7 @@ void Host::ShutdownServer(bool crash) {
     if (cls.state == ca_connected)  CL_Disconnect();
 
     // flush any pending messages - like the score!!!
-    LegacyTimeStamp_t start = Host_FloatTime();
+    LegTime_t start = Host_FloatTime();
     int  count;
     do {
         count = 0;
@@ -548,9 +548,9 @@ Runs all active servers
 ==================
 */
 void Host::_Frame(float time) {
-    static LegacyTimeStamp_t  _time1 = 0.0;
-    static LegacyTimeStamp_t  _time2 = 0.0;
-    static LegacyTimeStamp_t  _time3 = 0.0;
+    static LegTime_t  _time1 = 0.0;
+    static LegTime_t  _time2 = 0.0;
+    static LegTime_t  _time3 = 0.0;
 
     if (setjmp(host_abortserver))
         return;   // something bad happened, or the server disconnected
@@ -626,11 +626,11 @@ void Host::_Frame(float time) {
 
 void Host::Frame(float time) {
     if (serverprofile.value) {
-        LegacyTimeStamp_t time1 = Host_FloatTime();
+        LegTime_t time1 = Host_FloatTime();
         _Frame(time);
-        LegacyTimeStamp_t time2 = Host_FloatTime();
+        LegTime_t time2 = Host_FloatTime();
 
-        static LegacyTimeStamp_t _timeTotal;
+        static LegTime_t _timeTotal;
         _timeTotal += time2 - time1;
         static int _timeCount = 0;
         _timeCount++;

@@ -216,7 +216,7 @@ CL_DecayLights
 ===============
 */
 void CL_DecayLights() {
-    LegacyTimeDelta_t time = (LegacyTimeDelta_t)(cl.time - cl.oldtime);
+    LegDt_t time = (LegDt_t)(cl.time - cl.oldtime);
     dLight_p dl = cl_dlights;
     for (int i = 0; i < MAX_DLIGHTS; i++, dl++) {
         if ((dl->die < cl.time) || !dl->radius)
@@ -237,8 +237,8 @@ Determines the fraction between the last two messages that the objects
 should be put at.
 ===============
 */
-float CL_LerpPoint() {
-    float f = (float)(cl.mtime[0] - cl.mtime[1]);
+LegDt_t CL_LerpPoint() {
+    LegDt_t f = (LegDt_t)(cl.mtime[0] - cl.mtime[1]);
 
     if (!f ||
         cl_nolerp.value ||
@@ -246,30 +246,31 @@ float CL_LerpPoint() {
         Host_IsServerActive()
         ) {
         cl.time = cl.mtime[0];
-        return 1;
+        return 1.0f;
     }
 
-    if (f > 0.1) { // dropped packet, or start of demo
+    if (f > 0.1f) { // dropped packet, or start of demo
         cl.mtime[1] = cl.mtime[0] - 0.1;
         f = 0.1f;
     }
-    float frac = (float)(cl.time - cl.mtime[1]) / f;
+
+    LegDt_t frac = (LegDt_t)(cl.time - cl.mtime[1]) / f;
     //Con_Printf ("frac: %f\n",frac);
     if (frac < 0) {
-        if (frac < -0.01) {
+        if (frac < -0.01f) {
             SetPal(1);
             cl.time = cl.mtime[1];
             //    Con_Printf ("low frac\n");
         }
         frac = 0;
     }
-    else if (frac > 1) {
-        if (frac > 1.01) {
+    else if (frac > 1.0f) {
+        if (frac > 1.01f) {
             SetPal(2);
             cl.time = cl.mtime[0];
             //    Con_Printf ("high frac\n");
         }
-        frac = 1;
+        frac = 1.0f;
     }
     else
         SetPal(0);
@@ -285,7 +286,7 @@ CL_RelinkEntities
 */
 void CL_RelinkEntities() {
     // determine partial update time
-    float frac = CL_LerpPoint();
+    LegDt_t frac = CL_LerpPoint();
 
     cl_numvisedicts = 0;
 
@@ -329,7 +330,7 @@ void CL_RelinkEntities() {
             ent->angles = ent->msg_angles[0];
         }
         else { // if the delta is large, assume a teleport and don't lerp
-            float f = frac;
+            LegDt_t f = frac;
             vec3_t delta = VectorSubtract(ent->msg_origins[0], ent->msg_origins[1]);
             for (int j = 0; j < VECT_DIM; j++) {
                 if ((delta.v[j] > 100.0f) ||
@@ -366,20 +367,20 @@ void CL_RelinkEntities() {
             dl->origin = VectorMA(dl->origin, 18, bs.forward);
             dl->radius = (float)(200 + (rand() & 31));
             dl->minlight = 32;
-            dl->die = (float)(cl.time + 0.1);
+            dl->die = (LegDt_t)(cl.time + 0.1);
         }
         if (ent->effects & EF_BRIGHTLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
             dl->origin = ent->origin;
             dl->origin.z += 16;
             dl->radius = (float)(400 + (rand() & 31));
-            dl->die = (float)(cl.time + 0.001);
+            dl->die = (LegDt_t)(cl.time + 0.001);
         }
         if (ent->effects & EF_DIMLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
             dl->origin = ent->origin;
             dl->radius = (float)(200 + (rand() & 31));
-            dl->die = (float)(cl.time + 0.001);
+            dl->die = (LegDt_t)(cl.time + 0.001);
         }
 #ifdef QUAKE2
         if (ent->effects & EF_DARKLIGHT) {
@@ -406,7 +407,7 @@ void CL_RelinkEntities() {
             dLight_p dl = CL_AllocDlight(i);
             dl->origin = ent->origin;
             dl->radius = 200;
-            dl->die = (float)(cl.time + 0.01);
+            dl->die = (LegDt_t)(cl.time + 0.01);
         }
         else if (ent->model->flags & EF_GRENADE)    R_RocketTrail(oldorg, ent->origin, RT_GRENADE);
         else if (ent->model->flags & EF_TRACER3)    R_RocketTrail(oldorg, ent->origin, RT_TRACER3);
@@ -444,7 +445,7 @@ void CL_ReadFromServer() {
         if (ret == -1)  Host_Error("CL_ReadFromServer: lost server connection");
         if (!ret)       break;
 
-        cl.last_received_message = (float)realtime;
+        cl.last_received_message = (LegDt_t)realtime;
         CL_ParseServerMessage();
     } while (ret && (cls.state == ca_connected));
 

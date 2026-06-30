@@ -44,7 +44,7 @@ typedef struct {
 
 typedef struct {
     char    name[MAX_SCOREBOARDNAME];
-    LegacyTimeDelta_t   entertime;
+    LegDt_t   entertime;
     int32_t frags;
     int32_t colors;   // two 4 bit fields
     uint8_t translations[VID_GRADES * 256];
@@ -101,7 +101,7 @@ typedef struct {
     FILE* demofile;
     int32_t     td_lastframe;  // to meter out one message a frame
     int32_t     td_startframe;  // host_framecount at start
-    LegacyTimeDelta_t       td_starttime;  // realtime at second frame of timedemo
+    LegDt_t       td_starttime;  // realtime at second frame of timedemo
 
     // connection information
     int32_t     signon;   // 0 to SIGNONS
@@ -132,8 +132,8 @@ typedef struct {
     // information for local display
     uint32_t    stats[MAX_CL_STATS]; // health, etc
     uint32_t    items;   // inventory bit flags
-    LegacyTimeDelta_t       item_gettime[32]; // cl.time of aquiring item, for blinking
-    LegacyTimeDelta_t       faceanimtime; // use anim frame if cl.time < this
+    LegDt_t       item_gettime[32]; // cl.time of aquiring item, for blinking
+    LegDt_t       faceanimtime; // use anim frame if cl.time < this
 
     ColorShift_t    cshifts[NUM_CSHIFTS]; // color shifts for damage, powerups
     ColorShift_t    prev_cshifts[NUM_CSHIFTS]; // and content types
@@ -153,7 +153,7 @@ typedef struct {
     float       pitchvel;
     bool        nodrift;
     float       driftmove;
-    LegacyTimeStamp_t   laststop;
+    LegTime_t   laststop;
 
     float       viewheight;
     float       crouch;   // local amount for smoothing stepups
@@ -165,11 +165,11 @@ typedef struct {
     IntermissionState_e intermission; // don't change view angle, full screen, etc
     int32_t     completed_time; // latched at intermission start
 
-    LegacyTimeStamp_t   mtime[2];   // the timestamp of last two messages
-    LegacyTimeStamp_t   time;       // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
-    LegacyTimeStamp_t   oldtime;    // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
+    LegTime_t   mtime[2];   // the timestamp of last two messages
+    LegTime_t   time;       // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
+    LegTime_t   oldtime;    // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
 
-    LegacyTimeDelta_t       last_received_message; // (realtime) for net trouble icon
+    LegDt_t       last_received_message; // (realtime) for net trouble icon
 
     //
     // information that is static for the entire time connected to a server

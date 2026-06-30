@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 int			vid_modenum;
 vmode_p pcurrentmode = NULL;
 int			vid_testingmode, vid_realmode;
-LegacyTimeStamp_t		vid_testendtime;
+LegTime_t		vid_testendtime;
 
 CVAR(vid_mode, "0");
 CVAR(vid_wait, "0");
@@ -439,7 +439,7 @@ VID_TestMode_f
 */
 void VID_TestMode_f() {
 	int		modenum;
-	LegacyTimeDelta_t testduration;
+	LegDt_t testduration;
 
 	if (!vid_testingmode) {
 		modenum = Q_atoi(Cmd_Argv(1));

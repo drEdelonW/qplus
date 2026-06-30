@@ -24,12 +24,12 @@ public:
     QuakeParms_t parms;
 
     bool     initialized;  // true if into command execution
-    LegacyTimeStamp_t   frametime;
+    LegTime_t   frametime;
 
     uint8_p  basepal;
     uint8_p  colormap;
     int32_t  framecount; // incremented every frame, never reset
-    LegacyTimeStamp_t   realtime;   // not bounded in any way, changed at start of every frame, never reset
+    LegTime_t   realtime;   // not bounded in any way, changed at start of every frame, never reset
 #endif
 
   private:

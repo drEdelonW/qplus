@@ -144,14 +144,14 @@ void Sys_Printf(cString fmt, ...) {
 
 void Sys_Quit() { exit(0); }
 
-LegacyTimeStamp_t Sys_FloatTime() {
+LegTime_t Sys_FloatTime() {
     struct _timeb tstruct;
     _ftime(&tstruct);
 
     static int starttime;
     if (!starttime)
         starttime = tstruct.time;
-    LegacyTimeStamp_t t = (tstruct.time - starttime) + tstruct.millitm * 0.001;
+    LegTime_t t = (tstruct.time - starttime) + tstruct.millitm * 0.001;
 
     return t;
 }
@@ -206,7 +206,7 @@ cString newargv[256];
 int main(int argc, cStringArray argv) {
     MSG        msg;
     QuakeParms_t parms;
-    LegacyTimeStamp_t   time, oldtime;
+    LegTime_t   time, oldtime;
     static char cwd[1024];
 
     memset(&parms, 0, sizeof(parms));

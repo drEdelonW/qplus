@@ -137,14 +137,14 @@ mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) { // TODO: seems like 
     }
     else {
         mSpriteGroup_p pspritegroup = (mSpriteGroup_p)psprite->frames[frame].frameptr;
-        float_p pintervals = pspritegroup->intervals;   // TODO: replace by time interval specific type
+        LegDt_p pintervals = pspritegroup->intervals;   // TODO: replace by time interval specific type
         int numframes = pspritegroup->numframes;
         float fullinterval = pintervals[numframes - 1];
 
-        LegacyTimeDelta_t time = cl.time + currententity->syncbase;
+        LegDt_t time = cl.time + currententity->syncbase;
 
         // when loading in Mod_LoadSpriteGroup, we guaranteed all interval values are positive, so we don't have to worry about division by 0
-        LegacyTimeDelta_t targettime = time - ((int)(time / fullinterval)) * fullinterval;
+        LegDt_t targettime = time - ((int)(time / fullinterval)) * fullinterval;
 
         int i = 0;
         for (; i < (numframes - 1); i++) {
@@ -964,7 +964,7 @@ void R_RenderView() {
         !(cl.worldmodel)
         )                       Host_SysError("R_RenderView: NULL worldmodel");
 
-    LegacyTimeStamp_t time1;
+    LegTime_t time1;
     if (r_speeds.value) {
         glFinish();
         time1 = Host_FloatTime();
@@ -1014,7 +1014,7 @@ void R_RenderView() {
 
     if (r_speeds.value) {
         //  glFinish();
-        LegacyTimeStamp_t time2 = Host_FloatTime();
+        LegTime_t time2 = Host_FloatTime();
         Con_Printf("%3i ms  %4i wpoly %4i epoly\n", (int)((time2 - time1) * 1000), c_brush_polys, c_alias_polys);
     }
 }

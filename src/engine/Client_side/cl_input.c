@@ -119,20 +119,20 @@ float CL_KeyState(kbutton_p key) {
     float val = 0;
 
     if (impulsedown && !impulseup) {
-        if (down)   val = 0.5; // pressed and held this frame
-        else        val = 0; // I_Error();
+        if (down)   val = 0.5f; // pressed and held this frame
+        else        val = 0.0f; // I_Error();
     }
     if (impulseup && !impulsedown) {
-        if (down)   val = 0; // I_Error();
-        else        val = 0; // released this frame
+        if (down)   val = 0.0f; // I_Error();
+        else        val = 0.0f; // released this frame
     }
     if (!impulsedown && !impulseup) {
-        if (down)   val = 1.0; // held the entire frame
-        else        val = 0; // up the entire frame
+        if (down)   val = 1.0f; // held the entire frame
+        else        val = 0.0f; // up the entire frame
     }
     if (impulsedown && impulseup) {
-        if (down)   val = 0.75; // released and re-pressed this frame
-        else        val = 0.25; // pressed and released this frame
+        if (down)   val = 0.75f; // released and re-pressed this frame
+        else        val = 0.25f; // pressed and released this frame
     }
 
     key->state &= 1;  // clear impulses
@@ -153,10 +153,10 @@ float CL_KeyState(kbutton_p key) {
     ================
 */
 void CL_AdjustAngles() {
-    float speed;
+    LegDt_t speed;
 
-    if (in.speed.state & 1) speed = (float)host_frametime * cl_anglespeedkey.value;
-    else                    speed = (float)host_frametime;
+    if (in.speed.state & 1) speed = (LegDt_t)host_frametime * cl_anglespeedkey.value;
+    else                    speed = (LegDt_t)host_frametime;
 
     if (!(in.strafe.state & 1)) {
         cl.viewangles.yaw -= speed * cl_yawspeed.value * CL_KeyState(&in.right);

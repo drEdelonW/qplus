@@ -953,7 +953,7 @@ void	VID_Update(vRect_p rects) {
 
     if (count++ == 50) {
         count = 1;
-        printf("%lf frames/secs\n", 50.0 / ((LegacyTimeStamp_t)(gethrtime() - s) / 1e9));
+        printf("%lf frames/secs\n", 50.0 / ((LegTime_t)(gethrtime() - s) / 1e9));
         s = gethrtime();
     }
 #endif
@@ -1004,7 +1004,7 @@ void	VID_Update(vRect_p rects) {
             while (!oktodraw) GetEvent();
             rects = rects->pnext;
         }
-        //		printf("%lf\n", (LegacyTimeStamp_t)(gethrtime()-s)/1.0e9);
+        //		printf("%lf\n", (LegTime_t)(gethrtime()-s)/1.0e9);
         current_framebuffer = !current_framebuffer;
         vid.scr.pBuff = x_framebuffer[current_framebuffer]->data;
         vid.con.pBuff = vid.scr.pBuff;

@@ -123,7 +123,7 @@ void CL_ParseBeam(Model_p m) {
         if (b->entity == ent) {
             b->entity = ent;
             b->model = m;
-            b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2f);
+            b->endtime = (LegDt_t)(cl.time + 0.2f);
             b->start = start;
             b->end = end;
             return;
@@ -135,7 +135,7 @@ void CL_ParseBeam(Model_p m) {
         if (!b->model || (b->endtime < cl.time)) {
             b->entity = ent;
             b->model = m;
-            b->endtime = (LegacyTimeDelta_t)(cl.time + 0.2f);
+            b->endtime = (LegDt_t)(cl.time + 0.2f);
             b->start = start;
             b->end = end;
             return;
@@ -227,7 +227,7 @@ void CL_ParseTEnt() {
         dLight_p dl = CL_AllocDlight(0);
         dl->origin = pos;
         dl->radius = 350;
-        dl->die = (LegacyTimeDelta_t)(cl.time + 0.5f);
+        dl->die = (LegDt_t)(cl.time + 0.5f);
         dl->decay = 300;
         S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
     } break;
@@ -280,7 +280,7 @@ void CL_ParseTEnt() {
         dLight_p dl = CL_AllocDlight(0);
         dl->origin = pos;
         dl->radius = 350;
-        dl->die = (LegacyTimeDelta_t)(cl.time + 0.5f);
+        dl->die = (LegDt_t)(cl.time + 0.5f);
         dl->decay = 300;
         S_StartSound(-1, 0, cl_sfx_r_exp3, pos, 1, 1);
     } break;
@@ -313,7 +313,7 @@ void CL_ParseTEnt() {
         dLight_p dl = CL_AllocDlight(-1);
         dl->origin = endpos;
         dl->radius = 350;
-        dl->die = (LegacyTimeDelta_t)cl.time + 0.5f;
+        dl->die = (LegDt_t)cl.time + 0.5f;
         dl->decay = 300;
     } break;
 #endif
@@ -368,13 +368,13 @@ void CL_UpdateTEnts() {
         // calculate pitch and yaw
         vec3_t dist = VectorSubtract(b->end, b->start);
 
-        float yaw, pitch;
+        float yaw, pitch;   // TODO: wrap to vec3_t
         if ((dist.y == 0.0f) &&
             (dist.x == 0.0f)
             ) {
-            yaw = 0;
-            if (dist.z > 0.0f)   pitch = 90;
-            else                    pitch = 270;
+            yaw = 0.0f;
+            if (dist.z > 0.0f)  pitch = 90.0f;
+            else                pitch = 270.0f;
         }
         else {
             yaw = (float)(RAD2DEG(atan2(dist.y, dist.x)));
@@ -392,8 +392,8 @@ void CL_UpdateTEnts() {
         float d = VectorNormalize(&dist);
         while (d > 0) {
             r_Entity_p  ent = CL_NewTempEntity();
-            if (!ent)
-                return;
+            if (!ent)       return;
+
             ent->origin = org;
             ent->model = b->model;
             ent->angles.pitch = pitch;

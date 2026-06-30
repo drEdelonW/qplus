@@ -108,7 +108,7 @@ lmode_t	lowresmodes[] = {
 
 int			vid_modenum = NO_MODE;
 int			vid_testingmode, vid_realmode;
-LegacyTimeStamp_t		vid_testendtime;
+LegTime_t		vid_testendtime;
 int			vid_default = MODE_WINDOWED;
 static int	windowed_default;
 
@@ -1787,7 +1787,7 @@ void VID_TestMode_f() {
 
         if (VID_SetMode(modenum, vid_curpal)) {
             vid_testingmode = 1;
-            LegacyTimeDelta_t testduration = Q_atof(Cmd_Argv(2));
+            LegDt_t testduration = Q_atof(Cmd_Argv(2));
             if (testduration == 0)
                 testduration = 5.0;
             vid_testendtime = realtime + testduration;

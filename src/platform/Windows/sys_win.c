@@ -44,8 +44,8 @@ bool    ActiveApp, Minimized;
 bool    WinNT;
 
 static double   _pfreq;
-static LegacyTimeStamp_t   _curtime = 0.0;
-static LegacyTimeStamp_t   _lastcurtime = 0.0;
+static LegTime_t   _curtime = 0.0;
+static LegTime_t   _lastcurtime = 0.0;
 static int      _lowshift;
 static bool _ScReturnOnEnter = false;
 HANDLE          hinput, houtput;
@@ -291,7 +291,7 @@ void Sys_Error(cStringRO error, ...) {
     cStringRO text4 = "***********************************\n";
     cStringRO text5 = "\n";
     DWORD  dummy;
-    LegacyTimeStamp_t  starttime;
+    LegTime_t  starttime;
     static int in_sys_error0 = 0;
     static int in_sys_error1 = 0;
     static int in_sys_error2 = 0;
@@ -390,7 +390,7 @@ void Sys_Quit() {
 Sys_FloatTime
 ================
 */
-LegacyTimeStamp_t Sys_FloatTime() {
+LegTime_t Sys_FloatTime() {
     Sys_PushFPCW_SetHigh();
 
     LARGE_INTEGER   PerformanceCount;
@@ -413,7 +413,7 @@ LegacyTimeStamp_t Sys_FloatTime() {
         }
         else {
             uint32_t t2 = temp - oldtime;
-            LegacyTimeStamp_t time = (LegacyTimeStamp_t)t2 * _pfreq;
+            LegTime_t time = (LegTime_t)t2 * _pfreq;
             oldtime = temp;
 
             _curtime += time;
@@ -451,7 +451,7 @@ void Sys_InitFloatTime() {
 
     int j = COM_CheckParm("-starttime");
 
-    if (j)  _curtime = (LegacyTimeStamp_t)(Q_atof(com.argv[j + 1]));
+    if (j)  _curtime = (LegTime_t)(Q_atof(com.argv[j + 1]));
     else    _curtime = 0.0;
 
 
@@ -727,10 +727,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Sys_Printf("Host_Init\n");
     Host_Init(&parms);
 
-    LegacyTimeStamp_t oldtime = Sys_FloatTime();
+    LegTime_t oldtime = Sys_FloatTime();
     /* main window message loop */
     while (1) {
-        LegacyTimeStamp_t  time, newtime;
+        LegTime_t  time, newtime;
         if (isDedicated) {
             newtime = Sys_FloatTime();
             time = newtime - oldtime;

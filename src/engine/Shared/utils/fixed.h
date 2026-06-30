@@ -17,7 +17,6 @@ typedef fixed8_t*   fixed8_p;
 typedef int32_t     fixed16_t;  // 15.16 signed
 typedef fixed16_t*  fixed16_p;
 
-
 // -- Constants ----------------------------------------------------------------
 
 #define FIXED4_FRAC_BITS    4

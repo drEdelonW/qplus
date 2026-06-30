@@ -149,8 +149,8 @@ __weak void Sys_Printf(cStringRO fmt, ...) {
 
 __weak void Sys_Quit() { exit(0); }
 
-__weak LegacyTimeStamp_t Sys_FloatTime() {
-    static LegacyTimeStamp_t _time;
+__weak LegTime_t Sys_FloatTime() {
+    static LegTime_t _time;
     _time += 0.1;
     return _time;
 }

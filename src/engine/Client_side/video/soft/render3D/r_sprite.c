@@ -199,7 +199,7 @@ mSpriteFrame_p R_GetSpriteframe(mSprite_p psprite) { // TODO: seems like OpenGL 
     }
     else {
         mSpriteGroup_p pspritegroup = (mSpriteGroup_p)psprite->frames[frame].frameptr;
-        float_p pintervals = pspritegroup->intervals;   // TODO: replace by time interval specific type
+        LegDt_p pintervals = pspritegroup->intervals;   // TODO: replace by time interval specific type
         int numframes = pspritegroup->numframes;
         float fullinterval = pintervals[numframes - 1];
 

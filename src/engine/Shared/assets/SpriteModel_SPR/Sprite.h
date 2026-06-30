@@ -3,6 +3,7 @@
 #include "spritegn.h"
 #include "vector.h"
 #include "types.h"
+#include "qTime.h"
 #include "transform.h"
 #include "SyncType.h"
 #include "vid.h"
@@ -46,7 +47,7 @@ typedef struct {
 
 typedef struct {
     int32_t         numframes;
-    float_p         intervals;
+    LegDt_p         intervals;
     mSpriteFrame_p  frames[1];
 } mSpriteGroup_t;
 typedef mSpriteGroup_t* mSpriteGroup_p;

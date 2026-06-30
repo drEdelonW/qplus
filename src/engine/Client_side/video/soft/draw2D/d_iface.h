@@ -144,7 +144,7 @@ extern float skyspeed;
 extern float skyspeed2;
 
 #include "qTime.h"
-extern LegacyTimeDelta_t skytime;
+extern LegDt_t skytime;
 
 extern int c_surf;
 extern uint8_p r_warpbuffer;

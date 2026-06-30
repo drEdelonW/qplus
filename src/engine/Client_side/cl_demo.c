@@ -55,12 +55,12 @@ void CL_FinishTimeDemo() {
 
     // the first frame didn't count
     int frames = (host_framecount - cls.td_startframe) - 1;
-    LegacyTimeDelta_t time = (LegacyTimeDelta_t)(realtime - cls.td_starttime);
+    LegDt_t time = (LegDt_t)(realtime - cls.td_starttime);
     if (!time)
         time = 1;
     Con_Printf(
         "%i frames %5.1f seconds %5.1f fps\n",
-         frames, time, (LegacyTimeDelta_t)frames / time
+         frames, time, (LegDt_t)frames / time
         );
 }
 

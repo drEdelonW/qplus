@@ -51,15 +51,15 @@ void Sys_HighFPPrecision() {}
 void Sys_LowFPPrecision() {}
 
 #if 0
-LegacyTimeStamp_t Sys_FloatTime() {
-    static LegacyTimeStamp_t t = 0.0;
+LegTime_t Sys_FloatTime() {
+    static LegTime_t t = 0.0;
     t += 0.1;
     return t;
 }
 #else
-LegacyTimeStamp_t Sys_FloatTime() {
+LegTime_t Sys_FloatTime() {
     static uint32_t last_cycles = 0;
-    static double accumulated_time = 0.0;
+    static LegTime_t accumulated_time = 0.0;
     static bool is_initialized = false;
 
     uint32_t current_cycles = DWT->CYCCNT;
@@ -67,14 +67,14 @@ LegacyTimeStamp_t Sys_FloatTime() {
     if (!is_initialized) {
         last_cycles = current_cycles;
         is_initialized = true;
-        return (LegacyTimeStamp_t)accumulated_time;
+        return (LegTime_t)accumulated_time;
     }
 
     uint32_t delta_cycles = current_cycles - last_cycles;
-    accumulated_time += (double)delta_cycles / SystemCoreClock;
+    accumulated_time += (LegTime_t)delta_cycles / SystemCoreClock;
     last_cycles = current_cycles;
 
-    return (LegacyTimeStamp_t)accumulated_time;
+    return (LegTime_t)accumulated_time;
 }
 #endif
 
@@ -117,10 +117,10 @@ int main() {
     Host_Init(&parms);
     printf("STM32 Quake -- Version %0.3f\n", STM32_VERSION);
 
-    LegacyTimeStamp_t oldtime = Sys_FloatTime();
+    LegTime_t oldtime = Sys_FloatTime();
     while (1) {
-        LegacyTimeStamp_t newtime = Sys_FloatTime();
-        LegacyTimeStamp_t time = newtime - oldtime;
+        LegTime_t newtime = Sys_FloatTime();
+        LegTime_t time = newtime - oldtime;
         Host_Frame(time);
         oldtime = newtime;
     }

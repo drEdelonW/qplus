@@ -550,7 +550,7 @@ void R_AliasSetupSkin() {
     if (_pSkinDesc->type == ALIAS_SKIN_GROUP) {
         mAliasSkinGroup_p paliasskingroup = (mAliasSkinGroup_p)
             ((uint8_p)paliashdr + _pSkinDesc->skin);
-        float_p pskinintervals = (float_p)
+        LegDt_p pskinintervals = (LegDt_p)
             ((uint8_p)paliashdr + paliasskingroup->intervals);
         int numskins = paliasskingroup->numskins;
         float fullskininterval = pskinintervals[numskins - 1];
@@ -627,7 +627,7 @@ void R_AliasSetupFrame() {
 
     mAliasGroup_p paliasgroup = (mAliasGroup_p)
         ((uint8_p)paliashdr + paliashdr->frames[frame].frame);
-    float_p pintervals = (float_p)
+    LegDt_p pintervals = (LegDt_p)
         ((uint8_p)paliashdr + paliasgroup->intervals);
     int numframes = paliasgroup->numframes;
     float fullinterval = pintervals[numframes - 1];

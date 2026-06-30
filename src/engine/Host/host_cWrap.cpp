@@ -30,6 +30,6 @@ bool Host_IsServerActive() {
     return host.IsServerActive();
 }
 
-LegacyTimeStamp_t Host_FloatTime() {
+LegTime_t Host_FloatTime() {
     return Sys_FloatTime();
 }

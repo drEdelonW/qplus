@@ -530,7 +530,7 @@ void Sbar_DrawInventory() {
     // weapons
     for (int i = 0; i < 7; i++) {
         if (cl.items & (IT_SHOTGUN << i)) {
-            float time = cl.item_gettime[i];
+            LegDt_t time = cl.item_gettime[i];
             int flashon = (int)((cl.time - time) * 10);
             flashon = (flashon >= 10) ?
                 (cl.stats[STAT_ACTIVEWEAPON] == (IT_SHOTGUN << i)) : (flashon % 5) + 2;
@@ -548,7 +548,7 @@ void Sbar_DrawInventory() {
         int grenadeflashing = 0;
         for (int i = 0; i < 4; i++) {
             if (cl.items & (1 << hipweapons[i])) {
-                float time = cl.item_gettime[hipweapons[i]];
+                LegDt_t time = cl.item_gettime[hipweapons[i]];
                 int flashon = (int)((cl.time - time) * 10);
                 if (flashon >= 10) {
                     if (cl.stats[STAT_ACTIVEWEAPON] == (1 << hipweapons[i]))
@@ -602,7 +602,7 @@ void Sbar_DrawInventory() {
     // items
     for (int i = 0; i < 6; i++)
         if (cl.items & (1 << (17 + i))) {
-            float time = cl.item_gettime[17 + i];
+            LegDt_t time = cl.item_gettime[17 + i];
             if (time && (time > (cl.time - 2)) && flashon)   // flash frame
                 _sb.updates = 0;
             else
@@ -618,7 +618,7 @@ void Sbar_DrawInventory() {
     if (hipnotic) {
         for (int i = 0; i < 2; i++)
             if (cl.items & (1 << (24 + i))) {
-                float time = cl.item_gettime[24 + i];
+                LegDt_t time = cl.item_gettime[24 + i];
                 if (time && (time > (cl.time - 2)) && flashon)   // flash frame
                     _sb.updates = 0;
                 else    Sbar_DrawPic(288 + MUL16(i), -16, hsb_items[i]);
@@ -632,7 +632,7 @@ void Sbar_DrawInventory() {
         // new rogue items
         for (int i = 0; i < 2; i++) {
             if (cl.items & (1 << (29 + i))) {
-                float time = cl.item_gettime[29 + i];
+                LegDt_t time = cl.item_gettime[29 + i];
                 if (time && (time > (cl.time - 2)) && flashon)  // flash frame
                     _sb.updates = 0;
                 else    Sbar_DrawPic(288 + MUL16(i), -16, rsb_items[i]);
@@ -646,7 +646,7 @@ void Sbar_DrawInventory() {
         // sigils
         for (int i = 0; i < 4; i++) {
             if (cl.items & (1 << (28 + i))) {
-                float time = cl.item_gettime[28 + i];
+                LegDt_t time = cl.item_gettime[28 + i];
                 if (time && (time > (cl.time - 2)) && flashon)  // flash frame
                     _sb.updates = 0;
                 else    Sbar_DrawPic(320 - 32 + i * 8, -16, _sb.sigil[i]);

@@ -65,7 +65,7 @@ WSADATA  winsockdata;
 
 //=============================================================================
 
-static LegacyTimeStamp_t blocktime;
+static LegTime_t blocktime;
 #if 1
 INT_PTR CALLBACK BlockingHook() {
     WSACancelBlockingCall();

@@ -26,7 +26,7 @@ static int _iSkySpeed = 8;
 static int _iSkySpeed2 = 2;
 float skyspeed;
 float skyspeed2;
-LegacyTimeDelta_t   skytime;
+LegDt_t   skytime;
 
 uint8_p r_skysource;
 

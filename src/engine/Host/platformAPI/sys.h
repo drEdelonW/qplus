@@ -56,7 +56,7 @@ extern "C" {
     void Sys_Printf(cStringRO fmt, ...);    // send text to the console
 
     void Sys_Quit();
-    LegacyTimeStamp_t Sys_FloatTime();
+    LegTime_t Sys_FloatTime();
     cString Sys_ConsoleInput();
 
     void Sys_Sleep();   // called to yield for a little bit so as not to hog cpu when paused or debugging

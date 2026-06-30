@@ -169,7 +169,7 @@ dAliasFrameType_p  Mod_LoadAliasGroup(
 
     *pframeindex = (uint8_p)paliasgroup - (uint8_p)pheader;
     dAliasInterval_p pin_intervals = (dAliasInterval_p)(pingroup + 1);
-    float_p poutintervals = Hunk_AllocName(
+    LegDt_p poutintervals = Hunk_AllocName(
         sizeof(float) * numframes,
         Mod_loadName
     );
@@ -396,7 +396,7 @@ dAliasSkinType_p Mod_LoadAliasSkinGroup(
     paliasskingroup->numskins = numskins;
     *pskinindex = (uint8_p)paliasskingroup - (uint8_p)pheader;
     dAliasSkinInterval_p pinskinintervals = (dAliasSkinInterval_p)(pinskingroup + 1);
-    float_p poutskinintervals = Hunk_AllocName(
+    LegDt_p poutskinintervals = Hunk_AllocName(
         sizeof(float) * numskins,
         Mod_loadName
     );

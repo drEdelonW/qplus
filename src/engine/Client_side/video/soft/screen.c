@@ -218,7 +218,6 @@ void SCR_UpdateScreen() {
             .y = 0,
             .width = vid.scr.width,
             .height = vid.scr.height,
-            // .pnext = 0
         };
     }
     else if (scr.copytop) {     // fullScreen viewport with sBar
@@ -227,7 +226,6 @@ void SCR_UpdateScreen() {
             .y = 0,
             .width = vid.scr.width,
             .height = vid.scr.height - sb_lines,
-            // .pnext = 0
         };
     }
     else {                      // center screen rectangle viewport with sBar
@@ -236,7 +234,6 @@ void SCR_UpdateScreen() {
             .y = scr.vrect.y,
             .width = vid.scr.width,
             .height = vid.scr.height,
-            // .pnext = 0
         };
     }
     VID_Update(&vrect);
