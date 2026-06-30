@@ -5,6 +5,7 @@
 #ifdef GLQUAKE
 # include "Surface_pre.h"
 #endif
+#include "Lump.h"
 #include "assert.h"
 
 
@@ -53,8 +54,19 @@ typedef MipTex_t* MipTex_p;
 
 extern Texture_p r_notexture_mip;
 
-Texture_p R_TextureAnimation(Texture_p base);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static inline uint8_p Mip_GetPtr(Texture_p mt, MipLevel_t level) {
-    return (uint8_p)mt + mt->offsets[level];
+    Texture_p R_TextureAnimation(Texture_p base);
+    void Mod_LoadTextures(Lump_p Lump_in);
+
+#ifdef __cplusplus
+}
+#endif
+
+#include "vid.h"  // pixel_p
+
+static inline pixel_p GetMipPtr(Texture_p mt, MipLevel_t level) {
+    return (pixel_p)((uint8_p)mt + mt->offsets[level]);
 }

@@ -60,7 +60,7 @@ STATIC_ASSERT_SIZE(dHeader_t, 4 + 15 * 8); // 124
     =================
 */
 void Mod_LoadVertexes(Lump_p Lump_in) {
-    dVertex_p in = getMapLumpPtr(Lump_in);
+    dVertex_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);
@@ -83,7 +83,7 @@ void Mod_LoadVertexes(Lump_p Lump_in) {
     =================
 */
 void Mod_LoadEdges(Lump_p Lump_in) {
-    dEdge_p in = getMapLumpPtr(Lump_in);
+    dEdge_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);
@@ -105,7 +105,7 @@ Mod_LoadSurfedges
 =================
 */
 void Mod_LoadSurfedges(Lump_p Lump_in) {
-    int32_p in = getMapLumpPtr(Lump_in);
+    int32_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);
@@ -121,150 +121,6 @@ void Mod_LoadSurfedges(Lump_p Lump_in) {
 
 /*
 =================
-Mod_LoadTextures
-=================
-*/
-void Mod_LoadTextures(Lump_p Lump_in) {
-    if (!Lump_in->fileLen) { _loadModel->textures = NULL; return; }
-
-    dMipTexLump_p m = getMapLumpPtr(Lump_in);
-
-    m->nummiptex = LittleLong(m->nummiptex);
-
-    _loadModel->numtextures = m->nummiptex;
-    _loadModel->textures = Hunk_AllocName(
-        m->nummiptex * sizeof(*_loadModel->textures), Mod_loadName
-    );
-
-    for (int i = 0; i < m->nummiptex; i++) {
-        m->dataOfs[i] = LittleLong(m->dataOfs[i]);
-        if (m->dataOfs[i] == -1)        continue;
-
-        MipTex_p mt = (MipTex_p)((uint8_p)m + m->dataOfs[i]);
-        mt->width = LittleLong(mt->width);
-        mt->height = LittleLong(mt->height);
-
-        for (int j = 0; j < MIPLEVELS; j++)
-            mt->offsets[j] = LittleLong(mt->offsets[j]);
-
-        if ((mt->width & 0x0F) || (mt->height & 0x0F))      Host_SysError("Texture %s is not 16 aligned", mt->name);
-
-        int pixels = mt->width * mt->height / 64 * 85;
-        Texture_p tx = Hunk_AllocName(sizeof(Texture_t) + pixels, Mod_loadName);
-        _loadModel->textures[i] = tx;
-
-        memcpy(tx->name, mt->name, sizeof(tx->name));
-        tx->width = mt->width;
-        tx->height = mt->height;
-        for (int j = 0; j < MIPLEVELS; j++)
-            tx->offsets[j] = mt->offsets[j] + sizeof(Texture_t) - sizeof(MipTex_t);
-        // the pixels immediately follow the structures
-        memcpy(tx + 1, mt + 1, pixels);
-
-        if (!Q_strncmp(mt->name, "sky", 3))
-            R_InitSky(tx);
-#ifdef GLQUAKE
-        else {
-            texture_mode = GL_LINEAR_MIPMAP_NEAREST; //_LINEAR;
-            tx->gl_texturenum = GL_LoadTexture(
-                mt->name,
-                tx->width, tx->height,
-                (uint8_p)(tx + 1),
-                true, false
-            );
-            texture_mode = GL_LINEAR;
-        }
-#endif
-    }
-
-    //
-    // sequence the animations
-    //
-    for (int i = 0; i < m->nummiptex; i++) {
-        Texture_p tx = _loadModel->textures[i];
-        if (!tx ||
-            (tx->name[0] != '+') ||
-            (tx->anim_next)
-            )
-            continue; // allready sequenced
-
-        // find the number of frames in the animation
-        Texture_p anims[10] = { 0 };
-        Texture_p altanims[10] = { 0 };
-
-        int max = tx->name[1];
-        int altmax = 0;
-        if ((max >= 'a') && (max <= 'z'))   max -= 'a' - 'A';
-
-        if ((max >= '0') && (max <= '9')) {
-            max -= '0';
-            altmax = 0;
-            anims[max] = tx;
-            max++;
-        }
-        else
-            if ((max >= 'A') && (max <= 'J')) {
-                altmax = max - 'A';
-                max = 0;
-                altanims[altmax] = tx;
-                altmax++;
-            }
-            else
-                Host_SysError("Bad animating texture %s", tx->name);
-
-        for (int j = (i + 1); j < m->nummiptex; j++) {
-            Texture_p tx2 = _loadModel->textures[j];
-            if (!tx2 ||
-                (tx2->name[0] != '+') ||
-                strcmp(tx2->name + 2, tx->name + 2)
-                )
-                continue;
-
-            int num = tx2->name[1];
-            if ((num >= 'a') && (num <= 'z'))   num -= ('a' - 'A');
-            if ((num >= '0') && (num <= '9')) {
-                num -= '0';
-                anims[num] = tx2;
-                if ((num + 1) > max)        max = num + 1;
-            }
-            else
-                if ((num >= 'A') && (num <= 'J')) {
-                    num = num - 'A';
-                    altanims[num] = tx2;
-                    if (num + 1 > altmax)       altmax = num + 1;
-                }
-                else    Host_SysError("Bad animating texture %s", tx->name);
-        }
-
-#define ANIM_CYCLE 2
-        // link them all together
-        for (int j = 0; j < max; j++) {
-            Texture_p tx2 = anims[j];
-            if (!tx2)       Host_SysError("Missing frame %i of %s", j, tx->name);
-
-            tx2->anim_total = max * ANIM_CYCLE;
-            tx2->anim_min = j * ANIM_CYCLE;
-            tx2->anim_max = (j + 1) * ANIM_CYCLE;
-            tx2->anim_next = anims[(j + 1) % max];
-            if (altmax)
-                tx2->alternate_anims = altanims[0];
-        }
-        for (int j = 0; j < altmax; j++) {
-            Texture_p tx2 = altanims[j];
-            if (!tx2)       Host_SysError("Missing frame %i of %s", j, tx->name);
-
-            tx2->anim_total = altmax * ANIM_CYCLE;
-            tx2->anim_min = j * ANIM_CYCLE;
-            tx2->anim_max = (j + 1) * ANIM_CYCLE;
-            tx2->anim_next = altanims[(j + 1) % altmax];
-            if (max)
-                tx2->alternate_anims = anims[0];
-        }
-    }
-}
-
-/*
-=================
 Mod_LoadLighting
 =================
 */
@@ -272,7 +128,7 @@ void Mod_LoadLighting(Lump_p Lump_in) {
     if (!Lump_in->fileLen) { _loadModel->lightdata = NULL; return; }
 
     _loadModel->lightdata = Hunk_AllocName(Lump_in->fileLen, Mod_loadName);
-    memcpy(_loadModel->lightdata, getMapLumpPtr(Lump_in), Lump_in->fileLen);
+    memcpy(_loadModel->lightdata, getMapLumpPtr(mod_base, Lump_in), Lump_in->fileLen);
 }
 
 /*
@@ -281,7 +137,7 @@ void Mod_LoadLighting(Lump_p Lump_in) {
     =================
 */
 void Mod_LoadTexinfo(Lump_p Lump_in) {
-    TexInfo_p in = getMapLumpPtr(Lump_in);
+    TexInfo_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);
@@ -331,7 +187,7 @@ Mod_LoadMarksurfaces
 =================
 */
 void Mod_LoadMarksurfaces(Lump_p Lump_in) {
-    int16_p in = getMapLumpPtr(Lump_in);
+    int16_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))           Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int32_t count = Lump_in->fileLen / sizeof(*in);
@@ -357,7 +213,7 @@ void Mod_LoadVisibility(Lump_p Lump_in) {
     if (!Lump_in->fileLen) { _loadModel->visdata = NULL; return; }
 
     _loadModel->visdata = Hunk_AllocName(Lump_in->fileLen, Mod_loadName);
-    memcpy(_loadModel->visdata, getMapLumpPtr(Lump_in), Lump_in->fileLen);
+    memcpy(_loadModel->visdata, getMapLumpPtr(mod_base, Lump_in), Lump_in->fileLen);
 }
 
 
@@ -367,7 +223,7 @@ Mod_LoadLeafs
 =================
 */
 void Mod_LoadLeafs(Lump_p Lump_in) {
-    dLeaf_p in = getMapLumpPtr(Lump_in);
+    dLeaf_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);
@@ -467,7 +323,7 @@ void CalcSurfaceExtents(mSurface_p s) {
     =================
 */
 void Mod_LoadFaces(Lump_p Lump_in) {
-    dFace_p in = getMapLumpPtr(Lump_in);
+    dFace_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))
         Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
@@ -550,7 +406,7 @@ void Mod_SetParent(mNode_p node, mNode_p parent) {
     =================
 */
 void Mod_LoadNodes(Lump_p Lump_in) {
-    dNode_p in = getMapLumpPtr(Lump_in);
+    dNode_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);
@@ -592,7 +448,7 @@ Mod_LoadClipnodes
 =================
 */
 void Mod_LoadClipnodes(Lump_p Lump_in) {
-    dClipNode_p in = getMapLumpPtr(Lump_in);
+    dClipNode_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);
@@ -652,7 +508,7 @@ void Mod_LoadEntities(Lump_p Lump_in) {
     if (!Lump_in->fileLen) { _loadModel->entities = NULL; return; }
 
     _loadModel->entities = Hunk_AllocName(Lump_in->fileLen, Mod_loadName);
-    memcpy(_loadModel->entities, getMapLumpPtr(Lump_in), Lump_in->fileLen);
+    memcpy(_loadModel->entities, getMapLumpPtr(mod_base, Lump_in), Lump_in->fileLen);
 }
 
 
@@ -662,7 +518,7 @@ void Mod_LoadEntities(Lump_p Lump_in) {
     =================
 */
 void Mod_LoadSubmodels(Lump_p Lump_in) {
-    dModel_p in = getMapLumpPtr(Lump_in);
+    dModel_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);

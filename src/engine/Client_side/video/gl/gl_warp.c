@@ -928,7 +928,7 @@ void R_InitSky(Texture_p mt) {
 
     uint32_t trans[128 * 128];
 
-    uint8_p src = (uint8_p)mt + mt->offsets[Mip0];
+    uint8_p src = GetMipPtr(mt, Mip0);
 
     // make an average value for the back to avoid
     // a fringe on the top level

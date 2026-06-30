@@ -41,11 +41,7 @@ extern mTriangle_t triangles[MAXALIASTRIS];
 extern TriVertx_p poseverts[MAXALIASFRAMES];
 #endif
 extern char Mod_loadName[32]; // for hunk tags
-
 extern uint8_p mod_base;
-#define getMapLumpPtr(Lump_p) \
-    (TypeLess_ptr)(mod_base + Lump_p->fileOfs)
-
 extern Model_p _loadModel;
 
 /*

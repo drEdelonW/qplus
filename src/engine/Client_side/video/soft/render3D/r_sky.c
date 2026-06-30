@@ -70,7 +70,7 @@ A sky texture is 256*128, with the right side being a masked overlay
 ==============
 */
 void R_InitSky(Texture_p mt) {
-    uint8_p src = (uint8_p)mt + mt->offsets[Mip0];  // TODO: hide offset[mip]. use texture ptr_getter
+    uint8_p src = GetMipPtr(mt, Mip0);
 
     for (int i = 0; i < SKYSIZE; i++)
         for (int j = 0; j < SKYSIZE; j++)

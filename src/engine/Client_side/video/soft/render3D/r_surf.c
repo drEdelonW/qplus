@@ -185,7 +185,7 @@ void R_DrawSurface() {
 
     surfrowbytes = r_drawsurf.rowbytes;
     Texture_p mt = r_drawsurf.texture;
-    r_source = (uint8_p)mt + mt->offsets[r_drawsurf.surfmip];
+    r_source = GetMipPtr(mt, r_drawsurf.surfmip);
 
     // the fractional light values should range from 0 to INT_TO_FIXED16(VID_GRADES - 1)
     // from a source range of 0 - 255
@@ -503,18 +503,10 @@ R_GenTile
 void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest) {
     if (psurf->flags & SURF_DRAWTURB) {
         if (r_pixbytes == 1) {
-            R_GenTurbTile(
-                (pixel_p)(
-                    (uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[Mip0]),
-                pdest
-            );
+            R_GenTurbTile(GetMipPtr(psurf->texinfo->texture, Mip0), pdest);
         }
         else {
-            R_GenTurbTile16(
-                (pixel_p)(
-                    (uint8_p)psurf->texinfo->texture + psurf->texinfo->texture->offsets[Mip0]),
-                pdest
-            );
+            R_GenTurbTile16(GetMipPtr(psurf->texinfo->texture, Mip0), pdest);
         }
     }
     else if (psurf->flags & SURF_DRAWSKY) {

@@ -204,10 +204,7 @@ void D_DrawSurfaces() {
             else if (surf->flags & SURF_DRAWTURB) {
                 mSurface_p pface = surf->data;
                 _miplevel = Mip0;
-                cacheblock = (pixel_p)(
-                    (uint8_p)pface->texinfo->texture +
-                    pface->texinfo->texture->offsets[Mip0]
-                    );
+                cacheblock = (pixel_p)GetMipPtr(pface->texinfo->texture, Mip0);
                 cachewidth = 64;
 
                 if (surf->insubmodel) {

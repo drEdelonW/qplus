@@ -30,6 +30,14 @@ struct Particle_s {
     ParticleType_t  type;
 };
 
-void D_DrawParticle(Particle_p pparticle);
-void D_EndParticles();
-void D_StartParticles();
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    void D_DrawParticle(Particle_p pparticle);
+    void D_EndParticles();
+    void D_StartParticles();
+
+#ifdef __cplusplus
+}
+#endif
