@@ -32,8 +32,21 @@ typedef enum {
     VCR_ENDOF_PLAYBACK   = 255u
 } vcr_opcode_t;
 
+typedef struct {
+    LegTime_t       time;
+    vcr_opcode_t    op; // it was int
+    int32_t         session;
+    union {
+        int r;
+        int ret;
+    };
+    int32_t len;
+
+} vGMsg_t;
+
+extern bool isVCRrec;
+
 extern int  vcrFile;
-#define VCR_SIGNATURE (uint32_t)(0x56435231)
 
 int VCR_Init();
 void VCR_Listen(bool state);

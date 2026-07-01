@@ -76,7 +76,6 @@ int32_t unreliableMessagesReceived = 0;
 bool configRestored = false;
 
 int  vcrFile = -1;
-bool recording = false;
 
 // these two macros are to make the code more readable
 #define sfunc net_drivers[sock->driver]
@@ -386,11 +385,8 @@ NET_CheckNewConnections
 ===================
 */
 
-struct {
-    LegTime_t time;
-    vcr_opcode_t op;
-    int32_t  session;
-} vcrConnect;
+static vGMsg_t vcrConnect;
+
 
 qsocket_p NET_CheckNewConnections() {
     SetNetTime();
@@ -401,7 +397,7 @@ qsocket_p NET_CheckNewConnections() {
             continue;
         qsocket_p ret = dfunc.CheckNewConnections();
         if (ret) {
-            if (recording) {
+            if (isVCRrec) {
                 vcrConnect.time = host_time;
                 vcrConnect.op = VCR_OP_CONNECT;
                 vcrConnect.session = (intptr_t)ret;
@@ -412,7 +408,7 @@ qsocket_p NET_CheckNewConnections() {
         }
     }
 
-    if (recording) {
+    if (isVCRrec) {
         vcrConnect.time = host_time;
         vcrConnect.op = VCR_OP_CONNECT;
         vcrConnect.session = 0;
@@ -453,13 +449,6 @@ returns -1 if connection is invalid
 =================
 */
 
-typedef struct {
-    LegTime_t time;
-    vcr_opcode_t op;
-    int32_t session;
-    int32_t ret;
-    int32_t len;
-} vGMsg_t;
 vGMsg_t vcrGetMessage;
 
 
@@ -492,7 +481,7 @@ int32_t NET_GetMessage(qsocket_p sock) {
             else if (ret == 2)  unreliableMessagesReceived++;
         }
 
-        if (recording) {
+        if (isVCRrec) {
             vcrGetMessage = (vGMsg_t){
                 .time = host_time,
                 .op = VCR_OP_GETMESSAGE,
@@ -505,7 +494,7 @@ int32_t NET_GetMessage(qsocket_p sock) {
         }
     }
     else {
-        if (recording) {
+        if (isVCRrec) {
             vcrGetMessage = (vGMsg_t){
                 .time = host_time,
                 .op = VCR_OP_GETMESSAGE,
@@ -532,13 +521,8 @@ returns 1 if the message was sent properly
 returns -1 if the connection died
 ==================
 */
-struct
-{
-    LegTime_t  time;
-    vcr_opcode_t op;
-    int32_t  session;
-    int r;
-} vcrSendMessage;
+
+vGMsg_t vcrSendMessage;
 
 int32_t NET_SendMessage(qsocket_p sock, sizebuf_p data) {
     if (!sock)
@@ -554,7 +538,7 @@ int32_t NET_SendMessage(qsocket_p sock, sizebuf_p data) {
     if ((r == 1) && sock->driver)
         messagesSent++;
 
-    if (recording) {
+    if (isVCRrec) {
         vcrSendMessage.time = host_time;
         vcrSendMessage.op = VCR_OP_SENDMESSAGE;
         vcrSendMessage.session = (intptr_t)sock;
@@ -580,7 +564,7 @@ int32_t NET_SendUnreliableMessage(qsocket_p sock, sizebuf_p data) {
     if ((r == 1) && sock->driver)
         unreliableMessagesSent++;
 
-    if (recording) {
+    if (isVCRrec) {
         vcrSendMessage.time = host_time;
         vcrSendMessage.op = VCR_OP_SENDMESSAGE;
         vcrSendMessage.session = (intptr_t)sock;
@@ -609,7 +593,7 @@ bool NET_CanSendMessage(qsocket_p sock) {
 
     int32_t r = sfunc.CanSendMessage(sock);
 
-    if (recording) {
+    if (isVCRrec) {
         vcrSendMessage.time = host_time;
         vcrSendMessage.op = VCR_OP_CANSENDMESSAGE;
         vcrSendMessage.session = (intptr_t)sock;
@@ -689,8 +673,6 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
 NET_Init
 ====================
 */
-#undef SERVER   // TODO: remove this workaround
-#include "client.h"
 void NET_Init() {
     if (COM_CheckParm("-playback")) {
         net_numdrivers = 1;
@@ -698,7 +680,7 @@ void NET_Init() {
     }
 
     if (COM_CheckParm("-record"))
-        recording = true;
+        isVCRrec = true;
 
     int param = COM_CheckParm("-port");
     if (!param)     param = COM_CheckParm("-udpport");

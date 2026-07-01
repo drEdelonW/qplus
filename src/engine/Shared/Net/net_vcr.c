@@ -29,12 +29,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // everything necessary (events, timestamps, and data) to duplicate the game
 // from the viewpoint of everything above the network layer.
 
-typedef struct {
-    LegTime_t       time;
-    vcr_opcode_t    op; // it was int
-    int32_t         session;
-} vcrNext_t;
-static vcrNext_t next;
+bool isVCRrec = false;
+static vGMsg_t next;
 
 static net_driver_t _VCR_driver = {
         "Video Cassette Recorder",

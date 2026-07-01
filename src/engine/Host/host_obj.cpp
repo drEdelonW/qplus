@@ -658,6 +658,7 @@ void Host::Frame(float time) {
 
 
 // "VCR1"
+#define VCR_SIGNATURE (uint32_t)(0x56435231)
 
 void Host::InitVCR(QuakeParms_p parms) {
 

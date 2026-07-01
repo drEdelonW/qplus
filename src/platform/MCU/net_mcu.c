@@ -58,29 +58,33 @@ net_driver_t net_drivers[MAX_NET_DRIVERS] = {
 int32_t net_numdrivers = 1;
 
 net_landriver_t net_landrivers[MAX_NET_DRIVERS] = {
-    // {
-    //     "UDP",
-    //     false,
-    //     0,
-    //     UDP_Init,
-    //     UDP_Shutdown,
-    //     UDP_Listen,
-    //     UDP_OpenSocket,
-    //     UDP_CloseSocket,
-    //     UDP_Connect,
-    //     UDP_CheckNewConnections,
-    //     UDP_Read,
-    //     UDP_Write,
-    //     UDP_Broadcast,
-    //     UDP_AddrToString,
-    //     UDP_StringToAddr,
-    //     UDP_GetSocketAddr,
-    //     UDP_GetNameFromAddr,
-    //     UDP_GetAddrFromName,
-    //     UDP_AddrCompare,
-    //     UDP_GetSocketPort,
-    //     UDP_SetSocketPort
-    // }
+#if 0
+    {
+        "UDP",
+        false,
+        0,
+        UDP_Init,
+        UDP_Shutdown,
+        UDP_Listen,
+        UDP_OpenSocket,
+        UDP_CloseSocket,
+        UDP_Connect,
+        UDP_CheckNewConnections,
+        UDP_Read,
+        UDP_Write,
+        UDP_Broadcast,
+        UDP_AddrToString,
+        UDP_StringToAddr,
+        UDP_GetSocketAddr,
+        UDP_GetNameFromAddr,
+        UDP_GetAddrFromName,
+        UDP_AddrCompare,
+        UDP_GetSocketPort,
+        UDP_SetSocketPort
+    }
+#else
+    {0}
+#endif
 };
 
 int32_t net_numlandrivers = 0;

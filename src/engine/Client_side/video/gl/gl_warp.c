@@ -36,13 +36,13 @@ float speedscale;  // for top sky and bottom sky
 mSurface_p warpface;
 
 
-void BoundPoly(int numverts, vec3_p verts, vec3_p mins, vec3_p maxs) {
-    *mins = Scalar2Vector(9999.0f);
-    *maxs = Scalar2Vector(-9999.0f);
+void BoundPoly(int numverts, vec3_p verts, BBox_p bb) {
+    bb->mins = Scalar2Vector(9999.0f);
+    bb->maxs = Scalar2Vector(-9999.0f);
     for (int i = 0; i < numverts; i++) {
         for (int j = 0; j < VECT_DIM; j++) {
-            CLAMP_LESS(maxs->v[j], verts[i].v[j]);
-            CLAMP_MORE(mins->v[j], verts[i].v[j]);
+            CLAMP_LESS(bb->maxs.v[j], verts[i].v[j]);
+            CLAMP_MORE(bb->mins.v[j], verts[i].v[j]);
         }
     }
 }
@@ -54,21 +54,20 @@ void SubdividePolygon(int numverts, vec3_p verts) {
 
     if (numverts > 60)      Host_SysError("numverts = %i", numverts);
 
-    vec3_t mins;
-    vec3_t maxs;
-    BoundPoly(numverts, verts, &mins, &maxs);
+    BBox_t bb;
+    BoundPoly(numverts, verts, &bb);
 
     float subDivSz = gl_subdivide_size.value;
     vec3_t snap_arg = VectorAddVal(VectorScale(
-        VectorAdd(mins, maxs),
+        VectorAdd(bb.mins, bb.maxs),
         (0.5f / subDivSz)), 0.5f
     );
     vec_t m;
     int i = 0;
     for (; i < VECT_DIM; i++) {
         m = subDivSz * floor(snap_arg.v[i]);
-        if ((maxs.v[i] - m) < 8.0f)      continue;
-        if ((m - mins.v[i]) < 8.0f)      continue;
+        if ((bb.maxs.v[i] - m) < 8.0f)      continue;
+        if ((m - bb.mins.v[i]) < 8.0f)      continue;
         break;
     }
 

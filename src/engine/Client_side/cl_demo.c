@@ -55,13 +55,13 @@ void CL_FinishTimeDemo() {
 
     // the first frame didn't count
     int frames = (host_framecount - cls.td_startframe) - 1;
-    LegDt_t time = (LegDt_t)(realtime - cls.td_starttime);
-    if (!time)
-        time = 1;
+    RealDt_t time = realtime - cls.td_starttime;
+    if (!time)  time = 1.f;
+
     Con_Printf(
         "%i frames %5.1f seconds %5.1f fps\n",
-         frames, time, (LegDt_t)frames / time
-        );
+        frames, time, (LegDt_t)frames / time
+    );
 }
 
 /*
@@ -140,21 +140,20 @@ int CL_GetMessage() {
         if (net_message.cursize > MAX_MSGLEN)
             Host_SysError("Demo message > MAX_MSGLEN");
 
-        size_t r = fread(net_message.data, net_message.cursize, 1, cls.demofile);
-        if (r != 1) {
+        if (fread(net_message.data, net_message.cursize, 1, cls.demofile) != 1) {
             CL_StopPlayback();
             return 0;
         }
         return 1;
     }
 
-    int r;
+    int nRet;
     while (1) {
-        r = NET_GetMessage(cls.netcon);
+        nRet = NET_GetMessage(cls.netcon);
 
-        if ((r != 1) &&
-            (r != 2))
-            return r;
+        if ((nRet != 1) &&
+            (nRet != 2))
+            return nRet;
 
         // discard nop keepalive message
         if ((net_message.cursize == 1) && (net_message.data[0] == svc_nop))
@@ -166,7 +165,7 @@ int CL_GetMessage() {
     if (cls.demorecording)
         CL_WriteDemoMessage();
 
-    return r;
+    return nRet;
 }
 
 

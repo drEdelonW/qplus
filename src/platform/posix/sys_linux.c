@@ -224,7 +224,7 @@ int main(int c, cStringArray v) {
         if (Host_IsDedicated()) {     // play vcrfiles at max speed
             if ((time < sys_ticrate.value) &&
                 ((vcrFile == -1) ||
-                    (recording))
+                    (isVCRrec))
                 ) {
                 usleep(1);
                 continue;       // not time to run a server only tic yet
