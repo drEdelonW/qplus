@@ -24,17 +24,9 @@ typedef enum {
     VECT_DIM = 3u,
 } axis_e;
 
-/* Euler angle indices: up/down, left/right, roll (fall over) */
-enum {
-    PITCH = 0u,  /* up/down */
-    YAW = 1u,  /* left/right */
-    ROLL = 2u,  /* roll (fall over) */
-    ANGLES_COUNT = 3u
-};
-
 typedef union {
     struct { vec_t x, y, z; };
-    struct { float pitch, yaw, roll; };
+    // struct { float pitch, yaw, roll; }; // it move to ang3_t in angle.h
     vec_t v[VECT_DIM];
 } vec3_t;
 STATIC_ASSERT_SIZE(vec3_t, 3 * sizeof(vec_t));

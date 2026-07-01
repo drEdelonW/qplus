@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "types.h"
 #include "vector.h"
+#include "angle.h"
 #include "pr_qString.h"
 #include "pr_Function.h"
 

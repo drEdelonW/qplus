@@ -282,9 +282,8 @@ void CL_RelinkEntities() {
 
     if (cls.demoplayback) {
         // interpolate the angles
-        cl.viewangles = VectorMA(cl.mviewangles[1],
-            frac, VectorAngleProc(
-                VectorSubtract(cl.mviewangles[0], cl.mviewangles[1]))
+        cl.viewangles = AngleMA(cl.mviewangles[1],
+            frac, AngleSubtract(cl.mviewangles[0], cl.mviewangles[1])
         );
     }
 
@@ -325,9 +324,8 @@ void CL_RelinkEntities() {
             // interpolate the origin and angles
             ent->origin = VectorMA(ent->msg_origins[1], f, delta);
 
-            ent->angles = VectorMA(ent->msg_angles[1],
-                f, VectorAngleProc(
-                    VectorSubtract(ent->msg_angles[0], ent->msg_angles[1]))
+            ent->angles = AngleMA(ent->msg_angles[1],
+                f, AngleSubtract(ent->msg_angles[0], ent->msg_angles[1])
             );
         }
 
@@ -378,7 +376,7 @@ void CL_RelinkEntities() {
             dl->origin = ent->origin;
             dl->radius = 200;
             dl->die = cl.time + 0.001;
-    }
+        }
 #endif
 
         if (ent->model->flags & EF_GIB)             R_RocketTrail(oldorg, ent->origin, RT_GIB);
@@ -406,7 +404,7 @@ void CL_RelinkEntities() {
             cl_visedicts[cl_numvisedicts] = ent;
             cl_numvisedicts++;
         }
-}
+    }
 
 }
 

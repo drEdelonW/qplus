@@ -63,7 +63,7 @@ Used by view and sv_user
 
 static Basis_t _bs;
 
-float V_CalcRoll(vec3_t angles, vec3_t velocity) {
+float V_CalcRoll(ang3_t angles, vec3_t velocity) {
     _bs = GetBasis(angles);
     float side = DotProduct(velocity, _bs.right);
     float sign = (side < 0.0f) ? -1.0f : 1.0f;
@@ -650,12 +650,12 @@ void V_AddIdle() {
     r_refdef.viewangles.pitch += v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
     r_refdef.viewangles.yaw += v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
 #else
-    vec3_t v_i = (vec3_t){
+    ang3_t v_i = (ang3_t){
         .pitch = sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value,
         .yaw = sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value,
         .roll = sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value,
     };
-    r_refdef.viewangles = VectorMA(r_refdef.viewangles, v_idlescale.value, v_i);
+    r_refdef.viewangles = AngleMA(r_refdef.viewangles, v_idlescale.value, v_i);
 #endif
 }
 
@@ -753,7 +753,7 @@ void V_CalcRefdef() {
        .z = ent->angles.roll    /* angles[ROLL] */
     };
 #else
-    vec3_t angles = ent->angles;
+    ang3_t angles = ent->angles;
     angles.pitch = -angles.pitch;   // because entity pitches are actually backward
 #endif
 
@@ -798,7 +798,7 @@ void V_CalcRefdef() {
     view->colormap = vid.colormap;
 
     // set up the refresh position
-    r_refdef.viewangles = VectorAdd(r_refdef.viewangles, cl.punchangle);
+    r_refdef.viewangles = AngleAdd(r_refdef.viewangles, cl.punchangle);
 
     // smooth out stair step ups
     if ((cl.onground) &&

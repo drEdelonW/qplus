@@ -1035,7 +1035,7 @@ void SV_Physics_Noclip(edict_p ent) {
     // regular thinking
     if (!SV_RunThink(ent))  return;
 
-    ent->v.angles = VectorMA(ent->v.angles, (float)host_frametime, ent->v.avelocity);
+    ent->v.angles = AngleMA(ent->v.angles, (float)host_frametime, ent->v.avelocity);
     ent->v.origin = VectorMA(ent->v.origin, (float)host_frametime, ent->v.velocity);
 
     SV_LinkEdict(ent, false);
@@ -1141,7 +1141,7 @@ void SV_Physics_Toss(edict_p ent) {
 #endif
 
     // move angles
-    ent->v.angles = VectorMA(ent->v.angles, (float)host_frametime, ent->v.avelocity);
+    ent->v.angles = AngleMA(ent->v.angles, (float)host_frametime, ent->v.avelocity);
 
     // move origin
 #ifdef QUAKE2
@@ -1180,7 +1180,7 @@ void SV_Physics_Toss(edict_p ent) {
         ent->v.flags = (float)((int)((EntityFlags_t)ent->v.flags) | FL_ONGROUND);
         ent->v.groundentity = ED_GetEDictOffs(trace.ent);
         ent->v.velocity = vec3_origin;
-        ent->v.avelocity = vec3_origin;
+        ent->v.avelocity = ang3_origin;
 
     }
 
@@ -1389,7 +1389,7 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
     while (1) {
         SV_CheckVelocity(tent);
         SV_AddGravity(tent);
-        tent->v.angles = VectorMA(tent->v.angles, (float)host_frametime, tent->v.avelocity);
+        tent->v.angles = AngleMA(tent->v.angles, (float)host_frametime, tent->v.avelocity);
         vec3_t move = VectorScale(tent->v.velocity, (float)host_frametime);
         vec3_t end = VectorAdd(tent->v.origin, move);
         trace_t trace = SV_Move(tent->v.origin, tent->v.mins, tent->v.maxs, end, MOVE_NORMAL, tent);

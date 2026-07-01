@@ -905,7 +905,7 @@ void R_Mirror() {
         (-2 * DotProduct(BS.forward, mirror_plane->normal)), mirror_plane->normal
     );
 
-    r_refdef.viewangles = (vec3_t){
+    r_refdef.viewangles = (ang3_t){
         .pitch = DEG2RAD(-asin(BS.forward.z)),
         .yaw = DEG2RAD(atan2(BS.forward.y, BS.forward.x)),
         .roll = -r_refdef.viewangles.roll

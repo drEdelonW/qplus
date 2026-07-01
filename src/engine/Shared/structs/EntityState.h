@@ -1,7 +1,8 @@
 #pragma once
 
-#include "vector.h"
 #include "types.h"
+#include "vector.h"
+#include "angle.h"
 // entity effects
 typedef enum {
     EF_BRIGHTFIELD  = 1u << 0, // 0x0001
@@ -19,7 +20,7 @@ typedef enum {
 // #pragma pack(push, 1)
 typedef struct {
     vec3_t  origin;
-    vec3_t  angles;
+    ang3_t  angles;
     uint8_t modelindex;
     uint8_t frame;
     uint8_t colormap;

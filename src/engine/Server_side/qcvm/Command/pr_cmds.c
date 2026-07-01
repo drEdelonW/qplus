@@ -121,7 +121,7 @@ void PF_makevectors() {
         &pr_global_struct->v_up
     );
 #else
-    Basis_t bs = GetBasis(G_VECTOR(OFS_PARM0));
+    Basis_t bs = GetBasis(G_ANGLES(OFS_PARM0));
     pr_global_struct->v_forward = bs.forward;
     pr_global_struct->v_right = bs.right;
     pr_global_struct->v_up = bs.up;
@@ -159,7 +159,7 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
     }
     else {
         // find min / max for rotations
-        vec3_t angles = edict->v.angles;
+        ang3_t angles = edict->v.angles;
 
         float a = DEG2RAD(angles.yaw);
 

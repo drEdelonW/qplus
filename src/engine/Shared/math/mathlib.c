@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 vec3_t vec3_origin = { .x = 0.0f, .y = 0.0f, .z = 0.0f };  // TODO: move to more specific place
+ang3_t ang3_origin = { .pitch = 0.f, .yaw = 0.f, .roll = 0.f };  // TODO: move to more specific place
 uint32_t nanmask = 0xFF << 23;
 
 /*-----------------------------------------------------------------*/

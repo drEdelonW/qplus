@@ -1,11 +1,10 @@
 #include "transform.h"
-#include "angle.h"
 #include <math.h>
 
 Basis_t BS;
 Basis_t base_BS;
 
-void AngleVectors(vec3_t angles, vec3_p forward, vec3_p right, vec3_p up) {
+void AngleVectors(ang3_t angles, vec3_p forward, vec3_p right, vec3_p up) {
 #if 0
     angles = VectorScale(angles, (M_PI * 2.0f / 360.0f));
     float sy = sin(angles.yaw);
@@ -60,7 +59,7 @@ void AngleVectors(vec3_t angles, vec3_p forward, vec3_p right, vec3_p up) {
     *     rgt  = cr*rgt0 - sr*up1
     *     up   = sr*rgt0 + cr*up1
     */
-    angles = VectorScale(angles, M_PI * 2.0f / 360.0f);
+    angles = AngleScale(angles, M_PI * 2.0f / 360.0f);
 
     const float sy = sinf(angles.yaw),   cy = cosf(angles.yaw);   /* ring 1: yaw   about Z */
     const float sp = sinf(angles.pitch), cp = cosf(angles.pitch); /* ring 2: pitch about Y */
@@ -88,11 +87,11 @@ void AngleVectors(vec3_t angles, vec3_p forward, vec3_p right, vec3_p up) {
 }
 
 
-void AngleToBasis(vec3_t angles, Basis_p bs) {
+void AngleToBasis(ang3_t angles, Basis_p bs) {
     AngleVectors(angles, &bs->forward, &bs->right, &bs->up);
 }
 
-Basis_t GetBasis(vec3_t angles) {
+Basis_t GetBasis(ang3_t angles) {
     Basis_t out;
     AngleVectors(angles, &out.forward, &out.right, &out.up);
     return out;

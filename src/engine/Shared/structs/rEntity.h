@@ -6,6 +6,7 @@
 #include "Model_pre.h"
 #include "eFrag_pre.h"
 #include "Node.h"
+#include "angle.h"
 
 // it was [entity_t] on render side
 struct r_Entity_s {
@@ -15,8 +16,8 @@ struct r_Entity_s {
     LegTime_t msgtime;// time of last update
     vec3_t  msg_origins[2]; // last two updates(0 is newest)
     vec3_t  origin;
-    vec3_t  msg_angles[2];  // last two updates(0 is newest)
-    vec3_t  angles;
+    ang3_t  msg_angles[2];  // last two updates(0 is newest)
+    ang3_t  angles;
     Model_p model;          // NULL = no model
     efrag_p efrag;          // linked list of efrags
     int     frame;

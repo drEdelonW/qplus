@@ -1,7 +1,7 @@
 #include "angle.h"
 #include "fixed.h"
 
-float anglemod(float a) {
+Angle_t anglemod(Angle_t a) {
 #if 0
     if (a >= 0) a -= 360 * (int)(a / 360);
     else        a += 360 * (1 + (int)(-a / 360));
@@ -11,15 +11,15 @@ float anglemod(float a) {
         FIXED16_FRAC((fixed16_t)(a * (FIXED16_ONE / 360.0f)));
 }
 
-float angledelta(float a) {
+Angle_t angledelta(Angle_t a) {
     a = anglemod(a);
     if (a > 180.0f)     a -= 360.0f;
     return a;
 }
 
-vec3_t VectorAngleProc(vec3_t angles) {
-    vec3_t out = angles;
-    for (int j = 0; j < VECT_DIM; j++) {
+ang3_t AngleProc(ang3_t angles) {
+    ang3_t out = angles;
+    for (int j = 0; j < ANGLES_COUNT; j++) {
         /* */if (out.v[j] > 180.0f)    out.v[j] -= 360.0f;
         else if (out.v[j] < -180.0f)   out.v[j] += 360.0f;
     }

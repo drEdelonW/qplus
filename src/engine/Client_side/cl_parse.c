@@ -630,7 +630,7 @@ void CL_ParseServerMessage() {
             for (int i = 0; i < VECT_DIM; i++)
                 cl.viewangles.v[i] = MSG_ReadAngle();
 #else
-            cl.viewangles = (vec3_t){
+            cl.viewangles = (ang3_t){
                 .pitch = MSG_ReadAngle(),
                 .yaw = MSG_ReadAngle(),
                 .roll = MSG_ReadAngle()

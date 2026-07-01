@@ -364,12 +364,12 @@ void R_SetupFrame() {
 
     // debugging
 #if 0
-    r_refdef.vieworg[0] = 80;
-    r_refdef.vieworg[1] = 64;
-    r_refdef.vieworg[2] = 40;
-    r_refdef.viewangles[0] = 0;
-    r_refdef.viewangles[1] = 46.763641357;
-    r_refdef.viewangles[2] = 0;
+    r_refdef.vieworg.x = 80.0f;
+    r_refdef.vieworg.y = 64.0f;
+    r_refdef.vieworg.z = 40.0f;
+    r_refdef.viewangles.pitch = 0.0f;
+    r_refdef.viewangles.yaw = 46.763641357;
+    r_refdef.viewangles.roll = 0.0f;
 #endif
 
     // build the transformation matrix for the given view angles

@@ -335,7 +335,7 @@ void R_AliasSetUpTransform(int trivial_accept) {
     // TODO: should use a look-up table
     // TODO: could cache lazily, stored in the entity
 
-    vec3_t angles = {
+    ang3_t angles = {
         .pitch = -currententity->angles.pitch,
         .yaw = currententity->angles.yaw,
         .roll = currententity->angles.roll

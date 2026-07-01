@@ -286,13 +286,13 @@ SV_NewChaseDir
 #define DI_NODIR -1.0f
 void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
     // float   orient[3];   // direction angle Euler
-    vec3_t  orient;   // direction angle Euler
+    ang3_t  orient;   // direction angle Euler
 
     float olddir = anglemod((float)((int)(actor->v.ideal_yaw / 45) * 45));
     float turnaround = anglemod(olddir - 180);
 
-    float deltax = enemy->v.origin.pitch - actor->v.origin.pitch;
-    float deltay = enemy->v.origin.yaw - actor->v.origin.yaw;
+    float deltax = enemy->v.origin.x - actor->v.origin.x;
+    float deltay = enemy->v.origin.y - actor->v.origin.y;
 
 #if 0
     if (deltax > 10.0f)         orient.yaw = 0.0f;

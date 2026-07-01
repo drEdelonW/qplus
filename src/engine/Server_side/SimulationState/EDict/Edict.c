@@ -113,7 +113,7 @@ void ED_Free(edict_p ed) {
     ed->v.skin = 0;
     ed->v.frame = 0;
     ed->v.origin = vec3_origin;
-    ed->v.angles = vec3_origin;
+    ed->v.angles = ang3_origin;
     ed->v.nextthink = -1;
     ed->v.solid = 0;
 

@@ -206,7 +206,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
 
         if (ent->v.angles.pitch != ent->baseline.angles.pitch)  bits |= U_ANGLE1;
         if (ent->v.angles.yaw != ent->baseline.angles.yaw)      bits |= U_ANGLE2;
-        if (ent->v.angles.z != ent->baseline.angles.z)    bits |= U_ANGLE3;
+        if (ent->v.angles.roll != ent->baseline.angles.roll)    bits |= U_ANGLE3;
         if (ent->v.movetype == MOVETYPE_STEP)                   bits |= U_NOLERP;  // don't mess up the step animation
         if (ent->v.colormap != ent->baseline.colormap)          bits |= U_COLORMAP;
         if (ent->v.skin != ent->baseline.skin)                  bits |= U_SKIN;

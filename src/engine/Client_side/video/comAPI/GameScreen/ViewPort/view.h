@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // view.h
 
 #include "vector.h"
+#include "angle.h"
 #include "types.h"
 
 extern uint8_t gammatable[256]; // palette is sent through this
@@ -33,7 +34,7 @@ extern "C" {
 
     void V_Init();
     void V_RenderView();
-    float V_CalcRoll(vec3_t angles, vec3_t velocity);
+    float V_CalcRoll(ang3_t angles, vec3_t velocity);
     void V_UpdatePalette();
 #ifdef GLQUAKE
     void V_CalcBlend();

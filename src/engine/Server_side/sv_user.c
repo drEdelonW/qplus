@@ -188,12 +188,12 @@ void SV_Accelerate() {
 
 void SV_AirAccelerate(vec3_t wishveloc) {
     float wishspd = VectorNormalize(&wishveloc);
-    if (wishspd > 30)
-        wishspd = 30;
+    if (wishspd > 30.f)
+        wishspd = 30.f;
 
     float currentspeed = DotProduct(*_velocity, wishveloc);
     float addspeed = wishspd - currentspeed;
-    if (addspeed <= 0)
+    if (addspeed <= 0.f)
         return;
 
     // accelspeed = sv_accelerate.value * host_frametime;
@@ -204,16 +204,29 @@ void SV_AirAccelerate(vec3_t wishveloc) {
     * _velocity = VectorMA(*_velocity, accelspeed, wishveloc);
 }
 
-
+#if 0   /* TODO: clean it */
 void DropPunchAngle() {
     float len = VectorNormalize(&sv_player->v.punchangle);
 
     len -= (float)(10.0 * host_frametime);
-    if (len < 0)
-        len = 0;
+    if (len < 0.0f)     len = 0.0f;
+
     sv_player->v.punchangle = VectorScale(sv_player->v.punchangle, len);
 }
+#else
+static inline float _AngleLen(ang3_t a) { // local trick without physical meaning
+    return sqrtf(a.pitch*a.pitch + a.yaw*a.yaw + a.roll*a.roll);
+}
+void DropPunchAngle(void) {
+    float orig_len = _AngleLen(sv_player->v.punchangle);
+    if (orig_len == 0.f) return;
 
+    float new_len = orig_len - 10.f * (float)host_frametime;
+    if (new_len < 0.f)  new_len = 0.f;
+
+    sv_player->v.punchangle = AngleScale(sv_player->v.punchangle, new_len / orig_len);
+}
+#endif
 /*
 ===================
 SV_WaterMove
@@ -345,10 +358,10 @@ void SV_ClientThink() {
     // angles
     // show 1/3 the pitch angle and all the roll angle
     cmd = remoteClient->cmd;
-    vec3_p _angles = &sv_player->v.angles;
+    ang3_p _angles = &sv_player->v.angles;
 
-    vec3_t v_angle;
-    v_angle = VectorAdd(sv_player->v.v_angle, sv_player->v.punchangle);
+    ang3_t v_angle;
+    v_angle = AngleAdd(sv_player->v.v_angle, sv_player->v.punchangle);
     _angles->roll = V_CalcRoll(sv_player->v.angles, sv_player->v.velocity) * 4;
     if (!(sv_player->v.fixangle)) {
         _angles->pitch = -v_angle.pitch / 3;
@@ -379,10 +392,10 @@ void SV_ReadClientMove(UserCmd_p move) {
     remoteClient->num_pings++;
 
     // read current angles
-    vec3_t angle = {
-        .x = MSG_ReadAngle(),
-        .y = MSG_ReadAngle(),
-        .z = MSG_ReadAngle()
+    ang3_t angle = {
+        .pitch  = MSG_ReadAngle(),
+        .yaw    = MSG_ReadAngle(),
+        .roll   = MSG_ReadAngle()
     };
 
     remoteClient->edict->v.v_angle = angle;

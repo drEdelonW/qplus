@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vector.h"
+#include "angle.h"
 #include "vRect.h"
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
@@ -21,7 +23,7 @@ typedef struct {
     float   xOrigin;                // should probably allways be 0.5
     float   yOrigin;                // between be around 0.3 to 0.5
     vec3_t  vieworg;
-    vec3_t  viewangles;
+    ang3_t  viewangles;
     float   fov_x, fov_y;
     int     ambientlight;
 } refdef_t;

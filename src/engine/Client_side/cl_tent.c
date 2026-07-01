@@ -383,7 +383,7 @@ void CL_UpdateTEnts() {
         vec3_t dist = VectorSubtract(b->end, b->start);
 
         // float yaw, pitch;   // TODO: wrap to vec3_t
-        vec3_t tV;
+        ang3_t tV;
         if ((dist.y == 0.0f) &&
             (dist.x == 0.0f)
             ) {
