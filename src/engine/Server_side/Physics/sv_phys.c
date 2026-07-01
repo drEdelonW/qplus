@@ -51,10 +51,10 @@ solid_edge items only clip against bsp models.
 
 /* --- movement clip flags (bitmask) --- */
 typedef enum {
-    MOVECLIP_NONE = 0u,        /* no block */
-    MOVECLIP_FLOOR = 1u << 0,   /* floor (normal[Z_AX] > 0) */
-    MOVECLIP_WALL = 1u << 1,   /* wall/step (normal[Z_AX] == 0) */
-    MOVECLIP_DEADSTOP = 1u << 2,   /* dead stop (reserved by original comment) */
+    MOVECLIP_NONE       = 0u,        /* no block */
+    MOVECLIP_FLOOR      = 1u << 0,   /* floor (normal[Z_AX] > 0) */
+    MOVECLIP_WALL       = 1u << 1,   /* wall/step (normal[Z_AX] == 0) */
+    MOVECLIP_DEADSTOP   = 1u << 2,   /* dead stop (reserved by original comment) */
 
     /* --- special early-return results (non-bitmask) --- */
     /* note: 3 == (MOVECLIP_FLOOR|MOVECLIP_WALL) by value; here it is used as “trapped/allsolid” */
@@ -62,14 +62,6 @@ typedef enum {
     FLYMOVE_STUCK = FLYMOVE_TRAPPED | MOVECLIP_DEADSTOP /* unresolvable geometry / still stuck */
 } MoveClipFlags_e;
 
-
-#ifdef QUAKE2
-static vec3_t _vecOrigin = {
-    .x = 0.0f,
-    .y = 0.0f,
-    .z = 0.0f
-};
-#endif
 
 #define MOVE_EPSILON 0.01
 
@@ -1100,6 +1092,13 @@ SV_Physics_Toss
 Toss, bounce, and fly movement.  When onground, do nothing.
 =============
 */
+#ifdef QUAKE2
+static vec3_t _vecOrigin = {
+    .x = 0.0f,
+    .y = 0.0f,
+    .z = 0.0f
+};
+#endif
 void SV_Physics_Toss(edict_p ent) {
 #ifdef QUAKE2
     edict_p groundentity = ED_GetEDictByOffs(ent->v.groundentity);

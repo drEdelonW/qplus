@@ -412,11 +412,8 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
                     .y = node->bb.v[pindex[1]],
                     .z = node->bb.v[pindex[2]],
                 };
-                double d = DotProduct(rejectpt, view_clipplanes[i].normal) -
-                    view_clipplanes[i].dist;
-
-                if (d <= 0)
-                    return;
+                double d = DotProduct(rejectpt, view_clipplanes[i].normal) - view_clipplanes[i].dist;
+                if (d <= 0.0f)     return;
             }
             {
                 vec3_t acceptpt = {
@@ -424,11 +421,8 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
                     .y = node->bb.v[pindex[3 + 1]],
                     .z = node->bb.v[pindex[3 + 2]]
                 };
-                double d = DotProduct(acceptpt, view_clipplanes[i].normal) -
-                    view_clipplanes[i].dist;
-
-                if (d >= 0)
-                    clipflags &= ~(1 << i); // node is entirely on screen
+                double d = DotProduct(acceptpt, view_clipplanes[i].normal) - view_clipplanes[i].dist;
+                if (d >= 0.0f)     clipflags &= ~(1 << i); // node is entirely on screen
             }
         }
     }

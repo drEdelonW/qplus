@@ -18,24 +18,33 @@ void BOPS_Error() { Host_SysError("BoxOnPlaneSide:  Bad signbits"); }
 ==================
 BoxOnPlaneSide
 
-Returns 1, 2, or 1 + 2
+PlaneSide_t PsFront, PsBack, or PsBoth
 ==================
 */
+// bbox_indexes[signbits][axis] -> bounds selector for dist1 (near corner)
+// dist2 selector is always ^ 1
+static const int bbox_indexes[8][3] = {
+    {1, 1, 1},  // 0b000: all positive
+    {0, 1, 1},  // 0b001: x negative
+    {1, 0, 1},  // 0b010: y negative
+    {0, 0, 1},  // 0b011: x,y negative
+    {1, 1, 0},  // 0b100: z negative
+    {0, 1, 0},  // 0b101: x,z negative
+    {1, 0, 0},  // 0b110: y,z negative
+    {0, 0, 0},  // 0b111: all negative
+};
 PlaneSide_t BoxOnPlaneSide(BBox_t eBB, mPlane_p plane) {
-    // Extract bits: 0 if bit is set (negative -> use min), 1 if bit is clear (positive -> use max)
-    const int bit_x = ((plane->signbits >> 0) & 1) ^ 1;
-    const int bit_y = ((plane->signbits >> 1) & 1) ^ 1;
-    const int bit_z = ((plane->signbits >> 2) & 1) ^ 1;
+    const int* pindex = bbox_indexes[plane->signbits];
 
     float dist1 =
-        plane->normal.x * eBB.bounds[bit_x].x +
-        plane->normal.y * eBB.bounds[bit_y].y +
-        plane->normal.z * eBB.bounds[bit_z].z;
+        plane->normal.x * eBB.bounds[pindex[X_AX]  ].x +
+        plane->normal.y * eBB.bounds[pindex[Y_AX]  ].y +
+        plane->normal.z * eBB.bounds[pindex[Z_AX]  ].z;
 
     float dist2 =   // For dist2 we just invert the selection
-        plane->normal.x * eBB.bounds[bit_x ^ 1].x +
-        plane->normal.y * eBB.bounds[bit_y ^ 1].y +
-        plane->normal.z * eBB.bounds[bit_z ^ 1].z;
+        plane->normal.x * eBB.bounds[pindex[X_AX]^1].x +
+        plane->normal.y * eBB.bounds[pindex[Y_AX]^1].y +
+        plane->normal.z * eBB.bounds[pindex[Z_AX]^1].z;
 
     PlaneSide_t sides = PsNone;
     if (dist1 >= plane->dist)   sides |= PsFront;

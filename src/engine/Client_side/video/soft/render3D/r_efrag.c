@@ -183,13 +183,8 @@ void R_AddEfrags(r_Entity_p ent) {
 
     Model_p entmodel = ent->model;
 
-#if 0
-    r_emins = VectorAdd(ent->origin, entmodel->mins);
-    r_emaxs = VectorAdd(ent->origin, entmodel->maxs);
-#else
-    r_entBB.mins = VectorAdd(ent->origin, entmodel->BB.mins);
-    r_entBB.maxs = VectorAdd(ent->origin, entmodel->BB.maxs);
-#endif
+    r_entBB = BBoxTranslate(entmodel->BB, ent->origin);
+
     R_SplitEntityOnNode(cl.worldmodel->nodes);
     ent->topnode = r_pefragtopnode;
 }

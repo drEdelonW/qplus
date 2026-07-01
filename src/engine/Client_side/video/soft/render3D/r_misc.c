@@ -296,7 +296,7 @@ void R_SetUpFrustumIndexes() {
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < VECT_DIM; j++) {
-            if (view_clipplanes[i].normal.v[j] < 0) {
+            if (view_clipplanes[i].normal.v[j] < 0.0f) {
                 pindex[j] = j;
                 pindex[j + 3] = j + 3;
             }

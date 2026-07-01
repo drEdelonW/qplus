@@ -604,11 +604,8 @@ AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
                     .y = bb.v[pindex[1]],
                     .z = bb.v[pindex[2]]
                 };
-                double d = DotProduct(rejectpt, view_clipplanes[i].normal) -
-                    view_clipplanes[i].dist;
-
-                if (d <= 0)
-                    return BMODEL_FULLY_CLIPPED;
+                double d = DotProduct(rejectpt, view_clipplanes[i].normal) - view_clipplanes[i].dist;
+                if (d <= 0.0f)     return BMODEL_FULLY_CLIPPED;
             }
             {
                 vec3_t acceptpt = {
@@ -616,11 +613,8 @@ AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
                     .y = bb.v[pindex[3 + 1]],
                     .z = bb.v[pindex[3 + 2]]
                 };
-                double d = DotProduct(acceptpt, view_clipplanes[i].normal) -
-                    view_clipplanes[i].dist;
-
-                if (d <= 0)
-                    clipflags |= (1 << i);
+                double d = DotProduct(acceptpt, view_clipplanes[i].normal) - view_clipplanes[i].dist;
+                if (d <= 0.0f)     clipflags |= (1 << i);
             }
         }
     }
@@ -649,11 +643,7 @@ void R_DrawBEntitiesOnList() {
             Model_p clmodel = currententity->model;
 
             // see if the bounding box lets us trivially reject, also sets trivial accept status
-            BBox_t bb = (BBox_t){
-                .mins = VectorAdd(currententity->origin, clmodel->BB.mins),
-                .maxs = VectorAdd(currententity->origin, clmodel->BB.maxs)
-            };
-
+            BBox_t bb = BBoxTranslate(clmodel->BB, currententity->origin);
             AliasClipFlags_f clipflags = R_BmodelCheckBBox(clmodel, bb);
 
             if (clipflags != BMODEL_FULLY_CLIPPED) {
