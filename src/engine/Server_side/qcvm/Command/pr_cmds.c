@@ -250,7 +250,7 @@ void PF_setmodel() {
 
     Model_p mod = sv.models[(int)edict->v.modelindex]; // Mod_ForName (m, true);
 
-    if (mod)    SetMinMaxSize(edict, mod->mins, mod->maxs, true);
+    if (mod)    SetMinMaxSize(edict, mod->BB.mins, mod->BB.maxs, true);
     else        SetMinMaxSize(edict, vec3_origin, vec3_origin, true);
 }
 

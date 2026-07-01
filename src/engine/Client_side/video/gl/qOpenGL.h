@@ -4,6 +4,7 @@
 #include "cvar.h"
 #include "rEntity.h"
 #include "transform.h"
+#include "BBox.h"
 
 #include "glquake.h"
 #include "Light.h"
@@ -60,7 +61,7 @@ extern "C" {
     void EmitSkyPolys(mSurface_p fa);
     void EmitBothSkyLayers(mSurface_p fa);
     void R_DrawSkyChain(mSurface_p s);
-    bool R_CullBox(vec3_t mins, vec3_t maxs);
+
     void R_MarkLights(dLight_p light, int bit, mNode_p node);
     void R_RotateForEntity(r_Entity_p e);
     void R_StoreEfrags(efrag_ar ppefrag);

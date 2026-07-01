@@ -44,7 +44,11 @@ mNode_p r_pefragtopnode;
 */
 
 efrag_ar    lastlink;
+#if 0
 vec3_t      r_emins, r_emaxs;
+#else
+BBox_t      r_entBB;
+#endif
 r_Entity_p  r_addent;
 
 
@@ -123,7 +127,7 @@ void R_SplitEntityOnNode(mNode_p node) {
     // NODE_MIXED
 
     mPlane_p splitplane = node->plane;
-    int sides = BOX_ON_PLANE_SIDE(r_emins, r_emaxs, splitplane);
+    int sides = BOX_ON_PLANE_SIDE(r_entBB.mins, r_entBB.maxs, splitplane);
 
     if (sides == 3) {
         // split on this plane
@@ -154,7 +158,7 @@ void R_SplitEntityOnNode2(mNode_p node) {
     }
 
     mPlane_p splitplane = node->plane;
-    int sides = BOX_ON_PLANE_SIDE(r_emins, r_emaxs, splitplane);
+    int sides = BOX_ON_PLANE_SIDE(r_entBB.mins, r_entBB.maxs, splitplane);
 
     if (sides == 3) {
         // remember first splitter
@@ -185,9 +189,13 @@ void R_AddEfrags(r_Entity_p ent) {
 
     Model_p entmodel = ent->model;
 
+#if 0
     r_emins = VectorAdd(ent->origin, entmodel->mins);
     r_emaxs = VectorAdd(ent->origin, entmodel->maxs);
-
+#else
+    r_entBB.mins = VectorAdd(ent->origin, entmodel->BB.mins);
+    r_entBB.maxs = VectorAdd(ent->origin, entmodel->BB.maxs);
+#endif
     R_SplitEntityOnNode(cl.worldmodel->nodes);
     ent->topnode = r_pefragtopnode;
 }

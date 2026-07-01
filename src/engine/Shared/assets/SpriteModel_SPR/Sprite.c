@@ -197,10 +197,18 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
     mod->synctype = LittleLong(pin->synctype);
     psprite->numframes = numframes;
 
-    mod->mins.x = mod->mins.y = -HALF(psprite->maxwidth);
-    mod->maxs.x = mod->maxs.y = HALF(psprite->maxwidth);
-    mod->mins.z = -HALF(psprite->maxheight);
-    mod->maxs.z = HALF(psprite->maxheight);
+    mod->BB = (BBox_t){
+        .mins = {
+            .x = -HALF(psprite->maxwidth),
+            .y = -HALF(psprite->maxwidth),
+            .z = -HALF(psprite->maxheight)
+        },
+        .maxs = {
+            .x = HALF(psprite->maxwidth),
+            .y = HALF(psprite->maxwidth),
+            .z = HALF(psprite->maxheight)
+        }
+    };
 
     //
     // load the frames
@@ -242,8 +250,8 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
         default: {
             Host_Error(".SPR frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);
         } break;
-    }
+        }
 
-}
+    }
     mod->type = mod_sprite;
 }

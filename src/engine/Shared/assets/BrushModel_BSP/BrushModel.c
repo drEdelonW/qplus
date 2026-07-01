@@ -234,13 +234,8 @@ void Mod_LoadLeafs(Lump_p Lump_in) {
 
     for (int i = 0; i < count; i++, in++, out++) {
         for (int j = 0; j < 3; j++) {
-#ifdef GLQUAKE
-            out->min.v[j] = LittleShort(in->mins[j]);
-            out->max.v[j] = LittleShort(in->maxs[j]);
-#else
-            out->minmaxs[j] = LittleShort(in->mins[j]);
-            out->minmaxs[3 + j] = LittleShort(in->maxs[j]);
-#endif
+            out->bb.min.v[j] = (vec_t)LittleShort(in->mins[j]);
+            out->bb.max.v[j] = (vec_t)LittleShort(in->maxs[j]);
         }
 
         out->contents = LittleLong(in->contents);
@@ -418,11 +413,11 @@ void Mod_LoadNodes(Lump_p Lump_in) {
     for (int i = 0; i < count; i++, in++, out++) {
         for (int j = 0; j < 3; j++) {
 #ifdef GLQUAKE
-            out->min.v[j] = LittleShort(in->mins[j]);
-            out->max.v[j] = LittleShort(in->maxs[j]);
+            out->bb.min.v[j] = LittleShort(in->mins[j]);
+            out->bb.max.v[j] = LittleShort(in->maxs[j]);
 #else
-            out->minmaxs[j] = LittleShort(in->mins[j]);
-            out->minmaxs[3 + j] = LittleShort(in->maxs[j]);
+            out->bb.min.v[j] = (vec_t)LittleShort(in->mins[j]);
+            out->bb.max.v[j] = (vec_t)LittleShort(in->maxs[j]);
 #endif
         }
 
@@ -652,9 +647,9 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
         mod->firstModelSurface = bm->firstface;
         mod->numModelSurfaces = bm->numfaces;
 
-        mod->maxs = bm->maxs;
-        mod->mins = bm->mins;
-        mod->radius = RadiusFromBounds(mod->mins, mod->maxs);
+        mod->BB.maxs = bm->maxs;
+        mod->BB.mins = bm->mins;
+        mod->radius = RadiusFromBounds(mod->BB.mins, mod->BB.maxs);
 
         mod->numleafs = bm->visleafs;
 

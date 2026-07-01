@@ -531,22 +531,11 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
 
     mod->type = mod_alias;
 
-#if 0
-    // FIXME: do this right
-    mod->mins = (vec3_t){
-            .x = -16.0f,
-            .y = -16.0f,
-            .z = -16.0f
-        };
-    mod->maxs = (vec3_t){
-            .x = 16.0f,
-            .y = 16.0f,
-            .z = 16.0f
-        };
-#else
-     mod->mins = Scalar2Vector(-16.0f);
-     mod->maxs = Scalar2Vector(16.0f);
-#endif
+    mod->BB = (BBox_t){
+       .mins = Scalar2Vector(-16.0f),
+       .maxs = Scalar2Vector(16.0f)
+    };
+
     //
     // build the draw lists
     //
@@ -715,8 +704,8 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     mod->type = mod_alias;
 
     // FIXME: do this right
-    mod->mins = Scalar2Vector(-16.0f);
-    mod->maxs = Scalar2Vector(16.0f);
+    mod->BB.mins = Scalar2Vector(-16.0f);
+    mod->BB.maxs = Scalar2Vector(16.0f);
 
     //
     // move the complete, relocatable alias model to the cache

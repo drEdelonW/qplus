@@ -25,11 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "bspfile.h"
 #include "Model_st.h"
 #ifdef GLQUAKE
-// #   include "gl_model.h"
-// #   include "glquake.h"
 #   include "qOpenGL.h"
-#else
-// #   include "model/model.h"
 #endif
 
 typedef struct {
@@ -87,13 +83,3 @@ trace_t SV_Move(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, phymovetype_
 // shouldn't be considered solid objects
 
 // passedict is explicitly excluded from clipping checks (normally NULL)
-
-
-#define BOX_ON_PLANE_SIDE(emins, emaxs, p)      \
-    (((p)->type < 3)? (                         \
-        ((p)->dist <= (emins).v[(p)->type])?    \
-            1 : (                               \
-            ((p)->dist >= (emaxs).v[(p)->type])?\
-                2 : 3                           \
-        )                                       \
-    ) : BoxOnPlaneSide( (emins), (emaxs), (p)))

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "vector.h"
+#include "BBox.h"
 #include "types.h"
 
 #include "z_cache.h"    // CacheUser_t
-#include "Plane.h"
+// #include "Plane.h"
 #include "Leaf.h"
 #include "Vertex.h"
 #include "Edge.h"
@@ -27,14 +28,15 @@ typedef struct {
 
     int32_t headnode[MAX_MAP_HULLS];
     int32_t visleafs;  // not including the solid leaf 0
-    int32_t firstface, numfaces;
+    int32_t firstface;
+    int32_t numfaces;
 } dModel_t;
 typedef dModel_t* dModel_p;
 
 typedef enum {
-    NL_PRESENT      = 0u, // model is already loaded
-    NL_NEEDS_LOADED = 1u, // model must be loaded
-    NL_UNREFERENCED = 2u  // model is not referenced
+    NL_PRESENT = 0u, // model is already loaded
+    NL_NEEDS_LOADED, // model must be loaded
+    NL_UNREFERENCED  // model is not referenced
 } NeedLoad_t;
 
 typedef enum {
@@ -43,21 +45,30 @@ typedef enum {
     mod_alias   //  .mdl
 } ModType_t;
 
-struct Model_s{
+struct Model_s {
     char        name[MAX_QPATH];
     NeedLoad_t  needload;   // bmodels and sprites don't cache normally
     ModType_t   type;       // kind of content
     int32_t     numframes;
     SyncType_t  synctype;
     int32_t     flags;
+#if 0
     vec3_t  mins, maxs; // volume occupied by the model
+#else
+    BBox_t  BB; // volume occupied by the model
+#endif
     float   radius;
 #ifdef GLQUAKE
     bool    clipbox;    // solid volume for clipping
+#if 0
     vec3_t  clipmins;
     vec3_t  clipmaxs;
+#else
+    BBox_t  clip;
 #endif
-    uint32_t numModelSurfaces,   firstModelSurface;    // brush model
+
+#endif
+    uint32_t numModelSurfaces, firstModelSurface;    // brush model
     uint32_t numSubModels;       dModel_p    SubModels;
     uint32_t numplanes;          mPlane_p    planes;
     uint32_t numleafs;           mLeaf_p     leafs;  // number of visible leafs, not counting 0

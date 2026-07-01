@@ -225,7 +225,11 @@ extern int      r_maxsurfsseen, r_maxedgesseen;
 extern int      r_cnumsurfs;
 extern bool     r_dowarpold, r_viewchanged;
 extern mLeaf_p  r_viewleaf, r_oldviewleaf;
+#if 0
 extern vec3_t   r_emins, r_emaxs;
+#else
+extern BBox_t   r_entBB;
+#endif
 extern mNode_p  r_pefragtopnode;
 extern int      r_clipflags;
 extern int      r_dlightframecount;

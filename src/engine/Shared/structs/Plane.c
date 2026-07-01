@@ -51,7 +51,7 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, mPlane_p plane) {
     if (dist2 < 0)      sides |= 2;
 #else
     // bounds[0] = emins, bounds[1] = emaxs
-    const vec3_t bounds[2] = {
+    const vec3_t bounds[2] = { // TODO: make union vec3_t bounds[2]
         emins,
         emaxs
     };
@@ -95,7 +95,7 @@ Mod_LoadPlanes
 */
 
 void Mod_LoadPlanes(Lump_p Lump_in) {
-    dPlane_p in = getMapLumpPtr(Lump_in);
+    dPlane_p in = getMapLumpPtr(mod_base, Lump_in);
     if (Lump_in->fileLen % sizeof(*in))        Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
     int count = Lump_in->fileLen / sizeof(*in);

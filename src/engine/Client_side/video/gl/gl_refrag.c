@@ -42,7 +42,11 @@ mNode_p r_pefragtopnode;
 */
 
 efrag_ar    lastlink;
+#if 0
 vec3_t      r_emins, r_emaxs;
+#else
+BBox_t      r_entBB;
+#endif
 r_Entity_p  r_addent;
 
 
@@ -124,7 +128,7 @@ void R_SplitEntityOnNode(mNode_p node) {
     // NODE_MIXED
 
     mPlane_p splitplane = node->plane;
-    int sides = BOX_ON_PLANE_SIDE(r_emins, r_emaxs, splitplane);
+    int sides = BOX_ON_PLANE_SIDE(r_entBB.mins, r_entBB.maxs, splitplane);
 
     if (sides == 3) {
         // split on this plane
@@ -154,10 +158,7 @@ void R_AddEfrags(r_Entity_p ent) {
     lastlink = &ent->efrag;
     r_pefragtopnode = NULL;
 
-    Model_p entmodel = ent->model;
-
-    r_emins = VectorAdd(ent->origin, entmodel->mins);
-    r_emaxs = VectorAdd(ent->origin, entmodel->maxs);
+    r_entBB = BBoxTranslate(ent->model->BB, ent->origin);
 
     R_SplitEntityOnNode(cl.worldmodel->nodes);
 

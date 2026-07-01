@@ -111,7 +111,7 @@ void SCR_ScreenShot_f() {
     //
     char pcxname[80];
     strcpy(pcxname, "quake00.tga");
-
+    // -- pcxname[5/6] is ^^ this positions
     int i = 0;
     for (; i <= 99; i++) {
         pcxname[5] = i / 10 + '0';

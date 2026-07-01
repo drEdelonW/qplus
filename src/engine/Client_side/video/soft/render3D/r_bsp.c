@@ -409,9 +409,9 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
 
             {
                 vec3_t rejectpt = {
-                    .x = (float)node->minmaxs[pindex[0]],
-                    .y = (float)node->minmaxs[pindex[1]],
-                    .z = (float)node->minmaxs[pindex[2]],
+                    .x = node->bb.v[pindex[0]],
+                    .y = node->bb.v[pindex[1]],
+                    .z = node->bb.v[pindex[2]],
                 };
                 double d = DotProduct(rejectpt, view_clipplanes[i].normal);
                 d -= view_clipplanes[i].dist;
@@ -422,9 +422,9 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
 
             {
                 vec3_t acceptpt = {
-                    .x = (float)node->minmaxs[pindex[3 + 0]],
-                    .y = (float)node->minmaxs[pindex[3 + 1]],
-                    .z = (float)node->minmaxs[pindex[3 + 2]]
+                    .x = node->bb.v[pindex[3 + 0]],
+                    .y = node->bb.v[pindex[3 + 1]],
+                    .z = node->bb.v[pindex[3 + 2]]
                 };
                 double d = DotProduct(acceptpt, view_clipplanes[i].normal);
                 d -= view_clipplanes[i].dist;

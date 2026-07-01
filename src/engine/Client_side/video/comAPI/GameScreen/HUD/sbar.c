@@ -52,11 +52,12 @@ typedef struct {
 
     qPic_p  faces[7][2];  // 0 is gibbed, 1 is dead, 2-6 are alive
     // 0 is static, 1 is temporary animation
-    qPic_p  face_invis;
-    qPic_p  face_quad;
-    qPic_p  face_invuln;
-    qPic_p  face_invis_invuln;
-
+    struct {
+        qPic_p  invis;
+        qPic_p  quad;
+        qPic_p  invuln;
+        qPic_p  invis_invuln;
+    } face;
     bool    showscores;
 } sBar_t;
 static sBar_t _sb;
@@ -192,10 +193,10 @@ void Sbar_Init() {
     _sb.faces[0][0] = Draw_PicFromWad("face5");
     _sb.faces[0][1] = Draw_PicFromWad("face_p5");
 
-    _sb.face_invis = Draw_PicFromWad("face_invis");
-    _sb.face_invuln = Draw_PicFromWad("face_invul2");
-    _sb.face_invis_invuln = Draw_PicFromWad("face_inv2");
-    _sb.face_quad = Draw_PicFromWad("face_quad");
+    _sb.face.invis = Draw_PicFromWad("face_invis");
+    _sb.face.invuln = Draw_PicFromWad("face_invul2");
+    _sb.face.invis_invuln = Draw_PicFromWad("face_inv2");
+    _sb.face.quad = Draw_PicFromWad("face_quad");
 
     Cmd_AddCommand("+showscores", Sbar_ShowScores);
     Cmd_AddCommand("-showscores", Sbar_DontShowScores);
@@ -759,12 +760,12 @@ void Sbar_DrawFace() {
 
     if ((cl.items & (IT_INVISIBILITY | IT_INVULNERABILITY))
         == (IT_INVISIBILITY | IT_INVULNERABILITY)) {
-        Sbar_DrawPic(112, 0, _sb.face_invis_invuln);
+        Sbar_DrawPic(112, 0, _sb.face.invis_invuln);
         return;
     }
-    if (cl.items & IT_QUAD) { ;             Sbar_DrawPic(112, 0, _sb.face_quad);     return; }
-    if (cl.items & IT_INVISIBILITY) { ;     Sbar_DrawPic(112, 0, _sb.face_invis);    return; }
-    if (cl.items & IT_INVULNERABILITY) { ;  Sbar_DrawPic(112, 0, _sb.face_invuln);   return; }
+    if (cl.items & IT_QUAD) { ;             Sbar_DrawPic(112, 0, _sb.face.quad);     return; }
+    if (cl.items & IT_INVISIBILITY) { ;     Sbar_DrawPic(112, 0, _sb.face.invis);    return; }
+    if (cl.items & IT_INVULNERABILITY) { ;  Sbar_DrawPic(112, 0, _sb.face.invuln);   return; }
 
     int f = (cl.stats[STAT_HEALTH] >= 100) ?
         4 : cl.stats[STAT_HEALTH] / 20;

@@ -355,6 +355,21 @@ void R_SetupAliasFrame(int frame, AliasHdr_p pAliasHdr) {
 }
 
 
+/*
+=================
+R_CullBox
+
+Returns true if the box is completely outside the frustom
+=================
+*/
+static mPlane_t _frustum[4];
+bool R_CullBox(BBox_t bb) {
+    for (int i = 0; i < 4; i++)
+        if (BoxOnPlaneSide(bb.mins, bb.maxs, &_frustum[i]) == 2)
+            return true;
+    return false;
+}
+
 
 /*
 =================
@@ -365,11 +380,7 @@ R_DrawAliasModel
 void R_DrawAliasModel(r_Entity_p e) {
     Model_p clmodel = currententity->model;
 
-    vec3_t mins = VectorAdd(currententity->origin, clmodel->mins);
-    vec3_t maxs = VectorAdd(currententity->origin, clmodel->maxs);
-
-    if (R_CullBox(mins, maxs))      return;
-
+    if (R_CullBox(BBoxTranslate(clmodel->BB, currententity->origin)))      return;
 
     r_entorigin = currententity->origin;
     modelorg = VectorSubtract(r_origin, r_entorigin);
@@ -659,7 +670,6 @@ int SignbitsForPlane(mPlane_p out) {
     return bits;
 }
 
-static mPlane_t _frustum[4];
 void R_SetFrustum() {
     if (r_refdef.fov_x == 90.0f) {
         // front side is visible
@@ -680,20 +690,6 @@ void R_SetFrustum() {
         _frustum[i].dist = DotProduct(r_origin, _frustum[i].normal);
         _frustum[i].signbits = SignbitsForPlane(&_frustum[i]);
     }
-}
-
-/*
-=================
-R_CullBox
-
-Returns true if the box is completely outside the frustom
-=================
-*/
-bool R_CullBox(vec3_t mins, vec3_t maxs) {
-    for (int i = 0; i < 4; i++)
-        if (BoxOnPlaneSide(mins, maxs, &_frustum[i]) == 2)
-            return true;
-    return false;
 }
 
 
@@ -768,8 +764,8 @@ void R_SetupGL() {
     float sy = (float)glheight / vid.scr.height;
     int yx = vrect.x;
     int ty = vid.scr.height - vrect.y;
-    int x = yx  * sx;
-    int y = ty  * sy;
+    int x = yx * sx;
+    int y = ty * sy;
     int x2 = (yx + vrect.width) * sx;
     int y2 = (ty - vrect.height) * sy;
 #endif

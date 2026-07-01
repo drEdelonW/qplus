@@ -49,7 +49,9 @@ static mVertex_t _r_leftenter, _r_leftexit;
 static mVertex_t _r_rightenter, _r_rightexit;
 
 typedef struct {
-    float u, v, lzi;
+    float u;
+    float v;
+    float lzi;
     int  ceilv;
 } evert_t;
 
@@ -87,7 +89,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         {
             float scale = xscale * em.lzi;
             em.u = (xcenter + scale * transformed.x);
-            if (em.u < r_refdef.fvrectx_adj)
+            if (em.u < r_refdef.fvrectx_adj)    // TODO: CLAMP it
                 em.u = r_refdef.fvrectx_adj;
             if (em.u > r_refdef.fvrectright_adj)
                 em.u = r_refdef.fvrectright_adj;
@@ -96,7 +98,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         {
             float scale = yscale * em.lzi;
             em.v = (ycenter - scale * transformed.y);
-            if (em.v < r_refdef.fvrecty_adj)
+            if (em.v < r_refdef.fvrecty_adj)    // TODO: CLAMP it
                 em.v = r_refdef.fvrecty_adj;
             if (em.v > r_refdef.fvrectbottom_adj)
                 em.v = r_refdef.fvrectbottom_adj;
@@ -118,14 +120,14 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     {
         float scale = xscale * _r.lzi;
         _r.u = (xcenter + scale * transformed.x);
-        if (_r.u < r_refdef.fvrectx_adj)        _r.u = r_refdef.fvrectx_adj;
+        if (_r.u < r_refdef.fvrectx_adj)        _r.u = r_refdef.fvrectx_adj;    // TODO: CLAMP it
         if (_r.u > r_refdef.fvrectright_adj)    _r.u = r_refdef.fvrectright_adj;
     }
 
     {
         float scale = yscale * _r.lzi;
         _r.v = (ycenter - scale * transformed.y);
-        if (_r.v < r_refdef.fvrecty_adj)        _r.v = r_refdef.fvrecty_adj;
+        if (_r.v < r_refdef.fvrecty_adj)        _r.v = r_refdef.fvrecty_adj;    // TODO: CLAMP it
         if (_r.v > r_refdef.fvrectbottom_adj)   _r.v = r_refdef.fvrectbottom_adj;
     }
 
@@ -431,7 +433,7 @@ void R_RenderFace(mSurface_p fa, int clipflags) {
 
             if (_r_leftclipped)  _makeLeftEdge = true;
             if (_r_rightclipped) _makeRightEdge = true;
-            _rLastVertValid = true;
+            _rLastVertValid = true; /* + */
         }
     }
 

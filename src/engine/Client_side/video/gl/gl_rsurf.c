@@ -921,6 +921,8 @@ void DrawTextureChains() {
     }
 }
 
+bool R_CullBox(BBox_t bb); // TODO: palce it in specific header
+
 /*
 =================
 R_DrawBrushModel
@@ -932,26 +934,24 @@ void R_DrawBrushModel(r_Entity_p e) {
 
     Model_p clmodel = e->model;
     bool rotated;
-    {
-        vec3_t  mins, maxs;
-        if (e->angles.pitch ||
-            e->angles.yaw ||
-            e->angles.roll
-            ) {
-            rotated = true;
 
-            mins = VectorAddVal(e->origin, -clmodel->radius);
-            maxs = VectorAddVal(e->origin, +clmodel->radius);
-        }
-        else {
-            rotated = false;
-            mins = VectorAdd(e->origin, clmodel->mins);
-            maxs = VectorAdd(e->origin, clmodel->maxs);
-        }
+    if (e->angles.pitch ||
+        e->angles.yaw ||
+        e->angles.roll
+        ) {
+        rotated = true;
 
-        if (R_CullBox(mins, maxs))
-            return;
+        BBox_t bb = (BBox_t){
+            .mins = VectorAddVal(e->origin, -clmodel->radius),
+            .maxs = VectorAddVal(e->origin, +clmodel->radius)
+        };
+        if (R_CullBox(bb))     return;
     }
+    else {
+        rotated = false;
+        if (R_CullBox(BBoxTranslate(clmodel->BB, e->origin)))     return;
+    }
+
     glColor3f(1, 1, 1);
     memset(lightmap_polys, 0, sizeof(lightmap_polys));
 
@@ -1031,7 +1031,7 @@ R_RecursiveWorldNode
 void R_RecursiveWorldNode(mNode_p node) {
     if ((node->contents == CONTENTS_SOLID) ||   // solid
         (node->visframe != r_visframecount) ||
-        (R_CullBox(node->min, node->max))
+        (R_CullBox(node->bb))
         )   return;
 
     // if a leaf node, draw stuff

@@ -2,6 +2,7 @@
 
 #include "assert.h"
 #include "types.h"
+#include "BBox.h"
 #include "Leaf_pre.h"
 #include "Node.h"
 #include "Surface_pre.h"
@@ -13,15 +14,10 @@
 // it was [mleaf_t]
 struct mLeaf_s {    // TODO: merge in shared head structure with  mNode_s
     // common with node
-    /* contents_t */int32_t contents;   // wil be a negative contents number
-    int32_t visframe;   // node needs to be traversed if current
-#ifdef GLQUAKE
-    vec3_t  min;
-    vec3_t  max;
-#else
-    int16_t minmaxs[6]; // for bounding box culling
-#endif
-    mNode_p parent;
+    contents_t  contents;   // wil be a negative contents number
+    int32_t     visframe;   // node needs to be traversed if current
+    BBox_t      bb;
+    mNode_p     parent;
 
     // leaf specific
     uint8_p compressed_vis;

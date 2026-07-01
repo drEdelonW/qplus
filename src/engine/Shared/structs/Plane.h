@@ -56,3 +56,12 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#define BOX_ON_PLANE_SIDE(emins, emaxs, p)      \
+    (((p)->type < 3)? (                         \
+        ((p)->dist <= (emins).v[(p)->type])?    \
+            1 : (                               \
+            ((p)->dist >= (emaxs).v[(p)->type])?\
+                2 : 3                           \
+        )                                       \
+    ) : BoxOnPlaneSide( (emins), (emaxs), (p)))

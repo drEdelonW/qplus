@@ -484,7 +484,7 @@ void Draw_ConsoleBackground(int lines) {
 R_DrawRect8
 ==============
 */
-void R_DrawRect8(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
+void R_DrawRect8(vRect_p prect, int rowbytes, uint8_p psrc, bool transparent) {
     uint8_p pdest = vid.scr.pBuff + (prect->y * vid.rowbytes) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
@@ -520,7 +520,7 @@ void R_DrawRect8(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
 R_DrawRect16
 ==============
 */
-void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, int transparent) {
+void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, bool transparent) {
     // FIXME: would it be better to pre-expand native-format versions?
 
     uint16_p pdest = (uint16_p)vid.scr.pBuff +
@@ -569,10 +569,12 @@ refresh window.
 =============
 */
 void Draw_TileClear(int x, int y, int w, int h) {
-    _rRectDesc.rect.x = x;
-    _rRectDesc.rect.y = y;
-    _rRectDesc.rect.width = w;
-    _rRectDesc.rect.height = h;
+    _rRectDesc.rect = (vRect_t){
+        .x = x,
+        .y = y,
+        .width = w,
+        .height = h
+    };
 
     vRect_t vr = { .y = _rRectDesc.rect.y };
     int height = _rRectDesc.rect.height;
@@ -598,11 +600,11 @@ void Draw_TileClear(int x, int y, int w, int h) {
             if (vr.width > width)
                 vr.width = width;
 
-            uint8_p psrc = _rRectDesc.pTexBytes +
-                (tileoffsety * _rRectDesc.rowBytes) + tileoffsetx;
+            uint8_p psrc = _rRectDesc.pTexBytes + (ptrdiff_t)(
+                (tileoffsety * _rRectDesc.rowBytes) + tileoffsetx);
 
-            if (r_pixbytes == 1) { R_DrawRect8(&vr, _rRectDesc.rowBytes, psrc, 0); }
-            else { ;              R_DrawRect16(&vr, _rRectDesc.rowBytes, psrc, 0); }
+            if (r_pixbytes == 1)     R_DrawRect8(&vr, _rRectDesc.rowBytes, psrc, false);
+            else                    R_DrawRect16(&vr, _rRectDesc.rowBytes, psrc, false);
 
             vr.x += vr.width;
             width -= vr.width;
@@ -624,18 +626,23 @@ Fills a box of pixels with a single color
 =============
 */
 void Draw_Fill(int x, int y, int w, int h, int c) {
+    int stride = vid.rowbytes;
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.scr.pBuff + y * vid.rowbytes + x;
-        for (int v = 0; v < h; v++, dest += vid.rowbytes)
+        uint8_p dest = vid.scr.pBuff + (ptrdiff_t)(
+            (y * stride) + x
+            );
+        for (int v = 0; v < h; v++, dest += stride)
             for (int u = 0; u < w; u++)
                 dest[u] = c;
     }
     else {
-        uint16_t uc = d_8to16table[c];
-        uint16_p pusdest = (uint16_p)vid.scr.pBuff + y * HALF(vid.rowbytes) + x;
-        for (int v = 0; v < h; v++, pusdest += HALF(vid.rowbytes))
+        stride = HALF(stride);
+        uint16_p pusdest = (uint16_p)vid.scr.pBuff + (ptrdiff_t)(
+            (y * stride) + x
+            );
+        for (int v = 0; v < h; v++, pusdest += stride)
             for (int u = 0; u < w; u++)
-                pusdest[u] = uc;
+                pusdest[u] = d_8to16table[c];
     }
 }
 //=============================================================================

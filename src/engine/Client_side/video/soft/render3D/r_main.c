@@ -575,7 +575,7 @@ void R_DrawViewModel() {
 R_BmodelCheckBBox
 =============
 */
-int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
+int R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
     int clipflags = 0;
 
     if (currententity->angles.pitch ||
@@ -601,9 +601,9 @@ int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
             int* pindex = pfrustum_indexes[i];
             {
                 vec3_t rejectpt = {
-                    .x = minmaxs[pindex[0]],
-                    .y = minmaxs[pindex[1]],
-                    .z = minmaxs[pindex[2]]
+                    .x = bb.v[pindex[0]],
+                    .y = bb.v[pindex[1]],
+                    .z = bb.v[pindex[2]]
                 };
                 double d = DotProduct(rejectpt, view_clipplanes[i].normal);
                 d -= view_clipplanes[i].dist;
@@ -613,9 +613,9 @@ int R_BmodelCheckBBox(Model_p clmodel, float_p minmaxs) {
             }
             {
                 vec3_t acceptpt = {
-                    .x = minmaxs[pindex[3 + 0]],
-                    .y = minmaxs[pindex[3 + 1]],
-                    .z = minmaxs[pindex[3 + 2]]
+                    .x = bb.v[pindex[3 + 0]],
+                    .y = bb.v[pindex[3 + 1]],
+                    .z = bb.v[pindex[3 + 2]]
                 };
 
                 double d = DotProduct(acceptpt, view_clipplanes[i].normal);
@@ -651,20 +651,17 @@ void R_DrawBEntitiesOnList() {
             Model_p clmodel = currententity->model;
 
             // see if the bounding box lets us trivially reject, also sets trivial accept status
-            float  minmaxs[6];
-            for (int j = 0; j < VECT_DIM; j++) {
-                minmaxs[j] = currententity->origin.v[j] + clmodel->mins.v[j];
-                minmaxs[3 + j] = currententity->origin.v[j] + clmodel->maxs.v[j];
-            }
+            BBox_t bb = (BBox_t){
+                .mins = VectorAdd(currententity->origin, clmodel->BB.mins),
+                .maxs = VectorAdd(currententity->origin, clmodel->BB.maxs)
+            };
 
-            int clipflags = R_BmodelCheckBBox(clmodel, minmaxs);
+            int clipflags = R_BmodelCheckBBox(clmodel, bb);
 
             if (clipflags != BMODEL_FULLY_CLIPPED) {
                 r_entorigin = currententity->origin;
                 modelorg = VectorSubtract(r_origin, r_entorigin);
-#if 0
-                r_worldmodelorg = modelorg;                // FIXME: is this needed?
-#endif
+
                 r_pcurrentvertbase = clmodel->vertexes;
 
                 R_RotateBmodel();   // FIXME: stop transforming twice
@@ -695,10 +692,7 @@ void R_DrawBEntitiesOnList() {
                 else {
                     r_pefragtopnode = NULL;
 
-                    for (int j = 0; j < VECT_DIM; j++) {
-                        r_emins.v[j] = minmaxs[j];
-                        r_emaxs.v[j] = minmaxs[3 + j];
-                    }
+                    r_entBB = bb;
 
                     R_SplitEntityOnNode2(cl.worldmodel->nodes);
 

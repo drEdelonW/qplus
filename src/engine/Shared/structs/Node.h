@@ -1,21 +1,18 @@
 #pragma once
 
+#include "bspfile.h"
 #include "types.h"
 #include "Plane.h"
+#include "BBox.h"
 
 struct mNode_s;
 typedef struct mNode_s mNode_t;
 typedef mNode_t* mNode_p;
 struct mNode_s {    // TODO: merge in shared head structure with  mLeaf_s
     // common with leaf
-    /* contents_t */int32_t contents;  // 0, to differentiate from leafs
+    contents_t  contents;  // 0, to differentiate from leafs
     int32_t     visframe;  // node needs to be traversed if current
-#ifdef GLQUAKE
-    vec3_t      min;
-    vec3_t      max;
-#else
-    int16_t     minmaxs[6];  // for bounding box culling
-#endif
+    BBox_t      bb;
     mNode_p     parent;
 
     // node specific
