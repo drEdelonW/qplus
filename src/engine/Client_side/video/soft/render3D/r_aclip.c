@@ -206,7 +206,7 @@ void R_AliasClipTriangle(mTriangle_p ptri) {
     }
 
     // clip
-    uint32_t clipflags =
+    AliasClipFlags_f clipflags =
         _fv[0][0].flags |
         _fv[0][1].flags |
         _fv[0][2].flags;

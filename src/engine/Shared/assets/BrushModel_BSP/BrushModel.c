@@ -233,10 +233,18 @@ void Mod_LoadLeafs(Lump_p Lump_in) {
     _loadModel->numleafs = count;
 
     for (int i = 0; i < count; i++, in++, out++) {
-        for (int j = 0; j < 3; j++) {
-            out->bb.min.v[j] = (vec_t)LittleShort(in->mins[j]);
-            out->bb.max.v[j] = (vec_t)LittleShort(in->maxs[j]);
-        }
+        out->bb = (BBox_t){
+            .mins = {
+                .x = LittleShort(in->mins[X_AX]),
+                .y = LittleShort(in->mins[Y_AX]),
+                .z = LittleShort(in->mins[Z_AX])
+            },
+            .maxs = {
+                .x = LittleShort(in->maxs[X_AX]),
+                .y = LittleShort(in->maxs[Y_AX]),
+                .z = LittleShort(in->maxs[Z_AX])
+            }
+        };
 
         out->contents = LittleLong(in->contents);
 
@@ -411,15 +419,18 @@ void Mod_LoadNodes(Lump_p Lump_in) {
     _loadModel->numnodes = count;
 
     for (int i = 0; i < count; i++, in++, out++) {
-        for (int j = 0; j < 3; j++) {
-#ifdef GLQUAKE
-            out->bb.min.v[j] = LittleShort(in->mins[j]);
-            out->bb.max.v[j] = LittleShort(in->maxs[j]);
-#else
-            out->bb.min.v[j] = (vec_t)LittleShort(in->mins[j]);
-            out->bb.max.v[j] = (vec_t)LittleShort(in->maxs[j]);
-#endif
-        }
+        out->bb = (BBox_t){
+            .mins = {
+                .x = LittleShort(in->mins[X_AX]),
+                .y = LittleShort(in->mins[Y_AX]),
+                .z = LittleShort(in->mins[Z_AX])
+            },
+            .maxs = {
+                .x = LittleShort(in->maxs[X_AX]),
+                .y = LittleShort(in->maxs[Y_AX]),
+                .z = LittleShort(in->maxs[Z_AX])
+            }
+        };
 
         out->plane = _loadModel->planes + LittleLong(in->planenum);
 

@@ -365,7 +365,7 @@ Returns true if the box is completely outside the frustom
 static mPlane_t _frustum[4];
 bool R_CullBox(BBox_t bb) {
     for (int i = 0; i < 4; i++)
-        if (BoxOnPlaneSide(bb.mins, bb.maxs, &_frustum[i]) == 2)
+        if (BoxOnPlaneSide(bb, &_frustum[i]) == PsBack)
             return true;
     return false;
 }

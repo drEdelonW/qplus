@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "client.h"
 #include "r_local.h"
 #include "host.h"
-#include "world.h"  // BOX_ON_PLANE_SIDE
+#include "Plane.h"  // BOX_ON_PLANE_SIDE
 #include "console.h"
 
 mNode_p r_pefragtopnode;
@@ -125,20 +125,16 @@ void R_SplitEntityOnNode(mNode_p node) {
     }
 
     // NODE_MIXED
+    PlaneSide_t sides = BOX_ON_PLANE_SIDE(r_entBB, node->plane);
 
-    mPlane_p splitplane = node->plane;
-    int sides = BOX_ON_PLANE_SIDE(r_entBB.mins, r_entBB.maxs, splitplane);
-
-    if (sides == 3) {
-        // split on this plane
-        // if this is the first splitter of this bmodel, remember it
+    if (sides == PsBoth) {          // split on this plane
         if (!r_pefragtopnode)
-            r_pefragtopnode = node;
+            r_pefragtopnode = node; // if this is the first splitter of this bmodel, remember it
     }
 
     // recurse down the contacted sides
-    if (sides & 1)  R_SplitEntityOnNode(node->children[0]);
-    if (sides & 2)  R_SplitEntityOnNode(node->children[1]);
+    if (sides & PsFront)    R_SplitEntityOnNode(node->children[0]);
+    if (sides & PsBack)     R_SplitEntityOnNode(node->children[1]);
 }
 
 
@@ -157,18 +153,16 @@ void R_SplitEntityOnNode2(mNode_p node) {
         return;
     }
 
-    mPlane_p splitplane = node->plane;
-    int sides = BOX_ON_PLANE_SIDE(r_entBB.mins, r_entBB.maxs, splitplane);
+    PlaneSide_t sides = BOX_ON_PLANE_SIDE(r_entBB, node->plane);
 
-    if (sides == 3) {
-        // remember first splitter
-        r_pefragtopnode = node;
+    if (sides == PsBoth) {
+        r_pefragtopnode = node;     // remember first splitter
         return;
     }
 
     // not split yet; recurse down the contacted side
-    if (sides & 1)  R_SplitEntityOnNode2(node->children[0]);
-    else            R_SplitEntityOnNode2(node->children[1]);
+    if (sides & PsFront)    R_SplitEntityOnNode2(node->children[0]);
+    else                    R_SplitEntityOnNode2(node->children[1]);
 }
 
 

@@ -359,7 +359,7 @@ void R_DrawSolidClippedSubmodelPolygons(Model_p pmodel) {
 R_DrawSubmodelPolygons
 ================
 */
-void R_DrawSubmodelPolygons(Model_p pmodel, int clipflags) {
+void R_DrawSubmodelPolygons(Model_p pmodel, AliasClipFlags_f clipflags) {
     // FIXME: use bounding-box-based frustum clipping info?
     mSurface_p psurf = &pmodel->surfaces[pmodel->firstModelSurface];
     int numsurfaces = pmodel->numModelSurfaces;
@@ -388,6 +388,7 @@ void R_DrawSubmodelPolygons(Model_p pmodel, int clipflags) {
 R_RecursiveWorldNode
 ================
 */
+extern int* pfrustum_indexes[4];    // TODO: avoid int*
 void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
     if ((node->contents == CONTENTS_SOLID) ||  // solid
         (node->visframe != r_visframecount)
@@ -402,32 +403,29 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
                 continue; // don't need to clip against it
 
             // generate accept and reject points
-            // FIXME: do with fast look-ups or integer tests based on the sign bit
-            // of the floating point values
+            // FIXME: do with fast look-ups or integer tests based on the sign bit of the floating point values
 
             int* pindex = pfrustum_indexes[i];
-
             {
                 vec3_t rejectpt = {
                     .x = node->bb.v[pindex[0]],
                     .y = node->bb.v[pindex[1]],
                     .z = node->bb.v[pindex[2]],
                 };
-                double d = DotProduct(rejectpt, view_clipplanes[i].normal);
-                d -= view_clipplanes[i].dist;
+                double d = DotProduct(rejectpt, view_clipplanes[i].normal) -
+                    view_clipplanes[i].dist;
 
                 if (d <= 0)
                     return;
             }
-
             {
                 vec3_t acceptpt = {
                     .x = node->bb.v[pindex[3 + 0]],
                     .y = node->bb.v[pindex[3 + 1]],
                     .z = node->bb.v[pindex[3 + 2]]
                 };
-                double d = DotProduct(acceptpt, view_clipplanes[i].normal);
-                d -= view_clipplanes[i].dist;
+                double d = DotProduct(acceptpt, view_clipplanes[i].normal) -
+                    view_clipplanes[i].dist;
 
                 if (d >= 0)
                     clipflags &= ~(1 << i); // node is entirely on screen

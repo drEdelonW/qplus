@@ -26,6 +26,7 @@ typedef AuxVert_t* AuxVert_p;
 
 // flags in FinalVert_t.flags
 typedef enum alias_clip_flags_e {
+    ALIAS_NON_CLIP      = 0x0000u,
     ALIAS_LEFT_CLIP     = 0x0001u,
     ALIAS_TOP_CLIP      = 0x0002u,
     ALIAS_RIGHT_CLIP    = 0x0004u,

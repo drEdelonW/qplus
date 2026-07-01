@@ -3,14 +3,10 @@
 
 typedef union {
     struct {
-        vec3_t min;
-        vec3_t max;
-    };
-    struct {
         vec3_t mins;
         vec3_t maxs;
     };
-    // TODO: make union vec3_t bounds[2]
+    vec3_t bounds[2];   // fyi: used for BoxOnPlaneSide
     vec_t v[6];
 } BBox_t;
 typedef BBox_t* BBox_p;

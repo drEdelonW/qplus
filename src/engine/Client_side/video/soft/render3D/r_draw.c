@@ -325,7 +325,7 @@ void R_EmitCachedEdge() {
 R_RenderFace
 ================
 */
-void R_RenderFace(mSurface_p fa, int clipflags) {
+void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags) {
     static mEdge_t _tEdge;
 
     // skip out if no more surfs
@@ -591,7 +591,7 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
 R_RenderPoly
 ================
 */
-void R_RenderPoly(mSurface_p fa, int clipflags) {
+void R_RenderPoly(mSurface_p fa, AliasClipFlags_f clipflags) {
     mVertex_t   verts[2][100]; //FIXME: do real number
     PolyVert_t  pverts[100]; //FIXME: do real number, safely
 

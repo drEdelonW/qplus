@@ -104,8 +104,6 @@ int  r_wholepolycount;
 char    viewmodname[VIEWMODNAME_LENGTH + 1];
 int modcount;
 
-int* pfrustum_indexes[4];
-int r_frustum_indexes[4 * 6];
 
 mLeaf_p     r_viewleaf, r_oldviewleaf;
 
@@ -575,8 +573,9 @@ void R_DrawViewModel() {
 R_BmodelCheckBBox
 =============
 */
-int R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
-    int clipflags = 0;
+extern int* pfrustum_indexes[4];    // TODO: avoid int*
+AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
+    AliasClipFlags_f clipflags = ALIAS_NON_CLIP;
 
     if (currententity->angles.pitch ||
         currententity->angles.yaw ||
@@ -605,8 +604,8 @@ int R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
                     .y = bb.v[pindex[1]],
                     .z = bb.v[pindex[2]]
                 };
-                double d = DotProduct(rejectpt, view_clipplanes[i].normal);
-                d -= view_clipplanes[i].dist;
+                double d = DotProduct(rejectpt, view_clipplanes[i].normal) -
+                    view_clipplanes[i].dist;
 
                 if (d <= 0)
                     return BMODEL_FULLY_CLIPPED;
@@ -617,9 +616,8 @@ int R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
                     .y = bb.v[pindex[3 + 1]],
                     .z = bb.v[pindex[3 + 2]]
                 };
-
-                double d = DotProduct(acceptpt, view_clipplanes[i].normal);
-                d -= view_clipplanes[i].dist;
+                double d = DotProduct(acceptpt, view_clipplanes[i].normal) -
+                    view_clipplanes[i].dist;
 
                 if (d <= 0)
                     clipflags |= (1 << i);
@@ -656,7 +654,7 @@ void R_DrawBEntitiesOnList() {
                 .maxs = VectorAdd(currententity->origin, clmodel->BB.maxs)
             };
 
-            int clipflags = R_BmodelCheckBBox(clmodel, bb);
+            AliasClipFlags_f clipflags = R_BmodelCheckBBox(clmodel, bb);
 
             if (clipflags != BMODEL_FULLY_CLIPPED) {
                 r_entorigin = currententity->origin;

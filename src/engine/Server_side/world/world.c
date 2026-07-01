@@ -318,16 +318,15 @@ void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
     }
 
     // NODE_MIXED
-    mPlane_p splitplane = node->plane;
-    int sides = BOX_ON_PLANE_SIDE(
-        ent->v.absmin,
-        ent->v.absmax,
-        splitplane
-    );
+    BBox_t _bb = {
+        .mins = ent->v.absmin,
+        .maxs = ent->v.absmax
+    };
+    PlaneSide_t sides = BOX_ON_PLANE_SIDE(_bb, node->plane);
 
     // recurse down the contacted sides
-    if (sides & 1)      SV_FindTouchedLeafs(ent, node->children[0]);
-    if (sides & 2)      SV_FindTouchedLeafs(ent, node->children[1]);
+    if (sides & PsFront)    SV_FindTouchedLeafs(ent, node->children[0]);
+    if (sides & PsBack)     SV_FindTouchedLeafs(ent, node->children[1]);
 }
 
 /*

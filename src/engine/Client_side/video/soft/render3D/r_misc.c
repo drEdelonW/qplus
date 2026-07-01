@@ -288,8 +288,11 @@ void R_TransformPlane(mPlane_p p, vec3_p normal, float_p dist) {
     R_SetUpFrustumIndexes
     ===============
 */
+static int _r_frustum_indexes[4 * 6];
+int* pfrustum_indexes[4];
+
 void R_SetUpFrustumIndexes() {
-    int* pindex = r_frustum_indexes;
+    int* pindex = _r_frustum_indexes;
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < VECT_DIM; j++) {

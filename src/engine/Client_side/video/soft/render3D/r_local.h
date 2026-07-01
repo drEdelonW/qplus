@@ -90,8 +90,8 @@ extern vec3_t  r_worldmodelorg;
 
 
 void R_DrawSprite();
-void R_RenderFace(mSurface_p fa, int clipflags);
-void R_RenderPoly(mSurface_p fa, int clipflags);
+void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags);
+void R_RenderPoly(mSurface_p fa, AliasClipFlags_f clipflags);
 void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf);
 // void R_TransformPlane(mPlane_p p, vec3_p normal, float_p dist);
 void R_TransformFrustum();
@@ -110,7 +110,7 @@ void R_GenSkyTile(uint8_p pdest);
 void R_GenSkyTile16(uint16_p pdest);
 void R_Surf8Patch();    // we only patch code on Intel
 void R_Surf16Patch();   // we only patch code on Intel
-void R_DrawSubmodelPolygons(Model_p pmodel, int clipflags);
+void R_DrawSubmodelPolygons(Model_p pmodel, AliasClipFlags_f clipflags);
 void R_DrawSolidClippedSubmodelPolygons(Model_p pmodel);
 
 void R_AliasDrawModel(aLight_p plighting);
@@ -139,8 +139,6 @@ extern int r_outofsurfaces;
 extern int r_outofedges;
 #endif 
 
-extern int* pfrustum_indexes[4];    // TODO: avoid int*
-
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 #define NEAR_CLIP 0.01
 
@@ -154,12 +152,12 @@ extern int r_currentbkey;   // r_bsp.c
 #ifdef STM32
     typedef uint8_t ClipFlag_t ;
 #else
-    typedef int     ClipFlag_t;
+    typedef AliasClipFlags_f    ClipFlag_t;
 #endif
 
 typedef struct btofpoly_s {
     mSurface_p  psurf;
-    ClipFlag_t  clipflags;
+    ClipFlag_t  clipflags;  // TODO: is this AliasClipFlags_f ?
 } btofpoly_t;
 typedef btofpoly_t* btofpoly_p;
 
@@ -220,7 +218,6 @@ extern mVertex_p    r_pcurrentvertbase; // r_main.c
 void R_AliasClipTriangle(mTriangle_p ptri);
 
 extern float    r_time1; // r_main.c // TODO: move this to time specific code
-extern int      r_frustum_indexes[];   // r_main.c
 extern int      r_maxsurfsseen, r_maxedgesseen;
 extern int      r_cnumsurfs;
 extern bool     r_dowarpold, r_viewchanged;
