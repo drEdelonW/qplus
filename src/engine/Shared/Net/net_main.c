@@ -453,16 +453,17 @@ returns -1 if connection is invalid
 =================
 */
 
-struct {
+typedef struct {
     LegTime_t time;
     vcr_opcode_t op;
     int32_t session;
     int32_t ret;
     int32_t len;
-} vcrGetMessage;
+} vGMsg_t;
+vGMsg_t vcrGetMessage;
 
 
-int32_t  NET_GetMessage(qsocket_p sock) {
+int32_t NET_GetMessage(qsocket_p sock) {
     if (!sock)
         return -1;
 
@@ -487,26 +488,31 @@ int32_t  NET_GetMessage(qsocket_p sock) {
     if (ret > 0) {
         if (sock->driver) {
             sock->lastMessageTime = net_time;
-            if (ret == 1)       messagesReceived++;
+            /* */if (ret == 1)  messagesReceived++;
             else if (ret == 2)  unreliableMessagesReceived++;
         }
 
         if (recording) {
-            vcrGetMessage.time = host_time;
-            vcrGetMessage.op = VCR_OP_GETMESSAGE;
-            vcrGetMessage.session = (intptr_t)sock;
-            vcrGetMessage.ret = ret;
-            vcrGetMessage.len = net_message.cursize;
+            vcrGetMessage = (vGMsg_t){
+                .time = host_time,
+                .op = VCR_OP_GETMESSAGE,
+                .session = (intptr_t)sock,
+                .ret = ret,
+                .len = net_message.cursize
+            };
             Sys_FileWrite(vcrFile, &vcrGetMessage, 24);
             Sys_FileWrite(vcrFile, net_message.data, net_message.cursize);
         }
     }
     else {
         if (recording) {
-            vcrGetMessage.time = host_time;
-            vcrGetMessage.op = VCR_OP_GETMESSAGE;
-            vcrGetMessage.session = (intptr_t)sock;
-            vcrGetMessage.ret = ret;
+            vcrGetMessage = (vGMsg_t){
+                .time = host_time,
+                .op = VCR_OP_GETMESSAGE,
+                .session = (intptr_t)sock,
+                .ret = ret,
+                .len = vcrGetMessage.len,
+            };
             Sys_FileWrite(vcrFile, &vcrGetMessage, 20);
         }
     }

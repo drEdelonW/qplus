@@ -24,12 +24,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vector.h"
 #include "angle.h"
 
-// #error
-
 #define ON_EPSILON (0.1f)   // point on plane side epsilon
 
-extern vec3_t vec3_origin;    // TODO: move to more specific place
-extern ang3_t ang3_origin;    // TODO: move to more specific place
+extern const vec3_t vec3_origin;    // TODO: move to more specific place
+extern const ang3_t ang3_origin;    // TODO: move to more specific place
 
 extern uint32_t nanmask;
 #define IS_NAN(x) (((*(uint32_t *)&x)&nanmask) == nanmask)

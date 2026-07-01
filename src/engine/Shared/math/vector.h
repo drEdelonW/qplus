@@ -26,11 +26,14 @@ typedef enum {
 
 typedef union {
     struct { vec_t x, y, z; };
+    struct { vec_t forward, side, up; };    // names for UserCmd_t
     // struct { float pitch, yaw, roll; }; // it move to ang3_t in angle.h
     vec_t v[VECT_DIM];
 } vec3_t;
 STATIC_ASSERT_SIZE(vec3_t, 3 * sizeof(vec_t));
 typedef vec3_t* vec3_p;
+
+
 
 #if 0   /* TODO: rework textured vertex */
 typedef vec_t vec5_t[5];    // vec3_t(x/y/z) + vec2(s/t)

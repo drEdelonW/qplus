@@ -51,10 +51,10 @@ solid_edge items only clip against bsp models.
 
 /* --- movement clip flags (bitmask) --- */
 typedef enum {
-    MOVECLIP_NONE       = 0u,        /* no block */
-    MOVECLIP_FLOOR      = 1u << 0,   /* floor (normal[Z_AX] > 0) */
-    MOVECLIP_WALL       = 1u << 1,   /* wall/step (normal[Z_AX] == 0) */
-    MOVECLIP_DEADSTOP   = 1u << 2,   /* dead stop (reserved by original comment) */
+    MOVECLIP_NONE = 0u,        /* no block */
+    MOVECLIP_FLOOR = 1u << 0,   /* floor (normal[Z_AX] > 0) */
+    MOVECLIP_WALL = 1u << 1,   /* wall/step (normal[Z_AX] == 0) */
+    MOVECLIP_DEADSTOP = 1u << 2,   /* dead stop (reserved by original comment) */
 
     /* --- special early-return results (non-bitmask) --- */
     /* note: 3 == (MOVECLIP_FLOOR|MOVECLIP_WALL) by value; here it is used as “trapped/allsolid” */
@@ -211,13 +211,13 @@ If steptrace is not NULL, the trace of any vertical wall hit will be stored
 ============
 */
 #define MAX_CLIP_PLANES 5
-MoveClipFlags_e SV_FlyMove(edict_p ent, float time, trace_p steptrace) {
+MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
     MoveClipFlags_e blocked = MOVECLIP_NONE;
     vec3_t original_velocity = ent->v.velocity;
     vec3_t primal_velocity = ent->v.velocity;
     int numplanes = 0;
 
-    float time_left = time;
+    SimDt_t time_left = time;
 
     int numbumps = 4;
     vec3_t planes[MAX_CLIP_PLANES];
@@ -632,14 +632,14 @@ void SV_Physics_Pusher(edict_p ent) {
     float oldltime = ent->v.ltime;
 
     float thinktime = ent->v.nextthink;
-    float movetime;
+    SimDt_t movetime;
     if (thinktime < ent->v.ltime + host_frametime) {
         movetime = thinktime - ent->v.ltime;
-        if (movetime < 0)
-            movetime = 0;
+        if (movetime < 0.f)
+            movetime = 0.f;
     }
     else
-        movetime = (float)host_frametime;
+        movetime = host_frametime;
 
     if (movetime) {
 #ifdef QUAKE2
@@ -866,7 +866,7 @@ void SV_WalkMove(edict_p ent) {
     trace_t steptrace;
 
     if (
-        !(SV_FlyMove(ent, (float)host_frametime, &steptrace) & MOVECLIP_WALL) ||   // move didn't block on a step
+        !(SV_FlyMove(ent, host_frametime, &steptrace) & MOVECLIP_WALL) ||   // move didn't block on a step
         (!oldonground && (ent->v.waterlevel == 0)) ||                       // don't stair up while jumping
         ((movetype_t)ent->v.movetype != MOVETYPE_WALK) ||                   // gibbed by a trigger
         sv_nostep.value ||                                                  // no stepping allowed
@@ -881,19 +881,17 @@ void SV_WalkMove(edict_p ent) {
     // try moving up and forward to go up a step
     ent->v.origin = oldorg; // back to start pos
 
-    vec3_t upmove = vec3_origin;
-    upmove.z = STEPSIZE;
-    vec3_t downmove = vec3_origin;
-    downmove.z = (float)(-STEPSIZE + oldvel.z * host_frametime);
+    vec3_t downmove = (vec3_t){ .z = (float)(-STEPSIZE + oldvel.z * host_frametime) };
 
     // move up
+    vec3_t upmove = (vec3_t){ .z = STEPSIZE };
     SV_PushEntity(ent, upmove); // FIXME: don't link?
 
     // move forward
     ent->v.velocity.x = oldvel.x;
     ent->v.velocity.y = oldvel.y;
     ent->v.velocity.z = 0.0f;
-    MoveClipFlags_e clip = SV_FlyMove(ent, (float)host_frametime, &steptrace);
+    MoveClipFlags_e clip = SV_FlyMove(ent, host_frametime, &steptrace);
 
     // check for stuckness, possibly due to the limited precision of floats
     // in the clipping hulls
@@ -983,7 +981,7 @@ void SV_Physics_Client(edict_p ent, int num) {
 
     case MOVETYPE_TOSS:
     case MOVETYPE_BOUNCE:   SV_Physics_Toss(ent);                   break;
-    case MOVETYPE_FLY:      SV_FlyMove(ent, (float)host_frametime, NULL);  break;
+    case MOVETYPE_FLY:      SV_FlyMove(ent, host_frametime, NULL);  break;
     case MOVETYPE_NOCLIP:   ent->v.origin = VectorMA(ent->v.origin, (float)host_frametime, ent->v.velocity);    break;
     default:                Host_SysError("SV_Physics_Client: bad movetype %i", (int)ent->v.movetype);
     }
@@ -1306,7 +1304,7 @@ void SV_Physics_Step(edict_p ent) {
 
         SV_AddGravity(ent);
         SV_CheckVelocity(ent);
-        SV_FlyMove(ent, (float)host_frametime, NULL);
+        SV_FlyMove(ent, host_frametime, NULL);
         SV_LinkEdict(ent, true);
 
         if (((EntityFlags_t)ent->v.flags & FL_ONGROUND) && // just hit ground

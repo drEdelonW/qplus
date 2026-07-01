@@ -941,7 +941,7 @@ void IN_MouseMove(UserCmd_p cmd) {
             lookstrafe.value &&
             (in.mlook.state & 1))
         )
-        cmd->sidemove += m_side.value * _mx;
+        cmd->move.side += m_side.value * _mx;
     else
         cl.viewangles[YAW] -= m_yaw.value * _mx;
 
@@ -955,9 +955,9 @@ void IN_MouseMove(UserCmd_p cmd) {
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)
-            cmd->upmove -= m_forward.value * _my;
+            cmd->move.up -= m_forward.value * _my;
         else
-            cmd->forwardmove -= m_forward.value * _my;
+            cmd->move.forward -= m_forward.value * _my;
     }
     _mx = my = 0;
 }

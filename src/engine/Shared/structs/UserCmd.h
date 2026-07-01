@@ -1,12 +1,17 @@
 #pragma once
 
 #include "vector.h"
+#include "angle.h"
 typedef struct {
-    vec3_t viewangles;
+    // ang3_t viewangles; // TODO: not used?
     // intended velocities
+#if 0
     float forwardmove;
     float sidemove;
     float upmove;
+#else
+    vec3_t move;
+#endif
 #ifdef QUAKE2
     uint8_t lightlevel;
 #endif

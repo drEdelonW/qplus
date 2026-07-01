@@ -159,21 +159,23 @@ void CL_AdjustAngles() {
     else                    speed = (LegDt_t)host_frametime;
 
     if (!(in.strafe.state & 1)) {
-        cl.viewangles.yaw -= speed * cl_yawspeed.value * CL_KeyState(&in.right);
-        cl.viewangles.yaw += speed * cl_yawspeed.value * CL_KeyState(&in.left);
-        cl.viewangles.yaw = anglemod(cl.viewangles.yaw);
+        cl.viewangles.yaw = anglemod(
+            cl.viewangles.yaw +
+            speed * cl_yawspeed.value *
+            (CL_KeyState(&in.left) - CL_KeyState(&in.right))
+        );
     }
     if (in.klook.state & 1) {
         V_StopPitchDrift();
-        cl.viewangles.pitch -= speed * cl_pitchspeed.value * CL_KeyState(&in.forward);
-        cl.viewangles.pitch += speed * cl_pitchspeed.value * CL_KeyState(&in.back);
+        cl.viewangles.pitch +=
+            speed * cl_pitchspeed.value *
+            (CL_KeyState(&in.back) - CL_KeyState(&in.forward));
     }
 
     float up = CL_KeyState(&in.lookup);
     float down = CL_KeyState(&in.lookdown);
 
-    cl.viewangles.pitch -= speed * cl_pitchspeed.value * up;
-    cl.viewangles.pitch += speed * cl_pitchspeed.value * down;
+    cl.viewangles.pitch += speed * cl_pitchspeed.value * (down - up);
 
     if (up || down)
         V_StopPitchDrift();
@@ -199,28 +201,22 @@ void CL_BaseMove(UserCmd_p cmd) {
     Q_memset(cmd, 0, sizeof(*cmd));
 
     if (in.strafe.state & 1) {
-        cmd->sidemove += cl_sidespeed.value * CL_KeyState(&in.right);
-        cmd->sidemove -= cl_sidespeed.value * CL_KeyState(&in.left);
+        cmd->move.side += cl_sidespeed.value * (CL_KeyState(&in.right) - CL_KeyState(&in.left));
     }
-
-    cmd->sidemove += cl_sidespeed.value * CL_KeyState(&in.moveright);
-    cmd->sidemove -= cl_sidespeed.value * CL_KeyState(&in.moveleft);
-
-    cmd->upmove += cl_upspeed.value * CL_KeyState(&in.up);
-    cmd->upmove -= cl_upspeed.value * CL_KeyState(&in.down);
+    cmd->move.side += cl_sidespeed.value * (CL_KeyState(&in.moveright) - CL_KeyState(&in.moveleft));
+    cmd->move.up += cl_upspeed.value * (CL_KeyState(&in.up) - CL_KeyState(&in.down));
 
     if (!(in.klook.state & 1)) {
-        cmd->forwardmove += cl_forwardspeed.value * CL_KeyState(&in.forward);
-        cmd->forwardmove -= cl_backspeed.value * CL_KeyState(&in.back);
+        cmd->move.forward += cl_forwardspeed.value * (CL_KeyState(&in.forward) - CL_KeyState(&in.back));
     }
 
     //
     // adjust for speed key
     //
     if (in.speed.state & 1) {
-        cmd->forwardmove *= cl_movespeedkey.value;
-        cmd->sidemove *= cl_movespeedkey.value;
-        cmd->upmove *= cl_movespeedkey.value;
+        cmd->move.forward *= cl_movespeedkey.value; // TODO: make as vector scale
+        cmd->move.side *= cl_movespeedkey.value;
+        cmd->move.up *= cl_movespeedkey.value;
     }
 
 #ifdef QUAKE2
@@ -253,9 +249,9 @@ void CL_SendMove(UserCmd_p cmd) {
     for (int i = 0; i < VECT_DIM; i++)
         MSG_WriteAngle(&buf, cl.viewangles.v[i]);   // TODO: wrap MSG_WriteAngle to vector tools
 
-    MSG_WriteShort(&buf, (int16_t)cmd->forwardmove);
-    MSG_WriteShort(&buf, (int16_t)cmd->sidemove);
-    MSG_WriteShort(&buf, (int16_t)cmd->upmove);
+    MSG_WriteShort(&buf, (int16_t)cmd->move.forward);
+    MSG_WriteShort(&buf, (int16_t)cmd->move.side);
+    MSG_WriteShort(&buf, (int16_t)cmd->move.up);
 
     //
     // send button bits

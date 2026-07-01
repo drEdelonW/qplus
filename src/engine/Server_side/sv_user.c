@@ -237,14 +237,14 @@ void SV_WaterMove() {
     // user intentions
     _bs = GetBasis(sv_player->v.v_angle); 
 
-    vec3_t wishvel = VectorMA(VectorScale(_bs.forward, cmd.forwardmove), cmd.sidemove, _bs.right);
+    vec3_t wishvel = VectorMA(VectorScale(_bs.forward, cmd.move.forward), cmd.move.side, _bs.right);
 
-    if (!(cmd.forwardmove) &&
-        !(cmd.sidemove) &&
-        !(cmd.upmove))
+    if (!(cmd.move.forward) &&
+        !(cmd.move.side) &&
+        !(cmd.move.up))
         wishvel.z -= 60;  // drift towards bottom
     else
-        wishvel.z += cmd.upmove;
+        wishvel.z += cmd.move.up;
 
     _wishSpeed = Length(wishvel);
     if (_wishSpeed > sv_maxspeed.value) {
@@ -300,8 +300,8 @@ SV_AirMove
 void SV_AirMove() {
     _bs = GetBasis(sv_player->v.v_angle); 
 
-    float fmove = cmd.forwardmove;
-    float smove = cmd.sidemove;
+    float fmove = cmd.move.forward;
+    float smove = cmd.move.side;
 
     // hack to not let you back into teleporter
     if ((SV_GetTime() < sv_player->v.teleport_time) &&
@@ -311,7 +311,7 @@ void SV_AirMove() {
     vec3_t wishvel = VectorMA(VectorScale(_bs.forward, fmove), smove, _bs.right);
 
     if ((int)sv_player->v.movetype != MOVETYPE_WALK)
-        wishvel.z = cmd.upmove;
+        wishvel.z = cmd.move.up;
     else
         wishvel.z = 0.0f;
 
@@ -401,9 +401,11 @@ void SV_ReadClientMove(UserCmd_p move) {
     remoteClient->edict->v.v_angle = angle;
 
     // read movement
-    move->forwardmove = MSG_ReadShort();
-    move->sidemove = MSG_ReadShort();
-    move->upmove = MSG_ReadShort();
+    move->move = (vec3_t){
+        .forward = MSG_ReadShort(),
+        .side    = MSG_ReadShort(),
+        .up      = MSG_ReadShort()
+    };
 
     // read buttons
     int bits = MSG_ReadByte();

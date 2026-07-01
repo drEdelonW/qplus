@@ -646,7 +646,7 @@ void IN_MouseMove(UserCmd_p cmd) {
 
     // add mouse X/Y movement to cmd
     if ((in.strafe.state & 1) || (lookstrafe.value && (in.mlook.state & 1)))
-        cmd->sidemove += m_side.value * mouse_x;
+        cmd->move.side += m_side.value * mouse_x;
     else
         cl.viewangles[YAW] -= m_yaw.value * mouse_x;
 
@@ -662,9 +662,9 @@ void IN_MouseMove(UserCmd_p cmd) {
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)
-            cmd->upmove -= m_forward.value * mouse_y;
+            cmd->move.up -= m_forward.value * mouse_y;
         else
-            cmd->forwardmove -= m_forward.value * mouse_y;
+            cmd->move.forward -= m_forward.value * mouse_y;
     }
 
     // if the mouse has moved, force it to the center, so there's room to move
@@ -1050,14 +1050,14 @@ void IN_JoyMove(UserCmd_p cmd) {
             else {
                 // user wants forward control to be forward control
                 if (fabs(fAxisValue) > joy_forwardthreshold.value) {
-                    cmd->forwardmove += (fAxisValue * joy_forwardsensitivity.value) * speed * cl_forwardspeed.value;
+                    cmd->move.forward += (fAxisValue * joy_forwardsensitivity.value) * speed * cl_forwardspeed.value;
                 }
             }
             break;
 
         case AxisSide:
             if (fabs(fAxisValue) > joy_sidethreshold.value) {
-                cmd->sidemove += (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
+                cmd->move.side += (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
             }
             break;
 
@@ -1065,7 +1065,7 @@ void IN_JoyMove(UserCmd_p cmd) {
             if ((in.strafe.state & 1) || (lookstrafe.value && (in.mlook.state & 1))) {
                 // user wants turn control to become side control
                 if (fabs(fAxisValue) > joy_sidethreshold.value) {
-                    cmd->sidemove -= (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
+                    cmd->move.side -= (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
                 }
             }
             else {
