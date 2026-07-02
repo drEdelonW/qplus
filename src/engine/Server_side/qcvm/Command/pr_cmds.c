@@ -39,6 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdlib.h>
 #include "GlobVars.h"
 #include "LeafModel.h"
+#include "GameRule.h"
 
 /*
 ===============================================================================
@@ -145,17 +146,16 @@ void PF_setorigin() {
     SV_LinkEdict(edict, false);
 }
 
-void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
+void SetMinMaxSize(edict_p edict, BBox_t bb, bool rotate) {
     for (int i = 0; i < VECT_DIM; i++)
-        if (min.v[i] > max.v[i])
+        if (bb.mins.v[i] > bb.maxs.v[i])
             PR_RunError("backwards mins/maxs");
 
     rotate = false; // FIXME: implement rotation properly again
 
-    vec3_t rmin, rmax;
+    BBox_t rbb;
     if (!rotate) {
-        rmin = min;
-        rmax = max;
+        rbb = bb;
     }
     else {
         // find min / max for rotations
@@ -174,11 +174,11 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
 
         // float bounds[2][3];
         vec3_t bounds[2];
-        bounds[0] = min;
-        bounds[1] = max;
+        bounds[0] = bb.mins;
+        bounds[1] = bb.maxs;
 
-        rmin.x = rmin.y = rmin.z = 9999.0f;
-        rmax.x = rmax.y = rmax.z = -9999.0f;
+        rbb.mins = Scalar2Vector(9999.0f);
+        rbb.maxs = Scalar2Vector(-9999.0f);
 
         vec3_t base;
         for (int i = 0; i <= 1; i++) {
@@ -190,12 +190,12 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
 
                     // transform the point
                     vec3_t transformed = {
-                        .x = xvector[0] * base.x + yvector[0] * base.y,
-                        .y = xvector[1] * base.x + yvector[1] * base.y,
+                        .x = xvector[X_AX] * base.x + yvector[X_AX] * base.y,
+                        .y = xvector[Y_AX] * base.x + yvector[Y_AX] * base.y,
                         .z = base.z
                     };
                     for (int l = 0; l < VECT_DIM; l++) {
-                        CLAMP(rmin.v[l], transformed.v[l], rmax.v[l]);
+                        CLAMP(rbb.mins.v[l], transformed.v[l], rbb.maxs.v[l]);
                     }
                 }
             }
@@ -203,9 +203,9 @@ void SetMinMaxSize(edict_p edict, vec3_t min, vec3_t max, bool rotate) {
     }
 
     // set derived values
-    edict->v.mins = rmin;
-    edict->v.maxs = rmax;
-    edict->v.size = VectorSubtract(max, min);
+    edict->v.mins = rbb.mins;
+    edict->v.maxs = rbb.maxs;
+    edict->v.size = VectorSubtract(bb.maxs, bb.mins);
 
     SV_LinkEdict(edict, false);
 }
@@ -221,9 +221,12 @@ setsize (entity, minvector, maxvector)
 */
 void PF_setsize() {
     edict_p edict = G_EDICT(OFS_PARM0);
-    vec3_t min = G_VECTOR(OFS_PARM1);
-    vec3_t max = G_VECTOR(OFS_PARM2);
-    SetMinMaxSize(edict, min, max, false);
+    BBox_t bb = { 
+        .mins = G_VECTOR(OFS_PARM1),
+        .maxs = G_VECTOR(OFS_PARM2)
+    };
+
+    SetMinMaxSize(edict, bb, false);
 }
 
 /*
@@ -250,8 +253,8 @@ void PF_setmodel() {
 
     Model_p mod = sv.models[(int)edict->v.modelindex]; // Mod_ForName (m, true);
 
-    if (mod)    SetMinMaxSize(edict, mod->BB.mins, mod->BB.maxs, true);
-    else        SetMinMaxSize(edict, vec3_origin, vec3_origin, true);
+    if (mod)    SetMinMaxSize(edict, mod->BB, true);
+    else        SetMinMaxSize(edict, (BBox_t){ .mins =  vec3_origin, .maxs = vec3_origin }, true);
 }
 
 /*
@@ -282,7 +285,7 @@ void PF_sprint() {
     cString str = PF_VarString(1);
 
     if ((ent_num < 1) ||
-        (ent_num > svs.maxClients)) {
+        (ent_num > GetSvMaxClients())) {
         Con_Printf("tried to sprint to a non-client\n");    return;
     }
 
@@ -305,7 +308,7 @@ void PF_centerprint() {
     uint32_t entnum = G_EDICTNUM(OFS_PARM0);
     cString str = PF_VarString(1);
 
-    if ((entnum < 1) || (entnum > svs.maxClients)) {
+    if ((entnum < 1) || (entnum > GetSvMaxClients())) {
         Con_Printf("tried to sprint to a non-client\n");    return;
     }
 
@@ -599,13 +602,13 @@ static uint8_t _checkPvs[MAX_MAP_LEAFS / 8];
 
 uint8_t PF_newcheckclient(uint8_t check) {
     // cycle to the next one
-    CLAMP(1u, check, svs.maxClients);
+    CLAMP(1u, check, GetSvMaxClients());
 
-    uint8_t i = (check == svs.maxClients) ? 0 : (check + 1);
+    uint8_t i = (check == GetSvMaxClients()) ? 0 : (check + 1);
 
     edict_p ent;
     for (;; i++) {
-        if (i == svs.maxClients + 1)
+        if (i == GetSvMaxClients() + 1)
             i = 1;
 
         ent = ED_GetEDictByIdx(i);
@@ -697,7 +700,7 @@ stuffcmd (clientent, value)
 void PF_stuffcmd() {
     uint32_t entnum = G_EDICTNUM(OFS_PARM0);
     if ((entnum < 1) ||
-        (entnum > svs.maxClients)
+        (entnum > GetSvMaxClients())
         )
         PR_RunError("Parm 0 not a client");
 
@@ -1026,7 +1029,7 @@ void PF_lightstyle() {
     if (sv.state != ss_active) return;
 
     RmtClient_p client = svs.clients;
-    for (int j = 0; j < svs.maxClients; j++, client++)
+    for (int j = 0; j < GetSvMaxClients(); j++, client++)
         if (client->active || client->spawned) {
             MSG_WriteChar(&client->message, svc_lightstyle);
             MSG_WriteChar(&client->message, (int8_t)style);
@@ -1224,7 +1227,7 @@ sizebuf_p WriteDest() {
     case MSG_ONE: {
         edict_p ent = ED_GetEDictByOffs(pr_global_struct->msg_entity);
         uint32_t entnum = ED_GetEDictIdx(ent);
-        if ((entnum < 1) || (entnum > svs.maxClients))
+        if ((entnum < 1) || (entnum > GetSvMaxClients()))
             PR_RunError("WriteDest: not a client");
         return &svs.clients[entnum - 1].message;
     }
@@ -1274,7 +1277,7 @@ void PF_setspawnparms() {
     edict_p ent = G_EDICT(OFS_PARM0);
     uint32_t i = ED_GetEDictIdx(ent);
     if ((i < 1) ||
-        (i > svs.maxClients))
+        (i > GetSvMaxClients()))
         PR_RunError("Entity is not a client");
 
     // copy spawn parms out of the RmtClient_t

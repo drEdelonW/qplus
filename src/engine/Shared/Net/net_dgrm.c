@@ -35,6 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "msg.h"
 #include "menu_prv.h"
 #include "GlobVars.h"
+#include "GameRule.h"
 
 
 #define BAN_TEST
@@ -793,7 +794,7 @@ static qsocket_p _Datagram_CheckNewConnections() {
         MSG_WriteString(&net_message, hostname.string);
         MSG_WriteString(&net_message, SV_GetName());
         MSG_WriteByte(&net_message, net_activeconnections);
-        MSG_WriteByte(&net_message, svs.maxClients);
+        MSG_WriteByte(&net_message, GetSvMaxClients());
         MSG_WriteByte(&net_message, NET_PROTOCOL_VERSION);
         *((int*)net_message.data) = BigLong(NETFLAG_CTL | (net_message.cursize & NETFLAG_LENGTH_MASK));
         dfunc.Write(acceptsock, net_message.data, net_message.cursize, &clientaddr);
@@ -808,14 +809,14 @@ static qsocket_p _Datagram_CheckNewConnections() {
 
         int clientNumber = 0;
         RmtClient_p client = svs.clients;
-        for (; clientNumber < svs.maxClients; clientNumber++, client++) {
+        for (; clientNumber < GetSvMaxClients(); clientNumber++, client++) {
             if (client->active) {
                 activeNumber++;
                 if (activeNumber == playerNumber)
                     break;
             }
         }
-        if (clientNumber == svs.maxClients)
+        if (clientNumber == GetSvMaxClients())
             return NULL;
 
         SZ_Clear(&net_message);

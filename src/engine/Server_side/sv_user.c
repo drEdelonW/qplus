@@ -36,6 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "transform.h"
 #include "progs.h"
 #include "GlobVars.h"
+#include "GameRule.h"
 
 
 edict_p sv_player;
@@ -510,7 +511,7 @@ SV_RunClients
 */
 void SV_RunClients() {
     remoteClient = svs.clients;
-    for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+    for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
         if (!remoteClient->active) continue;
 
         sv_player = remoteClient->edict;
@@ -529,7 +530,7 @@ void SV_RunClients() {
         // always pause in single player if in console or menus
         if (!sv.paused &&
             (
-                (svs.maxClients > 1) ||
+                (GetSvMaxClients() > 1) ||
                 (key.dest == key_game))
             )   SV_ClientThink();
     }

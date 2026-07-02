@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "console.h"
 #include "q_tools.h"
 #include "z_hunk.h"
+#include "GameRule.h"
 
 
 qsocket_p net_activeSockets = NULL;
@@ -104,7 +105,7 @@ qsocket_p NET_NewQSocket() {
     if (net_freeSockets == NULL)
         return NULL;
 
-    if (net_activeconnections >= svs.maxClients)
+    if (net_activeconnections >= GetSvMaxClients())
         return NULL;
 
     // get one from free list
@@ -176,7 +177,7 @@ static void NET_Listen_f() {
 
 static void MaxPlayers_f() {
     if (Cmd_Argc() != 2) {
-        Con_Printf("\"maxplayers\" is \"%u\"\n", svs.maxClients);
+        Con_Printf("\"maxplayers\" is \"%u\"\n", GetSvMaxClients());
         return;
     }
 
@@ -188,8 +189,8 @@ static void MaxPlayers_f() {
     int n = Q_atoi(Cmd_Argv(1));
     if (n < 1)
         n = 1;
-    if (n > svs.maxClientsLimit) {
-        n = svs.maxClientsLimit;
+    if (n > GetSvMaxClientsLimit()) {
+        n = GetSvMaxClientsLimit();
         Con_Printf("\"maxplayers\" set to \"%u\"\n", n);
     }
 
@@ -611,7 +612,7 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
     bool state2[MAX_SCOREBOARD];
 
     remoteClient = svs.clients;
-    for (int32_t i = 0; i < svs.maxClients; i++, remoteClient++) {
+    for (int32_t i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
         if (!remoteClient->netconnection)
             continue;
         if (remoteClient->active) {
@@ -635,7 +636,7 @@ int32_t NET_SendToAll(sizebuf_p data, int32_t blocktime) {
     while (count) {
         count = 0;
         remoteClient = svs.clients;
-        for (int32_t i = 0; i < svs.maxClients; i++, remoteClient++) {
+        for (int32_t i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
             if (!state1[i]) {
                 if (NET_CanSendMessage(remoteClient->netconnection)) {
                     state1[i] = true;
@@ -696,7 +697,7 @@ void NET_Init() {
 
     if (COM_CheckParm("-listen") || (Host_IsDedicated()))
         listening = true;
-    net_numsockets = svs.maxClientsLimit;
+    net_numsockets = GetSvMaxClientsLimit();
     if (!Host_IsDedicated())
         net_numsockets++;
 

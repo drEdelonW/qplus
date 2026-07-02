@@ -70,7 +70,7 @@ angles and bad trails.
 =================
 */
 edict_p ED_Alloc() {
-    uint32_t i = svs.maxClients + 1; // Clients + World
+    uint32_t i = GetSvMaxClients() + 1; // Clients + World
     for (; i < EdictsNum; i++) {
         edict_p edict = ED_GetEDictByIdx(i);
         // the first couple seconds of server time can involve a lot of

@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "transform.h"
 #include "progs.h"
 #include "GlobVars.h"
+#include "GameRule.h"
 
 /*
 
@@ -1348,7 +1349,7 @@ void SV_Physics() {
             SV_LinkEdict(ent, true); // force retouch even for stationary
         }
 
-        if ((i > 0) && (i <= svs.maxClients)) {
+        if ((i > 0) && (i <= GetSvMaxClients())) {
             SV_Physics_Client(ent, i);
         }
         else {

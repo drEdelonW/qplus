@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "net_loop.h"
 #include "cvar_q1.h"
 #include "console.h"
+#include "GameRule.h"
 
 
 bool localconnectpending = false;
@@ -51,7 +52,7 @@ void Loop_SearchForHosts(bool xmit) {
         Q_strcpy(hostcache[0].name, hostname.string);
     Q_strcpy(hostcache[0].map, SV_GetName());
     hostcache[0].users = net_activeconnections;
-    hostcache[0].maxusers = svs.maxClients;
+    hostcache[0].maxusers = GetSvMaxClients();
     hostcache[0].driver = net_driverlevel;
     Q_strcpy(hostcache[0].cname, "local");
 }

@@ -80,7 +80,7 @@ typedef struct {
     bool        dropasap;   // has been told to go to another level
     bool        privileged; // can execute any host command
     bool        sendsignon; // only valid before spawned
-    LegTime_t      last_message;   // reliable messages must be sent periodically // TODO: add time to name like last_messageTime
+    LegTime_t   last_message;   // reliable messages must be sent periodically // TODO: add time to name like last_messageTime
     qsocket_p   netconnection;  // communications handle
     UserCmd_t   cmd;        // movement
     vec3_t      wishdir;    // intended motion calced from cmd

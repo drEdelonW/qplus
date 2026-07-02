@@ -143,10 +143,10 @@ void SV_CheckForNewClients() {
         // init a new client structure
         //
         int i = 0;
-        for (; i < svs.maxClients; i++) {
+        for (; i < GetSvMaxClients(); i++) {
             if (!svs.clients[i].active) break;
         }
-        if (i == svs.maxClients)        Host_SysError("Host_CheckForNewClients: no free clients");
+        if (i == GetSvMaxClients())        Host_SysError("Host_CheckForNewClients: no free clients");
 
         svs.clients[i].netconnection = ret;
         SV_ConnectClient(i);
@@ -200,7 +200,7 @@ void SV_SendClientMessages() {
 
     // build individual updates
     remoteClient = svs.clients;
-    for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+    for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
         if (!remoteClient->active)   continue;
 
         if (remoteClient->spawned) {
@@ -291,7 +291,7 @@ int SV_ModelIndex(cString name) {
 void SV_SaveSpawnparms() {
     svs.serverflags = (uint32_t)pr_global_struct->serverflags;
     remoteClient = svs.clients;
-    for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+    for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
         if (!remoteClient->active)       continue;
 
         // call the progs to get default spawn parms for the new client
@@ -361,8 +361,8 @@ void SV_SpawnServer(cString server
     // sv.edicts = Edicts;
 
     // leave slots at start for clients only
-    EdictsNum = svs.maxClients + 1;
-    for (int i = 0; i < svs.maxClients; i++) {
+    EdictsNum = GetSvMaxClients() + 1;
+    for (int i = 0; i < GetSvMaxClients(); i++) {
         svs.clients[i].edict = ED_GetEDictByIdx(i + 1);
     }
 
@@ -450,7 +450,7 @@ void SV_SpawnServer(cString server
 
     // send serverinfo to all connected clients
     remoteClient = svs.clients;
-    for (int i = 0; i < svs.maxClients; i++, remoteClient++)
+    for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++)
         if (remoteClient->active)
             SV_SendServerinfo(remoteClient);
 

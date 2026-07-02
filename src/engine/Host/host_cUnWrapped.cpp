@@ -10,6 +10,7 @@
 #include "console.h"
 #include "screen.h"
 #include "msg.h"
+#include "GameRule.h"
 
 #include <setjmp.h>
 extern jmp_buf host_abortserver;
@@ -111,7 +112,7 @@ void SV_BroadcastPrintf(cString fmt, ...) {
     char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
 
-    for (int i = 0; i < svs.maxClients; i++)
+    for (int i = 0; i < GetSvMaxClients(); i++)
         if (svs.clients[i].active && svs.clients[i].spawned) {
             sizebuf_p pBuf = &svs.clients[i].message;
             MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);

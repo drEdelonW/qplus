@@ -137,8 +137,8 @@ void Host::Error(cString error, ...) {
     va_end(argptr);
     Con_Printf("Host::Error: %s\n", string);
 
-    if (SV_IsActive())  ShutdownServer(false);
-    if (Host_IsDedicated())  Host_SysError("Host::Error: %s\n", string); // dedicated servers exit
+    if (SV_IsActive())          ShutdownServer(false);
+    if (Host_IsDedicated())     Host_SysError("Host::Error: %s\n", string); // dedicated servers exit
 
     CL_Disconnect();
     cls.demonum = -1;
@@ -171,12 +171,12 @@ void Host::FindMaxClients() {
         if (param != (com.argc - 1))    svs.maxClients = Q_atoi(com.argv[param + 1]);
         else                            svs.maxClients = 8;
     }
-    if (svs.maxClients < 1)                     svs.maxClients = 8;
-    else if (svs.maxClients > MAX_SCOREBOARD)   svs.maxClients = MAX_SCOREBOARD;
+    /**/ if (GetSvMaxClients() < 1)                 svs.maxClients = 8;
+    else if (GetSvMaxClients() > MAX_SCOREBOARD)    svs.maxClients = MAX_SCOREBOARD;
 
-    svs.maxClientsLimit = svs.maxClients;
-    if (svs.maxClientsLimit < MAX_CLIENT_LIMIT) svs.maxClientsLimit = MAX_CLIENT_LIMIT;
-    svs.clients = (RmtClient_p)Hunk_AllocName(svs.maxClientsLimit * sizeof(RmtClient_t), "clients");
+    svs.maxClientsLimit = GetSvMaxClients();
+    if (GetSvMaxClientsLimit() < MAX_CLIENT_LIMIT)  svs.maxClientsLimit = MAX_CLIENT_LIMIT;
+    svs.clients = (RmtClient_p)Hunk_AllocName(GetSvMaxClientsLimit() * sizeof(RmtClient_t), "clients");
 
     if (isMultiplayer()) Cvar_SetValue("deathmatch", 1.f);
     else                    Cvar_SetValue("deathmatch", 0.f);
@@ -254,6 +254,7 @@ void SV_ClientPrintf(cString fmt, ...) {
     va_list  argptr;    va_start(argptr, fmt);
     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
+
     sizebuf_p pBuf = &remoteClient->message;
     MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
 }
@@ -270,8 +271,11 @@ void SV_BroadcastPrintf(cString fmt, ...) {
     va_list  argptr;    va_start(argptr, fmt);
     char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
     va_end(argptr);
-    for (int i = 0; i < svs.maxClients; i++)
-        if (svs.clients[i].active && svs.clients[i].spawned) {
+
+    for (int i = 0; i < GetSvMaxClients(); i++)
+        if ((svs.clients[i].active) &&
+            (svs.clients[i].spawned)
+            ) {
             sizebuf_p pBuf = &svs.clients[i].message;
             MSG_WriteByte(pBuf, svc_print);   MSG_WriteString(pBuf, string);
         }
@@ -333,8 +337,9 @@ void SV_DropClient(bool crash) {
 
     // send notification to all clients
     RmtClient_p client = svs.clients;
-    for (int i = 0; i < svs.maxClients; i++, client++) {
+    for (int i = 0; i < GetSvMaxClients(); i++, client++) {
         if (!client->active)    continue;
+
         sizebuf_p pBuf = &client->message;
         MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteString(pBuf, "");
         MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteShort(pBuf, 0);
@@ -364,9 +369,10 @@ void Host::ShutdownServer(bool crash) {
     do {
         count = 0;
         remoteClient = svs.clients;
-        for (int i = 0; i < svs.maxClients; i++, remoteClient++)
+        for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++)
             if (remoteClient->active && remoteClient->message.cursize) {
-                if (NET_CanSendMessage(remoteClient->netconnection)) {
+                if (NET_CanSendMessage(remoteClient->netconnection)
+                    ) {
                     NET_SendMessage(remoteClient->netconnection, &remoteClient->message);
                     SZ_Clear(&remoteClient->message);
                 }
@@ -392,7 +398,7 @@ void Host::ShutdownServer(bool crash) {
             Con_Printf("Host::ShutdownServer: NET_SendToAll failed for %u clients\n", count);
     }
     remoteClient = svs.clients;
-    for (int i = 0; i < svs.maxClients; i++, remoteClient++)
+    for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++)
         if (remoteClient->active)
             SV_DropClient(crash);
 
@@ -400,7 +406,7 @@ void Host::ShutdownServer(bool crash) {
     // clear structures
     //
     memset(&sv, 0, sizeof(sv));
-    memset(svs.clients, 0, svs.maxClientsLimit * sizeof(RmtClient_t));
+    memset(svs.clients, 0, GetSvMaxClientsLimit() * sizeof(RmtClient_t));
 }
 
 
@@ -646,7 +652,7 @@ void Host::Frame(RealDt_t time) {
             _timeCount = 0;
             _timeTotal = 0;
             int numCli = 0;
-            for (int i = 0; i < svs.maxClients; i++) {
+            for (int i = 0; i < GetSvMaxClients(); i++) {
                 if (svs.clients[i].active)
                     numCli++;
             }

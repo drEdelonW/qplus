@@ -26,16 +26,15 @@ void SV_AddToFatPVS(vec3_t org, mNode_p node) {
         if (node->contents < CONTENTS_NODE) {
             if (node->contents != CONTENTS_SOLID) {
                 uint8_p pvs = Mod_LeafPVS((mLeaf_p)node, sv.worldmodel);
-                for (int i = 0; i < _fatBytes; i++) {
+                for (int i = 0; i < _fatBytes; i++) 
                     _fatPvs[i] |= pvs[i];
-                }
             }
             return;
         }
 
         mPlane_p plane = node->plane;
         float d = DotProduct(org, plane->normal) - plane->dist;
-        if (d > 8)          node = node->children[0];
+        /**/ if (d > 8)     node = node->children[0];
         else if (d < -8)    node = node->children[1];
         else {  // go down both
             SV_AddToFatPVS(org, node->children[0]);

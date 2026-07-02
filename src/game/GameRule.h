@@ -7,10 +7,11 @@ extern int current_skill;  // skill level for currently loaded level (in case th
 extern "C" {
 #endif
 
+    int GetSvMaxClients();
+    int GetSvMaxClientsLimit();
     bool isMultiplayer();
     bool isSingleGame();
     bool isSvPaused();
-    int GetSvMaxClients();
 
     bool isIntermission();
 

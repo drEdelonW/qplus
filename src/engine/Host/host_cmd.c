@@ -85,10 +85,10 @@ void Host_Status_f() {
     if (tcpipAvailable)     print("tcp/ip:  %s\n", my_tcpip_address);
     if (ipxAvailable)       print("ipx:     %s\n", my_ipx_address);
     print("map:     %s\n", SV_GetName());
-    print("players: %i active (%i max)\n\n", net_activeconnections, svs.maxClients);
+    print("players: %i active (%i max)\n\n", net_activeconnections, GetSvMaxClients());
 
     RmtClient_p rClient = svs.clients;
-    for (int j = 0; j < svs.maxClients; j++, rClient++) {
+    for (int j = 0; j < GetSvMaxClients(); j++, rClient++) {
         if (!rClient->active)    continue;
 
         int seconds = (int)(net_time - rClient->netconnection->connecttime);
@@ -132,7 +132,7 @@ void Host_Ping_f() {
 
     SV_ClientPrintf("Client ping times:\n");
     RmtClient_p rClient = svs.clients;
-    for (int i = 0; i < svs.maxClients; i++, rClient++) {
+    for (int i = 0; i < GetSvMaxClients(); i++, rClient++) {
         if (!rClient->active)    continue;
 
         float total = 0;
@@ -345,7 +345,7 @@ void Host_Savegame_f() {
     if (Cmd_Argc() != 2) { ;            Con_Printf("save <savename> : save a game\n");          return; }
     if (strstr(Cmd_Argv(1), "..")) { ;  Con_Printf("Relative pathnames are not allowed.\n");    return; }
 
-    for (int i = 0; i < svs.maxClients; i++) {
+    for (int i = 0; i < GetSvMaxClients(); i++) {
         if (svs.clients[i].active &&
             (svs.clients[i].edict->v.health <= 0)
             ) {
@@ -544,7 +544,7 @@ void SaveGamestate() {
     }
 
 
-    for (int i = svs.maxClients + 1; i < EdictsNum; i++) {
+    for (int i = GetSvMaxClients() + 1; i < EdictsNum; i++) {
         edict_p ent = ED_GetEDictByIdx(i);
         if ((int32_t)ent->v.flags & FL_ARCHIVE_OVERRIDE)
             continue;
@@ -706,7 +706,7 @@ void Host_Please_f() {
         (Q_strcmp(Cmd_Argv(1), "#") == 0)) {
         int j = Q_atof(Cmd_Argv(2)) - 1;
         if ((j < 0) ||
-            (j >= svs.maxClients) ||
+            (j >= GetSvMaxClients()) ||
             (!svs.clients[j].active)
             )
             return;
@@ -725,7 +725,7 @@ void Host_Please_f() {
 
     {
         RmtClient_p cl = svs.clients;
-        for (int j = 0; j < svs.maxClients; j++, cl++) {
+        for (int j = 0; j < GetSvMaxClients(); j++, cl++) {
             if (!cl->active)    continue;
             if (Q_strcasecmp(cl->name, Cmd_Argv(1)) == 0) {
                 if (cl->privileged) {
@@ -777,7 +777,7 @@ void Host_Say(bool teamonly) {
         strcat(text, "\n");
 
         RmtClient_p rClient = svs.clients;
-        for (int j = 0; j < svs.maxClients; j++, rClient++) {
+        for (int j = 0; j < GetSvMaxClients(); j++, rClient++) {
             if (!rClient ||
                 !rClient->active ||
                 !rClient->spawned ||
@@ -831,7 +831,7 @@ void Host_Tell_f() {
     RmtClient_p save = remoteClient;
     {
         RmtClient_p rClient = svs.clients;
-        for (int j = 0; j < svs.maxClients; j++, rClient++) {
+        for (int j = 0; j < GetSvMaxClients(); j++, rClient++) {
             if (!rClient->active || !rClient->spawned)        continue;
             if (Q_strcasecmp(rClient->name, Cmd_Argv(1)))    continue;
 
@@ -1004,7 +1004,7 @@ void Host_Spawn_f() {
     MSG_WriteByte(pBuf, svc_time);    MSG_WriteFloat(pBuf, (float)SV_GetTime());
     {
         RmtClient_p rClient = svs.clients;
-        for (int i = 0; i < svs.maxClients; i++, rClient++) {
+        for (int i = 0; i < GetSvMaxClients(); i++, rClient++) {
             MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, i); MSG_WriteString(pBuf, rClient->name);
             MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, i); MSG_WriteShort(pBuf, rClient->old_frags);
             MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, i); MSG_WriteByte(pBuf, rClient->colors);
@@ -1083,7 +1083,7 @@ void Host_Kick_f() {
         ) {
         i = (int32_t)Q_atof(Cmd_Argv(2)) - 1;
         if ((i < 0) ||
-            (i >= svs.maxClients) ||
+            (i >= GetSvMaxClients()) ||
             (!svs.clients[i].active)
             )
             return;
@@ -1092,13 +1092,13 @@ void Host_Kick_f() {
     }
     else {
         remoteClient = svs.clients;
-        for (i = 0; i < svs.maxClients; i++, remoteClient++) {
+        for (i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
             if (!remoteClient->active)                               continue;
             if (Q_strcasecmp(remoteClient->name, Cmd_Argv(1)) == 0)  break;
         }
     }
 
-    if (i < svs.maxClients) {
+    if (i < GetSvMaxClients()) {
         cString who;
         if (isCliCmd())
             if (Host_IsDedicated())  who = "Console";

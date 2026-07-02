@@ -10,6 +10,7 @@
 #include "host.h"
 #include "sound.h"
 #include "gamedefs.h"
+#include "GameRule.h"
 #include "GlobVars.h"
 #include "cmd.h"
 
@@ -131,7 +132,7 @@ void SV_SendServerinfo(RmtClient_p client) {
     snprintf(message, sizeof(message), "%c\nVERSION %4.2f SERVER (%i CRC)", 2, VERSION, pr_crc);
     MSG_WriteString(pBuf, message);
 
-    MSG_WriteByte(pBuf, svc_serverinfo); MSG_WriteLong(pBuf, PROTOCOL_VERSION); MSG_WriteByte(pBuf, svs.maxClients);
+    MSG_WriteByte(pBuf, svc_serverinfo); MSG_WriteLong(pBuf, PROTOCOL_VERSION); MSG_WriteByte(pBuf, GetSvMaxClients());
 
     MSG_WriteByte(pBuf, (!coop.value && deathmatch.value) ? GAME_DEATHMATCH : GAME_COOP);
 
@@ -396,10 +397,10 @@ void SV_UpdateToReliableMessages() {
 
     // check for changes to be sent over the reliable streams
     remoteClient = svs.clients;
-    for (int i = 0; i < svs.maxClients; i++, remoteClient++) {
+    for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
         if (remoteClient->old_frags != remoteClient->edict->v.frags) {
             client = svs.clients;
-            for (int j = 0; j < svs.maxClients; j++, client++) {
+            for (int j = 0; j < GetSvMaxClients(); j++, client++) {
                 if (!client->active)    continue;
 
                 sizebuf_p pBuf = &client->message;
@@ -411,7 +412,7 @@ void SV_UpdateToReliableMessages() {
     }
 
     client = svs.clients;
-    for (int j = 0; j < svs.maxClients; j++, client++) {
+    for (int j = 0; j < GetSvMaxClients(); j++, client++) {
         if (!client->active)    continue;
         SZ_Write(&client->message, sv.reliable_datagram.data, sv.reliable_datagram.cursize);
     }
@@ -433,7 +434,7 @@ void SV_CreateBaseline() {
         // get the current server version
         edict_p svent = ED_GetEDictByIdx(entnum);
         if ((svent->free) ||
-            ((entnum > svs.maxClients) &&
+            ((entnum > GetSvMaxClients()) &&
                 !svent->v.modelindex)
             )
             continue;
@@ -446,7 +447,7 @@ void SV_CreateBaseline() {
         svent->baseline.frame = (int32_t)svent->v.frame;
         svent->baseline.skin = (int32_t)svent->v.skin;
         if ((entnum > 0) &&
-            (entnum <= svs.maxClients)
+            (entnum <= GetSvMaxClients())
             ) {
             svent->baseline.colormap = (int32_t)entnum;
             svent->baseline.modelindex = SV_ModelIndex("progs/player.mdl");

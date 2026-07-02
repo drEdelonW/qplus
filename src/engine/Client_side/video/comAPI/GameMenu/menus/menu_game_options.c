@@ -166,7 +166,7 @@ void M_Menu_GameOptions_f() {
     m_state = m_gameoptions;
     m_entersound = true;
     if (_maxPlayers == 0)    _maxPlayers = GetSvMaxClients();
-    if (_maxPlayers < 2)     _maxPlayers = svs.maxClientsLimit;
+    if (_maxPlayers < 2)     _maxPlayers = GetSvMaxClientsLimit();
 }
 
 
@@ -290,8 +290,8 @@ void M_NetStart_Change(int dir) {
     switch (_cursor) {
     case go_MaxPlayer: {
         _maxPlayers += dir;
-        if (_maxPlayers > svs.maxClientsLimit) {
-            _maxPlayers = svs.maxClientsLimit;
+        if (_maxPlayers > GetSvMaxClientsLimit()) {
+            _maxPlayers = GetSvMaxClientsLimit();
             _svInfoMsg = true;
             _svInfoMsgTime = GetRealTime();
         }
