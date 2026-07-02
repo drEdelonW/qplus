@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include "GameRule.h"
 #include "server.h"
 #undef SERVER   // TODO: remove this workaround
 #include "common.h"
@@ -177,8 +178,8 @@ void Host::FindMaxClients() {
     if (svs.maxClientsLimit < MAX_CLIENT_LIMIT) svs.maxClientsLimit = MAX_CLIENT_LIMIT;
     svs.clients = (RmtClient_p)Hunk_AllocName(svs.maxClientsLimit * sizeof(RmtClient_t), "clients");
 
-    if (svs.maxClients > 1) Cvar_SetValue("deathmatch", 1.0);
-    else                    Cvar_SetValue("deathmatch", 0.0);
+    if (isMultiplayer()) Cvar_SetValue("deathmatch", 1.f);
+    else                    Cvar_SetValue("deathmatch", 0.f);
 }
 
 
@@ -491,8 +492,11 @@ void Host::_ServerFrame() {
 
     // move things around and think
     // always pause in single player if in console or menus
-    if (!sv.paused && ((svs.maxClients > 1) || (key.dest == key_game)))
-        SV_Physics();
+    if (!sv.paused &&
+        (
+            (isMultiplayer()) ||
+            (key.dest == key_game))
+        )   SV_Physics();
 }
 
 void Host::ServerFrame() {
@@ -532,11 +536,9 @@ void Host::ServerFrame() {
     // always pause in single player if in console or menus
     if (!sv.paused &&
         (
-            (svs.maxClients > 1) ||
-            (key.dest == key_game)
-            )
-        )
-        SV_Physics();
+            (isMultiplayer()) ||
+            (key.dest == key_game))
+        )   SV_Physics();
 
     SV_SendClientMessages(); // send all messages to the clients
 }

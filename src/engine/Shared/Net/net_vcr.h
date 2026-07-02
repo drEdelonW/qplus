@@ -40,6 +40,7 @@ typedef struct {
     int ret;
     int32_t len;
 } vGMsg_t;
+
 typedef struct {
     SimTime_t       time;
     vcr_opcode_t    op; // it was int
@@ -51,12 +52,14 @@ extern bool isVCRrec;
 extern int  vcrFile;
 
 int VCR_Init();
-void VCR_Listen(bool state);
-void VCR_SearchForHosts(bool xmit);
-qsocket_p VCR_Connect(cString host);
-qsocket_p VCR_CheckNewConnections();
-int VCR_GetMessage(qsocket_p sock);
-int VCR_SendMessage(qsocket_p sock, sizebuf_p data);
-bool VCR_CanSendMessage(qsocket_p sock);
-void VCR_Close(qsocket_p sock);
-void VCR_Shutdown();
+#if 0   /* not used external */
+    void VCR_Listen(bool state);
+    void VCR_SearchForHosts(bool xmit);
+    qsocket_p VCR_Connect(cString host);
+    qsocket_p VCR_CheckNewConnections();
+    int VCR_GetMessage(qsocket_p sock);
+    int VCR_SendMessage(qsocket_p sock, sizebuf_p data);
+    bool VCR_CanSendMessage(qsocket_p sock);
+    void VCR_Close(qsocket_p sock);
+    void VCR_Shutdown();
+#endif

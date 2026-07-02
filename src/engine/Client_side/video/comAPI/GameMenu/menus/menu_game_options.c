@@ -6,6 +6,7 @@
 #include "screen.h" // SCR_BeginLoadingPlaque();
 #include "cbuf.h"
 #include "gamedefs.h"
+#include "GameRule.h"
 
 //=============================================================================
 /* GAME OPTIONS MENU */
@@ -164,7 +165,7 @@ void M_Menu_GameOptions_f() {
     key.dest = key_menu;
     m_state = m_gameoptions;
     m_entersound = true;
-    if (_maxPlayers == 0)    _maxPlayers = svs.maxClients;
+    if (_maxPlayers == 0)    _maxPlayers = GetSvMaxClients();
     if (_maxPlayers < 2)     _maxPlayers = svs.maxClientsLimit;
 }
 

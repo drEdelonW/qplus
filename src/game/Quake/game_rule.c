@@ -8,7 +8,6 @@
 #include "cvar_q1.h"
 
 
-int32_t current_skill;
 
 bool standard_quake = true;
 bool rogue;
@@ -38,7 +37,6 @@ static uint16_t _pop[128] = {
 
 /*
 
-
 All of Quake's data access is through a hierchal file system, but the contents of the file system can be transparently merged from several sources.
 
 The "base directory" is the path to the directory holding the quake.exe and all game directories.  The sys_* files pass this to host_init in QuakeParms_t->baseDir.  This can be overridden with the "-basedir" command line parm to allow code debugging in a different directory.  The base directory is
@@ -50,11 +48,8 @@ The "cache directory" is only used during development to save network bandwidth,
 specified, when a file is found by the normal search path, it will be mirrored
 into the cache directory, then opened there.
 
-
-
 FIXME:
 The file "parms.txt" will be read out of the game directory and appended to the current command line arguments to allow different games to initialize startup parms differently.  This could be used to add a "-sspeed 22050" for the high quality sound edition.  Because they are added at the end, they will not override an explicit setting on the original command line.
-
 */
 
 
@@ -69,6 +64,7 @@ Immediately exits out if an alternate game was attempted to be started without
 being registered.
 ================
 */
+
 void GM_CheckRegistered() {
     int h;
     COM_OpenFile("gfx/pop.lmp", &h);

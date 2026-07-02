@@ -2,6 +2,7 @@
 #include "screen.h"
 #include "client.h"
 #include "cvar_q1.h"
+#include "GameRule.h"
 
 
 /*
@@ -13,7 +14,7 @@ void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) {
     float size = (scr_viewsize.value > 100.0f) ?
         100.0f : scr_viewsize.value;
 
-    if (cl.intermission != IM_NONE) {
+    if (isIntermission()) {
         size = 100.0f;
         lineadj = 0;
     }

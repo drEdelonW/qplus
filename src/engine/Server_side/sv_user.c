@@ -528,11 +528,10 @@ void SV_RunClients() {
 
         // always pause in single player if in console or menus
         if (!sv.paused &&
-            ((svs.maxClients > 1) ||
-                (key.dest == key_game)
-                )
-            )
-            SV_ClientThink();
+            (
+                (svs.maxClients > 1) ||
+                (key.dest == key_game))
+            )   SV_ClientThink();
     }
 }
 
@@ -563,8 +562,13 @@ void Host_God_f() {
 
 
 void Host_Notarget_f() {
-    if (isCliCmd()) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
+    if (isCliCmd()) {
+        Cmd_ForwardToServer();
+        return;
+    }
+    if ((pr_global_struct->deathmatch) &&
+        !(remoteClient->privileged)
+        )  return;
 
     sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_NOTARGET;
     SV_ClientPrintf("notarget %s\n",
@@ -576,8 +580,13 @@ void Host_Notarget_f() {
 bool noclip_anglehack;
 
 void Host_Noclip_f() {
-    if (isCliCmd()) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
+    if (isCliCmd()) {
+        Cmd_ForwardToServer();
+        return;
+    }
+    if ((pr_global_struct->deathmatch) &&
+        !(remoteClient->privileged)
+        )  return;
 
     if (sv_player->v.movetype == MOVETYPE_NOCLIP) {
         noclip_anglehack = false;
@@ -599,8 +608,14 @@ Sets client to flymode
 ==================
 */
 void Host_Fly_f() {
-    if (isCliCmd()) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
+    if (isCliCmd()) {
+        Cmd_ForwardToServer();
+        return;
+    }
+
+    if ((pr_global_struct->deathmatch) &&
+        !(remoteClient->privileged)
+        )  return;
 
     if (sv_player->v.movetype == MOVETYPE_FLY) {
         sv_player->v.movetype = MOVETYPE_WALK;

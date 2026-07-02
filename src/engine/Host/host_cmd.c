@@ -41,6 +41,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "msg.h"
 #include "menu_prv.h"
 #include "progs.h"
+#include "GameRule.h"
 
 /*
 ==================
@@ -87,7 +88,7 @@ void Host_Status_f() {
     print("players: %i active (%i max)\n\n", net_activeconnections, svs.maxClients);
 
     RmtClient_p rClient = svs.clients;
-    for (int32_t j = 0; j < svs.maxClients; j++, rClient++) {
+    for (int j = 0; j < svs.maxClients; j++, rClient++) {
         if (!rClient->active)    continue;
 
         int seconds = (int)(net_time - rClient->netconnection->connecttime);
@@ -131,7 +132,7 @@ void Host_Ping_f() {
 
     SV_ClientPrintf("Client ping times:\n");
     RmtClient_p rClient = svs.clients;
-    for (int32_t i = 0; i < svs.maxClients; i++, rClient++) {
+    for (int i = 0; i < svs.maxClients; i++, rClient++) {
         if (!rClient->active)    continue;
 
         float total = 0;
@@ -339,12 +340,12 @@ Host_Savegame_f
 void Host_Savegame_f() {
     if (isNetCmd())      return;
     if (!SV_IsActive()) { ;             Con_Printf("Not playing a local game.\n");              return; }
-    if (cl.intermission != IM_NONE) { ; Con_Printf("Can't save in intermission.\n");            return; }
-    if (svs.maxClients != 1) { ;        Con_Printf("Can't save multiplayer games.\n");          return; }
+    if (isIntermission()) { ;           Con_Printf("Can't save in intermission.\n");            return; }
+    if (isMultiplayer()) { ;            Con_Printf("Can't save multiplayer games.\n");          return; }
     if (Cmd_Argc() != 2) { ;            Con_Printf("save <savename> : save a game\n");          return; }
     if (strstr(Cmd_Argv(1), "..")) { ;  Con_Printf("Relative pathnames are not allowed.\n");    return; }
 
-    for (int32_t i = 0; i < svs.maxClients; i++) {
+    for (int i = 0; i < svs.maxClients; i++) {
         if (svs.clients[i].active &&
             (svs.clients[i].edict->v.health <= 0)
             ) {
@@ -776,7 +777,7 @@ void Host_Say(bool teamonly) {
         strcat(text, "\n");
 
         RmtClient_p rClient = svs.clients;
-        for (int32_t j = 0; j < svs.maxClients; j++, rClient++) {
+        for (int j = 0; j < svs.maxClients; j++, rClient++) {
             if (!rClient ||
                 !rClient->active ||
                 !rClient->spawned ||
@@ -830,7 +831,7 @@ void Host_Tell_f() {
     RmtClient_p save = remoteClient;
     {
         RmtClient_p rClient = svs.clients;
-        for (int32_t j = 0; j < svs.maxClients; j++, rClient++) {
+        for (int j = 0; j < svs.maxClients; j++, rClient++) {
             if (!rClient->active || !rClient->spawned)        continue;
             if (Q_strcasecmp(rClient->name, Cmd_Argv(1)))    continue;
 
@@ -1003,7 +1004,7 @@ void Host_Spawn_f() {
     MSG_WriteByte(pBuf, svc_time);    MSG_WriteFloat(pBuf, (float)SV_GetTime());
     {
         RmtClient_p rClient = svs.clients;
-        for (uint8_t i = 0; i < svs.maxClients; i++, rClient++) {
+        for (int i = 0; i < svs.maxClients; i++, rClient++) {
             MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, i); MSG_WriteString(pBuf, rClient->name);
             MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, i); MSG_WriteShort(pBuf, rClient->old_frags);
             MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, i); MSG_WriteByte(pBuf, rClient->colors);
@@ -1065,12 +1066,14 @@ Kicks a user off of the server
 void Host_Kick_f() {
     if (isCliCmd()) {
         if (!SV_IsActive()) {
-            Cmd_ForwardToServer(); return;
+            Cmd_ForwardToServer();
+            return;
         }
     }
     else
-        if (pr_global_struct->deathmatch && !remoteClient->privileged)
-            return;
+        if ((pr_global_struct->deathmatch) &&
+            !(remoteClient->privileged)
+            )  return;
 
     RmtClient_p save = remoteClient;
     int32_t i;
@@ -1114,7 +1117,7 @@ void Host_Kick_f() {
                     message++;
                 message += Q_strlen(Cmd_Argv(2)); // skip the number
             }
-            while (*message && *message == ' ')
+            while ((*message) && (*message == ' '))
                 message++;
         }
         if (message)    SV_ClientPrintf("Kicked by %s: %s\n", who, message);

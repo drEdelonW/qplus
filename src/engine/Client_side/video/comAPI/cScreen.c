@@ -18,6 +18,7 @@
 #else
 # include "render.h"
 #endif
+#include "GameRule.h"
 
 Screen_t scr;
 _Screen_t _scr;
@@ -81,7 +82,7 @@ void SCR_CenterPrint(cString str) {
 
 void SCR_DrawCenterString() {
     // the finale prints the characters one at a time
-    int remaining = (cl.intermission != IM_NONE) ?
+    int remaining = (isIntermission()) ?
         scr_printspeed.value * (GetClSimTime() - _scr.centertime_start) : 9999;
 
     _scr.erase_center = 0;
@@ -292,7 +293,7 @@ void SCR_CheckDrawCenterString() {
     scr.centertime_off -= host_frametime;
 
     if (((scr.centertime_off <= 0) &&
-        (cl.intermission == IM_NONE)) ||
+        (!isIntermission())) ||
         (key.dest != key_game)
         )
         return;
@@ -402,7 +403,7 @@ void SCR_CalcRefdef() {
 
     // intermission is always full screen
     {
-        float size = (cl.intermission != IM_NONE) ? 120 : scr_viewsize.value;
+        float size = (isIntermission()) ? 120 : scr_viewsize.value;
         /**/ if (size >= 120.0f)    sb_lines = 0;        // no status bar at all
         else if (size >= 110.0f)    sb_lines = 24;       // no inventory
         else /*               */    sb_lines = 24 + 16 + 8;
@@ -416,12 +417,12 @@ void SCR_CalcRefdef() {
     vRect_p pvrect = &r_refdef.vrect;
     int lineadj = sb_lines;
 #ifdef GLQUAKE
-    bool full = ((scr_viewsize.value >= 100.0f) || (cl.intermission != IM_NONE));
+    bool full = ((scr_viewsize.value >= 100.0f) || (isIntermission()));
     /* look like void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) in r_main.c */ {
         float size = (scr_viewsize.value > 100.0f) ?
             100.0f : scr_viewsize.value;
 
-        if (cl.intermission != IM_NONE) {
+        if (isIntermission()) {
             size = 100.0f;
             lineadj = 0;
         }

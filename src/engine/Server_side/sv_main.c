@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "progs.h"
 #include "GlobVars.h"
+#include "GameRule.h"
 
 server_t    sv;
 sv_static_t svs;
@@ -141,7 +142,7 @@ void SV_CheckForNewClients() {
         //
         // init a new client structure
         //
-        uint32_t i = 0;
+        int i = 0;
         for (; i < svs.maxClients; i++) {
             if (!svs.clients[i].active) break;
         }
@@ -331,10 +332,10 @@ void SV_SpawnServer(cString server
     //
     // make cvars consistant
     //
-    if (coop.value) Cvar_SetValue("deathmatch", 0);
+    if (coop.value) Cvar_SetValue("deathmatch", 0.f);
+
     current_skill = (int)(skill.value + 0.5f);
     CLAMP(0, current_skill, 3);
-
     Cvar_SetValue("skill", (float)current_skill);
 
     //
@@ -361,24 +362,24 @@ void SV_SpawnServer(cString server
 
     // leave slots at start for clients only
     EdictsNum = svs.maxClients + 1;
-    for (uint32_t i = 0; i < svs.maxClients; i++) {
+    for (int i = 0; i < svs.maxClients; i++) {
         svs.clients[i].edict = ED_GetEDictByIdx(i + 1);
     }
 
 
     sv.datagram = (sizebuf_t){
         .maxsize = sizeof(sv.datagram_buf),
-        .cursize = 0,
+        // .cursize = 0,
         .data = sv.datagram_buf
     };
     sv.reliable_datagram = (sizebuf_t){
         .maxsize = sizeof(sv.reliable_datagram_buf),
-        .cursize = 0,
+        // .cursize = 0,
         .data = sv.reliable_datagram_buf
     };
     sv.signon = (sizebuf_t){
         .maxsize = sizeof(sv.signon_buf),
-        .cursize = 0,
+        // .cursize = 0,
         .data = sv.signon_buf
     };
 

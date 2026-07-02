@@ -122,7 +122,8 @@ typedef enum {
 // server signon
 //
 typedef struct {
-    int32_t     movemessages; // since connecting to this server
+    int32_t     movemessages;
+    // since connecting to this server
     // throw out the first couple, so the player
     // doesn't accidentally do something the
     // first frame

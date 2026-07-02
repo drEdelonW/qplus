@@ -9,8 +9,6 @@
 #include "pr_def.h"
 #include "Edict.h"
 #include "cmd.h"
-// #include "pr_Function.h"
-// #include "pr_qString.h"
 
 #include "cvar_q1.h"
 
@@ -34,7 +32,7 @@ void PR_LoadProgs() {
         CRC_ProcessByte(&pr_crc, ((uint8_p)progs)[i]);
 
     // byte swap the header
-    for (int i = 0; i < sizeof(*progs) / 4; i++)
+    for (int i = 0; i < DIV4(sizeof(*progs)); i++)
         ((int32_p)progs)[i] = LittleLong(((int32_p)progs)[i]);
 
     if (progs->version != PROG_VERSION)     Host_SysError("progs.dat has wrong version number (%i should be %i)", progs->version, PROG_VERSION);

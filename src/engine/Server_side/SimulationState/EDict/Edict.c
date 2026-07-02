@@ -35,6 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include <stdlib.h>
 #include "server.h"
+#include "GameRule.h"
 
 #include "cvar_q1.h"
 
@@ -490,7 +491,8 @@ void ED_LoadFromFile(cString data) {
         else
             if (((current_skill == 0) && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_EASY)) ||
                 ((current_skill == 1) && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
-                ((current_skill >= 2) && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_HARD))) {
+                ((current_skill >= 2) && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_HARD))
+                ) {
                 ED_Free(ent);
                 inhibit++;
                 continue;

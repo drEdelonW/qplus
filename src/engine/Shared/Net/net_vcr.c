@@ -32,31 +32,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 bool isVCRrec = false;
 static vNext_t next;
 
-static net_driver_t _VCR_driver = {
-        "Video Cassette Recorder",
-        false,
-        VCR_Init,
-        NULL,   // .Listen
-        VCR_SearchForHosts,
-        VCR_Connect,
-        VCR_CheckNewConnections,
-        VCR_GetMessage,
-        VCR_SendMessage,
-        NULL,   // .SendUnreliableMessage
-        VCR_CanSendMessage,
-        NULL,   // .CanSendUnreliableMessage
-        VCR_Close,
-        VCR_Shutdown,
-        0,
-};
-
-int VCR_Init() {
-    net_drivers[0] = _VCR_driver;
-
-    Sys_FileRead(vcrFile, &next, sizeof(next));
-    return 0;
-}
-
 void VCR_ReadNext() {
     if (Sys_FileRead(vcrFile, &next, sizeof(next)) == 0) {
         next.op = VCR_ENDOF_PLAYBACK;
@@ -144,4 +119,29 @@ qsocket_p VCR_CheckNewConnections() {
     VCR_ReadNext();
 
     return sock;
+}
+
+static net_driver_t _VCR_driver = {
+        "Video Cassette Recorder",
+        false,
+        VCR_Init,
+        NULL,   // .Listen
+        VCR_SearchForHosts,
+        VCR_Connect,
+        VCR_CheckNewConnections,
+        VCR_GetMessage,
+        VCR_SendMessage,
+        NULL,   // .SendUnreliableMessage
+        VCR_CanSendMessage,
+        NULL,   // .CanSendUnreliableMessage
+        VCR_Close,
+        VCR_Shutdown,
+        0,
+};
+
+int VCR_Init() {
+    net_drivers[0] = _VCR_driver;
+
+    Sys_FileRead(vcrFile, &next, sizeof(next));
+    return 0;
 }

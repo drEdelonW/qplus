@@ -37,6 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include "transform.h"
 #include "render.h"
+#include "GameRule.h"
 
 /*
 
@@ -66,7 +67,7 @@ static Basis_t _bs;
 float V_CalcRoll(ang3_t angles, vec3_t velocity) {
     _bs = GetBasis(angles);
     float side = DotProduct(velocity, _bs.right);
-    float sign = (side < 0.0f) ? -1.0f : 1.0f;
+    float sign = (side < 0.f) ? -1.f : 1.f;
     side = fabs(side);
 
     float value = cl_rollangle.value;
@@ -100,9 +101,9 @@ float V_CalcBob() {
         (cl.velocity.y * cl.velocity.y)
     ) * cl_bob.value;
     //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
-    bob = bob * 0.3 + bob * 0.7 * sin(cycle);
-    if (bob > 4)        bob = 4;
-    else if (bob < -7)  bob = -7;
+    bob = (bob * 0.3f) + (bob * 0.7f * sin(cycle));
+    if (bob > 4.f)          bob = 4.f;
+    else if (bob < -7.f)    bob = -7.f;
 
     return bob;
 }
@@ -148,48 +149,47 @@ void V_DriftPitch() {
         !cl.onground ||
         cls.isDemoPlaying
         ) {
-        cl.driftmove = 0;
-        cl.pitchvel = 0;
+        cl.driftmove = 0.f;
+        cl.pitchvel = 0.f;
         return;
     }
 
     // don't count small mouse motion
     if (cl.nodrift) {
-        if (fabs(cl.cmd.move.forward) < cl_forwardspeed.value)  cl.driftmove = 0;
+        if (fabs(cl.cmd.move.forward) < cl_forwardspeed.value)  cl.driftmove = 0.f;
         else                                                    cl.driftmove += host_frametime;
 
-        if (cl.driftmove > v_centermove.value)
-            V_StartPitchDrift();
+        if (cl.driftmove > v_centermove.value)      V_StartPitchDrift();
         return;
     }
 
     float delta = cl.idealpitch - cl.viewangles.pitch;
 
-    if (!delta) { cl.pitchvel = 0; return; }
+    if (!delta) {
+        cl.pitchvel = 0.f;
+        return;
+    }
 
     float move = host_frametime * cl.pitchvel;
     cl.pitchvel += host_frametime * v_centerspeed.value;
 
     //Con_Printf ("move: %f (%f)\n", move, host_frametime);
 
-    if (delta > 0) {
+    if (delta > 0.f) {
         if (move > delta) {
-            cl.pitchvel = 0;
+            cl.pitchvel = 0.f;
             move = delta;
         }
         cl.viewangles.pitch += move;
     }
-    else if (delta < 0) {
+    else if (delta < 0.f) {
         if (move > -delta) {
-            cl.pitchvel = 0;
+            cl.pitchvel = 0.f;
             move = -delta;
         }
         cl.viewangles.pitch -= move;
     }
 }
-
-
-
 
 
 /*
@@ -206,9 +206,8 @@ ColorShift_t cshift_water = { {130, 80, 50}, 128 };
 ColorShift_t cshift_slime = { {0, 25, 5}, 150 };
 ColorShift_t cshift_lava = { {255, 80, 0}, 150 };
 
-
+// extern uint8_t gammatable[256]; // palette is sent through this
 uint8_t  gammatable[256]; // palette is sent through this
-
 
 
 void BuildGammaTable(float g) {
@@ -232,7 +231,6 @@ V_CheckGamma
 */
 bool V_CheckGamma() {
     static float _oldGammaValue;
-
     if (v_gamma.value == _oldGammaValue)     return false;
     _oldGammaValue = v_gamma.value;
 
@@ -259,8 +257,8 @@ void V_ParseDamage() {
     };
 
     float count = blood * 0.5f + armor * 0.5f;
-    if (count < 10)
-        count = 10;
+    if (count < 10.f)
+        count = 10.f;
 
     cl.faceanimtime = GetClSimTime() + 0.2f;  // but sbar face into pain frame
 
@@ -699,7 +697,7 @@ void V_CalcIntermissionRefdef() {
 
     // allways idle in intermission
     float old = v_idlescale.value;
-    v_idlescale.value = 1;
+    v_idlescale.value = 1.f;
     V_AddIdle();
     v_idlescale.value = old;
 }
@@ -711,7 +709,7 @@ V_CalcRefdef
 ==================
 */
 void V_CalcRefdef() {
-    static float _oldZ = 0;
+    static float _oldZ = 0.f;
 
     V_DriftPitch();
     r_Entity_p ent = &cl_entities[cl.viewentity];   // ent is the player model (visible when out of body)
@@ -731,31 +729,15 @@ void V_CalcRefdef() {
     // never let it sit exactly on a node line, because a water plane can
     // dissapear when viewed with the eye exactly on it.
     // the server protocol only specifies to 1/16 pixel, so add 1/32 in each axis
-#if 0
-    r_refdef.vieworg.x += 1.0 / 32;
-    r_refdef.vieworg.y += 1.0 / 32;
-    r_refdef.vieworg.z += 1.0 / 32;
-#else
     r_refdef.vieworg = VectorAdd(r_refdef.vieworg, Scalar2Vector(1.0 / 32));
-#endif
 
     r_refdef.viewangles = cl.viewangles;
     V_CalcViewRoll();
     V_AddIdle();
 
-#if 0
-    vec3_t angles = {
-        // offsets
-       .x = -ent->angles.pitch, /* angles[PITCH] */ // because entity pitches are actually backward
-       .y = ent->angles.yaw,    /* angles[YAW] */
-       .z = ent->angles.roll    /* angles[ROLL] */
-    };
-#else
-    ang3_t angles = ent->angles;
-    angles.pitch = -angles.pitch;   // because entity pitches are actually backward
-#endif
-
-
+    ang3_t angles = ent->angles; {
+        angles.pitch = -angles.pitch;   // because entity pitches are actually backward
+    }
     _bs = GetBasis(angles);
 
     r_refdef.vieworg =
@@ -807,7 +789,7 @@ void V_CalcRefdef() {
             steptime = 0.0f;    //FIXME  I_Error ("steptime < 0");
         }
 
-        _oldZ += steptime * 80;
+        _oldZ += steptime * 80.f;
         if (_oldZ > ent->origin.z)         _oldZ = ent->origin.z;
         if ((ent->origin.z - _oldZ) > 12)  _oldZ = ent->origin.z - 12;
         r_refdef.vieworg.z += _oldZ - ent->origin.z;
@@ -817,7 +799,7 @@ void V_CalcRefdef() {
 
     if (chase_active.value)
         Chase_Update();
-    }
+}
 
 /*
 ==================
@@ -838,12 +820,15 @@ void V_RenderView() {
         Cvar_Set("scr_ofsz", "0");
     }
 
-    if (cl.intermission != IM_NONE) { // intermission / finale rendering
+    if (isIntermission()) { // intermission / finale rendering
         V_CalcIntermissionRefdef();
     }
     else {
-        if (!cl.paused /* && ((sv.maxClients > 1) || (key.dest == key_game)) */)
-            V_CalcRefdef();
+        if (!cl.paused /* &&
+            (
+                (isMultiplayer()) ||
+                (key.dest == key_game)) */
+            )   V_CalcRefdef();
     }
 
     R_PushDlights();
@@ -905,7 +890,7 @@ Keybinding command
 =================
 */
 void V_SizeUp_f() {
-    Cvar_SetValue("viewsize", scr_viewsize.value + 10);
+    Cvar_SetValue("viewsize", scr_viewsize.value + 10.f);
     SCR_RequestCalcRefdef();
 }
 
@@ -918,7 +903,7 @@ Keybinding command
 =================
 */
 void V_SizeDown_f() {
-    Cvar_SetValue("viewsize", scr_viewsize.value - 10);
+    Cvar_SetValue("viewsize", scr_viewsize.value - 10.f);
     SCR_RequestCalcRefdef();
 }
 
@@ -972,7 +957,7 @@ void V_Init() {
     Cvar_RegisterVariable(&scr_fov);
 
 
-    BuildGammaTable(1.0); // no gamma yet
+    BuildGammaTable(1.f); // no gamma yet
     Cvar_RegisterVariable(&v_gamma);
 }
 

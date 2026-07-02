@@ -445,7 +445,9 @@ void SV_CreateBaseline() {
         svent->baseline.angles = svent->v.angles;
         svent->baseline.frame = (int32_t)svent->v.frame;
         svent->baseline.skin = (int32_t)svent->v.skin;
-        if ((entnum > 0) && (entnum <= svs.maxClients)) {
+        if ((entnum > 0) &&
+            (entnum <= svs.maxClients)
+            ) {
             svent->baseline.colormap = (int32_t)entnum;
             svent->baseline.modelindex = SV_ModelIndex("progs/player.mdl");
         }

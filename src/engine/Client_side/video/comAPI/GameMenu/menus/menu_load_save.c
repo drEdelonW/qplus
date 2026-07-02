@@ -7,9 +7,7 @@
 #include "cbuf.h"
 #include "screen.h"
 #include "host.h"
-#include "server.h"
-#undef SERVER   // TODO: remove this workaround
-#include "client.h"
+#include "GameRule.h"
 
 
 //=============================================================================
@@ -56,9 +54,10 @@ void M_Menu_Load_f() {
 
 void M_Menu_Save_f() {
     if ((!Host_IsServerActive()) ||
-        (cl.intermission != IM_NONE) ||
-        (svs.maxClients != 1))
-        return;
+        (isIntermission()) ||
+        (isMultiplayer())
+        )   return;
+
     m_entersound = true;
     m_state = m_save;
     key.dest = key_menu;

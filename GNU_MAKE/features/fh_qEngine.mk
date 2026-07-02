@@ -224,5 +224,9 @@ include features/fh_qRender$(QRND).mk
 
 #=============================[GAME DEPENDED LOGIC]=============================#
 
-$(eval GAME_DIR := $(SRC_DIR)/game/Quake) $(eval INCLUDES += $(GAME_DIR))
-        SRC_LIST += $(GAME_DIR)/game_rule.c
+$(eval GAME_DIR := $(SRC_DIR)/game) $(eval INCLUDES += $(GAME_DIR))
+        SRC_LIST += $(GAME_DIR)/GameRuleSv.c
+        SRC_LIST += $(GAME_DIR)/GameRuleCl.c
+
+        $(eval QGAME_DIR := $(GAME_DIR)/Quake) $(eval INCLUDES += $(QGAME_DIR))
+                SRC_LIST += $(QGAME_DIR)/game_rule.c
