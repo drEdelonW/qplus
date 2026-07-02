@@ -292,7 +292,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
     //
     if (s->flags & SURF_DRAWSKY) {
         GL_Bind(solidskytexture);
-        speedscale = realtime * 8.0f;
+        speedscale = GetRealTime() * 8.0f;
         speedscale -= (int)speedscale;
 
         EmitSkyPolys(s);
@@ -300,7 +300,7 @@ void R_DrawSequentialPoly(mSurface_p s) {
         glEnable(GL_BLEND); {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             GL_Bind(alphaskytexture);
-            speedscale = realtime * 16.0f;
+            speedscale = GetRealTime() * 16.0f;
             speedscale -= (int)speedscale;
             EmitSkyPolys(s);
             if (gl_lightmap_format == GL_LUMINANCE)
@@ -422,14 +422,14 @@ void R_DrawSequentialPoly(mSurface_p s) {
     if (s->flags & SURF_DRAWSKY) {
         GL_DisableMultitexture();
         GL_Bind(solidskytexture);
-        speedscale = realtime * 8;
+        speedscale = GetRealTime() * 8;
         speedscale -= (int)speedscale & ~127;
 
         EmitSkyPolys(s);
 
         glEnable(GL_BLEND);
         GL_Bind(alphaskytexture);
-        speedscale = realtime * 16.0f;
+        speedscale = GetRealTime() * 16.0f;
         speedscale -= (int)speedscale & ~127;
         EmitSkyPolys(s);
 
@@ -472,8 +472,8 @@ void R_DrawSequentialPoly(mSurface_p s) {
                 qglMTexCoord2fSGIS(TEXTURE1_SGIS, v.vf[5], v.vf[6]);
 
                 vec3_t nv = {
-                    .x = v.v.x + 8 * sin(v.v.y * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
-                    .y = v.v.y + 8 * sin(v.v.x * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
+                    .x = v.v.x + 8 * sin(v.v.y * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
+                    .y = v.v.y + 8 * sin(v.v.x * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
                     .z = v.v.z
                 };
                 glVertex3fv(nv.v);
@@ -513,8 +513,8 @@ void DrawGLWaterPoly(glpoly_p p) {
             glTexCoord2f(v.vf[3], v.vf[4]);
 
             vec3_t nv = {
-                .x = v.v.x + 8 * sin(v.v.y * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
-                .y = v.v.y + 8 * sin(v.v.x * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
+                .x = v.v.x + 8 * sin(v.v.y * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
+                .y = v.v.y + 8 * sin(v.v.x * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
                 .z = v.v.z
             };
 
@@ -532,8 +532,8 @@ void DrawGLWaterPolyLightmap(glpoly_p p) {
             glTexCoord2f(v.vf[5], v.vf[6]);
 
             vec3_t nv = {
-                .x = v.v.x + 8 * sin(v.v.y * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
-                .y = v.v.y + 8 * sin(v.v.x * 0.05 + realtime) * sin(v.v.z * 0.05 + realtime),
+                .x = v.v.x + 8 * sin(v.v.y * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
+                .y = v.v.y + 8 * sin(v.v.x * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
                 .z = v.v.z
             };
 
@@ -976,7 +976,7 @@ void R_DrawBrushModel(r_Entity_p e) {
         (!gl_flashblend.value)
         ) {
         for (int k = 0; k < MAX_DLIGHTS; k++) {
-            if ((cl_dlights[k].die < cl.time) ||
+            if ((cl_dlights[k].die < GetClSimTime()) ||
                 (!cl_dlights[k].radius)
                 )
                 continue;

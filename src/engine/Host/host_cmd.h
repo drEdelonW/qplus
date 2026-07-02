@@ -58,10 +58,10 @@ extern "C" {
     void Host_Kick_f();
     void Host_Give_f();
     /* view helpers */
-    void    Host_Viewmodel_f();
-    void    Host_Viewframe_f();
-    void    Host_Viewnext_f();
-    void    Host_Viewprev_f();
+    void Host_Viewmodel_f();
+    void Host_Viewframe_f();
+    void Host_Viewnext_f();
+    void Host_Viewprev_f();
 
     /* demo loop control */
     void Host_Startdemos_f();

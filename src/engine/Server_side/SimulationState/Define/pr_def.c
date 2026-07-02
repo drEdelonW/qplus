@@ -26,24 +26,23 @@ ED_WriteGlobals
 =============
 */
 void ED_WriteGlobals(FILE* f) {
-    fprintf(f, "{\n");
-    for (int i = 0; i < progs->globaldefs.num; i++) {
-        dDef_p def = &_globalDefs[i];
-        uint32_t type = def->type;
-        if (!(def->type & DEF_SAVEGLOBAL))  continue;
-        type &= ~DEF_SAVEGLOBAL;
+    fprintf(f, "{\n"); {
+        for (int i = 0; i < progs->globaldefs.num; i++) {
+            dDef_p def = &_globalDefs[i];
+            uint16_t type = def->type;
+            if (!(def->type & DEF_SAVEGLOBAL))  continue;
+            type &= ~DEF_SAVEGLOBAL;
 
-        if ((type != ev_string) &&
-            (type != ev_float) &&
-            (type != ev_entity)
-            )
-            continue;
+            if ((type != ev_string) &&
+                (type != ev_float) &&
+                (type != ev_entity)
+                )   continue;
 
-        cString name = PR_GetQString(def->s_name);
-        fprintf(f, "\"%s\" ", name);
-        fprintf(f, "\"%s\"\n", PR_UglyValueString(type, (eval_p)&pr_globals[def->ofs]));
-    }
-    fprintf(f, "}\n");
+            cString name = PR_GetQString(def->s_name);
+            fprintf(f, "\"%s\" ", name);
+            fprintf(f, "\"%s\"\n", PR_UglyValueString(type, (eval_p)&pr_globals[def->ofs]));
+        }
+    } fprintf(f, "}\n");
 }
 
 /*
@@ -174,11 +173,11 @@ dDef_p ED_FindFieldCached(cString field) {
         _rep ^= 1;
     }
 
-   return def;
+    return def;
 }
 
 void initProgDefs(TypeLess_ptr base, progLump_t plg, progLump_t plf) {
-     ED_InitCache();
+    ED_InitCache();
 
     // ======[Global Defs]======
     _globalDefs = (dDef_p)((uint8_p)base + plg.ofs);

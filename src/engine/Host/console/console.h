@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 #include "types.h"
+#include "qTime.h"
 
 #define CON_HORIZONLINE "\35\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\36\37\n"
 
@@ -33,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct {
     bool    isInitialized;
     char    lines[MAXCHATLEN][MAXCMDLINE];
-    float   times[NUM_CON_TIMES]; // realtime time the line was generated for transparent notify lines
+    sRealTime_t times[NUM_CON_TIMES]; // realtime time the line was generated for transparent notify lines
     int32_t totallines; // total lines in console scrollback
     int32_t backscroll; // lines up from bottom to display
     int32_t notifylines;// scan lines to clear for notify lines

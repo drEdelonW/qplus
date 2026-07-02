@@ -56,7 +56,7 @@ Texture_p R_TextureAnimation(Texture_p base) {
 
     if (!base->anim_total)      return base;
 
-    int reletive = (int)(cl.time * 10) % base->anim_total;
+    int reletive = (int)(GetClSimTime() * 10) % base->anim_total;
 
     int count = 0;
     while (

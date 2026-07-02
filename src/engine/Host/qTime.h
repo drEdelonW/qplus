@@ -27,6 +27,7 @@ typedef int64_t     RealTime_t;
 typedef int64_t     RealDt_t;
 #else
 typedef LegTime_t   RealTime_t;
+typedef LegDt_t     sRealTime_t;    // Short version of WallClock
 typedef LegDt_t     RealDt_t;
 #endif
 typedef RealTime_t* RealTime_p;
@@ -38,6 +39,7 @@ typedef int32_t     SimTime_t;
 typedef int32_t     SimDt_t;
 #else
 typedef LegTime_t   SimTime_t;
+typedef LegDt_t     sSimTime_t;  // Short version of SimTime_t
 typedef LegDt_t     SimDt_t;
 #endif
 typedef SimTime_t*  SimTime_p;

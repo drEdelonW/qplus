@@ -34,12 +34,12 @@ void Con_NotifyBox(cString text) {
         SCR_UpdateScreen();
         Sys_SendKeyEvents();
         LegTime_t t2 = Host_FloatTime();
-        realtime += t2 - t1;    // make the cursor blink
+        viewtime += t2 - t1;    // make the cursor blink
     } while (key.count < 0);
 
     Con_Printf("\n");
     key.dest = key_game;
-    realtime = 0.0;       // put the cursor back to invisible
+    viewtime = 0.0;       // put the cursor back to invisible
 }
 
 /*
@@ -151,7 +151,7 @@ void Con_DrawInput() {
     cString text = con.lines[con.edit_line];
 
     // add the cursor frame
-    text[con.linepos] = 10 + ((int)(realtime * con.cursorspeed) & 1);
+    text[con.linepos] = 10 + ((int)(GetVievTime() * con.cursorspeed) & 1);
 
     // fill out remainder with spaces
     for (uint32_t i = (con.linepos + 1); i < con.linewidth; i++)

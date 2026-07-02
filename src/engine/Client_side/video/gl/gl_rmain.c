@@ -141,7 +141,7 @@ mSpriteFrame_p R_GetSpriteFrame(r_Entity_p currententity) { // TODO: seems like 
         int numframes = pspritegroup->numframes;
         float fullinterval = pintervals[numframes - 1];
 
-        LegDt_t time = cl.time + currententity->syncbase;
+        LegDt_t time = GetClSimTime() + currententity->syncbase;
 
         // when loading in Mod_LoadSpriteGroup, we guaranteed all interval values are positive, so we don't have to worry about division by 0
         LegDt_t targettime = time - ((int)(time / fullinterval)) * fullinterval;
@@ -348,7 +348,7 @@ void R_SetupAliasFrame(int frame, AliasHdr_p pAliasHdr) {
 
     if (numposes > 1) {
         float interval = pAliasHdr->frames[frame].interval;
-        pose += (int)(cl.time / interval) % numposes;
+        pose += (int)(GetClSimTime() / interval) % numposes;
     }
 
     GL_DrawAliasFrame(pAliasHdr, pose);
@@ -398,7 +398,7 @@ void R_DrawAliasModel(r_Entity_p e) {
         ambientlight = shadelight = 24;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
-        if (cl_dlights[lnum].die >= cl.time) {
+        if (cl_dlights[lnum].die >= GetClSimTime()) {
             vec3_t  dist = VectorSubtract(
                 currententity->origin,
                 cl_dlights[lnum].origin
@@ -494,7 +494,7 @@ void R_DrawAliasModel(r_Entity_p e) {
         );
     }
 
-    int anim = (int)(cl.time * 10) & 3;
+    int anim = (int)(GetClSimTime() * 10) & 3;
     GL_Bind(pAliasHdr->gl_texturenum[currententity->skinnum][anim]);
 
     // we can't dynamically colormap textures, so they are cached
@@ -601,7 +601,7 @@ void R_DrawViewModel() {
         dLight_p dl = &cl_dlights[lnum];
         if (!dl->radius)        continue;
         if (!dl->radius)        continue;
-        if (dl->die < cl.time)  continue;
+        if (dl->die < GetClSimTime())  continue;
 
         vec3_t dist = VectorSubtract(currententity->origin, dl->origin);
         float add = dl->radius - Length(dist);

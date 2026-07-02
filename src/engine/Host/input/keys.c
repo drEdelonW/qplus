@@ -752,10 +752,10 @@ void Key_Event(keycode_t Key, bool down) {
 
         if (_keyshift[Key] != Key) {
             cString kb = NULL;
-            if (((uint32_t)Key < MAX_KEYS) &&
-                ((uint32_t)_keyshift[Key] < MAX_KEYS)
+            if ((Key < MAX_KEYS) &&
+                (_keyshift[Key] < MAX_KEYS)
                 ) {
-                kb = keyBindings[(uint32_t)_keyshift[Key]];
+                kb = keyBindings[_keyshift[Key]];
             }
             Key_ReleaseBinding(kb, Key);
         }
@@ -765,7 +765,7 @@ void Key_Event(keycode_t Key, bool down) {
     //
     // during demo playback, most keys bring up the main menu
     //
-    if (cls.demoplayback &&
+    if (cls.isDemoPlaying &&
         down &&
         _isConKeys[Key] &&
         (key.dest == key_game)

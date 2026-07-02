@@ -55,7 +55,7 @@ void CL_FinishTimeDemo() {
 
     // the first frame didn't count
     int frames = (host_framecount - cls.td_startframe) - 1;
-    RealDt_t time = realtime - cls.td_starttime;
+    RealDt_t time = GetRealTime() - cls.td_starttime;
     if (!time)  time = 1.f;
 
     Con_Printf(
@@ -72,11 +72,11 @@ Called when a demo file runs out, or the user starts a game
 ==============
 */
 void CL_StopPlayback() {
-    if (!cls.demoplayback)
+    if (!cls.isDemoPlaying)
         return;
 
     fclose(cls.demofile);
-    cls.demoplayback = false;
+    cls.isDemoPlaying = false;
     cls.demofile = NULL;
     cls.state = ca_disconnected;
 
@@ -110,7 +110,7 @@ Handles recording and playback of demos, on top of NET_ code
 ====================
 */
 int CL_GetMessage() {
-    if (cls.demoplayback) {
+    if (cls.isDemoPlaying) {
         // decide if it is time to grab the next message
         if (cls.signon == SIGNONS) { // allways grab until fully connected
             if (cls.timedemo) {
@@ -120,9 +120,9 @@ int CL_GetMessage() {
                 // if this is the second frame, grab the real td_starttime
                 // so the bogus time on the first frame doesn't count
                 if (host_framecount == cls.td_startframe + 1)
-                    cls.td_starttime = (float)realtime;
+                    cls.td_starttime = GetRealTime();
             }
-            else if ( /* cl.time > 0 && */ cl.time <= cl.mtime[0]) {
+            else if ( /* GetClSimTime() > 0 && */ GetClSimTime() <= cl.mtime[0]) {
                 return 0;  // don't need another message yet
             }
         }
@@ -177,7 +177,7 @@ stop recording a demo
 ====================
 */
 void CL_Stop_f() {
-    if (cmd_source != src_command) return;
+    if (!isCliCmd()) return;
     if (!cls.demorecording) { Con_Printf("Not recording a demo.\n"); return; }
 
     // write a disconnect message to the demo file
@@ -200,8 +200,7 @@ record <demoname> <map> [cd track]
 ====================
 */
 void CL_Record_f() {
-    if (cmd_source != src_command) return;
-
+    if (!isCliCmd()) return;
     int arg = Cmd_Argc();
     if ((arg != 2) &&
         (arg != 3) &&
@@ -267,9 +266,11 @@ play [demoname]
 */
 #include "terminal_tools.h"
 void CL_PlayDemo_f() {
-    if (cmd_source != src_command) return;
-
-    if (Cmd_Argc() != 2) { Con_Printf("play <demoname> : plays a demo\n"); return; }
+    if (!isCliCmd()) return;
+    if (Cmd_Argc() != 2) {
+        Con_Printf("play <demoname> : plays a demo\n");
+        return;
+    }
 
     //
     // disconnect from server
@@ -292,7 +293,7 @@ void CL_PlayDemo_f() {
         return;
     }
 
-    cls.demoplayback = true;
+    cls.isDemoPlaying = true;
     cls.state = ca_connected;
     cls.forcetrack = 0;
 
@@ -316,8 +317,11 @@ timedemo [demoname]
 ====================
 */
 void CL_TimeDemo_f() {
-    if (cmd_source != src_command) return;
-    if (Cmd_Argc() != 2) { Con_Printf("timedemo <demoname> : gets demo speeds\n"); return; }
+    if (!isCliCmd()) return;
+    if (Cmd_Argc() != 2) {
+        Con_Printf("timedemo <demoname> : gets demo speeds\n");
+        return;
+    }
 
     CL_PlayDemo_f();
 

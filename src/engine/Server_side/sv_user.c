@@ -183,7 +183,7 @@ void SV_Accelerate() {
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
-    * _velocity = VectorMA(*_velocity, accelspeed, _wishDir);
+    *_velocity = VectorMA(*_velocity, accelspeed, _wishDir);
 }
 
 void SV_AirAccelerate(vec3_t wishveloc) {
@@ -201,7 +201,7 @@ void SV_AirAccelerate(vec3_t wishveloc) {
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
-    * _velocity = VectorMA(*_velocity, accelspeed, wishveloc);
+    *_velocity = VectorMA(*_velocity, accelspeed, wishveloc);
 }
 
 #if 0   /* TODO: clean it */
@@ -215,7 +215,7 @@ void DropPunchAngle() {
 }
 #else
 static inline float _AngleLen(ang3_t a) { // local trick without physical meaning
-    return sqrtf(a.pitch*a.pitch + a.yaw*a.yaw + a.roll*a.roll);
+    return sqrtf(a.pitch * a.pitch + a.yaw * a.yaw + a.roll * a.roll);
 }
 void DropPunchAngle(void) {
     float orig_len = _AngleLen(sv_player->v.punchangle);
@@ -235,7 +235,7 @@ SV_WaterMove
 */
 void SV_WaterMove() {
     // user intentions
-    _bs = GetBasis(sv_player->v.v_angle); 
+    _bs = GetBasis(sv_player->v.v_angle);
 
     vec3_t wishvel = VectorMA(VectorScale(_bs.forward, cmd.move.forward), cmd.move.side, _bs.right);
 
@@ -276,7 +276,7 @@ void SV_WaterMove() {
     if (accelspeed > addspeed)
         accelspeed = addspeed;
 
-    * _velocity = VectorMA(*_velocity, accelspeed, wishvel);
+    *_velocity = VectorMA(*_velocity, accelspeed, wishvel);
 }
 
 void SV_WaterJump() {
@@ -298,7 +298,7 @@ SV_AirMove
 ===================
 */
 void SV_AirMove() {
-    _bs = GetBasis(sv_player->v.v_angle); 
+    _bs = GetBasis(sv_player->v.v_angle);
 
     float fmove = cmd.move.forward;
     float smove = cmd.move.side;
@@ -393,9 +393,9 @@ void SV_ReadClientMove(UserCmd_p move) {
 
     // read current angles
     ang3_t angle = {
-        .pitch  = MSG_ReadAngle(),
-        .yaw    = MSG_ReadAngle(),
-        .roll   = MSG_ReadAngle()
+        .pitch = MSG_ReadAngle(),
+        .yaw = MSG_ReadAngle(),
+        .roll = MSG_ReadAngle()
     };
 
     remoteClient->edict->v.v_angle = angle;
@@ -403,8 +403,8 @@ void SV_ReadClientMove(UserCmd_p move) {
     // read movement
     move->move = (vec3_t){
         .forward = MSG_ReadShort(),
-        .side    = MSG_ReadShort(),
-        .up      = MSG_ReadShort()
+        .side = MSG_ReadShort(),
+        .up = MSG_ReadShort()
     };
 
     // read buttons
@@ -546,8 +546,13 @@ Sets client to godmode
 ==================
 */
 void Host_God_f() {
-    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
-    if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
+    if (isCliCmd()) {
+        Cmd_ForwardToServer();
+        return;
+    }
+    if ((pr_global_struct->deathmatch) &&
+        !(remoteClient->privileged)
+        )  return;
 
     sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_GODMODE;
     SV_ClientPrintf("godmode %s\n",
@@ -558,7 +563,7 @@ void Host_God_f() {
 
 
 void Host_Notarget_f() {
-    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if (isCliCmd()) { Cmd_ForwardToServer(); return; }
     if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
 
     sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_NOTARGET;
@@ -571,7 +576,7 @@ void Host_Notarget_f() {
 bool noclip_anglehack;
 
 void Host_Noclip_f() {
-    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if (isCliCmd()) { Cmd_ForwardToServer(); return; }
     if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
 
     if (sv_player->v.movetype == MOVETYPE_NOCLIP) {
@@ -594,7 +599,7 @@ Sets client to flymode
 ==================
 */
 void Host_Fly_f() {
-    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if (isCliCmd()) { Cmd_ForwardToServer(); return; }
     if ((pr_global_struct->deathmatch) && (!remoteClient->privileged))  return;
 
     if (sv_player->v.movetype == MOVETYPE_FLY) {

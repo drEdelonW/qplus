@@ -203,7 +203,7 @@ mSpriteFrame_p R_GetSpriteframe(mSprite_p psprite) { // TODO: seems like OpenGL 
         int numframes = pspritegroup->numframes;
         float fullinterval = pintervals[numframes - 1];
 
-        float time = cl.time + currententity->syncbase;
+        float time = GetClSimTime() + currententity->syncbase;
 
         // when loading in Mod_LoadSpriteGroup, we guaranteed all interval values
         // are positive, so we don't have to worry about division by 0

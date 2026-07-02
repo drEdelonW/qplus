@@ -83,7 +83,7 @@ void R_RenderDlights() {
 
     dLight_p l = cl_dlights;
     for (int i = 0; i < MAX_DLIGHTS; i++, l++) {
-        if ((l->die < cl.time) ||
+        if ((l->die < GetClSimTime()) ||
             !(l->radius)
             )
             continue;

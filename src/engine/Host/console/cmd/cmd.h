@@ -34,13 +34,16 @@
 typedef void(*xcommand_t)();
 
 typedef enum {
-    src_client,  // came in over a net connection as a clc_stringcmd
-    // remoteClient will be valid during this state.
-    src_command  // from the command buffer
+    src_client, // came in over a net connection as a clc_stringcmd
+                // remoteClient will be valid during this state.
+    src_command // from the command buffer
 } cmd_source_t;
 
 extern cmd_source_t cmd_source;
 extern cString cmd_argv[];
+
+static inline bool isNetCmd()   { return cmd_source == src_client;  }
+static inline bool isCliCmd()   { return cmd_source == src_command; }
 
 #ifdef __cplusplus
 extern "C" {

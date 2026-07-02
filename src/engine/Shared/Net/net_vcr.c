@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // from the viewpoint of everything above the network layer.
 
 bool isVCRrec = false;
-static vGMsg_t next;
+static vNext_t next;
 
 static net_driver_t _VCR_driver = {
         "Video Cassette Recorder",
@@ -75,7 +75,7 @@ void VCR_Shutdown() {}
 int VCR_GetMessage(qsocket_p sock) {
     int  ret;
 
-    if ((host_time != next.time) ||
+    if ((GetHostTime() != next.time) ||
         (next.op != VCR_OP_GETMESSAGE) ||
         (next.session != *(int32_p)(&sock->driverdata))
         )   Host_SysError("VCR missmatch");
@@ -93,7 +93,7 @@ int VCR_GetMessage(qsocket_p sock) {
 
 
 int VCR_SendMessage(qsocket_p sock, sizebuf_p data) {
-    if ((host_time != next.time) ||
+    if ((GetHostTime() != next.time) ||
         (next.op != VCR_OP_SENDMESSAGE) ||
         (next.session != *(int32_p)(&sock->driverdata))
         )   Host_SysError("VCR missmatch");
@@ -108,7 +108,7 @@ int VCR_SendMessage(qsocket_p sock, sizebuf_p data) {
 
 
 bool VCR_CanSendMessage(qsocket_p sock) {
-    if ((host_time != next.time) ||
+    if ((GetHostTime() != next.time) ||
         (next.op != VCR_OP_CANSENDMESSAGE) ||
         (next.session != *(int32_p)(&sock->driverdata))
         )   Host_SysError("VCR missmatch");
@@ -131,7 +131,7 @@ qsocket_p VCR_Connect(cString host) { return NULL; }
 
 qsocket_p VCR_CheckNewConnections() {
 
-    if ((host_time != next.time) ||
+    if ((GetHostTime() != next.time) ||
         (next.op != VCR_OP_CONNECT)
         )   Host_SysError("VCR missmatch");
 

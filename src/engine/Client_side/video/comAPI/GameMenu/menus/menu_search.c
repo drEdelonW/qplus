@@ -33,13 +33,13 @@ void M_Search_Draw() {
 
     if (!searchComplete) {
         searchComplete = true;
-        searchCompleteTime = realtime;
+        searchCompleteTime = GetRealTime();
     }
 
     if (hostCacheCount) { M_Menu_ServerList_f();    return; }
 
     M_PrintWhite(HALF(320) - (HALF(22 * 8)), 64, "No Quake servers found");
-    if ((realtime - searchCompleteTime) < 3.0)
+    if ((GetRealTime() - searchCompleteTime) < 3.0)
         return;
 
     M_Menu_LanConfig_f();

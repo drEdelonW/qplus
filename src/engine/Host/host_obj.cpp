@@ -77,18 +77,20 @@ Memory is cleared / released when a server or client begins, not when they end.
 
 #if 1
 QuakeParms_t host_parms;
-bool    host_initialized;   // true if into command execution
-SimDt_t host_frametime;
-SimTime_t   host_time;
-int32_t host_framecount;
-int     host_hunklevel;
-jmp_buf host_abortserver;
-uint8_p host_basepal;
-uint8_p host_colormap;
-bool    isDedicated;
-RealTime_t  realtime;           // without any filtering or bounding
+bool         host_initialized;   // true if into command execution
+int32_t     host_framecount;
+int         host_hunklevel;
+jmp_buf     host_abortserver;
+uint8_p     host_basepal;
+uint8_p     host_colormap;
+bool        isDedicated;
 RealTime_t  oldrealtime;        // last frame run
-size_t  minimum_memory;
+size_t      minimum_memory;
+
+SimDt_t     host_frametime;
+SimTime_t   _hosttime;
+RealTime_t  _realtime;               // without any filtering or bounding
+ViewTime_t  viewtime;
 #endif
 
 
@@ -209,7 +211,7 @@ void Host::InitLocal() {
 
     FindMaxClients();
 
-    host_time = 1.0;  // so a think at time 0 won't get called
+    _hosttime = 1.0;  // so a think at time 0 won't get called
 }
 
 
@@ -432,16 +434,17 @@ Host::FilterTime
 Returns false if the time is too int16_t to run a frame
 ===================
 */
-bool Host::FilterTime(float time) {
-    realtime += time;
+bool Host::FilterTime(RealDt_t time) {
+    _realtime += time;
+    viewtime += time;
 
     if (!(cls.timedemo) &&
-        ((realtime - oldrealtime) < (1.0 / 72.0))
+        ((GetRealTime() - oldrealtime) < (1.0 / 72.0))
         )
         return false;  // framerate is too high
 
-    host_frametime = realtime - oldrealtime;
-    oldrealtime = realtime;
+    host_frametime = GetRealTime() - oldrealtime;
+    oldrealtime = GetRealTime();
 
     if (host_framerate.value > 0)
         host_frametime = host_framerate.value;
@@ -590,7 +593,7 @@ void Host::_Frame(float time) {
     // the incoming messages have been read
     if (!SV_IsActive()) CL_SendCmd();
 
-    host_time += host_frametime;
+    AddHostTime(host_frametime);
 
     // fetch results from server
     if (cls.state == ca_connected)  CL_ReadFromServer();
@@ -625,7 +628,7 @@ void Host::_Frame(float time) {
     host_framecount++;
 }
 
-void Host::Frame(float time) {
+void Host::Frame(RealDt_t time) {
     if (serverprofile.value) {
         LegTime_t time1 = Host_FloatTime();
         _Frame(time);

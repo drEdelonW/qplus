@@ -451,8 +451,8 @@ void Sbar_SoloScoreboard() {
     Sbar_DrawString(8, 12, str);
 
     // time
-    int minutes = cl.time / 60;
-    int seconds = cl.time - 60 * minutes;
+    int minutes = GetClSimTime() / 60;
+    int seconds = GetClSimTime() - 60 * minutes;
     int tens = seconds / 10;
     int units = seconds - 10 * tens;
     snprintf(str, sizeof(str), "Time :%3i:%i%i", minutes, tens, units);
@@ -532,7 +532,7 @@ void Sbar_DrawInventory() {
     for (int i = 0; i < 7; i++) {
         if (cl.items & (IT_SHOTGUN << i)) {
             LegDt_t time = cl.item_gettime[i];
-            int flashon = (int)((cl.time - time) * 10);
+            int flashon = (int)((GetClSimTime() - time) * 10);
             flashon = (flashon >= 10) ?
                 (cl.stats[STAT_ACTIVEWEAPON] == (IT_SHOTGUN << i)) : (flashon % 5) + 2;
 
@@ -550,7 +550,7 @@ void Sbar_DrawInventory() {
         for (int i = 0; i < 4; i++) {
             if (cl.items & (1 << hipweapons[i])) {
                 LegDt_t time = cl.item_gettime[hipweapons[i]];
-                int flashon = (int)((cl.time - time) * 10);
+                int flashon = (int)((GetClSimTime() - time) * 10);
                 if (flashon >= 10) {
                     if (cl.stats[STAT_ACTIVEWEAPON] == (1 << hipweapons[i]))
                         flashon = 1;
@@ -604,14 +604,14 @@ void Sbar_DrawInventory() {
     for (int i = 0; i < 6; i++)
         if (cl.items & (1 << (17 + i))) {
             LegDt_t time = cl.item_gettime[17 + i];
-            if (time && (time > (cl.time - 2)) && flashon)   // flash frame
+            if (time && (time > (GetClSimTime() - 2)) && flashon)   // flash frame
                 _sb.updates = 0;
             else
                 //MED 01/04/97 changed keys
                 if (!hipnotic || (i > 1))   Sbar_DrawPic(192 + MUL16(i), -16, _sb.items[i]);
 
 
-            if (time && (time > (cl.time - 2)))
+            if (time && (time > (GetClSimTime() - 2)))
                 _sb.updates = 0;
         }
     //MED 01/04/97 added hipnotic items
@@ -620,11 +620,11 @@ void Sbar_DrawInventory() {
         for (int i = 0; i < 2; i++)
             if (cl.items & (1 << (24 + i))) {
                 LegDt_t time = cl.item_gettime[24 + i];
-                if (time && (time > (cl.time - 2)) && flashon)   // flash frame
+                if (time && (time > (GetClSimTime() - 2)) && flashon)   // flash frame
                     _sb.updates = 0;
                 else    Sbar_DrawPic(288 + MUL16(i), -16, hsb_items[i]);
 
-                if (time && (time > (cl.time - 2)))
+                if (time && (time > (GetClSimTime() - 2)))
                     _sb.updates = 0;
             }
     }
@@ -634,11 +634,11 @@ void Sbar_DrawInventory() {
         for (int i = 0; i < 2; i++) {
             if (cl.items & (1 << (29 + i))) {
                 LegDt_t time = cl.item_gettime[29 + i];
-                if (time && (time > (cl.time - 2)) && flashon)  // flash frame
+                if (time && (time > (GetClSimTime() - 2)) && flashon)  // flash frame
                     _sb.updates = 0;
                 else    Sbar_DrawPic(288 + MUL16(i), -16, rsb_items[i]);
 
-                if (time && (time > (cl.time - 2)))
+                if (time && (time > (GetClSimTime() - 2)))
                     _sb.updates = 0;
             }
         }
@@ -648,11 +648,11 @@ void Sbar_DrawInventory() {
         for (int i = 0; i < 4; i++) {
             if (cl.items & (1 << (28 + i))) {
                 LegDt_t time = cl.item_gettime[28 + i];
-                if (time && (time > (cl.time - 2)) && flashon)  // flash frame
+                if (time && (time > (GetClSimTime() - 2)) && flashon)  // flash frame
                     _sb.updates = 0;
                 else    Sbar_DrawPic(320 - 32 + i * 8, -16, _sb.sigil[i]);
 
-                if (time && (time > (cl.time - 2)))
+                if (time && (time > (GetClSimTime() - 2)))
                     _sb.updates = 0;
             }
         }
@@ -771,7 +771,7 @@ void Sbar_DrawFace() {
         4 : cl.stats[STAT_HEALTH] / 20;
 
     int anim;
-    if (cl.time <= cl.faceanimtime) {
+    if (GetClSimTime() <= cl.faceanimtime) {
         anim = 1;
         _sb.updates = 0;  // make sure the anim gets drawn over
     }

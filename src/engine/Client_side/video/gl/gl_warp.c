@@ -179,8 +179,8 @@ void EmitWaterPolys(mSurface_p fa) {
                 float os = v.tx.s;
                 float ot = v.tx.t;
 
-                float s = (os + turbsin[(int)((ot * 0.125 + realtime) * TURBSCALE) & 255]) / 64.0f;
-                float t = (ot + turbsin[(int)((os * 0.125 + realtime) * TURBSCALE) & 255]) / 64.0f;
+                float s = (os + turbsin[(int)((ot * 0.125 + GetRealTime()) * TURBSCALE) & 255]) / 64.0f;
+                float t = (ot + turbsin[(int)((os * 0.125 + GetRealTime()) * TURBSCALE) & 255]) / 64.0f;
 
                 glTexCoord2f(s, t);     glVertex3fv(v.vf);
             }
@@ -231,14 +231,14 @@ void EmitBothSkyLayers(mSurface_p fa) {
     GL_DisableMultitexture();
 
     GL_Bind(solidskytexture);
-    speedscale = realtime * 8;
+    speedscale = GetRealTime() * 8;
     speedscale -= (int)speedscale & ~127;
 
     EmitSkyPolys(fa);
 
     glEnable(GL_BLEND); {
         GL_Bind(alphaskytexture);
-        speedscale = realtime * 16.0f;
+        speedscale = GetRealTime() * 16.0f;
         speedscale -= (int)speedscale & ~127;
 
         EmitSkyPolys(fa);
@@ -257,7 +257,7 @@ void R_DrawSkyChain(mSurface_p s) {
 
     // used when gl_texsort is on
     GL_Bind(solidskytexture);
-    speedscale = realtime * 8;
+    speedscale = GetRealTime() * 8;
     speedscale -= (int)speedscale & ~127;
 
     for (mSurface_p fa = s; fa; fa = fa->texturechain)
@@ -265,7 +265,7 @@ void R_DrawSkyChain(mSurface_p s) {
 
     glEnable(GL_BLEND); {
         GL_Bind(alphaskytexture);
-        speedscale = realtime * 16.0f;
+        speedscale = GetRealTime() * 16.0f;
         speedscale -= (int)speedscale & ~127;
 
         for (mSurface_p fa = s; fa; fa = fa->texturechain)

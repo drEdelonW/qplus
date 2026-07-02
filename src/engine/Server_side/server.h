@@ -43,7 +43,7 @@ typedef struct {
     bool        active;         // false if only a net client
     bool        paused;
     bool        loadgame;       // handle connections specially
-    SimTime_t   time;
+    SimTime_t   simTime;
     uint8_t     lastcheck;      // used by PF_checkclient
     SimTime_t   lastchecktime;
     char        name[NAME_LENGTH];       // map name
@@ -70,8 +70,6 @@ typedef struct {
     sizebuf_t   signon;
     uint8_t     signon_buf[8192];
 } server_t;
-
-
 
 #define NUM_PING_TIMES  16
 #define NUM_SPAWN_PARMS 16
@@ -116,6 +114,10 @@ extern sv_static_t  svs;    // persistent server info
 extern server_t     sv;     // local server
 extern RmtClient_p  remoteClient;
 extern edict_p      sv_player;
+
+static inline SimTime_t GetSvSimTime() { return sv.simTime; }
+static inline void AddSvSimTime(SimDt_t simDelta) { sv.simTime += simDelta; }
+static inline void SetSvSimTime(SimTime_t simTime) { sv.simTime = simTime; }
 
 //===========================================================
 #ifdef __cplusplus

@@ -124,7 +124,7 @@ void CL_ParseBeam(Model_p m) {
             cl_beams[i] = (Beam_t){
                 .entity = ent,
                 .model = m,
-                .endtime = (LegDt_t)(cl.time + 0.2f),
+                .endtime = (LegDt_t)(GetClSimTime() + 0.2f),
                 .start = start,
                 .end = end,
             };
@@ -134,12 +134,12 @@ void CL_ParseBeam(Model_p m) {
     // find a free beam
     for (int i = 0; i < MAX_BEAMS; i++)
         if (!(cl_beams[i].model) ||
-            (cl_beams[i].endtime < cl.time)
+            (cl_beams[i].endtime < GetClSimTime())
             ) {
             cl_beams[i] = (Beam_t){
                 .entity = ent,
                 .model = m,
-                .endtime = (LegDt_t)(cl.time + 0.2f),
+                .endtime = (LegDt_t)(GetClSimTime() + 0.2f),
                 .start = start,
                 .end = end,
             };
@@ -233,7 +233,7 @@ void CL_ParseTEnt() {
         *(dl = CL_AllocDlight(0)) = (dLight_t){
             .origin = pos,
             .radius = 350.0f,
-            .die = (LegDt_t)(cl.time + 0.5f),
+            .die = (LegDt_t)(GetClSimTime() + 0.5f),
             .decay = 300.0f,
             .key = 0,
         };
@@ -289,7 +289,7 @@ void CL_ParseTEnt() {
         *(dl = CL_AllocDlight(0)) = (dLight_t){
             .origin = pos,
             .radius = 350.0f,
-            .die = (LegDt_t)(cl.time + 0.5f),
+            .die = (LegDt_t)(GetClSimTime() + 0.5f),
             .decay = 300.0f,
             .key = 0,
         };
@@ -325,7 +325,7 @@ void CL_ParseTEnt() {
         *(dl = CL_AllocDlight(-1)) = (dLight_t){
             .origin = endpos,
             .radius = 350.0f,
-            .die = (LegDt_t)(cl.time + 0.5f),
+            .die = (LegDt_t)(GetClSimTime() + 0.5f),
             .decay = 300.0f,
             .key = -1;
         };
@@ -371,7 +371,7 @@ void CL_UpdateTEnts() {
     Beam_p b = cl_beams;
     for (int i = 0; i < MAX_BEAMS; i++, b++) {
         if (!b->model ||
-            (b->endtime < cl.time))
+            (b->endtime < GetClSimTime()))
             continue;
 
         // if coming from the player, update the start position

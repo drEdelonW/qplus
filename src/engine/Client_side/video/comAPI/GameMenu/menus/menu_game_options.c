@@ -266,7 +266,7 @@ void M_GameOptions_Draw() {
     M_DrawCharacter(_x2 - 16, _cur_ys[_cursor], curSymb());
 
     if (_svInfoMsg) {
-        if ((realtime - _svInfoMsgTime) < 5.0) {
+        if ((GetRealTime() - _svInfoMsgTime) < 5.0) {
             int x = HALF(320 - 26 * 8) / 2;
             M_DrawTextBox(x, 138, 24, 4);{
                 x += 8;
@@ -292,7 +292,7 @@ void M_NetStart_Change(int dir) {
         if (_maxPlayers > svs.maxClientsLimit) {
             _maxPlayers = svs.maxClientsLimit;
             _svInfoMsg = true;
-            _svInfoMsgTime = realtime;
+            _svInfoMsgTime = GetRealTime();
         }
         if (_maxPlayers < 2)
             _maxPlayers = 2;

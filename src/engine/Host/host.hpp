@@ -13,7 +13,7 @@ public:
     void Shutdown();
     void  Error(cString error, ...);
     void  EndGame(cString message, ...);
-    void Frame(float time);
+    void Frame(RealDt_t time);
     void Quit_f();
     void  ClientCommands(cString fmt, ...);
     void ShutdownServer(bool crash);
@@ -29,7 +29,6 @@ public:
     uint8_p  basepal;
     uint8_p  colormap;
     int32_t  framecount; // incremented every frame, never reset
-    LegTime_t   realtime;   // not bounded in any way, changed at start of every frame, never reset
 #endif
 
   private:

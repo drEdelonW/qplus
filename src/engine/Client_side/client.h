@@ -94,7 +94,7 @@ typedef struct {
     // demo recording info must be here, because record is started before
     // entering a map (and clearing ClientState_t)
     bool        demorecording;
-    bool        demoplayback;
+    bool        isDemoPlaying;
     bool        timedemo;
     int32_t     forcetrack;   // -1 = use normal cd track
     FILE* demofile;
@@ -162,13 +162,13 @@ typedef struct {
     bool        inwater;
 
     IntermissionState_e intermission; // don't change view angle, full screen, etc
-    int32_t     completed_time; // latched at intermission start
+    uint32_t    completed_time; // latched at intermission start
 
     LegTime_t   mtime[2];   // the timestamp of last two messages
-    LegTime_t   time;       // clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
-    LegTime_t   oldtime;    // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
+    SimTime_t   simTime;    // it was [cl.time] clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
+    SimTime_t   oldtime;    // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
 
-    LegDt_t       last_received_message; // (realtime) for net trouble icon
+    sRealTime_t last_received_message; // (realtime) for net trouble icon
 
     //
     // information that is static for the entire time connected to a server
@@ -200,8 +200,11 @@ typedef struct {
     int32_t   light_level;
 #endif
 } ClientState_t;
-
 extern ClientState_t cl;
+
+static inline SimTime_t GetClSimTime() { return cl.simTime; }
+static inline void AddClSimTime(SimDt_t simDelta) { cl.simTime += simDelta; }
+static inline void SetClSimTime(SimTime_t simTime) { cl.simTime = simTime; }
 
 // FIXME, allocate dynamically
 extern r_Entity_t   cl_entities[MAX_EDICTS];

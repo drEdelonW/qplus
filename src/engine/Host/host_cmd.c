@@ -70,8 +70,11 @@ Host_Status_f
 void Host_Status_f() {
     void (*print) (cStringRO fmt, ...);
 
-    if (cmd_source == src_command) {
-        if (!SV_IsActive()) { Cmd_ForwardToServer();    return; }
+    if (isCliCmd()) {
+        if (!SV_IsActive()) {
+            Cmd_ForwardToServer();
+            return;
+        }
         print = Con_Printf;
     }
     else    print = SV_ClientPrintf;
@@ -121,7 +124,10 @@ Host_Ping_f
 ==================
 */
 void Host_Ping_f() {
-    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if (isCliCmd()) {
+        Cmd_ForwardToServer();
+        return;
+    }
 
     SV_ClientPrintf("Client ping times:\n");
     RmtClient_p rClient = svs.clients;
@@ -155,7 +161,7 @@ command from the console.  Active clients are kicked off.
 ======================
 */
 void Host_Map_f() {
-    if (cmd_source != src_command)  return;
+    if (isNetCmd())  return;
 
     cls.demonum = -1;  // stop demo loop in case this fails
 
@@ -206,7 +212,7 @@ Goes to a new map, taking all clients along
 void Host_Changelevel_f() {
 #ifdef QUAKE2
     if (Cmd_Argc() < 2) { ;                 Con_Printf("changelevel <levelname> : continue game on a new level\n"); return; }
-    if (!SV_IsActive() || cls.demoplayback) { ; Con_Printf("Only the server may changelevel\n");                        return; }
+    if (!SV_IsActive() || cls.isDemoPlaying) { ; Con_Printf("Only the server may changelevel\n");                        return; }
 
     strcpy(level, Cmd_Argv(1));
     cString startspot;
@@ -223,7 +229,7 @@ void Host_Changelevel_f() {
 #else
 
     if (Cmd_Argc() != 2) { ;                Con_Printf("changelevel <levelname> : continue game on a new level\n"); return; }
-    if (!SV_IsActive() || cls.demoplayback) { ; Con_Printf("Only the server may changelevel\n");                        return; }
+    if (!SV_IsActive() || cls.isDemoPlaying) { ; Con_Printf("Only the server may changelevel\n");                        return; }
     SV_SaveSpawnparms();
 
     char level[MAX_QPATH];
@@ -240,9 +246,9 @@ Restarts the current server for a dead player
 ==================
 */
 void Host_Restart_f() {
-    if (cls.demoplayback ||
+    if (cls.isDemoPlaying ||
         !SV_IsActive() ||
-        cmd_source != src_command
+        isNetCmd()
         )
         return;
 
@@ -280,7 +286,7 @@ User command to connect to server
 */
 void Host_Connect_f() {
     cls.demonum = -1;  // stop demo loop in case this fails
-    if (cls.demoplayback) {
+    if (cls.isDemoPlaying) {
         CL_StopPlayback();
         CL_Disconnect();
     }
@@ -331,7 +337,7 @@ Host_Savegame_f
 ===============
 */
 void Host_Savegame_f() {
-    if (cmd_source != src_command)      return;
+    if (isNetCmd())      return;
     if (!SV_IsActive()) { ;             Con_Printf("Not playing a local game.\n");              return; }
     if (cl.intermission != IM_NONE) { ; Con_Printf("Can't save in intermission.\n");            return; }
     if (svs.maxClients != 1) { ;        Con_Printf("Can't save multiplayer games.\n");          return; }
@@ -383,19 +389,22 @@ void Host_Savegame_f() {
 }
 
 #include "z_hunk.h"
+#define MAX_SAVE_SIZE (0x8000) /* 32Kb*/
 /*
 ===============
 Host_Loadgame_f
 ===============
 */
 void Host_Loadgame_f() {
-    if (cmd_source != src_command)  return;
-    if (Cmd_Argc() != 2) { ;    Con_Printf("load <savename> : load a game\n"); return; }
+    if (isNetCmd())  return;
+    if (Cmd_Argc() != 2) {
+        Con_Printf("load <savename> : load a game\n");
+        return;
+    }
 
     cls.demonum = -1;  // stop demo loop in case this fails
 
-    char name[MAX_OSPATH];
-    snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
+    char name[MAX_OSPATH]; snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
     COM_DefaultExtension(name, ".sav");
 
     // we can't call SCR_BeginLoadingPlaque, because too much stack space has
@@ -406,12 +415,14 @@ void Host_Loadgame_f() {
     FILE* loadFile = fopen(name, "r");
     if (!loadFile) { Con_Printf("ERROR: couldn't open[r].\n"); return; }
 
-    int32_t version;
-    fscanf(loadFile, "%i\n", &version);
-    if (version != SAVEGAME_VERSION) { fclose(loadFile); Con_Printf("Savegame is version %i, not %i\n", version, SAVEGAME_VERSION); return; }
+    int32_t version; fscanf(loadFile, "%i\n", &version);
+    if (version != SAVEGAME_VERSION) {
+        fclose(loadFile);
+        Con_Printf("Savegame is version %i, not %i\n", version, SAVEGAME_VERSION);
+        return;
+    }
 
-    char str[32768];
-    fscanf(loadFile, "%s\n", str);
+    char str[MAX_SAVE_SIZE];  fscanf(loadFile, "%s\n", str);
 
     float spawn_parms[NUM_SPAWN_PARMS];
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
@@ -621,7 +632,7 @@ int LoadGamestate(cString level, cString startspot) {
 // changing levels within a unit
 void Host_Changelevel2_f() {
     if (Cmd_Argc() < 2) { Con_Printf("changelevel2 <levelname> : continue game on a new level in the unit\n");  return; }
-    if (!SV_IsActive() || cls.demoplayback) { Con_Printf("Only the server may changelevel\n");  return; }
+    if (!SV_IsActive() || cls.isDemoPlaying) { Con_Printf("Only the server may changelevel\n");  return; }
 
     char level[MAX_QPATH];
     strcpy(level, Cmd_Argv(1));
@@ -658,7 +669,7 @@ void Host_Name_f() {
     cString newName = (Cmd_Argc() == 2) ? Cmd_Argv(1) : Cmd_Args();
     newName[15] = 0;
 
-    if (cmd_source == src_command) {
+    if (isCliCmd()) {
         if (Q_strcmp(cl_name.string, newName) == 0) return;
 
         Cvar_Set("_cl_name", newName);
@@ -688,7 +699,7 @@ void Host_Version_f() {
 
 #ifdef IDGODS
 void Host_Please_f() {
-    if (cmd_source != src_command)  return;
+    if (isNetCmd())  return;
 
     if ((Cmd_Argc() == 3) &&
         (Q_strcmp(Cmd_Argv(1), "#") == 0)) {
@@ -733,7 +744,7 @@ void Host_Please_f() {
 
 void Host_Say(bool teamonly) {
     bool  fromServer = false;
-    if (cmd_source == src_command) {
+    if (isCliCmd()) {
         if (Host_IsDedicated()) {
             fromServer = true;
             teamonly = false;
@@ -790,7 +801,11 @@ void Host_Say_Team_f() { Host_Say(true); }
 
 
 void Host_Tell_f() {
-    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if (isCliCmd()) {
+        Cmd_ForwardToServer();
+        return;
+    }
+
     if (Cmd_Argc() < 3)     return;
 
     char text[NAME_LENGTH];
@@ -860,7 +875,7 @@ void Host_Color_f() {
 
     uint8_t playercolor = (uint8_t)(((uint16_t)top << 4) + bottom);
 
-    if (cmd_source == src_command) {
+    if (isCliCmd()) {
         Cvar_SetValue("_cl_color", playercolor);
         if (cls.state == ca_connected)  Cmd_ForwardToServer();
         return;
@@ -880,8 +895,14 @@ Host_Kill_f
 ==================
 */
 void Host_Kill_f() {
-    if (cmd_source == src_command) { ;  Cmd_ForwardToServer();                                  return; }
-    if (sv_player->v.health <= 0) { ;   SV_ClientPrintf("Can't suicide -- allready dead!\n");   return; }
+    if (isCliCmd()) {
+        Cmd_ForwardToServer();
+        return;
+    }
+    if (sv_player->v.health <= 0) {
+        SV_ClientPrintf("Can't suicide -- allready dead!\n");
+        return;
+    }
 
     pr_global_struct->time = (float)SV_GetTime();
     pr_global_struct->self = ED_GetEDictOffs(sv_player);
@@ -895,7 +916,10 @@ Host_Pause_f
 ==================
 */
 void Host_Pause_f() {
-    if (cmd_source == src_command) { Cmd_ForwardToServer(); return; }
+    if (isCliCmd()) {
+        Cmd_ForwardToServer();
+        return;
+    }
     if (!pausable.value)            SV_ClientPrintf("Pause not allowed.\n");
     else {
         sv.paused ^= 1;
@@ -917,7 +941,7 @@ Host_PreSpawn_f
 ==================
 */
 void Host_PreSpawn_f() {
-    if (cmd_source == src_command) { ;  Con_Printf("prespawn is not valid from the console\n"); return; }
+    if (isCliCmd()) { ;  Con_Printf("prespawn is not valid from the console\n"); return; }
     if (remoteClient->spawned) { ;       Con_Printf("prespawn not valid -- allready spawned\n"); return; }
 
     sizebuf_p pBuf = &remoteClient->message;
@@ -932,8 +956,14 @@ Host_Spawn_f
 ==================
 */
 void Host_Spawn_f() {
-    if (cmd_source == src_command) { ;  Con_Printf("spawn is not valid from the console\n");    return; }
-    if (remoteClient->spawned) { ;      Con_Printf("Spawn not valid -- allready spawned\n");    return; }
+    if (isCliCmd()) {
+        Con_Printf("spawn is not valid from the console\n");
+        return;
+    }
+    if (remoteClient->spawned) {
+        Con_Printf("Spawn not valid -- allready spawned\n");
+        return;
+    }
 
     // run the entrance script
     if (sv.loadgame) { // loaded games are fully inited allready
@@ -1014,7 +1044,10 @@ Host_Begin_f
 ==================
 */
 void Host_Begin_f() {
-    if (cmd_source == src_command) { Con_Printf("begin is not valid from the console\n"); return; }
+    if (isCliCmd()) {
+        Con_Printf("begin is not valid from the console\n");
+        return;
+    }
 
     remoteClient->spawned = true;
 }
@@ -1030,7 +1063,7 @@ Kicks a user off of the server
 ==================
 */
 void Host_Kick_f() {
-    if (cmd_source == src_command) {
+    if (isCliCmd()) {
         if (!SV_IsActive()) {
             Cmd_ForwardToServer(); return;
         }
@@ -1064,10 +1097,10 @@ void Host_Kick_f() {
 
     if (i < svs.maxClients) {
         cString who;
-        if (cmd_source == src_command)
+        if (isCliCmd())
             if (Host_IsDedicated())  who = "Console";
-            else                            who = cl_name.string;
-        else                                who = save->name;
+            else                     who = cl_name.string;
+        else                         who = save->name;
 
         // can't kick yourself!
         if (remoteClient == save)    return;
@@ -1106,8 +1139,13 @@ Host_Give_f
 ==================
 */
 void Host_Give_f() {
-    if (cmd_source == src_command) { Cmd_ForwardToServer();        return; }
-    if (pr_global_struct->deathmatch && !remoteClient->privileged)  return;
+    if (isCliCmd()) {
+        Cmd_ForwardToServer();
+        return;
+    }
+    if ((pr_global_struct->deathmatch) &&
+        !(remoteClient->privileged)
+        )  return;
 
     cString t = Cmd_Argv(1);
     int cVal = atoi(Cmd_Argv(2));
@@ -1314,7 +1352,7 @@ void Host_Startdemos_f() {
 
     if ((!SV_IsActive()) &&
         (cls.demonum != -1) &&
-        (!cls.demoplayback)
+        (!cls.isDemoPlaying)
         ) {
         cls.demonum = 0;
         CL_NextDemo();
@@ -1346,7 +1384,7 @@ Return to looping demos
 ==================
 */
 void Host_Stopdemo_f() {
-    if ((Host_IsDedicated()) || (!cls.demoplayback)) return;
+    if ((Host_IsDedicated()) || (!cls.isDemoPlaying)) return;
 
     CL_StopPlayback();
     CL_Disconnect();

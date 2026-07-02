@@ -78,7 +78,7 @@ void R_DarkFieldParticles(r_Entity_p ent) {
                 prt->next = _activeParticles;
                 _activeParticles = prt;
 
-                prt->die = cl.time + 0.2 + (rand() & 7) * 0.02;
+                prt->die = GetClSimTime() + 0.2 + (rand() & 7) * 0.02;
                 prt->color = 150 + rand() % 6;
                 prt->type = pt_slowgrav;
 
@@ -118,14 +118,14 @@ void R_EntityParticles(r_Entity_p ent) {
 
     float dist = 64.0f;
     for (int i = 0; i < NUMVERTEXNORMALS; i++) {
-        float angle = cl.time * _aVelocities[i].x;
+        float angle = GetClSimTime() * _aVelocities[i].x;
         float sy = sin(angle);
         float cy = cos(angle);
-        angle = cl.time * _aVelocities[i].y;
+        angle = GetClSimTime() * _aVelocities[i].y;
         float sp = sin(angle);
         float cp = cos(angle);
 #if 0 // it was disabled
-        angle = cl.time * _aVelocities[i].z;
+        angle = GetClSimTime() * _aVelocities[i].z;
         float sr = sin(angle);
         float cr = cos(angle);
 #endif
@@ -143,7 +143,7 @@ void R_EntityParticles(r_Entity_p ent) {
         prt->next = _activeParticles;
         _activeParticles = prt;
 
-        prt->die = cl.time + 0.01;
+        prt->die = GetClSimTime() + 0.01;
         prt->color = 0x6F;
         prt->type = pt_explode;
 
@@ -248,7 +248,7 @@ void R_ParticleExplosion(vec3_t org) {
         prt->next = _activeParticles;
         _activeParticles = prt;
 
-        prt->die = cl.time + 5;
+        prt->die = GetClSimTime() + 5;
         prt->color = ramp1[0];
         prt->ramp = rand() & 3;
         prt->type = (i & 1) ? pt_explode : pt_explode2;
@@ -275,7 +275,7 @@ void R_ParticleExplosion2(vec3_t org, int colorStart, int colorLength) {
         prt->next = _activeParticles;
         _activeParticles = prt;
 
-        prt->die = cl.time + 0.3;
+        prt->die = GetClSimTime() + 0.3;
         prt->color = colorStart + (colorMod % colorLength);
         colorMod++;
 
@@ -302,7 +302,7 @@ void R_BlobExplosion(vec3_t org) {
         prt->next = _activeParticles;
         _activeParticles = prt;
 
-        prt->die = cl.time + 1 + (rand() & 8) * 0.05;
+        prt->die = GetClSimTime() + 1 + (rand() & 8) * 0.05;
         prt->type = (i & 1) ? pt_blob : pt_blob2;
         prt->color = ((i & 1) ? 66 : 150) + rand() % 6;
         for (int j = 0; j < VECT_DIM; j++) {
@@ -328,7 +328,7 @@ void R_RunParticleEffect(vec3_t org, vec3_t dir, int color, int count) {
         _activeParticles = prt;
 
         if (count == 1024) { // rocket explosion
-            prt->die = cl.time + 5;
+            prt->die = GetClSimTime() + 5;
             prt->color = ramp1[0];
             prt->ramp = rand() & 3;
             if (i & 1) {
@@ -347,7 +347,7 @@ void R_RunParticleEffect(vec3_t org, vec3_t dir, int color, int count) {
             }
         }
         else {
-            prt->die = cl.time + 0.1 * (rand() % 5);
+            prt->die = GetClSimTime() + 0.1 * (rand() % 5);
             prt->color = (color & ~7) + (rand() & 7);
             prt->type = pt_slowgrav;
             for (int j = 0; j < VECT_DIM; j++) {
@@ -376,7 +376,7 @@ void R_LavaSplash(vec3_t org) {
                 prt->next = _activeParticles;
                 _activeParticles = prt;
 
-                prt->die = cl.time + 2 + (rand() & 31) * 0.02;
+                prt->die = GetClSimTime() + 2 + (rand() & 31) * 0.02;
                 prt->color = 224 + (rand() & 7);
                 prt->type = pt_slowgrav;
 
@@ -412,7 +412,7 @@ void R_TeleportSplash(vec3_t org) {
                 prt->next = _activeParticles;
                 _activeParticles = prt;
 
-                prt->die = cl.time + 0.2 + (rand() & 7) * 0.02;
+                prt->die = GetClSimTime() + 0.2 + (rand() & 7) * 0.02;
                 prt->color = 7 + (rand() & 7);
                 prt->type = pt_slowgrav;
 
@@ -457,7 +457,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
         _activeParticles = prt;
 
         prt->vel = vec3_origin;
-        prt->die = cl.time + 2;
+        prt->die = GetClSimTime() + 2;
 
         switch (type) {
         case RT_ROCKET: {// rocket trail
@@ -485,7 +485,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
 
         case RT_TRACER:
         case RT_TRACER2: {// tracer
-            prt->die = cl.time + 0.5;
+            prt->die = GetClSimTime() + 0.5;
             prt->type = pt_static;
             prt->color = ((type == 3) ? 52 : 230) +
                 (TWICE(tracercount & 4));
@@ -514,7 +514,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
         case RT_TRACER3: {// voor trail
             prt->color = 9 * 16 + 8 + (rand() & 3);
             prt->type = pt_static;
-            prt->die = cl.time + 0.3;
+            prt->die = GetClSimTime() + 0.3;
             for (int j = 0; j < VECT_DIM; j++)
                 prt->org.v[j] = start.v[j] + ((rand() & 15) - 8);
         } break;
@@ -527,7 +527,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
 
 static Particle_p Particle_KillFromHead(Particle_p head) {
     while (head &&
-        (head->die < cl.time)
+        (head->die < GetClSimTime())
         ) {
         Particle_p kill = head;
         head = kill->next;
@@ -544,7 +544,7 @@ R_DrawParticles
 */
 void R_DrawParticles() {
     D_StartParticles(); {
-        float frametime = cl.time - cl.oldtime;
+        float frametime = GetClSimTime() - cl.oldtime;
         float time3 = frametime * 15;
         float time2 = frametime * 10; // 15;
         float time1 = frametime * 5;

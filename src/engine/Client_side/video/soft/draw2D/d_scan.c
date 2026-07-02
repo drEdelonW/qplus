@@ -65,7 +65,7 @@ void D_WarpScreen() {   // Under water warp
             (int)((float)u * wratio * w / (w + AMP2 * 2));
     }
 
-    turb = intsintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
+    turb = intsintable + ((int)(GetClSimTime() * SPEED) & (CYCLE - 1));
     uint8_p dest = vid.scr.pBuff + scr.vrect.y * vid.rowbytes + scr.vrect.x;
 
     for (int v = 0; v < scr.vrect.height; v++, dest += vid.rowbytes) {
@@ -108,7 +108,7 @@ Turbulent8
 =============
 */
 void Turbulent8(eSpan_p pspan) {
-    r_turb_turb = sintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
+    r_turb_turb = sintable + ((int)(GetClSimTime() * SPEED) & (CYCLE - 1));
 
     r_turb_sstep = 0;    // keep compiler happy
     r_turb_tstep = 0;    // ditto

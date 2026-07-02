@@ -172,7 +172,7 @@ void Con_Print(cStringRO txt) {
             Con_Linefeed();
             // mark time for transparent overlay
             if (con.current >= 0)
-                con.times[con.current % NUM_CON_TIMES] = (float)realtime;
+                con.times[con.current % NUM_CON_TIMES] = GetRealTime();
         }
 
         switch (c) {

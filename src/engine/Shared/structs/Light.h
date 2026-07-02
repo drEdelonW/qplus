@@ -11,7 +11,7 @@
 typedef struct {
     vec3_t  origin;
     float   radius;
-    LegDt_t die;        // stop lighting after this time
+    sSimTime_t die;        // stop lighting after this time
     LegDt_t decay;      // drop this each second
     float   minlight;   // don't add when contributing less
     int32_t key;

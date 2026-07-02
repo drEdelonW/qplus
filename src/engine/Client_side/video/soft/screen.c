@@ -136,7 +136,7 @@ void SCR_UpdateScreen() {
     scr.copyeverything = false; // TODO: wrap this valuse to avoid global publishing
 
     if (scr.disabled_for_loading) {
-        if ((realtime - _scr.disabled_time) > 60) {
+        if ((GetRealTime() - _scr.disabled_time) > 60) {
             scr.disabled_for_loading = false;
             Con_Printf("load failed.\n");
         }

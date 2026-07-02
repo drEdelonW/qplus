@@ -40,7 +40,7 @@ void R_AnimateLight() {
     //
     // light animations
     // 'm' is normal light, 'a' is no light, 'z' is double bright
-    int i = (int)(cl.time * 10);
+    int i = (int)(GetClSimTime() * 10);
     for (int j = 0; j < MAX_LIGHTSTYLES; j++) {
         if (!cl_lightstyle[j].length) {
             d_lightstylevalue[j] = 256;
@@ -115,7 +115,7 @@ void R_PushDlights() {
     dLight_p l = cl_dlights;
 
     for (int i = 0; i < MAX_DLIGHTS; i++, l++) {
-        if ((l->die < cl.time) ||
+        if ((l->die < GetClSimTime()) ||
             !l->radius)
             continue;
         R_MarkLights(l, 1 << i, cl.worldmodel->nodes);

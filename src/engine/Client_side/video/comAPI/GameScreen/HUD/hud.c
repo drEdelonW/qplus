@@ -51,10 +51,10 @@ void Con_DrawNotify() {
     for (int32_t i = (con.current - NUM_CON_TIMES + 1); i <= con.current; i++) {
         if (i < 0)  continue;
 
-        LegDt_t time = con.times[i % NUM_CON_TIMES];
+        sRealTime_t time = con.times[i % NUM_CON_TIMES];
         if (time == 0)  continue;
 
-        time = (LegDt_t)realtime - time;
+        time = GetRealTime() - time;
         if (time > con_notifytime.value)    continue;
 
         cString text = con.text + (i % (int32_t)con.totallines) * con.linewidth;
@@ -79,7 +79,7 @@ void Con_DrawNotify() {
             Draw_Character(OCTO(x + 5), v, chatBuffer[x]);
             x++;
         }
-        Draw_Character(OCTO(x + 5), v, 10 + ((int)(realtime * con.cursorspeed) & 1));
+        Draw_Character(OCTO(x + 5), v, 10 + ((int)(GetRealTime() * con.cursorspeed) & 1));
         v += D_CHAR_HEIGHT;
     }
 

@@ -225,7 +225,7 @@ void R_SetSkyFrame() {
     int s2 = _iSkySpeed2 / g;
     float temp = SKYSIZE * s1 * s2;
 
-    skytime = cl.time - ((int)(cl.time / temp) * temp);
+    skytime = GetClSimTime() - ((int)(GetClSimTime() / temp) * temp);
 
     r_skymade = false;
 }

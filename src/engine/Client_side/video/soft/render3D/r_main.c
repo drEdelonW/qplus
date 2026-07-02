@@ -473,7 +473,7 @@ void R_DrawEntitiesOnList() {
                 lighting.plightvec = &lightvec;
 
                 for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
-                    if (cl_dlights[lnum].die >= cl.time) {
+                    if (cl_dlights[lnum].die >= GetClSimTime()) {
                         vec3_t dist = VectorSubtract(currententity->origin, cl_dlights[lnum].origin);
                         float add = cl_dlights[lnum].radius - Length(dist);
 
@@ -543,7 +543,7 @@ void R_DrawViewModel() {
         dLight_p dl = &cl_dlights[lnum];
         if ((!dl->radius) ||
             (!dl->radius) ||
-            (dl->die < cl.time))
+            (dl->die < GetClSimTime()))
             continue;
 
         vec3_t dist = VectorSubtract(currententity->origin, dl->origin);
@@ -659,7 +659,7 @@ void R_DrawBEntitiesOnList() {
                     (clmodel->firstModelSurface != 0)
                     ) {
                     for (int k = 0; k < MAX_DLIGHTS; k++) {
-                        if ((cl_dlights[k].die < cl.time) ||
+                        if ((cl_dlights[k].die < GetClSimTime()) ||
                             (!cl_dlights[k].radius)
                             ) {
                             continue;

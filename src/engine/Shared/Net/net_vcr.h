@@ -33,16 +33,18 @@ typedef enum {
 } vcr_opcode_t;
 
 typedef struct {
-    LegTime_t       time;
+    SimTime_t       time;
     vcr_opcode_t    op; // it was int
     int32_t         session;
-    union {
-        int r;
-        int ret;
-    };
-    int32_t len;
 
+    int ret;
+    int32_t len;
 } vGMsg_t;
+typedef struct {
+    SimTime_t       time;
+    vcr_opcode_t    op; // it was int
+    int32_t         session;
+} vNext_t;
 
 extern bool isVCRrec;
 

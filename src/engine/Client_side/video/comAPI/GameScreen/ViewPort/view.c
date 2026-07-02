@@ -87,7 +87,7 @@ V_CalcBob
 ===============
 */
 float V_CalcBob() {
-    LegDt_t cycle = (cl.time - (int)(cl.time / cl_bobcycle.value) * cl_bobcycle.value) / cl_bobcycle.value;
+    LegDt_t cycle = (GetClSimTime() - (int)(GetClSimTime() / cl_bobcycle.value) * cl_bobcycle.value) / cl_bobcycle.value;
 
     if (cycle < cl_bobup.value) cycle = M_PI * cycle / cl_bobup.value;
     else                        cycle = M_PI + M_PI * (cycle - cl_bobup.value) / (1.0 - cl_bobup.value);
@@ -112,7 +112,7 @@ float V_CalcBob() {
 
 void V_StartPitchDrift() {
 #if 1
-    if (cl.laststop == cl.time) return;  // something else is keeping it from drifting
+    if (cl.laststop == GetClSimTime()) return;  // something else is keeping it from drifting
 #endif
     if (
         cl.nodrift ||
@@ -125,7 +125,7 @@ void V_StartPitchDrift() {
 }
 
 void V_StopPitchDrift() {
-    cl.laststop = cl.time;
+    cl.laststop = GetClSimTime();
     cl.nodrift = true;
     cl.pitchvel = 0;
 }
@@ -146,7 +146,7 @@ lookspring is non 0, or when
 void V_DriftPitch() {
     if (noclip_anglehack ||
         !cl.onground ||
-        cls.demoplayback
+        cls.isDemoPlaying
         ) {
         cl.driftmove = 0;
         cl.pitchvel = 0;
@@ -262,7 +262,7 @@ void V_ParseDamage() {
     if (count < 10)
         count = 10;
 
-    cl.faceanimtime = cl.time + 0.2f;  // but sbar face into pain frame
+    cl.faceanimtime = GetClSimTime() + 0.2f;  // but sbar face into pain frame
 
     cl.cshifts[CSHIFT_DAMAGE].percent += 3 * count;
     if (cl.cshifts[CSHIFT_DAMAGE].percent < 0)  // for x86 must be signed and more then 8bit
@@ -436,9 +436,7 @@ V_UpdatePalette
 uint8_t  ramps[3][256];
 
 void V_UpdatePalette() {
-
     V_CalcPowerupCshift();
-
     bool new = false;
 
     for (int IdxShClr = 0; IdxShClr < NUM_CSHIFTS; IdxShClr++) {
@@ -616,9 +614,9 @@ void CalcGunAngle() {
     cl.viewent.angles.yaw = r_refdef.viewangles.yaw + yaw;
     cl.viewent.angles.pitch = -(r_refdef.viewangles.pitch + pitch);
 
-    cl.viewent.angles.roll -= v_idlescale.value * sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value;
-    cl.viewent.angles.pitch -= v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
-    cl.viewent.angles.yaw -= v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
+    cl.viewent.angles.roll -= v_idlescale.value * sin(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value;
+    cl.viewent.angles.pitch -= v_idlescale.value * sin(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value;
+    cl.viewent.angles.yaw -= v_idlescale.value * sin(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value;
 }
 
 /*
@@ -646,14 +644,14 @@ Idle swaying
 */
 void V_AddIdle() {
 #if 0
-    r_refdef.viewangles.roll += v_idlescale.value * sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value;
-    r_refdef.viewangles.pitch += v_idlescale.value * sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value;
-    r_refdef.viewangles.yaw += v_idlescale.value * sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value;
+    r_refdef.viewangles.roll += v_idlescale.value * sin(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value;
+    r_refdef.viewangles.pitch += v_idlescale.value * sin(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value;
+    r_refdef.viewangles.yaw += v_idlescale.value * sin(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value;
 #else
     ang3_t v_i = (ang3_t){
-        .pitch = sin(cl.time * v_ipitch_cycle.value) * v_ipitch_level.value,
-        .yaw = sin(cl.time * v_iyaw_cycle.value) * v_iyaw_level.value,
-        .roll = sin(cl.time * v_iroll_cycle.value) * v_iroll_level.value,
+        .pitch = sin(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value,
+        .yaw = sin(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value,
+        .roll = sin(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value,
     };
     r_refdef.viewangles = AngleMA(r_refdef.viewangles, v_idlescale.value, v_i);
 #endif
@@ -804,7 +802,7 @@ void V_CalcRefdef() {
     if ((cl.onground) &&
         ((ent->origin.z - _oldZ) > 0)) {
 
-        LegDt_t steptime = cl.time - cl.oldtime;
+        LegDt_t steptime = GetClSimTime() - cl.oldtime;
         if (steptime < 0.0f) {
             steptime = 0.0f;    //FIXME  I_Error ("steptime < 0");
         }

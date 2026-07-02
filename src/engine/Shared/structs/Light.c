@@ -25,7 +25,7 @@ dLight_p CL_AllocDlight(int32_t key) {
 
     // then look for anything else
     for (int i = 0; i < MAX_DLIGHTS; i++)
-        if (cl_dlights[i].die < cl.time) {
+        if (cl_dlights[i].die < GetClSimTime()) {
             cl_dlights[i] = (dLight_t){ // should clear all fields
                  .key = key
             };
@@ -46,10 +46,10 @@ CL_DecayLights
 ===============
 */
 void CL_DecayLights() {
-    LegDt_t time = (LegDt_t)(cl.time - cl.oldtime);
+    LegDt_t time = (LegDt_t)(GetClSimTime() - cl.oldtime);
 
     for (int i = 0; i < MAX_DLIGHTS; i++) {
-        if ((cl_dlights[i].die < cl.time) ||
+        if ((cl_dlights[i].die < GetClSimTime()) ||
             (cl_dlights[i].radius == 0.0f)
             )   continue;
 

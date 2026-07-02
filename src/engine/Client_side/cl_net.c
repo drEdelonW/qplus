@@ -25,7 +25,7 @@ void CL_Disconnect() {
     // SCR_BringDownConsole();
 
     // if running a local server, shut it down
-    if (cls.demoplayback)   CL_StopPlayback();
+    if (cls.isDemoPlaying)   CL_StopPlayback();
     else if (cls.state == ca_connected) {
         if (cls.demorecording)
             CL_Stop_f();
@@ -40,7 +40,7 @@ void CL_Disconnect() {
         if (Host_IsServerActive())      Host_ShutdownServer(false);
     }
 
-    cls.demoplayback = cls.timedemo = false;
+    cls.isDemoPlaying = cls.timedemo = false;
     cls.signon = 0;
 }
 

@@ -463,7 +463,7 @@ R_GenTurbTile
 ================
 */
 void R_GenTurbTile(pixel_p pbasetex, TypeLess_ptr pdest) {
-    int* turb = sintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
+    int* turb = sintable + ((int)(GetClSimTime() * SPEED) & (CYCLE - 1));
     uint8_p pd = (uint8_p)pdest;
 
     for (int i = 0; i < TILE_SIZE; i++) {
@@ -482,7 +482,7 @@ R_GenTurbTile16
 ================
 */
 void R_GenTurbTile16(pixel_p pbasetex, TypeLess_ptr pdest) {
-    int* turb = sintable + ((int)(cl.time * SPEED) & (CYCLE - 1));
+    int* turb = sintable + ((int)(GetClSimTime() * SPEED) & (CYCLE - 1));
     uint16_p pd = (uint16_p)pdest;
 
     for (int i = 0; i < TILE_SIZE; i++) {

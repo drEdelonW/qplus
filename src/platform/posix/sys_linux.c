@@ -216,10 +216,10 @@ int main(int c, cStringArray v) {
         printf("Linux Quake -- Version %0.3f\n", LINUX_VERSION);
     }
 
-    LegTime_t oldtime = Sys_FloatTime() - 0.1f;
+    RealTime_t oldtime = Sys_FloatTime() - 0.1f;
     while (1) {
-        LegTime_t newtime = Sys_FloatTime();
-        LegTime_t time = newtime - oldtime;    // find time spent rendering last frame
+        RealTime_t newtime = Sys_FloatTime();
+        RealDt_t time = newtime - oldtime;    // find time spent rendering last frame
 
         if (Host_IsDedicated()) {     // play vcrfiles at max speed
             if ((time < sys_ticrate.value) &&

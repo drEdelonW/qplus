@@ -554,7 +554,7 @@ void R_AliasSetupSkin() {
             ((uint8_p)paliashdr + paliasskingroup->intervals);
         int numskins = paliasskingroup->numskins;
         float fullskininterval = pskinintervals[numskins - 1];
-        float skintime = cl.time + currententity->syncbase;
+        float skintime = GetClSimTime() + currententity->syncbase;
 
         // when loading in Mod_LoadAliasSkinGroup, we guaranteed all interval
         // values are positive, so we don't have to worry about division by 0
@@ -631,7 +631,7 @@ void R_AliasSetupFrame() {
         ((uint8_p)paliashdr + paliasgroup->intervals);
     int numframes = paliasgroup->numframes;
     float fullinterval = pintervals[numframes - 1];
-    float time = cl.time + currententity->syncbase;
+    float time = GetClSimTime() + currententity->syncbase;
 
     //
     // when loading in Mod_LoadAliasGroup, we guaranteed all interval values

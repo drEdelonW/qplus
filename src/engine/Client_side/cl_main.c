@@ -99,7 +99,7 @@ Host should be either "local" or a net address to be passed on
 */
 void CL_EstablishConnection(cString host) {
     if ((Host_IsDedicated()) ||
-        (cls.demoplayback))
+        (cls.isDemoPlaying))
         return;
 
     CL_Disconnect();
@@ -228,7 +228,7 @@ LegDt_t CL_LerpPoint() {
         cls.timedemo ||
         Host_IsServerActive()
         ) {
-        cl.time = cl.mtime[0];
+        SetClSimTime(cl.mtime[0]);
         return 1.0f;
     }
 
@@ -237,12 +237,12 @@ LegDt_t CL_LerpPoint() {
         f = 0.1f;
     }
 
-    LegDt_t frac = (LegDt_t)(cl.time - cl.mtime[1]) / f;
+    LegDt_t frac = (LegDt_t)(GetClSimTime() - cl.mtime[1]) / f;
     //Con_Printf ("frac: %f\n",frac);
     if (frac < 0) {
         if (frac < -0.01f) {
             SetPal(1);
-            cl.time = cl.mtime[1];
+            SetClSimTime(cl.mtime[1]);
             //    Con_Printf ("low frac\n");
         }
         frac = 0;
@@ -250,7 +250,7 @@ LegDt_t CL_LerpPoint() {
     else if (frac > 1.0f) {
         if (frac > 1.01f) {
             SetPal(2);
-            cl.time = cl.mtime[0];
+            SetClSimTime(cl.mtime[0]);
             //    Con_Printf ("high frac\n");
         }
         frac = 1.0f;
@@ -280,14 +280,14 @@ void CL_RelinkEntities() {
         )
     );
 
-    if (cls.demoplayback) {
+    if (cls.isDemoPlaying) {
         // interpolate the angles
         cl.viewangles = AngleMA(cl.mviewangles[1],
             frac, AngleSubtract(cl.mviewangles[0], cl.mviewangles[1])
         );
     }
 
-    float bobjrotate = anglemod((float)(100 * cl.time));
+    float bobjrotate = anglemod((100.f * GetClSimTime()));
 
     // start on the entity after the world
     r_Entity_p ent = cl_entities + 1;
@@ -348,34 +348,34 @@ void CL_RelinkEntities() {
             dl->origin = VectorMA(dl->origin, 18, bs.forward);
             dl->radius = (float)(200 + (rand() & 31));
             dl->minlight = 32;
-            dl->die = (LegDt_t)(cl.time + 0.1);
+            dl->die = (sSimTime_t)(GetClSimTime() + 0.1);
         }
         if (ent->effects & EF_BRIGHTLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
             dl->origin = ent->origin;
             dl->origin.z += 16;
             dl->radius = (float)(400 + (rand() & 31));
-            dl->die = (LegDt_t)(cl.time + 0.001);
+            dl->die = (sSimTime_t)(GetClSimTime() + 0.001);
         }
         if (ent->effects & EF_DIMLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
             dl->origin = ent->origin;
             dl->radius = (float)(200 + (rand() & 31));
-            dl->die = (LegDt_t)(cl.time + 0.001);
+            dl->die = (sSimTime_t)(GetClSimTime() + 0.001);
         }
 #ifdef QUAKE2
         if (ent->effects & EF_DARKLIGHT) {
             dLight_p dl = CL_AllocDlight(i);
             dl->origin = ent->origin;
             dl->radius = 200.0 + (rand() & 31);
-            dl->die = cl.time + 0.001;
+            dl->die = (sSimTime_t)(GetClSimTime() + 0.001);
             dl->dark = true;
         }
         if (ent->effects & EF_LIGHT) {
             dLight_p dl = CL_AllocDlight(i);
             dl->origin = ent->origin;
             dl->radius = 200;
-            dl->die = cl.time + 0.001;
+            dl->die = (sSimTime_t)(GetClSimTime() + 0.001);
         }
 #endif
 
@@ -388,7 +388,7 @@ void CL_RelinkEntities() {
             dLight_p dl = CL_AllocDlight(i);
             dl->origin = ent->origin;
             dl->radius = 200;
-            dl->die = (LegDt_t)(cl.time + 0.01);
+            dl->die = (sSimTime_t)(GetClSimTime() + 0.01);
         }
         else if (ent->model->flags & EF_GRENADE)    R_RocketTrail(oldorg, ent->origin, RT_GRENADE);
         else if (ent->model->flags & EF_TRACER3)    R_RocketTrail(oldorg, ent->origin, RT_TRACER3);
@@ -417,8 +417,8 @@ Read all incoming data from the server
 ===============
 */
 void CL_ReadFromServer() {
-    cl.oldtime = cl.time;
-    cl.time += host_frametime;
+    cl.oldtime = GetClSimTime();
+    AddClSimTime(host_frametime);
 
     int ret;
     do {
@@ -426,7 +426,7 @@ void CL_ReadFromServer() {
         if (ret == -1)  Host_Error("CL_ReadFromServer: lost server connection");
         if (!ret)       break;
 
-        cl.last_received_message = (LegDt_t)realtime;
+        cl.last_received_message = GetRealTime();
         CL_ParseServerMessage();
     } while (ret && (cls.state == ca_connected));
 
@@ -456,7 +456,7 @@ void CL_SendCmd() {
         CL_SendMove(&cmd);  // send the unreliable message
     }
 
-    if (cls.demoplayback) { SZ_Clear(&cls.message); return; }
+    if (cls.isDemoPlaying) { SZ_Clear(&cls.message); return; }
 
     // send the reliable message
     if (!cls.message.cursize)   return;  // no message at all

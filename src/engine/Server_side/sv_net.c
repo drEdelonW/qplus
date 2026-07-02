@@ -493,7 +493,7 @@ void SV_SendNop(RmtClient_p client) {
 
     if (NET_SendUnreliableMessage(client->netconnection, &msg) == -1)
         SV_DropClient(true);  // if the message couldn't send, kick off
-    client->last_message = realtime;
+    client->last_message = GetRealTime();
 }
 
 #undef SERVER   // TODO: remove this workaround

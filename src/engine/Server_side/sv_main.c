@@ -59,21 +59,10 @@ void SV_Init() {
     }
 }
 
-cString SV_GetName() {
-    return sv.name;
-}
-
-bool SV_IsActive() {
-    return sv.active;
-}
-
-SimTime_t SV_GetTime() {
-    return sv.time;
-}
-
-void SV_SetTime(SimTime_t time) {
-    sv.time = time;
-}
+cString SV_GetName() { return sv.name; }
+bool SV_IsActive() { return sv.active; }
+SimTime_t SV_GetTime() { return GetSvSimTime(); }
+void SV_SetTime(SimTime_t time) { SetSvSimTime(time); }
 
 
 /*
@@ -223,7 +212,7 @@ void SV_SendClientMessages() {
             // some other message data (name changes, etc) may accumulate
             // between signon stages
             if (!remoteClient->sendsignon) {
-                if (realtime - remoteClient->last_message > 5)
+                if (GetRealTime() - remoteClient->last_message > 5)
                     SV_SendNop(remoteClient);
                 continue;  // don't send out non-signon messages
             }
@@ -249,7 +238,7 @@ void SV_SendClientMessages() {
                 if (NET_SendMessage(remoteClient->netconnection, &remoteClient->message) == -1)
                     SV_DropClient(true);  // if the message couldn't send, kick off
                 SZ_Clear(&remoteClient->message);
-                remoteClient->last_message = realtime;
+                remoteClient->last_message = GetRealTime();
                 remoteClient->sendsignon = false;
             }
         }
@@ -321,8 +310,7 @@ void SV_SaveSpawnparms() {
     ================
 */
 
-void SV_SpawnServer(
-    cString server
+void SV_SpawnServer(cString server
 #ifdef QUAKE2
     , cString startspot
 #endif

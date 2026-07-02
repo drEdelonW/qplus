@@ -43,7 +43,7 @@ void M_Main_Key(keycode_t Key) {
         m_state = m_none;
         cls.demonum = m_save_demonum;
         if ((cls.demonum != -1) &&
-            (!cls.demoplayback) &&
+            (!cls.isDemoPlaying) &&
             (cls.state != ca_connected))
             CL_NextDemo();
     } break;

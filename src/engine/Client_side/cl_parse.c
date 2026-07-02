@@ -159,7 +159,7 @@ void CL_KeepaliveMessage() {
     static LegDt_t _lastMsg;
 
     if ((Host_IsServerActive()) || // no need if server is local
-        (cls.demoplayback)) {
+        (cls.isDemoPlaying)) {
         return;
     }
 
@@ -447,7 +447,7 @@ void CL_ParseClientdata(server_update_bits_t bits) {
                 if ((msg & (1u << i)) &&
                     !(cl.items & (1u << i))
                     ) {
-                    cl.item_gettime[i] = (LegDt_t)cl.time;
+                    cl.item_gettime[i] = GetClSimTime();
                 }
             }
             cl.items = msg;
@@ -717,7 +717,7 @@ void CL_ParseServerMessage() {
         case svc_cdtrack: {
             cl.cdtrack = MSG_ReadByte();
             cl.looptrack = MSG_ReadByte();
-            if ((cls.demoplayback ||
+            if ((cls.isDemoPlaying ||
                 cls.demorecording) &&
                 (cls.forcetrack != -1)
                 )
@@ -727,20 +727,20 @@ void CL_ParseServerMessage() {
 
         case svc_intermission: {
             cl.intermission = IM_LEVEL;
-            cl.completed_time = (int32_t)cl.time;
+            cl.completed_time = (uint32_t)GetClSimTime();
             SCR_RequestCalcRefdef(); // go to full screen
         } break;
 
         case svc_finale: {
             cl.intermission = IM_FINALE;
-            cl.completed_time = (int32_t)cl.time;
+            cl.completed_time = (uint32_t)GetClSimTime();
             SCR_RequestCalcRefdef(); // go to full screen
             SCR_CenterPrint(MSG_ReadString());
         } break;
 
         case svc_cutscene: {
             cl.intermission = IM_CUTSCENE;
-            cl.completed_time = (int32_t)cl.time;
+            cl.completed_time = (uint32_t)GetClSimTime();
             SCR_RequestCalcRefdef(); // go to full screen
             SCR_CenterPrint(MSG_ReadString());
         } break;

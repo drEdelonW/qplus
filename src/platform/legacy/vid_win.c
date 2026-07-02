@@ -1816,7 +1816,7 @@ void VID_TestMode_f() {
             testduration = Q_atof(Cmd_Argv(2));
             if (testduration == 0)
                 testduration = 5.0;
-            vid_testendtime = realtime + testduration;
+            vid_testendtime = GetRealTime() + testduration;
         }
     }
 }
@@ -2156,7 +2156,7 @@ void VID_Update(vRect_p rects) {
     FlipScreen(rects);
 
     if (vid_testingmode) {
-        if (realtime >= vid_testendtime) {
+        if (GetRealTime() >= vid_testendtime) {
             VID_SetMode(vid_realmode, vid_curpal);
             vid_testingmode = 0;
         }
@@ -3013,7 +3013,7 @@ void VID_MenuKey(int key) {
         // happens during the mode set and does a VID_Update, which
         // checks vid_testingmode
         vid_testingmode = 1;
-        vid_testendtime = realtime + 5.0;
+        vid_testendtime = GetRealTime() + 5.0;
 
         if (!VID_SetMode(modedescs[vid_line].modenum, vid_curpal)) {
             vid_testingmode = 0;

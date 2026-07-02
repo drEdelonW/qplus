@@ -407,7 +407,7 @@ void Cmd_ForwardToServer() {
         return;
     }
 
-    if (cls.demoplayback) { return; }  // not really connected
+    if (cls.isDemoPlaying) { return; }  // not really connected
     sizebuf_p pBuf = &cls.message;
     MSG_WriteByte(pBuf, clc_stringcmd);
     if (Q_strcasecmp(Cmd_Argv(0), "cmd") != 0) {

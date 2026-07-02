@@ -703,7 +703,7 @@ void SV_CheckStuck(edict_p ent) {
             for (int j = -1; j <= 1; j++) {
                 ent->v.origin.x = org.x + (float)i;
                 ent->v.origin.y = org.y + (float)j;
-                ent->v.velocity.z = org.z + (float)z;
+                ent->v.origin.z = org.z + (float)z;
                 if (!SV_TestEntityPosition(ent)) {
                     Con_DPrintf("Unstuck.\n");
                     SV_LinkEdict(ent, true);
@@ -725,7 +725,7 @@ bool SV_CheckWater(edict_p ent) {
     vec3_t point = {
         .x = ent->v.origin.x,
         .y = ent->v.origin.y,
-        .z = ent->v.velocity.z + ent->v.mins.z + 1
+        .z = ent->v.origin.z + ent->v.mins.z + 1
     };
 
     ent->v.waterlevel = 0;
@@ -888,9 +888,11 @@ void SV_WalkMove(edict_p ent) {
     SV_PushEntity(ent, upmove); // FIXME: don't link?
 
     // move forward
-    ent->v.velocity.x = oldvel.x;
-    ent->v.velocity.y = oldvel.y;
-    ent->v.velocity.z = 0.0f;
+    ent->v.velocity = (vec3_t){
+        .x = oldvel.x,
+        .y = oldvel.y
+    };
+
     MoveClipFlags_e clip = SV_FlyMove(ent, host_frametime, &steptrace);
 
     // check for stuckness, possibly due to the limited precision of floats
@@ -1372,7 +1374,7 @@ void SV_Physics() {
     if (pr_global_struct->force_retouch)
         pr_global_struct->force_retouch--;
 
-    sv.time += host_frametime;
+    AddSvSimTime(host_frametime);
 }
 
 
@@ -1406,7 +1408,7 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
             p->type = pt_static;
             p->vel = vec3_origin;
             p->org = tent->v.origin;
-        }
+    }
 # endif
 
         if ((trace.ent) &&
@@ -1414,6 +1416,6 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
             // p->color = 224;
             host_frametime = save_frametime;
         return trace;
-    }
+}
 }
 #endif

@@ -68,7 +68,7 @@ for a few moments
 void SCR_CenterPrint(cString str) {
     strncpy(_scr.centerstring, str, sizeof(_scr.centerstring) - 1);
     scr.centertime_off = scr_centertime.value;
-    _scr.centertime_start = cl.time;
+    _scr.centertime_start = GetClSimTime();
 
     // count the number of lines for centering
     _scr.center_lines = 1;
@@ -82,7 +82,7 @@ void SCR_CenterPrint(cString str) {
 void SCR_DrawCenterString() {
     // the finale prints the characters one at a time
     int remaining = (cl.intermission != IM_NONE) ?
-        scr_printspeed.value * (cl.time - _scr.centertime_start) : 9999;
+        scr_printspeed.value * (GetClSimTime() - _scr.centertime_start) : 9999;
 
     _scr.erase_center = 0;
     cString start = _scr.centerstring;
@@ -224,7 +224,7 @@ void SCR_BeginLoadingPlaque() {
     _scr.drawloading = false;
 
     scr.disabled_for_loading = true;
-    _scr.disabled_time = realtime;
+    _scr.disabled_time = GetRealTime();
     SCR_RequestRedraw();
 }
 
@@ -276,8 +276,8 @@ SCR_DrawNet
 ==============
 */
 void SCR_DrawNet() {
-    if (((realtime - cl.last_received_message) < 0.3f) ||
-        (cls.demoplayback))
+    if (((GetRealTime() - cl.last_received_message) < 0.3f) ||
+        (cls.isDemoPlaying))
         return;
 
     Draw_Pic(scr.vrect.x + 64, scr.vrect.y, _scr.net);

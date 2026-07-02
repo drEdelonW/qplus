@@ -278,7 +278,7 @@ void CL_SendMove(UserCmd_p cmd) {
     //
     // deliver the message
     //
-    if (cls.demoplayback)   return;
+    if (cls.isDemoPlaying)   return;
 
     //
     // allways dump the first two message, because it may contain leftover inputs

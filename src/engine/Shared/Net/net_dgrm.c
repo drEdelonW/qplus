@@ -117,7 +117,7 @@ void NET_Ban_f() {
     char maskStr[32];
     void (*print) (cStringRO fmt, ...);
 
-    if (cmd_source == src_command) {
+    if (!isCliCmd()) {
         if (!SV_IsActive()) {
             Cmd_ForwardToServer();
             return;
