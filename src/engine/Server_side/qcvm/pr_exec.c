@@ -28,7 +28,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "server.h"
 #include "host.h"
 #include <string.h>
-#include <stdarg.h>
+// #include <stdarg.h>
+#include "VA.h"
 
 
 typedef struct {
@@ -113,9 +114,14 @@ Aborts the currently executing function
 ============
 */
 void PR_RunError(cString error, ...) {
-    va_list argptr;     va_start(argptr, error);
-    char string[1024];  vsnprintf(string, sizeof(string), error, argptr);
+    char string[1024];
+#if 0
+    va_list argptr; va_start(argptr, error);
+        vsnprintf(string, sizeof(string), error, argptr);
     va_end(argptr);
+#else
+    VA_EXPAND(string, error);
+#endif
 
     PR_PrintStatement(PR_GetStack(_pr_xStatement));
     PR_StackTrace();

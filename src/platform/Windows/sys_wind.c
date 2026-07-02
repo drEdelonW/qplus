@@ -136,8 +136,7 @@ void Sys_Error(cStringRO error, ...) {
 }
 
 void Sys_Printf(cString fmt, ...) {
-    va_list  argptr;
-    va_start(argptr, fmt);
+    va_list argptr; va_start(argptr, fmt);
     vprintf(fmt, argptr);
     va_end(argptr);
 }

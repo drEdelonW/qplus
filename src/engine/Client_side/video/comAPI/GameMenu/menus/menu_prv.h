@@ -3,7 +3,8 @@
 #include "menu.h"
 #include "keys.h"
 #include "draw.h"
-#include "common.h"
+// #include "common.h"
+#include "VA.h"
 #include "sound.h"
 #include "cmd.h"
 

@@ -36,9 +36,9 @@ SYSTEM IO
 
 void Sys_Printf(cStringRO fmt, ...) {
     va_list argptr;
-    va_start(argptr, fmt);
-    vprintf(fmt, argptr);
-    va_end(argptr);
+    va_start(argptr, fmt); {
+        vprintf(fmt, argptr);
+    } va_end(argptr);
 }
 
 cString Sys_ConsoleInput() {

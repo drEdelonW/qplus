@@ -62,9 +62,6 @@ extern "C" {
     void COM_FileBase(cStringRO in, cString out);
     void COM_DefaultExtension(cStringRO path, cString extension);
 
-    cString va(cStringRO format, ...);
-    // does a varargs printf into a temp buffer
-
     //============================================================================
 
     void COM_WriteFile(cStringRO filename, TypeLess_ptr data, size_t len);

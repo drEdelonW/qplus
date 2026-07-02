@@ -1,7 +1,8 @@
 #include "host.h"
 #include "host.hpp"
 
-#include <stdarg.h>
+// #include <stdarg.h>
+#include "VA.h"
 #include "server.h"
 #undef SERVER   // TODO: remove this workaround
 #include "client.h"
@@ -21,14 +22,12 @@ Host.EndGame
 ================
 */
 void Host_EndGame(cString message, ...) {
-    va_list argptr;     va_start(argptr, message);
-    char string[1024];  vsnprintf(string, sizeof(string), message, argptr);
-    va_end(argptr);
-
+    char string[1024];
+    VA_EXPAND(string, message);
     Con_DPrintf("Host.EndGame: %s\n", string);
 
     if (SV_IsActive())                  host.ShutdownServer(false);
-    if (cls.state == ca_dedicated)  Host_SysError("Host.EndGame: %s\n", string); // dedicated servers exit
+    if (cls.state == ca_dedicated)      Host_SysError("Host.EndGame: %s\n", string); // dedicated servers exit
 
     if (cls.demonum != -1)  CL_NextDemo();
     else                    CL_Disconnect();
@@ -37,10 +36,8 @@ void Host_EndGame(cString message, ...) {
 }
 
 void Host_Printf(cStringRO fmt, ...) {
-    va_list argptr;     va_start(argptr, fmt);
-    char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
-    va_end(argptr);
-
+    char string[1024];
+    VA_EXPAND(string, fmt);
     Sys_Printf("%s", string);
 }
 
@@ -58,10 +55,8 @@ void Host_Error(cString error, ...) {
 
     SCR_EndLoadingPlaque();  // reenable screen updates
 
-    va_list argptr;     va_start(argptr, error);
-    char string[1024];  vsnprintf(string, sizeof(string), error, argptr);
-    va_end(argptr);
-
+    char string[1024];
+    VA_EXPAND(string, error);
     Con_Printf("Host.Error: %s\n", string);
 
     if (SV_IsActive())                  host.ShutdownServer(false);
@@ -76,10 +71,8 @@ void Host_Error(cString error, ...) {
 }
 
 void Host_SysError(cStringRO error, ...) {
-    va_list argptr;     va_start(argptr, error);
-    char string[1024];  vsnprintf(string, sizeof(string), error, argptr);
-    va_end(argptr);
-
+    char string[1024];
+    VA_EXPAND(string, error);
     Sys_Error("%s", string);
 }
 
@@ -92,10 +85,8 @@ FIXME: make this just a stuffed echo?
 =================
 */
 void SV_ClientPrintf(cStringRO fmt, ...) {
-    va_list argptr;     va_start(argptr, fmt);
-    char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
-    va_end(argptr);
-
+    char string[1024];
+    VA_EXPAND(string, fmt);
     sizebuf_p pBuf = &remoteClient->message;
     MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
 }
@@ -108,12 +99,12 @@ Sends text to all active clients
 =================
 */
 void SV_BroadcastPrintf(cString fmt, ...) {
-    va_list argptr;     va_start(argptr, fmt);
-    char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
-    va_end(argptr);
-
+    char string[1024];
+    VA_EXPAND(string, fmt);
     for (int i = 0; i < GetSvMaxClients(); i++)
-        if (svs.clients[i].active && svs.clients[i].spawned) {
+        if ((svs.clients[i].active) &&
+            (svs.clients[i].spawned)
+            ) {
             sizebuf_p pBuf = &svs.clients[i].message;
             MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
         }
@@ -127,10 +118,8 @@ Send text over to the client to be executed
 =================
 */
 void Host_ClientCommands(cString fmt, ...) {
-    va_list argptr;     va_start(argptr, fmt);
-    char string[1024];  vsnprintf(string, sizeof(string), fmt, argptr);
-    va_end(argptr);
-
+    char string[1024];
+    VA_EXPAND(string, fmt);
     sizebuf_p pBuf = &remoteClient->message;
     MSG_WriteByte(pBuf, svc_stufftext); MSG_WriteString(pBuf, string);
 }

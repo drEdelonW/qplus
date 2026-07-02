@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include <errno.h>
 #include <stdarg.h>
+#include "VA.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -133,7 +134,7 @@ __weak void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
 
 __weak void Sys_Error(cStringRO error, ...) {
     printf("Sys_Error: ");
-    va_list argptr;    va_start(argptr, error);
+    va_list argptr; va_start(argptr, error);
     vprintf(error, argptr);
     va_end(argptr);
     printf("\n");
@@ -142,7 +143,7 @@ __weak void Sys_Error(cStringRO error, ...) {
 }
 
 __weak void Sys_Printf(cStringRO fmt, ...) {
-    va_list argptr;    va_start(argptr, fmt);
+    va_list argptr; va_start(argptr, fmt);
     vprintf(fmt, argptr);
     va_end(argptr);
 }

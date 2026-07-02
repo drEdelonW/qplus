@@ -1,7 +1,15 @@
 #pragma once
 #include "types.h"
 
-extern int current_skill;  // skill level for currently loaded level (in case the user changes the cvar while the level is running, this reflects the level actually in use)
+typedef enum {
+    SkEasy      = 0,
+    SkMedium    = 1,
+    SkHard      = 2,
+    SkNightmare = 3,
+} Skill_t;
+
+Skill_t GM_GetSkill();
+void    GM_SetSkill(Skill_t);
 
 #ifdef __cplusplus
 extern "C" {

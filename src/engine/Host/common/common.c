@@ -22,7 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "host.h"
 #include <string.h>
-#include <stdarg.h>
+// #include <stdarg.h>
+#include "VA.h"
 #include "sys.h"
 #include "Pak.h"
 #include "console.h"
@@ -305,27 +306,6 @@ void COM_InitArgv(int argc, cStringArray argv) {
         standard_quake = false;
     }
 }
-
-
-
-
-/*
-============
-va
-
-does a varargs printf into a temp buffer, so I don't need to have
-varargs versions of all text functions.
-FIXME: make this buffer size safe someday
-============
-*/
-cString va(cStringRO format, ...) {
-    va_list argptr;             va_start(argptr, format);
-    static char string[1024];   vsnprintf(string, sizeof(string), format, argptr);
-    va_end(argptr);
-
-    return string;
-}
-
 
 /// just for debugging
 int32_t memsearch(uint8_p start, int32_t count, int32_t search) {

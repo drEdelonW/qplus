@@ -1,6 +1,7 @@
 #include "cl_net.h"
 #include "client.h"
-#include "common.h"
+// #include "common.h"
+#include "VA.h"
 #include "msg.h"
 #include "sound.h"
 #include "console.h"

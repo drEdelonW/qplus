@@ -23,7 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host_cmd.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
+// #include <stdarg.h>
+#include "VA.h"
 #include <stdlib.h>
 #include "GameRule.h"
 #include "server.h"
@@ -102,9 +103,8 @@ Host::EndGame
 ================
 */
 void Host::EndGame(cString message, ...) {
-    va_list  argptr;    va_start(argptr, message);
-    char string[1024]; vsnprintf(string, sizeof(string), message, argptr);
-    va_end(argptr);
+    char string[1024];
+    VA_EXPAND(string, message);
     Con_DPrintf("Host::EndGame: %s\n", string);
 
     if (SV_IsActive())          ShutdownServer(false);
@@ -125,16 +125,13 @@ This shuts down both the client and server
 */
 void Host::Error(cString error, ...) {
     static bool _inError = false;
-
     if (_inError)       Host_SysError("Host::Error: recursively entered");
-
     _inError = true;
 
     SCR_EndLoadingPlaque();  // reenable screen updates
 
-    va_list  argptr;    va_start(argptr, error);
-    char  string[1024]; vsnprintf(string, sizeof(string), error, argptr);
-    va_end(argptr);
+    char string[1024];
+    VA_EXPAND(string, error);
     Con_Printf("Host::Error: %s\n", string);
 
     if (SV_IsActive())          ShutdownServer(false);
@@ -251,9 +248,8 @@ FIXME: make this just a stuffed echo?
 */
 #if 0
 void SV_ClientPrintf(cString fmt, ...) {
-    va_list  argptr;    va_start(argptr, fmt);
-    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
-    va_end(argptr);
+    char string[1024];
+    VA_EXPAND(string, fmt);
 
     sizebuf_p pBuf = &remoteClient->message;
     MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
@@ -268,9 +264,8 @@ Sends text to all active clients
 */
 #if 0
 void SV_BroadcastPrintf(cString fmt, ...) {
-    va_list  argptr;    va_start(argptr, fmt);
-    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
-    va_end(argptr);
+    char string[1024];
+    VA_EXPAND(string, fmt);
 
     for (int i = 0; i < GetSvMaxClients(); i++)
         if ((svs.clients[i].active) &&
@@ -289,9 +284,8 @@ Send text over to the client to be executed
 =================
 */
 void Host::ClientCommands(cString fmt, ...) {
-    va_list  argptr;    va_start(argptr, fmt);
-    char  string[1024]; vsnprintf(string, sizeof(string), fmt, argptr);
-    va_end(argptr);
+    char string[1024];
+    VA_EXPAND(string, fmt);
 
     sizebuf_p pBuf = &remoteClient->message;
     MSG_WriteByte(pBuf, svc_stufftext); MSG_WriteString(pBuf, string);

@@ -34,7 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cvar_q1.h"
 #include "protocol.h"
 #include "msg.h"
-#include "common.h"
+// #include "common.h"
+#include "VA.h"
 #include "cbuf.h"
 #include <stdlib.h>
 #include "GlobVars.h"

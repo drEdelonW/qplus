@@ -368,7 +368,7 @@ void Host_Savegame_f() {
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
         fprintf(saveFile, "%f\n", svs.clients->spawn_parms[i]);
 
-    fprintf(saveFile, "%d\n", current_skill);
+    fprintf(saveFile, "%d\n", GM_GetSkill());
     fprintf(saveFile, "%s\n", SV_GetName());
     fprintf(saveFile, "%f\n", SV_GetTime());
 
@@ -432,8 +432,8 @@ void Host_Loadgame_f() {
 
     float tfloat;
     fscanf(loadFile, "%f\n", &tfloat);
-    current_skill = (int32_t)(tfloat + 0.1);
-    Cvar_SetValue("skill", (float)current_skill);
+    GM_SetSkill((Skill_t)(tfloat + 0.1f));
+    Cvar_SetValue("skill", (float)GM_GetSkill());
 
 #ifdef QUAKE2
     Cvar_SetValue("deathmatch", 0);

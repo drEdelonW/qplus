@@ -83,39 +83,36 @@ EVENT MESSAGES
     ================
 */
 void SV_ConnectClient(uint32_t clientnum) {
-    float spawn_parms[NUM_SPAWN_PARMS];
-
     RmtClient_p client = svs.clients + clientnum;
     Con_DPrintf("Client %s connected\n", client->netconnection->address);
 
     // set up the RmtClient_t
-    qsocket_p netconnection = client->netconnection;
-
+    float spawn_parms[NUM_SPAWN_PARMS];
     if (sv.loadgame)
         memcpy(spawn_parms, client->spawn_parms, sizeof(spawn_parms));
-    memset(client, 0, sizeof(*client));
-    client->netconnection = netconnection;
-
-    strcpy(client->name, "unconnected");
-    client->active = true;
-    client->spawned = false;
-    client->edict = ED_GetEDictByIdx(clientnum + 1);
-    client->message.data = client->msgbuf;
-    client->message.maxsize = sizeof(client->msgbuf);
-    client->message.allowoverflow = true;    // we can catch it
-
-    client->privileged =
-#ifdef IDGODS
-        IsID(&client->netconnection->addr);
-#else
-        false;
-#endif
-
+    {
+        *client = (RmtClient_t){
+            .netconnection = client->netconnection,
+            .name = "unconnected",
+            .active = true,
+            .spawned = false,
+            .edict = ED_GetEDictByIdx(clientnum + 1),
+            .message = {
+                .data = client->msgbuf,
+                .maxsize = sizeof(client->msgbuf),
+                .allowoverflow = true,    // we can catch it
+            },
+    #ifdef IDGODS
+            .privileged = IsID(&client->netconnection->addr),
+    #else
+            .privileged = false,
+    #endif
+        };
+    }
     if (sv.loadgame)
         memcpy(client->spawn_parms, spawn_parms, sizeof(spawn_parms));
     else {
-        // call the progs to get default spawn parms for the new client
-        PR_ExecuteProgram(pr_global_struct->SetNewParms);
+        PR_ExecuteProgram(pr_global_struct->SetNewParms);   // call the progs to get default spawn parms for the new client
         for (int i = 0; i < NUM_SPAWN_PARMS; i++)
             client->spawn_parms[i] = (&pr_global_struct->parm1)[i];
     }
@@ -333,10 +330,8 @@ void SV_SpawnServer(cString server
     // make cvars consistant
     //
     if (coop.value) Cvar_SetValue("deathmatch", 0.f);
-
-    current_skill = (int)(skill.value + 0.5f);
-    CLAMP(0, current_skill, 3);
-    Cvar_SetValue("skill", (float)current_skill);
+    GM_SetSkill((Skill_t)(skill.value + 0.5f));
+    Cvar_SetValue("skill", (float)GM_GetSkill());
 
     //
     // set up the new server

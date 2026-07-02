@@ -210,6 +210,7 @@ include features/fh_qRender$(QRND).mk
                         SRC_LIST += $(CUTILS_DIR)/endian_tools.c
                         SRC_LIST += $(CUTILS_DIR)/q_tools.c
                         SRC_LIST += $(CUTILS_DIR)/link.c
+                        SRC_LIST += $(CUTILS_DIR)/VA.c
 
                 $(eval ZONE_DIR = $(SHARED_DIR)/zone) $(eval INCLUDES += $(ZONE_DIR))
                         SRC_LIST += $(ZONE_DIR)/zone.c

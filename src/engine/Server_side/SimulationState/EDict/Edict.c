@@ -488,15 +488,20 @@ void ED_LoadFromFile(cString data) {
                 continue;
             }
         }
-        else
-            if (((current_skill == 0) && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_EASY)) ||
-                ((current_skill == 1) && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_MEDIUM)) ||
-                ((current_skill >= 2) && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_HARD))
-                ) {
+        else {
+            SpawnFlags_t inhibit_flag = (SpawnFlags_t)0;
+            switch (GM_GetSkill()) {
+            case SkEasy:      inhibit_flag = SPAWNFLAG_NOT_EASY;   break;
+            case SkMedium:    inhibit_flag = SPAWNFLAG_NOT_MEDIUM; break;
+            case SkHard:
+            case SkNightmare: inhibit_flag = SPAWNFLAG_NOT_HARD;   break;
+            }
+            if ((SpawnFlags_t)ent->v.spawnflags & inhibit_flag) {
                 ED_Free(ent);
                 inhibit++;
                 continue;
             }
+        }
 
         //
         // immediately call spawn function
