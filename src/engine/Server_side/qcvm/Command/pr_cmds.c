@@ -254,7 +254,7 @@ void PF_setmodel() {
     Model_p mod = sv.models[(int)edict->v.modelindex]; // Mod_ForName (m, true);
 
     if (mod)    SetMinMaxSize(edict, mod->BB, true);
-    else        SetMinMaxSize(edict, (BBox_t){ .mins =  vec3_origin, .maxs = vec3_origin }, true);
+    else        SetMinMaxSize(edict, BBoxOrig(), true);
 }
 
 /*
@@ -549,7 +549,7 @@ void PF_traceline() {
     phymovetype_t moveType = (int)G_FLOAT(OFS_PARM2);
     edict_p ent = G_EDICT(OFS_PARM3);
 
-    trace_t trace = SV_Move(v1, vec3_origin, vec3_origin, v2, moveType, ent);
+    trace_t trace = SV_Move(v1, BBoxOrig(), v2, moveType, ent);
 
     pr_global_struct->trace_allsolid = trace.allsolid;
     pr_global_struct->trace_startsolid = trace.startsolid;
@@ -999,7 +999,7 @@ void PF_droptofloor() {
     vec3_t end = ent->v.origin;
     end.z -= 256.0f;
 
-    trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
+    trace_t trace = SV_Move(ent->v.origin, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent);
 
     if ((trace.fraction == 1) || trace.allsolid)    G_FLOAT(OFS_RETURN) = 0;
     else {
@@ -1100,7 +1100,7 @@ void PF_aim() {
     // try sending a trace straight
     vec3_t dir = pr_global_struct->v_forward;
     vec3_t end = VectorMA(start, 2048, dir);
-    trace_t tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent);
+    trace_t tr = SV_Move(start, BBoxOrig(), end, MOVE_NORMAL, ent);
     if (
         tr.ent &&
         (tr.ent->v.takedamage == DAMAGE_AIM) &&
@@ -1137,7 +1137,7 @@ void PF_aim() {
         float dist = DotProduct(dir, pr_global_struct->v_forward);
         if (dist < bestdist)    continue; // to far to turn
 
-        tr = SV_Move(start, vec3_origin, vec3_origin, end, MOVE_NORMAL, ent);
+        tr = SV_Move(start, BBoxOrig(), end, MOVE_NORMAL, ent);
         if (tr.ent == check) { // can shoot at this one
             bestdist = dist;
             bestent = check;

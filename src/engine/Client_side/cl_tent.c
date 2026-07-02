@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "mathlib.h"
 #include "render.h"
 #include "Light.h"
+#include "vector_tools.h"
 
 //
 // temp entity events
@@ -107,16 +108,8 @@ CL_ParseBeam
 void CL_ParseBeam(Model_p m) {
     int16_t ent = MSG_ReadShort();
 
-    vec3_t  start = {
-        .x = MSG_ReadCoord(),
-        .y = MSG_ReadCoord(),
-        .z = MSG_ReadCoord()
-    };
-    vec3_t  end = {
-        .x = MSG_ReadCoord(),
-        .y = MSG_ReadCoord(),
-        .z = MSG_ReadCoord()
-    };
+    vec3_t  start = MSG_ReadVector();
+    vec3_t  end = MSG_ReadVector();
 
     // override any beam with the same entity
     for (int i = 0; i < MAX_BEAMS; i++)
@@ -158,31 +151,19 @@ void CL_ParseTEnt() {
     TempEntEvent_t type = MSG_ReadByte();
     switch (type) {
     case TE_WIZSPIKE: {      // spike hitting wall
-        vec3_t  pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t  pos = MSG_ReadVector();
         R_RunParticleEffect(pos, vec3_origin, 20, 30);
         S_StartSound(-1, 0, cl_sfx.wizhit, pos, 1, 1);
     } break;
 
     case TE_KNIGHTSPIKE: {      // spike hitting wall
-        vec3_t  pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t  pos = MSG_ReadVector();
         R_RunParticleEffect(pos, vec3_origin, 226, 20);
         S_StartSound(-1, 0, cl_sfx.knighthit, pos, 1, 1);
     } break;
 
     case TE_SPIKE: {    // spike hitting wall
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
 #ifdef GLTEST
         Test_Spawn(pos);
 #else
@@ -197,11 +178,7 @@ void CL_ParseTEnt() {
         }
     } break;
     case TE_SUPERSPIKE: {    // super spike hitting wall
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
         R_RunParticleEffect(pos, vec3_origin, 0, 20);
 
         if (rand() % 5)     S_StartSound(-1, 0, cl_sfx.tink1, pos, 1, 1);
@@ -214,20 +191,12 @@ void CL_ParseTEnt() {
     } break;
 
     case TE_GUNSHOT: {      // bullet hitting wall
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
         R_RunParticleEffect(pos, vec3_origin, 0, 20);
     } break;
 
     case TE_EXPLOSION: {      // rocket explosion
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
         R_ParticleExplosion(pos);
         dLight_p dl;
         *(dl = CL_AllocDlight(0)) = (dLight_t){
@@ -241,11 +210,7 @@ void CL_ParseTEnt() {
     } break;
 
     case TE_TAREXPLOSION: {      // tarbaby explosion
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
         R_BlobExplosion(pos);
 
         S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1, 1);
@@ -259,29 +224,17 @@ void CL_ParseTEnt() {
         // PGM 01/21/97
 
     case TE_LAVASPLASH: {
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
         R_LavaSplash(pos);
     } break;
 
     case TE_TELEPORT: {
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
         R_TeleportSplash(pos);
     } break;
 
     case TE_EXPLOSION2: {        // color mapped explosion
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
         int colorStart = MSG_ReadByte();
         int colorLength = MSG_ReadByte();
         R_ParticleExplosion2(pos, colorStart, colorLength);
@@ -298,25 +251,13 @@ void CL_ParseTEnt() {
 
 #ifdef QUAKE2
     case TE_IMPLOSION: {
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
         S_StartSound(-1, 0, cl_sfx.imp, pos, 1, 1);
     } break;
 
     case TE_RAILTRAIL: {
-        vec3_t pos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
-        vec3_t endpos = {
-            .x = MSG_ReadCoord(),
-            .y = MSG_ReadCoord(),
-            .z = MSG_ReadCoord()
-        };
+        vec3_t pos = MSG_ReadVector();
+        vec3_t endpos = MSG_ReadVector();
         S_StartSound(-1, 0, cl_sfx.rail, pos, 1, 1);
         S_StartSound(-1, 1, cl_sfx.r_exp3, endpos, 1, 1);
         R_RocketTrail(pos, endpos, 0 + 128);

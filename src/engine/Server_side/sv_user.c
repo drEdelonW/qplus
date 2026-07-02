@@ -37,6 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "progs.h"
 #include "GlobVars.h"
 #include "GameRule.h"
+#include "vector_tools.h"
 
 
 edict_p sv_player;
@@ -83,7 +84,7 @@ void SV_SetIdealPitch() {
             .z = top.z - 160.0f
         };
 
-        trace_t tr = SV_Move(top, vec3_origin, vec3_origin, bottom, MOVE_NOMONSTERS, sv_player);
+        trace_t tr = SV_Move(top, BBoxOrig(), bottom, MOVE_NOMONSTERS, sv_player);
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
         if (tr.fraction == 1)   return; // near a dropoff
 
@@ -136,7 +137,7 @@ void SV_UserFriction() {
         .z = start.z - 34.0f
     };
 
-    trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, sv_player);
+    trace_t trace = SV_Move(start, BBoxOrig(), stop, MOVE_NOMONSTERS, sv_player);
 
     float friction;
     if (trace.fraction == 1.0f)     friction = sv_friction.value * sv_edgefriction.value;
@@ -393,11 +394,7 @@ void SV_ReadClientMove(UserCmd_p move) {
     remoteClient->num_pings++;
 
     // read current angles
-    ang3_t angle = {
-        .pitch = MSG_ReadAngle(),
-        .yaw = MSG_ReadAngle(),
-        .roll = MSG_ReadAngle()
-    };
+    ang3_t angle = MSG_ReadAngles();
 
     remoteClient->edict->v.v_angle = angle;
 

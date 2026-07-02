@@ -35,6 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "msg.h"
 #include <stdlib.h>
 #include "z_hunk.h"
+#include "vector_tools.h"
 
 int  ramp1[8] = { 0x6F, 0x6D, 0x6B, 0x69, 0x67, 0x65, 0x63, 0x61 }; // pt_explode
 int  ramp2[8] = { 0x6F, 0x6E, 0x6D, 0x6C, 0x6B, 0x6A, 0x68, 0x66 }; // pt_explode2
@@ -213,11 +214,7 @@ Parse an effect out of the server message
 ===============
 */
 void R_ParseParticleEffect() {
-    vec3_t org = {
-        .x = MSG_ReadCoord(),
-        .y = MSG_ReadCoord(),
-        .z = MSG_ReadCoord()
-    };
+    vec3_t org = MSG_ReadVector();
 
     vec3_t dir = {
         .x = MSG_ReadChar(),

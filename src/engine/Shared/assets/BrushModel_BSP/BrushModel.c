@@ -463,41 +463,26 @@ void Mod_LoadClipnodes(Lump_p Lump_in) {
     _loadModel->clipnodes = out;
     _loadModel->numclipnodes = count;
 
-    {
-        Hull_p hull = &_loadModel->hulls[1];
-        hull->clipnodes = out;
-        hull->firstclipnode = 0;
-        hull->lastclipnode = count - 1;
-        hull->planes = _loadModel->planes;
-        hull->clip_mins = (vec3_t){
-            .x = -16.0f,
-            .y = -16.0f,
-            .z = -24.0f
-        };
-        hull->clip_maxs = (vec3_t){
-            .x = 16.0f,
-            .y = 16.0f,
-            .z = 32.0f
-        };
-    }
-    {
-        Hull_p hull = &_loadModel->hulls[2];
-        hull->clipnodes = out;
-        hull->firstclipnode = 0;
-        hull->lastclipnode = count - 1;
-        hull->planes = _loadModel->planes;
-        hull->clip_mins = (vec3_t){
-            .x = -32.0f,
-            .y = -32.0f,
-            .z = -24.0f
-        };
-        hull->clip_maxs = (vec3_t){
-            .x = 32.0f,
-            .y = 32.0f,
-            .z = 64.0f
-        };
-    }
-
+    _loadModel->hulls[1] = (Hull_t) {
+        .clipnodes = out,
+        .firstclipnode = 0,
+        .lastclipnode = count - 1,
+        .planes = _loadModel->planes,
+        .clip = {
+            .mins = { .x = -16.0f, .y = -16.0f, .z = -24.0f },
+            .maxs = { .x = 16.0f, .y = 16.0f, .z = 32.0f }
+        }
+    };
+    _loadModel->hulls[2] = (Hull_t) {
+        .clipnodes = out,
+        .firstclipnode = 0,
+        .lastclipnode = count - 1,
+        .planes = _loadModel->planes,
+        .clip = (BBox_t){
+            .mins = { .x = -32.0f, .y = -32.0f, .z = -24.0f },
+            .maxs = { .x = 32.0f, .y = 32.0f, .z = 64.0f },
+        }
+    };
     for (int i = 0; i < count; i++, out++, in++) {
         out->planenum = LittleLong(in->planenum);
         out->children[0] = LittleShort(in->children[0]);

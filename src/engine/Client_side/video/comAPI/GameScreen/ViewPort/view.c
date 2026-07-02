@@ -38,6 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "transform.h"
 #include "render.h"
 #include "GameRule.h"
+#include "vector_tools.h"
 
 /*
 
@@ -250,11 +251,7 @@ V_ParseDamage
 void V_ParseDamage() {
     int armor = MSG_ReadByte();
     int blood = MSG_ReadByte();
-    vec3_t from = {
-        .x = MSG_ReadCoord(),
-        .y = MSG_ReadCoord(),
-        .z = MSG_ReadCoord()
-    };
+    vec3_t from = MSG_ReadVector();
 
     float count = blood * 0.5f + armor * 0.5f;
     if (count < 10.f)

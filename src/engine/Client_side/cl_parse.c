@@ -41,6 +41,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // #else
 #endif
 #   include "render.h"
+#   include "vector_tools.h"
 
 
 
@@ -134,11 +135,7 @@ void CL_ParseStartSoundPacket() {
     if (ent > MAX_EDICTS)
         Host_Error("CL_ParseStartSoundPacket: ent = %i", ent);
 
-    vec3_t pos = {
-        .x = MSG_ReadCoord(),
-        .y = MSG_ReadCoord(),
-        .z = MSG_ReadCoord()
-    };
+    vec3_t pos = MSG_ReadVector();
 
     S_StartSound(
         ent, channel,
@@ -544,11 +541,7 @@ void CL_ParseStatic() {
     ===================
 */
 void CL_ParseStaticSound() {
-    vec3_t org = {
-        .x = MSG_ReadCoord(),
-        .y = MSG_ReadCoord(),
-        .z = MSG_ReadCoord()
-    };
+    vec3_t org = MSG_ReadVector();
     uint8_t sound_num = MSG_ReadByte();
     uint8_t vol = MSG_ReadByte();
     uint8_t atten = MSG_ReadByte();
@@ -625,19 +618,7 @@ void CL_ParseServerMessage() {
             SCR_RequestCalcRefdef(); // leave intermission full screen
         } break;
 
-        case svc_setangle: {
-#if 0
-            for (int i = 0; i < VECT_DIM; i++)
-                cl.viewangles.v[i] = MSG_ReadAngle();
-#else
-            cl.viewangles = (ang3_t){
-                .pitch = MSG_ReadAngle(),
-                .yaw = MSG_ReadAngle(),
-                .roll = MSG_ReadAngle()
-            };
-#endif
-        } break;
-
+        case svc_setangle:      cl.viewangles = MSG_ReadAngles();       break;
         case svc_setview:       cl.viewentity = MSG_ReadShort();        break;
 
         case svc_lightstyle: {

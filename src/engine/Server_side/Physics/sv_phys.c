@@ -229,7 +229,8 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
 
         vec3_t end = VectorMA(ent->v.origin, time_left, ent->v.velocity);
 
-        trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
+        trace_t trace = SV_Move(ent->v.origin, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent
+        );
 
         if (trace.allsolid) { // entity is trapped in another solid
             ent->v.velocity = vec3_origin;
@@ -358,12 +359,16 @@ trace_t SV_PushEntity(edict_p ent, vec3_t push) {
     vec3_t end = VectorAdd(ent->v.origin, push);
 
     trace_t trace;
-    if (ent->v.movetype == MOVETYPE_FLYMISSILE)     trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_MISSILE, ent);
+    BBox_t entBB = {
+        .mins = ent->v.mins,
+        .maxs = ent->v.maxs
+    };
+    if (ent->v.movetype == MOVETYPE_FLYMISSILE)     trace = SV_Move(ent->v.origin, entBB, end, MOVE_MISSILE, ent);
     else
         switch ((solid_t)ent->v.solid) {
         case SOLID_TRIGGER:  // only clip against bmodels
-        case SOLID_NOT:                             trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NOMONSTERS, ent);    break;
-        default:                                    trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);        break;
+        case SOLID_NOT:                             trace = SV_Move(ent->v.origin, entBB, end, MOVE_NOMONSTERS, ent);    break;
+        default:                                    trace = SV_Move(ent->v.origin, entBB, end, MOVE_NORMAL, ent);        break;
         }
     ent->v.origin = trace.endpos;
     SV_LinkEdict(ent, true);
@@ -723,10 +728,8 @@ SV_CheckWater
 =============
 */
 bool SV_CheckWater(edict_p ent) {
-    vec3_t point = {
-        .x = ent->v.origin.x,
-        .y = ent->v.origin.y,
-        .z = ent->v.origin.z + ent->v.mins.z + 1
+    vec3_t point = ent->v.origin;{
+        point.z += ent->v.mins.z + 1.f;
     };
 
     ent->v.waterlevel = 0;
@@ -1393,7 +1396,8 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
         tent->v.angles = AngleMA(tent->v.angles, (float)host_frametime, tent->v.avelocity);
         vec3_t move = VectorScale(tent->v.velocity, (float)host_frametime);
         vec3_t end = VectorAdd(tent->v.origin, move);
-        trace_t trace = SV_Move(tent->v.origin, tent->v.mins, tent->v.maxs, end, MOVE_NORMAL, tent);
+        trace_t trace = SV_Move(tent->v.origin, *(BBox_p)&tent->v.mins, end, MOVE_NORMAL, tent
+        );
         tent->v.origin = trace.endpos;
 
 # if 0

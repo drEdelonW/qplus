@@ -89,7 +89,8 @@ realcheck:
         .z = start.z - 2 * STEPSIZE
     };
 #endif
-    trace_t trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, ent);
+    trace_t trace = SV_Move(start, BBoxOrig(), stop, MOVE_NOMONSTERS, ent
+    );
 
     if (trace.fraction == 1.0)
         return false;
@@ -103,7 +104,9 @@ realcheck:
             start.x = stop.x = (x) ? maxs.x : mins.x;
             start.y = stop.y = (y) ? maxs.y : mins.y;
 
-            trace = SV_Move(start, vec3_origin, vec3_origin, stop, MOVE_NOMONSTERS, ent);
+
+            trace = SV_Move(start, BBoxOrig(), stop, MOVE_NOMONSTERS, ent
+            );
 
             if ((trace.fraction != 1.0) &&
                 (trace.endpos.z > bottom)
@@ -147,7 +150,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
                 if (dz > 40)    neworg.z -= 8;
                 if (dz < 30)    neworg.z += 8;
             }
-            trace_t trace = SV_Move(ent->v.origin, ent->v.mins, ent->v.maxs, neworg, MOVE_NORMAL, ent);
+            trace_t trace = SV_Move(ent->v.origin, *(BBox_p)&ent->v.mins, neworg, MOVE_NORMAL, ent);
 
             if (trace.fraction == 1) {
                 if (((int)ent->v.flags & FL_SWIM) &&
@@ -172,14 +175,14 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
     vec3_t end = neworg;
     end.z -= STEPSIZE * 2.0f;
 
-    trace_t trace = SV_Move(neworg, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
+    trace_t trace = SV_Move(neworg, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent);
 
     if (trace.allsolid)
         return false;
 
     if (trace.startsolid) {
         neworg.z -= STEPSIZE;
-        trace = SV_Move(neworg, ent->v.mins, ent->v.maxs, end, MOVE_NORMAL, ent);
+        trace = SV_Move(neworg, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent);
         if (trace.allsolid || trace.startsolid)
             return false;
     }

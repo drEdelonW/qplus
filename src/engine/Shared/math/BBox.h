@@ -19,6 +19,9 @@ extern "C" {
 }
 #endif
 
+#include "mathlib.h"
+
+static inline BBox_t BBoxOrig() { return (BBox_t){ .mins = vec3_origin, .maxs = vec3_origin }; }
 static inline BBox_t BBoxTranslate(BBox_t bb, vec3_t offset) {
     return (BBox_t) {
         .mins = VectorAdd(bb.mins, offset),

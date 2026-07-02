@@ -11,7 +11,6 @@ typedef struct {
     mPlane_p    planes;
     int32_t     firstclipnode;
     int32_t     lastclipnode;
-    vec3_t      clip_mins;
-    vec3_t      clip_maxs;
+    BBox_t      clip;
 } Hull_t;
 typedef Hull_t* Hull_p;
