@@ -262,8 +262,8 @@ void PF_changepitch() {
     float move = angledelta(ent->v.idealpitch - current);
     if (move == 0.f)    return;
 
-    if (move > 0.f) CLAMP_MORE(move, speed);
-    else            CLAMP_LESS(move, -speed);
+    if (move > 0.f) CLAMP_MORE(&move, speed);
+    else            CLAMP_LESS(&move, -speed);
 
     ent->v.angles.pitch = anglemod(current + move);
 }
@@ -272,17 +272,13 @@ void PF_changepitch() {
 
 #ifdef QUAKE2
 
-#define CHAN_VOICE 2
-#define CHAN_BODY 4
-
-#define ATTN_NORM 1
 
 void PF_WaterMove() {
-    float damage = 0.0;
+    float damage = 0.f;
     edict_p self = ED_GetEDictByOffs(pr_global_struct->self);
 
     if (self->v.movetype == MOVETYPE_NOCLIP) {
-        self->v.air_finished = SV_GetTime() + 12;
+        self->v.air_finished = SV_GetTime() + 12.f;
         G_FLOAT(OFS_RETURN) = damage;
         return;
     }
@@ -292,7 +288,7 @@ void PF_WaterMove() {
         return;
     }
 
-    float drownlevel = (self->v.deadflag == DEAD_NO) ? 3 : 1;
+    float drownlevel = (self->v.deadflag == DEAD_NO) ? 3.f : 1.f;
 
     int flags = (int)self->v.flags;
     WaterLevel_t waterlevel = (int)self->v.waterlevel;
@@ -300,30 +296,30 @@ void PF_WaterMove() {
 
     if (!(flags & (FL_IMMUNE_WATER + FL_GODMODE)))
         if (
-            ((flags & FL_SWIM) &&
+            (
+                (flags & FL_SWIM) &&
                 (waterlevel < drownlevel)) ||
             (waterlevel >= drownlevel)
             ) {
             if (self->v.air_finished < SV_GetTime())
                 if (self->v.pain_finished < SV_GetTime()) {
                     self->v.dmg = self->v.dmg + 2;
-                    if (self->v.dmg > 15)
-                        self->v.dmg = 10;
+                    if (self->v.dmg > 15.f)   self->v.dmg = 10.f;
                     //     T_Damage (self, world, world, self.dmg, 0, FALSE);
                     damage = self->v.dmg;
                     self->v.pain_finished = SV_GetTime() + 1.0;
                 }
         }
         else {
-            if (self->v.air_finished < SV_GetTime())             SV_StartSound(self, CHAN_VOICE, "player/gasp2.wav", 255, ATTN_NORM);
-            else if (self->v.air_finished < SV_GetTime() + 9)    SV_StartSound(self, CHAN_VOICE, "player/gasp1.wav", 255, ATTN_NORM);
+            /* */if (self->v.air_finished < SV_GetTime())       SV_StartSound(self, SndChVoice, "player/gasp2.wav", VolFull, AtnNorm);
+            else if (self->v.air_finished < SV_GetTime() + 9)   SV_StartSound(self, SndChVoice, "player/gasp1.wav", VolFull, AtnNorm);
             self->v.air_finished = SV_GetTime() + 12.0;
             self->v.dmg = 2;
         }
 
     if (!waterlevel) {
         if (flags & FL_INWATER) {
-            SV_StartSound(self, CHAN_BODY, "misc/outwater.wav", 255, ATTN_NORM);    // play leave water sound
+            SV_StartSound(self, SndChBody, "misc/outwater.wav", VolFull, AtnNorm);    // play leave water sound
             self->v.flags = (float)(flags & ~FL_INWATER);
         }
         self->v.air_finished = SV_GetTime() + 12.0;
@@ -351,9 +347,9 @@ void PF_WaterMove() {
 
     if (!(flags & FL_INWATER)) {
         // player enter water sound
-        if (watertype == CONTENTS_LAVA)  SV_StartSound(self, CHAN_BODY, "player/inlava.wav", 255, ATTN_NORM);
-        if (watertype == CONTENTS_WATER) SV_StartSound(self, CHAN_BODY, "player/inh2o.wav", 255, ATTN_NORM);
-        if (watertype == CONTENTS_SLIME) SV_StartSound(self, CHAN_BODY, "player/slimbrn2.wav", 255, ATTN_NORM);
+        if (watertype == CONTENTS_LAVA)  SV_StartSound(self, SndChBody, "player/inlava.wav", VolFull, AtnNorm);
+        if (watertype == CONTENTS_WATER) SV_StartSound(self, SndChBody, "player/inh2o.wav", VolFull, AtnNorm);
+        if (watertype == CONTENTS_SLIME) SV_StartSound(self, SndChBody, "player/slimbrn2.wav", VolFull, AtnNorm);
 
         self->v.flags = (float)(flags | FL_INWATER);
         self->v.dmgtime = 0;

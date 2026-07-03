@@ -8,7 +8,7 @@
 
 #define MAX_LIGHTSTYLES     64
 #define MAX_MODELS          256   /* these are sent over the net as bytes */
-#define MAX_SOUNDS          256   /* so they cannot be blindly increased */
+
 #define MAXGAMEDIRLEN       1000
 
 #define MAX_SCOREBOARD      16
@@ -37,9 +37,6 @@
 #define MAX_STATIC_ENTITIES     128   /* torches, etc */
 
 #define MAX_VISEDICTS           256
-
-#define MAX_CLIENT_LIMIT        4
-
 
 #if 0   // NOT USED?
 //=============================================================================

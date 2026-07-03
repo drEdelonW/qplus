@@ -34,12 +34,7 @@ is not a staircase.
 #define STEPSIZE (18)
 
 bool SV_CheckBottom(edict_p ent) {
-#if 0
-    vec3_t mins = VectorAdd(ent->v.origin, ent->v.mins);
-    vec3_t maxs = VectorAdd(ent->v.origin, ent->v.maxs);
-#else
     BBox_t bb = *(BBox_p)&ent->v.mins;
-#endif
 
     // if all of the points under the corners are solid world, don't bother with the tougher checks
     // the corners must be within 16 of the midpoint

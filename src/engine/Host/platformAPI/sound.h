@@ -23,8 +23,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sound/sound_struct.h"
 #include "vector.h"
 
-#define DEFAULT_SOUND_PACKET_VOLUME         (255)
-#define DEFAULT_SOUND_PACKET_ATTENUATION    (1.0f)
+#define MAX_SOUNDS              (256)   /* uint8_max so they cannot be blindly increased */
+
+static const uint8_t VolFull   = 255; /* full volume */
+static const uint8_t VolSilent =   0; /* silent */
+
+static const float AtnNone = 0.f;  /* no attenuation - full volume everywhere */
+static const float AtnNorm = 1.f;  /* default attenuation - normal */
+static const float AtnMax  = 4.f;  /* Maximum attenuation */
 
     // ====================================================================
     // User-setable variables
@@ -32,6 +38,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MAX_CHANNELS            (128)
 #define MAX_DYNAMIC_CHANNELS    (8)
+
+typedef enum {
+    SndChAuto   = 0,  // auto-allocate
+#ifdef QUAKE2
+    SndChVoice  = 2
+    SndChBody   = 4
+#endif
+    SndChMax    = 7,  // 8 sources per entity
+} SndCh_t;
+
+
 
 extern  channel_t channels[MAX_CHANNELS];
 // 0 to MAX_DYNAMIC_CHANNELS-1 = normal entity sounds
@@ -67,9 +84,9 @@ extern "C" {
     void S_Init();
     void S_Startup();
     void S_Shutdown();
-    void S_StartSound(int entnum, int entchannel, sfx_p sfx, vec3_t origin, float fvol, float attenuation);
+    void S_StartSound(EdIdx entnum, int entchannel, sfx_p sfx, vec3_t origin, float fvol, float attenuation);
     void S_StaticSound(sfx_p sfx, vec3_t origin, float vol, float attenuation);
-    void S_StopSound(int entnum, int entchannel);
+    void S_StopSound(EdIdx entnum, int entchannel);
     void S_StopAllSounds(bool clear);
     void S_ClearBuffer();
     void S_Update(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up);

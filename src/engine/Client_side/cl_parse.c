@@ -99,9 +99,9 @@ cString svc_strings[] = {
     This error checks and tracks the total number of entities
     ===============
 */
-r_Entity_p CL_EntityNum(int num) {
+r_Entity_p CL_EntityNum(EdIdx num) {
     if (num >= cl.num_entities) {
-        if (num >= MAX_EDICTS)      Host_Error("CL_EntityNum: %i is an invalid number", num);
+        if (num >= EdictMax)      Host_Error("CL_EntityNum: %i is an invalid number", num);
 
         while (cl.num_entities <= num) {
             cl_entities[cl.num_entities].colormap = vid.colormap;
@@ -119,28 +119,21 @@ r_Entity_p CL_EntityNum(int num) {
     ==================
 */
 void CL_ParseStartSoundPacket() {
+    // {
     uint8_t field_mask = MSG_ReadByte();
-
-    uint8_t volume = (field_mask & SND_VOLUME) ?
-        MSG_ReadByte() : DEFAULT_SOUND_PACKET_VOLUME;
-
-    float attenuation = (field_mask & SND_ATTENUATION) ?
-        ((float)MSG_ReadByte() / 64.0f) : DEFAULT_SOUND_PACKET_ATTENUATION;
-
+    float volume = ((field_mask & SND_VOLUME) ? MSG_ReadByte() : VolFull) / (1.f * 255);
+    float attenuation = (field_mask & SND_ATTENUATION) ? (MSG_ReadByte() / (1.f * 64)) : AtnNorm;
     int16_t channel = MSG_ReadShort();
     uint8_t sound_num = MSG_ReadByte();
-
-    int16_t ent = EIGHTH(channel) & 0x07; // b0111
-
-    if (ent > MAX_EDICTS)
-        Host_Error("CL_ParseStartSoundPacket: ent = %i", ent);
-
     vec3_t pos = MSG_ReadVector();
+    // }
+    EdIdx ent = (channel >> 3);     channel &= 7; // b0111
+    if (ent > EdictMax)     Host_Error("CL_ParseStartSoundPacket: ent = %i", ent);
 
     S_StartSound(
         ent, channel,
         cl.sound_precache[sound_num], pos,
-        (volume / 255.0f), attenuation
+        volume, attenuation
     );
 }
 
@@ -434,8 +427,8 @@ void CL_ParseClientdata(server_update_bits_t bits) {
 
     cl.mvelocity[1] = cl.mvelocity[0];
     for (int i = 0; i < VECT_DIM; i++) {    // TODO: wrap MSG_ReadChar to MSG_vector_tools
-        cl.punchangle.v[i] = (bits & (SU_PUNCH1 << i)) ? (MSG_ReadChar() * 1.0f) : 0.0f;
-        cl.mvelocity[0].v[i] = (bits & (SU_VELOCITY1 << i)) ? (MSG_ReadChar() * 16.0f) : 0.0f;
+        cl.punchangle.v[i]   = (bits & (SU_PUNCH1 << i)) ?    (MSG_ReadChar() * 1.f) : 0.f;
+        cl.mvelocity[0].v[i] = (bits & (SU_VELOCITY1 << i)) ? fixed4_tof(MSG_ReadChar()) : 0.f;
     }
     uint32_t msg;
     // [always sent]    SU_ITEMS

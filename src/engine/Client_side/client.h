@@ -34,6 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "input.h"
 #include "protocol.h"   // MAX_CL_STATS etc.
 #include "angle.h"
+#include "sound.h"
 
 
 typedef struct {
@@ -186,7 +187,7 @@ typedef struct {
     // refresh related state
     Model_p     worldmodel; // cl_entitites[0].model
     efrag_p     free_efrags;
-    int32_t     num_entities; // held in cl_entities array
+    EdIdx       num_entities; // held in cl_entities array
     int32_t     num_statics; // held in cl_staticentities array
     r_Entity_t  viewent;   // the gun model
     uint8_t     cdtrack;
@@ -208,7 +209,7 @@ static inline void AddClSimTime(SimDt_t simDelta) { cl.simTime += simDelta; }
 static inline void SetClSimTime(SimTime_t simTime) { cl.simTime = simTime; }
 
 // FIXME, allocate dynamically
-extern r_Entity_t   cl_entities[MAX_EDICTS];
+extern r_Entity_t   cl_entities[EdictMax];
 extern r_Entity_t   cl_static_entities[MAX_STATIC_ENTITIES];
 extern LightStyle_t cl_lightstyle[MAX_LIGHTSTYLES];
 extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];

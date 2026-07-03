@@ -39,7 +39,7 @@ void SV_CheckWaterTransition(edict_p ent) {
     vec3_t point = {
         ent->v.origin[X_AX],
         ent->v.origin[Y_AX],
-        ent->v.velocity[Z_AX] + ent->v.mins[Z_AX] + 1
+        ent->v.origin[Z_AX] + ent->v.mins[Z_AX] + 1
     };
     int cont = SV_PointContents(point);
 #else
@@ -52,7 +52,7 @@ void SV_CheckWaterTransition(edict_p ent) {
     }
 
     if ((contents_t)ent->v.watertype == CONTENTS_EMPTY) // just crossed into water
-        SV_StartSound(ent, 0, "misc/h2ohit1.wav", 255, 1);
+        SV_StartSound(ent, SndChAuto, "misc/h2ohit1.wav", VolFull, AtnNorm);
 
     if (cont <= CONTENTS_WATER) {
         ent->v.watertype = (float)cont;
@@ -71,18 +71,12 @@ SV_Physics_Toss
 Toss, bounce, and fly movement.  When onground, do nothing.
 =============
 */
-#ifdef QUAKE2
-static vec3_t _vecOrigin = {
-    .x = 0.0f,
-    .y = 0.0f,
-    .z = 0.0f
-};
-#endif
+
 void SV_Physics_Toss(edict_p ent) {
 #ifdef QUAKE2
     edict_p groundentity = ED_GetEDictByOffs(ent->v.groundentity);
     if ((EntityFlags_t)groundentity->v.flags & FL_CONVEYOR) ent->v.basevelocity = VectorScale(groundentity->v.movedir, groundentity->v.speed);
-    else                                                    ent->v.basevelocity = _vecOrigin;
+    else                                                    ent->v.basevelocity = v3Zero;
     SV_CheckWater(ent);
 #endif
     // regular thinking
@@ -93,7 +87,7 @@ void SV_Physics_Toss(edict_p ent) {
         ent->v.flags = (EntityFlags_t)ent->v.flags & ~FL_ONGROUND;
 
     if ((((EntityFlags_t)ent->v.flags & FL_ONGROUND)) &&
-        (VectorCompare(ent->v.basevelocity, _vecOrigin)))
+        (VectorCompare(ent->v.basevelocity, v3Zero)))
         return;
 
     SV_CheckVelocity(ent);
@@ -239,7 +233,7 @@ void SV_Physics_Step(edict_p ent) {
 
     edict_p groundentity = ED_GetEDictByOffs(ent->v.groundentity);
     if ((EntityFlags_t)groundentity->v.flags & FL_CONVEYOR)     ent->v.basevelocity = VectorScale(groundentity->v.movedir, groundentity->v.speed);
-    else                                                        ent->v.basevelocity = _vecOrigin;
+    else                                                        ent->v.basevelocity = v3Zero;
     //@@
     pr_global_struct->time = SV_GetTime();
     pr_global_struct->self = ED_GetEDictOffs(ent);
@@ -264,8 +258,8 @@ void SV_Physics_Step(edict_p ent) {
         if (!inwater)   SV_AddGravity(ent);
     }
 
-    if (!VectorCompare(ent->v.velocity, _vecOrigin) ||
-        !VectorCompare(ent->v.basevelocity, _vecOrigin)) {
+    if (!VectorCompare(ent->v.velocity, v3Zero) ||
+        !VectorCompare(ent->v.basevelocity, v3Zero)) {
         ent->v.flags = (EntityFlags_t)ent->v.flags & ~FL_ONGROUND;
         // apply friction
         // let dead monsters who aren't completely onground slide
@@ -280,8 +274,7 @@ void SV_Physics_Step(edict_p ent) {
                     float control = speed < sv_stopspeed.value ? sv_stopspeed.value : speed;
                     float newspeed = speed - host_frametime * control * friction;
 
-                    if (newspeed < 0)
-                        newspeed = 0;
+                    if (newspeed < 0.f)   newspeed = 0.f;
                     newspeed /= speed;
 
                     vel->x = vel->x * newspeed;
@@ -295,29 +288,26 @@ void SV_Physics_Step(edict_p ent) {
 
         // determine if it's on solid ground at all
         {
-            vec3_t mins = VectorAdd(ent->v.origin, ent->v.mins);
-            vec3_t maxs = VectorAdd(ent->v.origin, ent->v.maxs);
+            BBox_t bb = BBoxTranslate(EvBBox(&ent->v), ent->v.origin);
 
-            vec3_t point;
-            point[Z_AX] = mins[Z_AX] - 1;
+            vec3_t point = { .z = bb.mins.z - 1.f };
             for (int x = 0; x <= 1; x++)
                 for (int y = 0; y <= 1; y++) {
-                    point[X_AX] = x ? maxs[X_AX] : mins[X_AX];
-                    point[Y_AX] = y ? maxs[Y_AX] : mins[Y_AX];
+                    point.x = (x) ? bb.maxs.x : bb.mins.x;
+                    point.y = (y) ? bb.maxs.y : bb.mins.y;
                     if (SV_PointContents(point) == CONTENTS_SOLID) {
                         ent->v.flags = (EntityFlags_t)ent->v.flags | FL_ONGROUND;
                         break;
                     }
                 }
-
         }
 
         SV_LinkEdict(ent, true);
 
         if (((EntityFlags_t)ent->v.flags & FL_ONGROUND) &&
             (!wasonground) &&
-            (hitsound))
-            SV_StartSound(ent, 0, "demon/dland2.wav", 255, 1);
+            (hitsound)
+            )   SV_StartSound(ent, SndChAuto, "demon/dland2.wav", VolFull, AtnNorm);
     }
 
     // regular thinking
@@ -337,7 +327,7 @@ void SV_Physics_Step(edict_p ent) {
 
         if (((EntityFlags_t)ent->v.flags & FL_ONGROUND) && // just hit ground
             (hitsound))
-            SV_StartSound(ent, 0, "demon/dland2.wav", 255, 1);
+            SV_StartSound(ent, SndChAuto, "demon/dland2.wav", VolFull, AtnNorm);
     }
 
     // regular thinking

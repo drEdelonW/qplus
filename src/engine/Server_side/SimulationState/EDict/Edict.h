@@ -7,7 +7,14 @@
 #include "vmValue.h"
 #include "qTime.h"
 
-#define MAX_EDICTS          600   /* FIXME: ouch! ouch! ouch! */
+#define MAX_CLIENT_LIMIT        4
+
+#define MAX_EDICTS      600   /* FIXME: ouch! ouch! ouch! */
+typedef enum {
+    EdictNull   = -1,           // invalid / no entity
+    EdictWorld  =  0,           // world entity (always exists)
+    EdictMax    = MAX_EDICTS,
+} EdIdx; // int16_t / int ?
 
 typedef enum {
     WL_None  = 0,   // not in water
@@ -118,11 +125,18 @@ typedef struct edict_s {
     // other fields from progs come immediately after
 } edict_t;
 typedef edict_t* edict_p;
+
 #define PROG_HEADER_SIZE (sizeof(edict_t) - sizeof(entvars_t))
 
-#define EDICT_FROM_AREA(l)  STRUCT_FROM_LINK(l, edict_t, area)
-#define G_EDICT(o)          ED_GetEDictByOffs((uint32_t)G_INT((o)))
-#define G_EDICTNUM(o)       ED_GetEDictIdx(G_EDICT((o)))
+/* TODO:  move to progs */
+#define EDICT_FROM_AREA(lnk)    STRUCT_FROM_LINK(lnk, edict_t, area)
+#define G_EDICT(o)              ED_GetEDictByOffs((uint32_t)G_INT((o)))
+#define G_EDICTNUM(o)           ED_GetEDictIdx(G_EDICT((o)))
+
+extern uint32_t     EdictSize;  // in bytes
+extern edict_p      Edicts;
+extern const EdIdx  EdictsMax;
+extern  EdIdx       EdictsNum;
 
 #ifdef __cplusplus
 extern "C" {
@@ -145,8 +159,8 @@ extern "C" {
     void ED_LoadFromFile(cString data);
     bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s);
 
-    edict_p ED_GetEDictByIdx(uint32_t idx);
-    uint32_t ED_GetEDictIdx(edict_p edict);
+    edict_p ED_GetEDictByIdx(EdIdx idx);
+    EdIdx ED_GetEDictIdx(edict_p edict);
 
     edict_p ED_GetEDictByOffs(int32_t offs);
     int32_t ED_GetEDictOffs(edict_p edict);
@@ -161,7 +175,4 @@ extern "C" {
 }
 #endif
 
-extern uint32_t EdictSize;  // in bytes
-extern edict_p  Edicts;
-extern const uint32_t EdictsMax;
-extern uint32_t EdictsNum;
+

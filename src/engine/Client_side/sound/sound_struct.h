@@ -3,6 +3,7 @@
 #include "platformdefs.h"
 #include "z_cache.h"
 #include "vector.h"
+
 // !!! if this is changed, it much be changed in asm_i386.h too !!!
 typedef struct {
     int left;
@@ -42,19 +43,20 @@ typedef struct {
 typedef dma_t* dma_p;
 
 
+#include "Edict.h"
 // !!! if this is changed, it much be changed in asm_i386.h too !!!
 typedef struct {
-    sfx_p   sfx;   // sfx number
-    int     leftvol;  // 0-255 volume
-    int     rightvol;  // 0-255 volume
-    int     end;   // end time in global paintsamples
-    int     pos;   // sample position in sfx
-    int     looping;  // where to loop, -1 = no looping
-    int     entnum;   // to allow overriding a specific sound
-    int     entchannel;  //
-    vec3_t  origin;   // origin of sound effect
+    sfx_p   sfx;        // sfx number
+    int     leftvol;    // 0-255 volume
+    int     rightvol;   // 0-255 volume
+    int     end;        // end time in global paintsamples
+    int     pos;        // sample position in sfx
+    int     looping;    // where to loop, -1 = no looping
+    EdIdx   entnum;     // to allow overriding a specific sound
+    int     entchannel; //
+    vec3_t  origin;     // origin of sound effect
     vec_t   dist_mult;  // distance multiplier (attenuation/clipK)
-    int     master_vol;  // 0-255 master volume
+    int     master_vol; // 0-255 master volume
 } channel_t;
 typedef channel_t* channel_p;
 

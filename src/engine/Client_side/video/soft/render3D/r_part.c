@@ -206,6 +206,13 @@ void R_ReadPointFile_f() {
     Con_Printf("%i points read\n", c);
 }
 
+typedef struct {   /* !!SEQUENCE MATTER!! */
+    vec3_t  org;
+    vec3_t  dir;        // fixed4 coarse
+    uint8_t count;
+    uint8_t color;
+} ParticleMsg_t;
+
 /*
 ===============
 R_ParseParticleEffect
@@ -213,21 +220,31 @@ R_ParseParticleEffect
 Parse an effect out of the server message
 ===============
 */
+#define PARTICLE_COUNT_MAX  1024
+#define PARTICLE_COUNT_BLOB 255     // svc sentinel: "big explosion"
+
 void R_ParseParticleEffect() {
-    vec3_t org = MSG_ReadVector();
-
-    vec3_t dir = {
-        .x = MSG_ReadChar(),
-        .y = MSG_ReadChar(),
-        .z = MSG_ReadChar()
+#if 0
+    vec3_t org;
+    vec3_t dir;
+    int msgcount;
+    int color;
+    {   /* !!SEQUENCE MATTER!! */
+        org = MSG_ReadVector();
+        dir = MSG_ReadVecCoarse();
+        msgcount = MSG_ReadByte();
+        color = MSG_ReadByte();
+    }
+#else
+    ParticleMsg_t part =     {   /* !!SEQUENCE MATTER!! */
+        .org = MSG_ReadVector(),
+        .dir = MSG_ReadVecCoarse(),
+        .count = MSG_ReadByte(),
+        .color = MSG_ReadByte(),
     };
-    dir = VectorScale(dir, (1.0f / 16.0f));
-
-    int msgcount = MSG_ReadByte();
-    int color = MSG_ReadByte();
-
-    int count = (msgcount == 255) ? 1024 : msgcount;
-    R_RunParticleEffect(org, dir, color, count);
+#endif
+    part.count = (part.count == PARTICLE_COUNT_BLOB) ? PARTICLE_COUNT_MAX : part.count;
+    R_RunParticleEffect(part.org, part.dir, part.color, part.count);
 }
 
 /*

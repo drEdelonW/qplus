@@ -1,23 +1,22 @@
 #include "Edict.h"
 #include "host.h"
 
-edict_p ED_GetEDictByIdx(uint32_t idx) {
+static inline EdIdx CheckEdictIdx(EdIdx idx) {
     if (
-        // (idx < 0) ||
+        (idx < EdictWorld) ||
         (idx >= EdictsMax)
-        )           Host_SysError("ED_GetEDictByIdx: bad index %i", idx);
+        )   Host_SysError("ED_GetEDictByIdx: bad index %i", idx);
+        return idx;
+}
 
+edict_p ED_GetEDictByIdx(EdIdx idx) {
+    CheckEdictIdx(idx);
     return (edict_p)((uint8_p)Edicts + (idx * EdictSize));
 }
 
-uint32_t ED_GetEDictIdx(edict_p edict) {
-    uint32_t idx = (uint32_t)((uint8_p)edict - (uint8_p)Edicts) / EdictSize;
-
-    if (
-        // (idx < 0) ||
-        (idx >= EdictsNum)
-        )           Host_SysError("ED_GetEDictIdx: bad pointer");
-
+EdIdx ED_GetEDictIdx(edict_p edict) {
+    EdIdx idx = (EdIdx)((uint8_p)edict - (uint8_p)Edicts) / EdictSize;
+    CheckEdictIdx(idx);
     return idx;
 }
 

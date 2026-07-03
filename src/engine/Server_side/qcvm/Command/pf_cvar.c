@@ -36,8 +36,8 @@ stuffcmd (clientent, value)
 =================
 */
 void PF_stuffcmd() {
-    uint32_t entnum = G_EDICTNUM(OFS_PARM0);
-    if ((entnum < 1) ||
+    EdIdx entnum = G_EDICTNUM(OFS_PARM0);
+    if ((entnum < EdictWorld) ||
         (entnum > GetSvMaxClients())
         )   PR_RunError("Parm 0 not a client");
 

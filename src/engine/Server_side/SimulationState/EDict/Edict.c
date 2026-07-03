@@ -41,8 +41,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 uint32_t    EdictSize = 0;      // in bytes
 edict_p     Edicts;
-const uint32_t  EdictsMax = MAX_EDICTS;
-uint32_t    EdictsNum;
+const EdIdx EdictsMax = EdictMax;
+EdIdx       EdictsNum;
 
 
 
@@ -70,7 +70,7 @@ angles and bad trails.
 =================
 */
 edict_p ED_Alloc() {
-    uint32_t i = GetSvMaxClients() + 1; // Clients + World
+    EdIdx i = 1 + GetSvMaxClients(); // World + Clients
     for (; i < EdictsNum; i++) {
         edict_p edict = ED_GetEDictByIdx(i);
         // the first couple seconds of server time can involve a lot of
@@ -86,7 +86,7 @@ edict_p ED_Alloc() {
         }
     }
 
-    if (i == MAX_EDICTS)            Host_SysError("ED_Alloc: no free edicts");
+    if (i == EdictMax)          Host_SysError("ED_Alloc: no free edicts");
 
     EdictsNum++;
     edict_p edict = ED_GetEDictByIdx(i);

@@ -153,13 +153,13 @@ void CL_ParseTEnt() {
     case TE_WIZSPIKE: {      // spike hitting wall
         vec3_t pos = MSG_ReadVector();
         R_RunParticleEffect(pos, v3Zero, 20, 30);
-        S_StartSound(-1, 0, cl_sfx.wizhit, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.wizhit, pos, 1.f, 1.f);
     } break;
 
     case TE_KNIGHTSPIKE: {      // spike hitting wall
         vec3_t pos = MSG_ReadVector();
         R_RunParticleEffect(pos, v3Zero, 226, 20);
-        S_StartSound(-1, 0, cl_sfx.knighthit, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.knighthit, pos, 1.f, 1.f);
     } break;
 
     case TE_SPIKE: {    // spike hitting wall
@@ -169,24 +169,24 @@ void CL_ParseTEnt() {
 #else
         R_RunParticleEffect(pos, v3Zero, 0, 10);
 #endif
-        if (rand() % 5)         S_StartSound(-1, 0, cl_sfx.tink1, pos, 1, 1);
+        if (rand() % 5)         S_StartSound(-1, 0, cl_sfx.tink1, pos, 1.f, 1.f);
         else {
             int rnd = rand() & 3;
-            if (rnd == 1)       S_StartSound(-1, 0, cl_sfx.ric1, pos, 1, 1);
-            else if (rnd == 2)  S_StartSound(-1, 0, cl_sfx.ric2, pos, 1, 1);
-            else                S_StartSound(-1, 0, cl_sfx.ric3, pos, 1, 1);
+            /* */if (rnd == 1)  S_StartSound(-1, 0, cl_sfx.ric1, pos, 1.f, 1.f);
+            else if (rnd == 2)  S_StartSound(-1, 0, cl_sfx.ric2, pos, 1.f, 1.f);
+            else                S_StartSound(-1, 0, cl_sfx.ric3, pos, 1.f, 1.f);
         }
     } break;
     case TE_SUPERSPIKE: {    // super spike hitting wall
         vec3_t pos = MSG_ReadVector();
         R_RunParticleEffect(pos, v3Zero, 0, 20);
 
-        if (rand() % 5)     S_StartSound(-1, 0, cl_sfx.tink1, pos, 1, 1);
+        if (rand() % 5)     S_StartSound(-1, 0, cl_sfx.tink1, pos, 1.f, 1.f);
         else {
             int rnd = rand() & 3;
-            if (rnd == 1)       S_StartSound(-1, 0, cl_sfx.ric1, pos, 1, 1);
-            else if (rnd == 2)  S_StartSound(-1, 0, cl_sfx.ric2, pos, 1, 1);
-            else                S_StartSound(-1, 0, cl_sfx.ric3, pos, 1, 1);
+            if (rnd == 1)       S_StartSound(-1, 0, cl_sfx.ric1, pos, 1.f, 1.f);
+            else if (rnd == 2)  S_StartSound(-1, 0, cl_sfx.ric2, pos, 1.f, 1.f);
+            else                S_StartSound(-1, 0, cl_sfx.ric3, pos, 1.f, 1.f);
         }
     } break;
 
@@ -206,14 +206,14 @@ void CL_ParseTEnt() {
             .decay = 300.0f,
             .key = 0,
         };
-        S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1.f, 1.f);
     } break;
 
     case TE_TAREXPLOSION: {      // tarbaby explosion
         vec3_t pos = MSG_ReadVector();
         R_BlobExplosion(pos);
 
-        S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1.f, 1.f);
     } break;
 
     case TE_LIGHTNING1:     CL_ParseBeam(Mod_ForName("progs/bolt.mdl", true));      break;  // lightning bolts
@@ -246,20 +246,20 @@ void CL_ParseTEnt() {
             .decay = 300.0f,
             .key = 0,
         };
-        S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.r_exp3, pos, 1.f, 1.f);
     } break;
 
 #ifdef QUAKE2
     case TE_IMPLOSION: {
         vec3_t pos = MSG_ReadVector();
-        S_StartSound(-1, 0, cl_sfx.imp, pos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.imp, pos, 1.f, 1.f);
     } break;
 
     case TE_RAILTRAIL: {
         vec3_t pos = MSG_ReadVector();
         vec3_t endpos = MSG_ReadVector();
-        S_StartSound(-1, 0, cl_sfx.rail, pos, 1, 1);
-        S_StartSound(-1, 1, cl_sfx.r_exp3, endpos, 1, 1);
+        S_StartSound(-1, 0, cl_sfx.rail, pos, 1.f, 1.f);
+        S_StartSound(-1, 1, cl_sfx.r_exp3, endpos, 1.f, 1.f);
         R_RocketTrail(pos, endpos, 0 + 128);
         R_ParticleExplosion(endpos);
         dLight_p dl;

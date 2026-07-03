@@ -42,7 +42,7 @@ ClientState_t cl;
 ClientStatic_t cls;
 // FIXME: put these on hunk?
 static efrag_t  cl_efrags[MAX_EFRAGS] PLACE_TO_SDRAM;
-r_Entity_t      cl_entities[MAX_EDICTS] PLACE_TO_SDRAM;
+r_Entity_t      cl_entities[EdictMax] PLACE_TO_SDRAM;
 r_Entity_t      cl_static_entities[MAX_STATIC_ENTITIES] PLACE_TO_SDRAM;
 LightStyle_t    cl_lightstyle[MAX_LIGHTSTYLES] PLACE_TO_SDRAM;
 

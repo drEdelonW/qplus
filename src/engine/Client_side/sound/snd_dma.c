@@ -407,7 +407,7 @@ void SND_Spatialize(channel_p ch) {
 // Start a sound effect
 // =======================================================================
 
-void S_StartSound(int entnum, int entchannel, sfx_p sfx, vec3_t origin, float fvol, float attenuation) {
+void S_StartSound(EdIdx entnum, int entchannel, sfx_p sfx, vec3_t origin, float fvol, float attenuation) {
     if ((!sound_started) ||
         (!sfx) ||
         (nosound.value))  return;
@@ -459,7 +459,7 @@ void S_StartSound(int entnum, int entchannel, sfx_p sfx, vec3_t origin, float fv
     }
 }
 
-void S_StopSound(int entnum, int entchannel) {
+void S_StopSound(EdIdx entnum, int entchannel) {
     for (int i = 0; i < MAX_DYNAMIC_CHANNELS; i++) {
         if ((channels[i].entnum == entnum) &&
             (channels[i].entchannel == entchannel)

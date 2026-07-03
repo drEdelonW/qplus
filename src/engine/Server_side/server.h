@@ -24,12 +24,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   error CLIENT defined
 #endif
 #include "model/model.h"
-// #include "BrushModel.h"
 #include "sizebuf.h"
 #include "net.h"
 #include "UserCmd.h"
 #include "Edict.h"
 #include "enginedefs.h"
+#include "sound.h"
 
 
 //=============================================================================
@@ -129,8 +129,7 @@ extern "C" {
     LegTime_t SV_GetTime();
     void SV_SetTime(LegTime_t time);
 
-
-    void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation);
+    void SV_StartSound(edict_p entity, SndCh_t channel, cString sample, uint8_t volume, float attenuation);
 
     void SV_DropClient(bool crash);
 

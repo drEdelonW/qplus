@@ -8,12 +8,12 @@
 #include <string.h>
 #include "console.h"
 #include "host.h"
-#include "sound.h"
 #include "gamedefs.h"
 #include "GameRule.h"
 #include "GlobVars.h"
 #include "cmd.h"
 #include "vector_tools.h"
+#include "BBox_tools.h"
 
 #include "cvar_q1.h"
 
@@ -28,21 +28,12 @@
 void SV_StartParticle(vec3_t org, vec3_t dir, uint8_t color, uint8_t count) {
     if (sv.datagram.cursize > (MAX_DATAGRAM - 16))      return;
 
-    MSG_WriteByte(&sv.datagram, svc_particle);
-#if 0
-    MSG_WriteCoord(&sv.datagram, org.x);
-    MSG_WriteCoord(&sv.datagram, org.y);
-    MSG_WriteCoord(&sv.datagram, org.z);
-#else
-    MSG_WriteVector(&sv.datagram, org);
-#endif
-    for (int i = 0; i < VECT_DIM; i++) {    // TODO: make vector send helper
-        int v = (int)(dir.v[i] * 16.0f); // TODO: adjust type
-        CLAMP(-128, &v, 127);
-        MSG_WriteChar(&sv.datagram, (int8_t)v);
+    MSG_WriteByte(&sv.datagram, svc_particle); {
+        MSG_WriteVector(&sv.datagram, org);
+        MSG_WriteVecCoarse(&sv.datagram, dir);
+        MSG_WriteByte(&sv.datagram, count);
+        MSG_WriteByte(&sv.datagram, color);
     }
-    MSG_WriteByte(&sv.datagram, count);
-    MSG_WriteByte(&sv.datagram, color);
 }
 
 
@@ -61,10 +52,10 @@ void SV_StartParticle(vec3_t org, vec3_t dir, uint8_t color, uint8_t count) {
 
     ==================
 */
-void SV_StartSound(edict_p entity, int channel, cString sample, int volume, float attenuation) {
-    if ((volume < 0) || (volume > 255))         Host_SysError("SV_StartSound: volume = %i", volume);
-    if ((attenuation < 0) || (attenuation > 4)) Host_SysError("SV_StartSound: attenuation = %f", attenuation);
-    if ((channel < 0) || (channel > 7))         Host_SysError("SV_StartSound: channel = %i", channel);
+void SV_StartSound(edict_p entity, SndCh_t channel, cString sample, uint8_t volume, float attenuation) {
+    // if ((volume < 0) || (volume > 255))                 Host_SysError("SV_StartSound: volume = %i", volume);
+    if ((attenuation < 0.f) || (attenuation > 4.f))     Host_SysError("SV_StartSound: attenuation = %f", attenuation);
+    if ((channel < SndChAuto) || (channel > SndChMax))  Host_SysError("SV_StartSound: channel = %i", channel);
 
     if (sv.datagram.cursize > (MAX_DATAGRAM - 16))  return;
 
@@ -72,45 +63,31 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
     int sound_num = 1;
     for (;
         (sound_num < MAX_SOUNDS) &&
-        sv.sound_precache[sound_num];
+        (sv.sound_precache[sound_num]);
         sound_num++) {
         if (!strcmp(sample, sv.sound_precache[sound_num]))
             break;
     }
     if ((sound_num == MAX_SOUNDS) ||
-        (!sv.sound_precache[sound_num])) {
+        (!sv.sound_precache[sound_num])
+        ) {
         Con_Printf("SV_StartSound: %s not precacheed\n", sample);
         return;
     }
 
-    channel |= (int)(ED_GetEDictIdx(entity) << 3);
-
     int field_mask = 0x00;
-    if (volume != DEFAULT_SOUND_PACKET_VOLUME)              field_mask |= SND_VOLUME;
-    if (attenuation != DEFAULT_SOUND_PACKET_ATTENUATION)    field_mask |= SND_ATTENUATION;
+    if (volume != VolFull)          field_mask |= SND_VOLUME;
+    if (attenuation != AtnNorm)     field_mask |= SND_ATTENUATION;
 
     // directed messages go only to the entity the are targeted on
-    MSG_WriteByte(&sv.datagram, svc_sound);    MSG_WriteByte(&sv.datagram, (uint8_t)field_mask);
-    if (field_mask & SND_VOLUME)        MSG_WriteByte(&sv.datagram, (uint8_t)volume);
+    MSG_WriteByte(&sv.datagram, svc_sound); { /* !!SEQUENCE MATTER!! */
+                                        MSG_WriteByte(&sv.datagram, (uint8_t)field_mask);
+    if (field_mask & SND_VOLUME)        MSG_WriteByte(&sv.datagram, volume);
     if (field_mask & SND_ATTENUATION)   MSG_WriteByte(&sv.datagram, (uint8_t)(attenuation * 64));
-    MSG_WriteShort(&sv.datagram, (int16_t)channel);
-    MSG_WriteByte(&sv.datagram, (uint8_t)sound_num);
-#if 0
-    for (int i = 0; i < VECT_DIM; i++) {
-        MSG_WriteCoord(&sv.datagram,
-            entity->v.origin.v[i] +
-            0.5f * (entity->v.mins.v[i] + entity->v.maxs.v[i])
-        );
+                                        MSG_WriteShort(&sv.datagram, (int16_t)((ED_GetEDictIdx(entity) << 3) | channel)); /* wire: [15..3] entity idx | [2..0] channel */
+                                        MSG_WriteByte(&sv.datagram, (uint8_t)sound_num);
+                                        MSG_WriteVector(&sv.datagram, VectorAdd(entity->v.origin, BBoxMid(EvBBox(&entity->v))));
     }
-#else
-    vec3_t out = VectorAdd(
-        entity->v.origin,
-        BBoxMid(
-            EvBBox(&entity->v)
-        ));
-    for (int i = 0; i < VECT_DIM; i++)
-        MSG_WriteCoord(&sv.datagram, out.v[i]);
-#endif
 }
 
 
@@ -268,14 +245,14 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
             MSG_WriteCoord(msg,
                 other->v.origin.v[i] +
                 0.5f *
-                    other->v.mins.v[i] +
-                    other->v.maxs.v[i])
+                other->v.mins.v[i] +
+                other->v.maxs.v[i])
             );
 #else
         MSG_WriteVector(msg,
-             VectorAdd(other->v.origin,
-                 BBoxMid(EvBBox(&other->v))
-        ));
+            VectorAdd(other->v.origin,
+                BBoxMid(EvBBox(&other->v))
+            ));
 #endif
         ent->v.dmg_take = 0;
         ent->v.dmg_save = 0;

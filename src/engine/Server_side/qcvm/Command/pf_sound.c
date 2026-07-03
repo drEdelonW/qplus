@@ -47,22 +47,19 @@ Larger attenuations will drop off.
 */
 void PF_sound() {
     edict_p entity = G_EDICT(OFS_PARM0);
-    int channel = (int)G_FLOAT(OFS_PARM1);
+    SndCh_t channel = (SndCh_t)G_FLOAT(OFS_PARM1);
     cString sample = G_STRING(OFS_PARM2);
     int volume = (int)G_FLOAT(OFS_PARM3) * 255;
     float attenuation = G_FLOAT(OFS_PARM4);
 
-    if ((volume < 0) ||
-        (volume > 255))
-        Host_SysError("SV_StartSound: volume = %i", volume);
+    if ((volume < VolSilent) || (volume > VolFull)
+    )   Host_SysError("SV_StartSound: volume = %i", volume);
 
-    if ((attenuation < 0) ||
-        (attenuation > 4))
-        Host_SysError("SV_StartSound: attenuation = %f", attenuation);
+    if ((attenuation < AtnNone) || (attenuation > AtnMax)
+    )   Host_SysError("SV_StartSound: attenuation = %f", attenuation);
 
-    if ((channel < 0) ||
-        (channel > 7))
-        Host_SysError("SV_StartSound: channel = %i", channel);
+    if ((channel < SndChAuto) || (channel > SndChMax)
+    )   Host_SysError("SV_StartSound: channel = %i", channel);
 
     SV_StartSound(entity, channel, sample, volume, attenuation);
 }

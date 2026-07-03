@@ -11,13 +11,24 @@ static inline vec3_t MSG_ReadVector() {
         .z = MSG_ReadCoord()
     };
 }
-
+static inline vec3_t MSG_ReadVecCoarse() {
+    return (vec3_t){
+        .x = fixed4_tof(MSG_ReadChar()),
+        .y = fixed4_tof(MSG_ReadChar()),
+        .z = fixed4_tof(MSG_ReadChar()),
+    };
+}
 static inline void MSG_WriteVector(sizebuf_p msg, vec3_t v) {
     MSG_WriteCoord(msg, v.x);
     MSG_WriteCoord(msg, v.y);
     MSG_WriteCoord(msg, v.z);
 }
 
+static inline void MSG_WriteVecCoarse(sizebuf_t *msg, vec3_t v) {
+    MSG_WriteChar(msg, fixed4_fsat(v.x));
+    MSG_WriteChar(msg, fixed4_fsat(v.y));
+    MSG_WriteChar(msg, fixed4_fsat(v.z));
+}
 
 static inline ang3_t MSG_ReadAngles() {
     return (ang3_t){

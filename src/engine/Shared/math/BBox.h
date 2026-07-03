@@ -72,13 +72,3 @@ static inline vec3_t BBoxMid(BBox_t bb) {
     return VectorScale(VectorAdd(bb.mins, bb.maxs), 0.5f);
 }
 
-#include "progdefs.h"
-static inline BBox_t EvBBox(const entvars_t *ev){
-    return (BBox_t){ .mins = ev->mins, .maxs = ev->maxs };
-}
-
-static inline void EvSetBBox(entvars_t *ev, BBox_t bb){
-    ev->mins = bb.mins;
-    ev->maxs = bb.maxs;
-    ev->size = BBoxSize(bb);
-}
