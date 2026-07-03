@@ -1,7 +1,6 @@
 #pragma once
 
 #include "progdefs.h"
-#include "progLump.h"
 
 typedef globalvars_t* globalvars_p;
 extern globalvars_p pr_global_struct;   // global variable of game settings
@@ -16,9 +15,9 @@ extern float_p      pr_globals;         // same as pr_global_struct
 #define G_STRING(o)         PR_GetQString(*(qVmString_t*)&pr_globals[(o)])
 
 #define PR_Freturn           G_FLOAT(OFS_RETURN) =
-#define PR_FRETURN(ret)      G_FLOAT(OFS_RETURN) = (ret)
-#define PR_Ireturn           G_INT(OFS_RETURN) =
-#define PR_IRETURN(ret)      G_INT(OFS_RETURN) = (ret)
+// #define PR_FRETURN(ret)      G_FLOAT(OFS_RETURN) = (ret)
+// #define PR_Ireturn           G_INT(OFS_RETURN) =
+// #define PR_IRETURN(ret)      G_INT(OFS_RETURN) = (ret)
 
 #ifdef __cplusplus
 extern "C" {

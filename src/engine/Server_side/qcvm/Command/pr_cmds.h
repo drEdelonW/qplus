@@ -1,6 +1,5 @@
 #pragma once
 
-#include "pr_cmds.h"
 #include "types.h"
 
 typedef void (*builtin_t)();

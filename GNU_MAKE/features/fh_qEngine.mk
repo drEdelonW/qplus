@@ -84,7 +84,16 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                                 SRC_LIST += $(PR_OPS_DIR)/pr_ops_tools.c
 
                         $(eval PR_CMD_DIR = $(PROG_DIR)/Command) $(eval INCLUDES += $(PR_CMD_DIR))
-                                SRC_LIST += $(PR_CMD_DIR)/pr_cmds.c
+                                SRC_LIST += $(PR_CMD_DIR)/pr_builtins.c
+                                SRC_LIST += $(PR_CMD_DIR)/pf_cvar.c
+                                SRC_LIST += $(PR_CMD_DIR)/pf_debug.c
+                                SRC_LIST += $(PR_CMD_DIR)/pf_edict.c
+                                SRC_LIST += $(PR_CMD_DIR)/pf_math.c
+                                SRC_LIST += $(PR_CMD_DIR)/pf_move.c
+                                SRC_LIST += $(PR_CMD_DIR)/pf_msg.c
+                                SRC_LIST += $(PR_CMD_DIR)/pf_print.c
+                                SRC_LIST += $(PR_CMD_DIR)/pf_sound.c
+                                SRC_LIST += $(PR_CMD_DIR)/pf_world.c
 
                         $(eval PR_FUNC_DIR = $(PROG_DIR)/Function) $(eval INCLUDES += $(PR_FUNC_DIR))
                                 SRC_LIST += $(PR_FUNC_DIR)/pr_Function.c

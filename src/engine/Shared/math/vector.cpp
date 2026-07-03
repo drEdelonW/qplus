@@ -153,7 +153,7 @@ vec_t Length(vec3_t const v) {
     float length = 0;
     for (int i = 0; i < VECT_DIM; i++)
         length += v[i] * v[i];
-    length = sqrt(length);  // FIXME
+    length = sqrtf(length);  // FIXME
 
     return length;
 #endif
@@ -167,7 +167,7 @@ float VectorNormalize(vec3_p v) {
     return len;
 #else
     float length = (x * x) + (y * y) + (z * z);
-    length = sqrt(length);  // FIXME
+    length = sqrtf(length);  // FIXME
 
     if (length) {
         float ilength = 1 / length;
