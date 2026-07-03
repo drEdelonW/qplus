@@ -77,7 +77,12 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
                 $(eval PR_PHYS_DIR = $(SV_SIDE_DIR)/Physics) $(eval INCLUDES += $(PR_PHYS_DIR))
                         SRC_LIST += $(PR_PHYS_DIR)/sv_phys.c
-                        SRC_LIST += $(PR_PHYS_DIR)/sv_move.c
+                        SRC_LIST += $(PR_PHYS_DIR)/sv_phys_core.c
+                        SRC_LIST += $(PR_PHYS_DIR)/sv_phys_push.c
+                        SRC_LIST += $(PR_PHYS_DIR)/sv_phys_client.c
+                        SRC_LIST += $(PR_PHYS_DIR)/sv_phys_ent.c
+                        SRC_LIST += $(PR_PHYS_DIR)/sv_monster_move.c
+                        SRC_LIST += $(PR_PHYS_DIR)/sv_monster_ai.c
 
                 $(eval PROG_DIR = $(SV_SIDE_DIR)/qcvm) $(eval INCLUDES += $(PROG_DIR))
                         $(eval PR_OPS_DIR = $(PROG_DIR)/Operations) $(eval INCLUDES += $(PR_OPS_DIR))

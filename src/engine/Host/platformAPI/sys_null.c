@@ -134,18 +134,14 @@ __weak void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
 
 __weak void Sys_Error(cStringRO error, ...) {
     printf("Sys_Error: ");
-    va_list argptr; va_start(argptr, error);
-    vprintf(error, argptr);
-    va_end(argptr);
+    VA_P_EXPAND(error);
     printf("\n");
 
     exit(1);
 }
 
 __weak void Sys_Printf(cStringRO fmt, ...) {
-    va_list argptr; va_start(argptr, fmt);
-    vprintf(fmt, argptr);
-    va_end(argptr);
+    VA_P_EXPAND(fmt);
 }
 
 __weak void Sys_Quit() { exit(0); }

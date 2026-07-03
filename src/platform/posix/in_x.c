@@ -327,18 +327,8 @@ void IN_Move(UserCmd_p cmd) {
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {  // mouseLook
         cl.viewangles.pitch += m_pitch.value * mouse_y;
-#if 0
-        if (cl.viewangles.pitch > 80)
-            cl.viewangles.pitch = 80;
-#else
-        CLAMP_MAX(cl.viewangles.pitch, 80);  // down look
-#endif
-#if 0
-        if (cl.viewangles.pitch < -70)
-            cl.viewangles.pitch = -70;
-#else
-        CLAMP_MIN(cl.viewangles.pitch, -70);   // up look
-#endif
+        CLAMP_MAX(&cl.viewangles.pitch, 80.f);  // down look
+        CLAMP_MIN(&cl.viewangles.pitch, -70.f);   // up look
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)

@@ -941,10 +941,10 @@ void R_DrawBrushModel(r_Entity_p e) {
         ) {
         rotated = true;
 
-        BBox_t bb = (BBox_t){
-            .mins = VectorAddVal(e->origin, -clmodel->radius),
-            .maxs = VectorAddVal(e->origin, +clmodel->radius)
-        };
+        BBox_t bb = BBoxFromVec3(
+            VectorAddVal(e->origin, -clmodel->radius),
+            VectorAddVal(e->origin, +clmodel->radius)
+        );
         if (R_CullBox(bb))     return;
     }
     else {

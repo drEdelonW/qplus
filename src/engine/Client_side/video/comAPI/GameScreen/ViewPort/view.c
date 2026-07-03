@@ -220,7 +220,7 @@ void BuildGammaTable(float g) {
 
     for (int i = 0; i < 256; i++) {
         int inf = 255 * pow((i + 0.5f) / 255.5, g) + 0.5f;
-        CLAMP(0, inf, 255);
+        CLAMP(0, &inf, 255);
         gammatable[i] = (uint8_t)inf;
     }
 }
@@ -413,12 +413,8 @@ void V_CalcBlend() {
     v_blend[1] = g * byteScaleFactor;
     v_blend[2] = b * byteScaleFactor;
     v_blend[3] = a;
-# if 0
-    if (v_blend[3] > 1.0f)        v_blend[3] = 1.0f;
-    if (v_blend[3] < 0.0f)        v_blend[3] = 0.0f;
-# else
-    CLAMP(0.0f, v_blend[3], 1.0f);
-# endif
+
+    CLAMP(0.f, &v_blend[3], 1.f);
 }
 #endif
 
@@ -579,9 +575,9 @@ void CalcGunAngle() {
     static float _oldPitch = 0;
 
     float yaw = r_refdef.viewangles.yaw;
-    yaw = angledelta(yaw - r_refdef.viewangles.yaw) * 0.4;
-    CLAMP(-10, yaw, 10);
-    float move = host_frametime * 20;
+    yaw = angledelta(yaw - r_refdef.viewangles.yaw) * 0.4f;
+    CLAMP(-10.f, &yaw, 10.f);
+    float move = host_frametime * 20.f;
     if (yaw > _oldYaw) {
         if ((_oldYaw + move) < yaw)
             yaw = _oldYaw + move;
@@ -592,8 +588,8 @@ void CalcGunAngle() {
     }
 
     float pitch = -r_refdef.viewangles.pitch;
-    pitch = angledelta(-pitch - r_refdef.viewangles.pitch) * 0.4;
-    CLAMP(-10, pitch, 10);
+    pitch = angledelta(-pitch - r_refdef.viewangles.pitch) * 0.4f;
+    CLAMP(-10.f, &pitch, 10.f);
     if (pitch > _oldPitch) {
         if ((_oldPitch + move) < pitch)
             pitch = _oldPitch + move;
@@ -625,9 +621,9 @@ void V_BoundOffsets() {
     // absolutely bound refresh reletive to entity clipping hull
     // so the view can never be inside a solid wall
 
-    CLAMP(ent->origin.x - 14, r_refdef.vieworg.x, ent->origin.x + 14);
-    CLAMP(ent->origin.y - 14, r_refdef.vieworg.y, ent->origin.y + 14);
-    CLAMP(ent->origin.z - 22, r_refdef.vieworg.z, ent->origin.z + 30);
+    CLAMP(ent->origin.x - 14.f, &r_refdef.vieworg.x, ent->origin.x + 14.f);
+    CLAMP(ent->origin.y - 14.f, &r_refdef.vieworg.y, ent->origin.y + 14.f);
+    CLAMP(ent->origin.z - 22.f, &r_refdef.vieworg.z, ent->origin.z + 30.f);
 }
 
 /*
@@ -638,18 +634,12 @@ Idle swaying
 ==============
 */
 void V_AddIdle() {
-#if 0
-    r_refdef.viewangles.roll += v_idlescale.value * sin(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value;
-    r_refdef.viewangles.pitch += v_idlescale.value * sin(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value;
-    r_refdef.viewangles.yaw += v_idlescale.value * sin(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value;
-#else
     ang3_t v_i = (ang3_t){
-        .pitch = sin(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value,
-        .yaw = sin(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value,
-        .roll = sin(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value,
+        .pitch  = sinf(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value,
+        .yaw    = sinf(GetClSimTime() * v_iyaw_cycle.value)   * v_iyaw_level.value,
+        .roll   = sinf(GetClSimTime() * v_iroll_cycle.value)  * v_iroll_level.value,
     };
     r_refdef.viewangles = AngleMA(r_refdef.viewangles, v_idlescale.value, v_i);
-#endif
 }
 
 

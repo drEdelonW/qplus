@@ -50,8 +50,9 @@ sizebuf_p WriteDest() {
     case MSG_ONE: {
         edict_p ent = ED_GetEDictByOffs(pr_global_struct->msg_entity);
         uint32_t entnum = ED_GetEDictIdx(ent);
-        if ((entnum < 1) || (entnum > GetSvMaxClients()))
-            PR_RunError("WriteDest: not a client");
+        if ((entnum < 1) ||
+            (entnum > GetSvMaxClients())
+            )   PR_RunError("WriteDest: not a client");
         return &svs.clients[entnum - 1].message;
     }
     case MSG_ALL:       return &sv.reliable_datagram;

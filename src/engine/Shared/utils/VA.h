@@ -10,6 +10,13 @@ extern va_list argptr;
         vsnprintf(buf, sizeof(buf), fmt, argptr);   \
     }va_end(argptr) 
 
+#define VA_P_EXPAND(fmt)        \
+    va_start(argptr, fmt); {    \
+        vprintf(fmt, argptr);   \
+    }va_end(argptr) 
+
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

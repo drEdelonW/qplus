@@ -115,14 +115,7 @@ Aborts the currently executing function
 */
 void PR_RunError(cString error, ...) {
     char string[1024];
-#if 0
-    va_list argptr; va_start(argptr, error);
-        vsnprintf(string, sizeof(string), error, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(string, error);
-#endif
-
     PR_PrintStatement(PR_GetStack(_pr_xStatement));
     PR_StackTrace();
     Con_Printf("%s\n", string);

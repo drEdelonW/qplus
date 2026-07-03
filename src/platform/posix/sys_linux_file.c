@@ -103,13 +103,7 @@ int Sys_FileRead(int handle, TypeLess_ptr dest, size_t count) {
 
 void Sys_DebugLog(cStringRO file, cStringRO fmt, ...) {
     char data[1024];
-#if 0
-    va_list argptr; va_start(argptr, fmt);
-        vsnprintf(data, sizeof(data), fmt, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(data, fmt);
-#endif
     //    fd = open(file, O_WRONLY | O_BINARY | O_CREAT | O_APPEND, 0666);
     int fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
     write(fd, data, strlen(data));

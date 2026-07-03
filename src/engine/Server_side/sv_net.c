@@ -13,6 +13,7 @@
 #include "GameRule.h"
 #include "GlobVars.h"
 #include "cmd.h"
+#include "vector_tools.h"
 
 #include "cvar_q1.h"
 
@@ -24,20 +25,24 @@
     Make sure the event gets sent to all clients
     ==================
 */
-void SV_StartParticle(vec3_t org, vec3_t dir, int color, size_t count) {
-    if (sv.datagram.cursize > (MAX_DATAGRAM - 16))  return;
+void SV_StartParticle(vec3_t org, vec3_t dir, uint8_t color, uint8_t count) {
+    if (sv.datagram.cursize > (MAX_DATAGRAM - 16))      return;
 
     MSG_WriteByte(&sv.datagram, svc_particle);
+#if 0
     MSG_WriteCoord(&sv.datagram, org.x);
     MSG_WriteCoord(&sv.datagram, org.y);
     MSG_WriteCoord(&sv.datagram, org.z);
-    for (int i = 0; i < VECT_DIM; i++) {
+#else
+    MSG_WriteVector(&sv.datagram, org);
+#endif
+    for (int i = 0; i < VECT_DIM; i++) {    // TODO: make vector send helper
         int v = (int)(dir.v[i] * 16.0f); // TODO: adjust type
-        CLAMP(-128, v, 127);
+        CLAMP(-128, &v, 127);
         MSG_WriteChar(&sv.datagram, (int8_t)v);
     }
-    MSG_WriteByte(&sv.datagram, (uint8_t)count);
-    MSG_WriteByte(&sv.datagram, (uint8_t)color);
+    MSG_WriteByte(&sv.datagram, count);
+    MSG_WriteByte(&sv.datagram, color);
 }
 
 
@@ -98,9 +103,10 @@ void SV_StartSound(edict_p entity, int channel, cString sample, int volume, floa
         );
     }
 #else
-    vec3_t out = VectorMA(entity->v.origin,
-        0.5f, VectorAdd(
-            entity->v.mins, entity->v.maxs
+    vec3_t out = VectorAdd(
+        entity->v.origin,
+        BBoxMid(
+            EvBBox(&entity->v)
         ));
     for (int i = 0; i < VECT_DIM; i++)
         MSG_WriteCoord(&sv.datagram, out.v[i]);
@@ -257,14 +263,20 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
         MSG_WriteByte(msg, svc_damage);
         MSG_WriteByte(msg, (uint8_t)ent->v.dmg_save);
         MSG_WriteByte(msg, (uint8_t)ent->v.dmg_take);
+#if 0
         for (int i = 0; i < VECT_DIM; i++)
             MSG_WriteCoord(msg,
                 other->v.origin.v[i] +
                 0.5f *
-                (other->v.mins.v[i] +
+                    other->v.mins.v[i] +
                     other->v.maxs.v[i])
             );
-
+#else
+        MSG_WriteVector(msg,
+             VectorAdd(other->v.origin,
+                 BBoxMid(EvBBox(&other->v))
+        ));
+#endif
         ent->v.dmg_take = 0;
         ent->v.dmg_save = 0;
     }
@@ -437,7 +449,7 @@ void SV_CreateBaseline() {
         edict_p svent = ED_GetEDictByIdx(entnum);
         if ((svent->free) ||
             ((entnum > GetSvMaxClients()) &&
-                !svent->v.modelindex)
+                !(svent->v.modelindex))
             )
             continue;
 

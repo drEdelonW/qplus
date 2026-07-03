@@ -35,10 +35,7 @@ SYSTEM IO
 */
 
 void Sys_Printf(cStringRO fmt, ...) {
-    va_list argptr;
-    va_start(argptr, fmt); {
-        vprintf(fmt, argptr);
-    } va_end(argptr);
+    VA_P_EXPAND(fmt);
 }
 
 cString Sys_ConsoleInput() {
@@ -50,7 +47,7 @@ cString Sys_ConsoleInput() {
 // Пишите в UART/ITM здесь, если нужно видеть printf
 int _write(int, cStringRO buf, int len) { (void)buf; return len; }
 #else
-int _write(int file, const char *buf, int len) {
+int _write(int file, const char* buf, int len) {
     if ((file == 1) || (file == 2)) {
         HAL_StatusTypeDef st = HAL_UART_Transmit(
             &huart1,
@@ -61,7 +58,8 @@ int _write(int file, const char *buf, int len) {
 
         if (st == HAL_OK) {
             return len;
-        } else {
+        }
+        else {
             errno = EIO;
             return -1;
         }

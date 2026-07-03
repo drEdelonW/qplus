@@ -39,20 +39,18 @@ void Test_Init() {}
 
 
 
-Plane_t junk;
+static Plane_t _junk;
 Plane_p HitPlane(vec3_t start, vec3_t end) {
-    trace_t trace;
+    trace_t trace = {   // fill in a default trace
+        .fraction = 1.f,
+        .allsolid = true,
+        .endpos = end,
+    };
 
-    // fill in a default trace
-    memset(&trace, 0, sizeof(trace_t));
-    trace.fraction = 1;
-    trace.allsolid = true;
-    trace.endpos = end;
+    SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0.f, 1.f, start, end, &trace);
 
-    SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
-
-    junk = trace.plane;
-    return &junk;
+    _junk = trace.plane;
+    return &_junk;
 }
 
 void Test_Spawn(vec3_t origin) {

@@ -30,8 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "render.h"
 
 
-static vec3_t _chaseDest;
-
 
 void Chase_Init() {
     Cvar_RegisterVariable(&chase_back);
@@ -42,38 +40,35 @@ void Chase_Init() {
 
 void Chase_Reset() {} // for respawning and teleporting start position 12 units behind head
 
-void TraceLine(vec3_t start, vec3_t end, vec3_p impact) {
-    trace_t  trace; memset(&trace, 0, sizeof(trace));
-    SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0, 1, start, end, &trace);
-
-    *impact = trace.endpos;
+vec3_t TraceLine(vec3_t start, vec3_t end) {
+    trace_t trace = { .endpos = v3Zero };
+    SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0.f, 1.f, start, end, &trace);
+    return trace.endpos;
 }
 
 void Chase_Update() {
     // if can't see player, reset
     Basis_t bs = GetBasis(cl.viewangles);
 
-    _chaseDest = VectorMA(VectorMA(r_refdef.vieworg,
+    vec3_t chaseDest = VectorMA(VectorMA(
+        r_refdef.vieworg,
         -chase_back.value, bs.forward),
         -chase_right.value, bs.right
-    );
-    _chaseDest.z = r_refdef.vieworg.z + chase_up.value;
+    ); {
+        chaseDest.z = r_refdef.vieworg.z + chase_up.value;
+    }
 
     // find the spot the player is looking at
-    vec3_t stop;  TraceLine(    // TODO: remake to stack vector return
-        r_refdef.vieworg,
-        VectorMA(r_refdef.vieworg, 4096, bs.forward),
-        &stop
+    vec3_t stop = TraceLine(r_refdef.vieworg,
+        VectorMA(r_refdef.vieworg, 4096.f, bs.forward)
     );
 
     // calculate pitch to look at the same spot from camera
-    stop = VectorSubtract(stop, r_refdef.vieworg);  // stop -= r_refdef.vieworg;
-    float dist = DotProduct(stop, bs.forward);
-    CLAMP_LESS(dist, 1);
+    float dist = DotProduct(VectorSubtract(stop, r_refdef.vieworg), bs.forward);
+    CLAMP_LESS(&dist, 1.f);
 
-    r_refdef.viewangles.pitch = DEG2RAD(-atan(stop.z / dist));
+    r_refdef.viewangles.pitch = DEG2RAD(-atanf(stop.z / dist));
 
-    // move towards destination
-    r_refdef.vieworg = _chaseDest;
+    r_refdef.vieworg = chaseDest;   // move towards destination
 }
 

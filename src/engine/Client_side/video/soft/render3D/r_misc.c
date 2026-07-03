@@ -121,7 +121,7 @@ void R_LineGraph(int x, int y, int h) {
 
     int s = r_graphheight.value;
 
-    CLAMP(0, h, s);
+    CLAMP(0, &h, s);
 
     for (int i = 0; i < s; ++i) {
         dest[0] = (i < h) ? GRAPH_FG : GRAPH_BG;
@@ -328,7 +328,7 @@ void R_SetupFrame() {
     }
 
     if (r_numsurfs.value) {
-        CLAMP_MIN(r_maxsurfsseen, (surface_p - surfaces));
+        CLAMP_MIN(&r_maxsurfsseen, (surface_p - surfaces));
 
         Con_Printf("Used %d of %d surfs; %d max\n",
             surface_p - surfaces,
@@ -340,7 +340,7 @@ void R_SetupFrame() {
     if (r_numedges.value) {
         int edgecount = edge_p - r_edges;
 
-        CLAMP_MIN(r_maxedgesseen, edgecount);
+        CLAMP_MIN(&r_maxedgesseen, edgecount);
 
         Con_Printf("Used %d of %d edges; %d max\n",
             edgecount, r_numallocatededges, r_maxedgesseen
@@ -349,7 +349,7 @@ void R_SetupFrame() {
 
     r_refdef.ambientlight = r_ambient.value;
 
-    CLAMP_MIN(r_refdef.ambientlight, 0);
+    CLAMP_MIN(&r_refdef.ambientlight, 0);
 
     if (!Host_IsServerActive())
         r_draworder.value = 0; // don't let cheaters look behind walls

@@ -414,7 +414,7 @@ void R_DrawAliasModel(r_Entity_p e) {
     }
 
     // clamp lighting so it doesn't overbright as much
-    CLAMP_MORE(ambientlight, 128);
+    CLAMP_MORE(&ambientlight, 128.f);
 
     if ((ambientlight + shadelight) > 192.0f)
         shadelight = 192.0f - ambientlight;
@@ -424,9 +424,9 @@ void R_DrawAliasModel(r_Entity_p e) {
     if ((i >= 1) &&
         (i <= cl.maxclients) /* &&
         !strcmp (currententity->model->name, "progs/player.mdl") */
-       )    if (ambientlight < 8.0f) {
-               ambientlight = 8.0f;
-               shadelight = 8.0f;
+       )    if (ambientlight < 8.f) {
+               ambientlight = 8.f;
+               shadelight = 8.f;
            }
 
     // HACK HACK HACK -- no fullbright colors, so make torches full light

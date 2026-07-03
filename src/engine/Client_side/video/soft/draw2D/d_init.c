@@ -115,7 +115,7 @@ void D_SetupFrame() {
     d_initial_rover = sc_rover;
 
     d_minmip = d_mipcap.value;
-    CLAMP(0, d_minmip, 3);
+    CLAMP(0, &d_minmip, 3);
 
     for (int i = 0; i < (NUM_MIPS - 1); i++)
         d_scalemip[i] = _BaseMip[i] * d_mipscale.value;

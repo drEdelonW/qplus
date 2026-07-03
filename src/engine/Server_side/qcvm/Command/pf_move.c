@@ -241,8 +241,8 @@ void PF_changeyaw() {
     float move = angledelta(ent->v.ideal_yaw - current);
     if (move == 0.f)    return;
 
-    if (move > 0.f) CLAMP_MORE(move, speed);
-    else            CLAMP_LESS(move, -speed);
+    if (move > 0.f) CLAMP_MORE(&move, speed);
+    else            CLAMP_LESS(&move, -speed);
 
     ent->v.angles.yaw = anglemod(current + move);
 }

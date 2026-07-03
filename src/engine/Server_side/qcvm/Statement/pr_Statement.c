@@ -27,6 +27,7 @@ void PR_PrintStatement(dStatement_p state) {
     // if ((uint32_t)state->op < (sizeof(_pr_opNames) / sizeof(_pr_opNames[0]))) {
     PR_PrintOperation(state->op);
 
+#if 0
     if ((state->op == OP_IF) ||
         (state->op == OP_IFNOT)
         )
@@ -42,6 +43,27 @@ void PR_PrintStatement(dStatement_p state) {
         if (state->b)   Con_Printf("%s", PR_GlobalString(state->b));
         if (state->c)   Con_Printf("%s", PR_GlobalStringNoContents(state->c));
     }
+#else
+    switch (state->op) {
+    case OP_IF:
+    case OP_IFNOT: { Con_Printf("%sbranch %i", PR_GlobalString(state->a), state->b); } break;
+    case OP_GOTO: { Con_Printf("branch %i", state->a); } break;
+    case OP_STORE_F:
+    case OP_STORE_V:
+    case OP_STORE_S:
+    case OP_STORE_ENT:
+    case OP_STORE_FLD:
+    case OP_STORE_FNC: {
+        Con_Printf("%s", PR_GlobalString(state->a));
+        Con_Printf("%s", PR_GlobalStringNoContents(state->b));
+    } break;
+    default: {
+        if (state->a)   Con_Printf("%s", PR_GlobalString(state->a));
+        if (state->b)   Con_Printf("%s", PR_GlobalString(state->b));
+        if (state->c)   Con_Printf("%s", PR_GlobalStringNoContents(state->c));
+    } break;
+    }
+#endif
     Con_Printf("\n");
 }
 

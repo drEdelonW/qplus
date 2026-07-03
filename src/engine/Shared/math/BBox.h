@@ -29,6 +29,13 @@ static inline bool BBoxIsValid(BBox_t bb) {
     return true;
 }
 
+static inline BBox_t BBoxFromVec3(vec3_t mins, vec3_t maxs) {
+    return (BBox_t) {
+        .mins = mins,
+        .maxs = maxs
+    };
+}
+
 static inline BBox_t BBoxTranslate(BBox_t bb, vec3_t offset) {
     return (BBox_t) {
         .mins = VectorAdd(bb.mins, offset),
@@ -59,4 +66,19 @@ static inline void BoundPoly(int numverts, vec3_p verts, BBox_p bb) {
 
 static inline vec3_t BBoxSize(BBox_t bb) {
     return VectorSubtract(bb.maxs, bb.mins);
+}
+
+static inline vec3_t BBoxMid(BBox_t bb) {
+    return VectorScale(VectorAdd(bb.mins, bb.maxs), 0.5f);
+}
+
+#include "progdefs.h"
+static inline BBox_t EvBBox(const entvars_t *ev){
+    return (BBox_t){ .mins = ev->mins, .maxs = ev->maxs };
+}
+
+static inline void EvSetBBox(entvars_t *ev, BBox_t bb){
+    ev->mins = bb.mins;
+    ev->maxs = bb.maxs;
+    ev->size = BBoxSize(bb);
 }

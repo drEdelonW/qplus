@@ -33,10 +33,7 @@ void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
 
 void Sys_Error(cStringRO error, ...) {
     printf("Sys_Error: ");
-    va_list argptr;
-    va_start(argptr, error); {
-        vprintf(error, argptr);
-    } va_end(argptr);
+    VA_P_EXPAND(error);
     printf("\n");
 
     exit(1);

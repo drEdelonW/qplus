@@ -48,6 +48,13 @@ typedef fixed16_t*  fixed16_p;
 
 #define FIXED_MID(a, b)         HALF(((a) + (b)))   // midpoint, stays in int
 
+#include "CLAMP.h"
+static inline int8_t float_to_fixed4_sat(float f) {
+    int v = (int)(f * FIXED4_ONE);
+    CLAMP(-128, &v, 127);
+    return (int8_t)v;
+}
+
 static inline fixed8_t fixed8_mul(fixed8_t a, fixed8_t b) {
     return (fixed8_t)(((int32_t)a * b) >> FIXED8_FRAC_BITS);
 }

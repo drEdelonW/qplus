@@ -195,7 +195,7 @@ void Con_DrawConsole(int32_t lines, bool drawinput) {
     for (int32_t i = (con.current - rows + 1); i <= con.current; i++, y += D_CHAR_HEIGHT) {
         int32_t j = i - con.backscroll;
 
-        CLAMP_LESS(j, 0);
+        CLAMP_LESS(&j, 0);
 
         cString text = con.text + (j % con.totallines) * con.linewidth;
 

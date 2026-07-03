@@ -72,10 +72,10 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
         int izi = (int)(zi * 0x8000 * FIXED16_ONE);
 
         fixed16_t s = (int)(sdivz * z) + sadjust;
-        CLAMP(0, s, bbextents);
+        CLAMP(0, &s, bbextents);
 
         fixed16_t t = (int)(tdivz * z) + tadjust;
-        CLAMP(0, t, bbextentt);
+        CLAMP(0, &t, bbextentt);
 
         do {
             // calculate s and t at the far end of the span

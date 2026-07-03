@@ -1,0 +1,6 @@
+SV_CreateAreaNode
+SV_ClearWorld
+SV_UnlinkEdict
+SV_FindTouchedLeafs
+SV_TouchLinks
+SV_LinkEdict

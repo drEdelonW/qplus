@@ -209,13 +209,7 @@ void Con_Print(cStringRO txt) {
 */
 void Con_DebugLog(cString file, cString fmt, ...) {
     char data[1024];
-#if 0
-    va_list argptr; va_start(argptr, fmt);
-        vsnprintf(data, sizeof(data), fmt, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(data, fmt);
-#endif
 
     int fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
     write(fd, data, strlen(data));
@@ -235,14 +229,7 @@ void Con_Printf(cStringRO fmt, ...) {
     static bool inupdate;
 
     char msg[MAXPRINTMSG];
-#if 0
-    va_list argptr; va_start(argptr, fmt);
-        vsnprintf(msg, sizeof(msg), fmt, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(msg, fmt);
-#endif
-
     // also echo to debugging console
     Host_Printf("%s", msg); // also echo to debugging console
 
@@ -286,14 +273,7 @@ void Con_DPrintf(cStringRO fmt, ...) {
         return;   // don't confuse non-developers with techie stuff...
 
     char msg[MAXPRINTMSG];
-#if 0
-    va_list argptr; va_start(argptr, fmt);
-        vsnprintf(msg, sizeof(msg), fmt, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(msg, fmt);
-#endif
-
     Con_Printf("%s", msg);
 }
 
@@ -307,13 +287,7 @@ void Con_DPrintf(cStringRO fmt, ...) {
 */
 void Con_SafePrintf(cStringRO fmt, ...) {
     char msg[1024]; 
-#if 0
-    va_list argptr; va_start(argptr, fmt);
-        vsnprintf(msg, sizeof(msg), fmt, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(msg, fmt);
-#endif
 
     int temp = scr.disabled_for_loading;
     scr.disabled_for_loading = true;

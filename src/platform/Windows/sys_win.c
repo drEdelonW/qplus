@@ -302,14 +302,15 @@ void Sys_Error(cStringRO error, ...) {
         VID_ForceUnlockedAndReturnState();
     }
 
-    va_list argptr;     va_start(argptr, error);
-    char text[1024];    vsnprintf(text, sizeof(text), error, argptr);
-    va_end(argptr);
+    char text[1024];
+    va_list argptr; va_start(argptr, error); {
+        vsnprintf(text, sizeof(text), error, argptr);
+    } va_end(argptr);
 
     if (isDedicated) {
-        va_start(argptr, error);
-        vsnprintf(text, sizeof(text), error, argptr);
-        va_end(argptr);
+        va_start(argptr, error); {
+            vsnprintf(text, sizeof(text), error, argptr);
+        } va_end(argptr);
 
         snprintf(text2, sizeof(text2), "ERROR: %s\n", text);
         WriteFile(houtput, text5, strlen(text5), &dummy, NULL);
@@ -359,9 +360,10 @@ void Sys_Printf(cStringRO fmt, ...) {
     DWORD   dummy;
 
     if (isDedicated) {
-        va_list argptr;     va_start(argptr, fmt);
-        char text[1024];    vsnprintf(text, sizeof(text), fmt, argptr);
-        va_end(argptr);
+        char text[1024];
+        va_list argptr; va_start(argptr, fmt); {
+            vsnprintf(text, sizeof(text), fmt, argptr);
+        } va_end(argptr);
 
         WriteFile(houtput, text, strlen(text), &dummy, NULL);
     }

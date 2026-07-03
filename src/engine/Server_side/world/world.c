@@ -19,33 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // world.c -- world query functions
 
-#include "world.h"
-#include <string.h>
-#include "server.h"
-#include "console.h"
-#include "q_tools.h"
-#include "mathlib.h"
-#include "progs.h"
-#include "host.h"
-#include "GlobVars.h"
-#include "BBox.h"
+#include "world_priv.h"
 
 /*
     entities never clip against themselves, or their owner
     line of sight checks trace->crosscontent, but bullets don't
 */
-
-typedef struct {
-    BBox_t  box;
-    BBox_t  mv;
-    BBox_t  m2;
-    vec3_t  start;
-    vec3_t  end;
-    trace_t trace;
-    phymovetype_t type;
-    edict_p passedict;
-} moveClip_t;
-typedef moveClip_t* moveClip_p;
 
 
 /*
@@ -144,10 +123,10 @@ Hull_p SV_HullForEntity(edict_p ent, BBox_t bb, vec3_p offset) {
     }
     else { // create a temp hull from bounding box sizes
 
-        hull = SV_HullForBox((BBox_t){
-            .mins = VectorSubtract(ent->v.mins, bb.maxs),
-            .maxs = VectorSubtract(ent->v.maxs, bb.mins)
-        });
+        hull = SV_HullForBox(BBoxFromVec3(
+                VectorSubtract(ent->v.mins, bb.maxs),
+                VectorSubtract(ent->v.maxs, bb.mins)
+        ));
 
         *offset = ent->v.origin;
     }
@@ -162,27 +141,10 @@ ENTITY AREA CHECKING
 
 ===============================================================================
 */
-typedef enum AreaAxis_e {
-    AXIS_LEAF = -1,// leaf node (no split)
-    AXIS_X = 0,    // split along X
-    AXIS_Y = 1     // split along Y
-} AreaAxis;
 
-typedef struct areaNode_s areaNode_t;
-typedef areaNode_t* areaNode_p;
-struct areaNode_s {
-    AreaAxis    axis;  // -1 = leaf node
-    float       dist;
-    areaNode_p  children[2];
-    link_t      trigger_edicts;
-    link_t      solid_edicts;
-};
+areaNode_t   _sv_AreaNodes[AREA_NODES];
+int          _sv_NumAreaNodes;
 
-#define AREA_DEPTH 4
-#define AREA_NODES 32
-
-static areaNode_t   _sv_AreaNodes[AREA_NODES];
-static int          _sv_NumAreaNodes;
 
 /*
 ===============
@@ -190,6 +152,7 @@ SV_CreateAreaNode
 
 ===============
 */
+#define AREA_DEPTH 4
 areaNode_p SV_CreateAreaNode(int depth, BBox_t bb) {
     areaNode_p anode = &_sv_AreaNodes[_sv_NumAreaNodes];
     _sv_NumAreaNodes++;
@@ -433,7 +396,7 @@ SV_HullPointContents
 
 ==================
 */
-int SV_HullPointContents(Hull_p hull, int num, vec3_t point) {
+contents_t SV_HullPointContents(Hull_p hull, int num, vec3_t point) {
     while (num >= 0) {
         if ((num < hull->firstclipnode) ||
             (num > hull->lastclipnode)
@@ -449,7 +412,7 @@ int SV_HullPointContents(Hull_p hull, int num, vec3_t point) {
                 ) -
             plane->dist;
 
-        num = node->children[(d < 0.0f) ? 1 : 0];
+        num = node->children[(d < 0.f) ? 1 : 0];
     }
 
     return num;
@@ -468,8 +431,7 @@ contents_t SV_PointContents(vec3_t point) {
     contents_t cont = SV_HullPointContents(&sv.worldmodel->hulls[0], 0, point);
     if ((cont <= CONTENTS_CURRENT_0) &&
         (cont >= CONTENTS_CURRENT_DOWN)
-        )
-        cont = CONTENTS_WATER;
+        )   cont = CONTENTS_WATER;
     return cont;
 }
 
@@ -488,10 +450,7 @@ This could be a lot more efficient...
 */
 edict_p SV_TestEntityPosition(edict_p ent) {
     trace_t trace = SV_Move(ent->v.origin,
-        (BBox_t){
-            .mins = ent->v.mins,
-            .maxs = ent->v.maxs
-        },
+        BBoxFromVec3(ent->v.mins, ent->v.maxs),
         ent->v.origin, MOVE_NORMAL, ent
     );
 
@@ -507,8 +466,7 @@ LINE TESTING IN HULLS
 ===============================================================================
 */
 
-// 1/32 epsilon to keep floating point happy
-#define DIST_EPSILON (0.03125f)
+#define DIST_EPSILON (0.03125f) /* 1/32 epsilon to keep floating point happy */
 
 /*
 ==================
@@ -555,18 +513,18 @@ bool SV_RecursiveHullCheck(
     }
 
 #if 1
-    if ((t1 >= 0.0f) && (t2 >= 0.0f))   return SV_RecursiveHullCheck(hull, node->children[0], p1f, p2f, p1, p2, trace);
-    if ((t1 < 0.0f) && (t2 < 0.0f))     return SV_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
+    if ((t1 >= 0.f) && (t2 >= 0.f))   return SV_RecursiveHullCheck(hull, node->children[0], p1f, p2f, p1, p2, trace);
+    if ((t1 < 0.f) && (t2 < 0.f))     return SV_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
 #else
     if (((t1 >= DIST_EPSILON) && (t2 >= DIST_EPSILON)) || ((t2 > t1) && (t1 >= 0)))     return SV_RecursiveHullCheck(hull, node->children[0], p1f, p2f, p1, p2, trace);
     if (((t1 <= -DIST_EPSILON) && (t2 <= -DIST_EPSILON)) || ((t2 < t1) && (t1 <= 0)))   return SV_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
 #endif
 
     // put the crosspoint DIST_EPSILON pixels on the near side
-    float  frac = (t1 + ((t1 < 0.f) ? DIST_EPSILON : -DIST_EPSILON)) /
+    float  frac =
+        (t1 + ((t1 < 0.f) ? DIST_EPSILON : -DIST_EPSILON)) /
         (t1 - t2);
-
-    CLAMP(0.f, frac, 1.f);
+    CLAMP(0.f, &frac, 1.f);
 
     float midf = p1f + (p2f - p1f) * frac;
 
@@ -582,7 +540,7 @@ bool SV_RecursiveHullCheck(
     if (SV_HullPointContents(sv_hullmodel, mid, node->children[side])
         == CONTENTS_SOLID) {
         Con_Printf("mid PointInHullSolid\n");        return false;
-    }
+}
 #endif
 
     if (SV_HullPointContents(hull, node->children[side ^ 1], mid) != CONTENTS_SOLID)    // go past the node
@@ -667,11 +625,11 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
                 .y = -DotProduct(end_l, right);
                 .z = DotProduct(end_l, up);
         }
-    }
+}
 #endif
 
     // trace a line through the apropriate clipping hull
-    SV_RecursiveHullCheck(hull, hull->firstclipnode, 0, 1, start_l, end_l, &trace);
+    SV_RecursiveHullCheck(hull, hull->firstclipnode, 0.f, 1.f, start_l, end_l, &trace);
 
 #ifdef QUAKE2
     // rotate endpos back to world frame of reference
@@ -734,8 +692,8 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
         if (touch->v.solid == SOLID_TRIGGER)    Host_SysError("Trigger in clipping list");
 
         if ((clip->type == MOVE_NOMONSTERS) &&
-            (touch->v.solid != SOLID_BSP))
-            continue;
+            (touch->v.solid != SOLID_BSP)
+            )   continue;
 
         if (
             (
@@ -751,8 +709,7 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
                 clip->passedict->v.size.x &&
                 !touch->v.size.x
                 )
-            )
-            continue; // points never interact
+            )   continue; // points never interact
 
         // might intersect, so do an exact clip
         if (clip->trace.allsolid)   return;
@@ -798,8 +755,8 @@ SV_MoveBounds
 */
 void SV_MoveBounds(vec3_t start, BBox_t bb, vec3_t end, BBox_p box) {
 #if 0
-// debug to test against everything
-        box = bbNull;
+    // debug to test against everything
+    box = bbNull;
 #else
     for (int i = 0; i < VECT_DIM; i++) {
         if (end.v[i] > start.v[i]) {

@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "progs.h"
-#include "progdefs.h"
 #include "GlobVars.h"
 #include <string.h>
 #include "console.h"
@@ -143,8 +142,11 @@ void PF_centerprint() {
     uint32_t entnum = G_EDICTNUM(OFS_PARM0);
     cString str = PF_VarString(1);
 
-    if ((entnum < 1) || (entnum > GetSvMaxClients())) {
-        Con_Printf("tried to sprint to a non-client\n");    return;
+    if ((entnum < 1) ||
+        (entnum > GetSvMaxClients())
+        ) {
+        Con_Printf("tried to sprint to a non-client\n");
+        return;
     }
 
     RmtClient_p client = &svs.clients[entnum - 1];

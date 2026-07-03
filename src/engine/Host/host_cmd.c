@@ -1031,7 +1031,7 @@ void Host_Spawn_f() {
     // and it won't happen if the game was just loaded, so you wind up
     // with a permanent head tilt
     edict_p ent = ED_GetEDictByIdx(1 + (uint32_t)(remoteClient - svs.clients));
-    MSG_WriteByte(pBuf, svc_setangle); MSG_WriteAngle(pBuf, ent->v.angles.pitch); MSG_WriteAngle(pBuf, ent->v.angles.pitch); MSG_WriteAngle(pBuf, 0);
+    MSG_WriteByte(pBuf, svc_setangle); { MSG_WriteAngle(pBuf, ent->v.angles.pitch); MSG_WriteAngle(pBuf, ent->v.angles.yaw); MSG_WriteAngle(pBuf, 0.f); };
 
     SV_WriteClientdataToMessage(sv_player, pBuf);
 

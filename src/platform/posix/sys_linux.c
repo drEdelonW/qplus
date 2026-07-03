@@ -37,13 +37,7 @@ void Sys_DebugNumber(int y, int val) {}
 #if 0
 void Sys_Printf(cStringRO fmt, ...) {
     char text[1024];
-#if 0
-    va_list argptr; va_start(argptr, fmt);
-        vsnprintf(text, sizeof(text), fmt, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(text, fmt);
-#endif
     fprintf(stderr, "%s", text);
 
     Con_Print(text);
@@ -57,14 +51,7 @@ void Sys_Printf(cStringRO fmt, ...) {
         return;
 
     char text[1024];
-#if 0
-    va_list argptr; va_start(argptr, fmt);
-        vsnprintf(text, sizeof(text), fmt, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(text, fmt);
-#endif
-
     l = strlen(text);
     t_p = text;
 
@@ -84,13 +71,7 @@ void Sys_Printf(cStringRO fmt, ...) {
 
 void Sys_Printf(cStringRO fmt, ...) {
     char text[1024];
-#if 0
-    va_list argptr; va_start(argptr, fmt);
-        vsnprintf(text, sizeof(text), fmt, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(text, fmt);
-#endif
 
     if (strlen(text) > sizeof(text))
         Sys_Error("memory overwrite in Sys_Printf");
@@ -136,13 +117,7 @@ void Sys_Error(cStringRO error, ...) {
     fcntl(0, F_SETFL, (fcntl(0, F_GETFL, 0) & ~FNDELAY));
 
     char string[1024];
-#if 0
-    va_list argptr; va_start(argptr, error);
-        vsnprintf(string, sizeof(string), error, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(string, error);
-#endif
     fprintf(stderr, "Error: %s\n", string);
 
     Host_Shutdown();
@@ -151,13 +126,7 @@ void Sys_Error(cStringRO error, ...) {
 
 void Sys_Warn(cStringRO warning, ...) {
     char string[1024];
-#if 0
-    va_list argptr; va_start(argptr, warning);
-        vsnprintf(string, sizeof(string), warning, argptr);
-    va_end(argptr);
-#else
     VA_EXPAND(string, warning);
-#endif
     fprintf(stderr, "Warning: %s", string);
 }
 

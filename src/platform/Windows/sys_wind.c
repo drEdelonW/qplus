@@ -74,7 +74,7 @@ int Sys_FileOpenRead(cString path, int* hndl) {
 
 int Sys_FileOpenWrite(cString path) {
     int i = findhandle();
-    FILE*  f = fopen(path, "wb");
+    FILE* f = fopen(path, "wb");
     if (!f)
         Sys_Error("Error opening %s: %s", path, strerror(errno));
     sys_handles[i] = f;
@@ -121,13 +121,14 @@ SYSTEM IO
 ===============================================================================
 */
 
-void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) { }
-void Sys_DebugLog(cString file, cString fmt, ...) { }
+void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
+void Sys_DebugLog(cString file, cString fmt, ...) {}
 
 void Sys_Error(cStringRO error, ...) {
-    va_list argptr;     va_start(argptr, error);
-    char text[1024];    vsnprintf(text, sizeof(text), error, argptr);
-    va_end(argptr);
+    char text[1024];
+    va_list argptr; va_start(argptr, error); {
+        vsnprintf(text, sizeof(text), error, argptr);
+    } va_end(argptr);
 
     //    MessageBox(NULL, text, "Error", 0 /* MB_OK */ );
     printf("ERROR: %s\n", text);
@@ -136,9 +137,7 @@ void Sys_Error(cStringRO error, ...) {
 }
 
 void Sys_Printf(cString fmt, ...) {
-    va_list argptr; va_start(argptr, fmt);
-    vprintf(fmt, argptr);
-    va_end(argptr);
+    VA_P_EXPAND(fmt);
 }
 
 void Sys_Quit() { exit(0); }

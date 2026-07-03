@@ -483,7 +483,7 @@ void R_DrawEntitiesOnList() {
                 }
 
                 // clamp lighting so it doesn't overbright as much
-                CLAMP_MORE(lighting.ambientlight, 128);
+                CLAMP_MORE(&lighting.ambientlight, 128);
 
                 if ((lighting.ambientlight + lighting.shadelight) > 192) // loop?
                     lighting.shadelight = 192 - lighting.ambientlight;
@@ -533,7 +533,7 @@ void R_DrawViewModel() {
 
     int j = R_LightPoint(currententity->origin);
 
-    CLAMP_LESS(j, 24);  // allways give some light on gun
+    CLAMP_LESS(&j, 24);  // allways give some light on gun
 
     r_viewlighting.ambientlight = j;
     r_viewlighting.shadelight = j;
@@ -552,7 +552,7 @@ void R_DrawViewModel() {
             r_viewlighting.ambientlight += add;
     }
 
-    CLAMP_LESS(r_viewlighting.ambientlight, 128);    // clamp lighting so it doesn't overbright as much
+    CLAMP_LESS(&r_viewlighting.ambientlight, 128);    // clamp lighting so it doesn't overbright as much
 
     if ((r_viewlighting.ambientlight + r_viewlighting.shadelight) > 192)
         r_viewlighting.shadelight = 192 - r_viewlighting.ambientlight;

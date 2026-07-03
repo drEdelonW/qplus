@@ -9,7 +9,7 @@
 #include "structs/Sound_struct.h" // TODO: fix name and kind of content
 #include "eFrag_pre.h"
 
-#define MAX_MAP_LEAFS           (8192)
+#define MAX_MAP_LEAFS   (8192) /* 8k */
 
 // it was [mleaf_t]
 struct mLeaf_s {    // TODO: merge in shared head structure with  mNode_s
@@ -36,8 +36,9 @@ typedef struct {
     int32_t contents;
     int32_t visofs;    // -1 = no visibility info
 
+    // TODO: wrap it to vec3i and BBoxi or some like this
     int16_t mins[3];   // for frustum culling
-    int16_t maxs[3];
+    int16_t maxs[3];   // for frustum culling
 
     uint16_t firstmarksurface;
     uint16_t nummarksurfaces;
