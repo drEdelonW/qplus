@@ -10,8 +10,8 @@
 
 
 bool standard_quake = true;
-bool rogue;
-bool hipnotic;
+bool rogue = false;
+bool hipnotic = false;
 
 int32_t  Registered = 1;  // only for startup check, then set
 

@@ -123,7 +123,7 @@ void CL_ParseStartSoundPacket() {
 
     uint8_t volume = (field_mask & SND_VOLUME) ?
         MSG_ReadByte() : DEFAULT_SOUND_PACKET_VOLUME;
-        
+
     float attenuation = (field_mask & SND_ATTENUATION) ?
         ((float)MSG_ReadByte() / 64.0f) : DEFAULT_SOUND_PACKET_ATTENUATION;
 
@@ -214,7 +214,8 @@ void CL_ParseServerInfo() {
     // parse maxClients
     cl.maxclients = MSG_ReadByte();
     if ((cl.maxclients < 1) ||
-        (cl.maxclients > MAX_SCOREBOARD)) {
+        (cl.maxclients > MAX_SCOREBOARD)
+        ) {
         Con_Printf("Bad maxClients (%u) from server\n", cl.maxclients);
         return;
     }
@@ -347,8 +348,9 @@ void CL_ParseUpdate(update_bits_t bits) {
         else        forcelink = true; // hack to make null model players work
 
 #ifdef GLQUAKE
-        if ((num > 0) && (num <= cl.maxclients))
-            R_TranslatePlayerSkin(num - 1);
+        if ((num > 0) &&
+            (num <= cl.maxclients)
+            )   R_TranslatePlayerSkin(num - 1);
 #endif
     }
 
@@ -367,8 +369,9 @@ void CL_ParseUpdate(update_bits_t bits) {
 
     if (skin != ent->skinnum) {
         ent->skinnum = skin;
-        if ((num > 0) && (num <= cl.maxclients))
-            R_TranslatePlayerSkin(num - 1);
+        if ((num > 0) &&
+            (num <= cl.maxclients)
+            )   R_TranslatePlayerSkin(num - 1);
     }
 
 #else
@@ -480,8 +483,8 @@ void CL_ParseClientdata(server_update_bits_t bits) {
 */
 void CL_NewTranslation(int32_t slot) {
     if ((slot < 0) ||
-        (slot > cl.maxclients))
-        Host_SysError("CL_NewTranslation: bad slot %d (max %d)", slot, cl.maxclients);
+        (slot > cl.maxclients)
+        )   Host_SysError("CL_NewTranslation: bad slot %d (max %d)", slot, cl.maxclients);
 
     uint8_p dest = cl.scores[slot].translations;
     uint8_p source = vid.colormap;

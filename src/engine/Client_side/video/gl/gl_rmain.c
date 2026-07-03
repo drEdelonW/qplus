@@ -421,11 +421,13 @@ void R_DrawAliasModel(r_Entity_p e) {
 
     // ZOID: never allow players to go totally black
     int i = currententity - cl_entities;
-    if ((i >= 1) && (i <= cl.maxclients) /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
-        if (ambientlight < 8.0f) {
-            ambientlight = 8.0f;
-            shadelight = 8.0f;
-        }
+    if ((i >= 1) &&
+        (i <= cl.maxclients) /* &&
+        !strcmp (currententity->model->name, "progs/player.mdl") */
+       )    if (ambientlight < 8.0f) {
+               ambientlight = 8.0f;
+               shadelight = 8.0f;
+           }
 
     // HACK HACK HACK -- no fullbright colors, so make torches full light
     if (!strcmp(clmodel->name, "progs/flame2.mdl") ||
@@ -439,17 +441,12 @@ void R_DrawAliasModel(r_Entity_p e) {
     shadelight = shadelight / 200.0f;
 
     float an = DEG2RAD(e->angles.yaw);
-#if 0
-    shadevector.x = cos(-an);
-    shadevector.y = sin(-an);
-    shadevector.z = 1;
-#else
+
     shadevector = (vec3_t){
         .x = cos(-an),
         .y = sin(-an),
-        .z = 1
+        .z = 1.f
     };
-#endif
     VectorNormalize(&shadevector);
 
     //

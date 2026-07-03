@@ -13,8 +13,8 @@ extern va_list argptr;
 #ifdef __cplusplus
 extern "C" {
 #endif
-    // does a varargs printf into a temp buffer
-    cString va(cStringRO format, ...); 
+
+    cString va(cStringRO format, ...); // does a varargs printf into a temp buffer
 
 #ifdef __cplusplus
 }

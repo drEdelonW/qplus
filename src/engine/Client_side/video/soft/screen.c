@@ -84,8 +84,9 @@ void SCR_ScreenShot_f() {
     //
     // find a file name to save it to
     //
-    char pcxname[80]; strcpy(pcxname, "quake00.pcx");
-
+    char pcxname[80];
+    strcpy(pcxname, "quake00.pcx");
+    // -- pcxname[5/6] is ^^ this positions
     for (int i = 0; i <= 99; i++) {
         pcxname[5] = (i / 10) + '0';
         pcxname[6] = (i % 10) + '0';

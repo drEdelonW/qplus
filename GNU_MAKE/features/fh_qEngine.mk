@@ -198,11 +198,16 @@ include features/fh_qRender$(QRND).mk
                                 SRC_LIST += $(WAD_DIR)/wad.c
 
                 $(eval STRUCT_DIR := $(SHARED_DIR)/structs) $(eval INCLUDES += $(STRUCT_DIR))
+                        $(eval PCX_DIR := $(STRUCT_DIR)/PCX) $(eval INCLUDES += $(PCX_DIR))
+                                SRC_LIST += $(PCX_DIR)/pcx.c
+
+                        $(eval TGA_DIR := $(STRUCT_DIR)/TGA) $(eval INCLUDES += $(TGA_DIR))
+                                SRC_LIST += $(TGA_DIR)/tga.c
+
                         $(eval BSP_DIR := $(STRUCT_DIR)/BSPtree) $(eval INCLUDES += $(BSP_DIR))
-                        SRC_LIST += $(STRUCT_DIR)/qPic.c
-                        SRC_LIST += $(STRUCT_DIR)/pcx.c
-                        SRC_LIST += $(STRUCT_DIR)/Plane.c
-                        SRC_LIST += $(STRUCT_DIR)/Light.c
+                                SRC_LIST += $(STRUCT_DIR)/qPic.c
+                                SRC_LIST += $(STRUCT_DIR)/Plane.c
+                                SRC_LIST += $(STRUCT_DIR)/Light.c
 
 
                 $(eval CUTILS_DIR = $(SHARED_DIR)/utils) $(eval INCLUDES += $(CUTILS_DIR))

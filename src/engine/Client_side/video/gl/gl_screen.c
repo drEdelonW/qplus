@@ -100,6 +100,8 @@ bool    scr_disabled_for_loading;
 ==============================================================================
 */
 
+#include "tga.h"
+
 /*
 ==================
 SCR_ScreenShot_f
@@ -126,7 +128,7 @@ void SCR_ScreenShot_f() {
         return;
     }
 
-
+#if 0
     uint8_p buffer = malloc(glwidth * glheight * 3 + 18);
     memset(buffer, 0, 18);
     buffer[2] = 2;        // uncompressed type
@@ -153,6 +155,24 @@ void SCR_ScreenShot_f() {
     COM_WriteFile(pcxname, buffer, glwidth * glheight * 3 + 18);
 
     free(buffer);
+#else
+    int buffSz = glwidth * glheight * 3;
+    uint8_p frBuff = malloc(buffSz);
+    glReadPixels(
+        glx, gly,
+        glwidth, glheight,
+        GL_RGB, GL_UNSIGNED_BYTE,
+        frBuff
+    );
+
+    WriteTGAfile(
+        pcxname, frBuff,
+        glwidth, glheight,
+        0, NULL
+    );
+    free(frBuff);
+
+#endif
     Con_Printf("Wrote %s\n", pcxname);
 }
 
