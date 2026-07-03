@@ -197,7 +197,7 @@ void R_ReadPointFile_f() {
 
         prt->org = org;
         prt->color = (-c) & 15;
-        prt->vel = vec3_origin;
+        prt->vel = v3Zero;
         prt->die = 99999;
         prt->type = pt_static;
     }
@@ -453,7 +453,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
         prt->next = _activeParticles;
         _activeParticles = prt;
 
-        prt->vel = vec3_origin;
+        prt->vel = v3Zero;
         prt->die = GetClSimTime() + 2;
 
         switch (type) {

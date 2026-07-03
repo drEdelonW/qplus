@@ -563,10 +563,10 @@ bool SV_RecursiveHullCheck(
 #endif
 
     // put the crosspoint DIST_EPSILON pixels on the near side
-    float  frac = (t1 + ((t1 < 0) ? DIST_EPSILON : -DIST_EPSILON)) /
+    float  frac = (t1 + ((t1 < 0.f) ? DIST_EPSILON : -DIST_EPSILON)) /
         (t1 - t2);
 
-    CLAMP(0.0, frac, 1.0);
+    CLAMP(0.f, frac, 1.f);
 
     float midf = p1f + (p2f - p1f) * frac;
 
@@ -598,7 +598,7 @@ bool SV_RecursiveHullCheck(
         trace->plane.dist = plane->dist;
     }
     else {
-        trace->plane.normal = VectorSubtract(vec3_origin, plane->normal);
+        trace->plane.normal = VectorSubtract(v3Zero, plane->normal);
         trace->plane.dist = -plane->dist;
     }
 
@@ -682,7 +682,7 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
             ent->v.angles.roll) &&
         (trace.fraction != 1)) {
         vec3_t forward, right, up;  AngleVectors(
-            VectorSubtract(vec3_origin, ent->v.angles),
+            VectorSubtract(v3Zero, ent->v.angles),
             &forward, &right, &up
         );
 
@@ -798,9 +798,8 @@ SV_MoveBounds
 */
 void SV_MoveBounds(vec3_t start, BBox_t bb, vec3_t end, BBox_p box) {
 #if 0
-    // debug to test against everything
-    boxmins = Scalar2Vector(-9999);
-    boxmaxs = Scalar2Vector(9999);
+// debug to test against everything
+        box = bbNull;
 #else
     for (int i = 0; i < VECT_DIM; i++) {
         if (end.v[i] > start.v[i]) {
@@ -825,10 +824,7 @@ trace_t SV_Move(vec3_t start, BBox_t bb, vec3_t end, phymovetype_t type, edict_p
         // .box = ,
         .mv = bb,
         .m2 = (type == MOVE_MISSILE) ?
-            ((BBox_t){
-                .mins = Scalar2Vector(-15.f),
-                .maxs = Scalar2Vector(15.f)
-            }) : bb,
+            BBoxSymmetric(15.f) : bb,
         .start = start,
         .end = end,
 

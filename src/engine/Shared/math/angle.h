@@ -32,6 +32,8 @@ typedef union {
 } ang3_t;
 typedef ang3_t* ang3_p;
 
+extern const ang3_t a3Zero; // zero angles;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

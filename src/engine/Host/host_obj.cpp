@@ -613,7 +613,7 @@ void Host::_Frame(float time) {
         CL_DecayLights();
     }
     else
-        S_Update(vec3_origin, vec3_origin, vec3_origin, vec3_origin);
+        S_Update(v3Zero, v3Zero, v3Zero, v3Zero);
 
     CDAudio_Update();
 

@@ -184,16 +184,10 @@ bool R_AliasCheckBBox() {
 
             // if one end is clipped and the other isn't, make a new point
             if (pv0->flags ^ pv1->flags) {
-                float frac =
-                    (ALIAS_Z_CLIP_PLANE - pa0->fv.z) /
-                    (pa1->fv.z - pa0->fv.z);
-                viewaux[numv].fv.x =
-                    pa0->fv.x +
-                    (pa1->fv.x - pa0->fv.x) * frac;
-                viewaux[numv].fv.y =
-                    pa0->fv.y +
-                    (pa1->fv.y - pa0->fv.y) * frac;
-                viewaux[numv].fv.z = ALIAS_Z_CLIP_PLANE;
+                float frac = (ALIAS_Z_CLIP_PLANE - pa0->fv.z) / (pa1->fv.z - pa0->fv.z);
+                viewaux[numv].fv.x = pa0->fv.x + (pa1->fv.x - pa0->fv.x) * frac;
+                viewaux[numv].fv.y = pa0->fv.y + (pa1->fv.y - pa0->fv.y) * frac;
+                viewaux[numv].fv.z = ALIAS_Z_CLIP_PLANE;    // TODO: make it in vector math
                 viewpts[numv].flags = 0;
                 numv++;
             }

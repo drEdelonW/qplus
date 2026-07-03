@@ -36,17 +36,6 @@ float speedscale;  // for top sky and bottom sky
 mSurface_p warpface;
 
 
-void BoundPoly(int numverts, vec3_p verts, BBox_p bb) {
-    bb->mins = Scalar2Vector(9999.0f);
-    bb->maxs = Scalar2Vector(-9999.0f);
-    for (int i = 0; i < numverts; i++) {
-        for (int j = 0; j < VECT_DIM; j++) {
-            CLAMP_LESS(bb->maxs.v[j], verts[i].v[j]);
-            CLAMP_MORE(bb->mins.v[j], verts[i].v[j]);
-        }
-    }
-}
-
 void SubdividePolygon(int numverts, vec3_p verts) {
     vec3_t front[64];
     vec3_t back[64];
@@ -359,7 +348,7 @@ void DrawSkyPolygon(int nump, vec3_p vecs) {
     return;
 #endif
     // decide which face it maps to
-    vec3_t v = vec3_origin;
+    vec3_t v = v3Zero;
     float_p vp = vecs->vx;
     for (int i = 0; i < nump; i++, vp += VECT_DIM) {
         v = VectorAdd(vp, v);   // v += vp;
@@ -510,6 +499,7 @@ void R_ClearSkyBox() {
         skymins[0][i] = skymins[1][i] = 9999;
         skymaxs[0][i] = skymaxs[1][i] = -9999;
     }
+    bbNull; // TODO: ...
 }
 
 

@@ -302,11 +302,13 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     bits |= SU_ITEMS;
 
     if ((int)ent->v.flags & FL_ONGROUND)    bits |= SU_ONGROUND;
-    if (ent->v.waterlevel >= 2)             bits |= SU_INWATER;
+    if (ent->v.waterlevel >= WL_Waist)      bits |= SU_INWATER;
+
     for (int i = 0; i < VECT_DIM; i++) {
         if (ent->v.punchangle.v[i])         bits |= (SU_PUNCH1 << i);
         if (ent->v.velocity.v[i])           bits |= (SU_VELOCITY1 << i);
     }
+
     if (ent->v.weaponframe)                 bits |= SU_WEAPONFRAME;
     if (ent->v.armorvalue)                  bits |= SU_ARMOR;
     if (ent->v.weapon)                      bits |= SU_WEAPON;

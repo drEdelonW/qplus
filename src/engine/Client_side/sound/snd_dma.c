@@ -851,7 +851,7 @@ void S_LocalSound(cString sound) {
         Con_Printf("S_LocalSound: can't cache %s\n", sound);
         return;
     }
-    S_StartSound(cl.viewentity, -1, sfx, vec3_origin, 1, 1);
+    S_StartSound(cl.viewentity, -1, sfx, v3Zero, 1, 1);
 }
 
 

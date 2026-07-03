@@ -1,6 +1,8 @@
 #include "angle.h"
 #include "fixed.h"
 
+const ang3_t a3Zero = { .pitch = 0.f, .yaw = 0.f, .roll = 0.f };
+
 Angle_t anglemod(Angle_t a) {
 #if 0
     if (a >= 0) a -= 360 * (int)(a / 360);

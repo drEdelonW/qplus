@@ -84,7 +84,7 @@ void SV_SetIdealPitch() {
             .z = top.z - 160.0f
         };
 
-        trace_t tr = SV_Move(top, BBoxOrig(), bottom, MOVE_NOMONSTERS, sv_player);
+        trace_t tr = SV_Move(top, bbZero, bottom, MOVE_NOMONSTERS, sv_player);
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
         if (tr.fraction == 1)   return; // near a dropoff
 
@@ -137,7 +137,7 @@ void SV_UserFriction() {
         .z = start.z - 34.0f
     };
 
-    trace_t trace = SV_Move(start, BBoxOrig(), stop, MOVE_NOMONSTERS, sv_player);
+    trace_t trace = SV_Move(start, bbZero, stop, MOVE_NOMONSTERS, sv_player);
 
     float friction;
     if (trace.fraction == 1.0f)     friction = sv_friction.value * sv_edgefriction.value;

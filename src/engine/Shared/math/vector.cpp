@@ -6,6 +6,8 @@
 /* UNDER CONSTRUCTION */
 /* Will be cleaned after all necessary functionality was bringup */
 
+const vec3_t v3Zero = { .x = 0.f, .y = 0.f, .z = 0.f };
+
 /*
 ** assumes "src" is normalized
 */

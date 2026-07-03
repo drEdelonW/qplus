@@ -89,7 +89,7 @@ realcheck:
         .z = start.z - 2 * STEPSIZE
     };
 #endif
-    trace_t trace = SV_Move(start, BBoxOrig(), stop, MOVE_NOMONSTERS, ent
+    trace_t trace = SV_Move(start, bbZero, stop, MOVE_NOMONSTERS, ent
     );
 
     if (trace.fraction == 1.0)
@@ -105,7 +105,7 @@ realcheck:
             start.y = stop.y = (y) ? maxs.y : mins.y;
 
 
-            trace = SV_Move(start, BBoxOrig(), stop, MOVE_NOMONSTERS, ent
+            trace = SV_Move(start, bbZero, stop, MOVE_NOMONSTERS, ent
             );
 
             if ((trace.fraction != 1.0) &&

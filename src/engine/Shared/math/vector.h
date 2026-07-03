@@ -53,6 +53,8 @@ typedef union {
 STATIC_ASSERT_SIZE(vec5_t, 5 * sizeof(vec_t));
 typedef vec5_t* vec5_p;
 
+extern const vec3_t v3Zero; // zero vector;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

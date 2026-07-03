@@ -42,11 +42,7 @@ mNode_p r_pefragtopnode;
 */
 
 efrag_ar    lastlink;
-#if 0
-vec3_t      r_emins, r_emaxs;
-#else
 BBox_t      r_entBB;
-#endif
 r_Entity_p  r_addent;
 
 

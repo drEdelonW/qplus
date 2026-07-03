@@ -148,38 +148,20 @@ void PF_setorigin() {
 }
 
 void SetMinMaxSize(edict_p edict, BBox_t bb, bool rotate) {
-    for (int i = 0; i < VECT_DIM; i++)
-        if (bb.mins.v[i] > bb.maxs.v[i])
-            PR_RunError("backwards mins/maxs");
+    if (!BBoxIsValid(bb))   PR_RunError("backwards mins/maxs");
 
+#if 0   // disabled because no rotation on map available
     rotate = false; // FIXME: implement rotation properly again
-
     BBox_t rbb;
-    if (!rotate) {
-        rbb = bb;
-    }
+    if (!rotate) { rbb = bb; }
     else {
         // find min / max for rotations
-        ang3_t angles = edict->v.angles;
+        float a = DEG2RAD(edict->v.angles.yaw);
+        vec3_t xvector = { .x = cosf(a), .y = sinf(a), .z = 0.f };
+        vec3_t yvector = { .x = -sinf(a), .y = cosf(a), .z = 0.f };
 
-        float a = DEG2RAD(angles.yaw);
-
-        float xvector[2] = {
-            (float)cos(a),
-            (float)sin(a)
-        };
-        float yvector[2] = {
-            (float)-sin(a),
-            (float)cos(a)
-        };
-
-        // float bounds[2][3];
-        vec3_t bounds[2];
-        bounds[0] = bb.mins;
-        bounds[1] = bb.maxs;
-
-        rbb.mins = Scalar2Vector(9999.0f);
-        rbb.maxs = Scalar2Vector(-9999.0f);
+        vec3_t bounds[2] = { bb.mins, bb.maxs };
+        rbb = bbNull;
 
         vec3_t base;
         for (int i = 0; i <= 1; i++) {
@@ -191,13 +173,11 @@ void SetMinMaxSize(edict_p edict, BBox_t bb, bool rotate) {
 
                     // transform the point
                     vec3_t transformed = {
-                        .x = xvector[X_AX] * base.x + yvector[X_AX] * base.y,
-                        .y = xvector[Y_AX] * base.x + yvector[Y_AX] * base.y,
+                        .x = (xvector.x * base.x) + (yvector.x * base.y),
+                        .y = (xvector.y * base.x) + (yvector.y * base.y),
                         .z = base.z
                     };
-                    for (int l = 0; l < VECT_DIM; l++) {
-                        CLAMP(rbb.mins.v[l], transformed.v[l], rbb.maxs.v[l]);
-                    }
+                    BBoxExpandPt(&rbb, transformed);
                 }
             }
         }
@@ -206,7 +186,11 @@ void SetMinMaxSize(edict_p edict, BBox_t bb, bool rotate) {
     // set derived values
     edict->v.mins = rbb.mins;
     edict->v.maxs = rbb.maxs;
-    edict->v.size = VectorSubtract(bb.maxs, bb.mins);
+#else
+    edict->v.mins = bb.mins;
+    edict->v.maxs = bb.maxs;
+#endif
+    edict->v.size = BBoxSize(bb);
 
     SV_LinkEdict(edict, false);
 }
@@ -222,7 +206,7 @@ setsize (entity, minvector, maxvector)
 */
 void PF_setsize() {
     edict_p edict = G_EDICT(OFS_PARM0);
-    BBox_t bb = { 
+    BBox_t bb = {
         .mins = G_VECTOR(OFS_PARM1),
         .maxs = G_VECTOR(OFS_PARM2)
     };
@@ -255,7 +239,7 @@ void PF_setmodel() {
     Model_p mod = sv.models[(int)edict->v.modelindex]; // Mod_ForName (m, true);
 
     if (mod)    SetMinMaxSize(edict, mod->BB, true);
-    else        SetMinMaxSize(edict, BBoxOrig(), true);
+    else        SetMinMaxSize(edict, bbZero, true);
 }
 
 /*
@@ -550,7 +534,7 @@ void PF_traceline() {
     phymovetype_t moveType = (int)G_FLOAT(OFS_PARM2);
     edict_p ent = G_EDICT(OFS_PARM3);
 
-    trace_t trace = SV_Move(v1, BBoxOrig(), v2, moveType, ent);
+    trace_t trace = SV_Move(v1, bbZero, v2, moveType, ent);
 
     pr_global_struct->trace_allsolid = trace.allsolid;
     pr_global_struct->trace_startsolid = trace.startsolid;
@@ -1101,7 +1085,7 @@ void PF_aim() {
     // try sending a trace straight
     vec3_t dir = pr_global_struct->v_forward;
     vec3_t end = VectorMA(start, 2048, dir);
-    trace_t tr = SV_Move(start, BBoxOrig(), end, MOVE_NORMAL, ent);
+    trace_t tr = SV_Move(start, bbZero, end, MOVE_NORMAL, ent);
     if (
         tr.ent &&
         (tr.ent->v.takedamage == DAMAGE_AIM) &&
@@ -1138,7 +1122,7 @@ void PF_aim() {
         float dist = DotProduct(dir, pr_global_struct->v_forward);
         if (dist < bestdist)    continue; // to far to turn
 
-        tr = SV_Move(start, BBoxOrig(), end, MOVE_NORMAL, ent);
+        tr = SV_Move(start, bbZero, end, MOVE_NORMAL, ent);
         if (tr.ent == check) { // can shoot at this one
             bestdist = dist;
             bestent = check;
@@ -1163,7 +1147,7 @@ PF_changeyaw
 This was a major timewaster in progs, so it was converted to C
 ==============
 */
-void PF_changeyaw() {
+void PF_changeyaw() { // TODO: solve by Ang3_tools
     edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
     float current = anglemod(ent->v.angles.yaw);
     float ideal = ent->v.ideal_yaw;
@@ -1174,7 +1158,7 @@ void PF_changeyaw() {
     if (ideal > current) { if (move >= 180)    move = move - 360; }
     else { ;               if (move <= -180)   move = move + 360; }
 
-    if (move > 0)   CLAMP_MORE(move, speed);
+    if (move > 0.f) CLAMP_MORE(move, speed);
     else            CLAMP_LESS(move, -speed);
 
     ent->v.angles.yaw = anglemod(current + move);
@@ -1318,14 +1302,6 @@ void PF_changelevel() {
 
 #ifdef QUAKE2
 
-#define CONTENT_WATER -3
-#define CONTENT_SLIME -4
-#define CONTENT_LAVA -5
-
-#define FL_IMMUNE_WATER 131072
-#define FL_IMMUNE_SLIME 262144
-#define FL_IMMUNE_LAVA 524288
-
 #define CHAN_VOICE 2
 #define CHAN_BODY 4
 
@@ -1349,8 +1325,8 @@ void PF_WaterMove() {
     float drownlevel = (self->v.deadflag == DEAD_NO) ? 3 : 1;
 
     int flags = (int)self->v.flags;
-    int waterlevel = (int)self->v.waterlevel;
-    int watertype = (int)self->v.watertype;
+    WaterLevel_t waterlevel = (int)self->v.waterlevel;
+    contents_t watertype = (int)self->v.watertype;
 
     if (!(flags & (FL_IMMUNE_WATER + FL_GODMODE)))
         if (
@@ -1385,7 +1361,7 @@ void PF_WaterMove() {
         return;
     }
 
-    if (watertype == CONTENT_LAVA) { // do damage
+    if (watertype == CONTENTS_LAVA) { // do damage
         if (!(flags & (FL_IMMUNE_LAVA + FL_GODMODE)))
             if (self->v.dmgtime < SV_GetTime()) {
                 if (self->v.radsuit_finished < SV_GetTime())     self->v.dmgtime = SV_GetTime() + 0.2;
@@ -1394,7 +1370,7 @@ void PF_WaterMove() {
                 damage = (float)(10 * waterlevel);
             }
     }
-    else if (watertype == CONTENT_SLIME) { // do damage
+    else if (watertype == CONTENTS_SLIME) { // do damage
         if (!(flags & (FL_IMMUNE_SLIME + FL_GODMODE)))
             if (self->v.dmgtime < SV_GetTime() && self->v.radsuit_finished < SV_GetTime()) {
                 self->v.dmgtime = SV_GetTime() + 1.0;
@@ -1405,9 +1381,9 @@ void PF_WaterMove() {
 
     if (!(flags & FL_INWATER)) {
         // player enter water sound
-        if (watertype == CONTENT_LAVA)  SV_StartSound(self, CHAN_BODY, "player/inlava.wav", 255, ATTN_NORM);
-        if (watertype == CONTENT_WATER) SV_StartSound(self, CHAN_BODY, "player/inh2o.wav", 255, ATTN_NORM);
-        if (watertype == CONTENT_SLIME) SV_StartSound(self, CHAN_BODY, "player/slimbrn2.wav", 255, ATTN_NORM);
+        if (watertype == CONTENTS_LAVA)  SV_StartSound(self, CHAN_BODY, "player/inlava.wav", 255, ATTN_NORM);
+        if (watertype == CONTENTS_WATER) SV_StartSound(self, CHAN_BODY, "player/inh2o.wav", 255, ATTN_NORM);
+        if (watertype == CONTENTS_SLIME) SV_StartSound(self, CHAN_BODY, "player/slimbrn2.wav", 255, ATTN_NORM);
 
         self->v.flags = (float)(flags | FL_INWATER);
         self->v.dmgtime = 0;
@@ -1492,40 +1468,40 @@ builtin_t pr_builtin[] = {
     PF_WriteEntity,
 
 #ifdef QUAKE2
-        PF_sin,
-        PF_cos,
-        PF_sqrt,
-        PF_changepitch,
-        PF_TraceToss,
-        PF_etos,
-        PF_WaterMove,
+    PF_sin,
+    PF_cos,
+    PF_sqrt,
+    PF_changepitch,
+    PF_TraceToss,
+    PF_etos,
+    PF_WaterMove,
 #else
-        PF_Fixme,
-        PF_Fixme,
-        PF_Fixme,
-        PF_Fixme,
-        PF_Fixme,
-        PF_Fixme,
-        PF_Fixme,
+    PF_Fixme,
+    PF_Fixme,
+    PF_Fixme,
+    PF_Fixme,
+    PF_Fixme,
+    PF_Fixme,
+    PF_Fixme,
 #endif
 
-        SV_MoveToGoal,
-        PF_precache_file,
-        PF_makestatic,
+    SV_MoveToGoal,
+    PF_precache_file,
+    PF_makestatic,
 
-        PF_changelevel,
-        PF_Fixme,
+    PF_changelevel,
+    PF_Fixme,
 
-        PF_cvar_set,
-        PF_centerprint,
+    PF_cvar_set,
+    PF_centerprint,
 
-        PF_ambientsound,
+    PF_ambientsound,
 
-        PF_precache_model,
-        PF_precache_sound, // precache_sound2 is different only for qcc
-        PF_precache_file,
+    PF_precache_model,
+    PF_precache_sound, // precache_sound2 is different only for qcc
+    PF_precache_file,
 
-        PF_setspawnparms
+    PF_setspawnparms
 };
 
 builtin_t* pr_builtins = pr_builtin;

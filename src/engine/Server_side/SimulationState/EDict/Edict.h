@@ -9,6 +9,13 @@
 
 #define MAX_EDICTS          600   /* FIXME: ouch! ouch! ouch! */
 
+typedef enum {
+    WL_None  = 0,   // not in water
+    WL_Feet  = 1,   // origin + mins.z + 1
+    WL_Waist = 2,   // origin + (mins.z + maxs.z) * 0.5
+    WL_Head  = 3,   // origin + view_ofs.z
+} WaterLevel_t;
+
 // edict->movetype values
 typedef enum {
     MOVETYPE_NONE           = 0u,  // never moves
@@ -70,6 +77,9 @@ typedef enum {
     FL_JUMPRELEASED     = 1u << 12,  // for jump debouncing
 #ifdef QUAKE2
     FL_FLASHLIGHT       = 1u << 13,
+    FL_IMMUNE_WATER     = 1u << 17
+    FL_IMMUNE_SLIME     = 1u << 18
+    FL_IMMUNE_LAVA      = 1u << 19
     FL_ARCHIVE_OVERRIDE = 1u << 20
 #endif
 } EntityFlags_t;   // sv_phys.c

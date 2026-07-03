@@ -233,7 +233,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
         );
 
         if (trace.allsolid) { // entity is trapped in another solid
-            ent->v.velocity = vec3_origin;
+            ent->v.velocity = v3Zero;
             return FLYMOVE_TRAPPED;
         }
 
@@ -270,7 +270,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
 
         // cliped to another plane
         if (numplanes >= MAX_CLIP_PLANES) { // this shouldn't really happen
-            ent->v.velocity = vec3_origin;
+            ent->v.velocity = v3Zero;
             return FLYMOVE_TRAPPED;
         }
 
@@ -300,7 +300,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
             else { // go along the crease
                 if (numplanes != 2) {
                     //    Con_Printf ("clip velocity, numplanes == %i\n",numplanes);
-                    ent->v.velocity = vec3_origin;
+                    ent->v.velocity = v3Zero;
                     return FLYMOVE_STUCK;
                 }
                 vec3_t dir = CrossProduct(planes[X_AX], planes[Y_AX]);
@@ -314,7 +314,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
         // to avoid tiny occilations in sloping corners
         //
         if (DotProduct(ent->v.velocity, primal_velocity) <= 0) {
-            ent->v.velocity = vec3_origin;
+            ent->v.velocity = v3Zero;
             return blocked;
         }
     }
@@ -516,7 +516,7 @@ void SV_PushRotate(edict_p pusher, float movetime) {
 
     vec3_t amove = VectorScale(pusher->v.avelocity, movetime);
 
-    vec3_t a = VectorSubtract(vec3_origin, amove);
+    vec3_t a = VectorSubtract(v3Zero, amove);
     vec3_t forward, right, up;  AngleVectors(a, forward, right, up);
 
     vec3_t pushorig = pusher->v.angles;
@@ -707,9 +707,20 @@ void SV_CheckStuck(edict_p ent) {
     for (int z = 0; z < 18; z++)
         for (int i = -1; i <= 1; i++)
             for (int j = -1; j <= 1; j++) {
+#if 0
                 ent->v.origin.x = org.x + (float)i;
                 ent->v.origin.y = org.y + (float)j;
                 ent->v.origin.z = org.z + (float)z;
+#else
+                ent->v.origin = VectorAdd(
+                    org,
+                    (vec3_t) {
+                        .x = (float)i,
+                        .y = (float)j,
+                        .z = (float)z
+                }
+                );
+#endif
                 if (!SV_TestEntityPosition(ent)) {
                     Con_DPrintf("Unstuck.\n");
                     SV_LinkEdict(ent, true);
@@ -728,11 +739,11 @@ SV_CheckWater
 =============
 */
 bool SV_CheckWater(edict_p ent) {
-    vec3_t point = ent->v.origin;{
+    vec3_t point = ent->v.origin; {
         point.z += ent->v.mins.z + 1.f;
     };
 
-    ent->v.waterlevel = 0;
+    ent->v.waterlevel = WL_None;
     ent->v.watertype = CONTENTS_EMPTY;
     contents_t cont = SV_PointContents(point);
     if (cont <= CONTENTS_WATER) {
@@ -740,15 +751,15 @@ bool SV_CheckWater(edict_p ent) {
         contents_t truecont = SV_TruePointContents(point);
 #endif
         ent->v.watertype = cont;
-        ent->v.waterlevel = 1;
+        ent->v.waterlevel = WL_Feet;
         point.z = ent->v.origin.z + (ent->v.mins.z + ent->v.maxs.z) * 0.5f;
         cont = SV_PointContents(point);
         if (cont <= CONTENTS_WATER) {
-            ent->v.waterlevel = 2;
+            ent->v.waterlevel = WL_Waist;
             point.z = ent->v.origin.z + ent->v.view_ofs.z;
             cont = SV_PointContents(point);
             if (cont <= CONTENTS_WATER)
-                ent->v.waterlevel = 3;
+                ent->v.waterlevel = WL_Head;
         }
 #ifdef QUAKE2
         if ((truecont <= CONTENTS_CURRENT_0) &&
@@ -768,11 +779,11 @@ bool SV_CheckWater(edict_p ent) {
                 150.0 * ent->v.waterlevel / 3.0,
                 current_table[CONTENTS_CURRENT_0 - truecont]
             );
-        }
-#endif
     }
+#endif
+}
 
-    return ent->v.waterlevel > 1;
+    return ent->v.waterlevel > WL_Feet;
 }
 
 /*
@@ -813,7 +824,7 @@ This is a hack, but in the interest of good gameplay...
 */
 MoveClipFlags_e SV_TryUnstick(edict_p ent, vec3_t oldvel) {
     vec3_t oldorg = ent->v.origin;
-    vec3_t dir = vec3_origin;
+    vec3_t dir = v3Zero;
 
     for (int i = 0; i < 8; i++) {
         // try pushing a little in an axial direction
@@ -847,7 +858,7 @@ MoveClipFlags_e SV_TryUnstick(edict_p ent, vec3_t oldvel) {
         ent->v.origin = oldorg;
     }
 
-    ent->v.velocity = vec3_origin;
+    ent->v.velocity = v3Zero;
     return FLYMOVE_STUCK;  // still not moving
 }
 
@@ -1072,7 +1083,7 @@ void SV_CheckWaterTransition(edict_p ent) {
 #endif
     if (!ent->v.watertype) { // just spawned here
         ent->v.watertype = (float)cont;
-        ent->v.waterlevel = 1;
+        ent->v.waterlevel = WL_Feet;
         return;
     }
 
@@ -1081,7 +1092,7 @@ void SV_CheckWaterTransition(edict_p ent) {
 
     if (cont <= CONTENTS_WATER) {
         ent->v.watertype = (float)cont;
-        ent->v.waterlevel = 1;
+        ent->v.waterlevel = WL_Feet;
     }
     else {
         ent->v.watertype = CONTENTS_EMPTY;
@@ -1183,8 +1194,8 @@ void SV_Physics_Toss(edict_p ent) {
             )) {
         ent->v.flags = (float)((int)((EntityFlags_t)ent->v.flags) | FL_ONGROUND);
         ent->v.groundentity = ED_GetEDictOffs(trace.ent);
-        ent->v.velocity = vec3_origin;
-        ent->v.avelocity = ang3_origin;
+        ent->v.velocity = v3Zero;
+        ent->v.avelocity = a3Zero;
 
     }
 
@@ -1236,7 +1247,7 @@ void SV_Physics_Step(edict_p ent) {
         (!((EntityFlags_t)ent->v.flags & FL_FLY)) &&
         (!(
             ((EntityFlags_t)ent->v.flags & FL_SWIM) &&
-            (ent->v.waterlevel > 0)
+            (ent->v.waterlevel > WL_None)
             ))) {
         hitsound = (ent->v.velocity[Z_AX] < (sv_gravity.value * -0.1));
         if (!inwater)   SV_AddGravity(ent);
@@ -1411,7 +1422,7 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
             p->die = 256;
             p->color = 15;
             p->type = pt_static;
-            p->vel = vec3_origin;
+            p->vel = v3Zero;
             p->org = tent->v.origin;
     }
 # endif

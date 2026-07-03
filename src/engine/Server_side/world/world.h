@@ -36,7 +36,8 @@ typedef struct {
 typedef struct {
     bool    allsolid;   // if true, plane is not valid
     bool    startsolid; // if true, the initial point was in a solid area
-    bool    inopen, inwater;
+    bool    inopen;
+    bool    inwater;
     float   fraction;   // time completed, 1.0 = didn't hit anything
     vec3_t  endpos;     // final position
     Plane_t plane;      // surface normal at impact

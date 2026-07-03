@@ -71,7 +71,7 @@ void Test_Spawn(vec3_t origin) {
 
     VectorNormalize(incoming);
     float d = DotProduct(incoming, plane->normal);
-    p->reflect = VectorSubtract(vec3_origin, incoming);
+    p->reflect = VectorSubtract(v3Zero, incoming);
     p->reflect = VectorMA(p->reflect, d * 2.0f, plane->normal);
 
     p->origin = origin;

@@ -83,7 +83,7 @@ void SCR_CenterPrint(cString str) {
 void SCR_DrawCenterString() {
     // the finale prints the characters one at a time
     int remaining = (isIntermission()) ?
-        scr_printspeed.value * (GetClSimTime() - _scr.centertime_start) : 9999;
+        (scr_printspeed.value * (GetClSimTime() - _scr.centertime_start)) : 9999;
 
     _scr.erase_center = 0;
     cString start = _scr.centerstring;

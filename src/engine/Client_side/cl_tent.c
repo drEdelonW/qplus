@@ -151,14 +151,14 @@ void CL_ParseTEnt() {
     TempEntEvent_t type = MSG_ReadByte();
     switch (type) {
     case TE_WIZSPIKE: {      // spike hitting wall
-        vec3_t  pos = MSG_ReadVector();
-        R_RunParticleEffect(pos, vec3_origin, 20, 30);
+        vec3_t pos = MSG_ReadVector();
+        R_RunParticleEffect(pos, v3Zero, 20, 30);
         S_StartSound(-1, 0, cl_sfx.wizhit, pos, 1, 1);
     } break;
 
     case TE_KNIGHTSPIKE: {      // spike hitting wall
-        vec3_t  pos = MSG_ReadVector();
-        R_RunParticleEffect(pos, vec3_origin, 226, 20);
+        vec3_t pos = MSG_ReadVector();
+        R_RunParticleEffect(pos, v3Zero, 226, 20);
         S_StartSound(-1, 0, cl_sfx.knighthit, pos, 1, 1);
     } break;
 
@@ -167,7 +167,7 @@ void CL_ParseTEnt() {
 #ifdef GLTEST
         Test_Spawn(pos);
 #else
-        R_RunParticleEffect(pos, vec3_origin, 0, 10);
+        R_RunParticleEffect(pos, v3Zero, 0, 10);
 #endif
         if (rand() % 5)         S_StartSound(-1, 0, cl_sfx.tink1, pos, 1, 1);
         else {
@@ -179,7 +179,7 @@ void CL_ParseTEnt() {
     } break;
     case TE_SUPERSPIKE: {    // super spike hitting wall
         vec3_t pos = MSG_ReadVector();
-        R_RunParticleEffect(pos, vec3_origin, 0, 20);
+        R_RunParticleEffect(pos, v3Zero, 0, 20);
 
         if (rand() % 5)     S_StartSound(-1, 0, cl_sfx.tink1, pos, 1, 1);
         else {
@@ -192,7 +192,7 @@ void CL_ParseTEnt() {
 
     case TE_GUNSHOT: {      // bullet hitting wall
         vec3_t pos = MSG_ReadVector();
-        R_RunParticleEffect(pos, vec3_origin, 0, 20);
+        R_RunParticleEffect(pos, v3Zero, 0, 20);
     } break;
 
     case TE_EXPLOSION: {      // rocket explosion
