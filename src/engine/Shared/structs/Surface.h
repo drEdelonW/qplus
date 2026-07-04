@@ -26,9 +26,8 @@ typedef union {
         vec2_t  lMap;   // 5, 6
     };
     float vf[7]; // TODO: make enum for [NAMED] access
-} glVert_t;
+} glVert_t;     STATIC_ASSERT_SIZE(glVert_t, 7 * sizeof(vec_t));
 typedef glVert_t* glVert_p;
-STATIC_ASSERT_SIZE(glVert_t, 7 * sizeof(vec_t));
 
 
 typedef struct glpoly_s glpoly_t;

@@ -32,9 +32,8 @@ typedef enum {
 
 typedef struct {
     AliasFrameType_t type;
-} dAliasFrameType_t;
+} dAliasFrameType_t;        STATIC_ASSERT_SIZE(dAliasFrameType_t, 4); // 4
 typedef dAliasFrameType_t* dAliasFrameType_p;
-STATIC_ASSERT_SIZE(dAliasFrameType_t, 4); // 4
 
 typedef struct {
 #ifdef GLQUAKE
@@ -100,9 +99,8 @@ typedef enum {
 
 typedef struct {
     AliasSkinType_t type;
-} dAliasSkinType_t;
+} dAliasSkinType_t;         STATIC_ASSERT_SIZE(dAliasSkinType_t, 4); // 4
 typedef dAliasSkinType_t* dAliasSkinType_p;
-STATIC_ASSERT_SIZE(dAliasSkinType_t, 4); // 4
 
 typedef struct {
     AliasSkinType_t type;
@@ -137,39 +135,34 @@ typedef struct {
     TriVertx_t  bboxmin;    // lightnormal isn't used
     TriVertx_t  bboxmax;    // lightnormal isn't used
     char        name[16];   // frame name from grabbing
-} dAliasFrame_t;
+} dAliasFrame_t;        STATIC_ASSERT_SIZE(dAliasFrame_t, 4*2 + 1*16); // 25
 typedef dAliasFrame_t* dAliasFrame_p;
-STATIC_ASSERT_SIZE(dAliasFrame_t, 4*2 + 1*16); // 25
 
 
 typedef struct {
     int32_t     numframes;
     TriVertx_t  bboxmin;    // lightnormal isn't used
     TriVertx_t  bboxmax;    // lightnormal isn't used
-} dAliasGroup_t;
+} dAliasGroup_t;        STATIC_ASSERT_SIZE(dAliasGroup_t, 4 + 4*2); // 12
 typedef dAliasGroup_t* dAliasGroup_p;
-STATIC_ASSERT_SIZE(dAliasGroup_t, 4 + 4*2); // 12
 
 
 typedef struct {
     int32_t numskins;
-} dAliasSkinGroup_t;
+} dAliasSkinGroup_t;    STATIC_ASSERT_SIZE(dAliasSkinGroup_t, 4); // 4
 typedef dAliasSkinGroup_t* dAliasSkinGroup_p;
-STATIC_ASSERT_SIZE(dAliasSkinGroup_t, 4); // 4
 
 
 typedef struct {
     float interval;
-} dAliasInterval_t;
+} dAliasInterval_t;     STATIC_ASSERT_SIZE(dAliasInterval_t, 4); // 4
 typedef dAliasInterval_t* dAliasInterval_p;
-STATIC_ASSERT_SIZE(dAliasInterval_t, 4); // 4
 
 
 typedef struct {
     float interval;
-} dAliasSkinInterval_t;
+} dAliasSkinInterval_t; STATIC_ASSERT_SIZE(dAliasSkinInterval_t, 4); // 4
 typedef dAliasSkinInterval_t* dAliasSkinInterval_p;
-STATIC_ASSERT_SIZE(dAliasSkinInterval_t, 4); // 4
 
 
 
@@ -189,9 +182,8 @@ typedef struct {
     SyncType_t  synctype;
     int32_t     flags;
     float       size;
-} Mdl_t;
+} Mdl_t;        STATIC_ASSERT_SIZE(Mdl_t, 9*4 + 2*4 + 3*12 + 4); // 84
 typedef Mdl_t* Mdl_p;
-STATIC_ASSERT_SIZE(Mdl_t, 9*4 + 2*4 + 3*12 + 4); // 84
 
 extern AliasHdr_p pheader;
 extern AliasHdr_p paliashdr;

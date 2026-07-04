@@ -73,9 +73,8 @@ typedef enum {
 
 typedef struct {
     SpriteFrameType_t type;
-} dSpriteFrameType_t;
+} dSpriteFrameType_t;       STATIC_ASSERT_SIZE(dSpriteFrameType_t, 4); // 4
 typedef dSpriteFrameType_t* dSpriteFrameType_p;
-STATIC_ASSERT_SIZE(dSpriteFrameType_t, 4); // 4
 
 typedef struct {
     SpriteFrameType_t   type;
@@ -107,28 +106,24 @@ typedef struct {
     int32_t     numframes;
     float       beamlength;
     SyncType_t  synctype;
-} dSprite_t;
+} dSprite_t;            STATIC_ASSERT_SIZE(dSprite_t, 4*8 + 4); // 
 typedef dSprite_t* dSprite_p;
-STATIC_ASSERT_SIZE(dSprite_t, 4*8 + 4); // 
 
 typedef struct {
     int32_t origin[2];
     int32_t width;
     int32_t height;
-} dSpriteFrame_t;
+} dSpriteFrame_t;       STATIC_ASSERT_SIZE(dSpriteFrame_t, 4*4); // 16
 typedef dSpriteFrame_t* dSpriteFrame_p;
-STATIC_ASSERT_SIZE(dSpriteFrame_t, 4*4); // 16
 
 typedef struct {
     int32_t numframes;
-} dSpriteGroup_t;
+} dSpriteGroup_t;       STATIC_ASSERT_SIZE(dSpriteGroup_t, 4); // 4
 typedef dSpriteGroup_t* dSpriteGroup_p;
-STATIC_ASSERT_SIZE(dSpriteGroup_t, 4); // 4
 
 typedef struct {
     float   interval;
-} dSpriteInterval_t;
+} dSpriteInterval_t;    STATIC_ASSERT_SIZE(dSpriteInterval_t, 4); // 4
 typedef dSpriteInterval_t* dSpriteInterval_p;
-STATIC_ASSERT_SIZE(dSpriteInterval_t, 4); // 4
 
 

@@ -22,7 +22,7 @@
 // Whole model
 //
 typedef struct {
-#if 1   // TODO: rework to BoundingBox
+#if 0   // TODO: rework to BoundingBox
     vec3_t  mins;
     vec3_t  maxs;
 #else
@@ -34,8 +34,7 @@ typedef struct {
     int32_t visleafs;  // not including the solid leaf 0
     int32_t firstface;
     int32_t numfaces;
-} dModel_t;
-STATIC_ASSERT_SIZE(dModel_t, 6*4 + 3*4 + 4*4 + 3*4); // 64
+} dModel_t;     STATIC_ASSERT_SIZE(dModel_t, 6*4 + 3*4 + 4*4 + 3*4); // 64
 typedef dModel_t* dModel_p;
 
 typedef enum {
@@ -73,14 +72,14 @@ struct Model_s {
     uint32_t numnodes;           mNode_p     nodes;
     uint32_t numtexinfo;         mTexInfo_p  texinfo;
     uint32_t numsurfaces;        mSurface_p  surfaces;
-    uint32_t numsurfedges;       int32_p     surfedges;
+    uint32_t numsurfedges;       int32_p     surfedges;     // TODO: find type of surfedges index
     uint32_t numclipnodes;       dClipNode_p clipnodes;
     uint32_t nummarksurfaces;    mSurface_ar marksurfaces;
     int32_t  numtextures;        Texture_p*  textures;
 
     Hull_t  hulls[MAX_MAP_HULLS];
     uint8_p visdata;
-    uint8_p lightdata;
+    uint8_p lightdata;  // TODO: pointer get index type
     cString entities;
     // additional model data
     CacheUser_t cache;  // only access through Mod_Extradata

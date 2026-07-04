@@ -14,9 +14,8 @@ typedef mVertex_t* mVertex_p;
 
 typedef struct {
     vec3_t point;
-} dVertex_t;
+} dVertex_t;        STATIC_ASSERT_SIZE(dVertex_t, 3*4); // 12
 typedef dVertex_t* dVertex_p;
-STATIC_ASSERT_SIZE(dVertex_t, 3*4); // 12
 
 
 typedef struct {

@@ -3,8 +3,7 @@
 #include <stdbool.h>
 
 
-typedef float vec_t;
-STATIC_ASSERT_SIZE(vec_t, sizeof(float));
+typedef float vec_t;    STATIC_ASSERT_SIZE(vec_t, sizeof(float));
 
 typedef enum {
     S_AX = 0u,
@@ -29,8 +28,7 @@ typedef union {
     struct { vec_t forward, side, up; };    // names for UserCmd_t
     // struct { float pitch, yaw, roll; }; // it move to ang3_t in angle.h
     vec_t v[VECT_DIM];
-} vec3_t;
-STATIC_ASSERT_SIZE(vec3_t, 3 * sizeof(vec_t));
+} vec3_t;       STATIC_ASSERT_SIZE(vec3_t, 3 * sizeof(vec_t));
 typedef vec3_t* vec3_p;
 
 

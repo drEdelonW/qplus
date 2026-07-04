@@ -44,7 +44,6 @@ typedef struct {
     uint16_t nummarksurfaces;
 
     uint8_t ambient_level[NUM_AMBIENTS];
-} dLeaf_t;
+} dLeaf_t;          STATIC_ASSERT_SIZE(dLeaf_t, 4*2 + 2*3*2 + 2*2 + 4); // 28
 typedef dLeaf_t* dLeaf_p;
-STATIC_ASSERT_SIZE(dLeaf_t, 4*2 + 2*3*2 + 2*2 + 4); // 28
 

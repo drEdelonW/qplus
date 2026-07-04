@@ -20,9 +20,8 @@ typedef struct {
 
     int32_t     numparms;
     uint8_t     parm_size[MAX_PARMS];
-} dFunction_t;
+} dFunction_t;      STATIC_ASSERT_SIZE(dFunction_t, 7*4 + 1*8); // 36
 typedef dFunction_t* dFunction_p;
-STATIC_ASSERT_SIZE(dFunction_t, 7*4 + 1*8); // 36
 
 extern dFunction_p  pr_functions;
 extern dFunction_p  pr_xFunction;

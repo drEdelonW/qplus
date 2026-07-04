@@ -344,8 +344,7 @@ void CL_RelinkEntities() {
             dLight_p dl = CL_AllocDlight(i);
             dl->origin = ent->origin;
             dl->origin.z += 16;
-            Basis_t bs = GetBasis(ent->angles);
-            dl->origin = VectorMA(dl->origin, 18, bs.forward);
+            dl->origin = VectorMA(dl->origin, 18, GetBasis(ent->angles).forward);
             dl->radius = (float)(200 + (rand() & 31));
             dl->minlight = 32;
             dl->die = (sSimTime_t)(GetClSimTime() + 0.1);

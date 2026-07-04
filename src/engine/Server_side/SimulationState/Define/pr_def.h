@@ -20,9 +20,8 @@ typedef struct {
                         // the variable needs to be saved in savegames
     uint16_t    ofs;
     string_t    s_name;
-} dDef_t;
+} dDef_t;       STATIC_ASSERT_SIZE(dDef_t, 2*2 + 4);    // 8
 typedef dDef_t* dDef_p;
-STATIC_ASSERT_SIZE(dDef_t, 2*2 + 4);    // 8
 
 extern dDef_p   pr_fielddefs;
 

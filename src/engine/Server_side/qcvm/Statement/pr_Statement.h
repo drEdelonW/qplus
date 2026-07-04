@@ -13,9 +13,8 @@ typedef struct {
     arg_type    a;
     arg_type    b;
     arg_type    c;
-} dStatement_t;
+} dStatement_t;     STATIC_ASSERT_SIZE(dStatement_t, 2*4);  // 8
 typedef dStatement_t* dStatement_p;
-STATIC_ASSERT_SIZE(dStatement_t, 2*4);  // 8
 
 
 

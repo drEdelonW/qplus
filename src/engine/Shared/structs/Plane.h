@@ -41,9 +41,8 @@ typedef struct {
     vec3_t      normal;
     float       dist;
     PlaneType_t type;  // PLANE_X - PLANE_ANYZ ?remove? trivial to regenerate
-} dPlane_t;
+} dPlane_t;     STATIC_ASSERT_SIZE(dPlane_t, 5 * 4); // 20
 typedef dPlane_t* dPlane_p;
-STATIC_ASSERT_SIZE(dPlane_t, 5 * 4); // 20
 
 #include "Lump.h"
 

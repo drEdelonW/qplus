@@ -39,9 +39,8 @@ struct Texture_s {
 typedef struct {
     int32_t nummiptex;
     int32_t dataOfs[MIPLEVELS]; // [nummiptex]
-} dMipTexLump_t;
+} dMipTexLump_t;        STATIC_ASSERT_SIZE(dMipTexLump_t, 4 + 4 * 4); // 20
 typedef dMipTexLump_t* dMipTexLump_p;
-STATIC_ASSERT_SIZE(dMipTexLump_t, 4 + 4 * 4); // 20
 
 typedef struct MipTex_s {
     char        name[16];

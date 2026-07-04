@@ -26,9 +26,8 @@ typedef enum {  // BSP Lumps
 typedef struct {
     int32_t version;
     Lump_t  lumps[HEADER_LUMPS];    // LumpType
-} dHeader_t;
+} dHeader_t;        STATIC_ASSERT_SIZE(dHeader_t, 4 + 15 * 8); // 124
 typedef dHeader_t* dHeader_p;
-STATIC_ASSERT_SIZE(dHeader_t, 4 + 15 * 8); // 124
 
 
 /*
@@ -62,10 +61,10 @@ STATIC_ASSERT_SIZE(dHeader_t, 4 + 15 * 8); // 124
 */
 void Mod_LoadVertexes(Lump_p Lump_in) {
     dVertex_p in = getMapLumpPtr(mod_base, Lump_in);
-    if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
+    if (Lump_in->fileLen % sizeof(dVertex_t))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
-    int count = Lump_in->fileLen / sizeof(*in);
-    mVertex_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
+    int count = Lump_in->fileLen / sizeof(dVertex_t);
+    mVertex_p out = Hunk_AllocName(sizeof(mVertex_t) * count, Mod_loadName);
 
     _loadModel->vertexes = out;
     _loadModel->numvertexes = count;
@@ -82,10 +81,10 @@ void Mod_LoadVertexes(Lump_p Lump_in) {
 */
 void Mod_LoadEdges(Lump_p Lump_in) {
     dEdge_p in = getMapLumpPtr(mod_base, Lump_in);
-    if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
+    if (Lump_in->fileLen % sizeof(dEdge_t))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
 
-    int count = Lump_in->fileLen / sizeof(*in);
-    mEdge_p out = Hunk_AllocName((count + 1) * sizeof(*out), Mod_loadName);
+    int count = Lump_in->fileLen / sizeof(dEdge_t);
+    mEdge_p out = Hunk_AllocName(sizeof(mEdge_t) * (count + 1), Mod_loadName);
 
     _loadModel->edges = out;
     _loadModel->numedges = count;
@@ -104,7 +103,11 @@ Mod_LoadSurfedges
 */
 void Mod_LoadSurfedges(Lump_p Lump_in) {
     int32_p in = getMapLumpPtr(mod_base, Lump_in);
-    if (Lump_in->fileLen % sizeof(*in))       Host_SysError("MOD_LoadBmodel: funny lump size in %s", _loadModel->name);
+    if (Lump_in->fileLen % sizeof(*in))
+        Host_SysError(
+            "MOD_LoadBmodel: funny lump size in %s",
+            _loadModel->name
+        );
 
     int count = Lump_in->fileLen / sizeof(*in);
     int32_p out = Hunk_AllocName(count * sizeof(*out), Mod_loadName);
@@ -123,7 +126,10 @@ Mod_LoadLighting
 =================
 */
 void Mod_LoadLighting(Lump_p Lump_in) {
-    if (!Lump_in->fileLen) { _loadModel->lightdata = NULL; return; }
+    if (!Lump_in->fileLen) {
+        _loadModel->lightdata = NULL;
+        return;
+    }
 
     _loadModel->lightdata = Hunk_AllocName(Lump_in->fileLen, Mod_loadName);
     memcpy(_loadModel->lightdata, getMapLumpPtr(mod_base, Lump_in), Lump_in->fileLen);
@@ -263,9 +269,9 @@ void Mod_LoadLeafs(Lump_p Lump_in) {
         if (out[i].contents != CONTENTS_EMPTY) {
             for (int j = 0; j < out[i].nummarksurfaces; j++)
                 out[i].firstmarksurface[j]->flags |= SURF_UNDERWATER;
-        }
-#endif
     }
+#endif
+}
 }
 
 
@@ -461,24 +467,24 @@ void Mod_LoadClipnodes(Lump_p Lump_in) {
     _loadModel->clipnodes = out;
     _loadModel->numclipnodes = count;
 
-    _loadModel->hulls[1] = (Hull_t) {
+    _loadModel->hulls[1] = (Hull_t){
         .clipnodes = out,
         .planes = _loadModel->planes,
         .firstclipnode = 0,
         .lastclipnode = count - 1,
         .clip = {
-            .mins = { .x = -16.0f, .y = -16.0f, .z = -24.0f },
-            .maxs = { .x =  16.0f, .y =  16.0f, .z =  32.0f }
+            .mins = {.x = -16.0f, .y = -16.0f, .z = -24.0f },
+            .maxs = {.x = 16.0f, .y = 16.0f, .z = 32.0f }
         }
     };
-    _loadModel->hulls[2] = (Hull_t) {
+    _loadModel->hulls[2] = (Hull_t){
         .clipnodes = out,
         .planes = _loadModel->planes,
         .firstclipnode = 0,
         .lastclipnode = count - 1,
         .clip = {
-            .mins = { .x = -32.0f, .y = -32.0f, .z = -24.0f },
-            .maxs = { .x =  32.0f, .y =  32.0f, .z =  64.0f },
+            .mins = {.x = -32.0f, .y = -32.0f, .z = -24.0f },
+            .maxs = {.x = 32.0f, .y = 32.0f, .z = 64.0f },
         }
     };
     for (int i = 0; i < count; i++) {
@@ -517,8 +523,8 @@ void Mod_LoadSubmodels(Lump_p Lump_in) {
     _loadModel->numSubModels = count;
 
     for (int i = 0; i < count; i++) {
-        out[i].mins = VectorAddScalar(LittleVector(in[i].mins), -1.f);
-        out[i].maxs = VectorAddScalar(LittleVector(in[i].maxs),  1.f);
+        out[i].bb.mins = VectorAddScalar(LittleVector(in[i].bb.mins), -1.f);
+        out[i].bb.maxs = VectorAddScalar(LittleVector(in[i].bb.maxs), 1.f);
         out[i].origin = LittleVector(in[i].origin);
 
         for (int j = 0; j < MAX_MAP_HULLS; j++)
@@ -566,12 +572,12 @@ void Mod_MakeHull0() {
 RadiusFromBounds
 =================
 */
-float RadiusFromBounds(vec3_t mins, vec3_t maxs) {
+float RadiusFromBounds(vec3_t mins, vec3_t maxs) {  // TODO: remake it with BBoxt tools
     vec3_t corner;
     for (int i = 0; i < VECT_DIM; i++) {
         corner.v[i] =
-            (fabs(mins.v[i]) > fabs(maxs.v[i])) ?
-            fabs(mins.v[i]) : fabs(maxs.v[i]);
+            (fabsf(mins.v[i]) > fabsf(maxs.v[i])) ?
+            fabsf(mins.v[i]) : fabsf(maxs.v[i]);
     }
 
     return Length(corner);
@@ -640,8 +646,7 @@ void Mod_LoadBrushModel(Model_p mod, TypeLess_ptr buffer) {
         mod->firstModelSurface = bm->firstface;
         mod->numModelSurfaces = bm->numfaces;
 
-        mod->BB.maxs = bm->maxs;
-        mod->BB.mins = bm->mins;
+        mod->BB = bm->bb;
         mod->radius = RadiusFromBounds(mod->BB.mins, mod->BB.maxs);
 
         mod->numleafs = bm->visleafs;

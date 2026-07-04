@@ -14,6 +14,5 @@ typedef struct {
     // lighting info
     uint8_t styles[MAXLIGHTMAPS];
     int32_t lightofs;   // start of [numstyles*surfsize] samples
-} dFace_t;
+} dFace_t;          STATIC_ASSERT_SIZE(dFace_t, 2*2 + 4 + 2*2 + 1*4 + 4); // 20
 typedef dFace_t* dFace_p;
-STATIC_ASSERT_SIZE(dFace_t, 2*2 + 4 + 2*2 + 1*4 + 4); // 20
