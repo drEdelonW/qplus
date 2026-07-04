@@ -72,3 +72,13 @@ static inline vec3_t BBoxMid(BBox_t bb) {
     return VectorScale(VectorAdd(bb.mins, bb.maxs), 0.5f);
 }
 
+static inline bool BBoxOverlaps(BBox_t a, BBox_t b) {
+    return !(
+        (a.mins.x > b.maxs.x) ||
+        (a.mins.y > b.maxs.y) ||
+        (a.mins.z > b.maxs.z) ||
+        (a.maxs.x < b.mins.x) ||
+        (a.maxs.y < b.mins.y) ||
+        (a.maxs.z < b.mins.z)
+    );
+}

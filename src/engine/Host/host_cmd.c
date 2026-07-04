@@ -381,7 +381,7 @@ void Host_Savegame_f() {
 
 
     ED_WriteGlobals(saveFile);
-    for (uint32_t i = 0; i < EdictsNum; i++) {
+    for (EdIdx i = EdictWorld; i < GetEdNum(); i++) {
         ED_Write(saveFile, ED_GetEDictByIdx(i));
         fflush(saveFile);
     }
@@ -502,7 +502,7 @@ void Host_Loadgame_f() {
         entnum++;
     }
 
-    EdictsNum = entnum;
+    SetEdNum(entnum);
     SV_SetTime(time);
 
     fclose(loadFile);
@@ -544,7 +544,7 @@ void SaveGamestate() {
     }
 
 
-    for (int i = GetSvMaxClients() + 1; i < EdictsNum; i++) {
+    for (EdIdx i = EdictWorld + GetSvMaxClients(); i < GetEdNum(); i++) {
         edict_p ent = ED_GetEDictByIdx(i);
         if ((int32_t)ent->v.flags & FL_ARCHIVE_OVERRIDE)
             continue;
@@ -620,7 +620,7 @@ int LoadGamestate(cString level, cString startspot) {
         if (!ent->free) SV_LinkEdict(ent, false);
     }
 
-    // EdictsNum = entnum;
+    // SetEdNum(entnum);
     SV_SetTime(time);
     fclose(loadGStFile);
 

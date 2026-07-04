@@ -296,8 +296,8 @@ SV_Physics_Client
 Player character actions
 ================
 */
-void SV_Physics_Client(edict_p ent, int num) {
-    if (!svs.clients[num - 1].active)   return;  // unconnected slot
+void SV_Physics_Client(edict_p ent, EdIdx clNum) {
+    if (!svs.clients[clNum - EdictPlayer1].active)   return;  // unconnected slot
 
     //
     // call standard client pre-think

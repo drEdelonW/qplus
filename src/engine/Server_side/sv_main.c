@@ -180,9 +180,9 @@ void SV_ClearDatagram() { SZ_Clear(&sv.datagram); }
     =============
 */
 void SV_CleanupEnts() {
-    edict_p ent = ED_GetEDictFirst();
-    for (int e = 1; e < EdictsNum; e++, ent = ED_GetEDictNext(ent)) {
-        ent->v.effects = (int)ent->v.effects & ~EF_MUZZLEFLASH;
+    for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
+        edict_p ent = ED_GetEDictByIdx(e);
+        ent->v.effects = ((int)ent->v.effects) & ~EF_MUZZLEFLASH;
     }
 }
 
@@ -351,12 +351,12 @@ void SV_SpawnServer(cString server
 
     // allocate server memory
     // WARNING!!! don't use [EdictSize] before PR_LoadProgs() called!!!
-    if (!EdictSize) Host_Error("EdictSize - not inited\n");
-    Edicts = Hunk_AllocName(EdictsMax * EdictSize, "edicts");
+    if (!GetEdictSize()) Host_Error("EdictSize - not inited\n");
+    Edicts = Hunk_AllocName(EdictMax * GetEdictSize(), "edicts");
     // sv.edicts = Edicts;
 
     // leave slots at start for clients only
-    EdictsNum = GetSvMaxClients() + 1;
+    SetEdNum(GetSvMaxClients() + 1);
     for (int i = 0; i < GetSvMaxClients(); i++) {
         svs.clients[i].edict = ED_GetEDictByIdx(i + 1);
     }

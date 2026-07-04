@@ -5,7 +5,7 @@
 #include "types.h"
 #include "assert.h"
 
-typedef uint16_t op_type;
+typedef uint16_t op_type;   // prog_operation_e
 typedef int16_t arg_type;   // should be signed int
 
 typedef struct {

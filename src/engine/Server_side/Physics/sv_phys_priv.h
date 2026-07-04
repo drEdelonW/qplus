@@ -57,7 +57,7 @@ bool            SV_CheckWater(edict_p ent);
 void            SV_WallFriction(edict_p ent, trace_p trace);
 MoveClipFlags_e SV_TryUnstick(edict_p ent, vec3_t oldvel);
 void            SV_WalkMove(edict_p ent);
-void            SV_Physics_Client(edict_p ent, int num);
+void            SV_Physics_Client(edict_p ent, EdIdx clNum);
 
 // sv_phys_ent.c
 void    SV_CheckWaterTransition(edict_p ent);

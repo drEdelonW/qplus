@@ -47,16 +47,20 @@ SV_CheckAllEnts
 */
 void SV_CheckAllEnts() {
     // see if any solid entities are inside the final position
-    edict_p check = ED_GetEDictFirst();
-    for (int e = 1; e < EdictsNum; e++, check = ED_GetEDictNext(check)) {
+    for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
+        edict_p check = ED_GetEDictByIdx(e);
+
         if (check->free) continue;
-        if (check->v.movetype == MOVETYPE_PUSH ||
-            check->v.movetype == MOVETYPE_NONE ||
+
+        switch ((movetype_t)check->v.movetype) {
 #ifdef QUAKE2
-            check->v.movetype == MOVETYPE_FOLLOW ||
+        case MOVETYPE_FOLLOW:
 #endif
-            check->v.movetype == MOVETYPE_NOCLIP)
-            continue;
+        case MOVETYPE_NONE:
+        case MOVETYPE_PUSH:
+        case MOVETYPE_NOCLIP:   continue;
+        default:    break;
+        }
 
         if (SV_TestEntityPosition(check))
             Con_Printf("entity in invalid position\n");
@@ -74,7 +78,7 @@ SV_Physics
 void SV_Physics() {
     // let the progs know that a new frame has started
     pr_global_struct->self = ED_GetEDictOffs(Edicts); // should be 0
-    pr_global_struct->other = ED_GetEDictOffs(Edicts); // should be 0
+    pr_global_struct->other = ED_GetEDictOffs(Edicts); // should be 0s
     pr_global_struct->time = (float)SV_GetTime();
     PR_ExecuteProgram(pr_global_struct->StartFrame);
 
@@ -82,16 +86,17 @@ void SV_Physics() {
 
     //
     // treat each object in turn
-    edict_p ent = Edicts;
-    for (int i = 0; i < EdictsNum; i++, ent = ED_GetEDictNext(ent)) {
+    for (EdIdx e = EdictWorld; e < GetEdNum(); e++) {
+        edict_p ent = ED_GetEDictByIdx(e);
+
         if (ent->free)  continue;
 
         if (pr_global_struct->force_retouch) {
             SV_LinkEdict(ent, true); // force retouch even for stationary
         }
 
-        if ((i > 0) && (i <= GetSvMaxClients())) {
-            SV_Physics_Client(ent, i);
+        if ((e > EdictWorld) && (e <= GetSvMaxClients())) {
+            SV_Physics_Client(ent, e);
         }
         else {
             switch ((movetype_t)ent->v.movetype) {

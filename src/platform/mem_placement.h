@@ -1,16 +1,14 @@
 #pragma once
 
 /* Use this macro to place objects into external SDRAM on STM32 target. */
-#if defined(STM32) && !defined(_MSC_VER)
-/* GCC / Clang for STM32 */
-#define PLACE_TO_SDRAM __attribute__((section(".sdram_data"), aligned(4)))
-#else
-/* Other platforms: ignore, keep default placement */
-#define PLACE_TO_SDRAM
+#if defined(STM32) && !defined(_MSC_VER)    /* GCC / Clang for STM32 */
+# define PLACE_TO_SDRAM __attribute__((section(".sdram_data"), aligned(4)))
+#else   /* Other platforms: ignore, keep default placement */
+# define PLACE_TO_SDRAM
 #endif
 
 #ifdef __weak
-#undef __weak
+# undef __weak
 #endif
-#   define __weak __attribute__((weak))
+#define __weak __attribute__((weak))
 

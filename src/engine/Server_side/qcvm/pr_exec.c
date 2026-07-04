@@ -218,64 +218,64 @@ void PR_ExecuteProgram(func_t fnum) {
     while (1) {
         stack++; // next statement
 
-        dStatement_p st = PR_GetStack(stack);
-        eval_p a = (eval_p)&pr_globals[st->a];
-        eval_p b = (eval_p)&pr_globals[st->b];
-        eval_p c = (eval_p)&pr_globals[st->c];
+        dStatement_p ST = PR_GetStack(stack);
+        eval_p A1 = (eval_p)&pr_globals[ST->a];
+        eval_p A2 = (eval_p)&pr_globals[ST->b];
+        eval_p R  = (eval_p)&pr_globals[ST->c];
 
         if (!--runaway)     PR_RunError("runaway loop error");
 
         pr_xFunction->profile++;
         _pr_xStatement = stack;
 
-        if (pr_trace)       PR_PrintStatement(st);
+        if (pr_trace)       PR_PrintStatement(ST);
 
         // Con_DPrintf("EXE[%s] a:0x%X b:0x%x\n",
-        //     _pr_opNames[st->op],
-        //     a->_int,
-        //     b->_int
+        //     _pr_opNames[ST->op],
+        //     A1->_int,
+        //     A2->_int
         // );
 
-        switch (st->op) {
+        switch (ST->op) {
             case OP_DONE:
             case OP_RETURN: {
-                G_FLOAT(OFS_RETURN + X_AX) = G_FLOAT(st->a + X_AX);
-                G_FLOAT(OFS_RETURN + Y_AX) = G_FLOAT(st->a + Y_AX);
-                G_FLOAT(OFS_RETURN + Z_AX) = G_FLOAT(st->a + Z_AX);
+                G_FLOAT(OFS_RETURN + X_AX) = G_FLOAT(ST->a + X_AX);
+                G_FLOAT(OFS_RETURN + Y_AX) = G_FLOAT(ST->a + Y_AX);
+                G_FLOAT(OFS_RETURN + Z_AX) = G_FLOAT(ST->a + Z_AX);
 
                 stack = PR_LeaveFunction();
                 if (_pr_Depth == exitdepth)
                     return;  // all done
             } break;
 
-            case OP_MUL_F:  c->_float = a->_float * b->_float;              break;
-            case OP_MUL_V:  c->_float = DotProduct(a->vector, b->vector);   break;
-            case OP_MUL_FV: c->vector = VectorScale(b->vector, a->_float);  break;
-            case OP_MUL_VF: c->vector = VectorScale(a->vector, b->_float);  break;
+            case OP_MUL_F:  R->_float = A1->_float * A2->_float;              break;
+            case OP_MUL_V:  R->_float = DotProduct(A1->vector, A2->vector);   break;
+            case OP_MUL_FV: R->vector = VectorScale(A2->vector, A1->_float);  break;
+            case OP_MUL_VF: R->vector = VectorScale(A1->vector, A2->_float);  break;
 
-            case OP_DIV_F:      c->_float = a->_float / b->_float;      break;
-            case OP_ADD_F:      c->_float = a->_float + b->_float;      break;
-            case OP_ADD_V: c->vector = VectorAdd(a->vector, b->vector); break;
+            case OP_DIV_F:      R->_float = A1->_float / A2->_float;      break;
+            case OP_ADD_F:      R->_float = A1->_float + A2->_float;      break;
+            case OP_ADD_V: R->vector = VectorAdd(A1->vector, A2->vector); break;
 
-            case OP_SUB_F:      c->_float = a->_float - b->_float;      break;
-            case OP_SUB_V: c->vector = VectorSubtract(a->vector, b->vector); break;
+            case OP_SUB_F:      R->_float = A1->_float - A2->_float;      break;
+            case OP_SUB_V: R->vector = VectorSubtract(A1->vector, A2->vector); break;
 
-            case OP_EQ_F:       c->_float = a->_float == b->_float;     break;
-            case OP_EQ_V:       c->_float = VectorCompare(a->vector, b->vector);    break;
-            case OP_EQ_S:       c->_float = !strcmp(PR_GetQString(a->string), PR_GetQString(b->string));        break;
-            case OP_EQ_E:       c->_float = (a->_int == b->_int);                   break;
-            case OP_EQ_FNC:     c->_float = a->function == b->function;             break;
+            case OP_EQ_F:       R->_float = A1->_float == A2->_float;     break;
+            case OP_EQ_V:       R->_float = VectorCompare(A1->vector, A2->vector);    break;
+            case OP_EQ_S:       R->_float = !strcmp(PR_GetQString(A1->string), PR_GetQString(A2->string));        break;
+            case OP_EQ_E:       R->_float = (A1->_int == A2->_int);                   break;
+            case OP_EQ_FNC:     R->_float = A1->function == A2->function;             break;
 
-            case OP_NE_F:       c->_float = a->_float != b->_float;                 break;
-            case OP_NE_V:       c->_float = !VectorCompare(a->vector, b->vector);   break;
-            case OP_NE_S:       c->_float = (float)strcmp(PR_GetQString(a->string), PR_GetQString(b->string));  break;
-            case OP_NE_E:       c->_float = a->_int != b->_int;         break;
-            case OP_NE_FNC:     c->_float = a->function != b->function; break;
+            case OP_NE_F:       R->_float = A1->_float != A2->_float;                 break;
+            case OP_NE_V:       R->_float = !VectorCompare(A1->vector, A2->vector);   break;
+            case OP_NE_S:       R->_float = (float)strcmp(PR_GetQString(A1->string), PR_GetQString(A2->string));  break;
+            case OP_NE_E:       R->_float = A1->_int != A2->_int;         break;
+            case OP_NE_FNC:     R->_float = A1->function != A2->function; break;
 
-            case OP_GE:         c->_float = a->_float >= b->_float;     break;
-            case OP_LE:         c->_float = a->_float <= b->_float;     break;
-            case OP_GT:         c->_float = a->_float > b->_float;      break;
-            case OP_LT:         c->_float = a->_float < b->_float;      break;
+            case OP_GE:         R->_float = A1->_float >= A2->_float;     break;
+            case OP_LE:         R->_float = A1->_float <= A2->_float;     break;
+            case OP_GT:         R->_float = A1->_float > A2->_float;      break;
+            case OP_LT:         R->_float = A1->_float < A2->_float;      break;
 
             //==================
 
@@ -284,25 +284,24 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_LOAD_ENT:
             case OP_LOAD_FLD:
             case OP_LOAD_FNC: {
-                edict_p ed = ED_GetEDictByOffs(a->edict);
+                edict_p ed = ED_GetEDictByOffs(A1->edict);
 #ifdef PARANOID
                 ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
-                a = (eval_p)((int32_p)&ed->v + b->_int);
-                c->_int = a->_int;
+                R->_int = (A1 = (eval_p)((int32_p)&ed->v + A2->_int))->_int;
             } break;
 
             case OP_LOAD_V: {
-                edict_p ed = ED_GetEDictByOffs(a->edict);
+                edict_p ed = ED_GetEDictByOffs(A1->edict);
 #ifdef PARANOID
                 ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
-                a = (eval_p)((int32_p)&ed->v + b->_int);
-                    c->vector = a->vector;
+                A1 = (eval_p)((int32_p)&ed->v + A2->_int);
+                    R->vector = A1->vector;
             } break;
 
             case OP_ADDRESS: {
-                edict_p ed = ED_GetEDictByOffs(a->edict);
+                edict_p ed = ED_GetEDictByOffs(A1->edict);
 #ifdef PARANOID
                 ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
@@ -311,10 +310,10 @@ void PR_ExecuteProgram(func_t fnum) {
                 )
                     PR_RunError("assignment to world entity");
 
-                // c->_int = (uint8_p)((int32_p)&ed->v + b->_int) - (uint8_p)Edicts;
+                // R->_int = (uint8_p)((int32_p)&ed->v + A2->_int) - (uint8_p)Edicts;
                 {
-                    eval_p ptr = (eval_p)((int32_p)&ed->v + b->_int);
-                    c->_int = (int32_t)((uintptr_t)ptr - (uintptr_t)Edicts);
+                    eval_p ptr = (eval_p)((int32_p)&ed->v + A2->_int);
+                    R->_int = (int32_t)((uintptr_t)ptr - (uintptr_t)Edicts);
                 }
             } break;
 
@@ -322,37 +321,31 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_STORE_S:
             case OP_STORE_ENT:
             case OP_STORE_FLD:  // integers
-            case OP_STORE_FNC:  b->_int = a->_int;          break;  // pointers
-            case OP_STORE_V:    b->vector = a->vector;      break;
+            case OP_STORE_FNC:  A2->_int = A1->_int;          break;  // pointers
+            case OP_STORE_V:    A2->vector = A1->vector;      break;
 
             case OP_STOREP_F:
             case OP_STOREP_S:
             case OP_STOREP_ENT:
             case OP_STOREP_FLD:  // integers
-            case OP_STOREP_FNC: {  // pointers
-                eval_p ptr = (eval_p)((uint8_p)Edicts + b->_int);
-                ptr->_int = a->_int;
-            } break;
-            case OP_STOREP_V: {
-                eval_p ptr = (eval_p)((uint8_p)Edicts + b->_int);
-                ptr->vector = a->vector;
-            } break;
+            case OP_STOREP_FNC: ((eval_p)((uint8_p)Edicts + A2->_int))->_int = A1->_int;        break;  // pointers
+            case OP_STOREP_V:   ((eval_p)((uint8_p)Edicts + A2->_int))->vector = A1->vector;    break;
 
             //==================
 
-            case OP_NOT_F:      c->_float = !a->_float;     break;
-            case OP_NOT_V:      c->_float = (!a->vector.x) && (!a->vector.y) && (!a->vector.z); break;
-            case OP_NOT_S:      c->_float = (!a->string) || (!(*PR_GetQString(a->string)));   break;        // c->_float = !a->string || !pr_strings[a->string];
-            case OP_NOT_ENT:    c->_float = (ED_GetEDictByOffs(a->edict) == Edicts);        break;
-            case OP_NOT_FNC:    c->_float = !a->function;   break;
+            case OP_NOT_F:      R->_float = !A1->_float;     break;
+            case OP_NOT_V:      R->_float = (!A1->vector.x) && (!A1->vector.y) && (!A1->vector.z); break;
+            case OP_NOT_S:      R->_float = (!A1->string) || (!(*PR_GetQString(A1->string)));   break;        // R->_float = !A1->string || !pr_strings[A1->string];
+            case OP_NOT_ENT:    R->_float = (ED_GetEDictByOffs(A1->edict) == Edicts);        break;
+            case OP_NOT_FNC:    R->_float = !A1->function;   break;
 
             case OP_IF: {
-                if (a->_int)
-                    stack += st->b - 1; // offset the stack++
+                if (A1->_int)
+                    stack += ST->b - 1; // offset the stack++
             } break;
             case OP_IFNOT: {
-                if (!a->_int)
-                    stack += st->b - 1; // offset the stack++
+                if (!A1->_int)
+                    stack += ST->b - 1; // offset the stack++
             } break;
 
             case OP_CALL0:
@@ -364,18 +357,17 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_CALL6:
             case OP_CALL7:
             case OP_CALL8: {
-                pr_argc = st->op - OP_CALL0;
-                if (!a->function)
+                pr_argc = ST->op - OP_CALL0;
+                if (!A1->function)
                     PR_RunError("NULL function");
 
-                dFunction_p newf = &pr_functions[a->function];
+                dFunction_p newf = &pr_functions[A1->function];
 
                 if (newf->first_statement < 0) { // negative statements are built in functions
                     int i = -(newf->first_statement);
-                    if (i >= pr_numbuiltins)
-                        PR_RunError("Bad builtin call number");
-                    if (pr_builtins[i] == PF_Fixme)
-                        PR_RunError("Not Implimented builtin call number[%d]", i);
+                    if (i >= pr_numbuiltins)        PR_RunError("Bad builtin call number");
+                    if (pr_builtins[i] == PF_Fixme) PR_RunError("Not Implimented builtin call number[%d]", i);
+
                     pr_builtins[i]();
                     break;
                 }
@@ -391,21 +383,21 @@ void PR_ExecuteProgram(func_t fnum) {
 #else
                     0.1f;
 #endif
-                if (a->_float != ed->v.frame)
-                    ed->v.frame = a->_float;
+                if (A1->_float != ed->v.frame)
+                    ed->v.frame = A1->_float;
 
-                ed->v.think = b->function;
+                ed->v.think = A2->function;
             } break;
 
-            case OP_GOTO:   stack += st->a - 1;     break;  // offset the stack++
+            case OP_GOTO:   stack += ST->a - 1;     break;  // offset the stack++
 
-            case OP_AND:    c->_float = a->_float && b->_float;     break;
-            case OP_OR:     c->_float = a->_float || b->_float;     break;
+            case OP_AND:    R->_float = A1->_float && A2->_float;     break;
+            case OP_OR:     R->_float = A1->_float || A2->_float;     break;
 
-            case OP_BITAND: c->_float = (int)a->_float & (int)b->_float;    break;
-            case OP_BITOR:  c->_float = (int)a->_float | (int)b->_float;    break;
+            case OP_BITAND: R->_float = (int)A1->_float & (int)A2->_float;    break;
+            case OP_BITOR:  R->_float = (int)A1->_float | (int)A2->_float;    break;
 
-            default:    PR_RunError("Bad opcode %i", st->op); break;
+            default:    PR_RunError("Bad opcode %i", ST->op); break;
         }
     }
 

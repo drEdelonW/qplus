@@ -39,12 +39,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "cvar_q1.h"
 
-uint32_t    EdictSize = 0;      // in bytes
-edict_p     Edicts;
-const EdIdx EdictsMax = EdictMax;
-EdIdx       EdictsNum;
-
-
+edict_p     Edicts;     // TODO: hide from public
+EdIdx       _EdictsNum;  // TODO: avoid public set
 
 /*
 =================
@@ -70,8 +66,8 @@ angles and bad trails.
 =================
 */
 edict_p ED_Alloc() {
-    EdIdx i = 1 + GetSvMaxClients(); // World + Clients
-    for (; i < EdictsNum; i++) {
+    EdIdx i = EdictPlayer1 + GetSvMaxClients(); // World + Clients
+    for (; i < GetEdNum(); i++) {
         edict_p edict = ED_GetEDictByIdx(i);
         // the first couple seconds of server time can involve a lot of
         // freeing and allocating, so relax the replacement policy
@@ -88,7 +84,7 @@ edict_p ED_Alloc() {
 
     if (i == EdictMax)          Host_SysError("ED_Alloc: no free edicts");
 
-    EdictsNum++;
+    SetEdNum(GetEdNum() + 1);
     edict_p edict = ED_GetEDictByIdx(i);
     ED_ClearEdict(edict);
 
@@ -227,7 +223,7 @@ void ED_Write(FILE* f, edict_p ed) {
     fprintf(f, "}\n");
 }
 
-void ED_PrintNum(uint32_t ent) {
+void ED_PrintNum(EdIdx ent) {
     ED_Print(ED_GetEDictByIdx(ent));
 }
 
@@ -239,8 +235,8 @@ For debugging, prints all the entities in the current server
 =============
 */
 void ED_PrintEdicts() {
-    Host_Printf("%i entities\n", EdictsNum);
-    for (uint32_t i = 0; i < EdictsNum; i++)
+    Host_Printf("%i entities\n", GetEdNum());
+    for (EdIdx i = EdictWorld; i < GetEdNum(); i++)
         ED_PrintNum(i);
 }
 
@@ -252,8 +248,8 @@ For debugging, prints a single edicy
 =============
 */
 void ED_PrintEdict_f() {
-    uint32_t i = (uint32_t)Q_atoi(Cmd_Argv(1));
-    if (i >= EdictsNum) { Host_Printf("Bad edict number\n"); return; }
+    EdIdx i = (EdIdx)Q_atoi(Cmd_Argv(1));
+    if (i >= GetEdNum()) { Host_Printf("Bad edict number\n"); return; }
     ED_PrintNum(i);
 }
 
@@ -269,7 +265,7 @@ void ED_Count() {
     int models = 0;
     int solid = 0;
     int step = 0;
-    for (uint32_t i = 0; i < EdictsNum; i++) {
+    for (EdIdx i = EdictWorld; i < GetEdNum(); i++) {
         edict_p ent = ED_GetEDictByIdx(i);
         if (ent->free)  continue;
 
@@ -279,7 +275,7 @@ void ED_Count() {
         if (ent->v.movetype == MOVETYPE_STEP)   step++;
     }
 
-    Host_Printf("num_edicts:%3i\n", EdictsNum);
+    Host_Printf("num_edicts:%3i\n", GetEdNum());
     Host_Printf("active    :%3i\n", active);
     Host_Printf("view      :%3i\n", models);
     Host_Printf("touch     :%3i\n", solid);
@@ -531,7 +527,7 @@ void ED_LoadFromFile(cString data) {
 }
 
 edict_p FindViewthing() {
-    for (uint32_t i = 0; i < EdictsNum; i++) {
+    for (EdIdx i = EdictWorld; i < GetEdNum(); i++) {
         edict_p eDict = ED_GetEDictByIdx(i);
         if (!strcmp(PR_GetQString(eDict->v.classname), "viewthing"))  return eDict;
     }

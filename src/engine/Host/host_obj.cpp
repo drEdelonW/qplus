@@ -150,6 +150,8 @@ void Host::Error(cString error, ...) {
 Host::FindMaxClients
 ================
 */
+#define MAX_CLIENT_LIMIT        4
+
 void Host::FindMaxClients() {
     svs.maxClients = 1;
 

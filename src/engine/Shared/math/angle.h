@@ -1,5 +1,6 @@
 #pragma once
 #include <math.h>   // sqrtf, fabsf
+#include <stdbool.h>   // sqrtf, fabsf
 
 #ifndef M_PI
 # define M_PI  (3.14159265358979323846) /* matches value in gcc v2 math.h */
@@ -76,4 +77,12 @@ static inline ang3_t AngleScale(ang3_t a, float s) {
         .yaw   = angledelta(a.yaw   * s),
         .roll  = angledelta(a.roll  * s)
     };
+}
+
+static inline bool AngleCompare(ang3_t const v1, ang3_t const v2) {
+    for (int i = 0; i < ANGLES_COUNT; i++)
+        if (v1.v[i] != v2.v[i])
+            return false;
+
+    return true;
 }

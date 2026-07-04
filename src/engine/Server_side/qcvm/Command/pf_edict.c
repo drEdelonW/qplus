@@ -47,13 +47,13 @@ void PF_Find() {
     edict_p first = Edicts;
     edict_p second = first;
     edict_p last = second;
-    edict = G_EDICTNUM(OFS_PARM0);
+    EdIdx edict = G_EDICTNUM(OFS_PARM0);
     int f = G_INT(OFS_PARM1);
     cString str = G_STRING(OFS_PARM2);
     if (!str)
         PR_RunError("PF_Find: bad search string");
 
-    for (int edict++; edict < EdictsNum; edict++) {
+    for (edict++; edict < GetEdNum(); edict++) {
         edict_p ed = ED_GetEDictByIdx(edict);
         if (ed->free)
             continue;
@@ -78,13 +78,13 @@ void PF_Find() {
     }
     RETURN_EDICT(first);
 #else
-    uint32_t edict = G_EDICTNUM(OFS_PARM0);
-    int f = G_INT(OFS_PARM1);
+    EdIdx edict = G_EDICTNUM(OFS_PARM0);
+    qVmString_t f = G_INT(OFS_PARM1);
     cString str = G_STRING(OFS_PARM2);
     if (!str)
         PR_RunError("PF_Find: bad search string");
 
-    for (edict++; edict < EdictsNum; edict++) {
+    for (edict++; edict < GetEdNum(); edict++) {
         edict_p ed = ED_GetEDictByIdx(edict);
         if (ed->free)   continue;
         cString t = E_STRING(ed, f);
@@ -115,11 +115,12 @@ void PF_findradius() {
     vec3_t org = G_VECTOR(OFS_PARM0);
     float rad = G_FLOAT(OFS_PARM1);
 
-    edict_p ent = ED_GetEDictFirst();
-    for (int i = 1; i < EdictsNum; i++, ent = ED_GetEDictNext(ent)) {
+    for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
+        edict_p ent = ED_GetEDictByIdx(e);
+
         if ((ent->free) ||
-            (ent->v.solid == SOLID_NOT))
-            continue;
+            (ent->v.solid == SOLID_NOT)
+            )   continue;
 
         vec3_t eorg = VectorSubtract(org,
             VectorAdd(ent->v.origin,
@@ -145,10 +146,10 @@ entity nextent(entity)
 =============
 */
 void PF_nextent() {
-    uint32_t i = G_EDICTNUM(OFS_PARM0);
+    EdIdx i = G_EDICTNUM(OFS_PARM0);
     while (1) {
         i++;
-        if (i == EdictsNum) { RETURN_EDICT(Edicts); return; }
+        if (i == GetEdNum()) { RETURN_EDICT(Edicts); return; }
         edict_p ent = ED_GetEDictByIdx(i);
         if (!ent->free) { RETURN_EDICT(ent); return; }
     }
@@ -366,14 +367,14 @@ name checkclient()
 // int c_invis, c_notvis;
 void PF_checkclient() {
     // find a new check if on a new frame
-    if (SV_GetTime() - sv.lastchecktime >= 0.1) {
+    if ((SV_GetTime() - sv.lastchecktime) >= 0.1) {
         sv.lastcheck = PF_newcheckclient(sv.lastcheck);
         sv.lastchecktime = SV_GetTime();
     }
 
     // return check if it might be visible
     edict_p ent = ED_GetEDictByIdx(sv.lastcheck);
-    if (ent->free ||
+    if ((ent->free) ||
         (ent->v.health <= 0)
         ) {
         RETURN_EDICT(Edicts);

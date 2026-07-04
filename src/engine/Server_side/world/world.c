@@ -124,8 +124,8 @@ Hull_p SV_HullForEntity(edict_p ent, BBox_t bb, vec3_p offset) {
     else { // create a temp hull from bounding box sizes
 
         hull = SV_HullForBox(BBoxFromVec3(
-                VectorSubtract(ent->v.mins, bb.maxs),
-                VectorSubtract(ent->v.maxs, bb.mins)
+            VectorSubtract(ent->v.mins, bb.maxs),
+            VectorSubtract(ent->v.maxs, bb.mins)
         ));
 
         *offset = ent->v.origin;
@@ -227,13 +227,20 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
             (touch->v.solid != SOLID_TRIGGER))
             continue;
 
+#if 0
         if ((ent->v.absmin.x > touch->v.absmax.x) ||
             (ent->v.absmin.y > touch->v.absmax.y) ||
             (ent->v.absmin.z > touch->v.absmax.z) ||
             (ent->v.absmax.x < touch->v.absmin.x) ||
             (ent->v.absmax.y < touch->v.absmin.y) ||
-            (ent->v.absmax.z < touch->v.absmin.z))
+            (ent->v.absmax.z < touch->v.absmin.z)
+            )   continue;
+#else
+        BBox_t entBB   = { .mins = ent->v.absmin,   .maxs = ent->v.absmax };
+        BBox_t touchBB = { .mins = touch->v.absmin, .maxs = touch->v.absmax };
+        if (!BBoxOverlaps(entBB, touchBB))
             continue;
+#endif
 
         int old_self = pr_global_struct->self;
         int old_other = pr_global_struct->other;
@@ -261,12 +268,13 @@ SV_FindTouchedLeafs
 
 ===============
 */
+#include "BBox_tools.h"
 void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
     if (node->contents == CONTENTS_SOLID)       return;
 
     // add an efrag if the node is a leaf
     if (node->contents < CONTENTS_NODE) {
-        if (ent->num_leafs == MAX_ENT_LEAFS)    return;
+        if (ent->num_leafs == EntLeafsMax)      return;
 
         mLeaf_p leaf = (mLeaf_p)node;
         int32_t leafnum = leaf - sv.worldmodel->leafs - 1;
@@ -277,6 +285,7 @@ void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
     }
 
     // NODE_MIXED
+    // BBox_t _bb = EvBBox(&ent->v);
     BBox_t _bb = {
         .mins = ent->v.absmin,
         .maxs = ent->v.absmax
@@ -353,7 +362,7 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     }
 
     // link to PVS leafs
-    ent->num_leafs = 0;
+    ent->num_leafs = EntLeafsFirst;
     if (ent->v.modelindex)
         SV_FindTouchedLeafs(ent, sv.worldmodel->nodes);
 
@@ -448,11 +457,9 @@ SV_TestEntityPosition
 This could be a lot more efficient...
 ============
 */
+#include "BBox_tools.h"
 edict_p SV_TestEntityPosition(edict_p ent) {
-    trace_t trace = SV_Move(ent->v.origin,
-        BBoxFromVec3(ent->v.mins, ent->v.maxs),
-        ent->v.origin, MOVE_NORMAL, ent
-    );
+    trace_t trace = SV_Move(ent->v.origin, EvBBox(&ent->v), ent->v.origin, MOVE_NORMAL, ent);
 
     return (trace.startsolid) ? Edicts : NULL;
 }
@@ -540,7 +547,7 @@ bool SV_RecursiveHullCheck(
     if (SV_HullPointContents(sv_hullmodel, mid, node->children[side])
         == CONTENTS_SOLID) {
         Con_Printf("mid PointInHullSolid\n");        return false;
-}
+    }
 #endif
 
     if (SV_HullPointContents(hull, node->children[side ^ 1], mid) != CONTENTS_SOLID)    // go past the node
@@ -625,7 +632,7 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
                 .y = -DotProduct(end_l, right);
                 .z = DotProduct(end_l, up);
         }
-}
+    }
 #endif
 
     // trace a line through the apropriate clipping hull

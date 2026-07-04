@@ -88,10 +88,11 @@ void SV_PushMove(edict_p pusher, float movetime) {
 
     // see if any solid entities are inside the final position
     int num_moved = 0;
-    edict_p check = ED_GetEDictFirst();
     edict_p moved_edict[EdictMax];
     vec3_t  moved_from[EdictMax];
-    for (int e = 1; e < EdictsNum; e++, check = ED_GetEDictNext(check)) {
+
+    for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
+        edict_p check = ED_GetEDictByIdx(e);
         if (check->free)    continue;
 
         switch ((movetype_t)check->v.movetype) {
@@ -209,10 +210,12 @@ void SV_PushRotate(edict_p pusher, float movetime) {
 
     // see if any solid entities are inside the final position
     int num_moved = 0;
-    edict_p check = ED_GetEDictFirst();
     edict_p moved_edict[EdictMax];
     vec3_t  moved_from[EdictMax];
-    for (int e = 1; e < EdictsNum; e++, check = ED_GetEDictNext(check)) {
+
+    for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
+        edict_p check = ED_GetEDictByIdx(e);
+
         if (check->free)    continue;
 
         if (check->v.movetype == MOVETYPE_PUSH ||

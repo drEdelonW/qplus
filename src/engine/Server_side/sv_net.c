@@ -81,12 +81,13 @@ void SV_StartSound(edict_p entity, SndCh_t channel, cString sample, uint8_t volu
 
     // directed messages go only to the entity the are targeted on
     MSG_WriteByte(&sv.datagram, svc_sound); { /* !!SEQUENCE MATTER!! */
-                                        MSG_WriteByte(&sv.datagram, (uint8_t)field_mask);
-    if (field_mask & SND_VOLUME)        MSG_WriteByte(&sv.datagram, volume);
-    if (field_mask & SND_ATTENUATION)   MSG_WriteByte(&sv.datagram, (uint8_t)(attenuation * 64));
-                                        MSG_WriteShort(&sv.datagram, (int16_t)((ED_GetEDictIdx(entity) << 3) | channel)); /* wire: [15..3] entity idx | [2..0] channel */
-                                        MSG_WriteByte(&sv.datagram, (uint8_t)sound_num);
-                                        MSG_WriteVector(&sv.datagram, VectorAdd(entity->v.origin, BBoxMid(EvBBox(&entity->v))));
+    /* blank comments below align columns AND suppress -Wmisleading-indentation */
+    /*                                   */ MSG_WriteByte(&sv.datagram, (uint8_t)field_mask);
+    if (field_mask & SND_VOLUME) /*      */ MSG_WriteByte(&sv.datagram, volume);
+    if (field_mask & SND_ATTENUATION) /* */ MSG_WriteByte(&sv.datagram, (uint8_t)(attenuation * (255 / AtnMax)));
+    /*                                   */ MSG_WriteShort(&sv.datagram, (int16_t)((ED_GetEDictIdx(entity) << 3) | channel)); /* wire: [15..3] entity idx | [2..0] channel */
+    /*                                   */ MSG_WriteByte(&sv.datagram, (uint8_t)sound_num);
+    /*                                   */ MSG_WriteVector(&sv.datagram, VectorAdd(entity->v.origin, BBoxMid(EvBBox(&entity->v))));
     }
 }
 
@@ -157,8 +158,9 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     uint8_p pvs = SV_FatPVS(org);
 
     // send over all entities (excpet the client) that touch the pvs
-    edict_p ent = ED_GetEDictFirst();
-    for (int e = 1; e < EdictsNum; e++, ent = ED_GetEDictNext(ent)) {
+    for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
+        edict_p ent = ED_GetEDictByIdx(e);
+
 #ifdef QUAKE2
         // don't send if flagged for NODRAW and there are no lighting effects
         if (ent->v.effects == EF_NODRAW)
@@ -171,11 +173,11 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
             // if (!ent->v.modelindex || !pr_strings[ent->v.model])    continue;
             if (!ent->v.modelindex || !PR_GetQString(ent->v.model)[0])    continue;
 
-            int i = 0;
+            EntLeaf_t i = EntLeafsFirst;
             for (; i < ent->num_leafs; i++)
                 if (pvs[EIGHTH(ent->leafnums[i])] & (1 << (ent->leafnums[i] & 7))) break;
 
-            if (i == ent->num_leafs) continue;    // not visible
+            if (i == ent->num_leafs)    continue;    // not visible
         }
 
         if (msg->maxsize - msg->cursize < 16) { Con_Printf("packet overflow\n"); return; }
@@ -420,15 +422,14 @@ void SV_UpdateToReliableMessages() {
     ================
 */
 void SV_CreateBaseline() {
-
-    for (uint32_t entnum = 0; entnum < EdictsNum; entnum++) {
+    for (EdIdx entnum = EdictWorld; entnum < GetEdNum(); entnum++) {
         // get the current server version
         edict_p svent = ED_GetEDictByIdx(entnum);
         if ((svent->free) ||
-            ((entnum > GetSvMaxClients()) &&
+            (
+                (entnum > GetSvMaxClients()) &&
                 !(svent->v.modelindex))
-            )
-            continue;
+            )   continue;
 
         //
         // create entity baseline
@@ -445,15 +446,15 @@ void SV_CreateBaseline() {
         }
         else {
             svent->baseline.colormap = 0;
-            svent->baseline.modelindex =
-                SV_ModelIndex(PR_GetQString(svent->v.model));
+            svent->baseline.modelindex = SV_ModelIndex(PR_GetQString(svent->v.model));
         }
 
         //
         // add to the message
         //
-        MSG_WriteByte(&sv.signon, svc_spawnbaseline);   MSG_WriteShort(&sv.signon, (int16_t)entnum);
+        MSG_WriteByte(&sv.signon, svc_spawnbaseline);
 
+        MSG_WriteShort(&sv.signon, (int16_t)entnum);
         MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.modelindex);
         MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.frame);
         MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.colormap);

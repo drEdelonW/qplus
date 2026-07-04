@@ -174,7 +174,7 @@ void PF_aim() {
     if (
         tr.ent &&
         (tr.ent->v.takedamage == DAMAGE_AIM) &&
-        (!teamplay.value ||
+        (!(teamplay.value) ||
             (ent->v.team <= 0) ||
             (ent->v.team != tr.ent->v.team))
         ) {
@@ -187,8 +187,9 @@ void PF_aim() {
     float bestdist = sv_aim.value;
     edict_p bestent = NULL;
 
-    edict_p check = ED_GetEDictFirst();
-    for (int i = 1; i < EdictsNum; i++, check = ED_GetEDictNext(check)) {
+    for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
+        edict_p check = ED_GetEDictByIdx(e);
+
         if ((check->v.takedamage != DAMAGE_AIM) ||
             (check == ent) ||
             (teamplay.value &&
@@ -271,7 +272,6 @@ void PF_changepitch() {
 
 
 #ifdef QUAKE2
-
 
 void PF_WaterMove() {
     float damage = 0.f;

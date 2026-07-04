@@ -25,8 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define MAX_SOUNDS              (256)   /* uint8_max so they cannot be blindly increased */
 
-static const uint8_t VolFull   = 255; /* full volume */
 static const uint8_t VolSilent =   0; /* silent */
+static const uint8_t VolFull   = 255; /* full volume */
 
 static const float AtnNone = 0.f;  /* no attenuation - full volume everywhere */
 static const float AtnNorm = 1.f;  /* default attenuation - normal */

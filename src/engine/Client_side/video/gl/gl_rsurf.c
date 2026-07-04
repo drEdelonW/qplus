@@ -363,10 +363,10 @@ void R_DrawSequentialPoly(mSurface_p s) {
                     BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
                     lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
                 );
-                theRect->l = BLOCK_WIDTH;
-                theRect->t = BLOCK_HEIGHT;
-                theRect->h = 0;
-                theRect->w = 0;
+                *theRect = (glRect_t){
+                    .l = BLOCK_WIDTH,
+                    .t = BLOCK_HEIGHT
+                };
             }
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
             glBegin(GL_POLYGON); {
@@ -459,21 +459,24 @@ void R_DrawSequentialPoly(mSurface_p s) {
                 BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
                 lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
             );
-            theRect->l = BLOCK_WIDTH;
-            theRect->t = BLOCK_HEIGHT;
-            theRect->h = 0;
-            theRect->w = 0;
+            *theRect = (glRect_t){
+                .l = BLOCK_WIDTH,
+                .t = BLOCK_HEIGHT
+            };
         }
+        sRealTime_t rt = GetRealTime();
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
         glBegin(GL_TRIANGLE_FAN); {
             for (int i = 0; i < p->numverts; i++) {
                 glVert_t v = p->verts[i];
+                vec3_t tv = VectorAddVal(VectorScale(v.v, 0.05f), rt);
+                float t = sinf(tv.z) * 8.f;
                 qglMTexCoord2fSGIS(TEXTURE0_SGIS, v.vf[3], v.vf[4]);
                 qglMTexCoord2fSGIS(TEXTURE1_SGIS, v.vf[5], v.vf[6]);
 
                 vec3_t nv = {
-                    .x = v.v.x + 8 * sin(v.v.y * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
-                    .y = v.v.y + 8 * sin(v.v.x * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
+                    .x = v.v.x + sinf(tv.y) * t,
+                    .y = v.v.y + sinf(tv.x) * t,
                     .z = v.v.z
                 };
                 glVertex3fv(nv.v);
@@ -505,16 +508,19 @@ Warp the vertex coordinates
 ================
 */
 void DrawGLWaterPoly(glpoly_p p) {
+    sRealTime_t rt = GetRealTime();
     GL_DisableMultitexture();
 
     glBegin(GL_TRIANGLE_FAN); {
         for (int i = 0; i < p->numverts; i++) {
             glVert_t v = p->verts[i];
+            vec3_t tv = VectorAddVal(VectorScale(v.v, 0.05f), rt);
+            float t = sinf(tv.z) * 8.f;
             glTexCoord2f(v.vf[3], v.vf[4]);
 
             vec3_t nv = {
-                .x = v.v.x + 8 * sin(v.v.y * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
-                .y = v.v.y + 8 * sin(v.v.x * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
+                .x = v.v.x + sinf(tv.y) * t,
+                .y = v.v.y + sinf(tv.x) * t,
                 .z = v.v.z
             };
 
@@ -524,16 +530,19 @@ void DrawGLWaterPoly(glpoly_p p) {
 }
 
 void DrawGLWaterPolyLightmap(glpoly_p p) {
+    sRealTime_t rt = GetRealTime();
     GL_DisableMultitexture();
 
     glBegin(GL_TRIANGLE_FAN); {
         for (int i = 0; i < p->numverts; i++) {
             glVert_t v = p->verts[i];
+            vec3_t tv = VectorAddVal(VectorScale(v.v, 0.05f), rt);
+            float t = sinf(tv.z) * 8.f;
             glTexCoord2f(v.vf[5], v.vf[6]);
 
             vec3_t nv = {
-                .x = v.v.x + 8 * sin(v.v.y * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
-                .y = v.v.y + 8 * sin(v.v.x * 0.05 + GetRealTime()) * sin(v.v.z * 0.05 + GetRealTime()),
+                .x = v.v.x + sinf(tv.y) * t,
+                .y = v.v.y + sinf(tv.x) * t,
                 .z = v.v.z
             };
 
@@ -590,28 +599,30 @@ void R_BlendLightmaps() {
 #if 0
             glTexImage2D(
                 GL_TEXTURE_2D, 0, _lightMapBytes,
-                BLOCK_WIDTH, BLOCK_HEIGHT, 0,
-                gl_lightmap_format, GL_UNSIGNED_BYTE,
+                BLOCK_WIDTH, BLOCK_HEIGHT,
+                0, gl_lightmap_format,
+                GL_UNSIGNED_BYTE,
                 lightmaps + i * BLOCK_WIDTH * BLOCK_HEIGHT * _lightMapBytes
             );
             glTexImage2D(
                 GL_TEXTURE_2D, 0, _lightMapBytes,
-                BLOCK_WIDTH, theRect->h, 0,
-                gl_lightmap_format, GL_UNSIGNED_BYTE,
+                BLOCK_WIDTH, theRect->h,
+                0, gl_lightmap_format,
+                  GL_UNSIGNED_BYTE,
                 lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
             );
 #else
             glTexSubImage2D(
-                GL_TEXTURE_2D, 0, 0, theRect->t,
-                BLOCK_WIDTH, theRect->h, gl_lightmap_format, GL_UNSIGNED_BYTE,
+                GL_TEXTURE_2D, 0,
+                0, theRect->t,
+                BLOCK_WIDTH, theRect->h,
+                gl_lightmap_format, GL_UNSIGNED_BYTE,
                 lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
             );
 #endif
-            * theRect = (glRect_t){
+            *theRect = (glRect_t){
                 .l = BLOCK_WIDTH,
                 .t = BLOCK_HEIGHT,
-                .h = 0,
-                .w = 0
             };
         }
         for (; p; p = p->chain) {
@@ -633,7 +644,7 @@ void R_BlendLightmaps() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     else if (gl_lightmap_format == GL_INTENSITY) {
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glColor4f(1.f, 1.f, 1.f, 1.f);
     }
 
     glDepthMask(1);        // back to normal Z buffering
@@ -762,6 +773,7 @@ R_MirrorChain
 void R_MirrorChain(mSurface_p s) {
     if (mirror)
         return;
+
     mirror = true;
     mirror_plane = s->plane;
 }
@@ -822,12 +834,11 @@ void R_DrawWaterSurfaces() {
     //
     // go back to the world matrix
     //
-
     glLoadMatrixf(r_world_matrix);
 
-    if (r_wateralpha.value < 1.0) {
+    if (r_wateralpha.value < 1.f) {
         glEnable(GL_BLEND);
-        glColor4f(1, 1, 1, r_wateralpha.value);
+        glColor4f(1.f, 1.f, 1.f, r_wateralpha.value);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
 
@@ -843,7 +854,6 @@ void R_DrawWaterSurfaces() {
         waterchain = NULL;
     }
     else {
-
         for (int i = 0; i < cl.worldmodel->numtextures; i++) {
             Texture_p t = cl.worldmodel->textures[i];
             if (!t)         continue;
@@ -862,7 +872,6 @@ void R_DrawWaterSurfaces() {
 
             t->texturechain = NULL;
         }
-
     }
 
     if (r_wateralpha.value < 1.0) {
@@ -889,7 +898,6 @@ void DrawTextureChains() {
             R_DrawSkyChain(skychain);
             skychain = NULL;
         }
-
         return;
     }
 
@@ -935,21 +943,19 @@ void R_DrawBrushModel(r_Entity_p e) {
     Model_p clmodel = e->model;
     bool rotated;
 
-    if (e->angles.pitch ||
-        e->angles.yaw ||
-        e->angles.roll
-        ) {
+    if (!AngleCompare(e->angles, a3Zero)) {
         rotated = true;
-
-        BBox_t bb = BBoxFromVec3(
-            VectorAddVal(e->origin, -clmodel->radius),
-            VectorAddVal(e->origin, +clmodel->radius)
-        );
-        if (R_CullBox(bb))     return;
+        if (R_CullBox(BBoxTranslate(
+            BBoxSymmetric(clmodel->radius),
+            e->origin))
+        )   return;
     }
     else {
         rotated = false;
-        if (R_CullBox(BBoxTranslate(clmodel->BB, e->origin)))     return;
+        if (R_CullBox(BBoxTranslate(
+            clmodel->BB,
+            e->origin))
+        )   return;
     }
 
     glColor3f(1, 1, 1);
@@ -969,8 +975,7 @@ void R_DrawBrushModel(r_Entity_p e) {
 
     mSurface_p psurf = &clmodel->surfaces[clmodel->firstModelSurface];
 
-    // calculate dynamic lighting for bmodel if it's not an
-    // instanced model
+    // calculate dynamic lighting for bmodel if it's not an instanced model
     // TODO: apply r_dlightmap
     if ((clmodel->firstModelSurface != 0) &&
         (!gl_flashblend.value)
@@ -978,8 +983,7 @@ void R_DrawBrushModel(r_Entity_p e) {
         for (int k = 0; k < MAX_DLIGHTS; k++) {
             if ((cl_dlights[k].die < GetClSimTime()) ||
                 (!cl_dlights[k].radius)
-                )
-                continue;
+                )   continue;
 
             R_MarkLights(&cl_dlights[k], 1 << k,
                 clmodel->nodes + clmodel->hulls[0].firstclipnode);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "host.h"
 #include "link.h"
 #include "pr_def.h"    // defs shared with qcc
 #include "progdefs.h"       //for entvars_t
@@ -7,13 +8,13 @@
 #include "vmValue.h"
 #include "qTime.h"
 
-#define MAX_CLIENT_LIMIT        4
 
 #define MAX_EDICTS      600   /* FIXME: ouch! ouch! ouch! */
 typedef enum {
-    EdictNull   = -1,           // invalid / no entity
-    EdictWorld  =  0,           // world entity (always exists)
-    EdictMax    = MAX_EDICTS,
+    EdictNull       = -1,           // invalid / no entity
+    EdictWorld      =  0,           // world entity (always exists)
+    EdictPlayer1    =  1,           // first player slot (single-player / first client)
+    EdictMax        = MAX_EDICTS,
 } EdIdx; // int16_t / int ?
 
 typedef enum {
@@ -113,12 +114,15 @@ typedef enum {
 #endif
 
 
-#define MAX_ENT_LEAFS (16)
+typedef enum {
+    EntLeafsFirst   = 0,
+    EntLeafsMax     = 16,
+} EntLeaf_t;
 typedef struct edict_s {
     bool            free;
     link_t          area;       // linked to a division node or leaf
-    int32_t         num_leafs;
-    int16_t         leafnums[MAX_ENT_LEAFS];
+    EntLeaf_t       num_leafs;
+    int16_t         leafnums[EntLeafsMax];
     EntityState_t   baseline;
     LegDt_t         freetime;   // sv.time when the object was freed
     entvars_t       v;          // C exported fields from progs
@@ -133,10 +137,29 @@ typedef edict_t* edict_p;
 #define G_EDICT(o)              ED_GetEDictByOffs((uint32_t)G_INT((o)))
 #define G_EDICTNUM(o)           ED_GetEDictIdx(G_EDICT((o)))
 
-extern uint32_t     EdictSize;  // in bytes
-extern edict_p      Edicts;
-extern const EdIdx  EdictsMax;
-extern  EdIdx       EdictsNum;
+#include "branch_likely.h"
+
+extern edict_p      Edicts;     // TODO: hide from public
+extern EdIdx        _EdictsNum;  // TODO: avoid public set
+static inline EdIdx GetEdNum() {
+    return _EdictsNum;
+}
+static inline void SetEdNum(EdIdx num) {
+    _EdictsNum = num;
+}
+
+
+extern size_t       EdictSize;  // in bytes 
+static inline size_t GetEdictSize() {
+    if (unlikely(EdictSize == 0)) {
+        Host_SysError("GetEdictSize: EdictSize not inited (PR_LoadProgs not called yet)");
+    }
+    return EdictSize;
+}
+
+
+
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -150,7 +173,7 @@ extern "C" {
 
     void ED_Print(edict_p ed);
     void ED_PrintEdicts();
-    void ED_PrintNum(uint32_t ent);
+    void ED_PrintNum(EdIdx ent);
 
     void ED_Write(FILE* f, edict_p ed);
 

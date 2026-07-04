@@ -1,21 +1,24 @@
 #include "Edict.h"
 #include "host.h"
 
+
+size_t  EdictSize = 0;      // in bytes
+
 static inline EdIdx CheckEdictIdx(EdIdx idx) {
     if (
         (idx < EdictWorld) ||
-        (idx >= EdictsMax)
+        (idx >= EdictMax)
         )   Host_SysError("ED_GetEDictByIdx: bad index %i", idx);
         return idx;
 }
 
 edict_p ED_GetEDictByIdx(EdIdx idx) {
     CheckEdictIdx(idx);
-    return (edict_p)((uint8_p)Edicts + (idx * EdictSize));
+    return (edict_p)((uint8_p)Edicts + (idx * GetEdictSize()));
 }
 
 EdIdx ED_GetEDictIdx(edict_p edict) {
-    EdIdx idx = (EdIdx)((uint8_p)edict - (uint8_p)Edicts) / EdictSize;
+    EdIdx idx = (EdIdx)((uint8_p)edict - (uint8_p)Edicts) / GetEdictSize();
     CheckEdictIdx(idx);
     return idx;
 }
@@ -33,5 +36,5 @@ edict_p ED_GetEDictFirst() {
 }
 
 edict_p ED_GetEDictNext(edict_p edict) {
-    return  (edict_p)((uint8_p)edict + EdictSize);
+    return  (edict_p)((uint8_p)edict + GetEdictSize());
 }
