@@ -72,7 +72,9 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                                 SRC_LIST += $(PR_ARG_DIR)/vmValue.c
 
                 $(eval WORLD_DIR = $(SV_SIDE_DIR)/world) $(eval INCLUDES += $(WORLD_DIR))
-                        SRC_LIST += $(WORLD_DIR)/world.c
+                        SRC_LIST += $(WORLD_DIR)/world_area.c
+                        SRC_LIST += $(WORLD_DIR)/world_hull.c
+                        SRC_LIST += $(WORLD_DIR)/world_move.c
                         SRC_LIST += $(WORLD_DIR)/sv_pvs.c
 
                 $(eval PR_PHYS_DIR = $(SV_SIDE_DIR)/Physics) $(eval INCLUDES += $(PR_PHYS_DIR))

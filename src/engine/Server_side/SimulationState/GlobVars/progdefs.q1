@@ -64,9 +64,9 @@ typedef struct {
     float   modelindex;
     vec3_t  absmin;
     vec3_t  absmax;
-    float   ltime;
+    float   ltime;      // SimDt_t
     float   movetype;   // movetype_t
-    float   solid;  // solid_t
+    float   solid;      // solid_t
     vec3_t  origin;
     vec3_t  oldorigin;
     vec3_t  velocity;

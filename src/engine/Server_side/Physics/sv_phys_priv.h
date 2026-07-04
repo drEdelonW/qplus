@@ -45,7 +45,7 @@ bool            SV_RunThink(edict_p ent);
 
 // sv_phys_push.c
 trace_t SV_PushEntity(edict_p ent, vec3_t push);
-void    SV_PushMove(edict_p pusher, float movetime);
+void    SV_PushMove(edict_p pusher, SimDt_t movetime);
 void    SV_Physics_Pusher(edict_p ent);
 #ifdef QUAKE2
 void    SV_PushRotate(edict_p pusher, float movetime);

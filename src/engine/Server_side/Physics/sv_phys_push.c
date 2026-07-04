@@ -66,7 +66,8 @@ SV_PushMove
 
 ============
 */
-void SV_PushMove(edict_p pusher, float movetime) {
+void SV_PushMove(edict_p pusher, SimDt_t movetime) {
+#if 0
     if (!(pusher->v.velocity.x) &&
         !(pusher->v.velocity.y) &&
         !(pusher->v.velocity.z)
@@ -74,15 +75,21 @@ void SV_PushMove(edict_p pusher, float movetime) {
         pusher->v.ltime += movetime;
         return;
     }
+#else
+    if (VectorCompare(pusher->v.velocity, v3Zero)) {
+        pusher->v.ltime += movetime;
+        return;
+    }
+#endif
 
-    vec3_t move = VectorScale(pusher->v.velocity, movetime);
-    vec3_t mins = VectorAdd(pusher->v.absmin, move);
-    vec3_t maxs = VectorAdd(pusher->v.absmax, move);
+    vec3_t displacement = VectorScale(pusher->v.velocity, movetime);
+    vec3_t mins = VectorAdd(pusher->v.absmin, displacement);
+    vec3_t maxs = VectorAdd(pusher->v.absmax, displacement);
 
     vec3_t pushorig = pusher->v.origin;
 
-    // move the pusher to it's final position
-    pusher->v.origin = VectorAdd(pusher->v.origin, move);
+    // displacement the pusher to it's final position
+    pusher->v.origin = VectorAdd(pusher->v.origin, displacement);
     pusher->v.ltime += movetime;
     SV_LinkEdict(pusher, false);
 
@@ -111,15 +118,14 @@ void SV_PushMove(edict_p pusher, float movetime) {
             ED_GetEDictByOffs(check->v.groundentity) == pusher)) {
             if (
                 (
-                    check->v.absmin.x >= maxs.x ||
-                    check->v.absmin.y >= maxs.y ||
-                    check->v.absmin.z >= maxs.z) ||
+                    (check->v.absmin.x >= maxs.x) ||
+                    (check->v.absmin.y >= maxs.y) ||
+                    (check->v.absmin.z >= maxs.z)) ||
                 (
-                    check->v.absmax.x <= mins.x ||
-                    check->v.absmax.y <= mins.y ||
-                    check->v.absmax.z <= mins.z)
-                )
-                continue;
+                    (check->v.absmax.x <= mins.x) ||
+                    (check->v.absmax.y <= mins.y) ||
+                    (check->v.absmax.z <= mins.z))
+                )   continue;
 
             // see if the ent's bbox is inside the pusher's final position
             if (!SV_TestEntityPosition(check))
@@ -137,17 +143,18 @@ void SV_PushMove(edict_p pusher, float movetime) {
 
         // try moving the contacted entity
         pusher->v.solid = SOLID_NOT;
-        SV_PushEntity(check, move);
+        SV_PushEntity(check, displacement);
         pusher->v.solid = SOLID_BSP;
 
         // if it is still inside the pusher, block
         edict_p block = SV_TestEntityPosition(check);
-        if (block) { // fail the move
+        if (block) { // fail the displacement
             if (check->v.mins.x == check->v.maxs.x) continue;
 
-            if (check->v.solid == SOLID_NOT ||
-                check->v.solid == SOLID_TRIGGER) { // corpse
-                check->v.mins.x = check->v.mins.y = 0;
+            if ((check->v.solid == SOLID_NOT) ||
+                (check->v.solid == SOLID_TRIGGER)
+                ) { // corpse
+                check->v.mins.x = check->v.mins.y = 0.f;
                 check->v.maxs = check->v.mins;
                 continue;
             }
@@ -157,6 +164,7 @@ void SV_PushMove(edict_p pusher, float movetime) {
 
             pusher->v.origin = pushorig;
             SV_LinkEdict(pusher, false);
+
             pusher->v.ltime -= movetime;
 
             // if the pusher has a "blocked" function, call it
@@ -187,17 +195,23 @@ SV_PushRotate
 ============
 */
 void SV_PushRotate(edict_p pusher, float movetime) {
+#if 0
     if (!(pusher->v.avelocity.x) &&
         !(pusher->v.avelocity.y) &&
         !(pusher->v.avelocity.z)) {
         pusher->v.ltime += movetime;
         return;
     }
+#else
+    if (AngleCompare(pusher->v.avelocity, a3Zero)) {
+        pusher->v.ltime += movetime;
+        return;
+    }
+#endif
 
+    ang3_t amove = VectorScale(pusher->v.avelocity, movetime);
 
-    vec3_t amove = VectorScale(pusher->v.avelocity, movetime);
-
-    vec3_t a = VectorSubtract(v3Zero, amove);
+    ang3_t a = VectorSubtract(v3Zero, amove);
     vec3_t forward, right, up;  AngleVectors(a, forward, right, up);
 
     vec3_t pushorig = pusher->v.angles;
@@ -218,24 +232,26 @@ void SV_PushRotate(edict_p pusher, float movetime) {
 
         if (check->free)    continue;
 
-        if (check->v.movetype == MOVETYPE_PUSH ||
-            check->v.movetype == MOVETYPE_NONE ||
-            check->v.movetype == MOVETYPE_FOLLOW ||
-            check->v.movetype == MOVETYPE_NOCLIP)
-            continue;
+        switch ((movetype_t)check->v.movetype) {
+        case MOVETYPE_PUSH:
+        case MOVETYPE_NONE:
+        case MOVETYPE_NOCLIP:
+        case MOVETYPE_FOLLOW:   continue;
+        default:                break;
+        }
 
         // if the entity is standing on the pusher, it will definately be moved
         if (!(((EntityFlags_t)check->v.flags & FL_ONGROUND) &&
             ED_GetEDictByOffs(check->v.groundentity) == pusher)) {
             if (
                 (
-                    check->v.absmin.x >= pusher->v.absmax.x ||
-                    check->v.absmin.y >= pusher->v.absmax.y ||
-                    check->v.absmin.z >= pusher->v.absmax.z) ||
+                    (check->v.absmin.x >= pusher->v.absmax.x) ||
+                    (check->v.absmin.y >= pusher->v.absmax.y) ||
+                    (check->v.absmin.z >= pusher->v.absmax.z)) ||
                 (
-                    check->v.absmax.x <= pusher->v.absmin.x ||
-                    check->v.absmax.y <= pusher->v.absmin.y ||
-                    check->v.absmax.z <= pusher->v.absmin.z)
+                    (check->v.absmax.x <= pusher->v.absmin.x) ||
+                    (check->v.absmax.y <= pusher->v.absmin.y) ||
+                    (check->v.absmax.z <= pusher->v.absmin.z))
                 )
                 continue;
 
@@ -260,11 +276,11 @@ void SV_PushRotate(edict_p pusher, float movetime) {
             -DotProduct(org, right),
             DotProduct(org, up)
         };
-        vec3_t move = VectorSubtract(org2, org);
+        vec3_t displacement = VectorSubtract(org2, org);
 
         // try moving the contacted entity
         pusher->v.solid = SOLID_NOT;
-        SV_PushEntity(check, move);
+        SV_PushEntity(check, displacement);
         pusher->v.solid = SOLID_BSP;
 
         // if it is still inside the pusher, block
