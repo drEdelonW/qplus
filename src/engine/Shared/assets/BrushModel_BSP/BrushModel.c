@@ -90,9 +90,9 @@ void Mod_LoadEdges(Lump_p Lump_in) {
     _loadModel->edges = out;
     _loadModel->numedges = count;
 
-    for (int i = 0; i < count; i++, in++) {
-        out[i].v16[0] = (uint16_t)LittleShort(in->v16[0]);
-        out[i].v16[1] = (uint16_t)LittleShort(in->v16[1]);
+    for (int i = 0; i < count; i++) {
+        out[i].v16[0] = (uint16_t)LittleShort(in[i].v16[0]);
+        out[i].v16[1] = (uint16_t)LittleShort(in[i].v16[1]);
     }
 }
 
@@ -144,9 +144,9 @@ void Mod_LoadTexinfo(Lump_p Lump_in) {
     _loadModel->texinfo = out;
     _loadModel->numtexinfo = count;
 
-    for (int i = 0; i < count; i++, in++) {
+    for (int i = 0; i < count; i++) {
         for (int j = 0; j < 8; j++)
-            out[i].vecs[S_AX].V[j] = LittleFloat(in->vecs[S_AX].V[j]);
+            out[i].vecs[S_AX].V[j] = LittleFloat(in[i].vecs[S_AX].V[j]);
 
         float len1 = Length((out[i].vecs[S_AX].vx));
         float len2 = Length((out[i].vecs[T_AX].vx));
@@ -161,8 +161,8 @@ void Mod_LoadTexinfo(Lump_p Lump_in) {
         else                            out[i].mipadjust = 1 / floor((len1 + len2) / 2 + 0.1f);
 #endif
 
-        int miptex = LittleLong(in->miptex);
-        out[i].flags = LittleLong(in->flags);
+        int miptex = LittleLong(in[i].miptex);
+        out[i].flags = LittleLong(in[i].flags);
 
         if (!_loadModel->textures) {
             out[i].texture = r_notexture_mip; // checkerboard texture
@@ -231,32 +231,32 @@ void Mod_LoadLeafs(Lump_p Lump_in) {
     _loadModel->leafs = out;
     _loadModel->numleafs = count;
 
-    for (int i = 0; i < count; i++, in++) {
+    for (int i = 0; i < count; i++) {
         out[i].bb = (BBox_t){
             .mins = {
-                .x = LittleShort(in->mins[X_AX]),
-                .y = LittleShort(in->mins[Y_AX]),
-                .z = LittleShort(in->mins[Z_AX])
+                .x = LittleShort(in[i].mins[X_AX]),
+                .y = LittleShort(in[i].mins[Y_AX]),
+                .z = LittleShort(in[i].mins[Z_AX])
             },
             .maxs = {
-                .x = LittleShort(in->maxs[X_AX]),
-                .y = LittleShort(in->maxs[Y_AX]),
-                .z = LittleShort(in->maxs[Z_AX])
+                .x = LittleShort(in[i].maxs[X_AX]),
+                .y = LittleShort(in[i].maxs[Y_AX]),
+                .z = LittleShort(in[i].maxs[Z_AX])
             }
         };
 
-        out[i].contents = LittleLong(in->contents);
+        out[i].contents = LittleLong(in[i].contents);
 
-        out[i].firstmarksurface = _loadModel->marksurfaces + LittleShort(in->firstmarksurface);
-        out[i].nummarksurfaces = LittleShort(in->nummarksurfaces);
+        out[i].firstmarksurface = _loadModel->marksurfaces + LittleShort(in[i].firstmarksurface);
+        out[i].nummarksurfaces = LittleShort(in[i].nummarksurfaces);
 
-        int p = LittleLong(in->visofs);
+        int p = LittleLong(in[i].visofs);
         if (p == -1)    out[i].compressed_vis = NULL;
         else            out[i].compressed_vis = _loadModel->visdata + p;
         out[i].efrags = NULL;
 
         for (int j = 0; j < 4; j++)
-            out[i].ambient_sound_level[j] = in->ambient_level[j];
+            out[i].ambient_sound_level[j] = in[i].ambient_level[j];
 
 #ifdef GLQAUKE
         // gl underwater warp
@@ -335,31 +335,30 @@ void Mod_LoadFaces(Lump_p Lump_in) {
     _loadModel->surfaces = out;
     _loadModel->numsurfaces = count;
 
-    for (int surfnum = 0; surfnum < count; surfnum++, in++, out++) {
-        out->firstedge = LittleLong(in->firstedge);
-        out->numedges = LittleShort(in->numedges);
+    for (int surfnum = 0; surfnum < count; surfnum++, out++) {
+        out->firstedge = LittleLong(in[surfnum].firstedge);
+        out->numedges = LittleShort(in[surfnum].numedges);
         out->flags = 0;
 
-        int planenum = LittleShort(in->planenum);
-        int side = LittleShort(in->side);
+        int planenum = LittleShort(in[surfnum].planenum);
+        int side = LittleShort(in[surfnum].side);
         if (side)
             out->flags |= SURF_PLANEBACK;
 
         out->plane = _loadModel->planes + planenum;
-
-        out->texinfo = _loadModel->texinfo + LittleShort(in->texinfo);
+        out->texinfo = _loadModel->texinfo + LittleShort(in[surfnum].texinfo);
 
         CalcSurfaceExtents(out);
 
         // lighting info
 
-        for (int i = 0; i < MAXLIGHTMAPS; i++) {
-            out->styles[i] = in->styles[i];
+        for (int lm = 0; lm < MAXLIGHTMAPS; lm++) {
+            out->styles[lm] = in[surfnum].styles[lm];
         }
 
-        int32_t i = LittleLong(in->lightofs);
-        if (i == -1)    out->samples = NULL;
-        else            out->samples = _loadModel->lightdata + i;
+        int32_t li = LittleLong(in[surfnum].lightofs);
+        if (li == -1)   out->samples = NULL;
+        else            out->samples = _loadModel->lightdata + li;
 
         // set the drawing flags flag
 
@@ -375,9 +374,9 @@ void Mod_LoadFaces(Lump_p Lump_in) {
 
         if (!Q_strncmp(out->texinfo->texture->name, "*", 1)) { // turbulent
             out->flags |= (SURF_DRAWTURB | SURF_DRAWTILED);
-            for (int i = 0; i < 2; i++) {
-                out->extents[i] = 16384;
-                out->texturemins[i] = -8192;
+            for (int sd = 0; sd < 2; sd++) {
+                out->extents[sd] = 0x4000; // (16384)
+                out->texturemins[sd] = 0xE000; // (-8192)
             }
 #ifdef GLQUAKE
             GL_SubdivideSurface(out); // cut up polygon for warps
@@ -417,29 +416,29 @@ void Mod_LoadNodes(Lump_p Lump_in) {
     _loadModel->nodes = out;
     _loadModel->numnodes = count;
 
-    for (int i = 0; i < count; i++, in++, out++) {
-        out->bb = (BBox_t){
+    for (int i = 0; i < count; i++) {
+        out[i].bb = (BBox_t){
             .mins = {
-                .x = LittleShort(in->mins[X_AX]),
-                .y = LittleShort(in->mins[Y_AX]),
-                .z = LittleShort(in->mins[Z_AX])
+                .x = LittleShort(in[i].mins[X_AX]),
+                .y = LittleShort(in[i].mins[Y_AX]),
+                .z = LittleShort(in[i].mins[Z_AX])
             },
             .maxs = {
-                .x = LittleShort(in->maxs[X_AX]),
-                .y = LittleShort(in->maxs[Y_AX]),
-                .z = LittleShort(in->maxs[Z_AX])
+                .x = LittleShort(in[i].maxs[X_AX]),
+                .y = LittleShort(in[i].maxs[Y_AX]),
+                .z = LittleShort(in[i].maxs[Z_AX])
             }
         };
 
-        out->plane = _loadModel->planes + LittleLong(in->planenum);
+        out[i].plane = _loadModel->planes + LittleLong(in[i].planenum);
 
-        out->firstsurface = LittleShort(in->firstface);
-        out->numsurfaces = LittleShort(in->numfaces);
+        out[i].firstsurface = LittleShort(in[i].firstface);
+        out[i].numsurfaces = LittleShort(in[i].numfaces);
 
         for (int j = 0; j < 2; j++) {
-            int p = LittleShort(in->children[j]);
-            if (p >= 0) out->children[j] = _loadModel->nodes + p;
-            else        out->children[j] = (mNode_p)(_loadModel->leafs + (-1 - p));
+            int p = LittleShort(in[i].children[j]);
+            if (p >= 0) out[i].children[j] = _loadModel->nodes + p;
+            else        out[i].children[j] = (mNode_p)(_loadModel->leafs + (-1 - p));
         }
     }
 
@@ -482,10 +481,10 @@ void Mod_LoadClipnodes(Lump_p Lump_in) {
             .maxs = { .x =  32.0f, .y =  32.0f, .z =  64.0f },
         }
     };
-    for (int i = 0; i < count; i++, out++, in++) {
-        out->planenum = LittleLong(in->planenum);
-        out->children[0] = LittleShort(in->children[0]);
-        out->children[1] = LittleShort(in->children[1]);
+    for (int i = 0; i < count; i++) {
+        out[i].planenum = LittleLong(in[i].planenum);
+        out[i].children[0] = LittleShort(in[i].children[0]);
+        out[i].children[1] = LittleShort(in[i].children[1]);
     }
 }
 
@@ -551,12 +550,12 @@ void Mod_MakeHull0() {
     hull->firstclipnode = 0;
     hull->lastclipnode = count - 1;
 
-    for (int i = 0; i < count; i++, out++, in++) {
-        out->planenum = in->plane - _loadModel->planes;
+    for (int i = 0; i < count; i++) {
+        out[i].planenum = in[i].plane - _loadModel->planes;
         for (int j = 0; j < 2; j++) {
-            mNode_p child = in->children[j];
-            if (child->contents < CONTENTS_NODE)    out->children[j] = child->contents;
-            else                                    out->children[j] = child - _loadModel->nodes;
+            mNode_p child = in[i].children[j];
+            if (child->contents < CONTENTS_NODE)    out[i].children[j] = child->contents;
+            else                                    out[i].children[j] = child - _loadModel->nodes;
         }
     }
 }
