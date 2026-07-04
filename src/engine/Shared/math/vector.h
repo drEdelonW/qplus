@@ -55,6 +55,13 @@ typedef vec5_t* vec5_p;
 
 extern const vec3_t v3Zero; // zero vector;
 
+static inline vec3_t VectorAddScalar(vec3_t v, vec_t scalar) {
+    vec3_t out;
+    for (int j = 0; j < VECT_DIM; j++)
+        out.v[j] = v.v[j] + scalar;
+    return out;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -63,7 +70,7 @@ extern "C" {
     vec3_t  Scalar2Vector(vec_t scale);
     vec3_t  VectorAdd(vec3_t const veca, vec3_t const vecb);        // va + vb
     vec3_t  VectorSubtract(vec3_t const veca, vec3_t const vecb);   // va - vb
-    vec3_t  VectorScale(vec3_t const in, vec_t const scale);        // va + s
+    vec3_t  VectorScale(vec3_t const in, vec_t const scale);        // va * s
     vec3_t  VectorMA(vec3_t veca, float scale, vec3_t vecb);        // va + (vb * s)
 
     void    VectorInverse(vec3_p v);                                // va = -va

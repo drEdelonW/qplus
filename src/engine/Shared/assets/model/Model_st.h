@@ -22,8 +22,12 @@
 // Whole model
 //
 typedef struct {
+#if 1   // TODO: rework to BoundingBox
     vec3_t  mins;
     vec3_t  maxs;
+#else
+    BBox_t  bb;
+#endif
     vec3_t  origin;
 
     int32_t headnode[MAX_MAP_HULLS];
@@ -52,23 +56,14 @@ struct Model_s {
     int32_t     numframes;
     SyncType_t  synctype;
     int32_t     flags;
-#if 0
-    vec3_t  mins, maxs; // volume occupied by the model
-#else
-    BBox_t  BB; // volume occupied by the model
-#endif
-    float   radius;
-#ifdef GLQUAKE
-    bool    clipbox;    // solid volume for clipping
-#if 0
-    vec3_t  clipmins;
-    vec3_t  clipmaxs;
-#else
-    BBox_t  clip;
-#endif
 
+    BBox_t      BB; // volume occupied by the model
+    float       radius;
+#ifdef GLQUAKE
+    bool        clipbox;    // solid volume for clipping
+    BBox_t      clip;
 #endif
-    uint32_t numModelSurfaces, firstModelSurface;    // brush model
+    uint32_t numModelSurfaces;   uint32_t    firstModelSurface;    // brush model
     uint32_t numSubModels;       dModel_p    SubModels;
     uint32_t numplanes;          mPlane_p    planes;
     uint32_t numleafs;           mLeaf_p     leafs;  // number of visible leafs, not counting 0
@@ -80,8 +75,9 @@ struct Model_s {
     uint32_t numsurfedges;       int32_p     surfedges;
     uint32_t numclipnodes;       dClipNode_p clipnodes;
     uint32_t nummarksurfaces;    mSurface_ar marksurfaces;
+    int32_t  numtextures;        Texture_p*  textures;
+
     Hull_t  hulls[MAX_MAP_HULLS];
-    int32_t numtextures;         Texture_p* textures;
     uint8_p visdata;
     uint8_p lightdata;
     cString entities;
