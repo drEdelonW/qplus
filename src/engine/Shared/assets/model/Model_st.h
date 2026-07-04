@@ -35,6 +35,7 @@ typedef struct {
     int32_t firstface;
     int32_t numfaces;
 } dModel_t;
+STATIC_ASSERT_SIZE(dModel_t, 6*4 + 3*4 + 4*4 + 3*4); // 64
 typedef dModel_t* dModel_p;
 
 typedef enum {
