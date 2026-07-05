@@ -36,9 +36,12 @@ typedef struct {
     int32_t contents;
     int32_t visofs;    // -1 = no visibility info
 
-    // TODO: wrap it to vec3i and BBoxi or some like this
+#if 1 // TODO: wrap it to vec3i and BBoxi or some like this
     int16_t mins[3];   // for frustum culling
     int16_t maxs[3];   // for frustum culling
+#else
+    BBox_t bb;
+#endif
 
     uint16_t firstmarksurface;
     uint16_t nummarksurfaces;

@@ -378,16 +378,17 @@ void CL_RelinkEntities() {
         }
 #endif
 
-        if (ent->model->flags & EF_GIB)             R_RocketTrail(oldorg, ent->origin, RT_GIB);
+        /* */if (ent->model->flags & EF_GIB)        R_RocketTrail(oldorg, ent->origin, RT_GIB);
         else if (ent->model->flags & EF_ZOMGIB)     R_RocketTrail(oldorg, ent->origin, RT_ZOMGIB);
         else if (ent->model->flags & EF_TRACER)     R_RocketTrail(oldorg, ent->origin, RT_TRACER);
         else if (ent->model->flags & EF_TRACER2)    R_RocketTrail(oldorg, ent->origin, RT_TRACER2);
         else if (ent->model->flags & EF_ROCKET) {
             R_RocketTrail(oldorg, ent->origin, RT_ROCKET);
-            dLight_p dl = CL_AllocDlight(i);
-            dl->origin = ent->origin;
-            dl->radius = 200;
-            dl->die = (sSimTime_t)(GetClSimTime() + 0.01);
+            dLight_p dl = CL_AllocDlight(i); {
+                dl->origin = ent->origin;
+                dl->radius = 200;
+                dl->die = GetClSimTime() + 0.01;
+            }
         }
         else if (ent->model->flags & EF_GRENADE)    R_RocketTrail(oldorg, ent->origin, RT_GRENADE);
         else if (ent->model->flags & EF_TRACER3)    R_RocketTrail(oldorg, ent->origin, RT_TRACER3);

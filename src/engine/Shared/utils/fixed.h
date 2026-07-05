@@ -18,7 +18,6 @@ typedef int32_t     fixed16_t;  // 15.16 signed
 typedef fixed16_t*  fixed16_p;
 
 // -- Constants ----------------------------------------------------------------
-
 #define FIXED4_FRAC_BITS    4
 #define FIXED4_ONE          (1 << FIXED4_FRAC_BITS)     // 0x10 (1.0) in 12.4 
 #define FIXED4_FRAC_MASK    (FIXED4_ONE - 1)   // 0x0F less then (1.0) in 12.4
@@ -45,7 +44,6 @@ typedef fixed16_t*  fixed16_p;
 #define FIXED16_FRAC(x)         ((x) & FIXED16_FRAC_MASK)   // Frac part (x & 0xFFFF)
 
 // -- Arithmetic ---------------------------------------------------------------
-
 #define FIXED_MID(a, b)         HALF(((a) + (b)))   // midpoint, stays in int
 
 #include "CLAMP.h"
@@ -54,6 +52,7 @@ static inline int8_t fixed4_fsat(float f) {
     CLAMP(INT8_MIN, &v, INT8_MAX);
     return (int8_t)v;
 }
+
 static inline float fixed4_tof(int8_t v) {
     return (float)v * (1.0f / FIXED4_ONE);
 }
@@ -67,10 +66,10 @@ static inline fixed16_t fixed16_mul(fixed16_t a, fixed16_t b) {
 }
 
 static inline fixed16_t fixed16_invert24(fixed16_t val) {
-    if (val < 256) return (fixed16_t)0xFFFFFFFF;
+    if (val < 256)      return (fixed16_t)0xFFFFFFFF;
+
     return (fixed16_t)(((double)FIXED16_ONE * (double)0x1000000 / (double)val) + 0.5);
 }
-
 
 #if 0 /* not used */
 # if !id386

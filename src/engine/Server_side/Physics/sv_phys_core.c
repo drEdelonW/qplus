@@ -75,19 +75,19 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
     for (int bumpcount = 0; bumpcount < numbumps; bumpcount++) {
         if (!(ent->v.velocity.x) &&
             !(ent->v.velocity.y) &&
-            !(ent->v.velocity.z)) break; // ent->v.velocity.is_zero()
+            !(ent->v.velocity.z)
+            )   break; // ent->v.velocity.is_zero()
 
         vec3_t end = VectorMA(ent->v.origin, time_left, ent->v.velocity);
 
-        trace_t trace = SV_Move(ent->v.origin, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent
-        );
+        trace_t trace = SV_Move(ent->v.origin, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent);
 
         if (trace.allsolid) { // entity is trapped in another solid
             ent->v.velocity = v3Zero;
             return FLYMOVE_TRAPPED;
         }
 
-        if (trace.fraction > 0) { // actually covered some distance
+        if (trace.fraction > 0.f) { // actually covered some distance
             ent->v.origin = trace.endpos;
             original_velocity = ent->v.velocity;
             numplanes = 0;
@@ -96,7 +96,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
         if (trace.fraction == 1)    break;  // moved the entire distance
         if (!trace.ent)             Host_SysError("SV_FlyMove: !trace.ent");
 
-        if (trace.plane.normal.z > 0.7) {
+        if (trace.plane.normal.z > 0.7f) {
             blocked |= MOVECLIP_FLOOR;  // floor
             if (trace.ent->v.solid == SOLID_BSP) {
                 ent->v.flags = (float)((EntityFlags_t)ent->v.flags | FL_ONGROUND);
@@ -114,7 +114,6 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
         //
         SV_Impact(ent, trace.ent);
         if (ent->free)  break;  // removed by the impact function
-
 
         time_left -= time_left * trace.fraction;
 
@@ -138,8 +137,8 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
                 int j = 0;
                 for (; j < numplanes; j++)
                     if ((j != i) &&
-                        (DotProduct(new_velocity, planes[j]) < 0))
-                        break; // not ok
+                        (DotProduct(new_velocity, planes[j]) < 0)
+                        )   break; // not ok
 
                 if (j == numplanes)     break;
             }
@@ -163,7 +162,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
         // if original velocity is against the original velocity, stop dead
         // to avoid tiny occilations in sloping corners
         //
-        if (DotProduct(ent->v.velocity, primal_velocity) <= 0) {
+        if (DotProduct(ent->v.velocity, primal_velocity) <= 0.f) {
             ent->v.velocity = v3Zero;
             return blocked;
         }
@@ -184,7 +183,7 @@ void SV_AddGravity(edict_p ent) {
     float ent_gravity = (ent->v.gravity) ? ent->v.gravity : 1.0f;
 #else
     eval_p val = GetEdictFieldValue(ent, "gravity");
-    float ent_gravity = (val && val->_float) ? val->_float : 1.0f;
+    float ent_gravity = ((val) && (val->_float)) ? val->_float : 1.f;
 #endif
     ent->v.velocity.z -= (float)(ent_gravity * sv_gravity.value * host_frametime);
 }
@@ -201,11 +200,11 @@ void SV_CheckVelocity(edict_p ent) {
     for (int i = 0; i < VECT_DIM; i++) {
         if (IS_NAN(ent->v.velocity.v[i])) {
             Con_Printf("Got a NaN velocity on %s\n", PR_GetQString(ent->v.classname));
-            ent->v.velocity.v[i] = 0.0f;
+            ent->v.velocity.v[i] = 0.f;
         }
         if (IS_NAN(ent->v.origin.v[i])) {
             Con_Printf("Got a NaN origin on %s\n", PR_GetQString(ent->v.classname));
-            ent->v.origin.v[i] = 0.0f;
+            ent->v.origin.v[i] = 0.f;
         }
         CLAMP(-sv_maxvelocity.value, &ent->v.velocity.v[i], sv_maxvelocity.value);
     }
@@ -253,15 +252,14 @@ Returns false if the entity removed itself.
 */
 bool SV_RunThink(edict_p ent) {
     float thinktime = ent->v.nextthink;
-    if ((thinktime <= 0) ||
+    if ((thinktime <= 0.f) ||
         (thinktime > (SV_GetTime() + host_frametime))
-        )
-        return true;
+        )   return true;
 
     CLAMP_LESS(&thinktime, (float)SV_GetTime()); // don't let things stay in the past.
     // it is possible to start that way
     // by a trigger with a local time.
-    ent->v.nextthink = 0;
+    ent->v.nextthink = 0.f;
     pr_global_struct->time = thinktime;
     pr_global_struct->self = ED_GetEDictOffs(ent);
     pr_global_struct->other = ED_GetEDictOffs(Edicts); // should be 0

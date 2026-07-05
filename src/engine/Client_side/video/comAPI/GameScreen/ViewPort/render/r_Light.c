@@ -106,9 +106,9 @@ R_PushDlights
 */
 void R_PushDlights() {
 #ifdef GLQUAKE
-    if (gl_flashblend.value)        return;
+    if (gl_flashblend.value)    return;
 #else
-    if (!r_dlightmap.value)    return;
+    if (!r_dlightmap.value)     return;
 #endif
 
     r_dlightframecount = r_framecount + 1; // because the count hasn't advanced yet for this frame
@@ -188,7 +188,7 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
             ) continue;
 
         if (surf->samples) {
-            r = 0;
+            fixed8_t r = 0;
             uint8_p lightmap =
                 surf->samples + (ptrdiff_t)(
                     FIXED4_TO_INT(tdt) * (FIXED4_TO_INT(surf->extents[S_AX]) + 1) +
@@ -196,13 +196,13 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
             ptrdiff_t lmStep = (ptrdiff_t)(
                 (FIXED4_TO_INT(surf->extents[S_AX]) + 1) *
                 (FIXED4_TO_INT(surf->extents[T_AX]) + 1)
-                );
+            );
             for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 0xFF); maps++) {
                 r += (*lightmap) * d_lightstylevalue[surf->styles[maps]];
                 lightmap += lmStep;
             }
 
-            return r >> 8;
+            return FIXED8_TO_INT(r);
         }
         return 0;
     }
@@ -217,19 +217,14 @@ int R_LightPoint(vec3_t p) {
     if (!cl.worldmodel->lightdata)
         return 255;
 
-    vec3_t end = {
-        .x = p.x,
-        .y = p.y,
-        .z = p.z - 2048.0f
-    };
+    vec3_t end = p; { end.z -= 2048.0f; };
     int r = RecursiveLightPoint(cl.worldmodel->nodes, p, end);
 
     if (r == -1)
         r = 0;
 
 #ifndef GLQUAKE
-    if (r < r_refdef.ambientlight)
-        r = r_refdef.ambientlight;
+    CLAMP_LESS(&r, r_refdef.ambientlight);
 #endif
 
     return r;

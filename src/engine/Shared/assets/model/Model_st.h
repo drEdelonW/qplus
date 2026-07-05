@@ -57,16 +57,16 @@ struct Model_s {
     SyncType_t  synctype;
     int32_t     flags;
 
-    BBox_t      BB; // volume occupied by the model
+    BBox_t      BB;     // volume occupied by the model
     float       radius;
 #ifdef GLQUAKE
     bool        clipbox;    // solid volume for clipping
     BBox_t      clip;
 #endif
-    uint32_t numModelSurfaces;   uint32_t    firstModelSurface;    // brush model
+    uint32_t numModelSurfaces;   uint32_t    firstModelSurface;     // brush model
     uint32_t numSubModels;       dModel_p    SubModels;
     uint32_t numplanes;          mPlane_p    planes;
-    uint32_t numleafs;           mLeaf_p     leafs;  // number of visible leafs, not counting 0
+    uint32_t numleafs;           mLeaf_p     leafs;         // number of visible leafs, not counting 0
     uint32_t numvertexes;        mVertex_p   vertexes;
     uint32_t numedges;           mEdge_p     edges;
     uint32_t numnodes;           mNode_p     nodes;
@@ -75,7 +75,7 @@ struct Model_s {
     uint32_t numsurfedges;       int32_p     surfedges;     // TODO: find type of surfedges index
     uint32_t numclipnodes;       dClipNode_p clipnodes;
     uint32_t nummarksurfaces;    mSurface_ar marksurfaces;
-    int32_t  numtextures;        Texture_p*  textures;
+    uint32_t numtextures;        Texture_ar  textures;
 
     Hull_t  hulls[MAX_MAP_HULLS];
     uint8_p visdata;
