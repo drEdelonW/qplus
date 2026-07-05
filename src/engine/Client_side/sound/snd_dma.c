@@ -200,17 +200,18 @@ void S_Init() {
     // create a piece of DMA memory
 
     if (fakedma) {
-        shm = (TypeLess_ptr)Hunk_AllocName(sizeof(*shm), "shm");
-        shm->splitbuffer = 0;
-        shm->samplebits = 16;
-        shm->speed = 22050;
-        shm->channels = 2;
-        shm->samples = 32768;
-        shm->samplepos = 0;
-        shm->soundalive = true;
-        shm->gamealive = true;
-        shm->submission_chunk = 1;
-        shm->buffer = Hunk_AllocName(1 << 16, "shmbuf");
+        *(shm = (TypeLess_ptr)Hunk_AllocName(sizeof(*shm), "shm")) = (dma_t){
+            .gamealive = true,
+            .soundalive = true,
+            .splitbuffer = false,
+            .channels = 2,
+            .samples = 0x8000,  // (32Kb)
+            .submission_chunk = 1,
+            .samplepos = 0,
+            .samplebits = 16,
+            .speed = 22050,
+            .buffer = Hunk_AllocName(0x8000, "shmbuf")
+        };
     }
 
     Con_Printf("Sound sampling rate: %i\n", shm->speed);
@@ -284,11 +285,11 @@ S_TouchSound
 
 ==================
 */
-void S_TouchSound(cString name) {
+void S_TouchSound(cString sampleName) {
     if (!sound_started)
         return;
 
-    sfx_p sfx = S_FindName(name);
+    sfx_p sfx = S_FindName(sampleName);
     Cache_Check(&sfx->cache);
 }
 
@@ -298,11 +299,11 @@ S_PrecacheSound
 
 ==================
 */
-sfx_p S_PrecacheSound(cString name) {
+sfx_p S_PrecacheSound(cString sampleName) {
     if (!sound_started || nosound.value)
         return NULL;
 
-    sfx_p sfx = S_FindName(name);
+    sfx_p sfx = S_FindName(sampleName);
 
     // cache it in
     if (precache.value)

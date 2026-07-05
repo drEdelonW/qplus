@@ -38,7 +38,7 @@ uint8_p S_Alloc(int size);
 ResampleSfx
 ================
 */
-void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cString data) {
+void ResampleSfx(sfx_p sfx, int inrate, int inwidth, uint8_p data) {
 
     sfxcache_p sc = Cache_Check(&sfx->cache);
     if (!sc)    return;
@@ -62,7 +62,7 @@ void ResampleSfx(sfx_p sfx, int inrate, int inwidth, cString data) {
         (sc->width == 1)) {
         // fast special case
         for (int i = 0; i < outcount; i++)
-            ((int8_p)sc->data)[i] = ((int8_t)(data[i]) - 128);
+            (sc->data)[i] = data[i] - 128;
     }
     else {
         // general case
@@ -103,7 +103,7 @@ sfxcache_p S_LoadSound(sfx_p s) {
     // Con_Printf ("loading %s\n", namebuffer);
 
     int8_t stackbuf[1 * 1024];  // avoid dirtying the cache heap
-    cString data = (cString)COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
+    uint8_p data = COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
 
     if (!data) {
         Con_Printf("Couldn't load %s\n", namebuffer);
@@ -148,10 +148,10 @@ WAV loading
 */
 
 
-cString data_p;
-cString iff_end;
-cString last_chunk;
-cString iff_data;
+uint8_p data_p;
+uint8_p iff_end;
+uint8_p last_chunk;
+uint8_p iff_data;
 int     iff_chunk_len;
 
 
@@ -191,7 +191,7 @@ void FindNextChunk(cString name) {
         //   Host_SysError ("FindNextChunk: %i length is past the 1 meg sanity limit", iff_chunk_len);
         data_p -= 8;
         last_chunk = data_p + 8 + ((iff_chunk_len + 1) & ~1);
-        if (!Q_strncmp(data_p, name, 4)) {
+        if (!Q_strncmp((cString)data_p, name, 4)) {
             return;
         }
     }
@@ -222,7 +222,7 @@ void DumpChunks() {
 GetWavinfo
 ============
 */
-wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
+wavinfo_t GetWavinfo(cString name, uint8_p wav, int wavlength) {
     wavinfo_t info; memset(&info, 0, sizeof(info));
 
     if (!wav)   return info;
@@ -232,10 +232,8 @@ wavinfo_t GetWavinfo(cString name, cString wav, int wavlength) {
 
     // find "RIFF" chunk
     FindChunk("RIFF");
-    if (!(
-        data_p &&
-        (!Q_strncmp(data_p + 8, "WAVE", 4))
-        )
+    if (!((data_p) &&
+        !(Q_strncmp((cString)(data_p + 8), "WAVE", 4)))
         ) {
         Con_Printf("Missing RIFF/WAVE chunks\n");   return info;
     }

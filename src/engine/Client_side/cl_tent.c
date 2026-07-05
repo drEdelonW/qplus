@@ -84,16 +84,16 @@ CL_ParseTEnt
 */
 void CL_InitTEnts() {
     cl_sfx = (clSFX_t){
-        .wizhit = S_PrecacheSound("wizard/hit.wav"),
-        .knighthit = S_PrecacheSound("hknight/hit.wav"),
-        .tink1 = S_PrecacheSound("weapons/tink1.wav"),
-        .ric1 = S_PrecacheSound("weapons/ric1.wav"),
-        .ric2 = S_PrecacheSound("weapons/ric2.wav"),
-        .ric3 = S_PrecacheSound("weapons/ric3.wav"),
-        .r_exp3 = S_PrecacheSound("weapons/r_exp3.wav"),
+        .wizhit/**/ = S_PrecacheSound("wizard/hit.wav"),
+        .knighthit  = S_PrecacheSound("hknight/hit.wav"),
+        .tink1 /**/ = S_PrecacheSound("weapons/tink1.wav"),
+        .ric1  /**/ = S_PrecacheSound("weapons/ric1.wav"),
+        .ric2  /**/ = S_PrecacheSound("weapons/ric2.wav"),
+        .ric3  /**/ = S_PrecacheSound("weapons/ric3.wav"),
+        .r_exp3/**/ = S_PrecacheSound("weapons/r_exp3.wav"),
 #ifdef QUAKE2
-        .imp = S_PrecacheSound("shambler/sattck1.wav"),
-        .rail = S_PrecacheSound("weapons/lstart.wav"),
+        .imp   /**/ = S_PrecacheSound("shambler/sattck1.wav"),
+        .rail  /**/ = S_PrecacheSound("weapons/lstart.wav"),
 #endif
     };
 }

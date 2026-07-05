@@ -5,16 +5,37 @@
 // TODO: wrap it to type protected form to avoid mistype operations
 // -- Types -------------------------------------------------------------------
 
+// -- fixed4_t (11.4 signed) ----------------------------------------------
+#if 1 /* old typeless alias — kept for reference, do not use directly */
 // typedef uint16_t    fixed4_t;   // 12.4   unsigned
 typedef int16_t     fixed4_t;   // 11.4   signed
+#else
+typedef struct {
+    int16_t fx;     // 11.4   signed
+} fixed4_t;
+#endif
 typedef fixed4_t*   fixed4_p;
 
+// -- fixed8_t (8.8 unsigned) ----------------------------------------------
+#if 1 /* old typeless alias — kept for reference, do not use directly */
 typedef uint16_t    fixed8_t;   // 8.8   usigned
 // typedef int16_t     fixed8_t;   // 7.8   signed
+#else
+typedef struct {
+    uint16_t fx;    // 8.8    unsigned
+} fixed8_t;
+#endif
 typedef fixed8_t*   fixed8_p;
 
+// -- fixed16_t (15.16 signed) ----------------------------------------------
+#if 1 /* old typeless alias — kept for reference, do not use directly */
 // typedef uint32_t    fixed16_t;  // 16.16 unsigned    // !!not work now!!
 typedef int32_t     fixed16_t;  // 15.16 signed
+#else
+typedef struct {
+    int32_t fx;     // 15.16  signed
+} fixed16_t;
+#endif
 typedef fixed16_t*  fixed16_p;
 
 // -- Constants ----------------------------------------------------------------
@@ -42,6 +63,27 @@ typedef fixed16_t*  fixed16_p;
 #define FIXED16_TO_INT(x)       ((x) >> FIXED16_FRAC_BITS)
 #define INT_TO_FIXED16(x)       ((fixed16_t)(x) << FIXED16_FRAC_BITS)
 #define FIXED16_FRAC(x)         ((x) & FIXED16_FRAC_MASK)   // Frac part (x & 0xFFFF)
+
+// -- fixed4_t (11.4 signed) --
+static inline int      Fx4ToInt(fixed4_t v)   { return v >> FIXED4_FRAC_BITS; }
+static inline fixed4_t IntToFx4(int v)        { return (fixed4_t)(v << FIXED4_FRAC_BITS); }
+static inline fixed4_t Fx4Frac(fixed4_t v)    { return v & FIXED4_FRAC_MASK; }
+static inline float    Fx4ToFl(fixed4_t v)    { return (float)v * (1.0f / FIXED4_ONE); }
+static inline fixed4_t FlToFx4(float f)       { return (fixed4_t)(f * FIXED4_ONE); }
+
+// -- fixed8_t (8.8 unsigned) --
+static inline int      Fx8ToInt(fixed8_t v)   { return v >> FIXED8_FRAC_BITS; }
+static inline fixed8_t IntToFx8(int v)        { return (fixed8_t)(v << FIXED8_FRAC_BITS); }
+static inline fixed8_t Fx8Frac(fixed8_t v)    { return v & FIXED8_FRAC_MASK; }
+static inline float    Fx8ToFl(fixed8_t v)    { return (float)v * (1.0f / FIXED8_ONE); }
+static inline fixed8_t FlToFx8(float f)       { return (fixed8_t)(f * FIXED8_ONE); }
+
+// -- fixed16_t (15.16 signed) --
+static inline int       Fx16ToInt(fixed16_t v)   { return v >> FIXED16_FRAC_BITS; }
+static inline fixed16_t IntToFx16(int v)         { return (fixed16_t)((int32_t)v << FIXED16_FRAC_BITS); }
+static inline fixed16_t Fx16Frac(fixed16_t v)    { return v & FIXED16_FRAC_MASK; }
+static inline float     Fx16ToFl(fixed16_t v)    { return (float)v * (1.0f / FIXED16_ONE); }
+static inline fixed16_t FlToFx16(float f)        { return (fixed16_t)(f * FIXED16_ONE); }
 
 // -- Arithmetic ---------------------------------------------------------------
 #define FIXED_MID(a, b)         HALF(((a) + (b)))   // midpoint, stays in int

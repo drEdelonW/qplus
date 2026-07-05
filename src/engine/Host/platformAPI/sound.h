@@ -92,8 +92,8 @@ extern "C" {
     void S_Update(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up);
     void S_ExtraUpdate();
 
-    sfx_p S_PrecacheSound(cString sample);
-    void S_TouchSound(cString sample);
+    sfx_p S_PrecacheSound(cString sampleName);
+    void S_TouchSound(cString sampleName);
     void S_ClearPrecache();
     void S_BeginPrecaching();
     void S_EndPrecaching();
@@ -109,7 +109,7 @@ extern "C" {
     void S_LocalSound(cString s);
     sfxcache_p S_LoadSound(sfx_p s);
 
-    wavinfo_t GetWavinfo(cString name, cString wav, int wavlength);
+    wavinfo_t GetWavinfo(cString name, uint8_p wav, int wavlength);
 
     void SND_InitScaletable();
     void SNDDMA_Submit();
