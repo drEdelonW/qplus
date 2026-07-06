@@ -224,25 +224,13 @@ Parse an effect out of the server message
 #define PARTICLE_COUNT_BLOB 255     // svc sentinel: "big explosion"
 
 void R_ParseParticleEffect() {
-#if 0
-    vec3_t org;
-    vec3_t dir;
-    int msgcount;
-    int color;
-    {   /* !!SEQUENCE MATTER!! */
-        org = MSG_ReadVector();
-        dir = MSG_ReadVecCoarse();
-        msgcount = MSG_ReadByte();
-        color = MSG_ReadByte();
-    }
-#else
     ParticleMsg_t part =     {   /* !!SEQUENCE MATTER!! */
         .org = MSG_ReadVector(),
         .dir = MSG_ReadVecCoarse(),
         .count = MSG_ReadByte(),
         .color = MSG_ReadByte(),
     };
-#endif
+
     part.count = (part.count == PARTICLE_COUNT_BLOB) ? PARTICLE_COUNT_MAX : part.count;
     R_RunParticleEffect(part.org, part.dir, part.color, part.count);
 }

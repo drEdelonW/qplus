@@ -184,9 +184,9 @@ CVAR(v_kicktime, "0.5");
 CVAR(v_kickroll, "0.6");
 CVAR(v_kickpitch, "0.6");
 
+CVAR(v_ipitch_cycle, "1");
 CVAR(v_iyaw_cycle, "2");
 CVAR(v_iroll_cycle, "0.5");
-CVAR(v_ipitch_cycle, "1");
 CVAR(v_iyaw_level, "0.3");
 CVAR(v_iroll_level, "0.1");
 CVAR(v_ipitch_level, "0.3");

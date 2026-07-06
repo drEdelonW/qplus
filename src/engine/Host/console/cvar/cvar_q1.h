@@ -171,9 +171,9 @@ CVAR_EXTERN(v_kicktime);
 CVAR_EXTERN(v_kickroll);
 CVAR_EXTERN(v_kickpitch);
 
+CVAR_EXTERN(v_ipitch_cycle);
 CVAR_EXTERN(v_iyaw_cycle);
 CVAR_EXTERN(v_iroll_cycle);
-CVAR_EXTERN(v_ipitch_cycle);
 CVAR_EXTERN(v_iyaw_level);
 CVAR_EXTERN(v_iroll_level);
 CVAR_EXTERN(v_ipitch_level);

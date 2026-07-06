@@ -75,7 +75,7 @@ float V_CalcRoll(ang3_t angles, vec3_t velocity) {
     // if (cl.inwater)
     //  value *= 6.0f;
 
-    if (side < cl_rollspeed.value)  side = side * value / cl_rollspeed.value;
+    if (side < cl_rollspeed.value)  side = value * (side / cl_rollspeed.value);
     else                            side = value;
 
     return side * sign;
@@ -91,7 +91,7 @@ V_CalcBob
 float V_CalcBob() {
     LegDt_t cycle = (GetClSimTime() - (int)(GetClSimTime() / cl_bobcycle.value) * cl_bobcycle.value) / cl_bobcycle.value;
 
-    if (cycle < cl_bobup.value) cycle = M_PI * cycle / cl_bobup.value;
+    if (cycle < cl_bobup.value) cycle = M_PI * (cycle / cl_bobup.value);
     else                        cycle = M_PI + M_PI * (cycle - cl_bobup.value) / (1.f - cl_bobup.value);
 
     // bob is proportional to velocity in the xy plane
@@ -103,9 +103,12 @@ float V_CalcBob() {
     ) * cl_bob.value;
     //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
     bob = (bob * 0.3f) + (bob * 0.7f * sinf(cycle));
+#if 0
     /**/ if (bob > 4.f)     bob = 4.f;
     else if (bob < -7.f)    bob = -7.f;
-
+#else
+    CLAMP(-7.f, &bob, 4.f);
+#endif
     return bob;
 }
 
@@ -335,8 +338,8 @@ Underwater, lava, etc each has a color shift
 */
 void V_SetContentsColor(contents_t contents) {
     switch (contents) {
-    case CONTENTS_EMPTY:
-    case CONTENTS_SOLID:    cl.cshifts[CSHIFT_CONTENTS] = cshift_empty; break;
+    case CONTENTS_SOLID:
+    case CONTENTS_EMPTY:    cl.cshifts[CSHIFT_CONTENTS] = cshift_empty; break;
     case CONTENTS_LAVA:     cl.cshifts[CSHIFT_CONTENTS] = cshift_lava;  break;
     case CONTENTS_SLIME:    cl.cshifts[CSHIFT_CONTENTS] = cshift_slime; break;
     default:                cl.cshifts[CSHIFT_CONTENTS] = cshift_water;
@@ -377,20 +380,11 @@ void V_CalcPowerupCshift() {
     else
         cl.cshifts[CSHIFT_POWERUP].percent = 0;
 #else
-    if (cl.items & IT_QUAD) {
-        cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {0, 0, 50}, 30 };
-    }
-    else if (cl.items & IT_SUIT) {
-        cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {0, 255, 0}, 20 };
-    }
-    else if (cl.items & IT_INVISIBILITY) {
-        cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {100, 100, 100}, 100 };
-    }
-    else if (cl.items & IT_INVULNERABILITY) {
-        cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {255, 255, 0}, 30 };
-    }
-    else
-        cl.cshifts[CSHIFT_POWERUP].percent = 0;
+    /* */if (cl.items & IT_QUAD)            cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {0, 0, 50}, 30 };
+    else if (cl.items & IT_SUIT)            cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {0, 255, 0}, 20 };
+    else if (cl.items & IT_INVISIBILITY)    cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {100, 100, 100}, 100 };
+    else if (cl.items & IT_INVULNERABILITY) cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {255, 255, 0}, 30 };
+    else                                    cl.cshifts[CSHIFT_POWERUP].percent = 0;
 #endif
 }
 
@@ -587,44 +581,37 @@ void V_UpdatePalette() {
 CalcGunAngle
 ==================
 */
+static ang3_t _old = { .pitch = 0.f, .yaw = 0.f };
 void CalcGunAngle() {
-    static float _oldYaw = 0;
-    static float _oldPitch = 0;
-
-    float yaw = r_refdef.viewangles.yaw;
-    yaw = angledelta(yaw - r_refdef.viewangles.yaw) * 0.4f;
-    CLAMP(-10.f, &yaw, 10.f);
-    float move = host_frametime * 20.f;
-    if (yaw > _oldYaw) {
-        if ((_oldYaw + move) < yaw)
-            yaw = _oldYaw + move;
-    }
-    else {
-        if ((_oldYaw - move) > yaw)
-            yaw = _oldYaw - move;
-    }
-
-    float pitch = -r_refdef.viewangles.pitch;
-    pitch = angledelta(-pitch - r_refdef.viewangles.pitch) * 0.4f;
+    ang3_t cAngl = {
+        .pitch = -r_refdef.viewangles.pitch,
+        .yaw = r_refdef.viewangles.yaw,
+    };
+    // TODO: solve this puzzle
+    // float move = host_frametime * 20.f;
+    float pitch = angledelta((_old.pitch - cAngl.pitch)) * 0.4f; // vertical
     CLAMP(-10.f, &pitch, 10.f);
-    if (pitch > _oldPitch) {
-        if ((_oldPitch + move) < pitch)
-            pitch = _oldPitch + move;
-    }
-    else {
-        if ((_oldPitch - move) > pitch)
-            pitch = _oldPitch - move;
-    }
+    // if (cAngl.pitch > _old.pitch)    CLAMP_MORE(&pitch, (_old.pitch + move));
+    // else                             CLAMP_LESS(&pitch, (_old.pitch - move));
 
-    _oldYaw = yaw;
-    _oldPitch = pitch;
+    float yaw = angledelta(_old.yaw - cAngl.yaw) * 0.4f; // horizontal
+    CLAMP(-10.f, &yaw, 10.f);
+    // if (cAngl.yaw > _old.yaw)    CLAMP_MORE(&yaw, (_old.yaw + move));
+    // else                         CLAMP_LESS(&yaw, (_old.yaw - move));
 
-    cl.viewent.angles.yaw = r_refdef.viewangles.yaw + yaw;
+    // Con_Printf("p:%f y:%f\t p:%f y:%f\t \n",
+    //     cAngl.pitch, cAngl.yaw,
+    //     pitch, yaw
+    // );
+    _old = cAngl;
+
     cl.viewent.angles.pitch = -(r_refdef.viewangles.pitch + pitch);
+    cl.viewent.angles.yaw = r_refdef.viewangles.yaw + yaw;
+    // cl.viewent.angles.roll = r_refdef.viewangles.roll + yaw * 2;`
 
-    cl.viewent.angles.roll -= v_idlescale.value * sin(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value;
-    cl.viewent.angles.pitch -= v_idlescale.value * sin(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value;
-    cl.viewent.angles.yaw -= v_idlescale.value * sin(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value;
+    cl.viewent.angles.roll -= v_idlescale.value * sinf(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value;
+    cl.viewent.angles.pitch -= v_idlescale.value * sinf(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value;
+    cl.viewent.angles.yaw -= v_idlescale.value * sinf(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value;
 }
 
 /*
@@ -652,9 +639,9 @@ Idle swaying
 */
 void V_AddIdle() {
     ang3_t v_i = (ang3_t){
-        .pitch  = sinf(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value,
-        .yaw    = sinf(GetClSimTime() * v_iyaw_cycle.value)   * v_iyaw_level.value,
-        .roll   = sinf(GetClSimTime() * v_iroll_cycle.value)  * v_iroll_level.value,
+        .pitch = sinf(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value,
+        .yaw = sinf(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value,
+        .roll = sinf(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value,
     };
     r_refdef.viewangles = AngleMA(r_refdef.viewangles, v_idlescale.value, v_i);
 }
