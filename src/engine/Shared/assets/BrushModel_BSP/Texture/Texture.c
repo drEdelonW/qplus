@@ -10,6 +10,13 @@
 
 Texture_p r_notexture_mip;
 
+typedef enum {
+    MipOffset0 = sizeof(Texture_t),
+    MipOffset1 = MipOffset0 + (16 * 16),
+    MipOffset2 = MipOffset1 + (8 * 8),
+    MipOffset3 = MipOffset2 + (4 * 4),
+    NoTextureSize = MipOffset3 + (2 * 2),
+} MipOffset_t;
 /*
 ==================
 R_InitTextures
@@ -18,14 +25,14 @@ R_InitTextures
 void R_InitTextures() {
     // create a simple checkerboard texture for the default
     *(r_notexture_mip = Hunk_AllocName(
-        sizeof(Texture_t) + (16 * 16) + (8 * 8) + (4 * 4) + (2 * 2),
-        "notexture")
-        ) = (Texture_t){
-        .width = r_notexture_mip->height = 16,
-        .offsets[Mip0] = sizeof(Texture_t),
-        .offsets[Mip1] = r_notexture_mip->offsets[Mip0] + (16 * 16),
-        .offsets[Mip2] = r_notexture_mip->offsets[Mip1] + (8 * 8),
-        .offsets[Mip3] = r_notexture_mip->offsets[Mip2] + (4 * 4),
+        NoTextureSize, "notexture"
+    )) = (Texture_t){
+        .width = 16,
+        .height = 16,
+        .offsets[Mip0] = MipOffset0,
+        .offsets[Mip1] = MipOffset1,
+        .offsets[Mip2] = MipOffset2,
+        .offsets[Mip3] = MipOffset3,
     };
 
     for (int m = 0; m < MIPLEVELS; m++) {

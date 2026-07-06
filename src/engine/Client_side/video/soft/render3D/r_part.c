@@ -209,7 +209,7 @@ void R_ReadPointFile_f() {
 typedef struct {   /* !!SEQUENCE MATTER!! */
     vec3_t  org;
     vec3_t  dir;        // fixed4 coarse
-    uint8_t count;
+    uint16_t count;
     uint8_t color;
 } ParticleMsg_t;
 
@@ -474,6 +474,7 @@ void R_RocketTrail(vec3_t start, vec3_t end, RocketTrailType type) {
         prt->die = GetClSimTime() + 2;
 
         switch (type) {
+        case RT_ROTATE: break;
         case RT_ROCKET: {// rocket trail
             prt->ramp = (rand() & 3);
             prt->color = ramp3[(int)prt->ramp];

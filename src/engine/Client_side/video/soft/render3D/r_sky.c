@@ -54,13 +54,15 @@ static inline uint8_t SkyBlendByte(uint8_p ptopsky, int ofs) {
     return (uint8_t)((*(ptopsky + SKYSIZE) & bottommask[ofs]) | bottomsky[ofs]);
 }
 
+
+#if UNALIGNED_OK
 // same blend, SKYSIZE/32 texels at once; requires UNALIGNED_OK (unaligned dword access)
 static inline uint32_t SkyBlendDword(uint32_p ptopsky, int ofs) {
     return (*(ptopsky + (SKYSIZE / sizeof(uint32_t))) &
         *(uint32_p)&bottommask[ofs]) |
         *(uint32_p)&bottomsky[ofs];
 }
-
+#endif
 
 /*
 =============
