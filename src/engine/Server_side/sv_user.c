@@ -78,11 +78,7 @@ void SV_SetIdealPitch() {
             .z = sv_player->v.origin.z + sv_player->v.view_ofs.z
         };
 
-        vec3_t bottom = {
-            .x = top.x,
-            .y = top.y,
-            .z = top.z - 160.0f
-        };
+        vec3_t bottom = top; { bottom.z -= 160.0f; }
 
         trace_t tr = SV_Move(top, bbZero, bottom, MOVE_NOMONSTERS, sv_player);
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
@@ -97,7 +93,10 @@ void SV_SetIdealPitch() {
         float step = z[j] - z[j - 1];
         if ((step > -ON_EPSILON) && (step < ON_EPSILON))    continue;
 
-        if (dir && (((step - dir) > ON_EPSILON) || ((step - dir) < -ON_EPSILON))) return;  // mixed changes
+        if (dir && (
+            ((step - dir) > ON_EPSILON) ||
+            ((step - dir) < -ON_EPSILON))
+            ) return;  // mixed changes
 
         steps++;
         dir = step;
@@ -122,37 +121,34 @@ SV_UserFriction
 void SV_UserFriction() {
     vec3_p vel = _velocity;
 
-    float speed = (float)sqrt((vel->x * vel->x) + (vel->y * vel->y));
+    float speed = (float)sqrtf((vel->x * vel->x) + (vel->y * vel->y));
     if (!speed) return;
 
-    // if the leading edge is over a dropoff, increase friction
-    vec3_t start = {
-        .x = _origin->x + vel->x / speed * 16.0f,
-        .y = _origin->y + vel->y / speed * 16.0f,
-        .z = _origin->z + sv_player->v.mins.z
+    // if the leading edge is over a dropoff, increase friction 
+    vec3_t start = *_origin; {
+        VectorScale(*vel, 16.f / speed);
+        start.z = _origin->z + sv_player->v.mins.z;
     };
-    vec3_t stop = {
-        .x = start.x,
-        .y = start.y,
-        .z = start.z - 34.0f
-    };
+    vec3_t stop = start; { stop.z -= 34.f; }
 
     trace_t trace = SV_Move(start, bbZero, stop, MOVE_NOMONSTERS, sv_player);
 
-    float friction;
-    if (trace.fraction == 1.0f)     friction = sv_friction.value * sv_edgefriction.value;
-    else                            friction = sv_friction.value;
+    float friction = (trace.fraction == 1.f) ?
+        (sv_friction.value * sv_edgefriction.value) : sv_friction.value;
 
     // apply friction
-    float control = (speed < sv_stopspeed.value) ? sv_stopspeed.value : speed;
+    float control = (speed < sv_stopspeed.value) ?
+        sv_stopspeed.value : speed;
     float newspeed = (float)(speed - host_frametime * control * friction);
 
-    if (newspeed < 0.0f)   newspeed = 0.0f;
+#if 0
+    if (newspeed < 0.f)   newspeed = 0.f;
+#else
+    CLAMP_LESS(&newspeed, 0.f);
+#endif
     newspeed /= speed;
 
-    vel->x = vel->x * newspeed;
-    vel->y = vel->y * newspeed;
-    vel->z = vel->z * newspeed;
+    *vel = VectorScale(*vel, newspeed);
 }
 
 /*
@@ -178,20 +174,28 @@ void SV_Accelerate(vec3_t wishvel) {
 void SV_Accelerate() {
     float currentspeed = DotProduct(*_velocity, _wishDir);
     float addspeed = _wishSpeed - currentspeed;
-    if (addspeed <= 0)
+    if (addspeed <= 0.f)
         return;
 
     float accelspeed = (float)(sv_accelerate.value * host_frametime * _wishSpeed);
+#if 0
     if (accelspeed > addspeed)
         accelspeed = addspeed;
+#else
+    CLAMP_MORE(&accelspeed, addspeed);
+#endif
 
     *_velocity = VectorMA(*_velocity, accelspeed, _wishDir);
 }
 
 void SV_AirAccelerate(vec3_t wishveloc) {
     float wishspd = VectorNormalize(&wishveloc);
+#if 0
     if (wishspd > 30.f)
         wishspd = 30.f;
+#else
+    CLAMP_MORE(&wishspd, 30.f);
+#endif
 
     float currentspeed = DotProduct(*_velocity, wishveloc);
     float addspeed = wishspd - currentspeed;
@@ -200,8 +204,12 @@ void SV_AirAccelerate(vec3_t wishveloc) {
 
     // accelspeed = sv_accelerate.value * host_frametime;
     float accelspeed = (float)(sv_accelerate.value * _wishSpeed * host_frametime);
+#if 0
     if (accelspeed > addspeed)
         accelspeed = addspeed;
+#else
+    CLAMP_MORE(&accelspeed, addspeed);
+#endif
 
     *_velocity = VectorMA(*_velocity, accelspeed, wishveloc);
 }
@@ -241,12 +249,8 @@ void SV_WaterMove() {
 
     vec3_t wishvel = VectorMA(VectorScale(_bs.forward, cmd.move.forward), cmd.move.side, _bs.right);
 
-    if (!(cmd.move.forward) &&
-        !(cmd.move.side) &&
-        !(cmd.move.up))
-        wishvel.z -= 60;  // drift towards bottom
-    else
-        wishvel.z += cmd.move.up;
+    float goDownVal = 60.f; // drift towards bottom
+    wishvel.z += (VectorCompare(cmd.move, v3Zero)) ? goDownVal : cmd.move.up;
 
     _wishSpeed = Length(wishvel);
     if (_wishSpeed > sv_maxspeed.value) {
@@ -260,18 +264,21 @@ void SV_WaterMove() {
     float newspeed;
     if (speed) {
         newspeed = (float)(speed - host_frametime * speed * sv_friction.value);
-        if (newspeed < 0)
-            newspeed = 0;
+#if 0
+        if (newspeed < 0)   newspeed = 0;
+#else
+        CLAMP_LESS(&newspeed, 0.f);
+#endif
         *_velocity = VectorScale(*_velocity, newspeed / speed);
     }
     else
-        newspeed = 0;
+        newspeed = 0.f;
 
     // water acceleration
     if (!_wishSpeed)     return;
 
     float addspeed = _wishSpeed - newspeed;
-    if (addspeed <= 0)  return;
+    if (addspeed <= 0.f)  return;
 
     VectorNormalize(&wishvel);
     float accelspeed = (float)(sv_accelerate.value * _wishSpeed * host_frametime);
@@ -282,11 +289,11 @@ void SV_WaterMove() {
 }
 
 void SV_WaterJump() {
-    if (SV_GetTime() > sv_player->v.teleport_time ||
+    if ((SV_GetTime() > sv_player->v.teleport_time) ||
         !sv_player->v.waterlevel
         ) {
         sv_player->v.flags = (int)sv_player->v.flags & ~FL_WATERJUMP;
-        sv_player->v.teleport_time = 0;
+        sv_player->v.teleport_time = 0.f;
     }
     sv_player->v.velocity.x = sv_player->v.movedir.x;
     sv_player->v.velocity.y = sv_player->v.movedir.y;
@@ -307,9 +314,8 @@ void SV_AirMove() {
 
     // hack to not let you back into teleporter
     if ((SV_GetTime() < sv_player->v.teleport_time) &&
-        (fmove < 0.0f)
-        )
-        fmove = 0.0f;
+        (fmove < 0.f)
+        )   fmove = 0.f;
     vec3_t wishvel = VectorMA(VectorScale(_bs.forward, fmove), smove, _bs.right);
 
     if ((int)sv_player->v.movetype != MOVETYPE_WALK)
@@ -443,9 +449,7 @@ bool SV_ReadClientMessage() {
 
             default: Host_Printf("SV_ReadClientMessage: unknown command char\n"); return false;
 
-            case clc_nop:
-                //    Host_Printf ("clc_nop\n");
-                break;
+            case clc_nop: /* Host_Printf ("clc_nop\n"); */ break;
 
             case clc_stringcmd: {
                 cString str = MSG_ReadString();
@@ -473,13 +477,12 @@ bool SV_ReadClientMessage() {
                     (Q_strncasecmp(str, "ban", 3) == 0))
                     ret = 1;
 
-                if (ret == 2)       Cbuf_InsertText(str);
+                /**/ if (ret == 2)  Cbuf_InsertText(str);
                 else if (ret == 1)  Cmd_ExecuteString(str, src_client);
                 else                Con_DPrintf("%s tried to %s\n", remoteClient->name, str);
             }    break;
 
-            case clc_disconnect:
-                //    Host_Printf ("SV_ReadClientMessage: client disconnected\n");
+            case clc_disconnect: /* Host_Printf ("SV_ReadClientMessage: client disconnected\n"); */
                 return false;
 
             case clc_move: SV_ReadClientMove(&remoteClient->cmd); break;

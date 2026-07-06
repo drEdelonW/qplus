@@ -94,9 +94,9 @@ void SV_Physics_Toss(edict_p ent) {
 
     // add gravity
     if (!((EntityFlags_t)ent->v.flags & FL_ONGROUND) &&
-        ent->v.movetype != MOVETYPE_FLY &&
-        ent->v.movetype != MOVETYPE_BOUNCEMISSILE &&
-        ent->v.movetype != MOVETYPE_FLYMISSILE)
+        (ent->v.movetype != MOVETYPE_FLY) &&
+        (ent->v.movetype != MOVETYPE_BOUNCEMISSILE) &&
+        (ent->v.movetype != MOVETYPE_FLYMISSILE))
         SV_AddGravity(ent);
 
 #else
@@ -132,17 +132,17 @@ void SV_Physics_Toss(edict_p ent) {
     float backoff;
     switch ((movetype_t)ent->v.movetype) {
 #ifdef QUAKE2
-    case MOVETYPE_BOUNCEMISSILE:    backoff = 2.0;  break;
+    case MOVETYPE_BOUNCEMISSILE:    backoff = 2.f;  break;
 #endif
-    case MOVETYPE_BOUNCE:           backoff = 1.5;  break;
-    default:                        backoff = 1.0;  break;
+    case MOVETYPE_BOUNCE:           backoff = 1.5f;  break;
+    default:                        backoff = 1.f;  break;
     }
 
     ClipVelocity(ent->v.velocity, trace.plane.normal, &ent->v.velocity, backoff);
 
     // stop if on ground
-    if ((trace.plane.normal.z > 0.7) &&
-        ((ent->v.velocity.z < 60) ||
+    if ((trace.plane.normal.z > 0.7f) &&
+        ((ent->v.velocity.z < 60.f) ||
             (
                 (ent->v.movetype != MOVETYPE_BOUNCE)
 #ifdef QUAKE2

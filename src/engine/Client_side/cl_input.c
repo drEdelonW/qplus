@@ -43,31 +43,27 @@
     ================
 */
 void CL_AdjustAngles() {
-    LegDt_t speed;
-
-    if (kbIsDown(in.speed)) speed = (LegDt_t)host_frametime * cl_anglespeedkey.value;
-    else                    speed = (LegDt_t)host_frametime;
+    LegDt_t speed = (kbIsDown(in.speed)) ?
+        host_frametime * cl_anglespeedkey.value : host_frametime;
 
     if (!(kbIsDown(in.strafe))) {
         cl.viewangles.yaw = anglemod(
             cl.viewangles.yaw +
-            speed * cl_yawspeed.value *
-            (CL_KeyState(&in.left) - CL_KeyState(&in.right))
+            speed * cl_yawspeed.value * (CL_KeyState(&in.left) - CL_KeyState(&in.right))
         );
     }
     if (kbIsDown(in.klook)) {
         V_StopPitchDrift();
         cl.viewangles.pitch +=
-            speed * cl_pitchspeed.value *
-            (CL_KeyState(&in.back) - CL_KeyState(&in.forward));
+            speed * cl_pitchspeed.value * (CL_KeyState(&in.back) - CL_KeyState(&in.forward));
     }
 
-    float up = CL_KeyState(&in.lookup);
-    float down = CL_KeyState(&in.lookdown);
+    float lUp = CL_KeyState(&in.lookup);
+    float lDown = CL_KeyState(&in.lookdown);
 
-    cl.viewangles.pitch += speed * cl_pitchspeed.value * (down - up);
+    cl.viewangles.pitch += speed * cl_pitchspeed.value * (lDown - lUp);
 
-    if (up || down)
+    if (lUp || lDown)
         V_StopPitchDrift();
 
     CLAMP(-70.f, &cl.viewangles.pitch, 80.f);    // down look
@@ -86,8 +82,9 @@ void CL_BaseMove(UserCmd_p cmd) {
     if (cls.signon != SIGNONS)
         return;
 
-    CL_AdjustAngles();
+    CL_AdjustAngles(); // Calc Aim
 
+#if 0
     Q_memset(cmd, 0, sizeof(*cmd));
 
     if (kbIsDown(in.strafe)) {
@@ -99,19 +96,25 @@ void CL_BaseMove(UserCmd_p cmd) {
     if (!(kbIsDown(in.klook))) {
         cmd->move.forward += cl_forwardspeed.value * (CL_KeyState(&in.forward) - CL_KeyState(&in.back));
     }
-
+#else
+    * cmd = (UserCmd_t){
+        .move = {
+            .forward = ((kbIsDown(in.klook))) ? 0.f :
+                cl_forwardspeed.value * (CL_KeyState(&in.forward) - CL_KeyState(&in.back)),
+            .side = cl_sidespeed.value * (
+                (CL_KeyState(&in.moveright) - CL_KeyState(&in.moveleft) +
+                    ((!kbIsDown(in.strafe)) ? 0.f :
+                    CL_KeyState(&in.right) - CL_KeyState(&in.left))
+                )),
+            .up = cl_upspeed.value * (CL_KeyState(&in.up) - CL_KeyState(&in.down))
+        }
+    };
+#endif
     //
     // adjust for speed key
     //
-    if (kbIsDown(in.speed)) {
-#if 0
-        cmd->move.forward *= cl_movespeedkey.value; // TODO: make as vector scale
-        cmd->move.side *= cl_movespeedkey.value;
-        cmd->move.up *= cl_movespeedkey.value;
-#else
+    if (kbIsDown(in.speed))
         cmd->move = VectorScale(cmd->move, cl_movespeedkey.value);
-#endif 
-    }
 
 #ifdef QUAKE2
     cmd->lightlevel = cl.light_level;

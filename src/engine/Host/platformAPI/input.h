@@ -48,6 +48,7 @@ typedef enum {
     KbsDown        = 1 << 0,   // current physical state (bit0)
     KbsImpulseDown = 1 << 1,   // edge: up->down transition this frame (bit1)
     KbsImpulseUp   = 1 << 2,   // edge: down->up transition this frame (bit2)
+    KbsMask        = KbsDown | KbsImpulseDown | KbsImpulseUp
 } KeyBtnState_t;
 
 // cl_input
@@ -65,27 +66,31 @@ static inline void kbClearImpulses(kbutton_p b)     { b->kState = (KeyBtnState_t
 static inline void kbClearImpulseDown(kbutton_p b)  { b->kState = (KeyBtnState_t)(b->kState & ~KbsImpulseDown); }
 
 typedef struct {
-    kbutton_t   mlook;
-    kbutton_t   klook;
-    kbutton_t   left;
-    kbutton_t   right;
-    kbutton_t   forward;
-    kbutton_t   forward2;
-    kbutton_t   up;
-    kbutton_t   down;
-    kbutton_t   back;
-    kbutton_t   lookup;
+    kbutton_t   up;     // Aim Up
+    kbutton_t   down;   // Aim Down
+    kbutton_t   left;   // Aim Left
+    kbutton_t   right;  // Aim Right
+
+    kbutton_t   lookup; 
     kbutton_t   lookdown;
+
+    kbutton_t   forward;// Move Forward
+    // kbutton_t   forward2;// not used
     kbutton_t   moveleft;
     kbutton_t   moveright;
+    kbutton_t   back;   // Move Back
+
     kbutton_t   strafe;
     kbutton_t   speed;
+    kbutton_t   attack;
     kbutton_t   use;
     kbutton_t   jump;
-    kbutton_t   attack;
+    kbutton_t   mlook;  // Mouse look
+    kbutton_t   klook;  // Keyboard Look
     uint8_t     impulse;
 } ClInput_t;
 extern ClInput_t in;
+
 
 extern void (*vid_menukeyfn)(keycode_t key);
 

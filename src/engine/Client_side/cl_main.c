@@ -381,6 +381,7 @@ void CL_RelinkEntities() {
 # ifdef QUAKE2
         case EF_DARKFIELD:      R_DarkFieldParticles(ent); break;
 # endif
+
         case EF_MUZZLEFLASH: {
             lOrig = VectorMA(lOrig, 18.f, GetBasis(ent->angles).forward);
             *(dl) = (dLight_t){
@@ -403,6 +404,7 @@ void CL_RelinkEntities() {
                 .key = dl->key
             }; break;
 
+        case EF_DIMLIGHT | EF_MUZZLEFLASH : // 0x0A
         case EF_DIMLIGHT:
             *dl = (dLight_t){
                 .origin = lOrig,

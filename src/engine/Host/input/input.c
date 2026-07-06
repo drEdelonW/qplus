@@ -23,8 +23,8 @@ void KeyDown(kbutton_p btn) {
         return;
     }
 
-    if (btn->kState & 1) return;  // still down
-    btn->kState |= 1 + 2; // down + impulse down
+    if (kbIsDown(*btn)) return;
+    btn->kState |= KbsDown | KbsImpulseDown;
 }
 
 void KeyUp(kbutton_p btn) {
@@ -34,7 +34,7 @@ void KeyUp(kbutton_p btn) {
     if (c[0]) { k = atoi(c); }
     else { // typed manually at the console, assume for unsticking, so clear all
         btn->down[0] = btn->down[1] = 0;
-        btn->kState = 4; // impulse up
+        btn->kState = KbsImpulseUp;
         return;
     }
 
@@ -42,14 +42,16 @@ void KeyUp(kbutton_p btn) {
     else if (btn->down[1] == k)     btn->down[1] = 0;
     else    return;  // key up without coresponding down (menu pass through)
 
-    if ((btn->down[0] ||
-        btn->down[1]) ||   // some other key is still holding it down
-        (!(btn->kState & 1)) // still up (this should not happen)
+    if ((
+        btn->down[0] ||
+        btn->down[1]
+        ) ||   // some other key is still holding it down
+        (!(kbIsDown(*btn))) // still up (this should not happen)
         ) {
         return;
     }
-    btn->kState &= ~1;  // now up
-    btn->kState |= 4;   // impulse up
+    btn->kState &= ~KbsDown;  // now up
+    btn->kState |= KbsImpulseUp;   // impulse up
 }
 
 /*
@@ -104,8 +106,8 @@ static const float kKeyStateTable[8] = {
 };
 
 float CL_KeyState(kbutton_p key) {
-    float val = kKeyStateTable[key->kState & 7];
-    key->kState &= KbsDown;  // clear impulses
+    float val = kKeyStateTable[key->kState & KbsMask];
+    kbClearImpulses(key);
     return val;
 }
 #endif

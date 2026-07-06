@@ -231,7 +231,7 @@ void GetEvent() {
 
     case ButtonPress: {
         int b = -1;
-        if (x_event.xbutton.button == 1)        b = 0;
+        /**/ if (x_event.xbutton.button == 1)   b = 0;
         else if (x_event.xbutton.button == 2)   b = 2;
         else if (x_event.xbutton.button == 3)   b = 1;
         if (b >= 0)         mouse_buttonstate |= 1 << b;
@@ -239,7 +239,7 @@ void GetEvent() {
 
     case ButtonRelease: {
         int b = -1;
-        if (x_event.xbutton.button == 1)        b = 0;
+        /**/ if (x_event.xbutton.button == 1)   b = 0;
         else if (x_event.xbutton.button == 2)   b = 2;
         else if (x_event.xbutton.button == 3)   b = 1;
         if (b >= 0)         mouse_buttonstate &= ~(1 << b);
@@ -292,13 +292,11 @@ void IN_Commands() {
     for (int i = 0; i < mouse_buttons; i++) {
         if ((mouse_buttonstate & (1 << i)) &&
             !(mouse_oldbuttonstate & (1 << i))
-            )
-            Key_Event(K_MOUSE1 + i, true);
+            )   Key_Event(K_MOUSE1 + i, true);
 
         if (!(mouse_buttonstate & (1 << i)) &&
             (mouse_oldbuttonstate & (1 << i))
-            )
-            Key_Event(K_MOUSE1 + i, false);
+            )   Key_Event(K_MOUSE1 + i, false);
     }
     mouse_oldbuttonstate = mouse_buttonstate;
 }
@@ -343,5 +341,5 @@ void IN_Move(UserCmd_p cmd) {
         else
             cmd->move.forward -= m_forward.value * mouse_y;
     }
-    mouse_x = mouse_y = 0.0;
+    mouse_x = mouse_y = 0.f;
 }

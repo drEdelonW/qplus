@@ -69,7 +69,7 @@ float V_CalcRoll(ang3_t angles, vec3_t velocity) {
     _bs = GetBasis(angles);
     float side = DotProduct(velocity, _bs.right);
     float sign = (side < 0.f) ? -1.f : 1.f;
-    side = fabs(side);
+    side = fabsf(side);
 
     float value = cl_rollangle.value;
     // if (cl.inwater)
@@ -92,18 +92,18 @@ float V_CalcBob() {
     LegDt_t cycle = (GetClSimTime() - (int)(GetClSimTime() / cl_bobcycle.value) * cl_bobcycle.value) / cl_bobcycle.value;
 
     if (cycle < cl_bobup.value) cycle = M_PI * cycle / cl_bobup.value;
-    else                        cycle = M_PI + M_PI * (cycle - cl_bobup.value) / (1.0 - cl_bobup.value);
+    else                        cycle = M_PI + M_PI * (cycle - cl_bobup.value) / (1.f - cl_bobup.value);
 
     // bob is proportional to velocity in the xy plane
     // (don't count Z, or jumping messes it up)
 
-    float bob = sqrt(
+    float bob = sqrtf(
         (cl.velocity.x * cl.velocity.x) +
         (cl.velocity.y * cl.velocity.y)
     ) * cl_bob.value;
     //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
-    bob = (bob * 0.3f) + (bob * 0.7f * sin(cycle));
-    if (bob > 4.f)          bob = 4.f;
+    bob = (bob * 0.3f) + (bob * 0.7f * sinf(cycle));
+    /**/ if (bob > 4.f)     bob = 4.f;
     else if (bob < -7.f)    bob = -7.f;
 
     return bob;
@@ -122,14 +122,14 @@ void V_StartPitchDrift() {
         ) {
         cl.pitchvel = v_centerspeed.value;
         cl.nodrift = false;
-        cl.driftmove = 0;
+        cl.driftmove = 0.f;
     }
 }
 
 void V_StopPitchDrift() {
     cl.laststop = GetClSimTime();
     cl.nodrift = true;
-    cl.pitchvel = 0;
+    cl.pitchvel = 0.f;
 }
 
 /*
@@ -349,6 +349,7 @@ V_CalcPowerupCshift
 =============
 */
 void V_CalcPowerupCshift() {
+#if 0
     if (cl.items & IT_QUAD) {
         cl.cshifts[CSHIFT_POWERUP].destcolor[0] = 0;
         cl.cshifts[CSHIFT_POWERUP].destcolor[1] = 0;
@@ -375,6 +376,22 @@ void V_CalcPowerupCshift() {
     }
     else
         cl.cshifts[CSHIFT_POWERUP].percent = 0;
+#else
+    if (cl.items & IT_QUAD) {
+        cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {0, 0, 50}, 30 };
+    }
+    else if (cl.items & IT_SUIT) {
+        cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {0, 255, 0}, 20 };
+    }
+    else if (cl.items & IT_INVISIBILITY) {
+        cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {100, 100, 100}, 100 };
+    }
+    else if (cl.items & IT_INVULNERABILITY) {
+        cl.cshifts[CSHIFT_POWERUP] = (ColorShift_t){ {255, 255, 0}, 30 };
+    }
+    else
+        cl.cshifts[CSHIFT_POWERUP].percent = 0;
+#endif
 }
 
 /*
@@ -769,16 +786,16 @@ void V_CalcRefdef() {
 
     // smooth out stair step ups
     if ((cl.onground) &&
-        ((ent->origin.z - _oldZ) > 0)) {
+        ((ent->origin.z - _oldZ) > 0.f)) {
 
         LegDt_t steptime = GetClSimTime() - cl.oldtime;
-        if (steptime < 0.0f) {
-            steptime = 0.0f;    //FIXME  I_Error ("steptime < 0");
+        if (steptime < 0.f) {
+            steptime = 0.f;    //FIXME  I_Error ("steptime < 0");
         }
 
         _oldZ += steptime * 80.f;
         if (_oldZ > ent->origin.z)         _oldZ = ent->origin.z;
-        if ((ent->origin.z - _oldZ) > 12)  _oldZ = ent->origin.z - 12;
+        if ((ent->origin.z - _oldZ) > 12.f)  _oldZ = ent->origin.z - 12.f;
         r_refdef.vieworg.z += _oldZ - ent->origin.z;
         view->origin.z += _oldZ - ent->origin.z;
     }

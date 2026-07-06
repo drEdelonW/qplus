@@ -66,7 +66,7 @@ void R_Alias_clip_z(FinalVert_p pfv0, FinalVert_p pfv1, FinalVert_p out) {
         avout.fv = VectorMA(pav1->fv, scale, VectorSubtract(pav0->fv, pav1->fv));
         avout.fv.z = ALIAS_Z_CLIP_PLANE;
 
-        out->vAttr.s = pfv1->vAttr.s + (pfv0->vAttr.s - pfv1->vAttr.s) * scale;
+        out->vAttr.s = pfv1->vAttr.s + (pfv0->vAttr.s - pfv1->vAttr.s) * scale; // TODO: replace by TxMA like
         out->vAttr.t = pfv1->vAttr.t + (pfv0->vAttr.t - pfv1->vAttr.t) * scale;
         out->vAttr.light = pfv1->vAttr.light + (pfv0->vAttr.light - pfv1->vAttr.light) * scale;
     }
