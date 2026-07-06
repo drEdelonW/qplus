@@ -16,7 +16,7 @@ typedef enum {
     SURF_DRAWTILED      = 1u << 5, // 0x20
     SURF_DRAWBACKGROUND = 1u << 6, // 0x40
     SURF_UNDERWATER     = 1u << 7  // 0x80  for GLQUAKE
-} SurfaceFlags_e;
+} SurfFlags_t;
 
 #ifdef GLQUAKE
 typedef union {
@@ -36,7 +36,7 @@ struct glpoly_s {
     glpoly_p    next;
     glpoly_p    chain;
     int         numverts;
-    int         flags;      // for SURF_UNDERWATER
+    SurfFlags_t flags;      // for SURF_UNDERWATER
     glVert_t    verts[4];
 };
 #endif
@@ -46,17 +46,21 @@ struct glpoly_s {
 struct mSurface_s {
     int32_t     visframe;   // should be drawn when node is crossed
     int32_t     dlightframe;
-    fixed8_t     dlightbits;
-    mPlane_p        plane;
-    SurfaceFlags_e  flags;
+    fixed8_t    dlightbits;
+    mPlane_p    plane;
+    SurfFlags_t flags;
     int32_t     firstedge;  // look up in model->surfedges[], negative numbers
     int32_t     numedges;   // are backwards edges
 
     // surface generation data
 #ifdef GLQUAKE
     mSurface_p  texturechain;
+#if 1   /* TODO: remake it fot fixed/int ST */
     int         light_s;
     int         light_t;           // gl lightmap coordinates
+#else
+    texST_t     light;
+#endif
     glpoly_p    polys;                      // multiple if warped
     int         lightmaptexturenum;
     int         cached_light[MAXLIGHTMAPS]; // values currently used in lightmap
@@ -64,7 +68,7 @@ struct mSurface_s {
 #else
     SurfCache_p cachespots[MIPLEVELS];
 #endif
-    fixed4_t    texturemins[VECT_TX_DIM];   // TODO: check is it fixed4_ jh fixed16_t
+    fixed4_t    texturemins[VECT_TX_DIM];   // TODO: check is it fixed4_ or fixed16_t
     fixed4_t    extents[VECT_TX_DIM];
     mTexInfo_p  texinfo;
 

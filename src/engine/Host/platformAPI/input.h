@@ -23,6 +23,70 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "UserCmd.h"
 #include "keys.h"
 
+/*
+    ===============================================================================
+
+    KEY BUTTONS
+
+    Continuous button event tracking is complicated by the fact that two different
+    input sources (say, mouse button 1 and the control key) can both press the
+    same button, but the button should only be released when both of the
+    pressing key have been released.
+
+    When a key event issues a button command (+forward, +attack, etc), it appends
+    its key number as a parameter to the command so it can be matched up with
+    the release.
+
+    kState bit 0 is the current kState of the key
+    kState bit 1 is edge triggered on the up to down transition
+    kState bit 2 is edge triggered on the down to up transition
+
+    ===============================================================================
+*/
+
+typedef enum {
+    KbsDown        = 1 << 0,   // current physical state (bit0)
+    KbsImpulseDown = 1 << 1,   // edge: up->down transition this frame (bit1)
+    KbsImpulseUp   = 1 << 2,   // edge: down->up transition this frame (bit2)
+} KeyBtnState_t;
+
+// cl_input
+typedef struct {
+    keycode_t       down[2];    // key nums holding it down
+    KeyBtnState_t   kState;     // low bit is down state // TODO: make bit state helpers
+} kbutton_t;
+typedef kbutton_t* kbutton_p;
+
+static inline bool kbIsDown(kbutton_t b)        { return b.kState & KbsDown; }
+static inline bool kbWentDown(kbutton_t b)      { return b.kState & KbsImpulseDown; }
+static inline bool kbWentUp(kbutton_t b)        { return b.kState & KbsImpulseUp; }
+static inline bool kbWasPressed(kbutton_t b)    { return kbIsDown(b) || kbWentDown(b); }
+static inline void kbClearImpulses(kbutton_p b)     { b->kState = (KeyBtnState_t)(b->kState & KbsDown); }
+static inline void kbClearImpulseDown(kbutton_p b)  { b->kState = (KeyBtnState_t)(b->kState & ~KbsImpulseDown); }
+
+typedef struct {
+    kbutton_t   mlook;
+    kbutton_t   klook;
+    kbutton_t   left;
+    kbutton_t   right;
+    kbutton_t   forward;
+    kbutton_t   forward2;
+    kbutton_t   up;
+    kbutton_t   down;
+    kbutton_t   back;
+    kbutton_t   lookup;
+    kbutton_t   lookdown;
+    kbutton_t   moveleft;
+    kbutton_t   moveright;
+    kbutton_t   strafe;
+    kbutton_t   speed;
+    kbutton_t   use;
+    kbutton_t   jump;
+    kbutton_t   attack;
+    uint8_t     impulse;
+} ClInput_t;
+extern ClInput_t in;
+
 extern void (*vid_menukeyfn)(keycode_t key);
 
 #ifdef __cplusplus

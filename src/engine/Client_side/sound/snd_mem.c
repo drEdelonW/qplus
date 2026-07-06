@@ -67,7 +67,7 @@ void ResampleSfx(sfx_p sfx, int inrate, int inwidth, uint8_p data) {
     else {
         // general case
         fixed8_t samplefrac = 0;
-        int fracstep = (int)(stepscale * 256);
+        fixed8_t fracstep = (int)(stepscale * FIXED8_ONE);
         for (int i = 0; i < outcount; i++) {
             int srcsample = FIXED8_TO_INT(samplefrac);
             samplefrac += fracstep;

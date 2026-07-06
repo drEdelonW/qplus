@@ -223,7 +223,7 @@ int WIPX_CheckNewConnections() {
 
 static char packetBuffer[NET_DATAGRAMSIZE + 4];
 
-int WIPX_Read(int handle, byte* buf, int len, qsockaddr_p addr) {
+int WIPX_Read(int handle, uint8_p buf, int len, qsockaddr_p addr) {
     int addrlen = sizeof(qsockaddr_t);
     int socket = ipxsocket[handle];
     int ret;
@@ -249,13 +249,13 @@ int WIPX_Read(int handle, byte* buf, int len, qsockaddr_p addr) {
 
 //=============================================================================
 
-int WIPX_Broadcast(int handle, byte* buf, int len) {
+int WIPX_Broadcast(int handle, uint8_p buf, int len) {
     return WIPX_Write(handle, buf, len, &broadcastaddr);
 }
 
 //=============================================================================
 
-int WIPX_Write(int handle, byte* buf, int len, qsockaddr_p addr) {
+int WIPX_Write(int handle, uint8_p buf, int len, qsockaddr_p addr) {
     int socket = ipxsocket[handle];
     int ret;
 

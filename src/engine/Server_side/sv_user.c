@@ -388,27 +388,17 @@ void SV_ClientThink() {
 SV_ReadClientMove
 ===================
 */
-void SV_ReadClientMove(UserCmd_p move) {
+void SV_ReadClientMove(UserCmd_p move) {    /* <==> void CL_SendMove(UserCmd_p cmd) */
     // read ping time
     remoteClient->ping_times[remoteClient->num_pings % NUM_PING_TIMES] = (float)SV_GetTime() - MSG_ReadFloat();
     remoteClient->num_pings++;
 
-    // read current angles
-    ang3_t angle = MSG_ReadAngles();
+    remoteClient->edict->v.v_angle = MSG_ReadAngles();  // read current angles
+    move->move = MSG_ReadMoveVec();                     // read movement
 
-    remoteClient->edict->v.v_angle = angle;
-
-    // read movement
-    move->move = (vec3_t){
-        .forward = MSG_ReadShort(),
-        .side = MSG_ReadShort(),
-        .up = MSG_ReadShort()
-    };
-
-    // read buttons
-    int bits = MSG_ReadByte();
-    remoteClient->edict->v.button0 = (float)(bits & 1);
-    remoteClient->edict->v.button2 = (float)((bits & 2) >> 1);
+    uint8_t bits = MSG_ReadByte();                      // read buttons
+    remoteClient->edict->v.button0 = (float)((bits & (1 << 0)) >> 0);
+    remoteClient->edict->v.button2 = (float)((bits & (1 << 1)) >> 1);
 
     uint8_t i = MSG_ReadByte();
     if (i)

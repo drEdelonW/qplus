@@ -114,7 +114,7 @@ static int	windowed_default;
 
 modestate_t	modestate = MS_UNINIT;
 
-static byte* vid_surfcache;
+static uint8_p vid_surfcache;
 static int		vid_surfcachesize;
 static int		VID_highhunkmark;
 
@@ -288,7 +288,7 @@ bool VID_AllocBuffers(int width, int height) {
 
     d_pzbuffer = Hunk_HighAllocName(tbuffersize, "video");
 
-    vid_surfcache = (byte*)d_pzbuffer +
+    vid_surfcache = (uint8_p)d_pzbuffer +
         width * height * sizeof(*d_pzbuffer);
 
     return true;
@@ -1588,7 +1588,7 @@ void VID_LockBuffer() {
     }
 
     if (r_dowarp)   d_viewbuffer = r_warpbuffer;
-    else            d_viewbuffer = (void*)(byte*)vid.scr.pBuff;
+    else            d_viewbuffer = (void*)(uint8_p)vid.scr.pBuff;
 
     if (r_dowarp)   screenwidth = WARP_WIDTH;
     else            screenwidth = vid.rowbytes;
@@ -1849,7 +1849,7 @@ void VID_ForceMode_f() {
 
 void	VID_Init(uint8_p palette) {
     int bestmatch, bestmatchmetric, t, dr, dg, db;
-    byte* ptmp;
+    uint8_p ptmp;
 
     Cvar_RegisterVariable(&vid_mode);
     Cvar_RegisterVariable(&vid_wait);
@@ -2157,7 +2157,7 @@ void VID_Update(vRect_p rects) {
 D_BeginDirectRect
 ================
 */
-void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
+void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
     int		i, j, reps, repshift;
     vRect_t	rect;
 
@@ -2209,10 +2209,10 @@ void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
         for (i = 0; i < (height << repshift); i += reps) {
             for (j = 0; j < reps; j++) {
                 memcpy(&backingbuf[(i + j) * 24],
-                    (byte*)mgldc->surface + x +
+                    (uint8_p)mgldc->surface + x +
                     ((y << repshift) + i + j) * mgldc->mi.bytesPerLine,
                     width);
-                memcpy((byte*)mgldc->surface + x +
+                memcpy((uint8_p)mgldc->surface + x +
                     ((y << repshift) + i + j) * mgldc->mi.bytesPerLine,
                     &pbitmap[(i >> repshift) * width],
                     width);
@@ -2285,7 +2285,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
         // restore to the screen
         for (int i = 0; i < (height << repshift); i += reps) {
             for (int j = 0; j < reps; j++) {
-                memcpy((byte*)mgldc->surface + x +
+                memcpy((uint8_p)mgldc->surface + x +
                     ((y << repshift) + i + j) * mgldc->mi.bytesPerLine,
                     &backingbuf[(i + j) * 24],
                     width);

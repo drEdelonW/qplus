@@ -145,7 +145,7 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
     mPlane_p plane = node->plane;
     float front = DotProduct(start, plane->normal) - plane->dist;
     float back = DotProduct(end, plane->normal) - plane->dist;
-    bool side = (front < 0.0f);
+    bool side = (front < 0.f);
 
     if ((back < 0) == side)
         return RecursiveLightPoint(node->children[side], start, end);

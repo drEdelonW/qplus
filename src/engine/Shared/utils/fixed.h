@@ -40,21 +40,23 @@ typedef fixed16_t*  fixed16_p;
 
 // -- Constants ----------------------------------------------------------------
 #define FIXED4_FRAC_BITS    4
-#define FIXED4_ONE          (1 << FIXED4_FRAC_BITS)     // 0x10 (1.0) in 12.4 
+#define FIXED4_ONE          ((int16_t)1 << FIXED4_FRAC_BITS)     // 0x10 (1.0) in 12.4 
 #define FIXED4_FRAC_MASK    (FIXED4_ONE - 1)   // 0x0F less then (1.0) in 12.4
 
 #define FIXED8_FRAC_BITS    8
-#define FIXED8_ONE          (1 << FIXED8_FRAC_BITS)     // 0x100 (1.0) in 8.8 
+#define FIXED8_ONE          ((uint16_t)1 << FIXED8_FRAC_BITS)     // (256) 0x100 (1.0) in 8.8 
 #define FIXED8_FRAC_MASK    (FIXED8_ONE - 1)   // 0xFF less then (1.0) in 8.8
 
 #define FIXED16_FRAC_BITS   16
-#define FIXED16_ONE         (1 << FIXED16_FRAC_BITS)    // 0x10000 (1.0) in 16.16
+#define FIXED16_ONE         ((int32_t)1 << FIXED16_FRAC_BITS)    // 0x10000 (1.0) in 16.16
 #define FIXED16_FRAC_MASK   (FIXED16_ONE - 1)   // 0xFFFF less then (1.0) in 16.16
 
 // -- Conversion ---------------------------------------------------------------
+#if 1
 #define FIXED4_TO_INT(x)        ((x) >> FIXED4_FRAC_BITS)
 #define INT_TO_FIXED4(x)        ((fixed4_t)(x) << FIXED4_FRAC_BITS)
 #define FIXED4_FRAC(x)          ((x) & FIXED4_FRAC_MASK)    // Frac part (x & 0x0F)
+#endif
 
 #define FIXED8_TO_INT(x)        ((x) >> FIXED8_FRAC_BITS)
 #define INT_TO_FIXED8(x)        ((fixed8_t)(x) << FIXED8_FRAC_BITS)
@@ -64,12 +66,39 @@ typedef fixed16_t*  fixed16_p;
 #define INT_TO_FIXED16(x)       ((fixed16_t)(x) << FIXED16_FRAC_BITS)
 #define FIXED16_FRAC(x)         ((x) & FIXED16_FRAC_MASK)   // Frac part (x & 0xFFFF)
 
+#if 0
 // -- fixed4_t (11.4 signed) --
-static inline int      Fx4ToInt(fixed4_t v)   { return v >> FIXED4_FRAC_BITS; }
-static inline fixed4_t IntToFx4(int v)        { return (fixed4_t)(v << FIXED4_FRAC_BITS); }
-static inline fixed4_t Fx4Frac(fixed4_t v)    { return v & FIXED4_FRAC_MASK; }
-static inline float    Fx4ToFl(fixed4_t v)    { return (float)v * (1.0f / FIXED4_ONE); }
-static inline fixed4_t FlToFx4(float f)       { return (fixed4_t)(f * FIXED4_ONE); }
+static inline int Fx4ToInt(fixed4_t v) {
+    return v.fx >> FIXED4_FRAC_BITS;
+}
+static inline fixed4_t IntToFx4(int i) {
+    return (fixed4_t){ .fx = (int16_t)(i << FIXED4_FRAC_BITS) };
+}
+
+static inline fixed4_t Fx4Frac(fixed4_t v){
+    return (fixed4_t){ .fx = (int16_t)(v.fx & FIXED4_FRAC_MASK)};
+}
+
+static inline float Fx4ToFl(fixed4_t v){
+    return (float)v.fx * (1.0f / FIXED4_ONE);
+}
+static inline fixed4_t FlToFx4(float f) {
+    return (fixed4_t){ .fx = (int16_t)(f * FIXED4_ONE) };
+}
+
+// -- fixed4_t arithmetic --
+static inline fixed4_t Fx4Add(fixed4_t a, fixed4_t b) {
+    return (fixed4_t){ .fx = (int16_t)(a.fx + b.fx) };
+}
+static inline fixed4_t Fx4Sub(fixed4_t a, fixed4_t b) {
+    return (fixed4_t){ .fx = (int16_t)(a.fx - b.fx) };
+}
+static inline bool Fx4Gt(fixed4_t a, fixed4_t b) { return a.fx >  b.fx; }
+static inline bool Fx4Lt(fixed4_t a, fixed4_t b) { return a.fx <  b.fx; }
+static inline bool Fx4Ge(fixed4_t a, fixed4_t b) { return a.fx >= b.fx; }
+static inline bool Fx4Le(fixed4_t a, fixed4_t b) { return a.fx <= b.fx; }
+static inline bool Fx4Eq(fixed4_t a, fixed4_t b) { return a.fx == b.fx; }
+
 
 // -- fixed8_t (8.8 unsigned) --
 static inline int      Fx8ToInt(fixed8_t v)   { return v >> FIXED8_FRAC_BITS; }
@@ -84,6 +113,7 @@ static inline fixed16_t IntToFx16(int v)         { return (fixed16_t)((int32_t)v
 static inline fixed16_t Fx16Frac(fixed16_t v)    { return v & FIXED16_FRAC_MASK; }
 static inline float     Fx16ToFl(fixed16_t v)    { return (float)v * (1.0f / FIXED16_ONE); }
 static inline fixed16_t FlToFx16(float f)        { return (fixed16_t)(f * FIXED16_ONE); }
+#endif
 
 // -- Arithmetic ---------------------------------------------------------------
 #define FIXED_MID(a, b)         HALF(((a) + (b)))   // midpoint, stays in int

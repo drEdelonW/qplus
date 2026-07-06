@@ -49,8 +49,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
                 $(eval INPUT_DIR = $(HOST_DIR)/input) $(eval INCLUDES += $(INPUT_DIR))
                         SRC_LIST += $(INPUT_DIR)/keys.c
-
-
+                        SRC_LIST += $(INPUT_DIR)/input.c
 
 
         $(eval SV_SIDE_DIR = $(ENG_DIR)/Server_side) $(eval INCLUDES += $(SV_SIDE_DIR))

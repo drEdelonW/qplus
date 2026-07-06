@@ -159,7 +159,7 @@ void VID_ForceLockState(int lk) {}
 void VID_LockBuffer() {}
 void VID_UnlockBuffer() {}
 int VID_ForceUnlockedAndReturnState() { return 0; }
-void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {}
+void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {}
 void D_EndDirectRect(int x, int y, int width, int height) {}
 
 void CenterWindow(HWND hWndCenter, int width, int height, BOOL lefttopjustify) {
@@ -1357,7 +1357,7 @@ VID_Init
 void    VID_Init(uint8_p palette) {
     int        i, existingmode;
     int        basenummodes, width, height, bpp, findbpp, done;
-    byte* ptmp;
+    uint8_p ptmp;
     char    gldir[MAX_OSPATH];
     HDC        hdc;
     DEVMODE    devmode;

@@ -383,7 +383,7 @@ int WINS_CheckNewConnections() {
 
 //=============================================================================
 
-int WINS_Read(int socket, byte* buf, int len, struct qsockaddr* addr) {
+int WINS_Read(int socket, uint8_p buf, int len, struct qsockaddr* addr) {
     int addrlen = sizeof(struct qsockaddr);
     int ret;
 
@@ -413,7 +413,7 @@ int WINS_MakeSocketBroadcastCapable(int socket) {
 
 //=============================================================================
 
-int WINS_Broadcast(int socket, byte* buf, int len) {
+int WINS_Broadcast(int socket, uint8_p buf, int len) {
     int ret;
 
     if (socket != net_broadcastsocket) {
@@ -432,7 +432,7 @@ int WINS_Broadcast(int socket, byte* buf, int len) {
 
 //=============================================================================
 
-int WINS_Write(int socket, byte* buf, int len, struct qsockaddr* addr) {
+int WINS_Write(int socket, uint8_p buf, int len, struct qsockaddr* addr) {
     int ret;
 
     ret = psendto(socket, buf, len, 0, (struct sockaddr*)addr, sizeof(struct qsockaddr));

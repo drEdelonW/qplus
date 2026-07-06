@@ -8,16 +8,19 @@
 #include "Node.h"
 #include "angle.h"
 
+#include "StateHistory.h"
 // it was [entity_t] on render side
 struct r_Entity_s {
     bool    forcelink;      // model changed
     int     update_type;
     EntityState_t baseline; // to fill in defaults in updates
-    LegTime_t msgtime;// time of last update
-    vec3_t  msg_origins[2]; // last two updates(0 is newest)
+    LegTime_t msgtime;      // time of last update
+
+    vec3_t  msg_origins[HistoryDepth]; // last two updates(Cur is newest)
     vec3_t  origin;
-    ang3_t  msg_angles[2];  // last two updates(0 is newest)
+    ang3_t  msg_angles[HistoryDepth];  // last two updates(Cur is newest)
     ang3_t  angles;
+
     Model_p model;          // NULL = no model
     efrag_p efrag;          // linked list of efrags
     int     frame;

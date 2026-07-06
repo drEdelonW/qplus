@@ -325,9 +325,9 @@ void CL_ParseUpdate(update_bits_t bits) {
             _bitCnt[i]++;
     }
 
-    bool forcelink = (ent->msgtime != cl.mtime[1]); // no previous frame to lerp from
+    bool forcelink = (ent->msgtime != cl.mtime[Prev]); // no previous frame to lerp from
 
-    ent->msgtime = cl.mtime[0];
+    ent->msgtime = cl.mtime[Cur];
 
     uint16_t modnum = (bits & U_MODEL) ? (uint16_t)MSG_ReadByte() : (uint16_t)ent->baseline.modelindex;
     if (modnum >= MAX_MODELS)   Host_Error("CL_ParseModel: bad modnum");
@@ -425,10 +425,10 @@ void CL_ParseClientdata(server_update_bits_t bits) {
     cl.viewheight = (bits & SU_VIEWHEIGHT) ? MSG_ReadChar() : DEFAULT_VIEWHEIGHT;
     cl.idealpitch = (bits & SU_IDEALPITCH) ? MSG_ReadChar() : 0;
 
-    cl.mvelocity[1] = cl.mvelocity[0];
+    cl.mvelocity[Prev] = cl.mvelocity[Cur];
     for (int i = 0; i < VECT_DIM; i++) {    // TODO: wrap MSG_ReadChar to MSG_vector_tools
         cl.punchangle.v[i]   = (bits & (SU_PUNCH1 << i)) ?    (MSG_ReadChar() * 1.f) : 0.f;
-        cl.mvelocity[0].v[i] = (bits & (SU_VELOCITY1 << i)) ? fixed4_tof(MSG_ReadChar()) : 0.f;
+        cl.mvelocity[Cur].v[i] = (bits & (SU_VELOCITY1 << i)) ? fixed4_tof(MSG_ReadChar()) : 0.f;
     }
     uint32_t msg;
     // [always sent]    SU_ITEMS
@@ -588,8 +588,8 @@ void CL_ParseServerMessage() {
         case svc_nop:       Con_Printf("%s\n", svc_strings[svc_nop]); break;
 
         case svc_time: {    // timestamp rotation
-            cl.mtime[1] = cl.mtime[0];
-            cl.mtime[0] = MSG_ReadFloat();
+            cl.mtime[Prev] = cl.mtime[Cur];
+            cl.mtime[Cur] = MSG_ReadFloat();
         } break;
 
         case svc_clientdata:    CL_ParseClientdata(MSG_ReadShort());    break;
@@ -686,7 +686,7 @@ void CL_ParseServerMessage() {
             uint8_t msg = MSG_ReadByte();
             if (msg >= MAX_CL_STATS)        Host_SysError("svc_updatestat: %i is invalid", msg);
 
-            cl.stats[msg] = (uint32_t)MSG_ReadLong();
+            cl.stats[msg] = MSG_ReadLong();
         } break;
 
         case svc_spawnstaticsound:  CL_ParseStaticSound();  break;

@@ -236,9 +236,9 @@ GL_DrawAliasFrame
 void GL_DrawAliasFrame(AliasHdr_p pAliasHdr, int posenum) {
     lastposenum = posenum;
 
-    TriVertx_p verts = (TriVertx_p)((byte*)pAliasHdr + pAliasHdr->posedata);
+    TriVertx_p verts = (TriVertx_p)((uint8_p)pAliasHdr + pAliasHdr->posedata);
     verts += posenum * pAliasHdr->poseverts;
-    int* order = (int*)((byte*)pAliasHdr + pAliasHdr->commands);
+    int* order = (int*)((uint8_p)pAliasHdr + pAliasHdr->commands);
 
     while (1) {
         // get the vertex count and primitive type
@@ -282,9 +282,9 @@ void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
     float lheight = currententity->origin.z - lightspot.z;
 
     float height = 0;
-    TriVertx_p verts = (TriVertx_p)((byte*)pAliasHdr + pAliasHdr->posedata);
+    TriVertx_p verts = (TriVertx_p)((uint8_p)pAliasHdr + pAliasHdr->posedata);
     verts += posenum * pAliasHdr->poseverts;
-    int* order = (int*)((byte*)pAliasHdr + pAliasHdr->commands);
+    int* order = (int*)((uint8_p)pAliasHdr + pAliasHdr->commands);
 
     height = -lheight + 1.0;
 

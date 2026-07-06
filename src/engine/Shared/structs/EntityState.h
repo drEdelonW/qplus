@@ -5,6 +5,7 @@
 #include "angle.h"
 // entity effects
 typedef enum {
+    EF_NONE         = 0u,      // 0x0000
     EF_BRIGHTFIELD  = 1u << 0, // 0x0001
     EF_MUZZLEFLASH  = 1u << 1, // 0x0002
     EF_BRIGHTLIGHT  = 1u << 2, // 0x0004

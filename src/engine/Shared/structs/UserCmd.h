@@ -3,15 +3,10 @@
 #include "vector.h"
 #include "angle.h"
 typedef struct {
-    // ang3_t viewangles; // TODO: not used?
-    // intended velocities
-#if 0
-    float forwardmove;
-    float sidemove;
-    float upmove;
-#else
-    vec3_t move;
+#if 0   // TODO: not used?
+    ang3_t viewangles;
 #endif
+    vec3_t move;    // intended velocities
 #ifdef QUAKE2
     uint8_t lightlevel;
 #endif

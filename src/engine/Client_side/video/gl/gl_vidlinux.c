@@ -121,7 +121,7 @@ bool isPermedia = false;
 bool gl_mtexable = false;
 
 /*-----------------------------------------------------------------------*/
-void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
+void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
 }
 
 void D_EndDirectRect(int x, int y, int width, int height) {
@@ -197,7 +197,7 @@ void VID_ShiftPalette(uint8_p p) {
 }
 
 void    VID_SetPalette(uint8_p palette) {
-    byte* pal;
+    uint8_p pal;
     uint32_t r, g, b;
     uint32_t v;
     int     r1, g1, b1;

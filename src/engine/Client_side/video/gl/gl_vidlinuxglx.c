@@ -102,7 +102,7 @@ bool isPermedia = false;
 bool gl_mtexable = false;
 
 /*-----------------------------------------------------------------------*/
-void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
+void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
 }
 
 void D_EndDirectRect(int x, int y, int width, int height) {
@@ -466,7 +466,7 @@ void VID_SetPalette(uint8_p palette) {
     //
     // 8 8 8 encoding
     //
-    byte* pal = palette;
+    uint8_p pal = palette;
     uint32_p table = d_8to24table;
     for (int i = 0; i < 256; i++) {
         uint32_t r = pal[0];

@@ -111,7 +111,7 @@ int  vid_buffersize;
 )
 
 int  VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
-byte* VGA_pagebase;
+uint8_p VGA_pagebase;
 
 bool   x_fullscreen = true;
 Display* x_disp = NULL;
@@ -156,7 +156,7 @@ static int    count_frames = 0;
 D_BeginDirectRect
 ================
 */
-void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height) {
+void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
     // direct drawing of the "accessing disk" icon isn't supported under Nextstep
 }
 

@@ -74,7 +74,7 @@ void Sys_PageIn(TypeLess_ptr ptr, int size) {
     // touch all the memory to make sure it's there. The 16-page skip is to
     // keep Win 95 from thinking we're trying to page ourselves in (we are
     // doing that, of course, but there's no reason we shouldn't)
-    byte* x = (byte*)ptr;
+    uint8_p x = (uint8_p)ptr;
 
     for (int n = 0; n < 4; n++) {
         for (int m = 0; m < (size - 16 * 0x1000); m += 4) {

@@ -171,6 +171,8 @@ void CL_PrintEntities_f() {
 }
 
 
+
+
 /*
 ===============
 SetPal
@@ -178,16 +180,24 @@ SetPal
 Debugging tool, just flashes the screen
 ===============
 */
-void SetPal(int i) {
-#if 0
-    static int _old;
+
+typedef enum {
+    PalNormal = 0,   // host_basepal
+    PalLowFrac = 1,   // green flash — frac < -0.01
+    PalHighFrac = 2,   // blue flash  — frac > 1.01
+} DbgPal_t;
+
+void SetPal(DbgPal_t i) {
+#if 0   /* seems like color frame profiling */
+# if 0
+    static DbgPal_t _old;
 
     if (i == _old)   return;
     _old = i;
 
-    if (i == 0)
+    if (i == PalNormal)
         VID_SetPalette(host_basepal);
-    else if (i == 1) {
+    else if (i == PalLowFrac) {
         uint8_t pal[768];
         for (int c = 0; c < 768; c += 3) {
             pal[c + 0] = 0;
@@ -196,7 +206,7 @@ void SetPal(int i) {
         }
         VID_SetPalette(pal);
     }
-    else {
+    else { // PalHighFrac
         uint8_t pal[768];
         for (int c = 0; c < 768; c += 3) {
             pal[c + 0] = 0;
@@ -205,11 +215,42 @@ void SetPal(int i) {
         }
         VID_SetPalette(pal);
     }
+# else
+    static DbgPal_t _old;
+
+    if (i == _old)   return;
+    _old = i;
+
+    switch (i) {
+    case PalNormal: {
+        VID_SetPalette(host_basepal);
+    } break;
+
+    case PalLowFrac: {
+        Con_Printf("low frac\n");
+        uint8_t pal[768];
+        for (int c = 0; c < 768; c += 3) {
+            pal[c + 0] = 0;
+            pal[c + 1] = 255;
+            pal[c + 2] = 0;
+        }
+        VID_SetPalette(pal);
+    } break;
+
+    case PalHighFrac: {
+        Con_Printf("high frac\n");
+        uint8_t pal[768];
+        for (int c = 0; c < 768; c += 3) {
+            pal[c + 0] = 0;
+            pal[c + 1] = 0;
+            pal[c + 2] = 255;
+        }
+        VID_SetPalette(pal);
+    } break;
+    };
+# endif
 #endif
 }
-
-
-
 
 
 /*
@@ -221,42 +262,40 @@ should be put at.
 ===============
 */
 LegDt_t CL_LerpPoint() {
-    LegDt_t f = (LegDt_t)(cl.mtime[0] - cl.mtime[1]);
+    LegDt_t dT = (LegDt_t)(cl.mtime[Cur] - cl.mtime[Prev]);
 
-    if (!f ||
+    if (!dT ||
         cl_nolerp.value ||
         cls.timedemo ||
         Host_IsServerActive()
         ) {
-        SetClSimTime(cl.mtime[0]);
-        return 1.0f;
+        SetClSimTime(cl.mtime[Cur]);
+        return 1.f;
     }
 
-    if (f > 0.1f) { // dropped packet, or start of demo
-        cl.mtime[1] = cl.mtime[0] - 0.1;
-        f = 0.1f;
+    if (dT > 0.1f) { // dropped packet, or start of demo
+        cl.mtime[Prev] = cl.mtime[Cur] - 0.1;
+        dT = 0.1f;
     }
 
-    LegDt_t frac = (LegDt_t)(GetClSimTime() - cl.mtime[1]) / f;
+    LegDt_t frac = (LegDt_t)(GetClSimTime() - cl.mtime[Prev]) / dT;
     //Con_Printf ("frac: %f\n",frac);
-    if (frac < 0) {
+    if (frac < 0.f) {
         if (frac < -0.01f) {
-            SetPal(1);
-            SetClSimTime(cl.mtime[1]);
-            //    Con_Printf ("low frac\n");
+            SetPal(PalLowFrac);
+            SetClSimTime(cl.mtime[Prev]);
         }
-        frac = 0;
+        frac = 0.f;
     }
-    else if (frac > 1.0f) {
+    else if (frac > 1.f) {
         if (frac > 1.01f) {
-            SetPal(2);
-            SetClSimTime(cl.mtime[0]);
-            //    Con_Printf ("high frac\n");
+            SetPal(PalHighFrac);
+            SetClSimTime(cl.mtime[Cur]);
         }
-        frac = 1.0f;
+        frac = 1.f;
     }
     else
-        SetPal(0);
+        SetPal(PalNormal);
 
     return frac;
 }
@@ -274,16 +313,18 @@ void CL_RelinkEntities() {
     cl_numvisedicts = 0;
 
     // interpolate player info
-    cl.velocity = VectorMA(cl.mvelocity[1],
+    cl.velocity = VectorMA(cl.mvelocity[Prev],
         frac, VectorSubtract(
-            cl.mvelocity[0], cl.mvelocity[1]
+            cl.mvelocity[Cur], cl.mvelocity[Prev]
         )
     );
 
     if (cls.isDemoPlaying) {
         // interpolate the angles
-        cl.viewangles = AngleMA(cl.mviewangles[1],
-            frac, AngleSubtract(cl.mviewangles[0], cl.mviewangles[1])
+        cl.viewangles = AngleMA(cl.mviewangles[Prev],
+            frac, AngleSubtract(
+                cl.mviewangles[Cur], cl.mviewangles[Prev]
+            )
         );
     }
 
@@ -299,103 +340,131 @@ void CL_RelinkEntities() {
         }
 
         // if the object wasn't included in the last packet, remove it
-        if (ent->msgtime != cl.mtime[0]) {
+        if (ent->msgtime != cl.mtime[Cur]) {
             ent->model = NULL;
             continue;
         }
 
         vec3_t oldorg = ent->origin;
 
-        if (ent->forcelink) { // the entity was not updated in the last message
-            // so move to the final spot
-            ent->origin = ent->msg_origins[0];
-            ent->angles = ent->msg_angles[0];
+        if (ent->forcelink) { // the entity was not updated in the last message so move to the final spot
+            ent->origin = ent->msg_origins[Cur];
+            ent->angles = ent->msg_angles[Cur];
         }
-        else { // if the delta is large, assume a teleport and don't lerp
-            LegDt_t f = frac;
-            vec3_t delta = VectorSubtract(ent->msg_origins[0], ent->msg_origins[1]);
+        else {  // if the delta is large, assume a teleport and don't lerp
+            LegDt_t fr = frac;
+            vec3_t delta = VectorSubtract(ent->msg_origins[Cur], ent->msg_origins[Prev]);
             for (int j = 0; j < VECT_DIM; j++) {
-                if ((delta.v[j] > 100.0f) ||
-                    (delta.v[j] < -100.0f)
+                if ((delta.v[j] > 100.f) ||
+                    (delta.v[j] < -100.f)
                     )
-                    f = 1.0f;  // assume a teleportation, not a motion
+                    fr = 1.f;  // assume a teleportation, not a motion
             }
 
             // interpolate the origin and angles
-            ent->origin = VectorMA(ent->msg_origins[1], f, delta);
-
-            ent->angles = AngleMA(ent->msg_angles[1],
-                f, AngleSubtract(ent->msg_angles[0], ent->msg_angles[1])
+            ent->origin = VectorMA(ent->msg_origins[Prev], fr, delta);
+            ent->angles = AngleMA(ent->msg_angles[Prev],
+                fr, AngleSubtract(
+                    ent->msg_angles[Cur], ent->msg_angles[Prev]
+                )
             );
         }
 
+        dLight_p dl = CL_AllocDlight(i);
+        vec3_t lOrig = ent->origin; { lOrig.z += 16.f; }
+
+        switch (ent->effects) {
+        default: Host_Error("Multiply effects flags setted [0x%X] at same time!", ent->effects); break;
+        case EF_NONE: break;
+
+        case EF_BRIGHTFIELD:    R_EntityParticles(ent);    break;
+# ifdef QUAKE2
+        case EF_DARKFIELD:      R_DarkFieldParticles(ent); break;
+# endif
+        case EF_MUZZLEFLASH: {
+            lOrig = VectorMA(lOrig, 18.f, GetBasis(ent->angles).forward);
+            *(dl) = (dLight_t){
+                .origin = lOrig,
+                .radius = 200.f + (float)((rand() & 31)),
+                .die = (sSimTime_t)(GetClSimTime() + 0.1),
+                // .decay = 0.f,
+                .minlight = 32.f,
+                .key = dl->key
+            };
+        } break;
+
+        case EF_BRIGHTLIGHT:
+            *dl = (dLight_t){
+                .origin = lOrig,
+                .radius = 400.f + (float)((rand() & 31)),
+                .die = (sSimTime_t)(GetClSimTime() + 0.001),
+                // .decay = 0.f,
+                // .minlight = 0.f,
+                .key = dl->key
+            }; break;
+
+        case EF_DIMLIGHT:
+            *dl = (dLight_t){
+                .origin = lOrig,
+                .radius = 200.f + (float)((rand() & 31)),
+                .die = (sSimTime_t)(GetClSimTime() + 0.001),
+                // .decay = 0.f,
+                // .minlight = 0.f,
+                .key = dl->key
+            }; break;
+# ifdef QUAKE2
+        case EF_DARKLIGHT:
+            *dl = (dLight_t){
+                .origin = lOrig,
+                .radius = 200.f + (float)((rand() & 31)),
+                .die = (sSimTime_t)(GetClSimTime() + 0.001),
+                // .decay = 0.f,
+                // .minlight = 0.f,
+                .key = dl->key,
+                .dark = true;
+            }; break;
+        case EF_LIGHT:
+            *dl = (dLight_t){
+                .origin = lOrig,
+                .radius = 200.f,
+                .die = (sSimTime_t)(GetClSimTime() + 0.001),
+                // .decay = 0.f,
+                // .minlight = 0.f,
+                .key = dl->key,
+            }; break;
+# endif
+        }
+
         // rotate binary objects locally
-        if (ent->model->flags & EF_ROTATE)
-            ent->angles.yaw = bobjrotate;
+        switch (ent->model->flags) {
+        default: Host_Error("Multiply model flags setted [0x%X] at same time!", ent->model->flags); break;
+        case EF_NONE: break;
 
-        if (ent->effects & EF_BRIGHTFIELD)
-            R_EntityParticles(ent);
-#ifdef QUAKE2
-        if (ent->effects & EF_DARKFIELD)
-            R_DarkFieldParticles(ent);
-#endif
-        if (ent->effects & EF_MUZZLEFLASH) {
-
-            dLight_p dl = CL_AllocDlight(i);
-            dl->origin = ent->origin;
-            dl->origin.z += 16;
-            dl->origin = VectorMA(dl->origin, 18, GetBasis(ent->angles).forward);
-            dl->radius = (float)(200 + (rand() & 31));
-            dl->minlight = 32;
-            dl->die = (sSimTime_t)(GetClSimTime() + 0.1);
-        }
-        if (ent->effects & EF_BRIGHTLIGHT) {
-            dLight_p dl = CL_AllocDlight(i);
-            dl->origin = ent->origin;
-            dl->origin.z += 16;
-            dl->radius = (float)(400 + (rand() & 31));
-            dl->die = (sSimTime_t)(GetClSimTime() + 0.001);
-        }
-        if (ent->effects & EF_DIMLIGHT) {
-            dLight_p dl = CL_AllocDlight(i);
-            dl->origin = ent->origin;
-            dl->radius = (float)(200 + (rand() & 31));
-            dl->die = (sSimTime_t)(GetClSimTime() + 0.001);
-        }
-#ifdef QUAKE2
-        if (ent->effects & EF_DARKLIGHT) {
-            dLight_p dl = CL_AllocDlight(i);
-            dl->origin = ent->origin;
-            dl->radius = 200.0 + (rand() & 31);
-            dl->die = (sSimTime_t)(GetClSimTime() + 0.001);
-            dl->dark = true;
-        }
-        if (ent->effects & EF_LIGHT) {
-            dLight_p dl = CL_AllocDlight(i);
-            dl->origin = ent->origin;
-            dl->radius = 200;
-            dl->die = (sSimTime_t)(GetClSimTime() + 0.001);
-        }
-#endif
-
-        /* */if (ent->model->flags & EF_GIB)        R_RocketTrail(oldorg, ent->origin, RT_GIB);
-        else if (ent->model->flags & EF_ZOMGIB)     R_RocketTrail(oldorg, ent->origin, RT_ZOMGIB);
-        else if (ent->model->flags & EF_TRACER)     R_RocketTrail(oldorg, ent->origin, RT_TRACER);
-        else if (ent->model->flags & EF_TRACER2)    R_RocketTrail(oldorg, ent->origin, RT_TRACER2);
-        else if (ent->model->flags & EF_ROCKET) {
+        case EF_ROTATE: ent->angles.yaw = bobjrotate; break;
+        case EF_ROCKET: {
             R_RocketTrail(oldorg, ent->origin, RT_ROCKET);
-            dLight_p dl = CL_AllocDlight(i); {
-                dl->origin = ent->origin;
-                dl->radius = 200;
-                dl->die = GetClSimTime() + 0.01;
-            }
-        }
-        else if (ent->model->flags & EF_GRENADE)    R_RocketTrail(oldorg, ent->origin, RT_GRENADE);
-        else if (ent->model->flags & EF_TRACER3)    R_RocketTrail(oldorg, ent->origin, RT_TRACER3);
+            *dl = (dLight_t){
+                .origin = ent->origin,
+                .radius = 200.f,
+                .die = (sSimTime_t)(GetClSimTime() + 0.01),
+                // .decay = 0.f,
+                // .minlight = 0.f,
+                .key = dl->key
+            };
+        } break;
+        case EF_GIB:        R_RocketTrail(oldorg, ent->origin, RT_GIB);     break;
+        case EF_ZOMGIB:     R_RocketTrail(oldorg, ent->origin, RT_ZOMGIB);  break;
+        case EF_TRACER:     R_RocketTrail(oldorg, ent->origin, RT_TRACER);  break;
+        case EF_TRACER2:    R_RocketTrail(oldorg, ent->origin, RT_TRACER2); break;
+        case EF_GRENADE:    R_RocketTrail(oldorg, ent->origin, RT_GRENADE); break;
+        case EF_TRACER3:    R_RocketTrail(oldorg, ent->origin, RT_TRACER3); break;
+        };
 
         ent->forcelink = false;
 
-        if ((i == cl.viewentity) && (!chase_active.value))  continue;
+        if ((i == cl.viewentity) &&
+            (!chase_active.value)
+            )  continue;
 
 #ifdef QUAKE2
         if (ent->effects & EF_NODRAW)                   continue;

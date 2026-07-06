@@ -123,18 +123,18 @@ int CL_GetMessage() {
                 if (host_framecount == cls.td_startframe + 1)
                     cls.td_starttime = GetRealTime();
             }
-            else if ( /* GetClSimTime() > 0 && */ GetClSimTime() <= cl.mtime[0]) {
+            else if ( /* GetClSimTime() > 0 && */ GetClSimTime() <= cl.mtime[Cur]) {
                 return 0;  // don't need another message yet
             }
         }
 
         // get the next message
         fread(&net_message.cursize, 4, 1, cls.demofile);    // TODO: adjust cursize to avoid 64bit issues
-        cl.mviewangles[1] = cl.mviewangles[0];
+        cl.mviewangles[Prev] = cl.mviewangles[Cur];
         for (int i = 0; i < VECT_DIM; i++) {
             vec_t f;
             fread(&f, sizeof(vec_t), 1, cls.demofile);
-            cl.mviewangles[0].v[i] = LittleFloat(f);
+            cl.mviewangles[Cur].v[i] = LittleFloat(f);
         }
 
         net_message.cursize = (size_t)LittleLong((int32_t)net_message.cursize);

@@ -118,12 +118,14 @@ typedef enum {
     IM_FINALE   = 2u,   // svc_finale: text finale
     IM_CUTSCENE = 3u    // svc_cutscene/finale2
 } IntermissionState_e;
+
 //
-// the ClientState_t structure is wiped completely at every
-// server signon
+// the ClientState_t structure is wiped completely at every server signon
 //
+#include "StateHistory.h"
+#include "gamedefs.h"
 typedef struct {
-    int32_t     movemessages;
+    uint32_t     movemessages;
     // since connecting to this server
     // throw out the first couple, so the player
     // doesn't accidentally do something the
@@ -131,10 +133,10 @@ typedef struct {
     UserCmd_t   cmd;   // last command sent to the server
 
     // information for local display
-    uint32_t    stats[MAX_CL_STATS]; // health, etc
-    uint32_t    items;   // inventory bit flags
-    LegDt_t       item_gettime[32]; // cl.time of aquiring item, for blinking
-    LegDt_t       faceanimtime; // use anim frame if cl.time < this
+    int32_t     stats[MAX_CL_STATS]; // health, etc. should be signed!
+    item_bits_t items;   // inventory bit flags [item_bits_t/rogue_item_bits_t]
+    LegDt_t     item_gettime[32]; // cl.time of aquiring item, for blinking
+    LegDt_t     faceanimtime; // use anim frame if cl.time < this
 
     ColorShift_t    cshifts[NUM_CSHIFTS]; // color shifts for damage, powerups
     ColorShift_t    prev_cshifts[NUM_CSHIFTS]; // and content types
@@ -143,11 +145,11 @@ typedef struct {
     // sent to the server each frame.  The server sets punchangle when
     // the view is temporarliy offset, and an angle reset commands at the start
     // of each level and after teleporting.
-    ang3_t      mviewangles[2]; // during demo playback viewangles is lerped between these
+    ang3_t      mviewangles[HistoryDepth];    // during demo playback viewangles is lerped between these
     ang3_t      viewangles;
-    vec3_t      mvelocity[2]; // update by server, used for lean+bob (0 is newest)
-    vec3_t      velocity;  // lerped between mvelocity[0] and [1]
-    ang3_t      punchangle;  // temporary offset
+    vec3_t      mvelocity[HistoryDepth];  // update by server, used for lean+bob (0 is newest)
+    vec3_t      velocity;               // lerped between mvelocity[Cur] and [Prev]
+    ang3_t      punchangle; // temporary offset
 
     // pitch drifting vars
     float       idealpitch;
@@ -166,7 +168,7 @@ typedef struct {
     IntermissionState_e intermission; // don't change view angle, full screen, etc
     uint32_t    completed_time; // latched at intermission start
 
-    LegTime_t   mtime[2];   // the timestamp of last two messages
+    SimTime_t   mtime[HistoryDepth];  // the timestamp of last two messages
     SimTime_t   simTime;    // it was [cl.time] clients view of time, should be between  servertime and oldservertime to generate  a lerp point for other data
     SimTime_t   oldtime;    // previous cl.time, time-oldtime is used  to decay light values and smooth step ups
 
@@ -217,35 +219,6 @@ extern r_Entity_t   cl_temp_entities[MAX_TEMP_ENTITIES];
 extern uint32_t     cl_numvisedicts;
 extern r_Entity_p   cl_visedicts[MAX_VISEDICTS];
 
-// cl_input
-typedef struct {
-    int down[2];    // key nums holding it down
-    int state;      // low bit is down state
-} kbutton_t;
-typedef kbutton_t* kbutton_p;
-
-typedef struct {
-    kbutton_t   mlook;
-    kbutton_t   klook;
-    kbutton_t   left;
-    kbutton_t   right;
-    kbutton_t   forward;
-    kbutton_t   forward2;
-    kbutton_t   up;
-    kbutton_t   down;
-    kbutton_t   back;
-    kbutton_t   lookup;
-    kbutton_t   lookdown;
-    kbutton_t   moveleft;
-    kbutton_t   moveright;
-    kbutton_t   strafe;
-    kbutton_t   speed;
-    kbutton_t   use;
-    kbutton_t   jump;
-    kbutton_t   attack;
-    uint8_t     impulse;
-} ClInput_t;
-extern ClInput_t in;
 
 //=============================================================================
 #ifdef __cplusplus

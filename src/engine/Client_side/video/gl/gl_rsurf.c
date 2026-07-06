@@ -129,7 +129,7 @@ R_BuildLightMap
 Combine and scale multiple lightmaps into the 8.8 format in blocklights
 ===============
 */
-void R_BuildLightMap(mSurface_p surf, byte* dest, int stride) {// TODO: merge with GL function almoust the same
+void R_BuildLightMap(mSurface_p surf, uint8_p dest, int stride) {// TODO: merge with GL function almoust the same
     surf->cached_dlight = (surf->dlightframe == r_framecount);
 
     int smax = FIXED4_TO_INT(surf->extents[S_AX]) + 1;
@@ -608,7 +608,7 @@ void R_BlendLightmaps() {
                 GL_TEXTURE_2D, 0, _lightMapBytes,
                 BLOCK_WIDTH, theRect->h,
                 0, gl_lightmap_format,
-                  GL_UNSIGNED_BYTE,
+                GL_UNSIGNED_BYTE,
                 lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
             );
 #else
@@ -620,7 +620,7 @@ void R_BlendLightmaps() {
                 lightmaps + (i * BLOCK_HEIGHT + theRect->t) * BLOCK_WIDTH * _lightMapBytes
             );
 #endif
-            *theRect = (glRect_t){
+            * theRect = (glRect_t){
                 .l = BLOCK_WIDTH,
                 .t = BLOCK_HEIGHT,
             };
@@ -706,7 +706,7 @@ void R_RenderBrushPoly(mSurface_p fa) {
                 if ((theRect->w + theRect->l) < (fa->light_s + smax))   theRect->w = (fa->light_s - theRect->l) + smax;
                 if ((theRect->h + theRect->t) < (fa->light_t + tmax))   theRect->h = (fa->light_t - theRect->t) + tmax;
 
-                byte* base = lightmaps + fa->lightmaptexturenum * _lightMapBytes * BLOCK_WIDTH * BLOCK_HEIGHT;
+                uint8_p base = lightmaps + fa->lightmaptexturenum * _lightMapBytes * BLOCK_WIDTH * BLOCK_HEIGHT;
                 base += fa->light_t * BLOCK_WIDTH * _lightMapBytes + fa->light_s * _lightMapBytes;
                 R_BuildLightMap(fa, base, BLOCK_WIDTH * _lightMapBytes);
             }
@@ -757,7 +757,7 @@ void R_RenderDynamicLightmaps(mSurface_p fa) {
                 if ((theRect->w + theRect->l) < (fa->light_s + smax))   theRect->w = (fa->light_s - theRect->l) + smax;
                 if ((theRect->h + theRect->t) < (fa->light_t + tmax))   theRect->h = (fa->light_t - theRect->t) + tmax;
 
-                byte* base = lightmaps + fa->lightmaptexturenum * _lightMapBytes * BLOCK_WIDTH * BLOCK_HEIGHT;
+                uint8_p base = lightmaps + fa->lightmaptexturenum * _lightMapBytes * BLOCK_WIDTH * BLOCK_HEIGHT;
                 base += fa->light_t * BLOCK_WIDTH * _lightMapBytes + fa->light_s * _lightMapBytes;
                 R_BuildLightMap(fa, base, BLOCK_WIDTH * _lightMapBytes);
             }
@@ -948,14 +948,14 @@ void R_DrawBrushModel(r_Entity_p e) {
         if (R_CullBox(BBoxTranslate(
             BBoxSymmetric(clmodel->radius),
             e->origin))
-        )   return;
+            )   return;
     }
     else {
         rotated = false;
         if (R_CullBox(BBoxTranslate(
             clmodel->BB,
             e->origin))
-        )   return;
+            )   return;
     }
 
     glColor3f(1, 1, 1);
@@ -1060,65 +1060,59 @@ void R_RecursiveWorldNode(mNode_p node) {
     }
     else {
         // node is just a decision point, so go down the apropriate sides
-
         // find which side of the node we are on
         mPlane_p plane = node->plane;
 
-        double dot;
+        float dot;
         switch (plane->type) {
-        case PLANE_X: { dot = modelorg.x - plane->dist; } break;
-        case PLANE_Y: { dot = modelorg.y - plane->dist; } break;
-        case PLANE_Z: { dot = modelorg.z - plane->dist; } break;
-        default: { dot = DotProduct(modelorg, plane->normal) - plane->dist; } break;
+        case PLANE_X:   dot = modelorg.x - plane->dist; break;
+        case PLANE_Y:   dot = modelorg.y - plane->dist; break;
+        case PLANE_Z:   dot = modelorg.z - plane->dist; break;
+        default:    dot = DotProduct(modelorg, plane->normal) - plane->dist;    break;
         }
 
-        int side = (dot >= 0) ? 0 : 1;
-
         // recurse down the children, front side first
-        R_RecursiveWorldNode(node->children[side]);
+        R_RecursiveWorldNode(node->children[dot < 0.f]);
 
+        SurfFlags_t side = (dot < 0.f);
         // draw stuff
         int c = node->numsurfaces;
-
         if (c) {
             mSurface_p surf = cl.worldmodel->surfaces + node->firstsurface;
 
-            if (dot < 0.0 - BACKFACE_EPSILON)     side = SURF_PLANEBACK;
-            else if (dot > BACKFACE_EPSILON)    side = 0;
-            {
-                for (; c; c--, surf++) {
-                    if (surf->visframe != r_framecount) // TODO: find whay we always fall out from render?
-                        continue;
+            /**/ if (dot < -BACKFACE_EPSILON)   side = SURF_PLANEBACK;
+            else if (dot > BACKFACE_EPSILON)    side = SURF_NONE;
 
-                    // don't backface underwater surfaces, because they warp
-                    if (!(surf->flags & SURF_UNDERWATER) &&
-                        ((dot < 0.0) ^ (!!(surf->flags & SURF_PLANEBACK)))
-                        )
-                        continue;        // wrong side
+            for (; c; c--, surf++) {
+                if (surf->visframe != r_framecount) // TODO: find whay we always fall out from render?
+                    continue;
 
-                    // if sorting by texture, just store it out
-                    if (gl_texsort.value) {
-                        if (!mirror ||
-                            (surf->texinfo->texture != cl.worldmodel->textures[mirrortexturenum])
-                            ) {
-                            surf->texturechain = surf->texinfo->texture->texturechain;
-                            surf->texinfo->texture->texturechain = surf;
-                        }
-                    }
-                    else if (surf->flags & SURF_DRAWSKY) {
-                        surf->texturechain = skychain;
-                        skychain = surf;
-                    }
-                    else if (surf->flags & SURF_DRAWTURB) {
-                        surf->texturechain = waterchain;
-                        waterchain = surf;
-                    }
-                    else
-                        R_DrawSequentialPoly(surf);
+                // don't backface underwater surfaces, because they warp
+                if (!(surf->flags & SURF_UNDERWATER) &&
+                    ((dot < 0.0) ^ (!!(surf->flags & SURF_PLANEBACK)))
+                    )   continue;        // wrong side
 
+                // if sorting by texture, just store it out
+                if (gl_texsort.value) {
+                    if (!mirror ||
+                        (surf->texinfo->texture != cl.worldmodel->textures[mirrortexturenum])
+                        ) {
+                        surf->texturechain = surf->texinfo->texture->texturechain;
+                        surf->texinfo->texture->texturechain = surf;
+                    }
                 }
-            }
+                else if (surf->flags & SURF_DRAWSKY) {
+                    surf->texturechain = skychain;
+                    skychain = surf;
+                }
+                else if (surf->flags & SURF_DRAWTURB) {
+                    surf->texturechain = waterchain;
+                    waterchain = surf;
+                }
+                else
+                    R_DrawSequentialPoly(surf);
 
+            }
         }
 
         // recurse down the back side
@@ -1134,14 +1128,12 @@ R_DrawWorld
 =============
 */
 void R_DrawWorld() {
-#if 1
+#if 0
     r_Entity_t    ent;
     memset(&ent, 0, sizeof(ent));
     ent.model = cl.worldmodel;
 #else
-    r_Entity_t ent = {
-        .model = cl.worldmodel
-    };
+    r_Entity_t ent = { .model = cl.worldmodel };
 #endif
 
     modelorg = r_refdef.vieworg;
@@ -1268,7 +1260,7 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
     //
     // draw texture
     //
-    glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + (lnumverts - 4) * sizeof(glVert_t));
+    glpoly_p poly = Hunk_Alloc(sizeof(glpoly_t) + sizeof(glVert_t) * (lnumverts - 4));
     poly->next = fa->polys;
     poly->flags = fa->flags;
     fa->polys = poly;
@@ -1317,23 +1309,19 @@ void BuildSurfaceDisplayList(mSurface_p fa) {
     //
     if (!gl_keeptjunctions.value && !(fa->flags & SURF_UNDERWATER)) {
         for (int i = 0; i < lnumverts; ++i) {
-            vec3_t v1, v2;
-            vec3_t prev, this, next;
+            vec3_t prev = *(vec3_p)(&poly->verts[(i + lnumverts - 1) % lnumverts]);
+            vec3_t this = *(vec3_p)(&poly->verts[i]);
+            vec3_t next = *(vec3_p)(&poly->verts[(i + 1) % lnumverts]);
 
-            prev = *(vec3_p)(&poly->verts[(i + lnumverts - 1) % lnumverts]);
-            this = *(vec3_p)(&poly->verts[i]);
-            next = *(vec3_p)(&poly->verts[(i + 1) % lnumverts]);
-
-            v1 = VectorSubtract(this, prev);
-            VectorNormalize(&v1);
-            v2 = VectorSubtract(next, prev);
-            VectorNormalize(&v2);
+            vec3_t v1 = VectorSubtract(this, prev); VectorNormalize(&v1);
+            vec3_t v2 = VectorSubtract(next, prev); VectorNormalize(&v2);
 
             // skip co-linear points
 #define COLINEAR_EPSILON 0.001
             if ((fabs(v1.x - v2.x) <= COLINEAR_EPSILON) &&
                 (fabs(v1.y - v2.y) <= COLINEAR_EPSILON) &&
-                (fabs(v1.z - v2.z) <= COLINEAR_EPSILON)) {
+                (fabs(v1.z - v2.z) <= COLINEAR_EPSILON)
+                ) {
                 for (int j = i + 1; j < lnumverts; ++j) {
                     poly->verts[j - 1] = poly->verts[j];
                 }
@@ -1361,8 +1349,11 @@ void GL_CreateSurfaceLightmap(mSurface_p surf) {
     int tmax = FIXED4_TO_INT(surf->extents[T_AX]) + 1;
 
     surf->lightmaptexturenum = AllocBlock(smax, tmax, &surf->light_s, &surf->light_t);
-    byte* base = lightmaps + surf->lightmaptexturenum * _lightMapBytes * BLOCK_WIDTH * BLOCK_HEIGHT;
-    base += (surf->light_t * BLOCK_WIDTH + surf->light_s) * _lightMapBytes;
+    uint8_p base = lightmaps + (
+        (BLOCK_WIDTH * BLOCK_HEIGHT * surf->lightmaptexturenum) +
+        ((BLOCK_WIDTH * surf->light_t) + surf->light_s)
+        ) *
+        _lightMapBytes;
     R_BuildLightMap(surf, base, BLOCK_WIDTH * _lightMapBytes);
 }
 

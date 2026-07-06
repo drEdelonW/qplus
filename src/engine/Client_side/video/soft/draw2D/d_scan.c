@@ -195,8 +195,8 @@ void Turbulent8(eSpan_p pspan) {
                 /**/ if (st_next.t > bbextentt)     st_next.t = bbextentt;
                 else if (st_next.t < 16)            st_next.t = 16;    // guard against round-off error on <0 steps
 
-                r_turb_ststep.s = FIXED4_TO_INT(st_next.s - r_turb_st.s);
-                r_turb_ststep.t = FIXED4_TO_INT(st_next.t - r_turb_st.t);
+                r_turb_ststep.s = DIV16(st_next.s - r_turb_st.s);
+                r_turb_ststep.t = DIV16(st_next.t - r_turb_st.t);
             }
             else {
                 // calculate s/z, t/z, zi->fixed s and t at last pixel in span (so

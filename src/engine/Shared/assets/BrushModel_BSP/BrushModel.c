@@ -285,8 +285,6 @@ Fills in s->texturemins[] and s->extents[]
 void CalcSurfaceExtents(mSurface_p s) {
     vec2_t mins = { .s = 999999.0f,  .t = 999999.0f };
     vec2_t maxs = { .s = -999999.0f, .t = -999999.0f };
-    int bmins[VECT_TX_DIM];
-    int bmaxs[VECT_TX_DIM];
 
     mTexInfo_p tex = s->texinfo;
 
@@ -306,12 +304,14 @@ void CalcSurfaceExtents(mSurface_p s) {
         }
     }
 
+    int bmins[VECT_TX_DIM];
+    int bmaxs[VECT_TX_DIM];
     for (int i = 0; i < VECT_TX_DIM; i++) {
-        bmins[i] = floor(mins.v[i] / 16.0f);
-        bmaxs[i] = ceil(maxs.v[i] / 16.0f);
+        bmins[i] = floorf(mins.v[i] / 16.0f);
+        bmaxs[i] = ceilf(maxs.v[i] / 16.0f);
 
-        s->texturemins[i] = MUL16(bmins[i]);
-        s->extents[i] = MUL16(bmaxs[i] - bmins[i]);
+        s->texturemins[i] = MUL16(bmins[i]);    // TODO: solve what is the mul16 and why?
+        s->extents[i] = MUL16(bmaxs[i] - bmins[i]);// TODO: solve what is the mul16 and why?
         if (
             (!(tex->flags & TEX_SPECIAL)) &&
 #ifdef GLQUAKE

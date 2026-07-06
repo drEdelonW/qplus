@@ -771,13 +771,10 @@ void Sbar_DrawFace() {
     int f = (cl.stats[STAT_HEALTH] >= 100) ?
         4 : cl.stats[STAT_HEALTH] / 20;
 
-    int anim;
-    if (GetClSimTime() <= cl.faceanimtime) {
-        anim = 1;
+    bool anim = (GetClSimTime() <= cl.faceanimtime);
+    if (anim) 
         _sb.updates = 0;  // make sure the anim gets drawn over
-    }
-    else
-        anim = 0;
+
     Sbar_DrawPic(112, 0, _sb.faces[f][anim]);
 }
 
@@ -827,20 +824,16 @@ void Sbar_Draw() {
             Sbar_DrawPic(0, 0, draw_disc);
         }
         else {
+            Sbar_DrawNum(
+                24, 0, cl.stats[STAT_ARMOR], 3,
+                cl.stats[STAT_ARMOR] <= 25
+            );
             if (rogue) {
-                Sbar_DrawNum(
-                    24, 0, cl.stats[STAT_ARMOR], 3,
-                    cl.stats[STAT_ARMOR] <= 25
-                );
                 /**/ if (cl.items & RIT_ARMOR3) Sbar_DrawPic(0, 0, _sb.armor[2]);
                 else if (cl.items & RIT_ARMOR2) Sbar_DrawPic(0, 0, _sb.armor[1]);
                 else if (cl.items & RIT_ARMOR1) Sbar_DrawPic(0, 0, _sb.armor[0]);
             }
             else {
-                Sbar_DrawNum(
-                    24, 0, cl.stats[STAT_ARMOR], 3,
-                    cl.stats[STAT_ARMOR] <= 25
-                );
                 /**/ if (cl.items & IT_ARMOR3)  Sbar_DrawPic(0, 0, _sb.armor[2]);
                 else if (cl.items & IT_ARMOR2)  Sbar_DrawPic(0, 0, _sb.armor[1]);
                 else if (cl.items & IT_ARMOR1)  Sbar_DrawPic(0, 0, _sb.armor[0]);

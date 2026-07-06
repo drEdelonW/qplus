@@ -10,6 +10,13 @@ static inline vec3_t MSG_ReadVector() {
         .z = MSG_ReadCoord()
     };
 }
+static inline vec3_t MSG_ReadMoveVec() {
+    return (vec3_t){
+        .x = (vec_t)MSG_ReadShort(),
+        .y = (vec_t)MSG_ReadShort(),
+        .z = (vec_t)MSG_ReadShort()
+    };
+}
 static inline vec3_t MSG_ReadVecCoarse() {
     return (vec3_t){
         .x = fixed4_tof(MSG_ReadChar()),
@@ -18,10 +25,16 @@ static inline vec3_t MSG_ReadVecCoarse() {
     };
 }
 
+
 static inline void MSG_WriteVector(sizebuf_p msg, vec3_t v) {
     MSG_WriteCoord(msg, v.x);
     MSG_WriteCoord(msg, v.y);
     MSG_WriteCoord(msg, v.z);
+}
+static inline void MSG_WriteMoveVec(sizebuf_p msg, vec3_t v) {
+    MSG_WriteShort(msg, (int16_t)v.x);
+    MSG_WriteShort(msg, (int16_t)v.y);
+    MSG_WriteShort(msg, (int16_t)v.z);
 }
 static inline void MSG_WriteVecCoarse(sizebuf_t *msg, vec3_t v) {
     MSG_WriteChar(msg, fixed4_fsat(v.x));
