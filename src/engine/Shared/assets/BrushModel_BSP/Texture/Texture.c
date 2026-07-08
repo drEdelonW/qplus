@@ -8,7 +8,11 @@
 #include "client.h"
 #include "host.h"
 
-Texture_p r_notexture_mip;
+Texture_p   r_notexture_mip;
+float       scale_for_mip;
+MipLevel_t  d_minmip;
+float       d_scalemip[MIPLEVELS - 1];
+
 
 typedef enum {
     MipOffset0 = sizeof(Texture_t),
@@ -139,7 +143,7 @@ void Mod_LoadTextures(Lump_p Lump_in) {
             tx->gl_texturenum = GL_LoadTexture(
                 mt->name,
                 tx->width, tx->height,
-                (uint8_p)(tx + 1),
+                (qColor8_p)(tx + 1),
                 true, false
             );
             texture_mode = GL_LINEAR;

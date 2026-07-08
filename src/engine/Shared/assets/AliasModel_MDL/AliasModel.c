@@ -3,6 +3,7 @@
 
 #ifdef GLQUAKE
 #   include "qOpenGL.h"
+#   include "vid.h"
 #else
 #   include "r_local.h"
 #   include "d_iface.h"
@@ -254,29 +255,29 @@ typedef struct {
 
 #define FLOODFILL_STEP( off, dx, dy ) \
 { \
-    if (pos[off] == fillcolor) {\
-        pos[off] = 255; \
+    if (pos[off].i == fillcolor.i) {\
+        pos[off].i = TRANSPARENT_COLOR; \
         fifo[inpt].x = x + (dx), fifo[inpt].y = y + (dy); \
         inpt = (inpt + 1) & FLOODFILL_FIFO_MASK; \
     } \
-    else if (pos[off] != 255) fdc = pos[off]; \
+    else if (pos[off].i != TRANSPARENT_COLOR) fdc = pos[off]; \
 }
 
-void Mod_FloodFillSkin(uint8_p skin, int skinwidth, int skinheight) {
+void Mod_FloodFillSkin(qColor8_p skin, int skinwidth, int skinheight) {
     int filledcolor = -1;
     if (filledcolor == -1) {
         filledcolor = 0;
         // attempt to find opaque black
-        for (int i = 0; i < 256; ++i)
+        for (int i = 0; i < InksNum; ++i)
             if (d_8to24table[i] == (255 << 0)) {// alpha 1.0
                 filledcolor = i;
                 break;
             }
     }
 
-    byte    fillcolor = *skin; // assume this is the pixel to fill
+    qColor8_t fillcolor = *skin; // assume this is the pixel to fill
     // can't fill to filled color or to transparent color (used as visited marker)
-    if ((fillcolor == filledcolor) || (fillcolor == 255)) {
+    if ((fillcolor.i == filledcolor) || (fillcolor.i == TRANSPARENT_COLOR)) {
         //printf( "not filling skin from %d to %d\n", fillcolor, filledcolor );
         return;
     }
@@ -291,8 +292,8 @@ void Mod_FloodFillSkin(uint8_p skin, int skinwidth, int skinheight) {
     while (outpt != inpt) {
         int x = fifo[outpt].x;
         int y = fifo[outpt].y;
-        int fdc = filledcolor;
-        uint8_p pos = &skin[x + skinwidth * y];
+        qColor8_t fdc = (qColor8_t){ .i = filledcolor };
+        qColor8_p pos = &skin[x + skinwidth * y];
 
         outpt = (outpt + 1) & FLOODFILL_FIFO_MASK;
 
@@ -310,7 +311,7 @@ Mod_LoadAllSkins
 ===============
 */
 TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
-    uint8_p skin = (uint8_p)(pskintype + 1);
+    qColor8_p skin = (qColor8_p)(pskintype + 1);
 
     if ((numskins < 1) || (numskins > MAX_SKINS))   Host_SysError("Mod_LoadAliasModel: Invalid # of skins: %d\n", numskins);
 
@@ -332,8 +333,9 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
                 pheader->gl_texturenum[i][2] =
                 pheader->gl_texturenum[i][3] =
                 GL_LoadTexture(
-                    name, pheader->skinwidth,
-                    pheader->skinheight, (uint8_p)(pskintype + 1), true, false
+                    name,
+                    pheader->skinwidth, pheader->skinheight,
+                    (qColor8_p)(pskintype + 1), true, false
                 );
             pskintype = (dAliasSkinType_p)((uint8_p)(pskintype + 1) + s);
         }
@@ -358,9 +360,9 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
                 pheader->gl_texturenum[i][j & 3] =
                     GL_LoadTexture(
                         name, pheader->skinwidth,
-                        pheader->skinheight, (uint8_p)(pskintype), true, false
+                        pheader->skinheight, (qColor8_p)(pskintype), true, false
                     );
-                pskintype = (dAliasSkinType_p)((uint8_p)(pskintype)+s);
+                pskintype = (dAliasSkinType_p)((uint8_p)(pskintype) + s);
             }
             int k = j;
             for (/* */; j < 4; j++)

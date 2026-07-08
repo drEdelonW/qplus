@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_local.h"
 
 #include "Particle.h"
+#include "vid.h"
 
 static vec3_t _up;
 static vec3_t _right;

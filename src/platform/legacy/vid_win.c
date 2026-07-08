@@ -105,7 +105,7 @@ static int  VID_highhunkmark;
 uint8_t vid_curpal[256 * 3];
 
 uint16_t d_8to16table[256];
-uint32_t d_8to24table[256];
+Rgb24_t     d_8to24table[256];
 
 int     driver = grDETECT, mode;
 bool    useWinDirect = true, useDirectDraw = true;

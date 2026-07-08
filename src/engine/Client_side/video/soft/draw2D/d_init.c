@@ -22,18 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include "d_local.h"
 
-#define NUM_MIPS 4
 
 SurfCache_p d_initial_rover;
 bool        d_roverwrapped;
-int         d_minmip;
-float       d_scalemip[NUM_MIPS - 1];
-
-static float _BaseMip[NUM_MIPS - 1] = {
-    1.0f,
-    0.5f * 0.8f,
-    0.25f * 0.8f
-};
 
 void (*d_drawspans)(eSpan_p pspan);
 
@@ -106,17 +97,20 @@ void D_DisableBackBufferAccess() { VID_UnlockBuffer(); }
 D_SetupFrame
 ===============
 */
+static float _BaseMip[MIPLEVELS - 1] = {
+    1.0f,
+    0.5f * 0.8f,
+    0.25f * 0.8f
+};
 void D_SetupFrame() {
-    d_viewbuffer = (r_dowarp) ? r_warpbuffer : (TypeLess_ptr)(uint8_p)vid.scr.pBuff;
-
+    d_viewbuffer = (r_dowarp) ? r_warpbuffer : vid.scr.pClr;
     screenwidth = (r_dowarp) ? WARP_WIDTH : vid.rowbytes;
 
     d_roverwrapped = false;
     d_initial_rover = sc_rover;
 
     d_minmip = d_mipcap.value;
-    CLAMP(0, &d_minmip, 3);
-
+    CLAMP(Mip0, &d_minmip, Mip3);
     for (int i = 0; i < (NUM_MIPS - 1); i++)
         d_scalemip[i] = _BaseMip[i] * d_mipscale.value;
 
@@ -125,6 +119,7 @@ void D_SetupFrame() {
     (d_subdiv16.value) ? D_DrawSpans16 :
 #endif
         D_DrawSpans8;
+
 
     d_aflatcolor = 0;
 }

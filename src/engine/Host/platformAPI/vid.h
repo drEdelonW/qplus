@@ -41,8 +41,8 @@ void VID_UnlockBuffer();
 
 extern palette_p    host_basepal;
 
-extern  PIXEL16     d_8to16table[256];
-extern  PIXEL24     d_8to24table[256]; // 0xAABBGGRR
+extern  Rgb16_t     d_8to16table[256];
+extern  Rgb24_t     d_8to24table[256]; // 0xAABBGGRR
 
 typedef struct {
     vRect_t     scr;            // invisible buffer inside pBuff

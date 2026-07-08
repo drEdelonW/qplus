@@ -60,7 +60,7 @@ int r_cnumsurfs;
 bool    r_surfsonstack;
 int     r_clipflags;
 
-uint8_p     r_warpbuffer;
+qColor8_p   r_warpbuffer;
 uint8_p     r_stack_start;
 
 bool r_fov_greater_than_90;
@@ -819,7 +819,7 @@ R_RenderView
 r_refdef must be set before the first call
 ================
 */
-static  uint8_t _warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+static  qColor8_t _warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 void R_RenderView_() {
 
     r_warpbuffer = _warpbuffer;

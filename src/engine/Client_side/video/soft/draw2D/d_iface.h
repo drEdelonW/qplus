@@ -98,7 +98,16 @@ void D_TurnZOn();
 void D_WarpScreen();
 
 void D_FillRect(vRect_p vrect, int color);
-// void D_DrawRect();
+#if 0 /* not used */
+// transparency types for D_DrawRect()
+typedef enum {
+    DR_SOLID        = 0, // draw solid
+    DR_TRANSPARENT  = 1  // draw transparent
+} drawrect_t;
+
+void D_DrawRect();
+#endif
+
 #if 0
 void D_UpdateRects(vRect_p prect);
 #endif
@@ -110,11 +119,7 @@ void D_PolysetUpdateTables();
 // these are currently for internal use only, and should not be used by drivers
 extern qColor8_p r_skysource;
 
-// transparency types for D_DrawRect()
-typedef enum {
-    DR_SOLID        = 0, // draw solid
-    DR_TRANSPARENT  = 1  // draw transparent
-} drawrect_t;
+
 
 
 //=======================================================================//
@@ -144,5 +149,5 @@ extern float skyspeed2;
 extern LegDt_t skytime;
 
 extern int c_surf;
-extern uint8_p r_warpbuffer;
+extern qColor8_p r_warpbuffer;
 

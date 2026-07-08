@@ -26,8 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Surface.h"
 
 static MipLevel_t _miplevel;
-float scale_for_mip;
-
 
 vec3_t  transformed_modelorg;
 
@@ -67,14 +65,14 @@ D_DrawSolidSurface
 // FIXME: clean this up
 
 void D_DrawSolidSurface(Surf_p surf, int color) {
-    int32_t pix =
+    uint32_t pix =
         (color << 24) |
         (color << 16) |
         (color << 8) |
         (color << 0);
 
     for (eSpan_p span = surf->spans; span; span = span->pnext) {
-        uint8_p pdest = (uint8_p)d_viewbuffer + (screenwidth * span->v);
+        qColor8_p pdest = d_viewbuffer + (screenwidth * span->v);
         int u = span->u;
         int u2 = span->u + span->count - 1;
         ((uint8_p)pdest)[u] = pix;

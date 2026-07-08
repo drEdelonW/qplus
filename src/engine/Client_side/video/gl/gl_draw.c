@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include "sbar.h"
 #include "z_hunk.h"
+#include "vid.h"
 
 
 // draw.c -- this is the only file outside the refresh that touches the
@@ -44,7 +45,7 @@ cvar_t  gl_nobind = { "gl_nobind", "0" };
 cvar_t  gl_max_size = { "gl_max_size", "1024" };
 cvar_t  gl_picmip = { "gl_picmip", "0" };
 
-uint8_p _drawChars;    // 8*8 graphic characters
+qColor8_p _drawChars;    // 8*8 graphic characters
 qPic_p draw_disc;
 qPic_p draw_backtile;
 
@@ -132,7 +133,7 @@ to crutch up stupid hardware / drivers
 #define BLOCK_HEIGHT 256
 
 int     scrap_allocated[MAX_SCRAPS][BLOCK_WIDTH];
-byte    scrap_texels[MAX_SCRAPS][BLOCK_WIDTH * BLOCK_HEIGHT * 4];
+qColor8_t scrap_texels[MAX_SCRAPS][BLOCK_WIDTH * BLOCK_HEIGHT * 4];
 bool    scrap_dirty;
 int     scrap_texnum;
 
@@ -170,7 +171,7 @@ int Scrap_AllocBlock(int w, int h, int* x, int* y) {
 }
 
 int scrap_uploads;
-void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha); // TODO: fix dependence hell
+void GL_Upload8(qColor8_p data, int width, int height, bool mipmap, bool alpha); // TODO: fix dependence hell
 void Scrap_Upload() {
     scrap_uploads++;
 
@@ -385,8 +386,8 @@ void Draw_Init() {
     // load the console background and the charset by hand, because we need to write the version string into the background before turning it into a texture
     _drawChars = W_GetLumpName("conchars");
     for (int i = 0; i < 256 * 64; i++)
-        if (_drawChars[i] == 0)
-            _drawChars[i] = 255; // proper transparent color
+        if (_drawChars[i].i == 0)
+            _drawChars[i].i = TRANSPARENT_COLOR; // proper transparent color
 
     // now turn them into textures
     char_texture = GL_LoadTexture("charset", 128, 128, _drawChars, false, true);
@@ -409,7 +410,7 @@ void Draw_Init() {
 #endif
         (float)GLQUAKE_VERSION, (float)VERSION
     );
-    uint8_p dest = cb->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    qColor8_p dest = cb->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
     int y = strlen(ver);
     for (int x = 0; x < y; x++)
         Draw_CharToConback(ver[x], dest + (x << 3));
@@ -440,7 +441,7 @@ void Draw_Init() {
 #else
     conback->width = cb->width;
     conback->height = cb->height;
-    uint8_p ncdata = cb->data;
+    qColor8_p ncdata = cb->data;
 #endif
 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -609,7 +610,7 @@ Draw_TransPicTranslate
 Only used for the player color selection menu
 =============
 */
-void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
+void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
     uint32_t  trans[64 * 64];
 
     GL_Bind(translate_texture);
@@ -622,7 +623,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
         for (int u = 0; u < 64; u++) {
             int p = src[DIV64(u * pic->width)];
             if (p == 255)   dest[u] = p;
-            else            dest[u] = d_8to24table[translation[p]];
+            else            dest[u] = d_8to24table[translation->pal[p].i];
         }
     }
 
@@ -832,12 +833,12 @@ GL_Resample8BitTexture -- JACK
 ================
 */
 void GL_Resample8BitTexture(
-    uint8_p in, int inwidth, int inheight,
-    uint8_p out, int outwidth, int outheight
+    qColor8_p in, int inwidth, int inheight,
+    qColor8_p out, int outwidth, int outheight
 ) {
     fixed16_t fracstep = inwidth * FIXED16_ONE / outwidth;
     for (int i = 0; i < outheight; i++, out += outwidth) {
-        uint8_p inrow = in + inwidth * (i * inheight / outheight);
+        qColor8_p inrow = in + inwidth * (i * inheight / outheight);
         fixed16_t frac = HALF(fracstep);
         for (int j = 0; j < outwidth; j += 4) {
             out[j + 1] = inrow[FIXED16_TO_INT(frac)];     frac += fracstep;
@@ -877,16 +878,16 @@ GL_MipMap8Bit
 Mipping for 8 bit textures
 ================
 */
-void GL_MipMap8Bit(uint8_p in, int width, int height) {
+void GL_MipMap8Bit(qColor8_p in, int width, int height) {
     // width = QUAD(width);
     height = HALF(height);
-    uint8_p out = in;
+    qColor8_p out = in;
     for (int i = 0; i < height; i++, in += width) {
         for (int j = 0; j < width; j += 2, out += 1, in += 2) {
-            uint8_p at1 = (uint8_p)(d_8to24table + in[0]);
-            uint8_p at2 = (uint8_p)(d_8to24table + in[1]);
-            uint8_p at3 = (uint8_p)(d_8to24table + in[width + 0]);
-            uint8_p at4 = (uint8_p)(d_8to24table + in[width + 1]);
+            uint8_p at1 = (uint8_p)(d_8to24table + in[0].i);
+            uint8_p at2 = (uint8_p)(d_8to24table + in[1].i);
+            uint8_p at3 = (uint8_p)(d_8to24table + in[width + 0].i);
+            uint8_p at4 = (uint8_p)(d_8to24table + in[width + 1].i);
 
             uint16_t r = DIV32(at1[0] + at2[0] + at3[0] + at4[0]);
             uint16_t g = DIV32(at1[1] + at2[1] + at3[1] + at4[1]);
@@ -997,8 +998,8 @@ done:;
     }
 }
 
-void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha) {
-    static uint8_t _scaled[1024 * 512]; // [512*256];
+void GL_Upload8_EXT(qColor8_p data, int width, int height, bool mipmap, bool alpha) {
+    static qColor8_t _scaled[1024 * 512]; // [512*256];
 
     int s = width * height;
     // if there are no transparent pixels, make it a 3 component
@@ -1006,7 +1007,7 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
     if (alpha) {
         bool noalpha = true;
         for (int i = 0; i < s; i++) {
-            if (data[i] == 255)
+            if (data[i].i == TRANSPARENT_COLOR)
                 noalpha = false;
         }
 
@@ -1046,7 +1047,11 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
         memcpy(_scaled, data, width * height);
     }
     else
-        GL_Resample8BitTexture(data, width, height, _scaled, scaled_width, scaled_height);
+        GL_Resample8BitTexture(data,
+            width, height,
+            _scaled,
+            scaled_width, scaled_height
+        );
 
     glTexImage2D(
         GL_TEXTURE_2D,
@@ -1060,7 +1065,7 @@ void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha
         while ((scaled_width > 1) ||
             (scaled_height > 1)
             ) {
-            GL_MipMap8Bit((uint8_p)_scaled, scaled_width, scaled_height);
+            GL_MipMap8Bit(_scaled, scaled_width, scaled_height);
             scaled_width = HALF(scaled_width);
             if (scaled_width < 1)       scaled_width = 1;
 
@@ -1095,7 +1100,7 @@ GL_Upload8
 ===============
 */
 void GL_Upload8(
-    uint8_p data,
+    qColor8_p data,
     int width, int height,
     bool mipmap,
     bool alpha
@@ -1108,10 +1113,9 @@ void GL_Upload8(
     if (alpha) {
         bool noalpha = true;
         for (int i = 0; i < s; i++) {
-            int p = data[i];
-            if (p == 255)
-                noalpha = false;
-            _trans[i] = d_8to24table[p];
+            qColor8_t p = data[i];
+            if (p.i == TRANSPARENT_COLOR) noalpha = false;
+            _trans[i] = d_8to24table[p.i];
         }
 
         if (alpha && noalpha)
@@ -1121,10 +1125,10 @@ void GL_Upload8(
         if (s & 3)      Host_SysError("GL_Upload8: s&3");
 
         for (int i = 0; i < s; i += 4) {
-            _trans[i + 0] = d_8to24table[data[i + 0]];
-            _trans[i + 1] = d_8to24table[data[i + 1]];
-            _trans[i + 2] = d_8to24table[data[i + 2]];
-            _trans[i + 3] = d_8to24table[data[i + 3]];
+            _trans[i + 0] = d_8to24table[data[i + 0].i];
+            _trans[i + 1] = d_8to24table[data[i + 1].i];
+            _trans[i + 2] = d_8to24table[data[i + 2].i];
+            _trans[i + 3] = d_8to24table[data[i + 3].i];
         }
     }
 
@@ -1146,7 +1150,7 @@ GL_LoadTexture
 int GL_LoadTexture(
     cString identifier,
     int width, int height,
-    uint8_p data,
+    qColor8_p data,
     bool mipmap, bool alpha
 ) {
     glTexture_p glt;

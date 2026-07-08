@@ -31,13 +31,13 @@ void M_BuildTranslationTable(int top, int bottom) {
     memcpy(dest, source, InksNum);
 
     if (top < 128) // the artists made some backwards ranges.  sigh.
-        memcpy(dest + TOP_RANGE, source + top, 16);
+        memcpy(TOP_RANGE + dest, source + top, 16);
     else
         for (int i = 0; i < 16; i++)
             dest[TOP_RANGE + i] = source[top + 15 - i];
 
     if (bottom < 128)
-        memcpy(dest + BOTTOM_RANGE, source + bottom, 16);
+        memcpy(BOTTOM_RANGE + dest, source + bottom, 16);
     else
         for (int i = 0; i < 16; i++)
             dest[BOTTOM_RANGE + i] = source[bottom + 15 - i];

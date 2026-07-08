@@ -207,17 +207,17 @@ void R_TranslatePlayerSkin(int playernum) {
     int top = cl.scores[playernum].colors & 0xF0;
     int bottom = (cl.scores[playernum].colors & 15) << 4;
 
-    uint8_t translate[256];
+    qColor8_t translate[256];
     for (int i = 0; i < 256; i++)
-        translate[i] = i;
+        translate[i].i = i;
 
     for (int i = 0; i < 16; i++) {
         // the artists made some backwards ranges.  sigh.
-        if (top < 128)  translate[TOP_RANGE + i] = top + i;
-        else            translate[TOP_RANGE + i] = top + 15 - i;
+        if (top < 128)  translate[TOP_RANGE + i].i = top + i;
+        else            translate[TOP_RANGE + i].i = top + 15 - i;
 
-        if (bottom < 128)   translate[BOTTOM_RANGE + i] = bottom + i;
-        else                translate[BOTTOM_RANGE + i] = bottom + 15 - i;
+        if (bottom < 128)   translate[BOTTOM_RANGE + i].i = bottom + i;
+        else                translate[BOTTOM_RANGE + i].i = bottom + 15 - i;
     }
 
     //
@@ -228,17 +228,17 @@ void R_TranslatePlayerSkin(int playernum) {
     if (!model)                     return;  // player doesn't have a model yet
     if (model->type != mod_alias)   return; // only translate skins on alias models
 
-    uint8_p original;
+    qColor8_p original;
     AliasHdr_p pAliasHdr = (AliasHdr_p)Mod_Extradata(model);
     int s = pAliasHdr->skinwidth * pAliasHdr->skinheight;
     if ((currententity->skinnum < 0) ||
         (currententity->skinnum >= pAliasHdr->numskins)
         ) {
         Con_Printf("(%d): Invalid player skin #%d\n", playernum, currententity->skinnum);
-        original = (uint8_p)pAliasHdr + pAliasHdr->texels[0];
+        original = (qColor8_p)pAliasHdr + pAliasHdr->texels[0];
     }
     else
-        original = (uint8_p)pAliasHdr + pAliasHdr->texels[currententity->skinnum];
+        original = (qColor8_p)pAliasHdr + pAliasHdr->texels[currententity->skinnum];
     if (s & 3)
         Host_SysError("R_TranslateSkin: s&3");
 
@@ -270,49 +270,53 @@ void R_TranslatePlayerSkin(int playernum) {
     scaled_width >>= (int)gl_playermip.value;
     scaled_height >>= (int)gl_playermip.value;
 
-    uint32_t pixels[512 * 256];
     if (VID_Is8bit()) { // 8bit texture upload
-        uint8_p out2;
+        qColor8_t pixels[512 * 256]; {
+            memset(pixels, 0, sizeof(pixels));
+        }
 
-        out2 = (uint8_p)pixels;
-        memset(pixels, 0, sizeof(pixels));
+        qColor8_p out2 = pixels;
         fixed16_t fracstep = inwidth * FIXED16_ONE / scaled_width;
         for (int i = 0; i < scaled_height; i++, out2 += scaled_width) {
-            uint8_p inrow = original + inwidth * (i * inheight / scaled_height);
+            qColor8_p inrow = original + inwidth * (i * inheight / scaled_height);
             fixed16_t frac = HALF(fracstep);
             for (int j = 0; j < scaled_width; j += 4) {
-                out2[j = 0] = translate[inrow[FIXED16_TO_INT(frac)]];     frac += fracstep;
-                out2[j + 1] = translate[inrow[FIXED16_TO_INT(frac)]];     frac += fracstep;
-                out2[j + 2] = translate[inrow[FIXED16_TO_INT(frac)]];     frac += fracstep;
-                out2[j + 3] = translate[inrow[FIXED16_TO_INT(frac)]];     frac += fracstep;
+                out2[j = 0] = translate[inrow[FIXED16_TO_INT(frac)].i];     frac += fracstep;
+                out2[j + 1] = translate[inrow[FIXED16_TO_INT(frac)].i];     frac += fracstep;
+                out2[j + 2] = translate[inrow[FIXED16_TO_INT(frac)].i];     frac += fracstep;
+                out2[j + 3] = translate[inrow[FIXED16_TO_INT(frac)].i];     frac += fracstep;
             }
         }
 
-        GL_Upload8_EXT((uint8_p)pixels, scaled_width, scaled_height, false, false);
+        GL_Upload8_EXT(pixels, scaled_width, scaled_height, false, false);
         return;
     }
+    else {
+        Rgb24_t translate32[256];
+        for (int i = 0; i < 256; i++)
+            translate32[i] = d_8to24table[translate[i].i];
 
-    uint32_t translate32[256];
-    for (int i = 0; i < 256; i++)
-        translate32[i] = d_8to24table[translate[i]];
-
-    uint32_p out = pixels;
-    fixed16_t fracstep = inwidth * FIXED16_ONE / scaled_width;
-    for (int i = 0; i < scaled_height; i++, out += scaled_width) {
-        uint8_p inrow = original + inwidth * (i * inheight / scaled_height);
-        fixed16_t frac = HALF(fracstep);
-        for (int j = 0; j < scaled_width; j += 4) {
-            out[j + 0] = translate32[inrow[FIXED16_TO_INT(frac)]];    frac += fracstep;
-            out[j + 1] = translate32[inrow[FIXED16_TO_INT(frac)]];    frac += fracstep;
-            out[j + 2] = translate32[inrow[FIXED16_TO_INT(frac)]];    frac += fracstep;
-            out[j + 3] = translate32[inrow[FIXED16_TO_INT(frac)]];    frac += fracstep;
+        Rgb24_t pixels24[512 * 256]; {
+            memset(pixels24, 0, sizeof(pixels24));
         }
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, gl_solid_format, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+        Rgb24_p out = pixels24;
+        fixed16_t fracstep = inwidth * FIXED16_ONE / scaled_width;
+        for (int i = 0; i < scaled_height; i++, out += scaled_width) {
+            qColor8_p inrow = original + inwidth * (i * inheight / scaled_height);
+            fixed16_t frac = HALF(fracstep);
+            for (int j = 0; j < scaled_width; j += 4) {
+                out[j + 0] = translate32[inrow[FIXED16_TO_INT(frac)].i];    frac += fracstep;
+                out[j + 1] = translate32[inrow[FIXED16_TO_INT(frac)].i];    frac += fracstep;
+                out[j + 2] = translate32[inrow[FIXED16_TO_INT(frac)].i];    frac += fracstep;
+                out[j + 3] = translate32[inrow[FIXED16_TO_INT(frac)].i];    frac += fracstep;
+            }
+        }
+        glTexImage2D(GL_TEXTURE_2D, 0, gl_solid_format, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels24);
 
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
 #endif
 
 }

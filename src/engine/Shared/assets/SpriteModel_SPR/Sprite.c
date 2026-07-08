@@ -60,7 +60,7 @@ TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_p* ppframe, int 
     pspriteframe->gl_texturenum = GL_LoadTexture(
         name,
         width, height,
-        (uint8_p)(pinframe + 1),
+        (qColor8_p)(pinframe + 1),
         true, true
     ); //
 

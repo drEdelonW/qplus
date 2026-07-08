@@ -72,8 +72,8 @@ extern  int texture_mode;
 
 
 void GL_Upload32(unsigned* data, int width, int height, bool mipmap, bool alpha);
-void GL_Upload8(uint8_p data, int width, int height, bool mipmap, bool alpha);
-int GL_LoadTexture(cString identifier, int width, int height, uint8_p data, bool mipmap, bool alpha);
+void GL_Upload8(qColor8_p data, int width, int height, bool mipmap, bool alpha);
+int GL_LoadTexture(cString identifier, int width, int height, qColor8_p data, bool mipmap, bool alpha);
 int GL_FindTexture(cString identifier);
 
 typedef struct {

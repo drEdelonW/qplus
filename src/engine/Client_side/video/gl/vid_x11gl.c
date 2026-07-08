@@ -45,7 +45,7 @@ CfgNotify_t xCfg = {
 };
 #endif
 
-uint8_t d_15to8table[65536];
+qColor8_t d_15to8table[0x10000u];
 bool    doShm;
 bool    oktodraw = false;
 Display*    x_disp = NULL;

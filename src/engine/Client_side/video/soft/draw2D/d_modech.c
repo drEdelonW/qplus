@@ -26,7 +26,6 @@ int d_vrectx, d_vrecty;
 int d_vrectright_particle, d_vrectbottom_particle;
 int d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
 int d_scantable[MAXHEIGHT];
-int16_p zspantable[MAXHEIGHT];
 
 /*
 ================
@@ -61,25 +60,22 @@ void D_ViewChanged() {
     if (yscale > xscale)
         scale_for_mip = yscale;
 
-    d_zrowbytes = TWICE(vid.scr.width);
     d_zwidth = vid.scr.width;
 
     d_pix_min = r_refdef.vrect.width / 320;
-    if (d_pix_min < 1)
-        d_pix_min = 1;
+    CLAMP_LESS(&d_pix_min, 1);
 
     d_pix_max = (int)((float)r_refdef.vrect.width / (320.0 / 4.0) + 0.5);
+    CLAMP_LESS(&d_pix_max, 1);
+
     d_pix_shift = 8 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
-    if (d_pix_max < 1)
-        d_pix_max = 1;
 
     d_y_aspect_shift = (pixelAspect > 1.4) ? 1 : 0;
 
     d_vrectx = r_refdef.vrect.x;
     d_vrecty = r_refdef.vrect.y;
     d_vrectright_particle = r_refdef.vrectright - d_pix_max;
-    d_vrectbottom_particle =
-        r_refdef.vrectbottom - (d_pix_max << d_y_aspect_shift);
+    d_vrectbottom_particle = r_refdef.vrectbottom - (d_pix_max << d_y_aspect_shift);
 
     int rowbytes = (r_dowarp) ? WARP_WIDTH : vid.rowbytes;
     for (int i = 0; i < vid.scr.height; i++) {

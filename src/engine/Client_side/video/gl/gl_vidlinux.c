@@ -40,9 +40,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static fxMesaContext _fc = NULL;
 #define stringify(m) { #m, m }
 
-uint16_t    d_8to16table[256];
-uint32_t    d_8to24table[256];
-uint8_t d_15to8table[65536];
+Rgb16_t     d_8to16table[256];
+Rgb24_t     d_8to24table[256];
+qColor8_t   d_15to8table[0x10000u];
 
 int num_shades = 32;
 

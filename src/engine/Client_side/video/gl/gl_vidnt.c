@@ -107,9 +107,9 @@ HWND WINAPI InitializeWindow(HINSTANCE hInstance, int nCmdShow);
 
 VidDef_t    vid;                // global video state
 
-uint16_t    d_8to16table[256];
-uint32_t    d_8to24table[256];
-uint8_t     d_15to8table[65536];
+Rgb16_t     d_8to16table[256];
+Rgb24_t     d_8to24table[256];
+qColor8_t   d_15to8table[0x10000u];
 
 modestate_t    modestate = MS_UNINIT;
 

@@ -86,7 +86,7 @@ typedef struct
 } keymap_t;
 
 VidDef_t vid; // global video state
-uint16_t       d_8to16table[256];
+Rgb16_t d_8to16table[256];
 
 int        num_shades = 32;
 
@@ -370,8 +370,7 @@ void ResetFrameBuffer() {
 
     //    d_pzbuffer = (uint16_t *) Z_Malloc(vid.scr.width*vid.scr.height*
     //        sizeof(*d_pzbuffer));
-    d_pzbuffer = (int16_p)Hunk_HighAllocName(vid.scr.width * vid.scr.height *
-        sizeof(*d_pzbuffer), "zbuff");
+    d_pzbuffer = (int16_p)Hunk_HighAllocName(vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer), "zbuff");
 
     x_framebuffer[0] = XCreateImage(x_disp,
         x_vis,

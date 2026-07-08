@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "z_hunk.h"
 #include "q_tools.h"
 #include "model.h"
+#include "vid.h"
 
 extern cvar_t gl_subdivide_size;
 
@@ -639,7 +640,7 @@ A sky texture is 256*128, with the right side being a masked overlay
 void R_InitSky(Texture_p mt) {
     uint32_t trans[128 * 128];
 
-    uint8_p src = GetMipPtr(mt, Mip0);
+    qColor8_p src = GetMipPtr(mt, Mip0);
 
     // make an average value for the back to avoid
     // a fringe on the top level
@@ -648,8 +649,8 @@ void R_InitSky(Texture_p mt) {
     r = g = b = 0;
     for (int i = 0; i < 128; i++)
         for (int j = 0; j < 128; j++) {
-            int p = src[(i * 256) + (j + 128)];
-            uint32_p rgba = &d_8to24table[p];
+            qColor8_t p = src[(i * 256) + (j + 128)];
+            Rgb24_p rgba = &d_8to24table[p.i];
             trans[(i * 128) + j] = *rgba;
             r += ((uint8_p)rgba)[0];
             g += ((uint8_p)rgba)[1];
@@ -678,9 +679,9 @@ void R_InitSky(Texture_p mt) {
 
     for (int i = 0; i < 128; i++)
         for (int j = 0; j < 128; j++) {
-            int p = src[(i * 256) + j];
-            if (p == 0)     trans[(i * 128) + j] = transpix;
-            else            trans[(i * 128) + j] = d_8to24table[p];
+            qColor8_t p = src[(i * 256) + j];
+            if (p.i == 0)   trans[(i * 128) + j] = transpix;
+            else            trans[(i * 128) + j] = d_8to24table[p.i];
         }
 
     if (!alphaskytexture)

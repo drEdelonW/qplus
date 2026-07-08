@@ -90,7 +90,7 @@ typedef struct {
 } keymap_t;
 
 VidDef_t vid; // global video state
-uint16_t       d_8to16table[256];
+Rgb16_t d_8to16table[256];
 
 int  num_shades = 32;
 

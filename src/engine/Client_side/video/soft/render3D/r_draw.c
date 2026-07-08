@@ -131,10 +131,11 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         if (_r.v > r_refdef.fvrectbottom_adj)   _r.v = r_refdef.fvrectbottom_adj;
     }
 
-    if (_r.lzi > em.lzi)      em.lzi = _r.lzi;
+    // if (em.lzi < _r.lzi)    em.lzi = _r.lzi;
+    CLAMP_LESS(&em.lzi, _r.lzi);
+    // if (_r_nearzi < em.lzi) _r_nearzi = em.lzi;  // for mipmap finding
+    CLAMP_LESS(&_r_nearzi, em.lzi);     // for mipmap finding
 
-    if (em.lzi > _r_nearzi) // for mipmap finding
-        _r_nearzi = em.lzi;
 
     // for right edges, all we want is the effect on 1/z
     if (_r_nearzionly)

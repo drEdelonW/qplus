@@ -21,7 +21,7 @@
 #define MAXWIDTH  1280
 
 extern palette_t ramps;
-extern uint8_t  d_15to8table[0x10000u];
+extern qColor8_t    d_15to8table[0x10000u];
 extern vec3_t   lightspot;
 extern int      solidskytexture;
 extern int      alphaskytexture;
@@ -56,7 +56,7 @@ extern "C" {
     void R_InitSky(Texture_p mt);
     void GL_SubdivideSurface(mSurface_p fa);
     void GL_MakeAliasModelDisplayLists(Model_p m, AliasHdr_p hdr);
-    void GL_Upload8_EXT(uint8_p data, int width, int height, bool mipmap, bool alpha);
+    void GL_Upload8_EXT(qColor8_p data, int width, int height, bool mipmap, bool alpha);
     void GL_BuildLightmaps();
     void EmitWaterPolys(mSurface_p fa);
     void EmitSkyPolys(mSurface_p fa);

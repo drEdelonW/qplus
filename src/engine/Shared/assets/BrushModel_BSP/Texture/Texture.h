@@ -8,15 +8,15 @@
 #include "Lump.h"
 #include "assert.h"
 
-
 #include "Texture_pre.h"    // Texture_p
 
+#define NUM_MIPS 4
 typedef enum {
-    Mip0,        // full size
-    Mip1,        // half size
-    Mip2,        // quarter size
-    Mip3,        // eighth size
-    MIPLEVELS    // count, used as array size
+    Mip0 = 0,   // full size
+    Mip1,       // half size
+    Mip2,       // quarter size
+    Mip3,       // eighth size
+    MIPLEVELS   // count, used as array size
 } MipLevel_t;
 
 struct Texture_s {
@@ -50,6 +50,9 @@ typedef struct MipTex_s {
 } MipTex_t;
 typedef MipTex_t* MipTex_p;
 
+extern MipLevel_t   d_minmip;
+extern float    scale_for_mip;
+extern float    d_scalemip[MIPLEVELS - 1];
 
 extern Texture_p r_notexture_mip;
 

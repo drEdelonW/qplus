@@ -52,7 +52,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 VidDef_t vid; // global video state
 
-uint16_t d_8to16table[InksNum]; // extern
+Rgb16_t d_8to16table[InksNum]; // extern
 static PIXEL16 st2d_8to16table[InksNum];
 static PIXEL24 st2d_8to24table[InksNum];
 static palette_t current_palette;   // 768 byte

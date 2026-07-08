@@ -53,10 +53,10 @@ qColor8_p cacheblock;
 int     cachewidth;
 
 qColor8_p d_viewbuffer;
-int16_p d_pzbuffer; // TODO: is this Z buffer???
 
-uint32_t d_zrowbytes;
+int16_p d_pzbuffer; // TODO: is this Z buffer???
 uint32_t d_zwidth;
+// size_t   d_zrowbytes;
 
 #endif // !id386
 

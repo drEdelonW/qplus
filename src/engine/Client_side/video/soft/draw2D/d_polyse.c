@@ -46,6 +46,8 @@ typedef struct {
 } SpanPackage_t;
 typedef SpanPackage_t* SpanPackage_p;
 
+int16_p zspantable[MAXHEIGHT];
+
 int errorterm;
 int erroradjustup;
 int erroradjustdown;
@@ -64,7 +66,6 @@ typedef EdgeTable_t* EdgeTable_p;
 
 static VertAttr_t _p[3];
 
-int   d_aflatcolor;
 int   d_xdenom;
 
 EdgeTable_p pedgetable;
@@ -632,6 +633,7 @@ void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
 D_PolysetFillSpans8
 ================
 */
+int   d_aflatcolor; // extern
 void D_PolysetFillSpans8(SpanPackage_p pspanpackage) {
     // FIXME: do z buffering
     qColor8_t color = { .i = d_aflatcolor++ };
