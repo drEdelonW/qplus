@@ -31,14 +31,15 @@ endif
 ifeq ($(OS),Windows_NT)
     $(info Windows_NT build (native MSYS2/MinGW), PC_ARCH=$(PC_ARCH))
     ifeq ($(PC_ARCH),i686)
-        GCC_PATH := /c/msys64/mingw32/bin
+        GCC_PATH := /mingw32/bin
     else
-        GCC_PATH := /c/msys64/mingw64/bin
+        GCC_PATH := /mingw64/bin
     endif
-    MINGW_PREFIX := $(GCC_PATH)/$(PC_ARCH)-w64-mingw32
+#     MINGW_PREFIX := $(GCC_PATH)/$(PC_ARCH)-w64-mingw32-
+    MINGW_PREFIX := $(GCC_PATH)/
 
-    CC  := $(MINGW_PREFIX)-gcc
-    CXX := $(MINGW_PREFIX)-g++
+    CC  := $(MINGW_PREFIX)gcc
+    CXX := $(MINGW_PREFIX)g++
 else
     $(info Cross-building Windows target from $(UNAME_S) host via mingw-w64, PC_ARCH=$(PC_ARCH))
     CROSS_PREFIX := $(PC_ARCH)-w64-mingw32-

@@ -34,18 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MINIMUM_WIN_MEMORY  0x0880000
 #define MAXIMUM_WIN_MEMORY  0x1000000
 
-// TEMP bring-up diagnostics: bisects the silent-crash-before-any-output
-// reported when cross-compiling quakeWin via mingw-w64 from Linux. Opens
-// and closes the file on every call so a breadcrumb survives even if the
-// very next line crashes. Remove once WinMain reaches VID_Init reliably.
-static void DbgBreadcrumb(cStringRO tag) {
-    FILE* f = fopen("quake_boot.log", "a");
-    if (f) {
-        fprintf(f, "[boot] %s\n", tag);
-        fclose(f);
-    }
-}
-
 #define CONSOLE_ERROR_TIMEOUT 60.0 // # of seconds to wait on Sys_Error running
                                         //  dedicated before exiting
 #define PAUSE_SLEEP  50    // sleep time on pause or minimization
@@ -600,8 +588,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     MEMORYSTATUS lpBuffer;
     static char cwd[1024];
 
-    DbgBreadcrumb("WinMain entry");
-
     /* previous instances do not exist in Win32 */
     if (hPrevInstance)
         return 0;
@@ -611,11 +597,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     lpBuffer.dwLength = sizeof(MEMORYSTATUS);
     GlobalMemoryStatus(&lpBuffer);
-    DbgBreadcrumb("GlobalMemoryStatus done");
 
     if (!GetCurrentDirectory(sizeof(cwd), cwd))
         Sys_Error("Couldn't determine current directory");
-    DbgBreadcrumb("GetCurrentDirectory done");
 
     if (cwd[Q_strlen(cwd) - 1] == '/')
         cwd[Q_strlen(cwd) - 1] = 0;
@@ -648,13 +632,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     parms.argv = argv;
 
     COM_InitArgv(parms.argc, parms.argv);
-    DbgBreadcrumb("COM_InitArgv done");
 
     parms.argc = com.argc;
     parms.argv = com.argv;
 
     isDedicated = (COM_CheckParm("-dedicated") != 0);
-    DbgBreadcrumb(isDedicated ? "isDedicated=1" : "isDedicated=0");
 
     if (!isDedicated) {
         hwnd_dialog = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, NULL);
@@ -705,19 +687,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Sys_Error("Not enough memory free; check disk space\n");
 
     Sys_PageIn(parms.membase, parms.memsize);
-    DbgBreadcrumb("membase alloc + PageIn done");
 
     _tEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     if (!_tEvent)
         Sys_Error("Couldn't create event");
-    DbgBreadcrumb("CreateEvent done");
 
     if (isDedicated) {
         if (!AllocConsole()) {
             Sys_Error("Couldn't create dedicated server console");
         }
-        DbgBreadcrumb("AllocConsole done");
 
         hinput = GetStdHandle(STD_INPUT_HANDLE);
         houtput = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -743,15 +722,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     Sys_Init();
-    DbgBreadcrumb("Sys_Init done");
 
     // because sound is off until we become active
     S_BlockSound();
 
     Sys_Printf("Host_Init\n");
-    DbgBreadcrumb("about to call Host_Init");
     Host_Init(&parms);
-    DbgBreadcrumb("Host_Init returned");
 
     LegTime_t oldtime = Sys_FloatTime();
     /* main window message loop */

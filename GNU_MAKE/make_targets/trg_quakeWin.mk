@@ -1,4 +1,5 @@
-DST_PLATFORM := WIN
+# DST_PLATFORM := WIN
+DST_PLATFORM := POSIX
 FORCE_32     := 1
 
 INCLUDES += $(SRC_DIR)/platform/Windows
@@ -19,11 +20,11 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
         SRC_LIST += $(WIN_DIR)/conproc.c
         SRC_LIST += $(WIN_DIR)/fpu_stubs.c
 
-        SRC_LIST += $(PLAPI_DIR)/vid_null.c
-#         SRC_LIST += $(WIN_DIR)/vid_win.c
+#         SRC_LIST += $(PLAPI_DIR)/vid_null.c
+        SRC_LIST += $(WIN_DIR)/vid_win.c
         $(eval MGL_DIR = $(WIN_DIR)/MGL) $(eval INCLUDES += $(MGL_DIR))
-#             SRC_LIST += $(MGL_DIR)/mgl_stubs.c
-#             LDLIBS += $(MGL_DIR)/MGLLT.LIB
+            LDLIBS += $(MGL_DIR)/MGLLT.LIB
+#             SRC_LIST += $(MGL_DIR)/mgl_stubs.c  # OVERWRITE [MGLLT.LIB]
 
     LDLIBS += -luser32 -lgdi32 -lwinmm -lws2_32 -lwsock32 -ldxguid
     DEFINES += _WIN32

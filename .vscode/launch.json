@@ -155,6 +155,26 @@
       // "gdbPath": "/home/edelon/arm-gnu-toolchain-13.3.rel1-aarch64-arm-none-eabi/bin/arm-none-eabi-gdb",
       "gdbPath": "/usr/bin/gdb-multiarch",
       // "showDevDebugOutput": "raw"
+    },{
+      "name": "Launch local quakeWin (MinGW gdb)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/GNU_MAKE/run_env/quakeWin",
+      "args": [],
+      "cwd": "${workspaceFolder}/GNU_MAKE/run_env",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb", // резолвится через PATH активного MSYS2-шелла (MINGW32/MINGW64); подставь полный путь, если VS Code не подхватывает эту переменную окружения
+      "stopAtEntry": false,
+      // "externalConsole": true, // важно: движок сам ничего не пишет в stdout вне -dedicated, нужна реальная консоль, чтобы видеть краш/точку останова
+      "setupCommands": [
+        {
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+      // "sourceFileMap": {
+      //   "/home/edelon/SelfLab/quake": "${workspaceFolder}"
+      // }
     }
 
   ]

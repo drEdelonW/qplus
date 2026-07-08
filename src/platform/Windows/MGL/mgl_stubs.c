@@ -7,7 +7,7 @@ void MGL_fatalError(cStringRO, ...) {}
 
 void MGL_registerDriver(void*) {}
 void MGL_unregisterAllDrivers() {}
-int  MGL_detectGraph() { return 0; }
+// int  MGL_detectGraph() { return 0; }
 void* MGL_availableModes() { return 0; }
 void  MGL_modeResolution(int, int*, int*) {}
 
@@ -42,10 +42,10 @@ void MGL_appActivate(int) {}
 
 /* driver symbols referenced in vid_win.c */
 int PACKED8_driver = 0;
-int DDRAW8_driver  = 0;
-int ACCEL8_driver  = 0;
+int DDRAW8_driver = 0;
+int ACCEL8_driver = 0;
 int LINEAR8_driver = 0;
-int VGA8_driver    = 0;
+int VGA8_driver = 0;
 
 
 // src/platform/Windows/mgl_stubs.c

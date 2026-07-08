@@ -166,7 +166,7 @@ void Draw_Character(int x, int y, int num) {
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
-                if (source[i].i)  // 0 is transparent
+                if (source[i].i != InkConTransp)
                     dest[i] = source[i];
 
             source += 128;
@@ -175,12 +175,12 @@ void Draw_Character(int x, int y, int num) {
     }
     else {
         // FIXME: pre-expand to native format?
-        uint16_p pusdest = (uint16_p)
+        uint16_p pusdest = (uint16_p) // TODO: rework to Rgb16_p
             ((uint8_p)vid.con.pBuff + y * vid.conrowbytes + (x << 1));
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
-                if (source[i].i)   // 0 is transparent
+                if (source[i].i != InkConTransp)
                     pusdest[i] = d_8to16table[source[i].i];
 
             source += 128;
