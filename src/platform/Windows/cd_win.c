@@ -40,7 +40,7 @@ static bool enabled = false;
 static bool playLooping = false;
 static float cdvolume;
 static byte  remap[100];
-static byte  cdrom;
+// static byte  cdrom;
 static byte  playTrack;
 static byte  maxTrack;
 
@@ -231,7 +231,7 @@ static void CD_f() {
     cString command;
     int  ret;
     int  n;
-    int  startAddress;
+    // int  startAddress;
 
     if (Cmd_Argc() < 2)
         return;

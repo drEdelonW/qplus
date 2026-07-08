@@ -47,6 +47,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 bool	dibonly;
 
+// TEMP bring-up diagnostics: see matching helper/comment in sys_win.c.
+extern void DbgBreadcrumb(cStringRO tag);
+
 
 HWND		mainwindow;
 
@@ -61,7 +64,8 @@ int			window_center_x, window_center_y, window_x, window_y, window_width, window
 RECT		window_rect;
 
 static DEVMODE	gdevmode;
-static bool	    startwindowed = 0, windowed_mode_set;
+static bool	    startwindowed = false;
+static bool     windowed_mode_set;
 static int		firstupdate = 1;
 static bool	    vid_initialized = false, vid_palettized;
 static int		lockcount;
@@ -92,10 +96,10 @@ CVAR_ARC(vid_config_y, "600");
 CVAR_ARC(vid_stretch_by_2, "1");
 // CVAR_ARC(_windowed_mouse, "0");
 CVAR_ARC(vid_fullscreen_mode, "3");
-CVAR_ARC(vid_windowed_mode, "0");
+CVAR_ARC(vid_windowed_mode, "1");
 CVAR_ARC(block_switch, "0");
-CVAR_ARC(vid_window_x, "0");
-CVAR_ARC(vid_window_y, "0");
+CVAR_ARC(vid_window_x, "100");
+CVAR_ARC(vid_window_y, "100");
 
 typedef struct {
     int		width;
@@ -340,6 +344,7 @@ int VID_Suspend(MGLDC* dc, m_int flags) {
         return MGL_NO_SUSPEND_APP;
     }
 
+    return MGL_NO_DEACTIVATE;
 }
 
 
@@ -1113,7 +1118,7 @@ bool VID_SetWindowedMode(int modenum) {
     HDC				hdc;
     pixel_format_t	pf;
     bool		stretched;
-    int				lastmodestate;
+    // int				lastmodestate;
     // LONG			wlong;
 
     if (!windowed_mode_set) {
@@ -1122,13 +1127,13 @@ bool VID_SetWindowedMode(int modenum) {
             Cvar_SetValue("vid_window_y", 0.0);
         }
 
-        windowed_mode_set;
+        windowed_mode_set = false;
     }
 
     VID_CheckModedescFixup(modenum);
 
     DDActive = 0;
-    lastmodestate = modestate;
+    // lastmodestate = modestate;
 
     DestroyFullscreenWindow();
     DestroyFullDIBWindow();
@@ -1307,7 +1312,7 @@ bool VID_SetFullscreenMode(int modenum) {
 bool VID_SetFullDIBMode(int modenum) {
     HDC				hdc;
     pixel_format_t	pf;
-    int				lastmodestate;
+    // int				lastmodestate;
 
     DDActive = 0;
 
@@ -1332,7 +1337,7 @@ bool VID_SetFullDIBMode(int modenum) {
     if (ChangeDisplaySettings(&gdevmode, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
         Sys_Error("Couldn't set fullscreen DIB mode");
 
-    lastmodestate = modestate;
+    // lastmodestate = modestate;
     modestate = MS_FULLDIB;
     vid_fulldib_on_focus_mode = modenum;
 

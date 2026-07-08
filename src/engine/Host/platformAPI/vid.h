@@ -40,7 +40,7 @@ void VID_UnlockBuffer();
 #include "qLight.h"
 
 typedef struct {
-    #warning move  [vRect_t scr;] and [ColorMap_p colormap;]  to screen
+    #warning TODO: move  [vRect_t scr;] and [ColorMap_p colormap;]  to screen
     vRect_t     scr;            // invisible buffer inside pBuff
     ColorMap_p   colormap;       // 256 * VID_GRADES size   
 

@@ -39,14 +39,14 @@ static uint8_t _surfCache[256 * 1024] PLACE_TO_SDRAM;
 Rgb16_t d_8to16table[InksNum];
 Rgb24_t d_8to24table[InksNum];
 
-__weak void VID_SetPalette(qPal_p palette) {}
-__weak void VID_ShiftPalette(qPal_p palette) {}
-__weak void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height) {}
-__weak void D_EndDirectRect(int x, int y, int width, int height) {}
-__weak void VID_Update(vRect_p rects) {}
+WEAK_FUNC(void, VID_SetPalette, (qPal_p palette)) {}
+WEAK_FUNC(void, VID_ShiftPalette, (qPal_p palette)) {}
+WEAK_FUNC(void, D_BeginDirectRect, (int x, int y, qColor8_p pbitmap, int width, int height)) {}
+WEAK_FUNC(void, D_EndDirectRect, (int x, int y, int width, int height)) {}
+WEAK_FUNC(void, VID_Update, (vRect_p rects)) {}
 
-__weak void VID_Shutdown() {}
-__weak void VID_Init(qPal_p palette) {
+WEAK_FUNC(void, VID_Shutdown, (void)) {}
+WEAK_FUNC(void, VID_Init, (qPal_p palette)) {
     vid = (VidDef_t){
         .colormap       = host_colormap,
         // .colormap16

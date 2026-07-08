@@ -1,3 +1,4 @@
+#include "types.h"
 /* src/platform/Windows/mgl_stubs.c: Rough MGL stubs to build without the library */
 void MGL_exit() {}
 int  MGL_result() { return 0; }
