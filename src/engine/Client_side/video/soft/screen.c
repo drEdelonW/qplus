@@ -49,7 +49,7 @@ CENTER PRINTING
 
 ===============================================================================
 */
-
+#include "vid.h" // vid.numpages
 void SCR_EraseCenterString() {
     if (_scr.erase_center++ > vid.numpages) {
         _scr.erase_lines = 0;
@@ -80,6 +80,7 @@ void SCR_EraseCenterString() {
 SCR_ScreenShot_f
 ==================
 */
+#include "vid.h" // vid.scr.pBuff
 void SCR_ScreenShot_f() {
     //
     // find a file name to save it to

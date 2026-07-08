@@ -74,111 +74,8 @@ Key_Console
 Interactive line editing and console scrollback
 ====================
 */
+#include "vid.h"    // vid.scr.height
 void Key_Console(keycode_t key) {
-#if 0
-    if (key == K_ENTER) {
-        Cbuf_AddText(con.lines[con.edit_line] + 1);    // skip the >
-        Cbuf_AddText("\n");
-        Con_Printf("%s\n", con.lines[con.edit_line]);
-        con.edit_line = (con.edit_line + 1) & 31;
-        _history_line = con.edit_line;
-        con.lines[con.edit_line][0] = ']';
-        con.linepos = 1;
-        if (cls.state == ca_disconnected)
-            SCR_UpdateScreen(); // force an update, because the command may take some time
-        return;
-    }
-
-    if (key == K_TAB) { // command completion
-        cString cmd = Cmd_CompleteCommand(con.lines[con.edit_line] + 1);
-        if (!cmd)
-            cmd = Cvar_CompleteVariable(con.lines[con.edit_line] + 1);
-
-        if (cmd) {
-            Q_strcpy(con.lines[con.edit_line] + 1, cmd);
-            con.linepos = Q_strlen(cmd) + 1;
-            con.lines[con.edit_line][con.linepos] = ' ';
-            con.linepos++;
-            con.lines[con.edit_line][con.linepos] = 0;
-            return;
-        }
-    }
-
-    if ((key == K_BACKSPACE) ||
-        (key == K_LEFTARROW)) {
-        if (con.linepos > 1)
-            con.linepos--;
-        return;
-    }
-
-    if (key == K_UPARROW) {
-        do {
-            _history_line = (_history_line - 1) & 31;
-        } while ((_history_line != con.edit_line) &&
-            (!con.lines[_history_line][1])
-            );
-        if (_history_line == con.edit_line)
-            _history_line = (con.edit_line + 1) & 31;
-        Q_strcpy(con.lines[con.edit_line], con.lines[_history_line]);
-        con.linepos = Q_strlen(con.lines[con.edit_line]);
-        return;
-    }
-
-    if (key == K_DOWNARROW) {
-        if (_history_line == con.edit_line) return;
-        do {
-            _history_line = (_history_line + 1) & 31;
-        } while ((_history_line != con.edit_line) &&
-            (!con.lines[_history_line][1]));
-
-        if (_history_line == con.edit_line) {
-            con.lines[con.edit_line][0] = ']';
-            con.linepos = 1;
-        }
-        else {
-            Q_strcpy(con.lines[con.edit_line], con.lines[_history_line]);
-            con.linepos = Q_strlen(con.lines[con.edit_line]);
-        }
-        return;
-    }
-
-    if ((key == K_PGUP) ||
-        (key == K_MWHEELUP)
-        ) {
-        con.backscroll += 2;
-        if (con.backscroll > (con.totallines - EIGHTH(vid.scr.height) - 1))
-            con.backscroll = con.totallines - EIGHTH(vid.scr.height) - 1;
-        return;
-    }
-
-    if ((key == K_PGDN) ||
-        (key == K_MWHEELDOWN)
-        ) {
-        con.backscroll -= 2;
-        if (con.backscroll < 0)
-            con.backscroll = 0;
-        return;
-    }
-
-    if (key == K_HOME) {
-        con.backscroll = con.totallines - EIGHTH(vid.scr.height) - 1;
-        return;
-    }
-
-    if (key == K_END) {
-        con.backscroll = 0;
-        return;
-    }
-
-    if (!is_printable(key))
-        return; // non printable
-
-    if (con.linepos < (MAXCMDLINE - 1)) {
-        con.lines[con.edit_line][con.linepos] = key;
-        con.linepos++;
-        con.lines[con.edit_line][con.linepos] = 0;
-    }
-#else
     switch (key) {
     case K_ENTER: {
         Cbuf_AddText(con.lines[con.edit_line] + 1);    // skip the >
@@ -267,7 +164,6 @@ void Key_Console(keycode_t key) {
         }
         return;
     }
-#endif
 }
 
 //============================================================================

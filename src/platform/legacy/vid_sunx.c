@@ -541,7 +541,6 @@ void    VID_Init(uint8_p palette) {
     vid.colormap = host_colormap;
     // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
     //vid.cbits = VID_CBITS;
-    //vid.grades = VID_GRADES;
 
     srandom(getpid());
 

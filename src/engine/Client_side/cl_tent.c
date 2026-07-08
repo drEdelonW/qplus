@@ -283,6 +283,7 @@ void CL_ParseTEnt() {
 CL_NewTempEntity
 =================
 */
+#include "vid.h"    // vid.colormap
 r_Entity_p CL_NewTempEntity() {
     if ((cl_numvisedicts == MAX_VISEDICTS) ||
         (num_temp_entities == MAX_TEMP_ENTITIES)

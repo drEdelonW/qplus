@@ -68,6 +68,7 @@ D_WarpScreen
 // the sine warp, to keep the edges from wrapping
 =============
 */
+#include "vid.h" // vid.scr.pBuff
 void D_WarpScreen() {   // Under water warp
     int* turb;
     int* col;

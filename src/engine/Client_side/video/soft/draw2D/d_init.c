@@ -71,6 +71,8 @@ void D_CopyRects(vRect_p prects, int transparent) {
 D_EnableBackBufferAccess
 ===============
 */
+#include "vid.h" // VID_LockBuffer
+
 void D_EnableBackBufferAccess() { VID_LockBuffer(); }
 
 

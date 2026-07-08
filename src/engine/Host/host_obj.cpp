@@ -729,6 +729,7 @@ void Host::InitVCR(QuakeParms_p parms) {
 Host::Init
 ====================
 */
+#include "vid.h"    // VID_Init
 void Host::Init(QuakeParms_p parms) {
     minimum_memory = (standard_quake) ? MINIMUM_MEMORY : MINIMUM_MEMORY_LEVELPAK;
 

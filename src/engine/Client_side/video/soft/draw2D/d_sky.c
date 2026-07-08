@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 D_Sky_uv_To_st
 =================
 */
+#include "vid.h" // vid.scr.width
 void D_Sky_uv_To_st(int u, int v, fixed16_p s, fixed16_p t) {
     float temp = (float)(
         (r_refdef.vrect.width >= r_refdef.vrect.height) ?

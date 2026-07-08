@@ -376,7 +376,6 @@ void VID_Init(palette_p palette) {
     vid.numpages = 2;
     vid.colormap = host_colormap;
     // vid.cbits = VID_CBITS;
-    // vid.grades = VID_GRADES;
     // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));s
 
     srandom(getpid());

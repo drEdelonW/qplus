@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // vid_null.c -- null video driver to aid porting efforts
 
-// #include "vid.h"
 #include "mem_placement.h"
 #include "host.h"
 #include "endian_tools.h"

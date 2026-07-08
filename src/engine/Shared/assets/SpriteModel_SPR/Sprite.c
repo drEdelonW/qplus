@@ -8,7 +8,6 @@
 #   include "qOpenGL.h"
 #else
 #   include "d_iface.h"
-#   include "vid.h"    // d_8to16table[]
 #endif
 #include "z_hunk.h"
 

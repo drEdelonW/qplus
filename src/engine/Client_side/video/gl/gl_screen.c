@@ -178,7 +178,7 @@ void SCR_ScreenShot_f() {
 
 
 //=============================================================================
-
+#include "vid.h" // vid.scr.height
 void SCR_TileClear() {
     if (r_refdef.vrect.x > 0) {
         // left

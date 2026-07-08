@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "enginedefs.h"
 #include "bspfile.h"    // contents_t
-#include "vid.h"        // VID_GRADES
+#include "qLight.h"     // VID_GRADES
 #include "rEntity.h"
 #include "Edict.h"
 #include "sound/sound_struct.h"

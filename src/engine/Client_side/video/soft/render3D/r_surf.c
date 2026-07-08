@@ -255,6 +255,7 @@ void R_DrawSurface() {
 R_DrawSurfaceBlock8_mip0
 ================
 */
+#include "vid.h" // vid.colormap
 void R_DrawSurfaceBlock8_mip0() {   // nearest surfaces
     qColor8_p psource = pbasesource;
     qColor8_p prowdest = prowdestbase;

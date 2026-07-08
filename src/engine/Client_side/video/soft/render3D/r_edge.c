@@ -578,6 +578,7 @@ Output:
 Each surface has a linked list of its visible spans
 ==============
 */
+#include "vid.h" // VID_UnlockBuffer
 #include "mem_placement.h"
 uint8_t BaseSpans[MAXSPANS * sizeof(eSpan_t) + CACHE_SIZE] PLACE_TO_SDRAM;
 void R_ScanEdges() {

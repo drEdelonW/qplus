@@ -51,6 +51,7 @@ void R_CheckVariables() {
     Debugging use
     ============
 */
+#include "vid.h" // vid.scr.width
 void Show() {
     vRect_t vr = {
         // .x      = 0,

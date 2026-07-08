@@ -80,6 +80,7 @@ void SCR_CenterPrint(cString str) {
     }
 }
 
+#include "vid.h"    // vid.scr.height
 void SCR_DrawCenterString() {
     // the finale prints the characters one at a time
     int remaining = (isIntermission()) ?

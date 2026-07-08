@@ -3,7 +3,6 @@
 #endif
 
 // TODO: cleanup this IA slop!
-// #include "vid.h"
 #include "x_prv.h"
 #include "cvar.h"
 #include "common.h"
@@ -66,6 +65,7 @@ void D_InitCaches(TypeLess_ptr buffer, int size) {
     (void)size;
 }
 
+#include "vid.h" // vid.scr.width
 void GL_BeginRendering(int *x, int *y, int *width, int *height) {
     *x = 0;
     *y = 0;
@@ -550,6 +550,7 @@ int create_gl_context(App_p app) {
     return 1;
 }
 
+#include "vid.h" // vid.maxwarp
 void apply_vid_state(App_p app) {
     _scrWidth = app->xwin.width;
     _scrHeight = app->xwin.height;

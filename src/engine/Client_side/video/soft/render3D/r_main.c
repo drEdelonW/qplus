@@ -735,6 +735,8 @@ Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2] PLACE_
 #define ALIGN_PTR(p, a) \
     ((TypeLess_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
 
+
+#include "vid.h" // VID_LockBuffer
 void R_EdgeDrawing() {
     r_edges = (auxedges) ?
         auxedges :

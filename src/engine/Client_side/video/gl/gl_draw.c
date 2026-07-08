@@ -31,7 +31,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include "sbar.h"
 #include "z_hunk.h"
-#include "vid.h"
 
 
 // draw.c -- this is the only file outside the refresh that touches the
@@ -370,6 +369,7 @@ void Draw_TextureMode_f() {
 Draw_Init
 ===============
 */
+#include "vid.h" // vid.scr.height
 void Draw_Init() {
     Cvar_RegisterVariable(&gl_nobind);
     Cvar_RegisterVariable(&gl_max_size);

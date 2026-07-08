@@ -99,6 +99,7 @@ cString svc_strings[] = {
     This error checks and tracks the total number of entities
     ===============
 */
+#include "vid.h"    // vid.colormap
 r_Entity_p CL_EntityNum(EdIdx num) {
     if (num >= cl.num_entities) {
         if (num >= EdictMax)      Host_Error("CL_EntityNum: %i is an invalid number", num);

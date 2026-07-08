@@ -85,3 +85,16 @@ typedef struct {
 typedef palette_t* palette_p;
 #endif /* ====================={ Palette end }=====================*/
 
+extern palette_p host_basepal;
+extern Rgb16_t   d_8to16table[256];
+extern Rgb24_t   d_8to24table[256]; // 0xAABBGGRR
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    void    VID_ShiftPalette(palette_p palette);    // called for bonus and pain flashes, and for underwater color changes
+
+#ifdef __cplusplus
+}
+#endif

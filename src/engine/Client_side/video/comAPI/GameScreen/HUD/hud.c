@@ -13,6 +13,7 @@
 DrawPause
 ==============
 */
+#include "vid.h" // vid.scr.width
 void SCR_DrawPause() {
     if ((!scr_showpause.value) ||  // turn off for screenshots
         (!cl.paused))

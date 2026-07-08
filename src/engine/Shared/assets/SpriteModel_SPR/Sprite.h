@@ -6,8 +6,7 @@
 #include "qTime.h"
 #include "transform.h"
 #include "SyncType.h"
-#include "vid.h"
-
+#include "qColor.h"
 
 typedef struct {
     float u, v;

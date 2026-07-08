@@ -3,7 +3,6 @@
 
 #ifdef GLQUAKE
 #   include "qOpenGL.h"
-#   include "vid.h"
 #else
 #   include "r_local.h"
 #   include "d_iface.h"

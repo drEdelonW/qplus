@@ -40,7 +40,7 @@ static cString _bindnames[][bs_num] = {
 
 #define NUMCOMMANDS (sizeof(_bindnames)/sizeof(_bindnames[0]))
 
-
+#include "vid.h" // vid.scr.width
 void M_Keys_Draw() {
     qPic_p p = Draw_CachePic("gfx/ttl_cstm.lmp");
     M_DrawPic(HALF(vid.scr.width - p->width), 4, p);

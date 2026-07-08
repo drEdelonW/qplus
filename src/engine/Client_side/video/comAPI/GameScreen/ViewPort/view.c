@@ -688,6 +688,7 @@ V_CalcRefdef
 
 ==================
 */
+#include "vid.h"    // vid.colormap
 void V_CalcRefdef() {
     static float _oldZ = 0.f;
 

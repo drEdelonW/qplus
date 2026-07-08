@@ -265,6 +265,7 @@ void Sbar_Init() {
     Sbar_DrawPic
     =============
 */
+#include "vid.h" // vid.scr.width
 void Sbar_DrawPic(int x, int y, qPic_p pic) {
     Draw_Pic(
         x +

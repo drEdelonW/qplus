@@ -377,6 +377,7 @@ R_DrawAliasModel
 
 =================
 */
+#include "vid.h" // vid.colormap
 void R_DrawAliasModel(r_Entity_p e) {
     Model_p clmodel = currententity->model;
 

@@ -54,6 +54,7 @@ void D_Patch() {
 D_ViewChanged
 ================
 */
+#include "vid.h" // vid.scr.width
 void D_ViewChanged() {
 
     scale_for_mip = xscale;

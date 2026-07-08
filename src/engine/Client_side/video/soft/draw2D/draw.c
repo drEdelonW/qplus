@@ -421,17 +421,18 @@ void Draw_ConsoleBackground(int lines) {
 
     // hack the version number directly into the pic
     char ver[100];
+    qColor8_p dest;
 #ifdef _WIN32
     snprintf(ver, sizeof(ver), "(WinQuake) %4.2f", (float)VERSION);
-    uint8_p dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
 #elif defined(X11)
     snprintf(ver, sizeof(ver), "(X11 Quake %2.2f) %4.2f", (float)X11_VERSION, (float)VERSION);
-    uint8_p dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
 #elif defined(__linux__)
     snprintf(ver, sizeof(ver), "(Linux Quake %2.2f) %4.2f", (float)LINUX_VERSION, (float)VERSION);
-    qColor8_p dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
 #else
-    uint8_p dest = conback->data + 320 - 43 + 320 * 186;
+    dest = conback->data + 320 - 43 + 320 * 186;
     snprintf(ver, sizeof(ver), "%4.2f", VERSION);
 #endif
 
