@@ -66,8 +66,7 @@ D_DrawSkyScans8
 */
 void D_DrawSkyScans8(eSpan_p pspan) {
     do {
-        uint8_p pdest = (uint8_p)d_viewbuffer +
-            (pspan->v * screenwidth) + pspan->u;
+        qColor8_p pdest = d_viewbuffer + (pspan->v * screenwidth) + pspan->u;
 
         int count = pspan->count;
 
@@ -114,7 +113,10 @@ void D_DrawSkyScans8(eSpan_p pspan) {
             }
 
             do {
-                *pdest++ = r_skysource[FIXED8_TO_INT(t & R_SKY_TMASK) + FIXED16_TO_INT(s & R_SKY_SMASK)];
+                *pdest++ = r_skysource[
+                    FIXED8_TO_INT(t & R_SKY_TMASK) +
+                    FIXED16_TO_INT(s & R_SKY_SMASK)
+                ];
                 s += sstep;
                 t += tstep;
             } while (--spancount > 0);

@@ -100,7 +100,7 @@ WritePCXfile
 void WritePCXfile(
     cString filename, uint8_p data,
     int width, int height,
-    int rowbytes, uint8_p palette
+    int rowbytes, palette_p palette
 ) {
     pcx_p pcx = Hunk_TempAlloc(TWICE(width * height) + 1000);
     if (pcx == NULL) {
@@ -140,8 +140,8 @@ void WritePCXfile(
 
     // write the palette
     *pack++ = PaletteMarker; // palette ID
-    for (int i = 0; i < 768; i++)
-        *pack++ = *palette++;
+    for (int i = 0; i < PalRawDIM; i++)
+        *pack++ = palette->raw[i];
 
     // write output file
     COM_WriteFile(filename, pcx, pack - (uint8_p)pcx);

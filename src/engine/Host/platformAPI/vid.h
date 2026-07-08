@@ -23,9 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // # error frame buffer not applicable for OpenGL
 #endif
 #include "types.h"
-#define VID_CBITS 6
-#define VID_GRADES (1 << VID_CBITS)
-
 
 #if defined(_WIN32) && !defined(WINDED)
 # if defined(_M_IX86)
@@ -39,15 +36,18 @@ void VID_UnlockBuffer();
 #endif
 // a pixel can be one, two, or four bytes
 #include "vRect.h"
-typedef uint8_t pixel_t;
-typedef pixel_t* pixel_p;
-extern  uint16_t    d_8to16table[256];
-extern  uint32_t    d_8to24table[256]; // 0xAABBGGRR
+#include "qColor.h"
+#include "qLight.h"
+
+extern palette_p    host_basepal;
+
+extern  PIXEL16     d_8to16table[256];
+extern  PIXEL24     d_8to24table[256]; // 0xAABBGGRR
 
 typedef struct {
     vRect_t     scr;            // invisible buffer inside pBuff
-    pixel_p     colormap;       // 256 * VID_GRADES size
-    uint16_p    colormap16;     // 256 * VID_GRADES size // TODO: check is ot not used?
+    ColorMap_p   colormap;       // 256 * VID_GRADES size
+    qColor16_p  colormap16;     // 256 * VID_GRADES size // TODO: check is ot not used?
     // int         fullbright;     // index of first fullbright color // not used
     uint32_t    rowbytes;       // may be > width if displayed in a window
 
@@ -56,7 +56,7 @@ typedef struct {
     vRect_t     con;
 
     vRect_t     maxwarp;
-    pixel_p     direct;         // direct drawing to framebuffer, if not NULL
+    qColor8_p   direct;         // direct drawing to framebuffer, if not NULL
 } VidDef_t;
 typedef VidDef_t* VidDef_p;
 
@@ -68,10 +68,10 @@ extern  void (*vid_menudrawfn)();
 extern "C" {
 #endif
 
-    void    VID_Init(uint8_p palette);  // Called at startup to set up translation tables, takes 256 8 bit RGB values the palette data will go away after the call, so it must be copied off if the video driver will need it again
+    void    VID_Init(palette_p palette);  // Called at startup to set up translation tables, takes 256 8 bit RGB values the palette data will go away after the call, so it must be copied off if the video driver will need it again
     void    VID_Shutdown(); // Called at shutdown
-    void    VID_SetPalette(uint8_p palette);    // called at startup and after any gamma correction
-    void    VID_ShiftPalette(uint8_p palette);    // called for bonus and pain flashes, and for underwater color changes
+    void    VID_SetPalette(palette_p palette);    // called at startup and after any gamma correction
+    void    VID_ShiftPalette(palette_p palette);    // called for bonus and pain flashes, and for underwater color changes
     void    VID_Update(vRect_p rects);  // flushes the given rectangles from the view buffer to the screen
     int     VID_SetMode(int modenum, uint8_p palette);  // sets the mode; only used by the Quake engine for resetting to mode 0 (the base mode) on memory allocation failures
     void    VID_HandlePause(bool pause);    // called only on Win32, when pause happens, so the mouse can be released

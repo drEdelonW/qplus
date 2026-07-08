@@ -1,5 +1,5 @@
 TARGET ?= quakeX11
-TARGET ?= quakeGLX11
+# TARGET ?= quakeGLX11
 # TARGET ?= quakeWin
 TARGET ?= quakeSTM32
 
@@ -145,6 +145,9 @@ fresh: clean build
 
 run: $(TARGETS)
 	cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX) ./$(TARGET)
+
+run1: $(TARGETS)
+	cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX1) ./$(TARGET)
 
 run2: $(TARGETS)
 	@cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX2) ./$(TARGET)

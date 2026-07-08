@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_iface.h"
 #include "Model_pre.h"
 #include "rEntity_pre.h"
-#include "vid.h"    // pixel_p
+#include "qColor.h"    // qColor8_p
 
 // r_shared.h: general refresh-related stuff shared between the refresh and the
 // driver
@@ -53,7 +53,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern void R_DrawLine(PolyVert_p polyvert0, PolyVert_p polyvert1);
 
 extern int      cachewidth;
-extern pixel_p  cacheblock;
+extern qColor8_p cacheblock;
 extern int      screenwidth;
 extern float    pixelAspect;
 extern int      r_drawnpolycount;

@@ -793,22 +793,25 @@ struct {
 int keyq_head = 0;
 int keyq_tail = 0;
 
-int config_notify = 0;
+#if 0
+bool config_notify = false;
 int config_notify_width;
 int config_notify_height;
-
+#else
+CfgNotify_t xCfg = {
+    .notify = false,
+    .notify_width = 0,
+    .notify_height = 0
+};
+#endif
 void GetEvent() {
     XEvent x_event;
     int b;
 
     XNextEvent(x_disp, &x_event);
     switch (x_event.type) {
-    case KeyPress:
-        Key_Event(XLateKey(&x_event.xkey), true);
-        break;
-    case KeyRelease:
-        Key_Event(XLateKey(&x_event.xkey), false);
-        break;
+    case KeyPress:      Key_Event(XLateKey(&x_event.xkey), true);   break;
+    case KeyRelease:    Key_Event(XLateKey(&x_event.xkey), false);  break;
 
     case MotionNotify:
 
@@ -860,7 +863,7 @@ void GetEvent() {
         //   printf("config notify\n");
         config_notify_width = x_event.xconfigure.width;
         config_notify_height = x_event.xconfigure.height;
-        config_notify = 1;
+        config_notify = true;
         sb_updates = 0;
         break;
     case Expose:
@@ -950,7 +953,7 @@ VID_Update(vRect_p rects) {
                 XConfigureWindow(x_disp, x_win, value_mask, &chg);
         }
 
-        config_notify = 0;
+        config_notify = false;
 
         vid.scr.width = MP(config_notify_width) & ~3;
         vid.scr.height = MP(config_notify_height);
@@ -1021,7 +1024,7 @@ VID_Update_MT(vRect_p rects) {
                 XConfigureWindow(x_disp, x_win, value_mask, &chg);
         }
 
-        config_notify = 0;
+        config_notify = false;
 
         vid.scr.width = MP(config_notify_width) & ~3;
         vid.scr.height = MP(config_notify_height);

@@ -33,9 +33,17 @@ bool isPermedia;
 
 int texture_mode;
 
-int config_notify = 0;
+#if 0
+bool config_notify = false;
 int config_notify_width;
 int config_notify_height;
+#else
+CfgNotify_t xCfg = {
+    .notify = false,
+    .notify_width = 0,
+    .notify_height = 0,
+};
+#endif
 
 uint8_t d_15to8table[65536];
 bool    doShm;
@@ -575,15 +583,13 @@ int init(App_p app) {
     return 1;
 }
 
-void VID_SetPalette(uint8_p palette) {
+void VID_SetPalette(palette_p palette) {
     // 8 8 8 encoding
-    uint8_p pal = palette;
     uint32_p table = d_8to24table;
-    for (int i = 0; i < 256; i++) {
-        uint32_t r = pal[0];
-        uint32_t g = pal[1];
-        uint32_t b = pal[2];
-        pal += 3;
+    for (int i = 0; i < InksNum; i++) {
+        uint32_t r = palette->ink[i].r;
+        uint32_t g = palette->ink[i].g;
+        uint32_t b = palette->ink[i].b;
 
         // uint32_t v = (0xFF << 24) | (r << 16) | (g << 8) | (b << 0);
         // uint32_t v = (b << 24) | (g << 16) | (r << 8) | (0xFF << 0);
@@ -591,10 +597,9 @@ void VID_SetPalette(uint8_p palette) {
         *table++ = v;
     }
     d_8to24table[255] &= 0x00FFFFFF;    // 255 is transparent
-
 }
 
-void VID_Init(uint8_p palette) {
+void VID_Init(palette_p palette) {
 
     if (!init(&app))
         Host_SysError("VID_Init: init failed\n");

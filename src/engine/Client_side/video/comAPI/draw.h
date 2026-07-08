@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // to touch the vid buffer
 // #include "wad.h"
 #include "qPic.h"
-
+#include "qLight.h"
 
 #define D_CHAR_WIDTH  (8)
 #define D_CHAR_HEIGHT (8)
@@ -41,7 +41,7 @@ extern "C" {
 
     void    Draw_Pic(int x, int y, qPic_p pic);
     void    Draw_TransPic(int x, int y, qPic_p pic);
-    void    Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation);
+    void    Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation); // TODO: is it ColorMap_p?
     void    Draw_ConsoleBackground(int lines);
 
     void    Draw_BeginDisc();

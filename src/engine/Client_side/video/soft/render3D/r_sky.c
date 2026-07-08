@@ -28,7 +28,7 @@ float skyspeed;
 float skyspeed2;
 LegDt_t   skytime;
 
-uint8_p r_skysource;
+qColor8_p r_skysource;
 
 bool r_skymade;
 // TODO: clean up these routines
@@ -41,17 +41,19 @@ bool r_skymade;
 #define SKY_MASK_OPAQUE         0x00   // bottomsky texel is visible
 #define SKY_MASK_TRANSPARENT    0xFF   // bottomsky texel shows topsky through
 
-static uint8_t bottomsky[SKYSIZE * SKY_BOTTOM_STRIDE];
-static uint8_t bottommask[SKYSIZE * SKY_BOTTOM_STRIDE];
-static uint8_t newsky[SKYSIZE * (SKYSIZE * 2)];
+static qColor8_t bottomsky[SKYSIZE * SKY_BOTTOM_STRIDE];
+static qColor8_t bottommask[SKYSIZE * SKY_BOTTOM_STRIDE];
+static qColor8_t newsky[SKYSIZE * (SKYSIZE * 2)];
 // newsky and topsky both pack in here,
 // SKYSIZE bytes of newsky on the left of each scan,
 // SKYSIZE bytes of topsky on the right,
 // because the low-level drawers need (SKYSIZE*2)-uint8_t scan widths
 
 // blends one texel: topsky masked by bottommask, or-ed with bottomsky
-static inline uint8_t SkyBlendByte(uint8_p ptopsky, int ofs) {
-    return (uint8_t)((*(ptopsky + SKYSIZE) & bottommask[ofs]) | bottomsky[ofs]);
+static inline qColor8_t SkyBlendByte(qColor8_p ptopsky, int ofs) {
+    return (qColor8_t){
+        .i = (((*(ptopsky + SKYSIZE)).i & bottommask[ofs].i) | bottomsky[ofs].i)
+    };
 }
 
 
@@ -72,7 +74,7 @@ A sky texture is 256*128, with the right side being a masked overlay
 ==============
 */
 void R_InitSky(Texture_p mt) {
-    uint8_p src = GetMipPtr(mt, Mip0);
+    qColor8_p src = GetMipPtr(mt, Mip0);
 
     for (int i = 0; i < SKYSIZE; i++)
         for (int j = 0; j < SKYSIZE; j++)
@@ -80,13 +82,13 @@ void R_InitSky(Texture_p mt) {
 
     for (int i = 0; i < SKYSIZE; i++)
         for (int j = 0; j < SKY_BOTTOM_STRIDE; j++)
-            if (src[MUL256(i) + (j & SKYMASK)]) {
+            if (src[MUL256(i) + (j & SKYMASK)].i) {
                 bottomsky[(i * SKY_BOTTOM_STRIDE) + j] = src[MUL256(i) + (j & SKYMASK)];
-                bottommask[(i * SKY_BOTTOM_STRIDE) + j] = SKY_MASK_OPAQUE;
+                bottommask[(i * SKY_BOTTOM_STRIDE) + j].i = SKY_MASK_OPAQUE;
             }
             else {
-                bottomsky[(i * SKY_BOTTOM_STRIDE) + j] = SKY_MASK_OPAQUE;
-                bottommask[(i * SKY_BOTTOM_STRIDE) + j] = SKY_MASK_TRANSPARENT;
+                bottomsky[(i * SKY_BOTTOM_STRIDE) + j].i = SKY_MASK_OPAQUE;
+                bottommask[(i * SKY_BOTTOM_STRIDE) + j].i = SKY_MASK_TRANSPARENT;
             }
 
 
@@ -117,7 +119,7 @@ void R_MakeSky() {
 #if UNALIGNED_OK
     uint32_p pnewsky = (uint32_p)&newsky[0];
 #else
-    uint8_p pnewsky = &newsky[0];
+    qColor8_p pnewsky = &newsky[0];
 #endif
 
     for (int y = 0; y < SKYSIZE; y++) {
@@ -149,7 +151,7 @@ void R_MakeSky() {
 R_GenSkyTile
 =================
 */
-void R_GenSkyTile(uint8_p pdest) {
+void R_GenSkyTile(qColor8_p pdest) {
     int xshift = skytime * skyspeed;
     int yshift = skytime * skyspeed;
 
@@ -157,8 +159,8 @@ void R_GenSkyTile(uint8_p pdest) {
     uint32_p pnewsky = (uint32_p)&newsky[0];
     uint32_p pd = (uint32_p)pdest;
 #else
-    uint8_p pnewsky = &newsky[0];
-    uint8_p pd = pdest;
+    qColor8_p pnewsky = &newsky[0];
+    qColor8_p pd = pdest;
 #endif
 
     for (int y = 0; y < SKYSIZE; y++) {
@@ -194,7 +196,7 @@ void R_GenSkyTile16(uint16_p pdest) {
     int xshift = skytime * skyspeed;
     int yshift = skytime * skyspeed;
 
-    uint8_p pnewsky = &newsky[0];
+    qColor8_p pnewsky = &newsky[0];
     uint16_p pd = pdest;
 
     for (int y = 0; y < SKYSIZE; y++) {
@@ -203,7 +205,7 @@ void R_GenSkyTile16(uint16_p pdest) {
         // FIXME: do faster unaligned version?
         for (int x = 0; x < SKYSIZE; x++) {
             int ofs = baseofs + ((x + xshift) & SKYMASK);
-            *pd = d_8to16table[SkyBlendByte(pnewsky, ofs)];
+            *pd = d_8to16table[SkyBlendByte(pnewsky, ofs).i];
             pnewsky++;
             pd++;
         }

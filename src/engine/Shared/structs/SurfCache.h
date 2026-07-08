@@ -18,5 +18,5 @@ struct SurfCache_s {
     uint32_t    height;                 // DEBUG only needed for debug
     float       mipscale;
     Texture_p   texture;                // checked for animating textures
-    uint8_t     data[4];                // width * height elements
+    qColor8_t   data[4];                // width * height elements
 } ;

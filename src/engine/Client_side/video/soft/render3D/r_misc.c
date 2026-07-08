@@ -205,21 +205,21 @@ void R_PrintAliasStats() {
 
 
 void WarpPalette() {
-    uint8_t newpalette[768];
-    int basecolor[3] = {
-        130,
-        80,
-        50
+    palette_t newpalette;
+    qRgb24 basecolor = {
+        .r = 130,
+        .g = 80,
+        .b = 50
     };
 
     // pull the colors halfway to bright brown
-    for (int i = 0; i < 256; i++) {
-        for (int j = 0; j < 3; j++) {
-            newpalette[(i * 3) + j] = HALF(host_basepal[(i * 3) + j] + basecolor[j]);
+    for (int idx = 0; idx < InksNum; idx++) {
+        for (int c = 0; c < RGB_DIM; c++) {
+            newpalette.ink[idx].ch[c] = HALF(host_basepal->ink[idx].ch[c] + basecolor.ch[c]);
         }
     }
 
-    VID_ShiftPalette(newpalette);
+    VID_ShiftPalette(&newpalette);
 }
 
 

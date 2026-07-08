@@ -79,7 +79,7 @@ void D_DrawSolidSurface(Surf_p surf, int color) {
         int u2 = span->u + span->count - 1;
         ((uint8_p)pdest)[u] = pix;
 
-        if (u2 - u < 8) {
+        if ((u2 - u) < 8) {
             for (u++; u <= u2; u++)
                 ((uint8_p)pdest)[u] = pix;
         }
@@ -204,7 +204,7 @@ void D_DrawSurfaces() {
             else if (surf->flags & SURF_DRAWTURB) {
                 mSurface_p pface = surf->data;
                 _miplevel = Mip0;
-                cacheblock = (pixel_p)GetMipPtr(pface->texinfo->texture, Mip0);
+                cacheblock = GetMipPtr(pface->texinfo->texture, Mip0);
                 cachewidth = 64;
 
                 if (surf->insubmodel) {
@@ -258,7 +258,7 @@ void D_DrawSurfaces() {
                 // FIXME: make this passed in to D_CacheSurface
                 SurfCache_p pcurrentcache = D_CacheSurface(pface, _miplevel);
 
-                cacheblock = (pixel_p)pcurrentcache->data;
+                cacheblock = pcurrentcache->data;
                 cachewidth = pcurrentcache->width;
 
                 D_CalcGradients(pface);

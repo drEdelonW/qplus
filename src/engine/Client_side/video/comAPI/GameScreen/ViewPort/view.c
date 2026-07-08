@@ -435,7 +435,7 @@ V_UpdatePalette
 =============
 */
 #ifdef GLQUAKE
-uint8_t  ramps[3][256];
+palette_t  ramps;
 
 void V_UpdatePalette() {
     V_CalcPowerupCshift();
@@ -483,29 +483,25 @@ void V_UpdatePalette() {
         if (ig > 255)   ig = 255;
         if (ib > 255)   ib = 255;
 
-        ramps[0][i] = gammatable[ir];
-        ramps[1][i] = gammatable[ig];
-        ramps[2][i] = gammatable[ib];
+        ramps.ink[i].r = gammatable[ir];
+        ramps.ink[i].g = gammatable[ig];
+        ramps.ink[i].b = gammatable[ib];
     }
 
-    uint8_t pal[255 * 3];
-    uint8_p basepal = host_basepal;
-    uint8_p newpal = pal;
+    palette_t pal;
 
-    for (int i = 0; i < 256; i++) {
-        int ir = basepal[0];
-        int ig = basepal[1];
-        int ib = basepal[2];
-        basepal += 3;
+    for (int i = 0; i < InksNum; i++) {
+        int ir = host_basepal->ink[i].r;
+        int ig = host_basepal->ink[i].g;
+        int ib = host_basepal->ink[i].b;
 
-        newpal[0] = ramps[0][ir];
-        newpal[1] = ramps[1][ig];
-        newpal[2] = ramps[2][ib];
+        pal.ink[i].r = ramps.ink[ir].r;
+        pal.ink[i].g = ramps.ink[ig].g;
+        pal.ink[i].b = ramps.ink[ib].b;
         //-------------------
-        newpal += 3;
     }
 
-    VID_ShiftPalette(pal);
+    VID_ShiftPalette(&pal);
 }
 #else // !GLQUAKE
 void V_UpdatePalette() {
@@ -540,30 +536,23 @@ void V_UpdatePalette() {
     if (!new && !force)
         return;
     //-------------------
-    uint8_t pal[256 * 3];
-    uint8_p basepal = host_basepal;
-    uint8_p newpal = pal;
-
-    for (int i = 0; i < 256; i++) {
-        int r = basepal[0];
-        int g = basepal[1];
-        int b = basepal[2];
-        basepal += 3;
+    palette_t pal;
+    for (int i = 0; i < InksNum; i++) {
+        qRgb24 col = host_basepal->ink[i];
 
         for (int IdxShClr = 0; IdxShClr < NUM_CSHIFTS; IdxShClr++) {
-            r += (cl.cshifts[IdxShClr].percent * (cl.cshifts[IdxShClr].destcolor[0] - r)) >> 8;
-            g += (cl.cshifts[IdxShClr].percent * (cl.cshifts[IdxShClr].destcolor[1] - g)) >> 8;
-            b += (cl.cshifts[IdxShClr].percent * (cl.cshifts[IdxShClr].destcolor[2] - b)) >> 8;
+            col.r += (cl.cshifts[IdxShClr].percent * (cl.cshifts[IdxShClr].destcolor[0] - col.r)) >> 8;
+            col.g += (cl.cshifts[IdxShClr].percent * (cl.cshifts[IdxShClr].destcolor[1] - col.g)) >> 8;
+            col.b += (cl.cshifts[IdxShClr].percent * (cl.cshifts[IdxShClr].destcolor[2] - col.b)) >> 8;
         }
 
-        newpal[0] = gammatable[r];
-        newpal[1] = gammatable[g];
-        newpal[2] = gammatable[b];
+        pal.ink[i].r = gammatable[col.r];
+        pal.ink[i].g = gammatable[col.g];
+        pal.ink[i].b = gammatable[col.b];
         //-------------------
-        newpal += 3;
     }
 
-    VID_ShiftPalette(pal);
+    VID_ShiftPalette(&pal);
 }
 #endif // !GLQUAKE
 

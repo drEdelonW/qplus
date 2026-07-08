@@ -48,9 +48,9 @@ float   mouse_x, mouse_y;
 float   old_mouse_x, old_mouse_y;
 int p_mouse_x;
 int p_mouse_y;
-bool	mouse_grabbed = false; // we grab it when console is up
+bool    mouse_grabbed = false; // we grab it when console is up
 
-int		VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
+int        VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
 uint8_p VGA_pagebase;
 
 // The following X property format is defined in Motif 1.1's
@@ -67,15 +67,15 @@ typedef struct {
     int32_t input_mode;
 } MotifWmHints;
 
-#define MAX_COLUMN_SIZE	11
+#define MAX_COLUMN_SIZE    11
 
-#define MAX_MODEDESCS	(MAX_COLUMN_SIZE*3)
+#define MAX_MODEDESCS    (MAX_COLUMN_SIZE*3)
 
 typedef struct
 {
-    int		modenum;
-    int		iscur;
-    char	desc[256];
+    int        modenum;
+    int        iscur;
+    char    desc[256];
 } modedesc_t;
 
 
@@ -88,79 +88,81 @@ typedef struct
 VidDef_t vid; // global video state
 uint16_t       d_8to16table[256];
 
-int		num_shades = 32;
+int        num_shades = 32;
 
-int	d_con_indirect = 0;
+int    d_con_indirect = 0;
 
-int		vid_buffersize;
+int        vid_buffersize;
 
 #define STD_EVENT_MASK \
 ( KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | \
 PointerMotionMask | EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | \
 ExposureMask | StructureNotifyMask )
 
-bool				x_fullscreen = true;
+bool                x_fullscreen = true;
 Display* x_disp = NULL;
-int						x_screen, x_screen_width, x_screen_height;
-int				x_center_width, x_center_height;
-int						x_std_event_mask = STD_EVENT_MASK;
-Window					x_win, x_root_win;
-bool				mouse_in_window = false;
-int				global_dx, global_dy;
+int                        x_screen, x_screen_width, x_screen_height;
+int                x_center_width, x_center_height;
+int                        x_std_event_mask = STD_EVENT_MASK;
+Window                    x_win, x_root_win;
+bool                mouse_in_window = false;
+int                global_dx, global_dy;
 
-static bool			doShm;
-static Colormap			x_cmap;
-static GC				x_gc;
+static bool            doShm;
+static Colormap            x_cmap;
+static GC                x_gc;
 static Visual* x_vis;
 static XVisualInfo* x_visinfo;
-static Atom				aHints = 0;
-static Atom				aWMDelete = 0;
+static Atom                aHints = 0;
+static Atom                aWMDelete = 0;
 
-static int				x_shmeventtype;
-//static XShmSegmentInfo	x_shminfo;
+static int                x_shmeventtype;
+//static XShmSegmentInfo    x_shminfo;
 
-static bool			oktodraw = false;
+static bool            oktodraw = false;
 
 int XShmQueryExtension(Display*);
 int XShmGetEventBase(Display*);
 
 static bool current_framebuffer;
 static XImage* x_framebuffer[2] = { 0, 0 };
-static XShmSegmentInfo	x_shminfo[2];
+static XShmSegmentInfo    x_shminfo[2];
 
-static int verbose = 1;
+static bool verbose = true; // ?
 
 static uint8_t current_palette[768];
+
 
 typedef uint16_t PIXEL16;
 typedef uint32_t PIXEL24;
 static PIXEL16 st2d_8to16table[256];
 static PIXEL24 st2d_8to24table[256];
-static int shiftmask_fl = 0;
-static int32_t r_shift, g_shift, b_shift;
+static int8_t r_shift, g_shift, b_shift;   // should be signed because (-8)
 static uint32_t r_mask, g_mask, b_mask;
 
+static bool shiftmask_fl = false;
 void shiftmask_init() {
-    uint32_t x;
     r_mask = x_vis->red_mask;
     g_mask = x_vis->green_mask;
     b_mask = x_vis->blue_mask;
-    for (r_shift = -8, x = 1;x < r_mask;x = x << 1)r_shift++;
-    for (g_shift = -8, x = 1;x < g_mask;x = x << 1)g_shift++;
-    for (b_shift = -8, x = 1;x < b_mask;x = x << 1)b_shift++;
-    shiftmask_fl = 1;
+
+    r_shift = -8; for (uint32_t x = 1; x < r_mask; x = x << 1) r_shift++;
+    g_shift = -8; for (uint32_t x = 1; x < g_mask; x = x << 1) g_shift++;
+    b_shift = -8; for (uint32_t x = 1; x < b_mask; x = x << 1) b_shift++;
+
+    shiftmask_fl = true;
 }
 
 PIXEL16 xlib_rgb16(int r, int g, int b) {
     PIXEL16 p;
-    if (shiftmask_fl == 0) shiftmask_init();
+    if (!shiftmask_fl) shiftmask_init();
     p = 0;
 
-    if (r_shift > 0) 		p = (r << (r_shift)) & r_mask;
-    else if (r_shift < 0) 	p = (r >> (-r_shift)) & r_mask;
-    else 					p |= (r & r_mask);
+    if (r_shift > 0)         p = (r << (r_shift)) & r_mask;
+    else if (r_shift < 0)     p = (r >> (-r_shift)) & r_mask;
+    else                     p |= (r & r_mask);
 
-    if (g_shift > 0) 	    p |= (g << (g_shift)) & g_mask;
+    if (g_shift > 0)         p |= (g << (g_shift)) & g_mask;
     else if (g_shift < 0)   p |= (g >> (-g_shift)) & g_mask;
     else                    p |= (g & g_mask);
 
@@ -173,19 +175,19 @@ PIXEL16 xlib_rgb16(int r, int g, int b) {
 
 PIXEL24 xlib_rgb24(int r, int g, int b) {
     PIXEL24 p;
-    if (shiftmask_fl == 0) shiftmask_init();
+    if (!shiftmask_fl) shiftmask_init();
     p = 0;
 
     if (r_shift > 0)        p = (r << (r_shift)) & r_mask;
     else if (r_shift < 0)   p = (r >> (-r_shift)) & r_mask;
     else                    p |= (r & r_mask);
 
-    if (g_shift > 0)        p |= (g << (g_shift)) & g_mask;    
-    else if (g_shift < 0)   p |= (g >> (-g_shift)) & g_mask;    
+    if (g_shift > 0)        p |= (g << (g_shift)) & g_mask;
+    else if (g_shift < 0)   p |= (g >> (-g_shift)) & g_mask;
     else                    p |= (g & g_mask);
 
     if (b_shift > 0)        p |= (b << (b_shift)) & b_mask;
-    else if (b_shift < 0)   p |= (b >> (-b_shift)) & b_mask;    
+    else if (b_shift < 0)   p |= (b >> (-b_shift)) & b_mask;
     else                    p |= (b & b_mask);
 
     return p;
@@ -209,21 +211,21 @@ void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
         src += x + width - 1;
 
         switch (count % 8) {
-        case 0:	do {
+        case 0:    do {
             *dest-- = st2d_8to16table[*src--];
-        case 7:			*dest-- = st2d_8to16table[*src--];
-        case 6:			*dest-- = st2d_8to16table[*src--];
-        case 5:			*dest-- = st2d_8to16table[*src--];
-        case 4:			*dest-- = st2d_8to16table[*src--];
-        case 3:			*dest-- = st2d_8to16table[*src--];
-        case 2:			*dest-- = st2d_8to16table[*src--];
-        case 1:			*dest-- = st2d_8to16table[*src--];
+        case 7:            *dest-- = st2d_8to16table[*src--];
+        case 6:            *dest-- = st2d_8to16table[*src--];
+        case 5:            *dest-- = st2d_8to16table[*src--];
+        case 4:            *dest-- = st2d_8to16table[*src--];
+        case 3:            *dest-- = st2d_8to16table[*src--];
+        case 2:            *dest-- = st2d_8to16table[*src--];
+        case 1:            *dest-- = st2d_8to16table[*src--];
         } while (--n > 0);
         }
 
-        //		for(xi = (x+width-1); xi >= x; xi--) {
-        //			dest[xi] = st2d_8to16table[src[xi]];
-        //		}
+        //        for(xi = (x+width-1); xi >= x; xi--) {
+        //            dest[xi] = st2d_8to16table[src[xi]];
+        //        }
     }
 }
 
@@ -245,21 +247,21 @@ void st3_fixup(XImage* framebuf, int x, int y, int width, int height) {
         src += x + width - 1;
 
         switch (count % 8) {
-        case 0:	do {
+        case 0:    do {
             *dest-- = st2d_8to24table[*src--];
-        case 7:			*dest-- = st2d_8to24table[*src--];
-        case 6:			*dest-- = st2d_8to24table[*src--];
-        case 5:			*dest-- = st2d_8to24table[*src--];
-        case 4:			*dest-- = st2d_8to24table[*src--];
-        case 3:			*dest-- = st2d_8to24table[*src--];
-        case 2:			*dest-- = st2d_8to24table[*src--];
-        case 1:			*dest-- = st2d_8to24table[*src--];
+        case 7:            *dest-- = st2d_8to24table[*src--];
+        case 6:            *dest-- = st2d_8to24table[*src--];
+        case 5:            *dest-- = st2d_8to24table[*src--];
+        case 4:            *dest-- = st2d_8to24table[*src--];
+        case 3:            *dest-- = st2d_8to24table[*src--];
+        case 2:            *dest-- = st2d_8to24table[*src--];
+        case 1:            *dest-- = st2d_8to24table[*src--];
         } while (--n > 0);
         }
 
-        //		for(xi = (x+width-1); xi >= x; xi--) {
-        //			dest[xi] = st2d_8to16table[src[xi]];
-        //		}
+        //        for(xi = (x+width-1); xi >= x; xi--) {
+        //            dest[xi] = st2d_8to16table[src[xi]];
+        //        }
     }
 }
 
@@ -295,8 +297,8 @@ byte vid_gamma[256];
 
 void VID_Gamma_f() {
 
-    float	g, f, inf;
-    int		i;
+    float    g, f, inf;
+    int        i;
 
     if (Cmd_Argc() == 2) {
         g = Q_atof(Cmd_Argv(1));
@@ -311,7 +313,7 @@ void VID_Gamma_f() {
 
         VID_SetPalette(current_palette);
 
-        SCR_RequestCalcRefdef();				// force a surface cache flush
+        SCR_RequestCalcRefdef();                // force a surface cache flush
     }
 
 }
@@ -358,7 +360,7 @@ void ResetFrameBuffer() {
 
     if (x_framebuffer[0]) {
         Z_Free(x_framebuffer[0]->data);
-        //		Z_Free(d_pzbuffer);
+        //        Z_Free(d_pzbuffer);
         free(x_framebuffer[0]);
     }
 
@@ -366,8 +368,8 @@ void ResetFrameBuffer() {
     if (pwidth == 3) pwidth = 4;
     mem = ((vid.scr.width * pwidth + 3) & ~3) * vid.scr.height;
 
-    //	d_pzbuffer = (uint16_t *) Z_Malloc(vid.scr.width*vid.scr.height*
-    //		sizeof(*d_pzbuffer));
+    //    d_pzbuffer = (uint16_t *) Z_Malloc(vid.scr.width*vid.scr.height*
+    //        sizeof(*d_pzbuffer));
     d_pzbuffer = (int16_p)Hunk_HighAllocName(vid.scr.width * vid.scr.height *
         sizeof(*d_pzbuffer), "zbuff");
 
@@ -393,8 +395,8 @@ void ResetSharedFrameBuffers() {
     int minsize = getpagesize();
     int frm;
 
-    //	if (d_pzbuffer)
-    //		Z_Free(d_pzbuffer);
+    //    if (d_pzbuffer)
+    //        Z_Free(d_pzbuffer);
     d_pzbuffer = Hunk_HighAllocName(vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer), "zbuff");
 
     for (frm = 0; frm < 2; frm++) {
@@ -453,8 +455,8 @@ void ResetSharedFrameBuffers() {
 void VID_MenuDraw() {
     qPic_p p;
     cString ptr;
-    int			i, j, column, row, dup;
-    char		temp[100];
+    int            i, j, column, row, dup;
+    char        temp[100];
 
     M_DrawPicHC(4, Draw_CachePic("gfx/vidmodes.lmp"));
 
@@ -468,14 +470,14 @@ void VID_MenuKey(int key) { M_Menu_Options_f(); }
 // the palette data will go away after the call, so it must be copied off if
 // the video driver will need it again
 
-byte	surfcache[1024 * 1024];
+byte    surfcache[1024 * 1024];
 
 //
 // VID_SetWindowTitle - set the window and icon titles
 //
 
 void VID_SetWindowTitle(Window win, cString pszName) {
-    XTextProperty	textprop;
+    XTextProperty    textprop;
     XWMHints* wmHints;
 
     // Setup ICCCM properties
@@ -522,7 +524,7 @@ bool VID_FullScreen(Window win) {
     return(true);
 }
 
-void	VID_Init(uint8_p palette) {
+void    VID_Init(uint8_p palette) {
 
     int pnum, i;
     XVisualInfo template;
@@ -562,7 +564,7 @@ void	VID_Init(uint8_p palette) {
 
     x_center_width = HALF(x_screen_width);
 
-    x_center_height = HALF(x_screen_height)  ;
+    x_center_height = HALF(x_screen_height);
 
     Con_Printf("Using screen %d: %dx%d\n", x_screen, x_screen_width, x_screen_height);
 
@@ -581,7 +583,7 @@ void	VID_Init(uint8_p palette) {
     //XAutoRepeatOff(x_disp);
 
 // for debugging only
-//	XSynchronize(x_disp, True);
+//    XSynchronize(x_disp, True);
 
 // check for command-line window size
     if ((pnum = COM_CheckParm("-winsize"))) {
@@ -617,7 +619,7 @@ void	VID_Init(uint8_p palette) {
     if (num_visuals > 1) {
         printf("Found more than one visual id at depth %d:\n", template.depth);
         for (i = 0; i < num_visuals; i++)
-            printf("	-visualid %d\n", (int)(x_visinfo[i].visualid));
+            printf("    -visualid %d\n", (int)(x_visinfo[i].visualid));
     }
     else if (num_visuals == 0) {
         if (template_mask == VisualIDMask)
@@ -628,14 +630,14 @@ void	VID_Init(uint8_p palette) {
 
     if (verbose) {
         printf("Using visualid %d:\n", (int)(x_visinfo->visualid));
-        printf("	class %d\n", x_visinfo->class);
-        printf("	screen %d\n", x_visinfo->screen);
-        printf("	depth %d\n", x_visinfo->depth);
-        printf("	red_mask 0x%x\n", (int)(x_visinfo->red_mask));
-        printf("	green_mask 0x%x\n", (int)(x_visinfo->green_mask));
-        printf("	blue_mask 0x%x\n", (int)(x_visinfo->blue_mask));
-        printf("	colormap_size %d\n", x_visinfo->colormap_size);
-        printf("	bits_per_rgb %d\n", x_visinfo->bits_per_rgb);
+        printf("    class %d\n", x_visinfo->class);
+        printf("    screen %d\n", x_visinfo->screen);
+        printf("    depth %d\n", x_visinfo->depth);
+        printf("    red_mask 0x%x\n", (int)(x_visinfo->red_mask));
+        printf("    green_mask 0x%x\n", (int)(x_visinfo->green_mask));
+        printf("    blue_mask 0x%x\n", (int)(x_visinfo->blue_mask));
+        printf("    colormap_size %d\n", x_visinfo->colormap_size);
+        printf("    bits_per_rgb %d\n", x_visinfo->bits_per_rgb);
     }
 
     x_vis = x_visinfo->visual;
@@ -656,7 +658,7 @@ void	VID_Init(uint8_p palette) {
         // create the main window
         x_win = XCreateWindow(x_disp,
             XRootWindow(x_disp, x_visinfo->screen),
-            0, 0,	// x, y
+            0, 0,    // x, y
             vid.scr.width, vid.scr.height,
             0, // borderwidth
             x_visinfo->depth,
@@ -739,7 +741,7 @@ void	VID_Init(uint8_p palette) {
 
     D_InitCaches(surfcache, sizeof(surfcache));
 
-    //	XSynchronize(x_disp, False);
+    //    XSynchronize(x_disp, False);
 
     vid_menudrawfn = VID_MenuDraw;
     vid_menukeyfn = VID_MenuKey;
@@ -777,7 +779,7 @@ void VID_SetPalette(uint8_p palette) {
 
 // Called at shutdown
 
-void	VID_Shutdown() {
+void    VID_Shutdown() {
     Con_Printf("VID_Shutdown\n");
     //XAutoRepeatOn(x_disp);
     if (mouse_grabbed) {
@@ -789,53 +791,52 @@ void	VID_Shutdown() {
 }
 
 keycode_t XLateKey(XKeyEvent* ev) {
-    keycode_t key;
     char buf[NAME_LENGTH];
     KeySym keysym;
-
     XLookupString(ev, buf, sizeof buf, &keysym, 0);
 
+    keycode_t key;
     switch (keysym) {
-    case XK_Page_Up:	 key = K_PGUP; break;
-    case XK_Page_Down:	 key = K_PGDN; break;
-    case XK_Home:	 key = K_HOME; break;
-    case XK_End:	 key = K_END; break;
-    case XK_Left:	 key = K_LEFTARROW; break;
-    case XK_Right:	key = K_RIGHTARROW;		break;
-    case XK_Down:	 key = K_DOWNARROW; break;
-    case XK_Up:		 key = K_UPARROW;	 break;
-    case XK_Escape: key = K_ESCAPE;		break;
-    case XK_Return: key = K_ENTER;		 break;
-    case XK_Tab:		key = K_TAB;			 break;
-    case XK_F1:		 key = K_F1;				break;
-    case XK_F2:		 key = K_F2;				break;
-    case XK_F3:		 key = K_F3;				break;
-    case XK_F4:		 key = K_F4;				break;
-    case XK_F5:		 key = K_F5;				break;
-    case XK_F6:		 key = K_F6;				break;
-    case XK_F7:		 key = K_F7;				break;
-    case XK_F8:		 key = K_F8;				break;
-    case XK_F9:		 key = K_F9;				break;
-    case XK_F10:		key = K_F10;			 break;
-    case XK_F11:		key = K_F11;			 break;
-    case XK_F12:		key = K_F12;			 break;
-    case XK_BackSpace:
-    case XK_Delete: key = K_BACKSPACE; break;
-    case XK_Pause:	key = K_PAUSE;		 break;
-    case XK_Shift_L:
-    case XK_Shift_R:		key = K_SHIFT;		break;
-    case XK_Control_L:
-    case XK_Control_R:	key = K_CTRL;		 break;
-    case XK_Alt_L:
-    case XK_Meta_L:
-    case XK_Alt_R:
-    case XK_Meta_R: key = K_ALT;			break;
+    case XK_Page_Up:    key = K_PGUP;       break;
+    case XK_Page_Down:  key = K_PGDN;       break;
+    case XK_Home:       key = K_HOME;       break;
+    case XK_End:        key = K_END;        break;
+    case XK_Left:       key = K_LEFTARROW;  break;
+    case XK_Right:      key = K_RIGHTARROW; break;
+    case XK_Down:       key = K_DOWNARROW;  break;
+    case XK_Up:         key = K_UPARROW;    break;
+    case XK_Escape:     key = K_ESCAPE;     break;
+    case XK_Return:     key = K_ENTER;      break;
+    case XK_Tab:        key = K_TAB;        break;
+    case XK_F1:         key = K_F1;         break;
+    case XK_F2:         key = K_F2;         break;
+    case XK_F3:         key = K_F3;         break;
+    case XK_F4:         key = K_F4;         break;
+    case XK_F5:         key = K_F5;         break;
+    case XK_F6:         key = K_F6;         break;
+    case XK_F7:         key = K_F7;         break;
+    case XK_F8:         key = K_F8;         break;
+    case XK_F9:         key = K_F9;         break;
+    case XK_F10:        key = K_F10;        break;
+    case XK_F11:        key = K_F11;        break;
+    case XK_F12:        key = K_F12;        break;
+    case XK_BackSpace:  /* FALLTHROUGH */
+    case XK_Delete:     key = K_BACKSPACE;  break;
+    case XK_Pause:      key = K_PAUSE;      break;
+    case XK_Shift_L:    /* FALLTHROUGH */
+    case XK_Shift_R:    key = K_SHIFT;      break;
+    case XK_Control_L:  /* FALLTHROUGH */
+    case XK_Control_R:  key = K_CTRL;       break;
+    case XK_Alt_L:      /* FALLTHROUGH */
+    case XK_Meta_L:     /* FALLTHROUGH */
+    case XK_Alt_R:      /* FALLTHROUGH */
+    case XK_Meta_R:     key = K_ALT;        break;
         // various other keys on the keyboard
-    case XK_F27: key = K_HOME; break;
-    case XK_F29: key = K_PGUP; break;
-    case XK_F33: key = K_END; break;
-    case XK_F35: key = K_PGDN; break;
-    case XK_KP_Insert: key = K_INS; break;
+    case XK_F27:        key = K_HOME;       break;
+    case XK_F29:        key = K_PGUP;       break;
+    case XK_F33:        key = K_END;        break;
+    case XK_F35:        key = K_PGDN;       break;
+    case XK_KP_Insert:  key = K_INS;        break;
 
     default:
         key = *buf;
@@ -854,21 +855,25 @@ struct
 int keyq_head = 0;
 int keyq_tail = 0;
 
-int config_notify = 0;
+#if 0
+bool config_notify = false;
 int config_notify_width;
 int config_notify_height;
+#else
+CfgNotify_t xCfg = {
+    .notify = false,
+    .notify_width = 0,
+    .notify_height = 0,
+};
+#endif
 
 void GetEvent() {
     XEvent x_event;
 
     XNextEvent(x_disp, &x_event);
     switch (x_event.type) {
-    case KeyPress:
-        Key_Event(XLateKey(&x_event.xkey), true);
-        break;
-    case KeyRelease:
-        Key_Event(XLateKey(&x_event.xkey), false);
-        break;
+    case KeyPress:      Key_Event(XLateKey(&x_event.xkey), true);   break;
+    case KeyRelease:    Key_Event(XLateKey(&x_event.xkey), false);  break;
     case ButtonPress:
         //printf( "button %d down\n", x_event.xbutton.button );
         Key_Event(K_MOUSE1 + x_event.xbutton.button - 1, true);
@@ -882,11 +887,17 @@ void GetEvent() {
             mouse_x = (float)((int)x_event.xmotion.x - HALF(vid.scr.width));
             mouse_y = (float)((int)x_event.xmotion.y - HALF(vid.scr.height));
             //printf("m: x=%d,y=%d, mx=%3.2f,my=%3.2f\n",
-            //	x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
+            //    x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
                         /* move the mouse to the window center again */
             XSelectInput(x_disp, x_win, STD_EVENT_MASK & ~PointerMotionMask);
-            XWarpPointer(x_disp, None, x_win, 0, 0, 0, 0, HALF(vid.scr.width), HALF(vid.scr.height));
+            XWarpPointer(
+                x_disp,
+                None, x_win,
+                0, 0,
+                0, 0,
+                HALF(vid.scr.width), HALF(vid.scr.height)
+            );
             XSelectInput(x_disp, x_win, STD_EVENT_MASK);
         }
         else {
@@ -897,25 +908,17 @@ void GetEvent() {
         }
         break;
 
-    case ConfigureNotify:
-        //			printf("config notify\n");
-        config_notify_width = x_event.xconfigure.width;
-        config_notify_height = x_event.xconfigure.height;
-        config_notify = 1;
+    case ConfigureNotify: {
+        //            printf("config notify\n");
+        xCfg.notify_width = x_event.xconfigure.width;
+        xCfg.notify_height = x_event.xconfigure.height;
+        xCfg.notify = true;
         sb_updates = 0;
-        break;
-    case Expose:
-        sb_updates = 0;
-        break;
-    case ClientMessage:
-        if (x_event.xclient.data.l[0] == aWMDelete) Host_Quit_f();
-        break;
-    case EnterNotify:
-        mouse_in_window = true;
-        break;
-    case LeaveNotify:
-        mouse_in_window = false;
-        break;
+    } break;
+    case Expose:        sb_updates = 0;             break;
+    case ClientMessage: if (x_event.xclient.data.l[0] == aWMDelete) Host_Quit_f();  break;
+    case EnterNotify:   mouse_in_window = true;     break;
+    case LeaveNotify:   mouse_in_window = false;    break;
 
     default:
         if (doShm && x_event.type == x_shmeventtype)
@@ -923,15 +926,23 @@ void GetEvent() {
     }
 
     if (mouse_avail) {
-        if (key.dest == key_game && !mouse_grabbed && mouse_in_window) {
+        if ((key.dest == key_game) &&
+            !(mouse_grabbed && mouse_in_window)
+            ) {
             mouse_grabbed = true;
             /* grab the pointer */
-            XGrabPointer(x_disp, x_win, True, 0, GrabModeAsync,
-                GrabModeAsync, x_win, None, CurrentTime);
+            XGrabPointer(
+                x_disp, x_win,
+                True, 0,
+                GrabModeAsync, GrabModeAsync,
+                x_win, None, CurrentTime
+            );
             // inviso cursor
             XDefineCursor(x_disp, x_win, CreateNullCursor(x_disp, x_win));
         }
-        else if ((key.dest != key_game || !mouse_in_window) && mouse_grabbed) {
+        else if (((key.dest != key_game) || !mouse_in_window) &&
+            mouse_grabbed
+            ) {
             mouse_grabbed = false;
             /* ungrab the pointer */
             XUngrabPointer(x_disp, CurrentTime);
@@ -942,7 +953,7 @@ void GetEvent() {
 
 // flushes the given rectangles from the view buffer to the screen
 
-void	VID_Update(vRect_p rects) {
+void    VID_Update(vRect_p rects) {
 #if 0
     static int count;
     static int64_t s;
@@ -960,51 +971,60 @@ void	VID_Update(vRect_p rects) {
 
     // if the window changes dimension, skip this frame
 
-    if (config_notify) {
+    if (xCfg.notify) {
         printf("config notify\n");
-        config_notify = 0;
-        vid.scr.width = config_notify_width & ~3;
-        vid.scr.height = config_notify_height;
+        xCfg.notify = false;
+        vid.scr.width = xCfg.notify_width & ~3;
+        vid.scr.height = xCfg.notify_height;
 
         printf("w = %d, h = %d\n", vid.scr.width, vid.scr.height);
 
-        if (doShm)
-            ResetSharedFrameBuffers();
-        else
-            ResetFrameBuffer();
+        if (doShm)  ResetSharedFrameBuffers();
+        else        ResetFrameBuffer();
+
         vid.rowbytes = x_framebuffer[0]->bytes_per_line;
         vid.scr.pBuff = x_framebuffer[current_framebuffer]->data;
         vid.con.pBuff = vid.scr.pBuff;
         vid.con.width = vid.scr.width;
         vid.con.height = vid.scr.height;
         vid.conrowbytes = vid.rowbytes;
-        SCR_RequestCalcRefdef();				// force a surface cache flush
+
+        SCR_RequestCalcRefdef();                // force a surface cache flush
         return;
     }
 
     if (doShm) {
-        //		int64_t s, gethrtime();
-        //		s = gethrtime();
+        //        int64_t s, gethrtime();
+        //        s = gethrtime();
 
         while (rects) {
             printf("update: %d,%d (%d,%d)\n", rects->x, rects->y, rects->width, rects->height);
             if (x_visinfo->depth == 16)
-                st2_fixup(x_framebuffer[current_framebuffer],
-                    rects->x, rects->y, rects->width,
-                    rects->height);
+                st2_fixup(
+                    x_framebuffer[current_framebuffer],
+                    rects->x, rects->y,
+                    rects->width, rects->height
+                );
             else if (x_visinfo->depth == 24)
-                st3_fixup(x_framebuffer[current_framebuffer],
-                    rects->x, rects->y, rects->width,
-                    rects->height);
-            if (!XShmPutImage(x_disp, x_win, x_gc,
-                x_framebuffer[current_framebuffer], rects->x, rects->y,
-                rects->x, rects->y, rects->width, rects->height, True))
-                Sys_Error("VID_Update: XShmPutImage failed\n");
+                st3_fixup(
+                    x_framebuffer[current_framebuffer],
+                    rects->x, rects->y,
+                    rects->width, rects->height
+                );
+            if (!XShmPutImage(
+                x_disp, x_win,
+                x_gc, x_framebuffer[current_framebuffer],
+                rects->x, rects->y,
+                rects->x, rects->y,
+                rects->width, rects->height,
+                True)
+                )   Sys_Error("VID_Update: XShmPutImage failed\n");
+
             oktodraw = false;
             while (!oktodraw) GetEvent();
-            rects = rects->pnext;
+            rects = rects->pNext;
         }
-        //		printf("%lf\n", (LegTime_t)(gethrtime()-s)/1.0e9);
+        //        printf("%lf\n", (LegTime_t)(gethrtime()-s)/1.0e9);
         current_framebuffer = !current_framebuffer;
         vid.scr.pBuff = x_framebuffer[current_framebuffer]->data;
         vid.con.pBuff = vid.scr.pBuff;
@@ -1014,15 +1034,25 @@ void	VID_Update(vRect_p rects) {
     else {
         while (rects) {
             if (x_visinfo->depth == 16)
-                st2_fixup(x_framebuffer[current_framebuffer],
-                    rects->x, rects->y, rects->width,
-                    rects->height);
+                st2_fixup(
+                    x_framebuffer[current_framebuffer],
+                    rects->x, rects->y,
+                    rects->width, rects->height
+                );
             else if (x_visinfo->depth == 24)
-                st3_fixup(x_framebuffer[current_framebuffer],
-                    rects->x, rects->y, rects->width,
-                    rects->height);
-            XPutImage(x_disp, x_win, x_gc, x_framebuffer[0], rects->x,
-                rects->y, rects->x, rects->y, rects->width, rects->height);
+                st3_fixup(
+                    x_framebuffer[current_framebuffer],
+                    rects->x, rects->y,
+                    rects->width, rects->height
+                );
+            XPutImage(
+                x_disp, x_win,
+                x_gc,
+                x_framebuffer[0],
+                rects->x, rects->y,
+                rects->x, rects->y,
+                rects->width, rects->height
+            );
             rects = rects->pnext;
         }
         XSync(x_disp, False);
@@ -1047,21 +1077,11 @@ void VID_DitherOff() {
 }
 #endif
 
-void VID_SetDefaultMode() {
-}
-
-int I_OpenWindow() {
-    return 0;
-}
-
-void I_EraseWindow(int window) {
-}
-
-void I_DrawCircle(int window, int x, int y, int r) {
-}
-
-void I_DisplayWindow(int window) {
-}
+void VID_SetDefaultMode() {}
+int I_OpenWindow() { return 0; }
+void I_EraseWindow(int window) {}
+void I_DrawCircle(int window, int x, int y, int r) {}
+void I_DisplayWindow(int window) {}
 
 void Sys_SendKeyEvents() {
     // get events from x server
@@ -1077,10 +1097,10 @@ void Sys_SendKeyEvents() {
 #if 0
 cString Sys_ConsoleInput() {
 
-    static char	text[256];
-    int		len;
+    static char    text[256];
+    int        len;
     fd_set  readfds;
-    int		ready;
+    int        ready;
     struct timeval timeout;
 
     timeout.tv_sec = 0;
@@ -1092,7 +1112,7 @@ cString Sys_ConsoleInput() {
     if (ready > 0) {
         len = read(0, text, sizeof(text));
         if (len >= 1) {
-            text[len - 1] = 0;	// rip off the /n and terminate
+            text[len - 1] = 0;    // rip off the /n and terminate
             return text;
         }
     }
@@ -1106,25 +1126,26 @@ void IN_Init() {
     Cvar_RegisterVariable(&m_filter);
     if (COM_CheckParm("-nomouse"))
         return;
-    mouse_x = mouse_y = 0.0;
-    mouse_avail = 1;
+    mouse_x = 0.f;
+    mouse_y = 0.f;
+    mouse_avail = true;
 }
 
 void IN_Shutdown() {
-    mouse_avail = 0;
+    mouse_avail = false;
 }
 
 void IN_Commands() {
-    int i;
-
     if (!mouse_avail) return;
 
-    for (i = 0; i < mouse_buttons; i++) {
-        if ((mouse_buttonstate & (1 << i)) && !(mouse_oldbuttonstate & (1 << i)))
-            Key_Event(K_MOUSE1 + i, true);
+    for (int i = 0; i < mouse_buttons; i++) {
+        if ((mouse_buttonstate & (1 << i)) &&
+            !(mouse_oldbuttonstate & (1 << i))
+            )   Key_Event(K_MOUSE1 + i, true);
 
-        if (!(mouse_buttonstate & (1 << i)) && (mouse_oldbuttonstate & (1 << i)))
-            Key_Event(K_MOUSE1 + i, false);
+        if (!(mouse_buttonstate & (1 << i)) &&
+            (mouse_oldbuttonstate & (1 << i))
+            )   Key_Event(K_MOUSE1 + i, false);
     }
     mouse_oldbuttonstate = mouse_buttonstate;
 }
@@ -1144,25 +1165,23 @@ void IN_Move(UserCmd_p cmd) {
     mouse_x *= sensitivity.value;
     mouse_y *= sensitivity.value;
 
-    if ((in.strafe.state & 1) || (lookstrafe.value && (in.mlook.state & 1)))
-        cmd->move.side += m_side.value * mouse_x;
-    else
-        cl.viewangles[YAW] -= m_yaw.value * mouse_x;
+    if ((in.strafe.state & 1) ||
+        (lookstrafe.value && (in.mlook.state & 1))
+        )   cmd->move.side += m_side.value * mouse_x;
+    else    cl.viewangles.yaw -= m_yaw.value * mouse_x;
+
     if (in.mlook.state & 1)
         V_StopPitchDrift();
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
-        cl.viewangles[PITCH] += m_pitch.value * mouse_y;
-        if (cl.viewangles[PITCH] > 80)
-            cl.viewangles[PITCH] = 80;
-        if (cl.viewangles[PITCH] < -70)
-            cl.viewangles[PITCH] = -70;
+        cl.viewangles.pitch += m_pitch.value * mouse_y;
+        CLAMP(-70.f, cl.viewangles.pitch, 80.f);
     }
     else {
-        if ((in.strafe.state & 1) && noclip_anglehack)
-            cmd->move.up -= m_forward.value * mouse_y;
-        else
-            cmd->move.forward -= m_forward.value * mouse_y;
+        if ((in.strafe.state & 1) &&
+            noclip_anglehack
+            )   cmd->move.up -= m_forward.value * mouse_y;
+        else    cmd->move.forward -= m_forward.value * mouse_y;
     }
     mouse_x = mouse_y = 0.0;
 }

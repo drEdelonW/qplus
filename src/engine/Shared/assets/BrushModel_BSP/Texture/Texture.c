@@ -36,10 +36,10 @@ void R_InitTextures() {
     };
 
     for (int m = 0; m < MIPLEVELS; m++) {
-        uint8_p dest = GetMipPtr(r_notexture_mip, m);
+        qColor8_p dest = GetMipPtr(r_notexture_mip, m);
         for (int y = 0; y < (16 >> m); y++)
             for (int x = 0; x < (16 >> m); x++) {
-                *dest++ =
+                (dest++)->i =
                     ((y < (8 >> m)) ^ (x < (8 >> m))) ?
                     0x00 : 0xFF;
             }

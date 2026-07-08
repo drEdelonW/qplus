@@ -64,8 +64,8 @@ extern "C" {
 }
 #endif
 
-#include "vid.h"  // pixel_p
+#include "qColor.h"  // qColor8_p
 
-static inline pixel_p GetMipPtr(Texture_p mt, MipLevel_t level) {
-    return (pixel_p)((uint8_p)mt + mt->offsets[level]);
+static inline qColor8_p GetMipPtr(Texture_p mt, MipLevel_t level) {
+    return (qColor8_p)((uint8_p)mt + mt->offsets[level]);
 }

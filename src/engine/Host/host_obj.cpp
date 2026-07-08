@@ -83,8 +83,8 @@ bool         host_initialized;   // true if into command execution
 int32_t     host_framecount;
 int         host_hunklevel;
 jmp_buf     host_abortserver;
-uint8_p     host_basepal;
-uint8_p     host_colormap;
+palette_p   host_basepal;
+ColorMap_p  host_colormap;
 bool        isDedicated;
 RealTime_t  oldrealtime;        // last frame run
 size_t      minimum_memory;
@@ -766,10 +766,10 @@ void Host::Init(QuakeParms_p parms) {
     R_InitTextures();  // needed even for dedicated servers
 
     if (cls.state != ca_dedicated) {
-        host_basepal = (uint8_p)COM_LoadHunkFile("gfx/palette.lmp");
+        host_basepal = (palette_p)COM_LoadHunkFile("gfx/palette.lmp");
         if (!host_basepal)      Host_SysError("Couldn't load gfx/palette.lmp");
 
-        host_colormap = (uint8_p)COM_LoadHunkFile("gfx/colormap.lmp");
+        host_colormap = (ColorMap_p)COM_LoadHunkFile("gfx/colormap.lmp");
         if (!host_colormap)     Host_SysError("Couldn't load gfx/colormap.lmp");
 
 #ifndef _WIN32 // on non win32, mouse comes before video for security reasons

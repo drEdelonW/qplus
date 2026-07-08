@@ -45,7 +45,8 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
 
 #----------LINUX------------
 ifeq ($(UNAME_S),Linux)
-        RUN_PREFIX := DISPLAY=:1
+        RUN_PREFIX :=
+        RUN_PREFIX1 := DISPLAY=:1
         RUN_PREFIX2 := DISPLAY=:2
 #----------MacOS------------
 else ifeq ($(UNAME_S),Darwin)

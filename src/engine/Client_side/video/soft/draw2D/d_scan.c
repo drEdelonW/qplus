@@ -79,9 +79,10 @@ void D_WarpScreen() {   // Under water warp
 
     float wratio = w / (float)scr.vrect.width;
     float hratio = h / (float)scr.vrect.height;
-
+#warning TODO: remake it to qColor8_p
     for (int v = 0; v < scr.vrect.height + AMP2 * 2; v++) {
-        rowptr[v] = d_viewbuffer + (r_refdef.vrect.y * screenwidth) +
+        rowptr[v] = (uint8_p)d_viewbuffer +
+            (r_refdef.vrect.y * screenwidth) +
             (screenwidth * (int)((float)v * hratio * h / (h + AMP2 * 2)));
     }
 

@@ -30,9 +30,9 @@ D_DrawZPoint
 
 
 typedef struct {
-    int     u, v;
-    float   zi;
-    int     color;
+    int         u, v;
+    float       zi;
+    qColor8_t   color;
 } zPointDesc_t;
 
 // extern zPointDesc_t r_zpointdesc;
@@ -41,7 +41,7 @@ zPointDesc_t    r_zpointdesc;
 // void D_DrawZPoint();     //NOT USED
 void D_DrawZPoint() {
     int16_p pz = d_pzbuffer + (d_zwidth * r_zpointdesc.v) + r_zpointdesc.u;
-    uint8_p pdest = d_viewbuffer + d_scantable[r_zpointdesc.v] + r_zpointdesc.u;
+    qColor8_p pdest = d_viewbuffer + d_scantable[r_zpointdesc.v] + r_zpointdesc.u;
     int izi = (int)(r_zpointdesc.zi * 0x8000);
 
     if (*pz <= izi) {

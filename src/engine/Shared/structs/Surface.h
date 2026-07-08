@@ -77,13 +77,13 @@ struct mSurface_s {
     uint8_p     samples;                // [numstyles*surfsize]
 };
 
-#include "vid.h"  // pixel_p
+#include "qColor.h"  // qColor8_p
 // it was [drawsurf_t]
 
 #include "Texture_pre.h"    // Texture_p
 #include "fixed.h"          // fixed8_t
 typedef struct {
-    pixel_p     surfdat;                // destination for generated surface
+    qColor8_p   surfdat;                // destination for generated surface
     int         rowbytes;               // destination logical width in bytes
     mSurface_p  surf;                   // description for surface to generate
     fixed8_t    lightadj[MAXLIGHTMAPS]; // adjust for lightmap levels for dynamic lighting

@@ -265,7 +265,7 @@ SurfCache_p D_CacheSurface(mSurface_p surface, MipLevel_t miplevel) {
 
     cache->dlight = (surface->dlightframe == r_framecount) ? 1 : 0;
 
-    r_drawsurf.surfdat = (pixel_p)cache->data;
+    r_drawsurf.surfdat = cache->data;
 
     cache->texture = r_drawsurf.texture;
     cache->lightadj[0] = r_drawsurf.lightadj[0];

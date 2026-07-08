@@ -236,10 +236,10 @@ qPic_p Draw_PicFromWad(cStringRO name) {
     else {
         *((glpic_p)p->data) = (glpic_t){
             .texnum = GL_LoadPicTexture(p),
-            .sl = 0.0f,
-            .tl = 0.0f,
-            .sh = 1.0f,
-            .th = 1.0f
+            .sl = 0.f,
+            .tl = 0.f,
+            .sh = 1.f,
+            .th = 1.f
         };
     }
     return p;
@@ -281,28 +281,28 @@ qPic_p Draw_CachePic(cStringRO path) {
     pic->pic.width = dat->width;
     pic->pic.height = dat->height;
 
-    * ((glpic_p)pic->pic.data) = (glpic_t){
+    *((glpic_p)pic->pic.data) = (glpic_t){
         .texnum = GL_LoadPicTexture(dat),
-        .sl = 0.0f,
-        .tl = 0.0f,
-        .sh = 1.0f,
-        .th = 1.0f
+        .sl = 0.f,
+        .tl = 0.f,
+        .sh = 1.f,
+        .th = 1.f
     };
     return &pic->pic;
 }
 
 
-void Draw_CharToConback(int num, uint8_p dest) {
+void Draw_CharToConback(int num, qColor8_p dest) {
     int row = num >> 4;
     int col = num & 0x0F;
-    uint8_p source = _drawChars + (row << 10) + (col << 3);
+    qColor8_p source = _drawChars + (row << 10) + (col << 3);
 
     int drawline = 8;
 
     while (drawline--) {
         for (int x = 0; x < 8; x++)
-            if (source[x] != 255)
-                dest[x] = 0x60 + source[x];
+            if (source[x].i != 255)
+                dest[x].i = 0x60 + source[x].i;
         source += 128;
         dest += 320;
     }
@@ -448,10 +448,10 @@ void Draw_Init() {
 
     *((glpic_p)conback->data) = (glpic_t){
         .texnum = GL_LoadTexture("conback", conback->width, conback->height, ncdata, false, false),
-        .sl = 0.0f,
-        .tl = 0.0f,
-        .sh = 1.0f,
-        .th = 1.0f
+        .sl = 0.f,
+        .tl = 0.f,
+        .sh = 1.f,
+        .th = 1.f
     };
 
     conback->width = vid.scr.width;
@@ -483,7 +483,7 @@ It can be clipped to the top of the screen to allow the console to be
 smoothly scrolled off.
 ================
 */
-#define CHAR_SCALE_F    (0.0625f) /* seems like character size in texture 1.0f space (1/16)*/
+#define CHAR_SCALE_F    (0.0625f) /* seems like character size in texture 1.f space (1/16)*/
 
 void Draw_Character(int x, int y, int num) {
     num &= 0xFF;
@@ -547,7 +547,7 @@ void Draw_AlphaPic(int x, int y, qPic_p pic, float alpha) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glCullFace(GL_FRONT);
 #endif
-    glColor4f(1.0f, 1.0f, 1.0f, alpha);
+    glColor4f(1.f, 1.f, 1.f, alpha);
     GL_Bind(gl->texnum);
     glBegin(GL_QUADS); {
         glTexCoord2f(gl->sl, gl->tl);   glVertex2f(x, y);
@@ -555,7 +555,7 @@ void Draw_AlphaPic(int x, int y, qPic_p pic, float alpha) {
         glTexCoord2f(gl->sh, gl->th);   glVertex2f(x + pic->width, y + pic->height);
         glTexCoord2f(gl->sl, gl->th);   glVertex2f(x, y + pic->height);
     } glEnd();
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glColor4f(1.f, 1.f, 1.f, 1.f);
     glEnable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
 }
@@ -573,7 +573,7 @@ void Draw_Pic(int x, int y, qPic_p pic) {
         Scrap_Upload();
 
     glpic_p gl = (glpic_p)pic->data;
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glColor4f(1.f, 1.f, 1.f, 1.f);
     GL_Bind(gl->texnum);
     glBegin(GL_QUADS); {
         glTexCoord2f(gl->sl, gl->tl);   glVertex2f(x, y);
@@ -639,10 +639,10 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
 
     glColor3f(1, 1, 1);
     glBegin(GL_QUADS); {
-        glTexCoord2f(0.0f, 0.0f);   glVertex2f(x, y);
-        glTexCoord2f(1.0f, 0.0f);   glVertex2f(x + pic->width, y);
-        glTexCoord2f(1.0f, 1.0f);   glVertex2f(x + pic->width, y + pic->height);
-        glTexCoord2f(0.0f, 1.0f);   glVertex2f(x, y + pic->height);
+        glTexCoord2f(0.f, 0.f);   glVertex2f(x, y);
+        glTexCoord2f(1.f, 0.f);   glVertex2f(x + pic->width, y);
+        glTexCoord2f(1.f, 1.f);   glVertex2f(x + pic->width, y + pic->height);
+        glTexCoord2f(0.f, 1.f);   glVertex2f(x, y + pic->height);
     } glEnd();
 }
 
@@ -672,13 +672,13 @@ refresh window.
 void Draw_TileClear(int x, int y, int w, int h) {
     int x1 = x + w;
     int y1 = y + h;
-    glColor3f(1.0f, 1.0f, 1.0f);
+    glColor3f(1.f, 1.f, 1.f);
     GL_Bind(*(int*)draw_backtile->data);
     glBegin(GL_QUADS); {
-        glTexCoord2f(x / 64.0f, y / 64.0f);         glVertex2f(x, y);
-        glTexCoord2f((x1) / 64.0f, y / 64.0f);      glVertex2f(x1, y);
-        glTexCoord2f((x1) / 64.0f, (y1) / 64.0f);   glVertex2f(x1, y1);
-        glTexCoord2f(x / 64.0f, (y1) / 64.0f);      glVertex2f(x, y1);
+        glTexCoord2f(x / 64.f, y / 64.f);         glVertex2f(x, y);
+        glTexCoord2f((x1) / 64.f, y / 64.f);      glVertex2f(x1, y);
+        glTexCoord2f((x1) / 64.f, (y1) / 64.f);   glVertex2f(x1, y1);
+        glTexCoord2f(x / 64.f, (y1) / 64.f);      glVertex2f(x, y1);
     } glEnd();
 }
 
@@ -691,23 +691,21 @@ Fills a box of pixels with a single color
 =============
 */
 void Draw_Fill(int x, int y, int w, int h, int c) {
-    int x1 = x + w;
-    int y1 = y + h;
-    glDisable(GL_TEXTURE_2D);
-    glColor3f(
-        host_basepal[c * 3 + 0] / 255.0f,
-        host_basepal[c * 3 + 1] / 255.0f,
-        host_basepal[c * 3 + 2] / 255.0f
-    );
 
-    glBegin(GL_QUADS); {
-        glVertex2f(x, y);
-        glVertex2f(x1, y);
-        glVertex2f(x1, y1);
-        glVertex2f(x, y1);
-    } glEnd();
-    glColor3f(1, 1, 1);
-    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_2D); {
+        glColor3f(
+            host_basepal->ink[c].r / 255.f,
+            host_basepal->ink[c].g / 255.f,
+            host_basepal->ink[c].b / 255.f
+        ); {
+            glBegin(GL_QUADS); {
+                glVertex2f(x, y);   int x1 = x + w;
+                glVertex2f(x1, y);  int y1 = y + h;
+                glVertex2f(x1, y1);
+                glVertex2f(x, y1);
+            } glEnd();
+        }glColor3f(1.f, 1.f, 1.f);
+    }glEnable(GL_TEXTURE_2D);
 }
 //=============================================================================
 
@@ -718,18 +716,18 @@ Draw_FadeScreen
 ================
 */
 void Draw_FadeScreen() {
-    glEnable(GL_BLEND);
-    glDisable(GL_TEXTURE_2D);
-    glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
-    glBegin(GL_QUADS); {
-        glVertex2f(0.0f, 0.0f);
-        glVertex2f(vid.scr.width, 0.0f);
-        glVertex2f(vid.scr.width, vid.scr.height);
-        glVertex2f(0.0f, vid.scr.height);
-    } glEnd();
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    glEnable(GL_TEXTURE_2D);
-    glDisable(GL_BLEND);
+    glEnable(GL_BLEND); {
+        glDisable(GL_TEXTURE_2D); {
+            glColor4f(0.f, 0.f, 0.f, 0.8f); {
+                glBegin(GL_QUADS); {
+                    glVertex2f(0.f, 0.f);
+                    glVertex2f(vid.scr.width, 0.f);
+                    glVertex2f(vid.scr.width, vid.scr.height);
+                    glVertex2f(0.f, vid.scr.height);
+                } glEnd();
+            } glColor4f(1.f, 1.f, 1.f, 1.f);
+        } glEnable(GL_TEXTURE_2D);
+    } glDisable(GL_BLEND);
 
     Sbar_Changed();
 }
@@ -786,7 +784,7 @@ void GL_Set2D() {
     glEnable(GL_ALPHA_TEST);
     // glDisable (GL_ALPHA_TEST);
 
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glColor4f(1.f, 1.f, 1.f, 1.f);
 }
 
 //====================================================================
@@ -933,7 +931,7 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     else {
         gluScaleImage(GL_RGBA, width, height, GL_UNSIGNED_BYTE, trans, scaled_width, scaled_height, GL_UNSIGNED_BYTE, _scaled);
         glTexImage2D(GL_TEXTURE_2D, 0, samples, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _scaled);
-}
+    }
 #else
     texels += scaled_width * scaled_height;
 

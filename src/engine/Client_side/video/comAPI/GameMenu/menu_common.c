@@ -6,6 +6,8 @@
 #include "host.h"
 #include "server.h"
 #include "model.h"
+#include "qLight.h"
+
 /*
 ================
 M_DrawCharacter
@@ -14,16 +16,19 @@ Draws one solid graphics character
 ================
 */
 
-static uint8_t _identityTable[256];
-static uint8_t _translationTable[256];
+static palMap_t _identityTable;
+static palMap_t _translationTable;
 
 void M_BuildTranslationTable(int top, int bottom) {
-    for (int i = 0; i < 256; i++)
-        _identityTable[i] = i;
+    for (int i = 0; i < InksNum; i++)
+        _identityTable.pal[i].i = i;
 
-    uint8_p dest = _translationTable;
-    uint8_p source = _identityTable;
-    memcpy(dest, source, 256);
+#warning TODO: rework it to palMap_p
+    // palMap_p dest = &_translationTable;
+    qColor8_p dest = &_translationTable.pal[0];
+    // palMap_p source = &_identityTable;
+    qColor8_p source = &_identityTable.pal[0];
+    memcpy(dest, source, InksNum);
 
     if (top < 128) // the artists made some backwards ranges.  sigh.
         memcpy(dest + TOP_RANGE, source + top, 16);
@@ -40,7 +45,7 @@ void M_BuildTranslationTable(int top, int bottom) {
 
 
 void M_DrawTransPicTranslate(int x, int y, qPic_p pic) {
-     Draw_TransPicTranslate(x + HALF(vid.scr.width - 320), y, pic, _translationTable); }
+     Draw_TransPicTranslate(x + HALF(vid.scr.width - 320), y, pic, &_translationTable); }
 
 
 void M_DrawTextBox(int x, int y, int width, int lines) {

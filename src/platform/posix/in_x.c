@@ -247,9 +247,9 @@ void GetEvent() {
 
     case ConfigureNotify:
         //printf("config notify\n");
-        config_notify_width = x_event.xconfigure.width;
-        config_notify_height = x_event.xconfigure.height;
-        config_notify = 1;
+        xCfg.notify_width = x_event.xconfigure.width;
+        xCfg.notify_height = x_event.xconfigure.height;
+        xCfg.notify = true;
         break;
 
     default:

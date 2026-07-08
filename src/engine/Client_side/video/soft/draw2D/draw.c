@@ -40,11 +40,11 @@ typedef struct {
     vRect_t rect;
     int     width;
     int     height;
-    uint8_p pTexBytes;
+    qColor8_p pTexBytes;
     int     rowBytes;
 } RectDesc_t;
 static RectDesc_t   _rRectDesc;
-static uint8_p      _draw_chars;    // 8*8 graphic characters
+static qColor8_p    _draw_chars;    // 8*8 graphic characters
 static qPic_p       _draw_backtile;
 
 //=============================================================================
@@ -149,7 +149,7 @@ void Draw_Character(int x, int y, int num) {
 
     int row = num >> 4;
     int col = num & 15;
-    uint8_p source = _draw_chars + (row << 10) + (col << 3);
+    qColor8_p source = _draw_chars + (row << 10) + (col << 3);
 
     int drawline;
     if (y < 0) { // clipped
@@ -162,11 +162,11 @@ void Draw_Character(int x, int y, int num) {
 
 
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.con.pBuff + y * vid.conrowbytes + x;
+        qColor8_p dest = (qColor8_p)vid.con.pBuff + y * vid.conrowbytes + x;
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
-                if (source[i])  // 0 is transparent
+                if (source[i].i)  // 0 is transparent
                     dest[i] = source[i];
 
             source += 128;
@@ -180,8 +180,8 @@ void Draw_Character(int x, int y, int num) {
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
-                if (source[i])   // 0 is transparent
-                    pusdest[i] = d_8to16table[source[i]];
+                if (source[i].i)   // 0 is transparent
+                    pusdest[i] = d_8to16table[source[i].i];
 
             source += 128;
             pusdest += HALF(vid.conrowbytes);
@@ -218,9 +218,9 @@ void Draw_DebugChar(char num) {
     int drawline = 8;
     int row = num >> 4;
     int col = num & 15;
-    uint8_p source = _draw_chars + (row << 10) + (col << 3);
+    qColor8_p source = _draw_chars + (row << 10) + (col << 3);
 
-    uint8_p dest = vid.direct + 312;
+    qColor8_p dest = vid.direct + 312;
 
     while (drawline--) {
         for (int i = 0; i < 8; i++)
@@ -245,10 +245,10 @@ void Draw_Pic(int x, int y, qPic_p pic) {
         Host_SysError("Draw_Pic: bad coordinates %i/%i-%i/%i", x, y, pic->width, pic->height);
     }
 
-    uint8_p source = pic->data;
+    qColor8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.scr.pBuff + y * vid.rowbytes + x;
+        qColor8_p dest = vid.scr.pClr + y * vid.rowbytes + x;
 
         for (int v = 0; v < pic->height; v++) {
             Q_memcpy(dest, source, pic->width);
@@ -262,7 +262,7 @@ void Draw_Pic(int x, int y, qPic_p pic) {
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++)
-                pusdest[u] = d_8to16table[source[u]];
+                pusdest[u] = d_8to16table[source[u].i];
 
             pusdest += HALF(vid.rowbytes);
             source += pic->width;
@@ -286,15 +286,15 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
         ) {
         Host_SysError("Draw_TransPic: bad coordinates");
     }
-    uint8_p source = pic->data;
+    qColor8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.scr.pBuff + y * vid.rowbytes + x;
-        uint8_t tbyte;
+        qColor8_p dest = vid.scr.pClr + y * vid.rowbytes + x;
+        qColor8_t tbyte;
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u++)
-                    if ((tbyte = source[u]) != TRANSPARENT_COLOR)
+                    if ((tbyte = source[u]).i != TRANSPARENT_COLOR)
                         dest[u] = tbyte;
 
                 dest += vid.rowbytes;
@@ -305,7 +305,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u += 8)
                     for (int i = 0; i < 8; i++)
-                        if ((tbyte = source[u + i]) != TRANSPARENT_COLOR)
+                        if ((tbyte = source[u + i]).i != TRANSPARENT_COLOR)
                             dest[u + i] = tbyte;
 
                 dest += vid.rowbytes;
@@ -319,7 +319,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
-                uint8_t tbyte = source[u];
+                uint8_t tbyte = source[u].i;
                 if (tbyte != TRANSPARENT_COLOR)
                     pusdest[u] = d_8to16table[tbyte];
             }
@@ -336,8 +336,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
 Draw_TransPicTranslate
 =============
 */
-void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
-    uint8_t tbyte;
+void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
     if (!pic)
         return;
 
@@ -349,14 +348,16 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
         Host_SysError("Draw_TransPic: bad coordinates");
     }
 
-    uint8_p source = pic->data;
+    qColor8_t tbyte;
+    qColor8_p source = pic->data;
     if (r_pixbytes == 1) {
-        uint8_p dest = vid.scr.pBuff + y * vid.rowbytes + x;
+        qColor8_p dest = vid.scr.pClr + y * vid.rowbytes + x;
 
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u++)
-                    if ((tbyte = source[u]) != TRANSPARENT_COLOR)       dest[u] = translation[tbyte];
+                    if ((tbyte = source[u]).i != TRANSPARENT_COLOR)
+                        dest[u] = translation->pal[tbyte.i];
 
                 dest += vid.rowbytes;
                 source += pic->width;
@@ -366,8 +367,8 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u += 8)
                     for (int i = 0; i < 8; i++)
-                        if ((tbyte = source[u + i]) != TRANSPARENT_COLOR)
-                            dest[u + i] = translation[tbyte];
+                        if ((tbyte = source[u + i]).i != TRANSPARENT_COLOR)
+                            dest[u + i] = translation->pal[tbyte.i];
 
                 dest += vid.rowbytes;
                 source += pic->width;
@@ -382,8 +383,8 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
             for (int u = 0; u < pic->width; u++) {
                 tbyte = source[u];
 
-                if (tbyte != TRANSPARENT_COLOR)
-                    pusdest[u] = d_8to16table[tbyte];
+                if (tbyte.i != TRANSPARENT_COLOR)
+                    pusdest[u] = d_8to16table[tbyte.i];
             }
 
             pusdest += HALF(vid.rowbytes);
@@ -393,16 +394,16 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, uint8_p translation) {
 }
 
 
-void Draw_CharToConback(int num, uint8_p dest) {
+void Draw_CharToConback(int num, qColor8_p dest) {
     int row = num >> 4;
     int col = num & 15;
-    uint8_p source = _draw_chars + (row << 10) + (col << 3);
+    qColor8_p source = _draw_chars + (row << 10) + (col << 3);
 
     int drawline = 8;
     while (drawline--) {
         for (int x = 0; x < 8; x++)
-            if (source[x])
-                dest[x] = 0x60 + source[x];
+            if (source[x].i)
+                dest[x].i = 0x60 + source[x].i;
         source += 128;
         dest += 320;
     }
@@ -428,7 +429,7 @@ void Draw_ConsoleBackground(int lines) {
     uint8_p dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
 #elif defined(__linux__)
     snprintf(ver, sizeof(ver), "(Linux Quake %2.2f) %4.2f", (float)LINUX_VERSION, (float)VERSION);
-    uint8_p dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    qColor8_p dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
 #else
     uint8_p dest = conback->data + 320 - 43 + 320 * 186;
     snprintf(ver, sizeof(ver), "%4.2f", VERSION);
@@ -439,11 +440,11 @@ void Draw_ConsoleBackground(int lines) {
 
     // draw the pic
     if (r_pixbytes == 1) {
-        dest = vid.con.pBuff;
+        dest = vid.con.pClr;
 
         for (int y = 0; y < lines; y++, dest += vid.conrowbytes) {
             int v = (vid.con.height - lines + y) * 200 / vid.con.height;
-            uint8_p src = conback->data + v * 320;
+            qColor8_p src = conback->data + v * 320;
             if (vid.con.width == 320)
                 memcpy(dest, src, vid.con.width);
             else {
@@ -465,14 +466,14 @@ void Draw_ConsoleBackground(int lines) {
             // FIXME: pre-expand to native format?
             // FIXME: does the endian switching go away in production?
             int v = (vid.con.height - lines + y) * 200 / vid.con.height;
-            uint8_p src = conback->data + v * 320;
+            qColor8_p src = conback->data + v * 320;
             fixed16_t f = 0;
             fixed16_t fstep = 320 * FIXED16_ONE / vid.con.width;
             for (int x = 0; x < vid.con.width; x += 4) {
-                pusdest[x + 0] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;
-                pusdest[x + 1] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;
-                pusdest[x + 2] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;
-                pusdest[x + 3] = d_8to16table[src[FIXED16_TO_INT(f)]];  f += fstep;
+                pusdest[x + 0] = d_8to16table[src[FIXED16_TO_INT(f)].i];  f += fstep;
+                pusdest[x + 1] = d_8to16table[src[FIXED16_TO_INT(f)].i];  f += fstep;
+                pusdest[x + 2] = d_8to16table[src[FIXED16_TO_INT(f)].i];  f += fstep;
+                pusdest[x + 3] = d_8to16table[src[FIXED16_TO_INT(f)].i];  f += fstep;
             }
         }
     }
@@ -484,8 +485,8 @@ void Draw_ConsoleBackground(int lines) {
 R_DrawRect8
 ==============
 */
-void R_DrawRect8(vRect_p prect, int rowbytes, uint8_p psrc, bool transparent) {
-    uint8_p pdest = vid.scr.pBuff + (prect->y * vid.rowbytes) + prect->x;
+void R_DrawRect8(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) {
+    qColor8_p pdest = vid.scr.pClr + (prect->y * vid.rowbytes) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
     int destdelta = vid.rowbytes - prect->width;
@@ -493,8 +494,8 @@ void R_DrawRect8(vRect_p prect, int rowbytes, uint8_p psrc, bool transparent) {
     if (transparent) {
         for (int i = 0; i < prect->height; i++) {
             for (int j = 0; j < prect->width; j++) {
-                uint8_t t = *psrc;
-                if (t != TRANSPARENT_COLOR)
+                qColor8_t t = *psrc;
+                if (t.i != TRANSPARENT_COLOR)
                     *pdest = t;
 
                 psrc++;
@@ -520,7 +521,7 @@ void R_DrawRect8(vRect_p prect, int rowbytes, uint8_p psrc, bool transparent) {
 R_DrawRect16
 ==============
 */
-void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, bool transparent) {
+void R_DrawRect16(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) {
     // FIXME: would it be better to pre-expand native-format versions?
 
     uint16_p pdest = (uint16_p)vid.scr.pBuff +
@@ -529,13 +530,13 @@ void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, bool transparent) {
     int srcdelta = rowbytes - prect->width;
     int destdelta = HALF(vid.rowbytes) - prect->width;
 
-    uint8_t t;
+    qColor8_t t;
     if (transparent) {
         for (int i = 0; i < prect->height; i++) {
             for (int j = 0; j < prect->width; j++) {
                 t = *psrc;
-                if (t != TRANSPARENT_COLOR)
-                    *pdest = d_8to16table[t];
+                if (t.i != TRANSPARENT_COLOR)
+                    *pdest = d_8to16table[t.i];
 
                 psrc++;
                 pdest++;
@@ -548,7 +549,7 @@ void R_DrawRect16(vRect_p prect, int rowbytes, uint8_p psrc, bool transparent) {
     else {
         for (int i = 0; i < prect->height; i++) {
             for (int j = 0; j < prect->width; j++) {
-                *pdest = d_8to16table[*psrc];
+                *pdest = d_8to16table[(*psrc).i];
                 psrc++;
                 pdest++;
             }
@@ -600,7 +601,7 @@ void Draw_TileClear(int x, int y, int w, int h) {
             if (vr.width > width)
                 vr.width = width;
 
-            uint8_p psrc = _rRectDesc.pTexBytes + (ptrdiff_t)(
+            qColor8_p psrc = _rRectDesc.pTexBytes + (ptrdiff_t)(
                 (tileoffsety * _rRectDesc.rowBytes) + tileoffsetx);
 
             if (r_pixbytes == 1)     R_DrawRect8(&vr, _rRectDesc.rowBytes, psrc, false);

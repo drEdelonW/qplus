@@ -249,7 +249,7 @@ void SV_WaterMove() {
 
     vec3_t wishvel = VectorMA(VectorScale(_bs.forward, cmd.move.forward), cmd.move.side, _bs.right);
 
-    float goDownVal = 60.f; // drift towards bottom
+    float goDownVal = -60.f; // drift towards bottom
     wishvel.z += (VectorCompare(cmd.move, v3Zero)) ? goDownVal : cmd.move.up;
 
     _wishSpeed = Length(wishvel);

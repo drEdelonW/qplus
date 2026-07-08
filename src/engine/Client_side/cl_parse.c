@@ -354,7 +354,7 @@ void CL_ParseUpdate(update_bits_t bits) {
     else {
         if (i > cl.maxclients)  Host_SysError("i >= cl.maxclients %d > %d", i, cl.maxclients);
 
-        ent->colormap = cl.scores[i - 1].translations;
+        ent->colormap = &cl.scores[i - 1].translations;
     }
 
 #ifdef GLQUAKE
@@ -479,10 +479,17 @@ void CL_NewTranslation(int32_t slot) {
         (slot > cl.maxclients)
         )   Host_SysError("CL_NewTranslation: bad slot %d (max %d)", slot, cl.maxclients);
 
-    uint8_p dest = cl.scores[slot].translations;
-    uint8_p source = vid.colormap;
+#if 0
+    ColorMap_p dest = &cl.scores[slot].translations;
+    ColorMap_p source = vid.colormap;
 
-    memcpy(dest, source, sizeof(cl.scores[slot].translations));
+    memcpy(dest, source, sizeof(ColorMap_t));
+#else
+    cl.scores[slot].translations = *vid.colormap;
+
+    qColor8_p dest = cl.scores[slot].translations.raw;  // TODO: rework next skin translation
+    qColor8_p source = vid.colormap->raw;
+#endif
 
     int top = (cl.scores[slot].colors & 0xF0);       // tshort
     int bottom = (cl.scores[slot].colors & 0x0F) << 4;  // pents

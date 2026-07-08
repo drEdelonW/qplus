@@ -85,7 +85,7 @@ void D_DrawParticle(Particle_p pparticle) {
     }
 
     int16_p pz = d_pzbuffer + (d_zwidth * v) + u;
-    uint8_p pdest = d_viewbuffer + d_scantable[v] + u;
+    qColor8_p pdest = d_viewbuffer + d_scantable[v] + u;
     int izi = (int)(zi * 0x8000);
 
     int pix = izi >> d_pix_shift;
@@ -99,7 +99,7 @@ void D_DrawParticle(Particle_p pparticle) {
         for (; count; count--, pz += d_zwidth, pdest += screenwidth) {
             if (pz[0] <= izi) {
                 pz[0] = izi;
-                pdest[0] = pparticle->color;
+                pdest[0].i = pparticle->color;
             }
         }
     }break;
@@ -110,12 +110,12 @@ void D_DrawParticle(Particle_p pparticle) {
         for (; count; count--, pz += d_zwidth, pdest += screenwidth) {
             if (pz[0] <= izi) {
                 pz[0] = izi;
-                pdest[0] = pparticle->color;
+                pdest[0].i = pparticle->color;
             }
 
             if (pz[1] <= izi) {
                 pz[1] = izi;
-                pdest[1] = pparticle->color;
+                pdest[1].i = pparticle->color;
             }
         }
     }break;
@@ -126,17 +126,17 @@ void D_DrawParticle(Particle_p pparticle) {
         for (; count; count--, pz += d_zwidth, pdest += screenwidth) {
             if (pz[0] <= izi) {
                 pz[0] = izi;
-                pdest[0] = pparticle->color;
+                pdest[0].i = pparticle->color;
             }
 
             if (pz[1] <= izi) {
                 pz[1] = izi;
-                pdest[1] = pparticle->color;
+                pdest[1].i = pparticle->color;
             }
 
             if (pz[2] <= izi) {
                 pz[2] = izi;
-                pdest[2] = pparticle->color;
+                pdest[2].i = pparticle->color;
             }
         }
     }break;
@@ -147,22 +147,22 @@ void D_DrawParticle(Particle_p pparticle) {
         for (; count; count--, pz += d_zwidth, pdest += screenwidth) {
             if (pz[0] <= izi) {
                 pz[0] = izi;
-                pdest[0] = pparticle->color;
+                pdest[0].i = pparticle->color;
             }
 
             if (pz[1] <= izi) {
                 pz[1] = izi;
-                pdest[1] = pparticle->color;
+                pdest[1].i = pparticle->color;
             }
 
             if (pz[2] <= izi) {
                 pz[2] = izi;
-                pdest[2] = pparticle->color;
+                pdest[2].i = pparticle->color;
             }
 
             if (pz[3] <= izi) {
                 pz[3] = izi;
-                pdest[3] = pparticle->color;
+                pdest[3].i = pparticle->color;
             }
         }
     }break;
@@ -174,7 +174,7 @@ void D_DrawParticle(Particle_p pparticle) {
             for (int i = 0; i < pix; i++)
                 if (pz[i] <= izi) {
                     pz[i] = izi;
-                    pdest[i] = pparticle->color;
+                    pdest[i].i = pparticle->color;
                 }
 
     }   break;

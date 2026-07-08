@@ -52,16 +52,18 @@ void CL_AdjustAngles() {
             speed * cl_yawspeed.value * (CL_KeyState(&in.left) - CL_KeyState(&in.right))
         );
     }
-    if (kbIsDown(in.klook)) {
-        V_StopPitchDrift();
-        cl.viewangles.pitch +=
-            speed * cl_pitchspeed.value * (CL_KeyState(&in.back) - CL_KeyState(&in.forward));
-    }
 
     float lUp = CL_KeyState(&in.lookup);
     float lDown = CL_KeyState(&in.lookdown);
 
     cl.viewangles.pitch += speed * cl_pitchspeed.value * (lDown - lUp);
+
+    if (kbIsDown(in.klook)) {
+        V_StopPitchDrift();
+        cl.viewangles.pitch +=
+            speed * cl_pitchspeed.value * (CL_KeyState(&in.back) - CL_KeyState(&in.forward)
+        );
+    }
 
     if (lUp || lDown)
         V_StopPitchDrift();

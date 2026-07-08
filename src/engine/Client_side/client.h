@@ -47,7 +47,7 @@ typedef struct {
     LegDt_t   entertime;
     int32_t frags;
     int32_t colors;   // two 4 bit fields
-    uint8_t translations[VID_GRADES * 256];
+    ColorMap_t translations;
 } ScoreBoard_t;
 typedef ScoreBoard_t* ScoreBoard_p;
 

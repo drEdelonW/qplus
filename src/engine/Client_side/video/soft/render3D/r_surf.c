@@ -33,13 +33,13 @@ int lightright;
 int blockdivshift;
 int lightleftstep, lightrightstep;
 TypeLess_ptr prowdestbase;
-uint8_p pbasesource;
+qColor8_p pbasesource;
 int surfrowbytes; // used by ASM files
 int r_stepback;
 int r_lightwidth;
 int r_numhblocks, r_numvblocks;
-uint8_p r_source;
-uint8_p r_sourcemax;
+qColor8_p r_source;
+qColor8_p r_sourcemax;
 
 void R_DrawSurfaceBlock8_mip0();
 void R_DrawSurfaceBlock8_mip1();
@@ -225,14 +225,14 @@ void R_DrawSurface() {
 
     // << 16 components are to guarantee positive values for %
     soffset = ((soffset >> r_drawsurf.surfmip) + INT_TO_FIXED16(smax)) % smax;
-    uint8_p basetptr = &r_source[
+    qColor8_p basetptr = &r_source[
         ((((basetoffset >> r_drawsurf.surfmip) +
             INT_TO_FIXED16(tmax)) %
             tmax) *
             twidth)
     ];
 
-    uint8_p pcolumndest = r_drawsurf.surfdat;
+    qColor8_p pcolumndest = r_drawsurf.surfdat;
     for (uint8_t u = 0; u < r_numhblocks; u++) {
         r_lightptr = blocklights + u;
         prowdestbase = pcolumndest;
@@ -256,8 +256,8 @@ R_DrawSurfaceBlock8_mip0
 ================
 */
 void R_DrawSurfaceBlock8_mip0() {   // nearest surfaces
-    uint8_p psource = pbasesource;
-    uint8_p prowdest = prowdestbase;
+    qColor8_p psource = pbasesource;
+    qColor8_p prowdest = prowdestbase;
 
     for (int v = 0; v < r_numvblocks; v++) {
         // FIXME: make these locals?
@@ -274,9 +274,8 @@ void R_DrawSurfaceBlock8_mip0() {   // nearest surfaces
             int light = lightright;
 
             for (int b = 15; b >= 0; b--) {
-                uint8_t pix = psource[b];
-                prowdest[b] = ((uint8_p)vid.colormap)
-                    [(light & 0xFF00) + pix];
+                qColor8_t pix = psource[b];
+                prowdest[b] = vid.colormap->raw[(light & 0xFF00) + pix.i];
                 light += lightstep;
             }
 
@@ -298,8 +297,8 @@ R_DrawSurfaceBlock8_mip1
 ================
 */
 void R_DrawSurfaceBlock8_mip1() {
-    uint8_p psource = pbasesource;
-    uint8_p prowdest = prowdestbase;
+    qColor8_p psource = pbasesource;
+    qColor8_p prowdest = prowdestbase;
 
     for (int v = 0; v < r_numvblocks; v++) {
         // FIXME: make these locals?
@@ -316,9 +315,8 @@ void R_DrawSurfaceBlock8_mip1() {
             int light = lightright;
 
             for (int b = 7; b >= 0; b--) {
-                uint8_t pix = psource[b];
-                prowdest[b] = ((uint8_p)vid.colormap)
-                    [(light & 0xFF00) + pix];
+                qColor8_t pix = psource[b];
+                prowdest[b] = vid.colormap->raw[(light & 0xFF00) + pix.i];
                 light += lightstep;
             }
 
@@ -340,8 +338,8 @@ R_DrawSurfaceBlock8_mip2
 ================
 */
 void R_DrawSurfaceBlock8_mip2() {
-    uint8_p psource = pbasesource;
-    uint8_p prowdest = prowdestbase;
+    qColor8_p psource = pbasesource;
+    qColor8_p prowdest = prowdestbase;
 
     for (int v = 0; v < r_numvblocks; v++) {
         // FIXME: make these locals?
@@ -358,9 +356,8 @@ void R_DrawSurfaceBlock8_mip2() {
             int light = lightright;
 
             for (int b = 3; b >= 0; b--) {
-                uint8_t pix = psource[b];
-                prowdest[b] = ((uint8_p)vid.colormap)
-                    [(light & 0xFF00) + pix];
+                qColor8_t pix = psource[b];
+                prowdest[b] = vid.colormap->raw[(light & 0xFF00) + pix.i];
                 light += lightstep;
             }
 
@@ -382,8 +379,8 @@ R_DrawSurfaceBlock8_mip3
 ================
 */
 void R_DrawSurfaceBlock8_mip3() {
-    uint8_p psource = pbasesource;
-    uint8_p prowdest = prowdestbase;
+    qColor8_p psource = pbasesource;
+    qColor8_p prowdest = prowdestbase;
 
     for (int v = 0; v < r_numvblocks; v++) {
         // FIXME: make these locals?
@@ -399,9 +396,8 @@ void R_DrawSurfaceBlock8_mip3() {
             int light = lightright;
 
             for (int b = 1; b >= 0; b--) {
-                uint8_t pix = psource[b];
-                prowdest[b] = ((uint8_p)vid.colormap)
-                    [(light & 0xFF00) + pix];
+                qColor8_t pix = psource[b];
+                prowdest[b] = vid.colormap->raw[(light & 0xFF00) + pix.i];
                 light += lightstep;
             }
 
@@ -428,7 +424,7 @@ void R_DrawSurfaceBlock16() {
     uint16_p prowdest = (uint16_p)prowdestbase;
 
     for (int k = 0; k < blocksize; k++) {
-        uint8_p psource = pbasesource;
+        qColor8_p psource = pbasesource;
         int lighttemp = lightright - lightleft;
         int lightstep = lighttemp >> blockdivshift;
 
@@ -436,8 +432,8 @@ void R_DrawSurfaceBlock16() {
         uint16_p pdest = prowdest;
 
         for (int b = 0; b < blocksize; b++) {
-            uint8_t pix = *psource;
-            *pdest = vid.colormap16[(light & 0xFF00) + pix];
+            qColor8_t pix = *psource;
+            *pdest = vid.colormap16[(light & 0xFF00) + pix.i].c;
             // psource += sourcesstep;  // TODO: is this correct?
             pdest++;
             light += lightstep;
@@ -462,9 +458,9 @@ void R_DrawSurfaceBlock16() {
 R_GenTurbTile
 ================
 */
-void R_GenTurbTile(pixel_p pbasetex, TypeLess_ptr pdest) {
+void R_GenTurbTile(qColor8_p pbasetex, qColor8_p pdest) {
     int* turb = sintable + ((int)(GetClSimTime() * SPEED) & (CYCLE - 1));
-    uint8_p pd = (uint8_p)pdest;
+    qColor8_p pd = pdest;
 
     for (int i = 0; i < TILE_SIZE; i++) {
         for (int j = 0; j < TILE_SIZE; j++) {
@@ -481,15 +477,15 @@ void R_GenTurbTile(pixel_p pbasetex, TypeLess_ptr pdest) {
 R_GenTurbTile16
 ================
 */
-void R_GenTurbTile16(pixel_p pbasetex, TypeLess_ptr pdest) {
+void R_GenTurbTile16(qColor8_p pbasetex, qColor16_p pdest) {
     int* turb = sintable + ((int)(GetClSimTime() * SPEED) & (CYCLE - 1));
-    uint16_p pd = (uint16_p)pdest;
+    qColor16_p pd = pdest;
 
     for (int i = 0; i < TILE_SIZE; i++) {
         for (int j = 0; j < TILE_SIZE; j++) {
             fixed16_t s = (FIXED16_TO_INT((INT_TO_FIXED16(j)) + turb[i & (CYCLE - 1)])) & 0x3F;
             fixed16_t t = (FIXED16_TO_INT((INT_TO_FIXED16(i)) + turb[j & (CYCLE - 1)])) & 0x3F;
-            *pd++ = d_8to16table[*(pbasetex + MUL64(t) + s)];
+            (pd++)->c = d_8to16table[(pbasetex + MUL64(t) + s)->i];
         }
     }
 }
@@ -502,12 +498,9 @@ R_GenTile
 */
 void R_GenTile(mSurface_p psurf, TypeLess_ptr pdest) {
     if (psurf->flags & SURF_DRAWTURB) {
-        if (r_pixbytes == 1) {
-            R_GenTurbTile(GetMipPtr(psurf->texinfo->texture, Mip0), pdest);
-        }
-        else {
-            R_GenTurbTile16(GetMipPtr(psurf->texinfo->texture, Mip0), pdest);
-        }
+        if (r_pixbytes == 1)    R_GenTurbTile(GetMipPtr(psurf->texinfo->texture, Mip0), pdest);
+        else                    R_GenTurbTile16(GetMipPtr(psurf->texinfo->texture, Mip0), pdest);
+
     }
     else if (psurf->flags & SURF_DRAWSKY) {
         if (r_pixbytes == 1)    R_GenSkyTile(pdest);

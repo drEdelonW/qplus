@@ -129,26 +129,23 @@ void VID_Update(vRect_p rects) {
 
 
 
-void VID_SetPalette(uint8_p palette) { // TODO: make copy and upscale with DMA2D
+void VID_SetPalette(palette_p palette) { // TODO: make copy and upscale with DMA2D
     // 8 8 8 encoding
-    uint8_p pal = palette;
     uint32_p table = d_8to24table;
-    for (int i = 0; i < 256; i++) {
-        uint32_t r = pal[0];
-        uint32_t g = pal[1];
-        uint32_t b = pal[2];
-        pal += 3;
+    for (int i = 0; i < InksNum; i++) {
+        Rgb32_t r = palette->ink[i].r;
+        Rgb32_t g = palette->ink[i].g;
+        Rgb32_t b = palette->ink[i].b;
 
         // uint32_t v = (0xFF << 24) | (r << 16) | (g << 8) | (b << 0);
         // uint32_t v = (b << 24) | (g << 16) | (r << 8) | (0xFF << 0);
-        uint32_t v = (0xFF << 24) | (b << 16) | (g << 8) | (r << 0);
+        Rgb32_t v = (0xFF << 24) | (b << 16) | (g << 8) | (r << 0);
         *table++ = v;
     }
-    d_8to24table[255] &= 0x00FFFFFF;    // 255 is transparent
-
+    d_8to24table[InksNum - 1] &= 0x00FFFFFF; // 255 is transparent
 }
 
-void VID_ShiftPalette(uint8_p p) {
+void VID_ShiftPalette(palette_p p) {
     VID_SetPalette(p);
 }
 // void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) { printf(TEXT_RED "D_BeginDirectRect\n" TEXT_RESET); }

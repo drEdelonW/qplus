@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "types.h"
 #include "fixed.h"  // fixed16_t
-#include "vid.h"    // pixel_p
+#include "qColor.h" // qColor8_p
 
 
 // all global and static refresh variables are collected in a contiguous block
@@ -49,11 +49,12 @@ fixed16_t bbextentt;
 // TODO: Rework gradient globals to vector like operations
 #endif
 
-pixel_p cacheblock;
+qColor8_p cacheblock;
 int     cachewidth;
-pixel_p d_viewbuffer;
 
-int16_p d_pzbuffer;
+qColor8_p d_viewbuffer;
+int16_p d_pzbuffer; // TODO: is this Z buffer???
+
 uint32_t d_zrowbytes;
 uint32_t d_zwidth;
 

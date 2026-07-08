@@ -457,7 +457,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     }
 
     scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
-    vid.colormap = (pixel_p)host_colormap;
+    vid.colormap = host_colormap;
     // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
     vid.conrowbytes = vid.rowbytes;
     vid.con.width = vid.scr.width;
@@ -485,7 +485,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     vid_surfcache = ((uint8_p)d_pzbuffer) + zsize;
 
-    vid.con.pBuff = vid.scr.pBuff = (pixel_p)(((uint8_p)d_pzbuffer) + zsize + tsize);
+    vid.con.pClr = (qColor8_p)(((uint8_p)d_pzbuffer) + zsize + tsize);
+    vid.scr.pClr = (qColor8_p)(((uint8_p)d_pzbuffer) + zsize + tsize);
 
     D_InitCaches(vid_surfcache, tsize);
 

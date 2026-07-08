@@ -2,6 +2,8 @@
 
 #include "qparams.h"
 #include "qTime.h"
+#include "qColor.h"
+#include "qLight.h"
 
 //
 // host
@@ -11,8 +13,7 @@ extern bool    isDedicated;
 extern QuakeParms_t host_parms;
 extern bool    host_initialized;  // true if into command execution
 extern SimDt_t host_frametime;
-extern uint8_p host_basepal;
-extern uint8_p host_colormap;
+extern ColorMap_p host_colormap;
 extern int32_t host_framecount; // incremented every frame, never reset
 // extern jmp_buf host_abortserver;
 

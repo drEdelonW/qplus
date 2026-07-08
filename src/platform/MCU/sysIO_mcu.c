@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdarg.h>
 #include <sys/errno.h>
 #include "perepherial.h"
+#include "VA.h"
 
 
 /*
@@ -56,13 +57,11 @@ int _write(int file, const char* buf, int len) {
             HAL_MAX_DELAY
         );
 
-        if (st == HAL_OK) {
-            return len;
-        }
-        else {
+        if (st != HAL_OK) {
             errno = EIO;
-            return -1;
+            len = -1;
         }
+            return len;
     }
 
     errno = EBADF;

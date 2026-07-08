@@ -82,7 +82,7 @@ extern int d_con_indirect; // if 0, Quake will draw console directly to vid.scr.
 extern Basis_t r_p;
 
 void D_Aff8Patch(TypeLess_ptr pcolormap);
-void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height);
+void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height);
 void D_DisableBackBufferAccess();
 void D_EndDirectRect(int x, int y, int width, int height);
 void D_PolysetDraw();
@@ -108,16 +108,13 @@ void D_UpdateRects(vRect_p prect);
 void D_PolysetUpdateTables();
 
 // these are currently for internal use only, and should not be used by drivers
-extern uint8_p r_skysource;
+extern qColor8_p r_skysource;
 
 // transparency types for D_DrawRect()
 typedef enum {
     DR_SOLID        = 0, // draw solid
     DR_TRANSPARENT  = 1  // draw transparent
 } drawrect_t;
-
-// !!! must be kept the same as in quakeasm.h !!!
-#define TRANSPARENT_COLOR (0xFF)
 
 
 //=======================================================================//

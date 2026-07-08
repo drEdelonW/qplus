@@ -106,7 +106,7 @@ void R_DrawSurfaceBlock8_mip2();
 void R_DrawSurfaceBlock8_mip3();
 #endif
 
-void R_GenSkyTile(uint8_p pdest);
+void R_GenSkyTile(qColor8_p pdest);
 void R_GenSkyTile16(uint16_p pdest);
 void R_Surf8Patch();    // we only patch code on Intel
 void R_Surf16Patch();   // we only patch code on Intel

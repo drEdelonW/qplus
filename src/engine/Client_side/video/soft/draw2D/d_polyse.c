@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct {
-    pixel_p     pdest;
+    qColor8_p   pdest;
     int16_p     pz;
     int8_p      ptex;
 
@@ -62,8 +62,8 @@ typedef EdgeTable_t* EdgeTable_p;
 
 static VertAttr_t _p[3];
 
-pixel_p acolormap;
-pixel_p d_pcolormap;
+ColorMap_p acolormap;  // TODO: is it kind of array?
+ColorMap_p d_pcolormap;// TODO: is it kind of array?
 
 int   d_aflatcolor;
 int   d_xdenom;
@@ -214,7 +214,7 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts) {
             if (z >= *zbuf) {
                 *zbuf = z;
                 d_viewbuffer[d_scantable[fv->vAttr.y] + fv->vAttr.x] =
-                    acolormap[
+                    acolormap->raw[
                         skintable[FIXED16_TO_INT(fv->vAttr.t)][FIXED16_TO_INT(fv->vAttr.s)] +
                             (fv->vAttr.light & 0xFF00)
                     ];
@@ -244,7 +244,7 @@ void D_DrawSubdiv() {
             continue;
         }
 
-        d_pcolormap = &acolormap[index0->vAttr.light & 0xFF00];
+        d_pcolormap = (ColorMap_p)&acolormap->raw[index0->vAttr.light & 0xFF00];
 
         if (ptri[i].facesfront) {
             D_PolysetRecursiveTriangle(&index0->vAttr, &index1->vAttr, &index2->vAttr);
@@ -393,8 +393,8 @@ void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) 
         int16_p zbuf = zspantable[_new.y] + _new.x;
         if (z >= *zbuf) {
             *zbuf = z;
-            d_viewbuffer[d_scantable[_new.y] + _new.x] =
-                d_pcolormap[skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)]];
+            qColor8_t t = d_pcolormap->raw[skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)]];
+            d_viewbuffer[d_scantable[_new.y] + _new.x] = t;
         }
     }
     // recursively continue
@@ -606,7 +606,7 @@ void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
 
             do {
                 if (FIXED16_TO_INT(l.zi) >= *l.pz) {
-                    *l.pdest = acolormap[*l.ptex + (l.light & 0xFF00)];
+                    *l.pdest = acolormap->raw[*l.ptex + (l.light & 0xFF00)];
                     // gel mapping     *lpdest = gelmap[*lpdest];
                     *l.pz = FIXED16_TO_INT(l.zi);
                 }
@@ -639,14 +639,14 @@ D_PolysetFillSpans8
 */
 void D_PolysetFillSpans8(SpanPackage_p pspanpackage) {
     // FIXME: do z buffering
-    int color = d_aflatcolor++;
+    qColor8_t color = {  .i = d_aflatcolor++ };
 
     while (1) {
         int lcount = pspanpackage->count;
 
         if (lcount == -1)   return;
         if (lcount) {
-            uint8_p lpdest = pspanpackage->pdest;
+            qColor8_p lpdest = pspanpackage->pdest;
 
             do {
                 *lpdest++ = color;

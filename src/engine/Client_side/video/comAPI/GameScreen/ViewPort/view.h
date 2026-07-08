@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "angle.h"
 #include "types.h"
 
-extern uint8_t ramps[3][256];
 extern float v_blend[4];
 
 #ifdef __cplusplus

@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "host.h"
 #include "versions.h"
+#include "VA.h"
 
 
 void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}

@@ -42,8 +42,6 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
     fixed16_t sstep = 0; // keep compiler happy
     fixed16_t tstep = 0; // ditto
 
-    uint8_p pbase = cacheblock;
-
     float sdivz8stepu = d_sdivzstepu * 8;
     float tdivz8stepu = d_tdivzstepu * 8;
     float zi8stepu = d_zistepu * 8;
@@ -52,7 +50,7 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
     int izistep = (int)(d_zistepu * 0x8000 * FIXED16_ONE);
 
     do {
-        uint8_p pdest = (uint8_p)d_viewbuffer + (screenwidth * pspan->v) + pspan->u;
+        qColor8_p pdest = d_viewbuffer + (screenwidth * pspan->v) + pspan->u;
         int16_p pz = d_pzbuffer + (d_zwidth * pspan->v) + pspan->u;
 
         int count = pspan->count;
@@ -132,8 +130,8 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
             }
 
             do {
-                uint8_t btemp = *(pbase + FIXED16_TO_INT(s) + FIXED16_TO_INT(t) * cachewidth);
-                if ((btemp != 0xFF) &&
+                qColor8_t btemp = *(cacheblock + FIXED16_TO_INT(s) + FIXED16_TO_INT(t) * cachewidth);
+                if ((btemp.i != TRANSPARENT_COLOR) &&
                     (*pz <= FIXED16_TO_INT(izi))
                     ) {
                     *pz = FIXED16_TO_INT(izi);
