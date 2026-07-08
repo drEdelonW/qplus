@@ -79,11 +79,11 @@ Memory is cleared / released when a server or client begins, not when they end.
 
 #if 1
 QuakeParms_t host_parms;
-bool         host_initialized;   // true if into command execution
+bool        host_initialized;   // true if into command execution
 int32_t     host_framecount;
 int         host_hunklevel;
 jmp_buf     host_abortserver;
-palette_p   host_basepal;
+qPal_p      host_basepal;
 ColorMap_p  host_colormap;
 bool        isDedicated;
 RealTime_t  oldrealtime;        // last frame run
@@ -767,7 +767,7 @@ void Host::Init(QuakeParms_p parms) {
     R_InitTextures();  // needed even for dedicated servers
 
     if (cls.state != ca_dedicated) {
-        host_basepal = (palette_p)COM_LoadHunkFile("gfx/palette.lmp");
+        host_basepal = (qPal_p)COM_LoadHunkFile("gfx/palette.lmp");
         if (!host_basepal)      Host_SysError("Couldn't load gfx/palette.lmp");
 
         host_colormap = (ColorMap_p)COM_LoadHunkFile("gfx/colormap.lmp");

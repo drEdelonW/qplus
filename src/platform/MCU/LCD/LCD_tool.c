@@ -129,7 +129,7 @@ void VID_Update(vRect_p rects) {
 
 
 
-void VID_SetPalette(palette_p palette) { // TODO: make copy and upscale with DMA2D
+void VID_SetPalette(qPal_p palette) { // TODO: make copy and upscale with DMA2D
     // 8 8 8 encoding
     uint32_p table = d_8to24table;
     for (int i = 0; i < InksNum; i++) {
@@ -145,7 +145,7 @@ void VID_SetPalette(palette_p palette) { // TODO: make copy and upscale with DMA
     d_8to24table[InksNum - 1] &= 0x00FFFFFF; // 255 is transparent
 }
 
-void VID_ShiftPalette(palette_p p) {
+void VID_ShiftPalette(qPal_p p) {
     VID_SetPalette(p);
 }
 // void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) { printf(TEXT_RED "D_BeginDirectRect\n" TEXT_RESET); }

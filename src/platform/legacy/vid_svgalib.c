@@ -408,7 +408,7 @@ void VID_ShiftPalette(uint8_p p) {
 
 void VID_SetPalette(uint8_p palette) {
 
-    static palette_t tmppal;
+    static qPal_t tmppal;
     int* tp;
     int i;
 

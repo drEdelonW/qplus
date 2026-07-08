@@ -20,7 +20,7 @@
 #define MAXHEIGHT  1024
 #define MAXWIDTH  1280
 
-extern palette_t ramps;
+extern qPal_t ramps;
 extern qColor8_t    d_15to8table[0x10000u];
 extern vec3_t   lightspot;
 extern int      solidskytexture;

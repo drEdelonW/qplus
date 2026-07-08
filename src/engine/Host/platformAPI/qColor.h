@@ -87,20 +87,20 @@ typedef struct {
         qRgb24  ink[InksNum];
         uint8_t raw[PalRawDIM];
     };
-} palette_t;      STATIC_ASSERT_SIZE(palette_t, 256*3); // 768
-typedef palette_t* palette_p;
+} qPal_t;      STATIC_ASSERT_SIZE(qPal_t, 256*3); // 768
+typedef qPal_t* qPal_p;
 #endif /* ====================={ Palette end }=====================*/
 
-extern palette_p host_basepal;
-extern Rgb16_t   d_8to16table[InksNum];	// not used in 8 bpp mode
-extern Rgb24_t   d_8to24table[InksNum];	// not used in 8 bpp mode // 0xAABBGGRR
-
+extern qPal_p   host_basepal;
+extern Rgb16_t  d_8to16table[InksNum];  // not used in 8 bpp mode
+extern Rgb24_t  d_8to24table[InksNum];  // not used in 8 bpp mode // 0xAABBGGRR
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    void    VID_ShiftPalette(palette_p palette);    // called for bonus and pain flashes, and for underwater color changes
+    void    VID_ShiftPalette(qPal_p palette);   // called for bonus and pain flashes, and for underwater color changes
+    void    VID_SetPalette(qPal_p palette);     // called at startup and after any gamma correction
 
 #ifdef __cplusplus
 }

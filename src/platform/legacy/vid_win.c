@@ -102,7 +102,7 @@ static uint8_p vid_surfcache;
 static int  vid_surfcachesize;
 static int  VID_highhunkmark;
 
-palette_t vid_curpal;
+qPal_p vid_curpal;
 
 uint16_t d_8to16table[InksNum];
 Rgb24_t     d_8to24table[InksNum];
@@ -1661,7 +1661,7 @@ void VID_ForceLockState(int lk) {
 
 void VID_SetPalette(uint8_p palette) {
     INT     i;
-    palette_t pal;
+    palette_t pal[InksNum];
     HDC   hdc;
 
     if (!Minimized) {

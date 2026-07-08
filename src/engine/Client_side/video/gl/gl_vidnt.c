@@ -91,7 +91,7 @@ int     vid_modenum = NO_MODE;
 int     vid_realmode;
 int     vid_default = MODE_WINDOWED;
 static int  windowed_default;
-palette_t vid_curpal;
+qPal_p vid_curpal;
 static bool fullsbardraw = false;
 
 static float vid_gamma = 1.0;
@@ -1302,7 +1302,7 @@ bool VID_Is8bit() {
 
 void VID_Init8bitPalette() {
     // Check for 8bit Extensions and initialize them.
-    palette_t thePalette;
+    qPal_t thePalette;
 
     glColorTableEXT = (TypeLess_ptr)wglGetProcAddress("glColorTableEXT");
     if (!glColorTableEXT || strstr(gl_extensions, "GL_EXT_shared_texture_palette") ||
@@ -1324,8 +1324,8 @@ void VID_Init8bitPalette() {
     is8bit = TRUE;
 }
 
-static void Check_Gamma(uint8_p pal) {
-    uint8_t    palette[768];
+static void Check_Gamma(qPal_p pal) {
+    qPal_t palette;
     int        i;
 
     if ((i = COM_CheckParm("-gamma")) == 0) {

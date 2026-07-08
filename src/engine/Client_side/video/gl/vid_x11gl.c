@@ -584,7 +584,7 @@ int init(App_p app) {
     return 1;
 }
 
-void VID_SetPalette(palette_p palette) {
+void VID_SetPalette(qPal_p palette) {
     // 8 8 8 encoding
     uint32_p table = d_8to24table;
     for (int i = 0; i < InksNum; i++) {
@@ -600,7 +600,7 @@ void VID_SetPalette(palette_p palette) {
     d_8to24table[255] &= 0x00FFFFFF;    // 255 is transparent
 }
 
-void VID_Init(palette_p palette) {
+void VID_Init(qPal_p palette) {
 
     if (!init(&app))
         Host_SysError("VID_Init: init failed\n");

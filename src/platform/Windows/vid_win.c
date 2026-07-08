@@ -39,6 +39,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "resource.h"
 #include "render.h"
 
+#include "vid.h"
+#include "z_hunk.h"
+
 #define MAX_MODE_LIST	30
 #define VID_ROW_SIZE	3
 
@@ -58,14 +61,14 @@ int			window_center_x, window_center_y, window_x, window_y, window_width, window
 RECT		window_rect;
 
 static DEVMODE	gdevmode;
-static bool	startwindowed = 0, windowed_mode_set;
+static bool	    startwindowed = 0, windowed_mode_set;
 static int		firstupdate = 1;
-static bool	vid_initialized = false, vid_palettized;
+static bool	    vid_initialized = false, vid_palettized;
 static int		lockcount;
 static int		vid_fulldib_on_focus_mode;
-static bool	force_minimized, in_mode_set, is_mode0x13, force_mode_set;
+static bool	    force_minimized, in_mode_set, is_mode0x13, force_mode_set;
 static int		vid_stretched, windowed_mouse;
-static bool	palette_changed, syscolchg, vid_mode_set, hide_window, pal_is_nostatic;
+static bool	    palette_changed, syscolchg, vid_mode_set, hide_window, pal_is_nostatic;
 static HICON	hIcon;
 
 VidDef_t	vid;				// global video state
@@ -106,8 +109,8 @@ lmode_t	lowresmodes[] = {
     {512, 384},
 };
 
-int			vid_modenum = NO_MODE;
-int			vid_testingmode, vid_realmode;
+int vid_modenum = NO_MODE;
+int vid_testingmode, vid_realmode;
 LegTime_t		vid_testendtime;
 int			vid_default = MODE_WINDOWED;
 static int	windowed_default;
@@ -118,7 +121,7 @@ static uint8_p vid_surfcache;
 static int		vid_surfcachesize;
 static int		VID_highhunkmark;
 
-palette_t	vid_curpal;
+qPal_p	vid_curpal;
 
 Rgb16_t d_8to16table[InksNum];
 Rgb24_t	d_8to24table[InksNum];
@@ -1231,7 +1234,9 @@ bool VID_SetWindowedMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    vid.scr.pBuff = vid.con.pBuff = vid.direct = dibdc->surface;
+    vid.scr.pClr = (qColor8_p)dibdc->surface;
+    vid.con.pClr = (qColor8_p)dibdc->surface;
+    vid.direct = (qColor8_p)dibdc->surface;
     vid.rowbytes = vid.conrowbytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
     vid.maxwarp.width = WARP_WIDTH;
@@ -1271,7 +1276,9 @@ bool VID_SetFullscreenMode(int modenum) {
     modestate = MS_FULLSCREEN;
     vid_fulldib_on_focus_mode = 0;
 
-    vid.scr.pBuff = vid.con.pBuff = vid.direct = NULL;
+    vid.scr.pClr = NULL;
+    vid.con.pClr = NULL;
+    vid.direct = NULL;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
     DIBHeight = vid.scr.height = vid.con.height = modelist[modenum].height;
@@ -1380,7 +1387,9 @@ bool VID_SetFullDIBMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    vid.scr.pBuff = vid.con.pBuff = vid.direct = dibdc->surface;
+    vid.scr.pClr = (qColor8_p)dibdc->surface;
+    vid.con.pClr = (qColor8_p)dibdc->surface;
+    vid.direct = (qColor8_p)dibdc->surface;
     vid.rowbytes = vid.conrowbytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
     vid.maxwarp.width = WARP_WIDTH;
@@ -1432,12 +1441,7 @@ void VID_SetDefaultMode() {
 }
 
 
-int VID_SetMode(int modenum, uint8_p palette) {
-    int				original_mode, temp;//, dummy;
-    bool		stat;
-    MSG				msg;
-    HDC				hdc;
-
+int VID_SetMode(int modenum, qPal_p palette) {
     while ((modenum >= nummodes) || (modenum < 0)) {
         if (vid_modenum == NO_MODE) {
             if (modenum == vid_default)     modenum = windowed_default;
@@ -1455,17 +1459,19 @@ int VID_SetMode(int modenum, uint8_p palette) {
         return true;
 
     // so Con_Printfs don't mess us up by forcing vid and snd updates
-    temp = scr.disabled_for_loading;
+    int temp = scr.disabled_for_loading;
     scr.disabled_for_loading = true;
     in_mode_set = true;
 
     CDAudio_Pause();
     S_ClearBuffer();
 
+    int original_mode;
     if (vid_modenum == NO_MODE)     original_mode = windowed_default;
     else                            original_mode = vid_modenum;
 
     // Set either the fullscreen or windowed mode
+    bool stat;
     if (modelist[modenum].type == MS_WINDOWED) {
         if (_windowed_mouse.value) {
             stat = VID_SetWindowedMode(modenum);
@@ -1513,8 +1519,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     if (!force_minimized)
         SetForegroundWindow(mainwindow);
 
-    hdc = GetDC(NULL);
-
+    HDC hdc = GetDC(NULL);
     if (GetDeviceCaps(hdc, RASTERCAPS) & RC_PALETTE)    vid_palettized = true;
     else                                                vid_palettized = false;
 
@@ -1532,7 +1537,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     }
 
     D_InitCaches(vid_surfcache, vid_surfcachesize);
-
+    MSG msg;
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -1576,12 +1581,16 @@ void VID_LockBuffer() {
 
     if (memdc) {
         // Update surface pointer for linear access modes
-        vid.scr.pBuff = vid.con.pBuff = vid.direct = memdc->surface;
+        vid.scr.pClr = (qColor8_p)memdc->surface;
+        vid.con.pClr = (qColor8_p)memdc->surface;
+        vid.direct = (qColor8_p)memdc->surface;
         vid.rowbytes = vid.conrowbytes = memdc->mi.bytesPerLine;
     }
     else if (mgldc) {
         // Update surface pointer for linear access modes
-        vid.scr.pBuff = vid.con.pBuff = vid.direct = mgldc->surface;
+        vid.scr.pClr = (qColor8_p)mgldc->surface;
+        vid.con.pClr = (qColor8_p)mgldc->surface;
+        vid.direct = (qColor8_p)mgldc->surface;
         vid.rowbytes = vid.conrowbytes = mgldc->mi.bytesPerLine;
     }
 
@@ -1611,7 +1620,9 @@ void VID_UnlockBuffer() {
     MGL_endDirectAccess();
 
     // to turn up any unlocked accesses
-    vid.scr.pBuff = vid.con.pBuff = vid.direct = d_viewbuffer = NULL;
+    vid.scr.pClr = NULL;
+    vid.con.pClr = NULL;
+    vid.direct = NULL;
 
 }
 
@@ -1645,9 +1656,9 @@ void VID_ForceLockState(int lk) {
 }
 
 
-void VID_SetPalette(palette_p palette) {
-    palette_t	pal[256];   // TODO: what ws that????
-    HDC			hdc;
+void VID_SetPalette(qPal_p palette) {
+    palette_t pal[InksNum];
+    HDC hdc;
 
     if (!Minimized) {
         palette_changed = true;
@@ -1669,9 +1680,9 @@ void VID_SetPalette(palette_p palette) {
         // Translate the palette values to an MGL palette array and
         // set the values.
         for (int i = 0; i < InksNum; i++) {
-            pal[i].red = palette[i * 3];
-            pal[i].green = palette[i * 3 + 1];
-            pal[i].blue = palette[i * 3 + 2];
+            pal[i].red = palette->ink[i].r;
+            pal[i].green = palette->ink[i].g;
+            pal[i].blue = palette->ink[i].b;
         }
 
         if (DDActive) {
@@ -1705,7 +1716,7 @@ void VID_SetPalette(palette_p palette) {
 }
 
 
-void	VID_ShiftPalette(uint8_p palette) {
+void VID_ShiftPalette(qPal_p palette) {
     VID_SetPalette(palette);
 }
 
@@ -1841,9 +1852,8 @@ void VID_ForceMode_f() {
 }
 
 
-void	VID_Init(uint8_p palette) {
+void VID_Init(qPal_p palette) {
     int bestmatch, bestmatchmetric, t, dr, dg, db;
-    uint8_p ptmp;
 
     Cvar_RegisterVariable(&vid_mode);
     Cvar_RegisterVariable(&vid_wait);
@@ -1901,9 +1911,9 @@ void	VID_Init(uint8_p palette) {
     bestmatchmetric = 256 * PalRawDIM;
 
     for (int i = 1; i < InksNum; i++) {
-        dr = palette[0] - palette[i * 3];
-        dg = palette[1] - palette[i * 3 + 1];
-        db = palette[2] - palette[i * 3 + 2];
+        dr = palette->ink[0].r - palette->ink[i].r;
+        dg = palette->ink[0].g - palette->ink[i].g;
+        db = palette->ink[0].b - palette->ink[i].b;
 
         t = (dr * dr) + (dg * dg) + (db * db);
 
@@ -1916,10 +1926,10 @@ void	VID_Init(uint8_p palette) {
         }
     }
 
-    ptmp = vid.colormap;
+    qColor8_p ptmp = &vid.colormap->raw[0];
     for (int i = 0; i < (1 << (VID_CBITS + 8)); i++, ptmp++) {
-        if (*ptmp == 0)
-            *ptmp = bestmatch;
+        if ((*ptmp).i == InkConTransp)
+            (*ptmp).i = bestmatch;
     }
 
     if (COM_CheckParm("-startwindowed")) {
@@ -2013,7 +2023,7 @@ void FlipScreen(vRect_p rects) {
                             rects->x, rects->y, MGL_REPLACE_MODE);
                     }
 
-                    rects = rects->pnext;
+                    rects = rects->pNext;
                 }
             }
 
@@ -2050,7 +2060,7 @@ void FlipScreen(vRect_p rects) {
                         rects->x, rects->y, MGL_REPLACE_MODE);
                 }
 
-                rects = rects->pnext;
+                rects = rects->pNext;
             }
         }
 
@@ -2067,7 +2077,7 @@ void VID_Update(vRect_p rects) {
             .y = 0,
             .width = vid.scr.width,
             .height = vid.scr.height,
-            .pnext = NULL
+            .pNext = NULL
         };
         rects = &rect;
     }
@@ -2151,7 +2161,7 @@ void VID_Update(vRect_p rects) {
 D_BeginDirectRect
 ================
 */
-void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
+void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height) {
     int		i, j, reps, repshift;
     vRect_t	rect;
 
@@ -2184,7 +2194,7 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
         rect.y = y;
         rect.width = width;
         rect.height = height << repshift;
-        rect.pnext = NULL;
+        rect.pNext = NULL;
 
         FlipScreen(&rect);
     }
@@ -2261,7 +2271,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
         rect.y = y;
         rect.width = width;
         rect.height = height << repshift;
-        rect.pnext = NULL;
+        rect.pNext = NULL;
 
         FlipScreen(&rect);
     }

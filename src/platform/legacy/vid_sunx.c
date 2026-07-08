@@ -741,16 +741,14 @@ void    VID_Init(uint8_p palette) {
 
 }
 
-void VID_ShiftPalette(palette_p p) {
+void VID_ShiftPalette(qPal_p p) {
     VID_SetPalette(p);
 }
 
-void VID_SetPalette(palette_p palette) {
-
-    int i;
+void VID_SetPalette(qPal_p palette) {
     XColor colors[InksNum];
 
-    for (i = 0;i < InksNum;i++) {
+    for (int i = 0; i < InksNum; i++) {
         st2d_8to16table[i] = xlib_rgb16(palette[i * 3], palette[i * 3 + 1], palette[i * 3 + 2]);
         st2d_8to24table[i] = xlib_rgb24(palette[i * 3], palette[i * 3 + 1], palette[i * 3 + 2]);
     }
@@ -758,7 +756,7 @@ void VID_SetPalette(palette_p palette) {
     if (x_visinfo->class == PseudoColor && x_visinfo->depth == 8) {
         if (palette != current_palette)
             memcpy(current_palette, palette, PalRawDIM);
-        for (i = 0; i < InksNum; i++) {
+        for (int i = 0; i < InksNum; i++) {
             colors[i].pixel = i;
             colors[i].flags = DoRed | DoGreen | DoBlue;
             colors[i].red = vid_gamma[palette[i * 3]] * 257;

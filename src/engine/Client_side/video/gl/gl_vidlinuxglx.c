@@ -458,11 +458,11 @@ void InitSig() {
     signal(SIGTERM, signal_handler);
 }
 
-void VID_ShiftPalette(palette_p p) {
+void VID_ShiftPalette(qPal_p p) {
     // VID_SetPalette(p);
 }
 
-void VID_SetPalette(palette_p palette) {
+void VID_SetPalette(qPal_p palette) {
     //
     // 8 8 8 encoding
     //

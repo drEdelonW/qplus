@@ -65,11 +65,10 @@ extern  void (*vid_menudrawfn)();
 extern "C" {
 #endif
 
-    void    VID_Init(palette_p palette);  // Called at startup to set up translation tables, takes 256 8 bit RGB values the palette data will go away after the call, so it must be copied off if the video driver will need it again
+    void    VID_Init(qPal_p palette);  // Called at startup to set up translation tables, takes 256 8 bit RGB values the palette data will go away after the call, so it must be copied off if the video driver will need it again
     void    VID_Shutdown(); // Called at shutdown
-    void    VID_SetPalette(palette_p palette);    // called at startup and after any gamma correction
     void    VID_Update(vRect_p rects);  // flushes the given rectangles from the view buffer to the screen
-    int     VID_SetMode(int modenum, uint8_p palette);  // sets the mode; only used by the Quake engine for resetting to mode 0 (the base mode) on memory allocation failures
+    int     VID_SetMode(int modenum, qPal_p palette);  // sets the mode; only used by the Quake engine for resetting to mode 0 (the base mode) on memory allocation failures
     void    VID_HandlePause(bool pause);    // called only on Win32, when pause happens, so the mouse can be released
 
 #ifdef __cplusplus

@@ -527,10 +527,10 @@ void VID_Init8bitPalette() {
     }
     else if (strstr(gl_extensions, "GL_EXT_shared_texture_palette") &&
         (qglColorTableEXT = dlsym(prjobj, "glColorTableEXT")) != NULL) {
-        palette_t thePalette;
+        qPal_t thePalette;
         int8_p oldPalette;
         int8_p newPalette;
-
+#warning remake this operation with qPal_t
         Con_SafePrintf("... Using GL_EXT_shared_texture_palette\n");
         glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
         oldPalette = (int8_p)d_8to24table; //d_8to24table3dfx;

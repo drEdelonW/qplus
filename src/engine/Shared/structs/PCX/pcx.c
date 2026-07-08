@@ -100,7 +100,7 @@ WritePCXfile
 void WritePCXfile(
     cString filename, uint8_p data,
     int width, int height,
-    int rowbytes, palette_p palette
+    int rowbytes, qPal_p palette
 ) {
     pcx_p pcx = Hunk_TempAlloc(TWICE(width * height) + 1000);
     if (pcx == NULL) {

@@ -92,24 +92,24 @@ PDWORD	pdwRawValue[JOY_MAX_AXES];
 // or when changing from one controller to another.  this way at least something
 // works.
 cvar_t	in_joystick = { "joystick","0", true };
-CVAR_NAMED(joy_name, "joyname", "joystick", cvf_none);
-CVAR_NAMED(joy_advanced, "joyadvanced", "0", cvf_none);
-CVAR_NAMED(joy_advaxisx, "joyadvaxisx", "0", cvf_none);
-CVAR_NAMED(joy_advaxisy, "joyadvaxisy", "0", cvf_none);
-CVAR_NAMED(joy_advaxisz, "joyadvaxisz", "0", cvf_none);
-CVAR_NAMED(joy_advaxisr, "joyadvaxisr", "0", cvf_none);
-CVAR_NAMED(joy_advaxisu, "joyadvaxisu", "0", cvf_none);
-CVAR_NAMED(joy_advaxisv, "joyadvaxisv", "0", cvf_none);
-CVAR_NAMED(joy_forwardthreshold, "joyforwardthreshold", "0.15", cvf_none);
-CVAR_NAMED(joy_sidethreshold, "joysidethreshold", "0.15", cvf_none);
-CVAR_NAMED(joy_pitchthreshold, "joypitchthreshold", "0.15", cvf_none);
-CVAR_NAMED(joy_yawthreshold, "joyyawthreshold", "0.15", cvf_none);
-CVAR_NAMED(joy_forwardsensitivity, "joyforwardsensitivity", "-1.0", cvf_none);
-CVAR_NAMED(joy_sidesensitivity, "joysidesensitivity", "-1.0", cvf_none);
-CVAR_NAMED(joy_pitchsensitivity, "joypitchsensitivity", "1.0", cvf_none);
-CVAR_NAMED(joy_yawsensitivity, "joyyawsensitivity", "-1.0", cvf_none);
-CVAR_NAMED(joy_wwhack1, "joywwhack1", "0.0", cvf_none);
-CVAR_NAMED(joy_wwhack2, "joywwhack2", "0.0", cvf_none);
+CVAR_NAMED(joy_name, "joyname", "joystick");
+CVAR_NAMED(joy_advanced, "joyadvanced", "0");
+CVAR_NAMED(joy_advaxisx, "joyadvaxisx", "0");
+CVAR_NAMED(joy_advaxisy, "joyadvaxisy", "0");
+CVAR_NAMED(joy_advaxisz, "joyadvaxisz", "0");
+CVAR_NAMED(joy_advaxisr, "joyadvaxisr", "0");
+CVAR_NAMED(joy_advaxisu, "joyadvaxisu", "0");
+CVAR_NAMED(joy_advaxisv, "joyadvaxisv", "0");
+CVAR_NAMED(joy_forwardthreshold, "joyforwardthreshold", "0.15");
+CVAR_NAMED(joy_sidethreshold, "joysidethreshold", "0.15");
+CVAR_NAMED(joy_pitchthreshold, "joypitchthreshold", "0.15");
+CVAR_NAMED(joy_yawthreshold, "joyyawthreshold", "0.15");
+CVAR_NAMED(joy_forwardsensitivity, "joyforwardsensitivity", "-1.0");
+CVAR_NAMED(joy_sidesensitivity, "joysidesensitivity", "-1.0");
+CVAR_NAMED(joy_pitchsensitivity, "joypitchsensitivity", "1.0");
+CVAR_NAMED(joy_yawsensitivity, "joyyawsensitivity", "-1.0");
+CVAR_NAMED(joy_wwhack1, "joywwhack1", "0.0");
+CVAR_NAMED(joy_wwhack2, "joywwhack2", "0.0");
 
 bool	joy_avail, joy_advancedinit, joy_haspov;
 DWORD		joy_oldbuttonstate, joy_oldpovstate;
@@ -170,7 +170,7 @@ Force_CenterView_f
 ===========
 */
 void Force_CenterView_f() {
-    cl.viewangles[PITCH] = 0;
+    cl.viewangles.pitch = 0;
 }
 
 
@@ -645,23 +645,23 @@ void IN_MouseMove(UserCmd_p cmd) {
     mouse_y *= sensitivity.value;
 
     // add mouse X/Y movement to cmd
-    if ((in.strafe.state & 1) || (lookstrafe.value && (in.mlook.state & 1)))
+    if (kbIsDown(in.strafe) || (lookstrafe.value && kbIsDown(in.mlook)))
         cmd->move.side += m_side.value * mouse_x;
     else
-        cl.viewangles[YAW] -= m_yaw.value * mouse_x;
+        cl.viewangles.yaw -= m_yaw.value * mouse_x;
 
-    if (in.mlook.state & 1)
+    if (kbIsDown(in.mlook))
         V_StopPitchDrift();
 
-    if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
-        cl.viewangles[PITCH] += m_pitch.value * mouse_y;
-        if (cl.viewangles[PITCH] > 80)
-            cl.viewangles[PITCH] = 80;
-        if (cl.viewangles[PITCH] < -70)
-            cl.viewangles[PITCH] = -70;
+    if ((kbIsDown(in.mlook)) && !(kbIsDown(in.strafe))) {
+        cl.viewangles.pitch += m_pitch.value * mouse_y;
+        if (cl.viewangles.pitch > 80)
+            cl.viewangles.pitch = 80;
+        if (cl.viewangles.pitch < -70)
+            cl.viewangles.pitch = -70;
     }
     else {
-        if ((in.strafe.state & 1) && noclip_anglehack)
+        if ((kbIsDown(in.strafe)) && noclip_anglehack)
             cmd->move.up -= m_forward.value * mouse_y;
         else
             cmd->move.forward -= m_forward.value * mouse_y;
@@ -993,7 +993,7 @@ void IN_JoyMove(UserCmd_p cmd) {
         return;
     }
 
-    if (in.speed.state & 1)
+    if (kbIsDown(in.speed))
         speed = cl_movespeedkey.value;
     else
         speed = 1;
@@ -1025,16 +1025,16 @@ void IN_JoyMove(UserCmd_p cmd) {
 
         switch (dwAxisMap[i]) {
         case AxisForward:
-            if ((joy_advanced.value == 0.0) && (in.mlook.state & 1)) {
+            if ((joy_advanced.value == 0.0) && (kbIsDown(in.mlook))) {
                 // user wants forward control to become look control
                 if (fabs(fAxisValue) > joy_pitchthreshold.value) {
                     // if mouse invert is on, invert the joystick pitch value
                     // only absolute control support here (joy_advanced is false)
                     if (m_pitch.value < 0.0) {
-                        cl.viewangles[PITCH] -= (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
+                        cl.viewangles.pitch -= (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
                     }
                     else {
-                        cl.viewangles[PITCH] += (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
+                        cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
                     }
                     V_StopPitchDrift();
                 }
@@ -1062,7 +1062,7 @@ void IN_JoyMove(UserCmd_p cmd) {
             break;
 
         case AxisTurn:
-            if ((in.strafe.state & 1) || (lookstrafe.value && (in.mlook.state & 1))) {
+            if (kbIsDown(in.strafe) || (lookstrafe.value && kbIsDown(in.mlook))) {
                 // user wants turn control to become side control
                 if (fabs(fAxisValue) > joy_sidethreshold.value) {
                     cmd->move.side -= (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
@@ -1072,10 +1072,10 @@ void IN_JoyMove(UserCmd_p cmd) {
                 // user wants turn control to be turn control
                 if (fabs(fAxisValue) > joy_yawthreshold.value) {
                     if (dwControlMap[i] == JOY_ABSOLUTE_AXIS) {
-                        cl.viewangles[YAW] += (fAxisValue * joy_yawsensitivity.value) * aspeed * cl_yawspeed.value;
+                        cl.viewangles.yaw += (fAxisValue * joy_yawsensitivity.value) * aspeed * cl_yawspeed.value;
                     }
                     else {
-                        cl.viewangles[YAW] += (fAxisValue * joy_yawsensitivity.value) * speed * 180.0;
+                        cl.viewangles.yaw += (fAxisValue * joy_yawsensitivity.value) * speed * 180.0;
                     }
 
                 }
@@ -1083,18 +1083,18 @@ void IN_JoyMove(UserCmd_p cmd) {
             break;
 
         case AxisLook:
-            if (in.mlook.state & 1) {
+            if (kbIsDown(in.mlook)) {
                 if (fabs(fAxisValue) > joy_pitchthreshold.value) {
                     // pitch movement detected and pitch movement desired by user
 #if 0
                     if (dwControlMap[i] == JOY_ABSOLUTE_AXIS) {
-                        cl.viewangles[PITCH] += (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
+                        cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
                     }
                     else {
-                        cl.viewangles[PITCH] += (fAxisValue * joy_pitchsensitivity.value) * speed * 180.0;
+                        cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) * speed * 180.0;
                     }
 #else
-                    cl.viewangles[PITCH] += (fAxisValue * joy_pitchsensitivity.value) *
+                    cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) *
                         (dwControlMap[i] == JOY_ABSOLUTE_AXIS) ?
                         (aspeed * cl_pitchspeed.value) : (speed * 180.0);
 #endif
@@ -1117,8 +1117,8 @@ void IN_JoyMove(UserCmd_p cmd) {
     }
 
     // bounds check pitch
-    if (cl.viewangles[PITCH] > 80.0)
-        cl.viewangles[PITCH] = 80.0;
-    if (cl.viewangles[PITCH] < -70.0)
-        cl.viewangles[PITCH] = -70.0;
+    if (cl.viewangles.pitch > 80.0)
+        cl.viewangles.pitch = 80.0;
+    if (cl.viewangles.pitch < -70.0)
+        cl.viewangles.pitch = -70.0;
 }

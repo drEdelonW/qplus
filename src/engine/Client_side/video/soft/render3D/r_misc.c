@@ -206,7 +206,7 @@ void R_PrintAliasStats() {
 
 
 void WarpPalette() {
-    palette_t newpalette;
+    qPal_t newpalette;
     qRgb24 basecolor = {
         .r = 130,
         .g = 80,

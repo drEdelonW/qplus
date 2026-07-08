@@ -435,7 +435,7 @@ V_UpdatePalette
 =============
 */
 #ifdef GLQUAKE
-palette_t  ramps;
+qPal_t  ramps;
 
 void V_UpdatePalette() {
     V_CalcPowerupCshift();
@@ -488,7 +488,7 @@ void V_UpdatePalette() {
         ramps.ink[i].b = gammatable[ib];
     }
 
-    palette_t pal;
+    qPal_t pal;
 
     for (int i = 0; i < InksNum; i++) {
         int ir = host_basepal->ink[i].r;
@@ -536,7 +536,7 @@ void V_UpdatePalette() {
     if (!new && !force)
         return;
     //-------------------
-    palette_t pal;
+    qPal_t pal;
     for (int i = 0; i < InksNum; i++) {
         qRgb24 col = host_basepal->ink[i];
 

@@ -55,7 +55,7 @@ VidDef_t vid; // global video state
 Rgb16_t d_8to16table[InksNum]; // extern
 static PIXEL16 st2d_8to16table[InksNum];
 static PIXEL24 st2d_8to24table[InksNum];
-static palette_t current_palette;   // 768 byte
+static qPal_t current_palette;   // 768 byte
 
 bool    doShm;  // extern
 Display* x_disp;    // shared with in_x
@@ -367,7 +367,7 @@ void ResetSharedFrameBuffers() {
 // the palette data will go away after the call, so it must be copied off if
 // the video driver will need it again
 
-void VID_Init(palette_p palette) {
+void VID_Init(qPal_p palette) {
 
     vid.scr.width = 320;
     vid.scr.height = 200;
@@ -581,13 +581,13 @@ void VID_Init(palette_p palette) {
 
 }
 
-void VID_ShiftPalette(palette_p p) {
+void VID_ShiftPalette(qPal_p p) {
     VID_SetPalette(p);
 }
 
 
 
-void VID_SetPalette(palette_p palette) {
+void VID_SetPalette(qPal_p palette) {
     for (int i = 0; i < InksNum; i++) {
         st2d_8to16table[i] = xlib_rgb16(
             palette->ink[i].r,
