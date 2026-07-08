@@ -73,8 +73,8 @@ uint8_t	vid_current_palette[768];	// save for mode changes
 
 static bool	nomodecheck = false;
 
-Rgb16_t	d_8to16table[256];	// not used in 8 bpp mode
-Rgb24_t	d_8to24table[256];	// not used in 8 bpp mode
+Rgb16_t	d_8to16table[InksNum];	// not used in 8 bpp mode
+Rgb24_t	d_8to24table[InksNum];	// not used in 8 bpp mode
 
 void VID_MenuDraw();
 void VID_MenuKey(int key);

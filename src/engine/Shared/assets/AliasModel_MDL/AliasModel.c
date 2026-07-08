@@ -255,11 +255,11 @@ typedef struct {
 #define FLOODFILL_STEP( off, dx, dy ) \
 { \
     if (pos[off].i == fillcolor.i) {\
-        pos[off].i = TRANSPARENT_COLOR; \
+        pos[off].i = InkTransp; \
         fifo[inpt].x = x + (dx), fifo[inpt].y = y + (dy); \
         inpt = (inpt + 1) & FLOODFILL_FIFO_MASK; \
     } \
-    else if (pos[off].i != TRANSPARENT_COLOR) fdc = pos[off]; \
+    else if (pos[off].i != InkTransp) fdc = pos[off]; \
 }
 
 void Mod_FloodFillSkin(qColor8_p skin, int skinwidth, int skinheight) {
@@ -268,7 +268,7 @@ void Mod_FloodFillSkin(qColor8_p skin, int skinwidth, int skinheight) {
         filledcolor = 0;
         // attempt to find opaque black
         for (int i = 0; i < InksNum; ++i)
-            if (d_8to24table[i] == (255 << 0)) {// alpha 1.0
+            if (d_8to24table[i] == (InkTransp << 0)) {// alpha 1.0
                 filledcolor = i;
                 break;
             }
@@ -276,7 +276,7 @@ void Mod_FloodFillSkin(qColor8_p skin, int skinwidth, int skinheight) {
 
     qColor8_t fillcolor = *skin; // assume this is the pixel to fill
     // can't fill to filled color or to transparent color (used as visited marker)
-    if ((fillcolor.i == filledcolor) || (fillcolor.i == TRANSPARENT_COLOR)) {
+    if ((fillcolor.i == filledcolor) || (fillcolor.i == InkTransp)) {
         //printf( "not filling skin from %d to %d\n", fillcolor, filledcolor );
         return;
     }

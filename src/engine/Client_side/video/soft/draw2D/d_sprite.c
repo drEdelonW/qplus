@@ -131,7 +131,7 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
 
             do {
                 qColor8_t btemp = *(cacheblock + FIXED16_TO_INT(s) + FIXED16_TO_INT(t) * cachewidth);
-                if ((btemp.i != TRANSPARENT_COLOR) &&
+                if ((btemp.i != InkTransp) &&
                     (*pz <= FIXED16_TO_INT(izi))
                     ) {
                     *pz = FIXED16_TO_INT(izi);

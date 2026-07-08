@@ -102,10 +102,10 @@ static uint8_p vid_surfcache;
 static int  vid_surfcachesize;
 static int  VID_highhunkmark;
 
-uint8_t vid_curpal[256 * 3];
+palette_t vid_curpal;
 
-uint16_t d_8to16table[256];
-Rgb24_t     d_8to24table[256];
+uint16_t d_8to16table[InksNum];
+Rgb24_t     d_8to24table[InksNum];
 
 int     driver = grDETECT, mode;
 bool    useWinDirect = true, useDirectDraw = true;
@@ -205,10 +205,8 @@ ClearAllStates
 ================
 */
 void ClearAllStates() {
-    int  i;
-
     // send an up event for each key, to make sure the server clears them all
-    for (i = 0; i < 256; i++) {
+    for (int i = 0; i < MAX_KEYS; i++) {
         Key_Event(i, false);
     }
 
@@ -1662,8 +1660,8 @@ void VID_ForceLockState(int lk) {
 
 
 void VID_SetPalette(uint8_p palette) {
-    INT   i;
-    palette_t pal[256];
+    INT     i;
+    palette_t pal;
     HDC   hdc;
 
     if (!Minimized) {
@@ -1685,7 +1683,7 @@ void VID_SetPalette(uint8_p palette) {
 
         // Translate the palette values to an MGL palette array and
         // set the values.
-        for (i = 0; i < 256; i++) {
+        for (i = 0; i < InksNum; i++) {
             pal[i].red = palette[i * 3];
             pal[i].green = palette[i * 3 + 1];
             pal[i].blue = palette[i * 3 + 2];
@@ -1695,20 +1693,20 @@ void VID_SetPalette(uint8_p palette) {
             if (!mgldc)
                 return;
 
-            MGL_setPalette(mgldc, pal, 256, 0);
-            MGL_realizePalette(mgldc, 256, 0, false);
+            MGL_setPalette(mgldc, pal, InksNum, 0);
+            MGL_realizePalette(mgldc, InksNum, 0, false);
             if (memdc)
-                MGL_setPalette(memdc, pal, 256, 0);
+                MGL_setPalette(memdc, pal, InksNum, 0);
         }
         else {
             if (!windc)
                 return;
 
-            MGL_setPalette(windc, pal, 256, 0);
-            MGL_realizePalette(windc, 256, 0, false);
+            MGL_setPalette(windc, pal, InksNum, 0);
+            MGL_realizePalette(windc, InksNum, 0, false);
             if (dibdc) {
-                MGL_setPalette(dibdc, pal, 256, 0);
-                MGL_realizePalette(dibdc, 256, 0, false);
+                MGL_setPalette(dibdc, pal, InksNum, 0);
+                MGL_realizePalette(dibdc, InksNum, 0, false);
             }
         }
     }
@@ -1934,9 +1932,9 @@ void VID_Init(uint8_p palette) {
 
     // GDI doesn't let us remap palette index 0, so we'll remap color
     // mappings from that black to another one
-    bestmatchmetric = 256 * 256 * 3;
+    bestmatchmetric = 256 * PalRawDIM;
 
-    for (i = 1; i < 256; i++) {
+    for (i = 1; i < InksNum; i++) {
         dr = palette[0] - palette[i * 3];
         dg = palette[1] - palette[i * 3 + 1];
         db = palette[2] - palette[i * 3 + 2];

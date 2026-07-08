@@ -61,20 +61,26 @@ typedef struct {
 typedef qColor16_t* qColor16_p;
 
 
-#if 0
-typedef uint8_t pixel_t;
-#else
-typedef struct {
-    uint8_t i;
-} qColor8_t;
-#endif
-typedef qColor8_t* qColor8_p;
+
 // !!! must be kept the same as in quakeasm.h !!!
+typedef enum {
+    InkConTransp    = 0x00,  /* console symbol transparent color */
+    InkTransp       = 0xFF,  /* texture transparent color */
+    InksNum         = 256,   /* number of colors in palette space */
+} InkIdx_t;
+
+typedef struct {
+    uint8_t i;  // InkIdx_t but uint8_t size
+} qColor8_t;    STATIC_ASSERT_SIZE(qColor8_t, 1); // 1
+typedef qColor8_t* qColor8_p;
 
 #if 1 /* =====================[ Palette ]=====================*/
-#define TRANSPARENT_COLOR (0xFF)
-#define InksNum     (256)               /* number of colors in palette */
 #define PalRawDIM   (InksNum * RGB_DIM) /* 256 * 3 = 768 */
+
+typedef struct {
+    qColor8_t pal[InksNum];
+} palMap_t;
+typedef palMap_t* palMap_p;
 
 typedef struct {
     union {
@@ -86,8 +92,9 @@ typedef palette_t* palette_p;
 #endif /* ====================={ Palette end }=====================*/
 
 extern palette_p host_basepal;
-extern Rgb16_t   d_8to16table[256];
-extern Rgb24_t   d_8to24table[256]; // 0xAABBGGRR
+extern Rgb16_t   d_8to16table[InksNum];	// not used in 8 bpp mode
+extern Rgb24_t   d_8to24table[InksNum];	// not used in 8 bpp mode // 0xAABBGGRR
+
 
 #ifdef __cplusplus
 extern "C" {

@@ -91,7 +91,7 @@ int     vid_modenum = NO_MODE;
 int     vid_realmode;
 int     vid_default = MODE_WINDOWED;
 static int  windowed_default;
-uint8_t vid_curpal[256 * 3];
+palette_t vid_curpal;
 static bool fullsbardraw = false;
 
 static float vid_gamma = 1.0;
@@ -107,8 +107,8 @@ HWND WINAPI InitializeWindow(HINSTANCE hInstance, int nCmdShow);
 
 VidDef_t    vid;                // global video state
 
-Rgb16_t     d_8to16table[256];
-Rgb24_t     d_8to24table[256];
+Rgb16_t     d_8to16table[InksNum];
+Rgb24_t     d_8to24table[InksNum];
 qColor8_t   d_15to8table[0x10000u];
 
 modestate_t    modestate = MS_UNINIT;
@@ -623,7 +623,7 @@ void    VID_SetPalette(uint8_p palette) {
     //
     uint8_p pal = palette;
     uint32_p table = d_8to24table;
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < InksNum; i++) {
         uint32_t r = pal[0];
         uint32_t g = pal[1];
         uint32_t b = pal[2];
@@ -651,7 +651,7 @@ void    VID_SetPalette(uint8_p palette) {
         pal = (uint8_p)d_8to24table;
         int k = 0;
         int l = 10000 * 10000;
-        for (int v = 0; v < 256; v++, pal += 4) {
+        for (int v = 0; v < InksNum; v++, pal += 4) {
             int r1 = r - pal[0];
             int g1 = g - pal[1];
             int b1 = b - pal[2];
@@ -806,7 +806,7 @@ ClearAllStates
 */
 void ClearAllStates() {
     // send an up event for each key, to make sure the server clears them all
-    for (inti = 0; i < 256; i++) {
+    for (int i = 0; i < MAX_KEYS; i++) {
         Key_Event(i, false);
     }
 
@@ -1302,7 +1302,7 @@ bool VID_Is8bit() {
 
 void VID_Init8bitPalette() {
     // Check for 8bit Extensions and initialize them.
-    char thePalette[256 * 3];
+    palette_t thePalette;
 
     glColorTableEXT = (TypeLess_ptr)wglGetProcAddress("glColorTableEXT");
     if (!glColorTableEXT || strstr(gl_extensions, "GL_EXT_shared_texture_palette") ||
@@ -1313,7 +1313,7 @@ void VID_Init8bitPalette() {
     glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
     int8_p oldPalette = (int8_p)d_8to24table; //d_8to24table3dfx;
     int8_p newPalette = thePalette;
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < InksNum; i++) {
         *newPalette++ = *oldPalette++;
         *newPalette++ = *oldPalette++;
         *newPalette++ = *oldPalette++;

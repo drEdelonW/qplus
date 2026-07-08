@@ -36,8 +36,8 @@ static uint8_t _vidBuf[BASEWIDTH * BASEHEIGHT] PLACE_TO_SDRAM;
 static int16_t _zBuf[BASEWIDTH * BASEHEIGHT] PLACE_TO_SDRAM;
 static uint8_t _surfCache[256 * 1024] PLACE_TO_SDRAM;
 
-Rgb16_t d_8to16table[256];
-Rgb24_t d_8to24table[256];
+Rgb16_t d_8to16table[InksNum];
+Rgb24_t d_8to24table[InksNum];
 
 __weak void VID_SetPalette(palette_p palette) {}
 __weak void VID_ShiftPalette(palette_p palette) {}

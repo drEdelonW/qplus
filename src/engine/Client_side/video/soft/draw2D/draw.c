@@ -294,7 +294,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u++)
-                    if ((tbyte = source[u]).i != TRANSPARENT_COLOR)
+                    if ((tbyte = source[u]).i != InkTransp)
                         dest[u] = tbyte;
 
                 dest += vid.rowbytes;
@@ -305,7 +305,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u += 8)
                     for (int i = 0; i < 8; i++)
-                        if ((tbyte = source[u + i]).i != TRANSPARENT_COLOR)
+                        if ((tbyte = source[u + i]).i != InkTransp)
                             dest[u + i] = tbyte;
 
                 dest += vid.rowbytes;
@@ -320,7 +320,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
                 uint8_t tbyte = source[u].i;
-                if (tbyte != TRANSPARENT_COLOR)
+                if (tbyte != InkTransp)
                     pusdest[u] = d_8to16table[tbyte];
             }
 
@@ -356,7 +356,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u++)
-                    if ((tbyte = source[u]).i != TRANSPARENT_COLOR)
+                    if ((tbyte = source[u]).i != InkTransp)
                         dest[u] = translation->pal[tbyte.i];
 
                 dest += vid.rowbytes;
@@ -367,7 +367,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
             for (int v = 0; v < pic->height; v++) {
                 for (int u = 0; u < pic->width; u += 8)
                     for (int i = 0; i < 8; i++)
-                        if ((tbyte = source[u + i]).i != TRANSPARENT_COLOR)
+                        if ((tbyte = source[u + i]).i != InkTransp)
                             dest[u + i] = translation->pal[tbyte.i];
 
                 dest += vid.rowbytes;
@@ -383,7 +383,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
             for (int u = 0; u < pic->width; u++) {
                 tbyte = source[u];
 
-                if (tbyte.i != TRANSPARENT_COLOR)
+                if (tbyte.i != InkTransp)
                     pusdest[u] = d_8to16table[tbyte.i];
             }
 
@@ -496,7 +496,7 @@ void R_DrawRect8(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) 
         for (int i = 0; i < prect->height; i++) {
             for (int j = 0; j < prect->width; j++) {
                 qColor8_t t = *psrc;
-                if (t.i != TRANSPARENT_COLOR)
+                if (t.i != InkTransp)
                     *pdest = t;
 
                 psrc++;
@@ -536,7 +536,7 @@ void R_DrawRect16(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent)
         for (int i = 0; i < prect->height; i++) {
             for (int j = 0; j < prect->width; j++) {
                 t = *psrc;
-                if (t.i != TRANSPARENT_COLOR)
+                if (t.i != InkTransp)
                     *pdest = d_8to16table[t.i];
 
                 psrc++;

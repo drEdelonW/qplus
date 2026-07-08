@@ -385,9 +385,9 @@ void Draw_Init() {
 
     // load the console background and the charset by hand, because we need to write the version string into the background before turning it into a texture
     _drawChars = W_GetLumpName("conchars");
-    for (int i = 0; i < 256 * 64; i++)
+    for (int i = 0; i < InksNum * 64; i++)
         if (_drawChars[i].i == 0)
-            _drawChars[i].i = TRANSPARENT_COLOR; // proper transparent color
+            _drawChars[i].i = InkTransp; // proper transparent color
 
     // now turn them into textures
     char_texture = GL_LoadTexture("charset", 128, 128, _drawChars, false, true);
@@ -1007,7 +1007,7 @@ void GL_Upload8_EXT(qColor8_p data, int width, int height, bool mipmap, bool alp
     if (alpha) {
         bool noalpha = true;
         for (int i = 0; i < s; i++) {
-            if (data[i].i == TRANSPARENT_COLOR)
+            if (data[i].i == InkTransp)
                 noalpha = false;
         }
 
@@ -1114,7 +1114,7 @@ void GL_Upload8(
         bool noalpha = true;
         for (int i = 0; i < s; i++) {
             qColor8_t p = data[i];
-            if (p.i == TRANSPARENT_COLOR) noalpha = false;
+            if (p.i == InkTransp)       noalpha = false;
             _trans[i] = d_8to24table[p.i];
         }
 

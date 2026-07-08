@@ -90,7 +90,7 @@ typedef struct {
 } keymap_t;
 
 VidDef_t vid; // global video state
-Rgb16_t d_8to16table[256];
+Rgb16_t d_8to16table[InksNum];
 
 int  num_shades = 32;
 
@@ -179,7 +179,7 @@ Keybinding command
 =================
 */
 
-byte vid_gamma[256];
+palMap_t vid_gamma;
 
 void VID_Gamma_f() {
 
@@ -377,7 +377,7 @@ void VID_Init(uint8_p palette) {
     if (pipe(render_pipeline) < 0)
         Sys_Error("VID_Init: pipe");
 
-    for (i = 0; i < 256; i++)
+    for (i = 0; i < InksNum; i++)
         vid_gamma[i] = i;
 
     vid.scr.width = 320;
@@ -688,19 +688,19 @@ void VID_ShiftPalette(uint8_p p) {
 void VID_SetPalette(uint8_p palette) {
 
     int i;
-    XColor colors[256];
+    XColor colors[InksNum];
 
     if (x_visinfo->class == PseudoColor && x_visinfo->depth == 8) {
         if (palette != current_palette)
             memcpy(current_palette, palette, 768);
-        for (i = 0; i < 256; i++) {
+        for (i = 0; i < InksNum; i++) {
             colors[i].pixel = i;
             colors[i].flags = DoRed | DoGreen | DoBlue;
             colors[i].red = vid_gamma[palette[i * 3]] * 257;
             colors[i].green = vid_gamma[palette[i * 3 + 1]] * 257;
             colors[i].blue = vid_gamma[palette[i * 3 + 2]] * 257;
         }
-        XStoreColors(x_disp, x_cmap, colors, 256);
+        XStoreColors(x_disp, x_cmap, colors, InksNum);
     }
 
 }

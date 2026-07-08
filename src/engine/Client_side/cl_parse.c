@@ -480,17 +480,11 @@ void CL_NewTranslation(int32_t slot) {
         (slot > cl.maxclients)
         )   Host_SysError("CL_NewTranslation: bad slot %d (max %d)", slot, cl.maxclients);
 
-#if 0
-    ColorMap_p dest = &cl.scores[slot].translations;
-    ColorMap_p source = vid.colormap;
 
-    memcpy(dest, source, sizeof(ColorMap_t));
-#else
     cl.scores[slot].translations = *vid.colormap;
 
     qColor8_p dest = cl.scores[slot].translations.raw;  // TODO: rework next skin translation
     qColor8_p source = vid.colormap->raw;
-#endif
 
     int top = (cl.scores[slot].colors & 0xF0);       // tshort
     int bottom = (cl.scores[slot].colors & 0x0F) << 4;  // pents
@@ -498,7 +492,7 @@ void CL_NewTranslation(int32_t slot) {
     R_TranslatePlayerSkin(slot);
 #endif
 
-    for (int i = 0; i < VID_GRADES; i++, dest += 256, source += 256) {
+    for (int i = 0; i < VID_GRADES; i++, dest += InksNum, source += InksNum) {
         if (top < 128) // the artists made some backwards ranges.  sigh.
             memcpy(dest + TOP_RANGE, source + top, 16);
         else

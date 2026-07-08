@@ -49,8 +49,8 @@ static GLXContext _ctx = NULL;
 #define X_MASK (KEY_MASK | MOUSE_MASK | VisibilityChangeMask | StructureNotifyMask )
 
 
-Rgb16_t     d_8to16table[256];
-Rgb24_t     d_8to24table[256];
+Rgb16_t     d_8to16table[InksNum];
+Rgb24_t     d_8to24table[InksNum];
 qColor8_t   d_15to8table[0x10000u];
 
 cvar_t    vid_mode = { "vid_mode","0",false };
@@ -458,17 +458,17 @@ void InitSig() {
     signal(SIGTERM, signal_handler);
 }
 
-void VID_ShiftPalette(uint8_p p) {
+void VID_ShiftPalette(palette_p p) {
     // VID_SetPalette(p);
 }
 
-void VID_SetPalette(uint8_p palette) {
+void VID_SetPalette(palette_p palette) {
     //
     // 8 8 8 encoding
     //
     uint8_p pal = palette;
     uint32_p table = d_8to24table;
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < InksNum; i++) {
         uint32_t r = pal[0];
         uint32_t g = pal[1];
         uint32_t b = pal[2];
@@ -479,7 +479,7 @@ void VID_SetPalette(uint8_p palette) {
             (g << 8) |
             (b << 16) |
             (0xFF << 24);
-            
+
         *table++ = v;
     }
     d_8to24table[255] &= 0xffffff;    // 255 is transparent

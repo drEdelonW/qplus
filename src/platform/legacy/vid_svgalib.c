@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define stringify(m) { #m, m }
 
-Rgb16_t       d_8to16table[256];
+Rgb16_t       d_8to16table[InksNum];
 static uint8_p vid_surfcache;
 static int  VID_highhunkmark;
 
@@ -310,8 +310,9 @@ void VID_InitModes() {
     // filter for modes i don't support
 
     for (i = 0; i < num_modes; i++) {
-        if (modes[i].bytesperpixel != 1 && modes[i].colors != 256)
-            modes[i].width = 0;
+        if ((modes[i].bytesperpixel != 1) &&
+            (modes[i].colors != 256)
+            )   modes[i].width = 0;
     }
 
 }
@@ -407,7 +408,7 @@ void VID_ShiftPalette(uint8_p p) {
 
 void VID_SetPalette(uint8_p palette) {
 
-    static int tmppal[256 * 3];
+    static palette_t tmppal;
     int* tp;
     int i;
 
@@ -416,14 +417,14 @@ void VID_SetPalette(uint8_p palette) {
 
     memcpy(vid_current_palette, palette, sizeof(vid_current_palette));
 
-    if (vga_getcolors() == 256) {
+    if (vga_getcolors() == InksNum) {
 
         tp = tmppal;
-        for (i = 256 * 3; i; i--)
+        for (i = PalRawDIM; i; i--)
             *(tp++) = *(palette++) >> 2;
 
         if (UseDisplay && vga_oktowrite())
-            vga_setpalvec(0, 256, tmppal);
+            vga_setpalvec(0, InksNum, tmppal);
 
     }
 }

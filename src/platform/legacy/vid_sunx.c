@@ -40,14 +40,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 CVAR_ARC(m_filter, "0");
 
-bool        mouse_avail;
-int             mouse_buttons = 3;
-int             mouse_oldbuttonstate;
-int             mouse_buttonstate;
+bool    mouse_avail;
+int     mouse_buttons = 3;
+int     mouse_oldbuttonstate;
+int     mouse_buttonstate;
 float   mouse_x, mouse_y;
 float   old_mouse_x, old_mouse_y;
-int p_mouse_x;
-int p_mouse_y;
+int     p_mouse_x;
+int     p_mouse_y;
 bool    mouse_grabbed = false; // we grab it when console is up
 
 int        VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
@@ -68,31 +68,26 @@ typedef struct {
 } MotifWmHints;
 
 #define MAX_COLUMN_SIZE    11
-
 #define MAX_MODEDESCS    (MAX_COLUMN_SIZE*3)
 
-typedef struct
-{
-    int        modenum;
-    int        iscur;
+typedef struct {
+    int     modenum;
+    int     iscur;
     char    desc[256];
 } modedesc_t;
 
 
-typedef struct
-{
+typedef struct {
     int input;
     int output;
 } keymap_t;
 
 VidDef_t vid; // global video state
-Rgb16_t d_8to16table[256];
+Rgb16_t d_8to16table[InksNum];
 
-int        num_shades = 32;
-
-int    d_con_indirect = 0;
-
-int        vid_buffersize;
+int num_shades = 32;
+int d_con_indirect = 0;
+int vid_buffersize;
 
 #define STD_EVENT_MASK \
 ( KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | \
@@ -135,8 +130,8 @@ static uint8_t current_palette[768];
 
 typedef uint16_t PIXEL16;
 typedef uint32_t PIXEL24;
-static PIXEL16 st2d_8to16table[256];
-static PIXEL24 st2d_8to24table[256];
+static PIXEL16 st2d_8to16table[InksNum];
+static PIXEL24 st2d_8to24table[InksNum];
 static int8_t r_shift, g_shift, b_shift;   // should be signed because (-8)
 static uint32_t r_mask, g_mask, b_mask;
 
@@ -293,7 +288,7 @@ Keybinding command
 =================
 */
 
-byte vid_gamma[256];
+palMap_t vid_gamma[InksNum];
 
 void VID_Gamma_f() {
 
@@ -531,7 +526,7 @@ void    VID_Init(uint8_p palette) {
     int template_mask;
 
     Cmd_AddCommand("gamma", VID_Gamma_f);
-    for (i = 0; i < 256; i++)
+    for (i = 0; i < InksNum; i++)
         vid_gamma[i] = i;
 
     vid.scr.width = 320;
@@ -746,31 +741,31 @@ void    VID_Init(uint8_p palette) {
 
 }
 
-void VID_ShiftPalette(uint8_p p) {
+void VID_ShiftPalette(palette_p p) {
     VID_SetPalette(p);
 }
 
-void VID_SetPalette(uint8_p palette) {
+void VID_SetPalette(palette_p palette) {
 
     int i;
-    XColor colors[256];
+    XColor colors[InksNum];
 
-    for (i = 0;i < 256;i++) {
+    for (i = 0;i < InksNum;i++) {
         st2d_8to16table[i] = xlib_rgb16(palette[i * 3], palette[i * 3 + 1], palette[i * 3 + 2]);
         st2d_8to24table[i] = xlib_rgb24(palette[i * 3], palette[i * 3 + 1], palette[i * 3 + 2]);
     }
 
     if (x_visinfo->class == PseudoColor && x_visinfo->depth == 8) {
         if (palette != current_palette)
-            memcpy(current_palette, palette, 768);
-        for (i = 0; i < 256; i++) {
+            memcpy(current_palette, palette, PalRawDIM);
+        for (i = 0; i < InksNum; i++) {
             colors[i].pixel = i;
             colors[i].flags = DoRed | DoGreen | DoBlue;
             colors[i].red = vid_gamma[palette[i * 3]] * 257;
             colors[i].green = vid_gamma[palette[i * 3 + 1]] * 257;
             colors[i].blue = vid_gamma[palette[i * 3 + 2]] * 257;
         }
-        XStoreColors(x_disp, x_cmap, colors, 256);
+        XStoreColors(x_disp, x_cmap, colors, InksNum);
     }
 
 }

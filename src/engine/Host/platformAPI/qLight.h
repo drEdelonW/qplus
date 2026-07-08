@@ -8,11 +8,6 @@
 #define ColormapDIM (VID_GRADES * InksNum)  /* 64 * 256 = 16384 */
 
 typedef struct {
-    qColor8_t pal[InksNum];
-} palMap_t;
-typedef palMap_t* palMap_p;
-
-typedef struct {
     union {
         palMap_t    illum[VID_GRADES];
         qColor8_t   raw[ColormapDIM];

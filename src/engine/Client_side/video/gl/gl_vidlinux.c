@@ -40,8 +40,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 static fxMesaContext _fc = NULL;
 #define stringify(m) { #m, m }
 
-Rgb16_t     d_8to16table[256];
-Rgb24_t     d_8to24table[256];
+Rgb16_t     d_8to16table[InksNum];
+Rgb24_t     d_8to24table[InksNum];
 qColor8_t   d_15to8table[0x10000u];
 
 int num_shades = 32;
@@ -214,7 +214,7 @@ void    VID_SetPalette(uint8_p palette) {
     //
     pal = palette;
     table = d_8to24table;
-    for (i = 0; i < 256; i++) {
+    for (i = 0; i < InksNum; i++) {
         r = pal[0];
         g = pal[1];
         b = pal[2];
@@ -237,7 +237,7 @@ void    VID_SetPalette(uint8_p palette) {
         g = ((i & 0x03E0) >> 2) + 4;
         b = ((i & 0x7C00) >> 7) + 4;
         pal = (uint8_p)d_8to24table;
-        for (v = 0, k = 0, bestdist = 10000 * 10000; v < 256; v++, pal += 4) {
+        for (v = 0, k = 0, bestdist = 10000 * 10000; v < InksNum; v++, pal += 4) {
             r1 = (int)r - (int)pal[0];
             g1 = (int)g - (int)pal[1];
             b1 = (int)b - (int)pal[2];
@@ -508,17 +508,17 @@ void VID_Init8bitPalette() {
 
     if (strstr(gl_extensions, "3DFX_set_global_palette") &&
         (qgl3DfxSetPaletteEXT = dlsym(prjobj, "gl3DfxSetPaletteEXT")) != NULL) {
-        GLubyte table[256][4];
+        GLubyte table[InksNum][4];
         int8_p oldpal;
 
         Con_SafePrintf("... Using 3DFX_set_global_palette\n");
         glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
         oldpal = (int8_p)d_8to24table; //d_8to24table3dfx;
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < InksNum; i++) {
             table[i][2] = *oldpal++;
             table[i][1] = *oldpal++;
             table[i][0] = *oldpal++;
-            table[i][3] = 255;
+            table[i][3] = InkTransp;
             oldpal++;
         }
         qgl3DfxSetPaletteEXT((GLuint*)table);
@@ -527,7 +527,7 @@ void VID_Init8bitPalette() {
     }
     else if (strstr(gl_extensions, "GL_EXT_shared_texture_palette") &&
         (qglColorTableEXT = dlsym(prjobj, "glColorTableEXT")) != NULL) {
-        char thePalette[256 * 3];
+        palette_t thePalette;
         int8_p oldPalette;
         int8_p newPalette;
 
@@ -535,7 +535,7 @@ void VID_Init8bitPalette() {
         glEnable(GL_SHARED_TEXTURE_PALETTE_EXT);
         oldPalette = (int8_p)d_8to24table; //d_8to24table3dfx;
         newPalette = thePalette;
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < InksNum; i++) {
             *newPalette++ = *oldPalette++;
             *newPalette++ = *oldPalette++;
             *newPalette++ = *oldPalette++;
@@ -565,10 +565,7 @@ static void Check_Gamma(uint8_p pal) {
     for (int i = 0; i < 768; i++) {
         float f = pow((pal[i] + 1) / 256.0, _vidGamma);
         float inf = f * 255 + 0.5;
-        if (inf < 0)
-            inf = 0;
-        if (inf > 255)
-            inf = 255;
+        CLAMP(0, &inf, 255);
         palette[i] = inf;
     }
 
