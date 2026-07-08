@@ -50,6 +50,8 @@ int errorterm;
 int erroradjustup;
 int erroradjustdown;
 
+ColorMap_p acolormap;
+ColorMap_p d_pcolormap;
 
 typedef struct {
     int  isflattop;     // TODO: not used
@@ -61,9 +63,6 @@ typedef struct {
 typedef EdgeTable_t* EdgeTable_p;
 
 static VertAttr_t _p[3];
-
-ColorMap_p acolormap;  // TODO: is it kind of array?
-ColorMap_p d_pcolormap;// TODO: is it kind of array?
 
 int   d_aflatcolor;
 int   d_xdenom;
@@ -162,8 +161,8 @@ static adivtab_t _aDivTab[32 * 32] = {
 #include "adivtab.h"
 };
 
-uint8_p skintable[MAX_LBM_HEIGHT];
-uint8_p skinstart;
+qColor8_p skintable[MAX_LBM_HEIGHT]; // ARRAY OF POINTERS
+qColor8_p skinstart;
 int  skinwidth;
 
 void D_PolysetDrawSpans8(SpanPackage_p pspanpackage);
@@ -214,9 +213,8 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts) {
             if (z >= *zbuf) {
                 *zbuf = z;
                 d_viewbuffer[d_scantable[fv->vAttr.y] + fv->vAttr.x] =
-                    acolormap->raw[
-                        skintable[FIXED16_TO_INT(fv->vAttr.t)][FIXED16_TO_INT(fv->vAttr.s)] +
-                            (fv->vAttr.light & 0xFF00)
+                    acolormap->raw[(fv->vAttr.light & 0xFF00) +
+                    skintable[FIXED16_TO_INT(fv->vAttr.t)][FIXED16_TO_INT(fv->vAttr.s)].i
                     ];
             }
         }
@@ -318,20 +316,20 @@ void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) 
     int d;
     if (
         (
-            ((d = lp2->x - lp1->x) < -1) ||
+            ((d = (lp2->x - lp1->x)) < -1) ||
             (d > 1)) ||
         (
-            ((d = lp2->y - lp1->y) < -1) ||
+            ((d = (lp2->y - lp1->y)) < -1) ||
             (d > 1))
         ) {
         /*  no rotation needed. do nothing */
     }
     else  if (
         (
-            ((d = lp3->x - lp2->x) < -1) ||
+            ((d = (lp3->x - lp2->x)) < -1) ||
             (d > 1)) ||
         (
-            ((d = lp3->y - lp2->y) < -1) ||
+            ((d = (lp3->y - lp2->y)) < -1) ||
             (d > 1))
         ) {
             {   // rotate
@@ -343,10 +341,10 @@ void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) 
     }
     else if (
         (
-            ((d = lp1->x - lp3->x) < -1) ||
+            ((d = (lp1->x - lp3->x)) < -1) ||
             (d > 1)) ||
         (
-            ((d = lp1->y - lp3->y) < -1) ||
+            ((d = (lp1->y - lp3->y)) < -1) ||
             (d > 1))
         ) {
             {   // rotate opposite
@@ -371,9 +369,8 @@ void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) 
     };
     if ((_new.y < 0) ||
         (_new.x < 0)
-        ) {
-        return;
-    }
+        )   return;
+
     // draw the point if splitting a leading edge
     if (
         !(
@@ -393,8 +390,8 @@ void D_PolysetRecursiveTriangle(VertAttr_p lp1, VertAttr_p lp2, VertAttr_p lp3) 
         int16_p zbuf = zspantable[_new.y] + _new.x;
         if (z >= *zbuf) {
             *zbuf = z;
-            qColor8_t t = d_pcolormap->raw[skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)]];
-            d_viewbuffer[d_scantable[_new.y] + _new.x] = t;
+            d_viewbuffer[d_scantable[_new.y] + _new.x] =
+                d_pcolormap->raw[skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)].i];
         }
     }
     // recursively continue
@@ -416,7 +413,7 @@ void D_PolysetUpdateTables() {
         ) {
         skinwidth = r_affinetridesc.skinwidth;
         skinstart = r_affinetridesc.pskin;
-        uint8_p s = skinstart;
+        qColor8_p s = skinstart;
         for (int i = 0; i < MAX_LBM_HEIGHT; i++, s += skinwidth)
             skintable[i] = s;
     }
@@ -482,10 +479,8 @@ D_PolysetSetUpForLineScan
 ====================
 */
 void D_PolysetSetUpForLineScan(
-    int startvertu,
-    int startvertv,
-    int endvertu,
-    int endvertv
+    int startvertu, int startvertv,
+    int endvertu, int endvertv
 ) {
     // TODO: implement x86 version
 
@@ -639,7 +634,7 @@ D_PolysetFillSpans8
 */
 void D_PolysetFillSpans8(SpanPackage_p pspanpackage) {
     // FIXME: do z buffering
-    qColor8_t color = {  .i = d_aflatcolor++ };
+    qColor8_t color = { .i = d_aflatcolor++ };
 
     while (1) {
         int lcount = pspanpackage->count;
@@ -787,7 +782,6 @@ void D_RasterizeAliasPolySmooth() {
         d_snap.pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
 
         if (height == 1) {
-
             *d_pedgespanpackage = d_snap;
             d_pedgespanpackage++;
         }
@@ -882,7 +876,7 @@ void D_RasterizeAliasPolySmooth() {
 }
 
 
-#if 0
+#if 0 /* it was disabled */
 
 void D_PolysetRecursiveDrawLine(VertAttr_p lp1, VertAttr_p lp2) {
     {
