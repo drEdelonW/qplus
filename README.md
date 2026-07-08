@@ -167,6 +167,20 @@ On ARM hosts (e.g. flashing/debugging from a Raspberry Pi) distro packages may b
 - MSYS2 / MinGW-w64 for `quakeWin`
 - [Xming](https://sourceforge.net/projects/xming/) (or another X server) when running X11 builds
 
+### Linux / macOS — cross-compiling `quakeWin`
+
+`quakeWin` (`DST_PLATFORM=WIN`) cross-compiles from a Linux or macOS host via mingw-w64 — no native Windows machine needed:
+
+```bash
+# Linux (Debian/Ubuntu/Raspbian)
+sudo apt install mingw-w64
+
+# macOS
+brew install mingw-w64
+```
+
+`GCC_tools_WIN.mk` picks the `i686-w64-mingw32-`/`x86_64-w64-mingw32-` prefix automatically based on `FORCE_32`.
+
 ## Building
 
 All commands run from `GNU_MAKE/`:

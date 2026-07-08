@@ -1,4 +1,4 @@
-DST_PLATFORM := PC
+DST_PLATFORM := WIN
 
 INCLUDES += $(SRC_DIR)/platform/Windows
 # INCLUDES += $(IDSRC_DIR)

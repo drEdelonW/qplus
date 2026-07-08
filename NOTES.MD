@@ -32,10 +32,12 @@
     clear ; \
     make TARGET=quakeX11 fresh && \
     make TARGET=quakeGLX11 fresh && \
+    make TARGET=quakeWin fresh && \
     make TARGET=quakeSTM32 fresh
 
     make TARGET=quakeX11 && \
-    make TARGET=quakeGLX11
+    make TARGET=quakeGLX11 && \
+    make TARGET=quakeWin
 
     make && make stupload && make stdebug
 ```

@@ -651,7 +651,7 @@ typedef void  Span_t;
 #endif
 
 typedef struct {
-    rect_t      rect;   /* Bounding rectangle for region  */
+    rect_t  rect;   /* Bounding rectangle for region  */
     Span_t* spans;   /* Start of span list for region  */
 } region_t;
 

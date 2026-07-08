@@ -1,4 +1,4 @@
-DST_PLATFORM := PC
+DST_PLATFORM := POSIX
 
 INCLUDES += $(SRC_DIR)
 $(eval SDL_DIR = $(SRC_DIR)/srcSDL2) $(eval INCLUDES += $(SDL_DIR))
