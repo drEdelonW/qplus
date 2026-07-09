@@ -52,6 +52,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // only the refresh window will be updated unless these variables are flagged
 typedef struct {
     vRect_t vrect;  // 3D viewport rectangle on screen
+
     LegDt_t    centertime_off;
     int32_t con_current;
     int32_t conlines;       // lines of console to display

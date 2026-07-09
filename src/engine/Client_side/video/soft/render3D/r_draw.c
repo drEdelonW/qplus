@@ -169,7 +169,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         v = em.ceilv;
         v2 = _r.ceilv - 1;
 
-        edge->surfs[0] = surface_p - surfaces;
+        edge->surfs[0] = pSurface - pSurfaces;
         edge->surfs[1] = 0;
 
         u_step = ((_r.u - em.u) / (_r.v - em.v));
@@ -181,7 +181,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         v = _r.ceilv;
 
         edge->surfs[0] = 0;
-        edge->surfs[1] = surface_p - surfaces;
+        edge->surfs[1] = pSurface - pSurfaces;
 
         u_step = ((em.u - _r.u) / (em.v - _r.v));
         u = _r.u + ((float)v - _r.v) * u_step;
@@ -311,8 +311,8 @@ R_EmitCachedEdge
 void R_EmitCachedEdge() {
     Edge_p pedge_t = (Edge_p)((uintptr_t)r_edges + (uintptr_t)_r_pedge->cachededgeoffset);
 
-    if (!pedge_t->surfs[0])     pedge_t->surfs[0] = surface_p - surfaces;
-    else                        pedge_t->surfs[1] = surface_p - surfaces;
+    if (!pedge_t->surfs[0])     pedge_t->surfs[0] = pSurface - pSurfaces;
+    else                        pedge_t->surfs[1] = pSurface - pSurfaces;
 
     if (pedge_t->nearzi > _r_nearzi) // for mipmap finding
         _r_nearzi = pedge_t->nearzi;
@@ -330,7 +330,7 @@ void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags) {
     static mEdge_t _tEdge;
 
     // skip out if no more surfs
-    if ((surface_p) >= surf_max) {
+    if ((pSurface) >= pSurf_max) {
         r_outofsurfaces++;
         return;
     }
@@ -461,14 +461,14 @@ void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags) {
 
     r_polycount++;
 
-    surface_p->data = (TypeLess_ptr)fa;
-    surface_p->nearzi = _r_nearzi;
-    surface_p->flags = fa->flags;
-    surface_p->insubmodel = insubmodel;
-    surface_p->spanstate = notInSpan;
-    surface_p->entity = currententity;
-    surface_p->key = r_currentkey++;
-    surface_p->spans = NULL;
+    pSurface->data = (TypeLess_ptr)fa;
+    pSurface->nearzi = _r_nearzi;
+    pSurface->flags = fa->flags;
+    pSurface->insubmodel = insubmodel;
+    pSurface->spanstate = notInSpan;
+    pSurface->entity = currententity;
+    pSurface->key = r_currentkey++;
+    pSurface->spans = NULL;
 
     mPlane_p pplane = fa->plane;
     // FIXME: cache this?
@@ -476,14 +476,14 @@ void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags) {
     // FIXME: cache this?
     float distinv = 1.0f / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
-    surface_p->d_zistepu = p_normal.x * xscaleinv * distinv;
-    surface_p->d_zistepv = -p_normal.y * yscaleinv * distinv;
-    surface_p->d_ziorigin = p_normal.z * distinv -
-        xcenter * surface_p->d_zistepu -
-        ycenter * surface_p->d_zistepv;
+    pSurface->d_zistepu = p_normal.x * xscaleinv * distinv;
+    pSurface->d_zistepv = -p_normal.y * yscaleinv * distinv;
+    pSurface->d_ziorigin = p_normal.z * distinv -
+        xcenter * pSurface->d_zistepu -
+        ycenter * pSurface->d_zistepv;
 
-    //JDC VectorCopy (r_worldmodelorg, surface_p->modelorg);
-    surface_p++;
+    //JDC VectorCopy (r_worldmodelorg, pSurface->modelorg);
+    pSurface++;
 }
 
 
@@ -496,7 +496,7 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
     static mEdge_t _tEdge;
 
     // skip out if no more surfs
-    if (surface_p >= surf_max) {
+    if (pSurface >= pSurf_max) {
         r_outofsurfaces++;
         return;
     }
@@ -561,14 +561,14 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
 
     r_polycount++;
 
-    surface_p->data = (TypeLess_ptr)psurf;
-    surface_p->nearzi = _r_nearzi;
-    surface_p->flags = psurf->flags;
-    surface_p->insubmodel = true;
-    surface_p->spanstate = notInSpan;
-    surface_p->entity = currententity;
-    surface_p->key = r_currentbkey;
-    surface_p->spans = NULL;
+    pSurface->data = (TypeLess_ptr)psurf;
+    pSurface->nearzi = _r_nearzi;
+    pSurface->flags = psurf->flags;
+    pSurface->insubmodel = true;
+    pSurface->spanstate = notInSpan;
+    pSurface->entity = currententity;
+    pSurface->key = r_currentbkey;
+    pSurface->spans = NULL;
 
     mPlane_p pplane = psurf->plane;
     // FIXME: cache this?
@@ -576,14 +576,14 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
     // FIXME: cache this?
     float distinv = 1.0f / (pplane->dist - DotProduct(modelorg, pplane->normal));
 
-    surface_p->d_zistepu = p_normal.x * xscaleinv * distinv;
-    surface_p->d_zistepv = -p_normal.y * yscaleinv * distinv;
-    surface_p->d_ziorigin = p_normal.z * distinv -
-        xcenter * surface_p->d_zistepu -
-        ycenter * surface_p->d_zistepv;
+    pSurface->d_zistepu = p_normal.x * xscaleinv * distinv;
+    pSurface->d_zistepv = -p_normal.y * yscaleinv * distinv;
+    pSurface->d_ziorigin = p_normal.z * distinv -
+        xcenter * pSurface->d_zistepu -
+        ycenter * pSurface->d_zistepv;
 
-    //JDC VectorCopy (r_worldmodelorg, surface_p->modelorg);
-    surface_p++;
+    //JDC VectorCopy (r_worldmodelorg, pSurface->modelorg);
+    pSurface++;
 }
 
 

@@ -160,7 +160,7 @@ void D_DrawSurfaces() {
 
     // TODO: could preset a lot of this at mode set time
     if (r_drawflat.value) {
-        for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++) {
+        for (Surf_p surf = &pSurfaces[1]; surf < pSurface; surf++) {
             if (!surf->spans)       continue;
 
             d_zistepu = surf->d_zistepu;
@@ -173,7 +173,7 @@ void D_DrawSurfaces() {
         }
     }
     else {
-        for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++) {
+        for (Surf_p surf = &pSurfaces[1]; surf < pSurface; surf++) {
             if (!surf->spans)       continue;
 
             r_drawnpolycount++;
@@ -210,7 +210,7 @@ void D_DrawSurfaces() {
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel()
-                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->origin);
+                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->pose.spot);
                     transformed_modelorg = TransformVector(local_modelorg);
 
                     R_RotateBmodel(); // FIXME: don't mess with the frustum,
@@ -240,7 +240,7 @@ void D_DrawSurfaces() {
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel()
-                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->origin);
+                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->pose.spot);
                     transformed_modelorg = TransformVector(local_modelorg);
 
                     R_RotateBmodel(); // FIXME: don't mess with the frustum,

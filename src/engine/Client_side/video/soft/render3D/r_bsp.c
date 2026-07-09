@@ -85,7 +85,7 @@ void R_RotateBmodel() {
     // TODO: share work with R_SetUpAliasTransform
 
     // yaw
-    float angle = currententity->angles.yaw;
+    float angle = currententity->pose.facing.yaw;
     angle = angle * M_PI * 2 / 360;
     float s = sin(angle);
     float c = cos(angle);
@@ -99,7 +99,7 @@ void R_RotateBmodel() {
             }
     };
     // pitch
-    angle = currententity->angles.pitch;
+    angle = currententity->pose.facing.pitch;
     angle = angle * M_PI * 2 / 360;
     s = sin(angle);
     c = cos(angle);
@@ -118,7 +118,7 @@ void R_RotateBmodel() {
     R_ConcatRotations(&temp2, &temp1, &temp3);
 
     // roll
-    angle = currententity->angles.roll;
+    angle = currententity->pose.facing.roll;
     angle = angle * M_PI * 2 / 360;
     s = sin(angle);
     c = cos(angle);

@@ -75,11 +75,11 @@ void Show() {
 #define VIEWANGLE_STEPS 128
 
 void R_TimeRefresh_f() {
-    int startangle = r_refdef.viewangles.yaw;
+    int startangle = r_refdef.view.facing.yaw;
 
     RealTime_t start = Host_FloatTime();
     for (int i = 0; i < VIEWANGLE_STEPS; i++) {
-        r_refdef.viewangles.yaw = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
+        r_refdef.view.facing.yaw = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
         VID_LockBuffer();
         R_RenderView();
@@ -99,7 +99,7 @@ void R_TimeRefresh_f() {
     RealDt_t time = stop - start;
     Con_Printf("%f seconds (%f fps)\n", time, VIEWANGLE_STEPS / time);
 
-    r_refdef.viewangles.yaw = startangle;
+    r_refdef.view.facing.yaw = startangle;
 }
 
 
@@ -147,7 +147,7 @@ void R_TimeGraph() {
     RealTime_t r_time2 = Host_FloatTime();
     int a = (r_time2 - r_time1) / 0.01;
     //a = fabs(mouse_y * 0.05);
-    //a = (int)((r_refdef.vieworg[2] + 1024)/1)%(int)r_graphheight.value;
+    //a = (int)((r_refdef.view.spot[2] + 1024)/1)%(int)r_graphheight.value;
     //a = fabs(velocity[0])/20;
     //a = ((int)fabs(origin[0])/8)%20;
     //a = (cl.idealpitch + 30)/5;
@@ -329,11 +329,11 @@ void R_SetupFrame() {
     }
 
     if (r_numsurfs.value) {
-        CLAMP_MIN(&r_maxsurfsseen, (surface_p - surfaces));
+        CLAMP_MIN(&r_maxsurfsseen, (pSurface - pSurfaces));
 
         Con_Printf("Used %d of %d surfs; %d max\n",
-            surface_p - surfaces,
-            surf_max - surfaces,
+            pSurface - pSurfaces,
+            pSurf_max - pSurfaces,
             r_maxsurfsseen
         );
     }
@@ -348,9 +348,9 @@ void R_SetupFrame() {
         );
     }
 
-    r_refdef.ambientlight = r_ambient.value;
+    r_refdef.ambientLight = r_ambient.value;
 
-    CLAMP_MIN(&r_refdef.ambientlight, 0);
+    CLAMP_MIN(&r_refdef.ambientLight, 0);
 
     if (!Host_IsServerActive())
         r_draworder.value = 0; // don't let cheaters look behind walls
@@ -365,15 +365,15 @@ void R_SetupFrame() {
 
     // debugging
 #if 0
-    r_refdef.vieworg = { .x = 80.0f, .y = 64.0f, .z = 40.0f };
-    r_refdef.viewangles = { .pitch = 0.0f, .yaw = 46.763641357, .roll = 0.0f };
+    r_refdef.view.spot = { .x = 80.0f, .y = 64.0f, .z = 40.0f };
+    r_refdef.view.facing = { .pitch = 0.0f, .yaw = 46.763641357, .roll = 0.0f };
 #endif
 
     // build the transformation matrix for the given view angles
-    modelorg = r_refdef.vieworg;
-    r_origin = r_refdef.vieworg;
+    modelorg = r_refdef.view.spot;
+    r_origin = r_refdef.view.spot;
 
-    BS = GetBasis(r_refdef.viewangles);
+    BS = GetBasis(r_refdef.view.facing);
     // current viewleaf
     r_oldviewleaf = r_viewleaf;
     r_viewleaf = Mod_PointInLeaf(r_origin, cl.worldmodel);

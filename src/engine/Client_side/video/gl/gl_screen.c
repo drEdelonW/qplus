@@ -226,7 +226,7 @@ needs almost the entire 256k of stack space!
 ==================
 */
 void SCR_UpdateScreen() {
-    if (scr.block_drawing)  return;
+    if (Scr.block_drawing)  return;
 
     vid.numpages = 2 + gl_triplebuffer.value;
 

@@ -307,15 +307,15 @@ void R_DrawSprite() {
     }
     else if (psprite->type == SPR_ORIENTED) {
         // generate the sprite's axes, according to the sprite's world orientation
-        r_spritedesc.bs = GetBasis(currententity->angles);
+        r_spritedesc.bs = GetBasis(currententity->pose.facing);
     }
     else if (psprite->type == SPR_VP_PARALLEL_ORIENTED) {
         // generate the sprite's axes, parallel to the viewplane, but rotated in
         // that plane around the center according to the sprite entity's roll
         // angle. So 'forward' stays the same, but 'right' and 'up' rotate
-        float angle = currententity->angles.roll * (M_PI * 2.0f / 360.0f);
-        float sr = sin(angle);
-        float cr = cos(angle);
+        float angle = currententity->pose.facing.roll * (M_PI * 2.0f / 360.0f);
+        float sr = sinf(angle);
+        float cr = cosf(angle);
 
         r_spritedesc.bs = (Basis_t){
             .forward = BS.forward,

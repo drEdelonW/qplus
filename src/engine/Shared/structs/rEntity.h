@@ -6,10 +6,10 @@
 #include "Model_pre.h"
 #include "eFrag_pre.h"
 #include "Node.h"
-#include "angle.h"
 #include "qLight.h"
-
+#include "pose.h"
 #include "StateHistory.h"
+
 // it was [entity_t] on render side
 struct r_Entity_s {
     bool    forcelink;      // model changed
@@ -17,10 +17,8 @@ struct r_Entity_s {
     EntityState_t baseline; // to fill in defaults in updates
     LegTime_t msgtime;      // time of last update
 
-    vec3_t  msg_origins[HistoryDepth]; // last two updates(Cur is newest)
-    vec3_t  origin;
-    ang3_t  msg_angles[HistoryDepth];  // last two updates(Cur is newest)
-    ang3_t  angles;
+    pose_t  msgPoses[HistoryDepth]; // last two updates (Cur is newest)
+    pose_t  pose;
 
     Model_p model;          // NULL = no model
     efrag_p efrag;          // linked list of efrags

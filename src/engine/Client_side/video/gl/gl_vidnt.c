@@ -897,10 +897,12 @@ LONG WINAPI MainWndProc(
     } break;
 
     case WM_KEYDOWN:
-    case WM_SYSKEYDOWN: { Key_Event(MapKey(lParam), true); } break;
+    case WM_SYSKEYDOWN: Key_Event(MapKey(lParam), true);
+        break;
 
     case WM_KEYUP:
-    case WM_SYSKEYUP: { Key_Event(MapKey(lParam), false); } break;
+    case WM_SYSKEYUP:   Key_Event(MapKey(lParam), false);
+        break;
 
     case WM_SYSCHAR:    break;    // keep Alt-Space from happening
 

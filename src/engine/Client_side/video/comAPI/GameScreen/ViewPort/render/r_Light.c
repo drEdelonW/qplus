@@ -156,8 +156,8 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
     vec3_t mid = VectorMA(start, frac, VectorSubtract(end, start));
 
     // go down front side
-    int r = RecursiveLightPoint(node->children[side], start, mid);
-    if (r >= 0)                 return r;        // hit something
+    int lp = RecursiveLightPoint(node->children[side], start, mid);
+    if (lp >= 0)                 return lp;        // hit something
     if ((back < 0) == side)     return -1;        // didn't hit anuthing
 
 #ifdef GLQUAKE
@@ -213,20 +213,20 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
 
 
 
-int R_LightPoint(vec3_t p) {
+int R_LightPoint(vec3_t pnt) {
     if (!cl.worldmodel->lightdata)
         return 255;
 
-    vec3_t end = p; { end.z -= 2048.0f; };
-    int r = RecursiveLightPoint(cl.worldmodel->nodes, p, end);
+    vec3_t end = pnt; { end.z -= 2048.0f; };
+    int lp = RecursiveLightPoint(cl.worldmodel->nodes, pnt, end);
 
-    if (r == -1)
-        r = 0;
+    if (lp == -1)
+        lp = 0;
 
 #ifndef GLQUAKE
-    CLAMP_LESS(&r, r_refdef.ambientlight);
+    CLAMP_LESS(&lp, r_refdef.ambientLight);
 #endif
 
-    return r;
+    return lp;
 }
 

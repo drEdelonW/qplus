@@ -943,29 +943,29 @@ void R_DrawBrushModel(r_Entity_p e) {
     Model_p clmodel = e->model;
     bool rotated;
 
-    if (!AngleCompare(e->angles, a3Zero)) {
+    if (!AngleCompare(e->pose.facing, a3Zero)) {
         rotated = true;
         if (R_CullBox(BBoxTranslate(
             BBoxSymmetric(clmodel->radius),
-            e->origin))
+            e->pose.spot))
             )   return;
     }
     else {
         rotated = false;
         if (R_CullBox(BBoxTranslate(
             clmodel->BB,
-            e->origin))
+            e->pose.spot))
             )   return;
     }
 
     glColor3f(1, 1, 1);
     memset(lightmap_polys, 0, sizeof(lightmap_polys));
 
-    modelorg = VectorSubtract(r_refdef.vieworg, e->origin);
+    modelorg = VectorSubtract(r_refdef.view.spot, e->pose.spot);
     if (rotated) {
         vec3_t temp = modelorg;
 
-        Basis_t bs = GetBasis(e->angles);
+        Basis_t bs = GetBasis(e->pose.facing);
         modelorg = (vec3_t){
             .x = DotProduct(temp, bs.forward),
             .y = -DotProduct(temp, bs.right),
@@ -991,9 +991,9 @@ void R_DrawBrushModel(r_Entity_p e) {
     }
 
     glPushMatrix();
-    e->angles.pitch = -e->angles.pitch;    // stupid quake bug
+    e->pose.facing.pitch = -e->pose.facing.pitch;    // stupid quake bug
     R_RotateForEntity(e);
-    e->angles.pitch = -e->angles.pitch;    // stupid quake bug
+    e->pose.facing.pitch = -e->pose.facing.pitch;    // stupid quake bug
 
     //
     // draw texture
@@ -1136,7 +1136,7 @@ void R_DrawWorld() {
     r_Entity_t ent = { .model = cl.worldmodel };
 #endif
 
-    modelorg = r_refdef.vieworg;
+    modelorg = r_refdef.view.spot;
 
     currententity = &ent;
     currenttexture = -1;

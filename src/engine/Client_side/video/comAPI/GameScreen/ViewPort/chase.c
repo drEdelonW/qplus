@@ -51,24 +51,24 @@ void Chase_Update() {
     Basis_t bs = GetBasis(cl.viewangles);
 
     vec3_t chaseDest = VectorMA(VectorMA(
-        r_refdef.vieworg,
+        r_refdef.view.spot,
         -chase_back.value, bs.forward),
         -chase_right.value, bs.right
     ); {
-        chaseDest.z = r_refdef.vieworg.z + chase_up.value;
+        chaseDest.z = r_refdef.view.spot.z + chase_up.value;
     }
 
     // find the spot the player is looking at
-    vec3_t stop = TraceLine(r_refdef.vieworg,
-        VectorMA(r_refdef.vieworg, 4096.f, bs.forward)
+    vec3_t stop = TraceLine(r_refdef.view.spot,
+        VectorMA(r_refdef.view.spot, 4096.f, bs.forward)
     );
 
     // calculate pitch to look at the same spot from camera
-    float dist = DotProduct(VectorSubtract(stop, r_refdef.vieworg), bs.forward);
+    float dist = DotProduct(VectorSubtract(stop, r_refdef.view.spot), bs.forward);
     CLAMP_LESS(&dist, 1.f);
 
-    r_refdef.viewangles.pitch = DEG2RAD(-atanf(stop.z / dist));
+    r_refdef.view.facing.pitch = DEG2RAD(-atanf(stop.z / dist));
 
-    r_refdef.vieworg = chaseDest;   // move towards destination
+    r_refdef.view.spot = chaseDest;   // move towards destination
 }
 

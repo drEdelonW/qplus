@@ -159,13 +159,13 @@ void CL_PrintEntities_f() {
             ent->model->name,
             ent->frame,
 
-            ent->origin.x,
-            ent->origin.y,
-            ent->origin.z,
+            ent->pose.spot.x,
+            ent->pose.spot.y,
+            ent->pose.spot.z,
 
-            ent->angles.pitch,
-            ent->angles.yaw,
-            ent->angles.roll
+            ent->pose.facing.pitch,
+            ent->pose.facing.yaw,
+            ent->pose.facing.roll
         );
     }
 }
@@ -345,15 +345,15 @@ void CL_RelinkEntities() {
             continue;
         }
 
-        vec3_t oldorg = ent->origin;
+        vec3_t oldorg = ent->pose.spot;
 
         if (ent->forcelink) { // the entity was not updated in the last message so move to the final spot
-            ent->origin = ent->msg_origins[Cur];
-            ent->angles = ent->msg_angles[Cur];
+            ent->pose.spot = ent->msgPoses[Cur].spot;
+            ent->pose.facing = ent->msgPoses[Cur].facing;
         }
         else {  // if the delta is large, assume a teleport and don't lerp
             LegDt_t fr = frac;
-            vec3_t delta = VectorSubtract(ent->msg_origins[Cur], ent->msg_origins[Prev]);
+            vec3_t delta = VectorSubtract(ent->msgPoses[Cur].spot, ent->msgPoses[Prev].spot);
             for (int j = 0; j < VECT_DIM; j++) {
                 if ((delta.v[j] > 100.f) ||
                     (delta.v[j] < -100.f)
@@ -362,16 +362,16 @@ void CL_RelinkEntities() {
             }
 
             // interpolate the origin and angles
-            ent->origin = VectorMA(ent->msg_origins[Prev], fr, delta);
-            ent->angles = AngleMA(ent->msg_angles[Prev],
+            ent->pose.spot = VectorMA(ent->msgPoses[Prev].spot, fr, delta);
+            ent->pose.facing = AngleMA(ent->msgPoses[Prev].facing,
                 fr, AngleSubtract(
-                    ent->msg_angles[Cur], ent->msg_angles[Prev]
+                    ent->msgPoses[Cur].facing, ent->msgPoses[Prev].facing
                 )
             );
         }
 
         dLight_p dl = CL_AllocDlight(i);
-        vec3_t lOrig = ent->origin; { lOrig.z += 16.f; }
+        vec3_t lOrig = ent->pose.spot; { lOrig.z += 16.f; }
 
         switch (ent->effects) {
         default: Host_Error("Multiply effects flags setted [0x%X] at same time!", ent->effects); break;
@@ -383,7 +383,7 @@ void CL_RelinkEntities() {
 # endif
 
         case EF_MUZZLEFLASH: {
-            lOrig = VectorMA(lOrig, 18.f, GetBasis(ent->angles).forward);
+            lOrig = VectorMA(lOrig, 18.f, GetBasis(ent->pose.facing).forward);
             *(dl) = (dLight_t){
                 .origin = lOrig,
                 .radius = 200.f + (float)((rand() & 31)),
@@ -442,11 +442,11 @@ void CL_RelinkEntities() {
         default: Host_Error("Multiply model flags setted [0x%X] at same time!", ent->model->flags); break;
         case EF_NONE: break;
 
-        case EF_ROTATE: ent->angles.yaw = bobjrotate; break;
+        case EF_ROTATE: ent->pose.facing.yaw = bobjrotate; break;
         case EF_ROCKET: {
-            R_RocketTrail(oldorg, ent->origin, RT_ROCKET);
+            R_RocketTrail(oldorg, ent->pose.spot, RT_ROCKET);
             *dl = (dLight_t){
-                .origin = ent->origin,
+                .origin = ent->pose.spot,
                 .radius = 200.f,
                 .die = (sSimTime_t)(GetClSimTime() + 0.01),
                 // .decay = 0.f,
@@ -454,12 +454,12 @@ void CL_RelinkEntities() {
                 .key = dl->key
             };
         } break;
-        case EF_GIB:        R_RocketTrail(oldorg, ent->origin, RT_GIB);     break;
-        case EF_ZOMGIB:     R_RocketTrail(oldorg, ent->origin, RT_ZOMGIB);  break;
-        case EF_TRACER:     R_RocketTrail(oldorg, ent->origin, RT_TRACER);  break;
-        case EF_TRACER2:    R_RocketTrail(oldorg, ent->origin, RT_TRACER2); break;
-        case EF_GRENADE:    R_RocketTrail(oldorg, ent->origin, RT_GRENADE); break;
-        case EF_TRACER3:    R_RocketTrail(oldorg, ent->origin, RT_TRACER3); break;
+        case EF_GIB:        R_RocketTrail(oldorg, ent->pose.spot, RT_GIB);     break;
+        case EF_ZOMGIB:     R_RocketTrail(oldorg, ent->pose.spot, RT_ZOMGIB);  break;
+        case EF_TRACER:     R_RocketTrail(oldorg, ent->pose.spot, RT_TRACER);  break;
+        case EF_TRACER2:    R_RocketTrail(oldorg, ent->pose.spot, RT_TRACER2); break;
+        case EF_GRENADE:    R_RocketTrail(oldorg, ent->pose.spot, RT_GRENADE); break;
+        case EF_TRACER3:    R_RocketTrail(oldorg, ent->pose.spot, RT_TRACER3); break;
         };
 
         ent->forcelink = false;

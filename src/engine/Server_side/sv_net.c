@@ -186,13 +186,13 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         uint16_t bits = 0;
 
         for (int i = 0; i < VECT_DIM; i++) {
-            float miss = ent->v.origin.v[i] - ent->baseline.origin.v[i];
+            float miss = ent->v.origin.v[i] - ent->baseline.pose.spot.v[i];
             if ((miss < -0.1f) || (miss > 0.1f))                bits |= (U_ORIGIN1 << i);
         }
 
-        if (ent->v.angles.pitch != ent->baseline.angles.pitch)  bits |= U_ANGLE1;
-        if (ent->v.angles.yaw != ent->baseline.angles.yaw)      bits |= U_ANGLE2;
-        if (ent->v.angles.roll != ent->baseline.angles.roll)    bits |= U_ANGLE3;
+        if (ent->v.angles.pitch != ent->baseline.pose.facing.pitch)  bits |= U_ANGLE1;
+        if (ent->v.angles.yaw != ent->baseline.pose.facing.yaw)      bits |= U_ANGLE2;
+        if (ent->v.angles.roll != ent->baseline.pose.facing.roll)    bits |= U_ANGLE3;
         if (ent->v.movetype == MOVETYPE_STEP)                   bits |= U_NOLERP;  // don't mess up the step animation
         if (ent->v.colormap != ent->baseline.colormap)          bits |= U_COLORMAP;
         if (ent->v.skin != ent->baseline.skin)                  bits |= U_SKIN;
@@ -434,8 +434,8 @@ void SV_CreateBaseline() {
         //
         // create entity baseline
         //
-        svent->baseline.origin = svent->v.origin;
-        svent->baseline.angles = svent->v.angles;
+        svent->baseline.pose.spot = svent->v.origin;
+        svent->baseline.pose.facing = svent->v.angles;
         svent->baseline.frame = (int32_t)svent->v.frame;
         svent->baseline.skin = (int32_t)svent->v.skin;
         if ((entnum > 0) &&
@@ -460,8 +460,8 @@ void SV_CreateBaseline() {
         MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.colormap);
         MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.skin);
         for (int i = 0; i < VECT_DIM; i++) {
-            MSG_WriteCoord(&sv.signon, svent->baseline.origin.v[i]);
-            MSG_WriteAngle(&sv.signon, svent->baseline.angles.v[i]);
+            MSG_WriteCoord(&sv.signon, svent->baseline.pose.spot.v[i]);
+            MSG_WriteAngle(&sv.signon, svent->baseline.pose.facing.v[i]);
         }
     }
 }

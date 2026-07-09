@@ -374,24 +374,24 @@ void CL_ParseUpdate(update_bits_t bits) {
     ent->effects = (bits & U_EFFECTS) ? MSG_ReadByte() : ent->baseline.effects;
 
     // shift the known values for interpolation
-    ent->msg_origins[1] = ent->msg_origins[0];
-    ent->msg_angles[1] = ent->msg_angles[0];
+    ent->msgPoses[Prev].spot = ent->msgPoses[Cur].spot;
+    ent->msgPoses[Prev].facing = ent->msgPoses[Cur].facing;
 
-    ent->msg_origins[0].x = (bits & U_ORIGIN1) ? MSG_ReadCoord() : ent->baseline.origin.x;
-    ent->msg_angles[0].pitch = (bits & U_ANGLE1) ? MSG_ReadAngle() : ent->baseline.angles.pitch;
-    ent->msg_origins[0].y = (bits & U_ORIGIN2) ? MSG_ReadCoord() : ent->baseline.origin.y;
-    ent->msg_angles[0].yaw = (bits & U_ANGLE2) ? MSG_ReadAngle() : ent->baseline.angles.yaw;
-    ent->msg_origins[0].z = (bits & U_ORIGIN3) ? MSG_ReadCoord() : ent->baseline.origin.z;
-    ent->msg_angles[0].roll = (bits & U_ANGLE3) ? MSG_ReadAngle() : ent->baseline.angles.roll;
+    ent->msgPoses[Cur].spot.x = (bits & U_ORIGIN1) ? MSG_ReadCoord() : ent->baseline.pose.spot.x;
+    ent->msgPoses[Cur].facing.pitch = (bits & U_ANGLE1) ? MSG_ReadAngle() : ent->baseline.pose.facing.pitch;
+    ent->msgPoses[Cur].spot.y = (bits & U_ORIGIN2) ? MSG_ReadCoord() : ent->baseline.pose.spot.y;
+    ent->msgPoses[Cur].facing.yaw = (bits & U_ANGLE2) ? MSG_ReadAngle() : ent->baseline.pose.facing.yaw;
+    ent->msgPoses[Cur].spot.z = (bits & U_ORIGIN3) ? MSG_ReadCoord() : ent->baseline.pose.spot.z;
+    ent->msgPoses[Cur].facing.roll = (bits & U_ANGLE3) ? MSG_ReadAngle() : ent->baseline.pose.facing.roll;
 
     if (bits & U_NOLERP)
         ent->forcelink = true;
 
     if (forcelink) { // didn't have an update last message
-        ent->msg_origins[1] = ent->msg_origins[0];
-        ent->origin = ent->msg_origins[0];
-        ent->msg_angles[1] = ent->msg_angles[0];
-        ent->angles = ent->msg_angles[0];
+        ent->msgPoses[Prev].spot = ent->msgPoses[Cur].spot;
+        ent->pose.spot = ent->msgPoses[Cur].spot;
+        ent->msgPoses[Prev].facing = ent->msgPoses[Cur].facing;
+        ent->pose.facing = ent->msgPoses[Cur].facing;
         ent->forcelink = true;
     }
 }
@@ -407,8 +407,8 @@ void CL_ParseBaseline(r_Entity_p ent) {
     ent->baseline.colormap = MSG_ReadByte();
     ent->baseline.skin = MSG_ReadByte();
     for (int i = 0; i < VECT_DIM; i++) {    // TODO: wrap MSG_ReadCoord/MSG_ReadAngle to MSG_vector_tools
-        ent->baseline.origin.v[i] = MSG_ReadCoord();
-        ent->baseline.angles.v[i] = MSG_ReadAngle();
+        ent->baseline.pose.spot.v[i] = MSG_ReadCoord();
+        ent->baseline.pose.facing.v[i] = MSG_ReadAngle();
     }
 }
 
@@ -528,8 +528,7 @@ void CL_ParseStatic() {
     ent->skinnum = ent->baseline.skin;
     ent->effects = ent->baseline.effects;
 
-    ent->origin = ent->baseline.origin;
-    ent->angles = ent->baseline.angles;
+    ent->pose = ent->baseline.pose;
     R_AddEfrags(ent);
 }
 

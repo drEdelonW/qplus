@@ -53,7 +53,7 @@ typedef struct {
     int         conrowbytes;    // offset in byte for next lone
     vRect_t     con;
 
-    vRect_t     maxwarp;
+    vRect_t     maxwarp;        // SoftRender WarpEffect buffer
 
     qColor8_p   direct;         // direct drawing to framebuffer, if not NULL
     uint32_t    rowbytes;       // may be > width if displayed in a window

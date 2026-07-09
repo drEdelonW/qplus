@@ -10,7 +10,10 @@
 R_SetVrect
 ===============
 */
-void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) {
+void R_SetVrect(const vRect_p pvrectin, vRect_p pRect, int lineadj) {
+#ifdef GLQUAKE
+    bool full = ((scr_viewsize.value >= 100.0f) || (isIntermission()));
+#endif
     float size = (scr_viewsize.value > 100.0f) ?
         100.0f : scr_viewsize.value;
 
@@ -18,30 +21,39 @@ void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) {
         size = 100.0f;
         lineadj = 0;
     }
-    size /= 100.0f;
+    size /= 100.0f; // normalize to 1.f
 
     int h = pvrectin->height - lineadj;
-    pvrect->width = pvrectin->width * size;
-    if (pvrect->width < 96.0f) {
+    pRect->width = pvrectin->width * size;
+    if (pRect->width < 96.0f) {
         size = 96.0f / pvrectin->width;
-        pvrect->width = 96.0f; // min for icons
+        pRect->width = 96.0f; // min for icons
     }
-    pvrect->width &= ~7;
-    pvrect->height = pvrectin->height * size;
-    if (pvrect->height > (pvrectin->height - lineadj))
-        pvrect->height = (pvrectin->height - lineadj);
+    pRect->width &= ~7;
+    pRect->height = pvrectin->height * size;
+    CLAMP_MORE(&pRect->height, (pvrectin->height - lineadj));
 
+#ifdef GLQUAKE
+    {   /* GLQUAKE specific */
+        if (pRect->height > pvrectin->height)
+            pRect->height = pvrectin->height;
+
+        pRect->x = HALF(pvrectin->width - pRect->width);
+        pRect->y = (full) ? 0 : HALF(h - pRect->height);
+    }
+#else
     {   /* Soft Render specific */
-        pvrect->height &= ~1;
+        pRect->height &= ~1;
 
-        pvrect->x = HALF(pvrectin->width - pvrect->width);
-        pvrect->y = HALF(h - pvrect->height);
+        pRect->x = HALF(pvrectin->width - pRect->width);
+        pRect->y = HALF(h - pRect->height);
 
-#ifndef STM32
+# ifndef STM32
         if (lcd_x.value) {
-            pvrect->y = HALF(pvrect->y);
-            pvrect->height = HALF(pvrect->height);
+            pRect->y = HALF(pRect->y);
+            pRect->height = HALF(pRect->height);
         }
-#endif
+# endif
     }
+#endif
 }

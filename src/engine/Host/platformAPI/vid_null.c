@@ -21,11 +21,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "vid.h"
 #include "mem_placement.h"  // __weak
+#ifndef GLQUAKE
 #include "d_local.h"    // d_pzbuffer
 
 static qColor8_t _vidBuf[BASEWIDTH * BASEHEIGHT] PLACE_TO_SDRAM;
 static int16_t _zBuf[BASEWIDTH * BASEHEIGHT] PLACE_TO_SDRAM;
 static uint8_t _surfCache[256 * 1024] PLACE_TO_SDRAM;
+#else
+static const qColor8_p _vidBuf = NULL;
+#endif
 
 Rgb16_t d_8to16table[InksNum];
 Rgb24_t d_8to24table[InksNum];
@@ -61,10 +65,13 @@ __weak void D_EndDirectRect(int x, int y, int width, int height) {}
 __weak void VID_Update(vRect_p rects) {}
 __weak void VID_Shutdown() {}
 __weak void VID_Init(qPal_p palette) {
-    vid.colormap = host_colormap,
+    
+#ifndef GLQUAKE
+    vid.colormap = host_colormap;
 
     d_pzbuffer = _zBuf;
     D_InitCaches(_surfCache, sizeof(_surfCache));
+#endif
 }
 
 

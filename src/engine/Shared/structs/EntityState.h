@@ -1,8 +1,8 @@
 #pragma once
 
 #include "types.h"
-#include "vector.h"
-#include "angle.h"
+#include "pose.h"
+
 // entity effects
 typedef enum {
     EF_NONE         = 0u,      // 0x0000
@@ -16,19 +16,17 @@ typedef enum {
     EF_LIGHT        = 1u << 6, // 0x0040
     EF_NODRAW       = 1u << 7  // 0x0080
 #endif
-} EntityEffects_t;
+} EntityEffects_t;  // uint8_t size
 
-// #pragma pack(push, 1)
-typedef struct {
-    vec3_t  origin;
-    ang3_t  angles;
+typedef struct {    // "Baseline"
+    pose_t pose;
+
     uint8_t modelindex;
     uint8_t frame;
     uint8_t colormap;
     uint8_t skin;
+
     uint8_t effects; // EntityEffects_t  was 1 int8
     // EntityEffects_t effects;    // now 4 int32
-    // uint8_t _pad[3];
+    uint8_t _pad[3];
 } EntityState_t;      STATIC_ASSERT_SIZE(EntityState_t, ((sizeof(vec3_t) * 2) + (sizeof(uint8_t) * 4) + 4) );
-// Baseline
-// #pragma pack(pop)

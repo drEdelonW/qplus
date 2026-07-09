@@ -2655,14 +2655,12 @@ LONG WINAPI MainWndProc(
 
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-        if (!in_mode_set)
-            Key_Event(MapKey(lParam), true);
+        if (!in_mode_set)   Key_Event(MapKey(lParam), true);
         break;
 
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        if (!in_mode_set)
-            Key_Event(MapKey(lParam), false);
+        if (!in_mode_set)   Key_Event(MapKey(lParam), false);
         break;
 
         // this is complicated because Win32 seems to pack multiple mouse events into

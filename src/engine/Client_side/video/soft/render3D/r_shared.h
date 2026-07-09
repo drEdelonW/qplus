@@ -111,7 +111,9 @@ struct Surf_s {
     int   pad[2];    // to 64 bytes
 };
 
-extern Surf_p surfaces, surface_p, surf_max;
+extern Surf_p pSurfaces;
+extern Surf_p pSurface;
+extern Surf_p pSurf_max;
 
 // surfaces are generated in back to front order by the bsp, so if a surf
 // pointer is greater than another one, it should be drawn in front

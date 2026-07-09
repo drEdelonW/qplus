@@ -101,11 +101,11 @@ cvar_t gl_doubleeyes = { "gl_doubleeys", "1" };
 
 
 void R_RotateForEntity(r_Entity_p e) {
-    glTranslatef(e->origin.x, e->origin.y, e->origin.z);
+    glTranslatef(e->pose.spot.x, e->pose.spot.y, e->pose.spot.z);
 
-    glRotatef(e->angles.yaw, 0, 0, 1);
-    glRotatef(-e->angles.pitch, 0, 1, 0);
-    glRotatef(e->angles.roll, 1, 0, 0);
+    glRotatef(e->pose.facing.yaw, 0, 0, 1);
+    glRotatef(-e->pose.facing.pitch, 0, 1, 0);
+    glRotatef(e->pose.facing.roll, 1, 0, 0);
 }
 
 /*
@@ -171,7 +171,7 @@ void R_DrawSpriteModel(r_Entity_p e) {
     vec3_t up, right;
 
     if (psprite->type == SPR_ORIENTED) { // bullet marks on walls
-        Basis_t bs = GetBasis(currententity->angles);
+        Basis_t bs = GetBasis(currententity->pose.facing);
         up = bs.up;
         right = bs.right;
     }
@@ -185,10 +185,10 @@ void R_DrawSpriteModel(r_Entity_p e) {
     GL_Bind(frame->gl_texturenum);
     glEnable(GL_ALPHA_TEST); {
         glBegin(GL_QUADS); {
-            glTexCoord2f(0.0f, 1.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->down, up), frame->left, right).v);
-            glTexCoord2f(0.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->up, up), frame->left, right).v);
-            glTexCoord2f(1.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->up, up), frame->right, right).v);
-            glTexCoord2f(1.0f, 1.0f);            glVertex3fv(VectorMA(VectorMA(e->origin, frame->down, up), frame->right, right).v);
+            glTexCoord2f(0.0f, 1.0f);            glVertex3fv(VectorMA(VectorMA(e->pose.spot, frame->down, up), frame->left, right).v);
+            glTexCoord2f(0.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->pose.spot, frame->up, up), frame->left, right).v);
+            glTexCoord2f(1.0f, 0.0f);            glVertex3fv(VectorMA(VectorMA(e->pose.spot, frame->up, up), frame->right, right).v);
+            glTexCoord2f(1.0f, 1.0f);            glVertex3fv(VectorMA(VectorMA(e->pose.spot, frame->down, up), frame->right, right).v);
         } glEnd();
     } glDisable(GL_ALPHA_TEST);
 }
@@ -279,7 +279,7 @@ GL_DrawAliasShadow
 
 void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
 
-    float lheight = currententity->origin.z - lightspot.z;
+    float lheight = currententity->pose.spot.z - lightspot.z;
 
     float height = 0;
     TriVertx_p verts = (TriVertx_p)((uint8_p)pAliasHdr + pAliasHdr->posedata);
@@ -381,16 +381,16 @@ R_DrawAliasModel
 void R_DrawAliasModel(r_Entity_p e) {
     Model_p clmodel = currententity->model;
 
-    if (R_CullBox(BBoxTranslate(clmodel->BB, currententity->origin)))      return;
+    if (R_CullBox(BBoxTranslate(clmodel->BB, currententity->pose.spot)))      return;
 
-    r_entorigin = currententity->origin;
+    r_entorigin = currententity->pose.spot;
     modelorg = VectorSubtract(r_origin, r_entorigin);
 
     //
     // get lighting information
     //
 
-    ambientlight = shadelight = R_LightPoint(currententity->origin);
+    ambientlight = shadelight = R_LightPoint(currententity->pose.spot);
 
     // allways give the gun some light
     if ((e == &cl.viewent) &&
@@ -401,7 +401,7 @@ void R_DrawAliasModel(r_Entity_p e) {
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
         if (cl_dlights[lnum].die >= GetClSimTime()) {
             vec3_t  dist = VectorSubtract(
-                currententity->origin,
+                currententity->pose.spot,
                 cl_dlights[lnum].origin
             );
             float add = cl_dlights[lnum].radius - Length(dist);
@@ -436,11 +436,11 @@ void R_DrawAliasModel(r_Entity_p e) {
         )   ambientlight = shadelight = 256.0f;
 
     shadedots = r_avertexnormal_dots[
-        ((int)(e->angles.yaw * (SHADEDOT_QUANT / 360.0f))) & (SHADEDOT_QUANT - 1)
+        ((int)(e->pose.facing.yaw * (SHADEDOT_QUANT / 360.0f))) & (SHADEDOT_QUANT - 1)
     ];
     shadelight = shadelight / 200.0f;
 
-    float an = DEG2RAD(e->angles.yaw);
+    float an = DEG2RAD(e->pose.facing.yaw);
 
     shadevector = (vec3_t){
         .x = cosf(-an),
@@ -589,7 +589,7 @@ void R_DrawViewModel() {
     currententity = &cl.viewent;
     if (!currententity->model)      return;
 
-    int j = R_LightPoint(currententity->origin);
+    int j = R_LightPoint(currententity->pose.spot);
     if (j < 24)        j = 24;  // allways give some light on gun
     int ambientlight = j;
 
@@ -600,7 +600,7 @@ void R_DrawViewModel() {
         if (!dl->radius)        continue;
         if (dl->die < GetClSimTime())  continue;
 
-        vec3_t dist = VectorSubtract(currententity->origin, dl->origin);
+        vec3_t dist = VectorSubtract(currententity->pose.spot, dl->origin);
         float add = dl->radius - Length(dist);
         if (add > 0)
             ambientlight += add;
@@ -704,9 +704,9 @@ void R_SetupFrame() {
     r_framecount++;
 
     // build the transformation matrix for the given view angles
-    r_origin = r_refdef.vieworg;
+    r_origin = r_refdef.view.spot;
 
-    BS = GetBasis(r_refdef.viewangles);
+    BS = GetBasis(r_refdef.view.facing);
 
     // current viewleaf
     r_oldviewleaf = r_viewleaf;
@@ -800,10 +800,10 @@ void R_SetupGL() {
 
     glRotatef(-90, 1, 0, 0);     // put Z going up
     glRotatef(90, 0, 0, 1);     // put Z going up
-    glRotatef(-r_refdef.viewangles.roll, 1, 0, 0);
-    glRotatef(-r_refdef.viewangles.pitch, 0, 1, 0);
-    glRotatef(-r_refdef.viewangles.yaw, 0, 0, 1);
-    glTranslatef(-r_refdef.vieworg.x, -r_refdef.vieworg.y, -r_refdef.vieworg.z);
+    glRotatef(-r_refdef.view.facing.roll, 1, 0, 0);
+    glRotatef(-r_refdef.view.facing.pitch, 0, 1, 0);
+    glRotatef(-r_refdef.view.facing.yaw, 0, 0, 1);
+    glTranslatef(-r_refdef.view.spot.x, -r_refdef.view.spot.y, -r_refdef.view.spot.z);
 
     glGetFloatv(GL_MODELVIEW_MATRIX, r_world_matrix);
 
@@ -895,17 +895,17 @@ void R_Mirror() {
 
     memcpy(r_base_world_matrix, r_world_matrix, sizeof(r_base_world_matrix));
 
-    r_refdef.vieworg = VectorMA(r_refdef.vieworg,
-        (-2 * (DotProduct(r_refdef.vieworg, mirror_plane->normal) - mirror_plane->dist)), mirror_plane->normal
+    r_refdef.view.spot = VectorMA(r_refdef.view.spot,
+        (-2 * (DotProduct(r_refdef.view.spot, mirror_plane->normal) - mirror_plane->dist)), mirror_plane->normal
     );
     BS.forward = VectorMA(BS.forward,
         (-2 * DotProduct(BS.forward, mirror_plane->normal)), mirror_plane->normal
     );
 
-    r_refdef.viewangles = (ang3_t){
+    r_refdef.view.facing = (ang3_t){
         .pitch = DEG2RAD(-asin(BS.forward.z)),
         .yaw = DEG2RAD(atan2(BS.forward.y, BS.forward.x)),
-        .roll = -r_refdef.viewangles.roll
+        .roll = -r_refdef.view.facing.roll
     };
 
     if (cl_numvisedicts < MAX_VISEDICTS) {

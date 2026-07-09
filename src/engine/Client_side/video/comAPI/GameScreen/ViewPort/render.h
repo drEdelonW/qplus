@@ -75,7 +75,7 @@ extern "C" {
     void D_FlushCaches();
     void D_DeleteSurfaceCache();
     void D_InitCaches(TypeLess_ptr buffer, int size);
-    void R_SetVrect(vRect_p pvrect, vRect_p pvrectin, int lineadj);
+    void R_SetVrect(const vRect_p pvrect, vRect_p pvrectin, int lineadj);
 
 
 #ifdef __cplusplus

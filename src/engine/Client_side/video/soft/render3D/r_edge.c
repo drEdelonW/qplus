@@ -41,13 +41,13 @@ Edge_p r_edges;
 Edge_p edge_p;
 Edge_p edge_max;
 
-Surf_p surfaces;
-Surf_p surface_p;
-Surf_p surf_max;
+Surf_p pSurfaces;
+Surf_p pSurface;
+Surf_p pSurf_max;
 
-// surfaces are generated in back to front order by the bsp, so if a surf
+// pSurfaces are generated in back to front order by the bsp, so if a surf
 // pointer is greater than another one, it should be drawn in front
-// surfaces[1] is the background, and is used as the active surface stack
+// pSurfaces[1] is the background, and is used as the active surface stack
 
 Edge_p newedges[MAXHEIGHT];
 Edge_p removeedges[MAXHEIGHT];
@@ -87,7 +87,7 @@ void R_DrawCulledPolys() {
     currententity = &cl_entities[0];
 
     if (r_worldpolysbacktofront) {
-        for (Surf_p surf = surface_p - 1; surf > &surfaces[1]; surf--) {
+        for (Surf_p surf = pSurface - 1; surf > &pSurfaces[1]; surf--) {
             if (!surf->spans)
                 continue;
 
@@ -98,7 +98,7 @@ void R_DrawCulledPolys() {
         }
     }
     else {
-        for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++) {
+        for (Surf_p surf = &pSurfaces[1]; surf < pSurface; surf++) {
             if (!surf->spans)
                 continue;
 
@@ -120,20 +120,20 @@ void R_BeginEdgeFrame() {
     edge_p = r_edges;
     edge_max = &r_edges[r_numallocatededges];
 
-    surface_p = &surfaces[2]; // background is surface 1,
+    pSurface = &pSurfaces[2]; // background is surface 1,
     //  surface 0 is a dummy
-    surfaces[1].spans = NULL; // no background spans yet
-    surfaces[1].flags = SURF_DRAWBACKGROUND;
+    pSurfaces[1].spans = NULL; // no background spans yet
+    pSurfaces[1].flags = SURF_DRAWBACKGROUND;
 
     // put the background behind everything in the world
     if (r_draworder.value) {
         _pDrawFunc = R_GenerateSpansBackward;
-        surfaces[1].key = 0;
+        pSurfaces[1].key = 0;
         r_currentkey = 1;
     }
     else {
         _pDrawFunc = R_GenerateSpans;
-        surfaces[1].key = 0x7FFFFFFF;
+        pSurfaces[1].key = 0x7FFFFFFF;
         r_currentkey = 0;
     }
 
@@ -273,8 +273,8 @@ R_CleanupSpan
 */
 void R_CleanupSpan() {
     // now that we've reached the right edge of the screen, we're done with any
-    // unfinished surfaces, so emit a span for whatever's on top
-    Surf_p surf = surfaces[1].next;
+    // unfinished pSurfaces, so emit a span for whatever's on top
+    Surf_p surf = pSurfaces[1].next;
     int iu = edge_tail_u_shift20;
     if (iu > surf->last_u) {
         eSpan_p span = span_p++;
@@ -285,11 +285,11 @@ void R_CleanupSpan() {
         surf->spans = span;
     }
 
-    // reset spanstate for all surfaces in the surface stack
+    // reset spanstate for all pSurfaces in the surface stack
     do {
         surf->spanstate = notInSpan;
         surf = surf->next;
-    } while (surf != &surfaces[1]);
+    } while (surf != &pSurfaces[1]);
 }
 
 
@@ -300,18 +300,18 @@ R_LeadingEdgeBackwards
 */
 void R_LeadingEdgeBackwards(Edge_p edge) {
     // it's adding a new surface in, so find the correct place
-    Surf_p surf = &surfaces[edge->surfs[1]];
+    Surf_p surf = &pSurfaces[edge->surfs[1]];
 
     // don't start a span if this is an inverted span, with the end
     // edge preceding the start edge (that is, we've already seen the
     // end edge)
     if (++surf->spanstate == inSpan) {
-        Surf_p surf2 = surfaces[1].next;
+        Surf_p surf2 = pSurfaces[1].next;
 
         if (surf->key > surf2->key)
             goto newtop;
 
-        // if it's two surfaces on the same plane, the one that's already
+        // if it's two pSurfaces on the same plane, the one that's already
         // active is in front, so keep going unless it's a bmodel
         if (surf->insubmodel && (surf->key == surf2->key)) {
             // must be two bmodels in the same leaf; don't care, because they'll
@@ -326,7 +326,7 @@ void R_LeadingEdgeBackwards(Edge_p edge) {
         } while (surf->key < surf2->key);
 
         if (surf->key == surf2->key) {
-            // if it's two surfaces on the same plane, the one that's already
+            // if it's two pSurfaces on the same plane, the one that's already
             // active is in front, so keep going unless it's a bmodel
             if (!surf->insubmodel)
                 goto continue_search;
@@ -377,7 +377,7 @@ void R_TrailingEdge(Surf_p surf, Edge_p  edge) {
         if (surf->insubmodel)
             r_bmodelactive--;
 
-        if (surf == surfaces[1].next) {
+        if (surf == pSurfaces[1].next) {
             // emit a span (current top going away)
             int iu = edge->u >> 20;
             if (iu > surf->last_u) {
@@ -409,7 +409,7 @@ R_LeadingEdge
 void R_LeadingEdge(Edge_p  edge) {
     if (edge->surfs[1]) {
         // it's adding a new surface in, so find the correct place
-        Surf_p surf = &surfaces[edge->surfs[1]];
+        Surf_p surf = &pSurfaces[edge->surfs[1]];
 
         // don't start a span if this is an inverted span, with the end
         // edge preceding the start edge (that is, we've already seen the
@@ -418,11 +418,11 @@ void R_LeadingEdge(Edge_p  edge) {
             if (surf->insubmodel)
                 r_bmodelactive++;
 
-            Surf_p surf2 = surfaces[1].next;
+            Surf_p surf2 = pSurfaces[1].next;
 
             if (surf->key < surf2->key)         goto newtop;
 
-            // if it's two surfaces on the same plane, the one that's already
+            // if it's two pSurfaces on the same plane, the one that's already
             // active is in front, so keep going unless it's a bmodel
             if (surf->insubmodel &&
                 (surf->key == surf2->key)
@@ -455,7 +455,7 @@ void R_LeadingEdge(Edge_p  edge) {
             } while (surf->key > surf2->key);
 
             if (surf->key == surf2->key) {
-                // if it's two surfaces on the same plane, the one that's already
+                // if it's two pSurfaces on the same plane, the one that's already
                 // active is in front, so keep going unless it's a bmodel
                 if (!surf->insubmodel)          goto continue_search;
 
@@ -519,15 +519,15 @@ R_GenerateSpans
 void R_GenerateSpans() {
     r_bmodelactive = 0;
 
-    // clear active surfaces to just the background surface
-    surfaces[1].next = surfaces[1].prev = &surfaces[1];
-    surfaces[1].last_u = edge_head_u_shift20;
+    // clear active pSurfaces to just the background surface
+    pSurfaces[1].next = pSurfaces[1].prev = &pSurfaces[1];  // TODO: make it clear
+    pSurfaces[1].last_u = edge_head_u_shift20;
 
     // generate spans
     for (Edge_p edge = edge_head.next; edge != &edge_tail; edge = edge->next) {
         if (edge->surfs[0]) {
             // it has a left surface, so a surface is going away for this span
-            Surf_p surf = &surfaces[edge->surfs[0]];
+            Surf_p surf = &pSurfaces[edge->surfs[0]];
             R_TrailingEdge(surf, edge);
             if (!edge->surfs[1])        continue;
         }
@@ -549,14 +549,14 @@ R_GenerateSpansBackward
 void R_GenerateSpansBackward() {
     r_bmodelactive = 0;
 
-    // clear active surfaces to just the background surface
-    surfaces[1].next = surfaces[1].prev = &surfaces[1];
-    surfaces[1].last_u = edge_head_u_shift20;
+    // clear active pSurfaces to just the background surface
+    pSurfaces[1].next = pSurfaces[1].prev = &pSurfaces[1]; // TODO: make it clear
+    pSurfaces[1].last_u = edge_head_u_shift20;
 
     // generate spans
     for (Edge_p edge = edge_head.next; edge != &edge_tail; edge = edge->next) {
         if (edge->surfs[0])
-            R_TrailingEdge(&surfaces[edge->surfs[0]], edge);
+            R_TrailingEdge(&pSurfaces[edge->surfs[0]], edge);
 
         if (edge->surfs[1])
             R_LeadingEdgeBackwards(edge);
@@ -628,7 +628,7 @@ void R_ScanEdges() {
         fv = (float)iv;
 
         // mark that the head (background start) span is pre-included
-        surfaces[1].spanstate = inSpan;
+        pSurfaces[1].spanstate = inSpan;
 
         if (newedges[iv])   R_InsertNewEdges(newedges[iv], edge_head.next);
         (*_pDrawFunc)();
@@ -643,7 +643,7 @@ void R_ScanEdges() {
 
 
             // clear the surface span pointers
-            for (Surf_p surf = &surfaces[1]; surf < surface_p; surf++)
+            for (Surf_p surf = &pSurfaces[1]; surf < pSurface; surf++)
                 surf->spans = NULL;
 
             span_p = basespan_p;
@@ -659,7 +659,7 @@ void R_ScanEdges() {
     fv = (float)iv;
 
     // mark that the head (background start) span is pre-included
-    surfaces[1].spanstate = inSpan;
+    pSurfaces[1].spanstate = inSpan;
 
     if (newedges[iv])   R_InsertNewEdges(newedges[iv], edge_head.next);
     (*_pDrawFunc)();

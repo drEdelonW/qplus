@@ -289,10 +289,10 @@ void V_ParseDamage() {
     //
     r_Entity_p ent = &cl_entities[cl.viewentity];
 
-    from = VectorSubtract(from, ent->origin);
+    from = VectorSubtract(from, ent->pose.spot);
     VectorNormalize(&from);
 
-    _bs = GetBasis(ent->angles);
+    _bs = GetBasis(ent->pose.facing);
 
     _v_DmgRoll = count * v_kickroll.value * DotProduct(from, _bs.right);
     _v_DmgPitch = count * v_kickpitch.value * DotProduct(from, _bs.forward);
@@ -573,8 +573,8 @@ CalcGunAngle
 static ang3_t _old = { .pitch = 0.f, .yaw = 0.f };
 void CalcGunAngle() {
     ang3_t cAngl = {
-        .pitch = -r_refdef.viewangles.pitch,
-        .yaw = r_refdef.viewangles.yaw,
+        .pitch = -r_refdef.view.facing.pitch,
+        .yaw = r_refdef.view.facing.yaw,
     };
     // TODO: solve this puzzle
     // float move = host_frametime * 20.f;
@@ -594,13 +594,13 @@ void CalcGunAngle() {
     // );
     _old = cAngl;
 
-    cl.viewent.angles.pitch = -(r_refdef.viewangles.pitch + pitch);
-    cl.viewent.angles.yaw = r_refdef.viewangles.yaw + yaw;
-    // cl.viewent.angles.roll = r_refdef.viewangles.roll + yaw * 2;`
+    cl.viewent.pose.facing.pitch = -(r_refdef.view.facing.pitch + pitch);
+    cl.viewent.pose.facing.yaw = r_refdef.view.facing.yaw + yaw;
+    // cl.viewent.pose.facing.roll = r_refdef.viewangles.roll + yaw * 2;`
 
-    cl.viewent.angles.roll -= v_idlescale.value * sinf(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value;
-    cl.viewent.angles.pitch -= v_idlescale.value * sinf(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value;
-    cl.viewent.angles.yaw -= v_idlescale.value * sinf(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value;
+    cl.viewent.pose.facing.roll -= v_idlescale.value * sinf(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value;
+    cl.viewent.pose.facing.pitch -= v_idlescale.value * sinf(GetClSimTime() * v_ipitch_cycle.value) * v_ipitch_level.value;
+    cl.viewent.pose.facing.yaw -= v_idlescale.value * sinf(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value;
 }
 
 /*
@@ -614,9 +614,9 @@ void V_BoundOffsets() {
     // absolutely bound refresh reletive to entity clipping hull
     // so the view can never be inside a solid wall
 
-    CLAMP(ent->origin.x - 14.f, &r_refdef.vieworg.x, ent->origin.x + 14.f);
-    CLAMP(ent->origin.y - 14.f, &r_refdef.vieworg.y, ent->origin.y + 14.f);
-    CLAMP(ent->origin.z - 22.f, &r_refdef.vieworg.z, ent->origin.z + 30.f);
+    CLAMP(ent->pose.spot.x - 14.f, &r_refdef.view.spot.x, ent->pose.spot.x + 14.f);
+    CLAMP(ent->pose.spot.y - 14.f, &r_refdef.view.spot.y, ent->pose.spot.y + 14.f);
+    CLAMP(ent->pose.spot.z - 22.f, &r_refdef.view.spot.z, ent->pose.spot.z + 30.f);
 }
 
 /*
@@ -632,7 +632,7 @@ void V_AddIdle() {
         .yaw = sinf(GetClSimTime() * v_iyaw_cycle.value) * v_iyaw_level.value,
         .roll = sinf(GetClSimTime() * v_iroll_cycle.value) * v_iroll_level.value,
     };
-    r_refdef.viewangles = AngleMA(r_refdef.viewangles, v_idlescale.value, v_i);
+    r_refdef.view.facing = AngleMA(r_refdef.view.facing, v_idlescale.value, v_i);
 }
 
 
@@ -644,17 +644,17 @@ Roll is induced by movement and damage
 ==============
 */
 void V_CalcViewRoll() {
-    float side = V_CalcRoll(cl_entities[cl.viewentity].angles, cl.velocity);
-    r_refdef.viewangles.roll += side;
+    float side = V_CalcRoll(cl_entities[cl.viewentity].pose.facing, cl.velocity);
+    r_refdef.view.facing.roll += side;
 
     if (_v_DmgTime > 0.0f) {
-        r_refdef.viewangles.roll += _v_DmgTime / v_kicktime.value * _v_DmgRoll;
-        r_refdef.viewangles.pitch += _v_DmgTime / v_kicktime.value * _v_DmgPitch;
+        r_refdef.view.facing.roll += _v_DmgTime / v_kicktime.value * _v_DmgRoll;
+        r_refdef.view.facing.pitch += _v_DmgTime / v_kicktime.value * _v_DmgPitch;
         _v_DmgTime -= host_frametime;
     }
 
     if (cl.stats[STAT_HEALTH] <= 0.0f) {
-        r_refdef.viewangles.roll = 80.0f; // dead view angle
+        r_refdef.view.facing.roll = 80.0f; // dead view angle
         return;
     }
 
@@ -671,8 +671,8 @@ void V_CalcIntermissionRefdef() {
     r_Entity_p ent = &cl_entities[cl.viewentity];    // ent is the player model (visible when out of body)
     r_Entity_p view = &cl.viewent;    // view is the weapon model (only visible from inside body)
 
-    r_refdef.vieworg = ent->origin;
-    r_refdef.viewangles = ent->angles;
+    r_refdef.view.spot = ent->pose.spot;
+    r_refdef.view.facing = ent->pose.facing;
     view->model = NULL;
 
     // allways idle in intermission
@@ -698,31 +698,31 @@ void V_CalcRefdef() {
 
 
     // transform the view offset by the model's matrix to get the offset from model origin for the view
-    ent->angles.yaw = cl.viewangles.yaw; // the model should face the view dir
-    ent->angles.pitch = -cl.viewangles.pitch; // the model should face the view dir
+    ent->pose.facing.yaw = cl.viewangles.yaw; // the model should face the view dir
+    ent->pose.facing.pitch = -cl.viewangles.pitch; // the model should face the view dir
 
 
     float bob = V_CalcBob();
     // refresh position
-    r_refdef.vieworg = ent->origin;
-    r_refdef.vieworg.z += cl.viewheight + bob;
+    r_refdef.view.spot = ent->pose.spot;
+    r_refdef.view.spot.z += cl.viewheight + bob;
 
     // never let it sit exactly on a node line, because a water plane can
     // dissapear when viewed with the eye exactly on it.
     // the server protocol only specifies to 1/16 pixel, so add 1/32 in each axis
-    r_refdef.vieworg = VectorAdd(r_refdef.vieworg, Scalar2Vector(1.0 / 32));
+    r_refdef.view.spot = VectorAdd(r_refdef.view.spot, Scalar2Vector(1.0 / 32));
 
-    r_refdef.viewangles = cl.viewangles;
+    r_refdef.view.facing = cl.viewangles;
     V_CalcViewRoll();
     V_AddIdle();
 
-    ang3_t angles = ent->angles; {
+    ang3_t angles = ent->pose.facing; {
         angles.pitch = -angles.pitch;   // because entity pitches are actually backward
     }
     _bs = GetBasis(angles);
 
-    r_refdef.vieworg =
-        VectorMA(VectorMA(VectorMA(r_refdef.vieworg,
+    r_refdef.view.spot =
+        VectorMA(VectorMA(VectorMA(r_refdef.view.spot,
             scr_ofsz.value, _bs.up),
             scr_ofsy.value, _bs.right),
             scr_ofsx.value, _bs.forward
@@ -731,17 +731,18 @@ void V_CalcRefdef() {
 
     V_BoundOffsets();
 
-    view->angles = cl.viewangles;    // set up gun position
+    view->pose.facing = cl.viewangles;    // set up gun position
 
     CalcGunAngle();
 
-    view->origin = ent->origin;
-    view->origin.z += cl.viewheight;
+    view->pose.spot = ent->pose.spot; {
+        view->pose.spot.z += cl.viewheight;
+    }
 
-    view->origin = VectorMA(view->origin, bob * 0.4f, _bs.forward);
-    // view->origin = VectorMA(view->origin, bob * 0.4f, _bs.right);
-    // view->origin = VectorMA(view->origin, bob * 0.8f, _bs.up);
-    view->origin.z += bob;
+    view->pose.spot = VectorMA(view->pose.spot, bob * 0.4f, _bs.forward);
+    // view->pose.spot = VectorMA(view->pose.spot, bob * 0.4f, _bs.right);
+    // view->pose.spot = VectorMA(view->pose.spot, bob * 0.8f, _bs.up);
+    view->pose.spot.z += bob;
 
     // fudge position around to keep amount of weapon visible
     // roughly equal with different FOV
@@ -749,21 +750,21 @@ void V_CalcRefdef() {
 #if 0
     if (cl.model_precache[cl.stats[STAT_WEAPON]] && strcmp(cl.model_precache[cl.stats[STAT_WEAPON]]->name, "progs/v_shot2.mdl")) {}
 #endif
-    /**/ if (scr_viewsize.value == 110) view->origin.z += 1;
-    else if (scr_viewsize.value == 100) view->origin.z += 2;
-    else if (scr_viewsize.value == 90)  view->origin.z += 1;
-    else if (scr_viewsize.value == 80)  view->origin.z += 0.5;
+    /**/ if (scr_viewsize.value == 110) view->pose.spot.z += 1;
+    else if (scr_viewsize.value == 100) view->pose.spot.z += 2;
+    else if (scr_viewsize.value == 90)  view->pose.spot.z += 1;
+    else if (scr_viewsize.value == 80)  view->pose.spot.z += 0.5;
 
     view->model = cl.model_precache[cl.stats[STAT_WEAPON]];
     view->frame = cl.stats[STAT_WEAPONFRAME];
     view->colormap = vid.colormap;
 
     // set up the refresh position
-    r_refdef.viewangles = AngleAdd(r_refdef.viewangles, cl.punchangle);
+    r_refdef.view.facing = AngleAdd(r_refdef.view.facing, cl.punchangle);
 
     // smooth out stair step ups
     if ((cl.onground) &&
-        ((ent->origin.z - _oldZ) > 0.f)) {
+        ((ent->pose.spot.z - _oldZ) > 0.f)) {
 
         LegDt_t steptime = GetClSimTime() - cl.oldtime;
         if (steptime < 0.f) {
@@ -771,12 +772,12 @@ void V_CalcRefdef() {
         }
 
         _oldZ += steptime * 80.f;
-        if (_oldZ > ent->origin.z)         _oldZ = ent->origin.z;
-        if ((ent->origin.z - _oldZ) > 12.f)  _oldZ = ent->origin.z - 12.f;
-        r_refdef.vieworg.z += _oldZ - ent->origin.z;
-        view->origin.z += _oldZ - ent->origin.z;
+        if (_oldZ > ent->pose.spot.z)              _oldZ = ent->pose.spot.z;
+        if ((ent->pose.spot.z - _oldZ) > 12.f)     _oldZ = ent->pose.spot.z - 12.f;
+        r_refdef.view.spot.z += _oldZ - ent->pose.spot.z;
+        view->pose.spot.z += _oldZ - ent->pose.spot.z;
     }
-    else { _oldZ = ent->origin.z; }
+    else { _oldZ = ent->pose.spot.z; }
 
     if (chase_active.value)
         Chase_Update();
@@ -822,16 +823,16 @@ void V_RenderView() {
         vid.rowbytes = TWICE(vid.rowbytes);
         Scr.aspect *= 0.5;
 
-        r_refdef.viewangles.yaw -= lcd_yaw.value;
-        r_refdef.vieworg = VectorMA(r_refdef.vieworg, -lcd_x.value, _bs.right);
+        r_refdef.view.facing.yaw -= lcd_yaw.value;
+        r_refdef.view.spot = VectorMA(r_refdef.view.spot, -lcd_x.value, _bs.right);
         R_RenderView();
         vid.scr.pBuff += HALF(vid.rowbytes);
 
         R_PushDlights();
 
-        r_refdef.viewangles.yaw += lcd_yaw.value * 2.0f;
+        r_refdef.view.facing.yaw += lcd_yaw.value * 2.0f;
 
-        r_refdef.vieworg = VectorMA(r_refdef.vieworg, lcd_x.value * 2.0f, _bs.right);
+        r_refdef.view.spot = VectorMA(r_refdef.view.spot, lcd_x.value * 2.0f, _bs.right);
         R_RenderView();
         vid.scr.pBuff -= HALF(vid.rowbytes);
 

@@ -86,7 +86,7 @@ int  screenwidth;
 float pixelAspect;
 float screenAspect;
 float verticalFieldOfView;
-float xOrigin, yOrigin;
+static float _xOrigin, _yOrigin;
 
 mPlane_t screenedge[4];
 
@@ -218,17 +218,16 @@ void R_NewMap() {
 
     r_cnumsurfs = r_maxsurfs.value;
 
-    if (r_cnumsurfs <= MINSURFACES)
-        r_cnumsurfs = MINSURFACES;
+    CLAMP_LESS(&r_cnumsurfs, MINSURFACES);
 
     if (r_cnumsurfs > NUMSTACKSURFACES) {
-        surfaces = Hunk_AllocName(r_cnumsurfs * sizeof(Surf_t), "surfaces");
-        surface_p = surfaces;
-        surf_max = &surfaces[r_cnumsurfs];
+        pSurfaces = Hunk_AllocName(sizeof(Surf_t) * r_cnumsurfs, "surfaces");
+        pSurface = pSurfaces;
+        pSurf_max = &pSurfaces[r_cnumsurfs];
         r_surfsonstack = false;
         // surface 0 doesn't really exist; it's just a dummy because index 0
         // is used to indicate no edge attached to surface
-        surfaces--;
+        pSurfaces--;
         R_SurfacePatch();
     }
     else {
@@ -299,8 +298,8 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
         r_refdef.aliasvrect.height;
 
     pixelAspect = aspect;
-    xOrigin = r_refdef.xOrigin;
-    yOrigin = r_refdef.yOrigin;
+    _xOrigin = r_refdef.xOrigin;
+    _yOrigin = r_refdef.yOrigin;
 
     screenAspect = r_refdef.vrect.width * pixelAspect /
         r_refdef.vrect.height;
@@ -336,7 +335,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
 
     screenedge[0] = (mPlane_t){  // left side clip
         .normal = {
-            .x = -1.0f / (xOrigin * r_refdef.horizontalFieldOfView),
+            .x = -1.0f / (_xOrigin * r_refdef.horizontalFieldOfView),
             .y = 0.0f,
             .z = 1.0f
         },
@@ -344,7 +343,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     };
     screenedge[1] = (mPlane_t){   // right side clip
         .normal = {
-            .x = 1.0f / ((1.0f - xOrigin) * r_refdef.horizontalFieldOfView),
+            .x = 1.0f / ((1.0f - _xOrigin) * r_refdef.horizontalFieldOfView),
             .y = 0.0f,
             .z = 1.0f
         },
@@ -353,7 +352,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     screenedge[2] = (mPlane_t){  // top side clip
         .normal = {
             .x = 0.0f,
-            .y = -1.0f / (yOrigin * verticalFieldOfView),
+            .y = -1.0f / (_yOrigin * verticalFieldOfView),
             .z = 1.0f
         },
         .type = PLANE_ANYZ
@@ -361,7 +360,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     screenedge[3] = (mPlane_t){   // bottom side clip
         .normal = {
             .x = 0.0f,
-            .y = 1.0f / ((1.0f - yOrigin) * verticalFieldOfView),
+            .y = 1.0f / ((1.0f - _yOrigin) * verticalFieldOfView),
             .z = 1.0f
         },
         .type = PLANE_ANYZ
@@ -452,18 +451,18 @@ void R_DrawEntitiesOnList() {
 
         switch (currententity->model->type) {
         case mod_sprite: {
-            r_entorigin = currententity->origin;
+            r_entorigin = currententity->pose.spot;
             modelorg = VectorSubtract(r_origin, r_entorigin);
             R_DrawSprite();
         } break;
 
         case mod_alias: {
-            r_entorigin = currententity->origin;
+            r_entorigin = currententity->pose.spot;
             modelorg = VectorSubtract(r_origin, r_entorigin);
 
             // see if the bounding box lets us trivially reject, also sets trivial accept status
             if (R_AliasCheckBBox()) {
-                int j = R_LightPoint(currententity->origin);
+                int j = R_LightPoint(currententity->pose.spot);
 
                 aLight_t lighting;
                 lighting.ambientlight = j;
@@ -474,7 +473,7 @@ void R_DrawEntitiesOnList() {
 
                 for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
                     if (cl_dlights[lnum].die >= GetClSimTime()) {
-                        vec3_t dist = VectorSubtract(currententity->origin, cl_dlights[lnum].origin);
+                        vec3_t dist = VectorSubtract(currententity->pose.spot, cl_dlights[lnum].origin);
                         float add = cl_dlights[lnum].radius - Length(dist);
 
                         if (add > 0.0f)
@@ -526,12 +525,12 @@ void R_DrawViewModel() {
     if (!currententity->model)
         return;
 
-    r_entorigin = currententity->origin;
+    r_entorigin = currententity->pose.spot;
     modelorg = VectorSubtract(r_origin, r_entorigin);
     viewlightvec = BS.up;
     VectorInverse(&viewlightvec);
 
-    int j = R_LightPoint(currententity->origin);
+    int j = R_LightPoint(currententity->pose.spot);
 
     CLAMP_LESS(&j, 24);  // allways give some light on gun
 
@@ -546,7 +545,7 @@ void R_DrawViewModel() {
             (dl->die < GetClSimTime()))
             continue;
 
-        vec3_t dist = VectorSubtract(currententity->origin, dl->origin);
+        vec3_t dist = VectorSubtract(currententity->pose.spot, dl->origin);
         float add = dl->radius - Length(dist);
         if (add > 0)
             r_viewlighting.ambientlight += add;
@@ -577,12 +576,12 @@ extern int* pfrustum_indexes[4];    // TODO: avoid int*
 AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
     AliasClipFlags_f clipflags = ALIAS_NON_CLIP;
 
-    if (currententity->angles.pitch ||
-        currententity->angles.yaw ||
-        currententity->angles.roll
+    if (currententity->pose.facing.pitch ||
+        currententity->pose.facing.yaw ||
+        currententity->pose.facing.roll
         ) {
         for (int i = 0; i < 4; i++) {
-            double d = DotProduct(currententity->origin, view_clipplanes[i].normal);
+            double d = DotProduct(currententity->pose.spot, view_clipplanes[i].normal);
             d -= view_clipplanes[i].dist;
 
             if (d <= -clmodel->radius)
@@ -643,11 +642,11 @@ void R_DrawBEntitiesOnList() {
             Model_p clmodel = currententity->model;
 
             // see if the bounding box lets us trivially reject, also sets trivial accept status
-            BBox_t bb = BBoxTranslate(clmodel->BB, currententity->origin);
+            BBox_t bb = BBoxTranslate(clmodel->BB, currententity->pose.spot);
             AliasClipFlags_f clipflags = R_BmodelCheckBBox(clmodel, bb);
 
             if (clipflags != BMODEL_FULLY_CLIPPED) {
-                r_entorigin = currententity->origin;
+                r_entorigin = currententity->pose.spot;
                 modelorg = VectorSubtract(r_origin, r_entorigin);
 
                 r_pcurrentvertbase = clmodel->vertexes;
@@ -727,7 +726,7 @@ R_EdgeDrawing
 Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 1] PLACE_TO_SDRAM;
 Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 1] PLACE_TO_SDRAM;
 #else
-// TODO: check it and clean --> /* запас +2: выравнивание + место для surfaces-1 */
+// TODO: check it and clean --> /* запас +2: выравнивание + место для pSurfaces-1 */
 Edge_t ledges[NUMSTACKEDGES + ((CACHE_SIZE - 1) / sizeof(Edge_t)) + 2] PLACE_TO_SDRAM;
 Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2] PLACE_TO_SDRAM;
 #endif
@@ -744,10 +743,10 @@ void R_EdgeDrawing() {
     // (((uintptr_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
 
     if (r_surfsonstack) {
-        /* выравниваем от (lsurfs + 1), чтобы потом surfaces = base - 1 было легально */
+        /* выравниваем от (lsurfs + 1), чтобы потом pSurfaces = base - 1 было легально */
         Surf_p base = (Surf_p)ALIGN_PTR(&lsurfs[1], CACHE_SIZE);
-        surfaces = base - 1; /* surfaces[1] указывает ровно на base */
-        surf_max = &surfaces[r_cnumsurfs];
+        pSurfaces = base - 1; /* pSurfaces[1] указывает ровно на base */
+        pSurf_max = &pSurfaces[r_cnumsurfs];
         /* surface 0 — фиктивный элемент */
         R_SurfacePatch();
     }
@@ -805,7 +804,10 @@ void R_PrintDSpeeds() {
     RealDt_t ms = /*   */(r_time2 - r_time1) * 1000;
 
     Con_Printf(
-        "%3i %4.1fp %3iw %4.1fb %3is %4.1fe %4.1fv\n",
+        "%3i %4.1fp "
+        "%3iw %4.1fb "
+        "%3is %4.1fe "
+        "%4.1fv\n",
         (int)ms, dp_time,
         (int)rw_time, db_time,
         (int)se_time, de_time,

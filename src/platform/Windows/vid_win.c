@@ -329,7 +329,7 @@ int VID_Suspend(MGLDC* dc, m_int flags) {
         // keep WM_PAINT from trying to redraw
         in_mode_set = true;
 
-        scr.block_drawing = true;    // so we don't try to draw while switched away
+        Scr.block_drawing = true;    // so we don't try to draw while switched away
 
         return MGL_NO_SUSPEND_APP;
     }
@@ -344,7 +344,7 @@ int VID_Suspend(MGLDC* dc, m_int flags) {
 
         SCR_RequestCalcRefdef();
 
-        scr.block_drawing = false;
+        Scr.block_drawing = false;
 
         return MGL_NO_SUSPEND_APP;
     }
@@ -1253,7 +1253,7 @@ bool VID_SetWindowedMode(int modenum) {
     vid.maxwarp.height = WARP_HEIGHT;
     vid.scr.height = vid.con.height = DIBHeight;
     vid.scr.width = vid.con.width = DIBWidth;
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
+    Scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
 
     vid_stretched = stretched;
 
@@ -1293,7 +1293,7 @@ bool VID_SetFullscreenMode(int modenum) {
     vid.maxwarp.height = WARP_HEIGHT;
     DIBHeight = vid.scr.height = vid.con.height = modelist[modenum].height;
     DIBWidth = vid.scr.width = vid.con.width = modelist[modenum].width;
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
+    Scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
         (320.0 / 240.0);
 
     vid_stretched = modelist[modenum].stretched;
@@ -1406,7 +1406,7 @@ bool VID_SetFullDIBMode(int modenum) {
     vid.maxwarp.height = WARP_HEIGHT;
     vid.scr.height = vid.con.height = DIBHeight;
     vid.scr.width = vid.con.width = DIBWidth;
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
+    Scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
         (320.0 / 240.0);
 
     vid_stretched = modelist[modenum].stretched;
@@ -1469,8 +1469,8 @@ int VID_SetMode(int modenum, qPal_p palette) {
         return true;
 
     // so Con_Printfs don't mess us up by forcing vid and snd updates
-    int temp = scr.disabled_for_loading;
-    scr.disabled_for_loading = true;
+    int temp = Scr.disabled_for_loading;
+    Scr.disabled_for_loading = true;
     in_mode_set = true;
 
     CDAudio_Pause();
@@ -1510,7 +1510,7 @@ int VID_SetMode(int modenum, qPal_p palette) {
     VID_UpdateWindowStatus();
 
     CDAudio_Resume();
-    scr.disabled_for_loading = temp;
+    Scr.disabled_for_loading = temp;
 
     if (!stat) {
         VID_RestoreOldMode(original_mode);
@@ -2177,7 +2177,7 @@ void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height) {
     if (!vid_initialized)
         return;
 
-    if (scr.aspect > 1.5) { ;   reps = 2; repshift = 1; }
+    if (Scr.aspect > 1.5f) { ;  reps = 2; repshift = 1; }
     else { ;                    reps = 1; repshift = 0; }
 
     if (vid.numpages == 1) {
@@ -2251,13 +2251,11 @@ D_EndDirectRect
 ================
 */
 void D_EndDirectRect(int x, int y, int width, int height) {
-    int     reps, repshift;
-    vRect_t    rect;
-
     if (!vid_initialized)
         return;
 
-    if (scr.aspect > 1.5) { ;   reps = 2; repshift = 1; }
+    int reps, repshift;
+    if (Scr.aspect > 1.5) { ;   reps = 2; repshift = 1; }
     else { ;                    reps = 1; repshift = 0; }
 
     if (vid.numpages == 1) {
@@ -2266,22 +2264,24 @@ void D_EndDirectRect(int x, int y, int width, int height) {
         if (!vid.direct)
             Sys_Error("NULL vid.direct pointer");
 
-        for (int i = 0; i < (height << repshift); i += reps) {
-            for (int j = 0; j < reps; j++) {
-                memcpy(vid.direct + x + ((y << repshift) + i + j) * vid.rowbytes,
+        for (int i = 0; i < (height << repshift); i += reps)
+            for (int j = 0; j < reps; j++)
+                memcpy(
+                    vid.direct + x +
+                    vid.rowbytes * ((y << repshift) + i + j),
                     &backingbuf[(i + j) * 24],
-                    width);
-            }
-        }
+                    width
+                );
+
 
         VID_UnlockBuffer();
-
-        rect.x = x;
-        rect.y = y;
-        rect.width = width;
-        rect.height = height << repshift;
-        rect.pNext = NULL;
-
+        vRect_t rect = {
+            .x = x,
+            .y = y,
+            .width = width,
+            .height = height << repshift,
+            .pNext = NULL,
+        };
         FlipScreen(&rect);
     }
     else {
@@ -2289,30 +2289,22 @@ void D_EndDirectRect(int x, int y, int width, int height) {
         if (lockcount > 0)
             MGL_endDirectAccess();
 
-        // set the active page to the displayed page
-        MGL_setActivePage(mgldc, vPage);
-
-        // lock the screen
-        MGL_beginDirectAccess();
+        MGL_setActivePage(mgldc, vPage);    // set the active page to the displayed page
+        MGL_beginDirectAccess();            // lock the screen
 
         // restore to the screen
-        for (int i = 0; i < (height << repshift); i += reps) {
-            for (int j = 0; j < reps; j++) {
-                memcpy((uint8_p)mgldc->surface + x +
-                    ((y << repshift) + i + j) * mgldc->mi.bytesPerLine,
+        for (int i = 0; i < (height << repshift); i += reps)
+            for (int j = 0; j < reps; j++)
+                memcpy((uint8_p)(
+                    mgldc->surface + x +
+                    mgldc->mi.bytesPerLine * ((y << repshift) + i + j)),
                     &backingbuf[(i + j) * 24],
-                    width);
-            }
-        }
+                    width
+                );
 
-        // unlock the screen
-        MGL_endDirectAccess();
-
-        // restore the original active page
-        MGL_setActivePage(mgldc, aPage);
-
-        // relock the screen if it was locked
-        if (lockcount > 0)
+        MGL_endDirectAccess();              // unlock the screen
+        MGL_setActivePage(mgldc, aPage);    // restore the original active page
+        if (lockcount > 0)                  // relock the screen if it was locked
             MGL_beginDirectAccess();
     }
 }
@@ -2622,14 +2614,12 @@ LONG WINAPI MainWndProc(
 
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-        if (!in_mode_set)
-            Key_Event(MapKey(lParam), true);
+        if (!in_mode_set)   Key_Event(MapKey(lParam), true);
         break;
 
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        if (!in_mode_set)
-            Key_Event(MapKey(lParam), false);
+        if (!in_mode_set)   Key_Event(MapKey(lParam), false);
         break;
 
         // this is complicated because Win32 seems to pack multiple mouse events into

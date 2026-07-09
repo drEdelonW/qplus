@@ -561,7 +561,7 @@ void apply_vid_state(App_p app) {
 
     vid.scr.width = app->xwin.width;
     vid.scr.height = app->xwin.height;
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0f / 240.0f);
+    Scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0f / 240.0f);
     vid.numpages = 2;
     SCR_RequestCalcRefdef();
 

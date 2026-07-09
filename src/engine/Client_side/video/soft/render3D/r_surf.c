@@ -141,7 +141,7 @@ void R_BuildLightMap() {// TODO: merge with GL function almoust the same
     }
     else {  // clear to ambient
         for (int i = 0; i < size; i++)
-            blocklights[i] = INT_TO_FIXED8(r_refdef.ambientlight);
+            blocklights[i] = INT_TO_FIXED8(r_refdef.ambientLight);
 
         {   // add all the lightmaps
             uint8_p lightmap = surf->samples;

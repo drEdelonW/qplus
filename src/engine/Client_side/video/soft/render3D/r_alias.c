@@ -77,12 +77,88 @@ vec3_t r_avertexnormals[NUMVERTEXNORMALS] = {
 };
 #pragma GCC diagnostic pop
 
-void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts);
-void R_AliasSetUpTransform(int trivial_accept);
-void R_AliasTransformVector(vec3_t in, vec3_p out);
-void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stVert_p pstverts);
-void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av);
 
+/*
+================
+R_AliasTransformVector
+================
+*/
+void R_AliasTransformVector(vec3_t in, vec3_p out) {
+    for (int i = 0; i < VECT_DIM; i++)
+        out->v[i] = DotProduct(in, *(vec3_p)&aliastransform.m[i][0]) + aliastransform.m[i][3];
+}
+
+/*
+================
+R_AliasSetUpTransform
+================
+*/
+void R_AliasSetUpTransform(bool trivial_accept) {
+    static mat3x4_t tmatrix;
+    static mat3x4_t viewmatrix;
+    // TODO: should really be stored with the entity instead of being reconstructed
+    // TODO: should use a look-up table
+    // TODO: could cache lazily, stored in the entity
+
+    ang3_t angles = {
+        .pitch = -currententity->pose.facing.pitch,
+        .yaw = currententity->pose.facing.yaw,
+        .roll = currententity->pose.facing.roll
+    };
+
+    _alias = GetBasis(angles);
+
+
+    tmatrix.m[0][0] = pmdl->scale.x;
+    tmatrix.m[1][1] = pmdl->scale.y;
+    tmatrix.m[2][2] = pmdl->scale.z;
+
+    tmatrix.m[0][3] = pmdl->scale_origin.x;
+    tmatrix.m[1][3] = pmdl->scale_origin.y;
+    tmatrix.m[2][3] = pmdl->scale_origin.z;
+
+    // TODO: can do this with simple matrix rearrangement
+    mat3x4_t rotationmatrix;
+    mat3x4_t t2matrix;
+
+    for (int i = 0; i < VECT_DIM; i++) {
+        t2matrix.m[i][0] = _alias.forward.v[i];
+        t2matrix.m[i][1] = -_alias.right.v[i];
+        t2matrix.m[i][2] = _alias.up.v[i];
+    }
+
+    t2matrix.m[0][3] = -modelorg.x;
+    t2matrix.m[1][3] = -modelorg.y;
+    t2matrix.m[2][3] = -modelorg.z;
+
+    // FIXME: can do more efficiently than full concatenation
+    R_ConcatTransforms(&t2matrix, &tmatrix, &rotationmatrix);
+
+    // TODO: should be global, set when vright, etc., set
+    VectorCopy(BS.right, (vec3_p)viewmatrix.m[0]);
+    VectorCopy(BS.up, (vec3_p)viewmatrix.m[1]);
+    VectorInverse((vec3_p)viewmatrix.m[1]);
+    VectorCopy(BS.forward, (vec3_p)viewmatrix.m[2]);
+
+    // viewmatrix[0][3] = 0;
+    // viewmatrix[1][3] = 0;
+    // viewmatrix[2][3] = 0;
+
+    R_ConcatTransforms(&viewmatrix, &rotationmatrix, &aliastransform);
+
+    // do the scaling up of x and y to screen coordinates as part of the transform
+    // for the unclipped case (it would mess up clipping in the clipped case).
+    // Also scale down z, so 1/z is scaled 31 bits for free, and scale down x and y
+    // correspondingly so the projected x and y come out right
+    // FIXME: make this work for clipped case too?
+    if (trivial_accept) {
+        for (int i = 0; i < 4; i++) {
+            aliastransform.m[0][i] *= aliasxscale * (1.0 / ((float)0x8000 * FIXED16_ONE));
+            aliastransform.m[1][i] *= aliasyscale * (1.0 / ((float)0x8000 * FIXED16_ONE));
+            aliastransform.m[2][i] *= /*       */   (1.0 / ((float)0x8000 * FIXED16_ONE));
+        }
+    }
+}
 
 /*
 ================
@@ -92,12 +168,12 @@ R_AliasCheckBBox
 bool R_AliasCheckBBox() {
     // expand, rotate, and translate points into worldspace
 
-    currententity->trivial_accept = 0;
+    currententity->trivial_accept = false;
     _pmodel = currententity->model;
     AliasHdr_p pahdr = Mod_Extradata(_pmodel);
     pmdl = (Mdl_p)((uint8_p)pahdr + pahdr->model);
 
-    R_AliasSetUpTransform(0);
+    R_AliasSetUpTransform(false);
 
     // construct the base bounding box for this frame
     int frame = currententity->frame;
@@ -105,8 +181,7 @@ bool R_AliasCheckBBox() {
     if ((frame >= pmdl->numframes) ||
         (frame < 0)
         ) {
-        Con_DPrintf("No such frame %d %s\n", frame,
-            _pmodel->name);
+        Con_DPrintf("No such frame %d %s\n", frame, _pmodel->name);
         frame = 0;
     }
 
@@ -173,8 +248,7 @@ bool R_AliasCheckBBox() {
     int numv = 8;
 
     if (zclipped) {
-        // organize points by edges, use edges to get new points (possible trivial
-        // reject)
+        // organize points by edges, use edges to get new points (possible trivial reject)
         for (int i = 0; i < 12; i++) {
             // edge endpoints
             FinalVert_p pv0 = &viewpts[_aEdges[i].index0];
@@ -195,8 +269,8 @@ bool R_AliasCheckBBox() {
     }
 
     // project the vertices that remain after clipping
-    uint32_t anyclip = 0;
-    uint32_t allclip = ALIAS_XY_CLIP_MASK;
+    AliasClipFlags_f anyclip = ALIAS_NON_CLIP;
+    AliasClipFlags_f allclip = ALIAS_XY_CLIP_MASK;
 
     // TODO: probably should do this loop in ASM, especially if we use floats
     for (int i = 0; i < numv; i++) {
@@ -210,7 +284,7 @@ bool R_AliasCheckBBox() {
         float v0 = (viewaux[i].fv.x * xscale * zi) + xcenter;
         float v1 = (viewaux[i].fv.y * yscale * zi) + ycenter;
 
-        int flags = 0;
+        AliasClipFlags_f flags = ALIAS_NON_CLIP;
 
         if (v0 < r_refdef.fvrectx)      flags |= ALIAS_LEFT_CLIP;
         if (v1 < r_refdef.fvrecty)      flags |= ALIAS_TOP_CLIP;
@@ -236,16 +310,58 @@ bool R_AliasCheckBBox() {
 }
 
 
+
 /*
 ================
-R_AliasTransformVector
+R_AliasTransformFinalVert
 ================
 */
-void R_AliasTransformVector(vec3_t in, vec3_p out) {
-    for (int i = 0; i < VECT_DIM; i++)
-        out->v[i] = DotProduct(in, *(vec3_p)&aliastransform.m[i][0]) + aliastransform.m[i][3];
+void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stVert_p pstverts) {
+    vec3_t tv = {
+        .x = pverts->v8[X_AX],
+        .y = pverts->v8[Y_AX],
+        .z = pverts->v8[Z_AX],
+    };
+    av->fv.x = DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3];
+    av->fv.y = DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3];
+    av->fv.z = DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3];
+
+    fv->vAttr.s = pstverts->s;
+    fv->vAttr.t = pstverts->t;
+
+    fv->flags = pstverts->onseam;
+
+    // lighting
+    vec3_p plightnormal = &r_avertexnormals[pverts->lightnormalindex];
+    float lightcos = DotProduct(*plightnormal, r_plightvec);
+    int temp = r_ambientlight;
+
+    if (lightcos < 0) {
+        temp += (int)(r_shadelight * lightcos);
+
+        // clamp; because we limited the minimum ambient and shading light, we
+        // don't have to clamp low light, just bright
+        if (temp < 0)
+            temp = 0;
+    }
+
+    fv->vAttr.light = temp;
 }
 
+/*
+================
+R_AliasProjectFinalVert
+================
+*/
+void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av) {
+    // project points
+    float zi = 1.0 / av->fv.z;
+
+    fv->vAttr.zi = zi * _ziscale;
+
+    fv->vAttr.x = (av->fv.x * aliasxscale * zi) + aliasxcenter;
+    fv->vAttr.y = (av->fv.y * aliasyscale * zi) + aliasycenter;
+}
 
 /*
 ================
@@ -317,117 +433,6 @@ void R_AliasPreparePoints() {
 }
 
 
-/*
-================
-R_AliasSetUpTransform
-================
-*/
-void R_AliasSetUpTransform(int trivial_accept) {
-    static mat3x4_t tmatrix;
-    static mat3x4_t viewmatrix;
-    // TODO: should really be stored with the entity instead of being reconstructed
-    // TODO: should use a look-up table
-    // TODO: could cache lazily, stored in the entity
-
-    ang3_t angles = {
-        .pitch = -currententity->angles.pitch,
-        .yaw = currententity->angles.yaw,
-        .roll = currententity->angles.roll
-    };
-
-    _alias = GetBasis(angles);
-
-
-    tmatrix.m[0][0] = pmdl->scale.x;
-    tmatrix.m[1][1] = pmdl->scale.y;
-    tmatrix.m[2][2] = pmdl->scale.z;
-
-    tmatrix.m[0][3] = pmdl->scale_origin.x;
-    tmatrix.m[1][3] = pmdl->scale_origin.y;
-    tmatrix.m[2][3] = pmdl->scale_origin.z;
-
-    // TODO: can do this with simple matrix rearrangement
-    mat3x4_t rotationmatrix;
-    mat3x4_t t2matrix;
-
-    for (int i = 0; i < VECT_DIM; i++) {
-        t2matrix.m[i][0] = _alias.forward.v[i];
-        t2matrix.m[i][1] = -_alias.right.v[i];
-        t2matrix.m[i][2] = _alias.up.v[i];
-    }
-
-    t2matrix.m[0][3] = -modelorg.x;
-    t2matrix.m[1][3] = -modelorg.y;
-    t2matrix.m[2][3] = -modelorg.z;
-
-    // FIXME: can do more efficiently than full concatenation
-    R_ConcatTransforms(&t2matrix, &tmatrix, &rotationmatrix);
-
-    // TODO: should be global, set when vright, etc., set
-    VectorCopy(BS.right, (vec3_p)viewmatrix.m[0]);
-    VectorCopy(BS.up, (vec3_p)viewmatrix.m[1]);
-    VectorInverse((vec3_p)viewmatrix.m[1]);
-    VectorCopy(BS.forward, (vec3_p)viewmatrix.m[2]);
-
-    // viewmatrix[0][3] = 0;
-    // viewmatrix[1][3] = 0;
-    // viewmatrix[2][3] = 0;
-
-    R_ConcatTransforms(&viewmatrix, &rotationmatrix, &aliastransform);
-
-    // do the scaling up of x and y to screen coordinates as part of the transform
-    // for the unclipped case (it would mess up clipping in the clipped case).
-    // Also scale down z, so 1/z is scaled 31 bits for free, and scale down x and y
-    // correspondingly so the projected x and y come out right
-    // FIXME: make this work for clipped case too?
-    if (trivial_accept) {
-        for (int i = 0; i < 4; i++) {
-            aliastransform.m[0][i] *= aliasxscale * (1.0 / ((float)0x8000 * FIXED16_ONE));
-            aliastransform.m[1][i] *= aliasyscale * (1.0 / ((float)0x8000 * FIXED16_ONE));
-            aliastransform.m[2][i] *= /*       */   (1.0 / ((float)0x8000 * FIXED16_ONE));
-        }
-    }
-}
-
-
-/*
-================
-R_AliasTransformFinalVert
-================
-*/
-void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stVert_p pstverts) {
-    vec3_t tv = {
-        .x = pverts->v8[X_AX],
-        .y = pverts->v8[Y_AX],
-        .z = pverts->v8[Z_AX],
-    };
-    av->fv.x = DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3];
-    av->fv.y = DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3];
-    av->fv.z = DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3];
-
-    fv->vAttr.s = pstverts->s;
-    fv->vAttr.t = pstverts->t;
-
-    fv->flags = pstverts->onseam;
-
-    // lighting
-    vec3_p plightnormal = &r_avertexnormals[pverts->lightnormalindex];
-    float lightcos = DotProduct(*plightnormal, r_plightvec);
-    int temp = r_ambientlight;
-
-    if (lightcos < 0) {
-        temp += (int)(r_shadelight * lightcos);
-
-        // clamp; because we limited the minimum ambient and shading light, we
-        // don't have to clamp low light, just bright
-        if (temp < 0)
-            temp = 0;
-    }
-
-    fv->vAttr.light = temp;
-}
-
-
 #if !id386
 
 /*
@@ -480,21 +485,6 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
 
 #endif
 
-
-/*
-================
-R_AliasProjectFinalVert
-================
-*/
-void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av) {
-    // project points
-    float zi = 1.0 / av->fv.z;
-
-    fv->vAttr.zi = zi * _ziscale;
-
-    fv->vAttr.x = (av->fv.x * aliasxscale * zi) + aliasxcenter;
-    fv->vAttr.y = (av->fv.y * aliasyscale * zi) + aliasycenter;
-}
 
 
 /*

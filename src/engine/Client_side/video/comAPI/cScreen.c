@@ -15,6 +15,7 @@
 #include "menu.h"
 #ifdef GLQUAKE
 # include "qOpenGL.h"
+    void R_SetVrect(const vRect_p pvrect, vRect_p pvrectin, int lineadj);
 #else
 # include "render.h"
 #endif
@@ -395,18 +396,18 @@ void SCR_CalcRefdef() {
     //========================================
 
     // bound viewsize
-    if (scr_viewsize.value < 30)    Cvar_Set("viewsize", "30");
-    if (scr_viewsize.value > 120)   Cvar_Set("viewsize", "120");
+    if (scr_viewsize.value < 30.f)      Cvar_Set("viewsize", "30");
+    if (scr_viewsize.value > 120.f)     Cvar_Set("viewsize", "120");
 
     // bound field of view
-    if (scr_fov.value < 10)         Cvar_Set("fov", "10");
-    if (scr_fov.value > 170)        Cvar_Set("fov", "170");
+    if (scr_fov.value < 10.f)       Cvar_Set("fov", "10");
+    if (scr_fov.value > 170.f)      Cvar_Set("fov", "170");
 
     // intermission is always full screen
     {
         float size = (isIntermission()) ? 120 : scr_viewsize.value;
-        /**/ if (size >= 120.0f)    sb_lines = 0;        // no status bar at all
-        else if (size >= 110.0f)    sb_lines = 24;       // no inventory
+        /**/ if (size >= 120.f)     sb_lines = 0;        // no status bar at all
+        else if (size >= 110.f)     sb_lines = 24;       // no inventory
         else /*               */    sb_lines = 24 + 16 + 8;
     }
 
@@ -418,6 +419,7 @@ void SCR_CalcRefdef() {
     vRect_p pvrect = &r_refdef.vrect;
     int lineadj = sb_lines;
 #ifdef GLQUAKE
+#if 0
     bool full = ((scr_viewsize.value >= 100.0f) || (isIntermission()));
     /* look like void R_SetVrect(vRect_p pvrectin, vRect_p pvrect, int lineadj) in r_main.c */ {
         float size = (scr_viewsize.value > 100.0f) ?
@@ -427,7 +429,7 @@ void SCR_CalcRefdef() {
             size = 100.0f;
             lineadj = 0;
         }
-        size /= 100.0f;
+        size /= 100.0f; // normalize to 1.f
 
         int h = pvrectin->height - lineadj;
         pvrect->width = pvrectin->width * size;
@@ -437,8 +439,7 @@ void SCR_CalcRefdef() {
         }
 
         pvrect->height = pvrectin->height * size;
-        if (pvrect->height > (pvrectin->height - lineadj))
-            pvrect->height = (pvrectin->height - lineadj);
+        CLAMP_MORE(&pvrect->height, (pvrectin->height - lineadj));
 
         {   /* GLQUAKE specific */
             if (pvrect->height > pvrectin->height)
@@ -448,6 +449,9 @@ void SCR_CalcRefdef() {
             pvrect->y = (full) ? 0 : HALF(h - pvrect->height);
         }
     }
+#else
+    R_SetVrect(pvrectin, pvrect, lineadj);
+#endif
 #else
     // these calculations mirror those in R_Init() for r_refdef, but take no account of water warping
 
