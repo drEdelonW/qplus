@@ -433,8 +433,7 @@ void R_DrawAliasModel(r_Entity_p e) {
     // HACK HACK HACK -- no fullbright colors, so make torches full light
     if (!strcmp(clmodel->name, "progs/flame2.mdl") ||
         !strcmp(clmodel->name, "progs/flame.mdl")
-        )
-        ambientlight = shadelight = 256.0f;
+        )   ambientlight = shadelight = 256.0f;
 
     shadedots = r_avertexnormal_dots[
         ((int)(e->angles.yaw * (SHADEDOT_QUANT / 360.0f))) & (SHADEDOT_QUANT - 1)
@@ -444,8 +443,8 @@ void R_DrawAliasModel(r_Entity_p e) {
     float an = DEG2RAD(e->angles.yaw);
 
     shadevector = (vec3_t){
-        .x = cos(-an),
-        .y = sin(-an),
+        .x = cosf(-an),
+        .y = sinf(-an),
         .z = 1.f
     };
     VectorNormalize(&shadevector);

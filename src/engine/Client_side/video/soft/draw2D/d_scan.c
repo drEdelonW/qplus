@@ -78,28 +78,28 @@ void D_WarpScreen() {   // Under water warp
     int w = r_refdef.vrect.width;
     int h = r_refdef.vrect.height;
 
-    float wratio = w / (float)scr.vrect.width;
-    float hratio = h / (float)scr.vrect.height;
+    float wratio = w / (float)Scr.vrect.width;
+    float hratio = h / (float)Scr.vrect.height;
 #warning TODO: remake it to qColor8_p
-    for (int v = 0; v < scr.vrect.height + AMP2 * 2; v++) {
+    for (int v = 0; v < Scr.vrect.height + AMP2 * 2; v++) {
         rowptr[v] = (uint8_p)d_viewbuffer +
             (r_refdef.vrect.y * screenwidth) +
             (screenwidth * (int)((float)v * hratio * h / (h + AMP2 * 2)));
     }
 
-    for (int u = 0; u < scr.vrect.width + AMP2 * 2; u++) {
+    for (int u = 0; u < Scr.vrect.width + AMP2 * 2; u++) {
         column[u] = r_refdef.vrect.x +
             (int)((float)u * wratio * w / (w + AMP2 * 2));
     }
 
     turb = intsintable + ((int)(GetClSimTime() * SPEED) & (CYCLE - 1));
-    uint8_p dest = vid.scr.pBuff + scr.vrect.y * vid.rowbytes + scr.vrect.x;
+    uint8_p dest = vid.scr.pBuff + Scr.vrect.y * vid.rowbytes + Scr.vrect.x;
 
-    for (int v = 0; v < scr.vrect.height; v++, dest += vid.rowbytes) {
+    for (int v = 0; v < Scr.vrect.height; v++, dest += vid.rowbytes) {
         col = &column[turb[v]];
         uint8_ar row = &rowptr[v];
 
-        for (int u = 0; u < scr.vrect.width; u += 4) {
+        for (int u = 0; u < Scr.vrect.width; u += 4) {
             dest[u + 0] = row[turb[u + 0]][col[u + 0]];
             dest[u + 1] = row[turb[u + 1]][col[u + 1]];
             dest[u + 2] = row[turb[u + 2]][col[u + 2]];

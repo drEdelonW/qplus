@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // vid_win.c -- Win32 video driver
-#error 
+#error deprecated
 #include "winquake.h"
 #include "d_local.h"
 #include "resource.h"
@@ -1927,7 +1927,6 @@ void VID_Init(uint8_p palette) {
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
-    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
     vid_testingmode = 0;
 
     // GDI doesn't let us remap palette index 0, so we'll remap color

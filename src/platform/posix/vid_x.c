@@ -106,8 +106,8 @@ static inline uint32_t ChanShiftMask(int value, int shift, uint32_t mask) {
 }
 static inline Rgb32_t PackRgb(int r, int g, int b) {   // TODO: rework for [qRgb24] color geting
     return ChanShiftMask(r, r_shift, r_mask) |
-           ChanShiftMask(g, g_shift, g_mask) |
-           ChanShiftMask(b, b_shift, b_mask);
+        ChanShiftMask(g, g_shift, g_mask) |
+        ChanShiftMask(b, b_shift, b_mask);
 }
 
 PIXEL16 xlib_rgb16(int r, int g, int b) {
@@ -136,7 +136,7 @@ void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
 
         switch (count % 8) {
         case 0: do {
-        /*     */ *dest-- = st2d_8to16table[*src--];
+            /*     */ *dest-- = st2d_8to16table[*src--];
         case 7:   *dest-- = st2d_8to16table[*src--];
         case 6:   *dest-- = st2d_8to16table[*src--];
         case 5:   *dest-- = st2d_8to16table[*src--];
@@ -169,7 +169,7 @@ void st3_fixup(XImage* framebuf, int x, int y, int width, int height) {
 
         switch (count % 8) {
         case 0: do {
-        /*     */ *dest-- = st2d_8to24table[*src--];
+            /*     */ *dest-- = st2d_8to24table[*src--];
         case 7:   *dest-- = st2d_8to24table[*src--];
         case 6:   *dest-- = st2d_8to24table[*src--];
         case 5:   *dest-- = st2d_8to24table[*src--];
@@ -368,15 +368,12 @@ void ResetSharedFrameBuffers() {
 // the video driver will need it again
 
 void VID_Init(qPal_p palette) {
-
-    vid.scr.width = 320;
-    vid.scr.height = 200;
+    vid.scr.width = BASEWIDTH;
+    vid.scr.height = BASEHEIGHT;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
     vid.numpages = 2;
     vid.colormap = host_colormap;
-    // vid.cbits = VID_CBITS;
-    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));s
 
     srandom(getpid());
 
@@ -385,11 +382,8 @@ void VID_Init(qPal_p palette) {
     // open the display
     x_disp = XOpenDisplay(0);
     if (!x_disp) {
-        if (getenv("DISPLAY"))
-            Sys_Error("VID: Could not open display [%s]\n",
-                getenv("DISPLAY"));
-        else
-            Sys_Error("VID: Could not open local display\n");
+        if (getenv("DISPLAY"))  Sys_Error("VID: Could not open display [%s]\n", getenv("DISPLAY"));
+        else                    Sys_Error("VID: Could not open local display\n");
     }
 
     // catch signals so i can turn on auto-repeat
@@ -536,13 +530,12 @@ void VID_Init(qPal_p palette) {
 
     // wait for first exposure event
     {
-        XEvent event;
         do {
+            XEvent event;
             XNextEvent(x_disp, &event);
             if ((event.type == Expose) &&
                 !(event.xexpose.count)
-                )
-                oktodraw = true;
+                )   oktodraw = true;
         } while (!oktodraw);
     }
     // now safe to draw
@@ -575,7 +568,7 @@ void VID_Init(qPal_p palette) {
     vid.conrowbytes = vid.rowbytes;
     vid.con.width = vid.scr.width;
     vid.con.height = vid.scr.height;
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
+    Scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
 
     // XSynchronize(x_disp, False);
 
@@ -706,12 +699,10 @@ void VID_Update(vRect_p p_rects) {
                 )   Sys_Error("VID_Update: XShmPutImage failed\n");
 
             oktodraw = false;
-            while (!oktodraw) GetEvent();
-#if 0   /* TODO: check is here something not NULL ? */
-            p_rects = p_rects->pnext;
-#else
-            p_rects = p_rects->pNext;
-#endif
+            while (!oktodraw)
+                GetEvent();
+
+            p_rects = p_rects->pNext;   /* TODO: check is here something not NULL ? */
         }
         current_framebuffer = !current_framebuffer;
         vid.con.pBuff = (uint8_p)x_framebuffer[current_framebuffer]->data;
@@ -747,36 +738,4 @@ void VID_Update(vRect_p p_rects) {
         XSync(x_disp, False);
     }
 
-}
-
-#if 0 /* NOT USED */
-static bool dither;
-
-void VID_DitherOn() {
-    if (!dither) {
-        SCR_RequestCalcRefdef();
-        dither = true;
-    }
-}
-
-void VID_DitherOff() {
-    if (dither) {
-        SCR_RequestCalcRefdef();
-        dither = false;
-    }
-}
-#endif
-
-int Sys_OpenWindow() { return 0; }
-void Sys_EraseWindow(int window) {}
-void Sys_DrawCircle(int window, int x, int y, int r) {}
-void Sys_DisplayWindow(int window) {}
-
-
-void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height) {
-    // direct drawing of the "accessing disk" icon isn't supported under Linux
-}
-
-void D_EndDirectRect(int x, int y, int width, int height) {
-    // direct drawing of the "accessing disk" icon isn't supported under Linux
 }

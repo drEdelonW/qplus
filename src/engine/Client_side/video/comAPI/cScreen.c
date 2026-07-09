@@ -20,7 +20,7 @@
 #endif
 #include "GameRule.h"
 
-Screen_t scr;
+Screen_t Scr;
 _Screen_t _scr;
 
 /*
@@ -68,7 +68,7 @@ for a few moments
 */
 void SCR_CenterPrint(cString str) {
     strncpy(_scr.centerstring, str, sizeof(_scr.centerstring) - 1);
-    scr.centertime_off = scr_centertime.value;
+    Scr.centertime_off = scr_centertime.value;
     _scr.centertime_start = GetClSimTime();
 
     // count the number of lines for centering
@@ -190,9 +190,9 @@ Brings the console down and fades the palettes back to normal
 ================
 */
 void SCR_BringDownConsole() {
-    scr.centertime_off = 0;
+    Scr.centertime_off = 0;
 
-    for (int i = 0; (i < 20) && (scr.conlines != scr.con_current); i++)
+    for (int i = 0; (i < 20) && (Scr.conlines != Scr.con_current); i++)
         SCR_UpdateScreen();
 
     cl.cshifts[0].percent = 0;        // no area contents palette on next frame
@@ -216,8 +216,8 @@ void SCR_BeginLoadingPlaque() {
 
     // redraw with no console and the loading plaque
     Con_ClearNotify();
-    scr.centertime_off = 0;
-    scr.con_current = 0;
+    Scr.centertime_off = 0;
+    Scr.con_current = 0;
 
     _scr.drawloading = true;
     SCR_RequestRedraw();
@@ -225,7 +225,7 @@ void SCR_BeginLoadingPlaque() {
     SCR_UpdateScreen();
     _scr.drawloading = false;
 
-    scr.disabled_for_loading = true;
+    Scr.disabled_for_loading = true;
     _scr.disabled_time = GetRealTime();
     SCR_RequestRedraw();
 }
@@ -237,7 +237,7 @@ SCR_EndLoadingPlaque
 ================
 */
 void SCR_EndLoadingPlaque() {
-    scr.disabled_for_loading = false;
+    Scr.disabled_for_loading = false;
     SCR_RequestRedraw();
     Con_ClearNotify();
 }
@@ -252,7 +252,7 @@ void SCR_DrawRam() {
         (!r_cache_thrash))
         return;
     // printf("drawRAM [%s]  \n", r_cache_thrash ? "true" : "false");
-    Draw_Pic(scr.vrect.x + 32, scr.vrect.y, _scr.ram);
+    Draw_Pic(Scr.vrect.x + 32, Scr.vrect.y, _scr.ram);
 }
 
 /*
@@ -269,7 +269,7 @@ void SCR_DrawTurtle() {
     _cnt++;
     if (_cnt < 3)  return;
 
-    Draw_Pic(scr.vrect.x, scr.vrect.y, _scr.turtle);
+    Draw_Pic(Scr.vrect.x, Scr.vrect.y, _scr.turtle);
 }
 
 /*
@@ -282,18 +282,18 @@ void SCR_DrawNet() {
         (cls.isDemoPlaying))
         return;
 
-    Draw_Pic(scr.vrect.x + 64, scr.vrect.y, _scr.net);
+    Draw_Pic(Scr.vrect.x + 64, Scr.vrect.y, _scr.net);
 }
 
 
 void SCR_CheckDrawCenterString() {
-    scr.copytop = true;
+    Scr.copytop = true;
     if (_scr.center_lines > _scr.erase_lines)
         _scr.erase_lines = _scr.center_lines;
 
-    scr.centertime_off -= host_frametime;
+    Scr.centertime_off -= host_frametime;
 
-    if (((scr.centertime_off <= 0) &&
+    if (((Scr.centertime_off <= 0) &&
         (!isIntermission())) ||
         (key.dest != key_game)
         )
@@ -332,40 +332,40 @@ void SCR_SetUpToDrawConsole() {
     con.forcedup = !cl.worldmodel || cls.signon != SIGNONS;
 
     /**/ if (con.forcedup) {
-        scr.conlines = vid.scr.height;  // full screen
-        scr.con_current = scr.conlines;
+        Scr.conlines = vid.scr.height;  // full screen
+        Scr.con_current = Scr.conlines;
     }
-    else if (key.dest == key_console)   scr.conlines = HALF(vid.scr.height);    // half screen
-    else                                scr.conlines = 0;                       // none visible
+    else if (key.dest == key_console)   Scr.conlines = HALF(vid.scr.height);    // half screen
+    else                                Scr.conlines = 0;                       // none visible
 
-    if (scr.con_current > scr.conlines) {
-        scr.con_current -= scr_conspeed.value * host_frametime;
-        if (scr.con_current < scr.conlines)
-            scr.con_current = scr.conlines;
+    if (Scr.con_current > Scr.conlines) {
+        Scr.con_current -= scr_conspeed.value * host_frametime;
+        if (Scr.con_current < Scr.conlines)
+            Scr.con_current = Scr.conlines;
 
     }
-    else if (scr.con_current < scr.conlines) {
-        scr.con_current += scr_conspeed.value * host_frametime;
-        if (scr.con_current > scr.conlines)
-            scr.con_current = scr.conlines;
+    else if (Scr.con_current < Scr.conlines) {
+        Scr.con_current += scr_conspeed.value * host_frametime;
+        if (Scr.con_current > Scr.conlines)
+            Scr.con_current = Scr.conlines;
     }
     if (_scr.clearConsole++ < vid.numpages) {
 #ifdef GLQUAKE
 #else
-        scr.copytop = true;
+        Scr.copytop = true;
         Draw_TileClear(
             0,
-            scr.con_current,
+            Scr.con_current,
             vid.scr.width,
-            vid.scr.height - scr.con_current
+            vid.scr.height - Scr.con_current
         );
 #endif
         Sbar_Changed();
     }
-    else if (scr.clearnotify++ < vid.numpages) {
+    else if (Scr.clearnotify++ < vid.numpages) {
 #ifdef GLQUAKE
 #else
-        scr.copytop = true;
+        Scr.copytop = true;
         Draw_TileClear(0, 0, vid.scr.width, con.notifylines);
 #endif
     }
@@ -451,7 +451,7 @@ void SCR_CalcRefdef() {
 #else
     // these calculations mirror those in R_Init() for r_refdef, but take no account of water warping
 
-    R_SetVrect(pvrectin, &scr.vrect, lineadj);
+    R_SetVrect(pvrectin, &Scr.vrect, lineadj);
 #endif
 
     r_refdef.fov_x = scr_fov.value;
@@ -460,11 +460,11 @@ void SCR_CalcRefdef() {
 #ifdef GLQUAKE
 #else
     // guard against going from one mode to another that's less than half the vertical resolution
-    if (scr.con_current > vid.scr.height)
-        scr.con_current = vid.scr.height;
+    if (Scr.con_current > vid.scr.height)
+        Scr.con_current = vid.scr.height;
 
     // notify the refresh of the change
-    R_ViewChanged(pvrectin, sb_lines, scr.aspect);
+    R_ViewChanged(pvrectin, sb_lines, Scr.aspect);
 #endif
 }
 
@@ -491,7 +491,7 @@ void SCR_Composite() {
         Sbar_Draw();
         Draw_FadeScreen();
         SCR_DrawNotifyString();
-        scr.copyeverything = true;
+        Scr.copyeverything = true;
     }
     else if (_scr.drawloading) {
         SCR_DrawLoading();

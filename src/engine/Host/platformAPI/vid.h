@@ -39,21 +39,25 @@ void VID_UnlockBuffer();
 #include "qColor.h"
 #include "qLight.h"
 
+#define BASEWIDTH  (320)
+#define BASEHEIGHT (200)
+
 typedef struct {
     #warning TODO: move  [vRect_t scr;] and [ColorMap_p colormap;]  to screen
     vRect_t     scr;            // invisible buffer inside pBuff
-    ColorMap_p   colormap;       // 256 * VID_GRADES size   
-
+    ColorMap_p  colormap;       // 256 * VID_GRADES size   
+#if 1 /* TODO: not useful? */
     qColor16_p  colormap16;     // 256 * VID_GRADES size // TODO: check is ot not used?
-    // int         fullbright;     // index of first fullbright color // not used
-    uint32_t    rowbytes;       // may be > width if displayed in a window
+#endif
 
-    int         numpages;
     int         conrowbytes;    // offset in byte for next lone
     vRect_t     con;
 
     vRect_t     maxwarp;
+
     qColor8_p   direct;         // direct drawing to framebuffer, if not NULL
+    uint32_t    rowbytes;       // may be > width if displayed in a window
+    int         numpages;
 } VidDef_t;
 typedef VidDef_t* VidDef_p;
 

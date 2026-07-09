@@ -218,9 +218,9 @@ SCR_DrawConsole
 ==================
 */
 void SCR_DrawConsole() {
-    if (scr.con_current) {
-        scr.copyeverything = true;
-        Con_DrawConsole(scr.con_current, true);
+    if (Scr.con_current) {
+        Scr.copyeverything = true;
+        Con_DrawConsole(Scr.con_current, true);
         _scr.clearConsole = 0;
     }
     else {

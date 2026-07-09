@@ -421,8 +421,10 @@ R_DrawSurfaceBlock16
 FIXME: make this work
 ================
 */
+#include "sys.h"    // Sys_Error
 void R_DrawSurfaceBlock16() {
     uint16_p prowdest = (uint16_p)prowdestbase;
+    if (!vid.colormap16)    Sys_Error("vid.colormap16 if NULL\n");
 
     for (int k = 0; k < blocksize; k++) {
         qColor8_p psource = pbasesource;

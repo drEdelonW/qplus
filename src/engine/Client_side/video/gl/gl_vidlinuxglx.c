@@ -102,11 +102,6 @@ bool isPermedia = false;
 bool gl_mtexable = false;
 
 /*-----------------------------------------------------------------------*/
-void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
-}
-
-void D_EndDirectRect(int x, int y, int width, int height) {
-}
 
 static int XLateKey(XKeyEvent* ev) {
 
@@ -718,7 +713,6 @@ void VID_Init(uint8_p palette) {
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
-    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
 
     // interpret command-line params
 

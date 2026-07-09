@@ -29,8 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define WARP_HEIGHT     200
 #define MAXWIDTH        10000
 #define MAXHEIGHT       10000
-#define BASEWIDTH       320
-#define BASEHEIGHT      200
+
 
 #define MODE_WINDOWED   0
 #define NO_MODE                    (MODE_WINDOWED - 1)
@@ -159,8 +158,6 @@ void VID_ForceLockState(int lk) {}
 void VID_LockBuffer() {}
 void VID_UnlockBuffer() {}
 int VID_ForceUnlockedAndReturnState() { return 0; }
-void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {}
-void D_EndDirectRect(int x, int y, int width, int height) {}
 
 void CenterWindow(HWND hWndCenter, int width, int height, BOOL lefttopjustify) {
     int CenterX = HALF(GetSystemMetrics(SM_CXSCREEN) - width);
@@ -1548,7 +1545,6 @@ void    VID_Init(uint8_p palette) {
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
-    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
 
     DestroyWindow(hwnd_dialog);
 

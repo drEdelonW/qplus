@@ -48,9 +48,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vRect.h"
 #include "qTime.h"
 
+
 // only the refresh window will be updated unless these variables are flagged
 typedef struct {
-    vRect_t vrect;          // 3D viewport rectangle on screen
+    vRect_t vrect;  // 3D viewport rectangle on screen
     LegDt_t    centertime_off;
     int32_t con_current;
     int32_t conlines;       // lines of console to display
@@ -65,7 +66,7 @@ typedef struct {
     bool    r_cache_thrash;     // compatability
     float   aspect;             // width / height -- < 0 is taller than wide
 } Screen_t;
-extern Screen_t scr;
+extern Screen_t Scr;
 
 #ifdef __cplusplus
 extern "C" {

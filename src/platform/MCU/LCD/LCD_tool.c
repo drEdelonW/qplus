@@ -148,7 +148,5 @@ void VID_SetPalette(qPal_p palette) { // TODO: make copy and upscale with DMA2D
 void VID_ShiftPalette(qPal_p p) {
     VID_SetPalette(p);
 }
-// void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) { printf(TEXT_RED "D_BeginDirectRect\n" TEXT_RESET); }
-// void D_EndDirectRect(int x, int y, int width, int height) { printf(TEXT_RED "D_EndDirectRect\n" TEXT_RESET); }
 
 void VID_Shutdown() { printf(RED("VID_Shutdown\n")); }

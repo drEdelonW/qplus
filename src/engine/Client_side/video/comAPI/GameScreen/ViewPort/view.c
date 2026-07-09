@@ -820,7 +820,7 @@ void V_RenderView() {
         //
 
         vid.rowbytes = TWICE(vid.rowbytes);
-        scr.aspect *= 0.5;
+        Scr.aspect *= 0.5;
 
         r_refdef.viewangles.yaw -= lcd_yaw.value;
         r_refdef.vieworg = VectorMA(r_refdef.vieworg, -lcd_x.value, _bs.right);
@@ -838,7 +838,7 @@ void V_RenderView() {
         r_refdef.vrect.height = TWICE(r_refdef.vrect.height);
 
         vid.rowbytes = HALF(vid.rowbytes);
-        scr.aspect *= 2;
+        Scr.aspect *= 2;
     }
     else {
         R_RenderView();
@@ -853,11 +853,11 @@ void Draw_crosshair() {
     if (crosshair.value)
         Draw_Character(
 #if GLQUAKE
-            scr.vrect.x + HALF(scr.vrect.width),
-            scr.vrect.y + HALF(scr.vrect.height),
+            Scr.vrect.x + HALF(Scr.vrect.width),
+            Scr.vrect.y + HALF(Scr.vrect.height),
 #else
-            scr.vrect.x + HALF(scr.vrect.width) + cl_crossx.value,
-            scr.vrect.y + HALF(scr.vrect.height) + cl_crossy.value,
+            Scr.vrect.x + HALF(Scr.vrect.width) + cl_crossx.value,
+            Scr.vrect.y + HALF(Scr.vrect.height) + cl_crossy.value,
 #endif
             '+'
         );

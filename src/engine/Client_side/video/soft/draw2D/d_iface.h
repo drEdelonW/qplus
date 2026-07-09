@@ -82,9 +82,9 @@ extern int d_con_indirect; // if 0, Quake will draw console directly to vid.scr.
 extern Basis_t r_p;
 
 void D_Aff8Patch(TypeLess_ptr pcolormap);
-void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height);
+void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height); // mokked in vid_null.c
+void D_EndDirectRect(int x, int y, int width, int height);  // mokked in svid_null.c
 void D_DisableBackBufferAccess();
-void D_EndDirectRect(int x, int y, int width, int height);
 void D_PolysetDraw();
 void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts);
 void D_DrawPoly();

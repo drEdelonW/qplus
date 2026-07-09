@@ -78,13 +78,14 @@ Memory is cleared / released when a server or client begins, not when they end.
 */
 
 #if 1
+ColorMap_p  host_colormap;      // TODO: VID/Light specific move it out
+
 QuakeParms_t host_parms;
 bool        host_initialized;   // true if into command execution
 int32_t     host_framecount;
 int         host_hunklevel;
 jmp_buf     host_abortserver;
 qPal_p      host_basepal;
-ColorMap_p  host_colormap;
 bool        isDedicated;
 RealTime_t  oldrealtime;        // last frame run
 size_t      minimum_memory;
@@ -828,7 +829,7 @@ void Host::Shutdown() {
     _isDown = true;
 
     // keep Con_Printf from trying to update the screen
-    scr.disabled_for_loading = true;
+    Scr.disabled_for_loading = true;
 
     WriteConfiguration();
 

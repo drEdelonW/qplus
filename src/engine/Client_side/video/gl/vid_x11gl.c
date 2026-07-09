@@ -558,7 +558,6 @@ void apply_vid_state(App_p app) {
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
-    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
 
     vid.scr.width = app->xwin.width;
     vid.scr.height = app->xwin.height;

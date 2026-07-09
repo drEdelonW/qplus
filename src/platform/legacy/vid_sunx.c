@@ -260,25 +260,6 @@ void st3_fixup(XImage* framebuf, int x, int y, int width, int height) {
     }
 }
 
-/*
-================
-D_BeginDirectRect
-================
-*/
-void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
-    // direct drawing of the "accessing disk" icon isn't supported under Nextstep
-}
-
-
-/*
-================
-D_EndDirectRect
-================
-*/
-void D_EndDirectRect(int x, int y, int width, int height) {
-    // direct drawing of the "accessing disk" icon isn't supported under Nextstep
-}
-
 
 /*
 =================
@@ -534,8 +515,6 @@ void    VID_Init(uint8_p palette) {
     // scr.aspect = 1.0;
     vid.numpages = 2;
     vid.colormap = host_colormap;
-    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
-    //vid.cbits = VID_CBITS;
 
     srandom(getpid());
 
@@ -1050,23 +1029,6 @@ void    VID_Update(vRect_p rects) {
     }
 }
 
-#if 0 /* NOT USED */
-static bool dither;
-
-void VID_DitherOn() {
-    if (!dither) {
-        SCR_RequestCalcRefdef();
-        dither = true;
-    }
-}
-
-void VID_DitherOff() {
-    if (dither) {
-        SCR_RequestCalcRefdef();
-        dither = false;
-    }
-}
-#endif
 
 void VID_SetDefaultMode() {}
 int I_OpenWindow() { return 0; }

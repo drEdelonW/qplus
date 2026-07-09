@@ -1,5 +1,5 @@
-# DST_PLATFORM := WIN
-DST_PLATFORM := POSIX
+DST_PLATFORM := WIN
+# DST_PLATFORM := POSIX
 FORCE_32     := 1
 
 INCLUDES += $(SRC_DIR)/platform/Windows
@@ -20,7 +20,6 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
         SRC_LIST += $(WIN_DIR)/conproc.c
         SRC_LIST += $(WIN_DIR)/fpu_stubs.c
 
-#         SRC_LIST += $(PLAPI_DIR)/vid_null.c
         SRC_LIST += $(WIN_DIR)/vid_win.c
         $(eval MGL_DIR = $(WIN_DIR)/MGL) $(eval INCLUDES += $(MGL_DIR))
             LDLIBS += $(MGL_DIR)/MGLLT.LIB

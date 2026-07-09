@@ -16,3 +16,6 @@ typedef struct {
 typedef ColorMap_t* ColorMap_p;
 
 #endif /* ====================={ colorMap end }=====================*/
+
+
+extern ColorMap_p host_colormap;

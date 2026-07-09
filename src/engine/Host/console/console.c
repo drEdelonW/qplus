@@ -249,7 +249,7 @@ void Con_Printf(cStringRO fmt, ...) {
 
     // update the screen if the console is displayed
     if ((cls.signon != SIGNONS) &&
-        (!scr.disabled_for_loading)
+        (!Scr.disabled_for_loading)
         ) {
         // protect against infinite loop if something in SCR_UpdateScreen calls
         // Con_Printd
@@ -289,10 +289,10 @@ void Con_SafePrintf(cStringRO fmt, ...) {
     char msg[1024]; 
     VA_EXPAND(msg, fmt);
 
-    int temp = scr.disabled_for_loading;
-    scr.disabled_for_loading = true;
+    int temp = Scr.disabled_for_loading;
+    Scr.disabled_for_loading = true;
     Con_Printf("%s", msg);
-    scr.disabled_for_loading = temp;
+    Scr.disabled_for_loading = temp;
 }
 
 

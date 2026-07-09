@@ -45,7 +45,7 @@ void M_BuildTranslationTable(int top, int bottom) {
 
 
 void M_DrawTransPicTranslate(int x, int y, qPic_p pic) {
-     Draw_TransPicTranslate(x + HALF(vid.scr.width - 320), y, pic, &_translationTable); }
+    Draw_TransPicTranslate(x + HALF(vid.scr.width - 320), y, pic, &_translationTable); }
 
 
 void M_DrawTextBox(int x, int y, int width, int lines) {

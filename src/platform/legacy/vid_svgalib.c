@@ -459,7 +459,6 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
     vid.colormap = host_colormap;
-    // vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
     vid.conrowbytes = vid.rowbytes;
     vid.con.width = vid.scr.width;
     vid.con.height = vid.scr.height;
@@ -739,23 +738,6 @@ void VID_Update(vRect_p rects) {
         VID_SetMode((int)vid_mode.value, vid_current_palette);
 }
 
-#if 0 /* NOT USED */
-static bool dither;
-
-void VID_DitherOn() {
-    if (!dither) {
-        // R_ViewChanged (&vrect, sb_lines, scr.aspect);
-        dither = true;
-    }
-}
-
-void VID_DitherOff() {
-    if (dither) {
-        // R_ViewChanged (&vrect, sb_lines, scr.aspect);
-        dither = false;
-    }
-}
-#endif
 
 void Sys_SendKeyEvents() {
     if (!svgalib_inited)

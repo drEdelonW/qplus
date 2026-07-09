@@ -59,7 +59,7 @@ void SCR_EraseCenterString() {
     int y = (_scr.center_lines <= 4) ?
         vid.scr.height * 0.35 : 48;
 
-    scr.copytop = true;
+    Scr.copytop = true;
     Draw_TileClear(0, y, vid.scr.width, 8 * _scr.erase_lines);
 }
 
@@ -130,16 +130,16 @@ needs almost the entire 256k of stack space!
 ==================
 */
 void SCR_UpdateScreen() {
-    if (scr.block_drawing ||
-        scr.skipupdate)
+    if (Scr.block_drawing ||
+        Scr.skipupdate)
         return;
 
-    scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing
-    scr.copyeverything = false; // TODO: wrap this valuse to avoid global publishing
+    Scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing
+    Scr.copyeverything = false; // TODO: wrap this valuse to avoid global publishing
 
-    if (scr.disabled_for_loading) {
+    if (Scr.disabled_for_loading) {
         if ((GetRealTime() - _scr.disabled_time) > 60) {
-            scr.disabled_for_loading = false;
+            Scr.disabled_for_loading = false;
             Con_Printf("load failed.\n");
         }
         else    return;
@@ -179,7 +179,7 @@ void SCR_UpdateScreen() {
     D_EnableBackBufferAccess(); // of all overlay stuff if drawing directly
 
     if (fullupdate++ < vid.numpages) { // clear the entire screen
-        scr.copyeverything = true;
+        Scr.copyeverything = true;
         Draw_TileClear(0, 0, vid.scr.width, vid.scr.height);
         Sbar_Changed();
     }
@@ -214,7 +214,7 @@ void SCR_UpdateScreen() {
     //
 
     vRect_t  vrect;
-    if (scr.copyeverything) {   // fullScreen viewport withOUT sBar
+    if (Scr.copyeverything) {   // fullScreen viewport withOUT sBar
         vrect = (vRect_t){
             .x = 0,
             .y = 0,
@@ -222,7 +222,7 @@ void SCR_UpdateScreen() {
             .height = vid.scr.height,
         };
     }
-    else if (scr.copytop) {     // fullScreen viewport with sBar
+    else if (Scr.copytop) {     // fullScreen viewport with sBar
         vrect = (vRect_t){
             .x = 0,
             .y = 0,
@@ -232,8 +232,8 @@ void SCR_UpdateScreen() {
     }
     else {                      // center screen rectangle viewport with sBar
         vrect = (vRect_t){
-            .x = scr.vrect.x,
-            .y = scr.vrect.y,
+            .x = Scr.vrect.x,
+            .y = Scr.vrect.y,
             .width = vid.scr.width,
             .height = vid.scr.height,
         };

@@ -60,8 +60,8 @@ void Con_DrawNotify() {
 
         cString text = con.text + (i % (int32_t)con.totallines) * con.linewidth;
 
-        scr.clearnotify = 0;
-        scr.copytop = true;
+        Scr.clearnotify = 0;
+        Scr.copytop = true;
 
         for (int32_t x = 0; x < con.linewidth; x++)
             Draw_Character(OCTO(x + 1), v, text[x]);
@@ -70,8 +70,8 @@ void Con_DrawNotify() {
     }
 
     if (key.dest == key_message) {
-        scr.clearnotify = 0;
-        scr.copytop = true;
+        Scr.clearnotify = 0;
+        Scr.copytop = true;
 
         int32_t x = 0;
 
