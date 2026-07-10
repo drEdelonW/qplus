@@ -752,15 +752,15 @@ void R_SetupGL() {
     glLoadIdentity();
     vRect_t vrect = r_refdef.vrect;
 #if 0
-    int x = vrect.x * (glwidth / vid.scr.width);
-    int x2 = (vrect.x + vrect.width) * (glwidth / vid.scr.width);
-    int y = (vid.scr.height - vrect.y) * (glheight / vid.scr.height);
-    int y2 = (vid.scr.height - (vrect.y + vrect.height)) * (glheight / vid.scr.height);
+    int x = vrect.x * (glwidth / Scr.vrect.width);
+    int x2 = (vrect.x + vrect.width) * (glwidth / Scr.vrect.width);
+    int y = (Scr.vrect.height - vrect.y) * (glheight / Scr.vrect.height);
+    int y2 = (Scr.vrect.height - (vrect.y + vrect.height)) * (glheight / Scr.vrect.height);
 #else
-    float sx = (float)glwidth / vid.scr.width;
-    float sy = (float)glheight / vid.scr.height;
+    float sx = (float)glwidth / Scr.vrect.width;
+    float sy = (float)glheight / Scr.vrect.height;
     int yx = vrect.x;
-    int ty = vid.scr.height - vrect.y;
+    int ty = Scr.vrect.height - vrect.y;
     int x = yx * sx;
     int y = ty * sy;
     int x2 = (yx + vrect.width) * sx;
@@ -788,7 +788,7 @@ void R_SetupGL() {
     MYgluPerspective(r_refdef.fov_y, screenaspect, 4, 4096);
 
     if (mirror) {
-        if (mirror_plane->normal.z)    glScalef(1, -1, 1);
+        if (mirror_plane->normal.z)     glScalef(1, -1, 1);
         else                            glScalef(-1, 1, 1);
         glCullFace(GL_BACK);
     }

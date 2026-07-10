@@ -100,9 +100,9 @@ void VID_Update(vRect_p rects) {
         }
     }
     int ofs = ((800 - 640) / 2) + (((480 - 400) / 2) * LCD_SCREEN_WIDTH);
-    for (int y = 0; y < vid.scr.height; y++)
-        for (int x = 0; x < vid.scr.width; x++) {
-            uint8_t idx = vid.scr.pBuff[y * vid.scr.width + x];
+    for (int y = 0; y < Scr.vrect.height; y++)
+        for (int x = 0; x < Scr.vrect.width; x++) {
+            uint8_t idx = Scr.vrect.pBuff[y * Scr.vrect.width + x];
 
             uint8_t r = (d_8to24table[idx] >> 0) & 0xFF;
             uint8_t g = (d_8to24table[idx] >> 8) & 0xFF;
@@ -114,9 +114,9 @@ void VID_Update(vRect_p rects) {
                 (g << 8) |
                 (b << 0);
 #if 0
-            LCD_BG_LAYER_ADDRESS[(x + y * LCD_SCREEN_WIDTH) + ofs] = argb;
+            LCD_BG_LAYER_ADDRESS[(x + (y * LCD_SCREEN_WIDTH)) + ofs] = argb;
 #else
-            int base = ofs + TWICE(x) + TWICE(y) * LCD_SCREEN_WIDTH;
+            int base = ofs + TWICE(x) + (TWICE(y) * LCD_SCREEN_WIDTH);
 
             LCD_BG_LAYER_ADDRESS[base] = argb;
             LCD_BG_LAYER_ADDRESS[base + 1] = argb;

@@ -64,6 +64,7 @@ __weak void D_EndDirectRect(int x, int y, int width, int height) {}
 __weak void VID_Update(vRect_p rects) {}
 __weak void VID_Shutdown() {}
 __weak void VID_Init(qPal_p palette) {
+    
 #ifndef GLQUAKE
     vid.colormap = host_colormap;
 

@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <string.h>
 #include "sbar.h"
 #include "z_hunk.h"
+#include "screen.h"
 
 
 // draw.c -- this is the only file outside the refresh that touches the
@@ -369,7 +370,6 @@ void Draw_TextureMode_f() {
 Draw_Init
 ===============
 */
-#include "vid.h" // vid.scr.height
 void Draw_Init() {
     Cvar_RegisterVariable(&gl_nobind);
     Cvar_RegisterVariable(&gl_max_size);
@@ -455,8 +455,8 @@ void Draw_Init() {
         .th = 1.f
     };
 
-    conback->width = vid.scr.width;
-    conback->height = vid.scr.height;
+    conback->width = Scr.vrect.width;
+    conback->height = Scr.vrect.height;
 
     Hunk_FreeToLowMark(start);      // free loaded console
 
@@ -593,8 +593,8 @@ Draw_TransPic
 void Draw_TransPic(int x, int y, qPic_p pic) {
     if ((x < 0) ||
         (y < 0) ||
-        ((uint32_t)(x + pic->width) > vid.scr.width) ||
-        ((uint32_t)(y + pic->height) > vid.scr.height)
+        ((uint32_t)(x + pic->width) > Scr.vrect.width) ||
+        ((uint32_t)(y + pic->height) > Scr.vrect.height)
         ) {
         Host_SysError("Draw_TransPic: bad coordinates");
     }
@@ -655,10 +655,10 @@ Draw_ConsoleBackground
 ================
 */
 void Draw_ConsoleBackground(int lines) {
-    int y = QUARTER(vid.scr.height * 3);
+    int y = QUARTER(Scr.vrect.height * 3);
 
-    if (lines > y)  Draw_Pic(0, lines - vid.scr.height, conback);
-    else            Draw_AlphaPic(0, lines - vid.scr.height, conback, (float)(1.2 * lines) / y);
+    if (lines > y)  Draw_Pic(0, lines - Scr.vrect.height, conback);
+    else            Draw_AlphaPic(0, lines - Scr.vrect.height, conback, (float)(1.2 * lines) / y);
 }
 
 
@@ -722,9 +722,9 @@ void Draw_FadeScreen() {
             glColor4f(0.f, 0.f, 0.f, 0.8f); {
                 glBegin(GL_QUADS); {
                     glVertex2f(0.f, 0.f);
-                    glVertex2f(vid.scr.width, 0.f);
-                    glVertex2f(vid.scr.width, vid.scr.height);
-                    glVertex2f(0.f, vid.scr.height);
+                    glVertex2f(Scr.vrect.width, 0.f);
+                    glVertex2f(Scr.vrect.width, Scr.vrect.height);
+                    glVertex2f(0.f, Scr.vrect.height);
                 } glEnd();
             } glColor4f(1.f, 1.f, 1.f, 1.f);
         } glEnable(GL_TEXTURE_2D);
@@ -747,7 +747,7 @@ void Draw_BeginDisc() {
     if (!draw_disc)     return;
 
     glDrawBuffer(GL_FRONT);
-    Draw_Pic(vid.scr.width - 24, 0, draw_disc);
+    Draw_Pic(Scr.vrect.width - 24, 0, draw_disc);
     glDrawBuffer(GL_BACK);
 }
 
@@ -774,7 +774,7 @@ void GL_Set2D() {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, vid.scr.width, vid.scr.height, 0, -99999, 99999);
+    glOrtho(0, Scr.vrect.width, Scr.vrect.height, 0, -99999, 99999);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

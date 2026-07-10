@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // # error frame buffer not applicable for OpenGL
 #endif
 #include "types.h"
+#include "screen.h"
 
 #if defined(_WIN32) && !defined(WINDED)
 # if defined(_M_IX86)
@@ -43,8 +44,12 @@ void VID_UnlockBuffer();
 #define BASEHEIGHT (200)
 
 typedef struct {
+#if 0
     #warning TODO: move  [vRect_t scr;] and [ColorMap_p colormap;]  to screen
     vRect_t     scr;            // invisible buffer inside pBuff
+#else
+    vRect_t     frameBuff;            // invisible buffer inside pBuff
+#endif
     ColorMap_p  colormap;       // 256 * VID_GRADES size   
 #if 1 /* TODO: not useful? */
     qColor16_p  colormap16;     // 256 * VID_GRADES size // TODO: check is ot not used?

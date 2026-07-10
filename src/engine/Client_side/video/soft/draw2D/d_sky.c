@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "r_local.h"
 #include "d_local.h"
+#include "screen.h"
 
 #define R_SKY_SMASK     (0x007F0000)
 #define R_SKY_TMASK     (0x007F0000)
@@ -33,15 +34,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 D_Sky_uv_To_st
 =================
 */
-#include "vid.h" // vid.scr.width
 void D_Sky_uv_To_st(int u, int v, fixed16_p s, fixed16_p t) {
     float temp = (float)(
         (r_refdef.vrect.width >= r_refdef.vrect.height) ?
         r_refdef.vrect.width : r_refdef.vrect.height
         );
 
-    float wu = 8192.0f * (float)(u - HALF(vid.scr.width)) / temp;
-    float wv = 8192.0f * (float)(HALF(vid.scr.height) - v) / temp;
+    float wu = 8192.0f * (float)(u - HALF(Scr.vrect.width)) / temp;
+    float wv = 8192.0f * (float)(HALF(Scr.vrect.height) - v) / temp;
 
 
     vec3_t end = VectorMA(VectorMA(

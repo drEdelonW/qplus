@@ -166,8 +166,10 @@ CVAR(r_aliastransbase, "200");
 CVAR(r_aliastransadj, "100");
 
 // FROM: src/ui/view.c
+#ifndef STM32
 CVAR(lcd_x, "0");
 CVAR(lcd_yaw, "0");
+#endif
 
 CVAR(scr_ofsx, "0");
 CVAR(scr_ofsy, "0");

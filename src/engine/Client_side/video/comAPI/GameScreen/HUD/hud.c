@@ -13,15 +13,14 @@
 DrawPause
 ==============
 */
-#include "vid.h" // vid.scr.width
 void SCR_DrawPause() {
     if ((!scr_showpause.value) ||  // turn off for screenshots
         (!cl.paused))
         return;
 
     qPic_p pic = Draw_CachePic("gfx/pause.lmp");
-    Draw_Pic(HALF(vid.scr.width - pic->width),
-        HALF(vid.scr.height - 48 - pic->height), pic);
+    Draw_Pic(HALF(Scr.vrect.width - pic->width),
+        HALF(Scr.vrect.height - 48 - pic->height), pic);
 }
 
 
@@ -35,8 +34,8 @@ void SCR_DrawLoading() {
     if (!_scr.drawloading)   return;
 
     qPic_p pic = Draw_CachePic("gfx/loading.lmp");
-    Draw_Pic(HALF(vid.scr.width - pic->width),
-        HALF(vid.scr.height - 48 - pic->height), pic);
+    Draw_Pic(HALF(Scr.vrect.width - pic->width),
+        HALF(Scr.vrect.height - 48 - pic->height), pic);
 }
 
 

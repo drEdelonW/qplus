@@ -178,7 +178,6 @@ void SCR_ScreenShot_f() {
 
 
 //=============================================================================
-#include "vid.h" // vid.scr.height
 void SCR_TileClear() {
     if (r_refdef.vrect.x > 0) {
         // left
@@ -186,14 +185,14 @@ void SCR_TileClear() {
             0,
             0,
             r_refdef.vrect.x,
-            vid.scr.height - sb_lines
+            Scr.vrect.height - sb_lines
         );
         // right
         Draw_TileClear(
             r_refdef.vrect.x + r_refdef.vrect.width,
             0,
-            vid.scr.width - r_refdef.vrect.x + r_refdef.vrect.width,
-            vid.scr.height - sb_lines
+            Scr.vrect.width - r_refdef.vrect.x + r_refdef.vrect.width,
+            Scr.vrect.height - sb_lines
         );
     }
     if (r_refdef.vrect.y > 0) {
@@ -209,7 +208,7 @@ void SCR_TileClear() {
             r_refdef.vrect.x,
             r_refdef.vrect.y + r_refdef.vrect.height,
             r_refdef.vrect.width,
-            vid.scr.height - sb_lines - (r_refdef.vrect.height + r_refdef.vrect.y)
+            Scr.vrect.height - sb_lines - (r_refdef.vrect.height + r_refdef.vrect.y)
         );
     }
 }
@@ -228,7 +227,7 @@ needs almost the entire 256k of stack space!
 void SCR_UpdateScreen() {
     if (Scr.block_drawing)  return;
 
-    vid.numpages = 2 + gl_triplebuffer.value;
+    // vid.numpages = 2 + gl_triplebuffer.value;
 
 #if 0   /* this specific for software render. not applicable for OpenGL */
     scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing

@@ -1,6 +1,6 @@
-TARGET ?= quakeX11
+# TARGET ?= quakeX11
 # TARGET ?= quakeGLX11
-TARGET ?= quakeWin
+# TARGET ?= quakeWin
 TARGET ?= quakeSTM32
 
 # TARGET ?= STM32_LCD
@@ -143,14 +143,16 @@ clean:
 
 fresh: clean build
 
+PRE_RUN ?= cd run_env && ln -sf ../$(TARGETS).elf $(TARGET)
+
 run: $(TARGETS)
-	cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX) ./$(TARGET)
+	@$(PRE_RUN) && $(RUN_PREFIX) ./$(TARGET)
 
 run1: $(TARGETS)
-	cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX1) ./$(TARGET)
+	@$(PRE_RUN) && $(RUN_PREFIX1) ./$(TARGET)
 
 run2: $(TARGETS)
-	@cd run_env && ln -sf ../$(TARGETS).elf $(TARGET) && $(RUN_PREFIX2) ./$(TARGET)
+	@$(PRE_RUN) && $(RUN_PREFIX2) ./$(TARGET)
 
 rund: $(TARGETS)
 	@cd run_env && $(RUN_PREFIX) gdbserver :1234 ./$(TARGET)

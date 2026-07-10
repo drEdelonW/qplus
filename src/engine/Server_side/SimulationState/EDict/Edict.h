@@ -118,6 +118,7 @@ typedef enum {
     EntLeafsFirst   = 0,
     EntLeafsMax     = 16,
 } EntLeaf_t;
+
 typedef struct edict_s {
     bool            free;
     link_t          area;       // linked to a division node or leaf

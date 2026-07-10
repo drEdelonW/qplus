@@ -153,8 +153,10 @@ CVAR_EXTERN(r_aliastransadj);
 // FROM: src/ui/view.c
 CVAR_EXTERN(scr_fov);   // 10 - 170
 
+#ifndef STM32
 CVAR_EXTERN(lcd_x); // stereo software render features 
 CVAR_EXTERN(lcd_yaw);
+#endif
 
 CVAR_EXTERN(scr_ofsx);
 CVAR_EXTERN(scr_ofsy);

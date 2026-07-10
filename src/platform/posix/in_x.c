@@ -203,8 +203,8 @@ void GetEvent() {
 
     case MotionNotify:
         if (_windowed_mouse.value) {
-            mouse_x = (float)((int)x_event.xmotion.x - (int)(vid.scr.width / 2));
-            mouse_y = (float)((int)x_event.xmotion.y - (int)(vid.scr.height / 2));
+            mouse_x = (float)((int)x_event.xmotion.x - (int)(Scr.vrect.width / 2));
+            mouse_y = (float)((int)x_event.xmotion.y - (int)(Scr.vrect.height / 2));
             //printf("m: x=%d,y=%d, mx=%3.2f,my=%3.2f\n",
             // x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
@@ -214,7 +214,7 @@ void GetEvent() {
                 KeyReleaseMask | ExposureMask |
                 ButtonPressMask | ButtonReleaseMask);
             XWarpPointer(x_disp, None, x_win, 0, 0, 0, 0,
-                (vid.scr.width / 2), (vid.scr.height / 2));
+                (Scr.vrect.width / 2), (Scr.vrect.height / 2));
             XSelectInput(x_disp, x_win,
                 StructureNotifyMask | KeyPressMask |
                 KeyReleaseMask | ExposureMask |

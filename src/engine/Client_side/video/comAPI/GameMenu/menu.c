@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "menu_prv.h"
 #include "console.h"
 #include "cmd.h"
-#include "vid.h" //vid.scr.height
 #include "screen.h"
 
 
@@ -85,7 +84,7 @@ void M_Init() {
     Cmd_AddCommand("menu_quit", M_Menu_Quit_f);
 }
 
-
+#include "vid.h" // VID_UnlockBuffer
 void M_Draw() {
     if ((m_state == m_none) ||
         (key.dest != key_menu))
@@ -95,7 +94,7 @@ void M_Draw() {
         Scr.copyeverything = true;
 
         if (Scr.con_current) {
-            Draw_ConsoleBackground(vid.scr.height);
+            Draw_ConsoleBackground(Scr.vrect.height);
             VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
         }
         else    Draw_FadeScreen();

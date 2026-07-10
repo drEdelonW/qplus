@@ -6,6 +6,7 @@
 #include "cmd.h"
 #include "cbuf.h"
 #include "host.h"
+#include "screen.h"
 
 //=============================================================================
 /* KEYS MENU */
@@ -40,10 +41,9 @@ static cString _bindnames[][bs_num] = {
 
 #define NUMCOMMANDS (sizeof(_bindnames)/sizeof(_bindnames[0]))
 
-#include "vid.h" // vid.scr.width
 void M_Keys_Draw() {
     qPic_p p = Draw_CachePic("gfx/ttl_cstm.lmp");
-    M_DrawPic(HALF(vid.scr.width - p->width), 4, p);
+    M_DrawPic(HALF(Scr.vrect.width - p->width), 4, p);
 
     M_Print(12, 32, (_bind_grab) ?
         "Press a key or button for this action" :

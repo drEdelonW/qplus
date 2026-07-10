@@ -65,12 +65,11 @@ void D_InitCaches(TypeLess_ptr buffer, int size) {
     (void)size;
 }
 
-#include "vid.h" // vid.scr.width
 void GL_BeginRendering(int *x, int *y, int *width, int *height) {
     *x = 0;
     *y = 0;
-    *width = vid.scr.width;
-    *height = vid.scr.height;
+    *width = Scr.vrect.width;
+    *height = Scr.vrect.height;
 }
 
 void GL_EndRendering() {
@@ -559,9 +558,9 @@ void apply_vid_state(App_p app) {
     vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
 
-    vid.scr.width = app->xwin.width;
-    vid.scr.height = app->xwin.height;
-    Scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0f / 240.0f);
+    Scr.vrect.width = app->xwin.width;
+    Scr.vrect.height = app->xwin.height;
+    Scr.aspect = ((float)Scr.vrect.height / (float)Scr.vrect.width) * (320.0f / 240.0f);
     vid.numpages = 2;
     SCR_RequestCalcRefdef();
 
@@ -609,8 +608,8 @@ void VID_Init(qPal_p palette) {
 
     Con_SafePrintf(
         "Video mode %dx%d initialized.\n",
-        vid.scr.width,
-        vid.scr.height
+        Scr.vrect.width,
+        Scr.vrect.height
     );
 
     oktodraw = true;

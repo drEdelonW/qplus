@@ -29,7 +29,10 @@ _Screen_t _scr;
 SCR_Init
 ==================
 */
+#include "vid.h"
 void SCR_Init() {
+    Scr.vrect = vid.frameBuff;
+
     Cvar_RegisterVariable(&scr_viewsize);
     Cvar_RegisterVariable(&scr_conspeed);
     Cvar_RegisterVariable(&scr_showram);
@@ -81,7 +84,6 @@ void SCR_CenterPrint(cString str) {
     }
 }
 
-#include "vid.h"    // vid.scr.height
 void SCR_DrawCenterString() {
     // the finale prints the characters one at a time
     int remaining = (isIntermission()) ?
@@ -91,7 +93,7 @@ void SCR_DrawCenterString() {
     cString start = _scr.centerstring;
 
     int y = (_scr.center_lines <= 4) ?
-        vid.scr.height * 0.35 : 48;
+        Scr.vrect.height * 0.35 : 48;
 
     do {
         // scan the width of the line
@@ -100,7 +102,7 @@ void SCR_DrawCenterString() {
             if ((start[inLine] == '\n') || !start[inLine])
                 break;
 
-        int x = HALF(vid.scr.width - OCTO(inLine));
+        int x = HALF(Scr.vrect.width - OCTO(inLine));
         for (int j = 0; j < inLine; j++, x += 8) {
             Draw_Character(x, y, start[j]);
             if (!remaining--)
@@ -158,7 +160,7 @@ int SCR_ModalMessage(cString text) {
 
 void SCR_DrawNotifyString() {
     cString start = _scr.notifystring;
-    int y = vid.scr.height * 0.35f;
+    int y = Scr.vrect.height * 0.35f;
 
     do {
         // scan the width of the line
@@ -169,7 +171,7 @@ void SCR_DrawNotifyString() {
                 )
                 break;
 
-        int x = HALF(vid.scr.width - OCTO(inLine));
+        int x = HALF(Scr.vrect.width - OCTO(inLine));
         for (int j = 0; j < inLine; j++, x += 8)
             Draw_Character(x, y, start[j]);
 
@@ -324,6 +326,7 @@ float CalcFov(float fov_x, float width, float height) {
 SCR_SetUpToDrawConsole
 ==================
 */
+#include "vid.h" // vid.numpages
 void SCR_SetUpToDrawConsole() {
     Con_CheckResize();
 
@@ -333,41 +336,37 @@ void SCR_SetUpToDrawConsole() {
     con.forcedup = !cl.worldmodel || cls.signon != SIGNONS;
 
     /**/ if (con.forcedup) {
-        Scr.conlines = vid.scr.height;  // full screen
+        Scr.conlines = Scr.vrect.height;  // full screen
         Scr.con_current = Scr.conlines;
     }
-    else if (key.dest == key_console)   Scr.conlines = HALF(vid.scr.height);    // half screen
+    else if (key.dest == key_console)   Scr.conlines = HALF(Scr.vrect.height);    // half screen
     else                                Scr.conlines = 0;                       // none visible
 
     if (Scr.con_current > Scr.conlines) {
         Scr.con_current -= scr_conspeed.value * host_frametime;
-        if (Scr.con_current < Scr.conlines)
-            Scr.con_current = Scr.conlines;
+        if (Scr.con_current < Scr.conlines)     Scr.con_current = Scr.conlines; // TODO: clip it
 
     }
     else if (Scr.con_current < Scr.conlines) {
         Scr.con_current += scr_conspeed.value * host_frametime;
-        if (Scr.con_current > Scr.conlines)
-            Scr.con_current = Scr.conlines;
+        if (Scr.con_current > Scr.conlines)     Scr.con_current = Scr.conlines; // TODO: clip it
     }
     if (_scr.clearConsole++ < vid.numpages) {
-#ifdef GLQUAKE
-#else
+#ifndef GLQUAKE
         Scr.copytop = true;
         Draw_TileClear(
             0,
             Scr.con_current,
-            vid.scr.width,
-            vid.scr.height - Scr.con_current
+            Scr.vrect.width,
+            Scr.vrect.height - Scr.con_current
         );
 #endif
         Sbar_Changed();
     }
     else if (Scr.clearnotify++ < vid.numpages) {
-#ifdef GLQUAKE
-#else
+#ifndef GLQUAKE
         Scr.copytop = true;
-        Draw_TileClear(0, 0, vid.scr.width, con.notifylines);
+        Draw_TileClear(0, 0, Scr.vrect.width, con.notifylines);
 #endif
     }
     else
@@ -411,12 +410,12 @@ void SCR_CalcRefdef() {
         else /*               */    sb_lines = 24 + 16 + 8;
     }
 
-    vRect_t vrect = {
-        .width = vid.scr.width,
-        .height = vid.scr.height
-    };
-    vRect_p pvrectin = &vrect;
-    vRect_p pvrect = &r_refdef.vrect;
+    // vRect_t vrect = {
+    //     .width = Scr.vrect.width,
+    //     .height = Scr.vrect.height
+    // };
+    // vRect_p pvrectin = &vrect;
+    // vRect_p pvrect = &r_refdef.vrect;
     int lineadj = sb_lines;
 #ifdef GLQUAKE
 #if 0
@@ -450,25 +449,26 @@ void SCR_CalcRefdef() {
         }
     }
 #else
-    R_SetVrect(pvrectin, pvrect, lineadj);
+    R_SetVrect(&Scr.vrect, &r_refdef.vrect, lineadj);
+    // R_SetVrect(pvrectin, pvrect, lineadj);
 #endif
 #else
     // these calculations mirror those in R_Init() for r_refdef, but take no account of water warping
 
-    R_SetVrect(pvrectin, &Scr.vrect, lineadj);
+    R_SetVrect(&Scr.vrect, &r_refdef.vrect, lineadj);
+    // R_SetVrect(pvrectin, &Scr.vrect, lineadj);
 #endif
 
     r_refdef.fov_x = scr_fov.value;
-    r_refdef.fov_y = CalcFov(r_refdef.fov_x, pvrect->width, pvrect->height);
+    r_refdef.fov_y = CalcFov(r_refdef.fov_x, r_refdef.vrect.width, r_refdef.vrect.height);
 
 #ifdef GLQUAKE
 #else
     // guard against going from one mode to another that's less than half the vertical resolution
-    if (Scr.con_current > vid.scr.height)
-        Scr.con_current = vid.scr.height;
+    if (Scr.con_current > Scr.vrect.height)
+        Scr.con_current = Scr.vrect.height;
 
-    // notify the refresh of the change
-    R_ViewChanged(pvrectin, sb_lines, Scr.aspect);
+    R_ViewChanged(&Scr.vrect, sb_lines, Scr.aspect);    // notify the refresh of the change
 #endif
 }
 

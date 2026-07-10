@@ -1603,8 +1603,10 @@ void VID_LockBuffer() {
     screenwidth = (r_dowarp) ?
         WARP_WIDTH : vid.rowbytes;
 
+#ifndef STM32
     if (lcd_x.value)
         screenwidth = TWICE(screenwidth);
+#endif
 }
 
 

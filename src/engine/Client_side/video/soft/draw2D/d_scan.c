@@ -68,7 +68,7 @@ D_WarpScreen
 // the sine warp, to keep the edges from wrapping
 =============
 */
-#include "vid.h" // vid.scr.pBuff
+#include "vid.h" // vid.frameBuff.pBuff
 void D_WarpScreen() {   // Under water warp
     int* turb;
     int* col;
@@ -93,7 +93,7 @@ void D_WarpScreen() {   // Under water warp
     }
 
     turb = intsintable + ((int)(GetClSimTime() * SPEED) & (CYCLE - 1));
-    uint8_p dest = vid.scr.pBuff + Scr.vrect.y * vid.rowbytes + Scr.vrect.x;
+    uint8_p dest = vid.frameBuff.pBuff + Scr.vrect.y * vid.rowbytes + Scr.vrect.x;
 
     for (int v = 0; v < Scr.vrect.height; v++, dest += vid.rowbytes) {
         col = &column[turb[v]];

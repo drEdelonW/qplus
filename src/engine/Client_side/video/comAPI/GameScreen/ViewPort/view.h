@@ -37,7 +37,7 @@ extern "C" {
 #ifdef GLQUAKE
     void V_CalcBlend();
 #endif
-    void Draw_crosshair();
+    void HUD_crosshair();
 
 #ifdef __cplusplus
 }

@@ -74,7 +74,7 @@ Key_Console
 Interactive line editing and console scrollback
 ====================
 */
-#include "vid.h"    // vid.scr.height
+
 void Key_Console(keycode_t key) {
     switch (key) {
     case K_ENTER: {
@@ -127,8 +127,8 @@ void Key_Console(keycode_t key) {
     case K_PGUP:
     case K_MWHEELUP: {
         con.backscroll += 2;
-        if (con.backscroll > (con.totallines - EIGHTH(vid.scr.height) - 1))
-            con.backscroll = con.totallines - EIGHTH(vid.scr.height) - 1;
+        if (con.backscroll > (con.totallines - EIGHTH(Scr.vrect.height) - 1))
+            con.backscroll = con.totallines - EIGHTH(Scr.vrect.height) - 1;
     } return;
 
     case K_PGDN:
@@ -138,7 +138,7 @@ void Key_Console(keycode_t key) {
             con.backscroll = 0;
     } return;
 
-    case K_HOME: { con.backscroll = con.totallines - EIGHTH(vid.scr.height) - 1; } return;
+    case K_HOME: { con.backscroll = con.totallines - EIGHTH(Scr.vrect.height) - 1; } return;
     case K_END: { con.backscroll = 0; } return;
 
     case K_TAB: { // command completion

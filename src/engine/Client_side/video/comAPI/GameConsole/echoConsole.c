@@ -49,9 +49,9 @@ void Con_NotifyBox(cString text) {
     If the line width has changed, reformat the buffer.
     ================
 */
-#include "vid.h" // vid.scr.width
+
 void Con_CheckResize() {
-    int32_t width = EIGHTH(vid.scr.width) - 2;
+    int32_t width = EIGHTH(Scr.vrect.width) - 2;
     if (width == con.linewidth)
         return;
 

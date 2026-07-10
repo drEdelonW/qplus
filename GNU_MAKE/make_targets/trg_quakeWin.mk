@@ -27,3 +27,5 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
 
     LDLIBS += -luser32 -lgdi32 -lwinmm -lws2_32 -lwsock32 -ldxguid
     DEFINES += _WIN32
+
+PRE_RUN = cd run_env && cp -f ../$(TARGETS).elf $(TARGET).exe 

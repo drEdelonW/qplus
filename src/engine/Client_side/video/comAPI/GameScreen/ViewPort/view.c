@@ -210,18 +210,17 @@ ColorShift_t cshift_water = { {130, 80, 50}, 128 };
 ColorShift_t cshift_slime = { {0, 25, 5}, 150 };
 ColorShift_t cshift_lava = { {255, 80, 0}, 150 };
 
-// extern uint8_t gammatable[256]; // palette is sent through this
-uint8_t  gammatable[256]; // palette is sent through this
+uint8_t  gammatable[InksNum]; // palette is sent through this
 
 
 void BuildGammaTable(float g) {
     if (g == 1.0f) {
-        for (int i = 0; i < 256; i++)
+        for (int i = 0; i < InksNum; i++)
             gammatable[i] = (uint8_t)i;
         return;
     }
 
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < InksNum; i++) {
         int inf = 255 * pow((i + 0.5f) / 255.5, g) + 0.5f;
         CLAMP(0, &inf, 255);
         gammatable[i] = (uint8_t)inf;
@@ -815,6 +814,7 @@ void V_RenderView() {
 
     R_PushDlights();
 
+#ifndef STM32
     if (lcd_x.value) {
         //
         // render two interleaved views
@@ -826,7 +826,7 @@ void V_RenderView() {
         r_refdef.view.facing.yaw -= lcd_yaw.value;
         r_refdef.view.spot = VectorMA(r_refdef.view.spot, -lcd_x.value, _bs.right);
         R_RenderView();
-        vid.scr.pBuff += HALF(vid.rowbytes);
+        vid.frameBuff.pBuff += HALF(vid.rowbytes);
 
         R_PushDlights();
 
@@ -834,31 +834,30 @@ void V_RenderView() {
 
         r_refdef.view.spot = VectorMA(r_refdef.view.spot, lcd_x.value * 2.0f, _bs.right);
         R_RenderView();
-        vid.scr.pBuff -= HALF(vid.rowbytes);
+        vid.frameBuff.pBuff -= HALF(vid.rowbytes);
 
         r_refdef.vrect.height = TWICE(r_refdef.vrect.height);
 
         vid.rowbytes = HALF(vid.rowbytes);
         Scr.aspect *= 2;
     }
-    else {
+    else
+#endif
         R_RenderView();
-    }
 
-    Draw_crosshair();
-
+    HUD_crosshair();
 }
 
 
-void Draw_crosshair() {
+void HUD_crosshair() {
     if (crosshair.value)
         Draw_Character(
 #if GLQUAKE
-            Scr.vrect.x + HALF(Scr.vrect.width),
-            Scr.vrect.y + HALF(Scr.vrect.height),
+            r_refdef.vrect.x + HALF(r_refdef.vrect.width),
+            r_refdef.vrect.y + HALF(r_refdef.vrect.height),
 #else
-            Scr.vrect.x + HALF(Scr.vrect.width) + cl_crossx.value,
-            Scr.vrect.y + HALF(Scr.vrect.height) + cl_crossy.value,
+            r_refdef.vrect.x + HALF(r_refdef.vrect.width) + cl_crossx.value,
+            r_refdef.vrect.y + HALF(r_refdef.vrect.height) + cl_crossy.value,
 #endif
             '+'
         );
@@ -904,8 +903,10 @@ void V_Init() {
     Cmd_AddCommand("sizeup", V_SizeUp_f);
     Cmd_AddCommand("sizedown", V_SizeDown_f);
 
+#ifndef STM32
     Cvar_RegisterVariable(&lcd_x);
     Cvar_RegisterVariable(&lcd_yaw);
+#endif
 
     Cvar_RegisterVariable(&v_centermove);
     Cvar_RegisterVariable(&v_centerspeed);
