@@ -31,7 +31,8 @@ float surfscale;
 bool r_cache_thrash;         // set if surface cache is thrashing
 
 int sc_size;
-SurfCache_p sc_rover, sc_base;
+SurfCache_p sc_rover;
+SurfCache_p sc_base;
 
 #define GUARDSIZE 4
 
@@ -67,7 +68,7 @@ D_InitCaches
 
 ================
 */
-void D_InitCaches(TypeLess_ptr buffer, int size) {
+void D_InitCaches(SurfCache_p buffer, int size) {
     if (!msg_suppress_1)
         Con_Printf("%ik surface cache\n", size / 1024);
 

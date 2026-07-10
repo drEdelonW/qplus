@@ -34,13 +34,14 @@ key up events are sent even if in console mode
 */
 
 #define MAXCMD      (1024)
+typedef char cmdStr_t[MAXCMD];
 
 Key_t key;
 
 static int  _history_line = 0;
 static bool _shift_down = false;
 
-cString keyBindings[MAX_KEYS];
+static cString _keyBindings[MAX_KEYS];
 static keycode_t _keyshift[MAX_KEYS];   // key to map to if shift held down in console
 static int  _key_repeats[MAX_KEYS];     // if > 1, it is autorepeating
 static bool _isConKeys[MAX_KEYS];       // if true, can't be rebound while in console
@@ -311,7 +312,7 @@ static keyname_t _keyNames[] = {
 ===================
 Key_StringToKeynum
 
-Returns a key number to be used to index keyBindings[] by looking at
+Returns a key number to be used to index _keyBindings[] by looking at
 the given string.  Single ascii characters return themselves, while
 the K_* names are matched up.
 ===================
@@ -371,9 +372,9 @@ void Key_SetBinding(keycode_t keynum, cString binding) {
         return;
 
     // free old bindings
-    if (keyBindings[keynum]) {
-        Z_Free(keyBindings[keynum]);
-        keyBindings[keynum] = NULL;
+    if (_keyBindings[keynum]) {
+        Z_Free(_keyBindings[keynum]);
+        _keyBindings[keynum] = NULL;
     }
 
     // allocate memory for new binding
@@ -381,7 +382,7 @@ void Key_SetBinding(keycode_t keynum, cString binding) {
     cString new = Z_Malloc(len + 1);
     Q_strcpy(new, binding);
     new[len] = 0;
-    keyBindings[keynum] = new;
+    _keyBindings[keynum] = new;
 }
 
 /*
@@ -406,7 +407,7 @@ void Key_Unbind_f() {
 
 void Key_Unbindall_f() {
     for (keycode_t i = 0; i < MAX_KEYS; i++)
-        if (keyBindings[i])
+        if (_keyBindings[i])
             Key_SetBinding(i, "");
 }
 
@@ -432,13 +433,13 @@ void Key_Bind_f() {
     }
 
     if (argcnt == 2) {
-        if (keyBindings[btn])   Con_Printf("\"%s\" = \"%s\"\n", Cmd_Argv(1), keyBindings[btn]);
+        if (_keyBindings[btn])   Con_Printf("\"%s\" = \"%s\"\n", Cmd_Argv(1), _keyBindings[btn]);
         else                    Con_Printf("\"%s\" is not bound\n", Cmd_Argv(1));
         return;
     }
 
     // copy the rest of the command line
-    char cmd[MAXCMD] = { 0 }; // start out with a null string
+    cmdStr_t cmd = { 0 }; // start out with a null string
     for (int i = 2; i < argcnt; i++) {
         if (i > 2)
             strcat(cmd, " ");
@@ -457,13 +458,13 @@ Writes lines containing "bind key value"
 */
 void Key_WriteBindings(FILE* f) {
     for (keycode_t i = 0; i < MAX_KEYS; i++) {
-        if ((keyBindings[i]) &&
-            (*keyBindings[i])
+        if ((_keyBindings[i]) &&
+            (*_keyBindings[i])
             ) {
             fprintf(f,
                 "bind \"%s\" \"%s\"\n",
                 Key_KeynumToString(i),
-                keyBindings[i]
+                _keyBindings[i]
             );
         }
     }
@@ -551,7 +552,7 @@ void Key_Init() {
 
 static inline void Key_ReleaseBinding(cString kb, keycode_t Key) {
     if (kb && (kb[0] == '+')) {
-        char cmd[MAXCMD];
+        cmdStr_t cmd;
         snprintf(cmd, sizeof(cmd), "-%s %i\n", kb + 1, Key);
         Cbuf_AddText(cmd);
     }
@@ -583,7 +584,7 @@ void Key_Event(keycode_t Key, bool down) {
             )               return; // ignore most autorepeats
 
         if ((Key >= 200) &&
-            !keyBindings[Key]
+            !_keyBindings[Key]
             ) {
             Con_Printf(
                 "%s is unbound, hit F4 to set.\n",
@@ -643,14 +644,14 @@ void Key_Event(keycode_t Key, bool down) {
     // downs can be matched with ups
     //
     if (!down) {
-        Key_ReleaseBinding(keyBindings[Key], Key);
+        Key_ReleaseBinding(_keyBindings[Key], Key);
 
         if (_keyshift[Key] != Key) {
             cString kb = NULL;
             if ((Key < MAX_KEYS) &&
                 (_keyshift[Key] < MAX_KEYS)
                 ) {
-                kb = keyBindings[_keyshift[Key]];
+                kb = _keyBindings[_keyshift[Key]];
             }
             Key_ReleaseBinding(kb, Key);
         }
@@ -678,10 +679,10 @@ void Key_Event(keycode_t Key, bool down) {
         ((key.dest == key_game) && (!con.forcedup ||
             !_isConKeys[Key]))
         ) {
-        cString kb = keyBindings[Key];
+        cString kb = _keyBindings[Key];
         if (kb) {
             if (kb[0] == '+') { // button commands add keynum as a parm
-                char cmd[MAXCMD];   snprintf(cmd, sizeof(cmd), "%s %i\n", kb, Key);
+                cmdStr_t cmd;   snprintf(cmd, sizeof(cmd), "%s %i\n", kb, Key);
                 Cbuf_AddText(cmd);
             }
             else {
@@ -713,9 +714,42 @@ Key_ClearStates
 ===================
 */
 void Key_ClearStates() {
+    // send an up event for each key, to make sure the server clears them all
+    for (int i = 0; i < MAX_KEYS; i++) {
+        Key_Event(i, false);
+    }
     for (keycode_t i = 0; i < MAX_KEYS; i++) {
         _isKeyDown[i] = false;
         _key_repeats[i] = 0;
+    }
+}
+
+void M_UnbindCommand(cString command) {
+    int len = strlen(command);
+
+    for (keycode_t j = 0; j < MAX_KEYS; j++) {
+        if (!_keyBindings[j])
+            continue;
+        if (!strncmp(_keyBindings[j], command, len))
+            Key_SetBinding(j, "");
+    }
+}
+
+
+void M_FindKeysForCommand(cString command, int* twokeys) {
+    twokeys[0] = twokeys[1] = -1;
+    int len = strlen(command);
+    int count = 0;
+
+    for (int j = 0; j < MAX_KEYS; j++) {
+        if (!_keyBindings[j])
+            continue;
+        if (!strncmp(_keyBindings[j], command, len)) {
+            twokeys[count] = j;
+            count++;
+            if (count == 2)
+                break;
+        }
     }
 }
 

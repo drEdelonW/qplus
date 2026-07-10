@@ -60,7 +60,7 @@ bool vidmode_ext = false;
 // static cvar_t m_filter = { "m_filter", "0" };
 
 // it live in d_surf.c
-void D_InitCaches(TypeLess_ptr buffer, int size) {
+void D_InitCaches(SurfCache_p buffer, int size) {
     (void)buffer;
     (void)size;
 }

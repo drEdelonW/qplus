@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "d_local.h"
 #include "types.h"
+#include "vid.h"
 
 /*
 =====================
@@ -40,7 +41,7 @@ zPointDesc_t    r_zpointdesc;
 
 // void D_DrawZPoint();     //NOT USED
 void D_DrawZPoint() {
-    int16_p pz = d_pzbuffer + (d_zwidth * r_zpointdesc.v) + r_zpointdesc.u;
+    int16_p pz = vid.zBuff.pZBuff + (vid.zBuff.width * r_zpointdesc.v) + r_zpointdesc.u;
     qColor8_p pdest = d_viewbuffer + d_scantable[r_zpointdesc.v] + r_zpointdesc.u;
     int izi = (int)(r_zpointdesc.zi * 0x8000);
 

@@ -366,7 +366,7 @@ void D_DrawZSpans(eSpan_p pspan) {
     InvZq izistep = (InvZq)(d_zistepu * 0x8000 * FIXED16_ONE);
 
     do {
-        int16_p pdest = d_pzbuffer + (d_zwidth * pspan->v) + pspan->u;
+        int16_p pdest = vid.zBuff.pZBuff + (vid.zBuff.width * pspan->v) + pspan->u;
 
         int count = pspan->count;
 

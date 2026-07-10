@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "r_local.h"
 #include "d_local.h"
+#include "vid.h"
 
 // TODO: put in span spilling to shrink list size
 // !!! if this is changed, it must be changed in d_polysa.s too !!!
@@ -693,8 +694,8 @@ void D_RasterizeAliasPolySmooth() {
     d_snap.light = plefttop->light;
     d_snap.zi = plefttop->zi;
 
-    d_snap.pdest = (d_viewbuffer + (_yStart * screenwidth) + plefttop->x);
-    d_snap.pz = (d_pzbuffer + (_yStart * d_zwidth) + plefttop->x);
+    d_snap.pdest = d_viewbuffer + (_yStart * screenwidth) + plefttop->x;
+    d_snap.pz = vid.zBuff.pZBuff + (_yStart * vid.zBuff.width) + plefttop->x;
 
     if (initialleftheight == 1) {
         *d_pedgespanpackage = d_snap;
@@ -707,13 +708,13 @@ void D_RasterizeAliasPolySmooth() {
         );
 
 #if id386
-        d_pzbasestep = (int16_p)(d_zwidth + d_basestep.count) << 1;
+        d_pzbasestep = (int16_p)(vid.zBuff.width + d_basestep.count) << 1;
         d_pzextrastep = d_pzbasestep + 2;
 #else
         d_extrastep.count = d_basestep.count + 1;
 
-        d_basestep.pz = (int16_p)(intptr_t)(d_zwidth + d_basestep.count);
-        d_extrastep.pz = (int16_p)(intptr_t)(d_zwidth + d_extrastep.count);
+        d_basestep.pz = (int16_p)(intptr_t)(vid.zBuff.width + d_basestep.count);
+        d_extrastep.pz = (int16_p)(intptr_t)(vid.zBuff.width + d_extrastep.count);
 #endif
 
         d_basestep.pdest = (TypeLess_ptr)(intptr_t)(screenwidth + d_basestep.count);
@@ -781,7 +782,7 @@ void D_RasterizeAliasPolySmooth() {
         d_snap.zi = plefttop->zi;
 
         d_snap.pdest = (TypeLess_ptr)d_viewbuffer + _yStart * screenwidth + plefttop->x;
-        d_snap.pz = d_pzbuffer + _yStart * d_zwidth + plefttop->x;
+        d_snap.pz = vid.zBuff.pZBuff + _yStart * vid.zBuff.width + plefttop->x;
 
         if (height == 1) {
             *d_pedgespanpackage = d_snap;
@@ -799,11 +800,11 @@ void D_RasterizeAliasPolySmooth() {
             d_extrastep.pdest = (TypeLess_ptr)(intptr_t)(screenwidth + d_extrastep.count);
 
 #if id386
-            d_basestep.pz = (int16_p)(d_zwidth + d_basestep.count) << 1;
+            d_basestep.pz = (int16_p)(vid.zBuff.width + d_basestep.count) << 1;
             d_extrastep.pz = d_basestep.pz + 2;
 #else
-            d_basestep.pz = (int16_p)(intptr_t)(d_zwidth + d_basestep.count);
-            d_extrastep.pz = (int16_p)(intptr_t)(d_zwidth + d_extrastep.count);
+            d_basestep.pz = (int16_p)(intptr_t)(vid.zBuff.width + d_basestep.count);
+            d_extrastep.pz = (int16_p)(intptr_t)(vid.zBuff.width + d_extrastep.count);
 #endif
 
             int working_lstepx = (d_basestep.count < 0) ?
@@ -906,8 +907,8 @@ split:
 
     // draw the point
     int ofs = d_scantable[_new.y] + _new.x;
-    if (_new.zi > d_pzbuffer[ofs]) {
-        d_pzbuffer[ofs] = _new.zi;
+    if (_new.zi > vid.zBuff.pZBuff[ofs]) {
+        vid.zBuff.pZBuff[ofs] = _new.zi;
         int pix = skintable[FIXED16_TO_INT(_new.t)][FIXED16_TO_INT(_new.s)];
         //  pix = ((uint8_t *)acolormap)[pix + (_new.light & 0xFF00)];
         d_viewbuffer[ofs] = pix;

@@ -205,11 +205,6 @@ ClearAllStates
 ================
 */
 void ClearAllStates() {
-    // send an up event for each key, to make sure the server clears them all
-    for (int i = 0; i < MAX_KEYS; i++) {
-        Key_Event(i, false);
-    }
-
     Key_ClearStates();
     IN_ClearStates();
 }
@@ -223,7 +218,7 @@ VID_CheckAdequateMem
 bool VID_CheckAdequateMem(int width, int height) {
     int  tbuffersize;
 
-    tbuffersize = width * height * sizeof(*d_pzbuffer);
+    tbuffersize = width * height * sizeof(*vid.zBuff.pZBuff);
 
     tbuffersize += D_SurfaceCacheForRes(width, height);
 
@@ -246,7 +241,7 @@ VID_AllocBuffers
 bool VID_AllocBuffers(int width, int height) {
     int  tsize, tbuffersize;
 
-    tbuffersize = width * height * sizeof(*d_pzbuffer);
+    tbuffersize = width * height * sizeof(*vid.zBuff.pZBuff);
 
     tsize = D_SurfaceCacheForRes(width, height);
 
@@ -262,18 +257,18 @@ bool VID_AllocBuffers(int width, int height) {
 
     vid_surfcachesize = tsize;
 
-    if (d_pzbuffer) {
+    if (vid.zBuff.pZBuff) {
         D_FlushCaches();
         Hunk_FreeToHighMark(VID_highhunkmark);
-        d_pzbuffer = NULL;
+        vid.zBuff.pZBuff = NULL;
     }
 
     VID_highhunkmark = Hunk_HighMark();
 
-    d_pzbuffer = Hunk_HighAllocName(tbuffersize, "video");
+    vid.zBuff.pZBuff = Hunk_HighAllocName(tbuffersize, "video");
 
-    vid_surfcache = (uint8_p)d_pzbuffer +
-        width * height * sizeof(*d_pzbuffer);
+    vid_surfcache = (uint8_p)vid.zBuff.pZBuff +
+        width * height * sizeof(*vid.zBuff.pZBuff);
 
     return true;
 }

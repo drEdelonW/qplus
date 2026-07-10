@@ -74,7 +74,6 @@ extern "C" {
     int  D_SurfaceCacheForRes(int width, int height);
     void D_FlushCaches();
     void D_DeleteSurfaceCache();
-    void D_InitCaches(TypeLess_ptr buffer, int size);
     void R_SetVrect(const vRect_p pvrect, vRect_p pvrectin, int lineadj);
 
 

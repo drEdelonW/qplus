@@ -80,16 +80,6 @@ void M_Keys_Draw() {
     );
 }
 
-void M_UnbindCommand(cString command) {
-    int len = strlen(command);
-
-    for (keycode_t j = 0; j < MAX_KEYS; j++) {
-        if (!keyBindings[j])
-            continue;
-        if (!strncmp(keyBindings[j], command, len))
-            Key_SetBinding(j, "");
-    }
-}
 
 void M_Keys_Key(keycode_t k) {
     char cmd[80];
@@ -153,22 +143,4 @@ void M_Menu_Keys_f() {
     m_state = m_keys;
     m_entersound = true;
 }
-
-void M_FindKeysForCommand(cString command, int* twokeys) {
-    twokeys[0] = twokeys[1] = -1;
-    int len = strlen(command);
-    int count = 0;
-
-    for (int j = 0; j < MAX_KEYS; j++) {
-        if (!keyBindings[j])
-            continue;
-        if (!strncmp(keyBindings[j], command, len)) {
-            twokeys[count] = j;
-            count++;
-            if (count == 2)
-                break;
-        }
-    }
-}
-
 

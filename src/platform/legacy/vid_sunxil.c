@@ -629,10 +629,10 @@ VID_ResetFramebuffer() {
     vid.maxwarp.height = WARP_HEIGHT;
     SCR_RequestCalcRefdef();    // force a surface cache flush
 
-    free(d_pzbuffer);
+    free(vid.zBuff.pZBuff);
 
-    d_pzbuffer = malloc(PM(vid.scr.width) * PM(vid.scr.height) * sizeof(*d_pzbuffer));
-    //Hunk_HighAllocName(PM(vid.scr.width)*PM(vid.scr.height)*sizeof(*d_pzbuffer), "zbuff");
+    vid.zBuff.pZBuff = malloc(PM(vid.scr.width) * PM(vid.scr.height) * sizeof(*vid.zBuff.pZBuff));
+    //Hunk_HighAllocName(PM(vid.scr.width)*PM(vid.scr.height)*sizeof(*vid.zBuff.pZBuff), "zbuff");
 }
 
 VID_ResetFramebuffer_MT() {
@@ -656,9 +656,9 @@ VID_ResetFramebuffer_MT() {
 
     xil_destroy(old_display_image);
 
-    free(d_pzbuffer);
+    free(vid.zBuff.pZBuff);
 
-    d_pzbuffer = malloc(PM(vid.scr.width) * PM(vid.scr.height) * sizeof(*d_pzbuffer));
+    vid.zBuff.pZBuff = malloc(PM(vid.scr.width) * PM(vid.scr.height) * sizeof(*vid.zBuff.pZBuff));
 }
 
 void VID_ShiftPalette(uint8_p p) {

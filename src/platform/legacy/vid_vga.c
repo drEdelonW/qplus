@@ -221,11 +221,11 @@ bool VGA_FreeAndAllocVidbuffer(VidDef_p lvid, int allocnewbuffer) {
 	if (allocnewbuffer) {
 		// alloc an extra line in case we want to wrap, and allocate the z-buffer
 		tbuffersize = (lvid->rowBytes * (lvid->height + 1)) +
-			(lvid->width * lvid->height * sizeof(*d_pzbuffer));
+			(lvid->width * lvid->height * sizeof(*vid.zBuff.pZBuff));
 	}
 	else {
 		// just allocate the z-buffer
-		tbuffersize = lvid->width * lvid->height * sizeof(*d_pzbuffer);
+		tbuffersize = lvid->width * lvid->height * sizeof(*vid.zBuff.pZBuff);
 	}
 
 	tsize = D_SurfaceCacheForRes(lvid->width, lvid->height);
@@ -245,18 +245,18 @@ bool VGA_FreeAndAllocVidbuffer(VidDef_p lvid, int allocnewbuffer) {
 	VGA_buffersize = tbuffersize;
 	vid_surfcachesize = tsize;
 
-	if (d_pzbuffer) {
+	if (vid.zBuff.pZBuff) {
 		D_FlushCaches();
 		Hunk_FreeToHighMark(VGA_highhunkmark);
-		d_pzbuffer = NULL;
+		vid.zBuff.pZBuff = NULL;
 	}
 
 	VGA_highhunkmark = Hunk_HighMark();
 
-	d_pzbuffer = Hunk_HighAllocName(VGA_buffersize, "video");
+	vid.zBuff.pZBuff = Hunk_HighAllocName(VGA_buffersize, "video");
 
-	vid_surfcache = (uint8_p)d_pzbuffer
-		+ lvid->width * lvid->height * sizeof(*d_pzbuffer);
+	vid_surfcache = (uint8_p)vid.zBuff.pZBuff
+		+ lvid->width * lvid->height * sizeof(*vid.zBuff.pZBuff);
 
 	if (allocnewbuffer) {
 		lvid->buffer = (TypeLess_ptr)((uint8_p)vid_surfcache + vid_surfcachesize);
@@ -273,7 +273,7 @@ VGA_CheckAdequateMem
 ================
 */
 bool VGA_CheckAdequateMem(int width, int height, int rowbytes, int allocnewbuffer) {
-	int tbuffersize = width * height * sizeof(*d_pzbuffer);
+	int tbuffersize = width * height * sizeof(*vid.zBuff.pZBuff);
 
 	if (allocnewbuffer) {
 		// alloc an extra line in case we want to wrap, and allocate the z-buffer

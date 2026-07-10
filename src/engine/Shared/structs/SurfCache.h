@@ -20,3 +20,13 @@ struct SurfCache_s {
     Texture_p   texture;                // checked for animating textures
     qColor8_t   data[4];                // width * height elements
 } ;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    void D_InitCaches(SurfCache_p buffer, int size);
+
+#ifdef __cplusplus
+}
+#endif

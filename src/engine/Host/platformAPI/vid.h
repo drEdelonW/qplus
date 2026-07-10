@@ -59,8 +59,7 @@ typedef struct {
 typedef VidDef_t* VidDef_p;
 
 #if 1   /* Z-buffer */
-extern int16_p  d_pzbuffer;
-extern uint32_t d_zwidth;
+// extern int16_p  d_pzbuffer;
 #endif
 
 extern  VidDef_t    vid;    // global video state

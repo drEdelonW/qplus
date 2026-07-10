@@ -336,7 +336,7 @@ void ResetFrameBuffer() {
 
     if (x_framebuffer[0]) {
         Z_Free(x_framebuffer[0]->data);
-        //        Z_Free(d_pzbuffer);
+        //        Z_Free(vid.zBuff.pZBuff);
         free(x_framebuffer[0]);
     }
 
@@ -344,9 +344,8 @@ void ResetFrameBuffer() {
     if (pwidth == 3) pwidth = 4;
     mem = ((vid.scr.width * pwidth + 3) & ~3) * vid.scr.height;
 
-    //    d_pzbuffer = (uint16_t *) Z_Malloc(vid.scr.width*vid.scr.height*
-    //        sizeof(*d_pzbuffer));
-    d_pzbuffer = (int16_p)Hunk_HighAllocName(vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer), "zbuff");
+    // vid.zBuff.pZBuff = (uint16_t*)Z_Malloc(vid.scr.width * vid.scr.height * sizeof(*vid.zBuff.pZBuff));
+    vid.zBuff.pZBuff = (int16_p)Hunk_HighAllocName(vid.scr.width * vid.scr.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
 
     x_framebuffer[0] = XCreateImage(x_disp,
         x_vis,
@@ -370,9 +369,9 @@ void ResetSharedFrameBuffers() {
     int minsize = getpagesize();
     int frm;
 
-    //    if (d_pzbuffer)
-    //        Z_Free(d_pzbuffer);
-    d_pzbuffer = Hunk_HighAllocName(vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer), "zbuff");
+    //    if (vid.zBuff.pZBuff)
+    //        Z_Free(vid.zBuff.pZBuff);
+    vid.zBuff.pZBuff = Hunk_HighAllocName(vid.scr.width * vid.scr.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
 
     for (frm = 0; frm < 2; frm++) {
 

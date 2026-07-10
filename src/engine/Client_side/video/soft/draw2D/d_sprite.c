@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_local.h"
 #include "q_tools.h"
 #include "render.h"
+#include "vid.h"
 #include <math.h>
 
 #define DS_SPAN_LIST_END   (-128)
@@ -51,7 +52,7 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
 
     do {
         qColor8_p pdest = d_viewbuffer + (screenwidth * pspan->v) + pspan->u;
-        int16_p pz = d_pzbuffer + (d_zwidth * pspan->v) + pspan->u;
+        int16_p pz = vid.zBuff.pZBuff + (vid.zBuff.width * pspan->v) + pspan->u;
 
         int count = pspan->count;
 

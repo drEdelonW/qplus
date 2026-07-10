@@ -40,7 +40,6 @@ VidDef_t vid = {    // global video state
             .pClr       = _vidBuf,
             .rowBytes   = BASEWIDTH,
         },
-
         .con = {
             .width      = BASEWIDTH,
             .height     = BASEHEIGHT,
@@ -51,6 +50,7 @@ VidDef_t vid = {    // global video state
             .width  = BASEWIDTH,
             .height = BASEHEIGHT
         },
+
         .direct     = NULL,
         .numpages   = 1,
     };
@@ -66,8 +66,8 @@ __weak void VID_Init(qPal_p palette) {
 #ifndef GLQUAKE
     vid.colormap = host_colormap;
 
-    d_pzbuffer = _zBuf;
-    D_InitCaches(_surfCache, sizeof(_surfCache));
+    vid.zBuff.pZBuff = _zBuf;
+    D_InitCaches((SurfCache_p)_surfCache, sizeof(_surfCache));
 #endif
 }
 

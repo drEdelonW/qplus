@@ -468,25 +468,25 @@ int VID_SetMode(int modenum, uint8_p palette) {
     vid.maxwarp.height = WARP_HEIGHT;
 
     // alloc zbuffer and surface cache
-    if (d_pzbuffer) {
+    if (vid.zBuff.pZBuff) {
         D_FlushCaches();
         Hunk_FreeToHighMark(VID_highhunkmark);
-        d_pzbuffer = NULL;
+        vid.zBuff.pZBuff = NULL;
         vid_surfcache = NULL;
     }
 
     bsize = vid.rowBytes * vid.scr.height;
     tsize = D_SurfaceCacheForRes(vid.scr.width, vid.scr.height);
-    zsize = vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer);
+    zsize = vid.scr.width * vid.scr.height * sizeof(*vid.zBuff.pZBuff);
 
     VID_highhunkmark = Hunk_HighMark();
 
-    d_pzbuffer = Hunk_HighAllocName(bsize + tsize + zsize, "video");
+    vid.zBuff.pZBuff = Hunk_HighAllocName(bsize + tsize + zsize, "video");
 
-    vid_surfcache = ((uint8_p)d_pzbuffer) + zsize;
+    vid_surfcache = ((uint8_p)vid.zBuff.pZBuff) + zsize;
 
-    vid.con.pClr = (qColor8_p)(((uint8_p)d_pzbuffer) + zsize + tsize);
-    vid.scr.pClr = (qColor8_p)(((uint8_p)d_pzbuffer) + zsize + tsize);
+    vid.con.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
+    vid.scr.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
 
     D_InitCaches(vid_surfcache, tsize);
 

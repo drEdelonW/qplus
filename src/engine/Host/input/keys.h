@@ -124,7 +124,6 @@ typedef enum {
     key_menu
 } keydest_t;
 
-extern cString   keyBindings[MAX_KEYS];
 typedef struct {
     keycode_t lastpress;
     keydest_t dest;
@@ -149,6 +148,8 @@ extern "C" {
     bool is_printable(keycode_t symb);
     bool is_digits(keycode_t symb);
 
+    void M_FindKeysForCommand(cString command, int* twokeys);
+    void M_UnbindCommand(cString command);
 
 #ifdef __cplusplus
 }

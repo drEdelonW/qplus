@@ -802,11 +802,6 @@ ClearAllStates
 ================
 */
 void ClearAllStates() {
-    // send an up event for each key, to make sure the server clears them all
-    for (int i = 0; i < MAX_KEYS; i++) {
-        Key_Event(i, false);
-    }
-
     Key_ClearStates();
     IN_ClearStates();
 }

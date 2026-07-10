@@ -11,6 +11,7 @@ struct vRect_s {
     union {
         qColor8_p pClr;
         uint8_p pBuff;
+        int16_p pZBuff;
 #if 1   /* seems like  it used only in vid_x.c */
         vRect_p pNext;
 #endif

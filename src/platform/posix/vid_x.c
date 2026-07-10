@@ -239,26 +239,26 @@ void ResetFrameBuffer() {
         free(x_framebuffer[0]);
     }
 
-    if (d_pzbuffer) {
+    if (vid.zBuff.pZBuff) {
         D_FlushCaches();
         Hunk_FreeToHighMark(X11_highhunkmark);
-        d_pzbuffer = NULL;
+        vid.zBuff.pZBuff = NULL;
     }
     X11_highhunkmark = Hunk_HighMark();
 
     // alloc an extra line in case we want to wrap, and allocate the z-buffer
-    X11_buffersize = vid.frameBuff.width * vid.frameBuff.height * sizeof(*d_pzbuffer);
+    X11_buffersize = vid.frameBuff.width * vid.frameBuff.height * sizeof(*vid.zBuff.pZBuff);
 
     vid_surfcachesize = D_SurfaceCacheForRes(vid.frameBuff.width, vid.frameBuff.height);
 
     X11_buffersize += vid_surfcachesize;
 
-    d_pzbuffer = Hunk_HighAllocName(X11_buffersize, "video");
-    if (d_pzbuffer == NULL)
+    vid.zBuff.pZBuff = Hunk_HighAllocName(X11_buffersize, "video");
+    if (vid.zBuff.pZBuff == NULL)
         Sys_Error("Not enough memory for video mode\n");
 
-    vid_surfcache = (uint8_p)d_pzbuffer
-        + vid.frameBuff.width * vid.frameBuff.height * sizeof(*d_pzbuffer);
+    vid_surfcache = (uint8_p)vid.zBuff.pZBuff
+        + vid.frameBuff.width * vid.frameBuff.height * sizeof(*vid.zBuff.pZBuff);
 
     D_InitCaches(vid_surfcache, vid_surfcachesize);
 
@@ -285,26 +285,26 @@ void ResetFrameBuffer() {
 void ResetSharedFrameBuffers() {
     int minsize = getpagesize();
 
-    if (d_pzbuffer) {
+    if (vid.zBuff.pZBuff) {
         D_FlushCaches();
         Hunk_FreeToHighMark(X11_highhunkmark);
-        d_pzbuffer = NULL;
+        vid.zBuff.pZBuff = NULL;
     }
 
     X11_highhunkmark = Hunk_HighMark();
 
     // alloc an extra line in case we want to wrap, and allocate the z-buffer
-    X11_buffersize = vid.frameBuff.width * vid.frameBuff.height * sizeof(*d_pzbuffer);
+    X11_buffersize = vid.frameBuff.width * vid.frameBuff.height * sizeof(*vid.zBuff.pZBuff);
 
     vid_surfcachesize = D_SurfaceCacheForRes(vid.frameBuff.width, vid.frameBuff.height);
 
     X11_buffersize += vid_surfcachesize;
 
-    d_pzbuffer = Hunk_HighAllocName(X11_buffersize, "video");
-    if (d_pzbuffer == NULL)
+    vid.zBuff.pZBuff = Hunk_HighAllocName(X11_buffersize, "video");
+    if (vid.zBuff.pZBuff == NULL)
         Sys_Error("Not enough memory for video mode\n");
 
-    vid_surfcache = (uint8_p)d_pzbuffer + (vid.frameBuff.width * vid.frameBuff.height * sizeof(*d_pzbuffer));
+    vid_surfcache = (uint8_p)vid.zBuff.pZBuff + (vid.frameBuff.width * vid.frameBuff.height * sizeof(*vid.zBuff.pZBuff));
 
     D_InitCaches(vid_surfcache, vid_surfcachesize);
 

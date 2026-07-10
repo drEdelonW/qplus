@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 
 #include "Particle.h"
+#include "vid.h"
 
 #define PARTICLE_Z_CLIP 8.0
 
@@ -84,7 +85,7 @@ void D_DrawParticle(Particle_p pparticle) {
         return;
     }
 
-    int16_p pz = d_pzbuffer + (d_zwidth * v) + u;
+    int16_p pz = vid.zBuff.pZBuff + (vid.zBuff.width * v) + u;
     qColor8_p pdest = d_viewbuffer + d_scantable[v] + u;
     int izi = (int)(zi * 0x8000);
 
@@ -96,7 +97,7 @@ void D_DrawParticle(Particle_p pparticle) {
     case 1: {
         int count = 1 << d_y_aspect_shift;
 
-        for (; count; count--, pz += d_zwidth, pdest += screenwidth) {
+        for (; count; count--, pz += vid.zBuff.width, pdest += screenwidth) {
             if (pz[0] <= izi) {
                 pz[0] = izi;
                 pdest[0].i = pparticle->color;
@@ -107,7 +108,7 @@ void D_DrawParticle(Particle_p pparticle) {
     case 2: {
         int count = 2 << d_y_aspect_shift;
 
-        for (; count; count--, pz += d_zwidth, pdest += screenwidth) {
+        for (; count; count--, pz += vid.zBuff.width, pdest += screenwidth) {
             if (pz[0] <= izi) {
                 pz[0] = izi;
                 pdest[0].i = pparticle->color;
@@ -123,7 +124,7 @@ void D_DrawParticle(Particle_p pparticle) {
     case 3: {
         int count = 3 << d_y_aspect_shift;
 
-        for (; count; count--, pz += d_zwidth, pdest += screenwidth) {
+        for (; count; count--, pz += vid.zBuff.width, pdest += screenwidth) {
             if (pz[0] <= izi) {
                 pz[0] = izi;
                 pdest[0].i = pparticle->color;
@@ -144,7 +145,7 @@ void D_DrawParticle(Particle_p pparticle) {
     case 4: {
         int count = 4 << d_y_aspect_shift;
 
-        for (; count; count--, pz += d_zwidth, pdest += screenwidth) {
+        for (; count; count--, pz += vid.zBuff.width, pdest += screenwidth) {
             if (pz[0] <= izi) {
                 pz[0] = izi;
                 pdest[0].i = pparticle->color;
@@ -170,7 +171,7 @@ void D_DrawParticle(Particle_p pparticle) {
     default: {
         int count = pix << d_y_aspect_shift;
 
-        for (; count; count--, pz += d_zwidth, pdest += screenwidth)
+        for (; count; count--, pz += vid.zBuff.width, pdest += screenwidth)
             for (int i = 0; i < pix; i++)
                 if (pz[i] <= izi) {
                     pz[i] = izi;
