@@ -92,7 +92,7 @@ void SCR_ScreenShot_f() {
         pcxname[5] = (i / 10) + '0';
         pcxname[6] = (i % 10) + '0';
 
-        char checkname[MAX_OSPATH];
+        fsPath_t checkname;
         snprintf(checkname, sizeof(checkname), "%s/%s", com.gamedir, pcxname);
         if (Sys_FileTime(checkname) == -1) {     // save the pcx file
             D_EnableBackBufferAccess(); // enable direct drawing of console to back
@@ -101,7 +101,7 @@ void SCR_ScreenShot_f() {
             WritePCXfile(
                 pcxname, Scr.vrect.pBuff,
                 Scr.vrect.width, Scr.vrect.height,
-                vid.rowbytes, host_basepal
+                Scr.vrect.rowBytes, host_basepal
             );
 
             D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
@@ -136,13 +136,14 @@ void SCR_UpdateScreen() {
 
     if (vid.numpages > 1) {
         Scr.vrect.pBuff = vid.frameBuff.pBuff;
-        vid.con.pBuff = Scr.vrect.pBuff; 
+        vid.con.pBuff = Scr.vrect.pBuff;
     }
+
     Scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing
     Scr.copyeverything = false; // TODO: wrap this valuse to avoid global publishing
 
     if (Scr.disabled_for_loading) {
-        if ((GetRealTime() - _scr.disabled_time) > 60) {
+        if ((GetRealTime() - _scr.disabled_time) > 60.f) {
             Scr.disabled_for_loading = false;
             Con_Printf("load failed.\n");
         }
@@ -165,42 +166,31 @@ void SCR_UpdateScreen() {
     }
 #endif
 
-    if (_scr.oldFov != scr_fov.value) {
-        _scr.oldFov = scr_fov.value;
-        SCR_RequestCalcRefdef();
-    }
-
-    if (_scr.oldViewSize != scr_viewsize.value) {
-        _scr.oldViewSize = scr_viewsize.value;
-        SCR_RequestCalcRefdef();
-    }
-
     SCR_CalcRefdef();
 
     //
     // do 3D refresh drawing, and then update the screen
     //
-    D_EnableBackBufferAccess(); // of all overlay stuff if drawing directly
-
-    if (fullupdate++ < vid.numpages) { // clear the entire screen
-        Scr.copyeverything = true;
-        Draw_TileClear(0, 0, Scr.vrect.width, Scr.vrect.height);
-        Sbar_Changed();
-    }
+    D_EnableBackBufferAccess(); { // of all overlay stuff if drawing directly
+        if (fullupdate++ < vid.numpages) { // clear the entire screen
+            Scr.copyeverything = true;
+            Draw_TileClear(0, 0, Scr.vrect.width, Scr.vrect.height);    // TODO: move to screen compositor
+            Sbar_Changed();
+        }
 
 #if 0
-    _pConUpdate = NULL;
+        _pConUpdate = NULL;
 #endif
 
-    SCR_SetUpToDrawConsole();
-    SCR_EraseCenterString();
+        SCR_SetUpToDrawConsole();
+        SCR_EraseCenterString();
 
-    D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
+    }D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
     //  for linear writes all the time
 
-    VID_LockBuffer();
-    V_RenderView();
-    VID_UnlockBuffer();
+    VID_LockBuffer(); {
+        V_RenderView();
+    } VID_UnlockBuffer();
 
     D_EnableBackBufferAccess(); { // of all overlay stuff if drawing directly
         SCR_Composite();    // main state based compositor
@@ -218,7 +208,7 @@ void SCR_UpdateScreen() {
     //
 
     vRect_t  vrect;
-    if (Scr.copyeverything) {   // fullScreen viewport withOUT sBar
+    if (Scr.copyeverything) {   // fullScreen viewport with sBar
         vrect = (vRect_t){
             .x = 0,
             .y = 0,
@@ -226,7 +216,7 @@ void SCR_UpdateScreen() {
             .height = Scr.vrect.height,
         };
     }
-    else if (Scr.copytop) {     // fullScreen viewport with sBar
+    else if (Scr.copytop) {     // fullScreen viewport withOUT sBar
         vrect = (vRect_t){
             .x = 0,
             .y = 0,

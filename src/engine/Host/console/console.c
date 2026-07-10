@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 
 console_t con = {
-    .cursorspeed = 4
+    .cursorBlinkHz = 4
 };
 
 /*
@@ -74,6 +74,7 @@ void Con_ClearNotify() {
     Con_Init
     ================
 */
+#define MAXGAMEDIRLEN   (1000)
 void Con_Init() {
     con.debuglog = COM_CheckParm("-condebug");
 
@@ -98,7 +99,6 @@ void Con_Init() {
     //
     Cvar_RegisterVariable(&con_notifytime);
 
-
     Cmd_AddCommand("clear", Con_Clear_f);
     con.isInitialized = true;
 }
@@ -113,10 +113,9 @@ void Con_Linefeed() {
     con.x = 0;
     con.current++;
     Q_memset(
-        &con.text[
-            (uint32_t)((con.current % (int32_t)con.totallines) * con.linewidth)
-        ],
-        ' ', (uint32_t)con.linewidth
+        &con.text[(con.current % con.totallines) * con.linewidth],
+        ' ',
+        con.linewidth
     );
 }
 
@@ -136,8 +135,7 @@ void Con_Print(cStringRO txt) {
 
     uint8_t mask;
     switch (txt[0]) {
-    case 1:     S_LocalSound("misc/talk.wav");
-        /* fall through */
+    case 1: S_LocalSound("misc/talk.wav");  /* fall through */
     case 2: {
         mask = 0x80; /* 128 */
         txt++;
@@ -149,7 +147,7 @@ void Con_Print(cStringRO txt) {
     char c;
     while ((c = *txt)) {
         // count word length
-        uint32_t l = 0;
+        int l = 0;
         for (; l < con.linewidth; l++) {
             if (txt[l] <= ' ')
                 break;
@@ -160,14 +158,12 @@ void Con_Print(cStringRO txt) {
             ((con.x + l) > (uint32_t)con.linewidth)) {
             con.x = 0;
         }
-
         txt++;
 
         if (cr) {
             con.current--;
             cr = false;
         }
-
 
         if (!con.x) {
             Con_Linefeed();
@@ -177,24 +173,16 @@ void Con_Print(cStringRO txt) {
         }
 
         switch (c) {
-        case '\r':  cr = 1;
-            /* fall through */
-        case '\n': {
-            con.x = 0;
-        } break;
+        case '\r':  cr = 1; /* fall through */
+        case '\n':  con.x = 0;
+            break;
 
 
         default: { // display character and advance
-            con.text[
-                (uint32_t)(
-                    (con.current % (int32_t)con.totallines) *
-                    con.linewidth) +
-                    con.x
-            ] = (uint32_t)c | mask;
+            con.text[((con.current % con.totallines) * con.linewidth) + con.x] = c | mask;
             con.x++;
-            if (con.x >= con.linewidth) {
+            if (con.x >= con.linewidth)
                 con.x = 0;
-            }
         } break;
         }
 
@@ -286,13 +274,13 @@ void Con_DPrintf(cStringRO fmt, ...) {
     ==================
 */
 void Con_SafePrintf(cStringRO fmt, ...) {
-    char msg[1024]; 
+    char msg[1024];
     VA_EXPAND(msg, fmt);
 
-    int temp = Scr.disabled_for_loading;
-    Scr.disabled_for_loading = true;
-    Con_Printf("%s", msg);
-    Scr.disabled_for_loading = temp;
+    int temp = Scr.disabled_for_loading; {
+        Scr.disabled_for_loading = true;
+        Con_Printf("%s", msg);
+    } Scr.disabled_for_loading = temp;
 }
 
 

@@ -176,20 +176,20 @@ void NetMsg::WriteFloat(float f) { ;                WriteFloat(_sb, f); }
 
 
 cString NetMsg::ReadString() {
-    static char string[MAX_MAPSTRING];
+    static mapStr_t _string;
 
     int l = 0;
     do {
         int c = NetMsg::ReadChar();
         if ((_badRead) || (c == '\0'))
             break;
-        string[l] = c;
+        _string[l] = c;
         l++;
-    } while (l < (sizeof(string) - 1));
+    } while (l < (sizeof(_string) - 1));
 
-    string[l] = 0;
+    _string[l] = 0;
 
-    return string;
+    return _string;
 }
 
 void NetMsg::WriteString(sizebuf_p sb, cStringRO s) {

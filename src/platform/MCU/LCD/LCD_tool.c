@@ -84,7 +84,7 @@ void LCD_Init() {
     // while (1) { ; }
 
 }
-static bool _cur = false;
+static uint32_t _phase = 0; // free-running frame counter, sliced below per refresh mode
 void VID_Update(vRect_p rects) {
     if (rects) {
         if ((rects->x != 0) ||
@@ -99,7 +99,15 @@ void VID_Update(vRect_p rects) {
             return;
         }
     }
-    _cur != _cur;
+    _phase++;
+
+#if 0   /* quarter refresh: one of the 4 sub-pixels per frame */
+    int dx = _phase & 1;
+    int dy = (_phase >> 1) & 1;
+#else   /* checkerboard refresh: one diagonal (2 of 4 sub-pixels) per frame */
+    bool cur = _phase & 1;
+#endif
+
     int ofs = ((800 - 640) / 2) + (((480 - 400) / 2) * LCD_SCREEN_WIDTH);
     for (int y = 0; y < Scr.vrect.height; y++)
         for (int x = 0; x < Scr.vrect.width; x++) {
@@ -112,12 +120,13 @@ void VID_Update(vRect_p rects) {
                 ((rgb & 0x00FF00) << 0 ) |       // g stays put
                 ((rgb & 0x0000FF) << 16) |       // r -> bits 16-23
                 ((rgb & 0xFF0000) >> 16);        // b -> bits 0-7
-#if 0
-            LCD_BG_LAYER_ADDRESS[(x + (y * LCD_SCREEN_WIDTH)) + ofs] = argb;
-#else
+
             int base = ofs + TWICE(x) + (TWICE(y) * LCD_SCREEN_WIDTH);
 
-            if (_cur) {
+#if 0   /* quarter refresh */
+            LCD_BG_LAYER_ADDRESS[base + dx + (dy * LCD_SCREEN_WIDTH)] = argb;
+#elif 0   /* checkerboard refresh */
+            if (cur) {
                 LCD_BG_LAYER_ADDRESS[base] = argb;
                 LCD_BG_LAYER_ADDRESS[base + LCD_SCREEN_WIDTH + 1] = argb;
             }
@@ -125,6 +134,11 @@ void VID_Update(vRect_p rects) {
                 LCD_BG_LAYER_ADDRESS[base + 1] = argb;
                 LCD_BG_LAYER_ADDRESS[base + LCD_SCREEN_WIDTH] = argb;
             }
+#else
+            LCD_BG_LAYER_ADDRESS[base] = argb;
+            LCD_BG_LAYER_ADDRESS[base + LCD_SCREEN_WIDTH + 1] = argb;
+            LCD_BG_LAYER_ADDRESS[base + 1] = argb;
+            LCD_BG_LAYER_ADDRESS[base + LCD_SCREEN_WIDTH] = argb;
 #endif
         }
     // LCD_BusResume(); LCD_BusPause();

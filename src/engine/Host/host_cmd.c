@@ -181,7 +181,7 @@ void Host_Map_f() {
 
     svs.serverflags = 0;   // haven't completed an episode yet
 
-    char name[MAX_QPATH];
+    qPath_t name;
     strcpy(name, Cmd_Argv(1));
     SV_SpawnServer(name
 #ifdef QUAKE2
@@ -219,13 +219,13 @@ void Host_Changelevel_f() {
     cString startspot;
     if (Cmd_Argc() == 2) { startspot = NULL; }
     else {
-        char _startspot[MAX_QPATH];
+        qPath_t _startspot;
         strcpy(_startspot, Cmd_Argv(2));
         startspot = _startspot;
     }
 
     SV_SaveSpawnparms();
-    char level[MAX_QPATH];
+    qPath_t level;
     SV_SpawnServer(level, startspot);
 #else
 
@@ -233,7 +233,7 @@ void Host_Changelevel_f() {
     if (!SV_IsActive() || cls.isDemoPlaying) { ; Con_Printf("Only the server may changelevel\n");                        return; }
     SV_SaveSpawnparms();
 
-    char level[MAX_QPATH];
+    qPath_t level;
     strcpy(level, Cmd_Argv(1));
     SV_SpawnServer(level);
 #endif
@@ -253,11 +253,11 @@ void Host_Restart_f() {
         )
         return;
 
-    char mapname[MAX_QPATH];
+    qPath_t mapname;
     strcpy(mapname, SV_GetName()); // must copy out, because it gets cleared
     // in sv_spawnserver
 #ifdef QUAKE2
-    char startspot[MAX_QPATH];
+    qPath_t startspot;
     strcpy(startspot, sv.startspot);
     SV_SpawnServer(mapname, startspot);
 #else
@@ -291,7 +291,7 @@ void Host_Connect_f() {
         CL_StopPlayback();
         CL_Disconnect();
     }
-    char name[MAX_QPATH];   strcpy(name, Cmd_Argv(1));
+    qPath_t name;   strcpy(name, Cmd_Argv(1));
     CL_EstablishConnection(name);
     Host_Reconnect_f();
 }
@@ -362,7 +362,7 @@ void Host_Savegame_f() {
     if (!saveFile) { ;     Con_Printf("ERROR: couldn't open[w].\n"); return; }
 
     fprintf(saveFile, "%i\n", SAVEGAME_VERSION);
-    char comment[SAVEGAME_COMMENT_LENGTH + 1];
+    saveComment_t comment;
     Host_SavegameComment(comment);
     fprintf(saveFile, "%s\n", comment);
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
@@ -405,7 +405,7 @@ void Host_Loadgame_f() {
 
     cls.demonum = -1;  // stop demo loop in case this fails
 
-    char name[MAX_OSPATH]; snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
+    fsPath_t name; snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
     COM_DefaultExtension(name, ".sav");
 
     // we can't call SCR_BeginLoadingPlaque, because too much stack space has
@@ -441,7 +441,7 @@ void Host_Loadgame_f() {
     Cvar_SetValue("teamplay", 0);
 #endif
 
-    char mapname[MAX_QPATH];
+    qPath_t mapname;
     fscanf(loadFile, "%s\n", mapname);
     float time;
     fscanf(loadFile, "%f\n", &time);
@@ -527,7 +527,7 @@ void SaveGamestate() {
 
     fprintf(saveGStFile, "%i\n", SAVEGAME_VERSION);
 
-    char comment[SAVEGAME_COMMENT_LENGTH + 1];
+    saveComment_t comment;
     Host_SavegameComment(comment);
     fprintf(saveGStFile, "%s\n", comment);
     // for (int i = 0; i < NUM_SPAWN_PARMS; i++)
@@ -557,7 +557,7 @@ void SaveGamestate() {
 }
 
 int LoadGamestate(cString level, cString startspot) {
-    char name[MAX_OSPATH];
+    fsPath_t name;
     snprintf(name, sizeof(name), "%s/%s.gip", com.gamedir, level);
 
     Con_Printf("Loading game from %s...\n", name);
@@ -577,8 +577,8 @@ int LoadGamestate(cString level, cString startspot) {
     float sk; fscanf(loadGStFile, "%f\n", &sk);
     Cvar_SetValue("skill", sk);
 
-    char mapname[MAX_QPATH];    fscanf(loadGStFile, "%s\n", mapname);
-    float time;                 fscanf(loadGStFile, "%f\n", &time);
+    qPath_t mapname;    fscanf(loadGStFile, "%s\n", mapname);
+    float time;         fscanf(loadGStFile, "%f\n", &time);
 
     SV_SpawnServer(mapname, startspot);
 
@@ -635,13 +635,13 @@ void Host_Changelevel2_f() {
     if (Cmd_Argc() < 2) { Con_Printf("changelevel2 <levelname> : continue game on a new level in the unit\n");  return; }
     if (!SV_IsActive() || cls.isDemoPlaying) { Con_Printf("Only the server may changelevel\n");  return; }
 
-    char level[MAX_QPATH];
+    qPath_t level;
     strcpy(level, Cmd_Argv(1));
 
     cString startspot;
     if (Cmd_Argc() == 2) { startspot = NULL; }
     else {
-        char _startspot[MAX_QPATH];
+        qPath_t _startspot;
         strcpy(_startspot, Cmd_Argv(2));
         startspot = _startspot;
     }
@@ -766,7 +766,7 @@ void Host_Say(bool teamonly) {
 
     // turn on color set 1
     {
-        char text[NAME_LENGTH];
+        name_t text;
         if (fromServer) snprintf(text, sizeof(text), "%c<%s> ", 1, hostname.string);
         else            snprintf(text, sizeof(text), "%c%s: ", 1, save->name);
 
@@ -809,7 +809,7 @@ void Host_Tell_f() {
 
     if (Cmd_Argc() < 3)     return;
 
-    char text[NAME_LENGTH];
+    name_t text;
     Q_strcpy(text, remoteClient->name);
     Q_strcat(text, ": ");
 

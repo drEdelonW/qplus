@@ -1,6 +1,11 @@
 #pragma once
 
+#include "platformdefs.h"
+typedef char fsPath_t[MAX_OSPATH];   // filesystem pathname
+typedef char qPath_t[MAX_QPATH];     // quake game pathname
+
 #define NAME_LENGTH         64
+typedef char name_t[NAME_LENGTH];
 
 //
 // per-level limits
@@ -9,7 +14,6 @@
 #define MAX_LIGHTSTYLES     64
 #define MAX_MODELS          256   /* these are sent over the net as bytes */
 
-#define MAXGAMEDIRLEN       1000
 
 #define MAX_SCOREBOARD      16
 #define MAX_SCOREBOARDNAME  32
@@ -19,6 +23,7 @@
 #define MAXLIGHTMAPS        4
 
 #define SAVEGAME_COMMENT_LENGTH 39
+typedef char saveComment_t[SAVEGAME_COMMENT_LENGTH + 1];
 
 #ifdef STM32
 #   define MAX_PARTICLES           200 /* default max # of particles at one time */
@@ -30,6 +35,8 @@
 #define MAX_EFRAGS              640
 
 #define MAX_MAPSTRING           2048
+typedef char mapStr_t[MAX_MAPSTRING];
+
 #define MAX_DEMOS               8
 #define MAX_DEMONAME            16
 

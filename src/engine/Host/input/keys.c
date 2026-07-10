@@ -97,7 +97,8 @@ void Key_Console(keycode_t key) {
             _history_line = (_history_line - 1) & 31;
         } while (
             (_history_line != con.edit_line) &&
-            (!con.lines[_history_line][1]));
+            (!con.lines[_history_line][1])
+            );
 
         if (_history_line == con.edit_line)
             _history_line = (con.edit_line + 1) & 31;
@@ -127,15 +128,13 @@ void Key_Console(keycode_t key) {
     case K_PGUP:
     case K_MWHEELUP: {
         con.backscroll += 2;
-        if (con.backscroll > (con.totallines - EIGHTH(Scr.vrect.height) - 1))
-            con.backscroll = con.totallines - EIGHTH(Scr.vrect.height) - 1;
+        CLAMP_MORE(&con.backscroll, con.totallines - EIGHTH(Scr.vrect.height) - 1);
     } return;
 
     case K_PGDN:
     case K_MWHEELDOWN: {
         con.backscroll -= 2;
-        if (con.backscroll < 0)
-            con.backscroll = 0;
+        CLAMP_LESS(&con.backscroll, 0);
     } return;
 
     case K_HOME: { con.backscroll = con.totallines - EIGHTH(Scr.vrect.height) - 1; } return;
@@ -158,7 +157,7 @@ void Key_Console(keycode_t key) {
     default:
         if (!is_printable(key)) return; // non printable
 
-        if (con.linepos < (MAXCMDLINE - 1)) {
+        if (con.linepos < (MaxCmdLine - 1)) {
             con.lines[con.edit_line][con.linepos++] = key;
             con.lines[con.edit_line][con.linepos] = 0;
         }
@@ -167,7 +166,7 @@ void Key_Console(keycode_t key) {
 }
 
 //============================================================================
-char chatBuffer[MAXCHATLEN];
+char chatBuffer[MaxCharLen];
 bool team_message = false;
 
 void Key_Message(keycode_t Key) {

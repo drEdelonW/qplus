@@ -105,7 +105,7 @@ bool gl_mtexable = false;
 
 static int XLateKey(XKeyEvent* ev) {
 
-    char buf[NAME_LENGTH];
+    name_t buf;
     KeySym keysym;
 
     int key = 0;
@@ -694,7 +694,7 @@ void VID_Init(uint8_p palette) {
         GLX_DEPTH_SIZE, 1,
         None
     };
-    char    gldir[MAX_OSPATH];
+    fsPath_t gldir;
     int width = 640, height = 480;
     XSetWindowAttributes attr;
     uint32_t mask;

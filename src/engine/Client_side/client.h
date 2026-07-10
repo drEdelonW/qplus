@@ -85,8 +85,8 @@ typedef struct {
     ClientStatus state;
 
     // personalization data sent to server
-    char        mapstring[MAX_QPATH];
-    char        spawnparms[MAX_MAPSTRING]; // to restart a level
+    qPath_t     mapstring;
+    mapStr_t    spawnparms; // to restart a level
 
     // demo loop control
     int32_t     demonum;  // -1 = don't play demos

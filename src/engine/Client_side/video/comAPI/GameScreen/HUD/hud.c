@@ -15,12 +15,15 @@ DrawPause
 */
 void SCR_DrawPause() {
     if ((!scr_showpause.value) ||  // turn off for screenshots
-        (!cl.paused))
-        return;
+        (!cl.paused)
+        )   return;
 
     qPic_p pic = Draw_CachePic("gfx/pause.lmp");
-    Draw_Pic(HALF(Scr.vrect.width - pic->width),
-        HALF(Scr.vrect.height - 48 - pic->height), pic);
+    Draw_Pic(   // TODO: wrap it to Draw_PicCenter(pic-cString)
+        HALF(Scr.vrect.width - pic->width),
+        HALF(Scr.vrect.height - pic->height - 48),
+        pic
+    );
 }
 
 
@@ -34,8 +37,11 @@ void SCR_DrawLoading() {
     if (!_scr.drawloading)   return;
 
     qPic_p pic = Draw_CachePic("gfx/loading.lmp");
-    Draw_Pic(HALF(Scr.vrect.width - pic->width),
-        HALF(Scr.vrect.height - 48 - pic->height), pic);
+    Draw_Pic(   // TODO: wrap it to Draw_PicCenter(pic-cString)
+        HALF(Scr.vrect.width - pic->width),
+        HALF(Scr.vrect.height - pic->height - 48),
+        pic
+    );
 }
 
 
@@ -47,8 +53,8 @@ void SCR_DrawLoading() {
     ================
 */
 void Con_DrawNotify() {
-    int32_t v = 0;
-    for (int32_t i = (con.current - NUM_CON_TIMES + 1); i <= con.current; i++) {
+    CmdLine_t v = FirstLine;
+    for (int i = (con.current - NUM_CON_TIMES + 1); i <= con.current; i++) {
         if (i < 0)  continue;
 
         sRealTime_t time = con.times[i % NUM_CON_TIMES];
@@ -57,13 +63,13 @@ void Con_DrawNotify() {
         time = GetRealTime() - time;
         if (time > con_notifytime.value)    continue;
 
-        cString text = con.text + (i % (int32_t)con.totallines) * con.linewidth;
+        cString text = con.text + (i % con.totallines) * con.linewidth;
 
         Scr.clearnotify = 0;
         Scr.copytop = true;
 
-        for (int32_t x = 0; x < con.linewidth; x++)
-            Draw_Character(OCTO(x + 1), v, text[x]);
+        for (CharCol_t x = FirstChar; x < con.linewidth; x++)
+            Draw_Character(MUL8(x + 1), v, text[x]);
 
         v += D_CHAR_HEIGHT;
     }
@@ -72,18 +78,19 @@ void Con_DrawNotify() {
         Scr.clearnotify = 0;
         Scr.copytop = true;
 
-        int32_t x = 0;
-
-        Draw_String(8, v, "say:");
-        while (chatBuffer[x]) {
-            Draw_Character(OCTO(x + 5), v, chatBuffer[x]);
-            x++;
+        Draw_String(8, v, "say:"); {
+            CharCol_t x = FirstChar;
+            while (chatBuffer[x]) {
+                Draw_Character(MUL8(x + 5), v,
+                    chatBuffer[x]);
+                x++;
+            }
+            Draw_Character(MUL8(x + 5), v, // Draw Input Cursor
+                InputCursor_Symb + ((int)(GetRealTime() * con.cursorBlinkHz) & 1)
+            );
         }
-        Draw_Character(OCTO(x + 5), v, 10 + ((int)(GetRealTime() * con.cursorspeed) & 1));
         v += D_CHAR_HEIGHT;
     }
 
-    if (v > con.notifylines) {
-        con.notifylines = v;
-    }
+    CLAMP_LESS(&con.notifylines, v);
 }

@@ -142,7 +142,7 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
     else {
         for (i = 0; i < (height << repshift); i += reps) {
             for (j = 0; j < reps; j++) {
-                offset = x + ((y << repshift) + i + j) * vid.rowbytes;
+                offset = x + ((y << repshift) + i + j) * vid.rowBytes;
                 off = offset % 0x10000;
                 if ((offset / 0x10000) != vidpage) {
                     vidpage = offset / 0x10000;
@@ -195,7 +195,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
     else {
         for (i = 0; i < (height << repshift); i += reps) {
             for (j = 0; j < reps; j++) {
-                offset = x + ((y << repshift) + i + j) * vid.rowbytes;
+                offset = x + ((y << repshift) + i + j) * vid.rowBytes;
                 off = offset % 0x10000;
                 if ((offset / 0x10000) != vidpage) {
                     vidpage = offset / 0x10000;
@@ -451,15 +451,15 @@ int VID_SetMode(int modenum, uint8_p palette) {
     VGA_height = modes[current_mode].height;
     VGA_planar = modes[current_mode].bytesperpixel == 0;
     VGA_rowbytes = modes[current_mode].linewidth;
-    vid.rowbytes = modes[current_mode].linewidth;
+    vid.rowBytes = modes[current_mode].linewidth;
     if (VGA_planar) {
         VGA_bufferrowbytes = modes[current_mode].linewidth * 4;
-        vid.rowbytes = modes[current_mode].linewidth * 4;
+        vid.rowBytes = modes[current_mode].linewidth * 4;
     }
 
     Scr.aspect = calcAspectRect(&vid.scr);
     vid.colormap = host_colormap;
-    vid.conrowbytes = vid.rowbytes;
+    vid.con.rowBytes = vid.rowBytes;
     vid.con.width = vid.scr.width;
     vid.con.height = vid.scr.height;
     vid.numpages = 1;
@@ -475,7 +475,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
         vid_surfcache = NULL;
     }
 
-    bsize = vid.rowbytes * vid.scr.height;
+    bsize = vid.rowBytes * vid.scr.height;
     tsize = D_SurfaceCacheForRes(vid.scr.width, vid.scr.height);
     zsize = vid.scr.width * vid.scr.height * sizeof(*d_pzbuffer);
 
@@ -687,7 +687,7 @@ void VID_Update(vRect_p rects) {
         VGA_UpdatePlanarScreen(vid.scr.pBuff);
 
     else if (vid_redrawfull.value) {
-        int total = vid.rowbytes * vid.scr.height;
+        int total = vid.rowBytes * vid.scr.height;
         int offset;
 
         for (offset = 0;offset < total;offset += 0x10000) {
@@ -706,7 +706,7 @@ void VID_Update(vRect_p rects) {
 
         while (rects) {
             ycount = rects->height;
-            offset = rects->y * vid.rowbytes + rects->x;
+            offset = rects->y * vid.rowBytes + rects->x;
             while (ycount--) {
                 register int i = offset % 0x10000;
 
@@ -727,7 +727,7 @@ void VID_Update(vRect_p rects) {
                     memcpy(framebuffer_ptr + i,
                         vid.scr.pBuff + offset,
                         rects->width);
-                offset += vid.rowbytes;
+                offset += vid.rowBytes;
             }
 
             rects = rects->pnext;

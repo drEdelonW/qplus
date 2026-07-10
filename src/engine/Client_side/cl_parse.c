@@ -231,7 +231,7 @@ void CL_ParseServerInfo() {
     //
 
     // precache models
-    char model_precache[MAX_MODELS][MAX_QPATH];
+    qPath_t model_precache[MAX_MODELS];
     memset(cl.model_precache, 0, sizeof(cl.model_precache));
     uint16_t nummodels;
     for (nummodels = 1; ; nummodels++) {
@@ -247,7 +247,7 @@ void CL_ParseServerInfo() {
     }
 
     // precache sounds
-    char sound_precache[MAX_SOUNDS][MAX_QPATH];
+    qPath_t sound_precache[MAX_SOUNDS];
     memset(cl.sound_precache, 0, sizeof(cl.sound_precache));
     int numsounds;
     for (numsounds = 1; ; numsounds++) {

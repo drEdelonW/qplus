@@ -561,11 +561,11 @@ void VID_Init(qPal_p palette) {
         ResetFrameBuffer();
 
     current_framebuffer = false;
-    vid.rowbytes = x_framebuffer[0]->bytes_per_line;
-    vid.frameBuff.pClr = (qColor8_p)x_framebuffer[0]->data;
+    vid.frameBuff.rowBytes = x_framebuffer[current_framebuffer]->bytes_per_line;
+    vid.frameBuff.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
     vid.direct = NULL;
-    vid.con.pClr = (qColor8_p)x_framebuffer[0]->data;
-    vid.conrowbytes = vid.rowbytes;
+    vid.con.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
+    vid.con.rowBytes = vid.frameBuff.rowBytes;
     vid.con.width = vid.frameBuff.width;
     vid.con.height = vid.frameBuff.height;
     // Scr.vpAspect = calcAspectRect(&vid.frameBuff);
@@ -656,12 +656,12 @@ void VID_Update(vRect_p p_rects) {
         if (doShm)      ResetSharedFrameBuffers();
         else            ResetFrameBuffer();
 
-        vid.rowbytes = x_framebuffer[0]->bytes_per_line;
+        Scr.vrect.rowBytes = x_framebuffer[0]->bytes_per_line;
         vid.frameBuff.pBuff = (uint8_p)x_framebuffer[current_framebuffer]->data;
         vid.con.pBuff = vid.frameBuff.pBuff;
         vid.con.width = vid.frameBuff.width;
         vid.con.height = vid.frameBuff.height;
-        vid.conrowbytes = vid.rowbytes;
+        vid.con.rowBytes = Scr.vrect.rowBytes;
 
         SCR_RequestCalcRefdef();    // force a surface cache flush
         Con_CheckResize();

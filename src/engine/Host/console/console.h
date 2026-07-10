@@ -26,27 +26,44 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // console
 //
-#define CON_TEXTSIZE    (int32_t)0x4000 /*16Kb - 16384b*/
+#define CON_TEXTSIZE  (0x4000) /*16Kb - 16384b*/
 
 #define NUM_CON_TIMES (4)
-#define MAXCHATLEN  (32)
-#define MAXCMDLINE  (256)
+
+typedef enum X {
+    FirstChar = 0,
+    LastChar = 31,
+    MaxCharLen // 32
+} CharCol_t;    /* X */
+// #define MAXCHATLEN  (32)
+
+typedef enum Y {
+    FirstLine = 0,
+    LastLine = 255,
+    MaxCmdLine // 256
+} CmdLine_t;    /* Y */
+// #define MAXCMDLINE  (256)
+
 typedef struct {
     bool    isInitialized;
-    char    lines[MAXCHATLEN][MAXCMDLINE];
+
+    char    lines[MaxCharLen][MaxCmdLine];
     sRealTime_t times[NUM_CON_TIMES]; // realtime time the line was generated for transparent notify lines
-    int32_t totallines; // total lines in console scrollback
-    int32_t backscroll; // lines up from bottom to display
-    int32_t notifylines;// scan lines to clear for notify lines
-    int32_t vislines;
-    int32_t linewidth;
-    int32_t current;    // where next message will be printed
-    int32_t edit_line;
-    uint32_t linepos;
-    uint32_t x;         // offset in current line for next print
-    float   cursorspeed;
     cString text;
-    bool    forcedup;   // because no entities to refresh
+
+    CmdLine_t   edit_line;
+    CmdLine_t   current;    // where next message will be printed
+    CmdLine_t   backscroll; // lines up from bottom to display
+    CmdLine_t   totallines; // total lines in console scrollback
+    CmdLine_t   vislines;   // internal
+    CmdLine_t   notifylines;// scan lines to clear for notify lines
+
+    CharCol_t   linewidth;
+    CharCol_t   linepos;
+    CharCol_t   x;          // offset in current line for next print
+
+    float   cursorBlinkHz;  // cursor blink speed [tenses per second]
+    bool    forcedup;       // because no entities to refresh
     bool    debuglog;
 } console_t;
 extern console_t con;

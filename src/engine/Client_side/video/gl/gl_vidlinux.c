@@ -627,7 +627,7 @@ void VID_Init(uint8_p palette) {
 
     GL_Init();
 
-    char gldir[MAX_OSPATH];
+    fsPath_t gldir;
     snprintf(gldir, sizeof(gldir), "%s/glquake", com.gamedir);
     Sys_mkdir(gldir);
 

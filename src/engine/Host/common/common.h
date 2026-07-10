@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 
-#include "platformdefs.h"
+#include "enginedefs.h"
 #include "types.h"
 
 #include "zone.h"
@@ -41,7 +41,7 @@ typedef struct {
     int32_t         filesize;
     char            cmdline[CMDLINE_LENGTH]; // private
     char            token[1024];
-    char            gamedir[MAX_OSPATH];
+    fsPath_t        gamedir;
 } common_t;
 
 extern common_t com;

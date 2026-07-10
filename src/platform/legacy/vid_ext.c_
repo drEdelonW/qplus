@@ -580,7 +580,7 @@ int VID_ExtraInitMode(VidDef_p lvid, vmode_p pcurrentmode) {
     VID_membase = pextra->plinearmem;
     VGA_width = lvid->width;
     VGA_height = lvid->height;
-    VGA_rowbytes = lvid->rowbytes;
+    VGA_rowbytes = lvid->rowBytes;
 
     lvid->colormap = host_colormap;
 
@@ -643,13 +643,13 @@ int VID_ExtraInitMode(VidDef_p lvid, vmode_p pcurrentmode) {
         lvid->conbuffer = lvid->buffer;
     }
     else {
-        lvid->rowbytes = lvid->width;
+        lvid->rowBytes = lvid->width;
     }
 
     lvid->direct = VGA_pagebase;
-    lvid->conrowbytes = lvid->rowbytes;
-    lvid->conwidth = lvid->width;
-    lvid->conheight = lvid->height;
+    lvid->con.rowBytes = lvid->rowBytes;
+    lvid->con.width = lvid->width;
+    lvid->con.height = lvid->height;
 
     lvid->maxwarpwidth = WARP_WIDTH;
     lvid->maxwarpheight = WARP_HEIGHT;
@@ -725,11 +725,11 @@ void VID_ExtraSwapBuffers(VidDef_p lvid, vmode_p pcurrentmode, vRect_p rects) {
 
         while (rects) {
             VGA_UpdateLinearScreen(
-                lvid->buffer + rects->x + (rects->y * lvid->rowbytes),
+                lvid->buffer + rects->x + (rects->y * lvid->rowBytes),
                 VGA_pagebase + rects->x + (rects->y * VGA_rowbytes),
                 rects->width,
                 rects->height,
-                lvid->rowbytes,
+                lvid->rowBytes,
                 VGA_rowbytes);
 
             rects = rects->pnext;

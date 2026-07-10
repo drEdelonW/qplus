@@ -218,7 +218,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 	vid.scr.width = pcurrentmode->width;
 	vid.scr.height = pcurrentmode->height;
 	scr.aspect = pcurrentmode->aspect;
-	vid.rowbytes = pcurrentmode->rowbytes;
+	vid.rowBytes = pcurrentmode->rowbytes;
 
 	stat = (*pcurrentmode->setmode) (&vid, pcurrentmode);
 
@@ -237,7 +237,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 			vid.scr.width = pcurrentmode->width;
 			vid.scr.height = pcurrentmode->height;
 			scr.aspect = pcurrentmode->aspect;
-			vid.rowbytes = pcurrentmode->rowbytes;
+			vid.rowBytes = pcurrentmode->rowbytes;
 			return 0;
 		}
 		else {
@@ -422,8 +422,7 @@ cString VID_GetModeDescription(int mode) {
 	pv = VID_GetModePtr(mode);
 	pinfo = VID_ModeInfo(mode, &pheader);
 
-	if (VGA_CheckAdequateMem(pv->width, pv->height, pv->rowbytes,
-		(pv->numpages == 1) || vid_nopageflip.value)) {
+	if (VGA_CheckAdequateMem(pv->width, pv->height, pv->rowbytes, (pv->numpages == 1) || vid_nopageflip.value)) {
 		return pinfo;
 	}
 	else {

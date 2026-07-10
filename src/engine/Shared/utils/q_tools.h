@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-    void Q_memset(TypeLess_ptr dest, int32_t fill, uint32_t count);
+    void Q_memset(TypeLess_ptr dest, uint8_t fill, int count);
     void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count);
     int Q_memcmp(TypeLess_ptr m1, TypeLess_ptr m2, int32_t count);
 

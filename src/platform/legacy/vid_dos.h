@@ -29,7 +29,7 @@ struct vmode_s {
     uint32_t	width;
     uint32_t	height;
     float		aspect;
-    uint32_t	rowbytes;
+    uint32_t	rowBytes;
     int			planar;
     int			numpages;
     TypeLess_ptr pextradata;

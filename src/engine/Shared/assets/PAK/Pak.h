@@ -1,6 +1,6 @@
 #pragma once
 
-#include "platformdefs.h"
+#include "enginedefs.h"
 #include "types.h"
 /*
 =============================================================================
@@ -16,14 +16,14 @@ extern bool contModified;   // set true if using non-id files
 // in memory
 //
 typedef struct {
-    char    name[MAX_QPATH];
-    uint32_t filepos;
-    uint32_t filelen;
+    qPath_t     name;
+    uint32_t    filepos;
+    uint32_t    filelen;
 } packfile_t;
 typedef packfile_t* packfile_p;
 
 typedef struct pack_s {
-    char        filename[MAX_OSPATH];
+    fsPath_t    filename;
     uint32_t     handle;
     uint32_t     numfiles;
     packfile_p  files;

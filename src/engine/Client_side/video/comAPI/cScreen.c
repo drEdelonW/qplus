@@ -15,7 +15,7 @@
 #include "menu.h"
 #ifdef GLQUAKE
 # include "qOpenGL.h"
-    void R_SetVrect(const vRect_p pvrect, vRect_p pvrectin, int lineadj);
+void R_SetVrect(const vRect_p pvrect, vRect_p pvrectin, int lineadj);
 #else
 # include "render.h"
 #endif
@@ -345,21 +345,18 @@ void SCR_SetUpToDrawConsole() {
 
     if (Scr.con_current > Scr.conlines) {
         Scr.con_current -= scr_conspeed.value * host_frametime;
-        if (Scr.con_current < Scr.conlines)     Scr.con_current = Scr.conlines; // TODO: clip it
-
+        CLAMP_LESS(&Scr.con_current, Scr.conlines);
     }
     else if (Scr.con_current < Scr.conlines) {
         Scr.con_current += scr_conspeed.value * host_frametime;
-        if (Scr.con_current > Scr.conlines)     Scr.con_current = Scr.conlines; // TODO: clip it
+        CLAMP_LESS(&Scr.con_current, Scr.conlines);
     }
     if (_scr.clearConsole++ < vid.numpages) {
 #ifndef GLQUAKE
         Scr.copytop = true;
         Draw_TileClear(
-            0,
-            Scr.con_current,
-            Scr.vrect.width,
-            Scr.vrect.height - Scr.con_current
+            0, Scr.con_current,
+            Scr.vrect.width, Scr.vrect.height - Scr.con_current
         );
 #endif
         Sbar_Changed();
@@ -389,6 +386,19 @@ Internal use only
 void SCR_CalcRefdef() {
     if (!recalc_refdef) return;
     else recalc_refdef = false;
+
+    //
+    // determine size of refresh window
+    //
+    if (_scr.oldFov != scr_fov.value) {
+        _scr.oldFov = scr_fov.value;
+        SCR_RequestCalcRefdef();
+    }
+
+    if (_scr.oldViewSize != scr_viewsize.value) {
+        _scr.oldViewSize = scr_viewsize.value;
+        SCR_RequestCalcRefdef();
+    }
 
     // force the status bar to redraw
     Sbar_Changed();

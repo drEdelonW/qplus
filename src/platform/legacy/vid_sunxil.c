@@ -110,7 +110,7 @@ int  vid_buffersize;
     FocusChangeMask \
 )
 
-int  VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
+int  VGA_width, VGA_height, VGA_rowBytes, VGA_bufferrowbytes, VGA_planar;
 uint8_p VGA_pagebase;
 
 bool   x_fullscreen = true;
@@ -618,10 +618,10 @@ VID_ResetFramebuffer() {
     if (xil_get_memory_storage(quake_image, &storage) == FALSE)
         Sys_Error("xil_get_memory_storage");
 
-    vid.rowbytes = storage.byte.scanline_stride;
+    vid.rowBytes = storage.byte.scanline_stride;
     vid.scr.pBuff = storage.byte.data;
     vid.con.pBuff = vid.scr.pBuff;
-    vid.conrowbytes = vid.rowbytes;
+    vid.con.rowBytes = vid.rowBytes;
     vid.con.width = vid.scr.width;
     vid.con.height = vid.scr.height;
 
@@ -701,7 +701,7 @@ void VID_Shutdown() {
 int XLateKey(XKeyEvent* ev) {
 
     int key;
-    char buf[NAME_LENGTH];
+    name_t buf;
     KeySym keysym;
 
     XLookupString(ev, buf, sizeof buf, &keysym, 0);
@@ -1051,10 +1051,10 @@ drain_renderpipeline(XilImage old) {
     if (xil_get_memory_storage(new, &storage) == FALSE)
         Sys_Error("xil_get_memory_storage");
 
-    vid.rowbytes = storage.byte.scanline_stride;
+    vid.rowBytes = storage.byte.scanline_stride;
     vid.scr.pBuff = storage.byte.data;
     vid.con.pBuff = vid.scr.pBuff;
-    vid.conrowbytes = vid.rowbytes;
+    vid.con.rowBytes = vid.rowBytes;
     vid.con.width = vid.scr.width;
     vid.con.height = vid.scr.height;
 

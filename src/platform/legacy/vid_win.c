@@ -1231,7 +1231,7 @@ bool VID_SetWindowedMode(int modenum) {
     MGL_makeCurrentDC(dibdc);
 
     Scr.vrect.pBuff = vid.con.pBuff = vid.direct = dibdc->surface;
-    vid.rowbytes = vid.conrowbytes = dibdc->mi.bytesPerLine;
+    vid.rowBytes = vid.con.rowBytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
@@ -1385,7 +1385,7 @@ bool VID_SetFullDIBMode(int modenum) {
     Scr.vrect.pBuff = dibdc->surface;
     Scr.aspect = calcAspectRect(&Scr.vrect);
     vid.direct = dibdc->surface;
-    vid.rowbytes = vid.conrowbytes = dibdc->mi.bytesPerLine;
+    vid.rowBytes = vid.con.rowBytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
@@ -1587,19 +1587,19 @@ void VID_LockBuffer() {
     if (memdc) {
         // Update surface pointer for linear access modes
         vid.scr.pBuff = vid.con.pBuff = vid.direct = memdc->surface;
-        vid.rowbytes = vid.conrowbytes = memdc->mi.bytesPerLine;
+        vid.rowBytes = vid.con.rowBytes = memdc->mi.bytesPerLine;
     }
     else if (mgldc) {
         // Update surface pointer for linear access modes
         vid.scr.pBuff = vid.con.pBuff = vid.direct = mgldc->surface;
-        vid.rowbytes = vid.conrowbytes = mgldc->mi.bytesPerLine;
+        vid.rowBytes = vid.con.rowBytes = mgldc->mi.bytesPerLine;
     }
 
     d_viewbuffer = (r_dowarp) ?
         r_warpbuffer : (TypeLess_ptr)(uint8_p)vid.scr.pBuff;
 
     screenwidth = (r_dowarp) ?
-        WARP_WIDTH : vid.rowbytes;
+        WARP_WIDTH : vid.rowBytes;
 
 #ifndef STM32
     if (lcd_x.value)
@@ -2216,9 +2216,9 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
         for (i = 0; i < (height << repshift); i += reps) {
             for (j = 0; j < reps; j++) {
                 memcpy(&backingbuf[(i + j) * 24],
-                    vid.direct + x + ((y << repshift) + i + j) * vid.rowbytes,
+                    vid.direct + x + ((y << repshift) + i + j) * vid.rowBytes,
                     width);
-                memcpy(vid.direct + x + ((y << repshift) + i + j) * vid.rowbytes,
+                memcpy(vid.direct + x + ((y << repshift) + i + j) * vid.rowBytes,
                     &pbitmap[(i >> repshift) * width],
                     width);
             }
@@ -2301,7 +2301,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
 
         for (i = 0; i < (height << repshift); i += reps) {
             for (j = 0; j < reps; j++) {
-                memcpy(vid.direct + x + ((y << repshift) + i + j) * vid.rowbytes,
+                memcpy(vid.direct + x + ((y << repshift) + i + j) * vid.rowBytes,
                     &backingbuf[(i + j) * 24],
                     width);
             }

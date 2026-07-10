@@ -56,7 +56,7 @@ static uint8_t  _playTrack;
 static uint8_t  _maxTrack;
 
 static int  _cdfile = -1;
-static char _cd_dev[NAME_LENGTH] = "/dev/cdrom";
+static name_t _cd_dev = "/dev/cdrom";
 
 static void CDAudio_Eject() {
     if ((_cdfile == -1) || !_enabled)

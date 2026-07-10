@@ -8,42 +8,21 @@
 ============================================================================
 */
 
-#if 0
-void Q_memset(TypeLess_ptr dest, int32_t fill, int32_t count) {
-    if ((((int32_t)dest | count) & 3) == 0) {
-        count = QUARTER(count);
-        fill = fill | (fill << 8) | (fill << 16) | (fill << 24);
-        for (int32_t i = 0; i < count; i++) {
-            ((int32_p)dest)[i] = fill;
-        }
-    }
-    else {
-        for (int32_t i = 0; i < count; i++) {
-            ((uint8_p)dest)[i] = fill;
-        }
-    }
-}
-#else
-void Q_memset(TypeLess_ptr dest, int32_t fill, uint32_t count) {
+void Q_memset(TypeLess_ptr dest, uint8_t fill, int count) {
     if (count <= 0) return;
     /* 64-bit safe alignment check */
     if ((((uintptr_t)dest | (uintptr_t)count) & 3u) == 0u) {
-        int32_t n = QUARTER(count);
-        uint32_t f = (uint8_t)fill;
+        uint32_t f = fill;
         f |= (f << 8);
         f |= (f << 16);
-        uint32_p d32 = (uint32_p)dest;
-        for (int32_t i = 0; i < n; ++i)
-            d32[i] = f;
+        for (int i = 0; i < DIV4(count); ++i)
+            ((int32_p)dest)[i] = f;
     }
     else {
-        uint8_p d8 = (uint8_p)dest;
-        uint8_t f8 = (uint8_t)fill;
-        for (int32_t i = 0; i < count; ++i)
-            d8[i] = f8;
+        for (int i = 0; i < count; ++i)
+            ((uint8_p)dest)[i] = fill;
     }
 }
-#endif
 
 #if 0
 void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count) {

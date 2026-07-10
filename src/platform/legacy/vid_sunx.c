@@ -50,7 +50,7 @@ int     p_mouse_x;
 int     p_mouse_y;
 bool    mouse_grabbed = false; // we grab it when console is up
 
-int        VGA_width, VGA_height, VGA_rowbytes, VGA_bufferrowbytes, VGA_planar;
+int        VGA_width, VGA_height, VGA_rowBytes, VGA_bufferrowbytes, VGA_planar;
 uint8_p VGA_pagebase;
 
 // The following X property format is defined in Motif 1.1's
@@ -701,10 +701,10 @@ void    VID_Init(uint8_p palette) {
         ResetFrameBuffer();
 
     current_framebuffer = false;
-    vid.rowbytes = x_framebuffer[0]->bytes_per_line;
+    vid.rowBytes = x_framebuffer[0]->bytes_per_line;
     vid.scr.pBuff = x_framebuffer[0]->data;
     vid.con.pBuff = x_framebuffer[0]->data;
-    vid.conrowbytes = vid.rowbytes;
+    vid.con.rowBytes = vid.rowBytes;
     vid.con.width = vid.scr.width;
     vid.con.height = vid.scr.height;
 
@@ -761,7 +761,7 @@ void    VID_Shutdown() {
 }
 
 keycode_t XLateKey(XKeyEvent* ev) {
-    char buf[NAME_LENGTH];
+    name_t buf;
     KeySym keysym;
     XLookupString(ev, buf, sizeof buf, &keysym, 0);
 
@@ -952,12 +952,12 @@ void    VID_Update(vRect_p rects) {
         if (doShm)  ResetSharedFrameBuffers();
         else        ResetFrameBuffer();
 
-        vid.rowbytes = x_framebuffer[0]->bytes_per_line;
+        vid.rowBytes = x_framebuffer[0]->bytes_per_line;
         vid.scr.pBuff = x_framebuffer[current_framebuffer]->data;
         vid.con.pBuff = vid.scr.pBuff;
         vid.con.width = vid.scr.width;
         vid.con.height = vid.scr.height;
-        vid.conrowbytes = vid.rowbytes;
+        vid.con.rowBytes = vid.rowBytes;
 
         SCR_RequestCalcRefdef();                // force a surface cache flush
         return;

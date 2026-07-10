@@ -118,7 +118,7 @@ void SCR_ScreenShot_f() {
     for (; i <= 99; i++) {
         pcxname[5] = i / 10 + '0';
         pcxname[6] = i % 10 + '0';
-        char checkname[MAX_OSPATH];
+        fsPath_t checkname;
         snprintf(checkname, sizeof(checkname), "%s/%s", com.gamedir, pcxname);
         if (Sys_FileTime(checkname) == -1)
             break;    // file doesn't exist
@@ -250,19 +250,6 @@ void SCR_UpdateScreen() {
 
     GL_BeginRendering(&glx, &gly, &glwidth, &glheight); {
 
-        //
-        // determine size of refresh window
-        //
-        if (_scr.oldFov != scr_fov.value) {
-            _scr.oldFov = scr_fov.value;
-            SCR_RequestCalcRefdef();
-        }
-
-        if (_scr.oldViewSize != scr_viewsize.value) {
-            _scr.oldViewSize = scr_viewsize.value;
-            SCR_RequestCalcRefdef();
-        }
-
         SCR_CalcRefdef();
 
         //
@@ -277,7 +264,7 @@ void SCR_UpdateScreen() {
         //
         // draw any areas not covered by the refresh
         //
-        SCR_TileClear();
+        SCR_TileClear(); 
             SCR_Composite();    // main state based compositor
         V_UpdatePalette();
 

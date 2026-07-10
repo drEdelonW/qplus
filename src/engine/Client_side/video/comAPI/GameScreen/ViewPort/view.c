@@ -820,13 +820,13 @@ void V_RenderView() {
         // render two interleaved views
         //
 
-        vid.rowbytes = TWICE(vid.rowbytes);
+        Scr.vrect.rowBytes = TWICE(Scr.vrect.rowBytes);
         Scr.vpAspect *= 0.5f;
 
         r_refdef.view.facing.yaw -= lcd_yaw.value;
         r_refdef.view.spot = VectorMA(r_refdef.view.spot, -lcd_x.value, _bs.right);
         R_RenderView();
-        vid.frameBuff.pBuff += HALF(vid.rowbytes);
+        vid.frameBuff.pBuff += HALF(Scr.vrect.rowBytes);
 
         R_PushDlights();
 
@@ -834,11 +834,11 @@ void V_RenderView() {
 
         r_refdef.view.spot = VectorMA(r_refdef.view.spot, lcd_x.value * 2.0f, _bs.right);
         R_RenderView();
-        vid.frameBuff.pBuff -= HALF(vid.rowbytes);
+        vid.frameBuff.pBuff -= HALF(Scr.vrect.rowBytes);
 
         r_refdef.vrect.height = TWICE(r_refdef.vrect.height);
 
-        vid.rowbytes = HALF(vid.rowbytes);
+        Scr.vrect.rowBytes = HALF(Scr.vrect.rowBytes);
         Scr.vpAspect *= 2.f;
     }
     else

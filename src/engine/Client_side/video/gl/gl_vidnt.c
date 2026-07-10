@@ -1357,7 +1357,7 @@ void    VID_Init(uint8_p palette) {
     int        i, existingmode;
     int        basenummodes, width, height, bpp, findbpp, done;
     uint8_p ptmp;
-    char    gldir[MAX_OSPATH];
+    fsPath_t gldir;
     HDC        hdc;
     DEVMODE    devmode;
 

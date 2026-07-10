@@ -73,7 +73,7 @@ cString Sys_ConsoleInput() {
 
 keycode_t XLateKey(XKeyEvent* ev) {
     keycode_t key;
-    char buf[NAME_LENGTH];
+    name_t buf;
     KeySym keysym;
 
     key = 0;

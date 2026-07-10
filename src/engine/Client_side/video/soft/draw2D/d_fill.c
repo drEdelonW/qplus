@@ -19,7 +19,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // d_clear: clears a specified rectangle to the specified color
 
-#include "vid.h"    // vid.rowbytes
 #include "screen.h"
 
 
@@ -52,7 +51,7 @@ void D_FillRect(vRect_p rect, int color) {
         (rheight < 1))
         return;
 
-    uint8_p dest = ((uint8_p)Scr.vrect.pBuff + ry * vid.rowbytes + rx);
+    uint8_p dest = ((uint8_p)Scr.vrect.pBuff + ry * Scr.vrect.rowBytes + rx);
 
     if (((rwidth & 0x03) == 0) &&
         (((uintptr_t)dest & 0x03) == 0)
@@ -67,7 +66,7 @@ void D_FillRect(vRect_p rect, int color) {
         for (int ry = 0; ry < rheight; ry++) {
             for (int rx = 0; rx < rwidth; rx++)
                 ldest[rx] = color;
-            ldest = (uint32_p)((uint8_p)ldest + vid.rowbytes);
+            ldest = (uint32_p)((uint8_p)ldest + Scr.vrect.rowBytes);
         }
     }
     else {
@@ -75,7 +74,7 @@ void D_FillRect(vRect_p rect, int color) {
         for (int ry = 0; ry < rheight; ry++) {
             for (int rx = 0; rx < rwidth; rx++)
                 dest[rx] = color;
-            dest += vid.rowbytes;
+            dest += Scr.vrect.rowBytes;
         }
     }
 }

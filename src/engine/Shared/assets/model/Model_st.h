@@ -12,7 +12,7 @@
 #include "ClipNode.h"
 #include "Hull.h"
 
-#include "platformdefs.h"
+#include "enginedefs.h"
 #include "SyncType.h"
 #include "TexInfo.h"
 
@@ -50,7 +50,7 @@ typedef enum {
 } ModType_t;
 
 struct Model_s {
-    char        name[MAX_QPATH];
+    qPath_t     name;
     NeedLoad_t  needload;   // bmodels and sprites don't cache normally
     ModType_t   type;       // kind of content
     int32_t     numframes;

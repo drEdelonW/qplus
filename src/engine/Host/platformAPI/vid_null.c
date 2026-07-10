@@ -35,23 +35,23 @@ Rgb16_t d_8to16table[InksNum];
 Rgb24_t d_8to24table[InksNum];
 VidDef_t vid = {    // global video state
         .frameBuff = {
-            .width  = BASEWIDTH,
-            .height = BASEHEIGHT,
-            .pClr   = _vidBuf,
+            .width      = BASEWIDTH,
+            .height     = BASEHEIGHT,
+            .pClr       = _vidBuf,
+            .rowBytes   = BASEWIDTH,
         },
 
-        .conrowbytes    = BASEWIDTH,
         .con = {
-            .width  = BASEWIDTH,
-            .height = BASEHEIGHT,
-            .pClr   = _vidBuf,
+            .width      = BASEWIDTH,
+            .height     = BASEHEIGHT,
+            .pClr       = _vidBuf,
+            .rowBytes   = BASEWIDTH,
         },
         .maxwarp = {
             .width  = BASEWIDTH,
             .height = BASEHEIGHT
         },
         .direct     = NULL,
-        .rowbytes   = BASEWIDTH,
         .numpages   = 1,
     };
 

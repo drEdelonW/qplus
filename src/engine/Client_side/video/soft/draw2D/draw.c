@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "draw.h"
 #include "screen.h"
 #include "vid.h"    // vid.con.pBuff VID_UnlockBuffer()
-#include "platformdefs.h"
+#include "enginedefs.h"
 #include "zone.h"
 #include <string.h>
 #include "host.h"
@@ -47,65 +47,6 @@ typedef struct {
 static RectDesc_t   _rRectDesc;
 static qColor8_p    _draw_chars;    // 8*8 graphic characters
 static qPic_p       _draw_backtile;
-
-//=============================================================================
-/* Support Routines */
-
-typedef struct CachePic_s {
-    char        name[MAX_QPATH];
-    CacheUser_t cache;
-} CachePic_t;
-typedef CachePic_t* CachePic_p;
-
-#define MAX_CACHED_PICS  128
-static CachePic_t   _menu_cachepics[MAX_CACHED_PICS];
-static int          _menu_numcachepics = 0;
-
-
-qPic_p Draw_PicFromWad(cStringRO name) {
-    return W_GetLumpName(name);
-}
-
-/*
-================
-Draw_CachePic
-================
-*/
-qPic_p Draw_CachePic(cStringRO path) {
-    CachePic_p pic = _menu_cachepics;
-    int i = 0;
-    for (; i < _menu_numcachepics; pic++, i++)
-        if (!strcmp(path, pic->name))
-            break;
-
-    if (i == _menu_numcachepics) {
-        if (_menu_numcachepics == MAX_CACHED_PICS)
-            Host_SysError("_menu_numcachepics == MAX_CACHED_PICS");
-
-        _menu_numcachepics++;
-        strcpy(pic->name, path);
-    }
-
-    qPic_p dat = Cache_Check(&pic->cache);
-    if (dat)
-        return dat;
-
-    //
-    // load the pic from disk
-    //
-    COM_LoadCacheFile(path, &pic->cache);
-
-    dat = (qPic_p)pic->cache.data;
-    if (!dat)
-        Host_SysError("Draw_CachePic: failed to load %s", path);
-
-    SwapPic(dat);
-
-    return dat;
-}
-
-
-
 /*
 ===============
 Draw_Init
@@ -122,6 +63,59 @@ void Draw_Init() {
     _rRectDesc.rowBytes = _draw_backtile->width;
 }
 
+//=============================================================================
+/* Support Routines */
+
+typedef struct CachePic_s {
+    qPath_t     name;
+    CacheUser_t cache;
+} CachePic_t;
+typedef CachePic_t* CachePic_p;
+
+
+qPic_p Draw_PicFromWad(cStringRO name) {
+    return W_GetLumpName(name);
+}
+
+/*
+================
+Draw_CachePic
+================
+*/
+#define MAX_CACHED_PICS  128
+static CachePic_t   _cachePics[MAX_CACHED_PICS];
+static int          _numCachePics = 0;
+qPic_p Draw_CachePic(cStringRO path) {
+    int i = 0;
+    for (; i < _numCachePics; i++)
+        if (!strcmp(path, _cachePics[i].name))
+            break;
+
+    if (i == _numCachePics) {
+        if (_numCachePics == MAX_CACHED_PICS)
+            Host_SysError("_numCachePics == MAX_CACHED_PICS");
+
+        _numCachePics++;
+        strcpy(_cachePics[i].name, path);
+    }
+
+    qPic_p dat = Cache_Check(&_cachePics[i].cache);
+    if (dat)
+        return dat;
+
+    //
+    // load the pic from disk
+    //
+    COM_LoadCacheFile(path, &_cachePics[i].cache);
+
+    dat = (qPic_p)_cachePics[i].cache.data;
+    if (!dat)
+        Host_SysError("Draw_CachePic: failed to load %s", path);
+
+    SwapPic(dat);
+
+    return dat;
+}
 
 
 /*
@@ -163,7 +157,7 @@ void Draw_Character(int x, int y, int num) {
 
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = (qColor8_p)vid.con.pBuff + y * vid.conrowbytes + x;
+        qColor8_p dest = (qColor8_p)vid.con.pBuff + y * vid.con.rowBytes + x;
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
@@ -171,13 +165,13 @@ void Draw_Character(int x, int y, int num) {
                     dest[i] = source[i];
 
             source += 128;
-            dest += vid.conrowbytes;
+            dest += vid.con.rowBytes;
         }
     }
     else {
         // FIXME: pre-expand to native format?
         uint16_p pusdest = (uint16_p) // TODO: rework to Rgb16_p
-            ((uint8_p)vid.con.pBuff + y * vid.conrowbytes + (x << 1));
+            ((uint8_p)vid.con.pBuff + y * vid.con.rowBytes + (x << 1));
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
@@ -185,7 +179,7 @@ void Draw_Character(int x, int y, int num) {
                     pusdest[i] = d_8to16table[source[i].i];
 
             source += 128;
-            pusdest += HALF(vid.conrowbytes);
+            pusdest += HALF(vid.con.rowBytes);
         }
     }
 }
@@ -244,30 +238,32 @@ void Draw_Pic(int x, int y, qPic_p pic) {
         (y < 0) ||
         ((x + pic->width) > Scr.vrect.width) ||
         ((y + pic->height) > Scr.vrect.height)
-        ) {
-        Host_SysError("Draw_Pic: bad coordinates %i/%i-%i/%i", x, y, pic->width, pic->height);
-    }
+        )   Host_SysError(
+            "Draw_Pic: bad coordinates %i/%i-%i/%i",
+            x, y, pic->width, pic->height
+        );
+
 
     qColor8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.vrect.pClr + y * vid.rowbytes + x;
+        qColor8_p dest = Scr.vrect.pClr + y * Scr.vrect.rowBytes + x;
 
         for (int v = 0; v < pic->height; v++) {
             Q_memcpy(dest, source, pic->width);
-            dest += vid.rowbytes;
+            dest += Scr.vrect.rowBytes;
             source += pic->width;
         }
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + y * HALF(vid.rowbytes) + x;
+        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + y * HALF(Scr.vrect.rowBytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++)
                 pusdest[u] = d_8to16table[source[u].i];
 
-            pusdest += HALF(vid.rowbytes);
+            pusdest += HALF(Scr.vrect.rowBytes);
             source += pic->width;
         }
     }
@@ -294,7 +290,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
     qColor8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.vrect.pClr + y * vid.rowbytes + x;
+        qColor8_p dest = Scr.vrect.pClr + y * Scr.vrect.rowBytes + x;
         qColor8_t tbyte;
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
@@ -302,7 +298,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                     if ((tbyte = source[u]).i != InkTransp)
                         dest[u] = tbyte;
 
-                dest += vid.rowbytes;
+                dest += Scr.vrect.rowBytes;
                 source += pic->width;
             }
         }
@@ -313,14 +309,14 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                         if ((tbyte = source[u + i]).i != InkTransp)
                             dest[u + i] = tbyte;
 
-                dest += vid.rowbytes;
+                dest += Scr.vrect.rowBytes;
                 source += pic->width;
             }
         }
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + y * HALF(vid.rowbytes) + x;
+        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + y * HALF(Scr.vrect.rowBytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
@@ -329,7 +325,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                     pusdest[u] = d_8to16table[tbyte];
             }
 
-            pusdest += HALF(vid.rowbytes);
+            pusdest += HALF(Scr.vrect.rowBytes);
             source += pic->width;
         }
     }
@@ -358,7 +354,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
     qColor8_t tbyte;
     qColor8_p source = pic->data;
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.vrect.pClr + y * vid.rowbytes + x;
+        qColor8_p dest = Scr.vrect.pClr + y * Scr.vrect.rowBytes + x;
 
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
@@ -366,7 +362,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
                     if ((tbyte = source[u]).i != InkTransp)
                         dest[u] = translation->pal[tbyte.i];
 
-                dest += vid.rowbytes;
+                dest += Scr.vrect.rowBytes;
                 source += pic->width;
             }
         }
@@ -377,14 +373,14 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
                         if ((tbyte = source[u + i]).i != InkTransp)
                             dest[u + i] = translation->pal[tbyte.i];
 
-                dest += vid.rowbytes;
+                dest += Scr.vrect.rowBytes;
                 source += pic->width;
             }
         }
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + y * HALF(vid.rowbytes) + x;
+        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + y * HALF(Scr.vrect.rowBytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
@@ -394,7 +390,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
                     pusdest[u] = d_8to16table[tbyte.i];
             }
 
-            pusdest += HALF(vid.rowbytes);
+            pusdest += HALF(Scr.vrect.rowBytes);
             source += pic->width;
         }
     }
@@ -450,7 +446,7 @@ void Draw_ConsoleBackground(int lines) {
     if (r_pixbytes == 1) {
         dest = vid.con.pClr;
 
-        for (int y = 0; y < lines; y++, dest += vid.conrowbytes) {
+        for (int y = 0; y < lines; y++, dest += vid.con.rowBytes) {
             int v = (vid.con.height - lines + y) * 200 / vid.con.height;
             qColor8_p src = conback->data + v * 320;
             if (vid.con.width == 320)
@@ -470,7 +466,7 @@ void Draw_ConsoleBackground(int lines) {
     else {
         uint16_p pusdest = (uint16_p)vid.con.pBuff;
 
-        for (int y = 0; y < lines; y++, pusdest += HALF(vid.conrowbytes)) {
+        for (int y = 0; y < lines; y++, pusdest += HALF(vid.con.rowBytes)) {
             // FIXME: pre-expand to native format?
             // FIXME: does the endian switching go away in production?
             int v = (vid.con.height - lines + y) * 200 / vid.con.height;
@@ -495,10 +491,10 @@ R_DrawRect8
 */
 void R_DrawRect8(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) {
     if (!Scr.vrect.pBuff)   return;
-    qColor8_p pdest = Scr.vrect.pClr + (prect->y * vid.rowbytes) + prect->x;
+    qColor8_p pdest = Scr.vrect.pClr + (prect->y * Scr.vrect.rowBytes) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
-    int destdelta = vid.rowbytes - prect->width;
+    int destdelta = Scr.vrect.rowBytes - prect->width;
 
     if (transparent) {
         for (int i = 0; i < prect->height; i++) {
@@ -519,7 +515,7 @@ void R_DrawRect8(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) 
         for (int i = 0; i < prect->height; i++) {
             memcpy(pdest, psrc, prect->width);
             psrc += rowbytes;
-            pdest += vid.rowbytes;
+            pdest += Scr.vrect.rowBytes;
         }
     }
 }
@@ -535,10 +531,10 @@ void R_DrawRect16(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent)
     // FIXME: would it be better to pre-expand native-format versions?
 
     uint16_p pdest = (uint16_p)Scr.vrect.pBuff +
-        (prect->y * HALF(vid.rowbytes)) + prect->x;
+        (prect->y * HALF(Scr.vrect.rowBytes)) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
-    int destdelta = HALF(vid.rowbytes) - prect->width;
+    int destdelta = HALF(Scr.vrect.rowBytes) - prect->width;
 
     qColor8_t t;
     if (transparent) {
@@ -598,18 +594,14 @@ void Draw_TileClear(int x, int y, int w, int h) {
 
         if (tileoffsety != 0)   vr.height = _rRectDesc.height - tileoffsety;
         else                    vr.height = _rRectDesc.height;
-
-        if (vr.height > height)
-            vr.height = height;
+        CLAMP_MORE(&vr.height, height);
 
         int tileoffsetx = vr.x % _rRectDesc.width;
 
         while (width > 0) {
             if (tileoffsetx != 0)   vr.width = _rRectDesc.width - tileoffsetx;
             else                    vr.width = _rRectDesc.width;
-
-            if (vr.width > width)
-                vr.width = width;
+            CLAMP_MORE(&vr.width, width);
 
             qColor8_p psrc = _rRectDesc.pTexBytes + (ptrdiff_t)(
                 (tileoffsety * _rRectDesc.rowBytes) + tileoffsetx);
@@ -638,7 +630,7 @@ Fills a box of pixels with a single color
 */
 void Draw_Fill(int x, int y, int w, int h, int c) {
     if (!Scr.vrect.pBuff)   return;
-    int stride = vid.rowbytes;
+    int stride = Scr.vrect.rowBytes;
     if (r_pixbytes == 1) {
         uint8_p dest = Scr.vrect.pBuff + (ptrdiff_t)(
             (y * stride) + x
@@ -670,7 +662,7 @@ void Draw_FadeScreen() {
     VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
 
     for (int y = 0; y < Scr.vrect.height; y++) {
-        uint8_p pbuf = (uint8_p)(Scr.vrect.pBuff + vid.rowbytes * y);
+        uint8_p pbuf = (uint8_p)(Scr.vrect.pBuff + Scr.vrect.rowBytes * y);
         int t = TWICE(y & 1);
 
         for (int x = 0; x < Scr.vrect.width; x++)

@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qOpenGL.h"
 #include "versions.h"
 #include "cvar.h"
-#include "platformdefs.h"
+#include "enginedefs.h"
 #include "console.h"
 #include "host.h"
 #include "wad.h"
@@ -76,7 +76,7 @@ int  texels;
 
 typedef struct {
     int  texnum;
-    char identifier[NAME_LENGTH];
+    name_t identifier;
     int  width, height;
     bool mipmap;
 } glTexture_t;
@@ -186,7 +186,7 @@ void Scrap_Upload() {
 /* Support Routines */
 
 typedef struct cachepic_s {
-    char    name[MAX_QPATH];
+    qPath_t name;
     qPic_t  pic;
     byte    padding[32]; // for appended glpic
 } cachepic_t;

@@ -39,7 +39,7 @@ void M_ServerList_Draw() {
 
     M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
     for (int n = 0; n < hostCacheCount; n++) {
-        char string[NAME_LENGTH];
+        name_t string;
         if (hostcache[n].maxusers)  snprintf(string, sizeof(string), "%-15.15s %-15.15s %2u/%2u\n", hostcache[n].name, hostcache[n].map, hostcache[n].users, hostcache[n].maxusers);
         else                        snprintf(string, sizeof(string), "%-15.15s %-15.15s\n", hostcache[n].name, hostcache[n].map);
         M_Print(16, 32 + 8 * n, string);

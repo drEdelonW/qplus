@@ -146,5 +146,5 @@ void M_DrawCheckbox(int x, int y, int on) {
 
 int curAnimFrame() { return ((int)(GetVievTime() * 10) % 6) + 1; }
 int blink(char sym) { return sym + ((int)(GetVievTime() * 4) & 1); }
-int curSymb() { return blink(12); }
-int inpSymb() { return blink(10); }
+int curSymb() { return blink(MenuCursor_Symb); }
+int inpSymb() { return blink(InputCursor_Symb); }

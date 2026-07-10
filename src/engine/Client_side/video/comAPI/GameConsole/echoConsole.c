@@ -51,40 +51,40 @@ void Con_NotifyBox(cString text) {
 */
 
 void Con_CheckResize() {
-    int32_t width = EIGHTH(Scr.vrect.width) - 2;
+    int width = DIV8(Scr.vrect.width) - 2;
     if (width == con.linewidth)
         return;
 
     if (width < 1) {   // video hasn't been initialized yet
         width = 38;
-        con.linewidth = (int32_t)width;
+        con.linewidth = width;
         con.totallines = CON_TEXTSIZE / con.linewidth;
         Q_memset(con.text, ' ', CON_TEXTSIZE);
     }
     else {
-        uint32_t oldwidth = (uint32_t)con.linewidth;
-        con.linewidth = (int32_t)width;
-        int32_t oldtotallines = con.totallines;
+        int oldwidth = con.linewidth;
+        con.linewidth = width;
+
+        int oldtotallines = con.totallines;
         con.totallines = CON_TEXTSIZE / con.linewidth;
-        int32_t numlines = oldtotallines;
 
-        if (con.totallines < numlines)
-            numlines = con.totallines;
+        int numlines = oldtotallines;
+        CLAMP_MORE(&numlines, con.totallines);
 
-        uint32_t numchars = oldwidth;
-
-        if (con.linewidth < numchars)
-            numchars = (uint32_t)con.linewidth;
+        int numchars = oldwidth;
+        CLAMP_MORE(&numchars, con.linewidth);
 
         char tbuf[CON_TEXTSIZE];
         Q_memcpy(tbuf, con.text, CON_TEXTSIZE);
         Q_memset(con.text, ' ', CON_TEXTSIZE);
 
-        for (int32_t i = 0; i < numlines; i++) {
-            for (int32_t j = 0; j < numchars; j++) {
+        for (int i = 0; i < numlines; i++) {
+            for (int j = 0; j < numchars; j++) {
                 con.text[(con.totallines - 1 - i) * con.linewidth + j] =
-                    tbuf[((con.current - i + oldtotallines) %
-                        oldtotallines) * (int32_t)oldwidth + j];
+                    tbuf[
+                        ((con.current - i + oldtotallines) %
+                            oldtotallines) * oldwidth + j
+                    ];
             }
         }
 
@@ -92,7 +92,7 @@ void Con_CheckResize() {
     }
 
     con.backscroll = 0;
-    con.current = (int32_t)con.totallines - 1;
+    con.current = con.totallines - 1;
 }
 
 /*
@@ -152,10 +152,10 @@ void Con_DrawInput() {
     cString text = con.lines[con.edit_line];
 
     // add the cursor frame
-    text[con.linepos] = 10 + ((int)(GetVievTime() * con.cursorspeed) & 1);
+    text[con.linepos] = InputCursor_Symb + ((int)(GetVievTime() * con.cursorBlinkHz) & 1);
 
     // fill out remainder with spaces
-    for (uint32_t i = (con.linepos + 1); i < con.linewidth; i++)
+    for (int i = (con.linepos + 1); i < con.linewidth; i++)
         text[i] = ' ';
 
     // prestep if horizontally scrolling
@@ -163,10 +163,10 @@ void Con_DrawInput() {
         text += 1 + con.linepos - (uint32_t)con.linewidth;
 
     // draw it
-    int32_t y = con.vislines - 16;
+    CmdLine_t y = con.vislines - 16;
 
-    for (int32_t i = 0; i < con.linewidth; i++)
-        Draw_Character(OCTO(i + 1), y, text[i]);
+    for (CharCol_t i = FirstChar; i < con.linewidth; i++)
+        Draw_Character(MUL8(i + 1), y, text[i]);
 
     // remove cursor
     con.lines[con.edit_line][con.linepos] = 0;
@@ -180,7 +180,7 @@ void Con_DrawInput() {
     The typing input line at the bottom should only be drawn if typing is allowed
     ================
 */
-void Con_DrawConsole(int32_t lines, bool drawinput) {
+void Con_DrawConsole(CmdLine_t lines, bool drawinput) {
     if (lines <= 0)
         return;
 
@@ -190,19 +190,16 @@ void Con_DrawConsole(int32_t lines, bool drawinput) {
     // draw the text
     con.vislines = lines;
 
-    int32_t rows = EIGHTH(lines - 16);  // rows of text to draw
-    int32_t y = lines - 16 - OCTO(rows); // may start slightly negative
+    int rows = DIV8(lines - 16);  // rows of text to draw
+    int y = lines - 16 - MUL8(rows); // may start slightly negative
 
-    for (int32_t i = (con.current - rows + 1); i <= con.current; i++, y += D_CHAR_HEIGHT) {
-        int32_t j = i - con.backscroll;
-
+    for (int i = (con.current - rows + 1); i <= con.current; i++, y += D_CHAR_HEIGHT) {
+        int j = i - con.backscroll;
         CLAMP_LESS(&j, 0);
 
         cString text = con.text + (j % con.totallines) * con.linewidth;
-
-        for (int32_t x = 0; x < con.linewidth; x++)
-            Draw_Character(OCTO(x + 1), y, text[x]);
-
+        for (int x = 0; x < con.linewidth; x++)
+            Draw_Character(MUL8(x + 1), y, text[x]);
     }
 
     // draw the input prompt, user text, and cursor if desired

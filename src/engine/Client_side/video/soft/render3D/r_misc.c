@@ -119,7 +119,7 @@ void R_LineGraph(int x, int y, int h) {
     x += r_refdef.vrect.x;
     y += r_refdef.vrect.y;
 
-    uint8_p dest = Scr.vrect.pBuff + (vid.rowbytes * y) + x;
+    uint8_p dest = Scr.vrect.pBuff + (Scr.vrect.rowBytes * y) + x;
 
     int s = r_graphheight.value;
 
@@ -128,8 +128,8 @@ void R_LineGraph(int x, int y, int h) {
     for (int i = 0; i < s; ++i) {
         dest[0] = (i < h) ? GRAPH_FG : GRAPH_BG;
 
-        dest[-vid.rowbytes] = GRAPH_BG;
-        dest -= TWICE(vid.rowbytes);
+        dest[-Scr.vrect.rowBytes] = GRAPH_BG;
+        dest -= TWICE(Scr.vrect.rowBytes);
     }
 }
 

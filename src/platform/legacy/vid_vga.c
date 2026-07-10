@@ -220,7 +220,7 @@ bool VGA_FreeAndAllocVidbuffer(VidDef_p lvid, int allocnewbuffer) {
 
 	if (allocnewbuffer) {
 		// alloc an extra line in case we want to wrap, and allocate the z-buffer
-		tbuffersize = (lvid->rowbytes * (lvid->height + 1)) +
+		tbuffersize = (lvid->rowBytes * (lvid->height + 1)) +
 			(lvid->width * lvid->height * sizeof(*d_pzbuffer));
 	}
 	else {
@@ -272,11 +272,8 @@ bool VGA_FreeAndAllocVidbuffer(VidDef_p lvid, int allocnewbuffer) {
 VGA_CheckAdequateMem
 ================
 */
-bool VGA_CheckAdequateMem(int width, int height, int rowbytes,
-	int allocnewbuffer) {
-	int		tbuffersize;
-
-	tbuffersize = width * height * sizeof(*d_pzbuffer);
+bool VGA_CheckAdequateMem(int width, int height, int rowbytes, int allocnewbuffer) {
+	int tbuffersize = width * height * sizeof(*d_pzbuffer);
 
 	if (allocnewbuffer) {
 		// alloc an extra line in case we want to wrap, and allocate the z-buffer
@@ -330,19 +327,19 @@ int VGA_InitMode(VidDef_p lvid, vmode_p pcurrentmode) {
 	VGA_height = lvid->height;
 	VGA_planar = pcurrentmode->planar;
 	if (VGA_planar)
-		VGA_rowbytes = lvid->rowbytes / 4;
+		VGA_rowbytes = lvid->rowBytes / 4;
 	else
-		VGA_rowbytes = lvid->rowbytes;
-	VGA_bufferrowbytes = lvid->rowbytes;
+		VGA_rowbytes = lvid->rowBytes;
+	VGA_bufferrowbytes = lvid->rowBytes;
 	lvid->colormap = host_colormap;
 
 	lvid->maxwarpwidth = WARP_WIDTH;
 	lvid->maxwarpheight = WARP_HEIGHT;
 
 	lvid->conbuffer = lvid->buffer;
-	lvid->conrowbytes = lvid->rowbytes;
-	lvid->conwidth = lvid->width;
-	lvid->conheight = lvid->height;
+	lvid->con.rowBytes = lvid->rowBytes;
+	lvid->con.width = lvid->width;
+	lvid->con.height = lvid->height;
 
 	VGA_pcurmode = pcurrentmode;
 
@@ -401,11 +398,11 @@ void VGA_SwapBuffersCopy(VidDef_p lvid, vmode_p pcurrentmode,
 	else {
 		while (rects) {
 			VGA_UpdateLinearScreen(
-				lvid->buffer + rects->x + (rects->y * lvid->rowbytes),
+				lvid->buffer + rects->x + (rects->y * lvid->rowBytes),
 				VGA_pagebase + rects->x + (rects->y * VGA_rowbytes),
 				rects->width,
 				rects->height,
-				lvid->rowbytes,
+				lvid->rowBytes,
 				VGA_rowbytes);
 
 			rects = rects->pnext;

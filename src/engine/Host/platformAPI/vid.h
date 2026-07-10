@@ -44,27 +44,24 @@ void VID_UnlockBuffer();
 #define BASEHEIGHT (200)
 
 typedef struct {
-#if 0
-    #warning TODO: move  [vRect_t scr;] and [ColorMap_p colormap;]  to screen
-    vRect_t     scr;            // invisible buffer inside pBuff
-#else
-    vRect_t     frameBuff;            // invisible buffer inside pBuff
-#endif
+    #warning TODO: move  [ColorMap_p colormap;]  to screen
     ColorMap_p  colormap;       // 256 * VID_GRADES size   
 #if 1 /* TODO: not useful? */
     qColor16_p  colormap16;     // 256 * VID_GRADES size // TODO: check is ot not used?
 #endif
-
-    int         conrowbytes;    // offset in byte for next lone
-    vRect_t     con;
-
-    vRect_t     maxwarp;        // SoftRender WarpEffect buffer
-
+    vRect_t frameBuff;            // invisible buffer inside pBuff
+    vRect_t con;
+    vRect_t maxwarp;        // SoftRender WarpEffect buffer
+    vRect_t zBuff;
     qColor8_p   direct;         // direct drawing to framebuffer, if not NULL
-    uint32_t    rowbytes;       // may be > width if displayed in a window
     int         numpages;
 } VidDef_t;
 typedef VidDef_t* VidDef_p;
+
+#if 1   /* Z-buffer */
+extern int16_p  d_pzbuffer;
+extern uint32_t d_zwidth;
+#endif
 
 extern  VidDef_t    vid;    // global video state
 

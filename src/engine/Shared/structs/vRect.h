@@ -7,6 +7,7 @@ typedef vRect_t* vRect_p;
 struct vRect_s {
     int x, y;
     int width, height;
+    ptrdiff_t rowBytes;  // Width in bytes - new line offset
     union {
         qColor8_p pClr;
         uint8_p pBuff;

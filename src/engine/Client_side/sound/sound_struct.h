@@ -1,6 +1,6 @@
 #pragma once
 
-#include "platformdefs.h"
+#include "enginedefs.h"
 #include "z_cache.h"
 #include "vector.h"
 
@@ -11,7 +11,7 @@ typedef struct {
 } portable_samplepair_t;
 
 typedef struct sfx_s {
-    char        name[MAX_QPATH];
+    qPath_t     name;
     CacheUser_t cache;
 } sfx_t;
 typedef sfx_t* sfx_p;

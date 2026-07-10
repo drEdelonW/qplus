@@ -28,6 +28,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define D_CHAR_WIDTH  (8)
 #define D_CHAR_HEIGHT (8)
 
+typedef enum {
+    InputCursor_Symb = 10,
+    MenuCursor_Symb = 12
+} ConsoleSymbols_t;
+
 extern qPic_p draw_disc;    // also used on sbar
 #ifdef __cplusplus
 extern "C" {

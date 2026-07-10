@@ -16,7 +16,7 @@
 int  load_cursor;  // 0 < load_cursor < MAX_SAVEGAMES
 
 #define MAX_SAVEGAMES  12
-char m_filenames[MAX_SAVEGAMES][SAVEGAME_COMMENT_LENGTH + 1];
+saveComment_t m_filenames[MAX_SAVEGAMES];
 int  loadable[MAX_SAVEGAMES];
 
 void M_ScanSaves() {
@@ -25,7 +25,7 @@ void M_ScanSaves() {
         strcpy(m_filenames[i], "--- UNUSED SLOT ---");
         loadable[i] = false;
 
-        char name[MAX_OSPATH];
+        fsPath_t name;
         snprintf(name, sizeof(name), "%s/s%i.sav", com.gamedir, i);
         FILE* f = fopen(name, "r");
         if (!f)

@@ -513,7 +513,7 @@ static void Test_Poll() {
         int colors = MSG_ReadLong();
         int frags = MSG_ReadLong();
         int connectTime = MSG_ReadLong();
-        char address[NAME_LENGTH]; Q_strcpy(address, MSG_ReadString());
+        name_t address; Q_strcpy(address, MSG_ReadString());
 
         Con_Printf(
             "%d:%s\n  frags:%3i  colors:%u %u  time:%u\n  %s\n",

@@ -35,6 +35,12 @@
     make TARGET=quakeWin fresh && \
     make TARGET=quakeSTM32 fresh
 
+    clear ; \
+    make TARGET=quakeX11 fresh -j4 && \
+    make TARGET=quakeGLX11 fresh -j4 && \
+    make TARGET=quakeWin fresh -j4 && \
+    make TARGET=quakeSTM32 fresh -j4 
+
     make TARGET=quakeX11 && \
     make TARGET=quakeGLX11 && \
     make TARGET=quakeWin
