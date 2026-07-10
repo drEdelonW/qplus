@@ -1162,7 +1162,7 @@ bool VID_SetWindowedMode(int modenum) {
 
     if (stretched) {
         DIBWidth = HALF(DIBWidth);
-        DIBHeight = HALF(DIBWidth);
+        DIBHeight = HALF(DIBHeight);
     }
 
     WindowStyle = WS_OVERLAPPED | WS_BORDER | WS_CAPTION | WS_SYSMENU |
@@ -1247,7 +1247,7 @@ bool VID_SetWindowedMode(int modenum) {
     Scr.vrect.pClr = (qColor8_p)dibdc->surface;
     Scr.vrect.height = DIBHeight;
     Scr.vrect.width = DIBWidth;
-    // vid.con.pClr = (qColor8_p)dibdc->surface;
+    Scr.vpAspect = calcAspectRect(&Scr.vrect);
     vid.con.height = DIBHeight;
     vid.con.width = DIBWidth;
     vid.direct = (qColor8_p)dibdc->surface;
@@ -1255,7 +1255,6 @@ bool VID_SetWindowedMode(int modenum) {
     vid.numpages = 1;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
-    Scr.aspect = ((float)Scr.vrect.height / (float)Scr.vrect.width) * (320.0 / 240.0);
 
     vid_stretched = stretched;
 
@@ -1294,8 +1293,7 @@ bool VID_SetFullscreenMode(int modenum) {
     vid.maxwarp.height = WARP_HEIGHT;
     DIBHeight = Scr.vrect.height = vid.con.height = modelist[modenum].height;
     DIBWidth = Scr.vrect.width = vid.con.width = modelist[modenum].width;
-    Scr.aspect = ((float)Scr.vrect.height / (float)Scr.vrect.width) *
-        (320.0 / 240.0);
+    Scr.vpAspect = calcAspectRect(&Scr.vrect);
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -1407,8 +1405,7 @@ bool VID_SetFullDIBMode(int modenum) {
     vid.maxwarp.height = WARP_HEIGHT;
     Scr.vrect.height = vid.con.height = DIBHeight;
     Scr.vrect.width = vid.con.width = DIBWidth;
-    Scr.aspect = ((float)Scr.vrect.height / (float)Scr.vrect.width) *
-        (320.0 / 240.0);
+    Scr.vpAspect = calcAspectRect(&Scr.vrect);
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -2178,7 +2175,7 @@ void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height) {
     if (!vid_initialized)
         return;
 
-    if (Scr.aspect > 1.5f) { ;  reps = 2; repshift = 1; }
+    if (Scr.vpAspect > 1.5f) { ;  reps = 2; repshift = 1; }
     else { ;                    reps = 1; repshift = 0; }
 
     if (vid.numpages == 1) {
@@ -2256,7 +2253,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
         return;
 
     int reps, repshift;
-    if (Scr.aspect > 1.5) { ;   reps = 2; repshift = 1; }
+    if (Scr.vpAspect > 1.5) { ;   reps = 2; repshift = 1; }
     else { ;                    reps = 1; repshift = 0; }
 
     if (vid.numpages == 1) {

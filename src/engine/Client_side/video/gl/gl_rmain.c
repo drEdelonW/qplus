@@ -496,7 +496,9 @@ void R_DrawAliasModel(r_Entity_p e) {
 
     // we can't dynamically colormap textures, so they are cached
     // seperately for the players.  Heads are just uncolored.
-    if (currententity->colormap != vid.colormap && !gl_nocolors.value) {
+    if ((currententity->colormap != vid.colormap) &&
+        (!gl_nocolors.value)
+        ) {
         int i = currententity - cl_entities;
         if (i >= 1 && i <= cl.maxclients /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
             GL_Bind(playertextures - 1 + i);

@@ -347,9 +347,7 @@ void VID_InitExtra() {
             vesa_modes[nummodes].name = &names[nummodes][0];
             vesa_modes[nummodes].width = modeinfo.width;
             vesa_modes[nummodes].height = modeinfo.height;
-            vesa_modes[nummodes].aspect =
-                ((float)modeinfo.height / (float)modeinfo.width) *
-                (320.0 / 240.0);
+            vesa_modes[nummodes].aspect = calcAspect(modeinfo.width, modeinfo.height);
             vesa_modes[nummodes].rowbytes = modeinfo.bytes_per_scanline;
             vesa_modes[nummodes].planar = 0;
             vesa_modes[nummodes].pextradata = &vesa_extra[nummodes];

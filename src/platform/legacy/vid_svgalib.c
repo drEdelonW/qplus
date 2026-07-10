@@ -105,7 +105,7 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
 
     if (!svgalib_inited || !vid.direct || !vga_oktowrite()) return;
 
-    if (scr.aspect > 1.5) {
+    if (scr.aspect > 1.5f) {
         reps = 2;
         repshift = 1;
     }
@@ -162,7 +162,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
 
     if (!svgalib_inited || !vid.direct || !vga_oktowrite()) return;
 
-    if (scr.aspect > 1.5) {
+    if (scr.aspect > 1.5f) {
         reps = 2;
         repshift = 1;
     }
@@ -457,7 +457,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
         vid.rowbytes = modes[current_mode].linewidth * 4;
     }
 
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
+    Scr.aspect = calcAspectRect(&vid.scr);
     vid.colormap = host_colormap;
     vid.conrowbytes = vid.rowbytes;
     vid.con.width = vid.scr.width;

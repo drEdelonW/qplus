@@ -1533,8 +1533,7 @@ void    VID_Init(uint8_p palette) {
 
     vid.con.width &= 0xfff8; // make it a multiple of eight
 
-    if (vid.con.width < 320)
-        vid.con.width = 320;
+    if (vid.con.width < 320)    vid.con.width = 320; // TODO: CLAMP
 
     // pick a conheight that matches with correct aspect
     vid.con.height = vid.con.width * 3 / 4;

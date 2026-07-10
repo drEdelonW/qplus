@@ -290,12 +290,8 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     r_refdef.aliasvrect.y = (int)(r_refdef.vrect.y * r_aliasuvscale);
     r_refdef.aliasvrect.width = (int)(r_refdef.vrect.width * r_aliasuvscale);
     r_refdef.aliasvrect.height = (int)(r_refdef.vrect.height * r_aliasuvscale);
-    r_refdef.aliasvrectright =
-        r_refdef.aliasvrect.x +
-        r_refdef.aliasvrect.width;
-    r_refdef.aliasvrectbottom =
-        r_refdef.aliasvrect.y +
-        r_refdef.aliasvrect.height;
+    r_refdef.aliasvrectright = r_refdef.aliasvrect.x + r_refdef.aliasvrect.width;
+    r_refdef.aliasvrectbottom = r_refdef.aliasvrect.y + r_refdef.aliasvrect.height;
 
     pixelAspect = aspect;
     _xOrigin = r_refdef.xOrigin;
@@ -401,7 +397,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
 #endif // id386
 
     D_ViewChanged();
-}
+    }
 
 
 /*

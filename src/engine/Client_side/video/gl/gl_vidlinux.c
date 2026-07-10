@@ -93,7 +93,8 @@ int        mx, my;
 
 cvar_t    m_filter = { "m_filter","1" };
 
-int scr_width, scr_height;
+static int _scrWidth;
+static int _scrHeight;
 
 /*-----------------------------------------------------------------------*/
 
@@ -321,8 +322,8 @@ GL_BeginRendering
 void GL_BeginRendering(int* x, int* y, int* width, int* height) {
 
     *x = *y = 0;
-    *width = scr_width;
-    *height = scr_height;
+    *width = _scrWidth;
+    *height = _scrHeight;
 
     //    if (!wglMakeCurrent( maindc, baseRC ))
     //        Host_SysError ("wglMakeCurrent failed");
@@ -568,11 +569,6 @@ static void Check_Gamma(uint8_p pal) {
 }
 
 void VID_Init(uint8_p palette) {
-    int i;
-    GLint attribs[32];
-    char    gldir[MAX_OSPATH];
-    int width = 640, height = 480;
-
     Init_KBD();
 
     Cvar_RegisterVariable(&vid_mode);
@@ -586,14 +582,9 @@ void VID_Init(uint8_p palette) {
 
     // interpret command-line params
 
-    // set vid parameters
-    attribs[0] = FXMESA_DOUBLEBUFFER;
-    attribs[1] = FXMESA_ALPHA_SIZE;
-    attribs[2] = 1;
-    attribs[3] = FXMESA_DEPTH_SIZE;
-    attribs[4] = 1;
-    attribs[5] = FXMESA_NONE;
-
+    int width = 640;
+    int height = 480;
+    int i;
     if ((i = COM_CheckParm("-width")) != 0)     width = atoi(com.argv[i + 1]);
     if ((i = COM_CheckParm("-height")) != 0)    height = atoi(com.argv[i + 1]);
 
@@ -601,8 +592,7 @@ void VID_Init(uint8_p palette) {
     else                                        vid.con.width = 640;
 
     vid.con.width &= 0xfff8; // make it a multiple of eight
-
-    if (vid.con.width < 320)        vid.con.width = 320;
+    CLAMP_LESS(&vid.con.width, 320);
 
     // pick a conheight that matches with correct aspect
     vid.con.height = vid.con.width * 3 / 4;
@@ -610,15 +600,20 @@ void VID_Init(uint8_p palette) {
     if ((i = COM_CheckParm("-conheight")) != 0)     vid.con.height = Q_atoi(com.argv[i + 1]);
     if (vid.con.height < 200)                        vid.con.height = 200;
 
-    _fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_75Hz,
-        attribs);
+    GLint attribs[32] = {   // set vid parameters
+        FXMESA_DOUBLEBUFFER,
+        FXMESA_ALPHA_SIZE, 1,
+        FXMESA_DEPTH_SIZE, 1,
+        FXMESA_NONE,
+    };
+    _fc = fxMesaCreateContext(0, findres(&width, &height), GR_REFRESH_75Hz, attribs);
     if (!_fc)
         Host_SysError("Unable to create 3DFX context.\n");
 
     InitSig(); // trap evil signals
 
-    scr_width = width;
-    scr_height = height;
+    _scrWidth = width;
+    _scrHeight = height;
 
     fxMesaMakeCurrent(_fc);
 
@@ -627,11 +622,12 @@ void VID_Init(uint8_p palette) {
     vid.scr.width = vid.con.width;
     vid.scr.height = vid.con.height;
 
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
+    scr.vpAspect = calcAspectRect(&vid.frameBuff);
     vid.numpages = 2;
 
     GL_Init();
 
+    char gldir[MAX_OSPATH];
     snprintf(gldir, sizeof(gldir), "%s/glquake", com.gamedir);
     Sys_mkdir(gldir);
 

@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *     │   └── sys icons    (top right corner)
  *     ├── menu            (front layer)
  *     └── echo console    (top layer, full/half screen)
- * 
+ *
  *  +--echo console (full / half screen)-----------+
  *  +--menu----------------------------------------+
  *  +--HUD-----------------------------------------+
@@ -49,7 +49,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "qTime.h"
 
 
-// only the refresh window will be updated unless these variables are flagged
+ // only the refresh window will be updated unless these variables are flagged
 typedef struct {
 #if 1
     vRect_t vrect;      // screen size rectangle
@@ -69,9 +69,12 @@ typedef struct {
     bool    skipupdate;
     bool    block_drawing;
     bool    r_cache_thrash;     // compatability
-    float   aspect;             // width / height -- < 0 is taller than wide
+    float   vpAspect;           // width / height -- < 0 is taller than wide  // move to view.h or RefDef
 } Screen_t;
 extern Screen_t Scr;
+
+static inline float calcAspect(int width, int height) { return ((float)height / (float)width) * (320.0 / 240.0); }
+static inline float calcAspectRect(vRect_p vR) { return ((float)vR->height / (float)vR->width) * (320.0 / 240.0); }
 
 #ifdef __cplusplus
 extern "C" {

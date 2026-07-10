@@ -84,7 +84,7 @@ void LCD_Init() {
     // while (1) { ; }
 
 }
-
+static bool _cur = false;
 void VID_Update(vRect_p rects) {
     if (rects) {
         if ((rects->x != 0) ||
@@ -99,32 +99,35 @@ void VID_Update(vRect_p rects) {
             return;
         }
     }
+    _cur != _cur;
     int ofs = ((800 - 640) / 2) + (((480 - 400) / 2) * LCD_SCREEN_WIDTH);
     for (int y = 0; y < Scr.vrect.height; y++)
         for (int x = 0; x < Scr.vrect.width; x++) {
             uint8_t idx = Scr.vrect.pBuff[y * Scr.vrect.width + x];
 
-            uint8_t r = (d_8to24table[idx] >> 0) & 0xFF;
-            uint8_t g = (d_8to24table[idx] >> 8) & 0xFF;
-            uint8_t b = (d_8to24table[idx] >> 16) & 0xFF;
+            uint32_t rgb = d_8to24table[idx];   // 0x00_bb_gg_rr
 
             uint32_t argb =
-                Color_Transparent |   // alpha
-                (r << 16) |
-                (g << 8) |
-                (b << 0);
+                Color_Transparent |              // alpha
+                ((rgb & 0x00FF00) << 0 ) |       // g stays put
+                ((rgb & 0x0000FF) << 16) |       // r -> bits 16-23
+                ((rgb & 0xFF0000) >> 16);        // b -> bits 0-7
 #if 0
             LCD_BG_LAYER_ADDRESS[(x + (y * LCD_SCREEN_WIDTH)) + ofs] = argb;
 #else
             int base = ofs + TWICE(x) + (TWICE(y) * LCD_SCREEN_WIDTH);
 
-            LCD_BG_LAYER_ADDRESS[base] = argb;
-            LCD_BG_LAYER_ADDRESS[base + 1] = argb;
-            LCD_BG_LAYER_ADDRESS[base + LCD_SCREEN_WIDTH] = argb;
-            LCD_BG_LAYER_ADDRESS[base + LCD_SCREEN_WIDTH + 1] = argb;
+            if (_cur) {
+                LCD_BG_LAYER_ADDRESS[base] = argb;
+                LCD_BG_LAYER_ADDRESS[base + LCD_SCREEN_WIDTH + 1] = argb;
+            }
+            else {
+                LCD_BG_LAYER_ADDRESS[base + 1] = argb;
+                LCD_BG_LAYER_ADDRESS[base + LCD_SCREEN_WIDTH] = argb;
+            }
 #endif
         }
-        // LCD_BusResume(); LCD_BusPause();
+    // LCD_BusResume(); LCD_BusPause();
 }
 
 

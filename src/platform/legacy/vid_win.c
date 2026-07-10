@@ -1230,15 +1230,14 @@ bool VID_SetWindowedMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    vid.scr.pBuff = vid.con.pBuff = vid.direct = dibdc->surface;
+    Scr.vrect.pBuff = vid.con.pBuff = vid.direct = dibdc->surface;
     vid.rowbytes = vid.conrowbytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
     vid.scr.height = vid.con.height = DIBHeight;
     vid.scr.width = vid.con.width = DIBWidth;
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
-        (320.0 / 240.0);
+    Scr.aspect = calcAspectRect(&Scr.vrect);
 
     vid_stretched = stretched;
 
@@ -1273,13 +1272,12 @@ bool VID_SetFullscreenMode(int modenum) {
     modestate = MS_FULLSCREEN;
     vid_fulldib_on_focus_mode = 0;
 
-    vid.scr.pBuff = vid.con.pBuff = vid.direct = NULL;
+    Scr.vrect.pBuff = vid.con.pBuff = vid.direct = NULL;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
     DIBHeight = vid.scr.height = vid.con.height = modelist[modenum].height;
     DIBWidth = vid.scr.width = vid.con.width = modelist[modenum].width;
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
-        (320.0 / 240.0);
+    Scr.aspect = calcAspectRect(&Scr.vrect);
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -1384,15 +1382,15 @@ bool VID_SetFullDIBMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    vid.scr.pBuff = vid.con.pBuff = vid.direct = dibdc->surface;
+    Scr.vrect.pBuff = dibdc->surface;
+    Scr.aspect = calcAspectRect(&Scr.vrect);
+    vid.direct = dibdc->surface;
     vid.rowbytes = vid.conrowbytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
     vid.scr.height = vid.con.height = DIBHeight;
     vid.scr.width = vid.con.width = DIBWidth;
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) *
-        (320.0 / 240.0);
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -2200,7 +2198,7 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
     if (!vid_initialized)
         return;
 
-    if (scr.aspect > 1.5) {
+    if (Scr.aspect > 1.5) {
         reps = 2;
         repshift = 1;
     }
@@ -2286,7 +2284,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
     if (!vid_initialized)
         return;
 
-    if (scr.aspect > 1.5) {
+    if (Scr.aspect > 1.5) {
         reps = 2;
         repshift = 1;
     }

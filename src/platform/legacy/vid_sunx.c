@@ -510,9 +510,9 @@ void    VID_Init(uint8_p palette) {
     for (i = 0; i < InksNum; i++)
         vid_gamma[i] = i;
 
-    vid.scr.width = 320;
-    vid.scr.height = 200;
-    // scr.aspect = 1.0;
+    Scr.vrect.width = 320;
+    Scr.vrect.height = 200;
+    // scr.aspect = 1.0; calcAspectRect(&Scr.vrect);
     vid.numpages = 2;
     vid.colormap = host_colormap;
 

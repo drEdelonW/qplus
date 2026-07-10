@@ -158,7 +158,7 @@ void GL_Init() {
 }
 
 static GLXContext _ctx = NULL;
-static int _scrWidth, _scrHeight;
+// static int _scrWidth, _scrHeight;
 
 #define KEY_MASK (KeyPressMask | KeyReleaseMask)
 #define MOUSE_MASK (ButtonPressMask | ButtonReleaseMask | \
@@ -551,19 +551,17 @@ int create_gl_context(App_p app) {
 
 #include "vid.h" // vid.maxwarp
 void apply_vid_state(App_p app) {
-    _scrWidth = app->xwin.width;
-    _scrHeight = app->xwin.height;
-
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
+
     vid.colormap = host_colormap;
 
     Scr.vrect.width = app->xwin.width;
     Scr.vrect.height = app->xwin.height;
-    Scr.aspect = ((float)Scr.vrect.height / (float)Scr.vrect.width) * (320.0f / 240.0f);
-    vid.numpages = 2;
+    vid.numpages = 1;
+    // vid.numpages = 2;
+    
     SCR_RequestCalcRefdef();
-
     glViewport(0, 0, app->xwin.width, app->xwin.height);
 }
 

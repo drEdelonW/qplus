@@ -29,9 +29,10 @@ _Screen_t _scr;
 SCR_Init
 ==================
 */
-#include "vid.h"
+#include "vid.h" // vid.frameBuff;
 void SCR_Init() {
     Scr.vrect = vid.frameBuff;
+    Scr.vpAspect = calcAspectRect(&Scr.vrect);
 
     Cvar_RegisterVariable(&scr_viewsize);
     Cvar_RegisterVariable(&scr_conspeed);
@@ -465,10 +466,8 @@ void SCR_CalcRefdef() {
 #ifdef GLQUAKE
 #else
     // guard against going from one mode to another that's less than half the vertical resolution
-    if (Scr.con_current > Scr.vrect.height)
-        Scr.con_current = Scr.vrect.height;
-
-    R_ViewChanged(&Scr.vrect, sb_lines, Scr.aspect);    // notify the refresh of the change
+    CLAMP_MORE(&Scr.con_current, Scr.vrect.height);
+    R_ViewChanged(&Scr.vrect, sb_lines, Scr.vpAspect);    // notify the refresh of the change
 #endif
 }
 

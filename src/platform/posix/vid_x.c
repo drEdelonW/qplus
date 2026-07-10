@@ -546,8 +546,8 @@ void VID_Init(qPal_p palette) {
         cString displayname = (cString)getenv("DISPLAY");
         if (displayname) {
             cString dName = displayname;
-            while (*dName && (*dName != ':')) dName++;
-            if (*dName) *dName = 0;
+            while (*dName && (*dName != ':'))   dName++;
+            if (*dName) *dName = 0x00;
             if (!(!strcasecmp(displayname, "unix") || !*displayname))
                 doShm = false;
         }
@@ -568,7 +568,7 @@ void VID_Init(qPal_p palette) {
     vid.conrowbytes = vid.rowbytes;
     vid.con.width = vid.frameBuff.width;
     vid.con.height = vid.frameBuff.height;
-    Scr.aspect = ((float)vid.frameBuff.height / (float)vid.frameBuff.width) * (320.0 / 240.0);
+    // Scr.vpAspect = calcAspectRect(&vid.frameBuff);
 
     // XSynchronize(x_disp, False);
 

@@ -865,7 +865,7 @@ void VID_Init(uint8_p palette) {
     vid.scr.width = vid.con.width;
     vid.scr.height = vid.con.height;
 
-    scr.aspect = ((float)vid.scr.height / (float)vid.scr.width) * (320.0 / 240.0);
+    Scr.aspect = calcAspectRect(&vid.scr);
     vid.numpages = 2;
 
     InitSig(); // trap evil signals

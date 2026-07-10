@@ -821,7 +821,7 @@ void V_RenderView() {
         //
 
         vid.rowbytes = TWICE(vid.rowbytes);
-        Scr.aspect *= 0.5;
+        Scr.vpAspect *= 0.5f;
 
         r_refdef.view.facing.yaw -= lcd_yaw.value;
         r_refdef.view.spot = VectorMA(r_refdef.view.spot, -lcd_x.value, _bs.right);
@@ -839,7 +839,7 @@ void V_RenderView() {
         r_refdef.vrect.height = TWICE(r_refdef.vrect.height);
 
         vid.rowbytes = HALF(vid.rowbytes);
-        Scr.aspect *= 2;
+        Scr.vpAspect *= 2.f;
     }
     else
 #endif

@@ -64,7 +64,7 @@ void VGA_BeginDirectRect(VidDef_p lvid, vmode_p pcurrentmode, int x,
 	if (!lvid->direct)
 		return;
 
-	if (lvid->aspect > 1.5) {
+	if (lvid->aspect > 1.5f) {
 		reps = 2;
 		repshift = 1;
 	}
@@ -124,7 +124,7 @@ void VGA_EndDirectRect(VidDef_p lvid, vmode_p pcurrentmode, int x,
 	if (!lvid->direct)
 		return;
 
-	if (lvid->aspect > 1.5) {
+	if (lvid->aspect > 1.5f) {
 		reps = 2;
 		repshift = 1;
 	}

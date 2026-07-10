@@ -33,7 +33,6 @@ static const qColor8_p _vidBuf = NULL;
 
 Rgb16_t d_8to16table[InksNum];
 Rgb24_t d_8to24table[InksNum];
-
 VidDef_t vid = {    // global video state
         .frameBuff = {
             .width  = BASEWIDTH,

@@ -287,8 +287,7 @@ CL_NewTempEntity
 r_Entity_p CL_NewTempEntity() {
     if ((cl_numvisedicts == MAX_VISEDICTS) ||
         (num_temp_entities == MAX_TEMP_ENTITIES)
-        )
-        return NULL;
+        )   return NULL;
 
     r_Entity_p ent = &cl_temp_entities[num_temp_entities];
     memset(ent, 0, sizeof(*ent));
