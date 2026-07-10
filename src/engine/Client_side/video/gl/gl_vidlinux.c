@@ -598,7 +598,7 @@ void VID_Init(uint8_p palette) {
     vid.con.height = vid.con.width * 3 / 4;
 
     if ((i = COM_CheckParm("-conheight")) != 0)     vid.con.height = Q_atoi(com.argv[i + 1]);
-    if (vid.con.height < 200)                        vid.con.height = 200;
+    CLAMP_LESS(&vid.con.height, 200);
 
     GLint attribs[32] = {   // set vid parameters
         FXMESA_DOUBLEBUFFER,
@@ -619,8 +619,8 @@ void VID_Init(uint8_p palette) {
 
     if (vid.con.height > height)     vid.con.height = height;
     if (vid.con.width > width)       vid.con.width = width;
-    vid.scr.width = vid.con.width;
-    vid.scr.height = vid.con.height;
+    Scr.vrect.width = vid.con.width;
+    Scr.vrect.height = vid.con.height;
 
     scr.vpAspect = calcAspectRect(&vid.frameBuff);
     vid.numpages = 2;
@@ -777,10 +777,7 @@ void IN_MouseMove(UserCmd_p cmd) {
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
         cl.viewangles[PITCH] += m_pitch.value * mouse_y;
-        if (cl.viewangles[PITCH] > 80)
-            cl.viewangles[PITCH] = 80;
-        if (cl.viewangles[PITCH] < -70)
-            cl.viewangles[PITCH] = -70;
+        CLAMP(-70, &cl.viewangles[PITCH], 80);
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)

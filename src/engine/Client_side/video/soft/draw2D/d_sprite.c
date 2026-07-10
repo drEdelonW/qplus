@@ -92,14 +92,12 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
                 z = (float)FIXED16_ONE / zi; // prescale to 16.16 fixed-point
 
                 snext = (int)(sdivz * z) + sadjust;
-                /**/ if (snext > bbextents)     snext = bbextents;
-                else if (snext < 8)             snext = 8; // prevent round-off error on <0 steps from
+                CLAMP(8, &snext, bbextents); // prevent round-off error on <0 steps from
                 //  from causing overstepping & running off the
                 //  edge of the texture
 
                 tnext = (int)(tdivz * z) + tadjust;
-                /**/ if (tnext > bbextentt)     tnext = bbextentt;
-                else if (tnext < 8)             tnext = 8; // guard against round-off error on <0 steps
+                CLAMP(8, &tnext, bbextentt); // guard against round-off error on <0 steps
 
                 sstep = EIGHTH(snext - s);
                 tstep = EIGHTH(tnext - t);
@@ -115,14 +113,12 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
                 zi += d_zistepu * spancountminus1;
                 z = (float)FIXED16_ONE / zi; // prescale to 16.16 fixed-point
                 snext = (int)(sdivz * z) + sadjust;
-                /**/ if (snext > bbextents)     snext = bbextents;
-                else if (snext < 8)             snext = 8; // prevent round-off error on <0 steps from
+                CLAMP(8, &snext, bbextents); // prevent round-off error on <0 steps from
                 //  from causing overstepping & running off the
                 //  edge of the texture
 
                 tnext = (int)(tdivz * z) + tadjust;
-                /**/ if (tnext > bbextentt)     tnext = bbextentt;
-                else if (tnext < 8)             tnext = 8; // guard against round-off error on <0 steps
+                CLAMP(8, &tnext, bbextentt); // guard against round-off error on <0 steps
 
                 if (spancount > 1) {
                     sstep = (snext - s) / (spancount - 1);
@@ -223,10 +219,7 @@ void D_SpriteScanRightEdge() {
     int i = _minIndex;
 
     float vvert = r_spritedesc.pverts[i].v;
-    if (vvert < r_refdef.fvrecty_adj)
-        vvert = r_refdef.fvrecty_adj;
-    if (vvert > r_refdef.fvrectbottom_adj)
-        vvert = r_refdef.fvrectbottom_adj;
+    CLAMP(r_refdef.fvrecty_adj, &vvert, r_refdef.fvrectbottom_adj);
 
     float vtop = ceil(vvert);
 
@@ -235,25 +228,16 @@ void D_SpriteScanRightEdge() {
         EmitPoint_p pnext = pvert + 1;
 
         float vnext = pnext->v;
-        if (vnext < r_refdef.fvrecty_adj)
-            vnext = r_refdef.fvrecty_adj;
-        if (vnext > r_refdef.fvrectbottom_adj)
-            vnext = r_refdef.fvrectbottom_adj;
+        CLAMP(r_refdef.fvrecty_adj, &vnext, r_refdef.fvrectbottom_adj);
 
         float vbottom = ceil(vnext);
 
         if (vtop < vbottom) {
             float uvert = pvert->u;
-            if (uvert < r_refdef.fvrectx_adj)
-                uvert = r_refdef.fvrectx_adj;
-            if (uvert > r_refdef.fvrectright_adj)
-                uvert = r_refdef.fvrectright_adj;
+            CLAMP(r_refdef.fvrectx_adj, &uvert, r_refdef.fvrectright_adj);
 
             float unext = pnext->u;
-            if (unext < r_refdef.fvrectx_adj)
-                unext = r_refdef.fvrectx_adj;
-            if (unext > r_refdef.fvrectright_adj)
-                unext = r_refdef.fvrectright_adj;
+            CLAMP(r_refdef.fvrectx_adj, &unext, r_refdef.fvrectright_adj);
 
             float du = unext - uvert;
             float dv = vnext - vvert;

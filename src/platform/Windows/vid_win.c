@@ -1597,11 +1597,11 @@ void VID_LockBuffer() {
         Scr.vrect.rowBytes = vid.con.rowBytes = mgldc->mi.bytesPerLine;
     }
 
-    if (r_dowarp)   d_viewbuffer = r_warpbuffer;
-    else            d_viewbuffer = (void*)(uint8_p)Scr.vrect.pBuff;
+    d_viewbuffer = (r_dowarp) ?
+        r_warpbuffer : Scr.vrect.pClr;
 
-    if (r_dowarp)   screenwidth = WARP_WIDTH;
-    else            screenwidth = Scr.vrect.rowBytes;
+    screenwidth = (r_dowarp) ?
+        WARP_WIDTH : Scr.vrect.rowBytes;
 
     if (lcd_x.value)
         screenwidth = TWICE(screenwidth);

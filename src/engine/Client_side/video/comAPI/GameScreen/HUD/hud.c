@@ -63,7 +63,7 @@ void Con_DrawNotify() {
         time = GetRealTime() - time;
         if (time > con_notifytime.value)    continue;
 
-        cString text = con.text + (i % con.totallines) * con.linewidth;
+        cString text = con.pText + (i % con.totallines) * con.linewidth;
 
         Scr.clearnotify = 0;
         Scr.copytop = true;

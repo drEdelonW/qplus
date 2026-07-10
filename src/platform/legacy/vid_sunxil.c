@@ -174,10 +174,7 @@ void VID_Gamma_f() {
         for (i = 0; i < 255; i++) {
             f = pow((i + 1) / 256.0, g);
             inf = f * 255 + 0.5;
-            if (inf < 0)
-                inf = 0;
-            if (inf > 255)
-                inf = 255;
+            CLAMP(0, &inf, 255);
             vid_gamma[i] = inf;
         }
 
@@ -197,10 +194,7 @@ bool CheckPixelMultiply() {
     int old_pixel;
 
     if ((m = (int)pixel_multiply.value) != current_pixel_multiply) {
-        if (m < 1)
-            m = 1;
-        if (m > 4)
-            m = 4;
+        CLAMP(1, &m, 4);
 
         old_pixel = current_pixel_multiply;
         current_pixel_multiply = m;
@@ -220,13 +214,12 @@ bool CheckPixelMultiply() {
 
         XConfigureWindow(x_disp, x_win, CWWidth | CWHeight, &chg);
 
-        vid.scr.width = MP(wattr.width) & ~3;
-        vid.scr.height = MP(wattr.height);
+        Scr.vrect.width = MP(wattr.width) & ~3;
+        Scr.vrect.height = MP(wattr.height);
 
-        if (vid.scr.width < 320)
-            vid.scr.width = 320;
-        if (vid.scr.height < 200)
-            vid.scr.height = 200;
+        if (Scr.vrect.width < 320)  Scr.vrect.width = 320;
+        if (Scr.vrect.height < 200)
+            Scr.vrect.height = 200;
         VID_ResetFramebuffer();
 
         return true;
@@ -478,17 +471,17 @@ void VID_Init(uint8_p palette) {
     if (desired_height < h)
         desired_height = h;
 
-    vid.scr.width = MP(desired_width);
-    vid.scr.height = MP(desired_height);
+    Scr.vrect.width = MP(desired_width);
+    Scr.vrect.height = MP(desired_height);
 
     //
     // patch things up so game doesn't fail if window is too small
     //
 
-    if (vid.scr.width < 320)
-        vid.scr.width = 320;
-    if (vid.scr.height < 200)
-        vid.scr.height = 200;
+    if (Scr.vrect.width < 320)
+        Scr.vrect.width = 320;
+    if (Scr.vrect.height < 200)
+        Scr.vrect.height = 200;
 
     //
     // see if we're going to use threads
@@ -598,14 +591,14 @@ VID_ResetFramebuffer() {
         return;
     }
 
-    //printf("VID_ResetFramebuffer: vid.scr.width %d, vid.scr.height %d\n", vid.scr.width, vid.scr.height);
+    //printf("VID_ResetFramebuffer: Scr.vrect.width %d, Scr.vrect.height %d\n", Scr.vrect.width, Scr.vrect.height);
 
     xil_destroy(display_image);
 
     xil_destroy(quake_image);
 
     display_image = xil_create_from_window(state, x_disp, x_win);
-    quake_image = xil_create(state, vid.scr.width, vid.scr.height, 1, XIL_BYTE);
+    quake_image = xil_create(state, Scr.vrect.width, Scr.vrect.height, 1, XIL_BYTE);
 
     xil_export(quake_image);
 
@@ -619,11 +612,11 @@ VID_ResetFramebuffer() {
         Sys_Error("xil_get_memory_storage");
 
     vid.rowBytes = storage.byte.scanline_stride;
-    vid.scr.pBuff = storage.byte.data;
-    vid.con.pBuff = vid.scr.pBuff;
+    Scr.vrect.pBuff = storage.byte.data;
+    vid.con.pBuff = Scr.vrect.pBuff;
     vid.con.rowBytes = vid.rowBytes;
-    vid.con.width = vid.scr.width;
-    vid.con.height = vid.scr.height;
+    vid.con.width = Scr.vrect.width;
+    vid.con.height = Scr.vrect.height;
 
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
@@ -631,8 +624,8 @@ VID_ResetFramebuffer() {
 
     free(vid.zBuff.pZBuff);
 
-    vid.zBuff.pZBuff = malloc(PM(vid.scr.width) * PM(vid.scr.height) * sizeof(*vid.zBuff.pZBuff));
-    //Hunk_HighAllocName(PM(vid.scr.width)*PM(vid.scr.height)*sizeof(*vid.zBuff.pZBuff), "zbuff");
+    vid.zBuff.pZBuff = malloc(PM(Scr.vrect.width) * PM(Scr.vrect.height) * sizeof(*vid.zBuff.pZBuff));
+    //Hunk_HighAllocName(PM(Scr.vrect.width)*PM(Scr.vrect.height)*sizeof(*vid.zBuff.pZBuff), "zbuff");
 }
 
 VID_ResetFramebuffer_MT() {
@@ -642,7 +635,7 @@ VID_ResetFramebuffer_MT() {
 
     TypeLess_ptr  update_thread();
 
-    printf("VID_ResetFramebuffer: vid.scr.width %d, vid.scr.height %d\n", vid.scr.width, vid.scr.height);
+    printf("VID_ResetFramebuffer: Scr.vrect.width %d, Scr.vrect.height %d\n", Scr.vrect.width, Scr.vrect.height);
 
     old_display_image = display_image;
 
@@ -658,7 +651,7 @@ VID_ResetFramebuffer_MT() {
 
     free(vid.zBuff.pZBuff);
 
-    vid.zBuff.pZBuff = malloc(PM(vid.scr.width) * PM(vid.scr.height) * sizeof(*vid.zBuff.pZBuff));
+    vid.zBuff.pZBuff = malloc(PM(Scr.vrect.width) * PM(Scr.vrect.height) * sizeof(*vid.zBuff.pZBuff));
 }
 
 void VID_ShiftPalette(uint8_p p) {
@@ -795,15 +788,15 @@ void GetEvent() {
     case MotionNotify:
 
         if (_windowed_mouse.value) {
-            mouse_x = (float)((int)x_event.xmotion.x - (int)(vid.scr.width / 2));
-            mouse_y = (float)((int)x_event.xmotion.y - (int)(vid.scr.height / 2));
+            mouse_x = (float)((int)x_event.xmotion.x - (int)(Scr.vrect.width / 2));
+            mouse_y = (float)((int)x_event.xmotion.y - (int)(Scr.vrect.height / 2));
             //printf("m: x=%d,y=%d, mx=%3.2f,my=%3.2f\n",
             // x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
                         /* move the mouse to the window center again */
             XSelectInput(x_disp, x_win, x_std_event_mask & ~PointerMotionMask);
             XWarpPointer(x_disp, None, x_win, 0, 0, 0, 0,
-                (vid.scr.width / 2), (vid.scr.height / 2));
+                (Scr.vrect.width / 2), (Scr.vrect.height / 2));
             XSelectInput(x_disp, x_win, x_std_event_mask);
         }
         else {
@@ -934,13 +927,13 @@ VID_Update(vRect_p rects) {
 
         config_notify = false;
 
-        vid.scr.width = MP(config_notify_width) & ~3;
-        vid.scr.height = MP(config_notify_height);
+        Scr.vrect.width = MP(config_notify_width) & ~3;
+        Scr.vrect.height = MP(config_notify_height);
 
-        if (vid.scr.width < 320)
-            vid.scr.width = 320;
-        if (vid.scr.height < 200)
-            vid.scr.height = 200;
+        if (Scr.vrect.width < 320)
+            Scr.vrect.width = 320;
+        if (Scr.vrect.height < 200)
+            Scr.vrect.height = 200;
 
         VID_ResetFramebuffer();
 
@@ -966,8 +959,8 @@ VID_Update(vRect_p rects) {
         if (xil_get_memory_storage(quake_image, &storage) == FALSE)
             Sys_Error("xil_get_memory_storage");
 
-        vid.scr.pBuff = storage.byte.data;
-        vid.con.pBuff = vid.scr.pBuff;
+        Scr.vrect.pBuff = storage.byte.data;
+        vid.con.pBuff = Scr.vrect.pBuff;
 
         rects = rects->pnext;
     }
@@ -1005,13 +998,13 @@ VID_Update_MT(vRect_p rects) {
 
         config_notify = false;
 
-        vid.scr.width = MP(config_notify_width) & ~3;
-        vid.scr.height = MP(config_notify_height);
+        Scr.vrect.width = MP(config_notify_width) & ~3;
+        Scr.vrect.height = MP(config_notify_height);
 
-        if (vid.scr.width < 320)
-            vid.scr.width = 320;
-        if (vid.scr.height < 200)
-            vid.scr.height = 200;
+        if (Scr.vrect.width < 320)
+            Scr.vrect.width = 320;
+        if (Scr.vrect.height < 200)
+            Scr.vrect.height = 200;
 
         VID_ResetFramebuffer_MT();
 
@@ -1039,12 +1032,12 @@ drain_renderpipeline(XilImage old) {
     xil_destroy(old);
 
 
-    new = xil_create(state, vid.scr.width, vid.scr.height, 1, XIL_BYTE);
+    new = xil_create(state, Scr.vrect.width, Scr.vrect.height, 1, XIL_BYTE);
 
     if (write(render_pipeline[0], &new, sizeof(new)) != sizeof(new))
         Sys_Error("drain_renderpipeline: write");
 
-    new = xil_create(state, vid.scr.width, vid.scr.height, 1, XIL_BYTE);
+    new = xil_create(state, Scr.vrect.width, Scr.vrect.height, 1, XIL_BYTE);
 
     xil_export(new);
 
@@ -1052,11 +1045,11 @@ drain_renderpipeline(XilImage old) {
         Sys_Error("xil_get_memory_storage");
 
     vid.rowBytes = storage.byte.scanline_stride;
-    vid.scr.pBuff = storage.byte.data;
-    vid.con.pBuff = vid.scr.pBuff;
+    Scr.vrect.pBuff = storage.byte.data;
+    vid.con.pBuff = Scr.vrect.pBuff;
     vid.con.rowBytes = vid.rowBytes;
-    vid.con.width = vid.scr.width;
-    vid.con.height = vid.scr.height;
+    vid.con.width = Scr.vrect.width;
+    vid.con.height = Scr.vrect.height;
 
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
@@ -1082,8 +1075,8 @@ sched_update(XilImage image) {
     if (xil_get_memory_storage(new, &storage) == FALSE)
         Sys_Error("xil_get_memory_storage");
 
-    vid.scr.pBuff = storage.byte.data;
-    vid.con.pBuff = vid.scr.pBuff;
+    Scr.vrect.pBuff = storage.byte.data;
+    vid.con.pBuff = Scr.vrect.pBuff;
 
     return (new);
 }
@@ -1193,10 +1186,7 @@ void IN_Move(UserCmd_p cmd) {
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
         cl.viewangles[PITCH] += m_pitch.value * mouse_y;
-        if (cl.viewangles[PITCH] > 80)
-            cl.viewangles[PITCH] = 80;
-        if (cl.viewangles[PITCH] < -70)
-            cl.viewangles[PITCH] = -70;
+        CLAMP(-70, &cl.viewangles[PITCH], 80);
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)

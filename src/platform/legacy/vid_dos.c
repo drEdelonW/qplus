@@ -188,7 +188,7 @@ VID_SetMode
 */
 int VID_SetMode(int modenum, uint8_p palette) {
 	int		stat;
-	vmode_p pnewmode,  poldmode;
+	vmode_p pnewmode, poldmode;
 
 	if ((modenum >= numvidmodes) || (modenum < 0)) {
 		Cvar_SetValue("vid_mode", (float)vid_modenum);
@@ -215,8 +215,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
 	poldmode = pcurrentmode;
 	pcurrentmode = pnewmode;
 
-	vid.scr.width = pcurrentmode->width;
-	vid.scr.height = pcurrentmode->height;
+	Scr.vrect.width = pcurrentmode->width;
+	Scr.vrect.height = pcurrentmode->height;
 	scr.aspect = pcurrentmode->aspect;
 	vid.rowBytes = pcurrentmode->rowbytes;
 
@@ -226,16 +226,18 @@ int VID_SetMode(int modenum, uint8_p palette) {
 		if (stat == 0) {
 			// real, hard failure that requires resetting the mode
 			if (!VID_SetMode(vid_modenum, palette))	// restore prior mode
-				Sys_Error("VID_SetMode: Unable to set any mode, probably "
-					"because there's not enough memory available");
+				Sys_Error(
+					"VID_SetMode: Unable to set any mode, probably "
+					"because there's not enough memory available"
+				);
 			Con_Printf("Failed to set mode %d\n", modenum);
 			return 0;
 		}
 		else if (stat == -1) {
 			// not enough memory; just put things back the way they were
 			pcurrentmode = poldmode;
-			vid.scr.width = pcurrentmode->width;
-			vid.scr.height = pcurrentmode->height;
+			Scr.vrect.width = pcurrentmode->width;
+			Scr.vrect.height = pcurrentmode->height;
 			scr.aspect = pcurrentmode->aspect;
 			vid.rowBytes = pcurrentmode->rowbytes;
 			return 0;

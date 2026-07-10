@@ -77,7 +77,7 @@ extern AffineTriDesc_t r_affinetridesc;
 extern SpriteDesc_t r_spritedesc;
 extern PolyDesc_t r_polydesc;
 
-extern int d_con_indirect; // if 0, Quake will draw console directly to vid.scr.pBuff; if 1, Quake will draw console via D_DrawRect. Must be defined by driver
+extern int d_con_indirect; // if 0, Quake will draw console directly to Scr.vrect.pBuff; if 1, Quake will draw console via D_DrawRect. Must be defined by driver
 
 extern Basis_t r_p;
 

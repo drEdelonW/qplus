@@ -592,7 +592,7 @@ void R_DrawViewModel() {
     if (!currententity->model)      return;
 
     int j = R_LightPoint(currententity->pose.spot);
-    if (j < 24)        j = 24;  // allways give some light on gun
+    CLAMP_LESS(&j, 24);  // allways give some light on gun
     int ambientlight = j;
 
     // add dynamic lights

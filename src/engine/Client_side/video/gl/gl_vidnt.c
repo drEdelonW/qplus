@@ -225,8 +225,8 @@ bool VID_SetWindowedMode(int modenum) {
 
     if (vid.con.height > modelist[modenum].height)   vid.con.height = modelist[modenum].height;
     if (vid.con.width > modelist[modenum].width)     vid.con.width = modelist[modenum].width;
-    vid.scr.width = vid.con.width;
-    vid.scr.height = vid.con.height;
+    Scr.vrect.width = vid.con.width;
+    Scr.vrect.height = vid.con.height;
 
     vid.numpages = 2;
 
@@ -299,8 +299,8 @@ bool VID_SetFullDIBMode(int modenum) {
 
     if (vid.con.height > modelist[modenum].height)   vid.con.height = modelist[modenum].height;
     if (vid.con.width > modelist[modenum].width)     vid.con.width = modelist[modenum].width;
-    vid.scr.width = vid.con.width;
-    vid.scr.height = vid.con.height;
+    Scr.vrect.width = vid.con.width;
+    Scr.vrect.height = vid.con.height;
 
     vid.numpages = 2;
 
@@ -1134,13 +1134,11 @@ void VID_InitDIB(HINSTANCE hInstance) {
 
     if (COM_CheckParm("-width"))    modelist[0].width = Q_atoi(com.argv[COM_CheckParm("-width") + 1]);
     else                            modelist[0].width = 640;
-
-    if (modelist[0].width < 320)    modelist[0].width = 320;
+    CLAMP_LESS(&modelist[0].width, 320);
 
     if (COM_CheckParm("-height"))   modelist[0].height = Q_atoi(com.argv[COM_CheckParm("-height") + 1]);
     else                            modelist[0].height = modelist[0].width * 240 / 320;
-
-    if (modelist[0].height < 240)   modelist[0].height = 240;
+    CLAMP_LESS(&modelist[0].height, 240);
 
     snprintf(
         modelist[0].modedesc, sizeof(modelist[0].modedesc),
@@ -1335,8 +1333,7 @@ static void Check_Gamma(qPal_p pal) {
     for (int i = 0; i < 768; i++) {
         float f = pow((pal[i] + 1) / 256.0, vid_gamma);
         float inf = f * 255 + 0.5;
-        if (inf < 0)    inf = 0;
-        if (inf > 255)  inf = 255;
+        CLAMP(0, &inf, 255);
         palette[i] = inf;
     }
 
@@ -1527,16 +1524,14 @@ void    VID_Init(uint8_p palette) {
         vid.con.width = 640;
 
     vid.con.width &= 0xfff8; // make it a multiple of eight
-
-    if (vid.con.width < 320)    vid.con.width = 320; // TODO: CLAMP
+    CLAMP_LESS(&vid.con.width, 320);
 
     // pick a conheight that matches with correct aspect
     vid.con.height = vid.con.width * 3 / 4;
 
     if ((i = COM_CheckParm("-conheight")) != 0)
         vid.con.height = Q_atoi(com.argv[i + 1]);
-    if (vid.con.height < 200)
-        vid.con.height = 200;
+    CLAMP_LESS(&vid.con.height, 200);
 
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;

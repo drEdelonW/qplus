@@ -970,10 +970,10 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
             ) {
             GL_MipMap((uint8_p)_scaled, scaled_width, scaled_height);
             scaled_width = HALF(scaled_width);
-            if (scaled_width < 1)   scaled_width = 1;
+            CLAMP_LESS(&scaled_width, 1);
 
             scaled_height = HALF(scaled_height);
-            if (scaled_height < 1)  scaled_height = 1;
+            CLAMP_LESS(&scaled_height, 1);
             miplevel++;
             glTexImage2D(
                 GL_TEXTURE_2D,
@@ -1067,10 +1067,10 @@ void GL_Upload8_EXT(qColor8_p data, int width, int height, bool mipmap, bool alp
             ) {
             GL_MipMap8Bit(_scaled, scaled_width, scaled_height);
             scaled_width = HALF(scaled_width);
-            if (scaled_width < 1)       scaled_width = 1;
+            CLAMP_LESS(&scaled_width, 1);
 
             scaled_height = HALF(scaled_height);
-            if (scaled_height < 1)      scaled_height = 1;
+            CLAMP_LESS(&scaled_height, 1);
             miplevel++;
             glTexImage2D(
                 GL_TEXTURE_2D,

@@ -334,7 +334,7 @@ void SCR_SetUpToDrawConsole() {
     if (_scr.drawloading)   return; // never a console with loading plaque
 
     // decide on the height of the console
-    con.forcedup = !cl.worldmodel || cls.signon != SIGNONS;
+    con.forcedup = !cl.worldmodel || (cls.signon != SIGNONS);
 
     /**/ if (con.forcedup) {
         Scr.conlines = Scr.vrect.height;  // full screen

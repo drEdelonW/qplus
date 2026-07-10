@@ -53,8 +53,8 @@ console_t con = {
     ================
 */
 void Con_Clear_f() {
-    if (con.text) {
-        Q_memset(con.text, ' ', CON_TEXTSIZE);
+    if (con.pText) {
+        Q_memset(con.pText, ' ', CON_TEXTSIZE);
     }
 }
 
@@ -87,8 +87,8 @@ void Con_Init() {
         }
     }
 
-    con.text = Hunk_AllocName(CON_TEXTSIZE, "context");
-    Q_memset(con.text, ' ', CON_TEXTSIZE);
+    con.pText = Hunk_AllocName(CON_TEXTSIZE, "context");
+    Q_memset(con.pText, ' ', CON_TEXTSIZE);
     con.linewidth = -1;
     Con_CheckResize();
 
@@ -113,7 +113,7 @@ void Con_Linefeed() {
     con.x = 0;
     con.current++;
     Q_memset(
-        &con.text[(con.current % con.totallines) * con.linewidth],
+        &con.pText[(con.current % con.totallines) * con.linewidth],
         ' ',
         con.linewidth
     );
@@ -179,7 +179,7 @@ void Con_Print(cStringRO txt) {
 
 
         default: { // display character and advance
-            con.text[((con.current % con.totallines) * con.linewidth) + con.x] = c | mask;
+            con.pText[((con.current % con.totallines) * con.linewidth) + con.x] = c | mask;
             con.x++;
             if (con.x >= con.linewidth)
                 con.x = 0;

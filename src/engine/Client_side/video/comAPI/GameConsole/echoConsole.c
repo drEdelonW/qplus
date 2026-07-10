@@ -59,7 +59,7 @@ void Con_CheckResize() {
         width = 38;
         con.linewidth = width;
         con.totallines = CON_TEXTSIZE / con.linewidth;
-        Q_memset(con.text, ' ', CON_TEXTSIZE);
+        Q_memset(con.pText, ' ', CON_TEXTSIZE);
     }
     else {
         int oldwidth = con.linewidth;
@@ -75,12 +75,12 @@ void Con_CheckResize() {
         CLAMP_MORE(&numchars, con.linewidth);
 
         char tbuf[CON_TEXTSIZE];
-        Q_memcpy(tbuf, con.text, CON_TEXTSIZE);
-        Q_memset(con.text, ' ', CON_TEXTSIZE);
+        Q_memcpy(tbuf, con.pText, CON_TEXTSIZE);
+        Q_memset(con.pText, ' ', CON_TEXTSIZE);
 
         for (int i = 0; i < numlines; i++) {
             for (int j = 0; j < numchars; j++) {
-                con.text[(con.totallines - 1 - i) * con.linewidth + j] =
+                con.pText[(con.totallines - 1 - i) * con.linewidth + j] =
                     tbuf[
                         ((con.current - i + oldtotallines) %
                             oldtotallines) * oldwidth + j
@@ -145,9 +145,9 @@ void Con_ToggleConsole_f() {
 */
 void Con_DrawInput() {
     if ((key.dest != key_console) &&
-        (!con.forcedup)) {
-        return;  // don't draw anything
-    }
+        (!con.forcedup)
+        )   return;  // don't draw anything
+
 
     cString text = con.lines[con.edit_line];
 
@@ -197,9 +197,9 @@ void Con_DrawConsole(CmdLine_t lines, bool drawinput) {
         int j = i - con.backscroll;
         CLAMP_LESS(&j, 0);
 
-        cString text = con.text + (j % con.totallines) * con.linewidth;
+        cString pText = con.pText + (j % con.totallines) * con.linewidth;
         for (int x = 0; x < con.linewidth; x++)
-            Draw_Character(MUL8(x + 1), y, text[x]);
+            Draw_Character(MUL8(x + 1), y, pText[x]);
     }
 
     // draw the input prompt, user text, and cursor if desired

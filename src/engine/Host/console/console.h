@@ -49,7 +49,7 @@ typedef struct {
 
     char    lines[MaxCharLen][MaxCmdLine];
     sRealTime_t times[NUM_CON_TIMES]; // realtime time the line was generated for transparent notify lines
-    cString text;
+    cString pText;
 
     CmdLine_t   edit_line;
     CmdLine_t   current;    // where next message will be printed

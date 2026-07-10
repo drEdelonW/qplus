@@ -433,7 +433,7 @@ void Key_Bind_f() {
     }
 
     if (argcnt == 2) {
-        if (_keyBindings[btn])   Con_Printf("\"%s\" = \"%s\"\n", Cmd_Argv(1), _keyBindings[btn]);
+        if (_keyBindings[btn])  Con_Printf("\"%s\" = \"%s\"\n", Cmd_Argv(1), _keyBindings[btn]);
         else                    Con_Printf("\"%s\" is not bound\n", Cmd_Argv(1));
         return;
     }
@@ -676,8 +676,8 @@ void Key_Event(keycode_t Key, bool down) {
     if (
         ((key.dest == key_menu) && _isMenuBound[Key]) ||
         ((key.dest == key_console) && !_isConKeys[Key]) ||
-        ((key.dest == key_game) && (!con.forcedup ||
-            !_isConKeys[Key]))
+        ((key.dest == key_game) &&
+            (!con.forcedup || !_isConKeys[Key]))
         ) {
         cString kb = _keyBindings[Key];
         if (kb) {

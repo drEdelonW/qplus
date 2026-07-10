@@ -89,19 +89,13 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         {
             float scale = xscale * em.lzi;
             em.u = (xcenter + scale * transformed.x);
-            if (em.u < r_refdef.fvrectx_adj)    // TODO: CLAMP it
-                em.u = r_refdef.fvrectx_adj;
-            if (em.u > r_refdef.fvrectright_adj)
-                em.u = r_refdef.fvrectright_adj;
+            CLAMP(r_refdef.fvrectx_adj, &em.u, r_refdef.fvrectright_adj);
         }
 
         {
             float scale = yscale * em.lzi;
             em.v = (ycenter - scale * transformed.y);
-            if (em.v < r_refdef.fvrecty_adj)    // TODO: CLAMP it
-                em.v = r_refdef.fvrecty_adj;
-            if (em.v > r_refdef.fvrectbottom_adj)
-                em.v = r_refdef.fvrectbottom_adj;
+            CLAMP(r_refdef.fvrecty_adj, &em.v, r_refdef.fvrectbottom_adj);
         }
         em.ceilv = (int)ceil(em.v);
     }
@@ -120,15 +114,14 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     {
         float scale = xscale * _r.lzi;
         _r.u = (xcenter + scale * transformed.x);
-        if (_r.u < r_refdef.fvrectx_adj)        _r.u = r_refdef.fvrectx_adj;    // TODO: CLAMP it
-        if (_r.u > r_refdef.fvrectright_adj)    _r.u = r_refdef.fvrectright_adj;
+        // TODO: CLAMP it
+        CLAMP(r_refdef.fvrectx_adj, &_r.u, r_refdef.fvrectright_adj);
     }
 
     {
         float scale = yscale * _r.lzi;
         _r.v = (ycenter - scale * transformed.y);
-        if (_r.v < r_refdef.fvrecty_adj)        _r.v = r_refdef.fvrecty_adj;    // TODO: CLAMP it
-        if (_r.v > r_refdef.fvrectbottom_adj)   _r.v = r_refdef.fvrectbottom_adj;
+        CLAMP(r_refdef.fvrecty_adj, &_r.v, r_refdef.fvrectbottom_adj);
     }
 
     // if (em.lzi < _r.lzi)    em.lzi = _r.lzi;
@@ -707,16 +700,14 @@ void R_RenderPoly(mSurface_p fa, AliasClipFlags_f clipflags) {
         {
             float scale = xscale * lzi;
             float u = (xcenter + scale * transformed.x);
-            if (u < r_refdef.fvrectx_adj)       u = r_refdef.fvrectx_adj;
-            if (u > r_refdef.fvrectright_adj)   u = r_refdef.fvrectright_adj;
+            CLAMP(r_refdef.fvrectx_adj, &u, r_refdef.fvrectright_adj);
             pverts[i].u = u;
         }
 
         {
             float scale = yscale * lzi;
             float v = (ycenter - scale * transformed.y);
-            if (v < r_refdef.fvrecty_adj)       v = r_refdef.fvrecty_adj;
-            if (v > r_refdef.fvrectbottom_adj)  v = r_refdef.fvrectbottom_adj;
+            CLAMP(r_refdef.fvrecty_adj, &v, r_refdef.fvrectbottom_adj);
             pverts[i].v = v;
         }
         pverts[i].zi = lzi;

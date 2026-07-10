@@ -103,12 +103,7 @@ float V_CalcBob() {
     ) * cl_bob.value;
     //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
     bob = (bob * 0.3f) + (bob * 0.7f * sinf(cycle));
-#if 0
-    /**/ if (bob > 4.f)     bob = 4.f;
-    else if (bob < -7.f)    bob = -7.f;
-#else
     CLAMP(-7.f, &bob, 4.f);
-#endif
     return bob;
 }
 
@@ -256,16 +251,12 @@ void V_ParseDamage() {
     vec3_t from = MSG_ReadVector();
 
     float count = blood * 0.5f + armor * 0.5f;
-    if (count < 10.f)
-        count = 10.f;
+    CLAMP_LESS(&count, 10.f);
 
     cl.faceanimtime = GetClSimTime() + 0.2f;  // but sbar face into pain frame
 
     cl.cshifts[CSHIFT_DAMAGE].percent += 3 * count;
-    if (cl.cshifts[CSHIFT_DAMAGE].percent < 0)  // for x86 must be signed and more then 8bit
-        cl.cshifts[CSHIFT_DAMAGE].percent = 0;
-    if (cl.cshifts[CSHIFT_DAMAGE].percent > 150)
-        cl.cshifts[CSHIFT_DAMAGE].percent = 150;
+    CLAMP(0, &cl.cshifts[CSHIFT_DAMAGE].percent, 150);  // for x86 must be signed and more then 8bit
 
     if (armor > blood) {
         cl.cshifts[CSHIFT_DAMAGE].destcolor[0] = 200;

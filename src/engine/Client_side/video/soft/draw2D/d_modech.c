@@ -54,9 +54,8 @@ void D_Patch() {
 D_ViewChanged
 ================
 */
-#include "vid.h" // vid.scr.width
+#include "vid.h" // vid.zBuff.width
 void D_ViewChanged() {
-
     scale_for_mip = xscale;
     if (yscale > xscale)
         scale_for_mip = yscale;

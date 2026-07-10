@@ -173,8 +173,7 @@ void S_TransferPaintBuffer(int endtime) {
         while (count--) {
             int16_t val = (int16_t)((*p * snd_vol) >> 8);
             p += step;
-            // if (val > MAX_SND_VAL)          val = MAX_SND_VAL;
-            // else if (val < MIN_SND_VAL)     val = MIN_SND_VAL;
+            // CLAMP(MIN_SND_VAL, &val, MAX_SND_VAL); // because int16_t
             out[out_idx] = val;
             out_idx = (out_idx + 1) & out_mask;
         }
@@ -184,8 +183,7 @@ void S_TransferPaintBuffer(int endtime) {
         while (count--) {
             int16_t val = (int16_t)((*p * snd_vol) >> 8);
             p += step;
-            // if (val > MAX_SND_VAL)          val = MAX_SND_VAL;
-            // else if (val < MIN_SND_VAL)     val = MIN_SND_VAL;
+            // CLAMP(MIN_SND_VAL, &val, MAX_SND_VAL); // because int16_t
             out[out_idx] = (uint8_t)((val >> 8) + 128);
             out_idx = (out_idx + 1) & out_mask;
         }

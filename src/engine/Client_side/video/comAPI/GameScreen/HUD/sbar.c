@@ -1008,8 +1008,7 @@ void Sbar_MiniDeathmatchOverlay() {
         0 :                 // we're not there
         i - HALF(numlines); // figure out start
 
-    if (i > sbl - numlines)     i = sbl - numlines;
-    else if (i < 0)                  i = 0;
+    CLAMP(0, &i, sbl - numlines);
 
 
     int x = 324;

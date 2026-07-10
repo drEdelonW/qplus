@@ -282,8 +282,7 @@ void VID_Gamma_f() {
         for (i = 0; i < 255; i++) {
             f = pow((i + 1) / 256.0f, g);
             inf = f * 255 + 0.5;
-            if (inf < 0)        inf = 0;
-            if (inf > 255)      inf = 255;
+            CLAMP(0, &inf, 255);
             vid_gamma[i] = inf;
         }
 
@@ -342,10 +341,10 @@ void ResetFrameBuffer() {
 
     pwidth = EIGHTH(x_visinfo->depth);
     if (pwidth == 3) pwidth = 4;
-    mem = ((vid.scr.width * pwidth + 3) & ~3) * vid.scr.height;
+    mem = ((Scr.vrect.width * pwidth + 3) & ~3) * Scr.vrect.height;
 
-    // vid.zBuff.pZBuff = (uint16_t*)Z_Malloc(vid.scr.width * vid.scr.height * sizeof(*vid.zBuff.pZBuff));
-    vid.zBuff.pZBuff = (int16_p)Hunk_HighAllocName(vid.scr.width * vid.scr.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
+    // vid.zBuff.pZBuff = (uint16_t*)Z_Malloc(Scr.vrect.width * Scr.vrect.height * sizeof(*vid.zBuff.pZBuff));
+    vid.zBuff.pZBuff = (int16_p)Hunk_HighAllocName(Scr.vrect.width * Scr.vrect.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
 
     x_framebuffer[0] = XCreateImage(x_disp,
         x_vis,
@@ -353,7 +352,7 @@ void ResetFrameBuffer() {
         ZPixmap,
         0,
         Z_Malloc(mem),
-        vid.scr.width, vid.scr.height,
+        Scr.vrect.width, Scr.vrect.height,
         32,
         0);
 
@@ -371,7 +370,7 @@ void ResetSharedFrameBuffers() {
 
     //    if (vid.zBuff.pZBuff)
     //        Z_Free(vid.zBuff.pZBuff);
-    vid.zBuff.pZBuff = Hunk_HighAllocName(vid.scr.width * vid.scr.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
+    vid.zBuff.pZBuff = Hunk_HighAllocName(Scr.vrect.width * Scr.vrect.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
 
     for (frm = 0; frm < 2; frm++) {
 
@@ -391,8 +390,8 @@ void ResetSharedFrameBuffers() {
             ZPixmap,
             0,
             &x_shminfo[frm],
-            vid.scr.width,
-            vid.scr.height);
+            Scr.vrect.width,
+            Scr.vrect.height);
 
         // grab shared memory
 
@@ -560,9 +559,9 @@ void    VID_Init(uint8_p palette) {
     if ((pnum = COM_CheckParm("-winsize"))) {
         if (pnum >= com.argc - 2)
             Sys_Error("VID: -winsize <width> <height>\n");
-        vid.scr.width = Q_atoi(com.argv[pnum + 1]);
-        vid.scr.height = Q_atoi(com.argv[pnum + 2]);
-        if (!vid.scr.width || !vid.scr.height)
+        Scr.vrect.width = Q_atoi(com.argv[pnum + 1]);
+        Scr.vrect.height = Q_atoi(com.argv[pnum + 2]);
+        if (!Scr.vrect.width || !Scr.vrect.height)
             Sys_Error("VID: Bad window width/height\n");
     }
 
@@ -630,7 +629,7 @@ void    VID_Init(uint8_p palette) {
         x_win = XCreateWindow(x_disp,
             XRootWindow(x_disp, x_visinfo->screen),
             0, 0,    // x, y
-            vid.scr.width, vid.scr.height,
+            Scr.vrect.width, Scr.vrect.height,
             0, // borderwidth
             x_visinfo->depth,
             InputOutput,
@@ -701,11 +700,11 @@ void    VID_Init(uint8_p palette) {
 
     current_framebuffer = false;
     vid.rowBytes = x_framebuffer[0]->bytes_per_line;
-    vid.scr.pBuff = x_framebuffer[0]->data;
+    Scr.vrect.pBuff = x_framebuffer[0]->data;
     vid.con.pBuff = x_framebuffer[0]->data;
     vid.con.rowBytes = vid.rowBytes;
-    vid.con.width = vid.scr.width;
-    vid.con.height = vid.scr.height;
+    vid.con.width = Scr.vrect.width;
+    vid.con.height = Scr.vrect.height;
 
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
@@ -853,8 +852,8 @@ void GetEvent() {
         break;
     case MotionNotify:
         if (mouse_avail && mouse_grabbed) {
-            mouse_x = (float)((int)x_event.xmotion.x - HALF(vid.scr.width));
-            mouse_y = (float)((int)x_event.xmotion.y - HALF(vid.scr.height));
+            mouse_x = (float)((int)x_event.xmotion.x - HALF(Scr.vrect.width));
+            mouse_y = (float)((int)x_event.xmotion.y - HALF(Scr.vrect.height));
             //printf("m: x=%d,y=%d, mx=%3.2f,my=%3.2f\n",
             //    x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
@@ -865,7 +864,7 @@ void GetEvent() {
                 None, x_win,
                 0, 0,
                 0, 0,
-                HALF(vid.scr.width), HALF(vid.scr.height)
+                HALF(Scr.vrect.width), HALF(Scr.vrect.height)
             );
             XSelectInput(x_disp, x_win, STD_EVENT_MASK);
         }
@@ -943,19 +942,19 @@ void    VID_Update(vRect_p rects) {
     if (xCfg.notify) {
         printf("config notify\n");
         xCfg.notify = false;
-        vid.scr.width = xCfg.notify_width & ~3;
-        vid.scr.height = xCfg.notify_height;
+        Scr.vrect.width = xCfg.notify_width & ~3;
+        Scr.vrect.height = xCfg.notify_height;
 
-        printf("w = %d, h = %d\n", vid.scr.width, vid.scr.height);
+        printf("w = %d, h = %d\n", Scr.vrect.width, Scr.vrect.height);
 
         if (doShm)  ResetSharedFrameBuffers();
         else        ResetFrameBuffer();
 
         vid.rowBytes = x_framebuffer[0]->bytes_per_line;
-        vid.scr.pBuff = x_framebuffer[current_framebuffer]->data;
-        vid.con.pBuff = vid.scr.pBuff;
-        vid.con.width = vid.scr.width;
-        vid.con.height = vid.scr.height;
+        Scr.vrect.pBuff = x_framebuffer[current_framebuffer]->data;
+        vid.con.pBuff = Scr.vrect.pBuff;
+        vid.con.width = Scr.vrect.width;
+        vid.con.height = Scr.vrect.height;
         vid.con.rowBytes = vid.rowBytes;
 
         SCR_RequestCalcRefdef();                // force a surface cache flush
@@ -995,8 +994,8 @@ void    VID_Update(vRect_p rects) {
         }
         //        printf("%lf\n", (LegTime_t)(gethrtime()-s)/1.0e9);
         current_framebuffer = !current_framebuffer;
-        vid.scr.pBuff = x_framebuffer[current_framebuffer]->data;
-        vid.con.pBuff = vid.scr.pBuff;
+        Scr.vrect.pBuff = x_framebuffer[current_framebuffer]->data;
+        vid.con.pBuff = Scr.vrect.pBuff;
         XSync(x_disp, False);
 
     }

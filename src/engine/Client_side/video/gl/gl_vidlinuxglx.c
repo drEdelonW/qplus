@@ -269,8 +269,9 @@ static void install_grabs() {
     else {
         XWarpPointer(
             _dpy, None, _win,
-            0, 0, 0, 0,
-            HALF(vid.scr.width), HALF(vid.scr.height)
+            0, 0,
+            0, 0,
+            HALF(Scr.vrect.width), HALF(Scr.vrect.height)
         );
     }
 
@@ -311,8 +312,8 @@ static void HandleEvents() {
     KeySym ks;
     int b;
     bool dowarp = false;
-    int mwx = HALF(vid.scr.width);
-    int mwy = HALF(vid.scr.height);
+    int mwx = HALF(Scr.vrect.width);
+    int mwy = HALF(Scr.vrect.height);
 
     if (!_dpy)
         return;
@@ -381,7 +382,7 @@ static void HandleEvents() {
         XWarpPointer(
             _dpy, None, _win,
             0, 0, 0, 0,
-            HALF(vid.scr.width), HALF(vid.scr.height)
+            HALF(Scr.vrect.width), HALF(Scr.vrect.height)
         );
     }
 
@@ -675,8 +676,7 @@ static void Check_Gamma(uint8_p pal) {
     for (i = 0; i < 768; i++) {
         float f = pow((pal[i] + 1) / 256.0, vid_gamma);
         float inf = f * 255 + 0.5;
-        if (inf < 0)    inf = 0;
-        if (inf > 255)  inf = 255;
+        CLAMP(0, &inf, 255);
         palette[i] = inf;
     }
 
@@ -862,8 +862,8 @@ void VID_Init(uint8_p palette) {
 
     if (vid.con.height > height)     vid.con.height = height;
     if (vid.con.width > width)       vid.con.width = width;
-    vid.scr.width = vid.con.width;
-    vid.scr.height = vid.con.height;
+    Scr.vrect.width = vid.con.width;
+    Scr.vrect.height = vid.con.height;
 
     Scr.aspect = calcAspectRect(&vid.scr);
     vid.numpages = 2;
@@ -944,8 +944,7 @@ void IN_MouseMove(UserCmd_p cmd) {
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
         cl.viewangles[PITCH] += m_pitch.value * _my;
-        if (cl.viewangles[PITCH] > 80)      cl.viewangles[PITCH] = 80;
-        if (cl.viewangles[PITCH] < -70)     cl.viewangles[PITCH] = -70;
+        CLAMP(-70, &cl.viewangles[PITCH], 80);
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)

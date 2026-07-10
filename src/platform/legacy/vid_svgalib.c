@@ -227,10 +227,7 @@ void VID_Gamma_f() {
         for (i = 0; i < 768; i++) {
             f = pow((host_basepal[i] + 1) / 256.0, gamma);
             inf = f * 255 + 0.5;
-            if (inf < 0)
-                inf = 0;
-            if (inf > 255)
-                inf = 255;
+            CLAMP(0, &inf, 255);
             palette[i] = inf;
         }
 
@@ -285,7 +282,7 @@ void VID_NumModes_f() {
 
 void VID_Debug_f() {
     Con_Printf("mode: %d\n", current_mode);
-    Con_Printf("height x width: %d x %d\n", vid.scr.height, vid.scr.width);
+    Con_Printf("height x width: %d x %d\n", Scr.vrect.height, Scr.vrect.width);
     Con_Printf("bpp: %d\n", modes[current_mode].bytesperpixel * 8);
     Con_Printf("scr.aspect: %f\n", scr.aspect);
 }
@@ -444,8 +441,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     current_mode = modenum;
 
-    vid.scr.width = modes[current_mode].width;
-    vid.scr.height = modes[current_mode].height;
+    Scr.vrect.width = modes[current_mode].width;
+    Scr.vrect.height = modes[current_mode].height;
 
     VGA_width = modes[current_mode].width;
     VGA_height = modes[current_mode].height;
@@ -460,8 +457,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
     Scr.aspect = calcAspectRect(&vid.scr);
     vid.colormap = host_colormap;
     vid.con.rowBytes = vid.rowBytes;
-    vid.con.width = vid.scr.width;
-    vid.con.height = vid.scr.height;
+    vid.con.width = Scr.vrect.width;
+    vid.con.height = Scr.vrect.height;
     vid.numpages = 1;
 
     vid.maxwarp.width = WARP_WIDTH;
@@ -475,9 +472,9 @@ int VID_SetMode(int modenum, uint8_p palette) {
         vid_surfcache = NULL;
     }
 
-    bsize = vid.rowBytes * vid.scr.height;
-    tsize = D_SurfaceCacheForRes(vid.scr.width, vid.scr.height);
-    zsize = vid.scr.width * vid.scr.height * sizeof(*vid.zBuff.pZBuff);
+    bsize = vid.rowBytes * Scr.vrect.height;
+    tsize = D_SurfaceCacheForRes(Scr.vrect.width, Scr.vrect.height);
+    zsize = Scr.vrect.width * Scr.vrect.height * sizeof(*vid.zBuff.pZBuff);
 
     VID_highhunkmark = Hunk_HighMark();
 
@@ -486,7 +483,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     vid_surfcache = ((uint8_p)vid.zBuff.pZBuff) + zsize;
 
     vid.con.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
-    vid.scr.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
+    Scr.vrect.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
 
     D_InitCaches(vid_surfcache, tsize);
 
@@ -684,16 +681,16 @@ void VID_Update(vRect_p rects) {
         vga_waitretrace();
 
     if (VGA_planar)
-        VGA_UpdatePlanarScreen(vid.scr.pBuff);
+        VGA_UpdatePlanarScreen(Scr.vrect.pBuff);
 
     else if (vid_redrawfull.value) {
-        int total = vid.rowBytes * vid.scr.height;
+        int total = vid.rowBytes * Scr.vrect.height;
         int offset;
 
         for (offset = 0;offset < total;offset += 0x10000) {
             vga_setpage(offset / 0x10000);
             memcpy(framebuffer_ptr,
-                vid.scr.pBuff + offset,
+                Scr.vrect.pBuff + offset,
                 ((total - offset > 0x10000) ? 0x10000 : (total - offset)));
         }
     }
@@ -716,16 +713,16 @@ void VID_Update(vRect_p rects) {
                 }
                 if (rects->width + i > 0x10000) {
                     memcpy(framebuffer_ptr + i,
-                        vid.scr.pBuff + offset,
+                        Scr.vrect.pBuff + offset,
                         0x10000 - i);
                     vga_setpage(++vidpage);
                     memcpy(framebuffer_ptr,
-                        vid.scr.pBuff + offset + 0x10000 - i,
+                        Scr.vrect.pBuff + offset + 0x10000 - i,
                         rects->width - 0x10000 + i);
                 }
                 else
                     memcpy(framebuffer_ptr + i,
-                        vid.scr.pBuff + offset,
+                        Scr.vrect.pBuff + offset,
                         rects->width);
                 offset += vid.rowBytes;
             }
@@ -880,10 +877,7 @@ void IN_MouseMove(UserCmd_p cmd) {
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
         cl.viewangles[PITCH] += m_pitch.value * mouse_y;
-        if (cl.viewangles[PITCH] > 80)
-            cl.viewangles[PITCH] = 80;
-        if (cl.viewangles[PITCH] < -70)
-            cl.viewangles[PITCH] = -70;
+        CLAMP(-70, &cl.viewangles[PITCH], 80);
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)
@@ -909,7 +903,7 @@ cString VID_ModeInfo(int modenum) {
 
     if (modenum == 0) {
         snprintf(modestr, sizeof(modestr), "%d x %d, %d bpp",
-            vid.scr.width, vid.scr.height, modes[current_mode].bytesperpixel * 8);
+            Scr.vrect.width, Scr.vrect.height, modes[current_mode].bytesperpixel * 8);
         return (modestr);
     }
     else {

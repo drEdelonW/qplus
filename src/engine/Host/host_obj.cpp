@@ -453,8 +453,7 @@ bool Host::FilterTime(RealDt_t time) {
     if (host_framerate.value > 0)
         host_frametime = host_framerate.value;
     else { // don't allow really long or int16_t frames
-        if (host_frametime > 0.1)   host_frametime = 0.1;
-        if (host_frametime < 0.001) host_frametime = 0.001;
+        CLAMP(0.001, &host_frametime, 0.1);
     }
 
     return true;

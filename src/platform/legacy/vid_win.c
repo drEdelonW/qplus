@@ -1230,8 +1230,8 @@ bool VID_SetWindowedMode(int modenum) {
     vid.numpages = 1;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
-    vid.scr.height = vid.con.height = DIBHeight;
-    vid.scr.width = vid.con.width = DIBWidth;
+    Scr.vrect.height = vid.con.height = DIBHeight;
+    Scr.vrect.width = vid.con.width = DIBWidth;
     Scr.aspect = calcAspectRect(&Scr.vrect);
 
     vid_stretched = stretched;
@@ -1270,8 +1270,8 @@ bool VID_SetFullscreenMode(int modenum) {
     Scr.vrect.pBuff = vid.con.pBuff = vid.direct = NULL;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
-    DIBHeight = vid.scr.height = vid.con.height = modelist[modenum].height;
-    DIBWidth = vid.scr.width = vid.con.width = modelist[modenum].width;
+    DIBHeight = Scr.vrect.height = vid.con.height = modelist[modenum].height;
+    DIBWidth = Scr.vrect.width = vid.con.width = modelist[modenum].width;
     Scr.aspect = calcAspectRect(&Scr.vrect);
 
     vid_stretched = modelist[modenum].stretched;
@@ -1384,8 +1384,8 @@ bool VID_SetFullDIBMode(int modenum) {
     vid.numpages = 1;
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;
-    vid.scr.height = vid.con.height = DIBHeight;
-    vid.scr.width = vid.con.width = DIBWidth;
+    Scr.vrect.height = vid.con.height = DIBHeight;
+    Scr.vrect.width = vid.con.width = DIBWidth;
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -1492,8 +1492,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
         IN_HideMouse();
     }
 
-    window_width = vid.scr.width << vid_stretched;
-    window_height = vid.scr.height << vid_stretched;
+    window_width = Scr.vrect.width << vid_stretched;
+    window_height = Scr.vrect.height << vid_stretched;
     VID_UpdateWindowStatus();
 
     CDAudio_Resume();
@@ -1530,7 +1530,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     vid_modenum = modenum;
     Cvar_SetValue("vid_mode", (float)vid_modenum);
 
-    if (!VID_AllocBuffers(vid.scr.width, vid.scr.height)) {
+    if (!VID_AllocBuffers(Scr.vrect.width, Scr.vrect.height)) {
         // couldn't get memory for this mode; try to fall back to previous mode
         VID_RestoreOldMode(original_mode);
         return false;
@@ -1581,20 +1581,20 @@ void VID_LockBuffer() {
 
     if (memdc) {
         // Update surface pointer for linear access modes
-        vid.scr.pBuff = vid.con.pBuff = vid.direct = memdc->surface;
+        Scr.vrect.pBuff = vid.con.pBuff = vid.direct = memdc->surface;
         vid.rowBytes = vid.con.rowBytes = memdc->mi.bytesPerLine;
     }
     else if (mgldc) {
         // Update surface pointer for linear access modes
-        vid.scr.pBuff = vid.con.pBuff = vid.direct = mgldc->surface;
+        Scr.vrect.pBuff = vid.con.pBuff = vid.direct = mgldc->surface;
         vid.rowBytes = vid.con.rowBytes = mgldc->mi.bytesPerLine;
     }
 
     d_viewbuffer = (r_dowarp) ?
-        r_warpbuffer : (TypeLess_ptr)(uint8_p)vid.scr.pBuff;
+        r_warpbuffer : Scr.vrect.pClr;
 
     screenwidth = (r_dowarp) ?
-        WARP_WIDTH : vid.rowBytes;
+        WARP_WIDTH : Scr.vrect.rowBytes;
 
 #ifndef STM32
     if (lcd_x.value)
@@ -1618,7 +1618,10 @@ void VID_UnlockBuffer() {
     MGL_endDirectAccess();
 
     // to turn up any unlocked accesses
-    vid.scr.pBuff = vid.con.pBuff = vid.direct = d_viewbuffer = NULL;
+    Scr.vrect.pBuff = NULL;
+    vid.con.pBuff = NULL;
+    vid.direct = NULL;
+    d_viewbuffer = NULL;
 
 }
 
@@ -2075,8 +2078,8 @@ void FlipScreen(vRect_p rects) {
                         rects->x, rects->y,
                         rects->x + rects->width, rects->y + rects->height,
                         rects->x << 1, rects->y << 1,
-                        (rects->x + rects->width) << 1,
-                        (rects->y + rects->height) << 1);
+                        (rects->x + rects->width) << 1, (rects->y + rects->height) << 1
+                    );
                 }
                 else {
                     MGL_bitBltCoord(windc, dibdc,
@@ -2102,8 +2105,8 @@ void VID_Update(vRect_p rects) {
         palette_changed = false;
         rect.x = 0;
         rect.y = 0;
-        rect.width = vid.scr.width;
-        rect.height = vid.scr.height;
+        rect.width = Scr.vrect.width;
+        rect.height = Scr.vrect.height;
         rect.pnext = NULL;
         rects = &rect;
     }

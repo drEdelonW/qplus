@@ -655,10 +655,7 @@ void IN_MouseMove(UserCmd_p cmd) {
 
     if ((kbIsDown(in.mlook)) && !(kbIsDown(in.strafe))) {
         cl.viewangles.pitch += m_pitch.value * mouse_y;
-        if (cl.viewangles.pitch > 80)
-            cl.viewangles.pitch = 80;
-        if (cl.viewangles.pitch < -70)
-            cl.viewangles.pitch = -70;
+        CLAMP(-70, &cl.viewangles.pitch, 80);
     }
     else {
         if ((kbIsDown(in.strafe)) && noclip_anglehack)
@@ -1117,8 +1114,5 @@ void IN_JoyMove(UserCmd_p cmd) {
     }
 
     // bounds check pitch
-    if (cl.viewangles.pitch > 80.0)
-        cl.viewangles.pitch = 80.0;
-    if (cl.viewangles.pitch < -70.0)
-        cl.viewangles.pitch = -70.0;
+    CLAMP(-70.0, &cl.viewangles.pitch, 80.0);
 }
