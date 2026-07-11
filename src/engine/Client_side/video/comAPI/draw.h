@@ -21,9 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // draw.h -- these are the only functions outside the refresh allowed
 // to touch the vid buffer
-// #include "wad.h"
 #include "qPic.h"
-// #include "qLight.h"
+#include "qSymbolChar.h"
 
 extern qPic_p draw_disc;    // also used on sbar
 #ifdef __cplusplus
@@ -32,8 +31,8 @@ extern "C" {
 
     void    Draw_Init();
 
-    void    Draw_Character(int x, int y, int num);
-    void    Draw_DebugChar(char num);
+    void    Draw_Character(int x, int y, ConsoleSymbols_t symb);
+    void    Draw_DebugChar(ConsoleSymbols_t symb);
     void    Draw_String(int x, int y, cStringRO str);
 
     void    Draw_Pic(int x, int y, qPic_p pic);
@@ -45,7 +44,7 @@ extern "C" {
     void    Draw_EndDisc();
 
     void    Draw_TileClear(int x, int y, int w, int h);
-    void    Draw_Fill(int x, int y, int w, int h, int c);
+    void    Draw_Fill(int x, int y, int w, int h, qColor8_t c);
 
     void    Draw_FadeScreen();
     qPic_p  Draw_PicFromWad(cStringRO name);

@@ -129,7 +129,8 @@ It can be clipped to the top of the screen to allow the console to be
 smoothly scrolled off.
 ================
 */
-void Draw_Character(int x, int y, int num) {
+void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
+    int num = symb;
     num &= 0xFF;
 
     if (y <= -8)    return; // totally off screen
@@ -208,11 +209,12 @@ This is for debugging lockups by drawing different chars in different parts
 of the code.
 ================
 */
-void Draw_DebugChar(char num) {
+void Draw_DebugChar(ConsoleSymbols_t symb) {
     if (!vid.direct)
         return;  // don't have direct FB access, so no debugchars...
 
     int drawline = 8;
+    int num = symb;
     int row = num >> 4;
     int col = num & 15;
     qColor8_p source = pDrawChars + (row << 10) + (col << 3);
@@ -630,11 +632,11 @@ Draw_Fill
 Fills a box of pixels with a single color
 =============
 */
-void Draw_Fill(int x, int y, int w, int h, int c) {
+void Draw_Fill(int x, int y, int w, int h, qColor8_t c) {
     if (!Scr.vrect.pBuff)   return;
     int stride = Scr.vrect.rowBytes;
     if (r_pixbytes == 1) {
-        uint8_p dest = Scr.vrect.pBuff + (ptrdiff_t)(
+        qColor8_p dest = Scr.vrect.pClr + (ptrdiff_t)(
             (y * stride) + x
             );
         for (int v = 0; v < h; v++, dest += stride)
@@ -648,7 +650,7 @@ void Draw_Fill(int x, int y, int w, int h, int c) {
             );
         for (int v = 0; v < h; v++, pusdest += stride)
             for (int u = 0; u < w; u++)
-                pusdest[u] = d_8to16table[c];
+                pusdest[u] = d_8to16table[c.i];
     }
 }
 //=============================================================================

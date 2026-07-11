@@ -433,10 +433,8 @@ void Sbar_UpdateScoreboard() {
         ScoreBoard_p s = &cl.scores[k];
         snprintf(&_scoreboardtext[i][1], sizeof(_scoreboardtext[i][1]), "%3i %s", s->frags, s->name);
 
-        // int top = s->colors & 0xf0;
-        // int bottom = (s->colors & 15) << 4;
-        // _scoreboardtop[i] = Sbar_ColorForMap(top);
-        // _scoreboardbottom[i] = Sbar_ColorForMap(bottom);
+        // _scoreboardtop[i] = Sbar_ColorForMap((s->colors & 0xF0) << 0);
+        // _scoreboardbottom[i] = Sbar_ColorForMap((s->colors & 0x0F) << 4);
     }
 }
 
@@ -497,13 +495,19 @@ void Sbar_DrawScoreboard() {
             continue;
 
         // draw background
-        int top = s->colors & 0xf0;
-        int bottom = (s->colors & 15) << 4;
-        top = Sbar_ColorForMap(top);
-        bottom = Sbar_ColorForMap(bottom);
+        qColor8_t top = { .i = Sbar_ColorForMap((s->colors & 0xF0) << 0) };
+        qColor8_t bottom = { .i = Sbar_ColorForMap((s->colors & 0x0F) << 4) };
 
-        Draw_Fill(x * 8 + 10 + HALF(Scr.vrect.width - 320), y + Scr.vrect.height - SBAR_HEIGHT, 28, 4, top);
-        Draw_Fill(x * 8 + 10 + HALF(Scr.vrect.width - 320), y + 4 + Scr.vrect.height - SBAR_HEIGHT, 28, 4, bottom);
+        Draw_Fill(
+            x * 8 + 10 + HALF(Scr.vrect.width - 320), y + Scr.vrect.height - SBAR_HEIGHT,
+            28, 4,
+            top
+        );
+        Draw_Fill(
+            x * 8 + 10 + HALF(Scr.vrect.width - 320), y + 4 + Scr.vrect.height - SBAR_HEIGHT,
+            28, 4,
+            bottom
+        );
 
         // draw text
         for (int j = 0; j < 20; j++) {
@@ -691,10 +695,8 @@ void Sbar_DrawFrags() {
             continue;
 
         // draw background
-        int top = s->colors & 0xF0;
-        int bottom = (s->colors & 15) << 4;
-        top = Sbar_ColorForMap(top);
-        bottom = Sbar_ColorForMap(bottom);
+        qColor8_t top = { .i = Sbar_ColorForMap((s->colors & 0xF0) << 0) };
+        qColor8_t bottom = { .i = Sbar_ColorForMap((s->colors & 0x0F) << 4) };
 
         Draw_Fill(xofs + x * 8 + 10, y, 28, 4, top);
         Draw_Fill(xofs + x * 8 + 10, y + 4, 28, 3, bottom);
@@ -734,23 +736,29 @@ void Sbar_DrawFace() {
 
         ScoreBoard_p s = &cl.scores[cl.viewentity - 1];
         // draw background
-        int top = s->colors & 0xf0;
-        int bottom = (s->colors & 15) << 4;
-        top = Sbar_ColorForMap(top);
-        bottom = Sbar_ColorForMap(bottom);
+        qColor8_t top = { .i = Sbar_ColorForMap((s->colors & 0xF0) << 0) };
+        qColor8_t bottom = { .i = Sbar_ColorForMap((s->colors & 0x0F) << 4) };
 
         int xofs = (cl.gametype == GAME_DEATHMATCH) ?
             113 : HALF(Scr.vrect.width - 320) + 113;
 
         Sbar_DrawPic(112, 0, rsb_teambord);
-        Draw_Fill(xofs, Scr.vrect.height - SBAR_HEIGHT + 3, 22, 9, top);
-        Draw_Fill(xofs, Scr.vrect.height - SBAR_HEIGHT + 12, 22, 9, bottom);
+        Draw_Fill(
+            xofs, Scr.vrect.height - SBAR_HEIGHT + 3,
+            22, 9,
+            top
+        );
+        Draw_Fill(
+            xofs, Scr.vrect.height - SBAR_HEIGHT + 12,
+            22, 9,
+            bottom
+        );
 
         // draw number
         char num[12];
         snprintf(num, sizeof(num), "%3i", s->frags);
 
-        if (top == 8) {
+        if (top.i == 8) {
             if (num[0] != ' ')  Sbar_DrawCharacter(109, 3, 18 + num[0] - '0');
             if (num[1] != ' ')  Sbar_DrawCharacter(116, 3, 18 + num[1] - '0');
             if (num[2] != ' ')  Sbar_DrawCharacter(123, 3, 18 + num[2] - '0');
@@ -938,11 +946,18 @@ void Sbar_DeathmatchOverlay() {
             continue;
 
         // draw background
-        int top = Sbar_ColorForMap((s->colors & 0xF0) << 0);
-        int bottom = Sbar_ColorForMap((s->colors & 0x0F) << 4);
+        qColor8_t top = { .i = Sbar_ColorForMap((s->colors & 0xF0) << 0) };
+        qColor8_t bottom = { .i = Sbar_ColorForMap((s->colors & 0x0F) << 4) };
 
-        Draw_Fill(x, y, 40, 4, top);
-        Draw_Fill(x, y + 4, 40, 4, bottom);
+        Draw_Fill(
+            x, y,
+            40, 4,
+            top);
+        Draw_Fill(
+            x, y + 4,
+            40, 4,
+            bottom
+        );
 
         // draw number
         int f = s->frags;
@@ -1021,13 +1036,19 @@ void Sbar_MiniDeathmatchOverlay() {
         ScoreBoard_p s = &cl.scores[k];
         if (s->name[0]) {
             // draw background
-            int top = s->colors & 0xf0;
-            int bottom = (s->colors & 15) << 4;
-            top = Sbar_ColorForMap(top);
-            bottom = Sbar_ColorForMap(bottom);
+            qColor8_t top = { .i = Sbar_ColorForMap((s->colors & 0xF0) << 0) };
+            qColor8_t bottom = { .i = Sbar_ColorForMap((s->colors & 0x0F) << 4) };
 
-            Draw_Fill(x, y + 1, 40, 3, top);
-            Draw_Fill(x, y + 4, 40, 4, bottom);
+            Draw_Fill(
+                x, y + 1,
+                40, 3,
+                top
+            );
+            Draw_Fill(
+                x, y + 4,
+                40, 4,
+                bottom
+            );
 
             // draw number
             char num[12];
