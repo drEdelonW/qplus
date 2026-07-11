@@ -11,6 +11,7 @@
 #include <string.h>
 #include "sys.h"
 
+#include "qSymbolChar.h"
 
 /*
     ==================

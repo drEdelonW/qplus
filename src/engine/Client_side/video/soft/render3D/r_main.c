@@ -54,14 +54,14 @@ int         numbtofpolys;
 btofpoly_p  pbtofpolys;
 mVertex_p   r_pcurrentvertbase;
 
-int     c_surf;
-int     r_maxsurfsseen, r_maxedgesseen;
+int c_surf;
+int r_maxsurfsseen;
+int r_maxedgesseen;
 int r_cnumsurfs;
-bool    r_surfsonstack;
-int     r_clipflags;
+bool r_surfsonstack;
+int r_clipflags;
 
-qColor8_p   r_warpbuffer;
-uint8_p     r_stack_start;
+uint8_p r_stack_start;
 
 bool r_fov_greater_than_90;
 
@@ -816,16 +816,18 @@ R_RenderView
 r_refdef must be set before the first call
 ================
 */
-static  qColor8_t _warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+static  qColor8_t _warpBuffer[WARP_WIDTH * WARP_HEIGHT];
 void R_RenderView_() {
-
-    r_warpbuffer = _warpbuffer;
+    vid.maxwarp = (vRect_t){ // SoftRender WarpEffect buffer
+        .width = WARP_WIDTH,
+        .height = WARP_HEIGHT,
+        .pClr = _warpBuffer
+    };
 
     if (r_timegraph.value ||
         r_speeds.value ||
         r_dspeeds.value
-        )
-        r_time1 = Host_FloatTime();
+        )   r_time1 = Host_FloatTime();
 
     R_SetupFrame();
 
@@ -896,7 +898,7 @@ void R_RenderView() {
     if ((delta < -10000) || (delta > 10000))    Host_SysError("R_RenderView: called without enough stack");
     if (Hunk_LowMark() & 3)                     Host_SysError("Hunk is missaligned");
     if ((uintptr_t)(&dummy) & 3)                Host_SysError("Stack is missaligned");
-    if ((uintptr_t)(&r_warpbuffer) & 3)         Host_SysError("Globals are missaligned");
+    if ((uintptr_t)(&vid.maxwarp.pClr) & 3)     Host_SysError("Globals are missaligned");
 
     R_RenderView_();
 }

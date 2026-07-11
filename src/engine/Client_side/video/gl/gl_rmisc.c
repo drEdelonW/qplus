@@ -250,7 +250,7 @@ void R_TranslatePlayerSkin(int playernum) {
     GL_Bind(playertextures + playernum);
 
 #if 0
-    uint8_t translated[320 * 200];
+    uint8_t translated[BASEWIDTH * BASEHEIGHT];
 
     for (int i = 0; i < s; i += 4) {
         translated[i] = translate[original[i]];

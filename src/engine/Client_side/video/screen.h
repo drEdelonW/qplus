@@ -48,6 +48,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vRect.h"
 #include "qTime.h"
 
+#define BASEWIDTH  (320)
+#define BASEHEIGHT (200)
 
  // only the refresh window will be updated unless these variables are flagged
 typedef struct {

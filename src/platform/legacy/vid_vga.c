@@ -333,9 +333,6 @@ int VGA_InitMode(VidDef_p lvid, vmode_p pcurrentmode) {
 	VGA_bufferrowbytes = lvid->rowBytes;
 	lvid->colormap = host_colormap;
 
-	lvid->maxwarpwidth = WARP_WIDTH;
-	lvid->maxwarpheight = WARP_HEIGHT;
-
 	lvid->conbuffer = lvid->buffer;
 	lvid->con.rowBytes = lvid->rowBytes;
 	lvid->con.width = lvid->width;

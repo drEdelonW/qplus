@@ -4,13 +4,11 @@
 
 static Skill_t _current_skill;  // skill level for currently loaded level (in case the user changes the cvar while the level is running, this reflects the level actually in use)
 
-Skill_t GM_GetSkill() {
-    return _current_skill;
-}
 void GM_SetSkill(Skill_t skill) {
+    ClampInRange(SkEasy, &skill, SkNightmare);
     _current_skill = skill;
-    ClampInRange(SkEasy, &_current_skill, SkNightmare);
 }
+Skill_t GM_GetSkill() { return _current_skill; }
 
 int GetSvMaxClients() { return svs.maxClients; }
 int GetSvMaxClientsLimit() { return svs.maxClientsLimit; }

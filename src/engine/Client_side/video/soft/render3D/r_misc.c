@@ -400,7 +400,6 @@ void R_SetupFrame() {
                     .width = Scr.vrect.width,
                     .height = Scr.vrect.height
                 };
-
                 R_ViewChanged(&vrect, sb_lines, Scr.vpAspect);
             }
             else {

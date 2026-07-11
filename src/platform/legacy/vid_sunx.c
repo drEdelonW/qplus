@@ -706,9 +706,6 @@ void    VID_Init(uint8_p palette) {
     vid.con.width = Scr.vrect.width;
     vid.con.height = Scr.vrect.height;
 
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
-
     D_InitCaches(surfcache, sizeof(surfcache));
 
     //    XSynchronize(x_disp, False);

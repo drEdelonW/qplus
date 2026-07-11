@@ -1264,8 +1264,6 @@ bool VID_SetWindowedMode(int modenum) {
     vid.direct = (qColor8_p)dibdc->surface;
     Scr.vrect.rowBytes = vid.con.rowBytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
 
     vid_stretched = stretched;
 
@@ -1300,8 +1298,6 @@ bool VID_SetFullscreenMode(int modenum) {
 
     Scr.vrect.pClr = NULL;
     vid.direct = NULL;
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
     DIBHeight = Scr.vrect.height = vid.con.height = modelist[modenum].height;
     DIBWidth = Scr.vrect.width = vid.con.width = modelist[modenum].width;
     Scr.vpAspect = calcAspectRect(&Scr.vrect);
@@ -1412,8 +1408,6 @@ bool VID_SetFullDIBMode(int modenum) {
     vid.direct = (qColor8_p)dibdc->surface;
     Scr.vrect.rowBytes = vid.con.rowBytes = dibdc->mi.bytesPerLine;
     vid.numpages = 1;
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
     Scr.vrect.height = vid.con.height = DIBHeight;
     Scr.vrect.width = vid.con.width = DIBWidth;
     Scr.vpAspect = calcAspectRect(&Scr.vrect);
@@ -1614,7 +1608,7 @@ void VID_LockBuffer() {
     }
 
     d_viewbuffer = (r_dowarp) ?
-        r_warpbuffer : Scr.vrect.pClr;
+        vid.maxwarp.pClr : Scr.vrect.pClr;
 
     screenwidth = (r_dowarp) ?
         WARP_WIDTH : Scr.vrect.rowBytes;
@@ -1915,12 +1909,8 @@ void VID_Init(qPal_p palette) {
     if (((nummodes == basenummodes) ||
         ((nummodes == (basenummodes + 1)) && is_mode0x13)) &&
         !COM_CheckParm("-nofulldib")
-        ) {
-        VID_InitFullDIB(global_hInstance);
-    }
+        )   VID_InitFullDIB(global_hInstance);
 
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
     vid_testingmode = 0;
 

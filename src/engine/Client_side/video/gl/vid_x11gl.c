@@ -229,8 +229,8 @@ void app_zero(App_p app) {
             .minor = 0,
         },
         .xwin = {
-            .width = 320,
-            .height = 200,
+            .width = BASEWIDTH,
+            .height = BASEHEIGHT,
         },
         .running = true,
     };
@@ -549,10 +549,8 @@ int create_gl_context(App_p app) {
     return 1;
 }
 
-#include "vid.h" // vid.maxwarp
+#include "vid.h" // vid.colormap
 void apply_vid_state(App_p app) {
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
 
     vid.colormap = host_colormap;
 

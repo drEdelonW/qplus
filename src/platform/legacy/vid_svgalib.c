@@ -461,9 +461,6 @@ int VID_SetMode(int modenum, uint8_p palette) {
     vid.con.height = Scr.vrect.height;
     vid.numpages = 1;
 
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
-
     // alloc zbuffer and surface cache
     if (vid.zBuff.pZBuff) {
         D_FlushCaches();

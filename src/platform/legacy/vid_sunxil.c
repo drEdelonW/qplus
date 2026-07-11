@@ -611,8 +611,6 @@ VID_ResetFramebuffer() {
     vid.con.width = Scr.vrect.width;
     vid.con.height = Scr.vrect.height;
 
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
     SCR_RequestCalcRefdef();    // force a surface cache flush
 
     free(vid.zBuff.pZBuff);
@@ -1040,8 +1038,6 @@ drain_renderpipeline(XilImage old) {
     vid.con.width = Scr.vrect.width;
     vid.con.height = Scr.vrect.height;
 
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
     SCR_RequestCalcRefdef();    // force a surface cache flush
 
     return(new);

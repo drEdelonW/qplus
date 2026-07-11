@@ -370,8 +370,6 @@ void ResetSharedFrameBuffers() {
 void VID_Init(qPal_p palette) {
     vid.frameBuff.width = BASEWIDTH;
     vid.frameBuff.height = BASEHEIGHT;
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
     vid.numpages = 2;
     vid.colormap = host_colormap;
 

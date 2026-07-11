@@ -6,6 +6,7 @@
 #include "console.h"
 #include "screen.h"
 #include "screen_prv.h"
+#include "qSymbolChar.h"
 
 
 /*

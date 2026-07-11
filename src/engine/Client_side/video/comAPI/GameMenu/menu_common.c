@@ -7,6 +7,7 @@
 #include "model.h"
 #include "qLight.h"
 #include "screen.h"
+#include "qSymbolChar.h"
 
 /*
 ================

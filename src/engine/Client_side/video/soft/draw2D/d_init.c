@@ -105,7 +105,7 @@ static float _BaseMip[MIPLEVELS - 1] = {
     0.25f * 0.8f
 };
 void D_SetupFrame() {
-    d_viewbuffer = (r_dowarp) ? r_warpbuffer : vid.frameBuff.pClr;
+    d_viewbuffer = (r_dowarp) ? vid.maxwarp.pClr : vid.frameBuff.pClr;
     screenwidth = (r_dowarp) ? WARP_WIDTH : Scr.vrect.rowBytes;
 
     d_roverwrapped = false;

@@ -23,15 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // to touch the vid buffer
 // #include "wad.h"
 #include "qPic.h"
-#include "qLight.h"
-
-#define D_CHAR_WIDTH  (8)
-#define D_CHAR_HEIGHT (8)
-
-typedef enum {
-    InputCursor_Symb = 10,
-    MenuCursor_Symb = 12
-} ConsoleSymbols_t;
+// #include "qLight.h"
 
 extern qPic_p draw_disc;    // also used on sbar
 #ifdef __cplusplus

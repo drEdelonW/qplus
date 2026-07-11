@@ -9,6 +9,7 @@
 #include "vid.h"    // vid_menudrawfn
 #include "q_tools.h"
 #include "screen.h"
+#include "qSymbolChar.h"
 #ifdef _WIN32
 #   include "winquake.h"
 #endif

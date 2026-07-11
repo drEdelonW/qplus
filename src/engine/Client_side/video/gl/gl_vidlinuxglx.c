@@ -35,8 +35,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <X11/extensions/xf86dga.h>
 #include <X11/extensions/xf86vmode.h>
 
-#define WARP_WIDTH              320
-#define WARP_HEIGHT             200
 
 static Display* _dpy = NULL;
 static int _scrNum;
@@ -710,8 +708,6 @@ void VID_Init(uint8_p palette) {
     Cvar_RegisterVariable(&m_filter);
     Cvar_RegisterVariable(&gl_ztrick);
 
-    vid.maxwarp.width = WARP_WIDTH;
-    vid.maxwarp.height = WARP_HEIGHT;
     vid.colormap = host_colormap;
 
     // interpret command-line params

@@ -29,8 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vRect.h"
 
 
-#define WARP_WIDTH  (320)
-#define WARP_HEIGHT (200)
+
 
 #define MAX_LBM_HEIGHT (480)
 
@@ -149,5 +148,4 @@ extern float skyspeed2;
 extern LegDt_t skytime;
 
 extern int c_surf;
-extern qColor8_p r_warpbuffer;
 
