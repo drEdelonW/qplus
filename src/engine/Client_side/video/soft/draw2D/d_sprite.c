@@ -43,9 +43,9 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
     fixed16_t sstep = 0; // keep compiler happy
     fixed16_t tstep = 0; // ditto
 
-    float sdivz8stepu = d_sdivzstepu * 8;
-    float tdivz8stepu = d_tdivzstepu * 8;
-    float zi8stepu = d_zistepu * 8;
+    float sdivz8stepu = d_sdivzstepu * 8.f;
+    float tdivz8stepu = d_tdivzstepu * 8.f;
+    float zi8stepu = d_zistepu * 8.f;
 
     // we count on FP exceptions being turned off to avoid range problems
     int izistep = (int)(d_zistepu * 0x8000 * FIXED16_ONE);

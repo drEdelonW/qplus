@@ -45,7 +45,6 @@ cvar_t  gl_nobind = { "gl_nobind", "0" };
 cvar_t  gl_max_size = { "gl_max_size", "1024" };
 cvar_t  gl_picmip = { "gl_picmip", "0" };
 
-qColor8_p _drawChars;    // 8*8 graphic characters
 qPic_p draw_disc;
 qPic_p draw_backtile;
 
@@ -292,7 +291,7 @@ qPic_p Draw_CachePic(cStringRO path) {
     return &pic->pic;
 }
 
-
+qColor8_p _drawChars;    // 8*8 graphic characters
 void Draw_CharToConback(int num, qColor8_p dest) {
     int row = num >> 4;
     int col = num & 0x0F;
@@ -302,7 +301,7 @@ void Draw_CharToConback(int num, qColor8_p dest) {
 
     while (drawline--) {
         for (int x = 0; x < 8; x++)
-            if (source[x].i != 255)
+            if (source[x].i != InkTransp)
                 dest[x].i = 0x60 + source[x].i;
         source += 128;
         dest += 320;
@@ -410,7 +409,7 @@ void Draw_Init() {
 #endif
         (float)GLQUAKE_VERSION, (float)VERSION
     );
-    qColor8_p dest = cb->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    qColor8_p dest = cb->data + 320 * 186 + 320 - 11 - MUL8(strlen(ver));
     int y = strlen(ver);
     for (int x = 0; x < y; x++)
         Draw_CharToConback(ver[x], dest + (x << 3));

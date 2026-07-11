@@ -155,14 +155,13 @@ void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
 }
 
 void st3_fixup(XImage* framebuf, int x, int y, int width, int height) {
-    register int count, n;
-
     if ((x < 0) || (y < 0))return;
 
     for (int yi = y; yi < (y + height); yi++) {
         uint8_p src = (uint8_p)&framebuf->data[yi * framebuf->bytes_per_line];
 
         // Duff's Device
+        register int count, n;
         count = width;
         n = (count + 7) / 8;
         PIXEL24* dest = ((PIXEL24*)src) + x + width - 1;

@@ -54,7 +54,7 @@ void M_ModemConfig_Draw() {
         M_Print(x + 8, piontY[mc_Clear] + 12, _mc.sClear);
     }
     if (_mc.cursor == mc_Clear)
-        M_DrawCharacter(x + 8 + 8 * strlen(_mc.sClear), piontY[mc_Clear] + 12, inpSymb());
+        M_DrawCharacter(x + 8 + MUL8(strlen(_mc.sClear)), piontY[mc_Clear] + 12, inpSymb());
 
 
     M_Print(x, piontY[mc_Init], "Init");
@@ -62,7 +62,7 @@ void M_ModemConfig_Draw() {
         M_Print(x + 8, piontY[mc_Init] + 12, _mc.sInit);
     }
     if (_mc.cursor == mc_Init)
-        M_DrawCharacter(x + 8 + 8 * strlen(_mc.sInit), piontY[mc_Init] + 12, inpSymb());
+        M_DrawCharacter(x + 8 + MUL8(strlen(_mc.sInit)), piontY[mc_Init] + 12, inpSymb());
 
 
     M_Print(x, piontY[mc_Hangup], "Hangup");
@@ -70,7 +70,7 @@ void M_ModemConfig_Draw() {
         M_Print(x + 8, piontY[mc_Hangup] + 12, _mc.sHangup);
     }
     if (_mc.cursor == mc_Hangup)
-        M_DrawCharacter(x + 8 + 8 * strlen(_mc.sHangup), piontY[mc_Hangup] + 12, inpSymb());
+        M_DrawCharacter(x + 8 + MUL8(strlen(_mc.sHangup)), piontY[mc_Hangup] + 12, inpSymb());
 
 
     M_DrawTextBox(x, piontY[mc_OK] - 8, 2, 1); {

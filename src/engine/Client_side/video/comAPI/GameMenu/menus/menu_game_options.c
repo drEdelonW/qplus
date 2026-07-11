@@ -268,7 +268,7 @@ void M_GameOptions_Draw() {
 
     if (_svInfoMsg) {
         if ((GetRealTime() - _svInfoMsgTime) < 5.0) {
-            int x = HALF(320 - 26 * 8) / 2;
+            int x = HALF(320 - MUL8(26)) / 2;
             M_DrawTextBox(x, 138, 24, 4);{
                 x += 8;
                 M_Print(x, 146, "  More than 4 players   ");

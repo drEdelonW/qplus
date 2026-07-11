@@ -112,7 +112,7 @@ void M_SerialConfig_Draw() {
     M_DrawCharacter(basex - 8, _serialConfigCursorTable[serialConfigCursor], curSymb());
 
     if (serialConfigCursor == 4)
-        M_DrawCharacter(168 + 8 * strlen(serialConfig_phone), _serialConfigCursorTable[serialConfigCursor], inpSymb());
+        M_DrawCharacter(168 + MUL8(strlen(serialConfig_phone)), _serialConfigCursorTable[serialConfigCursor], inpSymb());
 
     if (*m_return_reason)
         M_PrintWhite(basex, 148, m_return_reason);

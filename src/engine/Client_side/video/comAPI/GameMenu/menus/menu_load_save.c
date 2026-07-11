@@ -68,10 +68,10 @@ void M_Load_Draw() {
     M_DrawPicHC(4, Draw_CachePic("gfx/p_load.lmp"));
 
     for (int i = 0; i < MAX_SAVEGAMES; i++)
-        M_Print(16, 32 + 8 * i, m_filenames[i]);
+        M_Print(16, 32 + MUL8(i), m_filenames[i]);
 
     // line cursor
-    M_DrawCharacter(8, 32 + load_cursor * 8, curSymb());
+    M_DrawCharacter(8, 32 + MUL8(load_cursor), curSymb());
 }
 
 
@@ -79,10 +79,10 @@ void M_Save_Draw() {
     M_DrawPicHC(4, Draw_CachePic("gfx/p_save.lmp"));
 
     for (int i = 0; i < MAX_SAVEGAMES; i++)
-        M_Print(16, 32 + 8 * i, m_filenames[i]);
+        M_Print(16, 32 + MUL8(i), m_filenames[i]);
 
     // line cursor
-    M_DrawCharacter(8, 32 + load_cursor * 8, curSymb());
+    M_DrawCharacter(8, 32 + MUL8(load_cursor), curSymb());
 }
 
 

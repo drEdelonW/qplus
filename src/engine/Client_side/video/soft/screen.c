@@ -59,7 +59,7 @@ void SCR_EraseCenterString() {
         Scr.vrect.height * 0.35 : 48;
 
     Scr.copytop = true;
-    Draw_TileClear(0, y, Scr.vrect.width, 8 * _scr.erase_lines);
+    Draw_TileClear(0, y, Scr.vrect.width, MUL8(_scr.erase_lines));
 }
 
 //=============================================================================

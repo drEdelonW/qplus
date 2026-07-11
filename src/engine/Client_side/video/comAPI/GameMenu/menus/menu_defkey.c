@@ -52,7 +52,7 @@ void M_Keys_Draw() {
 
     // search for known bindings
     for (int i = 0; i < NUMCOMMANDS; i++) {
-        int y = 48 + (8 * i);
+        int y = 48 + MUL8(i);
         M_Print(16, y, _bindnames[i][description]);
         // int len = strlen (_bindnames[i][command]);
 
@@ -65,7 +65,7 @@ void M_Keys_Draw() {
         else {
             cStringRO name = Key_KeynumToString(keys[0]);
             M_Print(140, y, name);
-            int x = strlen(name) * 8;
+            int x = MUL8(strlen(name));
             if (keys[1] != -1) {
                 M_Print(140 + x + 8, y, "or");
                 M_Print(140 + x + 32, y, Key_KeynumToString(keys[1]));
@@ -74,7 +74,7 @@ void M_Keys_Draw() {
     }
 
     M_DrawCharacter(
-        130, 48 + (_keys_cursor * 8),
+        130, 48 + MUL8(_keys_cursor),
         (_bind_grab) ?
         '=' : curSymb()
     );

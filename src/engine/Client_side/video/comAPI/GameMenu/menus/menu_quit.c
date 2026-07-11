@@ -141,7 +141,7 @@ void M_Quit_Draw() {
 #else
     M_DrawTextBox(56, 76, 24, 4); {
         for (int i = 0; i < 4; i++)
-            M_Print(64, 84 + i * 8, quitMessage[_msgNumber][i]);
+            M_Print(64, 84 + MUL8(i), quitMessage[_msgNumber][i]);
     }
 #endif
 }

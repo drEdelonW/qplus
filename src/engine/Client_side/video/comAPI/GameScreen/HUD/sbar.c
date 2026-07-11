@@ -488,7 +488,7 @@ void Sbar_DrawScoreboard() {
 
     for (int i = 0; i < l; i++) {
         int x = 20 * (i & 1);
-        int y = i / 2 * 8;
+        int y = DIV2(MUL8(i));
 
         ScoreBoard_p s = &cl.scores[_fragsort[i]];
         if (!s->name[0])
@@ -499,12 +499,14 @@ void Sbar_DrawScoreboard() {
         qColor8_t bottom = { .i = Sbar_ColorForMap((s->colors & 0x0F) << 4) };
 
         Draw_Fill(
-            x * 8 + 10 + HALF(Scr.vrect.width - 320), y + Scr.vrect.height - SBAR_HEIGHT,
+            MUL8(x) + 10 + HALF(Scr.vrect.width - 320),
+            y + Scr.vrect.height - SBAR_HEIGHT,
             28, 4,
             top
         );
         Draw_Fill(
-            x * 8 + 10 + HALF(Scr.vrect.width - 320), y + 4 + Scr.vrect.height - SBAR_HEIGHT,
+            MUL8(x) + 10 + HALF(Scr.vrect.width - 320),
+            y + 4 + Scr.vrect.height - SBAR_HEIGHT,
             28, 4,
             bottom
         );
@@ -513,9 +515,9 @@ void Sbar_DrawScoreboard() {
         for (int j = 0; j < 20; j++) {
             int c = _scoreboardtext[i][j];
             if ((c == 0) ||
-                (c == ' '))
-                continue;
-            Sbar_DrawCharacter((x + j) * 8, y, c);
+                (c == ' ')
+                )   continue;
+            Sbar_DrawCharacter(MUL8(x + j), y, c);
         }
     }
 #endif
@@ -604,9 +606,9 @@ void Sbar_DrawInventory() {
     for (int i = 0; i < 4; i++) {
         char num[6];
         snprintf(num, sizeof(num), "%3i", cl.stats[STAT_SHELLS + i]);
-        if (num[0] != ' ')  Sbar_DrawCharacter((6 * i + 1) * 8 - 2, -24, 18 + num[0] - '0');
-        if (num[1] != ' ')  Sbar_DrawCharacter((6 * i + 2) * 8 - 2, -24, 18 + num[1] - '0');
-        if (num[2] != ' ')  Sbar_DrawCharacter((6 * i + 3) * 8 - 2, -24, 18 + num[2] - '0');
+        if (num[0] != ' ')  Sbar_DrawCharacter(MUL8(6 * i + 1) - 2, -24, 18 + num[0] - '0');
+        if (num[1] != ' ')  Sbar_DrawCharacter(MUL8(6 * i + 2) - 2, -24, 18 + num[1] - '0');
+        if (num[2] != ' ')  Sbar_DrawCharacter(MUL8(6 * i + 3) - 2, -24, 18 + num[2] - '0');
     }
 
     int flashon = 0;
@@ -661,7 +663,7 @@ void Sbar_DrawInventory() {
                 LegDt_t time = cl.item_gettime[28 + i];
                 if (time && (time > (GetClSimTime() - 2)) && flashon)  // flash frame
                     _sb.updates = 0;
-                else    Sbar_DrawPic(320 - 32 + i * 8, -16, _sb.sigil[i]);
+                else    Sbar_DrawPic(320 - 32 + MUL8(i), -16, _sb.sigil[i]);
 
                 if (time && (time > (GetClSimTime() - 2)))
                     _sb.updates = 0;
@@ -699,20 +701,20 @@ void Sbar_DrawFrags() {
         qColor8_t top = { .i = Sbar_ColorForMap((s->colors & 0xF0) << 0) };
         qColor8_t bottom = { .i = Sbar_ColorForMap((s->colors & 0x0F) << 4) };
 
-        Draw_Fill(xofs + x * 8 + 10, y, 28, 4, top);
-        Draw_Fill(xofs + x * 8 + 10, y + 4, 28, 3, bottom);
+        Draw_Fill(xofs + MUL8(x) + 10, y, 28, 4, top);
+        Draw_Fill(xofs + MUL8(x) + 10, y + 4, 28, 3, bottom);
 
         // draw number
         char num[12];
         snprintf(num, sizeof(num), "%3i", s->frags);
 
-        Sbar_DrawCharacter((x + 1) * 8, -24, num[0]);
-        Sbar_DrawCharacter((x + 2) * 8, -24, num[1]);
-        Sbar_DrawCharacter((x + 3) * 8, -24, num[2]);
+        Sbar_DrawCharacter(MUL8(x + 1), -24, num[0]);
+        Sbar_DrawCharacter(MUL8(x + 2), -24, num[1]);
+        Sbar_DrawCharacter(MUL8(x + 3), -24, num[2]);
 
         if (k == cl.viewentity - 1) {
-            Sbar_DrawCharacter(x * 8 + 2, -24, 16);
-            Sbar_DrawCharacter((x + 4) * 8 - 4, -24, 17);
+            Sbar_DrawCharacter(MUL8(x) + 2, -24, 16);
+            Sbar_DrawCharacter(MUL8(x + 4) - 4, -24, 17);
         }
         x += 4;
     }

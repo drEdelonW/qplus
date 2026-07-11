@@ -78,10 +78,10 @@ void M_Setup_Draw() {
     M_DrawCharacter(56, _y[_cursor], curSymb());
 
     if (_cursor == s_HostName)
-        M_DrawCharacter(168 + 8 * strlen(_s.hostname), _y[_cursor], inpSymb());
+        M_DrawCharacter(168 + MUL8(strlen(_s.hostname)), _y[_cursor], inpSymb());
 
     if (_cursor == s_PlayerName)
-        M_DrawCharacter(168 + 8 * strlen(_s.myname), _y[_cursor], inpSymb());
+        M_DrawCharacter(168 + MUL8(strlen(_s.myname)), _y[_cursor], inpSymb());
 }
 
 

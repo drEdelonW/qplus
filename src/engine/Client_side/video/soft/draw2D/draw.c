@@ -431,15 +431,15 @@ void Draw_ConsoleBackground(int lines) {
     qColor8_p dest = conback->data + ((320 * 186) + 320) - 11;
 #ifdef _WIN32
     snprintf(ver, sizeof(ver), "(WinQuake) %4.2f", (float)VERSION);
-    dest +=  - (8 * strlen(ver));
+    dest +=  - (MUL8(strlen(ver)));
 #elif defined(X11)
     snprintf(ver, sizeof(ver), "(X11 Quake %2.2f) %4.2f", (float)X11_VERSION, (float)VERSION);
-    dest += - (8 * strlen(ver));
+    dest += - (MUL8(strlen(ver)));
 #elif defined(__linux__)
     snprintf(ver, sizeof(ver), "(Linux Quake %2.2f) %4.2f", (float)LINUX_VERSION, (float)VERSION);
-    dest += - (8 * strlen(ver));
+    dest += - (MUL8(strlen(ver)));
 #else
-    dest += - (8 * 4) ;
+    dest += - MUL8(4) ;
     snprintf(ver, sizeof(ver), "%4.2f", VERSION);
 #endif
 

@@ -65,11 +65,11 @@ void M_LanConfig_Draw() {
 
     basex += 8;
     M_Print(basex, 52, "Address:");
-    M_Print(basex + 9 * 8, 52, (IPXConfig) ? my_ipx_address : my_tcpip_address);
+    M_Print(basex + MUL8(9), 52, (IPXConfig) ? my_ipx_address : my_tcpip_address);
 
     M_Print(basex, _y[lc_Port], "Port");
-    M_DrawTextBox(basex + 8 * 8, _y[lc_Port] - 8, 6, 1); {
-        M_Print(basex + 9 * 8, _y[lc_Port], lanConfig.portname);
+    M_DrawTextBox(basex + MUL8(8), _y[lc_Port] - 8, 6, 1); {
+        M_Print(basex + MUL8(9), _y[lc_Port], lanConfig.portname);
     }
 
     if (is_JoinGame()) {
@@ -88,10 +88,10 @@ void M_LanConfig_Draw() {
     M_DrawCharacter(basex - 8, _y[_cursor], curSymb());
 
     if (_cursor == lc_Port)
-        M_DrawCharacter(basex + 9 * 8 + 8 * strlen(lanConfig.portname), _y[lc_Port], inpSymb());
+        M_DrawCharacter(basex + MUL8(9) + MUL8(strlen(lanConfig.portname)), _y[lc_Port], inpSymb());
 
     if (_cursor == lc_JoinName)
-        M_DrawCharacter(basex + 16 + 8 * strlen(lanConfig.joinname), _y[lc_JoinName], inpSymb());
+        M_DrawCharacter(basex + 16 + MUL8(strlen(lanConfig.joinname)), _y[lc_JoinName], inpSymb());
 
     if (*m_return_reason)
         M_PrintWhite(basex, 148, m_return_reason);

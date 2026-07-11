@@ -42,9 +42,9 @@ void M_ServerList_Draw() {
         name_t string;
         if (hostcache[n].maxusers)  snprintf(string, sizeof(string), "%-15.15s %-15.15s %2u/%2u\n", hostcache[n].name, hostcache[n].map, hostcache[n].users, hostcache[n].maxusers);
         else                        snprintf(string, sizeof(string), "%-15.15s %-15.15s\n", hostcache[n].name, hostcache[n].map);
-        M_Print(16, 32 + 8 * n, string);
+        M_Print(16, 32 + MUL8(n), string);
     }
-    M_DrawCharacter(0, 32 + slist_cursor * 8, curSymb());
+    M_DrawCharacter(0, 32 + MUL8(slist_cursor), curSymb());
 
     if (*m_return_reason)
         M_PrintWhite(16, 148, m_return_reason);
