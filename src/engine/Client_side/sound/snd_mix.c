@@ -285,8 +285,8 @@ void SND_PaintChannelFrom8(channel_p ch, sfxcache_p sc, int count) {
     ClampMoreThen(&ch->leftvol, 0xFF);
     ClampMoreThen(&ch->rightvol, 0xFF);
 
-    int* lscale = _snd_scaletable[EIGHTH(ch->leftvol)];
-    int* rscale = _snd_scaletable[EIGHTH(ch->rightvol)];
+    int* lscale = _snd_scaletable[DIV8(ch->leftvol)];
+    int* rscale = _snd_scaletable[DIV8(ch->rightvol)];
     uint8_p sfx = (uint8_p)sc->data + ch->pos;
 
     for (int i = 0; i < count; i++) {

@@ -103,7 +103,7 @@ void SCR_DrawCenterString() {
             if ((start[inLine] == '\n') || !start[inLine])
                 break;
 
-        int x = HALF(Scr.vrect.width - OCTO(inLine));
+        int x = HALF(Scr.vrect.width - MUL8(inLine));
         for (int j = 0; j < inLine; j++, x += 8) {
             Draw_Character(x, y, start[j]);
             if (!remaining--)
@@ -172,7 +172,7 @@ void SCR_DrawNotifyString() {
                 )
                 break;
 
-        int x = HALF(Scr.vrect.width - OCTO(inLine));
+        int x = HALF(Scr.vrect.width - MUL8(inLine));
         for (int j = 0; j < inLine; j++, x += 8)
             Draw_Character(x, y, start[j]);
 

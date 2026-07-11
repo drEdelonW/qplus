@@ -30,8 +30,8 @@
 #define HALF(x)     DIV2(x)
 #define TWICE(x)    MUL2(x)
 
-#define QUARTER(x)  DIV4(x)
-#define QUAD(x)     MUL4(x)
+// #define QUARTER(x)  DIV4(x)
+// #define QUAD(x)     MUL4(x)
 
-#define EIGHTH(x)   DIV8(x)
-#define OCTO(x)     MUL8(x)
+// #define EIGHTH(x)   DIV8(x)
+// #define OCTO(x)     MUL8(x)

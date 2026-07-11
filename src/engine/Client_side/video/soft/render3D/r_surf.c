@@ -306,12 +306,12 @@ void R_DrawSurfaceBlock8_mip1() {
         lightleft = r_lightptr[0];
         lightright = r_lightptr[1];
         r_lightptr += r_lightwidth;
-        lightleftstep = EIGHTH(r_lightptr[0] - lightleft);
-        lightrightstep = EIGHTH(r_lightptr[1] - lightright);
+        lightleftstep = DIV8(r_lightptr[0] - lightleft);
+        lightrightstep = DIV8(r_lightptr[1] - lightright);
 
         for (int i = 0; i < 8; i++) {
             int lighttemp = lightleft - lightright;
-            int lightstep = EIGHTH(lighttemp);
+            int lightstep = DIV8(lighttemp);
             int light = lightright;
 
             for (int b = 7; b >= 0; b--) {
@@ -347,12 +347,12 @@ void R_DrawSurfaceBlock8_mip2() {
         lightleft = r_lightptr[0];
         lightright = r_lightptr[1];
         r_lightptr += r_lightwidth;
-        lightleftstep = QUARTER(r_lightptr[0] - lightleft);
-        lightrightstep = QUARTER(r_lightptr[1] - lightright);
+        lightleftstep = DIV4(r_lightptr[0] - lightleft);
+        lightrightstep = DIV4(r_lightptr[1] - lightright);
 
         for (int i = 0; i < 4; i++) {
             int lighttemp = lightleft - lightright;
-            int lightstep = QUARTER(lighttemp);
+            int lightstep = DIV4(lighttemp);
             int light = lightright;
 
             for (int b = 3; b >= 0; b--) {

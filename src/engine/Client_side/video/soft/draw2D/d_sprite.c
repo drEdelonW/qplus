@@ -99,8 +99,8 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
                 tnext = (int)(tdivz * z) + tadjust;
                 ClampInRange(8, &tnext, bbextentt); // guard against round-off error on <0 steps
 
-                sstep = EIGHTH(snext - s);
-                tstep = EIGHTH(tnext - t);
+                sstep = DIV8(snext - s);
+                tstep = DIV8(tnext - t);
             }
             else {
                 // calculate s/z, t/z, zi->fixed s and t at last pixel in span (so

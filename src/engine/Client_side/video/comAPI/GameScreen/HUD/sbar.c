@@ -1014,7 +1014,7 @@ void Sbar_MiniDeathmatchOverlay() {
     // draw the text
     int sbl = _scoreboardlines;
     int y = Scr.vrect.height - sb_lines;
-    int numlines = EIGHTH(sb_lines);
+    int numlines = DIV8(sb_lines);
     if (numlines < 3)
         return;
 

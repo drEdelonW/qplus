@@ -27,7 +27,7 @@ void Q_memset(TypeLess_ptr dest, uint8_t fill, int count) {
 #if 0
 void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count) {
     if ((((int32_t)dest | (int32_t)src | count) & 3) == 0) {
-        count = QUARTER(count);
+        count = DIV4(count);
         for (int32_t i = 0; i < count; i++) {
             ((int32_p)dest)[i] = ((int32_p)src)[i];
         }
@@ -42,7 +42,7 @@ void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count) {
 void Q_memcpy(TypeLess_ptr dest, TypeLess_ptr src, int32_t count) {
     if (count <= 0) return;
     if ((((uintptr_t)dest | (uintptr_t)src | (uintptr_t)count) & 3u) == 0u) {
-        int32_t n = QUARTER(count);
+        int32_t n = DIV4(count);
         uint32_p d32 = (uint32_p)dest;
         const uint32_p s32 = (const uint32_p)src;
         for (int32_t i = 0; i < n; ++i) d32[i] = s32[i];

@@ -129,7 +129,7 @@ void Key_Console(keycode_t key) {
     case K_PGUP:
     case K_MWHEELUP: {
         con.backscroll += 2;
-        ClampMoreThen(&con.backscroll, con.totallines - EIGHTH(Scr.vrect.height) - 1);
+        ClampMoreThen(&con.backscroll, con.totallines - DIV8(Scr.vrect.height) - 1);
     } return;
 
     case K_PGDN:
@@ -138,7 +138,7 @@ void Key_Console(keycode_t key) {
         ClampLessThen(&con.backscroll, 0);
     } return;
 
-    case K_HOME: { con.backscroll = con.totallines - EIGHTH(Scr.vrect.height) - 1; } return;
+    case K_HOME: { con.backscroll = con.totallines - DIV8(Scr.vrect.height) - 1; } return;
     case K_END: { con.backscroll = 0; } return;
 
     case K_TAB: { // command completion

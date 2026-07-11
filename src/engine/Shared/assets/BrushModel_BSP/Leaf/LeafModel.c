@@ -36,7 +36,7 @@ Mod_DecompressVis
 ===================
 */
 uint8_p Mod_DecompressVis(uint8_p in, Model_p model) {
-    int row = EIGHTH(model->numleafs + 7);
+    int row = DIV8(model->numleafs + 7);
     uint8_p out = _decompressed;
 
 #if 0

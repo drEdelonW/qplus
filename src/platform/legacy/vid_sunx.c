@@ -201,7 +201,7 @@ void st2_fixup(XImage* framebuf, int x, int y, int width, int height) {
 
         // Duff's Device
         count = width;
-        n = EIGHTH(count + 7);
+        n = DIV8(count + 7);
         dest = ((PIXEL16*)src) + x + width - 1;
         src += x + width - 1;
 
@@ -237,7 +237,7 @@ void st3_fixup(XImage* framebuf, int x, int y, int width, int height) {
 
         // Duff's Device
         count = width;
-        n = EIGHTH(count + 7);
+        n = DIV8(count + 7);
         dest = ((PIXEL24*)src) + x + width - 1;
         src += x + width - 1;
 
@@ -339,7 +339,7 @@ void ResetFrameBuffer() {
         free(x_framebuffer[0]);
     }
 
-    pwidth = EIGHTH(x_visinfo->depth);
+    pwidth = DIV8(x_visinfo->depth);
     if (pwidth == 3) pwidth = 4;
     mem = ((Scr.vrect.width * pwidth + 3) & ~3) * Scr.vrect.height;
 

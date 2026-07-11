@@ -386,7 +386,7 @@ void PF_checkclient() {
     mLeaf_p leaf = Mod_PointInLeaf(view, sv.worldmodel);
     int l = (leaf - sv.worldmodel->leafs) - 1;
     if ((l < 0) ||
-        !(_checkPvs[EIGHTH(l)] & (1 << (l & 7)))
+        !(_checkPvs[DIV8(l)] & (1 << (l & 7)))
         ) {
         // c_notvis++;
         RETURN_EDICT(Edicts);

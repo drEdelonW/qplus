@@ -522,7 +522,7 @@ void S_ClearBuffer() {
             }
         }
 
-        Q_memset(pData, clear, EIGHTH(shm->samples * shm->samplebits));
+        Q_memset(pData, clear, DIV8(shm->samples * shm->samplebits));
 
         pDSBuf->lpVtbl->Unlock(pDSBuf, pData, dwSize, NULL, 0);
 
@@ -530,7 +530,7 @@ void S_ClearBuffer() {
     else
 #endif
     {
-        Q_memset(shm->buffer, clear, (size_t)(EIGHTH(shm->samples * shm->samplebits)));
+        Q_memset(shm->buffer, clear, (size_t)(DIV8(shm->samples * shm->samplebits)));
     }
     }
 

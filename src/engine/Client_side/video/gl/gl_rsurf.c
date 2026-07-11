@@ -167,7 +167,7 @@ void R_BuildLightMap(mSurface_p surf, uint8_p dest, int stride) {// TODO: merge 
 
     switch (gl_lightmap_format) {
     case GL_RGBA: {
-        stride -= QUAD(smax);
+        stride -= MUL4(smax);
         fixed16_p bl = blocklights;
         for (int i = 0; i < tmax; i++, dest += stride)
             for (int j = 0; j < smax; j++) {
@@ -1181,12 +1181,12 @@ void R_MarkLeaves() {
         vis = Mod_LeafPVS(r_viewleaf, cl.worldmodel);
     }
     else {
-        memset(solid, 0xFF, EIGHTH(cl.worldmodel->numleafs + 7));
+        memset(solid, 0xFF, DIV8(cl.worldmodel->numleafs + 7));
         vis = solid;
     }
 
     for (int i = 0; i < cl.worldmodel->numleafs; i++) {
-        if (vis[EIGHTH(i)] & (1 << (i & 7))) {
+        if (vis[DIV8(i)] & (1 << (i & 7))) {
             mNode_p node = (mNode_p)&cl.worldmodel->leafs[i + 1];
             do {
                 if (node->visframe == r_visframecount)

@@ -60,7 +60,7 @@ void D_FillRect(vRect_p rect, int color) {
         uint32_p ldest = (uint32_p)dest;
         color += color << 16;
 
-        rwidth = QUARTER(rwidth);
+        rwidth = DIV4(rwidth);
         color += color << 8;
 
         for (int ry = 0; ry < rheight; ry++) {

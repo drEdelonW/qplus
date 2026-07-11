@@ -294,8 +294,8 @@ void D_DrawSpans8(eSpan_p pspan) {
                 st_next.t = (int)(dz.tz * z) + tadjust;
                 ClampInRange(8, &st_next.t, bbextentt);    // guard against round-off error on <0 steps
 
-                ststep.s = EIGHTH(st_next.s - st.s);
-                ststep.t = EIGHTH(st_next.t - st.t);
+                ststep.s = DIV8(st_next.s - st.s);
+                ststep.t = DIV8(st_next.t - st.t);
             }
             else {
                 // calculate s/z, t/z, zi->fixed s and t at last pixel in span (so

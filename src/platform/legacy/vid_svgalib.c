@@ -333,7 +333,7 @@ int get_mode(cString name, int width, int height, int depth) {
             if (modes[i].width) {
                 ok = ((modes[i].width == width) << 0) |
                     ((modes[i].height == height) << 1) |
-                    ((modes[i].bytesperpixel == EIGHTH(depth)) << 2);
+                    ((modes[i].bytesperpixel == DIV8(depth)) << 2);
                 if ((ok & match) == ok)
                     break;
             }

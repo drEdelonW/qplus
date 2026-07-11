@@ -486,7 +486,8 @@ smoothly scrolled off.
 */
 #define CHAR_SCALE_F    (0.0625f) /* seems like character size in texture 1.f space (1/16)*/
 
-void Draw_Character(int x, int y, int num) {
+void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
+    int num = symb;
     num &= 0xFF;
     if (num == ' ')     return; // 32 - space
 
@@ -530,7 +531,7 @@ This is for debugging lockups by drawing different chars in different parts
 of the code.
 ================
 */
-void Draw_DebugChar(char num) {}
+void Draw_DebugChar(ConsoleSymbols_t symb) {}
 
 /*
 =============
@@ -652,7 +653,7 @@ Draw_ConsoleBackground
 ================
 */
 void Draw_ConsoleBackground(int lines) {
-    int y = QUARTER(Scr.vrect.height * 3);
+    int y = DIV4(Scr.vrect.height * 3);
 
     if (lines > y)  Draw_Pic(0, lines - Scr.vrect.height, conback);
     else            Draw_AlphaPic(0, lines - Scr.vrect.height, conback, (float)(1.2 * lines) / y);
@@ -688,13 +689,13 @@ Draw_Fill
 Fills a box of pixels with a single color
 =============
 */
-void Draw_Fill(int x, int y, int w, int h, int c) {
+void Draw_Fill(int x, int y, int w, int h, qColor8_t c) {
 
     glDisable(GL_TEXTURE_2D); {
         glColor3f(
-            host_basepal->ink[c].r / 255.f,
-            host_basepal->ink[c].g / 255.f,
-            host_basepal->ink[c].b / 255.f
+            host_basepal->ink[c.i].r / 255.f,
+            host_basepal->ink[c.i].g / 255.f,
+            host_basepal->ink[c.i].b / 255.f
         ); {
             glBegin(GL_QUADS); {
                 glVertex2f(x, y);   int x1 = x + w;
@@ -855,15 +856,15 @@ Operates in place, quartering the size of the texture
 ================
 */
 void GL_MipMap(uint8_p in, int width, int height) {
-    width = QUAD(width);
+    width = MUL4(width);
     height = HALF(height);
     uint8_p out = in;
     for (int i = 0; i < height; i++, in += width) {
         for (int j = 0; j < width; j += 8, out += 4, in += 8) {
-            out[0] = QUARTER(in[0] + in[4] + in[width + 0] + in[width + 4]);
-            out[1] = QUARTER(in[1] + in[5] + in[width + 1] + in[width + 5]);
-            out[2] = QUARTER(in[2] + in[6] + in[width + 2] + in[width + 6]);
-            out[3] = QUARTER(in[3] + in[7] + in[width + 3] + in[width + 7]);
+            out[0] = DIV4(in[0] + in[4] + in[width + 0] + in[width + 4]);
+            out[1] = DIV4(in[1] + in[5] + in[width + 1] + in[width + 5]);
+            out[2] = DIV4(in[2] + in[6] + in[width + 2] + in[width + 6]);
+            out[3] = DIV4(in[3] + in[7] + in[width + 3] + in[width + 7]);
         }
     }
 }
@@ -876,7 +877,7 @@ Mipping for 8 bit textures
 ================
 */
 void GL_MipMap8Bit(qColor8_p in, int width, int height) {
-    // width = QUAD(width);
+    // width = MUL4(width);
     height = HALF(height);
     qColor8_p out = in;
     for (int i = 0; i < height; i++, in += width) {

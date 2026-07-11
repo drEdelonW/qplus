@@ -66,11 +66,11 @@ uint8_p LoadPCX(FILE* f_pcx) {
     uint16_t width = pcx.xmax + 1;
     uint16_t height = pcx.ymax + 1;
     int count = width * height;
-    uint8_p pcx_rgb = malloc(QUAD(count));
-    
+    uint8_p pcx_rgb = malloc(MUL4(count));
+
     fseek(f_pcx, offsetof(pcx_t, data), SEEK_SET);
     for (int y = 0; y < height; y++) {
-        uint8_p pix = pcx_rgb + QUAD(y * width);
+        uint8_p pix = pcx_rgb + MUL4(y * width);
         for (int x = 0; x < width; ) {
             int token = fgetc(f_pcx);
             bool isRle = (token & RleFlag) == RleFlag;
