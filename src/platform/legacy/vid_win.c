@@ -1213,11 +1213,11 @@ bool VID_SetWindowedMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    Scr.vrect.pBuff = vid.con.pBuff = vid.direct = dibdc->surface;
-    vid.rowBytes = vid.con.rowBytes = dibdc->mi.bytesPerLine;
+    Scr.vrect.pBuff = Scr.con.pBuff = Scr.direct = dibdc->surface;
+    vid.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
-    Scr.vrect.height = vid.con.height = DIBHeight;
-    Scr.vrect.width = vid.con.width = DIBWidth;
+    Scr.vrect.height = Scr.con.height = DIBHeight;
+    Scr.vrect.width = Scr.con.width = DIBWidth;
     Scr.aspect = calcAspectRect(&Scr.vrect);
 
     vid_stretched = stretched;
@@ -1253,9 +1253,9 @@ bool VID_SetFullscreenMode(int modenum) {
     modestate = MS_FULLSCREEN;
     vid_fulldib_on_focus_mode = 0;
 
-    Scr.vrect.pBuff = vid.con.pBuff = vid.direct = NULL;
-    DIBHeight = Scr.vrect.height = vid.con.height = modelist[modenum].height;
-    DIBWidth = Scr.vrect.width = vid.con.width = modelist[modenum].width;
+    Scr.vrect.pBuff = Scr.con.pBuff = Scr.direct = NULL;
+    DIBHeight = Scr.vrect.height = Scr.con.height = modelist[modenum].height;
+    DIBWidth = Scr.vrect.width = Scr.con.width = modelist[modenum].width;
     Scr.aspect = calcAspectRect(&Scr.vrect);
 
     vid_stretched = modelist[modenum].stretched;
@@ -1363,11 +1363,11 @@ bool VID_SetFullDIBMode(int modenum) {
 
     Scr.vrect.pBuff = dibdc->surface;
     Scr.aspect = calcAspectRect(&Scr.vrect);
-    vid.direct = dibdc->surface;
-    vid.rowBytes = vid.con.rowBytes = dibdc->mi.bytesPerLine;
+    Scr.direct = dibdc->surface;
+    vid.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
-    Scr.vrect.height = vid.con.height = DIBHeight;
-    Scr.vrect.width = vid.con.width = DIBWidth;
+    Scr.vrect.height = Scr.con.height = DIBHeight;
+    Scr.vrect.width = Scr.con.width = DIBWidth;
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -1563,13 +1563,13 @@ void VID_LockBuffer() {
 
     if (memdc) {
         // Update surface pointer for linear access modes
-        Scr.vrect.pBuff = vid.con.pBuff = vid.direct = memdc->surface;
-        vid.rowBytes = vid.con.rowBytes = memdc->mi.bytesPerLine;
+        Scr.vrect.pBuff = Scr.con.pBuff = Scr.direct = memdc->surface;
+        vid.rowBytes = Scr.con.rowBytes = memdc->mi.bytesPerLine;
     }
     else if (mgldc) {
         // Update surface pointer for linear access modes
-        Scr.vrect.pBuff = vid.con.pBuff = vid.direct = mgldc->surface;
-        vid.rowBytes = vid.con.rowBytes = mgldc->mi.bytesPerLine;
+        Scr.vrect.pBuff = Scr.con.pBuff = Scr.direct = mgldc->surface;
+        vid.rowBytes = Scr.con.rowBytes = mgldc->mi.bytesPerLine;
     }
 
     d_viewbuffer = (r_dowarp) ?
@@ -1601,8 +1601,8 @@ void VID_UnlockBuffer() {
 
     // to turn up any unlocked accesses
     Scr.vrect.pBuff = NULL;
-    vid.con.pBuff = NULL;
-    vid.direct = NULL;
+    Scr.con.pBuff = NULL;
+    Scr.direct = NULL;
     d_viewbuffer = NULL;
 
 }
@@ -1904,7 +1904,7 @@ void VID_Init(uint8_p palette) {
         VID_InitFullDIB(global_hInstance);
     }
 
-    vid.colormap = host_colormap;
+    Scr.pColorMapPal = host_colormap;
     vid_testingmode = 0;
 
     // GDI doesn't let us remap palette index 0, so we'll remap color
@@ -1927,7 +1927,7 @@ void VID_Init(uint8_p palette) {
         }
     }
 
-    for (i = 0, ptmp = vid.colormap; i < (1 << (VID_CBITS + 8)); i++, ptmp++) {
+    for (i = 0, ptmp = Scr.pColorMapPal; i < (1 << (VID_CBITS + 8)); i++, ptmp++) {
         if (*ptmp == 0)
             *ptmp = bestmatch;
     }
@@ -2188,15 +2188,15 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
     if (Scr.numpages == 1) {
         VID_LockBuffer();
 
-        if (!vid.direct)
-            Sys_Error("NULL vid.direct pointer");
+        if (!Scr.direct)
+            Sys_Error("NULL Scr.direct pointer");
 
         for (i = 0; i < (height << repshift); i += reps) {
             for (j = 0; j < reps; j++) {
                 memcpy(&backingbuf[(i + j) * 24],
-                    vid.direct + x + ((y << repshift) + i + j) * vid.rowBytes,
+                    Scr.direct + x + ((y << repshift) + i + j) * vid.rowBytes,
                     width);
-                memcpy(vid.direct + x + ((y << repshift) + i + j) * vid.rowBytes,
+                memcpy(Scr.direct + x + ((y << repshift) + i + j) * vid.rowBytes,
                     &pbitmap[(i >> repshift) * width],
                     width);
             }
@@ -2274,12 +2274,12 @@ void D_EndDirectRect(int x, int y, int width, int height) {
     if (Scr.numpages == 1) {
         VID_LockBuffer();
 
-        if (!vid.direct)
-            Sys_Error("NULL vid.direct pointer");
+        if (!Scr.direct)
+            Sys_Error("NULL Scr.direct pointer");
 
         for (i = 0; i < (height << repshift); i += reps) {
             for (j = 0; j < reps; j++) {
-                memcpy(vid.direct + x + ((y << repshift) + i + j) * vid.rowBytes,
+                memcpy(Scr.direct + x + ((y << repshift) + i + j) * vid.rowBytes,
                     &backingbuf[(i + j) * 24],
                     width);
             }
@@ -2626,7 +2626,7 @@ LONG WINAPI MainWndProc(
         hdc = BeginPaint(hWnd, &ps);
 
         if (!in_mode_set && host_initialized)
-            SCR_UpdateWholeScreen();
+            SCR_InstantUpdateScreen();
 
         EndPaint(hWnd, &ps);
         break;

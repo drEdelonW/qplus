@@ -356,7 +356,7 @@ void VID_Init(uint8_p palette) {
     Scr.vrect.height = 200;
     // scr.aspect = 1.0; calcAspectRect(&Scr.vrect);
     Scr.numpages = 2;
-    vid.colormap = host_colormap;
+    Scr.pColorMapPal = host_colormap;
 
     srandom(getpid());
 
@@ -606,10 +606,10 @@ VID_ResetFramebuffer() {
 
     vid.rowBytes = storage.byte.scanline_stride;
     Scr.vrect.pBuff = storage.byte.data;
-    vid.con.pBuff = Scr.vrect.pBuff;
-    vid.con.rowBytes = vid.rowBytes;
-    vid.con.width = Scr.vrect.width;
-    vid.con.height = Scr.vrect.height;
+    Scr.con.pBuff = Scr.vrect.pBuff;
+    Scr.con.rowBytes = vid.rowBytes;
+    Scr.con.width = Scr.vrect.width;
+    Scr.con.height = Scr.vrect.height;
 
     SCR_RequestCalcRefdef();    // force a surface cache flush
 
@@ -685,7 +685,7 @@ void VID_Shutdown() {
 int XLateKey(XKeyEvent* ev) {
 
     int key;
-    name_t buf;
+    nameStr_t buf;
     KeySym keysym;
 
     XLookupString(ev, buf, sizeof buf, &keysym, 0);
@@ -949,7 +949,7 @@ VID_Update(vRect_p rects) {
             Sys_Error("xil_get_memory_storage");
 
         Scr.vrect.pBuff = storage.byte.data;
-        vid.con.pBuff = Scr.vrect.pBuff;
+        Scr.con.pBuff = Scr.vrect.pBuff;
 
         rects = rects->pnext;
     }
@@ -1033,10 +1033,10 @@ drain_renderpipeline(XilImage old) {
 
     vid.rowBytes = storage.byte.scanline_stride;
     Scr.vrect.pBuff = storage.byte.data;
-    vid.con.pBuff = Scr.vrect.pBuff;
-    vid.con.rowBytes = vid.rowBytes;
-    vid.con.width = Scr.vrect.width;
-    vid.con.height = Scr.vrect.height;
+    Scr.con.pBuff = Scr.vrect.pBuff;
+    Scr.con.rowBytes = vid.rowBytes;
+    Scr.con.width = Scr.vrect.width;
+    Scr.con.height = Scr.vrect.height;
 
     SCR_RequestCalcRefdef();    // force a surface cache flush
 
@@ -1061,7 +1061,7 @@ sched_update(XilImage image) {
         Sys_Error("xil_get_memory_storage");
 
     Scr.vrect.pBuff = storage.byte.data;
-    vid.con.pBuff = Scr.vrect.pBuff;
+    Scr.con.pBuff = Scr.vrect.pBuff;
 
     return (new);
 }
@@ -1181,7 +1181,4 @@ void IN_Move(UserCmd_p cmd) {
     }
     mouse_x = mouse_y = 0.0;
 }
-
-//void VID_UnlockBuffer() { }
-//void VID_LockBuffer() { }
 

@@ -46,11 +46,11 @@ typedef struct {
     SimTime_t   simTime;
     uint8_t     lastcheck;      // used by PF_checkclient
     SimTime_t   lastchecktime;
-    name_t      name;       // map name
+    nameStr_t      name;       // map name
 #ifdef QUAKE2
-    name_t      startspot;
+    nameStr_t      startspot;
 #endif
-    name_t      modelname;  // maps/<name>.bsp, for model_precache[0]
+    nameStr_t      modelname;  // maps/<name>.bsp, for model_precache[0]
     Model_p     worldmodel;
     cString     model_precache[MAX_MODELS];     // NULL terminated
     Model_p     models[MAX_MODELS];

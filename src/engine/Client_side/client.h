@@ -35,11 +35,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "protocol.h"   // MAX_CL_STATS etc.
 #include "angle.h"
 #include "sound.h"
+#include "GameRule.h"
 
 
 typedef struct {
     uint32_t    length;
-    char        map[MAX_STYLESTRING];
+    styleStr_t  map;
 } LightStyle_t;
 
 typedef struct {
@@ -85,7 +86,7 @@ typedef struct {
     ClientStatus state;
 
     // personalization data sent to server
-    qPath_t     mapstring;
+    qPathStr_t     mapstring;
     mapStr_t    spawnparms; // to restart a level
 
     // demo loop control

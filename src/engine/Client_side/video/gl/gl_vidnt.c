@@ -221,10 +221,10 @@ bool VID_SetWindowedMode(int modenum) {
     PatBlt(hdc, 0, 0, WindowRect.right, WindowRect.bottom, BLACKNESS);
     ReleaseDC(dibwindow, hdc);
 
-    ClampMoreThen(&vid.con.height, modelist[modenum].height);
-    ClampMoreThen(&vid.con.width, modelist[modenum].width);
-    Scr.vrect.width = vid.con.width;
-    Scr.vrect.height = vid.con.height;
+    ClampMoreThen(&Scr.con.height, modelist[modenum].height);
+    ClampMoreThen(&Scr.con.width, modelist[modenum].width);
+    Scr.vrect.width = Scr.con.width;
+    Scr.vrect.height = Scr.con.height;
     Scr.numpages = 2;
     mainwindow = dibwindow;
 
@@ -293,10 +293,10 @@ bool VID_SetFullDIBMode(int modenum) {
     PatBlt(hdc, 0, 0, WindowRect.right, WindowRect.bottom, BLACKNESS);
     ReleaseDC(dibwindow, hdc);
 
-    ClampMoreThen(&vid.con.height, modelist[modenum].height);
-    ClampMoreThen(&vid.con.width, modelist[modenum].width);
-    Scr.vrect.width = vid.con.width;
-    Scr.vrect.height = vid.con.height;
+    ClampMoreThen(&Scr.con.height, modelist[modenum].height);
+    ClampMoreThen(&Scr.con.width, modelist[modenum].width);
+    Scr.vrect.width = Scr.con.width;
+    Scr.vrect.height = Scr.con.height;
     Scr.numpages = 2;
 
     // needed because we're not getting WM_MOVE messages fullscreen on NT
@@ -1344,7 +1344,7 @@ void    VID_Init(uint8_p palette) {
     int        i, existingmode;
     int        basenummodes, width, height, bpp, findbpp, done;
     uint8_p ptmp;
-    fsPath_t gldir;
+    fsPathStr_t gldir;
     HDC        hdc;
     DEVMODE    devmode;
 
@@ -1514,21 +1514,21 @@ void    VID_Init(uint8_p palette) {
     vid_initialized = true;
 
     if ((i = COM_CheckParm("-conwidth")) != 0)
-        vid.con.width = Q_atoi(com.argv[i + 1]);
+        Scr.con.width = Q_atoi(com.argv[i + 1]);
     else
-        vid.con.width = 640;
+        Scr.con.width = 640;
 
-    vid.con.width &= 0xfff8; // make it a multiple of eight
-    ClampLessThen(&vid.con.width, 320);
+    Scr.con.width &= 0xfff8; // make it a multiple of eight
+    ClampLessThen(&Scr.con.width, 320);
 
     // pick a conheight that matches with correct aspect
-    vid.con.height = vid.con.width * 3 / 4;
+    Scr.con.height = Scr.con.width * 3 / 4;
 
     if ((i = COM_CheckParm("-conheight")) != 0)
-        vid.con.height = Q_atoi(com.argv[i + 1]);
-    ClampLessThen(&vid.con.height, 200);
+        Scr.con.height = Q_atoi(com.argv[i + 1]);
+    ClampLessThen(&Scr.con.height, 200);
 
-    vid.colormap = host_colormap;
+    Scr.pColorMapPal = host_colormap;
 
     DestroyWindow(hwnd_dialog);
 

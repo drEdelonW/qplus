@@ -91,6 +91,7 @@ extern "C" {
     void S_ClearBuffer();
     void S_Update(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up);
     void S_ExtraUpdate();
+    void S_ExtraUpdateBUL();
 
     sfx_p S_PrecacheSound(cString sampleName);
     void S_TouchSound(cString sampleName);

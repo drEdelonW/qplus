@@ -25,7 +25,7 @@ void M_ScanSaves() {
         strcpy(m_filenames[i], "--- UNUSED SLOT ---");
         loadable[i] = false;
 
-        fsPath_t name;
+        fsPathStr_t name;
         snprintf(name, sizeof(name), "%s/s%i.sav", com.gamedir, i);
         FILE* f = fopen(name, "r");
         if (!f)

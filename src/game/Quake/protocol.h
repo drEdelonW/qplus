@@ -21,10 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // protocol.h -- communications protocols
 
 #define PROTOCOL_VERSION 15
-enum {
-    FAST_MASK = 0x7Fu,
-    FAST_FLAG = 0x80u
-};
+
 
 // if the high bit of the servercmd is set, the low bits are fast update flags:
 
@@ -139,8 +136,10 @@ typedef enum {
 
     svc_cdtrack          = 32u, // [byte] track [byte] looptrack
     svc_sellscreen       = 33u,
-    svc_cutscene         = 34u
+    svc_cutscene         = 34u,
 
+    svc_fastMask         = 0x7Fu,
+    svc_fastFlag         = 0x80u
 } svc_t;
 
 //

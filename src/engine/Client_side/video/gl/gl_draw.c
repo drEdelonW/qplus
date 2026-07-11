@@ -75,7 +75,7 @@ int  texels;
 
 typedef struct {
     int  texnum;
-    name_t identifier;
+    nameStr_t identifier;
     int  width, height;
     bool mipmap;
 } glTexture_t;
@@ -185,7 +185,7 @@ void Scrap_Upload() {
 /* Support Routines */
 
 typedef struct cachepic_s {
-    qPath_t name;
+    qPathStr_t name;
     qPic_t  pic;
     byte    padding[32]; // for appended glpic
 } cachepic_t;
@@ -415,21 +415,21 @@ void Draw_Init() {
         Draw_CharToConback(ver[x], dest + (x << 3));
 
 #if 0
-    conback->width = vid.con.width;
-    conback->height = vid.con.height;
+    conback->width = Scr.con.width;
+    conback->height = Scr.con.height;
 
     // scale console to vid size
     uint8_p ncdata
-        uint8_p dest = ncdata = Hunk_AllocName(vid.con.width * vid.con.height, "conback");
+        uint8_p dest = ncdata = Hunk_AllocName(Scr.con.width * Scr.con.height, "conback");
 
-    for (int y = 0; y < vid.con.height; y++, dest += vid.con.width) {
-        src = cb->data + cb->width * (y * cb->height / vid.con.height);
-        if (vid.con.width == cb->width)
-            memcpy(dest, src, vid.con.width);
+    for (int y = 0; y < Scr.con.height; y++, dest += Scr.con.width) {
+        src = cb->data + cb->width * (y * cb->height / Scr.con.height);
+        if (Scr.con.width == cb->width)
+            memcpy(dest, src, Scr.con.width);
         else {
             fixed16_t f = 0;
-            fixed16_t fstep = cb->width * FIXED16_ONE / vid.con.width;
-            for (int x = 0; x < vid.con.width; x += 4) {
+            fixed16_t fstep = cb->width * FIXED16_ONE / Scr.con.width;
+            for (int x = 0; x < Scr.con.width; x += 4) {
                 dest[x + 0] = src[FIXED16_TO_INT(f)];     f += fstep;
                 dest[x + 1] = src[FIXED16_TO_INT(f)];     f += fstep;
                 dest[x + 2] = src[FIXED16_TO_INT(f)];     f += fstep;

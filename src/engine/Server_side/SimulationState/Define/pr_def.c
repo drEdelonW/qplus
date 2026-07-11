@@ -57,7 +57,7 @@ void ED_ParseGlobals(cString data) {
         if (com.token[0] == '}')    break;
         if (!data)                  Host_SysError("ED_ParseEntity: EOF without closing brace");
 
-        name_t keyname;
+        nameStr_t keyname;
         strcpy(keyname, com.token);
 
         // parse value

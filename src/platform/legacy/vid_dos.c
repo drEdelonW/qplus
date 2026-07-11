@@ -463,10 +463,12 @@ D_BeginDirectRect
 */
 void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
 
-	if (!vid.direct || !pcurrentmode)
+	if (!Scr.direct || !pcurrentmode)
 		return;
 
-	if ((width > 24) || (height > 24) || (width < 1) || (height < 1))
+	if ((width > 24) || (height > 24) ||
+		(width < 1) || (height < 1)
+		)
 		return;
 
 	if (width & 0x03)
@@ -484,7 +486,7 @@ D_EndDirectRect
 */
 void D_EndDirectRect(int x, int y, int width, int height) {
 
-	if (!vid.direct || !pcurrentmode)
+	if (!Scr.direct || !pcurrentmode)
 		return;
 
 	if ((width > 24) || (height > 24) || (width < 1) || (height < 1))

@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "errno.h"
 #include "resource.h"
 #include "conproc.h"
+#include "VA.h"
 
 #define MINIMUM_WIN_MEMORY  0x0880000
 #define MAXIMUM_WIN_MEMORY  0x1000000

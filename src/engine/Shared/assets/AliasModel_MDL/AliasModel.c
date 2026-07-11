@@ -504,8 +504,8 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     for (int i = 0; i < numframes; i++) {
         AliasFrameType_t frametype = LittleLong(pframetype->type);
         switch (frametype) {
-        case ALIAS_SINGLE:  pframetype = Mod_LoadAliasFrame(pframetype + 1, &pHeader->frames[i]);   break;
-        case ALIAS_GROUP:   pframetype = Mod_LoadAliasGroup(pframetype + 1, &pHeader->frames[i]);   break;
+        case ALIAS_SINGLE:  pframetype = Mod_LoadAliasFrame((dAliasFrame_p)(pframetype + 1), &pHeader->frames[i]);   break;
+        case ALIAS_GROUP:   pframetype = Mod_LoadAliasGroup((dAliasGroup_p)(pframetype + 1), &pHeader->frames[i]);   break;
         default:            Host_Error(".MDL frametype[%d] [0x%X] UNKNOWN!\n", i, frametype);       break;
         }
     }

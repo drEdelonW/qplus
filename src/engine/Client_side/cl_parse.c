@@ -101,13 +101,12 @@ cString svc_strings[] = {
     This error checks and tracks the total number of entities
     ===============
 */
-#include "vid.h"    // vid.colormap
 r_Entity_p CL_EntityNum(EdIdx num) {
     if (num >= cl.num_entities) {
         if (num >= EdictMax)      Host_Error("CL_EntityNum: %i is an invalid number", num);
 
         while (cl.num_entities <= num) {
-            cl_entities[cl.num_entities].colormap = vid.colormap;
+            cl_entities[cl.num_entities].colormap = Scr.pColorMapPal;
             cl.num_entities++;
         }
     }
@@ -231,7 +230,7 @@ void CL_ParseServerInfo() {
     //
 
     // precache models
-    qPath_t model_precache[MAX_MODELS];
+    qPathStr_t model_precache[MAX_MODELS];
     memset(cl.model_precache, 0, sizeof(cl.model_precache));
     uint16_t nummodels;
     for (nummodels = 1; ; nummodels++) {
@@ -247,7 +246,7 @@ void CL_ParseServerInfo() {
     }
 
     // precache sounds
-    qPath_t sound_precache[MAX_SOUNDS];
+    qPathStr_t sound_precache[MAX_SOUNDS];
     memset(cl.sound_precache, 0, sizeof(cl.sound_precache));
     int numsounds;
     for (numsounds = 1; ; numsounds++) {
@@ -350,7 +349,7 @@ void CL_ParseUpdate(update_bits_t bits) {
     ent->frame = (bits & U_FRAME) ? MSG_ReadByte() : ent->baseline.frame;
     uint8_t i = (bits & U_COLORMAP) ? MSG_ReadByte() : (uint8_t)ent->baseline.colormap;
 
-    if (!i)     ent->colormap = vid.colormap;
+    if (!i)     ent->colormap = Scr.pColorMapPal;
     else {
         if (i > cl.maxclients)  Host_SysError("i >= cl.maxclients %d > %d", i, cl.maxclients);
 
@@ -477,10 +476,10 @@ void CL_NewTranslation(int32_t slot) {
         )   Host_SysError("CL_NewTranslation: bad slot %d (max %d)", slot, cl.maxclients);
 
 
-    cl.scores[slot].translations = *vid.colormap;
+    cl.scores[slot].translations = *Scr.pColorMapPal;
 
     qColor8_p dest = cl.scores[slot].translations.raw;  // TODO: rework next skin translation
-    qColor8_p source = vid.colormap->raw;
+    qColor8_p source = Scr.pColorMapPal->raw;
 
     int top = (cl.scores[slot].colors & 0xF0);       // tshort
     int bottom = (cl.scores[slot].colors & 0x0F) << 4;  // pents
@@ -520,7 +519,7 @@ void CL_ParseStatic() {
     // copy it to the current state
     ent->model = cl.model_precache[ent->baseline.modelindex];
     ent->frame = ent->baseline.frame;
-    ent->colormap = vid.colormap;
+    ent->colormap = Scr.pColorMapPal;
     ent->skinnum = ent->baseline.skin;
     ent->effects = ent->baseline.effects;
 
@@ -544,12 +543,18 @@ void CL_ParseStaticSound() {
 
 
 #define SHOWNET(x) if (cl_shownet.value == 2) { Con_Printf("%3i:%s\n", (getMsgReadCount() - 1), x);}
-
+static inline void ShowNet(cStringRO x) {
+    if (cl_shownet.value == 2)
+        Con_Printf("%3i:%s\n", (getMsgReadCount() - 1), x);
+}
 /*
     =====================
     CL_ParseServerMessage
     =====================
 */
+#ifdef _WIN32
+# include "vid.h"    // vid.colormap
+#endif
 void CL_ParseServerMessage() {
     // if recording demos, copy the message out
     /**/ if (cl_shownet.value == 1) Con_Printf("%i ", net_message.cursize);
@@ -564,18 +569,18 @@ void CL_ParseServerMessage() {
         svc_t cmd = MSG_ReadByte();
 
         if (getMsgBadRead()) {
-            SHOWNET("END OF MESSAGE");
+            ShowNet("END OF MESSAGE");
             return;  // end of message
         }
 
         // if the high bit of the command byte is set, it is a fast update
-        if (cmd & 0x80) {
-            SHOWNET("fast update");
-            CL_ParseUpdate(cmd & 0x7F);
-            continue;
+        if (cmd & svc_fastFlag) {
+            ShowNet("fast update");
+            CL_ParseUpdate(cmd & svc_fastMask);
+            continue; // while
         }
 
-        SHOWNET(svc_strings[cmd]);
+        ShowNet(svc_strings[cmd]);
 
         // other commands
         // int msg;

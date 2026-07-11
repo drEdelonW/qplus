@@ -174,7 +174,7 @@ void R_ClearParticles() {
 cString SV_GetName();   // TODO: adjust header inclusion
 
 void R_ReadPointFile_f() {
-    fsPath_t name;
+    fsPathStr_t name;
     snprintf(name, sizeof(name), "maps/%s.pts", SV_GetName());
 
     FILE* pntFile;

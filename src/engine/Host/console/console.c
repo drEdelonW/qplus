@@ -277,7 +277,7 @@ void Con_SafePrintf(cStringRO fmt, ...) {
     VaBuff_t msg;
     VA_EXPAND(msg, fmt);
 
-    int temp = Scr.disabled_for_loading; {
+    bool temp = Scr.disabled_for_loading; {
         Scr.disabled_for_loading = true;
         Con_Printf("%s", msg);
     } Scr.disabled_for_loading = temp;

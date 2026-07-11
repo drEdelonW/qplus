@@ -128,8 +128,8 @@ R_InitTurb
 */
 void R_InitTurb() {
     for (int i = 0; i < (SIN_BUFFER_SIZE); i++) {
-        sintable[i] = AMP + sin(i * 3.14159 * 2 / CYCLE) * AMP;
-        intsintable[i] = AMP2 + sin(i * 3.14159 * 2 / CYCLE) * AMP2; // AMP2, not 20
+        sintable[i] = AMP + sinf(i * 3.14159 * 2 / CYCLE) * AMP;
+        intsintable[i] = AMP2 + sinf(i * 3.14159 * 2 / CYCLE) * AMP2; // AMP2, not 20
     }
 }
 
@@ -381,7 +381,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
             (int32_t)R_Surf8Start,
             (int32_t)R_Surf8End - (int32_t)R_Surf8Start
         );
-        colormap = vid.colormap;
+        colormap = Scr.pColorMapPal;
         R_Surf8Patch();
     }
     else {
@@ -389,13 +389,13 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
             (int32_t)R_Surf16Start,
             (int32_t)R_Surf16End - (int32_t)R_Surf16Start
         );
-        colormap = vid.colormap16;
+        colormap = Scr.pColorMap16;
         R_Surf16Patch();
     }
 #endif // id386
 
     D_ViewChanged();
-    }
+}
 
 
 /*
@@ -746,13 +746,11 @@ void R_EdgeDrawing() {
 
     R_BeginEdgeFrame();
 
-    if (r_dspeeds.value) {
+    if (r_dspeeds.value)
         rw_time1 = Host_FloatTime();
-    }
 
-    if (r_drawworld.value) {
+    if (r_drawworld.value)
         R_RenderWorld();
-    }
 
     if (r_drawculledpolys)
         R_ScanEdges();
@@ -772,9 +770,8 @@ void R_EdgeDrawing() {
         se_time1 = db_time2;
     }
 
-    if (!r_dspeeds.value) {
-        VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); // don't let sound get messed up if going slow
-    }
+    if (!r_dspeeds.value)
+        S_ExtraUpdateBUL(); // don't let sound get messed up if going slow
 
     if (!(r_drawpolys | r_drawculledpolys))
         R_ScanEdges();
@@ -846,9 +843,9 @@ void R_RenderView_() {
     if (!cl_entities[0].model || !cl.worldmodel)
         Host_SysError("R_RenderView: NULL worldmodel");
 
-    if (!r_dspeeds.value) { VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); } // don't let sound get messed up if going slow
+    if (!r_dspeeds.value)   S_ExtraUpdateBUL(); // don't let sound get messed up if going slow
     R_EdgeDrawing();
-    if (!r_dspeeds.value) { VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer(); } // don't let sound get messed up if going slow
+    if (!r_dspeeds.value)   S_ExtraUpdateBUL(); // don't let sound get messed up if going slow
 
 
     if (r_dspeeds.value) {

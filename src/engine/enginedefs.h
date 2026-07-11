@@ -1,11 +1,15 @@
 #pragma once
 
 #include "platformdefs.h"
-typedef char fsPath_t[MAX_OSPATH];   // filesystem pathname
-typedef char qPath_t[MAX_QPATH];     // quake game pathname
+typedef char fsPathStr_t[MAX_OSPATH];   // filesystem pathname
+
+typedef char qPathStr_t[MAX_QPATH];     // quake game pathname
 
 #define NAME_LENGTH         64
-typedef char name_t[NAME_LENGTH];
+typedef char nameStr_t[NAME_LENGTH];
+
+#define	MAX_STYLESTRING	64
+typedef char styleStr_t[MAX_STYLESTRING];
 
 //
 // per-level limits
@@ -13,10 +17,6 @@ typedef char name_t[NAME_LENGTH];
 
 #define MAX_LIGHTSTYLES     64
 #define MAX_MODELS          256   /* these are sent over the net as bytes */
-
-
-#define MAX_SCOREBOARD      16
-#define MAX_SCOREBOARDNAME  32
 
 #define MAX_FILES_IN_PACK   2048
 

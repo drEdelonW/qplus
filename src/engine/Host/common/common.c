@@ -316,12 +316,12 @@ int32_t memsearch(uint8_p start, int32_t count, int32_t search) {
 }
 
 
-fsPath_t com_cachedir;
+fsPathStr_t com_cachedir;
 
 typedef struct searchpath_s searchpath_t;
 typedef searchpath_t* searchpath_p;
 struct searchpath_s {
-    fsPath_t    filename;
+    fsPathStr_t    filename;
     pack_p       pack;   // only one of filename / pack will be used
     searchpath_p next;
 };
@@ -350,7 +350,7 @@ The filename will be prefixed by the current game directory
 ============
 */
 void COM_WriteFile(cStringRO filename, TypeLess_ptr data, size_t len) {
-    fsPath_t name;
+    fsPathStr_t name;
     snprintf(name, sizeof(name), "%s/%s", com.gamedir, filename);
 
     int handle = Sys_FileOpenWrite(name);
@@ -467,7 +467,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
                     continue;
             }
 
-            fsPath_t netpath;
+            fsPathStr_t netpath;
             snprintf(netpath, sizeof(netpath), "%s/%s", search->filename, filename);
 
             int findtime = Sys_FileTime(netpath);
@@ -475,7 +475,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
                 continue;
 
             // see if the file needs to be updated in the cache
-            fsPath_t cachepath;
+            fsPathStr_t cachepath;
             if (!com_cachedir[0])
                 strcpy(cachepath, netpath);
             else {
@@ -655,7 +655,7 @@ void COM_AddGameDirectory(cStringRO dir) {
     // add any pak files in the format pak0.pak pak1.pak, ...
     //
     for (int i = 0; ; i++) {
-        fsPath_t pakfile;
+        fsPathStr_t pakfile;
         snprintf(pakfile, sizeof(pakfile), "%s/pak%i.pak", dir, i);
         pack_p pak = COM_LoadPackFile(pakfile);
         if (!pak)
@@ -678,7 +678,7 @@ COM_InitFilesystem
 ================
 */
 void COM_InitFilesystem() {
-    static fsPath_t _baseDir;
+    static fsPathStr_t _baseDir;
 
     //
     // -basedir <path>

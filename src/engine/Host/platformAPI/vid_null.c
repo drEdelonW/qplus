@@ -40,19 +40,10 @@ VidDef_t vid = {    // global video state
             .pClr       = _vidBuf,
             .rowBytes   = BASEWIDTH,
         },
-        .con = {
-            .width      = BASEWIDTH,
-            .height     = BASEHEIGHT,
-            .pClr       = _vidBuf,
-            .rowBytes   = BASEWIDTH,
-        },
         .maxwarp = {
             .width  = BASEWIDTH,
             .height = BASEHEIGHT
         },
-
-        .direct     = NULL,
-        // .numpages   = 1,
     };
 
 
@@ -64,8 +55,7 @@ __weak void VID_Update(vRect_p rects) {}
 __weak void VID_Shutdown() {}
 __weak void VID_Init(qPal_p palette) {
 #ifndef GLQUAKE
-    vid.colormap = host_colormap;
-
+    Scr.pColorMapPal = host_colormap;
     vid.zBuff.pZBuff = _zBuf;
     D_InitCaches((SurfCache_p)_surfCache, sizeof(_surfCache));
 #endif

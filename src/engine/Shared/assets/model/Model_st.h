@@ -50,7 +50,7 @@ typedef enum {
 } ModType_t;
 
 struct Model_s {
-    qPath_t     name;
+    qPathStr_t     name;
     NeedLoad_t  needload;   // bmodels and sprites don't cache normally
     ModType_t   type;       // kind of content
     int32_t     numframes;

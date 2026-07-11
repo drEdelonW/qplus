@@ -90,7 +90,7 @@ void SCR_ScreenShot_f() {
         pcxname[5] = (i / 10) + '0';
         pcxname[6] = (i % 10) + '0';
 
-        fsPath_t checkname;
+        fsPathStr_t checkname;
         snprintf(checkname, sizeof(checkname), "%s/%s", com.gamedir, pcxname);
         if (Sys_FileTime(checkname) == -1) {     // save the pcx file
             D_EnableBackBufferAccess(); // enable direct drawing of console to back
@@ -135,7 +135,7 @@ void SCR_UpdateScreen() {
 
     if (Scr.numpages > 1) {
         Scr.vrect.pBuff = vid.frameBuff.pBuff;
-        vid.con.pBuff = Scr.vrect.pBuff;
+        Scr.con.pBuff = Scr.vrect.pBuff;
     }
 
     Scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing
@@ -237,10 +237,10 @@ void SCR_UpdateScreen() {
 
 /*
 ==================
-SCR_UpdateWholeScreen
+SCR_InstantUpdateScreen
 ==================
 */
-void SCR_UpdateWholeScreen() {
+void SCR_InstantUpdateScreen() {
     SCR_RequestRedraw();
     SCR_UpdateScreen();
 }

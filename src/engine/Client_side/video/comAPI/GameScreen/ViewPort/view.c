@@ -675,7 +675,6 @@ V_CalcRefdef
 
 ==================
 */
-#include "vid.h"    // vid.colormap
 void V_CalcRefdef() {
     static float _oldZ = 0.f;
 
@@ -744,7 +743,7 @@ void V_CalcRefdef() {
 
     view->model = cl.model_precache[cl.stats[STAT_WEAPON]];
     view->frame = cl.stats[STAT_WEAPONFRAME];
-    view->colormap = vid.colormap;
+    view->colormap = Scr.pColorMapPal;
 
     // set up the refresh position
     r_refdef.view.facing = AngleAdd(r_refdef.view.facing, cl.punchangle);
@@ -805,30 +804,26 @@ void V_RenderView() {
         //
         // render two interleaved views
         //
-
         Scr.vrect.rowBytes = TWICE(Scr.vrect.rowBytes);
         Scr.vpAspect *= 0.5f;
 
         r_refdef.view.facing.yaw -= lcd_yaw.value;
         r_refdef.view.spot = VectorMA(r_refdef.view.spot, -lcd_x.value, _bs.right);
         R_RenderView();
-        vid.frameBuff.pBuff += HALF(Scr.vrect.rowBytes);
-
-        R_PushDlights();
-
-        r_refdef.view.facing.yaw += lcd_yaw.value * 2.0f;
-
-        r_refdef.view.spot = VectorMA(r_refdef.view.spot, lcd_x.value * 2.0f, _bs.right);
-        R_RenderView();
-        vid.frameBuff.pBuff -= HALF(Scr.vrect.rowBytes);
-
+        Scr.vrect.pBuff += HALF(Scr.vrect.rowBytes); {    // TODO: danger operation with source pointer
+            R_PushDlights();
+            r_refdef.view.facing.yaw += lcd_yaw.value * 2.0f;
+            r_refdef.view.spot = VectorMA(r_refdef.view.spot, lcd_x.value * 2.0f, _bs.right);
+            R_RenderView();
+        } Scr.vrect.pBuff -= HALF(Scr.vrect.rowBytes);
         r_refdef.vrect.height = TWICE(r_refdef.vrect.height);
-
         Scr.vrect.rowBytes = HALF(Scr.vrect.rowBytes);
         Scr.vpAspect *= 2.f;
     }
-    else
+#else
+    if (false) {}
 #endif
+    else
         R_RenderView();
 
     HUD_crosshair();

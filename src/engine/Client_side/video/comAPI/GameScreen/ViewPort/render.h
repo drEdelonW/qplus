@@ -20,11 +20,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 // refresh.h -- public interface to refresh functions
+#include "screen.h"
 #include "model_effect.h"   // RocketTrailType
 #include "transform.h"
 #include "rEntity.h"
 #include "Texture_pre.h"
-#include "render.h"
+#include "view.h"
 
 //=============================================================================
 

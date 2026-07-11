@@ -260,7 +260,7 @@ cString suf[6] = {
 void R_LoadSkys() {
     for (int i = 0; i < 6; i++) {
         GL_Bind(SKY_TEX + i);
-        name_t name; snprintf(name, sizeof(name), "gfx/env/bkgtst%s.tga", suf[i]);
+        nameStr_t name; snprintf(name, sizeof(name), "gfx/env/bkgtst%s.tga", suf[i]);
         FILE* f; COM_FOpenFile(name, &f);
         if (!f) {
             Con_Printf("Couldn't load %s\n", name);

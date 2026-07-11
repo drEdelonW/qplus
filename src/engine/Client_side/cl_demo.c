@@ -230,7 +230,7 @@ void CL_Record_f() {
     else
         track = -1;
 
-    fsPath_t name;
+    fsPathStr_t name;
     snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
 
     //

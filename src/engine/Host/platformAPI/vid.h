@@ -37,25 +37,15 @@ void VID_UnlockBuffer();
 #endif
 // a pixel can be one, two, or four bytes
 #include "vRect.h"
-#include "qColor.h"
-#include "qLight.h"
 
 #define WARP_WIDTH  (320)
 #define WARP_HEIGHT (200)
 // static  qColor8_t _warpBuffer[WARP_WIDTH * WARP_HEIGHT]; // r_main.c
 
 typedef struct {
-    #warning TODO: move  [ColorMap_p colormap;]  to screen
-    ColorMap_p  colormap;       // 256 * VID_GRADES size   
-#if 1 /* TODO: not useful? */
-    qColor16_p  colormap16;     // 256 * VID_GRADES size // TODO: check is ot not used?
-#endif
     vRect_t frameBuff;      // invisible buffer inside pBuff
-    vRect_t con;
     vRect_t maxwarp;        // SoftRender WarpEffect buffer
     vRect_t zBuff;
-
-    qColor8_p direct;     // direct drawing to framebuffer, if not NULL
 } VidDef_t;
 typedef VidDef_t* VidDef_p;
 

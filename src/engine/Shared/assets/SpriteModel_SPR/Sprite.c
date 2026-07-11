@@ -55,7 +55,7 @@ TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_p* ppframe, int 
     pspriteframe->left = origin[X_AX];
     pspriteframe->right = origin[X_AX] + width;
 
-    name_t name; snprintf(name, sizeof(name), "%s_%i", _loadModel->name, framenum);               //
+    nameStr_t name; snprintf(name, sizeof(name), "%s_%i", _loadModel->name, framenum);               //
     pspriteframe->gl_texturenum = GL_LoadTexture(
         name,
         width, height,

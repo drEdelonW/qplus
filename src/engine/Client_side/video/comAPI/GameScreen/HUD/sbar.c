@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // sbar.c -- status bar code
 
-// #include "sbar.h"
+#include "sbar.h"
 #include "qPic.h"
 #include "gamedefs.h"
 #include "cvar_q1.h"
@@ -37,7 +37,6 @@ int     sb_lines;   // scan lines to draw
 #define STAT_MINUS  10 // num frame for '-' stats digit
 
 typedef struct {
-    int     updates;  // if >= Scr.numpages, no update needed
     qPic_p  nums[2][11];
     qPic_p  colon;
     qPic_p  slash;
@@ -59,7 +58,6 @@ typedef struct {
         qPic_p  invuln;
         qPic_p  invis_invuln;
     } face;
-    bool    showscores;
 } sBar_t;
 static sBar_t _sb;
 
@@ -92,10 +90,11 @@ void M_DrawPic(int x, int y, qPic_p pic);
     Tab key down
     ===============
 */
+static bool _showScores = false;
 void Sbar_ShowScores() {
-    if (_sb.showscores)  return;
-    _sb.showscores = true;
-    _sb.updates = 0;
+    if (_showScores)  return;
+    _showScores = true;
+    Sbar_Changed();
 }
 
 /*
@@ -106,17 +105,8 @@ void Sbar_ShowScores() {
     ===============
 */
 void Sbar_DontShowScores() {
-    _sb.showscores = false;
-    _sb.updates = 0;
-}
-
-/*
-    ===============
-    Sbar_Changed
-    ===============
-*/
-void Sbar_Changed() {
-    _sb.updates = 0; // update next frame
+    _showScores = false;
+    Sbar_Changed();
 }
 
 /*
@@ -551,7 +541,7 @@ void Sbar_DrawInventory() {
             Sbar_DrawPic(i * 24, -16, _sb.weapons[flashon][i]);
 
             if (flashon > 1)
-                _sb.updates = 0; // force update to remove flash
+                Sbar_Changed(); // force update to remove flash
         }
     }
 
@@ -590,7 +580,7 @@ void Sbar_DrawInventory() {
                 }
                 else    Sbar_DrawPic(176 + (i * 24), -16, hsb_weapons[flashon][i]);
                 if (flashon > 1)
-                    _sb.updates = 0; // force update to remove flash
+                    Sbar_Changed(); // force update to remove flash
             }
         }
     }
@@ -617,7 +607,7 @@ void Sbar_DrawInventory() {
         if (cl.items & (1 << (17 + i))) {
             LegDt_t time = cl.item_gettime[17 + i];
             if (time && (time > (GetClSimTime() - 2)) && flashon)   // flash frame
-                _sb.updates = 0;
+                Sbar_Changed();
             else
                 //MED 01/04/97 changed keys
                 if (!hipnotic || (i > 1))
@@ -625,7 +615,7 @@ void Sbar_DrawInventory() {
 
 
             if (time && (time > (GetClSimTime() - 2)))
-                _sb.updates = 0;
+                Sbar_Changed();
         }
     //MED 01/04/97 added hipnotic items
     // hipnotic items
@@ -634,11 +624,11 @@ void Sbar_DrawInventory() {
             if (cl.items & (1 << (24 + i))) {
                 LegDt_t time = cl.item_gettime[24 + i];
                 if (time && (time > (GetClSimTime() - 2)) && flashon)   // flash frame
-                    _sb.updates = 0;
+                    Sbar_Changed();
                 else    Sbar_DrawPic(288 + MUL16(i), -16, hsb_items[i]);
 
                 if (time && (time > (GetClSimTime() - 2)))
-                    _sb.updates = 0;
+                    Sbar_Changed();
             }
     }
 
@@ -648,11 +638,11 @@ void Sbar_DrawInventory() {
             if (cl.items & (1 << (29 + i))) {
                 LegDt_t time = cl.item_gettime[29 + i];
                 if (time && (time > (GetClSimTime() - 2)) && flashon)  // flash frame
-                    _sb.updates = 0;
+                    Sbar_Changed();
                 else    Sbar_DrawPic(288 + MUL16(i), -16, rsb_items[i]);
 
                 if (time && (time > (GetClSimTime() - 2)))
-                    _sb.updates = 0;
+                    Sbar_Changed();
             }
         }
     }
@@ -662,11 +652,11 @@ void Sbar_DrawInventory() {
             if (cl.items & (1 << (28 + i))) {
                 LegDt_t time = cl.item_gettime[28 + i];
                 if (time && (time > (GetClSimTime() - 2)) && flashon)  // flash frame
-                    _sb.updates = 0;
+                    Sbar_Changed();
                 else    Sbar_DrawPic(320 - 32 + MUL8(i), -16, _sb.sigil[i]);
 
                 if (time && (time > (GetClSimTime() - 2)))
-                    _sb.updates = 0;
+                    Sbar_Changed();
             }
         }
     }
@@ -790,9 +780,20 @@ void Sbar_DrawFace() {
 
     bool anim = (GetClSimTime() <= cl.faceanimtime);
     if (anim)
-        _sb.updates = 0;  // make sure the anim gets drawn over
+        Sbar_Changed();  // make sure the anim gets drawn over
 
     Sbar_DrawPic(112, 0, _sb.faces[f][anim]);
+}
+
+
+/*
+    ===============
+    Sbar_Changed
+    ===============
+*/
+static int _sbUpdates = 0;  // if >= Scr.numpages, no update needed
+void Sbar_Changed() {
+    _sbUpdates = 0; // update next frame
 }
 
 /*
@@ -802,12 +803,12 @@ Sbar_Draw
 */
 void Sbar_Draw() {
     if ((Scr.con_current == Scr.vrect.height) || // console is full screen
-        (_sb.updates >= Scr.numpages)
+        (_sbUpdates >= Scr.numpages)
         )   return;
 
     Scr.copyeverything = true;
 
-    _sb.updates++;
+    _sbUpdates++;
 
     if (sb_lines &&
         (Scr.vrect.width > 320)
@@ -820,12 +821,12 @@ void Sbar_Draw() {
             Sbar_DrawFrags();
     }
 
-    if (_sb.showscores ||
+    if (_showScores ||
         (cl.stats[STAT_HEALTH] <= 0)
         ) {
         Sbar_DrawPic(0, 0, _sb.scorebar);
         Sbar_DrawScoreboard();
-        _sb.updates = 0;
+        Sbar_Changed();
     }
     else if (sb_lines) {
         Sbar_DrawPic(0, 0, _sb.sbar);

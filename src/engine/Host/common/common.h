@@ -41,7 +41,7 @@ typedef struct {
     int32_t filesize;
     char    cmdline[CMDLINE_LENGTH]; // private
     char    token[1024];
-    fsPath_t    gamedir;
+    fsPathStr_t    gamedir;
 } common_t;
 
 extern common_t com;

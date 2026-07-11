@@ -21,15 +21,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // screen.h
 
 /*  Screen layout concept
- * vid      (platform specific graphic environment)
- * └── screen   (layer compositor)
- *     ├── render viewport  (back layer)
- *     ├── HUD              (overlay viewport)
+ * vid      (platform specific graphic environment) <- "vid.h"
+ * └── screen   (layer compositor)                  <- "Screen.h"
+ *     ├── render viewport  (back layer)            <- "render.h", "View.h"
+ *     ├── HUD              (overlay viewport)      <- "hud.h"
  *     │   ├── crosshair    (center of viewport)
- *     │   ├── sbar         (bottom)
+ *     │   ├── sbar         (bottom)                <- "sbar.h"
  *     │   ├── status msgs  (top left corner)
  *     │   └── sys icons    (top right corner)
- *     ├── menu            (front layer)
+ *     ├── menu            (front layer)            <- "menu.h"
  *     └── echo console    (top layer, full/half screen)
  *
  *  +--echo console (full / half screen)-----------+
@@ -45,20 +45,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #include "types.h"
-#include "vRect.h"
 #include "qTime.h"
+#include "vRect.h"
+#include "qColor.h"
+#include "qLight.h"
 
 #define BASEWIDTH  (320)
 #define BASEHEIGHT (200)
 
  // only the refresh window will be updated unless these variables are flagged
 typedef struct {
-    vRect_t vrect;      // screen size rectangle
+    vRect_t vrect;      // Whole screen size rectangle
     int numpages;
+    qColor8_p direct;   // direct drawing to framebuffer, if not NULL
 
-    LegDt_t centertime_off;
+    vRect_t con;        // Console size rectangle
     int con_current;
     int conlines;       // lines of console to display
+
+    ColorMap_p  pColorMapPal;   // 256 * VID_GRADES size   
+#if 1 /* TODO: not useful? */
+    qColor16_p  pColorMap16;     // 256 * VID_GRADES size // TODO: check is ot not used?
+#endif
+
+
+    LegDt_t centertime_off; // TODO: wrap it {Scr.centertime_off = 0;}
 
     int clearnotify;    // set to 0 whenever notify text is drawn
 #if 1   /* this specific for software render. not applicable for OpenGL */
@@ -83,7 +94,7 @@ extern "C" {
     void SCR_Init();
     void SCR_UpdateScreen();
     void SCR_RequestRedraw();
-    void SCR_UpdateWholeScreen();   // INFO: Win VID specific
+    void SCR_InstantUpdateScreen();   // INFO: Win VID specific
     void SCR_CenterPrint(cString str);
     void SCR_BeginLoadingPlaque();
     void SCR_EndLoadingPlaque();

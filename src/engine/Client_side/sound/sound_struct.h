@@ -11,7 +11,7 @@ typedef struct {
 } portable_samplepair_t;
 
 typedef struct sfx_s {
-    qPath_t     name;
+    qPathStr_t     name;
     CacheUser_t cache;
 } sfx_t;
 typedef sfx_t* sfx_p;

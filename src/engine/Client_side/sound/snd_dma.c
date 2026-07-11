@@ -721,6 +721,14 @@ void GetSoundtime() {
     soundtime = _buffers * fullsamples + samplepos / shm->channels;
 #endif
 }
+
+
+#include "vid.h"    // VID_UnlockBuffer() VID_LockBuffer()
+void S_ExtraUpdateBUL() {
+    VID_UnlockBuffer();
+    S_ExtraUpdate();
+    VID_LockBuffer();
+}
 #ifdef _WIN32
 void IN_Accumulate();
 #endif
@@ -768,7 +776,7 @@ void S_Update_() {
             if (!(dwStatus & DSBSTATUS_PLAYING))
                 pDSBuf->lpVtbl->Play(pDSBuf, 0, 0, DSBPLAY_LOOPING);
         }
-    }
+}
 #endif
 
     S_PaintChannels(endtime);

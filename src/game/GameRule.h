@@ -1,6 +1,9 @@
 #pragma once
 #include "types.h"
 
+#define MAX_SCOREBOARD      16
+#define MAX_SCOREBOARDNAME  32
+
 typedef enum {
     SkEasy      = 0,
     SkMedium    = 1,

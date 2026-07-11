@@ -573,7 +573,7 @@ void VID_Init(uint8_p palette) {
     Cvar_RegisterVariable(&vid_waitforrefresh);
     Cvar_RegisterVariable(&gl_ztrick);
 
-    vid.colormap = host_colormap;
+    Scr.pColorMapPal = host_colormap;
 
     // interpret command-line params
 
@@ -583,17 +583,17 @@ void VID_Init(uint8_p palette) {
     if ((i = COM_CheckParm("-width")) != 0)     width = atoi(com.argv[i + 1]);
     if ((i = COM_CheckParm("-height")) != 0)    height = atoi(com.argv[i + 1]);
 
-    if ((i = COM_CheckParm("-conwidth")) != 0)  vid.con.width = Q_atoi(com.argv[i + 1]);
-    else                                        vid.con.width = 640;
+    if ((i = COM_CheckParm("-conwidth")) != 0)  Scr.con.width = Q_atoi(com.argv[i + 1]);
+    else                                        Scr.con.width = 640;
 
-    vid.con.width &= 0xfff8; // make it a multiple of eight
-    ClampLessThen(&vid.con.width, 320);
+    Scr.con.width &= 0xfff8; // make it a multiple of eight
+    ClampLessThen(&Scr.con.width, 320);
 
     // pick a conheight that matches with correct aspect
-    vid.con.height = vid.con.width * 3 / 4;
+    Scr.con.height = Scr.con.width * 3 / 4;
 
-    if ((i = COM_CheckParm("-conheight")) != 0)     vid.con.height = Q_atoi(com.argv[i + 1]);
-    ClampLessThen(&vid.con.height, 200);
+    if ((i = COM_CheckParm("-conheight")) != 0)     Scr.con.height = Q_atoi(com.argv[i + 1]);
+    ClampLessThen(&Scr.con.height, 200);
 
     GLint attribs[32] = {   // set vid parameters
         FXMESA_DOUBLEBUFFER,
@@ -612,16 +612,16 @@ void VID_Init(uint8_p palette) {
 
     fxMesaMakeCurrent(_fc);
 
-    ClampMoreThen(&vid.con.height, height);
-    ClampMoreThen(&vid.con.width, width);
-    Scr.vrect.width = vid.con.width;
-    Scr.vrect.height = vid.con.height;
+    ClampMoreThen(&Scr.con.height, height);
+    ClampMoreThen(&Scr.con.width, width);
+    Scr.vrect.width = Scr.con.width;
+    Scr.vrect.height = Scr.con.height;
     scr.vpAspect = calcAspectRect(&vid.frameBuff);
     Scr.numpages = 2;
 
     GL_Init();
 
-    fsPath_t gldir;
+    fsPathStr_t gldir;
     snprintf(gldir, sizeof(gldir), "%s/glquake", com.gamedir);
     Sys_mkdir(gldir);
 

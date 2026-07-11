@@ -512,7 +512,7 @@ void    VID_Init(uint8_p palette) {
     Scr.vrect.height = 200;
     // scr.aspect = 1.0; calcAspectRect(&Scr.vrect);
     Scr.numpages = 2;
-    vid.colormap = host_colormap;
+    Scr.pColorMapPal = host_colormap;
 
     srandom(getpid());
 
@@ -701,10 +701,10 @@ void    VID_Init(uint8_p palette) {
     current_framebuffer = false;
     vid.rowBytes = x_framebuffer[0]->bytes_per_line;
     Scr.vrect.pBuff = x_framebuffer[0]->data;
-    vid.con.pBuff = x_framebuffer[0]->data;
-    vid.con.rowBytes = vid.rowBytes;
-    vid.con.width = Scr.vrect.width;
-    vid.con.height = Scr.vrect.height;
+    Scr.con.pBuff = x_framebuffer[0]->data;
+    Scr.con.rowBytes = vid.rowBytes;
+    Scr.con.width = Scr.vrect.width;
+    Scr.con.height = Scr.vrect.height;
 
     D_InitCaches(surfcache, sizeof(surfcache));
 
@@ -756,7 +756,7 @@ void    VID_Shutdown() {
 }
 
 keycode_t XLateKey(XKeyEvent* ev) {
-    name_t buf;
+    nameStr_t buf;
     KeySym keysym;
     XLookupString(ev, buf, sizeof buf, &keysym, 0);
 
@@ -949,10 +949,10 @@ void    VID_Update(vRect_p rects) {
 
         vid.rowBytes = x_framebuffer[0]->bytes_per_line;
         Scr.vrect.pBuff = x_framebuffer[current_framebuffer]->data;
-        vid.con.pBuff = Scr.vrect.pBuff;
-        vid.con.width = Scr.vrect.width;
-        vid.con.height = Scr.vrect.height;
-        vid.con.rowBytes = vid.rowBytes;
+        Scr.con.pBuff = Scr.vrect.pBuff;
+        Scr.con.width = Scr.vrect.width;
+        Scr.con.height = Scr.vrect.height;
+        Scr.con.rowBytes = vid.rowBytes;
 
         SCR_RequestCalcRefdef();                // force a surface cache flush
         return;
@@ -992,7 +992,7 @@ void    VID_Update(vRect_p rects) {
         //        printf("%lf\n", (LegTime_t)(gethrtime()-s)/1.0e9);
         current_framebuffer = !current_framebuffer;
         Scr.vrect.pBuff = x_framebuffer[current_framebuffer]->data;
-        vid.con.pBuff = Scr.vrect.pBuff;
+        Scr.con.pBuff = Scr.vrect.pBuff;
         XSync(x_disp, False);
 
     }

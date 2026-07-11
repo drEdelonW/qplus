@@ -18,12 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-// draw.c -- this is the only file outside the refresh that touches the
-// vid buffer
+// draw.c -- this is the only file outside the refresh that touches the vid buffer
 
 #include "draw.h"
 #include "screen.h"
-#include "vid.h"    // vid.con.pBuff VID_UnlockBuffer()
 #include "enginedefs.h"
 #include "zone.h"
 #include <string.h>
@@ -69,7 +67,7 @@ void Draw_Init() {
 /* Support Routines */
 
 typedef struct CachePic_s {
-    qPath_t     name;
+    qPathStr_t     name;
     CacheUser_t cache;
 } CachePic_t;
 typedef CachePic_t* CachePic_p;
@@ -160,7 +158,7 @@ void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
 
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = vid.con.pClr + (y * vid.con.rowBytes) + x;
+        qColor8_p dest = Scr.con.pClr + (y * Scr.con.rowBytes) + x;
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
@@ -168,13 +166,13 @@ void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
                     dest[i] = source[i];
 
             source += 128;
-            dest += vid.con.rowBytes;
+            dest += Scr.con.rowBytes;
         }
     }
     else {
         // FIXME: pre-expand to native format?
-        ptrdiff_t row16Byte = DIV2(vid.con.rowBytes);
-        Rgb16_p pusdest = (Rgb16_p)vid.con.pClr + (y * row16Byte) + x;
+        ptrdiff_t row16Byte = DIV2(Scr.con.rowBytes);
+        Rgb16_p pusdest = (Rgb16_p)Scr.con.pClr + (y * row16Byte) + x;
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
@@ -209,8 +207,9 @@ This is for debugging lockups by drawing different chars in different parts
 of the code.
 ================
 */
+
 void Draw_DebugChar(ConsoleSymbols_t symb) {
-    if (!vid.direct)
+    if (!Scr.direct)
         return;  // don't have direct FB access, so no debugchars...
 
     int drawline = 8;
@@ -219,7 +218,7 @@ void Draw_DebugChar(ConsoleSymbols_t symb) {
     int col = num & 15;
     qColor8_p source = pDrawChars + (row << 10) + (col << 3);
 
-    qColor8_p dest = vid.direct + 312;
+    qColor8_p dest = Scr.direct + 312;
 
     while (drawline--) {
         for (int i = 0; i < 8; i++)
@@ -448,17 +447,17 @@ void Draw_ConsoleBackground(int lines) {
 
     // draw the pic
     if (r_pixbytes == 1) {
-        dest = vid.con.pClr;
+        dest = Scr.con.pClr;
 
-        for (int y = 0; y < lines; y++, dest += vid.con.rowBytes) {
-            int v = (vid.con.height - lines + y) * 200 / vid.con.height;
+        for (int y = 0; y < lines; y++, dest += Scr.con.rowBytes) {
+            int v = (Scr.con.height - lines + y) * 200 / Scr.con.height;
             qColor8_p src = conback->data + v * 320;
-            if (vid.con.width == 320)
-                memcpy(dest, src, vid.con.width);
+            if (Scr.con.width == 320)
+                memcpy(dest, src, Scr.con.width);
             else {
                 fixed16_t f = 0;
-                fixed16_t fstep = 320 * FIXED16_ONE / vid.con.width;
-                for (int x = 0; x < vid.con.width; x += 4) {
+                fixed16_t fstep = 320 * FIXED16_ONE / Scr.con.width;
+                for (int x = 0; x < Scr.con.width; x += 4) {
                     dest[x + 0] = src[FIXED16_TO_INT(f)];     f += fstep;
                     dest[x + 1] = src[FIXED16_TO_INT(f)];     f += fstep;
                     dest[x + 2] = src[FIXED16_TO_INT(f)];     f += fstep;
@@ -468,16 +467,16 @@ void Draw_ConsoleBackground(int lines) {
         }
     }
     else {
-        uint16_p pusdest = (uint16_p)vid.con.pBuff;
+        uint16_p pusdest = (uint16_p)Scr.con.pBuff;
 
-        for (int y = 0; y < lines; y++, pusdest += HALF(vid.con.rowBytes)) {
+        for (int y = 0; y < lines; y++, pusdest += HALF(Scr.con.rowBytes)) {
             // FIXME: pre-expand to native format?
             // FIXME: does the endian switching go away in production?
-            int v = (vid.con.height - lines + y) * 200 / vid.con.height;
+            int v = (Scr.con.height - lines + y) * 200 / Scr.con.height;
             qColor8_p src = conback->data + v * 320;
             fixed16_t f = 0;
-            fixed16_t fstep = 320 * FIXED16_ONE / vid.con.width;
-            for (int x = 0; x < vid.con.width; x += 4) {
+            fixed16_t fstep = 320 * FIXED16_ONE / Scr.con.width;
+            for (int x = 0; x < Scr.con.width; x += 4) {
                 pusdest[x + 0] = d_8to16table[src[FIXED16_TO_INT(f)].i];  f += fstep;
                 pusdest[x + 1] = d_8to16table[src[FIXED16_TO_INT(f)].i];  f += fstep;
                 pusdest[x + 2] = d_8to16table[src[FIXED16_TO_INT(f)].i];  f += fstep;
@@ -663,7 +662,7 @@ Draw_FadeScreen
 */
 void Draw_FadeScreen() {
     if (!Scr.vrect.pBuff)   return;
-    VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
+    S_ExtraUpdateBUL();
 
     for (int y = 0; y < Scr.vrect.height; y++) {
         uint8_p pbuf = (uint8_p)(Scr.vrect.pBuff + Scr.vrect.rowBytes * y);
@@ -674,7 +673,7 @@ void Draw_FadeScreen() {
                 pbuf[x] = 0;
     }
 
-    VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
+    S_ExtraUpdateBUL();
 }
 
 //=============================================================================

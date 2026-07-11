@@ -278,7 +278,7 @@ void ResetFrameBuffer() {
         Sys_Error("VID: XCreateImage failed\n");
 
     vid.frameBuff.pBuff = (uint8_p)(x_framebuffer[0]);
-    vid.con.pBuff = vid.frameBuff.pBuff;
+    Scr.con.pBuff = vid.frameBuff.pBuff;
 
 }
 
@@ -370,7 +370,7 @@ void ResetSharedFrameBuffers() {
 void VID_Init(qPal_p palette) {
     vid.frameBuff.width = BASEWIDTH;
     vid.frameBuff.height = BASEHEIGHT;
-    vid.colormap = host_colormap;
+    Scr.pColorMapPal = host_colormap;
     Scr.numpages = 2;
 
     srandom(getpid());
@@ -561,11 +561,10 @@ void VID_Init(qPal_p palette) {
     current_framebuffer = false;
     vid.frameBuff.rowBytes = x_framebuffer[current_framebuffer]->bytes_per_line;
     vid.frameBuff.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
-    vid.direct = NULL;
-    vid.con.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
-    vid.con.rowBytes = vid.frameBuff.rowBytes;
-    vid.con.width = vid.frameBuff.width;
-    vid.con.height = vid.frameBuff.height;
+    Scr.con.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
+    Scr.con.rowBytes = vid.frameBuff.rowBytes;
+    Scr.con.width = vid.frameBuff.width;
+    Scr.con.height = vid.frameBuff.height;
     // Scr.vpAspect = calcAspectRect(&vid.frameBuff);
 
     // XSynchronize(x_disp, False);
@@ -656,10 +655,10 @@ void VID_Update(vRect_p p_rects) {
 
         Scr.vrect.rowBytes = x_framebuffer[0]->bytes_per_line;
         vid.frameBuff.pBuff = (uint8_p)x_framebuffer[current_framebuffer]->data;
-        vid.con.pBuff = vid.frameBuff.pBuff;
-        vid.con.width = vid.frameBuff.width;
-        vid.con.height = vid.frameBuff.height;
-        vid.con.rowBytes = Scr.vrect.rowBytes;
+        Scr.con.pBuff = vid.frameBuff.pBuff;
+        Scr.con.width = vid.frameBuff.width;
+        Scr.con.height = vid.frameBuff.height;
+        Scr.con.rowBytes = Scr.vrect.rowBytes;
 
         SCR_RequestCalcRefdef();    // force a surface cache flush
         Con_CheckResize();

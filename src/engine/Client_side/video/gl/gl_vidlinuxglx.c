@@ -103,7 +103,7 @@ bool gl_mtexable = false;
 
 static int XLateKey(XKeyEvent* ev) {
 
-    name_t buf;
+    nameStr_t buf;
     KeySym keysym;
 
     int key = 0;
@@ -692,7 +692,7 @@ void VID_Init(uint8_p palette) {
         GLX_DEPTH_SIZE, 1,
         None
     };
-    fsPath_t gldir;
+    fsPathStr_t gldir;
     int width = 640, height = 480;
     XSetWindowAttributes attr;
     uint32_t mask;
@@ -708,7 +708,7 @@ void VID_Init(uint8_p palette) {
     Cvar_RegisterVariable(&m_filter);
     Cvar_RegisterVariable(&gl_ztrick);
 
-    vid.colormap = host_colormap;
+    Scr.pColorMapPal = host_colormap;
 
     // interpret command-line params
 
@@ -723,19 +723,19 @@ void VID_Init(uint8_p palette) {
         height = atoi(com.argv[i + 1]);
 
     if ((i = COM_CheckParm("-conwidth")) != 0)
-        vid.con.width = Q_atoi(com.argv[i + 1]);
+        Scr.con.width = Q_atoi(com.argv[i + 1]);
     else
-        vid.con.width = 640;
+        Scr.con.width = 640;
 
-    vid.con.width &= 0xfff8; // make it a multiple of eight
-    ClampLessThen(&vid.con.width, 320);
+    Scr.con.width &= 0xfff8; // make it a multiple of eight
+    ClampLessThen(&Scr.con.width, 320);
 
     // pick a conheight that matches with correct aspect
-    vid.con.height = vid.con.width * 3 / 4;
+    Scr.con.height = Scr.con.width * 3 / 4;
 
     if ((i = COM_CheckParm("-conheight")) != 0)
-        vid.con.height = Q_atoi(com.argv[i + 1]);
-    ClampLessThen(&vid.con.height, 200);
+        Scr.con.height = Q_atoi(com.argv[i + 1]);
+    ClampLessThen(&Scr.con.height, 200);
 
     if (!(_dpy = XOpenDisplay(NULL))) {
         fprintf(stderr, "Error couldn't open the X display\n");
@@ -854,10 +854,10 @@ void VID_Init(uint8_p palette) {
     _scrWidth = width;
     _scrHeight = height;
 
-    ClampMoreThen(&vid.con.height, height);
-    ClampMoreThen(&vid.con.width, width);
-    Scr.vrect.width = vid.con.width;
-    Scr.vrect.height = vid.con.height;
+    ClampMoreThen(&Scr.con.height, height);
+    ClampMoreThen(&Scr.con.width, width);
+    Scr.vrect.width = Scr.con.width;
+    Scr.vrect.height = Scr.con.height;
     Scr.aspect = calcAspectRect(&vid.scr);
     Scr.numpages = 2;
 

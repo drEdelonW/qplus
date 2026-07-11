@@ -254,7 +254,6 @@ void R_DrawSurface() {
 R_DrawSurfaceBlock8_mip0
 ================
 */
-#include "vid.h" // vid.colormap
 void R_DrawSurfaceBlock8_mip0() {   // nearest surfaces
     qColor8_p psource = pbasesource;
     qColor8_p prowdest = prowdestbase;
@@ -275,7 +274,7 @@ void R_DrawSurfaceBlock8_mip0() {   // nearest surfaces
 
             for (int b = 15; b >= 0; b--) {
                 qColor8_t pix = psource[b];
-                prowdest[b] = vid.colormap->raw[(light & 0xFF00) + pix.i];
+                prowdest[b] = Scr.pColorMapPal->raw[(light & 0xFF00) + pix.i];
                 light += lightstep;
             }
 
@@ -316,7 +315,7 @@ void R_DrawSurfaceBlock8_mip1() {
 
             for (int b = 7; b >= 0; b--) {
                 qColor8_t pix = psource[b];
-                prowdest[b] = vid.colormap->raw[(light & 0xFF00) + pix.i];
+                prowdest[b] = Scr.pColorMapPal->raw[(light & 0xFF00) + pix.i];
                 light += lightstep;
             }
 
@@ -357,7 +356,7 @@ void R_DrawSurfaceBlock8_mip2() {
 
             for (int b = 3; b >= 0; b--) {
                 qColor8_t pix = psource[b];
-                prowdest[b] = vid.colormap->raw[(light & 0xFF00) + pix.i];
+                prowdest[b] = Scr.pColorMapPal->raw[(light & 0xFF00) + pix.i];
                 light += lightstep;
             }
 
@@ -397,7 +396,7 @@ void R_DrawSurfaceBlock8_mip3() {
 
             for (int b = 1; b >= 0; b--) {
                 qColor8_t pix = psource[b];
-                prowdest[b] = vid.colormap->raw[(light & 0xFF00) + pix.i];
+                prowdest[b] = Scr.pColorMapPal->raw[(light & 0xFF00) + pix.i];
                 light += lightstep;
             }
 
@@ -423,7 +422,7 @@ FIXME: make this work
 #include "sys.h"    // Sys_Error
 void R_DrawSurfaceBlock16() {
     uint16_p prowdest = (uint16_p)prowdestbase;
-    if (!vid.colormap16)    Sys_Error("vid.colormap16 if NULL\n");
+    if (!Scr.pColorMap16)    Sys_Error("Scr.pColorMap16 if NULL\n");
 
     for (int k = 0; k < blocksize; k++) {
         qColor8_p psource = pbasesource;
@@ -435,7 +434,7 @@ void R_DrawSurfaceBlock16() {
 
         for (int b = 0; b < blocksize; b++) {
             qColor8_t pix = *psource;
-            *pdest = vid.colormap16[(light & 0xFF00) + pix.i].c;
+            *pdest = Scr.pColorMap16[(light & 0xFF00) + pix.i].c;
             // psource += sourcesstep;  // TODO: is this correct?
             pdest++;
             light += lightstep;

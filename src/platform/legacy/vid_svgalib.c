@@ -103,7 +103,7 @@ void VGA_UpdatePlanarScreen(TypeLess_ptr srcbuffer);
 void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
     int i, j, k, plane, reps, repshift, offset, vidpage, off;
 
-    if (!svgalib_inited || !vid.direct || !vga_oktowrite()) return;
+    if (!svgalib_inited || !Scr.direct || !vga_oktowrite()) return;
 
     if (scr.aspect > 1.5f) {
         reps = 2;
@@ -129,9 +129,9 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
                 for (k = 0; k < reps; k++) {
                     for (j = 0; j < (width >> 2); j++) {
                         backingbuf[(i + k) * 24 + (j << 2) + plane] =
-                            vid.direct[(y + i + k) * VGA_rowbytes +
+                            Scr.direct[(y + i + k) * VGA_rowbytes +
                             (x >> 2) + j];
-                        vid.direct[(y + i + k) * VGA_rowbytes + (x >> 2) + j] =
+                        Scr.direct[(y + i + k) * VGA_rowbytes + (x >> 2) + j] =
                             pbitmap[(i >> repshift) * 24 +
                             (j << 2) + plane];
                     }
@@ -148,10 +148,16 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
                     vidpage = offset / 0x10000;
                     vga_setpage(vidpage);
                 }
-                memcpy(&backingbuf[(i + j) * 24],
-                    vid.direct + off, width);
-                memcpy(vid.direct + off,
-                    &pbitmap[(i >> repshift) * width], width);
+                memcpy(
+                    &backingbuf[(i + j) * 24],
+                    Scr.direct + off,
+                    width
+                );
+                memcpy(
+                    Scr.direct + off,
+                    &pbitmap[(i >> repshift) * width],
+                    width
+                );
             }
         }
     }
@@ -160,7 +166,7 @@ void D_BeginDirectRect(int x, int y, uint8_p pbitmap, int width, int height) {
 void D_EndDirectRect(int x, int y, int width, int height) {
     int i, j, k, plane, reps, repshift, offset, vidpage, off;
 
-    if (!svgalib_inited || !vid.direct || !vga_oktowrite()) return;
+    if (!svgalib_inited || !Scr.direct || !vga_oktowrite()) return;
 
     if (scr.aspect > 1.5f) {
         reps = 2;
@@ -185,7 +191,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
             for (i = 0; i < (height << repshift); i += reps) {
                 for (k = 0; k < reps; k++) {
                     for (j = 0; j < (width >> 2); j++) {
-                        vid.direct[(y + i + k) * VGA_rowbytes + (x >> 2) + j] =
+                        Scr.direct[(y + i + k) * VGA_rowbytes + (x >> 2) + j] =
                             backingbuf[(i + k) * 24 + (j << 2) + plane];
                     }
                 }
@@ -201,7 +207,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
                     vidpage = offset / 0x10000;
                     vga_setpage(vidpage);
                 }
-                memcpy(vid.direct + off,
+                memcpy(Scr.direct + off,
                     &backingbuf[(i + j) * 24],
                     width);
             }
@@ -455,10 +461,10 @@ int VID_SetMode(int modenum, uint8_p palette) {
     }
 
     Scr.aspect = calcAspectRect(&vid.scr);
-    vid.colormap = host_colormap;
-    vid.con.rowBytes = vid.rowBytes;
-    vid.con.width = Scr.vrect.width;
-    vid.con.height = Scr.vrect.height;
+    Scr.pColorMapPal = host_colormap;
+    Scr.con.rowBytes = vid.rowBytes;
+    Scr.con.width = Scr.vrect.width;
+    Scr.con.height = Scr.vrect.height;
     Scr.numpages = 1;
 
     // alloc zbuffer and surface cache
@@ -479,7 +485,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     vid_surfcache = ((uint8_p)vid.zBuff.pZBuff) + zsize;
 
-    vid.con.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
+    Scr.con.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
     Scr.vrect.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
 
     D_InitCaches(vid_surfcache, tsize);
@@ -489,7 +495,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     vga_setmode(current_mode);
     VID_SetPalette(palette);
 
-    VGA_pagebase = vid.direct = framebuffer_ptr = (cString)vga_getgraphmem();
+    VGA_pagebase = Scr.direct = framebuffer_ptr = (cString)vga_getgraphmem();
     //  if (vga_setlinearaddressing()>0)
     //   framebuffer_ptr = (cString ) vga_getgraphmem();
     if (!framebuffer_ptr)

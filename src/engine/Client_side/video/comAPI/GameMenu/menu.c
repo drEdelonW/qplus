@@ -84,7 +84,6 @@ void M_Init() {
     Cmd_AddCommand("menu_quit", M_Menu_Quit_f);
 }
 
-#include "vid.h" // VID_UnlockBuffer
 void M_Draw() {
     if ((m_state == m_none) ||
         (key.dest != key_menu))
@@ -95,7 +94,7 @@ void M_Draw() {
 
         if (Scr.con_current) {
             Draw_ConsoleBackground(Scr.vrect.height);
-            VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
+            S_ExtraUpdateBUL();
         }
         else    Draw_FadeScreen();
 
@@ -130,7 +129,7 @@ void M_Draw() {
         m_entersound = false;
     }
 
-    VID_UnlockBuffer(); S_ExtraUpdate(); VID_LockBuffer();
+    S_ExtraUpdateBUL();
 }
 
 

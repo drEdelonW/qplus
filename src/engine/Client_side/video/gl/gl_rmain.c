@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_main.c
 #include "qOpenGL.h"
+#include "screen.h"
 #include "world.h"
 #include "Sprite.h"
 #include "console.h"
@@ -377,7 +378,6 @@ R_DrawAliasModel
 
 =================
 */
-#include "vid.h" // vid.colormap
 void R_DrawAliasModel(r_Entity_p e) {
     Model_p clmodel = currententity->model;
 
@@ -495,7 +495,7 @@ void R_DrawAliasModel(r_Entity_p e) {
 
     // we can't dynamically colormap textures, so they are cached
     // seperately for the players.  Heads are just uncolored.
-    if ((currententity->colormap != vid.colormap) &&
+    if ((currententity->colormap != Scr.pColorMapPal) &&
         (!gl_nocolors.value)
         ) {
         int i = currententity - cl_entities;

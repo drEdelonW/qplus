@@ -3,6 +3,7 @@
 #endif
 
 // TODO: cleanup this IA slop!
+#include "view.h" // SCR_RequestCalcRefdef()
 #include "x_prv.h"
 #include "cvar.h"
 #include "common.h"
@@ -549,9 +550,8 @@ int create_gl_context(App_p app) {
     return 1;
 }
 
-#include "vid.h" // vid.colormap
 void apply_vid_state(App_p app) {
-    vid.colormap = host_colormap;
+    Scr.pColorMapPal = host_colormap;
     Scr.vrect.width = app->xwin.width;
     Scr.numpages = 2;
     SCR_RequestCalcRefdef();
