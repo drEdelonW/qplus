@@ -511,7 +511,7 @@ void    VID_Init(uint8_p palette) {
     Scr.vrect.width = 320;
     Scr.vrect.height = 200;
     // scr.aspect = 1.0; calcAspectRect(&Scr.vrect);
-    vid.numpages = 2;
+    Scr.numpages = 2;
     vid.colormap = host_colormap;
 
     srandom(getpid());

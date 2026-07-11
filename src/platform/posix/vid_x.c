@@ -47,6 +47,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "q_tools.h"
 #include "screen.h"
+#include "view.h"
 #include "render.h"
 
 
@@ -370,8 +371,8 @@ void ResetSharedFrameBuffers() {
 void VID_Init(qPal_p palette) {
     vid.frameBuff.width = BASEWIDTH;
     vid.frameBuff.height = BASEHEIGHT;
-    vid.numpages = 2;
     vid.colormap = host_colormap;
+    Scr.numpages = 2;
 
     srandom(getpid());
 

@@ -22,7 +22,7 @@ Host.EndGame
 ================
 */
 void Host_EndGame(cString message, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, message);
     Con_DPrintf("Host.EndGame: %s\n", string);
 
@@ -36,7 +36,7 @@ void Host_EndGame(cString message, ...) {
 }
 
 void Host_Printf(cStringRO fmt, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, fmt);
     Sys_Printf("%s", string);
 }
@@ -55,7 +55,7 @@ void Host_Error(cString error, ...) {
 
     SCR_EndLoadingPlaque();  // reenable screen updates
 
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, error);
     Con_Printf("Host.Error: %s\n", string);
 
@@ -71,7 +71,7 @@ void Host_Error(cString error, ...) {
 }
 
 void Host_SysError(cStringRO error, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, error);
     Sys_Error("%s", string);
 }
@@ -85,7 +85,7 @@ FIXME: make this just a stuffed echo?
 =================
 */
 void SV_ClientPrintf(cStringRO fmt, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, fmt);
     sizebuf_p pBuf = &remoteClient->message;
     MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
@@ -99,7 +99,7 @@ Sends text to all active clients
 =================
 */
 void SV_BroadcastPrintf(cString fmt, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, fmt);
     for (int i = 0; i < GetSvMaxClients(); i++)
         if ((svs.clients[i].active) &&
@@ -118,7 +118,7 @@ Send text over to the client to be executed
 =================
 */
 void Host_ClientCommands(cString fmt, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, fmt);
     sizebuf_p pBuf = &remoteClient->message;
     MSG_WriteByte(pBuf, svc_stufftext); MSG_WriteString(pBuf, string);

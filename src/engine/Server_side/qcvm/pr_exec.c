@@ -114,7 +114,7 @@ Aborts the currently executing function
 ============
 */
 void PR_RunError(cString error, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, error);
     PR_PrintStatement(PR_GetStack(_pr_xStatement));
     PR_StackTrace();

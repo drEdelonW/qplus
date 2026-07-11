@@ -43,6 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   include "render.h"
 #   include "vector_tools.h"
 #include "qSymbolChar.h"
+#include "view.h"
 
 
 
@@ -148,8 +149,6 @@ void CL_ParseStartSoundPacket() {
     ==================
 */
 void CL_KeepaliveMessage() {
-    static LegDt_t _lastMsg;
-
     if ((Host_IsServerActive()) || // no need if server is local
         (cls.isDemoPlaying)
         )   return;
@@ -177,6 +176,7 @@ void CL_KeepaliveMessage() {
 
     // check time
     LegDt_t time = (LegDt_t)Host_FloatTime();
+    static LegDt_t _lastMsg;
     if ((time - _lastMsg) < 5.0f)    return;
     _lastMsg = time;
 
@@ -436,13 +436,10 @@ void CL_ParseClientdata(server_update_bits_t bits) {
         msg = (uint32_t)MSG_ReadLong();
         if (cl.items != msg) { // set flash times
             upd = true; /* Sbar_Changed(); */
-            for (int i = 0; i < 32; i++) {
+            for (int i = 0; i < 32; i++)
                 if ((msg & (1u << i)) &&
                     !(cl.items & (1u << i))
-                    ) {
-                    cl.item_gettime[i] = GetClSimTime();
-                }
-            }
+                    )   cl.item_gettime[i] = GetClSimTime();
             cl.items = msg;
         }
     }
@@ -546,7 +543,7 @@ void CL_ParseStaticSound() {
 }
 
 
-#define SHOWNET(x) if (cl_shownet.value == 2) {Con_Printf("%3i:%s\n", (getMsgReadCount() - 1), x);}
+#define SHOWNET(x) if (cl_shownet.value == 2) { Con_Printf("%3i:%s\n", (getMsgReadCount() - 1), x);}
 
 /*
     =====================

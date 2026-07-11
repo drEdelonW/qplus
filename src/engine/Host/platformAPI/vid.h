@@ -56,7 +56,6 @@ typedef struct {
     vRect_t zBuff;
 
     qColor8_p direct;     // direct drawing to framebuffer, if not NULL
-    int       numpages;
 } VidDef_t;
 typedef VidDef_t* VidDef_p;
 

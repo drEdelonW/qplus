@@ -12,7 +12,7 @@ FIXME: make this buffer size safe someday
 ============
 */
 cString va(cStringRO format, ...) {
-    static char string[1024]; 
+    static VaBuff_t string;
     VA_EXPAND(string, format);
     return string;
 }

@@ -562,20 +562,20 @@ MGLDC* createDisplayDC(int forcemem)
     }
 
     // Enable page flipping even for even for blitted surfaces
-    if (forcemem)       vid.numpages = 1;
+    if (forcemem)       Scr.numpages = 1;
     else {
-        vid.numpages = dc->mi.maxPage + 1;
+        Scr.numpages = dc->mi.maxPage + 1;
 
-        if (vid.numpages > 1) {
+        if (Scr.numpages > 1) {
             // Set up for page flipping
             MGL_setActivePage(dc, aPage = 1);
             MGL_setVisualPage(dc, vPage = 0, false);
         }
 
-        ClampMoreThen(&vid.numpages, 3);
+        ClampMoreThen(&Scr.numpages, 3);
     }
 
-    if (vid.numpages == 2)  waitVRT = true;
+    if (Scr.numpages == 2)  waitVRT = true;
     else                    waitVRT = false;
 
     return dc;
@@ -1263,7 +1263,7 @@ bool VID_SetWindowedMode(int modenum) {
     vid.con.width = DIBWidth;
     vid.direct = (qColor8_p)dibdc->surface;
     Scr.vrect.rowBytes = vid.con.rowBytes = dibdc->mi.bytesPerLine;
-    vid.numpages = 1;
+    Scr.numpages = 1;
 
     vid_stretched = stretched;
 
@@ -1407,7 +1407,7 @@ bool VID_SetFullDIBMode(int modenum) {
     vid.con.pClr = (qColor8_p)dibdc->surface;
     vid.direct = (qColor8_p)dibdc->surface;
     Scr.vrect.rowBytes = vid.con.rowBytes = dibdc->mi.bytesPerLine;
-    vid.numpages = 1;
+    Scr.numpages = 1;
     Scr.vrect.height = vid.con.height = DIBHeight;
     Scr.vrect.width = vid.con.width = DIBWidth;
     Scr.vpAspect = calcAspectRect(&Scr.vrect);
@@ -2035,10 +2035,10 @@ void FlipScreen(vRect_p rects) {
                 }
             }
 
-            if (vid.numpages > 1) {
+            if (Scr.numpages > 1) {
                 // We have a flipping surface, so do a hard page flip
-                aPage = (aPage + 1) % vid.numpages;
-                vPage = (vPage + 1) % vid.numpages;
+                aPage = (aPage + 1) % Scr.numpages;
+                vPage = (vPage + 1) % Scr.numpages;
                 MGL_setActivePage(mgldc, aPage);
                 MGL_setVisualPage(mgldc, vPage, waitVRT);
             }
@@ -2179,7 +2179,7 @@ void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height) {
     if (Scr.vpAspect > 1.5f) { ;  reps = 2; repshift = 1; }
     else { ;                    reps = 1; repshift = 0; }
 
-    if (vid.numpages == 1) {
+    if (Scr.numpages == 1) {
         VID_LockBuffer();
 
         if (!vid.direct)
@@ -2257,7 +2257,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
     if (Scr.vpAspect > 1.5) { ;   reps = 2; repshift = 1; }
     else { ;                    reps = 1; repshift = 0; }
 
-    if (vid.numpages == 1) {
+    if (Scr.numpages == 1) {
         VID_LockBuffer();
 
         if (!vid.direct)

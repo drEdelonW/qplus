@@ -34,6 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Beam.h"
 #include "eFrag.h"
 #include "render.h"
+#include "VA.h"
 
 // we need to declare some mouse variables here, because the menu system
 // references them even when on a unix system.
@@ -138,7 +139,7 @@ void CL_NextDemo() {
         }
     }
 
-    char str[1024];
+    VaBuff_t str;
     snprintf(str, sizeof(str), "playdemo %s\n", cls.demos[cls.demonum]);
     Cbuf_InsertText(str);
     cls.demonum++;

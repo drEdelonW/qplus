@@ -407,7 +407,8 @@ void SND_Spatialize(channel_p ch) {
 void S_StartSound(EdIdx entnum, int entchannel, sfx_p sfx, vec3_t origin, float fvol, float attenuation) {
     if ((!sound_started) ||
         (!sfx) ||
-        (nosound.value))  return;
+        (nosound.value)
+        )   return;
 
     float vol = fvol * 255;
 
@@ -417,7 +418,7 @@ void S_StartSound(EdIdx entnum, int entchannel, sfx_p sfx, vec3_t origin, float 
 
     // spatialize
     memset(target_chan, 0, sizeof(*target_chan));
-    target_chan->origin =origin;
+    target_chan->origin = origin;
     target_chan->dist_mult = attenuation / sound_nominal_clip_dist;
     target_chan->master_vol = (int)vol;
     target_chan->entnum = entnum;
@@ -532,7 +533,7 @@ void S_ClearBuffer() {
     {
         Q_memset(shm->buffer, clear, (size_t)(DIV8(shm->samples * shm->samplebits)));
     }
-    }
+}
 
 
 /*

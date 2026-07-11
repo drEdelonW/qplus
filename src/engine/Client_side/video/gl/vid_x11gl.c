@@ -551,14 +551,9 @@ int create_gl_context(App_p app) {
 
 #include "vid.h" // vid.colormap
 void apply_vid_state(App_p app) {
-
     vid.colormap = host_colormap;
-
     Scr.vrect.width = app->xwin.width;
-    Scr.vrect.height = app->xwin.height;
-    vid.numpages = 1;
-    // vid.numpages = 2;
-    
+    Scr.numpages = 2;
     SCR_RequestCalcRefdef();
     glViewport(0, 0, app->xwin.width, app->xwin.height);
 }

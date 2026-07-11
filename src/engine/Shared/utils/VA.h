@@ -5,15 +5,18 @@
 
 extern va_list argptr;
 
+#define VA_BUFF_SIZE   (1024)
+typedef char VaBuff_t[VA_BUFF_SIZE];
+
 #define VA_EXPAND(buf, fmt)                         \
     va_start(argptr, fmt); {                        \
         vsnprintf(buf, sizeof(buf), fmt, argptr);   \
-    }va_end(argptr) 
+    }va_end(argptr)
 
 #define VA_P_EXPAND(fmt)        \
     va_start(argptr, fmt); {    \
         vprintf(fmt, argptr);   \
-    }va_end(argptr) 
+    }va_end(argptr)
 
 
 

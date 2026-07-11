@@ -37,7 +37,7 @@ int     sb_lines;   // scan lines to draw
 #define STAT_MINUS  10 // num frame for '-' stats digit
 
 typedef struct {
-    int     updates;  // if >= vid.numpages, no update needed
+    int     updates;  // if >= Scr.numpages, no update needed
     qPic_p  nums[2][11];
     qPic_p  colon;
     qPic_p  slash;
@@ -549,7 +549,7 @@ void Sbar_DrawInventory() {
             Sbar_DrawPic(i * 24, -16, _sb.weapons[flashon][i]);
 
             if (flashon > 1)
-                _sb.updates = 0;  // force update to remove flash
+                _sb.updates = 0; // force update to remove flash
         }
     }
 
@@ -588,7 +588,7 @@ void Sbar_DrawInventory() {
                 }
                 else    Sbar_DrawPic(176 + (i * 24), -16, hsb_weapons[flashon][i]);
                 if (flashon > 1)
-                    _sb.updates = 0;      // force update to remove flash
+                    _sb.updates = 0; // force update to remove flash
             }
         }
     }
@@ -618,7 +618,8 @@ void Sbar_DrawInventory() {
                 _sb.updates = 0;
             else
                 //MED 01/04/97 changed keys
-                if (!hipnotic || (i > 1))   Sbar_DrawPic(192 + MUL16(i), -16, _sb.items[i]);
+                if (!hipnotic || (i > 1))
+                    Sbar_DrawPic(192 + MUL16(i), -16, _sb.items[i]);
 
 
             if (time && (time > (GetClSimTime() - 2)))
@@ -799,7 +800,7 @@ Sbar_Draw
 */
 void Sbar_Draw() {
     if ((Scr.con_current == Scr.vrect.height) || // console is full screen
-        (_sb.updates >= vid.numpages)
+        (_sb.updates >= Scr.numpages)
         )   return;
 
     Scr.copyeverything = true;

@@ -52,7 +52,7 @@ VidDef_t vid = {    // global video state
         },
 
         .direct     = NULL,
-        .numpages   = 1,
+        // .numpages   = 1,
     };
 
 

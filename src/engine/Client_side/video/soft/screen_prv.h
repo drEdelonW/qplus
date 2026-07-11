@@ -8,15 +8,16 @@ typedef struct {
     qPic_p  turtle;
     bool    drawloading;
     bool    drawdialog;
+
     int     erase_lines;
     int     erase_center;
+
     cString notifystring;
-    LegDt_t    disabled_time;
-    LegDt_t    centertime_start; // for slow victory printing
+    LegDt_t disabled_time;
+    LegDt_t centertime_start; // for slow victory printing
     int     center_lines;
     char    centerstring[1024];
-    int      clearConsole;
-    float    oldViewSize, oldFov;
+    int     clearConsole;  // numpages update screen
 } _Screen_t;
 
 extern _Screen_t _scr;
@@ -42,7 +43,7 @@ extern "C" {
     void SCR_DrawNet();
     void SCR_DrawPause();
     void SCR_DrawLoading();
-    void SCR_CalcRefdef();
+
 
     void Con_MessageMode_f();
     void Con_MessageMode2_f();

@@ -858,11 +858,10 @@ void R_Clear() {
         glDepthFunc(GL_LEQUAL);
     }
     else if (gl_ztrick.value) {
-        static int _trickFrame;
-
         if (gl_clear.value)
             glClear(GL_COLOR_BUFFER_BIT);
 
+        static int _trickFrame;
         _trickFrame++;
         if (_trickFrame & 1) {
             _glDepthMin = 0.0f;

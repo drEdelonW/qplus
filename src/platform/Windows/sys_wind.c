@@ -125,11 +125,15 @@ void Sys_MakeCodeWriteable(uintptr_t startaddr, size_t length) {}
 void Sys_DebugLog(cString file, cString fmt, ...) {}
 
 void Sys_Error(cStringRO error, ...) {
+#if 0
     char text[1024];
     va_list argptr; va_start(argptr, error); {
         vsnprintf(text, sizeof(text), error, argptr);
     } va_end(argptr);
-
+#else
+        VaBuff_t text;
+        VA_EXPAND(text, error);
+#endif
     //    MessageBox(NULL, text, "Error", 0 /* MB_OK */ );
     printf("ERROR: %s\n", text);
 

@@ -196,7 +196,7 @@ void Con_Print(cStringRO txt) {
     ================
 */
 void Con_DebugLog(cString file, cString fmt, ...) {
-    char data[1024];
+    VaBuff_t data;
     VA_EXPAND(data, fmt);
 
     int fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
@@ -274,7 +274,7 @@ void Con_DPrintf(cStringRO fmt, ...) {
     ==================
 */
 void Con_SafePrintf(cStringRO fmt, ...) {
-    char msg[1024];
+    VaBuff_t msg;
     VA_EXPAND(msg, fmt);
 
     int temp = Scr.disabled_for_loading; {

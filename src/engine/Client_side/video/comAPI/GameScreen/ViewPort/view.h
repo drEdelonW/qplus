@@ -38,6 +38,8 @@ extern "C" {
     void V_CalcBlend();
 #endif
     void HUD_crosshair();
+    void SCR_RequestCalcRefdef();
+    void SCR_CalcRefdef();
 
 #ifdef __cplusplus
 }

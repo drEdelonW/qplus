@@ -49,9 +49,8 @@ CENTER PRINTING
 
 ===============================================================================
 */
-#include "vid.h" // vid.numpages
 void SCR_EraseCenterString() {
-    if (_scr.erase_center++ > vid.numpages) {
+    if (_scr.erase_center++ > Scr.numpages) {
         _scr.erase_lines = 0;
         return;
     }
@@ -80,7 +79,6 @@ void SCR_EraseCenterString() {
 SCR_ScreenShot_f
 ==================
 */
-#include "vid.h" // vid.frameBuff.pBuff
 void SCR_ScreenShot_f() {
     //
     // find a file name to save it to
@@ -129,12 +127,13 @@ WARNING: be very careful calling this from elsewhere, because the refresh
 needs almost the entire 256k of stack space!
 ==================
 */
+#include "vid.h" // vid.frameBuff.pBuff
 void SCR_UpdateScreen() {
     if (Scr.block_drawing ||
         Scr.skipupdate)
         return;
 
-    if (vid.numpages > 1) {
+    if (Scr.numpages > 1) {
         Scr.vrect.pBuff = vid.frameBuff.pBuff;
         vid.con.pBuff = Scr.vrect.pBuff;
     }
@@ -172,7 +171,7 @@ void SCR_UpdateScreen() {
     // do 3D refresh drawing, and then update the screen
     //
     D_EnableBackBufferAccess(); { // of all overlay stuff if drawing directly
-        if (fullupdate++ < vid.numpages) { // clear the entire screen
+        if (fullupdate++ < Scr.numpages) { // clear the entire screen
             Scr.copyeverything = true;
             Draw_TileClear(0, 0, Scr.vrect.width, Scr.vrect.height);    // TODO: move to screen compositor
             Sbar_Changed();

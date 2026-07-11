@@ -70,8 +70,9 @@ void CL_SignonReply() {
             &cls.message,
             va("color %i %i\n",
                 ((int)cl_color.value) >> 4,
-                ((int)cl_color.value) & 15
-            ));
+                ((int)cl_color.value) & 0x0F
+            )
+        );
 
         char  str[NET_MAXMESSAGE];    // TODO: make this huge buffer out of stack!
         MSG_WriteByte(&cls.message, clc_stringcmd);

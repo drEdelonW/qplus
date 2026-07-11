@@ -227,7 +227,7 @@ needs almost the entire 256k of stack space!
 void SCR_UpdateScreen() {
     if (Scr.block_drawing)  return;
 
-    // vid.numpages = 2 + gl_triplebuffer.value;
+    // Scr.numpages = 2 + gl_triplebuffer.value;
 
 #if 0   /* this specific for software render. not applicable for OpenGL */
     scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing

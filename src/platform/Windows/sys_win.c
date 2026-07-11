@@ -287,7 +287,6 @@ void Sys_Init() {
 
 
 void Sys_Error(cStringRO error, ...) {
-    char text2[1024];
     cStringRO text3 = "Press Enter to exit\n";
     cStringRO text4 = "***********************************\n";
     cStringRO text5 = "\n";
@@ -303,16 +302,24 @@ void Sys_Error(cStringRO error, ...) {
         VID_ForceUnlockedAndReturnState();
     }
 
+#if 0
     char text[1024];
     va_list argptr; va_start(argptr, error); {
         vsnprintf(text, sizeof(text), error, argptr);
     } va_end(argptr);
-
+#else
+    VaBuff_t text;
+    VA_EXPAND(text, error);
+#endif
     if (isDedicated) {
+#if 0
         va_start(argptr, error); {
             vsnprintf(text, sizeof(text), error, argptr);
         } va_end(argptr);
-
+#else
+        VA_EXPAND(text, error);
+#endif
+        VaBuff_t text2;
         snprintf(text2, sizeof(text2), "ERROR: %s\n", text);
         WriteFile(houtput, text5, strlen(text5), &dummy, NULL);
         WriteFile(houtput, text4, strlen(text4), &dummy, NULL);
@@ -325,7 +332,8 @@ void Sys_Error(cStringRO error, ...) {
         _ScReturnOnEnter = true; // so Enter will get us out of here
 
         while (!Sys_ConsoleInput() &&
-            ((Sys_FloatTime() - starttime) < CONSOLE_ERROR_TIMEOUT)) {
+            ((Sys_FloatTime() - starttime) < CONSOLE_ERROR_TIMEOUT)
+            ) {
         }
     }
     else {
@@ -334,12 +342,16 @@ void Sys_Error(cStringRO error, ...) {
         if (!in_sys_error0) {
             in_sys_error0 = 1;
             VID_SetDefaultMode();
-            MessageBox(NULL, text, "Quake Error",
-                MB_OK | MB_SETFOREGROUND | MB_ICONSTOP);
+            MessageBox(
+                NULL, text, "Quake Error",
+                MB_OK | MB_SETFOREGROUND | MB_ICONSTOP
+            );
         }
         else {
-            MessageBox(NULL, text, "Double Quake Error",
-                MB_OK | MB_SETFOREGROUND | MB_ICONSTOP);
+            MessageBox(
+                NULL, text, "Double Quake Error",
+                MB_OK | MB_SETFOREGROUND | MB_ICONSTOP
+            );
         }
     }
 
@@ -361,18 +373,21 @@ void Sys_Printf(cStringRO fmt, ...) {
     DWORD   dummy;
 
     if (isDedicated) {
+#if 0
         char text[1024];
         va_list argptr; va_start(argptr, fmt); {
             vsnprintf(text, sizeof(text), fmt, argptr);
         } va_end(argptr);
-
+#else
+        VaBuff_t text;
+        VA_EXPAND(text, fmt);
+#endif
         WriteFile(houtput, text, strlen(text), &dummy, NULL);
     }
 }
 
 void Sys_Quit() {
     VID_ForceUnlockedAndReturnState();
-
     Host_Shutdown();
 
     if (_tEvent)
@@ -381,9 +396,7 @@ void Sys_Quit() {
     if (isDedicated)
         FreeConsole();
 
-    // shut down QHOST hooks if necessary
-    DeinitConProc();
-
+    DeinitConProc(); // shut down QHOST hooks if necessary
     exit(0);
 }
 
@@ -568,7 +581,9 @@ WinMain
 ==================
 */
 void SleepUntilInput(int time) {
-    MsgWaitForMultipleObjects(1, &_tEvent, FALSE, time, QS_ALLINPUT);
+    MsgWaitForMultipleObjects(
+        1, &_tEvent, FALSE, time, QS_ALLINPUT
+    );
 }
 
 
@@ -651,7 +666,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     hwnd_dialog, 0,
                     HALF(rect.left) - HALF(rect.right - rect.left),
                     rect.top, 0, 0,
-                    SWP_NOZORDER | SWP_NOSIZE);
+                    SWP_NOZORDER | SWP_NOSIZE
+                );
             }
 
             ShowWindow(hwnd_dialog, SW_SHOWDEFAULT);
@@ -738,7 +754,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
         else {
             // yield the CPU for a little while when paused, minimized, or not the focus
-            if ((cl.paused && (!ActiveApp && !DDActive)) || Minimized || Scr.block_drawing) {
+            /**/ if ((cl.paused && (!ActiveApp && !DDActive)) || Minimized || Scr.block_drawing) {
                 SleepUntilInput(PAUSE_SLEEP);
                 Scr.skipupdate = TRUE;  // no point in bothering to draw
             }

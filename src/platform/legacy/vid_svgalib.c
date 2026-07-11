@@ -459,7 +459,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     vid.con.rowBytes = vid.rowBytes;
     vid.con.width = Scr.vrect.width;
     vid.con.height = Scr.vrect.height;
-    vid.numpages = 1;
+    Scr.numpages = 1;
 
     // alloc zbuffer and surface cache
     if (vid.zBuff.pZBuff) {

@@ -858,9 +858,8 @@ void VID_Init(uint8_p palette) {
     ClampMoreThen(&vid.con.width, width);
     Scr.vrect.width = vid.con.width;
     Scr.vrect.height = vid.con.height;
-
     Scr.aspect = calcAspectRect(&vid.scr);
-    vid.numpages = 2;
+    Scr.numpages = 2;
 
     InitSig(); // trap evil signals
 

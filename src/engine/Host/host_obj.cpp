@@ -104,7 +104,7 @@ Host::EndGame
 ================
 */
 void Host::EndGame(cString message, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, message);
     Con_DPrintf("Host::EndGame: %s\n", string);
 
@@ -131,7 +131,7 @@ void Host::Error(cString error, ...) {
 
     SCR_EndLoadingPlaque();  // reenable screen updates
 
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, error);
     Con_Printf("Host::Error: %s\n", string);
 
@@ -251,7 +251,7 @@ FIXME: make this just a stuffed echo?
 */
 #if 0
 void SV_ClientPrintf(cString fmt, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, fmt);
 
     sizebuf_p pBuf = &remoteClient->message;
@@ -267,7 +267,7 @@ Sends text to all active clients
 */
 #if 0
 void SV_BroadcastPrintf(cString fmt, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, fmt);
 
     for (int i = 0; i < GetSvMaxClients(); i++)
@@ -287,7 +287,7 @@ Send text over to the client to be executed
 =================
 */
 void Host::ClientCommands(cString fmt, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, fmt);
 
     sizebuf_p pBuf = &remoteClient->message;

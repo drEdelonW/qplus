@@ -199,7 +199,7 @@ void SCR_BringDownConsole() {
     for (int i = 0; (i < 20) && (Scr.conlines != Scr.con_current); i++)
         SCR_UpdateScreen();
 
-    cl.cshifts[0].percent = 0;        // no area contents palette on next frame
+    cl.cshifts[0].percent = 0;  // no area contents palette on next frame
     VID_SetPalette(host_basepal);
 }
 
@@ -253,8 +253,8 @@ SCR_DrawRam
 */
 void SCR_DrawRam() {
     if ((!scr_showram.value) ||
-        (!r_cache_thrash))
-        return;
+        (!r_cache_thrash)
+        )   return;
     // printf("drawRAM [%s]  \n", r_cache_thrash ? "true" : "false");
     Draw_Pic(Scr.vrect.x + 32, Scr.vrect.y, _scr.ram);
 }
@@ -268,7 +268,10 @@ void SCR_DrawTurtle() {
     static int _cnt;
 
     if (!scr_showturtle.value)  return;
-    if (host_frametime < 0.1) { _cnt = 0;  return; }
+    if (host_frametime < 0.1) {
+        _cnt = 0;
+        return;
+    }
 
     _cnt++;
     if (_cnt < 3)  return;
@@ -326,7 +329,6 @@ float CalcFov(float fov_x, float width, float height) {
 SCR_SetUpToDrawConsole
 ==================
 */
-#include "vid.h" // vid.numpages
 void SCR_SetUpToDrawConsole() {
     Con_CheckResize();
 
@@ -342,7 +344,7 @@ void SCR_SetUpToDrawConsole() {
     else if (key.dest == key_console)   Scr.conlines = HALF(Scr.vrect.height);    // half screen
     else                                Scr.conlines = 0;                       // none visible
 
-    if (Scr.con_current > Scr.conlines) {
+    /**/ if (Scr.con_current > Scr.conlines) {
         Scr.con_current -= scr_conspeed.value * host_frametime;
         ClampLessThen(&Scr.con_current, Scr.conlines);
     }
@@ -350,7 +352,8 @@ void SCR_SetUpToDrawConsole() {
         Scr.con_current += scr_conspeed.value * host_frametime;
         ClampLessThen(&Scr.con_current, Scr.conlines);
     }
-    if (_scr.clearConsole++ < vid.numpages) {
+
+    if (_scr.clearConsole++ < Scr.numpages) {
 #ifndef GLQUAKE
         Scr.copytop = true;
         Draw_TileClear(
@@ -360,7 +363,7 @@ void SCR_SetUpToDrawConsole() {
 #endif
         Sbar_Changed();
     }
-    else if (Scr.clearnotify++ < vid.numpages) {
+    else if (Scr.clearnotify++ < Scr.numpages) {
 #ifndef GLQUAKE
         Scr.copytop = true;
         Draw_TileClear(0, 0, Scr.vrect.width, con.notifylines);
@@ -370,9 +373,9 @@ void SCR_SetUpToDrawConsole() {
         con.notifylines = 0;
 }
 
-bool recalc_refdef;  // if true, recalc vid-based stuff
+static bool _RecalcRefdef;  // if true, recalc vid-based stuff
 void SCR_RequestCalcRefdef() {
-    recalc_refdef = true;
+    _RecalcRefdef = true;
 }
 /*
 =================
@@ -383,24 +386,29 @@ Internal use only
 =================
 */
 void SCR_CalcRefdef() {
-    if (!recalc_refdef) return;
-    else recalc_refdef = false;
+    {
+        static float oldFov;
+        if (oldFov != scr_fov.value) {
+            oldFov = scr_fov.value;
+            SCR_RequestCalcRefdef();
+        }
+    }
+
+    {
+        static float oldViewSize;
+        if (oldViewSize != scr_viewsize.value) {
+            oldViewSize = scr_viewsize.value;
+            SCR_RequestCalcRefdef();
+        }
+    }
+
+    if (!_RecalcRefdef) return;
+    else _RecalcRefdef = false;
 
     //
     // determine size of refresh window
     //
-    if (_scr.oldFov != scr_fov.value) {
-        _scr.oldFov = scr_fov.value;
-        SCR_RequestCalcRefdef();
-    }
-
-    if (_scr.oldViewSize != scr_viewsize.value) {
-        _scr.oldViewSize = scr_viewsize.value;
-        SCR_RequestCalcRefdef();
-    }
-
-    // force the status bar to redraw
-    Sbar_Changed();
+    Sbar_Changed(); // force the status bar to redraw
 
     //========================================
 

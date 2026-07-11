@@ -38,10 +38,10 @@ extern bool		msg_suppress_1;		// suppresses resolution and cache size console ou
 typedef struct {
     int             argc;
     cStringArray    argv;
-    int32_t         filesize;
-    char            cmdline[CMDLINE_LENGTH]; // private
-    char            token[1024];
-    fsPath_t        gamedir;
+    int32_t filesize;
+    char    cmdline[CMDLINE_LENGTH]; // private
+    char    token[1024];
+    fsPath_t    gamedir;
 } common_t;
 
 extern common_t com;

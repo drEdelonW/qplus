@@ -229,13 +229,14 @@ V_CheckGamma
 */
 bool V_CheckGamma() {
     static float _oldGammaValue;
-    if (v_gamma.value == _oldGammaValue)     return false;
-    _oldGammaValue = v_gamma.value;
+    if (_oldGammaValue != v_gamma.value) {
+        _oldGammaValue = v_gamma.value;
+        SCR_RequestCalcRefdef();    // force a surface cache flush
 
-    BuildGammaTable(v_gamma.value);
-    SCR_RequestCalcRefdef();    // force a surface cache flush
-
-    return true;
+        BuildGammaTable(v_gamma.value);
+        return true;
+    }
+    return false;
 }
 
 

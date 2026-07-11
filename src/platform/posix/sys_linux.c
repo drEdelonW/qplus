@@ -36,7 +36,7 @@ void Sys_DebugNumber(int y, int val) {}
 
 #if 0
 void Sys_Printf(cStringRO fmt, ...) {
-    char text[1024];
+    VaBuff_t text;
     VA_EXPAND(text, fmt);
     fprintf(stderr, "%s", text);
 
@@ -50,7 +50,7 @@ void Sys_Printf(cStringRO fmt, ...) {
     if (nostdout)
         return;
 
-    char text[1024];
+    VaBuff_t text;
     VA_EXPAND(text, fmt);
     l = strlen(text);
     t_p = text;
@@ -70,7 +70,7 @@ void Sys_Printf(cStringRO fmt, ...) {
 #else
 
 void Sys_Printf(cStringRO fmt, ...) {
-    char text[1024];
+    VaBuff_t text;
     VA_EXPAND(text, fmt);
 
     if (strlen(text) > sizeof(text))
@@ -116,7 +116,7 @@ void Sys_Error(cStringRO error, ...) {
     // change stdin to non blocking
     fcntl(0, F_SETFL, (fcntl(0, F_GETFL, 0) & ~FNDELAY));
 
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, error);
     fprintf(stderr, "Error: %s\n", string);
 
@@ -125,7 +125,7 @@ void Sys_Error(cStringRO error, ...) {
 }
 
 void Sys_Warn(cStringRO warning, ...) {
-    char string[1024];
+    VaBuff_t string;
     VA_EXPAND(string, warning);
     fprintf(stderr, "Warning: %s", string);
 }
@@ -171,7 +171,6 @@ void Sys_LowFPPrecision() {}
 
 int main(int c, cStringArray v) {
     QuakeParms_t parms;
-
     //	static char cwd[1024];
 
     //	signal(SIGFPE, floating_point_exception_handler);
