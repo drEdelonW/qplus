@@ -349,7 +349,8 @@ void Host_Savegame_f() {
         if (svs.clients[i].active &&
             (svs.clients[i].edict->v.health <= 0)
             ) {
-            Con_Printf("Can't savegame with a dead player\n");  return;
+            Con_Printf("Can't savegame with a dead player\n");
+            return;
         }
     }
 
@@ -359,7 +360,10 @@ void Host_Savegame_f() {
 
     Con_Printf("Saving game to %s...\n", name);
     FILE* saveFile = fopen(name, "w");
-    if (!saveFile) { ;     Con_Printf("ERROR: couldn't open[w].\n"); return; }
+    if (!saveFile) {
+        Con_Printf("ERROR: couldn't open[w].\n");
+        return;
+    }
 
     fprintf(saveFile, "%i\n", SAVEGAME_VERSION);
     saveComment_t comment;
@@ -868,11 +872,9 @@ void Host_Color_f() {
     );
 
     top &= 15;
-    if (top > 13)
-        top = 13;
+    CLAMP_MORE(&top, 13);
     bottom &= 15;
-    if (bottom > 13)
-        bottom = 13;
+    CLAMP_MORE(&bottom, 13);
 
     uint8_t playercolor = (uint8_t)(((uint16_t)top << 4) + bottom);
 
@@ -1193,7 +1195,8 @@ void Host_Give_f() {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_nails1");
             if (val) {
                 val->_float = (float)cVal;
-                if (sv_player->v.weapon <= IT_LIGHTNING)    sv_player->v.ammo_nails = (float)cVal;
+                if (sv_player->v.weapon <= IT_LIGHTNING)
+                    sv_player->v.ammo_nails = (float)cVal;
             }
         }
         else {
@@ -1214,7 +1217,8 @@ void Host_Give_f() {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_rockets1");
             if (val) {
                 val->_float = (float)cVal;
-                if (sv_player->v.weapon <= IT_LIGHTNING)    sv_player->v.ammo_rockets = (float)cVal;
+                if (sv_player->v.weapon <= IT_LIGHTNING)
+                    sv_player->v.ammo_rockets = (float)cVal;
             }
         }
         else { sv_player->v.ammo_rockets = (float)cVal; }
@@ -1234,7 +1238,8 @@ void Host_Give_f() {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_cells1");
             if (val) {
                 val->_float = (float)cVal;
-                if (sv_player->v.weapon <= IT_LIGHTNING)    sv_player->v.ammo_cells = (float)cVal;
+                if (sv_player->v.weapon <= IT_LIGHTNING)
+                    sv_player->v.ammo_cells = (float)cVal;
             }
         }
         else { sv_player->v.ammo_cells = (float)cVal; }
@@ -1316,8 +1321,7 @@ void Host_Viewprev_f() {
 
     Model_p mdl = cl.model_precache[(int)eDict->v.modelindex];
     eDict->v.frame--;
-    if (eDict->v.frame < 0)
-        eDict->v.frame = 0;
+    CLAMP_LESS(&eDict->v.frame, 0);
 
     PrintFrameName(mdl, (int)eDict->v.frame);
 }

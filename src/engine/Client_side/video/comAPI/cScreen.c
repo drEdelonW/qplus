@@ -292,8 +292,7 @@ void SCR_DrawNet() {
 
 void SCR_CheckDrawCenterString() {
     Scr.copytop = true;
-    if (_scr.center_lines > _scr.erase_lines)
-        _scr.erase_lines = _scr.center_lines;
+    CLAMP_LESS(&_scr.erase_lines, _scr.center_lines);
 
     Scr.centertime_off -= host_frametime;
 
@@ -452,8 +451,7 @@ void SCR_CalcRefdef() {
         CLAMP_MORE(&pvrect->height, (pvrectin->height - lineadj));
 
         {   /* GLQUAKE specific */
-            if (pvrect->height > pvrectin->height)
-                pvrect->height = pvrectin->height;
+            CLAMP_MORE(&pvrect->height, pvrectin->height);
 
             pvrect->x = HALF(pvrectin->width - pvrect->width);
             pvrect->y = (full) ? 0 : HALF(h - pvrect->height);

@@ -156,9 +156,10 @@ void R_TimeGraph() {
     a = timex;
 
     int x =
-        r_refdef.vrect.width -
-        ((r_refdef.vrect.width <= MAX_TIMINGS) ?
-            1 : HALF(r_refdef.vrect.width - MAX_TIMINGS));
+        r_refdef.vrect.width - (
+            (r_refdef.vrect.width <= MAX_TIMINGS) ?
+            1 : HALF(r_refdef.vrect.width - MAX_TIMINGS)
+            );
     do {
         R_LineGraph(x, r_refdef.vrect.height - 2, r_timings[a]);
         if (x == 0)

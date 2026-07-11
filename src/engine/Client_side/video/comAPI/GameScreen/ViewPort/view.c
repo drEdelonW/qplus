@@ -174,7 +174,7 @@ void V_DriftPitch() {
 
     //Con_Printf ("move: %f (%f)\n", move, host_frametime);
 
-    if (delta > 0.f) {
+    /**/ if (delta > 0.f) {
         if (move > delta) {
             cl.pitchvel = 0.f;
             move = delta;
@@ -445,13 +445,11 @@ void V_UpdatePalette() {
 
     // drop the damage value
     cl.cshifts[CSHIFT_DAMAGE].percent -= host_frametime * 150;
-    if (cl.cshifts[CSHIFT_DAMAGE].percent <= 0)
-        cl.cshifts[CSHIFT_DAMAGE].percent = 0;
+    CLAMP_LESS(&cl.cshifts[CSHIFT_DAMAGE].percent, 0);
 
     // drop the bonus value
     cl.cshifts[CSHIFT_BONUS].percent -= host_frametime * 100;
-    if (cl.cshifts[CSHIFT_BONUS].percent <= 0)
-        cl.cshifts[CSHIFT_BONUS].percent = 0;
+    CLAMP_LESS(&cl.cshifts[CSHIFT_BONUS].percent, 0);
 
     bool force = V_CheckGamma();
     if (!new && !force)
@@ -469,9 +467,9 @@ void V_UpdatePalette() {
         int ir = i * a + r;
         int ig = i * a + g;
         int ib = i * a + b;
-        if (ir > 255)   ir = 255;
-        if (ig > 255)   ig = 255;
-        if (ib > 255)   ib = 255;
+        CLAMP_MORE(&ir, 255);
+        CLAMP_MORE(&ig, 255);
+        CLAMP_MORE(&ib, 255);
 
         ramps.ink[i].r = gammatable[ir];
         ramps.ink[i].g = gammatable[ig];
@@ -514,13 +512,11 @@ void V_UpdatePalette() {
 
     // drop the damage value
     cl.cshifts[CSHIFT_DAMAGE].percent -= host_frametime * 150;
-    if (cl.cshifts[CSHIFT_DAMAGE].percent <= 0)
-        cl.cshifts[CSHIFT_DAMAGE].percent = 0;
+    CLAMP_LESS(&cl.cshifts[CSHIFT_DAMAGE].percent, 0);
 
     // drop the bonus value
     cl.cshifts[CSHIFT_BONUS].percent -= host_frametime * 100;
-    if (cl.cshifts[CSHIFT_BONUS].percent <= 0)
-        cl.cshifts[CSHIFT_BONUS].percent = 0;
+    CLAMP_LESS(&cl.cshifts[CSHIFT_BONUS].percent, 0);
 
     bool force = V_CheckGamma();
     if (!new && !force)
@@ -757,12 +753,10 @@ void V_CalcRefdef() {
         ((ent->pose.spot.z - _oldZ) > 0.f)) {
 
         LegDt_t steptime = GetClSimTime() - cl.oldtime;
-        if (steptime < 0.f) {
-            steptime = 0.f;    //FIXME  I_Error ("steptime < 0");
-        }
+        CLAMP_LESS(&steptime, 0.f); //FIXME  I_Error ("steptime < 0");
 
         _oldZ += steptime * 80.f;
-        if (_oldZ > ent->pose.spot.z)              _oldZ = ent->pose.spot.z;
+        CLAMP_MORE(&_oldZ, ent->pose.spot.z);
         if ((ent->pose.spot.z - _oldZ) > 12.f)     _oldZ = ent->pose.spot.z - 12.f;
         r_refdef.view.spot.z += _oldZ - ent->pose.spot.z;
         view->pose.spot.z += _oldZ - ent->pose.spot.z;

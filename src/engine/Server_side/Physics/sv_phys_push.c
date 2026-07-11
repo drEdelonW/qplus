@@ -340,8 +340,7 @@ void SV_Physics_Pusher(edict_p ent) {
     SimDt_t movetime;
     if (thinktime < ent->v.ltime + host_frametime) {
         movetime = thinktime - ent->v.ltime;
-        if (movetime < 0.f)
-            movetime = 0.f;
+        CLAMP_LESS(&movetime, 0.f);
     }
     else
         movetime = host_frametime;

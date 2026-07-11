@@ -207,19 +207,16 @@ bool CheckPixelMultiply() {
         chg.width = wattr.width / old_pixel * current_pixel_multiply;
         chg.height = wattr.height / old_pixel * current_pixel_multiply;
 
-        if (chg.width < MIN_WIDTH * current_pixel_multiply)
-            chg.width = MIN_WIDTH * current_pixel_multiply;
-        if (chg.height < MIN_HEIGHT * current_pixel_multiply)
-            chg.height = MIN_HEIGHT * current_pixel_multiply;
+        CLAMP_LESS(&chg.width, MIN_WIDTH * current_pixel_multiply);
+        CLAMP_LESS(&chg.height, MIN_HEIGHT * current_pixel_multiply);
 
         XConfigureWindow(x_disp, x_win, CWWidth | CWHeight, &chg);
 
         Scr.vrect.width = MP(wattr.width) & ~3;
         Scr.vrect.height = MP(wattr.height);
 
-        if (Scr.vrect.width < 320)  Scr.vrect.width = 320;
-        if (Scr.vrect.height < 200)
-            Scr.vrect.height = 200;
+        CLAMP_LESS(&Scr.vrect.width, 320);
+        CLAMP_LESS(&Scr.vrect.height, 200);
         VID_ResetFramebuffer();
 
         return true;
@@ -466,10 +463,8 @@ void VID_Init(uint8_p palette) {
 
     w = 320 * current_pixel_multiply; // minimum width
     h = 200 * current_pixel_multiply; // minimum height
-    if (desired_width < w)
-        desired_width = w;
-    if (desired_height < h)
-        desired_height = h;
+    CLAMP_LESS(&desired_width, w);
+    CLAMP_LESS(&desired_height, h);
 
     Scr.vrect.width = MP(desired_width);
     Scr.vrect.height = MP(desired_height);
@@ -478,10 +473,8 @@ void VID_Init(uint8_p palette) {
     // patch things up so game doesn't fail if window is too small
     //
 
-    if (Scr.vrect.width < 320)
-        Scr.vrect.width = 320;
-    if (Scr.vrect.height < 200)
-        Scr.vrect.height = 200;
+    CLAMP_LESS(&Scr.vrect.width, 320);
+    CLAMP_LESS(&Scr.vrect.height, 200);
 
     //
     // see if we're going to use threads
@@ -930,10 +923,8 @@ VID_Update(vRect_p rects) {
         Scr.vrect.width = MP(config_notify_width) & ~3;
         Scr.vrect.height = MP(config_notify_height);
 
-        if (Scr.vrect.width < 320)
-            Scr.vrect.width = 320;
-        if (Scr.vrect.height < 200)
-            Scr.vrect.height = 200;
+        CLAMP_LESS(&Scr.vrect.width, 320);
+        CLAMP_LESS(&Scr.vrect.height, 200);
 
         VID_ResetFramebuffer();
 
@@ -1001,10 +992,8 @@ VID_Update_MT(vRect_p rects) {
         Scr.vrect.width = MP(config_notify_width) & ~3;
         Scr.vrect.height = MP(config_notify_height);
 
-        if (Scr.vrect.width < 320)
-            Scr.vrect.width = 320;
-        if (Scr.vrect.height < 200)
-            Scr.vrect.height = 200;
+        CLAMP_LESS(&Scr.vrect.width, 320);
+        CLAMP_LESS(&Scr.vrect.height, 200);
 
         VID_ResetFramebuffer_MT();
 

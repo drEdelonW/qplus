@@ -482,7 +482,8 @@ void Sbar_DrawScoreboard() {
 
     Sbar_UpdateScoreboard();
 
-    int l = (_scoreboardlines <= 6) ? _scoreboardlines : 6;
+    int l = (_scoreboardlines <= 6) ?
+        _scoreboardlines : 6;
 
     for (int i = 0; i < l; i++) {
         int x = 20 * (i & 1);
@@ -672,7 +673,8 @@ void Sbar_DrawFrags() {
     Sbar_SortFrags();
 
     // draw the text
-    int l = (_scoreboardlines <= 4) ? _scoreboardlines : 4;
+    int l = (_scoreboardlines <= 4) ?
+        _scoreboardlines : 4;
 
     int x = 23;
     int xofs = (cl.gametype == GAME_DEATHMATCH) ?
@@ -805,7 +807,8 @@ void Sbar_Draw() {
     }
 
     if (_sb.showscores ||
-        (cl.stats[STAT_HEALTH] <= 0)) {
+        (cl.stats[STAT_HEALTH] <= 0)
+        ) {
         Sbar_DrawPic(0, 0, _sb.scorebar);
         Sbar_DrawScoreboard();
         _sb.updates = 0;
@@ -845,8 +848,10 @@ void Sbar_Draw() {
         Sbar_DrawFace();
 
         // health
-        Sbar_DrawNum(136, 0, cl.stats[STAT_HEALTH], 3
-            , cl.stats[STAT_HEALTH] <= 25);
+        Sbar_DrawNum(
+            136, 0, cl.stats[STAT_HEALTH], 3,
+            cl.stats[STAT_HEALTH] <= 25
+        );
 
         // ammo icon
         if (rogue) {
@@ -865,8 +870,10 @@ void Sbar_Draw() {
             else if (cl.items & IT_CELLS)   Sbar_DrawPic(224, 0, _sb.ammo[3]);
         }
 
-        Sbar_DrawNum(248, 0, cl.stats[STAT_AMMO], 3,
-            cl.stats[STAT_AMMO] <= 10);
+        Sbar_DrawNum(
+            248, 0, cl.stats[STAT_AMMO], 3,
+            cl.stats[STAT_AMMO] <= 10
+        );
     }
 
     if ((Scr.vrect.width > 320) &&
@@ -961,14 +968,14 @@ void Sbar_DeathmatchOverlay() {
             snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
             Draw_String(x + 48, y, num);
-        }
+    }
 #endif
 
         // draw name
         Draw_String(x + 64, y, s->name);
 
         y += 10;
-    }
+}
 }
 
 /*
@@ -980,9 +987,7 @@ Sbar_DeathmatchOverlay
 void Sbar_MiniDeathmatchOverlay() {
     if ((Scr.vrect.width < 512) ||
         (!sb_lines)
-        ) {
-        return;
-    }
+        )   return;
 
     Scr.copyeverything = true;
     SCR_RequestRedraw();
@@ -1007,9 +1012,7 @@ void Sbar_MiniDeathmatchOverlay() {
     i = (i == sbl) ?
         0 :                 // we're not there
         i - HALF(numlines); // figure out start
-
     CLAMP(0, &i, sbl - numlines);
-
 
     int x = 324;
     for (; (i < sbl) && (y < (Scr.vrect.height - 8)); i++) {
@@ -1050,15 +1053,14 @@ void Sbar_MiniDeathmatchOverlay() {
                 snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
                 Draw_String(x + 48, y, num);
-            }
+        }
 #endif
 
             // draw name
             Draw_String(x + 48, y, s->name);
-
             y += 8;
-        }
     }
+}
 }
 
 /*

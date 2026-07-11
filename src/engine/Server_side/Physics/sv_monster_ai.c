@@ -99,30 +99,26 @@ void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
 
     if ((olddir != DI_NODIR) &&
         SV_StepDirection(actor, olddir, dist)
-        )
-        return;
+        )   return;
 
     {
         if (rand() & 1) {  /*randomly determine direction of search*/
             for (float tdir = 0.0f; tdir <= 315.0f; tdir += 45.0f)
                 if ((tdir != turnaround) &&
                     SV_StepDirection(actor, tdir, dist)
-                    )
-                    return;
+                    )   return;
         }
         else {
             for (float tdir = 315.0f; tdir >= 0.0f; tdir -= 45.0f)
                 if ((tdir != turnaround) &&
                     SV_StepDirection(actor, tdir, dist)
-                    )
-                    return;
+                    )   return;
         }
     }
 
     if ((turnaround != DI_NODIR) &&
         SV_StepDirection(actor, turnaround, dist)
-        )
-        return;
+        )   return;
 
     actor->v.ideal_yaw = olddir;  // can't move
 

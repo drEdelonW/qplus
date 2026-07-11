@@ -105,7 +105,7 @@ void S_TransferStereo16(int endtime) {
         _snd_out = (int16_p)pbuf + (lpos << 1);
 
         _snd_linear_count = HALF(shm->samples) - lpos;
-        if (lpaintedtime + _snd_linear_count > endtime)
+        if ((lpaintedtime + _snd_linear_count) > endtime)
             _snd_linear_count = endtime - lpaintedtime;
 
         _snd_linear_count = TWICE(_snd_linear_count);
@@ -282,8 +282,8 @@ void SND_InitScaletable() {
 #if !id386
 
 void SND_PaintChannelFrom8(channel_p ch, sfxcache_p sc, int count) {
-    if (ch->leftvol > 0xFF)     ch->leftvol = 0xFF;
-    if (ch->rightvol > 0xFF)    ch->rightvol = 0xFF;
+    CLAMP_MORE(&ch->leftvol, 0xFF);
+    CLAMP_MORE(&ch->rightvol, 0xFF);
 
     int* lscale = _snd_scaletable[EIGHTH(ch->leftvol)];
     int* rscale = _snd_scaletable[EIGHTH(ch->rightvol)];

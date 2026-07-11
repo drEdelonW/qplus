@@ -513,14 +513,10 @@ MGLDC* createDisplayDC(int forcemem)
         initFatalError();
 
     npages = MGL_availablePages(mode);
-
-    if (npages > 3)
-        npages = 3;
+    CLAMP_MORE(&npages, 3);
 
     if (!COM_CheckParm("-notriplebuf")) {
-        if (npages > 2) {
-            npages = 2;
-        }
+        CLAMP_MORE(&npages, 2);
     }
 
     if ((dc = MGL_createDisplayDC(npages)) == NULL)
@@ -548,9 +544,7 @@ MGLDC* createDisplayDC(int forcemem)
             MGL_setActivePage(dc, aPage = 1);
             MGL_setVisualPage(dc, vPage = 0, false);
         }
-
-        if (vid.numpages > 3)
-            vid.numpages = 3;
+        CLAMP_MORE(&vid.numpages, 3);
     }
 
     if (vid.numpages == 2)
@@ -712,9 +706,7 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                 }
 
                 if (!existingmode) {
-                    if (modelist[nummodes].width < lowestres)
-                        lowestres = modelist[nummodes].width;
-
+                    CLAMP_MORE(&lowestres, modelist[nummodes].width);
                     nummodes++;
                 }
             }
@@ -788,9 +780,7 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                     }
 
                     if (!existingmode) {
-                        if (modelist[nummodes].width < lowestres)
-                            lowestres = modelist[nummodes].width;
-
+                        CLAMP_MORE(&lowestres, modelist[nummodes].width);
                         nummodes++;
                     }
                 }
@@ -850,9 +840,7 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                 }
 
                 if (!existingmode) {
-                    if (modelist[nummodes].width < lowestres)
-                        lowestres = modelist[nummodes].width;
-
+                    CLAMP_MORE(&lowestres, modelist[nummodes].width);
                     nummodes++;
                 }
             }

@@ -305,26 +305,26 @@ void M_NetStart_Change(int dir) {
         else        count = 2;
 
         Cvar_SetValue("teamplay", Cvar_VariableValue("teamplay") + dir);
-        if (Cvar_VariableValue("teamplay") > count)     Cvar_SetValue("teamplay", 0);
-        else if (Cvar_VariableValue("teamplay") < 0)    Cvar_SetValue("teamplay", count);
+        /**/ if (Cvar_VariableValue("teamplay") > count)    Cvar_SetValue("teamplay", 0);
+        else if (Cvar_VariableValue("teamplay") < 0)        Cvar_SetValue("teamplay", count);
     } break;
 
     case go_Skill: {
         Cvar_SetValue("skill", Cvar_VariableValue("skill") + dir);
-        if (Cvar_VariableValue("skill") > 3)            Cvar_SetValue("skill", 0);
-        else if (Cvar_VariableValue("skill") < 0)       Cvar_SetValue("skill", 3);
+        /**/ if (Cvar_VariableValue("skill") > 3)           Cvar_SetValue("skill", 0);
+        else if (Cvar_VariableValue("skill") < 0)           Cvar_SetValue("skill", 3);
     } break;
 
     case go_FragLimit: {
         Cvar_SetValue("fraglimit", Cvar_VariableValue("fraglimit") + dir * 10);
-        if (Cvar_VariableValue("fraglimit") > 100)      Cvar_SetValue("fraglimit", 0);
-        else if (Cvar_VariableValue("fraglimit") < 0)   Cvar_SetValue("fraglimit", 100);
+        /**/ if (Cvar_VariableValue("fraglimit") > 100)     Cvar_SetValue("fraglimit", 0);
+        else if (Cvar_VariableValue("fraglimit") < 0)       Cvar_SetValue("fraglimit", 100);
     } break;
 
     case go_TimeLimit: {
         Cvar_SetValue("timelimit", Cvar_VariableValue("timelimit") + dir * 5);
-        if (Cvar_VariableValue("timelimit") > 60)       Cvar_SetValue("timelimit", 0);
-        else if (Cvar_VariableValue("timelimit") < 0)   Cvar_SetValue("timelimit", 60);
+        /**/ if (Cvar_VariableValue("timelimit") > 60)      Cvar_SetValue("timelimit", 0);
+        else if (Cvar_VariableValue("timelimit") < 0)       Cvar_SetValue("timelimit", 60);
     } break;
 
     case go_Episode: {
@@ -332,12 +332,12 @@ void M_NetStart_Change(int dir) {
         //MED 01/06/97 added hipnotic count
         //PGM 01/07/97 added rogue count
         //PGM 03/02/97 added 1 for dmatch episode
-        if (hipnotic)               count = 6;
-        else if (rogue)             count = 4;
+        /**/ if (hipnotic)                          count = 6;
+        else if (rogue)                             count = 4;
         else if (Cvar_VariableValue("registered"))  count = 7;
         else                                        count = 2;
 
-        if (_startEpisode < 0)              _startEpisode = count - 1;
+        /**/ if (_startEpisode < 0)         _startEpisode = count - 1;
         else if (_startEpisode >= count)    _startEpisode = 0;
 
         _startLevel = 0;
@@ -346,12 +346,12 @@ void M_NetStart_Change(int dir) {
     case go_Level: {
         _startLevel += dir;
         //MED 01/06/97 added hipnotic episodes
-        if (hipnotic)   count = hipnoticepisodes[_startEpisode].levels;
+        /**/ if (hipnotic)  count = hipnoticepisodes[_startEpisode].levels;
         //PGM 01/06/97 added hipnotic episodes
-        else if (rogue) count = rogueepisodes[_startEpisode].levels;
-        else            count = episodes[_startEpisode].levels;
+        else if (rogue)     count = rogueepisodes[_startEpisode].levels;
+        else                count = episodes[_startEpisode].levels;
 
-        if (_startLevel < 0)            _startLevel = count - 1;
+        /**/ if (_startLevel < 0)       _startLevel = count - 1;
         else if (_startLevel >= count)  _startLevel = 0;
     } break;
     default: break;
@@ -397,9 +397,9 @@ void M_GameOptions_Key(keycode_t key) {
             Cbuf_AddText(va("maxplayers %u\n", _maxPlayers));
             SCR_BeginLoadingPlaque();
 
-            if (hipnotic)   Cbuf_AddText(va("map %s\n", hipnoticlevels[hipnoticepisodes[_startEpisode].firstLevel + _startLevel].name));
-            else if (rogue) Cbuf_AddText(va("map %s\n", roguelevels[rogueepisodes[_startEpisode].firstLevel + _startLevel].name));
-            else            Cbuf_AddText(va("map %s\n", levels[episodes[_startEpisode].firstLevel + _startLevel].name));
+            /**/ if (hipnotic)  Cbuf_AddText(va("map %s\n", hipnoticlevels[hipnoticepisodes[_startEpisode].firstLevel + _startLevel].name));
+            else if (rogue)     Cbuf_AddText(va("map %s\n", roguelevels[rogueepisodes[_startEpisode].firstLevel + _startLevel].name));
+            else                Cbuf_AddText(va("map %s\n", levels[episodes[_startEpisode].firstLevel + _startLevel].name));
 
             return;
         }

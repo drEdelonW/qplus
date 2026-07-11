@@ -331,9 +331,8 @@ uint8_t PF_newcheckclient(uint8_t check) {
         if ((ent->free) ||
             (ent->v.health <= 0) ||
             ((int)ent->v.flags & FL_NOTARGET)
-            ) {
-            continue;
-        }
+            )   continue;
+
 
         // anything that is a client, or has a client as an enemy
         break;

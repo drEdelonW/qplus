@@ -732,16 +732,14 @@ void VID_Init(uint8_p palette) {
         vid.con.width = 640;
 
     vid.con.width &= 0xfff8; // make it a multiple of eight
-
-    if (vid.con.width < 320)     vid.con.width = 320;
+    CLAMP_LESS(&vid.con.width, 320);
 
     // pick a conheight that matches with correct aspect
     vid.con.height = vid.con.width * 3 / 4;
 
     if ((i = COM_CheckParm("-conheight")) != 0)
         vid.con.height = Q_atoi(com.argv[i + 1]);
-    if (vid.con.height < 200)
-        vid.con.height = 200;
+    CLAMP_LESS(&vid.con.height, 200);
 
     if (!(_dpy = XOpenDisplay(NULL))) {
         fprintf(stderr, "Error couldn't open the X display\n");
@@ -860,8 +858,8 @@ void VID_Init(uint8_p palette) {
     _scrWidth = width;
     _scrHeight = height;
 
-    if (vid.con.height > height)     vid.con.height = height;
-    if (vid.con.width > width)       vid.con.width = width;
+    CLAMP_MORE(&vid.con.height, height);
+    CLAMP_MORE(&vid.con.width, width);
     Scr.vrect.width = vid.con.width;
     Scr.vrect.height = vid.con.height;
 

@@ -28,6 +28,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #   include "qOpenGL.h"
 #endif
 
+#define DIST_EPSILON (0.03125f) /* 1/32 epsilon to keep floating point happy */
+
 typedef struct {
     vec3_t  normal;
     float   dist;

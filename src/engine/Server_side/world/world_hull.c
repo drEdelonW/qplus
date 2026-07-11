@@ -198,8 +198,6 @@ LINE TESTING IN HULLS
 ===============================================================================
 */
 
-#define DIST_EPSILON (0.03125f) /* 1/32 epsilon to keep floating point happy */
-
 /*
 ==================
 SV_RecursiveHullCheck

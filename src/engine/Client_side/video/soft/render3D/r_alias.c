@@ -233,8 +233,7 @@ bool R_AliasCheckBBox() {
             zclipped = true;
         }
         else {
-            if (viewaux[i].fv.z < minz)
-                minz = viewaux[i].fv.z;
+            CLAMP_MORE(&minz, viewaux[i].fv.z);
             viewpts[i].flags = 0;
             zfullyclipped = false;
         }
@@ -341,8 +340,7 @@ void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, 
 
         // clamp; because we limited the minimum ambient and shading light, we
         // don't have to clamp low light, just bright
-        if (temp < 0)
-            temp = 0;
+        CLAMP_LESS(&temp, 0);
     }
 
     fv->vAttr.light = temp;
@@ -475,8 +473,7 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
 
             // clamp; because we limited the minimum ambient and shading light, we
             // don't have to clamp low light, just bright
-            if (temp < 0)
-                temp = 0;
+            CLAMP_LESS(&temp, 0);
         }
 
         fv->vAttr.light = temp;
@@ -571,13 +568,13 @@ void R_AliasSetupLighting(aLight_p plighting) {
     // guarantee that no vertex will ever be lit below LIGHT_MIN, so we don't have
     // to clamp off the bottom
     r_ambientlight = plighting->ambientlight;
-    if (r_ambientlight < LIGHT_MIN)     r_ambientlight = LIGHT_MIN;
+    CLAMP_LESS(&r_ambientlight, LIGHT_MIN);
 
     r_ambientlight = (255 - r_ambientlight) << VID_CBITS;
-    if (r_ambientlight < LIGHT_MIN)     r_ambientlight = LIGHT_MIN;
+    CLAMP_LESS(&r_ambientlight, LIGHT_MIN);
 
     r_shadelight = plighting->shadelight;
-    if (r_shadelight < 0)               r_shadelight = 0;
+    CLAMP_LESS(&r_shadelight, 0);
 
     r_shadelight *= VID_GRADES;
 

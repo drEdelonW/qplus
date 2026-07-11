@@ -238,9 +238,7 @@ void R_NewMap() {
     r_maxsurfsseen = 0;
 
     r_numallocatededges = r_maxedges.value;
-
-    if (r_numallocatededges < MINEDGES)
-        r_numallocatededges = MINEDGES;
+    CLAMP_LESS(&r_numallocatededges, MINEDGES);
 
     if (r_numallocatededges <= NUMSTACKEDGES) {
         auxedges = NULL;
@@ -514,8 +512,7 @@ void R_DrawViewModel() {
             ) ||
         (cl.items & IT_INVISIBILITY) ||
         (cl.stats[STAT_HEALTH] <= 0)
-        )
-        return;
+        )   return;
 
     currententity = &cl.viewent;
     if (!currententity->model)

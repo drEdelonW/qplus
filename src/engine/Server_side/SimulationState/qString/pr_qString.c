@@ -32,8 +32,8 @@ qVmString_t PR_SetQString(cString str) {
     ptrdiff_t delta = str - _pr_strings;
 
     if ((delta >= 0) &&
-        (delta <= INT32_MAX))
-        return (qVmString_t)delta;
+        (delta <= INT32_MAX)
+        )   return (qVmString_t)delta;
 
     for (qVmString_t i = 0; i < _appStrings_num; ++i)
         if (_appStrings[i] == str)

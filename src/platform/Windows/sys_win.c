@@ -39,16 +39,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define PAUSE_SLEEP  50    // sleep time on pause or minimization
 #define NOT_FOCUS_SLEEP 20    // sleep time when not focus
 
-int         starttime;
-bool    ActiveApp, Minimized;
-bool    WinNT;
+int  starttime;
+bool ActiveApp, Minimized;
+bool WinNT;
 
-static double   _pfreq;
-static LegTime_t   _curtime = 0.0;
-static LegTime_t   _lastcurtime = 0.0;
-static int      _lowshift;
-static bool _ScReturnOnEnter = false;
-HANDLE          hinput, houtput;
+static double    _pfreq;
+static LegTime_t _curtime = 0.0;
+static LegTime_t _lastcurtime = 0.0;
+static int       _lowshift;
+static bool      _ScReturnOnEnter = false;
+HANDLE hinput;
+HANDLE houtput;
 
 // static cString _trackingTag = "Clams & Mooses";
 
@@ -410,9 +411,9 @@ LegTime_t Sys_FloatTime() {
     }
     else {
         // check for turnover or backward time
-        if ((temp <= oldtime) && ((oldtime - temp) < 0x10000000)) {
-            oldtime = temp; // so we can't get stuck
-        }
+        if ((temp <= oldtime) &&
+            ((oldtime - temp) < 0x10000000)
+            )   oldtime = temp; // so we can't get stuck
         else {
             uint32_t t2 = temp - oldtime;
             LegTime_t time = (LegTime_t)t2 * _pfreq;
@@ -664,14 +665,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // request otherwise
     parms.memsize = lpBuffer.dwAvailPhys;
 
-    if (parms.memsize < MINIMUM_WIN_MEMORY)
-        parms.memsize = MINIMUM_WIN_MEMORY;
-
-    if (parms.memsize < HALF(lpBuffer.dwTotalPhys))
-        parms.memsize = HALF(lpBuffer.dwTotalPhys);
-
-    if (parms.memsize > MAXIMUM_WIN_MEMORY)
-        parms.memsize = MAXIMUM_WIN_MEMORY;
+    CLAMP_LESS(&parms.memsize, MINIMUM_WIN_MEMORY);
+    CLAMP_LESS(&parms.memsize, HALF(lpBuffer.dwTotalPhys));
+    CLAMP_MORE(&parms.memsize, MAXIMUM_WIN_MEMORY);
 
     if (COM_CheckParm("-heapsize")) {
         int param;
@@ -694,29 +690,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Sys_Error("Couldn't create event");
 
     if (isDedicated) {
-        if (!AllocConsole()) {
+        if (!AllocConsole())
             Sys_Error("Couldn't create dedicated server console");
-        }
 
         hinput = GetStdHandle(STD_INPUT_HANDLE);
         houtput = GetStdHandle(STD_OUTPUT_HANDLE);
 
         // give QHOST a chance to hook into the console
         int param;
-        if ((param = COM_CheckParm("-HFILE")) > 0) {
+        if ((param = COM_CheckParm("-HFILE")) > 0)
             if (param < com.argc)
                 _hFile = (HANDLE)Q_atoi(com.argv[param + 1]);
-        }
 
-        if ((param = COM_CheckParm("-HPARENT")) > 0) {
+        if ((param = COM_CheckParm("-HPARENT")) > 0)
             if (param < com.argc)
                 _hEventParent = (HANDLE)Q_atoi(com.argv[param + 1]);
-        }
 
-        if ((param = COM_CheckParm("-HCHILD")) > 0) {
+        if ((param = COM_CheckParm("-HCHILD")) > 0)
             if (param < com.argc)
                 _hEventChild = (HANDLE)Q_atoi(com.argv[param + 1]);
-        }
+
 
         InitConProc(_hFile, _hEventParent, _hEventChild);
     }

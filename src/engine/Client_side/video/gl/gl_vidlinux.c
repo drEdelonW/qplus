@@ -617,8 +617,8 @@ void VID_Init(uint8_p palette) {
 
     fxMesaMakeCurrent(_fc);
 
-    if (vid.con.height > height)     vid.con.height = height;
-    if (vid.con.width > width)       vid.con.width = width;
+    CLAMP_MORE(&vid.con.height, height);
+    CLAMP_MORE(&vid.con.width, width);
     Scr.vrect.width = vid.con.width;
     Scr.vrect.height = vid.con.height;
 

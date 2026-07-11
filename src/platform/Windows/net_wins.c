@@ -510,8 +510,9 @@ int WINS_GetNameFromAddr(struct qsockaddr* addr, cString name) {
 int WINS_GetAddrFromName(cString name, struct qsockaddr* addr) {
     struct hostent* hostentry;
 
-    if (name[0] >= '0' && name[0] <= '9')
-        return PartialIPAddress(name, addr);
+    if ((name[0] >= '0') &&
+        (name[0] <= '9')
+        )   return PartialIPAddress(name, addr);
 
     hostentry = pgethostbyname(name);
     if (!hostentry)

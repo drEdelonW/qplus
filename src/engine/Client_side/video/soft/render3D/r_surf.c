@@ -161,8 +161,7 @@ void R_BuildLightMap() {// TODO: merge with GL function almoust the same
     }
     for (int i = 0; i < size; i++) {
         int t = (255 * 256 - (int)blocklights[i]) >> (8 - VID_CBITS);
-
-        if (t < 64)     t = 64;
+        CLAMP_LESS(&t, 64);
 
         blocklights[i] = t;
     }

@@ -116,8 +116,8 @@ void R_PushDlights() {
 
     for (int i = 0; i < MAX_DLIGHTS; i++, l++) {
         if ((l->die < GetClSimTime()) ||
-            !l->radius)
-            continue;
+            !(l->radius)
+            )   continue;
         R_MarkLights(l, 1 << i, cl.worldmodel->nodes);
     }
 }
@@ -196,7 +196,7 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
             ptrdiff_t lmStep = (ptrdiff_t)(
                 (FIXED4_TO_INT(surf->extents[S_AX]) + 1) *
                 (FIXED4_TO_INT(surf->extents[T_AX]) + 1)
-            );
+                );
             for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 0xFF); maps++) {
                 r += (*lightmap) * d_lightstylevalue[surf->styles[maps]];
                 lightmap += lmStep;

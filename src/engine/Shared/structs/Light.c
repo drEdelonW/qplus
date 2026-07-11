@@ -54,7 +54,6 @@ void CL_DecayLights() {
             )   continue;
 
         cl_dlights[i].radius -= time * cl_dlights[i].decay;
-        if (cl_dlights[i].radius < 0.0f)
-            cl_dlights[i].radius = 0.0f;
+        CLAMP_LESS(&cl_dlights[i].radius, 0.0f);
     }
 }

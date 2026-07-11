@@ -97,8 +97,7 @@ void M_Load_Key(keycode_t k) {
         m_state = m_none;
         key.dest = key_game;
 
-        // Host_Loadgame_f can't bring up the loading plaque because too much
-        // stack space has been used, so do it now
+        // Host_Loadgame_f can't bring up the loading plaque because too much stack space has been used, so do it now
         SCR_BeginLoadingPlaque();
 
         // issue the load command

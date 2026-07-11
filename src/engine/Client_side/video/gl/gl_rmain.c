@@ -395,8 +395,7 @@ void R_DrawAliasModel(r_Entity_p e) {
     // allways give the gun some light
     if ((e == &cl.viewent) &&
         (ambientlight < 24)
-        )
-        ambientlight = shadelight = 24;
+        )   ambientlight = shadelight = 24;
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
         if (cl_dlights[lnum].die >= GetClSimTime()) {

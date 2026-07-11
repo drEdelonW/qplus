@@ -80,8 +80,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         vec3_t local = VectorSubtract(world, modelorg);
         vec3_t transformed = TransformVector(local);
 
-        if (transformed.z < NEAR_CLIP)
-            transformed.z = NEAR_CLIP;
+        CLAMP_LESS(&transformed.z, NEAR_CLIP);
 
         em.lzi = 1.0 / transformed.z;
 
@@ -106,8 +105,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     vec3_t local = VectorSubtract(world, modelorg);
     vec3_t transformed = TransformVector(local);
 
-    if (transformed.z < NEAR_CLIP)
-        transformed.z = NEAR_CLIP;
+    CLAMP_LESS(&transformed.z, NEAR_CLIP);
 
     _r.lzi = 1.0 / transformed.z;
 
@@ -124,9 +122,9 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         CLAMP(r_refdef.fvrecty_adj, &_r.v, r_refdef.fvrectbottom_adj);
     }
 
-    // if (em.lzi < _r.lzi)    em.lzi = _r.lzi;
+    // CLAMP_LESS(&em.lzi, _r.lzi);
     CLAMP_LESS(&em.lzi, _r.lzi);
-    // if (_r_nearzi < em.lzi) _r_nearzi = em.lzi;  // for mipmap finding
+    // CLAMP_LESS(&_r_nearzi, em.lzi);  // for mipmap finding
     CLAMP_LESS(&_r_nearzi, em.lzi);     // for mipmap finding
 
 
@@ -188,8 +186,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     // it to incorrectly extend to the scan, and the extension of the line goes off
     // the edge of the screen
     // FIXME: is this actually needed?
-    if (edge->u < r_refdef.vrect_x_adj_shift20)     edge->u = r_refdef.vrect_x_adj_shift20;
-    if (edge->u > r_refdef.vrectright_adj_shift20)  edge->u = r_refdef.vrectright_adj_shift20;
+    CLAMP(r_refdef.vrect_x_adj_shift20, &edge->u, r_refdef.vrectright_adj_shift20);
 
     //
     // sort the edge in normally
@@ -688,8 +685,7 @@ void R_RenderPoly(mSurface_p fa, AliasClipFlags_f clipflags) {
         vec3_t local = VectorSubtract(verts[vertpage][i].position, modelorg);
         vec3_t transformed = TransformVector(local);
 
-        if (transformed.z < NEAR_CLIP)
-            transformed.z = NEAR_CLIP;
+        CLAMP_LESS(&transformed.z, NEAR_CLIP);
 
         float lzi = 1.0 / transformed.z;
 

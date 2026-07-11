@@ -85,8 +85,7 @@ void R_RenderDlights() {
     for (int i = 0; i < MAX_DLIGHTS; i++, l++) {
         if ((l->die < GetClSimTime()) ||
             !(l->radius)
-            )
-            continue;
+            )   continue;
         R_RenderDlight(l);
     }
 

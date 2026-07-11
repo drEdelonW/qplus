@@ -54,20 +54,15 @@ void SV_CheckStuck(edict_p ent) {
     for (int z = 0; z < 18; z++)
         for (int i = -1; i <= 1; i++)
             for (int j = -1; j <= 1; j++) {
-#if 0
-                ent->v.origin.x = org.x + (float)i;
-                ent->v.origin.y = org.y + (float)j;
-                ent->v.origin.z = org.z + (float)z;
-#else
                 ent->v.origin = VectorAdd(
                     org,
                     (vec3_t) {
-                        .x = (float)i,
+                    .x = (float)i,
                         .y = (float)j,
                         .z = (float)z
                 }
                 );
-#endif
+
                 if (!SV_TestEntityPosition(ent)) {
                     Con_DPrintf("Unstuck.\n");
                     SV_LinkEdict(ent, true);
@@ -110,9 +105,9 @@ bool SV_CheckWater(edict_p ent) {
         }
 #ifdef QUAKE2
         if ((truecont <= CONTENTS_CURRENT_0) &&
-            (truecont >= CONTENTS_CURRENT_DOWN)) {
-            static vec3_t current_table[] =
-            {
+            (truecont >= CONTENTS_CURRENT_DOWN)
+            ) {
+            static vec3_t current_table[] = {
                 {1, 0, 0},
                 {0, 1, 0},
                 {-1, 0, 0},
@@ -126,9 +121,9 @@ bool SV_CheckWater(edict_p ent) {
                 150.0 * ent->v.waterlevel / 3.0,
                 current_table[CONTENTS_CURRENT_0 - truecont]
             );
-    }
+        }
 #endif
-}
+    }
 
     return ent->v.waterlevel > WL_Feet;
 }
@@ -260,11 +255,9 @@ void SV_WalkMove(edict_p ent) {
     // check for stuckness, possibly due to the limited precision of floats
     // in the clipping hulls
     if (clip) {
-        if ((fabs(oldorg.y - ent->v.origin.y) < 0.03125) &&
-            (fabs(oldorg.x - ent->v.origin.x) < 0.03125)    // stepping up didn't make any progress
-            ) {
-            clip = SV_TryUnstick(ent, oldvel);
-        }
+        if ((fabsf(oldorg.y - ent->v.origin.y) < DIST_EPSILON) &&
+            (fabsf(oldorg.x - ent->v.origin.x) < DIST_EPSILON)    // stepping up didn't make any progress
+            )   clip = SV_TryUnstick(ent, oldvel);
     }
 
     // extra friction based on view angle

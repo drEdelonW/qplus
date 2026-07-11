@@ -265,16 +265,16 @@ void SV_Physics_Step(edict_p ent) {
         // let dead monsters who aren't completely onground slide
         if (wasonground)
             if (!((ent->v.health <= 0.0) &&
-                !SV_CheckBottom(ent))) {
+                !SV_CheckBottom(ent))
+                ) {
                 vec3_p vel = ent->v.velocity;
-                float speed = sqrt((vel->x * vel->x) + (vel->y * vel->y));
+                float speed = sqrtf((vel->x * vel->x) + (vel->y * vel->y));
                 if (speed) {
                     float friction = sv_friction.value;
 
                     float control = speed < sv_stopspeed.value ? sv_stopspeed.value : speed;
                     float newspeed = speed - host_frametime * control * friction;
-
-                    if (newspeed < 0.f)   newspeed = 0.f;
+                    CLAMP_LESS(&newspeed, 0.f);
                     newspeed /= speed;
 
                     vel->x = vel->x * newspeed;
@@ -370,7 +370,7 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
             p->type = pt_static;
             p->vel = v3Zero;
             p->org = tent->v.origin;
-    }
+        }
 # endif
 
         if ((trace.ent) &&
@@ -378,7 +378,7 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
             // p->color = 224;
             host_frametime = save_frametime;
         return trace;
-}
+    }
 }
 #endif
 

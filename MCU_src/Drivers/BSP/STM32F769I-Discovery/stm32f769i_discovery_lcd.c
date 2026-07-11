@@ -1267,12 +1267,12 @@ void BSP_LCD_FillPolygon(pPoint Points, uint16_t PointCount) {
 
     for (counter = 1; counter < PointCount; counter++) {
         pixelX = POLY_X(counter);
-        if (pixelX < IMAGE_LEFT)    IMAGE_LEFT = pixelX;
-        if (pixelX > IMAGE_RIGHT)   IMAGE_RIGHT = pixelX;
+        CLAMP_MORE(&IMAGE_LEFT, pixelX);
+        CLAMP_LESS(&IMAGE_RIGHT, pixelX);
 
         pixelY = POLY_Y(counter);
-        if (pixelY < IMAGE_TOP)     IMAGE_TOP = pixelY;
-        if (pixelY > IMAGE_BOTTOM)  IMAGE_BOTTOM = pixelY;
+        CLAMP_MORE(&IMAGE_TOP, pixelY);
+        CLAMP_LESS(&IMAGE_BOTTOM, pixelY);
     }
 
     if (PointCount < 2)     return;

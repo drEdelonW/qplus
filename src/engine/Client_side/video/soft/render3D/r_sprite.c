@@ -156,14 +156,11 @@ void R_SetupAndDrawSprite() {
     for (int i = 0; i < nump; i++) {
         vec3_t local = VectorSubtract(pv->vx, r_origin);
         vec3_t transformed = TransformVector(local);
-
-        if (transformed.z < NEAR_CLIP)
-            transformed.z = NEAR_CLIP;
+        CLAMP_LESS(&transformed.z, NEAR_CLIP);
 
         EmitPoint_p pout = &outverts[i];
         pout->zi = 1.0 / transformed.z;
-        if (pout->zi > r_spritedesc.nearzi)
-            r_spritedesc.nearzi = pout->zi;
+        CLAMP_LESS(&r_spritedesc.nearzi, pout->zi);
 
         pout->s = pv->s;
         pout->t = pv->t;

@@ -593,11 +593,9 @@ Draw_TransPic
 void Draw_TransPic(int x, int y, qPic_p pic) {
     if ((x < 0) ||
         (y < 0) ||
-        ((uint32_t)(x + pic->width) > Scr.vrect.width) ||
-        ((uint32_t)(y + pic->height) > Scr.vrect.height)
-        ) {
-        Host_SysError("Draw_TransPic: bad coordinates");
-    }
+        ((x + pic->width) > Scr.vrect.width) ||
+        ((y + pic->height) > Scr.vrect.height)
+        )   Host_SysError("Draw_TransPic: bad coordinates");
 
     Draw_Pic(x, y, pic);
 }
@@ -611,12 +609,11 @@ Only used for the player color selection menu
 =============
 */
 void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
-    uint32_t  trans[64 * 64];
-
     GL_Bind(translate_texture);
 
     // int c = pic->width * pic->height;
 
+    uint32_t trans[64 * 64];
     uint32_p dest = trans;
     for (int v = 0; v < 64; v++, dest += 64) {
         uint8_p src = &menuplyr_pixels[(DIV64(v * pic->height)) * pic->width];
@@ -914,8 +911,8 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
 
-    if (scaled_width > gl_max_size.value)       scaled_width = gl_max_size.value;
-    if (scaled_height > gl_max_size.value)      scaled_height = gl_max_size.value;
+    CLAMP_MORE(&scaled_width, gl_max_size.value);
+    CLAMP_MORE(&scaled_height, gl_max_size.value);
 
     if (scaled_width * scaled_height > sizeof(_scaled) / 4)
         Host_SysError("GL_LoadTexture: too big");
@@ -1023,8 +1020,8 @@ void GL_Upload8_EXT(qColor8_p data, int width, int height, bool mipmap, bool alp
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
 
-    if (scaled_width > gl_max_size.value)   scaled_width = gl_max_size.value;
-    if (scaled_height > gl_max_size.value)  scaled_height = gl_max_size.value;
+    CLAMP_MORE(&scaled_width, gl_max_size.value);
+    CLAMP_MORE(&scaled_height, gl_max_size.value);
 
     if (scaled_width * scaled_height > sizeof(_scaled))
         Host_SysError("GL_LoadTexture: too big");

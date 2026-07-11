@@ -172,7 +172,7 @@ void R_BuildLightMap(mSurface_p surf, uint8_p dest, int stride) {// TODO: merge 
         for (int i = 0; i < tmax; i++, dest += stride)
             for (int j = 0; j < smax; j++) {
                 int t = DIV128(*bl++);
-                if (t > 0xFF)    t = 0xFF;
+                CLAMP_MORE(&t, 0xFF);
                 dest[3] = 0xFF - t;
                 dest += 4;
             }
@@ -184,7 +184,7 @@ void R_BuildLightMap(mSurface_p surf, uint8_p dest, int stride) {// TODO: merge 
         for (int i = 0; i < tmax; i++, dest += stride)
             for (int j = 0; j < smax; j++) {
                 int t = DIV128(*bl++);
-                if (t > 0xFF)    t = 0xFF;
+                CLAMP_MORE(&t, 0xFF);
                 dest[j] = 0xFF - t;
             }
     } break;

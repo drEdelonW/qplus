@@ -276,12 +276,8 @@ BOOL SetConsoleCXCY(HANDLE hStdout, int cx, int cy) {
 	COORD						coordMax;
 
 	coordMax = GetLargestConsoleWindowSize(hStdout);
-
-	if (cy > coordMax.Y)
-		cy = coordMax.Y;
-
-	if (cx > coordMax.X)
-		cx = coordMax.X;
+	CLAMP_MORE(&cy, coordMax.Y);
+	CLAMP_MORE(&cx, coordMax.X);
 
 	if (!GetConsoleScreenBufferInfo(hStdout, &info))
 		return FALSE;

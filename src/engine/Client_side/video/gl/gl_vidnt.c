@@ -223,8 +223,8 @@ bool VID_SetWindowedMode(int modenum) {
     PatBlt(hdc, 0, 0, WindowRect.right, WindowRect.bottom, BLACKNESS);
     ReleaseDC(dibwindow, hdc);
 
-    if (vid.con.height > modelist[modenum].height)   vid.con.height = modelist[modenum].height;
-    if (vid.con.width > modelist[modenum].width)     vid.con.width = modelist[modenum].width;
+    CLAMP_MORE(&vid.con.height, modelist[modenum].height);
+    CLAMP_MORE(&vid.con.width, modelist[modenum].width);
     Scr.vrect.width = vid.con.width;
     Scr.vrect.height = vid.con.height;
 
@@ -297,8 +297,8 @@ bool VID_SetFullDIBMode(int modenum) {
     PatBlt(hdc, 0, 0, WindowRect.right, WindowRect.bottom, BLACKNESS);
     ReleaseDC(dibwindow, hdc);
 
-    if (vid.con.height > modelist[modenum].height)   vid.con.height = modelist[modenum].height;
-    if (vid.con.width > modelist[modenum].width)     vid.con.width = modelist[modenum].width;
+    CLAMP_MORE(&vid.con.height, modelist[modenum].height);
+    CLAMP_MORE(&vid.con.width, modelist[modenum].width);
     Scr.vrect.width = vid.con.width;
     Scr.vrect.height = vid.con.height;
 

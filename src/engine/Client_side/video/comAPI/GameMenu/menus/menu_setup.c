@@ -163,9 +163,9 @@ void M_Setup_Key(keycode_t k) {
     } break;
     }
 
-    if (_s.top > 13)        _s.top = 0;
-    else if (_s.top < 0)    _s.top = 13;
+    /**/ if (_s.top > 13)       _s.top = 0;
+    else if (_s.top < 0)        _s.top = 13;
 
-    if (_s.bottom > 13)     _s.bottom = 0;
-    else if (_s.bottom < 0) _s.bottom = 13;
+    /**/ if (_s.bottom > 13)    _s.bottom = 0;
+    else if (_s.bottom < 0)     _s.bottom = 13;
 }

@@ -44,7 +44,7 @@ static void project_point(
 ) {
     // shift forward to keep z > 0
     float z = p.z + 4.0f;
-    if (z < 0.1f) z = 0.1f;
+    CLAMP_LESS(&z, 0.1f);
 
     float px = (p.x / z) * fov_scale;
     float py = (p.y / z) * fov_scale;

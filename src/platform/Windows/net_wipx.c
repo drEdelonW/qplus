@@ -356,21 +356,21 @@ int WIPX_GetNameFromAddr(qsockaddr_p addr, cString name) {
 //=============================================================================
 
 int WIPX_GetAddrFromName(cString name, qsockaddr_p addr) {
-    int n;
-    char buf[32];
-
-    n = Q_strlen(name);
+    int n = Q_strlen(name);
 
     if (n == 12) {
+        char buf[32];
         snprintf(buf, sizeof(buf), "00000000:%s:%u", name, net_hostport);
         return WIPX_StringToAddr(buf, addr);
     }
     if (n == 21) {
+        char buf[32];
         snprintf(buf, sizeof(buf), "%s:%u", name, net_hostport);
         return WIPX_StringToAddr(buf, addr);
     }
-    if (n > 21 && n <= 27)
-        return WIPX_StringToAddr(name, addr);
+    if ((n > 21) &&
+        (n <= 27)
+        )   return WIPX_StringToAddr(name, addr);
 
     return -1;
 }

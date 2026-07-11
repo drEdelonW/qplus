@@ -178,8 +178,8 @@ keycode_t XLateKey(XKeyEvent* ev) {
     default:
         key = *(uint8_p)buf;
         if ((key >= 'A') &&
-            (key <= 'Z'))
-            key = key - 'A' + 'a';
+            (key <= 'Z')
+            )   key = key - 'A' + 'a';
         //   fprintf(stdout, "case 0x0%x: key = ___;break;/* [%c] */\n", keysym);
         break;
     }

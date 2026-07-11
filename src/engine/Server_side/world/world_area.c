@@ -219,9 +219,9 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
         float max = 0;
         for (int i = 0; i < VECT_DIM; i++) {
             float v = fabs(ent->v.mins[i]);
-            if (v > max)    max = v;
+            CLAMP_LESS(&max, v);
             v = fabs(ent->v.maxs[i]);
-            if (v > max)    max = v;
+            CLAMP_LESS(&max, v);
         }
 
         ent->v.absmin = VectorSubtract(ent->v.origin, Scalar2Vector(max));

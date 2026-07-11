@@ -543,14 +543,10 @@ MGLDC* createDisplayDC(int forcemem)
         initFatalError();
 
     npages = MGL_availablePages(mode);
+    CLAMP_MORE(&npages, 3);
 
-    if (npages > 3)
-        npages = 3;
-
-    if (!COM_CheckParm("-notriplebuf")) {
-        if (npages > 2)     npages = 2;
-
-    }
+    if (!COM_CheckParm("-notriplebuf"))
+        CLAMP_MORE(&npages, 2);
 
     if ((dc = MGL_createDisplayDC(npages)) == NULL)
         return NULL;
@@ -576,7 +572,7 @@ MGLDC* createDisplayDC(int forcemem)
             MGL_setVisualPage(dc, vPage = 0, false);
         }
 
-        if (vid.numpages > 3)   vid.numpages = 3;
+        CLAMP_MORE(&vid.numpages, 3);
     }
 
     if (vid.numpages == 2)  waitVRT = true;
@@ -695,8 +691,10 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
         if ((devmode.dmBitsPerPel == 8) &&
             (devmode.dmPelsWidth <= MAXWIDTH) &&
             (devmode.dmPelsHeight <= MAXHEIGHT) &&
-            (nummodes < MAX_MODE_LIST)) {
-            devmode.dmFields = DM_BITSPERPEL |
+            (nummodes < MAX_MODE_LIST)
+            ) {
+            devmode.dmFields =
+                DM_BITSPERPEL |
                 DM_PELSWIDTH |
                 DM_PELSHEIGHT;
 
@@ -719,7 +717,8 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                 // if the width is more than twice the height, reduce it by half because this
                 // is probably a dual-screen monitor
                 if (!COM_CheckParm("-noadjustaspect")) {
-                    if (modelist[nummodes].width > (modelist[nummodes].height << 1)) {
+                    if (modelist[nummodes].width > (modelist[nummodes].height << 1)
+                        ) {
                         modelist[nummodes].width = HALF(modelist[nummodes].width);
                         modelist[nummodes].halfscreen = 1;
                         snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
@@ -731,16 +730,15 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
 
                 for (i = originalnummodes, existingmode = 0; i < nummodes; i++) {
                     if ((modelist[nummodes].width == modelist[i].width) &&
-                        (modelist[nummodes].height == modelist[i].height)) {
+                        (modelist[nummodes].height == modelist[i].height)
+                        ) {
                         existingmode = 1;
                         break;
                     }
                 }
 
                 if (!existingmode) {
-                    if (modelist[nummodes].width < lowestres)
-                        lowestres = modelist[nummodes].width;
-
+                    CLAMP_MORE(&lowestres, modelist[nummodes].width);
                     nummodes++;
                 }
             }
@@ -761,19 +759,27 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
         do {
             stat = EnumDisplaySettings(NULL, modenum, &devmode);
 
-            if ((((devmode.dmPelsWidth <= MAXWIDTH) &&
-                (devmode.dmPelsHeight <= MAXHEIGHT)) ||
-                (!COM_CheckParm("-noadjustaspect") &&
+            if ((
+                (
+                    (devmode.dmPelsWidth <= MAXWIDTH) &&
+                    (devmode.dmPelsHeight <= MAXHEIGHT)
+                    ) ||
+                (
+                    !COM_CheckParm("-noadjustaspect") &&
                     (devmode.dmPelsWidth <= (MAXWIDTH * 2)) &&
-                    (devmode.dmPelsWidth > (devmode.dmPelsHeight * 2)))) &&
+                    (devmode.dmPelsWidth > (devmode.dmPelsHeight * 2))
+                    )
+                ) &&
                 (nummodes < MAX_MODE_LIST) &&
-                (devmode.dmBitsPerPel > 8)) {
-                devmode.dmFields = DM_BITSPERPEL |
+                (devmode.dmBitsPerPel > 8)
+                ) {
+                devmode.dmFields =
+                    DM_BITSPERPEL |
                     DM_PELSWIDTH |
                     DM_PELSHEIGHT;
 
-                if (ChangeDisplaySettings(&devmode, CDS_TEST | CDS_FULLSCREEN) ==
-                    DISP_CHANGE_SUCCESSFUL) {
+                if ((ChangeDisplaySettings(&devmode, CDS_TEST | CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL)
+                    ) {
                     modelist[nummodes].type = MS_FULLDIB;
                     modelist[nummodes].width = devmode.dmPelsWidth;
                     modelist[nummodes].height = devmode.dmPelsHeight;
@@ -784,9 +790,13 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                     modelist[nummodes].dib = 1;
                     modelist[nummodes].fullscreen = 1;
                     modelist[nummodes].bpp = devmode.dmBitsPerPel;
-                    snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
+                    snprintf(
+                        modelist[nummodes].modedesc,
+                        sizeof(modelist[nummodes].modedesc),
                         "%dx%d",
-                        devmode.dmPelsWidth, devmode.dmPelsHeight);
+                        devmode.dmPelsWidth,
+                        devmode.dmPelsHeight
+                    );
 
                     // if the width is more than twice the height, reduce it by half because this
                     // is probably a dual-screen monitor
@@ -794,18 +804,22 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                         if (modelist[nummodes].width > (modelist[nummodes].height * 2)) {
                             modelist[nummodes].width = HALF(modelist[nummodes].width);
                             modelist[nummodes].halfscreen = 1;
-                            snprintf(modelist[nummodes].modedesc, sizeof(modelist[nummodes].modedesc),
+                            snprintf(
+                                modelist[nummodes].modedesc,
+                                sizeof(modelist[nummodes].modedesc),
                                 "%dx%d",
                                 modelist[nummodes].width,
-                                modelist[nummodes].height);
+                                modelist[nummodes].height
+                            );
                         }
                     }
 
                     for (i = originalnummodes, existingmode = 0; i < nummodes; i++) {
                         if ((modelist[nummodes].width == modelist[i].width) &&
-                            (modelist[nummodes].height == modelist[i].height)) {
+                            (modelist[nummodes].height == modelist[i].height)
+                            ) {
                             // pick the lowest available bpp
-                            if (modelist[nummodes].bpp < modelist[i].bpp)
+                            if (modelist[i].bpp > modelist[nummodes].bpp)
                                 modelist[i] = modelist[nummodes];
 
                             existingmode = 1;
@@ -814,9 +828,7 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                     }
 
                     if (!existingmode) {
-                        if (modelist[nummodes].width < lowestres)
-                            lowestres = modelist[nummodes].width;
-
+                        CLAMP_MORE(&lowestres, modelist[nummodes].width);
                         nummodes++;
                     }
                 }
@@ -869,16 +881,15 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
                 for (i = originalnummodes, existingmode = 0; i < nummodes; i++) {
                     if ((modelist[nummodes].width == modelist[i].width) &&
                         (modelist[nummodes].height == modelist[i].height) &&
-                        (modelist[nummodes].bpp >= modelist[i].bpp)) {
+                        (modelist[nummodes].bpp >= modelist[i].bpp)
+                        ) {
                         existingmode = 1;
                         break;
                     }
                 }
 
                 if (!existingmode) {
-                    if (modelist[nummodes].width < lowestres)
-                        lowestres = modelist[nummodes].width;
-
+                    CLAMP_MORE(&lowestres, modelist[nummodes].width);
                     nummodes++;
                 }
             }
@@ -897,7 +908,8 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
     if (!is_mode0x13) {
         for (i = originalnummodes, cstretch = 0; i < nummodes; i++) {
             if ((HALF(modelist[i].width) < lowestres) &&
-                (HALF(modelist[i].width) >= 320)) {
+                (HALF(modelist[i].width) >= 320)
+                ) {
                 lowestres = HALF(modelist[i].width);
                 cstretch = 1;
                 mstretch = i;
@@ -918,9 +930,13 @@ void VID_InitFullDIB(HINSTANCE hInstance) {
             modelist[istretch].width = HALF(modelist[istretch].width);
             modelist[istretch].height = HALF(modelist[istretch].height);
             modelist[istretch].stretched = 1;
-            snprintf(modelist[istretch].modedesc, sizeof(modelist[nummodes].modedesc),
+            snprintf(
+                modelist[istretch].modedesc,
+                sizeof(modelist[nummodes].modedesc),
                 "%dx%d",
-                modelist[istretch].width, modelist[istretch].height);
+                modelist[istretch].width,
+                modelist[istretch].height
+            );
         }
     }
 
