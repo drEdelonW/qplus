@@ -108,7 +108,7 @@ void S_TransferStereo16(int endtime) {
         if ((lpaintedtime + _snd_linear_count) > endtime)
             _snd_linear_count = endtime - lpaintedtime;
 
-        _snd_linear_count = TWICE(_snd_linear_count);
+        _snd_linear_count = MUL2(_snd_linear_count);
 
         // write a linear blast of samples
         Snd_WriteLinearBlastStereo16();

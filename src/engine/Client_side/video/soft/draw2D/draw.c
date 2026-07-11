@@ -45,15 +45,17 @@ typedef struct {
     int     rowBytes;
 } RectDesc_t;
 static RectDesc_t   _rRectDesc;
-static qColor8_p    _draw_chars;    // 8*8 graphic characters
+
 static qPic_p       _draw_backtile;
 /*
 ===============
 Draw_Init
 ===============
 */
+#include "qSymbolChar.h"
+qColor8_p pDrawChars;
 void Draw_Init() {
-    _draw_chars = W_GetLumpName("conchars");
+    pDrawChars = W_GetLumpName("conchars");
     draw_disc = W_GetLumpName("disc");
     _draw_backtile = W_GetLumpName("backtile");
 
@@ -144,7 +146,7 @@ void Draw_Character(int x, int y, int num) {
 
     int row = num >> 4;
     int col = num & 15;
-    qColor8_p source = _draw_chars + (row << 10) + (col << 3);
+    qColor8_p source = pDrawChars + (row << 10) + (col << 3);
 
     int drawline;
     if (y < 0) { // clipped
@@ -157,7 +159,7 @@ void Draw_Character(int x, int y, int num) {
 
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = (qColor8_p)vid.con.pBuff + y * vid.con.rowBytes + x;
+        qColor8_p dest = vid.con.pClr + (y * vid.con.rowBytes) + x;
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
@@ -170,8 +172,8 @@ void Draw_Character(int x, int y, int num) {
     }
     else {
         // FIXME: pre-expand to native format?
-        uint16_p pusdest = (uint16_p) // TODO: rework to Rgb16_p
-            ((uint8_p)vid.con.pBuff + y * vid.con.rowBytes + (x << 1));
+        ptrdiff_t row16Byte = DIV2(vid.con.rowBytes);
+        Rgb16_p pusdest = (Rgb16_p)vid.con.pClr + (y * row16Byte) + x;
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
@@ -179,7 +181,7 @@ void Draw_Character(int x, int y, int num) {
                     pusdest[i] = d_8to16table[source[i].i];
 
             source += 128;
-            pusdest += HALF(vid.con.rowBytes);
+            pusdest += row16Byte;
         }
     }
 }
@@ -213,7 +215,7 @@ void Draw_DebugChar(char num) {
     int drawline = 8;
     int row = num >> 4;
     int col = num & 15;
-    qColor8_p source = _draw_chars + (row << 10) + (col << 3);
+    qColor8_p source = pDrawChars + (row << 10) + (col << 3);
 
     qColor8_p dest = vid.direct + 312;
 
@@ -400,7 +402,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
 void Draw_CharToConback(int num, qColor8_p dest) {
     int row = num >> 4;
     int col = num & 15;
-    qColor8_p source = _draw_chars + (row << 10) + (col << 3);
+    qColor8_p source = pDrawChars + (row << 10) + (col << 3);
 
     int drawline = 8;
     while (drawline--) {
@@ -424,18 +426,18 @@ void Draw_ConsoleBackground(int lines) {
 
     // hack the version number directly into the pic
     char ver[100];
-    qColor8_p dest;
+    qColor8_p dest = conback->data + ((320 * 186) + 320) - 11;
 #ifdef _WIN32
     snprintf(ver, sizeof(ver), "(WinQuake) %4.2f", (float)VERSION);
-    dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    dest +=  - (8 * strlen(ver));
 #elif defined(X11)
     snprintf(ver, sizeof(ver), "(X11 Quake %2.2f) %4.2f", (float)X11_VERSION, (float)VERSION);
-    dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    dest += - (8 * strlen(ver));
 #elif defined(__linux__)
     snprintf(ver, sizeof(ver), "(Linux Quake %2.2f) %4.2f", (float)LINUX_VERSION, (float)VERSION);
-    dest = conback->data + 320 * 186 + 320 - 11 - 8 * strlen(ver);
+    dest += - (8 * strlen(ver));
 #else
-    dest = conback->data + 320 - 43 + 320 * 186;
+    dest += - (8 * 4) ;
     snprintf(ver, sizeof(ver), "%4.2f", VERSION);
 #endif
 

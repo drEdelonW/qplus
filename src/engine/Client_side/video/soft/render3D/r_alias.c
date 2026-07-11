@@ -370,7 +370,7 @@ General clipped case
 */
 void R_AliasPreparePoints() {
     stVert_p pstverts = (stVert_p)
-        ((uint8_p)paliashdr + paliashdr->stverts);
+        ((uint8_p)pAliasHdr + pAliasHdr->stverts);
     r_anumverts = pmdl->numverts;
     FinalVert_p fv = pfinalverts;
     AuxVert_p av = pauxverts;
@@ -395,7 +395,7 @@ void R_AliasPreparePoints() {
     r_affinetridesc.numtriangles = 1;
 
     mTriangle_p ptri = (mTriangle_p)
-        ((uint8_p)paliashdr + paliashdr->triangles);
+        ((uint8_p)pAliasHdr + pAliasHdr->triangles);
     for (int i = 0; i < pmdl->numtris; i++, ptri++) {
         FinalVert_p pfv[3] = {
             &pfinalverts[ptri->vertindex[0]],
@@ -491,7 +491,7 @@ R_AliasPrepareUnclippedPoints
 */
 void R_AliasPrepareUnclippedPoints() {
     stVert_p pstverts = (stVert_p)
-        ((uint8_p)paliashdr + paliashdr->stverts);
+        ((uint8_p)pAliasHdr + pAliasHdr->stverts);
     r_anumverts = pmdl->numverts;
     // FIXME: just use pfinalverts directly?
     FinalVert_p fv = pfinalverts;
@@ -503,7 +503,7 @@ void R_AliasPrepareUnclippedPoints() {
 
     r_affinetridesc.pfinalverts = pfinalverts;
     r_affinetridesc.ptriangles = (mTriangle_p)
-        ((uint8_p)paliashdr + paliashdr->triangles);
+        ((uint8_p)pAliasHdr + pAliasHdr->triangles);
     r_affinetridesc.numtriangles = pmdl->numtris;
 
     D_PolysetDraw();
@@ -524,15 +524,15 @@ void R_AliasSetupSkin() {
     }
 
     _pSkinDesc = ((mAliasSkinDesc_p)
-        ((uint8_p)paliashdr + paliashdr->skindesc)) +
+        ((uint8_p)pAliasHdr + pAliasHdr->skindesc)) +
         skinnum;
     a_skinwidth = pmdl->skinwidth;
 
     if (_pSkinDesc->type == ALIAS_SKIN_GROUP) {
         mAliasSkinGroup_p paliasskingroup = (mAliasSkinGroup_p)
-            ((uint8_p)paliashdr + _pSkinDesc->skin);
+            ((uint8_p)pAliasHdr + _pSkinDesc->skin);
         LegDt_p pskinintervals = (LegDt_p)
-            ((uint8_p)paliashdr + paliasskingroup->intervals);
+            ((uint8_p)pAliasHdr + paliasskingroup->intervals);
         int numskins = paliasskingroup->numskins;
         float fullskininterval = pskinintervals[numskins - 1];
         float skintime = GetClSimTime() + currententity->syncbase;
@@ -552,7 +552,7 @@ void R_AliasSetupSkin() {
     }
 
     r_affinetridesc.pskindesc = _pSkinDesc;
-    r_affinetridesc.pskin = (TypeLess_ptr)((uint8_p)paliashdr + _pSkinDesc->skin);
+    r_affinetridesc.pskin = (TypeLess_ptr)((uint8_p)pAliasHdr + _pSkinDesc->skin);
     r_affinetridesc.skinwidth = a_skinwidth;
     r_affinetridesc.seamfixupX16 = INT_TO_FIXED16(HALF(a_skinwidth));
     r_affinetridesc.skinheight = pmdl->skinheight;
@@ -600,16 +600,16 @@ void R_AliasSetupFrame() {
         frame = 0;
     }
 
-    if (paliashdr->frames[frame].type == ALIAS_SINGLE) {
+    if (pAliasHdr->frames[frame].type == ALIAS_SINGLE) {
         r_apverts = (TriVertx_p)
-            ((uint8_p)paliashdr + paliashdr->frames[frame].frame);
+            ((uint8_p)pAliasHdr + pAliasHdr->frames[frame].frame);
         return;
     }
 
     mAliasGroup_p paliasgroup = (mAliasGroup_p)
-        ((uint8_p)paliashdr + paliashdr->frames[frame].frame);
+        ((uint8_p)pAliasHdr + pAliasHdr->frames[frame].frame);
     LegDt_p pintervals = (LegDt_p)
-        ((uint8_p)paliashdr + paliasgroup->intervals);
+        ((uint8_p)pAliasHdr + paliasgroup->intervals);
     int numframes = paliasgroup->numframes;
     float fullinterval = pintervals[numframes - 1];
     float time = GetClSimTime() + currententity->syncbase;
@@ -627,7 +627,7 @@ void R_AliasSetupFrame() {
     }
 
     r_apverts = (TriVertx_p)
-        ((uint8_p)paliashdr + paliasgroup->frames[i].frame);
+        ((uint8_p)pAliasHdr + paliasgroup->frames[i].frame);
 }
 
 
@@ -654,10 +654,10 @@ void R_AliasDrawModel(aLight_p plighting) {
     AuxVert_t auxverts[MAXALIASVERTS];
     pauxverts = &auxverts[0];
 
-    paliashdr = (AliasHdr_p)
+    pAliasHdr = (AliasHdr_p)
         Mod_Extradata(currententity->model);
     pmdl = (Mdl_p)
-        ((uint8_p)paliashdr + paliashdr->model);
+        ((uint8_p)pAliasHdr + pAliasHdr->model);
 
     R_AliasSetupSkin();
     R_AliasSetUpTransform(currententity->trivial_accept);

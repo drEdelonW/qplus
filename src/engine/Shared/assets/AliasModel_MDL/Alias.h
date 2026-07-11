@@ -185,6 +185,6 @@ typedef struct {
 } Mdl_t;        STATIC_ASSERT_SIZE(Mdl_t, 9*4 + 2*4 + 3*12 + 4); // 84
 typedef Mdl_t* Mdl_p;
 
-extern AliasHdr_p pheader;
-extern AliasHdr_p paliashdr;
+extern AliasHdr_p pHeader;
+extern AliasHdr_p pAliasHdr;
 

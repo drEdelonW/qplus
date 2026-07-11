@@ -369,7 +369,10 @@ void Sbar_DrawNum(int x, int y, int num, int digits, int color) {
         if (*ptr == '-')    frame = STAT_MINUS;
         else                frame = *ptr - '0';
 
-        Sbar_DrawTransPic(x, y, _sb.nums[color][frame]);
+        Sbar_DrawTransPic(
+            x, y,
+            _sb.nums[color][frame]
+        );
         x += 24;
         ptr++;
     }
@@ -829,7 +832,8 @@ void Sbar_Draw() {
         }
         else {
             Sbar_DrawNum(
-                24, 0, cl.stats[STAT_ARMOR], 3,
+                24, 0,
+                cl.stats[STAT_ARMOR], 3,
                 cl.stats[STAT_ARMOR] <= 25
             );
             if (rogue) {
@@ -849,7 +853,8 @@ void Sbar_Draw() {
 
         // health
         Sbar_DrawNum(
-            136, 0, cl.stats[STAT_HEALTH], 3,
+            136, 0,
+            cl.stats[STAT_HEALTH], 3,
             cl.stats[STAT_HEALTH] <= 25
         );
 
@@ -871,7 +876,8 @@ void Sbar_Draw() {
         }
 
         Sbar_DrawNum(
-            248, 0, cl.stats[STAT_AMMO], 3,
+            248, 0,
+            cl.stats[STAT_AMMO], 3,
             cl.stats[STAT_AMMO] <= 10
         );
     }
@@ -920,11 +926,8 @@ void Sbar_DeathmatchOverlay() {
 
     M_DrawPicHC(8, Draw_CachePic("gfx/ranking.lmp"));
 
-    // scores
-    Sbar_SortFrags();
-
-    // draw the text
-    int l = _scoreboardlines;
+    Sbar_SortFrags();       // scores
+    int l = _scoreboardlines;   // draw the text
 
     int x = 80 + HALF(Scr.vrect.width - 320);
     int y = 40;
@@ -935,10 +938,8 @@ void Sbar_DeathmatchOverlay() {
             continue;
 
         // draw background
-        int top = s->colors & 0xf0;
-        int bottom = (s->colors & 15) << 4;
-        top = Sbar_ColorForMap(top);
-        bottom = Sbar_ColorForMap(bottom);
+        int top = Sbar_ColorForMap((s->colors & 0xF0) << 0);
+        int bottom = Sbar_ColorForMap((s->colors & 0x0F) << 4);
 
         Draw_Fill(x, y, 40, 4, top);
         Draw_Fill(x, y + 4, 40, 4, bottom);
@@ -968,14 +969,14 @@ void Sbar_DeathmatchOverlay() {
             snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
             Draw_String(x + 48, y, num);
-    }
+        }
 #endif
 
         // draw name
         Draw_String(x + 64, y, s->name);
 
         y += 10;
-}
+    }
 }
 
 /*
@@ -1053,14 +1054,14 @@ void Sbar_MiniDeathmatchOverlay() {
                 snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
                 Draw_String(x + 48, y, num);
-        }
+            }
 #endif
 
             // draw name
             Draw_String(x + 48, y, s->name);
             y += 8;
+        }
     }
-}
 }
 
 /*

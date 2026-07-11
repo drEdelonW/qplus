@@ -68,7 +68,7 @@ typedef struct {
     sizebuf_t   reliable_datagram; // copied to all clients at end of frame
     uint8_t     reliable_datagram_buf[MAX_DATAGRAM];
     sizebuf_t   signon;
-    uint8_t     signon_buf[8192];
+    uint8_t     signon_buf[NET_MAXMESSAGE];
 } server_t;
 
 #define NUM_PING_TIMES  16

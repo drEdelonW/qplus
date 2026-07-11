@@ -151,13 +151,12 @@ void CL_KeepaliveMessage() {
     static LegDt_t _lastMsg;
 
     if ((Host_IsServerActive()) || // no need if server is local
-        (cls.isDemoPlaying)) {
-        return;
-    }
+        (cls.isDemoPlaying)
+        )   return;
 
     // read messages from server, should just be nops
     sizebuf_t old = net_message;
-    uint8_t olddata[8192];  memcpy(olddata, net_message.data, net_message.cursize);
+    uint8_t olddata[NET_MAXMESSAGE];  memcpy(olddata, net_message.data, net_message.cursize);
 
     int ret;
     do {
@@ -319,7 +318,6 @@ void CL_ParseUpdate(update_bits_t bits) {
     }
 
     int num = (bits & U_LONGENTITY) ? MSG_ReadShort() : MSG_ReadByte();
-
     r_Entity_p ent = CL_EntityNum(num);
 
     for (int i = 0; i < 16; i++) {
@@ -429,7 +427,7 @@ void CL_ParseClientdata(server_update_bits_t bits) {
 
     cl.mvelocity[Prev] = cl.mvelocity[Cur];
     for (int i = 0; i < VECT_DIM; i++) {    // TODO: wrap MSG_ReadChar to MSG_vector_tools
-        cl.punchangle.v[i]   = (bits & (SU_PUNCH1 << i)) ?    (MSG_ReadChar() * 1.f) : 0.f;
+        cl.punchangle.v[i] = (bits & (SU_PUNCH1 << i)) ? (MSG_ReadChar() * 1.f) : 0.f;
         cl.mvelocity[Cur].v[i] = (bits & (SU_VELOCITY1 << i)) ? fixed4_tof(MSG_ReadChar()) : 0.f;
     }
     uint32_t msg;
@@ -631,7 +629,7 @@ void CL_ParseServerMessage() {
 
         case svc_stopsound: {
             int16_t msg = MSG_ReadShort();
-            S_StopSound(EIGHTH(msg), (msg & 0x07));
+            S_StopSound(DIV4(msg), (msg & 0x07));
         } break;
 
         case svc_updatename: {
