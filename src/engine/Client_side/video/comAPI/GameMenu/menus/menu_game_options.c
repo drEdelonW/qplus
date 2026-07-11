@@ -295,7 +295,7 @@ void M_NetStart_Change(int dir) {
             _svInfoMsg = true;
             _svInfoMsgTime = GetRealTime();
         }
-        CLAMP_LESS(&_maxPlayers, 2);
+        ClampLessThen(&_maxPlayers, 2);
     } break;
 
     case go_GameType: Cvar_SetValue("coop", Cvar_VariableValue("coop") ? 0 : 1);  break;

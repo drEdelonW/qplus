@@ -330,8 +330,7 @@ void IN_Move(UserCmd_p cmd) {
         !(kbIsDown(in.strafe))
         ) {  // mouseLook
         cl.viewangles.pitch += m_pitch.value * mouse_y;
-        CLAMP_MAX(&cl.viewangles.pitch, 80.f);  // down look
-        CLAMP_MIN(&cl.viewangles.pitch, -70.f);   // up look
+        ClampInRange(-70.f, &cl.viewangles.pitch, 80.f); // (80.f - down look) (-70.f - up look)
     }
     else {
         if (kbIsDown(in.strafe) &&

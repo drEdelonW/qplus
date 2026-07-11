@@ -292,7 +292,7 @@ void SCR_DrawNet() {
 
 void SCR_CheckDrawCenterString() {
     Scr.copytop = true;
-    CLAMP_LESS(&_scr.erase_lines, _scr.center_lines);
+    ClampLessThen(&_scr.erase_lines, _scr.center_lines);
 
     Scr.centertime_off -= host_frametime;
 
@@ -344,11 +344,11 @@ void SCR_SetUpToDrawConsole() {
 
     if (Scr.con_current > Scr.conlines) {
         Scr.con_current -= scr_conspeed.value * host_frametime;
-        CLAMP_LESS(&Scr.con_current, Scr.conlines);
+        ClampLessThen(&Scr.con_current, Scr.conlines);
     }
     else if (Scr.con_current < Scr.conlines) {
         Scr.con_current += scr_conspeed.value * host_frametime;
-        CLAMP_LESS(&Scr.con_current, Scr.conlines);
+        ClampLessThen(&Scr.con_current, Scr.conlines);
     }
     if (_scr.clearConsole++ < vid.numpages) {
 #ifndef GLQUAKE
@@ -448,10 +448,10 @@ void SCR_CalcRefdef() {
         }
 
         pvrect->height = pvrectin->height * size;
-        CLAMP_MORE(&pvrect->height, (pvrectin->height - lineadj));
+        ClampMoreThen(&pvrect->height, (pvrectin->height - lineadj));
 
         {   /* GLQUAKE specific */
-            CLAMP_MORE(&pvrect->height, pvrectin->height);
+            ClampMoreThen(&pvrect->height, pvrectin->height);
 
             pvrect->x = HALF(pvrectin->width - pvrect->width);
             pvrect->y = (full) ? 0 : HALF(h - pvrect->height);
@@ -474,7 +474,7 @@ void SCR_CalcRefdef() {
 #ifdef GLQUAKE
 #else
     // guard against going from one mode to another that's less than half the vertical resolution
-    CLAMP_MORE(&Scr.con_current, Scr.vrect.height);
+    ClampMoreThen(&Scr.con_current, Scr.vrect.height);
     R_ViewChanged(&Scr.vrect, sb_lines, Scr.vpAspect);    // notify the refresh of the change
 #endif
 }

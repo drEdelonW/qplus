@@ -63,10 +63,10 @@ void D_ViewChanged() {
     vid.zBuff.width = vid.frameBuff.width;
 
     d_pix_min = r_refdef.vrect.width / 320;
-    CLAMP_LESS(&d_pix_min, 1);
+    ClampLessThen(&d_pix_min, 1);
 
     d_pix_max = (int)((float)r_refdef.vrect.width / (320.0 / 4.0) + 0.5);
-    CLAMP_LESS(&d_pix_max, 1);
+    ClampLessThen(&d_pix_max, 1);
 
     d_pix_shift = 8 - (int)((float)r_refdef.vrect.width / 320.0 + 0.5);
 

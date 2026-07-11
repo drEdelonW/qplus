@@ -254,7 +254,7 @@ bool SV_RecursiveHullCheck(
     float  frac =
         (t1 + ((t1 < 0.f) ? DIST_EPSILON : -DIST_EPSILON)) /
         (t1 - t2);
-    CLAMP(0.f, &frac, 1.f);
+    ClampInRange(0.f, &frac, 1.f);
 
     float midf = p1f + (p2f - p1f) * frac;
 

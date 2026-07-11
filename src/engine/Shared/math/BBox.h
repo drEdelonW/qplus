@@ -56,8 +56,8 @@ static inline void BBoxExpandPt(BBox_p bb, vec3_t p) {
         if (p.v[i] < bb->mins.v[i])      bb->mins.v[i] = p.v[i];
         if (p.v[i] > bb->maxs.v[i])      bb->maxs.v[i] = p.v[i];
 #else
-        CLAMP_MORE(&bb->mins.v[i], p.v[i]);
-        CLAMP_LESS(&bb->maxs.v[i], p.v[i]);
+        ClampMoreThen(&bb->mins.v[i], p.v[i]);
+        ClampLessThen(&bb->maxs.v[i], p.v[i]);
 #endif
     }
 }

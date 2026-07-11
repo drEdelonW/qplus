@@ -561,7 +561,7 @@ static void Check_Gamma(uint8_p pal) {
     for (int i = 0; i < 768; i++) {
         float f = pow((pal[i] + 1) / 256.0, _vidGamma);
         float inf = f * 255 + 0.5;
-        CLAMP(0, &inf, 255);
+        ClampInRange(0, &inf, 255);
         palette[i] = inf;
     }
 
@@ -592,13 +592,13 @@ void VID_Init(uint8_p palette) {
     else                                        vid.con.width = 640;
 
     vid.con.width &= 0xfff8; // make it a multiple of eight
-    CLAMP_LESS(&vid.con.width, 320);
+    ClampLessThen(&vid.con.width, 320);
 
     // pick a conheight that matches with correct aspect
     vid.con.height = vid.con.width * 3 / 4;
 
     if ((i = COM_CheckParm("-conheight")) != 0)     vid.con.height = Q_atoi(com.argv[i + 1]);
-    CLAMP_LESS(&vid.con.height, 200);
+    ClampLessThen(&vid.con.height, 200);
 
     GLint attribs[32] = {   // set vid parameters
         FXMESA_DOUBLEBUFFER,
@@ -617,8 +617,8 @@ void VID_Init(uint8_p palette) {
 
     fxMesaMakeCurrent(_fc);
 
-    CLAMP_MORE(&vid.con.height, height);
-    CLAMP_MORE(&vid.con.width, width);
+    ClampMoreThen(&vid.con.height, height);
+    ClampMoreThen(&vid.con.width, width);
     Scr.vrect.width = vid.con.width;
     Scr.vrect.height = vid.con.height;
 
@@ -777,7 +777,7 @@ void IN_MouseMove(UserCmd_p cmd) {
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
         cl.viewangles[PITCH] += m_pitch.value * mouse_y;
-        CLAMP(-70, &cl.viewangles[PITCH], 80);
+        ClampInRange(-70, &cl.viewangles[PITCH], 80);
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)

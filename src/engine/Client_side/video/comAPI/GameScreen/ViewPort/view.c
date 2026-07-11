@@ -103,7 +103,7 @@ float V_CalcBob() {
     ) * cl_bob.value;
     //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
     bob = (bob * 0.3f) + (bob * 0.7f * sinf(cycle));
-    CLAMP(-7.f, &bob, 4.f);
+    ClampInRange(-7.f, &bob, 4.f);
     return bob;
 }
 
@@ -217,7 +217,7 @@ void BuildGammaTable(float g) {
 
     for (int i = 0; i < InksNum; i++) {
         int inf = 255 * pow((i + 0.5f) / 255.5, g) + 0.5f;
-        CLAMP(0, &inf, 255);
+        ClampInRange(0, &inf, 255);
         gammatable[i] = (uint8_t)inf;
     }
 }
@@ -251,12 +251,12 @@ void V_ParseDamage() {
     vec3_t from = MSG_ReadVector();
 
     float count = blood * 0.5f + armor * 0.5f;
-    CLAMP_LESS(&count, 10.f);
+    ClampLessThen(&count, 10.f);
 
     cl.faceanimtime = GetClSimTime() + 0.2f;  // but sbar face into pain frame
 
     cl.cshifts[CSHIFT_DAMAGE].percent += 3 * count;
-    CLAMP(0, &cl.cshifts[CSHIFT_DAMAGE].percent, 150);  // for x86 must be signed and more then 8bit
+    ClampInRange(0, &cl.cshifts[CSHIFT_DAMAGE].percent, 150);  // for x86 must be signed and more then 8bit
 
     if (armor > blood) {
         cl.cshifts[CSHIFT_DAMAGE].destcolor[0] = 200;
@@ -415,7 +415,7 @@ void V_CalcBlend() {
     v_blend[2] = b * byteScaleFactor;
     v_blend[3] = a;
 
-    CLAMP(0.f, &v_blend[3], 1.f);
+    ClampInRange(0.f, &v_blend[3], 1.f);
 }
 #endif
 
@@ -445,11 +445,11 @@ void V_UpdatePalette() {
 
     // drop the damage value
     cl.cshifts[CSHIFT_DAMAGE].percent -= host_frametime * 150;
-    CLAMP_LESS(&cl.cshifts[CSHIFT_DAMAGE].percent, 0);
+    ClampLessThen(&cl.cshifts[CSHIFT_DAMAGE].percent, 0);
 
     // drop the bonus value
     cl.cshifts[CSHIFT_BONUS].percent -= host_frametime * 100;
-    CLAMP_LESS(&cl.cshifts[CSHIFT_BONUS].percent, 0);
+    ClampLessThen(&cl.cshifts[CSHIFT_BONUS].percent, 0);
 
     bool force = V_CheckGamma();
     if (!new && !force)
@@ -467,9 +467,9 @@ void V_UpdatePalette() {
         int ir = i * a + r;
         int ig = i * a + g;
         int ib = i * a + b;
-        CLAMP_MORE(&ir, 255);
-        CLAMP_MORE(&ig, 255);
-        CLAMP_MORE(&ib, 255);
+        ClampMoreThen(&ir, 255);
+        ClampMoreThen(&ig, 255);
+        ClampMoreThen(&ib, 255);
 
         ramps.ink[i].r = gammatable[ir];
         ramps.ink[i].g = gammatable[ig];
@@ -512,11 +512,11 @@ void V_UpdatePalette() {
 
     // drop the damage value
     cl.cshifts[CSHIFT_DAMAGE].percent -= host_frametime * 150;
-    CLAMP_LESS(&cl.cshifts[CSHIFT_DAMAGE].percent, 0);
+    ClampLessThen(&cl.cshifts[CSHIFT_DAMAGE].percent, 0);
 
     // drop the bonus value
     cl.cshifts[CSHIFT_BONUS].percent -= host_frametime * 100;
-    CLAMP_LESS(&cl.cshifts[CSHIFT_BONUS].percent, 0);
+    ClampLessThen(&cl.cshifts[CSHIFT_BONUS].percent, 0);
 
     bool force = V_CheckGamma();
     if (!new && !force)
@@ -565,14 +565,14 @@ void CalcGunAngle() {
     // TODO: solve this puzzle
     // float move = host_frametime * 20.f;
     float pitch = angledelta((_old.pitch - cAngl.pitch)) * 0.4f; // vertical
-    CLAMP(-10.f, &pitch, 10.f);
-    // if (cAngl.pitch > _old.pitch)    CLAMP_MORE(&pitch, (_old.pitch + move));
-    // else                             CLAMP_LESS(&pitch, (_old.pitch - move));
+    ClampInRange(-10.f, &pitch, 10.f);
+    // if (cAngl.pitch > _old.pitch)    ClampMoreThen(&pitch, (_old.pitch + move));
+    // else                             ClampLessThen(&pitch, (_old.pitch - move));
 
     float yaw = angledelta(_old.yaw - cAngl.yaw) * 0.4f; // horizontal
-    CLAMP(-10.f, &yaw, 10.f);
-    // if (cAngl.yaw > _old.yaw)    CLAMP_MORE(&yaw, (_old.yaw + move));
-    // else                         CLAMP_LESS(&yaw, (_old.yaw - move));
+    ClampInRange(-10.f, &yaw, 10.f);
+    // if (cAngl.yaw > _old.yaw)    ClampMoreThen(&yaw, (_old.yaw + move));
+    // else                         ClampLessThen(&yaw, (_old.yaw - move));
 
     // Con_Printf("p:%f y:%f\t p:%f y:%f\t \n",
     //     cAngl.pitch, cAngl.yaw,
@@ -600,9 +600,9 @@ void V_BoundOffsets() {
     // absolutely bound refresh reletive to entity clipping hull
     // so the view can never be inside a solid wall
 
-    CLAMP(ent->pose.spot.x - 14.f, &r_refdef.view.spot.x, ent->pose.spot.x + 14.f);
-    CLAMP(ent->pose.spot.y - 14.f, &r_refdef.view.spot.y, ent->pose.spot.y + 14.f);
-    CLAMP(ent->pose.spot.z - 22.f, &r_refdef.view.spot.z, ent->pose.spot.z + 30.f);
+    ClampInRange(ent->pose.spot.x - 14.f, &r_refdef.view.spot.x, ent->pose.spot.x + 14.f);
+    ClampInRange(ent->pose.spot.y - 14.f, &r_refdef.view.spot.y, ent->pose.spot.y + 14.f);
+    ClampInRange(ent->pose.spot.z - 22.f, &r_refdef.view.spot.z, ent->pose.spot.z + 30.f);
 }
 
 /*
@@ -753,10 +753,10 @@ void V_CalcRefdef() {
         ((ent->pose.spot.z - _oldZ) > 0.f)) {
 
         LegDt_t steptime = GetClSimTime() - cl.oldtime;
-        CLAMP_LESS(&steptime, 0.f); //FIXME  I_Error ("steptime < 0");
+        ClampLessThen(&steptime, 0.f); //FIXME  I_Error ("steptime < 0");
 
         _oldZ += steptime * 80.f;
-        CLAMP_MORE(&_oldZ, ent->pose.spot.z);
+        ClampMoreThen(&_oldZ, ent->pose.spot.z);
         if ((ent->pose.spot.z - _oldZ) > 12.f)     _oldZ = ent->pose.spot.z - 12.f;
         r_refdef.view.spot.z += _oldZ - ent->pose.spot.z;
         view->pose.spot.z += _oldZ - ent->pose.spot.z;

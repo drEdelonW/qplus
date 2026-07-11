@@ -126,7 +126,7 @@ void M_PrintWhite(int cx, int cy, cString str) {
 #define SLIDER_RANGE 10
 
 void M_DrawSlider(int x, int y, float range) {
-    CLAMP(0.0f, &range, 1.0f);
+    ClampInRange(0.0f, &range, 1.0f);
 
     M_DrawCharacter(x - D_CHAR_WIDTH, y, 128);
     int i = 0;

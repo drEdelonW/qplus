@@ -65,7 +65,7 @@ void Chase_Update() {
 
     // calculate pitch to look at the same spot from camera
     float dist = DotProduct(VectorSubtract(stop, r_refdef.view.spot), bs.forward);
-    CLAMP_LESS(&dist, 1.f);
+    ClampLessThen(&dist, 1.f);
 
     r_refdef.view.facing.pitch = DEG2RAD(-atanf(stop.z / dist));
 

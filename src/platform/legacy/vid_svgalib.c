@@ -227,7 +227,7 @@ void VID_Gamma_f() {
         for (i = 0; i < 768; i++) {
             f = pow((host_basepal[i] + 1) / 256.0, gamma);
             inf = f * 255 + 0.5;
-            CLAMP(0, &inf, 255);
+            ClampInRange(0, &inf, 255);
             palette[i] = inf;
         }
 
@@ -877,7 +877,7 @@ void IN_MouseMove(UserCmd_p cmd) {
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
         cl.viewangles[PITCH] += m_pitch.value * mouse_y;
-        CLAMP(-70, &cl.viewangles[PITCH], 80);
+        ClampInRange(-70, &cl.viewangles[PITCH], 80);
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)

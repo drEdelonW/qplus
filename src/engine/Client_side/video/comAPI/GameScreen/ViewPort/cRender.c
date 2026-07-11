@@ -31,11 +31,11 @@ void R_SetVrect(const vRect_p pvrectin, vRect_p pRect, int lineadj) {
     }
     pRect->width &= ~7;
     pRect->height = pvrectin->height * size;
-    CLAMP_MORE(&pRect->height, (pvrectin->height - lineadj));
+    ClampMoreThen(&pRect->height, (pvrectin->height - lineadj));
 
 #ifdef GLQUAKE
     {   /* GLQUAKE specific */
-        CLAMP_MORE(&pRect->height, pvrectin->height);
+        ClampMoreThen(&pRect->height, pvrectin->height);
 
         pRect->x = HALF(pvrectin->width - pRect->width);
         pRect->y = (full) ? 0 : HALF(h - pRect->height);

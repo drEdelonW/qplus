@@ -68,8 +68,8 @@ void CL_AdjustAngles() {
     if (lUp || lDown)
         V_StopPitchDrift();
 
-    CLAMP(-70.f, &cl.viewangles.pitch, 80.f);    // down look
-    CLAMP(-50.f, &cl.viewangles.roll, 50.f);
+    ClampInRange(-70.f, &cl.viewangles.pitch, 80.f);    // down look
+    ClampInRange(-50.f, &cl.viewangles.roll, 50.f);
 
 }
 

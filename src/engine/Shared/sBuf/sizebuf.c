@@ -9,7 +9,7 @@
 //===========================================================================
 
 void SZ_Alloc(sizebuf_p buf, size_t startsize) {
-    CLAMP_LESS(&startsize, 256);
+    ClampLessThen(&startsize, 256);
     buf->data = Hunk_AllocName(startsize, "sizebuf");
     buf->maxsize = startsize;
     buf->cursize = 0;

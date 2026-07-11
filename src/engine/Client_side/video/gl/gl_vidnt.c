@@ -223,8 +223,8 @@ bool VID_SetWindowedMode(int modenum) {
     PatBlt(hdc, 0, 0, WindowRect.right, WindowRect.bottom, BLACKNESS);
     ReleaseDC(dibwindow, hdc);
 
-    CLAMP_MORE(&vid.con.height, modelist[modenum].height);
-    CLAMP_MORE(&vid.con.width, modelist[modenum].width);
+    ClampMoreThen(&vid.con.height, modelist[modenum].height);
+    ClampMoreThen(&vid.con.width, modelist[modenum].width);
     Scr.vrect.width = vid.con.width;
     Scr.vrect.height = vid.con.height;
 
@@ -297,8 +297,8 @@ bool VID_SetFullDIBMode(int modenum) {
     PatBlt(hdc, 0, 0, WindowRect.right, WindowRect.bottom, BLACKNESS);
     ReleaseDC(dibwindow, hdc);
 
-    CLAMP_MORE(&vid.con.height, modelist[modenum].height);
-    CLAMP_MORE(&vid.con.width, modelist[modenum].width);
+    ClampMoreThen(&vid.con.height, modelist[modenum].height);
+    ClampMoreThen(&vid.con.width, modelist[modenum].width);
     Scr.vrect.width = vid.con.width;
     Scr.vrect.height = vid.con.height;
 
@@ -1134,11 +1134,11 @@ void VID_InitDIB(HINSTANCE hInstance) {
 
     if (COM_CheckParm("-width"))    modelist[0].width = Q_atoi(com.argv[COM_CheckParm("-width") + 1]);
     else                            modelist[0].width = 640;
-    CLAMP_LESS(&modelist[0].width, 320);
+    ClampLessThen(&modelist[0].width, 320);
 
     if (COM_CheckParm("-height"))   modelist[0].height = Q_atoi(com.argv[COM_CheckParm("-height") + 1]);
     else                            modelist[0].height = modelist[0].width * 240 / 320;
-    CLAMP_LESS(&modelist[0].height, 240);
+    ClampLessThen(&modelist[0].height, 240);
 
     snprintf(
         modelist[0].modedesc, sizeof(modelist[0].modedesc),
@@ -1333,7 +1333,7 @@ static void Check_Gamma(qPal_p pal) {
     for (int i = 0; i < 768; i++) {
         float f = pow((pal[i] + 1) / 256.0, vid_gamma);
         float inf = f * 255 + 0.5;
-        CLAMP(0, &inf, 255);
+        ClampInRange(0, &inf, 255);
         palette[i] = inf;
     }
 
@@ -1524,14 +1524,14 @@ void    VID_Init(uint8_p palette) {
         vid.con.width = 640;
 
     vid.con.width &= 0xfff8; // make it a multiple of eight
-    CLAMP_LESS(&vid.con.width, 320);
+    ClampLessThen(&vid.con.width, 320);
 
     // pick a conheight that matches with correct aspect
     vid.con.height = vid.con.width * 3 / 4;
 
     if ((i = COM_CheckParm("-conheight")) != 0)
         vid.con.height = Q_atoi(com.argv[i + 1]);
-    CLAMP_LESS(&vid.con.height, 200);
+    ClampLessThen(&vid.con.height, 200);
 
     vid.maxwarp.width = WARP_WIDTH;
     vid.maxwarp.height = WARP_HEIGHT;

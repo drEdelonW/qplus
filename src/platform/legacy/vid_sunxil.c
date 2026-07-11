@@ -174,7 +174,7 @@ void VID_Gamma_f() {
         for (i = 0; i < 255; i++) {
             f = pow((i + 1) / 256.0, g);
             inf = f * 255 + 0.5;
-            CLAMP(0, &inf, 255);
+            ClampInRange(0, &inf, 255);
             vid_gamma[i] = inf;
         }
 
@@ -194,7 +194,7 @@ bool CheckPixelMultiply() {
     int old_pixel;
 
     if ((m = (int)pixel_multiply.value) != current_pixel_multiply) {
-        CLAMP(1, &m, 4);
+        ClampInRange(1, &m, 4);
 
         old_pixel = current_pixel_multiply;
         current_pixel_multiply = m;
@@ -207,16 +207,16 @@ bool CheckPixelMultiply() {
         chg.width = wattr.width / old_pixel * current_pixel_multiply;
         chg.height = wattr.height / old_pixel * current_pixel_multiply;
 
-        CLAMP_LESS(&chg.width, MIN_WIDTH * current_pixel_multiply);
-        CLAMP_LESS(&chg.height, MIN_HEIGHT * current_pixel_multiply);
+        ClampLessThen(&chg.width, MIN_WIDTH * current_pixel_multiply);
+        ClampLessThen(&chg.height, MIN_HEIGHT * current_pixel_multiply);
 
         XConfigureWindow(x_disp, x_win, CWWidth | CWHeight, &chg);
 
         Scr.vrect.width = MP(wattr.width) & ~3;
         Scr.vrect.height = MP(wattr.height);
 
-        CLAMP_LESS(&Scr.vrect.width, 320);
-        CLAMP_LESS(&Scr.vrect.height, 200);
+        ClampLessThen(&Scr.vrect.width, 320);
+        ClampLessThen(&Scr.vrect.height, 200);
         VID_ResetFramebuffer();
 
         return true;
@@ -463,8 +463,8 @@ void VID_Init(uint8_p palette) {
 
     w = 320 * current_pixel_multiply; // minimum width
     h = 200 * current_pixel_multiply; // minimum height
-    CLAMP_LESS(&desired_width, w);
-    CLAMP_LESS(&desired_height, h);
+    ClampLessThen(&desired_width, w);
+    ClampLessThen(&desired_height, h);
 
     Scr.vrect.width = MP(desired_width);
     Scr.vrect.height = MP(desired_height);
@@ -473,8 +473,8 @@ void VID_Init(uint8_p palette) {
     // patch things up so game doesn't fail if window is too small
     //
 
-    CLAMP_LESS(&Scr.vrect.width, 320);
-    CLAMP_LESS(&Scr.vrect.height, 200);
+    ClampLessThen(&Scr.vrect.width, 320);
+    ClampLessThen(&Scr.vrect.height, 200);
 
     //
     // see if we're going to use threads
@@ -923,8 +923,8 @@ VID_Update(vRect_p rects) {
         Scr.vrect.width = MP(config_notify_width) & ~3;
         Scr.vrect.height = MP(config_notify_height);
 
-        CLAMP_LESS(&Scr.vrect.width, 320);
-        CLAMP_LESS(&Scr.vrect.height, 200);
+        ClampLessThen(&Scr.vrect.width, 320);
+        ClampLessThen(&Scr.vrect.height, 200);
 
         VID_ResetFramebuffer();
 
@@ -992,8 +992,8 @@ VID_Update_MT(vRect_p rects) {
         Scr.vrect.width = MP(config_notify_width) & ~3;
         Scr.vrect.height = MP(config_notify_height);
 
-        CLAMP_LESS(&Scr.vrect.width, 320);
-        CLAMP_LESS(&Scr.vrect.height, 200);
+        ClampLessThen(&Scr.vrect.width, 320);
+        ClampLessThen(&Scr.vrect.height, 200);
 
         VID_ResetFramebuffer_MT();
 
@@ -1175,7 +1175,7 @@ void IN_Move(UserCmd_p cmd) {
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
         cl.viewangles[PITCH] += m_pitch.value * mouse_y;
-        CLAMP(-70, &cl.viewangles[PITCH], 80);
+        ClampInRange(-70, &cl.viewangles[PITCH], 80);
     }
     else {
         if ((in.strafe.state & 1) && noclip_anglehack)

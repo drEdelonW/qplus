@@ -655,7 +655,7 @@ void IN_MouseMove(UserCmd_p cmd) {
 
     if ((kbIsDown(in.mlook)) && !(kbIsDown(in.strafe))) {
         cl.viewangles.pitch += m_pitch.value * mouse_y;
-        CLAMP(-70, &cl.viewangles.pitch, 80);
+        ClampInRange(-70, &cl.viewangles.pitch, 80);
     }
     else {
         if ((kbIsDown(in.strafe)) && noclip_anglehack)
@@ -1010,7 +1010,7 @@ void IN_JoyMove(UserCmd_p cmd) {
                 // also x values are in increments of 800 (so this is factored out)
                 // then bounds check result to level out excessively high spin rates
                 fTemp = 300.0 * pow(abs(fAxisValue) / 800.0, 1.3);
-                CLAMP_MORE(&fTemp, 14000.0);
+                ClampMoreThen(&fTemp, 14000.0);
                 // restore direction information
                 fAxisValue = (fAxisValue > 0.0) ? fTemp : -fTemp;
             }
@@ -1113,5 +1113,5 @@ void IN_JoyMove(UserCmd_p cmd) {
     }
 
     // bounds check pitch
-    CLAMP(-70.0, &cl.viewangles.pitch, 80.0);
+    ClampInRange(-70.0, &cl.viewangles.pitch, 80.0);
 }

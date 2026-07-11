@@ -224,7 +224,7 @@ int R_LightPoint(vec3_t pnt) {
         lp = 0;
 
 #ifndef GLQUAKE
-    CLAMP_LESS(&lp, r_refdef.ambientLight);
+    ClampLessThen(&lp, r_refdef.ambientLight);
 #endif
 
     return lp;

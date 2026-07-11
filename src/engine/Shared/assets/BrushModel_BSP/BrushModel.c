@@ -299,8 +299,8 @@ void CalcSurfaceExtents(mSurface_p s) {
 
         for (int j = 0; j < VECT_TX_DIM; j++) {
             float val = DotProduct(v->position, tex->vecs[j].vx) + tex->vecs[j].offs;
-            CLAMP_MORE(&mins.v[j], val);  // not CLAMP but GET MIN
-            CLAMP_LESS(&maxs.v[j], val);  // not CLAMP but GET MAX
+            ClampMoreThen(&mins.v[j], val);  // not ClampInRange but GET MIN
+            ClampLessThen(&maxs.v[j], val);  // not ClampInRange but GET MAX
         }
     }
 

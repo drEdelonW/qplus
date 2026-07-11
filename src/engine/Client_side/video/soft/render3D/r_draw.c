@@ -80,7 +80,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         vec3_t local = VectorSubtract(world, modelorg);
         vec3_t transformed = TransformVector(local);
 
-        CLAMP_LESS(&transformed.z, NEAR_CLIP);
+        ClampLessThen(&transformed.z, NEAR_CLIP);
 
         em.lzi = 1.0 / transformed.z;
 
@@ -88,13 +88,13 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
         {
             float scale = xscale * em.lzi;
             em.u = (xcenter + scale * transformed.x);
-            CLAMP(r_refdef.fvrectx_adj, &em.u, r_refdef.fvrectright_adj);
+            ClampInRange(r_refdef.fvrectx_adj, &em.u, r_refdef.fvrectright_adj);
         }
 
         {
             float scale = yscale * em.lzi;
             em.v = (ycenter - scale * transformed.y);
-            CLAMP(r_refdef.fvrecty_adj, &em.v, r_refdef.fvrectbottom_adj);
+            ClampInRange(r_refdef.fvrecty_adj, &em.v, r_refdef.fvrectbottom_adj);
         }
         em.ceilv = (int)ceil(em.v);
     }
@@ -105,27 +105,26 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     vec3_t local = VectorSubtract(world, modelorg);
     vec3_t transformed = TransformVector(local);
 
-    CLAMP_LESS(&transformed.z, NEAR_CLIP);
+    ClampLessThen(&transformed.z, NEAR_CLIP);
 
     _r.lzi = 1.0 / transformed.z;
 
     {
         float scale = xscale * _r.lzi;
         _r.u = (xcenter + scale * transformed.x);
-        // TODO: CLAMP it
-        CLAMP(r_refdef.fvrectx_adj, &_r.u, r_refdef.fvrectright_adj);
+        ClampInRange(r_refdef.fvrectx_adj, &_r.u, r_refdef.fvrectright_adj);
     }
 
     {
         float scale = yscale * _r.lzi;
         _r.v = (ycenter - scale * transformed.y);
-        CLAMP(r_refdef.fvrecty_adj, &_r.v, r_refdef.fvrectbottom_adj);
+        ClampInRange(r_refdef.fvrecty_adj, &_r.v, r_refdef.fvrectbottom_adj);
     }
 
-    // CLAMP_LESS(&em.lzi, _r.lzi);
-    CLAMP_LESS(&em.lzi, _r.lzi);
-    // CLAMP_LESS(&_r_nearzi, em.lzi);  // for mipmap finding
-    CLAMP_LESS(&_r_nearzi, em.lzi);     // for mipmap finding
+    // ClampLessThen(&em.lzi, _r.lzi);
+    ClampLessThen(&em.lzi, _r.lzi);
+    // ClampLessThen(&_r_nearzi, em.lzi);  // for mipmap finding
+    ClampLessThen(&_r_nearzi, em.lzi);     // for mipmap finding
 
 
     // for right edges, all we want is the effect on 1/z
@@ -186,7 +185,7 @@ void R_EmitEdge(mVertex_p pv0, mVertex_p pv1) {
     // it to incorrectly extend to the scan, and the extension of the line goes off
     // the edge of the screen
     // FIXME: is this actually needed?
-    CLAMP(r_refdef.vrect_x_adj_shift20, &edge->u, r_refdef.vrectright_adj_shift20);
+    ClampInRange(r_refdef.vrect_x_adj_shift20, &edge->u, r_refdef.vrectright_adj_shift20);
 
     //
     // sort the edge in normally
@@ -685,7 +684,7 @@ void R_RenderPoly(mSurface_p fa, AliasClipFlags_f clipflags) {
         vec3_t local = VectorSubtract(verts[vertpage][i].position, modelorg);
         vec3_t transformed = TransformVector(local);
 
-        CLAMP_LESS(&transformed.z, NEAR_CLIP);
+        ClampLessThen(&transformed.z, NEAR_CLIP);
 
         float lzi = 1.0 / transformed.z;
 
@@ -696,14 +695,14 @@ void R_RenderPoly(mSurface_p fa, AliasClipFlags_f clipflags) {
         {
             float scale = xscale * lzi;
             float u = (xcenter + scale * transformed.x);
-            CLAMP(r_refdef.fvrectx_adj, &u, r_refdef.fvrectright_adj);
+            ClampInRange(r_refdef.fvrectx_adj, &u, r_refdef.fvrectright_adj);
             pverts[i].u = u;
         }
 
         {
             float scale = yscale * lzi;
             float v = (ycenter - scale * transformed.y);
-            CLAMP(r_refdef.fvrecty_adj, &v, r_refdef.fvrectbottom_adj);
+            ClampInRange(r_refdef.fvrecty_adj, &v, r_refdef.fvrectbottom_adj);
             pverts[i].v = v;
         }
         pverts[i].zi = lzi;

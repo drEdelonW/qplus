@@ -242,8 +242,8 @@ void PF_changeyaw() {
     float move = angledelta(ent->v.ideal_yaw - current);
     if (move == 0.f)    return;
 
-    if (move > 0.f) CLAMP_MORE(&move, speed);
-    else            CLAMP_LESS(&move, -speed);
+    if (move > 0.f) ClampMoreThen(&move, speed);
+    else            ClampLessThen(&move, -speed);
 
     ent->v.angles.yaw = anglemod(current + move);
 }
@@ -263,8 +263,8 @@ void PF_changepitch() {
     float move = angledelta(ent->v.idealpitch - current);
     if (move == 0.f)    return;
 
-    if (move > 0.f) CLAMP_MORE(&move, speed);
-    else            CLAMP_LESS(&move, -speed);
+    if (move > 0.f) ClampMoreThen(&move, speed);
+    else            ClampLessThen(&move, -speed);
 
     ent->v.angles.pitch = anglemod(current + move);
 }

@@ -187,7 +187,7 @@ static void MaxPlayers_f() {
     }
 
     int n = Q_atoi(Cmd_Argv(1));
-    CLAMP_LESS(&n, 1);
+    ClampLessThen(&n, 1);
     if (n > GetSvMaxClientsLimit()) {
         n = GetSvMaxClientsLimit();
         Con_Printf("\"maxplayers\" set to \"%u\"\n", n);

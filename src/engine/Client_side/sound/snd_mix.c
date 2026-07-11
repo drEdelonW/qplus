@@ -173,7 +173,7 @@ void S_TransferPaintBuffer(int endtime) {
         while (count--) {
             int16_t val = (int16_t)((*p * snd_vol) >> 8);
             p += step;
-            // CLAMP(MIN_SND_VAL, &val, MAX_SND_VAL); // because int16_t
+            // ClampInRange(MIN_SND_VAL, &val, MAX_SND_VAL); // because int16_t
             out[out_idx] = val;
             out_idx = (out_idx + 1) & out_mask;
         }
@@ -183,7 +183,7 @@ void S_TransferPaintBuffer(int endtime) {
         while (count--) {
             int16_t val = (int16_t)((*p * snd_vol) >> 8);
             p += step;
-            // CLAMP(MIN_SND_VAL, &val, MAX_SND_VAL); // because int16_t
+            // ClampInRange(MIN_SND_VAL, &val, MAX_SND_VAL); // because int16_t
             out[out_idx] = (uint8_t)((val >> 8) + 128);
             out_idx = (out_idx + 1) & out_mask;
         }
@@ -282,8 +282,8 @@ void SND_InitScaletable() {
 #if !id386
 
 void SND_PaintChannelFrom8(channel_p ch, sfxcache_p sc, int count) {
-    CLAMP_MORE(&ch->leftvol, 0xFF);
-    CLAMP_MORE(&ch->rightvol, 0xFF);
+    ClampMoreThen(&ch->leftvol, 0xFF);
+    ClampMoreThen(&ch->rightvol, 0xFF);
 
     int* lscale = _snd_scaletable[EIGHTH(ch->leftvol)];
     int* rscale = _snd_scaletable[EIGHTH(ch->rightvol)];

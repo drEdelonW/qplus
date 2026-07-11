@@ -50,7 +50,7 @@ MipLevel_t D_MipLevelForScale(float scale) {
     else if (scale >= d_scalemip[2])    lMipLevel = Mip2;
     else /*                       */    lMipLevel = Mip3;
 
-    CLAMP_LESS(&lMipLevel, d_minmip);
+    ClampLessThen(&lMipLevel, d_minmip);
 
     return lMipLevel;
 }

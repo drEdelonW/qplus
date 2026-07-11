@@ -108,7 +108,7 @@ int FAT32_FileRead(FAT32_File_t* fh, void* dst, uint32_t bytes_to_read, uint32_p
     }
 
     uint32_t remaining = fh->file_size - fh->position;
-    CLAMP_MORE(&bytes_to_read, remaining);
+    ClampMoreThen(&bytes_to_read, remaining);
 
 
     uint32_t total_copied = 0;
@@ -166,8 +166,8 @@ int FAT32_FileSeekSet(FAT32_File_t* fh, uint32_t new_pos) {
     if (!fh) return -1;
 
     // clamp to EOF
-    CLAMP_MORE(&new_pos, fh->file_size);
-    else if (new_pos == 0u) {
+    ClampMoreThen(&new_pos, fh->file_size);
+    if (new_pos == 0u) {
         fh->current_cluster = fh->first_cluster;
         fh->position        = 0u;
         fh->cluster_index   = 0u;

@@ -1012,7 +1012,7 @@ void Sbar_MiniDeathmatchOverlay() {
     i = (i == sbl) ?
         0 :                 // we're not there
         i - HALF(numlines); // figure out start
-    CLAMP(0, &i, sbl - numlines);
+    ClampInRange(0, &i, sbl - numlines);
 
     int x = 324;
     for (; (i < sbl) && (y < (Scr.vrect.height - 8)); i++) {

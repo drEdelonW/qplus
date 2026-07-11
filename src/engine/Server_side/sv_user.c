@@ -140,7 +140,7 @@ void SV_UserFriction() {
     float control = (speed < sv_stopspeed.value) ?
         sv_stopspeed.value : speed;
     float newspeed = (float)(speed - host_frametime * control * friction);
-    CLAMP_LESS(&newspeed, 0.f);
+    ClampLessThen(&newspeed, 0.f);
     newspeed /= speed;
 
     *vel = VectorScale(*vel, newspeed);
@@ -160,7 +160,7 @@ void SV_Accelerate(vec3_t wishvel) {
     float addspeed = VectorNormalize(pushvec);
 
     float accelspeed = sv_accelerate.value * host_frametime * addspeed;
-    CLAMP_MORE(&accelspeed, addspeed);
+    ClampMoreThen(&accelspeed, addspeed);
 
     velocity = VectorMA(velocity, accelspeed, pushvec);
 }
@@ -172,14 +172,14 @@ void SV_Accelerate() {
         return;
 
     float accelspeed = (float)(sv_accelerate.value * host_frametime * _wishSpeed);
-    CLAMP_MORE(&accelspeed, addspeed);
+    ClampMoreThen(&accelspeed, addspeed);
 
     *_velocity = VectorMA(*_velocity, accelspeed, _wishDir);
 }
 
 void SV_AirAccelerate(vec3_t wishveloc) {
     float wishspd = VectorNormalize(&wishveloc);
-    CLAMP_MORE(&wishspd, 30.f);
+    ClampMoreThen(&wishspd, 30.f);
 
     float currentspeed = DotProduct(*_velocity, wishveloc);
     float addspeed = wishspd - currentspeed;
@@ -188,7 +188,7 @@ void SV_AirAccelerate(vec3_t wishveloc) {
 
     // accelspeed = sv_accelerate.value * host_frametime;
     float accelspeed = (float)(sv_accelerate.value * _wishSpeed * host_frametime);
-    CLAMP_MORE(&accelspeed, addspeed);
+    ClampMoreThen(&accelspeed, addspeed);
 
     *_velocity = VectorMA(*_velocity, accelspeed, wishveloc);
 }
@@ -198,7 +198,7 @@ void DropPunchAngle() {
     float len = VectorNormalize(&sv_player->v.punchangle);
 
     len -= (float)(10.0 * host_frametime);
-    CLAMP_LESS(&len, 0.0f);
+    ClampLessThen(&len, 0.0f);
 
     sv_player->v.punchangle = VectorScale(sv_player->v.punchangle, len);
 }
@@ -211,7 +211,7 @@ void DropPunchAngle(void) {
     if (orig_len == 0.f) return;
 
     float new_len = orig_len - 10.f * (float)host_frametime;
-    CLAMP_LESS(&new_len, 0.f);
+    ClampLessThen(&new_len, 0.f);
 
     sv_player->v.punchangle = AngleScale(sv_player->v.punchangle, new_len / orig_len);
 }
@@ -243,7 +243,7 @@ void SV_WaterMove() {
     float newspeed;
     if (speed) {
         newspeed = (float)(speed - host_frametime * speed * sv_friction.value);
-        CLAMP_LESS(&newspeed, 0.f);
+        ClampLessThen(&newspeed, 0.f);
         *_velocity = VectorScale(*_velocity, newspeed / speed);
     }
     else
@@ -257,7 +257,7 @@ void SV_WaterMove() {
 
     VectorNormalize(&wishvel);
     float accelspeed = (float)(sv_accelerate.value * _wishSpeed * host_frametime);
-    CLAMP_MORE(&accelspeed, addspeed);
+    ClampMoreThen(&accelspeed, addspeed);
 
     *_velocity = VectorMA(*_velocity, accelspeed, wishvel);
 }

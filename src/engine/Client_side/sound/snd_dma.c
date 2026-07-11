@@ -392,11 +392,11 @@ void SND_Spatialize(channel_p ch) {
     // add in distance effect
     vec_t scale = (1.0f - dist) * rscale;
     ch->rightvol = (int)((float)ch->master_vol * scale);
-    CLAMP_LESS(&ch->rightvol, 0);
+    ClampLessThen(&ch->rightvol, 0);
 
     scale = (1.0f - dist) * lscale;
     ch->leftvol = (int)((float)ch->master_vol * scale);
-    CLAMP_LESS(&ch->leftvol, 0);
+    ClampLessThen(&ch->leftvol, 0);
 }
 
 
@@ -600,11 +600,11 @@ void S_UpdateAmbientSounds() {
         // don't adjust volume too fast
         if (chan->master_vol < vol) {
             chan->master_vol += (int)((float)host_frametime * ambient_fade.value);
-            CLAMP_MORE(&chan->master_vol, vol);
+            ClampMoreThen(&chan->master_vol, vol);
         }
         else if (chan->master_vol > vol) {
             chan->master_vol -= (int)((float)host_frametime * ambient_fade.value);
-            CLAMP_LESS(&chan->master_vol, vol);
+            ClampLessThen(&chan->master_vol, vol);
         }
 
         chan->leftvol = chan->rightvol = chan->master_vol;

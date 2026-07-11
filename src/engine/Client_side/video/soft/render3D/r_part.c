@@ -58,7 +58,7 @@ void R_InitParticles() {
 
     if (i) {
         _rNumParticles = (int)(Q_atoi(com.argv[i + 1]));
-        CLAMP_LESS(&_rNumParticles, ABSOLUTE_MIN_PARTICLES);
+        ClampLessThen(&_rNumParticles, ABSOLUTE_MIN_PARTICLES);
     }
     else { _rNumParticles = MAX_PARTICLES; }
 

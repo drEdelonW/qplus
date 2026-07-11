@@ -594,14 +594,14 @@ void Draw_TileClear(int x, int y, int w, int h) {
 
         if (tileoffsety != 0)   vr.height = _rRectDesc.height - tileoffsety;
         else                    vr.height = _rRectDesc.height;
-        CLAMP_MORE(&vr.height, height);
+        ClampMoreThen(&vr.height, height);
 
         int tileoffsetx = vr.x % _rRectDesc.width;
 
         while (width > 0) {
             if (tileoffsetx != 0)   vr.width = _rRectDesc.width - tileoffsetx;
             else                    vr.width = _rRectDesc.width;
-            CLAMP_MORE(&vr.width, width);
+            ClampMoreThen(&vr.width, width);
 
             qColor8_p psrc = _rRectDesc.pTexBytes + (ptrdiff_t)(
                 (tileoffsety * _rRectDesc.rowBytes) + tileoffsetx);

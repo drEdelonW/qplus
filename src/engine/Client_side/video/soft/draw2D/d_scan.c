@@ -167,10 +167,10 @@ void Turbulent8(eSpan_p pspan) {
         InvZf z = (InvZf)FIXED16_ONE / dz.zi;    // prescale to 16.16 fixed-point
 
         r_turb_st.s = (int)(dz.sz * z) + sadjust;
-        CLAMP(0, &r_turb_st.s, bbextents);
+        ClampInRange(0, &r_turb_st.s, bbextents);
 
         r_turb_st.t = (int)(dz.tz * z) + tadjust;
-        CLAMP(0, &r_turb_st.t, bbextentt);
+        ClampInRange(0, &r_turb_st.t, bbextentt);
 
         do {
             // calculate s and t at the far end of the span
@@ -187,11 +187,11 @@ void Turbulent8(eSpan_p pspan) {
                 InvZf z = (InvZf)FIXED16_ONE / dz.zi;    // prescale to 16.16 fixed-point
 
                 st_next.s = (int)(dz.sz * z) + sadjust;
-                CLAMP(16, &st_next.s, bbextents);    // prevent round-off error on <0 steps from
+                ClampInRange(16, &st_next.s, bbextents);    // prevent round-off error on <0 steps from
                 //  from causing overstepping & running off the edge of the texture
 
                 st_next.t = (int)(dz.tz * z) + tadjust;
-                CLAMP(16, &st_next.t, bbextentt);    // guard against round-off error on <0 steps
+                ClampInRange(16, &st_next.t, bbextentt);    // guard against round-off error on <0 steps
 
                 r_turb_ststep.s = DIV16(st_next.s - r_turb_st.s);
                 r_turb_ststep.t = DIV16(st_next.t - r_turb_st.t);
@@ -207,11 +207,11 @@ void Turbulent8(eSpan_p pspan) {
                 dz.zi += d_zistepu * spancountminus1;
                 InvZf z = (InvZf)FIXED16_ONE / dz.zi;    // prescale to 16.16 fixed-point
                 st_next.s = (int)(dz.sz * z) + sadjust;
-                CLAMP(16, &st_next.s, bbextents);    // prevent round-off error on <0 steps from
+                ClampInRange(16, &st_next.s, bbextents);    // prevent round-off error on <0 steps from
                 //  from causing overstepping & running off the edge of the texture
 
                 st_next.t = (int)(dz.tz * z) + tadjust;
-                CLAMP(16, &st_next.t, bbextentt);    // guard against round-off error on <0 steps
+                ClampInRange(16, &st_next.t, bbextentt);    // guard against round-off error on <0 steps
 
                 if (r_turb_spancount > 1) {
                     r_turb_ststep.s = (st_next.s - r_turb_st.s) / (r_turb_spancount - 1);
@@ -266,10 +266,10 @@ void D_DrawSpans8(eSpan_p pspan) {
 
         STq16_t st;
         st.s = (int)(dz.sz * z) + sadjust;
-        CLAMP(0, &st.s, bbextents);
+        ClampInRange(0, &st.s, bbextents);
 
         st.t = (int)(dz.tz * z) + tadjust;
-        CLAMP(0, &st.t, bbextentt);
+        ClampInRange(0, &st.t, bbextentt);
 
         do {
             // calculate s and t at the far end of the span
@@ -288,11 +288,11 @@ void D_DrawSpans8(eSpan_p pspan) {
                 InvZf z = (InvZf)FIXED16_ONE / dz.zi;    // prescale to 16.16 fixed-point
 
                 st_next.s = (int)(dz.sz * z) + sadjust;
-                CLAMP(8, &st_next.s, bbextents);    // prevent round-off error on <0 steps from
+                ClampInRange(8, &st_next.s, bbextents);    // prevent round-off error on <0 steps from
                 //  from causing overstepping & running off the  edge of the texture
 
                 st_next.t = (int)(dz.tz * z) + tadjust;
-                CLAMP(8, &st_next.t, bbextentt);    // guard against round-off error on <0 steps
+                ClampInRange(8, &st_next.t, bbextentt);    // guard against round-off error on <0 steps
 
                 ststep.s = EIGHTH(st_next.s - st.s);
                 ststep.t = EIGHTH(st_next.t - st.t);
@@ -308,12 +308,12 @@ void D_DrawSpans8(eSpan_p pspan) {
                 dz.zi += d_zistepu * spancountminus1;
                 InvZf z = (InvZf)FIXED16_ONE / dz.zi;    // prescale to 16.16 fixed-point
                 st_next.s = (int)(dz.sz * z) + sadjust;
-                CLAMP(8, &st_next.s, bbextents);    // prevent round-off error on <0 steps from
+                ClampInRange(8, &st_next.s, bbextents);    // prevent round-off error on <0 steps from
                 //  from causing overstepping & running off the
                 //  edge of the texture
 
                 st_next.t = (int)(dz.tz * z) + tadjust;
-                CLAMP(8, &st_next.t, bbextentt);    // guard against round-off error on <0 steps
+                ClampInRange(8, &st_next.t, bbextentt);    // guard against round-off error on <0 steps
 
                 if (spancount > 1) {
                     ststep.s = (st_next.s - st.s) / (spancount - 1);

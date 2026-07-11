@@ -414,7 +414,7 @@ void R_DrawAliasModel(r_Entity_p e) {
     }
 
     // clamp lighting so it doesn't overbright as much
-    CLAMP_MORE(&ambientlight, 128.f);
+    ClampMoreThen(&ambientlight, 128.f);
 
     if ((ambientlight + shadelight) > 192.0f)
         shadelight = 192.0f - ambientlight;
@@ -591,7 +591,7 @@ void R_DrawViewModel() {
     if (!currententity->model)      return;
 
     int j = R_LightPoint(currententity->pose.spot);
-    CLAMP_LESS(&j, 24);  // allways give some light on gun
+    ClampLessThen(&j, 24);  // allways give some light on gun
     int ambientlight = j;
 
     // add dynamic lights

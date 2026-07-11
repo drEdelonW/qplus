@@ -9,7 +9,7 @@ Skill_t GM_GetSkill() {
 }
 void GM_SetSkill(Skill_t skill) {
     _current_skill = skill;
-    CLAMP(SkEasy, &_current_skill, SkNightmare);
+    ClampInRange(SkEasy, &_current_skill, SkNightmare);
 }
 
 int GetSvMaxClients() { return svs.maxClients; }

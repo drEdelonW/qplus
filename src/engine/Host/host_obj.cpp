@@ -444,17 +444,15 @@ bool Host::FilterTime(RealDt_t time) {
 
     if (!(cls.timedemo) &&
         ((GetRealTime() - oldrealtime) < (1.0 / 72.0))
-        )
-        return false;  // framerate is too high
+        )   return false;  // framerate is too high
 
     host_frametime = GetRealTime() - oldrealtime;
     oldrealtime = GetRealTime();
 
     if (host_framerate.value > 0)
         host_frametime = host_framerate.value;
-    else { // don't allow really long or int16_t frames
-        CLAMP(0.001, &host_frametime, 0.1);
-    }
+    else // don't allow really long or int16_t frames
+        ClampInRange(0.001, &host_frametime, 0.1);
 
     return true;
 }

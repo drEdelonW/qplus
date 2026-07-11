@@ -911,8 +911,8 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
 
-    CLAMP_MORE(&scaled_width, gl_max_size.value);
-    CLAMP_MORE(&scaled_height, gl_max_size.value);
+    ClampMoreThen(&scaled_width, gl_max_size.value);
+    ClampMoreThen(&scaled_height, gl_max_size.value);
 
     if (scaled_width * scaled_height > sizeof(_scaled) / 4)
         Host_SysError("GL_LoadTexture: too big");
@@ -967,10 +967,10 @@ void GL_Upload32(uint32_p data, int width, int height, bool mipmap, bool alpha) 
             ) {
             GL_MipMap((uint8_p)_scaled, scaled_width, scaled_height);
             scaled_width = HALF(scaled_width);
-            CLAMP_LESS(&scaled_width, 1);
+            ClampLessThen(&scaled_width, 1);
 
             scaled_height = HALF(scaled_height);
-            CLAMP_LESS(&scaled_height, 1);
+            ClampLessThen(&scaled_height, 1);
             miplevel++;
             glTexImage2D(
                 GL_TEXTURE_2D,
@@ -1020,8 +1020,8 @@ void GL_Upload8_EXT(qColor8_p data, int width, int height, bool mipmap, bool alp
     scaled_width >>= (int)gl_picmip.value;
     scaled_height >>= (int)gl_picmip.value;
 
-    CLAMP_MORE(&scaled_width, gl_max_size.value);
-    CLAMP_MORE(&scaled_height, gl_max_size.value);
+    ClampMoreThen(&scaled_width, gl_max_size.value);
+    ClampMoreThen(&scaled_height, gl_max_size.value);
 
     if (scaled_width * scaled_height > sizeof(_scaled))
         Host_SysError("GL_LoadTexture: too big");
@@ -1064,10 +1064,10 @@ void GL_Upload8_EXT(qColor8_p data, int width, int height, bool mipmap, bool alp
             ) {
             GL_MipMap8Bit(_scaled, scaled_width, scaled_height);
             scaled_width = HALF(scaled_width);
-            CLAMP_LESS(&scaled_width, 1);
+            ClampLessThen(&scaled_width, 1);
 
             scaled_height = HALF(scaled_height);
-            CLAMP_LESS(&scaled_height, 1);
+            ClampLessThen(&scaled_height, 1);
             miplevel++;
             glTexImage2D(
                 GL_TEXTURE_2D,

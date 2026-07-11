@@ -395,10 +395,10 @@ void DrawSkyPolygon(int nump, vec3_p vecs) {
             if (j < 0)  t = -vecs.v[-j - 1] / dv;
             else        t = vecs.v[j - 1] / dv;
         }
-        CLAMP_MORE(&sky[0].mins.v[axis], s);
-        CLAMP_MORE(&sky[1].mins.v[axis], t);
-        CLAMP_LESS(&sky[0].maxs.v[axis], s);
-        CLAMP_LESS(&sky[1].maxs.v[axis], t);
+        ClampMoreThen(&sky[0].mins.v[axis], s);
+        ClampMoreThen(&sky[1].mins.v[axis], t);
+        ClampLessThen(&sky[0].maxs.v[axis], s);
+        ClampLessThen(&sky[1].maxs.v[axis], t);
     }
 }
 
@@ -521,8 +521,8 @@ void MakeSkyVec(float s, float t, int axis) {
     s = (s + 1) * 0.5f;
     t = (t + 1) * 0.5f;
 
-    CLAMP(1.0f / 512, &s, 511.0f / 512);
-    CLAMP(1.0f / 512, &t, 511.0f / 512);
+    ClampInRange(1.0f / 512, &s, 511.0f / 512);
+    ClampInRange(1.0f / 512, &t, 511.0f / 512);
 
     t = 1.0f - t;
     glTexCoord2f(s, t);     glVertex3fv(v);

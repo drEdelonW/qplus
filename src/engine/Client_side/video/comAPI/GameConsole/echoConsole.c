@@ -69,10 +69,10 @@ void Con_CheckResize() {
         con.totallines = CON_TEXTSIZE / con.linewidth;
 
         int numlines = oldtotallines;
-        CLAMP_MORE(&numlines, con.totallines);
+        ClampMoreThen(&numlines, con.totallines);
 
         int numchars = oldwidth;
-        CLAMP_MORE(&numchars, con.linewidth);
+        ClampMoreThen(&numchars, con.linewidth);
 
         char tbuf[CON_TEXTSIZE];
         Q_memcpy(tbuf, con.pText, CON_TEXTSIZE);
@@ -195,7 +195,7 @@ void Con_DrawConsole(CmdLine_t lines, bool drawinput) {
 
     for (int i = (con.current - rows + 1); i <= con.current; i++, y += D_CHAR_HEIGHT) {
         int j = i - con.backscroll;
-        CLAMP_LESS(&j, 0);
+        ClampLessThen(&j, 0);
 
         cString pText = con.pText + (j % con.totallines) * con.linewidth;
         for (int x = 0; x < con.linewidth; x++)

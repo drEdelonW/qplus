@@ -91,7 +91,7 @@ void D_DrawParticle(Particle_p pparticle) {
 
     int pix = izi >> d_pix_shift;
 
-    CLAMP(d_pix_min, &pix, d_pix_max);
+    ClampInRange(d_pix_min, &pix, d_pix_max);
 
     switch (pix) {
     case 1: {

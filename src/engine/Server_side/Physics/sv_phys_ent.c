@@ -274,7 +274,7 @@ void SV_Physics_Step(edict_p ent) {
 
                     float control = speed < sv_stopspeed.value ? sv_stopspeed.value : speed;
                     float newspeed = speed - host_frametime * control * friction;
-                    CLAMP_LESS(&newspeed, 0.f);
+                    ClampLessThen(&newspeed, 0.f);
                     newspeed /= speed;
 
                     vel->x = vel->x * newspeed;

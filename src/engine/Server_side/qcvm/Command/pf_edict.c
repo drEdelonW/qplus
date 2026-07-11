@@ -315,7 +315,7 @@ static uint8_t _checkPvs[MAX_MAP_LEAFS / 8];
 
 uint8_t PF_newcheckclient(uint8_t check) {
     // cycle to the next one
-    CLAMP(1u, &check, GetSvMaxClients());
+    ClampInRange(1u, &check, GetSvMaxClients());
 
     uint8_t i = (check == GetSvMaxClients()) ? 0 : (check + 1);
 

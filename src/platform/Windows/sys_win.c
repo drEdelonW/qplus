@@ -665,9 +665,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // request otherwise
     parms.memsize = lpBuffer.dwAvailPhys;
 
-    CLAMP_LESS(&parms.memsize, MINIMUM_WIN_MEMORY);
-    CLAMP_LESS(&parms.memsize, HALF(lpBuffer.dwTotalPhys));
-    CLAMP_MORE(&parms.memsize, MAXIMUM_WIN_MEMORY);
+    ClampLessThen(&parms.memsize, MINIMUM_WIN_MEMORY);
+    ClampLessThen(&parms.memsize, HALF(lpBuffer.dwTotalPhys));
+    ClampMoreThen(&parms.memsize, MAXIMUM_WIN_MEMORY);
 
     if (COM_CheckParm("-heapsize")) {
         int param;

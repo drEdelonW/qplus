@@ -121,7 +121,7 @@ static inline fixed16_t FlToFx16(float f)        { return (fixed16_t)(f * FIXED1
 #include "CLAMP.h"
 static inline int8_t fixed4_fsat(float f) {
     int v = (int)(f * FIXED4_ONE);
-    CLAMP(INT8_MIN, &v, INT8_MAX);
+    ClampInRange(INT8_MIN, &v, INT8_MAX);
     return (int8_t)v;
 }
 

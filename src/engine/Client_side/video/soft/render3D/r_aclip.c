@@ -269,8 +269,8 @@ void R_AliasClipTriangle(mTriangle_p ptri) {
     }
 
     for (int i = 0; i < k; i++) {
-        CLAMP(r_refdef.aliasvrect.x, &_fv[pingpong][i].vAttr.x, r_refdef.aliasvrectright);
-        CLAMP(r_refdef.aliasvrect.y, &_fv[pingpong][i].vAttr.y, r_refdef.aliasvrectbottom);
+        ClampInRange(r_refdef.aliasvrect.x, &_fv[pingpong][i].vAttr.x, r_refdef.aliasvrectright);
+        ClampInRange(r_refdef.aliasvrect.y, &_fv[pingpong][i].vAttr.y, r_refdef.aliasvrectbottom);
         _fv[pingpong][i].flags = 0;
     }
 

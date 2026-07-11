@@ -202,7 +202,7 @@ void SV_CheckVelocity(edict_p ent) {
             Con_Printf("Got a NaN velocity on %s\n", PR_GetQString(ent->v.classname));
             ent->v.velocity.v[i] = 0.f;
         }
-        CLAMP(-sv_maxvelocity.value, &ent->v.velocity.v[i], sv_maxvelocity.value);
+        ClampInRange(-sv_maxvelocity.value, &ent->v.velocity.v[i], sv_maxvelocity.value);
 
         if (IS_NAN(ent->v.origin.v[i])) {
             Con_Printf("Got a NaN origin on %s\n", PR_GetQString(ent->v.classname));
@@ -257,7 +257,7 @@ bool SV_RunThink(edict_p ent) {
         (thinktime > (SV_GetTime() + host_frametime))
         )   return true;
 
-    CLAMP_LESS(&thinktime, (float)SV_GetTime()); // don't let things stay in the past.
+    ClampLessThen(&thinktime, (float)SV_GetTime()); // don't let things stay in the past.
     // it is possible to start that way
     // by a trigger with a local time.
     ent->v.nextthink = 0.f;

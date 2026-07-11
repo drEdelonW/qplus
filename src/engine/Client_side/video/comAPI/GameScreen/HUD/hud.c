@@ -92,5 +92,5 @@ void Con_DrawNotify() {
         v += D_CHAR_HEIGHT;
     }
 
-    CLAMP_LESS(&con.notifylines, v);
+    ClampLessThen(&con.notifylines, v);
 }

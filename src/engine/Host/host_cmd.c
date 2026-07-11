@@ -872,9 +872,9 @@ void Host_Color_f() {
     );
 
     top &= 15;
-    CLAMP_MORE(&top, 13);
+    ClampMoreThen(&top, 13);
     bottom &= 15;
-    CLAMP_MORE(&bottom, 13);
+    ClampMoreThen(&bottom, 13);
 
     uint8_t playercolor = (uint8_t)(((uint16_t)top << 4) + bottom);
 
@@ -1321,7 +1321,7 @@ void Host_Viewprev_f() {
 
     Model_p mdl = cl.model_precache[(int)eDict->v.modelindex];
     eDict->v.frame--;
-    CLAMP_LESS(&eDict->v.frame, 0);
+    ClampLessThen(&eDict->v.frame, 0);
 
     PrintFrameName(mdl, (int)eDict->v.frame);
 }

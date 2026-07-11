@@ -282,7 +282,7 @@ void VID_Gamma_f() {
         for (i = 0; i < 255; i++) {
             f = pow((i + 1) / 256.0f, g);
             inf = f * 255 + 0.5;
-            CLAMP(0, &inf, 255);
+            ClampInRange(0, &inf, 255);
             vid_gamma[i] = inf;
         }
 
@@ -1126,7 +1126,7 @@ void IN_Move(UserCmd_p cmd) {
 
     if ((in.mlook.state & 1) && !(in.strafe.state & 1)) {
         cl.viewangles.pitch += m_pitch.value * mouse_y;
-        CLAMP(-70.f, cl.viewangles.pitch, 80.f);
+        ClampInRange(-70.f, cl.viewangles.pitch, 80.f);
     }
     else {
         if ((in.strafe.state & 1) &&

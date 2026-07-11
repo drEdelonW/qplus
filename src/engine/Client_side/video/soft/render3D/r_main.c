@@ -218,7 +218,7 @@ void R_NewMap() {
 
     r_cnumsurfs = r_maxsurfs.value;
 
-    CLAMP_LESS(&r_cnumsurfs, MINSURFACES);
+    ClampLessThen(&r_cnumsurfs, MINSURFACES);
 
     if (r_cnumsurfs > NUMSTACKSURFACES) {
         pSurfaces = Hunk_AllocName(sizeof(Surf_t) * r_cnumsurfs, "surfaces");
@@ -238,7 +238,7 @@ void R_NewMap() {
     r_maxsurfsseen = 0;
 
     r_numallocatededges = r_maxedges.value;
-    CLAMP_LESS(&r_numallocatededges, MINEDGES);
+    ClampLessThen(&r_numallocatededges, MINEDGES);
 
     if (r_numallocatededges <= NUMSTACKEDGES) {
         auxedges = NULL;
@@ -476,7 +476,7 @@ void R_DrawEntitiesOnList() {
                 }
 
                 // clamp lighting so it doesn't overbright as much
-                CLAMP_MORE(&lighting.ambientlight, 128);
+                ClampMoreThen(&lighting.ambientlight, 128);
 
                 if ((lighting.ambientlight + lighting.shadelight) > 192) // loop?
                     lighting.shadelight = 192 - lighting.ambientlight;
@@ -525,7 +525,7 @@ void R_DrawViewModel() {
 
     int j = R_LightPoint(currententity->pose.spot);
 
-    CLAMP_LESS(&j, 24);  // allways give some light on gun
+    ClampLessThen(&j, 24);  // allways give some light on gun
 
     r_viewlighting.ambientlight = j;
     r_viewlighting.shadelight = j;
@@ -544,7 +544,7 @@ void R_DrawViewModel() {
             r_viewlighting.ambientlight += add;
     }
 
-    CLAMP_LESS(&r_viewlighting.ambientlight, 128);    // clamp lighting so it doesn't overbright as much
+    ClampLessThen(&r_viewlighting.ambientlight, 128);    // clamp lighting so it doesn't overbright as much
 
     if ((r_viewlighting.ambientlight + r_viewlighting.shadelight) > 192)
         r_viewlighting.shadelight = 192 - r_viewlighting.ambientlight;

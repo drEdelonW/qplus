@@ -64,17 +64,17 @@ void M_AdjustSliders(menuDirection_e dir) {
     switch (_cursor) {
     case o_ScreenSize: {
         scr_viewsize.value += dir * 10;
-        CLAMP(30.0f, &scr_viewsize.value, 120.0f);
+        ClampInRange(30.0f, &scr_viewsize.value, 120.0f);
         Cvar_SetValue("viewsize", scr_viewsize.value);
     } break;
     case o_Brightness: {// gamma
         v_gamma.value -= dir * 0.05;
-        CLAMP(0.5f, &v_gamma.value, 1.0f);
+        ClampInRange(0.5f, &v_gamma.value, 1.0f);
         Cvar_SetValue("gamma", v_gamma.value);
     } break;
     case o_MouseSpeed: { // mouse speed
         sensitivity.value += dir * 0.5;
-        CLAMP(1.0f, &sensitivity.value, 11.0f);
+        ClampInRange(1.0f, &sensitivity.value, 11.0f);
         Cvar_SetValue("sensitivity", sensitivity.value);
     } break;
     case o_CDVolume: { // music volume
@@ -83,12 +83,12 @@ void M_AdjustSliders(menuDirection_e dir) {
 #else
         bgmvolume.value += dir * 0.1f;
 #endif
-        CLAMP(0.0f, &bgmvolume.value, 1.0f);
+        ClampInRange(0.0f, &bgmvolume.value, 1.0f);
         Cvar_SetValue("bgmvolume", bgmvolume.value);
     } break;
     case o_SndVolume: {// sfx volume
         volume.value += dir * 0.1f;
-        CLAMP(0.0f, &volume.value, 1.0f);
+        ClampInRange(0.0f, &volume.value, 1.0f);
         Cvar_SetValue("volume", volume.value);
     } break;
 
