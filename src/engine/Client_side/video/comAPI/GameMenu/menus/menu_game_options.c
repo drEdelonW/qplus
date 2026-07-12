@@ -219,7 +219,7 @@ void M_GameOptions_Draw() {
     static int _x2 = 160;
     int yIdx = 0;
 
-    M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+    M_DrawTransPicName(16, 4, "gfx/qplaque.lmp");
     M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 
     M_DrawTextBox(_x2 - 8, _cur_ys[yIdx] - 8, 10, 1); {

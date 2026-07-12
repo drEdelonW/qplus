@@ -36,9 +36,13 @@ extern "C" {
     void    Draw_CharGrid(int col, int row, ConsoleSymbols_t symb);
     void    Draw_DebugChar(ConsoleSymbols_t symb);
     void    Draw_String(int x, int y, cStringRO str);
+    void    Draw_StrGrid(int col, int row, cStringRO str);
 
     void    Draw_Pic(int x, int y, qPic_p pic);
+    void    Draw_PicName(int x, int y, cStringRO str);
+    void    Draw_PicCenter(cStringRO str);
     void    Draw_TransPic(int x, int y, qPic_p pic);
+    void    Draw_TransPicName(int x, int y, cStringRO str);
     void    Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation); // TODO: is it ColorMap_p?
 
     void    Draw_TileClear(int x, int y, int w, int h);

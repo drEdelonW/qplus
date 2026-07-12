@@ -38,9 +38,6 @@ extern "C" {
     void SCR_SetUpToDrawConsole();
     void SCR_DrawConsole();
 
-    void SCR_DrawRam();
-    void SCR_DrawTurtle();
-    void SCR_DrawNet();
 
     void Con_MessageMode_f();
     void Con_MessageMode2_f();

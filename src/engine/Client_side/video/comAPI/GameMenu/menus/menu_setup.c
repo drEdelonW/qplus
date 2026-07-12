@@ -49,7 +49,7 @@ void M_Menu_Setup_f() {
 
 
 void M_Setup_Draw() {
-    M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+    M_DrawTransPicName(16, 4, "gfx/qplaque.lmp");
 
     M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 
@@ -70,7 +70,7 @@ void M_Setup_Draw() {
         M_Print(72, _y[s_Accept], "Accept Changes");
     }
 
-    M_DrawTransPic(160, 64, Draw_CachePic("gfx/bigbox.lmp"));
+    M_DrawTransPicName(160, 64, "gfx/bigbox.lmp");
     M_BuildTranslationTable(MUL16(_s.top), MUL16(_s.bottom)); {
         M_DrawTransPicTranslate(172, 72, Draw_CachePic("gfx/menuplyr.lmp"));
     }

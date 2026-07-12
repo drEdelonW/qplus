@@ -26,10 +26,10 @@ void M_Menu_SinglePlayer_f() {
 
 
 void M_SinglePlayer_Draw() {
-    M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+    M_DrawTransPicName(16, 4, "gfx/qplaque.lmp");
     M_DrawPicHC(4, Draw_CachePic("gfx/ttl_sgl.lmp"));
-    M_DrawTransPic(72, 32, Draw_CachePic("gfx/sp_menu.lmp"));
-    M_DrawTransPic(54, 32 + _cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame())));
+    M_DrawTransPicName(72, 32, "gfx/sp_menu.lmp");
+    M_DrawTransPicName(54, 32 + _cursor * 20, va("gfx/menudot%i.lmp", curAnimFrame()));
 }
 
 void M_SinglePlayer_Key(keycode_t Key) {

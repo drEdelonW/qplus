@@ -32,6 +32,7 @@ void M_BuildTranslationTable(int top, int bottom);
 
 void M_DrawTransPicTranslate(int x, int y, qPic_p pic);
 void M_DrawTransPic(int x, int y, qPic_p pic);
+void M_DrawTransPicName(int x, int y, cStringRO str);
 int M_DrawPicHC(int y, qPic_p pic);
 void M_DrawPic(int x, int y, qPic_p pic);
 

@@ -54,7 +54,7 @@ void M_Menu_Net_f() {
 }
 
 void M_Net_Draw() {
-    M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+    M_DrawTransPicName(16, 4, "gfx/qplaque.lmp");
 
     M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 
@@ -80,10 +80,10 @@ void M_Net_Draw() {
 #endif
     );
 
-    M_DrawTransPic(72, f += 19, Draw_CachePic((ipxAvailable) ? "gfx/netmen3.lmp" : "gfx/dim_ipx.lmp"));
-    M_DrawTransPic(72, f += 19, Draw_CachePic((tcpipAvailable) ? "gfx/netmen4.lmp" : "gfx/dim_tcp.lmp"));
+    M_DrawTransPicName(72, f += 19, (ipxAvailable) ? "gfx/netmen3.lmp" : "gfx/dim_ipx.lmp");
+    M_DrawTransPicName(72, f += 19, (tcpipAvailable) ? "gfx/netmen4.lmp" : "gfx/dim_tcp.lmp");
 
-    if (m_net_items == 5) M_DrawTransPic(72, f += 19, Draw_CachePic("gfx/netmen5.lmp")); // JDC, could just be removed
+    if (m_net_items == 5) M_DrawTransPicName(72, f += 19, "gfx/netmen5.lmp"); // JDC, could just be removed
 
     f = HALF(320 - MUL8(26));
     M_DrawTextBox(f, 134, 24, 4);
@@ -92,10 +92,9 @@ void M_Net_Draw() {
         M_Print(f, 142 + MUL8(i), net_helpMessage[m_net_cursor][i]);
 
 
-    M_DrawTransPic(
+    M_DrawTransPicName(
         54, 32 + m_net_cursor * 20,
-        Draw_CachePic(va("gfx/menudot%i.lmp", curAnimFrame())
-        )
+        va("gfx/menudot%i.lmp", curAnimFrame())
     );
 }
 

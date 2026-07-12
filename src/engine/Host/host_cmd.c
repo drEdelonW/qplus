@@ -181,8 +181,7 @@ void Host_Map_f() {
 
     svs.serverflags = 0;   // haven't completed an episode yet
 
-    qPathStr_t name;
-    strcpy(name, Cmd_Argv(1));
+    qPathStr_t name; strcpy(name, Cmd_Argv(1));
     SV_SpawnServer(name
 #ifdef QUAKE2
         , NULL
@@ -219,8 +218,7 @@ void Host_Changelevel_f() {
     cString startspot;
     if (Cmd_Argc() == 2) { startspot = NULL; }
     else {
-        qPathStr_t _startspot;
-        strcpy(_startspot, Cmd_Argv(2));
+        qPathStr_t _startspot; strcpy(_startspot, Cmd_Argv(2));
         startspot = _startspot;
     }
 
@@ -233,8 +231,7 @@ void Host_Changelevel_f() {
     if (!SV_IsActive() || cls.isDemoPlaying) { ; Con_Printf("Only the server may changelevel\n");                        return; }
     SV_SaveSpawnparms();
 
-    qPathStr_t level;
-    strcpy(level, Cmd_Argv(1));
+    qPathStr_t level; strcpy(level, Cmd_Argv(1));
     SV_SpawnServer(level);
 #endif
 }
@@ -253,12 +250,10 @@ void Host_Restart_f() {
         )
         return;
 
-    qPathStr_t mapname;
-    strcpy(mapname, SV_GetName()); // must copy out, because it gets cleared
+    qPathStr_t mapname; strcpy(mapname, SV_GetName()); // must copy out, because it gets cleared
     // in sv_spawnserver
 #ifdef QUAKE2
-    qPathStr_t startspot;
-    strcpy(startspot, sv.startspot);
+    qPathStr_t startspot; strcpy(startspot, sv.startspot);
     SV_SpawnServer(mapname, startspot);
 #else
     SV_SpawnServer(mapname);
@@ -291,7 +286,7 @@ void Host_Connect_f() {
         CL_StopPlayback();
         CL_Disconnect();
     }
-    qPathStr_t name;   strcpy(name, Cmd_Argv(1));
+    qPathStr_t name; strcpy(name, Cmd_Argv(1));
     CL_EstablishConnection(name);
     Host_Reconnect_f();
 }
@@ -639,14 +634,12 @@ void Host_Changelevel2_f() {
     if (Cmd_Argc() < 2) { Con_Printf("changelevel2 <levelname> : continue game on a new level in the unit\n");  return; }
     if (!SV_IsActive() || cls.isDemoPlaying) { Con_Printf("Only the server may changelevel\n");  return; }
 
-    qPathStr_t level;
-    strcpy(level, Cmd_Argv(1));
+    qPathStr_t level; strcpy(level, Cmd_Argv(1));
 
     cString startspot;
     if (Cmd_Argc() == 2) { startspot = NULL; }
     else {
-        qPathStr_t _startspot;
-        strcpy(_startspot, Cmd_Argv(2));
+        qPathStr_t _startspot; strcpy(_startspot, Cmd_Argv(2));
         startspot = _startspot;
     }
 

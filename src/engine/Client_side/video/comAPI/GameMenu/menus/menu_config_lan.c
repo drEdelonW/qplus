@@ -55,7 +55,7 @@ void M_Menu_LanConfig_f() {
 
 
 void M_LanConfig_Draw() {
-    M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+    M_DrawTransPicName(16, 4, "gfx/qplaque.lmp");
 
     int basex = M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 

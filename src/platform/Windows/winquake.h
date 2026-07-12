@@ -68,8 +68,8 @@ typedef enum {
 extern modestate_t modestate;
 
 extern HWND mainwindow;
-extern bool ActiveApp, Minimized;
-
+extern bool ActiveApp;
+extern bool Minimized;
 extern bool WinNT;
 
 int  VID_ForceUnlockedAndReturnState();

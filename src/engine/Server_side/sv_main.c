@@ -316,7 +316,7 @@ void SV_SpawnServer(cString server
     // let's not have any servers with no name
     if (hostname.string[0] == 0)
         Cvar_Set("hostname", "UNNAMED");
-    Scr.centertime_off = 0;
+    HideCenterPrint();
 
     Con_DPrintf("SpawnServer: %s\n", server);
     svs.changelevel_issued = false;    // now safe to issue another

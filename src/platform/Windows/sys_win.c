@@ -41,7 +41,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define NOT_FOCUS_SLEEP 20    // sleep time when not focus
 
 int  starttime;
-bool ActiveApp, Minimized;
+bool ActiveApp; // Global
+bool Minimized; // Global
 bool WinNT;
 
 static double    _pfreq;
@@ -191,25 +192,21 @@ int Sys_FileTime(cStringRO path) {
         fclose(f);
         retval = 1;
     }
-    else {
+    else
         retval = -1;
-    }
+
 
     VID_ForceLockState(t);
     return retval;
 }
 
+void Sys_mkdir(cStringRO path) {
 #if 0
-void Sys_mkdir(cStringRO path) {
     _mkdir(path);
-}
 #else
-void Sys_mkdir(cStringRO path) {
-    /* WinAPI создаёт папку, если её нет; если есть — вернёт FALSE и
-       GetLastError()==ERROR_ALREADY_EXISTS, что нам ок. */
     CreateDirectoryA(path, NULL);
-}
 #endif
+}
 
 
 /*
@@ -276,16 +273,12 @@ void Sys_Init() {
         Sys_Error("Couldn't get OS info");
 
     if ((vinfo.dwMajorVersion < 4) ||
-        (vinfo.dwPlatformId == VER_PLATFORM_WIN32s)) {
-        Sys_Error("WinQuake requires at least Win95 or NT 4.0");
-    }
+        (vinfo.dwPlatformId == VER_PLATFORM_WIN32s)
+        )   Sys_Error("WinQuake requires at least Win95 or NT 4.0");
 
-    if (vinfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
-        WinNT = true;
-    else
-        WinNT = false;
+
+    WinNT = (vinfo.dwPlatformId == VER_PLATFORM_WIN32_NT);
 }
-
 
 void Sys_Error(cStringRO error, ...) {
     cStringRO text3 = "Press Enter to exit\n";
@@ -303,23 +296,11 @@ void Sys_Error(cStringRO error, ...) {
         VID_ForceUnlockedAndReturnState();
     }
 
-#if 0
-    char text[1024];
-    va_list argptr; va_start(argptr, error); {
-        vsnprintf(text, sizeof(text), error, argptr);
-    } va_end(argptr);
-#else
     VaBuff_t text;
     VA_EXPAND(text, error);
-#endif
+
     if (isDedicated) {
-#if 0
-        va_start(argptr, error); {
-            vsnprintf(text, sizeof(text), error, argptr);
-        } va_end(argptr);
-#else
         VA_EXPAND(text, error);
-#endif
         VaBuff_t text2;
         snprintf(text2, sizeof(text2), "ERROR: %s\n", text);
         WriteFile(houtput, text5, strlen(text5), &dummy, NULL);
@@ -332,7 +313,8 @@ void Sys_Error(cStringRO error, ...) {
         starttime = Sys_FloatTime();
         _ScReturnOnEnter = true; // so Enter will get us out of here
 
-        while (!Sys_ConsoleInput() &&
+        while (
+            !Sys_ConsoleInput() &&
             ((Sys_FloatTime() - starttime) < CONSOLE_ERROR_TIMEOUT)
             ) {
         }
@@ -372,17 +354,9 @@ void Sys_Error(cStringRO error, ...) {
 
 void Sys_Printf(cStringRO fmt, ...) {
     DWORD   dummy;
-
     if (isDedicated) {
-#if 0
-        char text[1024];
-        va_list argptr; va_start(argptr, fmt); {
-            vsnprintf(text, sizeof(text), fmt, argptr);
-        } va_end(argptr);
-#else
         VaBuff_t text;
         VA_EXPAND(text, fmt);
-#endif
         WriteFile(houtput, text, strlen(text), &dummy, NULL);
     }
 }
@@ -444,9 +418,9 @@ LegTime_t Sys_FloatTime() {
                     sametimecount = 0;
                 }
             }
-            else {
+            else
                 sametimecount = 0;
-            }
+
 
             _lastcurtime = _curtime;
         }
@@ -628,8 +602,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     argv[0] = _empty_string;
 
     while (*lpCmdLine && (parms.argc < MAX_NUM_ARGVS)) {
-        while (*lpCmdLine && ((*lpCmdLine <= 32) || (*lpCmdLine > 126)))
-            lpCmdLine++;
+        while (*lpCmdLine &&
+            (
+                (*lpCmdLine <= 32) ||
+                (*lpCmdLine > 126)
+                )
+            )   lpCmdLine++;
 
         if (*lpCmdLine) {
             argv[parms.argc] = lpCmdLine;
@@ -755,11 +733,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
         else {
             // yield the CPU for a little while when paused, minimized, or not the focus
-            /**/ if ((cl.paused && (!ActiveApp && !DDActive)) || Minimized || Scr.block_drawing) {
+            /**/ if (
+                (
+                    cl.paused &&
+                    (
+                        !(ActiveApp) &&
+                        !(DDActive)
+                        )
+                    ) ||
+                Minimized ||
+                Scr.block_drawing
+                ) {
                 SleepUntilInput(PAUSE_SLEEP);
                 Scr.skipupdate = TRUE;  // no point in bothering to draw
             }
-            else if (!ActiveApp && !DDActive) {
+            else if (
+                !(ActiveApp) &&
+                !(DDActive)
+                ) {
                 SleepUntilInput(NOT_FOCUS_SLEEP);
             }
 

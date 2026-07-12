@@ -30,12 +30,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct {
     vRect_t rect;
-    int     width;
-    int     height;
-    qColor8_p pTexBytes;
-    int     rowBytes;
-} RectDesc_t;
-static RectDesc_t _rRectDesc;
+    int w; // width;
+    int h; //height;
+    qColor8_p pData;
+    int rowBytes;
+} BackTile_t;
+static BackTile_t _btR;
 
 /*
 ===============
@@ -49,13 +49,65 @@ void Draw_Init() {
     draw_disc = GetPicFromWad("disc");
 
     qPic_p BackTile = GetPicFromWad("backtile"); // get from WAD textures
-    _rRectDesc = (RectDesc_t){
-        .width = BackTile->width,
-        .height = BackTile->height,
-        .pTexBytes = BackTile->data,
+    _btR = (BackTile_t){
+        .w = BackTile->width,
+        .h = BackTile->height,
+        .pData = BackTile->data,
         .rowBytes = BackTile->width,
     };
 }
+
+
+/*
+=============
+Draw_TileClear
+
+This repeats a 64*64 tile graphic to fill the screen around a sized down
+refresh window.
+=============
+*/
+void R_DrawRect8(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent);
+void R_DrawRect16(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent);
+void Draw_TileClear(int x, int y, int w, int h) {
+    _btR.rect = (vRect_t){
+        .x = x,     .y = y,
+        .width = w, .height = h
+    };
+
+    vRect_t vr = {
+        .y = _btR.rect.y
+    };
+
+    int tileOffsY = vr.y % _btR.h;
+    {
+        int height = _btR.rect.height;
+        while (height > 0) {
+            vr.x = _btR.rect.x;
+            vr.height = _btR.h - tileOffsY;
+            ClampMoreThen(&vr.height, height);
+            int tileOffsX = vr.x % _btR.w;
+            {
+                int width = _btR.rect.width;
+                while (width > 0) {
+                    vr.width = _btR.w - tileOffsX;
+                    ClampMoreThen(&vr.width, width);
+                    qColor8_p pSrc = _btR.pData + (tileOffsY * _btR.rowBytes) + tileOffsX;
+
+                    if (r_pixbytes == 1)     R_DrawRect8(&vr, _btR.rowBytes, pSrc, false);
+                    else                    R_DrawRect16(&vr, _btR.rowBytes, pSrc, false);
+
+                    vr.x += vr.width;
+                    width -= vr.width;
+                    tileOffsX = 0; // only the left tile can be left-clipped
+                }
+            }
+            vr.y += vr.height;
+            height -= vr.height;
+            tileOffsY = 0;  // only the top tile can be top-clipped
+        }
+    }
+}
+
 
 //=============================================================================
 /* Support Routines */
@@ -75,11 +127,11 @@ void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
 #ifdef PARANOID
     if ((y > Scr.canvas.height - 80) ||
         (x < 0) ||
-        (x > Scr.canvas.width - 8))
-        Host_SysError("Con_DrawCharacter: (%i, %i)", x, y);
+        (x > Scr.canvas.width - 8)
+        )   Host_SysError("Con_DrawCharacter: (%i, %i)", x, y);
     if ((num < 0) ||
-        (num > 255))
-        Host_SysError("Con_DrawCharacter: char %i", num);
+        (num > 255)
+        )   Host_SysError("Con_DrawCharacter: char %i", num);
 #endif
 
     qColor8_p source = CharGlyphSource(symb);
@@ -191,6 +243,9 @@ void Draw_Pic(int x, int y, qPic_p pic) {
         }
     }
 }
+
+
+
 
 
 /*
@@ -475,59 +530,6 @@ void R_DrawRect16(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent)
     }
 }
 
-
-/*
-=============
-Draw_TileClear
-
-This repeats a 64*64 tile graphic to fill the screen around a sized down
-refresh window.
-=============
-*/
-void Draw_TileClear(int x, int y, int w, int h) {
-    _rRectDesc.rect = (vRect_t){
-        .x = x,
-        .y = y,
-        .width = w,
-        .height = h
-    };
-
-    vRect_t vr = { .y = _rRectDesc.rect.y };
-    int height = _rRectDesc.rect.height;
-
-    int tileoffsety = vr.y % _rRectDesc.height;
-
-    while (height > 0) {
-        vr.x = _rRectDesc.rect.x;
-        int width = _rRectDesc.rect.width;
-
-        if (tileoffsety != 0)   vr.height = _rRectDesc.height - tileoffsety;
-        else                    vr.height = _rRectDesc.height;
-        ClampMoreThen(&vr.height, height);
-
-        int tileoffsetx = vr.x % _rRectDesc.width;
-
-        while (width > 0) {
-            if (tileoffsetx != 0)   vr.width = _rRectDesc.width - tileoffsetx;
-            else                    vr.width = _rRectDesc.width;
-            ClampMoreThen(&vr.width, width);
-
-            qColor8_p psrc = _rRectDesc.pTexBytes + (ptrdiff_t)(
-                (tileoffsety * _rRectDesc.rowBytes) + tileoffsetx);
-
-            if (r_pixbytes == 1)     R_DrawRect8(&vr, _rRectDesc.rowBytes, psrc, false);
-            else                    R_DrawRect16(&vr, _rRectDesc.rowBytes, psrc, false);
-
-            vr.x += vr.width;
-            width -= vr.width;
-            tileoffsetx = 0; // only the left tile can be left-clipped
-        }
-
-        vr.y += vr.height;
-        height -= vr.height;
-        tileoffsety = 0;  // only the top tile can be top-clipped
-    }
-}
 
 
 /*

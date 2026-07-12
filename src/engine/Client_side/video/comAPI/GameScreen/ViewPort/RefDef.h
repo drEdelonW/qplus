@@ -39,7 +39,6 @@ typedef struct {
     int     ambientLight;
 #endif
 } refdef_t;
-extern bool r_cache_thrash; // set if thrashing the surface cache. OpenGL compatability;
 
 //
 // refresh

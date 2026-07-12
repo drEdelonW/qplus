@@ -328,8 +328,7 @@ bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
     case ev_entity:     *(int32_p)dstPtr = ED_GetEDictOffs(ED_GetEDictByIdx((uint32_t)atoi(s))); break;
 
     case ev_vector: {
-        char string[128];
-        strcpy(string, s);
+        char string[128]; strcpy(string, s);
         cString v = string;
         cString w = string;
         for (int i = 0; i < 3; i++) {
@@ -401,8 +400,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
         if (!strcmp(com.token, "light"))
             strcpy(com.token, "light_lev"); // hack for single light def
 
-        char keyname[256];
-        strcpy(keyname, com.token);
+        char keyname[256]; strcpy(keyname, com.token);
 
         // another hack to fix heynames with trailing spaces
         size_t n = strlen(keyname);
@@ -430,8 +428,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
         }
 
         if (anglehack) {
-            char temp[32];
-            strcpy(temp, com.token);
+            char temp[32]; strcpy(temp, com.token);
             snprintf(com.token, sizeof(com.token), "0 %s 0", temp);
         }
 

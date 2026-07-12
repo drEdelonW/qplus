@@ -70,9 +70,6 @@ typedef struct {
     qColor16_p  pColorMap16;     // 256 * VID_GRADES size // TODO: check is ot not used?
 #endif
 
-
-    LegDt_t centertime_off; // TODO: wrap it {Scr.centertime_off = 0;}
-
     int clearnotify;    // set to 0 whenever notify text is drawn
 #if 1   /* this specific for software render. not applicable for OpenGL */
     bool    copytop;
@@ -85,7 +82,6 @@ typedef struct {
     float   vpAspect;           // width / height -- < 0 is taller than wide  // move to view.h or RefDef
 } Screen_t;
 extern Screen_t Scr;
-
 
 
 static inline float calcAspect(int width, int height) { return ((float)height / (float)width) * (320.0 / 240.0); }
@@ -107,6 +103,7 @@ extern "C" {
     void Con_ToggleConsole_f();
     void Draw_ConsoleBackground(int lines);
 
+    void HideCenterPrint();
 
 #ifdef __cplusplus
 }

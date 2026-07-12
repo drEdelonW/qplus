@@ -120,7 +120,7 @@ void M_AdjustSliders(menuDirection_e dir) {
 void M_Options_Draw() {
     const int col0 = 16;
     const int col1 = 220;
-    M_DrawTransPic(col0, 4, Draw_CachePic("gfx/qplaque.lmp"));
+    M_DrawTransPicName(col0, 4, "gfx/qplaque.lmp");
 
     M_DrawPicHC(4, Draw_CachePic("gfx/p_option.lmp"));
 

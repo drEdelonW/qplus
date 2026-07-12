@@ -42,7 +42,7 @@ void M_Menu_ModemConfig_f() {
 
 
 void M_ModemConfig_Draw() {
-    M_DrawTransPic(16, 4, Draw_CachePic("gfx/qplaque.lmp"));
+    M_DrawTransPicName(16, 4, "gfx/qplaque.lmp");
 
     int x = M_DrawPicHC(4, Draw_CachePic("gfx/p_multi.lmp"));
 

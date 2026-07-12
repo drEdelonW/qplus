@@ -9,40 +9,18 @@
 #include "qSymbolChar.h"
 
 
-/*
-==============
-DrawPause
-==============
-*/
+
 void SCR_DrawPause() {
     if ((!scr_showpause.value) ||  // turn off for screenshots
         (!cl.paused)
         )   return;
-
-    qPic_p pic = Draw_CachePic("gfx/pause.lmp");
-    Draw_Pic(   // TODO: wrap it to Draw_PicCenter(pic-cString)
-        HALF(Scr.canvas.width - pic->width),
-        HALF(Scr.canvas.height - pic->height - 48),
-        pic
-    );
+    Draw_PicCenter("gfx/pause.lmp");
 }
 
 
-
-/*
-==============
-SCR_DrawLoading
-==============
-*/
 void SCR_DrawLoading() {
     if (!_scr.drawloading)   return;
-
-    qPic_p pic = Draw_CachePic("gfx/loading.lmp");
-    Draw_Pic(   // TODO: wrap it to Draw_PicCenter(pic-cString)
-        HALF(Scr.canvas.width - pic->width),
-        HALF(Scr.canvas.height - pic->height - 48),
-        pic
-    );
+    Draw_PicCenter("gfx/loading.lmp");
 }
 
 
@@ -70,15 +48,20 @@ void Con_DrawNotify() {
         Scr.copytop = true;
 
         for (CharCol_t x = FirstChar; x < con.linewidth; x++)
+#if 0
             Draw_Character(MUL8(x + 1), v, text[x]);
-
         v += D_CHAR_HEIGHT;
+#else
+            Draw_CharGrid((x + 1), v, text[x]);
+        v++;
+#endif
     }
 
     if (key.dest == key_message) {
         Scr.clearnotify = 0;
         Scr.copytop = true;
         int offs = 1;
+#if 0
         Draw_String(MUL8(offs++), v, "say:"); {
             offs += 3; // strlen("say:") - 1?;
             CharCol_t x = 0;
@@ -94,6 +77,23 @@ void Con_DrawNotify() {
             InputCursor_Symb + ((int)(GetRealTime() * con.cursorBlinkHz) & 1)
         );
         v += D_CHAR_HEIGHT;
+#else
+        Draw_StrGrid(offs++, v, "say:"); {
+            offs += 3; // strlen("say:") - 1?;
+            CharCol_t x = 0;
+            while (chatBuffer[x]) {
+                Draw_CharGrid(
+                    offs++, v,
+                    chatBuffer[x]
+                );
+                x++;
+            }
+        }
+        Draw_CharGrid(offs++, v, // Draw Input Cursor
+            InputCursor_Symb + ((int)(GetRealTime() * con.cursorBlinkHz) & 1)
+        );
+        v++;
+#endif
     }
 
     ClampLessThen(&con.notifylines, v);
@@ -118,7 +118,11 @@ void Draw_BeginDisc() {
     Draw_Pic(Scr.canvas.width - 24, 0, draw_disc);
     glDrawBuffer(GL_BACK);
 #else
-    D_BeginDirectRect(Scr.canvas.width - 24, 0, draw_disc->data, 24, 24);
+    D_BeginDirectRect(
+        Scr.canvas.width - 24, 0,
+        draw_disc->data,
+        24, 24
+    );
 #endif
 }
 
@@ -133,6 +137,56 @@ Call after completing any disc IO
 */
 void Draw_EndDisc() {
 #ifndef GLQUAKE
-    D_EndDirectRect(Scr.canvas.width - 24, 0, 24, 24);
+    D_EndDirectRect(
+        Scr.canvas.width - 24, 0,
+        24, 24
+    );
 #endif
 }
+
+
+void SCR_DrawRam() {
+    if ((!scr_showram.value) ||
+        (!r_cache_thrash)
+        )   return;
+    // printf("drawRAM [%s]  \n", r_cache_thrash ? "true" : "false");
+    Draw_Pic(
+        Scr.canvas.x + 32,
+        Scr.canvas.y,
+        _scr.ram
+    );
+}
+
+
+void SCR_DrawTurtle() {
+    if (!scr_showturtle.value)  return;
+
+    static int _cnt;
+    if (host_frametime < 0.1) {
+        _cnt = 0;
+        return;
+    }
+
+    _cnt++;
+    if (_cnt < 3)  return;
+
+    Draw_Pic(
+        Scr.canvas.x,
+        Scr.canvas.y,
+        _scr.turtle
+    );
+}
+
+
+void SCR_DrawNet() {
+    if (((GetRealTime() - cl.last_received_message) < 0.3f) ||
+        (cls.isDemoPlaying))
+        return;
+
+    Draw_Pic(
+        Scr.canvas.x + 64,
+        Scr.canvas.y,
+        _scr.net
+    );
+}
+

@@ -467,9 +467,7 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
                     continue;
             }
 
-            fsPathStr_t netpath;
-            snprintf(netpath, sizeof(netpath), "%s/%s", search->filename, filename);
-
+            fsPathStr_t netpath; snprintf(netpath, sizeof(netpath), "%s/%s", search->filename, filename);
             int findtime = Sys_FileTime(netpath);
             if (findtime == -1)
                 continue;
@@ -480,24 +478,23 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
                 strcpy(cachepath, netpath);
             else {
 #if defined(_WIN32)
-                if ((strlen(netpath) < 2) || (netpath[1] != ':'))
+                if ((strlen(netpath) < 2) ||
+                    (netpath[1] != ':')
+                    )
                     snprintf(cachepath, sizeof(cachepath), "%s%s", com_cachedir, netpath);
                 else
                     snprintf(cachepath, sizeof(cachepath), "%s%s", com_cachedir, netpath + 2);
 #else
                 snprintf(cachepath, sizeof(cachepath), "%s%s", com_cachedir, netpath);
 #endif
-
-                int cachetime = Sys_FileTime(cachepath);
-
-                if (cachetime < findtime)
+                if (Sys_FileTime(cachepath) < findtime)
                     COM_CopyFile(netpath, cachepath);
                 strcpy(netpath, cachepath);
             }
 
             Host_Printf("FindFile: %s\n", netpath);
-            int fHandle;
 
+            int fHandle;
             com.filesize = Sys_FileOpenRead(netpath, &fHandle);
             if (handle)
                 *handle = fHandle;
@@ -561,11 +558,11 @@ void COM_CloseFile(int h) {
 }
 
 typedef enum ComLoadHunk_e {
-    HUNK_ZMALLOC = 0u,   // Z_Malloc
-    HUNK_HUNK = 1u,   // Hunk_AllocName
-    HUNK_TEMP = 2u,   // Hunk_TempAlloc
-    HUNK_CACHE = 3u,   // Cache_Alloc
-    HUNK_STACK = 4u    // stack buffer, fallback to temp hunk
+    HUNK_ZMALLOC    = 0u,   // Z_Malloc
+    HUNK_HUNK       = 1u,   // Hunk_AllocName
+    HUNK_TEMP       = 2u,   // Hunk_TempAlloc
+    HUNK_CACHE      = 3u,   // Cache_Alloc
+    HUNK_STACK      = 4u    // stack buffer, fallback to temp hunk
 } ComLoadHunk_t;
 
 /*
@@ -629,7 +626,6 @@ uint8_p COM_LoadStackFile(cStringRO path, TypeLess_ptr buffer, size_t bufsize) {
     loadbuf = (uint8_p)buffer;
     loadsize = bufsize;
     return COM_LoadFile(path, HUNK_STACK);
-
 }
 
 

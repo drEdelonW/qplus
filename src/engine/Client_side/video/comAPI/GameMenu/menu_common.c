@@ -17,6 +17,15 @@ Draws one solid graphics character
 ================
 */
 
+void M_DrawTransPicName(int cx, int cy, cStringRO str) {
+    M_DrawTransPic(cx, cy, Draw_CachePic(str));
+}
+
+
+static inline int mCH(int h) {
+    return h + HALF(Scr.canvas.width - 320);
+}
+
 static palMap_t _identityTable;
 static palMap_t _translationTable;
 
@@ -47,7 +56,7 @@ void M_BuildTranslationTable(int top, int bottom) {
 
 void M_DrawTransPicTranslate(int x, int y, qPic_p pic) {
     Draw_TransPicTranslate(
-        x + HALF(Scr.canvas.width - 320), y,
+        mCH(x), y,
         pic,
         &_translationTable
     );
@@ -58,18 +67,18 @@ void M_DrawTextBox(int x, int y, int width, int lines) {
     // draw left side
     int cx = x;
     int cy = y;
-    M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tl.lmp"));
+    M_DrawTransPicName(cx, cy, "gfx/box_tl.lmp");
     for (int n = 0; n < lines; n++) {
         cy += D_CHAR_HEIGHT;
-        M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_ml.lmp"));
+        M_DrawTransPicName(cx, cy, "gfx/box_ml.lmp");
     }
-    M_DrawTransPic(cx, cy + D_CHAR_HEIGHT, Draw_CachePic("gfx/box_bl.lmp"));
+    M_DrawTransPicName(cx, cy + D_CHAR_HEIGHT, "gfx/box_bl.lmp");
 
     // draw middle
     cx += 8;
     while (width > 0) {
         cy = y;
-        M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tm.lmp"));
+        M_DrawTransPicName(cx, cy, "gfx/box_tm.lmp");
         qPic_p p = Draw_CachePic("gfx/box_mm.lmp");
         for (int n = 0; n < lines; n++) {
             cy += D_CHAR_HEIGHT;
@@ -77,33 +86,27 @@ void M_DrawTextBox(int x, int y, int width, int lines) {
                 p = Draw_CachePic("gfx/box_mm2.lmp");
             M_DrawTransPic(cx, cy, p);
         }
-        M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_bm.lmp"));
+        M_DrawTransPicName(cx, cy + 8, "gfx/box_bm.lmp");
         width -= 2;
         cx += 16;
     }
 
     // draw right side
     cy = y;
-    M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_tr.lmp"));
+    M_DrawTransPicName(cx, cy, "gfx/box_tr.lmp");
     for (int n = 0; n < lines; n++) {
         cy += D_CHAR_HEIGHT;
-        M_DrawTransPic(cx, cy, Draw_CachePic("gfx/box_mr.lmp"));
+        M_DrawTransPicName(cx, cy, "gfx/box_mr.lmp");
     }
-    M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_br.lmp"));
+    M_DrawTransPicName(cx, cy + 8, "gfx/box_br.lmp");
 }
 
 void M_DrawCharacter(int cx, int cy, ConsoleSymbols_t symb) {
-    Draw_Character(
-        cx + HALF(Scr.canvas.width - 320), cy,
-        symb
-    );
+    Draw_Character(mCH(cx), cy, symb);
 }
 
 void M_DrawTransPic(int x, int y, qPic_p pic) {
-    Draw_TransPic(
-        x + HALF(Scr.canvas.width - 320), y,
-        pic
-    );
+    Draw_TransPic(mCH(x), y, pic);
 }
 
 int M_DrawPicHC(int y, qPic_p pic) {
@@ -114,8 +117,9 @@ int M_DrawPicHC(int y, qPic_p pic) {
     }
     return -1;
 }
+
 void M_DrawPic(int x, int y, qPic_p pic) {
-    Draw_Pic(x + HALF(Scr.canvas.width - 320), y, pic);
+    Draw_Pic(mCH(x), y, pic);
 }
 
 void M_Print(int cx, int cy, cStringRO str) {

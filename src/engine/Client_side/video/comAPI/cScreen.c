@@ -63,27 +63,6 @@ void SCR_Init() {
 }
 
 
-/*
-==============
-SCR_CenterPrint
-
-Called for important messages that should stay in the center of the screen
-for a few moments
-==============
-*/
-void SCR_CenterPrint(cString str) {
-    strncpy(_scr.centerstring, str, sizeof(_scr.centerstring) - 1);
-    Scr.centertime_off = scr_centertime.value;
-    _scr.centertime_start = GetClSimTime();
-
-    // count the number of lines for centering
-    _scr.center_lines = 1;
-    while (*str) {
-        if (*str == '\n')
-            _scr.center_lines++;
-        str++;
-    }
-}
 
 void SCR_DrawCenterString() {
     // the finale prints the characters one at a time
@@ -194,7 +173,7 @@ Brings the console down and fades the palettes back to normal
 ================
 */
 void SCR_BringDownConsole() {
-    Scr.centertime_off = 0;
+    HideCenterPrint();
 
     for (int i = 0; (i < 20) && (Scr.conlines != Scr.con_current); i++)
         SCR_UpdateScreen();
@@ -220,7 +199,7 @@ void SCR_BeginLoadingPlaque() {
 
     // redraw with no console and the loading plaque
     Con_ClearNotify();
-    Scr.centertime_off = 0;
+    HideCenterPrint();
     Scr.con_current = 0;
 
     _scr.drawloading = true;
@@ -248,62 +227,44 @@ void SCR_EndLoadingPlaque() {
 
 /*
 ==============
-SCR_DrawRam
+SCR_CenterPrint
+
+Called for important messages that should stay in the center of the screen
+for a few moments
 ==============
 */
-void SCR_DrawRam() {
-    if ((!scr_showram.value) ||
-        (!r_cache_thrash)
-        )   return;
-    // printf("drawRAM [%s]  \n", r_cache_thrash ? "true" : "false");
-    Draw_Pic(Scr.canvas.x + 32, Scr.canvas.y, _scr.ram);
-}
+static LegDt_t _CentertTimeOff;
+void SCR_CenterPrint(cString str) {
+    strncpy(_scr.centerstring, str, sizeof(_scr.centerstring) - 1);
+    _CentertTimeOff = scr_centertime.value;
+    _scr.centertime_start = GetClSimTime();
 
-/*
-==============
-SCR_DrawTurtle
-==============
-*/
-void SCR_DrawTurtle() {
-    static int _cnt;
-
-    if (!scr_showturtle.value)  return;
-    if (host_frametime < 0.1) {
-        _cnt = 0;
-        return;
+    // count the number of lines for centering
+    _scr.center_lines = 1;
+    while (*str) {
+        if (*str == '\n')
+            _scr.center_lines++;
+        str++;
     }
-
-    _cnt++;
-    if (_cnt < 3)  return;
-
-    Draw_Pic(Scr.canvas.x, Scr.canvas.y, _scr.turtle);
 }
 
-/*
-==============
-SCR_DrawNet
-==============
-*/
-void SCR_DrawNet() {
-    if (((GetRealTime() - cl.last_received_message) < 0.3f) ||
-        (cls.isDemoPlaying))
-        return;
-
-    Draw_Pic(Scr.canvas.x + 64, Scr.canvas.y, _scr.net);
+void HideCenterPrint() {
+    _CentertTimeOff = 0.f;
 }
-
 
 void SCR_CheckDrawCenterString() {
     Scr.copytop = true;
     ClampLessThen(&_scr.erase_lines, _scr.center_lines);
 
-    Scr.centertime_off -= host_frametime;
+    if (_CentertTimeOff > 0.f)
+        _CentertTimeOff -= host_frametime;
 
-    if (((Scr.centertime_off <= 0) &&
-        (!isIntermission())) ||
+    if ((
+        (_CentertTimeOff <= 0.f) &&
+        (!isIntermission())
+        ) ||
         (key.dest != key_game)
-        )
-        return;
+        )   return;
 
     SCR_DrawCenterString();
 }
