@@ -61,8 +61,6 @@ static uint8_t _scanToKey[128];
 
 int num_mice = sizeof(mice) / sizeof(mice[0]);
 
-int    d_con_indirect = 0;
-
 int        svgalib_inited = 0;
 int        UseMouse = 1;
 int        UseKeyboard = 1;

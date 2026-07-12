@@ -93,41 +93,41 @@ void R_Envmap_f() {
     r_refdef.vrect.width = 256;
     r_refdef.vrect.height = 256;
 
-    r_refdef.view.facing.pitch = 0;
-    r_refdef.view.facing.yaw = 0;
-    r_refdef.view.facing.roll = 0;
+    r_refdef.view.aim.pitch = 0;
+    r_refdef.view.aim.yaw = 0;
+    r_refdef.view.aim.roll = 0;
     GL_BeginRendering(&glx, &gly, &glwidth, &glheight);
     R_RenderView();
     glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
     COM_WriteFile("env0.rgb", buffer, sizeof(buffer));
 
-    r_refdef.view.facing.yaw = 90;
+    r_refdef.view.aim.yaw = 90;
     GL_BeginRendering(&glx, &gly, &glwidth, &glheight);
     R_RenderView();
     glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
     COM_WriteFile("env1.rgb", buffer, sizeof(buffer));
 
-    r_refdef.view.facing.yaw = 180;
+    r_refdef.view.aim.yaw = 180;
     GL_BeginRendering(&glx, &gly, &glwidth, &glheight);
     R_RenderView();
     glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
     COM_WriteFile("env2.rgb", buffer, sizeof(buffer));
 
-    r_refdef.view.facing.yaw = 270;
+    r_refdef.view.aim.yaw = 270;
     GL_BeginRendering(&glx, &gly, &glwidth, &glheight);
     R_RenderView();
     glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
     COM_WriteFile("env3.rgb", buffer, sizeof(buffer));
 
-    r_refdef.view.facing.pitch = -90;
-    r_refdef.view.facing.yaw = 0;
+    r_refdef.view.aim.pitch = -90;
+    r_refdef.view.aim.yaw = 0;
     GL_BeginRendering(&glx, &gly, &glwidth, &glheight);
     R_RenderView();
     glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
     COM_WriteFile("env4.rgb", buffer, sizeof(buffer));
 
-    r_refdef.view.facing.pitch = 90;
-    r_refdef.view.facing.yaw = 0;
+    r_refdef.view.aim.pitch = 90;
+    r_refdef.view.aim.yaw = 0;
     GL_BeginRendering(&glx, &gly, &glwidth, &glheight);
     R_RenderView();
     glReadPixels(0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
@@ -372,14 +372,14 @@ For program optimization
 #define VIEWANGLE_STEPS 128
 
 void R_TimeRefresh_f() {
-    int startangle = r_refdef.view.facing.yaw;
+    int startangle = r_refdef.view.aim.yaw;
 
     glDrawBuffer(GL_FRONT);
     glFinish();
 
     LegTime_t start = Host_FloatTime();
     for (int i = 0; i < VIEWANGLE_STEPS; i++) {
-        r_refdef.view.facing.yaw = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
+        r_refdef.view.aim.yaw = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
         R_RenderView();
     }
@@ -392,7 +392,7 @@ void R_TimeRefresh_f() {
     glDrawBuffer(GL_BACK);
     GL_EndRendering();
 
-    r_refdef.view.facing.yaw = startangle;
+    r_refdef.view.aim.yaw = startangle;
 }
 
 void D_FlushCaches() {

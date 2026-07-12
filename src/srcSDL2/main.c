@@ -160,8 +160,8 @@ int main(int argc, char** argv) {
         SDL_SetRenderDrawColor(ren, 10, 12, 16, 255);
         SDL_RenderClear(ren);
 
-        // optional backface culling for edges: compute face normals and draw edges only for faces facing camera
-        // simple heuristic: normal.z < 0 (after rotation) means back-facing; camera looks towards +z in object+translation space
+        // optional backface culling for edges: compute face normals and draw edges only for faces aim camera
+        // simple heuristic: normal.z < 0 (after rotation) means back-aim; camera looks towards +z in object+translation space
         int face_visible[6] = { 0 };
         for (int f = 0; f < 6; ++f) {
             Vec3 a = tv[faces[f][0]];

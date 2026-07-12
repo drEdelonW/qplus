@@ -943,29 +943,29 @@ void R_DrawBrushModel(r_Entity_p e) {
     Model_p clmodel = e->model;
     bool rotated;
 
-    if (!AngleCompare(e->pose.facing, a3Zero)) {
+    if (!AngleCompare(e->pose.aim, a3Zero)) {
         rotated = true;
         if (R_CullBox(BBoxTranslate(
             BBoxSymmetric(clmodel->radius),
-            e->pose.spot))
+            e->pose.loc))
             )   return;
     }
     else {
         rotated = false;
         if (R_CullBox(BBoxTranslate(
             clmodel->BB,
-            e->pose.spot))
+            e->pose.loc))
             )   return;
     }
 
     glColor3f(1, 1, 1);
     memset(lightmap_polys, 0, sizeof(lightmap_polys));
 
-    modelorg = VectorSubtract(r_refdef.view.spot, e->pose.spot);
+    modelorg = VectorSubtract(r_refdef.view.loc, e->pose.loc);
     if (rotated) {
         vec3_t temp = modelorg;
 
-        Basis_t bs = GetBasis(e->pose.facing);
+        Basis_t bs = GetBasis(e->pose.aim);
         modelorg = (vec3_t){
             .x = DotProduct(temp, bs.forward),
             .y = -DotProduct(temp, bs.right),
@@ -991,9 +991,9 @@ void R_DrawBrushModel(r_Entity_p e) {
     }
 
     glPushMatrix();
-    e->pose.facing.pitch = -e->pose.facing.pitch;    // stupid quake bug
+    e->pose.aim.pitch = -e->pose.aim.pitch;    // stupid quake bug
     R_RotateForEntity(e);
-    e->pose.facing.pitch = -e->pose.facing.pitch;    // stupid quake bug
+    e->pose.aim.pitch = -e->pose.aim.pitch;    // stupid quake bug
 
     //
     // draw texture
@@ -1136,7 +1136,7 @@ void R_DrawWorld() {
     r_Entity_t ent = { .model = cl.worldmodel };
 #endif
 
-    modelorg = r_refdef.view.spot;
+    modelorg = r_refdef.view.loc;
 
     currententity = &ent;
     currenttexture = -1;
@@ -1223,7 +1223,7 @@ int AllocBlock(int w, int h, int* x, int* y) {
                 if (allocated[texnum][i + j] > best2)
                     best2 = allocated[texnum][i + j];
             }
-            if (j == w) {    // this is a valid spot
+            if (j == w) {    // this is a valid loc
                 *x = i;
                 *y = best = best2;
             }

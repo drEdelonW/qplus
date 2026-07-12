@@ -3,11 +3,6 @@
 #include "screen.h"
 
 qColor8_p pDrawChars;
-qPic_p draw_disc;
-
-void Draw_CharGrid(int col, int row, ConsoleSymbols_t symb) {
-    Draw_Character(MUL8(col), MUL8(row), symb);
-}
 
 void Draw_PicCenter(cStringRO str) {
     qPic_p pic = Draw_CachePic(str);
@@ -44,18 +39,10 @@ void Draw_String(int x, int y, cStringRO str) {
     }
 }
 
-
-void Draw_StrGrid(int col, int row, cStringRO str) {
-    Draw_String(MUL8(col), MUL8(row), str);
-}
-
-
 void Draw_PicName(int x, int y, cStringRO str) {
-    qPic_p pic = Draw_CachePic(str);
-    Draw_Pic(x, y, pic);
+    Draw_Pic(x, y, Draw_CachePic(str));
 }
 
 void Draw_TransPicName(int x, int y, cStringRO str) {
-    qPic_p pic = Draw_CachePic(str);
-    Draw_TransPic(x, y, pic);
+    Draw_TransPic(x, y, Draw_CachePic(str));
 }

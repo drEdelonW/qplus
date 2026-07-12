@@ -110,7 +110,7 @@ void D_SetupFrame() {
         };
 
     d_viewbuffer = (r_dowarp) ? vid.maxwarp.pClr : vid.frameBuff.pClr;
-    screenwidth = (r_dowarp) ? WARP_WIDTH : Scr.canvas.rowBytes;
+    screenwidth = (r_dowarp) ? WARP_WIDTH : Scr.SR_rowBytes;
 
     d_roverwrapped = false;
     d_initial_rover = sc_rover;

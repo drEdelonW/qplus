@@ -1,5 +1,11 @@
 #pragma once
 
+typedef enum {
+    invSpan     = -1,   // = in inverted span (end before start)
+    notInSpan   = 0,    // = not in span
+    inSpan      = 1,    // = in span
+} SnapState_e;
+
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct sSpan_s {
     int u;
@@ -17,6 +23,7 @@ struct eSpan_s {
     int     v;
     int     count;
 };
+
 
 
 void D_DrawSpans8(eSpan_p  pspans);

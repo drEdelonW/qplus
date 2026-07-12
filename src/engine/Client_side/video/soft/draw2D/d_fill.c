@@ -28,7 +28,7 @@ D_FillRect
 ================
 */
 void D_FillRect(vRect_p rect, int color) {
-    if (!Scr.canvas.pBuff)   return;
+    if (!Scr.canvas.pClr)   return;
     int rx = rect->x;
     int ry = rect->y;
     int rwidth = rect->width;
@@ -42,16 +42,16 @@ void D_FillRect(vRect_p rect, int color) {
         rheight += ry;
         ry = 0;
     }
-    if (rx + rwidth > Scr.canvas.width)
+    if ((rx + rwidth) > Scr.canvas.width)
         rwidth = Scr.canvas.width - rx;
-    if (ry + rheight > Scr.canvas.height)
+    if ((ry + rheight) > Scr.canvas.height)
         rheight = Scr.canvas.height - rx;
 
     if ((rwidth < 1) ||
         (rheight < 1))
         return;
 
-    uint8_p dest = ((uint8_p)Scr.canvas.pBuff + ry * Scr.canvas.rowBytes + rx);
+    qColor8_p dest = Scr.canvas.pClr + (ry * Scr.SR_rowBytes) + rx;
 
     if (((rwidth & 0x03) == 0) &&
         (((uintptr_t)dest & 0x03) == 0)
@@ -66,15 +66,15 @@ void D_FillRect(vRect_p rect, int color) {
         for (int ry = 0; ry < rheight; ry++) {
             for (int rx = 0; rx < rwidth; rx++)
                 ldest[rx] = color;
-            ldest = (uint32_p)((uint8_p)ldest + Scr.canvas.rowBytes);
+            ldest = (uint32_p)((uint8_p)ldest + Scr.SR_rowBytes);
         }
     }
     else {
         // slower byte-by-byte clear for unaligned cases
         for (int ry = 0; ry < rheight; ry++) {
             for (int rx = 0; rx < rwidth; rx++)
-                dest[rx] = color;
-            dest += Scr.canvas.rowBytes;
+                dest[rx].i = color;
+            dest += Scr.SR_rowBytes;
         }
     }
 }

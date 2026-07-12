@@ -21,10 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // draw.h -- these are the only functions outside the refresh allowed
 // to touch the vid buffer
-#include "qSymbolChar.h"
+
 #include "qPic.h"
 
-extern qPic_p draw_disc;    // also used on sbar
+#include "qSymbolChar.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,10 +33,8 @@ extern "C" {
     void    Draw_Init();
 
     void    Draw_Character(int x, int y, ConsoleSymbols_t symb);
-    void    Draw_CharGrid(int col, int row, ConsoleSymbols_t symb);
     void    Draw_DebugChar(ConsoleSymbols_t symb);
     void    Draw_String(int x, int y, cStringRO str);
-    void    Draw_StrGrid(int col, int row, cStringRO str);
 
     void    Draw_Pic(int x, int y, qPic_p pic);
     void    Draw_PicName(int x, int y, cStringRO str);
@@ -55,3 +53,13 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#include "console.h"
+
+static inline void Draw_CharGrid(CharCol_t col, CmdLine_t row, ConsoleSymbols_t symb) {
+    Draw_Character(MUL8(col), MUL8(row), symb);
+}
+static inline void Draw_StrGrid(CharCol_t col, CmdLine_t row, cStringRO str) {
+    Draw_String(MUL8(col), MUL8(row), str);
+}
+

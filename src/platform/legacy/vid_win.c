@@ -1213,8 +1213,8 @@ bool VID_SetWindowedMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    Scr.canvas.pBuff = Scr.con.pBuff = Scr.direct = dibdc->surface;
-    vid.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
+    Scr.canvas.pClr = Scr.con.pClr = Scr.direct = dibdc->surface;
+    vid.rowBytes = Scr.SR_rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
     Scr.canvas.height = Scr.con.height = DIBHeight;
     Scr.canvas.width = Scr.con.width = DIBWidth;
@@ -1253,7 +1253,7 @@ bool VID_SetFullscreenMode(int modenum) {
     modestate = MS_FULLSCREEN;
     vid_fulldib_on_focus_mode = 0;
 
-    Scr.canvas.pBuff = Scr.con.pBuff = Scr.direct = NULL;
+    Scr.canvas.pClr = Scr.con.pClr = Scr.direct = NULL;
     DIBHeight = Scr.canvas.height = Scr.con.height = modelist[modenum].height;
     DIBWidth = Scr.canvas.width = Scr.con.width = modelist[modenum].width;
     Scr.aspect = calcAspectRect(&Scr.canvas);
@@ -1361,10 +1361,10 @@ bool VID_SetFullDIBMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    Scr.canvas.pBuff = dibdc->surface;
+    Scr.canvas.pClr = dibdc->surface;
     Scr.aspect = calcAspectRect(&Scr.canvas);
     Scr.direct = dibdc->surface;
-    vid.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
+    vid.rowBytes = Scr.SR_rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
     Scr.canvas.height = Scr.con.height = DIBHeight;
     Scr.canvas.width = Scr.con.width = DIBWidth;
@@ -1563,20 +1563,20 @@ void VID_LockBuffer() {
 
     if (memdc) {
         // Update surface pointer for linear access modes
-        Scr.canvas.pBuff = Scr.con.pBuff = Scr.direct = memdc->surface;
-        vid.rowBytes = Scr.con.rowBytes = memdc->mi.bytesPerLine;
+        Scr.canvas.pClr = Scr.con.pClr = Scr.direct = memdc->surface;
+        vid.rowBytes = Scr.SR_rowBytes = memdc->mi.bytesPerLine;
     }
     else if (mgldc) {
         // Update surface pointer for linear access modes
-        Scr.canvas.pBuff = Scr.con.pBuff = Scr.direct = mgldc->surface;
-        vid.rowBytes = Scr.con.rowBytes = mgldc->mi.bytesPerLine;
+        Scr.canvas.pClr = Scr.con.pClr = Scr.direct = mgldc->surface;
+        vid.rowBytes = Scr.SR_rowBytes = mgldc->mi.bytesPerLine;
     }
 
     d_viewbuffer = (r_dowarp) ?
         vid.maxwarp.pClr : Scr.canvas.pClr;
 
     screenwidth = (r_dowarp) ?
-        WARP_WIDTH : Scr.canvas.rowBytes;
+        WARP_WIDTH : Scr.SR_rowBytes;
 
 #ifndef STM32
     if (lcd_x.value)
@@ -1600,8 +1600,8 @@ void VID_UnlockBuffer() {
     MGL_endDirectAccess();
 
     // to turn up any unlocked accesses
-    Scr.canvas.pBuff = NULL;
-    Scr.con.pBuff = NULL;
+    Scr.canvas.pClr = NULL;
+    Scr.con.pClr = NULL;
     Scr.direct = NULL;
     d_viewbuffer = NULL;
 

@@ -80,11 +80,6 @@ extern vec3_t r_avertexnormals[NUMVERTEXNORMALS];
 
 #include "Snap.h"
 
-typedef enum {
-    invSpan     = -1,   // = in inverted span (end before start)
-    notInSpan   = 0,  // = not in span
-    inSpan      = 1,     // = in span
-} SnapState_e;
 // FIXME: compress, make a union if that will help
 // insubmodel is only 1, flags is fewer than 32, spanstate could be a byte
 typedef struct Surf_s Surf_t;
@@ -96,16 +91,14 @@ struct Surf_s {
     int     key;        // sorting key (BSP order)
     int     last_u;     // set during tracing
     SnapState_e spanstate;
-    // int     spanstate;  // 0 = not in span
-    // 1 = in span
-    // -1 = in inverted span (end before
-    //  start)
     int     flags;      // currentface flags
     TypeLess_ptr    data;   // associated data like mSurface_t
     r_Entity_p  entity;
     float   nearzi;     // nearest 1/z on surface, for mipmapping
     bool    insubmodel;
-    float   d_ziorigin, d_zistepu, d_zistepv;
+    float   d_ziorigin;
+    float   d_zistepu;
+    float   d_zistepv;
 
     int   pad[2];    // to 64 bytes
 };

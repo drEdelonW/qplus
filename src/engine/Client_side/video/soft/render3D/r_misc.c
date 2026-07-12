@@ -75,11 +75,11 @@ void Show() {
 #define VIEWANGLE_STEPS 128
 
 void R_TimeRefresh_f() {
-    int startangle = r_refdef.view.facing.yaw;
+    int startangle = r_refdef.view.aim.yaw;
 
     RealTime_t start = Host_FloatTime();
     for (int i = 0; i < VIEWANGLE_STEPS; i++) {
-        r_refdef.view.facing.yaw = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
+        r_refdef.view.aim.yaw = ((float)i / (float)VIEWANGLE_STEPS) * 360.0;
 
         VID_LockBuffer();
         R_RenderView();
@@ -99,7 +99,7 @@ void R_TimeRefresh_f() {
     RealDt_t time = stop - start;
     Con_Printf("%f seconds (%f fps)\n", time, VIEWANGLE_STEPS / time);
 
-    r_refdef.view.facing.yaw = startangle;
+    r_refdef.view.aim.yaw = startangle;
 }
 
 
@@ -110,26 +110,25 @@ void R_TimeRefresh_f() {
     Only called by R_DisplayTime
     ================
 */
-#define GRAPH_FG 0xFF  // bright bar color
-#define GRAPH_BG 0x30  // background color
+
 void R_LineGraph(int x, int y, int h) {
-    if (!Scr.canvas.pBuff)   return;
+    if (!Scr.canvas.pClr)   return;
     // FIXME: should be disabled on no-buffer adapters, or should be in the driver
 
     x += r_refdef.vrect.x;
     y += r_refdef.vrect.y;
 
-    uint8_p dest = Scr.canvas.pBuff + (Scr.canvas.rowBytes * y) + x;
+    qColor8_p dest = Scr.canvas.pClr + (Scr.SR_rowBytes * y) + x;
 
     int s = r_graphheight.value;
 
     ClampInRange(0, &h, s);
 
     for (int i = 0; i < s; ++i) {
-        dest[0] = (i < h) ? GRAPH_FG : GRAPH_BG;
+        dest[0].i = (i < h) ? GRAPH_FG : GRAPH_BG;
 
-        dest[-Scr.canvas.rowBytes] = GRAPH_BG;
-        dest -= TWICE(Scr.canvas.rowBytes);
+        dest[-Scr.SR_rowBytes].i = GRAPH_BG;
+        dest -= TWICE(Scr.SR_rowBytes);
     }
 }
 
@@ -148,7 +147,7 @@ void R_TimeGraph() {
     RealTime_t r_time2 = Host_FloatTime();
     int a = (r_time2 - r_time1) / 0.01;
     //a = fabs(mouse_y * 0.05);
-    //a = (int)((r_refdef.view.spot[2] + 1024)/1)%(int)r_graphheight.value;
+    //a = (int)((r_refdef.view.loc[2] + 1024)/1)%(int)r_graphheight.value;
     //a = fabs(velocity[0])/20;
     //a = ((int)fabs(origin[0])/8)%20;
     //a = (cl.idealpitch + 30)/5;
@@ -331,11 +330,11 @@ void R_SetupFrame() {
     }
 
     if (r_numsurfs.value) {
-        ClampLessThen(&r_maxsurfsseen, (pSurface - pSurfaces));
-
+        int surfcount = pSurface - pSurfaces;
+        ClampLessThen(&r_maxsurfsseen, surfcount);
         Con_Printf(
             "Used %d of %d surfs; %d max\n",
-            pSurface - pSurfaces,
+            surfcount,
             pSurf_max - pSurfaces,
             r_maxsurfsseen
         );
@@ -344,7 +343,6 @@ void R_SetupFrame() {
     if (r_numedges.value) {
         int edgecount = edge_p - r_edges;
         ClampLessThen(&r_maxedgesseen, edgecount);
-
         Con_Printf(
             "Used %d of %d edges; %d max\n",
             edgecount,
@@ -369,15 +367,15 @@ void R_SetupFrame() {
 
     // debugging
 #if 0
-    r_refdef.view.spot = { .x = 80.0f, .y = 64.0f, .z = 40.0f };
-    r_refdef.view.facing = { .pitch = 0.0f, .yaw = 46.763641357, .roll = 0.0f };
+    r_refdef.view.loc = { .x = 80.0f, .y = 64.0f, .z = 40.0f };
+    r_refdef.view.aim = { .pitch = 0.0f, .yaw = 46.763641357, .roll = 0.0f };
 #endif
 
     // build the transformation matrix for the given view angles
-    modelorg = r_refdef.view.spot;
-    r_origin = r_refdef.view.spot;
+    modelorg = r_refdef.view.loc;
+    r_origin = r_refdef.view.loc;
 
-    BS = GetBasis(r_refdef.view.facing);
+    BS = GetBasis(r_refdef.view.aim);
     // current viewleaf
     r_oldviewleaf = r_viewleaf;
     r_viewleaf = Mod_PointInLeaf(r_origin, cl.worldmodel);
@@ -390,7 +388,7 @@ void R_SetupFrame() {
         lcd_x.value ||
 #endif
         (r_dowarp != r_dowarpold) ||
-        r_viewchanged
+        (r_viewchanged)
         ) {
         if (r_dowarp) {
             if ((Scr.canvas.width <= vid.maxwarp.width) &&

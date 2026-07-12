@@ -210,7 +210,7 @@ void D_DrawSurfaces() {
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel()
-                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->pose.spot);
+                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->pose.loc);
                     transformed_modelorg = TransformVector(local_modelorg);
 
                     R_RotateBmodel(); // FIXME: don't mess with the frustum,
@@ -240,7 +240,7 @@ void D_DrawSurfaces() {
                     // TODO: store once at start of frame
                     currententity = surf->entity; //FIXME: make this passed in to
                     // R_RotateBmodel()
-                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->pose.spot);
+                    vec3_t local_modelorg = VectorSubtract(r_origin, currententity->pose.loc);
                     transformed_modelorg = TransformVector(local_modelorg);
 
                     R_RotateBmodel(); // FIXME: don't mess with the frustum,

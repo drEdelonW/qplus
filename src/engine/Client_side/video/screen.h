@@ -21,12 +21,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // screen.h
 
 /*  Screen layout concept
- * vid      (platform specific graphic environment) <- "vid.h"
+ * vid      (platform specific graphic environment) <- "vid.h" (vid is for SoftRender)
  * └── screen   (layer compositor)                  <- "Screen.h"
  *     ├── render viewport  (back layer)            <- "render.h", "View.h"
  *     ├── HUD              (overlay viewport)      <- "hud.h"
- *     │   ├── crosshair    (center of viewport)
  *     │   ├── sbar         (bottom)                <- "sbar.h"
+ *     │   ├── crosshair    (center of viewport)
+ *     │   ├── center msg   (center message)
  *     │   ├── status msgs  (top left corner)
  *     │   └── sys icons    (top right corner)
  *     ├── menu            (front layer)            <- "menu.h"
@@ -58,6 +59,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  // only the refresh window will be updated unless these variables are flagged
 typedef struct {
     vRect_t canvas;     // Whole screen size rectangle
+    ptrdiff_t SR_rowBytes;  // Width in bytes - new line offset // TODO: move it to SoftRender specific
+
     qColor8_p direct;   // direct drawing to framebuffer, if not NULL
     int numpages;
 

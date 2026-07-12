@@ -65,6 +65,8 @@ typedef qColor16_t* qColor16_p;
 // !!! must be kept the same as in quakeasm.h !!!
 typedef enum {
     InkConTransp    = 0x00,  /* console symbol transparent color */
+    GRAPH_BG        = 0x30,  // background color
+    GRAPH_FG        = 0xFF,  // bright bar color
     InkTransp       = 0xFF,  /* texture transparent color */
     InksNum         = 256,   /* number of colors in palette space */
 } InkIdx_t;

@@ -20,6 +20,7 @@ void R_SetVrect(const vRect_p pvrect, vRect_p pvrectin, int lineadj);
 # include "render.h"
 #endif
 #include "GameRule.h"
+#include "hud.h"
 
 Screen_t Scr;
 _Screen_t _scr;
@@ -29,9 +30,18 @@ _Screen_t _scr;
 SCR_Init
 ==================
 */
+#ifndef GLQUAKE
 #include "vid.h" // vid.frameBuff;
+#endif
 void SCR_Init() {
+#ifndef GLQUAKE
     Scr.canvas = vid.frameBuff;
+#else
+    Scr.canvas = (vRect_t){
+        .width = BASEWIDTH,
+        .height = BASEHEIGHT
+    };
+#endif
     Scr.vpAspect = calcAspectRect(&Scr.canvas);
 
     Cvar_RegisterVariable(&scr_viewsize);
@@ -52,12 +62,7 @@ void SCR_Init() {
     Cmd_AddCommand("messagemode", Con_MessageMode_f);
     Cmd_AddCommand("messagemode2", Con_MessageMode2_f);
 
-
-#if 1 /* System status */
-    _scr.ram = GetPicFromWad("ram");
-    _scr.net = GetPicFromWad("net");
-    _scr.turtle = GetPicFromWad("turtle");
-#endif
+    HUD_Init();
 
     _scr.initialized = true;
 }

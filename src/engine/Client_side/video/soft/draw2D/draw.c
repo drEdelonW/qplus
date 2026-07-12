@@ -46,7 +46,7 @@ Draw_Init
 
 void Draw_Init() {
     pDrawChars = (qColor8_p)GetPicFromWad("conchars");
-    draw_disc = GetPicFromWad("disc");
+    hid.disc = GetPicFromWad("disc");
 
     qPic_p BackTile = GetPicFromWad("backtile"); // get from WAD textures
     _btR = (BackTile_t){
@@ -146,7 +146,7 @@ void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
 
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.con.pClr + (y * Scr.con.rowBytes) + x;
+        qColor8_p dest = Scr.con.pClr + (y * Scr.SR_rowBytes) + x;
 
         while (drawline--) {
             for (int i = 0; i < 8; i++)
@@ -154,12 +154,12 @@ void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
                     dest[i] = source[i];
 
             source += 128;
-            dest += Scr.con.rowBytes;
+            dest += Scr.SR_rowBytes;
         }
     }
     else {
         // FIXME: pre-expand to native format?
-        ptrdiff_t row16Byte = DIV2(Scr.con.rowBytes);
+        ptrdiff_t row16Byte = DIV2(Scr.SR_rowBytes);
         Rgb16_p pusdest = (Rgb16_p)Scr.con.pClr + (y * row16Byte) + x;
 
         while (drawline--) {
@@ -207,7 +207,7 @@ Draw_Pic
 =============
 */
 void Draw_Pic(int x, int y, qPic_p pic) {
-    if (!Scr.canvas.pBuff)   return;
+    if (!Scr.canvas.pClr)   return;
 
     if ((x < 0) ||
         (y < 0) ||
@@ -222,23 +222,23 @@ void Draw_Pic(int x, int y, qPic_p pic) {
     qColor8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.canvas.pClr + y * Scr.canvas.rowBytes + x;
+        qColor8_p dest = Scr.canvas.pClr + y * Scr.SR_rowBytes + x;
 
         for (int v = 0; v < pic->height; v++) {
             Q_memcpy(dest, source, pic->width);
-            dest += Scr.canvas.rowBytes;
+            dest += Scr.SR_rowBytes;
             source += pic->width;
         }
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)Scr.canvas.pBuff + y * HALF(Scr.canvas.rowBytes) + x;
+        uint16_p pusdest = (uint16_p)Scr.canvas.pClr + y * HALF(Scr.SR_rowBytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++)
                 pusdest[u] = d_8to16table[source[u].i];
 
-            pusdest += HALF(Scr.canvas.rowBytes);
+            pusdest += HALF(Scr.SR_rowBytes);
             source += pic->width;
         }
     }
@@ -254,7 +254,7 @@ Draw_TransPic
 =============
 */
 void Draw_TransPic(int x, int y, qPic_p pic) {
-    if (!Scr.canvas.pBuff)   return;
+    if (!Scr.canvas.pClr)   return;
 
     if (!pic)   return;
 
@@ -268,7 +268,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
     qColor8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.canvas.pClr + y * Scr.canvas.rowBytes + x;
+        qColor8_p dest = Scr.canvas.pClr + y * Scr.SR_rowBytes + x;
         qColor8_t tbyte;
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
@@ -276,7 +276,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                     if ((tbyte = source[u]).i != InkTransp)
                         dest[u] = tbyte;
 
-                dest += Scr.canvas.rowBytes;
+                dest += Scr.SR_rowBytes;
                 source += pic->width;
             }
         }
@@ -287,14 +287,14 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                         if ((tbyte = source[u + i]).i != InkTransp)
                             dest[u + i] = tbyte;
 
-                dest += Scr.canvas.rowBytes;
+                dest += Scr.SR_rowBytes;
                 source += pic->width;
             }
         }
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)Scr.canvas.pBuff + y * HALF(Scr.canvas.rowBytes) + x;
+        uint16_p pusdest = (uint16_p)Scr.canvas.pClr + y * HALF(Scr.SR_rowBytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
@@ -303,7 +303,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                     pusdest[u] = d_8to16table[tbyte];
             }
 
-            pusdest += HALF(Scr.canvas.rowBytes);
+            pusdest += HALF(Scr.SR_rowBytes);
             source += pic->width;
         }
     }
@@ -316,7 +316,7 @@ Draw_TransPicTranslate
 =============
 */
 void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
-    if (!Scr.canvas.pBuff)   return;
+    if (!Scr.canvas.pClr)   return;
 
     if (!pic)
         return;
@@ -332,7 +332,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
     qColor8_t tbyte;
     qColor8_p source = pic->data;
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.canvas.pClr + (y * Scr.canvas.rowBytes) + x;
+        qColor8_p dest = Scr.canvas.pClr + (y * Scr.SR_rowBytes) + x;
 
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
@@ -340,7 +340,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
                     if ((tbyte = source[u]).i != InkTransp)
                         dest[u] = translation->pal[tbyte.i];
 
-                dest += Scr.canvas.rowBytes;
+                dest += Scr.SR_rowBytes;
                 source += pic->width;
             }
         }
@@ -351,14 +351,14 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
                         if ((tbyte = source[u + i]).i != InkTransp)
                             dest[u + i] = translation->pal[tbyte.i];
 
-                dest += Scr.canvas.rowBytes;
+                dest += Scr.SR_rowBytes;
                 source += pic->width;
             }
         }
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)Scr.canvas.pBuff + y * HALF(Scr.canvas.rowBytes) + x;
+        uint16_p pusdest = (uint16_p)Scr.canvas.pClr + y * HALF(Scr.SR_rowBytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
@@ -367,7 +367,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
                     pusdest[u] = d_8to16table[tbyte.i];
             }
 
-            pusdest += HALF(Scr.canvas.rowBytes);
+            pusdest += HALF(Scr.SR_rowBytes);
             source += pic->width;
         }
     }
@@ -410,7 +410,7 @@ void Draw_ConsoleBackground(int lines) {
     if (r_pixbytes == 1) {
         dest = Scr.con.pClr;
 
-        for (int y = 0; y < lines; y++, dest += Scr.con.rowBytes) {
+        for (int y = 0; y < lines; y++, dest += Scr.SR_rowBytes) {
             int v = (Scr.con.height - lines + y) * 200 / Scr.con.height;
             qColor8_p src = conback->data + v * 320;
             if (Scr.con.width == 320)
@@ -428,9 +428,9 @@ void Draw_ConsoleBackground(int lines) {
         }
     }
     else {
-        uint16_p pusdest = (uint16_p)Scr.con.pBuff;
+        uint16_p pusdest = (uint16_p)Scr.con.pClr;
 
-        for (int y = 0; y < lines; y++, pusdest += HALF(Scr.con.rowBytes)) {
+        for (int y = 0; y < lines; y++, pusdest += HALF(Scr.SR_rowBytes)) {
             // FIXME: pre-expand to native format?
             // FIXME: does the endian switching go away in production?
             int v = (Scr.con.height - lines + y) * 200 / Scr.con.height;
@@ -454,11 +454,11 @@ R_DrawRect8
 ==============
 */
 void R_DrawRect8(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) {
-    if (!Scr.canvas.pBuff)   return;
-    qColor8_p pdest = Scr.canvas.pClr + (prect->y * Scr.canvas.rowBytes) + prect->x;
+    if (!Scr.canvas.pClr)   return;
+    qColor8_p pdest = Scr.canvas.pClr + (prect->y * Scr.SR_rowBytes) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
-    int destdelta = Scr.canvas.rowBytes - prect->width;
+    int destdelta = Scr.SR_rowBytes - prect->width;
 
     if (transparent) {
         for (int i = 0; i < prect->height; i++) {
@@ -479,7 +479,7 @@ void R_DrawRect8(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) 
         for (int i = 0; i < prect->height; i++) {
             memcpy(pdest, psrc, prect->width);
             psrc += rowbytes;
-            pdest += Scr.canvas.rowBytes;
+            pdest += Scr.SR_rowBytes;
         }
     }
 }
@@ -491,14 +491,14 @@ R_DrawRect16
 ==============
 */
 void R_DrawRect16(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) {
-    if (!Scr.canvas.pBuff)   return;
+    if (!Scr.canvas.pClr)   return;
     // FIXME: would it be better to pre-expand native-format versions?
 
-    uint16_p pdest = (uint16_p)Scr.canvas.pBuff +
-        (prect->y * HALF(Scr.canvas.rowBytes)) + prect->x;
+    uint16_p pdest = (uint16_p)Scr.canvas.pClr +
+        (prect->y * HALF(Scr.SR_rowBytes)) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
-    int destdelta = HALF(Scr.canvas.rowBytes) - prect->width;
+    int destdelta = HALF(Scr.SR_rowBytes) - prect->width;
 
     qColor8_t t;
     if (transparent) {
@@ -540,8 +540,8 @@ Fills a box of pixels with a single color
 =============
 */
 void Draw_Fill(int x, int y, int w, int h, qColor8_t c) {
-    if (!Scr.canvas.pBuff)   return;
-    int stride = Scr.canvas.rowBytes;
+    if (!Scr.canvas.pClr)   return;
+    int stride = Scr.SR_rowBytes;
     if (r_pixbytes == 1) {
         qColor8_p dest = Scr.canvas.pClr + (ptrdiff_t)(
             (y * stride) + x
@@ -552,7 +552,7 @@ void Draw_Fill(int x, int y, int w, int h, qColor8_t c) {
     }
     else {
         stride = HALF(stride);
-        uint16_p pusdest = (uint16_p)Scr.canvas.pBuff + (ptrdiff_t)(
+        uint16_p pusdest = (uint16_p)Scr.canvas.pClr + (ptrdiff_t)(
             (y * stride) + x
             );
         for (int v = 0; v < h; v++, pusdest += stride)
@@ -570,11 +570,11 @@ Draw_FadeScreen
 */
 #include "sound.h"  // S_ExtraUpdateBUL
 void Draw_FadeScreen() {
-    if (!Scr.canvas.pBuff)   return;
+    if (!Scr.canvas.pClr)   return;
     S_ExtraUpdateBUL();
 
     for (int y = 0; y < Scr.canvas.height; y++) {
-        uint8_p pbuf = (uint8_p)(Scr.canvas.pBuff + Scr.canvas.rowBytes * y);
+        uint8_p pbuf = (uint8_p)(Scr.canvas.pClr + Scr.SR_rowBytes * y);
         int t = TWICE(y & 1);
 
         for (int x = 0; x < Scr.canvas.width; x++)

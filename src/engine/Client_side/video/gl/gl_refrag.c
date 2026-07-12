@@ -150,7 +150,7 @@ void R_AddEfrags(r_Entity_p ent) {
     lastlink = &ent->efrag;
     r_pefragtopnode = NULL;
 
-    r_entBB = BBoxTranslate(ent->model->BB, ent->pose.spot);
+    r_entBB = BBoxTranslate(ent->model->BB, ent->pose.loc);
 
     R_SplitEntityOnNode(cl.worldmodel->nodes);
 

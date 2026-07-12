@@ -1,11 +1,7 @@
 #pragma once
 
-#include "qPic.h"
 typedef struct {
     bool    initialized;  // ready to draw
-    qPic_p  ram;
-    qPic_p  net;
-    qPic_p  turtle;
     bool    drawloading;
     bool    drawdialog;
 

@@ -310,8 +310,8 @@ int Sbar_itoa(int num, cString buf) {
 
 void Sbar_DrawNum(int x, int y, int num, int digits, int color) {
     char str[12];
-    int l = Sbar_itoa(num, str);
     cString ptr = str;
+    int l = Sbar_itoa(num, str);
     /**/ if (l > digits)    ptr += (l - digits);
     else if (l < digits)    x += (digits - l) * 24;
 
@@ -362,14 +362,12 @@ int Sbar_ColorForMap(int m) {
 
 void Sbar_UpdateScoreboard() {
     Sbar_SortFrags();
-
-    // draw the text
-    memset(_scoreboardtext, 0, sizeof(_scoreboardtext));
-
+    memset(_scoreboardtext, 0x00, sizeof(_scoreboardtext));    // draw the text
     for (int i = 0; i < _scoreboardlines; i++) {
         int k = _fragsort[i];
         ScoreBoard_p s = &cl.scores[k];
-        snprintf(&_scoreboardtext[i][1], sizeof(_scoreboardtext[i][1]),
+        snprintf(&_scoreboardtext[i][1],
+            sizeof(_scoreboardtext[i][1]),
             "%3i %s",
             s->frags,
             s->name
@@ -384,14 +382,16 @@ void Sbar_UpdateScoreboard() {
 
 void Sbar_SoloScoreboard() {
     char str[80];
-    snprintf(str, sizeof(str),
+    snprintf(str,
+        sizeof(str),
         "Monsters:%3i /%3i",
         cl.stats[STAT_MONSTERS],
         cl.stats[STAT_TOTALMONSTERS]
     );
     Sbar_DrawString(8, 4, str);
 
-    snprintf(str, sizeof(str),
+    snprintf(str,
+        sizeof(str),
         "Secrets :%3i /%3i",
         cl.stats[STAT_SECRETS],
         cl.stats[STAT_TOTALSECRETS]
@@ -403,7 +403,8 @@ void Sbar_SoloScoreboard() {
     int seconds = GetClSimTime() - 60 * minutes;
     int tens = seconds / 10;
     int units = seconds - 10 * tens;
-    snprintf(str, sizeof(str),
+    snprintf(str,
+        sizeof(str),
         "Time :%3i:%i%i",
         minutes,
         tens,
@@ -464,7 +465,7 @@ void Sbar_DrawScoreboard() {
                 )   continue;
             Sbar_DrawCharacter(MUL8(x + j), y, c);
         }
-    }
+}
 #endif
 }
 
@@ -766,7 +767,7 @@ void Sbar_Draw() {
         // armor
         if (cl.items & IT_INVULNERABILITY) {
             Sbar_DrawNum(24, 0, 666, 3, 1);
-            Sbar_DrawPic(0, 0, draw_disc);
+            Sbar_DrawPic(0, 0, hid.disc);
         }
         else {
             Sbar_DrawNum(
@@ -905,15 +906,12 @@ void Sbar_DeathmatchOverlay() {
             snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
             Draw_String(x + 48, y, num);
-        }
-#endif
-
-        // draw name
-        Draw_String(x + 64, y, s->name);
-
-        y += 10;
     }
+#endif
+        Draw_String(x + 64, y, s->name);    // draw name
+        y += 10;
 }
+    }
 
 
 void Sbar_MiniDeathmatchOverlay() {
@@ -991,15 +989,13 @@ void Sbar_MiniDeathmatchOverlay() {
                 snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
                 Draw_String(x + 48, y, num);
-            }
-#endif
-
-            // draw name
-            Draw_String(x + 48, y, s->name);
-            y += 8;
         }
+#endif
+            Draw_String(x + 48, y, s->name);    // draw name
+            y += 8;
     }
 }
+    }
 
 
 void Sbar_IntermissionOverlay() {

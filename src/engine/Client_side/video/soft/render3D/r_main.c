@@ -34,9 +34,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //define PASSAGES
 
-TypeLess_ptr colormap;
-vec3_t  viewlightvec;
-aLight_t    r_viewlighting = { 128, 192, &viewlightvec };
+// TypeLess_ptr colormap;
+static vec3_t  viewlightvec;
+static aLight_t    r_viewlighting = { 128, 192, &viewlightvec };
 float   r_time1;
 int     r_numallocatededges;
 bool    r_drawpolys;
@@ -54,14 +54,14 @@ int         numbtofpolys;
 btofpoly_p  pbtofpolys;
 mVertex_p   r_pcurrentvertbase;
 
-int c_surf;
-int r_maxsurfsseen;
-int r_maxedgesseen;
+int c_surf; // Debug metric
+int r_maxsurfsseen; // Debug metric
+int r_maxedgesseen; // Debug metric
 int r_cnumsurfs;
 bool r_surfsonstack;
-int r_clipflags;
+AliasClipFlags_f r_clipflags;
 
-uint8_p r_stack_start;
+
 
 bool r_fov_greater_than_90;
 
@@ -100,21 +100,21 @@ int  r_polycount;
 int  r_drawnpolycount;
 int  r_wholepolycount;
 
-#define VIEWMODNAME_LENGTH 256
-char    viewmodname[VIEWMODNAME_LENGTH + 1];
-int modcount;
+// #define VIEWMODNAME_LENGTH 256
+// char viewmodname[VIEWMODNAME_LENGTH + 1];
+// int modcount;
 
+mLeaf_p r_viewleaf;
+mLeaf_p r_oldviewleaf;
 
-mLeaf_p     r_viewleaf, r_oldviewleaf;
+fixed8_t d_lightstylevalue[256]; // 8.8 fraction of base light value
 
-fixed8_t  d_lightstylevalue[256]; // 8.8 fraction of base light value
-
-RealTime_t dp_time1, dp_time2;
-RealTime_t db_time1, db_time2;
-RealTime_t rw_time1, rw_time2;
-RealTime_t se_time1, se_time2;
-RealTime_t de_time1, de_time2;
-RealTime_t dv_time1, dv_time2;
+static RealTime_t dp_time1, dp_time2;
+static RealTime_t db_time1, db_time2;
+static RealTime_t rw_time1, rw_time2;
+static RealTime_t se_time1, se_time2;
+static RealTime_t de_time1, de_time2;
+static RealTime_t dv_time1, dv_time2;
 
 void R_MarkLeaves();
 void CreatePassages();
@@ -138,10 +138,9 @@ void R_InitTurb() {
 R_Init
 ===============
 */
+static uint8_p r_stack_start;
 void R_Init() {
-    int  dummy;
-
-    // get stack position so we can guess if we are going to overflow
+    int  dummy; // get stack position so we can guess if we are going to overflow
     r_stack_start = (uint8_p)&dummy;
 
     R_InitTurb();
@@ -381,7 +380,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
             (int32_t)R_Surf8Start,
             (int32_t)R_Surf8End - (int32_t)R_Surf8Start
         );
-        colormap = Scr.pColorMapPal;
+        // colormap = Scr.pColorMapPal;
         R_Surf8Patch();
     }
     else {
@@ -389,7 +388,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
             (int32_t)R_Surf16Start,
             (int32_t)R_Surf16End - (int32_t)R_Surf16Start
         );
-        colormap = Scr.pColorMap16;
+        // colormap = Scr.pColorMap16;
         R_Surf16Patch();
     }
 #endif // id386
@@ -445,18 +444,18 @@ void R_DrawEntitiesOnList() {
 
         switch (currententity->model->type) {
         case mod_sprite: {
-            r_entorigin = currententity->pose.spot;
+            r_entorigin = currententity->pose.loc;
             modelorg = VectorSubtract(r_origin, r_entorigin);
             R_DrawSprite();
         } break;
 
         case mod_alias: {
-            r_entorigin = currententity->pose.spot;
+            r_entorigin = currententity->pose.loc;
             modelorg = VectorSubtract(r_origin, r_entorigin);
 
             // see if the bounding box lets us trivially reject, also sets trivial accept status
             if (R_AliasCheckBBox()) {
-                int j = R_LightPoint(currententity->pose.spot);
+                int j = R_LightPoint(currententity->pose.loc);
 
                 aLight_t lighting;
                 lighting.ambientlight = j;
@@ -467,7 +466,7 @@ void R_DrawEntitiesOnList() {
 
                 for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
                     if (cl_dlights[lnum].die >= GetClSimTime()) {
-                        vec3_t dist = VectorSubtract(currententity->pose.spot, cl_dlights[lnum].origin);
+                        vec3_t dist = VectorSubtract(currententity->pose.loc, cl_dlights[lnum].origin);
                         float add = cl_dlights[lnum].radius - Length(dist);
 
                         if (add > 0.0f)
@@ -518,12 +517,12 @@ void R_DrawViewModel() {
     if (!currententity->model)
         return;
 
-    r_entorigin = currententity->pose.spot;
+    r_entorigin = currententity->pose.loc;
     modelorg = VectorSubtract(r_origin, r_entorigin);
     viewlightvec = BS.up;
     VectorInverse(&viewlightvec);
 
-    int j = R_LightPoint(currententity->pose.spot);
+    int j = R_LightPoint(currententity->pose.loc);
 
     ClampLessThen(&j, 24);  // allways give some light on gun
 
@@ -538,7 +537,7 @@ void R_DrawViewModel() {
             (dl->die < GetClSimTime()))
             continue;
 
-        vec3_t dist = VectorSubtract(currententity->pose.spot, dl->origin);
+        vec3_t dist = VectorSubtract(currententity->pose.loc, dl->origin);
         float add = dl->radius - Length(dist);
         if (add > 0)
             r_viewlighting.ambientlight += add;
@@ -569,12 +568,12 @@ extern int* pfrustum_indexes[4];    // TODO: avoid int*
 AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
     AliasClipFlags_f clipflags = ALIAS_NON_CLIP;
 
-    if (currententity->pose.facing.pitch ||
-        currententity->pose.facing.yaw ||
-        currententity->pose.facing.roll
+    if (currententity->pose.aim.pitch ||
+        currententity->pose.aim.yaw ||
+        currententity->pose.aim.roll
         ) {
         for (int i = 0; i < 4; i++) {
-            double d = DotProduct(currententity->pose.spot, view_clipplanes[i].normal);
+            double d = DotProduct(currententity->pose.loc, view_clipplanes[i].normal);
             d -= view_clipplanes[i].dist;
 
             if (d <= -clmodel->radius)
@@ -635,11 +634,11 @@ void R_DrawBEntitiesOnList() {
             Model_p clmodel = currententity->model;
 
             // see if the bounding box lets us trivially reject, also sets trivial accept status
-            BBox_t bb = BBoxTranslate(clmodel->BB, currententity->pose.spot);
+            BBox_t bb = BBoxTranslate(clmodel->BB, currententity->pose.loc);
             AliasClipFlags_f clipflags = R_BmodelCheckBBox(clmodel, bb);
 
             if (clipflags != BMODEL_FULLY_CLIPPED) {
-                r_entorigin = currententity->pose.spot;
+                r_entorigin = currententity->pose.loc;
                 modelorg = VectorSubtract(r_origin, r_entorigin);
 
                 r_pcurrentvertbase = clmodel->vertexes;
@@ -728,11 +727,9 @@ Surf_t lsurfs[NUMSTACKSURFACES + ((CACHE_SIZE - 1) / sizeof(Surf_t)) + 2] PLACE_
     ((TypeLess_ptr)((((uintptr_t)(p)) + ((a) - 1)) & ~((uintptr_t)((a) - 1))))
 
 
-#include "vid.h" // VID_LockBuffer
 void R_EdgeDrawing() {
     r_edges = (auxedges) ?
-        auxedges :
-        (Edge_p)ALIGN_PTR(&ledges[0], CACHE_SIZE);
+        auxedges : (Edge_p)ALIGN_PTR(&ledges[0], CACHE_SIZE);
     // (((uintptr_t)&ledges[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
 
     if (r_surfsonstack) {
@@ -814,9 +811,9 @@ r_refdef must be set before the first call
 ================
 */
 void R_RenderView_() {
-    if (r_timegraph.value ||
-        r_speeds.value ||
-        r_dspeeds.value
+    if ((r_timegraph.value) ||
+        (r_speeds.value) ||
+        (r_dspeeds.value)
         )   r_time1 = Host_FloatTime();
 
     R_SetupFrame();
@@ -878,10 +875,10 @@ void R_RenderView_() {
     if (r_reportedgeout.value && r_outofedges)
         Con_Printf("Short roughly %d edges\n", TWICE(r_outofedges) / 3);
 
-    // back to high floating-point precision
-    Sys_HighFPPrecision();
+    Sys_HighFPPrecision();  // back to high floating-point precision
 }
 
+#include "vid.h" // vid.maxwarp.pClr
 void R_RenderView() {
     int dummy;
     int delta = (uint8_p)&dummy - r_stack_start;

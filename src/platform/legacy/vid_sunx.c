@@ -86,7 +86,6 @@ VidDef_t vid; // global video state
 Rgb16_t d_8to16table[InksNum];
 
 int num_shades = 32;
-int d_con_indirect = 0;
 int vid_buffersize;
 
 #define STD_EVENT_MASK \
@@ -700,9 +699,9 @@ void    VID_Init(uint8_p palette) {
 
     current_framebuffer = false;
     vid.rowBytes = x_framebuffer[0]->bytes_per_line;
-    Scr.canvas.pBuff = x_framebuffer[0]->data;
-    Scr.con.pBuff = x_framebuffer[0]->data;
-    Scr.con.rowBytes = vid.rowBytes;
+    Scr.canvas.pClr = x_framebuffer[0]->data;
+    Scr.con.pClr = x_framebuffer[0]->data;
+    Scr.SR_rowBytes = vid.rowBytes;
     Scr.con.width = Scr.canvas.width;
     Scr.con.height = Scr.canvas.height;
 
@@ -948,11 +947,11 @@ void    VID_Update(vRect_p rects) {
         else        ResetFrameBuffer();
 
         vid.rowBytes = x_framebuffer[0]->bytes_per_line;
-        Scr.canvas.pBuff = x_framebuffer[current_framebuffer]->data;
-        Scr.con.pBuff = Scr.canvas.pBuff;
+        Scr.canvas.pClr = x_framebuffer[current_framebuffer]->data;
+        Scr.con.pClr = Scr.canvas.pClr;
         Scr.con.width = Scr.canvas.width;
         Scr.con.height = Scr.canvas.height;
-        Scr.con.rowBytes = vid.rowBytes;
+        Scr.SR_rowBytes = vid.rowBytes;
 
         SCR_RequestCalcRefdef();                // force a surface cache flush
         return;
@@ -991,8 +990,8 @@ void    VID_Update(vRect_p rects) {
         }
         //        printf("%lf\n", (LegTime_t)(gethrtime()-s)/1.0e9);
         current_framebuffer = !current_framebuffer;
-        Scr.canvas.pBuff = x_framebuffer[current_framebuffer]->data;
-        Scr.con.pBuff = Scr.canvas.pBuff;
+        Scr.canvas.pClr = x_framebuffer[current_framebuffer]->data;
+        Scr.con.pClr = Scr.canvas.pClr;
         XSync(x_disp, False);
 
     }

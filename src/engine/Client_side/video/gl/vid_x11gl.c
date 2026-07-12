@@ -60,11 +60,11 @@ bool vidmode_ext = false;
 // static cvar_t in_dgamouse = { "in_dgamouse", "1", false };
 // static cvar_t m_filter = { "m_filter", "0" };
 
-// it live in d_surf.c
-void D_InitCaches(SurfCache_p buffer, int size) {
-    (void)buffer;
-    (void)size;
-}
+// // it live in d_surf.c
+// void D_InitCaches(SurfCache_p buffer, int size) {
+//     (void)buffer;
+//     (void)size;
+// }
 
 void GL_BeginRendering(int *x, int *y, int *width, int *height) {
     *x = 0;

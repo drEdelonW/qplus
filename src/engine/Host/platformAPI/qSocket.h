@@ -2,6 +2,8 @@
 #include "qTime.h"
 
 #define NET_MAXMESSAGE  8192
+typedef uint8_t netMsgBuf_t[NET_MAXMESSAGE];
+
 #define NET_NAMELEN   64
 
 
@@ -32,12 +34,12 @@ struct qsocket_s {
     uint32_t sendSequence;
     uint32_t unreliableSendSequence;
     int32_t sendMessageLength;
-    uint8_t sendMessage[NET_MAXMESSAGE];
+    netMsgBuf_t sendMessage;
 
     uint32_t receiveSequence;
     uint32_t unreliableReceiveSequence;
     int32_t receiveMessageLength;
-    uint8_t receiveMessage[NET_MAXMESSAGE];
+    netMsgBuf_t receiveMessage;
 
     qsockaddr_t addr;
     char address[NET_NAMELEN];

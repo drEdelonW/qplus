@@ -14,6 +14,8 @@ typedef enum {
 Skill_t GM_GetSkill();
 void    GM_SetSkill(Skill_t);
 
+// TODO: wrap (cl.maxclients > 1) and (cl.maxclients != 1) to isSingleGame()
+
 #ifdef __cplusplus
 extern "C" {
 #endif

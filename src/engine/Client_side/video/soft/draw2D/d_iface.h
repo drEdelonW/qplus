@@ -76,7 +76,7 @@ extern AffineTriDesc_t r_affinetridesc;
 extern SpriteDesc_t r_spritedesc;
 extern PolyDesc_t r_polydesc;
 
-extern int d_con_indirect; // if 0, Quake will draw console directly to Scr.canvas.pBuff; if 1, Quake will draw console via D_DrawRect. Must be defined by driver
+
 
 extern Basis_t r_p;
 
@@ -144,5 +144,5 @@ extern float skyspeed2;
 #include "qTime.h"
 extern LegDt_t skytime;
 
-extern int c_surf;
+extern int c_surf;  // Debug metric
 

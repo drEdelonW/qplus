@@ -59,6 +59,7 @@ static inline vec3_t VectorAddScalar(vec3_t v, vec_t scalar) {
     return out;
 }
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif

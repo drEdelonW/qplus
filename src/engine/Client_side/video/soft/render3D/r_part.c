@@ -67,7 +67,7 @@ void R_InitParticles() {
 
 #ifdef QUAKE2
 void R_DarkFieldParticles(r_Entity_p ent) {
-    vec3_t org = ent->pose.spot;
+    vec3_t org = ent->pose.loc;
     for (int i = -16; i < 16; i += 8)
         for (int j = -16; j < 16; j += 8)
             for (int k = 0; k < 32; k += 8) {
@@ -148,7 +148,7 @@ void R_EntityParticles(r_Entity_p ent) {
         prt->type = pt_explode;
 
         prt->org = VectorMA(VectorMA(
-            ent->pose.spot,
+            ent->pose.loc,
             dist, r_avertexnormals[i]),
             _beamLength, forward
         );

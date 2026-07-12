@@ -1262,7 +1262,7 @@ bool VID_SetWindowedMode(int modenum) {
     Scr.con.height = DIBHeight;
     Scr.con.width = DIBWidth;
     Scr.direct = (qColor8_p)dibdc->surface;
-    Scr.canvas.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
+    Scr.SR_rowBytes = Scr.SR_rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
 
     vid_stretched = stretched;
@@ -1406,7 +1406,7 @@ bool VID_SetFullDIBMode(int modenum) {
     Scr.canvas.pClr = (qColor8_p)dibdc->surface;
     Scr.con.pClr = (qColor8_p)dibdc->surface;
     Scr.direct = (qColor8_p)dibdc->surface;
-    Scr.canvas.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
+    Scr.SR_rowBytes = Scr.SR_rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
     Scr.canvas.height = Scr.con.height = DIBHeight;
     Scr.canvas.width = Scr.con.width = DIBWidth;
@@ -1597,21 +1597,21 @@ void VID_LockBuffer() {
         Scr.canvas.pClr = (qColor8_p)memdc->surface;
         Scr.con.pClr = (qColor8_p)memdc->surface;
         Scr.direct = (qColor8_p)memdc->surface;
-        Scr.canvas.rowBytes = Scr.con.rowBytes = memdc->mi.bytesPerLine;
+        Scr.SR_rowBytes = Scr.SR_rowBytes = memdc->mi.bytesPerLine;
     }
     else if (mgldc) {
         // Update surface pointer for linear access modes
         Scr.canvas.pClr = (qColor8_p)mgldc->surface;
         Scr.con.pClr = (qColor8_p)mgldc->surface;
         Scr.direct = (qColor8_p)mgldc->surface;
-        Scr.canvas.rowBytes = Scr.con.rowBytes = mgldc->mi.bytesPerLine;
+        Scr.SR_rowBytes = Scr.SR_rowBytes = mgldc->mi.bytesPerLine;
     }
 
     d_viewbuffer = (r_dowarp) ?
         vid.maxwarp.pClr : Scr.canvas.pClr;
 
     screenwidth = (r_dowarp) ?
-        WARP_WIDTH : Scr.canvas.rowBytes;
+        WARP_WIDTH : Scr.SR_rowBytes;
 
     if (lcd_x.value)
         screenwidth = TWICE(screenwidth);
@@ -2188,9 +2188,9 @@ void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height) {
         for (i = 0; i < (height << repshift); i += reps) {
             for (j = 0; j < reps; j++) {
                 memcpy(&backingbuf[(i + j) * 24],
-                    Scr.direct + x + ((y << repshift) + i + j) * Scr.canvas.rowBytes,
+                    Scr.direct + x + ((y << repshift) + i + j) * Scr.SR_rowBytes,
                     width);
-                memcpy(Scr.direct + x + ((y << repshift) + i + j) * Scr.canvas.rowBytes,
+                memcpy(Scr.direct + x + ((y << repshift) + i + j) * Scr.SR_rowBytes,
                     &pbitmap[(i >> repshift) * width],
                     width);
             }
@@ -2267,7 +2267,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
             for (int j = 0; j < reps; j++)
                 memcpy(
                     Scr.direct + x +
-                    Scr.canvas.rowBytes * ((y << repshift) + i + j),
+                    Scr.SR_rowBytes * ((y << repshift) + i + j),
                     &backingbuf[(i + j) * 24],
                     width
                 );

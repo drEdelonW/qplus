@@ -183,7 +183,7 @@ void R_AddEfrags(r_Entity_p ent) {
 
     Model_p entmodel = ent->model;
 
-    r_entBB = BBoxTranslate(entmodel->BB, ent->pose.spot);
+    r_entBB = BBoxTranslate(entmodel->BB, ent->pose.loc);
 
     R_SplitEntityOnNode(cl.worldmodel->nodes);
     ent->topnode = r_pefragtopnode;

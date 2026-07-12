@@ -54,8 +54,6 @@ CVAR_ARC(block_switch, "0");
 CVAR_ARC(vid_window_x, "0");
 CVAR_ARC(vid_window_y, "0");
 
-int	d_con_indirect = 0;
-
 int		numvidmodes;
 vmode_p pvidmodes;
 

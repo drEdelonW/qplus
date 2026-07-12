@@ -74,8 +74,8 @@ void CL_SignonReply() {
             )
         );
 
-        char  str[NET_MAXMESSAGE];    // TODO: make this huge buffer out of stack!
         MSG_WriteByte(&cls.message, clc_stringcmd);
+        char  str[NET_MAXMESSAGE];    // TODO: make this huge buffer out of stack!
         snprintf(str, sizeof(str), "spawn %s", cls.spawnparms);
         MSG_WriteString(&cls.message, str);
     } break;

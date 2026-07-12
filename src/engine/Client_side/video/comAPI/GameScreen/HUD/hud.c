@@ -8,6 +8,7 @@
 #include "screen_prv.h"
 #include "qSymbolChar.h"
 
+Hid_t hid;
 
 
 void SCR_DrawPause() {
@@ -17,9 +18,9 @@ void SCR_DrawPause() {
     Draw_PicCenter("gfx/pause.lmp");
 }
 
-
 void SCR_DrawLoading() {
-    if (!_scr.drawloading)   return;
+    if (!(_scr.drawloading)
+        )   return;
     Draw_PicCenter("gfx/loading.lmp");
 }
 
@@ -112,15 +113,15 @@ Call before beginning any disc IO.
 #endif
 void Draw_BeginDisc() {
 #ifdef GLQUAKE
-    if (!draw_disc)     return;
+    if (!hid.disc)     return;
 
-    glDrawBuffer(GL_FRONT);
-    Draw_Pic(Scr.canvas.width - 24, 0, draw_disc);
-    glDrawBuffer(GL_BACK);
+    glDrawBuffer(GL_FRONT); {
+        Draw_Pic(Scr.canvas.width - 24, 0, hid.disc);
+    } glDrawBuffer(GL_BACK);
 #else
     D_BeginDirectRect(
         Scr.canvas.width - 24, 0,
-        draw_disc->data,
+        hid.disc->data,
         24, 24
     );
 #endif
@@ -153,7 +154,7 @@ void SCR_DrawRam() {
     Draw_Pic(
         Scr.canvas.x + 32,
         Scr.canvas.y,
-        _scr.ram
+        hid.ram
     );
 }
 
@@ -173,7 +174,7 @@ void SCR_DrawTurtle() {
     Draw_Pic(
         Scr.canvas.x,
         Scr.canvas.y,
-        _scr.turtle
+        hid.turtle
     );
 }
 
@@ -186,7 +187,7 @@ void SCR_DrawNet() {
     Draw_Pic(
         Scr.canvas.x + 64,
         Scr.canvas.y,
-        _scr.net
+        hid.net
     );
 }
 

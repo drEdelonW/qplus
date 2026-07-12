@@ -36,8 +36,6 @@ extern vec3_t   r_origin;
 //
 // surface cache related
 //
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif

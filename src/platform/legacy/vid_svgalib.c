@@ -62,8 +62,6 @@ static uint8_t vid_current_palette[768];
 
 int num_mice = sizeof(mice) / sizeof(mice[0]);
 
-int d_con_indirect = 0;
-
 int  svgalib_inited = 0;
 int  UseMouse = 1;
 int  UseDisplay = 1;
@@ -462,7 +460,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     Scr.aspect = calcAspectRect(&Scr.canvas);
     Scr.pColorMapPal = host_colormap;
-    Scr.con.rowBytes = vid.rowBytes;
+    Scr.SR_rowBytes = vid.rowBytes;
     Scr.con.width = Scr.canvas.width;
     Scr.con.height = Scr.canvas.height;
     Scr.numpages = 1;
@@ -684,7 +682,7 @@ void VID_Update(vRect_p rects) {
         vga_waitretrace();
 
     if (VGA_planar)
-        VGA_UpdatePlanarScreen(Scr.canvas.pBuff);
+        VGA_UpdatePlanarScreen(Scr.canvas.pClr);
 
     else if (vid_redrawfull.value) {
         int total = vid.rowBytes * Scr.canvas.height;
@@ -693,7 +691,7 @@ void VID_Update(vRect_p rects) {
         for (offset = 0;offset < total;offset += 0x10000) {
             vga_setpage(offset / 0x10000);
             memcpy(framebuffer_ptr,
-                Scr.canvas.pBuff + offset,
+                Scr.canvas.pClr + offset,
                 ((total - offset > 0x10000) ? 0x10000 : (total - offset)));
         }
     }
@@ -716,16 +714,16 @@ void VID_Update(vRect_p rects) {
                 }
                 if (rects->width + i > 0x10000) {
                     memcpy(framebuffer_ptr + i,
-                        Scr.canvas.pBuff + offset,
+                        Scr.canvas.pClr + offset,
                         0x10000 - i);
                     vga_setpage(++vidpage);
                     memcpy(framebuffer_ptr,
-                        Scr.canvas.pBuff + offset + 0x10000 - i,
+                        Scr.canvas.pClr + offset + 0x10000 - i,
                         rects->width - 0x10000 + i);
                 }
                 else
                     memcpy(framebuffer_ptr + i,
-                        Scr.canvas.pBuff + offset,
+                        Scr.canvas.pClr + offset,
                         rects->width);
                 offset += vid.rowBytes;
             }

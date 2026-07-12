@@ -225,7 +225,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
 SV_StepDirection
 
 Turns to the movement direction, and walks the current distance if
-facing it.
+aim it.
 
 ======================
 */

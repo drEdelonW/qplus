@@ -101,9 +101,9 @@ void R_AliasSetUpTransform(bool trivial_accept) {
     // TODO: could cache lazily, stored in the entity
 
     ang3_t angles = {
-        .pitch = -currententity->pose.facing.pitch,
-        .yaw = currententity->pose.facing.yaw,
-        .roll = currententity->pose.facing.roll
+        .pitch = -currententity->pose.aim.pitch,
+        .yaw = currententity->pose.aim.yaw,
+        .roll = currententity->pose.aim.roll
     };
 
     _alias = GetBasis(angles);

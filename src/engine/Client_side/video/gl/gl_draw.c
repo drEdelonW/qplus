@@ -150,7 +150,7 @@ int Scrap_AllocBlock(int w, int h, int* x, int* y) {
                 if (scrap_allocated[texnum][i + j] > best2)
                     best2 = scrap_allocated[texnum][i + j];
             }
-            if (j == w) { // this is a valid spot
+            if (j == w) { // this is a valid loc
                 *x = i;
                 *y = best = best2;
             }
@@ -461,7 +461,7 @@ void Draw_Init() {
     //
     // get the other pics we need
     //
-    draw_disc = GetPicFromWad("disc");
+    hid.disc = GetPicFromWad("disc");
     draw_backtile = GetPicFromWad("backtile");
 }
 

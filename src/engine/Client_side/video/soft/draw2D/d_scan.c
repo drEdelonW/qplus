@@ -93,9 +93,9 @@ void D_WarpScreen() {   // Under water warp
     }
 
     turb = intsintable + ((int)(GetClSimTime() * SPEED) & (CYCLE - 1));
-    uint8_p dest = vid.frameBuff.pBuff + Scr.canvas.y * Scr.canvas.rowBytes + Scr.canvas.x;
+    uint8_p dest = (uint8_p)vid.frameBuff.pClr + Scr.canvas.y * Scr.SR_rowBytes + Scr.canvas.x;
 
-    for (int v = 0; v < Scr.canvas.height; v++, dest += Scr.canvas.rowBytes) {
+    for (int v = 0; v < Scr.canvas.height; v++, dest += Scr.SR_rowBytes) {
         col = &column[turb[v]];
         uint8_ar row = &rowptr[v];
 

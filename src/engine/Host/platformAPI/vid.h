@@ -48,7 +48,9 @@ typedef struct {
 } VidDef_t;
 typedef VidDef_t* VidDef_p;
 
+#ifndef GLQUAKE
 extern VidDef_t vid; // global video state
+#endif
 extern  void (*vid_menudrawfn)();
 
 #ifdef __cplusplus

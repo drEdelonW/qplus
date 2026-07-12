@@ -2,6 +2,24 @@
 
 #include "msg.h"
 #include "vector.h"
+#include <math.h>
+
+static inline bool isVectorOutOfRange(vec3_t v, vec_t scalar) {
+    for (int j = 0; j < VECT_DIM; j++) {
+        if ((v.v[j] > scalar) ||
+            (v.v[j] < -scalar)
+            )   return true;
+    }
+    return false;
+}
+
+static inline bool isVectorL1OutOfRange(vec3_t v, vec_t scalar) {
+    return (
+        fabsf(v.x) +
+        fabsf(v.y) +
+        fabsf(v.z)
+    ) > scalar;
+}
 
 static inline vec3_t MSG_ReadVector() {
     return (vec3_t){

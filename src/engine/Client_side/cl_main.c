@@ -35,6 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "eFrag.h"
 #include "render.h"
 #include "VA.h"
+#include "vector_tools.h"
 
 // we need to declare some mouse variables here, because the menu system
 // references them even when on a unix system.
@@ -138,10 +139,13 @@ void CL_NextDemo() {
             return;
         }
     }
-
+#if 0
     VaBuff_t str;
     snprintf(str, sizeof(str), "playdemo %s\n", cls.demos[cls.demonum]);
     Cbuf_InsertText(str);
+#else
+    Cbuf_InsertText(va("playdemo %s\n", cls.demos[cls.demonum]));
+#endif
     cls.demonum++;
 }
 
@@ -160,13 +164,13 @@ void CL_PrintEntities_f() {
             ent->model->name,
             ent->frame,
 
-            ent->pose.spot.x,
-            ent->pose.spot.y,
-            ent->pose.spot.z,
+            ent->pose.loc.x,
+            ent->pose.loc.y,
+            ent->pose.loc.z,
 
-            ent->pose.facing.pitch,
-            ent->pose.facing.yaw,
-            ent->pose.facing.roll
+            ent->pose.aim.pitch,
+            ent->pose.aim.yaw,
+            ent->pose.aim.roll
         );
     }
 }
@@ -346,33 +350,31 @@ void CL_RelinkEntities() {
             continue;
         }
 
-        vec3_t oldorg = ent->pose.spot;
+        vec3_t oldorg = ent->pose.loc;
 
-        if (ent->forcelink) { // the entity was not updated in the last message so move to the final spot
-            ent->pose.spot = ent->msgPoses[Cur].spot;
-            ent->pose.facing = ent->msgPoses[Cur].facing;
+        if (ent->forcelink) { // the entity was not updated in the last message so move to the final loc
+            ent->pose.loc = ent->msgPoses[Cur].loc;
+            ent->pose.aim = ent->msgPoses[Cur].aim;
         }
         else {  // if the delta is large, assume a teleport and don't lerp
             LegDt_t fr = frac;
-            vec3_t delta = VectorSubtract(ent->msgPoses[Cur].spot, ent->msgPoses[Prev].spot);
+            vec3_t delta = VectorSubtract(ent->msgPoses[Cur].loc, ent->msgPoses[Prev].loc);
             for (int j = 0; j < VECT_DIM; j++) {
-                if ((delta.v[j] > 100.f) ||
-                    (delta.v[j] < -100.f)
-                    )
+                if (isVectorOutOfRange(delta, 100.f))
                     fr = 1.f;  // assume a teleportation, not a motion
             }
 
             // interpolate the origin and angles
-            ent->pose.spot = VectorMA(ent->msgPoses[Prev].spot, fr, delta);
-            ent->pose.facing = AngleMA(ent->msgPoses[Prev].facing,
+            ent->pose.loc = VectorMA(ent->msgPoses[Prev].loc, fr, delta);
+            ent->pose.aim = AngleMA(ent->msgPoses[Prev].aim,
                 fr, AngleSubtract(
-                    ent->msgPoses[Cur].facing, ent->msgPoses[Prev].facing
+                    ent->msgPoses[Cur].aim, ent->msgPoses[Prev].aim
                 )
             );
         }
 
         dLight_p dl = CL_AllocDlight(i);
-        vec3_t lOrig = ent->pose.spot; { lOrig.z += 16.f; }
+        vec3_t lOrig = ent->pose.loc; { lOrig.z += 16.f; }
 
         switch (ent->effects) {
         default: Host_Error("Multiply effects flags setted [0x%X] at same time!", ent->effects); break;
@@ -384,7 +386,7 @@ void CL_RelinkEntities() {
 # endif
 
         case EF_MUZZLEFLASH: {
-            lOrig = VectorMA(lOrig, 18.f, GetBasis(ent->pose.facing).forward);
+            lOrig = VectorMA(lOrig, 18.f, GetBasis(ent->pose.aim).forward);
             *(dl) = (dLight_t){
                 .origin = lOrig,
                 .radius = 200.f + (float)((rand() & 31)),
@@ -405,7 +407,7 @@ void CL_RelinkEntities() {
                 .key = dl->key
             }; break;
 
-        case EF_DIMLIGHT | EF_MUZZLEFLASH : // 0x0A
+        case EF_DIMLIGHT | EF_MUZZLEFLASH: // 0x0A
         case EF_DIMLIGHT:
             *dl = (dLight_t){
                 .origin = lOrig,
@@ -443,11 +445,11 @@ void CL_RelinkEntities() {
         default: Host_Error("Multiply model flags setted [0x%X] at same time!", ent->model->flags); break;
         case EF_NONE: break;
 
-        case EF_ROTATE: ent->pose.facing.yaw = bobjrotate; break;
+        case EF_ROTATE: ent->pose.aim.yaw = bobjrotate; break;
         case EF_ROCKET: {
-            R_RocketTrail(oldorg, ent->pose.spot, RT_ROCKET);
+            R_RocketTrail(oldorg, ent->pose.loc, RT_ROCKET);
             *dl = (dLight_t){
-                .origin = ent->pose.spot,
+                .origin = ent->pose.loc,
                 .radius = 200.f,
                 .die = (sSimTime_t)(GetClSimTime() + 0.01),
                 // .decay = 0.f,
@@ -455,12 +457,12 @@ void CL_RelinkEntities() {
                 .key = dl->key
             };
         } break;
-        case EF_GIB:        R_RocketTrail(oldorg, ent->pose.spot, RT_GIB);     break;
-        case EF_ZOMGIB:     R_RocketTrail(oldorg, ent->pose.spot, RT_ZOMGIB);  break;
-        case EF_TRACER:     R_RocketTrail(oldorg, ent->pose.spot, RT_TRACER);  break;
-        case EF_TRACER2:    R_RocketTrail(oldorg, ent->pose.spot, RT_TRACER2); break;
-        case EF_GRENADE:    R_RocketTrail(oldorg, ent->pose.spot, RT_GRENADE); break;
-        case EF_TRACER3:    R_RocketTrail(oldorg, ent->pose.spot, RT_TRACER3); break;
+        case EF_GIB:        R_RocketTrail(oldorg, ent->pose.loc, RT_GIB);     break;
+        case EF_ZOMGIB:     R_RocketTrail(oldorg, ent->pose.loc, RT_ZOMGIB);  break;
+        case EF_TRACER:     R_RocketTrail(oldorg, ent->pose.loc, RT_TRACER);  break;
+        case EF_TRACER2:    R_RocketTrail(oldorg, ent->pose.loc, RT_TRACER2); break;
+        case EF_GRENADE:    R_RocketTrail(oldorg, ent->pose.loc, RT_GRENADE); break;
+        case EF_TRACER3:    R_RocketTrail(oldorg, ent->pose.loc, RT_TRACER3); break;
         };
 
         ent->forcelink = false;

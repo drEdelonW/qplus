@@ -154,7 +154,7 @@ void CL_KeepaliveMessage() {
 
     // read messages from server, should just be nops
     sizebuf_t old = net_message;
-    uint8_t olddata[NET_MAXMESSAGE];  memcpy(olddata, net_message.data, net_message.cursize);
+    netMsgBuf_t olddata;  memcpy(olddata, net_message.data, net_message.cursize);
 
     int ret;
     do {
@@ -372,24 +372,24 @@ void CL_ParseUpdate(update_bits_t bits) {
     ent->effects = (bits & U_EFFECTS) ? MSG_ReadByte() : ent->baseline.effects;
 
     // shift the known values for interpolation
-    ent->msgPoses[Prev].spot = ent->msgPoses[Cur].spot;
-    ent->msgPoses[Prev].facing = ent->msgPoses[Cur].facing;
+    ent->msgPoses[Prev].loc = ent->msgPoses[Cur].loc;
+    ent->msgPoses[Prev].aim = ent->msgPoses[Cur].aim;
 
-    ent->msgPoses[Cur].spot.x = (bits & U_ORIGIN1) ? MSG_ReadCoord() : ent->baseline.pose.spot.x;
-    ent->msgPoses[Cur].facing.pitch = (bits & U_ANGLE1) ? MSG_ReadAngle() : ent->baseline.pose.facing.pitch;
-    ent->msgPoses[Cur].spot.y = (bits & U_ORIGIN2) ? MSG_ReadCoord() : ent->baseline.pose.spot.y;
-    ent->msgPoses[Cur].facing.yaw = (bits & U_ANGLE2) ? MSG_ReadAngle() : ent->baseline.pose.facing.yaw;
-    ent->msgPoses[Cur].spot.z = (bits & U_ORIGIN3) ? MSG_ReadCoord() : ent->baseline.pose.spot.z;
-    ent->msgPoses[Cur].facing.roll = (bits & U_ANGLE3) ? MSG_ReadAngle() : ent->baseline.pose.facing.roll;
+    ent->msgPoses[Cur].loc.x = (bits & U_ORIGIN1) ? MSG_ReadCoord() : ent->baseline.pose.loc.x;
+    ent->msgPoses[Cur].aim.pitch = (bits & U_ANGLE1) ? MSG_ReadAngle() : ent->baseline.pose.aim.pitch;
+    ent->msgPoses[Cur].loc.y = (bits & U_ORIGIN2) ? MSG_ReadCoord() : ent->baseline.pose.loc.y;
+    ent->msgPoses[Cur].aim.yaw = (bits & U_ANGLE2) ? MSG_ReadAngle() : ent->baseline.pose.aim.yaw;
+    ent->msgPoses[Cur].loc.z = (bits & U_ORIGIN3) ? MSG_ReadCoord() : ent->baseline.pose.loc.z;
+    ent->msgPoses[Cur].aim.roll = (bits & U_ANGLE3) ? MSG_ReadAngle() : ent->baseline.pose.aim.roll;
 
     if (bits & U_NOLERP)
         ent->forcelink = true;
 
     if (forcelink) { // didn't have an update last message
-        ent->msgPoses[Prev].spot = ent->msgPoses[Cur].spot;
-        ent->pose.spot = ent->msgPoses[Cur].spot;
-        ent->msgPoses[Prev].facing = ent->msgPoses[Cur].facing;
-        ent->pose.facing = ent->msgPoses[Cur].facing;
+        ent->msgPoses[Prev].loc = ent->msgPoses[Cur].loc;
+        ent->pose.loc = ent->msgPoses[Cur].loc;
+        ent->msgPoses[Prev].aim = ent->msgPoses[Cur].aim;
+        ent->pose.aim = ent->msgPoses[Cur].aim;
         ent->forcelink = true;
     }
 }
@@ -405,8 +405,8 @@ void CL_ParseBaseline(r_Entity_p ent) {
     ent->baseline.colormap = MSG_ReadByte();
     ent->baseline.skin = MSG_ReadByte();
     for (int i = 0; i < VECT_DIM; i++) {    // TODO: wrap MSG_ReadCoord/MSG_ReadAngle to MSG_vector_tools
-        ent->baseline.pose.spot.v[i] = MSG_ReadCoord();
-        ent->baseline.pose.facing.v[i] = MSG_ReadAngle();
+        ent->baseline.pose.loc.v[i] = MSG_ReadCoord();
+        ent->baseline.pose.aim.v[i] = MSG_ReadAngle();
     }
 }
 

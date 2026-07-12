@@ -277,8 +277,8 @@ void ResetFrameBuffer() {
     if (!x_framebuffer[0])
         Sys_Error("VID: XCreateImage failed\n");
 
-    vid.frameBuff.pBuff = (uint8_p)(x_framebuffer[0]);
-    Scr.con.pBuff = vid.frameBuff.pBuff;
+    vid.frameBuff.pClr = (qColor8_p)x_framebuffer[0];
+    Scr.con.pClr = vid.frameBuff.pClr; // TODO: move it to screen update
 
 }
 
@@ -559,10 +559,9 @@ void VID_Init(qPal_p palette) {
         ResetFrameBuffer();
 
     current_framebuffer = false;
-    vid.frameBuff.rowBytes = x_framebuffer[current_framebuffer]->bytes_per_line;
+    Scr.SR_rowBytes = x_framebuffer[current_framebuffer]->bytes_per_line;
     vid.frameBuff.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
     Scr.con.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
-    Scr.con.rowBytes = vid.frameBuff.rowBytes;
     Scr.con.width = vid.frameBuff.width;
     Scr.con.height = vid.frameBuff.height;
 
@@ -652,12 +651,9 @@ void VID_Update(vRect_p p_rects) {
         if (doShm)      ResetSharedFrameBuffers();
         else            ResetFrameBuffer();
 
-        Scr.canvas.rowBytes = x_framebuffer[0]->bytes_per_line;
-        vid.frameBuff.pBuff = (uint8_p)x_framebuffer[current_framebuffer]->data;
-        Scr.con.pBuff = vid.frameBuff.pBuff;
-        Scr.con.width = vid.frameBuff.width;
-        Scr.con.height = vid.frameBuff.height;
-        Scr.con.rowBytes = Scr.canvas.rowBytes;
+        Scr.SR_rowBytes = x_framebuffer[0]->bytes_per_line;
+        vid.frameBuff.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
+        Scr.con = vid.frameBuff;
 
         SCR_RequestCalcRefdef();    // force a surface cache flush
         Con_CheckResize();
@@ -701,7 +697,7 @@ void VID_Update(vRect_p p_rects) {
             p_rects = p_rects->pNext;   /* TODO: check is here something not NULL ? */
         }
         current_framebuffer = !current_framebuffer;
-        vid.frameBuff.pBuff = (uint8_p)x_framebuffer[current_framebuffer]->data;
+        vid.frameBuff.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
         XSync(x_disp, False);
     }
     else {

@@ -94,8 +94,6 @@ Rgb16_t d_8to16table[InksNum];
 
 int  num_shades = 32;
 
-int d_con_indirect = 0;
-
 int  vid_buffersize;
 
 #define STD_EVENT_MASK \
@@ -605,9 +603,9 @@ VID_ResetFramebuffer() {
         Sys_Error("xil_get_memory_storage");
 
     vid.rowBytes = storage.byte.scanline_stride;
-    Scr.canvas.pBuff = storage.byte.data;
-    Scr.con.pBuff = Scr.canvas.pBuff;
-    Scr.con.rowBytes = vid.rowBytes;
+    Scr.canvas.pClr = storage.byte.data;
+    Scr.con.pClr = Scr.canvas.pClr;
+    Scr.SR_rowBytes = vid.rowBytes;
     Scr.con.width = Scr.canvas.width;
     Scr.con.height = Scr.canvas.height;
 
@@ -948,8 +946,8 @@ VID_Update(vRect_p rects) {
         if (xil_get_memory_storage(quake_image, &storage) == FALSE)
             Sys_Error("xil_get_memory_storage");
 
-        Scr.canvas.pBuff = storage.byte.data;
-        Scr.con.pBuff = Scr.canvas.pBuff;
+        Scr.canvas.pClr = storage.byte.data;
+        Scr.con.pClr = Scr.canvas.pClr;
 
         rects = rects->pnext;
     }
@@ -1032,9 +1030,9 @@ drain_renderpipeline(XilImage old) {
         Sys_Error("xil_get_memory_storage");
 
     vid.rowBytes = storage.byte.scanline_stride;
-    Scr.canvas.pBuff = storage.byte.data;
-    Scr.con.pBuff = Scr.canvas.pBuff;
-    Scr.con.rowBytes = vid.rowBytes;
+    Scr.canvas.pClr = storage.byte.data;
+    Scr.con.pClr = Scr.canvas.pClr;
+    Scr.SR_rowBytes = vid.rowBytes;
     Scr.con.width = Scr.canvas.width;
     Scr.con.height = Scr.canvas.height;
 
@@ -1060,8 +1058,8 @@ sched_update(XilImage image) {
     if (xil_get_memory_storage(new, &storage) == FALSE)
         Sys_Error("xil_get_memory_storage");
 
-    Scr.canvas.pBuff = storage.byte.data;
-    Scr.con.pBuff = Scr.canvas.pBuff;
+    Scr.canvas.pClr = storage.byte.data;
+    Scr.con.pClr = Scr.canvas.pClr;
 
     return (new);
 }

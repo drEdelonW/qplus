@@ -111,9 +111,9 @@ void VID_Update(vRect_p rects) {
     int ofs = ((800 - 640) / 2) + (((480 - 400) / 2) * LCD_SCREEN_WIDTH);
     for (int y = 0; y < Scr.canvas.height; y++)
         for (int x = 0; x < Scr.canvas.width; x++) {
-            uint8_t idx = Scr.canvas.pBuff[y * Scr.canvas.width + x];
+            qColor8_t idx = Scr.canvas.pClr[y * Scr.canvas.width + x];
 
-            uint32_t rgb = d_8to24table[idx];   // 0x00_bb_gg_rr
+            Rgb24_t rgb = d_8to24table[idx.i];   // 0x00_bb_gg_rr
 
             uint32_t argb =
                 Color_Transparent |              // alpha

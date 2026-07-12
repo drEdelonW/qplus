@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MAX_DATAGRAM 1024  // max length of unreliable message
 
 #define NET_HEADERSIZE  (sizeof(uint32_t) * 2)
-#define NET_DATAGRAMSIZE (MAX_DATAGRAM + NET_HEADERSIZE)
+#define NET_DATAGRAMSIZE (NET_HEADERSIZE + MAX_DATAGRAM)
 
 // NetHeader flags
 typedef enum {

@@ -316,7 +316,7 @@ void CL_UpdateTEnts() {
 
         // if coming from the player, update the start position
         if (b->entity == cl.viewentity) {
-            b->start = cl_entities[cl.viewentity].pose.spot;
+            b->start = cl_entities[cl.viewentity].pose.loc;
         }
 
         // calculate pitch and yaw
@@ -350,9 +350,9 @@ void CL_UpdateTEnts() {
             if (!ent)       return;
 
             tV.roll = (float)(rand() % 360);
-            ent->pose.spot = org;
+            ent->pose.loc = org;
             ent->model = b->model;
-            ent->pose.facing = tV;
+            ent->pose.aim = tV;
 
             org = VectorMA(org, 30.0f, dist);
             d -= 30.0f;

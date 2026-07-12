@@ -90,9 +90,9 @@ void SCR_ScreenShot_f() {
         if (Sys_FileTime(checkname) == -1) { // save the pcx file
             D_EnableBackBufferAccess(); { // enable direct drawing of console to back buffer
                 WritePCXfile(
-                    pcxname, Scr.canvas.pBuff,
+                    pcxname, (uint8_p)Scr.canvas.pClr,
                     Scr.canvas.width, Scr.canvas.height,
-                    Scr.canvas.rowBytes, host_basepal
+                    Scr.SR_rowBytes, host_basepal
                 );
             } D_DisableBackBufferAccess(); // for adapters that can't stay mapped in for linear writes all the time
             Con_Printf("Wrote %s\n", pcxname);
@@ -124,8 +124,8 @@ void SCR_UpdateScreen() {
         return;
 
     if (Scr.numpages > 1) {
-        Scr.canvas.pBuff = vid.frameBuff.pBuff;
-        Scr.con.pBuff = Scr.canvas.pBuff;
+        Scr.canvas.pClr = vid.frameBuff.pClr;
+        Scr.con.pClr = Scr.canvas.pClr;
     }
 
     Scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing
