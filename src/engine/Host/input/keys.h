@@ -132,7 +132,6 @@ typedef struct {
 
 extern Key_t key;
 extern char chatBuffer[];
-extern bool team_message;   // TODO: move to sv\cl side
 
 
 #ifdef __cplusplus
@@ -148,7 +147,7 @@ extern "C" {
     bool is_printable(keycode_t symb);
     bool is_digits(keycode_t symb);
 
-    void M_FindKeysForCommand(cString command, int* twokeys);
+    void M_FindKeysForCommand(cString command, int* twokeys);   // TODO: redefine type of kays type
     void M_UnbindCommand(cString command);
 
 #ifdef __cplusplus

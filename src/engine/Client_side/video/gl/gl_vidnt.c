@@ -223,8 +223,8 @@ bool VID_SetWindowedMode(int modenum) {
 
     ClampMoreThen(&Scr.con.height, modelist[modenum].height);
     ClampMoreThen(&Scr.con.width, modelist[modenum].width);
-    Scr.vrect.width = Scr.con.width;
-    Scr.vrect.height = Scr.con.height;
+    Scr.canvas.width = Scr.con.width;
+    Scr.canvas.height = Scr.con.height;
     Scr.numpages = 2;
     mainwindow = dibwindow;
 
@@ -295,8 +295,8 @@ bool VID_SetFullDIBMode(int modenum) {
 
     ClampMoreThen(&Scr.con.height, modelist[modenum].height);
     ClampMoreThen(&Scr.con.width, modelist[modenum].width);
-    Scr.vrect.width = Scr.con.width;
-    Scr.vrect.height = Scr.con.height;
+    Scr.canvas.width = Scr.con.width;
+    Scr.canvas.height = Scr.con.height;
     Scr.numpages = 2;
 
     // needed because we're not getting WM_MOVE messages fullscreen on NT

@@ -22,18 +22,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "draw.h"
 #include "screen.h"
-#include "enginedefs.h"
-#include "zone.h"
 #include <string.h>
+#include <stdio.h>   // snprintf
 #include "host.h"
-#include "common.h"
-#include "d_iface.h"
-#include "versions.h"
-#include "sound.h"
 #include "q_tools.h"
-#include "wad.h"
 
-qPic_p draw_disc;
 
 typedef struct {
     vRect_t rect;
@@ -42,81 +35,30 @@ typedef struct {
     qColor8_p pTexBytes;
     int     rowBytes;
 } RectDesc_t;
-static RectDesc_t   _rRectDesc;
+static RectDesc_t _rRectDesc;
 
-static qPic_p       _draw_backtile;
 /*
 ===============
 Draw_Init
 ===============
 */
 #include "qSymbolChar.h"
-qColor8_p pDrawChars;
-void Draw_Init() {
-    pDrawChars = W_GetLumpName("conchars");
-    draw_disc = W_GetLumpName("disc");
-    _draw_backtile = W_GetLumpName("backtile");
 
-    _rRectDesc.width = _draw_backtile->width;
-    _rRectDesc.height = _draw_backtile->height;
-    _rRectDesc.pTexBytes = _draw_backtile->data;
-    _rRectDesc.rowBytes = _draw_backtile->width;
+void Draw_Init() {
+    pDrawChars = (qColor8_p)GetPicFromWad("conchars");
+    draw_disc = GetPicFromWad("disc");
+
+    qPic_p BackTile = GetPicFromWad("backtile"); // get from WAD textures
+    _rRectDesc = (RectDesc_t){
+        .width = BackTile->width,
+        .height = BackTile->height,
+        .pTexBytes = BackTile->data,
+        .rowBytes = BackTile->width,
+    };
 }
 
 //=============================================================================
 /* Support Routines */
-
-typedef struct CachePic_s {
-    qPathStr_t     name;
-    CacheUser_t cache;
-} CachePic_t;
-typedef CachePic_t* CachePic_p;
-
-
-qPic_p Draw_PicFromWad(cStringRO name) {
-    return W_GetLumpName(name);
-}
-
-/*
-================
-Draw_CachePic
-================
-*/
-#define MAX_CACHED_PICS  128
-static CachePic_t   _cachePics[MAX_CACHED_PICS];
-static int          _numCachePics = 0;
-qPic_p Draw_CachePic(cStringRO path) {
-    int i = 0;
-    for (; i < _numCachePics; i++)
-        if (!strcmp(path, _cachePics[i].name))
-            break;
-
-    if (i == _numCachePics) {
-        if (_numCachePics == MAX_CACHED_PICS)
-            Host_SysError("_numCachePics == MAX_CACHED_PICS");
-
-        _numCachePics++;
-        strcpy(_cachePics[i].name, path);
-    }
-
-    qPic_p dat = Cache_Check(&_cachePics[i].cache);
-    if (dat)
-        return dat;
-
-    //
-    // load the pic from disk
-    //
-    COM_LoadCacheFile(path, &_cachePics[i].cache);
-
-    dat = (qPic_p)_cachePics[i].cache.data;
-    if (!dat)
-        Host_SysError("Draw_CachePic: failed to load %s", path);
-
-    SwapPic(dat);
-
-    return dat;
-}
-
 
 /*
 ================
@@ -128,25 +70,19 @@ smoothly scrolled off.
 ================
 */
 void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
-    int num = symb;
-    num &= 0xFF;
-
     if (y <= -8)    return; // totally off screen
 
 #ifdef PARANOID
-    if ((y > Scr.vrect.height - 80) ||
+    if ((y > Scr.canvas.height - 80) ||
         (x < 0) ||
-        (x > Scr.vrect.width - 8))
+        (x > Scr.canvas.width - 8))
         Host_SysError("Con_DrawCharacter: (%i, %i)", x, y);
     if ((num < 0) ||
         (num > 255))
         Host_SysError("Con_DrawCharacter: char %i", num);
 #endif
 
-    int row = num >> 4;
-    int col = num & 15;
-    qColor8_p source = pDrawChars + (row << 10) + (col << 3);
-
+    qColor8_p source = CharGlyphSource(symb);
     int drawline;
     if (y < 0) { // clipped
         drawline = 8 + y;
@@ -185,18 +121,6 @@ void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
     }
 }
 
-/*
-================
-Draw_String
-================
-*/
-void Draw_String(int x, int y, cStringRO str) {
-    while (*str) {
-        Draw_Character(x, y, *str);
-        str++;
-        x += 8;
-    }
-}
 
 /*
 ================
@@ -212,14 +136,10 @@ void Draw_DebugChar(ConsoleSymbols_t symb) {
     if (!Scr.direct)
         return;  // don't have direct FB access, so no debugchars...
 
-    int drawline = 8;
-    int num = symb;
-    int row = num >> 4;
-    int col = num & 15;
-    qColor8_p source = pDrawChars + (row << 10) + (col << 3);
-
+    qColor8_p source = CharGlyphSource(symb);
     qColor8_p dest = Scr.direct + 312;
 
+    int drawline = 8;
     while (drawline--) {
         for (int i = 0; i < 8; i++)
             dest[i] = source[i];
@@ -235,12 +155,12 @@ Draw_Pic
 =============
 */
 void Draw_Pic(int x, int y, qPic_p pic) {
-    if (!Scr.vrect.pBuff)   return;
+    if (!Scr.canvas.pBuff)   return;
 
     if ((x < 0) ||
         (y < 0) ||
-        ((x + pic->width) > Scr.vrect.width) ||
-        ((y + pic->height) > Scr.vrect.height)
+        ((x + pic->width) > Scr.canvas.width) ||
+        ((y + pic->height) > Scr.canvas.height)
         )   Host_SysError(
             "Draw_Pic: bad coordinates %i/%i-%i/%i",
             x, y, pic->width, pic->height
@@ -250,23 +170,23 @@ void Draw_Pic(int x, int y, qPic_p pic) {
     qColor8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.vrect.pClr + y * Scr.vrect.rowBytes + x;
+        qColor8_p dest = Scr.canvas.pClr + y * Scr.canvas.rowBytes + x;
 
         for (int v = 0; v < pic->height; v++) {
             Q_memcpy(dest, source, pic->width);
-            dest += Scr.vrect.rowBytes;
+            dest += Scr.canvas.rowBytes;
             source += pic->width;
         }
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + y * HALF(Scr.vrect.rowBytes) + x;
+        uint16_p pusdest = (uint16_p)Scr.canvas.pBuff + y * HALF(Scr.canvas.rowBytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++)
                 pusdest[u] = d_8to16table[source[u].i];
 
-            pusdest += HALF(Scr.vrect.rowBytes);
+            pusdest += HALF(Scr.canvas.rowBytes);
             source += pic->width;
         }
     }
@@ -279,21 +199,21 @@ Draw_TransPic
 =============
 */
 void Draw_TransPic(int x, int y, qPic_p pic) {
-    if (!Scr.vrect.pBuff)   return;
+    if (!Scr.canvas.pBuff)   return;
 
     if (!pic)   return;
 
     if ((x < 0) ||
         (y < 0) ||
-        ((uint32_t)(x + pic->width) > Scr.vrect.width) ||
-        ((uint32_t)(y + pic->height) > Scr.vrect.height)
+        ((uint32_t)(x + pic->width) > Scr.canvas.width) ||
+        ((uint32_t)(y + pic->height) > Scr.canvas.height)
         ) {
         Host_SysError("Draw_TransPic: bad coordinates");
     }
     qColor8_p source = pic->data;
 
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.vrect.pClr + y * Scr.vrect.rowBytes + x;
+        qColor8_p dest = Scr.canvas.pClr + y * Scr.canvas.rowBytes + x;
         qColor8_t tbyte;
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
@@ -301,7 +221,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                     if ((tbyte = source[u]).i != InkTransp)
                         dest[u] = tbyte;
 
-                dest += Scr.vrect.rowBytes;
+                dest += Scr.canvas.rowBytes;
                 source += pic->width;
             }
         }
@@ -312,14 +232,14 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                         if ((tbyte = source[u + i]).i != InkTransp)
                             dest[u + i] = tbyte;
 
-                dest += Scr.vrect.rowBytes;
+                dest += Scr.canvas.rowBytes;
                 source += pic->width;
             }
         }
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + y * HALF(Scr.vrect.rowBytes) + x;
+        uint16_p pusdest = (uint16_p)Scr.canvas.pBuff + y * HALF(Scr.canvas.rowBytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
@@ -328,7 +248,7 @@ void Draw_TransPic(int x, int y, qPic_p pic) {
                     pusdest[u] = d_8to16table[tbyte];
             }
 
-            pusdest += HALF(Scr.vrect.rowBytes);
+            pusdest += HALF(Scr.canvas.rowBytes);
             source += pic->width;
         }
     }
@@ -341,15 +261,15 @@ Draw_TransPicTranslate
 =============
 */
 void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
-    if (!Scr.vrect.pBuff)   return;
+    if (!Scr.canvas.pBuff)   return;
 
     if (!pic)
         return;
 
     if ((x < 0) ||
         (y < 0) ||
-        ((uint32_t)(x + pic->width) > Scr.vrect.width) ||
-        (uint32_t)(y + pic->height) > Scr.vrect.height
+        ((uint32_t)(x + pic->width) > Scr.canvas.width) ||
+        (uint32_t)(y + pic->height) > Scr.canvas.height
         ) {
         Host_SysError("Draw_TransPic: bad coordinates");
     }
@@ -357,7 +277,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
     qColor8_t tbyte;
     qColor8_p source = pic->data;
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.vrect.pClr + y * Scr.vrect.rowBytes + x;
+        qColor8_p dest = Scr.canvas.pClr + (y * Scr.canvas.rowBytes) + x;
 
         if (pic->width & 7) { // general
             for (int v = 0; v < pic->height; v++) {
@@ -365,7 +285,7 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
                     if ((tbyte = source[u]).i != InkTransp)
                         dest[u] = translation->pal[tbyte.i];
 
-                dest += Scr.vrect.rowBytes;
+                dest += Scr.canvas.rowBytes;
                 source += pic->width;
             }
         }
@@ -376,45 +296,30 @@ void Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation) {
                         if ((tbyte = source[u + i]).i != InkTransp)
                             dest[u + i] = translation->pal[tbyte.i];
 
-                dest += Scr.vrect.rowBytes;
+                dest += Scr.canvas.rowBytes;
                 source += pic->width;
             }
         }
     }
     else {
         // FIXME: pretranslate at load time?
-        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + y * HALF(Scr.vrect.rowBytes) + x;
+        uint16_p pusdest = (uint16_p)Scr.canvas.pBuff + y * HALF(Scr.canvas.rowBytes) + x;
 
         for (int v = 0; v < pic->height; v++) {
             for (int u = 0; u < pic->width; u++) {
                 tbyte = source[u];
-
                 if (tbyte.i != InkTransp)
                     pusdest[u] = d_8to16table[tbyte.i];
             }
 
-            pusdest += HALF(Scr.vrect.rowBytes);
+            pusdest += HALF(Scr.canvas.rowBytes);
             source += pic->width;
         }
     }
 }
 
 
-void Draw_CharToConback(int num, qColor8_p dest) {
-    int row = num >> 4;
-    int col = num & 15;
-    qColor8_p source = pDrawChars + (row << 10) + (col << 3);
 
-    int drawline = 8;
-    while (drawline--) {
-        for (int x = 0; x < 8; x++)
-            if (source[x].i)
-                dest[x].i = 0x60 + source[x].i;
-        source += 128;
-        dest += 320;
-    }
-
-}
 
 /*
 ================
@@ -422,6 +327,7 @@ Draw_ConsoleBackground
 
 ================
 */
+#include "versions.h"
 void Draw_ConsoleBackground(int lines) {
     qPic_p conback = Draw_CachePic("gfx/conback.lmp");
 
@@ -430,15 +336,15 @@ void Draw_ConsoleBackground(int lines) {
     qColor8_p dest = conback->data + ((320 * 186) + 320) - 11;
 #ifdef _WIN32
     snprintf(ver, sizeof(ver), "(WinQuake) %4.2f", (float)VERSION);
-    dest +=  - (MUL8(strlen(ver)));
+    dest += -(MUL8(strlen(ver)));
 #elif defined(X11)
     snprintf(ver, sizeof(ver), "(X11 Quake %2.2f) %4.2f", (float)X11_VERSION, (float)VERSION);
-    dest += - (MUL8(strlen(ver)));
+    dest += -(MUL8(strlen(ver)));
 #elif defined(__linux__)
     snprintf(ver, sizeof(ver), "(Linux Quake %2.2f) %4.2f", (float)LINUX_VERSION, (float)VERSION);
-    dest += - (MUL8(strlen(ver)));
+    dest += -(MUL8(strlen(ver)));
 #else
-    dest += - MUL8(4) ;
+    dest += -MUL8(4);
     snprintf(ver, sizeof(ver), "%4.2f", VERSION);
 #endif
 
@@ -493,11 +399,11 @@ R_DrawRect8
 ==============
 */
 void R_DrawRect8(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) {
-    if (!Scr.vrect.pBuff)   return;
-    qColor8_p pdest = Scr.vrect.pClr + (prect->y * Scr.vrect.rowBytes) + prect->x;
+    if (!Scr.canvas.pBuff)   return;
+    qColor8_p pdest = Scr.canvas.pClr + (prect->y * Scr.canvas.rowBytes) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
-    int destdelta = Scr.vrect.rowBytes - prect->width;
+    int destdelta = Scr.canvas.rowBytes - prect->width;
 
     if (transparent) {
         for (int i = 0; i < prect->height; i++) {
@@ -518,7 +424,7 @@ void R_DrawRect8(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) 
         for (int i = 0; i < prect->height; i++) {
             memcpy(pdest, psrc, prect->width);
             psrc += rowbytes;
-            pdest += Scr.vrect.rowBytes;
+            pdest += Scr.canvas.rowBytes;
         }
     }
 }
@@ -530,14 +436,14 @@ R_DrawRect16
 ==============
 */
 void R_DrawRect16(vRect_p prect, int rowbytes, qColor8_p psrc, bool transparent) {
-    if (!Scr.vrect.pBuff)   return;
+    if (!Scr.canvas.pBuff)   return;
     // FIXME: would it be better to pre-expand native-format versions?
 
-    uint16_p pdest = (uint16_p)Scr.vrect.pBuff +
-        (prect->y * HALF(Scr.vrect.rowBytes)) + prect->x;
+    uint16_p pdest = (uint16_p)Scr.canvas.pBuff +
+        (prect->y * HALF(Scr.canvas.rowBytes)) + prect->x;
 
     int srcdelta = rowbytes - prect->width;
-    int destdelta = HALF(Scr.vrect.rowBytes) - prect->width;
+    int destdelta = HALF(Scr.canvas.rowBytes) - prect->width;
 
     qColor8_t t;
     if (transparent) {
@@ -632,10 +538,10 @@ Fills a box of pixels with a single color
 =============
 */
 void Draw_Fill(int x, int y, int w, int h, qColor8_t c) {
-    if (!Scr.vrect.pBuff)   return;
-    int stride = Scr.vrect.rowBytes;
+    if (!Scr.canvas.pBuff)   return;
+    int stride = Scr.canvas.rowBytes;
     if (r_pixbytes == 1) {
-        qColor8_p dest = Scr.vrect.pClr + (ptrdiff_t)(
+        qColor8_p dest = Scr.canvas.pClr + (ptrdiff_t)(
             (y * stride) + x
             );
         for (int v = 0; v < h; v++, dest += stride)
@@ -644,7 +550,7 @@ void Draw_Fill(int x, int y, int w, int h, qColor8_t c) {
     }
     else {
         stride = HALF(stride);
-        uint16_p pusdest = (uint16_p)Scr.vrect.pBuff + (ptrdiff_t)(
+        uint16_p pusdest = (uint16_p)Scr.canvas.pBuff + (ptrdiff_t)(
             (y * stride) + x
             );
         for (int v = 0; v < h; v++, pusdest += stride)
@@ -660,15 +566,16 @@ Draw_FadeScreen
 
 ================
 */
+#include "sound.h"  // S_ExtraUpdateBUL
 void Draw_FadeScreen() {
-    if (!Scr.vrect.pBuff)   return;
+    if (!Scr.canvas.pBuff)   return;
     S_ExtraUpdateBUL();
 
-    for (int y = 0; y < Scr.vrect.height; y++) {
-        uint8_p pbuf = (uint8_p)(Scr.vrect.pBuff + Scr.vrect.rowBytes * y);
+    for (int y = 0; y < Scr.canvas.height; y++) {
+        uint8_p pbuf = (uint8_p)(Scr.canvas.pBuff + Scr.canvas.rowBytes * y);
         int t = TWICE(y & 1);
 
-        for (int x = 0; x < Scr.vrect.width; x++)
+        for (int x = 0; x < Scr.canvas.width; x++)
             if ((x & 3) != t)
                 pbuf[x] = 0;
     }
@@ -678,28 +585,4 @@ void Draw_FadeScreen() {
 
 //=============================================================================
 
-/*
-================
-Draw_BeginDisc
-
-Draws the little blue disc in the corner of the screen.
-Call before beginning any disc IO.
-================
-*/
-void Draw_BeginDisc() {
-    D_BeginDirectRect(Scr.vrect.width - 24, 0, draw_disc->data, 24, 24);
-}
-
-
-/*
-================
-Draw_EndDisc
-
-Erases the disc icon.
-Call after completing any disc IO
-================
-*/
-void Draw_EndDisc() {
-    D_EndDirectRect(Scr.vrect.width - 24, 0, 24, 24);
-}
 

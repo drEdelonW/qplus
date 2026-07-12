@@ -1213,12 +1213,12 @@ bool VID_SetWindowedMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    Scr.vrect.pBuff = Scr.con.pBuff = Scr.direct = dibdc->surface;
+    Scr.canvas.pBuff = Scr.con.pBuff = Scr.direct = dibdc->surface;
     vid.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
-    Scr.vrect.height = Scr.con.height = DIBHeight;
-    Scr.vrect.width = Scr.con.width = DIBWidth;
-    Scr.aspect = calcAspectRect(&Scr.vrect);
+    Scr.canvas.height = Scr.con.height = DIBHeight;
+    Scr.canvas.width = Scr.con.width = DIBWidth;
+    Scr.aspect = calcAspectRect(&Scr.canvas);
 
     vid_stretched = stretched;
 
@@ -1253,10 +1253,10 @@ bool VID_SetFullscreenMode(int modenum) {
     modestate = MS_FULLSCREEN;
     vid_fulldib_on_focus_mode = 0;
 
-    Scr.vrect.pBuff = Scr.con.pBuff = Scr.direct = NULL;
-    DIBHeight = Scr.vrect.height = Scr.con.height = modelist[modenum].height;
-    DIBWidth = Scr.vrect.width = Scr.con.width = modelist[modenum].width;
-    Scr.aspect = calcAspectRect(&Scr.vrect);
+    Scr.canvas.pBuff = Scr.con.pBuff = Scr.direct = NULL;
+    DIBHeight = Scr.canvas.height = Scr.con.height = modelist[modenum].height;
+    DIBWidth = Scr.canvas.width = Scr.con.width = modelist[modenum].width;
+    Scr.aspect = calcAspectRect(&Scr.canvas);
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -1361,13 +1361,13 @@ bool VID_SetFullDIBMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    Scr.vrect.pBuff = dibdc->surface;
-    Scr.aspect = calcAspectRect(&Scr.vrect);
+    Scr.canvas.pBuff = dibdc->surface;
+    Scr.aspect = calcAspectRect(&Scr.canvas);
     Scr.direct = dibdc->surface;
     vid.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
-    Scr.vrect.height = Scr.con.height = DIBHeight;
-    Scr.vrect.width = Scr.con.width = DIBWidth;
+    Scr.canvas.height = Scr.con.height = DIBHeight;
+    Scr.canvas.width = Scr.con.width = DIBWidth;
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -1474,8 +1474,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
         IN_HideMouse();
     }
 
-    window_width = Scr.vrect.width << vid_stretched;
-    window_height = Scr.vrect.height << vid_stretched;
+    window_width = Scr.canvas.width << vid_stretched;
+    window_height = Scr.canvas.height << vid_stretched;
     VID_UpdateWindowStatus();
 
     CDAudio_Resume();
@@ -1512,7 +1512,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     vid_modenum = modenum;
     Cvar_SetValue("vid_mode", (float)vid_modenum);
 
-    if (!VID_AllocBuffers(Scr.vrect.width, Scr.vrect.height)) {
+    if (!VID_AllocBuffers(Scr.canvas.width, Scr.canvas.height)) {
         // couldn't get memory for this mode; try to fall back to previous mode
         VID_RestoreOldMode(original_mode);
         return false;
@@ -1563,20 +1563,20 @@ void VID_LockBuffer() {
 
     if (memdc) {
         // Update surface pointer for linear access modes
-        Scr.vrect.pBuff = Scr.con.pBuff = Scr.direct = memdc->surface;
+        Scr.canvas.pBuff = Scr.con.pBuff = Scr.direct = memdc->surface;
         vid.rowBytes = Scr.con.rowBytes = memdc->mi.bytesPerLine;
     }
     else if (mgldc) {
         // Update surface pointer for linear access modes
-        Scr.vrect.pBuff = Scr.con.pBuff = Scr.direct = mgldc->surface;
+        Scr.canvas.pBuff = Scr.con.pBuff = Scr.direct = mgldc->surface;
         vid.rowBytes = Scr.con.rowBytes = mgldc->mi.bytesPerLine;
     }
 
     d_viewbuffer = (r_dowarp) ?
-        vid.maxwarp.pClr : Scr.vrect.pClr;
+        vid.maxwarp.pClr : Scr.canvas.pClr;
 
     screenwidth = (r_dowarp) ?
-        WARP_WIDTH : Scr.vrect.rowBytes;
+        WARP_WIDTH : Scr.canvas.rowBytes;
 
 #ifndef STM32
     if (lcd_x.value)
@@ -1600,7 +1600,7 @@ void VID_UnlockBuffer() {
     MGL_endDirectAccess();
 
     // to turn up any unlocked accesses
-    Scr.vrect.pBuff = NULL;
+    Scr.canvas.pBuff = NULL;
     Scr.con.pBuff = NULL;
     Scr.direct = NULL;
     d_viewbuffer = NULL;
@@ -2085,8 +2085,8 @@ void VID_Update(vRect_p rects) {
         palette_changed = false;
         rect.x = 0;
         rect.y = 0;
-        rect.width = Scr.vrect.width;
-        rect.height = Scr.vrect.height;
+        rect.width = Scr.canvas.width;
+        rect.height = Scr.canvas.height;
         rect.pnext = NULL;
         rects = &rect;
     }

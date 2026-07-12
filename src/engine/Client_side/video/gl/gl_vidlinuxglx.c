@@ -269,7 +269,7 @@ static void install_grabs() {
             _dpy, None, _win,
             0, 0,
             0, 0,
-            HALF(Scr.vrect.width), HALF(Scr.vrect.height)
+            HALF(Scr.canvas.width), HALF(Scr.canvas.height)
         );
     }
 
@@ -310,8 +310,8 @@ static void HandleEvents() {
     KeySym ks;
     int b;
     bool dowarp = false;
-    int mwx = HALF(Scr.vrect.width);
-    int mwy = HALF(Scr.vrect.height);
+    int mwx = HALF(Scr.canvas.width);
+    int mwy = HALF(Scr.canvas.height);
 
     if (!_dpy)
         return;
@@ -380,7 +380,7 @@ static void HandleEvents() {
         XWarpPointer(
             _dpy, None, _win,
             0, 0, 0, 0,
-            HALF(Scr.vrect.width), HALF(Scr.vrect.height)
+            HALF(Scr.canvas.width), HALF(Scr.canvas.height)
         );
     }
 
@@ -856,9 +856,9 @@ void VID_Init(uint8_p palette) {
 
     ClampMoreThen(&Scr.con.height, height);
     ClampMoreThen(&Scr.con.width, width);
-    Scr.vrect.width = Scr.con.width;
-    Scr.vrect.height = Scr.con.height;
-    Scr.aspect = calcAspectRect(&vid.scr);
+    Scr.canvas.width = Scr.con.width;
+    Scr.canvas.height = Scr.con.height;
+    Scr.aspect = calcAspectRect(&Scr.canvas);
     Scr.numpages = 2;
 
     InitSig(); // trap evil signals

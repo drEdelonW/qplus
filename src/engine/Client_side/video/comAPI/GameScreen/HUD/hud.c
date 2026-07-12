@@ -21,8 +21,8 @@ void SCR_DrawPause() {
 
     qPic_p pic = Draw_CachePic("gfx/pause.lmp");
     Draw_Pic(   // TODO: wrap it to Draw_PicCenter(pic-cString)
-        HALF(Scr.vrect.width - pic->width),
-        HALF(Scr.vrect.height - pic->height - 48),
+        HALF(Scr.canvas.width - pic->width),
+        HALF(Scr.canvas.height - pic->height - 48),
         pic
     );
 }
@@ -39,8 +39,8 @@ void SCR_DrawLoading() {
 
     qPic_p pic = Draw_CachePic("gfx/loading.lmp");
     Draw_Pic(   // TODO: wrap it to Draw_PicCenter(pic-cString)
-        HALF(Scr.vrect.width - pic->width),
-        HALF(Scr.vrect.height - pic->height - 48),
+        HALF(Scr.canvas.width - pic->width),
+        HALF(Scr.canvas.height - pic->height - 48),
         pic
     );
 }
@@ -78,20 +78,61 @@ void Con_DrawNotify() {
     if (key.dest == key_message) {
         Scr.clearnotify = 0;
         Scr.copytop = true;
-
-        Draw_String(8, v, "say:"); {
-            CharCol_t x = FirstChar;
+        int offs = 1;
+        Draw_String(MUL8(offs++), v, "say:"); {
+            offs += 3; // strlen("say:") - 1?;
+            CharCol_t x = 0;
             while (chatBuffer[x]) {
-                Draw_Character(MUL8(x + 5), v,
-                    chatBuffer[x]);
+                Draw_Character(
+                    MUL8(offs++), v,
+                    chatBuffer[x]
+                );
                 x++;
             }
-            Draw_Character(MUL8(x + 5), v, // Draw Input Cursor
-                InputCursor_Symb + ((int)(GetRealTime() * con.cursorBlinkHz) & 1)
-            );
         }
+        Draw_Character(MUL8(offs++), v, // Draw Input Cursor
+            InputCursor_Symb + ((int)(GetRealTime() * con.cursorBlinkHz) & 1)
+        );
         v += D_CHAR_HEIGHT;
     }
 
     ClampLessThen(&con.notifylines, v);
+}
+
+/*
+================
+Draw_BeginDisc
+
+Draws the little blue disc in the corner of the screen.
+Call before beginning any disc IO.
+================
+*/
+#ifdef GLQUAKE
+#include "qOpenGL.h"
+#endif
+void Draw_BeginDisc() {
+#ifdef GLQUAKE
+    if (!draw_disc)     return;
+
+    glDrawBuffer(GL_FRONT);
+    Draw_Pic(Scr.canvas.width - 24, 0, draw_disc);
+    glDrawBuffer(GL_BACK);
+#else
+    D_BeginDirectRect(Scr.canvas.width - 24, 0, draw_disc->data, 24, 24);
+#endif
+}
+
+
+/*
+================
+Draw_EndDisc
+
+Erases the disc icon.
+Call after completing any disc IO
+================
+*/
+void Draw_EndDisc() {
+#ifndef GLQUAKE
+    D_EndDirectRect(Scr.canvas.width - 24, 0, 24, 24);
+#endif
 }

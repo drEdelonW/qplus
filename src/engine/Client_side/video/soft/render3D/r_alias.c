@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern ColorMap_p acolormap; // FYI: live in d_polyse.c
 
 #define LIGHT_MIN (5)  // lowest light value we'll allow, to avoid the
-                            //  need for inner-loop light clamping
+//  need for inner-loop light clamping
 
 AffineTriDesc_t r_affinetridesc;
 TriVertx_p      r_apverts;
@@ -564,7 +564,6 @@ R_AliasSetupLighting
 ================
 */
 void R_AliasSetupLighting(aLight_p plighting) {
-
     // guarantee that no vertex will ever be lit below LIGHT_MIN, so we don't have
     // to clamp off the bottom
     r_ambientlight = plighting->ambientlight;
@@ -601,15 +600,12 @@ void R_AliasSetupFrame() {
     }
 
     if (pAliasHdr->frames[frame].type == ALIAS_SINGLE) {
-        r_apverts = (TriVertx_p)
-            ((uint8_p)pAliasHdr + pAliasHdr->frames[frame].frame);
+        r_apverts = (TriVertx_p)((uint8_p)pAliasHdr + pAliasHdr->frames[frame].frame);
         return;
     }
 
-    mAliasGroup_p paliasgroup = (mAliasGroup_p)
-        ((uint8_p)pAliasHdr + pAliasHdr->frames[frame].frame);
-    LegDt_p pintervals = (LegDt_p)
-        ((uint8_p)pAliasHdr + paliasgroup->intervals);
+    mAliasGroup_p paliasgroup = (mAliasGroup_p)((uint8_p)pAliasHdr + pAliasHdr->frames[frame].frame);
+    LegDt_p pintervals = (LegDt_p)((uint8_p)pAliasHdr + paliasgroup->intervals);
     int numframes = paliasgroup->numframes;
     float fullinterval = pintervals[numframes - 1];
     float time = GetClSimTime() + currententity->syncbase;
@@ -620,14 +616,15 @@ void R_AliasSetupFrame() {
     //
     float targettime = time - ((int)(time / fullinterval)) * fullinterval;
 
-    int i = 0;
-    for (; i < (numframes - 1); i++) {
-        if (pintervals[i] > targettime)
-            break;
+    {
+        int i = 0;
+        for (; i < (numframes - 1); i++) {
+            if (pintervals[i] > targettime)
+                break;
+        }
+        r_apverts = (TriVertx_p)
+            ((uint8_p)pAliasHdr + paliasgroup->frames[i].frame);
     }
-
-    r_apverts = (TriVertx_p)
-        ((uint8_p)pAliasHdr + paliasgroup->frames[i].frame);
 }
 
 
@@ -654,18 +651,16 @@ void R_AliasDrawModel(aLight_p plighting) {
     AuxVert_t auxverts[MAXALIASVERTS];
     pauxverts = &auxverts[0];
 
-    pAliasHdr = (AliasHdr_p)
-        Mod_Extradata(currententity->model);
-    pmdl = (Mdl_p)
-        ((uint8_p)pAliasHdr + pAliasHdr->model);
+    pAliasHdr = (AliasHdr_p)Mod_Extradata(currententity->model);
+    pmdl = (Mdl_p)((uint8_p)pAliasHdr + pAliasHdr->model);
 
     R_AliasSetupSkin();
     R_AliasSetUpTransform(currententity->trivial_accept);
     R_AliasSetupLighting(plighting);
     R_AliasSetupFrame();
 
-    if (!currententity->colormap)
-        Host_SysError("R_AliasDrawModel: !currententity->colormap");
+    if (!currententity->pColorMap)
+        Host_SysError("R_AliasDrawModel: !currententity->pColorMap");
 
     r_affinetridesc.drawtype = (
         (currententity->trivial_accept == 3) &&
@@ -673,10 +668,10 @@ void R_AliasDrawModel(aLight_p plighting) {
 
     if (r_affinetridesc.drawtype)   D_PolysetUpdateTables();  // FIXME: precalc...
 #if id386
-    else                            D_Aff8Patch(currententity->colormap);
+    else                            D_Aff8Patch(currententity->pColorMap);
 #endif
 
-    acolormap = currententity->colormap;
+    acolormap = currententity->pColorMap;
 
     if (currententity != &cl.viewent)   _ziscale = (float)0x8000 * (float)FIXED16_ONE;
     else                                _ziscale = (float)0x8000 * (float)FIXED16_ONE * 3.0;

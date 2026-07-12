@@ -15,6 +15,8 @@ extern "C" {
 #endif
 
     void SwapPic(qPic_p pic);
+    qPic_p  GetPicFromWad(cStringRO name);
+    qPic_p  Draw_CachePic(cStringRO path);
 
 #ifdef __cplusplus
 }

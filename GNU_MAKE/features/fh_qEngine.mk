@@ -129,6 +129,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
                 $(eval VID_DIR = $(CL_SIDE_DIR)/video/comAPI) $(eval INCLUDES += $(VID_DIR))
                         SRC_LIST += $(VID_DIR)/cScreen.c
+                        SRC_LIST += $(VID_DIR)/cDraw.c
 
                         $(eval GSCR_DIR = $(VID_DIR)/GameScreen) $(eval INCLUDES += $(GSCR_DIR))
                                 $(eval VP_DIR = $(GSCR_DIR)/ViewPort) $(eval INCLUDES += $(VP_DIR))

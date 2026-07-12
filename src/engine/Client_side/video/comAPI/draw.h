@@ -21,10 +21,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // draw.h -- these are the only functions outside the refresh allowed
 // to touch the vid buffer
-#include "qPic.h"
 #include "qSymbolChar.h"
+#include "qPic.h"
 
 extern qPic_p draw_disc;    // also used on sbar
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,23 +33,20 @@ extern "C" {
     void    Draw_Init();
 
     void    Draw_Character(int x, int y, ConsoleSymbols_t symb);
+    void    Draw_CharGrid(int col, int row, ConsoleSymbols_t symb);
     void    Draw_DebugChar(ConsoleSymbols_t symb);
     void    Draw_String(int x, int y, cStringRO str);
 
     void    Draw_Pic(int x, int y, qPic_p pic);
     void    Draw_TransPic(int x, int y, qPic_p pic);
     void    Draw_TransPicTranslate(int x, int y, qPic_p pic, palMap_p translation); // TODO: is it ColorMap_p?
-    void    Draw_ConsoleBackground(int lines);
-
-    void    Draw_BeginDisc();
-    void    Draw_EndDisc();
 
     void    Draw_TileClear(int x, int y, int w, int h);
     void    Draw_Fill(int x, int y, int w, int h, qColor8_t c);
 
     void    Draw_FadeScreen();
-    qPic_p  Draw_PicFromWad(cStringRO name);
-    qPic_p  Draw_CachePic(cStringRO path);
+
+    void    D_EndDirectRect(int x, int y, int width, int height);  // mokked in svid_null.c
 
 #ifdef __cplusplus
 }

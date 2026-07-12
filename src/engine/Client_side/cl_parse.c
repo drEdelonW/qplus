@@ -106,7 +106,7 @@ r_Entity_p CL_EntityNum(EdIdx num) {
         if (num >= EdictMax)      Host_Error("CL_EntityNum: %i is an invalid number", num);
 
         while (cl.num_entities <= num) {
-            cl_entities[cl.num_entities].colormap = Scr.pColorMapPal;
+            cl_entities[cl.num_entities].pColorMap = Scr.pColorMapPal;
             cl.num_entities++;
         }
     }
@@ -349,11 +349,11 @@ void CL_ParseUpdate(update_bits_t bits) {
     ent->frame = (bits & U_FRAME) ? MSG_ReadByte() : ent->baseline.frame;
     uint8_t i = (bits & U_COLORMAP) ? MSG_ReadByte() : (uint8_t)ent->baseline.colormap;
 
-    if (!i)     ent->colormap = Scr.pColorMapPal;
+    if (!i)     ent->pColorMap = Scr.pColorMapPal;
     else {
         if (i > cl.maxclients)  Host_SysError("i >= cl.maxclients %d > %d", i, cl.maxclients);
 
-        ent->colormap = &cl.scores[i - 1].translations;
+        ent->pColorMap = &cl.scores[i - 1].translations;
     }
 
 #ifdef GLQUAKE
@@ -519,7 +519,7 @@ void CL_ParseStatic() {
     // copy it to the current state
     ent->model = cl.model_precache[ent->baseline.modelindex];
     ent->frame = ent->baseline.frame;
-    ent->colormap = Scr.pColorMapPal;
+    ent->pColorMap = Scr.pColorMapPal;
     ent->skinnum = ent->baseline.skin;
     ent->effects = ent->baseline.effects;
 
@@ -553,7 +553,7 @@ static inline void ShowNet(cStringRO x) {
     =====================
 */
 #ifdef _WIN32
-# include "vid.h"    // vid.colormap
+# include "vid.h"    // VID_HandlePause();
 #endif
 void CL_ParseServerMessage() {
     // if recording demos, copy the message out

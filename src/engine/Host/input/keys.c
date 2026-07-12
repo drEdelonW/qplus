@@ -129,7 +129,7 @@ void Key_Console(keycode_t key) {
     case K_PGUP:
     case K_MWHEELUP: {
         con.backscroll += 2;
-        ClampMoreThen(&con.backscroll, con.totallines - DIV8(Scr.vrect.height) - 1);
+        ClampMoreThen(&con.backscroll, con.totallines - DIV8(Scr.canvas.height) - 1);
     } return;
 
     case K_PGDN:
@@ -138,7 +138,7 @@ void Key_Console(keycode_t key) {
         ClampLessThen(&con.backscroll, 0);
     } return;
 
-    case K_HOME: { con.backscroll = con.totallines - DIV8(Scr.vrect.height) - 1; } return;
+    case K_HOME: { con.backscroll = con.totallines - DIV8(Scr.canvas.height) - 1; } return;
     case K_END: { con.backscroll = 0; } return;
 
     case K_TAB: { // command completion
@@ -168,13 +168,13 @@ void Key_Console(keycode_t key) {
 
 //============================================================================
 char chatBuffer[MaxCharLen];
-bool team_message = false;
+static bool _teamMsg = false;
 
 void Key_Message(keycode_t Key) {
     static int _chatBuffLen = 0;
 
     if (Key == K_ENTER) {
-        if (team_message)   Cbuf_AddText("say_team \"");
+        if (_teamMsg)   Cbuf_AddText("say_team \"");
         else                Cbuf_AddText("say \"");
 
         Cbuf_AddText(chatBuffer);
@@ -210,6 +210,28 @@ void Key_Message(keycode_t Key) {
     chatBuffer[_chatBuffLen++] = Key;
     chatBuffer[_chatBuffLen] = 0;
 }
+
+/*
+    ================
+    Con_MessageMode2_f
+    ================
+*/
+void Con_MessageMode2_f() {
+    key.dest = key_message;
+    _teamMsg = true;
+}
+
+/*
+    ================
+    Con_MessageMode_f
+    ================
+*/
+
+void Con_MessageMode_f() {
+    key.dest = key_message;
+    _teamMsg = false;
+}
+
 
 //============================================================================
 
@@ -477,18 +499,17 @@ Key_Init
 ===================
 */
 void Key_Init() {
-    for (int i = 0; i < 32; i++) {
+    for (int i = FirstChar; i < MaxCharLen; i++) {
         con.lines[i][0] = ']';
-        con.lines[i][1] = 0;
+        con.lines[i][1] = 0x00;
     }
     con.linepos = 1;
 
     //
     // init ascii characters in console mode
     //
-    for (int i = 32; i < 128; i++) {
+    for (int i = K_SPACE; i < K_UPARROW; i++)
         _isConKeys[i] = true;
-    }
 
     _isConKeys[K_ENTER] = true;
     _isConKeys[K_TAB] = true;
@@ -505,13 +526,11 @@ void Key_Init() {
     _isConKeys['`'] = false;
     _isConKeys['~'] = false;
 
-    for (keycode_t i = 0; i < MAX_KEYS; i++) {
+    for (keycode_t i = 0; i < MAX_KEYS; i++)
         _keyshift[i] = i;
-    }
 
-    for (keycode_t i = 'a'; i <= 'z'; i++) {
+    for (keycode_t i = 'a'; i <= 'z'; i++)
         _keyshift[i] = i - 'a' + 'A';
-    }
 
     _keyshift['1'] = '!';
     _keyshift['2'] = '@';
@@ -536,9 +555,8 @@ void Key_Init() {
     _keyshift['\\'] = '|';
 
     _isMenuBound[K_ESCAPE] = true;
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 12; i++)
         _isMenuBound[K_F1 + i] = true;
-    }
 
     //
     // register our functions
@@ -546,14 +564,14 @@ void Key_Init() {
     Cmd_AddCommand("bind", Key_Bind_f);
     Cmd_AddCommand("unbind", Key_Unbind_f);
     Cmd_AddCommand("unbindall", Key_Unbindall_f);
-
 }
 
 
 static inline void Key_ReleaseBinding(cString kb, keycode_t Key) {
-    if (kb && (kb[0] == '+')) {
-        cmdStr_t cmd;
-        snprintf(cmd, sizeof(cmd), "-%s %i\n", kb + 1, Key);
+    if (kb &&
+        (kb[0] == '+')
+        ) {
+        cmdStr_t cmd;  snprintf(cmd, sizeof(cmd), "-%s %i\n", kb + 1, Key);
         Cbuf_AddText(cmd);
     }
 }
@@ -581,7 +599,7 @@ void Key_Event(keycode_t Key, bool down) {
         if ((Key != K_BACKSPACE) &&
             (Key != K_PAUSE) &&
             (_key_repeats[Key] > 1)
-            )               return; // ignore most autorepeats
+            )   return; // ignore most autorepeats
 
         if ((Key >= 200) &&
             !_keyBindings[Key]
@@ -597,7 +615,6 @@ void Key_Event(keycode_t Key, bool down) {
     if (Key == K_SHIFT)
         _shift_down = down;
 
-
     //
     // handle escape specialy, so the user can never unbind it
     //
@@ -612,7 +629,7 @@ void Key_Event(keycode_t Key, bool down) {
         default:            Host_SysError("Bad key.dest");
         }
         return;
-    }
+}
 #else
     switch (Key) {
     case K_SHIFT:   _shift_down = down; break;
@@ -715,9 +732,9 @@ Key_ClearStates
 */
 void Key_ClearStates() {
     // send an up event for each key, to make sure the server clears them all
-    for (int i = 0; i < MAX_KEYS; i++) {
+    for (int i = 0; i < MAX_KEYS; i++)
         Key_Event(i, false);
-    }
+
     for (keycode_t i = 0; i < MAX_KEYS; i++) {
         _isKeyDown[i] = false;
         _key_repeats[i] = 0;

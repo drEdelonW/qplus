@@ -51,3 +51,14 @@
     Find:    if\s*\(\s*([\w.\[\]]+(?:->[\w.\[\]]+)*)\s*(?<!-)>=?\s*([\w.\[\]]+(?:->[\w.\[\]]+)*)\s*\)\s*(?:\{\s*\r?\n?\s*\2\s*=\s*\1\s*;\s*\r?\n?\s*\}|\r?\n?\s*\2\s*=\s*\1\s*;)
     Replace: ClampLessThen(&$2, $1);
 */
+
+#define SmallerOf(a, b)    (((a) <= (b)) ? (a) : (b))
+/* --- SmallerOf ---
+    Find:    \(\s*([^()?]+?)\s*<=?\s*([^()?]+?)\s*\)\s*\?\s*\1\s*:\s*\2
+    Replace: SmallerOf($1, $2)
+*/
+#define LargerOf(a, b)     (((a) >= (b)) ? (a) : (b))
+/* --- LargerOf ---
+    Find:    \(\s*([^()?]+?)\s*(?<!-)>=?\s*([^()?]+?)\s*\)\s*\?\s*\1\s*:\s*\2
+    Replace: LargerOf($1, $2)
+*/

@@ -294,7 +294,7 @@ r_Entity_p CL_NewTempEntity() {
     cl_visedicts[cl_numvisedicts] = ent;
     cl_numvisedicts++;
 
-    ent->colormap = Scr.pColorMapPal;
+    ent->pColorMap = Scr.pColorMapPal;
     return ent;
 }
 

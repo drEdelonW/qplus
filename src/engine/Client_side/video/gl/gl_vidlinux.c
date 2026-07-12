@@ -614,9 +614,9 @@ void VID_Init(uint8_p palette) {
 
     ClampMoreThen(&Scr.con.height, height);
     ClampMoreThen(&Scr.con.width, width);
-    Scr.vrect.width = Scr.con.width;
-    Scr.vrect.height = Scr.con.height;
-    scr.vpAspect = calcAspectRect(&vid.frameBuff);
+    Scr.canvas.width = Scr.con.width;
+    Scr.canvas.height = Scr.con.height;
+    scr.vpAspect = calcAspectRect(&Scr.canvas);
     Scr.numpages = 2;
 
     GL_Init();

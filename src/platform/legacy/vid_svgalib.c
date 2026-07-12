@@ -288,7 +288,7 @@ void VID_NumModes_f() {
 
 void VID_Debug_f() {
     Con_Printf("mode: %d\n", current_mode);
-    Con_Printf("height x width: %d x %d\n", Scr.vrect.height, Scr.vrect.width);
+    Con_Printf("height x width: %d x %d\n", Scr.canvas.height, Scr.canvas.width);
     Con_Printf("bpp: %d\n", modes[current_mode].bytesperpixel * 8);
     Con_Printf("scr.aspect: %f\n", scr.aspect);
 }
@@ -447,8 +447,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
 
     current_mode = modenum;
 
-    Scr.vrect.width = modes[current_mode].width;
-    Scr.vrect.height = modes[current_mode].height;
+    Scr.canvas.width = modes[current_mode].width;
+    Scr.canvas.height = modes[current_mode].height;
 
     VGA_width = modes[current_mode].width;
     VGA_height = modes[current_mode].height;
@@ -460,11 +460,11 @@ int VID_SetMode(int modenum, uint8_p palette) {
         vid.rowBytes = modes[current_mode].linewidth * 4;
     }
 
-    Scr.aspect = calcAspectRect(&vid.scr);
+    Scr.aspect = calcAspectRect(&Scr.canvas);
     Scr.pColorMapPal = host_colormap;
     Scr.con.rowBytes = vid.rowBytes;
-    Scr.con.width = Scr.vrect.width;
-    Scr.con.height = Scr.vrect.height;
+    Scr.con.width = Scr.canvas.width;
+    Scr.con.height = Scr.canvas.height;
     Scr.numpages = 1;
 
     // alloc zbuffer and surface cache
@@ -475,9 +475,9 @@ int VID_SetMode(int modenum, uint8_p palette) {
         vid_surfcache = NULL;
     }
 
-    bsize = vid.rowBytes * Scr.vrect.height;
-    tsize = D_SurfaceCacheForRes(Scr.vrect.width, Scr.vrect.height);
-    zsize = Scr.vrect.width * Scr.vrect.height * sizeof(*vid.zBuff.pZBuff);
+    bsize = vid.rowBytes * Scr.canvas.height;
+    tsize = D_SurfaceCacheForRes(Scr.canvas.width, Scr.canvas.height);
+    zsize = Scr.canvas.width * Scr.canvas.height * sizeof(*vid.zBuff.pZBuff);
 
     VID_highhunkmark = Hunk_HighMark();
 
@@ -486,7 +486,7 @@ int VID_SetMode(int modenum, uint8_p palette) {
     vid_surfcache = ((uint8_p)vid.zBuff.pZBuff) + zsize;
 
     Scr.con.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
-    Scr.vrect.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
+    Scr.canvas.pClr = (qColor8_p)(((uint8_p)vid.zBuff.pZBuff) + zsize + tsize);
 
     D_InitCaches(vid_surfcache, tsize);
 
@@ -684,16 +684,16 @@ void VID_Update(vRect_p rects) {
         vga_waitretrace();
 
     if (VGA_planar)
-        VGA_UpdatePlanarScreen(Scr.vrect.pBuff);
+        VGA_UpdatePlanarScreen(Scr.canvas.pBuff);
 
     else if (vid_redrawfull.value) {
-        int total = vid.rowBytes * Scr.vrect.height;
+        int total = vid.rowBytes * Scr.canvas.height;
         int offset;
 
         for (offset = 0;offset < total;offset += 0x10000) {
             vga_setpage(offset / 0x10000);
             memcpy(framebuffer_ptr,
-                Scr.vrect.pBuff + offset,
+                Scr.canvas.pBuff + offset,
                 ((total - offset > 0x10000) ? 0x10000 : (total - offset)));
         }
     }
@@ -716,16 +716,16 @@ void VID_Update(vRect_p rects) {
                 }
                 if (rects->width + i > 0x10000) {
                     memcpy(framebuffer_ptr + i,
-                        Scr.vrect.pBuff + offset,
+                        Scr.canvas.pBuff + offset,
                         0x10000 - i);
                     vga_setpage(++vidpage);
                     memcpy(framebuffer_ptr,
-                        Scr.vrect.pBuff + offset + 0x10000 - i,
+                        Scr.canvas.pBuff + offset + 0x10000 - i,
                         rects->width - 0x10000 + i);
                 }
                 else
                     memcpy(framebuffer_ptr + i,
-                        Scr.vrect.pBuff + offset,
+                        Scr.canvas.pBuff + offset,
                         rects->width);
                 offset += vid.rowBytes;
             }
@@ -906,7 +906,7 @@ cString VID_ModeInfo(int modenum) {
 
     if (modenum == 0) {
         snprintf(modestr, sizeof(modestr), "%d x %d, %d bpp",
-            Scr.vrect.width, Scr.vrect.height, modes[current_mode].bytesperpixel * 8);
+            Scr.canvas.width, Scr.canvas.height, modes[current_mode].bytesperpixel * 8);
         return (modestr);
     }
     else {

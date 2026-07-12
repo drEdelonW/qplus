@@ -24,7 +24,7 @@ struct r_Entity_s {
     efrag_p efrag;          // linked list of efrags
     int     frame;
     float   syncbase;       // for client-side animations
-    ColorMap_p colormap;
+    ColorMap_p pColorMap;
     EntityEffects_t effects;// light, particals, etc
     int     skinnum;        // for Alias models
     int     visframe;       // last frame this entity was found in an active leaf

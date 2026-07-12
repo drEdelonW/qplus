@@ -185,14 +185,14 @@ void SCR_TileClear() {
             0,
             0,
             r_refdef.vrect.x,
-            Scr.vrect.height - sb_lines
+            Scr.canvas.height - sb_lines
         );
         // right
         Draw_TileClear(
             r_refdef.vrect.x + r_refdef.vrect.width,
             0,
-            Scr.vrect.width - r_refdef.vrect.x + r_refdef.vrect.width,
-            Scr.vrect.height - sb_lines
+            Scr.canvas.width - r_refdef.vrect.x + r_refdef.vrect.width,
+            Scr.canvas.height - sb_lines
         );
     }
     if (r_refdef.vrect.y > 0) {
@@ -208,7 +208,7 @@ void SCR_TileClear() {
             r_refdef.vrect.x,
             r_refdef.vrect.y + r_refdef.vrect.height,
             r_refdef.vrect.width,
-            Scr.vrect.height - sb_lines - (r_refdef.vrect.height + r_refdef.vrect.y)
+            Scr.canvas.height - sb_lines - (r_refdef.vrect.height + r_refdef.vrect.y)
         );
     }
 }

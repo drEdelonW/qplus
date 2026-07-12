@@ -49,15 +49,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "vRect.h"
 #include "qColor.h"
 #include "qLight.h"
+#include "hud.h"
+#include "view.h"
 
 #define BASEWIDTH  (320)
 #define BASEHEIGHT (200)
 
  // only the refresh window will be updated unless these variables are flagged
 typedef struct {
-    vRect_t vrect;      // Whole screen size rectangle
-    int numpages;
+    vRect_t canvas;     // Whole screen size rectangle
     qColor8_p direct;   // direct drawing to framebuffer, if not NULL
+    int numpages;
 
     vRect_t con;        // Console size rectangle
     int con_current;
@@ -84,6 +86,8 @@ typedef struct {
 } Screen_t;
 extern Screen_t Scr;
 
+
+
 static inline float calcAspect(int width, int height) { return ((float)height / (float)width) * (320.0 / 240.0); }
 static inline float calcAspectRect(vRect_p vR) { return ((float)vR->height / (float)vR->width) * (320.0 / 240.0); }
 
@@ -101,6 +105,8 @@ extern "C" {
     int  SCR_ModalMessage(cString text);
     void Con_CheckResize();
     void Con_ToggleConsole_f();
+    void Draw_ConsoleBackground(int lines);
+
 
 #ifdef __cplusplus
 }

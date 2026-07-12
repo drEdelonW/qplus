@@ -93,7 +93,7 @@ void M_Draw() {
         Scr.copyeverything = true;
 
         if (Scr.con_current) {
-            Draw_ConsoleBackground(Scr.vrect.height);
+            Draw_ConsoleBackground(Scr.canvas.height);
             S_ExtraUpdateBUL();
         }
         else    Draw_FadeScreen();

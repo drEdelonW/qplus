@@ -954,7 +954,7 @@ bool IN_ReadJoystick() {
     }
     else {
         // read error occurred
-        // turning off the joystick seems too harsh for 1 read error,\
+        // turning off the joystick seems too harsh for 1 read error,\ 
         // but what should be done?
         // Con_Printf ("IN_ReadJoystick: no response\n");
         // joy_avail = false;

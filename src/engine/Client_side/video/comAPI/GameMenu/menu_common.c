@@ -46,7 +46,11 @@ void M_BuildTranslationTable(int top, int bottom) {
 
 
 void M_DrawTransPicTranslate(int x, int y, qPic_p pic) {
-    Draw_TransPicTranslate(x + HALF(Scr.vrect.width - 320), y, pic, &_translationTable);
+    Draw_TransPicTranslate(
+        x + HALF(Scr.canvas.width - 320), y,
+        pic,
+        &_translationTable
+    );
 }
 
 
@@ -88,12 +92,18 @@ void M_DrawTextBox(int x, int y, int width, int lines) {
     M_DrawTransPic(cx, cy + 8, Draw_CachePic("gfx/box_br.lmp"));
 }
 
-void M_DrawCharacter(int cx, int line, int num) {
-    Draw_Character(cx + HALF(Scr.vrect.width - 320), line, num);
+void M_DrawCharacter(int cx, int cy, ConsoleSymbols_t symb) {
+    Draw_Character(
+        cx + HALF(Scr.canvas.width - 320), cy,
+        symb
+    );
 }
 
 void M_DrawTransPic(int x, int y, qPic_p pic) {
-    Draw_TransPic(x + HALF(Scr.vrect.width - 320), y, pic);
+    Draw_TransPic(
+        x + HALF(Scr.canvas.width - 320), y,
+        pic
+    );
 }
 
 int M_DrawPicHC(int y, qPic_p pic) {
@@ -105,7 +115,7 @@ int M_DrawPicHC(int y, qPic_p pic) {
     return -1;
 }
 void M_DrawPic(int x, int y, qPic_p pic) {
-    Draw_Pic(x + HALF(Scr.vrect.width - 320), y, pic);
+    Draw_Pic(x + HALF(Scr.canvas.width - 320), y, pic);
 }
 
 void M_Print(int cx, int cy, cStringRO str) {

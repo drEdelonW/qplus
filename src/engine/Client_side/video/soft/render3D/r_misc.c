@@ -56,8 +56,8 @@ void Show() {
     vRect_t vr = {
         // .x      = 0,
         // .y      = 0,
-        .width = Scr.vrect.width,
-        .height = Scr.vrect.height,
+        .width = Scr.canvas.width,
+        .height = Scr.canvas.height,
         // .pnext  = NULL
     };
 
@@ -113,13 +113,13 @@ void R_TimeRefresh_f() {
 #define GRAPH_FG 0xFF  // bright bar color
 #define GRAPH_BG 0x30  // background color
 void R_LineGraph(int x, int y, int h) {
-    if (!Scr.vrect.pBuff)   return;
+    if (!Scr.canvas.pBuff)   return;
     // FIXME: should be disabled on no-buffer adapters, or should be in the driver
 
     x += r_refdef.vrect.x;
     y += r_refdef.vrect.y;
 
-    uint8_p dest = Scr.vrect.pBuff + (Scr.vrect.rowBytes * y) + x;
+    uint8_p dest = Scr.canvas.pBuff + (Scr.canvas.rowBytes * y) + x;
 
     int s = r_graphheight.value;
 
@@ -128,8 +128,8 @@ void R_LineGraph(int x, int y, int h) {
     for (int i = 0; i < s; ++i) {
         dest[0] = (i < h) ? GRAPH_FG : GRAPH_BG;
 
-        dest[-Scr.vrect.rowBytes] = GRAPH_BG;
-        dest -= TWICE(Scr.vrect.rowBytes);
+        dest[-Scr.canvas.rowBytes] = GRAPH_BG;
+        dest -= TWICE(Scr.canvas.rowBytes);
     }
 }
 
@@ -393,18 +393,18 @@ void R_SetupFrame() {
         r_viewchanged
         ) {
         if (r_dowarp) {
-            if ((Scr.vrect.width <= vid.maxwarp.width) &&
-                (Scr.vrect.height <= vid.maxwarp.height)
+            if ((Scr.canvas.width <= vid.maxwarp.width) &&
+                (Scr.canvas.height <= vid.maxwarp.height)
                 ) {
                 vRect_t vrect = {
-                    .width = Scr.vrect.width,
-                    .height = Scr.vrect.height
+                    .width = Scr.canvas.width,
+                    .height = Scr.canvas.height
                 };
                 R_ViewChanged(&vrect, sb_lines, Scr.vpAspect);
             }
             else {
-                float w = Scr.vrect.width;
-                float h = Scr.vrect.height;
+                float w = Scr.canvas.width;
+                float h = Scr.canvas.height;
 
                 if (w > vid.maxwarp.width) {
                     h *= (float)vid.maxwarp.width / w;
@@ -422,15 +422,15 @@ void R_SetupFrame() {
                 };
 
                 R_ViewChanged(&vrect,
-                    (int)((float)sb_lines * (h / (float)Scr.vrect.height)),
+                    (int)((float)sb_lines * (h / (float)Scr.canvas.height)),
                     Scr.vpAspect * (h / w) *
-                    ((float)Scr.vrect.width / (float)Scr.vrect.height));
+                    ((float)Scr.canvas.width / (float)Scr.canvas.height));
             }
         }
         else {
             vRect_t vrect = {
-                .width = Scr.vrect.width,
-                .height = Scr.vrect.height
+                .width = Scr.canvas.width,
+                .height = Scr.canvas.height
             };
 
             R_ViewChanged(&vrect, sb_lines, Scr.vpAspect);

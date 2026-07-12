@@ -493,9 +493,9 @@ void R_DrawAliasModel(r_Entity_p e) {
     int anim = (int)(GetClSimTime() * 10) & 3;
     GL_Bind(pAliasHdr->gl_texturenum[currententity->skinnum][anim]);
 
-    // we can't dynamically colormap textures, so they are cached
+    // we can't dynamically pColorMap textures, so they are cached
     // seperately for the players.  Heads are just uncolored.
-    if ((currententity->colormap != Scr.pColorMapPal) &&
+    if ((currententity->pColorMap != Scr.pColorMapPal) &&
         (!gl_nocolors.value)
         ) {
         int i = currententity - cl_entities;
@@ -753,15 +753,15 @@ void R_SetupGL() {
     glLoadIdentity();
     vRect_t vrect = r_refdef.vrect;
 #if 0
-    int x = vrect.x * (glwidth / Scr.vrect.width);
-    int x2 = (vrect.x + vrect.width) * (glwidth / Scr.vrect.width);
-    int y = (Scr.vrect.height - vrect.y) * (glheight / Scr.vrect.height);
-    int y2 = (Scr.vrect.height - (vrect.y + vrect.height)) * (glheight / Scr.vrect.height);
+    int x = vrect.x * (glwidth / Scr.canvas.width);
+    int x2 = (vrect.x + vrect.width) * (glwidth / Scr.canvas.width);
+    int y = (Scr.canvas.height - vrect.y) * (glheight / Scr.canvas.height);
+    int y2 = (Scr.canvas.height - (vrect.y + vrect.height)) * (glheight / Scr.canvas.height);
 #else
-    float sx = (float)glwidth / Scr.vrect.width;
-    float sy = (float)glheight / Scr.vrect.height;
+    float sx = (float)glwidth / Scr.canvas.width;
+    float sy = (float)glheight / Scr.canvas.height;
     int yx = vrect.x;
-    int ty = Scr.vrect.height - vrect.y;
+    int ty = Scr.canvas.height - vrect.y;
     int x = yx * sx;
     int y = ty * sy;
     int x2 = (yx + vrect.width) * sx;

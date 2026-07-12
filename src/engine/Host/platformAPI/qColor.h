@@ -94,6 +94,7 @@ typedef qPal_t* qPal_p;
 extern qPal_p   host_basepal;
 extern Rgb16_t  d_8to16table[InksNum];  // not used in 8 bpp mode
 extern Rgb24_t  d_8to24table[InksNum];  // not used in 8 bpp mode // 0xAABBGGRR
+extern int  r_pixbytes; // TODO: move to SoftRender specific area
 
 #ifdef __cplusplus
 extern "C" {

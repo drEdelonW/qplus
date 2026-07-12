@@ -52,7 +52,7 @@ void Con_NotifyBox(cString text) {
 */
 
 void Con_CheckResize() {
-    int width = DIV8(Scr.vrect.width) - 2;
+    int width = DIV8(Scr.canvas.width) - 2;
     if (width == con.linewidth)
         return;
 
@@ -96,27 +96,6 @@ void Con_CheckResize() {
     con.current = con.totallines - 1;
 }
 
-/*
-    ================
-    Con_MessageMode_f
-    ================
-*/
-
-void Con_MessageMode_f() {
-    key.dest = key_message;
-    team_message = false;
-}
-
-
-/*
-    ================
-    Con_MessageMode2_f
-    ================
-*/
-void Con_MessageMode2_f() {
-    key.dest = key_message;
-    team_message = true;
-}
 
 /*
     ================

@@ -1255,14 +1255,14 @@ bool VID_SetWindowedMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    Scr.vrect.pClr = (qColor8_p)dibdc->surface;
-    Scr.vrect.height = DIBHeight;
-    Scr.vrect.width = DIBWidth;
-    Scr.vpAspect = calcAspectRect(&Scr.vrect);
+    Scr.canvas.pClr = (qColor8_p)dibdc->surface;
+    Scr.canvas.height = DIBHeight;
+    Scr.canvas.width = DIBWidth;
+    Scr.vpAspect = calcAspectRect(&Scr.canvas);
     Scr.con.height = DIBHeight;
     Scr.con.width = DIBWidth;
     Scr.direct = (qColor8_p)dibdc->surface;
-    Scr.vrect.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
+    Scr.canvas.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
 
     vid_stretched = stretched;
@@ -1296,11 +1296,11 @@ bool VID_SetFullscreenMode(int modenum) {
     modestate = MS_FULLSCREEN;
     vid_fulldib_on_focus_mode = 0;
 
-    Scr.vrect.pClr = NULL;
+    Scr.canvas.pClr = NULL;
     Scr.direct = NULL;
-    DIBHeight = Scr.vrect.height = Scr.con.height = modelist[modenum].height;
-    DIBWidth = Scr.vrect.width = Scr.con.width = modelist[modenum].width;
-    Scr.vpAspect = calcAspectRect(&Scr.vrect);
+    DIBHeight = Scr.canvas.height = Scr.con.height = modelist[modenum].height;
+    DIBWidth = Scr.canvas.width = Scr.con.width = modelist[modenum].width;
+    Scr.vpAspect = calcAspectRect(&Scr.canvas);
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -1403,14 +1403,14 @@ bool VID_SetFullDIBMode(int modenum) {
 
     MGL_makeCurrentDC(dibdc);
 
-    Scr.vrect.pClr = (qColor8_p)dibdc->surface;
+    Scr.canvas.pClr = (qColor8_p)dibdc->surface;
     Scr.con.pClr = (qColor8_p)dibdc->surface;
     Scr.direct = (qColor8_p)dibdc->surface;
-    Scr.vrect.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
+    Scr.canvas.rowBytes = Scr.con.rowBytes = dibdc->mi.bytesPerLine;
     Scr.numpages = 1;
-    Scr.vrect.height = Scr.con.height = DIBHeight;
-    Scr.vrect.width = Scr.con.width = DIBWidth;
-    Scr.vpAspect = calcAspectRect(&Scr.vrect);
+    Scr.canvas.height = Scr.con.height = DIBHeight;
+    Scr.canvas.width = Scr.con.width = DIBWidth;
+    Scr.vpAspect = calcAspectRect(&Scr.canvas);
 
     vid_stretched = modelist[modenum].stretched;
 
@@ -1508,8 +1508,8 @@ int VID_SetMode(int modenum, qPal_p palette) {
         IN_HideMouse();
     }
 
-    window_width = Scr.vrect.width << vid_stretched;
-    window_height = Scr.vrect.height << vid_stretched;
+    window_width = Scr.canvas.width << vid_stretched;
+    window_height = Scr.canvas.height << vid_stretched;
     VID_UpdateWindowStatus();
 
     CDAudio_Resume();
@@ -1543,7 +1543,7 @@ int VID_SetMode(int modenum, qPal_p palette) {
     vid_modenum = modenum;
     Cvar_SetValue("vid_mode", (float)vid_modenum);
 
-    if (!VID_AllocBuffers(Scr.vrect.width, Scr.vrect.height)) {
+    if (!VID_AllocBuffers(Scr.canvas.width, Scr.canvas.height)) {
         // couldn't get memory for this mode; try to fall back to previous mode
         VID_RestoreOldMode(original_mode);
         return false;
@@ -1594,24 +1594,24 @@ void VID_LockBuffer() {
 
     if (memdc) {
         // Update surface pointer for linear access modes
-        Scr.vrect.pClr = (qColor8_p)memdc->surface;
+        Scr.canvas.pClr = (qColor8_p)memdc->surface;
         Scr.con.pClr = (qColor8_p)memdc->surface;
         Scr.direct = (qColor8_p)memdc->surface;
-        Scr.vrect.rowBytes = Scr.con.rowBytes = memdc->mi.bytesPerLine;
+        Scr.canvas.rowBytes = Scr.con.rowBytes = memdc->mi.bytesPerLine;
     }
     else if (mgldc) {
         // Update surface pointer for linear access modes
-        Scr.vrect.pClr = (qColor8_p)mgldc->surface;
+        Scr.canvas.pClr = (qColor8_p)mgldc->surface;
         Scr.con.pClr = (qColor8_p)mgldc->surface;
         Scr.direct = (qColor8_p)mgldc->surface;
-        Scr.vrect.rowBytes = Scr.con.rowBytes = mgldc->mi.bytesPerLine;
+        Scr.canvas.rowBytes = Scr.con.rowBytes = mgldc->mi.bytesPerLine;
     }
 
     d_viewbuffer = (r_dowarp) ?
-        vid.maxwarp.pClr : Scr.vrect.pClr;
+        vid.maxwarp.pClr : Scr.canvas.pClr;
 
     screenwidth = (r_dowarp) ?
-        WARP_WIDTH : Scr.vrect.rowBytes;
+        WARP_WIDTH : Scr.canvas.rowBytes;
 
     if (lcd_x.value)
         screenwidth = TWICE(screenwidth);
@@ -1633,7 +1633,7 @@ void VID_UnlockBuffer() {
     MGL_endDirectAccess();
 
     // to turn up any unlocked accesses
-    Scr.vrect.pClr = NULL;
+    Scr.canvas.pClr = NULL;
     Scr.con.pClr = NULL;
     Scr.direct = NULL;
 
@@ -2083,8 +2083,8 @@ void VID_Update(vRect_p rects) {
         vRect_t    rect = {
             .x = 0,
             .y = 0,
-            .width = Scr.vrect.width,
-            .height = Scr.vrect.height,
+            .width = Scr.canvas.width,
+            .height = Scr.canvas.height,
             .pNext = NULL
         };
         rects = &rect;
@@ -2188,9 +2188,9 @@ void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height) {
         for (i = 0; i < (height << repshift); i += reps) {
             for (j = 0; j < reps; j++) {
                 memcpy(&backingbuf[(i + j) * 24],
-                    Scr.direct + x + ((y << repshift) + i + j) * Scr.vrect.rowBytes,
+                    Scr.direct + x + ((y << repshift) + i + j) * Scr.canvas.rowBytes,
                     width);
-                memcpy(Scr.direct + x + ((y << repshift) + i + j) * Scr.vrect.rowBytes,
+                memcpy(Scr.direct + x + ((y << repshift) + i + j) * Scr.canvas.rowBytes,
                     &pbitmap[(i >> repshift) * width],
                     width);
             }
@@ -2267,7 +2267,7 @@ void D_EndDirectRect(int x, int y, int width, int height) {
             for (int j = 0; j < reps; j++)
                 memcpy(
                     Scr.direct + x +
-                    Scr.vrect.rowBytes * ((y << repshift) + i + j),
+                    Scr.canvas.rowBytes * ((y << repshift) + i + j),
                     &backingbuf[(i + j) * 24],
                     width
                 );

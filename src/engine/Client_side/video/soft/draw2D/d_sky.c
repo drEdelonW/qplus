@@ -40,8 +40,8 @@ void D_Sky_uv_To_st(int u, int v, fixed16_p s, fixed16_p t) {
         r_refdef.vrect.width : r_refdef.vrect.height
         );
 
-    float wu = 8192.0f * (float)(u - HALF(Scr.vrect.width)) / temp;
-    float wv = 8192.0f * (float)(HALF(Scr.vrect.height) - v) / temp;
+    float wu = 8192.0f * (float)(u - HALF(Scr.canvas.width)) / temp;
+    float wv = 8192.0f * (float)(HALF(Scr.canvas.height) - v) / temp;
 
 
     vec3_t end = VectorMA(VectorMA(

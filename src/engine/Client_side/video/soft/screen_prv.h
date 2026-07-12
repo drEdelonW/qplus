@@ -41,13 +41,9 @@ extern "C" {
     void SCR_DrawRam();
     void SCR_DrawTurtle();
     void SCR_DrawNet();
-    void SCR_DrawPause();
-    void SCR_DrawLoading();
-
 
     void Con_MessageMode_f();
     void Con_MessageMode2_f();
-    void Con_DrawNotify();
 
 #ifdef __cplusplus
 }

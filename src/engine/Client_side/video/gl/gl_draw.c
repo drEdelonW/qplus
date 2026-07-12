@@ -45,7 +45,6 @@ cvar_t  gl_nobind = { "gl_nobind", "0" };
 cvar_t  gl_max_size = { "gl_max_size", "1024" };
 cvar_t  gl_picmip = { "gl_picmip", "0" };
 
-qPic_p draw_disc;
 qPic_p draw_backtile;
 
 int   translate_texture;
@@ -202,9 +201,16 @@ int  pic_texels;
 int  pic_count;
 #endif
 
-int GL_LoadPicTexture(qPic_p pic);
+/*
+================
+GL_LoadPicTexture
+================
+*/
+int GL_LoadPicTexture(qPic_p pic) {
+    return GL_LoadTexture("", pic->width, pic->height, pic->data, false, true);
+}
 
-qPic_p Draw_PicFromWad(cStringRO name) {
+qPic_p GetPicFromWad(cStringRO name) {
     qPic_p p = W_GetLumpName(name);
 
     // load little ones into the scrap
@@ -235,7 +241,11 @@ qPic_p Draw_PicFromWad(cStringRO name) {
     }
     else {
         *((glpic_p)p->data) = (glpic_t){
+#if 0
             .texnum = GL_LoadPicTexture(p),
+#else
+            .texnum = GL_LoadTexture("", p->width, p->height, p->data, false, true),
+#endif
             .sl = 0.f,
             .tl = 0.f,
             .sh = 1.f,
@@ -251,6 +261,7 @@ qPic_p Draw_PicFromWad(cStringRO name) {
 Draw_CachePic
 ================
 */
+
 qPic_p Draw_CachePic(cStringRO path) {
     cachepic_p pic = menu_cachepics;
     for (int i = 0; i < menu_numcachepics; pic++, i++)
@@ -291,23 +302,6 @@ qPic_p Draw_CachePic(cStringRO path) {
     return &pic->pic;
 }
 
-qColor8_p _drawChars;    // 8*8 graphic characters
-void Draw_CharToConback(int num, qColor8_p dest) {
-    int row = num >> 4;
-    int col = num & 0x0F;
-    qColor8_p source = _drawChars + (row << 10) + (col << 3);
-
-    int drawline = 8;
-
-    while (drawline--) {
-        for (int x = 0; x < 8; x++)
-            if (source[x].i != InkTransp)
-                dest[x].i = 0x60 + source[x].i;
-        source += 128;
-        dest += 320;
-    }
-
-}
 
 typedef struct {
     cString name;
@@ -377,19 +371,18 @@ void Draw_Init() {
     // 3dfx can only handle 256 wide textures
     if (!(Q_strncasecmp((cString)gl_renderer, "3dfx", 4)) ||
         strstr((cString)gl_renderer, "Glide")
-        )
-        Cvar_Set("gl_max_size", "256");
+        )   Cvar_Set("gl_max_size", "256");
 
     Cmd_AddCommand("gl_texturemode", &Draw_TextureMode_f);
 
     // load the console background and the charset by hand, because we need to write the version string into the background before turning it into a texture
-    _drawChars = W_GetLumpName("conchars");
-    for (int i = 0; i < InksNum * 64; i++)
-        if (_drawChars[i].i == 0)
-            _drawChars[i].i = InkTransp; // proper transparent color
+    pDrawChars = W_GetLumpName("conchars");
+    for (int i = 0; i < (InksNum * 64); i++)
+        if (pDrawChars[i].i == InkConTransp)
+            pDrawChars[i].i = InkTransp; // proper transparent color
 
     // now turn them into textures
-    char_texture = GL_LoadTexture("charset", 128, 128, _drawChars, false, true);
+    char_texture = GL_LoadTexture("charset", 128, 128, pDrawChars, false, true);
 
     size_t start = Hunk_LowMark();
 
@@ -454,8 +447,8 @@ void Draw_Init() {
         .th = 1.f
     };
 
-    conback->width = Scr.vrect.width;
-    conback->height = Scr.vrect.height;
+    conback->width = Scr.canvas.width;
+    conback->height = Scr.canvas.height;
 
     Hunk_FreeToLowMark(start);      // free loaded console
 
@@ -468,8 +461,8 @@ void Draw_Init() {
     //
     // get the other pics we need
     //
-    draw_disc = Draw_PicFromWad("disc");
-    draw_backtile = Draw_PicFromWad("backtile");
+    draw_disc = GetPicFromWad("disc");
+    draw_backtile = GetPicFromWad("backtile");
 }
 
 
@@ -506,19 +499,6 @@ void Draw_Character(int x, int y, ConsoleSymbols_t symb) {
         glTexCoord2f(fcol + size, frow + size); glVertex2f(x + 8, y + 8);
         glTexCoord2f(fcol, frow + size);        glVertex2f(x, y + 8);
     } glEnd();
-}
-
-/*
-================
-Draw_String
-================
-*/
-void Draw_String(int x, int y, cStringRO str) {
-    while (*str) {
-        Draw_Character(x, y, *str);
-        str++;
-        x += 8;
-    }
 }
 
 /*
@@ -593,8 +573,8 @@ Draw_TransPic
 void Draw_TransPic(int x, int y, qPic_p pic) {
     if ((x < 0) ||
         (y < 0) ||
-        ((x + pic->width) > Scr.vrect.width) ||
-        ((y + pic->height) > Scr.vrect.height)
+        ((x + pic->width) > Scr.canvas.width) ||
+        ((y + pic->height) > Scr.canvas.height)
         )   Host_SysError("Draw_TransPic: bad coordinates");
 
     Draw_Pic(x, y, pic);
@@ -652,10 +632,10 @@ Draw_ConsoleBackground
 ================
 */
 void Draw_ConsoleBackground(int lines) {
-    int y = DIV4(Scr.vrect.height * 3);
+    int y = DIV4(Scr.canvas.height * 3);
 
-    if (lines > y)  Draw_Pic(0, lines - Scr.vrect.height, conback);
-    else            Draw_AlphaPic(0, lines - Scr.vrect.height, conback, (float)(1.2 * lines) / y);
+    if (lines > y)  Draw_Pic(0, lines - Scr.canvas.height, conback);
+    else            Draw_AlphaPic(0, lines - Scr.canvas.height, conback, (float)(1.2 * lines) / y);
 }
 
 
@@ -719,9 +699,9 @@ void Draw_FadeScreen() {
             glColor4f(0.f, 0.f, 0.f, 0.8f); {
                 glBegin(GL_QUADS); {
                     glVertex2f(0.f, 0.f);
-                    glVertex2f(Scr.vrect.width, 0.f);
-                    glVertex2f(Scr.vrect.width, Scr.vrect.height);
-                    glVertex2f(0.f, Scr.vrect.height);
+                    glVertex2f(Scr.canvas.width, 0.f);
+                    glVertex2f(Scr.canvas.width, Scr.canvas.height);
+                    glVertex2f(0.f, Scr.canvas.height);
                 } glEnd();
             } glColor4f(1.f, 1.f, 1.f, 1.f);
         } glEnable(GL_TEXTURE_2D);
@@ -732,32 +712,6 @@ void Draw_FadeScreen() {
 
 //=============================================================================
 
-/*
-================
-Draw_BeginDisc
-
-Draws the little blue disc in the corner of the screen.
-Call before beginning any disc IO.
-================
-*/
-void Draw_BeginDisc() {
-    if (!draw_disc)     return;
-
-    glDrawBuffer(GL_FRONT);
-    Draw_Pic(Scr.vrect.width - 24, 0, draw_disc);
-    glDrawBuffer(GL_BACK);
-}
-
-
-/*
-================
-Draw_EndDisc
-
-Erases the disc icon.
-Call after completing any disc IO
-================
-*/
-void Draw_EndDisc() {}
 
 /*
 ================
@@ -771,7 +725,7 @@ void GL_Set2D() {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, Scr.vrect.width, Scr.vrect.height, 0, -99999, 99999);
+    glOrtho(0, Scr.canvas.width, Scr.canvas.height, 0, -99999, 99999);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -1181,14 +1135,6 @@ int GL_LoadTexture(
     return texture_extension_number - 1;
 }
 
-/*
-================
-GL_LoadPicTexture
-================
-*/
-int GL_LoadPicTexture(qPic_p pic) {
-    return GL_LoadTexture("", pic->width, pic->height, pic->data, false, true);
-}
 
 /****************************************/
 

@@ -11,7 +11,7 @@
 //=============================================================================
 /* KEYS MENU */
 enum bind_st {
-    command     = 0u,
+    command = 0u,
     description,
     bs_num
 };
@@ -43,25 +43,22 @@ static cString _bindnames[][bs_num] = {
 
 void M_Keys_Draw() {
     qPic_p p = Draw_CachePic("gfx/ttl_cstm.lmp");
-    M_DrawPic(DIV2(Scr.vrect.width - p->width), 4, p);
+    M_DrawPic(DIV2(Scr.canvas.width - p->width), 4, p);
 
     M_Print(12, 32, (_bind_grab) ?
         "Press a key or button for this action" :
         "Enter to change, backspace to clear"
     );
 
-    // search for known bindings
-    for (int i = 0; i < NUMCOMMANDS; i++) {
+    for (int i = 0; i < NUMCOMMANDS; i++) {     // search for known bindings
         int y = 48 + MUL8(i);
         M_Print(16, y, _bindnames[i][description]);
-        // int len = strlen (_bindnames[i][command]);
 
         int keys[2];
         M_FindKeysForCommand(_bindnames[i][command], keys);
 
-        if (keys[0] == -1) {
+        if (keys[0] == -1)
             M_Print(140, y, "???");
-        }
         else {
             cStringRO name = Key_KeynumToString(keys[0]);
             M_Print(140, y, name);
@@ -82,15 +79,12 @@ void M_Keys_Draw() {
 
 
 void M_Keys_Key(keycode_t k) {
-    char cmd[80];
-    int  keys[2];
-
     if (_bind_grab) { // defining a key
         S_LocalSound("misc/menu1.wav");
-        if (k == K_ESCAPE) {
+        if (k == K_ESCAPE)
             _bind_grab = false;
-        }
         else if (k != '`') {
+            char cmd[80];
             snprintf(
                 cmd, sizeof(cmd),
                 "bind \"%s\" \"%s\"\n",
@@ -122,6 +116,7 @@ void M_Keys_Key(keycode_t k) {
     } break;
 
     case K_ENTER: { // go into bind mode
+        int  keys[2];
         M_FindKeysForCommand(_bindnames[_keys_cursor][command], keys);
         S_LocalSound("misc/menu2.wav");
         if (keys[1] != -1)

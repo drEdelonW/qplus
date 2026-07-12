@@ -77,7 +77,7 @@ void D_ViewChanged() {
     d_vrectright_particle = r_refdef.vrectright - d_pix_max;
     d_vrectbottom_particle = r_refdef.vrectbottom - (d_pix_max << d_y_aspect_shift);
 
-    ptrdiff_t rowbytes = (r_dowarp) ? WARP_WIDTH : Scr.vrect.rowBytes;
+    ptrdiff_t rowbytes = (r_dowarp) ? WARP_WIDTH : Scr.canvas.rowBytes;
     for (int i = 0; i < vid.frameBuff.height; i++) {
         d_scantable[i] = rowbytes * i;
         zspantable[i] = vid.zBuff.pZBuff + i * vid.zBuff.width;

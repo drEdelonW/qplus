@@ -31,8 +31,8 @@ SCR_Init
 */
 #include "vid.h" // vid.frameBuff;
 void SCR_Init() {
-    Scr.vrect = vid.frameBuff;
-    Scr.vpAspect = calcAspectRect(&Scr.vrect);
+    Scr.canvas = vid.frameBuff;
+    Scr.vpAspect = calcAspectRect(&Scr.canvas);
 
     Cvar_RegisterVariable(&scr_viewsize);
     Cvar_RegisterVariable(&scr_conspeed);
@@ -54,9 +54,9 @@ void SCR_Init() {
 
 
 #if 1 /* System status */
-    _scr.ram = Draw_PicFromWad("ram");
-    _scr.net = Draw_PicFromWad("net");
-    _scr.turtle = Draw_PicFromWad("turtle");
+    _scr.ram = GetPicFromWad("ram");
+    _scr.net = GetPicFromWad("net");
+    _scr.turtle = GetPicFromWad("turtle");
 #endif
 
     _scr.initialized = true;
@@ -94,7 +94,7 @@ void SCR_DrawCenterString() {
     cString start = _scr.centerstring;
 
     int y = (_scr.center_lines <= 4) ?
-        Scr.vrect.height * 0.35 : 48;
+        Scr.canvas.height * 0.35 : 48;
 
     do {
         // scan the width of the line
@@ -103,7 +103,7 @@ void SCR_DrawCenterString() {
             if ((start[inLine] == '\n') || !start[inLine])
                 break;
 
-        int x = HALF(Scr.vrect.width - MUL8(inLine));
+        int x = HALF(Scr.canvas.width - MUL8(inLine));
         for (int j = 0; j < inLine; j++, x += 8) {
             Draw_Character(x, y, start[j]);
             if (!remaining--)
@@ -161,7 +161,7 @@ int SCR_ModalMessage(cString text) {
 
 void SCR_DrawNotifyString() {
     cString start = _scr.notifystring;
-    int y = Scr.vrect.height * 0.35f;
+    int y = Scr.canvas.height * 0.35f;
 
     do {
         // scan the width of the line
@@ -172,7 +172,7 @@ void SCR_DrawNotifyString() {
                 )
                 break;
 
-        int x = HALF(Scr.vrect.width - MUL8(inLine));
+        int x = HALF(Scr.canvas.width - MUL8(inLine));
         for (int j = 0; j < inLine; j++, x += 8)
             Draw_Character(x, y, start[j]);
 
@@ -256,7 +256,7 @@ void SCR_DrawRam() {
         (!r_cache_thrash)
         )   return;
     // printf("drawRAM [%s]  \n", r_cache_thrash ? "true" : "false");
-    Draw_Pic(Scr.vrect.x + 32, Scr.vrect.y, _scr.ram);
+    Draw_Pic(Scr.canvas.x + 32, Scr.canvas.y, _scr.ram);
 }
 
 /*
@@ -276,7 +276,7 @@ void SCR_DrawTurtle() {
     _cnt++;
     if (_cnt < 3)  return;
 
-    Draw_Pic(Scr.vrect.x, Scr.vrect.y, _scr.turtle);
+    Draw_Pic(Scr.canvas.x, Scr.canvas.y, _scr.turtle);
 }
 
 /*
@@ -289,7 +289,7 @@ void SCR_DrawNet() {
         (cls.isDemoPlaying))
         return;
 
-    Draw_Pic(Scr.vrect.x + 64, Scr.vrect.y, _scr.net);
+    Draw_Pic(Scr.canvas.x + 64, Scr.canvas.y, _scr.net);
 }
 
 
@@ -338,10 +338,10 @@ void SCR_SetUpToDrawConsole() {
     con.forcedup = !cl.worldmodel || (cls.signon != SIGNONS);
 
     /**/ if (con.forcedup) {
-        Scr.conlines = Scr.vrect.height;  // full screen
+        Scr.conlines = Scr.canvas.height;  // full screen
         Scr.con_current = Scr.conlines;
     }
-    else if (key.dest == key_console)   Scr.conlines = HALF(Scr.vrect.height);    // half screen
+    else if (key.dest == key_console)   Scr.conlines = HALF(Scr.canvas.height);    // half screen
     else                                Scr.conlines = 0;                       // none visible
 
     /**/ if (Scr.con_current > Scr.conlines) {
@@ -358,7 +358,7 @@ void SCR_SetUpToDrawConsole() {
         Scr.copytop = true;
         Draw_TileClear(
             0, Scr.con_current,
-            Scr.vrect.width, Scr.vrect.height - Scr.con_current
+            Scr.canvas.width, Scr.canvas.height - Scr.con_current
         );
 #endif
         Sbar_Changed();
@@ -366,7 +366,7 @@ void SCR_SetUpToDrawConsole() {
     else if (Scr.clearnotify++ < Scr.numpages) {
 #ifndef GLQUAKE
         Scr.copytop = true;
-        Draw_TileClear(0, 0, Scr.vrect.width, con.notifylines);
+        Draw_TileClear(0, 0, Scr.canvas.width, con.notifylines);
 #endif
     }
     else
@@ -429,8 +429,8 @@ void SCR_CalcRefdef() {
     }
 
     // vRect_t vrect = {
-    //     .width = Scr.vrect.width,
-    //     .height = Scr.vrect.height
+    //     .width = Scr.canvas.width,
+    //     .height = Scr.canvas.height
     // };
     // vRect_p pvrectin = &vrect;
     // vRect_p pvrect = &r_refdef.vrect;
@@ -466,14 +466,14 @@ void SCR_CalcRefdef() {
         }
     }
 #else
-    R_SetVrect(&Scr.vrect, &r_refdef.vrect, lineadj);
+    R_SetVrect(&Scr.canvas, &r_refdef.vrect, lineadj);
     // R_SetVrect(pvrectin, pvrect, lineadj);
 #endif
 #else
     // these calculations mirror those in R_Init() for r_refdef, but take no account of water warping
 
-    R_SetVrect(&Scr.vrect, &r_refdef.vrect, lineadj);
-    // R_SetVrect(pvrectin, &Scr.vrect, lineadj);
+    R_SetVrect(&Scr.canvas, &r_refdef.vrect, lineadj);
+    // R_SetVrect(pvrectin, &Scr.canvas, lineadj);
 #endif
 
     r_refdef.fov_x = scr_fov.value;
@@ -482,8 +482,8 @@ void SCR_CalcRefdef() {
 #ifdef GLQUAKE
 #else
     // guard against going from one mode to another that's less than half the vertical resolution
-    ClampMoreThen(&Scr.con_current, Scr.vrect.height);
-    R_ViewChanged(&Scr.vrect, sb_lines, Scr.vpAspect);    // notify the refresh of the change
+    ClampMoreThen(&Scr.con_current, Scr.canvas.height);
+    R_ViewChanged(&Scr.canvas, sb_lines, Scr.vpAspect);    // notify the refresh of the change
 #endif
 }
 

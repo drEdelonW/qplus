@@ -78,7 +78,7 @@ Memory is cleared / released when a server or client begins, not when they end.
 */
 
 #if 1
-ColorMap_p  host_colormap;      // TODO: VID/Light specific move it out
+ColorMap_p  host_colormap;      // TODO: Light specific move it out
 
 QuakeParms_t host_parms;
 bool        host_initialized;   // true if into command execution

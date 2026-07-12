@@ -69,8 +69,8 @@ void D_InitCaches(SurfCache_p buffer, int size) {
 void GL_BeginRendering(int *x, int *y, int *width, int *height) {
     *x = 0;
     *y = 0;
-    *width = Scr.vrect.width;
-    *height = Scr.vrect.height;
+    *width = Scr.canvas.width;
+    *height = Scr.canvas.height;
 }
 
 void GL_EndRendering() {
@@ -552,7 +552,7 @@ int create_gl_context(App_p app) {
 
 void apply_vid_state(App_p app) {
     Scr.pColorMapPal = host_colormap;
-    Scr.vrect.width = app->xwin.width;
+    Scr.canvas.width = app->xwin.width;
     Scr.numpages = 2;
     SCR_RequestCalcRefdef();
     glViewport(0, 0, app->xwin.width, app->xwin.height);
@@ -599,8 +599,8 @@ void VID_Init(qPal_p palette) {
 
     Con_SafePrintf(
         "Video mode %dx%d initialized.\n",
-        Scr.vrect.width,
-        Scr.vrect.height
+        Scr.canvas.width,
+        Scr.canvas.height
     );
 
     oktodraw = true;

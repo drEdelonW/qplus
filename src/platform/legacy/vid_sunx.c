@@ -341,10 +341,10 @@ void ResetFrameBuffer() {
 
     pwidth = DIV8(x_visinfo->depth);
     if (pwidth == 3) pwidth = 4;
-    mem = ((Scr.vrect.width * pwidth + 3) & ~3) * Scr.vrect.height;
+    mem = ((Scr.canvas.width * pwidth + 3) & ~3) * Scr.canvas.height;
 
-    // vid.zBuff.pZBuff = (uint16_t*)Z_Malloc(Scr.vrect.width * Scr.vrect.height * sizeof(*vid.zBuff.pZBuff));
-    vid.zBuff.pZBuff = (int16_p)Hunk_HighAllocName(Scr.vrect.width * Scr.vrect.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
+    // vid.zBuff.pZBuff = (uint16_t*)Z_Malloc(Scr.canvas.width * Scr.canvas.height * sizeof(*vid.zBuff.pZBuff));
+    vid.zBuff.pZBuff = (int16_p)Hunk_HighAllocName(Scr.canvas.width * Scr.canvas.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
 
     x_framebuffer[0] = XCreateImage(x_disp,
         x_vis,
@@ -352,7 +352,7 @@ void ResetFrameBuffer() {
         ZPixmap,
         0,
         Z_Malloc(mem),
-        Scr.vrect.width, Scr.vrect.height,
+        Scr.canvas.width, Scr.canvas.height,
         32,
         0);
 
@@ -370,7 +370,7 @@ void ResetSharedFrameBuffers() {
 
     //    if (vid.zBuff.pZBuff)
     //        Z_Free(vid.zBuff.pZBuff);
-    vid.zBuff.pZBuff = Hunk_HighAllocName(Scr.vrect.width * Scr.vrect.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
+    vid.zBuff.pZBuff = Hunk_HighAllocName(Scr.canvas.width * Scr.canvas.height * sizeof(*vid.zBuff.pZBuff), "zbuff");
 
     for (frm = 0; frm < 2; frm++) {
 
@@ -390,8 +390,8 @@ void ResetSharedFrameBuffers() {
             ZPixmap,
             0,
             &x_shminfo[frm],
-            Scr.vrect.width,
-            Scr.vrect.height);
+            Scr.canvas.width,
+            Scr.canvas.height);
 
         // grab shared memory
 
@@ -508,9 +508,9 @@ void    VID_Init(uint8_p palette) {
     for (i = 0; i < InksNum; i++)
         vid_gamma[i] = i;
 
-    Scr.vrect.width = 320;
-    Scr.vrect.height = 200;
-    // scr.aspect = 1.0; calcAspectRect(&Scr.vrect);
+    Scr.canvas.width = 320;
+    Scr.canvas.height = 200;
+    // scr.aspect = 1.0; calcAspectRect(&Scr.canvas);
     Scr.numpages = 2;
     Scr.pColorMapPal = host_colormap;
 
@@ -559,9 +559,9 @@ void    VID_Init(uint8_p palette) {
     if ((pnum = COM_CheckParm("-winsize"))) {
         if (pnum >= com.argc - 2)
             Sys_Error("VID: -winsize <width> <height>\n");
-        Scr.vrect.width = Q_atoi(com.argv[pnum + 1]);
-        Scr.vrect.height = Q_atoi(com.argv[pnum + 2]);
-        if (!Scr.vrect.width || !Scr.vrect.height)
+        Scr.canvas.width = Q_atoi(com.argv[pnum + 1]);
+        Scr.canvas.height = Q_atoi(com.argv[pnum + 2]);
+        if (!Scr.canvas.width || !Scr.canvas.height)
             Sys_Error("VID: Bad window width/height\n");
     }
 
@@ -629,7 +629,7 @@ void    VID_Init(uint8_p palette) {
         x_win = XCreateWindow(x_disp,
             XRootWindow(x_disp, x_visinfo->screen),
             0, 0,    // x, y
-            Scr.vrect.width, Scr.vrect.height,
+            Scr.canvas.width, Scr.canvas.height,
             0, // borderwidth
             x_visinfo->depth,
             InputOutput,
@@ -700,11 +700,11 @@ void    VID_Init(uint8_p palette) {
 
     current_framebuffer = false;
     vid.rowBytes = x_framebuffer[0]->bytes_per_line;
-    Scr.vrect.pBuff = x_framebuffer[0]->data;
+    Scr.canvas.pBuff = x_framebuffer[0]->data;
     Scr.con.pBuff = x_framebuffer[0]->data;
     Scr.con.rowBytes = vid.rowBytes;
-    Scr.con.width = Scr.vrect.width;
-    Scr.con.height = Scr.vrect.height;
+    Scr.con.width = Scr.canvas.width;
+    Scr.con.height = Scr.canvas.height;
 
     D_InitCaches(surfcache, sizeof(surfcache));
 
@@ -849,8 +849,8 @@ void GetEvent() {
         break;
     case MotionNotify:
         if (mouse_avail && mouse_grabbed) {
-            mouse_x = (float)((int)x_event.xmotion.x - HALF(Scr.vrect.width));
-            mouse_y = (float)((int)x_event.xmotion.y - HALF(Scr.vrect.height));
+            mouse_x = (float)((int)x_event.xmotion.x - HALF(Scr.canvas.width));
+            mouse_y = (float)((int)x_event.xmotion.y - HALF(Scr.canvas.height));
             //printf("m: x=%d,y=%d, mx=%3.2f,my=%3.2f\n",
             //    x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
@@ -861,7 +861,7 @@ void GetEvent() {
                 None, x_win,
                 0, 0,
                 0, 0,
-                HALF(Scr.vrect.width), HALF(Scr.vrect.height)
+                HALF(Scr.canvas.width), HALF(Scr.canvas.height)
             );
             XSelectInput(x_disp, x_win, STD_EVENT_MASK);
         }
@@ -939,19 +939,19 @@ void    VID_Update(vRect_p rects) {
     if (xCfg.notify) {
         printf("config notify\n");
         xCfg.notify = false;
-        Scr.vrect.width = xCfg.notify_width & ~3;
-        Scr.vrect.height = xCfg.notify_height;
+        Scr.canvas.width = xCfg.notify_width & ~3;
+        Scr.canvas.height = xCfg.notify_height;
 
-        printf("w = %d, h = %d\n", Scr.vrect.width, Scr.vrect.height);
+        printf("w = %d, h = %d\n", Scr.canvas.width, Scr.canvas.height);
 
         if (doShm)  ResetSharedFrameBuffers();
         else        ResetFrameBuffer();
 
         vid.rowBytes = x_framebuffer[0]->bytes_per_line;
-        Scr.vrect.pBuff = x_framebuffer[current_framebuffer]->data;
-        Scr.con.pBuff = Scr.vrect.pBuff;
-        Scr.con.width = Scr.vrect.width;
-        Scr.con.height = Scr.vrect.height;
+        Scr.canvas.pBuff = x_framebuffer[current_framebuffer]->data;
+        Scr.con.pBuff = Scr.canvas.pBuff;
+        Scr.con.width = Scr.canvas.width;
+        Scr.con.height = Scr.canvas.height;
         Scr.con.rowBytes = vid.rowBytes;
 
         SCR_RequestCalcRefdef();                // force a surface cache flush
@@ -991,8 +991,8 @@ void    VID_Update(vRect_p rects) {
         }
         //        printf("%lf\n", (LegTime_t)(gethrtime()-s)/1.0e9);
         current_framebuffer = !current_framebuffer;
-        Scr.vrect.pBuff = x_framebuffer[current_framebuffer]->data;
-        Scr.con.pBuff = Scr.vrect.pBuff;
+        Scr.canvas.pBuff = x_framebuffer[current_framebuffer]->data;
+        Scr.con.pBuff = Scr.canvas.pBuff;
         XSync(x_disp, False);
 
     }

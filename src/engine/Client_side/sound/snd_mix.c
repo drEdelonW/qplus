@@ -242,7 +242,7 @@ void S_PaintChannels(int endtime) {
             int ltime = paintedtime;
 
             while (ltime < end) { // paint up to end
-                int count = ((ch->end < end) ? ch->end : end) - ltime;
+                int count = SmallerOf(ch->end, end) - ltime;
 
                 if (count > 0) {
                     if (sc->width == 1) SND_PaintChannelFrom8(ch, sc, count);

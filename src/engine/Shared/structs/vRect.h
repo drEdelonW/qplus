@@ -17,3 +17,13 @@ struct vRect_s {
 #endif
     };
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height); // mokked in vid_null.c
+
+#ifdef __cplusplus
+}
+#endif

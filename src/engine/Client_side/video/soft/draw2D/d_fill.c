@@ -28,7 +28,7 @@ D_FillRect
 ================
 */
 void D_FillRect(vRect_p rect, int color) {
-    if (!Scr.vrect.pBuff)   return;
+    if (!Scr.canvas.pBuff)   return;
     int rx = rect->x;
     int ry = rect->y;
     int rwidth = rect->width;
@@ -42,16 +42,16 @@ void D_FillRect(vRect_p rect, int color) {
         rheight += ry;
         ry = 0;
     }
-    if (rx + rwidth > Scr.vrect.width)
-        rwidth = Scr.vrect.width - rx;
-    if (ry + rheight > Scr.vrect.height)
-        rheight = Scr.vrect.height - rx;
+    if (rx + rwidth > Scr.canvas.width)
+        rwidth = Scr.canvas.width - rx;
+    if (ry + rheight > Scr.canvas.height)
+        rheight = Scr.canvas.height - rx;
 
     if ((rwidth < 1) ||
         (rheight < 1))
         return;
 
-    uint8_p dest = ((uint8_p)Scr.vrect.pBuff + ry * Scr.vrect.rowBytes + rx);
+    uint8_p dest = ((uint8_p)Scr.canvas.pBuff + ry * Scr.canvas.rowBytes + rx);
 
     if (((rwidth & 0x03) == 0) &&
         (((uintptr_t)dest & 0x03) == 0)
@@ -66,7 +66,7 @@ void D_FillRect(vRect_p rect, int color) {
         for (int ry = 0; ry < rheight; ry++) {
             for (int rx = 0; rx < rwidth; rx++)
                 ldest[rx] = color;
-            ldest = (uint32_p)((uint8_p)ldest + Scr.vrect.rowBytes);
+            ldest = (uint32_p)((uint8_p)ldest + Scr.canvas.rowBytes);
         }
     }
     else {
@@ -74,7 +74,7 @@ void D_FillRect(vRect_p rect, int color) {
         for (int ry = 0; ry < rheight; ry++) {
             for (int rx = 0; rx < rwidth; rx++)
                 dest[rx] = color;
-            dest += Scr.vrect.rowBytes;
+            dest += Scr.canvas.rowBytes;
         }
     }
 }

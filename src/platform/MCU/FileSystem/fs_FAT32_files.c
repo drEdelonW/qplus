@@ -34,7 +34,7 @@ int FAT32_ReadFileToBuffer(cStringRO path, uint8_t* dst, uint32_t max_len, uint3
             return -1;
         }
 
-        uint32_t to_copy = (bytes_left < bytes_per_cluster) ? bytes_left : bytes_per_cluster;
+        uint32_t to_copy = SmallerOf(bytes_left, bytes_per_cluster);
 
         for (uint32_t i = 0; i < to_copy; ++i) {
             dst[offset + i] = cluster_buf[i];
@@ -121,7 +121,7 @@ int FAT32_FileRead(FAT32_File_t* fh, void* dst, uint32_t bytes_to_read, uint32_p
         uint32_t pos_in_cluster = fh->position % fh->bytes_per_cluster;
         uint32_t left_in_cluster = fh->bytes_per_cluster - pos_in_cluster;
 
-        uint32_t chunk = (bytes_to_read < left_in_cluster) ? bytes_to_read : left_in_cluster;
+        uint32_t chunk = SmallerOf(bytes_to_read, left_in_cluster);
 
         // copy chunk
         for (uint32_t i = 0; i < chunk; ++i) {

@@ -215,8 +215,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
 	poldmode = pcurrentmode;
 	pcurrentmode = pnewmode;
 
-	Scr.vrect.width = pcurrentmode->width;
-	Scr.vrect.height = pcurrentmode->height;
+	Scr.canvas.width = pcurrentmode->width;
+	Scr.canvas.height = pcurrentmode->height;
 	scr.aspect = pcurrentmode->aspect;
 	vid.rowBytes = pcurrentmode->rowbytes;
 
@@ -236,8 +236,8 @@ int VID_SetMode(int modenum, uint8_p palette) {
 		else if (stat == -1) {
 			// not enough memory; just put things back the way they were
 			pcurrentmode = poldmode;
-			Scr.vrect.width = pcurrentmode->width;
-			Scr.vrect.height = pcurrentmode->height;
+			Scr.canvas.width = pcurrentmode->width;
+			Scr.canvas.height = pcurrentmode->height;
 			scr.aspect = pcurrentmode->aspect;
 			vid.rowBytes = pcurrentmode->rowbytes;
 			return 0;

@@ -212,11 +212,11 @@ bool CheckPixelMultiply() {
 
         XConfigureWindow(x_disp, x_win, CWWidth | CWHeight, &chg);
 
-        Scr.vrect.width = MP(wattr.width) & ~3;
-        Scr.vrect.height = MP(wattr.height);
+        Scr.canvas.width = MP(wattr.width) & ~3;
+        Scr.canvas.height = MP(wattr.height);
 
-        ClampLessThen(&Scr.vrect.width, 320);
-        ClampLessThen(&Scr.vrect.height, 200);
+        ClampLessThen(&Scr.canvas.width, 320);
+        ClampLessThen(&Scr.canvas.height, 200);
         VID_ResetFramebuffer();
 
         return true;
@@ -352,9 +352,9 @@ void VID_Init(uint8_p palette) {
     for (i = 0; i < InksNum; i++)
         vid_gamma[i] = i;
 
-    Scr.vrect.width = 320;
-    Scr.vrect.height = 200;
-    // scr.aspect = 1.0; calcAspectRect(&Scr.vrect);
+    Scr.canvas.width = 320;
+    Scr.canvas.height = 200;
+    // scr.aspect = 1.0; calcAspectRect(&Scr.canvas);
     Scr.numpages = 2;
     Scr.pColorMapPal = host_colormap;
 
@@ -466,15 +466,15 @@ void VID_Init(uint8_p palette) {
     ClampLessThen(&desired_width, w);
     ClampLessThen(&desired_height, h);
 
-    Scr.vrect.width = MP(desired_width);
-    Scr.vrect.height = MP(desired_height);
+    Scr.canvas.width = MP(desired_width);
+    Scr.canvas.height = MP(desired_height);
 
     //
     // patch things up so game doesn't fail if window is too small
     //
 
-    ClampLessThen(&Scr.vrect.width, 320);
-    ClampLessThen(&Scr.vrect.height, 200);
+    ClampLessThen(&Scr.canvas.width, 320);
+    ClampLessThen(&Scr.canvas.height, 200);
 
     //
     // see if we're going to use threads
@@ -584,14 +584,14 @@ VID_ResetFramebuffer() {
         return;
     }
 
-    //printf("VID_ResetFramebuffer: Scr.vrect.width %d, Scr.vrect.height %d\n", Scr.vrect.width, Scr.vrect.height);
+    //printf("VID_ResetFramebuffer: Scr.canvas.width %d, Scr.canvas.height %d\n", Scr.canvas.width, Scr.canvas.height);
 
     xil_destroy(display_image);
 
     xil_destroy(quake_image);
 
     display_image = xil_create_from_window(state, x_disp, x_win);
-    quake_image = xil_create(state, Scr.vrect.width, Scr.vrect.height, 1, XIL_BYTE);
+    quake_image = xil_create(state, Scr.canvas.width, Scr.canvas.height, 1, XIL_BYTE);
 
     xil_export(quake_image);
 
@@ -605,18 +605,18 @@ VID_ResetFramebuffer() {
         Sys_Error("xil_get_memory_storage");
 
     vid.rowBytes = storage.byte.scanline_stride;
-    Scr.vrect.pBuff = storage.byte.data;
-    Scr.con.pBuff = Scr.vrect.pBuff;
+    Scr.canvas.pBuff = storage.byte.data;
+    Scr.con.pBuff = Scr.canvas.pBuff;
     Scr.con.rowBytes = vid.rowBytes;
-    Scr.con.width = Scr.vrect.width;
-    Scr.con.height = Scr.vrect.height;
+    Scr.con.width = Scr.canvas.width;
+    Scr.con.height = Scr.canvas.height;
 
     SCR_RequestCalcRefdef();    // force a surface cache flush
 
     free(vid.zBuff.pZBuff);
 
-    vid.zBuff.pZBuff = malloc(PM(Scr.vrect.width) * PM(Scr.vrect.height) * sizeof(*vid.zBuff.pZBuff));
-    //Hunk_HighAllocName(PM(Scr.vrect.width)*PM(Scr.vrect.height)*sizeof(*vid.zBuff.pZBuff), "zbuff");
+    vid.zBuff.pZBuff = malloc(PM(Scr.canvas.width) * PM(Scr.canvas.height) * sizeof(*vid.zBuff.pZBuff));
+    //Hunk_HighAllocName(PM(Scr.canvas.width)*PM(Scr.canvas.height)*sizeof(*vid.zBuff.pZBuff), "zbuff");
 }
 
 VID_ResetFramebuffer_MT() {
@@ -626,7 +626,7 @@ VID_ResetFramebuffer_MT() {
 
     TypeLess_ptr  update_thread();
 
-    printf("VID_ResetFramebuffer: Scr.vrect.width %d, Scr.vrect.height %d\n", Scr.vrect.width, Scr.vrect.height);
+    printf("VID_ResetFramebuffer: Scr.canvas.width %d, Scr.canvas.height %d\n", Scr.canvas.width, Scr.canvas.height);
 
     old_display_image = display_image;
 
@@ -642,7 +642,7 @@ VID_ResetFramebuffer_MT() {
 
     free(vid.zBuff.pZBuff);
 
-    vid.zBuff.pZBuff = malloc(PM(Scr.vrect.width) * PM(Scr.vrect.height) * sizeof(*vid.zBuff.pZBuff));
+    vid.zBuff.pZBuff = malloc(PM(Scr.canvas.width) * PM(Scr.canvas.height) * sizeof(*vid.zBuff.pZBuff));
 }
 
 void VID_ShiftPalette(uint8_p p) {
@@ -779,15 +779,15 @@ void GetEvent() {
     case MotionNotify:
 
         if (_windowed_mouse.value) {
-            mouse_x = (float)((int)x_event.xmotion.x - (int)(Scr.vrect.width / 2));
-            mouse_y = (float)((int)x_event.xmotion.y - (int)(Scr.vrect.height / 2));
+            mouse_x = (float)((int)x_event.xmotion.x - (int)(Scr.canvas.width / 2));
+            mouse_y = (float)((int)x_event.xmotion.y - (int)(Scr.canvas.height / 2));
             //printf("m: x=%d,y=%d, mx=%3.2f,my=%3.2f\n",
             // x_event.xmotion.x, x_event.xmotion.y, mouse_x, mouse_y);
 
                         /* move the mouse to the window center again */
             XSelectInput(x_disp, x_win, x_std_event_mask & ~PointerMotionMask);
             XWarpPointer(x_disp, None, x_win, 0, 0, 0, 0,
-                (Scr.vrect.width / 2), (Scr.vrect.height / 2));
+                (Scr.canvas.width / 2), (Scr.canvas.height / 2));
             XSelectInput(x_disp, x_win, x_std_event_mask);
         }
         else {
@@ -918,11 +918,11 @@ VID_Update(vRect_p rects) {
 
         config_notify = false;
 
-        Scr.vrect.width = MP(config_notify_width) & ~3;
-        Scr.vrect.height = MP(config_notify_height);
+        Scr.canvas.width = MP(config_notify_width) & ~3;
+        Scr.canvas.height = MP(config_notify_height);
 
-        ClampLessThen(&Scr.vrect.width, 320);
-        ClampLessThen(&Scr.vrect.height, 200);
+        ClampLessThen(&Scr.canvas.width, 320);
+        ClampLessThen(&Scr.canvas.height, 200);
 
         VID_ResetFramebuffer();
 
@@ -948,8 +948,8 @@ VID_Update(vRect_p rects) {
         if (xil_get_memory_storage(quake_image, &storage) == FALSE)
             Sys_Error("xil_get_memory_storage");
 
-        Scr.vrect.pBuff = storage.byte.data;
-        Scr.con.pBuff = Scr.vrect.pBuff;
+        Scr.canvas.pBuff = storage.byte.data;
+        Scr.con.pBuff = Scr.canvas.pBuff;
 
         rects = rects->pnext;
     }
@@ -987,11 +987,11 @@ VID_Update_MT(vRect_p rects) {
 
         config_notify = false;
 
-        Scr.vrect.width = MP(config_notify_width) & ~3;
-        Scr.vrect.height = MP(config_notify_height);
+        Scr.canvas.width = MP(config_notify_width) & ~3;
+        Scr.canvas.height = MP(config_notify_height);
 
-        ClampLessThen(&Scr.vrect.width, 320);
-        ClampLessThen(&Scr.vrect.height, 200);
+        ClampLessThen(&Scr.canvas.width, 320);
+        ClampLessThen(&Scr.canvas.height, 200);
 
         VID_ResetFramebuffer_MT();
 
@@ -1019,12 +1019,12 @@ drain_renderpipeline(XilImage old) {
     xil_destroy(old);
 
 
-    new = xil_create(state, Scr.vrect.width, Scr.vrect.height, 1, XIL_BYTE);
+    new = xil_create(state, Scr.canvas.width, Scr.canvas.height, 1, XIL_BYTE);
 
     if (write(render_pipeline[0], &new, sizeof(new)) != sizeof(new))
         Sys_Error("drain_renderpipeline: write");
 
-    new = xil_create(state, Scr.vrect.width, Scr.vrect.height, 1, XIL_BYTE);
+    new = xil_create(state, Scr.canvas.width, Scr.canvas.height, 1, XIL_BYTE);
 
     xil_export(new);
 
@@ -1032,11 +1032,11 @@ drain_renderpipeline(XilImage old) {
         Sys_Error("xil_get_memory_storage");
 
     vid.rowBytes = storage.byte.scanline_stride;
-    Scr.vrect.pBuff = storage.byte.data;
-    Scr.con.pBuff = Scr.vrect.pBuff;
+    Scr.canvas.pBuff = storage.byte.data;
+    Scr.con.pBuff = Scr.canvas.pBuff;
     Scr.con.rowBytes = vid.rowBytes;
-    Scr.con.width = Scr.vrect.width;
-    Scr.con.height = Scr.vrect.height;
+    Scr.con.width = Scr.canvas.width;
+    Scr.con.height = Scr.canvas.height;
 
     SCR_RequestCalcRefdef();    // force a surface cache flush
 
@@ -1060,8 +1060,8 @@ sched_update(XilImage image) {
     if (xil_get_memory_storage(new, &storage) == FALSE)
         Sys_Error("xil_get_memory_storage");
 
-    Scr.vrect.pBuff = storage.byte.data;
-    Scr.con.pBuff = Scr.vrect.pBuff;
+    Scr.canvas.pBuff = storage.byte.data;
+    Scr.con.pBuff = Scr.canvas.pBuff;
 
     return (new);
 }

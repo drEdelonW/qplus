@@ -38,10 +38,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "screen_prv.h"
 
-#if 0
-static vRect_p  _pConUpdate;
-#endif
-
 /*
 ===============================================================================
 
@@ -56,10 +52,10 @@ void SCR_EraseCenterString() {
     }
 
     int y = (_scr.center_lines <= 4) ?
-        Scr.vrect.height * 0.35 : 48;
+        Scr.canvas.height * 0.35 : 48;
 
     Scr.copytop = true;
-    Draw_TileClear(0, y, Scr.vrect.width, MUL8(_scr.erase_lines));
+    Draw_TileClear(0, y, Scr.canvas.width, MUL8(_scr.erase_lines));
 }
 
 //=============================================================================
@@ -92,19 +88,14 @@ void SCR_ScreenShot_f() {
 
         fsPathStr_t checkname;
         snprintf(checkname, sizeof(checkname), "%s/%s", com.gamedir, pcxname);
-        if (Sys_FileTime(checkname) == -1) {     // save the pcx file
-            D_EnableBackBufferAccess(); // enable direct drawing of console to back
-            //  buffer
-
-            WritePCXfile(
-                pcxname, Scr.vrect.pBuff,
-                Scr.vrect.width, Scr.vrect.height,
-                Scr.vrect.rowBytes, host_basepal
-            );
-
-            D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
-            //  for linear writes all the time
-
+        if (Sys_FileTime(checkname) == -1) { // save the pcx file
+            D_EnableBackBufferAccess(); { // enable direct drawing of console to back buffer
+                WritePCXfile(
+                    pcxname, Scr.canvas.pBuff,
+                    Scr.canvas.width, Scr.canvas.height,
+                    Scr.canvas.rowBytes, host_basepal
+                );
+            } D_DisableBackBufferAccess(); // for adapters that can't stay mapped in for linear writes all the time
             Con_Printf("Wrote %s\n", pcxname);
         }
     }
@@ -134,8 +125,8 @@ void SCR_UpdateScreen() {
         return;
 
     if (Scr.numpages > 1) {
-        Scr.vrect.pBuff = vid.frameBuff.pBuff;
-        Scr.con.pBuff = Scr.vrect.pBuff;
+        Scr.canvas.pBuff = vid.frameBuff.pBuff;
+        Scr.con.pBuff = Scr.canvas.pBuff;
     }
 
     Scr.copytop = false;        // TODO: wrap this valuse to avoid global publishing
@@ -173,18 +164,15 @@ void SCR_UpdateScreen() {
     D_EnableBackBufferAccess(); { // of all overlay stuff if drawing directly
         if (fullupdate++ < Scr.numpages) { // clear the entire screen
             Scr.copyeverything = true;
-            Draw_TileClear(0, 0, Scr.vrect.width, Scr.vrect.height);    // TODO: move to screen compositor
+            Draw_TileClear(0, 0, Scr.canvas.width, Scr.canvas.height);    // TODO: move to screen compositor
             Sbar_Changed();
         }
 
-#if 0
-        _pConUpdate = NULL;
-#endif
 
         SCR_SetUpToDrawConsole();
         SCR_EraseCenterString();
 
-    }D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
+    } D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
     //  for linear writes all the time
 
     VID_LockBuffer(); {
@@ -195,10 +183,6 @@ void SCR_UpdateScreen() {
         SCR_Composite();    // main state based compositor
     } D_DisableBackBufferAccess(); // for adapters that can't stay mapped in
     //  for linear writes all the time
-#if 0
-    if (_pConUpdate)
-        D_UpdateRects(_pConUpdate);
-#endif
 
     V_UpdatePalette();
 
@@ -211,24 +195,24 @@ void SCR_UpdateScreen() {
         vrect = (vRect_t){
             .x = 0,
             .y = 0,
-            .width = Scr.vrect.width,
-            .height = Scr.vrect.height,
+            .width = Scr.canvas.width,
+            .height = Scr.canvas.height,
         };
     }
     else if (Scr.copytop) {     // fullScreen viewport withOUT sBar
         vrect = (vRect_t){
             .x = 0,
             .y = 0,
-            .width = Scr.vrect.width,
-            .height = Scr.vrect.height - sb_lines,
+            .width = Scr.canvas.width,
+            .height = Scr.canvas.height - sb_lines,
         };
     }
     else {                      // center screen rectangle viewport with sBar
         vrect = (vRect_t){
-            .x = Scr.vrect.x,
-            .y = Scr.vrect.y,
-            .width = Scr.vrect.width,
-            .height = Scr.vrect.height,
+            .x = Scr.canvas.x,
+            .y = Scr.canvas.y,
+            .width = Scr.canvas.width,
+            .height = Scr.canvas.height,
         };
     }
     VID_Update(&vrect);
