@@ -813,14 +813,7 @@ R_RenderView
 r_refdef must be set before the first call
 ================
 */
-static  qColor8_t _warpBuffer[WARP_WIDTH * WARP_HEIGHT];
 void R_RenderView_() {
-    vid.maxwarp = (vRect_t){ // SoftRender WarpEffect buffer
-        .width = WARP_WIDTH,
-        .height = WARP_HEIGHT,
-        .pClr = _warpBuffer
-    };
-
     if (r_timegraph.value ||
         r_speeds.value ||
         r_dspeeds.value

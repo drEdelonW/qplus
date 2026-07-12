@@ -35,7 +35,6 @@ D_Init
 ===============
 */
 void D_Init() {
-
     Cvar_RegisterVariable(&d_subdiv16);
     Cvar_RegisterVariable(&d_mipcap);
     Cvar_RegisterVariable(&d_mipscale);
@@ -101,7 +100,15 @@ static float _BaseMip[MIPLEVELS - 1] = {
     0.5f * 0.8f,
     0.25f * 0.8f
 };
+static qColor8_t _warpBuffer[WARP_WIDTH * WARP_HEIGHT];
 void D_SetupFrame() {
+    if (!vid.maxwarp.pClr)
+        vid.maxwarp = (vRect_t){ // SoftRender WarpEffect buffer
+            .width = WARP_WIDTH,
+            .height = WARP_HEIGHT,
+            .pClr = _warpBuffer
+        };
+
     d_viewbuffer = (r_dowarp) ? vid.maxwarp.pClr : vid.frameBuff.pClr;
     screenwidth = (r_dowarp) ? WARP_WIDTH : Scr.canvas.rowBytes;
 

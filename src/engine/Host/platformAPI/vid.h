@@ -40,7 +40,6 @@ void VID_UnlockBuffer();
 
 #define WARP_WIDTH  (320)
 #define WARP_HEIGHT (200)
-// static  qColor8_t _warpBuffer[WARP_WIDTH * WARP_HEIGHT]; // r_main.c
 
 typedef struct {
     vRect_t frameBuff;      // invisible buffer inside pBuff
