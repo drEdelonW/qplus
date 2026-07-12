@@ -553,6 +553,7 @@ int create_gl_context(App_p app) {
 void apply_vid_state(App_p app) {
     Scr.pColorMapPal = host_colormap;
     Scr.canvas.width = app->xwin.width;
+    Scr.canvas.height = app->xwin.height;
     Scr.numpages = 2;
     SCR_RequestCalcRefdef();
     glViewport(0, 0, app->xwin.width, app->xwin.height);
