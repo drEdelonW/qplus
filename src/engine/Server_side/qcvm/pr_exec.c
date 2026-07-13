@@ -84,7 +84,7 @@ void PR_Profile_f() {
     do {
         int max = 0;
         best = NULL;
-        for (int i = 0; i < progs->functions.num; i++) {
+        for (int i = 0; i < pProgsDat->functions.num; i++) {
             dFunction_p func = &pr_functions[i];
             if (func->profile > max) {
                 max = func->profile;
@@ -199,7 +199,7 @@ PR_ExecuteProgram
 */
 void PR_ExecuteProgram(func_t fnum) {
     if (!fnum ||
-        (fnum >= progs->functions.num)) {
+        (fnum >= pProgsDat->functions.num)) {
         if (pr_global_struct->self)
             ED_Print(ED_GetEDictByOffs(pr_global_struct->self));
         Host_Error("PR_ExecuteProgram: NULL function");

@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "q_tools.h"
 #include "world.h"
 #include "render.h"
+#include "trace.h"
 
 
 
@@ -68,7 +69,6 @@ void Chase_Update() {
     ClampLessThen(&dist, 1.f);
 
     r_refdef.view.aim.pitch = DEG2RAD(-atanf(stop.z / dist));
-
     r_refdef.view.loc = chaseDest;   // move towards destination
 }
 

@@ -36,10 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 PF_pointcontents
 =============
 */
-void PF_pointcontents() {
-    vec3_t v = G_VECTOR(OFS_PARM0);
-    G_FLOAT(OFS_RETURN) = SV_PointContents(v);
-}
+void PF_pointcontents() { G_FLOAT(OFS_RETURN) = SV_PointContents(G_VECTOR(OFS_PARM0)); }
 
 
 /*
@@ -57,14 +54,18 @@ void PF_lightstyle() {
     sv.lightstyles[style] = val;
 
     // send message to all clients on this server
-    if (sv.state != ss_active) return;
+    if (sv.state != ss_active)
+        return;
 
     RmtClient_p client = svs.clients;
     for (int j = 0; j < GetSvMaxClients(); j++, client++)
-        if (client->active || client->spawned) {
-            MSG_WriteChar(&client->message, svc_lightstyle);
-            MSG_WriteChar(&client->message, (int8_t)style);
-            MSG_WriteString(&client->message, val);
+        if ((client->active) ||
+            (client->spawned)
+            ) {
+            MSG_WriteChar(&client->message, svc_lightstyle); {
+                MSG_WriteChar(&client->message, (int8_t)style);
+                MSG_WriteString(&client->message, val);
+            }
         }
 }
 
@@ -76,13 +77,7 @@ PF_particle
 particle(origin, color, count)
 =================
 */
-void PF_particle() {
-    vec3_t org = G_VECTOR(OFS_PARM0);
-    vec3_t dir = G_VECTOR(OFS_PARM1);
-    float color = G_FLOAT(OFS_PARM2);
-    float count = G_FLOAT(OFS_PARM3);
-    SV_StartParticle(org, dir, (int)color, (size_t)count);
-}
+void PF_particle() { SV_StartParticle(G_VECTOR(OFS_PARM0), G_VECTOR(OFS_PARM1), (int)G_FLOAT(OFS_PARM2), (size_t)G_FLOAT(OFS_PARM3)); }
 
 void PR_CheckEmptyString(cString str) {
     if (str[0] <= ' ')
@@ -159,8 +154,7 @@ void PF_changelevel() {
         return;
     svs.changelevel_issued = true;
 
-    cString str = G_STRING(OFS_PARM0);
-    Cbuf_AddText(va("changelevel %s\n", str));
+    Cbuf_AddText(va("changelevel %s\n", G_STRING(OFS_PARM0)));
 #endif
 }
 

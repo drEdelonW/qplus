@@ -35,7 +35,7 @@ edict_p SV_TestEntityPosition(edict_p ent) {
         MOVE_NORMAL, ent
     );
 
-    return (trace.startsolid) ? Edicts : NULL;
+    return (trace.startsolid) ? Edicts : NULL; // world map or none
 }
 
 
@@ -52,7 +52,7 @@ eventually rotation) of the end points
 trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
     // fill in a default trace
     trace_t trace = {
-        .fraction = 1,
+        .fraction = 1.f,
         .allsolid = true,
         .endpos = end
     };
@@ -60,7 +60,6 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
     // get the clipping hull
     vec3_t offset;
     Hull_p hull = SV_HullForEntity(ent, bb, &offset);
-
     vec3_t start_l = VectorSubtract(start, offset);
     vec3_t end_l = VectorSubtract(end, offset);
 
@@ -121,13 +120,13 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
 #endif
 
     // fix trace up by the offset
-    if (trace.fraction != 1)
+    if (trace.fraction != 1.f)
         trace.endpos = VectorAdd(trace.endpos, offset);
 
     // did we clip the move?
-    if ((trace.fraction < 1) ||
+    if ((trace.fraction < 1.f) ||
         (trace.startsolid)
-        )   trace.ent = ent;
+        )   trace.pEnt = ent;
 
     return trace;
 }
@@ -154,7 +153,7 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
 
         if (touch->v.solid == SOLID_TRIGGER)    Host_SysError("Trigger in clipping list");
 
-        if ((clip->type == MOVE_NOMONSTERS) &&
+        if ((clip->moveType == MOVE_NOMONSTERS) &&
             (touch->v.solid != SOLID_BSP)
             )   continue;
 
@@ -191,7 +190,7 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
             trace.startsolid ||
             (trace.fraction < clip->trace.fraction)
             ) {
-            trace.ent = touch;
+            trace.pEnt = touch;
             if (clip->trace.startsolid) {
                 clip->trace = trace;
                 clip->trace.startsolid = true;
@@ -241,7 +240,7 @@ trace_t SV_Move(vec3_t start, BBox_t bb, vec3_t end, phymovetype_t type, edict_p
         .end = end,
 
         .trace = SV_ClipMoveToEntity(Edicts, start, bb, end),
-        .type = type,
+        .moveType = type,
         .passedict = passedict
     };
 

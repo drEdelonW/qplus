@@ -32,10 +32,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 cString PF_VarString(int first) {
     static char _out[256];
-
-    _out[0] = 0;
+    _out[0] = 0x00;
     for (int i = first; i < pr_argc; i++)
-        strcat(_out, G_STRING((OFS_PARM0 + i * 3)));
+        strcat(_out, G_STRING((OFS_PARM0 + (i * 3))));
 
     return _out;
 }
@@ -53,14 +52,11 @@ error(value)
 */
 
 void PF_error() {
-    cString str = PF_VarString(0);
     Con_Printf(
         "======SERVER ERROR in %s:\n%s\n",
-        PR_GetQString(pr_xFunction->s_name),
-        str);
-    edict_p ed = ED_GetEDictByOffs(pr_global_struct->self);
-    ED_Print(ed);
-
+        PR_GetQString(pr_xFunction->s_name), PF_VarString(0)
+    );
+    ED_Print(ED_GetEDictByOffs(pr_global_struct->self));
     Host_Error("Program error");
 }
 
@@ -76,11 +72,10 @@ objerror(value)
 =================
 */
 void PF_objerror() {
-    cString str = PF_VarString(0);
     Con_Printf(
         "======OBJECT ERROR in %s:\n%s\n",
-        PR_GetQString(pr_xFunction->s_name),
-        str);
+        PR_GetQString(pr_xFunction->s_name), PF_VarString(0)
+    );
     edict_p ed = ED_GetEDictByOffs(pr_global_struct->self);
     ED_Print(ed);
     ED_Free(ed);
@@ -98,10 +93,7 @@ broadcast print to everyone on server
 bprint(value)
 =================
 */
-void PF_bprint() {
-    cString str = PF_VarString(0);
-    SV_BroadcastPrintf("%s", str);
-}
+void PF_bprint() { SV_BroadcastPrintf("%s", PF_VarString(0)); }
 
 
 /*
@@ -114,18 +106,16 @@ sprint(clientent, value)
 =================
 */
 void PF_sprint() {
-    uint32_t ent_num = G_EDICTNUM(OFS_PARM0);
-    cString str = PF_VarString(1);
-
-    if ((ent_num < 1) ||
-        (ent_num > GetSvMaxClients())) {
+    EdIdx ent_num = G_EDICTNUM(OFS_PARM0);
+    if ((ent_num < EdictPlayer1) ||
+        (ent_num > GetSvMaxClients())
+        ) {
         Con_Printf("tried to sprint to a non-client\n");    return;
     }
-
     RmtClient_p client = &svs.clients[ent_num - 1];
-
-    MSG_WriteChar(&client->message, svc_print);
-    MSG_WriteString(&client->message, str);
+    MSG_WriteChar(&client->message, svc_print); {
+        MSG_WriteString(&client->message, PF_VarString(1));
+    }
 }
 
 
@@ -139,20 +129,17 @@ centerprint(clientent, value)
 =================
 */
 void PF_centerprint() {
-    uint32_t entnum = G_EDICTNUM(OFS_PARM0);
-    cString str = PF_VarString(1);
-
-    if ((entnum < 1) ||
+    EdIdx entnum = G_EDICTNUM(OFS_PARM0);
+    if ((entnum < EdictPlayer1) ||
         (entnum > GetSvMaxClients())
         ) {
-        Con_Printf("tried to sprint to a non-client\n");
-        return;
+        Con_Printf("tried to sprint to a non-client\n");    return;
     }
 
     RmtClient_p client = &svs.clients[entnum - 1];
-
-    MSG_WriteChar(&client->message, svc_centerprint);
-    MSG_WriteString(&client->message, str);
+    MSG_WriteChar(&client->message, svc_centerprint); {
+        MSG_WriteString(&client->message, PF_VarString(1));
+    }
 }
 
 
@@ -164,7 +151,6 @@ PF_dprint
 void PF_dprint() { Con_DPrintf("%s", PF_VarString(0)); }
 
 static char _pr_string_temp[128];
-
 void PF_ftos() {
     float v = G_FLOAT(OFS_PARM0);
 
@@ -176,8 +162,8 @@ void PF_ftos() {
 
 
 void PF_vtos() {
-    snprintf(
-        _pr_string_temp, sizeof(_pr_string_temp),
+    snprintf(_pr_string_temp,
+        sizeof(_pr_string_temp),
         "'%5.1f %5.1f %5.1f'",
         G_VECTOR(OFS_PARM0).x,
         G_VECTOR(OFS_PARM0).y,
@@ -189,7 +175,11 @@ void PF_vtos() {
 
 #ifdef QUAKE2
 void PF_etos() {
-    snprintf(_pr_string_temp, sizeof(_pr_string_temp), "entity %i", G_EDICTNUM(OFS_PARM0));
+    snprintf(_pr_string_temp,
+        sizeof(_pr_string_temp),
+        "entity %i",
+        G_EDICTNUM(OFS_PARM0)
+    );
     G_INT(OFS_RETURN) = PR_SetQString(_pr_string_temp);
 }
 #endif

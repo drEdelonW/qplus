@@ -109,6 +109,7 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
                         SRC_LIST += $(PROG_DIR)/VM_state.c
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
+                        SRC_LIST += $(PROG_DIR)/progLump.c
 
                 SRC_LIST += $(SV_SIDE_DIR)/sv_main.c
                 SRC_LIST += $(SV_SIDE_DIR)/sv_user.c

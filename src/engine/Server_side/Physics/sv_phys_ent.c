@@ -152,7 +152,7 @@ void SV_Physics_Toss(edict_p ent) {
             )
         ) {
         ent->v.flags = (float)((int)((EntityFlags_t)ent->v.flags) | FL_ONGROUND);
-        ent->v.groundentity = ED_GetEDictOffs(trace.ent);
+        ent->v.groundentity = ED_GetEDictOffs(trace.pEnt);
         ent->v.velocity = v3Zero;
         ent->v.avelocity = a3Zero;
 
@@ -372,8 +372,8 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
         }
 # endif
 
-        if ((trace.ent) &&
-            (trace.ent != ignore)
+        if ((trace.pEnt) &&
+            (trace.pEnt != ignore)
             )   host_frametime = save_frametime;        // p->color = 224;
         return trace;
     }

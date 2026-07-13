@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
     dFunction_p ED_FindFunction(cString name);
-    void initProgFunction(TypeLess_ptr base, progLump_t pl);
+    void initProgFunction(progLump_t pl);
 
 #ifdef __cplusplus
 }

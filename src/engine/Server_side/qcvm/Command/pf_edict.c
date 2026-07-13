@@ -30,16 +30,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "protocol.h"
 #include "q_tools.h"
 #include "LeafModel.h"
+#include "BBox_tools.h"
 
-void PF_Spawn() {
-    edict_p ed = ED_Alloc();
-    RETURN_EDICT(ed);
-}
-
-void PF_Remove() {
-    edict_p ed = G_EDICT(OFS_PARM0);
-    ED_Free(ed);
-}
+void PF_Spawn() { RETURN_EDICT(ED_Alloc()); }
+void PF_Remove() { ED_Free(G_EDICT(OFS_PARM0)); }
 
 // entity (entity start, .string field, string match) find = #5;
 void PF_Find() {
@@ -112,9 +106,6 @@ findradius (origin, radius)
 */
 void PF_findradius() {
     edict_p chain = Edicts;
-    vec3_t org = G_VECTOR(OFS_PARM0);
-    float rad = G_FLOAT(OFS_PARM1);
-
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
         edict_p ent = ED_GetEDictByIdx(e);
 
@@ -122,13 +113,15 @@ void PF_findradius() {
             (ent->v.solid == SOLID_NOT)
             )   continue;
 
-        vec3_t eorg = VectorSubtract(org,
-            VectorAdd(ent->v.origin,
-                VectorScale(VectorAdd(ent->v.mins, ent->v.maxs), 0.5f)
-            )
-        );
-
-        if (Length(eorg) > rad) continue;
+        if (
+            Length(
+                VectorSubtract(
+                    /*origin*/G_VECTOR(OFS_PARM0), VectorAdd(
+                        ent->v.origin, BBoxMid(EvBBox(&ent->v))
+                    )
+                )
+            ) > /*radius*/G_FLOAT(OFS_PARM1)
+            )   continue;
 
         ent->v.chain = ED_GetEDictOffs(chain);
         chain = ent;
@@ -167,11 +160,9 @@ setorigin (entity, origin)
 */
 void PF_setorigin() {
     edict_p edict = G_EDICT(OFS_PARM0);
-    vec3_t org = G_VECTOR(OFS_PARM1);
-    edict->v.origin = org;
+    edict->v.origin = G_VECTOR(OFS_PARM1);
     SV_LinkEdict(edict, false);
 }
-
 
 
 void SetMinMaxSize(edict_p edict, BBox_t bb, bool rotate) {
@@ -213,9 +204,11 @@ void SetMinMaxSize(edict_p edict, BBox_t bb, bool rotate) {
     // set derived values
     edict->v.mins = rbb.mins;
     edict->v.maxs = rbb.maxs;
-#else
+#elif 0
     edict->v.mins = bb.mins;
     edict->v.maxs = bb.maxs;
+#else
+    EvSetBBox(&edict->v, bb);
 #endif
     edict->v.size = BBoxSize(bb);
 
@@ -231,16 +224,7 @@ the size box is rotated by the current angle
 setsize (entity, minvector, maxvector)
 =================
 */
-void PF_setsize() {
-    edict_p edict = G_EDICT(OFS_PARM0);
-    BBox_t bb = {
-        .mins = G_VECTOR(OFS_PARM1),
-        .maxs = G_VECTOR(OFS_PARM2)
-    };
-
-    SetMinMaxSize(edict, bb, false);
-}
-
+void PF_setsize() { SetMinMaxSize(G_EDICT(OFS_PARM0), BBoxFromVec3(G_VECTOR(OFS_PARM1), G_VECTOR(OFS_PARM2)), false); }
 
 /*
 =================
@@ -250,7 +234,6 @@ setmodel(entity, model)
 =================
 */
 void PF_setmodel() {
-    edict_p edict = G_EDICT(OFS_PARM0);
     cString m = G_STRING(OFS_PARM1);
 
     // check to see if model was properly precached
@@ -261,6 +244,7 @@ void PF_setmodel() {
 
     if (!*check)        PR_RunError("no precache: %s\n", m);
 
+    edict_p edict = G_EDICT(OFS_PARM0);
     edict->v.model = PR_SetQString(m);
     edict->v.modelindex = (float)i; // SV_ModelIndex (m);
 
@@ -294,14 +278,13 @@ PF_setspawnparms
 ==============
 */
 void PF_setspawnparms() {
-    edict_p ent = G_EDICT(OFS_PARM0);
-    uint32_t i = ED_GetEDictIdx(ent);
-    if ((i < 1) ||
-        (i > GetSvMaxClients()))
-        PR_RunError("Entity is not a client");
+    EdIdx i = ED_GetEDictIdx(G_EDICT(OFS_PARM0));
+    if ((i < EdictPlayer1) ||
+        (i > GetSvMaxClients())
+        )   PR_RunError("Entity is not a client");
 
     // copy spawn parms out of the RmtClient_t
-    RmtClient_p client = svs.clients + (i - 1);
+    RmtClient_p client = svs.clients + (i - EdictPlayer1);
 
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
         (&pr_global_struct->parm1)[i] = client->spawn_parms[i];
@@ -314,33 +297,25 @@ void PF_setspawnparms() {
 static uint8_t _checkPvs[MAX_MAP_LEAFS / 8];
 
 uint8_t PF_newcheckclient(uint8_t check) {
-    // cycle to the next one
-    ClampInRange(1u, &check, GetSvMaxClients());
-
+    ClampInRange(EdictPlayer1, &check, GetSvMaxClients()); // cycle to the next one
     uint8_t i = (check == GetSvMaxClients()) ? 0 : (check + 1);
-
-    edict_p ent;
     for (;; i++) {
         if (i == GetSvMaxClients() + 1)
             i = 1;
-
-        ent = ED_GetEDictByIdx(i);
-
         if (i == check) break; // didn't find anything else
 
+        edict_p ent = ED_GetEDictByIdx(i);
         if ((ent->free) ||
             (ent->v.health <= 0) ||
             ((int)ent->v.flags & FL_NOTARGET)
             )   continue;
 
-
-        // anything that is a client, or has a client as an enemy
-        break;
+        break;  // anything that is a client, or has a client as an enemy
     }
 
     // get the PVS for the entity
-    vec3_t org = VectorAdd(ent->v.origin, ent->v.view_ofs);
-    mLeaf_p leaf = Mod_PointInLeaf(org, sv.worldmodel);
+    edict_p ent = ED_GetEDictByIdx(i);
+    mLeaf_p leaf = Mod_PointInLeaf(VectorAdd(ent->v.origin, ent->v.view_ofs), sv.worldmodel);
     uint8_p pvs = Mod_LeafPVS(leaf, sv.worldmodel);
     memcpy(_checkPvs, pvs, (sv.worldmodel->numleafs + 7) >> 3);
 
@@ -365,8 +340,7 @@ name checkclient()
 // #define MAX_CHECK 16
 // int c_invis, c_notvis;
 void PF_checkclient() {
-    // find a new check if on a new frame
-    if ((SV_GetTime() - sv.lastchecktime) >= 0.1) {
+    if ((SV_GetTime() - sv.lastchecktime) >= 0.1) {     // find a new check if on a new frame
         sv.lastcheck = PF_newcheckclient(sv.lastcheck);
         sv.lastchecktime = SV_GetTime();
     }
@@ -374,27 +348,21 @@ void PF_checkclient() {
     // return check if it might be visible
     edict_p ent = ED_GetEDictByIdx(sv.lastcheck);
     if ((ent->free) ||
-        (ent->v.health <= 0)
+        (ent->v.health <= 0.f)
         ) {
-        RETURN_EDICT(Edicts);
-        return;
+        RETURN_EDICT(Edicts);   return;
     }
 
     // if current entity can't possibly see the check entity, return 0
     edict_p self = ED_GetEDictByOffs(pr_global_struct->self);
-    vec3_t view = VectorAdd(self->v.origin, self->v.view_ofs);
-    mLeaf_p leaf = Mod_PointInLeaf(view, sv.worldmodel);
-    int l = (leaf - sv.worldmodel->leafs) - 1;
-    if ((l < 0) ||
-        !(_checkPvs[DIV8(l)] & (1 << (l & 7)))
-        ) {
-        // c_notvis++;
-        RETURN_EDICT(Edicts);
-        return;
+    mLeaf_p leaf = Mod_PointInLeaf(VectorAdd(self->v.origin, self->v.view_ofs), sv.worldmodel);
+    int Leaf = (leaf - sv.worldmodel->leafs) - 1;
+    if ((Leaf < 0) ||
+        !(_checkPvs[DIV8(Leaf)] & (1 << (Leaf & 7)))
+        ) { // c_notvis++;
+        RETURN_EDICT(Edicts);   return;
     }
-
-    // might be able to see it
-    // c_invis++;
-    RETURN_EDICT(ent);
+    // c_invis++;  // might be able to see it
+    RETURN_EDICT(ent);   return;
 }
 

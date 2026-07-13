@@ -14,6 +14,7 @@
 #include "progs.h"
 #include "GlobVars.h"
 #include "GameRule.h"
+#include "trace.h"
 
 
 /* --- movement clip flags (bitmask) --- */
@@ -84,3 +85,5 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink);
 bool SV_CloseEnough(edict_p ent, edict_p goal, float dist);
 void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist);
 void SV_MoveToGoal(void);
+
+edict_p SV_TestEntityPosition(edict_p ent);

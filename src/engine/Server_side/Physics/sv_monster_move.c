@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BBox.h"
 #include "Edict.h"
 #include "world.h"
+#include "trace.h"
 
 
 /*
@@ -204,7 +205,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
         //  Con_Printf ("back on ground\n");
         ent->v.flags = (int)ent->v.flags & ~FL_PARTIALGROUND;
     }
-    ent->v.groundentity = ED_GetEDictOffs(trace.ent);
+    ent->v.groundentity = ED_GetEDictOffs(trace.pEnt);
 
     // the move is ok
     if (relink)

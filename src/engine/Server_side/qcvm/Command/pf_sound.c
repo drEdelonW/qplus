@@ -89,22 +89,13 @@ void PF_ambientsound() {
             break;
 
     if (!*check) {
-        Con_Printf("no precache: %s\n", samp);
-        return;
+        Con_Printf("no precache: %s\n", samp);  return;
     }
 
     // add an svc_spawnambient command to the level signon packet
-
     MSG_WriteByte(&sv.signon, svc_spawnstaticsound);
-#if 0
-    for (int i = 0; i < VECT_DIM; i++)
-        MSG_WriteCoord(&sv.signon, pos.v[i]);
-#else
     MSG_WriteVector(&sv.signon, pos);
-#endif
-
     MSG_WriteByte(&sv.signon, soundnum);
-
     MSG_WriteByte(&sv.signon, (uint8_t)(vol * 255));
     MSG_WriteByte(&sv.signon, (uint8_t)(attenuation * 64));
 }

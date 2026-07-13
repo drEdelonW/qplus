@@ -257,7 +257,7 @@ void SV_WalkMove(edict_p ent) {
     if (downtrace.plane.normal.z > 0.7) {
         if (ent->v.solid == SOLID_BSP) {
             ent->v.flags = (float)((int)((EntityFlags_t)ent->v.flags) | FL_ONGROUND);
-            ent->v.groundentity = ED_GetEDictOffs(downtrace.ent);
+            ent->v.groundentity = ED_GetEDictOffs(downtrace.pEnt);
         }
     }
     else {

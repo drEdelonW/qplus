@@ -250,9 +250,9 @@ bool SV_RecursiveHullCheck(
         )   return false;
 
 #ifdef PARANOID
-    if (SV_HullPointContents(sv_hullmodel, mid, node->children[side])
-        == CONTENTS_SOLID) {
-        Con_Printf("mid PointInHullSolid\n");        return false;
+    if (SV_HullPointContents(sv_hullmodel, mid, node->children[side]) == CONTENTS_SOLID) {
+        Con_Printf("mid PointInHullSolid\n");
+        return false;
     }
 #endif
 

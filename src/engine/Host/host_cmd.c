@@ -490,7 +490,7 @@ void Host_Loadgame_f() {
         if (entnum == -1) { ED_ParseGlobals(start); }   // parse the global vars
         else { // parse an edict
             edict_p ent = ED_GetEDictByIdx((uint32_t)entnum);
-            memset(&ent->v, 0, progs->entityfields * 4);
+            memset(&ent->v, 0x00, SizeOfEntFields());
             ent->free = false;
             ED_ParseEdict(start, ent);
 
@@ -612,7 +612,7 @@ int LoadGamestate(cString level, cString startspot) {
         // parse an edict
 
         edict_p ent = ED_GetEDictByIdx(entnum);
-        memset(&ent->v, 0, progs->entityfields * 4);
+        memset(&ent->v, 0, SizeOfEntFields());
         ent->free = false;
         ED_ParseEdict(start, ent);
 
@@ -970,7 +970,7 @@ void Host_Spawn_f() {
     else {
         // set up the edict
         edict_p ent = remoteClient->edict;
-        memset(&ent->v, 0, progs->entityfields * 4);
+        memset(&ent->v, 0, SizeOfEntFields());
         ent->v.colormap = (float)ED_GetEDictIdx(ent);
         ent->v.team = (float)(remoteClient->colors & 15) + 1;
         ent->v.netname = PR_SetQString(remoteClient->name);

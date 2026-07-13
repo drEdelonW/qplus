@@ -2,8 +2,8 @@
 
 #include "host.h"
 #include "link.h"
-#include "pr_def.h"    // defs shared with qcc
-#include "progdefs.h"       //for entvars_t
+#include "pr_def.h"     // defs shared with qcc
+#include "progdefs.h"   //for entvars_t
 #include "EntityState.h"
 #include "vmValue.h"
 #include "qTime.h"

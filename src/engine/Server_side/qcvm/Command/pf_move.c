@@ -27,6 +27,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "server_priv.h"
 #include "cvar_q1.h"
 #include "q_tools.h"
+#include "BBox_tools.h"
+#include "trace.h"
+
+dFunction_p pr_xFunction;
 
 /*
 ===============
@@ -37,31 +41,20 @@ float(float yaw, float dist) walkmove
 */
 void PF_walkmove() {
     edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
-    Angle_t yaw = G_FLOAT(OFS_PARM0);
-    float dist = G_FLOAT(OFS_PARM1);
-
     if (!((int)ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM))) {
-        G_FLOAT(OFS_RETURN) = 0;
-        return;
+        G_FLOAT(OFS_RETURN) = 0;    return;
     }
 
-    yaw = DEG2RAD(yaw);
-
+    Angle_t yaw = DEG2RAD(G_FLOAT(OFS_PARM0));
     vec3_t move = {
-        .x = cosf(yaw) * dist,
-        .y = sinf(yaw) * dist,
-        .z = 0.0f,
+        .x = cosf(yaw),
+        .y = sinf(yaw),
     };
 
     // save program state, because SV_movestep may call other progs
-    dFunction_p oldf = pr_xFunction;
-    int oldself = pr_global_struct->self;
-
-    G_FLOAT(OFS_RETURN) = SV_movestep(ent, move, true);
-
-    // restore program state
-    pr_xFunction = oldf;
-    pr_global_struct->self = oldself;
+    dFunction_p oldf = pr_xFunction;    int oldself = pr_global_struct->self; { // PR_PUSH
+        G_FLOAT(OFS_RETURN) = SV_movestep(ent, VectorScale(move, G_FLOAT(OFS_PARM1)), true);
+    } pr_xFunction = oldf;    pr_global_struct->self = oldself; // PR_POP // restore program state
 }
 
 /*
@@ -73,30 +66,25 @@ void() droptofloor
 */
 void PF_droptofloor() {
     edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
-    vec3_t end = ent->v.origin;
-    end.z -= 256.0f;
+    vec3_t end = ent->v.origin; { end.z -= 256.f; /* down */ }
+    trace_t trace = SV_Move(ent->v.origin, EvBBox(&ent->v), end, MOVE_NORMAL, ent);
 
-    trace_t trace = SV_Move(ent->v.origin, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent);
-
-    if ((trace.fraction == 1) || trace.allsolid)    G_FLOAT(OFS_RETURN) = 0;
+    if ((trace.fraction == 1) ||
+        (trace.allsolid)
+        )   G_FLOAT(OFS_RETURN) = 0;
     else {
         ent->v.origin = trace.endpos;
         SV_LinkEdict(ent, false);
         ent->v.flags = (int)ent->v.flags | FL_ONGROUND;
-        ent->v.groundentity = ED_GetEDictOffs(trace.ent);
+        ent->v.groundentity = ED_GetEDictOffs(trace.pEnt);
         G_FLOAT(OFS_RETURN) = 1;
     }
 }
 
 
-/*
-=============
-PF_checkbottom
-=============
-*/
+
 void PF_checkbottom() {
-    edict_p ent = G_EDICT(OFS_PARM0);
-    G_FLOAT(OFS_RETURN) = SV_CheckBottom(ent);
+    G_FLOAT(OFS_RETURN) = SV_CheckBottom(G_EDICT(OFS_PARM0));
 }
 
 
@@ -111,45 +99,47 @@ if the tryents flag is set.
 traceline (vector1, vector2, tryents)
 =================
 */
+#include "PhyMoveType.h"
 void PF_traceline() {
-    vec3_t v1 = G_VECTOR(OFS_PARM0);
-    vec3_t v2 = G_VECTOR(OFS_PARM1);
-    phymovetype_t moveType = (int)G_FLOAT(OFS_PARM2);
-    edict_p ent = G_EDICT(OFS_PARM3);
-
-    trace_t trace = SV_Move(v1, bbZero, v2, moveType, ent);
-
-    pr_global_struct->trace_allsolid = trace.allsolid;
-    pr_global_struct->trace_startsolid = trace.startsolid;
-    pr_global_struct->trace_fraction = trace.fraction;
-    pr_global_struct->trace_inwater = trace.inwater;
-    pr_global_struct->trace_inopen = trace.inopen;
-    pr_global_struct->trace_endpos = trace.endpos;
-    pr_global_struct->trace_plane_normal = trace.plane.normal;
-    pr_global_struct->trace_plane_dist = trace.plane.dist;
-    if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
-    else            pr_global_struct->trace_ent = ED_GetEDictOffs(Edicts);
+    trace_t trace = SV_Move(
+        G_VECTOR(OFS_PARM0), bbZero, G_VECTOR(OFS_PARM1),
+        (phymovetype_t)G_FLOAT(OFS_PARM2),
+        G_EDICT(OFS_PARM3)
+    ); {
+        trace.pEnt = (trace.pEnt) ? trace.pEnt : Edicts;
+    }
+    {
+        pr_global_struct->trace_allsolid    /**/ = trace.allsolid;
+        pr_global_struct->trace_startsolid  /**/ = trace.startsolid;
+        pr_global_struct->trace_fraction    /**/ = trace.fraction;
+        pr_global_struct->trace_endpos      /**/ = trace.endpos;
+        pr_global_struct->trace_plane_normal/**/ = trace.plane.normal;
+        pr_global_struct->trace_plane_dist  /**/ = trace.plane.dist;
+        pr_global_struct->trace_ent         /**/ = ED_GetEDictOffs(trace.pEnt);
+        pr_global_struct->trace_inopen      /**/ = trace.inopen;
+        pr_global_struct->trace_inwater     /**/ = trace.inwater;
+    }
 }
 
 
 #ifdef QUAKE2
-
 void PF_TraceToss() {
-    edict_p ent = G_EDICT(OFS_PARM0);
-    edict_p ignore = G_EDICT(OFS_PARM1);
-
-    trace_t trace = SV_Trace_Toss(ent, ignore);
-
-    pr_global_struct->trace_allsolid = trace.allsolid;
-    pr_global_struct->trace_startsolid = trace.startsolid;
-    pr_global_struct->trace_fraction = trace.fraction;
-    pr_global_struct->trace_inwater = trace.inwater;
-    pr_global_struct->trace_inopen = trace.inopen;
-    pr_global_struct->trace_endpos = trace.endpos;
-    pr_global_struct->trace_plane_normal = trace.plane.normal;
-    pr_global_struct->trace_plane_dist = trace.plane.dist;
-    if (trace.ent)  pr_global_struct->trace_ent = ED_GetEDictOffs(trace.ent);
-    else            pr_global_struct->trace_ent = ED_GetEDictOffs(Edicts);
+    trace_t trace = SV_Trace_Toss(
+        G_EDICT(OFS_PARM0),
+        G_EDICT(OFS_PARM1)
+    );
+    trace.pEnt = (trace.pEnt) ? trace.pEnt : Edicts;
+    {
+        pr_global_struct->trace_allsolid    /**/ = trace.allsolid;
+        pr_global_struct->trace_startsolid  /**/ = trace.startsolid;
+        pr_global_struct->trace_fraction    /**/ = trace.fraction;
+        pr_global_struct->trace_endpos      /**/ = trace.endpos;
+        pr_global_struct->trace_plane_normal/**/ = trace.plane.normal;
+        pr_global_struct->trace_plane_dist  /**/ = trace.plane.dist;
+        pr_global_struct->trace_ent         /**/ = ED_GetEDictOffs(trace.pEnt);
+        pr_global_struct->trace_inopen      /**/ = trace.inopen;
+        pr_global_struct->trace_inwater     /**/ = trace.inwater;
+    }
 }
 #endif
 
@@ -170,17 +160,20 @@ void PF_aim() {
 
     // try sending a trace straight
     vec3_t dir = pr_global_struct->v_forward;
-    vec3_t end = VectorMA(start, 2048, dir);
-    trace_t tr = SV_Move(start, bbZero, end, MOVE_NORMAL, ent);
+    trace_t tr = SV_Move(
+        start, bbZero,
+        VectorMA(start, 2048, dir),
+        MOVE_NORMAL, ent
+    );
     if (
-        tr.ent &&
-        (tr.ent->v.takedamage == DAMAGE_AIM) &&
-        (!(teamplay.value) ||
+        (tr.pEnt) &&
+        (tr.pEnt->v.takedamage == DAMAGE_AIM) &&
+        (
+            !(teamplay.value) ||
             (ent->v.team <= 0) ||
-            (ent->v.team != tr.ent->v.team))
+            (ent->v.team != tr.pEnt->v.team))
         ) {
-        G_VECTOR(OFS_RETURN) = pr_global_struct->v_forward;
-        return;
+        G_VECTOR(OFS_RETURN) = pr_global_struct->v_forward; return;
     }
 
     // try all possible entities
@@ -193,38 +186,41 @@ void PF_aim() {
 
         if ((check->v.takedamage != DAMAGE_AIM) ||
             (check == ent) ||
-            (teamplay.value &&
+            (
+                (teamplay.value) &&
                 (ent->v.team > 0) &&
                 (ent->v.team == check->v.team))
-            ) {
-            continue; // don't aim at teammate
-        }
+            )   continue; // don't aim at teammate
 
-        vec3_t end = VectorMA(check->v.origin,
-            0.5f, VectorAdd(
-                check->v.mins, check->v.maxs)
+        vec3_t end = VectorAdd(
+            check->v.origin,
+            BBoxMid(EvBBox(&check->v))
         );
-        dir = VectorSubtract(end, start);
+        vec3_t dir = VectorSubtract(end, start);
         VectorNormalize(&dir);
         float dist = DotProduct(dir, pr_global_struct->v_forward);
-        if (dist < bestdist)    continue; // to far to turn
+        if (dist < bestdist)
+            continue; // to far to turn
 
         tr = SV_Move(start, bbZero, end, MOVE_NORMAL, ent);
-        if (tr.ent == check) { // can shoot at this one
+        if (tr.pEnt == check) { // can shoot at this one
             bestdist = dist;
             bestent = check;
         }
     }
 
     if (bestent) {
-        dir = VectorSubtract(bestent->v.origin, ent->v.origin);
-        float dist = DotProduct(dir, pr_global_struct->v_forward);
-        end = VectorScale(pr_global_struct->v_forward, dist);
-        end.z = dir.z;
-        VectorNormalize(&end);
-        G_VECTOR(OFS_RETURN) = end;
+        vec3_t dir = VectorSubtract(bestent->v.origin, ent->v.origin);
+        vec3_t end = VectorScale(
+            pr_global_struct->v_forward,
+            DotProduct(dir, pr_global_struct->v_forward)
+        ); {
+            end.z = dir.z;
+            VectorNormalize(&end);
+        }
+        G_VECTOR(OFS_RETURN) = end; return;
     }
-    else G_VECTOR(OFS_RETURN) = bestdir;
+    else { G_VECTOR(OFS_RETURN) = bestdir; return; }
 }
 
 
@@ -238,42 +234,30 @@ This was a major timewaster in progs, so it was converted to C
 void PF_changeyaw() {
     edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
     float current = anglemod(ent->v.angles.yaw);
-    float speed   = ent->v.yaw_speed;
+    float rotSpeed = ent->v.yaw_speed;
 
-    float move = angledelta(ent->v.ideal_yaw - current);
-    if (move == 0.f)    return;
-
-    if (move > 0.f) ClampMoreThen(&move, speed);
-    else            ClampLessThen(&move, -speed);
-
-    ent->v.angles.yaw = anglemod(current + move);
+    float rot = angledelta(ent->v.ideal_yaw - current);
+    if (rot == 0.f)    return;
+    ClampInRange(-rotSpeed, &rot, rotSpeed);
+    ent->v.angles.yaw = anglemod(current + rot);
 }
 
 
 #ifdef QUAKE2
-/*
-==============
-PF_changepitch
-==============
-*/
 void PF_changepitch() {
     edict_p ent = G_EDICT(OFS_PARM0);
     float current = anglemod(ent->v.angles.pitch);
-    float speed   = ent->v.pitch_speed;
+    float rotSpeed = ent->v.pitch_speed;
 
-    float move = angledelta(ent->v.idealpitch - current);
-    if (move == 0.f)    return;
-
-    if (move > 0.f) ClampMoreThen(&move, speed);
-    else            ClampLessThen(&move, -speed);
-
-    ent->v.angles.pitch = anglemod(current + move);
+    float rot = angledelta(ent->v.idealpitch - current);
+    if (rot == 0.f)    return;
+    ClampInRange(-rotSpeed, &rot, rotSpeed);
+    ent->v.angles.pitch = anglemod(current + rot);
 }
 #endif
 
 
 #ifdef QUAKE2
-
 void PF_WaterMove() {
     float damage = 0.f;
     edict_p self = ED_GetEDictByOffs(pr_global_struct->self);
@@ -299,7 +283,8 @@ void PF_WaterMove() {
         if (
             (
                 (flags & FL_SWIM) &&
-                (waterlevel < drownlevel)) ||
+                (waterlevel < drownlevel)
+                ) ||
             (waterlevel >= drownlevel)
             ) {
             if (self->v.air_finished < SV_GetTime())

@@ -373,7 +373,7 @@ void SV_SpawnServer(cString server
 
     // load the rest of the entities
     edict_p ent = ED_GetEDictByIdx(0);
-    memset(&ent->v, 0, progs->entityfields * 4);
+    memset(&ent->v, 0, pProgsDat->entityfields * 4);
     ent->free = false;
     ent->v.model = PR_SetQString(sv.worldmodel->name);
     ent->v.modelindex = 1;    // world model

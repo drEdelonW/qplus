@@ -40,52 +40,15 @@ void PF_stuffcmd() {
     if ((entnum < EdictWorld) ||
         (entnum > GetSvMaxClients())
         )   PR_RunError("Parm 0 not a client");
-
-    cString str = G_STRING(OFS_PARM1);
-
-    RmtClient_p old = remoteClient;
-    remoteClient = &svs.clients[entnum - 1];
-    Host_ClientCommands("%s", str);
-    remoteClient = old;
+    else {
+        RmtClient_p old = remoteClient;
+        remoteClient = &svs.clients[entnum - 1];
+        Host_ClientCommands("%s", G_STRING(OFS_PARM1));
+        remoteClient = old;
+    }
 }
 
 
-/*
-=================
-PF_localcmd
-
-Sends text over to the client's execution buffer
-
-localcmd (string)
-=================
-*/
-void PF_localcmd() {
-    cString str = G_STRING(OFS_PARM0);
-    Cbuf_AddText(str);
-}
-
-
-/*
-=================
-PF_cvar
-
-float cvar (string)
-=================
-*/
-void PF_cvar() {
-    cString str = G_STRING(OFS_PARM0);
-    G_FLOAT(OFS_RETURN) = Cvar_VariableValue(str);
-}
-
-/*
-=================
-PF_cvar_set
-
-float cvar (string)
-=================
-*/
-void PF_cvar_set() {
-    cString var = G_STRING(OFS_PARM0);
-    cString val = G_STRING(OFS_PARM1);
-    Cvar_Set(var, val);
-}
+void PF_localcmd() { Cbuf_AddText(G_STRING(OFS_PARM0)); }
+void PF_cvar() { G_FLOAT(OFS_RETURN) = Cvar_VariableValue(G_STRING(OFS_PARM0)); }
+void PF_cvar_set() { Cvar_Set(/*var*/G_STRING(OFS_PARM0), /*val*/G_STRING(OFS_PARM1)); }

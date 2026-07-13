@@ -50,7 +50,7 @@ Sets everything to NULL
 =================
 */
 void ED_ClearEdict(edict_p edict) {
-    memset(&edict->v, 0, progs->entityfields * 4);
+    memset(&edict->v, 0, SizeOfEntFields());
     edict->free = false;
 }
 
@@ -158,7 +158,7 @@ void ED_Print(edict_p ed) {
     if (ed->free) { Host_Printf("FREE\n"); return; }
 
     Host_Printf("\nEDICT %i:\n", ED_GetEDictIdx(ed));
-    for (int i = 1; i < progs->fielddefs.num; i++) {
+    for (int i = 1; i < pProgsDat->fielddefs.num; i++) {
         dDef_p flDef = &pr_fielddefs[i];
         cString name = PR_GetQString(flDef->s_name);
         if (name[strlen(name) - 2] == '_')
@@ -198,7 +198,7 @@ void ED_Write(FILE* f, edict_p ed) {
 
     if (ed->free) { fprintf(f, "}\n"); return; }
 
-    for (int i = 1; i < progs->fielddefs.num; i++) {
+    for (int i = 1; i < pProgsDat->fielddefs.num; i++) {
         dDef_p flDef = &pr_fielddefs[i];
         cString name = PR_GetQString(flDef->s_name);
         if (name[strlen(name) - 2] == '_')
@@ -377,7 +377,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
 
     // clear it
     if (ent != Edicts) // hack
-        memset(&ent->v, 0, progs->entityfields * 4);
+        memset(&ent->v, 0, SizeOfEntFields());
 
     // go through all the dictionary pairs
     while (1) {

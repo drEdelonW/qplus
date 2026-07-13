@@ -38,6 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "GlobVars.h"
 #include "GameRule.h"
 #include "vector_tools.h"
+#include "trace.h"
 
 
 edict_p sv_player;

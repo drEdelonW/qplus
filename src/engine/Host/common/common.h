@@ -71,7 +71,7 @@ extern "C" {
 
     uint8_p COM_LoadStackFile(cStringRO path, TypeLess_ptr buffer, size_t bufsize);
     uint8_p COM_LoadTempFile(cStringRO path);
-    uint8_p COM_LoadHunkFile(cStringRO path);
+    uint8_p COM_LoadHunkFile(cStringRO path);   // TODO: make it typeLessPtr
 
 #ifdef __cplusplus
 }

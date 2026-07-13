@@ -12,7 +12,7 @@
 
 #include "cvar_q1.h"
 
-dprograms_p progs;
+dprograms_p pProgsDat;
 uint16_t    pr_crc;
 
 /*
@@ -22,29 +22,31 @@ PR_LoadProgs
 */
 void PR_LoadProgs() {
     // ======[Prog.DAT]======
-    progs = (dprograms_p)COM_LoadHunkFile("progs.dat");
-    if (!progs)             Host_SysError("PR_LoadProgs: couldn't load progs.dat");
+    pProgsDat = (dprograms_p)COM_LoadHunkFile("progs.dat");
+    if (!pProgsDat)         Host_SysError("PR_LoadProgs: couldn't load progs.dat");
     else                    Con_DPrintf("Programs occupy %iK.\n", com.filesize / 1024);
 
     // ======[CRC]======
     CRC_Init(&pr_crc);
     for (int i = 0; i < com.filesize; i++)
-        CRC_ProcessByte(&pr_crc, ((uint8_p)progs)[i]);
+        CRC_ProcessByte(&pr_crc, ((uint8_p)pProgsDat)[i]);
 
     // byte swap the header
-    for (int i = 0; i < DIV4(sizeof(*progs)); i++)
-        ((int32_p)progs)[i] = LittleLong(((int32_p)progs)[i]);
+    for (int i = 0; i < DIV4(sizeof(*pProgsDat)); i++)
+        ((int32_p)pProgsDat)[i] = LittleLong(((int32_p)pProgsDat)[i]);
 
-    if (progs->version != PROG_VERSION)     Host_SysError("progs.dat has wrong version number (%i should be %i)", progs->version, PROG_VERSION);
-    if (progs->crc != PROGHEADER_CRC)       Host_SysError("progs.dat system vars have been modified, progdefs.h is out of date");
+    if (pProgsDat->version != PROG_VERSION)     Host_SysError("progs.dat has wrong version number (%i should be %i)", pProgsDat->version, PROG_VERSION);
+    if (pProgsDat->crc != PROGHEADER_CRC)       Host_SysError("progs.dat system vars have been modified, progdefs.h is out of date");
 
-    initProgString(progs, progs->strings);                      // ======[Prog Strings]======
-    initProgGlobals(progs, progs->globals);                     // ======[Global Struct]======
-    initProgStatement(progs, progs->statements);                // ======[Statements]======
-    initProgFunction(progs, progs->functions);                  // ======[Function]======
-    initProgDefs(progs, progs->globaldefs, progs->fielddefs);   // ======[Global Defs]======
+    SetLumpBase(pProgsDat); {
+        initProgString(pProgsDat->strings);                     // ======[Prog Strings]======
+        initProgGlobals(pProgsDat->globals);                    // ======[Global Struct]======
+        initProgStatement(pProgsDat->statements);               // ======[Statements]======
+        initProgFunction(pProgsDat->functions);                 // ======[Function]======
+        initProgDefs(pProgsDat->globaldefs, pProgsDat->fielddefs);  // ======[Global Defs]======
+    } SetLumpBase(NULL);
 
-    EdictSize = PROG_HEADER_SIZE + progs->entityfields * 4;     // ======[Edict Size]======
+    EdictSize = PROG_HEADER_SIZE + SizeOfEntFields();       // ======[Edict Size]======
 }
 
 /*

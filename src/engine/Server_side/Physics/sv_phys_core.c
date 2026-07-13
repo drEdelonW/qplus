@@ -99,13 +99,13 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
         }
 
         if (trace.fraction == 1)    break;  // moved the entire distance
-        if (!trace.ent)             Host_SysError("SV_FlyMove: !trace.ent");
+        if (!trace.pEnt)             Host_SysError("SV_FlyMove: !trace.pEnt");
 
         if (trace.plane.normal.z > 0.7f) {
             blocked |= MOVECLIP_FLOOR;  // floor
-            if (trace.ent->v.solid == SOLID_BSP) {
+            if (trace.pEnt->v.solid == SOLID_BSP) {
                 ent->v.flags = (float)((EntityFlags_t)ent->v.flags | FL_ONGROUND);
-                ent->v.groundentity = ED_GetEDictOffs(trace.ent);
+                ent->v.groundentity = ED_GetEDictOffs(trace.pEnt);
             }
         }
         if (!trace.plane.normal.z) {
@@ -117,7 +117,7 @@ MoveClipFlags_e SV_FlyMove(edict_p ent, SimDt_t time, trace_p steptrace) {
         //
         // run the impact function
         //
-        SV_Impact(ent, trace.ent);
+        SV_Impact(ent, trace.pEnt);
         if (ent->free)  break;  // removed by the impact function
 
         time_left -= time_left * trace.fraction;

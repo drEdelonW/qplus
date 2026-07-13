@@ -24,54 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "transform.h"
 #include <stdlib.h>
 
-/*
-=================
-PF_normalize
 
-vector normalize(vector)
-=================
-*/
-void PF_normalize() {
-    vec3_t value1 = G_VECTOR(OFS_PARM0);
-    float new =
-        value1.x * value1.x +
-        value1.y * value1.y +
-        value1.z * value1.z;
-    new = (float)sqrt(new);
-
-    vec3_t newvalue;
-    if (new == 0.0f)   newvalue = (vec3_t){ .x = 0.0f, .y = 0.0f, .z = 0.0f };
-    else {
-        new = 1 / new;
-        newvalue.x = value1.x * new;  // newvalue = value1 * new;
-        newvalue.y = value1.y * new;
-        newvalue.z = value1.z * new;
-    }
-
-    G_VECTOR(OFS_RETURN) = newvalue;
-}
-
-/*
-=================
-PF_vlen
-
-scalar vlen(vector)
-=================
-*/
-void PF_vlen() {
-    vec3_t value1 = G_VECTOR(OFS_PARM0);
-
-    float new =
-        value1.x * value1.x +
-        value1.y * value1.y +
-        value1.z * value1.z;
-    new = (float)sqrt(new);
-#if 0
-    G_FLOAT(OFS_RETURN) = new;
-#else
-    PR_Freturn new;
-#endif
-}
 
 /*
 =================
@@ -82,11 +35,10 @@ float vectoyaw(vector)
 */
 void PF_vectoyaw() {
     vec3_t value1 = G_VECTOR(OFS_PARM0);
-
     Angle_t yaw;
     if ((value1.y == 0.f) &&
-        (value1.x == 0.f))
-        yaw = 0.f;
+        (value1.x == 0.f)
+        )   yaw = 0.f;
     else {
         yaw = (RAD2DEG(atan2f(value1.y, value1.x)));
         if (yaw < 0.f)    yaw += 360.f;
@@ -133,20 +85,10 @@ makevectors(vector)
 ==============
 */
 void PF_makevectors() {
-#if 0
-    AngleVectors(
-        G_VECTOR(OFS_PARM0),
-        &pr_global_struct->v_forward,
-        &pr_global_struct->v_right,
-        &pr_global_struct->v_up
-    );
-#else
     Basis_t bs = GetBasis(G_ANGLES(OFS_PARM0));
     pr_global_struct->v_forward = bs.forward;
     pr_global_struct->v_right = bs.right;
     pr_global_struct->v_up = bs.up;
-
-#endif
 }
 
 /*
@@ -158,21 +100,16 @@ Returns a number from 0<= num < 1
 random()
 =================
 */
-void PF_random() { G_FLOAT(OFS_RETURN) = (float)(rand() & 0x7fff) / ((float)0x7fff); }
-
 void PF_rint() {
     float f = G_FLOAT(OFS_PARM0);
-    if (f > 0)  G_FLOAT(OFS_RETURN) = (float)((int)(f + 0.5));
-    else        G_FLOAT(OFS_RETURN) = (float)((int)(f - 0.5));
+    G_FLOAT(OFS_RETURN) = (float)((int)(f + ((f > 0.f) ? 0.5f : -0.5f)));
 }
-void PF_floor() { G_FLOAT(OFS_RETURN) = (float)floor(G_FLOAT(OFS_PARM0)); }
-void PF_ceil() { G_FLOAT(OFS_RETURN) = (float)ceil(G_FLOAT(OFS_PARM0)); }
-
-void PF_fabs() {
-    float v = G_FLOAT(OFS_PARM0);
-    G_FLOAT(OFS_RETURN) = (float)fabs(v);
-}
-
+void PF_normalize() { vec3_t value1 = G_VECTOR(OFS_PARM0); VectorNormalize(&value1); G_VECTOR(OFS_RETURN) = value1; }
+void PF_vlen() { PR_Freturn Length(G_VECTOR(OFS_PARM0)); }
+void PF_random() { G_FLOAT(OFS_RETURN) = (float)(rand() & 0x7fff) / ((float)0x7fff); }
+void PF_floor() { G_FLOAT(OFS_RETURN) = floorf(G_FLOAT(OFS_PARM0)); }
+void PF_ceil() { G_FLOAT(OFS_RETURN) = ceilf(G_FLOAT(OFS_PARM0)); }
+void PF_fabs() { G_FLOAT(OFS_RETURN) = fabsf(G_FLOAT(OFS_PARM0)); }
 void PF_sin() { G_FLOAT(OFS_RETURN) = sinf(G_FLOAT(OFS_PARM0)); }
 void PF_cos() { G_FLOAT(OFS_RETURN) = cosf(G_FLOAT(OFS_PARM0)); }
 void PF_sqrt() { G_FLOAT(OFS_RETURN) = sqrtf(G_FLOAT(OFS_PARM0)); }

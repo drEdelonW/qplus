@@ -3,25 +3,22 @@
 #include "endian_tools.h"
 
 dFunction_p pr_functions;
-dFunction_p pr_xFunction;
-
 /*
 ============
 ED_FindFunction
 ============
 */
 dFunction_p ED_FindFunction(cString name) {
-    for (int i = 0; i < progs->functions.num; i++) {
-        dFunction_p func = &pr_functions[i];
-        if (!strcmp(PR_GetQString(func->s_name), name))
-            return func;
-    }
+    for (int i = 0; i < pProgsDat->functions.num; i++)
+        if (!strcmp(PR_GetQString(pr_functions[i].s_name), name))
+            return &pr_functions[i];
+
     return NULL;
 }
 
 
-void initProgFunction(TypeLess_ptr base, progLump_t pl) {
-    pr_functions = (dFunction_p)((uint8_p)base + pl.ofs);
+void initProgFunction(progLump_t pl) {
+    pr_functions = GetPtrFromLump(pl);
     for (int i = 0; i < pl.num; i++) {
         pr_functions[i].first_statement = LittleLong(pr_functions[i].first_statement);
         pr_functions[i].parm_start = LittleLong(pr_functions[i].parm_start);

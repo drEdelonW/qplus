@@ -6,3 +6,6 @@ typedef struct {
     uint32_t ofs;   /* byte offset from start of progs blob */
     uint32_t num;   /* element count (not bytes) */
 } progLump_t;       STATIC_ASSERT_SIZE(progLump_t, 2*4); // 60
+
+void SetLumpBase(TypeLess_ptr base);
+TypeLess_ptr GetPtrFromLump(progLump_t pl);

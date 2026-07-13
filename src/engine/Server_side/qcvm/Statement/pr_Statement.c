@@ -4,10 +4,8 @@
 #include "console.h"
 
 dStatement_p   pr_statements;
-
-
-void initProgStatement(TypeLess_ptr base, progLump_t pl) {
-    pr_statements = (dStatement_p)((uint8_p)base + pl.ofs);
+void initProgStatement(progLump_t pl) {
+    pr_statements = GetPtrFromLump(pl);
     // uint8_t swap the lumps
     for (int i = 0; i < pl.num; i++) {
         pr_statements[i].op = (op_type)LittleShort((int16_t)pr_statements[i].op);

@@ -23,7 +23,7 @@ extern float_p      pr_globals;         // same as pr_global_struct
 extern "C" {
 #endif
 
-    void initProgGlobals(TypeLess_ptr base, progLump_t pl);
+    void initProgGlobals(progLump_t pl);
 
 #ifdef __cplusplus
 }

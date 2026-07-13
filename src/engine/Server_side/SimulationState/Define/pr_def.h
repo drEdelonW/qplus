@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
     void ED_InitCache();
-    void initProgDefs(TypeLess_ptr base, progLump_t plg, progLump_t plf);
+    void initProgDefs(progLump_t plg, progLump_t plf);
 
     void ED_WriteGlobals(FILE* f);
     void ED_ParseGlobals(cString data);

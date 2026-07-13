@@ -43,21 +43,18 @@ typedef enum msg_dest_e {
 } msg_dest_e;
 
 sizebuf_p WriteDest() {
-    msg_dest_e dest = G_FLOAT(OFS_PARM0);
-    switch (dest) {
+    switch ((msg_dest_e)G_FLOAT(OFS_PARM0)) {
     case MSG_BROADCAST: return &sv.datagram;
-
+    case MSG_ALL:       return &sv.reliable_datagram;
+    case MSG_INIT:      return &sv.signon;
     case MSG_ONE: {
-        edict_p ent = ED_GetEDictByOffs(pr_global_struct->msg_entity);
-        uint32_t entnum = ED_GetEDictIdx(ent);
+        uint32_t entnum = ED_GetEDictIdx(ED_GetEDictByOffs(pr_global_struct->msg_entity));
         if ((entnum < 1) ||
             (entnum > GetSvMaxClients())
             )   PR_RunError("WriteDest: not a client");
         return &svs.clients[entnum - 1].message;
     }
-    case MSG_ALL:       return &sv.reliable_datagram;
-    case MSG_INIT:      return &sv.signon;
-    default:            PR_RunError("WriteDest: bad destination");  break;
+    default:    PR_RunError("WriteDest: bad destination");  break;
     }
 
     return NULL;

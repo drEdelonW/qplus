@@ -53,8 +53,8 @@ trace_t SV_PushEntity(edict_p ent, vec3_t push) {
     ent->v.origin = trace.endpos;
     SV_LinkEdict(ent, true);
 
-    if (trace.ent)
-        SV_Impact(ent, trace.ent);
+    if (trace.pEnt)
+        SV_Impact(ent, trace.pEnt);
 
     return trace;
 }
