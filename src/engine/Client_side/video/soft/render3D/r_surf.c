@@ -24,22 +24,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "host.h"
 #include "Surface.h"
 
-DrawSurf_t r_drawsurf;
+DrawSurf_t r_drawsurf;  // extern
 
-int sourcetstep;
-int blocksize;
-int lightleft;
-int lightright;
-int blockdivshift;
-int lightleftstep, lightrightstep;
-TypeLess_ptr prowdestbase;
-qColor8_p pbasesource;
-int surfrowbytes; // used by ASM files
-int r_stepback;
-int r_lightwidth;
-int r_numhblocks, r_numvblocks;
-qColor8_p r_source;
-qColor8_p r_sourcemax;
+static int _sourceTstep;
+static int _blockSize;
+static int _lightLeft;
+static int _lightRight;
+static int _blockDivShift;
+static int _lightLeftStep;
+static int  _lightRightStep;
+static TypeLess_ptr _pRowDestBase;
+static qColor8_p _pBaseSource;
+static int _surfRowBytes; // used by ASM files
+static int _r_StepBack;
+static int _r_LightWidth;
+static int _r_NumHBlocks;
+static int _r_NumVBlocks;
+static qColor8_p _r_Source;
+static qColor8_p _r_SourceMax;
 
 void R_DrawSurfaceBlock8_mip0();
 void R_DrawSurfaceBlock8_mip1();
@@ -53,9 +55,8 @@ static void (*surfmiptable[MIPLEVELS])() = {
     R_DrawSurfaceBlock8_mip3
 };
 
-
-fixed16_p r_lightptr;
-fixed16_t  blocklights[18 * 18];
+static fixed16_p _r_LightPtr;
+static fixed16_t  _blockLights[18 * 18];
 
 /*
 ===============
@@ -104,14 +105,14 @@ void R_AddDynamicLights() { // TODO: merge with GL function almoust the same
                 {
                     uint32_t temp = (rad - dist) * 256;
                     i = t * smax + s;
-                    if (!cl_dlights[lnum].dark)     blocklights[i] += temp;
+                    if (!cl_dlights[lnum].dark)     _blockLights[i] += temp;
                     else {
-                        if (blocklights[i] > temp)  blocklights[i] -= temp;
-                        else                        blocklights[i] = 0;
+                        if (_blockLights[i] > temp)  _blockLights[i] -= temp;
+                        else                        _blockLights[i] = 0;
                     }
                 }
 #else
-                    blocklights[(t * smax) + s] += (rad - dist) * 256;
+                    _blockLights[(t * smax) + s] += (rad - dist) * 256;
 #endif
             }
         }
@@ -122,7 +123,7 @@ void R_AddDynamicLights() { // TODO: merge with GL function almoust the same
 ===============
 R_BuildLightMap
 
-Combine and scale multiple lightmaps into the 8.8 format in blocklights
+Combine and scale multiple lightmaps into the 8.8 format in _blockLights
 ===============
 */
 void R_BuildLightMap() {// TODO: merge with GL function almoust the same
@@ -136,12 +137,12 @@ void R_BuildLightMap() {// TODO: merge with GL function almoust the same
         (!cl.worldmodel->lightdata)
         ) {
         for (int i = 0; i < size; i++)
-            blocklights[i] = 0;
+            _blockLights[i] = 0;
         return;
     }
     else {  // clear to ambient
         for (int i = 0; i < size; i++)
-            blocklights[i] = INT_TO_FIXED8(r_refdef.ambientLight);
+            _blockLights[i] = INT_TO_FIXED8(r_refdef.ambientLight);
 
         {   // add all the lightmaps
             uint8_p lightmap = surf->samples;
@@ -149,7 +150,7 @@ void R_BuildLightMap() {// TODO: merge with GL function almoust the same
                 for (int maps = 0; (maps < MAXLIGHTMAPS) && (surf->styles[maps] != 255); maps++) {
                     fixed8_t scale = r_drawsurf.lightadj[maps]; // 8.8 fraction
                     for (int i = 0; i < size; i++)
-                        blocklights[i] += lightmap[i] * scale;
+                        _blockLights[i] += lightmap[i] * scale;
                     lightmap += size; // skip to next lightmap
                 }
         }
@@ -160,10 +161,10 @@ void R_BuildLightMap() {// TODO: merge with GL function almoust the same
         // bound, invert, and shift
     }
     for (int i = 0; i < size; i++) {
-        int t = (255 * 256 - (int)blocklights[i]) >> (8 - VID_CBITS);
+        int t = (255 * 256 - (int)_blockLights[i]) >> (8 - VID_CBITS);
         ClampLessThen(&t, 64);
 
-        blocklights[i] = t;
+        _blockLights[i] = t;
     }
 }
 
@@ -182,22 +183,22 @@ void R_DrawSurface() {
         R_BuildLightMap();
     }
 
-    surfrowbytes = r_drawsurf.rowbytes;
+    _surfRowBytes = r_drawsurf.rowbytes;
     Texture_p mt = r_drawsurf.texture;
-    r_source = GetMipPtr(mt, r_drawsurf.surfmip);
+    _r_Source = GetMipPtr(mt, r_drawsurf.surfmip);
 
     // the fractional light values should range from 0 to INT_TO_FIXED16(VID_GRADES - 1)
     // from a source range of 0 - 255
 
     int texwidth = mt->width >> r_drawsurf.surfmip;
 
-    blocksize = 16 >> r_drawsurf.surfmip;
-    blockdivshift = 4 - r_drawsurf.surfmip;
-    // blockdivmask = (1 << blockdivshift) - 1;
+    _blockSize = 16 >> r_drawsurf.surfmip;
+    _blockDivShift = 4 - r_drawsurf.surfmip;
+    // blockdivmask = (1 << _blockDivShift) - 1;
 
-    r_lightwidth = FIXED4_TO_INT(r_drawsurf.surf->extents[0]) + 1;
-    r_numhblocks = r_drawsurf.surfwidth >> blockdivshift;
-    r_numvblocks = r_drawsurf.surfheight >> blockdivshift;
+    _r_LightWidth = FIXED4_TO_INT(r_drawsurf.surf->extents[0]) + 1;
+    _r_NumHBlocks = r_drawsurf.surfwidth >> _blockDivShift;
+    _r_NumVBlocks = r_drawsurf.surfheight >> _blockDivShift;
 
     //==============================
 
@@ -205,26 +206,26 @@ void R_DrawSurface() {
     if (r_pixbytes == 1) {
         pblockdrawer = surfmiptable[r_drawsurf.surfmip];
         // TODO: only needs to be set when there is a display settings change
-        horzblockstep = blocksize;
+        horzblockstep = _blockSize;
     }
     else {
         pblockdrawer = R_DrawSurfaceBlock16;
         // TODO: only needs to be set when there is a display settings change
-        horzblockstep = TWICE(blocksize);
+        horzblockstep = TWICE(_blockSize);
     }
 
     fixed16_t smax = mt->width >> r_drawsurf.surfmip;
     int twidth = texwidth;
     fixed16_t tmax = mt->height >> r_drawsurf.surfmip;
-    sourcetstep = texwidth;
-    r_stepback = tmax * twidth;
-    r_sourcemax = r_source + (tmax * smax);
+    _sourceTstep = texwidth;
+    _r_StepBack = tmax * twidth;
+    _r_SourceMax = _r_Source + (tmax * smax);
     int soffset = r_drawsurf.surf->texturemins[0];
     int basetoffset = r_drawsurf.surf->texturemins[1];
 
     // << 16 components are to guarantee positive values for %
     soffset = ((soffset >> r_drawsurf.surfmip) + INT_TO_FIXED16(smax)) % smax;
-    qColor8_p basetptr = &r_source[
+    qColor8_p basetptr = &_r_Source[
         ((((basetoffset >> r_drawsurf.surfmip) +
             INT_TO_FIXED16(tmax)) %
             tmax) *
@@ -232,12 +233,12 @@ void R_DrawSurface() {
     ];
 
     qColor8_p pcolumndest = r_drawsurf.surfdat;
-    for (uint8_t u = 0; u < r_numhblocks; u++) {
-        r_lightptr = blocklights + u;
-        prowdestbase = pcolumndest;
-        pbasesource = basetptr + soffset;
+    for (uint8_t u = 0; u < _r_NumHBlocks; u++) {
+        _r_LightPtr = _blockLights + u;
+        _pRowDestBase = pcolumndest;
+        _pBaseSource = basetptr + soffset;
         (*pblockdrawer)();
-        soffset = soffset + blocksize;
+        soffset = soffset + _blockSize;
         if (soffset >= smax)
             soffset = 0;
         pcolumndest += horzblockstep;
@@ -255,22 +256,21 @@ R_DrawSurfaceBlock8_mip0
 ================
 */
 void R_DrawSurfaceBlock8_mip0() {   // nearest surfaces
-    qColor8_p psource = pbasesource;
-    qColor8_p prowdest = prowdestbase;
+    qColor8_p psource = _pBaseSource;
+    qColor8_p prowdest = _pRowDestBase;
 
-    for (int v = 0; v < r_numvblocks; v++) {
+    for (int v = 0; v < _r_NumVBlocks; v++) {
         // FIXME: make these locals?
         // FIXME: use delta rather than both right and left, like ASM?
-        lightleft = r_lightptr[0];
-        lightright = r_lightptr[1];
-        r_lightptr += r_lightwidth;
-        lightleftstep = DIV16(r_lightptr[0] - lightleft);
-        lightrightstep = DIV16(r_lightptr[1] - lightright);
+        _lightLeft = _r_LightPtr[0];
+        _lightRight = _r_LightPtr[1];
+        _r_LightPtr += _r_LightWidth;
+        _lightLeftStep = DIV16(_r_LightPtr[0] - _lightLeft);
+        _lightRightStep = DIV16(_r_LightPtr[1] - _lightRight);
 
         for (int i = 0; i < 16; i++) {
-            int lighttemp = lightleft - lightright;
-            int lightstep = DIV16(lighttemp);
-            int light = lightright;
+            int lightstep = DIV16(_lightLeft - _lightRight);
+            int light = _lightRight;
 
             for (int b = 15; b >= 0; b--) {
                 qColor8_t pix = psource[b];
@@ -278,14 +278,14 @@ void R_DrawSurfaceBlock8_mip0() {   // nearest surfaces
                 light += lightstep;
             }
 
-            psource += sourcetstep;
-            lightright += lightrightstep;
-            lightleft += lightleftstep;
-            prowdest += surfrowbytes;
+            psource += _sourceTstep;
+            _lightRight += _lightRightStep;
+            _lightLeft += _lightLeftStep;
+            prowdest += _surfRowBytes;
         }
 
-        if (psource >= r_sourcemax)
-            psource -= r_stepback;
+        if (psource >= _r_SourceMax)
+            psource -= _r_StepBack;
     }
 }
 
@@ -296,22 +296,21 @@ R_DrawSurfaceBlock8_mip1
 ================
 */
 void R_DrawSurfaceBlock8_mip1() {
-    qColor8_p psource = pbasesource;
-    qColor8_p prowdest = prowdestbase;
+    qColor8_p psource = _pBaseSource;
+    qColor8_p prowdest = _pRowDestBase;
 
-    for (int v = 0; v < r_numvblocks; v++) {
+    for (int v = 0; v < _r_NumVBlocks; v++) {
         // FIXME: make these locals?
         // FIXME: use delta rather than both right and left, like ASM?
-        lightleft = r_lightptr[0];
-        lightright = r_lightptr[1];
-        r_lightptr += r_lightwidth;
-        lightleftstep = DIV8(r_lightptr[0] - lightleft);
-        lightrightstep = DIV8(r_lightptr[1] - lightright);
+        _lightLeft = _r_LightPtr[0];
+        _lightRight = _r_LightPtr[1];
+        _r_LightPtr += _r_LightWidth;
+        _lightLeftStep = DIV8(_r_LightPtr[0] - _lightLeft);
+        _lightRightStep = DIV8(_r_LightPtr[1] - _lightRight);
 
         for (int i = 0; i < 8; i++) {
-            int lighttemp = lightleft - lightright;
-            int lightstep = DIV8(lighttemp);
-            int light = lightright;
+            int lightstep = DIV8(_lightLeft - _lightRight);
+            int light = _lightRight;
 
             for (int b = 7; b >= 0; b--) {
                 qColor8_t pix = psource[b];
@@ -319,14 +318,14 @@ void R_DrawSurfaceBlock8_mip1() {
                 light += lightstep;
             }
 
-            psource += sourcetstep;
-            lightright += lightrightstep;
-            lightleft += lightleftstep;
-            prowdest += surfrowbytes;
+            psource += _sourceTstep;
+            _lightRight += _lightRightStep;
+            _lightLeft += _lightLeftStep;
+            prowdest += _surfRowBytes;
         }
 
-        if (psource >= r_sourcemax)
-            psource -= r_stepback;
+        if (psource >= _r_SourceMax)
+            psource -= _r_StepBack;
     }
 }
 
@@ -337,22 +336,21 @@ R_DrawSurfaceBlock8_mip2
 ================
 */
 void R_DrawSurfaceBlock8_mip2() {
-    qColor8_p psource = pbasesource;
-    qColor8_p prowdest = prowdestbase;
+    qColor8_p psource = _pBaseSource;
+    qColor8_p prowdest = _pRowDestBase;
 
-    for (int v = 0; v < r_numvblocks; v++) {
+    for (int v = 0; v < _r_NumVBlocks; v++) {
         // FIXME: make these locals?
         // FIXME: use delta rather than both right and left, like ASM?
-        lightleft = r_lightptr[0];
-        lightright = r_lightptr[1];
-        r_lightptr += r_lightwidth;
-        lightleftstep = DIV4(r_lightptr[0] - lightleft);
-        lightrightstep = DIV4(r_lightptr[1] - lightright);
+        _lightLeft = _r_LightPtr[0];
+        _lightRight = _r_LightPtr[1];
+        _r_LightPtr += _r_LightWidth;
+        _lightLeftStep = DIV4(_r_LightPtr[0] - _lightLeft);
+        _lightRightStep = DIV4(_r_LightPtr[1] - _lightRight);
 
         for (int i = 0; i < 4; i++) {
-            int lighttemp = lightleft - lightright;
-            int lightstep = DIV4(lighttemp);
-            int light = lightright;
+            int lightstep = DIV4(_lightLeft - _lightRight);
+            int light = _lightRight;
 
             for (int b = 3; b >= 0; b--) {
                 qColor8_t pix = psource[b];
@@ -360,14 +358,14 @@ void R_DrawSurfaceBlock8_mip2() {
                 light += lightstep;
             }
 
-            psource += sourcetstep;
-            lightright += lightrightstep;
-            lightleft += lightleftstep;
-            prowdest += surfrowbytes;
+            psource += _sourceTstep;
+            _lightRight += _lightRightStep;
+            _lightLeft += _lightLeftStep;
+            prowdest += _surfRowBytes;
         }
 
-        if (psource >= r_sourcemax)
-            psource -= r_stepback;
+        if (psource >= _r_SourceMax)
+            psource -= _r_StepBack;
     }
 }
 
@@ -378,21 +376,21 @@ R_DrawSurfaceBlock8_mip3
 ================
 */
 void R_DrawSurfaceBlock8_mip3() {
-    qColor8_p psource = pbasesource;
-    qColor8_p prowdest = prowdestbase;
+    qColor8_p psource = _pBaseSource;
+    qColor8_p prowdest = _pRowDestBase;
 
-    for (int v = 0; v < r_numvblocks; v++) {
+    for (int v = 0; v < _r_NumVBlocks; v++) {
         // FIXME: make these locals?
         // FIXME: use delta rather than both right and left, like ASM?
-        lightleft = r_lightptr[0];
-        lightright = r_lightptr[1];
-        r_lightptr += r_lightwidth;
-        lightleftstep = HALF(r_lightptr[0] - lightleft);
-        lightrightstep = HALF(r_lightptr[1] - lightright);
+        _lightLeft = _r_LightPtr[0];
+        _lightRight = _r_LightPtr[1];
+        _r_LightPtr += _r_LightWidth;
+        _lightLeftStep = HALF(_r_LightPtr[0] - _lightLeft);
+        _lightRightStep = HALF(_r_LightPtr[1] - _lightRight);
 
         for (int i = 0; i < 2; i++) {
-            int lightstep = HALF(lightleft - lightright);
-            int light = lightright;
+            int lightstep = HALF(_lightLeft - _lightRight);
+            int light = _lightRight;
 
             for (int b = 1; b >= 0; b--) {
                 qColor8_t pix = psource[b];
@@ -400,14 +398,14 @@ void R_DrawSurfaceBlock8_mip3() {
                 light += lightstep;
             }
 
-            psource += sourcetstep;
-            lightright += lightrightstep;
-            lightleft += lightleftstep;
-            prowdest += surfrowbytes;
+            psource += _sourceTstep;
+            _lightRight += _lightRightStep;
+            _lightLeft += _lightLeftStep;
+            prowdest += _surfRowBytes;
         }
 
-        if (psource >= r_sourcemax)
-            psource -= r_stepback;
+        if (psource >= _r_SourceMax)
+            psource -= _r_StepBack;
     }
 }
 
@@ -421,18 +419,17 @@ FIXME: make this work
 */
 #include "sys.h"    // Sys_Error
 void R_DrawSurfaceBlock16() {
-    uint16_p prowdest = (uint16_p)prowdestbase;
+    uint16_p prowdest = (uint16_p)_pRowDestBase;
     if (!Scr.pColorMap16)    Sys_Error("Scr.pColorMap16 if NULL\n");
 
-    for (int k = 0; k < blocksize; k++) {
-        qColor8_p psource = pbasesource;
-        int lighttemp = lightright - lightleft;
-        int lightstep = lighttemp >> blockdivshift;
+    for (int k = 0; k < _blockSize; k++) {
+        qColor8_p psource = _pBaseSource;
+        int lightstep = (_lightRight - _lightLeft) >> _blockDivShift;
 
-        int light = lightleft;
+        int light = _lightLeft;
         uint16_p pdest = prowdest;
 
-        for (int b = 0; b < blocksize; b++) {
+        for (int b = 0; b < _blockSize; b++) {
             qColor8_t pix = *psource;
             *pdest = Scr.pColorMap16[(light & 0xFF00) + pix.i].c;
             // psource += sourcesstep;  // TODO: is this correct?
@@ -440,13 +437,13 @@ void R_DrawSurfaceBlock16() {
             light += lightstep;
         }
 
-        pbasesource += sourcetstep;
-        lightright += lightrightstep;
-        lightleft += lightleftstep;
-        prowdest = (uint16_p)((uint8_p)prowdest + surfrowbytes);
+        _pBaseSource += _sourceTstep;
+        _lightRight += _lightRightStep;
+        _lightLeft += _lightLeftStep;
+        prowdest = (uint16_p)((uint8_p)prowdest + _surfRowBytes);
     }
 
-    prowdestbase = prowdest;
+    _pRowDestBase = prowdest;
 }
 
 #endif

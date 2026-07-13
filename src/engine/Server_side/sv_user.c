@@ -42,8 +42,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 edict_p sv_player;
 
-Basis_t _bs;
-
 static vec3_t _wishDir;
 static float _wishSpeed;
 
@@ -222,6 +220,7 @@ SV_WaterMove
 
 ===================
 */
+extern Basis_t _bs; // leave in view.c
 void SV_WaterMove() {
     // user intentions
     _bs = GetBasis(sv_player->v.v_angle);

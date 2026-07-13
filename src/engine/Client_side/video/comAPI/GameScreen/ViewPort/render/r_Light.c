@@ -37,7 +37,6 @@ R_AnimateLight
 ==================
 */
 void R_AnimateLight() {
-    //
     // light animations
     // 'm' is normal light, 'a' is no light, 'z' is double bright
     int i = (int)(GetClSimTime() * 10);
@@ -62,11 +61,6 @@ DYNAMIC LIGHTS
 =============================================================================
 */
 
-/*
-=============
-R_MarkLights
-=============
-*/
 void R_MarkLights(dLight_p light, int bit, mNode_p node) {
     if (node->contents < CONTENTS_NODE)     return;
 
@@ -99,11 +93,6 @@ void R_MarkLights(dLight_p light, int bit, mNode_p node) {
 
 
 
-/*
-=============
-R_PushDlights
-=============
-*/
 void R_PushDlights() {
 #ifdef GLQUAKE
     if (gl_flashblend.value)    return;

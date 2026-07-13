@@ -51,7 +51,6 @@ struct areaNode_s {
 #define AREA_NODES 32
 
 extern areaNode_t   _sv_AreaNodes[AREA_NODES];
-extern int          _sv_NumAreaNodes;
 
 // world_hull.c
 Hull_p      SV_HullForBox(BBox_t bb);

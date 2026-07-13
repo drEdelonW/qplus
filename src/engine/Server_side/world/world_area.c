@@ -34,16 +34,10 @@ ENTITY AREA CHECKING
 ===============================================================================
 */
 
-areaNode_t   _sv_AreaNodes[AREA_NODES];
-int          _sv_NumAreaNodes;
+areaNode_t _sv_AreaNodes[AREA_NODES];
+static int _sv_NumAreaNodes;
 
 
-/*
-===============
-SV_CreateAreaNode
-
-===============
-*/
 #define AREA_DEPTH 4
 areaNode_p SV_CreateAreaNode(int depth, BBox_t bb) {
     areaNode_p anode = &_sv_AreaNodes[_sv_NumAreaNodes];
@@ -73,12 +67,7 @@ areaNode_p SV_CreateAreaNode(int depth, BBox_t bb) {
     return anode;
 }
 
-/*
-===============
-SV_ClearWorld
 
-===============
-*/
 void SV_ClearWorld() {
     SV_InitBoxHull();
 
@@ -88,12 +77,6 @@ void SV_ClearWorld() {
 }
 
 
-/*
-===============
-SV_UnlinkEdict
-
-===============
-*/
 void SV_UnlinkEdict(edict_p ent) {
     if (!ent->area.prev)    return;  // not linked in anywhere
 
@@ -103,13 +86,6 @@ void SV_UnlinkEdict(edict_p ent) {
 
 
 
-
-/*
-===============
-SV_FindTouchedLeafs
-
-===============
-*/
 #include "BBox_tools.h"
 void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
     if (node->contents == CONTENTS_SOLID)       return;
@@ -127,12 +103,7 @@ void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
     }
 
     // NODE_MIXED
-    // BBox_t _bb = EvBBox(&ent->v);
     BBox_t _bb = EvAbsBBox(&ent->v);
-    // BBox_t _bb = {
-    //     .mins = ent->v.absmin,
-    //     .maxs = ent->v.absmax
-    // };
     PlaneSide_t sides = BOX_ON_PLANE_SIDE(_bb, node->plane);
 
     // recurse down the contacted sides
@@ -141,11 +112,7 @@ void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
 }
 
 
-/*
-====================
-SV_TouchLinks
-====================
-*/
+
 void SV_TouchLinks(edict_p ent, areaNode_p node) {
     // touch linked edicts
     link_p next;
@@ -167,10 +134,10 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
             (ent->v.absmax.z < touch->v.absmin.z)
             )   continue;
 #else
-        BBox_t entBB   = { .mins = ent->v.absmin,   .maxs = ent->v.absmax };
-        BBox_t touchBB = { .mins = touch->v.absmin, .maxs = touch->v.absmax };
-        if (!BBoxOverlaps(entBB, touchBB))
-            continue;
+        if (!BBoxOverlaps(
+            EvAbsBBox(&ent->v),
+            EvAbsBBox(&touch->v))
+            )   continue;
 #endif
 
         int old_self = pr_global_struct->self;
@@ -193,20 +160,14 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
 }
 
 
-/*
-===============
-SV_LinkEdict
 
-===============
-*/
 void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     if (ent->area.prev)
         SV_UnlinkEdict(ent); // unlink from old position
 
     if ((ent == Edicts) ||  // don't add the world
-        (ent->free))
-        return;
-
+        (ent->free)
+        )   return;
     // set the abs box
 
 #ifdef QUAKE2

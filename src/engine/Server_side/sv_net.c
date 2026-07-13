@@ -252,20 +252,13 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
         ent->v.dmg_save = 0;
     }
 
-    //
     // send the current viewpos offset from the view entity
-    //
     SV_SetIdealPitch();    // how much to look up / down ideally
 
     // a fixangle might get lost in a dropped packet.  Oh well.
     if (ent->v.fixangle) {
         MSG_WriteByte(msg, svc_setangle);
-#if 0
-        for (int i = 0; i < VECT_DIM; i++)
-            MSG_WriteAngle(msg, ent->v.angles.v[i]);
-#else
         MSG_WriteAngles(msg, ent->v.angles);
-#endif
         ent->v.fixangle = 0;
     }
 
@@ -279,11 +272,8 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     int items = (int)ent->v.items | ((int)ent->v.items2 << 23);
 #else
     eval_p val = GetEdictFieldValue(ent, "items2");
-    int items = (int)ent->v.items | (
-        (val) ?
-        ((int)val->_float << 23) :
-        ((int)pr_global_struct->serverflags << 28)
-        );
+    int items = (int)ent->v.items | ((val) ?
+        ((int)val->_float << 23) : ((int)pr_global_struct->serverflags << 28));
 #endif
 
     bits |= SU_ITEMS;
@@ -301,7 +291,6 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     if (ent->v.weapon)                      bits |= SU_WEAPON;
 
     // send the data
-
     MSG_WriteByte(msg, svc_clientdata); MSG_WriteShort(msg, (int16_t)bits);
     if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, (int8_t)ent->v.view_ofs.z);
     if (bits & SU_IDEALPITCH)           MSG_WriteChar(msg, (int8_t)ent->v.idealpitch);
@@ -325,14 +314,12 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     MSG_WriteByte(msg, (uint8_t)ent->v.ammo_cells);
 
     if (standard_quake)                 MSG_WriteByte(msg, (uint8_t)ent->v.weapon);
-    else {
-        for (uint8_t i = 0; i < 32; i++) {
+    else
+        for (uint8_t i = 0; i < 32; i++)
             if (((int)ent->v.weapon) & (1 << i)) {
                 MSG_WriteByte(msg, i);
                 break;
             }
-        }
-    }
 }
 
 
@@ -346,13 +333,8 @@ bool SV_SendClientDatagram(RmtClient_p client) {
     uint8_t    buf[MAX_DATAGRAM];
     sizebuf_t   msg = {
         .data = buf,
-        .maxsize = sizeof(buf),
-        .cursize = 0
+        .maxsize = sizeof(buf)
     };
-
-    // msg.data = buf;
-    // msg.maxsize = sizeof(buf);
-    // msg.cursize = 0;
 
     MSG_WriteByte(&msg, svc_time);
     MSG_WriteFloat(&msg, (float)SV_GetTime());
@@ -362,7 +344,7 @@ bool SV_SendClientDatagram(RmtClient_p client) {
     SV_WriteEntitiesToClient(client->edict, &msg);
 
     // copy the server datagram if there is space
-    if (msg.cursize + sv.datagram.cursize < msg.maxsize)
+    if ((msg.cursize + sv.datagram.cursize) < msg.maxsize)
         SZ_Write(&msg, sv.datagram.data, sv.datagram.cursize);
 
     // send the datagram
@@ -382,28 +364,31 @@ bool SV_SendClientDatagram(RmtClient_p client) {
     =======================
 */
 void SV_UpdateToReliableMessages() {
-    RmtClient_p client;
-
     // check for changes to be sent over the reliable streams
     remoteClient = svs.clients;
     for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
         if (remoteClient->old_frags != remoteClient->edict->v.frags) {
-            client = svs.clients;
+            RmtClient_p client = svs.clients;
             for (int j = 0; j < GetSvMaxClients(); j++, client++) {
                 if (!client->active)    continue;
 
                 sizebuf_p pBuf = &client->message;
-                MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, (uint8_t)i); MSG_WriteShort(pBuf, (int16_t)remoteClient->edict->v.frags);
+                MSG_WriteByte(pBuf, svc_updatefrags); {
+                    MSG_WriteByte(pBuf, (uint8_t)i);
+                    MSG_WriteShort(pBuf, (int16_t)remoteClient->edict->v.frags);
+                }
             }
 
             remoteClient->old_frags = (int16_t)remoteClient->edict->v.frags;
         }
     }
 
-    client = svs.clients;
-    for (int j = 0; j < GetSvMaxClients(); j++, client++) {
-        if (!client->active)    continue;
-        SZ_Write(&client->message, sv.reliable_datagram.data, sv.reliable_datagram.cursize);
+    {
+        RmtClient_p client = svs.clients;
+        for (int j = 0; j < GetSvMaxClients(); j++, client++) {
+            if (!client->active)    continue;
+            SZ_Write(&client->message, sv.reliable_datagram.data, sv.reliable_datagram.cursize);
+        }
     }
 
     SZ_Clear(&sv.reliable_datagram);
@@ -445,19 +430,17 @@ void SV_CreateBaseline() {
             svent->baseline.modelindex = SV_ModelIndex(PR_GetQString(svent->v.model));
         }
 
-        //
         // add to the message
-        //
-        MSG_WriteByte(&sv.signon, svc_spawnbaseline);
-
-        MSG_WriteShort(&sv.signon, (int16_t)entnum);
-        MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.modelindex);
-        MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.frame);
-        MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.colormap);
-        MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.skin);
-        for (int i = 0; i < VECT_DIM; i++) {
-            MSG_WriteCoord(&sv.signon, svent->baseline.pose.loc.v[i]);
-            MSG_WriteAngle(&sv.signon, svent->baseline.pose.aim.v[i]);
+        MSG_WriteByte(&sv.signon, svc_spawnbaseline); {
+            MSG_WriteShort(&sv.signon, (int16_t)entnum);
+            MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.modelindex);
+            MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.frame);
+            MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.colormap);
+            MSG_WriteByte(&sv.signon, (uint8_t)svent->baseline.skin);
+            for (int i = 0; i < VECT_DIM; i++) {
+                MSG_WriteCoord(&sv.signon, svent->baseline.pose.loc.v[i]);
+                MSG_WriteAngle(&sv.signon, svent->baseline.pose.aim.v[i]);
+            }
         }
     }
 }

@@ -229,9 +229,8 @@ void R_NewMap() {
         pSurfaces--;
         R_SurfacePatch();
     }
-    else {
+    else
         r_surfsonstack = true;
-    }
 
     r_maxedgesseen = 0;
     r_maxsurfsseen = 0;
@@ -239,12 +238,10 @@ void R_NewMap() {
     r_numallocatededges = r_maxedges.value;
     ClampLessThen(&r_numallocatededges, MINEDGES);
 
-    if (r_numallocatededges <= NUMSTACKEDGES) {
+    if (r_numallocatededges <= NUMSTACKEDGES)
         auxedges = NULL;
-    }
     else {
-        auxedges = Hunk_AllocName(r_numallocatededges * sizeof(Edge_t),
-            "edges");
+        auxedges = Hunk_AllocName(r_numallocatededges * sizeof(Edge_t), "edges");
     }
 
     r_dowarpold = false;
@@ -268,7 +265,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
 
     R_SetVrect(pvrect, &r_refdef.vrect, lineadj);
 
-    r_refdef.horizontalFieldOfView = 2.0 * tan(r_refdef.fov_x / 360 * M_PI);
+    r_refdef.horizontalFieldOfView = 2.0 * tanf(r_refdef.fov_x / 360 * M_PI);
     r_refdef.fvrectx = (float)r_refdef.vrect.x;
     r_refdef.fvrectx_adj = (float)r_refdef.vrect.x - 0.5;
     r_refdef.vrect_x_adj_shift20 = (r_refdef.vrect.x << 20) + (1 << 19) - 1;
@@ -363,7 +360,7 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
         VectorNormalize(&screenedge[i].normal);
 
     float res_scale =
-        sqrt(
+        sqrtf(
             (double)(
                 r_refdef.vrect.width * r_refdef.vrect.height) /
             (320.0 * 152.0)) *
@@ -464,7 +461,7 @@ void R_DrawEntitiesOnList() {
                 vec3_t lightvec = { .x = -1.0f, .y = 0.0f, .z = 0.0f };
                 lighting.plightvec = &lightvec;
 
-                for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
+                for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++)
                     if (cl_dlights[lnum].die >= GetClSimTime()) {
                         vec3_t dist = VectorSubtract(currententity->pose.loc, cl_dlights[lnum].origin);
                         float add = cl_dlights[lnum].radius - Length(dist);
@@ -472,7 +469,6 @@ void R_DrawEntitiesOnList() {
                         if (add > 0.0f)
                             lighting.ambientlight += add;
                     }
-                }
 
                 // clamp lighting so it doesn't overbright as much
                 ClampMoreThen(&lighting.ambientlight, 128);
@@ -506,7 +502,8 @@ void R_DrawViewModel() {
     // FIXME: remove and do real lighting
 
     if (
-        ((!r_drawviewmodel.value) ||
+        (
+            (!r_drawviewmodel.value) ||
             (r_fov_greater_than_90)
             ) ||
         (cl.items & IT_INVISIBILITY) ||
@@ -534,8 +531,8 @@ void R_DrawViewModel() {
         dLight_p dl = &cl_dlights[lnum];
         if ((!dl->radius) ||
             (!dl->radius) ||
-            (dl->die < GetClSimTime()))
-            continue;
+            (dl->die < GetClSimTime())
+            )   continue;
 
         vec3_t dist = VectorSubtract(currententity->pose.loc, dl->origin);
         float add = dl->radius - Length(dist);
@@ -676,9 +673,8 @@ void R_DrawBEntitiesOnList() {
                                 r_clipflags = clipflags;
                                 R_DrawSolidClippedSubmodelPolygons(clmodel);
                             }
-                            else {  // falls entirely in one leaf, so we just put all the edges in the edge list and let 1/z sorting handle drawing order
+                            else // falls entirely in one leaf, so we just put all the edges in the edge list and let 1/z sorting handle drawing order
                                 R_DrawSubmodelPolygons(clmodel, clipflags);
-                            }
 
                             currententity->topnode = NULL;
                         }

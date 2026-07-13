@@ -42,7 +42,7 @@ static int _lightMapTextures;
 int texture_extension_number = 1;
 
 
-fixed16_t blocklights[18 * 18];
+static fixed16_t _blockLights[18 * 18];
 
 #define BLOCK_WIDTH     128
 #define BLOCK_HEIGHT    128
@@ -64,9 +64,8 @@ glRect_t    lightmap_rectchange[MAX_LIGHTMAPS];
 
 int allocated[MAX_LIGHTMAPS][BLOCK_WIDTH];
 
-// the lightmap texture data needs to be kept in
-// main memory so texsubimage can update properly
-byte    lightmaps[4 * MAX_LIGHTMAPS * BLOCK_WIDTH * BLOCK_HEIGHT];
+// the lightmap texture data needs to be kept in main memory so texsubimage can update properly
+static byte lightmaps[4 * MAX_LIGHTMAPS * BLOCK_WIDTH * BLOCK_HEIGHT];
 
 // For gl_texsort 0
 mSurface_p skychain = NULL;
@@ -115,7 +114,7 @@ void R_AddDynamicLights(mSurface_p surf) { // TODO: merge with SoftR function al
                     sd + HALF(td) : td + HALF(sd);
 
                 if (dist < minlight)
-                    blocklights[(t * smax) + s] += (rad - dist) * 256;
+                    _blockLights[(t * smax) + s] += (rad - dist) * 256;
             }
         }
     }
@@ -126,7 +125,7 @@ void R_AddDynamicLights(mSurface_p surf) { // TODO: merge with SoftR function al
 ===============
 R_BuildLightMap
 
-Combine and scale multiple lightmaps into the 8.8 format in blocklights
+Combine and scale multiple lightmaps into the 8.8 format in _blockLights
 ===============
 */
 void R_BuildLightMap(mSurface_p surf, uint8_p dest, int stride) {// TODO: merge with GL function almoust the same
@@ -141,11 +140,11 @@ void R_BuildLightMap(mSurface_p surf, uint8_p dest, int stride) {// TODO: merge 
         !(cl.worldmodel->lightdata)
         ) {
         for (int i = 0; i < size; i++)
-            blocklights[i] = 255 * 256;
+            _blockLights[i] = 255 * 256;
     }
     else {  // clear to no light
         for (int i = 0; i < size; i++)
-            blocklights[i] = 0;
+            _blockLights[i] = 0;
 
         {   // add all the lightmaps
             uint8_p lightmap = surf->samples;
@@ -154,7 +153,7 @@ void R_BuildLightMap(mSurface_p surf, uint8_p dest, int stride) {// TODO: merge 
                     fixed8_t scale = d_lightstylevalue[surf->styles[maps]];
                     surf->cached_light[maps] = scale;    // 8.8 fraction
                     for (int i = 0; i < size; i++)
-                        blocklights[i] += lightmap[i] * scale;
+                        _blockLights[i] += lightmap[i] * scale;
                     lightmap += size;    // skip to next lightmap
                 }
         }
@@ -168,7 +167,7 @@ void R_BuildLightMap(mSurface_p surf, uint8_p dest, int stride) {// TODO: merge 
     switch (gl_lightmap_format) {
     case GL_RGBA: {
         stride -= MUL4(smax);
-        fixed16_p bl = blocklights;
+        fixed16_p bl = _blockLights;
         for (int i = 0; i < tmax; i++, dest += stride)
             for (int j = 0; j < smax; j++) {
                 int t = DIV128(*bl++);
@@ -180,7 +179,7 @@ void R_BuildLightMap(mSurface_p surf, uint8_p dest, int stride) {// TODO: merge 
     case GL_ALPHA:
     case GL_LUMINANCE:
     case GL_INTENSITY: {
-        fixed16_p bl = blocklights;
+        fixed16_p bl = _blockLights;
         for (int i = 0; i < tmax; i++, dest += stride)
             for (int j = 0; j < smax; j++) {
                 int t = DIV128(*bl++);

@@ -80,10 +80,7 @@ extern int      r_visframecount;    // r_main.c
 
 //=============================================================================
 
-//
 // current entity info
-//
-
 void R_DrawSprite();
 void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags);
 void R_RenderPoly(mSurface_p fa, AliasClipFlags_f clipflags);
@@ -93,13 +90,6 @@ void R_TransformFrustum();
 void R_SetSkyFrame();
 void R_DrawSurfaceBlock16();
 
-#if id386
-// used for surfmiptable[]
-void R_DrawSurfaceBlock8_mip0();
-void R_DrawSurfaceBlock8_mip1();
-void R_DrawSurfaceBlock8_mip2();
-void R_DrawSurfaceBlock8_mip3();
-#endif
 
 void R_GenSkyTile(qColor8_p pdest);
 void R_GenSkyTile16(uint16_p pdest);
@@ -217,11 +207,7 @@ extern int  r_maxedgesseen; // Debug metric
 extern int      r_cnumsurfs;
 extern bool     r_dowarpold, r_viewchanged;
 extern mLeaf_p  r_viewleaf, r_oldviewleaf;
-#if 0
-extern vec3_t   r_emins, r_emaxs;
-#else
 extern BBox_t   r_entBB;
-#endif
 extern mNode_p  r_pefragtopnode;
 extern AliasClipFlags_f r_clipflags;
 extern int      r_dlightframecount;

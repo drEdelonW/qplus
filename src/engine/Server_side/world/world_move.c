@@ -21,8 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "world_priv.h"
 
 
-
-
 /*
 ============
 SV_TestEntityPosition
@@ -32,7 +30,10 @@ This could be a lot more efficient...
 */
 #include "BBox_tools.h"
 edict_p SV_TestEntityPosition(edict_p ent) {
-    trace_t trace = SV_Move(ent->v.origin, EvBBox(&ent->v), ent->v.origin, MOVE_NORMAL, ent);
+    trace_t trace = SV_Move(
+        ent->v.origin, EvBBox(&ent->v), ent->v.origin,
+        MOVE_NORMAL, ent
+    );
 
     return (trace.startsolid) ? Edicts : NULL;
 }
@@ -124,8 +125,9 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
         trace.endpos = VectorAdd(trace.endpos, offset);
 
     // did we clip the move?
-    if ((trace.fraction < 1) || trace.startsolid)
-        trace.ent = ent;
+    if ((trace.fraction < 1) ||
+        (trace.startsolid)
+        )   trace.ent = ent;
 
     return trace;
 }
@@ -147,8 +149,8 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
         next = l->next;
         edict_p touch = EDICT_FROM_AREA(l);
         if ((touch->v.solid == SOLID_NOT) ||
-            (touch == clip->passedict))
-            continue;
+            (touch == clip->passedict)
+            )   continue;
 
         if (touch->v.solid == SOLID_TRIGGER)    Host_SysError("Trigger in clipping list");
 
@@ -209,11 +211,7 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
 }
 
 
-/*
-==================
-SV_MoveBounds
-==================
-*/
+
 void SV_MoveBounds(vec3_t start, BBox_t bb, vec3_t end, BBox_p box) {
 #if 0
     // debug to test against everything
@@ -232,11 +230,7 @@ void SV_MoveBounds(vec3_t start, BBox_t bb, vec3_t end, BBox_p box) {
 #endif
 }
 
-/*
-==================
-SV_Move
-==================
-*/
+
 trace_t SV_Move(vec3_t start, BBox_t bb, vec3_t end, phymovetype_t type, edict_p passedict) {
     moveClip_t clip = {
         // .box = ,

@@ -63,7 +63,7 @@ Used by view and sv_user
 ===============
 */
 
-static Basis_t _bs;
+Basis_t _bs;
 
 float V_CalcRoll(ang3_t angles, vec3_t velocity) {
     _bs = GetBasis(angles);

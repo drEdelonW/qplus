@@ -38,11 +38,7 @@ static char _localModels[MAX_MODELS][5];    // inline model names for precache
 
 //============================================================================
 
-/*
-    ===============
-    SV_Init
-    ===============
-*/
+
 void SV_Init() {
     Cvar_RegisterVariable(&sv_maxvelocity);
     Cvar_RegisterVariable(&sv_gravity);
@@ -55,9 +51,9 @@ void SV_Init() {
     Cvar_RegisterVariable(&sv_aim);
     Cvar_RegisterVariable(&sv_nostep);
 
-    for (int i = 0; i < MAX_MODELS; i++) {
+    for (int i = 0; i < MAX_MODELS; i++)
         snprintf(_localModels[i], sizeof(_localModels[i]), "*%i", i);
-    }
+
 }
 
 cString SV_GetName() { return sv.name; }
@@ -121,12 +117,7 @@ void SV_ConnectClient(uint32_t clientnum) {
 }
 
 
-/*
-    ===================
-    SV_CheckForNewClients
 
-    ===================
-*/
 void SV_CheckForNewClients() {
     //
     // check for new connections
@@ -162,23 +153,13 @@ FRAME UPDATES
 ===============================================================================
 */
 
-/*
-    ==================
-    SV_ClearDatagram
 
-    ==================
-*/
 void SV_ClearDatagram() { SZ_Clear(&sv.datagram); }
 
 //=============================================================================
 
 
-/*
-    =============
-    SV_CleanupEnts
 
-    =============
-*/
 void SV_CleanupEnts() {
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
         edict_p ent = ED_GetEDictByIdx(e);
@@ -187,11 +168,7 @@ void SV_CleanupEnts() {
 }
 
 
-/*
-    =======================
-    SV_SendClientMessages
-    =======================
-*/
+
 void SV_SendClientMessages() {
     SV_UpdateToReliableMessages();  // update frags, names, etc
 
@@ -231,7 +208,8 @@ void SV_SendClientMessages() {
                 continue;
             }
 
-            if (remoteClient->dropasap)      SV_DropClient(false);  // went to another level
+            if (remoteClient->dropasap)
+                SV_DropClient(false);  // went to another level
             else {
                 if (NET_SendMessage(remoteClient->netconnection, &remoteClient->message) == -1)
                     SV_DropClient(true);  // if the message couldn't send, kick off
@@ -256,22 +234,19 @@ SERVER SPAWNING
 ==============================================================================
 */
 
-/*
-    ================
-    SV_ModelIndex
 
-    ================
-*/
 int SV_ModelIndex(cString name) {
-    if (!name || !name[0]) return 0;
+    if (!(name) ||
+        !(name[0])
+        )   return 0;
 
     int i = 0;
-    for (; i < MAX_MODELS && sv.model_precache[i]; i++)
+    for (; (i < MAX_MODELS) && (sv.model_precache[i]); i++)
         if (!strcmp(sv.model_precache[i], name))
             return i;
     if ((i == MAX_MODELS) ||
-        !sv.model_precache[i])
-        Host_SysError("SV_ModelIndex: model %s not precached", name);
+        !(sv.model_precache[i])
+        )   Host_SysError("SV_ModelIndex: model %s not precached", name);
     return i;
 }
 
@@ -321,21 +296,16 @@ void SV_SpawnServer(cString server
     Con_DPrintf("SpawnServer: %s\n", server);
     svs.changelevel_issued = false;    // now safe to issue another
 
-    //
     // tell all connected clients that we are going to a new level
-    //
-    if (SV_IsActive()) { SV_SendReconnect(); }
+    if (SV_IsActive()) 
+        SV_SendReconnect();
 
-    //
     // make cvars consistant
-    //
     if (coop.value) Cvar_SetValue("deathmatch", 0.f);
     GM_SetSkill((Skill_t)(skill.value + 0.5f));
     Cvar_SetValue("skill", (float)GM_GetSkill());
 
-    //
     // set up the new server
-    //
     Host_ClearMemory();
 
     memset(&sv, 0, sizeof(sv));
@@ -357,24 +327,20 @@ void SV_SpawnServer(cString server
 
     // leave slots at start for clients only
     SetEdNum(GetSvMaxClients() + 1);
-    for (int i = 0; i < GetSvMaxClients(); i++) {
+    for (int i = 0; i < GetSvMaxClients(); i++)
         svs.clients[i].edict = ED_GetEDictByIdx(i + 1);
-    }
 
 
     sv.datagram = (sizebuf_t){
         .maxsize = sizeof(sv.datagram_buf),
-        // .cursize = 0,
         .data = sv.datagram_buf
     };
     sv.reliable_datagram = (sizebuf_t){
         .maxsize = sizeof(sv.reliable_datagram_buf),
-        // .cursize = 0,
         .data = sv.reliable_datagram_buf
     };
     sv.signon = (sizebuf_t){
         .maxsize = sizeof(sv.signon_buf),
-        // .cursize = 0,
         .data = sv.signon_buf
     };
 
@@ -393,9 +359,7 @@ void SV_SpawnServer(cString server
     }
     sv.models[1] = sv.worldmodel;
 
-    //
     // clear world interaction links
-    //
     SV_ClearWorld();
 
     // sv.sound_precache[0] = pr_strings;
@@ -407,9 +371,7 @@ void SV_SpawnServer(cString server
         sv.models[i + 1] = Mod_ForName(_localModels[i], false);
     }
 
-    //
     // load the rest of the entities
-    //
     edict_p ent = ED_GetEDictByIdx(0);
     memset(&ent->v, 0, progs->entityfields * 4);
     ent->free = false;
@@ -432,7 +394,6 @@ void SV_SpawnServer(cString server
     ED_LoadFromFile(sv.worldmodel->entities);
 
     sv.active = true;
-
     sv.state = ss_active;    // all setup is completed, any further precache statements are errors
 
     // run two frames to allow everything to settle
