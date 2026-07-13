@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define SURFCACHE_SIZE_AT_320X200  (600 * 1024)
 
-extern int   d_aflatcolor;
+extern qColor8_t   d_aflatcolor;
 extern bool  d_roverwrapped;
 
 extern SurfCache_p sc_rover;
@@ -64,17 +64,14 @@ extern void D_PolysetAff8Start();
 extern void D_PolysetAff8End();
 #endif
 
-#if 1   /* Z-buffer */
-// extern int16_p  d_pzbuffer;
-#endif
-
 extern int      d_scantable[MAXHEIGHT];
-extern int      d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
-extern int      d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
+extern int16_p  zspantable[MAXHEIGHT];
+
+extern int d_vrectx, d_vrecty, d_vrectright_particle, d_vrectbottom_particle;
+extern int d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
 
 extern qColor8_p  d_viewbuffer;
 
-extern int16_p  zspantable[MAXHEIGHT];
 
 
 

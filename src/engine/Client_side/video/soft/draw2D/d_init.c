@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 SurfCache_p d_initial_rover;
-bool        d_roverwrapped;
 
 void (*d_drawspans)(eSpan_p pspan);
 
@@ -127,6 +126,6 @@ void D_SetupFrame() {
         D_DrawSpans8;
 
 
-    d_aflatcolor = 0;
+    d_aflatcolor.i = InkConTransp;
 }
 

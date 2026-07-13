@@ -42,6 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "menu_prv.h"
 #include "progs.h"
 #include "GameRule.h"
+#include "vector_tools.h"
 
 /*
 ==================
@@ -1026,7 +1027,17 @@ void Host_Spawn_f() {
     // and it won't happen if the game was just loaded, so you wind up
     // with a permanent head tilt
     edict_p ent = ED_GetEDictByIdx(1 + (uint32_t)(remoteClient - svs.clients));
-    MSG_WriteByte(pBuf, svc_setangle); { MSG_WriteAngle(pBuf, ent->v.angles.pitch); MSG_WriteAngle(pBuf, ent->v.angles.yaw); MSG_WriteAngle(pBuf, 0.f); };
+    MSG_WriteByte(pBuf, svc_setangle);
+#if 0
+    {
+        MSG_WriteAngle(pBuf, ent->v.angles.pitch);
+        MSG_WriteAngle(pBuf, ent->v.angles.yaw);
+        MSG_WriteAngle(pBuf, 0.f);
+    };
+#else
+    ang3_t toSend = ent->v.angles; { ent->v.angles.roll = 0.f; }
+    MSG_WriteAngles(pBuf, toSend);
+#endif
 
     SV_WriteClientdataToMessage(sv_player, pBuf);
 

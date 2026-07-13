@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "progs.h"
 #include "progdefs.h"
 #include "GlobVars.h"
+#include "sv_phys.h"
 #include "Edict.h"
 #include "world.h"
 #include "server_priv.h"

@@ -56,7 +56,7 @@ VidDef_t vid; // global video state
 Rgb16_t d_8to16table[InksNum]; // extern
 static PIXEL16 st2d_8to16table[InksNum];
 static PIXEL24 st2d_8to24table[InksNum];
-static qPal_t current_palette;   // 768 byte
+static qPal_t current_palette;
 
 bool    doShm = false;  // extern
 Display* x_disp;    // shared with in_x
@@ -65,7 +65,7 @@ Window          x_win;
 static GC       x_gc;
 static Visual* x_vis;
 static XVisualInfo* x_visinfo;
-int          x_shmeventtype;
+int x_shmeventtype;
 
 bool   oktodraw = false;
 
@@ -106,7 +106,8 @@ static inline uint32_t ChanShiftMask(int value, int shift, uint32_t mask) {
     /*           */ return (uint32_t)value & mask;
 }
 static inline Rgb32_t PackRgb(int r, int g, int b) {   // TODO: rework for [qRgb24] color geting
-    return ChanShiftMask(r, r_shift, r_mask) |
+    return
+        ChanShiftMask(r, r_shift, r_mask) |
         ChanShiftMask(g, g_shift, g_mask) |
         ChanShiftMask(b, b_shift, b_mask);
 }
@@ -248,17 +249,13 @@ void ResetFrameBuffer() {
 
     // alloc an extra line in case we want to wrap, and allocate the z-buffer
     X11_buffersize = vid.frameBuff.width * vid.frameBuff.height * sizeof(*vid.zBuff.pZBuff);
-
     vid_surfcachesize = D_SurfaceCacheForRes(vid.frameBuff.width, vid.frameBuff.height);
-
     X11_buffersize += vid_surfcachesize;
-
     vid.zBuff.pZBuff = Hunk_HighAllocName(X11_buffersize, "video");
     if (vid.zBuff.pZBuff == NULL)
         Sys_Error("Not enough memory for video mode\n");
 
-    vid_surfcache = (uint8_p)vid.zBuff.pZBuff
-        + vid.frameBuff.width * vid.frameBuff.height * sizeof(*vid.zBuff.pZBuff);
+    vid_surfcache = (uint8_p)vid.zBuff.pZBuff + (vid.frameBuff.width * vid.frameBuff.height * sizeof(*vid.zBuff.pZBuff));
 
     D_InitCaches(vid_surfcache, vid_surfcachesize);
 
@@ -295,31 +292,23 @@ void ResetSharedFrameBuffers() {
 
     // alloc an extra line in case we want to wrap, and allocate the z-buffer
     X11_buffersize = vid.frameBuff.width * vid.frameBuff.height * sizeof(*vid.zBuff.pZBuff);
-
     vid_surfcachesize = D_SurfaceCacheForRes(vid.frameBuff.width, vid.frameBuff.height);
-
     X11_buffersize += vid_surfcachesize;
-
     vid.zBuff.pZBuff = Hunk_HighAllocName(X11_buffersize, "video");
     if (vid.zBuff.pZBuff == NULL)
         Sys_Error("Not enough memory for video mode\n");
 
     vid_surfcache = (uint8_p)vid.zBuff.pZBuff + (vid.frameBuff.width * vid.frameBuff.height * sizeof(*vid.zBuff.pZBuff));
-
     D_InitCaches(vid_surfcache, vid_surfcachesize);
 
     for (int frm = 0; frm < 2; frm++) {
-
-        // free up old frame buffer memory
-
-        if (x_framebuffer[frm]) {
+        if (x_framebuffer[frm]) { // free up old frame buffer memory
             XShmDetach(x_disp, &x_shminfo[frm]);
             free(x_framebuffer[frm]);
             shmdt(x_shminfo[frm].shmaddr);
         }
 
         // create the image
-
         x_framebuffer[frm] = XShmCreateImage(
             x_disp,
             x_vis, x_visinfo->depth,
@@ -329,7 +318,6 @@ void ResetSharedFrameBuffers() {
         );
 
         // grab shared memory
-
         int size =
             x_framebuffer[frm]->bytes_per_line *
             x_framebuffer[frm]->height;
@@ -346,19 +334,17 @@ void ResetSharedFrameBuffers() {
             (TypeLess_ptr)shmat(x_shminfo[frm].shmid, 0, 0);
 
         printf("VID: shared memory id=%d, addr=0x%p\n",
-            x_shminfo[frm].shmid,
-            (TypeLess_ptr)x_shminfo[frm].shmaddr);
+            x_shminfo[frm].shmid, (TypeLess_ptr)x_shminfo[frm].shmaddr
+        );
 
         x_framebuffer[frm]->data = x_shminfo[frm].shmaddr;
 
         // get the X server to attach to it
-
         if (!XShmAttach(x_disp, &x_shminfo[frm]))
             Sys_Error("VID: XShmAttach() failed\n");
 
         XSync(x_disp, 0);
         shmctl(x_shminfo[frm].shmid, IPC_RMID, 0);
-
     }
 
 }
@@ -394,35 +380,40 @@ void VID_Init(qPal_p palette) {
 
     XSynchronize(x_disp, True);    // for debugging only
 
-    int pnum;
-    // check for command-line window size
-    if ((pnum = COM_CheckParm("-winsize"))) {
-        if (pnum >= com.argc - 2)       Sys_Error("VID: -winsize <width> <height>\n");
+    {   // check for command-line window size
+        int pnum;
+        if ((pnum = COM_CheckParm("-winsize"))) {
+            if (pnum >= com.argc - 2)       Sys_Error("VID: -winsize <width> <height>\n");
 
-        vid.frameBuff.width = Q_atoi(com.argv[pnum + 1]);
-        vid.frameBuff.height = Q_atoi(com.argv[pnum + 2]);
-        if (!(vid.frameBuff.width) ||
-            !(vid.frameBuff.height)
-            )   Sys_Error("VID: Bad window width/height\n");
+            vid.frameBuff.width = Q_atoi(com.argv[pnum + 1]);
+            vid.frameBuff.height = Q_atoi(com.argv[pnum + 2]);
+            if (!(vid.frameBuff.width) ||
+                !(vid.frameBuff.height)
+                )   Sys_Error("VID: Bad window width/height\n");
+        }
     }
-    if ((pnum = COM_CheckParm("-width"))) {
-        if (pnum >= com.argc - 1)       Sys_Error("VID: -width <width>\n");
+    {
+        int pnum;
+        if ((pnum = COM_CheckParm("-width"))) {
+            if (pnum >= com.argc - 1)       Sys_Error("VID: -width <width>\n");
 
-        vid.frameBuff.width = Q_atoi(com.argv[pnum + 1]);
-        if (!vid.frameBuff.width)       Sys_Error("VID: Bad window width\n");
+            vid.frameBuff.width = Q_atoi(com.argv[pnum + 1]);
+            if (!vid.frameBuff.width)       Sys_Error("VID: Bad window width\n");
+        }
     }
+    {
+        int pnum;
+        if ((pnum = COM_CheckParm("-height"))) {
+            if (pnum >= com.argc - 1)       Sys_Error("VID: -height <height>\n");
 
-    if ((pnum = COM_CheckParm("-height"))) {
-        if (pnum >= com.argc - 1)       Sys_Error("VID: -height <height>\n");
-
-        vid.frameBuff.height = Q_atoi(com.argv[pnum + 1]);
-        if (!vid.frameBuff.height)      Sys_Error("VID: Bad window height\n");
+            vid.frameBuff.height = Q_atoi(com.argv[pnum + 1]);
+            if (!vid.frameBuff.height)      Sys_Error("VID: Bad window height\n");
+        }
     }
-
-    int template_mask = 0;
-
     {   // specify a visual id
+        int pnum;
         XVisualInfo template;
+        int template_mask = 0;
         if ((pnum = COM_CheckParm("-visualid"))) {
             if (pnum >= com.argc - 1)       Sys_Error("VID: -visualid <id#>\n");
 
@@ -534,10 +525,14 @@ void VID_Init(qPal_p palette) {
         cString displayname = (cString)getenv("DISPLAY");
         if (displayname) {
             cString dName = displayname;
-            while (*dName && (*dName != ':'))   dName++;
-            if (*dName) *dName = 0x00;
-            if (!(!strcasecmp(displayname, "unix") || !*displayname))
-                doShm = false;
+            while ((*dName) &&
+                (*dName != ':')
+                )   dName++;
+
+            if (*dName)     *dName = 0x00;
+            if (!(!strcasecmp(displayname, "unix") ||
+                !*displayname)
+                )   doShm = false;
         }
     }
 

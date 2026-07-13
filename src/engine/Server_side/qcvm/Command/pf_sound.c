@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "server.h"
 #include "protocol.h"
 #include <string.h>
+#include "vector_tools.h"
 
 
 /*
@@ -52,14 +53,17 @@ void PF_sound() {
     int volume = (int)G_FLOAT(OFS_PARM3) * 255;
     float attenuation = G_FLOAT(OFS_PARM4);
 
-    if ((volume < VolSilent) || (volume > VolFull)
-    )   Host_SysError("SV_StartSound: volume = %i", volume);
+    if ((volume < VolSilent) ||
+        (volume > VolFull)
+        )   Host_SysError("SV_StartSound: volume = %i", volume);
 
-    if ((attenuation < AtnNone) || (attenuation > AtnMax)
-    )   Host_SysError("SV_StartSound: attenuation = %f", attenuation);
+    if ((attenuation < AtnNone) ||
+        (attenuation > AtnMax)
+        )   Host_SysError("SV_StartSound: attenuation = %f", attenuation);
 
-    if ((channel < SndChAuto) || (channel > SndChMax)
-    )   Host_SysError("SV_StartSound: channel = %i", channel);
+    if ((channel < SndChAuto) ||
+        (channel > SndChMax)
+        )   Host_SysError("SV_StartSound: channel = %i", channel);
 
     SV_StartSound(entity, channel, sample, volume, attenuation);
 }
@@ -92,8 +96,12 @@ void PF_ambientsound() {
     // add an svc_spawnambient command to the level signon packet
 
     MSG_WriteByte(&sv.signon, svc_spawnstaticsound);
+#if 0
     for (int i = 0; i < VECT_DIM; i++)
         MSG_WriteCoord(&sv.signon, pos.v[i]);
+#else
+    MSG_WriteVector(&sv.signon, pos);
+#endif
 
     MSG_WriteByte(&sv.signon, soundnum);
 

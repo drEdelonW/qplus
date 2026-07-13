@@ -110,7 +110,7 @@ static XVisualInfo* x_visinfo;
 static Atom                aHints = 0;
 static Atom                aWMDelete = 0;
 
-static int                x_shmeventtype;
+int  x_shmeventtype;
 //static XShmSegmentInfo    x_shminfo;
 
 static bool            oktodraw = false;
@@ -505,7 +505,7 @@ void    VID_Init(uint8_p palette) {
 
     Cmd_AddCommand("gamma", VID_Gamma_f);
     for (i = 0; i < InksNum; i++)
-        vid_gamma[i] = i;
+        vid_gamma[i].pal.i = i;
 
     Scr.canvas.width = 320;
     Scr.canvas.height = 200;
@@ -514,7 +514,6 @@ void    VID_Init(uint8_p palette) {
     Scr.pColorMapPal = host_colormap;
 
     srandom(getpid());
-
     verbose = COM_CheckParm("-verbose");
 
     // open the display
@@ -530,13 +529,12 @@ void    VID_Init(uint8_p palette) {
     x_screen = XDefaultScreen(x_disp);
     x_screen_width = WidthOfScreen(ScreenOfDisplay(x_disp, x_screen));
     x_screen_height = HeightOfScreen(ScreenOfDisplay(x_disp, x_screen));
-
     x_center_width = HALF(x_screen_width);
-
     x_center_height = HALF(x_screen_height);
-
-    Con_Printf("Using screen %d: %dx%d\n", x_screen, x_screen_width, x_screen_height);
-
+    Con_Printf(
+        "Using screen %d: %dx%d\n",
+        x_screen, x_screen_width, x_screen_height
+    );
     x_root_win = XRootWindow(x_disp, x_screen);
 
     // catch signals so i can turn on auto-repeat
@@ -560,8 +558,9 @@ void    VID_Init(uint8_p palette) {
             Sys_Error("VID: -winsize <width> <height>\n");
         Scr.canvas.width = Q_atoi(com.argv[pnum + 1]);
         Scr.canvas.height = Q_atoi(com.argv[pnum + 2]);
-        if (!Scr.canvas.width || !Scr.canvas.height)
-            Sys_Error("VID: Bad window width/height\n");
+        if (!(Scr.canvas.width) ||
+            !(Scr.canvas.height)
+            )   Sys_Error("VID: Bad window width/height\n");
     }
 
     template_mask = 0;
@@ -573,9 +572,7 @@ void    VID_Init(uint8_p palette) {
         template.visualid = Q_atoi(com.argv[pnum + 1]);
         template_mask = VisualIDMask;
     }
-
-    // If not specified, use default visual
-    else {
+    else {  // If not specified, use default visual
         int screen;
         screen = XDefaultScreen(x_disp);
         template.visualid =
@@ -611,8 +608,7 @@ void    VID_Init(uint8_p palette) {
 
     x_vis = x_visinfo->visual;
 
-    // setup attributes for main window
-    {
+    {   // setup attributes for main window
         int attribmask = CWEventMask | CWColormap | CWBorderPixel;
         XSetWindowAttributes attribs;
         Colormap tmpcmap;
@@ -642,7 +638,6 @@ void    VID_Init(uint8_p palette) {
     }
 
     if (x_visinfo->depth == 8) {
-
         // create and upload the palette
         if (x_visinfo->class == PseudoColor) {
             x_cmap = XCreateColormap(x_disp, x_win, x_vis, AllocAll);
@@ -653,20 +648,15 @@ void    VID_Init(uint8_p palette) {
     }
 
     VID_SetWindowTitle(x_win, "Quake");
-
-    // create the GC
-    {
+    {   // create the GC
         XGCValues xgcvalues;
         int valuemask = GCGraphicsExposures;
         xgcvalues.graphics_exposures = False;
         x_gc = XCreateGC(x_disp, x_win, valuemask, &xgcvalues);
     }
 
-    // map the window
-    XMapWindow(x_disp, x_win);
-
-    // wait for first exposure event
-    {
+    XMapWindow(x_disp, x_win);    // map the window
+    {   // wait for first exposure event
         XEvent event;
         do {
             XNextEvent(x_disp, &event);
@@ -683,10 +673,11 @@ void    VID_Init(uint8_p palette) {
         displayname = (cString)getenv("DISPLAY");
         if (displayname) {
             cString d = displayname;
-            while (*d && (*d != ':')) d++;
+            while (*d && (*d != ':'))       d++;
             if (*d) *d = 0;
-            if (!(!strcasecmp(displayname, "unix") || !*displayname))
-                doShm = false;
+            if (!(!strcasecmp(displayname, "unix") ||
+                !*displayname)
+                )   doShm = false;
         }
     }
 

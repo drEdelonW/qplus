@@ -359,10 +359,8 @@ void CL_RelinkEntities() {
         else {  // if the delta is large, assume a teleport and don't lerp
             LegDt_t fr = frac;
             vec3_t delta = VectorSubtract(ent->msgPoses[Cur].loc, ent->msgPoses[Prev].loc);
-            for (int j = 0; j < VECT_DIM; j++) {
-                if (isVectorOutOfRange(delta, 100.f))
-                    fr = 1.f;  // assume a teleportation, not a motion
-            }
+            if (isVectorOutOfRange(delta, 100.f))
+                fr = 1.f;  // assume a teleportation, not a motion
 
             // interpolate the origin and angles
             ent->pose.loc = VectorMA(ent->msgPoses[Prev].loc, fr, delta);

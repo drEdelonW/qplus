@@ -5,9 +5,9 @@
 #include <math.h>
 
 static inline bool isVectorOutOfRange(vec3_t v, vec_t scalar) {
-    for (int j = 0; j < VECT_DIM; j++) {
-        if ((v.v[j] > scalar) ||
-            (v.v[j] < -scalar)
+    for (int i = 0; i < VECT_DIM; i++) {
+        if ((v.v[i] > scalar) ||
+            (v.v[i] < -scalar)
             )   return true;
     }
     return false;

@@ -129,7 +129,6 @@ extern int c_faceclip;
 extern int r_polycount;
 extern int r_wholepolycount;
 extern int r_amodels_drawn;
-extern int r_bmodelactive;
 extern int r_outofsurfaces;
 extern int r_outofedges;
 #endif 

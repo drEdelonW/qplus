@@ -72,15 +72,12 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
         !(pusher->v.velocity.y) &&
         !(pusher->v.velocity.z)
         ) {
-        pusher->v.ltime += movetime;
-        return;
-    }
 #else
     if (VectorCompare(pusher->v.velocity, v3Zero)) {
+#endif
         pusher->v.ltime += movetime;
         return;
     }
-#endif
 
     vec3_t displacement = VectorScale(pusher->v.velocity, movetime);
     vec3_t mins = VectorAdd(pusher->v.absmin, displacement);
@@ -185,7 +182,7 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
     }
 
 
-}
+    }
 
 #ifdef QUAKE2
 /*
@@ -338,7 +335,7 @@ void SV_Physics_Pusher(edict_p ent) {
 
     float thinktime = ent->v.nextthink;
     SimDt_t movetime;
-    if (thinktime < ent->v.ltime + host_frametime) {
+    if (thinktime < (ent->v.ltime + host_frametime)) {
         movetime = thinktime - ent->v.ltime;
         ClampLessThen(&movetime, 0.f);
     }

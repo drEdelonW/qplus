@@ -81,13 +81,13 @@ void SV_StartSound(edict_p entity, SndCh_t channel, cString sample, uint8_t volu
 
     // directed messages go only to the entity the are targeted on
     MSG_WriteByte(&sv.datagram, svc_sound); { /* !!SEQUENCE MATTER!! */
-    /* blank comments below align columns AND suppress -Wmisleading-indentation */
-    /*                                   */ MSG_WriteByte(&sv.datagram, (uint8_t)field_mask);
-    if (field_mask & SND_VOLUME) /*      */ MSG_WriteByte(&sv.datagram, volume);
-    if (field_mask & SND_ATTENUATION) /* */ MSG_WriteByte(&sv.datagram, (uint8_t)(attenuation * (255 / AtnMax)));
-    /*                                   */ MSG_WriteShort(&sv.datagram, (int16_t)((ED_GetEDictIdx(entity) << 3) | channel)); /* wire: [15..3] entity idx | [2..0] channel */
-    /*                                   */ MSG_WriteByte(&sv.datagram, (uint8_t)sound_num);
-    /*                                   */ MSG_WriteVector(&sv.datagram, VectorAdd(entity->v.origin, BBoxMid(EvBBox(&entity->v))));
+        /* blank comments below align columns AND suppress -Wmisleading-indentation */
+        /*                                   */ MSG_WriteByte(&sv.datagram, (uint8_t)field_mask);
+        if (field_mask & SND_VOLUME) /*      */ MSG_WriteByte(&sv.datagram, volume);
+        if (field_mask & SND_ATTENUATION) /* */ MSG_WriteByte(&sv.datagram, (uint8_t)(attenuation * (255 / AtnMax)));
+        /*                                   */ MSG_WriteShort(&sv.datagram, (int16_t)((ED_GetEDictIdx(entity) << 3) | channel)); /* wire: [15..3] entity idx | [2..0] channel */
+        /*                                   */ MSG_WriteByte(&sv.datagram, (uint8_t)sound_num);
+        /*                                   */ MSG_WriteVector(&sv.datagram, VectorAdd(entity->v.origin, BBoxMid(EvBBox(&entity->v))));
     }
 }
 
@@ -190,9 +190,9 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
             if ((miss < -0.1f) || (miss > 0.1f))                bits |= (U_ORIGIN1 << i);
         }
 
-        if (ent->v.angles.pitch != ent->baseline.pose.aim.pitch)  bits |= U_ANGLE1;
-        if (ent->v.angles.yaw != ent->baseline.pose.aim.yaw)      bits |= U_ANGLE2;
-        if (ent->v.angles.roll != ent->baseline.pose.aim.roll)    bits |= U_ANGLE3;
+        if (ent->v.angles.pitch != ent->baseline.pose.aim.pitch)bits |= U_ANGLE1;
+        if (ent->v.angles.yaw != ent->baseline.pose.aim.yaw)    bits |= U_ANGLE2;
+        if (ent->v.angles.roll != ent->baseline.pose.aim.roll)  bits |= U_ANGLE3;
         if (ent->v.movetype == MOVETYPE_STEP)                   bits |= U_NOLERP;  // don't mess up the step animation
         if (ent->v.colormap != ent->baseline.colormap)          bits |= U_COLORMAP;
         if (ent->v.skin != ent->baseline.skin)                  bits |= U_SKIN;
@@ -237,25 +237,17 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     //
     // send a damage message
     //
-    if (ent->v.dmg_take || ent->v.dmg_save) {
+    if ((ent->v.dmg_take) ||
+        (ent->v.dmg_save)
+        ) {
         edict_p other = ED_GetEDictByOffs(ent->v.dmg_inflictor);
         MSG_WriteByte(msg, svc_damage);
         MSG_WriteByte(msg, (uint8_t)ent->v.dmg_save);
         MSG_WriteByte(msg, (uint8_t)ent->v.dmg_take);
-#if 0
-        for (int i = 0; i < VECT_DIM; i++)
-            MSG_WriteCoord(msg,
-                other->v.origin.v[i] +
-                0.5f *
-                other->v.mins.v[i] +
-                other->v.maxs.v[i])
-            );
-#else
         MSG_WriteVector(msg,
             VectorAdd(other->v.origin,
                 BBoxMid(EvBBox(&other->v))
             ));
-#endif
         ent->v.dmg_take = 0;
         ent->v.dmg_save = 0;
     }
@@ -268,8 +260,12 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     // a fixangle might get lost in a dropped packet.  Oh well.
     if (ent->v.fixangle) {
         MSG_WriteByte(msg, svc_setangle);
+#if 0
         for (int i = 0; i < VECT_DIM; i++)
             MSG_WriteAngle(msg, ent->v.angles.v[i]);
+#else
+        MSG_WriteAngles(msg, ent->v.angles);
+#endif
         ent->v.fixangle = 0;
     }
 

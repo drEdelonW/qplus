@@ -37,7 +37,6 @@ clipping hull.
 =============
 */
 void SV_CheckStuck(edict_p ent) {
-
     if (!SV_TestEntityPosition(ent)) {
         ent->v.oldorigin = ent->v.origin;
         return;
@@ -57,10 +56,10 @@ void SV_CheckStuck(edict_p ent) {
                 ent->v.origin = VectorAdd(
                     org,
                     (vec3_t) {
-                    .x = (float)i,
+                        .x = (float)i,
                         .y = (float)j,
-                        .z = (float)z
-                }
+                        .z = (float)z,
+                    }
                 );
 
                 if (!SV_TestEntityPosition(ent)) {
@@ -75,11 +74,6 @@ void SV_CheckStuck(edict_p ent) {
 }
 
 
-/*
-=============
-SV_CheckWater
-=============
-*/
 bool SV_CheckWater(edict_p ent) {
     vec3_t point = ent->v.origin; {
         point.z += ent->v.mins.z + 1.f;
@@ -128,12 +122,7 @@ bool SV_CheckWater(edict_p ent) {
     return ent->v.waterlevel > WL_Feet;
 }
 
-/*
-============
-SV_WallFriction
 
-============
-*/
 void SV_WallFriction(edict_p ent, trace_p trace) {
     Basis_t bs = GetBasis(ent->v.v_angle);
 
@@ -240,8 +229,7 @@ void SV_WalkMove(edict_p ent) {
 
     vec3_t downmove = (vec3_t){ .z = (float)(-STEPSIZE + oldvel.z * host_frametime) };
 
-    // move up
-    vec3_t upmove = (vec3_t){ .z = STEPSIZE };
+    vec3_t upmove = (vec3_t){ .z = STEPSIZE };    // move up
     SV_PushEntity(ent, upmove); // FIXME: don't link?
 
     // move forward

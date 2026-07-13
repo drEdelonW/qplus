@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "sv_phys_priv.h"
-
+#include "vector_tools.h"
 /*
 ==================
 ClipVelocity
@@ -31,19 +31,24 @@ returns the blocked flags (1 = floor, 2 = step / wall)
 #define STOP_EPSILON 0.1
 
 MoveClipFlags_e ClipVelocity(vec3_t in, vec3_t normal, vec3_p out, float overbounce) {
-    MoveClipFlags_e blocked = MOVECLIP_NONE;
-    if (normal.z > 0.0f)    blocked |= MOVECLIP_FLOOR;  // floor
-    if (!(normal.z))        blocked |= MOVECLIP_WALL;  // step
+    MoveClipFlags_e         blocked = MOVECLIP_NONE;
+    if (normal.z > 0.f)     blocked |= MOVECLIP_FLOOR;  // floor
+    if (!(normal.z))        blocked |= MOVECLIP_WALL;   // step
 
     float backoff = DotProduct(in, normal) * overbounce;
 
     *out = VectorMA(in, -backoff, normal);
+#if 0
     for (int i = 0; i < VECT_DIM; i++) {
-        if ((out->v[i] > -STOP_EPSILON) &&
-            (out->v[i] < STOP_EPSILON)
+        if ((out->v[i] < STOP_EPSILON) &&
+            (out->v[i] > -STOP_EPSILON)
             )
             out->v[i] = 0.0f;
     }
+#else
+    if (!(isVectorOutOfRange(*out, STOP_EPSILON)))
+        *out = v3Zero;
+#endif
 
     return blocked;
 }
@@ -257,7 +262,8 @@ bool SV_RunThink(edict_p ent) {
         (thinktime > (SV_GetTime() + host_frametime))
         )   return true;
 
-    ClampLessThen(&thinktime, (float)SV_GetTime()); // don't let things stay in the past.
+    ClampLessThen(&thinktime, (float)SV_GetTime());
+    // don't let things stay in the past.
     // it is possible to start that way
     // by a trigger with a local time.
     ent->v.nextthink = 0.f;

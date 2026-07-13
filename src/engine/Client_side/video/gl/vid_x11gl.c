@@ -52,7 +52,7 @@ Display* x_disp = NULL;
 // static Display* _dpy = NULL;
 static int _scrNum;
 Window      x_win;
-int         x_shmeventtype;
+int x_shmeventtype;
 bool vidmode_ext = false;
 
 // cvar_t   vid_mode = { "vid_mode","0",false };

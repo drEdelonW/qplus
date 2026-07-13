@@ -205,7 +205,8 @@ void CL_Record_f() {
     int arg = Cmd_Argc();
     if ((arg != 2) &&
         (arg != 3) &&
-        (arg != 4)) {
+        (arg != 4)
+        ) {
         Con_Printf("record <demoname> [<map> [cd track]]\n");
         return;
     }

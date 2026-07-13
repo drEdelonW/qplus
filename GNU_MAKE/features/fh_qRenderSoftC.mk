@@ -33,7 +33,7 @@ $(eval PLATFORM_DIR = $(SRC_DIR)/platform) $(eval INCLUDES += $(PLATFORM_DIR)) $
                                         SRC_LIST += $(RENDER_DIR)/r_sprite.c
                                         SRC_LIST += $(RENDER_DIR)/r_surf.c
                                         SRC_LIST += $(RENDER_DIR)/r_part.c
-                                        SRC_LIST += $(RENDER_DIR)/r_vars.c
+#                                         SRC_LIST += $(RENDER_DIR)/r_vars.c
 
                                 SRC_LIST += $(SOFTRND_DIR)/screen.c
 

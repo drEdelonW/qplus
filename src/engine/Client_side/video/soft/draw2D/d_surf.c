@@ -107,6 +107,7 @@ void D_FlushCaches() {
 D_SCAlloc
 =================
 */
+bool d_roverwrapped; // extern
 SurfCache_p D_SCAlloc(int width, int size) {
     if ((width < 0) || (width > 256))           Host_SysError("D_SCAlloc: bad cache width %d\n", width);
     if ((size <= 0) || (size > 0x10000))        Host_SysError("D_SCAlloc: bad cache size %d\n", size);

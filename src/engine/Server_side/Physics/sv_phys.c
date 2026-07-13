@@ -91,13 +91,12 @@ void SV_Physics() {
 
         if (ent->free)  continue;
 
-        if (pr_global_struct->force_retouch) {
+        if (pr_global_struct->force_retouch)
             SV_LinkEdict(ent, true); // force retouch even for stationary
-        }
 
-        if ((e > EdictWorld) && (e <= GetSvMaxClients())) {
-            SV_Physics_Client(ent, e);
-        }
+        if ((e > EdictWorld) &&
+            (e <= GetSvMaxClients())
+            )   SV_Physics_Client(ent, e);
         else {
             switch ((movetype_t)ent->v.movetype) {
 #ifdef QUAKE2

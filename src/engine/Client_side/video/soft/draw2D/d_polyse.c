@@ -47,8 +47,6 @@ typedef struct {
 } SpanPackage_t;
 typedef SpanPackage_t* SpanPackage_p;
 
-int16_p zspantable[MAXHEIGHT];
-
 int errorterm;
 int erroradjustup;
 int erroradjustdown;
@@ -64,14 +62,11 @@ typedef struct {
     VertAttr_p pRightEdgeVert[3];
 } EdgeTable_t;
 typedef EdgeTable_t* EdgeTable_p;
-
 static VertAttr_t _p[3];
+static int _xDenom;
 
-int   d_xdenom;
-
-EdgeTable_p pedgetable;
-
-EdgeTable_t edgetables[12] = {
+static EdgeTable_p _pEdgeTable;
+static EdgeTable_t _EdgeTables[12] = {
     {0, 1, {&_p[0], &_p[2], NULL  },    2, {&_p[0], &_p[1], &_p[2]}},
     {0, 2, {&_p[1], &_p[0], &_p[2]},    1, {&_p[1], &_p[2], NULL  }},
     {1, 1, {&_p[0], &_p[2], NULL  },    1, {&_p[1], &_p[2], NULL  }},
@@ -115,7 +110,7 @@ void D_PolysetSetEdgeTable() {
     //
     if (_p[0].y >= _p[1].y) {
         if (_p[0].y == _p[1].y) {
-            pedgetable = (_p[0].y < _p[2].y) ? &edgetables[2] : &edgetables[5];
+            _pEdgeTable = (_p[0].y < _p[2].y) ? &_EdgeTables[2] : &_EdgeTables[5];
             return;
         }
         else    edgetableindex = 1;
@@ -123,18 +118,18 @@ void D_PolysetSetEdgeTable() {
     }
 
     if (_p[0].y == _p[2].y) {
-        pedgetable = (edgetableindex) ? &edgetables[8] : &edgetables[9];
+        _pEdgeTable = (edgetableindex) ? &_EdgeTables[8] : &_EdgeTables[9];
         return;
     }
     else if (_p[1].y == _p[2].y) {
-        pedgetable = (edgetableindex) ? &edgetables[10] : &edgetables[11];
+        _pEdgeTable = (edgetableindex) ? &_EdgeTables[10] : &_EdgeTables[11];
         return;
     }
 
     if (_p[0].y > _p[2].y)      edgetableindex += 2;
     if (_p[1].y > _p[2].y)      edgetableindex += 4;
 
-    pedgetable = &edgetables[edgetableindex];
+    _pEdgeTable = &_EdgeTables[edgetableindex];
 }
 
 // FIXME: some of these can become statics
@@ -163,6 +158,7 @@ static adivtab_t _aDivTab[32 * 32] = {
 #include "adivtab.h"
 };
 
+#include "AliasModel.h"
 qColor8_p skintable[MAX_LBM_HEIGHT]; // ARRAY OF POINTERS
 qColor8_p skinstart;
 int  skinwidth;
@@ -215,8 +211,9 @@ void D_PolysetDrawFinalVerts(FinalVert_p fv, int numverts) {
             if (z >= *zbuf) {
                 *zbuf = z;
                 d_viewbuffer[d_scantable[fv->vAttr.y] + fv->vAttr.x] =
-                    acolormap->raw[(fv->vAttr.light & 0xFF00) +
-                    skintable[FIXED16_TO_INT(fv->vAttr.t)][FIXED16_TO_INT(fv->vAttr.s)].i
+                    acolormap->raw[
+                        (fv->vAttr.light & 0xFF00) +
+                            skintable[FIXED16_TO_INT(fv->vAttr.t)][FIXED16_TO_INT(fv->vAttr.s)].i
                     ];
             }
         }
@@ -283,11 +280,11 @@ void D_DrawNonSubdiv() {
         FinalVert_p index1 = pfv + ptri->vertindex[1];
         FinalVert_p index2 = pfv + ptri->vertindex[2];
 
-        d_xdenom =
+        _xDenom =
             (index0->vAttr.y - index1->vAttr.y) * (index0->vAttr.x - index2->vAttr.x) -
             (index0->vAttr.x - index1->vAttr.x) * (index0->vAttr.y - index2->vAttr.y);
 
-        if (d_xdenom >= 0) { continue; }
+        if (_xDenom >= 0)      continue;
 
         _p[0] = index0->vAttr;
         _p[1] = index1->vAttr;
@@ -302,7 +299,7 @@ void D_DrawNonSubdiv() {
 #if 0
         D_PolysetSetEdgeTable();
 #else
-        pedgetable = &edgetables[getOrder()];
+        _pEdgeTable = &_EdgeTables[getOrder()];
 #endif
         D_RasterizeAliasPolySmooth();
     }
@@ -523,8 +520,7 @@ void D_PolysetCalcGradients(int skinwidth) {
     float p10_minus_p20 = _p[1].x - _p[2].x;
     float p11_minus_p21 = _p[1].y - _p[2].y;
 
-    float xstepdenominv = 1.0 / (float)d_xdenom;
-
+    float xstepdenominv = 1.0 / (float)_xDenom;
     float ystepdenominv = -xstepdenominv;
 
     // ceil() for light so positive steps are exaggerated, negative steps
@@ -634,15 +630,16 @@ void D_PolysetDrawSpans8(SpanPackage_p pspanpackage) {
 D_PolysetFillSpans8
 ================
 */
-int   d_aflatcolor; // extern
+qColor8_t   d_aflatcolor; // extern
 void D_PolysetFillSpans8(SpanPackage_p pspanpackage) {
     // FIXME: do z buffering
-    qColor8_t color = { .i = d_aflatcolor++ };
+    d_aflatcolor.i++;
+    qColor8_t color = d_aflatcolor;
 
     while (1) {
         int lcount = pspanpackage->count;
-
         if (lcount == -1)   return;
+
         if (lcount) {
             qColor8_p lpdest = pspanpackage->pdest;
 
@@ -661,16 +658,15 @@ D_RasterizeAliasPolySmooth
 ================
 */
 void D_RasterizeAliasPolySmooth() {
-    VertAttr_p plefttop = pedgetable->pLeftEdgeVert[0];
-    VertAttr_p prighttop = pedgetable->pRightEdgeVert[0];
-    VertAttr_p pleftbottom = pedgetable->pLeftEdgeVert[1];
-    VertAttr_p prightbottom = pedgetable->pRightEdgeVert[1];
+    VertAttr_p plefttop = _pEdgeTable->pLeftEdgeVert[0];
+    VertAttr_p prighttop = _pEdgeTable->pRightEdgeVert[0];
+    VertAttr_p pleftbottom = _pEdgeTable->pLeftEdgeVert[1];
+    VertAttr_p prightbottom = _pEdgeTable->pRightEdgeVert[1];
 
     int initialleftheight = pleftbottom->y - plefttop->y;
     int initialrightheight = prightbottom->y - prighttop->y;
 
-    // set the s, t, and light gradients, which are consistent across the triangle
-    // because being a triangle, things are affine
+    // set the s, t, and light gradients, which are consistent across the triangle because being a triangle, things are affine
     D_PolysetCalcGradients(r_affinetridesc.skinwidth);
 
     // rasterize the polygon
@@ -761,14 +757,13 @@ void D_RasterizeAliasPolySmooth() {
     //
     // scan out the bottom part of the left edge, if it exists
     //
-    if (pedgetable->numLeftEdges == 2) {
+    if (_pEdgeTable->numLeftEdges == 2) {
         plefttop = pleftbottom;
-        pleftbottom = pedgetable->pLeftEdgeVert[2];
+        pleftbottom = _pEdgeTable->pLeftEdgeVert[2];
 
         int height = pleftbottom->y - plefttop->y;
 
         // TODO: make this a function; modularize this function in general
-
         _yStart = plefttop->y;
         d_snap.count = plefttop->x - prighttop->x;
         d_snap.ptex = (TypeLess_ptr)(
@@ -855,14 +850,14 @@ void D_RasterizeAliasPolySmooth() {
     D_PolysetDrawSpans8(a_spans);
 
     // scan out the bottom part of the right edge, if it exists
-    if (pedgetable->numRightEdges == 2) {
+    if (_pEdgeTable->numRightEdges == 2) {
         SpanPackage_p pstart = a_spans + initialrightheight;
         pstart->count = originalcount;
 
         d_snap.count = prightbottom->x - prighttop->x;
 
         prighttop = prightbottom;
-        prightbottom = pedgetable->pRightEdgeVert[2];
+        prightbottom = _pEdgeTable->pRightEdgeVert[2];
 
         int height = prightbottom->y - prighttop->y;
 

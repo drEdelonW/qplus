@@ -61,7 +61,7 @@ dAliasFrameType_p Mod_LoadAliasFrame(
     dAliasFrame_p  pin,
     int32_p     pframeindex,
     int32_t     numv,
-    TriVertx_p  pbboxmin,   
+    TriVertx_p  pbboxmin,
     TriVertx_p  pbboxmax,
     AliasHdr_p  pHeader,
     cString     name
@@ -351,7 +351,7 @@ TypeLess_ptr Mod_LoadAllSkins(int numskins, dAliasSkinType_p pskintype) {
                         name, pHeader->skinwidth,
                         pHeader->skinheight, (qColor8_p)(pskintype), true, false
                     );
-                pskintype = (dAliasSkinType_p)((uint8_p)(pskintype) + s);
+                pskintype = (dAliasSkinType_p)((uint8_p)(pskintype)+s);
             }
             int k = j;
             for (/* */; j < 4; j++)
@@ -461,11 +461,13 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     mod->synctype = LittleLong(pinmodel->synctype);
     mod->numframes = pHeader->numframes;
 
-    for (int i = 0; i < VECT_DIM; i++) {
+    for (int i = 0; i < VECT_DIM; i++)
         pHeader->scale.v[i] = LittleFloat(pinmodel->scale.v[i]);
+    for (int i = 0; i < VECT_DIM; i++)
         pHeader->scale_origin.v[i] = LittleFloat(pinmodel->scale_origin.v[i]);
+    for (int i = 0; i < VECT_DIM; i++)
         pHeader->eyeposition.v[i] = LittleFloat(pinmodel->eyeposition.v[i]);
-    }
+
 
     //
     // load the skins
@@ -570,11 +572,12 @@ void Mod_LoadAliasModel(Model_p mod, TypeLess_ptr buffer) {
     mod->synctype = LittleLong(pinmodel->synctype);
     mod->numframes = pMdl->numframes;
 
-    for (int i = 0; i < VECT_DIM; i++) {
+    for (int i = 0; i < VECT_DIM; i++)
         pMdl->scale.v[i] = LittleFloat(pinmodel->scale.v[i]);
+    for (int i = 0; i < VECT_DIM; i++)
         pMdl->scale_origin.v[i] = LittleFloat(pinmodel->scale_origin.v[i]);
+    for (int i = 0; i < VECT_DIM; i++)
         pMdl->eyeposition.v[i] = LittleFloat(pinmodel->eyeposition.v[i]);
-    }
 
     int numskins = pMdl->numskins;
     int numframes = pMdl->numframes;

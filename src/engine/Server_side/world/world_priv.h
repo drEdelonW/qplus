@@ -57,7 +57,6 @@ extern int          _sv_NumAreaNodes;
 Hull_p      SV_HullForBox(BBox_t bb);
 Hull_p      SV_HullForEntity(edict_p ent, BBox_t bb, vec3_p offset);
 contents_t  SV_HullPointContents(Hull_p hull, int num, vec3_t point);
-contents_t  SV_PointContents(vec3_t point);
 contents_t  SV_TruePointContents(vec3_t point);
 bool        SV_RecursiveHullCheck(Hull_p hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_p trace);
 void        SV_InitBoxHull(void);

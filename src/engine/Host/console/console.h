@@ -21,9 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "types.h"
 #include "qTime.h"
 
-// extern int d_con_indirect;
-// if 0, Quake will draw console directly to Scr.canvas.pBuff;
-// if 1, Quake will draw console via D_DrawRect. Must be defined by driver
+
 
 //
 // console

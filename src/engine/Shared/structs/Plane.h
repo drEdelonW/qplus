@@ -6,9 +6,6 @@
 #include "assert.h"
 
 typedef
-#if 0
-uint8_t
-#else
 enum {
     // 0–2 are axial planes
     PLANE_X = 0u,
@@ -19,9 +16,7 @@ enum {
     PLANE_ANYX = 3u,
     PLANE_ANYY = 4u,
     PLANE_ANYZ = 5u
-}
-#endif
-PlaneType_t; // should be size int on 32 os
+} PlaneType_t; // should be size int on 32 os
 
 // it was [mplane_t]
 // Plane_t structure
@@ -47,10 +42,10 @@ typedef dPlane_t* dPlane_p;
 #include "Lump.h"
 
 typedef enum {
-    PsNone = 0,                // no side determined yet
+    PsNone  = 0,                // no side determined yet
     PsFront = 1 << 0,           // box is entirely on the positive (front) side of the plane
-    PsBack = 1 << 1,           // box is entirely on the negative (back) side of the plane
-    PsBoth = PsFront | PsBack, // box straddles the plane; can't trivially cull
+    PsBack  = 1 << 1,           // box is entirely on the negative (back) side of the plane
+    PsBoth  = PsFront | PsBack, // box straddles the plane; can't trivially cull
 } PlaneSide_t;
 
 #ifdef __cplusplus

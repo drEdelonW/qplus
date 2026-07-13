@@ -18,7 +18,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "sv_phys_priv.h"
+#include "sv_phys.h"
+#include "types.h"
+#include "BBox.h"
+#include "Edict.h"
+#include "world.h"
 
 
 /*
@@ -95,15 +99,8 @@ realcheck:
 
 
 
-/*
-======================
-SV_FixCheckBottom
-
-======================
-*/
 void SV_FixCheckBottom(edict_p ent) {
     // Con_Printf ("SV_FixCheckBottom\n");
-
     ent->v.flags = (int)ent->v.flags | FL_PARTIALGROUND;
 }
 
@@ -124,7 +121,6 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
     // try the move
     vec3_t oldorg = ent->v.origin;
     vec3_t neworg = VectorAdd(ent->v.origin, move);
-
 
     // flying monsters don't step up
     if ((int)ent->v.flags & (FL_SWIM | FL_FLY)) {
@@ -172,8 +168,9 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
     if (trace.startsolid) {
         neworg.z -= STEPSIZE;
         trace = SV_Move(neworg, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent);
-        if (trace.allsolid || trace.startsolid)
-            return false;
+        if ((trace.allsolid) ||
+            (trace.startsolid)
+            )   return false;
     }
     if (trace.fraction == 1) {
         // if monster had the ground pulled out, go ahead and fall
@@ -234,21 +231,19 @@ bool SV_StepDirection(edict_p ent, float yaw, float dist) {
     ent->v.ideal_yaw = yaw;
     PF_changeyaw();
 
-    yaw = yaw * (float)M_PI * 2 / 360;
+    yaw = yaw * (float)M_PI * 2.f / 360.f;
     vec3_t move = {
-        .x = (float)cos(yaw) * dist,
-        .y = (float)sin(yaw) * dist,
+        .x = (float)cosf(yaw) * dist,
+        .y = (float)sinf(yaw) * dist,
         .z = 0.0f
     };
 
     vec3_t oldorigin = ent->v.origin;
     if (SV_movestep(ent, move, false)) {
         float delta = ent->v.angles.yaw - ent->v.ideal_yaw;
-        if ((delta > 45) &&
-            (delta < 315)  // not turned far enough, so don't take the step
-            ) {
-            ent->v.origin = oldorigin;
-        }
+        if ((delta > 45.f) &&
+            (delta < 315.f)  // not turned far enough, so don't take the step
+            )   ent->v.origin = oldorigin; // restore
         SV_LinkEdict(ent, true);
         return true;
     }

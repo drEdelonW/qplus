@@ -63,7 +63,6 @@ D_DrawSolidSurface
 */
 
 // FIXME: clean this up
-
 void D_DrawSolidSurface(Surf_p surf, int color) {
     uint32_t pix =
         (color << 24) |

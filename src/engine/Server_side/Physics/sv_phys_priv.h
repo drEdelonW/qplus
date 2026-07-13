@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sv_phys.h"
 #include "server.h"
 #include "cvar_q1.h"
 #include "q_tools.h"
@@ -77,10 +78,7 @@ void SV_CheckAllEnts(void);
 void SV_Physics(void);
 
 // sv_monster_move.c
-bool SV_CheckBottom(edict_p ent);
-void SV_FixCheckBottom(edict_p ent);
 bool SV_movestep(edict_p ent, vec3_t move, bool relink);
-bool SV_StepDirection(edict_p ent, float yaw, float dist);
 
 // sv_monster_ai.c
 bool SV_CloseEnough(edict_p ent, edict_p goal, float dist);

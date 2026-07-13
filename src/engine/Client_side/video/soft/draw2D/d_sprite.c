@@ -28,8 +28,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define DS_SPAN_LIST_END   (-128)
 
-static int  _spriteHeight;
-static int  _minIndex, _maxIndex;
+static int _spriteHeight;
+static int _minIndex;
+static int _maxIndex;
 static sSpan_p _spriteSpans;
 
 #if !id386
@@ -93,8 +94,7 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
 
                 snext = (int)(sdivz * z) + sadjust;
                 ClampInRange(8, &snext, bbextents); // prevent round-off error on <0 steps from
-                //  from causing overstepping & running off the
-                //  edge of the texture
+                //  from causing overstepping & running off the edge of the texture
 
                 tnext = (int)(tdivz * z) + tadjust;
                 ClampInRange(8, &tnext, bbextentt); // guard against round-off error on <0 steps
@@ -105,8 +105,7 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
             else {
                 // calculate s/z, t/z, zi->fixed s and t at last pixel in span (so
                 // can't step off polygon), clamp, calculate s and t steps across
-                // span by division, biasing steps low so we don't run off the
-                // texture
+                // span by division, biasing steps low so we don't run off the texture
                 float spancountminus1 = (float)(spancount - 1);
                 sdivz += d_sdivzstepu * spancountminus1;
                 tdivz += d_tdivzstepu * spancountminus1;
@@ -114,8 +113,7 @@ void D_SpriteDrawSpans(sSpan_p pspan) {
                 z = (float)FIXED16_ONE / zi; // prescale to 16.16 fixed-point
                 snext = (int)(sdivz * z) + sadjust;
                 ClampInRange(8, &snext, bbextents); // prevent round-off error on <0 steps from
-                //  from causing overstepping & running off the
-                //  edge of the texture
+                //  from causing overstepping & running off the edge of the texture
 
                 tnext = (int)(tdivz * z) + tadjust;
                 ClampInRange(8, &tnext, bbextentt); // guard against round-off error on <0 steps
@@ -167,9 +165,9 @@ void D_SpriteScanLeftEdge() {
     if (i == 0)
         i = r_spritedesc.nump;
 
-    int lmaxindex = _maxIndex;
-    if (lmaxindex == 0)
-        lmaxindex = r_spritedesc.nump;
+    int LMaxIndex = _maxIndex;
+    if (LMaxIndex == 0)
+        LMaxIndex = r_spritedesc.nump;
 
     float vtop = ceil(r_spritedesc.pverts[i].v);
 
@@ -205,7 +203,7 @@ void D_SpriteScanLeftEdge() {
         if (i == 0)
             i = r_spritedesc.nump;
 
-    } while (i != lmaxindex);
+    } while (i != LMaxIndex);
 }
 
 
@@ -353,8 +351,7 @@ void D_DrawSprite() {
     _spriteHeight = r_spritedesc.pspriteframe->height;
     cacheblock = &r_spritedesc.pspriteframe->pixels[0];
 
-    // copy the first vertex to the last vertex, so we don't have to deal with
-    // wrapping
+    // copy the first vertex to the last vertex, so we don't have to deal with wrapping
     int nump = r_spritedesc.nump;
     pverts = r_spritedesc.pverts;
     pverts[nump] = pverts[0];

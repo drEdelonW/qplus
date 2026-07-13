@@ -115,7 +115,6 @@ void SV_Physics_Toss(edict_p ent) {
 
     // move angles
     ent->v.angles = AngleMA(ent->v.angles, (float)host_frametime, ent->v.avelocity);
-
     // move origin
 #ifdef QUAKE2
     ent->v.velocity = VectorAdd(ent->v.velocity, ent->v.basevelocity);
@@ -126,8 +125,8 @@ void SV_Physics_Toss(edict_p ent) {
     ent->v.velocity = VectorSubtract(ent->v.velocity, ent->v.basevelocity);
 #endif
     if ((trace.fraction == 1) ||
-        (ent->free))
-        return;
+        (ent->free)
+        )   return;
 
     float backoff;
     switch ((movetype_t)ent->v.movetype) {
@@ -142,14 +141,16 @@ void SV_Physics_Toss(edict_p ent) {
 
     // stop if on ground
     if ((trace.plane.normal.z > 0.7f) &&
-        ((ent->v.velocity.z < 60.f) ||
+        (
+            (ent->v.velocity.z < 60.f) ||
             (
-                (ent->v.movetype != MOVETYPE_BOUNCE)
 #ifdef QUAKE2
-                && (ent->v.movetype != MOVETYPE_BOUNCEMISSILE)
+            (ent->v.movetype != MOVETYPE_BOUNCEMISSILE) &&
 #endif
+                (ent->v.movetype != MOVETYPE_BOUNCE)
                 )
-            )) {
+            )
+        ) {
         ent->v.flags = (float)((int)((EntityFlags_t)ent->v.flags) | FL_ONGROUND);
         ent->v.groundentity = ED_GetEDictOffs(trace.ent);
         ent->v.velocity = v3Zero;
@@ -318,7 +319,7 @@ void SV_Physics_Step(edict_p ent) {
 void SV_Physics_Step(edict_p ent) {
     // freefall if not onground
     if (!((EntityFlags_t)ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM))) {
-        bool hitsound = (ent->v.velocity.z < sv_gravity.value * -0.1);
+        bool hitsound = (ent->v.velocity.z < (sv_gravity.value * -0.1f));
 
         SV_AddGravity(ent);
         SV_CheckVelocity(ent);
@@ -326,13 +327,11 @@ void SV_Physics_Step(edict_p ent) {
         SV_LinkEdict(ent, true);
 
         if (((EntityFlags_t)ent->v.flags & FL_ONGROUND) && // just hit ground
-            (hitsound))
-            SV_StartSound(ent, SndChAuto, "demon/dland2.wav", VolFull, AtnNorm);
+            (hitsound)
+            )   SV_StartSound(ent, SndChAuto, "demon/dland2.wav", VolFull, AtnNorm);
     }
 
-    // regular thinking
-    SV_RunThink(ent);
-
+    SV_RunThink(ent);   // regular thinking
     SV_CheckWaterTransition(ent);
 }
 #endif
@@ -374,9 +373,8 @@ trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
 # endif
 
         if ((trace.ent) &&
-            (trace.ent != ignore))
-            // p->color = 224;
-            host_frametime = save_frametime;
+            (trace.ent != ignore)
+            )   host_frametime = save_frametime;        // p->color = 224;
         return trace;
     }
 }

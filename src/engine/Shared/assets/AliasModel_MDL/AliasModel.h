@@ -2,6 +2,8 @@
 
 #include "model.h"
 
+#define MAX_LBM_HEIGHT (480)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

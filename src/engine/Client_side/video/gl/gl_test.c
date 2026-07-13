@@ -30,31 +30,31 @@ typedef struct {
     float   length;
 } puff_t;
 
-#define MAX_PUFFS   64
-
-puff_t  puffs[MAX_PUFFS];
-
+#define MAX_PUFFS 64
+static puff_t _Puffs[MAX_PUFFS];
 
 void Test_Init() {}
 
-
-
-static Plane_t _junk;
 Plane_p HitPlane(vec3_t start, vec3_t end) {
     trace_t trace = {   // fill in a default trace
         .fraction = 1.f,
         .allsolid = true,
         .endpos = end,
     };
+    SV_RecursiveHullCheck(
+        cl.worldmodel->hulls, 0,
+        0.f, 1.f,
+        start, end,
+        &trace
+    );
 
-    SV_RecursiveHullCheck(cl.worldmodel->hulls, 0, 0.f, 1.f, start, end, &trace);
-
-    _junk = trace.plane;
-    return &_junk;
+    static Plane_t junk;
+    junk = trace.plane;
+    return &junk;
 }
 
 void Test_Spawn(vec3_t origin) {
-    puff_p p = puffs;
+    puff_p p = _Puffs;
     int i = 0;
     for (; i < MAX_PUFFS; i++, p++) {
         if (p->length <= 0)
@@ -144,7 +144,7 @@ void DrawPuff(puff_p p) {
 
 
 void Test_Draw() {
-    puff_p p = puffs;
+    puff_p p = _Puffs;
     for (int i = 0; i < MAX_PUFFS; i++, p++) {
         if (p->length > 0)
             DrawPuff(p);

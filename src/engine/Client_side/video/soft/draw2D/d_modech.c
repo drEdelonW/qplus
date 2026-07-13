@@ -22,10 +22,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "d_local.h"
 #include "render.h"
 
-int d_vrectx, d_vrecty;
-int d_vrectright_particle, d_vrectbottom_particle;
-int d_y_aspect_shift, d_pix_min, d_pix_max, d_pix_shift;
+int d_vrectx;
+int d_vrecty;
+int d_vrectright_particle;
+int d_vrectbottom_particle;
+int d_y_aspect_shift;
+int d_pix_min;
+int d_pix_max;
+int d_pix_shift;
 int d_scantable[MAXHEIGHT];
+int16_p zspantable[MAXHEIGHT];
+
 
 /*
 ================
@@ -57,8 +64,7 @@ D_ViewChanged
 #include "vid.h" // vid.zBuff.width
 void D_ViewChanged() {
     scale_for_mip = xscale;
-    if (yscale > xscale)
-        scale_for_mip = yscale;
+    ClampLessThen(&scale_for_mip, yscale);
 
     vid.zBuff.width = vid.frameBuff.width;
 
@@ -79,8 +85,8 @@ void D_ViewChanged() {
 
     ptrdiff_t rowbytes = (r_dowarp) ? WARP_WIDTH : Scr.SR_rowBytes;
     for (int i = 0; i < vid.frameBuff.height; i++) {
-        d_scantable[i] = rowbytes * i;
-        zspantable[i] = vid.zBuff.pZBuff + i * vid.zBuff.width;
+        d_scantable[i] = (rowbytes * i);
+        zspantable[i] = vid.zBuff.pZBuff + (vid.zBuff.width * i);
     }
 
     D_Patch();
