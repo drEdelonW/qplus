@@ -31,13 +31,12 @@ D_DrawZPoint
 
 
 typedef struct {
-    int         u, v;
-    float       zi;
+    int     u, v;
+    float   zi;
     qColor8_t   color;
 } zPointDesc_t;
 
-// extern zPointDesc_t r_zpointdesc;
-zPointDesc_t    r_zpointdesc;
+zPointDesc_t r_zpointdesc;
 
 // void D_DrawZPoint();     //NOT USED
 void D_DrawZPoint() {

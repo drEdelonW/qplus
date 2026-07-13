@@ -1,22 +1,23 @@
 #pragma once
 
 #include "qPic.h"
-extern bool r_cache_thrash; // set if thrashing the surface cache. OpenGL compatability;
 
 typedef struct {
     qPic_p  ram;
     qPic_p  net;
     qPic_p  turtle;
     qPic_p  disc;
+    bool r_cache_thrash; // set if thrashing the surface cache. OpenGL compatability;
 } Hid_t;
 extern Hid_t hid;
 
 static inline void HUD_Init() {
-#if 1 /* System status */
-    hid.ram = GetPicFromWad("ram");
-    hid.net = GetPicFromWad("net");
-    hid.turtle = GetPicFromWad("turtle");
-#endif
+    hid = (Hid_t){  /* System status */
+        .ram    = GetPicFromWad("ram"),
+        .net    = GetPicFromWad("net"),
+        .turtle = GetPicFromWad("turtle"),
+        .disc   = GetPicFromWad("disc"),
+    };
 }
 
 #ifdef __cplusplus

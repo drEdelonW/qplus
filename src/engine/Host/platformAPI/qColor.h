@@ -60,13 +60,11 @@ typedef struct {
 #endif
 typedef qColor16_t* qColor16_p;
 
-
-
 // !!! must be kept the same as in quakeasm.h !!!
 typedef enum {
     InkConTransp    = 0x00,  /* console symbol transparent color */
-    GRAPH_BG        = 0x30,  // background color
-    GRAPH_FG        = 0xFF,  // bright bar color
+    GRAPH_BG        = 0x30,  // background color R_LineGraph(black)
+    GRAPH_FG        = 0xFF,  // bright bar color R_LineGraph(pink?)
     InkTransp       = 0xFF,  /* texture transparent color */
     InksNum         = 256,   /* number of colors in palette space */
 } InkIdx_t;
@@ -102,8 +100,8 @@ extern int  r_pixbytes; // TODO: move to SoftRender specific area
 extern "C" {
 #endif
 
-    void    VID_ShiftPalette(qPal_p palette);   // called for bonus and pain flashes, and for underwater color changes
-    void    VID_SetPalette(qPal_p palette);     // called at startup and after any gamma correction
+    void VID_ShiftPalette(const qPal_p palette);    // called for bonus and pain flashes, and for underwater color changes
+    void VID_SetPalette(const qPal_p palette);      // called at startup and after any gamma correction
 
 #ifdef __cplusplus
 }

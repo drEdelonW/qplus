@@ -623,88 +623,82 @@ void R_DrawBEntitiesOnList() {
     if (!r_drawentities.value)  return;
 
     vec3_t oldorigin = modelorg;
-    insubmodel = true;
-    r_dlightframecount = r_framecount;
+    inSubModel = true; {
+        r_dlightframecount = r_framecount;
 
-    for (int i = 0; i < cl_numvisedicts; i++) {
-        currententity = cl_visedicts[i];
+        for (int i = 0; i < cl_numvisedicts; i++) {
+            currententity = cl_visedicts[i];
 
-        switch (currententity->model->type) {
-        case mod_brush: {
-            Model_p clmodel = currententity->model;
+            switch (currententity->model->type) {
+            case mod_brush: {
+                Model_p clmodel = currententity->model;
 
-            // see if the bounding box lets us trivially reject, also sets trivial accept status
-            BBox_t bb = BBoxTranslate(clmodel->BB, currententity->pose.loc);
-            AliasClipFlags_f clipflags = R_BmodelCheckBBox(clmodel, bb);
+                // see if the bounding box lets us trivially reject, also sets trivial accept status
+                BBox_t bb = BBoxTranslate(clmodel->BB, currententity->pose.loc);
+                AliasClipFlags_f clipflags = R_BmodelCheckBBox(clmodel, bb);
 
-            if (clipflags != BMODEL_FULLY_CLIPPED) {
-                r_entorigin = currententity->pose.loc;
-                modelorg = VectorSubtract(r_origin, r_entorigin);
+                if (clipflags != BMODEL_FULLY_CLIPPED) {
+                    r_entorigin = currententity->pose.loc;
+                    modelorg = VectorSubtract(r_origin, r_entorigin);
 
-                r_pcurrentvertbase = clmodel->vertexes;
+                    r_pcurrentvertbase = clmodel->vertexes;
+                    R_RotateBmodel();   // FIXME: stop transforming twice
 
-                R_RotateBmodel();   // FIXME: stop transforming twice
+                    // calculate dynamic lighting for bmodel if it's not an instanced model
+                    if ((r_dlightmap.value) &&
+                        (clmodel->firstModelSurface != 0)
+                        )
+                        for (int k = 0; k < MAX_DLIGHTS; k++) {
+                            if ((cl_dlights[k].die < GetClSimTime()) ||
+                                (!cl_dlights[k].radius)
+                                )   continue;
 
-                // calculate dynamic lighting for bmodel if it's not an instanced model
-                if ((r_dlightmap.value) &&
-                    (clmodel->firstModelSurface != 0)
-                    ) {
-                    for (int k = 0; k < MAX_DLIGHTS; k++) {
-                        if ((cl_dlights[k].die < GetClSimTime()) ||
-                            (!cl_dlights[k].radius)
-                            ) {
-                            continue;
+                            R_MarkLights(
+                                &cl_dlights[k],
+                                1 << k,
+                                clmodel->nodes + clmodel->hulls[0].firstclipnode
+                            );
                         }
 
-                        R_MarkLights(
-                            &cl_dlights[k],
-                            1 << k,
-                            clmodel->nodes + clmodel->hulls[0].firstclipnode
-                        );
+
+                    // if the driver wants polygons, deliver those. Z-buffering is on at this point, so no clipping to the world tree is needed, just frustum clipping
+                    if (r_drawpolys | r_drawculledpolys)
+                        R_ZDrawSubmodelPolys(clmodel);
+                    else {
+                        r_pefragtopnode = NULL;
+                        r_entBB = bb;
+                        R_SplitEntityOnNode2(cl.worldmodel->nodes);
+
+                        if (r_pefragtopnode) {
+                            currententity->topnode = r_pefragtopnode;
+
+                            if (r_pefragtopnode->contents >= CONTENTS_NODE) {   // not a leaf; has to be clipped to the world BSP
+                                r_clipflags = clipflags;
+                                R_DrawSolidClippedSubmodelPolygons(clmodel);
+                            }
+                            else {  // falls entirely in one leaf, so we just put all the edges in the edge list and let 1/z sorting handle drawing order
+                                R_DrawSubmodelPolygons(clmodel, clipflags);
+                            }
+
+                            currententity->topnode = NULL;
+                        }
                     }
+
+                    // put back world rotation and frustum clipping
+                    // FIXME: R_RotateBmodel should just work off base_vxx
+                    BS = base_BS;
+                    modelorg = base_modelorg;
+                    modelorg = oldorigin;
+                    R_TransformFrustum();
                 }
 
-                // if the driver wants polygons, deliver those. Z-buffering is on at this point, so no clipping to the world tree is needed, just frustum clipping
-                if (r_drawpolys | r_drawculledpolys) {
-                    R_ZDrawSubmodelPolys(clmodel);
-                }
-                else {
-                    r_pefragtopnode = NULL;
+            } break;
 
-                    r_entBB = bb;
-
-                    R_SplitEntityOnNode2(cl.worldmodel->nodes);
-
-                    if (r_pefragtopnode) {
-                        currententity->topnode = r_pefragtopnode;
-
-                        if (r_pefragtopnode->contents >= CONTENTS_NODE) {   // not a leaf; has to be clipped to the world BSP
-                            r_clipflags = clipflags;
-                            R_DrawSolidClippedSubmodelPolygons(clmodel);
-                        }
-                        else {  // falls entirely in one leaf, so we just put all the edges in the edge list and let 1/z sorting handle drawing order
-                            R_DrawSubmodelPolygons(clmodel, clipflags);
-                        }
-
-                        currententity->topnode = NULL;
-                    }
-                }
-
-                // put back world rotation and frustum clipping
-                // FIXME: R_RotateBmodel should just work off base_vxx
-                BS = base_BS;
-                modelorg = base_modelorg;
-                modelorg = oldorigin;
-                R_TransformFrustum();
+            default:    break;
             }
-
-        } break;
-
-        default:    break;
         }
-    }
 
-    insubmodel = false;
+    } inSubModel = false;
 }
 
 

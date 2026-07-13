@@ -351,7 +351,7 @@ void CL_ParseUpdate(update_bits_t bits) {
 
     if (!i)     ent->pColorMap = Scr.pColorMapPal;
     else {
-        if (i > cl.maxclients)  Host_SysError("i >= cl.maxclients %d > %d", i, cl.maxclients);
+        if (i > cl.maxclients)      Host_SysError("i >= cl.maxclients %d > %d", i, cl.maxclients);
 
         ent->pColorMap = &cl.scores[i - 1].translations;
     }

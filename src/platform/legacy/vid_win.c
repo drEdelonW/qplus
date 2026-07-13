@@ -104,12 +104,17 @@ static int  VID_highhunkmark;
 
 qPal_p vid_curpal;
 
-uint16_t d_8to16table[InksNum];
-Rgb24_t     d_8to24table[InksNum];
+Rgb16_t d_8to16table[InksNum];
+Rgb24_t d_8to24table[InksNum];
 
-int     driver = grDETECT, mode;
-bool    useWinDirect = true, useDirectDraw = true;
-MGLDC* mgldc = NULL, * memdc = NULL, * dibdc = NULL, * windc = NULL;
+int driver = grDETECT;
+int mode;
+bool useWinDirect = true;
+bool useDirectDraw = true;
+MGLDC* mgldc = NULL;
+MGLDC* memdc = NULL;
+MGLDC* dibdc = NULL;
+MGLDC* windc = NULL;
 
 typedef struct {
     modestate_t type;
@@ -1609,13 +1614,10 @@ void VID_UnlockBuffer() {
 
 
 int VID_ForceUnlockedAndReturnState() {
-    int lk;
-
     if (!lockcount)
         return 0;
 
-    lk = lockcount;
-
+    int lk = lockcount;
     if (dibdc) {
         lockcount = 0;
     }
@@ -1629,7 +1631,6 @@ int VID_ForceUnlockedAndReturnState() {
 
 
 void VID_ForceLockState(int lk) {
-
     if (!dibdc && lk) {
         lockcount = 0;
         VID_LockBuffer();
@@ -1638,8 +1639,11 @@ void VID_ForceLockState(int lk) {
     lockcount = lk;
 }
 
+void VID_ShiftPalette(const qPal_p palette) {
+    VID_SetPalette(palette);
+}
 
-void VID_SetPalette(uint8_p palette) {
+void VID_SetPalette(const qPal_p palette) {
     INT     i;
     palette_t pal[InksNum];
     HDC   hdc;
@@ -1700,32 +1704,16 @@ void VID_SetPalette(uint8_p palette) {
 }
 
 
-void VID_ShiftPalette(uint8_p palette) {
-    VID_SetPalette(palette);
-}
 
-
-/*
-=================
-VID_DescribeCurrentMode_f
-=================
-*/
 void VID_DescribeCurrentMode_f() {
     Con_Printf("%s\n", VID_GetExtModeDescription(vid_modenum));
 }
 
 
-/*
-=================
-VID_NumModes_f
-=================
-*/
 void VID_NumModes_f() {
 
-    if (nummodes == 1)
-        Con_Printf("%d video mode is available\n", nummodes);
-    else
-        Con_Printf("%d video modes are available\n", nummodes);
+    if (nummodes == 1)      Con_Printf("%d video mode is available\n", nummodes);
+    else                    Con_Printf("%d video modes are available\n", nummodes);
 }
 
 

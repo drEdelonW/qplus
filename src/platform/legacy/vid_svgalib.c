@@ -403,10 +403,6 @@ void VID_Shutdown() {
 
 }
 
-void VID_ShiftPalette(uint8_p p) {
-    VID_SetPalette(p);
-}
-
 void VID_SetPalette(uint8_p palette) {
 
     static qPal_t tmppal;

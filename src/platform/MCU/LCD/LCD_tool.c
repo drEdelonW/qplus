@@ -162,8 +162,5 @@ void VID_SetPalette(qPal_p palette) { // TODO: make copy and upscale with DMA2D
     d_8to24table[InksNum - 1] &= 0x00FFFFFF; // 255 is transparent
 }
 
-void VID_ShiftPalette(qPal_p p) {
-    VID_SetPalette(p);
-}
 
 void VID_Shutdown() { printf(RED("VID_Shutdown\n")); }

@@ -56,8 +56,9 @@ __weak void VID_Init(qPal_p palette) {
     D_InitCaches((SurfCache_p)_surfCache, sizeof(_surfCache));
 #endif
 }
-__weak void VID_SetPalette(qPal_p palette) {}
-__weak void VID_ShiftPalette(qPal_p palette) {}
+__weak void VID_ShiftPalette(const qPal_p palette) { VID_SetPalette(palette); }
+__weak void VID_SetPalette(const qPal_p palette) {}
+
 __weak void D_BeginDirectRect(int x, int y, qColor8_p pbitmap, int width, int height) {}
 __weak void D_EndDirectRect(int x, int y, int width, int height) {}
 __weak void VID_Update(vRect_p rects) {}

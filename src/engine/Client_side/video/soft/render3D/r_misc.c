@@ -125,7 +125,8 @@ void R_LineGraph(int x, int y, int h) {
     ClampInRange(0, &h, s);
 
     for (int i = 0; i < s; ++i) {
-        dest[0].i = (i < h) ? GRAPH_FG : GRAPH_BG;
+        dest[0].i = (i < h) ?
+            GRAPH_FG : GRAPH_BG;
 
         dest[-Scr.SR_rowBytes].i = GRAPH_BG;
         dest -= TWICE(Scr.SR_rowBytes);
@@ -205,7 +206,7 @@ void R_PrintAliasStats() {
     );
 }
 
-
+#if 0   /* NOT USED */
 void WarpPalette() {
     qPal_t newpalette;
     qRgb24 basecolor = {
@@ -215,14 +216,14 @@ void WarpPalette() {
     };
 
     // pull the colors halfway to bright brown
-    for (int idx = 0; idx < InksNum; idx++) {
-        for (int c = 0; c < RGB_DIM; c++) {
-            newpalette.ink[idx].ch[c] = HALF(host_basepal->ink[idx].ch[c] + basecolor.ch[c]);
-        }
-    }
+    for (int idx = 0; idx < InksNum; idx++)
+        for (int c = 0; c < RGB_DIM; c++)
+            newpalette.ink[idx].ch[c] =
+            HALF(host_basepal->ink[idx].ch[c] + basecolor.ch[c]);
 
     VID_ShiftPalette(&newpalette);
 }
+#endif
 
 
 /*
@@ -440,17 +441,14 @@ void R_SetupFrame() {
     // start off with just the four screen edge clip planes
     R_TransformFrustum();
 
-    // save base values
-
-    base_BS = BS;
+    base_BS = BS;   // save base values
     base_modelorg = modelorg;
 
     R_SetSkyFrame();
 
     R_SetUpFrustumIndexes();
 
-    r_cache_thrash = false;
-
+#if 1   // Debug counters
     // clear frame counts
     c_faceclip = 0;
     d_spanpixcount = 0;
@@ -460,6 +458,7 @@ void R_SetupFrame() {
     r_amodels_drawn = 0;
     r_outofsurfaces = 0;
     r_outofedges = 0;
+#endif
 
     D_SetupFrame();
 }

@@ -28,11 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Surface.h"
 
 float surfscale;
-bool r_cache_thrash;         // set if surface cache is thrashing
 
-int sc_size;
+static int sc_size;
 SurfCache_p sc_rover;
-SurfCache_p sc_base;
+static SurfCache_p sc_base;
 
 #define GUARDSIZE 4
 
@@ -144,7 +143,7 @@ SurfCache_p D_SCAlloc(int width, int size) {
     }
 
     // create a fragment out of any leftovers
-    if (new->size - size > 256) {
+    if ((new->size - size) > 256) {
         sc_rover = (SurfCache_p)((uint8_p)new + size);
         sc_rover->size = new->size - size;
         sc_rover->next = new->next;
@@ -163,14 +162,12 @@ SurfCache_p D_SCAlloc(int width, int size) {
 
     new->owner = NULL;              // should be set properly after return
 
-    if (d_roverwrapped) {
-        if (wrapped_this_time ||
-            (sc_rover >= d_initial_rover))
-            r_cache_thrash = true;
-    }
-    else if (wrapped_this_time) {
+    if (d_roverwrapped) 
+        if ((wrapped_this_time) ||
+            (sc_rover >= d_initial_rover)
+            )   hid.r_cache_thrash = true;
+    else if (wrapped_this_time)
         d_roverwrapped = true;
-    }
 
     D_CheckCacheGuard();   // DEBUG
     return new;
@@ -231,8 +228,8 @@ SurfCache_p D_CacheSurface(mSurface_p surface, MipLevel_t miplevel) {
     //
     SurfCache_p cache = surface->cachespots[miplevel];
 
-    if (cache &&
-        !cache->dlight &&
+    if ((cache) &&
+        !(cache->dlight) &&
         (surface->dlightframe != r_framecount) &&
         (cache->texture == r_drawsurf.texture) &&
         (cache->lightadj[0] == r_drawsurf.lightadj[0]) &&
@@ -245,7 +242,7 @@ SurfCache_p D_CacheSurface(mSurface_p surface, MipLevel_t miplevel) {
     //
     // determine shape of surface
     //
-    surfscale = 1.0 / (1 << miplevel);
+    surfscale = 1.f / (1 << miplevel);
     r_drawsurf.surfmip = miplevel;
     r_drawsurf.surfwidth = surface->extents[0] >> miplevel;
     r_drawsurf.rowbytes = r_drawsurf.surfwidth;
@@ -264,7 +261,7 @@ SurfCache_p D_CacheSurface(mSurface_p surface, MipLevel_t miplevel) {
         cache->mipscale = surfscale;
     }
 
-    cache->dlight = (surface->dlightframe == r_framecount) ? 1 : 0;
+    cache->dlight = (surface->dlightframe == r_framecount);
 
     r_drawsurf.surfdat = cache->data;
 

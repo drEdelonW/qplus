@@ -461,7 +461,6 @@ void Draw_Init() {
     //
     // get the other pics we need
     //
-    hid.disc = GetPicFromWad("disc");
     draw_backtile = GetPicFromWad("backtile");
 }
 

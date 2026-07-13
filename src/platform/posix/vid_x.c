@@ -374,7 +374,6 @@ void VID_Init(qPal_p palette) {
     Scr.numpages = 2;
 
     srandom(getpid());
-
     verbose = COM_CheckParm("-verbose");
 
     // open the display
@@ -384,48 +383,45 @@ void VID_Init(qPal_p palette) {
         else                    Sys_Error("VID: Could not open local display\n");
     }
 
-    // catch signals so i can turn on auto-repeat
-
-    {
+    {   // catch signals so i can turn on auto-repeat
         struct sigaction sa;
         sigaction(SIGINT, 0, &sa);
         sa.sa_handler = TragicDeath;
         sigaction(SIGINT, &sa, 0);
         sigaction(SIGTERM, &sa, 0);
     }
-
     XAutoRepeatOff(x_disp);
 
-    // for debugging only
-    XSynchronize(x_disp, True);
+    XSynchronize(x_disp, True);    // for debugging only
 
     int pnum;
     // check for command-line window size
     if ((pnum = COM_CheckParm("-winsize"))) {
-        if (pnum >= com.argc - 2)           Sys_Error("VID: -winsize <width> <height>\n");
+        if (pnum >= com.argc - 2)       Sys_Error("VID: -winsize <width> <height>\n");
 
         vid.frameBuff.width = Q_atoi(com.argv[pnum + 1]);
         vid.frameBuff.height = Q_atoi(com.argv[pnum + 2]);
-        if (!vid.frameBuff.width || !vid.frameBuff.height)      Sys_Error("VID: Bad window width/height\n");
-
+        if (!(vid.frameBuff.width) ||
+            !(vid.frameBuff.height)
+            )   Sys_Error("VID: Bad window width/height\n");
     }
     if ((pnum = COM_CheckParm("-width"))) {
         if (pnum >= com.argc - 1)       Sys_Error("VID: -width <width>\n");
 
         vid.frameBuff.width = Q_atoi(com.argv[pnum + 1]);
-        if (!vid.frameBuff.width)                 Sys_Error("VID: Bad window width\n");
-
+        if (!vid.frameBuff.width)       Sys_Error("VID: Bad window width\n");
     }
+
     if ((pnum = COM_CheckParm("-height"))) {
         if (pnum >= com.argc - 1)       Sys_Error("VID: -height <height>\n");
 
         vid.frameBuff.height = Q_atoi(com.argv[pnum + 1]);
-        if (!vid.frameBuff.height)                Sys_Error("VID: Bad window height\n");
+        if (!vid.frameBuff.height)      Sys_Error("VID: Bad window height\n");
     }
 
     int template_mask = 0;
 
-    {// specify a visual id
+    {   // specify a visual id
         XVisualInfo template;
         if ((pnum = COM_CheckParm("-visualid"))) {
             if (pnum >= com.argc - 1)       Sys_Error("VID: -visualid <id#>\n");
@@ -434,14 +430,13 @@ void VID_Init(qPal_p palette) {
             template_mask = VisualIDMask;
         }
 
-        // If not specified, use default visual
-        else {
+        else {  // If not specified, use default visual
             int screen = XDefaultScreen(x_disp);
             template.visualid = XVisualIDFromVisual(XDefaultVisual(x_disp, screen));
             template_mask = VisualIDMask;
         }
 
-        {// pick a visual- warn if more than one was available
+        { // pick a visual- warn if more than one was available
             int num_visuals;
             x_visinfo = XGetVisualInfo(x_disp, template_mask, &template, &num_visuals);
             if (num_visuals > 1) {
@@ -468,8 +463,7 @@ void VID_Init(qPal_p palette) {
 
     x_vis = x_visinfo->visual;
 
-    // setup attributes for main window
-    {
+    {   // setup attributes for main window
         int attribmask = CWEventMask | CWColormap | CWBorderPixel;
         XSetWindowAttributes attribs;
         Colormap tmpcmap = XCreateColormap(
@@ -504,8 +498,7 @@ void VID_Init(qPal_p palette) {
             XFreeColormap(x_disp, tmpcmap);
     }
 
-    if (x_visinfo->depth == 8) {
-        // create and upload the palette
+    if (x_visinfo->depth == 8) {    // create and upload the palette
         if (x_visinfo->class == PseudoColor) {
             x_cmap = XCreateColormap(x_disp, x_win, x_vis, AllocAll);
             VID_SetPalette(palette);
@@ -516,18 +509,15 @@ void VID_Init(qPal_p palette) {
     // inviso cursor
     XDefineCursor(x_disp, x_win, CreateNullCursor(x_disp, x_win));
 
-    // create the GC
-    {
+    {   // create the GC
         int valuemask = GCGraphicsExposures;
         XGCValues xgcvalues = { .graphics_exposures = False };
         x_gc = XCreateGC(x_disp, x_win, valuemask, &xgcvalues);
     }
 
-    // map the window
-    XMapWindow(x_disp, x_win);
+    XMapWindow(x_disp, x_win);  // map the window
 
-    // wait for first exposure event
-    {
+    {   // wait for first exposure event
         do {
             XEvent event;
             XNextEvent(x_disp, &event);
@@ -561,21 +551,13 @@ void VID_Init(qPal_p palette) {
     current_framebuffer = false;
     Scr.SR_rowBytes = x_framebuffer[current_framebuffer]->bytes_per_line;
     vid.frameBuff.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
-    Scr.con.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
-    Scr.con.width = vid.frameBuff.width;
-    Scr.con.height = vid.frameBuff.height;
-
+    Scr.con = vid.frameBuff;
     // XSynchronize(x_disp, False);
-
-}
-
-void VID_ShiftPalette(qPal_p p) {
-    VID_SetPalette(p);
 }
 
 
 
-void VID_SetPalette(qPal_p palette) {
+void VID_SetPalette(const qPal_p palette) {
     for (int i = 0; i < InksNum; i++) {
         st2d_8to16table[i] = xlib_rgb16(
             palette->ink[i].r,
@@ -592,12 +574,9 @@ void VID_SetPalette(qPal_p palette) {
     if ((x_visinfo->class == PseudoColor) &&
         (x_visinfo->depth == 8)
         ) {
-        if (palette != &current_palette)
-#if 0
-            memcpy(current_palette, palette, 768);
-#else
+        if (&current_palette != palette)
             current_palette = *palette;
-#endif
+
         XColor colors[InksNum];
         for (int i = 0; i < InksNum; i++) {
             colors[i] = (XColor){
@@ -614,33 +593,21 @@ void VID_SetPalette(qPal_p palette) {
 }
 
 // Called at shutdown
-
 void VID_Shutdown() {
     Con_Printf("VID_Shutdown\n");
     XAutoRepeatOn(x_disp);
     XCloseDisplay(x_disp);
 }
 
-
-
-#if 0
-bool config_notify = false;
-int config_notify_width;
-int config_notify_height;
-#else
 CfgNotify_t xCfg = {
     .notify = false,
     .notify_width = 0,
     .notify_height = 0
 };
-#endif
 // flushes the given rectangles from the view buffer to the screen
 
 void VID_Update(vRect_p p_rects) {
-    // vRect_t full;
-
-// if the window changes dimension, skip this frame
-
+    // if the window changes dimension, skip this frame
     if (xCfg.notify) {
         fprintf(stderr, "config notify\n");
         xCfg.notify = false;
@@ -680,21 +647,22 @@ void VID_Update(vRect_p p_rects) {
                     p_rects->width, p_rects->height
                 );
 
-            if (!XShmPutImage(
-                x_disp, x_win,
-                x_gc, x_framebuffer[current_framebuffer],
-                p_rects->x, p_rects->y,
-                p_rects->x, p_rects->y,
-                p_rects->width, p_rects->height,
-                True
-            )
+            if (
+                !XShmPutImage(
+                    x_disp, x_win,
+                    x_gc, x_framebuffer[current_framebuffer],
+                    p_rects->x, p_rects->y,
+                    p_rects->x, p_rects->y,
+                    p_rects->width, p_rects->height,
+                    True
+                )
                 )   Sys_Error("VID_Update: XShmPutImage failed\n");
 
             oktodraw = false;
             while (!oktodraw)
                 GetEvent();
 
-            p_rects = p_rects->pNext;   /* TODO: check is here something not NULL ? */
+            p_rects = p_rects->pNext;
         }
         current_framebuffer = !current_framebuffer;
         vid.frameBuff.pClr = (qColor8_p)x_framebuffer[current_framebuffer]->data;
@@ -720,11 +688,7 @@ void VID_Update(vRect_p p_rects) {
                 p_rects->width, p_rects->height
             );
 
-#if 0   /* TODO: check is here something not NULL ? */
-            p_rects = p_rects->pnext;
-#else
             p_rects = p_rects->pNext;
-#endif
         }
         XSync(x_disp, False);
     }

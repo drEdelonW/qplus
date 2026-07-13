@@ -21,7 +21,6 @@ void M_DrawTransPicName(int cx, int cy, cStringRO str) {
     M_DrawTransPic(cx, cy, Draw_CachePic(str));
 }
 
-
 static inline int mCH(int h) {
     return h + HALF(Scr.canvas.width - 320);
 }

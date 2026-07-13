@@ -83,11 +83,6 @@ extern int      r_visframecount;    // r_main.c
 //
 // current entity info
 //
-extern bool insubmodel; // r_bsp.c
-#if 0   // not needed extern
-extern vec3_t  r_worldmodelorg;
-#endif
-
 
 void R_DrawSprite();
 void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags);

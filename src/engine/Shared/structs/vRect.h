@@ -7,10 +7,8 @@ typedef vRect_t* vRect_p;
 struct vRect_s {
     int x, y;
     int width, height;
-    // ptrdiff_t rowBytes;  // Width in bytes - new line offset // TODO: move it to SoftRender specific
     union {
         qColor8_p pClr;
-        // uint8_p pBuff;
         int16_p pZBuff;
     };
 #if 1   /* seems like  it used only in vid_x.c */

@@ -12,7 +12,7 @@ struct SurfCache_s {
     SurfCache_p next;
     SurfCache_ar owner;                 // NULL is an empty chunk of memory
     int         lightadj[MAXLIGHTMAPS]; // checked for strobe flush
-    int         dlight;
+    bool        dlight;
     int         size;                   // including header
     uint32_t    width;
     uint32_t    height;                 // DEBUG only needed for debug

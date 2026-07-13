@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 D_FillRect
 ================
 */
-void D_FillRect(vRect_p rect, int color) {
+void D_FillRect(vRect_p rect, qColor8_t color) {
     if (!Scr.canvas.pClr)   return;
     int rx = rect->x;
     int ry = rect->y;
@@ -45,11 +45,11 @@ void D_FillRect(vRect_p rect, int color) {
     if ((rx + rwidth) > Scr.canvas.width)
         rwidth = Scr.canvas.width - rx;
     if ((ry + rheight) > Scr.canvas.height)
-        rheight = Scr.canvas.height - rx;
+        rheight = Scr.canvas.height - ry;
 
     if ((rwidth < 1) ||
-        (rheight < 1))
-        return;
+        (rheight < 1)
+        )   return;
 
     qColor8_p dest = Scr.canvas.pClr + (ry * Scr.SR_rowBytes) + rx;
 
@@ -58,14 +58,15 @@ void D_FillRect(vRect_p rect, int color) {
         ) {
         // faster aligned dword clear
         uint32_p ldest = (uint32_p)dest;
-        color += color << 16;
+        uint32_t clr = color.i;
+        clr += clr << 16;
 
         rwidth = DIV4(rwidth);
-        color += color << 8;
+        clr += clr << 8;
 
         for (int ry = 0; ry < rheight; ry++) {
             for (int rx = 0; rx < rwidth; rx++)
-                ldest[rx] = color;
+                ldest[rx] = clr;
             ldest = (uint32_p)((uint8_p)ldest + Scr.SR_rowBytes);
         }
     }
@@ -73,7 +74,7 @@ void D_FillRect(vRect_p rect, int color) {
         // slower byte-by-byte clear for unaligned cases
         for (int ry = 0; ry < rheight; ry++) {
             for (int rx = 0; rx < rwidth; rx++)
-                dest[rx].i = color;
+                dest[rx] = color;
             dest += Scr.SR_rowBytes;
         }
     }

@@ -714,10 +714,6 @@ void    VID_Init(uint8_p palette) {
 
 }
 
-void VID_ShiftPalette(qPal_p p) {
-    VID_SetPalette(p);
-}
-
 void VID_SetPalette(qPal_p palette) {
     XColor colors[InksNum];
 
@@ -962,7 +958,11 @@ void    VID_Update(vRect_p rects) {
         //        s = gethrtime();
 
         while (rects) {
-            printf("update: %d,%d (%d,%d)\n", rects->x, rects->y, rects->width, rects->height);
+            printf(
+                "update: %d,%d (%d,%d)\n",
+                rects->x, rects->y,
+                rects->width, rects->height
+            );
             if (x_visinfo->depth == 16)
                 st2_fixup(
                     x_framebuffer[current_framebuffer],

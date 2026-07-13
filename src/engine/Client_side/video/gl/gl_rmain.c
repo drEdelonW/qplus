@@ -38,8 +38,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 r_Entity_t r_worldentity; // was Entity_t
 
-bool r_cache_thrash;  // compatability
-
 vec3_t  modelorg;
 vec3_t  r_entorigin;
 r_Entity_p currententity;
@@ -216,26 +214,24 @@ vec3_t r_avertexnormals[NUMVERTEXNORMALS] = {
 };
 #pragma GCC diagnostic pop
 
-vec3_t shadevector;
-float shadelight, ambientlight;
+static vec3_t shadevector;
+
 
 // precalculated dot products for quantized angles
 #define SHADEDOT_QUANT 16
+#if 1 /* !!!SOLID BLOCK BEGIN!!! */
 float r_avertexnormal_dots[SHADEDOT_QUANT][256] =
 #include "anorm_dots.h"
 ;
+#endif /* !!!SOLID BLOCK END!!! */
 
-float_p shadedots = r_avertexnormal_dots[0];
+static float_p _pShadeDots = r_avertexnormal_dots[0];
 
-int lastposenum;
-
-/*
-=============
-GL_DrawAliasFrame
-=============
-*/
+static float _shadeLight;
+static float _ambientLight;
+static int _lastPoseNum;
 void GL_DrawAliasFrame(AliasHdr_p pAliasHdr, int posenum) {
-    lastposenum = posenum;
+    _lastPoseNum = posenum;
 
     TriVertx_p verts = (TriVertx_p)((uint8_p)pAliasHdr + pAliasHdr->posedata);
     verts += posenum * pAliasHdr->poseverts;
@@ -261,7 +257,7 @@ void GL_DrawAliasFrame(AliasHdr_p pAliasHdr, int posenum) {
                 order += 2;
 
                 // normals and vertexes come from the frame list
-                float l = shadedots[verts->lightnormalindex] * shadelight;
+                float l = _pShadeDots[verts->lightnormalindex] * _shadeLight;
                 glColor3f(l, l, l);
                 glVertex3f(verts->v8[X_AX], verts->v8[Y_AX], verts->v8[Z_AX]);
                 verts++;
@@ -272,25 +268,16 @@ void GL_DrawAliasFrame(AliasHdr_p pAliasHdr, int posenum) {
 }
 
 
-/*
-=============
-GL_DrawAliasShadow
-=============
-*/
-
 void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
-
-    float lheight = currententity->pose.loc.z - lightspot.z;
-
-    float height = 0;
-    TriVertx_p verts = (TriVertx_p)((uint8_p)pAliasHdr + pAliasHdr->posedata);
-    verts += posenum * pAliasHdr->poseverts;
+    TriVertx_p verts =
+        (TriVertx_p)((uint8_p)pAliasHdr) +
+        (pAliasHdr->poseverts * posenum) +
+        (pAliasHdr->posedata);
     int* order = (int*)((uint8_p)pAliasHdr + pAliasHdr->commands);
 
-    height = -lheight + 1.0;
-
-    while (1) {
-        // get the vertex count and primitive type
+    float lheight = currententity->pose.loc.z - lightspot.z;
+    float height = -lheight + 1.0;
+    while (1) { // get the vertex count and primitive type
         int count = *order++;
         if (!count)     break;  // done
 
@@ -305,8 +292,7 @@ void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
         glBegin(mode); {
 
             do {
-                // texture coordinates come from the draw list
-                // (skipped for shadows) glTexCoord2fv ((float *)order);
+                // texture coordinates come from the draw list (skipped for shadows) glTexCoord2fv ((float *)order);
                 order += 2;
 
                 // normals and vertexes come from the frame list
@@ -329,13 +315,6 @@ void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
 }
 
 
-
-/*
-=================
-R_SetupAliasFrame
-
-=================
-*/
 void R_SetupAliasFrame(int frame, AliasHdr_p pAliasHdr) {
     if ((frame >= pAliasHdr->numframes) ||
         (frame < 0)
@@ -372,12 +351,6 @@ bool R_CullBox(BBox_t bb) {
 }
 
 
-/*
-=================
-R_DrawAliasModel
-
-=================
-*/
 void R_DrawAliasModel(r_Entity_p e) {
     Model_p clmodel = currententity->model;
 
@@ -386,16 +359,17 @@ void R_DrawAliasModel(r_Entity_p e) {
     r_entorigin = currententity->pose.loc;
     modelorg = VectorSubtract(r_origin, r_entorigin);
 
-    //
     // get lighting information
-    //
-
-    ambientlight = shadelight = R_LightPoint(currententity->pose.loc);
+    _ambientLight = R_LightPoint(currententity->pose.loc);
+    _shadeLight = _ambientLight;
 
     // allways give the gun some light
     if ((e == &cl.viewent) &&
-        (ambientlight < 24)
-        )   ambientlight = shadelight = 24;
+        (_ambientLight < 24.f)
+        ) {
+            _ambientLight = 24.f;
+            _shadeLight = 24.f;
+        }
 
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
         if (cl_dlights[lnum].die >= GetClSimTime()) {
@@ -406,38 +380,40 @@ void R_DrawAliasModel(r_Entity_p e) {
             float add = cl_dlights[lnum].radius - Length(dist);
 
             if (add > 0) {
-                ambientlight += add;
+                _ambientLight += add;
                 //ZOID models should be affected by dlights as well
-                shadelight += add;
+                _shadeLight += add;
             }
         }
     }
 
     // clamp lighting so it doesn't overbright as much
-    ClampMoreThen(&ambientlight, 128.f);
+    ClampMoreThen(&_ambientLight, 128.f);
 
-    if ((ambientlight + shadelight) > 192.0f)
-        shadelight = 192.0f - ambientlight;
+    if ((_ambientLight + _shadeLight) > 192.0f)
+        _shadeLight = 192.0f - _ambientLight;
 
-    // ZOID: never allow players to go totally black
+    { // ZOID: never allow players to go totally black
     int i = currententity - cl_entities;
     if ((i >= 1) &&
         (i <= cl.maxclients) /* &&
         !strcmp (currententity->model->name, "progs/player.mdl") */
-       )    if (ambientlight < 8.f) {
-               ambientlight = 8.f;
-               shadelight = 8.f;
-           }
+        )
+            if (_ambientLight < 8.f) {
+                _ambientLight = 8.f;
+                _shadeLight = 8.f;
+            }
+    }
 
     // HACK HACK HACK -- no fullbright colors, so make torches full light
     if (!strcmp(clmodel->name, "progs/flame2.mdl") ||
         !strcmp(clmodel->name, "progs/flame.mdl")
-        )   ambientlight = shadelight = 256.0f;
+        )   _ambientLight = _shadeLight = 256.0f;
 
-    shadedots = r_avertexnormal_dots[
+    _pShadeDots = r_avertexnormal_dots[
         ((int)(e->pose.aim.yaw * (SHADEDOT_QUANT / 360.0f))) & (SHADEDOT_QUANT - 1)
     ];
-    shadelight = shadelight / 200.0f;
+    _shadeLight = _shadeLight / 200.0f;
 
     float an = DEG2RAD(e->pose.aim.yaw);
 
@@ -448,81 +424,76 @@ void R_DrawAliasModel(r_Entity_p e) {
     };
     VectorNormalize(&shadevector);
 
-    //
     // locate the proper data
-    //
     AliasHdr_p pAliasHdr = (AliasHdr_p)Mod_Extradata(currententity->model);
 
     c_alias_polys += pAliasHdr->numtris;
 
-    //
     // draw all the triangles
-    //
-
     GL_DisableMultitexture();
 
-    glPushMatrix();
-    R_RotateForEntity(e);
+    glPushMatrix(); {
+        R_RotateForEntity(e);
 
-    if (!strcmp(clmodel->name, "progs/eyes.mdl") && gl_doubleeyes.value) {
-        glTranslatef(
-            pAliasHdr->scale_origin.x,
-            pAliasHdr->scale_origin.y,
-            pAliasHdr->scale_origin.z - (22 + 8)
-        );
-        // double size of eyes, since they are really hard to see in gl
-        glScalef(
-            pAliasHdr->scale.x * 2.0f,
-            pAliasHdr->scale.y * 2.0f,
-            pAliasHdr->scale.z * 2.0f
-        );
-    }
-    else {
-        glTranslatef(
-            pAliasHdr->scale_origin.x,
-            pAliasHdr->scale_origin.y,
-            pAliasHdr->scale_origin.z
-        );
-        glScalef(
-            pAliasHdr->scale.x,
-            pAliasHdr->scale.y,
-            pAliasHdr->scale.z
-        );
-    }
+        if (!strcmp(clmodel->name, "progs/eyes.mdl") && gl_doubleeyes.value) {
+            glTranslatef(
+                pAliasHdr->scale_origin.x,
+                pAliasHdr->scale_origin.y,
+                pAliasHdr->scale_origin.z - (22 + 8)
+            );
+            // double size of eyes, since they are really hard to see in gl
+            glScalef(
+                pAliasHdr->scale.x * 2.0f,
+                pAliasHdr->scale.y * 2.0f,
+                pAliasHdr->scale.z * 2.0f
+            );
+        }
+        else {
+            glTranslatef(
+                pAliasHdr->scale_origin.x,
+                pAliasHdr->scale_origin.y,
+                pAliasHdr->scale_origin.z
+            );
+            glScalef(
+                pAliasHdr->scale.x,
+                pAliasHdr->scale.y,
+                pAliasHdr->scale.z
+            );
+        }
 
-    int anim = (int)(GetClSimTime() * 10) & 3;
-    GL_Bind(pAliasHdr->gl_texturenum[currententity->skinnum][anim]);
+        int anim = (int)(GetClSimTime() * 10) & 3;
+        GL_Bind(pAliasHdr->gl_texturenum[currententity->skinnum][anim]);
 
-    // we can't dynamically pColorMap textures, so they are cached
-    // seperately for the players.  Heads are just uncolored.
-    if ((currententity->pColorMap != Scr.pColorMapPal) &&
-        (!gl_nocolors.value)
-        ) {
-        int i = currententity - cl_entities;
-        if (i >= 1 && i <= cl.maxclients /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
-            GL_Bind(playertextures - 1 + i);
-    }
+        // we can't dynamically pColorMap textures, so they are cached
+        // seperately for the players.  Heads are just uncolored.
+        if ((currententity->pColorMap != Scr.pColorMapPal) &&
+            (!gl_nocolors.value)
+            ) {
+            int i = currententity - cl_entities;
+            if ((i >= 1) && (i <= cl.maxclients) /* && !strcmp (currententity->model->name, "progs/player.mdl") */)
+                GL_Bind(playertextures - 1 + i);
+        }
 
-    if (gl_smoothmodels.value)
-        glShadeModel(GL_SMOOTH);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        if (gl_smoothmodels.value)
+            glShadeModel(GL_SMOOTH);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-    if (gl_affinemodels.value)      glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+        if (gl_affinemodels.value)
+            glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 
-    R_SetupAliasFrame(currententity->frame, pAliasHdr);
+        R_SetupAliasFrame(currententity->frame, pAliasHdr);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    glShadeModel(GL_FLAT);
-    if (gl_affinemodels.value)      glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-    glPopMatrix();
+        glShadeModel(GL_FLAT);
+        if (gl_affinemodels.value)
+            glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    } glPopMatrix();
 
     if (r_shadows.value) {
         glPushMatrix(); {
             R_RotateForEntity(e);
             glDisable(GL_TEXTURE_2D);   glEnable(GL_BLEND);     glColor4f(0, 0, 0, 0.5); {
-                GL_DrawAliasShadow(pAliasHdr, lastposenum);
+                GL_DrawAliasShadow(pAliasHdr, _lastPoseNum);
             } glEnable(GL_TEXTURE_2D);    glDisable(GL_BLEND);    glColor4f(1, 1, 1, 1);
         } glPopMatrix();
     }
@@ -592,7 +563,7 @@ void R_DrawViewModel() {
 
     int j = R_LightPoint(currententity->pose.loc);
     ClampLessThen(&j, 24);  // allways give some light on gun
-    int ambientlight = j;
+    int _ambientLight = j;
 
     // add dynamic lights
     for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++) {
@@ -604,14 +575,14 @@ void R_DrawViewModel() {
         vec3_t dist = VectorSubtract(currententity->pose.loc, dl->origin);
         float add = dl->radius - Length(dist);
         if (add > 0)
-            ambientlight += add;
+            _ambientLight += add;
     }
 
 #if 0
     int shadelight = j;
     float ambient[4], diffuse[4];
-    ambient[0] = ambient[1] = ambient[2] = ambient[3] = (float)ambientlight / 128;
-    diffuse[0] = diffuse[1] = diffuse[2] = diffuse[3] = (float)shadelight / 128;
+    ambient[0] = ambient[1] = ambient[2] = ambient[3] = (float)_ambientLight / 128;
+    diffuse[0] = diffuse[1] = diffuse[2] = diffuse[3] = (float)_shadeLight / 128;
 #endif
     #warning TODO: investigate why ambient and diffuse go nowhere
 
@@ -715,8 +686,6 @@ void R_SetupFrame() {
 
     V_SetContentsColor(r_viewleaf->contents);
     V_CalcBlend();
-
-    r_cache_thrash = false;
 
     c_brush_polys = 0;   // FYI: DEBUG metrics
     c_alias_polys = 0;   // FYI: DEBUG metrics

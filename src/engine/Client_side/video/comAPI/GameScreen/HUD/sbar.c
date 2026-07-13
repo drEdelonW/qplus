@@ -372,9 +372,6 @@ void Sbar_UpdateScoreboard() {
             s->frags,
             s->name
         );
-
-        // _scoreboardtop[i] = Sbar_ColorForMap((s->colors & 0xF0) << 0);
-        // _scoreboardbottom[i] = Sbar_ColorForMap((s->colors & 0x0F) << 4);
     }
 }
 
@@ -465,7 +462,7 @@ void Sbar_DrawScoreboard() {
                 )   continue;
             Sbar_DrawCharacter(MUL8(x + j), y, c);
         }
-}
+    }
 #endif
 }
 
@@ -509,9 +506,10 @@ void Sbar_DrawInventory() {
             if (cl.items & (1 << hipweapons[i])) {
                 LegDt_t time = cl.item_gettime[hipweapons[i]];
                 int flashon = (int)((GetClSimTime() - time) * 10);
-                if (flashon >= 10)
+                if (flashon >= 10) {
                     flashon = (flashon >= 10) ?
-                    (cl.stats[STAT_ACTIVEWEAPON] == (1 << hipweapons[i])) : ((flashon % 5) + 2);
+                        (cl.stats[STAT_ACTIVEWEAPON] == (1 << hipweapons[i])) : ((flashon % 5) + 2);
+                }
 
                 // check grenade launcher
                 if (i == 2) {
@@ -561,16 +559,14 @@ void Sbar_DrawInventory() {
             if (flashon &&   // flash frame
                 isTime(time)
                 )               Sbar_Changed();
-            else
-                //MED 01/04/97 changed keys
+            else    //MED 01/04/97 changed keys
                 if (!hipnotic ||
                     (i > 1)
                     )           Sbar_DrawPic(192 + MUL16(i), -16, _sb.items[i]);
             if (isTime(time))   Sbar_Changed();
         }
     //MED 01/04/97 added hipnotic items
-    // hipnotic items
-    if (hipnotic) {
+    if (hipnotic)    // hipnotic items
         for (int i = 0; i < 2; i++)
             if (cl.items & (1 << (24 + i))) {
                 LegDt_t time = cl.item_gettime[24 + i];
@@ -580,11 +576,10 @@ void Sbar_DrawInventory() {
                 else                Sbar_DrawPic(288 + MUL16(i), -16, hsb_items[i]);
                 if (isTime(time))   Sbar_Changed();
             }
-    }
 
-    if (rogue) {
-        // new rogue items
-        for (int i = 0; i < 2; i++) {
+
+    if (rogue) { // new rogue items
+        for (int i = 0; i < 2; i++)
             if (cl.items & (1 << (29 + i))) {
                 LegDt_t time = cl.item_gettime[29 + i];
                 if (flashon &&   // flash frame
@@ -593,11 +588,9 @@ void Sbar_DrawInventory() {
                 else                Sbar_DrawPic(288 + MUL16(i), -16, rsb_items[i]);
                 if (isTime(time))   Sbar_Changed();
             }
-        }
     }
-    else {
-        // sigils
-        for (int i = 0; i < 4; i++) {
+    else // sigils
+        for (int i = 0; i < 4; i++)
             if (cl.items & (1 << (28 + i))) {
                 LegDt_t time = cl.item_gettime[28 + i];
                 if (flashon &&   // flash frame
@@ -606,8 +599,8 @@ void Sbar_DrawInventory() {
                 else                Sbar_DrawPic(320 - 32 + MUL8(i), -16, _sb.sigil[i]);
                 if (isTime(time))   Sbar_Changed();
             }
-        }
-    }
+
+
 }
 
 //=============================================================================
@@ -683,8 +676,7 @@ void Sbar_DrawFace() {
         );
 
         // draw number
-        char num[12];
-        snprintf(num, sizeof(num), "%3i", s->frags);
+        char num[12]; snprintf(num, sizeof(num), "%3i", s->frags);
 
         if (top.i == 8) {
             if (num[0] != ' ')  Sbar_DrawCharacter(109, 3, 18 + num[0] - '0');
@@ -700,9 +692,9 @@ void Sbar_DrawFace() {
         return;
     }
     // PGM 01/19/97 - team color drawing
-
     if ((cl.items & (IT_INVISIBILITY | IT_INVULNERABILITY))
-        == (IT_INVISIBILITY | IT_INVULNERABILITY)) {
+        == (IT_INVISIBILITY | IT_INVULNERABILITY)
+        ) {
         Sbar_DrawPic(112, 0, _sb.face.invis_invuln);
         return;
     }
@@ -906,12 +898,12 @@ void Sbar_DeathmatchOverlay() {
             snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
             Draw_String(x + 48, y, num);
-    }
+        }
 #endif
         Draw_String(x + 64, y, s->name);    // draw name
         y += 10;
-}
     }
+}
 
 
 void Sbar_MiniDeathmatchOverlay() {
@@ -989,13 +981,13 @@ void Sbar_MiniDeathmatchOverlay() {
                 snprintf(num, sizeof(str), "%3i:%i%i", minutes, tens, units);
 
                 Draw_String(x + 48, y, num);
-        }
+            }
 #endif
             Draw_String(x + 48, y, s->name);    // draw name
             y += 8;
+        }
     }
 }
-    }
 
 
 void Sbar_IntermissionOverlay() {

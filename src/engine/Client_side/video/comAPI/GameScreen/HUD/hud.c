@@ -145,10 +145,9 @@ void Draw_EndDisc() {
 #endif
 }
 
-
 void SCR_DrawRam() {
     if ((!scr_showram.value) ||
-        (!r_cache_thrash)
+        (!hid.r_cache_thrash)
         )   return;
     // printf("drawRAM [%s]  \n", r_cache_thrash ? "true" : "false");
     Draw_Pic(
@@ -156,6 +155,7 @@ void SCR_DrawRam() {
         Scr.canvas.y,
         hid.ram
     );
+    hid.r_cache_thrash = false;
 }
 
 

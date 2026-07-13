@@ -46,7 +46,6 @@ Draw_Init
 
 void Draw_Init() {
     pDrawChars = (qColor8_p)GetPicFromWad("conchars");
-    hid.disc = GetPicFromWad("disc");
 
     qPic_p BackTile = GetPicFromWad("backtile"); // get from WAD textures
     _btR = (BackTile_t){

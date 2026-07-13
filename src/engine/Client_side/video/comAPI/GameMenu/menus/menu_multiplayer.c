@@ -36,7 +36,8 @@ void M_MultiPlayer_Draw() {
     );
 
     if (!(is_anyComAval()))
-        M_PrintWhite(HALF(320) - DIV2(MUL8(27)), 148,
+        M_PrintWhite(
+            DIV2(320 - MUL8(27)), 148,
             "No Communications Available"
         );
 }

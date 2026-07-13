@@ -27,19 +27,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // current entity info
 //
-bool        insubmodel;
+bool        inSubModel;
 r_Entity_p  currententity;
-vec3_t      modelorg, base_modelorg;    // TODO: move to transform code
-// modelorg is the viewpoint reletive to
-// the currently rendering entity
-vec3_t      r_entorigin; // the currently rendering entity in world
-// coordinates
-
+vec3_t  modelorg;       // modelorg is the viewpoint reletive to the currently rendering entity
+vec3_t  base_modelorg;  // TODO: move to transform code
+vec3_t  r_entorigin;    // the currently rendering entity in world coordinates
 mat3_t  entity_rotation;
-#if 0   // not needed extern
-vec3_t  r_worldmodelorg;
-#endif
-
 int     r_currentbkey;
 
 typedef enum {
@@ -49,13 +42,18 @@ typedef enum {
 } solidstate_t;
 
 #define MAX_BMODEL_VERTS 500   // 6K
-#define MAX_BMODEL_EDGES 1000  // 12K
+mVertex_t bverts[MAX_BMODEL_VERTS];
+static mVertex_p _pbVerts;
+static int       _numbVerts;
 
-static mVertex_p    _pbVerts;
-static bEdge_p      _pbEdges;
-static int          _numbVerts, _numbEges;
-static mVertex_p    _pFrontEnter, _pFrontExit;
-static bool         _makeClippedEdge;
+#define MAX_BMODEL_EDGES 1000  // 12K
+bEdge_t bedges[MAX_BMODEL_EDGES];
+static bEdge_p _pbEdges;
+static int     _numbEges;
+
+static mVertex_p _pFrontEnter;
+static mVertex_p _pFrontExit;
+static bool _makeClippedEdge;
 
 
 //===========================================================================
@@ -305,19 +303,23 @@ void R_DrawSolidClippedSubmodelPolygons(Model_p pmodel) {
         vec_t dot = DotProduct(modelorg, pplane->normal) - pplane->dist;
 
         // draw the polygon
-        if (((psurf->flags & SURF_PLANEBACK) &&
-            (dot < -BACKFACE_EPSILON)) ||
-            (!(psurf->flags & SURF_PLANEBACK) &&
-                (dot > BACKFACE_EPSILON))) {
+        if (
+            (
+                (psurf->flags & SURF_PLANEBACK) &&
+                (dot < -BACKFACE_EPSILON)
+                ) ||
+            (
+                !(psurf->flags & SURF_PLANEBACK) &&
+                (dot > BACKFACE_EPSILON)
+                )
+            ) {
             // FIXME: use bounding-box-based frustum clipping info?
 
             // copy the edges to bedges, flipping if necessary so always
             // clockwise winding
             // FIXME: if edges and vertices get caches, these assignments must move
             // outside the loop, and overflow checking must be done here
-            mVertex_t bverts[MAX_BMODEL_VERTS];
             _pbVerts = bverts;
-            bEdge_t bedges[MAX_BMODEL_EDGES];
             _pbEdges = bedges;
             _numbVerts = _numbEges = 0;
 

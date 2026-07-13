@@ -19,7 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-
+#include <stdbool.h>
+extern bool inSubModel; // r_bsp.c
 
 typedef enum {
     CONTENTS_NODE         =  0,

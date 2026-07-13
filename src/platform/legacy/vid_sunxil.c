@@ -643,10 +643,6 @@ VID_ResetFramebuffer_MT() {
     vid.zBuff.pZBuff = malloc(PM(Scr.canvas.width) * PM(Scr.canvas.height) * sizeof(*vid.zBuff.pZBuff));
 }
 
-void VID_ShiftPalette(uint8_p p) {
-    VID_SetPalette(p);
-}
-
 void VID_SetPalette(uint8_p palette) {
 
     int i;

@@ -48,7 +48,7 @@ CfgNotify_t xCfg = {
 qColor8_t d_15to8table[0x10000u];
 bool    doShm;
 bool    oktodraw = false;
-Display*    x_disp = NULL;
+Display* x_disp = NULL;
 // static Display* _dpy = NULL;
 static int _scrNum;
 Window      x_win;
@@ -66,7 +66,7 @@ bool vidmode_ext = false;
 //     (void)size;
 // }
 
-void GL_BeginRendering(int *x, int *y, int *width, int *height) {
+void GL_BeginRendering(int* x, int* y, int* width, int* height) {
     *x = 0;
     *y = 0;
     *width = Scr.canvas.width;
@@ -172,7 +172,7 @@ typedef struct GlxState_s {
     int             major;
     int             minor;
 
-    XVisualInfo*    visual;
+    XVisualInfo* visual;
     GLXContext      context;
     int             doublebuffer;
     bool            is_direct;
@@ -188,7 +188,7 @@ typedef struct WindowState_s {
 } WindowState_t;
 
 typedef struct App_s {
-    Display*        display;
+    Display* display;
     int             screen;
     bool            running;
 
@@ -251,8 +251,9 @@ int open_display(App_p app) {
     x_disp = app->display;
     _scrNum = app->screen;
 
-    Con_Printf("[OK] XOpenDisplay\n");
-    Con_Printf("[X11] vendor=%s\n", ServerVendor(app->display));
+    Con_Printf("[OK] XOpenDisplay\n[X11] vendor=%s\n",
+        ServerVendor(app->display)
+    );
 
     return 1;
 }

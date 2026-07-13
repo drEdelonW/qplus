@@ -36,7 +36,7 @@ TriVertx_p      r_apverts;
 // TODO: these probably will go away with optimized rasterization
 Mdl_p   pmdl;
 vec3_t  r_plightvec;
-int     r_ambientlight;
+static int r_ambientlight;
 float   r_shadelight;
 FinalVert_p pfinalverts;
 AuxVert_p   pauxverts;
@@ -466,16 +466,12 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
         // lighting
         vec3_p plightnormal = &r_avertexnormals[pverts->lightnormalindex];
         float lightcos = DotProduct(*plightnormal, r_plightvec);
-        int temp = r_ambientlight;
 
+        int temp = r_ambientlight;
         if (lightcos < 0) {
             temp += (int)(r_shadelight * lightcos);
-
-            // clamp; because we limited the minimum ambient and shading light, we
-            // don't have to clamp low light, just bright
-            ClampLessThen(&temp, 0);
+            ClampLessThen(&temp, 0);    // clamp; because we limited the minimum ambient and shading light, we don't have to clamp low light, just bright
         }
-
         fv->vAttr.light = temp;
     }
 }
@@ -564,8 +560,7 @@ R_AliasSetupLighting
 ================
 */
 void R_AliasSetupLighting(aLight_p plighting) {
-    // guarantee that no vertex will ever be lit below LIGHT_MIN, so we don't have
-    // to clamp off the bottom
+    // guarantee that no vertex will ever be lit below LIGHT_MIN, so we don't have to clamp off the bottom
     r_ambientlight = plighting->ambientlight;
     ClampLessThen(&r_ambientlight, LIGHT_MIN);
 
@@ -573,7 +568,7 @@ void R_AliasSetupLighting(aLight_p plighting) {
     ClampLessThen(&r_ambientlight, LIGHT_MIN);
 
     r_shadelight = plighting->shadelight;
-    ClampLessThen(&r_shadelight, 0);
+    ClampLessThen(&r_shadelight, 0.f);
 
     r_shadelight *= VID_GRADES;
 

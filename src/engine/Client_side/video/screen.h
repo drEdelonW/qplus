@@ -81,7 +81,6 @@ typedef struct {
     bool    disabled_for_loading;
     bool    skipupdate;
     bool    block_drawing;
-    bool    r_cache_thrash;     // compatability
     float   vpAspect;           // width / height -- < 0 is taller than wide  // move to view.h or RefDef
 } Screen_t;
 extern Screen_t Scr;

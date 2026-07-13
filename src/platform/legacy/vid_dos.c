@@ -274,17 +274,6 @@ void    VID_SetPalette(uint8_p palette) {
 
 /*
 ================
-VID_ShiftPalette
-================
-*/
-void    VID_ShiftPalette(uint8_p palette) {
-
-	VID_SetPalette(palette);
-}
-
-
-/*
-================
 VID_Shutdown
 ================
 */

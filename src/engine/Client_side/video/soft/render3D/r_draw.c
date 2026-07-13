@@ -343,7 +343,7 @@ void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags) {
             _r_pedge = &pedges[lindex];
 
             // if the edge is cached, we can just reuse the edge
-            if (!insubmodel) {
+            if (!inSubModel) {
                 if ((_r_pedge->cachededgeoffset & FULLY_CLIPPED_CACHED) &&
                     ((_r_pedge->cachededgeoffset & FRAMECOUNT_MASK) == r_framecount)
                     ) {
@@ -377,7 +377,7 @@ void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags) {
         else {
             lindex = -lindex;
             _r_pedge = &pedges[lindex];
-            if (!insubmodel)  // if the edge is cached, we can just reuse the edge
+            if (!inSubModel)  // if the edge is cached, we can just reuse the edge
                 if ((_r_pedge->cachededgeoffset & FULLY_CLIPPED_CACHED) &&
                     ((_r_pedge->cachededgeoffset & FRAMECOUNT_MASK) == r_framecount)
                     ) {
@@ -434,7 +434,7 @@ void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags) {
     pSurface->data = (TypeLess_ptr)fa;
     pSurface->nearzi = _r_nearzi;
     pSurface->flags = fa->flags;
-    pSurface->insubmodel = insubmodel;
+    pSurface->insubmodel = inSubModel;
     pSurface->spanstate = notInSpan;
     pSurface->entity = currententity;
     pSurface->key = r_currentkey++;
@@ -452,7 +452,6 @@ void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags) {
         xcenter * pSurface->d_zistepu -
         ycenter * pSurface->d_zistepv;
 
-    //JDC VectorCopy (r_worldmodelorg, pSurface->modelorg);
     pSurface++;
 }
 
@@ -549,7 +548,6 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
         xcenter * pSurface->d_zistepu -
         ycenter * pSurface->d_zistepv;
 
-    //JDC VectorCopy (r_worldmodelorg, pSurface->modelorg);
     pSurface++;
 }
 
