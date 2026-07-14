@@ -9,7 +9,7 @@ typedef struct {
     float   dist;
 } Plane_t;
 
-typedef struct {    // sequence like in [pr_global_struct->trace_allsolid]
+typedef struct {    // sequence like in [GV_pGame()->trace_allsolid]
     bool    allsolid;   // if true, plane is not valid
     bool    startsolid; // if true, the initial point was in a solid area
     float   fraction;   // time completed, 1.0 = didn't hit anything

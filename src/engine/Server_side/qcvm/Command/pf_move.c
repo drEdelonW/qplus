@@ -40,7 +40,7 @@ float(float yaw, float dist) walkmove
 ===============
 */
 void PF_walkmove() {
-    edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
+    edict_p ent = ED_GetEDictByOffs(GV_pGame()->self);
     if (!((int)ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM))) {
         G_FLOAT(OFS_RETURN) = 0;    return;
     }
@@ -52,9 +52,9 @@ void PF_walkmove() {
     };
 
     // save program state, because SV_movestep may call other progs
-    dFunction_p oldf = pr_xFunction;    int oldself = pr_global_struct->self; { // PR_PUSH
+    dFunction_p oldf = pr_xFunction;    int oldself = GV_pGame()->self; { // PR_PUSH
         G_FLOAT(OFS_RETURN) = SV_movestep(ent, VectorScale(move, G_FLOAT(OFS_PARM1)), true);
-    } pr_xFunction = oldf;    pr_global_struct->self = oldself; // PR_POP // restore program state
+    } pr_xFunction = oldf;    GV_pGame()->self = oldself; // PR_POP // restore program state
 }
 
 /*
@@ -65,7 +65,7 @@ void() droptofloor
 ===============
 */
 void PF_droptofloor() {
-    edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
+    edict_p ent = ED_GetEDictByOffs(GV_pGame()->self);
     vec3_t end = ent->v.origin; { end.z -= 256.f; /* down */ }
     trace_t trace = SV_Move(ent->v.origin, EvBBox(&ent->v), end, MOVE_NORMAL, ent);
 
@@ -109,15 +109,15 @@ void PF_traceline() {
         trace.pEnt = (trace.pEnt) ? trace.pEnt : Edicts;
     }
     {
-        pr_global_struct->trace_allsolid    /**/ = trace.allsolid;
-        pr_global_struct->trace_startsolid  /**/ = trace.startsolid;
-        pr_global_struct->trace_fraction    /**/ = trace.fraction;
-        pr_global_struct->trace_endpos      /**/ = trace.endpos;
-        pr_global_struct->trace_plane_normal/**/ = trace.plane.normal;
-        pr_global_struct->trace_plane_dist  /**/ = trace.plane.dist;
-        pr_global_struct->trace_ent         /**/ = ED_GetEDictOffs(trace.pEnt);
-        pr_global_struct->trace_inopen      /**/ = trace.inopen;
-        pr_global_struct->trace_inwater     /**/ = trace.inwater;
+        GV_pGame()->trace_allsolid    /**/ = trace.allsolid;
+        GV_pGame()->trace_startsolid  /**/ = trace.startsolid;
+        GV_pGame()->trace_fraction    /**/ = trace.fraction;
+        GV_pGame()->trace_endpos      /**/ = trace.endpos;
+        GV_pGame()->trace_plane_normal/**/ = trace.plane.normal;
+        GV_pGame()->trace_plane_dist  /**/ = trace.plane.dist;
+        GV_pGame()->trace_ent         /**/ = ED_GetEDictOffs(trace.pEnt);
+        GV_pGame()->trace_inopen      /**/ = trace.inopen;
+        GV_pGame()->trace_inwater     /**/ = trace.inwater;
     }
 }
 
@@ -130,15 +130,15 @@ void PF_TraceToss() {
     );
     trace.pEnt = (trace.pEnt) ? trace.pEnt : Edicts;
     {
-        pr_global_struct->trace_allsolid    /**/ = trace.allsolid;
-        pr_global_struct->trace_startsolid  /**/ = trace.startsolid;
-        pr_global_struct->trace_fraction    /**/ = trace.fraction;
-        pr_global_struct->trace_endpos      /**/ = trace.endpos;
-        pr_global_struct->trace_plane_normal/**/ = trace.plane.normal;
-        pr_global_struct->trace_plane_dist  /**/ = trace.plane.dist;
-        pr_global_struct->trace_ent         /**/ = ED_GetEDictOffs(trace.pEnt);
-        pr_global_struct->trace_inopen      /**/ = trace.inopen;
-        pr_global_struct->trace_inwater     /**/ = trace.inwater;
+        GV_pGame()->trace_allsolid    /**/ = trace.allsolid;
+        GV_pGame()->trace_startsolid  /**/ = trace.startsolid;
+        GV_pGame()->trace_fraction    /**/ = trace.fraction;
+        GV_pGame()->trace_endpos      /**/ = trace.endpos;
+        GV_pGame()->trace_plane_normal/**/ = trace.plane.normal;
+        GV_pGame()->trace_plane_dist  /**/ = trace.plane.dist;
+        GV_pGame()->trace_ent         /**/ = ED_GetEDictOffs(trace.pEnt);
+        GV_pGame()->trace_inopen      /**/ = trace.inopen;
+        GV_pGame()->trace_inwater     /**/ = trace.inwater;
     }
 }
 #endif
@@ -152,14 +152,13 @@ vector aim(entity, missilespeed)
 =============
 */
 void PF_aim() {
-    edict_p ent = G_EDICT(OFS_PARM0);
-    // float speed = G_FLOAT(OFS_PARM1);
-
-    vec3_t start = ent->v.origin;
-    start.z += 20.0f;
+    edict_p ent = G_EDICT(OFS_PARM0);   // float speed = G_FLOAT(OFS_PARM1);
+    vec3_t start = ent->v.origin; {
+        start.z += 20.0f;
+    }
 
     // try sending a trace straight
-    vec3_t dir = pr_global_struct->v_forward;
+    vec3_t dir = GV_pGame()->v_forward;
     trace_t tr = SV_Move(
         start, bbZero,
         VectorMA(start, 2048, dir),
@@ -173,7 +172,7 @@ void PF_aim() {
             (ent->v.team <= 0) ||
             (ent->v.team != tr.pEnt->v.team))
         ) {
-        G_VECTOR(OFS_RETURN) = pr_global_struct->v_forward; return;
+        G_VECTOR(OFS_RETURN) = GV_pGame()->v_forward; return;
     }
 
     // try all possible entities
@@ -198,7 +197,7 @@ void PF_aim() {
         );
         vec3_t dir = VectorSubtract(end, start);
         VectorNormalize(&dir);
-        float dist = DotProduct(dir, pr_global_struct->v_forward);
+        float dist = DotProduct(dir, GV_pGame()->v_forward);
         if (dist < bestdist)
             continue; // to far to turn
 
@@ -212,8 +211,8 @@ void PF_aim() {
     if (bestent) {
         vec3_t dir = VectorSubtract(bestent->v.origin, ent->v.origin);
         vec3_t end = VectorScale(
-            pr_global_struct->v_forward,
-            DotProduct(dir, pr_global_struct->v_forward)
+            GV_pGame()->v_forward,
+            DotProduct(dir, GV_pGame()->v_forward)
         ); {
             end.z = dir.z;
             VectorNormalize(&end);
@@ -232,7 +231,7 @@ This was a major timewaster in progs, so it was converted to C
 ==============
 */
 void PF_changeyaw() {
-    edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
+    edict_p ent = ED_GetEDictByOffs(GV_pGame()->self);
     float current = anglemod(ent->v.angles.yaw);
     float rotSpeed = ent->v.yaw_speed;
 
@@ -260,7 +259,7 @@ void PF_changepitch() {
 #ifdef QUAKE2
 void PF_WaterMove() {
     float damage = 0.f;
-    edict_p self = ED_GetEDictByOffs(pr_global_struct->self);
+    edict_p self = ED_GetEDictByOffs(GV_pGame()->self);
 
     if (self->v.movetype == MOVETYPE_NOCLIP) {
         self->v.air_finished = SV_GetTime() + 12.f;

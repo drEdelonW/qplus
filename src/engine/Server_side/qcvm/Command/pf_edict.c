@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "LeafModel.h"
 #include "BBox_tools.h"
 
-void PF_Spawn() { RETURN_EDICT(ED_Alloc()); }
+void PF_Spawn() { RETURN_EDICT(ED_Alloc()); return; }
 void PF_Remove() { ED_Free(G_EDICT(OFS_PARM0)); }
 
 // entity (entity start, .string field, string match) find = #5;
@@ -70,7 +70,7 @@ void PF_Find() {
             )
             second->v.chain = ED_GetEDictOffs(last);
     }
-    RETURN_EDICT(first);
+    RETURN_EDICT(first); return;
 #else
     EdIdx edict = G_EDICTNUM(OFS_PARM0);
     qVmString_t f = G_INT(OFS_PARM1);
@@ -85,12 +85,11 @@ void PF_Find() {
         if (!t)         continue;
         if (!strcmp(t, str)
             ) {
-            RETURN_EDICT(ed);
-            return;
+            RETURN_EDICT(ed); return;
         }
     }
 
-    RETURN_EDICT(Edicts);
+    RETURN_EDICT(Edicts); return;
 #endif
 }
 
@@ -127,7 +126,7 @@ void PF_findradius() {
         chain = ent;
     }
 
-    RETURN_EDICT(chain);
+    RETURN_EDICT(chain); return;
 }
 
 
@@ -287,7 +286,7 @@ void PF_setspawnparms() {
     RmtClient_p client = svs.clients + (i - EdictPlayer1);
 
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
-        (&pr_global_struct->parm1)[i] = client->spawn_parms[i];
+        (&GV_pGame()->parm1)[i] = client->spawn_parms[i];
 }
 
 
@@ -354,7 +353,7 @@ void PF_checkclient() {
     }
 
     // if current entity can't possibly see the check entity, return 0
-    edict_p self = ED_GetEDictByOffs(pr_global_struct->self);
+    edict_p self = ED_GetEDictByOffs(GV_pGame()->self);
     mLeaf_p leaf = Mod_PointInLeaf(VectorAdd(self->v.origin, self->v.view_ofs), sv.worldmodel);
     int Leaf = (leaf - sv.worldmodel->leafs) - 1;
     if ((Leaf < 0) ||

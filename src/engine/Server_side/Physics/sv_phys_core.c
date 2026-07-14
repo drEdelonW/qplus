@@ -225,24 +225,28 @@ Two entities have touched, so run their touch functions
 ==================
 */
 void SV_Impact(edict_p e1, edict_p e2) {
-    int old_self = pr_global_struct->self;
-    int old_other = pr_global_struct->other;
+    int old_self = GV_pGame()->self;
+    int old_other = GV_pGame()->other;
 
-    pr_global_struct->time = (float)SV_GetTime();
-    if (e1->v.touch && (e1->v.solid != SOLID_NOT)) {
-        pr_global_struct->self = ED_GetEDictOffs(e1);
-        pr_global_struct->other = ED_GetEDictOffs(e2);
+    GV_pGame()->time = (float)SV_GetTime();
+    if ((e1->v.touch) &&
+        (e1->v.solid != SOLID_NOT)
+        ) {
+        GV_pGame()->self = ED_GetEDictOffs(e1);
+        GV_pGame()->other = ED_GetEDictOffs(e2);
         PR_ExecuteProgram(e1->v.touch);
     }
 
-    if (e2->v.touch && e2->v.solid != SOLID_NOT) {
-        pr_global_struct->self = ED_GetEDictOffs(e2);
-        pr_global_struct->other = ED_GetEDictOffs(e1);
+    if ((e2->v.touch) &&
+        (e2->v.solid != SOLID_NOT)
+        ) {
+        GV_pGame()->self = ED_GetEDictOffs(e2);
+        GV_pGame()->other = ED_GetEDictOffs(e1);
         PR_ExecuteProgram(e2->v.touch);
     }
 
-    pr_global_struct->self = old_self;
-    pr_global_struct->other = old_other;
+    GV_pGame()->self = old_self;
+    GV_pGame()->other = old_other;
 }
 
 
@@ -264,12 +268,11 @@ bool SV_RunThink(edict_p pEntIn) {
 
     ClampLessThen(&thinktime, (float)SV_GetTime());
     // don't let things stay in the past.
-    // it is possible to start that way
-    // by a trigger with a local time.
+    // it is possible to start that way by a trigger with a local time.
     pEntIn->v.nextthink = 0.f;
-    pr_global_struct->time = thinktime;
-    pr_global_struct->self = ED_GetEDictOffs(pEntIn);
-    pr_global_struct->other = ED_GetEDictOffs(Edicts); // should be 0
+    GV_pGame()->time = thinktime;
+    GV_pGame()->self = ED_GetEDictOffs(pEntIn);
+    GV_pGame()->other = ED_GetEDictOffs(Edicts); // should be 0
     PR_ExecuteProgram(pEntIn->v.think);
     return !pEntIn->free;
 }

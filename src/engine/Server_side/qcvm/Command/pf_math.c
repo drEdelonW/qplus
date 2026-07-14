@@ -86,9 +86,9 @@ makevectors(vector)
 */
 void PF_makevectors() {
     Basis_t bs = GetBasis(G_ANGLES(OFS_PARM0));
-    pr_global_struct->v_forward = bs.forward;
-    pr_global_struct->v_right = bs.right;
-    pr_global_struct->v_up = bs.up;
+    GV_pGame()->v_forward = bs.forward;
+    GV_pGame()->v_right = bs.right;
+    GV_pGame()->v_up = bs.up;
 }
 
 /*

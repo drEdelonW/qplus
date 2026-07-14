@@ -280,21 +280,15 @@ Player character actions
 void SV_Physics_Client(edict_p ent, EdIdx clNum) {
     if (!svs.clients[clNum - EdictPlayer1].active)   return;  // unconnected slot
 
-    //
     // call standard client pre-think
-    //
-    pr_global_struct->time = (float)SV_GetTime();
-    pr_global_struct->self = ED_GetEDictOffs(ent);
-    PR_ExecuteProgram(pr_global_struct->PlayerPreThink);
+    GV_pGame()->time = (float)SV_GetTime();
+    GV_pGame()->self = ED_GetEDictOffs(ent);
+    PR_ExecuteProgram(GV_pGame()->PlayerPreThink);
 
-    //
     // do a move
-    //
     SV_CheckVelocity(ent);
 
-    //
     // decide which move function to call
-    //
     // first: entities that require thinking before physics
     switch ((movetype_t)ent->v.movetype) {
     case MOVETYPE_NONE:
@@ -331,12 +325,10 @@ void SV_Physics_Client(edict_p ent, EdIdx clNum) {
     default:                Host_SysError("SV_Physics_Client: bad movetype %i", (int)ent->v.movetype);
     }
 
-    //
     // call standard player post-think
-    //
     SV_LinkEdict(ent, true);
 
-    pr_global_struct->time = (float)SV_GetTime();
-    pr_global_struct->self = ED_GetEDictOffs(ent);
-    PR_ExecuteProgram(pr_global_struct->PlayerPostThink);
+    GV_pGame()->time = (float)SV_GetTime();
+    GV_pGame()->self = ED_GetEDictOffs(ent);
+    PR_ExecuteProgram(GV_pGame()->PlayerPostThink);
 }

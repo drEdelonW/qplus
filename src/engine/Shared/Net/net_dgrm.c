@@ -126,7 +126,7 @@ void NET_Ban_f() {
         print = Con_Printf;
     }
     else {
-        if ((pr_global_struct->deathmatch) &&
+        if ((GV_pGame()->deathmatch) &&
             !(remoteClient->privileged)
             )  return;
         print = SV_ClientPrintf;

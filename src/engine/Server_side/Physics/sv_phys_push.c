@@ -168,8 +168,8 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
             // if the pusher has a "blocked" function, call it
             // otherwise, just stay in place until the obstacle is gone
             if (pusher->v.blocked) {
-                pr_global_struct->self = ED_GetEDictOffs(pusher);
-                pr_global_struct->other = ED_GetEDictOffs(check);
+                GV_pGame()->self = ED_GetEDictOffs(pusher);
+                GV_pGame()->other = ED_GetEDictOffs(check);
                 PR_ExecuteProgram(pusher->v.blocked);
             }
 
@@ -288,8 +288,8 @@ void SV_PushRotate(edict_p pusher, float movetime) {
             // if the pusher has a "blocked" function, call it
             // otherwise, just stay in place until the obstacle is gone
             if (pusher->v.blocked) {
-                pr_global_struct->self = ED_GetEDictOffs(pusher);
-                pr_global_struct->other = ED_GetEDictOffs(check);
+                GV_pGame()->self = ED_GetEDictOffs(pusher);
+                GV_pGame()->other = ED_GetEDictOffs(check);
                 PR_ExecuteProgram(pusher->v.blocked);
             }
 
@@ -343,9 +343,9 @@ void SV_Physics_Pusher(edict_p ent) {
         (thinktime <= ent->v.ltime)
         ) {
         ent->v.nextthink = 0.f;
-        pr_global_struct->time = (float)SV_GetTime();
-        pr_global_struct->self = ED_GetEDictOffs(ent);
-        pr_global_struct->other = ED_GetEDictOffs(Edicts); // should be 0
+        GV_pGame()->time = (float)SV_GetTime();
+        GV_pGame()->self = ED_GetEDictOffs(ent);
+        GV_pGame()->other = ED_GetEDictOffs(Edicts); // should be 0
         PR_ExecuteProgram(ent->v.think);
         if (ent->free)
             return;

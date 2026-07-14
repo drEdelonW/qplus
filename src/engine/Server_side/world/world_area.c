@@ -130,16 +130,16 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
             EvAbsBBox(&touch->v))
             )   continue;
 
-        int old_self = pr_global_struct->self;
-        int old_other = pr_global_struct->other;
+        int old_self = GV_pGame()->self;
+        int old_other = GV_pGame()->other;
 
-        pr_global_struct->self = ED_GetEDictOffs(touch);
-        pr_global_struct->other = ED_GetEDictOffs(ent);
-        pr_global_struct->time = (float)SV_GetTime();
+        GV_pGame()->self = ED_GetEDictOffs(touch);
+        GV_pGame()->other = ED_GetEDictOffs(ent);
+        GV_pGame()->time = (float)SV_GetTime();
         PR_ExecuteProgram(touch->v.touch);
 
-        pr_global_struct->self = old_self;
-        pr_global_struct->other = old_other;
+        GV_pGame()->self = old_self;
+        GV_pGame()->other = old_other;
     }
 
     // recurse down both sides

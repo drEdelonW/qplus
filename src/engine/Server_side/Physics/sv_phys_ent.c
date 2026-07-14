@@ -246,8 +246,8 @@ void SV_Physics_Step(edict_p pEntIn) {
     if ((EntityFlags_t)groundentity->v.flags & FL_CONVEYOR)     pEntIn->v.basevelocity = VectorScale(groundentity->v.movedir, groundentity->v.speed);
     else                                                        pEntIn->v.basevelocity = v3Zero;
     //@@
-    pr_global_struct->time = SV_GetTime();
-    pr_global_struct->self = ED_GetEDictOffs(pEntIn);
+    GV_pGame()->time = SV_GetTime();
+    GV_pGame()->self = ED_GetEDictOffs(pEntIn);
     PF_WaterMove();
 
     SV_CheckVelocity(pEntIn);

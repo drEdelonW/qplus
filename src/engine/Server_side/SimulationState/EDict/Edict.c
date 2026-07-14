@@ -459,7 +459,7 @@ to call ED_CallSpawnFunctions() to let the objects initialize themselves.
 void ED_LoadFromFile(cString data) {
     edict_p ent = NULL;
     int inhibit = 0;
-    pr_global_struct->time = (float)SV_GetTime();
+    GV_pGame()->time = (float)SV_GetTime();
 
     // parse ents
     while (1) {
@@ -515,7 +515,7 @@ void ED_LoadFromFile(cString data) {
             continue;
         }
 
-        pr_global_struct->self = ED_GetEDictOffs(ent);
+        GV_pGame()->self = ED_GetEDictOffs(ent);
         PR_ExecuteProgram(func - pr_functions);
     }
 

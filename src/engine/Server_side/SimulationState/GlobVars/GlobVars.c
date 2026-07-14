@@ -1,7 +1,7 @@
 #include "GlobVars.h"
 #include "endian_tools.h"
 
-globalvars_p   pr_global_struct;   // much more
+static globalvars_p   pr_global_struct;   // much more
 static float_p  _prGlobals;        // same as pr_global_struct
 void initProgGlobals(progLump_t pl) {
     pr_global_struct = GetPtrFromLump(pl);
@@ -10,8 +10,9 @@ void initProgGlobals(progLump_t pl) {
         _prGlobals[i] = LittleFloat(_prGlobals[i]);
 }
 
-// TypeLessPtr GV_pBaseGlobals() { return _prGlobals; }
+globalvars_p GV_pGame() { return pr_global_struct; }
 
+// TypeLessPtr GV_pBaseGlobals() { return _prGlobals; }
 void RETURN_EDICT(edict_p edict) { ((int32_p)_prGlobals)[OFS_RETURN] = ED_GetEDictOffs(edict); }
 edict_p GV_pEdict(PrOfs_e Param) { return (edict_p)&_prGlobals[Param]; }
 eval_p GV_pEval(PrOfs_e Param) { return (eval_p)&_prGlobals[Param]; }

@@ -135,7 +135,7 @@ bool SV_CloseEnough(edict_p ent, edict_p goal, float dist) {    // TODO: make it
 
 
 void SV_MoveToGoal() {
-    edict_p ent = ED_GetEDictByOffs(pr_global_struct->self);
+    edict_p ent = ED_GetEDictByOffs(GV_pGame()->self);
     edict_p goal = ED_GetEDictByOffs(ent->v.goalentity);
     float dist = G_FLOAT(OFS_PARM0);
 

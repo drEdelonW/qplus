@@ -48,7 +48,7 @@ sizebuf_p WriteDest() {
     case MSG_ALL:       return &sv.reliable_datagram;
     case MSG_INIT:      return &sv.signon;
     case MSG_ONE: {
-        uint32_t entnum = ED_GetEDictIdx(ED_GetEDictByOffs(pr_global_struct->msg_entity));
+        uint32_t entnum = ED_GetEDictIdx(ED_GetEDictByOffs(GV_pGame()->msg_entity));
         if ((entnum < 1) ||
             (entnum > GetSvMaxClients())
             )   PR_RunError("WriteDest: not a client");

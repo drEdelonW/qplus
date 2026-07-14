@@ -514,7 +514,7 @@ void Host_God_f() {
         Cmd_ForwardToServer();
         return;
     }
-    if ((pr_global_struct->deathmatch) &&
+    if ((GV_pGame()->deathmatch) &&
         !(remoteClient->privileged)
         )  return;
 
@@ -531,7 +531,7 @@ void Host_Notarget_f() {
         Cmd_ForwardToServer();
         return;
     }
-    if ((pr_global_struct->deathmatch) &&
+    if ((GV_pGame()->deathmatch) &&
         !(remoteClient->privileged)
         )  return;
 
@@ -549,7 +549,7 @@ void Host_Noclip_f() {
         Cmd_ForwardToServer();
         return;
     }
-    if ((pr_global_struct->deathmatch) &&
+    if ((GV_pGame()->deathmatch) &&
         !(remoteClient->privileged)
         )  return;
 
@@ -578,7 +578,7 @@ void Host_Fly_f() {
         return;
     }
 
-    if ((pr_global_struct->deathmatch) &&
+    if ((GV_pGame()->deathmatch) &&
         !(remoteClient->privileged)
         )  return;
 

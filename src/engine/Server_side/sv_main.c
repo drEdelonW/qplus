@@ -108,9 +108,9 @@ void SV_ConnectClient(uint32_t clientnum) {
     if (sv.loadgame)
         memcpy(client->spawn_parms, spawn_parms, sizeof(spawn_parms));
     else {
-        PR_ExecuteProgram(pr_global_struct->SetNewParms);   // call the progs to get default spawn parms for the new client
+        PR_ExecuteProgram(GV_pGame()->SetNewParms);   // call the progs to get default spawn parms for the new client
         for (int i = 0; i < NUM_SPAWN_PARMS; i++)
-            client->spawn_parms[i] = (&pr_global_struct->parm1)[i];
+            client->spawn_parms[i] = (&GV_pGame()->parm1)[i];
     }
 
     SV_SendServerinfo(client);
@@ -261,16 +261,16 @@ int SV_ModelIndex(cString name) {
     ================
 */
 void SV_SaveSpawnparms() {
-    svs.serverflags = (uint32_t)pr_global_struct->serverflags;
+    svs.serverflags = (uint32_t)GV_pGame()->serverflags;
     remoteClient = svs.clients;
     for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
         if (!remoteClient->active)       continue;
 
         // call the progs to get default spawn parms for the new client
-        pr_global_struct->self = ED_GetEDictOffs(remoteClient->edict);
-        PR_ExecuteProgram(pr_global_struct->SetChangeParms);
+        GV_pGame()->self = ED_GetEDictOffs(remoteClient->edict);
+        PR_ExecuteProgram(GV_pGame()->SetChangeParms);
         for (int j = 0; j < NUM_SPAWN_PARMS; j++)
-            remoteClient->spawn_parms[j] = (&pr_global_struct->parm1)[j];
+            remoteClient->spawn_parms[j] = (&GV_pGame()->parm1)[j];
     }
 }
 
@@ -380,16 +380,16 @@ void SV_SpawnServer(cString server
     ent->v.solid = SOLID_BSP;
     ent->v.movetype = MOVETYPE_PUSH;
 
-    if (coop.value) pr_global_struct->coop = coop.value;
-    else            pr_global_struct->deathmatch = deathmatch.value;
+    if (coop.value) GV_pGame()->coop = coop.value;
+    else            GV_pGame()->deathmatch = deathmatch.value;
 
-    pr_global_struct->mapname = PR_SetQString(SV_GetName());
+    GV_pGame()->mapname = PR_SetQString(SV_GetName());
 #ifdef QUAKE2
-    pr_global_struct->startspot = PR_SetQString(sv.startspot);
+    GV_pGame()->startspot = PR_SetQString(sv.startspot);
 #endif
 
     // serverflags are for cross level information (sigils)
-    pr_global_struct->serverflags = (float)svs.serverflags;
+    GV_pGame()->serverflags = (float)svs.serverflags;
 
     ED_LoadFromFile(sv.worldmodel->entities);
 
