@@ -10,6 +10,9 @@
 #include "pose.h"
 #include "StateHistory.h"
 
+#define MAX_TEMP_ENTITIES       64   /* lightning bolts, etc */
+#define MAX_STATIC_ENTITIES     128   /* torches, etc */
+
 // it was [entity_t] on render side
 struct r_Entity_s {
     bool    forcelink;      // model changed

@@ -7,7 +7,19 @@
 #include "endian_tools.h"
 #include "cvar_q1.h"
 
+#define PAK0_COUNT  (339)
+#define PAK0_CRC    ((uint16_t)0x80D5u) /* 32981 */
 
+bool contModified = false;   // set true if using non-id files
+
+void GM_pakCRC(uint16_t crc) {
+    if (crc != PAK0_CRC)
+        contModified = true;
+}
+void GM_pakNumFiles(int numFiles) {
+    if (numFiles != PAK0_COUNT)
+        contModified = true;    // not the original file
+}
 
 bool standard_quake = true;
 bool rogue = false;

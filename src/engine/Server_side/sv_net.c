@@ -109,36 +109,50 @@ void SV_StartSound(edict_p entity, SndCh_t channel, cString sample, uint8_t volu
     ================
 */
 void SV_SendServerinfo(RmtClient_p client) {
-    char message[2048];
 
     sizebuf_p pBuf = &client->message;
-    MSG_WriteByte(pBuf, svc_print);
-    snprintf(message, sizeof(message), "%c\nVERSION %4.2f SERVER (%i CRC)", 2, VERSION, pr_crc);
-    MSG_WriteString(pBuf, message);
+    MSG_WriteByte(pBuf, svc_print); {
+        char message[2048];
+        snprintf(message,
+            sizeof(message),
+            "%c\nVERSION %4.2f SERVER (%i CRC)",
+            2, VERSION, PR_getCRC()
+        );
+        MSG_WriteString(pBuf, message);
+    }
+    MSG_WriteByte(pBuf, svc_serverinfo); {
+        MSG_WriteLong(pBuf, PROTOCOL_VERSION);
+        MSG_WriteByte(pBuf, GetSvMaxClients());
+        MSG_WriteByte(pBuf, (!coop.value && deathmatch.value) ? GAME_DEATHMATCH : GAME_COOP);
+        char message[2048];
+        snprintf(message,
+            sizeof(message),
+            "%s",
+            PR_GetQString(GetEdictsPtr()->v.message)
+        );
+        MSG_WriteString(pBuf, message);
 
-    MSG_WriteByte(pBuf, svc_serverinfo); MSG_WriteLong(pBuf, PROTOCOL_VERSION); MSG_WriteByte(pBuf, GetSvMaxClients());
+        for (cStringArray s = (sv.model_precache + 1); *s; s++)
+            MSG_WriteString(pBuf, *s);
+        MSG_WriteByte(pBuf, 0);
 
-    MSG_WriteByte(pBuf, (!coop.value && deathmatch.value) ? GAME_DEATHMATCH : GAME_COOP);
-
-    snprintf(message, sizeof(message), "%s", PR_GetQString(Edicts->v.message));
-
-    MSG_WriteString(pBuf, message);
-
-    for (cStringArray s = (sv.model_precache + 1); *s; s++)
-        MSG_WriteString(pBuf, *s);
-    MSG_WriteByte(pBuf, 0);
-
-    for (cStringArray s = (sv.sound_precache + 1); *s; s++)
-        MSG_WriteString(pBuf, *s);
-    MSG_WriteByte(pBuf, 0);
-
+        for (cStringArray s = (sv.sound_precache + 1); *s; s++)
+            MSG_WriteString(pBuf, *s);
+        MSG_WriteByte(pBuf, 0);
+    }
     // send music
-    MSG_WriteByte(pBuf, svc_cdtrack);   MSG_WriteByte(pBuf, (uint8_t)Edicts->v.sounds); MSG_WriteByte(pBuf, (uint8_t)Edicts->v.sounds);
-
+    MSG_WriteByte(pBuf, svc_cdtrack); {
+        MSG_WriteByte(pBuf, (uint8_t)GetEdictsPtr()->v.sounds);
+        MSG_WriteByte(pBuf, (uint8_t)GetEdictsPtr()->v.sounds);
+    }
     // set view
-    MSG_WriteByte(pBuf, svc_setview);   MSG_WriteShort(pBuf, (int16_t)ED_GetEDictIdx(client->edict));
+    MSG_WriteByte(pBuf, svc_setview); {
+        MSG_WriteShort(pBuf, (int16_t)ED_GetEDictIdx(client->edict));
+    }
 
-    MSG_WriteByte(pBuf, svc_signonnum); MSG_WriteByte(pBuf, 1);
+    MSG_WriteByte(pBuf, svc_signonnum); {
+        MSG_WriteByte(pBuf, 1);
+    }
 
     client->sendsignon = true;
     client->spawned = false;    // need prespawn, spawn, etc
@@ -146,16 +160,13 @@ void SV_SendServerinfo(RmtClient_p client) {
 
 
 
-/*
-    =============
-    SV_WriteEntitiesToClient
-
-    =============
-*/
 void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
-    // find the client's PVS
-    vec3_t  org = VectorAdd(clent->v.origin, clent->v.view_ofs);
-    uint8_p pvs = SV_FatPVS(org);
+    uint8_p pvs = SV_FatPVS(    // find the client's PVS
+        VectorAdd(
+            clent->v.origin,
+            clent->v.view_ofs
+        )
+    );
 
     // send over all entities (excpet the client) that touch the pvs
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
@@ -180,7 +191,10 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
             if (i == ent->num_leafs)    continue;    // not visible
         }
 
-        if (msg->maxsize - msg->cursize < 16) { Con_Printf("packet overflow\n"); return; }
+        if (msg->maxsize - msg->cursize < 16) {
+            Con_Printf("packet overflow\n");
+            return;
+        }
 
         // send an update
         uint16_t bits = 0;
@@ -205,23 +219,23 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
         //
         // write the message
         //
-        MSG_WriteByte(msg, (uint8_t)(bits | U_SIGNAL));
+        MSG_WriteByte(msg, (uint8_t)(bits | U_SIGNAL)); {
+            if (bits & U_MOREBITS)  MSG_WriteByte(msg, (uint8_t)(bits >> 8));
+            if (bits & U_LONGENTITY)MSG_WriteShort(msg, (int16_t)e);
+            else                    MSG_WriteByte(msg, (uint8_t)e);
 
-        if (bits & U_MOREBITS)  MSG_WriteByte(msg, (uint8_t)(bits >> 8));
-        if (bits & U_LONGENTITY)MSG_WriteShort(msg, (int16_t)e);
-        else                    MSG_WriteByte(msg, (uint8_t)e);
-
-        if (bits & U_MODEL)     MSG_WriteByte(msg, (uint8_t)ent->v.modelindex);
-        if (bits & U_FRAME)     MSG_WriteByte(msg, (uint8_t)ent->v.frame);
-        if (bits & U_COLORMAP)  MSG_WriteByte(msg, (uint8_t)ent->v.colormap);
-        if (bits & U_SKIN)      MSG_WriteByte(msg, (uint8_t)ent->v.skin);
-        if (bits & U_EFFECTS)   MSG_WriteByte(msg, (uint8_t)ent->v.effects);
-        if (bits & U_ORIGIN1)   MSG_WriteCoord(msg, ent->v.origin.x);
-        if (bits & U_ANGLE1)    MSG_WriteAngle(msg, ent->v.angles.pitch);
-        if (bits & U_ORIGIN2)   MSG_WriteCoord(msg, ent->v.origin.y);
-        if (bits & U_ANGLE2)    MSG_WriteAngle(msg, ent->v.angles.yaw);
-        if (bits & U_ORIGIN3)   MSG_WriteCoord(msg, ent->v.origin.z);
-        if (bits & U_ANGLE3)    MSG_WriteAngle(msg, ent->v.angles.roll);
+            if (bits & U_MODEL)     MSG_WriteByte(msg, (uint8_t)ent->v.modelindex);
+            if (bits & U_FRAME)     MSG_WriteByte(msg, (uint8_t)ent->v.frame);
+            if (bits & U_COLORMAP)  MSG_WriteByte(msg, (uint8_t)ent->v.colormap);
+            if (bits & U_SKIN)      MSG_WriteByte(msg, (uint8_t)ent->v.skin);
+            if (bits & U_EFFECTS)   MSG_WriteByte(msg, (uint8_t)ent->v.effects);
+            if (bits & U_ORIGIN1)   MSG_WriteCoord(msg, ent->v.origin.x);
+            if (bits & U_ANGLE1)    MSG_WriteAngle(msg, ent->v.angles.pitch);
+            if (bits & U_ORIGIN2)   MSG_WriteCoord(msg, ent->v.origin.y);
+            if (bits & U_ANGLE2)    MSG_WriteAngle(msg, ent->v.angles.yaw);
+            if (bits & U_ORIGIN3)   MSG_WriteCoord(msg, ent->v.origin.z);
+            if (bits & U_ANGLE3)    MSG_WriteAngle(msg, ent->v.angles.roll);
+        }
     }
 }
 
@@ -234,22 +248,21 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
     ==================
 */
 void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
-    //
     // send a damage message
-    //
     if ((ent->v.dmg_take) ||
         (ent->v.dmg_save)
         ) {
         edict_p other = ED_GetEDictByOffs(ent->v.dmg_inflictor);
-        MSG_WriteByte(msg, svc_damage);
-        MSG_WriteByte(msg, (uint8_t)ent->v.dmg_save);
-        MSG_WriteByte(msg, (uint8_t)ent->v.dmg_take);
-        MSG_WriteVector(msg,
-            VectorAdd(other->v.origin,
-                BBoxMid(EvBBox(&other->v))
-            ));
-        ent->v.dmg_take = 0;
-        ent->v.dmg_save = 0;
+        MSG_WriteByte(msg, svc_damage); {
+            MSG_WriteByte(msg, (uint8_t)ent->v.dmg_save);
+            MSG_WriteByte(msg, (uint8_t)ent->v.dmg_take);
+            MSG_WriteVector(msg,
+                VectorAdd(other->v.origin,
+                    BBoxMid(EvBBox(&other->v))
+                ));
+            ent->v.dmg_take = 0;
+            ent->v.dmg_save = 0;
+        }
     }
 
     // send the current viewpos offset from the view entity
@@ -257,9 +270,10 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
 
     // a fixangle might get lost in a dropped packet.  Oh well.
     if (ent->v.fixangle) {
-        MSG_WriteByte(msg, svc_setangle);
-        MSG_WriteAngles(msg, ent->v.angles);
-        ent->v.fixangle = 0;
+        MSG_WriteByte(msg, svc_setangle); {
+            MSG_WriteAngles(msg, ent->v.angles);
+            ent->v.fixangle = 0;
+        }
     }
 
     int bits = 0;
@@ -291,35 +305,36 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
     if (ent->v.weapon)                      bits |= SU_WEAPON;
 
     // send the data
-    MSG_WriteByte(msg, svc_clientdata); MSG_WriteShort(msg, (int16_t)bits);
-    if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, (int8_t)ent->v.view_ofs.z);
-    if (bits & SU_IDEALPITCH)           MSG_WriteChar(msg, (int8_t)ent->v.idealpitch);
-    for (int i = 0; i < VECT_DIM; i++) {
-        if (bits & (SU_PUNCH1 << i))    MSG_WriteChar(msg, (int8_t)ent->v.punchangle.v[i]);
-        if (bits & (SU_VELOCITY1 << i)) MSG_WriteChar(msg, (int8_t)ent->v.velocity.v[i] / 16);
+    MSG_WriteByte(msg, svc_clientdata); {
+        MSG_WriteShort(msg, (int16_t)bits);
+        if (bits & SU_VIEWHEIGHT)           MSG_WriteChar(msg, (int8_t)ent->v.view_ofs.z);
+        if (bits & SU_IDEALPITCH)           MSG_WriteChar(msg, (int8_t)ent->v.idealpitch);
+        for (int i = 0; i < VECT_DIM; i++) {
+            if (bits & (SU_PUNCH1 << i))    MSG_WriteChar(msg, (int8_t)ent->v.punchangle.v[i]);
+            if (bits & (SU_VELOCITY1 << i)) MSG_WriteChar(msg, (int8_t)ent->v.velocity.v[i] / 16);
+        }
+
+        /* if (bits & SU_ITEMS) */          MSG_WriteLong(msg, items);  // [always sent]
+
+        if (bits & SU_WEAPONFRAME)          MSG_WriteByte(msg, (uint8_t)ent->v.weaponframe);
+        if (bits & SU_ARMOR)                MSG_WriteByte(msg, (uint8_t)ent->v.armorvalue);
+        if (bits & SU_WEAPON)               MSG_WriteByte(msg, (uint8_t)SV_ModelIndex(PR_GetQString(ent->v.weaponmodel)));
+
+        MSG_WriteShort(msg, (int16_t)ent->v.health);
+        MSG_WriteByte(msg, (uint8_t)ent->v.currentammo);
+        MSG_WriteByte(msg, (uint8_t)ent->v.ammo_shells);
+        MSG_WriteByte(msg, (uint8_t)ent->v.ammo_nails);
+        MSG_WriteByte(msg, (uint8_t)ent->v.ammo_rockets);
+        MSG_WriteByte(msg, (uint8_t)ent->v.ammo_cells);
+
+        if (standard_quake)                 MSG_WriteByte(msg, (uint8_t)ent->v.weapon);
+        else
+            for (uint8_t i = 0; i < 32; i++)
+                if (((int)ent->v.weapon) & (1 << i)) {
+                    MSG_WriteByte(msg, i);
+                    break;
+                }
     }
-
-    // [always sent]
-    /* if (bits & SU_ITEMS) */          MSG_WriteLong(msg, items);
-
-    if (bits & SU_WEAPONFRAME)          MSG_WriteByte(msg, (uint8_t)ent->v.weaponframe);
-    if (bits & SU_ARMOR)                MSG_WriteByte(msg, (uint8_t)ent->v.armorvalue);
-    if (bits & SU_WEAPON)               MSG_WriteByte(msg, (uint8_t)SV_ModelIndex(PR_GetQString(ent->v.weaponmodel)));
-
-    MSG_WriteShort(msg, (int16_t)ent->v.health);
-    MSG_WriteByte(msg, (uint8_t)ent->v.currentammo);
-    MSG_WriteByte(msg, (uint8_t)ent->v.ammo_shells);
-    MSG_WriteByte(msg, (uint8_t)ent->v.ammo_nails);
-    MSG_WriteByte(msg, (uint8_t)ent->v.ammo_rockets);
-    MSG_WriteByte(msg, (uint8_t)ent->v.ammo_cells);
-
-    if (standard_quake)                 MSG_WriteByte(msg, (uint8_t)ent->v.weapon);
-    else
-        for (uint8_t i = 0; i < 32; i++)
-            if (((int)ent->v.weapon) & (1 << i)) {
-                MSG_WriteByte(msg, i);
-                break;
-            }
 }
 
 
@@ -336,17 +351,17 @@ bool SV_SendClientDatagram(RmtClient_p client) {
         .maxsize = sizeof(buf)
     };
 
-    MSG_WriteByte(&msg, svc_time);
-    MSG_WriteFloat(&msg, (float)SV_GetTime());
+    MSG_WriteByte(&msg, svc_time); {
+        MSG_WriteFloat(&msg, (float)SV_GetTime());
 
-    // add the client specific data to the datagram
-    SV_WriteClientdataToMessage(client->edict, &msg);
-    SV_WriteEntitiesToClient(client->edict, &msg);
+        // add the client specific data to the datagram
+        SV_WriteClientdataToMessage(client->edict, &msg);
+        SV_WriteEntitiesToClient(client->edict, &msg);
 
-    // copy the server datagram if there is space
-    if ((msg.cursize + sv.datagram.cursize) < msg.maxsize)
-        SZ_Write(&msg, sv.datagram.data, sv.datagram.cursize);
-
+        // copy the server datagram if there is space
+        if ((msg.cursize + sv.datagram.cursize) < msg.maxsize)
+            SZ_Write(&msg, sv.datagram.data, sv.datagram.cursize);
+    }
     // send the datagram
     if (NET_SendUnreliableMessage(client->netconnection, &msg) == -1) {
         SV_DropClient(true);// if the message couldn't send, kick off
@@ -366,7 +381,7 @@ bool SV_SendClientDatagram(RmtClient_p client) {
 void SV_UpdateToReliableMessages() {
     // check for changes to be sent over the reliable streams
     remoteClient = svs.clients;
-    for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
+    for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++)
         if (remoteClient->old_frags != remoteClient->edict->v.frags) {
             RmtClient_p client = svs.clients;
             for (int j = 0; j < GetSvMaxClients(); j++, client++) {
@@ -381,7 +396,6 @@ void SV_UpdateToReliableMessages() {
 
             remoteClient->old_frags = (int16_t)remoteClient->edict->v.frags;
         }
-    }
 
     {
         RmtClient_p client = svs.clients;
@@ -460,10 +474,9 @@ void SV_SendNop(RmtClient_p client) {
     sizebuf_t  msg = {
         .data = buf,
         .maxsize = sizeof(buf),
-        .cursize = 0,
     };
 
-    MSG_WriteChar(&msg, svc_nop);
+    MSG_WriteChar(&msg, svc_nop); {}
 
     if (NET_SendUnreliableMessage(client->netconnection, &msg) == -1)
         SV_DropClient(true);  // if the message couldn't send, kick off
@@ -484,13 +497,13 @@ void SV_SendReconnect() {
     uint8_t data[128];
     sizebuf_t msg = {
         .data = data,
-        .cursize = 0,
         .maxsize = sizeof(data),
     };
 
-    MSG_WriteChar(&msg, svc_stufftext);
-    MSG_WriteString(&msg, "reconnect\n");
-    NET_SendToAll(&msg, 5);
+    MSG_WriteChar(&msg, svc_stufftext); {
+        MSG_WriteString(&msg, "reconnect\n");
+        NET_SendToAll(&msg, 5);
+    }
 
     if (!Host_IsDedicated())
 #ifdef QUAKE2

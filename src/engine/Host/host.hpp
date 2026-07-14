@@ -11,7 +11,7 @@ public:
     void ClearMemory();
     void Init(QuakeParms_p parms);
     void Shutdown();
-    void  Error(cString error, ...);
+    Q_NORETURN void  Error(cString error, ...);
     void  EndGame(cString message, ...);
     void Frame(RealDt_t time);
     void Quit_f();

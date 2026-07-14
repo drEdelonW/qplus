@@ -35,7 +35,7 @@ edict_p SV_TestEntityPosition(edict_p ent) {
         MOVE_NORMAL, ent
     );
 
-    return (trace.startsolid) ? Edicts : NULL; // world map or none
+    return (trace.startsolid) ? GetEdictsPtr() : NULL; // world map or none
 }
 
 
@@ -239,7 +239,7 @@ trace_t SV_Move(vec3_t start, BBox_t bb, vec3_t end, phymovetype_t type, edict_p
         .start = start,
         .end = end,
 
-        .trace = SV_ClipMoveToEntity(Edicts, start, bb, end),
+        .trace = SV_ClipMoveToEntity(GetEdictsPtr(), start, bb, end),
         .moveType = type,
         .passedict = passedict
     };

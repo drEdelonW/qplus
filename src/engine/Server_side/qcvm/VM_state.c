@@ -13,13 +13,12 @@
 #include "cvar_q1.h"
 
 dprograms_p pProgsDat;
-uint16_t    pr_crc;
 
-/*
-===============
-PR_LoadProgs
-===============
-*/
+static CRC_t pr_crc = 0x0000;
+CRC_t PR_getCRC() {
+    return pr_crc;
+}
+
 void PR_LoadProgs() {
     // ======[Prog.DAT]======
     pProgsDat = (dprograms_p)COM_LoadHunkFile("progs.dat");
@@ -39,21 +38,17 @@ void PR_LoadProgs() {
     if (pProgsDat->crc != PROGHEADER_CRC)       Host_SysError("progs.dat system vars have been modified, progdefs.h is out of date");
 
     SetLumpBase(pProgsDat); {
-        initProgString(pProgsDat->strings);                     // ======[Prog Strings]======
-        initProgGlobals(pProgsDat->globals);                    // ======[Global Struct]======
-        initProgStatement(pProgsDat->statements);               // ======[Statements]======
-        initProgFunction(pProgsDat->functions);                 // ======[Function]======
+        initProgString(pProgsDat->strings);                         // ======[Prog Strings]======
+        initProgGlobals(pProgsDat->globals);                        // ======[Global Struct]======
+        initProgStatement(pProgsDat->statements);                   // ======[Statements]======
+        initProgFunction(pProgsDat->functions);                     // ======[Function]======
         initProgDefs(pProgsDat->globaldefs, pProgsDat->fielddefs);  // ======[Global Defs]======
     } SetLumpBase(NULL);
 
-    EdictSize = PROG_HEADER_SIZE + SizeOfEntFields();       // ======[Edict Size]======
+    SetEdictSize(PROG_HEADER_SIZE + SizeOfEntFields());             // ======[Edict Size]======
 }
 
-/*
-===============
-PR_Init
-===============
-*/
+
 void PR_Init() {
     ED_Init();
     Cmd_AddCommand("profile", PR_Profile_f);

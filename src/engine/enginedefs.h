@@ -11,9 +11,7 @@ typedef char nameStr_t[NAME_LENGTH];
 #define	MAX_STYLESTRING	64
 typedef char styleStr_t[MAX_STYLESTRING];
 
-//
 // per-level limits
-//
 
 #define MAX_LIGHTSTYLES     64
 #define MAX_MODELS          256   /* these are sent over the net as bytes */
@@ -39,9 +37,7 @@ typedef char mapStr_t[MAX_MAPSTRING];
 
 #define MAX_DEMOS               8
 #define MAX_DEMONAME            16
-
-#define MAX_TEMP_ENTITIES       64   /* lightning bolts, etc */
-#define MAX_STATIC_ENTITIES     128   /* torches, etc */
+typedef char demoStr_t[MAX_DEMONAME];
 
 #define MAX_VISEDICTS           256
 

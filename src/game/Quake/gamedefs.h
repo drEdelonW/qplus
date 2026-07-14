@@ -97,7 +97,7 @@ extern bool noclip_anglehack;
 #else
     #define GAMENAME "id1"
 #endif
-
+extern bool     contModified;
 extern bool     standard_quake;
 extern bool     rogue;
 extern bool     hipnotic;
@@ -110,6 +110,8 @@ extern "C" {
     void GM_GameInit();
     void GM_CheckRegistered();
     void GM_Quit();
+    void GM_pakCRC(uint16_t crc);
+    void GM_pakNumFiles(int numFiles);
 
 #ifdef __cplusplus
 }

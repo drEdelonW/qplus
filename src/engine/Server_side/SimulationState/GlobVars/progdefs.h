@@ -45,12 +45,12 @@ typedef enum {
 } PrOfs_e;
 
 
-
 #ifndef QUAKE2
 #   include "progdefs.q1"
 #else
 #   include "progdefs.q2"
 #endif
 
+typedef globalvars_t* globalvars_p;
 
 // typedef entvars_t* entvars_p;  // not necessary yet

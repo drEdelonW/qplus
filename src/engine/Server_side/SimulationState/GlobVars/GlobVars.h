@@ -4,15 +4,14 @@
 #include "Edict.h"  // edict_p
 #include "vmValue.h"  // eval_p
 
-typedef globalvars_t* globalvars_p;
-
-#define G_EVAL(o)       (*(GV_pEval(o)))
-#define G_FLOAT(o)      (*(GV_pFloat(o)))
-#define G_INT_P(o)      (GV_pInt(o))
+#define G_PTR(o)        (GV_pInt(o))
 #define G_INT(o)        (*(GV_pInt(o)))
+#define G_FLOAT(o)      (*(GV_pFloat(o)))
+#define G_STRING(o)     PR_GetQString((*GV_pqStr(o)))
 #define G_VECTOR(o)     (*(GV_pVec3(o)))
 #define G_ANGLES(o)     (*(GV_pAng3(o)))
-#define G_STRING(o)     PR_GetQString((*GV_pqStr(o)))
+#define G_EVAL(o)       (*(GV_pEval(o)))
+
 #define PR_Freturn      G_FLOAT(OFS_RETURN) =
 
 #ifdef __cplusplus

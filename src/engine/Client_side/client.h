@@ -86,12 +86,12 @@ typedef struct {
     ClientStatus state;
 
     // personalization data sent to server
-    qPathStr_t     mapstring;
+    qPathStr_t  mapstring;
     mapStr_t    spawnparms; // to restart a level
 
     // demo loop control
     int32_t     demonum;  // -1 = don't play demos
-    char        demos[MAX_DEMOS][MAX_DEMONAME];  // when not playing
+    demoStr_t   demos[MAX_DEMOS];  // when not playing
 
     // demo recording info must be here, because record is started before
     // entering a map (and clearing ClientState_t)

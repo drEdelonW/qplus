@@ -345,7 +345,7 @@ void SV_Physics_Pusher(edict_p ent) {
         ent->v.nextthink = 0.f;
         GV_pGame()->time = (float)SV_GetTime();
         GV_pGame()->self = ED_GetEDictOffs(ent);
-        GV_pGame()->other = ED_GetEDictOffs(Edicts); // should be 0
+        GV_pGame()->other = EdictWorld; // should be 0
         PR_ExecuteProgram(ent->v.think);
         if (ent->free)
             return;

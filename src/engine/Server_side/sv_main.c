@@ -297,7 +297,7 @@ void SV_SpawnServer(cString server
     svs.changelevel_issued = false;    // now safe to issue another
 
     // tell all connected clients that we are going to a new level
-    if (SV_IsActive()) 
+    if (SV_IsActive())
         SV_SendReconnect();
 
     // make cvars consistant
@@ -316,14 +316,9 @@ void SV_SpawnServer(cString server
         strcpy(sv.startspot, startspot);
 #endif
 
-    // load progs to get entity field count
-    PR_LoadProgs();
-
+    PR_LoadProgs(); // load progs to get entity field count
     // allocate server memory
-    // WARNING!!! don't use [EdictSize] before PR_LoadProgs() called!!!
-    if (!GetEdictSize()) Host_Error("EdictSize - not inited\n");
-    Edicts = Hunk_AllocName(EdictMax * GetEdictSize(), "edicts");
-    // sv.edicts = Edicts;
+    SetEdicts(Hunk_AllocName(EdictMax * GetEdictSize(), "edicts"));
 
     // leave slots at start for clients only
     SetEdNum(GetSvMaxClients() + 1);

@@ -204,17 +204,13 @@ void PR_ExecuteProgram(func_t fnum) {
             ED_Print(ED_GetEDictByOffs(GV_pGame()->self));
         Host_Error("PR_ExecuteProgram: NULL function");
     }
-
     dFunction_p func = &pr_functions[fnum];
-
-    int32_t runaway = 100000;
     pr_trace = false;
 
-    // make a stack frame
-    int32_t exitdepth = _pr_Depth;
-
+    int32_t exitdepth = _pr_Depth;    // make a stack frame
     int32_t stack = PR_EnterFunction(func);
 
+    int32_t runaway = 100000;
     while (1) {
         stack++; // next statement
 
@@ -228,13 +224,14 @@ void PR_ExecuteProgram(func_t fnum) {
         pr_xFunction->profile++;
         _pr_xStatement = stack;
 
-        if (pr_trace)       PR_PrintStatement(ST);
-
-        // Con_DPrintf("EXE[%s] a:0x%X b:0x%x\n",
-        //     _pr_opNames[ST->op],
-        //     A1->_int,
-        //     A2->_int
-        // );
+        if (pr_trace)   PR_PrintStatement(ST);
+#if 0
+        Con_DPrintf(
+            "EXE[%s] a:0x%X b:0x%x\n",
+            _pr_opNames[ST->op],
+            A1->_int, A2->_int
+        );
+#endif
 
         switch (ST->op) {
             case OP_DONE:
@@ -305,15 +302,14 @@ void PR_ExecuteProgram(func_t fnum) {
 #ifdef PARANOID
                 ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
-                if ((ed == Edicts) &&
+                if ((ed == GetEdictsPtr()) &&
                     (sv.state == ss_active)
-                )
-                    PR_RunError("assignment to world entity");
+                )   PR_RunError("assignment to world entity");
 
-                // R->_int = (uint8_p)((int32_p)&ed->v + A2->_int) - (uint8_p)Edicts;
+                // R->_int = (uint8_p)((int32_p)&ed->v + A2->_int) - (uint8_p)GetEdictsPtr();
                 {
                     eval_p ptr = (eval_p)((int32_p)&ed->v + A2->_int);
-                    R->_int = (int32_t)((uintptr_t)ptr - (uintptr_t)Edicts);
+                    R->_int = (int32_t)((uintptr_t)ptr - (uintptr_t)GetEdictsPtr());
                 }
             } break;
 
@@ -328,15 +324,15 @@ void PR_ExecuteProgram(func_t fnum) {
             case OP_STOREP_S:
             case OP_STOREP_ENT:
             case OP_STOREP_FLD:  // integers
-            case OP_STOREP_FNC: ((eval_p)((uint8_p)Edicts + A2->_int))->_int = A1->_int;        break;  // pointers
-            case OP_STOREP_V:   ((eval_p)((uint8_p)Edicts + A2->_int))->vector = A1->vector;    break;
+            case OP_STOREP_FNC: ((eval_p)((uint8_p)GetEdictsPtr() + A2->_int))->_int = A1->_int;        break;  // pointers
+            case OP_STOREP_V:   ((eval_p)((uint8_p)GetEdictsPtr() + A2->_int))->vector = A1->vector;    break;
 
             //==================
 
             case OP_NOT_F:      R->_float = !A1->_float;     break;
-            case OP_NOT_V:      R->_float = (!A1->vector.x) && (!A1->vector.y) && (!A1->vector.z); break;
-            case OP_NOT_S:      R->_float = (!A1->string) || (!(*PR_GetQString(A1->string)));   break;        // R->_float = !A1->string || !pr_strings[A1->string];
-            case OP_NOT_ENT:    R->_float = (ED_GetEDictByOffs(A1->edict) == Edicts);        break;
+            case OP_NOT_V:      R->_float = (!A1->vector.x) && (!A1->vector.y) && (!A1->vector.z);  break;
+            case OP_NOT_S:      R->_float = (!A1->string) || (!(*PR_GetQString(A1->string)));       break;        // R->_float = !A1->string || !pr_strings[A1->string];
+            case OP_NOT_ENT:    R->_float = (ED_GetEDictByOffs(A1->edict) == GetEdictsPtr());       break;
             case OP_NOT_FNC:    R->_float = !A1->function;   break;
 
             case OP_IF: {

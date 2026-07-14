@@ -11,7 +11,7 @@ typedef struct{
     float   frametime;
     float   force_retouch;
     string_t mapname;
-    string_t startspot;
+    string_t startspot; // Q2
     float   deathmatch;
     float   coop;
     float   teamplay;

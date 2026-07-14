@@ -138,33 +138,20 @@ typedef edict_t* edict_p;
 #define G_EDICT(o)              ED_GetEDictByOffs((uint32_t)G_INT((o)))
 #define G_EDICTNUM(o)           ED_GetEDictIdx(G_EDICT((o)))
 
-#include "branch_likely.h"
-extern edict_p      Edicts;     // TODO: hide from public
-extern EdIdx        _EdictsNum;  // TODO: avoid public set
-
-static inline EdIdx GetEdNum() {
-    return _EdictsNum;
-}
-static inline void SetEdNum(EdIdx num) {
-    _EdictsNum = num;
-}
-
-extern size_t       EdictSize;  // in bytes 
-static inline size_t GetEdictSize() {
-    if (unlikely(EdictSize == 0)) {
-        Host_SysError("GetEdictSize: EdictSize not inited (PR_LoadProgs not called yet)");
-    }
-    return EdictSize;
-}
-
-
-
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
     void ED_Init();
+
+    edict_p GetEdictsPtr();
+    void SetEdicts(edict_p pEdicts);
+
+    EdIdx GetEdNum();
+    void SetEdNum(EdIdx num);
+
+    size_t GetEdictSize();
+    void SetEdictSize(size_t size);
 
     edict_p ED_Alloc();
     void ED_Free(edict_p ed);

@@ -11,7 +11,7 @@ typedef union {
     vec3_t      vector;
     func_t      function;
     int32_t     _int;    // VM-slot as 32-bit
-    int32_t     edict;   // 32-bit byte offset from Edicts
+    int32_t     edict;   // 32-bit byte offset from GetEdictsPtr()
 } eval_t;       STATIC_ASSERT_SIZE(eval_t, 3*4);    // 12
 typedef eval_t* eval_p;
 

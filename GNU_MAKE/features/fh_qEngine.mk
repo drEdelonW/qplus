@@ -215,12 +215,13 @@ include features/fh_qRender$(QRND).mk
                         $(eval WAD_DIR = $(AST_DIR)/wad) $(eval INCLUDES += $(WAD_DIR))
                                 SRC_LIST += $(WAD_DIR)/wad.c
 
-                $(eval STRUCT_DIR := $(SHARED_DIR)/structs) $(eval INCLUDES += $(STRUCT_DIR))
-                        $(eval PCX_DIR := $(STRUCT_DIR)/PCX) $(eval INCLUDES += $(PCX_DIR))
+                        $(eval PCX_DIR := $(AST_DIR)/PCX) $(eval INCLUDES += $(PCX_DIR))
                                 SRC_LIST += $(PCX_DIR)/pcx.c
 
-                        $(eval TGA_DIR := $(STRUCT_DIR)/TGA) $(eval INCLUDES += $(TGA_DIR))
+                        $(eval TGA_DIR := $(AST_DIR)/TGA) $(eval INCLUDES += $(TGA_DIR))
                                 SRC_LIST += $(TGA_DIR)/tga.c
+
+                $(eval STRUCT_DIR := $(SHARED_DIR)/structs) $(eval INCLUDES += $(STRUCT_DIR))
 
                         $(eval BSP_DIR := $(STRUCT_DIR)/BSPtree) $(eval INCLUDES += $(BSP_DIR))
                                 SRC_LIST += $(STRUCT_DIR)/qPic.c
@@ -253,4 +254,4 @@ $(eval GAME_DIR := $(SRC_DIR)/game) $(eval INCLUDES += $(GAME_DIR))
         SRC_LIST += $(GAME_DIR)/GameRuleCl.c
 
         $(eval QGAME_DIR := $(GAME_DIR)/Quake) $(eval INCLUDES += $(QGAME_DIR))
-                SRC_LIST += $(QGAME_DIR)/game_rule.c
+                SRC_LIST += $(QGAME_DIR)/IDcopyRights.c

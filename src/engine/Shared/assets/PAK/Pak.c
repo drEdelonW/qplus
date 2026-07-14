@@ -1,21 +1,7 @@
 #include "Pak.h"
- 
-//
-// on disk
-//
-typedef struct {
-    char    name[56];
-    uint32_t filepos;
-    uint32_t filelen;
-} dpackfile_t;
-
-typedef struct {
-    char    id[4];
-    uint32_t dirofs;
-    uint32_t dirlen;
-} dpackHeader_t;
 
 #include "enginedefs.h"
+#include "gamedefs.h" // GM_pakNumFiles() GM_pakCRC()
 #include "sys.h"
 #include "endian_tools.h"
 #include "crc.h"
@@ -24,10 +10,7 @@ typedef struct {
 #include <string.h>
 #include "z_hunk.h"
 
-bool     contModified;   // set true if using non-id files
 
-#define PAK0_COUNT              339
-#define PAK0_CRC                32981
 
 /*
 =================
@@ -51,16 +34,14 @@ pack_p COM_LoadPackFile(cStringRO packfile) {
         (header.id[1] != 'A') ||
         (header.id[2] != 'C') ||
         (header.id[3] != 'K')
-        )                                       Host_SysError("%s is not a packfile", packfile);
+        )   Host_SysError("%s is not a packfile", packfile);
 
     header.dirofs = LittleLong(header.dirofs);
     header.dirlen = LittleLong(header.dirlen);
 
     int numpackfiles = header.dirlen / sizeof(dpackfile_t);
     if (numpackfiles > MAX_FILES_IN_PACK)       Host_SysError("%s has %i files", packfile, numpackfiles);
-
-    if (numpackfiles != PAK0_COUNT)
-        contModified = true;    // not the original file
+    GM_pakNumFiles(numpackfiles);
 
     packfile_p newfiles = Hunk_AllocName(numpackfiles * sizeof(packfile_t), "packfile");
 
@@ -68,14 +49,13 @@ pack_p COM_LoadPackFile(cStringRO packfile) {
     dpackfile_t info[MAX_FILES_IN_PACK];
     Sys_FileRead(packhandle, (TypeLess_ptr)info, header.dirlen);
 
-    // crc the directory to check for modifications
-    uint16_t crc;
-    CRC_Init(&crc);
-    for (int i = 0; i < header.dirlen; i++)
-        CRC_ProcessByte(&crc, ((uint8_p)info)[i]);
-
-    if (crc != PAK0_CRC)
-        contModified = true;
+    {   // crc the directory to check for modifications
+        uint16_t crc;
+        CRC_Init(&crc);
+        for (int i = 0; i < header.dirlen; i++)
+            CRC_ProcessByte(&crc, ((uint8_p)info)[i]);
+        GM_pakCRC(crc);
+    }
 
     // parse the directory
     for (int i = 0; i < numpackfiles; i++) {

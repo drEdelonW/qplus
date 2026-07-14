@@ -77,8 +77,8 @@ SV_Physics
 */
 void SV_Physics() {
     // let the progs know that a new frame has started
-    GV_pGame()->self = ED_GetEDictOffs(Edicts); // should be 0
-    GV_pGame()->other = ED_GetEDictOffs(Edicts); // should be 0
+    GV_pGame()->self = EdictWorld;
+    GV_pGame()->other = EdictWorld;
     GV_pGame()->time = (float)SV_GetTime();
     PR_ExecuteProgram(GV_pGame()->StartFrame);
 

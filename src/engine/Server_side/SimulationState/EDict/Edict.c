@@ -39,8 +39,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "cvar_q1.h"
 
-edict_p     Edicts;     // TODO: hide from public
-EdIdx       _EdictsNum;  // TODO: avoid public set
 
 /*
 =================
@@ -69,11 +67,10 @@ edict_p ED_Alloc() {
     EdIdx i = EdictPlayer1 + GetSvMaxClients(); // World + Clients
     for (; i < GetEdNum(); i++) {
         edict_p edict = ED_GetEDictByIdx(i);
-        // the first couple seconds of server time can involve a lot of
-        // freeing and allocating, so relax the replacement policy
+        // the first couple seconds of server time can involve a lot of freeing and allocating, so relax the replacement policy
         if ((edict->free) &&
             (
-                (edict->freetime < 2.0f) ||
+                (edict->freetime < 2.f) ||
                 ((SV_GetTime() - edict->freetime) > 0.5f)
                 )
             ) {
@@ -101,20 +98,20 @@ FIXME: walk all entities and NULL out references to this entity
 */
 void ED_Free(edict_p ed) {
     SV_UnlinkEdict(ed); // unlink from world bsp
-
-    ed->free = true;
-    ed->v.model = 0;
-    ed->v.takedamage = 0;
-    ed->v.modelindex = 0;
-    ed->v.colormap = 0;
-    ed->v.skin = 0;
-    ed->v.frame = 0;
-    ed->v.origin = v3Zero;
-    ed->v.angles = a3Zero;
-    ed->v.nextthink = -1;
-    ed->v.solid = 0;
-
-    ed->freetime = (float)SV_GetTime();
+    {
+        ed->free = true;
+        ed->v.model = 0;
+        ed->v.takedamage = 0;
+        ed->v.modelindex = 0;
+        ed->v.colormap = 0;
+        ed->v.skin = 0;
+        ed->v.frame = 0;
+        ed->v.origin = v3Zero;
+        ed->v.angles = a3Zero;
+        ed->v.nextthink = -1;
+        ed->v.solid = 0;
+        ed->freetime = (float)SV_GetTime();
+    }
 }
 
 //===========================================================================
@@ -164,7 +161,7 @@ void ED_Print(edict_p ed) {
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
-        int32_p v = (int32_p)((cString)&ed->v + flDef->ofs * 4);
+        int32_p v = (int32_p)((cString)&ed->v + MUL4(flDef->ofs));
 
         // if the value is still all 0, skip the field
         etype_t type = ((etype_t)flDef->type) & ~DEF_SAVEGLOBAL;
@@ -177,8 +174,8 @@ void ED_Print(edict_p ed) {
             continue;
 
         Host_Printf("%s", name);
-        size_t l = strlen(name);
-        while (l++ < 15)
+        size_t len = strlen(name);
+        while (len++ < 15)
             Host_Printf(" ");
 
         Host_Printf("%s\n", PR_ValueString(flDef->type, (eval_p)v));
@@ -248,7 +245,10 @@ For debugging, prints a single edicy
 */
 void ED_PrintEdict_f() {
     EdIdx i = (EdIdx)Q_atoi(Cmd_Argv(1));
-    if (i >= GetEdNum()) { Host_Printf("Bad edict number\n"); return; }
+    if (i >= GetEdNum()) {
+        Host_Printf("Bad edict number\n");
+        return;
+    }
     ED_PrintNum(i);
 }
 
@@ -285,19 +285,14 @@ void ED_Count() {
 //============================================================================
 
 #include "z_hunk.h"
-/*
-=============
-ED_NewString
-=============
-*/
 cString ED_NewString(cString string) {
-    size_t l = strlen(string) + 1;
-    cString new = Hunk_Alloc(l);
+    size_t len = strlen(string) + 1;
+    cString new = Hunk_Alloc(len);
     cString new_p = new;
 
-    for (int i = 0; i < l; i++) {
+    for (int i = 0; i < len; i++) {
         if ((string[i] == '\\') &&
-            (i < (l - 1))
+            (i < (len - 1))
             ) {
             i++;
             if (string[i] == 'n')   *new_p++ = '\n';
@@ -322,19 +317,21 @@ bool ED_ParseEpair(edict_p base, dDef_p key, cString s) {
     TypeLess_ptr dstPtr = (TypeLess_ptr)((int32_p)base + key->ofs);
 
     switch (key->type & ~DEF_SAVEGLOBAL) {
-    case ev_string:     *(string_t*)dstPtr = PR_SetQString(ED_NewString(s));                     break;
-    case ev_float:      *(float_p)dstPtr = (float)atof(s);                                       break;
-    case ev_entity:     *(int32_p)dstPtr = ED_GetEDictOffs(ED_GetEDictByIdx((uint32_t)atoi(s))); break;
+    case ev_string:     *(string_t*)dstPtr = PR_SetQString(ED_NewString(s));            break;
+    case ev_float:      *(float_p)dstPtr = (float)atof(s);                              break;
+    case ev_entity:     *(int32_p)dstPtr = ED_GetEDictOffs(ED_GetEDictByIdx(atoi(s)));  break;
 
     case ev_vector: {
         char string[128]; strcpy(string, s);
         cString v = string;
         cString w = string;
-        for (int i = 0; i < 3; i++) {
-            while ((*v != 0) && (*v != ' '))
-                v++;
-            *v = 0;
-            ((float_p)dstPtr)[i] = (float)atof(w);
+        for (int i = 0; i < VECT_DIM; i++) {
+            while (
+                (*v != 0x00) &&
+                (*v != ' ')
+                )   v++;
+            *v = 0x00;
+            ((vec3_p)dstPtr)->v[i] = (vec_t)atof(w);
             w = v = v + 1;
         }
     } break;
@@ -372,23 +369,22 @@ Used for initial level load and for savegames.
 ====================
 */
 cString ED_ParseEdict(cString data, edict_p ent) {
-    bool init = false;
-
     // clear it
-    if (ent != Edicts) // hack
+    if (ent != GetEdictsPtr()) // hack
         memset(&ent->v, 0, SizeOfEntFields());
 
     // go through all the dictionary pairs
+    bool init = false;
     while (1) {
-        // parse key
-        data = COM_Parse(data);
+        data = COM_Parse(data); // parse key
         if (com.token[0] == '}')    break;
         if (!data)                  Host_SysError("ED_ParseEntity: EOF without closing brace");
 
         // anglehack is to allow QuakeEd to write single scalar angles
         // and allow them to be turned into vectors. (FIXME...)
         bool anglehack;
-        if (!strcmp(com.token, "angle")) {
+        if (!strcmp(com.token, "angle")
+            ) {
             strcpy(com.token, "angles");
             anglehack = true;
         }
@@ -400,11 +396,10 @@ cString ED_ParseEdict(cString data, edict_p ent) {
             strcpy(com.token, "light_lev"); // hack for single light def
 
         char keyname[256]; strcpy(keyname, com.token);
-
         // another hack to fix heynames with trailing spaces
         size_t n = strlen(keyname);
         while (n && (keyname[n - 1] == ' ')) {
-            keyname[n - 1] = 0;
+            keyname[n - 1] = 0x00;
             n--;
         }
 
@@ -415,8 +410,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
 
         init = true;
 
-        // keynames with a leading underscore are used for utility comments,
-        // and are immediately discarded by quake
+        // keynames with a leading underscore are used for utility comments, and are immediately discarded by quake
         if (keyname[0] == '_')
             continue;
 
@@ -458,11 +452,10 @@ to call ED_CallSpawnFunctions() to let the objects initialize themselves.
 */
 void ED_LoadFromFile(cString data) {
     edict_p ent = NULL;
-    int inhibit = 0;
     GV_pGame()->time = (float)SV_GetTime();
 
-    // parse ents
-    while (1) {
+    int inhibit = 0;
+    while (1) { // parse ents
         // parse the opening brace
         data = COM_Parse(data);
         if (!data)  break;
@@ -495,9 +488,7 @@ void ED_LoadFromFile(cString data) {
             }
         }
 
-        //
         // immediately call spawn function
-        //
         if (!ent->v.classname) {
             Host_Printf("No classname for:\n");
             ED_Print(ent);
@@ -531,13 +522,36 @@ edict_p FindViewthing() {
     return NULL;
 }
 
-/*
-===============
-PR_Init
-===============
-*/
 void ED_Init() {
     Cmd_AddCommand("edict", ED_PrintEdict_f);
     Cmd_AddCommand("edicts", ED_PrintEdicts);
     Cmd_AddCommand("edictcount", ED_Count);
 }
+
+#include "branch_likely.h"
+edict_p Edicts = NULL; // TODO: hide from public
+edict_p  GetEdictsPtr() {
+    if (unlikely(Edicts == NULL))
+        Host_SysError(
+            "GetEdictSize: Edicts not inited "
+            "(PR_LoadProgs not called yet)"
+        );
+
+    return Edicts;
+}
+void SetEdicts(edict_p pEdicts) { Edicts = pEdicts; }
+
+
+static EdIdx _EdictsNum;
+EdIdx GetEdNum() { return _EdictsNum; }
+void SetEdNum(EdIdx num) { _EdictsNum = num; }
+
+
+static size_t _EdictSize = 0;      // in bytes
+size_t GetEdictSize() {
+    if (unlikely(_EdictSize == 0))
+        Host_SysError("GetEdictSize: EdictSize not inited (PR_LoadProgs not called yet)");
+
+    return _EdictSize;
+}
+void SetEdictSize(size_t size) { _EdictSize = size; }

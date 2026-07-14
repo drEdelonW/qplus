@@ -130,7 +130,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
             neworg = VectorAdd(ent->v.origin, move);
             edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
             if ((i == 0) &&
-                (enemy != Edicts)
+                (enemy != GetEdictsPtr())
                 ) {
                 float dz = ent->v.origin.z - ED_GetEDictByOffs(ent->v.enemy)->v.origin.z;
                 if (dz > 40)    neworg.z -= 8;
@@ -149,7 +149,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
                 return true;
             }
 
-            if (enemy == Edicts)
+            if (enemy == GetEdictsPtr())
                 break;
         }
 

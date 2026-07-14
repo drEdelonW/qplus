@@ -106,7 +106,7 @@ void PF_traceline() {
         (phymovetype_t)G_FLOAT(OFS_PARM2),
         G_EDICT(OFS_PARM3)
     ); {
-        trace.pEnt = (trace.pEnt) ? trace.pEnt : Edicts;
+        trace.pEnt = (trace.pEnt) ? trace.pEnt : GetEdictsPtr();
     }
     {
         GV_pGame()->trace_allsolid    /**/ = trace.allsolid;
@@ -128,7 +128,7 @@ void PF_TraceToss() {
         G_EDICT(OFS_PARM0),
         G_EDICT(OFS_PARM1)
     );
-    trace.pEnt = (trace.pEnt) ? trace.pEnt : Edicts;
+    trace.pEnt = (trace.pEnt) ? trace.pEnt : GetEdictsPtr();
     {
         GV_pGame()->trace_allsolid    /**/ = trace.allsolid;
         GV_pGame()->trace_startsolid  /**/ = trace.startsolid;

@@ -147,10 +147,10 @@ void SV_MoveToGoal() {
     // if the next step hits the enemy, return immediately
 #ifdef QUAKE2
     edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
-    if ((enemy != Edicts) &&
+    if ((enemy != GetEdictsPtr()) &&
         SV_CloseEnough(ent, enemy, dist))
 #else
-    if ((ED_GetEDictByOffs(ent->v.enemy) != Edicts) &&
+    if ((ED_GetEDictByOffs(ent->v.enemy) != GetEdictsPtr()) &&
         SV_CloseEnough(ent, goal, dist))
 #endif
         return;
