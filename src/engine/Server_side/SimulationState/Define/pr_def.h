@@ -13,11 +13,10 @@
 // Fields:  per-entity variables stored inside edict payload.
 //
 // Access pattern: name -> dDef -> offset -> raw memory read/write.
-// #include "vmValue.h"
 
+// #include "vmValue.h" // etype_t
 typedef struct {
-    uint16_t    type;   // [etype_t] if DEF_SAVEGLOBAL bit is set
-                        // the variable needs to be saved in savegames
+    uint16_t    type;   // [etype_t] if DEF_SAVEGLOBAL bit is set the variable needs to be saved in savegames
     uint16_t    ofs;
     string_t    s_name;
 } dDef_t;       STATIC_ASSERT_SIZE(dDef_t, 2*2 + 4);    // 8

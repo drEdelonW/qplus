@@ -167,14 +167,13 @@ void ED_Print(edict_p ed) {
         int32_p v = (int32_p)((cString)&ed->v + flDef->ofs * 4);
 
         // if the value is still all 0, skip the field
-        uint32_t type = flDef->type & ~DEF_SAVEGLOBAL;
-
+        etype_t type = ((etype_t)flDef->type) & ~DEF_SAVEGLOBAL;
         int j = 0;
-        for (; j < type_size[type]; j++)
+        for (; j < SizeOfPrType(type); j++)
             if (v[j])
                 break;
 
-        if (j == type_size[type])
+        if (j == SizeOfPrType(type))
             continue;
 
         Host_Printf("%s", name);
@@ -207,13 +206,13 @@ void ED_Write(FILE* f, edict_p ed) {
         int32_p value = (int32_p)((cString)&ed->v + flDef->ofs * 4);
 
         // if the value is still all 0, skip the field
-        uint32_t type = flDef->type & ~DEF_SAVEGLOBAL;
+        etype_t type = ((etype_t)flDef->type) & ~DEF_SAVEGLOBAL;
         int j = 0;
-        for (; j < type_size[type]; j++)
+        for (; j < SizeOfPrType(type); j++)
             if (value[j])
                 break;
 
-        if (j == type_size[type])
+        if (j == SizeOfPrType(type))
             continue;
 
         fprintf(f, "\"%s\" ", name);

@@ -103,7 +103,7 @@ static cString _pr_opNames[OP_LAST] = {
     "BITOR"
 };
 
-void PR_PrintOperation(prog_operation_e op){
+void PR_PrintOperation(prog_operation_e op) {
     if (op < OP_LAST) {
         Con_Printf("%s ", _pr_opNames[op]);
         size_t i = strlen(_pr_opNames[op]);
@@ -131,11 +131,17 @@ cString PR_GlobalString(int32_t ofs) {
     TypeLess_ptr val = (TypeLess_ptr)&pr_globals[ofs];
     dDef_p def = ED_GlobalAtOfs(ofs);
     if (!def)
-        snprintf(_line, sizeof(_line), "%i(???)", ofs);
-    else {
-        cString s = PR_ValueString(def->type, val);
-        snprintf(_line, sizeof(_line), "%i(%s)%s", ofs, PR_GetQString(def->s_name), s);
-    }
+        snprintf(_line,
+            sizeof(_line),
+            "%i(???)",
+            ofs
+        );
+    else
+        snprintf(_line,
+            sizeof(_line),
+            "%i(%s)%s",
+            ofs, PR_GetQString(def->s_name), PR_ValueString(def->type, val)
+        );
 
     size_t i = strlen(_line);
     for (; i < 20; i++)

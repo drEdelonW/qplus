@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // wad.h
 #include "types.h"
-
+#include "qPic.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,9 +28,8 @@ extern "C" {
 
     void W_LoadWadFile(cStringRO filename);
     void W_CleanupName(cStringRO in, cString out);
-    // LumpInfo_p W_GetLumpinfo(cStringRO name); // used local
-    TypeLess_ptr W_GetLumpName(cStringRO name);
-    TypeLess_ptr W_GetLumpNum(int32_t num);
+    qPic_p W_GetLumpName(cStringRO name);
+    qPic_p W_GetLumpNum(int num);
 
 #ifdef __cplusplus
 }

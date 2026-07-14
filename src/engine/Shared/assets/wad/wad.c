@@ -24,10 +24,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "host.h"
 #include "endian_tools.h"
-#include "qPic.h"
 
 #define LUMP_NAME_LEN   (16)
-
+typedef char LumpName_t[LUMP_NAME_LEN]; // must be null terminated
 //===============
 //   TYPES
 //===============
@@ -56,13 +55,13 @@ typedef struct {
     /* CmpType */char   compression;    // CmpType ?
     uint8_t             pad1;
     uint8_t             pad2;
-    char                name[LUMP_NAME_LEN]; // must be null terminated
+    LumpName_t          name; // must be null terminated
 } LumpInfo_t;
 typedef LumpInfo_t* LumpInfo_p;
 
 static LumpInfo_p  _LumpsBase;
 static int32_t     _NumLumps;
-static uint8_p     _wadBase;
+static uint8_p     _pWadBase;
 
 typedef struct {
     uint8_t ID[4];  // should be WAD2 or 2DAW
@@ -89,7 +88,9 @@ void W_CleanupName(cStringRO in, cString out) {
         char c = in[i];
         if (!c) break;
 
-        if ((c >= 'A') && (c <= 'Z'))   c += ('a' - 'A');
+        if ((c >= 'A') &&
+            (c <= 'Z')
+            )   c += ('a' - 'A');
         out[i] = c;
     }
 
@@ -103,29 +104,27 @@ void W_CleanupName(cStringRO in, cString out) {
     ====================
 */
 void W_LoadWadFile(cStringRO filename) {
-    _wadBase = COM_LoadHunkFile(filename);
-    if (!_wadBase)      Host_SysError("W_LoadWadFile: couldn't load %s", filename);
+    _pWadBase = COM_LoadHunkFile(filename);
+    if (!_pWadBase)      Host_SysError("W_LoadWadFile: couldn't load %s", filename);
 
-    WadInfo_p header = (WadInfo_p)_wadBase;
+    WadInfo_p header = (WadInfo_p)_pWadBase;
 
     if (
         (header->ID[0] != 'W') ||
         (header->ID[1] != 'A') ||
         (header->ID[2] != 'D') ||
         (header->ID[3] != '2')
-        )               Host_SysError("Wad file %s doesn't have WAD2 id\n", filename);
+        )   Host_SysError("Wad file %s doesn't have WAD2 id\n", filename);
 
     _NumLumps = LittleLong(header->numLumps);
     int infoTableOfs = LittleLong(header->infoTableOfs);
-    _LumpsBase = (LumpInfo_p)(_wadBase + infoTableOfs);
-
-    LumpInfo_p lump_p = _LumpsBase;
-    for (uint32_t i = 0; i < _NumLumps; i++, lump_p++) {
-        lump_p->filepos = LittleLong(lump_p->filepos);
-        lump_p->size = LittleLong(lump_p->size);
-        W_CleanupName(lump_p->name, lump_p->name);
-        if (lump_p->type == TYP_QPIC)
-            SwapPic((qPic_p)(_wadBase + lump_p->filepos));
+    _LumpsBase = (LumpInfo_p)(_pWadBase + infoTableOfs);
+    for (int i = 0; i < _NumLumps; i++) {
+        _LumpsBase[i].filepos = LittleLong(_LumpsBase[i].filepos);
+        _LumpsBase[i].size = LittleLong(_LumpsBase[i].size);
+        W_CleanupName(_LumpsBase[i].name, _LumpsBase[i].name);
+        if (_LumpsBase[i].type == TYP_QPIC)
+            SwapPic((qPic_p)(_pWadBase + _LumpsBase[i].filepos));
     }
 }
 
@@ -136,30 +135,27 @@ void W_LoadWadFile(cStringRO filename) {
     =============
 */
 LumpInfo_p W_GetLumpinfo(cStringRO name) {
-    char clean[LUMP_NAME_LEN];
+    LumpName_t clean;
     W_CleanupName(name, clean);
 
-    LumpInfo_p lump_p = _LumpsBase;
-    for (int32_t i = 0; i < _NumLumps; i++, lump_p++) {
-        if (!strncmp(clean, lump_p->name, LUMP_NAME_LEN))
-            return lump_p;
+    for (int i = 0; i < _NumLumps; i++) {
+        if (!strncmp(clean, _LumpsBase[i].name, LUMP_NAME_LEN))
+            return &_LumpsBase[i];
     }
 
-    Host_SysError("W_GetLumpinfo: [%s] not found", name);
-    return NULL;
+    Host_SysError("W_GetLumpinfo: [%s] not found", name);    return NULL;
 }
 
-TypeLess_ptr W_GetLumpName(cStringRO name) {
-    return (TypeLess_ptr)(_wadBase + W_GetLumpinfo(name)->filepos);
+qPic_p W_GetLumpName(cStringRO name) {
+    return (qPic_p)(_pWadBase + W_GetLumpinfo(name)->filepos);
 }
 
-TypeLess_ptr W_GetLumpNum(int32_t num) {
+qPic_p W_GetLumpNum(int num) {
     if ((num < 0) ||
         (num > _NumLumps)
-        )
-        Host_SysError("W_GetLumpNum: bad number: %i", num);
+        )   Host_SysError("W_GetLumpNum: bad number: %i", num);
 
-    return (TypeLess_ptr)(_wadBase + (_LumpsBase + num)->filepos);
+    return (qPic_p)(_pWadBase + _LumpsBase[num].filepos);
 }
 
 /*

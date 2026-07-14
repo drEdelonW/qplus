@@ -3,8 +3,7 @@
 #include "Edict.h"
 
 
-
-int type_size[ev_LAST] = {
+static const int type_size[ev_LAST] = {
     1,                          // ev_void,
     sizeof(string_t) / 4,       // ev_string,
     1,                          // ev_float,
@@ -14,6 +13,11 @@ int type_size[ev_LAST] = {
     sizeof(func_t) / 4,         // ev_function,
     sizeof(TypeLess_ptr) / 4    // ev_pointer
 };
+
+size_t SizeOfPrType(etype_t type){
+    if (type < ev_LAST)     return type_size[type];
+    else                    Host_Error("Unsupported TYPE [0x%X]\n", type);
+}
 
 /*
 ============

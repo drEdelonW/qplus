@@ -37,11 +37,7 @@ typedef struct {
 } BackTile_t;
 static BackTile_t _btR;
 
-/*
-===============
-Draw_Init
-===============
-*/
+
 #include "qSymbolChar.h"
 
 void Draw_Init() {
@@ -200,11 +196,7 @@ void Draw_DebugChar(ConsoleSymbols_t symb) {
     }
 }
 
-/*
-=============
-Draw_Pic
-=============
-*/
+
 void Draw_Pic(int x, int y, qPic_p pic) {
     if (!Scr.canvas.pClr)   return;
 

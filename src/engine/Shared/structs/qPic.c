@@ -16,7 +16,7 @@ typedef struct CachePic_s {
     qPathStr_t  name;
     CacheUser_t cache;
 } CachePic_t;
-typedef CachePic_t* CachePic_p;
+// typedef CachePic_t* CachePic_p; // not used
 
 #ifndef GLQUAKE
 #include "wad.h"

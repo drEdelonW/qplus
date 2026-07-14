@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "sv_phys_priv.h"
+#include "BBox_tools.h"
 
 /*
 ===============================================================================
@@ -39,10 +40,7 @@ trace_t SV_PushEntity(edict_p ent, vec3_t push) {
     vec3_t end = VectorAdd(ent->v.origin, push);
 
     trace_t trace;
-    BBox_t entBB = {
-        .mins = ent->v.mins,
-        .maxs = ent->v.maxs
-    };
+    BBox_t entBB = EvBBox(&ent->v);
     if (ent->v.movetype == MOVETYPE_FLYMISSILE)     trace = SV_Move(ent->v.origin, entBB, end, MOVE_MISSILE, ent);
     else
         switch ((solid_t)ent->v.solid) {
@@ -67,21 +65,16 @@ SV_PushMove
 ============
 */
 void SV_PushMove(edict_p pusher, SimDt_t movetime) {
-#if 0
-    if (!(pusher->v.velocity.x) &&
-        !(pusher->v.velocity.y) &&
-        !(pusher->v.velocity.z)
-        ) {
-#else
     if (VectorCompare(pusher->v.velocity, v3Zero)) {
-#endif
         pusher->v.ltime += movetime;
         return;
     }
 
     vec3_t displacement = VectorScale(pusher->v.velocity, movetime);
-    vec3_t mins = VectorAdd(pusher->v.absmin, displacement);
-    vec3_t maxs = VectorAdd(pusher->v.absmax, displacement);
+    BBox_t bbPusher = BBoxFromVec3(
+        VectorAdd(pusher->v.absmin, displacement),
+        VectorAdd(pusher->v.absmax, displacement)
+    );
 
     vec3_t pushorig = pusher->v.origin;
 
@@ -107,12 +100,13 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
         case MOVETYPE_NONE:
         case MOVETYPE_NOCLIP:   continue;
 
-        default:                break;
+        default:    break;
         }
 
         // if the entity is standing on the pusher, it will definately be moved
         if (!(((EntityFlags_t)check->v.flags & FL_ONGROUND) &&
             ED_GetEDictByOffs(check->v.groundentity) == pusher)) {
+#if 0
             if (
                 (
                     (check->v.absmin.x >= maxs.x) ||
@@ -123,7 +117,12 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
                     (check->v.absmax.y <= mins.y) ||
                     (check->v.absmax.z <= mins.z))
                 )   continue;
-
+#else
+            if (!BBoxTouches(
+                EvAbsBBox(&check->v),
+                bbPusher)
+                )   continue;
+#endif
             // see if the ent's bbox is inside the pusher's final position
             if (!SV_TestEntityPosition(check))
                 continue;
@@ -131,7 +130,7 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
 
         // remove the onground flag for non-players
         if (check->v.movetype != MOVETYPE_WALK)
-            check->v.flags = (float)((int)((EntityFlags_t)check->v.flags) & ~FL_ONGROUND);
+            check->v.flags = (float)((EntityFlags_t)check->v.flags & ~FL_ONGROUND);
 
         vec3_t entorig = check->v.origin;
         moved_from[num_moved] = check->v.origin;
@@ -139,19 +138,21 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
         num_moved++;
 
         // try moving the contacted entity
-        pusher->v.solid = SOLID_NOT;
-        SV_PushEntity(check, displacement);
-        pusher->v.solid = SOLID_BSP;
+        pusher->v.solid = SOLID_NOT; {
+            SV_PushEntity(check, displacement);
+        } pusher->v.solid = SOLID_BSP;
 
         // if it is still inside the pusher, block
         edict_p block = SV_TestEntityPosition(check);
         if (block) { // fail the displacement
-            if (check->v.mins.x == check->v.maxs.x) continue;
+            if (check->v.mins.x == check->v.maxs.x)
+                continue;
 
             if ((check->v.solid == SOLID_NOT) ||
                 (check->v.solid == SOLID_TRIGGER)
                 ) { // corpse
-                check->v.mins.x = check->v.mins.y = 0.f;
+                check->v.mins.x = 0.f;
+                check->v.mins.y = 0.f;
                 check->v.maxs = check->v.mins;
                 continue;
             }
@@ -182,7 +183,7 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
     }
 
 
-    }
+}
 
 #ifdef QUAKE2
 /*
@@ -192,19 +193,10 @@ SV_PushRotate
 ============
 */
 void SV_PushRotate(edict_p pusher, float movetime) {
-#if 0
-    if (!(pusher->v.avelocity.x) &&
-        !(pusher->v.avelocity.y) &&
-        !(pusher->v.avelocity.z)) {
-        pusher->v.ltime += movetime;
-        return;
-    }
-#else
     if (AngleCompare(pusher->v.avelocity, a3Zero)) {
         pusher->v.ltime += movetime;
         return;
     }
-#endif
 
     ang3_t amove = VectorScale(pusher->v.avelocity, movetime);
 
@@ -240,17 +232,11 @@ void SV_PushRotate(edict_p pusher, float movetime) {
         // if the entity is standing on the pusher, it will definately be moved
         if (!(((EntityFlags_t)check->v.flags & FL_ONGROUND) &&
             ED_GetEDictByOffs(check->v.groundentity) == pusher)) {
-            if (
-                (
-                    (check->v.absmin.x >= pusher->v.absmax.x) ||
-                    (check->v.absmin.y >= pusher->v.absmax.y) ||
-                    (check->v.absmin.z >= pusher->v.absmax.z)) ||
-                (
-                    (check->v.absmax.x <= pusher->v.absmin.x) ||
-                    (check->v.absmax.y <= pusher->v.absmin.y) ||
-                    (check->v.absmax.z <= pusher->v.absmin.z))
-                )
-                continue;
+
+            if (!BBoxTouches(
+                EvAbsBBox(&check->v),
+                EvAbsBBox(&pusher->v))
+                )   continue;
 
             // see if the ent's bbox is inside the pusher's final position
             if (!SV_TestEntityPosition(check))
@@ -344,10 +330,10 @@ void SV_Physics_Pusher(edict_p ent) {
 
     if (movetime) {
 #ifdef QUAKE2
-        if (ent->v.avelocity[X_AX] ||
-            ent->v.avelocity[Y_AX] ||
-            ent->v.avelocity[Z_AX])
-            SV_PushRotate(ent, movetime);
+        if (ent->v.avelocity[PITCH] ||
+            ent->v.avelocity[YAW] ||
+            ent->v.avelocity[ROLL]
+            )   SV_PushRotate(ent, movetime);
         else
 #endif
             SV_PushMove(ent, movetime); // advances ent->v.ltime if not blocked
@@ -356,7 +342,7 @@ void SV_Physics_Pusher(edict_p ent) {
     if ((thinktime > oldltime) &&
         (thinktime <= ent->v.ltime)
         ) {
-        ent->v.nextthink = 0;
+        ent->v.nextthink = 0.f;
         pr_global_struct->time = (float)SV_GetTime();
         pr_global_struct->self = ED_GetEDictOffs(ent);
         pr_global_struct->other = ED_GetEDictOffs(Edicts); // should be 0

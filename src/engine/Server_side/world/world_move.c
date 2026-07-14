@@ -78,13 +78,13 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
             .x = DotProduct(start_l, forward);
             .y = -DotProduct(start_l, right);
             .z = DotProduct(start_l, up);
-        }
+        };
 
-            end_l = (vec3_t){
-                .x = DotProduct(end_l, forward);
-                .y = -DotProduct(end_l, right);
-                .z = DotProduct(end_l, up);
-        }
+        end_l = (vec3_t){
+            .x = DotProduct(end_l, forward);
+            .y = -DotProduct(end_l, right);
+            .z = DotProduct(end_l, up);
+        };
     }
 #endif
 

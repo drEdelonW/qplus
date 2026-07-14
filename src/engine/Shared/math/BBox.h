@@ -64,9 +64,8 @@ static inline void BBoxExpandPt(BBox_p bb, vec3_t p) {
 
 static inline void BoundPoly(int numverts, vec3_p verts, BBox_p bb) {
     *bb = bbNull;
-    for (int i = 0; i < numverts; i++) {
+    for (int i = 0; i < numverts; i++)
         BBoxExpandPt(bb, verts[i]);
-    }
 }
 
 static inline vec3_t BBoxSize(BBox_t bb) {
@@ -85,5 +84,16 @@ static inline bool BBoxOverlaps(BBox_t a, BBox_t b) {
         (a.maxs.x < b.mins.x) ||
         (a.maxs.y < b.mins.y) ||
         (a.maxs.z < b.mins.z)
+    );
+}
+
+static inline bool BBoxTouches(BBox_t a, BBox_t b) {
+    return !(
+        (a.mins.x >= b.maxs.x) ||
+        (a.mins.y >= b.maxs.y) ||
+        (a.mins.z >= b.maxs.z) ||
+        (a.maxs.x <= b.mins.x) ||
+        (a.maxs.y <= b.mins.y) ||
+        (a.maxs.z <= b.mins.z)
     );
 }

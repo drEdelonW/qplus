@@ -35,7 +35,8 @@ typedef mSpriteFrame_t* mSpriteFrame_p;
 
 typedef struct {
     int         nump;
-    EmitPoint_p pverts; // there's room for an extra element at [nump],
+    EmitPoint_p pverts;
+    // there's room for an extra element at [nump],
     //  if the driver wants to duplicate element [0] at
     //  element [nump] to avoid dealing with wrapping
     mSpriteFrame_p  pspriteframe;

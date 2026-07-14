@@ -29,7 +29,7 @@ Mod_LoadSpriteFrame
 #ifdef GLQUAKE
 
 TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_p* ppframe, int framenum) { //
-    dSpriteFrame_p pinframe = (dSpriteFrame_p)pin;
+    dSpriteFrame_p pinframe = pin;
 
     int width = LittleLong(pinframe->width);
     int height = LittleLong(pinframe->height);
@@ -68,18 +68,17 @@ TypeLess_ptr Mod_LoadSpriteFrame(TypeLess_ptr pin, mSpriteFrame_p* ppframe, int 
 #else
 
 TypeLess_ptr  Mod_LoadSpriteFrame(TypeLess_ptr  pin, mSpriteFrame_p* ppframe) {
-    dSpriteFrame_p pinframe = (dSpriteFrame_p)pin;
+    dSpriteFrame_p pinframe = pin;
 
     int width = LittleLong(pinframe->width);
     int height = LittleLong(pinframe->height);
     int size = width * height;
 
     mSpriteFrame_p pspriteframe = Hunk_AllocName(
-        sizeof(mSpriteFrame_t) + size * r_pixbytes,
-        Mod_loadName
+        sizeof(mSpriteFrame_t) + (size * r_pixbytes), Mod_loadName
     );
+    Q_memset(pspriteframe, 0x00, sizeof(mSpriteFrame_t) + (size * r_pixbytes));
 
-    Q_memset(pspriteframe, 0, sizeof(mSpriteFrame_t) + size);
     *ppframe = pspriteframe;
 
     pspriteframe->width = width;
@@ -170,7 +169,7 @@ Mod_LoadSpriteModel
 */
 
 void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
-    dSprite_p pin = (dSprite_p)buffer;
+    dSprite_p pin = buffer;
 
     int version = LittleLong(pin->version);
     if (version != SPRITE_VERSION)
@@ -182,30 +181,30 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
 
     int numframes = LittleLong(pin->numframes);
 
-    mSprite_p psprite = Hunk_AllocName(
-        sizeof(mSprite_t) + (numframes - 1) * sizeof(psprite->frames),
+    mSprite_p pSprite = Hunk_AllocName(
+        sizeof(mSprite_t) + (numframes - 1) * sizeof(pSprite->frames),
         Mod_loadName
     );
 
-    mod->cache.data = psprite;
+    mod->cache.data = pSprite;
 
-    psprite->type = LittleLong(pin->type);
-    psprite->maxwidth = LittleLong(pin->width);
-    psprite->maxheight = LittleLong(pin->height);
-    psprite->beamlength = LittleFloat(pin->beamlength);
+    pSprite->type = LittleLong(pin->type);
+    pSprite->maxwidth = LittleLong(pin->width);
+    pSprite->maxheight = LittleLong(pin->height);
+    pSprite->beamlength = LittleFloat(pin->beamlength);
     mod->synctype = LittleLong(pin->synctype);
-    psprite->numframes = numframes;
+    pSprite->numframes = numframes;
 
     mod->BB = (BBox_t){
         .mins = {
-            .x = -HALF(psprite->maxwidth),
-            .y = -HALF(psprite->maxwidth),
-            .z = -HALF(psprite->maxheight)
+            .x = -HALF(pSprite->maxwidth),
+            .y = -HALF(pSprite->maxwidth),
+            .z = -HALF(pSprite->maxheight)
         },
         .maxs = {
-            .x = HALF(psprite->maxwidth),
-            .y = HALF(psprite->maxwidth),
-            .z = HALF(psprite->maxheight)
+            .x = HALF(pSprite->maxwidth),
+            .y = HALF(pSprite->maxwidth),
+            .z = HALF(pSprite->maxheight)
         }
     };
 
@@ -223,16 +222,14 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
     dSpriteFrameType_p pframetype = (dSpriteFrameType_p)(pin + 1);
 
     for (int i = 0; i < numframes; i++) {
-        SpriteFrameType_t frametype;
-
-        frametype = LittleLong(pframetype->type);
-        psprite->frames[i].type = frametype;
+        SpriteFrameType_t frametype = LittleLong(pframetype->type);
+        pSprite->frames[i].type = frametype;
 
 
         switch (frametype) {
         case SPR_SINGLE: {
             pframetype = (dSpriteFrameType_p)Mod_LoadSpriteFrame(
-                pframetype + 1, &psprite->frames[i].frameptr
+                pframetype + 1, &pSprite->frames[i].frameptr
 #ifdef GLQUAKE
                 , i
 #endif
@@ -240,7 +237,7 @@ void Mod_LoadSpriteModel(Model_p mod, TypeLess_ptr buffer) {
         } break;
         case SPR_GROUP: {
             pframetype = (dSpriteFrameType_p)Mod_LoadSpriteGroup(
-                pframetype + 1, &psprite->frames[i].frameptr
+                pframetype + 1, &pSprite->frames[i].frameptr
 #ifdef GLQUAKE
                 , i
 #endif

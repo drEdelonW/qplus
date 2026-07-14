@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "sv_phys_priv.h"
+#include "BBox_tools.h"
 
 /*
 ==============================================================================
@@ -34,33 +35,39 @@ SV_CheckWaterTransition
 
 =============
 */
-void SV_CheckWaterTransition(edict_p ent) {
+void SV_CheckWaterTransition(edict_p pEntIn) {
 #ifdef QUAKE2
+# if 0
     vec3_t point = {
-        ent->v.origin[X_AX],
-        ent->v.origin[Y_AX],
-        ent->v.origin[Z_AX] + ent->v.mins[Z_AX] + 1
+        pEntIn->v.origin.x,
+        pEntIn->v.origin.y,
+        pEntIn->v.origin.z + pEntIn->v.mins.z + 1
     };
+# else
+    vec3_t point = pEntIn->v.origin; {
+        point.z += pEntIn->v.mins.z + 1.f;
+    }
+# endif
     int cont = SV_PointContents(point);
 #else
-    int cont = SV_PointContents(ent->v.origin);
+    contents_t cont = SV_PointContents(pEntIn->v.origin);
 #endif
-    if (!ent->v.watertype) { // just spawned here
-        ent->v.watertype = (float)cont;
-        ent->v.waterlevel = WL_Feet;
+    if (!pEntIn->v.watertype) { // just spawned here
+        pEntIn->v.watertype = (float)cont;
+        pEntIn->v.waterlevel = WL_Feet;
         return;
     }
 
-    if ((contents_t)ent->v.watertype == CONTENTS_EMPTY) // just crossed into water
-        SV_StartSound(ent, SndChAuto, "misc/h2ohit1.wav", VolFull, AtnNorm);
+    if ((contents_t)pEntIn->v.watertype == CONTENTS_EMPTY) // just crossed into water
+        SV_StartSound(pEntIn, SndChAuto, "misc/h2ohit1.wav", VolFull, AtnNorm);
 
     if (cont <= CONTENTS_WATER) {
-        ent->v.watertype = (float)cont;
-        ent->v.waterlevel = WL_Feet;
+        pEntIn->v.watertype = (float)cont;
+        pEntIn->v.waterlevel = WL_Feet;
     }
     else {
-        ent->v.watertype = CONTENTS_EMPTY;
-        ent->v.waterlevel = (float)cont;
+        pEntIn->v.watertype = CONTENTS_EMPTY;
+        pEntIn->v.waterlevel = (float)cont;
     }
 }
 
@@ -72,64 +79,65 @@ Toss, bounce, and fly movement.  When onground, do nothing.
 =============
 */
 
-void SV_Physics_Toss(edict_p ent) {
+void SV_Physics_Toss(edict_p pEntIn) {
 #ifdef QUAKE2
-    edict_p groundentity = ED_GetEDictByOffs(ent->v.groundentity);
-    if ((EntityFlags_t)groundentity->v.flags & FL_CONVEYOR) ent->v.basevelocity = VectorScale(groundentity->v.movedir, groundentity->v.speed);
-    else                                                    ent->v.basevelocity = v3Zero;
-    SV_CheckWater(ent);
+    edict_p groundentity = ED_GetEDictByOffs(pEntIn->v.groundentity);
+    if (groundentity->v.flags & FL_CONVEYOR)    pEntIn->v.basevelocity = VectorScale(groundentity->v.movedir, groundentity->v.speed);
+    else                                        pEntIn->v.basevelocity = v3Zero;
+    SV_CheckWater(pEntIn);
 #endif
     // regular thinking
-    if (!SV_RunThink(ent))  return;
+    if (!SV_RunThink(pEntIn))  return;
 
 #ifdef QUAKE2
-    if (ent->v.velocity[Z_AX] > 0)
-        ent->v.flags = (EntityFlags_t)ent->v.flags & ~FL_ONGROUND;
+    if (pEntIn->v.velocity.z > 0)
+        pEntIn->v.flags = (EntityFlags_t)pEntIn->v.flags & ~FL_ONGROUND;
 
-    if ((((EntityFlags_t)ent->v.flags & FL_ONGROUND)) &&
-        (VectorCompare(ent->v.basevelocity, v3Zero)))
-        return;
+    if (((pEntIn->v.flags & FL_ONGROUND)) &&
+        (VectorCompare(pEntIn->v.basevelocity, v3Zero))
+        )   return;
 
-    SV_CheckVelocity(ent);
+    SV_CheckVelocity(pEntIn);
 
     // add gravity
-    if (!((EntityFlags_t)ent->v.flags & FL_ONGROUND) &&
-        (ent->v.movetype != MOVETYPE_FLY) &&
-        (ent->v.movetype != MOVETYPE_BOUNCEMISSILE) &&
-        (ent->v.movetype != MOVETYPE_FLYMISSILE))
-        SV_AddGravity(ent);
+    if (!(pEntIn->v.flags & FL_ONGROUND) &&
+        (pEntIn->v.movetype != MOVETYPE_FLY) &&
+        (pEntIn->v.movetype != MOVETYPE_BOUNCEMISSILE) &&
+        (pEntIn->v.movetype != MOVETYPE_FLYMISSILE)
+        )   SV_AddGravity(pEntIn);
 
 #else
     // if onground, return without moving
-    if (((EntityFlags_t)ent->v.flags & FL_ONGROUND))  return;
+    if (((EntityFlags_t)pEntIn->v.flags & FL_ONGROUND))  return;
 
-    SV_CheckVelocity(ent);
+    SV_CheckVelocity(pEntIn);
 
     // add gravity
-    switch ((movetype_t)ent->v.movetype) {
+    switch ((movetype_t)pEntIn->v.movetype) {
     case MOVETYPE_FLY:
     case MOVETYPE_FLYMISSILE:   /* no gravity */    break;
-    default:                    SV_AddGravity(ent); break;
+    default:                    SV_AddGravity(pEntIn); break;
     }
 #endif
 
     // move angles
-    ent->v.angles = AngleMA(ent->v.angles, (float)host_frametime, ent->v.avelocity);
+    pEntIn->v.angles = AngleMA(pEntIn->v.angles, (float)host_frametime, pEntIn->v.avelocity);
     // move origin
 #ifdef QUAKE2
-    ent->v.velocity = VectorAdd(ent->v.velocity, ent->v.basevelocity);
+    pEntIn->v.velocity = VectorAdd(pEntIn->v.velocity, pEntIn->v.basevelocity);
 #endif
-    vec3_t move = VectorScale(ent->v.velocity, (float)host_frametime);
-    trace_t trace = SV_PushEntity(ent, move);
+    trace_t trace = SV_PushEntity(pEntIn,
+        VectorScale(pEntIn->v.velocity, (float)host_frametime)
+    );
 #ifdef QUAKE2
-    ent->v.velocity = VectorSubtract(ent->v.velocity, ent->v.basevelocity);
+    pEntIn->v.velocity = VectorSubtract(pEntIn->v.velocity, pEntIn->v.basevelocity);
 #endif
-    if ((trace.fraction == 1) ||
-        (ent->free)
+    if ((trace.fraction == 1.f) ||
+        (pEntIn->free)
         )   return;
 
     float backoff;
-    switch ((movetype_t)ent->v.movetype) {
+    switch ((movetype_t)pEntIn->v.movetype) {
 #ifdef QUAKE2
     case MOVETYPE_BOUNCEMISSILE:    backoff = 2.f;  break;
 #endif
@@ -137,29 +145,29 @@ void SV_Physics_Toss(edict_p ent) {
     default:                        backoff = 1.f;  break;
     }
 
-    ClipVelocity(ent->v.velocity, trace.plane.normal, &ent->v.velocity, backoff);
+    ClipVelocity(pEntIn->v.velocity, trace.plane.normal, &pEntIn->v.velocity, backoff);
 
     // stop if on ground
     if ((trace.plane.normal.z > 0.7f) &&
         (
-            (ent->v.velocity.z < 60.f) ||
+            (pEntIn->v.velocity.z < 60.f) ||
             (
 #ifdef QUAKE2
-            (ent->v.movetype != MOVETYPE_BOUNCEMISSILE) &&
+            (pEntIn->v.movetype != MOVETYPE_BOUNCEMISSILE) &&
 #endif
-                (ent->v.movetype != MOVETYPE_BOUNCE)
+                (pEntIn->v.movetype != MOVETYPE_BOUNCE)
                 )
             )
         ) {
-        ent->v.flags = (float)((int)((EntityFlags_t)ent->v.flags) | FL_ONGROUND);
-        ent->v.groundentity = ED_GetEDictOffs(trace.pEnt);
-        ent->v.velocity = v3Zero;
-        ent->v.avelocity = a3Zero;
+        pEntIn->v.flags = (float)((EntityFlags_t)pEntIn->v.flags | FL_ONGROUND);
+        pEntIn->v.groundentity = ED_GetEDictOffs(trace.pEnt);
+        pEntIn->v.velocity = v3Zero;
+        pEntIn->v.avelocity = a3Zero;
 
     }
 
     // check for in water
-    SV_CheckWaterTransition(ent);
+    SV_CheckWaterTransition(pEntIn);
 }
 
 
@@ -171,7 +179,7 @@ SV_Physics_None
 Non moving objects can only think
 =============
 */
-void SV_Physics_None(edict_p ent) { SV_RunThink(ent); } // regular thinking
+void SV_Physics_None(edict_p pEntIn) { SV_RunThink(pEntIn); } // regular thinking
 
 #ifdef QUAKE2
 /*
@@ -181,10 +189,12 @@ SV_Physics_Follow
 Entities that are "stuck" to another entity
 =============
 */
-void SV_Physics_Follow(edict_p ent) {
-    SV_RunThink(ent);    // regular thinking
-    ent->v.origin = VectorAdd(ED_GetEDictByOffs(ent->v.aiment)->v.origin, ent->v.v_angle);
-    SV_LinkEdict(ent, true);
+void SV_Physics_Follow(edict_p pEntIn) {
+    SV_RunThink(pEntIn);    // regular thinking
+    pEntIn->v.origin = VectorAdd(
+        ED_GetEDictByOffs(pEntIn->v.aiment)->v.origin, pEntIn->v.v_angle
+    );
+    SV_LinkEdict(pEntIn, true);
 }
 #endif
 
@@ -198,14 +208,14 @@ SV_Physics_Noclip
 A moving object that doesn't obey physics
 =============
 */
-void SV_Physics_Noclip(edict_p ent) {
+void SV_Physics_Noclip(edict_p pEntIn) {
     // regular thinking
-    if (!SV_RunThink(ent))  return;
+    if (!SV_RunThink(pEntIn))  return;
 
-    ent->v.angles = AngleMA(ent->v.angles, (float)host_frametime, ent->v.avelocity);
-    ent->v.origin = VectorMA(ent->v.origin, (float)host_frametime, ent->v.velocity);
+    pEntIn->v.angles = AngleMA(pEntIn->v.angles, (float)host_frametime, pEntIn->v.avelocity);
+    pEntIn->v.origin = VectorMA(pEntIn->v.origin, (float)host_frametime, pEntIn->v.velocity);
 
-    SV_LinkEdict(ent, false);
+    SV_LinkEdict(pEntIn, false);
 }
 
 
@@ -229,46 +239,50 @@ will fall if the floor is pulled out from under them.
 =============
 */
 #ifdef QUAKE2
-void SV_Physics_Step(edict_p ent) {
+void SV_Physics_Step(edict_p pEntIn) {
     bool hitsound = false;
 
-    edict_p groundentity = ED_GetEDictByOffs(ent->v.groundentity);
-    if ((EntityFlags_t)groundentity->v.flags & FL_CONVEYOR)     ent->v.basevelocity = VectorScale(groundentity->v.movedir, groundentity->v.speed);
-    else                                                        ent->v.basevelocity = v3Zero;
+    edict_p groundentity = ED_GetEDictByOffs(pEntIn->v.groundentity);
+    if ((EntityFlags_t)groundentity->v.flags & FL_CONVEYOR)     pEntIn->v.basevelocity = VectorScale(groundentity->v.movedir, groundentity->v.speed);
+    else                                                        pEntIn->v.basevelocity = v3Zero;
     //@@
     pr_global_struct->time = SV_GetTime();
-    pr_global_struct->self = ED_GetEDictOffs(ent);
+    pr_global_struct->self = ED_GetEDictOffs(pEntIn);
     PF_WaterMove();
 
-    SV_CheckVelocity(ent);
+    SV_CheckVelocity(pEntIn);
 
-    bool wasonground = (EntityFlags_t)ent->v.flags & FL_ONGROUND;
-    // ent->v.flags = (EntityFlags_t)ent->v.flags & ~FL_ONGROUND;
+    bool wasonground = (EntityFlags_t)pEntIn->v.flags & FL_ONGROUND;
+    // pEntIn->v.flags = (EntityFlags_t)pEntIn->v.flags & ~FL_ONGROUND;
 
         // add gravity except:
         //   flying monsters
         //   swimming monsters who are in the water
-    bool inwater = SV_CheckWater(ent);
+    bool inwater = SV_CheckWater(pEntIn);
     if ((!wasonground) &&
-        (!((EntityFlags_t)ent->v.flags & FL_FLY)) &&
+        (!((EntityFlags_t)pEntIn->v.flags & FL_FLY)) &&
         (!(
-            ((EntityFlags_t)ent->v.flags & FL_SWIM) &&
-            (ent->v.waterlevel > WL_None)
-            ))) {
-        hitsound = (ent->v.velocity[Z_AX] < (sv_gravity.value * -0.1));
-        if (!inwater)   SV_AddGravity(ent);
+            ((EntityFlags_t)pEntIn->v.flags & FL_SWIM) &&
+            (pEntIn->v.waterlevel > WL_None)
+            )
+            )
+        ) {
+        hitsound = (pEntIn->v.velocity.z < (sv_gravity.value * -0.1));
+        if (!inwater)
+            SV_AddGravity(pEntIn);
     }
 
-    if (!VectorCompare(ent->v.velocity, v3Zero) ||
-        !VectorCompare(ent->v.basevelocity, v3Zero)) {
-        ent->v.flags = (EntityFlags_t)ent->v.flags & ~FL_ONGROUND;
+    if (!VectorCompare(pEntIn->v.velocity, v3Zero) ||
+        !VectorCompare(pEntIn->v.basevelocity, v3Zero)
+        ) {
+        pEntIn->v.flags = (EntityFlags_t)pEntIn->v.flags & ~FL_ONGROUND;
         // apply friction
         // let dead monsters who aren't completely onground slide
         if (wasonground)
-            if (!((ent->v.health <= 0.0) &&
-                !SV_CheckBottom(ent))
+            if (!((pEntIn->v.health <= 0.0) &&
+                !SV_CheckBottom(pEntIn))
                 ) {
-                vec3_p vel = ent->v.velocity;
+                vec3_p vel = pEntIn->v.velocity;
                 float speed = sqrtf((vel->x * vel->x) + (vel->y * vel->y));
                 if (speed) {
                     float friction = sv_friction.value;
@@ -283,76 +297,81 @@ void SV_Physics_Step(edict_p ent) {
                 }
             }
 
-        VectorAdd(ent->v.velocity, ent->v.basevelocity, ent->v.velocity);
-        SV_FlyMove(ent, host_frametime, NULL);
-        ent->v.velocity = VectorSubtract(ent->v.velocity, ent->v.basevelocity);
+        VectorAdd(pEntIn->v.velocity, pEntIn->v.basevelocity, pEntIn->v.velocity);
+        SV_FlyMove(pEntIn, host_frametime, NULL);
+        pEntIn->v.velocity = VectorSubtract(pEntIn->v.velocity, pEntIn->v.basevelocity);
 
         // determine if it's on solid ground at all
         {
-            BBox_t bb = BBoxTranslate(EvBBox(&ent->v), ent->v.origin);
-
+            BBox_t bb = BBoxTranslate(EvBBox(&pEntIn->v), pEntIn->v.origin);
             vec3_t point = { .z = bb.mins.z - 1.f };
             for (int x = 0; x <= 1; x++)
                 for (int y = 0; y <= 1; y++) {
                     point.x = (x) ? bb.maxs.x : bb.mins.x;
                     point.y = (y) ? bb.maxs.y : bb.mins.y;
                     if (SV_PointContents(point) == CONTENTS_SOLID) {
-                        ent->v.flags = (EntityFlags_t)ent->v.flags | FL_ONGROUND;
+                        pEntIn->v.flags = pEntIn->v.flags | FL_ONGROUND;
                         break;
                     }
                 }
         }
 
-        SV_LinkEdict(ent, true);
+        SV_LinkEdict(pEntIn, true);
 
-        if (((EntityFlags_t)ent->v.flags & FL_ONGROUND) &&
+        if (((EntityFlags_t)pEntIn->v.flags & FL_ONGROUND) &&
             (!wasonground) &&
             (hitsound)
-            )   SV_StartSound(ent, SndChAuto, "demon/dland2.wav", VolFull, AtnNorm);
+            )   SV_StartSound(pEntIn, SndChAuto, "demon/dland2.wav", VolFull, AtnNorm);
     }
 
     // regular thinking
-    SV_RunThink(ent);
-    SV_CheckWaterTransition(ent);
+    SV_RunThink(pEntIn);
+    SV_CheckWaterTransition(pEntIn);
 }
 #else
-void SV_Physics_Step(edict_p ent) {
+void SV_Physics_Step(edict_p pEntIn) {
     // freefall if not onground
-    if (!((EntityFlags_t)ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM))) {
-        bool hitsound = (ent->v.velocity.z < (sv_gravity.value * -0.1f));
+    if (!((EntityFlags_t)pEntIn->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM))) {
+        bool hitsound = (pEntIn->v.velocity.z < (sv_gravity.value * -0.1f));
 
-        SV_AddGravity(ent);
-        SV_CheckVelocity(ent);
-        SV_FlyMove(ent, host_frametime, NULL);
-        SV_LinkEdict(ent, true);
+        SV_AddGravity(pEntIn);
+        SV_CheckVelocity(pEntIn);
+        SV_FlyMove(pEntIn, host_frametime, NULL);
+        SV_LinkEdict(pEntIn, true);
 
-        if (((EntityFlags_t)ent->v.flags & FL_ONGROUND) && // just hit ground
+        if (((EntityFlags_t)pEntIn->v.flags & FL_ONGROUND) && // just hit ground
             (hitsound)
-            )   SV_StartSound(ent, SndChAuto, "demon/dland2.wav", VolFull, AtnNorm);
+            )   SV_StartSound(pEntIn, SndChAuto, "demon/dland2.wav", VolFull, AtnNorm);
     }
 
-    SV_RunThink(ent);   // regular thinking
-    SV_CheckWaterTransition(ent);
+    SV_RunThink(pEntIn);   // regular thinking
+    SV_CheckWaterTransition(pEntIn);
 }
 #endif
 
 
 
 #ifndef QUAKE2
-trace_t SV_Trace_Toss(edict_p ent, edict_p ignore) {
+trace_t SV_Trace_Toss(edict_p pEntIn, edict_p ignore) {
     LegTime_t save_frametime = host_frametime;
     host_frametime = 0.05;
 
-    edict_t tempent; memcpy(&tempent, ent, sizeof(edict_t)); // TODO: ACHTUNG! sizeof(edict_t) ILLIGAL
+#warning !!!ACHTUNG!!! sizeof(edict_t) ILLEGAL
+#if 0
+    edict_t tempent; memcpy(&tempent, pEntIn, sizeof(edict_t));
+#else
+    edict_t tempent = *pEntIn;
+#endif
     edict_p tent = &tempent;
 
     while (1) {
         SV_CheckVelocity(tent);
         SV_AddGravity(tent);
         tent->v.angles = AngleMA(tent->v.angles, (float)host_frametime, tent->v.avelocity);
-        vec3_t move = VectorScale(tent->v.velocity, (float)host_frametime);
-        vec3_t end = VectorAdd(tent->v.origin, move);
-        trace_t trace = SV_Move(tent->v.origin, *(BBox_p)&tent->v.mins, end, MOVE_NORMAL, tent
+        trace_t trace = SV_Move(
+            tent->v.origin, EvBBox(&tent->v),
+            VectorMA(tent->v.origin, (float)host_frametime, tent->v.velocity),
+            MOVE_NORMAL, tent
         );
         tent->v.origin = trace.endpos;
 

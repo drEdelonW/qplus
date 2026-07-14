@@ -229,10 +229,10 @@ qPic_p GetPicFromWad(cStringRO name) {
 
         *((glpic_p)p->data) = (glpic_t){
             .texnum = texnum,
-            .sl = (x + 0.01) / (float)BLOCK_WIDTH,
-            .tl = (y + 0.01) / (float)BLOCK_WIDTH,
-            .sh = (x + p->width - 0.01) / (float)BLOCK_WIDTH,
-            .th = (y + p->height - 0.01) / (float)BLOCK_WIDTH
+            .sl = (x + 0.01f) / (float)BLOCK_WIDTH,
+            .tl = (y + 0.01f) / (float)BLOCK_WIDTH,
+            .sh = (x + p->width - 0.01f) / (float)BLOCK_WIDTH,
+            .th = (y + p->height - 0.01f) / (float)BLOCK_WIDTH
         };
 #ifdef GLTEST
         pic_count++;
@@ -246,8 +246,8 @@ qPic_p GetPicFromWad(cStringRO name) {
 #else
             .texnum = GL_LoadTexture("", p->width, p->height, p->data, false, true),
 #endif
-            .sl = 0.f,
-            .tl = 0.f,
+            // .sl = 0.f,
+            // .tl = 0.f,
             .sh = 1.f,
             .th = 1.f
         };
@@ -376,7 +376,7 @@ void Draw_Init() {
     Cmd_AddCommand("gl_texturemode", &Draw_TextureMode_f);
 
     // load the console background and the charset by hand, because we need to write the version string into the background before turning it into a texture
-    pDrawChars = W_GetLumpName("conchars");
+    pDrawChars = (qColor8_p)W_GetLumpName("conchars");  // raw workaround
     for (int i = 0; i < (InksNum * 64); i++)
         if (pDrawChars[i].i == InkConTransp)
             pDrawChars[i].i = InkTransp; // proper transparent color

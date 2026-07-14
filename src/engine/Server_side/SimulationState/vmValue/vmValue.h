@@ -29,9 +29,7 @@ typedef enum {
 
     DEF_SAVEGLOBAL = (1U << 15)
 } etype_t;  // :uint16_t
-
-extern int type_size[ev_LAST];
-
+size_t SizeOfPrType(etype_t type);
 
 cString PR_ValueString(etype_t type, eval_p val);
 cString PR_UglyValueString(etype_t type, eval_p val);

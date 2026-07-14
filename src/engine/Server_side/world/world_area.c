@@ -125,20 +125,10 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
             (touch->v.solid != SOLID_TRIGGER))
             continue;
 
-#if 0
-        if ((ent->v.absmin.x > touch->v.absmax.x) ||
-            (ent->v.absmin.y > touch->v.absmax.y) ||
-            (ent->v.absmin.z > touch->v.absmax.z) ||
-            (ent->v.absmax.x < touch->v.absmin.x) ||
-            (ent->v.absmax.y < touch->v.absmin.y) ||
-            (ent->v.absmax.z < touch->v.absmin.z)
-            )   continue;
-#else
         if (!BBoxOverlaps(
             EvAbsBBox(&ent->v),
             EvAbsBBox(&touch->v))
             )   continue;
-#endif
 
         int old_self = pr_global_struct->self;
         int old_other = pr_global_struct->other;
