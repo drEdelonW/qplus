@@ -313,10 +313,10 @@ void SV_DropClient(bool crash) {
         if (remoteClient->edict && remoteClient->spawned) {
             // call the prog function for removing a client
             // this will set the body to a dead frame, among other things
-            int saveSelf = GV_pGame()->self;
-            GV_pGame()->self = ED_GetEDictOffs(remoteClient->edict);
-            PR_ExecuteProgram(GV_pGame()->ClientDisconnect);
-            GV_pGame()->self = saveSelf;
+            int saveSelf = pGame()->self;
+            pGame()->self = ED_GetEDictOffs(remoteClient->edict);
+            PR_ExecuteProgram(pGame()->ClientDisconnect);
+            pGame()->self = saveSelf;
         }
 
         Host_Printf("Client %s removed\n", remoteClient->name);
@@ -485,7 +485,7 @@ Host::ServerFrame
 
 void Host::_ServerFrame() {
     // run the world state
-    GV_pGame()->frametime = host_frametime;
+    pGame()->frametime = host_frametime;
 
     // read client messages
     SV_RunClients();
@@ -501,7 +501,7 @@ void Host::_ServerFrame() {
 
 void Host::ServerFrame() {
     // run the world state
-    GV_pGame()->frametime = host_frametime;
+    pGame()->frametime = host_frametime;
 
     // set the time and clear the general datagram
     SV_ClearDatagram();
@@ -526,7 +526,7 @@ void Host::ServerFrame() {
 #else
 
 void Host::ServerFrame() {
-    GV_pGame()->frametime = host_frametime;   // run the world state
+    pGame()->frametime = host_frametime;   // run the world state
 
     SV_ClearDatagram();     // set the time and clear the general datagram
     SV_CheckForNewClients();    // check for new clients

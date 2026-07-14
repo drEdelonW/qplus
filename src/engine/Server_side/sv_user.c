@@ -78,8 +78,10 @@ void SV_SetIdealPitch() {
         };
 
         vec3_t bottom = top; { bottom.z -= 160.0f; }
-
-        trace_t tr = SV_Move(top, bbZero, bottom, MOVE_NOMONSTERS, sv_player);
+        trace_t tr = SV_MoveLine(
+            top, bottom,
+            MOVE_NOMONSTERS, sv_player
+        );
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
         if (tr.fraction == 1)   return; // near a dropoff
 
@@ -130,7 +132,7 @@ void SV_UserFriction() {
     };
     vec3_t stop = start; { stop.z -= 34.f; }
 
-    trace_t trace = SV_Move(start, bbZero, stop, MOVE_NOMONSTERS, sv_player);
+    trace_t trace = SV_MoveLine(start, stop, MOVE_NOMONSTERS, sv_player);
 
     float friction = (trace.fraction == 1.f) ?
         (sv_friction.value * sv_edgefriction.value) : sv_friction.value;
@@ -514,7 +516,7 @@ void Host_God_f() {
         Cmd_ForwardToServer();
         return;
     }
-    if ((GV_pGame()->deathmatch) &&
+    if ((pGame()->deathmatch) &&
         !(remoteClient->privileged)
         )  return;
 
@@ -531,7 +533,7 @@ void Host_Notarget_f() {
         Cmd_ForwardToServer();
         return;
     }
-    if ((GV_pGame()->deathmatch) &&
+    if ((pGame()->deathmatch) &&
         !(remoteClient->privileged)
         )  return;
 
@@ -549,7 +551,7 @@ void Host_Noclip_f() {
         Cmd_ForwardToServer();
         return;
     }
-    if ((GV_pGame()->deathmatch) &&
+    if ((pGame()->deathmatch) &&
         !(remoteClient->privileged)
         )  return;
 
@@ -578,7 +580,7 @@ void Host_Fly_f() {
         return;
     }
 
-    if ((GV_pGame()->deathmatch) &&
+    if ((pGame()->deathmatch) &&
         !(remoteClient->privileged)
         )  return;
 

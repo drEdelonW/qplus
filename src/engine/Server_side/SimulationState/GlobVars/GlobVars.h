@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-    globalvars_p GV_pGame();   // global variable of game settings
+    globalvars_p pGame();   // global variable of game settings
     void RETURN_EDICT(edict_p edict);
     edict_p GV_pEdict(PrOfs_e Param);
     // #define G_EDICT(o)      (*(GV_pEdict(o)))

@@ -40,13 +40,12 @@ trace_t SV_PushEntity(edict_p ent, vec3_t push) {
     vec3_t end = VectorAdd(ent->v.origin, push);
 
     trace_t trace;
-    BBox_t entBB = EvBBox(&ent->v);
-    if (ent->v.movetype == MOVETYPE_FLYMISSILE)     trace = SV_Move(ent->v.origin, entBB, end, MOVE_MISSILE, ent);
+    if (ent->v.movetype == MOVETYPE_FLYMISSILE)     trace = SV_MoveBox(ent->v.origin, end, MOVE_MISSILE, ent);
     else
         switch ((solid_t)ent->v.solid) {
         case SOLID_TRIGGER:  // only clip against bmodels
-        case SOLID_NOT:                             trace = SV_Move(ent->v.origin, entBB, end, MOVE_NOMONSTERS, ent);    break;
-        default:                                    trace = SV_Move(ent->v.origin, entBB, end, MOVE_NORMAL, ent);        break;
+        case SOLID_NOT:                             trace = SV_MoveBox(ent->v.origin, end, MOVE_NOMONSTERS, ent);    break;
+        default:                                    trace = SV_MoveBox(ent->v.origin, end, MOVE_NORMAL, ent);        break;
         }
     ent->v.origin = trace.endpos;
     SV_LinkEdict(ent, true);
@@ -168,8 +167,8 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
             // if the pusher has a "blocked" function, call it
             // otherwise, just stay in place until the obstacle is gone
             if (pusher->v.blocked) {
-                GV_pGame()->self = ED_GetEDictOffs(pusher);
-                GV_pGame()->other = ED_GetEDictOffs(check);
+                pGame()->self = ED_GetEDictOffs(pusher);
+                pGame()->other = ED_GetEDictOffs(check);
                 PR_ExecuteProgram(pusher->v.blocked);
             }
 
@@ -272,7 +271,8 @@ void SV_PushRotate(edict_p pusher, float movetime) {
             if (check->v.mins.x == check->v.maxs.x)   continue;
 
             if ((check->v.solid == SOLID_NOT) ||
-                (check->v.solid == SOLID_TRIGGER)) { // corpse
+                (check->v.solid == SOLID_TRIGGER)
+                ) { // corpse
                 check->v.mins.x = check->v.mins.y = 0;
                 check->v.maxs = check->v.mins;
                 continue;
@@ -288,8 +288,8 @@ void SV_PushRotate(edict_p pusher, float movetime) {
             // if the pusher has a "blocked" function, call it
             // otherwise, just stay in place until the obstacle is gone
             if (pusher->v.blocked) {
-                GV_pGame()->self = ED_GetEDictOffs(pusher);
-                GV_pGame()->other = ED_GetEDictOffs(check);
+                pGame()->self = ED_GetEDictOffs(pusher);
+                pGame()->other = ED_GetEDictOffs(check);
                 PR_ExecuteProgram(pusher->v.blocked);
             }
 
@@ -343,9 +343,9 @@ void SV_Physics_Pusher(edict_p ent) {
         (thinktime <= ent->v.ltime)
         ) {
         ent->v.nextthink = 0.f;
-        GV_pGame()->time = (float)SV_GetTime();
-        GV_pGame()->self = ED_GetEDictOffs(ent);
-        GV_pGame()->other = EdictWorld; // should be 0
+        pGame()->time = (float)SV_GetTime();
+        pGame()->self = ED_GetEDictOffs(ent);
+        pGame()->other = EdictWorld; // should be 0
         PR_ExecuteProgram(ent->v.think);
         if (ent->free)
             return;

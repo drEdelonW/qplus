@@ -70,7 +70,6 @@ areaNode_p SV_CreateAreaNode(int depth, BBox_t bb) {
 
 void SV_ClearWorld() {
     SV_InitBoxHull();
-
     memset(_sv_AreaNodes, 0, sizeof(_sv_AreaNodes));
     _sv_NumAreaNodes = 0;
     SV_CreateAreaNode(0, sv.worldmodel->BB);
@@ -130,16 +129,16 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
             EvAbsBBox(&touch->v))
             )   continue;
 
-        int old_self = GV_pGame()->self;
-        int old_other = GV_pGame()->other;
+        int old_self = pGame()->self;
+        int old_other = pGame()->other;
 
-        GV_pGame()->self = ED_GetEDictOffs(touch);
-        GV_pGame()->other = ED_GetEDictOffs(ent);
-        GV_pGame()->time = (float)SV_GetTime();
+        pGame()->self = ED_GetEDictOffs(touch);
+        pGame()->other = ED_GetEDictOffs(ent);
+        pGame()->time = (float)SV_GetTime();
         PR_ExecuteProgram(touch->v.touch);
 
-        GV_pGame()->self = old_self;
-        GV_pGame()->other = old_other;
+        pGame()->self = old_self;
+        pGame()->other = old_other;
     }
 
     // recurse down both sides
@@ -182,8 +181,12 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     else
 #endif
     {
+#if 0
         ent->v.absmin = VectorAdd(ent->v.origin, ent->v.mins);
         ent->v.absmax = VectorAdd(ent->v.origin, ent->v.maxs);
+#else
+        EvSetAbsBBox(&ent->v, BBoxTranslate(EvBBox(&ent->v), ent->v.origin));
+#endif
     }
 
     //

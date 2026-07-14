@@ -11,7 +11,6 @@ extern "C" {
     void SV_MoveToGoal();
     bool SV_movestep(edict_p ent, vec3_t move, bool relink);
     int  SV_ModelIndex(cString name);
-    void SV_ClearWorld();
 
 #ifdef __cplusplus
 }

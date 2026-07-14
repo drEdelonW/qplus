@@ -281,9 +281,9 @@ void SV_Physics_Client(edict_p ent, EdIdx clNum) {
     if (!svs.clients[clNum - EdictPlayer1].active)   return;  // unconnected slot
 
     // call standard client pre-think
-    GV_pGame()->time = (float)SV_GetTime();
-    GV_pGame()->self = ED_GetEDictOffs(ent);
-    PR_ExecuteProgram(GV_pGame()->PlayerPreThink);
+    pGame()->time = (float)SV_GetTime();
+    pGame()->self = ED_GetEDictOffs(ent);
+    PR_ExecuteProgram(pGame()->PlayerPreThink);
 
     // do a move
     SV_CheckVelocity(ent);
@@ -328,7 +328,7 @@ void SV_Physics_Client(edict_p ent, EdIdx clNum) {
     // call standard player post-think
     SV_LinkEdict(ent, true);
 
-    GV_pGame()->time = (float)SV_GetTime();
-    GV_pGame()->self = ED_GetEDictOffs(ent);
-    PR_ExecuteProgram(GV_pGame()->PlayerPostThink);
+    pGame()->time = (float)SV_GetTime();
+    pGame()->self = ED_GetEDictOffs(ent);
+    PR_ExecuteProgram(pGame()->PlayerPostThink);
 }

@@ -287,7 +287,7 @@ void SV_WriteClientdataToMessage(edict_p ent, sizebuf_p msg) {
 #else
     eval_p val = GetEdictFieldValue(ent, "items2");
     int items = (int)ent->v.items | ((val) ?
-        ((int)val->_float << 23) : ((int)GV_pGame()->serverflags << 28));
+        ((int)val->_float << 23) : ((int)pGame()->serverflags << 28));
 #endif
 
     bits |= SU_ITEMS;

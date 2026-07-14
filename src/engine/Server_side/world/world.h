@@ -30,6 +30,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define DIST_EPSILON (0.03125f) /* 1/32 epsilon to keep floating point happy */
 
+void SV_ClearWorld();
+
 void SV_UnlinkEdict(edict_p ent);
 // call before removing an entity, and before trying to move one, so it doesn't clip against itself
 // flags ent->v.modified

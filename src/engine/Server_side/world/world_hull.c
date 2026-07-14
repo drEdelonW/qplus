@@ -114,6 +114,7 @@ Hull_p SV_HullForEntity(edict_p ent, BBox_t bb, vec3_p offset) {
         );
     }
     else { // create a temp hull from bounding box sizes
+#warning rework it BBox
         hull = SV_HullForBox(BBoxFromVec3(
             VectorSubtract(ent->v.mins, bb.maxs),
             VectorSubtract(ent->v.maxs, bb.mins)

@@ -30,10 +30,7 @@ This could be a lot more efficient...
 */
 #include "BBox_tools.h"
 edict_p SV_TestEntityPosition(edict_p ent) {
-    trace_t trace = SV_Move(
-        ent->v.origin, EvBBox(&ent->v), ent->v.origin,
-        MOVE_NORMAL, ent
-    );
+    trace_t trace = SV_MoveBox(ent->v.origin, ent->v.origin, MOVE_NORMAL, ent);
 
     return (trace.startsolid) ? GetEdictsPtr() : NULL; // world map or none
 }
@@ -225,7 +222,7 @@ void SV_MoveBounds(vec3_t start, BBox_t bb, vec3_t end, BBox_p box) {
             box->mins.v[i] = end.v[i] + bb.mins.v[i] - 1;
             box->maxs.v[i] = start.v[i] + bb.maxs.v[i] + 1;
         }
-    }
+}
 #endif
 }
 
@@ -248,4 +245,11 @@ trace_t SV_Move(vec3_t start, BBox_t bb, vec3_t end, phymovetype_t type, edict_p
     SV_ClipToLinks(_sv_AreaNodes, &clip); // clip to entities
 
     return clip.trace;
+}
+
+trace_t SV_MoveLine(vec3_t start, vec3_t end, phymovetype_t type, edict_p passedict) {
+    return SV_Move(start, bbZero, end, type, passedict);
+}
+trace_t SV_MoveBox(vec3_t start, vec3_t end, phymovetype_t type, edict_p passedict) {
+    return SV_Move(start, EvBBox(&passedict->v), end, type, passedict);
 }

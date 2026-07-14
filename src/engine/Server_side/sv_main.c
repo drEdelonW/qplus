@@ -108,9 +108,9 @@ void SV_ConnectClient(uint32_t clientnum) {
     if (sv.loadgame)
         memcpy(client->spawn_parms, spawn_parms, sizeof(spawn_parms));
     else {
-        PR_ExecuteProgram(GV_pGame()->SetNewParms);   // call the progs to get default spawn parms for the new client
+        PR_ExecuteProgram(pGame()->SetNewParms);   // call the progs to get default spawn parms for the new client
         for (int i = 0; i < NUM_SPAWN_PARMS; i++)
-            client->spawn_parms[i] = (&GV_pGame()->parm1)[i];
+            client->spawn_parms[i] = (&pGame()->parm1)[i];
     }
 
     SV_SendServerinfo(client);
@@ -261,20 +261,21 @@ int SV_ModelIndex(cString name) {
     ================
 */
 void SV_SaveSpawnparms() {
-    svs.serverflags = (uint32_t)GV_pGame()->serverflags;
+    svs.serverflags = (uint32_t)pGame()->serverflags;
     remoteClient = svs.clients;
     for (int i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
         if (!remoteClient->active)       continue;
 
         // call the progs to get default spawn parms for the new client
-        GV_pGame()->self = ED_GetEDictOffs(remoteClient->edict);
-        PR_ExecuteProgram(GV_pGame()->SetChangeParms);
+        pGame()->self = ED_GetEDictOffs(remoteClient->edict);
+        PR_ExecuteProgram(pGame()->SetChangeParms);
         for (int j = 0; j < NUM_SPAWN_PARMS; j++)
-            remoteClient->spawn_parms[j] = (&GV_pGame()->parm1)[j];
+            remoteClient->spawn_parms[j] = (&pGame()->parm1)[j];
     }
 }
 
 #include "z_hunk.h"
+#include "world.h" // SV_ClearWorld()
 /*
     ================
     SV_SpawnServer
@@ -368,23 +369,23 @@ void SV_SpawnServer(cString server
 
     // load the rest of the entities
     edict_p ent = ED_GetEDictByIdx(0);
-    memset(&ent->v, 0, pProgsDat->entityfields * 4);
+    memset(&ent->v, 0x00, MUL4(pProgsDat->entityfields));
     ent->free = false;
     ent->v.model = PR_SetQString(sv.worldmodel->name);
     ent->v.modelindex = 1;    // world model
     ent->v.solid = SOLID_BSP;
     ent->v.movetype = MOVETYPE_PUSH;
 
-    if (coop.value) GV_pGame()->coop = coop.value;
-    else            GV_pGame()->deathmatch = deathmatch.value;
+    if (coop.value) pGame()->coop = coop.value;
+    else            pGame()->deathmatch = deathmatch.value;
 
-    GV_pGame()->mapname = PR_SetQString(SV_GetName());
+    pGame()->mapname = PR_SetQString(SV_GetName());
 #ifdef QUAKE2
-    GV_pGame()->startspot = PR_SetQString(sv.startspot);
+    pGame()->startspot = PR_SetQString(sv.startspot);
 #endif
 
     // serverflags are for cross level information (sigils)
-    GV_pGame()->serverflags = (float)svs.serverflags;
+    pGame()->serverflags = (float)svs.serverflags;
 
     ED_LoadFromFile(sv.worldmodel->entities);
 

@@ -21,3 +21,9 @@ static inline BBox_t EvAbsBBox(const entvars_t *ev) {
         .maxs = ev->absmax
     };
 }
+
+static inline void EvSetAbsBBox(entvars_t *ev, BBox_t bb){
+    ev->absmin = bb.mins;
+    ev->absmax = bb.maxs;
+    // ev->size = BBoxSize(bb);
+}

@@ -121,6 +121,7 @@ typedef enum {
 
 typedef struct edict_s {
     bool            free;
+    bool            inUse; // TODO: use it instead of free because free = false by default and "free" is a reserved word
     link_t          area;       // linked to a division node or leaf
     EntLeaf_t       num_leafs;
     int16_t         leafnums[EntLeafsMax];
@@ -181,6 +182,7 @@ extern "C" {
     eval_p GetEdictFieldValue(edict_p ed, cString field);
 
     edict_p FindViewthing();
+
 #ifdef __cplusplus
 }
 #endif

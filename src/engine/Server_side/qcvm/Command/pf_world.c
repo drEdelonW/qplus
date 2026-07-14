@@ -144,7 +144,7 @@ void PF_changelevel() {
     cString s1 = G_STRING(OFS_PARM0);
     cString s2 = G_STRING(OFS_PARM1);
 
-    if ((int)GV_pGame()->serverflags & (SFL_NEW_UNIT | SFL_NEW_EPISODE))
+    if ((int)pGame()->serverflags & (SFL_NEW_UNIT | SFL_NEW_EPISODE))
         Cbuf_AddText(va("changelevel %s %s\n", s1, s2));
     else
         Cbuf_AddText(va("changelevel2 %s %s\n", s1, s2));

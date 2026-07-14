@@ -200,8 +200,8 @@ PR_ExecuteProgram
 void PR_ExecuteProgram(func_t fnum) {
     if (!fnum ||
         (fnum >= pProgsDat->functions.num)) {
-        if (GV_pGame()->self)
-            ED_Print(ED_GetEDictByOffs(GV_pGame()->self));
+        if (pGame()->self)
+            ED_Print(ED_GetEDictByOffs(pGame()->self));
         Host_Error("PR_ExecuteProgram: NULL function");
     }
     dFunction_p func = &pr_functions[fnum];
@@ -372,8 +372,8 @@ void PR_ExecuteProgram(func_t fnum) {
             } break;
 
             case OP_STATE: {
-                edict_p ed = ED_GetEDictByOffs(GV_pGame()->self);
-                ed->v.nextthink = GV_pGame()->time +
+                edict_p ed = ED_GetEDictByOffs(pGame()->self);
+                ed->v.nextthink = pGame()->time +
 #ifdef FPS_20
                     0.05f;
 #else

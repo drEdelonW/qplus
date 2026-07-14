@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "sv_phys_priv.h"
 #include "vector_tools.h"
+#include "BBox_tools.h"
 /*
 ==================
 ClipVelocity
@@ -36,19 +37,9 @@ MoveClipFlags_e ClipVelocity(vec3_t in, vec3_t normal, vec3_p out, float overbou
     if (!(normal.z))        blocked |= MOVECLIP_WALL;   // step
 
     float backoff = DotProduct(in, normal) * overbounce;
-
     *out = VectorMA(in, -backoff, normal);
-#if 0
-    for (int i = 0; i < VECT_DIM; i++) {
-        if ((out->v[i] < STOP_EPSILON) &&
-            (out->v[i] > -STOP_EPSILON)
-            )
-            out->v[i] = 0.0f;
-    }
-#else
     if (!(isVectorOutOfRange(*out, STOP_EPSILON)))
         *out = v3Zero;
-#endif
 
     return blocked;
 }
@@ -78,14 +69,20 @@ MoveClipFlags_e SV_FlyMove(edict_p pEntIn, SimDt_t time, trace_p steptrace) {
     int numbumps = 4;
     vec3_t planes[MAX_CLIP_PLANES];
     for (int bumpcount = 0; bumpcount < numbumps; bumpcount++) {
+#if 0
         if (!(pEntIn->v.velocity.x) &&
             !(pEntIn->v.velocity.y) &&
             !(pEntIn->v.velocity.z)
             )   break; // pEntIn->v.velocity.is_zero()
+#else
+        if (VectorCompare(pEntIn->v.velocity, v3Zero) // pEntIn->v.velocity.is_zero()
+            )   break;
+#endif
 
-        vec3_t end = VectorMA(pEntIn->v.origin, time_left, pEntIn->v.velocity);
-
-        trace_t trace = SV_Move(pEntIn->v.origin, *(BBox_p)&pEntIn->v.mins, end, MOVE_NORMAL, pEntIn);
+        trace_t trace = SV_MoveBox(
+            pEntIn->v.origin, VectorMA(pEntIn->v.origin, time_left, pEntIn->v.velocity),
+            MOVE_NORMAL, pEntIn
+        );
 
         if (trace.allsolid) { // entity is trapped in another solid
             pEntIn->v.velocity = v3Zero;
@@ -99,7 +96,7 @@ MoveClipFlags_e SV_FlyMove(edict_p pEntIn, SimDt_t time, trace_p steptrace) {
         }
 
         if (trace.fraction == 1)    break;  // moved the entire distance
-        if (!trace.pEnt)             Host_SysError("SV_FlyMove: !trace.pEnt");
+        if (!trace.pEnt)            Host_SysError("SV_FlyMove: !trace.pEnt");
 
         if (trace.plane.normal.z > 0.7f) {
             blocked |= MOVECLIP_FLOOR;  // floor
@@ -114,9 +111,7 @@ MoveClipFlags_e SV_FlyMove(edict_p pEntIn, SimDt_t time, trace_p steptrace) {
                 *steptrace = trace; // save for player extrafriction
         }
 
-        //
         // run the impact function
-        //
         SV_Impact(pEntIn, trace.pEnt);
         if (pEntIn->free)  break;  // removed by the impact function
 
@@ -131,11 +126,9 @@ MoveClipFlags_e SV_FlyMove(edict_p pEntIn, SimDt_t time, trace_p steptrace) {
         planes[numplanes] = trace.plane.normal;
         numplanes++;
 
-        //
         // modify original_velocity so it parallels all of the clip planes
-        //
         {
-            vec3_t  new_velocity;
+            vec3_t new_velocity;
             int i = 0;
             for (; i < numplanes; i++) {
                 ClipVelocity(original_velocity, planes[i], &new_velocity, 1);
@@ -163,10 +156,7 @@ MoveClipFlags_e SV_FlyMove(edict_p pEntIn, SimDt_t time, trace_p steptrace) {
             }
         }
 
-        //
-        // if original velocity is against the original velocity, stop dead
-        // to avoid tiny occilations in sloping corners
-        //
+        // if original velocity is against the original velocity, stop dead to avoid tiny occilations in sloping corners
         if (DotProduct(pEntIn->v.velocity, primal_velocity) <= 0.f) {
             pEntIn->v.velocity = v3Zero;
             return blocked;
@@ -177,12 +167,7 @@ MoveClipFlags_e SV_FlyMove(edict_p pEntIn, SimDt_t time, trace_p steptrace) {
 }
 
 
-/*
-============
-SV_AddGravity
 
-============
-*/
 void SV_AddGravity(edict_p pEntIn) {
 #ifdef QUAKE2
     float ent_gravity = (pEntIn->v.gravity) ? pEntIn->v.gravity : 1.0f;
@@ -193,22 +178,17 @@ void SV_AddGravity(edict_p pEntIn) {
     pEntIn->v.velocity.z -= (float)(ent_gravity * sv_gravity.value * host_frametime);
 }
 
-/*
-================
-SV_CheckVelocity
-================
-*/
+
 void SV_CheckVelocity(edict_p pEntIn) {
-    //
     // bound velocity
-    //
     for (int i = 0; i < VECT_DIM; i++) {
         if (IS_NAN(pEntIn->v.velocity.v[i])) {
             Con_Printf("Got a NaN velocity on %s\n", PR_GetQString(pEntIn->v.classname));
             pEntIn->v.velocity.v[i] = 0.f;
         }
         ClampInRange(-sv_maxvelocity.value, &pEntIn->v.velocity.v[i], sv_maxvelocity.value);
-
+    }
+    for (int i = 0; i < VECT_DIM; i++) {
         if (IS_NAN(pEntIn->v.origin.v[i])) {
             Con_Printf("Got a NaN origin on %s\n", PR_GetQString(pEntIn->v.classname));
             pEntIn->v.origin.v[i] = 0.f;
@@ -225,28 +205,28 @@ Two entities have touched, so run their touch functions
 ==================
 */
 void SV_Impact(edict_p e1, edict_p e2) {
-    int old_self = GV_pGame()->self;
-    int old_other = GV_pGame()->other;
+    int old_self = pGame()->self;
+    int old_other = pGame()->other;
 
-    GV_pGame()->time = (float)SV_GetTime();
+    pGame()->time = (float)SV_GetTime();
     if ((e1->v.touch) &&
         (e1->v.solid != SOLID_NOT)
         ) {
-        GV_pGame()->self = ED_GetEDictOffs(e1);
-        GV_pGame()->other = ED_GetEDictOffs(e2);
+        pGame()->self = ED_GetEDictOffs(e1);
+        pGame()->other = ED_GetEDictOffs(e2);
         PR_ExecuteProgram(e1->v.touch);
     }
 
     if ((e2->v.touch) &&
         (e2->v.solid != SOLID_NOT)
         ) {
-        GV_pGame()->self = ED_GetEDictOffs(e2);
-        GV_pGame()->other = ED_GetEDictOffs(e1);
+        pGame()->self = ED_GetEDictOffs(e2);
+        pGame()->other = ED_GetEDictOffs(e1);
         PR_ExecuteProgram(e2->v.touch);
     }
 
-    GV_pGame()->self = old_self;
-    GV_pGame()->other = old_other;
+    pGame()->self = old_self;
+    pGame()->other = old_other;
 }
 
 
@@ -270,9 +250,9 @@ bool SV_RunThink(edict_p pEntIn) {
     // don't let things stay in the past.
     // it is possible to start that way by a trigger with a local time.
     pEntIn->v.nextthink = 0.f;
-    GV_pGame()->time = thinktime;
-    GV_pGame()->self = ED_GetEDictOffs(pEntIn);
-    GV_pGame()->other = EdictWorld; // should be 0
+    pGame()->time = thinktime;
+    pGame()->self = ED_GetEDictOffs(pEntIn);
+    pGame()->other = EdictWorld; // should be 0
     PR_ExecuteProgram(pEntIn->v.think);
     return !pEntIn->free;
 }

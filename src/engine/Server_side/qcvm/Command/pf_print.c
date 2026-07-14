@@ -56,7 +56,7 @@ void PF_error() {
         "======SERVER ERROR in %s:\n%s\n",
         PR_GetQString(pr_xFunction->s_name), PF_VarString(0)
     );
-    ED_Print(ED_GetEDictByOffs(GV_pGame()->self));
+    ED_Print(ED_GetEDictByOffs(pGame()->self));
     Host_Error("Program error");
 }
 
@@ -76,7 +76,7 @@ void PF_objerror() {
         "======OBJECT ERROR in %s:\n%s\n",
         PR_GetQString(pr_xFunction->s_name), PF_VarString(0)
     );
-    edict_p ed = ED_GetEDictByOffs(GV_pGame()->self);
+    edict_p ed = ED_GetEDictByOffs(pGame()->self);
     ED_Print(ed);
     ED_Free(ed);
 

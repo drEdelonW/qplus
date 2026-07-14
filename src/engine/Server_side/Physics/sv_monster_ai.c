@@ -123,7 +123,7 @@ void SV_NewChaseDir(edict_p actor, edict_p enemy, float dist) {
 
 }
 
-
+#warning BBox tool make
 bool SV_CloseEnough(edict_p ent, edict_p goal, float dist) {    // TODO: make it in vector tools
     for (int i = 0; i < VECT_DIM; i++) {
         if ((goal->v.absmin.v[i] > (ent->v.absmax.v[i] + dist)) ||
@@ -135,7 +135,7 @@ bool SV_CloseEnough(edict_p ent, edict_p goal, float dist) {    // TODO: make it
 
 
 void SV_MoveToGoal() {
-    edict_p ent = ED_GetEDictByOffs(GV_pGame()->self);
+    edict_p ent = ED_GetEDictByOffs(pGame()->self);
     edict_p goal = ED_GetEDictByOffs(ent->v.goalentity);
     float dist = G_FLOAT(OFS_PARM0);
 

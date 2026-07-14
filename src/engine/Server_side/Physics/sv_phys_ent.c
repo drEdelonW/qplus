@@ -246,8 +246,8 @@ void SV_Physics_Step(edict_p pEntIn) {
     if ((EntityFlags_t)groundentity->v.flags & FL_CONVEYOR)     pEntIn->v.basevelocity = VectorScale(groundentity->v.movedir, groundentity->v.speed);
     else                                                        pEntIn->v.basevelocity = v3Zero;
     //@@
-    GV_pGame()->time = SV_GetTime();
-    GV_pGame()->self = ED_GetEDictOffs(pEntIn);
+    pGame()->time = SV_GetTime();
+    pGame()->self = ED_GetEDictOffs(pEntIn);
     PF_WaterMove();
 
     SV_CheckVelocity(pEntIn);
@@ -368,9 +368,8 @@ trace_t SV_Trace_Toss(edict_p pEntIn, edict_p ignore) {
         SV_CheckVelocity(tent);
         SV_AddGravity(tent);
         tent->v.angles = AngleMA(tent->v.angles, (float)host_frametime, tent->v.avelocity);
-        trace_t trace = SV_Move(
-            tent->v.origin, EvBBox(&tent->v),
-            VectorMA(tent->v.origin, (float)host_frametime, tent->v.velocity),
+        trace_t trace = SV_MoveBox(
+            tent->v.origin, VectorMA(tent->v.origin, (float)host_frametime, tent->v.velocity),
             MOVE_NORMAL, tent
         );
         tent->v.origin = trace.endpos;

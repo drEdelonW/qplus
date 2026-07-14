@@ -203,9 +203,6 @@ void SetMinMaxSize(edict_p edict, BBox_t bb, bool rotate) {
     // set derived values
     edict->v.mins = rbb.mins;
     edict->v.maxs = rbb.maxs;
-#elif 0
-    edict->v.mins = bb.mins;
-    edict->v.maxs = bb.maxs;
 #else
     EvSetBBox(&edict->v, bb);
 #endif
@@ -286,7 +283,7 @@ void PF_setspawnparms() {
     RmtClient_p client = svs.clients + (i - EdictPlayer1);
 
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
-        (&GV_pGame()->parm1)[i] = client->spawn_parms[i];
+        (&pGame()->parm1)[i] = client->spawn_parms[i];
 }
 
 
@@ -353,7 +350,7 @@ void PF_checkclient() {
     }
 
     // if current entity can't possibly see the check entity, return 0
-    edict_p self = ED_GetEDictByOffs(GV_pGame()->self);
+    edict_p self = ED_GetEDictByOffs(pGame()->self);
     mLeaf_p leaf = Mod_PointInLeaf(VectorAdd(self->v.origin, self->v.view_ofs), sv.worldmodel);
     int Leaf = (leaf - sv.worldmodel->leafs) - 1;
     if ((Leaf < 0) ||

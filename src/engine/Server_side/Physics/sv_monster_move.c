@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sv_phys.h"
 #include "types.h"
 #include "BBox.h"
+#include "BBox_tools.h"
 #include "Edict.h"
 #include "world.h"
 #include "trace.h"
@@ -39,13 +40,11 @@ is not a staircase.
 #define STEPSIZE (18)
 
 bool SV_CheckBottom(edict_p ent) {
-    BBox_t bb = *(BBox_p)&ent->v.mins;
+    BBox_t bb = EvBBox(&ent->v);
 
     // if all of the points under the corners are solid world, don't bother with the tougher checks
     // the corners must be within 16 of the midpoint
-    vec3_t start = v3Zero; {
-        start.z = bb.mins.z - 1.f;
-    };
+    vec3_t start = (vec3_t){ .z = bb.mins.z - 1.f };
     for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++) {
             start.x = (x) ? bb.maxs.x : bb.mins.x;
@@ -59,18 +58,13 @@ bool SV_CheckBottom(edict_p ent) {
 
 realcheck:
     // c_no++;
-    //
     // check it for real...
-    //
     start = VectorScale(VectorAdd(bb.mins, bb.maxs), 0.5f); {
         start.z = bb.mins.z;   // the midpoint must be within 16 of the bottom
     }
 
-    vec3_t stop = start; {
-        stop.z -= TWICE(STEPSIZE);
-    }
-
-    trace_t trace = SV_Move(start, bbZero, stop, MOVE_NOMONSTERS, ent);
+    vec3_t stop = start; { stop.z -= TWICE(STEPSIZE); }
+    trace_t trace = SV_MoveLine(start, stop, MOVE_NOMONSTERS, ent);
 
     if (trace.fraction == 1.f)
         return false;
@@ -84,7 +78,7 @@ realcheck:
             start.x = stop.x = (x) ? bb.maxs.x : bb.mins.x;
             start.y = stop.y = (y) ? bb.maxs.y : bb.mins.y;
 
-            trace = SV_Move(start, bbZero, stop, MOVE_NOMONSTERS, ent);
+            trace = SV_MoveLine(start, stop, MOVE_NOMONSTERS, ent);
             if ((trace.fraction != 1.f) &&
                 (trace.endpos.z > bottom)
                 )   bottom = trace.endpos.z;
@@ -115,7 +109,7 @@ SV_movestep
 Called by monster program code.
 The move will be adjusted for slopes and stairs, but if the move isn't
 possible, no move is done, false is returned, and
-GV_pGame()->trace_normal is set to the normal of the blocking wall
+pGame()->trace_normal is set to the normal of the blocking wall
 =============
 */
 bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
@@ -136,9 +130,9 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
                 if (dz > 40)    neworg.z -= 8;
                 if (dz < 30)    neworg.z += 8;
             }
-            trace_t trace = SV_Move(ent->v.origin, *(BBox_p)&ent->v.mins, neworg, MOVE_NORMAL, ent);
 
-            if (trace.fraction == 1) {
+            trace_t trace = SV_MoveBox(ent->v.origin, neworg, MOVE_NORMAL, ent);
+            if (trace.fraction == 1.f) {
                 if (((int)ent->v.flags & FL_SWIM) &&
                     SV_PointContents(trace.endpos) == CONTENTS_EMPTY)
                     return false; // swim monster left water
@@ -158,22 +152,20 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
 
     // push down from a step height above the wished position
     neworg.z += STEPSIZE;
-    vec3_t end = neworg;
-    end.z -= STEPSIZE * 2.0f;
-
-    trace_t trace = SV_Move(neworg, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent);
+    vec3_t end = neworg; { end.z -= STEPSIZE * 2.0f; }
+    trace_t trace = SV_MoveBox(neworg, end, MOVE_NORMAL, ent);
 
     if (trace.allsolid)
         return false;
 
     if (trace.startsolid) {
         neworg.z -= STEPSIZE;
-        trace = SV_Move(neworg, *(BBox_p)&ent->v.mins, end, MOVE_NORMAL, ent);
+        trace = SV_MoveBox(neworg, end, MOVE_NORMAL, ent);
         if ((trace.allsolid) ||
             (trace.startsolid)
             )   return false;
     }
-    if (trace.fraction == 1) {
+    if (trace.fraction == 1.f) {
         // if monster had the ground pulled out, go ahead and fall
         if ((int)ent->v.flags & FL_PARTIALGROUND) {
             ent->v.origin = VectorAdd(ent->v.origin, move);

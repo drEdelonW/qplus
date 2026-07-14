@@ -114,10 +114,7 @@ uint32_t banAddr = 0x00000000;
 uint32_t banMask = 0xFFFFFFFF;
 
 void NET_Ban_f() {
-    char addrStr[32];
-    char maskStr[32];
     void (*print) (cStringRO fmt, ...);
-
     if (!isCliCmd()) {
         if (!SV_IsActive()) {
             Cmd_ForwardToServer();
@@ -126,39 +123,37 @@ void NET_Ban_f() {
         print = Con_Printf;
     }
     else {
-        if ((GV_pGame()->deathmatch) &&
+        if ((pGame()->deathmatch) &&
             !(remoteClient->privileged)
             )  return;
         print = SV_ClientPrintf;
     }
 
     switch (Cmd_Argc()) {
-    case 1:
+    case 1: {
         if (((in_addr_p)&banAddr)->s_addr) {
-            Q_strcpy(addrStr, inet_ntoa(*(in_addr_p)&banAddr));
-            Q_strcpy(maskStr, inet_ntoa(*(in_addr_p)&banMask));
+            char addrStr[32];   Q_strcpy(addrStr, inet_ntoa(*(in_addr_p)&banAddr));
+            char maskStr[32];   Q_strcpy(maskStr, inet_ntoa(*(in_addr_p)&banMask));
             print("Banning %s [%s]\n", addrStr, maskStr);
         }
         else
             print("Banning not active\n");
-        break;
+    } break;
 
-    case 2:
+    case 2: {
         if (Q_strcasecmp(Cmd_Argv(1), "off") == 0)
             banAddr = 0x00000000;
         else
             banAddr = inet_addr(Cmd_Argv(1));
         banMask = 0xffffffff;
-        break;
+    } break;
 
-    case 3:
+    case 3: {
         banAddr = inet_addr(Cmd_Argv(1));
         banMask = inet_addr(Cmd_Argv(2));
-        break;
+    } break;
 
-    default:
-        print("BAN ip_address [mask]\n");
-        break;
+    default:    print("BAN ip_address [mask]\n");   break;
     }
 }
 #endif
@@ -236,19 +231,12 @@ int SendMessageNext(qsocket_p sock) {
 
 
 int ReSendMessage(qsocket_p sock) {
-    uint32_t dataLen;
-    uint32_t eom;
-
-    if (sock->sendMessageLength <= MAX_DATAGRAM) {
-        dataLen = sock->sendMessageLength;
-        eom = NETFLAG_EOM;
-    }
-    else {
-        dataLen = MAX_DATAGRAM;
-        eom = 0;
-    }
+    uint32_t dataLen = (sock->sendMessageLength <= MAX_DATAGRAM) ?
+        sock->sendMessageLength : MAX_DATAGRAM;
     uint32_t packetLen = NET_HEADERSIZE + dataLen;
 
+    uint32_t eom = (sock->sendMessageLength <= MAX_DATAGRAM) ?
+        NETFLAG_EOM : 0;
     packetBuffer.length = BigLong(packetLen | (NETFLAG_DATA | eom));
     packetBuffer.sequence = BigLong(sock->sendSequence - 1);
     Q_memcpy(packetBuffer.data, sock->sendMessage, dataLen);
@@ -471,18 +459,13 @@ void NET_Stats_f() {
 }
 
 
+
+static void Test_Poll();
+PollProcedure testPollProcedure = { NULL, 0.0, Test_Poll };
 static bool _testInProgress = false;
 static int _testPollCount;
 static int _testDriver;
 static int _testSocket;
-
-static void Test_Poll();
-PollProcedure testPollProcedure = {
-    NULL,
-    0.0,
-    Test_Poll
-};
-
 static void Test_Poll() {
     qsockaddr_t clientaddr;
 
@@ -501,9 +484,7 @@ static void Test_Poll() {
         if ((control == -1) ||
             ((control & (~NETFLAG_LENGTH_MASK)) != NETFLAG_CTL) ||
             ((control & NETFLAG_LENGTH_MASK) != len)
-            ) {
-            break;
-        }
+            )   break;
 
         if (MSG_ReadByte() != CCREP_PLAYER_INFO)
             Host_SysError("Unexpected repsonse to Player Info request\n");
@@ -517,8 +498,7 @@ static void Test_Poll() {
 
         Con_Printf(
             "%d:%s\n  frags:%3i  colors:%u %u  time:%u\n  %s\n",
-            playerNumber,
-            name, frags,
+            playerNumber, name, frags,
             colors >> 4, colors & 0x0f,
             connectTime / 60,
             address
@@ -526,9 +506,8 @@ static void Test_Poll() {
     }
 
     _testPollCount--;
-    if (_testPollCount) {
+    if (_testPollCount)
         SchedulePollProcedure(&testPollProcedure, 0.1);
-    }
     else {
         dfunc.CloseSocket(_testSocket);
         _testInProgress = false;
@@ -599,12 +578,7 @@ static int _test2Driver;
 static int _test2Socket;
 
 static void Test2_Poll();
-PollProcedure test2PollProcedure = {
-    NULL,
-    0.0,
-    Test2_Poll
-};
-
+PollProcedure test2PollProcedure = { NULL, 0.0, Test2_Poll };
 static void Test2_Poll() {
     qsockaddr_t clientaddr;
 
@@ -622,28 +596,32 @@ static void Test2_Poll() {
     if ((control == -1) ||
         ((control & (~NETFLAG_LENGTH_MASK)) != NETFLAG_CTL) ||
         ((control & NETFLAG_LENGTH_MASK) != len) ||
-        (MSG_ReadByte() != CCREP_RULE_INFO))
-        goto Error;
+        (MSG_ReadByte() != CCREP_RULE_INFO)
+        )   goto Error;
 
-    char name[256]; name[0] = 0; Q_strcpy(name, MSG_ReadString());
-    if (name[0] == 0)
-        goto Done;
-    char value[256]; Q_strcpy(value, MSG_ReadString());
-
-    Con_Printf("%-16.16s  %-16.16s\n", name, value);
-
-    SZ_Clear(&net_message);
-    // save space for the header, filled in later
-    MSG_WriteLong(&net_message, 0);
-    MSG_WriteByte(&net_message, CCREQ_RULE_INFO);
-    MSG_WriteString(&net_message, name);
-    *((int*)net_message.data) = BigLong(NETFLAG_CTL | (net_message.cursize & NETFLAG_LENGTH_MASK));
+    {
+        char name[256]; { name[0] = 0x00; }
+        Q_strcpy(name, MSG_ReadString());
+        if (name[0] == 0x00)
+            goto Done;
+        else {
+            char value[256]; Q_strcpy(value, MSG_ReadString());
+            Con_Printf("%-16.16s  %-16.16s\n", name, value);
+        }
+        SZ_Clear(&net_message);
+        // save space for the header, filled in later
+        MSG_WriteLong(&net_message, 0);
+        MSG_WriteByte(&net_message, CCREQ_RULE_INFO);
+        MSG_WriteString(&net_message, name);
+    }
+    *((int*)net_message.data) = BigLong((net_message.cursize & NETFLAG_LENGTH_MASK) | NETFLAG_CTL);
     dfunc.Write(_test2Socket, net_message.data, net_message.cursize, &clientaddr);
     SZ_Clear(&net_message);
 
 Reschedule:
-    SchedulePollProcedure(&test2PollProcedure, 0.05);
-    return;
+    {
+        SchedulePollProcedure(&test2PollProcedure, 0.05);  return;
+    }
 
 Error:
     Con_Printf("Unexpected repsonse to Rule Info request\n");

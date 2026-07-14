@@ -77,10 +77,10 @@ SV_Physics
 */
 void SV_Physics() {
     // let the progs know that a new frame has started
-    GV_pGame()->self = EdictWorld;
-    GV_pGame()->other = EdictWorld;
-    GV_pGame()->time = (float)SV_GetTime();
-    PR_ExecuteProgram(GV_pGame()->StartFrame);
+    pGame()->self = EdictWorld;
+    pGame()->other = EdictWorld;
+    pGame()->time = (float)SV_GetTime();
+    PR_ExecuteProgram(pGame()->StartFrame);
 
     //SV_CheckAllEnts();
 
@@ -91,7 +91,7 @@ void SV_Physics() {
 
         if (ent->free)  continue;
 
-        if (GV_pGame()->force_retouch)
+        if (pGame()->force_retouch)
             SV_LinkEdict(ent, true); // force retouch even for stationary
 
         if ((e > EdictWorld) &&
@@ -117,8 +117,8 @@ void SV_Physics() {
         }
     }
 
-    if (GV_pGame()->force_retouch)
-        GV_pGame()->force_retouch--;
+    if (pGame()->force_retouch)
+        pGame()->force_retouch--;
 
     AddSvSimTime(host_frametime);
 }

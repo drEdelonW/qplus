@@ -901,9 +901,9 @@ void Host_Kill_f() {
         return;
     }
 
-    GV_pGame()->time = (float)SV_GetTime();
-    GV_pGame()->self = ED_GetEDictOffs(sv_player);
-    PR_ExecuteProgram(GV_pGame()->ClientKill);
+    pGame()->time = (float)SV_GetTime();
+    pGame()->self = ED_GetEDictOffs(sv_player);
+    PR_ExecuteProgram(pGame()->ClientKill);
 }
 
 
@@ -978,18 +978,18 @@ void Host_Spawn_f() {
         // copy spawn parms out of the RmtClient_t
 
         for (int i = 0; i < NUM_SPAWN_PARMS; i++)
-            (&GV_pGame()->parm1)[i] = remoteClient->spawn_parms[i];
+            (&pGame()->parm1)[i] = remoteClient->spawn_parms[i];
 
         // call the spawn function
 
-        GV_pGame()->time = (float)SV_GetTime();
-        GV_pGame()->self = ED_GetEDictOffs(sv_player);
-        PR_ExecuteProgram(GV_pGame()->ClientConnect);
+        pGame()->time = (float)SV_GetTime();
+        pGame()->self = ED_GetEDictOffs(sv_player);
+        PR_ExecuteProgram(pGame()->ClientConnect);
 
         if ((Host_FloatTime() - remoteClient->netconnection->connecttime) <= SV_GetTime())
             Host_Printf("%s entered the game\n", remoteClient->name);
 
-        PR_ExecuteProgram(GV_pGame()->PutClientInServer);
+        PR_ExecuteProgram(pGame()->PutClientInServer);
     }
 
 
@@ -1014,10 +1014,10 @@ void Host_Spawn_f() {
     //
     // send some stats
     //
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALSECRETS);  MSG_WriteLong(pBuf, (int32_t)GV_pGame()->total_secrets);
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALMONSTERS); MSG_WriteLong(pBuf, (int32_t)GV_pGame()->total_monsters);
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_SECRETS);       MSG_WriteLong(pBuf, (int32_t)GV_pGame()->found_secrets);
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_MONSTERS);      MSG_WriteLong(pBuf, (int32_t)GV_pGame()->killed_monsters);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALSECRETS);  MSG_WriteLong(pBuf, (int32_t)pGame()->total_secrets);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALMONSTERS); MSG_WriteLong(pBuf, (int32_t)pGame()->total_monsters);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_SECRETS);       MSG_WriteLong(pBuf, (int32_t)pGame()->found_secrets);
+    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_MONSTERS);      MSG_WriteLong(pBuf, (int32_t)pGame()->killed_monsters);
 
 
     //
@@ -1077,7 +1077,7 @@ void Host_Kick_f() {
         }
     }
     else
-        if ((GV_pGame()->deathmatch) &&
+        if ((pGame()->deathmatch) &&
             !(remoteClient->privileged)
             )  return;
 
@@ -1152,7 +1152,7 @@ void Host_Give_f() {
         Cmd_ForwardToServer();
         return;
     }
-    if ((GV_pGame()->deathmatch) &&
+    if ((pGame()->deathmatch) &&
         !(remoteClient->privileged)
         )  return;
 

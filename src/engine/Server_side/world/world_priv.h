@@ -55,18 +55,17 @@ struct areaNode_s {
 extern areaNode_t   _sv_AreaNodes[AREA_NODES];
 
 // world_hull.c
-Hull_p      SV_HullForBox(BBox_t bb);
+// Hull_p      SV_HullForBox(BBox_t bb);
 Hull_p      SV_HullForEntity(edict_p ent, BBox_t bb, vec3_p offset);
-contents_t  SV_HullPointContents(Hull_p hull, int num, vec3_t point);
+// contents_t  SV_HullPointContents(Hull_p hull, int num, vec3_t point);
 void        SV_InitBoxHull(void);
 
 // world_area.c
-areaNode_p  SV_CreateAreaNode(int depth, BBox_t bb);
-void        SV_ClearWorld(void);
-void        SV_FindTouchedLeafs(edict_p ent, mNode_p node);
-void        SV_TouchLinks(edict_p ent, areaNode_p node);
+// areaNode_p  SV_CreateAreaNode(int depth, BBox_t bb);
+// void        SV_FindTouchedLeafs(edict_p ent, mNode_p node);
+// void        SV_TouchLinks(edict_p ent, areaNode_p node);
 
 // world_move.c
-trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end);
-void    SV_ClipToLinks(areaNode_p node, moveClip_p clip);
-void    SV_MoveBounds(vec3_t start, BBox_t bb, vec3_t end, BBox_p box);
+// trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end);
+// void    SV_ClipToLinks(areaNode_p node, moveClip_p clip);
+// void    SV_MoveBounds(vec3_t start, BBox_t bb, vec3_t end, BBox_p box);
