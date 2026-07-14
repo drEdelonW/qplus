@@ -318,7 +318,7 @@ Can parse either fields or globals
 returns false if error
 =============
 */
-bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s) {
+bool ED_ParseEpair(edict_p base, dDef_p key, cString s) {
     TypeLess_ptr dstPtr = (TypeLess_ptr)((int32_p)base + key->ofs);
 
     switch (key->type & ~DEF_SAVEGLOBAL) {

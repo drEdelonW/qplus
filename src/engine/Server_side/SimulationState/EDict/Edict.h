@@ -180,7 +180,7 @@ extern "C" {
     cString ED_ParseEdict(cString data, edict_p ent);
 
     void ED_LoadFromFile(cString data);
-    bool ED_ParseEpair(TypeLess_ptr base, dDef_p key, cString s);
+    bool ED_ParseEpair(edict_p base, dDef_p key, cString s);
 
     edict_p ED_GetEDictByIdx(EdIdx idx);
     EdIdx ED_GetEDictIdx(edict_p edict);

@@ -63,7 +63,7 @@ void ED_ParseGlobals(cString data) {
             continue;
         }
 
-        if (!ED_ParseEpair(GV_pBaseGlobals(), key, com.token))
+        if (!ED_ParseEpair(GV_pEdict(OFS_NULL), key, com.token))
             Host_Error("ED_ParseGlobals: parse error");
     }
 }
