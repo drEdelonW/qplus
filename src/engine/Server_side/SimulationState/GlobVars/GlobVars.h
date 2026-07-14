@@ -1,12 +1,13 @@
 #pragma once
 
 #include "progdefs.h"
-#include "Edict.h"  //
+#include "Edict.h"  // edict_p
+#include "vmValue.h"  // eval_p
 
 typedef globalvars_t* globalvars_p;
 extern globalvars_p pr_global_struct;   // global variable of game settings
-extern float_p      pr_globals;         // same as pr_global_struct
-
+// extern float_p      pr_globals;         // same as pr_global_struct
+float_p GV_pBaseGlobals();
 #if 0
 // #define RETURN_EDICT(edict) (((int *)pr_globals)[OFS_RETURN] = ED_GetEDictOffs(edict))
 // #define G_FLOAT(o)          (pr_globals[(o)])
@@ -24,6 +25,8 @@ extern float_p      pr_globals;         // same as pr_global_struct
 #else
 
 void RETURN_EDICT(edict_p edict);
+eval_p GV_pEval(PrOfs_e Param);
+#define G_EVAL(o)  (*(GV_pEval(o)))
 float_p GV_pFloat(PrOfs_e Param);
 #define G_FLOAT(o)  (*(GV_pFloat(o)))
 int32_p GV_pInt(PrOfs_e Param);

@@ -12,8 +12,9 @@ void initProgGlobals(progLump_t pl) {
         pr_globals[i] = LittleFloat(pr_globals[i]);
 }
 
-
+float_p GV_pBaseGlobals() { return pr_globals; }
 void RETURN_EDICT(edict_p edict) { ((int32_p)pr_globals)[OFS_RETURN] = ED_GetEDictOffs(edict); }
+eval_p GV_pEval(PrOfs_e Param) { return (eval_p)&pr_globals[Param]; }
 float_p GV_pFloat(PrOfs_e Param) { return (float_p)&pr_globals[Param]; }
 int32_p GV_pInt(PrOfs_e Param) { return (int32_p)&pr_globals[Param]; }
 vec3_p GV_pVec3(PrOfs_e Param) { return (vec3_p)&pr_globals[Param]; }

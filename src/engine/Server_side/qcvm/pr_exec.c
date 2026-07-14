@@ -154,14 +154,14 @@ int32_t PR_EnterFunction(dFunction_p func) {
         PR_RunError("PR_ExecuteProgram: locals stack overflow\n");
 
     for (int i = 0; i < param_used; i++)
-        _localStack[_localStack_used + i] = ((int32_p)pr_globals)[func->parm_start + i];
+        _localStack[_localStack_used + i] = G_INT(func->parm_start + i);
     _localStack_used += param_used;
 
     // copy parameters
     int param_ofs = func->parm_start;
     for (int i = 0; i < func->numparms; i++) {
         for (int j = 0; j < func->parm_size[i]; j++) {
-            ((int32_p)pr_globals)[param_ofs] = ((int32_p)pr_globals)[OFS_PARM0 + i * 3 + j];
+            G_INT(param_ofs) = G_INT(OFS_PARM0 + i * 3 + j);
             param_ofs++;
         }
     }
@@ -184,7 +184,7 @@ int32_t PR_LeaveFunction() {
     if (_localStack_used < 0)   PR_RunError("PR_ExecuteProgram: locals stack underflow\n");
 
     for (int i = 0; i < param_used; i++)
-        ((int32_p)pr_globals)[pr_xFunction->parm_start + i] = _localStack[_localStack_used + i];
+        G_INT(pr_xFunction->parm_start + i) = _localStack[_localStack_used + i];
 
     // up stack
     _pr_Depth--;
@@ -219,9 +219,9 @@ void PR_ExecuteProgram(func_t fnum) {
         stack++; // next statement
 
         dStatement_p ST = PR_GetStack(stack);
-        eval_p A1 = (eval_p)&pr_globals[ST->a];
-        eval_p A2 = (eval_p)&pr_globals[ST->b];
-        eval_p R  = (eval_p)&pr_globals[ST->c];
+        eval_p A1 = GV_pEval(ST->a);
+        eval_p A2 = GV_pEval(ST->b);
+        eval_p R  = GV_pEval(ST->c);
 
         if (!--runaway)     PR_RunError("runaway loop error");
 

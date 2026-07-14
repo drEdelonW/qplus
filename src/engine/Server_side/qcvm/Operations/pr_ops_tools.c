@@ -128,7 +128,7 @@ padded to 20 field width
 */
 static char _line[128];
 cString PR_GlobalString(int32_t ofs) {
-    TypeLess_ptr val = (TypeLess_ptr)&pr_globals[ofs];
+    eval_p val = GV_pEval(ofs);
     dDef_p def = ED_GlobalAtOfs(ofs);
     if (!def)
         snprintf(_line,

@@ -37,7 +37,7 @@ void ED_WriteGlobals(FILE* f) {
 
             cString name = PR_GetQString(def->s_name);
             fprintf(f, "\"%s\" ", name);
-            fprintf(f, "\"%s\"\n", PR_UglyValueString(type, (eval_p)&pr_globals[def->ofs]));
+            fprintf(f, "\"%s\"\n", PR_UglyValueString(type, GV_pEval(def->ofs)));
         }
     } fprintf(f, "}\n");
 }
@@ -63,7 +63,7 @@ void ED_ParseGlobals(cString data) {
             continue;
         }
 
-        if (!ED_ParseEpair((TypeLess_ptr)pr_globals, key, com.token))
+        if (!ED_ParseEpair(GV_pBaseGlobals(), key, com.token))
             Host_Error("ED_ParseGlobals: parse error");
     }
 }
