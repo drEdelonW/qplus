@@ -1,5 +1,4 @@
 #include "GlobVars.h"
-// #include "progdefs.h"
 #include "endian_tools.h"
 
 globalvars_p   pr_global_struct;   // much more
@@ -12,3 +11,27 @@ void initProgGlobals(progLump_t pl) {
     for (int i = 0; i < pl.num; i++)
         pr_globals[i] = LittleFloat(pr_globals[i]);
 }
+
+
+float_p GV_pFloat(PrOfs_e Param) {
+    return (float_p)&pr_globals[Param];
+}
+
+int32_p GV_pInt(PrOfs_e Param) {
+    return (int32_p)&pr_globals[Param];
+}
+
+vec3_p GV_pVec3(PrOfs_e Param) {
+    return (vec3_p)&pr_globals[Param];
+}
+
+ang3_p GV_pAng3(PrOfs_e Param) {
+    return (ang3_p)&pr_globals[Param];
+}
+
+string_p GV_pqStr(PrOfs_e Param) {
+    return (string_p)&pr_globals[Param];
+}
+// int32_p GV_Int(PrOfs_e Param) { return (int32_p)&pr_globals[Param]; }
+// int32_p GV_Int(PrOfs_e Param) { return (int32_p)&pr_globals[Param]; }
+// int32_p GV_Int(PrOfs_e Param) { return (int32_p)&pr_globals[Param]; }

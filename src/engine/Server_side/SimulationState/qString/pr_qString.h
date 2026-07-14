@@ -4,6 +4,7 @@
 #include "progLump.h"
 
 typedef int32_t string_t;
+typedef string_t* string_p;
 typedef int32_t qVmString_t;    // should be signed!!! it was [string_t] from "pr_comp.h"
 
 #define E_STRING(e, o)  PR_GetQString(*(qVmString_t*)&((float_p)&(e)->v)[(o)])
