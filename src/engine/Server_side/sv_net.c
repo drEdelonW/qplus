@@ -420,7 +420,7 @@ void SV_CreateBaseline() {
     for (EdIdx entnum = EdictWorld; entnum < GetEdNum(); entnum++) {
         // get the current server version
         edict_p svent = ED_GetEDictByIdx(entnum);
-        if ((svent->free) ||
+        if ((!svent->inUse) ||
             (
                 (entnum > GetSvMaxClients()) &&
                 !(svent->v.modelindex))

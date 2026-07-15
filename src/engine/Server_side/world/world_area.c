@@ -155,7 +155,7 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
         SV_UnlinkEdict(ent); // unlink from old position
 
     if ((ent == ED_GetEDictByIdx(EdictWorld)) ||  // don't add the world
-        (ent->free)
+        (!ent->inUse)
         )   return;
     // set the abs box
 

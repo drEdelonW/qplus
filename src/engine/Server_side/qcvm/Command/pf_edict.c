@@ -49,7 +49,7 @@ void PF_Find() {
 
     for (edict++; edict < GetEdNum(); edict++) {
         edict_p ed = ED_GetEDictByIdx(edict);
-        if (ed->free)   continue;
+        if (!ed->inUse)   continue;
 
         cString t = E_STRING(ed, f);
         if (!t)            continue;
@@ -80,7 +80,7 @@ void PF_Find() {
 
     for (edict++; edict < GetEdNum(); edict++) {
         edict_p ed = ED_GetEDictByIdx(edict);
-        if (ed->free)   continue;
+        if (!ed->inUse)   continue;
         cString t = E_STRING(ed, f);
         if (!t)         continue;
         if (!strcmp(t, str)
@@ -108,7 +108,7 @@ void PF_findradius() {
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
         edict_p ent = ED_GetEDictByIdx(e);
 
-        if ((ent->free) ||
+        if ((!ent->inUse) ||
             (ent->v.solid == SOLID_NOT)
             )   continue;
 
@@ -145,7 +145,7 @@ void PF_nextent() {
             RETURN_EDICT(ED_GetEDictByIdx(EdictWorld)); return;
         }
         edict_p ent = ED_GetEDictByIdx(i);
-        if (!ent->free) {
+        if (ent->inUse) {
             RETURN_EDICT(ent); return;
         }
     }
@@ -305,7 +305,7 @@ uint8_t PF_newcheckclient(uint8_t check) {
         if (i == check) break; // didn't find anything else
 
         edict_p ent = ED_GetEDictByIdx(i);
-        if ((ent->free) ||
+        if ((!ent->inUse) ||
             (ent->v.health <= 0) ||
             ((int)ent->v.flags & FL_NOTARGET)
             )   continue;
@@ -347,7 +347,7 @@ void PF_checkclient() {
 
     // return check if it might be visible
     edict_p ent = ED_GetEDictByIdx(sv.lastcheck);
-    if ((ent->free) ||
+    if ((!ent->inUse) ||
         (ent->v.health <= 0.f)
         ) {
         RETURN_EDICT(ED_GetEDictByIdx(EdictWorld));   return;

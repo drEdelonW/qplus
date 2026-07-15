@@ -41,5 +41,5 @@ typedef struct {
 } dprograms_t;      STATIC_ASSERT_SIZE(dprograms_t, 2*4 + 6*8 + 4); // 60
 typedef dprograms_t* dprograms_p;
 
-extern dprograms_p  pProgsDat;
+extern dprograms_p  pProgsDat;  /* TODO: hide it */
 static inline size_t SizeOfEntFields(){ return MUL4(pProgsDat->entityfields); }

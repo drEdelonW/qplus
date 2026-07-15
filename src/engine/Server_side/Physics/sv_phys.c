@@ -49,7 +49,7 @@ void SV_CheckAllEnts() {
     // see if any solid entities are inside the final position
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
         edict_p check = ED_GetEDictByIdx(e);
-        if (check->free) continue;
+        if (!check->inUse) continue;
 
         switch ((movetype_t)check->v.movetype) {
 #ifdef QUAKE2
@@ -88,7 +88,7 @@ void SV_Physics() {
     for (EdIdx e = EdictWorld; e < GetEdNum(); e++) {
         edict_p ent = ED_GetEDictByIdx(e);
 
-        if (ent->free)  continue;
+        if (!ent->inUse)  continue;
 
         if (pGame()->force_retouch)
             SV_LinkEdict(ent, true); // force retouch even for stationary

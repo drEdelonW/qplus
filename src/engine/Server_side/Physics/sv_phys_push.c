@@ -88,7 +88,7 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
 
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
         edict_p check = ED_GetEDictByIdx(e);
-        if (check->free)    continue;
+        if (!check->inUse)    continue;
 
         switch ((movetype_t)check->v.movetype) {
 #ifdef QUAKE2
@@ -217,7 +217,7 @@ void SV_PushRotate(edict_p pusher, float movetime) {
 
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
         edict_p check = ED_GetEDictByIdx(e);
-        if (check->free)    continue;
+        if (!check->inUse)    continue;
 
         switch ((movetype_t)check->v.movetype) {
         case MOVETYPE_PUSH:
@@ -347,7 +347,7 @@ void SV_Physics_Pusher(edict_p ent) {
         pGame()->self = ED_GetEDictOffs(ent);
         pGame()->other = EdictWorld; // should be 0
         PR_ExecuteProgram(ent->v.think);
-        if (ent->free)
+        if (!ent->inUse)
             return;
     }
 

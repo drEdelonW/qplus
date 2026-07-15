@@ -325,7 +325,6 @@ void SV_SpawnServer(cString server
     for (int i = 0; i < GetSvMaxClients(); i++)
         svs.clients[i].edict = ED_GetEDictByIdx(EdictPlayer1 + i);
 
-
     sv.datagram = (sizebuf_t){
         .maxsize = sizeof(sv.datagram_buf),
         .data = sv.datagram_buf
@@ -368,8 +367,12 @@ void SV_SpawnServer(cString server
 
     // load the rest of the entities
     edict_p ent = ED_GetEDictByIdx(EdictWorld);
-    memset(&ent->v, 0x00, MUL4(pProgsDat->entityfields));
-    ent->free = false;
+#if 0
+    memset(&ent->v, 0x00, SizeOfEntFields());
+    ent->inUse = true;
+#else
+    ED_ClearEdict(ent);
+#endif
     ent->v.model = PR_SetQString(sv.worldmodel->name);
     ent->v.modelindex = 1;    // world model
     ent->v.solid = SOLID_BSP;

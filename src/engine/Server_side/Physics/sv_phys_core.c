@@ -113,7 +113,7 @@ MoveClipFlags_e SV_FlyMove(edict_p pEntIn, SimDt_t time, trace_p steptrace) {
 
         // run the impact function
         SV_Impact(pEntIn, trace.pEnt);
-        if (pEntIn->free)  break;  // removed by the impact function
+        if (!pEntIn->inUse)  break;  // removed by the impact function
 
         time_left -= time_left * trace.fraction;
 
@@ -254,5 +254,5 @@ bool SV_RunThink(edict_p pEntIn) {
     pGame()->self = ED_GetEDictOffs(pEntIn);
     pGame()->other = EdictWorld;
     PR_ExecuteProgram(pEntIn->v.think);
-    return !pEntIn->free;
+    return pEntIn->inUse;
 }

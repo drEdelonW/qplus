@@ -49,7 +49,7 @@ Sets everything to NULL
 */
 void ED_ClearEdict(edict_p edict) {
     memset(&edict->v, 0x00, SizeOfEntFields());
-    edict->free = false;
+    edict->inUse = true;
 }
 
 /*
@@ -68,7 +68,7 @@ edict_p ED_Alloc() {
     for (; i < GetEdNum(); i++) {
         edict_p edict = ED_GetEDictByIdx(i);
         // the first couple seconds of server time can involve a lot of freeing and allocating, so relax the replacement policy
-        if ((edict->free) &&
+        if ((!edict->inUse) &&
             (
                 (edict->freetime < 2.f) ||
                 ((SV_GetTime() - edict->freetime) > 0.5f)
@@ -100,7 +100,7 @@ FIXME: walk all entities and NULL out references to this entity
 void ED_Free(edict_p ed) {
     SV_UnlinkEdict(ed); // unlink from world bsp
     {
-        ed->free = true;
+        ed->inUse = false;
         ed->v.model = 0;
         ed->v.takedamage = 0;
         ed->v.modelindex = 0;
@@ -153,7 +153,7 @@ For debugging
 =============
 */
 void ED_Print(edict_p ed) {
-    if (ed->free) { Host_Printf("FREE\n"); return; }
+    if (!ed->inUse) { Host_Printf("FREE\n"); return; }
 
     Host_Printf("\nEDICT %i:\n", ED_GetEDictIdx(ed));
     for (int i = 1; i < pProgsDat->fielddefs.num; i++) {
@@ -193,7 +193,7 @@ For savegames
 void ED_Write(FILE* f, edict_p ed) {
     fprintf(f, "{\n");
 
-    if (ed->free) { fprintf(f, "}\n"); return; }
+    if (!ed->inUse) { fprintf(f, "}\n"); return; }
 
     for (int i = 1; i < pProgsDat->fielddefs.num; i++) {
         dDef_p flDef = &pr_fielddefs[i];
@@ -267,7 +267,7 @@ void ED_Count() {
     int step = 0;
     for (EdIdx i = EdictWorld; i < GetEdNum(); i++) {
         edict_p ent = ED_GetEDictByIdx(i);
-        if (ent->free)  continue;
+        if (!ent->inUse)  continue;
 
         active++;
         if (ent->v.solid)   solid++;
@@ -434,7 +434,7 @@ cString ED_ParseEdict(cString data, edict_p ent) {
     }
 
     if (!init)
-        ent->free = true;
+        ent->inUse = false;
 
     return data;
 }

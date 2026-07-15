@@ -466,7 +466,7 @@ void Host_Loadgame_f() {
             ED_ParseEdict(start, ent);
 
             // link it into the bsp tree
-            if (!ent->free)
+            if (ent->inUse)
                 SV_LinkEdict(ent, false);
         }
 
@@ -592,7 +592,7 @@ int LoadGamestate(cString level, cString startspot) {
         ED_ParseEdict(start, ent);
 
         // link it into the bsp tree
-        if (!ent->free) SV_LinkEdict(ent, false);
+        if (ent->inUse) SV_LinkEdict(ent, false);
     }
 
     // SetEdNum(entnum);

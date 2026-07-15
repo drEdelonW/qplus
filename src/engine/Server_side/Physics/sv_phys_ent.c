@@ -133,7 +133,7 @@ void SV_Physics_Toss(edict_p pEntIn) {
     pEntIn->v.velocity = VectorSubtract(pEntIn->v.velocity, pEntIn->v.basevelocity);
 #endif
     if ((trace.fraction == 1.f) ||
-        (pEntIn->free)
+        (!pEntIn->inUse)
         )   return;
 
     float backoff;

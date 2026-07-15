@@ -165,7 +165,7 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
                 clip->box.maxs.y < touch->v.absmin.y ||
                 clip->box.maxs.z < touch->v.absmin.z) ||
 #else
-            BBoxOverlaps(clip->box, EvAbsBBox(&touch->v)) ||
+            !BBoxOverlaps(clip->box, EvAbsBBox(&touch->v)) ||
 #endif
             (
                 clip->passedict &&
