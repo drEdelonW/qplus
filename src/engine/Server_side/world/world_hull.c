@@ -208,14 +208,13 @@ bool SV_RecursiveHullCheck(
         (num > hull->lastclipnode)
         )   Host_SysError("SV_RecursiveHullCheck: bad node number");
 
-    //
+
     // find the point distances
-    //
     dClipNode_p node = hull->clipnodes + num;
     mPlane_p plane = hull->planes + node->planenum;
 
     float t1, t2;
-    if (plane->type < 3) {
+    if (plane->type < VECT_DIM) {
         t1 = p1.v[plane->type] - plane->dist;
         t2 = p2.v[plane->type] - plane->dist;
     }

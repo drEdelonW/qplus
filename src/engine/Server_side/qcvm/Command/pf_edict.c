@@ -38,7 +38,7 @@ void PF_Remove() { ED_Free(G_EDICT(OFS_PARM0)); }
 // entity (entity start, .string field, string match) find = #5;
 void PF_Find() {
 #ifdef QUAKE2
-    edict_p first = GetEdictsPtr();
+    edict_p first = ED_GetEDictByIdx(EdictWorld);
     edict_p second = first;
     edict_p last = second;
     EdIdx edict = G_EDICTNUM(OFS_PARM0);
@@ -54,8 +54,8 @@ void PF_Find() {
         cString t = E_STRING(ed, f);
         if (!t)            continue;
         if (!strcmp(t, str)) {
-            if (first == GetEdictsPtr())        first = ed;
-            else if (second == GetEdictsPtr())  second = ed;
+            /**/ if (first == ED_GetEDictByIdx(EdictWorld))   first = ed;
+            else if (second == ED_GetEDictByIdx(EdictWorld))  second = ed;
             ed->v.chain = ED_GetEDictOffs(last);
             last = ed;
         }
@@ -89,7 +89,7 @@ void PF_Find() {
         }
     }
 
-    RETURN_EDICT(GetEdictsPtr()); return;
+    RETURN_EDICT(ED_GetEDictByIdx(EdictWorld)); return;
 #endif
 }
 
@@ -104,7 +104,7 @@ findradius (origin, radius)
 =================
 */
 void PF_findradius() {
-    edict_p chain = GetEdictsPtr();
+    edict_p chain = ED_GetEDictByIdx(EdictWorld);
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
         edict_p ent = ED_GetEDictByIdx(e);
 
@@ -141,9 +141,13 @@ void PF_nextent() {
     EdIdx i = G_EDICTNUM(OFS_PARM0);
     while (1) {
         i++;
-        if (i == GetEdNum()) { RETURN_EDICT(GetEdictsPtr()); return; }
+        if (i == GetEdNum()) {
+            RETURN_EDICT(ED_GetEDictByIdx(EdictWorld)); return;
+        }
         edict_p ent = ED_GetEDictByIdx(i);
-        if (!ent->free) { RETURN_EDICT(ent); return; }
+        if (!ent->free) {
+            RETURN_EDICT(ent); return;
+        }
     }
 }
 
@@ -346,7 +350,7 @@ void PF_checkclient() {
     if ((ent->free) ||
         (ent->v.health <= 0.f)
         ) {
-        RETURN_EDICT(GetEdictsPtr());   return;
+        RETURN_EDICT(ED_GetEDictByIdx(EdictWorld));   return;
     }
 
     // if current entity can't possibly see the check entity, return 0
@@ -356,7 +360,7 @@ void PF_checkclient() {
     if ((Leaf < 0) ||
         !(_checkPvs[DIV8(Leaf)] & (1 << (Leaf & 7)))
         ) { // c_notvis++;
-        RETURN_EDICT(GetEdictsPtr());   return;
+        RETURN_EDICT(ED_GetEDictByIdx(EdictWorld));   return;
     }
     // c_invis++;  // might be able to see it
     RETURN_EDICT(ent);   return;

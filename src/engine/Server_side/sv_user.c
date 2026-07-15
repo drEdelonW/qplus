@@ -77,15 +77,12 @@ void SV_SetIdealPitch() {
             .z = sv_player->v.origin.z + sv_player->v.view_ofs.z
         };
 
-        vec3_t bottom = top; { bottom.z -= 160.0f; }
-        trace_t tr = SV_MoveLine(
-            top, bottom,
-            MOVE_NOMONSTERS, sv_player
-        );
+        trace_t tr = SV_MoveDLine(top, VecZ(-160.f), MOVE_NOMONSTERS, sv_player );
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
-        if (tr.fraction == 1)   return; // near a dropoff
+        if (tr.fraction == 1.f)   return; // near a dropoff
 
-        z[i] = top.z + tr.fraction * (bottom.z - top.z);
+        z[i] = top.z + tr.fraction * (-160.f);
+
     }
 
     float dir = 0;
@@ -130,9 +127,8 @@ void SV_UserFriction() {
         VectorScale(*vel, 16.f / speed);
         start.z = _origin->z + sv_player->v.mins.z;
     };
-    vec3_t stop = start; { stop.z -= 34.f; }
 
-    trace_t trace = SV_MoveLine(start, stop, MOVE_NOMONSTERS, sv_player);
+    trace_t trace = SV_MoveDLine(start, VecZ(-34.f), MOVE_NOMONSTERS, sv_player);
 
     float friction = (trace.fraction == 1.f) ?
         (sv_friction.value * sv_edgefriction.value) : sv_friction.value;

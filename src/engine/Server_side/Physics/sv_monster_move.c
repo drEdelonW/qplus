@@ -62,9 +62,8 @@ realcheck:
     start = VectorScale(VectorAdd(bb.mins, bb.maxs), 0.5f); {
         start.z = bb.mins.z;   // the midpoint must be within 16 of the bottom
     }
-
-    vec3_t stop = start; { stop.z -= TWICE(STEPSIZE); }
-    trace_t trace = SV_MoveLine(start, stop, MOVE_NOMONSTERS, ent);
+    vec3_t dDown = VecZ((float)-TWICE(STEPSIZE));
+trace_t trace = SV_MoveDLine(start, dDown, MOVE_NOMONSTERS, ent);
 
     if (trace.fraction == 1.f)
         return false;
@@ -75,10 +74,9 @@ realcheck:
     // the corners must be within 16 of the midpoint
     for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++) {
-            start.x = stop.x = (x) ? bb.maxs.x : bb.mins.x;
-            start.y = stop.y = (y) ? bb.maxs.y : bb.mins.y;
-
-            trace = SV_MoveLine(start, stop, MOVE_NOMONSTERS, ent);
+            start.x = (x) ? bb.maxs.x : bb.mins.x;
+            start.y = (y) ? bb.maxs.y : bb.mins.y;
+            trace = SV_MoveDLine(start, dDown, MOVE_NOMONSTERS, ent);
             if ((trace.fraction != 1.f) &&
                 (trace.endpos.z > bottom)
                 )   bottom = trace.endpos.z;
@@ -124,7 +122,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
             neworg = VectorAdd(ent->v.origin, move);
             edict_p enemy = ED_GetEDictByOffs(ent->v.enemy);
             if ((i == 0) &&
-                (enemy != GetEdictsPtr())
+                (enemy != ED_GetEDictByIdx(EdictWorld))
                 ) {
                 float dz = ent->v.origin.z - ED_GetEDictByOffs(ent->v.enemy)->v.origin.z;
                 if (dz > 40)    neworg.z -= 8;
@@ -143,7 +141,7 @@ bool SV_movestep(edict_p ent, vec3_t move, bool relink) {
                 return true;
             }
 
-            if (enemy == GetEdictsPtr())
+            if (enemy == ED_GetEDictByIdx(EdictWorld))
                 break;
         }
 

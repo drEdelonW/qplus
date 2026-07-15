@@ -213,7 +213,6 @@ void PR_ExecuteProgram(func_t fnum) {
     int32_t runaway = 100000;
     while (1) {
         stack++; // next statement
-
         dStatement_p ST = PR_GetStack(stack);
         eval_p A1 = GV_pEval(ST->a);
         eval_p A2 = GV_pEval(ST->b);
@@ -302,9 +301,9 @@ void PR_ExecuteProgram(func_t fnum) {
 #ifdef PARANOID
                 ED_GetEDictIdx(ed);  // make sure it's in range
 #endif
-                if ((ed == GetEdictsPtr()) &&
+                if ((ed == ED_GetEDictByIdx(EdictWorld)) &&
                     (sv.state == ss_active)
-                )   PR_RunError("assignment to world entity");
+                    )   PR_RunError("assignment to world entity");
 
                 // R->_int = (uint8_p)((int32_p)&ed->v + A2->_int) - (uint8_p)GetEdictsPtr();
                 {
@@ -330,9 +329,9 @@ void PR_ExecuteProgram(func_t fnum) {
             //==================
 
             case OP_NOT_F:      R->_float = !A1->_float;     break;
-            case OP_NOT_V:      R->_float = (!A1->vector.x) && (!A1->vector.y) && (!A1->vector.z);  break;
-            case OP_NOT_S:      R->_float = (!A1->string) || (!(*PR_GetQString(A1->string)));       break;        // R->_float = !A1->string || !pr_strings[A1->string];
-            case OP_NOT_ENT:    R->_float = (ED_GetEDictByOffs(A1->edict) == GetEdictsPtr());       break;
+            case OP_NOT_V:      R->_float = (!A1->vector.x) && (!A1->vector.y) && (!A1->vector.z);          break;
+            case OP_NOT_S:      R->_float = (!A1->string) || (!(*PR_GetQString(A1->string)));               break;        // R->_float = !A1->string || !pr_strings[A1->string];
+            case OP_NOT_ENT:    R->_float = (ED_GetEDictByOffs(A1->edict) == ED_GetEDictByIdx(EdictWorld)); break;
             case OP_NOT_FNC:    R->_float = !A1->function;   break;
 
             case OP_IF: {

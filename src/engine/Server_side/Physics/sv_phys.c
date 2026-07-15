@@ -49,7 +49,6 @@ void SV_CheckAllEnts() {
     // see if any solid entities are inside the final position
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
         edict_p check = ED_GetEDictByIdx(e);
-
         if (check->free) continue;
 
         switch ((movetype_t)check->v.movetype) {

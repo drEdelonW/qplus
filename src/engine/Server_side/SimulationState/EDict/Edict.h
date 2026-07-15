@@ -146,7 +146,7 @@ extern "C" {
     void ED_Init();
 
     edict_p GetEdictsPtr();
-    void SetEdicts(edict_p pEdicts);
+    void SetEdictsRoot(edict_p pEdicts);
 
     EdIdx GetEdNum();
     void SetEdNum(EdIdx num);

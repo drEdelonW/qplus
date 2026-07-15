@@ -30,12 +30,12 @@ This could be a lot more efficient...
 */
 #include "BBox_tools.h"
 edict_p SV_TestEntityPosition(edict_p ent) {
-    trace_t trace = SV_MoveBox(ent->v.origin, ent->v.origin, MOVE_NORMAL, ent);
-
-    return (trace.startsolid) ? GetEdictsPtr() : NULL; // world map or none
+    return (
+        SV_MoveBox(
+            ent->v.origin, ent->v.origin, MOVE_NORMAL, ent
+        ).startsolid) ? // world map or none
+        ED_GetEDictByIdx(EdictWorld) : NULL; 
 }
-
-
 
 
 /*
@@ -82,7 +82,7 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
             .y = -DotProduct(end_l, right);
             .z = DotProduct(end_l, up);
         };
-    }
+}
 #endif
 
     // trace a line through the apropriate clipping hull
@@ -112,7 +112,6 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
             .y = -DotProduct(trace.plane.normal, right),
             .z = DotProduct(trace.plane.normal, up),
         };
-
     }
 #endif
 
@@ -155,6 +154,7 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
             )   continue;
 
         if (
+#if 0
             (
                 clip->box.mins.x > touch->v.absmax.x ||
                 clip->box.mins.y > touch->v.absmax.y ||
@@ -163,6 +163,9 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
                 clip->box.maxs.x < touch->v.absmin.x ||
                 clip->box.maxs.y < touch->v.absmin.y ||
                 clip->box.maxs.z < touch->v.absmin.z) ||
+#else
+            BBoxOverlaps(clip->box, EvAbsBBox(&touch->v)) ||
+#endif
             (
                 clip->passedict &&
                 clip->passedict->v.size.x &&
@@ -174,17 +177,26 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
         if (clip->trace.allsolid)   return;
 
         if (clip->passedict) {
-            if ((ED_GetEDictByOffs(touch->v.owner) == clip->passedict) || // don't clip against own missiles
-                (ED_GetEDictByOffs(clip->passedict->v.owner) == touch)) // don't clip against owner
-                continue;
+            if ((ED_GetEDictByOffs(touch->v.owner) == clip->passedict) ||   // don't clip against own missiles
+                (ED_GetEDictByOffs(clip->passedict->v.owner) == touch)      // don't clip against owner
+                )   continue;
         }
 
+#if 0
         trace_t trace;
         if ((int)touch->v.flags & FL_MONSTER)       trace = SV_ClipMoveToEntity(touch, clip->start, clip->m2, clip->end);
         else                                        trace = SV_ClipMoveToEntity(touch, clip->start, clip->mv, clip->end);
+#else
+        trace_t trace = SV_ClipMoveToEntity(
+            touch, clip->start,
+            ((int)touch->v.flags & FL_MONSTER) ?
+            clip->m2 : clip->mv,
+            clip->end
+        );
+#endif
 
-        if (trace.allsolid ||
-            trace.startsolid ||
+        if ((trace.allsolid) ||
+            (trace.startsolid) ||
             (trace.fraction < clip->trace.fraction)
             ) {
             trace.pEnt = touch;
@@ -222,10 +234,31 @@ void SV_MoveBounds(vec3_t start, BBox_t bb, vec3_t end, BBox_p box) {
             box->mins.v[i] = end.v[i] + bb.mins.v[i] - 1;
             box->maxs.v[i] = start.v[i] + bb.maxs.v[i] + 1;
         }
-}
+    }
 #endif
 }
 
+trace_t SV_MoveDelta(vec3_t start, BBox_t bb, vec3_t delta, phymovetype_t type, edict_p passedict) {
+    moveClip_t clip = {
+        // .box = ,
+        .mv = bb,
+        .m2 = (type == MOVE_MISSILE) ?
+            BBoxSymmetric(15.f) : bb,
+        .start = start,
+        .end = VectorAdd(start, delta),
+
+        .trace = SV_ClipMoveToEntity(GetEdictsPtr(), start, bb, VectorAdd(start, delta)),
+        .moveType = type,
+        .passedict = passedict
+    };
+
+    SV_MoveBounds(start, clip.m2, VectorAdd(start, delta), &clip.box);  // create the bounding box of the entire move
+    SV_ClipToLinks(_sv_AreaNodes, &clip); // clip to entities
+
+    return clip.trace;
+}
+trace_t SV_MoveDLine(vec3_t start, vec3_t delta, phymovetype_t type, edict_p passedict) { return SV_MoveDelta(start, bbZero, delta, type, passedict); }
+trace_t SV_MoveDBox(vec3_t start, vec3_t delta, phymovetype_t type, edict_p passedict) { return SV_MoveDelta(start, EvBBox(&passedict->v), delta, type, passedict); }
 
 trace_t SV_Move(vec3_t start, BBox_t bb, vec3_t end, phymovetype_t type, edict_p passedict) {
     moveClip_t clip = {
@@ -246,10 +279,5 @@ trace_t SV_Move(vec3_t start, BBox_t bb, vec3_t end, phymovetype_t type, edict_p
 
     return clip.trace;
 }
-
-trace_t SV_MoveLine(vec3_t start, vec3_t end, phymovetype_t type, edict_p passedict) {
-    return SV_Move(start, bbZero, end, type, passedict);
-}
-trace_t SV_MoveBox(vec3_t start, vec3_t end, phymovetype_t type, edict_p passedict) {
-    return SV_Move(start, EvBBox(&passedict->v), end, type, passedict);
-}
+trace_t SV_MoveLine(vec3_t start, vec3_t end, phymovetype_t type, edict_p passedict) { return SV_Move(start, bbZero, end, type, passedict); }
+trace_t SV_MoveBox(vec3_t start, vec3_t end, phymovetype_t type, edict_p passedict) { return SV_Move(start, EvBBox(&passedict->v), end, type, passedict); }

@@ -319,7 +319,7 @@ void SV_SpawnServer(cString server
 
     PR_LoadProgs(); // load progs to get entity field count
     // allocate server memory
-    SetEdicts(Hunk_AllocName(EdictMax * GetEdictSize(), "edicts"));
+    SetEdictsRoot(Hunk_AllocName(EdictMax * GetEdictSize(), "edicts"));
 
     // leave slots at start for clients only
     SetEdNum(GetSvMaxClients() + 1);

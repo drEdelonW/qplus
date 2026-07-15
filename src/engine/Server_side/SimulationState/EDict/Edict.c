@@ -79,7 +79,8 @@ edict_p ED_Alloc() {
         }
     }
 
-    if (i == EdictMax)          Host_SysError("ED_Alloc: no free edicts");
+    if (i == EdictMax)
+        Host_SysError("ED_Alloc: no free edicts");
 
     SetEdNum(GetEdNum() + 1);
     edict_p edict = ED_GetEDictByIdx(i);

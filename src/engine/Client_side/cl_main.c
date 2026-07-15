@@ -155,22 +155,26 @@ CL_PrintEntities_f
 ==============
 */
 void CL_PrintEntities_f() {
-    r_Entity_p ent = cl_entities;
-    for (int i = 0; i < cl.num_entities; i++, ent++) {
+    for (int i = 0; i < cl.num_entities; i++) {
         Con_Printf("%3i:", i);
-        if (!ent->model) { Con_Printf("EMPTY\n"); continue; }
+        if (!cl_entities[i].model) {
+            Con_Printf("EMPTY\n");
+            continue;
+        }
         Con_Printf(
-            "%s:%2i  (%5.1f,%5.1f,%5.1f) [%5.1f %5.1f %5.1f]\n",
-            ent->model->name,
-            ent->frame,
+            "%s:%2i  "
+            "(%5.1f,%5.1f,%5.1f) "
+            "[%5.1f %5.1f %5.1f]\n",
+            cl_entities[i].model->name,
+            cl_entities[i].frame,
 
-            ent->pose.loc.x,
-            ent->pose.loc.y,
-            ent->pose.loc.z,
+            cl_entities[i].pose.loc.x,
+            cl_entities[i].pose.loc.y,
+            cl_entities[i].pose.loc.z,
 
-            ent->pose.aim.pitch,
-            ent->pose.aim.yaw,
-            ent->pose.aim.roll
+            cl_entities[i].pose.aim.pitch,
+            cl_entities[i].pose.aim.yaw,
+            cl_entities[i].pose.aim.roll
         );
     }
 }

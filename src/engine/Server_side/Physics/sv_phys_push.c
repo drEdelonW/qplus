@@ -37,17 +37,16 @@ Does not change the entities velocity at all
 ============
 */
 trace_t SV_PushEntity(edict_p ent, vec3_t push) {
-    vec3_t end = VectorAdd(ent->v.origin, push);
 
     trace_t trace;
-    if (ent->v.movetype == MOVETYPE_FLYMISSILE)     trace = SV_MoveBox(ent->v.origin, end, MOVE_MISSILE, ent);
+    if (ent->v.movetype == MOVETYPE_FLYMISSILE)     trace = SV_MoveDBox(ent->v.origin, push, MOVE_MISSILE, ent);
     else
         switch ((solid_t)ent->v.solid) {
         case SOLID_TRIGGER:  // only clip against bmodels
-        case SOLID_NOT:                             trace = SV_MoveBox(ent->v.origin, end, MOVE_NOMONSTERS, ent);    break;
-        default:                                    trace = SV_MoveBox(ent->v.origin, end, MOVE_NORMAL, ent);        break;
+        case SOLID_NOT:                             trace = SV_MoveDBox(ent->v.origin, push, MOVE_NOMONSTERS, ent);    break;
+        default:                                    trace = SV_MoveDBox(ent->v.origin, push, MOVE_NORMAL, ent);        break;
         }
-    ent->v.origin = trace.endpos;
+        ent->v.origin = trace.endpos;
     SV_LinkEdict(ent, true);
 
     if (trace.pEnt)

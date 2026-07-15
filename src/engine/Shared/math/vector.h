@@ -58,8 +58,9 @@ static inline vec3_t VectorAddScalar(vec3_t v, vec_t scalar) {
         out.v[j] = v.v[j] + scalar;
     return out;
 }
-
-
+static inline vec3_t VecX(vec_t scale) { return (vec3_t){ .x = scale }; }
+static inline vec3_t VecY(vec_t scale) { return (vec3_t){ .y = scale }; }
+static inline vec3_t VecZ(vec_t scale) { return (vec3_t){ .z = scale }; }
 #ifdef __cplusplus
 extern "C" {
 #endif

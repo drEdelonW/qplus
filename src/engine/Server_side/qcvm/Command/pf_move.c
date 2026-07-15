@@ -158,10 +158,7 @@ void PF_aim() {
 
     // try sending a trace straight
     vec3_t dir = pGame()->v_forward;
-    trace_t tr = SV_MoveLine(
-        start, VectorMA(start, 2048.f, dir),
-        MOVE_NORMAL, ent
-    );
+    trace_t tr = SV_MoveDLine(start, VectorScale(dir, 2048.f), MOVE_NORMAL, ent);
     if (
         (tr.pEnt) &&
         (tr.pEnt->v.takedamage == DAMAGE_AIM) &&
@@ -200,7 +197,7 @@ void PF_aim() {
         if (dist < bestdist)
             continue; // to far to turn
 
-        tr = SV_MoveLine(start, end, MOVE_NORMAL, ent);
+        tr = SV_MoveDLine(start, BBoxMid(EvBBox(&check->v)), MOVE_NORMAL, ent);
         if (tr.pEnt == check) { // can shoot at this one
             bestdist = dist;
             bestent = check;
