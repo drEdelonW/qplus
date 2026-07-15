@@ -22,11 +22,14 @@ typedef struct {
 } dDef_t;       STATIC_ASSERT_SIZE(dDef_t, 2*2 + 4);    // 8
 typedef dDef_t* dDef_p;
 
-extern dDef_p   pr_fielddefs;
+extern dDef_p   pr_fielddefs; //TODO: hide it
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    int GetGlobalDefsNum();
+    int GetFieldDefsNum();
 
     void ED_InitCache();
     void initProgDefs(progLump_t plg, progLump_t plf);

@@ -8,8 +8,18 @@
 #include "Edict.h"
 #include "endian_tools.h"
 
-dDef_p  pr_fielddefs; // extern
+dDef_p  pr_fielddefs; // extern //TODO: hide it
+static int _GlobalDefsNum = 0;  // globaldefs.num
+static int _FieldDefsNum = 0;   // fielddefs.num
 
+int GetGlobalDefsNum() {
+    if (!_GlobalDefsNum)    Host_SysError("_GlobalDefsNum empty");
+    return _GlobalDefsNum;
+}
+int GetFieldDefsNum() {
+    if (!_FieldDefsNum)    Host_SysError("_FieldDefsNum empty");
+    return _FieldDefsNum;
+}
 /*
 ==============================================================================
 
@@ -19,12 +29,12 @@ FIXME: need to tag constants, doesn't really work
 ==============================================================================
 */
 
-static dDef_p   _globalDefs;
+static dDef_p  _pGlobalDefs;
 void ED_WriteGlobals(FILE* f) {
     fprintf(f, "{\n"); {
-        for (int i = 0; i < pProgsDat->globaldefs.num; i++) {
-            dDef_p def = &_globalDefs[i];
-            uint16_t type = def->type;
+        for (int i = 0; i < _GlobalDefsNum; i++) {
+            dDef_p def = &_pGlobalDefs[i];
+            etype_t type = def->type;
             if (!(def->type & DEF_SAVEGLOBAL)
                 )  continue;
 
@@ -69,10 +79,9 @@ void ED_ParseGlobals(cString data) {
 }
 
 
-
 dDef_p ED_GlobalAtOfs(int ofs) {
-    for (int i = 0; i < pProgsDat->globaldefs.num; i++) {
-        dDef_p def = &_globalDefs[i];
+    for (int i = 0; i < _GlobalDefsNum; i++) {
+        dDef_p def = &_pGlobalDefs[i];
         if (def->ofs == ofs)
             return def;
     }
@@ -81,8 +90,8 @@ dDef_p ED_GlobalAtOfs(int ofs) {
 
 
 dDef_p ED_FindGlobal(cString name) {
-    for (int i = 0; i < pProgsDat->globaldefs.num; i++) {
-        dDef_p def = &_globalDefs[i];
+    for (int i = 0; i < _GlobalDefsNum; i++) {
+        dDef_p def = &_pGlobalDefs[i];
         if (!strcmp(PR_GetQString(def->s_name), name))
             return def;
     }
@@ -90,9 +99,8 @@ dDef_p ED_FindGlobal(cString name) {
 }
 
 
-
 dDef_p ED_FieldAtOfs(int ofs) {
-    for (int i = 0; i < pProgsDat->fielddefs.num; i++) {
+    for (int i = 0; i < _FieldDefsNum; i++) {
         dDef_p def = &pr_fielddefs[i];
         if (def->ofs == ofs)
             return def;
@@ -102,7 +110,7 @@ dDef_p ED_FieldAtOfs(int ofs) {
 
 
 dDef_p ED_FindField(cString name) {
-    for (int i = 0; i < pProgsDat->fielddefs.num; i++) {
+    for (int i = 0; i < _FieldDefsNum; i++) {
         dDef_p def = &pr_fielddefs[i];
         if (!strcmp(PR_GetQString(def->s_name), name))
             return def;
@@ -133,16 +141,11 @@ void ED_InitCache() {
 }
 
 dDef_p ED_FindFieldCached(cString field) {
-
-    dDef_p def = NULL;
-    for (int i = 0; i < GEFV_CACHESIZE; i++) {
-        if (!strcmp(field, gefvCache[i].field)) {
+    for (int i = 0; i < GEFV_CACHESIZE; i++)
+        if (!strcmp(field, gefvCache[i].field))
             return gefvCache[i].pcache;
-        }
-    }
 
-    def = ED_FindField(field);
-
+    dDef_p def = ED_FindField(field);
     if (strlen(field) < MAX_FIELD_LEN) {
         gefvCache[_rep].pcache = def;
         strcpy(gefvCache[_rep].field, field);
@@ -156,16 +159,18 @@ void initProgDefs(progLump_t plg, progLump_t plf) {
     ED_InitCache();
 
     // ======[Global Defs]======
-    _globalDefs = GetPtrFromLump(plg);
-    for (int i = 0; i < plg.num; i++) {
-        _globalDefs[i].type = (op_type)LittleShort((int16_t)_globalDefs[i].type);
-        _globalDefs[i].ofs = (uint16_t)LittleShort((int16_t)_globalDefs[i].ofs);
-        _globalDefs[i].s_name = LittleLong(_globalDefs[i].s_name);
+    _pGlobalDefs = GetPtrFromLump(plg);
+    _FieldDefsNum = plg.num;
+    for (int i = 0; i < _FieldDefsNum; i++) {
+        _pGlobalDefs[i].type = (op_type)LittleShort((int16_t)_pGlobalDefs[i].type);
+        _pGlobalDefs[i].ofs = (uint16_t)LittleShort((int16_t)_pGlobalDefs[i].ofs);
+        _pGlobalDefs[i].s_name = LittleLong(_pGlobalDefs[i].s_name);
     }
 
     // ======[File Defs]======
     pr_fielddefs = GetPtrFromLump(plf);
-    for (int i = 0; i < plf.num; i++) {
+    _FieldDefsNum = plf.num;
+    for (int i = 0; i < _FieldDefsNum; i++) {
         pr_fielddefs[i].type = (op_type)LittleShort((int16_t)pr_fielddefs[i].type);
         pr_fielddefs[i].ofs = (uint16_t)LittleShort((int16_t)pr_fielddefs[i].ofs);
         pr_fielddefs[i].s_name = LittleLong(pr_fielddefs[i].s_name);

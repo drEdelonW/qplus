@@ -156,30 +156,32 @@ void ED_Print(edict_p ed) {
     if (!ed->inUse) { Host_Printf("FREE\n"); return; }
 
     Host_Printf("\nEDICT %i:\n", ED_GetEDictIdx(ed));
-    for (int i = 1; i < pProgsDat->fielddefs.num; i++) {
+    /*--------------------------------------------*/
+    for (int i = 1; i < GetFieldDefsNum(); i++) {
         dDef_p flDef = &pr_fielddefs[i];
         cString name = PR_GetQString(flDef->s_name);
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
-        int32_p v = (int32_p)((cString)&ed->v + MUL4(flDef->ofs));
+        int32_p value = (int32_p)((cString)&ed->v + MUL4(flDef->ofs));
 
         // if the value is still all 0, skip the field
         etype_t type = ((etype_t)flDef->type) & ~DEF_SAVEGLOBAL;
         int j = 0;
         for (; j < SizeOfPrType(type); j++)
-            if (v[j])
+            if (value[j])
                 break;
 
         if (j == SizeOfPrType(type))
             continue;
 
+        /*--------------------------------------------*/
         Host_Printf("%s", name);
         size_t len = strlen(name);
         while (len++ < 15)
             Host_Printf(" ");
 
-        Host_Printf("%s\n", PR_ValueString(flDef->type, (eval_p)v));
+        Host_Printf("%s\n", PR_ValueString(flDef->type, (eval_p)value));
     }
 }
 
@@ -194,14 +196,14 @@ void ED_Write(FILE* f, edict_p ed) {
     fprintf(f, "{\n");
 
     if (!ed->inUse) { fprintf(f, "}\n"); return; }
-
-    for (int i = 1; i < pProgsDat->fielddefs.num; i++) {
+    /*--------------------------------------------*/
+    for (int i = 1; i < GetFieldDefsNum(); i++) {
         dDef_p flDef = &pr_fielddefs[i];
         cString name = PR_GetQString(flDef->s_name);
         if (name[strlen(name) - 2] == '_')
             continue; // skip _x, _y, _z vars
 
-        int32_p value = (int32_p)((cString)&ed->v + flDef->ofs * 4);
+        int32_p value = (int32_p)((cString)&ed->v + MUL4(flDef->ofs));
 
         // if the value is still all 0, skip the field
         etype_t type = ((etype_t)flDef->type) & ~DEF_SAVEGLOBAL;
@@ -213,6 +215,7 @@ void ED_Write(FILE* f, edict_p ed) {
         if (j == SizeOfPrType(type))
             continue;
 
+        /*--------------------------------------------*/
         fprintf(f, "\"%s\" ", name);
         fprintf(f, "\"%s\"\n", PR_UglyValueString(flDef->type, (eval_p)value));
     }
