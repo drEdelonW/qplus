@@ -176,6 +176,7 @@ void R_Init() {
     Cvar_SetValue("r_maxedges", (float)NUMSTACKEDGES);
     Cvar_SetValue("r_maxsurfs", (float)NUMSTACKSURFACES);
 
+#if 1
     view_clipplanes[0].leftedge = true;
     view_clipplanes[1].rightedge = true;
     view_clipplanes[1].leftedge =
@@ -184,7 +185,8 @@ void R_Init() {
     view_clipplanes[0].rightedge =
         view_clipplanes[2].rightedge =
         view_clipplanes[3].rightedge = false;
-
+#else
+#endif
     r_refdef.xOrigin = XCENTERING;
     r_refdef.yOrigin = YCENTERING;
 
@@ -556,11 +558,8 @@ void R_DrawViewModel() {
 }
 
 
-/*
-=============
-R_BmodelCheckBBox
-=============
-*/
+
+
 extern int* pfrustum_indexes[4];    // TODO: avoid int*
 AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
     AliasClipFlags_f clipflags = ALIAS_NON_CLIP;
@@ -584,25 +583,23 @@ AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
         for (int i = 0; i < 4; i++) {
             // generate accept and reject points
             // FIXME: do with fast look-ups or integer tests based on the sign bit of the floating point values
-
-            int* pindex = pfrustum_indexes[i];
             {
-                vec3_t rejectpt = {
-                    .x = bb.v[pindex[0]],
-                    .y = bb.v[pindex[1]],
-                    .z = bb.v[pindex[2]]
-                };
+                vec3_t rejectpt = VecXYZ(
+                    bb.v[pfrustum_indexes[i][X_AX]],
+                    bb.v[pfrustum_indexes[i][Y_AX]],
+                    bb.v[pfrustum_indexes[i][Z_AX]]
+                );
                 double d = DotProduct(rejectpt, view_clipplanes[i].normal) - view_clipplanes[i].dist;
                 if (d <= 0.0f)     return BMODEL_FULLY_CLIPPED;
             }
             {
-                vec3_t acceptpt = {
-                    .x = bb.v[pindex[3 + 0]],
-                    .y = bb.v[pindex[3 + 1]],
-                    .z = bb.v[pindex[3 + 2]]
-                };
+                vec3_t acceptpt = VecXYZ(
+                    bb.v[pfrustum_indexes[i][3 + X_AX]],
+                    bb.v[pfrustum_indexes[i][3 + Y_AX]],
+                    bb.v[pfrustum_indexes[i][3 + Z_AX]]
+                );
                 double d = DotProduct(acceptpt, view_clipplanes[i].normal) - view_clipplanes[i].dist;
-                if (d <= 0.0f)     clipflags |= (1 << i);
+                if (d <= 0.f)     clipflags |= (1 << i);
             }
         }
     }
@@ -611,11 +608,8 @@ AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
 }
 
 
-/*
-=============
-R_DrawBEntitiesOnList
-=============
-*/
+
+extern bool inSubModel; // r_draw.c TODO: make is ext in header/API
 void R_DrawBEntitiesOnList() {
     if (!r_drawentities.value)  return;
 

@@ -52,12 +52,32 @@ typedef union {
     };
     vec3_t cols[4];     // Column access as vector array
 #else
-    // vec3_t rows[3];     // Каждая строка содержит 4 float (последний — координата)
+    // vec3_t rows[3];
 #endif
-    float m[3][4];      // Raw array access for R_ConcatTransforms
+    float m[3][4];      // Raw array access for R_ConcatTransforms 
 } mat3x4_t;
 typedef mat3x4_t* mat3x4_p;
 
+#include "transform.h"
+typedef union {
+#if 0
+    struct {
+        vec3_t right;   // Right direction + X scaling
+        vec3_t up;      // Up direction + Y scaling
+        vec3_t forward; // Forward direction + Z scaling
+        vec3_t origin;  // World position (translation)
+    };
+    vec3_t cols[4];     // Column access as vector array
+#else
+    // vec3_t rows[3];     // Каждая строка содержит 4 float (последний — координата)
+#endif
+    float m[4][3];      // Raw array access for R_ConcatTransforms 
+    struct {
+        Basis_t space;
+        ang3_t  rot;
+    } MxTr;
+} mat4x3_t;
+typedef mat4x3_t* mat4x3_p;
 
 int     Q_log2(int val);
 

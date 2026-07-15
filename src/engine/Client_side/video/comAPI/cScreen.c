@@ -238,7 +238,7 @@ Called for important messages that should stay in the center of the screen
 for a few moments
 ==============
 */
-static LegDt_t _CentertTimeOff;
+static sSimTime_t _CentertTimeOff;
 void SCR_CenterPrint(cString str) {
     strncpy(_scr.centerstring, str, sizeof(_scr.centerstring) - 1);
     _CentertTimeOff = scr_centertime.value;

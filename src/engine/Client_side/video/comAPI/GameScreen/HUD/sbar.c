@@ -469,8 +469,9 @@ void Sbar_DrawScoreboard() {
 //=============================================================================
 
 
-static inline bool isTime(LegDt_t time) {
-    return time &&
+static inline bool isTime(sSimTime_t time) {
+    return
+        (time) &&
         (time > (GetClSimTime() - 2));
 }
 void Sbar_DrawInventory() {

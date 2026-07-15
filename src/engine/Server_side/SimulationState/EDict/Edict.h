@@ -120,13 +120,12 @@ typedef enum {
 } EntLeaf_t;
 
 typedef struct edict_s {
-    // bool            free;
-    bool            inUse; // TODO: use it instead of free because free = false by default and "free" is a reserved word
+    bool            inUse;
     link_t          area;       // linked to a division node or leaf
     EntLeaf_t       num_leafs;
     int16_t         leafnums[EntLeafsMax];
     EntityState_t   baseline;
-    LegDt_t         freetime;   // sv.time when the object was freed
+    sSimTime_t      freetime;   // sv.time when the object was freed
     entvars_t       v;          // C exported fields from progs
     // other fields from progs come immediately after
 } edict_t;

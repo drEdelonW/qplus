@@ -1,11 +1,30 @@
 #pragma once
 
-#include "bspfile.h"
 #include "types.h"
 #include "Plane.h"
 #include "BBox.h"
 
-struct mNode_s;
+typedef enum {
+    CONTENTS_NODE         =  0,
+  /* vvv[Leaf]vvv ^^^[Node]^^^ */
+    CONTENTS_EMPTY        = -1,
+    CONTENTS_SOLID        = -2,
+    CONTENTS_WATER        = -3,
+    CONTENTS_SLIME        = -4,
+    CONTENTS_LAVA         = -5,
+    CONTENTS_SKY          = -6,
+    CONTENTS_ORIGIN       = -7,  // removed at CSG time
+    CONTENTS_CLIP         = -8,  // changed to CONTENTS_SOLID
+
+    CONTENTS_CURRENT_0    = -9,
+    CONTENTS_CURRENT_90   = -10,
+    CONTENTS_CURRENT_180  = -11,
+    CONTENTS_CURRENT_270  = -12,
+    CONTENTS_CURRENT_UP   = -13,
+    CONTENTS_CURRENT_DOWN = -14
+} contents_t;
+
+
 typedef struct mNode_s mNode_t;
 typedef mNode_t* mNode_p;
 struct mNode_s {    // TODO: merge in shared head structure with  mLeaf_s
@@ -17,7 +36,7 @@ struct mNode_s {    // TODO: merge in shared head structure with  mLeaf_s
 
     // node specific
     mPlane_p    plane;
-    mNode_p     children[2];
+    mNode_p     children[PlaneSides];
     uint16_t    firstsurface;
     uint16_t    numsurfaces;
 };
@@ -25,12 +44,24 @@ struct mNode_s {    // TODO: merge in shared head structure with  mLeaf_s
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
 typedef struct {
     int32_t     planenum;
-    int16_t     children[2]; // negative numbers are -(leafs+1), not nodes
+    int16_t     children[PlaneSides]; // negative numbers are -(leafs+1), not nodes
 
-    int16_t     mins[3];  // for sphere culling
-    int16_t     maxs[3];
+    int16_t     mins[VECT_DIM];  // for sphere culling
+    int16_t     maxs[VECT_DIM];
 
     uint16_t    firstface;
     uint16_t    numfaces; // counting both sides
 } dNode_t;      STATIC_ASSERT_SIZE(dNode_t, 4 + 2*2 + 2*2*3 + 2*2); // 24
 typedef dNode_t* dNode_p;
+
+
+typedef enum {
+    isNode, // >= CONTENTS_NODE
+    isLeaf  // < CONTENTS_NODE
+} nodeKind_t;
+
+#include "Node.h"
+static inline nodeKind_t NodeKind(mNode_p pNode) {
+    return (pNode->contents < CONTENTS_NODE)?
+        isLeaf : isNode;
+}

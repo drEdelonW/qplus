@@ -28,5 +28,5 @@ typedef struct {    // "Baseline"
 
     uint8_t effects; // EntityEffects_t  was 1 int8
     // EntityEffects_t effects;    // now 4 int32
-    uint8_t _pad[3];
+    // uint8_t _pad[3];
 } EntityState_t;      STATIC_ASSERT_SIZE(EntityState_t, ((sizeof(vec3_t) * 2) + (sizeof(uint8_t) * 4) + 4) );

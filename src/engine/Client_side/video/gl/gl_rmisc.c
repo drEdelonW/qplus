@@ -43,14 +43,10 @@ uint8_t dottexture[8][8] = {
     {0,0,0,0,0,0,0,0},
 };
 void R_InitParticleTexture() {
-    uint8_t data[8][8][4];
-
-    //
-    // particle texture
-    //
     particletexture = texture_extension_number++;
     GL_Bind(particletexture);
 
+    uint8_t data[8][8][4];    // particle texture
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
             data[y][x][0] = 0xFF;

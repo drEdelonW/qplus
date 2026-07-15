@@ -1,4 +1,4 @@
-#include "progLump.h"
+#include "Lump.h"
 
 static TypeLess_ptr _base = NULL;
 void SetLumpBase(TypeLess_ptr base){ _base = base; }

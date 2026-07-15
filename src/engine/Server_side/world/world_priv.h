@@ -1,7 +1,6 @@
 #pragma once
 
 #include "world.h"
-#include "bspfile.h"
 #include <string.h>
 #include "server.h"
 #include "console.h"

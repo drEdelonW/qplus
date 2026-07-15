@@ -125,16 +125,16 @@ void R_SplitEntityOnNode(mNode_p node) {
     }
 
     // NODE_MIXED
-    PlaneSide_t sides = BOX_ON_PLANE_SIDE(r_entBB, node->plane);
+    BoxPlaneSide_t sides = BOX_ON_PLANE_SIDE(r_entBB, node->plane);
 
-    if (sides == PsBoth) {          // split on this plane
+    if (sides == BPsBoth) {          // split on this plane
         if (!r_pefragtopnode)
             r_pefragtopnode = node; // if this is the first splitter of this bmodel, remember it
     }
 
     // recurse down the contacted sides
-    if (sides & PsFront)    R_SplitEntityOnNode(node->children[0]);
-    if (sides & PsBack)     R_SplitEntityOnNode(node->children[1]);
+    if (sides & BPsFront)    R_SplitEntityOnNode(node->children[PsFront]);
+    if (sides & BPsBack)     R_SplitEntityOnNode(node->children[PsBack]);
 }
 
 
@@ -153,16 +153,16 @@ void R_SplitEntityOnNode2(mNode_p node) {
         return;
     }
 
-    PlaneSide_t sides = BOX_ON_PLANE_SIDE(r_entBB, node->plane);
+    BoxPlaneSide_t sides = BOX_ON_PLANE_SIDE(r_entBB, node->plane);
 
-    if (sides == PsBoth) {
+    if (sides == BPsBoth) {
         r_pefragtopnode = node;     // remember first splitter
         return;
     }
 
     // not split yet; recurse down the contacted side
-    if (sides & PsFront)    R_SplitEntityOnNode2(node->children[0]);
-    else                    R_SplitEntityOnNode2(node->children[1]);
+    if (sides & BPsFront)   R_SplitEntityOnNode2(node->children[PsFront]);
+    else                    R_SplitEntityOnNode2(node->children[PsBack]);
 }
 
 

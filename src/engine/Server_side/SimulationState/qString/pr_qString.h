@@ -1,7 +1,7 @@
 #pragma once
 #include "types.h"
 #include "pr_comp.h"
-#include "progLump.h"
+#include "Lump.h"
 
 typedef int32_t string_t;
 typedef string_t* string_p;

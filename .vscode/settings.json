@@ -4,24 +4,6 @@
         "*.hpp": "cpp",
         "*.h": "c",
         "*.c": "c",
-        "mathlib.h": "c",
-        "sizebuf.h": "c",
-        "q_tools.h": "c",
-        "qboolean.h": "c",
-        "byte_t.h": "c",
-        "endian_tools.h": "c",
-        "qparams.h": "c",
-        "chase.h": "c",
-        "r_local.h": "c",
-        "quakedef.h": "c",
-        "d_local.h": "c",
-        "*.q1": "c",
-        "*.q2": "c",
-        "common.h": "c",
-        "bspfile.h": "c",
-        "random": "c",
-        "limits": "c",
-        "ratio": "c",
-        "cstddef": "c"
+
     }
 }

@@ -78,21 +78,13 @@ vec3_t r_avertexnormals[NUMVERTEXNORMALS] = {
 #pragma GCC diagnostic pop
 
 
-/*
-================
-R_AliasTransformVector
-================
-*/
 void R_AliasTransformVector(vec3_t in, vec3_p out) {
     for (int i = 0; i < VECT_DIM; i++)
         out->v[i] = DotProduct(in, *(vec3_p)&aliastransform.m[i][0]) + aliastransform.m[i][3];
 }
 
-/*
-================
-R_AliasSetUpTransform
-================
-*/
+
+
 void R_AliasSetUpTransform(bool trivial_accept) {
     static mat3x4_t tmatrix;
     static mat3x4_t viewmatrix;
@@ -107,7 +99,6 @@ void R_AliasSetUpTransform(bool trivial_accept) {
     };
 
     _alias = GetBasis(angles);
-
 
     tmatrix.m[0][0] = pmdl->scale.x;
     tmatrix.m[1][1] = pmdl->scale.y;
@@ -321,9 +312,11 @@ void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, 
         .y = pverts->v8[Y_AX],
         .z = pverts->v8[Z_AX],
     };
-    av->fv.x = DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3];
-    av->fv.y = DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3];
-    av->fv.z = DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3];
+    av->fv = VecXYZ(
+        DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3],
+        DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3],
+        DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3]
+    );
 
     fv->vAttr.s = pstverts->s;
     fv->vAttr.t = pstverts->t;
@@ -353,7 +346,7 @@ R_AliasProjectFinalVert
 */
 void R_AliasProjectFinalVert(FinalVert_p fv, AuxVert_p av) {
     // project points
-    float zi = 1.0 / av->fv.z;
+    float zi = 1.f / av->fv.z;
 
     fv->vAttr.zi = zi * _ziscale;
 

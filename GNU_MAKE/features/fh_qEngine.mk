@@ -109,7 +109,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
 
                         SRC_LIST += $(PROG_DIR)/VM_state.c
                         SRC_LIST += $(PROG_DIR)/pr_exec.c
-                        SRC_LIST += $(PROG_DIR)/progLump.c
 
                 SRC_LIST += $(SV_SIDE_DIR)/sv_main.c
                 SRC_LIST += $(SV_SIDE_DIR)/sv_user.c
@@ -222,6 +221,8 @@ include features/fh_qRender$(QRND).mk
                                 SRC_LIST += $(TGA_DIR)/tga.c
 
                 $(eval STRUCT_DIR := $(SHARED_DIR)/structs) $(eval INCLUDES += $(STRUCT_DIR))
+                        $(eval LUMP_DIR := $(STRUCT_DIR)/Lump) $(eval INCLUDES += $(LUMP_DIR))
+                                SRC_LIST += $(LUMP_DIR)/Lump.c
 
                         $(eval BSP_DIR := $(STRUCT_DIR)/BSPtree) $(eval INCLUDES += $(BSP_DIR))
                                 SRC_LIST += $(STRUCT_DIR)/qPic.c

@@ -48,7 +48,7 @@ void SV_CheckWaterTransition(edict_p pEntIn) {
         point.z += pEntIn->v.mins.z + 1.f;
     }
 # endif
-    int cont = SV_PointContents(point);
+    contents_t cont = SV_PointContents(point);
 #else
     contents_t cont = SV_PointContents(pEntIn->v.origin);
 #endif
@@ -58,7 +58,7 @@ void SV_CheckWaterTransition(edict_p pEntIn) {
         return;
     }
 
-    if ((contents_t)pEntIn->v.watertype == CONTENTS_EMPTY) // just crossed into water
+    if (pEntIn->v.watertype == CONTENTS_EMPTY) // just crossed into water
         SV_StartSound(pEntIn, SndChAuto, "misc/h2ohit1.wav", VolFull, AtnNorm);
 
     if (cont <= CONTENTS_WATER) {

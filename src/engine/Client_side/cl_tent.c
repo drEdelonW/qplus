@@ -117,7 +117,7 @@ void CL_ParseBeam(Model_p m) {
             cl_beams[i] = (Beam_t){
                 .entity = ent,
                 .model = m,
-                .endtime = (LegDt_t)(GetClSimTime() + 0.2f),
+                .endtime = (GetClSimTime() + 0.2f),
                 .start = start,
                 .end = end,
             };
@@ -132,7 +132,7 @@ void CL_ParseBeam(Model_p m) {
             cl_beams[i] = (Beam_t){
                 .entity = ent,
                 .model = m,
-                .endtime = (LegDt_t)(GetClSimTime() + 0.2f),
+                .endtime = (GetClSimTime() + 0.2f),
                 .start = start,
                 .end = end,
             };
@@ -202,7 +202,7 @@ void CL_ParseTEnt() {
         *(dl = CL_AllocDlight(0)) = (dLight_t){
             .origin = pos,
             .radius = 350.0f,
-            .die = (LegDt_t)(GetClSimTime() + 0.5f),
+            .die = (GetClSimTime() + 0.5f),
             .decay = 300.0f,
             .key = 0,
         };
@@ -242,7 +242,7 @@ void CL_ParseTEnt() {
         *(dl = CL_AllocDlight(0)) = (dLight_t){
             .origin = pos,
             .radius = 350.0f,
-            .die = (LegDt_t)(GetClSimTime() + 0.5f),
+            .die = (GetClSimTime() + 0.5f),
             .decay = 300.0f,
             .key = 0,
         };
@@ -266,7 +266,7 @@ void CL_ParseTEnt() {
         *(dl = CL_AllocDlight(-1)) = (dLight_t){
             .origin = endpos,
             .radius = 350.0f,
-            .die = (LegDt_t)(GetClSimTime() + 0.5f),
+            .die = (GetClSimTime() + 0.5f),
             .decay = 300.0f,
             .key = -1;
         };

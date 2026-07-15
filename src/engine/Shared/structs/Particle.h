@@ -26,7 +26,7 @@ struct Particle_s {
     Particle_p      next;
     vec3_t          vel;
     float           ramp;
-    LegDt_t         die;
+    sRealTime_t     die;
     ParticleType_t  type;
 };
 

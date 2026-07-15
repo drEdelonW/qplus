@@ -27,7 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // current entity info
 //
-bool        inSubModel;
 r_Entity_p  currententity;
 vec3_t  modelorg;       // modelorg is the viewpoint reletive to the currently rendering entity
 vec3_t  base_modelorg;  // TODO: move to transform code

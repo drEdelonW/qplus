@@ -50,7 +50,7 @@ when crossing a water boudnary.
 */
 
 
-static LegDt_t _v_DmgTime;
+static sSimTime_t _v_DmgTime;
 static float _v_DmgRoll, _v_DmgPitch;
 
 
@@ -89,7 +89,7 @@ V_CalcBob
 ===============
 */
 float V_CalcBob() {
-    LegDt_t cycle = (GetClSimTime() - (int)(GetClSimTime() / cl_bobcycle.value) * cl_bobcycle.value) / cl_bobcycle.value;
+    float cycle = (GetClSimTime() - (int)(GetClSimTime() / cl_bobcycle.value) * cl_bobcycle.value) / cl_bobcycle.value;
 
     if (cycle < cl_bobup.value) cycle = M_PI * (cycle / cl_bobup.value);
     else                        cycle = M_PI + M_PI * (cycle - cl_bobup.value) / (1.f - cl_bobup.value);
@@ -97,10 +97,11 @@ float V_CalcBob() {
     // bob is proportional to velocity in the xy plane
     // (don't count Z, or jumping messes it up)
 
-    float bob = sqrtf(
-        (cl.velocity.x * cl.velocity.x) +
-        (cl.velocity.y * cl.velocity.y)
-    ) * cl_bob.value;
+    float bob =
+        sqrtf(
+            (cl.velocity.x * cl.velocity.x) +
+            (cl.velocity.y * cl.velocity.y)
+        ) * cl_bob.value;
     //Con_Printf ("speed: %5.1f\n", Length(cl.velocity));
     bob = (bob * 0.3f) + (bob * 0.7f * sinf(cycle));
     ClampInRange(-7.f, &bob, 4.f);

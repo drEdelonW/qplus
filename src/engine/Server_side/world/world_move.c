@@ -215,8 +215,8 @@ void SV_ClipToLinks(areaNode_p node, moveClip_p clip) {
     if (node->axis == AXIS_LEAF)
         return;
 
-    if (clip->box.maxs.v[node->axis] > node->dist)     SV_ClipToLinks(node->children[0], clip);
-    if (clip->box.mins.v[node->axis] < node->dist)     SV_ClipToLinks(node->children[1], clip);
+    if (clip->box.maxs.v[node->axis] > node->dist)     SV_ClipToLinks(node->children[PsFront], clip);
+    if (clip->box.mins.v[node->axis] < node->dist)     SV_ClipToLinks(node->children[PsBack], clip);
 }
 
 

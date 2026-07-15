@@ -43,7 +43,7 @@
     ================
 */
 void CL_AdjustAngles() {
-    LegDt_t speed = (kbIsDown(in.speed)) ?
+    SimDt_t speed = (kbIsDown(in.speed)) ?
         host_frametime * cl_anglespeedkey.value : host_frametime;
 
     if (!(kbIsDown(in.strafe))) {

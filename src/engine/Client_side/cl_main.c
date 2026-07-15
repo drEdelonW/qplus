@@ -51,12 +51,8 @@ LightStyle_t    cl_lightstyle[MAX_LIGHTSTYLES] PLACE_TO_SDRAM;
 uint32_t        cl_numvisedicts;
 r_Entity_p      cl_visedicts[MAX_VISEDICTS] PLACE_TO_SDRAM;
 
-/*
-=====================
-CL_ClearState
 
-=====================
-*/
+
 void CL_ClearState() {
     if (!Host_IsServerActive())
         Host_ClearMemory();
@@ -149,11 +145,8 @@ void CL_NextDemo() {
     cls.demonum++;
 }
 
-/*
-==============
-CL_PrintEntities_f
-==============
-*/
+
+
 void CL_PrintEntities_f() {
     for (int i = 0; i < cl.num_entities; i++) {
         Con_Printf("%3i:", i);
@@ -189,7 +182,6 @@ SetPal
 Debugging tool, just flashes the screen
 ===============
 */
-
 typedef enum {
     PalNormal = 0,   // host_basepal
     PalLowFrac = 1,   // green flash — frac < -0.01
@@ -270,8 +262,8 @@ Determines the fraction between the last two messages that the objects
 should be put at.
 ===============
 */
-LegDt_t CL_LerpPoint() {
-    LegDt_t dT = (LegDt_t)(cl.mtime[Cur] - cl.mtime[Prev]);
+float CL_LerpPoint() {
+    SimDt_t dT = cl.mtime[Cur] - cl.mtime[Prev];
 
     if (!dT ||
         cl_nolerp.value ||
@@ -287,7 +279,7 @@ LegDt_t CL_LerpPoint() {
         dT = 0.1f;
     }
 
-    LegDt_t frac = (LegDt_t)(GetClSimTime() - cl.mtime[Prev]) / dT;
+    float frac = (GetClSimTime() - cl.mtime[Prev]) / dT;
     //Con_Printf ("frac: %f\n",frac);
     if (frac < 0.f) {
         if (frac < -0.01f) {
@@ -310,14 +302,9 @@ LegDt_t CL_LerpPoint() {
 }
 
 
-/*
-===============
-CL_RelinkEntities
-===============
-*/
+
 void CL_RelinkEntities() {
-    // determine partial update time
-    LegDt_t frac = CL_LerpPoint();
+    float frac = CL_LerpPoint();    // determine partial update time
 
     cl_numvisedicts = 0;
 
@@ -328,8 +315,7 @@ void CL_RelinkEntities() {
         )
     );
 
-    if (cls.isDemoPlaying) {
-        // interpolate the angles
+    if (cls.isDemoPlaying) {    // interpolate the angles
         cl.viewangles = AngleMA(cl.mviewangles[Prev],
             frac, AngleSubtract(
                 cl.mviewangles[Cur], cl.mviewangles[Prev]
@@ -356,12 +342,10 @@ void CL_RelinkEntities() {
 
         vec3_t oldorg = ent->pose.loc;
 
-        if (ent->forcelink) { // the entity was not updated in the last message so move to the final loc
-            ent->pose.loc = ent->msgPoses[Cur].loc;
-            ent->pose.aim = ent->msgPoses[Cur].aim;
-        }
+        if (ent->forcelink) // the entity was not updated in the last message so move to the final loc
+            ent->pose = ent->msgPoses[Cur];
         else {  // if the delta is large, assume a teleport and don't lerp
-            LegDt_t fr = frac;
+            float fr = frac;
             vec3_t delta = VectorSubtract(ent->msgPoses[Cur].loc, ent->msgPoses[Prev].loc);
             if (isVectorOutOfRange(delta, 100.f))
                 fr = 1.f;  // assume a teleportation, not a motion
@@ -504,7 +488,10 @@ void CL_ReadFromServer() {
 
         cl.last_received_message = GetRealTime();
         CL_ParseServerMessage();
-    } while (ret && (cls.state == ca_connected));
+    } while (
+        (ret) &&
+        (cls.state == ca_connected)
+        );
 
     if (cl_shownet.value)   Con_Printf("\n");
 
@@ -517,11 +504,8 @@ void CL_ReadFromServer() {
     // return 0;
 }
 
-/*
-=================
-CL_SendCmd
-=================
-*/
+
+
 void CL_SendCmd() {
     if (cls.state != ca_connected)  return;
 
@@ -548,20 +532,15 @@ void CL_SendCmd() {
     SZ_Clear(&cls.message);
 }
 
-/*
-=================
-CL_Init
-=================
-*/
+
+
 void CL_Init() {
     SZ_Alloc(&cls.message, 1024);
 
     CL_InitInput();
     CL_InitTEnts();
 
-    //
     // register our commands
-    //
     Cvar_RegisterVariable(&cl_name);
     Cvar_RegisterVariable(&cl_color);
     Cvar_RegisterVariable(&cl_upspeed);

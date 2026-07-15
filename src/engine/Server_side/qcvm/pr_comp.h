@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // this file is shared by quake and qcc
 #include "types.h"
-#include "progLump.h"
+#include "Lump.h"
 #include "assert.h"
 
 #define PROG_VERSION 6

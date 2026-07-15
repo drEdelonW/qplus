@@ -68,11 +68,11 @@ void R_MarkLights(dLight_p light, int bit, mNode_p node) {
     float dist = DotProduct(light->origin, splitplane->normal) - splitplane->dist;
 
     if (dist > light->radius) {
-        R_MarkLights(light, bit, node->children[0]);
+        R_MarkLights(light, bit, node->children[PsFront]);
         return;
     }
     if (dist < -light->radius) {
-        R_MarkLights(light, bit, node->children[1]);
+        R_MarkLights(light, bit, node->children[PsBack]);
         return;
     }
 
@@ -86,8 +86,8 @@ void R_MarkLights(dLight_p light, int bit, mNode_p node) {
         surf->dlightbits |= bit;
     }
 
-    R_MarkLights(light, bit, node->children[0]);
-    R_MarkLights(light, bit, node->children[1]);
+    R_MarkLights(light, bit, node->children[PsFront]);
+    R_MarkLights(light, bit, node->children[PsBack]);
 }
 
 
@@ -136,7 +136,7 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
     float back = DotProduct(end, plane->normal) - plane->dist;
     bool side = (front < 0.f);
 
-    if ((back < 0) == side)
+    if ((back < 0.f) == side)
         return RecursiveLightPoint(node->children[side], start, end);
 
     float frac = front / (front - back);

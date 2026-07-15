@@ -9,7 +9,6 @@
 #include "structs/Sound_struct.h" // TODO: fix name and kind of content
 #include "eFrag_pre.h"
 
-#define MAX_MAP_LEAFS   (8192) /* 8k */
 
 // it was [mleaf_t]
 struct mLeaf_s {    // TODO: merge in shared head structure with  mNode_s

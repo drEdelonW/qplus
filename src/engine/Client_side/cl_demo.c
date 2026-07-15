@@ -61,7 +61,7 @@ void CL_FinishTimeDemo() {
 
     Con_Printf(
         "%i frames %5.1f seconds %5.1f fps\n",
-        frames, time, (LegDt_t)frames / time
+        frames, time, frames / time
     );
 }
 

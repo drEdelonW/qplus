@@ -115,11 +115,8 @@ r_Entity_p CL_EntityNum(EdIdx num) {
 }
 
 
-/*
-    ==================
-    CL_ParseStartSoundPacket
-    ==================
-*/
+
+
 void CL_ParseStartSoundPacket() {
     // {
     uint8_t field_mask = MSG_ReadByte();
@@ -173,25 +170,22 @@ void CL_KeepaliveMessage() {
     net_message = old;
     memcpy(net_message.data, olddata, net_message.cursize);
 
-    // check time
-    LegDt_t time = (LegDt_t)Host_FloatTime();
-    static LegDt_t _lastMsg;
-    if ((time - _lastMsg) < 5.0f)    return;
-    _lastMsg = time;
-
-    // write out a nop
-    Con_Printf("--> client to server keepalive\n");
+    {// check time
+        LegDt_t time = (LegDt_t)Host_FloatTime();
+        static LegDt_t _lastMsg;
+        if ((time - _lastMsg) < 5.0f)
+            return;
+        _lastMsg = time;
+    }
+    Con_Printf("--> client to server keepalive\n");    // write out a nop
 
     MSG_WriteByte(&cls.message, clc_nop);    NET_SendMessage(cls.netcon, &cls.message);
     SZ_Clear(&cls.message);
 }
 
+
+
 #include "z_hunk.h"
-/*
-    ==================
-    CL_ParseServerInfo
-    ==================
-*/
 void CL_ParseServerInfo() {
     Con_DPrintf("Serverinfo packet received.\n");
 
@@ -375,12 +369,12 @@ void CL_ParseUpdate(update_bits_t bits) {
     // shift the known values for interpolation
     ent->msgPoses[Prev] = ent->msgPoses[Cur];
     {
-        ent->msgPoses[Cur].loc.x    /**/= (bits & U_ORIGIN1) /**/ ? MSG_ReadCoord() : ent->baseline.pose.loc.x;
-        ent->msgPoses[Cur].aim.pitch/**/= (bits & U_ANGLE1)  /**/ ? MSG_ReadAngle() : ent->baseline.pose.aim.pitch;
-        ent->msgPoses[Cur].loc.y    /**/= (bits & U_ORIGIN2) /**/ ? MSG_ReadCoord() : ent->baseline.pose.loc.y;
-        ent->msgPoses[Cur].aim.yaw  /**/= (bits & U_ANGLE2)  /**/ ? MSG_ReadAngle() : ent->baseline.pose.aim.yaw;
-        ent->msgPoses[Cur].loc.z    /**/= (bits & U_ORIGIN3) /**/ ? MSG_ReadCoord() : ent->baseline.pose.loc.z;
-        ent->msgPoses[Cur].aim.roll /**/= (bits & U_ANGLE3)  /**/ ? MSG_ReadAngle() : ent->baseline.pose.aim.roll;
+        ent->msgPoses[Cur].loc.x    /**/ = (bits & U_ORIGIN1) /**/ ? MSG_ReadCoord() : ent->baseline.pose.loc.x;
+        ent->msgPoses[Cur].aim.pitch/**/ = (bits & U_ANGLE1)  /**/ ? MSG_ReadAngle() : ent->baseline.pose.aim.pitch;
+        ent->msgPoses[Cur].loc.y    /**/ = (bits & U_ORIGIN2) /**/ ? MSG_ReadCoord() : ent->baseline.pose.loc.y;
+        ent->msgPoses[Cur].aim.yaw  /**/ = (bits & U_ANGLE2)  /**/ ? MSG_ReadAngle() : ent->baseline.pose.aim.yaw;
+        ent->msgPoses[Cur].loc.z    /**/ = (bits & U_ORIGIN3) /**/ ? MSG_ReadCoord() : ent->baseline.pose.loc.z;
+        ent->msgPoses[Cur].aim.roll /**/ = (bits & U_ANGLE3)  /**/ ? MSG_ReadAngle() : ent->baseline.pose.aim.roll;
     }
     if (bits & U_NOLERP)
         ent->forcelink = true;
@@ -392,11 +386,9 @@ void CL_ParseUpdate(update_bits_t bits) {
     }
 }
 
-/*
-    ==================
-    CL_ParseBaseline
-    ==================
-*/
+
+
+
 void CL_ParseBaseline(r_Entity_p ent) {
     ent->baseline.modelindex /**/ = MSG_ReadByte();
     ent->baseline.frame      /**/ = MSG_ReadByte();
@@ -463,11 +455,9 @@ void CL_ParseClientdata(server_update_bits_t bits) {
     if (upd) { Sbar_Changed(); }
 }
 
-/*
-    =====================
-    CL_NewTranslation
-    =====================
-*/
+
+
+
 void CL_NewTranslation(int32_t slot) {
     if ((slot < 0) ||
         (slot > cl.maxclients)
@@ -500,11 +490,9 @@ void CL_NewTranslation(int32_t slot) {
     }
 }
 
-/*
-    =====================
-    CL_ParseStatic
-    =====================
-*/
+
+
+
 void CL_ParseStatic() {
     int statics = cl.num_statics;
     if (statics >= MAX_STATIC_ENTITIES)
@@ -525,11 +513,9 @@ void CL_ParseStatic() {
     R_AddEfrags(ent);
 }
 
-/*
-    ===================
-    CL_ParseStaticSound
-    ===================
-*/
+
+
+
 void CL_ParseStaticSound() {
     vec3_t org = MSG_ReadVector();
     uint8_t sound_num = MSG_ReadByte();
@@ -545,11 +531,10 @@ static inline void ShowNet(cStringRO x) {
     if (cl_shownet.value == 2)
         Con_Printf("%3i:%s\n", (getMsgReadCount() - 1), x);
 }
-/*
-    =====================
-    CL_ParseServerMessage
-    =====================
-*/
+
+
+
+
 #ifdef _WIN32
 # include "vid.h"    // VID_HandlePause();
 #endif
@@ -627,10 +612,7 @@ void CL_ParseServerMessage() {
 
         case svc_sound:         CL_ParseStartSoundPacket();             break;
 
-        case svc_stopsound: {
-            int16_t msg = MSG_ReadShort();
-            S_StopSound(DIV4(msg), (msg & 0x07));
-        } break;
+        case svc_stopsound: { int16_t msg = MSG_ReadShort(); S_StopSound(DIV4(msg), (msg & 0x07)); } break;
 
         case svc_updatename: {
             Sbar_Changed();

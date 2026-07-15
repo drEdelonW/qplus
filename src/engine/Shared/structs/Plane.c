@@ -18,7 +18,7 @@ void BOPS_Error() { Host_SysError("BoxOnPlaneSide:  Bad signbits"); }
 ==================
 BoxOnPlaneSide
 
-PlaneSide_t PsFront, PsBack, or PsBoth
+BoxPlaneSide_t BPsFront, BPsBack, or BPsBoth
 ==================
 */
 // bbox_indexes[signbits][axis] -> bounds selector for dist1 (near corner)
@@ -33,22 +33,22 @@ static const int bbox_indexes[8][3] = {
     {1, 0, 0},  // 0b110: y,z negative
     {0, 0, 0},  // 0b111: all negative
 };
-PlaneSide_t BoxOnPlaneSide(BBox_t eBB, mPlane_p plane) {
-    const int* pindex = bbox_indexes[plane->signbits];
+BoxPlaneSide_t BoxOnPlaneSide(BBox_t eBB, mPlane_p plane) {
+    const int* pIdx = bbox_indexes[plane->signbits];
+    float dist1 = DotProduct(plane->normal, VecXYZ(
+        eBB.bounds[pIdx[X_AX]  ].x,
+        eBB.bounds[pIdx[Y_AX]  ].y,
+        eBB.bounds[pIdx[Z_AX]  ].z
+    ));
+    float dist2 = DotProduct(plane->normal, VecXYZ(  // For dist2 we just invert the selection
+        eBB.bounds[pIdx[X_AX]^1].x,
+        eBB.bounds[pIdx[Y_AX]^1].y,
+        eBB.bounds[pIdx[Z_AX]^1].z
+    ));
 
-    float dist1 =
-        plane->normal.x * eBB.bounds[pindex[X_AX]  ].x +
-        plane->normal.y * eBB.bounds[pindex[Y_AX]  ].y +
-        plane->normal.z * eBB.bounds[pindex[Z_AX]  ].z;
-
-    float dist2 =   // For dist2 we just invert the selection
-        plane->normal.x * eBB.bounds[pindex[X_AX]^1].x +
-        plane->normal.y * eBB.bounds[pindex[Y_AX]^1].y +
-        plane->normal.z * eBB.bounds[pindex[Z_AX]^1].z;
-
-    PlaneSide_t sides = PsNone;
-    if (dist1 >= plane->dist)   sides |= PsFront;
-    if (dist2 < plane->dist)    sides |= PsBack;
+    BoxPlaneSide_t sides = BPsNone;
+    if (dist1 >= plane->dist)   sides |= BPsFront;
+    if (dist2 < plane->dist)    sides |= BPsBack;
 
 #ifdef PARANOID
     if (sides == PsNone) Host_SysError("BoxOnPlaneSide: sides==0");
@@ -63,11 +63,6 @@ PlaneSide_t BoxOnPlaneSide(BBox_t eBB, mPlane_p plane) {
 #include "BrushModel.h"
 #include "endian_tools.h"
 
-/*
-=================
-Mod_LoadPlanes
-=================
-*/
 
 void Mod_LoadPlanes(Lump_p Lump_in) {
     dPlane_p in = getMapLumpPtr(mod_base, Lump_in);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "progLump.h"
+#include "Lump.h"
 #include "types.h"
 #include "assert.h"
 #include "pr_qString.h"
@@ -9,7 +9,7 @@
 // dDef: runtime descriptor of a QuakeC variable (name, type, offset).
 // Used as reflection over VM memory (progs.dat layout).
 //
-// Globals: variables stored in pr_globals[] (VM-wide state).
+// Globals: variables stored in _pGlobalDefs[] (VM-wide state).
 // Fields:  per-entity variables stored inside edict payload.
 //
 // Access pattern: name -> dDef -> offset -> raw memory read/write.

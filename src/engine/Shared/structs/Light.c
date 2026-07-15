@@ -46,7 +46,7 @@ CL_DecayLights
 ===============
 */
 void CL_DecayLights() {
-    LegDt_t time = (LegDt_t)(GetClSimTime() - cl.oldtime);
+    sSimTime_t time = (GetClSimTime() - cl.oldtime);
 
     for (int i = 0; i < MAX_DLIGHTS; i++) {
         if ((cl_dlights[i].die < GetClSimTime()) ||

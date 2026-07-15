@@ -186,7 +186,7 @@ void SV_WriteEntitiesToClient(edict_p clent, sizebuf_p msg) {
 
             EntLeaf_t i = EntLeafsFirst;
             for (; i < ent->num_leafs; i++)
-                if (pvs[DIV8(ent->leafnums[i])] & (1 << (ent->leafnums[i] & 7))) break;
+                if (pvs[DIV8(ent->leafnums[i])] & (1 << (ent->leafnums[i] & 0x07))) break;
 
             if (i == ent->num_leafs)    continue;    // not visible
         }

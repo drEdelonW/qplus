@@ -42,7 +42,7 @@ void PF_Find() {
     edict_p second = first;
     edict_p last = second;
     EdIdx edict = G_EDICTNUM(OFS_PARM0);
-    int f = G_INT(OFS_PARM1);
+    qVmString_t qStr = G_INT(OFS_PARM1);
     cString str = G_STRING(OFS_PARM2);
     if (!str)
         PR_RunError("PF_Find: bad search string");
@@ -51,9 +51,9 @@ void PF_Find() {
         edict_p ed = ED_GetEDictByIdx(edict);
         if (!ed->inUse)   continue;
 
-        cString t = E_STRING(ed, f);
-        if (!t)            continue;
-        if (!strcmp(t, str)) {
+        cString cStr = E_STRING(ed, qStr);
+        if (!cStr)            continue;
+        if (!strcmp(cStr, str)) {
             /**/ if (first == ED_GetEDictByIdx(EdictWorld))   first = ed;
             else if (second == ED_GetEDictByIdx(EdictWorld))  second = ed;
             ed->v.chain = ED_GetEDictOffs(last);
@@ -73,7 +73,7 @@ void PF_Find() {
     RETURN_EDICT(first); return;
 #else
     EdIdx edict = G_EDICTNUM(OFS_PARM0);
-    qVmString_t f = G_INT(OFS_PARM1);
+    qVmString_t qStr = G_INT(OFS_PARM1);
     cString str = G_STRING(OFS_PARM2);
     if (!str)
         PR_RunError("PF_Find: bad search string");
@@ -81,9 +81,9 @@ void PF_Find() {
     for (edict++; edict < GetEdNum(); edict++) {
         edict_p ed = ED_GetEDictByIdx(edict);
         if (!ed->inUse)   continue;
-        cString t = E_STRING(ed, f);
-        if (!t)         continue;
-        if (!strcmp(t, str)
+        cString cStr = E_STRING(ed, qStr);
+        if (!cStr)         continue;
+        if (!strcmp(cStr, str)
             ) {
             RETURN_EDICT(ed); return;
         }
@@ -105,8 +105,8 @@ findradius (origin, radius)
 */
 void PF_findradius() {
     edict_p chain = ED_GetEDictByIdx(EdictWorld);
-    for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
-        edict_p ent = ED_GetEDictByIdx(e);
+    for (EdIdx idx = EdictPlayer1; idx < GetEdNum(); idx++) {
+        edict_p ent = ED_GetEDictByIdx(idx);
 
         if ((!ent->inUse) ||
             (ent->v.solid == SOLID_NOT)
@@ -207,11 +207,10 @@ void SetMinMaxSize(edict_p edict, BBox_t bb, bool rotate) {
     // set derived values
     edict->v.mins = rbb.mins;
     edict->v.maxs = rbb.maxs;
+    edict->v.size = BBoxSize(bb);
 #else
     EvSetBBox(&edict->v, bb);
 #endif
-    edict->v.size = BBoxSize(bb);
-
     SV_LinkEdict(edict, false);
 }
 
@@ -224,7 +223,13 @@ the size box is rotated by the current angle
 setsize (entity, minvector, maxvector)
 =================
 */
-void PF_setsize() { SetMinMaxSize(G_EDICT(OFS_PARM0), BBoxFromVec3(G_VECTOR(OFS_PARM1), G_VECTOR(OFS_PARM2)), false); }
+void PF_setsize() {
+    SetMinMaxSize(
+        G_EDICT(OFS_PARM0),
+        BBoxFromVec3(G_VECTOR(OFS_PARM1), G_VECTOR(OFS_PARM2)),
+        false
+    );
+}
 
 /*
 =================
@@ -257,112 +262,32 @@ void PF_setmodel() {
 
 void PF_makestatic() {
     edict_p ent = G_EDICT(OFS_PARM0);
-    MSG_WriteByte(&sv.signon, svc_spawnstatic);
-    MSG_WriteByte(&sv.signon, (uint8_t)SV_ModelIndex(PR_GetQString(ent->v.model)));
-    MSG_WriteByte(&sv.signon, (uint8_t)ent->v.frame);
-    MSG_WriteByte(&sv.signon, (uint8_t)ent->v.colormap);
-    MSG_WriteByte(&sv.signon, (uint8_t)ent->v.skin);
-    for (int i = 0; i < VECT_DIM; i++) {
-        MSG_WriteCoord(&sv.signon, ent->v.origin.v[i]);
-        MSG_WriteAngle(&sv.signon, ent->v.angles.v[i]);
+    MSG_WriteByte(&sv.signon, svc_spawnstatic); {
+        MSG_WriteByte(&sv.signon, (uint8_t)SV_ModelIndex(PR_GetQString(ent->v.model)));
+        MSG_WriteByte(&sv.signon, (uint8_t)ent->v.frame);
+        MSG_WriteByte(&sv.signon, (uint8_t)ent->v.colormap);
+        MSG_WriteByte(&sv.signon, (uint8_t)ent->v.skin);
+        for (int i = 0; i < VECT_DIM; i++) {
+            MSG_WriteCoord(&sv.signon, ent->v.origin.v[i]);
+            MSG_WriteAngle(&sv.signon, ent->v.angles.v[i]);
+        }
     }
-
-    // throw the entity away now
-    ED_Free(ent);
+    ED_Free(ent);   // throw the entity away now
 }
 
 
-/*
-==============
-PF_setspawnparms
-==============
-*/
+
 void PF_setspawnparms() {
-    EdIdx i = ED_GetEDictIdx(G_EDICT(OFS_PARM0));
-    if ((i < EdictPlayer1) ||
-        (i > GetSvMaxClients())
+    EdIdx idx = ED_GetEDictIdx(G_EDICT(OFS_PARM0));
+    if ((idx < EdictPlayer1) ||
+        (idx > GetSvMaxClients())
         )   PR_RunError("Entity is not a client");
 
     // copy spawn parms out of the RmtClient_t
-    RmtClient_p client = svs.clients + (i - EdictPlayer1);
+    RmtClient_p client = svs.clients + (idx - EdictPlayer1);
 
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
         (&pGame()->parm1)[i] = client->spawn_parms[i];
 }
 
-
-//============================================================================
-
-
-static uint8_t _checkPvs[MAX_MAP_LEAFS / 8];
-
-uint8_t PF_newcheckclient(uint8_t check) {
-    ClampInRange(EdictPlayer1, &check, GetSvMaxClients()); // cycle to the next one
-    uint8_t i = (check == GetSvMaxClients()) ? 0 : (check + 1);
-    for (;; i++) {
-        if (i == GetSvMaxClients() + 1)
-            i = 1;
-        if (i == check) break; // didn't find anything else
-
-        edict_p ent = ED_GetEDictByIdx(i);
-        if ((!ent->inUse) ||
-            (ent->v.health <= 0) ||
-            ((int)ent->v.flags & FL_NOTARGET)
-            )   continue;
-
-        break;  // anything that is a client, or has a client as an enemy
-    }
-
-    // get the PVS for the entity
-    edict_p ent = ED_GetEDictByIdx(i);
-    mLeaf_p leaf = Mod_PointInLeaf(VectorAdd(ent->v.origin, ent->v.view_ofs), sv.worldmodel);
-    uint8_p pvs = Mod_LeafPVS(leaf, sv.worldmodel);
-    memcpy(_checkPvs, pvs, (sv.worldmodel->numleafs + 7) >> 3);
-
-    return i;
-}
-
-/*
-=================
-PF_checkclient
-
-Returns a client (or object that has a client enemy) that would be a
-valid target.
-
-If there are more than one valid options, they are cycled each frame
-
-If (self.origin + self.viewofs) is not in the PVS of the current target,
-it is not returned at all.
-
-name checkclient()
-=================
-*/
-// #define MAX_CHECK 16
-// int c_invis, c_notvis;
-void PF_checkclient() {
-    if ((SV_GetTime() - sv.lastchecktime) >= 0.1) {     // find a new check if on a new frame
-        sv.lastcheck = PF_newcheckclient(sv.lastcheck);
-        sv.lastchecktime = SV_GetTime();
-    }
-
-    // return check if it might be visible
-    edict_p ent = ED_GetEDictByIdx(sv.lastcheck);
-    if ((!ent->inUse) ||
-        (ent->v.health <= 0.f)
-        ) {
-        RETURN_EDICT(ED_GetEDictByIdx(EdictWorld));   return;
-    }
-
-    // if current entity can't possibly see the check entity, return 0
-    edict_p self = ED_GetEDictByOffs(pGame()->self);
-    mLeaf_p leaf = Mod_PointInLeaf(VectorAdd(self->v.origin, self->v.view_ofs), sv.worldmodel);
-    int Leaf = (leaf - sv.worldmodel->leafs) - 1;
-    if ((Leaf < 0) ||
-        !(_checkPvs[DIV8(Leaf)] & (1 << (Leaf & 7)))
-        ) { // c_notvis++;
-        RETURN_EDICT(ED_GetEDictByIdx(EdictWorld));   return;
-    }
-    // c_invis++;  // might be able to see it
-    RETURN_EDICT(ent);   return;
-}
 

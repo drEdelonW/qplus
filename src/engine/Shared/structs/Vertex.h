@@ -32,6 +32,7 @@ typedef enum alias_clip_flags_e {
     ALIAS_BOTTOM_CLIP   = 0x0008u,
     ALIAS_XY_CLIP_MASK  = 0x000Fu, //  must be kept in sync
     ALIAS_Z_CLIP        = 0x0010u,
+    BMODEL_FULLY_CLIPPED= 0x0010u, // value returned by R_BmodelCheckBBox() if bbox is trivially rejected
 
     // must stay in sync with d_ifacea.h and modelgen.h
     ALIAS_ONSEAM        = 0x0020u,  // also defined in modelgen.h

@@ -50,9 +50,10 @@ static inline BBox_t BBoxSymmetric(vec_t r) {
     };
 }
 
+#include "CLAMP.h"
 static inline void BBoxExpandPt(BBox_p bb, vec3_t p) {
     for (int i = 0; i < VECT_DIM; i++) {
-#if 1
+#if 0
         if (p.v[i] < bb->mins.v[i])      bb->mins.v[i] = p.v[i];
         if (p.v[i] > bb->maxs.v[i])      bb->maxs.v[i] = p.v[i];
 #else
@@ -76,24 +77,50 @@ static inline vec3_t BBoxMid(BBox_t bb) {
     return VectorScale(VectorAdd(bb.mins, bb.maxs), 0.5f);
 }
 
+
 static inline bool BBoxOverlaps(BBox_t a, BBox_t b) {
     return !(
-        (a.mins.x > b.maxs.x) ||
-        (a.mins.y > b.maxs.y) ||
-        (a.mins.z > b.maxs.z) ||
-        (a.maxs.x < b.mins.x) ||
-        (a.maxs.y < b.mins.y) ||
-        (a.maxs.z < b.mins.z)
+        (
+            (a.mins.x > b.maxs.x) ||
+            (a.mins.y > b.maxs.y) ||
+            (a.mins.z > b.maxs.z)
+        ) ||
+        (
+            (a.maxs.x < b.mins.x) ||
+            (a.maxs.y < b.mins.y) ||
+            (a.maxs.z < b.mins.z)
+        )
     );
 }
 
 static inline bool BBoxTouches(BBox_t a, BBox_t b) {
     return !(
-        (a.mins.x >= b.maxs.x) ||
-        (a.mins.y >= b.maxs.y) ||
-        (a.mins.z >= b.maxs.z) ||
-        (a.maxs.x <= b.mins.x) ||
-        (a.maxs.y <= b.mins.y) ||
-        (a.maxs.z <= b.mins.z)
+        (
+            (a.mins.x >= b.maxs.x) ||
+            (a.mins.y >= b.maxs.y) ||
+            (a.mins.z >= b.maxs.z)
+        ) ||
+        (
+            (a.maxs.x <= b.mins.x) ||
+            (a.maxs.y <= b.mins.y) ||
+            (a.maxs.z <= b.mins.z)
+        )
     );
+}
+
+#include <math.h> 
+static inline float BBoxRadius(BBox_t bb) {
+    vec3_t corner;
+    for (int i = 0; i < VECT_DIM; i++) {
+#if 0
+        corner.v[i] =
+            (fabsf(bb.mins.v[i]) > fabsf(bb.maxs.v[i])) ?
+            fabsf(bb.mins.v[i]) : fabsf(bb.maxs.v[i]);
+#else
+        float mn = fabsf(bb.mins.v[i]);
+        float mx = fabsf(bb.maxs.v[i]);
+        corner.v[i] = LargerOf(mn, mx);
+#endif
+    }
+    return Length(corner);
 }

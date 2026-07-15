@@ -224,11 +224,11 @@ bool SV_RecursiveHullCheck(
     }
 
 #if 1
-    if ((t1 >= 0.f) && (t2 >= 0.f))   return SV_RecursiveHullCheck(hull, node->children[0], p1f, p2f, p1, p2, trace);
-    if ((t1 < 0.f) && (t2 < 0.f))     return SV_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
+    if ((t1 >= 0.f) && (t2 >= 0.f))   return SV_RecursiveHullCheck(hull, node->children[PsFront], p1f, p2f, p1, p2, trace);
+    if ((t1 < 0.f) && (t2 < 0.f))     return SV_RecursiveHullCheck(hull, node->children[PsBack], p1f, p2f, p1, p2, trace);
 #else
-    if (((t1 >= DIST_EPSILON) && (t2 >= DIST_EPSILON)) || ((t2 > t1) && (t1 >= 0)))     return SV_RecursiveHullCheck(hull, node->children[0], p1f, p2f, p1, p2, trace);
-    if (((t1 <= -DIST_EPSILON) && (t2 <= -DIST_EPSILON)) || ((t2 < t1) && (t1 <= 0)))   return SV_RecursiveHullCheck(hull, node->children[1], p1f, p2f, p1, p2, trace);
+    if (((t1 >= DIST_EPSILON) && (t2 >= DIST_EPSILON)) || ((t2 > t1) && (t1 >= 0)))     return SV_RecursiveHullCheck(hull, node->children[PsFront], p1f, p2f, p1, p2, trace);
+    if (((t1 <= -DIST_EPSILON) && (t2 <= -DIST_EPSILON)) || ((t2 < t1) && (t1 <= 0)))   return SV_RecursiveHullCheck(hull, node->children[PsBack], p1f, p2f, p1, p2, trace);
 #endif
 
     // put the crosspoint DIST_EPSILON pixels on the near side

@@ -6,11 +6,11 @@
 #include "qTime.h"
 
 typedef struct {
-    int32_t entity;
-    Model_p model;
-    LegDt_t endtime;
-    vec3_t  start;
-    vec3_t  end;
+    int32_t     entity;
+    Model_p     model;
+    sSimTime_t  endtime;
+    vec3_t      start;
+    vec3_t      end;
 } Beam_t;
 typedef Beam_t* Beam_p;
 

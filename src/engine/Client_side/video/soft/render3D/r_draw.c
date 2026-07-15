@@ -295,13 +295,10 @@ void R_EmitCachedEdge() {
 }
 
 
-/*
-================
-R_RenderFace
-================
-*/
+
+bool inSubModel;
+static mEdge_t _tEdge;
 void R_RenderFace(mSurface_p fa, AliasClipFlags_f clipflags) {
-    static mEdge_t _tEdge;
 
     // skip out if no more surfs
     if ((pSurface) >= pSurf_max) {
@@ -462,7 +459,6 @@ R_RenderBmodelFace
 ================
 */
 void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
-    static mEdge_t _tEdge;
 
     if (pSurface >= pSurf_max) {    // skip out if no more surfs
         r_outofsurfaces++;
@@ -478,7 +474,6 @@ void R_RenderBmodelFace(bEdge_p pedges, mSurface_p psurf) {
 
     // this is a dummy to give the caching mechanism someplace to write to
     _r_pedge = &_tEdge;
-
     ClipPlane_p pclip = NULL;   // set up clip planes
 
     AliasClipFlags_f mask = ALIAS_BOTTOM_CLIP;

@@ -48,7 +48,8 @@ areaNode_p SV_CreateAreaNode(int depth, BBox_t bb) {
 
     if (depth == AREA_DEPTH) {
         anode->axis = AXIS_LEAF;
-        anode->children[0] = anode->children[1] = NULL;
+        anode->children[PsFront] = NULL;
+        anode->children[PsBack] = NULL;
         return anode;
     }
 
@@ -61,8 +62,8 @@ areaNode_p SV_CreateAreaNode(int depth, BBox_t bb) {
     BBox_t m2 = bb;
     m1.maxs.v[anode->axis] = m2.mins.v[anode->axis] = anode->dist;
 
-    anode->children[0] = SV_CreateAreaNode(depth + 1, m2);
-    anode->children[1] = SV_CreateAreaNode(depth + 1, m1);
+    anode->children[PsFront] = SV_CreateAreaNode(depth + 1, m2);
+    anode->children[PsBack] = SV_CreateAreaNode(depth + 1, m1);
 
     return anode;
 }
@@ -102,12 +103,11 @@ void SV_FindTouchedLeafs(edict_p ent, mNode_p node) {
     }
 
     // NODE_MIXED
-    BBox_t _bb = EvAbsBBox(&ent->v);
-    PlaneSide_t sides = BOX_ON_PLANE_SIDE(_bb, node->plane);
+    BoxPlaneSide_t sides = BOX_ON_PLANE_SIDE(EvAbsBBox(&ent->v), node->plane);
 
     // recurse down the contacted sides
-    if (sides & PsFront)    SV_FindTouchedLeafs(ent, node->children[0]);
-    if (sides & PsBack)     SV_FindTouchedLeafs(ent, node->children[1]);
+    if (sides & BPsFront)    SV_FindTouchedLeafs(ent, node->children[PsFront]);
+    if (sides & BPsBack)     SV_FindTouchedLeafs(ent, node->children[PsBack]);
 }
 
 
@@ -144,8 +144,8 @@ void SV_TouchLinks(edict_p ent, areaNode_p node) {
     // recurse down both sides
     if (node->axis == AXIS_LEAF)       return;
 
-    if (ent->v.absmax.v[node->axis] > node->dist)     SV_TouchLinks(ent, node->children[0]);
-    if (ent->v.absmin.v[node->axis] < node->dist)     SV_TouchLinks(ent, node->children[1]);
+    if (ent->v.absmax.v[node->axis] > node->dist)     SV_TouchLinks(ent, node->children[PsFront]);
+    if (ent->v.absmin.v[node->axis] < node->dist)     SV_TouchLinks(ent, node->children[PsBack]);
 }
 
 
@@ -223,8 +223,8 @@ void SV_LinkEdict(edict_p ent, bool touch_triggers) {
     while (1) {
         if (node->axis == AXIS_LEAF)       break;
 
-        /**/ if (ent->v.absmin.v[node->axis] > node->dist)      node = node->children[0];
-        else if (ent->v.absmax.v[node->axis] < node->dist)      node = node->children[1];
+        /**/ if (ent->v.absmin.v[node->axis] > node->dist)      node = node->children[PsFront];
+        else if (ent->v.absmax.v[node->axis] < node->dist)      node = node->children[PsBack];
         else    break;  // crosses the node
     }
 

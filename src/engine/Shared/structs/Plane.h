@@ -18,6 +18,7 @@ enum {
     PLANE_ANYZ = 5u
 } PlaneType_t; // should be size int on 32 os
 
+
 // it was [mplane_t]
 // Plane_t structure
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
@@ -25,8 +26,8 @@ typedef struct {
     vec3_t      normal;
     float       dist;
     PlaneType_t type;       // for texture axis selection and fast side tests
-    uint8_t     signbits;   // signx + signy<<1 + signz<<1
-    uint8_t     pad[2];
+    uint8_t     signbits;   // signx | signy<<1 | signz<<1
+    // uint8_t     pad[2];
 } mPlane_t;
 typedef mPlane_t* mPlane_p;
 
@@ -39,20 +40,26 @@ typedef struct {
 } dPlane_t;     STATIC_ASSERT_SIZE(dPlane_t, 5 * 4); // 20
 typedef dPlane_t* dPlane_p;
 
-#include "Lump.h"
 
 typedef enum {
-    PsNone  = 0,                // no side determined yet
-    PsFront = 1 << 0,           // box is entirely on the positive (front) side of the plane
-    PsBack  = 1 << 1,           // box is entirely on the negative (back) side of the plane
-    PsBoth  = PsFront | PsBack, // box straddles the plane; can't trivially cull
+    PsFront     = 0,
+    PsBack      = 1,
+    PlaneSides  = 2
 } PlaneSide_t;
 
+typedef enum {  // TODO: rework this trash
+    BPsNone  = 0,               // no side determined yet
+    BPsFront = 1 << PsFront,    // box is entirely on the positive (front) side of the plane
+    BPsBack  = 1 << PsBack,     // box is entirely on the negative (back) side of the plane
+    BPsBoth  = BPsFront | BPsBack, // box straddles the plane; can't trivially cull
+} BoxPlaneSide_t;
+
+#include "Lump.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    PlaneSide_t BoxOnPlaneSide(BBox_t eBB, mPlane_p plane);
+    BoxPlaneSide_t BoxOnPlaneSide(BBox_t eBB, mPlane_p plane);
     void Mod_LoadPlanes(Lump_p l);
 
 #ifdef __cplusplus
@@ -62,7 +69,7 @@ extern "C" {
 #define BOX_ON_PLANE_SIDE(bb, p)                                        \
     (((p)->type < PLANE_ANYX)? (                              \
         ((p)->dist <= ((bb).mins).v[(p)->type])?    \
-            PsFront : (                                                 \
+            BPsFront : (                                                 \
                 ((p)->dist >= ((bb).maxs).v[(p)->type])?      \
-                    PsBack : PsBoth )                                   \
+                    BPsBack : BPsBoth )                                   \
     ) : BoxOnPlaneSide( (bb), (p)))

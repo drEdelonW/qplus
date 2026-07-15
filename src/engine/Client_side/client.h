@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #include "enginedefs.h"
-#include "bspfile.h"    // contents_t
 #include "qLight.h"     // VID_GRADES
 #include "rEntity.h"
 #include "Edict.h"
@@ -45,7 +44,7 @@ typedef struct {
 
 typedef struct {
     char    name[MAX_SCOREBOARDNAME];
-    LegDt_t   entertime;
+    LegDt_t entertime;
     int32_t frags;
     int32_t colors;   // two 4 bit fields
     ColorMap_t translations;

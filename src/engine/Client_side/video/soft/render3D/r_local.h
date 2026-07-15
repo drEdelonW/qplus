@@ -30,8 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "mathlib.h"
 
-#define BMODEL_FULLY_CLIPPED 0x10 // value returned by R_BmodelCheckBBox()
-                                     //  if bbox is trivially rejected
 
 //===========================================================================
 // viewmodel lighting
@@ -58,12 +56,12 @@ typedef aLight_t* aLight_p;
 typedef struct ClipPlane_s ClipPlane_t;
 typedef ClipPlane_t* ClipPlane_p;
 struct ClipPlane_s {
-    vec3_t      normal;
-    float       dist;
+    vec3_t      normal; // TODO: same as mPlane
+    float       dist;   // TODO: same as mPlane
     ClipPlane_p next;
-    uint8_t     leftedge;
-    uint8_t     rightedge;
-    uint8_t     reserved[2];
+    bool     leftedge;
+    bool     rightedge;
+    // uint8_t     reserved[2];
 };
 extern ClipPlane_t view_clipplanes[4];
 
