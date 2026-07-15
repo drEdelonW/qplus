@@ -963,7 +963,6 @@ void R_DrawBrushModel(r_Entity_p e) {
     modelorg = VectorSubtract(r_refdef.view.loc, e->pose.loc);
     if (rotated) {
         vec3_t temp = modelorg;
-
         Basis_t bs = GetBasis(e->pose.aim);
         modelorg = (vec3_t){
             .x = DotProduct(temp, bs.forward),

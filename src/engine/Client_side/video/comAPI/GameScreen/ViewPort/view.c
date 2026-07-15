@@ -284,7 +284,6 @@ void V_ParseDamage() {
     VectorNormalize(&from);
 
     _bs = GetBasis(ent->pose.aim);
-
     _v_DmgRoll = count * v_kickroll.value * DotProduct(from, _bs.right);
     _v_DmgPitch = count * v_kickpitch.value * DotProduct(from, _bs.forward);
 
@@ -706,7 +705,6 @@ void V_CalcRefdef() {
         angles.pitch = -angles.pitch;   // because entity pitches are actually backward
     }
     _bs = GetBasis(angles);
-
     r_refdef.view.loc =
         VectorMA(VectorMA(VectorMA(r_refdef.view.loc,
             scr_ofsz.value, _bs.up),
@@ -714,16 +712,10 @@ void V_CalcRefdef() {
             scr_ofsx.value, _bs.forward
         );
 
-
     V_BoundOffsets();
-
     view->pose.aim = cl.viewangles;    // set up gun position
-
     CalcGunAngle();
-
-    view->pose.loc = ent->pose.loc; {
-        view->pose.loc.z += cl.viewheight;
-    }
+    view->pose.loc = VectorAdd(ent->pose.loc, VecZ(cl.viewheight));
 
     view->pose.loc = VectorMA(view->pose.loc, bob * 0.4f, _bs.forward);
     // view->pose.loc = VectorMA(view->pose.loc, bob * 0.4f, _bs.right);
@@ -750,14 +742,16 @@ void V_CalcRefdef() {
 
     // smooth out stair step ups
     if ((cl.onground) &&
-        ((ent->pose.loc.z - _oldZ) > 0.f)) {
-
+        ((ent->pose.loc.z - _oldZ) > 0.f)
+        ) {
         LegDt_t steptime = GetClSimTime() - cl.oldtime;
         ClampLessThen(&steptime, 0.f); //FIXME  I_Error ("steptime < 0");
 
         _oldZ += steptime * 80.f;
         ClampMoreThen(&_oldZ, ent->pose.loc.z);
-        if ((ent->pose.loc.z - _oldZ) > 12.f)     _oldZ = ent->pose.loc.z - 12.f;
+        if ((ent->pose.loc.z - _oldZ) > 12.f)
+            _oldZ = ent->pose.loc.z - 12.f;
+
         r_refdef.view.loc.z += _oldZ - ent->pose.loc.z;
         view->pose.loc.z += _oldZ - ent->pose.loc.z;
     }
@@ -786,9 +780,8 @@ void V_RenderView() {
         Cvar_Set("scr_ofsz", "0");
     }
 
-    if (isIntermission()) { // intermission / finale rendering
+    if (isIntermission())   // intermission / finale rendering
         V_CalcIntermissionRefdef();
-    }
     else {
         if (!cl.paused /* &&
             (

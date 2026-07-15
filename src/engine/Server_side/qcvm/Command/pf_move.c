@@ -184,7 +184,8 @@ void PF_aim() {
             (
                 (teamplay.value) &&
                 (ent->v.team > 0) &&
-                (ent->v.team == check->v.team))
+                (ent->v.team == check->v.team)
+                )
             )   continue; // don't aim at teammate
 
         vec3_t end = VectorAdd(

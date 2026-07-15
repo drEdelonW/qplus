@@ -55,11 +55,7 @@ void SV_CheckStuck(edict_p ent) {
             for (int j = -1; j <= 1; j++) {
                 ent->v.origin = VectorAdd(
                     org,
-                    (vec3_t) {
-                        .x = (float)i,
-                        .y = (float)j,
-                        .z = (float)z,
-                    }
+                    VecXYZ((float)i, (float)j, (float)z)
                 );
 
                 if (!SV_TestEntityPosition(ent)) {
@@ -124,18 +120,21 @@ bool SV_CheckWater(edict_p ent) {
 
 
 void SV_WallFriction(edict_p ent, trace_p trace) {
-    Basis_t bs = GetBasis(ent->v.v_angle);
-
-    float d = DotProduct(trace->plane.normal, bs.forward);
-
-    d += 0.5f;
-    if (d >= 0)
+    float d = DotProduct(trace->plane.normal,
+        GetBasis(ent->v.v_angle).forward
+    ) + 0.5f;
+    if (d >= 0.f)
         return;
 
     // cut the tangential velocity
-    float i = DotProduct(trace->plane.normal, ent->v.velocity);
-    vec3_t into = VectorScale(trace->plane.normal, i);
-    vec3_t side = VectorSubtract(ent->v.velocity, into);
+    vec3_t side =
+        VectorSubtract(ent->v.velocity,
+            VectorScale(trace->plane.normal,
+                DotProduct(trace->plane.normal,
+                    ent->v.velocity
+                )
+            )
+        );
 
     ent->v.velocity.x = side.x * (1 + d);
     ent->v.velocity.y = side.y * (1 + d);
@@ -173,14 +172,18 @@ MoveClipFlags_e SV_TryUnstick(edict_p ent, vec3_t oldvel) {
         SV_PushEntity(ent, dir);
 
         // retry the original move
+#if 0
         ent->v.velocity.x = oldvel.x;
         ent->v.velocity.y = oldvel.y;
-        ent->v.velocity.z = 0;
+        ent->v.velocity.z = 0.f;
+#else
+        ent->v.velocity = VecXY(oldvel.x, oldvel.y);
+#endif
         trace_t steptrace;
         MoveClipFlags_e clip = SV_FlyMove(ent, 0.1f, &steptrace);
-
-        if ((fabs(oldorg.y - ent->v.origin.y) > 4) ||
-            (fabs(oldorg.x - ent->v.origin.x) > 4)) {
+        if ((fabs(oldorg.y - ent->v.origin.y) > 4.f) ||
+            (fabs(oldorg.x - ent->v.origin.x) > 4.f)
+            ) {
             //Con_DPrintf ("unstuck!\n");
             return clip;
         }
@@ -217,46 +220,36 @@ void SV_WalkMove(edict_p ent) {
         ((movetype_t)ent->v.movetype != MOVETYPE_WALK) ||                   // gibbed by a trigger
         sv_nostep.value ||                                                  // no stepping allowed
         ((EntityFlags_t)sv_player->v.flags & FL_WATERJUMP)                  // waterjump active
-        ) {
-        return;
-    }
+        )   return;
 
     vec3_t nosteporg = ent->v.origin;
     vec3_t nostepvel = ent->v.velocity;
 
     // try moving up and forward to go up a step
     ent->v.origin = oldorg; // back to start pos
-
-    vec3_t downmove = (vec3_t){ .z = (float)(-STEPSIZE + oldvel.z * host_frametime) };
-
-    vec3_t upmove = (vec3_t){ .z = STEPSIZE };    // move up
-    SV_PushEntity(ent, upmove); // FIXME: don't link?
+    SV_PushEntity(ent, VecZ(STEPSIZE));  // move up // FIXME: don't link?
 
     // move forward
-    ent->v.velocity = (vec3_t){
-        .x = oldvel.x,
-        .y = oldvel.y
-    };
-
+    ent->v.velocity = VecXY(oldvel.x, oldvel.y);
     MoveClipFlags_e clip = SV_FlyMove(ent, host_frametime, &steptrace);
 
-    // check for stuckness, possibly due to the limited precision of floats
-    // in the clipping hulls
-    if (clip) {
-        if ((fabsf(oldorg.y - ent->v.origin.y) < DIST_EPSILON) &&
-            (fabsf(oldorg.x - ent->v.origin.x) < DIST_EPSILON)    // stepping up didn't make any progress
-            )   clip = SV_TryUnstick(ent, oldvel);
-    }
+    // check for stuckness, possibly due to the limited precision of floats in the clipping hulls
+    if ((clip != MOVECLIP_NONE) &&
+        (fabsf(oldorg.y - ent->v.origin.y) < DIST_EPSILON) &&
+        (fabsf(oldorg.x - ent->v.origin.x) < DIST_EPSILON)    // stepping up didn't make any progress
+        )   clip = SV_TryUnstick(ent, oldvel);
+
 
     // extra friction based on view angle
     if (clip & MOVECLIP_WALL)   SV_WallFriction(ent, &steptrace);
 
     // move down
+    vec3_t downmove = VecZ((oldvel.z * host_frametime) - STEPSIZE);
     trace_t downtrace = SV_PushEntity(ent, downmove); // FIXME: don't link?
 
     if (downtrace.plane.normal.z > 0.7) {
         if (ent->v.solid == SOLID_BSP) {
-            ent->v.flags = (float)((int)((EntityFlags_t)ent->v.flags) | FL_ONGROUND);
+            ent->v.flags = (float)(((EntityFlags_t)ent->v.flags) | FL_ONGROUND);
             ent->v.groundentity = ED_GetEDictOffs(downtrace.pEnt);
         }
     }
@@ -305,8 +298,7 @@ void SV_Physics_Client(edict_p ent, EdIdx clNum) {
     case MOVETYPE_WALK:
         if (!SV_CheckWater(ent) &&
             !((EntityFlags_t)ent->v.flags & FL_WATERJUMP)
-            )
-            SV_AddGravity(ent);
+            )   SV_AddGravity(ent);
 
         SV_CheckStuck(ent);
 #ifdef QUAKE2

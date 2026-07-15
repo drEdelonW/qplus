@@ -417,11 +417,7 @@ void R_DrawAliasModel(r_Entity_p e) {
 
     float an = DEG2RAD(e->pose.aim.yaw);
 
-    shadevector = (vec3_t){
-        .x = cosf(-an),
-        .y = sinf(-an),
-        .z = 1.f
-    };
+    shadevector = VecXYZ(cosf(-an), sinf(-an), 1.f);
     VectorNormalize(&shadevector);
 
     // locate the proper data

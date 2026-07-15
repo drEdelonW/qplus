@@ -32,9 +32,10 @@ This could be a lot more efficient...
 edict_p SV_TestEntityPosition(edict_p ent) {
     return (
         SV_MoveBox(
-            ent->v.origin, ent->v.origin, MOVE_NORMAL, ent
+            ent->v.origin, ent->v.origin,
+            MOVE_NORMAL, ent
         ).startsolid) ? // world map or none
-        ED_GetEDictByIdx(EdictWorld) : NULL; 
+        ED_GetEDictByIdx(EdictWorld) : NULL;
 }
 
 
@@ -72,17 +73,17 @@ trace_t SV_ClipMoveToEntity(edict_p ent, vec3_t start, BBox_t bb, vec3_t end) {
         vec3_t forward, right, up; AngleVectors(ent->v.angles, &forward, &right, &up);
 
         start_l = (vec3_t){
-            .x = DotProduct(start_l, forward);
-            .y = -DotProduct(start_l, right);
-            .z = DotProduct(start_l, up);
+            .x = DotProduct(start_l, forward),
+            .y = -DotProduct(start_l, right),
+            .z = DotProduct(start_l, up),
         };
 
         end_l = (vec3_t){
-            .x = DotProduct(end_l, forward);
-            .y = -DotProduct(end_l, right);
-            .z = DotProduct(end_l, up);
+            .x = DotProduct(end_l, forward),
+            .y = -DotProduct(end_l, right),
+            .z = DotProduct(end_l, up),
         };
-}
+    }
 #endif
 
     // trace a line through the apropriate clipping hull

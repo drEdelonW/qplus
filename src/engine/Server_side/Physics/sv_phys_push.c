@@ -46,7 +46,7 @@ trace_t SV_PushEntity(edict_p ent, vec3_t push) {
         case SOLID_NOT:                             trace = SV_MoveDBox(ent->v.origin, push, MOVE_NOMONSTERS, ent);    break;
         default:                                    trace = SV_MoveDBox(ent->v.origin, push, MOVE_NORMAL, ent);        break;
         }
-        ent->v.origin = trace.endpos;
+    ent->v.origin = trace.endpos;
     SV_LinkEdict(ent, true);
 
     if (trace.pEnt)
@@ -103,7 +103,8 @@ void SV_PushMove(edict_p pusher, SimDt_t movetime) {
 
         // if the entity is standing on the pusher, it will definately be moved
         if (!(((EntityFlags_t)check->v.flags & FL_ONGROUND) &&
-            ED_GetEDictByOffs(check->v.groundentity) == pusher)) {
+            ED_GetEDictByOffs(check->v.groundentity) == pusher)
+            ) {
 #if 0
             if (
                 (
@@ -216,7 +217,6 @@ void SV_PushRotate(edict_p pusher, float movetime) {
 
     for (EdIdx e = EdictPlayer1; e < GetEdNum(); e++) {
         edict_p check = ED_GetEDictByIdx(e);
-
         if (check->free)    continue;
 
         switch ((movetype_t)check->v.movetype) {
@@ -229,7 +229,8 @@ void SV_PushRotate(edict_p pusher, float movetime) {
 
         // if the entity is standing on the pusher, it will definately be moved
         if (!(((EntityFlags_t)check->v.flags & FL_ONGROUND) &&
-            ED_GetEDictByOffs(check->v.groundentity) == pusher)) {
+            ED_GetEDictByOffs(check->v.groundentity) == pusher)
+            ) {
 
             if (!BBoxTouches(
                 EvAbsBBox(&check->v),

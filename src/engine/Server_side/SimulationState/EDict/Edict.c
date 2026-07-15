@@ -48,7 +48,7 @@ Sets everything to NULL
 =================
 */
 void ED_ClearEdict(edict_p edict) {
-    memset(&edict->v, 0, SizeOfEntFields());
+    memset(&edict->v, 0x00, SizeOfEntFields());
     edict->free = false;
 }
 
@@ -372,8 +372,11 @@ Used for initial level load and for savegames.
 cString ED_ParseEdict(cString data, edict_p ent) {
     // clear it
     if (ent != GetEdictsPtr()) // hack
-        memset(&ent->v, 0, SizeOfEntFields());
-
+#if 0
+        memset(&ent->v, 0x00, SizeOfEntFields());
+#else
+        ED_ClearEdict(ent);
+#endif
     // go through all the dictionary pairs
     bool init = false;
     while (1) {
@@ -462,7 +465,7 @@ void ED_LoadFromFile(cString data) {
         if (!data)  break;
         if (com.token[0] != '{')    Host_SysError("ED_LoadFromFile: found %s when expecting {", com.token);
 
-        if (!ent)   ent = ED_GetEDictByIdx(0);
+        if (!ent)   ent = ED_GetEDictByIdx(EdictWorld);
         else        ent = ED_Alloc();
         data = ED_ParseEdict(data, ent);
 

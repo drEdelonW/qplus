@@ -252,7 +252,7 @@ bool SV_RunThink(edict_p pEntIn) {
     pEntIn->v.nextthink = 0.f;
     pGame()->time = thinktime;
     pGame()->self = ED_GetEDictOffs(pEntIn);
-    pGame()->other = EdictWorld; // should be 0
+    pGame()->other = EdictWorld;
     PR_ExecuteProgram(pEntIn->v.think);
     return !pEntIn->free;
 }

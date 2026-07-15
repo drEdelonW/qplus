@@ -22,25 +22,25 @@ static inline bool isVectorL1OutOfRange(vec3_t v, vec_t scalar) {
 }
 
 static inline vec3_t MSG_ReadVector() {
-    return (vec3_t){
-        .x = MSG_ReadCoord(),
-        .y = MSG_ReadCoord(),
-        .z = MSG_ReadCoord()
-    };
+    return VecXYZ(
+        MSG_ReadCoord(),
+        MSG_ReadCoord(),
+        MSG_ReadCoord()
+    );
 }
 static inline vec3_t MSG_ReadMoveVec() {
-    return (vec3_t){
-        .x = (vec_t)MSG_ReadShort(),
-        .y = (vec_t)MSG_ReadShort(),
-        .z = (vec_t)MSG_ReadShort()
-    };
+    return VecXYZ(
+        (vec_t)MSG_ReadShort(),
+        (vec_t)MSG_ReadShort(),
+        (vec_t)MSG_ReadShort()
+    );
 }
 static inline vec3_t MSG_ReadVecCoarse() {
-    return (vec3_t){
-        .x = fixed4_tof(MSG_ReadChar()),
-        .y = fixed4_tof(MSG_ReadChar()),
-        .z = fixed4_tof(MSG_ReadChar()),
-    };
+    return VecXYZ(
+        fixed4_tof(MSG_ReadChar()),
+        fixed4_tof(MSG_ReadChar()),
+        fixed4_tof(MSG_ReadChar())
+    );
 }
 
 
@@ -62,11 +62,11 @@ static inline void MSG_WriteVecCoarse(sizebuf_t *msg, vec3_t v) {
 
 #include "endian_tools.h"
 static inline vec3_t LittleVector(vec3_t v) {
-    return (vec3_t) {
-        .x = LittleFloat(v.x),
-        .y = LittleFloat(v.y),
-        .z = LittleFloat(v.z)
-    };
+    return VecXYZ(
+        LittleFloat(v.x),
+        LittleFloat(v.y),
+        LittleFloat(v.z)
+    );
 }
 
 #include "angle.h"

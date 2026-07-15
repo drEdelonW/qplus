@@ -246,25 +246,13 @@ void R_DrawSprite() {
             (dot < -0.999848f)) // cos(1 degree) = 0.999848
             return;
 
-        r_spritedesc.bs.up = (vec3_t){
-            .x = 0.0f,
-            .y = 0.0f,
-            .z = 1.0f
-        };
+        r_spritedesc.bs.up = VecZ(1.0f);
         // r_spritedesc.bs.right = CrossProduct(r_spritedesc.bs.up, -modelorg);
 
-        r_spritedesc.bs.right = (vec3_t){
-            .x = tvec.y,
-            .y = -tvec.x,
-            .z = 0.0f
-        };
+        r_spritedesc.bs.right = VecXY(tvec.y, -tvec.x);
         VectorNormalize(&r_spritedesc.bs.right);
 
-        r_spritedesc.bs.forward = (vec3_t){
-            .x = -r_spritedesc.bs.right.y,
-            .y = r_spritedesc.bs.right.x,
-            .z = 0.0f
-        };
+        r_spritedesc.bs.forward = VecXY(-r_spritedesc.bs.right.y, r_spritedesc.bs.right.x);
         // r_spritedesc.bs.forward = CrossProduct(r_spritedesc.bs.right, r_spritedesc.bs.up);
     }
     else if (psprite->type == SPR_VP_PARALLEL) {
@@ -288,18 +276,10 @@ void R_DrawSprite() {
         r_spritedesc.bs.up = Scalar2Vector(0.0f);
 
         //  r_spritedesc.vright = CrossProduct(r_spritedesc.bs.up, BS.forward)
-        r_spritedesc.bs.right = (vec3_t){
-            .x = BS.forward.y,
-            .y = -BS.forward.x,
-            .z = 0.0f
-        };
+        r_spritedesc.bs.right = VecXY(BS.forward.y, -BS.forward.x);
         VectorNormalize(&r_spritedesc.bs.right);
 
-        r_spritedesc.bs.forward = (vec3_t){
-            .x = -r_spritedesc.bs.right.y,
-            .y = r_spritedesc.bs.right.x,
-            .z = 0.0f
-        };
+        r_spritedesc.bs.forward = VecXY(-r_spritedesc.bs.right.y, r_spritedesc.bs.right.x);
         // r_spritedesc.bs.forward = CrossProduct(r_spritedesc.bs.right, r_spritedesc.bs.up)
     }
     else if (psprite->type == SPR_ORIENTED) {

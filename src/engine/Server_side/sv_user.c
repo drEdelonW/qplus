@@ -77,7 +77,7 @@ void SV_SetIdealPitch() {
             .z = sv_player->v.origin.z + sv_player->v.view_ofs.z
         };
 
-        trace_t tr = SV_MoveDLine(top, VecZ(-160.f), MOVE_NOMONSTERS, sv_player );
+        trace_t tr = SV_MoveDLine(top, VecZ(-160.f), MOVE_NOMONSTERS, sv_player);
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
         if (tr.fraction == 1.f)   return; // near a dropoff
 
@@ -149,19 +149,6 @@ SV_Accelerate
 ==============
 */
 
-#if 0
-void SV_Accelerate(vec3_t wishvel) {
-    if (_wishSpeed == 0) return;
-
-    vec3_t pushvec = VectorSubtract(wishvel, velocity);
-    float addspeed = VectorNormalize(pushvec);
-
-    float accelspeed = sv_accelerate.value * host_frametime * addspeed;
-    ClampMoreThen(&accelspeed, addspeed);
-
-    velocity = VectorMA(velocity, accelspeed, pushvec);
-}
-#endif
 void SV_Accelerate() {
     float currentspeed = DotProduct(*_velocity, _wishDir);
     float addspeed = _wishSpeed - currentspeed;
@@ -190,16 +177,6 @@ void SV_AirAccelerate(vec3_t wishveloc) {
     *_velocity = VectorMA(*_velocity, accelspeed, wishveloc);
 }
 
-#if 0   /* TODO: clean it */
-void DropPunchAngle() {
-    float len = VectorNormalize(&sv_player->v.punchangle);
-
-    len -= (float)(10.0 * host_frametime);
-    ClampLessThen(&len, 0.0f);
-
-    sv_player->v.punchangle = VectorScale(sv_player->v.punchangle, len);
-}
-#else
 static inline float _AngleLen(ang3_t a) { // local trick without physical meaning
     return sqrtf(a.pitch * a.pitch + a.yaw * a.yaw + a.roll * a.roll);
 }
@@ -212,7 +189,6 @@ void DropPunchAngle(void) {
 
     sv_player->v.punchangle = AngleScale(sv_player->v.punchangle, new_len / orig_len);
 }
-#endif
 /*
 ===================
 SV_WaterMove
@@ -272,12 +248,7 @@ void SV_WaterJump() {
 }
 
 
-/*
-===================
-SV_AirMove
 
-===================
-*/
 void SV_AirMove() {
     _bs = GetBasis(sv_player->v.v_angle);
 
@@ -352,7 +323,8 @@ void SV_ClientThink() {
 
     // walk
     if ((sv_player->v.waterlevel >= 2) &&
-        (sv_player->v.movetype != MOVETYPE_NOCLIP)) {
+        (sv_player->v.movetype != MOVETYPE_NOCLIP)
+        ) {
         SV_WaterMove();
         return;
     }
@@ -361,11 +333,7 @@ void SV_ClientThink() {
 }
 
 
-/*
-===================
-SV_ReadClientMove
-===================
-*/
+
 void SV_ReadClientMove(UserCmd_p move) {    /* <==> void CL_SendMove(UserCmd_p cmd) */
     // read ping time
     remoteClient->ping_times[remoteClient->num_pings % NUM_PING_TIMES] = (float)SV_GetTime() - MSG_ReadFloat();
@@ -428,25 +396,25 @@ bool SV_ReadClientMessage() {
                 if (remoteClient->privileged)   ret = 2;
                 else                            ret = 0;
 
-                if ((Q_strncasecmp(str, "status", 6) == 0) ||
-                    (Q_strncasecmp(str, "god", 3) == 0) ||
-                    (Q_strncasecmp(str, "notarget", 8) == 0) ||
-                    (Q_strncasecmp(str, "fly", 3) == 0) ||
-                    (Q_strncasecmp(str, "name", 4) == 0) ||
-                    (Q_strncasecmp(str, "noclip", 6) == 0) ||
-                    (Q_strncasecmp(str, "say", 3) == 0) ||
-                    (Q_strncasecmp(str, "say_team", 8) == 0) ||
-                    (Q_strncasecmp(str, "tell", 4) == 0) ||
-                    (Q_strncasecmp(str, "color", 5) == 0) ||
-                    (Q_strncasecmp(str, "kill", 4) == 0) ||
-                    (Q_strncasecmp(str, "pause", 5) == 0) ||
-                    (Q_strncasecmp(str, "spawn", 5) == 0) ||
-                    (Q_strncasecmp(str, "begin", 5) == 0) ||
-                    (Q_strncasecmp(str, "prespawn", 8) == 0) ||
-                    (Q_strncasecmp(str, "kick", 4) == 0) ||
-                    (Q_strncasecmp(str, "ping", 4) == 0) ||
-                    (Q_strncasecmp(str, "give", 4) == 0) ||
-                    (Q_strncasecmp(str, "ban", 3) == 0))
+                if ((Q_strncasecmp(str, "status", 6)    /**/ == 0) ||
+                    (Q_strncasecmp(str, "god", 3)       /**/ == 0) ||
+                    (Q_strncasecmp(str, "notarget", 8)  /**/ == 0) ||
+                    (Q_strncasecmp(str, "fly", 3)       /**/ == 0) ||
+                    (Q_strncasecmp(str, "name", 4)      /**/ == 0) ||
+                    (Q_strncasecmp(str, "noclip", 6)    /**/ == 0) ||
+                    (Q_strncasecmp(str, "say", 3)       /**/ == 0) ||
+                    (Q_strncasecmp(str, "say_team", 8)  /**/ == 0) ||
+                    (Q_strncasecmp(str, "tell", 4)      /**/ == 0) ||
+                    (Q_strncasecmp(str, "color", 5)     /**/ == 0) ||
+                    (Q_strncasecmp(str, "kill", 4)      /**/ == 0) ||
+                    (Q_strncasecmp(str, "pause", 5)     /**/ == 0) ||
+                    (Q_strncasecmp(str, "spawn", 5)     /**/ == 0) ||
+                    (Q_strncasecmp(str, "begin", 5)     /**/ == 0) ||
+                    (Q_strncasecmp(str, "prespawn", 8)  /**/ == 0) ||
+                    (Q_strncasecmp(str, "kick", 4)      /**/ == 0) ||
+                    (Q_strncasecmp(str, "ping", 4)      /**/ == 0) ||
+                    (Q_strncasecmp(str, "give", 4)      /**/ == 0) ||
+                    (Q_strncasecmp(str, "ban", 3)       /**/ == 0))
                     ret = 1;
 
                 /**/ if (ret == 2)  Cbuf_InsertText(str);
@@ -483,8 +451,7 @@ void SV_RunClients() {
             continue;
         }
 
-        if (!remoteClient->spawned) {
-            // clear client movement until a new packet is received
+        if (!remoteClient->spawned) {   // clear client movement until a new packet is received
             memset(&remoteClient->cmd, 0, sizeof(remoteClient->cmd));
             continue;
         }

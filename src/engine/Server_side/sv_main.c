@@ -92,7 +92,7 @@ void SV_ConnectClient(uint32_t clientnum) {
             .name = "unconnected",
             .active = true,
             .spawned = false,
-            .edict = ED_GetEDictByIdx(clientnum + 1),
+            .edict = ED_GetEDictByIdx(EdictPlayer1 + clientnum),
             .message = {
                 .data = client->msgbuf,
                 .maxsize = sizeof(client->msgbuf),
@@ -310,7 +310,6 @@ void SV_SpawnServer(cString server
     Host_ClearMemory();
 
     memset(&sv, 0, sizeof(sv));
-
     strcpy(sv.name, server);
 #ifdef QUAKE2
     if (startspot)
@@ -322,9 +321,9 @@ void SV_SpawnServer(cString server
     SetEdictsRoot(Hunk_AllocName(EdictMax * GetEdictSize(), "edicts"));
 
     // leave slots at start for clients only
-    SetEdNum(GetSvMaxClients() + 1);
+    SetEdNum(EdictPlayer1 + GetSvMaxClients());
     for (int i = 0; i < GetSvMaxClients(); i++)
-        svs.clients[i].edict = ED_GetEDictByIdx(i + 1);
+        svs.clients[i].edict = ED_GetEDictByIdx(EdictPlayer1 + i);
 
 
     sv.datagram = (sizebuf_t){
@@ -368,7 +367,7 @@ void SV_SpawnServer(cString server
     }
 
     // load the rest of the entities
-    edict_p ent = ED_GetEDictByIdx(0);
+    edict_p ent = ED_GetEDictByIdx(EdictWorld);
     memset(&ent->v, 0x00, MUL4(pProgsDat->entityfields));
     ent->free = false;
     ent->v.model = PR_SetQString(sv.worldmodel->name);

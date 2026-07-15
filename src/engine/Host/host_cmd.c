@@ -44,11 +44,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "GameRule.h"
 #include "vector_tools.h"
 
-/*
-==================
-Host_Quit_f
-==================
-*/
 
 
 void Host_Quit_f() {
@@ -64,29 +59,22 @@ void Host_Quit_f() {
 }
 
 
-/*
-==================
-Host_Status_f
-==================
-*/
+
 void Host_Status_f() {
     void (*print) (cStringRO fmt, ...);
-
     if (isCliCmd()) {
-        if (!SV_IsActive()) {
-            Cmd_ForwardToServer();
-            return;
-        }
+        if (!SV_IsActive()) { Cmd_ForwardToServer();  return; }
         print = Con_Printf;
     }
-    else    print = SV_ClientPrintf;
+    else
+        print = SV_ClientPrintf;
 
-    print("host:    %s\n", Cvar_VariableString("hostname"));
-    print("version: %4.2f\n", VERSION);
+    /*                    */print("host:    %s\n", Cvar_VariableString("hostname"));
+    /*                    */print("version: %4.2f\n", VERSION);
     if (tcpipAvailable)     print("tcp/ip:  %s\n", my_tcpip_address);
     if (ipxAvailable)       print("ipx:     %s\n", my_ipx_address);
-    print("map:     %s\n", SV_GetName());
-    print("players: %i active (%i max)\n\n", net_activeconnections, GetSvMaxClients());
+    /*                    */print("map:     %s\n", SV_GetName());
+    /*                    */print("players: %i active (%i max)\n\n", net_activeconnections, GetSvMaxClients());
 
     RmtClient_p rClient = svs.clients;
     for (int j = 0; j < GetSvMaxClients(); j++, rClient++) {
@@ -102,15 +90,16 @@ void Host_Status_f() {
             if (hours)
                 minutes -= (hours * 60);
         }
-        else    hours = 0;
+        else
+            hours = 0;
 
-        print("#%-2u %-16.16s  %3i  %2i:%02i:%02i\n",
-            j + 1,
-            rClient->name,
+        print(
+            "#%-2u %-16.16s  "
+            "%3i  "
+            "%2i:%02i:%02i\n",
+            j + 1, rClient->name,
             (int32_t)rClient->edict->v.frags,
-            hours,
-            minutes,
-            seconds
+            hours, minutes, seconds
         );
         print("   %s\n", rClient->netconnection->address);
     }
@@ -119,12 +108,6 @@ void Host_Status_f() {
 
 
 
-/*
-==================
-Host_Ping_f
-
-==================
-*/
 void Host_Ping_f() {
     if (isCliCmd()) {
         Cmd_ForwardToServer();
@@ -179,7 +162,6 @@ void Host_Map_f() {
         strcat(cls.mapstring, " ");
     }
     strcat(cls.mapstring, "\n");
-
     svs.serverflags = 0;   // haven't completed an episode yet
 
     qPathStr_t name; strcpy(name, Cmd_Argv(1));
@@ -301,7 +283,6 @@ LOAD / SAVE GAME
 ===============================================================================
 */
 
-#define SAVEGAME_VERSION 5
 
 /*
 ===============
@@ -328,32 +309,26 @@ void Host_SavegameComment(cString text) {
 }
 
 
-/*
-===============
-Host_Savegame_f
-===============
-*/
+
+#define SAVEGAME_VERSION 5
 void Host_Savegame_f() {
-    if (isNetCmd())      return;
-    if (!SV_IsActive()) { ;             Con_Printf("Not playing a local game.\n");              return; }
-    if (isIntermission()) { ;           Con_Printf("Can't save in intermission.\n");            return; }
-    if (isMultiplayer()) { ;            Con_Printf("Can't save multiplayer games.\n");          return; }
-    if (Cmd_Argc() != 2) { ;            Con_Printf("save <savename> : save a game\n");          return; }
-    if (strstr(Cmd_Argv(1), "..")) { ;  Con_Printf("Relative pathnames are not allowed.\n");    return; }
+    if (isNetCmd())                 /**/                                                        return;
+    if (!SV_IsActive())             /**/ { Con_Printf("Not playing a local game.\n");           return; }
+    if (isIntermission())           /**/ { Con_Printf("Can't save in intermission.\n");         return; }
+    if (isMultiplayer())            /**/ { Con_Printf("Can't save multiplayer games.\n");       return; }
+    if (Cmd_Argc() != 2)            /**/ { Con_Printf("save <savename> : save a game\n");       return; }
+    if (strstr(Cmd_Argv(1), ".."))  /**/ { Con_Printf("Relative pathnames are not allowed.\n"); return; }
 
     for (int i = 0; i < GetSvMaxClients(); i++) {
-        if (svs.clients[i].active &&
+        if ((svs.clients[i].active) &&
             (svs.clients[i].edict->v.health <= 0)
-            ) {
-            Con_Printf("Can't savegame with a dead player\n");
-            return;
+            )                       /**/ {
+            Con_Printf("Can't savegame with a dead player\n"); return;
         }
     }
 
-    char name[256];
-    snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
+    char name[256]; snprintf(name, sizeof(name), "%s/%s", com.gamedir, Cmd_Argv(1));
     COM_DefaultExtension(name, ".sav");
-
     Con_Printf("Saving game to %s...\n", name);
     FILE* saveFile = fopen(name, "w");
     if (!saveFile) {
@@ -362,8 +337,7 @@ void Host_Savegame_f() {
     }
 
     fprintf(saveFile, "%i\n", SAVEGAME_VERSION);
-    saveComment_t comment;
-    Host_SavegameComment(comment);
+    saveComment_t comment; Host_SavegameComment(comment);
     fprintf(saveFile, "%s\n", comment);
     for (int i = 0; i < NUM_SPAWN_PARMS; i++)
         fprintf(saveFile, "%f\n", svs.clients->spawn_parms[i]);
@@ -373,12 +347,10 @@ void Host_Savegame_f() {
     fprintf(saveFile, "%f\n", SV_GetTime());
 
     // write the light styles
-
     for (int i = 0; i < MAX_LIGHTSTYLES; i++) {
         if (sv.lightstyles[i])  fprintf(saveFile, "%s\n", sv.lightstyles[i]);
         else                    fprintf(saveFile, "m\n");
     }
-
 
     ED_WriteGlobals(saveFile);
     for (EdIdx i = EdictWorld; i < GetEdNum(); i++) {
@@ -389,19 +361,14 @@ void Host_Savegame_f() {
     Con_Printf("done.\n");
 }
 
+
+
+
 #include "z_hunk.h"
 #define MAX_SAVE_SIZE (0x8000) /* 32Kb*/
-/*
-===============
-Host_Loadgame_f
-===============
-*/
 void Host_Loadgame_f() {
     if (isNetCmd())  return;
-    if (Cmd_Argc() != 2) {
-        Con_Printf("load <savename> : load a game\n");
-        return;
-    }
+    if (Cmd_Argc() != 2) { Con_Printf("load <savename> : load a game\n"); return; }
 
     cls.demonum = -1;  // stop demo loop in case this fails
 
@@ -454,12 +421,11 @@ void Host_Loadgame_f() {
 #endif
     );
 
-    if (!SV_IsActive()) { Con_Printf("Couldn't load map\n");    return; }
+    if (!SV_IsActive()) { Con_Printf("Couldn't load map\n"); return; }
     sv.paused = true;  // pause until all clients connect
     sv.loadgame = true;
 
     // load the light styles
-
     for (int i = 0; i < MAX_LIGHTSTYLES; i++) {
         fscanf(loadFile, "%s\n", str);
         sv.lightstyles[i] = Hunk_Alloc(strlen(str) + 1);
@@ -480,18 +446,23 @@ void Host_Loadgame_f() {
                 break;
             }
         }
-        if (i == sizeof(str) - 1)   Host_SysError("Loadgame buffer overflow");
+        if (i == (sizeof(str) - 1))   Host_SysError("Loadgame buffer overflow");
         str[i] = 0;
         cString start = str;
         start = COM_Parse(str);
         if (!com.token[0])  break;  // end of file
         if (strcmp(com.token, "{")) Host_SysError("First token isn't a brace");
 
-        if (entnum == -1) { ED_ParseGlobals(start); }   // parse the global vars
+        if (entnum == -1)
+            ED_ParseGlobals(start); // parse the global vars
         else { // parse an edict
             edict_p ent = ED_GetEDictByIdx((uint32_t)entnum);
+#if 0
             memset(&ent->v, 0x00, SizeOfEntFields());
             ent->free = false;
+#else
+            ED_ClearEdict(ent);
+#endif
             ED_ParseEdict(start, ent);
 
             // link it into the bsp tree
@@ -612,8 +583,12 @@ int LoadGamestate(cString level, cString startspot) {
         // parse an edict
 
         edict_p ent = ED_GetEDictByIdx(entnum);
-        memset(&ent->v, 0, SizeOfEntFields());
+#if 0
+        memset(&ent->v, 0x00, SizeOfEntFields());
         ent->free = false;
+#else
+        ED_ClearEdict(ent);
+#endif
         ED_ParseEdict(start, ent);
 
         // link it into the bsp tree
@@ -657,11 +632,8 @@ void Host_Changelevel2_f() {
 
 //============================================================================
 
-/*
-======================
-Host_Name_f
-======================
-*/
+
+
 void Host_Name_f() {
     if (Cmd_Argc() == 1) { Con_Printf("\"name\" is \"%s\"\n", cl_name.string); return; }
 
@@ -842,11 +814,7 @@ void Host_Tell_f() {
 }
 
 
-/*
-==================
-Host_Color_f
-==================
-*/
+
 void Host_Color_f() {
     if (Cmd_Argc() == 1) {
         Con_Printf("\"color\" is \"%i %i\"\n",
@@ -886,20 +854,11 @@ void Host_Color_f() {
     MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteByte(pBuf, remoteClient->colors);
 }
 
-/*
-==================
-Host_Kill_f
-==================
-*/
+
+
 void Host_Kill_f() {
-    if (isCliCmd()) {
-        Cmd_ForwardToServer();
-        return;
-    }
-    if (sv_player->v.health <= 0) {
-        SV_ClientPrintf("Can't suicide -- allready dead!\n");
-        return;
-    }
+    if (isCliCmd())                 /**/ { Cmd_ForwardToServer(); return; }
+    if (sv_player->v.health <= 0)   /**/ { SV_ClientPrintf("Can't suicide -- allready dead!\n"); return; }
 
     pGame()->time = (float)SV_GetTime();
     pGame()->self = ED_GetEDictOffs(sv_player);
@@ -907,11 +866,7 @@ void Host_Kill_f() {
 }
 
 
-/*
-==================
-Host_Pause_f
-==================
-*/
+
 void Host_Pause_f() {
     if (isCliCmd()) {
         Cmd_ForwardToServer();
@@ -920,8 +875,11 @@ void Host_Pause_f() {
     if (!pausable.value)            SV_ClientPrintf("Pause not allowed.\n");
     else {
         sv.paused ^= 1;
-
-        SV_BroadcastPrintf("%s %spaused the game\n", (sv.paused) ? "" : "un", PR_GetQString(sv_player->v.netname));
+        SV_BroadcastPrintf(
+            "%s %spaused the game\n",
+            (sv.paused) ? "" : "un",
+            PR_GetQString(sv_player->v.netname)
+        );
 
         // send notification to all clients
         sizebuf_p pBuf = &sv.reliable_datagram;
@@ -932,14 +890,10 @@ void Host_Pause_f() {
 //===========================================================================
 
 
-/*
-==================
-Host_PreSpawn_f
-==================
-*/
+
 void Host_PreSpawn_f() {
-    if (isCliCmd()) { ;  Con_Printf("prespawn is not valid from the console\n"); return; }
-    if (remoteClient->spawned) { ;       Con_Printf("prespawn not valid -- allready spawned\n"); return; }
+    if (isCliCmd())             /**/ { Con_Printf("prespawn is not valid from the console\n"); return; }
+    if (remoteClient->spawned)  /**/ { Con_Printf("prespawn not valid -- allready spawned\n"); return; }
 
     sizebuf_p pBuf = &remoteClient->message;
     SZ_Write(pBuf, sv.signon.data, (size_t)sv.signon.cursize);
@@ -947,20 +901,10 @@ void Host_PreSpawn_f() {
     remoteClient->sendsignon = true;
 }
 
-/*
-==================
-Host_Spawn_f
-==================
-*/
+
 void Host_Spawn_f() {
-    if (isCliCmd()) {
-        Con_Printf("spawn is not valid from the console\n");
-        return;
-    }
-    if (remoteClient->spawned) {
-        Con_Printf("Spawn not valid -- allready spawned\n");
-        return;
-    }
+    if (isCliCmd())             /**/ { Con_Printf("spawn is not valid from the console\n"); return; }
+    if (remoteClient->spawned)  /**/ { Con_Printf("Spawn not valid -- allready spawned\n"); return; }
 
     // run the entrance script
     if (sv.loadgame) { // loaded games are fully inited allready
@@ -970,7 +914,11 @@ void Host_Spawn_f() {
     else {
         // set up the edict
         edict_p ent = remoteClient->edict;
-        memset(&ent->v, 0, SizeOfEntFields());
+#if 0
+        memset(&ent->v, 0x00, SizeOfEntFields());
+#else
+        ED_ClearEdict(ent);
+#endif
         ent->v.colormap = (float)ED_GetEDictIdx(ent);
         ent->v.team = (float)(remoteClient->colors & 15) + 1;
         ent->v.netname = PR_SetQString(remoteClient->name);
@@ -994,11 +942,12 @@ void Host_Spawn_f() {
 
 
     // send all current names, colors, and frag counts
-    sizebuf_p pBuf = &remoteClient->message;    SZ_Clear(pBuf);
+    sizebuf_p pBuf = &remoteClient->message;  SZ_Clear(pBuf);
 
     // send time of update
-    MSG_WriteByte(pBuf, svc_time);    MSG_WriteFloat(pBuf, (float)SV_GetTime());
+    MSG_WriteByte(pBuf, svc_time);
     {
+        MSG_WriteFloat(pBuf, (float)SV_GetTime());
         RmtClient_p rClient = svs.clients;
         for (int i = 0; i < GetSvMaxClients(); i++, rClient++) {
             MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, i); MSG_WriteString(pBuf, rClient->name);
@@ -1011,13 +960,19 @@ void Host_Spawn_f() {
         MSG_WriteByte(pBuf, svc_lightstyle); MSG_WriteByte(pBuf, (char)i); MSG_WriteString(pBuf, sv.lightstyles[i]);
     }
 
-    //
     // send some stats
-    //
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALSECRETS);  MSG_WriteLong(pBuf, (int32_t)pGame()->total_secrets);
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_TOTALMONSTERS); MSG_WriteLong(pBuf, (int32_t)pGame()->total_monsters);
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_SECRETS);       MSG_WriteLong(pBuf, (int32_t)pGame()->found_secrets);
-    MSG_WriteByte(pBuf, svc_updatestat); MSG_WriteByte(pBuf, STAT_MONSTERS);      MSG_WriteLong(pBuf, (int32_t)pGame()->killed_monsters);
+    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_TOTALSECRETS); {
+        MSG_WriteLong(pBuf, (int32_t)pGame()->total_secrets);
+    }
+    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_TOTALMONSTERS); {
+        MSG_WriteLong(pBuf, (int32_t)pGame()->total_monsters);
+    }
+    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_SECRETS); {
+        MSG_WriteLong(pBuf, (int32_t)pGame()->found_secrets);
+    }
+    MSG_WriteByte(pBuf, svc_updatestat);    MSG_WriteByte(pBuf, STAT_MONSTERS); {
+        MSG_WriteLong(pBuf, (int32_t)pGame()->killed_monsters);
+    }
 
 
     //
@@ -1026,36 +981,22 @@ void Host_Spawn_f() {
     // in a state where it is expecting the client to correct the angle
     // and it won't happen if the game was just loaded, so you wind up
     // with a permanent head tilt
-    edict_p ent = ED_GetEDictByIdx(1 + (uint32_t)(remoteClient - svs.clients));
-    MSG_WriteByte(pBuf, svc_setangle);
-#if 0
-    {
-        MSG_WriteAngle(pBuf, ent->v.angles.pitch);
-        MSG_WriteAngle(pBuf, ent->v.angles.yaw);
-        MSG_WriteAngle(pBuf, 0.f);
-    };
-#else
-    ang3_t toSend = ent->v.angles; { ent->v.angles.roll = 0.f; }
-    MSG_WriteAngles(pBuf, toSend);
-#endif
+    edict_p ent = ED_GetEDictByIdx(EdictPlayer1 + (uint32_t)(remoteClient - svs.clients));
+    MSG_WriteByte(pBuf, svc_setangle); {
+        ang3_t toSend = ent->v.angles; { ent->v.angles.roll = 0.f; }
+        MSG_WriteAngles(pBuf, toSend);
+    }
 
     SV_WriteClientdataToMessage(sv_player, pBuf);
 
-    MSG_WriteByte(pBuf, svc_signonnum);    MSG_WriteByte(pBuf, 3);
+    MSG_WriteByte(pBuf, svc_signonnum); { MSG_WriteByte(pBuf, 3); }
     remoteClient->sendsignon = true;
 }
 
-/*
-==================
-Host_Begin_f
-==================
-*/
-void Host_Begin_f() {
-    if (isCliCmd()) {
-        Con_Printf("begin is not valid from the console\n");
-        return;
-    }
 
+
+void Host_Begin_f() {
+    if (isCliCmd()) { Con_Printf("begin is not valid from the console\n"); return; }
     remoteClient->spawned = true;
 }
 
@@ -1079,20 +1020,19 @@ void Host_Kick_f() {
     else
         if ((pGame()->deathmatch) &&
             !(remoteClient->privileged)
-            )  return;
+            )   return;
 
     RmtClient_p save = remoteClient;
-    int32_t i;
+    int i;
     bool byNumber = false;
     if ((Cmd_Argc() > 2) &&
         (Q_strcmp(Cmd_Argv(1), "#") == 0)
         ) {
-        i = (int32_t)Q_atof(Cmd_Argv(2)) - 1;
+        i = Q_atof(Cmd_Argv(2)) - 1;
         if ((i < 0) ||
             (i >= GetSvMaxClients()) ||
             (!svs.clients[i].active)
-            )
-            return;
+            )   return;
         remoteClient = &svs.clients[i];
         byNumber = true;
     }
@@ -1142,11 +1082,8 @@ DEBUGGING TOOLS
 ===============================================================================
 */
 
-/*
-==================
-Host_Give_f
-==================
-*/
+
+
 void Host_Give_f() {
     if (isCliCmd()) {
         Cmd_ForwardToServer();
@@ -1156,10 +1093,9 @@ void Host_Give_f() {
         !(remoteClient->privileged)
         )  return;
 
-    cString t = Cmd_Argv(1);
+    cString argsStr = Cmd_Argv(1);
     int cVal = atoi(Cmd_Argv(2));
-
-    switch (t[0]) {
+    switch (argsStr[0]) {
     case '0':
     case '1':
     case '2':
@@ -1169,23 +1105,23 @@ void Host_Give_f() {
     case '6':
     case '7':
     case '8':
-    case '9':
+    case '9': {
         // MED 01/04/97 added hipnotic give stuff
         if (hipnotic) {
-            if (t[0] == '6') {
-                if (t[1] == 'a')    sv_player->v.items = (int)sv_player->v.items | HIT_PROXIMITY_GUN;
-                else                sv_player->v.items = (int)sv_player->v.items | IT_GRENADE_LAUNCHER;
+            /**/ if (argsStr[0] == '6') {
+                if (argsStr[1] == 'a')      sv_player->v.items = (int)sv_player->v.items | HIT_PROXIMITY_GUN;
+                else                        sv_player->v.items = (int)sv_player->v.items | IT_GRENADE_LAUNCHER;
             }
-            else if (t[0] == '9')   sv_player->v.items = (int)sv_player->v.items | HIT_LASER_CANNON;
-            else if (t[0] == '0')   sv_player->v.items = (int)sv_player->v.items | HIT_MJOLNIR;
-            else if (t[0] >= '2')   sv_player->v.items = (int)sv_player->v.items | (IT_SHOTGUN << (t[0] - '2'));
+            else if (argsStr[0] == '9')     sv_player->v.items = (int)sv_player->v.items | HIT_LASER_CANNON;
+            else if (argsStr[0] == '0')     sv_player->v.items = (int)sv_player->v.items | HIT_MJOLNIR;
+            else if (argsStr[0] >= '2')     sv_player->v.items = (int)sv_player->v.items | (IT_SHOTGUN << (argsStr[0] - '2'));
         }
         else {
-            if (t[0] >= '2')    sv_player->v.items = (int)sv_player->v.items | (IT_SHOTGUN << (t[0] - '2'));
+            if (argsStr[0] >= '2')          sv_player->v.items = (int)sv_player->v.items | (IT_SHOTGUN << (argsStr[0] - '2'));
         }
-        break;
+    } break;
 
-    case 's':
+    case 's': {
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_shells1");
             if (val)
@@ -1193,8 +1129,8 @@ void Host_Give_f() {
         }
 
         sv_player->v.ammo_shells = (float)cVal;
-        break;
-    case 'n':
+    } break;
+    case 'n': {
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_nails1");
             if (val) {
@@ -1203,11 +1139,10 @@ void Host_Give_f() {
                     sv_player->v.ammo_nails = (float)cVal;
             }
         }
-        else {
+        else
             sv_player->v.ammo_nails = (float)cVal;
-        }
-        break;
-    case 'l':
+    } break;
+    case 'l': {
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_lava_nails");
             if (val) {
@@ -1215,8 +1150,8 @@ void Host_Give_f() {
                 if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_nails = (float)cVal;
             }
         }
-        break;
-    case 'r':
+    } break;
+    case 'r': {
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_rockets1");
             if (val) {
@@ -1225,9 +1160,10 @@ void Host_Give_f() {
                     sv_player->v.ammo_rockets = (float)cVal;
             }
         }
-        else { sv_player->v.ammo_rockets = (float)cVal; }
-        break;
-    case 'm':
+        else
+            sv_player->v.ammo_rockets = (float)cVal;
+    } break;
+    case 'm': {
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_multi_rockets");
             if (val) {
@@ -1235,9 +1171,9 @@ void Host_Give_f() {
                 if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_rockets = (float)cVal;
             }
         }
-        break;
+    } break;
     case 'h':   sv_player->v.health = (float)cVal; break;
-    case 'c':
+    case 'c': {
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_cells1");
             if (val) {
@@ -1247,8 +1183,8 @@ void Host_Give_f() {
             }
         }
         else { sv_player->v.ammo_cells = (float)cVal; }
-        break;
-    case 'p':
+    } break;
+    case 'p': {
         if (rogue) {
             eval_p val = GetEdictFieldValue(sv_player, "ammo_plasma");
             if (val) {
@@ -1256,16 +1192,13 @@ void Host_Give_f() {
                 if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_cells = (float)cVal;
             }
         }
-        break;
+    } break;
     }
 }
 
 
-/*
-==================
-Host_Viewmodel_f
-==================
-*/
+
+
 void Host_Viewmodel_f() {
     edict_p eDict = FindViewthing();
     if (!eDict) return;
@@ -1277,11 +1210,8 @@ void Host_Viewmodel_f() {
     cl.model_precache[(int)eDict->v.modelindex] = mdl;
 }
 
-/*
-==================
-Host_Viewframe_f
-==================
-*/
+
+
 void Host_Viewframe_f() {
     edict_p eDict = FindViewthing();
     if (!eDict)     return;
@@ -1297,11 +1227,6 @@ void Host_Viewframe_f() {
 
 
 
-/*
-==================
-Host_Viewnext_f
-==================
-*/
 void Host_Viewnext_f() {
     edict_p eDict = FindViewthing();
     if (!eDict)     return;
@@ -1314,11 +1239,8 @@ void Host_Viewnext_f() {
     PrintFrameName(mdl, (int)eDict->v.frame);
 }
 
-/*
-==================
-Host_Viewprev_f
-==================
-*/
+
+
 void Host_Viewprev_f() {
     edict_p eDict = FindViewthing();
     if (!eDict)     return;
@@ -1339,11 +1261,7 @@ DEMO LOOP CONTROL
 */
 
 
-/*
-==================
-Host_Startdemos_f
-==================
-*/
+
 void Host_Startdemos_f() {
     if (Host_IsDedicated()) {
         if (!SV_IsActive())

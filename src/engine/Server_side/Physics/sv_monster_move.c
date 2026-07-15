@@ -44,7 +44,7 @@ bool SV_CheckBottom(edict_p ent) {
 
     // if all of the points under the corners are solid world, don't bother with the tougher checks
     // the corners must be within 16 of the midpoint
-    vec3_t start = (vec3_t){ .z = bb.mins.z - 1.f };
+    vec3_t start = VecZ(bb.mins.z - 1.f);
     for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++) {
             start.x = (x) ? bb.maxs.x : bb.mins.x;
@@ -63,7 +63,7 @@ realcheck:
         start.z = bb.mins.z;   // the midpoint must be within 16 of the bottom
     }
     vec3_t dDown = VecZ((float)-TWICE(STEPSIZE));
-trace_t trace = SV_MoveDLine(start, dDown, MOVE_NOMONSTERS, ent);
+    trace_t trace = SV_MoveDLine(start, dDown, MOVE_NOMONSTERS, ent);
 
     if (trace.fraction == 1.f)
         return false;

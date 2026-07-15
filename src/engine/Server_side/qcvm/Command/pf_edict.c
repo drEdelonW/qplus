@@ -49,8 +49,8 @@ void PF_Find() {
 
     for (edict++; edict < GetEdNum(); edict++) {
         edict_p ed = ED_GetEDictByIdx(edict);
-        if (ed->free)
-            continue;
+        if (ed->free)   continue;
+
         cString t = E_STRING(ed, f);
         if (!t)            continue;
         if (!strcmp(t, str)) {

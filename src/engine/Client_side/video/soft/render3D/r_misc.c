@@ -262,7 +262,6 @@ void R_TransformFrustum() {
 */
 vec3_t/*void*/  TransformVector(vec3_t in /*, vec3_p out */) {
     vec3_t out = (vec3_t){
-
         .x = DotProduct(in, BS.right),
         .y = DotProduct(in, BS.up),
         .z = DotProduct(in, BS.forward)

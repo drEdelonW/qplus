@@ -156,6 +156,7 @@ extern "C" {
 
     edict_p ED_Alloc();
     void ED_Free(edict_p ed);
+    void ED_ClearEdict(edict_p edict);
 
     cString ED_NewString(cString string);   // returns a copy of the string allocated from the server's string heap
 
