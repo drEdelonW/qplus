@@ -36,27 +36,28 @@ char pr_immediate_string[2048];
 int  pr_error_count;
 
 // longer symbols must be before a shorter partial match
-cStr_p pr_punctuation[] = {
-    "&&",   "||",   "<=",   ">=",   "==",
-    "!=",   ";",    ",",    "!",    "*",
-    "/",    "(",    ")",    "-",    "+",
-    "=",    "[",    "]",    "{",    "}",
-    "...",  ".",    "<",    ">" ,   "#" ,
-     "&" ,  "|" , NULL
+const cStr_p pr_punctuation[] = {
+    "&&",   "||",   "<=",   ">=",
+    "==",   "!=",   ";",    ",",
+    "!",    "*",    "/",    "(",
+    ")",    "-",    "+",    "=",
+    "[",    "]",    "{",    "}",
+    "...",  ".",    "<",    ">" ,
+    "#" ,   "&" ,   "|" ,   NULL
 };
 
 // simple types.  function types are dynamically allocated
-type_t type_void = { ev_void, &def_void };
-type_t type_string = { ev_string, &def_string };
-type_t type_float = { ev_float, &def_float };
-type_t type_vector = { ev_vector, &def_vector };
-type_t type_entity = { ev_entity, &def_entity };
-type_t type_field = { ev_field, &def_field };
-type_t type_function = { ev_function, &def_function,NULL,&type_void };
+type_t type_void        /**/ = { ev_void,   &def_void };
+type_t type_string      /**/ = { ev_string, &def_string };
+type_t type_float       /**/ = { ev_float,  &def_float };
+type_t type_vector      /**/ = { ev_vector, &def_vector };
+type_t type_entity      /**/ = { ev_entity, &def_entity };
+type_t type_field       /**/ = { ev_field,  &def_field };
+type_t type_function    /**/ = { ev_function, &def_function, NULL, &type_void };
 // type_function is a void() function used for state defs
-type_t type_pointer = { ev_pointer, &def_pointer };
+type_t type_pointer     /**/ = { ev_pointer, &def_pointer };
 
-type_t type_floatfield = { ev_field, &def_field, NULL, &type_float };
+type_t type_floatfield  /**/ = { ev_field, &def_field, NULL, &type_float };
 
 #if 0
 int  type_size[8] = { 1,1,1,3,1,1,1,1 };
@@ -74,18 +75,28 @@ const int type_size[ev_LAST] = {
 };
 #endif
 
-def_t def_void = { &type_void, "temp" };
-def_t def_string = { &type_string, "temp" };
-def_t def_float = { &type_float, "temp" };
-def_t def_vector = { &type_vector, "temp" };
-def_t def_entity = { &type_entity, "temp" };
-def_t def_field = { &type_field, "temp" };
-def_t def_function = { &type_function, "temp" };
-def_t def_pointer = { &type_pointer, "temp" };
+def_t def_void      /**/ = { &type_void,    "temp" };
+def_t def_string    /**/ = { &type_string,  "temp" };
+def_t def_float     /**/ = { &type_float,   "temp" };
+def_t def_vector    /**/ = { &type_vector,  "temp" };
+def_t def_entity    /**/ = { &type_entity,  "temp" };
+def_t def_field     /**/ = { &type_field,   "temp" };
+def_t def_function  /**/ = { &type_function,"temp" };
+def_t def_pointer   /**/ = { &type_pointer, "temp" };
 
-def_t def_ret, def_parms[MAX_PARMS];
+def_t def_ret;
+def_t def_parms[MAX_PARMS];
 
-def_p def_for_type[8] = { &def_void, &def_string, &def_float, &def_vector, &def_entity, &def_field, &def_function, &def_pointer };
+def_p def_for_type[8] = {
+    &def_void,
+    &def_string,
+    &def_float,
+    &def_vector,
+    &def_entity,
+    &def_field,
+    &def_function,
+    &def_pointer
+};
 
 void PR_LexWhitespace();
 
@@ -96,12 +107,10 @@ PR_PrintNextLine
 ==============
 */
 void PR_PrintNextLine() {
-    cStr_p t;
-
-    printf("%3i:", pr_source_line);
-    for (t = pr_line_start; *t && *t != '\n'; t++)
+    printf("%3i:", pr_source_line); {
+    for (cStr_p t = pr_line_start; (*t) && (*t != '\n'); t++)
         printf("%c", *t);
-    printf("\n");
+    } printf("\n");
 }
 
 /*
@@ -112,22 +121,15 @@ Call at start of file and when *pr_file_p == '\n'
 ==============
 */
 void PR_NewLine() {
-    boolean m;
+    bool m = (*pr_file_p == '\n');
+    if (m) {pr_file_p++;} {
 
-    if (*pr_file_p == '\n') {
-        pr_file_p++;
-        m = true;
-    }
-    else
-        m = false;
+        pr_source_line++;
+        pr_line_start = pr_file_p;
 
-    pr_source_line++;
-    pr_line_start = pr_file_p;
-
-    // if (pr_dumpasm)
-    //  PR_PrintNextLine ();
-    if (m)
-        pr_file_p--;
+        // if (pr_dumpasm)
+        //  PR_PrintNextLine ();
+    } if (m)  pr_file_p--;
 }
 
 /*
@@ -138,27 +140,18 @@ Parses a quoted string
 ==============
 */
 void PR_LexString() {
-    int  c;
-    int  len;
-
-    len = 0;
+    int len = 0;
     pr_file_p++;
     do {
-        c = *pr_file_p++;
-        if (!c)
-            PR_ParseError("EOF inside quote");
-        if (c == '\n')
-            PR_ParseError("newline inside quote");
+        int c = *pr_file_p++;
+        if (!c)         PR_ParseError("EOF inside quote");
+        if (c == '\n')  PR_ParseError("newline inside quote");
         if (c == '\\') { // escape char
             c = *pr_file_p++;
-            if (!c)
-                PR_ParseError("EOF inside quote");
-            if (c == 'n')
-                c = '\n';
-            else if (c == '"')
-                c = '"';
-            else
-                PR_ParseError("Unknown escape char");
+            if (!c)             PR_ParseError("EOF inside quote");
+            /**/ if (c == 'n')  c = '\n';
+            else if (c == '"')  c = '"';
+            else                PR_ParseError("Unknown escape char");
         }
         else if (c == '\"') {
             pr_token[len] = 0;
@@ -178,17 +171,20 @@ PR_LexNumber
 ==============
 */
 float PR_LexNumber() {
-    int  c;
-    int  len;
-
-    len = 0;
-    c = *pr_file_p;
+    int len = 0;
+    int c = *pr_file_p;
     do {
         pr_token[len] = c;
         len++;
         pr_file_p++;
         c = *pr_file_p;
-    } while ((c >= '0' && c <= '9') || c == '.');
+    } while (
+        (
+            (c >= '0') &&
+            (c <= '9')
+            ) ||
+        (c == '.')
+        );
     pr_token[len] = 0;
     return atof(pr_token);
 }
@@ -201,12 +197,10 @@ Parses a single quoted vector
 ==============
 */
 void PR_LexVector() {
-    int  i;
-
     pr_file_p++;
     pr_token_type = tt_immediate;
     pr_immediate_type = &type_vector;
-    for (i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         pr_immediate.vector[i] = PR_LexNumber();
         PR_LexWhitespace();
     }
@@ -223,18 +217,28 @@ Parses an identifier
 ==============
 */
 void PR_LexName() {
-    int  c;
-    int  len;
-
-    len = 0;
-    c = *pr_file_p;
+    int len = 0;
+    int c = *pr_file_p;
     do {
         pr_token[len] = c;
         len++;
         pr_file_p++;
         c = *pr_file_p;
-    } while ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
-        || (c >= '0' && c <= '9'));
+    } while (
+        (
+            (c >= 'a') &&   // is LC char
+            (c <= 'z')
+            ) ||
+        (
+            (c >= 'A') &&   // is UC char
+            (c <= 'Z')
+            ) ||
+        (c == '_') ||
+        (
+            (c >= '0') &&   // is digits
+            (c <= '9')
+            )
+        );
     pr_token[len] = 0;
     pr_token_type = tt_name;
 }
@@ -245,20 +249,15 @@ PR_LexPunctuation
 ==============
 */
 void PR_LexPunctuation() {
-    int  i;
-    int  len;
-    cStr_p p;
-
     pr_token_type = tt_punct;
 
-    for (i = 0; (p = pr_punctuation[i]) != NULL; i++) {
-        len = strlen(p);
+    cStr_p p;
+    for (int i = 0; (p = pr_punctuation[i]) != NULL; i++) {
+        int len = strlen(p);
         if (!strncmp(p, pr_file_p, len)) {
             strcpy(pr_token, p);
-            if (p[0] == '{')
-                pr_bracelevel++;
-            else if (p[0] == '}')
-                pr_bracelevel--;
+            /**/ if (p[0] == '{')   pr_bracelevel++;
+            else if (p[0] == '}')   pr_bracelevel--;
             pr_file_p += len;
             return;
         }
@@ -338,7 +337,7 @@ void PR_FindMacro() {
 }
 
 // just parses text, returning false if an eol is reached
-boolean PR_SimpleGetToken() {
+bool PR_SimpleGetToken() {
     int  c;
     int  i;
 
@@ -508,7 +507,7 @@ Returns true and gets the next token if the current token equals string
 Returns false and does nothing otherwise
 =============
 */
-boolean PR_Check(cStr_p string) {
+bool PR_Check(cStr_p string) {
     if (strcmp(string, pr_token))
         return false;
 

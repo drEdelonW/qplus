@@ -21,8 +21,7 @@
 // this file is shared by quake and qcc
 #include "types.h"
 
-typedef int func_t;
-typedef int string_t;
+typedef int32_t string_t;
 
 #if 0
 typedef enum {
@@ -64,8 +63,10 @@ typedef enum {
 #define OFS_PARM7  25
 #define RESERVED_OFS 28
 
-
-enum {
+#if 0
+typedef int func_t;
+#else
+typedef enum {
     OP_DONE,
     OP_MUL_F,
     OP_MUL_V,
@@ -140,22 +141,39 @@ enum {
     OP_OR,
 
     OP_BITAND,
-    OP_BITOR
-};
+    OP_BITOR,
+
+    OP_LAST     // Should be last
+} func_t;
+#endif
 
 
+#if 0
 typedef struct statement_s {
     unsigned short op;
     short a, b, c;
 } dstatement_t;
+#else
+#include "assert.h"
+typedef uint16_t op_type;   // prog_operation_e // #include "pr_ops.h"
+typedef int16_t arg_type;   // should be signed int
+
+typedef struct {
+    op_type     op;    // prog_operation_e
+    arg_type    a;
+    arg_type    b;
+    arg_type    c;
+} dstatement_t;  STATIC_ASSERT_SIZE(dstatement_t, 2*4);  // 8
+// } dStatement_t;
+// typedef dstatement_t* dStatement_p;
+#endif
 typedef dstatement_t* dstatement_p;
 
 typedef struct {
-    unsigned short type;  // if DEF_SAVEGLOBGAL bit is set
-    // the variable needs to be saved in savegames
-    unsigned short ofs;
-    int   s_name;
-} ddef_t;
+    uint16_t    type; // [etype_t] if DEF_SAVEGLOBAL bit is set the variable needs to be saved in savegames
+    uint16_t    ofs;
+    string_t    s_name;
+} ddef_t;       STATIC_ASSERT_SIZE(ddef_t, 2*2 + 4); 
 typedef ddef_t* ddef_p;
 #define DEF_SAVEGLOBGAL (1<<15)
 
@@ -172,7 +190,7 @@ typedef struct {
     int  s_file;   // source file defined in
 
     int  numparms;
-    byte parm_size[MAX_PARMS];
+    uint8_t parm_size[MAX_PARMS];
 } dfunction_t;
 typedef dfunction_t* dfunction_p;
 

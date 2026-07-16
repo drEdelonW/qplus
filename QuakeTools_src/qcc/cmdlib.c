@@ -24,10 +24,6 @@
 
 #define PATHSEPERATOR   '/'
 
-// set these before calling CheckParm
-int myargc;
-char** myargv;
-
 char com_token[1024];
 int  com_eof;
 
@@ -39,10 +35,9 @@ I_FloatTime
 double I_FloatTime() {
     struct timeval tp;
     struct timezone tzp;
-    static int  secbase;
-
     gettimeofday(&tp, &tzp);
 
+    static int secbase = 0;
     if (!secbase) {
         secbase = tp.tv_sec;
         return tp.tv_usec / 1000000.0;
@@ -59,20 +54,14 @@ COM_Parse
 Parse a token out of a string
 ==============
 */
-char* COM_Parse(char* data) {
-    int  c;
-    int  len;
-
-    len = 0;
-    com_token[0] = 0;
-
+cStr_p COM_Parse(cStr_p data) {
     if (!data)
         return NULL;
 
-    // skip whitespace
+    char ch;
 skipwhite:
-    while ((c = *data) <= ' ') {
-        if (c == 0) {
+while ((ch = *data) <= ' ') {    // skip whitespace
+        if (ch == 0) {
             com_eof = true;
             return NULL;   // end of file;
         }
@@ -80,44 +69,61 @@ skipwhite:
     }
 
     // skip // comments
-    if (c == '/' && data[1] == '/') {
-        while (*data && *data != '\n')
-            data++;
+    if ((ch == '/') &&
+        (data[1] == '/')
+        ) {
+        while ((*data) &&
+            (*data != '\n') // until new line
+            )   data++;
+
         goto skipwhite;
     }
 
 
     // handle quoted strings specially
-    if (c == '\"') {
+    int len = 0;
+    com_token[len] = 0;
+    if (ch == '\"') {
         data++;
         do {
-            c = *data++;
-            if (c == '\"') {
+            ch = *data++;
+            if (ch == '\"') {
                 com_token[len] = 0;
                 return data;
             }
-            com_token[len] = c;
+            com_token[len] = ch;
             len++;
         } while (1);
     }
 
     // parse single characters
-    if (c == '{' || c == '}' || c == ')' || c == '(' || c == '\'' || c == ':') {
-        com_token[len] = c;
+    if ((ch == '{') ||
+        (ch == '}') ||
+        (ch == ')') ||
+        (ch == '(') ||
+        (ch == '\'') ||
+        (ch == ':')
+        ) {
+        com_token[len] = ch;
         len++;
-        com_token[len] = 0;
+        com_token[len] = 0x00;
         return data + 1;
     }
 
     // parse a regular word
     do {
-        com_token[len] = c;
+        com_token[len] = ch;
         data++;
         len++;
-        c = *data;
-        if (c == '{' || c == '}' || c == ')' || c == '(' || c == '\'' || c == ':')
-            break;
-    } while (c > 32);
+        ch = *data;
+        if ((ch == '{') ||
+            (ch == '}') ||
+            (ch == ')') ||
+            (ch == '(') ||
+            (ch == '\'') ||
+            (ch == ':')
+            )   break;
+    } while (ch > ' ');
 
     com_token[len] = 0;
     return data;
@@ -133,10 +139,8 @@ filelength
 */
 int filelength(int handle) {
     struct stat fileinfo;
-
-    if (fstat(handle, &fileinfo) == -1) {
+    if (fstat(handle, &fileinfo) == -1)
         Error("Error fstating");
-    }
 
     return fileinfo.st_size;
 }
@@ -145,8 +149,8 @@ int tell(int handle) {
     return lseek(handle, 0, SEEK_CUR);
 }
 
-char* strupr(char* start) {
-    char* in;
+cStr_p strupr(cStr_p start) {
+    cStr_p in;
     in = start;
     while (*in) {
         *in = toupper(*in);
@@ -155,9 +159,8 @@ char* strupr(char* start) {
     return start;
 }
 
-char* strlower(char* start) {
-    char* in;
-    in = start;
+cStr_p strlower(cStr_p start) {
+    cStr_p in = start;
     while (*in) {
         *in = tolower(*in);
         in++;
@@ -181,7 +184,7 @@ Error
 For abnormal program terminations
 =================
 */
-void Error(char* error, ...) {
+void Error(cStr_p error, ...) { // TODO: rework it to "va.h"
     va_list argptr;
 
     printf("\n************ ERROR ************\n");
@@ -202,13 +205,13 @@ Checks for the given parameter in the program's command line arguments
 Returns the argument number (1 to argc-1) or 0 if not present
 =================
 */
-int CheckParm(char* check) {
-    int             i;
-
-    for (i = 1;i < myargc;i++) {
+// set these before calling CheckParm
+int myargc;
+cStr_ar myargv;
+int CheckParm(cStr_p check) {
+    for (int i = 1; i < myargc; i++)
         if (!strcasecmp(check, myargv[i]))
             return i;
-    }
 
     return 0;
 }
@@ -218,25 +221,17 @@ int CheckParm(char* check) {
 #define O_BINARY 0
 #endif
 
-int SafeOpenWrite(char* filename) {
-    int     handle;
-
+int SafeOpenWrite(cStr_p filename) {
     umask(0);
-
-    handle = open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY
-        , 0666);
-
+    int handle = open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
     if (handle == -1)
         Error("Error opening %s: %s", filename, strerror(errno));
 
     return handle;
 }
 
-int SafeOpenRead(char* filename) {
-    int     handle;
-
-    handle = open(filename, O_RDONLY | O_BINARY);
-
+int SafeOpenRead(cStr_p filename) {
+    int handle = open(filename, O_RDONLY | O_BINARY);
     if (handle == -1)
         Error("Error opening %s: %s", filename, strerror(errno));
 
@@ -244,26 +239,22 @@ int SafeOpenRead(char* filename) {
 }
 
 
-void SafeRead(int handle, void* buffer, long count) {
+void SafeRead(int handle, Any_p buffer, long count) {
     if (read(handle, buffer, count) != count)
         Error("File read failure");
 }
 
 
-void SafeWrite(int handle, void* buffer, long count) {
+void SafeWrite(int handle, Any_p buffer, long count) {
     if (write(handle, buffer, count) != count)
         Error("File write failure");
 }
 
 
-void* SafeMalloc(long size) {
-    void* ptr;
-
-    ptr = malloc(size);
-
+Any_p SafeMalloc(long size) {
+    Any_p ptr = malloc(size);
     if (!ptr)
         Error("Malloc failure for %lu bytes", size);
-
     return ptr;
 }
 
@@ -273,15 +264,11 @@ void* SafeMalloc(long size) {
 LoadFile
 ==============
 */
-long    LoadFile(char* filename, void** bufferptr) {
-    int             handle;
-    long    length;
-    void* buffer;
-
-    handle = SafeOpenRead(filename);
-    length = filelength(handle);
-    buffer = SafeMalloc(length + 1);
-    ((byte*)buffer)[length] = 0;
+long LoadFile(cStr_p filename, void** bufferptr) {
+    int handle = SafeOpenRead(filename);
+    long length = filelength(handle);
+    Any_p buffer = SafeMalloc(length + 1);
+    ((uint8_p)buffer)[length] = 0;
     SafeRead(handle, buffer, length);
     close(handle);
 
@@ -295,25 +282,20 @@ long    LoadFile(char* filename, void** bufferptr) {
 SaveFile
 ==============
 */
-void    SaveFile(char* filename, void* buffer, long count) {
-    int             handle;
-
-    handle = SafeOpenWrite(filename);
+void SaveFile(cStr_p filename, Any_p buffer, long count) {
+    int handle = SafeOpenWrite(filename);
     SafeWrite(handle, buffer, count);
     close(handle);
 }
 
 
 
-void DefaultExtension(char* path, char* extension) {
-    char* src;
-    //
+void DefaultExtension(cStr_p path, cStr_p extension) {
     // if path doesn't have a .EXT, append extension
     // (extension should include the .)
-    //
-    src = path + strlen(path) - 1;
+    cStr_p src = path + strlen(path) - 1;
 
-    while (*src != PATHSEPERATOR && src != path) {
+    while ((*src != PATHSEPERATOR) && (src != path)) {
         if (*src == '.')
             return;                 // it has an extension
         src--;
@@ -323,31 +305,29 @@ void DefaultExtension(char* path, char* extension) {
 }
 
 
-void DefaultPath(char* path, char* basepath) {
-    char    temp[128];
-
+void DefaultPath(cStr_p path, cStr_p basepath) {
     if (path[0] == PATHSEPERATOR)
         return;                   // absolute path location
+    char temp[128];
     strcpy(temp, path);
     strcpy(path, basepath);
     strcat(path, temp);
 }
 
 
-void    StripFilename(char* path) {
-    int             length;
-
-    length = strlen(path) - 1;
-    while (length > 0 && path[length] != PATHSEPERATOR)
-        length--;
+void StripFilename(cStr_p path) {
+    int length = strlen(path) - 1;
+    while ((length > 0) &&
+        (path[length] != PATHSEPERATOR)
+        )   length--;
     path[length] = 0;
 }
 
-void    StripExtension(char* path) {
-    int             length;
-
-    length = strlen(path) - 1;
-    while (length > 0 && path[length] != '.') {
+void StripExtension(cStr_p path) {
+    int  length = strlen(path) - 1;
+    while ((length > 0) &&
+        (path[length] != '.')
+        ) {
         length--;
         if (path[length] == '/')
             return;  // no extension
@@ -362,48 +342,38 @@ void    StripExtension(char* path) {
 Extract file parts
 ====================
 */
-void ExtractFilePath(char* path, char* dest) {
-    char* src;
+void ExtractFilePath(cStr_p path, cStr_p dest) {
+    cStr_p src = path + strlen(path) - 1;
 
-    src = path + strlen(path) - 1;
-
-    //
     // back up until a \ or the start
-    //
-    while (src != path && *(src - 1) != PATHSEPERATOR)
-        src--;
+    while ((src != path) &&
+        (*(src - 1) != PATHSEPERATOR)
+        )   src--;
 
     memcpy(dest, path, src - path);
     dest[src - path] = 0;
 }
 
-void ExtractFileBase(char* path, char* dest) {
-    char* src;
-
-    src = path + strlen(path) - 1;
-
-    //
+void ExtractFileBase(cStr_p path, cStr_p dest) {
+    cStr_p src = path + strlen(path) - 1;
     // back up until a \ or the start
-    //
-    while (src != path && *(src - 1) != PATHSEPERATOR)
-        src--;
+    while ((src != path) &&
+        (*(src - 1) != PATHSEPERATOR)
+        )   src--;
 
-    while (*src && *src != '.') {
-        *dest++ = *src++;
-    }
+    while ((*src) &&
+        (*src != '.')
+        )   *dest++ = *src++;
+
     *dest = 0;
 }
 
-void ExtractFileExtension(char* path, char* dest) {
-    char* src;
-
-    src = path + strlen(path) - 1;
-
-    //
+void ExtractFileExtension(cStr_p path, cStr_p dest) {
+    cStr_p src = path + strlen(path) - 1;
     // back up until a . or the start
-    //
-    while (src != path && *(src - 1) != '.')
-        src--;
+    while ((src != path) &&
+        (*(src - 1) != '.')
+        )   src--;
     if (src == path) {
         *dest = 0; // no extension
         return;
@@ -418,23 +388,15 @@ void ExtractFileExtension(char* path, char* dest) {
 ParseNum / ParseHex
 ==============
 */
-long ParseHex(char* hex) {
-    char* str;
-    long    num;
-
-    num = 0;
-    str = hex;
-
+long ParseHex(cStr_p hex) {
+    long num = 0;
+    cStr_p str = hex;
     while (*str) {
         num <<= 4;
-        if (*str >= '0' && *str <= '9')
-            num += *str - '0';
-        else if (*str >= 'a' && *str <= 'f')
-            num += 10 + *str - 'a';
-        else if (*str >= 'A' && *str <= 'F')
-            num += 10 + *str - 'A';
-        else
-            Error("Bad hex number: %s", hex);
+        /**/ if ((*str >= '0') && (*str <= '9'))    num += *str - '0';
+        else if ((*str >= 'a') && (*str <= 'f'))    num += 10 + *str - 'a';
+        else if ((*str >= 'A') && (*str <= 'F'))    num += 10 + *str - 'A';
+        else    Error("Bad hex number: %s", hex);
         str++;
     }
 
@@ -442,11 +404,9 @@ long ParseHex(char* hex) {
 }
 
 
-long ParseNum(char* str) {
-    if (str[0] == '$')
-        return ParseHex(str + 1);
-    if (str[0] == '0' && str[1] == 'x')
-        return ParseHex(str + 2);
+long ParseNum(cStr_p str) {
+    if (str[0] == '$')                      return ParseHex(str + 1);
+    if ((str[0] == '0') && (str[1] == 'x')) return ParseHex(str + 2);
     return atol(str);
 }
 
@@ -463,10 +423,10 @@ long ParseNum(char* str) {
 #ifdef __BIG_ENDIAN__
 
 short   LittleShort(short l) {
-    byte    b1, b2;
+    uint8_t    b1, b2;
 
-    b1 = l & 255;
-    b2 = (l >> 8) & 255;
+    b1 = l & 0xFF;
+    b2 = (l >> 8) & 0xFF;
 
     return (b1 << 8) + b2;
 }
@@ -477,12 +437,12 @@ short   BigShort(short l) {
 
 
 long    LittleLong(long l) {
-    byte    b1, b2, b3, b4;
+    uint8_t    b1, b2, b3, b4;
 
-    b1 = l & 255;
-    b2 = (l >> 8) & 255;
-    b3 = (l >> 16) & 255;
-    b4 = (l >> 24) & 255;
+    b1 = l & 0xFF;
+    b2 = (l >> 8) & 0xFF;
+    b3 = (l >> 16) & 0xFF;
+    b4 = (l >> 24) & 0xFF;
 
     return ((long)b1 << 24) + ((long)b2 << 16) + ((long)b3 << 8) + b4;
 }
@@ -493,7 +453,7 @@ long    BigLong(long l) {
 
 
 float LittleFloat(float l) {
-    union { byte b[4]; float f; } in, out;
+    union { uint8_t b[4]; float f; } in, out;
 
     in.f = l;
     out.b[0] = in.b[3];
@@ -513,10 +473,8 @@ float BigFloat(float l) {
 
 
 short   BigShort(short l) {
-    byte    b1, b2;
-
-    b1 = l & 255;
-    b2 = (l >> 8) & 255;
+    uint8_t b1 = (l >> 0) & 0xFF;
+    uint8_t b2 = (l >> 8) & 0xFF;
 
     return (b1 << 8) + b2;
 }
@@ -526,13 +484,13 @@ short   LittleShort(short l) {
 }
 
 
-long    BigLong(long l) {
-    byte    b1, b2, b3, b4;
+long BigLong(long l) {
+    uint8_t    b1, b2, b3, b4;
 
-    b1 = l & 255;
-    b2 = (l >> 8) & 255;
-    b3 = (l >> 16) & 255;
-    b4 = (l >> 24) & 255;
+    b1 = (l >> 0) & 0xFF;
+    b2 = (l >> 8) & 0xFF;
+    b3 = (l >> 16) & 0xFF;
+    b4 = (l >> 24) & 0xFF;
 
     return ((long)b1 << 24) + ((long)b2 << 16) + ((long)b3 << 8) + b4;
 }
@@ -542,7 +500,10 @@ long    LittleLong(long l) {
 }
 
 float BigFloat(float l) {
-    union { byte b[4]; float f; } in, out;
+    union {
+        uint8_t b[4];
+        float f;
+    } in, out;
 
     in.f = l;
     out.b[0] = in.b[3];

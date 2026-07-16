@@ -66,12 +66,12 @@ void BspModels() {
     int p = CheckParm("-bspmodels");
     if (!p)
         return;
-    if (p == myargc - 1)
+    if (p == (myargc - 1))
         Error("-bspmodels must preceed a game directory");
-    cString gamedir = myargv[p + 1];
+    cStr_p gamedir = myargv[p + 1];
 
     for (int i = 0; i < nummodels; i++) {
-        cString m = precache_models[i];
+        cStr_p m = precache_models[i];
         if (strcmp(m + strlen(m) - 4, ".bsp"))
             continue;
 
@@ -79,14 +79,18 @@ void BspModels() {
         strcpy(name, m);
         name[strlen(m) - 4] = 0;
         char cmd[1024];
-        snprintf(cmd, sizeof(cmd), "qbsp %s/%s ; light -extra %s/%s", gamedir, name, gamedir, name);
+        snprintf(cmd,
+            sizeof(cmd),
+            "qbsp %s/%s ; light -extra %s/%s",
+            gamedir, name, gamedir, name
+        );
         system(cmd);
     }
 }
 
 // CopyString returns an offset from the string heap
-int CopyString(cString str) {
-    int  old = strofs;
+int CopyString(cStr_p str) {
+    int old = strofs;
     strcpy(strings + strofs, str);
     strofs += strlen(str) + 1;
     return old;
@@ -113,7 +117,13 @@ void PrintStrings() {
 void PrintFunctions() {
     for (int i = 0; i < numfunctions; i++) {
         dfunction_p d = &functions[i];
-        printf("%s : %s : %i %i (", strings + d->s_file, strings + d->s_name, d->first_statement, d->parm_start);
+        printf(
+            "%s : %s : %i %i (",
+            strings + d->s_file,
+            strings + d->s_name,
+            d->first_statement,
+            d->parm_start
+        );
         for (int j = 0; j < d->numparms; j++)
             printf("%i ", d->parm_size[j]);
         printf(")\n");
@@ -123,14 +133,24 @@ void PrintFunctions() {
 void PrintFields() {
     for (int i = 0; i < numfielddefs; i++) {
         ddef_p d = &fields[i];
-        printf("%5i : (%i) %s\n", d->ofs, d->type, strings + d->s_name);
+        printf(
+            "%5i : (%i) %s\n",
+            d->ofs,
+            d->type,
+            strings + d->s_name
+        );
     }
 }
 
 void PrintGlobals() {
     for (int i = 0; i < numglobaldefs; i++) {
         ddef_p d = &globals[i];
-        printf("%5i : (%i) %s\n", d->ofs, d->type, strings + d->s_name);
+        printf(
+            "%5i : (%i) %s\n",
+            d->ofs,
+            d->type,
+            strings + d->s_name
+        );
     }
 }
 
@@ -149,17 +169,11 @@ void InitData() {
 
 
 void WriteData(int crc) {
-    def_p def;
-    ddef_p dd;
-    dprograms_t progs;
-    int   h;
-    int   i;
-
-    for (def = pr.def_head.next; def; def = def->next) {
-        if (def->type->type == ev_function) {
+    for (def_p def = pr.def_head.next; def; def = def->next) {
+        ddef_p dd;
+        /**/ if (def->type->type == ev_function) {
             //   df = &functions[numfunctions];
             //   numfunctions++;
-
         }
         else if (def->type->type == ev_field) {
             dd = &fields[numfielddefs];
@@ -171,11 +185,11 @@ void WriteData(int crc) {
         dd = &globals[numglobaldefs];
         numglobaldefs++;
         dd->type = def->type->type;
-        if (!def->initialized
-            && def->type->type != ev_function
-            && def->type->type != ev_field
-            && def->scope == NULL)
-            dd->type |= DEF_SAVEGLOBGAL;
+        if (!(def->initialized) &&
+            (def->type->type != ev_function) &&
+            (def->type->type != ev_field) &&
+            (def->scope == NULL)
+            )   dd->type |= DEF_SAVEGLOBGAL;
         dd->s_name = CopyString(def->name);
         dd->ofs = def->ofs;
     }
@@ -193,7 +207,8 @@ void WriteData(int crc) {
     printf("%6i numfielddefs\n", numfielddefs);
     printf("%6i numpr_globals\n", numpr_globals);
 
-    h = SafeOpenWrite(destfile);
+    int h = SafeOpenWrite(destfile);
+    dprograms_t progs;
     SafeWrite(h, &progs, sizeof(progs));
 
     progs.ofs_strings = lseek(h, 0, SEEK_CUR);
@@ -202,7 +217,7 @@ void WriteData(int crc) {
 
     progs.ofs_statements = lseek(h, 0, SEEK_CUR);
     progs.numstatements = numstatements;
-    for (i = 0; i < numstatements; i++) {
+    for (int i = 0; i < numstatements; i++) {
         statements[i].op = LittleShort(statements[i].op);
         statements[i].a = LittleShort(statements[i].a);
         statements[i].b = LittleShort(statements[i].b);
@@ -212,7 +227,7 @@ void WriteData(int crc) {
 
     progs.ofs_functions = lseek(h, 0, SEEK_CUR);
     progs.numfunctions = numfunctions;
-    for (i = 0; i < numfunctions; i++) {
+    for (int i = 0; i < numfunctions; i++) {
         functions[i].first_statement = LittleLong(functions[i].first_statement);
         functions[i].parm_start = LittleLong(functions[i].parm_start);
         functions[i].s_name = LittleLong(functions[i].s_name);
@@ -224,7 +239,7 @@ void WriteData(int crc) {
 
     progs.ofs_globaldefs = lseek(h, 0, SEEK_CUR);
     progs.numglobaldefs = numglobaldefs;
-    for (i = 0; i < numglobaldefs; i++) {
+    for (int i = 0; i < numglobaldefs; i++) {
         globals[i].type = LittleShort(globals[i].type);
         globals[i].ofs = LittleShort(globals[i].ofs);
         globals[i].s_name = LittleLong(globals[i].s_name);
@@ -233,7 +248,7 @@ void WriteData(int crc) {
 
     progs.ofs_fielddefs = lseek(h, 0, SEEK_CUR);
     progs.numfielddefs = numfielddefs;
-    for (i = 0; i < numfielddefs; i++) {
+    for (int i = 0; i < numfielddefs; i++) {
         fields[i].type = LittleShort(fields[i].type);
         fields[i].ofs = LittleShort(fields[i].ofs);
         fields[i].s_name = LittleLong(fields[i].s_name);
@@ -242,11 +257,14 @@ void WriteData(int crc) {
 
     progs.ofs_globals = lseek(h, 0, SEEK_CUR);
     progs.numglobals = numpr_globals;
-    for (i = 0; i < numpr_globals; i++)
+    for (int i = 0; i < numpr_globals; i++)
         ((int*)pr_globals)[i] = LittleLong(((int*)pr_globals)[i]);
     SafeWrite(h, pr_globals, numpr_globals * 4);
 
-    printf("%6i TOTAL SIZE\n", (int)lseek(h, 0, SEEK_CUR));
+    printf(
+        "%6i TOTAL SIZE\n",
+        (int)lseek(h, 0, SEEK_CUR)
+    );
 
     progs.entityfields = pr.size_fields;
 
@@ -254,12 +272,11 @@ void WriteData(int crc) {
     progs.crc = crc;
 
     // byte swap the header and write it out
-    for (i = 0; i < sizeof(progs) / 4; i++)
+    for (int i = 0; i < sizeof(progs) / 4; i++)
         ((int*)&progs)[i] = LittleLong(((int*)&progs)[i]);
     lseek(h, 0, SEEK_SET);
     SafeWrite(h, &progs, sizeof(progs));
     close(h);
-
 }
 
 
@@ -271,14 +288,14 @@ PR_String
 Returns a string suitable for printing (no newlines, max 60 chars length)
 ===============
 */
-cString PR_String(cString string) {
+cStr_p PR_String(cStr_p string) {
     static char buf[80];
-    cString s;
-
-    s = buf;
+    cStr_p s = buf;
     *s++ = '"';
-    while (string && *string) {
-        if (s == buf + sizeof(buf) - 2)
+    while ((string) &&
+        (*string)
+        ) {
+        if (s == (buf + sizeof(buf) - 2))
             break;
         if (*string == '\n') {
             *s++ = '\\';
@@ -291,7 +308,7 @@ cString PR_String(cString string) {
         else
             *s++ = *string;
         string++;
-        if (s - buf > 60) {
+        if ((s - buf) > 60) {
             *s++ = '.';
             *s++ = '.';
             *s++ = '.';
@@ -306,13 +323,9 @@ cString PR_String(cString string) {
 
 
 def_p PR_DefForFieldOfs(gofs_t ofs) {
-    def_p d;
-
-    for (d = pr.def_head.next; d; d = d->next) {
-        if (d->type->type != ev_field)
-            continue;
-        if (*((int*)&pr_globals[d->ofs]) == ofs)
-            return d;
+    for (def_p d = pr.def_head.next; d; d = d->next) {
+        if (d->type->type != ev_field)              continue;
+        if (*((int*)&pr_globals[d->ofs]) == ofs)    return d;
     }
     Error("PR_DefForFieldOfs: couldn't find %i", ofs);
     return NULL;
@@ -325,44 +338,22 @@ PR_ValueString
 Returns a string describing *data in a type specific manner
 =============
 */
-cString PR_ValueString(etype_t type, Any_p val) {
+cStr_p PR_ValueString(etype_t type, Any_p val) {
     static char line[256];
-    def_p def;
-    dfunction_t* f;
-
     switch (type) {
-    case ev_string:
-        snprintf(line, sizeof(line), "%s", PR_String(strings + *(int*)val));
-        break;
-    case ev_entity:
-        snprintf(line, sizeof(line), "entity %i", *(int*)val);
-        break;
-    case ev_function:
-        f = functions + *(int*)val;
-        if (!f)
-            snprintf(line, sizeof(line), "undefined function");
-        else
-            snprintf(line, sizeof(line), "%s()", strings + f->s_name);
-        break;
-    case ev_field:
-        def = PR_DefForFieldOfs(*(int*)val);
-        snprintf(line, sizeof(line), ".%s", def->name);
-        break;
-    case ev_void:
-        snprintf(line, sizeof(line), "void");
-        break;
-    case ev_float:
-        snprintf(line, sizeof(line), "%5.1f", *(float*)val);
-        break;
-    case ev_vector:
-        snprintf(line, sizeof(line), "'%5.1f %5.1f %5.1f'", ((float*)val)[0], ((float*)val)[1], ((float*)val)[2]);
-        break;
-    case ev_pointer:
-        snprintf(line, sizeof(line), "pointer");
-        break;
-    default:
-        snprintf(line, sizeof(line), "bad type %i", type);
-        break;
+    case ev_string:     snprintf(line, sizeof(line), "%s", PR_String(strings + *(int*)val));    break;
+    case ev_entity:     snprintf(line, sizeof(line), "entity %i", *(int*)val);                  break;
+    case ev_function: {
+        dfunction_p f = functions + *(int*)val;
+        if (!f)         snprintf(line, sizeof(line), "undefined function");
+        else            snprintf(line, sizeof(line), "%s()", strings + f->s_name);
+    } break;
+    case ev_field:      snprintf(line, sizeof(line), ".%s", (PR_DefForFieldOfs(*(int*)val))->name);   break;
+    case ev_void:       snprintf(line, sizeof(line), "void");        break;
+    case ev_float:      snprintf(line, sizeof(line), "%5.1f", *(float*)val);        break;
+    case ev_vector:     snprintf(line, sizeof(line), "'%5.1f %5.1f %5.1f'", ((float*)val)[0], ((float*)val)[1], ((float*)val)[2]);        break;
+    case ev_pointer:    snprintf(line, sizeof(line), "pointer");        break;
+    default:            snprintf(line, sizeof(line), "bad type %i", type);        break;
     }
 
     return line;
@@ -376,9 +367,8 @@ Returns a string with a description and the contents of a global,
 padded to 20 field width
 ============
 */
-cString PR_GlobalStringNoContents(gofs_t ofs) {
+cStr_p PR_GlobalStringNoContents(gofs_t ofs) {
     static char line[128];
-
     def_p def = pr_global_defs[ofs];
     if (!def)   snprintf(line, sizeof(line), "%i(???)", ofs);    //  Error ("PR_GlobalString: no def for %i", ofs);
     else        snprintf(line, sizeof(line), "%i(%s)", ofs, def->name);
@@ -391,18 +381,18 @@ cString PR_GlobalStringNoContents(gofs_t ofs) {
     return line;
 }
 
-cString PR_GlobalString(gofs_t ofs) {
-    static char line[128];
-
+cStr_p PR_GlobalString(gofs_t ofs) {
     def_p def = pr_global_defs[ofs];
     if (!def)
         return PR_GlobalStringNoContents(ofs);
-    if (def->initialized && (def->type->type != ev_function))
-        snprintf(line, sizeof(line), "%i(%s)", ofs, PR_ValueString(def->type->type, &pr_globals[ofs]));
-    else    snprintf(line, sizeof(line), "%i(%s)", ofs, def->name);
 
-    int i = strlen(line);
-    for (; i < 16; i++)
+    static char line[128];
+    if ((def->initialized) &&
+        (def->type->type != ev_function)
+        )       snprintf(line, sizeof(line), "%i(%s)", ofs, PR_ValueString(def->type->type, &pr_globals[ofs]));
+    else        snprintf(line, sizeof(line), "%i(%s)", ofs, def->name);
+
+    for (int i = strlen(line); i < 16; i++)
         strcat(line, " ");
     strcat(line, " ");
 
@@ -423,30 +413,26 @@ void PR_PrintOfs(gofs_t ofs) {
 PR_PrintStatement
 =================
 */
-void PR_PrintStatement(dstatement_t* s) {
-    int  i;
-
-    printf("%4i : %4i : %s ", (int)(s - statements), statement_linenums[s - statements], pr_opcodes[s->op].opname);
-    i = strlen(pr_opcodes[s->op].opname);
+void PR_PrintStatement(dstatement_p s) {
+    printf("%4i : %4i : %s ",
+        (int)(s - statements),
+        statement_linenums[s - statements],
+        pr_opcodes[s->op].opname
+    );
+    int i = strlen(pr_opcodes[s->op].opname);
     for (; i < 10; i++)
         printf(" ");
 
-    if (s->op == OP_IF || s->op == OP_IFNOT)
-        printf("%sbranch %i", PR_GlobalString(s->a), s->b);
-    else if (s->op == OP_GOTO) {
-        printf("branch %i", s->a);
-    }
+    /**/ if ((s->op == OP_IF) || (s->op == OP_IFNOT))   printf("%sbranch %i", PR_GlobalString(s->a), s->b);
+    else if (s->op == OP_GOTO)                          printf("branch %i", s->a);
     else if ((unsigned)(s->op - OP_STORE_F) < 6) {
         printf("%s", PR_GlobalString(s->a));
         printf("%s", PR_GlobalStringNoContents(s->b));
     }
     else {
-        if (s->a)
-            printf("%s", PR_GlobalString(s->a));
-        if (s->b)
-            printf("%s", PR_GlobalString(s->b));
-        if (s->c)
-            printf("%s", PR_GlobalStringNoContents(s->c));
+        if (s->a)   printf("%s", PR_GlobalString(s->a));
+        if (s->b)   printf("%s", PR_GlobalString(s->b));
+        if (s->c)   printf("%s", PR_GlobalStringNoContents(s->c));
     }
     printf("\n");
 }
@@ -458,9 +444,7 @@ PR_PrintDefs
 ============
 */
 void PR_PrintDefs() {
-    def_p d;
-
-    for (d = pr.def_head.next; d; d = d->next)
+    for (def_p d = pr.def_head.next; d; d = d->next)
         PR_PrintOfs(d->ofs);
 }
 
@@ -473,15 +457,13 @@ called before compiling a batch of files, clears the pr struct
 ==============
 */
 void PR_BeginCompilation(Any_p memory, int memsize) {
-    int  i;
-
     pr.memory = memory;
     pr.max_memory = memsize;
 
     numpr_globals = RESERVED_OFS;
     pr.def_tail = &pr.def_head;
 
-    for (i = 0; i < RESERVED_OFS; i++)
+    for (int i = 0; i < RESERVED_OFS; i++)
         pr_global_defs[i] = &def_void;
 
     // link the function type in so state forward declarations match proper type
@@ -498,16 +480,11 @@ called after all files are compiled to check for errors
 Returns false if errors were detected.
 ==============
 */
-boolean PR_FinishCompilation() {
-    def_p d;
-    boolean errors;
-
-    errors = false;
-
+bool PR_FinishCompilation() {
+    bool errors = false;
     // check to make sure all functions prototyped have code
-    for (d = pr.def_head.next; d; d = d->next) {
-        if (d->type->type == ev_function && !d->scope)// function parms are ok
-        {
+    for (def_p d = pr.def_head.next; d; d = d->next)
+        if (d->type->type == ev_function && !d->scope) {// function parms are ok
             //   f = G_FUNCTION(d->ofs);
             //   if (!f || (!f->code && !f->builtin) )
             if (!d->initialized) {
@@ -515,7 +492,6 @@ boolean PR_FinishCompilation() {
                 errors = true;
             }
         }
-    }
 
     return !errors;
 }
@@ -528,11 +504,12 @@ boolean PR_FinishCompilation() {
 // and the initial and final xor values shown below...  in other words, the
 // CCITT standard CRC used by XMODEM
 
-#define CRC_INIT_VALUE 0xffff
-#define CRC_XOR_VALUE 0x0000
+typedef uint16_t CRC_t;
+typedef CRC_t* CRC_p;
+#define CRC_INIT_VALUE (CRC_t)0xFFFF
+#define CRC_XOR_VALUE  (CRC_t)0x0000
 
-static unsigned short crctable[256] =
-{
+static const CRC_t crctable[256] = {
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
     0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
     0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
@@ -567,17 +544,11 @@ static unsigned short crctable[256] =
     0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 };
 
-void CRC_Init(unsigned short* crcvalue) {
-    *crcvalue = CRC_INIT_VALUE;
-}
+void CRC_Init(CRC_p crcvalue) { *crcvalue = CRC_INIT_VALUE; }
 
-void CRC_ProcessByte(unsigned short* crcvalue, byte data) {
-    *crcvalue = (*crcvalue << 8) ^ crctable[(*crcvalue >> 8) ^ data];
-}
+void CRC_ProcessByte(CRC_p crcvalue, uint8_t data) { *crcvalue = (*crcvalue << 8) ^ crctable[(*crcvalue >> 8) ^ data]; }
 
-unsigned short CRC_Value(unsigned short crcvalue) {
-    return crcvalue ^ CRC_XOR_VALUE;
-}
+uint8_t CRC_Value(uint8_t crcvalue) { return crcvalue ^ CRC_XOR_VALUE; }
 //=============================================================================
 
 /*
@@ -589,107 +560,76 @@ Returns a crc of the header, to be stored in the progs file for comparison
 at load time.
 ============
 */
-int PR_WriteProgdefs(cString filename) {
-    def_p d;
-    FILE* f;
-    unsigned short  crc;
-    int  c;
-
+int PR_WriteProgdefs(cStr_p filename) {
     printf("writing %s\n", filename);
-    f = fopen(filename, "w");
+    FILE* f = fopen(filename, "w"); {
+        // print global vars until the first field is defined
+        fprintf(f,
+            "\n/* file generated by qcc, do not modify */\n\n"
+            "typedef struct\n{\tint\tpad[%i];\n",
+            RESERVED_OFS
+        ); {
+            for (def_p d = pr.def_head.next; d; d = d->next) {
+                if (!strcmp(d->name, "end_sys_globals"))    break;
 
-    // print global vars until the first field is defined
-    fprintf(f, "\n/* file generated by qcc, do not modify */\n\ntypedef struct\n{\tint\tpad[%i];\n", RESERVED_OFS);
-    for (d = pr.def_head.next; d; d = d->next) {
-        if (!strcmp(d->name, "end_sys_globals"))
-            break;
+                switch (d->type->type) {
+                case ev_float:      fprintf(f, "\tfloat\t%s;\n", d->name);      break;
+                case ev_vector: {
+                    fprintf(f, "\tvec3_t\t%s;\n", d->name); d = d->next->next->next; // skip the elements
+                } break;
+                case ev_string:     fprintf(f, "\tstring_t\t%s;\n", d->name);   break;
+                case ev_function:   fprintf(f, "\tfunc_t\t%s;\n", d->name);     break;
+                case ev_entity:     fprintf(f, "\tint\t%s;\n", d->name);        break;
+                default:            fprintf(f, "\tint\t%s;\n", d->name);        break;
+                }
+            }
+        } fprintf(f, "} globalvars_t;\n\n");
 
-        switch (d->type->type) {
-        case ev_float:
-            fprintf(f, "\tfloat\t%s;\n", d->name);
-            break;
-        case ev_vector:
-            fprintf(f, "\tvec3_t\t%s;\n", d->name);
-            d = d->next->next->next; // skip the elements
-            break;
-        case ev_string:
-            fprintf(f, "\tstring_t\t%s;\n", d->name);
-            break;
-        case ev_function:
-            fprintf(f, "\tfunc_t\t%s;\n", d->name);
-            break;
-        case ev_entity:
-            fprintf(f, "\tint\t%s;\n", d->name);
-            break;
-        default:
-            fprintf(f, "\tint\t%s;\n", d->name);
-            break;
-        }
-    }
-    fprintf(f, "} globalvars_t;\n\n");
+        // print all fields
+        fprintf(f, "typedef struct\n{\n"); {
+            for (def_p d = pr.def_head.next; d; d = d->next) {
+                if (!strcmp(d->name, "end_sys_fields"))
+                    break;
 
-    // print all fields
-    fprintf(f, "typedef struct\n{\n");
-    for (d = pr.def_head.next; d; d = d->next) {
-        if (!strcmp(d->name, "end_sys_fields"))
-            break;
+                if (d->type->type != ev_field)  continue;
 
-        if (d->type->type != ev_field)
-            continue;
-
-        switch (d->type->aux_type->type) {
-        case ev_float:
-            fprintf(f, "\tfloat\t%s;\n", d->name);
-            break;
-        case ev_vector:
-            fprintf(f, "\tvec3_t\t%s;\n", d->name);
-            d = d->next->next->next; // skip the elements
-            break;
-        case ev_string:
-            fprintf(f, "\tstring_t\t%s;\n", d->name);
-            break;
-        case ev_function:
-            fprintf(f, "\tfunc_t\t%s;\n", d->name);
-            break;
-        case ev_entity:
-            fprintf(f, "\tint\t%s;\n", d->name);
-            break;
-        default:
-            fprintf(f, "\tint\t%s;\n", d->name);
-            break;
-        }
-    }
-    fprintf(f, "} entvars_t;\n\n");
-
-    fclose(f);
+                switch (d->type->aux_type->type) {
+                case ev_float:      fprintf(f, "\tfloat\t%s;\n", d->name);      break;
+                case ev_vector:
+                    fprintf(f, "\tvec3_t\t%s;\n", d->name); d = d->next->next->next; // skip the elements
+                    break;
+                case ev_string:     fprintf(f, "\tstring_t\t%s;\n", d->name);   break;
+                case ev_function:   fprintf(f, "\tfunc_t\t%s;\n", d->name);     break;
+                case ev_entity:     fprintf(f, "\tint\t%s;\n", d->name);        break;
+                default:            fprintf(f, "\tint\t%s;\n", d->name);        break;
+                }
+            }
+        } fprintf(f, "} entvars_t;\n\n");
+    } fclose(f);
 
     // do a crc of the file
+    CRC_t crc;
     CRC_Init(&crc);
-    f = fopen(filename, "r+");
-    while ((c = fgetc(f)) != EOF)
-        CRC_ProcessByte(&crc, c);
-
-    fprintf(f, "#define PROGHEADER_CRC %i\n", crc);
-    fclose(f);
-
+    f = fopen(filename, "r+"); {
+        int c;
+        while ((c = fgetc(f)) != EOF)
+            CRC_ProcessByte(&crc, c);
+        fprintf(f, "#define PROGHEADER_CRC %i\n", crc);
+    } fclose(f);
     return crc;
 }
 
-
-void PrintFunction(cString name) {
-    int  i;
-    dstatement_t* ds;
-    dfunction_t* df;
-
-    for (i = 0; i < numfunctions; i++)
+void PrintFunction(cStr_p name) {
+    int i = 0;
+    for (; i < numfunctions; i++)
         if (!strcmp(name, strings + functions[i].s_name))
             break;
     if (i == numfunctions)
         Error("No function names \"%s\"", name);
-    df = functions + i;
+    dfunction_p df = functions + i;
 
     printf("Statements for %s:\n", name);
-    ds = statements + df->first_statement;
+    dstatement_p ds = statements + df->first_statement;
     while (1) {
         PR_PrintStatement(ds);
         if (!ds->op)
@@ -706,28 +646,26 @@ DIRECTORY COPYING / PACKFILE CREATION
 ==============================================================================
 */
 
-typedef struct
-{
+typedef struct {
     char name[56];
     int  filepos, filelen;
 } packfile_t;
+typedef packfile_t* packfile_p;
 
-typedef struct
-{
+typedef struct {
     char id[4];
     int  dirofs;
     int  dirlen;
 } packheader_t;
 
-packfile_t pfiles[4096], * pf;
+packfile_t pfiles[4096];
+packfile_p pf;
 int   packhandle;
 int   packbytes;
 
-void Sys_mkdir(cString path) {
-    if (mkdir(path, 0777) != -1)
-        return;
-    if (errno != EEXIST)
-        Error("mkdir %s: %s", path, strerror(errno));
+void Sys_mkdir(cStr_p path) {
+    if (mkdir(path, 0777) != -1)    return;
+    if (errno != EEXIST)            Error("mkdir %s: %s", path, strerror(errno));
 }
 
 /*
@@ -735,16 +673,13 @@ void Sys_mkdir(cString path) {
 CreatePath
 ============
 */
-void CreatePath(cString path) {
-    cString ofs;
-
-    for (ofs = path + 1; *ofs; ofs++) {
+void CreatePath(cStr_p path) {
+    for (cStr_p ofs = path + 1; *ofs; ofs++)
         if (*ofs == '/') { // create the directory
-            *ofs = 0;
+            *ofs = 0x00;
             Sys_mkdir(path);
             *ofs = '/';
         }
-    }
 }
 
 
@@ -755,16 +690,12 @@ PackFile
 Copy a file into the pak file
 ===========
 */
-void PackFile(cString src, cString name) {
-    int  in;
-    int  remaining, count;
-    char buf[4096];
-
-    if ((byte*)pf - (byte*)pfiles > sizeof(pfiles))
+void PackFile(cStr_p src, cStr_p name) {
+    if (((uint8_p)pf - (uint8_p)pfiles) > sizeof(pfiles))
         Error("Too many files in pak file");
 
-    in = SafeOpenRead(src);
-    remaining = filelength(in);
+    int in = SafeOpenRead(src);
+    int remaining = filelength(in);
 
     pf->filepos = LittleLong(lseek(packhandle, 0, SEEK_CUR));
     pf->filelen = LittleLong(remaining);
@@ -774,10 +705,8 @@ void PackFile(cString src, cString name) {
     packbytes += remaining;
 
     while (remaining) {
-        if (remaining < sizeof(buf))
-            count = remaining;
-        else
-            count = sizeof(buf);
+        char buf[4096];
+        int count = SmallerOf(remaining, sizeof(buf));
         SafeRead(in, buf, count);
         SafeWrite(packhandle, buf, count);
         remaining -= count;
@@ -795,7 +724,7 @@ CopyFile
 Copies a file, creating any directories needed
 ===========
 */
-void CopyFile(cString src, cString dest) {
+void CopyFile(cStr_p src, cStr_p dest) {
     printf("%s to %s\n", src, dest);
 
     int in = SafeOpenRead(src);
@@ -806,11 +735,7 @@ void CopyFile(cString src, cString dest) {
 
     while (remaining) {
         char buf[4096];
-#if 0
-        int count = (remaining < sizeof(buf)) ? remaining : sizeof(buf);
-#else
         int count = SmallerOf(remaining, sizeof(buf));
-#endif
         SafeRead(in, buf, count);
         SafeWrite(out, buf, count);
         remaining -= count;
@@ -827,85 +752,78 @@ CopyFiles
 ===========
 */
 void CopyFiles() {
-    int  i, p;
-    char srcdir[1024], destdir[1024];
-    char srcfile[1024], destfile[1024];
-    int  copytype;
-    char name[1024];
-    packheader_t header;
-    int  dirlen;
-    int  blocknum;
-    unsigned short  crc;
-
     printf("%3i unique precache_sounds\n", numsounds);
     printf("%3i unique precache_models\n", nummodels);
 
-    copytype = 0;
+    int copytype = 0;
 
-    p = CheckParm("-copy");
-    if (p && p < myargc - 2) { // create a new directory tree
-        copytype = 1;
+    char srcdir[1024];
+    char destdir[1024];
+    {
+        int p = CheckParm("-copy");
+        if ((p) &&
+            (p < (myargc - 2))
+            ) { // create a new directory tree
+            copytype = 1;
 
-        strcpy(srcdir, myargv[p + 1]);
-        strcpy(destdir, myargv[p + 2]);
-        if (srcdir[strlen(srcdir) - 1] != '/')
-            strcat(srcdir, "/");
-        if (destdir[strlen(destdir) - 1] != '/')
-            strcat(destdir, "/");
+            strcpy(srcdir, myargv[p + 1]);
+            strcpy(destdir, myargv[p + 2]);
+            if (srcdir[strlen(srcdir) - 1] != '/')
+                strcat(srcdir, "/");
+            if (destdir[strlen(destdir) - 1] != '/')
+                strcat(destdir, "/");
+        }
     }
+    int blocknum = 1;
+    packheader_t header;
+    {
+        int p = CheckParm("-pak2");
+        if ((p) &&
+            (p < (myargc - 2))
+            )   blocknum = 2;
+        else    p = CheckParm("-pak");
 
-    blocknum = 1;
-    p = CheckParm("-pak2");
-    if (p && p < myargc - 2)
-        blocknum = 2;
-    else
-        p = CheckParm("-pak");
-    if (p && p < myargc - 2) { // create a pak file
-        strcpy(srcdir, myargv[p + 1]);
-        strcpy(destdir, myargv[p + 2]);
-        if (srcdir[strlen(srcdir) - 1] != '/')
-            strcat(srcdir, "/");
-        DefaultExtension(destdir, ".pak");
+        if ((p) &&
+            (p < (myargc - 2))
+            ) { // create a pak file
+            strcpy(srcdir, myargv[p + 1]);
+            strcpy(destdir, myargv[p + 2]);
+            if (srcdir[strlen(srcdir) - 1] != '/')
+                strcat(srcdir, "/");
+            DefaultExtension(destdir, ".pak");
 
-        pf = pfiles;
-        packhandle = SafeOpenWrite(destdir);
-        SafeWrite(packhandle, &header, sizeof(header));
-        copytype = 2;
+            pf = pfiles;
+            packhandle = SafeOpenWrite(destdir);
+            SafeWrite(packhandle, &header, sizeof(header));
+            copytype = 2;
+        }
     }
-
     if (!copytype)
         return;
 
-    for (i = 0; i < numsounds; i++) {
-        if (precache_sounds_block[i] != blocknum)
-            continue;
-        snprintf(name, sizeof(name), "sound/%s", precache_sounds[i]);
+    char srcfile[1024];
+    char destfile[1024];
+    for (int i = 0; i < numsounds; i++) {
+        if (precache_sounds_block[i] != blocknum)   continue;
+        char name[1024]; snprintf(name, sizeof(name), "sound/%s", precache_sounds[i]);
         snprintf(srcfile, sizeof(srcfile), "%s%s", srcdir, name);
         snprintf(destfile, sizeof(destfile), "%s%s", destdir, name);
-        if (copytype == 1)
-            CopyFile(srcfile, destfile);
-        else
-            PackFile(srcfile, name);
+        if (copytype == 1)  CopyFile(srcfile, destfile);
+        else                PackFile(srcfile, name);
     }
-    for (i = 0; i < nummodels; i++) {
-        if (precache_models_block[i] != blocknum)
-            continue;
+    for (int i = 0; i < nummodels; i++) {
+        if (precache_models_block[i] != blocknum)   continue;
         snprintf(srcfile, sizeof(srcfile), "%s%s", srcdir, precache_models[i]);
         snprintf(destfile, sizeof(destfile), "%s%s", destdir, precache_models[i]);
-        if (copytype == 1)
-            CopyFile(srcfile, destfile);
-        else
-            PackFile(srcfile, precache_models[i]);
+        if (copytype == 1)  CopyFile(srcfile, destfile);
+        else                PackFile(srcfile, precache_models[i]);
     }
-    for (i = 0; i < numfiles; i++) {
-        if (precache_files_block[i] != blocknum)
-            continue;
+    for (int i = 0; i < numfiles; i++) {
+        if (precache_files_block[i] != blocknum)    continue;
         snprintf(srcfile, sizeof(srcfile), "%s%s", srcdir, precache_files[i]);
         snprintf(destfile, sizeof(destfile), "%s%s", destdir, precache_files[i]);
-        if (copytype == 1)
-            CopyFile(srcfile, destfile);
-        else
-            PackFile(srcfile, precache_files[i]);
+        if (copytype == 1)  CopyFile(srcfile, destfile);
+        else                PackFile(srcfile, precache_files[i]);
     }
 
     if (copytype == 2) {
@@ -913,10 +831,10 @@ void CopyFiles() {
         header.id[1] = 'A';
         header.id[2] = 'C';
         header.id[3] = 'K';
-        dirlen = (byte*)pf - (byte*)pfiles;
         header.dirofs = LittleLong(lseek(packhandle, 0, SEEK_CUR));
-        header.dirlen = LittleLong(dirlen);
 
+        int dirlen = (uint8_p)pf - (uint8_p)pfiles;
+        header.dirlen = LittleLong(dirlen);
         SafeWrite(packhandle, pfiles, dirlen);
 
         lseek(packhandle, 0, SEEK_SET);
@@ -924,12 +842,17 @@ void CopyFiles() {
         close(packhandle);
 
         // do a crc of the file
+        CRC_t crc;
         CRC_Init(&crc);
-        for (i = 0; i < dirlen; i++)
-            CRC_ProcessByte(&crc, ((byte*)pfiles)[i]);
+        int i = 0;
+        for (; i < dirlen; i++)
+            CRC_ProcessByte(&crc, ((uint8_p)pfiles)[i]);
 
         i = pf - pfiles;
-        printf("%i files packed in %i bytes (%i crc)\n", i, packbytes, crc);
+        printf(
+            "%i files packed in %i bytes (%i crc)\n",
+            i, packbytes, crc
+        );
     }
 }
 
@@ -940,7 +863,7 @@ void CopyFiles() {
 main
 ============
 */
-int main(int argc, char** argv) {
+int main(int argc, cStr_ar argv) {
     myargc = argc;
     myargv = argv;
 
@@ -973,7 +896,7 @@ int main(int argc, char** argv) {
 
     char filename[1024];
     snprintf(filename, sizeof(filename), "%sprogs.src", sourcedir);
-    cString src;  LoadFile(filename, (Any_p)&src);
+    cStr_p src;  LoadFile(filename, (Any_p)&src);
 
     src = COM_Parse(src);
     if (!src)
@@ -991,7 +914,7 @@ int main(int argc, char** argv) {
             break;
         snprintf(filename, sizeof(filename), "%s%s", sourcedir, com_token);
         printf("compiling %s\n", filename);
-        cString src2; LoadFile(filename, (Any_p)&src2);
+        cStr_p src2; LoadFile(filename, (Any_p)&src2);
 
         if (!PR_CompileFile(src2, filename))
             exit(1);    // return error

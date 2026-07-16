@@ -35,11 +35,7 @@
 #include <libc.h>
 #endif
 
-#ifndef __BYTEBOOL__
-#define __BYTEBOOL__
-typedef enum { false, true } boolean;
-typedef unsigned char byte;
-#endif
+#include "types.h"
 
 // the dec offsetof macro doesn't work very well...
 #define myoffsetof(type,identifier) ((size_t)&((type *)0)->identifier)
@@ -47,37 +43,37 @@ typedef unsigned char byte;
 
 // set these before calling CheckParm
 extern int myargc;
-extern char** myargv;
+extern cStr_ar myargv;
 
-char* strupr(char* in);
-char* strlower(char* in);
+cStr_p strupr(cStr_p in);
+cStr_p strlower(cStr_p in);
 int filelength(int handle);
 int tell(int handle);
 
 double I_FloatTime();
 
-void Error(char* error, ...);
-int  CheckParm(char* check);
+void Error(cStr_p error, ...);
+int  CheckParm(cStr_p check);
 
-int  SafeOpenWrite(char* filename);
-int  SafeOpenRead(char* filename);
-void  SafeRead(int handle, void* buffer, long count);
-void  SafeWrite(int handle, void* buffer, long count);
-void* SafeMalloc(long size);
+int  SafeOpenWrite(cStr_p filename);
+int  SafeOpenRead(cStr_p filename);
+void  SafeRead(int handle, Any_p buffer, long count);
+void  SafeWrite(int handle, Any_p buffer, long count);
+Any_p SafeMalloc(long size);
 
-long LoadFile(char* filename, void** bufferptr);
-void SaveFile(char* filename, void* buffer, long count);
+long LoadFile(cStr_p filename, Any_p* bufferptr);
+void SaveFile(cStr_p filename, Any_p buffer, long count);
 
-void  DefaultExtension(char* path, char* extension);
-void  DefaultPath(char* path, char* basepath);
-void  StripFilename(char* path);
-void  StripExtension(char* path);
+void  DefaultExtension(cStr_p path, cStr_p extension);
+void  DefaultPath(cStr_p path, cStr_p basepath);
+void  StripFilename(cStr_p path);
+void  StripExtension(cStr_p path);
 
-void  ExtractFilePath(char* path, char* dest);
-void  ExtractFileBase(char* path, char* dest);
-void ExtractFileExtension(char* path, char* dest);
+void  ExtractFilePath(cStr_p path, cStr_p dest);
+void  ExtractFileBase(cStr_p path, cStr_p dest);
+void ExtractFileExtension(cStr_p path, cStr_p dest);
 
-long  ParseNum(char* str);
+long  ParseNum(cStr_p str);
 
 short BigShort(short l);
 short LittleShort(short l);
@@ -87,7 +83,7 @@ float BigFloat(float l);
 float LittleFloat(float l);
 
 
-char* COM_Parse(char* data);
+cStr_p COM_Parse(cStr_p data);
 
 extern char com_token[1024];
 extern int  com_eof;
