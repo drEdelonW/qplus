@@ -5,13 +5,13 @@
 #include "BBox.h"
 
 typedef enum {
-    CONTENTS_NODE         =  0,
+    CONTENTS_NODE         =  (int16_t)0,
   /* vvv[Leaf]vvv ^^^[Node]^^^ */
-    CONTENTS_EMPTY        = -1,
+    CONTENTS_EMPTY        = -1,  // used by watertype
     CONTENTS_SOLID        = -2,
-    CONTENTS_WATER        = -3,
-    CONTENTS_SLIME        = -4,
-    CONTENTS_LAVA         = -5,
+    CONTENTS_WATER        = -3,  // used by watertype
+    CONTENTS_SLIME        = -4,  // used by watertype
+    CONTENTS_LAVA         = -5,  // used by watertype
     CONTENTS_SKY          = -6,
     CONTENTS_ORIGIN       = -7,  // removed at CSG time
     CONTENTS_CLIP         = -8,  // changed to CONTENTS_SOLID
@@ -22,7 +22,7 @@ typedef enum {
     CONTENTS_CURRENT_270  = -12,
     CONTENTS_CURRENT_UP   = -13,
     CONTENTS_CURRENT_DOWN = -14
-} contents_t;
+} contents_t;   // should be int16_t
 
 
 typedef struct mNode_s mNode_t;
@@ -44,7 +44,7 @@ struct mNode_s {    // TODO: merge in shared head structure with  mLeaf_s
 // !!! if this is changed, it must be changed in asm_i386.h too !!!
 typedef struct {
     int32_t     planenum;
-    int16_t     children[PlaneSides]; // negative numbers are -(leafs+1), not nodes
+    int16_t     children[PlaneSides]; // [contents_t] negative numbers are -(leafs+1), not nodes
 
     int16_t     mins[VECT_DIM];  // for sphere culling
     int16_t     maxs[VECT_DIM];

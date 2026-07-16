@@ -126,7 +126,7 @@ void R_SplitEntityOnNode(mNode_p node) {
 
     if (sides == BPsBoth) {      // split on this plane
         if (!r_pefragtopnode)
-        r_pefragtopnode = node; // if this is the first splitter of this bmodel, remember it
+            r_pefragtopnode = node; // if this is the first splitter of this bmodel, remember it
     }
 
     // recurse down the contacted sides
@@ -176,13 +176,11 @@ void R_StoreEfrags(efrag_ar ppefrag) {
         case mod_brush:
         case mod_sprite: {
             pent = pefrag->entity;
-
             if ((pent->visframe != r_framecount) &&
-                (cl_numvisedicts < MAX_VISEDICTS)) {
+                (cl_numvisedicts < MAX_VISEDICTS)
+                ) {
                 cl_visedicts[cl_numvisedicts++] = pent;
-
-                // mark that we've recorded this entity for this frame
-                pent->visframe = r_framecount;
+                pent->visframe = r_framecount;  // mark that we've recorded this entity for this frame
             }
 
             ppefrag = &pefrag->leafnext;

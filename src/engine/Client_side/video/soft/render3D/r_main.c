@@ -326,35 +326,19 @@ void R_ViewChanged(vRect_p pvrect, int lineadj, float aspect) {
     yscaleshrink = xscaleshrink * pixelAspect;
 
     screenedge[0] = (mPlane_t){  // left side clip
-        .normal = {
-            .x = -1.0f / (_xOrigin * r_refdef.horizontalFieldOfView),
-            .y = 0.0f,
-            .z = 1.0f
-        },
+        .normal = VecXZ(-1.f / (_xOrigin * r_refdef.horizontalFieldOfView), 1.f),
         .type = PLANE_ANYZ
     };
     screenedge[1] = (mPlane_t){   // right side clip
-        .normal = {
-            .x = 1.0f / ((1.0f - _xOrigin) * r_refdef.horizontalFieldOfView),
-            .y = 0.0f,
-            .z = 1.0f
-        },
+        .normal = VecXZ(1.f / ((1.f - _xOrigin) * r_refdef.horizontalFieldOfView), 1.f),
         .type = PLANE_ANYZ
     };
     screenedge[2] = (mPlane_t){  // top side clip
-        .normal = {
-            .x = 0.0f,
-            .y = -1.0f / (_yOrigin * verticalFieldOfView),
-            .z = 1.0f
-        },
+        .normal = VecYZ(-1.f / (_yOrigin * verticalFieldOfView), 1.f),
         .type = PLANE_ANYZ
     };
     screenedge[3] = (mPlane_t){   // bottom side clip
-        .normal = {
-            .x = 0.0f,
-            .y = 1.0f / ((1.0f - _yOrigin) * verticalFieldOfView),
-            .z = 1.0f
-        },
+        .normal = VecYZ(1.f / ((1.f - _yOrigin) * verticalFieldOfView), 1.f),
         .type = PLANE_ANYZ
     };
 
@@ -460,7 +444,7 @@ void R_DrawEntitiesOnList() {
                 lighting.ambientlight = j;
                 lighting.shadelight = j;
 
-                vec3_t lightvec = { .x = -1.0f, .y = 0.0f, .z = 0.0f };
+                vec3_t lightvec = VecX(-1.0f);
                 lighting.plightvec = &lightvec;
 
                 for (int lnum = 0; lnum < MAX_DLIGHTS; lnum++)
@@ -542,12 +526,12 @@ void R_DrawViewModel() {
             r_viewlighting.ambientlight += add;
     }
 
-    ClampLessThen(&r_viewlighting.ambientlight, 128);    // clamp lighting so it doesn't overbright as much
+    ClampMoreThen(&r_viewlighting.ambientlight, 128);    // clamp lighting so it doesn't overbright as much
 
     if ((r_viewlighting.ambientlight + r_viewlighting.shadelight) > 192)
         r_viewlighting.shadelight = 192 - r_viewlighting.ambientlight;
 
-    vec3_t lightvec = { .x = -1.0f, .y = 0.0f, .z = 0.0f };
+    vec3_t lightvec = VecX(-1.0f);
     r_viewlighting.plightvec = &lightvec;
 
 #ifdef QUAKE2
@@ -560,7 +544,6 @@ void R_DrawViewModel() {
 
 
 
-extern int* pfrustum_indexes[4];    // TODO: avoid int*
 AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
     AliasClipFlags_f clipflags = ALIAS_NON_CLIP;
 
@@ -590,7 +573,7 @@ AliasClipFlags_f R_BmodelCheckBBox(Model_p clmodel, BBox_t bb) {
                     bb.v[pfrustum_indexes[i][Z_AX]]
                 );
                 double d = DotProduct(rejectpt, view_clipplanes[i].normal) - view_clipplanes[i].dist;
-                if (d <= 0.0f)     return BMODEL_FULLY_CLIPPED;
+                if (d <= 0.f)     return BMODEL_FULLY_CLIPPED;
             }
             {
                 vec3_t acceptpt = VecXYZ(

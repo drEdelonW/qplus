@@ -13,6 +13,14 @@
 #define MAX_TEMP_ENTITIES       64   /* lightning bolts, etc */
 #define MAX_STATIC_ENTITIES     128   /* torches, etc */
 
+typedef enum {
+    TaNone       = 0,
+    TaAccept     = 1 << 0,   // bbox fully unclipped: !anyclip && !zclipped
+    TaDeepEnough = 1 << 1,   // meaningful only with TaAccept set:
+                             // minz beyond r_aliastransition + pmdl->size * r_resfudge
+    TaFull       = TaAccept | TaDeepEnough,  // = 3, used in R_AliasDrawModel comparison
+} TrivialAccept_t;
+
 // it was [entity_t] on render side
 struct r_Entity_s {
     bool    forcelink;      // model changed

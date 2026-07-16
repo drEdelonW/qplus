@@ -375,7 +375,7 @@ void CL_RelinkEntities() {
             lOrig = VectorMA(lOrig, 18.f, GetBasis(ent->pose.aim).forward);
             *(dl) = (dLight_t){
                 .origin = lOrig,
-                .radius = 200.f + (float)((rand() & 31)),
+                .radius = (float)(200 + (rand() & 31)),
                 .die = (sSimTime_t)(GetClSimTime() + 0.1),
                 // .decay = 0.f,
                 .minlight = 32.f,
@@ -386,7 +386,7 @@ void CL_RelinkEntities() {
         case EF_BRIGHTLIGHT:
             *dl = (dLight_t){
                 .origin = lOrig,
-                .radius = 400.f + (float)((rand() & 31)),
+                .radius = (float)(400 + (rand() & 31)),
                 .die = (sSimTime_t)(GetClSimTime() + 0.001),
                 // .decay = 0.f,
                 // .minlight = 0.f,
@@ -397,7 +397,7 @@ void CL_RelinkEntities() {
         case EF_DIMLIGHT:
             *dl = (dLight_t){
                 .origin = lOrig,
-                .radius = 200.f + (float)((rand() & 31)),
+                .radius = (float)(200 + (rand() & 31)),
                 .die = (sSimTime_t)(GetClSimTime() + 0.001),
                 // .decay = 0.f,
                 // .minlight = 0.f,
@@ -407,7 +407,7 @@ void CL_RelinkEntities() {
         case EF_DARKLIGHT:
             *dl = (dLight_t){
                 .origin = lOrig,
-                .radius = 200.f + (float)((rand() & 31)),
+                .radius = (float)(200 + (rand() & 31)),
                 .die = (sSimTime_t)(GetClSimTime() + 0.001),
                 // .decay = 0.f,
                 // .minlight = 0.f,

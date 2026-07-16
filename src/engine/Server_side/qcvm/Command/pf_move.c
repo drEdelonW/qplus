@@ -30,7 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BBox_tools.h"
 #include "trace.h"
 
-dFunction_p pr_xFunction;
 
 /*
 ===============
@@ -42,19 +41,19 @@ float(float yaw, float dist) walkmove
 void PF_walkmove() {
     edict_p ent = ED_GetEDictByOffs(pGame()->self);
     if (!((int)ent->v.flags & (FL_ONGROUND | FL_FLY | FL_SWIM))) {
-        G_FLOAT(OFS_RETURN) = 0;    return;
+        G_FLOAT(OFS_RETURN) = false;    return;
     }
 
-    Angle_t yaw = DEG2RAD(G_FLOAT(OFS_PARM0));
-    vec3_t move = {
-        .x = cosf(yaw),
-        .y = sinf(yaw),
-    };
-
-    // save program state, because SV_movestep may call other progs
-    dFunction_p oldf = pr_xFunction;    int oldself = pGame()->self; { // PR_PUSH
-        G_FLOAT(OFS_RETURN) = SV_movestep(ent, VectorScale(move, G_FLOAT(OFS_PARM1)), true);
-    } pr_xFunction = oldf;    pGame()->self = oldself; // PR_POP // restore program state
+    FnPush(&pGame()->self); { // save program state, because SV_movestep may call other progs
+        Angle_t yaw = DEG2RAD(G_FLOAT(OFS_PARM0));
+        G_FLOAT(OFS_RETURN) = SV_movestep(
+            ent,
+            VectorScale(
+                VecXY(cosf(yaw), sinf(yaw)),
+                G_FLOAT(OFS_PARM1)
+            ), true
+        );
+    }FnPop(&pGame()->self);
 }
 
 /*

@@ -472,12 +472,20 @@ void R_DrawSequentialPoly(mSurface_p s) {
                 float t = sinf(tv.z) * 8.f;
                 qglMTexCoord2fSGIS(TEXTURE0_SGIS, v.vf[3], v.vf[4]);
                 qglMTexCoord2fSGIS(TEXTURE1_SGIS, v.vf[5], v.vf[6]);
-
-                vec3_t nv = {
-                    .x = v.v.x + sinf(tv.y) * t,
-                    .y = v.v.y + sinf(tv.x) * t,
-                    .z = v.v.z
-                };
+#if 0
+                vec3_t nv = VecXYZ(
+                    v.v.x + sinf(tv.y) * t,
+                    v.v.y + sinf(tv.x) * t,
+                    v.v.z
+                );
+#else
+                vec3_t nv = VectorAdd(v.v,
+                    VecXY(
+                        sinf(tv.y) * t,
+                        sinf(tv.x) * t
+                    )
+                );
+#endif
                 glVertex3fv(nv.v);
             }
         } glEnd();
@@ -517,11 +525,12 @@ void DrawGLWaterPoly(glpoly_p p) {
             float t = sinf(tv.z) * 8.f;
             glTexCoord2f(v.vf[3], v.vf[4]);
 
-            vec3_t nv = {
-                .x = v.v.x + sinf(tv.y) * t,
-                .y = v.v.y + sinf(tv.x) * t,
-                .z = v.v.z
-            };
+            vec3_t nv = VectorAdd(v.v,
+                VecXY(
+                    sinf(tv.y) * t,
+                    sinf(tv.x) * t
+                )
+            );
 
             glVertex3fv(nv.v);
         }
@@ -538,13 +547,12 @@ void DrawGLWaterPolyLightmap(glpoly_p p) {
             vec3_t tv = VectorAddVal(VectorScale(v.v, 0.05f), rt);
             float t = sinf(tv.z) * 8.f;
             glTexCoord2f(v.vf[5], v.vf[6]);
-
-            vec3_t nv = {
-                .x = v.v.x + sinf(tv.y) * t,
-                .y = v.v.y + sinf(tv.x) * t,
-                .z = v.v.z
-            };
-
+            vec3_t nv = VectorAdd(v.v,
+                VecXY(
+                    sinf(tv.y) * t,
+                    sinf(tv.x) * t
+                )
+            );
             glVertex3fv(nv.v);
         }
     } glEnd();

@@ -285,26 +285,21 @@ void R_TransformPlane(mPlane_p p, vec3_p normal, float_p dist) {
 }
 #endif
 
-/*
-    ===============
-    R_SetUpFrustumIndexes
-    ===============
-*/
-static int _r_frustum_indexes[4 * 6];
-int* pfrustum_indexes[4];
+int* pfrustum_indexes[FRUST_NUM];
+static int _r_frustum_indexes[FRUST_NUM * 6];
 
 void R_SetUpFrustumIndexes() {
     int* pindex = _r_frustum_indexes;
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < FRUST_NUM; i++) {
         for (int j = 0; j < VECT_DIM; j++) {
-            if (view_clipplanes[i].normal.v[j] < 0.0f) {
+            if (view_clipplanes[i].normal.v[j] < 0.f) {
                 pindex[j] = j;
-                pindex[j + 3] = j + 3;
+                pindex[j + VECT_DIM] = j + VECT_DIM;
             }
             else {
-                pindex[j] = j + 3;
-                pindex[j + 3] = j;
+                pindex[j] = j + VECT_DIM;
+                pindex[j + VECT_DIM] = j;
             }
         }
 
@@ -367,7 +362,7 @@ void R_SetupFrame() {
 
     // debugging
 #if 0
-    r_refdef.view.loc = { .x = 80.0f, .y = 64.0f, .z = 40.0f };
+    r_refdef.view.loc = VecXYZ(80.0f, 64.0f, 40.0f);
     r_refdef.view.aim = { .pitch = 0.0f, .yaw = 46.763641357, .roll = 0.0f };
 #endif
 

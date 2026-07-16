@@ -70,7 +70,7 @@ void SV_CheckStuck(edict_p ent) {
 }
 
 
-bool SV_CheckWater(edict_p ent) {
+bool SV_CheckWater(edict_p ent) {   // Check by few points how deep under water
     vec3_t point = ent->v.origin; {
         point.z += ent->v.mins.z + 1.f;
     };
@@ -82,8 +82,8 @@ bool SV_CheckWater(edict_p ent) {
 #ifdef QUAKE2
         contents_t truecont = SV_TruePointContents(point);
 #endif
-        ent->v.watertype = cont;
         ent->v.waterlevel = WL_Feet;
+        ent->v.watertype = cont;
         point.z = ent->v.origin.z + (ent->v.mins.z + ent->v.maxs.z) * 0.5f;
         cont = SV_PointContents(point);
         if (cont <= CONTENTS_WATER) {
@@ -204,6 +204,7 @@ Only used by players
 ======================
 */
 #define STEPSIZE 18
+#include "Player.h"
 void SV_WalkMove(edict_p ent) {
     // do a regular slide move unless it looks like you ran into a step
     bool oldonground = (EntityFlags_t)ent->v.flags & FL_ONGROUND;
@@ -219,7 +220,7 @@ void SV_WalkMove(edict_p ent) {
         (!oldonground && (ent->v.waterlevel == 0)) ||                       // don't stair up while jumping
         ((movetype_t)ent->v.movetype != MOVETYPE_WALK) ||                   // gibbed by a trigger
         sv_nostep.value ||                                                  // no stepping allowed
-        ((EntityFlags_t)sv_player->v.flags & FL_WATERJUMP)                  // waterjump active
+        (SvPlayer_IsFlag(FL_WATERJUMP))                                     // waterjump active
         )   return;
 
     vec3_t nosteporg = ent->v.origin;
@@ -278,47 +279,45 @@ void SV_Physics_Client(edict_p ent, EdIdx clNum) {
     pGame()->self = ED_GetEDictOffs(ent);
     PR_ExecuteProgram(pGame()->PlayerPreThink);
 
-    // do a move
-    SV_CheckVelocity(ent);
+    SV_CheckVelocity(ent);    // do a move
 
     // decide which move function to call
     // first: entities that require thinking before physics
     switch ((movetype_t)ent->v.movetype) {
-    case MOVETYPE_NONE:
-    case MOVETYPE_WALK:
-    case MOVETYPE_FLY:
-    case MOVETYPE_NOCLIP:        if (!SV_RunThink(ent)) return;
+        case MOVETYPE_NONE:
+        case MOVETYPE_WALK:
+        case MOVETYPE_FLY:
+        case MOVETYPE_NOCLIP:        if (!SV_RunThink(ent)) return;
 
-    default:    break;  // other movetypes handled later
+        default:    break;  // other movetypes handled later
     }
 
     // second: actual physics behavior
     switch ((movetype_t)ent->v.movetype) {
-    case MOVETYPE_NONE:     break;  // no movement, just think
-    case MOVETYPE_WALK:
-        if (!SV_CheckWater(ent) &&
-            !((EntityFlags_t)ent->v.flags & FL_WATERJUMP)
-            )   SV_AddGravity(ent);
+        case MOVETYPE_NONE:     break;  // no movement, just think
+        case MOVETYPE_WALK:
+            if (!SV_CheckWater(ent) &&
+                !((EntityFlags_t)ent->v.flags & FL_WATERJUMP)
+                )   SV_AddGravity(ent);
 
-        SV_CheckStuck(ent);
+            SV_CheckStuck(ent);
 #ifdef QUAKE2
-        ent->v.velocity = VectorAdd(ent->v.velocity, ent->v.basevelocity); // ent->v.velocity += ent->v.basevelocity;
-        SV_WalkMove(ent);
-        ent->v.velocity = VectorSubtract(ent->v.velocity, ent->v.basevelocity); // ent->v.velocity -= ent->v.basevelocity;
+            ent->v.velocity = VectorAdd(ent->v.velocity, ent->v.basevelocity); // ent->v.velocity += ent->v.basevelocity;
+            SV_WalkMove(ent);
+            ent->v.velocity = VectorSubtract(ent->v.velocity, ent->v.basevelocity); // ent->v.velocity -= ent->v.basevelocity;
 #else
-        SV_WalkMove(ent);
+            SV_WalkMove(ent);
 #endif
-        break;
+            break;
 
-    case MOVETYPE_TOSS:
-    case MOVETYPE_BOUNCE:   SV_Physics_Toss(ent);                   break;
-    case MOVETYPE_FLY:      SV_FlyMove(ent, host_frametime, NULL);  break;
-    case MOVETYPE_NOCLIP:   ent->v.origin = VectorMA(ent->v.origin, (float)host_frametime, ent->v.velocity);    break;
-    default:                Host_SysError("SV_Physics_Client: bad movetype %i", (int)ent->v.movetype);
+        case MOVETYPE_TOSS:
+        case MOVETYPE_BOUNCE:   SV_Physics_Toss(ent);                   break;
+        case MOVETYPE_FLY:      SV_FlyMove(ent, host_frametime, NULL);  break;
+        case MOVETYPE_NOCLIP:   ent->v.origin = VectorMA(ent->v.origin, (float)host_frametime, ent->v.velocity);    break;
+        default:                Host_SysError("SV_Physics_Client: bad movetype %i", (int)ent->v.movetype);
     }
 
-    // call standard player post-think
-    SV_LinkEdict(ent, true);
+    SV_LinkEdict(ent, true);    // call standard player post-think
 
     pGame()->time = (float)SV_GetTime();
     pGame()->self = ED_GetEDictOffs(ent);

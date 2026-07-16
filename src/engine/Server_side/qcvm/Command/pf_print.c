@@ -30,16 +30,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "protocol.h"
 
 
-cString PF_VarString(int first) {
-    static char _out[256];
-    _out[0] = 0x00;
-    for (int i = first; i < pr_argc; i++)
-        strcat(_out, G_STRING((OFS_PARM0 + (i * 3))));
 
-    return _out;
-}
-
-
+cString PF_VarString(int first); // TODO: make it in .h file
 /*
 =================
 PF_errror
@@ -54,7 +46,7 @@ error(value)
 void PF_error() {
     Con_Printf(
         "======SERVER ERROR in %s:\n%s\n",
-        PR_GetQString(pr_xFunction->s_name), PF_VarString(0)
+        Get_xFnName(), PF_VarString(0)
     );
     ED_Print(ED_GetEDictByOffs(pGame()->self));
     Host_Error("Program error");
@@ -74,7 +66,7 @@ objerror(value)
 void PF_objerror() {
     Con_Printf(
         "======OBJECT ERROR in %s:\n%s\n",
-        PR_GetQString(pr_xFunction->s_name), PF_VarString(0)
+        Get_xFnName(), PF_VarString(0)
     );
     edict_p ed = ED_GetEDictByOffs(pGame()->self);
     ED_Print(ed);
@@ -112,7 +104,7 @@ void PF_sprint() {
         ) {
         Con_Printf("tried to sprint to a non-client\n");    return;
     }
-    RmtClient_p client = &svs.clients[ent_num - 1];
+    RmtClient_p client = &svs.clients[ent_num - EdictPlayer1];
     MSG_WriteChar(&client->message, svc_print); {
         MSG_WriteString(&client->message, PF_VarString(1));
     }
@@ -136,7 +128,7 @@ void PF_centerprint() {
         Con_Printf("tried to sprint to a non-client\n");    return;
     }
 
-    RmtClient_p client = &svs.clients[entnum - 1];
+    RmtClient_p client = &svs.clients[entnum - EdictPlayer1];
     MSG_WriteChar(&client->message, svc_centerprint); {
         MSG_WriteString(&client->message, PF_VarString(1));
     }

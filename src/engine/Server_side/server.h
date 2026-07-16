@@ -113,7 +113,6 @@ typedef struct {
 extern sv_static_t  svs;    // persistent server info
 extern server_t     sv;     // local server
 extern RmtClient_p  remoteClient;
-extern edict_p      sv_player;
 
 static inline SimTime_t GetSvSimTime() { return sv.simTime; }
 static inline void AddSvSimTime(SimDt_t simDelta) { sv.simTime += simDelta; }
@@ -126,7 +125,7 @@ extern "C" {
     void SV_Init();
     cString SV_GetName();
     bool SV_IsActive();
-    LegTime_t SV_GetTime();
+    SimTime_t SV_GetTime();
     void SV_SetTime(LegTime_t time);
 
     void SV_StartSound(edict_p entity, SndCh_t channel, cString sample, uint8_t volume, float attenuation);

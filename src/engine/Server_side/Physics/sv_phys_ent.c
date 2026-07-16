@@ -53,8 +53,8 @@ void SV_CheckWaterTransition(edict_p pEntIn) {
     contents_t cont = SV_PointContents(pEntIn->v.origin);
 #endif
     if (!pEntIn->v.watertype) { // just spawned here
-        pEntIn->v.watertype = (float)cont;
         pEntIn->v.waterlevel = WL_Feet;
+        pEntIn->v.watertype = (float)cont;
         return;
     }
 

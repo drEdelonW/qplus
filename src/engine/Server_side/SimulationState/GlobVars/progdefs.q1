@@ -7,7 +7,7 @@ typedef struct {
     int32_t self;
     int32_t other;
     int32_t world;
-    float   time;
+    float   time;       // sSimTime_t
     float   frametime;
     float   force_retouch;
     string_t mapname;
@@ -118,8 +118,8 @@ typedef struct {
     float   teleport_time;
     float   armortype;
     float   armorvalue;
-    float   waterlevel;
-    float   watertype;
+    float   waterlevel; // WaterLevel_t
+    float   watertype;  // contents_t(CONTENTS_EMPTY/CONTENTS_WATER/CONTENTS_SLIME/CONTENTS_LAVA)
     float   ideal_yaw;
     float   yaw_speed;
     int32_t aiment;

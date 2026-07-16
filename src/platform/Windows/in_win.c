@@ -954,7 +954,7 @@ bool IN_ReadJoystick() {
     }
     else {
         // read error occurred
-        // turning off the joystick seems too harsh for 1 read error,\ 
+        // turning off the joystick seems too harsh for 1 read error,
         // but what should be done?
         // Con_Printf ("IN_ReadJoystick: no response\n");
         // joy_avail = false;
@@ -971,7 +971,6 @@ IN_JoyMove
 void IN_JoyMove(UserCmd_p cmd) {
     float	speed, aspeed;
     float	fAxisValue, fTemp;
-    int		i;
 
     // complete initialization if first time in
     // this is needed as cvars are not available at initialization time
@@ -981,23 +980,19 @@ void IN_JoyMove(UserCmd_p cmd) {
     }
 
     // verify joystick is available and that the user wants to use it
-    if (!joy_avail || !in_joystick.value) {
+    if (!joy_avail || !in_joystick.value)
         return;
-    }
 
     // collect the joystick data, if possible
-    if (IN_ReadJoystick() != true) {
+    if (IN_ReadJoystick() != true)
         return;
-    }
 
-    if (kbIsDown(in.speed))
-        speed = cl_movespeedkey.value;
-    else
-        speed = 1;
+    if (kbIsDown(in.speed))     speed = cl_movespeedkey.value;
+    else                        speed = 1;
     aspeed = speed * host_frametime;
 
     // loop through the axes
-    for (i = 0; i < JOY_MAX_AXES; i++) {
+    for (int i = 0; i < JOY_MAX_AXES; i++) {
         // get the floating point zero-centered, potentially-inverted data for the current axis
         fAxisValue = (float)*pdwRawValue[i];
         // move centerpoint to zero
@@ -1009,7 +1004,7 @@ void IN_JoyMove(UserCmd_p cmd) {
                 // y=ax^b; where a = 300 and b = 1.3
                 // also x values are in increments of 800 (so this is factored out)
                 // then bounds check result to level out excessively high spin rates
-                fTemp = 300.0 * pow(abs(fAxisValue) / 800.0, 1.3);
+                fTemp = 300.f * powf(fabsf(fAxisValue) / 800.f, 1.3f);
                 ClampMoreThen(&fTemp, 14000.0);
                 // restore direction information
                 fAxisValue = (fAxisValue > 0.0) ? fTemp : -fTemp;
@@ -1021,17 +1016,13 @@ void IN_JoyMove(UserCmd_p cmd) {
 
         switch (dwAxisMap[i]) {
         case AxisForward:
-            if ((joy_advanced.value == 0.0) && (kbIsDown(in.mlook))) {
+            if ((joy_advanced.value == 0.f) && (kbIsDown(in.mlook))) {
                 // user wants forward control to become look control
                 if (fabs(fAxisValue) > joy_pitchthreshold.value) {
-                    // if mouse invert is on, invert the joystick pitch value
-                    // only absolute control support here (joy_advanced is false)
-                    if (m_pitch.value < 0.0) {
-                        cl.viewangles.pitch -= (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
-                    }
-                    else {
-                        cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
-                    }
+                    // if mouse invert is on, invert the joystick pitch value only absolute control support here (joy_advanced is false)
+                    if (m_pitch.value < 0.f)    cl.viewangles.pitch -= (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
+                    else                        cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
+
                     V_StopPitchDrift();
                 }
                 else {
@@ -1059,10 +1050,8 @@ void IN_JoyMove(UserCmd_p cmd) {
 
         case AxisTurn:
             if (kbIsDown(in.strafe) || (lookstrafe.value && kbIsDown(in.mlook))) {
-                // user wants turn control to become side control
-                if (fabs(fAxisValue) > joy_sidethreshold.value) {
+                if (fabs(fAxisValue) > joy_sidethreshold.value)     // user wants turn control to become side control
                     cmd->move.side -= (fAxisValue * joy_sidesensitivity.value) * speed * cl_sidespeed.value;
-                }
             }
             else {
                 // user wants turn control to be turn control
@@ -1083,12 +1072,8 @@ void IN_JoyMove(UserCmd_p cmd) {
                 if (fabs(fAxisValue) > joy_pitchthreshold.value) {
                     // pitch movement detected and pitch movement desired by user
 #if 0
-                    if (dwControlMap[i] == JOY_ABSOLUTE_AXIS) {
-                        cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
-                    }
-                    else {
-                        cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) * speed * 180.0;
-                    }
+                    if (dwControlMap[i] == JOY_ABSOLUTE_AXIS)   cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) * aspeed * cl_pitchspeed.value;
+                    else                                        cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) * speed * 180.0;
 #else
                     cl.viewangles.pitch += (fAxisValue * joy_pitchsensitivity.value) *
                         (dwControlMap[i] == JOY_ABSOLUTE_AXIS) ?
@@ -1113,5 +1098,5 @@ void IN_JoyMove(UserCmd_p cmd) {
     }
 
     // bounds check pitch
-    ClampInRange(-70.0, &cl.viewangles.pitch, 80.0);
+    ClampInRange(-70.f, &cl.viewangles.pitch, 80.f);
 }

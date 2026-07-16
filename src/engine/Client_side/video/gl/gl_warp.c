@@ -504,11 +504,7 @@ void R_ClearSkyBox() {
 
 
 void MakeSkyVec(float s, float t, int axis) {
-    vec3_t b = {
-        .x = s * 2048,
-        .y = t * 2048,
-        .z = 2048
-    };
+    vec3_t b = VectorScale(VecXYZ(s, t, 1.f), 2048.f);
     vec3_t v;
     for (int j = 0; j < VECT_DIM; j++) {
         int k = st_to_vec[axis][j];
@@ -518,8 +514,8 @@ void MakeSkyVec(float s, float t, int axis) {
     }
 
     // avoid bilerp seam
-    s = (s + 1) * 0.5f;
-    t = (t + 1) * 0.5f;
+    s = (s + 1.f) * 0.5f;
+    t = (t + 1.f) * 0.5f;
 
     ClampInRange(1.0f / 512, &s, 511.0f / 512);
     ClampInRange(1.0f / 512, &t, 511.0f / 512);

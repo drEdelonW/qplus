@@ -3,11 +3,9 @@
 #include "endian_tools.h"
 
 dFunction_p pr_functions;
-/*
-============
-ED_FindFunction
-============
-*/
+
+
+
 dFunction_p ED_FindFunction(cString name) {
     for (int i = 0; i < pProgsDat->functions.num; i++)
         if (!strcmp(PR_GetQString(pr_functions[i].s_name), name))
@@ -31,3 +29,4 @@ void initProgFunction(progLump_t pl) {
     }
 
 }
+

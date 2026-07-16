@@ -62,7 +62,7 @@ DYNAMIC LIGHTS
 */
 
 void R_MarkLights(dLight_p light, int bit, mNode_p node) {
-    if (node->contents < CONTENTS_NODE)     return;
+    if (NodeKind(node) == isLeaf)     return;
 
     mPlane_p splitplane = node->plane;
     float dist = DotProduct(light->origin, splitplane->normal) - splitplane->dist;
@@ -126,28 +126,26 @@ vec3_t      lightspot;
 #endif
 
 
-int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
-    if (node->contents < CONTENTS_NODE)     return -1;  // didn't hit anything
+contents_t RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
+    if (NodeKind(node) == isLeaf)     return CONTENTS_EMPTY;  // didn't hit anything
+    
     // calculate mid point
-
     // FIXME: optimize for axial
     mPlane_p plane = node->plane;
-    float front = DotProduct(start, plane->normal) - plane->dist;
-    float back = DotProduct(end, plane->normal) - plane->dist;
-    bool side = (front < 0.f);
+    float front = DotProduct(start, plane->normal) - plane->dist;   bool fSide = (front < 0.f);
+    float back = DotProduct(end, plane->normal) - plane->dist;      bool bSide = (back < 0.f);
 
-    if ((back < 0.f) == side)
-        return RecursiveLightPoint(node->children[side], start, end);
+    if (bSide == fSide)
+        return RecursiveLightPoint(node->children[fSide], start, end);
 
     float frac = front / (front - back);
-
     // Linear interpolation: mid = start + (end - start) * frac
     vec3_t mid = VectorMA(start, frac, VectorSubtract(end, start));
 
     // go down front side
-    int lp = RecursiveLightPoint(node->children[side], start, mid);
-    if (lp >= 0)                 return lp;        // hit something
-    if ((back < 0) == side)     return -1;        // didn't hit anuthing
+    contents_t lp = RecursiveLightPoint(node->children[fSide], start, mid);
+    if (lp >= 0)            return lp;              // hit something
+    if (bSide == fSide)     return CONTENTS_EMPTY;  // didn't hit anuthing
 
 #ifdef GLQUAKE
     // check for impact on this node
@@ -193,11 +191,10 @@ int RecursiveLightPoint(mNode_p node, vec3_t start, vec3_t end) {
 
             return FIXED8_TO_INT(r);
         }
-        return 0;
+        return CONTENTS_NODE;
     }
 
-    // go down back side
-    return RecursiveLightPoint(node->children[!side], mid, end);
+    return RecursiveLightPoint(node->children[!fSide], mid, end);    // go down back side
 }
 
 

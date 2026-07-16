@@ -394,7 +394,7 @@ void R_DrawSubmodelPolygons(Model_p pmodel, AliasClipFlags_f clipflags) {
 R_RecursiveWorldNode
 ================
 */
-extern int* pfrustum_indexes[4];    // TODO: avoid int*
+
 void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
     if ((node->contents == CONTENTS_SOLID) ||  // solid
         (node->visframe != r_visframecount)
@@ -410,25 +410,23 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
 
             // generate accept and reject points
             // FIXME: do with fast look-ups or integer tests based on the sign bit of the floating point values
-
-            int* pindex = pfrustum_indexes[i];
             {
-                vec3_t rejectpt = {
-                    .x = node->bb.v[pindex[0]],
-                    .y = node->bb.v[pindex[1]],
-                    .z = node->bb.v[pindex[2]],
-                };
+                vec3_t rejectpt = VecXYZ(
+                    node->bb.v[pfrustum_indexes[i][X_AX]],
+                    node->bb.v[pfrustum_indexes[i][Y_AX]],
+                    node->bb.v[pfrustum_indexes[i][Z_AX]]
+                );
                 double d = DotProduct(rejectpt, view_clipplanes[i].normal) - view_clipplanes[i].dist;
-                if (d <= 0.0f)     return;
+                if (d <= 0.f)     return;
             }
             {
-                vec3_t acceptpt = {
-                    .x = node->bb.v[pindex[3 + 0]],
-                    .y = node->bb.v[pindex[3 + 1]],
-                    .z = node->bb.v[pindex[3 + 2]]
-                };
+                vec3_t acceptpt = VecXYZ(
+                    node->bb.v[pfrustum_indexes[i][3 + X_AX]],
+                    node->bb.v[pfrustum_indexes[i][3 + Y_AX]],
+                    node->bb.v[pfrustum_indexes[i][3 + Z_AX]]
+                );
                 double d = DotProduct(acceptpt, view_clipplanes[i].normal) - view_clipplanes[i].dist;
-                if (d >= 0.0f)     clipflags &= ~(1 << i); // node is entirely on screen
+                if (d >= 0.f)     clipflags &= ~(1 << i); // node is entirely on screen
             }
         }
     }
@@ -459,10 +457,8 @@ void R_RecursiveWorldNode(mNode_p node, ClipFlag_t clipflags) {
     }
     else {
         // node is just a decision point, so go down the apropriate sides
-
         // find which side of the node we are on
         mPlane_p plane = node->plane;
-
         double  dot;
         switch (plane->type) {
         case PLANE_X: { dot = modelorg.x - plane->dist; } break;

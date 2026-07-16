@@ -42,9 +42,9 @@ typedef dPlane_t* dPlane_p;
 
 
 typedef enum {
-    PsFront     = 0,
-    PsBack      = 1,
-    PlaneSides  = 2
+    PsFront = 0,
+    PsBack,
+    PlaneSides
 } PlaneSide_t;
 
 typedef enum {  // TODO: rework this trash
@@ -72,4 +72,4 @@ extern "C" {
             BPsFront : (                                                 \
                 ((p)->dist >= ((bb).maxs).v[(p)->type])?      \
                     BPsBack : BPsBoth )                                   \
-    ) : BoxOnPlaneSide( (bb), (p)))
+    ) : BoxOnPlaneSide((bb), (p)))

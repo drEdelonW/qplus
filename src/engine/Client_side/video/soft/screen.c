@@ -192,16 +192,12 @@ void SCR_UpdateScreen() {
     vRect_t  vrect;
     if (Scr.copyeverything) {   // fullScreen viewport with sBar
         vrect = (vRect_t){
-            .x = 0,
-            .y = 0,
             .width = Scr.canvas.width,
             .height = Scr.canvas.height,
         };
     }
     else if (Scr.copytop) {     // fullScreen viewport withOUT sBar
         vrect = (vRect_t){
-            .x = 0,
-            .y = 0,
             .width = Scr.canvas.width,
             .height = Scr.canvas.height - sb_lines,
         };

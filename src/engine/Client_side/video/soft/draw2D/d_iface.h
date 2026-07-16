@@ -62,7 +62,7 @@ typedef struct {
 
 
 extern int  d_spanpixcount;
-extern int  r_framecount;               // sequence # of current frame since Quake started
+extern int  r_framecount;               // sequence # of current frame since Quake started     // TODO: move to common API
 extern bool r_drawpolys;                // 1 if driver wants clipped polygons rather than a span list
 extern bool r_drawculledpolys;          // 1 if driver wants clipped polygons that have been culled by the edge list
 extern bool r_worldpolysbacktofront;    // 1 if driver wants polygons delivered back to front rather than front to back

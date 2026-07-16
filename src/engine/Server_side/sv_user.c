@@ -41,7 +41,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "trace.h"
 
 
-edict_p sv_player;
+
 
 static vec3_t _wishDir;
 static float _wishSpeed;
@@ -55,29 +55,28 @@ static bool _onGround;
 UserCmd_t cmd;
 
 
-/*
-===============
-SV_SetIdealPitch
-===============
-*/
+static edict_p sv_player;
+edict_p SvPlayer() { return sv_player; }
+
+#include "Player.h"
 #define MAX_FORWARD 6
 void SV_SetIdealPitch() {
-    if (!((int)sv_player->v.flags & FL_ONGROUND))   return;
+    if (!SvPlayer_IsFlag(FL_ONGROUND))   return;
 
     float z[MAX_FORWARD];
-    float angleval = sv_player->v.angles.yaw * (float)M_PI * 2.0f / 360;
-    float sinval = (float)sin(angleval);
-    float cosval = (float)cos(angleval);
+    float angleval = DEG2RAD(SvPlayer_Angles().yaw);
+    float sinval = sinf(angleval);
+    float cosval = cosf(angleval);
 
     int i = 0;
     for (; i < MAX_FORWARD; i++) {
-        vec3_t top = {
-            .x = sv_player->v.origin.x + cosval * ((float)i + 3) * 12,
-            .y = sv_player->v.origin.y + sinval * ((float)i + 3) * 12,
-            .z = sv_player->v.origin.z + sv_player->v.view_ofs.z
-        };
+        vec3_t top = VectorAdd(SvPlayer_Origin(), VecXYZ(
+            cosval * (float)((i + 3) * 12),
+            sinval * (float)((i + 3) * 12),
+            SvPlayer_ViewOffs().z
+        ));
 
-        trace_t tr = SV_MoveDLine(top, VecZ(-160.f), MOVE_NOMONSTERS, sv_player);
+        trace_t tr = SV_MoveDLine(top, VecZ(-160.f), MOVE_NOMONSTERS, SvPlayer());
         if (tr.allsolid)        return; // looking at a wall, leave ideal the way is was
         if (tr.fraction == 1.f)   return; // near a dropoff
 
@@ -94,41 +93,37 @@ void SV_SetIdealPitch() {
         if (dir && (
             ((step - dir) > ON_EPSILON) ||
             ((step - dir) < -ON_EPSILON))
-            ) return;  // mixed changes
+            )   return;  // mixed changes
 
         steps++;
         dir = step;
     }
 
     if (!dir) {
-        sv_player->v.idealpitch = 0;
+        SvPlayer_SetIdealPitch(0.f);
         return;
     }
 
     if (steps < 2)  return;
-    sv_player->v.idealpitch = -dir * sv_idealpitchscale.value;
+    SvPlayer_SetIdealPitch(-dir * sv_idealpitchscale.value);
 }
 
 
-/*
-==================
-SV_UserFriction
 
-==================
-*/
+
 void SV_UserFriction() {
     vec3_p vel = _velocity;
 
-    float speed = (float)sqrtf((vel->x * vel->x) + (vel->y * vel->y));
+    float speed = sqrtf((vel->x * vel->x) + (vel->y * vel->y));
     if (!speed) return;
 
     // if the leading edge is over a dropoff, increase friction 
     vec3_t start = *_origin; {
         VectorScale(*vel, 16.f / speed);
-        start.z = _origin->z + sv_player->v.mins.z;
+        start.z = _origin->z + SvPlayer_Mins().z;
     };
 
-    trace_t trace = SV_MoveDLine(start, VecZ(-34.f), MOVE_NOMONSTERS, sv_player);
+    trace_t trace = SV_MoveDLine(start, VecZ(-34.f), MOVE_NOMONSTERS, SvPlayer());
 
     float friction = (trace.fraction == 1.f) ?
         (sv_friction.value * sv_edgefriction.value) : sv_friction.value;
@@ -181,13 +176,18 @@ static inline float _AngleLen(ang3_t a) { // local trick without physical meanin
     return sqrtf(a.pitch * a.pitch + a.yaw * a.yaw + a.roll * a.roll);
 }
 void DropPunchAngle(void) {
-    float orig_len = _AngleLen(sv_player->v.punchangle);
+    float orig_len = _AngleLen(SvPlayer_PunchAngle());
     if (orig_len == 0.f) return;
 
     float new_len = orig_len - 10.f * (float)host_frametime;
     ClampLessThen(&new_len, 0.f);
 
-    sv_player->v.punchangle = AngleScale(sv_player->v.punchangle, new_len / orig_len);
+    SvPlayer_SetPunchAngle(
+        AngleScale(
+            SvPlayer_PunchAngle(),
+            new_len / orig_len
+        )
+    );
 }
 /*
 ===================
@@ -195,10 +195,11 @@ SV_WaterMove
 
 ===================
 */
+#include "Player.h"
 extern Basis_t _bs; // leave in view.c
 void SV_WaterMove() {
     // user intentions
-    _bs = GetBasis(sv_player->v.v_angle);
+    _bs = GetBasis(SvPlayer_ViewAngle());
 
     vec3_t wishvel = VectorMA(VectorScale(_bs.forward, cmd.move.forward), cmd.move.side, _bs.right);
 
@@ -237,34 +238,32 @@ void SV_WaterMove() {
 }
 
 void SV_WaterJump() {
-    if ((SV_GetTime() > sv_player->v.teleport_time) ||
-        !sv_player->v.waterlevel
+    if (SvPlayer_TeleportTimeElapsed() ||
+        !SvPlayer_WaterLevel()
         ) {
-        sv_player->v.flags = (int)sv_player->v.flags & ~FL_WATERJUMP;
-        sv_player->v.teleport_time = 0.f;
+        SvPlayer_ClrFlag(FL_WATERJUMP);
+        SvPlayer_SetTeleportTime(0.f);
     }
-    sv_player->v.velocity.x = sv_player->v.movedir.x;
-    sv_player->v.velocity.y = sv_player->v.movedir.y;
+    SvPlayer_pVelocity()->x = SvPlayer_MoveDir().x;
+    SvPlayer_pVelocity()->y = SvPlayer_MoveDir().y;
 }
 
 
 
 void SV_AirMove() {
-    _bs = GetBasis(sv_player->v.v_angle);
+    _bs = GetBasis(SvPlayer_ViewAngle());
 
     float fmove = cmd.move.forward;
     float smove = cmd.move.side;
 
     // hack to not let you back into teleporter
-    if ((SV_GetTime() < sv_player->v.teleport_time) &&
+    if ((!SvPlayer_TeleportTimeElapsed()) &&
         (fmove < 0.f)
         )   fmove = 0.f;
-    vec3_t wishvel = VectorMA(VectorScale(_bs.forward, fmove), smove, _bs.right);
 
-    if ((int)sv_player->v.movetype != MOVETYPE_WALK)
-        wishvel.z = cmd.move.up;
-    else
-        wishvel.z = 0.0f;
+    vec3_t wishvel = VectorMA(VectorScale(_bs.forward, fmove), smove, _bs.right);
+    wishvel.z = (SvPlayer_MoveType() != MOVETYPE_WALK) ?
+        cmd.move.up : 0.f;
 
     _wishDir = wishvel;
     _wishSpeed = VectorNormalize(&_wishDir);
@@ -273,16 +272,14 @@ void SV_AirMove() {
         _wishSpeed = sv_maxspeed.value;
     }
 
-    if (sv_player->v.movetype == MOVETYPE_NOCLIP) { // noclip
+    if (SvPlayer_MoveType() == MOVETYPE_NOCLIP) // noclip
         *_velocity = wishvel;
-    }
     else if (_onGround) {
         SV_UserFriction();
         SV_Accelerate();
     }
-    else { // not on ground, so little effect on velocity
+    else // not on ground, so little effect on velocity
         SV_AirAccelerate(wishvel);
-    }
 }
 
 /*
@@ -294,36 +291,36 @@ the angle fields specify an exact angular motion in degrees
 ===================
 */
 void SV_ClientThink() {
-    if (sv_player->v.movetype == MOVETYPE_NONE) return;
+    if (SvPlayer_MoveType() == MOVETYPE_NONE) return;
 
-    _onGround = (int)sv_player->v.flags & FL_ONGROUND;
+    _onGround = SvPlayer_IsFlag(FL_ONGROUND);
 
-    _origin = &sv_player->v.origin;
-    _velocity = &sv_player->v.velocity;
+    _origin = SvPlayer_pOrigin();
+    _velocity = SvPlayer_pVelocity();
 
     DropPunchAngle();
 
     // if dead, behave differently
-    if (sv_player->v.health <= 0)   return;
+    if (SvPlayer_IsDead())   return;
 
     // angles
     // show 1/3 the pitch angle and all the roll angle
     cmd = remoteClient->cmd;
-    ang3_p _angles = &sv_player->v.angles;
+    ang3_p _angles = SvPlayer_pAngles();
 
     ang3_t v_angle;
-    v_angle = AngleAdd(sv_player->v.v_angle, sv_player->v.punchangle);
-    _angles->roll = V_CalcRoll(sv_player->v.angles, sv_player->v.velocity) * 4;
-    if (!(sv_player->v.fixangle)) {
+    v_angle = AngleAdd(SvPlayer_ViewAngle(), SvPlayer_PunchAngle());
+    _angles->roll = V_CalcRoll(SvPlayer_Angles(), SvPlayer_Velocity()) * 4;
+    if (!(SvPlayer_FixAngle())) {
         _angles->pitch = -v_angle.pitch / 3;
         _angles->yaw = v_angle.yaw;
     }
 
-    if ((int)sv_player->v.flags & FL_WATERJUMP) { SV_WaterJump(); return; }
+    if (SvPlayer_IsFlag(FL_WATERJUMP)) { SV_WaterJump(); return; }
 
     // walk
-    if ((sv_player->v.waterlevel >= 2) &&
-        (sv_player->v.movetype != MOVETYPE_NOCLIP)
+    if ((SvPlayer_WaterLevel() >= WL_Waist) &&
+        (SvPlayer_MoveType() != MOVETYPE_NOCLIP)
         ) {
         SV_WaterMove();
         return;
@@ -483,9 +480,9 @@ void Host_God_f() {
         !(remoteClient->privileged)
         )  return;
 
-    sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_GODMODE;
+    SvPlayer_ToggleFlag(FL_GODMODE);
     SV_ClientPrintf("godmode %s\n",
-        (((int32_t)sv_player->v.flags) & FL_GODMODE) ?
+        (SvPlayer_IsFlag(FL_GODMODE)) ?
         "ON" : "OFF"
     );
 }
@@ -500,9 +497,9 @@ void Host_Notarget_f() {
         !(remoteClient->privileged)
         )  return;
 
-    sv_player->v.flags = (int32_t)sv_player->v.flags ^ FL_NOTARGET;
+    SvPlayer_ToggleFlag(FL_NOTARGET);
     SV_ClientPrintf("notarget %s\n",
-        (((int32_t)sv_player->v.flags) & FL_NOTARGET) ?
+        (SvPlayer_IsFlag(FL_NOTARGET)) ?
         "ON" : "OFF"
     );
 }
@@ -518,14 +515,14 @@ void Host_Noclip_f() {
         !(remoteClient->privileged)
         )  return;
 
-    if (sv_player->v.movetype == MOVETYPE_NOCLIP) {
+    if (SvPlayer_MoveType() == MOVETYPE_NOCLIP) {
         noclip_anglehack = false;
-        sv_player->v.movetype = MOVETYPE_WALK;
+        SvPlayer_SetMoveType(MOVETYPE_WALK);
         SV_ClientPrintf("noclip OFF\n");
     }
     else {
         noclip_anglehack = true;
-        sv_player->v.movetype = MOVETYPE_NOCLIP;
+        SvPlayer_SetMoveType(MOVETYPE_NOCLIP);
         SV_ClientPrintf("noclip ON\n");
     }
 }
@@ -547,12 +544,12 @@ void Host_Fly_f() {
         !(remoteClient->privileged)
         )  return;
 
-    if (sv_player->v.movetype == MOVETYPE_FLY) {
-        sv_player->v.movetype = MOVETYPE_WALK;
+    if (SvPlayer_MoveType() == MOVETYPE_FLY) {
+        SvPlayer_SetMoveType(MOVETYPE_WALK);
         SV_ClientPrintf("flymode OFF\n");
     }
     else {
-        sv_player->v.movetype = MOVETYPE_FLY;
+        SvPlayer_SetMoveType(MOVETYPE_FLY);
         SV_ClientPrintf("flymode ON\n");
     }
 }

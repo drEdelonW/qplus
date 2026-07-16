@@ -296,11 +296,11 @@ void GL_DrawAliasShadow(AliasHdr_p pAliasHdr, int posenum) {
                 order += 2;
 
                 // normals and vertexes come from the frame list
-                vec3_t point = {
-                    .x = verts->v8[X_AX] * pAliasHdr->scale.x + pAliasHdr->scale_origin.x,
-                    .y = verts->v8[Y_AX] * pAliasHdr->scale.y + pAliasHdr->scale_origin.y,
-                    .z = verts->v8[Z_AX] * pAliasHdr->scale.z + pAliasHdr->scale_origin.z
-                };
+                vec3_t point = VecXYZ(
+                    verts->v8[X_AX] * pAliasHdr->scale.x + pAliasHdr->scale_origin.x,
+                    verts->v8[Y_AX] * pAliasHdr->scale.y + pAliasHdr->scale_origin.y,
+                    verts->v8[Z_AX] * pAliasHdr->scale.z + pAliasHdr->scale_origin.z
+                );
                 point.x -= shadevector.x * (point.z + lheight);
                 point.y -= shadevector.y * (point.z + lheight);
                 point.z = height;

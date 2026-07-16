@@ -7,6 +7,11 @@ pr_builtins_priv.h - private declarations for pr_builtins.c only
 */
 #pragma once
 
+// pf_exec.c
+void PF_traceon();
+void PF_traceoff();
+
+
 // pf_print.c
 void PF_VarString_init();
 void PF_error();
@@ -96,8 +101,6 @@ void PF_cvar_set();
 
 // pf_debug.c
 void PF_coredump();
-void PF_traceon();
-void PF_traceoff();
 void PF_eprint();
 void PF_checkpos();
 

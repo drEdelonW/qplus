@@ -23,8 +23,7 @@ typedef struct {
 } dFunction_t;      STATIC_ASSERT_SIZE(dFunction_t, 7*4 + 1*8); // 36
 typedef dFunction_t* dFunction_p;
 
-extern dFunction_p  pr_functions;
-extern dFunction_p  pr_xFunction;
+extern dFunction_p  pr_functions; // TODO: hide it
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,6 +31,10 @@ extern "C" {
 
     dFunction_p ED_FindFunction(cString name);
     void initProgFunction(progLump_t pl);
+    cString Get_xFnName();
+
+    void FnPush(int32_p self);
+    void FnPop(int32_p self);
 
 #ifdef __cplusplus
 }

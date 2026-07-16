@@ -239,7 +239,7 @@ void R_DrawSprite() {
         // down, because the cross product will be between two nearly parallel
         // vectors and starts to approach an undefined state, so we don't draw if
         // the two vectors are less than 1 degree apart
-        vec3_t tvec = { .x = -modelorg.x, .y = -modelorg.y, .z = -modelorg.z };
+        vec3_t tvec = VectorScale(modelorg, -1.f);
         VectorNormalize(&tvec);
         float dot = tvec.z; // same as DotProduct (tvec, r_spritedesc.vup) because r_spritedesc.vup is 0, 0, 1
         if ((dot > 0.999848f) ||

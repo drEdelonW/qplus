@@ -62,6 +62,8 @@ static inline vec3_t VecX(vec_t scale) { return (vec3_t){ .x = scale }; }
 static inline vec3_t VecY(vec_t scale) { return (vec3_t){ .y = scale }; }
 static inline vec3_t VecZ(vec_t scale) { return (vec3_t){ .z = scale }; }
 static inline vec3_t VecXY(vec_t scaleX, vec_t scaleY) { return (vec3_t){ .x = scaleX, .y = scaleY }; }
+static inline vec3_t VecYZ(vec_t scaleY, vec_t scaleZ) { return (vec3_t){ .y = scaleY, .z = scaleZ }; }
+static inline vec3_t VecXZ(vec_t scaleX, vec_t scaleZ) { return (vec3_t){ .x = scaleX, .z = scaleZ }; }
 static inline vec3_t VecXYZ(vec_t scaleX, vec_t scaleY, vec_t scaleZ) { return (vec3_t){ .x = scaleX, .y = scaleY, .z = scaleZ }; }
 
 #ifdef __cplusplus

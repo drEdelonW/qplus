@@ -32,8 +32,9 @@ typedef enum {
     OFS_RETURN_X  = 1u,
     OFS_RETURN_Y  = 2u,
     OFS_RETURN_Z  = 3u,
+    PARM_STRIDE   = 3,
 
-    OFS_PARM0     = 4u,     // parm0..parm7: +3 per parm
+    OFS_PARM0     = 4u,     // parm0..parm7: +3(PARM_STRIDE) per parm 
     OFS_PARM1     = 7u,
     OFS_PARM2     = 10u,
     OFS_PARM3     = 13u,

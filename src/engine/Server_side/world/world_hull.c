@@ -214,7 +214,7 @@ bool SV_RecursiveHullCheck(
     mPlane_p plane = hull->planes + node->planenum;
 
     float t1, t2;
-    if (plane->type < VECT_DIM) {
+    if (plane->type <= PLANE_Z) {
         t1 = p1.v[plane->type] - plane->dist;
         t2 = p2.v[plane->type] - plane->dist;
     }

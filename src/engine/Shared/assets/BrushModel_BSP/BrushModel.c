@@ -529,7 +529,7 @@ void Mod_MakeHull0() {
 
     for (int i = 0; i < count; i++) {
         out[i].planenum = in[i].plane - _loadModel->planes;
-        for (PlaneSide_t j = 0; j < PlaneSides; j++) {
+        for (PlaneSide_t j = PsFront; j < PlaneSides; j++) {
             mNode_p child = in[i].children[j];
             out[i].children[j] = (NodeKind(child) == isLeaf) ?
                 child->contents : (child - _loadModel->nodes);

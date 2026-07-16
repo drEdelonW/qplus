@@ -19,16 +19,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // r_alias.c: routines for setting up to draw alias models
 
+#include "AliasModel.h"
 #include "r_local.h"
 #include "host.h"
-#include "d_local.h" // FIXME: shouldn't be needed (is needed for patch
-                        // right now, but that should move)
+#include "d_local.h" // FIXME: shouldn't be needed (is needed for patch right now, but that should move)
 #include "console.h"
 
 extern ColorMap_p acolormap; // FYI: live in d_polyse.c
 
-#define LIGHT_MIN (5)  // lowest light value we'll allow, to avoid the
-//  need for inner-loop light clamping
+#define LIGHT_MIN (5)  // lowest light value we'll allow, to avoid the need for inner-loop light clamping
 
 AffineTriDesc_t r_affinetridesc;
 TriVertx_p      r_apverts;
@@ -159,7 +158,7 @@ R_AliasCheckBBox
 bool R_AliasCheckBBox() {
     // expand, rotate, and translate points into worldspace
 
-    currententity->trivial_accept = false;
+    currententity->trivial_accept = TaNone;
     _pmodel = currententity->model;
     AliasHdr_p pahdr = Mod_Extradata(_pmodel);
     pmdl = (Mdl_p)((uint8_p)pahdr + pahdr->model);
@@ -288,12 +287,12 @@ bool R_AliasCheckBBox() {
     if (allclip)
         return false; // trivial reject off one side
 
-    currententity->trivial_accept = !anyclip & !zclipped;
+    currententity->trivial_accept = !anyclip & !zclipped; // TaAccept
 
     if ((currententity->trivial_accept) &&
         (minz > (r_aliastransition + (pmdl->size * r_resfudge)))
         ) {
-        currententity->trivial_accept |= 2;
+        currententity->trivial_accept |= TaDeepEnough;
     }
 
     return true;
@@ -307,11 +306,11 @@ R_AliasTransformFinalVert
 ================
 */
 void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, stVert_p pstverts) {
-    vec3_t tv = {
-        .x = pverts->v8[X_AX],
-        .y = pverts->v8[Y_AX],
-        .z = pverts->v8[Z_AX],
-    };
+    vec3_t tv = VecXYZ(
+        pverts->v8[X_AX],
+        pverts->v8[Y_AX],
+        pverts->v8[Z_AX]
+    );
     av->fv = VecXYZ(
         DotProduct(tv, *(vec3_p)aliastransform.m[0]) + aliastransform.m[0][3],
         DotProduct(tv, *(vec3_p)aliastransform.m[1]) + aliastransform.m[1][3],
@@ -331,8 +330,7 @@ void R_AliasTransformFinalVert(FinalVert_p fv, AuxVert_p av, TriVertx_p pverts, 
     if (lightcos < 0) {
         temp += (int)(r_shadelight * lightcos);
 
-        // clamp; because we limited the minimum ambient and shading light, we
-        // don't have to clamp low light, just bright
+        // clamp; because we limited the minimum ambient and shading light, we don't have to clamp low light, just bright
         ClampLessThen(&temp, 0);
     }
 
@@ -436,11 +434,11 @@ void R_AliasTransformAndProjectFinalVerts(FinalVert_p fv, stVert_p pstverts) {
 
     for (int i = 0; i < r_anumverts; i++, fv++, pverts++, pstverts++) {
         // transform and project
-        vec3_t tv = {
-            .x = pverts->v8[X_AX],
-            .y = pverts->v8[Y_AX],
-            .z = pverts->v8[Z_AX],
-        };
+        vec3_t tv = VecXYZ(
+            pverts->v8[X_AX],
+            pverts->v8[Y_AX],
+            pverts->v8[Z_AX]
+        );
         float zi = 1.0f /
             (DotProduct(tv, *(vec3_p)aliastransform.m[2]) + aliastransform.m[2][3]);
 
@@ -615,27 +613,18 @@ void R_AliasSetupFrame() {
     }
 }
 
-
-/*
-================
-R_AliasDrawModel
-================
-*/
+#include "mem_placement.h"
+static FinalVert_t _finalVerts[MAXALIASVERTS + (CACHE_LAST / sizeof(FinalVert_t)) + 1] PLACE_TO_SDRAM;
 void R_AliasDrawModel(aLight_p plighting) {
-    FinalVert_t finalverts[
-        MAXALIASVERTS +
-            (
-                (CACHE_SIZE - 1) /
-                sizeof(FinalVert_t)
-                ) +
-            1
-    ];
+    static bool inProgress = false;
+    if (inProgress)
+        Host_SysError("R_AliasDrawModel: reentrant call");
+    else
+        inProgress = true;
 
     r_amodels_drawn++;
-
     // cache align
-    pfinalverts = (FinalVert_p)
-        (((uintptr_t)&finalverts[0] + CACHE_SIZE - 1) & ~(uintptr_t)(CACHE_SIZE - 1));
+    pfinalverts = (FinalVert_p)(((uintptr_t)&_finalVerts[0] + CACHE_LAST) & ~(uintptr_t)CACHE_LAST);
     AuxVert_t auxverts[MAXALIASVERTS];
     pauxverts = &auxverts[0];
 
@@ -651,8 +640,9 @@ void R_AliasDrawModel(aLight_p plighting) {
         Host_SysError("R_AliasDrawModel: !currententity->pColorMap");
 
     r_affinetridesc.drawtype = (
-        (currententity->trivial_accept == 3) &&
-        r_recursiveaffinetriangles);
+        (currententity->trivial_accept == TaFull) && // must be both clipped
+        (r_recursiveaffinetriangles)
+    );
 
     if (r_affinetridesc.drawtype)   D_PolysetUpdateTables();  // FIXME: precalc...
 #if id386
@@ -660,11 +650,12 @@ void R_AliasDrawModel(aLight_p plighting) {
 #endif
 
     acolormap = currententity->pColorMap;
-
     if (currententity != &cl.viewent)   _ziscale = (float)0x8000 * (float)FIXED16_ONE;
     else                                _ziscale = (float)0x8000 * (float)FIXED16_ONE * 3.0;
 
     if (currententity->trivial_accept)  R_AliasPrepareUnclippedPoints();
     else                                R_AliasPreparePoints();
+    pfinalverts = NULL;
+    inProgress = false;
 }
 

@@ -30,7 +30,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "common.h"
 #include "mathlib.h"
 
-
+#define FRUST_NUM (4)
+extern int* pfrustum_indexes[FRUST_NUM];    // TODO: avoid int*
 //===========================================================================
 // viewmodel lighting
 
@@ -158,8 +159,7 @@ void R_ZDrawSubmodelPolys(Model_p clmodel);
 // Alias models
 //=========================================================
 
-#define MAXALIASVERTS  2000 // TODO: tune this
-#define ALIAS_Z_CLIP_PLANE 5
+#define ALIAS_Z_CLIP_PLANE (5.f)
 
 extern FinalVert_p  pfinalverts;
 extern AuxVert_p    pauxverts;

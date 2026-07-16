@@ -855,13 +855,13 @@ void Host_Color_f() {
 }
 
 
-
+#include "Player.h"
 void Host_Kill_f() {
-    if (isCliCmd())                 /**/ { Cmd_ForwardToServer(); return; }
-    if (sv_player->v.health <= 0)   /**/ { SV_ClientPrintf("Can't suicide -- allready dead!\n"); return; }
+    if (isCliCmd())         /**/ { Cmd_ForwardToServer(); return; }
+    if (SvPlayer_IsDead())  /**/ { SV_ClientPrintf("Can't suicide -- allready dead!\n"); return; }
 
     pGame()->time = (float)SV_GetTime();
-    pGame()->self = ED_GetEDictOffs(sv_player);
+    pGame()->self = ED_GetEDictOffs(SvPlayer());
     PR_ExecuteProgram(pGame()->ClientKill);
 }
 
@@ -878,7 +878,7 @@ void Host_Pause_f() {
         SV_BroadcastPrintf(
             "%s %spaused the game\n",
             (sv.paused) ? "" : "un",
-            PR_GetQString(sv_player->v.netname)
+            PR_GetQString(SvPlayer_NetName())
         );
 
         // send notification to all clients
@@ -931,7 +931,7 @@ void Host_Spawn_f() {
         // call the spawn function
 
         pGame()->time = (float)SV_GetTime();
-        pGame()->self = ED_GetEDictOffs(sv_player);
+        pGame()->self = ED_GetEDictOffs(SvPlayer());
         PR_ExecuteProgram(pGame()->ClientConnect);
 
         if ((Host_FloatTime() - remoteClient->netconnection->connecttime) <= SV_GetTime())
@@ -987,7 +987,7 @@ void Host_Spawn_f() {
         MSG_WriteAngles(pBuf, toSend);
     }
 
-    SV_WriteClientdataToMessage(sv_player, pBuf);
+    SV_WriteClientdataToMessage(SvPlayer(), pBuf);
 
     MSG_WriteByte(pBuf, svc_signonnum); { MSG_WriteByte(pBuf, 3); }
     remoteClient->sendsignon = true;
@@ -1083,7 +1083,6 @@ DEBUGGING TOOLS
 */
 
 
-
 void Host_Give_f() {
     if (isCliCmd()) {
         Cmd_ForwardToServer();
@@ -1096,103 +1095,103 @@ void Host_Give_f() {
     cString argsStr = Cmd_Argv(1);
     int cVal = atoi(Cmd_Argv(2));
     switch (argsStr[0]) {
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9': {
+    case '0': case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7': case '8': case '9': {
         // MED 01/04/97 added hipnotic give stuff
         if (hipnotic) {
-            /**/ if (argsStr[0] == '6') {
-                if (argsStr[1] == 'a')      sv_player->v.items = (int)sv_player->v.items | HIT_PROXIMITY_GUN;
-                else                        sv_player->v.items = (int)sv_player->v.items | IT_GRENADE_LAUNCHER;
-            }
-            else if (argsStr[0] == '9')     sv_player->v.items = (int)sv_player->v.items | HIT_LASER_CANNON;
-            else if (argsStr[0] == '0')     sv_player->v.items = (int)sv_player->v.items | HIT_MJOLNIR;
-            else if (argsStr[0] >= '2')     sv_player->v.items = (int)sv_player->v.items | (IT_SHOTGUN << (argsStr[0] - '2'));
+            switch (argsStr[0]) {
+            case '6': SvPlayer_AddItems((argsStr[1] == 'a') ? (item_bits_t)HIT_PROXIMITY_GUN : IT_GRENADE_LAUNCHER); break;
+            case '9': SvPlayer_AddItems((item_bits_t)HIT_LASER_CANNON);     break;
+            case '0': SvPlayer_AddItems((item_bits_t)HIT_MJOLNIR);          break;
+            default:  if (argsStr[0] >= '2')    SvPlayer_AddItems(IT_SHOTGUN << (argsStr[0] - '2')); break;
+            } break;
         }
         else {
-            if (argsStr[0] >= '2')          sv_player->v.items = (int)sv_player->v.items | (IT_SHOTGUN << (argsStr[0] - '2'));
+            if (argsStr[0] >= '2')              SvPlayer_AddItems(IT_SHOTGUN << (argsStr[0] - '2')); break;
         }
     } break;
+
+    case 'h':   SvPlayer_SetHealth(cVal); break;
+        // case 'a':   SvPlayer_SetArmor(cVal);  break;
 
     case 's': {
         if (rogue) {
-            eval_p val = GetEdictFieldValue(sv_player, "ammo_shells1");
+            eval_p val = GetEdictFieldValue(SvPlayer(), "ammo_shells1");
             if (val)
                 val->_float = (float)cVal;
         }
-
-        sv_player->v.ammo_shells = (float)cVal;
+        SvPlayer_SetAmmoShells(cVal);
     } break;
+
     case 'n': {
         if (rogue) {
-            eval_p val = GetEdictFieldValue(sv_player, "ammo_nails1");
+            eval_p val = GetEdictFieldValue(SvPlayer(), "ammo_nails1");
             if (val) {
                 val->_float = (float)cVal;
-                if (sv_player->v.weapon <= IT_LIGHTNING)
-                    sv_player->v.ammo_nails = (float)cVal;
+                if (SvPlayer_WeaponAtMostLightning())
+                    SvPlayer_SetAmmoNails(cVal);
             }
         }
         else
-            sv_player->v.ammo_nails = (float)cVal;
+            SvPlayer_SetAmmoNails(cVal);
     } break;
     case 'l': {
         if (rogue) {
-            eval_p val = GetEdictFieldValue(sv_player, "ammo_lava_nails");
+            eval_p val = GetEdictFieldValue(SvPlayer(), "ammo_lava_nails");
             if (val) {
                 val->_float = (float)cVal;
-                if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_nails = (float)cVal;
+                if (!(SvPlayer_WeaponAtMostLightning()))
+                    SvPlayer_SetAmmoNails(cVal);
             }
         }
     } break;
+
     case 'r': {
         if (rogue) {
-            eval_p val = GetEdictFieldValue(sv_player, "ammo_rockets1");
+            eval_p val = GetEdictFieldValue(SvPlayer(), "ammo_rockets1");
             if (val) {
                 val->_float = (float)cVal;
-                if (sv_player->v.weapon <= IT_LIGHTNING)
-                    sv_player->v.ammo_rockets = (float)cVal;
+                if (SvPlayer_WeaponAtMostLightning())
+                    SvPlayer_SetAmmoRockets(cVal);
             }
         }
         else
-            sv_player->v.ammo_rockets = (float)cVal;
+            SvPlayer_SetAmmoRockets(cVal);
     } break;
     case 'm': {
         if (rogue) {
-            eval_p val = GetEdictFieldValue(sv_player, "ammo_multi_rockets");
+            eval_p val = GetEdictFieldValue(SvPlayer(), "ammo_multi_rockets");
             if (val) {
                 val->_float = (float)cVal;
-                if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_rockets = (float)cVal;
+                if (!(SvPlayer_WeaponAtMostLightning()))
+                    SvPlayer_SetAmmoRockets(cVal);
             }
         }
     } break;
-    case 'h':   sv_player->v.health = (float)cVal; break;
+
     case 'c': {
         if (rogue) {
-            eval_p val = GetEdictFieldValue(sv_player, "ammo_cells1");
+            eval_p val = GetEdictFieldValue(SvPlayer(), "ammo_cells1");
             if (val) {
                 val->_float = (float)cVal;
-                if (sv_player->v.weapon <= IT_LIGHTNING)
-                    sv_player->v.ammo_cells = (float)cVal;
+                if (SvPlayer_WeaponAtMostLightning())
+                    SvPlayer_SetAmmoCells(cVal);
             }
         }
-        else { sv_player->v.ammo_cells = (float)cVal; }
+        else
+            SvPlayer_SetAmmoCells(cVal);
     } break;
     case 'p': {
         if (rogue) {
-            eval_p val = GetEdictFieldValue(sv_player, "ammo_plasma");
+            eval_p val = GetEdictFieldValue(SvPlayer(), "ammo_plasma");
             if (val) {
                 val->_float = (float)cVal;
-                if (sv_player->v.weapon > IT_LIGHTNING)     sv_player->v.ammo_cells = (float)cVal;
+                if (!(SvPlayer_WeaponAtMostLightning()))
+                    SvPlayer_SetAmmoCells(cVal);
             }
         }
     } break;
+
     }
 }
 
@@ -1204,7 +1203,10 @@ void Host_Viewmodel_f() {
     if (!eDict) return;
 
     Model_p mdl = Mod_ForName(Cmd_Argv(1), false);
-    if (!mdl) { Con_Printf("Can't load %s\n", Cmd_Argv(1)); return; }
+    if (!mdl) {
+        Con_Printf("Can't load %s\n", Cmd_Argv(1));
+        return;
+    }
 
     eDict->v.frame = 0;
     cl.model_precache[(int)eDict->v.modelindex] = mdl;

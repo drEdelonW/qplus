@@ -23,8 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Edict.h"
 
 void PF_coredump() { ED_PrintEdicts(); }
-void PF_traceon() { pr_trace = true; }
-void PF_traceoff() { pr_trace = false; }
+
 void PF_eprint() { ED_PrintNum(G_EDICTNUM(OFS_PARM0)); }
 
 /*

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "model.h"
-
 #define MAX_LBM_HEIGHT (480)
+#define MAXALIASVERTS  (2000) // TODO: tune this
 
+#include "model.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

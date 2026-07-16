@@ -26,13 +26,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Particle.h"
 #include "vid.h"
 
-#define PARTICLE_Z_CLIP 8.0
+#define PARTICLE_Z_CLIP 8.f
 
-/*
-==============
-D_StartParticles
-==============
-*/
+
 void D_StartParticles() {
     r_p = (Basis_t){
         .forward = BS.forward,
@@ -42,11 +38,7 @@ void D_StartParticles() {
 }
 
 
-/*
-==============
-D_EndParticles
-==============
-*/
+
 void D_EndParticles() {
     // not used by software driver
 }
@@ -54,11 +46,6 @@ void D_EndParticles() {
 
 #if !id386
 
-/*
-==============
-D_DrawParticle
-==============
-*/
 void D_DrawParticle(Particle_p pparticle) {
     // transform point
     vec3_t local = VectorSubtract(pparticle->org, r_origin);
@@ -75,22 +62,20 @@ void D_DrawParticle(Particle_p pparticle) {
     // project the point
     // FIXME: preadjust xcenter and ycenter
     float zi = 1.0f / transformed.z;
-    int u = (int)(xcenter + zi * transformed.x + 0.5f);
-    int v = (int)(ycenter - zi * transformed.y + 0.5f);
+    int u = (int)(xcenter + (zi * transformed.x) + 0.5f);
+    int v = (int)(ycenter - (zi * transformed.y) + 0.5f);
 
     if ((v > d_vrectbottom_particle) ||
         (u > d_vrectright_particle) ||
         (v < d_vrecty) ||
-        (u < d_vrectx)) {
-        return;
-    }
+        (u < d_vrectx)
+        )   return;
 
     int16_p pz = vid.zBuff.pZBuff + (vid.zBuff.width * v) + u;
     qColor8_p pdest = d_viewbuffer + d_scantable[v] + u;
     int izi = (int)(zi * 0x8000);
 
     int pix = izi >> d_pix_shift;
-
     ClampInRange(d_pix_min, &pix, d_pix_max);
 
     switch (pix) {

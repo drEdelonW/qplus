@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern bool		msg_suppress_1;		// suppresses resolution and cache size console output an fullscreen DIB focus gain/loss
 #define CACHE_SIZE	32		// used to align key data structures
+#define CACHE_LAST	(CACHE_SIZE - 1)
 
 //============================================================================
 #define CMDLINE_LENGTH 256

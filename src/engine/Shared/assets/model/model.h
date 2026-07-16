@@ -24,16 +24,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define TOP_RANGE  (16)   // soldier uniform colors
 #define BOTTOM_RANGE (96)
 /*
-
 d*_t structures are on-disk representations
 m*_t structures are in-memory
-
 */
 #ifdef GLQUAKE
 #   include "Alias.h"   // for mTriangle_t
+#   include "AliasModel.h"  // MAXALIASVERTS
 #   include "Vertex.h"
 
-#   define MAXALIASVERTS 1024
 #   define MAXALIASFRAMES 256
 #   define MAXALIASTRIS 2048
 extern stVert_t stverts[MAXALIASVERTS];
