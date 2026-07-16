@@ -635,10 +635,16 @@ void Host_Changelevel2_f() {
 
 
 void Host_Name_f() {
-    if (Cmd_Argc() == 1) { Con_Printf("\"name\" is \"%s\"\n", cl_name.string); return; }
+    if (Cmd_Argc() == 1) {
+        Con_Printf(
+            "\"name\" is \"%s\"\n",
+            cl_name.string
+        );
+        return;
+    }
 
     cString newName = (Cmd_Argc() == 2) ? Cmd_Argv(1) : Cmd_Args();
-    newName[15] = 0;
+    newName[15] = 0x00;
 
     if (isCliCmd()) {
         if (Q_strcmp(cl_name.string, newName) == 0) return;
@@ -651,8 +657,7 @@ void Host_Name_f() {
     if (remoteClient->name[0] &&
         strcmp(remoteClient->name, "unconnected") &&
         (Q_strcmp(remoteClient->name, newName) != 0)
-        )
-        Con_Printf("%s renamed to %s\n", remoteClient->name, newName);
+        )   Con_Printf("%s renamed to %s\n", remoteClient->name, newName);
 
     Q_strcpy(remoteClient->name, newName);
     remoteClient->edict->v.netname = PR_SetQString(remoteClient->name);
@@ -678,8 +683,7 @@ void Host_Please_f() {
         if ((j < 0) ||
             (j >= GetSvMaxClients()) ||
             (!svs.clients[j].active)
-            )
-            return;
+            )   return;
 
         RmtClient_p cl = &svs.clients[j];
         if (cl->privileged) {
@@ -692,7 +696,6 @@ void Host_Please_f() {
     }
 
     if (Cmd_Argc() != 2)    return;
-
     {
         RmtClient_p cl = svs.clients;
         for (int j = 0; j < GetSvMaxClients(); j++, cl++) {
@@ -720,7 +723,10 @@ void Host_Say(bool teamonly) {
             fromServer = true;
             teamonly = false;
         }
-        else { Cmd_ForwardToServer();   return; }
+        else {
+            Cmd_ForwardToServer();
+            return;
+        }
     }
 
     if (Cmd_Argc() < 2)         return;
@@ -792,20 +798,21 @@ void Host_Tell_f() {
     }
 
     // check length & truncate if necessary
-    uint32_t j = sizeof(text) - 2 - Q_strlen(text);  // -2 for /n and null terminator
-    if (Q_strlen(args) > j)     args[j] = 0;
+    int j = sizeof(text) - 2 - Q_strlen(text);  // -2 for /n and null terminator
+    if (Q_strlen(args) > j)     args[j] = 0x00;
 
     strcat(text, args);
     strcat(text, "\n");
 
     RmtClient_p save = remoteClient;
     {
-        RmtClient_p rClient = svs.clients;
-        for (int j = 0; j < GetSvMaxClients(); j++, rClient++) {
-            if (!rClient->active || !rClient->spawned)        continue;
-            if (Q_strcasecmp(rClient->name, Cmd_Argv(1)))    continue;
+        for (int j = 0; j < GetSvMaxClients(); j++) {
+            if (!(svs.clients[j].active) ||
+                !(svs.clients[j].spawned)
+                )  continue;
+            if (Q_strcasecmp(svs.clients[j].name, Cmd_Argv(1)))   continue;
 
-            remoteClient = rClient;
+            remoteClient = &svs.clients[j];
             SV_ClientPrintf("%s", text);
             break;
         }
@@ -819,7 +826,7 @@ void Host_Color_f() {
     if (Cmd_Argc() == 1) {
         Con_Printf("\"color\" is \"%i %i\"\n",
             ((uint8_t)cl_color.value) >> 4,
-            ((uint8_t)cl_color.value) & 0x0f
+            ((uint8_t)cl_color.value) & 0x0F
         );
         Con_Printf("color <0-13> [0-13]\n");
         return;
@@ -833,9 +840,9 @@ void Host_Color_f() {
         )
     );
 
-    top &= 15;
+    top &= 0x0F;
     ClampMoreThen(&top, 13);
-    bottom &= 15;
+    bottom &= 0x0F;
     ClampMoreThen(&bottom, 13);
 
     uint8_t playercolor = (uint8_t)(((uint16_t)top << 4) + bottom);
@@ -983,7 +990,7 @@ void Host_Spawn_f() {
     // with a permanent head tilt
     edict_p ent = ED_GetEDictByIdx(EdictPlayer1 + (uint32_t)(remoteClient - svs.clients));
     MSG_WriteByte(pBuf, svc_setangle); {
-        ang3_t toSend = ent->v.angles; { ent->v.angles.roll = 0.f; }
+        ang3_t toSend = ent->v.angles; { toSend.roll = 0.f; }
         MSG_WriteAngles(pBuf, toSend);
     }
 
@@ -1100,10 +1107,10 @@ void Host_Give_f() {
         // MED 01/04/97 added hipnotic give stuff
         if (hipnotic) {
             switch (argsStr[0]) {
-            case '6': SvPlayer_AddItems((argsStr[1] == 'a') ? (item_bits_t)HIT_PROXIMITY_GUN : IT_GRENADE_LAUNCHER); break;
-            case '9': SvPlayer_AddItems((item_bits_t)HIT_LASER_CANNON);     break;
-            case '0': SvPlayer_AddItems((item_bits_t)HIT_MJOLNIR);          break;
-            default:  if (argsStr[0] >= '2')    SvPlayer_AddItems(IT_SHOTGUN << (argsStr[0] - '2')); break;
+            case '6':                           SvPlayer_AddItems((argsStr[1] == 'a') ? (item_bits_t)HIT_PROXIMITY_GUN : IT_GRENADE_LAUNCHER); break;
+            case '9':                           SvPlayer_AddItems((item_bits_t)HIT_LASER_CANNON);       break;
+            case '0':                           SvPlayer_AddItems((item_bits_t)HIT_MJOLNIR);            break;
+            default:  if (argsStr[0] >= '2')    SvPlayer_AddItems(IT_SHOTGUN << (argsStr[0] - '2'));    break;
             } break;
         }
         else {

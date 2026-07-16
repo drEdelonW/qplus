@@ -88,7 +88,9 @@ void SV_ClientPrintf(cStringRO fmt, ...) {
     VaBuff_t string;
     VA_EXPAND(string, fmt);
     sizebuf_p pBuf = &remoteClient->message;
-    MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
+    MSG_WriteByte(pBuf, svc_print); {
+        MSG_WriteString(pBuf, string);
+    }
 }
 
 /*
