@@ -1,8 +1,13 @@
+# --- [Quake targets] ---
 TARGET ?= quakeX11
-TARGET ?= quakeGLX11
-TARGET ?= quakeWin
-TARGET ?= quakeSTM32
+# TARGET ?= quakeGLX11
+# TARGET ?= quakeWin
+# TARGET ?= quakeSTM32
 
+# --- [Quake utils] ---
+# TARGET ?= qcc
+
+# --- [WorkBench] ---
 # TARGET ?= STM32_LCD
 # TARGET ?= testSTM32
 # TARGET ?= testSDL2

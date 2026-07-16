@@ -22,12 +22,15 @@
 typedef uint8_t byte;
 // typedef bool qboolean;
 
-typedef char* cString;
-typedef char** cStringArray;
+typedef char* cStr_p;
+typedef cStr_p cString; // deprecated
+typedef char** cStr_ar;
+typedef cStr_ar cStringArray; // deprecated
 typedef const char* cStringRO;  // read-only
 typedef const unsigned char* cStringGlRO;  // read-only
-typedef void* TypeLess_ptr;
-
+typedef void* Any_p;
+typedef void* Raw_p;
+typedef Any_p TypeLess_ptr; // deprecated
 // Pointers to standard integer types
 // (ptrdiff_t) - pointer diff type
 typedef int8_t* int8_p;

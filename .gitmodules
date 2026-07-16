@@ -3,3 +3,13 @@
 	# url = git@github.com:drEdelonW/Quake.git
 	# url = git@github.com:id-Software/Quake.git
 	url = ssh://git@gitlab.ark/id_software/Quake.git
+[submodule "QuakeTools_ID_src"]
+	path = QuakeTools_ID_src
+	# url = git@github.com:drEdelonW/Quake-Tools.git
+	# url = git@github.com:id-Software/Quake-Tools.git
+	url = ssh://git@gitlab.ark/id_software/Quake-Tools.git
+[submodule "QuakeQC_ID_src"]
+	path = QuakeQC_ID_src
+	# url = git@github.com:drEdelonW/quake-rerelease-qc.git
+	# url = git@github.com:id-Software/quake-rerelease-qc.git
+	url = git@GitLab.ark:id_software/quake-rerelease-qc.git
