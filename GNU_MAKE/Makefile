@@ -9,6 +9,7 @@ TARGET ?= quakeX11
 
 # --- [Quake Game Logic] ---
 # TARGET ?= v101qc
+TARGET ?= qplusqc
 
 # --- [WorkBench] ---
 # TARGET ?= STM32_LCD
