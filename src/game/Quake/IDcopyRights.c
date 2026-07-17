@@ -25,7 +25,7 @@ bool standard_quake = true;
 bool rogue = false;
 bool hipnotic = false;
 
-int32_t  Registered = 1;  // only for startup check, then set
+bool Registered = true;  // only for startup check, then set
 
 // this graphic needs to be in the pak file to use registered features
 static uint16_t _pop[128] = {
@@ -78,9 +78,10 @@ being registered.
 */
 
 void GM_CheckRegistered() {
+    Registered = false;
+#if 1
     int h;
     COM_OpenFile("gfx/pop.lmp", &h);
-    Registered = 0;
 
     if (h == -1) {
 #if WINDED
@@ -99,10 +100,10 @@ void GM_CheckRegistered() {
     for (int i = 0; i < 128; i++)
         if (_pop[i] != (uint16_t)BigShort(check[i]))
             Host_SysError("Corrupted data file.");
-
+#endif
     Cvar_Set("cmdline", com.cmdline);
     Cvar_Set("registered", "1");
-    Registered = 1;
+    Registered = true;
     Con_Printf("Playing registered version.\n");
 }
 

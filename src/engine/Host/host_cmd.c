@@ -1114,7 +1114,7 @@ void Host_Give_f() {
             } break;
         }
         else {
-            if (argsStr[0] >= '2')              SvPlayer_AddItems(IT_SHOTGUN << (argsStr[0] - '2')); break;
+            if (argsStr[0] >= '2') {            SvPlayer_AddItems(IT_SHOTGUN << (argsStr[0] - '2')); }break;
         }
     } break;
 

@@ -101,7 +101,7 @@ extern bool     contModified;
 extern bool     standard_quake;
 extern bool     rogue;
 extern bool     hipnotic;
-extern int32_t  Registered;
+extern bool     Registered;
 
 #ifdef __cplusplus
 extern "C" {

@@ -463,8 +463,8 @@ int COM_FindFile(cStringRO filename, int* handle, FILE** file) {
             // check a file in the directory tree
             if (!Registered) {       // if not a registered version, don't ever go beyond base
                 if (strchr(filename, '/') ||
-                    strchr(filename, '\\'))
-                    continue;
+                    strchr(filename, '\\')
+                    )   continue;
             }
 
             fsPathStr_t netpath; snprintf(netpath, sizeof(netpath), "%s/%s", search->filename, filename);

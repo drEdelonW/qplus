@@ -37,6 +37,9 @@
 
     clear ; make TARGET=qcc fresh
 
+    make TARGET=v101qc fresh
+    make TARGET=v101qc qcrun
+
     clear ; \
     make TARGET=quakeX11 fresh -j4 && \
     make TARGET=quakeGLX11 fresh -j4 && \
