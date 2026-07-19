@@ -224,36 +224,6 @@ There are no ++ / -- operators, or operate/assign operators.
 
 #include "VM_types.h"
 
-// offsets are allways multiplied by 4 before using
-typedef int gofs_t;    // offset in global data block
-
-typedef struct def_s def_t;
-typedef def_t* def_p;
-
-typedef struct type_s type_t;
-typedef type_t* type_p;
-
-#define MAX_PARMS 8
-struct type_s {
-    etype_t type;
-    def_p   def;  // a def that points to this type
-    type_p  next;
-    // function types are more complex
-    type_p  aux_type;  // return type or field type
-    int     num_parms; // -1 = variable args
-    type_p  parm_types[MAX_PARMS]; // only [num_parms] allocated
-};
-
-
-struct def_s {
-    type_p  type;
-    cStr_p  name;
-    def_p   next;
-    gofs_t  ofs;
-    def_p   scope;  // function the var was defined in, or NULL
-    int     initialized; // 1 when a declaration included "= immediate"
-};
-
 //============================================================================
 
 // pr_loc.h -- program local defs
@@ -263,40 +233,25 @@ struct def_s {
 #define MAX_REGS    0x4000 /* (16384) */
 
 //=============================================================================
+#include "VM_type_func.h"
+#include "VM_type_string.h"
+#include "vector.h"
 
 typedef union eval_s eval_t;
 typedef eval_t* eval_p;
 union eval_s {
     string_t    string;
     float       _float;
+#if 0
     float       vector[3];
+#else
+    vec3_t      vector;
+#endif
     func_t      function;
     int32_t     _int;
     eval_p      ptr;
 };
 
-
-extern const int type_size[ev_LAST];
-extern def_p def_for_type[ev_LAST];
-
-extern type_t type_void;
-extern type_t type_string;
-extern type_t type_float;
-extern type_t type_vector;
-extern type_t type_entity;
-extern type_t type_field;
-extern type_t type_function;
-extern type_t type_pointer;
-extern type_t type_floatfield;
-
-extern def_t def_void;
-extern def_t def_string;
-extern def_t def_float;
-extern def_t def_vector;
-extern def_t def_entity;
-extern def_t def_field;
-extern def_t def_function;
-extern def_t def_pointer;
 
 typedef struct function_s function_t;
 typedef function_t* function_p;
@@ -374,16 +329,7 @@ extern cStr_p   pr_file_p;
 
 Any_p PR_Malloc(int size);
 
-// PrOfs_e from src/engine/Server_side/SimulationState/GlobVars/progdefs.h
-#define OFS_NULL  0
-#define OFS_RETURN  1
-#define OFS_PARM0  4  // leave 3 ofs for each parm to hold vectors
-#define OFS_PARM1  7
-#define OFS_PARM2  10
-#define OFS_PARM3  13
-#define OFS_PARM4  16
-#define RESERVED_OFS 28
-
+# include "VM_param.h"
 
 extern def_p    pr_scope;
 extern int      pr_error_count;
@@ -413,10 +359,10 @@ extern def_t def_ret, def_parms[MAX_PARMS];
 //=============================================================================
 
 #define MAX_STRINGS  500000
-#define MAX_GLOBALS  16384
+#define MAX_GLOBALS  (0x4000) /* 16384 */
 #define MAX_FIELDS  1024
-#define MAX_STATEMENTS 65536
-#define MAX_FUNCTIONS 8192
+#define MAX_STATEMENTS (0x10000)/* 65536 */
+#define MAX_FUNCTIONS (0x4000) /* 8192 */
 
 #define MAX_SOUNDS  1024
 #define MAX_MODELS  1024

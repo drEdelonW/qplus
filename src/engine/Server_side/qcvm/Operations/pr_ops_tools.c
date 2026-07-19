@@ -103,7 +103,7 @@ static cString _pr_opNames[OP_LAST] = {
     [OP_BITOR] = "BITOR"
 };
 
-void PR_PrintOperation(prog_operation_e op) {
+void PR_PrintOperation(prog_operation_t op) {
     if (op < OP_LAST) {
         Con_Printf("%s ", _pr_opNames[op]);
         size_t i = strlen(_pr_opNames[op]);

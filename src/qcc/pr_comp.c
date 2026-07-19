@@ -202,9 +202,9 @@ def_p PR_ParseImmediate() {
             }
         }
         else if (pr_immediate_type == &type_vector) {
-            if ((G_FLOAT(cn->ofs + 0) == pr_immediate.vector[0]) &&
-                (G_FLOAT(cn->ofs + 1) == pr_immediate.vector[1]) &&
-                (G_FLOAT(cn->ofs + 2) == pr_immediate.vector[2])
+            if ((G_FLOAT(cn->ofs + X_AX) == pr_immediate.vector.x) &&
+                (G_FLOAT(cn->ofs + Y_AX) == pr_immediate.vector.y) &&
+                (G_FLOAT(cn->ofs + Z_AX) == pr_immediate.vector.z)
                 ) {
                 PR_Lex();
                 return cn;

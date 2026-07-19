@@ -4,7 +4,7 @@
 #include "assert.h"
 #include "pr_qString.h"
 
-typedef int32_t func_t;
+#include "VM_type_func.h"
 
 #define MAX_PARMS (8)
 

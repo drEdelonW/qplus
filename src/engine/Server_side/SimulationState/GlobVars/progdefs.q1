@@ -4,16 +4,16 @@
 #pragma pack(push, 4)
 typedef struct {
     int32_t pad[RESERVED_OFS]; // PrOfs_e::RESERVED_OFS
-    int32_t self;
-    int32_t other;
-    int32_t world;
+    int32_t self;       // EdIdx
+    int32_t other;      // EdIdx
+    int32_t world;      // EdIdx
     float   time;       // sSimTime_t
     float   frametime;
     float   force_retouch;
     string_t mapname;
-    float   deathmatch;
-    float   coop;
-    float   teamplay;
+    float   deathmatch; // bool
+    float   coop;       // bool
+    float   teamplay;   // bool
     float   serverflags;
     float   total_secrets;
     float   total_monsters;
@@ -110,8 +110,8 @@ typedef struct {
     ang3_t  v_angle;
     float   idealpitch;
     string_t netname;
-    int32_t enemy;
-    float   flags;  // EntityFlags_t
+    int32_t enemy;      // EdIdx
+    float   flags;      // EntityFlags_t
     float   colormap;
     float   team;
     float   max_health;
@@ -122,15 +122,15 @@ typedef struct {
     float   watertype;  // contents_t(CONTENTS_EMPTY/CONTENTS_WATER/CONTENTS_SLIME/CONTENTS_LAVA)
     float   ideal_yaw;
     float   yaw_speed;
-    int32_t aiment;
-    int32_t goalentity;
+    int32_t aiment;     // EdIdx
+    int32_t goalentity; // EdIdx
     float   spawnflags; // SpawnFlags_t
     string_t target;
     string_t targetname;
     float   dmg_take;
     float   dmg_save;
-    int32_t dmg_inflictor;
-    int32_t owner;
+    int32_t dmg_inflictor;  // EdIdx
+    int32_t owner;          // EdIdx
     vec3_t  movedir;
     string_t message;
     float   sounds;

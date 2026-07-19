@@ -59,21 +59,8 @@ type_t type_pointer     /**/ = { ev_pointer, &def_pointer };
 
 type_t type_floatfield  /**/ = { ev_field, &def_field, NULL, &type_float };
 
-#if 0
-int  type_size[8] = { 1,1,1,3,1,1,1,1 };
-#else
 #include "pr_comp.h"
-const int type_size[ev_LAST] = {
-    1,                          // ev_void,
-    sizeof(string_t) / 4,       // ev_string,
-    1,                          // ev_float,
-    3,                          // ev_vector,
-    1,                          // ev_entity,
-    1,                          // ev_field,
-    sizeof(func_t) / 4,         // ev_function,
-    sizeof(TypeLess_ptr) / 4    // ev_pointer
-};
-#endif
+
 
 def_t def_void      /**/ = { &type_void,    "temp" };
 def_t def_string    /**/ = { &type_string,  "temp" };
@@ -87,16 +74,7 @@ def_t def_pointer   /**/ = { &type_pointer, "temp" };
 def_t def_ret;
 def_t def_parms[MAX_PARMS];
 
-def_p def_for_type[8] = {
-    &def_void,
-    &def_string,
-    &def_float,
-    &def_vector,
-    &def_entity,
-    &def_field,
-    &def_function,
-    &def_pointer
-};
+
 
 void PR_LexWhitespace();
 
@@ -108,8 +86,8 @@ PR_PrintNextLine
 */
 void PR_PrintNextLine() {
     printf("%3i:", pr_source_line); {
-    for (cStr_p t = pr_line_start; (*t) && (*t != '\n'); t++)
-        printf("%c", *t);
+        for (cStr_p t = pr_line_start; (*t) && (*t != '\n'); t++)
+            printf("%c", *t);
     } printf("\n");
 }
 
@@ -122,14 +100,14 @@ Call at start of file and when *pr_file_p == '\n'
 */
 void PR_NewLine() {
     bool m = (*pr_file_p == '\n');
-    if (m) {pr_file_p++;} {
+    if (m) { pr_file_p++; } {
 
         pr_source_line++;
         pr_line_start = pr_file_p;
 
         // if (pr_dumpasm)
         //  PR_PrintNextLine ();
-    } if (m)  pr_file_p--;
+    } if (m) { pr_file_p--; }
 }
 
 /*
@@ -200,8 +178,8 @@ void PR_LexVector() {
     pr_file_p++;
     pr_token_type = tt_immediate;
     pr_immediate_type = &type_vector;
-    for (int i = 0; i < 3; i++) {
-        pr_immediate.vector[i] = PR_LexNumber();
+    for (int i = 0; i < VECT_DIM; i++) {
+        pr_immediate.vector.v[i] = PR_LexNumber();
         PR_LexWhitespace();
     }
     if (*pr_file_p != '\'')
@@ -273,36 +251,37 @@ PR_LexWhitespace
 ==============
 */
 void PR_LexWhitespace() {
-    int  c;
-
     while (1) {
-        // skip whitespace
-        while ((c = *pr_file_p) <= ' ') {
-            if (c == '\n')
-                PR_NewLine();
-            if (c == 0)
-                return;  // end of file
+        int  c;
+        while ((c = *pr_file_p) <= ' ') {   // skip whitespace
+            if (c == '\n')      PR_NewLine();
+            if (c == 0x00)      return;  // end of file
             pr_file_p++;
         }
 
         // skip // comments
-        if (c == '/' && pr_file_p[1] == '/') {
-            while (*pr_file_p && *pr_file_p != '\n')
-                pr_file_p++;
+        if ((c == '/') &&
+            (pr_file_p[1] == '/')
+            ) {
+            while ((*pr_file_p) &&
+                (*pr_file_p != '\n')
+                ) pr_file_p++;
             PR_NewLine();
             pr_file_p++;
             continue;
         }
 
         // skip /* */ comments
-        if (c == '/' && pr_file_p[1] == '*') {
+        if ((c == '/') &&
+            (pr_file_p[1] == '*')
+            ) {
             do {
                 pr_file_p++;
-                if (pr_file_p[0] == '\n')
-                    PR_NewLine();
-                if (pr_file_p[1] == 0)
-                    return;
-            } while (pr_file_p[-1] != '*' || pr_file_p[0] != '/');
+                if (pr_file_p[0] == '\n')   PR_NewLine();
+                if (pr_file_p[1] == 0x00)   return;
+            } while (
+                (pr_file_p[-1] != '*') ||
+                (pr_file_p[0] != '/'));
             pr_file_p++;
             continue;
         }
@@ -323,9 +302,7 @@ void PR_ClearGrabMacros() {
 }
 
 void PR_FindMacro() {
-    int  i;
-
-    for (i = 0; i < pr_nummacros; i++)
+    for (int i = 0; i < pr_nummacros; i++)
         if (!strcmp(pr_token, pr_framemacros[i])) {
             sprintf(pr_token, "%d", i);
             pr_token_type = tt_immediate;
@@ -339,17 +316,18 @@ void PR_FindMacro() {
 // just parses text, returning false if an eol is reached
 bool PR_SimpleGetToken() {
     int  c;
-    int  i;
-
-    // skip whitespace
-    while ((c = *pr_file_p) <= ' ') {
-        if (c == '\n' || c == 0)
-            return false;
+    while ((c = *pr_file_p) <= ' ') {  // skip whitespace
+        if ((c == '\n') ||
+            (c == 0)
+            )   return false;
         pr_file_p++;
     }
 
-    i = 0;
-    while ((c = *pr_file_p) > ' ' && c != ',' && c != ';') {
+    int i = 0;
+    while (((c = *pr_file_p) > ' ') &&
+        (c != ',') &&
+        (c != ';')
+        ) {
         pr_token[i] = c;
         i++;
         pr_file_p++;
@@ -383,12 +361,13 @@ void PR_LexGrab() {
         PR_Lex();
     }
     // ignore other known $commands
-    else if (!strcmp(pr_token, "cd")
-        || !strcmp(pr_token, "origin")
-        || !strcmp(pr_token, "base")
-        || !strcmp(pr_token, "flags")
-        || !strcmp(pr_token, "scale")
-        || !strcmp(pr_token, "skin")) { // skip to end of line
+    else if (!strcmp(pr_token, "cd") ||
+        !strcmp(pr_token, "origin") ||
+        !strcmp(pr_token, "base") ||
+        !strcmp(pr_token, "flags") ||
+        !strcmp(pr_token, "scale") ||
+        !strcmp(pr_token, "skin")
+        ) { // skip to end of line
         while (PR_SimpleGetToken())
             ;
         PR_Lex();
@@ -408,8 +387,6 @@ Sets pr_token, pr_token_type, and possibly pr_immediate and pr_immediate_type
 ==============
 */
 void PR_Lex() {
-    int  c;
-
     pr_token[0] = 0;
 
     if (!pr_file_p) {
@@ -419,8 +396,7 @@ void PR_Lex() {
 
     PR_LexWhitespace();
 
-    c = *pr_file_p;
-
+    int  c = *pr_file_p;
     if (!c) {
         pr_token_type = tt_eof;
         return;
@@ -440,14 +416,28 @@ void PR_Lex() {
 
     // if the first character is a valid identifier, parse until a non-id
     // character is reached
-    if ((c >= '0' && c <= '9') || (c == '-' && pr_file_p[1] >= '0' && pr_file_p[1] <= '9')) {
+    if (
+        (
+            (c >= '0') &&
+            (c <= '9')
+            ) ||
+        (
+            (c == '-') &&
+            (pr_file_p[1] >= '0') &&
+            (pr_file_p[1] <= '9')
+            )
+        ) {
         pr_token_type = tt_immediate;
         pr_immediate_type = &type_float;
         pr_immediate._float = PR_LexNumber();
         return;
     }
 
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_') {
+    if (
+        ((c >= 'a') && (c <= 'z')) ||
+        ((c >= 'A') && (c <= 'Z')) ||
+        (c == '_')
+        ) {
         PR_LexName();
         return;
     }
@@ -523,12 +513,10 @@ Checks to see if the current token is a valid name
 ============
 */
 cStr_p PR_ParseName() {
-    static char ident[MAX_NAME];
+    if (pr_token_type != tt_name)           PR_ParseError("not a name");
+    if (strlen(pr_token) >= MAX_NAME - 1)   PR_ParseError("name too long");
 
-    if (pr_token_type != tt_name)
-        PR_ParseError("not a name");
-    if (strlen(pr_token) >= MAX_NAME - 1)
-        PR_ParseError("name too long");
+    static char ident[MAX_NAME];
     strcpy(ident, pr_token);
     PR_Lex();
 
@@ -544,17 +532,15 @@ a new one and copies it out.
 ============
 */
 type_p PR_FindType(type_p type) {
-    def_p def;
-    type_p check;
-    int  i;
 
-    for (check = pr.types; check; check = check->next) {
+    for (type_p check = pr.types; check; check = check->next) {
         if ((check->type != type->type) ||
             (check->aux_type != type->aux_type) ||
             (check->num_parms != type->num_parms)
             )   continue;
 
-        for (i = 0; i < type->num_parms; i++)
+        int i = 0;
+        for (; i < type->num_parms; i++)
             if (check->parm_types[i] != type->parm_types[i])
                 break;
 
@@ -562,18 +548,20 @@ type_p PR_FindType(type_p type) {
             return check;
     }
 
-    // allocate a new one
-    check = malloc(sizeof(*check));
-    *check = *type;
-    check->next = pr.types;
-    pr.types = check;
+    {
+        // allocate a new one
+        type_p check = malloc(sizeof(*check));
+        *check = *type;
+        check->next = pr.types;
+        pr.types = check;
 
-    // allocate a generic def for the type, so fields can reference it
-    def = malloc(sizeof(def_t));
-    def->name = "COMPLEX TYPE";
-    def->type = check;
-    check->def = def;
-    return check;
+        // allocate a generic def for the type, so fields can reference it
+        def_p def = malloc(sizeof(def_t));
+        def->name = "COMPLEX TYPE";
+        def->type = check;
+        check->def = def;
+        return check;
+    }
 }
 
 
@@ -604,17 +592,15 @@ Parses a variable type, including field and functions types
 char pr_parm_names[MAX_PARMS][MAX_NAME];
 
 type_p PR_ParseType() {
-    type_t new;
-    type_p type;
-    cStr_p name;
-
     if (PR_Check(".")) {
+        type_t new;
         memset(&new, 0, sizeof(new));
         new.type = ev_field;
         new.aux_type = PR_ParseType();
         return PR_FindType(&new);
     }
 
+    type_p type;
     /**/ if (!strcmp(pr_token, "float"))        type = &type_float;
     else if (!strcmp(pr_token, "vector"))       type = &type_vector;
     else if (!strcmp(pr_token, "float"))        type = &type_float;
@@ -630,26 +616,29 @@ type_p PR_ParseType() {
     if (!PR_Check("("))
         return type;
 
-    // function type
-    memset(&new, 0, sizeof(new));
-    new.type = ev_function;
-    new.aux_type = type; // return type
-    new.num_parms = 0;
-    if (!PR_Check(")")) {
-        if (PR_Check("..."))
-            new.num_parms = -1; // variable args
-        else
-            do {
-                type = PR_ParseType();
-                name = PR_ParseName();
-                strcpy(pr_parm_names[new.num_parms], name);
-                new.parm_types[new.num_parms] = type;
-                new.num_parms++;
-            } while (PR_Check(","));
+    {
+        // function type
+        type_t new;
+        memset(&new, 0, sizeof(new));
+        new.type = ev_function;
+        new.aux_type = type; // return type
+        new.num_parms = 0;
+        if (!PR_Check(")")) {
+            if (PR_Check("..."))
+                new.num_parms = -1; // variable args
+            else
+                do {
+                    type = PR_ParseType();
+                    cStr_p name = PR_ParseName();
+                    strcpy(pr_parm_names[new.num_parms], name);
+                    new.parm_types[new.num_parms] = type;
+                    new.num_parms++;
+                } while (PR_Check(","));
 
-        PR_Expect(")");
+            PR_Expect(")");
+        }
+
+        return PR_FindType(&new);
     }
-
-    return PR_FindType(&new);
 }
 

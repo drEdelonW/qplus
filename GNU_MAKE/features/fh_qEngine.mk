@@ -57,6 +57,8 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         $(eval PR_DEF_DIR = $(SIMSTATE_DIR)/Define) $(eval INCLUDES += $(PR_DEF_DIR))
                                 SRC_LIST += $(PR_DEF_DIR)/pr_def.c
 
+                        $(eval QVMC_DIR = $(SRC_DIR)/qcc/QCVM) $(eval INCLUDES += $(QVMC_DIR))
+
                         $(eval GVARS_DIR = $(SIMSTATE_DIR)/GlobVars) $(eval INCLUDES += $(GVARS_DIR))
                                 SRC_LIST += $(GVARS_DIR)/GlobVars.c
 

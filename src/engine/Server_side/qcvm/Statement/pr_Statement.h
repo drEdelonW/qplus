@@ -5,11 +5,11 @@
 #include "types.h"
 #include "assert.h"
 
-typedef uint16_t op_type;   // prog_operation_e // #include "pr_ops.h"
+typedef uint16_t op_type;   // prog_operation_t // #include "pr_ops.h"
 typedef int16_t arg_type;   // should be signed int
 
 typedef struct {
-    op_type     op;    // prog_operation_e
+    op_type     op;    // prog_operation_t
     arg_type    a;
     arg_type    b;
     arg_type    c;

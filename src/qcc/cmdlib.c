@@ -60,7 +60,7 @@ cStr_p COM_Parse(cStr_p data) {
 
     char ch;
 skipwhite:
-while ((ch = *data) <= ' ') {    // skip whitespace
+    while ((ch = *data) <= ' ') {    // skip whitespace
         if (ch == 0) {
             com_eof = true;
             return NULL;   // end of file;
@@ -185,13 +185,10 @@ For abnormal program terminations
 =================
 */
 void Error(cStr_p error, ...) { // TODO: rework it to "va.h"
-    va_list argptr;
-
     printf("\n************ ERROR ************\n");
-
-    va_start(argptr, error);
-    vprintf(error, argptr);
-    va_end(argptr);
+    va_list argptr; va_start(argptr, error); {
+        vprintf(error, argptr);
+    } va_end(argptr);
     printf("\n");
     exit(1);
 }
@@ -295,7 +292,9 @@ void DefaultExtension(cStr_p path, cStr_p extension) {
     // (extension should include the .)
     cStr_p src = path + strlen(path) - 1;
 
-    while ((*src != PATHSEPERATOR) && (src != path)) {
+    while ((*src != PATHSEPERATOR) &&
+        (src != path)
+        ) {
         if (*src == '.')
             return;                 // it has an extension
         src--;
@@ -393,7 +392,7 @@ long ParseHex(cStr_p hex) {
     cStr_p str = hex;
     while (*str) {
         num <<= 4;
-        /**/ if ((*str >= '0') && (*str <= '9'))    num += *str - '0';
+        /**/ if ((*str >= '0') && (*str <= '9'))    num += 0 + *str - '0';
         else if ((*str >= 'a') && (*str <= 'f'))    num += 10 + *str - 'a';
         else if ((*str >= 'A') && (*str <= 'F'))    num += 10 + *str - 'A';
         else    Error("Bad hex number: %s", hex);
