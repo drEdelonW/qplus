@@ -79,7 +79,7 @@ being registered.
 
 void GM_CheckRegistered() {
     Registered = false;
-#if 1
+#if 0
     int h;
     COM_OpenFile("gfx/pop.lmp", &h);
 

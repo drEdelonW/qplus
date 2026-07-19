@@ -116,11 +116,11 @@ void()	Tar_JumpTouch =
 		{
 			ldmg = 10 + 10*random();
 			T_Damage (other, self, self, ldmg);	
-			sound (self, CHAN_WEAPON, "blob/hit1.wav", 1, ATTN_NORM);
+			sound(self, CHAN_WEAPON, "blob/hit1.wav", 1, ATTN_NORM);
 		}
 	}
 	else
-		sound (self, CHAN_WEAPON, "blob/land1.wav", 1, ATTN_NORM);
+		sound(self, CHAN_WEAPON, "blob/land1.wav", 1, ATTN_NORM);
 
 
 	if (!checkbottom(self))
@@ -189,14 +189,14 @@ void()	tbaby_die2	=[	$exp,		tbaby_run1	]
 {
 	T_RadiusDamage (self, self, 120, world);
 
-	sound (self, CHAN_VOICE, "blob/death1.wav", 1, ATTN_NORM);
+	sound(self, CHAN_VOICE, "blob/death1.wav", 1, ATTN_NORM);
 	self.origin = self.origin - 8*normalize(self.velocity);
 
-	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_TAREXPLOSION);
-	WriteCoord (MSG_BROADCAST, self.origin_x);
-	WriteCoord (MSG_BROADCAST, self.origin_y);
-	WriteCoord (MSG_BROADCAST, self.origin_z);
+	WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+	WriteByte(MSG_BROADCAST, TE_TAREXPLOSION);
+	WriteCoord(MSG_BROADCAST, self.origin_x);
+	WriteCoord(MSG_BROADCAST, self.origin_y);
+	WriteCoord(MSG_BROADCAST, self.origin_z);
 	
 	BecomeExplosion ();
 };
@@ -223,9 +223,9 @@ void() monster_tarbaby =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/tarbaby.mdl");
+	setmodel(self, "progs/tarbaby.mdl");
 
-	setsize (self, '-16 -16 -24', '16 16 40');
+	setsize(self, '-16 -16 -24', '16 16 40');
 	self.health = 80;
 
 	self.th_stand = tbaby_stand1;

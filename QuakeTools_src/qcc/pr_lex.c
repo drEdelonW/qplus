@@ -64,14 +64,14 @@ int  type_size[8] = { 1,1,1,3,1,1,1,1 };
 #else
 #include "pr_comp.h"
 const int type_size[ev_LAST] = {
-    1,                          // ev_void,
-    sizeof(string_t) / 4,       // ev_string,
-    1,                          // ev_float,
-    3,                          // ev_vector,
-    1,                          // ev_entity,
-    1,                          // ev_field,
-    sizeof(func_t) / 4,         // ev_function,
-    sizeof(TypeLess_ptr) / 4    // ev_pointer
+    [ev_void]     /**/ = 1,                          // ev_void,
+    [ev_string]   /**/ = sizeof(string_t) / 4,       // ev_string,
+    [ev_float]    /**/ = 1,                          // ev_float,
+    [ev_vector]   /**/ = 3,                          // ev_vector,
+    [ev_entity]   /**/ = 1,                          // ev_entity,
+    [ev_field]    /**/ = 1,                          // ev_field,
+    [ev_function] /**/ = sizeof(func_t) / 4,         // ev_function,
+    [ev_pointer]  /**/ = sizeof(TypeLess_ptr) / 4    // ev_pointer
 };
 #endif
 
@@ -87,15 +87,15 @@ def_t def_pointer   /**/ = { &type_pointer, "temp" };
 def_t def_ret;
 def_t def_parms[MAX_PARMS];
 
-def_p def_for_type[8] = {
-    &def_void,
-    &def_string,
-    &def_float,
-    &def_vector,
-    &def_entity,
-    &def_field,
-    &def_function,
-    &def_pointer
+def_p def_for_type[ev_LAST] = {
+  [ev_void]     /**/ = &def_void,
+  [ev_string]   /**/ = &def_string,
+  [ev_float]    /**/ = &def_float,
+  [ev_vector]   /**/ = &def_vector,
+  [ev_entity]   /**/ = &def_entity,
+  [ev_field]    /**/ = &def_field,
+  [ev_function] /**/ = &def_function,
+  [ev_pointer]  /**/ = &def_pointer
 };
 
 void PR_LexWhitespace();
@@ -108,8 +108,8 @@ PR_PrintNextLine
 */
 void PR_PrintNextLine() {
     printf("%3i:", pr_source_line); {
-    for (cStr_p t = pr_line_start; (*t) && (*t != '\n'); t++)
-        printf("%c", *t);
+        for (cStr_p t = pr_line_start; (*t) && (*t != '\n'); t++)
+            printf("%c", *t);
     } printf("\n");
 }
 
@@ -122,7 +122,7 @@ Call at start of file and when *pr_file_p == '\n'
 */
 void PR_NewLine() {
     bool m = (*pr_file_p == '\n');
-    if (m) {pr_file_p++;} {
+    if (m) { pr_file_p++; } {
 
         pr_source_line++;
         pr_line_start = pr_file_p;

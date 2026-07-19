@@ -60,7 +60,7 @@ cStr_p COM_Parse(cStr_p data) {
 
     char ch;
 skipwhite:
-while ((ch = *data) <= ' ') {    // skip whitespace
+    while ((ch = *data) <= ' ') {    // skip whitespace
         if (ch == 0) {
             com_eof = true;
             return NULL;   // end of file;
@@ -264,7 +264,7 @@ Any_p SafeMalloc(long size) {
 LoadFile
 ==============
 */
-long LoadFile(cStr_p filename, void** bufferptr) {
+long LoadFile(cStr_p filename, cStr_ar bufferptr) {
     int handle = SafeOpenRead(filename);
     long length = filelength(handle);
     Any_p buffer = SafeMalloc(length + 1);
@@ -295,7 +295,9 @@ void DefaultExtension(cStr_p path, cStr_p extension) {
     // (extension should include the .)
     cStr_p src = path + strlen(path) - 1;
 
-    while ((*src != PATHSEPERATOR) && (src != path)) {
+    while ((*src != PATHSEPERATOR) &&
+        (src != path)
+        ) {
         if (*src == '.')
             return;                 // it has an extension
         src--;
@@ -393,9 +395,9 @@ long ParseHex(cStr_p hex) {
     cStr_p str = hex;
     while (*str) {
         num <<= 4;
-        /**/ if ((*str >= '0') && (*str <= '9'))    num += *str - '0';
-        else if ((*str >= 'a') && (*str <= 'f'))    num += 10 + *str - 'a';
-        else if ((*str >= 'A') && (*str <= 'F'))    num += 10 + *str - 'A';
+        /**/ if ((*str >= '0') && (*str <= '9'))    num += 0x0 + *str - '0';
+        else if ((*str >= 'a') && (*str <= 'f'))    num += 0xa + *str - 'a';
+        else if ((*str >= 'A') && (*str <= 'F'))    num += 0xa + *str - 'A';
         else    Error("Bad hex number: %s", hex);
         str++;
     }

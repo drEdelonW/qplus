@@ -103,8 +103,7 @@ void PrintStrings() {
         printf("%5i : ", i);
         for (int j = 0; j < l; j++) {
             if (strings[i + j] == '\n') {
-                putchar('\\');
-                putchar('n');
+                putchar('\\');  putchar('n');
             }
             else
                 putchar(strings[i + j]);
@@ -189,7 +188,7 @@ void WriteData(int crc) {
             (def->type->type != ev_function) &&
             (def->type->type != ev_field) &&
             (def->scope == NULL)
-            )   dd->type |= DEF_SAVEGLOBGAL;
+            )   dd->type |= DEF_SAVEGLOBAL;
         dd->s_name = CopyString(def->name);
         dd->ofs = def->ofs;
     }

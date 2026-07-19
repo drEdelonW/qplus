@@ -54,7 +54,7 @@ void() InitTrigger =
 	if (self.angles != '0 0 0')
 		SetMovedir ();
 	self.solid = SOLID_TRIGGER;
-	setmodel (self, self.model);	// set size and link into world
+	setmodel(self, self.model);	// set size and link into world
 	self.movetype = MOVETYPE_NONE;
 	self.modelindex = 0;
 	self.model = "";
@@ -101,7 +101,7 @@ local float		len, traveltime;
 	vdestdelta = tdest - self.origin;
 	
 // calculate length of vector
-	len = vlen (vdestdelta);
+	len = vlen(vdestdelta);
 	
 // divide by speed to get time to reach dest
 	traveltime = len / tspeed;
@@ -166,7 +166,7 @@ local float		len, traveltime;
 	destdelta = destangle - self.angles;
 	
 // calculate length of vector
-	len = vlen (destdelta);
+	len = vlen(destdelta);
 	
 // divide by speed to get time to reach dest
 	traveltime = len / tspeed;
@@ -202,7 +202,7 @@ void() SUB_CalcAngleMoveDone =
 void() DelayThink =
 {
 	activator = self.enemy;
-	SUB_UseTargets ();
+	SUB_UseTargets();
 	remove(self);
 };
 
@@ -254,7 +254,7 @@ void() SUB_UseTargets =
 	{
 		centerprint (activator, self.message);
 		if (!self.noise)
-			sound (activator, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM);
+			sound(activator, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM);
 	}
 
 //
@@ -268,7 +268,7 @@ void() SUB_UseTargets =
 			t = find (t, targetname, self.killtarget);
 			if (!t)
 				return;
-			remove (t);
+			remove(t);
 		} while ( 1 );
 	}
 	

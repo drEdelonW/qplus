@@ -265,7 +265,7 @@ local float		rs;
 
 	if (damage_attacker.classname == "teledeath")
 	{
-		sound (self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
+		sound(self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
 		return;
 	}
 
@@ -274,9 +274,9 @@ local float		rs;
 	{
 		DeathBubbles(1);
 		if (random() > 0.5)
-			sound (self, CHAN_VOICE, "player/drown1.wav", 1, ATTN_NORM);
+			sound(self, CHAN_VOICE, "player/drown1.wav", 1, ATTN_NORM);
 		else
-			sound (self, CHAN_VOICE, "player/drown2.wav", 1, ATTN_NORM);
+			sound(self, CHAN_VOICE, "player/drown2.wav", 1, ATTN_NORM);
 		return;
 	}
 
@@ -285,18 +285,18 @@ local float		rs;
 	{
 // FIX ME	put in some steam here
 		if (random() > 0.5)
-			sound (self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
+			sound(self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
 		else
-			sound (self, CHAN_VOICE, "player/lburn2.wav", 1, ATTN_NORM);
+			sound(self, CHAN_VOICE, "player/lburn2.wav", 1, ATTN_NORM);
 		return;
 	}
 
 	if (self.watertype == CONTENT_LAVA)
 	{
 		if (random() > 0.5)
-			sound (self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
+			sound(self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
 		else
-			sound (self, CHAN_VOICE, "player/lburn2.wav", 1, ATTN_NORM);
+			sound(self, CHAN_VOICE, "player/lburn2.wav", 1, ATTN_NORM);
 		return;
 	}
 
@@ -313,7 +313,7 @@ local float		rs;
 	if (self.axhitme == 1)
 	{
 		self.axhitme = 0;
-		sound (self, CHAN_VOICE, "player/axhit1.wav", 1, ATTN_NORM);
+		sound(self, CHAN_VOICE, "player/axhit1.wav", 1, ATTN_NORM);
 		return;
 	}
 	
@@ -334,7 +334,7 @@ local float		rs;
 	else
 		self.noise = "player/pain6.wav";
 
-	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+	sound(self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	return;
 };
 
@@ -379,8 +379,8 @@ local entity	bubble;
 	if (self.owner.waterlevel != 3)
 		return;
 	bubble = spawn();
-	setmodel (bubble, "progs/s_bubble.spr");
-	setorigin (bubble, self.owner.origin + '0 0 24');
+	setmodel(bubble, "progs/s_bubble.spr");
+	setorigin(bubble, self.owner.origin + '0 0 24');
 	bubble.movetype = MOVETYPE_NOCLIP;
 	bubble.solid = SOLID_NOT;
 	bubble.velocity = '0 0 15';
@@ -389,7 +389,7 @@ local entity	bubble;
 	bubble.classname = "bubble";
 	bubble.frame = 0;
 	bubble.cnt = 0;
-	setsize (bubble, '-8 -8 -8', '8 8 8');
+	setsize(bubble, '-8 -8 -8', '8 8 8');
 	self.nextthink = time + 0.1;
 	self.think = DeathBubblesSpawn;
 	self.air_finished = self.air_finished + 1;
@@ -402,7 +402,7 @@ void(float num_bubbles) DeathBubbles =
 local entity	bubble_spawner;
 	
 	bubble_spawner = spawn();
-	setorigin (bubble_spawner, self.origin);
+	setorigin(bubble_spawner, self.origin);
 	bubble_spawner.movetype = MOVETYPE_NONE;
 	bubble_spawner.solid = SOLID_NOT;
 	bubble_spawner.nextthink = time + 0.1;
@@ -422,7 +422,7 @@ local float		rs;
 	if (self.waterlevel == 3)
 	{
 		DeathBubbles(20);
-		sound (self, CHAN_VOICE, "player/h2odeath.wav", 1, ATTN_NONE);
+		sound(self, CHAN_VOICE, "player/h2odeath.wav", 1, ATTN_NONE);
 		return;
 	}
 	
@@ -438,7 +438,7 @@ local float		rs;
 	if (rs == 5)
 		self.noise = "player/death5.wav";
 
-	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NONE);
+	sound(self, CHAN_VOICE, self.noise, 1, ATTN_NONE);
 	return;
 };
 
@@ -480,8 +480,8 @@ void(string gibname, float dm) ThrowGib =
 
 	new = spawn();
 	new.origin = self.origin;
-	setmodel (new, gibname);
-	setsize (new, '0 0 0', '0 0 0');
+	setmodel(new, gibname);
+	setsize(new, '0 0 0', '0 0 0');
 	new.velocity = VelocityForDamage (dm);
 	new.movetype = MOVETYPE_BOUNCE;
 	new.solid = SOLID_NOT;
@@ -497,14 +497,14 @@ void(string gibname, float dm) ThrowGib =
 
 void(string gibname, float dm) ThrowHead =
 {
-	setmodel (self, gibname);
+	setmodel(self, gibname);
 	self.frame = 0;
 	self.nextthink = -1;
 	self.movetype = MOVETYPE_BOUNCE;
 	self.takedamage = DAMAGE_NO;
 	self.solid = SOLID_NOT;
 	self.view_ofs = '0 0 8';
-	setsize (self, '-16 -16 0', '16 16 56');
+	setsize(self, '-16 -16 0', '16 16 56');
 	self.velocity = VelocityForDamage (dm);
 	self.origin_z = self.origin_z - 24;
 	self.flags = self.flags - (self.flags & FL_ONGROUND);
@@ -514,29 +514,29 @@ void(string gibname, float dm) ThrowHead =
 
 void() GibPlayer =
 {
-	ThrowHead ("progs/h_player.mdl", self.health);
-	ThrowGib ("progs/gib1.mdl", self.health);
-	ThrowGib ("progs/gib2.mdl", self.health);
-	ThrowGib ("progs/gib3.mdl", self.health);
+	ThrowHead("progs/h_player.mdl", self.health);
+	ThrowGib("progs/gib1.mdl", self.health);
+	ThrowGib("progs/gib2.mdl", self.health);
+	ThrowGib("progs/gib3.mdl", self.health);
 
 	self.deadflag = DEAD_DEAD;
 
 	if (damage_attacker.classname == "teledeath")
 	{
-		sound (self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
+		sound(self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
 		return;
 	}
 
 	if (damage_attacker.classname == "teledeath2")
 	{
-		sound (self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
+		sound(self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
 		return;
 	}
 		
 	if (random() < 0.5)
-		sound (self, CHAN_VOICE, "player/gib.wav", 1, ATTN_NONE);
+		sound(self, CHAN_VOICE, "player/gib.wav", 1, ATTN_NONE);
 	else
-		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NONE);
+		sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NONE);
 };
 
 void() PlayerDie =

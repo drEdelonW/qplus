@@ -30,7 +30,7 @@ $skin skin
 $scale 5
 
 $frame rise1 rise2 rise3 rise4 rise5 rise6 rise7 rise8 rise9 rise10
-$frame rise11 rise12 rise13 rise14 rise15 rise16 rise17 
+$frame rise11 rise12 rise13 rise14 rise15 rise16 rise17
 
 $frame walk1 walk2 walk3 walk4 walk5 walk6 walk7 walk8
 $frame walk9 walk10 walk11 walk12 walk13 walk14 walk15
@@ -45,20 +45,21 @@ $frame attack16 attack17 attack18 attack19 attack20 attack21 attack22
 $frame attack23
 
 $frame shocka1 shocka2 shocka3 shocka4 shocka5 shocka6 shocka7 shocka8
-$frame shocka9 shocka10 
+$frame shocka9 shocka10
 
 $frame shockb1 shockb2 shockb3 shockb4 shockb5 shockb6
 
-$frame shockc1 shockc2 shockc3 shockc4 shockc5 shockc6 shockc7 shockc8 
+$frame shockc1 shockc2 shockc3 shockc4 shockc5 shockc6 shockc7 shockc8
 $frame shockc9 shockc10
 
 
 void(vector p) boss_missile;
 
 void() boss_face = {
-
-// go for another player if multi player
-    if ((self.enemy.health <= 0) || (random() < 0.02)) {
+    // go for another player if multi player
+    if ((self.enemy.health <= 0) ||
+        (random() < 0.02)
+        ) {
         self.enemy = find(self.enemy, classname, "player");
         if (!self.enemy)
             self.enemy = find(self.enemy, classname, "player");
@@ -66,8 +67,8 @@ void() boss_face = {
     ai_face();
 };
 
-void() boss_rise1 =[ $rise1, boss_rise2 ] { sound (self, CHAN_WEAPON, "boss1/out1.wav", 1, ATTN_NORM); };
-void() boss_rise2 =[ $rise2, boss_rise3 ] { sound (self, CHAN_VOICE, "boss1/sight1.wav", 1, ATTN_NORM); };
+void() boss_rise1 =[ $rise1, boss_rise2 ] { sound(self, CHAN_WEAPON, "boss1/out1.wav", 1, ATTN_NORM); };
+void() boss_rise2 =[ $rise2, boss_rise3 ] { sound(self, CHAN_VOICE, "boss1/sight1.wav", 1, ATTN_NORM); };
 void() boss_rise3 =[ $rise3, boss_rise4 ] {};
 void() boss_rise4 =[ $rise4, boss_rise5 ] {};
 void() boss_rise5 =[ $rise5, boss_rise6 ] {};
@@ -173,7 +174,7 @@ void() boss_shockc8 =[ $shockc8, boss_shockc9 ] {};
 void() boss_shockc9 =[ $shockc9, boss_shockc10 ] {};
 void() boss_shockc10 =[ $shockc10, boss_death1 ] {};
 
-void() boss_death1 = [$death1, boss_death2] { sound (self, CHAN_VOICE, "boss1/death.wav", 1, ATTN_NORM); };
+void() boss_death1 = [$death1, boss_death2] { sound(self, CHAN_VOICE, "boss1/death.wav", 1, ATTN_NORM); };
 void() boss_death2 = [$death2, boss_death3] {};
 void() boss_death3 = [$death3, boss_death4] {};
 void() boss_death4 = [$death4, boss_death5] {};
@@ -182,19 +183,19 @@ void() boss_death6 = [$death6, boss_death7] {};
 void() boss_death7 = [$death7, boss_death8] {};
 void() boss_death8 = [$death8, boss_death9] {};
 void() boss_death9 = [$death9, boss_death10] {
-    sound (self, CHAN_BODY, "boss1/out1.wav", 1, ATTN_NORM);
-    WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-    WriteByte (MSG_BROADCAST, TE_LAVASPLASH);
-    WriteCoord (MSG_BROADCAST, self.origin_x);
-    WriteCoord (MSG_BROADCAST, self.origin_y);
-    WriteCoord (MSG_BROADCAST, self.origin_z);
+    sound(self, CHAN_BODY, "boss1/out1.wav", 1, ATTN_NORM);
+    WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+    WriteByte(MSG_BROADCAST, TE_LAVASPLASH);
+    WriteCoord(MSG_BROADCAST, self.origin_x);
+    WriteCoord(MSG_BROADCAST, self.origin_y);
+    WriteCoord(MSG_BROADCAST, self.origin_z);
 };
 
 void() boss_death10 = [$death9, boss_death10] {
     killed_monsters = killed_monsters + 1;
-    WriteByte (MSG_ALL, SVC_KILLEDMONSTER); // FIXME: reliable broadcast
-    SUB_UseTargets ();
-    remove (self);
+    WriteByte(MSG_ALL, SVC_KILLEDMONSTER); // FIXME: reliable broadcast
+    SUB_UseTargets();
+    remove(self);
 };
 
 void(vector p) boss_missile = {
@@ -202,7 +203,7 @@ void(vector p) boss_missile = {
     local vector org, vec, d;
     local float t;
 
-    offang = vectoangles(self.enemy.origin - self.origin); 
+    offang = vectoangles(self.enemy.origin - self.origin);
     makevectors(offang);
 
     org = self.origin + p_x*v_forward + p_y*v_right + p_z*'0 0 1';
@@ -222,7 +223,7 @@ void(vector p) boss_missile = {
     launch_spike(org, vec);
     setmodel(newmis, "progs/lavaball.mdl");
     newmis.avelocity = '200 100 300';
-    setsize(newmis, VEC_ORIGIN, VEC_ORIGIN);  
+    setsize(newmis, VEC_ORIGIN, VEC_ORIGIN);
     newmis.velocity = vec*300;
     newmis.touch = T_MissileTouch; // rocket explosion
     sound(self, CHAN_WEAPON, "boss1/throw.wav", 1, ATTN_NORM);
@@ -295,13 +296,13 @@ void() lightning_fire = {
         door_go_down ();
         return;
     }
-    
+
     p1 = (le1.mins + le1.maxs) * 0.5;
     p1_z = le1.absmin_z - 16;
-    
+
     p2 = (le2.mins + le2.maxs) * 0.5;
     p2_z = le2.absmin_z - 16;
-    
+
     // compensate for length of bolt
     p2 = p2 - normalize(p2-p1)*100;
 
@@ -345,20 +346,22 @@ void() lightning_use = {
     lightning_end = time + 1;
 
     sound(self, CHAN_VOICE, "misc/power.wav", 1, ATTN_NORM);
-    lightning_fire ();  
+    lightning_fire();
 
-// advance the boss pain if down
+    // advance the boss pain if down
     self = find(world, classname, "monster_boss");
     if (!self)
         return;
     self.enemy = activator;
-    if ((le1.state == STATE_TOP) && (self.health > 0)) {
+    if ((le1.state == STATE_TOP) &&
+        (self.health > 0)
+        ) {
         sound(self, CHAN_VOICE, "boss1/pain.wav", 1, ATTN_NORM);
         self.health = self.health - 1;
         /**/ if (self.health >= 2)      boss_shocka1();
         else if (self.health == 1)      boss_shockb1();
         else if (self.health == 0)      boss_shockc1();
-    } 
+    }
 };
 
 

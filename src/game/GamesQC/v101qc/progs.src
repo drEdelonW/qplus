@@ -1,4 +1,4 @@
-../progs.dat
+/Users/edelon/SelfLab/rnd/quake/GNU_MAKE/OUTPUT/v101qc/progs.dat
 
 defs.qc
 subs.qc
@@ -16,7 +16,6 @@ buttons.qc
 triggers.qc
 plats.qc
 misc.qc
-
 ogre.qc
 demon.qc
 shambler.qc
@@ -26,10 +25,9 @@ wizard.qc
 dog.qc
 zombie.qc
 boss.qc
-
-tarbaby.qc		// registered
-hknight.qc		// registered
-fish.qc			// registered
-shalrath.qc		// registered
-enforcer.qc		// registered
-oldone.qc		// registered
+tarbaby.qc
+hknight.qc
+fish.qc
+shalrath.qc
+enforcer.qc
+oldone.qc

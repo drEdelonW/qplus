@@ -36,7 +36,7 @@ typedef enum {
 } etype_t;
 #else
 typedef enum {
-    ev_void     = 0u,
+    ev_void = 0u,
     ev_string,
     ev_float,
     ev_vector,
@@ -173,12 +173,11 @@ typedef struct {
     uint16_t    type; // [etype_t] if DEF_SAVEGLOBAL bit is set the variable needs to be saved in savegames
     uint16_t    ofs;
     string_t    s_name;
-} ddef_t;       STATIC_ASSERT_SIZE(ddef_t, 2*2 + 4); 
+} ddef_t;       STATIC_ASSERT_SIZE(ddef_t, 2*2 + 4);
 typedef ddef_t* ddef_p;
-#define DEF_SAVEGLOBGAL (1<<15)
+// #define DEF_SAVEGLOBAL (1 << 15)
 
 #define MAX_PARMS 8
-
 typedef struct {
     int  first_statement; // negative numbers are builtins
     int  parm_start;
@@ -200,7 +199,7 @@ typedef struct {
     int  version;
     int  crc;   // check of header file
 
-// lumps
+    // lumps
     int  ofs_statements;
     int  numstatements; // statement 0 is an error
 

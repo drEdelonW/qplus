@@ -57,11 +57,11 @@ void() multi_trigger =
 		if (self.enemy.classname != "player")
 			return;
 		found_secrets = found_secrets + 1;
-		WriteByte (MSG_ALL, SVC_FOUNDSECRET);
+		WriteByte(MSG_ALL, SVC_FOUNDSECRET);
 	}
 
 	if (self.noise)
-		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+		sound(self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 
 // don't trigger again until reset
 	self.takedamage = DAMAGE_NO;
@@ -76,7 +76,7 @@ void() multi_trigger =
 		self.nextthink = time + self.wait;
 	}
 	else
-	{	// we can't just remove (self) here, because this is a touch function
+	{	// we can't just remove(self) here, because this is a touch function
 		// called wheil C code is looping through area links...
 		self.touch = SUB_Null;
 		self.nextthink = time + 0.1;
@@ -130,17 +130,17 @@ void() trigger_multiple =
 {
 	if (self.sounds == 1)
 	{
-		precache_sound ("misc/secret.wav");
+		precache_sound("misc/secret.wav");
 		self.noise = "misc/secret.wav";
 	}
 	else if (self.sounds == 2)
 	{
-		precache_sound ("misc/talk.wav");
+		precache_sound("misc/talk.wav");
 		self.noise = "misc/talk.wav";
 	}
 	else if (self.sounds == 3)
 	{
-		precache_sound ("misc/trigger1.wav");
+		precache_sound("misc/trigger1.wav");
 		self.noise = "misc/trigger1.wav";
 	}
 	
@@ -158,7 +158,7 @@ void() trigger_multiple =
 		self.th_die = multi_killed;
 		self.takedamage = DAMAGE_YES;
 		self.solid = SOLID_BBOX;
-		setorigin (self, self.origin);	// make sure it links into the world
+		setorigin(self, self.origin);	// make sure it links into the world
 	}
 	else
 	{
@@ -222,12 +222,12 @@ void() trigger_secret =
 	
 	if (self.sounds == 1)
 	{
-		precache_sound ("misc/secret.wav");
+		precache_sound("misc/secret.wav");
 		self.noise = "misc/secret.wav";
 	}
 	else if (self.sounds == 2)
 	{
-		precache_sound ("misc/talk.wav");
+		precache_sound("misc/talk.wav");
 		self.noise = "misc/talk.wav";
 	}
 
@@ -314,22 +314,22 @@ void() play_teleport =
 	else
 		tmpstr = "misc/r_tele5.wav";
 
-	sound (self, CHAN_VOICE, tmpstr, 1, ATTN_NORM);
-	remove (self);
+	sound(self, CHAN_VOICE, tmpstr, 1, ATTN_NORM);
+	remove(self);
 };
 
 void(vector org) spawn_tfog =
 {
-	s = spawn ();
+	s = spawn();
 	s.origin = org;
 	s.nextthink = time + 0.2;
 	s.think = play_teleport;
 
-	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_TELEPORT);
-	WriteCoord (MSG_BROADCAST, org_x);
-	WriteCoord (MSG_BROADCAST, org_y);
-	WriteCoord (MSG_BROADCAST, org_z);
+	WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+	WriteByte(MSG_BROADCAST, TE_TELEPORT);
+	WriteCoord(MSG_BROADCAST, org_x);
+	WriteCoord(MSG_BROADCAST, org_y);
+	WriteCoord(MSG_BROADCAST, org_z);
 };
 
 
@@ -367,8 +367,8 @@ local entity	death;
 	death.movetype = MOVETYPE_NONE;
 	death.solid = SOLID_TRIGGER;
 	death.angles = '0 0 0';
-	setsize (death, death_owner.mins - '1 1 1', death_owner.maxs + '1 1 1');
-	setorigin (death, org);
+	setsize(death, death_owner.mins - '1 1 1', death_owner.maxs + '1 1 1');
+	setorigin(death, org);
 	death.touch = tdeath_touch;
 	death.nextthink = time + 0.2;
 	death.think = SUB_Remove;
@@ -400,7 +400,7 @@ local vector	org;
 	if (other.health <= 0 || other.solid != SOLID_SLIDEBOX)
 		return;
 
-	SUB_UseTargets ();
+	SUB_UseTargets();
 
 // put a tfog where the player was
 	spawn_tfog (other.origin);
@@ -424,7 +424,7 @@ local vector	org;
 		return;
 	}
 
-	setorigin (other, t.origin);
+	setorigin(other, t.origin);
 	other.angles = t.mangle;
 	if (other.classname == "player")
 	{
@@ -476,7 +476,7 @@ void() trigger_teleport =
 
 	if (!(self.spawnflags & SILENT))
 	{
-		precache_sound ("ambience/hum1.wav");
+		precache_sound("ambience/hum1.wav");
 		o = (self.mins + self.maxs)*0.5;
 		ambientsound (o, "ambience/hum1.wav",0.5 , ATTN_STATIC);
 	}
@@ -528,15 +528,15 @@ void() trigger_onlyregistered_touch =
 	if (cvar("registered"))
 	{
 		self.message = "";
-		SUB_UseTargets ();
-		remove (self);
+		SUB_UseTargets();
+		remove(self);
 	}
 	else
 	{
 		if (self.message != "")
 		{
 			centerprint (other, self.message);
-			sound (other, CHAN_BODY, "misc/talk.wav", 1, ATTN_NORM);
+			sound(other, CHAN_BODY, "misc/talk.wav", 1, ATTN_NORM);
 		}
 	}
 };
@@ -546,7 +546,7 @@ Only fires if playing the registered version, otherwise prints the message
 */
 void() trigger_onlyregistered =
 {
-	precache_sound ("misc/talk.wav");
+	precache_sound("misc/talk.wav");
 	InitTrigger ();
 	self.touch = trigger_onlyregistered_touch;
 };
@@ -601,7 +601,7 @@ void() trigger_push_touch =
 			if (other.fly_sound < time)
 			{
 				other.fly_sound = time + 1.5;
-				sound (other, CHAN_AUTO, "ambience/windfly.wav", 1, ATTN_NORM);
+				sound(other, CHAN_AUTO, "ambience/windfly.wav", 1, ATTN_NORM);
 			}
 		}
 	}
@@ -616,7 +616,7 @@ Pushes the player
 void() trigger_push =
 {
 	InitTrigger ();
-	precache_sound ("ambience/windfly.wav");
+	precache_sound("ambience/windfly.wav");
 	self.touch = trigger_push_touch;
 	if (!self.speed)
 		self.speed = 1000;

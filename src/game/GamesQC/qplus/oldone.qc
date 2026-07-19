@@ -139,9 +139,9 @@ void() finale_1 =
 	pl = find (world, classname, "misc_teleporttrain");
 	if (!pl)
 		error ("no teleporttrain");
-	remove (pl);
+	remove(pl);
 
-	WriteByte (MSG_ALL, SVC_FINALE);
+	WriteByte(MSG_ALL, SVC_FINALE);
 	WriteString (MSG_ALL, "");
 
 	pl = find (world, classname, "player");
@@ -156,7 +156,7 @@ void() finale_1 =
 		pl.solid = SOLID_NOT;
 		pl.movetype = MOVETYPE_NONE;
 		pl.modelindex = 0;
-		setorigin (pl, pos.origin);
+		setorigin(pl, pos.origin);
 		pl = find (pl, classname, "player");
 	}	
 	
@@ -176,13 +176,13 @@ void() finale_2 =
 	// start a teleport splash inside shub
 
 	o = shub.origin - '0 100 0';
-	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_TELEPORT);
-	WriteCoord (MSG_BROADCAST, o_x);
-	WriteCoord (MSG_BROADCAST, o_y);
-	WriteCoord (MSG_BROADCAST, o_z);
+	WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+	WriteByte(MSG_BROADCAST, TE_TELEPORT);
+	WriteCoord(MSG_BROADCAST, o_x);
+	WriteCoord(MSG_BROADCAST, o_y);
+	WriteCoord(MSG_BROADCAST, o_z);
 
-	sound (shub, CHAN_VOICE, "misc/r_tele1.wav", 1, ATTN_NORM);
+	sound(shub, CHAN_VOICE, "misc/r_tele1.wav", 1, ATTN_NORM);
 	
 	self.nextthink = time + 2;
 	self.think = finale_3;
@@ -192,7 +192,7 @@ void() finale_3 =
 {
 	// start shub thrashing wildly
 	shub.think = old_thrash1;
-	sound (shub, CHAN_VOICE, "boss2/death.wav", 1, ATTN_NORM);
+	sound(shub, CHAN_VOICE, "boss2/death.wav", 1, ATTN_NORM);
 	lightstyle(0, "abcdefghijklmlkjihgfedcb");	
 };
 
@@ -204,7 +204,7 @@ void() finale_4 =
 	local	float	r;
 	local entity	n;
 
-	sound (self, CHAN_VOICE, "boss2/pop2.wav", 1, ATTN_NORM);
+	sound(self, CHAN_VOICE, "boss2/pop2.wav", 1, ATTN_NORM);
 	
 	oldo = self.origin;
 
@@ -223,11 +223,11 @@ void() finale_4 =
 
 				r = random();
 				if (r < 0.3)				
-					ThrowGib ("progs/gib1.mdl", -999);
+					ThrowGib("progs/gib1.mdl", -999);
 				else if (r < 0.6)
-					ThrowGib ("progs/gib2.mdl", -999);
+					ThrowGib("progs/gib2.mdl", -999);
 				else
-					ThrowGib ("progs/gib3.mdl", -999);
+					ThrowGib("progs/gib3.mdl", -999);
 				y = y + 32;
 			}
 			x = x + 32;
@@ -235,23 +235,23 @@ void() finale_4 =
 		z = z + 96;
 	}
 	// start the end text
-	WriteByte (MSG_ALL, SVC_FINALE);
+	WriteByte(MSG_ALL, SVC_FINALE);
 	WriteString (MSG_ALL, "Congratulations and well done! You have\nbeaten the hideous Shub-Niggurath, and\nher hundreds of ugly changelings and\nmonsters. You have proven that your\nskill and your cunning are greater than\nall the powers of Quake. You are the\nmaster now. Id Software salutes you.");
 
 // put a player model down
 	n = spawn();
-	setmodel (n, "progs/player.mdl");
+	setmodel(n, "progs/player.mdl");
 	oldo = oldo - '32 264 0';
-	setorigin (n, oldo);
+	setorigin(n, oldo);
 	n.angles = '0 290 0';
 	n.frame = 1;
 
-	remove (self);
+	remove(self);
 
 // switch cd track
-	WriteByte (MSG_ALL, SVC_CDTRACK);
-	WriteByte (MSG_ALL, 3);
-	WriteByte (MSG_ALL, 3);
+	WriteByte(MSG_ALL, SVC_CDTRACK);
+	WriteByte(MSG_ALL, 3);
+	WriteByte(MSG_ALL, 3);
 	lightstyle(0, "m");	
 };
 
@@ -278,8 +278,8 @@ void() monster_oldone =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 	
-	setmodel (self, "progs/oldone.mdl");
-	setsize (self, '-160 -128 -24', '160 128 256');
+	setmodel(self, "progs/oldone.mdl");
+	setsize(self, '-160 -128 -24', '160 128 256');
 
 	self.health = 40000;		// kill by telefrag
 	self.think = old_idle1;

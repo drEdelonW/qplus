@@ -57,12 +57,12 @@ void() plat_spawn_inside_trigger =
 		tmax_y = tmin_y + 1;
 	}
 	
-	setsize (trigger, tmin, tmax);
+	setsize(trigger, tmin, tmax);
 };
 
 void() plat_hit_top =
 {
-	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
+	sound(self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.state = STATE_TOP;
 	self.think = plat_go_down;
 	self.nextthink = self.ltime + 3;
@@ -70,20 +70,20 @@ void() plat_hit_top =
 
 void() plat_hit_bottom =
 {
-	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
+	sound(self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.state = STATE_BOTTOM;
 };
 
 void() plat_go_down =
 {
-	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+	sound(self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	self.state = STATE_DOWN;
 	SUB_CalcMove (self.pos2, self.speed, plat_hit_bottom);
 };
 
 void() plat_go_up =
 {
-	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+	sound(self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	self.state = STATE_UP;
 	SUB_CalcMove (self.pos1, self.speed, plat_hit_top);
 };
@@ -178,16 +178,16 @@ local entity t;
 
 	if (self.sounds == 1)
 	{
-		precache_sound ("plats/plat1.wav");
-		precache_sound ("plats/plat2.wav");
+		precache_sound("plats/plat1.wav");
+		precache_sound("plats/plat2.wav");
 		self.noise = "plats/plat1.wav";
 		self.noise1 = "plats/plat2.wav";
 	}
 
 	if (self.sounds == 2)
 	{
-		precache_sound ("plats/medplat1.wav");
-		precache_sound ("plats/medplat2.wav");
+		precache_sound("plats/medplat1.wav");
+		precache_sound("plats/medplat2.wav");
 		self.noise = "plats/medplat1.wav";
 		self.noise1 = "plats/medplat2.wav";
 	}
@@ -199,9 +199,9 @@ local entity t;
 	self.classname = "plat";
 	self.solid = SOLID_BSP;
 	self.movetype = MOVETYPE_PUSH;
-	setorigin (self, self.origin);	
-	setmodel (self, self.model);
-	setsize (self, self.mins , self.maxs);
+	setorigin(self, self.origin);	
+	setmodel(self, self.model);
+	setsize(self, self.mins , self.maxs);
 
 	self.blocked = plat_crush;
 	if (!self.speed)
@@ -226,7 +226,7 @@ local entity t;
 	}
 	else
 	{
-		setorigin (self, self.pos2);
+		setorigin(self, self.pos2);
 		self.state = STATE_BOTTOM;
 	}
 };
@@ -255,7 +255,7 @@ void() train_wait =
 	if (self.wait)
 	{
 		self.nextthink = self.ltime + self.wait;
-		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+		sound(self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	}
 	else
 		self.nextthink = self.ltime + 0.1;
@@ -275,7 +275,7 @@ void() train_next =
 		self.wait = targ.wait;
 	else
 		self.wait = 0;
-	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
+	sound(self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	SUB_CalcMove (targ.origin - self.mins, self.speed, train_wait);
 };
 
@@ -286,7 +286,7 @@ void() func_train_find =
 
 	targ = find (world, targetname, self.target);
 	self.target = targ.target;
-	setorigin (self, targ.origin - self.mins);
+	setorigin(self, targ.origin - self.mins);
 	if (!self.targetname)
 	{	// not triggered, so start immediately
 		self.nextthink = self.ltime + 0.1;
@@ -317,17 +317,17 @@ void() func_train =
 	if (self.sounds == 0)
 	{
 		self.noise = ("misc/null.wav");
-		precache_sound ("misc/null.wav");
+		precache_sound("misc/null.wav");
 		self.noise1 = ("misc/null.wav");
-		precache_sound ("misc/null.wav");
+		precache_sound("misc/null.wav");
 	}
 
 	if (self.sounds == 1)
 	{
 		self.noise = ("plats/train2.wav");
-		precache_sound ("plats/train2.wav");
+		precache_sound("plats/train2.wav");
 		self.noise1 = ("plats/train1.wav");
-		precache_sound ("plats/train1.wav");
+		precache_sound("plats/train1.wav");
 	}
 
 	self.cnt = 1;
@@ -337,9 +337,9 @@ void() func_train =
 	self.use = train_use;
 	self.classname = "train";
 
-	setmodel (self, self.model);
-	setsize (self, self.mins , self.maxs);
-	setorigin (self, self.origin);
+	setmodel(self, self.model);
+	setsize(self, self.mins , self.maxs);
+	setorigin(self, self.origin);
 
 // start trains on the second frame, to make sure their targets have had
 // a chance to spawn
@@ -365,14 +365,14 @@ void() misc_teleporttrain =
 	self.avelocity = '100 200 300';
 
 	self.noise = ("misc/null.wav");
-	precache_sound ("misc/null.wav");
+	precache_sound("misc/null.wav");
 	self.noise1 = ("misc/null.wav");
-	precache_sound ("misc/null.wav");
+	precache_sound("misc/null.wav");
 
 	precache_model2 ("progs/teleport.mdl");
-	setmodel (self, "progs/teleport.mdl");
-	setsize (self, self.mins , self.maxs);
-	setorigin (self, self.origin);
+	setmodel(self, "progs/teleport.mdl");
+	setsize(self, self.mins , self.maxs);
+	setorigin(self, self.origin);
 
 // start trains on the second frame, to make sure their targets have had
 // a chance to spawn

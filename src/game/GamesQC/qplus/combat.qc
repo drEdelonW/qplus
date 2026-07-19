@@ -80,7 +80,7 @@ void(entity targ, entity attacker) Killed = {
     // bump the monster counter
     if (self.flags & FL_MONSTER) {
         killed_monsters = killed_monsters + 1;
-        WriteByte (MSG_ALL, SVC_KILLEDMONSTER);
+        WriteByte(MSG_ALL, SVC_KILLEDMONSTER);
     }
 
     ClientObituary(self, attacker);
@@ -151,7 +151,7 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_Damage= {
         return;
     if (targ.invincible_finished >= time) {
         if (self.invincible_sound < time) {
-            sound (targ, CHAN_ITEM, "items/protect3.wav", 1, ATTN_NORM);
+            sound(targ, CHAN_ITEM, "items/protect3.wav", 1, ATTN_NORM);
             self.invincible_sound = time + 2;
         }
         return;
@@ -243,7 +243,7 @@ void(entity attacker, float damage) T_BeamDamage = {
 
     while (head) {
         if (head.takedamage) {
-            points = 0.5*vlen (attacker.origin - head.origin);
+            points = 0.5*vlen(attacker.origin - head.origin);
             if (points < 0)             points = 0;
             points = damage - points;
             if (head == attacker)       points = points * 0.5;

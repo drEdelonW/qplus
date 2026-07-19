@@ -60,7 +60,7 @@ void() button_fire = {
 
 void() button_use = {
     self.enemy = activator;
-    button_fire ();
+    button_fire();
 };
 
 void() button_touch = {
@@ -97,27 +97,27 @@ void() func_button = {
 local float  gtemp, ftemp;
 
     if (self.sounds == 0) {
-        precache_sound ("buttons/airbut1.wav");
+        precache_sound("buttons/airbut1.wav");
         self.noise = "buttons/airbut1.wav";
     }
     if (self.sounds == 1) {
-        precache_sound ("buttons/switch21.wav");
+        precache_sound("buttons/switch21.wav");
         self.noise = "buttons/switch21.wav";
     }
     if (self.sounds == 2) {
-        precache_sound ("buttons/switch02.wav");
+        precache_sound("buttons/switch02.wav");
         self.noise = "buttons/switch02.wav";
     }
     if (self.sounds == 3) {
-        precache_sound ("buttons/switch04.wav");
+        precache_sound("buttons/switch04.wav");
         self.noise = "buttons/switch04.wav";
     }
 
-    SetMovedir ();
+    SetMovedir();
 
     self.movetype = MOVETYPE_PUSH;
     self.solid = SOLID_BSP;
-    setmodel (self, self.model);
+    setmodel(self, self.model);
 
     self.blocked = button_blocked;
     self.use = button_use;

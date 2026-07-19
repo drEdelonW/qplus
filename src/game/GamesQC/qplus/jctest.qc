@@ -27,7 +27,7 @@ dprint ("here\n\n");
 */
 void() trigger_jctest =
 {
-	setsize (self, self.mins, self.maxs);
+	setsize(self, self.mins, self.maxs);
 	self.solid = SOLID_EDGE;
 	self.touch = jctrig;
 };

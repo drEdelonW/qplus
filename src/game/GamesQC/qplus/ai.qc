@@ -126,9 +126,10 @@ local entity temp;
     self = other;
     other = temp;
 
-    if (self.classname == "monster_ogre")       sound(self, CHAN_VOICE, "ogre/ogdrag.wav", 1, ATTN_IDLE);// play chainsaw drag sound
+    if (self.classname == "monster_ogre")
+        sound(self, CHAN_VOICE, "ogre/ogdrag.wav", 1, ATTN_IDLE);// play chainsaw drag sound
 
-//dprint ("t_movetarget\n");
+    // dprint ("t_movetarget\n");
     self.goalentity = self.movetarget = find(world, targetname, other.target);
     self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
     if (!self.movetarget) {
@@ -155,7 +156,7 @@ returns the range catagorization of an entity reletive to self
 */
 float(entity targ) range = {
 local vector spot1, spot2;
-local float  r; 
+local float  r;
     spot1 = self.origin + self.view_ofs;
     spot2 = targ.origin + targ.view_ofs;
 
@@ -224,8 +225,8 @@ Called every 0.1 sec by monsters
 void() ChangeYaw = {
     local float  ideal, move;
 
-//current_yaw = self.ideal_yaw;
-// mod down the current angle
+    //current_yaw = self.ideal_yaw;
+    // mod down the current angle
     current_yaw = anglemod(self.angles_y );
     ideal = self.ideal_yaw;
 
@@ -279,10 +280,10 @@ local float rsnd;
     else if (self.classname == "monster_vomit")         sound(self, CHAN_VOICE, "vomitus/v_sight1.wav", 1, ATTN_NORM);
     else if (self.classname == "monster_enforcer") {
         rsnd = rint(random() * 3);
-        /**/ if (rsnd == 1)     sound(self, CHAN_VOICE, "enforcer/sight1.wav", 1, ATTN_NORM);
-        else if (rsnd == 2)     sound(self, CHAN_VOICE, "enforcer/sight2.wav", 1, ATTN_NORM);
-        else if (rsnd == 0)     sound(self, CHAN_VOICE, "enforcer/sight3.wav", 1, ATTN_NORM);
-        else                    sound(self, CHAN_VOICE, "enforcer/sight4.wav", 1, ATTN_NORM);
+        /**/ if (rsnd == 1)                             sound(self, CHAN_VOICE, "enforcer/sight1.wav", 1, ATTN_NORM);
+        else if (rsnd == 2)                             sound(self, CHAN_VOICE, "enforcer/sight2.wav", 1, ATTN_NORM);
+        else if (rsnd == 0)                             sound(self, CHAN_VOICE, "enforcer/sight3.wav", 1, ATTN_NORM);
+        else                                            sound(self, CHAN_VOICE, "enforcer/sight4.wav", 1, ATTN_NORM);
     }
     else if (self.classname == "monster_army")          sound(self, CHAN_VOICE, "soldier/sight1.wav", 1, ATTN_NORM);
     else if (self.classname == "monster_shalrath")      sound(self, CHAN_VOICE, "shalrath/sight.wav", 1, ATTN_NORM);
@@ -321,12 +322,12 @@ float() FindTarget = {
     local entity client;
     local float  r;
 
-// if the first spawnflag bit is set, the monster will only wake up on
-// really seeing the player, not another monster getting angry
+    // if the first spawnflag bit is set, the monster will only wake up on
+    // really seeing the player, not another monster getting angry
 
-// spawnflags & 3 is a big hack, because zombie crucified used the first
-// spawn flag prior to the ambush flag, and I forgot about it, so the second
-// spawn flag works as well
+    // spawnflags & 3 is a big hack, because zombie crucified used the first
+    // spawn flag prior to the ambush flag, and I forgot about it, so the second
+    // spawn flag works as well
     if ((sight_entity_time >= (time - 0.1)) &&
         !(self.spawnflags & 3)
         ) {
@@ -346,10 +347,14 @@ float() FindTarget = {
     if (!visible (client))      return FALSE;
 
     /**/ if (r == RANGE_NEAR) {
-        if ((client.show_hostile < time) && !infront(client))           return FALSE;
+        if ((client.show_hostile < time) &&
+            !infront(client)
+            )   return FALSE;
     }
     else if (r == RANGE_MID) {
-        if ( /* (client.show_hostile < time) || */ !infront(client))    return FALSE;
+        if ( /* (client.show_hostile < time) || */
+            !infront(client)
+            )    return FALSE;
     }
 
 // got one
@@ -387,7 +392,7 @@ stagger back a bit
 =============
 */
 void(float dist) ai_pain = {
-    ai_back (dist);
+    ai_back(dist);
 /*
     local float away;
 
@@ -490,7 +495,7 @@ void(vector dest3) ChooseTurn = {
     }
 
     dir_z = 0;
-    self.ideal_yaw = vectoyaw(dir); 
+    self.ideal_yaw = vectoyaw(dir);
 };
 
 /*
@@ -502,8 +507,9 @@ FacingIdeal
 float() FacingIdeal = {
     local float delta;
     delta = anglemod(self.angles_y - self.ideal_yaw);
-    if ((delta > 45) && (delta < 315))
-        return FALSE;
+    if ((delta > 45) &&
+        (delta < 315)
+        )   return FALSE;
     return TRUE;
 };
 
@@ -595,9 +601,9 @@ void(float dist) ai_run = {
     local vector delta;
     local float axis;
     local float direct, ang_rint, ang_floor, ang_ceil;
-    
+
     movedist = dist;
-// see if the enemy is dead
+    // see if the enemy is dead
     if (self.enemy.health <= 0) {
         self.enemy = world;
     // FIXME: look all around for other targets
@@ -613,13 +619,15 @@ void(float dist) ai_run = {
 
     self.show_hostile = time + 1;  // wake up other monsters
 
-// check knowledge of enemy
+    // check knowledge of enemy
     enemy_vis = visible(self.enemy);
     if (enemy_vis)
         self.search_time = time + 5;
 
-// look for other coop players
-    if (coop && self.search_time < time) {
+    // look for other coop players
+    if (coop &&
+        (self.search_time < time)
+        ) {
         if (FindTarget ())
             return;
     }
@@ -627,14 +635,14 @@ void(float dist) ai_run = {
     enemy_infront = infront(self.enemy);
     enemy_range = range(self.enemy);
     enemy_yaw = vectoyaw(self.enemy.origin - self.origin);
-    
+
     if (self.attack_state == AS_MISSILE) {
-//dprint ("ai_run_missile\n");
+    //    dprint ("ai_run_missile\n");
         ai_run_missile();
         return;
     }
     if (self.attack_state == AS_MELEE) {
-//dprint ("ai_run_melee\n");
+    //    dprint ("ai_run_melee\n");
         ai_run_melee();
         return;
     }
@@ -646,8 +654,8 @@ void(float dist) ai_run = {
         ai_run_slide();
         return;
     }
-        
-// head straight in
+
+    // head straight in
     movetogoal(dist);  // done in C code...
 };
 

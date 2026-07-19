@@ -632,7 +632,7 @@ void() PlayerDeathThink = {
     local float  forward;
 
     if ((self.flags & FL_ONGROUND)) {
-        forward = vlen (self.velocity);
+        forward = vlen(self.velocity);
         forward = forward - 20;
         if (forward <= 0)   self.velocity = '0 0 0';
         else                self.velocity = forward * normalize(self.velocity);

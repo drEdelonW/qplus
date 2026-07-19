@@ -69,7 +69,7 @@ void() Laser_Touch =
 		return;
 	}
 	
-	sound (self, CHAN_WEAPON, "enforcer/enfstop.wav", 1, ATTN_STATIC);
+	sound(self, CHAN_WEAPON, "enforcer/enfstop.wav", 1, ATTN_STATIC);
 	org = self.origin - 8*normalize(self.velocity);
 
 	if (other.health)
@@ -79,11 +79,11 @@ void() Laser_Touch =
 	}
 	else
 	{
-		WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-		WriteByte (MSG_BROADCAST, TE_GUNSHOT);
-		WriteCoord (MSG_BROADCAST, org_x);
-		WriteCoord (MSG_BROADCAST, org_y);
-		WriteCoord (MSG_BROADCAST, org_z);
+		WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+		WriteByte(MSG_BROADCAST, TE_GUNSHOT);
+		WriteCoord(MSG_BROADCAST, org_x);
+		WriteCoord(MSG_BROADCAST, org_y);
+		WriteCoord(MSG_BROADCAST, org_z);
 	}
 	
 	remove(self);	
@@ -94,7 +94,7 @@ void(vector org, vector vec) LaunchLaser =
 	local	vector	vec;
 		
 	if (self.classname == "monster_enforcer")
-		sound (self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
+		sound(self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
 
 	vec = normalize(vec);
 	
@@ -104,10 +104,10 @@ void(vector org, vector vec) LaunchLaser =
 	newmis.solid = SOLID_BBOX;
 	newmis.effects = EF_DIMLIGHT;
 
-	setmodel (newmis, "progs/laser.mdl");
-	setsize (newmis, '0 0 0', '0 0 0');		
+	setmodel(newmis, "progs/laser.mdl");
+	setsize(newmis, '0 0 0', '0 0 0');		
 
-	setorigin (newmis, org);
+	setorigin(newmis, org);
 
 	newmis.velocity = vec * 600;
 	newmis.angles = vectoangles(newmis.velocity);
@@ -143,7 +143,7 @@ void()	enf_stand7	=[	$stand7,	enf_stand1	] {ai_stand();};
 
 void()	enf_walk1	=[	$walk1 ,	enf_walk2	] {
 if (random() < 0.2)
-	sound (self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE);
+	sound(self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE);
 ai_walk(2);};
 void()	enf_walk2	=[	$walk2 ,	enf_walk3	] {ai_walk(4);};
 void()	enf_walk3	=[	$walk3 ,	enf_walk4	] {ai_walk(4);};
@@ -163,7 +163,7 @@ void()	enf_walk16	=[	$walk16,	enf_walk1	] {ai_walk(2);};
 
 void()	enf_run1	=[	$run1  ,	enf_run2	] {
 if (random() < 0.2)
-	sound (self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE);
+	sound(self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE);
 ai_run(18);};
 void()	enf_run2	=[	$run2  ,	enf_run3	] {ai_run(14);};
 void()	enf_run3	=[	$run3  ,	enf_run4	] {ai_run(7);};
@@ -234,15 +234,15 @@ void(entity attacker, float damage)	enf_pain =
 {
 	local float r;
 
-	r = random ();
+	r = random();
 	if (self.pain_finished > time)
 		return;
 
 	
 	if (r < 0.5)
-		sound (self, CHAN_VOICE, "enforcer/pain1.wav", 1, ATTN_NORM);
+		sound(self, CHAN_VOICE, "enforcer/pain1.wav", 1, ATTN_NORM);
 	else
-		sound (self, CHAN_VOICE, "enforcer/pain2.wav", 1, ATTN_NORM);
+		sound(self, CHAN_VOICE, "enforcer/pain2.wav", 1, ATTN_NORM);
 
 	if (r < 0.2)
 	{
@@ -308,16 +308,16 @@ void() enf_die =
 // check for gib
 	if (self.health < -35)
 	{
-		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead ("progs/h_mega.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
+		sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		ThrowHead("progs/h_mega.mdl", self.health);
+		ThrowGib("progs/gib1.mdl", self.health);
+		ThrowGib("progs/gib2.mdl", self.health);
+		ThrowGib("progs/gib3.mdl", self.health);
 		return;
 	}
 
 // regular death
-	sound (self, CHAN_VOICE, "enforcer/death1.wav", 1, ATTN_NORM);
+	sound(self, CHAN_VOICE, "enforcer/death1.wav", 1, ATTN_NORM);
 	if (random() > 0.5)
 		enf_die1 ();
 	else
@@ -353,9 +353,9 @@ void() monster_enforcer =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/enforcer.mdl");
+	setmodel(self, "progs/enforcer.mdl");
 
-	setsize (self, '-16 -16 -24', '16 16 40');
+	setsize(self, '-16 -16 -24', '16 16 40');
 	self.health = 80;
 
 	self.th_stand = enf_stand1;

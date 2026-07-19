@@ -61,7 +61,7 @@ void  SafeRead(int handle, Any_p buffer, long count);
 void  SafeWrite(int handle, Any_p buffer, long count);
 Any_p SafeMalloc(long size);
 
-long LoadFile(cStr_p filename, Any_p* bufferptr);
+long LoadFile(cStr_p filename, cStr_ar bufferptr);
 void SaveFile(cStr_p filename, Any_p buffer, long count);
 
 void  DefaultExtension(cStr_p path, cStr_p extension);

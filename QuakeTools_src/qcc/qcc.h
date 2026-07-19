@@ -285,7 +285,7 @@ union eval_s {
 };
 
 extern const int type_size[ev_LAST];
-extern def_p def_for_type[8];
+extern def_p def_for_type[ev_LAST];
 
 extern type_t type_void;
 extern type_t type_string;
