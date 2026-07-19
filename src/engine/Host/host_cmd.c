@@ -48,7 +48,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 void Host_Quit_f() {
     if ((key.dest != key_console) &&
-        (!Host_IsDedicated())) {
+        (!Host_IsDedicated())
+        ) {
         M_Menu_Quit_f();
         return;
     }
@@ -63,7 +64,10 @@ void Host_Quit_f() {
 void Host_Status_f() {
     void (*print) (cStringRO fmt, ...);
     if (isCliCmd()) {
-        if (!SV_IsActive()) { Cmd_ForwardToServer();  return; }
+        if (!SV_IsActive()) {
+            Cmd_ForwardToServer();
+            return;
+        }
         print = Con_Printf;
     }
     else
@@ -123,7 +127,10 @@ void Host_Ping_f() {
         for (int j = 0; j < NUM_PING_TIMES; j++)
             total += rClient->ping_times[j];
         total /= NUM_PING_TIMES;
-        SV_ClientPrintf("%4i %s\n", (int)(total * 1000), rClient->name);
+        SV_ClientPrintf("%4i %s\n",
+            (int)(total * 1000),
+            rClient->name
+        );
     }
 }
 
@@ -194,8 +201,8 @@ Goes to a new map, taking all clients along
 */
 void Host_Changelevel_f() {
 #ifdef QUAKE2
-    if (Cmd_Argc() < 2) { ;                 Con_Printf("changelevel <levelname> : continue game on a new level\n"); return; }
-    if (!SV_IsActive() || cls.isDemoPlaying) { ; Con_Printf("Only the server may changelevel\n");                        return; }
+    if (Cmd_Argc() < 2) { ;                 Con_Printf("changelevel <levelname> : continue game on a new level\n");     return; }
+    if (!SV_IsActive() || cls.isDemoPlaying) { ; Con_Printf("Only the server may changelevel\n");                       return; }
 
     strcpy(level, Cmd_Argv(1));
     cString startspot;
@@ -211,7 +218,7 @@ void Host_Changelevel_f() {
 #else
 
     if (Cmd_Argc() != 2) { ;                Con_Printf("changelevel <levelname> : continue game on a new level\n"); return; }
-    if (!SV_IsActive() || cls.isDemoPlaying) { ; Con_Printf("Only the server may changelevel\n");                        return; }
+    if (!SV_IsActive() || cls.isDemoPlaying) { ; Con_Printf("Only the server may changelevel\n");                   return; }
     SV_SaveSpawnparms();
 
     qPathStr_t level; strcpy(level, Cmd_Argv(1));
@@ -230,11 +237,9 @@ void Host_Restart_f() {
     if (cls.isDemoPlaying ||
         !SV_IsActive() ||
         isNetCmd()
-        )
-        return;
+        )   return;
 
-    qPathStr_t mapname; strcpy(mapname, SV_GetName()); // must copy out, because it gets cleared
-    // in sv_spawnserver
+    qPathStr_t mapname; strcpy(mapname, SV_GetName()); // must copy out, because it gets cleared in sv_spawnserver
 #ifdef QUAKE2
     qPathStr_t startspot; strcpy(startspot, sv.startspot);
     SV_SpawnServer(mapname, startspot);
@@ -298,7 +303,12 @@ void Host_SavegameComment(cString text) {
     memcpy(text, cl.levelname, strlen(cl.levelname));
 
     char kills[20];
-    snprintf(kills, sizeof(kills), "kills:%3i/%3i", cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
+    snprintf(kills,
+        sizeof(kills),
+        "kills:%3i/%3i",
+        cl.stats[STAT_MONSTERS],
+        cl.stats[STAT_TOTALMONSTERS]
+    );
     memcpy(text + 22, kills, strlen(kills));
     // convert space to _ to make stdio happy
     for (int i = 0; i < SAVEGAME_COMMENT_LENGTH; i++)
@@ -322,7 +332,7 @@ void Host_Savegame_f() {
     for (int i = 0; i < GetSvMaxClients(); i++) {
         if ((svs.clients[i].active) &&
             (svs.clients[i].edict->v.health <= 0)
-            )                       /**/ {
+            ) {
             Con_Printf("Can't savegame with a dead player\n"); return;
         }
     }
@@ -457,12 +467,7 @@ void Host_Loadgame_f() {
             ED_ParseGlobals(start); // parse the global vars
         else { // parse an edict
             edict_p ent = ED_GetEDictByIdx((uint32_t)entnum);
-#if 0
-            memset(&ent->v, 0x00, SizeOfEntFields());
-            ent->free = false;
-#else
             ED_ClearEdict(ent);
-#endif
             ED_ParseEdict(start, ent);
 
             // link it into the bsp tree
@@ -583,14 +588,8 @@ int LoadGamestate(cString level, cString startspot) {
         // parse an edict
 
         edict_p ent = ED_GetEDictByIdx(entnum);
-#if 0
-        memset(&ent->v, 0x00, SizeOfEntFields());
-        ent->free = false;
-#else
         ED_ClearEdict(ent);
-#endif
         ED_ParseEdict(start, ent);
-
         // link it into the bsp tree
         if (ent->inUse) SV_LinkEdict(ent, false);
     }
@@ -613,7 +612,8 @@ void Host_Changelevel2_f() {
     qPathStr_t level; strcpy(level, Cmd_Argv(1));
 
     cString startspot;
-    if (Cmd_Argc() == 2) { startspot = NULL; }
+    if (Cmd_Argc() == 2)
+        startspot = NULL;
     else {
         qPathStr_t _startspot; strcpy(_startspot, Cmd_Argv(2));
         startspot = _startspot;
@@ -621,11 +621,11 @@ void Host_Changelevel2_f() {
 
     SV_SaveSpawnparms();
 
-    // save the current level's state
-    SaveGamestate();
+    SaveGamestate();    // save the current level's state
 
     // try to restore the new level
-    if (LoadGamestate(level, startspot)) { SV_SpawnServer(level, startspot); }
+    if (LoadGamestate(level, startspot))
+        SV_SpawnServer(level, startspot);
 }
 #endif
 
@@ -664,7 +664,10 @@ void Host_Name_f() {
 
     // send notification to all clients
     sizebuf_p pBuf = &sv.reliable_datagram;
-    MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteString(pBuf, remoteClient->name);
+    MSG_WriteByte(pBuf, svc_updatename); {
+        MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));
+        MSG_WriteString(pBuf, remoteClient->name);
+    }
 }
 
 
@@ -678,7 +681,8 @@ void Host_Please_f() {
     if (isNetCmd())  return;
 
     if ((Cmd_Argc() == 3) &&
-        (Q_strcmp(Cmd_Argv(1), "#") == 0)) {
+        (Q_strcmp(Cmd_Argv(1), "#") == 0)
+        ) {
         int j = Q_atof(Cmd_Argv(2)) - 1;
         if ((j < 0) ||
             (j >= GetSvMaxClients()) ||
@@ -754,15 +758,17 @@ void Host_Say(bool teamonly) {
 
         RmtClient_p rClient = svs.clients;
         for (int j = 0; j < GetSvMaxClients(); j++, rClient++) {
-            if (!rClient ||
-                !rClient->active ||
-                !rClient->spawned ||
+            if (
+                !(rClient) ||
+                !(rClient->active) ||
+                !(rClient->spawned) ||
                 (
-                    teamplay.value &&
-                    teamonly &&
-                    (rClient->edict->v.team != save->edict->v.team))
-                )
-                continue;
+                    (teamplay.value) &&
+                    (teamonly) &&
+                    (rClient->edict->v.team != save->edict->v.team)
+                    )
+                )   continue;
+
             remoteClient = rClient;
             SV_ClientPrintf("%s", text);
         }
@@ -804,8 +810,7 @@ void Host_Tell_f() {
     strcat(text, args);
     strcat(text, "\n");
 
-    RmtClient_p save = remoteClient;
-    {
+    RmtClient_p save = remoteClient; {
         for (int j = 0; j < GetSvMaxClients(); j++) {
             if (!(svs.clients[j].active) ||
                 !(svs.clients[j].spawned)
@@ -816,8 +821,7 @@ void Host_Tell_f() {
             SV_ClientPrintf("%s", text);
             break;
         }
-    }
-    remoteClient = save;
+    } remoteClient = save;
 }
 
 
@@ -858,7 +862,10 @@ void Host_Color_f() {
 
     // send notification to all clients
     sizebuf_p pBuf = &sv.reliable_datagram;
-    MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));    MSG_WriteByte(pBuf, remoteClient->colors);
+    MSG_WriteByte(pBuf, svc_updatecolors); {
+        MSG_WriteByte(pBuf, (uint8_t)(remoteClient - svs.clients));
+        MSG_WriteByte(pBuf, remoteClient->colors);
+    }
 }
 
 
@@ -890,7 +897,9 @@ void Host_Pause_f() {
 
         // send notification to all clients
         sizebuf_p pBuf = &sv.reliable_datagram;
-        MSG_WriteByte(pBuf, svc_setpause);  MSG_WriteByte(pBuf, sv.paused);
+        MSG_WriteByte(pBuf, svc_setpause); {
+            MSG_WriteByte(pBuf, sv.paused);
+        }
     }
 }
 
@@ -904,7 +913,9 @@ void Host_PreSpawn_f() {
 
     sizebuf_p pBuf = &remoteClient->message;
     SZ_Write(pBuf, sv.signon.data, (size_t)sv.signon.cursize);
-    MSG_WriteByte(pBuf, svc_signonnum);    MSG_WriteByte(pBuf, 2);
+    MSG_WriteByte(pBuf, svc_signonnum); {
+        MSG_WriteByte(pBuf, 2);
+    }
     remoteClient->sendsignon = true;
 }
 
@@ -921,11 +932,7 @@ void Host_Spawn_f() {
     else {
         // set up the edict
         edict_p ent = remoteClient->edict;
-#if 0
-        memset(&ent->v, 0x00, SizeOfEntFields());
-#else
         ED_ClearEdict(ent);
-#endif
         ent->v.colormap = (float)ED_GetEDictIdx(ent);
         ent->v.team = (float)(remoteClient->colors & 15) + 1;
         ent->v.netname = PR_SetQString(remoteClient->name);
@@ -957,14 +964,26 @@ void Host_Spawn_f() {
         MSG_WriteFloat(pBuf, (float)SV_GetTime());
         RmtClient_p rClient = svs.clients;
         for (int i = 0; i < GetSvMaxClients(); i++, rClient++) {
-            MSG_WriteByte(pBuf, svc_updatename);    MSG_WriteByte(pBuf, i); MSG_WriteString(pBuf, rClient->name);
-            MSG_WriteByte(pBuf, svc_updatefrags);   MSG_WriteByte(pBuf, i); MSG_WriteShort(pBuf, rClient->old_frags);
-            MSG_WriteByte(pBuf, svc_updatecolors);  MSG_WriteByte(pBuf, i); MSG_WriteByte(pBuf, rClient->colors);
+            MSG_WriteByte(pBuf, svc_updatename); {
+                MSG_WriteByte(pBuf, i);
+                MSG_WriteString(pBuf, rClient->name);
+            }
+            MSG_WriteByte(pBuf, svc_updatefrags); {
+                MSG_WriteByte(pBuf, i);
+                MSG_WriteShort(pBuf, rClient->old_frags);
+            }
+            MSG_WriteByte(pBuf, svc_updatecolors); {
+                MSG_WriteByte(pBuf, i);
+                MSG_WriteByte(pBuf, rClient->colors);
+            }
         }
     }
     // send all current light styles
     for (int i = 0; i < MAX_LIGHTSTYLES; i++) {
-        MSG_WriteByte(pBuf, svc_lightstyle); MSG_WriteByte(pBuf, (char)i); MSG_WriteString(pBuf, sv.lightstyles[i]);
+        MSG_WriteByte(pBuf, svc_lightstyle); {
+            MSG_WriteByte(pBuf, (char)i);
+            MSG_WriteString(pBuf, sv.lightstyles[i]);
+        }
     }
 
     // send some stats
@@ -996,14 +1015,19 @@ void Host_Spawn_f() {
 
     SV_WriteClientdataToMessage(SvPlayer(), pBuf);
 
-    MSG_WriteByte(pBuf, svc_signonnum); { MSG_WriteByte(pBuf, 3); }
+    MSG_WriteByte(pBuf, svc_signonnum); {
+        MSG_WriteByte(pBuf, 3);
+    }
     remoteClient->sendsignon = true;
 }
 
 
 
 void Host_Begin_f() {
-    if (isCliCmd()) { Con_Printf("begin is not valid from the console\n"); return; }
+    if (isCliCmd()) {
+        Con_Printf("begin is not valid from the console\n");
+        return;
+    }
     remoteClient->spawned = true;
 }
 
@@ -1045,7 +1069,8 @@ void Host_Kick_f() {
     }
     else {
         remoteClient = svs.clients;
-        for (i = 0; i < GetSvMaxClients(); i++, remoteClient++) {
+        i = 0;
+        for (; i < GetSvMaxClients(); i++, remoteClient++) {
             if (!remoteClient->active)                               continue;
             if (Q_strcasecmp(remoteClient->name, Cmd_Argv(1)) == 0)  break;
         }
@@ -1066,12 +1091,13 @@ void Host_Kick_f() {
             message = COM_Parse(Cmd_Args());
             if (byNumber) {
                 message++;       // skip the #
-                while (*message == ' ')    // skip white space
-                    message++;
+                while ((*message == ' ')    // skip white space
+                    )   message++;
                 message += Q_strlen(Cmd_Argv(2)); // skip the number
             }
-            while ((*message) && (*message == ' '))
-                message++;
+            while ((*message) &&
+                (*message == ' ')
+                )   message++;
         }
         if (message)    SV_ClientPrintf("Kicked by %s: %s\n", who, message);
         else            SV_ClientPrintf("Kicked by %s\n", who);
@@ -1114,7 +1140,7 @@ void Host_Give_f() {
             } break;
         }
         else {
-            if (argsStr[0] >= '2') {            SvPlayer_AddItems(IT_SHOTGUN << (argsStr[0] - '2')); }break;
+            if (argsStr[0] >= '2') { SvPlayer_AddItems(IT_SHOTGUN << (argsStr[0] - '2')); }break;
         }
     } break;
 
@@ -1322,7 +1348,9 @@ Return to looping demos
 ==================
 */
 void Host_Stopdemo_f() {
-    if ((Host_IsDedicated()) || (!cls.isDemoPlaying)) return;
+    if ((Host_IsDedicated()) ||
+        (!cls.isDemoPlaying)
+        )   return;
 
     CL_StopPlayback();
     CL_Disconnect();

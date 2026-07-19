@@ -1,10 +1,11 @@
 DST_PLATFORM := POSIX
 
-$(eval QCC_DIR = ../QuakeTools_src/qcc) $(eval INCLUDES += $(QCC_DIR))
+$(eval QCC_DIR = ../src/qcc) $(eval INCLUDES += $(QCC_DIR))
 	SRC_LIST += $(QCC_DIR)/cmdlib.c
 	SRC_LIST += $(QCC_DIR)/pr_lex.c
 	SRC_LIST += $(QCC_DIR)/pr_comp.c
 	SRC_LIST += $(QCC_DIR)/qcc.c
+$(eval QCVM_DIR = $(QCC_DIR)/QCVM) $(eval INCLUDES += $(QCVM_DIR))
 
 $(eval CUTILS_DIR = ../src/engine/Shared/utils) $(eval INCLUDES += $(CUTILS_DIR))
 

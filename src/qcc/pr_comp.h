@@ -23,33 +23,6 @@
 
 typedef int32_t string_t;
 
-#if 0
-typedef enum {
-    ev_void,
-    ev_string,
-    ev_float,
-    ev_vector,
-    ev_entity,
-    ev_field,
-    ev_function,
-    ev_pointer
-} etype_t;
-#else
-typedef enum {
-    ev_void = 0u,
-    ev_string,
-    ev_float,
-    ev_vector,
-    ev_entity,
-    ev_field,
-    ev_function,
-    ev_pointer,
-    ev_LAST,
-
-    DEF_SAVEGLOBAL = (1U << 15)
-} etype_t;  // :uint16_t
-#endif
-
 // PrOfs_e from src/engine/Server_side/SimulationState/GlobVars/progdefs.h
 #define OFS_NULL  0
 #define OFS_RETURN  1
@@ -147,37 +120,18 @@ typedef enum {
 } func_t;
 #endif
 
-
-#if 0
-typedef struct statement_s {
-    unsigned short op;
-    short a, b, c;
-} dstatement_t;
-#else
-#include "assert.h"
-typedef uint16_t op_type;   // prog_operation_e // #include "pr_ops.h"
-typedef int16_t arg_type;   // should be signed int
-
-typedef struct {
-    op_type     op;    // prog_operation_e
-    arg_type    a;
-    arg_type    b;
-    arg_type    c;
-} dstatement_t;  STATIC_ASSERT_SIZE(dstatement_t, 2*4);  // 8
-// } dStatement_t;
-// typedef dstatement_t* dStatement_p;
-#endif
-typedef dstatement_t* dstatement_p;
+#include "VM_statment.h"
 
 typedef struct {
     uint16_t    type; // [etype_t] if DEF_SAVEGLOBAL bit is set the variable needs to be saved in savegames
     uint16_t    ofs;
     string_t    s_name;
-} ddef_t;       STATIC_ASSERT_SIZE(ddef_t, 2*2 + 4);
+} ddef_t;       STATIC_ASSERT_SIZE(ddef_t, 2*2 + 4); 
 typedef ddef_t* ddef_p;
-// #define DEF_SAVEGLOBAL (1 << 15)
+#define DEF_SAVEGLOBGAL (1<<15)
 
 #define MAX_PARMS 8
+
 typedef struct {
     int  first_statement; // negative numbers are builtins
     int  parm_start;
@@ -199,7 +153,7 @@ typedef struct {
     int  version;
     int  crc;   // check of header file
 
-    // lumps
+// lumps
     int  ofs_statements;
     int  numstatements; // statement 0 is an error
 

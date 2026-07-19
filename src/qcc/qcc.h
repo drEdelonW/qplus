@@ -26,27 +26,16 @@
 #include "pr_comp.h"
 
 /*
-
 TODO:
-
 "stopped at 10 errors"
-
 other pointer types for models and clients?
-
 compact string heap?
-
 allways initialize all variables to something safe
-
 the def->type->type arrangement is really silly.
-
 return type checking
-
 parm count type checking
-
 immediate overflow checking
-
 pass the first two parms in call->b and call->c
-
 */
 
 /*
@@ -233,6 +222,8 @@ There are no ++ / -- operators, or operate/assign operators.
 
 //=============================================================================
 
+#include "VM_types.h"
+
 // offsets are allways multiplied by 4 before using
 typedef int gofs_t;    // offset in global data block
 
@@ -248,7 +239,7 @@ struct type_s {
     def_p   def;  // a def that points to this type
     type_p  next;
     // function types are more complex
-    type_p  aux_type; // return type or field type
+    type_p  aux_type;  // return type or field type
     int     num_parms; // -1 = variable args
     type_p  parm_types[MAX_PARMS]; // only [num_parms] allocated
 };
@@ -280,9 +271,10 @@ union eval_s {
     float       _float;
     float       vector[3];
     func_t      function;
-    int         _int;
+    int32_t     _int;
     eval_p      ptr;
 };
+
 
 extern const int type_size[ev_LAST];
 extern def_p def_for_type[ev_LAST];
@@ -338,7 +330,7 @@ extern pr_info_t pr;
 typedef struct {
     cStr_p  name;
     cStr_p  opname;
-    float   priority;
+    int     priority;
     bool    right_associative;
     def_p   type_a;
     def_p   type_b;
@@ -365,7 +357,7 @@ extern token_type_t pr_token_type;
 extern type_p pr_immediate_type;
 extern eval_t  pr_immediate;
 
-void PR_PrintStatement(dstatement_t* s);
+void PR_PrintStatement(dStatement_t* s);
 void PR_Lex();  // reads the next token into pr_token and classifies its type
 
 type_p PR_ParseType();
@@ -434,7 +426,7 @@ extern def_t def_ret, def_parms[MAX_PARMS];
 extern char strings[MAX_STRINGS];
 extern int  strofs;
 
-extern dstatement_t statements[MAX_STATEMENTS];
+extern dStatement_t statements[MAX_STATEMENTS];
 extern int   numstatements;
 extern int   statement_linenums[MAX_STATEMENTS];
 

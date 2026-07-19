@@ -50,7 +50,7 @@ This shuts down both the client and server
 */
 void Host_Error(cString error, ...) {
     static bool inerror = false;
-    if (inerror)    Host_SysError("Host.Error: recursively entered");
+    if (inerror)                    Host_SysError("Host.Error: recursively entered");
     inerror = true;
 
     SCR_EndLoadingPlaque();  // reenable screen updates
@@ -59,7 +59,7 @@ void Host_Error(cString error, ...) {
     VA_EXPAND(string, error);
     Con_Printf("Host.Error: %s\n", string);
 
-    if (SV_IsActive())                  host.ShutdownServer(false);
+    if (SV_IsActive())              host.ShutdownServer(false);
     if (cls.state == ca_dedicated)  Host_SysError("Host.Error: %s\n", string); // dedicated servers exit
 
     CL_Disconnect();
@@ -108,7 +108,9 @@ void SV_BroadcastPrintf(cString fmt, ...) {
             (svs.clients[i].spawned)
             ) {
             sizebuf_p pBuf = &svs.clients[i].message;
-            MSG_WriteByte(pBuf, svc_print); MSG_WriteString(pBuf, string);
+            MSG_WriteByte(pBuf, svc_print); {
+                MSG_WriteString(pBuf, string);
+            }
         }
 }
 
@@ -123,5 +125,7 @@ void Host_ClientCommands(cString fmt, ...) {
     VaBuff_t string;
     VA_EXPAND(string, fmt);
     sizebuf_p pBuf = &remoteClient->message;
-    MSG_WriteByte(pBuf, svc_stufftext); MSG_WriteString(pBuf, string);
+    MSG_WriteByte(pBuf, svc_stufftext); {
+        MSG_WriteString(pBuf, string);
+    }
 }

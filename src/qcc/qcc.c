@@ -29,7 +29,7 @@ int   numpr_globals;
 char  strings[MAX_STRINGS];
 int   strofs;
 
-dstatement_t statements[MAX_STATEMENTS];
+dStatement_t statements[MAX_STATEMENTS];
 int   numstatements;
 int   statement_linenums[MAX_STATEMENTS];
 
@@ -103,7 +103,8 @@ void PrintStrings() {
         printf("%5i : ", i);
         for (int j = 0; j < l; j++) {
             if (strings[i + j] == '\n') {
-                putchar('\\');  putchar('n');
+                putchar('\\');
+                putchar('n');
             }
             else
                 putchar(strings[i + j]);
@@ -188,7 +189,7 @@ void WriteData(int crc) {
             (def->type->type != ev_function) &&
             (def->type->type != ev_field) &&
             (def->scope == NULL)
-            )   dd->type |= DEF_SAVEGLOBAL;
+            )   dd->type |= DEF_SAVEGLOBGAL;
         dd->s_name = CopyString(def->name);
         dd->ofs = def->ofs;
     }
@@ -222,7 +223,7 @@ void WriteData(int crc) {
         statements[i].b = LittleShort(statements[i].b);
         statements[i].c = LittleShort(statements[i].c);
     }
-    SafeWrite(h, statements, numstatements * sizeof(dstatement_t));
+    SafeWrite(h, statements, numstatements * sizeof(dStatement_t));
 
     progs.ofs_functions = lseek(h, 0, SEEK_CUR);
     progs.numfunctions = numfunctions;
@@ -412,7 +413,7 @@ void PR_PrintOfs(gofs_t ofs) {
 PR_PrintStatement
 =================
 */
-void PR_PrintStatement(dstatement_p s) {
+void PR_PrintStatement(dStatement_p s) {
     printf("%4i : %4i : %s ",
         (int)(s - statements),
         statement_linenums[s - statements],
@@ -628,7 +629,7 @@ void PrintFunction(cStr_p name) {
     dfunction_p df = functions + i;
 
     printf("Statements for %s:\n", name);
-    dstatement_p ds = statements + df->first_statement;
+    dStatement_p ds = statements + df->first_statement;
     while (1) {
         PR_PrintStatement(ds);
         if (!ds->op)

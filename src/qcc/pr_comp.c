@@ -144,7 +144,7 @@ Emits a primitive statement, returning the var it places it's value in
 ============
 */
 def_p PR_Statement(opcode_p op, def_p var_a, def_p var_b) {
-    dstatement_p statement = &statements[numstatements];
+    dStatement_p statement = &statements[numstatements];
     numstatements++;
 
     statement_linenums[statement - statements] = pr_source_line;
@@ -185,11 +185,11 @@ def_p PR_ParseImmediate() {
     // check for a constant with the same value
     def_p cn = pr.def_head.next;
     for (; cn; cn = cn->next) {
-        if ((!cn->initialized) ||
+        if (!(cn->initialized) ||
             (cn->type != pr_immediate_type)
             )   continue;
 
-        if (pr_immediate_type == &type_string) {
+        /**/ if (pr_immediate_type == &type_string) {
             if (!strcmp(G_STRING(cn->ofs), pr_immediate_string)) {
                 PR_Lex();
                 return cn;
@@ -296,16 +296,16 @@ PR_ParseFunctionCall
 ============
 */
 def_p PR_ParseFunctionCall(def_p func) {
-    type_p t = func->type;
-    if (t->type != ev_function)
+    type_p fnTyp = func->type;
+    if (fnTyp->type != ev_function)
         PR_ParseError("not a function");
 
     // copy the arguments to the global parameter variables
     int arg = 0;
     if (!PR_Check(")")) {
         do {
-            if ((t->num_parms != -1) &&
-                (arg >= t->num_parms)
+            if ((fnTyp->num_parms != -1) &&
+                (fnTyp->num_parms <= arg)
                 )   PR_ParseError("too many parameters");
             def_p e = PR_Expression(TOP_PRIORITY);
 
@@ -318,16 +318,17 @@ def_p PR_ParseFunctionCall(def_p func) {
                 else if (!strncmp(func->name, "precache_file", 13))     PrecacheFile(e, func->name[13]);
             }
 
-            if (t->num_parms != -1 && (e->type != t->parm_types[arg]))
-                PR_ParseError("type mismatch on parm %i", arg);
+            if ((fnTyp->num_parms != -1) &&
+                (fnTyp->parm_types[arg] != e->type)
+                )   PR_ParseError("type mismatch on parm %i", arg);
             // a vector copy will copy everything
-            def_parms[arg].type = t->parm_types[arg];
+            def_parms[arg].type = fnTyp->parm_types[arg];
             PR_Statement(&pr_opcodes[OP_STORE_V], e, &def_parms[arg]);
             arg++;
         } while (PR_Check(","));
 
-        if ((t->num_parms != -1) &&
-            (arg != t->num_parms)
+        if ((fnTyp->num_parms != -1) &&
+            (fnTyp->num_parms != arg)
             )   PR_ParseError("too few parameters");
         PR_Expect(")");
     }
@@ -336,7 +337,7 @@ def_p PR_ParseFunctionCall(def_p func) {
 
     PR_Statement(&pr_opcodes[OP_CALL0 + arg], func, 0);
 
-    def_ret.type = t->aux_type;
+    def_ret.type = fnTyp->aux_type;
     return &def_ret;
 }
 
@@ -500,10 +501,10 @@ void PR_ParseStatement() {
 
     if (PR_Check("while")) {
         PR_Expect("(");
-        dstatement_p patch2 = &statements[numstatements];
+        dStatement_p patch2 = &statements[numstatements];
         def_p e = PR_Expression(TOP_PRIORITY);
         PR_Expect(")");
-        dstatement_p patch1 = &statements[numstatements];
+        dStatement_p patch1 = &statements[numstatements];
         PR_Statement(&pr_opcodes[OP_IFNOT], e, 0);
         PR_ParseStatement();
         junkdef.ofs = patch2 - &statements[numstatements];
@@ -513,7 +514,7 @@ void PR_ParseStatement() {
     }
 
     if (PR_Check("do")) {
-        dstatement_p patch1 = &statements[numstatements];
+        dStatement_p patch1 = &statements[numstatements];
         PR_ParseStatement();
         PR_Expect("while");
         PR_Expect("(");
@@ -536,13 +537,13 @@ void PR_ParseStatement() {
         def_p e = PR_Expression(TOP_PRIORITY);
         PR_Expect(")");
 
-        dstatement_p patch1 = &statements[numstatements];
+        dStatement_p patch1 = &statements[numstatements];
         PR_Statement(&pr_opcodes[OP_IFNOT], e, 0);
 
         PR_ParseStatement();
 
         if (PR_Check("else")) {
-            dstatement_p patch2 = &statements[numstatements];
+            dStatement_p patch2 = &statements[numstatements];
             PR_Statement(&pr_opcodes[OP_GOTO], 0, 0);
             patch1->b = &statements[numstatements] - patch1;
             PR_ParseStatement();
