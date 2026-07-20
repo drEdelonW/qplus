@@ -1,8 +1,5 @@
 #pragma once
 
-
-typedef uint32_t func_t;
-
 typedef enum {
     OP_DONE,
     OP_MUL_F,

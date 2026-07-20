@@ -1,5 +1,7 @@
 #pragma once
 
+#define MAX_PARMS (8)
+
 // VM global offsets; vectors occupy 3 float slots
 typedef enum {
     OFS_NULL      = 0u,

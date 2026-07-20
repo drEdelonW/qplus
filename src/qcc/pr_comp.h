@@ -29,24 +29,6 @@ typedef struct {
     string_t    s_name;
 } ddef_t;       STATIC_ASSERT_SIZE(ddef_t, 2*2 + 4); 
 typedef ddef_t* ddef_p;
-#define DEF_SAVEGLOBGAL (1 << 15)
-
-#define MAX_PARMS 8
-
-typedef struct {
-    int  first_statement; // negative numbers are builtins
-    int  parm_start;
-    int  locals;    // total ints of parms + locals
-
-    int  profile;  // runtime
-
-    int  s_name;
-    int  s_file;   // source file defined in
-
-    int  numparms;
-    uint8_t parm_size[MAX_PARMS];
-} dfunction_t;
-typedef dfunction_t* dfunction_p;
 
 
 #define PROG_VERSION 6

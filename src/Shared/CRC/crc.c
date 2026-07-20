@@ -1,34 +1,11 @@
-/*
-Copyright (C) 1996-1997 Id Software, Inc.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
-*/
-/* crc.c */
-
 #include "crc.h"
 
 // this is a 16 bit, non-reflected CRC using the polynomial 0x1021
 // and the initial and final xor values shown below...  in other words, the
 // CCITT standard CRC used by XMODEM
 
-#define CRC_INIT_VALUE  0xFFFF
-#define CRC_XOR_VALUE   0x0000
 
-static uint16_t _crctable[256] = {
+static const CRC_t crctable[256] = {
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
     0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
     0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
@@ -63,14 +40,20 @@ static uint16_t _crctable[256] = {
     0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 };
 
-void CRC_Init(uint16_p crcvalue) {
+#define CRC_INIT_VALUE (CRC_t)0xFFFF
+void CRC_Init(CRC_p crcvalue) {
     *crcvalue = CRC_INIT_VALUE;
 }
 
-void CRC_ProcessByte(uint16_p crcvalue, uint8_t data) {
-    *crcvalue = (*crcvalue << 8) ^ _crctable[(*crcvalue >> 8) ^ data];
+void CRC_ProcessByte(CRC_p crcvalue, uint8_t data) {
+    *crcvalue =
+        (*crcvalue << 8) ^
+        crctable[(*crcvalue >> 8) ^ data];
 }
 
-uint16_t CRC_Value(uint16_t crcvalue) {
+#if 0
+#define CRC_XOR_VALUE  (CRC_t)0x0000
+CRC_t CRC_Value(CRC_t crcvalue) {
     return crcvalue ^ CRC_XOR_VALUE;
 }
+#endif

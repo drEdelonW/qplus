@@ -2,20 +2,6 @@
 
 #include "types.h"
 
-typedef enum {
-    ev_void     = 0u,
-    ev_string,
-    ev_float,
-    ev_vector,
-    ev_entity,
-    ev_field,
-    ev_function,
-    ev_pointer,
-    ev_LAST,
-
-    DEF_SAVEGLOBAL = (1U << 15)
-} etype_t;  // :uint16_t
-
 // offsets are allways multiplied by 4 before using
 typedef int gofs_t;    // offset in global data block
 
@@ -25,7 +11,8 @@ typedef def_t* def_p;
 typedef struct type_s type_t;
 typedef type_t* type_p;
 
-#define MAX_PARMS 8
+#include "VM_param.h"
+#include "VM_enumTypes.h"
 struct type_s {
     etype_t type;
     def_p   def;  // a def that points to this type
@@ -46,7 +33,7 @@ struct def_s {
     int     initialized; // 1 when a declaration included "= immediate"
 };
 
-extern const int type_size[ev_LAST];
+
 extern def_p def_for_type[ev_LAST];
 extern cStringRO typeCName[ev_LAST];
 

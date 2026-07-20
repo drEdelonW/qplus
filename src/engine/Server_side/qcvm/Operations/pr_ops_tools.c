@@ -1,14 +1,7 @@
-#include "progs.h"
-#include "GlobVars.h"
-#include "pr_def.h"
-#include "pr_ops.h"
-#include "vmValue.h"
-#include "types.h"
-#include "console.h"
-#include <stdio.h>
-#include <string.h>
 
-static cString _pr_opNames[OP_LAST] = {
+#include "types.h"          // cStringRO
+#include "VM_operation.h"   // prog_operation_t
+static cStringRO _pr_opNames[OP_LAST] = {
     [OP_DONE] = "DONE",
 
     [OP_MUL_F] = "MUL_F",
@@ -103,6 +96,8 @@ static cString _pr_opNames[OP_LAST] = {
     [OP_BITOR] = "BITOR"
 };
 
+#include "console.h"    // Con_Printf
+#include <string.h>     // strlen
 void PR_PrintOperation(prog_operation_t op) {
     if (op < OP_LAST) {
         Con_Printf("%s ", _pr_opNames[op]);
@@ -112,7 +107,13 @@ void PR_PrintOperation(prog_operation_t op) {
     }
 }
 
+#include "progs.h"
+#include "GlobVars.h"
+#include "pr_ops.h"
+#include "vmValue.h"
+#include <stdio.h>
 
+#include "pr_def.h" // dDef_p
 dDef_p ED_GlobalAtOfs(int ofs);
 cString PR_ValueString(etype_t type, eval_p val);
 

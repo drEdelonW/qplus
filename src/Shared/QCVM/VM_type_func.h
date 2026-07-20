@@ -1,5 +1,5 @@
 #pragma once
 
 #include "types.h"
+typedef uint32_t func_t;
 
-typedef int32_t string_t;

@@ -1,6 +1,6 @@
 #pragma once
 
-
+#define MAX_STATEMENTS (0x10000)/* 65536 */
 
 
 #if 0 // original
@@ -23,3 +23,8 @@ typedef struct {
 } dStatement_t;  STATIC_ASSERT_SIZE(dStatement_t, 2*4);  // 8
 
 typedef dStatement_t* dStatement_p;
+
+extern int numstatements;
+extern int statement_linenums[MAX_STATEMENTS];
+extern dStatement_t statements[MAX_STATEMENTS];
+

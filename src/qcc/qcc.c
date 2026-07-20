@@ -20,6 +20,8 @@
 #include "qcc.h"
 #include <unistd.h>
 #include "CLAMP.h"
+#include "VM_statment.h"
+#include "VM_function.h"
 
 char  destfile[1024];
 
@@ -29,12 +31,6 @@ int   numpr_globals;
 char  strings[MAX_STRINGS];
 int   strofs;
 
-dStatement_t statements[MAX_STATEMENTS];
-int   numstatements;
-int   statement_linenums[MAX_STATEMENTS];
-
-dfunction_t functions[MAX_FUNCTIONS];
-int   numfunctions;
 
 ddef_t  globals[MAX_GLOBALS];
 int   numglobaldefs;
@@ -116,7 +112,7 @@ void PrintStrings() {
 
 void PrintFunctions() {
     for (int i = 0; i < numfunctions; i++) {
-        dfunction_p d = &functions[i];
+        dFunction_p d = &functions[i];
         printf(
             "%s : %s : %i %i (",
             strings + d->s_file,
@@ -189,7 +185,7 @@ void WriteData(int crc) {
             (def->type->type != ev_function) &&
             (def->type->type != ev_field) &&
             (def->scope == NULL)
-            )   dd->type |= DEF_SAVEGLOBGAL;
+            )   dd->type |= DEF_SAVEGLOBAL;
         dd->s_name = CopyString(def->name);
         dd->ofs = def->ofs;
     }
@@ -235,7 +231,7 @@ void WriteData(int crc) {
         functions[i].numparms = LittleLong(functions[i].numparms);
         functions[i].locals = LittleLong(functions[i].locals);
     }
-    SafeWrite(h, functions, numfunctions * sizeof(dfunction_t));
+    SafeWrite(h, functions, numfunctions * sizeof(dFunction_t));
 
     progs.ofs_globaldefs = lseek(h, 0, SEEK_CUR);
     progs.numglobaldefs = numglobaldefs;
@@ -345,7 +341,7 @@ cStr_p PR_ValueString(etype_t type, Any_p val) {
     case ev_string:     snprintf(line, sizeof(line), "%s", PR_String(strings + *(int*)val));    break;
     case ev_entity:     snprintf(line, sizeof(line), "entity %i", *(int*)val);                  break;
     case ev_function: {
-        dfunction_p f = functions + *(int*)val;
+        dFunction_p f = functions + *(int*)val;
         if (!f)         snprintf(line, sizeof(line), "undefined function");
         else            snprintf(line, sizeof(line), "%s()", strings + f->s_name);
     } break;
@@ -409,6 +405,7 @@ void PR_PrintOfs(gofs_t ofs) {
     printf("%s\n", PR_GlobalString(ofs));
 }
 
+#include "VM_opcode.h"
 /*
 =================
 PR_PrintStatement
@@ -426,10 +423,7 @@ void PR_PrintStatement(dStatement_p s) {
 
     /**/ if ((s->op == OP_IF) || (s->op == OP_IFNOT))   printf("%sbranch %i", PR_GlobalString(s->a), s->b);
     else if (s->op == OP_GOTO)                          printf("branch %i", s->a);
-    else if ((unsigned)(s->op - OP_STORE_F) < 6) {
-        printf("%s", PR_GlobalString(s->a));
-        printf("%s", PR_GlobalStringNoContents(s->b));
-    }
+    else if ((unsigned)(s->op - OP_STORE_F) < 6)        printf("%s""%s", PR_GlobalString(s->a), PR_GlobalStringNoContents(s->b));
     else {
         if (s->a)   printf("%s", PR_GlobalString(s->a));
         if (s->b)   printf("%s", PR_GlobalString(s->b));
@@ -488,12 +482,19 @@ bool PR_FinishCompilation() {
         if ((d->type->type == ev_function) &&
             !(d->scope)
             ) {// function parms are ok
-            //   f = G_FUNCTION(d->ofs);
-            //   if (!f || (!f->code && !f->builtin) )
-            if (!d->initialized) {
-                printf("function %s was not defined\n", d->name);
-                errors = true;
-            }
+#if 0
+            f = G_FUNCTION(d->ofs);
+            if (!(f) ||
+                (
+                    !(f->code) &&
+                    !(f->builtin)
+                    )
+                )
+#endif
+                if (!d->initialized) {
+                    printf("function %s was not defined\n", d->name);
+                    errors = true;
+                }
         }
 
     return !errors;
@@ -502,57 +503,6 @@ bool PR_FinishCompilation() {
 //=============================================================================
 
 // FIXME: byte swap?
-
-// this is a 16 bit, non-reflected CRC using the polynomial 0x1021
-// and the initial and final xor values shown below...  in other words, the
-// CCITT standard CRC used by XMODEM
-
-typedef uint16_t CRC_t;
-typedef CRC_t* CRC_p;
-#define CRC_INIT_VALUE (CRC_t)0xFFFF
-#define CRC_XOR_VALUE  (CRC_t)0x0000
-
-static const CRC_t crctable[256] = {
-    0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
-    0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
-    0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
-    0x9339, 0x8318, 0xb37b, 0xa35a, 0xd3bd, 0xc39c, 0xf3ff, 0xe3de,
-    0x2462, 0x3443, 0x0420, 0x1401, 0x64e6, 0x74c7, 0x44a4, 0x5485,
-    0xa56a, 0xb54b, 0x8528, 0x9509, 0xe5ee, 0xf5cf, 0xc5ac, 0xd58d,
-    0x3653, 0x2672, 0x1611, 0x0630, 0x76d7, 0x66f6, 0x5695, 0x46b4,
-    0xb75b, 0xa77a, 0x9719, 0x8738, 0xf7df, 0xe7fe, 0xd79d, 0xc7bc,
-    0x48c4, 0x58e5, 0x6886, 0x78a7, 0x0840, 0x1861, 0x2802, 0x3823,
-    0xc9cc, 0xd9ed, 0xe98e, 0xf9af, 0x8948, 0x9969, 0xa90a, 0xb92b,
-    0x5af5, 0x4ad4, 0x7ab7, 0x6a96, 0x1a71, 0x0a50, 0x3a33, 0x2a12,
-    0xdbfd, 0xcbdc, 0xfbbf, 0xeb9e, 0x9b79, 0x8b58, 0xbb3b, 0xab1a,
-    0x6ca6, 0x7c87, 0x4ce4, 0x5cc5, 0x2c22, 0x3c03, 0x0c60, 0x1c41,
-    0xedae, 0xfd8f, 0xcdec, 0xddcd, 0xad2a, 0xbd0b, 0x8d68, 0x9d49,
-    0x7e97, 0x6eb6, 0x5ed5, 0x4ef4, 0x3e13, 0x2e32, 0x1e51, 0x0e70,
-    0xff9f, 0xefbe, 0xdfdd, 0xcffc, 0xbf1b, 0xaf3a, 0x9f59, 0x8f78,
-    0x9188, 0x81a9, 0xb1ca, 0xa1eb, 0xd10c, 0xc12d, 0xf14e, 0xe16f,
-    0x1080, 0x00a1, 0x30c2, 0x20e3, 0x5004, 0x4025, 0x7046, 0x6067,
-    0x83b9, 0x9398, 0xa3fb, 0xb3da, 0xc33d, 0xd31c, 0xe37f, 0xf35e,
-    0x02b1, 0x1290, 0x22f3, 0x32d2, 0x4235, 0x5214, 0x6277, 0x7256,
-    0xb5ea, 0xa5cb, 0x95a8, 0x8589, 0xf56e, 0xe54f, 0xd52c, 0xc50d,
-    0x34e2, 0x24c3, 0x14a0, 0x0481, 0x7466, 0x6447, 0x5424, 0x4405,
-    0xa7db, 0xb7fa, 0x8799, 0x97b8, 0xe75f, 0xf77e, 0xc71d, 0xd73c,
-    0x26d3, 0x36f2, 0x0691, 0x16b0, 0x6657, 0x7676, 0x4615, 0x5634,
-    0xd94c, 0xc96d, 0xf90e, 0xe92f, 0x99c8, 0x89e9, 0xb98a, 0xa9ab,
-    0x5844, 0x4865, 0x7806, 0x6827, 0x18c0, 0x08e1, 0x3882, 0x28a3,
-    0xcb7d, 0xdb5c, 0xeb3f, 0xfb1e, 0x8bf9, 0x9bd8, 0xabbb, 0xbb9a,
-    0x4a75, 0x5a54, 0x6a37, 0x7a16, 0x0af1, 0x1ad0, 0x2ab3, 0x3a92,
-    0xfd2e, 0xed0f, 0xdd6c, 0xcd4d, 0xbdaa, 0xad8b, 0x9de8, 0x8dc9,
-    0x7c26, 0x6c07, 0x5c64, 0x4c45, 0x3ca2, 0x2c83, 0x1ce0, 0x0cc1,
-    0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8,
-    0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
-};
-
-void CRC_Init(CRC_p crcvalue) { *crcvalue = CRC_INIT_VALUE; }
-
-void CRC_ProcessByte(CRC_p crcvalue, uint8_t data) { *crcvalue = (*crcvalue << 8) ^ crctable[(*crcvalue >> 8) ^ data]; }
-
-uint8_t CRC_Value(uint8_t crcvalue) { return crcvalue ^ CRC_XOR_VALUE; }
-//=============================================================================
 
 /*
 ============
@@ -572,6 +522,7 @@ bool writeVar(FILE* f, etype_t type, def_p d) {
     return false;
 }
 
+#include "crc.h"
 int PR_WriteProgdefs(cStr_p filename) {
     printf("writing %s\n", filename);
     FILE* f = fopen(filename, "w"); {
@@ -628,7 +579,7 @@ void PrintFunction(cStr_p name) {
             break;
     if (i == numfunctions)
         Error("No function names \"%s\"", name);
-    dfunction_p df = functions + i;
+    dFunction_p df = functions + i;
 
     printf("Statements for %s:\n", name);
     dStatement_p ds = statements + df->first_statement;

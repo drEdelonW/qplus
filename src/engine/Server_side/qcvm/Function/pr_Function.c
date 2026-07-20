@@ -4,8 +4,8 @@
 
 dFunction_p pr_functions;
 
-
-
+#include "pr_qString.h" // PR_GetQString
+#include "pr_comp.h"    // pProgsDat
 dFunction_p ED_FindFunction(cString name) {
     for (int i = 0; i < pProgsDat->functions.num; i++)
         if (!strcmp(PR_GetQString(pr_functions[i].s_name), name))

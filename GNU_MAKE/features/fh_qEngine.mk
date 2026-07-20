@@ -57,8 +57,6 @@ $(eval ENG_DIR := $(SRC_DIR)/engine) $(eval INCLUDES += $(ENG_DIR))
                         $(eval PR_DEF_DIR = $(SIMSTATE_DIR)/Define) $(eval INCLUDES += $(PR_DEF_DIR))
                                 SRC_LIST += $(PR_DEF_DIR)/pr_def.c
 
-                        $(eval QVMC_DIR = $(SRC_DIR)/qcc/QCVM) $(eval INCLUDES += $(QVMC_DIR))
-
                         $(eval GVARS_DIR = $(SIMSTATE_DIR)/GlobVars) $(eval INCLUDES += $(GVARS_DIR))
                                 SRC_LIST += $(GVARS_DIR)/GlobVars.c
 
@@ -231,9 +229,7 @@ include features/fh_qRender$(QRND).mk
                                 SRC_LIST += $(STRUCT_DIR)/Plane.c
                                 SRC_LIST += $(STRUCT_DIR)/Light.c
 
-
                 $(eval CUTILS_DIR = $(SHARED_DIR)/utils) $(eval INCLUDES += $(CUTILS_DIR))
-                        SRC_LIST += $(CUTILS_DIR)/crc.c
                         SRC_LIST += $(CUTILS_DIR)/endian_tools.c
                         SRC_LIST += $(CUTILS_DIR)/q_tools.c
                         SRC_LIST += $(CUTILS_DIR)/link.c
@@ -248,7 +244,8 @@ include features/fh_qRender$(QRND).mk
                 $(eval SBUF_DIR = $(SHARED_DIR)/sBuf) $(eval INCLUDES += $(SBUF_DIR))
                         SRC_LIST += $(SBUF_DIR)/sizebuf.c
 
-
+include features/fh_CRC.mk
+include features/fh_QCVM.mk
 
 #=============================[GAME DEPENDED LOGIC]=============================#
 
