@@ -1,7 +1,7 @@
 #pragma once
 
 typedef enum {
-    ev_void     = 0u,
+    ev_void = 0u,
     ev_string,
     ev_float,
     ev_vector,

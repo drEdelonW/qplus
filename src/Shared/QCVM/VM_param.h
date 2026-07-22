@@ -1,6 +1,9 @@
 #pragma once
 
-#define MAX_PARMS (8)
+typedef enum {
+    VariousArg  = -1,  // -1 = variable args
+    MAX_PARMS   =  8
+} ArgNum_t;
 
 // VM global offsets; vectors occupy 3 float slots
 typedef enum {

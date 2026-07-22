@@ -86,7 +86,6 @@ float LittleFloat(float l);
 cStr_p COM_Parse(cStr_p data);
 
 extern char com_token[1024];
-extern int  com_eof;
 
 
 

@@ -21,10 +21,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 /* crc.h */
 #include "types.h"
 
-
 typedef uint16_t CRC_t;
 typedef CRC_t* CRC_p;
 
-void CRC_Init(CRC_p crcvalue);
-void CRC_ProcessByte(CRC_p crcvalue, uint8_t data);
-// CRC_t CRC_Value(CRC_t crcvalue);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    void CRC_Init(CRC_p crcvalue);
+    void CRC_ProcessByte(CRC_p crcvalue, uint8_t data);
+    // CRC_t CRC_Value(CRC_t crcvalue);
+
+#ifdef __cplusplus
+}
+#endif

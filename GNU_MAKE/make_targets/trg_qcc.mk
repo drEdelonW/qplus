@@ -6,6 +6,7 @@ include features/fh_QCVM.mk
     SRC_LIST += $(QCVM_DIR)/VM_types.c
     SRC_LIST += $(QCVM_DIR)/VM_opcode.c
     SRC_LIST += $(QCVM_DIR)/VM_statments.c
+    SRC_LIST += $(QCVM_DIR)/VM_priority.c
 
 
 $(eval MATH_DIR = ../src/engine/Shared/math) $(eval INCLUDES += $(MATH_DIR))

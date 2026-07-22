@@ -25,7 +25,6 @@
 #define PATHSEPERATOR   '/'
 
 char com_token[1024];
-int  com_eof;
 
 /*
 ================
@@ -43,7 +42,8 @@ double I_FloatTime() {
         return tp.tv_usec / 1000000.0;
     }
 
-    return (tp.tv_sec - secbase) + tp.tv_usec / 1000000.0;
+    return (tp.tv_sec - secbase) +
+        tp.tv_usec / 1000000.0;
 }
 
 
@@ -61,8 +61,7 @@ cStr_p COM_Parse(cStr_p data) {
     char ch;
 skipwhite:
     while ((ch = *data) <= ' ') {    // skip whitespace
-        if (ch == 0) {
-            com_eof = true;
+        if (ch == 0x00) {
             return NULL;   // end of file;
         }
         data++;
@@ -392,9 +391,9 @@ long ParseHex(cStr_p hex) {
     cStr_p str = hex;
     while (*str) {
         num <<= 4;
-        /**/ if ((*str >= '0') && (*str <= '9'))    num += 0 + *str - '0';
-        else if ((*str >= 'a') && (*str <= 'f'))    num += 10 + *str - 'a';
-        else if ((*str >= 'A') && (*str <= 'F'))    num += 10 + *str - 'A';
+        /**/ if ((*str >= '0') && (*str <= '9'))    num += 0x00 + *str - '0';
+        else if ((*str >= 'a') && (*str <= 'f'))    num += 0x0A + *str - 'a';
+        else if ((*str >= 'A') && (*str <= 'F'))    num += 0x0A + *str - 'A';
         else    Error("Bad hex number: %s", hex);
         str++;
     }
@@ -421,38 +420,41 @@ long ParseNum(cStr_p str) {
 
 #ifdef __BIG_ENDIAN__
 
-short   LittleShort(short l) {
-    uint8_t    b1, b2;
+short LittleShort(short l) {
+    uint8_t b1 = (l >> 0) & 0xFF;
+    uint8_t b2 = (l >> 8) & 0xFF;
 
-    b1 = l & 0xFF;
-    b2 = (l >> 8) & 0xFF;
-
-    return (b1 << 8) + b2;
+    return
+        (b1 << 8)
+        (b2 << 0);
 }
 
-short   BigShort(short l) {
+short BigShort(short l) {
     return l;
 }
 
+long LittleLong(long l) {
+    uint8_t b1 = (l >> 0) & 0xFF;
+    uint8_t b2 = (l >> 8) & 0xFF;
+    uint8_t b3 = (l >> 16) & 0xFF;
+    uint8_t b4 = (l >> 24) & 0xFF;
 
-long    LittleLong(long l) {
-    uint8_t    b1, b2, b3, b4;
-
-    b1 = l & 0xFF;
-    b2 = (l >> 8) & 0xFF;
-    b3 = (l >> 16) & 0xFF;
-    b4 = (l >> 24) & 0xFF;
-
-    return ((long)b1 << 24) + ((long)b2 << 16) + ((long)b3 << 8) + b4;
+    return
+        ((long)b1 << 24) |
+        ((long)b2 << 16) |
+        ((long)b3 << 8) |
+        ((long)b4 << 0);
 }
 
-long    BigLong(long l) {
+long BigLong(long l) {
     return l;
 }
-
 
 float LittleFloat(float l) {
-    union { uint8_t b[4]; float f; } in, out;
+    union {
+        uint8_t b[4];
+        float f;
+    } in, out;
 
     in.f = l;
     out.b[0] = in.b[3];
@@ -470,31 +472,33 @@ float BigFloat(float l) {
 
 #else
 
-
-short   BigShort(short l) {
+short BigShort(short l) {
     uint8_t b1 = (l >> 0) & 0xFF;
     uint8_t b2 = (l >> 8) & 0xFF;
 
-    return (b1 << 8) + b2;
+    return
+        (b1 << 8) |
+        (b2 << 0);
 }
 
-short   LittleShort(short l) {
+short LittleShort(short l) {
     return l;
 }
 
-
 long BigLong(long l) {
-    uint8_t    b1, b2, b3, b4;
+    uint8_t b1 = (l >> 0) & 0xFF;
+    uint8_t b2 = (l >> 8) & 0xFF;
+    uint8_t b3 = (l >> 16) & 0xFF;
+    uint8_t b4 = (l >> 24) & 0xFF;
 
-    b1 = (l >> 0) & 0xFF;
-    b2 = (l >> 8) & 0xFF;
-    b3 = (l >> 16) & 0xFF;
-    b4 = (l >> 24) & 0xFF;
-
-    return ((long)b1 << 24) + ((long)b2 << 16) + ((long)b3 << 8) + b4;
+    return
+        ((long)b1 << 24) |
+        ((long)b2 << 16) |
+        ((long)b3 << 8) |
+        ((long)b4 << 0);
 }
 
-long    LittleLong(long l) {
+long LittleLong(long l) {
     return l;
 }
 
@@ -516,8 +520,6 @@ float BigFloat(float l) {
 float LittleFloat(float l) {
     return l;
 }
-
-
 
 #endif
 

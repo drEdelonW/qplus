@@ -461,12 +461,10 @@ Aborts the current file load
 ============
 */
 void PR_ParseError(cStr_p error, ...) {
-    va_list  argptr;
-    char  string[1024];
-
-    va_start(argptr, error);
-    vsprintf(string, error, argptr);
-    va_end(argptr);
+    char string[1024];
+    va_list argptr; va_start(argptr, error); {
+        vsprintf(string, error, argptr);
+    } va_end(argptr);
 
     printf("%s:%i:%s\n", strings + s_file, pr_source_line, string);
 
@@ -625,7 +623,7 @@ type_p PR_ParseType() {
         new.num_parms = 0;
         if (!PR_Check(")")) {
             if (PR_Check("..."))
-                new.num_parms = -1; // variable args
+                new.num_parms = VariousArg; // variable args
             else
                 do {
                     type = PR_ParseType();

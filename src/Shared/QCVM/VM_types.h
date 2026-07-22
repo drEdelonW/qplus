@@ -11,16 +11,16 @@ typedef def_t* def_p;
 typedef struct type_s type_t;
 typedef type_t* type_p;
 
-#include "VM_param.h"
-#include "VM_enumTypes.h"
+#include "VM_param.h"       // MAX_PARMS
+#include "VM_enumTypes.h"   // etype_t
 struct type_s {
     etype_t type;
     def_p   def;  // a def that points to this type
     type_p  next;
     // function types are more complex
-    type_p  aux_type;  // return type or field type
-    int     num_parms; // -1 = variable args
-    type_p  parm_types[MAX_PARMS]; // only [num_parms] allocated
+    type_p      aux_type;  // return type or field type
+    ArgNum_t    num_parms;
+    type_p      parm_types[MAX_PARMS]; // only [num_parms] allocated
 };
 
 

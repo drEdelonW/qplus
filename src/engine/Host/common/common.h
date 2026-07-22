@@ -47,7 +47,6 @@ typedef struct {
 
 extern common_t com;
 
-// extern bool com_eof; // not used
 #ifdef __cplusplus
 extern "C" {
 #endif
