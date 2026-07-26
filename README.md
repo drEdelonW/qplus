@@ -19,6 +19,20 @@ Targets are selected via `TARGET` in `GNU_MAKE/Makefile` or on the command line 
 | `quakeGLX11` | Linux | OpenGL (GLX) | OpenGL renderer over X11 |
 | `quakeWin` | Windows (MinGW) | Software | Win32 port |
 
+### QuakeC targets (`qcc`, mod progs)
+
+These targets don't produce an engine binary — they build the QuakeC compiler
+itself, or drive it to produce a mod's `progs.dat`:
+
+| TARGET | `DST_PLATFORM` | Purpose |
+|--------|-----------------|---------|
+| `qcc` | `POSIX` | Builds the QuakeC compiler (`src/qcc`) → `OUTPUT/qcc/qcc.elf` |
+| `qplusqc` | `QVM` | Builds `progs.dat` for the **Quake+** mod (`src/game/GamesQC/qplus`) |
+| `v101qc` | `QVM` | Builds `progs.dat` from the **id1 v1.01** QuakeC sources (`src/game/GamesQC/v101qc`) |
+
+`DST_PLATFORM=QVM` (`GCC_tools_QVM.mk`) replaces the normal `all`/`build`/`clean`
+goals with QuakeC compilation — see [Compiling QuakeC](#compiling-quakec-progsdat) below.
+
 As in the Makefile:
 
 ```makefile
@@ -53,7 +67,8 @@ quake/
 ├── src/                    # Engine and platform layers
 │   ├── engine/             # Host, client, server, shared
 │   ├── game/               # Game logic (QuakeC VM, etc.)
-│   └── platform/           # POSIX, Windows, MCU (STM32, FAT32, LCD)
+│   ├── platform/           # POSIX, Windows, MCU (STM32, FAT32, LCD)
+│   └── qcc/                # QuakeC compiler (ported id qcc)
 ├── MCU_src/                # STM32 HAL, BSP, FreeRTOS, startup, linker script
 ├── ID_src/                 # Git submodule — original id Software sources (reference only)
 ├── GNU_MAKE/               # Build system
@@ -214,6 +229,36 @@ make TARGET=quakeGLX11 fresh
 ```bash
 make TARGET=quakeWin
 ```
+
+### Compiling QuakeC (`progs.dat`)
+
+Goals `qcbuild` / `qcclean` / `qcrun` are only available for `TARGET`s with
+`DST_PLATFORM := QVM` (currently `qplusqc`, `v101qc` — see
+`make_targets/trg_<TARGET>.mk`). The `qcc` compiler tool
+(`OUTPUT/qcc/qcc.elf`) is built automatically on demand.
+
+```bash
+make TARGET=qplusqc qcbuild                 # -> OUTPUT/qplusqc/progs.dat + progdefs.h
+make TARGET=qplusqc qcrun                   # build progs.dat, symlink into run_env/qplusqc/, launch engine
+make TARGET=qplusqc qcrun ENGINE=quakeGLX11 # launch a different engine build (default: quakeX11)
+make TARGET=qplusqc qcrun PACK=1            # also (re)build pak0.pak from run_env/id1/ via `qcc -pak`
+make TARGET=qplusqc qcclean                 # remove progs.dat / progs.src / progdefs.h
+```
+
+Switch which mod source tree is compiled via `QC_DIR` (default set per-target
+in `trg_<TARGET>.mk`):
+
+```bash
+make TARGET=qplusqc QC_DIR=../src/game/GamesQC/v101qc qcbuild
+```
+
+Only `qplusqc` and `v101qc` are wired up so far; the other trees under
+`src/game/GamesQC/` (`quakec`, `quakec_ctf`, `quakec_hipnotic`, `quakec_mg1`,
+`quakec_rogue` — id's 2021 re-release sources) don't have a `trg_*.mk` yet.
+
+**Note:** `progs.src` is regenerated in-place inside `QC_DIR` (under `src/`)
+on every build and is tracked by git — building with a different `.qc` file
+list/order will show up as a modified file in `git status`.
 
 ### General Make goals
 
